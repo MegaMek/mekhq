@@ -1048,7 +1048,10 @@ public class MissionViewPanel extends JScrollablePanel {
 
         addDescriptionPane(contract.getDescription(), y++, 0.0);
 
-        // Enemy morale is shown at the very bottom of the panel, as a labelled gauge.
+        // Enemy morale is shown as a labelled gauge at the very bottom of the panel, after the contract description.
+        // This (always-present) row carries the panel's vertical weight so the contract stats stay anchored to the top
+        // rather than centering; SOUTHWEST anchoring keeps the fixed-height gauge pinned to the bottom of that row, so
+        // any extra vertical space falls above the gauge instead of below it.
         final MoraleBar.MoraleDisplay moraleDisplay = MoraleBar.getMoraleDisplay(contract);
         final String moraleText = moraleDisplay.label();
         final String moraleTooltip = moraleDisplay.tooltip();
@@ -1063,7 +1066,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new Insets(UIUtil.scaleForGUI(6), 0, 2, 0);
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.anchor = GridBagConstraints.SOUTHWEST;
         pnlStats.add(moraleBar, gridBagConstraints);
     }
 

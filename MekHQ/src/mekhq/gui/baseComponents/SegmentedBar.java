@@ -42,12 +42,14 @@ import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import javax.swing.JComponent;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.client.ui.util.UIUtil;
-import megamek.common.annotations.Nullable;
 
 /**
  * A compact, reusable gauge that draws a row of equally-sized colored segments.
@@ -76,7 +78,7 @@ public class SegmentedBar extends JComponent {
      * @param color   the fill color used when the segment is active
      * @param tooltip the tooltip to show when hovering this segment, or {@code null} for no tooltip
      */
-    public record Segment(Color color, @Nullable String tooltip) {
+    public record Segment(@Nonnull Color color, @Nullable String tooltip) {
     }
 
     private static final int DEFAULT_GAP = 2;
@@ -268,7 +270,7 @@ public class SegmentedBar extends JComponent {
      * @param g2     the graphics context to paint on
      * @param filled the effective number of filled segments
      */
-    private void paintActiveLabel(final Graphics2D g2, final int filled) {
+    private void paintActiveLabel(@Nonnull final Graphics2D g2, final int filled) {
         if ((activeLabel == null) || activeLabel.isBlank() || (filled <= 0)) {
             return;
         }
@@ -288,7 +290,7 @@ public class SegmentedBar extends JComponent {
     }
 
     @Override
-    public @Nullable String getToolTipText(final MouseEvent event) {
+    public @Nullable String getToolTipText(@Nonnull final MouseEvent event) {
         for (int i = 0; i < segments.size(); i++) {
             final Rectangle bounds = segmentBounds(i);
             if ((bounds != null) && bounds.contains(event.getPoint())) {
@@ -307,21 +309,34 @@ public class SegmentedBar extends JComponent {
      *
      * @return the neutral color
      */
-    private static Color neutralColor() {
+    private static @Nonnull Color neutralColor() {
         final Color foreground = UIManager.getColor("Label.foreground");
         return (foreground == null) ? Color.GRAY : foreground;
     }
 
     /**
      * Builds a list of segments whose colors are interpolated across the given gradient anchors. The number of
-     * segments equals the number of tooltips; anchor colors are spread evenly across that range.
+     * segments equals the number of tooltips; anchor colors are spread evenly across that range. An empty
+     * {@code tooltips} array yields an empty segment list (a bar with nothing to draw).
      *
-     * @param anchors  two or more colors to interpolate across, from first segment to last
-     * @param tooltips one tooltip per segment (its length determines the number of segments)
+     * @param anchors  one or more colors to interpolate across, from first segment to last; must not be {@code null}
+     *                 or empty
+     * @param tooltips one tooltip per segment (its length determines the number of segments); must not be
+     *                 {@code null}, though individual entries may be {@code null} for a segment with no tooltip
      *
      * @return the generated segments
+     *
+     * @throws NullPointerException     if {@code anchors} or {@code tooltips} is {@code null}
+     * @throws IllegalArgumentException if {@code anchors} is empty
      */
-    public static List<Segment> gradientSegments(final Color[] anchors, final String[] tooltips) {
+    public static @Nonnull List<Segment> gradientSegments(@Nonnull final Color[] anchors,
+          @Nonnull final String[] tooltips) {
+        Objects.requireNonNull(anchors, "anchors must not be null");
+        Objects.requireNonNull(tooltips, "tooltips must not be null");
+        if (anchors.length == 0) {
+            throw new IllegalArgumentException("anchors must contain at least one color");
+        }
+
         final int count = tooltips.length;
         final List<Segment> result = new ArrayList<>(count);
         for (int i = 0; i < count; i++) {
@@ -333,26 +348,42 @@ public class SegmentedBar extends JComponent {
     /**
      * Convenience overload that interpolates between a single start and end color.
      *
-     * @param start    the color of the first segment
-     * @param end      the color of the last segment
-     * @param tooltips one tooltip per segment (its length determines the number of segments)
+     * @param start    the color of the first segment; must not be {@code null}
+     * @param end      the color of the last segment; must not be {@code null}
+     * @param tooltips one tooltip per segment (its length determines the number of segments); must not be {@code null}
      *
      * @return the generated segments
+     *
+     * @throws NullPointerException if {@code start}, {@code end}, or {@code tooltips} is {@code null}
      */
-    public static List<Segment> gradientSegments(final Color start, final Color end, final String[] tooltips) {
+    public static @Nonnull List<Segment> gradientSegments(@Nonnull final Color start, @Nonnull final Color end,
+          @Nonnull final String[] tooltips) {
+        Objects.requireNonNull(start, "start must not be null");
+        Objects.requireNonNull(end, "end must not be null");
         return gradientSegments(new Color[] { start, end }, tooltips);
     }
 
     /**
      * Computes a single interpolated color for a segment index within a gradient.
      *
-     * @param anchors two or more colors to interpolate across
+     * @param anchors one or more colors to interpolate across; must not be {@code null} or empty
      * @param count   the total number of segments
-     * @param index   the zero-based index of the segment to color
+     * @param index   the zero-based index of the segment to color; must be in the range {@code [0, count)}
      *
      * @return the interpolated color for the segment
+     *
+     * @throws NullPointerException     if {@code anchors} is {@code null}
+     * @throws IllegalArgumentException if {@code anchors} is empty, or if {@code index} is outside {@code [0, count)}
      */
-    public static Color interpolatedColor(final Color[] anchors, final int count, final int index) {
+    public static @Nonnull Color interpolatedColor(@Nonnull final Color[] anchors, final int count, final int index) {
+        Objects.requireNonNull(anchors, "anchors must not be null");
+        if (anchors.length == 0) {
+            throw new IllegalArgumentException("anchors must contain at least one color");
+        }
+        if ((index < 0) || (index >= count)) {
+            throw new IllegalArgumentException("index must be in the range [0, " + count + "), but was " + index);
+        }
+
         if ((count <= 1) || (anchors.length == 1)) {
             return anchors[0];
         }
@@ -364,7 +395,7 @@ public class SegmentedBar extends JComponent {
         return interpolate(anchors[lower], anchors[upper], scaled - lower);
     }
 
-    private static Color interpolate(final Color from, final Color to, final float t) {
+    private static @Nonnull Color interpolate(@Nonnull final Color from, @Nonnull final Color to, final float t) {
         final int red = Math.round(from.getRed() + (to.getRed() - from.getRed()) * t);
         final int green = Math.round(from.getGreen() + (to.getGreen() - from.getGreen()) * t);
         final int blue = Math.round(from.getBlue() + (to.getBlue() - from.getBlue()) * t);

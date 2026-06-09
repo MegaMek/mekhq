@@ -33,17 +33,16 @@
 package mekhq.gui.view;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.util.List;
-import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.client.ui.util.UIUtil;
-import megamek.common.annotations.Nullable;
-import mekhq.MekHQ;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.gui.baseComponents.SegmentedBar;
@@ -59,15 +58,11 @@ import mekhq.gui.baseComponents.SegmentedBar;
  * Hovering a segment shows the name and description of that morale level.
  * </p>
  *
- * <p>
- * This wraps a private {@link SegmentedBar} (composition rather than inheritance) so that only the morale-specific API
- * is exposed; callers cannot reconfigure the underlying segments and break the "one segment per morale level"
- * invariant.
- * </p>
- *
  * @author The MegaMek Team
  */
 public class MoraleBar extends JPanel {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.ContractViewPanel";
+
     /**
      * Anchor colors for the morale gradient, ordered from the lowest enemy morale to the highest. Low enemy morale is
      * green (favourable for the player) and high enemy morale is red (dangerous for the player), so the gauge reads as
@@ -90,51 +85,16 @@ public class MoraleBar extends JPanel {
     private final SegmentedBar bar = new SegmentedBar();
 
     /**
-     * Creates a morale bar for the given morale level.
+     * Creates a morale bar for the given morale level, with a label drawn beneath the active segment.
      *
-     * @param moraleLevel the enemy morale level to display; may be {@code null}, in which case nothing is painted
+     * @param moraleLevel the enemy morale level to display
+     * @param labelText   the text to show beneath the current level (for example the morale level's name, or a
+     *                    contract-specific name such as "Peaceful"). Pass a blank string to show no label.
      */
-    public MoraleBar(final @Nullable AtBMoraleLevel moraleLevel) {
-        this(moraleLevel, (moraleLevel == null) ? null : moraleLevel.toString());
-    }
-
-    /**
-     * Creates a morale bar for the given morale level with a custom label drawn beneath the active segment.
-     *
-     * @param moraleLevel the enemy morale level to display; may be {@code null}, in which case nothing is painted
-     * @param labelText   the text to show beneath the current level (for example a contract-specific name such as
-     *                    "Peaceful"), or {@code null} to use the morale level's own name
-     */
-    public MoraleBar(final @Nullable AtBMoraleLevel moraleLevel, final @Nullable String labelText) {
+    public MoraleBar(@Nonnull final AtBMoraleLevel moraleLevel, @Nonnull final String labelText) {
         super(new BorderLayout());
         setOpaque(false);
         add(bar, BorderLayout.CENTER);
-        setMoraleLevel(moraleLevel, labelText);
-    }
-
-    /**
-     * Updates the displayed morale level and repaints the bar. The label beneath the active segment defaults to the
-     * morale level's own name.
-     *
-     * @param moraleLevel the new enemy morale level to display, or {@code null} to clear the bar
-     */
-    public void setMoraleLevel(final @Nullable AtBMoraleLevel moraleLevel) {
-        setMoraleLevel(moraleLevel, (moraleLevel == null) ? null : moraleLevel.toString());
-    }
-
-    /**
-     * Updates the displayed morale level and the label drawn beneath the active segment, then repaints the bar.
-     *
-     * @param moraleLevel the new enemy morale level to display, or {@code null} to clear the bar
-     * @param labelText   the text to show beneath the current level, or {@code null} for no label
-     */
-    public void setMoraleLevel(final @Nullable AtBMoraleLevel moraleLevel, final @Nullable String labelText) {
-        if (moraleLevel == null) {
-            bar.setSegments(List.of());
-            bar.setFilledCount(0);
-            bar.setActiveLabel(null);
-            return;
-        }
 
         final AtBMoraleLevel[] levels = AtBMoraleLevel.values();
         final String[] tooltips = new String[levels.length];
@@ -168,7 +128,7 @@ public class MoraleBar extends JPanel {
      *
      * @return a transparent panel containing the configured morale bar
      */
-    public static JPanel createDialogPanel(final AtBContract contract) {
+    public static @Nonnull JPanel createDialogPanel(@Nonnull final AtBContract contract) {
         final JPanel panel = new JPanel(new BorderLayout());
         panel.setOpaque(false);
         final int horizontalPadding = UIUtil.scaleForGUI(40);
@@ -189,7 +149,7 @@ public class MoraleBar extends JPanel {
      * @param label   the short morale name to show (e.g. a morale level name, or "Peaceful")
      * @param tooltip the descriptive tooltip for that morale state
      */
-    public record MoraleDisplay(String label, String tooltip) {
+    public record MoraleDisplay(@Nonnull String label, @Nonnull String tooltip) {
     }
 
     /**
@@ -201,14 +161,12 @@ public class MoraleBar extends JPanel {
      *
      * @return the label and tooltip to display
      */
-    public static MoraleDisplay getMoraleDisplay(final AtBContract contract) {
+    public static @Nonnull MoraleDisplay getMoraleDisplay(@Nonnull final AtBContract contract) {
         final AtBMoraleLevel level = contract.getMoraleLevel();
         if ((contract.getContractType().isGarrisonDuty() || contract.getContractType().isRetainer()) &&
                 level.isRouted()) {
-            final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.ContractViewPanel",
-                    MekHQ.getMHQOptions().getLocale());
-            return new MoraleDisplay(resources.getString("txtGarrisonMoraleRouted.text"),
-                    resources.getString("txtGarrisonMoraleRouted.tooltip"));
+            return new MoraleDisplay(getTextAt(RESOURCE_BUNDLE, "txtGarrisonMoraleRouted.text"),
+                    getTextAt(RESOURCE_BUNDLE, "txtGarrisonMoraleRouted.tooltip"));
         }
         return new MoraleDisplay(level.toString(), level.getToolTipText());
     }
