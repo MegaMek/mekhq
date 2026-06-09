@@ -3670,10 +3670,21 @@ public class Campaign implements ITechManager, IPlace {
         report += "  needs " + target.getValueAsString();
         report += " and rolls " + roll + ':';
         // Edge reroll, if applicable
-        if (getCampaignOptions().isUseSupportEdge() &&
+        int targetValue = target.getValue();
+        boolean isUseSupportEdge = getCampaignOptions().isUseSupportEdge();
+        boolean hasEdgeTrigger = isUseSupportEdge && person != null;
+        if (hasEdgeTrigger) {
+            if (targetValue >= 11) {
+                hasEdgeTrigger = person.getOptions().booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL_ELEVEN);
+            } else if (targetValue >= 8) {
+                hasEdgeTrigger = person.getOptions().booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL_EIGHT);
+            } else {
+                hasEdgeTrigger = person.getOptions().booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL_OTHER);
+            }
+        }
+        if (isUseSupportEdge &&
                   (roll < target.getValue()) &&
-                  (person != null) &&
-                  person.getOptions().booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL) &&
+                  hasEdgeTrigger &&
                   (person.getCurrentEdge() > 0)) {
             person.changeCurrentEdge(-1);
             roll = d6(2);

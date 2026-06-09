@@ -3562,10 +3562,33 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     menu.add(cbMenuItem);
 
                     // Admins
-                    cbMenuItem = new JCheckBoxMenuItem(resources.getString("edgeTriggerAcquireCheck.text"));
-                    cbMenuItem.setSelected(person.getOptions().booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL));
+                    cbMenuItem = new JCheckBoxMenuItem(resources.getString("edgeTriggerAcquireCheckOther.text"));
+                    cbMenuItem.setSelected(person.getOptions()
+                                                 .booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL_OTHER));
                     cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER,
-                          PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL));
+                          PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL_OTHER));
+                    if (!person.getPrimaryRole().isAdministrator()) {
+                        cbMenuItem.setForeground(new Color(150, 150, 150));
+                    }
+                    cbMenuItem.addActionListener(this);
+                    menu.add(cbMenuItem);
+
+                    cbMenuItem = new JCheckBoxMenuItem(resources.getString("edgeTriggerAcquireCheckEight.text"));
+                    cbMenuItem.setSelected(person.getOptions()
+                                                 .booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL_EIGHT));
+                    cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER,
+                          PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL_EIGHT));
+                    if (!person.getPrimaryRole().isAdministrator()) {
+                        cbMenuItem.setForeground(new Color(150, 150, 150));
+                    }
+                    cbMenuItem.addActionListener(this);
+                    menu.add(cbMenuItem);
+
+                    cbMenuItem = new JCheckBoxMenuItem(resources.getString("edgeTriggerAcquireCheckEleven.text"));
+                    cbMenuItem.setSelected(person.getOptions()
+                                                 .booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL_ELEVEN));
+                    cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER,
+                          PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL_ELEVEN));
                     if (!person.getPrimaryRole().isAdministrator()) {
                         cbMenuItem.setForeground(new Color(150, 150, 150));
                     }
@@ -3671,9 +3694,23 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     menuItem.addActionListener(this);
                     submenu.add(menuItem);
 
-                    menuItem = new JMenuItem(resources.getString("edgeTriggerAcquireCheck.text"));
+                    menuItem = new JMenuItem(resources.getString("edgeTriggerAcquireCheckOther.text"));
                     menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER,
-                          PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL,
+                          PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL_OTHER,
+                          TRUE));
+                    menuItem.addActionListener(this);
+                    submenu.add(menuItem);
+
+                    menuItem = new JMenuItem(resources.getString("edgeTriggerAcquireCheckEight.text"));
+                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER,
+                          PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL_EIGHT,
+                          TRUE));
+                    menuItem.addActionListener(this);
+                    submenu.add(menuItem);
+
+                    menuItem = new JMenuItem(resources.getString("edgeTriggerAcquireCheckEleven.text"));
+                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER,
+                          PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL_ELEVEN,
                           TRUE));
                     menuItem.addActionListener(this);
                     submenu.add(menuItem);
@@ -3771,9 +3808,23 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     menuItem.addActionListener(this);
                     submenu.add(menuItem);
 
-                    menuItem = new JMenuItem(resources.getString("edgeTriggerAcquireCheck.text"));
+                    menuItem = new JMenuItem(resources.getString("edgeTriggerAcquireCheckOther.text"));
                     menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER,
-                          PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL,
+                          PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL_OTHER,
+                          FALSE));
+                    menuItem.addActionListener(this);
+                    submenu.add(menuItem);
+
+                    menuItem = new JMenuItem(resources.getString("edgeTriggerAcquireCheckEight.text"));
+                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER,
+                          PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL_EIGHT,
+                          FALSE));
+                    menuItem.addActionListener(this);
+                    submenu.add(menuItem);
+
+                    menuItem = new JMenuItem(resources.getString("edgeTriggerAcquireCheckEleven.text"));
+                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER,
+                          PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL_ELEVEN,
                           FALSE));
                     menuItem.addActionListener(this);
                     submenu.add(menuItem);
