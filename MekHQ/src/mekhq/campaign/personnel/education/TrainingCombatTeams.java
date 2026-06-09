@@ -561,17 +561,16 @@ public class TrainingCombatTeams {
     /**
      * Returns {@code true} if the given skill name is present as a key in the educator's skill map.
      *
-     * @param educatorSkills              the skill map to query; must not be {@code null}
-     * @param currentInfantryGunnerySkill the skill name to look up
+     * @param educatorSkills the skill map to query; must not be {@code null}
+     * @param skillName      the skill name to look up
      *
      * @return {@code true} if {@code educatorSkills} contains the specified skill
      *
      * @author Illiani
      * @since 0.51.01
      */
-    private static boolean isSkillAmongEducatorSkills(Map<String, Integer> educatorSkills,
-          String currentInfantryGunnerySkill) {
-        return educatorSkills.containsKey(currentInfantryGunnerySkill);
+    private static boolean isSkillAmongEducatorSkills(Map<String, Integer> educatorSkills, String skillName) {
+        return educatorSkills.containsKey(skillName);
     }
 
     /**
