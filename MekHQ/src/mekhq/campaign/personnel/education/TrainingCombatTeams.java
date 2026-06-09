@@ -484,9 +484,10 @@ public class TrainingCombatTeams {
 
         for (Person educator : educators) {
             getProfessionSkillsForEducator(professionSkills, educator, educatorSkills);
-            filterInfantryGunnerySkillsForEducator(educatorSkills);
-            filterScoutingSkillsForEducator(educatorSkills);
         }
+
+        filterInfantryGunnerySkillsForEducator(educatorSkills);
+        filterScoutingSkillsForEducator(educatorSkills);
 
         return educatorSkills;
     }
