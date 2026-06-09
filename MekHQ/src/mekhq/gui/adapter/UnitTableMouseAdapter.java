@@ -33,6 +33,7 @@
 package mekhq.gui.adapter;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
+import static megamek.common.enums.SkillLevel.ELITE;
 import static megamek.common.enums.SkillLevel.GREEN;
 import static megamek.common.enums.SkillLevel.HEROIC;
 import static megamek.common.enums.SkillLevel.LEGENDARY;
@@ -478,6 +479,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 SkillLevel skillLevel = switch (command) {
                     case String s when s.contains("LEGENDARY") -> LEGENDARY;
                     case String s when s.contains("HEROIC") -> HEROIC;
+                    case String s when s.contains("ELITE") -> ELITE;
                     case String s when s.contains("VETERAN") -> VETERAN;
                     case String s when s.contains("REGULAR") -> REGULAR;
                     // Must come before GREEN as ULTRA_GREEN contains GREEN
