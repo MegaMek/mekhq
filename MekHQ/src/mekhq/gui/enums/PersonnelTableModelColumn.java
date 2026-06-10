@@ -898,7 +898,7 @@ public enum PersonnelTableModelColumn {
             case LOCATION_SYSTEM -> {
                 AbstractLocation location = getPersonLocation(person);
                 if (location != null) {
-                    var system = location.getCurrentSystem();
+                    PlanetarySystem system = location.getCurrentSystem();
                     yield system != null ? system.getPrintableName(today) : "-";
                 }
                 yield "-";
