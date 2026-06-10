@@ -37,46 +37,51 @@ import java.io.PrintWriter;
 import megamek.common.equipment.EquipmentType;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.parts.Part;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
  * The "missing" / needs-acquisition counterpart of {@link InfantryDisposableWeaponPart}. It is the acquisition work for
- * buying a spare Disposable Weapon (TO:AR p.106) loadout, and {@link #getNewPart()} produces the correctly-typed spare
- * so a fired platoon's disposables can be reloaded from warehouse stock.
+ * buying a spare Disposable Weapon (TO:AR p.106). One is created per missing trooper's disposable, so a refit shops for
+ * one per trooper. It accepts a plain {@link EquipmentPart} of the same weapon type as a replacement, because the parts
+ * store stocks a disposable weapon as a generic EquipmentPart - so existing warehouse stock is consumed first.
  */
 public class MissingInfantryDisposableWeaponPart extends MissingEquipmentPart {
     private static final MMLogger LOGGER = MMLogger.create(MissingInfantryDisposableWeaponPart.class);
     private static final String DISPOSABLE_SUFFIX = " (Disposable)";
 
-    private int troopers;
-
     public MissingInfantryDisposableWeaponPart() {
-        this(0, null, -1, 0, null);
+        this(0, null, -1, null);
     }
 
-    public MissingInfantryDisposableWeaponPart(int tonnage, EquipmentType et, int equipNum, int troopers, Campaign c) {
+    public MissingInfantryDisposableWeaponPart(int tonnage, EquipmentType et, int equipNum, Campaign c) {
         super(tonnage, et, equipNum, c, (et == null) ? 0 : et.getTonnage(null, 1.0), 1.0, false);
-        this.troopers = troopers;
         if (et != null) {
             name = et.getName() + DISPOSABLE_SUFFIX;
         }
     }
 
-    public int getTroopers() {
-        return troopers;
+    @Override
+    public InfantryDisposableWeaponPart getNewPart() {
+        return new InfantryDisposableWeaponPart(getUnitTonnage(), type, -1, campaign);
     }
 
     @Override
-    public InfantryDisposableWeaponPart getNewPart() {
-        return new InfantryDisposableWeaponPart(getUnitTonnage(), type, -1, troopers, campaign);
+    public boolean isAcceptableReplacement(Part part, boolean refit) {
+        // Match any spare weapon part of the same weapon type - the parts store stocks a disposable weapon as a plain
+        // EquipmentPart, so existing warehouse stock (and freshly bought spares) satisfy the refit/replacement.
+        return (part instanceof EquipmentPart equipmentPart)
+              && (type != null)
+              && (equipmentPart.getType() != null)
+              && type.getInternalName().equals(equipmentPart.getType().getInternalName());
     }
 
     @Override
     public MissingInfantryDisposableWeaponPart clone() {
         MissingInfantryDisposableWeaponPart clone = new MissingInfantryDisposableWeaponPart(getUnitTonnage(), getType(),
-              getEquipmentNum(), troopers, campaign);
+              getEquipmentNum(), campaign);
         clone.copyBaseData(this);
         return clone;
     }
@@ -87,7 +92,6 @@ public class MissingInfantryDisposableWeaponPart extends MissingEquipmentPart {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "typeName", type.getInternalName());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "equipmentNum", equipmentNum);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "equipTonnage", equipTonnage);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "troopers", troopers);
         writeToXMLEnd(pw, indent);
     }
 
@@ -103,8 +107,6 @@ public class MissingInfantryDisposableWeaponPart extends MissingEquipmentPart {
                     typeName = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("equipTonnage")) {
                     equipTonnage = Double.parseDouble(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("troopers")) {
-                    troopers = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
                 LOGGER.error("", e);

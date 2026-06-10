@@ -3894,13 +3894,17 @@ public class Unit implements ITechnology, ILocation {
                 EquipmentType type = m.getType();
                 if ((entity instanceof BattleArmor) && (m instanceof WeaponMounted weaponMounted)
                       && weaponMounted.isDisposableWeapon()) {
-                    // Disposable Weapon (TO:AR p.106): one squad loadout part, mount-linked to track firing,
-                    // instead of the per-trooper parts used for ordinary BA equipment.
+                    // Disposable Weapon (TO:AR p.106): one per trooper (squad size), valued/bought/sold individually,
+                    // instead of the per-trooper BattleArmorEquipmentPart used for ordinary BA equipment.
                     if (disposableW == null) {
-                        disposableW = new InfantryDisposableWeaponPart((int) entity.getWeight(), type, equipmentNum,
-                              ((BattleArmor) entity).getSquadSize(), getCampaign());
-                        addPart(disposableW);
-                        partsToAdd.add(disposableW);
+                        int number = ((BattleArmor) entity).getSquadSize();
+                        while (number > 0) {
+                            disposableW = new InfantryDisposableWeaponPart((int) entity.getWeight(), type, -1,
+                                  getCampaign());
+                            addPart(disposableW);
+                            partsToAdd.add(disposableW);
+                            number--;
+                        }
                     }
                 } else if (entity instanceof BattleArmor) {
                     // for BattleArmor we have multiple parts per mount, one for each trooper
@@ -4584,22 +4588,18 @@ public class Unit implements ITechnology, ILocation {
                     number--;
                 }
             }
-            // Disposable Weapons (TO:AR p.106): one part for the platoon's loadout (one per trooper), mounted on the
-            // real Disposable Weapon slot so it can track whether the platoon fired its disposables this scenario.
+            // Disposable Weapons (TO:AR p.106): one per trooper (like primary/secondary), so the loadout is valued,
+            // refit and bought/sold as that many individual weapons. The platoon shares one fireable mount in combat.
             InfantryWeapon disposableType = infantry.getDisposableWeapon();
             if ((null == disposableW) && (null != disposableType)) {
-                int disposableEquipNum = -1;
-                for (WeaponMounted weaponMounted : entity.getWeaponList()) {
-                    if (weaponMounted.isDisposableWeapon()) {
-                        disposableEquipNum = entity.getEquipmentNum(weaponMounted);
-                        break;
-                    }
+                int number = entity.getOInternal(ConvInfantry.LOC_INFANTRY);
+                while (number > 0) {
+                    disposableW = new InfantryDisposableWeaponPart((int) entity.getWeight(), disposableType, -1,
+                          getCampaign());
+                    addPart(disposableW);
+                    partsToAdd.add(disposableW);
+                    number--;
                 }
-                int troopers = entity.getOInternal(ConvInfantry.LOC_INFANTRY);
-                disposableW = new InfantryDisposableWeaponPart((int) entity.getWeight(), disposableType,
-                      disposableEquipNum, troopers, getCampaign());
-                addPart(disposableW);
-                partsToAdd.add(disposableW);
             }
         }
         if (getEntity() instanceof LandAirMek) {

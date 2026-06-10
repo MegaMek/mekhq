@@ -3376,11 +3376,16 @@ public class Campaign implements ITechManager, IPlace {
                             double logisticianModifier = options.booleanOption(ADMIN_LOGISTICIAN) ? 0.9 : 1.0;
                             transitTime = (int) Math.round(transitTime * logisticianModifier);
 
+                            int requestedQuantity = shoppingItem.getQuantity();
                             int totalQuantity = 0;
                             while (shoppingItem.getQuantity() > 0 &&
                                          canAcquireParts(person) &&
                                          acquireEquipment(shoppingItem, person, system, transitTime)) {
                                 totalQuantity++;
+                            }
+                            // A bulk infantry order is filled by a single roll; report the full amount delivered.
+                            if (shoppingItem.isBulkAcquisition()) {
+                                totalQuantity = requestedQuantity - shoppingItem.getQuantity();
                             }
                             if (totalQuantity > 0) {
                                 addReport(ACQUISITIONS, personTitle +
@@ -3708,6 +3713,19 @@ public class Campaign implements ITechManager, IPlace {
             }
             report = report + acquisition.find(transitDays, valueChange) + ' ' + appraisalReport;
             found = true;
+            // Infantry weapons and ammo ship as a single bulk order: this one successful roll supplies the rest of the
+            // platoon's quantity too (while it can be paid for), counting as a single acquisition for the daily limit.
+            if (acquisition.isBulkAcquisition()) {
+                int bulkDelivered = 1;
+                while ((acquisition.getQuantity() > 1) && canPayFor(acquisition)) {
+                    acquisition.find(transitDays, valueChange);
+                    acquisition.decrementQuantity();
+                    bulkDelivered++;
+                }
+                if (bulkDelivered > 1) {
+                    report += " (bulk order of " + bulkDelivered + ")";
+                }
+            }
             if (person != null) {
                 if (roll == 12 && target.getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
                     xpGained += getCampaignOptions().getSuccessXP();

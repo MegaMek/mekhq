@@ -44,88 +44,87 @@ import java.lang.reflect.Field;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.parts.Part;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests {@link InfantryDisposableWeaponPart} - the Disposable Weapon (TO:AR p.106) loadout part used to value and
- * buy/sell a conventional infantry platoon's disposable weapons.
+ * Tests {@link InfantryDisposableWeaponPart} - a single per-trooper Disposable Weapon (TO:AR p.106). A platoon gets one
+ * of these per trooper, so it is valued/refit/bought-and-sold as an individual weapon.
  */
 class InfantryDisposableWeaponPartTest {
 
     private static final String LAW = "Rocket Launcher (LAW)";
-    private static final int TROOPERS = 28;
 
     @BeforeAll
     static void initializeEquipment() {
         EquipmentType.initializeTypes();
     }
 
-    private static InfantryDisposableWeaponPart newPart(int troopers) {
+    private static InfantryDisposableWeaponPart newPart() {
         InfantryWeapon law = (InfantryWeapon) EquipmentType.get(LAW);
-        return new InfantryDisposableWeaponPart(0, law, -1, troopers, mock(Campaign.class));
+        return new InfantryDisposableWeaponPart(0, law, -1, mock(Campaign.class));
     }
 
     @Test
     @DisplayName("name is the weapon name with a (Disposable) suffix")
     void nameHasDisposableSuffix() {
-        assertEquals("Rocket Launcher (LAW) (Disposable)", newPart(TROOPERS).getName());
+        assertEquals("Rocket Launcher (LAW) (Disposable)", newPart().getName());
     }
 
     @Test
     @DisplayName("a disposable weapon part is not a primary weapon and starts unspent")
     void notPrimaryAndUnspent() {
-        InfantryDisposableWeaponPart part = newPart(TROOPERS);
+        InfantryDisposableWeaponPart part = newPart();
         assertFalse(part.isPrimary());
         assertFalse(part.isSpent());
         assertFalse(part.needsFixing());
     }
 
     @Test
-    @DisplayName("the loadout is valued at the weapon cost times the number of troopers")
-    void stickerPriceScalesWithTroopers() {
-        Money onePerTrooper = newPart(1).getStickerPrice();
-        Money fullPlatoon = newPart(TROOPERS).getStickerPrice();
-
-        assertTrue(onePerTrooper.isPositive(), "A disposable weapon part should have a positive value");
-        assertEquals(onePerTrooper.multipliedBy(TROOPERS), fullPlatoon);
+    @DisplayName("each disposable weapon part is valued at the single weapon's cost")
+    void stickerPriceIsWeaponCost() {
+        assertTrue(newPart().getStickerPrice().isPositive(), "A disposable weapon part should have a positive value");
     }
 
     @Test
     @DisplayName("clone produces an equal, distinct part of the same type")
     void cloneIsDistinctSameType() {
-        InfantryDisposableWeaponPart part = newPart(TROOPERS);
+        InfantryDisposableWeaponPart part = newPart();
         InfantryDisposableWeaponPart clone = part.clone();
 
         assertNotSame(part, clone);
         assertInstanceOf(InfantryDisposableWeaponPart.class, clone);
         assertEquals(part.getName(), clone.getName());
-        assertEquals(part.getTroopers(), clone.getTroopers());
         assertTrue(part.isSamePartType(clone), "A clone should be the same part type for warehouse/acquisition");
     }
 
     @Test
-    @DisplayName("the missing part produces a matching spare for reload-from-stock")
-    void missingPartProducesMatchingSpare() {
-        InfantryDisposableWeaponPart part = newPart(TROOPERS);
+    @DisplayName("the missing part accepts a plain EquipmentPart of the same weapon type from stock")
+    void missingPartAcceptsEquipmentPartSpare() {
+        InfantryDisposableWeaponPart part = newPart();
+        InfantryWeapon law = (InfantryWeapon) EquipmentType.get(LAW);
 
         MissingInfantryDisposableWeaponPart missing = part.getMissingPart();
-        assertEquals(TROOPERS, missing.getTroopers());
+        assertInstanceOf(InfantryDisposableWeaponPart.class, missing.getNewPart());
 
-        Part spare = missing.getNewPart();
-        assertInstanceOf(InfantryDisposableWeaponPart.class, spare);
-        assertEquals(TROOPERS, ((InfantryDisposableWeaponPart) spare).getTroopers());
-        assertTrue(part.isSamePartType(spare),
-              "A spare acquired via the missing part must match so a fired loadout can be reloaded from stock");
+        // A LAW stocked as a plain EquipmentPart (what the parts store creates) must satisfy the refit/replacement.
+        EquipmentPart stockSpare = new EquipmentPart(0, law, -1, 1.0, false, mock(Campaign.class));
+        assertTrue(missing.isAcceptableReplacement(stockSpare, true),
+              "An existing EquipmentPart LAW in the warehouse should be an acceptable replacement");
     }
 
     @Test
-    @DisplayName("a spent loadout presents as reloadable work")
-    void spentLoadoutIsReloadWork() throws Exception {
-        InfantryDisposableWeaponPart part = newPart(TROOPERS);
+    @DisplayName("a disposable order is a bulk acquisition (one roll fills the whole platoon)")
+    void missingPartIsBulkAcquisition() {
+        assertTrue(newPart().getMissingPart().isBulkAcquisition(),
+              "Infantry disposable weapons should be ordered as a single bulk acquisition");
+    }
+
+    @Test
+    @DisplayName("a spent disposable presents as reloadable work")
+    void spentIsReloadWork() throws Exception {
+        InfantryDisposableWeaponPart part = newPart();
         Field spentField = InfantryDisposableWeaponPart.class.getDeclaredField("spent");
         spentField.setAccessible(true);
         spentField.set(part, true);

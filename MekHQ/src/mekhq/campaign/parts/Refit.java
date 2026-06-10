@@ -212,23 +212,6 @@ public class Refit extends Part implements IAcquisitionWork {
         replacingLocations = false;
         campaign = oldUnit.getCampaign();
         calculate();
-        // [REFIT-DIAG] Dump the calculation result so we can see why a refit (e.g. infantry disposables) is blocked.
-        LOGGER.info("[REFIT-DIAG] Refit.calculate() done: oldUnit='{}', newEntity={}, refitClass={} ('{}'), "
-                    + "customJob={}, kitFound={}, time={}, errorStrings='{}'",
-              oldUnit.getName(), newEntity.getClass().getSimpleName(), refitClass, getRefitClassName(), customJob,
-              kitFound, time, errorStrings.toString().trim());
-        LOGGER.info("[REFIT-DIAG]   shoppingList ({}): {}", shoppingList.size(), describePartsForDiag(shoppingList));
-        LOGGER.info("[REFIT-DIAG]   newUnitParts ({}): {}", newUnitParts.size(), describePartsForDiag(newUnitParts));
-        LOGGER.info("[REFIT-DIAG]   leftover oldUnitParts ({}): {}", oldUnitParts.size(),
-              describePartsForDiag(oldUnitParts));
-        if ((newEntity instanceof ConvInfantry newInfantry)
-              && (oldUnit.getEntity() instanceof ConvInfantry oldInfantry)) {
-            LOGGER.info("[REFIT-DIAG]   disposable weapon old='{}' new='{}'",
-                  (oldInfantry.getDisposableWeapon() == null) ? "none"
-                        : oldInfantry.getDisposableWeapon().getInternalName(),
-                  (newInfantry.getDisposableWeapon() == null) ? "none"
-                        : newInfantry.getDisposableWeapon().getInternalName());
-        }
 
         // Using Customize -> Refit/Customize... -> Customize to Model will pass in TRUE for "custom". We do not want
         // to rename infantry if we're refitting to an existing model, but if we're editing in the MekLab tab we
@@ -1401,11 +1384,6 @@ public class Refit extends Part implements IAcquisitionWork {
         orderArmorSupplies();
         shoppingList = newShoppingList;
 
-        // [REFIT-DIAG] Show what the refit is still waiting on each day.
-        LOGGER.info("[REFIT-DIAG] acquireParts: stillNeeded={}, partsInTransit={}, armorNeeded={}, armorHave={}",
-              describePartsForDiag(shoppingList), partsInTransit(), armorNeeded,
-              (newArmorSupplies == null) ? 0 : newArmorSupplies.getAmount());
-
         // Also, check to make sure that they're not still in transit! - ralgith
         // 2013/07/09
         if (partsInTransit()) {
@@ -2307,15 +2285,6 @@ public class Refit extends Part implements IAcquisitionWork {
         return errorStrings.length() == 0 ? null : errorStrings.toString();
     }
 
-    /** [REFIT-DIAG] Formats a part list (class + name) for diagnostic logging. */
-    private static String describePartsForDiag(List<Part> parts) {
-        StringBuilder builder = new StringBuilder();
-        for (Part part : parts) {
-            builder.append(part.getClass().getSimpleName()).append("['").append(part.getName()).append("'] ");
-        }
-        return builder.toString().trim();
-    }
-
     /**
      * Dumps this object into XML for the save file
      *
@@ -2773,13 +2742,19 @@ public class Refit extends Part implements IAcquisitionWork {
         if (newEntity instanceof ConvInfantry infantry) {
             String chassis = getChassis(infantry);
             newEntity.setChassis(chassis);
-            String model = "?";
-            if (infantry.getSecondaryWeaponsPerSquad() > 1 && null != infantry.getSecondaryWeapon()) {
-                model = "(" + infantry.getSecondaryWeapon().getInternalName() + ")";
-            } else if (null != infantry.getPrimaryWeapon()) {
-                model = "(" + infantry.getPrimaryWeapon().getInternalName() + ")";
+            // Only auto-derive a model from the weapons when one has not already been set (by MegaMekLab as the
+            // loadout is edited, or typed in by the user). This preserves a custom Model name through the refit so
+            // the confirmation dialog shows what the user entered.
+            String currentModel = newEntity.getModel();
+            if ((currentModel == null) || currentModel.isBlank() || currentModel.equals("?")) {
+                String model = "?";
+                if (infantry.getSecondaryWeaponsPerSquad() > 1 && null != infantry.getSecondaryWeapon()) {
+                    model = "(" + infantry.getSecondaryWeapon().getInternalName() + ")";
+                } else if (null != infantry.getPrimaryWeapon()) {
+                    model = "(" + infantry.getPrimaryWeapon().getInternalName() + ")";
+                }
+                newEntity.setModel(model);
             }
-            newEntity.setModel(model);
         }
     }
 
