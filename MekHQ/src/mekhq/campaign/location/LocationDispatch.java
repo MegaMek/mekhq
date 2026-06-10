@@ -70,8 +70,8 @@ public final class LocationDispatch {
      * Returns the transit time from {@code fromSystem} that should be used as the start-transit
      * parameter when calculating a new journey's duration.
      *
-     * <p>When the campaign JumpShip is already in-system, we inherit its current transit progress.
-     * When there is no campaign location (e.g., the faction has no fixed JumpShip), we assume the
+     * <p>When already in-system, we inherit its current transit progress.
+     * When there is no location, we assume the
      * traveler starts at the outer jump point of their system.</p>
      *
      * @param fromSystem the departure system; must not be {@code null}
