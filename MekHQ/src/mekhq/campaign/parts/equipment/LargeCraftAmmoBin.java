@@ -43,7 +43,6 @@ import megamek.common.equipment.WeaponMounted;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.location.IPlace;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
 import mekhq.utilities.MHQXMLUtility;
@@ -409,10 +408,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
         if (null != unit) {
             String availability = "";
             int shotsAvailable = getAmountAvailable();
-            IPlace place = getPlace();
-            PartInventory inventories = (place != null)
-                    ? place.getPartInventory(getNewPart())
-                    : campaign.getPartInventory(getNewPart());
+            PartInventory inventories = getPartInventory(getNewPart());
             if (shotsAvailable == 0) {
                 availability = "<br><font color='" +
                                      ReportingUtilities.getNegativeColor() +

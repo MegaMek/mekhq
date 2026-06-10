@@ -46,7 +46,6 @@ import javax.swing.table.TableCellRenderer;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.rolls.TargetRoll;
 import mekhq.IconPackage;
-import mekhq.campaign.location.IPlace;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.parts.PodSpace;
@@ -141,10 +140,7 @@ public class TaskTableModel extends DataTableModel<IPartWork> {
                 if (part instanceof MissingPart) {
                     if (!((MissingPart) part).isReplacementAvailable()) {
                         MissingPart missingPart = (MissingPart) part;
-                        IPlace place = missingPart.getPlace();
-                        PartInventory inventories = (place != null)
-                                ? place.getPartInventory(missingPart.getNewPart())
-                                : gui.getCampaign().getPartInventory(missingPart.getNewPart());
+                        PartInventory inventories = missingPart.getPartInventory(missingPart.getNewPart());
 
                         if ((inventories.getTransit() > 0) || (inventories.getOrdered() > 0)) {
                             availableLevel = REPAIR_STATE.IN_TRANSIT;

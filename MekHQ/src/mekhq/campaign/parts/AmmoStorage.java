@@ -45,7 +45,6 @@ import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.location.IPlace;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
@@ -322,10 +321,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         toReturn += ">";
         toReturn += "<b>" + getAcquisitionDisplayName() + "</b> " + getAcquisitionBonus() + "<br/>";
         toReturn += getAcquisitionExtraDesc() + "<br/>";
-        IPlace place = getPlace();
-        PartInventory inventories = (place != null)
-                ? place.getPartInventory(getAcquisitionPart())
-                : getCampaign().getPartInventory(getAcquisitionPart());
+        PartInventory inventories = getPartInventory(getAcquisitionPart());
         toReturn += inventories.getTransitOrderedDetails() + "<br/>";
         toReturn += getActualValue().toAmountAndSymbolString() + "<br/>";
         toReturn += "</font></html>";

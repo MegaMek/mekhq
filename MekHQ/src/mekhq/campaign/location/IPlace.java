@@ -33,7 +33,11 @@
 
 package mekhq.campaign.location;
 
+import java.util.ArrayList;
+
 import megamek.common.annotations.Nullable;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.Personnel;
 import mekhq.campaign.Warehouse;
@@ -132,5 +136,32 @@ public interface IPlace extends ILocation {
         }
         inventory.setCountModifier(countModifier);
         return inventory;
+    }
+
+    /**
+     * Processes arriving travel nodes parented to this place.
+     *
+     * <p>Landing hangar and warehouse default to this place's own resources; if either is
+     * {@code null} (e.g. a campus that owns no hangar or warehouse) the campaign's resource is
+     * used as a fallback. {@link mekhq.campaign.Campaign} overrides this with its own
+     * implementation and is unaffected.</p>
+     */
+    @Override
+    default void processArrivals(Campaign campaign) {
+        Personnel personnel = getPersonnel();
+        if (personnel == null || !hasLocationNode()) {
+            return;
+        }
+        Hangar hangar = getHangar() != null ? getHangar() : campaign.getHangar();
+        Warehouse warehouse = getWarehouse() != null ? getWarehouse() : campaign.getWarehouse();
+        for (LocationNode child : new ArrayList<>(getLocationNode().getChildren())) {
+            if (!(child.getLocatable() instanceof CurrentLocation travelNode)) {
+                continue;
+            }
+            if (!travelNode.isOnPlanet()) {
+                continue;
+            }
+            LocationDispatch.landFromTravelNode(travelNode, personnel, hangar, warehouse, campaign);
+        }
     }
 }

@@ -1781,7 +1781,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     for (UUID personId : campusLocation.drainPendingPersonIds()) {
                         Person person = campaign.getPerson(personId);
                         if (person != null) {
-                            person.setParent(campusLocation.getCampusPersonnel());
+                            person.setParent(campusLocation.getPersonnel());
                         } else {
                             LOGGER.warn("reconnectPersonsToTravelLocations: person {} not found in campaign", personId);
                         }
@@ -1875,7 +1875,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 if (campusLocation != null) {
                     LOGGER.info("migrateLegacyEducationTravel: placed {} at campus '{}' in system {}",
                           person.getFullTitle(), person.getEduAcademyNameInSet(), systemId);
-                    person.setParent(campusLocation.getCampusPersonnel());
+                    person.setParent(campusLocation.getPersonnel());
                     campusMigrated++;
                 } else {
                     LOGGER.warn("migrateLegacyEducationTravel: getOrCreateCampusLocation returned null for {}"

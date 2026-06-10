@@ -260,33 +260,6 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
         return campaign;
     }
 
-    @Override
-    public Warehouse getWarehouse() {
-        IPlace place = getPlace();
-        if (place != null) {
-            Warehouse w = place.getWarehouse();
-            if (w != null) {
-                return w;
-            }
-        }
-        return campaign.getWarehouse();
-    }
-
-    @Override
-    public IPlace getPlace() {
-        if (unit != null) {
-            return unit.getPlace();
-        }
-        LocationNode node = hasLocationNode() ? getLocationNode() : null;
-        while (node != null) {
-            if (node.getLocatable() instanceof IPlace place) {
-                return place;
-            }
-            node = node.getParent();
-        }
-        return null;
-    }
-
     public String getName() {
         return name;
     }
@@ -416,7 +389,18 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
 
     @Override
     public LocationNode getLocationNode() {
-        return locationNode;
+        return unit != null ? unit.getLocationNode() : locationNode;
+    }
+
+    @Override
+    public Warehouse getWarehouse() {
+        IPlace place = getPlace();
+        return place != null ? place.getWarehouse() : campaign.getWarehouse();
+    }
+
+    public PartInventory getPartInventory(Part forPart) {
+        IPlace place = getPlace();
+        return place != null ? place.getPartInventory(forPart) : campaign.getPartInventory(forPart);
     }
 
     @Override
@@ -1501,17 +1485,10 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
     public void setQuantity(int number) {
         quantity = Math.max(number, 0);
         if (quantity == 0) {
-            // Determine which warehouse actually holds this part.
-            // Dispatched spare parts have their locationNode parent set to a Warehouse node;
-            // main-force parts have no such parent, so fall back to the campaign's main warehouse.
-            LocationNode parentNode = locationNode.getParent();
-            Warehouse owningWarehouse = (parentNode != null && parentNode.getLocatable() instanceof Warehouse w)
-                                              ? w
-                                              : campaign.getWarehouse();
             for (Part childPart : childParts) {
-                owningWarehouse.removePart(childPart);
+                getWarehouse().removePart(childPart);
             }
-            owningWarehouse.removePart(this);
+            getWarehouse().removePart(this);
         }
     }
 

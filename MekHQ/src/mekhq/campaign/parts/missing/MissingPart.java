@@ -48,11 +48,7 @@ import megamek.common.enums.Faction;
 import megamek.common.enums.TechBase;
 import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Warehouse;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.location.IPlace;
-import mekhq.campaign.location.LocationNode;
-import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.parts.Availability;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
@@ -236,10 +232,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
 
     @Override
     public String getDetails(boolean includeRepairDetails) {
-        IPlace place = getPlace();
-        PartInventory inventories = (place != null)
-              ? place.getPartInventory(getNewPart())
-              : campaign.getPartInventory(getNewPart());
+        PartInventory inventories = getPartInventory(getNewPart());
         StringBuilder toReturn = new StringBuilder();
 
         String superDetails = super.getDetails(includeRepairDetails);
@@ -352,17 +345,12 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
 
         toReturn += ">";
         toReturn += "<b>" + getAcquisitionDisplayName() + "</b> " + getAcquisitionBonus() + "<br/>";
-        IPlace place = getPlace();
-        PartInventory inventories = (place != null)
-              ? place.getPartInventory(getNewPart())
-              : campaign.getPartInventory(getNewPart());
+        PartInventory inventories = getPartInventory(getNewPart());
         toReturn += inventories.getTransitOrderedDetails();
         if (!isOmniPodded()) {
             Part newPart = getAcquisitionPart();
             newPart.setOmniPodded(true);
-            inventories = (place != null)
-                  ? place.getPartInventory(newPart)
-                  : campaign.getPartInventory(newPart);
+            inventories = getPartInventory(newPart);
             if (inventories.getSupply() > 0) {
                 toReturn += ", " + inventories.supplyAsString() + " OmniPod";
             }
@@ -491,12 +479,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
             if (replacement.getQuantity() > 1) {
                 Part actualReplacement = replacement.clone();
                 actualReplacement.setReservedBy(getTech());
-                // Add the split-off clone to the same warehouse the original spare is in,
-                // not necessarily the main campaign warehouse.
-                Warehouse localWarehouse = LocationUtils.getEffectiveWarehouse(getUnit(), campaign);
-                localWarehouse.addPart(actualReplacement, true);
-                // Keep the locationNode in sync so setQuantity() later finds the right warehouse.
-                LocationNode.LocationManager.setLocation(actualReplacement, localWarehouse);
+                replacement.getWarehouse().addPart(actualReplacement, true);
                 setReplacementPart(actualReplacement);
                 replacement.changeQuantity(-1);
             } else {
@@ -513,11 +496,8 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
             if (replacement != null) {
                 replacement.setReservedBy(null);
 
-                // Return the reservation back to the warehouse it came from (the unit's
-                // effective warehouse), not unconditionally to the main campaign warehouse.
                 if (replacement.getQuantity() > 0) {
-                    Warehouse localWarehouse = LocationUtils.getEffectiveWarehouse(getUnit(), campaign);
-                    localWarehouse.addPart(replacement, true);
+                    replacement.getWarehouse().addPart(replacement, true);
                 }
             }
         }

@@ -39,7 +39,6 @@ import java.util.UUID;
 
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.Personnel;
 import mekhq.campaign.personnel.Person;
@@ -56,7 +55,7 @@ import org.w3c.dom.NodeList;
  * serving as a child of a {@link mekhq.campaign.FixedLocation} at the same planetary system.
  * Personnel enrolled at the campus can be attached as children of this node.</p>
  */
-public class AcademyCampusLocation implements ILocation {
+public class AcademyCampusLocation implements IPlace {
 
     private static final MMLogger LOGGER = MMLogger.create(AcademyCampusLocation.class);
 
@@ -89,21 +88,9 @@ public class AcademyCampusLocation implements ILocation {
         return locationNode;
     }
 
-    public Personnel getCampusPersonnel() {
-        return personnel;
-    }
-
     @Override
-    public void processArrivals(Campaign campaign) {
-        for (LocationNode child : new ArrayList<>(locationNode.getChildren())) {
-            if (!(child.getLocatable() instanceof CurrentLocation travelNode)) {
-                continue;
-            }
-            if (!travelNode.isOnPlanet()) {
-                continue;
-            }
-            LocationDispatch.landFromTravelNode(travelNode, personnel, campaign, campaign, campaign);
-        }
+    public Personnel getPersonnel() {
+        return personnel;
     }
 
     public void writeToXML(PrintWriter pw, int indent) {

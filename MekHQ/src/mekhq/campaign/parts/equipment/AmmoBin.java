@@ -61,7 +61,6 @@ import megamek.common.units.SmallCraft;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.location.IPlace;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Availability;
 import mekhq.campaign.parts.Part;
@@ -566,10 +565,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         }
         if (null != unit) {
             int shotsAvailable = getAmountAvailable();
-            IPlace place = getPlace();
-            PartInventory inventories = (place != null)
-                                              ? place.getPartInventory(getNewPart())
-                                              : campaign.getPartInventory(getNewPart());
+            PartInventory inventories = getPartInventory(getNewPart());
 
             StringBuilder toReturn = new StringBuilder();
             toReturn.append(getType().getDesc())
@@ -633,10 +629,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         toReturn += ">";
         toReturn += "<b>" + getAcquisitionDisplayName() + "</b> " + getAcquisitionBonus() + "<br/>";
         toReturn += getAcquisitionExtraDesc() + "<br/>";
-        IPlace place = getPlace();
-        PartInventory inventories = (place != null)
-                                          ? place.getPartInventory(getAcquisitionPart())
-                                          : campaign.getPartInventory(getAcquisitionPart());
+        PartInventory inventories = getPartInventory(getAcquisitionPart());
         toReturn += inventories.getTransitOrderedDetails() + "<br/>";
         toReturn += getBuyCost().toAmountAndSymbolString() + "<br/>";
         toReturn += "</font></html>";

@@ -42,7 +42,6 @@ import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.Mounted;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.location.IPlace;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.PartInventory;
 
@@ -220,10 +219,7 @@ public class BattleArmorAmmoBin extends AmmoBin {
         toReturn += ">";
         toReturn += "<b>" + getAcquisitionDisplayName() + "</b> " + getAcquisitionBonus() + "<br/>";
         toReturn += getAcquisitionExtraDesc() + "<br/>";
-        IPlace place = getPlace();
-        PartInventory inventories = (place != null)
-                ? place.getPartInventory(getAcquisitionPart())
-                : campaign.getPartInventory(getAcquisitionPart());
+        PartInventory inventories = getPartInventory(getAcquisitionPart());
         toReturn += inventories.getTransitOrderedDetails() + "<br/>";
         toReturn += getBuyCost().toAmountAndSymbolString() + "<br/>";
         toReturn += "</font></html>";

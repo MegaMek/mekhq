@@ -320,7 +320,7 @@ public class EducationController {
             person.setEduEducationStage(EducationStage.EDUCATION);
             AcademyCampusLocation campusLocation =
                   campaign.getOrCreateLocalCampusLocation(academy.getSet(), academy.getName());
-            person.setParent(campusLocation.getCampusPersonnel());
+            person.setParent(campusLocation.getPersonnel());
         } else {
             person.setEduEducationStage(EducationStage.JOURNEY_TO_CAMPUS);
         }
@@ -416,7 +416,7 @@ public class EducationController {
             person.setEduEducationStage(EducationStage.EDUCATION);
             AcademyCampusLocation campusLoc =
                   campaign.getOrCreateLocalCampusLocation(academy.getSet(), academy.getName());
-            person.setParent(campusLoc.getCampusPersonnel());
+            person.setParent(campusLoc.getPersonnel());
         } else {
             // Person is already at the campus — keep them there and restart the course.
             // The 2-day JOURNEY_TO_CAMPUS stage fires landAtCampus via the day-counter fallback
@@ -658,7 +658,7 @@ public class EducationController {
                 throw new IllegalStateException("Campus location must exist for system " + person.getEduAcademySystem());
             }
         }
-        person.setParent(campusLoc.getCampusPersonnel());
+        person.setParent(campusLoc.getPersonnel());
         LocationDispatch.removeTravelNode(travelLocation, campaign);
         person.setEduEducationStage(EducationStage.EDUCATION);
     }

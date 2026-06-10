@@ -48,7 +48,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.AmmoBin;
@@ -94,12 +93,6 @@ public class PodSpace implements IPartWork {
                 this.location = -1;
             }
         }
-    }
-
-    /** Delegates location to the owning unit; pod spaces have no independent location. */
-    @Override
-    public LocationNode getLocationNode() {
-        return unit != null ? unit.getLocationNode() : null;
     }
 
     @Override
@@ -313,6 +306,11 @@ public class PodSpace implements IPartWork {
     }
 
     @Override
+    public LocationNode getLocationNode() {
+        return unit != null ? unit.getLocationNode() : null;
+    }
+
+    @Override
     public Warehouse getWarehouse() {
         return campaign.getWarehouse();
     }
@@ -466,10 +464,7 @@ public class PodSpace implements IPartWork {
                         replacements++;
                     } else {
                         //FIXME: This won't work if there are multiple items of the same type that need replacing and the number on order or in transit is less than the required number
-                        IPlace place = missing.getPlace();
-                        PartInventory inventories = (place != null)
-                                ? place.getPartInventory(missing.getNewPart())
-                                : campaign.getPartInventory(missing.getNewPart());
+                        PartInventory inventories = missing.getPartInventory(missing.getNewPart());
                         if (inventories.getTransit() > 0) {
                             inTransit++;
                         }
