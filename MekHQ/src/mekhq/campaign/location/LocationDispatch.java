@@ -220,13 +220,13 @@ public final class LocationDispatch {
                 continue;
             }
 
-            Optional<CurrentLocation> maybeTravelLoc = buildTravelNode(
+            Optional<CurrentLocation> maybeTravelLocation = buildTravelNode(
                   fromSystem, destinationSystem, destination, campaign, "dispatchToLocation");
-            if (maybeTravelLoc.isEmpty()) {
+            if (maybeTravelLocation.isEmpty()) {
                 group.forEach(p -> p.setParent(destination));
                 continue;
             }
-            group.forEach(p -> p.setParent(maybeTravelLoc.get()));
+            group.forEach(p -> p.setParent(maybeTravelLocation.get()));
         }
     }
 

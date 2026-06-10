@@ -802,9 +802,9 @@ public class EducationController {
           Consumer<CurrentLocation> onTravelArrival) {
         person.incrementEduDaysOfTravel();
 
-        AbstractLocation travelLoc = person.getCurrentLocation();
+        AbstractLocation travelLocation = person.getCurrentLocation();
 
-        if (!(travelLoc instanceof CurrentLocation currentLocation)) {
+        if (!(travelLocation instanceof CurrentLocation currentLocation)) {
             int travelTime = max(2,
                   campaign.getSimplifiedTravelTime(campaign.getSystemById(person.getEduAcademySystem())));
             if (travelTime != person.getEduJourneyTime()) {
