@@ -77,6 +77,7 @@ public class PersonnelOptions extends PilotOptions {
     public static final String TECH_FIXER = "tech_fixer";
     public static final String UNOFFICIAL_SPICE_IS_RIGHT = "unofficial_spice_is_right";
     public static final String UNOFFICIAL_KITCHEN_MENACE = "unofficial_kitchen_menace";
+    public static final String UNOFFICIAL_ILL_DO_IT_MYSELF = "unofficial_ill_do_it_myself";
     public static final String TECH_MAINTAINER = "tech_maintainer";
     public static final String FLAW_GLASS_JAW = "flaw_glass_jaw";
     public static final String ATOW_TOUGHNESS = "atow_toughness";
@@ -264,6 +265,7 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, TECH_FIXER, false);
         addOption(l3a, UNOFFICIAL_SPICE_IS_RIGHT, false);
         addOption(l3a, UNOFFICIAL_KITCHEN_MENACE, false);
+        addOption(l3a, UNOFFICIAL_ILL_DO_IT_MYSELF, false);
         addOption(l3a, TECH_MAINTAINER, false);
         addOption(l3a, FLAW_GLASS_JAW, false);
         addOption(l3a, ATOW_TOUGHNESS, false);
