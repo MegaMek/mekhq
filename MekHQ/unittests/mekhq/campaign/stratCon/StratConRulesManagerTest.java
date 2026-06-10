@@ -188,7 +188,7 @@ class StratConRulesManagerTest {
         }
 
         assertTrue(track.getScenarios().isEmpty());
-            assertTrue(track.getFacilities().isEmpty());
+        assertTrue(track.getFacilities().isEmpty());
         assertTrue(track.getStrategicObjectives().isEmpty());
     }
 

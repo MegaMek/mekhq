@@ -62,6 +62,7 @@ public enum PersonnelTabView {
     FLAGS_C("PersonnelTabView.FLAGS_C.text", "PersonnelTabView.FLAGS_C.toolTipText"),
     TRANSPORT("PersonnelTabView.TRANSPORT.text", "PersonnelTabView.TRANSPORT.toolTipText"),
     EDUCATION("PersonnelTabView.EDUCATION.text", "PersonnelTabView.EDUCATION.toolTipText"),
+    LOCATION("PersonnelTabView.LOCATION.text", "PersonnelTabView.LOCATION.toolTipText"),
     OTHER("PersonnelTabView.OTHER.text", "PersonnelTabView.OTHER.toolTipText");
     //endregion Enum Declarations
 
@@ -161,6 +162,10 @@ public enum PersonnelTabView {
 
     public boolean isTraits() {
         return this == TRAITS;
+    }
+
+    public boolean isLocation() {
+        return this == LOCATION;
     }
 
     public boolean isOther() {
