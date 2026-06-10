@@ -45,6 +45,7 @@ public final class MHQConstants extends SuiteConstants {
     // region General Constants
     public static final String PROJECT_NAME = "MekHQ";
     public static final int AS_TECH_TEAM_SIZE = 6;
+    public static final int MEDIC_TEAM_SIZE = 4;
     public static final int MAX_JUMP_RADIUS = 30; //
     public static final int PREGNANCY_STANDARD_DURATION = 280; // standard duration of a pregnancy in days (40 weeks)
     public static final String EGO_OBJECTIVE_NAME = "Player";
