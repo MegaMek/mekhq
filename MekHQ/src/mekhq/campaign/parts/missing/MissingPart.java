@@ -50,6 +50,7 @@ import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.parts.Availability;
@@ -192,10 +193,6 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
             return getReplacementPart();
         }
 
-        // Search only the warehouse co-located with this part's unit so that spares at other
-        // locations (e.g. a different base, or main force) cannot be consumed by a repair here.
-        Warehouse localWarehouse = LocationUtils.getEffectiveWarehouse(getUnit(), campaign);
-
         // don't just return with the first part if it is damaged
         return getWarehouse()
                      .streamSpareParts()
@@ -239,7 +236,10 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
 
     @Override
     public String getDetails(boolean includeRepairDetails) {
-        PartInventory inventories = campaign.getPartInventory(getNewPart());
+        IPlace place = getPlace();
+        PartInventory inventories = (place != null)
+              ? place.getPartInventory(getNewPart())
+              : campaign.getPartInventory(getNewPart());
         StringBuilder toReturn = new StringBuilder();
 
         String superDetails = super.getDetails(includeRepairDetails);
@@ -352,12 +352,17 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
 
         toReturn += ">";
         toReturn += "<b>" + getAcquisitionDisplayName() + "</b> " + getAcquisitionBonus() + "<br/>";
-        PartInventory inventories = campaign.getPartInventory(getNewPart());
+        IPlace place = getPlace();
+        PartInventory inventories = (place != null)
+              ? place.getPartInventory(getNewPart())
+              : campaign.getPartInventory(getNewPart());
         toReturn += inventories.getTransitOrderedDetails();
         if (!isOmniPodded()) {
             Part newPart = getAcquisitionPart();
             newPart.setOmniPodded(true);
-            inventories = campaign.getPartInventory(newPart);
+            inventories = (place != null)
+                  ? place.getPartInventory(newPart)
+                  : campaign.getPartInventory(newPart);
             if (inventories.getSupply() > 0) {
                 toReturn += ", " + inventories.supplyAsString() + " OmniPod";
             }

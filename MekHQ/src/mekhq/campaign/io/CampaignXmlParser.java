@@ -787,10 +787,12 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             correctSexualPreferencesForCurrentSpouse(campaign.getAllPersonnel());
         }
 
-        // Reconnect all persons to the main-force personnel node. Persons whose location was
-        // serialized inside a travel or campus node will be re-parented during reconnectChildren.
+        // Reconnect persons to the main-force personnel node. Skip persons already placed by
+        // processPlayerBaseNodes or reconnectChildren (base / travel / campus persons).
         for (Person person : campaign.getAllPersonnel()) {
-            person.setParent(campaign.getMainForcePersonnel());
+            if (person.getLocationNode().getParent() == null) {
+                person.setParent(campaign.getMainForcePersonnel());
+            }
         }
 
 

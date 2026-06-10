@@ -59,6 +59,7 @@ import megamek.common.units.Warship;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.location.IPlace;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -216,7 +217,10 @@ public class Armor extends Part implements IAcquisitionWork {
                 }
             }
 
-            PartInventory inventories = campaign.getPartInventory(getNewPart());
+            IPlace place = getPlace();
+            PartInventory inventories = (place != null)
+                    ? place.getPartInventory(getNewPart())
+                    : campaign.getPartInventory(getNewPart());
             String orderTransitString = inventories.getTransitOrderedDetails();
             if (!orderTransitString.isEmpty()) {
                 toReturn.append(spanOpeningWithCustomColor(getWarningColor()))
@@ -531,7 +535,10 @@ public class Armor extends Part implements IAcquisitionWork {
         toReturn += ">";
         toReturn += "<b>" + getAcquisitionDisplayName() + "</b> " + getAcquisitionBonus() + "<br/>";
         toReturn += getAcquisitionExtraDesc() + "<br/>";
-        PartInventory inventories = campaign.getPartInventory(getAcquisitionPart());
+        IPlace place = getPlace();
+        PartInventory inventories = (place != null)
+                ? place.getPartInventory(getAcquisitionPart())
+                : campaign.getPartInventory(getAcquisitionPart());
         toReturn += inventories.getTransitOrderedDetails() + "<br/>";
         toReturn += adjustCostsForCampaignOptions(getStickerPrice()).toAmountAndSymbolString() + "<br/>";
         toReturn += "</font></html>";

@@ -37,6 +37,10 @@ import megamek.common.annotations.Nullable;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.Personnel;
 import mekhq.campaign.Warehouse;
+import mekhq.campaign.parts.AmmoStorage;
+import mekhq.campaign.parts.Armor;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.PartInventory;
 
 /**
  * A sub-interface of {@link ILocation} that marks a node in the {@link LocationNode} tree as a
@@ -88,5 +92,45 @@ public interface IPlace extends ILocation {
     @Nullable
     default Personnel getPersonnel() {
         return null;
+    }
+
+    /**
+     * Returns a {@link PartInventory} counting spare parts that match {@code part} in this place's warehouse.
+     *
+     * <p>Supply counts present spares; transit counts non-present spares. The ordered count is
+     * zero by default — {@link mekhq.campaign.Campaign} overrides this to add shopping-list orders.</p>
+     */
+    default PartInventory getPartInventory(Part part) {
+        PartInventory inventory = new PartInventory();
+        Warehouse warehouse = getWarehouse();
+        if (warehouse == null) {
+            return inventory;
+        }
+        int nSupply = 0;
+        int nTransit = 0;
+        for (Part p : warehouse.getParts()) {
+            if (!p.isSpare()) {
+                continue;
+            }
+            if (part.isSamePartType(p)) {
+                if (p.isPresent()) {
+                    nSupply += p.getTotalQuantity();
+                } else {
+                    nTransit += p.getTotalQuantity();
+                }
+            }
+        }
+        inventory.setSupply(nSupply);
+        inventory.setTransit(nTransit);
+
+        String countModifier = "";
+        if (part instanceof Armor) {
+            countModifier = "points";
+        }
+        if (part instanceof AmmoStorage) {
+            countModifier = "shots";
+        }
+        inventory.setCountModifier(countModifier);
+        return inventory;
     }
 }

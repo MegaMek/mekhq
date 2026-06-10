@@ -45,6 +45,7 @@ import mekhq.campaign.Hangar;
 import mekhq.campaign.Personnel;
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.location.ILocation;
+import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationDispatch;
 import mekhq.campaign.location.LocationNode;
 import mekhq.utilities.MHQXMLUtility;
@@ -57,7 +58,7 @@ import org.w3c.dom.Node;
  * {@link ILocation} (typically a {@link mekhq.campaign.FixedLocation}) is required at
  * construction time to ensure the base is always anchored to a real place in the universe.</p>
  */
-public abstract class AbstractBase implements ILocation {
+public abstract class AbstractBase implements IPlace {
     protected static final MMLogger logger = MMLogger.create(AbstractBase.class);
 
     private UUID id;
@@ -111,6 +112,21 @@ public abstract class AbstractBase implements ILocation {
     /** Returns the {@link Hangar} that holds units stationed at this base. */
     public Hangar getBaseHangar() {
         return baseHangar;
+    }
+
+    @Override
+    public Warehouse getWarehouse() {
+        return baseWarehouse;
+    }
+
+    @Override
+    public Hangar getHangar() {
+        return baseHangar;
+    }
+
+    @Override
+    public Personnel getPersonnel() {
+        return basePersonnel;
     }
 
     public UUID getId() {

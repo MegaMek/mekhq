@@ -190,7 +190,6 @@ import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.mission.rentals.ContractRentalType;
 import mekhq.campaign.mission.rentals.FacilityRentals;
-import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.BAArmor;
 import mekhq.campaign.parts.OmniPod;
@@ -1894,15 +1893,6 @@ public class Campaign implements ITechManager, IPlace {
         AcademyCampusLocation campus = new AcademyCampusLocation(academySet, academyName);
         LocationNode.LocationManager.setLocation(campus, this);
         return campus;
-    }
-
-    @Override
-    public void processArrivals(Campaign campaign) {
-        for (LocationNode child : locationNode.getChildren()) {
-            if (child.getLocatable() instanceof AcademyCampusLocation campus) {
-                campus.processArrivals(campaign);
-            }
-        }
     }
 
     /**
@@ -8343,44 +8333,16 @@ public class Campaign implements ITechManager, IPlace {
      *
      * @see PartInventory
      */
+    @Override
     public PartInventory getPartInventory(Part part) {
-        PartInventory inventory = new PartInventory();
-
-        int nSupply = 0;
-        int nTransit = 0;
-        for (Part p : getParts()) {
-            if (!p.isSpare()) {
-                continue;
-            }
-            if (part.isSamePartType(p)) {
-                if (p.isPresent()) {
-                    nSupply += p.getTotalQuantity();
-                } else {
-                    nTransit += p.getTotalQuantity();
-                }
-            }
-        }
-
-        inventory.setSupply(nSupply);
-        inventory.setTransit(nTransit);
+        PartInventory inventory = IPlace.super.getPartInventory(part);
 
         int nOrdered = 0;
         IAcquisitionWork onOrder = getShoppingList().getShoppingItem(part);
         if (null != onOrder) {
             nOrdered += onOrder.getTotalQuantity();
         }
-
         inventory.setOrdered(nOrdered);
-
-        String countModifier = "";
-        if (part instanceof Armor) { // ProtoMek Armor and BAArmor are derived from Armor
-            countModifier = "points";
-        }
-        if (part instanceof AmmoStorage) {
-            countModifier = "shots";
-        }
-
-        inventory.setCountModifier(countModifier);
         return inventory;
     }
 

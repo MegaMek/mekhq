@@ -344,6 +344,22 @@ public interface ILocation {
 
 
     /**
+     * Walks up the {@link LocationNode} tree and returns the nearest {@link IPlace} ancestor, or
+     * {@code null} if no IPlace ancestor exists.
+     */
+    @Nullable
+    default IPlace getPlace() {
+        LocationNode node = hasLocationNode() ? getLocationNode() : null;
+        while (node != null) {
+            if (node.getLocatable() instanceof IPlace place) {
+                return place;
+            }
+            node = node.getParent();
+        }
+        return null;
+    }
+
+    /**
      * Returns the {@link Hangar} owned by the nearest {@link mekhq.campaign.location.IPlace} ancestor of this location, or
      * {@code null} if no such ancestor exists or it does not own a hangar.
      */

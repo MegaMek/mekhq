@@ -68,6 +68,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.location.ILocation;
+import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.enums.PartRepairType;
@@ -261,7 +262,29 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
 
     @Override
     public Warehouse getWarehouse() {
+        IPlace place = getPlace();
+        if (place != null) {
+            Warehouse w = place.getWarehouse();
+            if (w != null) {
+                return w;
+            }
+        }
         return campaign.getWarehouse();
+    }
+
+    @Override
+    public IPlace getPlace() {
+        if (unit != null) {
+            return unit.getPlace();
+        }
+        LocationNode node = hasLocationNode() ? getLocationNode() : null;
+        while (node != null) {
+            if (node.getLocatable() instanceof IPlace place) {
+                return place;
+            }
+            node = node.getParent();
+        }
+        return null;
     }
 
     public String getName() {
