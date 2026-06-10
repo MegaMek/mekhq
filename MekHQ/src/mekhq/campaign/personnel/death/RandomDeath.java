@@ -67,6 +67,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.enums.HPGRating;
 import mekhq.campaign.universe.eras.Era;
+import mekhq.gui.dialog.RandomDeathAnnouncement;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Element;
@@ -691,7 +692,10 @@ public class RandomDeath {
                       person.getHyperlinkedFullTitle(), formatOpener, CLOSING_SPAN_TAG));
             }
 
-            person.changeStatus(campaign, today, getCause(person, ageGroup, age));
+            PersonnelStatus causeOfDeath = getCause(person, ageGroup, age);
+            person.changeStatus(campaign, today, causeOfDeath);
+            
+            new RandomDeathAnnouncement(campaign, person, causeOfDeath);
 
             return true;
         } else {
