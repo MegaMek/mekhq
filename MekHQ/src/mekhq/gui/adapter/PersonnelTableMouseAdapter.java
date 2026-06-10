@@ -3516,6 +3516,19 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 cbMenuItem.addActionListener(this);
                 menu.add(cbMenuItem);
 
+                // Commander
+                cbMenuItem = new JCheckBoxMenuItem(resources.getString(
+                      "edgeTriggerCommanderNegotiationCheck.text"));
+                cbMenuItem.setSelected(person.getOptions()
+                                             .booleanOption(PersonnelOptions.EDGE_COMMANDER_NEGOTIATION));
+                cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER,
+                      PersonnelOptions.EDGE_COMMANDER_NEGOTIATION));
+                if (!person.isCommander()) {
+                    cbMenuItem.setForeground(new Color(150, 150, 150));
+                }
+                cbMenuItem.addActionListener(this);
+                menu.add(cbMenuItem);
+
                 // Support Edge
                 if (getCampaignOptions().isUseSupportEdge()) {
                     // Doctors
@@ -3683,6 +3696,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 menuItem.addActionListener(this);
                 submenu.add(menuItem);
 
+                menuItem = new JMenuItem(resources.getString("edgeTriggerCommanderNegotiationCheck.text"));
+                menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER,
+                      PersonnelOptions.EDGE_COMMANDER_NEGOTIATION,
+                      TRUE));
+                menuItem.addActionListener(this);
+                submenu.add(menuItem);
+
                 if (getCampaignOptions().isUseSupportEdge()) {
                     menuItem = new JMenuItem(resources.getString("edgeTriggerHealCheck.text"));
                     menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_MEDICAL, TRUE));
@@ -3806,6 +3826,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                 menuItem = new JMenuItem(resources.getString("edgeTriggerEscapeAttempt.text"));
                 menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, EDGE_ESCAPE_ATTEMPTS, FALSE));
+                menuItem.addActionListener(this);
+                submenu.add(menuItem);
+
+                menuItem = new JMenuItem(resources.getString("edgeTriggerCommanderNegotiationCheck.text"));
+                menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER,
+                      PersonnelOptions.EDGE_COMMANDER_NEGOTIATION,
+                      FALSE));
                 menuItem.addActionListener(this);
                 submenu.add(menuItem);
 

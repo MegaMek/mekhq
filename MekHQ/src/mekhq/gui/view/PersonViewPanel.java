@@ -355,6 +355,24 @@ public class PersonViewPanel extends JScrollablePanel {
             gridY++;
         }
 
+        if (!person.getBiography().isBlank()) {
+            JTextPane txtDesc = new JTextPane();
+            txtDesc.setName("txtDesc");
+            txtDesc.setEditable(false);
+            txtDesc.setContentType("text/html");
+            txtDesc.setText(MarkdownRenderer.getRenderedHtml(person.getBiography()));
+            txtDesc.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("pnlDescription.title")));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = gridY;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            add(txtDesc, gridBagConstraints);
+            gridY++;
+        }
+
         if ((!person.getPersonalityDescription().isBlank()) &&
                   (campaignOptions.isUseRandomPersonalities()) &&
                   (!person.isHidePersonality()) &&
@@ -373,24 +391,6 @@ public class PersonViewPanel extends JScrollablePanel {
                 txtDesc.setText(person.getPersonalityDescription());
             }
             txtDesc.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(borderTitleKey)));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridY;
-            gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
-            gridBagConstraints.fill = GridBagConstraints.BOTH;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            add(txtDesc, gridBagConstraints);
-            gridY++;
-        }
-
-        if (!person.getBiography().isBlank()) {
-            JTextPane txtDesc = new JTextPane();
-            txtDesc.setName("txtDesc");
-            txtDesc.setEditable(false);
-            txtDesc.setContentType("text/html");
-            txtDesc.setText(MarkdownRenderer.getRenderedHtml(person.getBiography()));
-            txtDesc.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("pnlDescription.title")));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridY;
