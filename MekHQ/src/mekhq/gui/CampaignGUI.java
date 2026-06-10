@@ -115,7 +115,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.baseComponents.roundedComponents.RoundedMMToggleButton;
 import mekhq.gui.dialog.*;
-import mekhq.gui.dialog.glossary.NewGlossaryDialog;
+import mekhq.gui.dialog.glossary.GlossaryDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.menus.MekHQMenuBar;
 import mekhq.gui.model.LocationFilterItem;
@@ -546,7 +546,7 @@ public class CampaignGUI extends JPanel {
 
         RoundedJButton btnGlossary = new RoundedJButton(resourceMap.getString("btnGlossary.text"));
         btnGlossary.setToolTipText(resourceMap.getString("btnGlossary.toolTipText"));
-        btnGlossary.addActionListener(evt -> new NewGlossaryDialog(getFrame()));
+        btnGlossary.addActionListener(evt -> new GlossaryDialog(getFrame()));
         gridBagConstraints.weightx = 0.4;
         gridBagConstraints.insets = new Insets(SMALL_GAP, SMALL_GAP, THIN_GAP, 0);
         pnlButton.add(btnGlossary, gridBagConstraints);

@@ -682,6 +682,18 @@ public enum PersonnelStatus {
     }
 
     /**
+     * @return {@code true} if we want to continue following the character after they leave the campaign.
+     */
+    public boolean isFollowAfterLeavingCampaign() {
+        return isRetired() ||
+                     isImprisoned() ||
+                     isDeserted() ||
+                     isDefected() ||
+                     isEnemyBondsman() ||
+                     isBackground();
+    }
+
+    /**
      * @return {@code true} if a person is dead, otherwise {@code false}
      */
     public boolean isDead() {

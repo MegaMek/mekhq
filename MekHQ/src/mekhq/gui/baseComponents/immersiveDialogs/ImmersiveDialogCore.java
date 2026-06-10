@@ -42,8 +42,8 @@ import static megamek.common.icons.Portrait.DEFAULT_PORTRAIT_FILENAME;
 import static megamek.common.icons.Portrait.NO_PORTRAIT_NAME;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.campaign.force.Formation.FORMATION_NONE;
-import static mekhq.gui.dialog.glossary.NewGlossaryDialog.DOCUMENTATION_COMMAND_STRING;
-import static mekhq.gui.dialog.glossary.NewGlossaryDialog.GLOSSARY_COMMAND_STRING;
+import static mekhq.gui.dialog.glossary.GlossaryDialog.DOCUMENTATION_COMMAND_STRING;
+import static mekhq.gui.dialog.glossary.GlossaryDialog.GLOSSARY_COMMAND_STRING;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.awt.BorderLayout;
@@ -81,8 +81,8 @@ import mekhq.campaign.utilities.glossary.GlossaryEntry;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
-import mekhq.gui.dialog.glossary.NewDocumentationEntryDialog;
-import mekhq.gui.dialog.glossary.NewGlossaryEntryDialog;
+import mekhq.gui.dialog.glossary.GlossaryDocumentationEntryDialog;
+import mekhq.gui.dialog.glossary.GlossaryEntryDialog;
 
 /**
  * An immersive dialog used in MekHQ to display interactions between speakers, messages, and actions. The dialog
@@ -410,7 +410,7 @@ public class ImmersiveDialogCore extends JDialog {
      *
      * <b>Supported Commands:</b>
      * <ul>
-     *   <li>{@code GLOSSARY_COMMAND_STRING}: Opens a new {@link NewGlossaryEntryDialog} to display the
+     *   <li>{@code GLOSSARY_COMMAND_STRING}: Opens a new {@link GlossaryEntryDialog} to display the
      *   referenced glossary entry.</li>
      *   <li>{@code PERSON_COMMAND_STRING}: Focuses on a specific person in the campaign using
      *   their unique identifier (UUID). If using this, you will need to ensure your dialog has
@@ -442,7 +442,7 @@ public class ImmersiveDialogCore extends JDialog {
                 return;
             }
 
-            new NewGlossaryEntryDialog(parent, glossaryEntry);
+            new GlossaryEntryDialog(parent, glossaryEntry);
         } else if (commandKey.equalsIgnoreCase(DOCUMENTATION_COMMAND_STRING)) {
             DocumentationEntry documentationEntry = DocumentationEntry.getDocumentationEntryFromLookUpName(entryKey);
 
@@ -452,7 +452,7 @@ public class ImmersiveDialogCore extends JDialog {
             }
 
             try {
-                new NewDocumentationEntryDialog(parent, documentationEntry);
+                new GlossaryDocumentationEntryDialog(parent, documentationEntry);
             } catch (Exception ex) {
                 LOGGER.error("Failed to open PDF", ex);
             }
@@ -541,9 +541,10 @@ public class ImmersiveDialogCore extends JDialog {
      * (`isVerticalLayout`).
      * </p>
      *
-     * @param buttons A {@link List} of {@link ButtonLabelTooltipPair} instances, where each pair defines the label and
-     *                tooltip for a button.
-     * @param isVerticalLayout A {@code boolean} value indicating the layout style: {@code true} for vertical stacking, {@code false} for horizontal arrangement.
+     * @param buttons          A {@link List} of {@link ButtonLabelTooltipPair} instances, where each pair defines the
+     *                         label and tooltip for a button.
+     * @param isVerticalLayout A {@code boolean} value indicating the layout style: {@code true} for vertical stacking,
+     *                         {@code false} for horizontal arrangement.
      */
     protected JPanel populateButtonPanel(List<ButtonLabelTooltipPair> buttons, boolean isVerticalLayout) {
         final int padding = getPadding();

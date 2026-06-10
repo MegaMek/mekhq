@@ -5807,6 +5807,29 @@ public class Person implements ILocation {
     }
 
     /**
+     * Calculates the cost to improve a specific skill, at a specified skill level, with an optional reasoning
+     * multiplier.
+     *
+     * @param skillName        the name of the skill for which to calculate the improvement cost.
+     * @param useReasoning     a boolean indicating whether to apply {@link Reasoning} cost multipliers.
+     * @param targetSkillLevel The target skill level
+     *
+     * @return the cost to improve the skill, adjusted by the reasoning multiplier if applicable, or the cost for level
+     *       0 if the specified skill does not currently exist.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public int getCostToImprove(final String skillName, final boolean useReasoning, final int targetSkillLevel) {
+        final SkillType skillType = getType(skillName);
+        int cost = skillType.getCost(targetSkillLevel);
+
+        double multiplier = getTalentBasedXpCostMultiplier(useReasoning, skillType);
+
+        return (int) round(cost * multiplier);
+    }
+
+    /**
      * Calculates the cost to improve a specific skill, with an optional reasoning multiplier.
      *
      * <p>If the skill exists, the cost is based on its current level's improvement cost.</p>
@@ -7979,6 +8002,21 @@ public class Person implements ILocation {
     @Override
     public java.util.Set<Person> fetchPersonnelAtLocation() {
         return java.util.Set.of(this);
+    }
+
+    public List<Skill> getInProgressSkills() {
+        Collection<Skill> allTrainedSkills = skills.getSkills();
+        List<Skill> inProgressSkills = new ArrayList<>();
+
+        for (Skill skill : allTrainedSkills) {
+            if (skill.getXpProgress() > 0) {
+                inProgressSkills.add(skill);
+            }
+        }
+
+        inProgressSkills.sort(Comparator.comparing(s -> s.getType().getName()));
+
+        return inProgressSkills;
     }
 
     public static class PersonUnitRef extends Unit {

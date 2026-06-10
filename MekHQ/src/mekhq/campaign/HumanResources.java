@@ -39,6 +39,7 @@ import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
 import static mekhq.campaign.personnel.PersonUtility.setVeterancyAwardEligibility;
+import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_ILL_DO_IT_MYSELF;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternateImplants.giveEIImplant;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getAllActiveDiseases;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getAllSystemSpecificDiseasesWithCures;
@@ -443,9 +444,18 @@ public class HumanResources {
     }
 
     public int getAsTechNeed(CampaignOptions campaignOptions) {
-        return (Math.toIntExact(getActivePersonnel(false, false).stream().filter(Person::isTech).count()) *
-                      MHQConstants.AS_TECH_TEAM_SIZE) -
-                     getNumberAsTechs(campaignOptions);
+        List<Person> techs = getActivePersonnel(false, false).stream()
+                                   .filter(Person::isTech)
+                                   .toList();
+        int techCount = techs.size();
+
+        for (Person person : techs) {
+            if (person.getOptions().booleanOption(UNOFFICIAL_ILL_DO_IT_MYSELF)) {
+                techCount--;
+            }
+        }
+
+        return (techCount * MHQConstants.AS_TECH_TEAM_SIZE) - getNumberAsTechs(campaignOptions);
     }
 
     public void increaseAsTechPool(Campaign campaign, int i) {
@@ -577,7 +587,19 @@ public class HumanResources {
     }
 
     public int getMedicsNeed() {
-        return (getDoctors().size() * 4) - getNumberMedics();
+        List<Person> doctors = getActivePersonnel(false, false).stream()
+                                     .filter(Person::isDoctor)
+                                     .toList();
+        int doctorCount = doctors.size();
+
+        for (Person person : doctors) {
+            boolean hasDoItMyself = person.getOptions().booleanOption(UNOFFICIAL_ILL_DO_IT_MYSELF);
+            if (hasDoItMyself) {
+                doctorCount--;
+            }
+        }
+
+        return (doctorCount * MHQConstants.MEDIC_TEAM_SIZE) - getNumberMedics();
     }
 
     public int getNumberMedics() {
@@ -1975,7 +1997,7 @@ public class HumanResources {
 
         String formerSurname = person.getSurname();
 
-        if (!personnel.containsValue(person)) {
+        if (!personnel.containsKey(person.getId())) {
             person.setJoinedCampaign(currentDay);
             personnel.put(person.getId(), person);
             person.setParent(campaign.getMainForcePersonnel());
