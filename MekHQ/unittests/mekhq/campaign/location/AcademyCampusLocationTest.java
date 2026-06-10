@@ -86,8 +86,10 @@ public class AcademyCampusLocationTest {
     }
 
     @Test
-    void getLocationNode_noChildrenByDefault() {
-        assertTrue(campus.getLocationNode().getChildren().isEmpty());
+    void getLocationNode_hasPersonnelChildByDefault() {
+        assertEquals(1, campus.getLocationNode().getChildren().size());
+        assertSame(campus.getCampusPersonnel().getLocationNode(),
+              campus.getLocationNode().getChildren().iterator().next());
     }
 
     @Test
@@ -166,7 +168,7 @@ public class AcademyCampusLocationTest {
         void writeToXML_includesPersonIdForPersonChild() {
             campus.setParent(new FixedLocation(mock(PlanetarySystem.class)));
             Person person = new Person("First", "Last", null, "MERC");
-            person.setParent(campus);
+            person.setParent(campus.getCampusPersonnel());
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             campus.writeToXML(new PrintWriter(baos, true), 0);

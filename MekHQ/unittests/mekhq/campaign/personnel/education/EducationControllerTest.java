@@ -33,6 +33,7 @@
 package mekhq.campaign.personnel.education;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Answers.CALLS_REAL_METHODS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyDouble;
@@ -316,6 +317,8 @@ class EducationControllerTest {
             campaign = buildMinimalCampaignMock();
             when(campaign.getOrCreateCampusLocation(any(), any(), any()))
                   .thenReturn(new AcademyCampusLocation(ACADEMY_SET, ACADEMY_NAME));
+            when(campaign.getOrCreateLocalCampusLocation(any(), any()))
+                  .thenReturn(new AcademyCampusLocation(ACADEMY_SET, ACADEMY_NAME));
         }
 
         @Test
@@ -351,7 +354,7 @@ class EducationControllerTest {
 
             Person person = buildStudentPerson();
 
-            try (MockedStatic<LocationDispatch> mockDispatch = mockStatic(LocationDispatch.class)) {
+            try (MockedStatic<LocationDispatch> mockDispatch = mockStatic(LocationDispatch.class, CALLS_REAL_METHODS)) {
                 JumpPath mockPath = mock(JumpPath.class);
                 when(mockPath.getTotalTime(any(), anyDouble(), anyBoolean())).thenReturn(10.0);
                 CurrentLocation travelLoc = new CurrentLocation(mock(PlanetarySystem.class), 0.5);
@@ -403,7 +406,7 @@ class EducationControllerTest {
 
             Person person = buildStudentPerson();
 
-            try (MockedStatic<LocationDispatch> mockDispatch = mockStatic(LocationDispatch.class)) {
+            try (MockedStatic<LocationDispatch> mockDispatch = mockStatic(LocationDispatch.class, CALLS_REAL_METHODS)) {
                 JumpPath mockPath = mock(JumpPath.class);
                 when(mockPath.getTotalTime(any(), anyDouble(), anyBoolean())).thenReturn(10.0);
                 CurrentLocation travelLoc = new CurrentLocation(mock(PlanetarySystem.class), 0.5);

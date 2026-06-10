@@ -1766,8 +1766,8 @@ public class Campaign implements ITechManager, IPlace {
         }
     }
 
-    public void removeLocation(AbstractLocation l) {
-        locations.remove(l);
+    public void removeLocation(AbstractLocation location) {
+        locations.remove(location);
     }
 
     /**
@@ -1857,8 +1857,8 @@ public class Campaign implements ITechManager, IPlace {
      */
     public AcademyCampusLocation getOrCreateCampusLocation(String academySet,
           String academyName, String systemId) {
-        for (AbstractLocation loc : locations) {
-            if (!(loc instanceof FixedLocation fixedLocation)) {
+        for (AbstractLocation location : locations) {
+            if (!(location instanceof FixedLocation fixedLocation)) {
                 continue;
             }
             if (!fixedLocation.getCurrentSystem().getId().equals(systemId)) {
@@ -1873,6 +1873,36 @@ public class Campaign implements ITechManager, IPlace {
             }
         }
         return addCampusLocation(academySet, academyName, systemId);
+    }
+
+    /**
+     * Returns the existing local {@link AcademyCampusLocation} (home-school or unit-education) for
+     * the given campus parented directly under this campaign, creating it on demand if it does not
+     * yet exist.
+     *
+     * <p>Local campuses travel with the campaign and are not anchored to a {@link FixedLocation}.
+     * Use {@link #getOrCreateCampusLocation} for academies at a fixed planetary system.</p>
+     */
+    public AcademyCampusLocation getOrCreateLocalCampusLocation(String academySet, String academyName) {
+        for (LocationNode child : locationNode.getChildren()) {
+            if (child.getLocatable() instanceof AcademyCampusLocation campus
+                      && academySet.equals(campus.getAcademySet())
+                      && academyName.equals(campus.getAcademyName())) {
+                return campus;
+            }
+        }
+        AcademyCampusLocation campus = new AcademyCampusLocation(academySet, academyName);
+        LocationNode.LocationManager.setLocation(campus, this);
+        return campus;
+    }
+
+    @Override
+    public void processArrivals(Campaign campaign) {
+        for (LocationNode child : locationNode.getChildren()) {
+            if (child.getLocatable() instanceof AcademyCampusLocation campus) {
+                campus.processArrivals(campaign);
+            }
+        }
     }
 
     /**

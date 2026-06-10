@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.UUID;
 
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.Personnel;
@@ -56,6 +57,8 @@ import org.w3c.dom.NodeList;
  * Personnel enrolled at the campus can be attached as children of this node.</p>
  */
 public class AcademyCampusLocation implements ILocation {
+
+    private static final MMLogger LOGGER = MMLogger.create(AcademyCampusLocation.class);
 
     private final LocationNode locationNode;
     private final Personnel personnel = new Personnel();
@@ -93,13 +96,13 @@ public class AcademyCampusLocation implements ILocation {
     @Override
     public void processArrivals(Campaign campaign) {
         for (LocationNode child : new ArrayList<>(locationNode.getChildren())) {
-            if (!(child.getLocatable() instanceof CurrentLocation travelLoc)) {
+            if (!(child.getLocatable() instanceof CurrentLocation travelNode)) {
                 continue;
             }
-            if (!travelLoc.isOnPlanet()) {
+            if (!travelNode.isOnPlanet()) {
                 continue;
             }
-            LocationDispatch.landFromTravelNode(travelLoc, personnel, personnel, personnel, campaign);
+            LocationDispatch.landFromTravelNode(travelNode, personnel, campaign, campaign, campaign);
         }
     }
 
@@ -113,7 +116,7 @@ public class AcademyCampusLocation implements ILocation {
             }
         }
         for (LocationNode child : personnel.getLocationNode().getChildren()) {
-            for (Person person : personnel.values()) {
+            if (child.getLocatable() instanceof Person person) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personId", person.getId().toString());
             }
         }
@@ -131,28 +134,33 @@ public class AcademyCampusLocation implements ILocation {
     }
 
     public static @Nullable AcademyCampusLocation generateInstanceFromXML(Node wn) {
-        String academySet = null;
-        String academyName = null;
-        List<UUID> personIds = new ArrayList<>();
-        NodeList nodeList = wn.getChildNodes();
-        for (int x = 0; x < nodeList.getLength(); x++) {
-            Node wn2 = nodeList.item(x);
-            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
+        AcademyCampusLocation campus = null;
+        try {
+            String academySet = null;
+            String academyName = null;
+            List<UUID> personIds = new ArrayList<>();
+            NodeList nodeList = wn.getChildNodes();
+            for (int x = 0; x < nodeList.getLength(); x++) {
+                Node wn2 = nodeList.item(x);
+                if (wn2.getNodeType() != Node.ELEMENT_NODE) {
+                    continue;
+                }
+                if (wn2.getNodeName().equalsIgnoreCase("academySet")) {
+                    academySet = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("academyName")) {
+                    academyName = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("personId")) {
+                    personIds.add(UUID.fromString(wn2.getTextContent().trim()));
+                }
             }
-            if (wn2.getNodeName().equalsIgnoreCase("academySet")) {
-                academySet = wn2.getTextContent();
-            } else if (wn2.getNodeName().equalsIgnoreCase("academyName")) {
-                academyName = wn2.getTextContent();
-            } else if (wn2.getNodeName().equalsIgnoreCase("personId")) {
-                personIds.add(UUID.fromString(wn2.getTextContent().trim()));
+            if (academySet == null || academyName == null) {
+                return null;
             }
+            campus = new AcademyCampusLocation(academySet, academyName);
+            campus.pendingPersonIds.addAll(personIds);
+        } catch (Exception ex) {
+            LOGGER.error("", ex);
         }
-        if (academySet == null || academyName == null) {
-            return null;
-        }
-        AcademyCampusLocation campus = new AcademyCampusLocation(academySet, academyName);
-        campus.pendingPersonIds.addAll(personIds);
         return campus;
     }
 }

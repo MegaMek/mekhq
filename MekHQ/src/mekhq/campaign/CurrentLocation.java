@@ -359,8 +359,8 @@ public class CurrentLocation extends AbstractLocation {
             jumpPath.writeToXML(pw, indent);
         }
         for (LocationNode child : locationNode.getChildren()) {
-            if (child.getLocatable() instanceof mekhq.campaign.personnel.Person p) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personId", p.getId().toString());
+            if (child.getLocatable() instanceof mekhq.campaign.personnel.Person person) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personId", person.getId().toString());
             } else if (child.getLocatable() instanceof Unit u) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitId", u.getId().toString());
             } else if (child.getLocatable() instanceof Part part) {

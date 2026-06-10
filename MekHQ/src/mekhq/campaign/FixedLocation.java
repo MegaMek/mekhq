@@ -85,16 +85,16 @@ public class FixedLocation extends AbstractLocation {
                     continue;
                 }
                 if (wn2.getNodeName().equalsIgnoreCase("currentSystemId")) {
-                    PlanetarySystem p = Systems.getInstance().getSystemById(wn2.getTextContent());
-                    if (p == null) {
+                    PlanetarySystem system = Systems.getInstance().getSystemById(wn2.getTextContent());
+                    if (system == null) {
                         logger.error("Couldn't find system: {}", wn2.getTextContent());
-                        p = campaign.getSystemByName("Terra");
-                        if (p == null) {
+                        system = campaign.getSystemByName("Terra");
+                        if (system == null) {
                             logger.error("Couldn't find Terra fallback; using first available system");
-                            p = campaign.getSystems().getFirst();
+                            system = campaign.getSystems().getFirst();
                         }
                     }
-                    returnValue.currentSystem = p;
+                    returnValue.currentSystem = system;
                 } else if (wn2.getNodeName().equalsIgnoreCase("locationNodeChildren")) {
                     LocationNode.reconnectChildren(wn2, returnValue, campaign);
                 }

@@ -32,6 +32,8 @@
  */
 package mekhq.gui.enums;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedText;
+import static mekhq.utilities.MHQInternationalization.getText;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -45,12 +47,10 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
 import javax.swing.SortOrder;
 import javax.swing.SwingConstants;
 
 import megamek.common.util.sorter.NaturalOrderComparator;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.FixedLocation;
@@ -80,9 +80,6 @@ import org.junit.jupiter.api.Test;
 public class PersonnelTableModelColumnTest {
     //region Variable Declarations
     private static final PersonnelTableModelColumn[] columns = PersonnelTableModelColumn.values();
-
-    private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
-          MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Boolean Comparison Methods
@@ -943,15 +940,15 @@ public class PersonnelTableModelColumnTest {
 
     @Test
     public void testToStringOverride() {
-        assertEquals(resources.getString("PersonnelTableModelColumn.RANK.text"),
+        assertEquals(getText("PersonnelTableModelColumn.RANK.text"),
               PersonnelTableModelColumn.RANK.toString());
-        assertEquals(resources.getString("PersonnelTableModelColumn.PERSONNEL_STATUS.text"),
+        assertEquals(getText("PersonnelTableModelColumn.PERSONNEL_STATUS.text"),
               PersonnelTableModelColumn.PERSONNEL_STATUS.toString());
-        assertEquals(resources.getString("PersonnelTableModelColumn.FORCE.text"),
+        assertEquals(getText("PersonnelTableModelColumn.FORCE.text"),
               PersonnelTableModelColumn.FORCE.toString());
-        assertEquals(resources.getString("PersonnelTableModelColumn.TECH_MECHANIC.text"),
+        assertEquals(getText("PersonnelTableModelColumn.TECH_MECHANIC.text"),
               PersonnelTableModelColumn.TECH_MECHANIC.toString());
-        assertEquals(resources.getString("PersonnelTableModelColumn.RECRUITMENT_DATE.text"),
+        assertEquals(getText("PersonnelTableModelColumn.RECRUITMENT_DATE.text"),
               PersonnelTableModelColumn.RECRUITMENT_DATE.toString());
     }
 
@@ -980,17 +977,17 @@ public class PersonnelTableModelColumnTest {
         }
 
         private Campaign mockCampaign() {
-            Campaign c = mock(Campaign.class);
+            Campaign campaign = mock(Campaign.class);
             CampaignOptions opts = mock(CampaignOptions.class);
-            when(c.getLocalDate()).thenReturn(TODAY);
-            when(c.getName()).thenReturn(CAMPAIGN_NAME);
-            when(c.getMainForcePersonnel()).thenReturn(mainForce);
-            when(c.getCampaignOptions()).thenReturn(opts);
-            when(c.isOverridingCommandCircuitRequirements()).thenReturn(false);
-            when(c.isGM()).thenReturn(false);
+            when(campaign.getLocalDate()).thenReturn(TODAY);
+            when(campaign.getName()).thenReturn(CAMPAIGN_NAME);
+            when(campaign.getMainForcePersonnel()).thenReturn(mainForce);
+            when(campaign.getCampaignOptions()).thenReturn(opts);
+            when(campaign.isOverridingCommandCircuitRequirements()).thenReturn(false);
+            when(campaign.isGM()).thenReturn(false);
             when(opts.isUseFactionStandingCommandCircuitSafe()).thenReturn(false);
-            when(c.getFutureAtBContracts()).thenReturn(List.of());
-            return c;
+            when(campaign.getFutureAtBContracts()).thenReturn(List.of());
+            return campaign;
         }
 
         private Person mockPerson() {
@@ -1007,16 +1004,16 @@ public class PersonnelTableModelColumnTest {
         @Test
         void noParent_allColumnsReturnDash() {
             Person person = mockPerson();
-            Campaign c = mockCampaign();
-            assertEquals("-", PersonnelTableModelColumn.LOCATION_SYSTEM.getCellValue(c, market, person, false, false));
-            assertEquals("-", PersonnelTableModelColumn.LOCATION_PLANET.getCellValue(c, market, person, false, false));
-            assertEquals("-", PersonnelTableModelColumn.LOCATION_NAME.getCellValue(c, market, person, false, false));
+            Campaign campaign = mockCampaign();
+            assertEquals("-", PersonnelTableModelColumn.LOCATION_SYSTEM.getCellValue(campaign, market, person, false, false));
+            assertEquals("-", PersonnelTableModelColumn.LOCATION_PLANET.getCellValue(campaign, market, person, false, false));
+            assertEquals("-", PersonnelTableModelColumn.LOCATION_NAME.getCellValue(campaign, market, person, false, false));
             assertEquals("-",
-                  PersonnelTableModelColumn.DESTINATION_SYSTEM.getCellValue(c, market, person, false, false));
+                  PersonnelTableModelColumn.DESTINATION_SYSTEM.getCellValue(campaign, market, person, false, false));
             assertEquals("-",
-                  PersonnelTableModelColumn.DESTINATION_PLANET.getCellValue(c, market, person, false, false));
+                  PersonnelTableModelColumn.DESTINATION_PLANET.getCellValue(campaign, market, person, false, false));
             assertEquals("-",
-                  PersonnelTableModelColumn.DESTINATION_NAME.getCellValue(c, market, person, false, false));
+                  PersonnelTableModelColumn.DESTINATION_NAME.getCellValue(campaign, market, person, false, false));
         }
 
         @Nested
@@ -1146,9 +1143,9 @@ public class PersonnelTableModelColumnTest {
 
             private Person buildTravelingPerson(CurrentLocation cl) {
                 wire(cl, campus);
-                Person p = mockPerson();
-                wire(p, cl);
-                return p;
+                Person person = mockPerson();
+                wire(person, cl);
+                return person;
             }
 
             @Test
@@ -1159,8 +1156,7 @@ public class PersonnelTableModelColumnTest {
                 Person person = buildTravelingPerson(cl);
 
                 assertEquals(
-                      String.format(resources.getString(
-                            "PersonnelTableModelColumn.LOCATION_NAME.inTransit.toJumpPoint.text"), 7),
+                      getFormattedText("PersonnelTableModelColumn.LOCATION_NAME.inTransit.toJumpPoint.text", 7),
                       PersonnelTableModelColumn.LOCATION_NAME.getCellValue(campaign, market, person, false, false));
             }
 
@@ -1173,8 +1169,7 @@ public class PersonnelTableModelColumnTest {
                 Person person = buildTravelingPerson(cl);
 
                 assertEquals(
-                      String.format(resources.getString(
-                            "PersonnelTableModelColumn.LOCATION_NAME.inTransit.recharging.text"), 7),
+                      getFormattedText("PersonnelTableModelColumn.LOCATION_NAME.inTransit.recharging.text", 7),
                       PersonnelTableModelColumn.LOCATION_NAME.getCellValue(campaign, market, person, false, false));
             }
 
@@ -1187,7 +1182,7 @@ public class PersonnelTableModelColumnTest {
                 Person person = buildTravelingPerson(cl);
 
                 assertEquals(
-                      resources.getString("PersonnelTableModelColumn.LOCATION_NAME.inTransit.readyToJump.text"),
+                      getText("PersonnelTableModelColumn.LOCATION_NAME.inTransit.readyToJump.text"),
                       PersonnelTableModelColumn.LOCATION_NAME.getCellValue(campaign, market, person, false, false));
             }
 
@@ -1198,8 +1193,7 @@ public class PersonnelTableModelColumnTest {
                 Person person = buildTravelingPerson(cl);
 
                 assertEquals(
-                      String.format(resources.getString(
-                            "PersonnelTableModelColumn.LOCATION_NAME.inTransit.toPlanet.text"), 4),
+                      getFormattedText("PersonnelTableModelColumn.LOCATION_NAME.inTransit.toPlanet.text", 4),
                       PersonnelTableModelColumn.LOCATION_NAME.getCellValue(campaign, market, person, false, false));
             }
 

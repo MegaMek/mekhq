@@ -140,30 +140,35 @@ public class LocationNode {
         NodeList nl = xmlNode.getChildNodes();
         for (int i = 0; i < nl.getLength(); i++) {
             Node wn = nl.item(i);
-            if (wn.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            if (wn.getNodeName().equalsIgnoreCase("academyCampus")) {
-                AcademyCampusLocation campus = AcademyCampusLocation.generateInstanceFromXML(wn);
-                if (campus != null) {
-                    LocationManager.setLocation(campus, parent);
-                    NodeList campusChildren = wn.getChildNodes();
-                    for (int j = 0; j < campusChildren.getLength(); j++) {
-                        Node campusChild = campusChildren.item(j);
-                        if (campusChild.getNodeType() != Node.ELEMENT_NODE) {
-                            continue;
-                        }
-                        if (campusChild.getNodeName().equalsIgnoreCase("location")) {
-                            CurrentLocation travelLoc = CurrentLocation.generateInstanceFromXML(campusChild, campaign);
-                            if (travelLoc != null) {
-                                LocationManager.setLocation(travelLoc, campus);
-                                campaign.addLocation(travelLoc);
+            try {
+                if (wn.getNodeType() != Node.ELEMENT_NODE) {
+                    continue;
+                }
+                if (wn.getNodeName().equalsIgnoreCase("academyCampus")) {
+                    AcademyCampusLocation campus = AcademyCampusLocation.generateInstanceFromXML(wn);
+                    if (campus != null) {
+                        LocationManager.setLocation(campus, parent);
+                        NodeList campusChildren = wn.getChildNodes();
+                        for (int j = 0; j < campusChildren.getLength(); j++) {
+                            Node campusChild = campusChildren.item(j);
+                            if (campusChild.getNodeType() != Node.ELEMENT_NODE) {
+                                continue;
+                            }
+                            if (campusChild.getNodeName().equalsIgnoreCase("location")) {
+                                CurrentLocation travelNode = CurrentLocation.generateInstanceFromXML(campusChild, campaign);
+                                if (travelNode != null) {
+                                    LocationManager.setLocation(travelNode, campus);
+                                    campaign.addLocation(travelNode);
+                                }
                             }
                         }
                     }
+                } else {
+                    // Person, Unit, and Part reconnection will be added here
+                    logger.warn("Unrecognized locationNodeChildren element '{}' — skipping", wn.getNodeName());
                 }
-            } else {
-                logger.warn("Unrecognized locationNodeChildren element '{}' — skipping", wn.getNodeName());
+            } catch (Exception ex) {
+                logger.error("", ex);
             }
         }
     }
