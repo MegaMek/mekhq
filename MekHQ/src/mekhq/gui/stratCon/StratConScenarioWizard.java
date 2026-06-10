@@ -44,6 +44,7 @@ import static mekhq.campaign.stratCon.StratConRulesManager.ReinforcementResultsT
 import static mekhq.campaign.stratCon.StratConRulesManager.ReinforcementResultsType.FAILED;
 import static mekhq.campaign.stratCon.StratConRulesManager.ReinforcementResultsType.INSTANT;
 import static mekhq.campaign.stratCon.StratConRulesManager.calculateReinforcementTargetNumber;
+import static mekhq.campaign.stratCon.StratConRulesManager.commanderLanceHasDefensiveAssignment;
 import static mekhq.campaign.stratCon.StratConRulesManager.getEligibleLeadershipUnits;
 import static mekhq.campaign.stratCon.StratConRulesManager.getReinforcementType;
 import static mekhq.campaign.stratCon.StratConRulesManager.processReinforcementDeployment;
@@ -230,19 +231,23 @@ public class StratConScenarioWizard extends JDialog {
         if (isPrimaryForce) {
             gbc.gridy++;
             AtBDynamicScenario backingScenario = currentScenario.getBackingScenario();
-            int leadershipSkill = backingScenario.getLanceCommanderSkill(S_LEADER, campaign);
 
-            if (backingScenario.getStratConScenarioType().isOfficialChallenge()) {
-                leadershipSkill = 0; // No leadership units for combat challenges, that'd be cheating
-            }
+            if (commanderLanceHasDefensiveAssignment(backingScenario, campaign)) {
+                int leadershipSkill = backingScenario.getLanceCommanderSkill(S_LEADER, campaign);
+                if (backingScenario.getStratConScenarioType().isOfficialChallenge()) {
+                    leadershipSkill = 0; // No leadership units for combat challenges, that'd be cheating
+                }
 
-            if (currentScenario.getNumDefensivePoints() > 0) {
                 eligibleLeadershipUnits = getEligibleLeadershipUnits(campaign, currentScenario, leadershipSkill);
                 eligibleLeadershipUnits.sort(Comparator.comparing(this::getForceNameReversed));
 
-                setLeadershipUI(gbc, eligibleLeadershipUnits, leadershipSkill);
-                gbc.gridy++;
+                if (leadershipSkill > 0) {
+                    setLeadershipUI(gbc, eligibleLeadershipUnits, leadershipSkill);
+                    gbc.gridy++;
+                }
+            }
 
+            if (currentScenario.getNumDefensivePoints() > 0) {
                 setDefensiveUI(gbc);
                 gbc.gridy++;
             }
