@@ -39,11 +39,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.FixedLocation;
 import mekhq.campaign.JumpPath;
-import mekhq.campaign.Warehouse;
 import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.universe.PlanetarySystem;
 import org.junit.jupiter.api.BeforeEach;
@@ -136,50 +134,10 @@ public class LocationUtilsTest {
         }
     }
 
-    // ---- getEffectiveWarehouse ---------------------------------------------
-
-    @Nested
-    class GetEffectiveWarehouse {
-
-        Campaign mockCampaign;
-        Warehouse campaignWarehouse;
-
-        @BeforeEach
-        void setUp() {
-            mockCampaign = mock(Campaign.class);
-            campaignWarehouse = new Warehouse();
-            when(mockCampaign.getWarehouse()).thenReturn(campaignWarehouse);
-        }
-
-        @Test
-        void nullLocation_returnsCampaignWarehouse() {
-            assertSame(campaignWarehouse, LocationUtils.getEffectiveWarehouse(null, mockCampaign));
-        }
-
-        @Test
-        void locationWithNoBaseAncestor_returnsCampaignWarehouse() {
-            assertSame(campaignWarehouse, LocationUtils.getEffectiveWarehouse(fixed, mockCampaign));
-        }
-
-        @Test
-        void locationUnderBase_returnsBaseWarehouse() {
-            assertSame(base.getBaseWarehouse(),
-                  LocationUtils.getEffectiveWarehouse(base.getBaseHangar(), mockCampaign));
-        }
-    }
-
     // ---- areSameEffectiveLocation ------------------------------------------
 
     @Nested
     class AreSameEffectiveLocation {
-
-        Campaign mockCampaign;
-
-        @BeforeEach
-        void setUp() {
-            mockCampaign = mock(Campaign.class);
-            when(mockCampaign.getWarehouse()).thenReturn(new Warehouse());
-        }
 
         @Test
         void bothNull_returnsFalse() {

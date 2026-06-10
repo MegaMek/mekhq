@@ -77,11 +77,12 @@ public class LocationNode {
 
         return null;
     }
+
+    @Nullable
     public LocationNode getParent() {
         return parent;
     }
 
-    @Nullable
     void setParent(LocationNode parent) {
         this.parent = parent;
     }

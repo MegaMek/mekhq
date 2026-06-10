@@ -35,9 +35,7 @@ package mekhq.campaign.location;
 import java.util.Objects;
 
 import megamek.common.annotations.Nullable;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
-import mekhq.campaign.Warehouse;
 import mekhq.campaign.base.AbstractBase;
 
 /**
@@ -100,25 +98,13 @@ public final class LocationUtils {
     }
 
     /**
-     * Returns the {@link Warehouse} appropriate for spare-part lookups and storage at {@code loc}'s effective location.
-     *
-     * <p>If {@code loc} is under an {@link AbstractBase} in the tree, that base's warehouse is returned.
-     * Otherwise, the campaign's main warehouse is returned.  A {@code null} {@code loc} always
-     * returns the campaign's main warehouse.</p>
-     *
-     * @param loc      the location item (unit, part, person, …); may be {@code null}
-     * @param campaign the active campaign; must not be {@code null}
-     *
-     * @return the effective {@link Warehouse}, never {@code null}
-     */
-    public static Warehouse getEffectiveWarehouse(@Nullable ILocation loc, Campaign campaign) {
-        AbstractBase base = findEffectiveBase(loc);
-        return (base != null) ? base.getBaseWarehouse() : campaign.getWarehouse();
-    }
-
-    /**
      * Returns {@code true} if the item — or any of its ancestors in the {@link LocationNode} tree — is a
      * {@link CurrentLocation} with an active {@link mekhq.campaign.JumpPath} (i.e. the item is currently traveling).
+     *
+     * <p>This intentionally checks for a non-empty {@link mekhq.campaign.JumpPath} rather than
+     * {@link ILocation#isInTransit()}, which only returns {@code true} once the ship has actually
+     * started moving (transit time &gt; 0). An item with an assigned but not-yet-started journey
+     * must also be treated as in transit for co-location and assignment purposes.</p>
      *
      * @param loc the location item to inspect
      *

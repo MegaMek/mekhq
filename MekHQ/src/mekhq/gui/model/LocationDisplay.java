@@ -46,6 +46,7 @@ import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationNode;
+import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 
@@ -90,22 +91,28 @@ public final class LocationDisplay {
                                     && cl.getJumpPath() != null && !cl.getJumpPath().isEmpty();
 
         if (node != null) {
-            LocationNode parent = node.getParent();
-            while (parent != null) {
-                ILocation locatable = parent.getLocatable();
-                if (locatable == campaign.getMainForcePersonnel()) {
+            ILocation mfp = campaign.getMainForcePersonnel();
+            LocationNode cursor = node;
+            while (cursor != null) {
+                if (cursor.getLocatable() == mfp) {
                     return campaign.getName();
                 }
-                if (!isTraveling) {
-                    if (locatable instanceof AbstractBase base) {
-                        String name = base.getDisplayName();
-                        return (name != null && !name.isBlank()) ? name : "Unnamed Base";
-                    }
-                    if (locatable instanceof AcademyCampusLocation campus) {
-                        return campus.getAcademyName();
-                    }
+                cursor = cursor.getParent();
+            }
+        }
+
+        if (!isTraveling && node != null) {
+            AbstractBase base = LocationUtils.findEffectiveBase(item);
+            if (base != null) {
+                String name = base.getDisplayName();
+                return (name != null && !name.isBlank()) ? name : "Unnamed Base";
+            }
+            LocationNode cursor = node;
+            while (cursor != null) {
+                if (cursor.getLocatable() instanceof AcademyCampusLocation campus) {
+                    return campus.getAcademyName();
                 }
-                parent = parent.getParent();
+                cursor = cursor.getParent();
             }
         }
 

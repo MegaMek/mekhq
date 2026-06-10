@@ -56,8 +56,8 @@ import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_INTERSTELLAR_NEGOTIATOR;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_LOGISTICIAN;
-import static mekhq.campaign.personnel.ranks.Rank.RO_MIN;
 import static mekhq.campaign.personnel.PersonnelOptions.EDGE_ADMIN_APPRAISAL_FAIL;
+import static mekhq.campaign.personnel.ranks.Rank.RO_MIN;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_MEDTECH;
@@ -4184,7 +4184,7 @@ public class Campaign implements ITechManager, IPlace {
         Part repairable = part.clone();
         // Capture the original's effective warehouse before decrementing, since
         // decrementing to zero would remove the original and clear its locationNode.
-        Warehouse targetWarehouse = LocationUtils.getEffectiveWarehouse(part, this);
+        Warehouse targetWarehouse = part.getWarehouse();
         part.changeQuantity(-1);
 
         fixPart(repairable, tech);

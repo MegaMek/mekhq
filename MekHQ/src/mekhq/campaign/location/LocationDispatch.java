@@ -171,6 +171,25 @@ public final class LocationDispatch {
     }
 
     /**
+     * Builds a zero-transit "arrived" node parented under {@code destination} and registers it
+     * with the campaign. The node has {@code transitTime = 0}, so {@code isOnPlanet()} is
+     * immediately {@code true} and {@link IPlace#processArrivals} will land all carried items on
+     * its next call.
+     */
+    private static CurrentLocation buildArrivedNode(PlanetarySystem system,
+          ILocation destination,
+          Campaign campaign,
+          String logContext) {
+        CurrentLocation arrivedCL = new CurrentLocation(system, 0.0);
+        if (!arrivedCL.setParent(destination)) {
+            LOGGER.warn("{}: setParent failed for arrivedCL → {}",
+                  logContext, destination.getClass().getSimpleName());
+        }
+        campaign.addLocation(arrivedCL);
+        return arrivedCL;
+    }
+
+    /**
      * Builds a cross-system travel node from {@code fromSystem} toward {@code destinationSystem},
      * parented under {@code destination}, and registers it with the campaign.
      *
@@ -210,12 +229,6 @@ public final class LocationDispatch {
           ILocation destination,
           Campaign campaign) {
 
-        // Persons who have arrived go into basePersonnel; travel nodes go directly under the base
-        // so they can carry units and parts alongside people in the future.
-        ILocation arrivalDestination = (destination instanceof AbstractBase base)
-                                             ? base.getBasePersonnel()
-                                             : destination;
-
         PlanetarySystem destSystem = destination.getCurrentSystem();
 
         Map<PlanetarySystem, List<Person>> bySystem = people.stream()
@@ -229,14 +242,25 @@ public final class LocationDispatch {
             List<Person> group = entry.getValue();
 
             if (destSystem == null || fromSystem.equals(destSystem)) {
-                group.forEach(p -> p.setParent(arrivalDestination));
+                if (destination instanceof AbstractBase) {
+                    PlanetarySystem sys = destSystem != null ? destSystem : fromSystem;
+                    CurrentLocation arrivedCL = buildArrivedNode(sys, destination, campaign, "dispatchToLocation");
+                    group.forEach(p -> p.setParent(arrivedCL));
+                } else {
+                    group.forEach(p -> p.setParent(destination));
+                }
                 continue;
             }
 
             Optional<CurrentLocation> maybeTravelLoc = buildTravelNode(
                   fromSystem, destSystem, destination, campaign, "dispatchToLocation");
             if (maybeTravelLoc.isEmpty()) {
-                group.forEach(p -> p.setParent(arrivalDestination));
+                if (destination instanceof AbstractBase) {
+                    CurrentLocation arrivedCL = buildArrivedNode(destSystem, destination, campaign, "dispatchToLocation");
+                    group.forEach(p -> p.setParent(arrivedCL));
+                } else {
+                    group.forEach(p -> p.setParent(destination));
+                }
                 continue;
             }
             group.forEach(p -> p.setParent(maybeTravelLoc.get()));
@@ -285,14 +309,25 @@ public final class LocationDispatch {
             }
 
             if (destSystem == null || fromSystem.equals(destSystem)) {
-                group.forEach(u -> LocationNode.LocationManager.setLocation(u, arrivalHangar));
+                if (destination instanceof AbstractBase) {
+                    PlanetarySystem sys = destSystem != null ? destSystem : fromSystem;
+                    CurrentLocation arrivedCL = buildArrivedNode(sys, destination, campaign, "dispatchUnitsToLocation");
+                    group.forEach(u -> LocationNode.LocationManager.setLocation(u, arrivedCL));
+                } else {
+                    group.forEach(u -> LocationNode.LocationManager.setLocation(u, arrivalHangar));
+                }
                 continue;
             }
 
             Optional<CurrentLocation> maybeTravelLoc = buildTravelNode(
                   fromSystem, destSystem, destination, campaign, "dispatchUnitsToLocation");
             if (maybeTravelLoc.isEmpty()) {
-                group.forEach(u -> LocationNode.LocationManager.setLocation(u, arrivalHangar));
+                if (destination instanceof AbstractBase) {
+                    CurrentLocation arrivedCL = buildArrivedNode(destSystem, destination, campaign, "dispatchUnitsToLocation");
+                    group.forEach(u -> LocationNode.LocationManager.setLocation(u, arrivedCL));
+                } else {
+                    group.forEach(u -> LocationNode.LocationManager.setLocation(u, arrivalHangar));
+                }
                 continue;
             }
             group.forEach(u -> LocationNode.LocationManager.setLocation(u, maybeTravelLoc.get()));
@@ -340,14 +375,25 @@ public final class LocationDispatch {
             }
 
             if (destSystem == null || fromSystem.equals(destSystem)) {
-                group.forEach(p -> LocationNode.LocationManager.setLocation(p, arrivalWarehouse));
+                if (destination instanceof AbstractBase) {
+                    PlanetarySystem sys = destSystem != null ? destSystem : fromSystem;
+                    CurrentLocation arrivedCL = buildArrivedNode(sys, destination, campaign, "dispatchPartsToLocation");
+                    group.forEach(p -> LocationNode.LocationManager.setLocation(p, arrivedCL));
+                } else {
+                    group.forEach(p -> LocationNode.LocationManager.setLocation(p, arrivalWarehouse));
+                }
                 continue;
             }
 
             Optional<CurrentLocation> maybeTravelLoc = buildTravelNode(
                   fromSystem, destSystem, destination, campaign, "dispatchPartsToLocation");
             if (maybeTravelLoc.isEmpty()) {
-                group.forEach(p -> LocationNode.LocationManager.setLocation(p, arrivalWarehouse));
+                if (destination instanceof AbstractBase) {
+                    CurrentLocation arrivedCL = buildArrivedNode(destSystem, destination, campaign, "dispatchPartsToLocation");
+                    group.forEach(p -> LocationNode.LocationManager.setLocation(p, arrivedCL));
+                } else {
+                    group.forEach(p -> LocationNode.LocationManager.setLocation(p, arrivalWarehouse));
+                }
                 continue;
             }
             group.forEach(p -> LocationNode.LocationManager.setLocation(p, maybeTravelLoc.get()));
