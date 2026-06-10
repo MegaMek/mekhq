@@ -396,7 +396,7 @@ public class LocationNodeTest {
         void locationInBaseHangar_chainReachesBase() {
             PlayerBase base = new PlayerBase(new FixedLocation(mock(mekhq.campaign.universe.PlanetarySystem.class)));
 
-            // The hangar is two levels below the base: hangar.parent = base.
+            // The hangar is below the base: hangar.parent = base.
             // The hangar itself is a concrete ILocation — getPlace() should find the base.
             assertSame(base, base.getBaseHangar().getPlace());
         }
