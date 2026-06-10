@@ -1637,6 +1637,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     Person person = campaign.getPerson(personId);
                     if (person != null) {
                         person.setParent(currentLocation);
+                    } else {
+                        LOGGER.warn("reconnectPersonsToTravelLocations: person {} not found in campaign", personId);
                     }
                 }
             }
@@ -1651,6 +1653,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                         Person person = campaign.getPerson(personId);
                         if (person != null) {
                             person.setParent(campusLocation);
+                        } else {
+                            LOGGER.warn("reconnectPersonsToTravelLocations: person {} not found in campaign", personId);
                         }
                     }
                 }

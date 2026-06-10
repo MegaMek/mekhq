@@ -600,7 +600,7 @@ public class EducationController {
 
         // is person in transit to the institution?
         if (educationStage.isJourneyToCampus()) {
-            journeyToAcademy(campaign, person, resources);
+            journeyToAcademy(campaign, person);
             return false;
         }
 
@@ -634,17 +634,17 @@ public class EducationController {
      * @param person    The person for whom the journey is being processed.
      * @param resources The resource bundle containing localized strings.
      */
-    private static void journeyToAcademy(Campaign campaign, Person person, ResourceBundle resources) {
+    private static void journeyToAcademy(Campaign campaign, Person person) {
         PlanetarySystem targetSystem = campaign.getSystemById(person.getEduAcademySystem());
         processJourney(campaign, person, targetSystem,
-              () -> landAtCampus(campaign, person, resources, null),
-              cl -> landAtCampus(campaign, person, resources, cl));
+              () -> landAtCampus(campaign, person, null),
+              cl -> landAtCampus(campaign, person, cl));
     }
 
-    private static void landAtCampus(Campaign campaign, Person person, ResourceBundle resources,
+    private static void landAtCampus(Campaign campaign, Person person,
           @Nullable CurrentLocation travelLocation) {
         campaign.addReport(PERSONNEL,
-              String.format(resources.getString("arrived.text"), person.getHyperlinkedFullTitle()));
+              getFormattedTextAt(BUNDLE_NAME, "arrived.text", person.getHyperlinkedFullTitle()));
 
         Academy landingAcademy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
         AcademyCampusLocation campusLoc;

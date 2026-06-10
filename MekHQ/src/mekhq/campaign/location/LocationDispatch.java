@@ -111,71 +111,71 @@ public final class LocationDispatch {
      * Completes the arrival of all persons, units, and parts carried by a finished travel node,
      * then removes the node from the location tree and campaign registry.
      *
-     * <p>Persons are reparented to {@code personDest}. Units and parts have their
-     * {@link LocationNode} moved to {@code unitDest} and {@code partDest} respectively; their
+     * <p>Persons are reparented to {@code personDestination}. Units and parts have their
+     * {@link LocationNode} moved to {@code unitDestination} and {@code partDestination} respectively; their
      * hangar and warehouse data structures are assumed to have already been updated at dispatch
      * time.</p>
      *
      * @param travelLoc  the completed travel node; must not be {@code null}
-     * @param personDest destination container for persons; if {@code null}, persons fall back to
+     * @param personDestination destination container for persons; if {@code null}, persons fall back to
      *                   {@code campaign} with a warning
-     * @param unitDest   destination container for units; if {@code null}, units fall back to
+     * @param unitDestination   destination container for units; if {@code null}, units fall back to
      *                   {@code campaign} with a warning
-     * @param partDest   destination container for parts; if {@code null}, parts fall back to
+     * @param partDestination   destination container for parts; if {@code null}, parts fall back to
      *                   {@code campaign} with a warning
      * @param campaign   the active campaign; must not be {@code null}
      */
     public static void landFromTravelNode(CurrentLocation travelLoc,
-          @Nullable ILocation personDest,
-          @Nullable ILocation unitDest,
-          @Nullable ILocation partDest,
+          @Nullable ILocation personDestination,
+          @Nullable ILocation unitDestination,
+          @Nullable ILocation partDestination,
           Campaign campaign) {
-        if (personDest == null) {
-            LOGGER.warn("landFromTravelNode: null personDest; landing persons at Campaign root");
+        if (personDestination == null) {
+            LOGGER.warn("landFromTravelNode: null personDestination; landing persons at Campaign root");
         }
-        if (unitDest == null) {
-            LOGGER.warn("landFromTravelNode: null unitDest; landing units at Campaign root");
+        if (unitDestination == null) {
+            LOGGER.warn("landFromTravelNode: null unitDestination; landing units at Campaign root");
         }
-        if (partDest == null) {
-            LOGGER.warn("landFromTravelNode: null partDest; landing parts at Campaign root");
+        if (partDestination == null) {
+            LOGGER.warn("landFromTravelNode: null partDestination; landing parts at Campaign root");
         }
         landFromTravelNodeImpl(travelLoc,
-              personDest != null ? personDest : campaign,
-              unitDest != null ? unitDest : campaign,
-              partDest != null ? partDest : campaign,
+              personDestination != null ? personDestination : campaign,
+              unitDestination != null ? unitDestination : campaign,
+              partDestination != null ? partDestination : campaign,
               campaign);
     }
 
     private static void landFromTravelNodeImpl(CurrentLocation travelLoc,
-          ILocation personDest,
-          ILocation unitDest,
-          ILocation partDest,
+          ILocation personDestination,
+          ILocation unitDestination,
+          ILocation partDestination,
           Campaign campaign) {
         for (Person person : new ArrayList<>(travelLoc.fetchPersonnelAtLocation())) {
-            person.setParent(personDest);
+            person.setParent(personDestination);
         }
         for (Unit unit : new ArrayList<>(travelLoc.fetchUnitsAtLocation())) {
-            LocationNode.LocationManager.setLocation(unit, unitDest);
+            LocationNode.LocationManager.setLocation(unit, unitDestination);
         }
         for (Part part : new ArrayList<>(travelLoc.fetchPartsAtLocation())) {
-            LocationNode.LocationManager.setLocation(part, partDest);
+            LocationNode.LocationManager.setLocation(part, partDestination);
         }
         removeTravelNode(travelLoc, campaign);
     }
 
     /**
-     * Builds a cross-system travel node from {@code fromSystem} toward {@code destSystem}, parented under
+     * Builds a cross-system travel node from {@code fromSystem} toward {@code destinationSystem}, parented under
      * {@code destination}, and registers it with the campaign.
      *
      * <p>Returns an empty {@link Optional} (without modifying state) when no path exists or the
      * path is empty — callers should fall back to direct placement in that case.</p>
      */
     private static Optional<CurrentLocation> buildTravelNode(PlanetarySystem fromSystem,
-          PlanetarySystem destSystem,
+          PlanetarySystem destinationSystem,
           ILocation destination,
           Campaign campaign,
           String logContext) {
-        JumpPath path = campaign.calculateJumpPath(fromSystem, destSystem);
+        JumpPath path = campaign.calculateJumpPath(fromSystem, destinationSystem);
         if (path == null || path.isEmpty()) {
             return Optional.empty();
         }
@@ -203,25 +203,25 @@ public final class LocationDispatch {
           ILocation destination,
           Campaign campaign) {
 
-        PlanetarySystem destSystem = destination.getCurrentSystem();
+        PlanetarySystem destinationSystem = destination.getCurrentSystem();
 
         Map<PlanetarySystem, List<Person>> bySystem = people.stream()
               .collect(Collectors.groupingBy(p -> {
-                  PlanetarySystem sys = p.getCurrentSystem();
-                  return sys != null ? sys : campaign.getCurrentSystem();
+                  PlanetarySystem system = p.getCurrentSystem();
+                  return system != null ? system : campaign.getCurrentSystem();
               }));
 
         for (Map.Entry<PlanetarySystem, List<Person>> entry : bySystem.entrySet()) {
             PlanetarySystem fromSystem = entry.getKey();
             List<Person> group = entry.getValue();
 
-            if (destSystem == null || fromSystem.equals(destSystem)) {
+            if (destinationSystem == null || fromSystem.equals(destinationSystem)) {
                 group.forEach(p -> p.setParent(destination));
                 continue;
             }
 
             Optional<CurrentLocation> maybeTravelLoc = buildTravelNode(
-                  fromSystem, destSystem, destination, campaign, "dispatchToLocation");
+                  fromSystem, destinationSystem, destination, campaign, "dispatchToLocation");
             if (maybeTravelLoc.isEmpty()) {
                 group.forEach(p -> p.setParent(destination));
                 continue;
