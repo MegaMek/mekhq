@@ -33,7 +33,6 @@
 package mekhq.gui.enums;
 
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
-import static mekhq.utilities.MHQInternationalization.getFormattedText;
 import static mekhq.utilities.MHQInternationalization.getText;
 
 import java.time.LocalDate;
@@ -56,15 +55,9 @@ import megamek.common.units.Tank;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
-import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CurrentLocation;
-import mekhq.campaign.JumpPath;
-import mekhq.campaign.base.AbstractBase;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.location.AcademyCampusLocation;
-import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Injury;
@@ -86,7 +79,7 @@ import mekhq.campaign.randomEvents.personalities.enums.Greed;
 import mekhq.campaign.randomEvents.personalities.enums.Social;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.gui.model.LocationDisplay;
 import mekhq.gui.sorter.AttributeScoreSorter;
 import mekhq.gui.sorter.BonusSorter;
 import mekhq.gui.sorter.DateStringComparator;
@@ -754,54 +747,9 @@ public enum PersonnelTableModelColumn {
                 }
                 yield scenario.getName();
             }
-            case DESTINATION_NAME -> {
-                AbstractLocation location = getPersonLocation(person);
-                if (location instanceof CurrentLocation currentLocation
-                          && currentLocation.getJumpPath() != null && !currentLocation.getJumpPath().isEmpty()) {
-                    PlanetarySystem destination = currentLocation.getJumpPath().getLastSystem();
-                    LocationNode currentLocationNode = currentLocation.getLocationNode();
-                    if (currentLocationNode != null) {
-                        LocationNode parent = currentLocationNode.getParent();
-                        while (parent != null) {
-                            if (parent.getLocatable() instanceof AbstractBase base) {
-                                yield base.getDisplayName();
-                            }
-                            if (parent.getLocatable() instanceof AcademyCampusLocation campus) {
-                                LocationNode fixedLocationNode = parent.getParent();
-                                if (fixedLocationNode != null
-                                          && fixedLocationNode.getLocatable() instanceof AbstractLocation campusLocation
-                                          && campusLocation.getCurrentSystem().equals(destination)) {
-                                    yield campus.getAcademyName();
-                                }
-                                yield campaign.getName();
-                            }
-                            parent = parent.getParent();
-                        }
-                    }
-                }
-                yield "-";
-            }
-            case DESTINATION_PLANET -> {
-                AbstractLocation location = getPersonLocation(person);
-                if (location instanceof CurrentLocation currentLocation
-                          && currentLocation.getJumpPath() != null && !currentLocation.getJumpPath().isEmpty()) {
-                    PlanetarySystem destinationSystem = currentLocation.getJumpPath().getLastSystem();
-                    if (destinationSystem != null) {
-                        Planet planet = destinationSystem.getPrimaryPlanet();
-                        yield planet != null ? planet.getPrintableName(today) : "-";
-                    }
-                }
-                yield "-";
-            }
-            case DESTINATION_SYSTEM -> {
-                AbstractLocation location = getPersonLocation(person);
-                if (location instanceof CurrentLocation currentLocation
-                          && currentLocation.getJumpPath() != null && !currentLocation.getJumpPath().isEmpty()) {
-                    PlanetarySystem destinationSystem = currentLocation.getJumpPath().getLastSystem();
-                    yield destinationSystem != null ? destinationSystem.getPrintableName(today) : "-";
-                }
-                yield "-";
-            }
+            case DESTINATION_NAME -> LocationDisplay.getDestinationName(person, campaign, today);
+            case DESTINATION_PLANET -> LocationDisplay.getDestinationPlanet(person, today);
+            case DESTINATION_SYSTEM -> LocationDisplay.getDestinationSystem(person, today);
             case DEXTERITY -> getAttributeScoreDisplay(person, SkillAttribute.DEXTERITY);
             case DIVORCEABLE -> getText(person.getGenealogy().hasSpouse() ?
                                                           (convertBooleanToYesNo(person.isDivorceable())) : "NA.text");
@@ -844,72 +792,9 @@ public enum PersonnelTableModelColumn {
             case LAST_NAME -> person.getLastName();
             case LAST_RANK_CHANGE_DATE -> MekHQ.getMHQOptions().getDisplayFormattedDate(person.getLastRankChangeDate());
             case LEADERSHIP -> skillValue.apply(SkillType.S_LEADER);
-            case LOCATION_NAME -> {
-                AbstractLocation location = getPersonLocation(person);
-                boolean isTraveling = location instanceof CurrentLocation cl
-                                            && cl.getJumpPath() != null && !cl.getJumpPath().isEmpty();
-                LocationNode node = person.getLocationNode();
-                if (node != null) {
-                    LocationNode parent = node.getParent();
-                    while (parent != null) {
-                        if (parent.getLocatable() == campaign.getMainForcePersonnel()) {
-                            yield campaign.getName();
-                        }
-                        if (!isTraveling && parent.getLocatable() instanceof AbstractBase base) {
-                            yield base.getDisplayName();
-                        }
-                        if (!isTraveling && parent.getLocatable() instanceof AcademyCampusLocation campus) {
-                            yield campus.getAcademyName();
-                        }
-                        parent = parent.getParent();
-                    }
-                }
-                if (isTraveling) {
-                    CurrentLocation currentLocation = (CurrentLocation) location;
-                    JumpPath path = currentLocation.getJumpPath();
-                    PlanetarySystem sys = currentLocation.getCurrentSystem();
-                    if (path.size() > 1 && currentLocation.isAtJumpPoint()) {
-                        double neededHours = sys.getRechargeTime(today,
-                              currentLocation.computeIsUseCommandCircuit(campaign));
-                        double remainingHours = neededHours - currentLocation.getRechargeTime();
-                        if (remainingHours > 0) {
-                            int days = (int) Math.ceil(remainingHours / 24.0);
-                            yield getFormattedText(
-                                  "PersonnelTableModelColumn.LOCATION_NAME.inTransit.recharging.text",
-                                  days);
-                        }
-                        yield getText("PersonnelTableModelColumn.LOCATION_NAME.inTransit.readyToJump.text");
-                    } else if (path.size() == 1) {
-                        int days = (int) Math.ceil(currentLocation.getTransitTime());
-                        yield getFormattedText(
-                              "PersonnelTableModelColumn.LOCATION_NAME.inTransit.toPlanet.text",
-                              days);
-                    } else {
-                        double daysToJumpPoint = sys.getTimeToJumpPoint(1.0) - currentLocation.getTransitTime();
-                        int days = (int) Math.ceil(daysToJumpPoint);
-                        yield getFormattedText(
-                              "PersonnelTableModelColumn.LOCATION_NAME.inTransit.toJumpPoint.text",
-                              days);
-                    }
-                }
-                yield "-";
-            }
-            case LOCATION_PLANET -> {
-                AbstractLocation location = getPersonLocation(person);
-                if (location != null) {
-                    Planet planet = location.getPlanet();
-                    yield planet != null ? planet.getPrintableName(today) : "-";
-                }
-                yield "-";
-            }
-            case LOCATION_SYSTEM -> {
-                AbstractLocation location = getPersonLocation(person);
-                if (location != null) {
-                    PlanetarySystem system = location.getCurrentSystem();
-                    yield system != null ? system.getPrintableName(today) : "-";
-                }
-                yield "-";
-            }
+            case LOCATION_NAME -> LocationDisplay.getLocationName(person, campaign, today);
+            case LOCATION_PLANET -> LocationDisplay.getLocationPlanet(person, today, campaign);
+            case LOCATION_SYSTEM -> LocationDisplay.getLocationSystem(person, today, campaign);
             case LOYALTY -> String.valueOf(person.getAdjustedLoyalty(campaign.getFaction(),
                   campaignOptions.isUseAlternativeAdvancedMedical()));
             case MARRIAGEABLE -> getText(person.getGenealogy().hasSpouse() ? "NA.text"
@@ -1096,11 +981,6 @@ public enum PersonnelTableModelColumn {
             case XP -> Integer.toString(person.getXP());
             case ZERO_G -> skillValue.apply(SkillType.S_ZERO_G_OPERATIONS);
         };
-    }
-
-    private static @Nullable AbstractLocation getPersonLocation(Person person) {
-        LocationNode node = person.getLocationNode();
-        return node != null ? node.getNearestAbstractLocation() : null;
     }
 
     private static String getAggregateSkillDisplay(Person person, PersonnelRole primaryProfession,

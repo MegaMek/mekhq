@@ -168,7 +168,7 @@ public record Quartermaster(Campaign campaign) {
         part.postProcessCampaignAddition();
 
         // Add the part to our warehouse and merge it with any existing part if possible
-        part.getWarehouse().addPart(part, true);
+        getWarehouse().addPart(part, true);
     }
 
     /**
@@ -550,7 +550,7 @@ public record Quartermaster(Campaign campaign) {
 
         // Add the part back to the Warehouse, asking that
         // it be merged with any existing spare part.
-        part = part.getWarehouse().addPart(part, true);
+        part = getWarehouse().addPart(part, true);
         MekHQ.triggerEvent(new PartArrivedEvent(part));
     }
 

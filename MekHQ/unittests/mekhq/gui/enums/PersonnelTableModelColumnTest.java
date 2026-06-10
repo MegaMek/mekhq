@@ -1007,7 +1007,7 @@ public class PersonnelTableModelColumnTest {
             Campaign campaign = mockCampaign();
             assertEquals("-", PersonnelTableModelColumn.LOCATION_SYSTEM.getCellValue(campaign, market, person, false, false));
             assertEquals("-", PersonnelTableModelColumn.LOCATION_PLANET.getCellValue(campaign, market, person, false, false));
-            assertEquals("-", PersonnelTableModelColumn.LOCATION_NAME.getCellValue(campaign, market, person, false, false));
+            assertEquals(CAMPAIGN_NAME, PersonnelTableModelColumn.LOCATION_NAME.getCellValue(campaign, market, person, false, false));
             assertEquals("-",
                   PersonnelTableModelColumn.DESTINATION_SYSTEM.getCellValue(campaign, market, person, false, false));
             assertEquals("-",

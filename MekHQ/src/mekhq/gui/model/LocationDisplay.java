@@ -32,14 +32,18 @@
  */
 package mekhq.gui.model;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 import java.time.LocalDate;
-import java.util.ResourceBundle;
 
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.base.AbstractBase;
+import mekhq.campaign.base.PlayerBase;
+import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.universe.Planet;
@@ -65,8 +69,7 @@ import mekhq.campaign.universe.PlanetarySystem;
  */
 public final class LocationDisplay {
 
-    private static final ResourceBundle RESOURCES =
-          ResourceBundle.getBundle("mekhq.resources.GUI");
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.GUI";
 
     private LocationDisplay() {}
 
@@ -86,12 +89,21 @@ public final class LocationDisplay {
         boolean isTraveling = loc instanceof CurrentLocation cl
                                     && cl.getJumpPath() != null && !cl.getJumpPath().isEmpty();
 
-        if (!isTraveling && node != null) {
+        if (node != null) {
             LocationNode parent = node.getParent();
             while (parent != null) {
-                if (parent.getLocatable() instanceof AbstractBase base) {
-                    String name = base.getDisplayName();
-                    return (name != null && !name.isBlank()) ? name : "Unnamed Base";
+                ILocation locatable = parent.getLocatable();
+                if (locatable == campaign.getMainForcePersonnel()) {
+                    return campaign.getName();
+                }
+                if (!isTraveling) {
+                    if (locatable instanceof AbstractBase base) {
+                        String name = base.getDisplayName();
+                        return (name != null && !name.isBlank()) ? name : "Unnamed Base";
+                    }
+                    if (locatable instanceof AcademyCampusLocation campus) {
+                        return campus.getAcademyName();
+                    }
                 }
                 parent = parent.getParent();
             }
@@ -107,25 +119,22 @@ public final class LocationDisplay {
                 double remainingHours = neededHours - cl.getRechargeTime();
                 if (remainingHours > 0) {
                     int days = (int) Math.ceil(remainingHours / 24.0);
-                    return String.format(
-                          RESOURCES.getString(
-                                "PersonnelTableModelColumn.LOCATION_NAME.inTransit.recharging.text"),
+                    return getFormattedTextAt(RESOURCE_BUNDLE,
+                          "PersonnelTableModelColumn.LOCATION_NAME.inTransit.recharging.text",
                           days);
                 }
-                return RESOURCES.getString(
+                return getTextAt(RESOURCE_BUNDLE,
                       "PersonnelTableModelColumn.LOCATION_NAME.inTransit.readyToJump.text");
             } else if (path.size() == 1) {
                 int days = (int) Math.ceil(cl.getTransitTime());
-                return String.format(
-                      RESOURCES.getString(
-                            "PersonnelTableModelColumn.LOCATION_NAME.inTransit.toPlanet.text"),
+                return getFormattedTextAt(RESOURCE_BUNDLE,
+                      "PersonnelTableModelColumn.LOCATION_NAME.inTransit.toPlanet.text",
                       days);
             } else {
                 double daysToJP = sys.getTimeToJumpPoint(1.0) - cl.getTransitTime();
                 int days = (int) Math.ceil(daysToJP);
-                return String.format(
-                      RESOURCES.getString(
-                            "PersonnelTableModelColumn.LOCATION_NAME.inTransit.toJumpPoint.text"),
+                return getFormattedTextAt(RESOURCE_BUNDLE,
+                      "PersonnelTableModelColumn.LOCATION_NAME.inTransit.toJumpPoint.text",
                       days);
             }
         }
@@ -182,6 +191,7 @@ public final class LocationDisplay {
         if (loc instanceof CurrentLocation cl) {
             JumpPath path = cl.getJumpPath();
             if (path != null && !path.isEmpty()) {
+                PlanetarySystem dest = path.getLastSystem();
                 LocationNode clNode = cl.getLocationNode();
                 if (clNode != null) {
                     LocationNode parent = clNode.getParent();
@@ -190,11 +200,27 @@ public final class LocationDisplay {
                             String name = base.getDisplayName();
                             return (name != null && !name.isBlank()) ? name : "Unnamed Base";
                         }
+                        if (parent.getLocatable() instanceof AcademyCampusLocation campus) {
+                            LocationNode fixedNode = parent.getParent();
+                            if (fixedNode != null
+                                      && fixedNode.getLocatable() instanceof AbstractLocation campusLoc
+                                      && campusLoc.getCurrentSystem().equals(dest)) {
+                                return campus.getAcademyName();
+                            }
+                            return campaign.getName();
+                        }
                         parent = parent.getParent();
                     }
                 }
-                PlanetarySystem dest = path.getLastSystem();
-                return dest != null ? dest.getPrintableName(today) : "-";
+                if (dest != null) {
+                    for (PlayerBase base : campaign.getPlayerBases()) {
+                        if (dest.equals(base.getCurrentSystem())) {
+                            String name = base.getDisplayName();
+                            return (name != null && !name.isBlank()) ? name : "Unnamed Base";
+                        }
+                    }
+                    return dest.getPrintableName(today);
+                }
             }
         }
         return "-";

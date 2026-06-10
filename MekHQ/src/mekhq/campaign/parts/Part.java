@@ -389,7 +389,13 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
 
     @Override
     public LocationNode getLocationNode() {
-        return unit != null ? unit.getLocationNode() : locationNode;
+        if (unit != null) {
+            LocationNode unitNode = unit.getLocationNode();
+            if (unitNode != null) {
+                return unitNode;
+            }
+        }
+        return locationNode;
     }
 
     @Override
