@@ -878,8 +878,8 @@ public enum PersonnelTableModelColumn {
                               "PersonnelTableModelColumn.LOCATION_NAME.inTransit.toPlanet.text",
                               days);
                     } else {
-                        double daysToJP = sys.getTimeToJumpPoint(1.0) - currentLocation.getTransitTime();
-                        int days = (int) Math.ceil(daysToJP);
+                        double daysToJumpPoint = sys.getTimeToJumpPoint(1.0) - currentLocation.getTransitTime();
+                        int days = (int) Math.ceil(daysToJumpPoint);
                         yield getFormattedText(
                               "PersonnelTableModelColumn.LOCATION_NAME.inTransit.toJumpPoint.text",
                               days);
