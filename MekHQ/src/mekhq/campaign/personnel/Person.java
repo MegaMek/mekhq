@@ -7954,6 +7954,21 @@ public class Person implements ILocation {
         return java.util.Set.of(this);
     }
 
+    public List<Skill> getInProgressSkills() {
+        Collection<Skill> allTrainedSkills = skills.getSkills();
+        List<Skill> inProgressSkills = new ArrayList<>();
+
+        for (Skill skill : allTrainedSkills) {
+            if (skill.getXpProgress() > 0) {
+                inProgressSkills.add(skill);
+            }
+        }
+
+        inProgressSkills.sort(Comparator.comparing(s -> s.getType().getName()));
+
+        return inProgressSkills;
+    }
+
     public static class PersonUnitRef extends Unit {
         private PersonUnitRef(final UUID id) {
             setId(id);

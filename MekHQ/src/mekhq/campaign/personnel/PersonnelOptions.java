@@ -69,6 +69,7 @@ public class PersonnelOptions extends PilotOptions {
     public static final String EDGE_SALVAGE_ACCIDENTS = "edge_when_salvage_accident";
     public static final String EDGE_ESCAPE_ATTEMPTS = "edge_when_escape_attempt_fail";
     public static final String EDGE_COMMANDER_NEGOTIATION = "edge_when_commander_negotiation_fail";
+    public static final String EDGE_RECON_FAIL = "edge_when_recon_fail";
     public static final String EDGE_TRAINING = "edge_when_training_fail";
 
     public static final String TECH_WEAPON_SPECIALIST = "tech_weapon_specialist";
@@ -403,6 +404,7 @@ public class PersonnelOptions extends PilotOptions {
         addOption(edge, EDGE_SALVAGE_ACCIDENTS, true);
         addOption(edge, EDGE_ESCAPE_ATTEMPTS, true);
         addOption(edge, EDGE_COMMANDER_NEGOTIATION, true);
+        addOption(edge, EDGE_RECON_FAIL, false);
         addOption(edge, EDGE_TRAINING, true);
 
         List<CustomOption> customs = CustomOption.getCustomAbilities();
