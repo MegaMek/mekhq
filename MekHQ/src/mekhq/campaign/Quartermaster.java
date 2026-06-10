@@ -172,16 +172,50 @@ public record Quartermaster(Campaign campaign) {
     }
 
     /**
+     * Adds ammo to a specific warehouse.
+     *
+     * @param warehouse The warehouse to add ammo to.
+     * @param ammoType  The type of ammo to add.
+     * @param shots     The number of rounds of ammo to add.
+     */
+    public void addAmmo(Warehouse warehouse, AmmoType ammoType, int shots) {
+        Objects.requireNonNull(ammoType);
+        if (shots > 0) {
+            AmmoStorage storage = new AmmoStorage(0, ammoType, shots, campaign());
+            storage.setDaysToArrival(0);
+            storage.setBrandNew(false);
+            storage.postProcessCampaignAddition();
+            warehouse.addPart(storage, true);
+        }
+    }
+
+    /**
      * Adds ammo to the campaign.
      *
      * @param ammoType The type of ammo to add.
      * @param shots    The number of rounds of ammo to add.
      */
     public void addAmmo(AmmoType ammoType, int shots) {
-        Objects.requireNonNull(ammoType);
+        addAmmo(getWarehouse(), ammoType, shots);
+    }
 
+    /**
+     * Adds infantry ammo to a specific warehouse.
+     *
+     * @param warehouse      The warehouse to add ammo to.
+     * @param ammoType       The type of ammo to add.
+     * @param infantryWeapon The type of infantry weapon using the ammo.
+     * @param shots          The number of rounds of ammo to add.
+     */
+    public void addAmmo(Warehouse warehouse, AmmoType ammoType, InfantryWeapon infantryWeapon, int shots) {
+        Objects.requireNonNull(ammoType);
+        Objects.requireNonNull(infantryWeapon);
         if (shots > 0) {
-            addPart(new AmmoStorage(0, ammoType, shots, campaign()), 0);
+            InfantryAmmoStorage storage = new InfantryAmmoStorage(0, ammoType, shots, infantryWeapon, campaign());
+            storage.setDaysToArrival(0);
+            storage.setBrandNew(false);
+            storage.postProcessCampaignAddition();
+            warehouse.addPart(storage, true);
         }
     }
 
@@ -193,12 +227,34 @@ public record Quartermaster(Campaign campaign) {
      * @param shots          The number of rounds of ammo to add.
      */
     public void addAmmo(AmmoType ammoType, InfantryWeapon infantryWeapon, int shots) {
-        Objects.requireNonNull(ammoType);
-        Objects.requireNonNull(infantryWeapon);
+        addAmmo(getWarehouse(), ammoType, infantryWeapon, shots);
+    }
 
-        if (shots > 0) {
-            addPart(new InfantryAmmoStorage(0, ammoType, shots, infantryWeapon, campaign()), 0);
+    /**
+     * Removes ammo from a specific warehouse, if available.
+     *
+     * @param warehouse   The warehouse to remove ammo from.
+     * @param ammoType    The type of ammo to remove.
+     * @param shotsNeeded The number of rounds of ammo needed.
+     *
+     * @return The number of rounds of ammo removed. This value may be less than or equal to {@code shotsNeeded}.
+     */
+    public int removeAmmo(Warehouse warehouse, AmmoType ammoType, int shotsNeeded) {
+        Objects.requireNonNull(ammoType);
+
+        if (shotsNeeded <= 0) {
+            return 0;
         }
+
+        AmmoStorage ammoStorage = findSpareAmmo(warehouse, ammoType);
+        int shotsRemoved = removeAmmo(warehouse, ammoStorage, shotsNeeded);
+        int shotsRemaining = shotsNeeded - shotsRemoved;
+
+        if ((shotsRemaining > 0) && getCampaignOptions().isUseAmmoByType()) {
+            shotsRemoved += removeCompatibleAmmo(warehouse, ammoType, shotsRemaining);
+        }
+
+        return shotsRemoved;
     }
 
     /**
@@ -211,43 +267,20 @@ public record Quartermaster(Campaign campaign) {
      *       {@code shotsNeeded}.
      */
     public int removeAmmo(AmmoType ammoType, int shotsNeeded) {
-        Objects.requireNonNull(ammoType);
-
-        if (shotsNeeded <= 0) {
-            return 0;
-        }
-
-        AmmoStorage ammoStorage = findSpareAmmo(ammoType);
-
-        int shotsRemoved = removeAmmo(ammoStorage, shotsNeeded);
-
-        // See if we still need some more ammo ...
-        int shotsRemaining = shotsNeeded - shotsRemoved;
-
-        // ... then check if we can use compatible ammo ...
-        if ((shotsRemaining > 0) && getCampaignOptions().isUseAmmoByType()) {
-            shotsRemoved += removeCompatibleAmmo(ammoType, shotsRemaining);
-        }
-
-        // Inform the caller how many shots we actually removed for them ...
-        return shotsRemoved;
+        return removeAmmo(getWarehouse(), ammoType, shotsNeeded);
     }
 
     /**
-     * Remove ammo directly from an AmmoStorage part.
-     *
-     * @param shotsNeeded The number of shots needed.
-     *
-     * @return The number of shots removed.
+     * Remove ammo directly from an AmmoStorage part, using the given warehouse for cleanup.
      */
-    private int removeAmmo(@Nullable AmmoStorage ammoStorage, int shotsNeeded) {
+    private int removeAmmo(Warehouse warehouse, @Nullable AmmoStorage ammoStorage, int shotsNeeded) {
         if (ammoStorage == null) {
             return 0;
         }
 
         if (ammoStorage.getShots() == 0) {
             // Clean up empty AmmoStorage that shouldn't exist in the warehouse
-            getWarehouse().removePart(ammoStorage);
+            warehouse.removePart(ammoStorage);
             return 0;
         }
 
@@ -260,12 +293,56 @@ public record Quartermaster(Campaign campaign) {
         ammoStorage.changeShots(-shotsRemoved);
         if (ammoStorage.getShots() == 0) {
             // ... and remove the part if we've run out.
-            getWarehouse().removePart(ammoStorage);
+            warehouse.removePart(ammoStorage);
         } else {
             MekHQ.triggerEvent(new PartChangedEvent(ammoStorage));
         }
 
         return shotsRemoved;
+    }
+
+    /**
+     * Removes compatible ammo from a specific warehouse, if available.
+     *
+     * @param warehouse   The warehouse to remove ammo from.
+     * @param ammoType    The type of ammo to remove.
+     * @param shotsNeeded The number of rounds of ammo needed.
+     *
+     * @return The number of rounds of ammo removed. This value may be less than or equal to {@code shotsNeeded}.
+     */
+    public int removeCompatibleAmmo(Warehouse warehouse, AmmoType ammoType, int shotsNeeded) {
+        Objects.requireNonNull(ammoType);
+
+        if (shotsNeeded <= 0) {
+            return 0;
+        }
+
+        int shotsRemoved = 0;
+
+        List<AmmoStorage> compatibleAmmo = findCompatibleSpareAmmo(warehouse, ammoType);
+        for (AmmoStorage compatible : compatibleAmmo) {
+            if (shotsRemoved >= shotsNeeded) {
+                break;
+            }
+
+            int shotsAvailable = convertShots(compatible.getType(), compatible.getShots(), ammoType);
+            if (shotsAvailable <= 0) {
+                continue;
+            }
+
+            int compatibleShotsNeeded = convertShotsNeeded(ammoType, shotsNeeded, compatible.getType());
+            int compatibleShotsRemoved = removeAmmo(warehouse, compatible, compatibleShotsNeeded);
+            if (compatibleShotsRemoved > 0) {
+                shotsRemoved += convertShots(compatible.getType(), compatibleShotsRemoved, ammoType);
+            }
+        }
+
+        int unusedShots = shotsRemoved - shotsNeeded;
+        if (unusedShots > 0) {
+            addAmmo(warehouse, ammoType, unusedShots);
+        }
+
+        return Math.min(shotsNeeded, shotsRemoved);
     }
 
     /**
@@ -278,46 +355,16 @@ public record Quartermaster(Campaign campaign) {
      *       {@code shotsNeeded}.
      */
     public int removeCompatibleAmmo(AmmoType ammoType, int shotsNeeded) {
-        Objects.requireNonNull(ammoType);
+        return removeCompatibleAmmo(getWarehouse(), ammoType, shotsNeeded);
+    }
 
-        if (shotsNeeded <= 0) {
-            return 0;
-        }
-
-        int shotsRemoved = 0;
-
-        List<AmmoStorage> compatibleAmmo = findCompatibleSpareAmmo(ammoType);
-        for (AmmoStorage compatible : compatibleAmmo) {
-            if (shotsRemoved >= shotsNeeded) {
-                break;
-            }
-
-            // Check to see if it has at least one shot we can use in our target ammo type ...
-            int shotsAvailable = convertShots(compatible.getType(), compatible.getShots(), ammoType);
-            if (shotsAvailable <= 0) {
-                // ... and if not, skip this ammo storage.
-                continue;
-            }
-
-            // Calculate the shots needed in the compatible ammo type ...
-            int compatibleShotsNeeded = convertShotsNeeded(ammoType, shotsNeeded, compatible.getType());
-
-            // Try removing at least one shot of ammo from the compatible ammo storage.
-            int compatibleShotsRemoved = removeAmmo(compatible, compatibleShotsNeeded);
-            if (compatibleShotsRemoved > 0) {
-                // If we did remove some ammo, adjust the number of shots we removed and needed
-                shotsRemoved += convertShots(compatible.getType(), compatibleShotsRemoved, ammoType);
-            }
-        }
-
-        // Check if we removed more than we needed (e.g. we pull LRM20 ammo for an LRM5) ...
-        int unusedShots = shotsRemoved - shotsNeeded;
-        if (unusedShots > 0) {
-            // ... and if we did, return it to the campaign.
-            addAmmo(ammoType, unusedShots);
-        }
-
-        return Math.min(shotsNeeded, shotsRemoved);
+    /**
+     * Finds spare ammo of a given type in a specific warehouse, if any.
+     */
+    private @Nullable AmmoStorage findSpareAmmo(Warehouse warehouse, AmmoType ammoType) {
+        return (AmmoStorage) warehouse.findSparePart(part -> isAvailableAsSpareAmmo(part)
+                                                                  &&
+                                                                  ((AmmoStorage) part).isSameAmmoType(ammoType));
     }
 
     /**
@@ -328,9 +375,30 @@ public record Quartermaster(Campaign campaign) {
      * @return The matching spare {@code AmmoStorage} part, otherwise {@code null}.
      */
     private @Nullable AmmoStorage findSpareAmmo(AmmoType ammoType) {
-        return (AmmoStorage) getWarehouse().findSparePart(part -> isAvailableAsSpareAmmo(part)
-                                                                        &&
-                                                                        ((AmmoStorage) part).isSameAmmoType(ammoType));
+        return findSpareAmmo(getWarehouse(), ammoType);
+    }
+
+    /**
+     * Find compatible ammo in a specific warehouse.
+     */
+    private List<AmmoStorage> findCompatibleSpareAmmo(Warehouse warehouse, AmmoType ammoType) {
+        List<AmmoStorage> compatibleAmmo = new ArrayList<>();
+        warehouse.forEachSparePart(part -> {
+            if (!isAvailableAsSpareAmmo(part)) {
+                return;
+            }
+
+            AmmoStorage spare = (AmmoStorage) part;
+            if (spare.isSameAmmoType(ammoType)) {
+                return;
+            }
+
+            if (spare.isCompatibleAmmo(ammoType) && (spare.getShots() > 0)) {
+                compatibleAmmo.add(spare);
+            }
+        });
+
+        return compatibleAmmo;
     }
 
     /**
@@ -341,26 +409,7 @@ public record Quartermaster(Campaign campaign) {
      * @return A list of spare {@code AmmoStorage} parts in the warehouse.
      */
     private List<AmmoStorage> findCompatibleSpareAmmo(AmmoType ammoType) {
-        List<AmmoStorage> compatibleAmmo = new ArrayList<>();
-        getWarehouse().forEachSparePart(part -> {
-            if (!isAvailableAsSpareAmmo(part)) {
-                return;
-            }
-
-            AmmoStorage spare = (AmmoStorage) part;
-            if (spare.isSameAmmoType(ammoType)) {
-                // We are looking for compatible ammo, not identical ammo.
-                return;
-            }
-
-            // If we found a spare ammo bin with at least one shot available ...
-            if (spare.isCompatibleAmmo(ammoType) && (spare.getShots() > 0)) {
-                // ... add it to our list of compatible ammo.
-                compatibleAmmo.add(spare);
-            }
-        });
-
-        return compatibleAmmo;
+        return findCompatibleSpareAmmo(getWarehouse(), ammoType);
     }
 
     /**
@@ -488,6 +537,18 @@ public record Quartermaster(Campaign campaign) {
     }
 
     /**
+     * Finds spare infantry ammo of a given type in a specific warehouse, if any.
+     */
+    private @Nullable InfantryAmmoStorage findSpareAmmo(Warehouse warehouse, AmmoType ammoType, InfantryWeapon weaponType) {
+        return (InfantryAmmoStorage) warehouse.findSparePart(part -> {
+            if (!(part instanceof InfantryAmmoStorage) || !isAvailableAsSpareAmmo(part)) {
+                return false;
+            }
+            return ((InfantryAmmoStorage) part).isSameAmmoType(ammoType, weaponType);
+        });
+    }
+
+    /**
      * Finds spare infantry ammo of a given type, if any.
      *
      * @param ammoType   The {@code AmmoType} to search for.
@@ -496,12 +557,28 @@ public record Quartermaster(Campaign campaign) {
      * @return The matching spare {@code InfantryAmmoStorage} part, otherwise {@code null}.
      */
     private @Nullable InfantryAmmoStorage findSpareAmmo(AmmoType ammoType, InfantryWeapon weaponType) {
-        return (InfantryAmmoStorage) getWarehouse().findSparePart(part -> {
-            if (!(part instanceof InfantryAmmoStorage) || !isAvailableAsSpareAmmo(part)) {
-                return false;
-            }
-            return ((InfantryAmmoStorage) part).isSameAmmoType(ammoType, weaponType);
-        });
+        return findSpareAmmo(getWarehouse(), ammoType, weaponType);
+    }
+
+    /**
+     * Removes infantry ammo from a specific warehouse, if available.
+     *
+     * @param warehouse      The warehouse to remove ammo from.
+     * @param ammoType       The type of ammo to remove.
+     * @param infantryWeapon The infantry weapon using the ammo.
+     * @param shotsNeeded    The number of rounds of ammo needed.
+     *
+     * @return The number of rounds of ammo removed. This value may be less than or equal to {@code shotsNeeded}.
+     */
+    public int removeAmmo(Warehouse warehouse, AmmoType ammoType, InfantryWeapon infantryWeapon, int shotsNeeded) {
+        Objects.requireNonNull(ammoType);
+
+        if (shotsNeeded <= 0) {
+            return 0;
+        }
+
+        InfantryAmmoStorage ammoStorage = findSpareAmmo(warehouse, ammoType, infantryWeapon);
+        return removeAmmo(warehouse, ammoStorage, shotsNeeded);
     }
 
     /**
@@ -515,16 +592,7 @@ public record Quartermaster(Campaign campaign) {
      *       {@code shotsNeeded}.
      */
     public int removeAmmo(AmmoType ammoType, InfantryWeapon infantryWeapon, int shotsNeeded) {
-        Objects.requireNonNull(ammoType);
-
-        if (shotsNeeded <= 0) {
-            return 0;
-        }
-
-        InfantryAmmoStorage ammoStorage = findSpareAmmo(ammoType, infantryWeapon);
-
-        // Inform the caller how many shots we actually removed for them.
-        return removeAmmo(ammoStorage, shotsNeeded);
+        return removeAmmo(getWarehouse(), ammoType, infantryWeapon, shotsNeeded);
     }
 
     /**

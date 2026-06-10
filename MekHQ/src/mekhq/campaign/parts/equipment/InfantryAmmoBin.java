@@ -193,7 +193,7 @@ public class InfantryAmmoBin extends AmmoBin {
     protected int requisitionAmmo(AmmoType ammoType, int shotsNeeded) {
         Objects.requireNonNull(ammoType);
 
-        return getCampaign().getQuartermaster().removeAmmo(ammoType, getWeaponType(), shotsNeeded);
+        return getCampaign().getQuartermaster().removeAmmo(getEffectiveWarehouse(), ammoType, getWeaponType(), shotsNeeded);
     }
 
     @Override
@@ -201,7 +201,7 @@ public class InfantryAmmoBin extends AmmoBin {
         Objects.requireNonNull(ammoType);
 
         if (shotsUnloaded > 0) {
-            getCampaign().getQuartermaster().addAmmo(ammoType, getWeaponType(), shotsUnloaded);
+            getCampaign().getQuartermaster().addAmmo(getEffectiveWarehouse(), ammoType, getWeaponType(), shotsUnloaded);
         }
     }
 

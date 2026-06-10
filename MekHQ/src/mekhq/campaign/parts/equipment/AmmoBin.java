@@ -60,6 +60,7 @@ import megamek.common.units.ProtoMek;
 import megamek.common.units.SmallCraft;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.Warehouse;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Availability;
@@ -341,19 +342,32 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         return null;
     }
 
+    protected Warehouse getEffectiveWarehouse() {
+        Unit unit = getUnit();
+        if (unit != null) {
+            Warehouse w = unit.getWarehouse();
+            if (w != null) {
+                return w;
+            }
+        }
+        return campaign.getWarehouse();
+    }
+
     /**
-     * Requisitions ammo of a given type from the quartermaster.
+     * Requisitions ammo of a given type from the unit's local warehouse (or campaign warehouse as
+     * fallback).
      *
      * @param ammoType    The {@code AmmoType} being requisitioned.
-     * @param shotsNeeded The number of shots needed from the quartermaster.
+     * @param shotsNeeded The number of shots needed.
      *
      * @return The number of shots requisitioned. This may be less than {@code shotsNeeded}.
      */
     protected int requisitionAmmo(AmmoType ammoType, int shotsNeeded) {
         Objects.requireNonNull(ammoType);
+        Warehouse warehouse = getEffectiveWarehouse();
         int shotsLoaded = 0;
         while (shotsLoaded < shotsNeeded) {
-            int shots = campaign.getQuartermaster().removeAmmo(ammoType, shotsNeeded - shotsLoaded);
+            int shots = campaign.getQuartermaster().removeAmmo(warehouse, ammoType, shotsNeeded - shotsLoaded);
             if (shots < 1) {
                 return shotsLoaded;
             } else {
@@ -409,7 +423,8 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
 
     /**
-     * Returns ammo unloaded from the bin to the quartermaster.
+     * Returns ammo unloaded from the bin to the unit's local warehouse (or campaign warehouse as
+     * fallback).
      *
      * @param ammoType      The {@code AmmoType} unloaded.
      * @param shotsUnloaded The number of shots of ammo unloaded.
@@ -418,7 +433,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         Objects.requireNonNull(ammoType);
 
         if (shotsUnloaded > 0) {
-            getCampaign().getQuartermaster().addAmmo(ammoType, shotsUnloaded);
+            getCampaign().getQuartermaster().addAmmo(getEffectiveWarehouse(), ammoType, shotsUnloaded);
         }
     }
 
