@@ -6930,13 +6930,11 @@ public class Campaign implements ITechManager, IPlace {
     }
 
     public boolean requiresAdditionalAsTechs() {
-        return getAsTechNeed() > 0;
+        return humanResources.requiresAdditionalAsTechs(campaignOptions);
     }
 
     public int getAsTechNeed() {
-        return (Math.toIntExact(getActivePersonnel(false, false).stream().filter(Person::isTech).count()) *
-                      MHQConstants.AS_TECH_TEAM_SIZE) -
-                     getNumberAsTechs();
+        return humanResources.getAsTechNeed(campaignOptions);
     }
 
     public void increaseAsTechPool(int i) {
@@ -7149,11 +7147,11 @@ public class Campaign implements ITechManager, IPlace {
     }
 
     public boolean requiresAdditionalMedics() {
-        return getMedicsNeed() > 0;
+        return humanResources.requiresAdditionalMedics();
     }
 
     public int getMedicsNeed() {
-        return (getDoctors().size() * 4) - getNumberMedics();
+        return humanResources.getMedicsNeed();
     }
 
     public void increaseMedicPool(int i) {
