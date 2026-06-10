@@ -3300,6 +3300,7 @@ public class Unit implements ITechnology, ILocation {
         Part motiveType = null;
         Part primaryW = null;
         Part secondaryW = null;
+        Part disposableW = null;
         Part infantryArmor = null;
         Part dropCollar = null;
         Part kfBoom = null;
@@ -3344,6 +3345,8 @@ public class Unit implements ITechnology, ILocation {
                 motiveType = part;
             } else if (part instanceof InfantryArmorPart) {
                 infantryArmor = part;
+            } else if (part instanceof InfantryDisposableWeaponPart) {
+                disposableW = part;
             } else if (part instanceof InfantryWeaponPart) {
                 if (((InfantryWeaponPart) part).isPrimary()) {
                     primaryW = part;
@@ -3889,7 +3892,17 @@ public class Unit implements ITechnology, ILocation {
             } else {
                 int equipmentNum = entity.getEquipmentNum(m);
                 EquipmentType type = m.getType();
-                if (entity instanceof BattleArmor) {
+                if ((entity instanceof BattleArmor) && (m instanceof WeaponMounted weaponMounted)
+                      && weaponMounted.isDisposableWeapon()) {
+                    // Disposable Weapon (TO:AR p.106): one squad loadout part, mount-linked to track firing,
+                    // instead of the per-trooper parts used for ordinary BA equipment.
+                    if (disposableW == null) {
+                        disposableW = new InfantryDisposableWeaponPart((int) entity.getWeight(), type, equipmentNum,
+                              ((BattleArmor) entity).getSquadSize(), getCampaign());
+                        addPart(disposableW);
+                        partsToAdd.add(disposableW);
+                    }
+                } else if (entity instanceof BattleArmor) {
                     // for BattleArmor we have multiple parts per mount, one for each trooper
                     Part[] equipmentParts = baEquipParts.get(equipmentNum);
                     for (int i = 0; i < ((BattleArmor) entity).getSquadSize(); i++) {
@@ -4570,6 +4583,23 @@ public class Unit implements ITechnology, ILocation {
                     partsToAdd.add(secondaryW);
                     number--;
                 }
+            }
+            // Disposable Weapons (TO:AR p.106): one part for the platoon's loadout (one per trooper), mounted on the
+            // real Disposable Weapon slot so it can track whether the platoon fired its disposables this scenario.
+            InfantryWeapon disposableType = infantry.getDisposableWeapon();
+            if ((null == disposableW) && (null != disposableType)) {
+                int disposableEquipNum = -1;
+                for (WeaponMounted weaponMounted : entity.getWeaponList()) {
+                    if (weaponMounted.isDisposableWeapon()) {
+                        disposableEquipNum = entity.getEquipmentNum(weaponMounted);
+                        break;
+                    }
+                }
+                int troopers = entity.getOInternal(ConvInfantry.LOC_INFANTRY);
+                disposableW = new InfantryDisposableWeaponPart((int) entity.getWeight(), disposableType,
+                      disposableEquipNum, troopers, getCampaign());
+                addPart(disposableW);
+                partsToAdd.add(disposableW);
             }
         }
         if (getEntity() instanceof LandAirMek) {

@@ -378,7 +378,20 @@ public class MekLabTab extends CampaignGuiTab {
             tonnage = battleArmor.getTrooperWeight() * battleArmor.getSquadSize();
         }
 
+        // [REFIT-DIAG] Extensive logging to diagnose why the Begin Refit button is disabled (e.g. infantry disposables).
+        String refitCheckFixable = refit.checkFixable();
+        LOGGER.info("[REFIT-DIAG] === refreshRefitSummary unit='{}' entity={} ===", unit.getName(),
+              entity.getClass().getSimpleName());
+        LOGGER.info("[REFIT-DIAG] tonnage={}, testEntity.calculateWeight()={}, overweight={}", tonnage,
+              testEntity.calculateWeight(), (tonnage < testEntity.calculateWeight()));
+        LOGGER.info("[REFIT-DIAG] correctEntity sb.isEmpty={}, sb='{}'", sb.isEmpty(), sb.toString().trim());
+        LOGGER.info("[REFIT-DIAG] refit.checkFixable()={}", refitCheckFixable);
+        LOGGER.info("[REFIT-DIAG] refit.getRefitClass()={}, refitClassName='{}', isNoChange={}, entity.getWeight()={}",
+              refit.getRefitClass(), refit.getRefitClassName(), (refit.getRefitClass() == Refit.NO_CHANGE),
+              entity.getWeight());
+
         if (tonnage < testEntity.calculateWeight()) {
+            LOGGER.info("[REFIT-DIAG] DISABLED: overweight ({} < {})", tonnage, testEntity.calculateWeight());
             btnRefit.setEnabled(false);
             btnRefit.setToolTipText("Unit is overweight.");
             btnSaveForLater.setEnabled(true);
@@ -389,18 +402,22 @@ public class MekLabTab extends CampaignGuiTab {
             // btnRefit.setEnabled(false);
             // btnRefit.setToolTipText("Unit is underweight.");
         } else if (!sb.isEmpty()) {
+            LOGGER.info("[REFIT-DIAG] DISABLED: correctEntity errors: {}", sb.toString().trim());
             btnRefit.setEnabled(false);
             btnRefit.setToolTipText(sb.toString());
             btnSaveForLater.setEnabled(true);
-        } else if (null != refit.checkFixable()) {
+        } else if (null != refitCheckFixable) {
+            LOGGER.info("[REFIT-DIAG] DISABLED: refit.checkFixable()={}", refitCheckFixable);
             btnRefit.setEnabled(false);
-            btnRefit.setToolTipText(refit.checkFixable());
+            btnRefit.setToolTipText(refitCheckFixable);
             btnSaveForLater.setEnabled(true);
         } else if (refit.getRefitClass() == Refit.NO_CHANGE && entity.getWeight() == testEntity.calculateWeight()) {
+            LOGGER.info("[REFIT-DIAG] DISABLED: NO_CHANGE and same weight");
             btnRefit.setEnabled(false);
             btnRefit.setToolTipText("Nothing to change.");
             btnSaveForLater.setEnabled(false);
         } else {
+            LOGGER.info("[REFIT-DIAG] ENABLED: Begin Refit button is enabled");
             btnRefit.setEnabled(true);
             btnRefit.setToolTipText(null);
             btnSaveForLater.setEnabled(true);
@@ -626,6 +643,9 @@ public class MekLabTab extends CampaignGuiTab {
             buildTab.refresh();
             previewTab.refresh();
             refreshSummary();
+            // A full refresh (e.g. an infantry Disposable Weapon or primary/secondary weapon change) must also
+            // re-evaluate the refit so the Begin Refit button reflects the change, not just the MML preview.
+            refreshRefitSummary();
         }
 
         @Override
@@ -883,6 +903,9 @@ public class MekLabTab extends CampaignGuiTab {
             buildTab.refresh();
             previewTab.refresh();
             refreshSummary();
+            // A full refresh (e.g. an infantry Disposable Weapon or primary/secondary weapon change) must also
+            // re-evaluate the refit so the Begin Refit button reflects the change, not just the MML preview.
+            refreshRefitSummary();
         }
 
         @Override
@@ -1007,6 +1030,9 @@ public class MekLabTab extends CampaignGuiTab {
             buildTab.refresh();
             previewTab.refresh();
             refreshSummary();
+            // A full refresh (e.g. an infantry Disposable Weapon or primary/secondary weapon change) must also
+            // re-evaluate the refit so the Begin Refit button reflects the change, not just the MML preview.
+            refreshRefitSummary();
         }
 
         @Override
@@ -1267,6 +1293,9 @@ public class MekLabTab extends CampaignGuiTab {
             buildTab.refresh();
             previewTab.refresh();
             refreshSummary();
+            // A full refresh (e.g. an infantry Disposable Weapon or primary/secondary weapon change) must also
+            // re-evaluate the refit so the Begin Refit button reflects the change, not just the MML preview.
+            refreshRefitSummary();
         }
 
         @Override
@@ -1503,6 +1532,9 @@ public class MekLabTab extends CampaignGuiTab {
             buildTab.refresh();
             previewTab.refresh();
             refreshSummary();
+            // A full refresh (e.g. an infantry Disposable Weapon or primary/secondary weapon change) must also
+            // re-evaluate the refit so the Begin Refit button reflects the change, not just the MML preview.
+            refreshRefitSummary();
         }
 
         @Override

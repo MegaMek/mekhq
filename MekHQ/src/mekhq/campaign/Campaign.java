@@ -196,6 +196,8 @@ import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.SpacecraftCoolingSystem;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
+import mekhq.campaign.parts.equipment.InfantryAmmoBin;
+import mekhq.campaign.parts.equipment.InfantryDisposableWeaponPart;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.parts.meks.MekLocation;
@@ -4159,7 +4161,11 @@ public class Campaign implements ITechManager, IPlace {
             roll = d6(2);
         } else {
             roll = Utilities.roll3d6();
-            wrongType = " <b>Warning: wrong tech type for this repair.</b>";
+            // On an automatic success the tech type is irrelevant (e.g. a self-crewed infantry unit reloading its
+            // disposables or field guns - there is no valid tech type for it), so do not show the misleading warning.
+            if (target.getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
+                wrongType = " <b>Warning: wrong tech type for this repair.</b>";
+            }
         }
         report = report + ",  needs " + target.getValueAsString() + " and rolls " + roll + ':';
         int xpGained = 0;
@@ -6556,6 +6562,21 @@ public class Campaign implements ITechManager, IPlace {
                   (partWork.getUnit() != null) &&
                   partWork.getUnit().isConventionalInfantry()) {
             return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "infantry refit");
+        }
+
+        // Reloading a Disposable Weapon (TO:AR p.106) is a resupply, not a skill repair: it succeeds automatically
+        // (the warehouse-stock check is handled by checkFixable above), so a self-crewed infantry unit - which has no
+        // mechanic tech type - is not penalised or able to fail the reload.
+        if (partWork instanceof InfantryDisposableWeaponPart) {
+            return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "disposable weapon reload");
+        }
+
+        // Reloading field-gun ammo on a self-crewed conventional infantry unit is likewise a resupply. CI has no
+        // mechanic tech type, so its own officer must not be penalised or able to fail the reload. (Field guns on
+        // support vehicles keep their normal mechanic-teched repair roll, as those units have a valid tech type.)
+        if ((partWork instanceof InfantryAmmoBin) && (partWork.getUnit() != null)
+                  && partWork.getUnit().isConventionalInfantry()) {
+            return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "infantry field gun reload");
         }
 
         // If we are using the MoF rule, then we will ignore mode penalty here
