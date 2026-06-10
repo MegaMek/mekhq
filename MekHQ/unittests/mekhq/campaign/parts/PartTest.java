@@ -36,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
@@ -47,12 +48,18 @@ import java.util.List;
 import java.util.UUID;
 
 import megamek.common.units.Entity;
+import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.FixedLocation;
 import mekhq.campaign.Warehouse;
+import mekhq.campaign.base.PlayerBase;
+import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.parts.meks.MekLocation;
 import mekhq.campaign.parts.meks.MekSensor;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.PlanetarySystem;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -377,5 +384,110 @@ public class PartTest {
         TransportBayPart tbp = new TransportBayPart(size, 1, size, mockCampaign);
         // Should return default name, _not_ throw NPE here
         assertNotNull(tbp.getName());
+    }
+
+    @Nested
+    class LocationNodeDelegation {
+        @Test
+        void getLocationNode_withoutUnit_returnsOwnNode() {
+            Part part = new MekSensor();
+            LocationNode node = part.getLocationNode();
+            assertNotNull(node);
+            assertSame(part, node.getLocatable());
+        }
+
+        @Test
+        void getLocationNode_withUnit_returnsUnitNode() {
+            LocationNode unitNode = mock(LocationNode.class);
+            Entity mockEntity = mock(Mek.class);
+            when(mockEntity.getWeight()).thenReturn(20.0);
+            Unit mockUnit = mock(Unit.class);
+            when(mockUnit.getId()).thenReturn(UUID.randomUUID());
+            when(mockUnit.getEntity()).thenReturn(mockEntity);
+            when(mockUnit.getLocationNode()).thenReturn(unitNode);
+
+            Part part = new MekSensor();
+            part.setUnit(mockUnit);
+
+            assertSame(unitNode, part.getLocationNode());
+        }
+    }
+
+    @Nested
+    class WarehouseLocalization {
+        @Test
+        void getWarehouse_sparePartInCampaignWarehouse_returnsCampaignWarehouse() {
+            Campaign mockCampaign = mock(Campaign.class);
+            Warehouse campaignWarehouse = new Warehouse();
+            when(mockCampaign.getWarehouse()).thenReturn(campaignWarehouse);
+
+            Part part = new MekSensor();
+            part.setCampaign(mockCampaign);
+
+            // spare part with no place ancestor: falls back to campaign warehouse
+            assertSame(campaignWarehouse, part.getWarehouse());
+        }
+
+        @Test
+        void getWarehouse_sparePartInBaseWarehouse_returnsBaseWarehouse() {
+            Campaign mockCampaign = mock(Campaign.class);
+            Warehouse campaignWarehouse = new Warehouse();
+            when(mockCampaign.getWarehouse()).thenReturn(campaignWarehouse);
+
+            PlayerBase base = new PlayerBase(new FixedLocation(mock(PlanetarySystem.class)));
+
+            Part part = new MekSensor();
+            part.setCampaign(mockCampaign);
+            base.getBaseWarehouse().addPart(part);
+
+            assertSame(base.getBaseWarehouse(), part.getWarehouse());
+        }
+
+        @Test
+        void getWarehouse_partOnUnitAtBase_returnsBaseWarehouse() {
+            Campaign mockCampaign = mock(Campaign.class);
+            Warehouse campaignWarehouse = new Warehouse();
+            when(mockCampaign.getWarehouse()).thenReturn(campaignWarehouse);
+
+            PlayerBase base = new PlayerBase(new FixedLocation(mock(PlanetarySystem.class)));
+
+            // Wire a unit into the base hangar so its locationNode parent chain reaches the base.
+            Entity mockEntity = mock(Mek.class);
+            when(mockEntity.getWeight()).thenReturn(20.0);
+            Unit mockUnit = mock(Unit.class);
+            when(mockUnit.getId()).thenReturn(UUID.randomUUID());
+            when(mockUnit.getEntity()).thenReturn(mockEntity);
+            LocationNode unitNode = new LocationNode(mockUnit);
+            LocationNode.LocationManager.setLocation(unitNode, base.getBaseHangar().getLocationNode());
+            when(mockUnit.getLocationNode()).thenReturn(unitNode);
+
+            Part part = new MekSensor();
+            part.setCampaign(mockCampaign);
+            part.setUnit(mockUnit);
+
+            assertSame(base.getBaseWarehouse(), part.getWarehouse());
+        }
+
+        @Test
+        void getWarehouse_partOnMainForceUnit_returnsCampaignWarehouse() {
+            Campaign mockCampaign = mock(Campaign.class);
+            Warehouse campaignWarehouse = new Warehouse();
+            when(mockCampaign.getWarehouse()).thenReturn(campaignWarehouse);
+
+            // Unit with a locationNode that has no IPlace ancestor.
+            Entity mockEntity = mock(Mek.class);
+            when(mockEntity.getWeight()).thenReturn(20.0);
+            Unit mockUnit = mock(Unit.class);
+            when(mockUnit.getId()).thenReturn(UUID.randomUUID());
+            when(mockUnit.getEntity()).thenReturn(mockEntity);
+            LocationNode unitNode = new LocationNode(mockUnit);
+            when(mockUnit.getLocationNode()).thenReturn(unitNode);
+
+            Part part = new MekSensor();
+            part.setCampaign(mockCampaign);
+            part.setUnit(mockUnit);
+
+            assertSame(campaignWarehouse, part.getWarehouse());
+        }
     }
 }

@@ -989,7 +989,7 @@ public class CampaignNewDayManager {
     }
 
     private void processPersonnelWhoHaveDepartedCampaign(boolean isNewWeek, RandomDeath randomDeath) {
-        List<Person> departedPersonnel = campaign.getPersonnel().stream()
+        List<Person> departedPersonnel = campaign.getAllPersonnel().stream()
                                                .filter(person -> person.getStatus().isFollowAfterLeavingCampaign())
                                                .toList();
         for (Person person : departedPersonnel) {
