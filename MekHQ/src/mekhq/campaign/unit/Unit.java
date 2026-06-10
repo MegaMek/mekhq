@@ -34,6 +34,7 @@
 package mekhq.campaign.unit;
 
 import static java.lang.Math.ceil;
+import static java.lang.Math.floor;
 import static java.lang.Math.max;
 import static megamek.common.board.Board.START_NONE;
 import static megamek.common.equipment.MiscType.F_CARGO;
@@ -2142,7 +2143,7 @@ public class Unit implements ITechnology, ILocation {
      */
     @Deprecated(since = "0.50.04")
     public int getCurrentDocks() {
-        return (int) Math.floor(getShipTransportedUnitsSummary().getCurrentTransportCapacity(DOCKING_COLLAR));
+        return (int) floor(getShipTransportedUnitsSummary().getCurrentTransportCapacity(DOCKING_COLLAR));
     }
 
     /**
@@ -5016,9 +5017,14 @@ public class Unit implements ITechnology, ILocation {
             int commanderTacticsBonus = commander.getSkill(SkillType.S_TACTICS)
                                               .getTotalSkillLevel(skillModifierData);
 
-            if (getCampaign().getCampaignOptions().isUseTactics()) {
+            CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
+            if (campaignOptions.isUseSensibleTactics()) {
+                commanderTacticsBonus = (int) floor(commanderTacticsBonus / 2.0);
+            }
+
+            if (campaignOptions.isUseTactics()) {
                 entity.getCrew().setCommandBonus(commanderTacticsBonus);
-            } else if (getCampaign().getCampaignOptions().isUseInitiativeBonus()) {
+            } else if (campaignOptions.isUseInitiativeBonus()) {
                 entity.getCrew().setInitBonus(commanderTacticsBonus);
             }
         }
@@ -7008,7 +7014,7 @@ public class Unit implements ITechnology, ILocation {
      */
     @Deprecated(since = "0.50.06", forRemoval = true)
     public int getAsTechsMaintained() {
-        return (int) Math.floor(asTechDaysMaintained / daysSinceMaintenance);
+        return (int) floor(asTechDaysMaintained / daysSinceMaintenance);
     }
 
     public int getMaintenanceMultiplier() {

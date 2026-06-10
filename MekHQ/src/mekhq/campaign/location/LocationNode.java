@@ -41,6 +41,7 @@ import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CurrentLocation;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -108,20 +109,67 @@ public class LocationNode {
     }
 
     public void writeToXML(PrintWriter pw, int indent) {
-        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent, "locationNodeChildren");
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw, indent, "locationNodeChildren");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "locationNodeChildren");
+        for (LocationNode child : children) {
+            if (child.getLocatable() instanceof AcademyCampusLocation campus) {
+                campus.writeToXML(pw, indent);
+            }
+            // Future: Additional objects that need to be saved in a location-context other than the main force
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "locationNodeChildren");
     }
 
+    /**
+     * Reconnects deserialized children of a {@link Campaign} location node.
+     *
+     * <p>Person, Unit, and Part reconnection will be added here once those types are fully
+     * serialized through the location tree.</p>
+     */
     public static void reconnectChildren(Node xmlNode, Campaign campaign) {
+        reconnectChildren(xmlNode, campaign, campaign);
+    }
+
+    /**
+     * Reconnects deserialized children of any {@link ILocation} node.
+     *
+     * @param xmlNode  the {@code <locationNodeChildren>} DOM node
+     * @param parent   the {@link ILocation} to attach deserialized children to
+     * @param campaign the owning campaign (used for UUID-keyed lookups when needed)
+     */
+    public static void reconnectChildren(Node xmlNode, ILocation parent, Campaign campaign) {
         NodeList nl = xmlNode.getChildNodes();
         for (int i = 0; i < nl.getLength(); i++) {
             Node wn = nl.item(i);
-            if (wn.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
+            try {
+                if (wn.getNodeType() != Node.ELEMENT_NODE) {
+                    continue;
+                }
+                if (wn.getNodeName().equalsIgnoreCase("academyCampus")) {
+                    AcademyCampusLocation campus = AcademyCampusLocation.generateInstanceFromXML(wn);
+                    if (campus != null) {
+                        LocationManager.setLocation(campus, parent);
+                        NodeList campusChildren = wn.getChildNodes();
+                        for (int j = 0; j < campusChildren.getLength(); j++) {
+                            Node campusChild = campusChildren.item(j);
+                            if (campusChild.getNodeType() != Node.ELEMENT_NODE) {
+                                continue;
+                            }
+                            if (campusChild.getNodeName().equalsIgnoreCase("location")) {
+                                CurrentLocation travelNode = CurrentLocation.generateInstanceFromXML(campusChild, campaign);
+                                if (travelNode != null) {
+                                    LocationManager.setLocation(travelNode, campus);
+                                    campaign.addLocation(travelNode);
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    // Person, Unit, and Part reconnection will be added here
+                    logger.warn("Unrecognized locationNodeChildren element '{}' — skipping", wn.getNodeName());
+                }
+            } catch (Exception ex) {
+                logger.error("", ex);
             }
-            // Unit, Person, and Part child reconnection will be added here once
-            // those types implement ILocation and are serialized by writeToXML.
-            logger.warn("Unrecognized locationNodeChildren element '{}' — skipping", wn.getNodeName());
         }
     }
 

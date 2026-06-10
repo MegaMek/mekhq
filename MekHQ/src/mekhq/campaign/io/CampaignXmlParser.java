@@ -36,6 +36,7 @@ import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.force.Formation.FORMATION_NONE;
 import static mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket.generatePersonnelMarketDataFromXML;
+import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.statusValidator;
 import static mekhq.campaign.personnel.skills.SkillDeprecationTool.DEPRECATED_SKILLS;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -94,6 +95,7 @@ import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignFactory;
 import mekhq.campaign.CurrentLocation;
+import mekhq.campaign.FixedLocation;
 import mekhq.campaign.Kill;
 import mekhq.campaign.Personnel;
 import mekhq.campaign.Warehouse;
@@ -106,6 +108,7 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.icons.UnitIcon;
+import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
@@ -134,8 +137,10 @@ import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -150,6 +155,7 @@ import mekhq.campaign.unit.cleanup.EquipmentUnscrambler;
 import mekhq.campaign.unit.cleanup.EquipmentUnscramblerResult;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.PlanetarySystemCampaignXmlIO;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.dialog.MilestoneUpgradePathDialog;
@@ -752,6 +758,9 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         for (Person person : campaign.getAllPersonnel()) {
             person.setParent(campaign.getMainForcePersonnel());
         }
+
+        reconnectPersonsToTravelLocations(campaign);
+        migrateLegacyEducationTravel(campaign);
 
         LOGGER.info("Load of campaign file complete!");
 
@@ -1611,6 +1620,209 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 }
             }
         }
+    }
+
+    /**
+     * Reconnects persons to their location nodes after a save/load.
+     *
+     * <p>During save, each {@link CurrentLocation} (traveling persons) and each
+     * {@link AcademyCampusLocation} (persons already at campus) writes the UUIDs of its direct {@link Person} children.
+     * On load those parent links are lost. This pass restores them.</p>
+     */
+    private static void reconnectPersonsToTravelLocations(Campaign campaign) {
+        for (AbstractLocation location : campaign.getLocations()) {
+            // Persons traveling to/from campus — parented under a CurrentLocation
+            if (location instanceof CurrentLocation currentLocation) {
+                for (UUID personId : currentLocation.drainPendingPersonIds()) {
+                    Person person = campaign.getPerson(personId);
+                    if (person != null) {
+                        person.setParent(currentLocation);
+                    } else {
+                        LOGGER.warn("reconnectPersonsToTravelLocations: person {} not found in campaign", personId);
+                    }
+                }
+            }
+
+            // Persons at campus — parented directly under AcademyCampusLocation (no CurrentLocation)
+            if (location instanceof FixedLocation fixedLocation) {
+                for (LocationNode campusNode : fixedLocation.getLocationNode().getChildren()) {
+                    if (!(campusNode.getLocatable() instanceof AcademyCampusLocation campusLocation)) {
+                        continue;
+                    }
+                    for (UUID personId : campusLocation.drainPendingPersonIds()) {
+                        Person person = campaign.getPerson(personId);
+                        if (person != null) {
+                            person.setParent(campusLocation);
+                        } else {
+                            LOGGER.warn("reconnectPersonsToTravelLocations: person {} not found in campaign", personId);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Migrates persons mid-journey on legacy saves (pre-location-tree) into real {@link CurrentLocation} nodes so they
+     * are handled by the location-aware travel code.
+     *
+     * <p>For each person in JOURNEY_TO_CAMPUS or JOURNEY_FROM_CAMPUS whose location chain contains
+     * no {@link CurrentLocation}, a new {@code CurrentLocation} is created at the target system (academy system for
+     * outbound, campaign current system for return). Transit time is set from the jump-point approach time so they
+     * arrive on planet within a day or two via normal {@code newDay()} processing.</p>
+     */
+    private static void migrateLegacyEducationTravel(Campaign campaign) {
+        LOGGER.info("migrateLegacyEducationTravel: scanning {} personnel for legacy education travel",
+              campaign.getPersonnel().size());
+        int campusMigrated = 0;
+        int travelMigrated = 0;
+        int skipped = 0;
+
+        for (Person person : campaign.getPersonnel()) {
+            EducationStage stage = person.getEduEducationStage();
+            if (stage != EducationStage.JOURNEY_TO_CAMPUS
+                      && stage != EducationStage.JOURNEY_FROM_CAMPUS
+                      && stage != EducationStage.EDUCATION
+                      && stage != EducationStage.GRADUATING
+                      && stage != EducationStage.DROPPING_OUT) {
+                continue;
+            }
+
+            LOGGER.info("migrateLegacyEducationTravel: processing {} (stage={}, academy='{}', set='{}')",
+                  person.getFullTitle(), stage, person.getEduAcademyNameInSet(), person.getEduAcademySet());
+
+            // Campus stages: Set the location's parent.
+            // This covers EDUCATION, GRADUATING, and DROPPING_OUT.
+            if (stage == EducationStage.EDUCATION
+                      || stage == EducationStage.GRADUATING
+                      || stage == EducationStage.DROPPING_OUT) {
+                String systemId = resolveAcademySystemId(campaign, person);
+                if (systemId == null) {
+                    LOGGER.warn("migrateLegacyEducationTravel: could not resolve academy system for {} (stage={})"
+                          + " — skipping campus placement", person.getFullTitle(), stage);
+                    skipped++;
+                    continue;
+                }
+                AcademyCampusLocation campusLocation = campaign.getOrCreateCampusLocation(
+                      person.getEduAcademySet(), person.getEduAcademyNameInSet(), systemId);
+                if (campusLocation != null) {
+                    LOGGER.info("migrateLegacyEducationTravel: placed {} at campus '{}' in system {}",
+                          person.getFullTitle(), person.getEduAcademyNameInSet(), systemId);
+                    person.setParent(campusLocation);
+                    campusMigrated++;
+                } else {
+                    LOGGER.warn("migrateLegacyEducationTravel: getOrCreateCampusLocation returned null for {}"
+                          + " (academy='{}', system='{}') — skipping", person.getFullTitle(),
+                          person.getEduAcademyNameInSet(), systemId);
+                    skipped++;
+                }
+                continue;
+            }
+
+            // Journey stages: skip if already under a CurrentLocation — reconnectPersonsToTravelLocations
+            // already placed this person (post-refactor saves). Legacy saves have mainForcePersonnel as parent.
+            LocationNode parentNode = person.getLocationNode().getParent();
+            if (parentNode != null && parentNode.getLocatable() instanceof CurrentLocation) {
+                LOGGER.info("migrateLegacyEducationTravel: {} already under CurrentLocation — skipping (post-refactor save)",
+                      person.getFullTitle());
+                skipped++;
+                continue;
+            }
+
+            String systemId = resolveAcademySystemId(campaign, person);
+            if (systemId == null) {
+                LOGGER.warn("migrateLegacyEducationTravel: could not resolve academy system for {} (stage={})"
+                      + " — skipping travel node creation", person.getFullTitle(), stage);
+                skipped++;
+                continue;
+            }
+            PlanetarySystem targetSystem = campaign.getSystemById(systemId);
+            if (targetSystem == null) {
+                LOGGER.warn("migrateLegacyEducationTravel: system '{}' not found for {} (stage={})"
+                      + " — skipping travel node creation", systemId, person.getFullTitle(), stage);
+                skipped++;
+                continue;
+            }
+
+            double transitTime = (double) Math.max(0, person.getEduJourneyTime() - person.getEduDaysOfTravel());
+            LOGGER.info("migrateLegacyEducationTravel: creating travel node for {} (stage={}, system={}, transitTime={} days)",
+                  person.getFullTitle(), stage, targetSystem.getId(), transitTime);
+
+            CurrentLocation travelLocation = new CurrentLocation(targetSystem, transitTime);
+            AcademyCampusLocation campusLocation = campaign.getOrCreateCampusLocation(
+                  person.getEduAcademySet(), person.getEduAcademyNameInSet(), systemId);
+            if (campusLocation != null) {
+                LOGGER.info("migrateLegacyEducationTravel: parenting travel node under campus '{}' for {}",
+                      person.getEduAcademyNameInSet(), person.getFullTitle());
+                travelLocation.setParent(campusLocation);
+            } else if (stage == EducationStage.JOURNEY_FROM_CAMPUS) {
+                LOGGER.info("migrateLegacyEducationTravel: no campus found for {} (JOURNEY_FROM_CAMPUS)"
+                      + " — parenting travel node under Campaign root", person.getFullTitle());
+                travelLocation.setParent(campaign);
+            }
+            person.setParent(travelLocation);
+            campaign.addLocation(travelLocation);
+            travelMigrated++;
+        }
+
+        LOGGER.info("migrateLegacyEducationTravel: complete — {} placed at campus, {} given travel nodes, {} skipped",
+              campusMigrated, travelMigrated, skipped);
+    }
+
+    /**
+     * Resolves the planetary system ID for a person's academy attendance.
+     *
+     * <p>Tries the location-tree-aware method first (works for new saves where the person is
+     * already under an {@link AcademyCampusLocation}, or when {@code legacyEduAcademySystem} was populated from an
+     * {@code <eduAcademySystem>} XML tag). Falls back to parsing the system name from the trailing {@code (SystemName)}
+     * in {@code eduAcademyName}, which is the format written by enrollment for non-local, non-homeschool
+     * academies.</p>
+     */
+    private static @Nullable String resolveAcademySystemId(Campaign campaign, Person person) {
+        String systemId = person.getEduAcademySystem();
+        if (systemId != null) {
+            return systemId;
+        }
+        String academyName = person.getEduAcademyName();
+        if (academyName == null || academyName.isBlank()) {
+            return null;
+        }
+        Academy academy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
+        if ((academy != null) &&
+                  !(academy.isLocal() || academy.isHomeSchool()) &&
+                  !academy.getLocationSystems().isEmpty()) {
+
+            systemId = academy.getLocationSystems().getFirst();
+            if (academy.getLocationSystems().size() == 1) {
+                LOGGER.warn("Could not resolve Academy System ID for person {}. Returning only location for " +
+                                  "non-homeschool, non-local academy: {}", person, systemId);
+            } else {
+                LOGGER.warn("Could not resolve Academy System ID for person {} for non-homeschool, " +
+                                  "non-local academy with multiple locations, returning first : {}", person, systemId);
+            }
+            return systemId;
+
+        }
+
+        if (academy != null && campaign.getCurrentSystem() != null) {
+            LOGGER.warn("Could not resolve Academy System ID for person {}. for homeschool, " +
+                              "or local academy returning campaign's location : {}", person, systemId);
+            return campaign.getCurrentSystem().getId();
+        }
+
+        // This is bad if we reach here. This resolution attempt will fail for academy's at systems with parenthesis
+        // in the name. But if we've reached here we've run out of other options for getting the academy's location
+        // and have to guess based on the limited information we have.
+        LOGGER.warn("Could not resolve Academy System ID for person: {}. Guessing based on Academy name.",
+              person);
+        int lastOpen = academyName.lastIndexOf('(');
+        int lastClose = academyName.lastIndexOf(')');
+        if (lastOpen < 0 || lastClose <= lastOpen) {
+            return null;
+        }
+        String systemName = academyName.substring(lastOpen + 1, lastClose).trim();
+        PlanetarySystem system = campaign.getSystemByName(systemName);
+        return system != null ? system.getId() : null;
     }
 
     private static void processSkillTypeNodes(Node wn, Version version) {

@@ -147,6 +147,7 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.campaign.universe.factionStanding.PerformBatchall;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.gui.view.MoraleBar;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -489,8 +490,9 @@ public class AtBContract extends Contract {
               campaignOptions.getMoraleDecisiveDefeatEffect(), campaignOptions.getMoraleDefeatEffect());
         String flavorText = MHQMorale.getFormattedTitle()
                                   + "<h2 style='text-align:center;'>" + getName() + "</h2>"
-                                  + moraleLevel.getToolTipText();
-        new ImmersiveDialogNotification(campaign, flavorText, moraleReport, true);
+                + MoraleBar.getMoraleDisplay(this).tooltip();
+        new ImmersiveDialogNotification(campaign, flavorText, moraleReport, MoraleBar.createDialogPanel(this),
+                true);
 
         MHQMorale.routedMoraleUpdate(campaign, this);
 
