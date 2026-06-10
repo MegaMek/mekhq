@@ -1827,8 +1827,8 @@ public class Campaign implements ITechManager, IPlace {
      */
     public AcademyCampusLocation getOrCreateCampusLocation(String academySet,
           String academyName, String systemId) {
-        for (AbstractLocation loc : locations) {
-            if (!(loc instanceof FixedLocation fixedLocation)) {
+        for (AbstractLocation location : locations) {
+            if (!(location instanceof FixedLocation fixedLocation)) {
                 continue;
             }
             if (!fixedLocation.getCurrentSystem().getId().equals(systemId)) {

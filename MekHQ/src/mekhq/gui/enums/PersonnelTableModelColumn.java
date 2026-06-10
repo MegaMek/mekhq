@@ -755,12 +755,12 @@ public enum PersonnelTableModelColumn {
             }
             case DESTINATION_NAME -> {
                 AbstractLocation location = getPersonLocation(person);
-                if (location instanceof CurrentLocation cl
-                          && cl.getJumpPath() != null && !cl.getJumpPath().isEmpty()) {
-                    var destination = cl.getJumpPath().getLastSystem();
-                    LocationNode clNode = cl.getLocationNode();
-                    if (clNode != null) {
-                        LocationNode parent = clNode.getParent();
+                if (location instanceof CurrentLocation currentLocation
+                          && currentLocation.getJumpPath() != null && !currentLocation.getJumpPath().isEmpty()) {
+                    PlanetarySystem destination = currentLocation.getJumpPath().getLastSystem();
+                    LocationNode currentLocationNode = currentLocation.getLocationNode();
+                    if (currentLocationNode != null) {
+                        LocationNode parent = currentLocationNode.getParent();
                         while (parent != null) {
                             if (parent.getLocatable() instanceof AcademyCampusLocation campus) {
                                 LocationNode fixedLocationNode = parent.getParent();
@@ -779,11 +779,11 @@ public enum PersonnelTableModelColumn {
             }
             case DESTINATION_PLANET -> {
                 AbstractLocation location = getPersonLocation(person);
-                if (location instanceof CurrentLocation cl
-                          && cl.getJumpPath() != null && !cl.getJumpPath().isEmpty()) {
-                    var dest = cl.getJumpPath().getLastSystem();
-                    if (dest != null) {
-                        Planet planet = dest.getPrimaryPlanet();
+                if (location instanceof CurrentLocation currentLocation
+                          && currentLocation.getJumpPath() != null && !currentLocation.getJumpPath().isEmpty()) {
+                    PlanetarySystem destinationSystem = currentLocation.getJumpPath().getLastSystem();
+                    if (destinationSystem != null) {
+                        Planet planet = destinationSystem.getPrimaryPlanet();
                         yield planet != null ? planet.getPrintableName(today) : "-";
                     }
                 }
@@ -791,10 +791,10 @@ public enum PersonnelTableModelColumn {
             }
             case DESTINATION_SYSTEM -> {
                 AbstractLocation location = getPersonLocation(person);
-                if (location instanceof CurrentLocation cl
-                          && cl.getJumpPath() != null && !cl.getJumpPath().isEmpty()) {
-                    var dest = cl.getJumpPath().getLastSystem();
-                    yield dest != null ? dest.getPrintableName(today) : "-";
+                if (location instanceof CurrentLocation currentLocation
+                          && currentLocation.getJumpPath() != null && !currentLocation.getJumpPath().isEmpty()) {
+                    PlanetarySystem destinationSystem = currentLocation.getJumpPath().getLastSystem();
+                    yield destinationSystem != null ? destinationSystem.getPrintableName(today) : "-";
                 }
                 yield "-";
             }

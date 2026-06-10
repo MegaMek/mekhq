@@ -116,7 +116,7 @@ public final class LocationDispatch {
      * hangar and warehouse data structures are assumed to have already been updated at dispatch
      * time.</p>
      *
-     * @param travelLoc  the completed travel node; must not be {@code null}
+     * @param travelNode  the completed travel node; must not be {@code null}
      * @param personDestination destination container for persons; if {@code null}, persons fall back to
      *                   {@code campaign} with a warning
      * @param unitDestination   destination container for units; if {@code null}, units fall back to
@@ -125,7 +125,7 @@ public final class LocationDispatch {
      *                   {@code campaign} with a warning
      * @param campaign   the active campaign; must not be {@code null}
      */
-    public static void landFromTravelNode(CurrentLocation travelLoc,
+    public static void landFromTravelNode(CurrentLocation travelNode,
           @Nullable ILocation personDestination,
           @Nullable ILocation unitDestination,
           @Nullable ILocation partDestination,
@@ -139,28 +139,28 @@ public final class LocationDispatch {
         if (partDestination == null) {
             LOGGER.warn("landFromTravelNode: null partDestination; landing parts at Campaign root");
         }
-        landFromTravelNodeImpl(travelLoc,
+        landFromTravelNodeImpl(travelNode,
               personDestination != null ? personDestination : campaign,
               unitDestination != null ? unitDestination : campaign,
               partDestination != null ? partDestination : campaign,
               campaign);
     }
 
-    private static void landFromTravelNodeImpl(CurrentLocation travelLoc,
+    private static void landFromTravelNodeImpl(CurrentLocation travelNode,
           ILocation personDestination,
           ILocation unitDestination,
           ILocation partDestination,
           Campaign campaign) {
-        for (Person person : new ArrayList<>(travelLoc.fetchPersonnelAtLocation())) {
+        for (Person person : new ArrayList<>(travelNode.fetchPersonnelAtLocation())) {
             person.setParent(personDestination);
         }
-        for (Unit unit : new ArrayList<>(travelLoc.fetchUnitsAtLocation())) {
+        for (Unit unit : new ArrayList<>(travelNode.fetchUnitsAtLocation())) {
             LocationNode.LocationManager.setLocation(unit, unitDestination);
         }
-        for (Part part : new ArrayList<>(travelLoc.fetchPartsAtLocation())) {
+        for (Part part : new ArrayList<>(travelNode.fetchPartsAtLocation())) {
             LocationNode.LocationManager.setLocation(part, partDestination);
         }
-        removeTravelNode(travelLoc, campaign);
+        removeTravelNode(travelNode, campaign);
     }
 
     /**
@@ -180,15 +180,15 @@ public final class LocationDispatch {
             return Optional.empty();
         }
         double startTransit = computeStartTransit(fromSystem, campaign);
-        CurrentLocation travelLoc = new CurrentLocation(fromSystem, startTransit);
-        travelLoc.setJumpPath(path);
-        if (!travelLoc.setParent(destination)) {
-            LOGGER.warn("{}: setParent failed for travelLoc → {}; "
+        CurrentLocation travelNode = new CurrentLocation(fromSystem, startTransit);
+        travelNode.setJumpPath(path);
+        if (!travelNode.setParent(destination)) {
+            LOGGER.warn("{}: setParent failed for travelNode → {}; "
                               + "items may display as Main Force after save/load",
                   logContext, destination.getClass().getSimpleName());
         }
-        campaign.addLocation(travelLoc);
-        return Optional.of(travelLoc);
+        campaign.addLocation(travelNode);
+        return Optional.of(travelNode);
     }
 
     /**

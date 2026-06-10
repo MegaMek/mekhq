@@ -93,13 +93,13 @@ public class AcademyCampusLocation implements ILocation {
     @Override
     public void processArrivals(Campaign campaign) {
         for (LocationNode child : new ArrayList<>(locationNode.getChildren())) {
-            if (!(child.getLocatable() instanceof CurrentLocation travelLoc)) {
+            if (!(child.getLocatable() instanceof CurrentLocation travelNode)) {
                 continue;
             }
-            if (!travelLoc.isOnPlanet()) {
+            if (!travelNode.isOnPlanet()) {
                 continue;
             }
-            LocationDispatch.landFromTravelNode(travelLoc, personnel, campaign, campaign, campaign);
+            LocationDispatch.landFromTravelNode(travelNode, personnel, campaign, campaign, campaign);
         }
     }
 
