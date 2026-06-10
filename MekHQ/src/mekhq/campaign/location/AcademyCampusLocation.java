@@ -113,8 +113,8 @@ public class AcademyCampusLocation implements ILocation {
             }
         }
         for (LocationNode child : personnel.getLocationNode().getChildren()) {
-            if (child.getLocatable() instanceof Person p) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personId", p.getId().toString());
+            if (child.getLocatable() instanceof Person person) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personId", person.getId().toString());
             }
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "academyCampus");

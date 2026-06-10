@@ -151,11 +151,11 @@ public final class LocationDispatch {
           ILocation unitDest,
           ILocation partDest,
           Campaign campaign) {
-        for (Person p : new ArrayList<>(travelLoc.fetchPersonnelAtLocation())) {
-            p.setParent(personDest);
+        for (Person person : new ArrayList<>(travelLoc.fetchPersonnelAtLocation())) {
+            person.setParent(personDest);
         }
-        for (Unit u : new ArrayList<>(travelLoc.fetchUnitsAtLocation())) {
-            LocationNode.LocationManager.setLocation(u, unitDest);
+        for (Unit unit : new ArrayList<>(travelLoc.fetchUnitsAtLocation())) {
+            LocationNode.LocationManager.setLocation(unit, unitDest);
         }
         for (Part part : new ArrayList<>(travelLoc.fetchPartsAtLocation())) {
             LocationNode.LocationManager.setLocation(part, partDest);

@@ -344,9 +344,9 @@ public class EducationController {
                 double startTransit = originSystem != null && originSystem.equals(campaign.getCurrentSystem())
                                             ? LocationDispatch.computeStartTransit(originSystem, campaign)
                                             : 0.0;
-                JumpPath jp = person.getJumpPath();
-                person.setEduJourneyTime(jp != null
-                      ? LocationDispatch.computeJourneyDays(jp, campaign.getLocalDate(), startTransit)
+                JumpPath jumpPath = person.getJumpPath();
+                person.setEduJourneyTime(jumpPath != null
+                      ? LocationDispatch.computeJourneyDays(jumpPath, campaign.getLocalDate(), startTransit)
                       : max(2, campaign.getSimplifiedTravelTime(campaign.getSystemById(campus))));
             }
         }

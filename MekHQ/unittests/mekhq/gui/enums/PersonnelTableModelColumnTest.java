@@ -980,17 +980,17 @@ public class PersonnelTableModelColumnTest {
         }
 
         private Campaign mockCampaign() {
-            Campaign c = mock(Campaign.class);
+            Campaign campaign = mock(Campaign.class);
             CampaignOptions opts = mock(CampaignOptions.class);
-            when(c.getLocalDate()).thenReturn(TODAY);
-            when(c.getName()).thenReturn(CAMPAIGN_NAME);
-            when(c.getMainForcePersonnel()).thenReturn(mainForce);
-            when(c.getCampaignOptions()).thenReturn(opts);
-            when(c.isOverridingCommandCircuitRequirements()).thenReturn(false);
-            when(c.isGM()).thenReturn(false);
+            when(campaign.getLocalDate()).thenReturn(TODAY);
+            when(campaign.getName()).thenReturn(CAMPAIGN_NAME);
+            when(campaign.getMainForcePersonnel()).thenReturn(mainForce);
+            when(campaign.getCampaignOptions()).thenReturn(opts);
+            when(campaign.isOverridingCommandCircuitRequirements()).thenReturn(false);
+            when(campaign.isGM()).thenReturn(false);
             when(opts.isUseFactionStandingCommandCircuitSafe()).thenReturn(false);
-            when(c.getFutureAtBContracts()).thenReturn(List.of());
-            return c;
+            when(campaign.getFutureAtBContracts()).thenReturn(List.of());
+            return campaign;
         }
 
         private Person mockPerson() {
@@ -1007,16 +1007,16 @@ public class PersonnelTableModelColumnTest {
         @Test
         void noParent_allColumnsReturnDash() {
             Person person = mockPerson();
-            Campaign c = mockCampaign();
-            assertEquals("-", PersonnelTableModelColumn.LOCATION_SYSTEM.getCellValue(c, market, person, false, false));
-            assertEquals("-", PersonnelTableModelColumn.LOCATION_PLANET.getCellValue(c, market, person, false, false));
-            assertEquals("-", PersonnelTableModelColumn.LOCATION_NAME.getCellValue(c, market, person, false, false));
+            Campaign campaign = mockCampaign();
+            assertEquals("-", PersonnelTableModelColumn.LOCATION_SYSTEM.getCellValue(campaign, market, person, false, false));
+            assertEquals("-", PersonnelTableModelColumn.LOCATION_PLANET.getCellValue(campaign, market, person, false, false));
+            assertEquals("-", PersonnelTableModelColumn.LOCATION_NAME.getCellValue(campaign, market, person, false, false));
             assertEquals("-",
-                  PersonnelTableModelColumn.DESTINATION_SYSTEM.getCellValue(c, market, person, false, false));
+                  PersonnelTableModelColumn.DESTINATION_SYSTEM.getCellValue(campaign, market, person, false, false));
             assertEquals("-",
-                  PersonnelTableModelColumn.DESTINATION_PLANET.getCellValue(c, market, person, false, false));
+                  PersonnelTableModelColumn.DESTINATION_PLANET.getCellValue(campaign, market, person, false, false));
             assertEquals("-",
-                  PersonnelTableModelColumn.DESTINATION_NAME.getCellValue(c, market, person, false, false));
+                  PersonnelTableModelColumn.DESTINATION_NAME.getCellValue(campaign, market, person, false, false));
         }
 
         @Nested
@@ -1146,9 +1146,9 @@ public class PersonnelTableModelColumnTest {
 
             private Person buildTravelingPerson(CurrentLocation cl) {
                 wire(cl, campus);
-                Person p = mockPerson();
-                wire(p, cl);
-                return p;
+                Person person = mockPerson();
+                wire(person, cl);
+                return person;
             }
 
             @Test

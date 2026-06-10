@@ -1756,8 +1756,8 @@ public class Campaign implements ITechManager, IPlace {
         }
     }
 
-    public void removeLocation(AbstractLocation l) {
-        locations.remove(l);
+    public void removeLocation(AbstractLocation location) {
+        locations.remove(location);
     }
 
     /**
