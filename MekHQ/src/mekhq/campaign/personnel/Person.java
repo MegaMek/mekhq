@@ -2773,9 +2773,11 @@ public class Person implements ILocation {
                 LocationNode campusParent = node.getParent();
                 if (campusParent != null && campusParent.getLocatable() instanceof AbstractLocation location) {
                     PlanetarySystem system = location.getCurrentSystem();
-                    return system != null ? system.getId() : null;
+                    if (system != null) {
+                        return system.getId();
+                    }
                 }
-                return null;
+                return legacyEduAcademySystem;
             }
             node = node.getParent();
         }

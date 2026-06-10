@@ -38,7 +38,9 @@ import java.util.List;
 import java.util.UUID;
 
 import megamek.common.annotations.Nullable;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
+import mekhq.campaign.Personnel;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.AcademyFactory;
@@ -56,6 +58,7 @@ import org.w3c.dom.NodeList;
 public class AcademyCampusLocation implements ILocation {
 
     private final LocationNode locationNode;
+    private final Personnel personnel = new Personnel();
     private final String academySet;
     private final String academyName;
 
@@ -63,6 +66,7 @@ public class AcademyCampusLocation implements ILocation {
         this.academySet = academySet;
         this.academyName = academyName;
         this.locationNode = new LocationNode(this);
+        LocationNode.LocationManager.setLocation(personnel, this);
     }
 
     public String getAcademySet() {
@@ -82,6 +86,23 @@ public class AcademyCampusLocation implements ILocation {
         return locationNode;
     }
 
+    public Personnel getCampusPersonnel() {
+        return personnel;
+    }
+
+    @Override
+    public void processArrivals(Campaign campaign) {
+        for (LocationNode child : new ArrayList<>(locationNode.getChildren())) {
+            if (!(child.getLocatable() instanceof CurrentLocation travelLoc)) {
+                continue;
+            }
+            if (!travelLoc.isOnPlanet()) {
+                continue;
+            }
+            LocationDispatch.landFromTravelNode(travelLoc, personnel, campaign, campaign, campaign);
+        }
+    }
+
     public void writeToXML(PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "academyCampus");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "academySet", academySet);
@@ -89,7 +110,10 @@ public class AcademyCampusLocation implements ILocation {
         for (LocationNode child : locationNode.getChildren()) {
             if (child.getLocatable() instanceof CurrentLocation currentLoc) {
                 currentLoc.writeToXML(pw, indent);
-            } else if (child.getLocatable() instanceof Person p) {
+            }
+        }
+        for (LocationNode child : personnel.getLocationNode().getChildren()) {
+            if (child.getLocatable() instanceof Person p) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personId", p.getId().toString());
             }
         }

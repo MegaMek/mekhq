@@ -309,8 +309,9 @@ public class LocationNodeTest {
                   (AcademyCampusLocation) parentFixed.getLocationNode().getChildren()
                                                 .iterator().next().getLocatable();
             Set<LocationNode> campusChildren = campus.getLocationNode().getChildren();
-            assertEquals(1, campusChildren.size());
-            assertTrue(campusChildren.iterator().next().getLocatable() instanceof CurrentLocation);
+            // campus has 2 children: the Personnel sub-container + the deserialized CurrentLocation
+            assertEquals(2, campusChildren.size());
+            assertTrue(campusChildren.stream().anyMatch(c -> c.getLocatable() instanceof CurrentLocation));
         }
 
         @Test

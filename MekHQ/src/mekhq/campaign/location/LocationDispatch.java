@@ -32,49 +32,178 @@
  */
 package mekhq.campaign.location;
 
-import static java.lang.Math.max;
-
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.JumpPath;
+import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.PlanetarySystem;
 
 /**
- * Utility for moving groups of students to or from an academy campus via shared
- * {@link CurrentLocation} travel nodes.
+ * Utility for moving groups of {@link ILocation} items (persons, units, parts) to a destination
+ * via a shared {@link CurrentLocation} travel node.
  *
- * <p>Students departing from the same system are batched into a single {@code CurrentLocation}
- * so they travel together rather than each getting their own node.</p>
+ * <p>Items departing from the same system are batched into a single {@code CurrentLocation}
+ * so that they travel together. Items already in the destination system are reparented
+ * directly without creating a travel node.</p>
  */
 public final class LocationDispatch {
+    private static final MMLogger LOGGER = MMLogger.create(LocationDispatch.class);
 
     private LocationDispatch() {}
 
     /**
-     * Dispatches {@code people} to an academy campus identified by {@code academySet},
-     * {@code academyName}, and {@code campusSystemId}.
+     * Returns the transit time from {@code fromSystem} that should be used as the start-transit
+     * parameter when calculating a new journey's duration.
      *
-     * <p>Students departing from the same system share one {@link CurrentLocation}. Students
-     * already at the campus system are reparented directly. When no jump path can be calculated,
-     * the existing day-counter fallback is used without creating a travel node.</p>
-     *
-     * <p>Sets {@code eduJourneyTime} on each person.</p>
-     *
-     * @param people         the students to dispatch; must not be {@code null}
-     * @param academySet     the academy set name; must not be {@code null}
-     * @param academyName    the academy name within the set; must not be {@code null}
-     * @param campusSystemId the ID of the planetary system hosting the campus; must not be {@code null}
-     * @param campaign       the active campaign; must not be {@code null}
+     * @param fromSystem the departure system; must not be {@code null}
+     * @param campaign   the active campaign; must not be {@code null}
+     * @return transit time in days
      */
-    public static void dispatchToAcademy(Collection<Person> people, String academySet,
-            String academyName, String campusSystemId, Campaign campaign) {
-        PlanetarySystem destSystem = campaign.getSystemById(campusSystemId);
+    public static double computeStartTransit(PlanetarySystem fromSystem, Campaign campaign) {
+        return campaign.getCurrentLocation() != null
+                     ? campaign.getCurrentLocation().getTransitTime()
+                     : fromSystem.getTimeToJumpPoint(1.0);
+    }
+
+    /**
+     * Computes the total journey duration in days from a {@link JumpPath}, applying a minimum of 2 days.
+     *
+     * @param path         the route to calculate; must not be {@code null}
+     * @param date         the in-game date (used for pirate-point availability); must not be {@code null}
+     * @param startTransit the already-elapsed transit time at the origin, in days
+     *
+     * @return journey length in whole days, always at least 2
+     */
+    public static int computeJourneyDays(JumpPath path, LocalDate date, double startTransit) {
+        return Math.max(2, (int) Math.ceil(path.getTotalTime(date, startTransit, false)));
+    }
+
+    /**
+     * Removes a completed travel node from the campaign: detaches it from the location tree and
+     * de-registers it from the campaign's location list.
+     *
+     * <p>Safe to call with a {@code null} argument (no-op).</p>
+     *
+     * @param travelNode the node to remove, or {@code null}
+     * @param campaign   the active campaign; must not be {@code null}
+     */
+    public static void removeTravelNode(@Nullable CurrentLocation travelNode, Campaign campaign) {
+        if (travelNode == null) {
+            return;
+        }
+        travelNode.setParent(null);
+        campaign.removeLocation(travelNode);
+    }
+
+    /**
+     * Completes the arrival of all persons, units, and parts carried by a finished travel node,
+     * then removes the node from the location tree and campaign registry.
+     *
+     * <p>Persons are reparented to {@code personDest}. Units and parts have their
+     * {@link LocationNode} moved to {@code unitDest} and {@code partDest} respectively; their
+     * hangar and warehouse data structures are assumed to have already been updated at dispatch
+     * time.</p>
+     *
+     * @param travelLoc  the completed travel node; must not be {@code null}
+     * @param personDest destination container for persons; if {@code null}, persons fall back to
+     *                   {@code campaign} with a warning
+     * @param unitDest   destination container for units; if {@code null}, units fall back to
+     *                   {@code campaign} with a warning
+     * @param partDest   destination container for parts; if {@code null}, parts fall back to
+     *                   {@code campaign} with a warning
+     * @param campaign   the active campaign; must not be {@code null}
+     */
+    public static void landFromTravelNode(CurrentLocation travelLoc,
+          @Nullable ILocation personDest,
+          @Nullable ILocation unitDest,
+          @Nullable ILocation partDest,
+          Campaign campaign) {
+        if (personDest == null) {
+            LOGGER.warn("landFromTravelNode: null personDest; landing persons at Campaign root");
+        }
+        if (unitDest == null) {
+            LOGGER.warn("landFromTravelNode: null unitDest; landing units at Campaign root");
+        }
+        if (partDest == null) {
+            LOGGER.warn("landFromTravelNode: null partDest; landing parts at Campaign root");
+        }
+        landFromTravelNodeImpl(travelLoc,
+              personDest != null ? personDest : campaign,
+              unitDest != null ? unitDest : campaign,
+              partDest != null ? partDest : campaign,
+              campaign);
+    }
+
+    private static void landFromTravelNodeImpl(CurrentLocation travelLoc,
+          ILocation personDest,
+          ILocation unitDest,
+          ILocation partDest,
+          Campaign campaign) {
+        for (Person p : new ArrayList<>(travelLoc.fetchPersonnelAtLocation())) {
+            p.setParent(personDest);
+        }
+        for (Unit u : new ArrayList<>(travelLoc.fetchUnitsAtLocation())) {
+            LocationNode.LocationManager.setLocation(u, unitDest);
+        }
+        for (Part part : new ArrayList<>(travelLoc.fetchPartsAtLocation())) {
+            LocationNode.LocationManager.setLocation(part, partDest);
+        }
+        removeTravelNode(travelLoc, campaign);
+    }
+
+    /**
+     * Builds a cross-system travel node from {@code fromSystem} toward {@code destSystem}, parented under
+     * {@code destination}, and registers it with the campaign.
+     *
+     * <p>Returns an empty {@link Optional} (without modifying state) when no path exists or the
+     * path is empty — callers should fall back to direct placement in that case.</p>
+     */
+    private static Optional<CurrentLocation> buildTravelNode(PlanetarySystem fromSystem,
+          PlanetarySystem destSystem,
+          ILocation destination,
+          Campaign campaign,
+          String logContext) {
+        JumpPath path = campaign.calculateJumpPath(fromSystem, destSystem);
+        if (path == null || path.isEmpty()) {
+            return Optional.empty();
+        }
+        double startTransit = computeStartTransit(fromSystem, campaign);
+        CurrentLocation travelLoc = new CurrentLocation(fromSystem, startTransit);
+        travelLoc.setJumpPath(path);
+        if (!travelLoc.setParent(destination)) {
+            LOGGER.warn("{}: setParent failed for travelLoc → {}; "
+                              + "items may display as Main Force after save/load",
+                  logContext, destination.getClass().getSimpleName());
+        }
+        campaign.addLocation(travelLoc);
+        return Optional.of(travelLoc);
+    }
+
+    /**
+     * Dispatches {@code people} to {@code destination}, grouping by departure system so that
+     * everyone leaving from the same system shares one {@link CurrentLocation} for the journey.
+     *
+     * @param people      the persons to dispatch; must not be {@code null}
+     * @param destination the target {@link ILocation}; must not be {@code null}
+     * @param campaign    the active campaign; must not be {@code null}
+     */
+    public static void dispatchToLocation(Collection<Person> people,
+          ILocation destination,
+          Campaign campaign) {
+
+        PlanetarySystem destSystem = destination.getCurrentSystem();
 
         Map<PlanetarySystem, List<Person>> bySystem = people.stream()
               .collect(Collectors.groupingBy(p -> {
@@ -86,121 +215,19 @@ public final class LocationDispatch {
             PlanetarySystem fromSystem = entry.getKey();
             List<Person> group = entry.getValue();
 
-            if (destSystem != null && fromSystem.equals(destSystem)) {
-                AcademyCampusLocation campusLocation = campaign.getOrCreateCampusLocation(
-                      academySet, academyName, campusSystemId);
-                if (campusLocation == null) {
-                    throw new IllegalStateException(
-                          "Campus location must exist for system " + campusSystemId);
-                }
-                group.forEach(p -> {
-                    p.setParent(campusLocation);
-                    p.setEduJourneyTime(2);
-                });
+            if (destSystem == null || fromSystem.equals(destSystem)) {
+                group.forEach(p -> p.setParent(destination));
                 continue;
             }
 
-            JumpPath path = (destSystem != null)
-                  ? campaign.calculateJumpPath(fromSystem, destSystem)
-                  : null;
-
-            if (path == null || path.isEmpty()) {
-                int travelTime = destSystem != null
-                      ? max(2, campaign.getSimplifiedTravelTime(destSystem))
-                      : 14;
-                group.forEach(p -> p.setEduJourneyTime(travelTime));
+            Optional<CurrentLocation> maybeTravelLoc = buildTravelNode(
+                  fromSystem, destSystem, destination, campaign, "dispatchToLocation");
+            if (maybeTravelLoc.isEmpty()) {
+                group.forEach(p -> p.setParent(destination));
                 continue;
             }
-
-            double startTransit = fromSystem.equals(campaign.getCurrentSystem())
-                  && campaign.getCurrentLocation() != null
-                  ? campaign.getCurrentLocation().getTransitTime()
-                  : 0.0;
-
-            AcademyCampusLocation campusLocation = campaign.getOrCreateCampusLocation(
-                  academySet, academyName, campusSystemId);
-            if (campusLocation == null) {
-                throw new IllegalStateException(
-                      "Campus location must exist for system " + campusSystemId);
-            }
-
-            CurrentLocation traveLocation = new CurrentLocation(fromSystem, startTransit);
-            traveLocation.setJumpPath(path);
-            traveLocation.setParent(campusLocation);
-            campaign.addLocation(traveLocation);
-
-            int journeyDays = max(2,
-                  (int) Math.ceil(path.getTotalTime(campaign.getLocalDate(), startTransit, false)));
-            group.forEach(p -> {
-                p.setParent(traveLocation);
-                p.setEduJourneyTime(journeyDays);
-            });
+            group.forEach(p -> p.setParent(maybeTravelLoc.get()));
         }
     }
 
-    /**
-     * Dispatches {@code people} homeward from their academy campuses to the campaign's current
-     * system, creating a shared {@link CurrentLocation} for each group departing from the same
-     * academy system.
-     *
-     * <p>When no jump path exists, people remain parented under their campus location so that
-     * {@code getEduAcademySystem()} continues to resolve correctly during the day-counter phase
-     * of the return journey.</p>
-     *
-     * <p>Sets {@code eduJourneyTime} and resets {@code eduDaysOfTravel} to zero on each person.</p>
-     *
-     * @param people   the students to send home; must not be {@code null}
-     * @param campaign the active campaign; must not be {@code null}
-     */
-    public static void dispatchHome(Collection<Person> people, Campaign campaign) {
-        PlanetarySystem homeSystem = campaign.getCurrentSystem();
-
-        Map<String, List<Person>> byAcademySystem = people.stream()
-              .collect(Collectors.groupingBy(Person::getEduAcademySystem));
-
-        for (Map.Entry<String, List<Person>> entry : byAcademySystem.entrySet()) {
-            String academySystemId = entry.getKey();
-            List<Person> group = entry.getValue();
-            Person first = group.get(0);
-
-            PlanetarySystem academySystem = campaign.getSystemById(academySystemId);
-
-            AcademyCampusLocation campusLocation = campaign.getOrCreateCampusLocation(
-                  first.getEduAcademySet(), first.getEduAcademyNameInSet(), academySystemId);
-            if (campusLocation == null) {
-                throw new IllegalStateException(
-                      "Campus location must exist for system " + academySystemId);
-            }
-
-            JumpPath returnPath = (academySystem != null && homeSystem != null)
-                  ? campaign.calculateJumpPath(academySystem, homeSystem)
-                  : null;
-
-            if (returnPath == null || returnPath.isEmpty()) {
-                int travelTime = academySystem != null
-                      ? max(2, campaign.getSimplifiedTravelTime(academySystem))
-                      : 14;
-                group.forEach(p -> {
-                    p.setParent(campusLocation);
-                    p.setEduJourneyTime(travelTime);
-                    p.setEduDaysOfTravel(0);
-                });
-                continue;
-            }
-
-            double startTransit = academySystem.getTimeToJumpPoint(1.0);
-            CurrentLocation returnLocation = new CurrentLocation(academySystem, startTransit);
-            returnLocation.setJumpPath(returnPath);
-            returnLocation.setParent(campusLocation);
-            campaign.addLocation(returnLocation);
-
-            int journeyDays = max(2,
-                  (int) Math.ceil(returnPath.getTotalTime(campaign.getLocalDate(), startTransit, false)));
-            group.forEach(p -> {
-                p.setParent(returnLocation);
-                p.setEduJourneyTime(journeyDays);
-                p.setEduDaysOfTravel(0);
-            });
-        }
-    }
 }

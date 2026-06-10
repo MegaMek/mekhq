@@ -1846,6 +1846,36 @@ public class Campaign implements ITechManager, IPlace {
     }
 
     /**
+     * Returns the existing local {@link AcademyCampusLocation} (home-school or unit-education) for
+     * the given campus parented directly under this campaign, creating it on demand if it does not
+     * yet exist.
+     *
+     * <p>Local campuses travel with the campaign and are not anchored to a {@link FixedLocation}.
+     * Use {@link #getOrCreateCampusLocation} for academies at a fixed planetary system.</p>
+     */
+    public AcademyCampusLocation getOrCreateLocalCampusLocation(String academySet, String academyName) {
+        for (LocationNode child : locationNode.getChildren()) {
+            if (child.getLocatable() instanceof AcademyCampusLocation campus
+                      && academySet.equals(campus.getAcademySet())
+                      && academyName.equals(campus.getAcademyName())) {
+                return campus;
+            }
+        }
+        AcademyCampusLocation campus = new AcademyCampusLocation(academySet, academyName);
+        LocationNode.LocationManager.setLocation(campus, this);
+        return campus;
+    }
+
+    @Override
+    public void processArrivals(Campaign campaign) {
+        for (LocationNode child : locationNode.getChildren()) {
+            if (child.getLocatable() instanceof AcademyCampusLocation campus) {
+                campus.processArrivals(campaign);
+            }
+        }
+    }
+
+    /**
      * Relocates the campaign immediately to the specified {@link PlanetarySystem}, updating the current location and
      * firing any associated events or automated behaviors.
      *
