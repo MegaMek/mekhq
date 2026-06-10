@@ -57,7 +57,7 @@ public enum DocumentationEntry {
     AGING_EFFECTS("AGING_EFFECTS", "GlossaryDocs/Personnel Modules/Aging Effects", new Version("0.50.06")),
     AWARDS_MODULE("AWARDS_MODULE", "GlossaryDocs/Personnel Modules/Awards Module", new Version("0.50.06")),
     CHAOS_CAMPAIGNS("CHAOS_CAMPAIGNS", "GlossaryDocs/MegaMek -MekHQ Chaos Campaign Guide", new Version("0.50.06")),
-    COMBAT_TEAMS("COMBAT_TEAMS", "GlossaryDocs/StratCon/Combat Teams, Roles & Reinforcements", new Version("0.50.10")),
+    COMBAT_TEAMS("COMBAT_TEAMS", "GlossaryDocs/Combat Teams, Roles & Reinforcements", new Version("0.50.10")),
     COOP_CAMPAIGNS("COOP_CAMPAIGNS", "GlossaryDocs/MekHQ Co-Op Campaign Guide v1", new Version("0.50.06")),
     EDUCATION_MODULE("EDUCATION_MODULE", "GlossaryDocs/Personnel Modules/Education Module", new Version("0.50.06")),
     FACTION_STANDINGS("FACTION_STANDINGS", "GlossaryDocs/Faction Standings", new Version("0.50.11")),
