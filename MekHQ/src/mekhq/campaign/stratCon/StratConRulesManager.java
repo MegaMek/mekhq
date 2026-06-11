@@ -1611,7 +1611,8 @@ public class StratConRulesManager {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         Formation formation = campaign.getFormation(forceID);
         Hangar hangar = campaign.getAllHangar();
-        List<ScoutRecord> scouts = buildScoutMap(formation, hangar, campaignOptions);
+        List<ScoutRecord> scouts = buildScoutMap(formation, hangar, campaignOptions,
+              campaign.isClanCampaign(), campaign.getLocalDate());
 
         boolean useAdvancedScouting = campaignOptions.isUseAdvancedScouting();
         // Each scout may scan up to scanMultiplier hexes
@@ -1682,8 +1683,8 @@ boolean isUseEdge = campaignOptions.isUseEdge() && scout.getOptions().booleanOpt
                               0,
                               isUseEdge,
                               false,
-                              false, // Irrelevant
-                              false, // Irrelevant
+                              campaignOptions.isUseAgeEffects(),
+                              campaign.isClanCampaign(),
                               campaign.getLocalDate()
                         );
                         campaign.addReport(SKILL_CHECKS, skillCheck.getResultsText());
@@ -1855,6 +1856,8 @@ boolean isUseEdge = campaignOptions.isUseEdge() && scout.getOptions().booleanOpt
      * @param formation       the {@link Formation} containing units to evaluate
      * @param hangar          the {@link Hangar} used to help retrieve units from the force
      * @param campaignOptions {@link CampaignOptions}, used to check useCommanderOnly options
+     * @param isClanCampaign  if {@code true}, applies rules specific to clan campaigns
+     * @param date            the current date, used for time-dependent logic
      *
      * @return a list of {@link ScoutRecord} objects, each representing the best scout and their skill details for a
      *       unit, sorted from the highest to lowest scout skill level
@@ -1862,7 +1865,8 @@ boolean isUseEdge = campaignOptions.isUseEdge() && scout.getOptions().booleanOpt
      * @author Illiani
      * @since 0.50.07
      */
-    static List<ScoutRecord> buildScoutMap(Formation formation, Hangar hangar, CampaignOptions campaignOptions) {
+    static List<ScoutRecord> buildScoutMap(Formation formation, Hangar hangar, CampaignOptions campaignOptions,
+          boolean isClanCampaign, LocalDate date) {
         if (formation == null) {
             return new ArrayList<>();
         }
@@ -1906,18 +1910,10 @@ boolean isUseEdge = campaignOptions.isUseEdge() && scout.getOptions().booleanOpt
                     continue;
                 }
 
-                // StratConRules manager passes useAgingEffects == false, so we use a deprecated method version for now
                 TargetRoll targetNumber = SkillCheckUtility.determineTargetNumber(crewMember,
-                      SkillType.getType(scoutSkillName), 0);
-                LOGGER.error("Target number: " + targetNumber.getValue());
-                List<TargetRollModifier> modifiers = getAllScoutRollModifiers(unitWeight,
-                      unitSpeed,
-                      hasEagleEyes,
-                      hasSensorEquipment);
-
-                modifiers.forEach(targetNumber::addModifier);
-                modifiers.forEach(m ->
-                                        LOGGER.error("Modifier: " + m.value()));
+                      SkillType.getType(scoutSkillName), 0, campaignOptions.isUseAgeEffects(), isClanCampaign, date);
+                getAllScoutRollModifiers(unitWeight, unitSpeed, hasEagleEyes, hasSensorEquipment)
+                      .forEach(targetNumber::addModifier);
 
                 if (bestScout == null || targetNumber.getValue() < bestScoutTargetNumber) {
                     bestScout = new ScoutRecord(crewMember, targetNumber, scoutSkillName,

@@ -103,6 +103,7 @@ import megamek.common.units.*;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
+import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ExtraData;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -112,6 +113,7 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.log.LogEntry;
@@ -362,12 +364,12 @@ public class Person implements ILocation {
     private String eduAcademySet;
     private String eduAcademyNameInSet;
     private String eduAcademyFaction;
-    private String eduAcademySystem;
     private int eduCourseIndex;
     private EducationStage eduEducationStage;
     private int eduJourneyTime;
     private int eduEducationTime;
     private int eduDaysOfTravel;
+    private transient String legacyEduAcademySystem;
     private List<UUID> eduTagAlongs;
     private List<String> eduFailedApplications;
     private double trainingForceEducationTime;
@@ -601,7 +603,6 @@ public class Person implements ILocation {
         acquisitions = 0;
         eduHighestEducation = EducationLevel.EARLY_CHILDHOOD;
         eduAcademyName = null;
-        eduAcademySystem = null;
         eduCourseIndex = 0;
         eduEducationStage = EducationStage.NONE;
         eduJourneyTime = 0;
@@ -1722,8 +1723,8 @@ public class Person implements ILocation {
         this.setEduAcademySystem(null);
         this.setEduCourseIndex(0);
         this.setEduEducationStage(EducationStage.NONE);
-        this.setEduEducationTime(0);
         this.setEduJourneyTime(0);
+        this.setEduEducationTime(0);
         this.setEduDaysOfTravel(0);
 
         for (UUID tagAlongId : eduTagAlongs) {
@@ -2710,6 +2711,14 @@ public class Person implements ILocation {
         this.eduHighestEducation = eduHighestEducation;
     }
 
+    /**
+     * Returns an estimated journey time in days to or from the academy.
+     *
+     * <p>This value is a snapshot recorded at enrollment or journey-start and may not reflect the
+     * actual remaining travel time. The person's {@link AbstractLocation} (accessible via
+     * {@link #getCurrentLocation()}) holds the authoritative travel state including the live
+     * {@link mekhq.campaign.JumpPath}.</p>
+     */
     public int getEduJourneyTime() {
         return eduJourneyTime;
     }
@@ -2718,12 +2727,69 @@ public class Person implements ILocation {
         this.eduJourneyTime = eduJourneyTime;
     }
 
+    /**
+     * Returns an estimated count of days elapsed since the person began their current journey.
+     *
+     * <p>This counter is incremented each day during JOURNEY_TO_CAMPUS and JOURNEY_FROM_CAMPUS
+     * stages as a rough progress indicator. The person's {@link AbstractLocation} (accessible via
+     * {@link #getCurrentLocation()}) holds the authoritative travel state including the live
+     * {@link mekhq.campaign.JumpPath}.</p>
+     */
     public int getEduDaysOfTravel() {
         return eduDaysOfTravel;
     }
 
     public void setEduDaysOfTravel(final int eduDaysOfTravel) {
         this.eduDaysOfTravel = eduDaysOfTravel;
+    }
+
+    /**
+     * Increments the number of educational travel days by 1.
+     *
+     * <p>See {@link #getEduDaysOfTravel()} for caveats about accuracy.</p>
+     */
+    public void incrementEduDaysOfTravel() {
+        this.eduDaysOfTravel++;
+    }
+
+    /**
+     * Returns the ID of the planetary system where the person's academy campus is located.
+     *
+     * <p>The primary source is the location tree: this walks the person's parent chain to find
+     * the nearest {@link AcademyCampusLocation}, then returns the system ID from its parent
+     * {@link AbstractLocation} (typically a {@link mekhq.campaign.FixedLocation}).</p>
+     *
+     * <p>If no campus node is reachable in the tree — for example, during JOURNEY_FROM_CAMPUS,
+     * a local-academy transit before campus arrival, or when loading a pre-location-tree save
+     * file — this falls back to a transient value populated from the legacy {@code eduAcademySystem}
+     * XML tag.</p>
+     *
+     * @return the campus system ID, or {@code null} if not derivable from either source
+     */
+    public @Nullable String getEduAcademySystem() {
+        LocationNode node = getLocationNode().getParent();
+        while (node != null) {
+            if (node.getLocatable() instanceof AcademyCampusLocation) {
+                LocationNode campusParent = node.getParent();
+                if (campusParent != null && campusParent.getLocatable() instanceof AbstractLocation location) {
+                    PlanetarySystem system = location.getCurrentSystem();
+                    if (system != null) {
+                        return system.getId();
+                    }
+                }
+                return legacyEduAcademySystem;
+            }
+            node = node.getParent();
+        }
+        return legacyEduAcademySystem;
+    }
+
+    public void setEduAcademySystem(final String academySystem) {
+        // The authoritative source is the location tree (see getEduAcademySystem()).
+        // This value is stored transiently as a fallback for callers that set the system
+        // before a travel CurrentLocation is established (e.g. test setup, enrollment).
+        // It is not persisted to XML.
+        this.legacyEduAcademySystem = academySystem;
     }
 
     public List<UUID> getEduTagAlongs() {
@@ -2746,27 +2812,12 @@ public class Person implements ILocation {
         eduFailedApplications.add(failedApplication);
     }
 
-    /**
-     * Increments the number educational travel days by 1.
-     */
-    public void incrementEduDaysOfTravel() {
-        this.eduDaysOfTravel++;
-    }
-
     public int getEduEducationTime() {
         return eduEducationTime;
     }
 
     public void setEduEducationTime(final int eduEducationTime) {
         this.eduEducationTime = eduEducationTime;
-    }
-
-    public String getEduAcademySystem() {
-        return eduAcademySystem;
-    }
-
-    public void setEduAcademySystem(final String eduAcademySystem) {
-        this.eduAcademySystem = eduAcademySystem;
     }
 
     public String getEduAcademyNameInSet() {
@@ -3629,10 +3680,6 @@ public class Person implements ILocation {
                 MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "eduFailedApplications");
             }
 
-            if (eduAcademySystem != null) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduAcademySystem", eduAcademySystem);
-            }
-
             if (eduAcademyNameInSet != null) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduAcademyNameInSet", eduAcademyNameInSet);
             }
@@ -4301,6 +4348,10 @@ public class Person implements ILocation {
                     person.eduJourneyTime = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("eduDaysOfTravel")) {
                     person.eduDaysOfTravel = MathUtility.parseInt(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("eduAcademySystem")) {
+                    // Legacy tag — academy system is now derived from the location tree.
+                    // Stored transiently so mid-journey persons on old saves can still function.
+                    person.legacyEduAcademySystem = wn2.getTextContent().trim();
                 } else if (nodeName.equalsIgnoreCase("eduTagAlongs")) {
                     if (nodeName.equalsIgnoreCase("eduTagAlongs")) {
                         NodeList uuidNodes = wn2.getChildNodes();
@@ -4329,8 +4380,6 @@ public class Person implements ILocation {
                             }
                         }
                     }
-                } else if (nodeName.equalsIgnoreCase("eduAcademySystem")) {
-                    person.eduAcademySystem = String.valueOf(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("eduAcademyName")) {
                     person.eduAcademyName = String.valueOf(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("eduAcademySet")) {
