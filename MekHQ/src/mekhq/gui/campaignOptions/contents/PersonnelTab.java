@@ -104,6 +104,7 @@ public class PersonnelTab {
     private JPanel pnlPersonnelGeneralOptions;
     private JCheckBox chkUseTactics;
     private JCheckBox chkUseInitiativeBonus;
+    private JCheckBox chkUseSensibleTactics;
     private JCheckBox chkUseToughness;
     private JCheckBox chkUseRandomToughness;
     private JCheckBox chkUseArtillery;
@@ -390,6 +391,7 @@ public class PersonnelTab {
         pnlPersonnelGeneralOptions = new JPanel();
         chkUseTactics = new JCheckBox();
         chkUseInitiativeBonus = new JCheckBox();
+        chkUseSensibleTactics = new JCheckBox();
         chkUseToughness = new JCheckBox();
         chkUseRandomToughness = new JCheckBox();
         chkUseArtillery = new JCheckBox();
@@ -436,7 +438,7 @@ public class PersonnelTab {
         // Header
         generalHeader = new CampaignOptionsHeaderPanel("PersonnelGeneralTab",
               getImageDirectory() + "logo_clan_wolverine.png",
-              5);
+              6);
 
         // Contents
         pnlPersonnelGeneralOptions = createGeneralOptionsPanel();
@@ -491,6 +493,9 @@ public class PersonnelTab {
         chkUseInitiativeBonus = new CampaignOptionsCheckBox("UseInitiativeBonus",
               getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         chkUseInitiativeBonus.addMouseListener(createTipPanelUpdater(generalHeader, "UseInitiativeBonus"));
+        chkUseSensibleTactics = new CampaignOptionsCheckBox("UseSensibleTactics",
+              getMetadata(new Version(0, 51, 1), CampaignOptionFlag.IMPORTANT, CampaignOptionFlag.CUSTOM_SYSTEM));
+        chkUseSensibleTactics.addMouseListener(createTipPanelUpdater(generalHeader, "UseSensibleTactics"));
         chkUseToughness = new CampaignOptionsCheckBox("UseToughness",
               getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseToughness.addMouseListener(createTipPanelUpdater(generalHeader, "UseToughness"));
@@ -554,6 +559,9 @@ public class PersonnelTab {
 
         layout.gridy++;
         panel.add(chkUseInitiativeBonus, layout);
+
+        layout.gridy++;
+        panel.add(chkUseSensibleTactics, layout);
 
         layout.gridy++;
         panel.add(chkUseToughness, layout);
@@ -1505,6 +1513,7 @@ public class PersonnelTab {
         // General
         chkUseTactics.setSelected(options.isUseTactics());
         chkUseInitiativeBonus.setSelected(options.isUseInitiativeBonus());
+        chkUseSensibleTactics.setSelected(options.isUseSensibleTactics());
         chkUseToughness.setSelected(options.isUseToughness());
         chkUseRandomToughness.setSelected(options.isUseRandomToughness());
         chkUseArtillery.setSelected(options.isUseArtillery());
@@ -1617,6 +1626,7 @@ public class PersonnelTab {
         // General
         options.setUseTactics(chkUseTactics.isSelected());
         options.setUseInitiativeBonus(chkUseInitiativeBonus.isSelected());
+        options.setUseSensibleTactics(chkUseSensibleTactics.isSelected());
         options.setUseToughness(chkUseToughness.isSelected());
         options.setUseRandomToughness(chkUseRandomToughness.isSelected());
         options.setUseArtillery(chkUseArtillery.isSelected());

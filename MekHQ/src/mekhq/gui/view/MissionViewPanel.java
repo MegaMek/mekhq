@@ -247,7 +247,7 @@ public class MissionViewPanel extends JScrollablePanel {
             pnlStats.add(txtType, gridBagConstraints);
         }
 
-        addDescriptionPane(mission.getDescription(), 3);
+        addDescriptionPane(mission.getDescription(), 3, 1.0);
     }
 
     private void fillStatsContract() {
@@ -542,7 +542,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblSalvagePct2, gridBagConstraints);
         i++;
-        addDescriptionPane(contract.getDescription(), i);
+        addDescriptionPane(contract.getDescription(), i, 1.0);
 
     }
 
@@ -576,8 +576,6 @@ public class MissionViewPanel extends JScrollablePanel {
         JLabel txtAllyRating = new JLabel();
         JLabel lblEnemyRating = new JLabel();
         JLabel txtEnemyRating = new JLabel();
-        JLabel lblMorale = new JLabel();
-        JLabel txtMorale = new JLabel();
         JLabel lblSharePct = new JLabel();
         JLabel txtSharePct = new JLabel();
         JLabel lblCargoRequirement = new JLabel();
@@ -923,35 +921,6 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtSalvagePct, gridBagConstraints);
 
-        lblMorale.setName("lblMorale");
-        lblMorale.setText(resourceMap.getString("lblMorale.text"));
-        lblMorale.setToolTipText(wordWrap(contract.getMoraleLevel().getToolTipText()));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(lblMorale, gridBagConstraints);
-
-        txtMorale.setName("txtMorale");
-
-        if ((contract.getContractType().isGarrisonDuty() || contract.getContractType().isRetainer()) &&
-                  contract.getMoraleLevel().isRouted()) {
-            txtMorale.setText(resourceMap.getString("txtGarrisonMoraleRouted.text"));
-            txtMorale.setToolTipText(wordWrap(resourceMap.getString("txtGarrisonMoraleRouted.tooltip")));
-        } else {
-            txtMorale.setText(contract.getMoraleLevel().toString());
-            txtMorale.setToolTipText(wordWrap(contract.getMoraleLevel().getToolTipText()));
-        }
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(txtMorale, gridBagConstraints);
-
         if (campaign.getCampaignOptions().isUseShareSystem()) {
             lblSharePct.setName("lblSharePct");
             lblSharePct.setText(resourceMap.getString("lblSharePct.text"));
@@ -1077,10 +1046,31 @@ public class MissionViewPanel extends JScrollablePanel {
             pnlStats.add(txtSupport, gridBagConstraints);
         }
 
-        addDescriptionPane(contract.getDescription(), y);
+        addDescriptionPane(contract.getDescription(), y++, 0.0);
+
+        // Enemy morale is shown as a labelled gauge at the very bottom of the panel, after the contract description.
+        // This (always-present) row carries the panel's vertical weight so the contract stats stay anchored to the top
+        // rather than centering; SOUTHWEST anchoring keeps the fixed-height gauge pinned to the bottom of that row, so
+        // any extra vertical space falls above the gauge instead of below it.
+        final MoraleBar.MoraleDisplay moraleDisplay = MoraleBar.getMoraleDisplay(contract);
+        final String moraleText = moraleDisplay.label();
+        final String moraleTooltip = moraleDisplay.tooltip();
+
+        MoraleBar moraleBar = new MoraleBar(contract.getMoraleLevel(), moraleText);
+        moraleBar.setToolTipText(wordWrap(moraleTooltip));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new Insets(UIUtil.scaleForGUI(6), 0, 2, 0);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.SOUTHWEST;
+        pnlStats.add(moraleBar, gridBagConstraints);
     }
 
-    private void addDescriptionPane(String description, int gridY) {
+    private void addDescriptionPane(String description, int gridY, double weighty) {
         if ((description == null) || description.isBlank()) {
             return;
         }
@@ -1095,7 +1085,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.gridy = gridY;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.weighty = weighty;
         gridBagConstraints.insets = new Insets(0, 0, 5, 0);
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;

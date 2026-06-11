@@ -160,6 +160,10 @@ public abstract class AbstractLocation implements IPlace {
         return locationNode;
     }
 
+    public boolean computeIsUseCommandCircuit(Campaign campaign) {
+        return computeIsUseCommandCircuit(campaign, campaign.getCampaignOptions());
+    }
+
     protected boolean computeIsUseCommandCircuit(Campaign campaign, CampaignOptions campaignOptions) {
         return FactionStandingUtilities.isUseCommandCircuit(
               campaign.isOverridingCommandCircuitRequirements(),
@@ -181,14 +185,16 @@ public abstract class AbstractLocation implements IPlace {
      * @return the number of hours actually used for recharging
      */
     protected double applyRechargeForHours(Campaign campaign, LocalDate today, boolean isUseCommandCircuit,
-          double availableHours) {
+          double availableHours, boolean isSilentProcessing) {
         double neededRechargeTime = currentSystem.getRechargeTime(today, isUseCommandCircuit);
         double usedRechargeTime = Math.min(availableHours, neededRechargeTime - getRechargeTime());
         if (usedRechargeTime > 0) {
-            campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, "getReport.recharge.hours",
-                  Math.round(100.0 * usedRechargeTime) / 100.0));
+            if (!isSilentProcessing) {
+                campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, "getReport.recharge.hours",
+                                                  Math.round(100.0 * usedRechargeTime) / 100.0));
+            }
             setRechargeTime(getRechargeTime() + usedRechargeTime);
-            if (getRechargeTime() >= neededRechargeTime) {
+            if (getRechargeTime() >= neededRechargeTime && !isSilentProcessing) {
                 campaign.addReport(GENERAL, getTextAt(RESOURCE_BUNDLE, "getReport.recharge.complete"));
             }
         }
@@ -196,10 +202,11 @@ public abstract class AbstractLocation implements IPlace {
     }
 
     // recharge even if there is no jump path because JumpShips don't go anywhere
-    public void newDay(Campaign campaign) {
+    public void newDay(Campaign campaign, boolean isSilentProcessing) {
         LocalDate today = campaign.getLocalDate();
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        applyRechargeForHours(campaign, today, computeIsUseCommandCircuit(campaign, campaignOptions), 24.0);
+        applyRechargeForHours(campaign, today, computeIsUseCommandCircuit(campaign, campaignOptions), 24.0,
+              isSilentProcessing);
     }
 
     void checkForDiseaseOrBioweaponOutbreaks(Campaign campaign, LocalDate today) {
@@ -298,9 +305,16 @@ public abstract class AbstractLocation implements IPlace {
 
     public abstract void writeToXML(PrintWriter writer, int indent);
 
+    /**
+     * Dispatches XML deserialization to the correct {@link AbstractLocation} subclass based on the element name of
+     * {@code wn}.
+     *
+     * @return the deserialized location, or {@code null} if the node name is unrecognized
+     */
     public static @Nullable AbstractLocation generateInstanceFromXML(Node wn, Campaign campaign) {
         return switch (wn.getNodeName().toLowerCase()) {
             case "location" -> CurrentLocation.generateInstanceFromXML(wn, campaign);
+            case "fixedlocation" -> FixedLocation.generateInstanceFromXML(wn, campaign);
             default -> {
                 logger.warn("Unrecognized location node '{}' — skipping", wn.getNodeName());
                 yield null;
