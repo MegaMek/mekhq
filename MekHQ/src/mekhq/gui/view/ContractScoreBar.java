@@ -34,12 +34,16 @@ package mekhq.gui.view;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 
 import jakarta.annotation.Nonnull;
@@ -54,15 +58,17 @@ import mekhq.gui.baseComponents.GradientMarkerBar.MarkerStyle;
  *
  * <p>
  * The gauge reads from the player's perspective: a low or negative score is red, climbing through gold to green as it
- * approaches the required total. Because the score is unbounded and may be negative or exceed the requirement, values
- * outside the {@code 0..required} range are shown in flat darker overshoot caps (dark red below zero, dark green above
- * the target). Those caps are only drawn when the score is actually outside the range, so the bar stays uncluttered in
- * the common case. The exact figures remain available as marker labels and in the tooltip.
+ * approaches the required total. It is the primary display for the score, so its markers carry the figures: the
+ * required total is a reference tick, while the zero baseline and the current score are solid markers. Because the
+ * score is unbounded and may be negative or exceed the requirement, the track stretches to keep every marker in view
+ * and proportionally placed, filling the stretched-in regions with flat darker colors (dark red below zero, dark green
+ * beyond the target). Those regions appear only when the score is actually outside the {@code 0..required} range, so
+ * the bar stays uncluttered in the common case.
  * </p>
  *
  * <p>
  * Whether the player may declare victory early upon reaching the target is conveyed by the prominence of the goal marker
- * (muted when the contract cannot be ended early) and by the accompanying caption, rather than by the bar's colors.
+ * (muted when the contract cannot be ended early) and by an accompanying caption, rather than by the bar's colors.
  * </p>
  *
  * @author The MegaMek Team
@@ -78,6 +84,8 @@ public class ContractScoreBar extends JPanel {
     private static final Color GREEN = new Color(0x36, 0xB3, 0x2B);
     /** Alpha applied to the goal marker when the contract cannot be ended early, muting it to a reference line. */
     private static final int MUTED_ALPHA = 160;
+    /** Alpha applied to the "cannot be ended early" caption so it reads as a secondary note. */
+    private static final int CAPTION_ALPHA = 170;
 
     /** The wrapped gauge. Kept private so the marker-level API is not exposed to callers. */
     private final GradientMarkerBar bar = new GradientMarkerBar();
@@ -108,13 +116,23 @@ public class ContractScoreBar extends JPanel {
 
         final Color markerColor = markerColor();
         final Color goalColor = canEndEarly ? markerColor : muted(markerColor);
-        final List<Marker> markers = new ArrayList<>(2);
-        // Goal threshold first, then the current-score marker so the latter is painted on top where they overlap. The
-        // goal value is labelled above the track and the current value below, so both stay legible even when the two
-        // markers sit close together (for example once the score reaches or overshoots the target).
-        markers.add(new Marker(requiredScore, Integer.toString(requiredScore), goalColor, MarkerStyle.TICK, true));
-        markers.add(new Marker(currentScore, Integer.toString(currentScore), markerColor, MarkerStyle.SOLID, false));
+        final List<Marker> markers = new ArrayList<>(3);
+        // The bar is the primary display, so its markers carry the figures. The current score is the prominent, thick
+        // solid marker labelled above the track; the zero baseline and the required total are thin reference ticks
+        // labelled below it, so the thicker marker the player tracks is unambiguously the current value. Markers are
+        // painted in list order, so the current-score marker is added last to sit on top where markers coincide (for
+        // example a brand-new contract whose score is still zero).
+        markers.add(new Marker(requiredScore, Integer.toString(requiredScore), goalColor, MarkerStyle.TICK, false));
+        markers.add(new Marker(0, "0", markerColor, MarkerStyle.TICK, false));
+        markers.add(new Marker(currentScore, Integer.toString(currentScore), markerColor, MarkerStyle.SOLID, true));
         bar.setMarkers(markers);
+
+        // When the contract cannot be ended early, a muted goal marker plus this slim caption convey that reaching the
+        // target does not let the player leave; the caption spans the full width so the note fits where the value
+        // column could not.
+        if (!canEndEarly) {
+            add(buildCannotEndEarlyCaption(), BorderLayout.SOUTH);
+        }
 
         setToolTipText(wordWrap(getFormattedTextAt(RESOURCE_BUNDLE,
               canEndEarly ? "contractScoreBar.tooltip.canEndEarly" : "contractScoreBar.tooltip.cannotEndEarly",
@@ -147,5 +165,21 @@ public class ContractScoreBar extends JPanel {
      */
     private static @Nonnull Color muted(final @Nonnull Color color) {
         return new Color(color.getRed(), color.getGreen(), color.getBlue(), MUTED_ALPHA);
+    }
+
+    /**
+     * Builds the slim, centered italic caption shown beneath the bar for contracts that cannot be ended early.
+     *
+     * @return the caption label
+     */
+    private static @Nonnull JLabel buildCannotEndEarlyCaption() {
+        final JLabel caption = new JLabel(getTextAt(RESOURCE_BUNDLE, "lblNoEarlyEnd.text"), SwingConstants.CENTER);
+        caption.setFont(caption.getFont().deriveFont(Font.ITALIC, caption.getFont().getSize2D() - 1.0f));
+        final Color foreground = UIManager.getColor("Label.foreground");
+        if (foreground != null) {
+            caption.setForeground(new Color(foreground.getRed(), foreground.getGreen(), foreground.getBlue(),
+                  CAPTION_ALPHA));
+        }
+        return caption;
     }
 }

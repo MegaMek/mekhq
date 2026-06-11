@@ -53,26 +53,29 @@ import megamek.client.ui.util.UIUtil;
  * A compact, reusable gauge that draws a continuous horizontal track and places one or more labeled markers on it.
  *
  * <p>
- * Unlike {@link SegmentedBar}, which fills a fixed number of discrete blocks, this component represents an
- * <em>unbounded</em>, possibly signed value as a position along a track. A smooth color gradient is painted across a
- * caller-defined value range (the "gradient range"); values that fall outside that range are represented by optional
- * flat-colored "overshoot caps" at each end. This makes the control suitable for quantities that have a meaningful
- * working range but no hard minimum or maximum (for example a contract score that climbs toward a victory threshold but
- * may go negative or overshoot).
+ * The component represents an <em>unbounded</em>, possibly signed value as a position along a track. A smooth color
+ * gradient is painted across a caller-defined value range (the "gradient range"). This makes the control suitable for
+ * quantities that have a meaningful working range but no hard minimum or maximum (for example a contract score that
+ * climbs toward a victory threshold but may go negative or overshoot).
  * </p>
  *
  * <p>
- * Markers are drawn as thin vertical handles that poke slightly above and below the track so they stay visible against
- * any gradient color behind them. Each {@link Marker} carries a value, an optional text label, a color, and a
- * {@link MarkerStyle}. A marker whose value lies outside the gradient range is pinned to the center of the
- * corresponding overshoot cap (or clamped to the track end when that cap is disabled), so the marker never leaves the
- * track; callers are expected to show the exact value as text elsewhere.
+ * The visible track always covers at least the gradient range, but it stretches automatically to include any marker
+ * whose value falls outside that range, so every marker stays on the track and proportionally placed. The stretched-in
+ * regions beyond the gradient range are filled with optional flat colors, which therefore appear only when a value
+ * actually falls outside the range.
+ * </p>
+ *
+ * <p>
+ * Markers are drawn as vertical handles that poke slightly above and below the track so they stay visible against any
+ * gradient color behind them. Each {@link Marker} carries a value, an optional text label, a color, and a
+ * {@link MarkerStyle}.
  * </p>
  *
  * <p>
  * The component is value-agnostic: callers describe what to show by setting the gradient range, the gradient colors,
- * the optional caps, and the markers. This keeps the same control usable for very different concepts (contract score,
- * faction standing, ...).
+ * the optional out-of-gradient colors, and the markers. This keeps the same control usable for very different concepts
+ * (contract score, faction standing, ...).
  * </p>
  *
  * @author The MegaMek Team
@@ -109,7 +112,7 @@ public class GradientMarkerBar extends JComponent {
     private static final int PADDING = 6;
     private static final int TRACK_HEIGHT = 8;
     /** How far a marker handle extends beyond the track, top and bottom, so it stays visible over the gradient. */
-    private static final int MARKER_OVERHANG = 4;
+    private static final int MARKER_OVERHANG = 3;
     private static final int SOLID_MARKER_WIDTH = 4;
     private static final int TICK_MARKER_WIDTH = 2;
     private static final int TRACK_ARC = 6;
