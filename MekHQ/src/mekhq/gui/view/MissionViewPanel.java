@@ -1025,6 +1025,23 @@ public class MissionViewPanel extends JScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(txtScore, gridBagConstraints);
 
+            // Victory points are also shown as a continuous gauge directly beneath the figures. The gauge is only
+            // meaningful when a positive target exists, so it is skipped otherwise and the text above stands alone.
+            if (neededScore > 0) {
+                final boolean canEndEarly = (contract.getStratconCampaignState() == null) ||
+                                                  contract.getStratconCampaignState().allowEarlyVictory();
+                final ContractScoreBar contractScoreBar = new ContractScoreBar(currentScore, neededScore, canEndEarly);
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 0;
+                gridBagConstraints.gridy = y++;
+                gridBagConstraints.gridwidth = 2;
+                gridBagConstraints.weightx = 1.0;
+                gridBagConstraints.insets = new Insets(UIUtil.scaleForGUI(2), 0, UIUtil.scaleForGUI(4), 0);
+                gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                pnlStats.add(contractScoreBar, gridBagConstraints);
+            }
+
             lblSupportPoints.setName("lblSupportPoints");
             lblSupportPoints.setText(resourceMap.getString("lblSupportPoints.text"));
             gridBagConstraints = new GridBagConstraints();
