@@ -56,6 +56,7 @@ import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.Space;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.SpecificGroundTerrain;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_COORDINATOR;
+import static mekhq.campaign.personnel.PersonnelOptions.EDGE_RECON_FAIL;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_TACTICS;
 import static mekhq.campaign.stratCon.StratConContractInitializer.getUnoccupiedCoords;
@@ -1610,7 +1611,8 @@ public class StratConRulesManager {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         Formation formation = campaign.getFormation(forceID);
         Hangar hangar = campaign.getAllHangar();
-        List<ScoutRecord> scouts = buildScoutMap(formation, hangar, campaignOptions);
+        List<ScoutRecord> scouts = buildScoutMap(formation, hangar, campaignOptions,
+              campaign.isClanCampaign(), campaign.getLocalDate());
 
         boolean useAdvancedScouting = campaignOptions.isUseAdvancedScouting();
         // Each scout may scan up to scanMultiplier hexes
@@ -1640,6 +1642,7 @@ public class StratConRulesManager {
                     continue;
                 }
 
+boolean isUseEdge = campaignOptions.isUseEdge() && scout.getOptions().booleanOption(EDGE_RECON_FAIL);
                 for (int direction = 0; direction < 6; direction++) {
                     StratConCoords checkCoords = currentCoords.translate(direction);
 
@@ -1678,10 +1681,10 @@ public class StratConRulesManager {
                               scoutData.bestScoutSkillName(),
                               scoutData.getAllScoutRollModifiers(),
                               0,
+                              isUseEdge,
                               false,
-                              false,
-                              false, // Irrelevant
-                              false, // Irrelevant
+                              campaignOptions.isUseAgeEffects(),
+                              campaign.isClanCampaign(),
                               campaign.getLocalDate()
                         );
                         campaign.addReport(SKILL_CHECKS, skillCheck.getResultsText());
@@ -1789,8 +1792,8 @@ public class StratConRulesManager {
      *
      * @param unitHasSensorEquipment flag signifying presence of sensor equipment
      *
-     * @return a {@link TargetRollModifier} reflecting bonuses from unit sensor equipment; will have a modifier
-     *       value of 0 if no qualifying equipment is present
+     * @return a {@link TargetRollModifier} reflecting bonuses from unit sensor equipment; will have a modifier value of
+     *       0 if no qualifying equipment is present
      */
     static TargetRollModifier getUnitEquipmentModifier(boolean unitHasSensorEquipment) {
         int modifier = unitHasSensorEquipment ? -1 : 0;
@@ -1841,8 +1844,8 @@ public class StratConRulesManager {
      * force.
      *
      * <p>For each unit retrieved from the {@code Force}, this method examines all crew members to determine which
-     * has the highest scouting-related skill (as evaluated by
-     * {@link ScoutingSkills#getBestScoutingSkill(Person)}) in combination with scouting roll modifiers</p>
+     * has the highest scouting-related skill (as evaluated by {@link ScoutingSkills#getBestScoutingSkill(Person)}) in
+     * combination with scouting roll modifiers</p>
      *
      * <p>The crew member with the highest skill level becomes the designated scout for that unit. The method also
      * determines whether each unit is a "light unit" based on its weight class.</p>
@@ -1853,6 +1856,8 @@ public class StratConRulesManager {
      * @param formation       the {@link Formation} containing units to evaluate
      * @param hangar          the {@link Hangar} used to help retrieve units from the force
      * @param campaignOptions {@link CampaignOptions}, used to check useCommanderOnly options
+     * @param isClanCampaign  if {@code true}, applies rules specific to clan campaigns
+     * @param date            the current date, used for time-dependent logic
      *
      * @return a list of {@link ScoutRecord} objects, each representing the best scout and their skill details for a
      *       unit, sorted from the highest to lowest scout skill level
@@ -1860,7 +1865,8 @@ public class StratConRulesManager {
      * @author Illiani
      * @since 0.50.07
      */
-    static List<ScoutRecord> buildScoutMap(Formation formation, Hangar hangar, CampaignOptions campaignOptions) {
+    static List<ScoutRecord> buildScoutMap(Formation formation, Hangar hangar, CampaignOptions campaignOptions,
+          boolean isClanCampaign, LocalDate date) {
         if (formation == null) {
             return new ArrayList<>();
         }
@@ -1904,22 +1910,14 @@ public class StratConRulesManager {
                     continue;
                 }
 
-                // StratConRules manager passes useAgingEffects == false, so we use a deprecated method version for now
                 TargetRoll targetNumber = SkillCheckUtility.determineTargetNumber(crewMember,
-                      SkillType.getType(scoutSkillName), 0);
-                LOGGER.error("Target number: " + targetNumber.getValue());
-                List<TargetRollModifier> modifiers = getAllScoutRollModifiers(unitWeight,
-                      unitSpeed,
-                      hasEagleEyes,
-                      hasSensorEquipment);
-
-                modifiers.forEach(targetNumber::addModifier);
-                modifiers.forEach(m ->
-                    LOGGER.error("Modifier: " + m.value()));
+                      SkillType.getType(scoutSkillName), 0, campaignOptions.isUseAgeEffects(), isClanCampaign, date);
+                getAllScoutRollModifiers(unitWeight, unitSpeed, hasEagleEyes, hasSensorEquipment)
+                      .forEach(targetNumber::addModifier);
 
                 if (bestScout == null || targetNumber.getValue() < bestScoutTargetNumber) {
                     bestScout = new ScoutRecord(crewMember, targetNumber, scoutSkillName,
-                        hasEagleEyes, unitWeight, unitSpeed, hasSensorEquipment);
+                          hasEagleEyes, unitWeight, unitSpeed, hasSensorEquipment);
                     bestScoutTargetNumber = targetNumber.getValue();
                 }
             }
@@ -2376,7 +2374,7 @@ public class StratConRulesManager {
     /**
      * Utility method to determine if the current scenario's force commander's force is on defence
      */
-    private static boolean commanderLanceHasDefensiveAssignment(AtBDynamicScenario scenario, Campaign campaign) {
+    public static boolean commanderLanceHasDefensiveAssignment(AtBDynamicScenario scenario, Campaign campaign) {
         Person lanceCommander = scenario.getLanceCommander(campaign);
         if (lanceCommander != null) {
             Unit commanderUnit = lanceCommander.getUnit();

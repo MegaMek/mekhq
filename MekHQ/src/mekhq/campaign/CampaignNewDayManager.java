@@ -239,6 +239,7 @@ public class CampaignNewDayManager {
         this.warehouse = campaign.getAllWarehouse();
         this.quartermaster = campaign.getQuartermaster();
         this.finances = campaign.getFinances();
+        this.updatedLocation = campaign.getCurrentLocation();
     }
 
     /**
@@ -429,12 +430,16 @@ public class CampaignNewDayManager {
 
         campaign.readNews();
 
-        campaign.getCurrentLocation().newDay(campaign);
+        for (AbstractLocation location : new ArrayList<>(campaign.getLocations())) {
+            location.newDay(campaign, location != updatedLocation);
+        }
         updatedLocation = campaign.getCurrentLocation();
+
 
         updateFacilities();
 
         processNewDayPersonnel();
+        campaign.pruneEmptyLocations();
 
         if (campaignOptions.isUseRandomDiseases() && campaignOptions.isUseAlternativeAdvancedMedical()) {
             PlanetarySystem currentSystem = updatedLocation.getCurrentSystem();
