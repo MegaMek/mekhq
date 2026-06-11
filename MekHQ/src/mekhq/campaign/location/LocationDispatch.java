@@ -181,9 +181,7 @@ public final class LocationDispatch {
      * immediately {@code true} and {@link IPlace#processArrivals} will land all carried items on
      * its next call.
      */
-    private static CurrentLocation buildArrivedNode(PlanetarySystem system,
-          ILocation destination,
-          Campaign campaign,
+    private static CurrentLocation buildArrivedNode(PlanetarySystem system, ILocation destination, Campaign campaign,
           String logContext) {
         CurrentLocation arrivedLocation = new CurrentLocation(system, 0.0);
         if (!arrivedLocation.setParent(destination)) {
