@@ -998,6 +998,26 @@ public class MissionViewPanel extends JScrollablePanel {
                 pnlStats.add(txtDeploymentCoverage, gridBagConstraints);
             }
 
+            lblSupportPoints.setName("lblSupportPoints");
+            lblSupportPoints.setText(resourceMap.getString("lblSupportPoints.text"));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlStats.add(lblSupportPoints, gridBagConstraints);
+
+            txtSupport.setName("txtSupport");
+            txtSupport.setText(Integer.toString(contract.getCurrentSupportPoints()));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.weightx = 0.5;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlStats.add(txtSupport, gridBagConstraints);
+
             lblScore.setName("lblScore");
             lblScore.setText(resourceMap.getString("lblScore.text"));
             gridBagConstraints = new GridBagConstraints();
@@ -1042,25 +1062,6 @@ public class MissionViewPanel extends JScrollablePanel {
                 pnlStats.add(contractScoreBar, gridBagConstraints);
             }
 
-            lblSupportPoints.setName("lblSupportPoints");
-            lblSupportPoints.setText(resourceMap.getString("lblSupportPoints.text"));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = y;
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlStats.add(lblSupportPoints, gridBagConstraints);
-
-            txtSupport.setName("txtSupport");
-            txtSupport.setText(Integer.toString(contract.getCurrentSupportPoints()));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = y++;
-            gridBagConstraints.weightx = 0.5;
-            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlStats.add(txtSupport, gridBagConstraints);
         }
 
         addDescriptionPane(contract.getDescription(), y++, 0.0);

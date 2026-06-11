@@ -110,8 +110,6 @@ public class GradientMarkerBar extends JComponent {
     private static final int TRACK_HEIGHT = 8;
     /** How far a marker handle extends beyond the track, top and bottom, so it stays visible over the gradient. */
     private static final int MARKER_OVERHANG = 4;
-    /** Fixed pixel width of each overshoot cap, when enabled. */
-    private static final int CAP_WIDTH = 12;
     private static final int SOLID_MARKER_WIDTH = 4;
     private static final int TICK_MARKER_WIDTH = 2;
     private static final int TRACK_ARC = 6;
@@ -125,30 +123,32 @@ public class GradientMarkerBar extends JComponent {
     private double gradientStart = 0.0;
     private double gradientEnd = 1.0;
     private Color[] gradient = {};
-    private @Nullable Color belowCapColor;
-    private @Nullable Color aboveCapColor;
+    private @Nullable Color belowColor;
+    private @Nullable Color aboveColor;
     private List<Marker> markers = List.of();
 
     /**
      * Creates an empty bar. Configure it with {@link #setGradientRange(double, double)}, {@link #setGradient(Color[])},
-     * {@link #setOvershootCaps(Color, Color)}, and {@link #setMarkers(List)}.
+     * {@link #setOutOfGradientColors(Color, Color)}, and {@link #setMarkers(List)}.
      */
     public GradientMarkerBar() {
         setOpaque(false);
     }
 
     /**
-     * Sets the value range spanned by the color gradient. Values at or below {@code start} map to the left end of the
-     * gradient and values at or above {@code end} map to the right end; values outside the range are represented by the
-     * overshoot caps (see {@link #setOvershootCaps(Color, Color)}).
+     * Sets the value range spanned by the color gradient. The visible track always covers at least this range, but it
+     * stretches automatically to include any marker whose value falls below {@code start} or above {@code end} (see
+     * {@link #displayMin()} and {@link #displayMax()}), so every marker stays on the track and proportionally placed.
+     * The portions of the track beyond this range are filled with the flat out-of-gradient colors (see
+     * {@link #setOutOfGradientColors(Color, Color)}).
      *
      * @param start the value mapped to the left end of the gradient
-     * @param end   the value mapped to the right end of the gradient; should be greater than {@code start} (a
-     *              non-positive span disables value-to-position mapping and pins markers to the left)
+     * @param end   the value mapped to the right end of the gradient; should be greater than {@code start}
      */
     public void setGradientRange(final double start, final double end) {
         this.gradientStart = start;
         this.gradientEnd = end;
+        revalidate();
         repaint();
     }
 
@@ -164,17 +164,17 @@ public class GradientMarkerBar extends JComponent {
     }
 
     /**
-     * Sets the flat fill colors for the overshoot caps drawn beyond each end of the gradient range. A {@code null}
-     * color disables that cap, in which case markers beyond that end clamp to the track end instead of pinning to a
-     * cap.
+     * Sets the flat fill colors used for the portions of the track that represent values below the gradient range or
+     * above it. These portions exist only when a marker has stretched the display range past a gradient bound, so a
+     * color set here is shown only when there is actually an out-of-gradient region to fill. A {@code null} color
+     * leaves the corresponding region unfilled (it falls back to the bare track).
      *
-     * @param belowColor the fill for the cap below the gradient range, or {@code null} for none
-     * @param aboveColor the fill for the cap above the gradient range, or {@code null} for none
+     * @param belowColor the fill for values below the gradient range, or {@code null} for none
+     * @param aboveColor the fill for values above the gradient range, or {@code null} for none
      */
-    public void setOvershootCaps(final @Nullable Color belowColor, final @Nullable Color aboveColor) {
-        this.belowCapColor = belowColor;
-        this.aboveCapColor = aboveColor;
-        revalidate();
+    public void setOutOfGradientColors(final @Nullable Color belowColor, final @Nullable Color aboveColor) {
+        this.belowColor = belowColor;
+        this.aboveColor = aboveColor;
         repaint();
     }
 
@@ -205,10 +205,6 @@ public class GradientMarkerBar extends JComponent {
         return Math.max(UIUtil.scaleForGUI(PADDING), 1);
     }
 
-    private int capWidth() {
-        return Math.max(UIUtil.scaleForGUI(CAP_WIDTH), 1);
-    }
-
     private int trackHeight() {
         return Math.max(UIUtil.scaleForGUI(TRACK_HEIGHT), 2);
     }
@@ -217,12 +213,12 @@ public class GradientMarkerBar extends JComponent {
         return Math.max(UIUtil.scaleForGUI(MARKER_OVERHANG), 1);
     }
 
-    private boolean hasBelowCap() {
-        return belowCapColor != null;
+    private boolean hasBelowColor() {
+        return belowColor != null;
     }
 
-    private boolean hasAboveCap() {
-        return aboveCapColor != null;
+    private boolean hasAboveColor() {
+        return aboveColor != null;
     }
 
     /**
@@ -245,21 +241,34 @@ public class GradientMarkerBar extends JComponent {
         return Math.max(UIUtil.scaleForGUI(LABEL_GAP), 1) + getFontMetrics(getFont()).getHeight();
     }
 
-    /** @return the left edge of the gradient zone in pixels (after any below-cap). */
-    private int gradientLeft() {
-        return padding() + (hasBelowCap() ? capWidth() : 0);
-    }
-
-    /** @return the right edge of the gradient zone in pixels (before any above-cap). */
-    private int gradientRight() {
-        return Math.max(getWidth() - padding() - (hasAboveCap() ? capWidth() : 0), gradientLeft() + 1);
+    /**
+     * @return the smallest value shown on the track: the lower gradient bound, extended to include any marker that
+     *       falls below it so out-of-gradient markers remain visible and proportionally placed
+     */
+    double displayMin() {
+        double min = Math.min(gradientStart, gradientEnd);
+        for (final Marker marker : markers) {
+            min = Math.min(min, marker.value());
+        }
+        return min;
     }
 
     /**
-     * Maps a value to its x-coordinate on the track. Values within the gradient range (inclusive of both ends) map
-     * linearly across the gradient zone; values strictly below the range pin to the center of the below-cap (or the
-     * gradient's left edge when that cap is disabled); values strictly above the range pin to the center of the
-     * above-cap (or the gradient's right edge when that cap is disabled).
+     * @return the largest value shown on the track: the upper gradient bound, extended to include any marker that falls
+     *       above it
+     */
+    double displayMax() {
+        double max = Math.max(gradientStart, gradientEnd);
+        for (final Marker marker : markers) {
+            max = Math.max(max, marker.value());
+        }
+        return max;
+    }
+
+    /**
+     * Maps a value to its x-coordinate on the track. The track spans the full display range (see {@link #displayMin()}
+     * and {@link #displayMax()}), which always covers the gradient range and stretches to include any out-of-gradient
+     * markers, so every value maps linearly and proportionally across the available width.
      *
      * @param value the value to map
      *
@@ -269,20 +278,16 @@ public class GradientMarkerBar extends JComponent {
         if (getWidth() <= 0) {
             return 0;
         }
-        final int gradLeft = gradientLeft();
-        final int gradRight = gradientRight();
-        final double range = gradientEnd - gradientStart;
-        if (range <= 0) {
-            return gradLeft;
+        final int left = padding();
+        final int right = getWidth() - padding();
+        final double min = displayMin();
+        final double max = displayMax();
+        if (max <= min) {
+            return left;
         }
-        if (value < gradientStart) {
-            return hasBelowCap() ? padding() + capWidth() / 2 : gradLeft;
-        }
-        if (value > gradientEnd) {
-            return hasAboveCap() ? getWidth() - padding() - capWidth() / 2 : gradRight;
-        }
-        final double fraction = (value - gradientStart) / range;
-        return (int) Math.round(gradLeft + fraction * (gradRight - gradLeft));
+        final double clamped = Math.max(min, Math.min(max, value));
+        final double fraction = (clamped - min) / (max - min);
+        return (int) Math.round(left + fraction * (right - left));
     }
 
     @Override
@@ -313,7 +318,8 @@ public class GradientMarkerBar extends JComponent {
     }
 
     /**
-     * Paints the track: the optional overshoot caps and the gradient between them, clipped to a single rounded
+     * Paints the track: the gradient across the portion of the track that represents the gradient range, with flat
+     * fills for any portions that represent values below or above that range. Everything is clipped to a single rounded
      * rectangle so the outer corners are rounded.
      */
     private void paintTrack(final @Nonnull Graphics2D g2, final int trackLeft, final int trackTop, final int trackWidth,
@@ -322,20 +328,23 @@ public class GradientMarkerBar extends JComponent {
         final Shape oldClip = g2.getClip();
         g2.clip(clip);
 
-        final int gradLeft = gradientLeft();
-        final int gradRight = gradientRight();
+        final int trackRight = trackLeft + trackWidth;
+        final int gradLeft = valueToX(gradientStart);
+        final int gradRight = valueToX(gradientEnd);
 
         // Background fill so the track is visible even before/without a gradient.
         g2.setColor(emptyTrackColor());
         g2.fillRect(trackLeft, trackTop, trackWidth, trackHeight);
 
-        if (hasBelowCap()) {
-            g2.setColor(belowCapColor);
+        // Flat fills for the out-of-gradient portions. These have non-zero width only when a marker has stretched the
+        // display range past a gradient bound, so they appear only when there is actually an out-of-range value.
+        if (hasBelowColor() && (gradLeft > trackLeft)) {
+            g2.setColor(belowColor);
             g2.fillRect(trackLeft, trackTop, gradLeft - trackLeft, trackHeight);
         }
-        if (hasAboveCap()) {
-            g2.setColor(aboveCapColor);
-            g2.fillRect(gradRight, trackTop, (trackLeft + trackWidth) - gradRight, trackHeight);
+        if (hasAboveColor() && (gradRight < trackRight)) {
+            g2.setColor(aboveColor);
+            g2.fillRect(gradRight, trackTop, trackRight - gradRight, trackHeight);
         }
 
         paintGradient(g2, gradLeft, trackTop, gradRight - gradLeft, trackHeight);

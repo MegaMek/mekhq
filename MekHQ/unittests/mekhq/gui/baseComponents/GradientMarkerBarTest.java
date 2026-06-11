@@ -46,8 +46,8 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Tests for the value-to-pixel mapping and gradient math of {@link GradientMarkerBar}. Assertions are written to be
- * independent of the active GUI scale factor: they check relationships (monotonicity, symmetry, clamping) rather than
- * absolute pixel positions, since padding and cap widths are scaled by {@code UIUtil.scaleForGUI}.
+ * independent of the active GUI scale factor: they check relationships (monotonicity, symmetry, proportional ordering)
+ * rather than absolute pixel positions, since padding is scaled by {@code UIUtil.scaleForGUI}.
  */
 class GradientMarkerBarTest {
     private static final int WIDTH = 800;
@@ -127,81 +127,92 @@ class GradientMarkerBarTest {
 
     // endregion valueToX - basic behavior
 
-    // region valueToX - overshoot caps
+    // region valueToX - proportional out-of-gradient handling
 
     @Test
-    void belowRangeValuesPinToBelowCapWhenEnabled() {
+    void displayRangeMatchesGradientRangeWithoutMarkers() {
         final GradientMarkerBar bar = sizedBar();
         bar.setGradientRange(0, 10);
-        bar.setOvershootCaps(Color.RED.darker(), Color.GREEN.darker());
-
-        final int gradientLeft = bar.valueToX(0);
-        final int belowOne = bar.valueToX(-1);
-        final int belowFifty = bar.valueToX(-50);
-        // All below-range values pin to the same point, left of the gradient's start.
-        assertEquals(belowOne, belowFifty);
-        assertTrue(belowOne < gradientLeft, "below-cap marker should sit left of the gradient start");
+        assertEquals(0.0, bar.displayMin());
+        assertEquals(10.0, bar.displayMax());
     }
 
     @Test
-    void aboveRangeValuesPinToAboveCapWhenEnabled() {
+    void markerBelowGradientExpandsDisplayMin() {
         final GradientMarkerBar bar = sizedBar();
         bar.setGradientRange(0, 10);
-        bar.setOvershootCaps(Color.RED.darker(), Color.GREEN.darker());
-
-        final int gradientRight = bar.valueToX(10);
-        final int aboveOne = bar.valueToX(11);
-        final int aboveFifty = bar.valueToX(50);
-        // All above-range values pin to the same point, right of the gradient's end.
-        assertEquals(aboveOne, aboveFifty);
-        assertTrue(aboveOne > gradientRight, "above-cap marker should sit right of the gradient end");
+        bar.setMarkers(List.of(new Marker(-4, null, Color.WHITE, MarkerStyle.SOLID, false)));
+        assertEquals(-4.0, bar.displayMin());
+        assertEquals(10.0, bar.displayMax());
     }
 
     @Test
-    void rangeBoundariesStayInsideTheGradientZone() {
+    void markerAboveGradientExpandsDisplayMax() {
         final GradientMarkerBar bar = sizedBar();
         bar.setGradientRange(0, 10);
-        bar.setOvershootCaps(Color.RED.darker(), Color.GREEN.darker());
-
-        // Exactly start / end belong to the gradient zone, not the caps.
-        assertTrue(bar.valueToX(0) > bar.valueToX(-1), "value at range start should be right of the below-cap");
-        assertTrue(bar.valueToX(10) < bar.valueToX(11), "value at range end should be left of the above-cap");
+        bar.setMarkers(List.of(new Marker(18, null, Color.WHITE, MarkerStyle.SOLID, false)));
+        assertEquals(0.0, bar.displayMin());
+        assertEquals(18.0, bar.displayMax());
     }
 
     @Test
-    void belowRangeClampsToGradientStartWhenCapDisabled() {
+    void inRangeMarkersDoNotExpandDisplayRange() {
         final GradientMarkerBar bar = sizedBar();
         bar.setGradientRange(0, 10);
-        // No caps configured.
-
-        assertEquals(bar.valueToX(0), bar.valueToX(-25));
+        bar.setMarkers(List.of(new Marker(3, null, Color.WHITE, MarkerStyle.SOLID, false),
+              new Marker(10, null, Color.WHITE, MarkerStyle.TICK, true)));
+        assertEquals(0.0, bar.displayMin());
+        assertEquals(10.0, bar.displayMax());
     }
 
     @Test
-    void aboveRangeClampsToGradientEndWhenCapDisabled() {
+    void overflowMarkersArePlacedProportionallyNotPinned() {
+        // The whole point of the redesign: a larger overflow sits further right than a smaller one, rather than both
+        // pinning to a fixed-width cap.
+        final GradientMarkerBar smallOverflow = sizedBar();
+        smallOverflow.setGradientRange(0, 10);
+        smallOverflow.setMarkers(List.of(new Marker(12, null, Color.WHITE, MarkerStyle.SOLID, false)));
+
+        final GradientMarkerBar largeOverflow = sizedBar();
+        largeOverflow.setGradientRange(0, 10);
+        largeOverflow.setMarkers(List.of(new Marker(40, null, Color.WHITE, MarkerStyle.SOLID, false)));
+
+        // Within a bar, the gradient end (10) sits left of the overflowing value...
+        assertTrue(smallOverflow.valueToX(10) < smallOverflow.valueToX(12));
+        // ...and the larger the overflow, the more the gradient end is compressed toward the left.
+        assertTrue(largeOverflow.valueToX(10) < smallOverflow.valueToX(10));
+    }
+
+    @Test
+    void valueToXIsProportionalAcrossAnExpandedRange() {
         final GradientMarkerBar bar = sizedBar();
         bar.setGradientRange(0, 10);
-        // No caps configured.
-
-        assertEquals(bar.valueToX(10), bar.valueToX(99));
+        bar.setMarkers(List.of(new Marker(-10, null, Color.WHITE, MarkerStyle.SOLID, false),
+              new Marker(10, null, Color.WHITE, MarkerStyle.TICK, true)));
+        // The display range is now [-10, 10], so zero should land at the center.
+        final int left = bar.valueToX(-10);
+        final int right = bar.valueToX(10);
+        assertEquals((left + right) / 2.0, bar.valueToX(0), 1.0);
     }
 
     @Test
-    void onlyBelowCapShiftsLeftEdgeButNotRightEdge() {
-        final GradientMarkerBar withoutCaps = sizedBar();
-        withoutCaps.setGradientRange(0, 10);
+    void outOfGradientColorsDoNotChangeGeometry() {
+        final GradientMarkerBar withoutColors = sizedBar();
+        withoutColors.setGradientRange(0, 10);
+        withoutColors.setMarkers(List.of(new Marker(-5, null, Color.WHITE, MarkerStyle.SOLID, false)));
 
-        final GradientMarkerBar withBelowCap = sizedBar();
-        withBelowCap.setGradientRange(0, 10);
-        withBelowCap.setOvershootCaps(Color.RED.darker(), null);
+        final GradientMarkerBar withColors = sizedBar();
+        withColors.setGradientRange(0, 10);
+        withColors.setMarkers(List.of(new Marker(-5, null, Color.WHITE, MarkerStyle.SOLID, false)));
+        withColors.setOutOfGradientColors(Color.RED.darker(), Color.GREEN.darker());
 
-        // Enabling only the below-cap reserves space on the left, pushing the gradient start inward...
-        assertTrue(withBelowCap.valueToX(0) > withoutCaps.valueToX(0));
-        // ...while the right edge (no above-cap) is unchanged.
-        assertEquals(withoutCaps.valueToX(10), withBelowCap.valueToX(10));
+        // The flat fills are purely cosmetic; they must not shift where values land.
+        assertEquals(withoutColors.valueToX(0), withColors.valueToX(0));
+        assertEquals(withoutColors.valueToX(10), withColors.valueToX(10));
+        assertEquals(withoutColors.valueToX(-5), withColors.valueToX(-5));
     }
 
-    // endregion valueToX - overshoot caps
+    // endregion valueToX - proportional out-of-gradient handling
 
     // region valueToX - degenerate ranges
 
