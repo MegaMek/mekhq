@@ -86,15 +86,15 @@ public final class LocationDisplay {
      */
     public static String getLocationName(ILocation item, Campaign campaign, LocalDate today) {
         LocationNode node = item.getLocationNode();
-        AbstractLocation loc = node != null ? node.getNearestAbstractLocation() : null;
-        boolean isTraveling = loc instanceof CurrentLocation cl
-                                    && cl.getJumpPath() != null && !cl.getJumpPath().isEmpty();
+        AbstractLocation location = node != null ? node.getNearestAbstractLocation() : null;
+        boolean isTraveling = location instanceof CurrentLocation currentLocation
+                                    && currentLocation.getJumpPath() != null && !currentLocation.getJumpPath().isEmpty();
 
         if (node != null) {
-            ILocation mfp = campaign.getMainForcePersonnel();
+            ILocation mainForcePersonnel = campaign.getMainForcePersonnel();
             LocationNode cursor = node;
             while (cursor != null) {
-                if (cursor.getLocatable() == mfp) {
+                if (cursor.getLocatable() == mainForcePersonnel) {
                     return campaign.getName();
                 }
                 cursor = cursor.getParent();
@@ -117,13 +117,13 @@ public final class LocationDisplay {
         }
 
         if (isTraveling) {
-            CurrentLocation cl = (CurrentLocation) loc;
-            JumpPath path = cl.getJumpPath();
-            PlanetarySystem sys = cl.getCurrentSystem();
+            CurrentLocation currentLocation = (CurrentLocation) location;
+            JumpPath path = currentLocation.getJumpPath();
+            PlanetarySystem system = currentLocation.getCurrentSystem();
 
-            if (path.size() > 1 && cl.isAtJumpPoint()) {
-                double neededHours = sys.getRechargeTime(today, cl.computeIsUseCommandCircuit(campaign));
-                double remainingHours = neededHours - cl.getRechargeTime();
+            if (path.size() > 1 && currentLocation.isAtJumpPoint()) {
+                double neededHours = system.getRechargeTime(today, currentLocation.computeIsUseCommandCircuit(campaign));
+                double remainingHours = neededHours - currentLocation.getRechargeTime();
                 if (remainingHours > 0) {
                     int days = (int) Math.ceil(remainingHours / 24.0);
                     return getFormattedTextAt(RESOURCE_BUNDLE,
@@ -133,12 +133,12 @@ public final class LocationDisplay {
                 return getTextAt(RESOURCE_BUNDLE,
                       "PersonnelTableModelColumn.LOCATION_NAME.inTransit.readyToJump.text");
             } else if (path.size() == 1) {
-                int days = (int) Math.ceil(cl.getTransitTime());
+                int days = (int) Math.ceil(currentLocation.getTransitTime());
                 return getFormattedTextAt(RESOURCE_BUNDLE,
                       "PersonnelTableModelColumn.LOCATION_NAME.inTransit.toPlanet.text",
                       days);
             } else {
-                double daysToJP = sys.getTimeToJumpPoint(1.0) - cl.getTransitTime();
+                double daysToJP = system.getTimeToJumpPoint(1.0) - currentLocation.getTransitTime();
                 int days = (int) Math.ceil(daysToJP);
                 return getFormattedTextAt(RESOURCE_BUNDLE,
                       "PersonnelTableModelColumn.LOCATION_NAME.inTransit.toJumpPoint.text",
@@ -157,13 +157,13 @@ public final class LocationDisplay {
      */
     public static String getLocationSystem(ILocation item, LocalDate today, Campaign campaign) {
         LocationNode node = item.getLocationNode();
-        AbstractLocation loc = node != null ? node.getNearestAbstractLocation() : null;
-        if (loc != null) {
-            PlanetarySystem system = loc.getCurrentSystem();
+        AbstractLocation location = node != null ? node.getNearestAbstractLocation() : null;
+        if (location != null) {
+            PlanetarySystem system = location.getCurrentSystem();
             return system != null ? system.getPrintableName(today) : "-";
         }
-        PlanetarySystem sys = campaign.getCurrentSystem();
-        return sys != null ? sys.getPrintableName(today) : "-";
+        PlanetarySystem system = campaign.getCurrentSystem();
+        return system != null ? system.getPrintableName(today) : "-";
     }
 
     /**
@@ -173,14 +173,14 @@ public final class LocationDisplay {
      */
     public static String getLocationPlanet(ILocation item, LocalDate today, Campaign campaign) {
         LocationNode node = item.getLocationNode();
-        AbstractLocation loc = node != null ? node.getNearestAbstractLocation() : null;
-        if (loc != null) {
-            Planet planet = loc.getPlanet();
+        AbstractLocation location = node != null ? node.getNearestAbstractLocation() : null;
+        if (location != null) {
+            Planet planet = location.getPlanet();
             return planet != null ? planet.getPrintableName(today) : "-";
         }
-        PlanetarySystem sys = campaign.getCurrentSystem();
-        if (sys != null) {
-            Planet planet = sys.getPrimaryPlanet();
+        PlanetarySystem system = campaign.getCurrentSystem();
+        if (system != null) {
+            Planet planet = system.getPrimaryPlanet();
             return planet != null ? planet.getPrintableName(today) : "-";
         }
         return "-";
@@ -194,14 +194,14 @@ public final class LocationDisplay {
      * Returns {@code "-"} when the item is not traveling.</p>
      */
     public static String getDestinationName(ILocation item, Campaign campaign, LocalDate today) {
-        AbstractLocation loc = getNearestAbstractLocation(item);
-        if (loc instanceof CurrentLocation cl) {
-            JumpPath path = cl.getJumpPath();
+        AbstractLocation location = getNearestAbstractLocation(item);
+        if (location instanceof CurrentLocation currentLocation) {
+            JumpPath path = currentLocation.getJumpPath();
             if (path != null && !path.isEmpty()) {
                 PlanetarySystem dest = path.getLastSystem();
-                LocationNode clNode = cl.getLocationNode();
-                if (clNode != null) {
-                    LocationNode parent = clNode.getParent();
+                LocationNode currentLocationNode = currentLocation.getLocationNode();
+                if (currentLocationNode != null) {
+                    LocationNode parent = currentLocationNode.getParent();
                     while (parent != null) {
                         if (parent.getLocatable() instanceof AbstractBase base) {
                             String name = base.getDisplayName();
@@ -237,9 +237,9 @@ public final class LocationDisplay {
      * The printable name of the destination system when in transit, or {@code "-"} otherwise.
      */
     public static String getDestinationSystem(ILocation item, LocalDate today) {
-        AbstractLocation loc = getNearestAbstractLocation(item);
-        if (loc instanceof CurrentLocation cl) {
-            JumpPath path = cl.getJumpPath();
+        AbstractLocation location = getNearestAbstractLocation(item);
+        if (location instanceof CurrentLocation currentLocation) {
+            JumpPath path = currentLocation.getJumpPath();
             if (path != null && !path.isEmpty()) {
                 PlanetarySystem dest = path.getLastSystem();
                 return dest != null ? dest.getPrintableName(today) : "-";
@@ -253,9 +253,9 @@ public final class LocationDisplay {
      * or {@code "-"} otherwise.
      */
     public static String getDestinationPlanet(ILocation item, LocalDate today) {
-        AbstractLocation loc = getNearestAbstractLocation(item);
-        if (loc instanceof CurrentLocation cl) {
-            JumpPath path = cl.getJumpPath();
+        AbstractLocation location = getNearestAbstractLocation(item);
+        if (location instanceof CurrentLocation currentLocation) {
+            JumpPath path = currentLocation.getJumpPath();
             if (path != null && !path.isEmpty()) {
                 PlanetarySystem dest = path.getLastSystem();
                 if (dest != null) {

@@ -79,15 +79,15 @@ public final class LocationUtils {
      * Walks up the {@link LocationNode} tree and returns the nearest {@link AbstractBase} ancestor, or {@code null} if
      * the item belongs to the main force (no base ancestor).
      *
-     * @param loc the location item to inspect
+     * @param location the location item to inspect
      *
      * @return the nearest {@link AbstractBase}, or {@code null} for main force
      */
-    public static @Nullable AbstractBase findEffectiveBase(@Nullable ILocation loc) {
-        if (loc == null) {
+    public static @Nullable AbstractBase findEffectiveBase(@Nullable ILocation location) {
+        if (location == null) {
             return null;
         }
-        LocationNode node = loc.getLocationNode();
+        LocationNode node = location.getLocationNode();
         while (node != null) {
             if (node.getLocatable() instanceof AbstractBase base) {
                 return base;
@@ -106,18 +106,18 @@ public final class LocationUtils {
      * started moving (transit time &gt; 0). An item with an assigned but not-yet-started journey
      * must also be treated as in transit for co-location and assignment purposes.</p>
      *
-     * @param loc the location item to inspect
+     * @param location the location item to inspect
      *
      * @return {@code true} if the item is in transit
      */
-    public static boolean isInTransit(@Nullable ILocation loc) {
-        if (loc == null) {
+    public static boolean isInTransit(@Nullable ILocation location) {
+        if (location == null) {
             return false;
         }
-        LocationNode node = loc.getLocationNode();
+        LocationNode node = location.getLocationNode();
         while (node != null) {
-            if (node.getLocatable() instanceof CurrentLocation cl
-                      && cl.getJumpPath() != null && !cl.getJumpPath().isEmpty()) {
+            if (node.getLocatable() instanceof CurrentLocation currentLocation
+                      && currentLocation.getJumpPath() != null && !currentLocation.getJumpPath().isEmpty()) {
                 return true;
             }
             node = node.getParent();

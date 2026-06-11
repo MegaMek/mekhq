@@ -146,10 +146,10 @@ public class SendToLocationMenu extends JScrollableMenu {
                 contextSystem = campaign.getCurrentSystem();
                 contextPlanet = campaign.getPlanet();
             }
-            BaseSettingsDialog dlg = new BaseSettingsDialog(frame, campaign,
+            BaseSettingsDialog dialog = new BaseSettingsDialog(frame, campaign,
                   contextSystem, contextPlanet);
-            dlg.setVisible(true);
-            dlg.getResult().ifPresent(dispatcher::accept);
+            dialog.setVisible(true);
+            dialog.getResult().ifPresent(dispatcher::accept);
         });
         add(newBase);
     }
@@ -172,13 +172,13 @@ public class SendToLocationMenu extends JScrollableMenu {
                 }
                 pathSoFar.append('/').append(part);
                 String key = pathSoFar.toString();
-                JMenu sub = pathToMenu.get(key);
-                if (sub == null) {
-                    sub = new JMenu(part);
-                    parent.add(sub);
-                    pathToMenu.put(key, sub);
+                JMenu submenu = pathToMenu.get(key);
+                if (submenu == null) {
+                    submenu = new JMenu(part);
+                    parent.add(submenu);
+                    pathToMenu.put(key, submenu);
                 }
-                parent = sub;
+                parent = submenu;
             }
         }
 

@@ -345,9 +345,9 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     protected Warehouse getEffectiveWarehouse() {
         Unit unit = getUnit();
         if (unit != null) {
-            Warehouse w = unit.getWarehouse();
-            if (w != null) {
-                return w;
+            Warehouse warehouse = unit.getWarehouse();
+            if (warehouse != null) {
+                return warehouse;
             }
         }
         return campaign.getWarehouse();

@@ -137,12 +137,12 @@ public class BaseSettingsDialog extends JDialog {
 
         // Cascade: selecting a system repopulates the planet combo
         cboSystem.addActionListener(e -> {
-            Object sel = cboSystem.getSelectedItem();
+            Object selected = cboSystem.getSelectedItem();
             planetBaseModel.removeAllElements();
             planetFilterModel.setFilter(null);
             clearEditorText(cboPlanet);
 
-            if (!(sel instanceof PlanetarySystem system)) {
+            if (!(selected instanceof PlanetarySystem system)) {
                 cboPlanet.setEnabled(false);
                 return;
             }
@@ -164,11 +164,11 @@ public class BaseSettingsDialog extends JDialog {
             if (existingBase.getDisplayType() != null) {
                 txtDisplayType.setText(existingBase.getDisplayType());
             }
-            PlanetarySystem sys = existingBase.getCurrentSystem();
-            if (sys != null) {
-                cboSystem.setSelectedItem(sys);
+            PlanetarySystem system = existingBase.getCurrentSystem();
+            if (system != null) {
+                cboSystem.setSelectedItem(system);
                 if (existingBase.getPlanetId() != null) {
-                    Planet p = sys.getPlanetById(existingBase.getPlanetId());
+                    Planet p = system.getPlanetById(existingBase.getPlanetId());
                     if (p != null) {
                         cboPlanet.setSelectedItem(p);
                     }

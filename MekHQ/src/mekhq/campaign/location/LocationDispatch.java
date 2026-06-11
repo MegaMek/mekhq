@@ -180,13 +180,13 @@ public final class LocationDispatch {
           ILocation destination,
           Campaign campaign,
           String logContext) {
-        CurrentLocation arrivedCL = new CurrentLocation(system, 0.0);
-        if (!arrivedCL.setParent(destination)) {
-            LOGGER.warn("{}: setParent failed for arrivedCL → {}",
+        CurrentLocation arrivedLocation = new CurrentLocation(system, 0.0);
+        if (!arrivedLocation.setParent(destination)) {
+            LOGGER.warn("{}: setParent failed for arrivedLocation → {}",
                   logContext, destination.getClass().getSimpleName());
         }
-        campaign.addLocation(arrivedCL);
-        return arrivedCL;
+        campaign.addLocation(arrivedLocation);
+        return arrivedLocation;
     }
 
     /**
@@ -243,9 +243,9 @@ public final class LocationDispatch {
 
             if (destSystem == null || fromSystem.equals(destSystem)) {
                 if (destination instanceof AbstractBase) {
-                    PlanetarySystem sys = destSystem != null ? destSystem : fromSystem;
-                    CurrentLocation arrivedCL = buildArrivedNode(sys, destination, campaign, "dispatchToLocation");
-                    group.forEach(p -> p.setParent(arrivedCL));
+                    PlanetarySystem system = destSystem != null ? destSystem : fromSystem;
+                    CurrentLocation arrivedLocation = buildArrivedNode(system, destination, campaign, "dispatchToLocation");
+                    group.forEach(p -> p.setParent(arrivedLocation));
                 } else {
                     group.forEach(p -> p.setParent(destination));
                 }
@@ -256,8 +256,8 @@ public final class LocationDispatch {
                   fromSystem, destSystem, destination, campaign, "dispatchToLocation");
             if (maybeTravelLoc.isEmpty()) {
                 if (destination instanceof AbstractBase) {
-                    CurrentLocation arrivedCL = buildArrivedNode(destSystem, destination, campaign, "dispatchToLocation");
-                    group.forEach(p -> p.setParent(arrivedCL));
+                    CurrentLocation arrivedLocation = buildArrivedNode(destSystem, destination, campaign, "dispatchToLocation");
+                    group.forEach(p -> p.setParent(arrivedLocation));
                 } else {
                     group.forEach(p -> p.setParent(destination));
                 }
@@ -310,9 +310,9 @@ public final class LocationDispatch {
 
             if (destSystem == null || fromSystem.equals(destSystem)) {
                 if (destination instanceof AbstractBase) {
-                    PlanetarySystem sys = destSystem != null ? destSystem : fromSystem;
-                    CurrentLocation arrivedCL = buildArrivedNode(sys, destination, campaign, "dispatchUnitsToLocation");
-                    group.forEach(u -> LocationNode.LocationManager.setLocation(u, arrivedCL));
+                    PlanetarySystem system = destSystem != null ? destSystem : fromSystem;
+                    CurrentLocation arrivedLocation = buildArrivedNode(system, destination, campaign, "dispatchUnitsToLocation");
+                    group.forEach(u -> LocationNode.LocationManager.setLocation(u, arrivedLocation));
                 } else {
                     group.forEach(u -> LocationNode.LocationManager.setLocation(u, arrivalHangar));
                 }
@@ -323,8 +323,8 @@ public final class LocationDispatch {
                   fromSystem, destSystem, destination, campaign, "dispatchUnitsToLocation");
             if (maybeTravelLoc.isEmpty()) {
                 if (destination instanceof AbstractBase) {
-                    CurrentLocation arrivedCL = buildArrivedNode(destSystem, destination, campaign, "dispatchUnitsToLocation");
-                    group.forEach(u -> LocationNode.LocationManager.setLocation(u, arrivedCL));
+                    CurrentLocation arrivedLocation = buildArrivedNode(destSystem, destination, campaign, "dispatchUnitsToLocation");
+                    group.forEach(u -> LocationNode.LocationManager.setLocation(u, arrivedLocation));
                 } else {
                     group.forEach(u -> LocationNode.LocationManager.setLocation(u, arrivalHangar));
                 }
@@ -376,9 +376,9 @@ public final class LocationDispatch {
 
             if (destSystem == null || fromSystem.equals(destSystem)) {
                 if (destination instanceof AbstractBase) {
-                    PlanetarySystem sys = destSystem != null ? destSystem : fromSystem;
-                    CurrentLocation arrivedCL = buildArrivedNode(sys, destination, campaign, "dispatchPartsToLocation");
-                    group.forEach(p -> LocationNode.LocationManager.setLocation(p, arrivedCL));
+                    PlanetarySystem system = destSystem != null ? destSystem : fromSystem;
+                    CurrentLocation arrivedLocation = buildArrivedNode(system, destination, campaign, "dispatchPartsToLocation");
+                    group.forEach(p -> LocationNode.LocationManager.setLocation(p, arrivedLocation));
                 } else {
                     group.forEach(p -> LocationNode.LocationManager.setLocation(p, arrivalWarehouse));
                 }
@@ -389,8 +389,8 @@ public final class LocationDispatch {
                   fromSystem, destSystem, destination, campaign, "dispatchPartsToLocation");
             if (maybeTravelLoc.isEmpty()) {
                 if (destination instanceof AbstractBase) {
-                    CurrentLocation arrivedCL = buildArrivedNode(destSystem, destination, campaign, "dispatchPartsToLocation");
-                    group.forEach(p -> LocationNode.LocationManager.setLocation(p, arrivedCL));
+                    CurrentLocation arrivedLocation = buildArrivedNode(destSystem, destination, campaign, "dispatchPartsToLocation");
+                    group.forEach(p -> LocationNode.LocationManager.setLocation(p, arrivedLocation));
                 } else {
                     group.forEach(p -> LocationNode.LocationManager.setLocation(p, arrivalWarehouse));
                 }

@@ -326,7 +326,6 @@ public class CurrentLocation extends AbstractLocation {
                 performAutomatedActivation(campaign);
             }
 
-            // TODO: Remove?
             if (campaignOptions.isUseRandomDiseases() && campaignOptions.isUseAlternativeAdvancedMedical()) {
                 checkForDiseaseOrBioweaponOutbreaks(campaign, today);
             }
