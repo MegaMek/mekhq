@@ -34,7 +34,7 @@
 package mekhq.campaign.parts;
 
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
-import static mekhq.utilities.MHQInternationalization.getText;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
@@ -525,7 +525,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
         } else {
             toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
                   MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
-                  getText("Part.damaged.beyond.repair")));
+                  getTextAt(RESOURCE_BUNDLE, "Part.damaged.beyond.repair")));
         }
         toReturn.append("</html>");
         return toReturn.toString();
