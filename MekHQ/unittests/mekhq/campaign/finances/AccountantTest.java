@@ -54,7 +54,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
@@ -71,17 +70,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 public class AccountantTest {
-
-    /** Creates {@code count} distinct {@link Person} objects, each configured by {@code configure}. */
-    private static List<Person> createPersons(int count, Campaign campaign, Consumer<Person> configure) {
-        List<Person> result = new ArrayList<>(count);
-        for (int i = 0; i < count; i++) {
-            Person p = new Person(campaign);
-            configure.accept(p);
-            result.add(p);
-        }
-        return result;
-    }
 
     @Test
     void testGetMonthlyFoodAndHousingExpenses_WhenFoodAndHousingDisabled() {
@@ -144,10 +132,12 @@ public class AccountantTest {
         CurrentLocation location = new CurrentLocation();
         when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
-        when(mockCampaign.getFaction()).thenReturn(new Faction());
+        Faction faction = new Faction();
+        when(mockCampaign.getFaction()).thenReturn(faction);
 
-        List<Person> prisoners = createPersons(3, mockCampaign,
-              p -> p.setPrisonerStatus(mockCampaign, PRISONER, false));
+        Person prisoner = new Person(mockCampaign);
+        prisoner.setPrisonerStatus(mockCampaign, PRISONER, false);
+        List<Person> prisoners = List.of(prisoner, prisoner, prisoner);
         when(mockCampaign.getAllPersonnel()).thenReturn(prisoners);
 
         // Act
@@ -175,10 +165,12 @@ public class AccountantTest {
         CurrentLocation location = new CurrentLocation();
         when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
-        when(mockCampaign.getFaction()).thenReturn(new Faction());
+        Faction faction = new Faction();
+        when(mockCampaign.getFaction()).thenReturn(faction);
 
-        List<Person> prisoners = createPersons(3, mockCampaign,
-              p -> p.setPrisonerStatus(mockCampaign, PRISONER, false));
+        Person prisoner = new Person(mockCampaign);
+        prisoner.setPrisonerStatus(mockCampaign, PRISONER, false);
+        List<Person> prisoners = List.of(prisoner, prisoner, prisoner);
         when(mockCampaign.getAllPersonnel()).thenReturn(prisoners);
 
         // Act
@@ -205,10 +197,12 @@ public class AccountantTest {
         CurrentLocation location = new CurrentLocation();
         when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
-        when(mockCampaign.getFaction()).thenReturn(new Faction());
+        Faction faction = new Faction();
+        when(mockCampaign.getFaction()).thenReturn(faction);
 
-        List<Person> prisoners = createPersons(3, mockCampaign,
-              p -> p.setPrisonerStatus(mockCampaign, PRISONER, false));
+        Person prisoner = new Person(mockCampaign);
+        prisoner.setPrisonerStatus(mockCampaign, PRISONER, false);
+        List<Person> prisoners = List.of(prisoner, prisoner, prisoner);
         when(mockCampaign.getAllPersonnel()).thenReturn(prisoners);
 
         // Act
@@ -235,10 +229,12 @@ public class AccountantTest {
         CurrentLocation location = new CurrentLocation();
         when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
-        when(mockCampaign.getFaction()).thenReturn(new Faction());
+        Faction faction = new Faction();
+        when(mockCampaign.getFaction()).thenReturn(faction);
 
-        List<Person> dependents = createPersons(3, mockCampaign,
-              p -> p.setPrimaryRole(mockCampaign, DEPENDENT));
+        Person dependent = new Person(mockCampaign);
+        dependent.setPrimaryRole(mockCampaign, DEPENDENT);
+        List<Person> dependents = List.of(dependent, dependent, dependent);
         when(mockCampaign.getAllPersonnel()).thenReturn(dependents);
 
         // Act
@@ -266,10 +262,12 @@ public class AccountantTest {
         CurrentLocation location = new CurrentLocation();
         when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
-        when(mockCampaign.getFaction()).thenReturn(new Faction());
+        Faction faction = new Faction();
+        when(mockCampaign.getFaction()).thenReturn(faction);
 
-        List<Person> dependents = createPersons(3, mockCampaign,
-              p -> p.setPrimaryRole(mockCampaign, DEPENDENT));
+        Person dependent = new Person(mockCampaign);
+        dependent.setPrimaryRole(mockCampaign, DEPENDENT);
+        List<Person> dependents = List.of(dependent, dependent, dependent);
         when(mockCampaign.getAllPersonnel()).thenReturn(dependents);
 
         // Act
@@ -296,10 +294,12 @@ public class AccountantTest {
         CurrentLocation location = new CurrentLocation();
         when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
-        when(mockCampaign.getFaction()).thenReturn(new Faction());
+        Faction faction = new Faction();
+        when(mockCampaign.getFaction()).thenReturn(faction);
 
-        List<Person> dependents = createPersons(3, mockCampaign,
-              p -> p.setPrimaryRole(mockCampaign, DEPENDENT));
+        Person dependent = new Person(mockCampaign);
+        dependent.setPrimaryRole(mockCampaign, DEPENDENT);
+        List<Person> dependents = List.of(dependent, dependent, dependent);
         when(mockCampaign.getAllPersonnel()).thenReturn(dependents);
 
         // Act
@@ -326,12 +326,13 @@ public class AccountantTest {
         CurrentLocation location = new CurrentLocation();
         when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
-        when(mockCampaign.getFaction()).thenReturn(new Faction());
+        Faction faction = new Faction();
+        when(mockCampaign.getFaction()).thenReturn(faction);
 
-        List<Person> enlistedPersonnel = createPersons(3, mockCampaign, p -> {
-            p.setPrimaryRole(mockCampaign, MEKWARRIOR);
-            p.setRank(RWO_MIN - 1);
-        });
+        Person enlisted = new Person(mockCampaign);
+        enlisted.setPrimaryRole(mockCampaign, MEKWARRIOR);
+        enlisted.setRank(RWO_MIN - 1);
+        List<Person> enlistedPersonnel = List.of(enlisted, enlisted, enlisted);
         when(mockCampaign.getAllPersonnel()).thenReturn(enlistedPersonnel);
 
         // Act
@@ -359,12 +360,13 @@ public class AccountantTest {
         CurrentLocation location = new CurrentLocation();
         when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
-        when(mockCampaign.getFaction()).thenReturn(new Faction());
+        Faction faction = new Faction();
+        when(mockCampaign.getFaction()).thenReturn(faction);
 
-        List<Person> enlistedPersonnel = createPersons(3, mockCampaign, p -> {
-            p.setPrimaryRole(mockCampaign, MEKWARRIOR);
-            p.setRank(RWO_MIN - 1);
-        });
+        Person enlisted = new Person(mockCampaign);
+        enlisted.setPrimaryRole(mockCampaign, MEKWARRIOR);
+        enlisted.setRank(RWO_MIN - 1);
+        List<Person> enlistedPersonnel = List.of(enlisted, enlisted, enlisted);
         when(mockCampaign.getAllPersonnel()).thenReturn(enlistedPersonnel);
 
         // Act
@@ -391,12 +393,13 @@ public class AccountantTest {
         CurrentLocation location = new CurrentLocation();
         when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
-        when(mockCampaign.getFaction()).thenReturn(new Faction());
+        Faction faction = new Faction();
+        when(mockCampaign.getFaction()).thenReturn(faction);
 
-        List<Person> enlistedPersonnel = createPersons(3, mockCampaign, p -> {
-            p.setPrimaryRole(mockCampaign, MEKWARRIOR);
-            p.setRank(RWO_MIN - 1);
-        });
+        Person enlisted = new Person(mockCampaign);
+        enlisted.setPrimaryRole(mockCampaign, MEKWARRIOR);
+        enlisted.setRank(RWO_MIN - 1);
+        List<Person> enlistedPersonnel = List.of(enlisted, enlisted, enlisted);
         when(mockCampaign.getAllPersonnel()).thenReturn(enlistedPersonnel);
 
         // Act
@@ -423,12 +426,13 @@ public class AccountantTest {
         CurrentLocation location = new CurrentLocation();
         when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
-        when(mockCampaign.getFaction()).thenReturn(new Faction());
+        Faction faction = new Faction();
+        when(mockCampaign.getFaction()).thenReturn(faction);
 
-        List<Person> officerPersonnel = createPersons(3, mockCampaign, p -> {
-            p.setPrimaryRole(mockCampaign, MEKWARRIOR);
-            p.setRank(RWO_MIN + 1);
-        });
+        Person officer = new Person(mockCampaign);
+        officer.setPrimaryRole(mockCampaign, MEKWARRIOR);
+        officer.setRank(RWO_MIN + 1);
+        List<Person> officerPersonnel = List.of(officer, officer, officer);
         when(mockCampaign.getAllPersonnel()).thenReturn(officerPersonnel);
 
         // Act
@@ -456,12 +460,13 @@ public class AccountantTest {
         CurrentLocation location = new CurrentLocation();
         when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
-        when(mockCampaign.getFaction()).thenReturn(new Faction());
+        Faction faction = new Faction();
+        when(mockCampaign.getFaction()).thenReturn(faction);
 
-        List<Person> officerPersonnel = createPersons(3, mockCampaign, p -> {
-            p.setPrimaryRole(mockCampaign, MEKWARRIOR);
-            p.setRank(RWO_MIN + 1);
-        });
+        Person officer = new Person(mockCampaign);
+        officer.setPrimaryRole(mockCampaign, MEKWARRIOR);
+        officer.setRank(RWO_MIN + 1);
+        List<Person> officerPersonnel = List.of(officer, officer, officer);
         when(mockCampaign.getAllPersonnel()).thenReturn(officerPersonnel);
 
         // Act
@@ -488,12 +493,13 @@ public class AccountantTest {
         CurrentLocation location = new CurrentLocation();
         when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
-        when(mockCampaign.getFaction()).thenReturn(new Faction());
+        Faction faction = new Faction();
+        when(mockCampaign.getFaction()).thenReturn(faction);
 
-        List<Person> officerPersonnel = createPersons(3, mockCampaign, p -> {
-            p.setPrimaryRole(mockCampaign, MEKWARRIOR);
-            p.setRank(RWO_MIN + 1);
-        });
+        Person officer = new Person(mockCampaign);
+        officer.setPrimaryRole(mockCampaign, MEKWARRIOR);
+        officer.setRank(RWO_MIN + 1);
+        List<Person> officerPersonnel = List.of(officer, officer, officer);
         when(mockCampaign.getAllPersonnel()).thenReturn(officerPersonnel);
 
         // Act
@@ -520,20 +526,26 @@ public class AccountantTest {
         CurrentLocation location = new CurrentLocation();
         when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
-        when(mockCampaign.getFaction()).thenReturn(new Faction());
+        Faction faction = new Faction();
+        when(mockCampaign.getFaction()).thenReturn(faction);
 
-        List<Person> prisoners = createPersons(3, mockCampaign,
-              p -> p.setPrisonerStatus(mockCampaign, PRISONER, false));
-        List<Person> dependents = createPersons(3, mockCampaign,
-              p -> p.setPrimaryRole(mockCampaign, DEPENDENT));
-        List<Person> enlistedPersonnel = createPersons(3, mockCampaign, p -> {
-            p.setPrimaryRole(mockCampaign, MEKWARRIOR);
-            p.setRank(RWO_MIN - 1);
-        });
-        List<Person> officerPersonnel = createPersons(3, mockCampaign, p -> {
-            p.setPrimaryRole(mockCampaign, MEKWARRIOR);
-            p.setRank(RWO_MIN + 1);
-        });
+        Person prisoner = new Person(mockCampaign);
+        prisoner.setPrisonerStatus(mockCampaign, PRISONER, false);
+        List<Person> prisoners = List.of(prisoner, prisoner, prisoner);
+
+        Person dependent = new Person(mockCampaign);
+        dependent.setPrimaryRole(mockCampaign, DEPENDENT);
+        List<Person> dependents = List.of(dependent, dependent, dependent);
+
+        Person enlisted = new Person(mockCampaign);
+        enlisted.setPrimaryRole(mockCampaign, MEKWARRIOR);
+        enlisted.setRank(RWO_MIN - 1);
+        List<Person> enlistedPersonnel = List.of(enlisted, enlisted, enlisted);
+
+        Person officer = new Person(mockCampaign);
+        officer.setPrimaryRole(mockCampaign, MEKWARRIOR);
+        officer.setRank(RWO_MIN + 1);
+        List<Person> officerPersonnel = List.of(officer, officer, officer);
 
         List<Person> allPersonnel = new ArrayList<>();
         allPersonnel.addAll(prisoners);
@@ -573,20 +585,26 @@ public class AccountantTest {
         CurrentLocation location = new CurrentLocation();
         when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
-        when(mockCampaign.getFaction()).thenReturn(new Faction());
+        Faction faction = new Faction();
+        when(mockCampaign.getFaction()).thenReturn(faction);
 
-        List<Person> prisoners = createPersons(3, mockCampaign,
-              p -> p.setPrisonerStatus(mockCampaign, PRISONER, false));
-        List<Person> dependents = createPersons(3, mockCampaign,
-              p -> p.setPrimaryRole(mockCampaign, DEPENDENT));
-        List<Person> enlistedPersonnel = createPersons(3, mockCampaign, p -> {
-            p.setPrimaryRole(mockCampaign, MEKWARRIOR);
-            p.setRank(RWO_MIN - 1);
-        });
-        List<Person> officerPersonnel = createPersons(3, mockCampaign, p -> {
-            p.setPrimaryRole(mockCampaign, MEKWARRIOR);
-            p.setRank(RWO_MIN + 1);
-        });
+        Person prisoner = new Person(mockCampaign);
+        prisoner.setPrisonerStatus(mockCampaign, PRISONER, false);
+        List<Person> prisoners = List.of(prisoner, prisoner, prisoner);
+
+        Person dependent = new Person(mockCampaign);
+        dependent.setPrimaryRole(mockCampaign, DEPENDENT);
+        List<Person> dependents = List.of(dependent, dependent, dependent);
+
+        Person enlisted = new Person(mockCampaign);
+        enlisted.setPrimaryRole(mockCampaign, MEKWARRIOR);
+        enlisted.setRank(RWO_MIN - 1);
+        List<Person> enlistedPersonnel = List.of(enlisted, enlisted, enlisted);
+
+        Person officer = new Person(mockCampaign);
+        officer.setPrimaryRole(mockCampaign, MEKWARRIOR);
+        officer.setRank(RWO_MIN + 1);
+        List<Person> officerPersonnel = List.of(officer, officer, officer);
 
         List<Person> allPersonnel = new ArrayList<>();
         allPersonnel.addAll(prisoners);
@@ -622,20 +640,26 @@ public class AccountantTest {
         CurrentLocation location = new CurrentLocation();
         when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
-        when(mockCampaign.getFaction()).thenReturn(new Faction());
+        Faction faction = new Faction();
+        when(mockCampaign.getFaction()).thenReturn(faction);
 
-        List<Person> prisoners = createPersons(3, mockCampaign,
-              p -> p.setPrisonerStatus(mockCampaign, PRISONER, false));
-        List<Person> dependents = createPersons(3, mockCampaign,
-              p -> p.setPrimaryRole(mockCampaign, DEPENDENT));
-        List<Person> enlistedPersonnel = createPersons(3, mockCampaign, p -> {
-            p.setPrimaryRole(mockCampaign, MEKWARRIOR);
-            p.setRank(RWO_MIN - 1);
-        });
-        List<Person> officerPersonnel = createPersons(3, mockCampaign, p -> {
-            p.setPrimaryRole(mockCampaign, MEKWARRIOR);
-            p.setRank(RWO_MIN + 1);
-        });
+        Person prisoner = new Person(mockCampaign);
+        prisoner.setPrisonerStatus(mockCampaign, PRISONER, false);
+        List<Person> prisoners = List.of(prisoner, prisoner, prisoner);
+
+        Person dependent = new Person(mockCampaign);
+        dependent.setPrimaryRole(mockCampaign, DEPENDENT);
+        List<Person> dependents = List.of(dependent, dependent, dependent);
+
+        Person enlisted = new Person(mockCampaign);
+        enlisted.setPrimaryRole(mockCampaign, MEKWARRIOR);
+        enlisted.setRank(RWO_MIN - 1);
+        List<Person> enlistedPersonnel = List.of(enlisted, enlisted, enlisted);
+
+        Person officer = new Person(mockCampaign);
+        officer.setPrimaryRole(mockCampaign, MEKWARRIOR);
+        officer.setRank(RWO_MIN + 1);
+        List<Person> officerPersonnel = List.of(officer, officer, officer);
 
         List<Person> allPersonnel = new ArrayList<>();
         allPersonnel.addAll(prisoners);
@@ -672,20 +696,26 @@ public class AccountantTest {
         location.setTransitTime(1);
         when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
-        when(mockCampaign.getFaction()).thenReturn(new Faction());
+        Faction faction = new Faction();
+        when(mockCampaign.getFaction()).thenReturn(faction);
 
-        List<Person> prisoners = createPersons(3, mockCampaign,
-              p -> p.setPrisonerStatus(mockCampaign, PRISONER, false));
-        List<Person> dependents = createPersons(3, mockCampaign,
-              p -> p.setPrimaryRole(mockCampaign, DEPENDENT));
-        List<Person> enlistedPersonnel = createPersons(3, mockCampaign, p -> {
-            p.setPrimaryRole(mockCampaign, MEKWARRIOR);
-            p.setRank(RWO_MIN - 1);
-        });
-        List<Person> officerPersonnel = createPersons(3, mockCampaign, p -> {
-            p.setPrimaryRole(mockCampaign, MEKWARRIOR);
-            p.setRank(RWO_MIN + 1);
-        });
+        Person prisoner = new Person(mockCampaign);
+        prisoner.setPrisonerStatus(mockCampaign, PRISONER, false);
+        List<Person> prisoners = List.of(prisoner, prisoner, prisoner);
+
+        Person dependent = new Person(mockCampaign);
+        dependent.setPrimaryRole(mockCampaign, DEPENDENT);
+        List<Person> dependents = List.of(dependent, dependent, dependent);
+
+        Person enlisted = new Person(mockCampaign);
+        enlisted.setPrimaryRole(mockCampaign, MEKWARRIOR);
+        enlisted.setRank(RWO_MIN - 1);
+        List<Person> enlistedPersonnel = List.of(enlisted, enlisted, enlisted);
+
+        Person officer = new Person(mockCampaign);
+        officer.setPrimaryRole(mockCampaign, MEKWARRIOR);
+        officer.setRank(RWO_MIN + 1);
+        List<Person> officerPersonnel = List.of(officer, officer, officer);
 
         List<Person> allPersonnel = new ArrayList<>();
         allPersonnel.addAll(prisoners);
@@ -723,20 +753,26 @@ public class AccountantTest {
         CurrentLocation location = new CurrentLocation();
         when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
-        when(mockCampaign.getFaction()).thenReturn(new Faction());
+        Faction faction = new Faction();
+        when(mockCampaign.getFaction()).thenReturn(faction);
 
-        List<Person> prisoners = createPersons(3, mockCampaign,
-              p -> p.setPrisonerStatus(mockCampaign, PRISONER, false));
-        List<Person> dependents = createPersons(3, mockCampaign,
-              p -> p.setPrimaryRole(mockCampaign, DEPENDENT));
-        List<Person> enlistedPersonnel = createPersons(3, mockCampaign, p -> {
-            p.setPrimaryRole(mockCampaign, MEKWARRIOR);
-            p.setRank(RWO_MIN - 1);
-        });
-        List<Person> officerPersonnel = createPersons(3, mockCampaign, p -> {
-            p.setPrimaryRole(mockCampaign, MEKWARRIOR);
-            p.setRank(RWO_MIN + 1);
-        });
+        Person prisoner = new Person(mockCampaign);
+        prisoner.setPrisonerStatus(mockCampaign, PRISONER, false);
+        List<Person> prisoners = List.of(prisoner, prisoner, prisoner);
+
+        Person dependent = new Person(mockCampaign);
+        dependent.setPrimaryRole(mockCampaign, DEPENDENT);
+        List<Person> dependents = List.of(dependent, dependent, dependent);
+
+        Person enlisted = new Person(mockCampaign);
+        enlisted.setPrimaryRole(mockCampaign, MEKWARRIOR);
+        enlisted.setRank(RWO_MIN - 1);
+        List<Person> enlistedPersonnel = List.of(enlisted, enlisted, enlisted);
+
+        Person officer = new Person(mockCampaign);
+        officer.setPrimaryRole(mockCampaign, MEKWARRIOR);
+        officer.setRank(RWO_MIN + 1);
+        List<Person> officerPersonnel = List.of(officer, officer, officer);
 
         Unit warShip = new Unit();
         Entity mockEntity = mock(Entity.class);
@@ -744,12 +780,11 @@ public class AccountantTest {
         when(mockEntity.isDropShip()).thenReturn(false);
         warShip.setEntity(mockEntity);
 
-        Unit finalWarShip = warShip;
-        List<Person> warShipPersonnel = createPersons(3, mockCampaign, p -> {
-            p.setPrimaryRole(mockCampaign, VESSEL_GUNNER);
-            p.setRank(RWO_MIN - 1);
-            p.setUnit(finalWarShip);
-        });
+        Person warShipCrew = new Person(mockCampaign);
+        warShipCrew.setPrimaryRole(mockCampaign, VESSEL_GUNNER);
+        warShipCrew.setRank(RWO_MIN - 1);
+        warShipCrew.setUnit(warShip);
+        List<Person> warShipPersonnel = List.of(warShipCrew, warShipCrew, warShipCrew);
 
         List<Person> allPersonnel = new ArrayList<>();
         allPersonnel.addAll(prisoners);
