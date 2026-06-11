@@ -43,6 +43,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.StringJoiner;
 import java.util.UUID;
 
@@ -402,6 +403,11 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
     public Warehouse getWarehouse() {
         IPlace place = getPlace();
         return place != null ? place.getWarehouse() : campaign.getWarehouse();
+    }
+
+    @Override
+    public Set<Part> fetchPartsAtLocation() {
+        return Set.of(this);
     }
 
     public PartInventory getPartInventory(Part forPart) {

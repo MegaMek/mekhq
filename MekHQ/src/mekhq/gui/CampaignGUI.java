@@ -43,6 +43,7 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedOutputStream;
@@ -1444,7 +1445,10 @@ public class CampaignGUI extends JPanel {
      */
     public void refreshActiveLocation() {
         LocationFilterItem previous = getActiveLocation();
-        choiceActiveLocation.removeActionListener(choiceActiveLocation.getActionListeners()[0]);
+        ActionListener[] listeners = choiceActiveLocation.getActionListeners();
+        if (listeners.length > 0) {
+            choiceActiveLocation.removeActionListener(listeners[0]);
+        }
         choiceActiveLocation.setModel(buildActiveLocationModel());
 
         // Restore previous selection by sentinel identity or base UUID

@@ -304,7 +304,8 @@ public final class LocationDispatch {
 
             // Move data structure immediately so hangar filters stay correct.
             for (Unit unit : group) {
-                campaign.getHangar().removeUnit(unit.getId());
+                Hangar sourceHangar = unit.getHangar();
+                (sourceHangar != null ? sourceHangar : campaign.getHangar()).removeUnit(unit.getId());
                 arrivalHangar.addUnit(unit);
             }
 
@@ -370,7 +371,8 @@ public final class LocationDispatch {
 
             // Move data structure immediately so warehouse filters stay correct.
             for (Part part : group) {
-                campaign.getWarehouse().removePart(part);
+                Warehouse sourceWarehouse = part.getWarehouse();
+                (sourceWarehouse != null ? sourceWarehouse : campaign.getWarehouse()).removePart(part);
                 arrivalWarehouse.addPart(part);
             }
 

@@ -37,7 +37,6 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import javax.swing.JFrame;
@@ -127,10 +126,7 @@ public class SendToLocationMenu extends JScrollableMenu {
             if (sharedCurrent == base
                   || sharedCurrent == base.getBasePersonnel()
                   || sharedCurrent == base.getBaseWarehouse()
-                  || sharedCurrent == base.getBaseHangar()
-                  || Objects.equals(sharedCurrent, base.getBasePersonnel())
-                  || Objects.equals(sharedCurrent, base.getBaseWarehouse())
-                  || Objects.equals(sharedCurrent, base.getBaseHangar())) {
+                  || sharedCurrent == base.getBaseHangar()) {
                 continue;
             }
             addBaseItem(this, base, dispatcher, pathToMenu);
