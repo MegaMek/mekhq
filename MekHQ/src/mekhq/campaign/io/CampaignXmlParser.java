@@ -468,6 +468,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         // Process parts...
         // Note: Units must have their Entities set prior to reaching this point!
         postProcessParts(campaign, version);
+        rehomeBaseHangarUnitParts(campaign);
 
         LOGGER.info("[Campaign Load] Parts processed in {}ms", System.currentTimeMillis() - timestamp);
         timestamp = System.currentTimeMillis();
@@ -533,28 +534,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         // These units are NOT in campaign.getHangar(), so the loop above skips them.
         // They need setCampaign() and fixReferences() just like main-force units.
         for (PlayerBase base : campaign.getPlayerBases()) {
-            base.getBaseHangar().forEachUnit(unit -> {
-                unit.setCampaign(campaign);
-                unit.fixReferences(campaign);
-
-                if (unit.getRefit() != null) {
-                    unit.getRefit().fixReferences(campaign);
-                    unit.getRefit().reCalc();
-                    if (!unit.getRefit().isCustomJob() && !unit.getRefit().kitFound()) {
-                        campaign.getShoppingList().addShoppingItemWithoutChecking(unit.getRefit());
-                    }
-                }
-
-                if ((unit.getFormationId() > 0) && (campaign.getFormation(unit.getFormationId()) == null)) {
-                    unit.setFormationId(FORMATION_NONE);
-                }
-
-                final EquipmentUnscrambler unscrambler = EquipmentUnscrambler.create(unit);
-                final EquipmentUnscramblerResult result = unscrambler.unscramble();
-                if (!result.succeeded()) {
-                    LOGGER.warn(result.getMessage());
-                }
-            });
+            base.getBaseHangar().forEachUnit(unit -> initializeBaseUnit(unit, campaign));
         }
 
         LOGGER.info("[Campaign Load] Base hangar references fixed in {}ms", System.currentTimeMillis() - timestamp);
@@ -665,6 +645,18 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
         for (Unit unit : removeUnits) {
             campaign.removeUnit(unit.getId());
+        }
+
+        for (PlayerBase base : campaign.getPlayerBases()) {
+            base.getBaseHangar().forEachUnit(unit -> {
+                unit.initializeParts(false);
+                unit.runDiagnostic(false);
+
+                List<String> reports = unit.checkForOverCrewing();
+                for (String report : reports) {
+                    campaign.addReport(GENERAL, report);
+                }
+            });
         }
 
         LOGGER.info("[Campaign Load] Units initialized in {}ms", System.currentTimeMillis() - timestamp);
@@ -1470,10 +1462,33 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         }
     }
 
+    private static void initializeBaseUnit(Unit unit, Campaign campaign) {
+        unit.setCampaign(campaign);
+        unit.fixReferences(campaign);
+
+        if (unit.getRefit() != null) {
+            unit.getRefit().fixReferences(campaign);
+            unit.getRefit().reCalc();
+            if (!unit.getRefit().isCustomJob() && !unit.getRefit().kitFound()) {
+                campaign.getShoppingList().addShoppingItemWithoutChecking(unit.getRefit());
+            }
+        }
+
+        if ((unit.getFormationId() > 0) && (campaign.getFormation(unit.getFormationId()) == null)) {
+            unit.setFormationId(FORMATION_NONE);
+        }
+
+        final EquipmentUnscrambler unscrambler = EquipmentUnscrambler.create(unit);
+        final EquipmentUnscramblerResult result = unscrambler.unscramble();
+        if (!result.succeeded()) {
+            LOGGER.warn(result.getMessage());
+        }
+    }
+
     private static void processPlayerBaseNodes(Campaign campaign, Node wn, Version version) {
-        NodeList nl = wn.getChildNodes();
-        for (int x = 0; x < nl.getLength(); x++) {
-            Node wn2 = nl.item(x);
+        NodeList nodeList = wn.getChildNodes();
+        for (int x = 0; x < nodeList.getLength(); x++) {
+            Node wn2 = nodeList.item(x);
             if (wn2.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }
@@ -1487,10 +1502,10 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                             person.setParent(base.getBasePersonnel());
                         }
                     }
-                    for (mekhq.campaign.parts.Part part : base.drainPendingBaseWarehouseParts()) {
+                    for (Part part : base.drainPendingBaseWarehouseParts()) {
                         LocationNode.LocationManager.setLocation(part, base.getBaseWarehouse());
                     }
-                    for (mekhq.campaign.unit.Unit unit : base.drainPendingBaseHangarUnits()) {
+                    for (Unit unit : base.drainPendingBaseHangarUnits()) {
                         LocationNode.LocationManager.setLocation(unit, base.getBaseHangar());
                     }
                 }
@@ -1691,9 +1706,9 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
      * Reconnects persons, units, and parts to their travel {@link CurrentLocation} nodes after a
      * save/load.
      *
-     * <p>During save, each {@link CurrentLocation} writes the UUIDs/IDs of its direct children
+     * <p>During save, each {@link CurrentLocation} writes the IDs of its direct children
      * ({@link Person}, {@link Unit}, {@link Part}). On load those parent links are lost because
-     * the {@link mekhq.campaign.location.LocationNode} tree is not serialized directly. This pass
+     * the {@link LocationNode} tree is not serialized directly. This pass
      * restores them by looking each item up in the campaign's data structures and re-parenting it
      * under the correct travel node.</p>
      *
@@ -1792,7 +1807,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
     }
 
     /** Searches campaign hangar then all base hangars for a unit by UUID. */
-    private static Unit findUnitAnywhere(Campaign campaign, UUID unitId) {
+    private static @Nullable Unit findUnitAnywhere(Campaign campaign, UUID unitId) {
         Unit unit = campaign.getHangar().getUnit(unitId);
         if (unit != null) {
             return unit;
@@ -1807,7 +1822,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
     }
 
     /** Searches campaign warehouse then all base warehouses for a part by ID. */
-    private static Part findPartAnywhere(Campaign campaign, int partId) {
+    private static @Nullable Part findPartAnywhere(Campaign campaign, int partId) {
         Part part = campaign.getWarehouse().getPart(partId);
         if (part != null) {
             return part;
@@ -2423,10 +2438,43 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         LOGGER.info("Load Part Nodes Complete!");
     }
 
+    /**
+     * After {@link #postProcessParts} wires up unit references, parts that belong to base-hangar
+     * units are still locationNode-parented to the campaign warehouse (where they were loaded).
+     * Move them to the correct base warehouse so that {@link Part#getWarehouse()} returns the
+     * local warehouse for that base, keeping spare-part searches and fix-button availability
+     * scoped to the base the unit is stationed at.
+     */
+    private static void rehomeBaseHangarUnitParts(Campaign campaign) {
+        for (PlayerBase base : campaign.getPlayerBases()) {
+            Warehouse baseWarehouse = base.getBaseWarehouse();
+            base.getBaseHangar().forEachUnit(unit -> {
+                for (Part part : unit.getParts()) {
+                    Warehouse current = part.getWarehouse();
+                    if (current != baseWarehouse) {
+                        current.removePart(part);
+                        baseWarehouse.addPart(part);
+                    }
+                }
+            });
+        }
+    }
+
     private static void postProcessParts(Campaign retVal, Version version) {
-        Map<Integer, Part> replaceParts = new HashMap<>();
         List<Part> removeParts = new ArrayList<>();
-        for (Part prt : retVal.getWarehouse().getParts()) {
+        postProcessWarehouse(retVal.getWarehouse(), retVal, removeParts);
+        for (PlayerBase base : retVal.getPlayerBases()) {
+            postProcessWarehouse(base.getBaseWarehouse(), retVal, removeParts);
+        }
+        for (Part prt : removeParts) {
+            LOGGER.debug("Removing part #{} {}", prt.getId(), prt.getName());
+            prt.getWarehouse().removePart(prt);
+        }
+    }
+
+    private static void postProcessWarehouse(Warehouse warehouse, Campaign retVal, List<Part> removeParts) {
+        Map<Integer, Part> replaceParts = new HashMap<>();
+        for (Part prt : warehouse.getParts()) {
             prt.fixReferences(retVal);
 
             // Remove fundamentally broken equipment parts
@@ -2467,16 +2515,15 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         // Replace parts that need to be replaced
         for (Entry<Integer, Part> entry : replaceParts.entrySet()) {
             int partId = entry.getKey();
-            Part oldPart = retVal.getWarehouse().getPart(partId);
+            Part oldPart = warehouse.getPart(partId);
             if (oldPart != null) {
-                retVal.getWarehouse().removePart(oldPart);
+                warehouse.removePart(oldPart);
             }
-
-            retVal.getWarehouse().addPart(entry.getValue());
+            warehouse.addPart(entry.getValue());
         }
 
         // After replacing parts, go back through and remove more broken parts
-        for (Part prt : retVal.getWarehouse().getParts()) {
+        for (Part prt : warehouse.getParts()) {
             // deal with the Weapon as Heat Sink problem from earlier versions
             if ((prt instanceof HeatSink) && !prt.getName().contains("Heat Sink")) {
                 removeParts.add(prt);
@@ -2610,10 +2657,6 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             if ((prt instanceof AmmoBin) && prt.isSpare()) {
                 removeParts.add(prt);
             }
-        }
-        for (Part prt : removeParts) {
-            LOGGER.debug("Removing part #{} {}", prt.getId(), prt.getName());
-            retVal.getWarehouse().removePart(prt);
         }
     }
 

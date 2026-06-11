@@ -36,6 +36,7 @@ import java.io.PrintWriter;
 import java.util.Objects;
 import java.util.UUID;
 
+import jakarta.annotation.Nonnull;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -79,7 +80,10 @@ public abstract class AbstractBase implements IPlace {
         LocationNode.LocationManager.setLocation(basePersonnel, this);
         LocationNode.LocationManager.setLocation(baseWarehouse, this);
         LocationNode.LocationManager.setLocation(baseHangar, this);
-        this.setParent(parentLocation);
+        if (!this.setParent(parentLocation)) {
+            throw new IllegalArgumentException("Base " + id + " rejected parent location " + parentLocation
+                                                     + ": see ILocation#canSetParent");
+        }
     }
 
     /** No-arg constructor for XML deserialization only. */
@@ -92,7 +96,7 @@ public abstract class AbstractBase implements IPlace {
     }
 
     @Override
-    public LocationNode getLocationNode() {
+    public @Nonnull LocationNode getLocationNode() {
         return locationNode;
     }
 
@@ -186,7 +190,12 @@ public abstract class AbstractBase implements IPlace {
     protected static boolean readBaseFieldFromXML(AbstractBase base, Node wn2) {
         switch (wn2.getNodeName().toLowerCase()) {
             case "id" -> {
-                base.id = UUID.fromString(wn2.getTextContent().trim());
+                try {
+                    base.id = UUID.fromString(wn2.getTextContent().trim());
+                } catch (IllegalArgumentException e) {
+                    logger.warn("Invalid UUID '{}' for base — skipping id assignment",
+                          wn2.getTextContent().trim());
+                }
                 return true;
             }
             case "displayname" -> {
@@ -218,7 +227,14 @@ public abstract class AbstractBase implements IPlace {
     public static @Nullable AbstractBase generateInstanceFromXML(Node wn, Campaign campaign,
           megamek.Version version) {
         return switch (wn.getNodeName().toLowerCase()) {
-            case "playerbase" -> PlayerBase.generateInstanceFromXML(wn, campaign, version);
+            case "playerbase" -> {
+                try {
+                    yield PlayerBase.generateInstanceFromXML(wn, campaign, version);
+                } catch (Exception e) {
+                    logger.warn("Error parsing base node '{}' — skipping", wn.getNodeName(), e);
+                    yield null;
+                }
+            }
             default -> {
                 logger.warn("Unrecognized base node '{}' — skipping", wn.getNodeName());
                 yield null;

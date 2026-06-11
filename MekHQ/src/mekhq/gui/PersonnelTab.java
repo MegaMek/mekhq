@@ -500,27 +500,20 @@ public final class PersonnelTab extends CampaignGuiTab {
         UUID selectedUUID = null;
         int selectedRow = personnelTable.getSelectedRow();
         if (selectedRow != -1) {
-            Person p = personModel.getPerson(personnelTable.convertRowIndexToModel(selectedRow));
-            if (null != p) {
-                selectedUUID = p.getId();
+            Person person = personModel.getPerson(personnelTable.convertRowIndexToModel(selectedRow));
+            if (null != person) {
+                selectedUUID = person.getId();
             }
         }
 
         LocationFilterItem locationFilter = getCampaignGui().getActiveLocation();
 
-        List<Person> people;
-        if (locationFilter.isAll()) {
-            people = new ArrayList<>(getCampaign().getAllPersonnel());
-        } else if (locationFilter.isMainForce()) {
-            people = new ArrayList<>(getCampaign().getMainForcePersonnel().fetchPersonnelAtLocation());
-        } else {
-            people = new ArrayList<>(locationFilter.getBase().fetchPersonnelAtLocation());
-        }
+        List<Person> people = locationFilter.selectPersonnel(getCampaign());
         personModel.setData(people);
 
         for (int row = 0; row < personnelTable.getRowCount(); row++) {
-            Person p = personModel.getPerson(personnelTable.convertRowIndexToModel(row));
-            if (p != null && p.getId().equals(selectedUUID)) {
+            Person person = personModel.getPerson(personnelTable.convertRowIndexToModel(row));
+            if (person != null && person.getId().equals(selectedUUID)) {
                 personnelTable.setRowSelectionInterval(row, row);
                 refreshPersonnelView();
                 break;

@@ -70,35 +70,35 @@ public class PersonnelReport extends AbstractReport {
         int countRetired = 0;
         Money salary = Money.zero();
 
-        for (Person p : getCampaign().getPersonnel().values()) {
-            if ((!p.getPrimaryRole().isCombat()) || (!p.getPrisonerStatus().isFreeOrBondsman())) {
+        for (Person person : getCampaign().getPersonnel().values()) {
+            if ((!person.getPrimaryRole().isCombat()) || (!person.getPrisonerStatus().isFreeOrBondsman())) {
                 continue;
             }
 
             // Add them to the total count
-            if (p.getStatus().isActive()) {
-                countPersonByType[p.getPrimaryRole().ordinal()]++;
+            if (person.getStatus().isActive()) {
+                countPersonByType[person.getPrimaryRole().ordinal()]++;
                 countTotal++;
-                if (getCampaign().getCampaignOptions().isUseAdvancedMedical() && !p.getInjuries().isEmpty()) {
+                if (getCampaign().getCampaignOptions().isUseAdvancedMedical() && !person.getInjuries().isEmpty()) {
                     countInjured++;
-                } else if (p.getHits() > 0) {
-                    countInjured++;
-                }
-                salary = salary.plus(p.getSalary(getCampaign()));
-            } else if ((p.getPrisonerStatus().isBondsman()) && (p.getStatus().isActive())) {
-                if (!p.getInjuries().isEmpty() || (p.getHits() > 0)) {
+                } else if (person.getHits() > 0) {
                     countInjured++;
                 }
-            } else if (p.getStatus().isRetired()) {
+                salary = salary.plus(person.getSalary(getCampaign()));
+            } else if ((person.getPrisonerStatus().isBondsman()) && (person.getStatus().isActive())) {
+                if (!person.getInjuries().isEmpty() || (person.getHits() > 0)) {
+                    countInjured++;
+                }
+            } else if (person.getStatus().isRetired()) {
                 countRetired++;
-            } else if (p.getStatus().isMIA()) {
+            } else if (person.getStatus().isMIA()) {
                 countMIA++;
-            } else if (p.getStatus().isKIA()) {
+            } else if (person.getStatus().isKIA()) {
                 countKIA++;
                 countDead++;
-            } else if (p.getStatus().isDead()) {
+            } else if (person.getStatus().isDead()) {
                 countDead++;
-            } else if (p.getStatus().isStudent()) {
+            } else if (person.getStatus().isStudent()) {
                 countStudents++;
             }
         }

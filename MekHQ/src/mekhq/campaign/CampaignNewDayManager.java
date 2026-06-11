@@ -443,13 +443,7 @@ public class CampaignNewDayManager {
 
         processNewDayPersonnel();
 
-        for (AbstractLocation location : new ArrayList<>(campaign.getLocations())) {
-            location.processArrivals(campaign);
-        }
-        for (PlayerBase base : campaign.getPlayerBases()) {
-            base.processArrivals(campaign);
-        }
-        campaign.processArrivals(campaign);
+        processAllArrivals();
 
         campaign.pruneEmptyLocations();
 
@@ -662,6 +656,16 @@ public class CampaignNewDayManager {
      * @author Illiani
      * @since 0.50.10
      */
+
+    private void processAllArrivals() {
+        for (AbstractLocation location : new ArrayList<>(campaign.getLocations())) {
+            location.processArrivals(campaign);
+        }
+        for (PlayerBase base : campaign.getPlayerBases()) {
+            base.processArrivals(campaign);
+        }
+        campaign.processArrivals(campaign);
+    }
 
     private void updateFacilities() {
         updateFieldKitchenCapacity();
@@ -1389,13 +1393,13 @@ public class CampaignNewDayManager {
                               "Could not perform overnight maintenance on {} ({}) due to an error",
                               part.getName(),
                               part.getId());
-                        campaign.addReport(TECHNICAL, String.format(
-                              "ERROR: an error occurred performing overnight maintenance on %s, check the log",
+                        campaign.addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE,
+                              "CampaignNewDayManager.maintenanceError.report",
                               part.getName()));
                     }
                 } else {
-                    campaign.addReport(TECHNICAL, String.format(
-                          "%s looks at %s, recalls his total lack of skill for working with such technology, then slowly puts the tools down before anybody gets hurt.",
+                    campaign.addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE,
+                          "CampaignNewDayManager.techAbort.report",
                           tech.getHyperlinkedFullTitle(),
                           part.getName()));
                     part.cancelAssignment(false);

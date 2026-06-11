@@ -38,6 +38,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import megamek.common.annotations.Nullable;
@@ -63,6 +64,10 @@ import mekhq.campaign.universe.PlanetarySystem;
  */
 public final class LocationDispatch {
     private static final MMLogger LOGGER = MMLogger.create(LocationDispatch.class);
+
+    private static final String LOG_DISPATCH_PERSONS = "dispatchToLocation";
+    private static final String LOG_DISPATCH_UNITS = "dispatchUnitsToLocation";
+    private static final String LOG_DISPATCH_PARTS = "dispatchPartsToLocation";
 
     private LocationDispatch() {}
 
@@ -225,46 +230,8 @@ public final class LocationDispatch {
      * @param destination the target {@link ILocation}; must not be {@code null}
      * @param campaign    the active campaign; must not be {@code null}
      */
-    public static void dispatchToLocation(Collection<Person> people,
-          ILocation destination,
-          Campaign campaign) {
-
-        PlanetarySystem destSystem = destination.getCurrentSystem();
-
-        Map<PlanetarySystem, List<Person>> bySystem = people.stream()
-              .collect(Collectors.groupingBy(p -> {
-                  PlanetarySystem system = p.getCurrentSystem();
-                  return system != null ? system : campaign.getCurrentSystem();
-              }));
-
-        for (Map.Entry<PlanetarySystem, List<Person>> entry : bySystem.entrySet()) {
-            PlanetarySystem fromSystem = entry.getKey();
-            List<Person> group = entry.getValue();
-
-            if (destSystem == null || fromSystem.equals(destSystem)) {
-                if (destination instanceof AbstractBase) {
-                    PlanetarySystem system = destSystem != null ? destSystem : fromSystem;
-                    CurrentLocation arrivedLocation = buildArrivedNode(system, destination, campaign, "dispatchToLocation");
-                    group.forEach(p -> p.setParent(arrivedLocation));
-                } else {
-                    group.forEach(p -> p.setParent(destination));
-                }
-                continue;
-            }
-
-            Optional<CurrentLocation> maybeTravelLocation = buildTravelNode(
-                  fromSystem, destSystem, destination, campaign, "dispatchToLocation");
-            if (maybeTravelLocation.isEmpty()) {
-                if (destination instanceof AbstractBase) {
-                    CurrentLocation arrivedLocation = buildArrivedNode(destSystem, destination, campaign, "dispatchToLocation");
-                    group.forEach(p -> p.setParent(arrivedLocation));
-                } else {
-                    group.forEach(p -> p.setParent(destination));
-                }
-                continue;
-            }
-            group.forEach(p -> p.setParent(maybeTravelLocation.get()));
-        }
+    public static void dispatchToLocation(Collection<Person> people, ILocation destination, Campaign campaign) {
+        dispatch(people, destination, campaign, LOG_DISPATCH_PERSONS, destination, null);
     }
 
     /**
@@ -287,52 +254,28 @@ public final class LocationDispatch {
           Campaign campaign) {
 
         Hangar arrivalHangar = (destination instanceof AbstractBase base)
-                                     ? base.getBaseHangar()
-                                     : campaign.getHangar();
+              ? base.getBaseHangar()
+              : campaign.getHangar();
+        Warehouse arrivalWarehouse = (destination instanceof AbstractBase base)
+              ? base.getBaseWarehouse()
+              : campaign.getWarehouse();
 
-        PlanetarySystem destSystem = destination.getCurrentSystem();
-
-        Map<PlanetarySystem, List<Unit>> bySystem = units.stream()
-                                                          .collect(Collectors.groupingBy(u -> {
-                                                              PlanetarySystem sys = u.getCurrentSystem();
-                                                              return sys != null ? sys : campaign.getCurrentSystem();
-                                                          }));
-
-        for (Map.Entry<PlanetarySystem, List<Unit>> entry : bySystem.entrySet()) {
-            PlanetarySystem fromSystem = entry.getKey();
-            List<Unit> group = entry.getValue();
-
-            // Move data structure immediately so hangar filters stay correct.
+        // Move data structures immediately so hangar and warehouse filters stay correct.
+        dispatch(units, destination, campaign, LOG_DISPATCH_UNITS, arrivalHangar, group -> {
             for (Unit unit : group) {
                 Hangar sourceHangar = unit.getHangar();
                 (sourceHangar != null ? sourceHangar : campaign.getHangar()).removeUnit(unit.getId());
                 arrivalHangar.addUnit(unit);
-            }
-
-            if (destSystem == null || fromSystem.equals(destSystem)) {
-                if (destination instanceof AbstractBase) {
-                    PlanetarySystem system = destSystem != null ? destSystem : fromSystem;
-                    CurrentLocation arrivedLocation = buildArrivedNode(system, destination, campaign, "dispatchUnitsToLocation");
-                    group.forEach(u -> LocationNode.LocationManager.setLocation(u, arrivedLocation));
-                } else {
-                    group.forEach(u -> LocationNode.LocationManager.setLocation(u, arrivalHangar));
+                // Installed parts live in the warehouse local to their unit; move them along.
+                for (Part part : unit.getParts()) {
+                    Warehouse sourceWarehouse = part.getWarehouse();
+                    if (sourceWarehouse != arrivalWarehouse) {
+                        (sourceWarehouse != null ? sourceWarehouse : campaign.getWarehouse()).removePart(part);
+                        arrivalWarehouse.addPart(part);
+                    }
                 }
-                continue;
             }
-
-            Optional<CurrentLocation> maybeTravelLocation = buildTravelNode(
-                  fromSystem, destSystem, destination, campaign, "dispatchUnitsToLocation");
-            if (maybeTravelLocation.isEmpty()) {
-                if (destination instanceof AbstractBase) {
-                    CurrentLocation arrivedLocation = buildArrivedNode(destSystem, destination, campaign, "dispatchUnitsToLocation");
-                    group.forEach(u -> LocationNode.LocationManager.setLocation(u, arrivedLocation));
-                } else {
-                    group.forEach(u -> LocationNode.LocationManager.setLocation(u, arrivalHangar));
-                }
-                continue;
-            }
-            group.forEach(u -> LocationNode.LocationManager.setLocation(u, maybeTravelLocation.get()));
-        }
+        });
     }
 
     /**
@@ -354,51 +297,90 @@ public final class LocationDispatch {
           Campaign campaign) {
 
         Warehouse arrivalWarehouse = (destination instanceof AbstractBase base)
-                                           ? base.getBaseWarehouse()
-                                           : campaign.getWarehouse();
+              ? base.getBaseWarehouse()
+              : campaign.getWarehouse();
 
-        PlanetarySystem destSystem = destination.getCurrentSystem();
-
-        Map<PlanetarySystem, List<Part>> bySystem = parts.stream()
-                                                          .collect(Collectors.groupingBy(p -> {
-                                                              PlanetarySystem sys = p.getCurrentSystem();
-                                                              return sys != null ? sys : campaign.getCurrentSystem();
-                                                          }));
-
-        for (Map.Entry<PlanetarySystem, List<Part>> entry : bySystem.entrySet()) {
-            PlanetarySystem fromSystem = entry.getKey();
-            List<Part> group = entry.getValue();
-
-            // Move data structure immediately so warehouse filters stay correct.
+        // Move the data structure immediately so warehouse filters stay correct.
+        dispatch(parts, destination, campaign, LOG_DISPATCH_PARTS, arrivalWarehouse, group -> {
             for (Part part : group) {
                 Warehouse sourceWarehouse = part.getWarehouse();
                 (sourceWarehouse != null ? sourceWarehouse : campaign.getWarehouse()).removePart(part);
                 arrivalWarehouse.addPart(part);
             }
+        });
+    }
 
-            if (destSystem == null || fromSystem.equals(destSystem)) {
-                if (destination instanceof AbstractBase) {
-                    PlanetarySystem system = destSystem != null ? destSystem : fromSystem;
-                    CurrentLocation arrivedLocation = buildArrivedNode(system, destination, campaign, "dispatchPartsToLocation");
-                    group.forEach(p -> LocationNode.LocationManager.setLocation(p, arrivedLocation));
-                } else {
-                    group.forEach(p -> LocationNode.LocationManager.setLocation(p, arrivalWarehouse));
-                }
+    /**
+     * Shared dispatch loop for persons, units, and parts.
+     *
+     * <p>Groups {@code items} by departure system. Each group's containers are moved first (via
+     * {@code moveContainers}, when the item type owns one), then the group either lands
+     * immediately (same system, or no calculable jump path) or is parented under a shared
+     * {@link CurrentLocation} travel node. All reparenting goes through the validated
+     * {@link ILocation#setParent} path; rejected moves are logged rather than silently skipped.</p>
+     *
+     * @param items               the items to dispatch; must not be {@code null}
+     * @param destination         the target {@link ILocation}; must not be {@code null}
+     * @param campaign            the active campaign; must not be {@code null}
+     * @param logMarker           marker naming the public entry point, for travel-node logs
+     * @param directLandingTarget the parent used when landing somewhere that is not a base
+     * @param moveContainers      moves each group between hangars/warehouses, or {@code null} if
+     *                            the item type has no container to maintain
+     */
+    private static <T extends ILocation> void dispatch(Collection<T> items, ILocation destination, Campaign campaign,
+          String logMarker, ILocation directLandingTarget, @Nullable Consumer<List<T>> moveContainers) {
+
+        PlanetarySystem destinationSystem = destination.getCurrentSystem();
+
+        Map<PlanetarySystem, List<T>> bySystem = items.stream()
+              .collect(Collectors.groupingBy(item -> {
+                  PlanetarySystem system = item.getCurrentSystem();
+                  return system != null ? system : campaign.getCurrentSystem();
+              }));
+
+        for (Map.Entry<PlanetarySystem, List<T>> entry : bySystem.entrySet()) {
+            PlanetarySystem fromSystem = entry.getKey();
+            List<T> group = entry.getValue();
+
+            if (moveContainers != null) {
+                moveContainers.accept(group);
+            }
+
+            if (destinationSystem == null || fromSystem.equals(destinationSystem)) {
+                PlanetarySystem system = destinationSystem != null ? destinationSystem : fromSystem;
+                land(group, destination, directLandingTarget, system, campaign, logMarker);
                 continue;
             }
 
             Optional<CurrentLocation> maybeTravelLocation = buildTravelNode(
-                  fromSystem, destSystem, destination, campaign, "dispatchPartsToLocation");
+                  fromSystem, destinationSystem, destination, campaign, logMarker);
             if (maybeTravelLocation.isEmpty()) {
-                if (destination instanceof AbstractBase) {
-                    CurrentLocation arrivedLocation = buildArrivedNode(destSystem, destination, campaign, "dispatchPartsToLocation");
-                    group.forEach(p -> LocationNode.LocationManager.setLocation(p, arrivedLocation));
-                } else {
-                    group.forEach(p -> LocationNode.LocationManager.setLocation(p, arrivalWarehouse));
-                }
+                land(group, destination, directLandingTarget, destinationSystem, campaign, logMarker);
                 continue;
             }
-            group.forEach(p -> LocationNode.LocationManager.setLocation(p, maybeTravelLocation.get()));
+            CurrentLocation travelLocation = maybeTravelLocation.get();
+            group.forEach(item -> reparent(item, travelLocation));
+        }
+    }
+
+    /**
+     * Lands {@code group} at {@code destination}: bases receive an arrived {@link CurrentLocation}
+     * node so arrival accounting still runs; anywhere else the group is parented directly under
+     * {@code directLandingTarget}.
+     */
+    private static void land(List<? extends ILocation> group, ILocation destination, ILocation directLandingTarget,
+          PlanetarySystem system, Campaign campaign, String logMarker) {
+        if (destination instanceof AbstractBase) {
+            CurrentLocation arrivedLocation = buildArrivedNode(system, destination, campaign, logMarker);
+            group.forEach(item -> reparent(item, arrivedLocation));
+        } else {
+            group.forEach(item -> reparent(item, directLandingTarget));
+        }
+    }
+
+    private static void reparent(ILocation item, ILocation target) {
+        if (!item.setParent(target)) {
+            LOGGER.error("Could not move {} under {}: rejected by canSetParent", item, target);
         }
     }
 

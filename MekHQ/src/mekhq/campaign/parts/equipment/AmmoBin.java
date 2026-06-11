@@ -342,17 +342,6 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         return null;
     }
 
-    protected Warehouse getEffectiveWarehouse() {
-        Unit unit = getUnit();
-        if (unit != null) {
-            Warehouse warehouse = unit.getWarehouse();
-            if (warehouse != null) {
-                return warehouse;
-            }
-        }
-        return campaign.getWarehouse();
-    }
-
     /**
      * Requisitions ammo of a given type from the unit's local warehouse (or campaign warehouse as
      * fallback).
@@ -364,7 +353,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
      */
     protected int requisitionAmmo(AmmoType ammoType, int shotsNeeded) {
         Objects.requireNonNull(ammoType);
-        Warehouse warehouse = getEffectiveWarehouse();
+        Warehouse warehouse = getWarehouse();
         int shotsLoaded = 0;
         while (shotsLoaded < shotsNeeded) {
             int shots = campaign.getQuartermaster().removeAmmo(warehouse, ammoType, shotsNeeded - shotsLoaded);
@@ -433,7 +422,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         Objects.requireNonNull(ammoType);
 
         if (shotsUnloaded > 0) {
-            getCampaign().getQuartermaster().addAmmo(getEffectiveWarehouse(), ammoType, shotsUnloaded);
+            getCampaign().getQuartermaster().addAmmo(getWarehouse(), ammoType, shotsUnloaded);
         }
     }
 

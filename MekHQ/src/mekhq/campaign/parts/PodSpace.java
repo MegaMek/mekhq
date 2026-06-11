@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import jakarta.annotation.Nonnull;
 import megamek.common.annotations.Nullable;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.units.Aero;
@@ -69,6 +70,7 @@ public class PodSpace implements IPartWork {
     protected Unit unit;
     protected int location;
     protected List<Integer> childPartIds = new ArrayList<>();
+    private final LocationNode locationNode = new LocationNode(this);
 
     protected Person tech;
     protected int timeSpent = 0;
@@ -306,8 +308,8 @@ public class PodSpace implements IPartWork {
     }
 
     @Override
-    public LocationNode getLocationNode() {
-        return unit != null ? unit.getLocationNode() : null;
+    public @Nonnull LocationNode getLocationNode() {
+        return locationNode;
     }
 
     @Override

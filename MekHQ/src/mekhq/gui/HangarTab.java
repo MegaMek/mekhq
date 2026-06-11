@@ -67,7 +67,6 @@ import megamek.common.units.UnitType;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
-import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.events.AcquisitionEvent;
 import mekhq.campaign.events.DeploymentChangedEvent;
 import mekhq.campaign.events.OrganizationChangedEvent;
@@ -745,17 +744,7 @@ public final class HangarTab extends CampaignGuiTab {
 
         LocationFilterItem locationFilter = getCampaignGui().getActiveLocation();
 
-        List<Unit> units;
-        if (locationFilter.isAll()) {
-            units = new ArrayList<>(getCampaign().getHangar().getUnits());
-            for (PlayerBase base : getCampaign().getPlayerBases()) {
-                units.addAll(base.getBaseHangar().getUnits());
-            }
-        } else if (locationFilter.isMainForce()) {
-            units = new ArrayList<>(getCampaign().getHangar().getUnits());
-        } else {
-            units = new ArrayList<>(locationFilter.getBase().getBaseHangar().getUnits());
-        }
+        List<Unit> units = locationFilter.selectUnits(getCampaign());
         unitModel.setData(units);
 
         for (int row = 0; row < unitTable.getRowCount(); row++) {

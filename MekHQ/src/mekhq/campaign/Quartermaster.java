@@ -167,8 +167,13 @@ public record Quartermaster(Campaign campaign) {
         // be careful in using this next line
         part.postProcessCampaignAddition();
 
-        // Add the part to our warehouse and merge it with any existing part if possible
-        getWarehouse().addPart(part, true);
+        // Add the part to the warehouse local to its unit (e.g. a base warehouse for a unit
+        // stationed at a base) and merge it with any existing part if possible
+        Unit unit = part.getUnit();
+        Warehouse warehouse = ((unit != null) && (unit.getWarehouse() != null))
+              ? unit.getWarehouse()
+              : getWarehouse();
+        warehouse.addPart(part, true);
     }
 
     /**

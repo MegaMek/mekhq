@@ -105,7 +105,7 @@ public class PlayerBase extends AbstractBase {
      */
     public @Nullable FixedLocation getFixedLocation() {
         ILocation parent = getParent();
-        return parent instanceof FixedLocation fl ? fl : null;
+        return parent instanceof FixedLocation fixedLocation ? fixedLocation : null;
     }
 
     @Override
@@ -118,8 +118,8 @@ public class PlayerBase extends AbstractBase {
         }
         // Persons who have arrived live under basePersonnel.
         for (LocationNode child : getBasePersonnel().getLocationNode().getChildren()) {
-            if (child.getLocatable() instanceof Person p) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personId", p.getId().toString());
+            if (child.getLocatable() instanceof Person person) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personId", person.getId().toString());
             }
         }
         // Travel nodes (CurrentLocation) sit directly under the base so they can carry
@@ -139,27 +139,56 @@ public class PlayerBase extends AbstractBase {
     public static @Nullable PlayerBase generateInstanceFromXML(Node wn, Campaign campaign,
           Version version) {
         try {
-            String systemId = null;
             PlayerBase base = new PlayerBase();
+            NodeList nodeList = wn.getChildNodes();
 
-            NodeList nl = wn.getChildNodes();
-            for (int x = 0; x < nl.getLength(); x++) {
-                Node wn2 = nl.item(x);
+            // Pre-scan for systemId so we can establish the base's FixedLocation parent
+            // before loading hangar units. Hangar.addUnit calls unit.setParent(hangar),
+            // which requires the root of the hangar's location tree to be an AbstractLocation.
+            // Without this pre-scan, canSetParent silently returns false for every unit.
+            String systemId = null;
+            for (int x = 0; x < nodeList.getLength(); x++) {
+                Node wn2 = nodeList.item(x);
+                if (wn2.getNodeType() == Node.ELEMENT_NODE
+                          && wn2.getNodeName().equalsIgnoreCase("systemId")) {
+                    systemId = wn2.getTextContent().trim();
+                    break;
+                }
+            }
+
+            if (systemId == null) {
+                logger.error("PlayerBase XML missing systemId — skipping");
+                return null;
+            }
+            PlanetarySystem system = Systems.getInstance().getSystemById(systemId);
+            if (system == null) {
+                logger.error("PlayerBase could not find system '{}' — skipping", systemId);
+                return null;
+            }
+            FixedLocation fixedLocation = new FixedLocation(system);
+            if (!base.setParent(fixedLocation)) {
+                logger.error("PlayerBase could not be anchored under system '{}' — skipping", systemId);
+                return null;
+            }
+
+            for (int x = 0; x < nodeList.getLength(); x++) {
+                Node wn2 = nodeList.item(x);
                 if (wn2.getNodeType() != Node.ELEMENT_NODE) {
                     continue;
                 }
-                if (wn2.getNodeName().equalsIgnoreCase("systemId")) {
-                    systemId = wn2.getTextContent().trim();
-                } else if (wn2.getNodeName().equalsIgnoreCase("personId")) {
+                String nodeName = wn2.getNodeName();
+                if (nodeName.equalsIgnoreCase("systemId")) {
+                    // Already handled in pre-scan above.
+                } else if (nodeName.equalsIgnoreCase("personId")) {
                     base.pendingPersonIds.add(UUID.fromString(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("location")) {
+                } else if (nodeName.equalsIgnoreCase("location")) {
                     // Travel nodes sit directly under the base (not under basePersonnel).
                     CurrentLocation travelLocation = CurrentLocation.generateInstanceFromXML(wn2, campaign);
                     if (travelLocation != null) {
                         travelLocation.setParent(base);
                         campaign.addLocation(travelLocation);
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("baseWarehouse")) {
+                } else if (nodeName.equalsIgnoreCase("baseWarehouse")) {
                     NodeList partNodes = wn2.getChildNodes();
                     for (int i = 0; i < partNodes.getLength(); i++) {
                         Node partNode = partNodes.item(i);
@@ -173,7 +202,7 @@ public class PlayerBase extends AbstractBase {
                             base.pendingBaseWarehouseParts.add(part);
                         }
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("baseHangar")) {
+                } else if (nodeName.equalsIgnoreCase("baseHangar")) {
                     NodeList unitNodes = wn2.getChildNodes();
                     for (int i = 0; i < unitNodes.getLength(); i++) {
                         Node unitNode = unitNodes.item(i);
@@ -191,19 +220,6 @@ public class PlayerBase extends AbstractBase {
                 }
             }
 
-            if (systemId == null) {
-                logger.error("PlayerBase XML missing systemId — skipping");
-                return null;
-            }
-
-            PlanetarySystem system = Systems.getInstance().getSystemById(systemId);
-            if (system == null) {
-                logger.error("PlayerBase could not find system '{}' — skipping", systemId);
-                return null;
-            }
-
-            FixedLocation fixedLocation = new FixedLocation(system);
-            base.setParent(fixedLocation);
             return base;
 
         } catch (Exception ex) {

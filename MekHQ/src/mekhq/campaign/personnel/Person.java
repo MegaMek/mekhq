@@ -82,6 +82,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javax.swing.ImageIcon;
 
+import jakarta.annotation.Nonnull;
 import megamek.Version;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.codeUtilities.MathUtility;
@@ -7995,7 +7996,7 @@ public class Person implements ILocation {
     }
 
     @Override
-    public LocationNode getLocationNode() {
+    public @Nonnull LocationNode getLocationNode() {
         return locationNode;
     }
 
@@ -9343,9 +9344,8 @@ public class Person implements ILocation {
 
     @Override
     public boolean setParent(ILocation parent) {
-        ILocation oldParent = getLocationNode().getParent() != null ?
-                                    getLocationNode().getParent().getLocatable() :
-                                    null;
+        LocationNode parentNode = getLocationNode().getParent();
+        ILocation oldParent = parentNode != null ? parentNode.getLocatable() : null;
         if (ILocation.super.setParent(parent)) {
             if (oldParent instanceof Personnel personnel) {
                 personnel.remove(getId());

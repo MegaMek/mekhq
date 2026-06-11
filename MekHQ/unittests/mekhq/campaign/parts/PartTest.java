@@ -397,19 +397,20 @@ public class PartTest {
         }
 
         @Test
-        void getLocationNode_withUnit_returnsUnitNode() {
-            LocationNode unitNode = mock(LocationNode.class);
+        void getLocationNode_withUnit_keepsOwnNode() {
+            // Node identity must stay stable when a part is installed; place resolution for
+            // installed parts goes through getPlace() via the unit's node instead.
             Entity mockEntity = mock(Mek.class);
             when(mockEntity.getWeight()).thenReturn(20.0);
             Unit mockUnit = mock(Unit.class);
             when(mockUnit.getId()).thenReturn(UUID.randomUUID());
             when(mockUnit.getEntity()).thenReturn(mockEntity);
-            when(mockUnit.getLocationNode()).thenReturn(unitNode);
+            when(mockUnit.getLocationNode()).thenReturn(new LocationNode(mockUnit));
 
             Part part = new MekSensor();
             part.setUnit(mockUnit);
 
-            assertSame(unitNode, part.getLocationNode());
+            assertSame(part, part.getLocationNode().getLocatable());
         }
     }
 

@@ -63,7 +63,6 @@ import megamek.common.rolls.TargetRoll;
 import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
-import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.events.AcquisitionEvent;
 import mekhq.campaign.events.AsTechPoolChangedEvent;
 import mekhq.campaign.events.OvertimeModeEvent;
@@ -755,17 +754,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     public void refreshPartsList() {
         LocationFilterItem locationFilter = getCampaignGui().getActiveLocation();
 
-        List<Part> parts;
-        if (locationFilter.isAll()) {
-            parts = new ArrayList<>(getCampaign().getWarehouse().getSpareParts());
-            for (PlayerBase base : getCampaign().getPlayerBases()) {
-                parts.addAll(base.getBaseWarehouse().getSpareParts());
-            }
-        } else if (locationFilter.isMainForce()) {
-            parts = getCampaign().getWarehouse().getSpareParts();
-        } else {
-            parts = locationFilter.getBase().getBaseWarehouse().getSpareParts();
-        }
+        List<Part> parts = locationFilter.selectSpareParts(getCampaign());
         partsModel.setData(parts);
         getCampaign().getShoppingList().removeZeroQuantityFromList(); // To
         // prevent

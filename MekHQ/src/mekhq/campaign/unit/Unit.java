@@ -71,6 +71,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.swing.UIManager;
 
+import jakarta.annotation.Nonnull;
 import megamek.Version;
 import megamek.client.ui.tileset.EntityImage;
 import megamek.common.CriticalSlot;
@@ -557,7 +558,7 @@ public class Unit implements ITechnology, ILocation {
     }
 
     @Override
-    public LocationNode getLocationNode() {
+    public @Nonnull LocationNode getLocationNode() {
         return locationNode;
     }
 
@@ -5866,6 +5867,17 @@ public class Unit implements ITechnology, ILocation {
         return entity instanceof Infantry;
     }
 
+    /**
+     * Logs and reports a crew/tech assignment that was rejected because {@code person} is not at the same effective
+     * location as this unit, so the failure is visible to the player instead of only in the log.
+     */
+    private void reportAssignmentBlockedByLocation(Person person, String role) {
+        LOGGER.warn("Cannot assign {} as {} of {}: not at the same location", person.getFullName(), role, getName());
+        getCampaign().addReport(TECHNICAL,
+              getFormattedTextAt(RESOURCE_BUNDLE, "Unit.assignmentBlockedByLocation.text",
+                    person.getHyperlinkedFullTitle(), role, getName()));
+    }
+
     public void addDriver(Person p) {
         addDriver(p, false);
     }
@@ -5874,8 +5886,7 @@ public class Unit implements ITechnology, ILocation {
         Objects.requireNonNull(person);
 
         if (!LocationUtils.areSameEffectiveLocation(this, person)) {
-            LOGGER.warn("Cannot assign {} as driver of {}: not at the same location",
-                  person.getFullName(), getName());
+            reportAssignmentBlockedByLocation(person, "driver");
             return;
         }
         ensurePersonIsRegistered(person);
@@ -5898,8 +5909,7 @@ public class Unit implements ITechnology, ILocation {
         Objects.requireNonNull(person);
 
         if (!LocationUtils.areSameEffectiveLocation(this, person)) {
-            LOGGER.warn("Cannot assign {} as gunner of {}: not at the same location",
-                  person.getFullName(), getName());
+            reportAssignmentBlockedByLocation(person, "gunner");
             return;
         }
         ensurePersonIsRegistered(person);
@@ -5922,8 +5932,7 @@ public class Unit implements ITechnology, ILocation {
         Objects.requireNonNull(person);
 
         if (!LocationUtils.areSameEffectiveLocation(this, person)) {
-            LOGGER.warn("Cannot assign {} as vessel crew of {}: not at the same location",
-                  person.getFullName(), getName());
+            reportAssignmentBlockedByLocation(person, "vessel crew");
             return;
         }
         ensurePersonIsRegistered(person);
@@ -5946,8 +5955,7 @@ public class Unit implements ITechnology, ILocation {
         Objects.requireNonNull(person);
 
         if (!LocationUtils.areSameEffectiveLocation(this, person)) {
-            LOGGER.warn("Cannot assign {} as navigator of {}: not at the same location",
-                  person.getFullName(), getName());
+            reportAssignmentBlockedByLocation(person, "navigator");
             return;
         }
         ensurePersonIsRegistered(person);
@@ -5974,8 +5982,7 @@ public class Unit implements ITechnology, ILocation {
         Objects.requireNonNull(person);
 
         if (!LocationUtils.areSameEffectiveLocation(this, person)) {
-            LOGGER.warn("Cannot assign {} as tech officer of {}: not at the same location",
-                  person.getFullName(), getName());
+            reportAssignmentBlockedByLocation(person, "tech officer");
             return;
         }
         ensurePersonIsRegistered(person);
@@ -5990,21 +5997,21 @@ public class Unit implements ITechnology, ILocation {
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(campaign, person, this));
     }
 
-    public void setTech(Person p) {
-        Objects.requireNonNull(p);
+    public void setTech(Person person) {
+        Objects.requireNonNull(person);
 
-        if (!LocationUtils.areSameEffectiveLocation(this, p)) {
-            LOGGER.warn("Cannot assign {} as tech of {}: not at the same location", p.getFullName(), getName());
+        if (!LocationUtils.areSameEffectiveLocation(this, person)) {
+            reportAssignmentBlockedByLocation(person, "tech");
             return;
         }
         if (null != tech) {
-            LOGGER.warn("New tech assigned {} without removing previous tech {}", p.getFullName(), tech);
+            LOGGER.warn("New tech assigned {} without removing previous tech {}", person.getFullName(), tech);
         }
-        ensurePersonIsRegistered(p);
-        tech = p;
-        p.addTechUnit(this);
-        AssignmentLogger.assignedTo(p, getCampaign().getLocalDate(), getName());
-        MekHQ.triggerEvent(new PersonTechAssignmentEvent(p, this));
+        ensurePersonIsRegistered(person);
+        tech = person;
+        person.addTechUnit(this);
+        AssignmentLogger.assignedTo(person, getCampaign().getLocalDate(), getName());
+        MekHQ.triggerEvent(new PersonTechAssignmentEvent(person, this));
     }
 
     public void removeTech() {
@@ -6036,8 +6043,7 @@ public class Unit implements ITechnology, ILocation {
         Objects.requireNonNull(person);
 
         if (!LocationUtils.areSameEffectiveLocation(this, person)) {
-            LOGGER.warn("Cannot assign {} as pilot/soldier of {}: not at the same location",
-                  person.getFullName(), getName());
+            reportAssignmentBlockedByLocation(person, "pilot/soldier");
             return;
         }
         ensurePersonIsRegistered(person);

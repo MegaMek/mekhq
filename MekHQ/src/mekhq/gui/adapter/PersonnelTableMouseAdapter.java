@@ -2521,7 +2521,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         List<mekhq.campaign.personnel.Person> selectedPeople = Arrays.asList(selected);
         JMenuHelpers.addMenuIfNonEmpty(popup, new SendToLocationMenu(getCampaign(), getFrame(),
               selectedPeople,
-              dest -> LocationDispatch.dispatchToLocation(selectedPeople, dest, getCampaign())));
+              destination -> LocationDispatch.dispatchToLocation(selectedPeople, destination, getCampaign())));
 
         if (oneSelected && person.getStatus().isActiveFlexible()) {
             if (getCampaignOptions().isUseManualMarriages() &&

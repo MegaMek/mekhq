@@ -74,6 +74,7 @@ import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.TORTUGA_DOMINIONS_FACTION_CODE;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.File;
@@ -92,6 +93,7 @@ import java.util.stream.Collectors;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
+import jakarta.annotation.Nonnull;
 import megamek.Version;
 import megamek.client.bot.princess.BehaviorSettings;
 import megamek.client.generator.RandomGenderGenerator;
@@ -1809,14 +1811,14 @@ public class Campaign implements ITechManager, IPlace {
         return Collections.unmodifiableList(locations);
     }
 
-    public void addPlayerBase(PlayerBase base) {
+    public void addPlayerBase(@Nullable PlayerBase base) {
         if (base == null) {
             return;
         }
         playerBases.add(base);
     }
 
-    public void removePlayerBase(PlayerBase base) {
+    public void removePlayerBase(@Nullable PlayerBase base) {
         if (base == null) {
             return;
         }
@@ -1927,7 +1929,7 @@ public class Campaign implements ITechManager, IPlace {
 
     @Override
     @Nullable
-    public LocationNode getLocationNode() {
+    public @Nonnull LocationNode getLocationNode() {
         return locationNode;
     }
 
@@ -4225,8 +4227,8 @@ public class Campaign implements ITechManager, IPlace {
         ILocation repairTarget = (partWork instanceof Part p && p.getUnit() != null)
                                        ? p.getUnit() : (ILocation) partWork;
         if (!LocationUtils.areSameEffectiveLocation(tech, repairTarget)) {
-            String report = tech.getFullName() + " cannot repair " + partWork.getPartName()
-                                  + " — not at the same location.";
+            String report = getFormattedTextAt(RESOURCE_BUNDLE, "fixPart.locationMismatch.report",
+                  tech.getFullName(), partWork.getPartName());
             addReport(TECHNICAL, report);
             return report;
         }
@@ -4693,7 +4695,7 @@ public class Campaign implements ITechManager, IPlace {
      * @return the flagged commander if present, otherwise {@code null}
      */
     public @Nullable Person getFlaggedCommander() {
-        return getPersonnel().values().stream().filter(Person::isCommander).findFirst().orElse(null);
+        return getAllPersonnel().stream().filter(Person::isCommander).findFirst().orElse(null);
     }
 
     /**
@@ -4705,7 +4707,7 @@ public class Campaign implements ITechManager, IPlace {
      * @return the flagged second-in-command if present, otherwise {@code null}
      */
     public @Nullable Person getFlaggedSecondInCommand() {
-        return getPersonnel().values().stream().filter(Person::isSecondInCommand).findFirst().orElse(null);
+        return getAllPersonnel().stream().filter(Person::isSecondInCommand).findFirst().orElse(null);
     }
 
     /**

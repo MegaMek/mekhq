@@ -32,6 +32,8 @@
  */
 package mekhq.gui.menus;
 
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
@@ -46,6 +48,7 @@ import javax.swing.JMenuItem;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.location.ILocation;
+import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.baseComponents.JScrollableMenu;
@@ -68,6 +71,8 @@ import mekhq.gui.dialog.BaseSettingsDialog;
  */
 public class SendToLocationMenu extends JScrollableMenu {
 
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.SendToLocationMenu";
+
     /**
      * @param campaign   the active campaign
      * @param frame      parent frame for any dialogs
@@ -88,7 +93,7 @@ public class SendToLocationMenu extends JScrollableMenu {
             return;
         }
 
-        setText("Send To...");
+        setText(getTextAt(RESOURCE_BUNDLE, "menu.sendTo.text"));
 
         // Determine the ILocation parent all selected items share (if any), to exclude it.
         // ILocation subtypes like Personnel extend LinkedHashMap, so Objects.equals() would
@@ -96,7 +101,7 @@ public class SendToLocationMenu extends JScrollableMenu {
         // match, hiding every base from the menu. Use an identity-keyed set instead.
         Set<ILocation> currentLocations = Collections.newSetFromMap(new IdentityHashMap<>());
         for (ILocation item : items) {
-            var node = item.getLocationNode();
+            LocationNode node = item.getLocationNode();
             currentLocations.add((node == null || node.getParent() == null)
                                        ? null
                                        : node.getParent().getLocatable());
@@ -114,7 +119,7 @@ public class SendToLocationMenu extends JScrollableMenu {
               || sharedCurrent == campaign.getHangar()
               || sharedCurrent == campaign.getWarehouse();
         if (!alreadyAtMainForce) {
-            JMenuItem mainForce = new JMenuItem("Main Force");
+            JMenuItem mainForce = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "label.mainForce.text"));
             mainForce.addActionListener(e -> dispatcher.accept(campaign));
             add(mainForce);
         }
@@ -134,7 +139,7 @@ public class SendToLocationMenu extends JScrollableMenu {
 
         addSeparator();
 
-        JMenuItem newBase = new JMenuItem("New Base...");
+        JMenuItem newBase = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "menuItem.newBase.text"));
         newBase.addActionListener(e -> {
             PlanetarySystem contextSystem = items.get(0).getCurrentSystem();
             Planet contextPlanet = items.get(0).getPlanet();

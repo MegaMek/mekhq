@@ -533,8 +533,8 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
                                   .collect(Collectors.toList());
         JMenuHelpers.addMenuIfNonEmpty(popup, new SendToLocationMenu(
               gui.getCampaign(), gui.getFrame(), spares,
-              dest -> LocationDispatch.dispatchPartsToLocation(
-                    spares, dest, gui.getCampaign())));
+              destination -> LocationDispatch.dispatchPartsToLocation(
+                    spares, destination, gui.getCampaign())));
 
         return Optional.of(popup);
     }

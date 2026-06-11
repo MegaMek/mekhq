@@ -141,8 +141,8 @@ public class PersonnelTableModel extends DataTableModel<Person> {
             setData(new ArrayList<>(getCampaign().getAllPersonnel()));
         } else {
             List<Person> commanders = new ArrayList<>();
-            for (Person p : getCampaign().getAllPersonnel()) {
-                if ((p.getUnit() != null) && !p.equals(p.getUnit().getCommander())) {
+            for (Person person : getCampaign().getAllPersonnel()) {
+                if ((person.getUnit() != null) && !person.equals(person.getUnit().getCommander())) {
                     // this person is NOT the commander of their unit,
                     // skip them.
                     continue;
@@ -151,7 +151,7 @@ public class PersonnelTableModel extends DataTableModel<Person> {
                 // 1. If they don't have a unit, add them.
                 // 2. If their unit doesn't have a commander, add them.
                 // 3. If their unit doesn't exist (error?), add them.
-                commanders.add(p);
+                commanders.add(person);
             }
 
             setData(commanders);

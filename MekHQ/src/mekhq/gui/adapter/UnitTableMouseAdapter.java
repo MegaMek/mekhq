@@ -1061,8 +1061,8 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             List<mekhq.campaign.unit.Unit> unitList = List.of(units);
             JMenuHelpers.addMenuIfNonEmpty(popup, new SendToLocationMenu(
                   gui.getCampaign(), gui.getFrame(), unitList,
-                  dest -> LocationDispatch.dispatchUnitsToLocation(
-                        unitList, dest, gui.getCampaign())));
+                  destination -> LocationDispatch.dispatchUnitsToLocation(
+                        unitList, destination, gui.getCampaign())));
 
             // if we're using maintenance and have selected something that requires
             // maintenance and

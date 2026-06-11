@@ -40,6 +40,7 @@ import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.P
 import static mekhq.campaign.personnel.skills.SkillType.getExperienceLevelName;
 import static mekhq.gui.dialog.nagDialogs.NagController.triggerDailyNags;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -404,7 +405,7 @@ public class CampaignGUI extends JPanel {
         lblTempVesselCrew = new JLabel();
         lblPartsAvailabilityRating = new JLabel();
 
-        statusPanel.add(new JLabel(resourceMap.getString("lblActiveLocation.text")));
+        statusPanel.add(new JLabel(getTextAt(resourceMap.getBaseBundleName(), "lblActiveLocation.text")));
         choiceActiveLocation = new JComboBox<>(buildActiveLocationModel());
         choiceActiveLocation.addActionListener(ev -> refreshLocationFilteredTabs());
         statusPanel.add(choiceActiveLocation);
@@ -1484,13 +1485,13 @@ public class CampaignGUI extends JPanel {
 
     /** Refreshes the three location-filtered tabs when the Active Location selection changes. */
     private void refreshLocationFilteredTabs() {
-        HangarTab ht = getHangarTab();
-        if (ht != null) {
-            ht.refreshUnitList();
+        HangarTab hangarTab = getHangarTab();
+        if (hangarTab != null) {
+            hangarTab.refreshUnitList();
         }
-        PersonnelTab pt = getPersonnelTab();
-        if (pt != null) {
-            pt.refreshPersonnelList();
+        PersonnelTab personnelTab = getPersonnelTab();
+        if (personnelTab != null) {
+            personnelTab.refreshPersonnelList();
         }
         WarehouseTab wt = getWarehouseTab();
         if (wt != null) {
@@ -1627,8 +1628,11 @@ public class CampaignGUI extends JPanel {
     }
 
     private void refreshCampaignControlButtons() {
-        boolean emptyHangar = getCampaign().getUnits().isEmpty();
-        boolean noPersonnel = getCampaign().getPersonnel().isEmpty();
+        boolean emptyHangar = getCampaign().getUnits().isEmpty() &&
+                                    getCampaign().getPlayerBases()
+                                          .stream()
+                                          .allMatch(base -> base.getBaseHangar().getUnits().isEmpty());
+        boolean noPersonnel = getCampaign().getAllPersonnel().isEmpty();
         btnCompanyGenerator.setVisible(emptyHangar && noPersonnel);
     }
 

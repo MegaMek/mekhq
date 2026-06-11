@@ -110,22 +110,22 @@ public interface IPlace extends ILocation {
         if (warehouse == null) {
             return inventory;
         }
-        int nSupply = 0;
-        int nTransit = 0;
-        for (Part p : warehouse.getParts()) {
-            if (!p.isSpare()) {
+        int localSupplyCount = 0;
+        int countInTransit = 0;
+        for (Part warehousePart : warehouse.getParts()) {
+            if (!warehousePart.isSpare()) {
                 continue;
             }
-            if (part.isSamePartType(p)) {
-                if (p.isPresent()) {
-                    nSupply += p.getTotalQuantity();
+            if (part.isSamePartType(warehousePart)) {
+                if (warehousePart.isPresent()) {
+                    localSupplyCount += warehousePart.getTotalQuantity();
                 } else {
-                    nTransit += p.getTotalQuantity();
+                    countInTransit += warehousePart.getTotalQuantity();
                 }
             }
         }
-        inventory.setSupply(nSupply);
-        inventory.setTransit(nTransit);
+        inventory.setSupply(localSupplyCount);
+        inventory.setTransit(countInTransit);
 
         String countModifier = "";
         if (part instanceof Armor) {

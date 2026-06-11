@@ -32,10 +32,13 @@
  */
 package mekhq.gui.dialog;
 
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.time.LocalDate;
@@ -49,6 +52,7 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.FixedLocation;
@@ -65,6 +69,8 @@ import mekhq.gui.model.FilterableComboBoxModel;
  * once a System is selected; changing the System resets the Planet.</p>
  */
 public class BaseSettingsDialog extends JDialog {
+
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.BaseSettingsDialog";
 
     private final Campaign campaign;
     private final PlayerBase existingBase;
@@ -105,13 +111,15 @@ public class BaseSettingsDialog extends JDialog {
 
     private void initComponents(@Nullable PlanetarySystem defaultSystem,
           @Nullable Planet defaultPlanet) {
-        setTitle(existingBase == null ? "New Base" : "Edit Base");
+        setTitle(existingBase == null
+                       ? getTextAt(RESOURCE_BUNDLE, "title.newBase.text")
+                       : getTextAt(RESOURCE_BUNDLE, "title.editBase.text"));
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
         LocalDate today = campaign.getLocalDate();
 
-        txtDisplayName = new JTextField(20);
-        txtDisplayType = new JTextField(20);
+        txtDisplayName = new JTextField(30);
+        txtDisplayType = new JTextField(30);
 
         // System combo — all systems sorted alphabetically, with type-to-search
         List<PlanetarySystem> systems = new ArrayList<>(campaign.getSystems());
@@ -168,9 +176,9 @@ public class BaseSettingsDialog extends JDialog {
             if (system != null) {
                 cboSystem.setSelectedItem(system);
                 if (existingBase.getPlanetId() != null) {
-                    Planet p = system.getPlanetById(existingBase.getPlanetId());
-                    if (p != null) {
-                        cboPlanet.setSelectedItem(p);
+                    Planet planet = system.getPlanetById(existingBase.getPlanetId());
+                    if (planet != null) {
+                        cboPlanet.setSelectedItem(planet);
                     }
                 }
             }
@@ -183,14 +191,15 @@ public class BaseSettingsDialog extends JDialog {
             cboSystem.setSelectedIndex(-1);
         }
 
-        JButton btnOk = new JButton("OK");
+        JButton btnOk = new JButton(getTextAt(RESOURCE_BUNDLE, "button.ok.text"));
         btnOk.addActionListener(e -> onOk());
-        JButton btnCancel = new JButton("Cancel");
+        JButton btnCancel = new JButton(getTextAt(RESOURCE_BUNDLE, "button.cancel.text"));
         btnCancel.addActionListener(e -> dispose());
 
         JPanel content = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(4, 4, 4, 4);
+        int pad = UIUtil.scaleForGUI(4);
+        gbc.insets = new Insets(pad, pad, pad, pad);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
@@ -198,7 +207,7 @@ public class BaseSettingsDialog extends JDialog {
         gbc.gridx = 0;
         gbc.gridy = row;
         gbc.weightx = 0;
-        content.add(new JLabel("Display Name:"), gbc);
+        content.add(new JLabel(getTextAt(RESOURCE_BUNDLE, "label.displayName.text")), gbc);
         gbc.gridx = 1;
         gbc.weightx = 1.0;
         content.add(txtDisplayName, gbc);
@@ -207,7 +216,7 @@ public class BaseSettingsDialog extends JDialog {
         gbc.gridx = 0;
         gbc.gridy = row;
         gbc.weightx = 0;
-        content.add(new JLabel("Display Type:"), gbc);
+        content.add(new JLabel(getTextAt(RESOURCE_BUNDLE, "label.displayType.text")), gbc);
         gbc.gridx = 1;
         gbc.weightx = 1.0;
         content.add(txtDisplayType, gbc);
@@ -216,7 +225,7 @@ public class BaseSettingsDialog extends JDialog {
         gbc.gridx = 0;
         gbc.gridy = row;
         gbc.weightx = 0;
-        content.add(new JLabel("System:"), gbc);
+        content.add(new JLabel(getTextAt(RESOURCE_BUNDLE, "label.system.text")), gbc);
         gbc.gridx = 1;
         gbc.weightx = 1.0;
         content.add(cboSystem, gbc);
@@ -225,7 +234,7 @@ public class BaseSettingsDialog extends JDialog {
         gbc.gridx = 0;
         gbc.gridy = row;
         gbc.weightx = 0;
-        content.add(new JLabel("Planet:"), gbc);
+        content.add(new JLabel(getTextAt(RESOURCE_BUNDLE, "label.planet.text")), gbc);
         gbc.gridx = 1;
         gbc.weightx = 1.0;
         content.add(cboPlanet, gbc);
@@ -288,8 +297,8 @@ public class BaseSettingsDialog extends JDialog {
                 try {
                     if (anObject == null) {
                         editorField.setText("");
-                    } else if (anObject instanceof String s) {
-                        editorField.setText(s);
+                    } else if (anObject instanceof String string) {
+                        editorField.setText(string);
                     } else {
                         editorField.setText(displayName.apply((T) anObject));
                     }
@@ -323,13 +332,13 @@ public class BaseSettingsDialog extends JDialog {
             }
 
             @Override
-            public void addActionListener(java.awt.event.ActionListener l) {
-                editorField.addActionListener(l);
+            public void addActionListener(ActionListener listener) {
+                editorField.addActionListener(listener);
             }
 
             @Override
-            public void removeActionListener(java.awt.event.ActionListener l) {
-                editorField.removeActionListener(l);
+            public void removeActionListener(ActionListener listener) {
+                editorField.removeActionListener(listener);
             }
         });
 
@@ -353,8 +362,8 @@ public class BaseSettingsDialog extends JDialog {
         editorField.addFocusListener(new FocusAdapter() {
             @Override
             @SuppressWarnings("unchecked")
-            public void focusLost(FocusEvent e) {
-                if (e.isTemporary()) {
+            public void focusLost(FocusEvent evt) {
+                if (evt.isTemporary()) {
                     return; // popup opening/closing — do not interfere
                 }
                 Object current = combo.getModel().getSelectedItem();
@@ -425,8 +434,8 @@ public class BaseSettingsDialog extends JDialog {
     /** Clears the editor text field of an editable combo without firing a selection event. */
     private static void clearEditorText(JComboBox<?> combo) {
         Component editor = combo.getEditor().getEditorComponent();
-        if (editor instanceof JTextField tf) {
-            tf.setText("");
+        if (editor instanceof JTextField textField) {
+            textField.setText("");
         }
     }
 
@@ -437,14 +446,13 @@ public class BaseSettingsDialog extends JDialog {
             return;
         }
 
-        Object systemSel = cboSystem.getSelectedItem();
-        if (!(systemSel instanceof PlanetarySystem system)) {
+        Object selectedSystem = cboSystem.getSelectedItem();
+        if (!(selectedSystem instanceof PlanetarySystem system)) {
             cboSystem.requestFocusInWindow();
             return;
         }
 
-        Object planetSel = cboPlanet.getSelectedItem();
-        Planet planet = planetSel instanceof Planet p ? p : null;
+        Planet selectedPlanet = cboPlanet.getSelectedItem() instanceof Planet p ? p : null;
 
         FixedLocation fixedLocation = new FixedLocation(system);
         PlayerBase base = existingBase != null ? existingBase : new PlayerBase(fixedLocation);
@@ -455,7 +463,7 @@ public class BaseSettingsDialog extends JDialog {
         base.setDisplayName(displayName);
         String displayType = txtDisplayType.getText().trim();
         base.setDisplayType(displayType.isEmpty() ? null : displayType);
-        base.setPlanetId(planet != null ? planet.getId() : null);
+        base.setPlanetId(selectedPlanet != null ? selectedPlanet.getId() : null);
 
         if (existingBase == null) {
             campaign.addPlayerBase(base);

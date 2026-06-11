@@ -44,6 +44,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import jakarta.annotation.Nonnull;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.location.ILocation;
@@ -59,7 +60,7 @@ public class Hangar implements ILocation {
     private final LocationNode locationNode = new LocationNode(this);
 
     @Override
-    public LocationNode getLocationNode() {
+    public @Nonnull LocationNode getLocationNode() {
         return locationNode;
     }
 

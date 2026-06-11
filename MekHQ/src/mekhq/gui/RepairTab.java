@@ -67,7 +67,6 @@ import megamek.common.rolls.TargetRoll;
 import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
-import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.events.AcquisitionEvent;
 import mekhq.campaign.events.AsTechPoolChangedEvent;
 import mekhq.campaign.events.DeploymentChangedEvent;
@@ -800,7 +799,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                 Person tech = techModel.getTechAt(entry.getIdentifier());
                 // Tech must be at the same location as the unit being repaired
                 ILocation repairTarget = (unit != null) ? unit
-                      : (part instanceof Part p && p.getUnit() != null) ? p.getUnit() : (ILocation) part;
+                      : (part instanceof Part partWithUnit && partWithUnit.getUnit() != null) ? partWithUnit.getUnit() : (ILocation) part;
                 if (!LocationUtils.areSameEffectiveLocation(tech, repairTarget)) {
                     return false;
                 }
@@ -866,17 +865,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         UUID uuid = (getSelectedServicedUnit() != null) ? getSelectedServicedUnit().getId() : null;
 
         LocationFilterItem locationFilter = getCampaignGui().getActiveLocation();
-        List<Unit> candidates;
-        if (locationFilter.isAll()) {
-            candidates = new ArrayList<>(getCampaign().getHangar().getUnits());
-            for (PlayerBase base : getCampaign().getPlayerBases()) {
-                candidates.addAll(base.getBaseHangar().getUnits());
-            }
-        } else if (locationFilter.isMainForce()) {
-            candidates = new ArrayList<>(getCampaign().getHangar().getUnits());
-        } else {
-            candidates = new ArrayList<>(locationFilter.getBase().getBaseHangar().getUnits());
-        }
+        List<Unit> candidates = locationFilter.selectUnits(getCampaign());
 
         List<Unit> serviceable = new ArrayList<>();
         for (Unit u : candidates) {

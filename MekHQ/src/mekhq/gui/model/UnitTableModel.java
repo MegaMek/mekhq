@@ -142,12 +142,12 @@ public class UnitTableModel extends DataTableModel<Unit> {
             case COL_MODE -> "Mode";
             case COL_SHIP_TRANSPORT -> "Ship Transport";
             case COL_TAC_TRANSPORT -> "Tactical Transport";
-            case COL_LOCATION_NAME -> "Location";
-            case COL_LOCATION_SYSTEM -> "System";
-            case COL_LOCATION_PLANET -> "Planet";
-            case COL_DESTINATION_NAME -> "Destination";
-            case COL_DESTINATION_SYSTEM -> "Dest. System";
-            case COL_DESTINATION_PLANET -> "Dest. Planet";
+            case COL_LOCATION_NAME -> getTextAt(RESOURCE_BUNDLE, "UnitTableModel.col.locationName");
+            case COL_LOCATION_SYSTEM -> getTextAt(RESOURCE_BUNDLE, "UnitTableModel.col.locationSystem");
+            case COL_LOCATION_PLANET -> getTextAt(RESOURCE_BUNDLE, "UnitTableModel.col.locationPlanet");
+            case COL_DESTINATION_NAME -> getTextAt(RESOURCE_BUNDLE, "UnitTableModel.col.destinationName");
+            case COL_DESTINATION_SYSTEM -> getTextAt(RESOURCE_BUNDLE, "UnitTableModel.col.destinationSystem");
+            case COL_DESTINATION_PLANET -> getTextAt(RESOURCE_BUNDLE, "UnitTableModel.col.destinationPlanet");
             default -> "?";
         };
     }

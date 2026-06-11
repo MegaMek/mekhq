@@ -47,6 +47,7 @@ import java.util.Set;
 import java.util.StringJoiner;
 import java.util.UUID;
 
+import jakarta.annotation.Nonnull;
 import megamek.Version;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
@@ -389,14 +390,21 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
     }
 
     @Override
-    public LocationNode getLocationNode() {
-        if (unit != null) {
-            LocationNode unitNode = unit.getLocationNode();
-            if (unitNode != null) {
-                return unitNode;
-            }
-        }
+    public @Nonnull LocationNode getLocationNode() {
         return locationNode;
+    }
+
+    /**
+     * A part installed on a unit lives wherever the unit is, so its place resolves through the unit's
+     * {@link LocationNode} chain; spares resolve via their own node.
+     */
+    @Override
+    public @Nullable IPlace getPlace() {
+        Unit unit = getUnit();
+        if (unit != null) {
+            return ILocation.findPlace(unit.getLocationNode());
+        }
+        return ILocation.findPlace(getLocationNode());
     }
 
     @Override
@@ -499,8 +507,25 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
         if (this.isSalvaging()) {
             int inStock = 0;
             if (this instanceof mekhq.campaign.parts.equipment.AmmoBin ammoBin) {
-                if (campaign.getQuartermaster() != null) {
-                    inStock = campaign.getQuartermaster().getAmmoAvailable(ammoBin.getType());
+                Warehouse localWarehouse = getWarehouse();
+                if (localWarehouse != null) {
+                    megamek.common.equipment.AmmoType ammoType = ammoBin.getType();
+                    boolean useAmmoByType = campaign.getCampaignOptions().isUseAmmoByType();
+                    inStock = localWarehouse.streamSpareParts()
+                                    .filter(p -> p instanceof AmmoStorage
+                                                       && p.isPresent()
+                                                       && !p.isReservedForRefit())
+                                    .mapToInt(p -> {
+                                        AmmoStorage spare = (AmmoStorage) p;
+                                        if (spare.isSameAmmoType(ammoType)) {
+                                            return spare.getShots();
+                                        } else if (useAmmoByType && spare.isCompatibleAmmo(ammoType)) {
+                                            return mekhq.campaign.Quartermaster.convertShots(
+                                                  spare.getType(), spare.getShots(), ammoType);
+                                        }
+                                        return 0;
+                                    })
+                                    .sum();
                 }
             } else if (getWarehouse() != null) {
                 inStock = getWarehouse().getSparePartsCount(this);

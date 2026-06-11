@@ -360,8 +360,8 @@ public class CurrentLocation extends AbstractLocation {
         for (LocationNode child : locationNode.getChildren()) {
             if (child.getLocatable() instanceof mekhq.campaign.personnel.Person person) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personId", person.getId().toString());
-            } else if (child.getLocatable() instanceof Unit u) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitId", u.getId().toString());
+            } else if (child.getLocatable() instanceof Unit unit) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitId", unit.getId().toString());
             } else if (child.getLocatable() instanceof Part part) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "partId", String.valueOf(part.getId()));
             }

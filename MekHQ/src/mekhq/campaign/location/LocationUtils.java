@@ -60,19 +60,19 @@ public final class LocationUtils {
      * <p>Both items must be non-null, neither may currently be in transit, and they must share
      * the same nearest {@link AbstractBase} ancestor (or both have none, meaning main force).</p>
      *
-     * @param a first location item
-     * @param b second location item
+     * @param firstLocation  first location item
+     * @param secondLocation second location item
      *
      * @return {@code true} if the two items are co-located
      */
-    public static boolean areSameEffectiveLocation(@Nullable ILocation a, @Nullable ILocation b) {
-        if (a == null || b == null) {
+    public static boolean areSameEffectiveLocation(@Nullable ILocation firstLocation, @Nullable ILocation secondLocation) {
+        if (firstLocation == null || secondLocation == null) {
             return false;
         }
-        if (isInTransit(a) || isInTransit(b)) {
+        if (isInTransit(firstLocation) || isInTransit(secondLocation)) {
             return false;
         }
-        return Objects.equals(findEffectiveBase(a), findEffectiveBase(b));
+        return Objects.equals(findEffectiveBase(firstLocation), findEffectiveBase(secondLocation));
     }
 
     /**

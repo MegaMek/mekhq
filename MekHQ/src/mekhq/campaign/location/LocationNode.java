@@ -104,6 +104,21 @@ public class LocationNode {
         return children.add(childLocationNode);
     }
 
+    /**
+     * Returns {@code true} if {@code node} appears anywhere in the ancestor chain of {@code potentialAncestor}, which
+     * would indicate that making {@code potentialAncestor} an ancestor of {@code node} would create a cycle.
+     */
+    static boolean wouldCreateCycle(LocationNode node, LocationNode potentialAncestor) {
+        LocationNode cursor = potentialAncestor;
+        while (cursor != null) {
+            if (cursor == node) {
+                return true;
+            }
+            cursor = cursor.getParent();
+        }
+        return false;
+    }
+
     boolean removeChild(LocationNode childLocationNode) {
         return children.remove(childLocationNode);
     }
@@ -185,6 +200,13 @@ public class LocationNode {
         }
 
         public static void setLocation(LocationNode childLocationNode, @Nullable LocationNode parentLocationNode) {
+            if ((parentLocationNode != null) && wouldCreateCycle(childLocationNode, parentLocationNode)) {
+                logger.error("Refusing to parent {} under {}: would create a location-tree cycle",
+                      childLocationNode.getLocatable(),
+                      parentLocationNode.getLocatable());
+                return;
+            }
+
             if (childLocationNode.getParent() != null) {
                 childLocationNode.getParent().removeChild(childLocationNode);
             }
