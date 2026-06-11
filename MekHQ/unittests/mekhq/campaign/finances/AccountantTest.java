@@ -16,7 +16,7 @@
  * A copy of the GPL should have been included with this project;
  * if not, see <https://www.gnu.org/licenses/>.
  *
- * NOTICE: The MegaMek Organization is a non-profit group of volunteers
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
  * creating free software for the BattleTech community.
  *
  * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks

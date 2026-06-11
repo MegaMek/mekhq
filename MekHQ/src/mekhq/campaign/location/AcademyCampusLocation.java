@@ -98,8 +98,8 @@ public class AcademyCampusLocation implements IPlace {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "academySet", academySet);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "academyName", academyName);
         for (LocationNode child : locationNode.getChildren()) {
-            if (child.getLocatable() instanceof CurrentLocation currentLoc) {
-                currentLoc.writeToXML(pw, indent);
+            if (child.getLocatable() instanceof CurrentLocation currentLocation) {
+                currentLocation.writeToXML(pw, indent);
             }
         }
         for (LocationNode child : personnel.getLocationNode().getChildren()) {

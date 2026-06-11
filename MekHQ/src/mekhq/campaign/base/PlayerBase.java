@@ -125,8 +125,8 @@ public class PlayerBase extends AbstractBase {
         // Travel nodes (CurrentLocation) sit directly under the base so they can carry
         // units and parts alongside people in the future.
         for (LocationNode child : getLocationNode().getChildren()) {
-            if (child.getLocatable() instanceof CurrentLocation currentLoc) {
-                currentLoc.writeToXML(pw, indent);
+            if (child.getLocatable() instanceof CurrentLocation currentLocation) {
+                currentLocation.writeToXML(pw, indent);
             }
         }
         // Spare parts stored at this base's warehouse.
@@ -154,10 +154,10 @@ public class PlayerBase extends AbstractBase {
                     base.pendingPersonIds.add(UUID.fromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("location")) {
                     // Travel nodes sit directly under the base (not under basePersonnel).
-                    CurrentLocation travelLoc = CurrentLocation.generateInstanceFromXML(wn2, campaign);
-                    if (travelLoc != null) {
-                        travelLoc.setParent(base);
-                        campaign.addLocation(travelLoc);
+                    CurrentLocation travelLocation = CurrentLocation.generateInstanceFromXML(wn2, campaign);
+                    if (travelLocation != null) {
+                        travelLocation.setParent(base);
+                        campaign.addLocation(travelLocation);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("baseWarehouse")) {
                     NodeList partNodes = wn2.getChildNodes();
