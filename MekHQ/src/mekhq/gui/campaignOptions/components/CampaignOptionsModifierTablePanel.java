@@ -45,6 +45,9 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 /**
  * A compact matrix panel for option groups that compare numeric modifiers across shared row labels.
  */
@@ -84,7 +87,7 @@ public class CampaignOptionsModifierTablePanel extends JPanel {
      * @param columnHeaders the header component for each data column; the column
      *                      count is taken from this array
      */
-    public CampaignOptionsModifierTablePanel(String name, JComponent... columnHeaders) {
+    public CampaignOptionsModifierTablePanel(@Nonnull String name, @Nonnull JComponent... columnHeaders) {
         this(name, DEFAULT_ROW_LABEL_WIDTH, DEFAULT_CONTROL_WIDTH, columnHeaders);
     }
 
@@ -98,8 +101,8 @@ public class CampaignOptionsModifierTablePanel extends JPanel {
      * @param columnHeaders the header component for each data column; the column
      *                      count is taken from this array
      */
-    public CampaignOptionsModifierTablePanel(String name, int rowLabelWidth, int controlWidth,
-          JComponent... columnHeaders) {
+    public CampaignOptionsModifierTablePanel(@Nonnull String name, int rowLabelWidth, int controlWidth,
+          @Nonnull JComponent... columnHeaders) {
         this.rowLabelWidth = rowLabelWidth;
         this.controlWidth = controlWidth;
         this.columnCount = columnHeaders.length;
@@ -122,7 +125,7 @@ public class CampaignOptionsModifierTablePanel extends JPanel {
      * @param rowLabel the component used as the row heading
      * @param cells    row controls, one entry for each table column
      */
-    public void addRow(JComponent rowLabel, JComponent... cells) {
+    public void addRow(@Nonnull JComponent rowLabel, @Nullable JComponent... cells) {
         if (cells.length != columnCount) {
             throw new IllegalArgumentException("Modifier table row must provide one cell per column.");
         }
@@ -278,7 +281,7 @@ public class CampaignOptionsModifierTablePanel extends JPanel {
         }
     }
 
-    private Color getAlternateRowColor() {
+    private @Nullable Color getAlternateRowColor() {
         Color color = UIManager.getColor("Table.alternateRowColor");
         Color background = UIManager.getColor("Panel.background");
         if (color == null || background == null) {

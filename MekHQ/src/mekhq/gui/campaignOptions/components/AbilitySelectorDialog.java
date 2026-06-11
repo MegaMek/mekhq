@@ -52,6 +52,8 @@ import javax.swing.WindowConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.ui.FastJScrollPane;
 import megamek.common.util.sorter.NaturalOrderComparator;
@@ -79,8 +81,8 @@ public class AbilitySelectorDialog extends JDialog {
      * @param currentSelection the ability lookup names that should start checked
      * @param allSPAs          every selectable special ability, keyed by lookup name
      */
-    public AbilitySelectorDialog(Window parent, String title, Collection<String> currentSelection,
-          Map<String, SpecialAbility> allSPAs) {
+    public AbilitySelectorDialog(@Nullable Window parent, @Nonnull String title,
+          @Nonnull Collection<String> currentSelection, @Nonnull Map<String, SpecialAbility> allSPAs) {
         super(parent, title, ModalityType.APPLICATION_MODAL);
         this.selected = new Vector<>(currentSelection);
         this.cancelled = false;
@@ -178,7 +180,7 @@ public class AbilitySelectorDialog extends JDialog {
     /**
      * @return the chosen ability lookup names; only meaningful when {@link #wasCancelled()} is {@code false}
      */
-    public Vector<String> getSelected() {
+    public @Nonnull Vector<String> getSelected() {
         return selected;
     }
 

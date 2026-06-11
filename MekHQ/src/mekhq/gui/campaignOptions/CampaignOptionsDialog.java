@@ -47,8 +47,9 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.client.ui.util.UIUtil;
-import megamek.common.annotations.Nullable;
 import mekhq.CampaignPreset;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -93,7 +94,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
      * @param frame    the parent {@link JFrame} for this dialog
      * @param campaign the {@link Campaign} instance representing the current campaign
      */
-    public CampaignOptionsDialog(final JFrame frame, final Campaign campaign) {
+    public CampaignOptionsDialog(final JFrame frame, @Nonnull final Campaign campaign) {
         super(frame,
               true,
               ResourceBundle.getBundle(getCampaignOptionsResourceBundle()),
@@ -117,7 +118,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
      * @param preset   an optional {@link CampaignPreset} to initialize the campaign (can be null)
      * @param mode     the {@link CampaignOptionsDialogMode} defining the behavior of the dialog
      */
-    public CampaignOptionsDialog(final JFrame frame, final Campaign campaign, @Nullable CampaignPreset preset,
+    public CampaignOptionsDialog(final JFrame frame, @Nonnull final Campaign campaign, @Nullable CampaignPreset preset,
           CampaignOptionsDialogMode mode) {
         super(frame,
               true,
@@ -148,7 +149,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
      * @param preset   an optional {@link CampaignPreset} to apply initial settings (maybe {@code null})
      */
     @Deprecated(since = "0.51.0", forRemoval = true)
-    public CampaignOptionsDialog(final Campaign campaign, @Nullable CampaignPreset preset) {
+    public CampaignOptionsDialog(@Nonnull final Campaign campaign, @Nullable CampaignPreset preset) {
         super(null,
               false,
               ResourceBundle.getBundle(getCampaignOptionsResourceBundle()),
@@ -182,7 +183,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
      * @return a {@link Container} representing the center pane of the dialog
      */
     @Override
-    protected Container createCenterPane() {
+    protected @Nonnull Container createCenterPane() {
         return campaignOptionsPane;
     }
 
@@ -193,7 +194,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
      * @return a {@link JPanel} representing the button panel
      */
     @Override
-    protected JPanel createButtonPanel() {
+    protected @Nonnull JPanel createButtonPanel() {
         final JPanel pnlButtons = new JPanel(new FlowLayout(FlowLayout.CENTER, BUTTON_GAP, BUTTON_GAP));
 
         // Apply Settings
@@ -302,7 +303,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
      * @param preset the {@link CampaignPreset} instance to apply
      */
     @Deprecated(since = "0.50.07", forRemoval = true)
-    public void applyPreset(CampaignPreset preset) {
+    public void applyPreset(@Nullable CampaignPreset preset) {
         campaignOptionsPane.applyPreset(preset, true);
     }
 
@@ -317,7 +318,7 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
      * @param preset    the {@link CampaignPreset} whose settings will be applied to the options pane
      * @param isStartup {@code true} if the dialog is being used during the startup of a new campaign
      */
-    public void applyPreset(CampaignPreset preset, boolean isStartup) {
+    public void applyPreset(@Nullable CampaignPreset preset, boolean isStartup) {
         campaignOptionsPane.applyPreset(preset, isStartup);
     }
 

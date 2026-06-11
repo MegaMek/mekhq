@@ -64,7 +64,8 @@ import javax.swing.JSplitPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import mekhq.CampaignPreset;
 import mekhq.MekHQ;
 import mekhq.campaign.AbstractLocation;
@@ -159,7 +160,7 @@ public class CampaignOptionsPane extends JPanel {
      * @param mode     the {@link CampaignOptionsDialogMode} for configuring the
      *                 pane's behavior
      */
-    public CampaignOptionsPane(final JFrame frame, final Campaign campaign, CampaignOptionsDialogMode mode) {
+    public CampaignOptionsPane(final JFrame frame, @Nonnull final Campaign campaign, CampaignOptionsDialogMode mode) {
         super(new BorderLayout());
         setName("campaignOptionsDialog");
         this.frame = frame;
@@ -997,7 +998,7 @@ public class CampaignOptionsPane extends JPanel {
      * @author Illiani
      * @since 0.50.11
      */
-    public static void triggerUpgradeFreebies(Campaign campaign, CampaignOptionsFreebieTracker oldOptions,
+    public static void triggerUpgradeFreebies(@Nonnull Campaign campaign, CampaignOptionsFreebieTracker oldOptions,
             CampaignOptionsFreebieTracker newOptions,
             boolean isStartUp) {
         // Store old values for use if we want to trigger certain dialogs

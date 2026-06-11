@@ -41,6 +41,8 @@ import javax.swing.BorderFactory;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 
+import jakarta.annotation.Nonnull;
+
 /**
  * Optional explanatory text shown before a sectioned campaign-options page.
  */
@@ -54,7 +56,7 @@ public class CampaignOptionsIntroPanel extends JPanel {
      * @param text      the intro text; may contain HTML markup
      * @param textWidth the width to wrap the text to, in pixels
      */
-    public CampaignOptionsIntroPanel(String name, String text, int textWidth) {
+    public CampaignOptionsIntroPanel(@Nonnull String name, @Nonnull String text, int textWidth) {
         setName("pnl" + name);
         setOpaque(false);
         setLayout(new FlowLayout(FlowLayout.LEADING, 0, 0));

@@ -43,7 +43,7 @@ import javax.swing.Scrollable;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
 
 /**

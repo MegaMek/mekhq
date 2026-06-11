@@ -49,8 +49,9 @@ import javax.swing.JSpinner.NumberEditor;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.client.ui.comboBoxes.MMComboBox;
-import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
@@ -183,7 +184,7 @@ public class FinancesTab {
      *                 associated with. Provides access to
      *                 campaign-related options and data.
      */
-    public FinancesTab(Campaign campaign) {
+    public FinancesTab(@Nonnull Campaign campaign) {
         this.campaignOptions = campaign.getCampaignOptions();
 
         initialize();
@@ -283,7 +284,7 @@ public class FinancesTab {
      * @return A fully configured JPanel representing the Finances General Options
      *         tab.
      */
-    public JPanel createFinancesGeneralOptionsTab() {
+    public @Nonnull JPanel createFinancesGeneralOptionsTab() {
         // Header
         String imageAddress = getImageDirectory() + "logo_star_league.png";
         financesGeneralOptions = new CampaignOptionsHeaderPanel("FinancesGeneralTab",
@@ -339,7 +340,7 @@ public class FinancesTab {
      * @return a JPanel instance containing the configured payment options
      *         checkboxes.
      */
-    private JPanel createPaymentsPanel() {
+    private @Nonnull JPanel createPaymentsPanel() {
         // Contents
         payForPartsBox = new CampaignOptionsCheckBox("PayForPartsBox");
         payForPartsBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "PayForPartsBox"));
@@ -394,7 +395,7 @@ public class FinancesTab {
      * @return A JPanel containing the general options components laid out in a
      *         structured format.
      */
-    private JPanel createGeneralOptionsPanel() {
+    private @Nonnull JPanel createGeneralOptionsPanel() {
         // Contents
         useLoanLimitsBox = new CampaignOptionsCheckBox("UseLoanLimitsBox",
                 getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
@@ -453,7 +454,7 @@ public class FinancesTab {
      *
      * @return A JPanel instance containing the configured sales options.
      */
-    private JPanel createSalesPanel() {
+    private @Nonnull JPanel createSalesPanel() {
         // Contents
         sellUnitsBox = new CampaignOptionsCheckBox("SellUnitsBox");
         sellUnitsBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "SellUnitsBox"));
@@ -477,7 +478,7 @@ public class FinancesTab {
      *
      * @return the configured JPanel containing the components for the taxes panel.
      */
-    private JPanel createTaxesPanel() {
+    private @Nonnull JPanel createTaxesPanel() {
         // Contents
         chkUseTaxes = new CampaignOptionsCheckBox("UseTaxesBox");
         chkUseTaxes.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "UseTaxesBox"));
@@ -507,7 +508,7 @@ public class FinancesTab {
      *
      * @return A JPanel containing the configured components for the 'Shares Panel'.
      */
-    private JPanel createSharesPanel() {
+    private @Nonnull JPanel createSharesPanel() {
         // Contents
         chkUseShareSystem = new CampaignOptionsCheckBox("UseShareSystem");
         chkUseShareSystem.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "UseShareSystem"));
@@ -523,7 +524,7 @@ public class FinancesTab {
         return panel;
     }
 
-    private JPanel createRentedFacilitiesPanel() {
+    private @Nonnull JPanel createRentedFacilitiesPanel() {
         // Contents
         lblRentedFacilitiesCostHospitalBeds = new CampaignOptionsLabel("RentedFacilitiesCostHospitalBeds",
                 getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
@@ -617,7 +618,7 @@ public class FinancesTab {
      *
      * @return a JPanel representing the Price Multipliers tab
      */
-    public JPanel createPriceMultipliersTab() {
+    public @Nonnull JPanel createPriceMultipliersTab() {
         // Header
         String imageAddress = getImageDirectory() + "logo_clan_stone_lion.png";
         priceMultipliersHeader = new CampaignOptionsHeaderPanel("PriceMultipliersTab",
@@ -660,7 +661,7 @@ public class FinancesTab {
      *
      * @return a JPanel containing the components for setting general multipliers.
      */
-    private JPanel createGeneralMultipliersPanel() {
+    private @Nonnull JPanel createGeneralMultipliersPanel() {
         // Contents
         lblCommonPartPriceMultiplier = new CampaignOptionsLabel("CommonPartPriceMultiplier");
         lblCommonPartPriceMultiplier.addMouseListener(createTipPanelUpdater(priceMultipliersHeader,
@@ -745,7 +746,7 @@ public class FinancesTab {
      * @return A JPanel containing labels and spinners for used parts price
      *         multipliers.
      */
-    private JPanel createUsedPartsMultiplierPanel() {
+    private @Nonnull JPanel createUsedPartsMultiplierPanel() {
         // Contents
         lblUsedPartPriceMultipliers = new JLabel[QUALITY_F.ordinal() + 1];
         spnUsedPartPriceMultipliers = new JSpinner[QUALITY_F.ordinal() + 1];
@@ -788,7 +789,7 @@ public class FinancesTab {
      * @return a JPanel instance containing the components for configuring the
      *         multipliers.
      */
-    private JPanel createOtherMultipliersPanel() {
+    private @Nonnull JPanel createOtherMultipliersPanel() {
         // Contents
         lblDamagedPartsValueMultiplier = new CampaignOptionsLabel("DamagedPartsValueMultiplier");
         lblDamagedPartsValueMultiplier.addMouseListener(createTipPanelUpdater(priceMultipliersHeader,
@@ -846,7 +847,7 @@ public class FinancesTab {
      *
      * @return the assembled paired-field grid panel
      */
-    private CampaignOptionsPairedFieldGridPanel createPriceMultiplierGridPanel(String name, JComponent[] labels,
+    private @Nonnull CampaignOptionsPairedFieldGridPanel createPriceMultiplierGridPanel(String name, JComponent[] labels,
             JComponent[] controls) {
         final CampaignOptionsPairedFieldGridPanel panel = new CampaignOptionsPairedFieldGridPanel(name,
                 FINANCES_GRID_FIRST_PAIR_COLUMN_WIDTH,

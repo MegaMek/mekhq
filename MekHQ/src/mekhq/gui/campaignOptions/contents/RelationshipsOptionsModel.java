@@ -32,6 +32,7 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import jakarta.annotation.Nonnull;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.BabySurnameStyle;
 import mekhq.campaign.personnel.enums.RandomDivorceMethod;
@@ -81,7 +82,7 @@ class RelationshipsOptionsModel {
     int interestedInSameSexDiceSize;
     int interestedInBothSexesDiceSize;
 
-    RelationshipsOptionsModel(CampaignOptions options) {
+    RelationshipsOptionsModel(@Nonnull CampaignOptions options) {
         useManualMarriages = options.isUseManualMarriages();
         useClanPersonnelMarriages = options.isUseClanPersonnelMarriages();
         usePrisonerMarriages = options.isUsePrisonerMarriages();
@@ -125,7 +126,7 @@ class RelationshipsOptionsModel {
         interestedInBothSexesDiceSize = options.getInterestedInBothSexesDiceSize();
     }
 
-    void applyTo(CampaignOptions options) {
+    void applyTo(@Nonnull CampaignOptions options) {
         options.setUseManualMarriages(useManualMarriages);
         options.setUseClanPersonnelMarriages(useClanPersonnelMarriages);
         options.setUsePrisonerMarriages(usePrisonerMarriages);

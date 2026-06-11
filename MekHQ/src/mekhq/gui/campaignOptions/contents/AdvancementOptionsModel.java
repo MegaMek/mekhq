@@ -35,6 +35,7 @@ package mekhq.gui.campaignOptions.contents;
 import java.util.HashMap;
 import java.util.Map;
 
+import jakarta.annotation.Nonnull;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
@@ -81,7 +82,7 @@ class AdvancementOptionsModel {
     int secondSkillBonus;
     Map<PersonnelRole, Integer> recruitmentBonuses;
 
-    AdvancementOptionsModel(CampaignOptions options, RandomSkillPreferences skillPreferences) {
+    AdvancementOptionsModel(@Nonnull CampaignOptions options, @Nonnull RandomSkillPreferences skillPreferences) {
         xpCostMultiplier = options.getXpCostMultiplier();
         taskXP = options.getTaskXP();
         nTasksXP = options.getNTasksXP();
@@ -120,7 +121,7 @@ class AdvancementOptionsModel {
         recruitmentBonuses = new HashMap<>(skillPreferences.getRecruitmentBonuses());
     }
 
-    void applyTo(CampaignOptions options, RandomSkillPreferences skillPreferences) {
+    void applyTo(@Nonnull CampaignOptions options, @Nonnull RandomSkillPreferences skillPreferences) {
         options.setXpCostMultiplier(xpCostMultiplier);
         options.setTaskXP(taskXP);
         options.setNTasksXP(nTasksXP);

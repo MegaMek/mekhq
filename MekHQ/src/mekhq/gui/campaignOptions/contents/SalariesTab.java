@@ -67,8 +67,9 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableRowSorter;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.client.ui.util.UIUtil;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -139,7 +140,7 @@ public class SalariesTab {
      * @param campaignOptions the {@link CampaignOptions} instance to be used for initializing and managing personnel
      *                        options.
      */
-    public SalariesTab(CampaignOptions campaignOptions) {
+    public SalariesTab(@Nonnull CampaignOptions campaignOptions) {
         this.campaignOptions = campaignOptions;
 
         initialize();
@@ -184,7 +185,7 @@ public class SalariesTab {
      *
      * @return a {@link JPanel} representing the Salaries Tab.
      */
-    public JPanel createSalariesTab(PersonnelRoleSubType type) {
+    public @Nonnull JPanel createSalariesTab(PersonnelRoleSubType type) {
         // Header
         String imageAddress = getImageDirectory() + "logo_clan_coyote.png";
         String headerName = getHeaderName(type);
@@ -243,7 +244,7 @@ public class SalariesTab {
         };
     }
 
-    private JPanel createSalaryRulesPanel() {
+    private @Nonnull JPanel createSalaryRulesPanel() {
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("SalaryRulesPanel",
               FORM_LABEL_COLUMN_WIDTH,
               FORM_CONTROL_COLUMN_WIDTH);
@@ -257,7 +258,7 @@ public class SalariesTab {
      *
      * @return a {@link JPanel} containing salary multiplier options.
      */
-    private JPanel createSalaryMultipliersPanel() {
+    private @Nonnull JPanel createSalaryMultipliersPanel() {
         // Contents
         lblAntiMekSalary = new CampaignOptionsLabel("AntiMekSalary");
         lblAntiMekSalary.addMouseListener(createTipPanelUpdater(salariesHeader, "AntiMekSalary"));
@@ -287,7 +288,7 @@ public class SalariesTab {
      *
      * @return a {@link JPanel} containing settings for skill-based experience multipliers.
      */
-    private JPanel createExperienceMultipliersPanel() {
+    private @Nonnull JPanel createExperienceMultipliersPanel() {
         // Contents
         SkillLevel[] skillLevels = Skills.SKILL_LEVELS;
 
@@ -325,7 +326,7 @@ public class SalariesTab {
      *
      * @return a {@link JPanel} containing settings for base salaries.
      */
-    private JPanel createBaseSalariesPanel(PersonnelRoleSubType type) {
+    private @Nonnull JPanel createBaseSalariesPanel(PersonnelRoleSubType type) {
         if (type == PersonnelRoleSubType.CIVILIAN) {
             return createCivilianBaseSalariesPanel();
         }
@@ -394,7 +395,7 @@ public class SalariesTab {
         return spinner;
     }
 
-    private JPanel createPairedFieldGridPanel(String name, JComponent[] labels, JComponent[] controls,
+    private @Nonnull JPanel createPairedFieldGridPanel(String name, JComponent[] labels, JComponent[] controls,
             int columnCount, int controlWidth) {
         CampaignOptionsPairedFieldGridPanel panel = new CampaignOptionsPairedFieldGridPanel(name,
               FORM_LABEL_COLUMN_WIDTH + FORM_LABEL_CONTROL_GAP,
@@ -405,7 +406,7 @@ public class SalariesTab {
           return panel;
     }
 
-    private JPanel createCivilianBaseSalariesPanel() {
+    private @Nonnull JPanel createCivilianBaseSalariesPanel() {
         civilianSalaryTableModel = new SalaryTableModel(civilianRoles);
         if (model != null) {
             civilianSalaryTableModel.setValues(model.roleBaseSalaries);

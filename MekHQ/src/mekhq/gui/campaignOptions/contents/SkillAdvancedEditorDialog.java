@@ -51,6 +51,8 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.WindowConstants;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.client.ui.util.UIUtil;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 
@@ -85,7 +87,8 @@ class SkillAdvancedEditorDialog extends JDialog {
      * @param skillDisplayName the human-readable skill name shown in the title
      * @param config           the configuration to edit; only mutated when the user confirms
      */
-    SkillAdvancedEditorDialog(Window parent, String skillDisplayName, SkillConfiguration config) {
+    SkillAdvancedEditorDialog(@Nullable Window parent, @Nonnull String skillDisplayName,
+          @Nonnull SkillConfiguration config) {
         super(parent, getTextAt(getCampaignOptionsResourceBundle(), "skillAdvancedEditor.title") + skillDisplayName,
               ModalityType.APPLICATION_MODAL);
         this.config = config;

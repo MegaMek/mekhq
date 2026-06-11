@@ -51,10 +51,11 @@ import java.util.Map;
 import javax.swing.*;
 import javax.swing.table.TableColumn;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.comboBoxes.MMComboBox;
-import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -250,7 +251,7 @@ public class BiographyTab {
      *                   origin options are derived from this object.
      * @param generalTab The currently active General Tab.
      */
-    public BiographyTab(Campaign campaign, GeneralTab generalTab) {
+    public BiographyTab(@Nonnull Campaign campaign, GeneralTab generalTab) {
         this.campaign = campaign;
         this.generalTab = generalTab;
         this.campaignOptions = campaign.getCampaignOptions();
@@ -472,7 +473,7 @@ public class BiographyTab {
      * @return A `JPanel` representing the General tab in the campaign options
      *         dialog.
      */
-    public JPanel createGeneralTab() {
+    public @Nonnull JPanel createGeneralTab() {
         // Header
         String imageAddress = getImageDirectory() + "logo_clan_blood_spirit.png";
         generalHeader = new CampaignOptionsHeaderPanel("BiographyGeneralTab", imageAddress, 6);
@@ -519,7 +520,7 @@ public class BiographyTab {
         return panel;
     }
 
-    private JPanel createBiographyGeneralOptionsPanel() {
+    private @Nonnull JPanel createBiographyGeneralOptionsPanel() {
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("BiographyGeneralOptionsPanel",
                 FORM_LABEL_COLUMN_WIDTH,
                 FORM_CONTROL_COLUMN_WIDTH);
@@ -542,7 +543,7 @@ public class BiographyTab {
      * @return A `JPanel` containing the UI components for defining
      *         anniversary-related settings.
      */
-    private JPanel createAnniversariesPanel() {
+    private @Nonnull JPanel createAnniversariesPanel() {
         // Contents
         chkAnnounceBirthdays = new CampaignOptionsCheckBox("AnnounceBirthdays");
         chkAnnounceBirthdays.addMouseListener(createTipPanelUpdater(generalHeader, "AnnounceBirthdays"));
@@ -568,7 +569,7 @@ public class BiographyTab {
         return panel;
     }
 
-    private JPanel createLifeEventsPanel() {
+    private @Nonnull JPanel createLifeEventsPanel() {
         // Contents
         chkShowLifeEventDialogBirths = new CampaignOptionsCheckBox("ShowLifeEventDialogBirths");
         chkShowLifeEventDialogBirths.addMouseListener(createTipPanelUpdater(generalHeader,
@@ -592,7 +593,7 @@ public class BiographyTab {
         return panel;
     }
 
-    private JPanel createComingOfAgePanel() {
+    private @Nonnull JPanel createComingOfAgePanel() {
         // Contents
         chkVeterancySPAs = new CampaignOptionsCheckBox("VeterancySPAs",
                 getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.RECOMMENDED));
@@ -636,7 +637,7 @@ public class BiographyTab {
      * @return A `JPanel` representing the Backgrounds tab in the campaign options
      *         dialog.
      */
-    public JPanel createBackgroundsTab() {
+    public @Nonnull JPanel createBackgroundsTab() {
         // Header
         String imageAddress = getImageDirectory() + "logo_nueva_castile.png";
         backgroundHeader = new CampaignOptionsHeaderPanel("BackgroundsTab", imageAddress, 3);
@@ -675,7 +676,7 @@ public class BiographyTab {
      *
      * @return A {@code JPanel} representing the random background configuration UI.
      */
-    JPanel createRandomBackgroundsPanel() {
+    @Nonnull JPanel createRandomBackgroundsPanel() {
         // Contents
         chkUseRandomPersonalities = new CampaignOptionsCheckBox("UseRandomPersonalities",
                 getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.DOCUMENTED));
@@ -716,7 +717,7 @@ public class BiographyTab {
      *
      * @return A `JPanel` for managing random origin settings.
      */
-    private JPanel createRandomOriginOptionsPanel() {
+    private @Nonnull JPanel createRandomOriginOptionsPanel() {
         // Contents
         chkRandomizeOrigin = new CampaignOptionsCheckBox("RandomizeOrigin");
         chkRandomizeOrigin.addMouseListener(createTipPanelUpdater(backgroundHeader, "RandomizeOrigin"));
@@ -962,7 +963,7 @@ public class BiographyTab {
      *
      * @return A `JPanel` representing the Death tab.
      */
-    public JPanel createDeathTab() {
+    public @Nonnull JPanel createDeathTab() {
         // Header
         String imageAddress = getImageDirectory() + "logo_clan_fire_mandrills.png";
         deathHeader = new CampaignOptionsHeaderPanel("DeathTab", imageAddress, 5);
@@ -993,7 +994,7 @@ public class BiographyTab {
         return panel;
     }
 
-    private JPanel createDeathOptionsPanel() {
+    private @Nonnull JPanel createDeathOptionsPanel() {
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("DeathOptionsPanel",
                 FORM_LABEL_COLUMN_WIDTH,
                 FORM_CONTROL_COLUMN_WIDTH);
@@ -1010,7 +1011,7 @@ public class BiographyTab {
      *
      * @return A `JPanel` containing the random death age group options.
      */
-    private JPanel createDeathAgeGroupsPanel() {
+    private @Nonnull JPanel createDeathAgeGroupsPanel() {
         final AgeGroup[] ageGroups = AgeGroup.values();
 
         // Contents
@@ -1049,7 +1050,7 @@ public class BiographyTab {
      *
      * @return A {@code JPanel} representing the Education tab in the campaign UI.
      */
-    public JPanel createEducationTab() {
+    public @Nonnull JPanel createEducationTab() {
         // Header
         String imageAddress = getImageDirectory() + "logo_taurian_concordat.png";
         educationHeader = new CampaignOptionsHeaderPanel("EducationTab", imageAddress, 3);
@@ -1108,7 +1109,7 @@ public class BiographyTab {
         return panel;
     }
 
-    private JPanel createEducationOptionsPanel() {
+    private @Nonnull JPanel createEducationOptionsPanel() {
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("EducationOptionsPanel",
                 FORM_LABEL_COLUMN_WIDTH,
                 FORM_CONTROL_COLUMN_WIDTH);
@@ -1136,7 +1137,7 @@ public class BiographyTab {
      *
      * @return A {@code JPanel} containing the Enable Standard Sets UI components.
      */
-    private JPanel createEnableStandardSetsPanel() {
+    private @Nonnull JPanel createEnableStandardSetsPanel() {
         chkEnableLocalAcademies = new CampaignOptionsCheckBox("EnableLocalAcademies");
         chkEnableLocalAcademies.addMouseListener(createTipPanelUpdater(educationHeader, "EnableLocalAcademies"));
         chkEnablePrestigiousAcademies = new CampaignOptionsCheckBox("EnablePrestigiousAcademies");
@@ -1167,7 +1168,7 @@ public class BiographyTab {
      *
      * @return A {@code JPanel} for managing XP rates and skill bonuses.
      */
-    private JPanel createXpAndSkillBonusesPanel() {
+    private @Nonnull JPanel createXpAndSkillBonusesPanel() {
         // Contents
         chkEnableBonuses = new CampaignOptionsCheckBox("EnableBonuses");
         chkEnableBonuses.addMouseListener(createTipPanelUpdater(educationHeader, "EnableBonuses"));
@@ -1198,7 +1199,7 @@ public class BiographyTab {
      *
      * @return A {@code JPanel} for managing dropout change settings.
      */
-    private JPanel createDropoutChancePanel() {
+    private @Nonnull JPanel createDropoutChancePanel() {
         // Contents
         lblAdultDropoutChance = new CampaignOptionsLabel("AdultDropoutChance");
         lblAdultDropoutChance.addMouseListener(createTipPanelUpdater(educationHeader, "AdultDropoutChance"));
@@ -1233,7 +1234,7 @@ public class BiographyTab {
      * @return A {@code JPanel} containing the accidents and events configuration
      *         UI.
      */
-    private JPanel createAccidentsAndEventsPanel() {
+    private @Nonnull JPanel createAccidentsAndEventsPanel() {
         // Contents
         chkAllAges = new CampaignOptionsCheckBox("AllAges");
         chkAllAges.addMouseListener(createTipPanelUpdater(educationHeader, "AllAges"));
@@ -1268,7 +1269,7 @@ public class BiographyTab {
      *
      * @return A {@code JPanel} representing the Name and Portrait Generation tab.
      */
-    public JPanel createNameAndPortraitGenerationTab() {
+    public @Nonnull JPanel createNameAndPortraitGenerationTab() {
         // Header
         String imageAddress = getImageDirectory() + "logo_clan_nova_cat.png";
         nameAndPortraitGenerationHeader = new CampaignOptionsHeaderPanel("NameAndPortraitGenerationTab",
@@ -1326,7 +1327,7 @@ public class BiographyTab {
         return panel;
     }
 
-    private JPanel createNameGenerationPanel() {
+    private @Nonnull JPanel createNameGenerationPanel() {
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("NameGenerationPanel",
                 FORM_LABEL_COLUMN_WIDTH,
                 FORM_CONTROL_COLUMN_WIDTH);
@@ -1336,7 +1337,7 @@ public class BiographyTab {
         return panel;
     }
 
-    private JPanel createPortraitRulesPanel() {
+    private @Nonnull JPanel createPortraitRulesPanel() {
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("PortraitRulesPanel",
                 FORM_LABEL_COLUMN_WIDTH,
                 FORM_CONTROL_COLUMN_WIDTH);
@@ -1363,7 +1364,7 @@ public class BiographyTab {
      * @return A {@code JPanel} containing the random portrait generation
      *         configuration UI.
      */
-    private JPanel createRandomPortraitPanel() {
+    private @Nonnull JPanel createRandomPortraitPanel() {
         // Contents
         chkUsePortrait = new JCheckBox[personnelRoles.size() + 1];
 
@@ -1437,7 +1438,7 @@ public class BiographyTab {
         return panel;
     }
 
-    private JButton createPortraitAssignmentButton(String name) {
+    private @Nonnull JButton createPortraitAssignmentButton(String name) {
         JButton button = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".text"));
         button.setName("btn" + name);
         button.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".tooltip"));
@@ -1457,7 +1458,7 @@ public class BiographyTab {
      * @return A {@code JPanel} representing the Rank tab in the campaign
      *         configuration.
      */
-    public JPanel createRankTab() {
+    public @Nonnull JPanel createRankTab() {
         // Header
         String imageAddress = getImageDirectory() + "logo_umayyad_caliphate.png";
         CampaignOptionsHeaderPanel headerPanel = new CampaignOptionsHeaderPanel("RankTab", imageAddress);
@@ -1472,7 +1473,7 @@ public class BiographyTab {
             .build();
     }
 
-    private JPanel createRankSystemsPanel() {
+    private @Nonnull JPanel createRankSystemsPanel() {
         rankSystemsPane.applyToCampaign();
         configureEmbeddedRankSystemsPane();
 

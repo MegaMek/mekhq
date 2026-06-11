@@ -46,7 +46,8 @@ import javax.swing.SwingUtilities;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
 
 /**
@@ -75,7 +76,7 @@ public class CampaignOptionsSpinner extends JSpinner {
      * @param noTooltip      if {@code true}, the spinner will not have a tooltip
      * @param metadata       version and flag metadata for displaying badges in tooltip, or {@code null} for no badges
      */
-    public CampaignOptionsSpinner(String name, @Nullable Integer customWrapSize,
+    public CampaignOptionsSpinner(@Nonnull String name, @Nullable Integer customWrapSize,
           Number defaultValue, Number minimum, Number maximum, Number stepSize, boolean noTooltip,
           @Nullable CampaignOptionsMetadata metadata) {
         super(createSpinnerModel(defaultValue, minimum, maximum, stepSize));
@@ -101,7 +102,7 @@ public class CampaignOptionsSpinner extends JSpinner {
      * @param maximum      the maximum value for the spinner (integer)
      * @param stepSize     the step value for incrementing or decrementing the spinner (integer)
      */
-    public CampaignOptionsSpinner(String name, int defaultValue, int minimum,
+    public CampaignOptionsSpinner(@Nonnull String name, int defaultValue, int minimum,
           int maximum, int stepSize) {
         this(name, null, defaultValue, minimum, maximum, stepSize, false, null);
     }
@@ -118,7 +119,7 @@ public class CampaignOptionsSpinner extends JSpinner {
      * @param maximum      the maximum value for the spinner (double)
      * @param stepSize     the step value for incrementing or decrementing the spinner (double)
      */
-    public CampaignOptionsSpinner(String name, double defaultValue, double minimum,
+    public CampaignOptionsSpinner(@Nonnull String name, double defaultValue, double minimum,
           double maximum, double stepSize) {
         this(name, null, defaultValue, minimum, maximum, stepSize, false, null);
     }
@@ -133,7 +134,7 @@ public class CampaignOptionsSpinner extends JSpinner {
      * @param stepSize     the step value for incrementing or decrementing the spinner (integer)
      * @param metadata     version and flag metadata for displaying badges in tooltip, or {@code null} for no badges
      */
-    public CampaignOptionsSpinner(String name, int defaultValue, int minimum,
+    public CampaignOptionsSpinner(@Nonnull String name, int defaultValue, int minimum,
           int maximum, int stepSize, @Nullable CampaignOptionsMetadata metadata) {
         this(name, null, defaultValue, minimum, maximum, stepSize, false, metadata);
     }
@@ -148,7 +149,7 @@ public class CampaignOptionsSpinner extends JSpinner {
      * @param stepSize     the step value for incrementing or decrementing the spinner (double)
      * @param metadata     version and flag metadata for displaying badges in tooltip, or {@code null} for no badges
      */
-    public CampaignOptionsSpinner(String name, double defaultValue, double minimum,
+    public CampaignOptionsSpinner(@Nonnull String name, double defaultValue, double minimum,
           double maximum, double stepSize, @Nullable CampaignOptionsMetadata metadata) {
         this(name, null, defaultValue, minimum, maximum, stepSize, false, metadata);
     }
@@ -165,7 +166,7 @@ public class CampaignOptionsSpinner extends JSpinner {
      * @param stepSize       the step value for incrementing or decrementing the spinner (integer)
      * @param noTooltip      if {@code true}, the spinner will not have a tooltip
      */
-    public CampaignOptionsSpinner(String name, @Nullable Integer customWrapSize, int defaultValue, int minimum,
+    public CampaignOptionsSpinner(@Nonnull String name, @Nullable Integer customWrapSize, int defaultValue, int minimum,
           int maximum, int stepSize, boolean noTooltip) {
         this(name, customWrapSize, defaultValue, minimum, maximum, stepSize, noTooltip, null);
     }
@@ -182,7 +183,7 @@ public class CampaignOptionsSpinner extends JSpinner {
      * @param stepSize       the step value for incrementing or decrementing the spinner (double)
      * @param noTooltip      if {@code true}, the spinner will not have a tooltip
      */
-    public CampaignOptionsSpinner(String name, @Nullable Integer customWrapSize, double defaultValue, double minimum,
+    public CampaignOptionsSpinner(@Nonnull String name, @Nullable Integer customWrapSize, double defaultValue, double minimum,
           double maximum, double stepSize, boolean noTooltip) {
         this(name, customWrapSize, defaultValue, minimum, maximum, stepSize, noTooltip, null);
     }
@@ -248,7 +249,7 @@ public class CampaignOptionsSpinner extends JSpinner {
      *
      * @param spinner the spinner whose editor should auto-select its value on focus
      */
-    public static void installSelectAllOnFocus(JSpinner spinner) {
+    public static void installSelectAllOnFocus(@Nonnull JSpinner spinner) {
         if (spinner.getEditor() instanceof DefaultEditor editor) {
             JTextField textField = editor.getTextField();
             textField.addFocusListener(new FocusAdapter() {

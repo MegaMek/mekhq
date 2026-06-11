@@ -47,13 +47,14 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.dialogs.buttonDialogs.GameOptionsDialog;
 import megamek.client.ui.enums.ValidationState;
 import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
 import megamek.client.ui.preferences.JToggleButtonPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.annotations.Nullable;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.options.GameOptions;
 import megamek.common.util.sorter.NaturalOrderComparator;
@@ -86,7 +87,7 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
 
     //region Variable Declarations
     private final Campaign campaign;
-    private CampaignPreset preset;
+    private @Nullable CampaignPreset preset;
 
     private JTextField txtPresetName;
     private JTextArea txtPresetDescription;
@@ -105,7 +106,7 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
     private JSpinner spnContractCount;
     private JCheckBox chkGM;
     private JCheckBox chkSpecifyCompanyGenerationOptions;
-    private CompanyGenerationOptions companyGenerationOptions;
+    private @Nullable CompanyGenerationOptions companyGenerationOptions;
     //endregion Startup
 
     //region Continuous
@@ -120,7 +121,7 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
     //endregion Variable Declarations
 
     //region Constructors
-    public CreateCampaignPreset(final JFrame frame, final Campaign campaign,
+    public CreateCampaignPreset(final JFrame frame, final @Nonnull Campaign campaign,
           final @Nullable CampaignPreset preset) {
         super(frame, "CreateCampaignPresetDialog", "CreateCampaignPresetDialog.title");
         this.campaign = campaign;
@@ -142,7 +143,7 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
     //endregion Constructors
 
     //region Getters/Setters
-    public Campaign getCampaign() {
+    public @Nonnull Campaign getCampaign() {
         return campaign;
     }
 
@@ -311,7 +312,7 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         this.chkSpecifyGameOptions = chkSpecifyGameOptions;
     }
 
-    public GameOptions getGameOptions() {
+    public @Nonnull GameOptions getGameOptions() {
         return gameOptions;
     }
 
@@ -323,19 +324,19 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         this.chkSpecifyCampaignOptions = chkSpecifyCampaignOptions;
     }
 
-    public CampaignOptions getCampaignOptions() {
+    public @Nonnull CampaignOptions getCampaignOptions() {
         return campaignOptions;
     }
 
-    public RandomSkillPreferences getRandomSkillPreferences() {
+    public @Nonnull RandomSkillPreferences getRandomSkillPreferences() {
         return randomSkillPreferences;
     }
 
-    public Map<String, SkillType> getSkills() {
+    public @Nonnull Map<String, SkillType> getSkills() {
         return skills;
     }
 
-    public Map<String, SpecialAbility> getSpecialAbilities() {
+    public @Nonnull Map<String, SpecialAbility> getSpecialAbilities() {
         return specialAbilities;
     }
     //endregion Continuous
@@ -343,7 +344,7 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
 
     //region Initialization
     @Override
-    protected Container createCenterPane() {
+    protected @Nonnull Container createCenterPane() {
         final int padding = UIUtil.scaleForGUI(5);
 
         final JPanel panel = new JPanel(new GridBagLayout());
@@ -827,7 +828,7 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
 
     //region Button Actions
     @Override
-    protected JPanel createButtonPanel() {
+    protected @Nonnull JPanel createButtonPanel() {
         final int gap = UIUtil.scaleForGUI(8);
         final JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, gap, gap));
 
@@ -899,7 +900,7 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
     }
 
     @Override
-    protected ValidationState validateAction(final boolean display) {
+    protected @Nonnull ValidationState validateAction(final boolean display) {
         if (getTxtPresetName().getText().isBlank()) {
             final String text = resources.getString("blankPresetName.text");
             if (display) {

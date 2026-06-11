@@ -32,6 +32,7 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import jakarta.annotation.Nonnull;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.TurnoverFrequency;
 
@@ -78,7 +79,7 @@ class TurnoverAndRetentionOptionsModel {
     int fatigueUndeploymentThreshold;
     int fatigueLeaveThreshold;
 
-    TurnoverAndRetentionOptionsModel(CampaignOptions options) {
+    TurnoverAndRetentionOptionsModel(@Nonnull CampaignOptions options) {
         useRandomRetirement = options.isUseRandomRetirement();
         turnoverFixedTargetNumber = options.getTurnoverFixedTargetNumber();
         turnoverFrequency = options.getTurnoverFrequency();
@@ -122,7 +123,7 @@ class TurnoverAndRetentionOptionsModel {
         fatigueLeaveThreshold = options.getFatigueLeaveThreshold();
     }
 
-    void applyTo(CampaignOptions options) {
+    void applyTo(@Nonnull CampaignOptions options) {
         options.setUseRandomRetirement(useRandomRetirement);
         options.setTurnoverFixedTargetNumber(turnoverFixedTargetNumber);
         options.setTurnoverFrequency(turnoverFrequency);

@@ -59,6 +59,9 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 /**
  * Left-side navigation tree and filter for the Campaign Options dialog.
  */
@@ -71,12 +74,12 @@ class CampaignOptionsNavigationPanel extends JPanel {
     private final JTextField filterField;
     private final JLabel filterStatusLabel;
     private final JTree navigationTree;
-    private CampaignOptionsRoute currentRoute;
+    private @Nullable CampaignOptionsRoute currentRoute;
     private boolean isSyncingSelection;
-    private Runnable searchIndexInitializer;
+    private @Nullable Runnable searchIndexInitializer;
 
-    CampaignOptionsNavigationPanel(List<CampaignOptionsRoute> routes,
-          Consumer<CampaignOptionsRoute> routeSelectionListener) {
+    CampaignOptionsNavigationPanel(@Nonnull List<CampaignOptionsRoute> routes,
+          @Nonnull Consumer<CampaignOptionsRoute> routeSelectionListener) {
         super(new BorderLayout());
         this.routes = routes;
         this.routeSelectionListener = routeSelectionListener;
@@ -317,7 +320,7 @@ class CampaignOptionsNavigationPanel extends JPanel {
         return child;
     }
 
-    private CampaignOptionsRoute getSelectedRoute() {
+    private @Nullable CampaignOptionsRoute getSelectedRoute() {
         TreePath selectionPath = navigationTree.getSelectionPath();
         if (selectionPath == null) {
             return null;
@@ -332,7 +335,8 @@ class CampaignOptionsNavigationPanel extends JPanel {
         return null;
     }
 
-    private DefaultMutableTreeNode findNavigationNode(DefaultMutableTreeNode node, CampaignOptionsRoute route) {
+    private @Nullable DefaultMutableTreeNode findNavigationNode(DefaultMutableTreeNode node,
+          CampaignOptionsRoute route) {
         if (node.getUserObject() instanceof NavigationTreeNode treeNode && treeNode.route == route) {
             return node;
         }
@@ -350,15 +354,15 @@ class CampaignOptionsNavigationPanel extends JPanel {
 
     private static class NavigationTreeNode {
         private final String label;
-        private CampaignOptionsRoute route;
+        private @Nullable CampaignOptionsRoute route;
 
-        private NavigationTreeNode(String label, CampaignOptionsRoute route) {
+        private NavigationTreeNode(String label, @Nullable CampaignOptionsRoute route) {
             this.label = label;
             this.route = route;
         }
 
         @Override
-        public String toString() {
+        public @Nonnull String toString() {
             return label;
         }
     }

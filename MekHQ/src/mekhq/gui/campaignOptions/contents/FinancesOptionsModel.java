@@ -34,6 +34,7 @@ package mekhq.gui.campaignOptions.contents;
 
 import java.util.Arrays;
 
+import jakarta.annotation.Nonnull;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
 
@@ -77,7 +78,7 @@ class FinancesOptionsModel {
     double unrepairablePartsValueMultiplier;
     double cancelledOrderRefundMultiplier;
 
-    FinancesOptionsModel(CampaignOptions options) {
+    FinancesOptionsModel(@Nonnull CampaignOptions options) {
         useLoanLimits = options.isUseLoanLimits();
         usePercentageMaintenance = options.isUsePercentageMaintenance();
         useExtendedPartsModifier = options.isUseExtendedPartsModifier();
@@ -119,7 +120,7 @@ class FinancesOptionsModel {
         cancelledOrderRefundMultiplier = options.getCancelledOrderRefundMultiplier();
     }
 
-    void applyTo(CampaignOptions options) {
+    void applyTo(@Nonnull CampaignOptions options) {
         options.setLoanLimits(useLoanLimits);
         options.setUsePercentageMaintenance(usePercentageMaintenance);
         options.setUseExtendedPartsModifier(useExtendedPartsModifier);

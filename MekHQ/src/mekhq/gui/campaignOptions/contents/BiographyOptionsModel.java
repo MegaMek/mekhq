@@ -37,6 +37,8 @@ import static megamek.client.generator.RandomGenderGenerator.getPercentFemale;
 import java.util.EnumMap;
 import java.util.Map;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import mekhq.campaign.RandomOriginOptions;
@@ -69,7 +71,7 @@ class BiographyOptionsModel {
     boolean randomizeOrigin;
     boolean randomizeDependentOrigin;
     boolean randomizeAroundSpecifiedPlanet;
-    Planet specifiedPlanet;
+    @Nullable Planet specifiedPlanet;
     int originSearchRadius;
     double originDistanceScale;
     boolean allowClanOrigins;
@@ -102,7 +104,7 @@ class BiographyOptionsModel {
     boolean childPortraitsWhenComingOfAge;
     final boolean[] usePortraitForRole;
 
-    BiographyOptionsModel(CampaignOptions options, RandomOriginOptions originOptions) {
+    BiographyOptionsModel(@Nonnull CampaignOptions options, @Nonnull RandomOriginOptions originOptions) {
         useDylansRandomXP = options.isUseDylansRandomXP();
         percentFemale = getPercentFemale();
         nonBinaryDiceSize = options.getNonBinaryDiceSize();
@@ -159,7 +161,7 @@ class BiographyOptionsModel {
         usePortraitForRole = options.isUsePortraitForRoles().clone();
     }
 
-    void applyTo(CampaignOptions options, RandomOriginOptions originOptions) {
+    void applyTo(@Nonnull CampaignOptions options, @Nonnull RandomOriginOptions originOptions) {
         options.setUseDylansRandomXP(useDylansRandomXP);
         RandomGenderGenerator.setPercentFemale(percentFemale);
         options.setNonBinaryDiceSize(nonBinaryDiceSize);

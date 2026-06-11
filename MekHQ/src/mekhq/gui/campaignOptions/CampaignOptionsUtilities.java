@@ -57,9 +57,10 @@ import javax.swing.GroupLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.client.ui.util.UIUtil;
-import megamek.common.annotations.Nullable;
 import mekhq.gui.baseComponents.MHQCollapsiblePanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
@@ -125,7 +126,7 @@ public class CampaignOptionsUtilities {
      *
      * @return a CampaignOptionMetadata instance, either from cache or newly created
      */
-    public static CampaignOptionsMetadata getMetadata(@Nullable Version version, CampaignOptionFlag... flags) {
+    public static @Nonnull CampaignOptionsMetadata getMetadata(@Nullable Version version, CampaignOptionFlag... flags) {
         String key = buildMetadataKey(version, flags);
         return METADATA_CACHE.computeIfAbsent(key, k -> new CampaignOptionsMetadata(version, Set.of(flags)));
     }
@@ -148,7 +149,7 @@ public class CampaignOptionsUtilities {
         return versionKey + ":" + flagsKey;
     }
 
-    public static String getCampaignOptionsResourceBundle() {
+    public static @Nonnull String getCampaignOptionsResourceBundle() {
         return RESOURCE_BUNDLE;
     }
 
@@ -161,7 +162,7 @@ public class CampaignOptionsUtilities {
      *
      * @return a {@link String} representing the path to the image directory.
      */
-    public static String getImageDirectory() {
+    public static @Nonnull String getImageDirectory() {
         return IMAGE_DIRECTORY;
     }
 
@@ -177,7 +178,7 @@ public class CampaignOptionsUtilities {
      *
      * @return the {@link GroupLayout} instance configured for the given panel.
      */
-    public static GroupLayout createGroupLayout(JPanel panel) {
+    public static @Nonnull GroupLayout createGroupLayout(JPanel panel) {
         final GroupLayout layout = new GroupLayout(panel);
         layout.setAutoCreateGaps(true);
         layout.setAutoCreateContainerGaps(true);
@@ -194,7 +195,7 @@ public class CampaignOptionsUtilities {
      *
      * @return a fully initialized {@link JPanel} configured as a parent container.
      */
-    public static JPanel createParentPanel(JPanel panel, String name) {
+    public static @Nonnull JPanel createParentPanel(JPanel panel, String name) {
         return new CampaignOptionsPageWrapper(panel, name);
     }
 
@@ -319,7 +320,7 @@ public class CampaignOptionsUtilities {
      * @author Illiani
      * @since 0.50.06
      */
-    public static MouseAdapter createTipPanelUpdater(CampaignOptionsHeaderPanel associatedHeaderPanel,
+    public static @Nonnull MouseAdapter createTipPanelUpdater(CampaignOptionsHeaderPanel associatedHeaderPanel,
           @Nullable String sourceComponentBaseName) {
         return createTipPanelUpdater(associatedHeaderPanel, sourceComponentBaseName, null);
     }
@@ -343,7 +344,7 @@ public class CampaignOptionsUtilities {
      * @author Illiani
      * @since 0.50.06
      */
-    public static MouseAdapter createTipPanelUpdater(CampaignOptionsHeaderPanel associatedHeaderPanel,
+    public static @Nonnull MouseAdapter createTipPanelUpdater(CampaignOptionsHeaderPanel associatedHeaderPanel,
           @Nullable String sourceComponentBaseName, @Nullable String replacementText) {
         return new MouseAdapter() {
             @Override
@@ -388,7 +389,7 @@ public class CampaignOptionsUtilities {
      *
      * @return an HTML-formatted string with all badges, or empty string if metadata is null
      */
-    public static String formatBadges(@Nullable CampaignOptionsMetadata metadata) {
+    public static @Nonnull String formatBadges(@Nullable CampaignOptionsMetadata metadata) {
         if (metadata == null) {
             return "";
         }

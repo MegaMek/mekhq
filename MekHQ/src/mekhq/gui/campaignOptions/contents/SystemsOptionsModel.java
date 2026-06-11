@@ -32,6 +32,7 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import jakarta.annotation.Nonnull;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 
@@ -65,7 +66,7 @@ class SystemsOptionsModel {
     boolean useBetterExtraIncome;
     boolean useSmallArmsOnly;
 
-    SystemsOptionsModel(CampaignOptions options, RandomSkillPreferences skillPreferences) {
+    SystemsOptionsModel(@Nonnull CampaignOptions options, @Nonnull RandomSkillPreferences skillPreferences) {
         manualUnitRatingModifier = options.getManualUnitRatingModifier();
         resetCriminalRecord = false;
         requireSupportForceTransportation = options.isRequireSupportForceTransportation();
@@ -96,7 +97,7 @@ class SystemsOptionsModel {
         useSmallArmsOnly = options.isUseSmallArmsOnly();
     }
 
-    void applyTo(CampaignOptions options, RandomSkillPreferences skillPreferences) {
+    void applyTo(@Nonnull CampaignOptions options, @Nonnull RandomSkillPreferences skillPreferences) {
         options.setManualUnitRatingModifier(manualUnitRatingModifier);
         options.setRequireSupportForceTransportation(requireSupportForceTransportation);
         options.setClampReputationPayMultiplier(clampReputationPayMultiplier);

@@ -57,6 +57,8 @@ import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.ui.FastJScrollPane;
 import mekhq.campaign.personnel.SkillPrerequisite;
@@ -100,7 +102,7 @@ public class SkillPrerequisitesDialog extends JDialog {
      * @param ability the ability whose prerequisite skills are edited
      */
     @SuppressWarnings("unchecked")
-    public SkillPrerequisitesDialog(Window parent, SpecialAbility ability) {
+    public SkillPrerequisitesDialog(@Nullable Window parent, @Nonnull SpecialAbility ability) {
         super(parent, "Edit Skill Requirements", ModalityType.APPLICATION_MODAL);
         // Work on a clone so a cancel leaves the ability untouched.
         this.prerequisiteSkills = (Vector<SkillPrerequisite>) ability.getPrereqSkills().clone();
@@ -343,8 +345,8 @@ public class SkillPrerequisitesDialog extends JDialog {
      */
     private static final class SkillSetRenderer extends DefaultListCellRenderer {
         @Override
-        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
-                boolean cellHasFocus) {
+        public @Nonnull Component getListCellRendererComponent(JList<?> list, @Nullable Object value, int index,
+                boolean isSelected, boolean cellHasFocus) {
             super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
             if (value instanceof SkillPrerequisite prerequisite) {
                 setText("<html>" + describeSkillSet(prerequisite) + "</html>");

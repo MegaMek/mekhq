@@ -34,6 +34,7 @@ package mekhq.gui.campaignOptions.contents;
 
 import java.util.Arrays;
 
+import jakarta.annotation.Nonnull;
 import mekhq.campaign.personnel.skills.SkillType;
 
 /**
@@ -52,7 +53,7 @@ class SkillConfiguration {
     int heroicLevel;
     int legendaryLevel;
 
-    SkillConfiguration(SkillType skillType) {
+    SkillConfiguration(@Nonnull SkillType skillType) {
         targetNumber = skillType.getTarget();
         costs = Arrays.copyOf(skillType.getCosts(), skillType.getCosts().length);
         greenLevel = skillType.getGreenLevel();
@@ -63,7 +64,7 @@ class SkillConfiguration {
         legendaryLevel = skillType.getLegendaryLevel();
     }
 
-    SkillConfiguration(SkillConfiguration other) {
+    SkillConfiguration(@Nonnull SkillConfiguration other) {
         copyFrom(other);
     }
 
@@ -72,7 +73,7 @@ class SkillConfiguration {
      *
      * @param other the configuration to copy values from
      */
-    void copyFrom(SkillConfiguration other) {
+    void copyFrom(@Nonnull SkillConfiguration other) {
         targetNumber = other.targetNumber;
         costs = Arrays.copyOf(other.costs, other.costs.length);
         greenLevel = other.greenLevel;
@@ -83,7 +84,7 @@ class SkillConfiguration {
         legendaryLevel = other.legendaryLevel;
     }
 
-    void applyTo(SkillType skillType) {
+    void applyTo(@Nonnull SkillType skillType) {
         skillType.setTarget(targetNumber);
         Integer[] targetCosts = skillType.getCosts();
         for (int i = 0; i < Math.min(costs.length, targetCosts.length); i++) {

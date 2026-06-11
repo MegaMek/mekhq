@@ -45,8 +45,9 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.client.ui.comboBoxes.MMComboBox;
-import megamek.common.annotations.Nullable;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.BabySurnameStyle;
 import mekhq.campaign.personnel.enums.RandomDivorceMethod;
@@ -179,7 +180,7 @@ public class RelationshipsTab {
      * @param campaignOptions the {@link CampaignOptions} instance to be used for
      *                        managing relationship settings.
      */
-    public RelationshipsTab(CampaignOptions campaignOptions) {
+    public RelationshipsTab(@Nonnull CampaignOptions campaignOptions) {
         this.campaignOptions = campaignOptions;
 
         initialize();
@@ -300,7 +301,7 @@ public class RelationshipsTab {
      *
      * @return a {@link JPanel} representing the Marriage Tab.
      */
-    public JPanel createMarriageTab() {
+    public @Nonnull JPanel createMarriageTab() {
         // Header
         String imageAddress = getImageDirectory() + "logo_morgrains_valkyrate.png";
         marriageHeader = new CampaignOptionsHeaderPanel("MarriageTab", imageAddress, 4);
@@ -330,7 +331,7 @@ public class RelationshipsTab {
      *
      * @return a {@link JPanel} containing general marriage options.
      */
-    private JPanel createMarriageGeneralOptionsPanel() {
+    private @Nonnull JPanel createMarriageGeneralOptionsPanel() {
         // Contents
         chkUseManualMarriages = new CampaignOptionsCheckBox("UseManualMarriages");
         chkUseManualMarriages.addMouseListener(createTipPanelUpdater(marriageHeader, "UseManualMarriages"));
@@ -372,7 +373,7 @@ public class RelationshipsTab {
      *
      * @return a {@link JPanel} containing random marriage settings.
      */
-    private JPanel createRandomMarriagePanel() {
+    private @Nonnull JPanel createRandomMarriagePanel() {
         // Contents
         lblRandomMarriageMethod = new CampaignOptionsLabel("RandomMarriageMethod");
         lblRandomMarriageMethod.addMouseListener(createTipPanelUpdater(marriageHeader, "RandomMarriageMethod"));
@@ -438,7 +439,7 @@ public class RelationshipsTab {
      *
      * @return a {@link JPanel} representing the Divorce Tab.
      */
-    public JPanel createDivorceTab() {
+    public @Nonnull JPanel createDivorceTab() {
         // Header
         String imageAddress = getImageDirectory() + "logo_escorpion_imperio.png";
         divorceHeader = new CampaignOptionsHeaderPanel("DivorceTab", imageAddress, 3);
@@ -461,7 +462,7 @@ public class RelationshipsTab {
         return panel;
     }
 
-    private JPanel createDivorceGeneralOptionsPanel() {
+    private @Nonnull JPanel createDivorceGeneralOptionsPanel() {
         // Contents
         chkUseManualDivorce = new CampaignOptionsCheckBox("UseManualDivorce");
         chkUseManualDivorce.addMouseListener(createTipPanelUpdater(divorceHeader, "UseManualDivorce"));
@@ -490,7 +491,7 @@ public class RelationshipsTab {
      *
      * @return a {@link JPanel} containing random divorce settings.
      */
-    private JPanel createRandomDivorcePanel() {
+    private @Nonnull JPanel createRandomDivorcePanel() {
         // Contents
         lblRandomDivorceMethod = new CampaignOptionsLabel("RandomDivorceMethod");
         lblRandomDivorceMethod.addMouseListener(createTipPanelUpdater(divorceHeader, "RandomDivorceMethod"));
@@ -548,7 +549,7 @@ public class RelationshipsTab {
      *
      * @return a {@link JPanel} representing the Procreation Tab.
      */
-    public JPanel createProcreationTab() {
+    public @Nonnull JPanel createProcreationTab() {
         // Header
         String imageAddress = getImageDirectory() + "logo_hanseatic_league.png";
         procreationHeader = new CampaignOptionsHeaderPanel("ProcreationTab", imageAddress, 6);
@@ -582,7 +583,7 @@ public class RelationshipsTab {
      *
      * @return a {@link JPanel} containing general procreation options.
      */
-    private JPanel createProcreationGeneralOptionsPanel() {
+    private @Nonnull JPanel createProcreationGeneralOptionsPanel() {
         // Contents
         chkUseManualProcreation = new CampaignOptionsCheckBox("UseManualProcreation");
         chkUseManualProcreation.addMouseListener(createTipPanelUpdater(procreationHeader, "UseManualProcreation"));
@@ -670,7 +671,7 @@ public class RelationshipsTab {
      *
      * @return a {@link JPanel} containing random procreation settings.
      */
-    private JPanel createRandomProcreationPanel() {
+    private @Nonnull JPanel createRandomProcreationPanel() {
         // Contents
         lblRandomProcreationMethod = new CampaignOptionsLabel("RandomProcreationMethod");
         lblRandomProcreationMethod.addMouseListener(createTipPanelUpdater(procreationHeader,
@@ -739,7 +740,7 @@ public class RelationshipsTab {
         return panel;
     }
 
-    private JPanel createRandomSexualityPanel() {
+    private @Nonnull JPanel createRandomSexualityPanel() {
         // Contents
         lblNoInterestInRelationshipsDiceSize = new CampaignOptionsLabel("NoInterestInRelationshipsDiceSize",
                 getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));

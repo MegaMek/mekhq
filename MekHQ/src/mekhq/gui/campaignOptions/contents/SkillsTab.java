@@ -79,9 +79,10 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.client.ui.util.UIUtil;
-import megamek.common.annotations.Nullable;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
@@ -121,7 +122,7 @@ public class SkillsTab {
      * @param campaignOptions the {@code CampaignOptions} instance that holds the settings to be modified or displayed
      *                        in this tab.
      */
-    public SkillsTab(CampaignOptions campaignOptions) {
+    public SkillsTab(@Nonnull CampaignOptions campaignOptions) {
         this.campaignOptions = campaignOptions;
         initialize();
         loadValuesFromCampaignOptions();
@@ -143,13 +144,13 @@ public class SkillsTab {
      *
      * @return a {@link JPanel} containing the skill table and supporting controls for the selected category.
      */
-    public JPanel createSkillsTab(SkillSubType category) {
+    public @Nonnull JPanel createSkillsTab(SkillSubType category) {
         // The page never rebuilds in place (only its table models refresh), so the CampaignOptionsPagePanel can be
         // cached and returned directly rather than wrapping it in a container.
         return createdCategoryTabs.computeIfAbsent(category, this::createSkillsPage);
     }
 
-    private CampaignOptionsPagePanel createSkillsPage(SkillSubType category) {
+    private @Nonnull CampaignOptionsPagePanel createSkillsPage(SkillSubType category) {
         // Header
         CampaignOptionsHeaderPanel headerPanel;
         String panelName;
@@ -356,7 +357,7 @@ public class SkillsTab {
      *
      * @return a {@link JPanel} containing the Edge and Attribute cost controls.
      */
-    private JPanel createEdgeCostPanel() {
+    private @Nonnull JPanel createEdgeCostPanel() {
         JLabel lblEdgeCost = new CampaignOptionsLabel("EdgeCost");
         spnEdgeCost = new CampaignOptionsSpinner("EdgeCost", 100, 0, 500, 1);
 
@@ -606,7 +607,7 @@ public class SkillsTab {
             return skillNames.get(rowIndex);
         }
 
-        private SkillConfiguration getConfiguration(int rowIndex) {
+        private @Nullable SkillConfiguration getConfiguration(int rowIndex) {
             if (optionsModel == null) {
                 return null;
             }

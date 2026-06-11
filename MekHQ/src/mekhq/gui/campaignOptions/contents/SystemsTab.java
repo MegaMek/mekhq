@@ -47,8 +47,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.Version;
-import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
@@ -140,7 +141,7 @@ public class SystemsTab {
      * @author Illiani
      * @since 0.50.07
      */
-    public SystemsTab(Campaign campaign) {
+    public SystemsTab(@Nonnull Campaign campaign) {
         this.campaign = campaign;
         this.campaignOptions = campaign.getCampaignOptions();
         this.randomSkillPreferences = campaign.getRandomSkillPreferences();
@@ -156,7 +157,7 @@ public class SystemsTab {
      * @author Illiani
      * @since 0.50.07
      */
-    public JPanel createReputationTab() {
+    public @Nonnull JPanel createReputationTab() {
         // Header
         String imageAddress = getImageDirectory() + "logo_morgrains_valkyrate.png";
         reputationHeader = new CampaignOptionsHeaderPanel("ReputationTab", imageAddress);
@@ -193,7 +194,7 @@ public class SystemsTab {
      * @author Illiani
      * @since 0.50.07
      */
-    private JPanel createReputationGeneralPanel() {
+    private @Nonnull JPanel createReputationGeneralPanel() {
         // Contents
         JLabel lblManualUnitRatingModifier = new CampaignOptionsLabel("ManualUnitRatingModifier");
         lblManualUnitRatingModifier.addMouseListener(createTipPanelUpdater(reputationHeader,
@@ -232,7 +233,7 @@ public class SystemsTab {
         return button;
     }
 
-    private JPanel createLeftAlignedButtonPanel(JButton button) {
+    private @Nonnull JPanel createLeftAlignedButtonPanel(JButton button) {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         panel.setOpaque(false);
         panel.add(button);
@@ -249,7 +250,7 @@ public class SystemsTab {
      * @author Illiani
      * @since 0.50.07
      */
-    private JPanel createReputationSanityPanel() {
+    private @Nonnull JPanel createReputationSanityPanel() {
         // Contents
         chkRequireSupportForceTransportation = new CampaignOptionsCheckBox("RequireSupportForceTransportation",
                 getMetadata(new Version(0, 51, 0)));
@@ -298,7 +299,7 @@ public class SystemsTab {
      * @author Illiani
      * @since 0.50.07
      */
-    public JPanel createFactionStandingTab() {
+    public @Nonnull JPanel createFactionStandingTab() {
         // Header
         String imageAddress = getImageDirectory() + "logo_morgrains_valkyrate.png";
         factionStandingHeader = new CampaignOptionsHeaderPanel("FactionStandingTab", imageAddress);
@@ -326,7 +327,7 @@ public class SystemsTab {
         return panel;
     }
 
-    private JPanel createFactionStandingTrackingPanel() {
+    private @Nonnull JPanel createFactionStandingTrackingPanel() {
         // Contents
         chkTrackFactionStanding = new CampaignOptionsCheckBox("TrackFactionStanding",
                 getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM,
@@ -367,7 +368,7 @@ public class SystemsTab {
      * @author Illiani
      * @since 0.50.07
      */
-    private JPanel createFactionStandingModifiersPanel() {
+    private @Nonnull JPanel createFactionStandingModifiersPanel() {
         // Contents
         chkUseFactionStandingNegotiation = new CampaignOptionsCheckBox("UseFactionStandingNegotiation",
                 getMetadata(MILESTONE_BEFORE_METADATA));
@@ -448,7 +449,7 @@ public class SystemsTab {
      * @author Illiani
      * @since 0.50.07
      */
-    public JPanel createATOWTab() {
+    public @Nonnull JPanel createATOWTab() {
         // Header
         String imageAddress = getImageDirectory() + "logo_elysian_fields.png";
         atowHeader = new CampaignOptionsHeaderPanel("ATimeOfWarTab", imageAddress);
@@ -479,7 +480,7 @@ public class SystemsTab {
      * @return A {@code JPanel} containing configuration options for phenotype
      *         probabilities.
      */
-    private JPanel createATOWAttributesPanel() {
+    private @Nonnull JPanel createATOWAttributesPanel() {
         // Contents
         chkUseAttributes = new CampaignOptionsCheckBox("UseAttributes",
                 getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));

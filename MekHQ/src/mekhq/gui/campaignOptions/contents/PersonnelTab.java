@@ -45,9 +45,10 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import javax.swing.*;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.client.ui.comboBoxes.MMComboBox;
-import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.AwardBonus;
@@ -259,7 +260,7 @@ public class PersonnelTab {
      *                        initializing and managing personnel
      *                        options.
      */
-    public PersonnelTab(CampaignOptions campaignOptions) {
+    public PersonnelTab(@Nonnull CampaignOptions campaignOptions) {
         this.campaignOptions = campaignOptions;
 
         initialize();
@@ -459,7 +460,7 @@ public class PersonnelTab {
      *
      * @return a {@link JPanel} representing the General Tab.
      */
-    public JPanel createGeneralTab() {
+    public @Nonnull JPanel createGeneralTab() {
         // Header
         String imageAddress = getImageDirectory() + "logo_clan_wolverine.png";
         generalHeader = new CampaignOptionsHeaderPanel("PersonnelGeneralTab", imageAddress, 5);
@@ -501,7 +502,7 @@ public class PersonnelTab {
      * @return a {@link JPanel} containing checkboxes for various personnel
      *         management settings.
      */
-    private JPanel createGeneralOptionsPanel() {
+    private @Nonnull JPanel createGeneralOptionsPanel() {
         // Contents
         chkUseTactics = new CampaignOptionsCheckBox("UseTactics",
                 getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
@@ -592,7 +593,7 @@ public class PersonnelTab {
      * @return a {@link JPanel} containing options for personnel cleanup, such as
      *         removal exemptions.
      */
-    private JPanel createPersonnelCleanUpPanel() {
+    private @Nonnull JPanel createPersonnelCleanUpPanel() {
         // Contents
         chkUsePersonnelRemoval = new CampaignOptionsCheckBox("UsePersonnelRemoval");
         chkUsePersonnelRemoval.addMouseListener(createTipPanelUpdater(generalHeader, "UsePersonnelRemoval"));
@@ -621,7 +622,7 @@ public class PersonnelTab {
      * @return a {@link JPanel} containing settings related to administrators, such
      *         as negotiation options.
      */
-    private JPanel createAdministratorsPanel() {
+    private @Nonnull JPanel createAdministratorsPanel() {
         // Contents
         chkAdminsHaveNegotiation = new CampaignOptionsCheckBox("AdminsHaveNegotiation");
         chkAdminsHaveNegotiation.addMouseListener(createTipPanelUpdater(generalHeader, "AdminsHaveNegotiation"));
@@ -647,7 +648,7 @@ public class PersonnelTab {
      * @return a {@link JPanel} containing settings related to blob crews (temporary
      *         personnel pools).
      */
-    private JPanel createBlobCrewPanel() {
+    private @Nonnull JPanel createBlobCrewPanel() {
         // Contents
         chkUseBlobInfantry = new CampaignOptionsCheckBox("UseBlobInfantry", getMetadata(new Version(0, 50, 12)));
         chkUseBlobInfantry.addMouseListener(createTipPanelUpdater(generalHeader, "UseBlobInfantry"));
@@ -698,7 +699,7 @@ public class PersonnelTab {
      *
      * @return a {@link JPanel} representing the Awards Tab.
      */
-    public JPanel createAwardsTab() {
+    public @Nonnull JPanel createAwardsTab() {
         // Header
                 String imageAddress = getImageDirectory() + "logo_outworld_alliance.png";
                 awardsHeader = new CampaignOptionsHeaderPanel("AwardsTab", imageAddress, 4);
@@ -799,7 +800,7 @@ public class PersonnelTab {
      *
      * @return a {@link JPanel} containing checkboxes for various award filters.
      */
-    private JPanel createAutoAwardsFilterPanel() {
+    private @Nonnull JPanel createAutoAwardsFilterPanel() {
         // Contents
         chkEnableContractAwards = new CampaignOptionsCheckBox("EnableContractAwards");
         chkEnableContractAwards.addMouseListener(createTipPanelUpdater(awardsHeader, "EnableContractAwards"));
@@ -855,7 +856,7 @@ public class PersonnelTab {
         return panel;
     }
 
-    private JPanel createAwardSetFilterPanel(JScrollPane scrollAwardSetFilterList) {
+    private @Nonnull JPanel createAwardSetFilterPanel(JScrollPane scrollAwardSetFilterList) {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setName("pnlAwardSetFilterPanel");
         panel.setOpaque(false);
@@ -869,7 +870,7 @@ public class PersonnelTab {
      *
      * @return a {@link JPanel} containing medical-related settings.
      */
-    public JPanel createMedicalTab() {
+    public @Nonnull JPanel createMedicalTab() {
         // Header
         // start Medical Tab
                 String imageAddress = getImageDirectory() + "logo_duchy_of_tamarind_abbey.png";
@@ -1000,7 +1001,7 @@ public class PersonnelTab {
      *
      * @return a {@link JPanel} representing the Personnel Information Tab.
      */
-    public JPanel createPersonnelInformationTab() {
+    public @Nonnull JPanel createPersonnelInformationTab() {
         // Header
                 String imageAddress = getImageDirectory() + "logo_rasalhague_dominion.png";
                 personnelInformationHeader = new CampaignOptionsHeaderPanel("PersonnelInformation", imageAddress, 3);
@@ -1133,7 +1134,7 @@ public class PersonnelTab {
      * @return a {@link JPanel} containing the Prisoners and Dependents Tab
      *         components.
      */
-    public JPanel createPrisonersAndDependentsTab() {
+    public @Nonnull JPanel createPrisonersAndDependentsTab() {
         // Header
         String imageAddress = getImageDirectory() + "logo_illyrian_palatinate.png";
         prisonersAndDependentsHeader = new CampaignOptionsHeaderPanel("PrisonersAndDependentsTab", imageAddress, 6);
@@ -1169,7 +1170,7 @@ public class PersonnelTab {
      * @return a {@link JPanel} containing prisoner-related options such as capture
      *         style and status.
      */
-    private JPanel createPrisonersPanel() {
+    private @Nonnull JPanel createPrisonersPanel() {
         // Contents
         lblPrisonerCaptureStyle = new CampaignOptionsLabel("PrisonerCaptureStyle");
         lblPrisonerCaptureStyle.addMouseListener(createTipPanelUpdater(prisonersAndDependentsHeader,
@@ -1216,7 +1217,7 @@ public class PersonnelTab {
      *
      * @return a {@link JPanel} containing dependent management options.
      */
-    private JPanel createDependentsPanel() {
+    private @Nonnull JPanel createDependentsPanel() {
         // Contents
         chkUseRandomDependentAddition = new CampaignOptionsCheckBox("UseRandomDependentAddition");
         chkUseRandomDependentAddition.addMouseListener(createTipPanelUpdater(prisonersAndDependentsHeader,
@@ -1301,7 +1302,7 @@ public class PersonnelTab {
      * @param presetCampaignOptions optional custom {@link CampaignOptions} to apply
      *                              changes to.
      */
-    public void applyCampaignOptionsToCampaign(Campaign campaign, @Nullable CampaignOptions presetCampaignOptions) {
+    public void applyCampaignOptionsToCampaign(@Nonnull Campaign campaign, @Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;

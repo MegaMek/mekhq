@@ -61,9 +61,10 @@ import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.client.ui.comboBoxes.MMComboBox;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -220,7 +221,7 @@ public class MarketsTab {
        *                 campaign is used to retrieve and
        *                 modify {@link CampaignOptions}.
        */
-      public MarketsTab(Campaign campaign) {
+      public MarketsTab(@Nonnull Campaign campaign) {
             this.campaign = campaign;
             this.campaignOptions = campaign.getCampaignOptions();
 
@@ -297,7 +298,7 @@ public class MarketsTab {
        *
        * @return A {@link JPanel} for the Personnel Market configuration tab.
        */
-      public JPanel createPersonnelMarketTab() {
+      public @Nonnull JPanel createPersonnelMarketTab() {
             // Header
             String imageAddress = getImageDirectory() + "logo_st_ives_compact.png";
             personnelMarketHeader = new CampaignOptionsHeaderPanel("PersonnelMarketTab", imageAddress);
@@ -335,7 +336,7 @@ public class MarketsTab {
        * @return A {@link JPanel} representing the general options within the
        *         Personnel Market tab.
        */
-      private JPanel createPersonnelMarketGeneralOptionsPanel() {
+      private @Nonnull JPanel createPersonnelMarketGeneralOptionsPanel() {
             // Contents
             lblPersonnelMarketStyle = new CampaignOptionsLabel("PersonnelMarketStyle",
                         getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT,
@@ -393,7 +394,7 @@ public class MarketsTab {
        *
        * @return A {@link JPanel} containing removal options for the Personnel Market.
        */
-      private JPanel createPersonnelMarketRemovalOptionsPanel() {
+      private @Nonnull JPanel createPersonnelMarketRemovalOptionsPanel() {
             // Contents
             for (final SkillLevel skillLevel : Skills.SKILL_LEVELS) {
                   final JLabel jLabel = new JLabel(skillLevel.toString());
@@ -440,7 +441,7 @@ public class MarketsTab {
        *
        * @return the assembled grid panel
        */
-      private JPanel createPairedFieldGridPanel(String name, JComponent[] labels, JComponent[] controls,
+      private @Nonnull JPanel createPairedFieldGridPanel(String name, JComponent[] labels, JComponent[] controls,
                   int columnCount, int controlWidth) {
             final CampaignOptionsPairedFieldGridPanel panel = new CampaignOptionsPairedFieldGridPanel(name,
                         FORM_LABEL_COLUMN_WIDTH + FORM_LABEL_CONTROL_GAP,
@@ -480,7 +481,7 @@ public class MarketsTab {
        *
        * @return A {@link JPanel} for the Unit Market configuration tab.
        */
-      public JPanel createUnitMarketTab() {
+      public @Nonnull JPanel createUnitMarketTab() {
             // Header
             // start Unit Market
             String imageAddress = getImageDirectory() + "logo_clan_ice_hellion.png";
@@ -543,7 +544,7 @@ public class MarketsTab {
             return panel;
       }
 
-      private JPanel createUnitMarketGenerationPanel() {
+      private @Nonnull JPanel createUnitMarketGenerationPanel() {
             final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("UnitMarketGenerationPanel",
                         FORM_LABEL_COLUMN_WIDTH,
                         FORM_CONTROL_COLUMN_WIDTH);
@@ -555,7 +556,7 @@ public class MarketsTab {
             return panel;
       }
 
-      private JPanel createUnitMarketDeliveryPanel() {
+      private @Nonnull JPanel createUnitMarketDeliveryPanel() {
             final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("UnitMarketDeliveryPanel",
                         FORM_LABEL_COLUMN_WIDTH,
                         FORM_CONTROL_COLUMN_WIDTH);
@@ -625,7 +626,7 @@ public class MarketsTab {
        *
        * @return A {@link JPanel} for the Contract Market configuration tab.
        */
-      public JPanel createContractMarketTab() {
+      public @Nonnull JPanel createContractMarketTab() {
             // Header
             String imageAddress = getImageDirectory() + "logo_federated_suns.png";
             contractMarketHeader = new CampaignOptionsHeaderPanel("ContractMarketTab", imageAddress);
@@ -659,7 +660,7 @@ public class MarketsTab {
        * @return A {@link JPanel} representing general options within the Contract
        *         Market tab.
        */
-      private JPanel createContractMarketGeneralOptionsPanel() {
+      private @Nonnull JPanel createContractMarketGeneralOptionsPanel() {
             // Contents
             lblContractMarketMethod = new CampaignOptionsLabel("ContractMarketMethod");
             lblContractMarketMethod
@@ -775,7 +776,7 @@ public class MarketsTab {
        * @return A {@link JPanel} containing payment configuration settings for the
        *         Contract Market.
        */
-      private JPanel createContractPayPanel() {
+      private @Nonnull JPanel createContractPayPanel() {
             // Contents
             btnContractEquipment = new JRadioButton(getTextAt(getCampaignOptionsResourceBundle(),
                         "lblContractEquipment.text"));
@@ -916,7 +917,7 @@ public class MarketsTab {
        *
        * @return the assembled subsection card
        */
-      private JPanel createContractPaySubsection(String name, JRadioButton radioButton, JPanel options) {
+      private @Nonnull JPanel createContractPaySubsection(String name, JRadioButton radioButton, JPanel options) {
             final JPanel card = new CampaignOptionsStandardPanel(name, true);
             final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(card);
             layout.weightx = 1.0;

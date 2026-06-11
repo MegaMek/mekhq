@@ -38,7 +38,8 @@ import java.awt.Insets;
 import java.util.Objects;
 import javax.swing.JPanel;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 /**
  * A custom implementation of {@link GridBagConstraints} designed for use with panels in the campaign options dialog.
@@ -64,7 +65,7 @@ public class CampaignOptionsGridBagConstraints extends GridBagConstraints {
      *
      * @param panel the {@link JPanel} for which the {@link GridBagConstraints} is created
      */
-    public CampaignOptionsGridBagConstraints(JPanel panel) {
+    public CampaignOptionsGridBagConstraints(@Nonnull JPanel panel) {
         this(panel, null, null);
     }
 
@@ -88,7 +89,7 @@ public class CampaignOptionsGridBagConstraints extends GridBagConstraints {
      * @param fill   the fill setting for the {@link GridBagConstraints}, or {@code null} to use the default value
      *               {@link GridBagConstraints#HORIZONTAL}
      */
-    public CampaignOptionsGridBagConstraints(JPanel panel, @Nullable Integer anchor, @Nullable Integer fill) {
+    public CampaignOptionsGridBagConstraints(@Nonnull JPanel panel, @Nullable Integer anchor, @Nullable Integer fill) {
         super();
 
         // Set up GridBagLayout on the panel

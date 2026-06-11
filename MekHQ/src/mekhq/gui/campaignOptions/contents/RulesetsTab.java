@@ -52,11 +52,12 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.client.ui.clientGUI.GUIPreferences;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.models.FileNameComboBoxModel;
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.campaignOptions.BoardScalingType;
@@ -204,7 +205,7 @@ public class RulesetsTab {
      *                        maintenance, and other ruleset
      *                        options.
      */
-    public RulesetsTab(CampaignOptions campaignOptions) {
+    public RulesetsTab(@Nonnull CampaignOptions campaignOptions) {
         this.campaignOptions = campaignOptions;
 
         initialize();
@@ -490,7 +491,7 @@ public class RulesetsTab {
      *
      * @return a {@link JPanel} containing all StratCon settings.
      */
-    public JPanel createStratConTab() {
+    public @Nonnull JPanel createStratConTab() {
         // Header
         // start StratCon
         String imageAddress = getImageDirectory() + "logo_clan_wolf.png";
@@ -627,7 +628,7 @@ public class RulesetsTab {
                 .build();
     }
 
-    private JPanel createStratConGeneralOptionsPanel() {
+    private @Nonnull JPanel createStratConGeneralOptionsPanel() {
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("StratConGeneralOptionsPanel",
                 FORM_LABEL_COLUMN_WIDTH,
                 FORM_CONTROL_COLUMN_WIDTH);
@@ -643,7 +644,7 @@ public class RulesetsTab {
         return panel;
     }
 
-    private JPanel createStratConScenarioGenerationPanel() {
+    private @Nonnull JPanel createStratConScenarioGenerationPanel() {
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("StratConScenarioGenerationPanel",
                 FORM_LABEL_COLUMN_WIDTH,
                 FORM_CONTROL_COLUMN_WIDTH);
@@ -665,7 +666,7 @@ public class RulesetsTab {
         return panel;
     }
 
-    private JPanel createStratConScenarioModifiersPanel() {
+    private @Nonnull JPanel createStratConScenarioModifiersPanel() {
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("StratConScenarioModifiersPanel",
                 FORM_LABEL_COLUMN_WIDTH,
                 FORM_CONTROL_COLUMN_WIDTH);
@@ -679,7 +680,7 @@ public class RulesetsTab {
         return panel;
     }
 
-    private JPanel createStratConScenarioConditionsPanel() {
+    private @Nonnull JPanel createStratConScenarioConditionsPanel() {
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("StratConScenarioConditionsPanel",
                 FORM_LABEL_COLUMN_WIDTH,
                 FORM_CONTROL_COLUMN_WIDTH);
@@ -694,7 +695,7 @@ public class RulesetsTab {
         return panel;
     }
 
-    private JPanel createStratConMoralePanel() {
+    private @Nonnull JPanel createStratConMoralePanel() {
         // A generic 4-column (label/control, label/control) aligned grid: the two
         // victory modifiers sit on the top
         // row and the two defeat modifiers on the bottom row. Reuses the shared
@@ -715,7 +716,7 @@ public class RulesetsTab {
         return panel;
     }
 
-    private JPanel createStratConAutoResolvePanel() {
+    private @Nonnull JPanel createStratConAutoResolvePanel() {
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("StratConAutoResolvePanel",
                 FORM_LABEL_COLUMN_WIDTH,
                 FORM_CONTROL_COLUMN_WIDTH);
@@ -746,7 +747,7 @@ public class RulesetsTab {
      * @return a {@link JPanel} containing all Legacy AtB settings.
      */
     @Deprecated(since = "0.51.0", forRemoval = true)
-    public JPanel createLegacyTab() {
+    public @Nonnull JPanel createLegacyTab() {
         // Header
         legacyHeader = new CampaignOptionsHeaderPanel("LegacyTab",
                 getImageDirectory() + "logo_free_rasalhague_republic.png",

@@ -36,6 +36,7 @@ import java.util.EnumMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import jakarta.annotation.Nonnull;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
@@ -48,7 +49,7 @@ class SalariesOptionsModel {
     final Map<SkillLevel, Double> salaryXpMultipliers = new EnumMap<>(SkillLevel.class);
     final Map<PersonnelRole, Double> roleBaseSalaries = new EnumMap<>(PersonnelRole.class);
 
-    SalariesOptionsModel(CampaignOptions options) {
+    SalariesOptionsModel(@Nonnull CampaignOptions options) {
         disableSecondaryRoleSalary = options.isDisableSecondaryRoleSalary();
         salaryAntiMekMultiplier = options.getSalaryAntiMekMultiplier();
         salarySpecialistInfantryMultiplier = options.getSalarySpecialistInfantryMultiplier();
@@ -61,7 +62,7 @@ class SalariesOptionsModel {
         }
     }
 
-    void applyTo(CampaignOptions options) {
+    void applyTo(@Nonnull CampaignOptions options) {
         options.setDisableSecondaryRoleSalary(disableSecondaryRoleSalary);
         options.setSalaryAntiMekMultiplier(salaryAntiMekMultiplier);
         options.setSalarySpecialistInfantryMultiplier(salarySpecialistInfantryMultiplier);

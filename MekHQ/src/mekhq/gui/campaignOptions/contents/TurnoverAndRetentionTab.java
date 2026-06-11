@@ -45,9 +45,10 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.client.ui.comboBoxes.MMComboBox;
-import megamek.common.annotations.Nullable;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.TurnoverFrequency;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
@@ -174,7 +175,7 @@ public class TurnoverAndRetentionTab {
      *                        settings to be modified or displayed
      *                        in this tab.
      */
-    public TurnoverAndRetentionTab(CampaignOptions campaignOptions) {
+    public TurnoverAndRetentionTab(@Nonnull CampaignOptions campaignOptions) {
         this.campaignOptions = campaignOptions;
 
         initialize();
@@ -278,7 +279,7 @@ public class TurnoverAndRetentionTab {
      *
      * @return the {@link JPanel} representing the constructed Fatigue tab.
      */
-    public JPanel createFatigueTab() {
+    public @Nonnull JPanel createFatigueTab() {
         // Header
         // start Fatigue Tab
                 String imageAddress = getImageDirectory() + "logo_clan_mongoose.png";
@@ -344,7 +345,7 @@ public class TurnoverAndRetentionTab {
         return panel;
     }
 
-    private JPanel createFatigueRulesPanel() {
+    private @Nonnull JPanel createFatigueRulesPanel() {
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("FatigueRulesPanel",
                 TURNOVER_LABEL_COLUMN_WIDTH,
                 TURNOVER_CONTROL_COLUMN_WIDTH);
@@ -355,7 +356,7 @@ public class TurnoverAndRetentionTab {
         return panel;
     }
 
-    private JPanel createFatigueFieldKitchenPanel() {
+    private @Nonnull JPanel createFatigueFieldKitchenPanel() {
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("FatigueFieldKitchenPanel",
                 TURNOVER_LABEL_COLUMN_WIDTH,
                 TURNOVER_CONTROL_COLUMN_WIDTH);
@@ -365,7 +366,7 @@ public class TurnoverAndRetentionTab {
         return panel;
     }
 
-    private JPanel createFatigueAutomationPanel() {
+    private @Nonnull JPanel createFatigueAutomationPanel() {
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("FatigueAutomationPanel",
                 TURNOVER_LABEL_COLUMN_WIDTH,
                 TURNOVER_CONTROL_COLUMN_WIDTH);
@@ -383,7 +384,7 @@ public class TurnoverAndRetentionTab {
      *
      * @return the {@link JPanel} representing the constructed Turnover tab.
      */
-    public JPanel createTurnoverTab() {
+    public @Nonnull JPanel createTurnoverTab() {
         // Header
         String imageAddress = getImageDirectory() + "logo_duchy_of_andurien.png";
         turnoverHeader = new CampaignOptionsHeaderPanel("TurnoverTab", imageAddress, 0);
@@ -413,7 +414,7 @@ public class TurnoverAndRetentionTab {
         return panel;
     }
 
-    private JPanel createTurnoverGeneralPanel() {
+    private @Nonnull JPanel createTurnoverGeneralPanel() {
         // Contents
         chkUseRandomRetirement = new CampaignOptionsCheckBox("UseRandomRetirement");
         chkUseRandomRetirement.addMouseListener(createTipPanelUpdater(turnoverHeader, "UseRandomRetirement"));
@@ -459,7 +460,7 @@ public class TurnoverAndRetentionTab {
         return panel;
     }
 
-    private JPanel createContractRulesPanel() {
+    private @Nonnull JPanel createContractRulesPanel() {
         // Contents
 
         chkUseContractCompletionRandomRetirement = new CampaignOptionsCheckBox(
@@ -512,7 +513,7 @@ public class TurnoverAndRetentionTab {
         return panel;
     }
 
-    private JPanel createRetentionBonusPanel() {
+    private @Nonnull JPanel createRetentionBonusPanel() {
         // Contents
         chkPayBonusDefault = new CampaignOptionsCheckBox("PayBonusDefault");
         chkPayBonusDefault.addMouseListener(createTipPanelUpdater(turnoverHeader, "PayBonusDefault"));
@@ -542,7 +543,7 @@ public class TurnoverAndRetentionTab {
      *
      * @return the {@link JPanel} representing the turnover modifiers.
      */
-    private JPanel createModifiersPanel() {
+    private @Nonnull JPanel createModifiersPanel() {
         // Contents
         chkUseCustomRetirementModifiers = new CampaignOptionsCheckBox("UseCustomRetirementModifiers");
         chkUseCustomRetirementModifiers.addMouseListener(createTipPanelUpdater(turnoverHeader,
@@ -597,7 +598,7 @@ public class TurnoverAndRetentionTab {
      *
      * @return the {@link JPanel} representing the payout settings.
      */
-    private JPanel createPayoutsPanel() {
+    private @Nonnull JPanel createPayoutsPanel() {
         // Contents
         lblPayoutRateOfficer = new CampaignOptionsLabel("PayoutRateOfficer");
         lblPayoutRateOfficer.addMouseListener(createTipPanelUpdater(turnoverHeader, "PayoutRateOfficer"));
@@ -648,7 +649,7 @@ public class TurnoverAndRetentionTab {
      *
      * @return the {@link JPanel} containing unit cohesion settings.
      */
-    private JPanel createUnitCohesionPanel() {
+    private @Nonnull JPanel createUnitCohesionPanel() {
         // Contents
         chkUseHRStrain = new CampaignOptionsCheckBox("UseHRStrain");
         chkUseHRStrain.addMouseListener(createTipPanelUpdater(turnoverHeader, "UseHRStrain"));

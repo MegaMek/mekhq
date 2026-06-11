@@ -43,7 +43,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
@@ -121,7 +122,7 @@ public class RepairAndMaintenanceTab {
      *                        managing repair and maintenance
      *                        options.
      */
-    public RepairAndMaintenanceTab(CampaignOptions campaignOptions) {
+    public RepairAndMaintenanceTab(@Nonnull CampaignOptions campaignOptions) {
         this.campaignOptions = campaignOptions;
 
         initialize();
@@ -209,7 +210,7 @@ public class RepairAndMaintenanceTab {
      *
      * @return a {@link JPanel} representing the Repair Tab.
      */
-    public JPanel createRepairTab() {
+    public @Nonnull JPanel createRepairTab() {
         // Header
         // start Repair Tab
         String imageAddress = getImageDirectory() + "logo_clan_burrock.png";
@@ -271,7 +272,7 @@ public class RepairAndMaintenanceTab {
                 .build();
     }
 
-    private JPanel createRepairOptionsPanel() {
+    private @Nonnull JPanel createRepairOptionsPanel() {
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("RepairOptionsPanel",
                 FORM_LABEL_COLUMN_WIDTH,
                 FORM_CONTROL_COLUMN_WIDTH);
@@ -286,7 +287,7 @@ public class RepairAndMaintenanceTab {
         return panel;
     }
 
-    private JPanel createComponentDamagePanel() {
+    private @Nonnull JPanel createComponentDamagePanel() {
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("ComponentDamagePanel",
                 FORM_LABEL_COLUMN_WIDTH,
                 FORM_CONTROL_COLUMN_WIDTH);
@@ -309,7 +310,7 @@ public class RepairAndMaintenanceTab {
      *
      * @return a {@link JPanel} representing the Maintenance Tab.
      */
-    public JPanel createMaintenanceTab() {
+    public @Nonnull JPanel createMaintenanceTab() {
         // Header
         // start Maintenance Tab
         String imageAddress = getImageDirectory() + "logo_magistracy_of_canopus.png";
@@ -381,7 +382,7 @@ public class RepairAndMaintenanceTab {
                 .build();
     }
 
-    private JPanel createMaintenanceSchedulePanel() {
+    private @Nonnull JPanel createMaintenanceSchedulePanel() {
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("MaintenanceSchedulePanel",
                 FORM_LABEL_COLUMN_WIDTH,
                 FORM_CONTROL_COLUMN_WIDTH);
@@ -394,7 +395,7 @@ public class RepairAndMaintenanceTab {
         return panel;
     }
 
-    private JPanel createMaintenanceQualityPanel() {
+    private @Nonnull JPanel createMaintenanceQualityPanel() {
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("MaintenanceQualityPanel",
                 FORM_LABEL_COLUMN_WIDTH,
                 FORM_CONTROL_COLUMN_WIDTH);

@@ -34,6 +34,7 @@ package mekhq.gui.campaignOptions.contents;
 
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
 
+import jakarta.annotation.Nonnull;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.AwardBonus;
@@ -130,7 +131,7 @@ class PersonnelOptionsModel {
     int dependentProfessionDieSize;
     int civilianProfessionDieSize;
 
-    PersonnelOptionsModel(CampaignOptions options) {
+    PersonnelOptionsModel(@Nonnull CampaignOptions options) {
         useTactics = options.isUseTactics();
         useInitiativeBonus = options.isUseInitiativeBonus();
         useToughness = options.isUseToughness();
@@ -220,7 +221,7 @@ class PersonnelOptionsModel {
         civilianProfessionDieSize = options.getCivilianProfessionDieSize();
     }
 
-    void applyTo(Campaign campaign, CampaignOptions options) {
+    void applyTo(@Nonnull Campaign campaign, @Nonnull CampaignOptions options) {
         options.setUseTactics(useTactics);
         options.setUseInitiativeBonus(useInitiativeBonus);
         options.setUseToughness(useToughness);

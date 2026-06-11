@@ -46,6 +46,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
+import jakarta.annotation.Nonnull;
 import megamek.client.ui.util.UIUtil;
 
 /**
@@ -60,7 +61,7 @@ public class CampaignOptionsHeaderPanel extends JPanel {
     private static final int DEFAULT_BODY_TEXT_WIDTH = 750;
 
     @Deprecated(since = "0.50.06", forRemoval = true)
-    public CampaignOptionsHeaderPanel(String name, String imageAddress, boolean includeBodyText) {
+    public CampaignOptionsHeaderPanel(@Nonnull String name, @Nonnull String imageAddress, boolean includeBodyText) {
         this(name, imageAddress, includeBodyText, false, 0, DEFAULT_IMAGE_SIZE);
     }
 
@@ -74,7 +75,7 @@ public class CampaignOptionsHeaderPanel extends JPanel {
      * @param name         a unique identifier used to fetch resource bundle entries and to form the panel's name
      * @param imageAddress the path to the image file displayed in the panel
      */
-    public CampaignOptionsHeaderPanel(String name, String imageAddress) {
+    public CampaignOptionsHeaderPanel(@Nonnull String name, @Nonnull String imageAddress) {
         this(name, imageAddress, false, false, 0, DEFAULT_IMAGE_SIZE);
     }
 
@@ -89,7 +90,7 @@ public class CampaignOptionsHeaderPanel extends JPanel {
      * @param imageAddress   the path to the image file displayed in the panel
      * @param tipPanelHeight retained for constructor compatibility; contextual help is shown in the shell
      */
-    public CampaignOptionsHeaderPanel(String name, String imageAddress, int tipPanelHeight) {
+    public CampaignOptionsHeaderPanel(@Nonnull String name, @Nonnull String imageAddress, int tipPanelHeight) {
         this(name, imageAddress, false, true, tipPanelHeight, DEFAULT_IMAGE_SIZE);
     }
 
@@ -101,7 +102,7 @@ public class CampaignOptionsHeaderPanel extends JPanel {
      * @param includeBodyText if true, includes a body label beneath the image with descriptive text
      * @param imageSize       the target width or height for the header image
      */
-    public CampaignOptionsHeaderPanel(String name, String imageAddress, boolean includeBodyText, int imageSize) {
+    public CampaignOptionsHeaderPanel(@Nonnull String name, @Nonnull String imageAddress, boolean includeBodyText, int imageSize) {
         this(name, imageAddress, includeBodyText, imageSize, true);
     }
 
@@ -114,7 +115,7 @@ public class CampaignOptionsHeaderPanel extends JPanel {
      * @param imageSize       the target width or height for the header image
      * @param tintImage       if true, tints the image black to match the standard options header style
      */
-    public CampaignOptionsHeaderPanel(String name, String imageAddress, boolean includeBodyText, int imageSize,
+    public CampaignOptionsHeaderPanel(@Nonnull String name, @Nonnull String imageAddress, boolean includeBodyText, int imageSize,
           boolean tintImage) {
         this(name, imageAddress, includeBodyText, false, 0, imageSize, tintImage);
     }
@@ -133,7 +134,7 @@ public class CampaignOptionsHeaderPanel extends JPanel {
      * @param includeTipPanel retained for constructor compatibility; contextual help is shown in the shell
      * @param tipPanelHeight  retained for constructor compatibility; contextual help is shown in the shell
      */
-    public CampaignOptionsHeaderPanel(String name, String imageAddress, boolean includeBodyText,
+    public CampaignOptionsHeaderPanel(@Nonnull String name, @Nonnull String imageAddress, boolean includeBodyText,
           boolean includeTipPanel, int tipPanelHeight) {
         this(name, imageAddress, includeBodyText, includeTipPanel, tipPanelHeight, DEFAULT_IMAGE_SIZE);
     }
@@ -153,7 +154,7 @@ public class CampaignOptionsHeaderPanel extends JPanel {
      * @param tipPanelHeight  retained for constructor compatibility; contextual help is shown in the shell
      * @param imageSize       the target width or height for the header image
      */
-    public CampaignOptionsHeaderPanel(String name, String imageAddress, boolean includeBodyText,
+    public CampaignOptionsHeaderPanel(@Nonnull String name, @Nonnull String imageAddress, boolean includeBodyText,
           boolean includeTipPanel, int tipPanelHeight, int imageSize) {
         this(name, imageAddress, includeBodyText, includeTipPanel, tipPanelHeight, imageSize, true);
     }
@@ -174,7 +175,7 @@ public class CampaignOptionsHeaderPanel extends JPanel {
      * @param imageSize       the target width or height for the header image
      * @param tintImage       if true, tints the image black to match the standard options header style
      */
-    public CampaignOptionsHeaderPanel(String name, String imageAddress, boolean includeBodyText,
+    public CampaignOptionsHeaderPanel(@Nonnull String name, @Nonnull String imageAddress, boolean includeBodyText,
           boolean includeTipPanel, int tipPanelHeight, int imageSize, boolean tintImage) {
         // Load and scale the image using the provided file path
         ImageIcon imageIcon = new ImageIcon(imageAddress);

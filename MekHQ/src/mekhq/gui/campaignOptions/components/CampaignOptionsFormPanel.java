@@ -41,6 +41,8 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
+import jakarta.annotation.Nonnull;
+
 /**
  * A compact, vertically stacked form panel for campaign option pages.
  *
@@ -102,7 +104,7 @@ public class CampaignOptionsFormPanel extends JPanel {
      * @param name the panel's base name; the Swing component name becomes
      *             {@code "pnl" + name}
      */
-    public CampaignOptionsFormPanel(String name) {
+    public CampaignOptionsFormPanel(@Nonnull String name) {
         this(name, 0, DEFAULT_CONTROL_WIDTH);
     }
 
@@ -115,7 +117,7 @@ public class CampaignOptionsFormPanel extends JPanel {
      * @param labelWidth the minimum width of the label column, or {@code 0} to
      *                   leave labels at their natural width
      */
-    public CampaignOptionsFormPanel(String name, int labelWidth) {
+    public CampaignOptionsFormPanel(@Nonnull String name, int labelWidth) {
         this(name, labelWidth, DEFAULT_CONTROL_WIDTH);
     }
 
@@ -128,7 +130,7 @@ public class CampaignOptionsFormPanel extends JPanel {
      *                     leave labels at their natural width
      * @param controlWidth the minimum width of the control column
      */
-    public CampaignOptionsFormPanel(String name, int labelWidth, int controlWidth) {
+    public CampaignOptionsFormPanel(@Nonnull String name, int labelWidth, int controlWidth) {
         this.labelWidth = labelWidth;
         this.controlWidth = controlWidth;
         setName("pnl" + name);
@@ -141,7 +143,7 @@ public class CampaignOptionsFormPanel extends JPanel {
      *
      * @param checkBox the checkbox to add
      */
-    public void addCheckBox(JCheckBox checkBox) {
+    public void addCheckBox(@Nonnull JCheckBox checkBox) {
         alignCheckBoxToStart(checkBox);
 
         int currentRow = row++;
@@ -164,7 +166,7 @@ public class CampaignOptionsFormPanel extends JPanel {
      *
      * @param component the component to add
      */
-    public void addFullWidthComponent(JComponent component) {
+    public void addFullWidthComponent(@Nonnull JComponent component) {
         int currentRow = row++;
         GridBagConstraints layout = new GridBagConstraints();
         layout.gridx = 0;
@@ -190,7 +192,7 @@ public class CampaignOptionsFormPanel extends JPanel {
      * @param columnCount the number of components to place side by side on each row
      * @param components  the components to add, in row-major order
      */
-    public void addComponentGrid(int columnCount, JComponent... components) {
+    public void addComponentGrid(int columnCount, @Nonnull JComponent... components) {
         if (columnCount <= 1) {
             for (JComponent component : components) {
                 addFullWidthComponent(component);
@@ -234,7 +236,7 @@ public class CampaignOptionsFormPanel extends JPanel {
      * @param columnCount the number of checkboxes to place side by side on each row
      * @param checkBoxes  the checkboxes to add, in row-major order
      */
-    public void addCheckBoxGrid(int columnCount, JCheckBox... checkBoxes) {
+    public void addCheckBoxGrid(int columnCount, @Nonnull JCheckBox... checkBoxes) {
         if (columnCount <= 1) {
             for (JCheckBox checkBox : checkBoxes) {
                 addCheckBox(checkBox);
@@ -309,7 +311,7 @@ public class CampaignOptionsFormPanel extends JPanel {
      * @param label   the label component for the left column
      * @param control the control component for the right column
      */
-    public void addRow(JComponent label, JComponent control) {
+    public void addRow(@Nonnull JComponent label, @Nonnull JComponent control) {
         setMinimumLabelWidth(label);
         setMinimumControlWidth(control);
 
@@ -348,7 +350,7 @@ public class CampaignOptionsFormPanel extends JPanel {
      * @param pairsPerRow       the number of label/control pairs to place side by side on each row
      * @param labelsAndControls alternating label and control components
      */
-    public void addRowGrid(int pairsPerRow, JComponent... labelsAndControls) {
+    public void addRowGrid(int pairsPerRow, @Nonnull JComponent... labelsAndControls) {
         if (pairsPerRow <= 1) {
             for (int index = 0; index + 1 < labelsAndControls.length; index += 2) {
                 addRow(labelsAndControls[index], labelsAndControls[index + 1]);

@@ -32,6 +32,7 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import jakarta.annotation.Nonnull;
 import mekhq.campaign.campaignOptions.AcquisitionsType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
@@ -80,7 +81,7 @@ class EquipmentAndSuppliesOptionsModel {
     boolean variableTechLevel;
     boolean useAmmoByType;
 
-    EquipmentAndSuppliesOptionsModel(CampaignOptions options) {
+    EquipmentAndSuppliesOptionsModel(@Nonnull CampaignOptions options) {
         acquisitionType = options.getAcquisitionType();
         useFunctionalAppraisal = options.isUseFunctionalAppraisal();
         acquisitionPersonnelCategory = options.getAcquisitionPersonnelCategory();
@@ -132,7 +133,7 @@ class EquipmentAndSuppliesOptionsModel {
         useAmmoByType = options.isUseAmmoByType();
     }
 
-    void applyTo(CampaignOptions options) {
+    void applyTo(@Nonnull CampaignOptions options) {
         options.setAcquisitionType(acquisitionType);
         options.setUseFunctionalAppraisal(useFunctionalAppraisal);
         options.setAcquisitionPersonnelCategory(acquisitionPersonnelCategory);

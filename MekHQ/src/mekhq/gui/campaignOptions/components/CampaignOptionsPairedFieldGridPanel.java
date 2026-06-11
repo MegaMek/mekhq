@@ -41,6 +41,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
+import jakarta.annotation.Nonnull;
+
 /**
  * A dense, column-aligned grid of label/control pairs for sections that hold
  * many short fields.
@@ -91,7 +93,7 @@ public class CampaignOptionsPairedFieldGridPanel extends JPanel {
      * @throws IllegalArgumentException if {@code columnCount} is less than
      *                                  {@code 1}
      */
-    public CampaignOptionsPairedFieldGridPanel(String name, int firstPairWidth, int followingPairWidth,
+    public CampaignOptionsPairedFieldGridPanel(@Nonnull String name, int firstPairWidth, int followingPairWidth,
           int controlWidth, int columnCount) {
         if (columnCount < 1) {
             throw new IllegalArgumentException("Paired field grids require at least one column.");
@@ -118,7 +120,7 @@ public class CampaignOptionsPairedFieldGridPanel extends JPanel {
      *
      * @throws IllegalArgumentException if the two arrays have different lengths
      */
-    public void addPairs(JComponent[] labels, JComponent[] controls) {
+    public void addPairs(@Nonnull JComponent[] labels, @Nonnull JComponent[] controls) {
         if (labels.length != controls.length) {
             throw new IllegalArgumentException("Paired field grids require one control per label.");
         }

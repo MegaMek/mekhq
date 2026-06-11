@@ -40,7 +40,8 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import javax.swing.JCheckBox;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
 import mekhq.gui.campaignOptions.CampaignOptionsUtilities;
 
@@ -67,7 +68,7 @@ public class CampaignOptionsCheckBox extends JCheckBox {
      *
      * @param name the name used to fetch the checkbox's text and tooltip, and to set its name
      */
-    public CampaignOptionsCheckBox(String name) {
+    public CampaignOptionsCheckBox(@Nonnull String name) {
         this(name, null, null);
     }
 
@@ -86,7 +87,7 @@ public class CampaignOptionsCheckBox extends JCheckBox {
      * @param customWrapSize the maximum number of characters per tooltip line, or {@code null} for the default wrap
      *                       size
      */
-    public CampaignOptionsCheckBox(String name, @Nullable Integer customWrapSize) {
+    public CampaignOptionsCheckBox(@Nonnull String name, @Nullable Integer customWrapSize) {
         this(name, customWrapSize, null);
     }
 
@@ -98,7 +99,7 @@ public class CampaignOptionsCheckBox extends JCheckBox {
      * @param name     the name used to fetch the checkbox's text and tooltip, and to set its name
      * @param metadata version and flag metadata for displaying badges, or {@code null} for no badges
      */
-    public CampaignOptionsCheckBox(String name, @Nullable CampaignOptionsMetadata metadata) {
+    public CampaignOptionsCheckBox(@Nonnull String name, @Nullable CampaignOptionsMetadata metadata) {
         this(name, null, metadata);
     }
 
@@ -120,7 +121,7 @@ public class CampaignOptionsCheckBox extends JCheckBox {
      *                       size
      * @param metadata       version and flag metadata for displaying badges, or {@code null} for no badges
      */
-    public CampaignOptionsCheckBox(String name, @Nullable Integer customWrapSize,
+    public CampaignOptionsCheckBox(@Nonnull String name, @Nullable Integer customWrapSize,
                                    @Nullable CampaignOptionsMetadata metadata) {
         // Fetch base text and append badges
         // Sets the checkbox's text from the resource bundle, wrapped in HTML tags. The <nobr> keeps the label and its

@@ -36,6 +36,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -48,7 +50,7 @@ import mekhq.campaign.market.personnelMarket.markets.PersonnelMarketCamOpsStrict
 import mekhq.campaign.market.personnelMarket.markets.PersonnelMarketMekHQ;
 
 class MarketsOptionsModel {
-    PersonnelMarketStyle personnelMarketStyle;
+    @Nullable PersonnelMarketStyle personnelMarketStyle;
     String personnelMarketName;
     boolean personnelMarketReportRefresh;
     boolean usePersonnelHireHiringHallOnly;
@@ -87,7 +89,7 @@ class MarketsOptionsModel {
     boolean blcSaleValue;
     boolean overageRepaymentInFinalPayment;
 
-    MarketsOptionsModel(CampaignOptions options) {
+    MarketsOptionsModel(@Nonnull CampaignOptions options) {
         personnelMarketStyle = options.getPersonnelMarketStyle();
         personnelMarketName = options.getPersonnelMarketName();
         personnelMarketReportRefresh = options.isPersonnelMarketReportRefresh();
@@ -128,7 +130,7 @@ class MarketsOptionsModel {
         overageRepaymentInFinalPayment = options.isOverageRepaymentInFinalPayment();
     }
 
-    void applyTo(Campaign campaign, CampaignOptions options) {
+    void applyTo(@Nonnull Campaign campaign, @Nonnull CampaignOptions options) {
         if (personnelMarketStyle != null) {
             PersonnelMarketStyle originalPersonnelMarketStyle = options.getPersonnelMarketStyle();
             if (personnelMarketStyle != originalPersonnelMarketStyle) {

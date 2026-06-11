@@ -56,11 +56,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.dialogs.iconChooser.CamoChooserDialog;
 import megamek.client.ui.util.UIUtil;
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
 import megamek.common.util.DateUtilities;
 import mekhq.MekHQ;
@@ -138,7 +139,7 @@ public class GeneralTab {
      * @param mode     The {@link CampaignOptionsDialogMode} enum determining what state caused the dialog to be
      *                 triggered.
      */
-    public GeneralTab(Campaign campaign, JFrame frame, CampaignOptionsDialogMode mode) {
+    public GeneralTab(@Nonnull Campaign campaign, JFrame frame, CampaignOptionsDialogMode mode) {
         // region Variable Declarations
         this.frame = frame;
         this.campaign = campaign;
@@ -153,7 +154,7 @@ public class GeneralTab {
     /**
      * @return the currently selected date
      */
-    public LocalDate getDate() {
+    public @Nonnull LocalDate getDate() {
         return date;
     }
 
@@ -188,7 +189,7 @@ public class GeneralTab {
      *
      * @return A {@link JPanel} containing the general tab content.
      */
-    public JPanel createGeneralTab() {
+    public @Nonnull JPanel createGeneralTab() {
         // Campaign name
         lblName = new CampaignOptionsLabel("Name");
         txtName = new CampaignOptionsTextField("Name");
@@ -265,7 +266,7 @@ public class GeneralTab {
               .build();
     }
 
-    private JPanel createCampaignBasicsPanel() {
+    private @Nonnull JPanel createCampaignBasicsPanel() {
         CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("GeneralCampaignBasicsPanel",
               FORM_LABEL_COLUMN_WIDTH,
               FORM_CONTROL_COLUMN_WIDTH);
@@ -307,7 +308,7 @@ public class GeneralTab {
         return panel;
     }
 
-    private JPanel createIdentityArtworkPanel() {
+    private @Nonnull JPanel createIdentityArtworkPanel() {
         CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("GeneralIdentityArtworkPanel",
               FORM_LABEL_COLUMN_WIDTH,
               UIUtil.scaleForGUI(120));
@@ -475,7 +476,7 @@ public class GeneralTab {
      *
      * @return A {@link JPanel} containing additional informational components.
      */
-    private JPanel createFurtherReadingPanel() {
+    private @Nonnull JPanel createFurtherReadingPanel() {
         return new CampaignOptionsIntroPanel("FurtherReadingPanel",
               getFurtherReadingText(),
               UIUtil.scaleForGUI(FURTHER_READING_TEXT_WIDTH));

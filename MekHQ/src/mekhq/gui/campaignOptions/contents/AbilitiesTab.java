@@ -74,8 +74,9 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.client.ui.util.UIUtil;
-import megamek.common.annotations.Nullable;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import mekhq.CampaignPreset;
@@ -238,7 +239,7 @@ public class AbilitiesTab {
      *
      * @return A {@code JPanel} representing the generated abilities tab.
      */
-    public JPanel createAbilitiesTab(AbilityCategory abilityCategory) {
+    public @Nonnull JPanel createAbilitiesTab(AbilityCategory abilityCategory) {
         JPanel tab = createdCategoryTabs.computeIfAbsent(abilityCategory, category -> new JPanel(new BorderLayout()));
         if (tab.getComponentCount() == 0) {
             refreshTabContents(abilityCategory);
@@ -247,7 +248,7 @@ public class AbilitiesTab {
         return tab;
     }
 
-    private JPanel createAbilitiesPage(AbilityCategory abilityCategory) {
+    private @Nonnull JPanel createAbilitiesPage(AbilityCategory abilityCategory) {
         // Header name and logo image per category.
         String[] headerInfo = switch (abilityCategory) {
             case COMBAT_ABILITY -> new String[] { "CombatAbilitiesTab", "logo_aurigan_coalition.png" };
@@ -301,7 +302,7 @@ public class AbilitiesTab {
      *
      * @return a left-aligned panel with the four action buttons
      */
-    private JPanel createAbilityButtonBar(AbilityCategory abilityCategory) {
+    private @Nonnull JPanel createAbilityButtonBar(AbilityCategory abilityCategory) {
         JButton btnEnableCurrent = createAbilityActionButton("AddAllCurrent");
         btnEnableCurrent.addActionListener(e -> toggleAbilitiesAction(abilityCategory, true));
 
@@ -335,7 +336,7 @@ public class AbilitiesTab {
      *
      * @return the configured button
      */
-    private static JButton createAbilityActionButton(String name) {
+    private static @Nonnull JButton createAbilityActionButton(String name) {
         JButton button = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".text"));
         button.setName("btn" + name);
 

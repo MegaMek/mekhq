@@ -37,7 +37,8 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import javax.swing.JPanel;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
 import mekhq.gui.campaignOptions.CampaignOptionsUtilities;
@@ -58,7 +59,7 @@ public class CampaignOptionsStandardPanel extends JPanel {
      *
      * @param name the name of the panel, used to set its internal name
      */
-    public CampaignOptionsStandardPanel(String name) {
+    public CampaignOptionsStandardPanel(@Nonnull String name) {
         this(name, false, "");
     }
 
@@ -72,7 +73,7 @@ public class CampaignOptionsStandardPanel extends JPanel {
      * @param name          the name of the panel, used to set its internal name
      * @param includeBorder {@code true} if the panel should include an untitled border
      */
-    public CampaignOptionsStandardPanel(String name, boolean includeBorder) {
+    public CampaignOptionsStandardPanel(@Nonnull String name, boolean includeBorder) {
         this(name, includeBorder, "");
     }
 
@@ -88,7 +89,7 @@ public class CampaignOptionsStandardPanel extends JPanel {
      * @param includeBorder {@code true} if the panel should include a border
      * @param borderTitle   the resource bundle key for the border's title; an empty string indicates no title
      */
-    public CampaignOptionsStandardPanel(String name, boolean includeBorder, String borderTitle) {
+    public CampaignOptionsStandardPanel(@Nonnull String name, boolean includeBorder, @Nonnull String borderTitle) {
         this(name, includeBorder, borderTitle, null);
     }
 
@@ -106,7 +107,7 @@ public class CampaignOptionsStandardPanel extends JPanel {
      * @param borderTitle   the resource bundle key for the border's title; an empty string indicates no title
      * @param metadata      version and flag metadata for displaying badges, or {@code null} for no badges
      */
-    public CampaignOptionsStandardPanel(String name, boolean includeBorder, String borderTitle,
+    public CampaignOptionsStandardPanel(@Nonnull String name, boolean includeBorder, @Nonnull String borderTitle,
                                         @Nullable CampaignOptionsMetadata metadata) {
         borderTitle = borderTitle.isBlank() ?
                             "" :

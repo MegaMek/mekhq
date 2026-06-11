@@ -47,7 +47,8 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -234,7 +235,7 @@ public class AdvancementTab {
      *                 and random skill preferences are
      *                 retrieved.
      */
-    public AdvancementTab(Campaign campaign) {
+    public AdvancementTab(@Nonnull Campaign campaign) {
         this.campaign = campaign;
         this.randomSkillPreferences = campaign.getRandomSkillPreferences();
         this.campaignOptions = campaign.getCampaignOptions();
@@ -313,7 +314,7 @@ public class AdvancementTab {
      * @return A {@code JPanel} containing the configuration options for XP Awards
      *         in the campaign.
      */
-    public JPanel xpAwardsTab() {
+    public @Nonnull JPanel xpAwardsTab() {
         // Header
         String imageAddress = getImageDirectory() + "logo_clan_steel_viper.png";
         xpAwardsHeader = new CampaignOptionsHeaderPanel("XpAwardsTab", imageAddress);
@@ -350,7 +351,7 @@ public class AdvancementTab {
                 .build();
     }
 
-    private JPanel createXpAwardOptionsPanel() {
+    private @Nonnull JPanel createXpAwardOptionsPanel() {
         lblXpCostMultiplier = new CampaignOptionsLabel("XpCostMultiplier",
                 getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblXpCostMultiplier.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "XpCostMultiplier"));
@@ -365,7 +366,7 @@ public class AdvancementTab {
         return panel;
     }
 
-    private CampaignOptionsPairedFieldGridPanel createAdvancementPairedGrid(String name, JComponent[] labels,
+    private @Nonnull CampaignOptionsPairedFieldGridPanel createAdvancementPairedGrid(String name, JComponent[] labels,
             JComponent[] controls) {
         final CampaignOptionsPairedFieldGridPanel panel = new CampaignOptionsPairedFieldGridPanel(name,
                 ADVANCEMENT_GRID_FIRST_PAIR_COLUMN_WIDTH,
@@ -377,7 +378,7 @@ public class AdvancementTab {
         return panel;
     }
 
-    private CampaignOptionsPairedFieldGridPanel createAdvancementPairedGrid(String name, JComponent[] labels,
+    private @Nonnull CampaignOptionsPairedFieldGridPanel createAdvancementPairedGrid(String name, JComponent[] labels,
             JComponent[] controls, int pairColumnWidth) {
         final CampaignOptionsPairedFieldGridPanel panel = new CampaignOptionsPairedFieldGridPanel(name,
                 pairColumnWidth,
@@ -397,7 +398,7 @@ public class AdvancementTab {
      * @return A {@code JPanel} containing configuration options for task-related
      *         experience awards.
      */
-    private JPanel createTasksPanel() {
+    private @Nonnull JPanel createTasksPanel() {
         // Contents
         lblTaskXP = new CampaignOptionsLabel("TaskXP");
         lblTaskXP.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "TaskXP"));
@@ -444,7 +445,7 @@ public class AdvancementTab {
      * @return A {@code JPanel} containing configuration options for
      *         scenario-related experience awards.
      */
-    private JPanel createScenariosPanel() {
+    private @Nonnull JPanel createScenariosPanel() {
         // Contents
         lblScenarioXP = new CampaignOptionsLabel("ScenarioXP");
         lblScenarioXP.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "ScenarioXP"));
@@ -474,7 +475,7 @@ public class AdvancementTab {
      * @return A {@code JPanel} containing configuration options for mission-related
      *         experience settings.
      */
-    private JPanel createMissionsPanel() {
+    private @Nonnull JPanel createMissionsPanel() {
         // Contents
         lblVocationalXP = new CampaignOptionsLabel("VocationalXP",
                 getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
@@ -523,7 +524,7 @@ public class AdvancementTab {
      * @return A {@code JPanel} containing configuration options for administrator
      *         experience settings.
      */
-    private JPanel createAdministratorsPanel() {
+    private @Nonnull JPanel createAdministratorsPanel() {
         // Contents
         lblAdminWeeklyXP = new CampaignOptionsLabel("AdminWeeklyXP");
         lblAdminWeeklyXP.addMouseListener(createTipPanelUpdater(xpAwardsHeader, "AdminWeeklyXP"));
@@ -632,7 +633,7 @@ public class AdvancementTab {
      * @return A {@code JPanel} containing the configuration options for skill
      *         randomization.
      */
-    public JPanel skillRandomizationTab() {
+    public @Nonnull JPanel skillRandomizationTab() {
         // Header
         String imageAddress = getImageDirectory() + "logo_republic_of_the_sphere.png";
         skillRandomizationHeader = new CampaignOptionsHeaderPanel("SkillRandomizationTab", imageAddress);
@@ -663,7 +664,7 @@ public class AdvancementTab {
                 .build();
     }
 
-    private JPanel createSkillRandomizationOptionsPanel() {
+    private @Nonnull JPanel createSkillRandomizationOptionsPanel() {
         chkExtraRandomness = new CampaignOptionsCheckBox("ExtraRandomness",
                 getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         chkExtraRandomness.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, "ExtraRandomness"));
@@ -684,7 +685,7 @@ public class AdvancementTab {
      * @return A {@code JPanel} containing configuration options for phenotype
      *         probabilities.
      */
-    private JPanel createPhenotypePanel() {
+    private @Nonnull JPanel createPhenotypePanel() {
         // Contents
         List<Phenotype> phenotypes = Phenotype.getExternalPhenotypes();
         phenotypeLabels = new JLabel[phenotypes.size()];
@@ -705,7 +706,7 @@ public class AdvancementTab {
                 ADVANCEMENT_GRID_MEDIUM_PAIR_COLUMN_WIDTH);
     }
 
-    private JPanel createExperienceLevelModifiersPanel() {
+    private @Nonnull JPanel createExperienceLevelModifiersPanel() {
         createAbilityModifierControls();
         createCommandSkillModifierControls();
         createUtilitySkillModifierControls();
@@ -792,21 +793,21 @@ public class AdvancementTab {
         spnUtilitySkillsLegendary = createSkillModifierSpinner("UtilitySkillsLegendary");
     }
 
-    private JLabel createModifierColumnHeader(String name) {
+    private @Nonnull JLabel createModifierColumnHeader(String name) {
         return new JLabel(getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".text"));
     }
 
-    private JLabel createExperienceLevelLabel(int experienceLevel) {
+    private @Nonnull JLabel createExperienceLevelLabel(int experienceLevel) {
         return new JLabel(SkillType.getExperienceLevelName(experienceLevel));
     }
 
-    private JSpinner createSkillModifierSpinner(String name) {
+    private @Nonnull JSpinner createSkillModifierSpinner(String name) {
         JSpinner spinner = new CampaignOptionsSpinner(name, 0, -12, 12, 1);
         spinner.addMouseListener(createTipPanelUpdater(skillRandomizationHeader, name));
         return spinner;
     }
 
-    private JPanel createSpecialSkillModifiersPanel() {
+    private @Nonnull JPanel createSpecialSkillModifiersPanel() {
         createSecondarySkillControls();
         createArtilleryControls();
         createSmallArmsControls();
@@ -880,7 +881,7 @@ public class AdvancementTab {
      *
      * @return the fully configured {@link JPanel} for recruitment bonus settings
      */
-    public JPanel recruitmentBonusesTab() {
+    public @Nonnull JPanel recruitmentBonusesTab() {
         // Header
         // start Recruitment Bonus Tab
         String imageAddress = getImageDirectory() + "logo_calderon_protectorate.png";
@@ -919,7 +920,7 @@ public class AdvancementTab {
      * @return a configured {@link JPanel} specifically for defining recruitment
      *         bonuses for combat roles
      */
-    private JPanel createRecruitmentBonusesCombatPanel() {
+    private @Nonnull JPanel createRecruitmentBonusesCombatPanel() {
         // Contents
         List<PersonnelRole> roles = PersonnelRole.getCombatRoles();
         lblRecruitmentBonusCombat = new JLabel[roles.size()];
@@ -957,7 +958,7 @@ public class AdvancementTab {
      * @return a configured {@link JPanel} specifically for defining recruitment
      *         bonuses for support roles
      */
-    private JPanel createRecruitmentBonusesSupportPanel() {
+    private @Nonnull JPanel createRecruitmentBonusesSupportPanel() {
         // Contents
         List<PersonnelRole> roles = PersonnelRole.getSupportRoles();
         lblRecruitmentBonusSupport = new JLabel[roles.size()];

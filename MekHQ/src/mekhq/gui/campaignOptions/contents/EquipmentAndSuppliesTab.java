@@ -48,8 +48,9 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.client.ui.comboBoxes.MMComboBox;
-import megamek.common.annotations.Nullable;
 import mekhq.campaign.campaignOptions.AcquisitionsType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
@@ -195,7 +196,7 @@ public class EquipmentAndSuppliesTab {
      *
      * @param campaignOptions the {@link CampaignOptions} object containing configuration settings for the campaign
      */
-    public EquipmentAndSuppliesTab(CampaignOptions campaignOptions) {
+    public EquipmentAndSuppliesTab(@Nonnull CampaignOptions campaignOptions) {
         this.campaignOptions = campaignOptions;
 
         initialize();
@@ -352,7 +353,7 @@ public class EquipmentAndSuppliesTab {
      *
      * @return A {@code JPanel} instance representing the complete acquisition tab.
      */
-    public JPanel createAcquisitionTab() {
+    public @Nonnull JPanel createAcquisitionTab() {
         // Header
         String imageAddress = getImageDirectory() + "logo_clan_cloud_cobra.png";
         acquisitionHeader = new CampaignOptionsHeaderPanel("AcquisitionTab", imageAddress);
@@ -389,7 +390,7 @@ public class EquipmentAndSuppliesTab {
      *
      * @return A {@code JPanel} populated with acquisition configuration components and their layout.
      */
-    private JPanel createAcquisitionPanel() {
+    private @Nonnull JPanel createAcquisitionPanel() {
         // Content
         lblChoiceAcquireSkill = new CampaignOptionsLabel("ChoiceAcquireSkill");
         lblChoiceAcquireSkill.addMouseListener(createTipPanelUpdater(acquisitionHeader, "ChoiceAcquireSkill"));
@@ -437,7 +438,7 @@ public class EquipmentAndSuppliesTab {
         return panel;
     }
 
-    private JPanel createDeliveryPanel() {
+    private @Nonnull JPanel createDeliveryPanel() {
         lblTransitTimeUnits = new CampaignOptionsLabel("TransitTimeUnits");
         lblTransitTimeUnits.addMouseListener(createTipPanelUpdater(acquisitionHeader, "TransitTimeUnits"));
         choiceTransitTimeUnits.addMouseListener(createTipPanelUpdater(acquisitionHeader, "TransitTimeUnits"));
@@ -462,7 +463,7 @@ public class EquipmentAndSuppliesTab {
      *
      * @return A {@code JPanel} populated with autoLogistics configuration components and their layout.
      */
-    private JPanel createAutoLogisticsPanel() {
+    private @Nonnull JPanel createAutoLogisticsPanel() {
         // Content
         lblAutoLogisticsMekHead = new CampaignOptionsLabel("AutoLogisticsMekHead");
         lblAutoLogisticsMekHead.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AutoLogisticsMekHead"));
@@ -605,7 +606,7 @@ public class EquipmentAndSuppliesTab {
      * @return a {@code JPanel} object representing the planetary acquisition tab with its configured components and
      *       layout.
      */
-    public JPanel createPlanetaryAcquisitionTab() {
+    public @Nonnull JPanel createPlanetaryAcquisitionTab() {
         // Header
         String imageAddress = getImageDirectory() + "logo_rim_worlds_republic.png";
         planetaryAcquisitionHeader = new CampaignOptionsHeaderPanel("PlanetaryAcquisitionTab", imageAddress);
@@ -636,7 +637,7 @@ public class EquipmentAndSuppliesTab {
      *
      * @return a {@code JPanel} containing the campaign options panel for planetary acquisitions.
      */
-    private JPanel createOptionsPanel() {
+    private @Nonnull JPanel createOptionsPanel() {
         usePlanetaryAcquisitions = new CampaignOptionsCheckBox("UsePlanetaryAcquisitions",
               getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT, CampaignOptionFlag.RECOMMENDED));
         usePlanetaryAcquisitions.addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
@@ -689,7 +690,7 @@ public class EquipmentAndSuppliesTab {
         return panel;
     }
 
-    private JPanel createModifiersPanel() {
+    private @Nonnull JPanel createModifiersPanel() {
         int i = 0;
         for (PlanetarySophistication ignored : PlanetarySophistication.values()) {
             spnPlanetAcquireTechBonus[i] = createModifierSpinner("TechLabel");
@@ -729,19 +730,19 @@ public class EquipmentAndSuppliesTab {
         return panel;
     }
 
-    private JLabel createModifierColumnHeader(String name) {
+    private @Nonnull JLabel createModifierColumnHeader(String name) {
         JLabel label = new CampaignOptionsLabel(name);
         label.addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader, name));
         return label;
     }
 
-    private JLabel createModifierRowLabel(String text) {
+    private @Nonnull JLabel createModifierRowLabel(String text) {
         JLabel label = new JLabel(String.format("<html>%s</html>", text));
         label.addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader, "TechLabel"));
         return label;
     }
 
-    private JSpinner createModifierSpinner(String tipKey) {
+    private @Nonnull JSpinner createModifierSpinner(String tipKey) {
         JSpinner spinner = new JSpinner(new SpinnerNumberModel(0, -12, 12, 1));
         spinner.addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader, tipKey));
         CampaignOptionsSpinner.installSelectAllOnFocus(spinner);
@@ -819,7 +820,7 @@ public class EquipmentAndSuppliesTab {
      *
      * @return the {@code JPanel} representing the "Tech Limits" tab, fully configured with its components and layout.
      */
-    public JPanel createTechLimitsTab() {
+    public @Nonnull JPanel createTechLimitsTab() {
         // Header
         //start Tech Limits Tab
         String imageAddress = getImageDirectory() + "logo_clan_ghost_bear.png";
@@ -877,7 +878,7 @@ public class EquipmentAndSuppliesTab {
                 .build();
     }
 
-    private JPanel createTechLevelPanel() {
+    private @Nonnull JPanel createTechLevelPanel() {
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("TechLevelPanel",
               EQUIPMENT_LABEL_COLUMN_WIDTH,
               EQUIPMENT_CONTROL_COLUMN_WIDTH);
@@ -888,7 +889,7 @@ public class EquipmentAndSuppliesTab {
         return panel;
     }
 
-    private JPanel createPurchaseRulesPanel() {
+    private @Nonnull JPanel createPurchaseRulesPanel() {
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("TechPurchaseRulesPanel",
               EQUIPMENT_LABEL_COLUMN_WIDTH,
               EQUIPMENT_CONTROL_COLUMN_WIDTH);

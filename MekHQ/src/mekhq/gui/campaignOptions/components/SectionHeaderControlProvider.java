@@ -34,7 +34,7 @@ package mekhq.gui.campaignOptions.components;
 
 import javax.swing.JComponent;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.gui.baseComponents.MHQCollapsiblePanel;
 
 /**

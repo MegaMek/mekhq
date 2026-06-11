@@ -53,7 +53,8 @@ import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 
 import megamek.client.ui.util.UIUtil;
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import mekhq.gui.baseComponents.MHQCollapsiblePanel;
 import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
 
@@ -137,7 +138,8 @@ public class CampaignOptionsPagePanel extends JPanel {
         add(pageBody);
     }
 
-    public static Builder builder(String name, String headerResourceName, String imageAddress) {
+    public static @Nonnull Builder builder(@Nonnull String name, @Nonnull String headerResourceName,
+          @Nonnull String imageAddress) {
         return new Builder(name, headerResourceName, imageAddress);
     }
 
@@ -151,7 +153,7 @@ public class CampaignOptionsPagePanel extends JPanel {
      *
      * @return the section search text, or an empty string if the page has no sections
      */
-    public String getSectionSearchText() {
+    public @Nonnull String getSectionSearchText() {
         return sectionSearchText;
     }
 
@@ -171,13 +173,13 @@ public class CampaignOptionsPagePanel extends JPanel {
     }
 
     @Override
-    public Dimension getPreferredSize() {
+    public @Nonnull Dimension getPreferredSize() {
         Dimension preferredSize = pageBody.getPreferredSize();
         return new Dimension(Math.min(preferredSize.width, CAMPAIGN_OPTIONS_PANEL_WIDTH), preferredSize.height);
     }
 
     @Override
-    public Dimension getMinimumSize() {
+    public @Nonnull Dimension getMinimumSize() {
         return new Dimension(0, pageBody.getMinimumSize().height);
     }
 

@@ -32,6 +32,7 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import jakarta.annotation.Nonnull;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.campaignOptions.BoardScalingType;
@@ -81,7 +82,7 @@ class RulesetsOptionsModel {
     boolean useGenericBattleValue;
     boolean useVerboseBidding;
 
-    RulesetsOptionsModel(CampaignOptions options) {
+    RulesetsOptionsModel(@Nonnull CampaignOptions options) {
         skillLevel = options.getSkillLevel();
         boardScalingType = options.getBoardScalingType();
         opForLanceTypeMeks = options.getOpForLanceTypeMeks();
@@ -125,7 +126,7 @@ class RulesetsOptionsModel {
         useVerboseBidding = options.isUseVerboseBidding();
     }
 
-    void applyTo(CampaignOptions options) {
+    void applyTo(@Nonnull CampaignOptions options) {
         options.setSkillLevel(skillLevel);
         options.setBoardScalingType(boardScalingType);
         options.setOpForLanceTypeMeks(opForLanceTypeMeks);

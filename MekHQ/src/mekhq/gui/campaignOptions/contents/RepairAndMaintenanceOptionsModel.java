@@ -32,6 +32,7 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import jakarta.annotation.Nonnull;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 
 class RepairAndMaintenanceOptionsModel {
@@ -56,7 +57,7 @@ class RepairAndMaintenanceOptionsModel {
     boolean useUnofficialMaintenance;
     boolean logMaintenance;
 
-    RepairAndMaintenanceOptionsModel(CampaignOptions options) {
+    RepairAndMaintenanceOptionsModel(@Nonnull CampaignOptions options) {
         techsUseAdministration = options.isTechsUseAdministration();
         useUsefulAsTechs = options.isUseUsefulAsTechs();
         useEraMods = options.isUseEraMods();
@@ -79,7 +80,7 @@ class RepairAndMaintenanceOptionsModel {
         logMaintenance = options.isLogMaintenance();
     }
 
-    void applyTo(CampaignOptions options) {
+    void applyTo(@Nonnull CampaignOptions options) {
         options.setTechsUseAdministration(techsUseAdministration);
         options.setIsUseUsefulAsTechs(useUsefulAsTechs);
         options.setEraMods(useEraMods);

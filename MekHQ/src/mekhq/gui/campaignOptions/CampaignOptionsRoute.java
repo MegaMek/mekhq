@@ -34,6 +34,9 @@ package mekhq.gui.campaignOptions;
 
 import java.util.List;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 /**
  * Describes a navigable Campaign Options route.
  */
@@ -45,11 +48,12 @@ class CampaignOptionsRoute {
     private final String searchableText;
     private String sectionSearchText = "";
 
-    CampaignOptionsRoute(String id, List<String> path, List<String> titleResourceNames) {
+    CampaignOptionsRoute(@Nonnull String id, @Nonnull List<String> path, @Nonnull List<String> titleResourceNames) {
         this(id, path, titleResourceNames, true);
     }
 
-    CampaignOptionsRoute(String id, List<String> path, List<String> titleResourceNames, boolean showHelpPanel) {
+    CampaignOptionsRoute(@Nonnull String id, @Nonnull List<String> path, @Nonnull List<String> titleResourceNames,
+          boolean showHelpPanel) {
         this.id = id;
         this.path = List.copyOf(path);
         this.titleResourceNames = List.copyOf(titleResourceNames);
@@ -58,15 +62,15 @@ class CampaignOptionsRoute {
                                                          + String.join(" ", titleResourceNames));
     }
 
-    String getId() {
+    @Nonnull String getId() {
         return id;
     }
 
-    List<String> getPath() {
+    @Nonnull List<String> getPath() {
         return path;
     }
 
-    List<String> getTitleResourceNames() {
+    @Nonnull List<String> getTitleResourceNames() {
         return titleResourceNames;
     }
 
@@ -74,7 +78,7 @@ class CampaignOptionsRoute {
         return showHelpPanel;
     }
 
-    String getTopLevelResourceName() {
+    @Nonnull String getTopLevelResourceName() {
         return titleResourceNames.get(0);
     }
 
@@ -88,11 +92,11 @@ class CampaignOptionsRoute {
      *
      * @param text the raw section text to index; ignored when {@code null} or blank
      */
-    void setSectionSearchText(String text) {
+    void setSectionSearchText(@Nullable String text) {
         this.sectionSearchText = text == null ? "" : normalizeSearchText(text);
     }
 
-    boolean matches(String normalizedFilter) {
+    boolean matches(@Nonnull String normalizedFilter) {
         if (normalizedFilter.isBlank()) {
             return true;
         }
@@ -106,12 +110,12 @@ class CampaignOptionsRoute {
         return true;
     }
 
-    static String normalizeSearchText(String text) {
+    static @Nonnull String normalizeSearchText(@Nonnull String text) {
         return text.toLowerCase().replaceAll("[^a-z0-9]+", " ").trim();
     }
 
     @Override
-    public String toString() {
+    public @Nonnull String toString() {
         return id;
     }
 }

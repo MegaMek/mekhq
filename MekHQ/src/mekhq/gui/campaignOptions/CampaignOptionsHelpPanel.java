@@ -43,6 +43,7 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.EmptyBorder;
 
+import jakarta.annotation.Nonnull;
 import megamek.client.ui.util.UIUtil;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
@@ -82,7 +83,7 @@ class CampaignOptionsHelpPanel extends JPanel {
         clearHelpText();
     }
 
-    void setHelpText(String helpText) {
+    void setHelpText(@Nonnull String helpText) {
         if (helpText.isBlank()) {
             clearHelpText();
             return;
@@ -97,13 +98,13 @@ class CampaignOptionsHelpPanel extends JPanel {
     }
 
     @Override
-    public Dimension getPreferredSize() {
+    public @Nonnull Dimension getPreferredSize() {
         Dimension preferredSize = super.getPreferredSize();
         return new Dimension(preferredSize.width, UIUtil.scaleForGUI(HELP_PANEL_HEIGHT));
     }
 
     @Override
-    public Dimension getMinimumSize() {
+    public @Nonnull Dimension getMinimumSize() {
         Dimension minimumSize = super.getMinimumSize();
         return new Dimension(minimumSize.width, UIUtil.scaleForGUI(HELP_PANEL_HEIGHT));
     }

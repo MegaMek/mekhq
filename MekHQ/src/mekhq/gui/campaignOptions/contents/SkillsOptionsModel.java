@@ -35,6 +35,8 @@ package mekhq.gui.campaignOptions.contents;
 import java.util.HashMap;
 import java.util.Map;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -46,15 +48,16 @@ class SkillsOptionsModel {
     int edgeCost;
     int attributeCost;
 
-    SkillsOptionsModel(CampaignOptions options, Map<String, SkillType> presetSkillValues) {
+    SkillsOptionsModel(@Nonnull CampaignOptions options, @Nullable Map<String, SkillType> presetSkillValues) {
         loadFrom(options, presetSkillValues);
     }
 
+    @Nullable
     SkillConfiguration getSkillConfiguration(String skillName) {
         return skillConfigurations.get(skillName);
     }
 
-    void loadFrom(CampaignOptions options, Map<String, SkillType> presetSkillValues) {
+    void loadFrom(@Nonnull CampaignOptions options, @Nullable Map<String, SkillType> presetSkillValues) {
         Map<String, SkillType> skillValues = presetSkillValues == null ? Map.of() : presetSkillValues;
         String[] skills = SkillType.getSkillList();
 
@@ -72,7 +75,7 @@ class SkillsOptionsModel {
         attributeCost = options.getAttributeCost();
     }
 
-    void applyTo(CampaignOptions options, Map<String, SkillType> presetSkills) {
+    void applyTo(@Nonnull CampaignOptions options, @Nullable Map<String, SkillType> presetSkills) {
         for (final String skillName : SkillType.getSkillList()) {
             SkillType type = SkillType.getType(skillName);
             if (presetSkills != null) {
