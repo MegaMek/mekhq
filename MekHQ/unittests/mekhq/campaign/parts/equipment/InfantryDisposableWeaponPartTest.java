@@ -35,6 +35,8 @@ package mekhq.campaign.parts.equipment;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -49,8 +51,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests {@link InfantryDisposableWeaponPart} - a single per-trooper Disposable Weapon (TO:AR p.106). A platoon gets one
- * of these per trooper, so it is valued/refit/bought-and-sold as an individual weapon.
+ * Tests {@link InfantryDisposableWeaponPart} - a single per-trooper Disposable Weapon (TO:AuE p.116, Corrected Sixth
+ * Printing). A platoon gets one of these per trooper, so it is valued/refit/bought-and-sold as an individual weapon.
  */
 class InfantryDisposableWeaponPartTest {
 
@@ -112,6 +114,27 @@ class InfantryDisposableWeaponPartTest {
         EquipmentPart stockSpare = new EquipmentPart(0, law, -1, 1.0, false, mock(Campaign.class));
         assertTrue(missing.isAcceptableReplacement(stockSpare, true),
               "An existing EquipmentPart LAW in the warehouse should be an acceptable replacement");
+    }
+
+    @Test
+    @DisplayName("internal-name matching does not cross-match IS and Clan variants of a weapon")
+    void internalNameMatchingSeparatesClanAndInnerSphere() {
+        EquipmentType innerSphereLaser = EquipmentType.get("ISERMediumLaser");
+        EquipmentType clanLaser = EquipmentType.get("CLERMediumLaser");
+        assertNotNull(innerSphereLaser, "IS ER Medium Laser should be a registered equipment type");
+        assertNotNull(clanLaser, "Clan ER Medium Laser should be a registered equipment type");
+        assertNotEquals(innerSphereLaser.getInternalName(), clanLaser.getInternalName(),
+              "IS and Clan variants register under distinct internal names");
+
+        MissingInfantryDisposableWeaponPart missing = new MissingInfantryDisposableWeaponPart(0, innerSphereLaser, -1,
+              mock(Campaign.class));
+        EquipmentPart innerSphereSpare = new EquipmentPart(0, innerSphereLaser, -1, 1.0, false, mock(Campaign.class));
+        EquipmentPart clanSpare = new EquipmentPart(0, clanLaser, -1, 1.0, false, mock(Campaign.class));
+
+        assertTrue(missing.isAcceptableReplacement(innerSphereSpare, true),
+              "The exact same weapon type should be an acceptable replacement");
+        assertFalse(missing.isAcceptableReplacement(clanSpare, true),
+              "The other tech base's variant must not satisfy the replacement");
     }
 
     @Test

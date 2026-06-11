@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.parts.equipment;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
 import java.io.PrintWriter;
 
 import megamek.common.annotations.Nullable;
@@ -45,15 +47,18 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * A single one-shot Disposable Weapon (TO:AR p.106) carried by one trooper. A platoon/squad gets one of these per
- * trooper (like the primary/secondary {@link InfantryWeaponPart}), so the loadout is valued, refit, and bought/sold as
- * that many individual weapons. The whole platoon fires its disposables together in one volley; this part tracks
- * whether that has happened (and not yet been reloaded) via the {@code spent} flag, which is driven by the platoon's
- * single fireable Disposable Weapon mount ({@link WeaponMounted#isFired()}).
+ * A single one-shot Disposable Weapon (TO:AuE p.116, Corrected Sixth Printing) carried by one trooper. A platoon/squad
+ * gets one of these per trooper (like the primary/secondary {@link InfantryWeaponPart}), so the loadout is valued,
+ * refit, and bought/sold as that many individual weapons. The whole platoon fires its disposables together in one
+ * volley; this part tracks whether that has happened (and not yet been reloaded) via the {@code spent} flag, which is
+ * driven by the platoon's single fireable Disposable Weapon mount ({@link WeaponMounted#isFired()}).
  */
 public class InfantryDisposableWeaponPart extends InfantryWeaponPart {
     private static final MMLogger LOGGER = MMLogger.create(InfantryDisposableWeaponPart.class);
-    private static final String DISPOSABLE_SUFFIX = " (Disposable)";
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Parts";
+
+    /** Reloading the platoon's disposables is a quick resupply task, not a repair (minutes). */
+    private static final int RELOAD_BASE_TIME_MINUTES = 15;
 
     private boolean spent;
 
@@ -61,11 +66,20 @@ public class InfantryDisposableWeaponPart extends InfantryWeaponPart {
         this(0, null, -1, null);
     }
 
-    public InfantryDisposableWeaponPart(int tonnage, EquipmentType et, int equipNum, Campaign c) {
-        super(tonnage, et, equipNum, c, false);
-        if (et != null) {
-            name = et.getName() + DISPOSABLE_SUFFIX;
+    public InfantryDisposableWeaponPart(int tonnage, EquipmentType equipmentType, int equipNum, Campaign campaign) {
+        super(tonnage, equipmentType, equipNum, campaign, false);
+        if (equipmentType != null) {
+            name = buildDisposableName(equipmentType);
         }
+    }
+
+    /**
+     * @param weaponType the disposable weapon's equipment type, never null
+     *
+     * @return the part name for a disposable weapon of the given type, e.g. "Rocket Launcher (LAW) (Disposable)"
+     */
+    static String buildDisposableName(EquipmentType weaponType) {
+        return getFormattedTextAt(RESOURCE_BUNDLE, "InfantryDisposableWeaponPart.name.format", weaponType.getName());
     }
 
     /**
@@ -79,7 +93,7 @@ public class InfantryDisposableWeaponPart extends InfantryWeaponPart {
     public void restore() {
         super.restore();
         if (type != null) {
-            name = type.getName() + DISPOSABLE_SUFFIX;
+            name = buildDisposableName(type);
         }
     }
 
@@ -92,25 +106,44 @@ public class InfantryDisposableWeaponPart extends InfantryWeaponPart {
         return clone;
     }
 
-    /** @return the platoon's single fireable Disposable Weapon mount of this weapon type, or null */
+    /**
+     * Finds the platoon's fireable Disposable Weapon mount of this part's weapon type. A unit carries at most one
+     * disposable mount per weapon type (a conventional infantry platoon carries at most one in total -
+     * {@code ConvInfantry#equipDisposableWeapon} replaces any existing disposable mount), so the first match is the
+     * mount the whole platoon shares.
+     *
+     * @return the platoon's single fireable Disposable Weapon mount of this weapon type, or null
+     */
     private @Nullable WeaponMounted findDisposableMount() {
         if ((unit == null) || (unit.getEntity() == null) || (type == null)) {
             return null;
         }
-        return unit.getEntity().getWeaponList().stream()
-              .filter(WeaponMounted::isDisposableWeapon)
-              .filter(weaponMounted -> (weaponMounted.getType() != null)
-                    && type.getInternalName().equals(weaponMounted.getType().getInternalName()))
-              .findFirst()
-              .orElse(null);
+        for (WeaponMounted weaponMounted : unit.getEntity().getWeaponList()) {
+            if (weaponMounted.isDisposableWeapon() && isSameWeaponType(weaponMounted.getType())) {
+                return weaponMounted;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Compares weapon types by internal name - the unique key equipment is registered under
+     * ({@link EquipmentType#get(String)}), so it is stable across save/load and equipment-singleton restores.
+     *
+     * @param otherType the candidate equipment type, or null
+     *
+     * @return true if the candidate is the same weapon type as this part
+     */
+    private boolean isSameWeaponType(@Nullable EquipmentType otherType) {
+        return (type != null) && (otherType != null) && type.getInternalName().equals(otherType.getInternalName());
     }
 
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
         super.updateConditionFromEntity(checkForDestruction);
-        // Read-only: the whole platoon shares one fireable mount, so every per-trooper disposable part is spent iff
-        // that mount has been fired. Do NOT mutate the entity here - that would corrupt a refit diff computed off the
-        // same entity.
+        // Read-only: the whole platoon shares one fireable mount, so every per-trooper disposable part is spent
+        // exactly when that mount has been fired. Do NOT mutate the entity here - that would corrupt a refit diff
+        // computed off the same entity.
         WeaponMounted mount = findDisposableMount();
         spent = (mount != null) && mount.isFired();
     }
@@ -125,21 +158,24 @@ public class InfantryDisposableWeaponPart extends InfantryWeaponPart {
         if (unit == null) {
             return 1;
         }
-        return (int) Math.max(1, unit.getParts().stream()
-              .filter(part -> part instanceof InfantryDisposableWeaponPart)
-              .count());
+        int count = 0;
+        for (Part part : unit.getParts()) {
+            if (part instanceof InfantryDisposableWeaponPart) {
+                count++;
+            }
+        }
+        return Math.max(1, count);
     }
 
     /** @return total spare weapons of this disposable type available in the warehouse. */
     private int availableReloadStock() {
-        final String weaponInternalName = (type == null) ? null : type.getInternalName();
-        if (weaponInternalName == null) {
+        if (type == null) {
             return 0;
         }
+        // The warehouse can hold a very large number of parts, so a stream is appropriate here.
         return getWarehouse().getSpareParts().stream()
               .filter(spare -> (spare instanceof EquipmentPart equipmentSpare)
-                    && (equipmentSpare.getType() != null)
-                    && weaponInternalName.equals(equipmentSpare.getType().getInternalName()))
+                    && isSameWeaponType(equipmentSpare.getType()))
               .mapToInt(Part::getQuantity)
               .sum();
     }
@@ -163,15 +199,23 @@ public class InfantryDisposableWeaponPart extends InfantryWeaponPart {
      * ammo finds spares.
      */
     private @Nullable Part findSpareReload() {
-        final String weaponInternalName = (type == null) ? null : type.getInternalName();
-        if (weaponInternalName == null) {
+        if (type == null) {
             return null;
         }
-        return getWarehouse().findSparePart(spare -> (spare instanceof EquipmentPart equipmentSpare)
-              && (spare.getId() != getId())
-              && (spare.getQuantity() > 0)
-              && (equipmentSpare.getType() != null)
-              && weaponInternalName.equals(equipmentSpare.getType().getInternalName()));
+        return getWarehouse().findSparePart(this::isUsableReloadSpare);
+    }
+
+    /**
+     * @param spare a warehouse spare candidate, never null (supplied by the warehouse)
+     *
+     * @return true if the spare is another part of this weapon type with stock remaining
+     */
+    private boolean isUsableReloadSpare(Part spare) {
+        boolean isOtherPart = spare.getId() != getId();
+        boolean hasStock = spare.getQuantity() > 0;
+        boolean isSameWeapon = (spare instanceof EquipmentPart equipmentSpare)
+              && isSameWeaponType(equipmentSpare.getType());
+        return isOtherPart && hasStock && isSameWeapon;
     }
 
     /**
@@ -193,15 +237,18 @@ public class InfantryDisposableWeaponPart extends InfantryWeaponPart {
     @Override
     public @Nullable String checkFixable() {
         WeaponMounted mount = findDisposableMount();
-        if (spent && (mount != null) && mount.isFired() && (availableReloadStock() < trooperCount())) {
-            return getName() + ": not enough spares in stock to reload the platoon";
+        boolean needsReload = spent && (mount != null) && mount.isFired();
+        boolean lacksStock = availableReloadStock() < trooperCount();
+        if (needsReload && lacksStock) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "InfantryDisposableWeaponPart.notEnoughSpares.format",
+                  getName());
         }
         return super.checkFixable();
     }
 
     @Override
     public int getBaseTime() {
-        return spent ? 15 : super.getBaseTime();
+        return spent ? RELOAD_BASE_TIME_MINUTES : super.getBaseTime();
     }
 
     @Override
@@ -216,36 +263,40 @@ public class InfantryDisposableWeaponPart extends InfantryWeaponPart {
 
     @Override
     public String getDetails(boolean includeRepairDetails) {
-        return spent ? (getName() + " - spent") : super.getDetails(includeRepairDetails);
+        if (spent) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "InfantryDisposableWeaponPart.details.spent.format", getName());
+        }
+        return super.getDetails(includeRepairDetails);
     }
 
     @Override
-    public void writeToXML(final PrintWriter pw, int indent) {
-        indent = writeToXMLBegin(pw, indent);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "equipmentNum", getEquipmentNum());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "typeName", type.getInternalName());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "equipTonnage", equipTonnage);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "spent", spent);
-        writeToXMLEnd(pw, indent);
+    public void writeToXML(final PrintWriter printWriter, int indent) {
+        indent = writeToXMLBegin(printWriter, indent);
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "equipmentNum", getEquipmentNum());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "typeName", type.getInternalName());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "equipTonnage", equipTonnage);
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "spent", spent);
+        writeToXMLEnd(printWriter, indent);
     }
 
     @Override
-    protected void loadFieldsFromXmlNode(Node wn) {
-        NodeList nl = wn.getChildNodes();
-        for (int x = 0; x < nl.getLength(); x++) {
-            Node wn2 = nl.item(x);
+    protected void loadFieldsFromXmlNode(Node node) {
+        NodeList childNodes = node.getChildNodes();
+        for (int index = 0; index < childNodes.getLength(); index++) {
+            Node childNode = childNodes.item(index);
+            String nodeName = childNode.getNodeName();
             try {
-                if (wn2.getNodeName().equalsIgnoreCase("equipmentNum")) {
-                    equipmentNum = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("typeName")) {
-                    typeName = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("equipTonnage")) {
-                    equipTonnage = Double.parseDouble(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("spent")) {
-                    spent = Boolean.parseBoolean(wn2.getTextContent().trim());
+                if (nodeName.equalsIgnoreCase("equipmentNum")) {
+                    equipmentNum = Integer.parseInt(childNode.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("typeName")) {
+                    typeName = childNode.getTextContent();
+                } else if (nodeName.equalsIgnoreCase("equipTonnage")) {
+                    equipTonnage = Double.parseDouble(childNode.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("spent")) {
+                    spent = Boolean.parseBoolean(childNode.getTextContent().trim());
                 }
-            } catch (Exception e) {
-                LOGGER.error("", e);
+            } catch (Exception exception) {
+                LOGGER.error(nodeName, exception);
             }
         }
         restore();

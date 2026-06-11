@@ -74,6 +74,7 @@ import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.TORTUGA_DOMINIONS_FACTION_CODE;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.File;
@@ -3835,7 +3836,8 @@ public class Campaign implements ITechManager, IPlace {
                     bulkDelivered++;
                 }
                 if (bulkDelivered > 1) {
-                    report += " (bulk order of " + bulkDelivered + ")";
+                    report += " " + getFormattedTextAt(RESOURCE_BUNDLE, "acquireEquipment.bulkOrder.format",
+                          bulkDelivered);
                 }
             }
             if (person != null) {
@@ -6694,9 +6696,9 @@ public class Campaign implements ITechManager, IPlace {
             return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "infantry refit");
         }
 
-        // Reloading a Disposable Weapon (TO:AR p.106) is a resupply, not a skill repair: it succeeds automatically
-        // (the warehouse-stock check is handled by checkFixable above), so a self-crewed infantry unit - which has no
-        // mechanic tech type - is not penalised or able to fail the reload.
+        // Reloading a Disposable Weapon (TO:AuE p.116, Corrected Sixth Printing) is a resupply, not a skill repair: it
+        // succeeds automatically (the warehouse-stock check is handled by checkFixable above), so a self-crewed
+        // infantry unit - which has no mechanic tech type - is not penalised or able to fail the reload.
         if (partWork instanceof InfantryDisposableWeaponPart) {
             return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "disposable weapon reload");
         }

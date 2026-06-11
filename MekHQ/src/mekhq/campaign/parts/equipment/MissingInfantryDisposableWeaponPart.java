@@ -43,23 +43,33 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * The "missing" / needs-acquisition counterpart of {@link InfantryDisposableWeaponPart}. It is the acquisition work for
- * buying a spare Disposable Weapon (TO:AR p.106). One is created per missing trooper's disposable, so a refit shops for
- * one per trooper. It accepts a plain {@link EquipmentPart} of the same weapon type as a replacement, because the parts
- * store stocks a disposable weapon as a generic EquipmentPart - so existing warehouse stock is consumed first.
+ * The "missing" / needs-acquisition counterpart of {@link InfantryDisposableWeaponPart}. It is the acquisition work
+ * for buying a spare Disposable Weapon (TO:AuE p.116, Corrected Sixth Printing). One is created per missing trooper's
+ * disposable, so a refit shops for one per trooper. It accepts a plain {@link EquipmentPart} of the same weapon type
+ * as a replacement, because the parts store stocks a disposable weapon as a generic EquipmentPart - so existing
+ * warehouse stock is consumed first.
  */
 public class MissingInfantryDisposableWeaponPart extends MissingEquipmentPart {
     private static final MMLogger LOGGER = MMLogger.create(MissingInfantryDisposableWeaponPart.class);
-    private static final String DISPOSABLE_SUFFIX = " (Disposable)";
 
     public MissingInfantryDisposableWeaponPart() {
         this(0, null, -1, null);
     }
 
-    public MissingInfantryDisposableWeaponPart(int tonnage, EquipmentType et, int equipNum, Campaign c) {
-        super(tonnage, et, equipNum, c, (et == null) ? 0 : et.getTonnage(null, 1.0), 1.0, false);
-        if (et != null) {
-            name = et.getName() + DISPOSABLE_SUFFIX;
+    public MissingInfantryDisposableWeaponPart(int tonnage, EquipmentType equipmentType, int equipNum,
+          Campaign campaign) {
+        super(tonnage, equipmentType, equipNum, campaign,
+              (equipmentType == null) ? 0 : equipmentType.getTonnage(null, 1.0), 1.0, false);
+        if (equipmentType != null) {
+            name = InfantryDisposableWeaponPart.buildDisposableName(equipmentType);
+        }
+    }
+
+    @Override
+    public void restore() {
+        super.restore();
+        if (type != null) {
+            name = InfantryDisposableWeaponPart.buildDisposableName(type);
         }
     }
 
@@ -72,10 +82,15 @@ public class MissingInfantryDisposableWeaponPart extends MissingEquipmentPart {
     public boolean isAcceptableReplacement(Part part, boolean refit) {
         // Match any spare weapon part of the same weapon type - the parts store stocks a disposable weapon as a plain
         // EquipmentPart, so existing warehouse stock (and freshly bought spares) satisfy the refit/replacement.
-        return (part instanceof EquipmentPart equipmentPart)
-              && (type != null)
-              && (equipmentPart.getType() != null)
+        // Internal name is the unique key equipment is registered under (EquipmentType.get), so IS and Clan variants
+        // of a weapon - which register under different internal names - never cross-match.
+        if (!(part instanceof EquipmentPart equipmentPart)) {
+            return false;
+        }
+        boolean typesResolved = (type != null) && (equipmentPart.getType() != null);
+        boolean isSameWeaponType = typesResolved
               && type.getInternalName().equals(equipmentPart.getType().getInternalName());
+        return isSameWeaponType;
     }
 
     @Override
@@ -87,29 +102,30 @@ public class MissingInfantryDisposableWeaponPart extends MissingEquipmentPart {
     }
 
     @Override
-    public void writeToXML(final PrintWriter pw, int indent) {
-        indent = writeToXMLBegin(pw, indent);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "typeName", type.getInternalName());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "equipmentNum", equipmentNum);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "equipTonnage", equipTonnage);
-        writeToXMLEnd(pw, indent);
+    public void writeToXML(final PrintWriter printWriter, int indent) {
+        indent = writeToXMLBegin(printWriter, indent);
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "typeName", type.getInternalName());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "equipmentNum", equipmentNum);
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "equipTonnage", equipTonnage);
+        writeToXMLEnd(printWriter, indent);
     }
 
     @Override
-    protected void loadFieldsFromXmlNode(Node wn) {
-        NodeList nl = wn.getChildNodes();
-        for (int x = 0; x < nl.getLength(); x++) {
-            Node wn2 = nl.item(x);
+    protected void loadFieldsFromXmlNode(Node node) {
+        NodeList childNodes = node.getChildNodes();
+        for (int index = 0; index < childNodes.getLength(); index++) {
+            Node childNode = childNodes.item(index);
+            String nodeName = childNode.getNodeName();
             try {
-                if (wn2.getNodeName().equalsIgnoreCase("equipmentNum")) {
-                    equipmentNum = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("typeName")) {
-                    typeName = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("equipTonnage")) {
-                    equipTonnage = Double.parseDouble(wn2.getTextContent());
+                if (nodeName.equalsIgnoreCase("equipmentNum")) {
+                    equipmentNum = Integer.parseInt(childNode.getTextContent());
+                } else if (nodeName.equalsIgnoreCase("typeName")) {
+                    typeName = childNode.getTextContent();
+                } else if (nodeName.equalsIgnoreCase("equipTonnage")) {
+                    equipTonnage = Double.parseDouble(childNode.getTextContent());
                 }
-            } catch (Exception e) {
-                LOGGER.error("", e);
+            } catch (Exception exception) {
+                LOGGER.error(nodeName, exception);
             }
         }
         restore();
