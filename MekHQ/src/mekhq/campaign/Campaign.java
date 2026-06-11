@@ -1936,14 +1936,14 @@ public class Campaign implements ITechManager, IPlace {
             return;
         }
         for (LocationNode child : new ArrayList<>(locationNode.getChildren())) {
-            if (!(child.getLocatable() instanceof CurrentLocation travelLoc)) {
+            if (!(child.getLocatable() instanceof CurrentLocation travelLocation)) {
                 continue;
             }
-            if (!travelLoc.isOnPlanet()) {
+            if (!travelLocation.isOnPlanet()) {
                 continue;
             }
             LocationDispatch.landFromTravelNode(
-                  travelLoc, mainForcePersonnel, units, parts, campaign);
+                  travelLocation, mainForcePersonnel, units, parts, campaign);
         }
     }
 

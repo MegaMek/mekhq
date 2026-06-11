@@ -252,9 +252,9 @@ public final class LocationDispatch {
                 continue;
             }
 
-            Optional<CurrentLocation> maybeTravelLoc = buildTravelNode(
+            Optional<CurrentLocation> maybeTravelLocation = buildTravelNode(
                   fromSystem, destSystem, destination, campaign, "dispatchToLocation");
-            if (maybeTravelLoc.isEmpty()) {
+            if (maybeTravelLocation.isEmpty()) {
                 if (destination instanceof AbstractBase) {
                     CurrentLocation arrivedLocation = buildArrivedNode(destSystem, destination, campaign, "dispatchToLocation");
                     group.forEach(p -> p.setParent(arrivedLocation));
@@ -263,7 +263,7 @@ public final class LocationDispatch {
                 }
                 continue;
             }
-            group.forEach(p -> p.setParent(maybeTravelLoc.get()));
+            group.forEach(p -> p.setParent(maybeTravelLocation.get()));
         }
     }
 
@@ -319,9 +319,9 @@ public final class LocationDispatch {
                 continue;
             }
 
-            Optional<CurrentLocation> maybeTravelLoc = buildTravelNode(
+            Optional<CurrentLocation> maybeTravelLocation = buildTravelNode(
                   fromSystem, destSystem, destination, campaign, "dispatchUnitsToLocation");
-            if (maybeTravelLoc.isEmpty()) {
+            if (maybeTravelLocation.isEmpty()) {
                 if (destination instanceof AbstractBase) {
                     CurrentLocation arrivedLocation = buildArrivedNode(destSystem, destination, campaign, "dispatchUnitsToLocation");
                     group.forEach(u -> LocationNode.LocationManager.setLocation(u, arrivedLocation));
@@ -330,7 +330,7 @@ public final class LocationDispatch {
                 }
                 continue;
             }
-            group.forEach(u -> LocationNode.LocationManager.setLocation(u, maybeTravelLoc.get()));
+            group.forEach(u -> LocationNode.LocationManager.setLocation(u, maybeTravelLocation.get()));
         }
     }
 
@@ -385,9 +385,9 @@ public final class LocationDispatch {
                 continue;
             }
 
-            Optional<CurrentLocation> maybeTravelLoc = buildTravelNode(
+            Optional<CurrentLocation> maybeTravelLocation = buildTravelNode(
                   fromSystem, destSystem, destination, campaign, "dispatchPartsToLocation");
-            if (maybeTravelLoc.isEmpty()) {
+            if (maybeTravelLocation.isEmpty()) {
                 if (destination instanceof AbstractBase) {
                     CurrentLocation arrivedLocation = buildArrivedNode(destSystem, destination, campaign, "dispatchPartsToLocation");
                     group.forEach(p -> LocationNode.LocationManager.setLocation(p, arrivedLocation));
@@ -396,7 +396,7 @@ public final class LocationDispatch {
                 }
                 continue;
             }
-            group.forEach(p -> LocationNode.LocationManager.setLocation(p, maybeTravelLoc.get()));
+            group.forEach(p -> LocationNode.LocationManager.setLocation(p, maybeTravelLocation.get()));
         }
     }
 

@@ -210,8 +210,8 @@ public final class LocationDisplay {
                         if (parent.getLocatable() instanceof AcademyCampusLocation campus) {
                             LocationNode fixedNode = parent.getParent();
                             if (fixedNode != null
-                                      && fixedNode.getLocatable() instanceof AbstractLocation campusLoc
-                                      && campusLoc.getCurrentSystem().equals(dest)) {
+                                      && fixedNode.getLocatable() instanceof AbstractLocation campusLocation
+                                      && campusLocation.getCurrentSystem().equals(dest)) {
                                 return campus.getAcademyName();
                             }
                             return campaign.getName();
