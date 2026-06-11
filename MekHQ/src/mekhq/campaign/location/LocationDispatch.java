@@ -202,10 +202,7 @@ public final class LocationDispatch {
      * path is empty — callers should fall back to direct placement in that case.</p>
      */
     private static Optional<CurrentLocation> buildTravelNode(PlanetarySystem fromSystem,
-          PlanetarySystem destinationSystem,
-          ILocation destination,
-          Campaign campaign,
-          String logContext) {
+          PlanetarySystem destinationSystem, ILocation destination, Campaign campaign, String logContext) {
         JumpPath path = campaign.calculateJumpPath(fromSystem, destinationSystem);
         if (path == null || path.isEmpty()) {
             return Optional.empty();
