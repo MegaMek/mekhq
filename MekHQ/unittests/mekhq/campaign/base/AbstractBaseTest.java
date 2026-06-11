@@ -46,7 +46,6 @@ import mekhq.campaign.FixedLocation;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.Personnel;
 import mekhq.campaign.Warehouse;
-import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.PartInventory;
@@ -80,11 +79,6 @@ public class AbstractBaseTest {
     @Test
     void getLocationNode_locatableIsBase() {
         assertSame(base, base.getLocationNode().getLocatable());
-    }
-
-    @Test
-    void implementsIPlace() {
-        assertTrue(base instanceof IPlace);
     }
 
     @Nested

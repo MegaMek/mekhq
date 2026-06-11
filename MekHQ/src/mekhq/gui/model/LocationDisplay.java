@@ -36,6 +36,7 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
@@ -211,7 +212,7 @@ public final class LocationDisplay {
                             LocationNode fixedNode = parent.getParent();
                             if (fixedNode != null
                                       && fixedNode.getLocatable() instanceof AbstractLocation campusLocation
-                                      && campusLocation.getCurrentSystem().equals(dest)) {
+                                      && Objects.equals(campusLocation.getCurrentSystem(), dest)) {
                                 return campus.getAcademyName();
                             }
                             return campaign.getName();

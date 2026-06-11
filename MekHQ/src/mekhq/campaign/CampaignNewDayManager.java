@@ -1374,8 +1374,8 @@ public class CampaignNewDayManager {
                 // cancel it and notify the player rather than silently failing.
                 ILocation repairTarget = (part.getUnit() != null) ? part.getUnit() : part;
                 if (!LocationUtils.areSameEffectiveLocation(tech, repairTarget)) {
-                    campaign.addReport(TECHNICAL, String.format(
-                          "%s cannot continue working on %s — they are no longer at the same location. Assignment cancelled.",
+                    campaign.addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE,
+                          "CampaignNewDayManager.techAtDifferentLocation",
                           tech.getHyperlinkedFullTitle(),
                           part.getName()));
                     part.cancelAssignment(true);

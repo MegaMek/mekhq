@@ -835,6 +835,7 @@ public class Campaign implements ITechManager, IPlace {
         this.campaignStartDate = campaignStartDate;
     }
 
+    @Override
     public PlanetarySystem getCurrentSystem() {
         AbstractLocation location = getCurrentLocation();
         return location != null ? location.getCurrentSystem() : null;

@@ -112,8 +112,8 @@ public class Maintenance {
             Person tech = unit.getTech();
             if (tech != null && !LocationUtils.areSameEffectiveLocation(unit, tech)) {
                 // Tech is at a different location; maintenance cannot be performed this cycle.
-                campaign.addReport(TECHNICAL, String.format(resources.getString("maintenanceNotAvailable.text"),
-                      unit.getName()));
+                campaign.addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE,
+                      "Maintenance.techAtDifferentLocation", unit.getName()));
                 tech = null;
             }
             if (tech != null) {

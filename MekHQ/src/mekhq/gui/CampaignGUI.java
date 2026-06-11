@@ -1449,12 +1449,11 @@ public class CampaignGUI extends JPanel {
         if (listeners.length > 0) {
             choiceActiveLocation.removeActionListener(listeners[0]);
         }
-        choiceActiveLocation.setModel(buildActiveLocationModel());
+        DefaultComboBoxModel<LocationFilterItem> model = buildActiveLocationModel();
+        choiceActiveLocation.setModel(model);
 
         // Restore previous selection by sentinel identity or base UUID
         if (!previous.isAll()) {
-            DefaultComboBoxModel<LocationFilterItem> model =
-                  (DefaultComboBoxModel<LocationFilterItem>) choiceActiveLocation.getModel();
             for (int i = 0; i < model.getSize(); i++) {
                 LocationFilterItem item = model.getElementAt(i);
                 if (previous.isMainForce() && item.isMainForce()) {
