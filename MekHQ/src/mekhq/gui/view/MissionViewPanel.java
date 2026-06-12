@@ -1018,24 +1018,14 @@ public class MissionViewPanel extends JScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(txtSupport, gridBagConstraints);
 
-            lblScore.setName("lblScore");
-            lblScore.setText(resourceMap.getString("lblScore.text"));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = y;
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlStats.add(lblScore, gridBagConstraints);
-
             int currentScore = contract.getContractScore(campaign.getCampaignOptions().isUseStratConMaplessMode());
             int neededScore = contract.getRequiredVictoryPoints();
 
-            // Victory points are shown as a continuous gauge whenever a positive target exists. The gauge is the
-            // primary display and carries the figures on its markers, so the "Victory Points" caption above stands
-            // alone on its row (its value column intentionally left empty) rather than repeating the numbers. When
-            // there is no meaningful target, fall back to a plain "current / required" text value beside the caption.
+            // Victory points: when a positive target exists they are shown as a self-contained gauge that carries its
+            // own "Victory Points" title, the figures on its markers, and a lock indicator for contracts that cannot be
+            // ended early; it spans both columns. Otherwise fall back to a plain "Victory Points: current / required"
+            // label/value row.
             if (neededScore > 0) {
-                y++;
                 final boolean canEndEarly = (contract.getStratconCampaignState() == null) ||
                                                   contract.getStratconCampaignState().allowEarlyVictory();
                 final ContractScoreBar contractScoreBar = new ContractScoreBar(currentScore, neededScore, canEndEarly);
@@ -1049,6 +1039,15 @@ public class MissionViewPanel extends JScrollablePanel {
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
                 pnlStats.add(contractScoreBar, gridBagConstraints);
             } else {
+                lblScore.setName("lblScore");
+                lblScore.setText(resourceMap.getString("lblScore.text"));
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 0;
+                gridBagConstraints.gridy = y;
+                gridBagConstraints.fill = GridBagConstraints.NONE;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                pnlStats.add(lblScore, gridBagConstraints);
+
                 txtScore.setName("txtScore");
                 txtScore.setText(currentScore + " / " + neededScore);
                 gridBagConstraints = new GridBagConstraints();
@@ -1081,7 +1080,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new Insets(UIUtil.scaleForGUI(6), 0, 2, 0);
+        gridBagConstraints.insets = new Insets(UIUtil.scaleForGUI(2), 0, 2, 0);
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.SOUTHWEST;
         pnlStats.add(moraleBar, gridBagConstraints);
