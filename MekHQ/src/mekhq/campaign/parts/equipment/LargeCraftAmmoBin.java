@@ -408,7 +408,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
         if (null != unit) {
             String availability = "";
             int shotsAvailable = getAmountAvailable();
-            PartInventory inventories = campaign.getPartInventory(getNewPart());
+            PartInventory inventories = getPartInventory(getNewPart());
             if (shotsAvailable == 0) {
                 availability = "<br><font color='" +
                                      ReportingUtilities.getNegativeColor() +

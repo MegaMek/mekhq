@@ -48,6 +48,7 @@ import static mekhq.campaign.personnel.DiscretionarySpending.performExtremeExpen
 import static mekhq.campaign.personnel.Person.*;
 import static mekhq.campaign.personnel.PersonnelOptions.EDGE_ESCAPE_ATTEMPTS;
 import static mekhq.campaign.personnel.PersonnelOptions.EDGE_RECON_FAIL;
+import static mekhq.campaign.personnel.PersonnelOptions.EDGE_TRAINING;
 import static mekhq.campaign.personnel.education.Academy.skillParser;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.education.EducationController.makeEnrollmentCheck;
@@ -121,6 +122,7 @@ import mekhq.campaign.events.persons.PersonLogEvent;
 import mekhq.campaign.events.persons.PersonStatusChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.location.LocationDispatch;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.PerformanceLogger;
 import mekhq.campaign.personnel.Award;
@@ -171,6 +173,7 @@ import mekhq.gui.control.EditLogControl.LogType;
 import mekhq.gui.dialog.*;
 import mekhq.gui.displayWrappers.RankDisplay;
 import mekhq.gui.menus.AssignPersonToUnitMenu;
+import mekhq.gui.menus.SendToLocationMenu;
 import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.MultiLineTooltip;
@@ -1340,7 +1343,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_FAMILY_TREE: {
-                new FamilyTreeDialog(gui.getFrame(), selectedPerson.getGenealogy(), getCampaign().getPersonnel());
+                new FamilyTreeDialog(gui.getFrame(), selectedPerson.getGenealogy(), getCampaign().getPersonnel().values());
                 break;
             }
             case CMD_EDIT: {
@@ -2516,6 +2519,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         }
 
         JMenuHelpers.addMenuIfNonEmpty(popup, new AssignPersonToUnitMenu(getCampaign(), selected));
+        List<mekhq.campaign.personnel.Person> selectedPeople = Arrays.asList(selected);
+        JMenuHelpers.addMenuIfNonEmpty(popup, new SendToLocationMenu(getCampaign(), getFrame(),
+              selectedPeople,
+              destination -> LocationDispatch.dispatchToLocation(selectedPeople, destination, getCampaign())));
 
         if (oneSelected && person.getStatus().isActiveFlexible()) {
             if (getCampaignOptions().isUseManualMarriages() &&
@@ -2531,7 +2538,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 final Campaign campaign = getCampaign();
                 final AbstractMarriage marriage = campaign.getMarriage();
 
-                final List<Person> personnel = campaign.getPersonnel()
+                final List<Person> personnel = campaign.getPersonnel().values()
                                                      .stream()
                                                      .filter(potentialSpouse -> marriage.safeSpouse(campaign,
                                                            today,
@@ -3526,6 +3533,15 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 cbMenuItem.addActionListener(this);
                 menu.add(cbMenuItem);
 
+                cbMenuItem = new JCheckBoxMenuItem(resources.getString("edgeTriggerTraining.text"));
+                cbMenuItem.setSelected(person.getOptions().booleanOption(EDGE_TRAINING));
+                cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, EDGE_TRAINING));
+                if (!person.isCombat()) {
+                    cbMenuItem.setForeground(new Color(150, 150, 150));
+                }
+                cbMenuItem.addActionListener(this);
+                menu.add(cbMenuItem);
+
                 // Commander
                 cbMenuItem = new JCheckBoxMenuItem(resources.getString(
                       "edgeTriggerCommanderNegotiationCheck.text"));
@@ -3718,6 +3734,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 menuItem.addActionListener(this);
                 submenu.add(menuItem);
 
+                menuItem = new JMenuItem(resources.getString("edgeTriggerTraining.text"));
+                menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, EDGE_TRAINING, TRUE));
+                menuItem.addActionListener(this);
+                submenu.add(menuItem);
+
                 if (getCampaignOptions().isUseSupportEdge()) {
                     menuItem = new JMenuItem(resources.getString("edgeTriggerHealCheck.text"));
                     menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_MEDICAL, TRUE));
@@ -3841,6 +3862,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                 menuItem = new JMenuItem(resources.getString("edgeTriggerReconFailure.text"));
                 menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, EDGE_RECON_FAIL, FALSE));
+                menuItem.addActionListener(this);
+                submenu.add(menuItem);
+
+                menuItem = new JMenuItem(resources.getString("edgeTriggerTraining.text"));
+                menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, EDGE_TRAINING, FALSE));
                 menuItem.addActionListener(this);
                 submenu.add(menuItem);
 
@@ -4072,7 +4098,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             miCommander.setName("miCommander");
             miCommander.setSelected(person.isCommander());
             miCommander.addActionListener(evt -> {
-                getCampaign().getPersonnel().stream().filter(Person::isCommander).forEach(commander -> {
+                getCampaign().getPersonnel().values().stream().filter(Person::isCommander).forEach(commander -> {
                     commander.setCommander(false);
                     getCampaign().addReport(PERSONNEL, String.format(resources.getString("removedCommander.format"),
                           commander.getHyperlinkedFullTitle()));
@@ -4093,7 +4119,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             miSecondInCommand.setName("miSecondInCommand");
             miSecondInCommand.setSelected(person.isSecondInCommand());
             miSecondInCommand.addActionListener(evt -> {
-                getCampaign().getPersonnel().stream().filter(Person::isSecondInCommand).forEach(secondInCommand -> {
+                getCampaign().getPersonnel()
+                      .values()
+                      .stream()
+                      .filter(Person::isSecondInCommand)
+                      .forEach(secondInCommand -> {
                     secondInCommand.setSecondInCommand(false);
                     getCampaign().addReport(PERSONNEL, getFormattedText("removedSecondInCommand.format",
                           secondInCommand.getHyperlinkedFullTitle()));

@@ -51,7 +51,9 @@ import mekhq.campaign.events.LocationChangedEvent;
 import mekhq.campaign.events.TransitCompleteEvent;
 import mekhq.campaign.events.TransitStatusChangedEvent;
 import mekhq.campaign.location.LocationNode;
+import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -76,13 +78,29 @@ public class CurrentLocation extends AbstractLocation {
     // JumpShip at nadir or zenith
     private boolean jumpZenith;
 
-    // Populated during XML load; drained by CampaignXmlParser to reconnect persons after load.
-    private transient List<UUID> pendingPersonIds = new ArrayList<>();
+    // Populated during XML load; drained by CampaignXmlParser to reconnect ILocations after load.
+    private transient List<UUID>    pendingPersonIds = new ArrayList<>();
+    private transient List<UUID>    pendingUnitIds   = new ArrayList<>();
+    private transient List<Integer> pendingPartIds   = new ArrayList<>();
 
     /** Returns and clears the person UUIDs read from XML, for use during post-load reconnection. */
     public List<UUID> drainPendingPersonIds() {
         List<UUID> ids = new ArrayList<>(pendingPersonIds);
         pendingPersonIds.clear();
+        return ids;
+    }
+
+    /** Returns and clears the unit UUIDs read from XML, for use during post-load reconnection. */
+    public List<UUID> drainPendingUnitIds() {
+        List<UUID> ids = new ArrayList<>(pendingUnitIds);
+        pendingUnitIds.clear();
+        return ids;
+    }
+
+    /** Returns and clears the part IDs read from XML, for use during post-load reconnection. */
+    public List<Integer> drainPendingPartIds() {
+        List<Integer> ids = new ArrayList<>(pendingPartIds);
+        pendingPartIds.clear();
         return ids;
     }
 
@@ -342,6 +360,10 @@ public class CurrentLocation extends AbstractLocation {
         for (LocationNode child : locationNode.getChildren()) {
             if (child.getLocatable() instanceof mekhq.campaign.personnel.Person person) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personId", person.getId().toString());
+            } else if (child.getLocatable() instanceof Unit unit) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitId", unit.getId().toString());
+            } else if (child.getLocatable() instanceof Part part) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "partId", String.valueOf(part.getId()));
             }
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "location");
@@ -380,6 +402,10 @@ public class CurrentLocation extends AbstractLocation {
                     retVal.jumpPath = JumpPath.generateInstanceFromXML(wn2, c);
                 } else if (wn2.getNodeName().equalsIgnoreCase("personId")) {
                     retVal.pendingPersonIds.add(UUID.fromString(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("unitId")) {
+                    retVal.pendingUnitIds.add(UUID.fromString(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("partId")) {
+                    retVal.pendingPartIds.add(Integer.parseInt(wn2.getTextContent().trim()));
                 }
             }
         } catch (Exception ex) {

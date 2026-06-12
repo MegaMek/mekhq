@@ -33,15 +33,16 @@
 
 package mekhq.campaign.location;
 
-import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import jakarta.annotation.Nonnull;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.JumpPath;
+import mekhq.campaign.Personnel;
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
@@ -73,7 +74,7 @@ public interface ILocation {
     Planet NO_PLANET = null;
     JumpPath NO_JUMP_PATH = null;
 
-    @Nullable
+    @Nonnull
     LocationNode getLocationNode();
 
     default boolean hasLocationNode() {
@@ -262,7 +263,7 @@ public interface ILocation {
         if (!hasLocationNode() || !parent.hasLocationNode()) {
             return false;
         }
-        if (wouldCreateCycle(getLocationNode(), parent.getLocationNode())) {
+        if (LocationNode.wouldCreateCycle(getLocationNode(), parent.getLocationNode())) {
             return false;
         }
         return findRoot(parent.getLocationNode()).getLocatable() instanceof AbstractLocation;
@@ -328,20 +329,28 @@ public interface ILocation {
     }
 
     /**
-     * Returns {@code true} if {@code node} appears anywhere in the ancestor chain of {@code potentialAncestor}, which
-     * would indicate that making {@code potentialAncestor} an ancestor of {@code node} would create a cycle.
+     * Walks up the {@link LocationNode} tree and returns the nearest {@link IPlace} ancestor, or
+     * {@code null} if no IPlace ancestor exists.
      */
-    private static boolean wouldCreateCycle(LocationNode node, LocationNode potentialAncestor) {
-        LocationNode cursor = potentialAncestor;
-        while (cursor != null) {
-            if (cursor == node) {
-                return true;
-            }
-            cursor = cursor.getParent();
-        }
-        return false;
+    @Nullable
+    default IPlace getPlace() {
+        return findPlace(hasLocationNode() ? getLocationNode() : null);
     }
 
+    /**
+     * Walks up from {@code node} (inclusive) and returns the nearest {@link IPlace}, or
+     * {@code null} if the chain contains none.
+     */
+    @Nullable
+    static IPlace findPlace(@Nullable LocationNode node) {
+        while (node != null) {
+            if (node.getLocatable() instanceof IPlace place) {
+                return place;
+            }
+            node = node.getParent();
+        }
+        return null;
+    }
 
     /**
      * Returns the {@link Hangar} owned by the nearest {@link mekhq.campaign.location.IPlace} ancestor of this location, or
@@ -372,7 +381,7 @@ public interface ILocation {
      * or {@code null} if no such ancestor exists or it does not own a personnel roster.
      */
     @Nullable
-    default Collection<Person> getPersonnel() {
+    default Personnel getPersonnel() {
         if (!hasLocationNode() || getLocationNode().getParent() == null) {
             return null;
         }
