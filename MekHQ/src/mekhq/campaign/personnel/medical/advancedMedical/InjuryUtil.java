@@ -62,6 +62,7 @@ import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -188,6 +189,7 @@ public final class InjuryUtil {
 
         // We double-check the injury has been added, as it might have been removed by purgeIllogicalInjuries
         boolean hasNewInjuries = false;
+        boolean hasMissingLimbHandled = false;
         List<Injury> currentInjuries = person.getInjuries();
         for (Injury injury : newInjuries) {
             if (!hasNewInjuries && currentInjuries.contains(injury)) {
@@ -196,6 +198,13 @@ public final class InjuryUtil {
 
             if (injury.getType().impliesDead(injury.getLocation())) {
                 person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
+            }
+            // For missing limbs, we add an amputation recovery so they always show up in the infirmary
+            if (!hasMissingLimbHandled && injury.getType().impliesMissingLocation() && injury.getLocation().isLimb()) {
+                hasMissingLimbHandled = true;
+                Injury amputationRecovery = AlternateInjuries.AMPUTATION_RECOVERY.newInjury(campaign, person,
+                      injury.getLocation(), 1);
+                person.addInjury(amputationRecovery);
             }
         }
 
@@ -239,6 +248,18 @@ public final class InjuryUtil {
         List<Injury> newInjuries = new ArrayList<>();
         for (Entry<BodyLocation, Integer> accEntry : hitAccumulator.entrySet()) {
             newInjuries.addAll(genInjuries(campaign, person, accEntry.getKey(), accEntry.getValue()));
+        }
+        // For missing limbs, we add an amputation recovery so they always show up in the infirmary
+        Injury amputation_recovery = null;
+        for (Injury injury : newInjuries) {
+            if (injury.getType().impliesMissingLocation()) {
+                amputation_recovery = InjuryTypes.AMPUTATION_RECOVERY.newInjury(campaign, person,
+                      injury.getLocation(), 1);
+                break;
+            }
+        }
+        if (null != amputation_recovery) {
+            newInjuries.add(amputation_recovery);
         }
         return newInjuries;
     }
