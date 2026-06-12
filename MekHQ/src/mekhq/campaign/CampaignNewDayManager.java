@@ -1039,18 +1039,11 @@ public class CampaignNewDayManager {
         List<Person> departedPersonnel = campaign.getAllPersonnel().stream()
                                                .filter(person -> person.getStatus().isFollowAfterLeavingCampaign())
                                                .toList();
-
-        boolean someoneRandomlyDied = false;
         for (Person person : departedPersonnel) {
             if (isNewWeek) {
-                boolean didDie = randomDeath.processNewWeek(campaign, today, person);
-                if (didDie) {
-                    someoneRandomlyDied = true;
-                }
+                randomDeath.processNewWeek(campaign, today, person);
             }
         }
-
-        return someoneRandomlyDied;
     }
 
     /**
