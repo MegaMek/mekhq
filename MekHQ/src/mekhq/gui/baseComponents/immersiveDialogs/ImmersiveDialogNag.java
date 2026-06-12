@@ -105,7 +105,7 @@ public class ImmersiveDialogNag {
     }
 
     /**
-     * This constructor is largely created to facilitate class extenders, such as {@link RandomDeathAnnouncement}.</p>
+     * This constructor is largely created to facilitate class extenders, such as {@link RandomDeathAnnouncement}.
      */
     public ImmersiveDialogNag() {
     }
