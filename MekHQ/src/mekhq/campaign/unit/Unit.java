@@ -71,6 +71,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.swing.UIManager;
 
+import jakarta.annotation.Nonnull;
 import megamek.Version;
 import megamek.client.ui.tileset.EntityImage;
 import megamek.common.CriticalSlot;
@@ -117,6 +118,7 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationType;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationNode;
+import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.log.AssignmentLogger;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
@@ -187,8 +189,8 @@ public class Unit implements ITechnology, ILocation {
     private int site;
     private boolean salvaged;
     private UUID id;
+    private final LocationNode locationNode = new LocationNode(this);
     private String fluffName;
-    private LocationNode locationNode = new LocationNode(this);
 
     // This is the large craft assigned to transport this unit
     private TransportShipAssignment transportShipAssignment;
@@ -553,6 +555,11 @@ public class Unit implements ITechnology, ILocation {
 
     public void setId(UUID i) {
         this.id = i;
+    }
+
+    @Override
+    public @Nonnull LocationNode getLocationNode() {
+        return locationNode;
     }
 
     // Generic Transport Methods
@@ -4830,6 +4837,14 @@ public class Unit implements ITechnology, ILocation {
         if (getTotalCrewSize() < getFullCrewSize()) {
             reasons.add("colorReason.unit.uncrewed");
         }
+        boolean crewMislocated = getActiveCrew().stream()
+                                       .anyMatch(p -> !LocationUtils.areSameEffectiveLocation(this, p));
+        if (crewMislocated) {
+            reasons.add("colorReason.unit.crewMislocated");
+        }
+        if (getTech() != null && !LocationUtils.areSameEffectiveLocation(this, getTech())) {
+            reasons.add("colorReason.unit.techMislocated");
+        }
 
         return reasons;
     }
@@ -5884,6 +5899,17 @@ public class Unit implements ITechnology, ILocation {
         return entity instanceof Infantry;
     }
 
+    /**
+     * Logs and reports a crew/tech assignment that was rejected because {@code person} is not at the same effective
+     * location as this unit, so the failure is visible to the player instead of only in the log.
+     */
+    private void reportAssignmentBlockedByLocation(Person person, String role) {
+        LOGGER.warn("Cannot assign {} as {} of {}: not at the same location", person.getFullName(), role, getName());
+        getCampaign().addReport(TECHNICAL,
+              getFormattedTextAt(RESOURCE_BUNDLE, "Unit.assignmentBlockedByLocation.text",
+                    person.getHyperlinkedFullTitle(), role, getName()));
+    }
+
     public void addDriver(Person p) {
         addDriver(p, false);
     }
@@ -5891,6 +5917,10 @@ public class Unit implements ITechnology, ILocation {
     public void addDriver(Person person, boolean useTransfers) {
         Objects.requireNonNull(person);
 
+        if (!LocationUtils.areSameEffectiveLocation(this, person)) {
+            reportAssignmentBlockedByLocation(person, "driver");
+            return;
+        }
         ensurePersonIsRegistered(person);
         drivers.add(person);
         person.setUnit(this);
@@ -5910,6 +5940,10 @@ public class Unit implements ITechnology, ILocation {
     public void addGunner(Person person, boolean useTransfers) {
         Objects.requireNonNull(person);
 
+        if (!LocationUtils.areSameEffectiveLocation(this, person)) {
+            reportAssignmentBlockedByLocation(person, "gunner");
+            return;
+        }
         ensurePersonIsRegistered(person);
         gunners.add(person);
         person.setUnit(this);
@@ -5929,6 +5963,10 @@ public class Unit implements ITechnology, ILocation {
     public void addVesselCrew(Person person, boolean useTransfers) {
         Objects.requireNonNull(person);
 
+        if (!LocationUtils.areSameEffectiveLocation(this, person)) {
+            reportAssignmentBlockedByLocation(person, "vessel crew");
+            return;
+        }
         ensurePersonIsRegistered(person);
         vesselCrew.add(person);
         person.setUnit(this);
@@ -5948,6 +5986,10 @@ public class Unit implements ITechnology, ILocation {
     public void setNavigator(Person person, boolean useTransfers) {
         Objects.requireNonNull(person);
 
+        if (!LocationUtils.areSameEffectiveLocation(this, person)) {
+            reportAssignmentBlockedByLocation(person, "navigator");
+            return;
+        }
         ensurePersonIsRegistered(person);
         navigator = person;
         person.setUnit(this);
@@ -5971,6 +6013,10 @@ public class Unit implements ITechnology, ILocation {
     public void setTechOfficer(Person person, boolean useTransfers) {
         Objects.requireNonNull(person);
 
+        if (!LocationUtils.areSameEffectiveLocation(this, person)) {
+            reportAssignmentBlockedByLocation(person, "tech officer");
+            return;
+        }
         ensurePersonIsRegistered(person);
         techOfficer = person;
         person.setUnit(this);
@@ -5983,17 +6029,21 @@ public class Unit implements ITechnology, ILocation {
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(campaign, person, this));
     }
 
-    public void setTech(Person p) {
-        Objects.requireNonNull(p);
+    public void setTech(Person person) {
+        Objects.requireNonNull(person);
 
-        if (null != tech) {
-            LOGGER.warn("New tech assigned {} without removing previous tech {}", p.getFullName(), tech);
+        if (!LocationUtils.areSameEffectiveLocation(this, person)) {
+            reportAssignmentBlockedByLocation(person, "tech");
+            return;
         }
-        ensurePersonIsRegistered(p);
-        tech = p;
-        p.addTechUnit(this);
-        AssignmentLogger.assignedTo(p, getCampaign().getLocalDate(), getName());
-        MekHQ.triggerEvent(new PersonTechAssignmentEvent(p, this));
+        if (null != tech) {
+            LOGGER.warn("New tech assigned {} without removing previous tech {}", person.getFullName(), tech);
+        }
+        ensurePersonIsRegistered(person);
+        tech = person;
+        person.addTechUnit(this);
+        AssignmentLogger.assignedTo(person, getCampaign().getLocalDate(), getName());
+        MekHQ.triggerEvent(new PersonTechAssignmentEvent(person, this));
     }
 
     public void removeTech() {
@@ -6024,6 +6074,10 @@ public class Unit implements ITechnology, ILocation {
     public void addPilotOrSoldier(final Person person, final @Nullable Unit oldUnit, final boolean useTransfers) {
         Objects.requireNonNull(person);
 
+        if (!LocationUtils.areSameEffectiveLocation(this, person)) {
+            reportAssignmentBlockedByLocation(person, "pilot/soldier");
+            return;
+        }
         ensurePersonIsRegistered(person);
         drivers.add(person);
         // Multi-crew cockpits should not set the pilot to the gunner position
@@ -7067,23 +7121,43 @@ public class Unit implements ITechnology, ILocation {
     /**
      * Not always opposite to isUnmaintained() - both are false for units that do not require maintenance.
      *
-     * @return true if unit requires maintenance and has a tech assigned, false otherwise.
+     * <p>A tech at a different location does not count as maintaining the unit — they cannot
+     * physically reach it.</p>
+     *
+     * @return true if unit requires maintenance, has a tech assigned, and that tech is co-located
+     *       with the unit, false otherwise.
      *
      * @see #isUnmaintained()
      */
     public boolean isMaintained() {
-        return requiresMaintenance() && (getTech() != null);
+        if (!requiresMaintenance()) {
+            return false;
+        }
+        Person assignedTech = getTech();
+        return assignedTech != null && LocationUtils.areSameEffectiveLocation(this, assignedTech);
     }
 
     /**
      * Not always opposite to isMaintained() - both are false for units that do not require maintenance.
      *
-     * @return true if unit requires maintenance and does not have a tech assigned, false otherwise.
+     * <p>A unit is also considered unmaintained when its assigned tech is at a different location —
+     * the tech cannot physically perform maintenance, so the unit incurs the same penalties as if
+     * no tech were assigned.</p>
+     *
+     * @return true if unit requires maintenance and either has no tech assigned or the tech is at a
+     *       different location, false otherwise.
      *
      * @see #isMaintained()
      */
     public boolean isUnmaintained() {
-        return requiresMaintenance() && (getTech() == null);
+        if (!requiresMaintenance()) {
+            return false;
+        }
+        Person assignedTech = getTech();
+        if (assignedTech == null) {
+            return true;
+        }
+        return !LocationUtils.areSameEffectiveLocation(this, assignedTech);
     }
 
     public boolean isSelfCrewed() {
@@ -7995,11 +8069,6 @@ public class Unit implements ITechnology, ILocation {
             LOGGER.info("Unknown unit type parsed into getGunnerRole(): {}", getEntity().getUnitType());
             return null;
         }
-    }
-
-    @Override
-    public LocationNode getLocationNode() {
-        return locationNode;
     }
 
     @Override

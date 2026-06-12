@@ -88,7 +88,7 @@ public class AcademyCampusLocationTest {
     @Test
     void getLocationNode_hasPersonnelChildByDefault() {
         assertEquals(1, campus.getLocationNode().getChildren().size());
-        assertSame(campus.getCampusPersonnel().getLocationNode(),
+        assertSame(campus.getPersonnel().getLocationNode(),
               campus.getLocationNode().getChildren().iterator().next());
     }
 
@@ -168,7 +168,7 @@ public class AcademyCampusLocationTest {
         void writeToXML_includesPersonIdForPersonChild() {
             campus.setParent(new FixedLocation(mock(PlanetarySystem.class)));
             Person person = new Person("First", "Last", null, "MERC");
-            person.setParent(campus.getCampusPersonnel());
+            person.setParent(campus.getPersonnel());
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             campus.writeToXML(new PrintWriter(baos, true), 0);
@@ -238,6 +238,32 @@ public class AcademyCampusLocationTest {
         private Node parseXml(String xml) throws Exception {
             DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             return db.parse(new ByteArrayInputStream(xml.getBytes())).getDocumentElement();
+        }
+    }
+
+    @Nested
+    class IPlaceBehavior {
+        @Test
+        void getPersonnel_returnsNonNull() {
+            assertNotNull(campus.getPersonnel());
+        }
+
+        @Test
+        void getWarehouse_returnsNull() {
+            assertNull(campus.getWarehouse());
+        }
+
+        @Test
+        void getHangar_returnsNull() {
+            assertNull(campus.getHangar());
+        }
+
+        @Test
+        void getPartInventory_returnsEmptyWhenNoWarehouse() {
+            mekhq.campaign.parts.PartInventory inv =
+                  campus.getPartInventory(new mekhq.campaign.parts.meks.MekSensor());
+            assertEquals(0, inv.getSupply());
+            assertEquals(0, inv.getTransit());
         }
     }
 }
