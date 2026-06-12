@@ -976,5 +976,31 @@ public class RefitTest {
             assertEquals("Foot Platoon", refit.getNewEntity().getChassis());
             assertEquals("(Machine Gun (Portable))", refit.getNewEntity().getModel());
         }
+
+        @Test
+        public void customTrueSaveTrue_userTypedModelPreserved() {
+            Entity oldEntity = MHQTestUtilities.getEntityForUnitTesting(
+                  "Foot Platoon (DCMS) (Laser 2620+)", true);
+            assertNotNull(oldEntity);
+            Player mockPlayer = mock(Player.class);
+            when(mockPlayer.getName()).thenReturn("Test Player");
+            oldEntity.setOwner(mockPlayer);
+
+            Entity newEntity = MHQTestUtilities.getEntityForUnitTesting(
+                  "Foot Platoon (DCMS) (MG 2620+)", true);
+            assertNotNull(newEntity);
+            // The user typed a model name in MegaMekLab; it no longer matches any canonical design, so the refit
+            // must not clobber it with the weapon-derived auto-name
+            newEntity.setModel("(My Custom Loadout)");
+
+            Unit oldUnit = new Unit(oldEntity, mockCampaign);
+            oldUnit.setId(UUID.randomUUID());
+            oldUnit.initializeParts(false);
+
+            Refit refit = new Refit(oldUnit, newEntity, true, false, true);
+
+            assertEquals("Foot Platoon", refit.getNewEntity().getChassis());
+            assertEquals("(My Custom Loadout)", refit.getNewEntity().getModel());
+        }
     }
 }

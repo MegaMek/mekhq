@@ -2740,13 +2740,16 @@ public class Refit extends Part implements IAcquisitionWork {
      */
     public void suggestNewName() {
         if (newEntity instanceof ConvInfantry infantry) {
-            String chassis = getChassis(infantry);
-            newEntity.setChassis(chassis);
-            // Only auto-derive a model from the weapons when one has not already been set (by MegaMekLab as the
-            // loadout is edited, or typed in by the user). This preserves a custom Model name through the refit so
-            // the confirmation dialog shows what the user entered.
+            // Auto-derive a model from the weapons when no model has been set yet, or when the unit still carries
+            // the name of an existing canonical design (Issue #9154: a saved customization must not keep the stock
+            // catalog name). A model the user typed in MegaMekLab matches no canonical design and is preserved, so
+            // the refit confirmation dialog shows what the user entered.
             String currentModel = newEntity.getModel();
-            if ((currentModel == null) || currentModel.isBlank() || currentModel.equals("?")) {
+            boolean modelMissing = (currentModel == null) || currentModel.isBlank() || currentModel.equals("?");
+            boolean matchesCanonicalDesign = MekSummaryCache.getInstance()
+                                                   .getMek(newEntity.getShortNameRaw()) != null;
+            newEntity.setChassis(getChassis(infantry));
+            if (modelMissing || matchesCanonicalDesign) {
                 String model = "?";
                 if (infantry.getSecondaryWeaponsPerSquad() > 1 && null != infantry.getSecondaryWeapon()) {
                     model = "(" + infantry.getSecondaryWeapon().getInternalName() + ")";
