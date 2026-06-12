@@ -998,25 +998,44 @@ public class MissionViewPanel extends JScrollablePanel {
                 pnlStats.add(txtDeploymentCoverage, gridBagConstraints);
             }
 
-            lblSupportPoints.setName("lblSupportPoints");
-            lblSupportPoints.setText(resourceMap.getString("lblSupportPoints.text"));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = y;
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlStats.add(lblSupportPoints, gridBagConstraints);
+            int currentSupportPoints = contract.getCurrentSupportPoints();
+            int maximumSupportPoints = contract.getMaximumSupportPoints();
 
-            txtSupport.setName("txtSupport");
-            txtSupport.setText(Integer.toString(contract.getCurrentSupportPoints()));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = y++;
-            gridBagConstraints.weightx = 0.5;
-            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlStats.add(txtSupport, gridBagConstraints);
+            // Support points: shown as a self-contained gauge (current vs. the reserve the contract can be negotiated
+            // up to) when that reserve is positive; otherwise a plain "Support Points: N" label/value row.
+            if (maximumSupportPoints > 0) {
+                final ContractMeterBar supportPointsBar = ContractMeterBar.supportPoints(currentSupportPoints,
+                      maximumSupportPoints);
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 0;
+                gridBagConstraints.gridy = y++;
+                gridBagConstraints.gridwidth = 2;
+                gridBagConstraints.weightx = 1.0;
+                gridBagConstraints.insets = new Insets(0, 0, UIUtil.scaleForGUI(4), 0);
+                gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                pnlStats.add(supportPointsBar, gridBagConstraints);
+            } else {
+                lblSupportPoints.setName("lblSupportPoints");
+                lblSupportPoints.setText(resourceMap.getString("lblSupportPoints.text"));
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 0;
+                gridBagConstraints.gridy = y;
+                gridBagConstraints.fill = GridBagConstraints.NONE;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                pnlStats.add(lblSupportPoints, gridBagConstraints);
+
+                txtSupport.setName("txtSupport");
+                txtSupport.setText(Integer.toString(currentSupportPoints));
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 1;
+                gridBagConstraints.gridy = y++;
+                gridBagConstraints.weightx = 0.5;
+                gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+                gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                pnlStats.add(txtSupport, gridBagConstraints);
+            }
 
             int currentScore = contract.getContractScore(campaign.getCampaignOptions().isUseStratConMaplessMode());
             int neededScore = contract.getRequiredVictoryPoints();
@@ -1028,7 +1047,8 @@ public class MissionViewPanel extends JScrollablePanel {
             if (neededScore > 0) {
                 final boolean canEndEarly = (contract.getStratconCampaignState() == null) ||
                                                   contract.getStratconCampaignState().allowEarlyVictory();
-                final ContractScoreBar contractScoreBar = new ContractScoreBar(currentScore, neededScore, canEndEarly);
+                final ContractMeterBar contractScoreBar = ContractMeterBar.victoryPoints(currentScore, neededScore,
+                      canEndEarly);
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 0;
                 gridBagConstraints.gridy = y++;
