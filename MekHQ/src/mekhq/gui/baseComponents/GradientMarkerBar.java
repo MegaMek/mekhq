@@ -34,6 +34,7 @@ package mekhq.gui.baseComponents;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -104,9 +105,24 @@ public class GradientMarkerBar extends JComponent {
      *                   reference line
      * @param labelAbove {@code true} to draw the label above the track, {@code false} to draw it below; ignored when
      *                   {@code label} is {@code null} or blank
+     * @param bold       {@code true} to emphasise this marker with a heavier handle and a bold label, used to call out
+     *                   the primary value among several markers
      */
     public record Marker(double value, @Nullable String label, @Nonnull Color color, @Nonnull MarkerStyle style,
-                         boolean labelAbove) {
+                         boolean labelAbove, boolean bold) {
+        /**
+         * Convenience constructor for a marker that is not emphasised (not bold).
+         *
+         * @param value      the value the marker represents
+         * @param label      an optional short label, or {@code null} for none
+         * @param color      the color used to draw the marker handle
+         * @param style      the marker style
+         * @param labelAbove {@code true} to draw the label above the track, {@code false} to draw it below
+         */
+        public Marker(final double value, final @Nullable String label, final @Nonnull Color color,
+              final @Nonnull MarkerStyle style, final boolean labelAbove) {
+            this(value, label, color, style, labelAbove, false);
+        }
     }
 
     private static final int PADDING = 6;
@@ -114,6 +130,8 @@ public class GradientMarkerBar extends JComponent {
     /** How far a marker handle extends beyond the track, top and bottom, so it stays visible over the gradient. */
     private static final int MARKER_OVERHANG = 3;
     private static final int SOLID_MARKER_WIDTH = 4;
+    /** Width of a bold (emphasised) {@link MarkerStyle#SOLID} handle. */
+    private static final int BOLD_MARKER_WIDTH = 6;
     private static final int TICK_MARKER_WIDTH = 2;
     private static final int TRACK_ARC = 6;
     /** Vertical gap between a marker label and the track. */
@@ -383,8 +401,13 @@ public class GradientMarkerBar extends JComponent {
         final int markerTop = trackTop - overhang;
         final int markerHeight = trackHeight + 2 * overhang;
         for (final Marker marker : markers) {
-            final int width = (marker.style() == MarkerStyle.SOLID) ? Math.max(UIUtil.scaleForGUI(SOLID_MARKER_WIDTH), 2)
-                  : Math.max(UIUtil.scaleForGUI(TICK_MARKER_WIDTH), 1);
+            final int width;
+            if (marker.style() == MarkerStyle.SOLID) {
+                final int base = marker.bold() ? BOLD_MARKER_WIDTH : SOLID_MARKER_WIDTH;
+                width = Math.max(UIUtil.scaleForGUI(base), 2);
+            } else {
+                width = Math.max(UIUtil.scaleForGUI(TICK_MARKER_WIDTH), 1);
+            }
             final int centerX = valueToX(marker.value());
             int x = centerX - width / 2;
             // Keep the handle fully within the component bounds.
@@ -411,7 +434,10 @@ public class GradientMarkerBar extends JComponent {
             return;
         }
         g2.setColor(marker.color());
-        final FontMetrics metrics = g2.getFontMetrics(getFont());
+        final Font baseFont = getFont();
+        final Font font = (marker.bold() && (baseFont != null)) ? baseFont.deriveFont(Font.BOLD) : baseFont;
+        g2.setFont(font);
+        final FontMetrics metrics = g2.getFontMetrics(font);
         final int textWidth = metrics.stringWidth(label);
         int textX = centerX - (textWidth / 2);
         textX = Math.max(0, Math.min(textX, getWidth() - textWidth));

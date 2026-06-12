@@ -34,7 +34,6 @@ package mekhq.gui.view;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -47,6 +46,7 @@ import javax.swing.UIManager;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import megamek.client.ui.util.UIUtil;
 import mekhq.gui.baseComponents.GradientMarkerBar;
 import mekhq.gui.baseComponents.GradientMarkerBar.Marker;
 import mekhq.gui.baseComponents.GradientMarkerBar.MarkerStyle;
@@ -86,8 +86,6 @@ public class ContractMeterBar extends JPanel {
     private static final Color GREEN = new Color(0x36, 0xB3, 0x2B);
     /** Cool azure accent for the current-value marker, chosen to stand out against the warm red-gold-green gradient. */
     private static final Color CURRENT_MARKER_COLOR = new Color(0x29, 0xB6, 0xF6);
-    /** Alpha applied to the reference marker when it is muted (reaching the reference is not, by itself, a goal). */
-    private static final int MUTED_ALPHA = 160;
 
     /** The wrapped gauge. Kept private so the marker-level API is not exposed to callers. */
     private final GradientMarkerBar bar = new GradientMarkerBar();
@@ -100,13 +98,12 @@ public class ContractMeterBar extends JPanel {
      * @param currentValue   the current value, drawn as the prominent accent-colored marker (may be negative)
      * @param referenceValue the upper reference value (the green end of the gradient and a reference tick); should be
      *                       positive (callers fall back to a plain-text display when it is not)
-     * @param mutedReference {@code true} to de-emphasise the reference tick, used when reaching it is not, by itself,
-     *                       an achievable goal (for example a contract that cannot be ended early)
      * @param tooltip        the tooltip shown when hovering anywhere on the bar
      */
     private ContractMeterBar(final String title, final int currentValue, final int referenceValue,
-          final boolean mutedReference, final String tooltip) {
-        super(new BorderLayout());
+          final String tooltip) {
+        // A small vertical gap separates the title from the bar so they read as a grouped unit without crowding.
+        super(new BorderLayout(0, UIUtil.scaleForGUI(1)));
         setOpaque(false);
         add(buildTitle(title), BorderLayout.NORTH);
         add(bar, BorderLayout.CENTER);
@@ -120,18 +117,18 @@ public class ContractMeterBar extends JPanel {
         bar.setOutOfGradientColors(DEEP_RED.darker(), GREEN.darker());
 
         final Color markerColor = markerColor();
-        final Color referenceColor = mutedReference ? muted(markerColor) : markerColor;
         final List<Marker> markers = new ArrayList<>(3);
         // The bar is the primary display, so its markers carry the figures, all labelled below the track so the title
-        // can sit flush above it. The zero baseline and the reference total are neutral thin reference ticks; the
-        // current value is a thicker, accent-colored solid marker, so the figure the player tracks stands out both by
-        // weight and by hue. Markers are painted in list order, so the current-value marker is added last to sit on
-        // top where markers coincide (for example a brand-new contract whose value is still zero).
-        markers.add(new Marker(referenceValue, Integer.toString(referenceValue), referenceColor, MarkerStyle.TICK,
+        // can sit flush above it. The zero baseline and the reference total are neutral thin reference ticks drawn in
+        // the same color (a different color reads as a bug without explanation); the current value is a bold, thicker,
+        // accent-colored solid marker, so the figure the player tracks stands out by weight, hue, and a bold label.
+        // Markers are painted in list order, so the current-value marker is added last to sit on top where markers
+        // coincide (for example a brand-new contract whose value is still zero).
+        markers.add(new Marker(referenceValue, Integer.toString(referenceValue), markerColor, MarkerStyle.TICK,
               false));
         markers.add(new Marker(0, "0", markerColor, MarkerStyle.TICK, false));
         markers.add(new Marker(currentValue, Integer.toString(currentValue), CURRENT_MARKER_COLOR, MarkerStyle.SOLID,
-              false));
+              false, true));
         bar.setMarkers(markers);
 
         setToolTipText(wordWrap(tooltip));
@@ -144,8 +141,8 @@ public class ContractMeterBar extends JPanel {
      * @param requiredScore the victory points required to declare victory; should be positive (callers should fall
      *                      back to a plain-text display when the requirement is not a positive number)
      * @param canEndEarly   {@code true} if reaching {@code requiredScore} lets the player declare victory early;
-     *                      {@code false} if the contract must run its full term, in which case the reference tick is
-     *                      muted because reaching it is not, by itself, an exit
+     *                      {@code false} if the contract must run its full term, in which case the title carries a
+     *                      concise "full term" cue
      *
      * @return the configured gauge
      */
@@ -154,8 +151,9 @@ public class ContractMeterBar extends JPanel {
         final String tooltip = getFormattedTextAt(RESOURCE_BUNDLE,
               canEndEarly ? "contractScoreBar.tooltip.canEndEarly" : "contractScoreBar.tooltip.cannotEndEarly",
               currentScore, requiredScore);
-        return new ContractMeterBar(getTextAt(RESOURCE_BUNDLE, "contractScoreBar.title.text"), currentScore,
-              requiredScore, !canEndEarly, tooltip);
+        final String titleKey = canEndEarly ? "contractScoreBar.title.text" : "contractScoreBar.title.cannotEndEarly.text";
+        return new ContractMeterBar(getFormattedTextAt(RESOURCE_BUNDLE, titleKey, currentScore, requiredScore),
+              currentScore, requiredScore, tooltip);
     }
 
     /**
@@ -170,8 +168,8 @@ public class ContractMeterBar extends JPanel {
     public static @Nonnull ContractMeterBar supportPoints(final int currentPoints, final int maximumPoints) {
         final String tooltip = getFormattedTextAt(RESOURCE_BUNDLE, "contractSupportPointsBar.tooltip", currentPoints,
               maximumPoints);
-        return new ContractMeterBar(getTextAt(RESOURCE_BUNDLE, "contractSupportPointsBar.title.text"), currentPoints,
-              maximumPoints, false, tooltip);
+        return new ContractMeterBar(getFormattedTextAt(RESOURCE_BUNDLE, "contractSupportPointsBar.title.text",
+              currentPoints, maximumPoints), currentPoints, maximumPoints, tooltip);
     }
 
     /**
@@ -192,14 +190,6 @@ public class ContractMeterBar extends JPanel {
     private static @Nonnull Color markerColor() {
         final Color foreground = UIManager.getColor("Label.foreground");
         return (foreground == null) ? Color.WHITE : foreground;
-    }
-
-    /**
-     * @return the given color with reduced opacity, used to de-emphasise the goal marker for contracts that cannot be
-     *       ended early
-     */
-    private static @Nonnull Color muted(final @Nonnull Color color) {
-        return new Color(color.getRed(), color.getGreen(), color.getBlue(), MUTED_ALPHA);
     }
 
     /**

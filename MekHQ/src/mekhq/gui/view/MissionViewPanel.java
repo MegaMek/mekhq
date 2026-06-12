@@ -1011,7 +1011,7 @@ public class MissionViewPanel extends JScrollablePanel {
                 gridBagConstraints.gridy = y++;
                 gridBagConstraints.gridwidth = 2;
                 gridBagConstraints.weightx = 1.0;
-                gridBagConstraints.insets = new Insets(0, 0, UIUtil.scaleForGUI(4), 0);
+                gridBagConstraints.insets = new Insets(0, 0, UIUtil.scaleForGUI(1), 0);
                 gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
                 pnlStats.add(supportPointsBar, gridBagConstraints);
