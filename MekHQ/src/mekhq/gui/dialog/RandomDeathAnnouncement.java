@@ -289,8 +289,11 @@ public class RandomDeathAnnouncement extends ImmersiveDialogNag {
      */
     private String getOutOfCharacterText(String nagConstant) {
         String messageKey = "RandomDeathAnnouncement.outOfCharacter";
+        
         String classificationKey = messageKey + '.' + nagConstant;
-        return getFormattedTextAt(RESOURCE_BUNDLE, "RandomDeathAnnouncement.outOfCharacter", classificationKey);
+        String classification = getFormattedTextAt(RESOURCE_BUNDLE, classificationKey);
+
+        return getFormattedTextAt(RESOURCE_BUNDLE, "RandomDeathAnnouncement.outOfCharacter", classification);
     }
 
     /**
