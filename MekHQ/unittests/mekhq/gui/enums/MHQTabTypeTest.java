@@ -54,7 +54,7 @@ public class MHQTabTypeTest {
     @Test
     public void testGetMnemonic() {
         assertEquals(KeyEvent.VK_O, MHQTabType.COMMAND_CENTER.getMnemonic());
-        assertEquals(KeyEvent.VK_G, MHQTabType.NAVIGATION.getMnemonic());
+        assertEquals(KeyEvent.VK_UNDEFINED, MHQTabType.NAVIGATION.getMnemonic());
         assertEquals(KeyEvent.VK_S, MHQTabType.INTERSTELLAR_MAP.getMnemonic());
         assertEquals(KeyEvent.VK_H, MHQTabType.HANGAR.getMnemonic());
         assertEquals(KeyEvent.VK_L, MHQTabType.MEK_LAB.getMnemonic());

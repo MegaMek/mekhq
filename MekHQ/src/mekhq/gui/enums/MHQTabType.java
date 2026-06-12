@@ -48,7 +48,7 @@ import mekhq.gui.CampaignGUI;
 public enum MHQTabType {
     //region Enum Declaration
     COMMAND_CENTER("MHQTabType.COMMAND_CENTER.text", KeyEvent.VK_O),
-    NAVIGATION("MHQTabType.NAVIGATION.text", KeyEvent.VK_G),
+    NAVIGATION("MHQTabType.NAVIGATION.text", KeyEvent.VK_UNDEFINED),
     INTERSTELLAR_MAP("MHQTabType.INTERSTELLAR_MAP.text", KeyEvent.VK_S),
     TOE("MHQTabType.TOE.text", KeyEvent.VK_T),
     BRIEFING_ROOM("MHQTabType.BRIEFING_ROOM.text", KeyEvent.VK_B),
