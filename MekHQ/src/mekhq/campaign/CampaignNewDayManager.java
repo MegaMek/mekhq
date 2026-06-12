@@ -105,6 +105,7 @@ import java.util.UUID;
 import javax.swing.JOptionPane;
 
 import megamek.codeUtilities.StringUtility;
+import megamek.common.event.Subscribe;
 import megamek.common.options.OptionsConstants;
 import megamek.logging.MMLogger;
 import mekhq.MHQOptions;
@@ -114,6 +115,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.DayEndingEvent;
 import mekhq.campaign.events.DeploymentChangedEvent;
+import mekhq.campaign.events.InterruptAdvanceMultipleDaysEvent;
 import mekhq.campaign.events.NewDayEvent;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.finances.Finances;
@@ -231,7 +233,19 @@ public class CampaignNewDayManager {
     private LocalDate today;
     private AbstractLocation updatedLocation;
 
+    /**
+     * Indicates whether the day should begin without any interruptions.
+     *
+     * <p>Initializes as {@code true} and should remain that way, unless modified by a nag dialog.</p>
+     *
+     * <p>Nag dialogs should set this value to {@code false} if the player chooses to cancel new day advance, as this
+     * will interrupt any ongoing Advance Multiple Days processes.</p>
+     */
+    private boolean startDayWithNoInterruptions = true;
+
     public CampaignNewDayManager(Campaign campaign) {
+        MekHQ.registerHandler(this);
+
         this.campaign = campaign;
         this.campaignOptions = campaign.getCampaignOptions();
         this.faction = campaign.getFaction();
@@ -242,8 +256,29 @@ public class CampaignNewDayManager {
         this.updatedLocation = campaign.getCurrentLocation();
     }
 
+    public void dispose() {
+        MekHQ.unregisterHandler(this);
+    }
+
+    @Subscribe
+    public void handleInterruptAdvanceDay(InterruptAdvanceMultipleDaysEvent event) {
+        // This guard is future proofing. At the time of writing there is only ever one campaign instance. That may
+        // not always be the case, so this check ensures that multiple instances of Campaign don't pollute each other.
+        if (event.getCampaign() == this.campaign) {
+            startDayWithNoInterruptions = false;
+        }
+    }
+
     /**
-     * @return <code>true</code> if the new day arrived
+     * Processes the general actions that need to occur on New Day.
+     *
+     * <p>Having this method return {@code false} will interrupt any Advance Multiple Days actions.</p>
+     *
+     * <p><b>A Note on Nags:</b> Normally nags interrupt {@link DayEndingEvent} but that can't be done here, as the
+     * day isn't ending, but starting. So we have this method return {@code false} instead, which effectively does the
+     * same thing, insofar as the player is concerned.</p>
+     *
+     * @return {@code true} if the new day concluded successfully, {@code false} if the new day failed.
      */
     public boolean newDay() {
         // Clear previous daily report nags (we want this up top so that we can make sure no messages have been
@@ -563,7 +598,15 @@ public class CampaignNewDayManager {
 
         // campaign must be the last step before returning true
         MekHQ.triggerEvent(new NewDayEvent(campaign));
-        return true;
+
+        // This conditional should always be the last thing in the method to ensure we're only logging a 'manual
+        // cancellation' in the event advance day was manually canceled and not when a bug occurred. Failure to
+        // follow this advice may result in actual problems being masked - Illiani, Jun/11/2026
+        if (!startDayWithNoInterruptions) {
+            LOGGER.info("Player chose to interrupt any ongoing Advance Multiple Days processes.");
+        }
+
+        return startDayWithNoInterruptions;
     }
 
     private void checkForBioweaponAttacksOrNewVaccines(String systemName, String systemId) {
@@ -976,15 +1019,22 @@ public class CampaignNewDayManager {
         }
     }
 
-    private void processPersonnelWhoHaveDepartedCampaign(boolean isNewWeek, RandomDeath randomDeath) {
+    private boolean processPersonnelWhoHaveDepartedCampaign(boolean isNewWeek, RandomDeath randomDeath) {
         List<Person> departedPersonnel = campaign.getPersonnel().stream()
                                                .filter(person -> person.getStatus().isFollowAfterLeavingCampaign())
                                                .toList();
+
+        boolean someoneRandomlyDied = false;
         for (Person person : departedPersonnel) {
             if (isNewWeek) {
-                randomDeath.processNewWeek(campaign, today, person);
+                boolean didDie = randomDeath.processNewWeek(campaign, today, person);
+                if (didDie) {
+                    someoneRandomlyDied = true;
+                }
             }
         }
+
+        return someoneRandomlyDied;
     }
 
     /**

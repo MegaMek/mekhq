@@ -694,8 +694,12 @@ public class RandomDeath {
 
             PersonnelStatus causeOfDeath = getCause(person, ageGroup, age);
             person.changeStatus(campaign, today, causeOfDeath);
-            
-            new RandomDeathAnnouncement(campaign, person, causeOfDeath);
+
+            // Announce death if applicable
+            String deathAnnouncementNagConstant = RandomDeathAnnouncement.getRandomDeathAnnouncementNagConstant(person);
+            if (RandomDeathAnnouncement.checkNag(deathAnnouncementNagConstant)) {
+                new RandomDeathAnnouncement(campaign, person, causeOfDeath, deathAnnouncementNagConstant);
+            }
 
             return true;
         } else {

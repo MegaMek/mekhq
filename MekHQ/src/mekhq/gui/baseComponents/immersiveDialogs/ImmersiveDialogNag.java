@@ -44,6 +44,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.ButtonLabelTooltipPair;
+import mekhq.gui.dialog.RandomDeathAnnouncement;
 
 /**
  * Handles the display and processing of immersive nag dialogs.
@@ -66,7 +67,7 @@ public class ImmersiveDialogNag {
     /**
      * Represents the available user choices for the nag dialog.
      */
-    private enum DialogChoice {
+    protected enum DialogChoice {
         CHOICE_CANCEL(0), CHOICE_CONTINUE(1), CHOICE_SUPPRESS(2);
 
         private final int choiceIndex;
@@ -97,10 +98,16 @@ public class ImmersiveDialogNag {
 
     private final String RESOURCE_BUNDLE = "mekhq.resources.NagDialogs";
 
-    private boolean cancelAdvanceDay;
+    protected boolean cancelAdvanceDay;
 
     protected String getResourceBundle() {
         return RESOURCE_BUNDLE;
+    }
+
+    /**
+     * This constructor is largely created to facilitate class extenders, such as {@link RandomDeathAnnouncement}.</p>
+     */
+    public ImmersiveDialogNag() {
     }
 
     /**
@@ -207,7 +214,7 @@ public class ImmersiveDialogNag {
      *
      * @throws IllegalStateException If the {@code choiceIndex} does not match any of the expected constants.
      */
-    private void processDialogChoice(int choiceIndex, String nagConstant) {
+    protected void processDialogChoice(int choiceIndex, String nagConstant) {
         DialogChoice choice = DialogChoice.fromIndex(choiceIndex);
 
         switch (choice) {

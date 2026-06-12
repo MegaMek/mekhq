@@ -32,43 +32,152 @@
  */
 package mekhq.gui.dialog;
 
+import static mekhq.MHQConstants.NAG_SOMEONE_RANDOMLY_DIED_CAMP_FOLLOWER;
+import static mekhq.MHQConstants.NAG_SOMEONE_RANDOMLY_DIED_CIVILIAN;
+import static mekhq.MHQConstants.NAG_SOMEONE_RANDOMLY_DIED_COMBAT;
+import static mekhq.MHQConstants.NAG_SOMEONE_RANDOMLY_DIED_OTHER_SUPPORT;
+import static mekhq.MHQConstants.NAG_SOMEONE_RANDOMLY_DIED_RETIREE;
+import static mekhq.MHQConstants.NAG_SOMEONE_RANDOMLY_DIED_TECH;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import java.util.List;
+import java.time.LocalDate;
 
+import megamek.common.enums.SkillLevel;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.events.InterruptAdvanceMultipleDaysEvent;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
+import org.jspecify.annotations.NonNull;
 
-public class RandomDeathAnnouncement {
+public class RandomDeathAnnouncement extends ImmersiveDialogNag {
     private final static String RESOURCE_BUNDLE = "mekhq.resources.RandomDeathAnnouncement";
 
-    public RandomDeathAnnouncement(Campaign campaign, Person victim, PersonnelStatus causeOfDeath) {
-        new ImmersiveDialogSimple(campaign,
-              victim,
-              null,
-              getInCharacterText(victim, causeOfDeath),
-              List.of(getResponseText()),
-              getOutOfCharacterText(),
-              null,
-              false);
+    private final Campaign campaign;
+
+    public RandomDeathAnnouncement(Campaign campaign, Person deceased, PersonnelStatus causeOfDeath,
+          String nagConstant) {
+        super();
+        this.campaign = campaign;
+
+        ImmersiveDialogCore dialog = constructDialog(campaign, deceased, causeOfDeath, nagConstant);
+        processDialogChoice(dialog.getDialogChoice(), nagConstant);
     }
 
-    private String getInCharacterText(Person victim, PersonnelStatus causeOfDeath) {
+    private ImmersiveDialogCore constructDialog(Campaign campaign, Person deceased, PersonnelStatus causeOfDeath,
+          String nagConstant) {
+        return new ImmersiveDialogCore(campaign,
+              deceased,
+              null,
+              getInCharacterText(campaign, deceased, causeOfDeath),
+              createButtons(),
+              getOutOfCharacterText(nagConstant),
+              null,
+              true,
+              null,
+              null,
+              true);
+    }
+
+    private String getInCharacterText(Campaign campaign, Person deceased, PersonnelStatus causeOfDeath) {
+        LocalDate today = campaign.getLocalDate();
         String causeOfDeathLabel = causeOfDeath.getLogText();
 
-        return getFormattedTextAt(RESOURCE_BUNDLE, "RandomDeathAnnouncement.inCharacter",
-              victim.getHyperlinkedFullTitle(),
-              causeOfDeathLabel);
+        String primaryProfessionLabel = getPrimaryProfessionLabel(deceased, campaign);
+        String secondaryProfessionLabel = getSecondaryProfessionLabel(deceased, campaign);
+
+        String professions = primaryProfessionLabel +
+                                   (secondaryProfessionLabel.isBlank() ? "" : ", " + secondaryProfessionLabel);
+
+        if (deceased.getStatus().isCampFollower()) {
+            return getCampFollowerDeathReport(deceased, campaign, causeOfDeathLabel, professions, today);
+        } else {
+            return getEmployeeDeathReport(deceased, campaign, causeOfDeathLabel, professions, today);
+        }
     }
 
-    private String getResponseText() {
-        return getTextAt(RESOURCE_BUNDLE, "RandomDeathAnnouncement.response");
+    private static @NonNull String getCampFollowerDeathReport(Person deceased, Campaign campaign,
+          String causeOfDeathLabel,
+          String professions, LocalDate today) {
+        return getFormattedTextAt(RESOURCE_BUNDLE, "RandomDeathAnnouncement.inCharacter.unemployed",
+              deceased.getHyperlinkedFullTitle(),
+              causeOfDeathLabel,
+              professions,
+              deceased.getAge(today),
+              deceased.getYearsSinceJoiningCampaign(campaign));
     }
 
-    private String getOutOfCharacterText() {
-        return getTextAt(RESOURCE_BUNDLE, "RandomDeathAnnouncement.outOfCharacter");
+    private static @NonNull String getEmployeeDeathReport(Person deceased, Campaign campaign, String causeOfDeathLabel,
+          String professions, LocalDate today) {
+        return getFormattedTextAt(RESOURCE_BUNDLE, "RandomDeathAnnouncement.inCharacter.employed",
+              deceased.getHyperlinkedFullTitle(),
+              causeOfDeathLabel,
+              professions,
+              deceased.getAge(today),
+              deceased.getYearsSinceJoiningCampaign(campaign),
+              deceased.getYearsInService(campaign),
+              deceased.getTotalXPEarnings(),
+              deceased.getTotalEarnings().toAmountString());
+    }
+
+    private static @NonNull String getPrimaryProfessionLabel(Person deceased, Campaign campaign) {
+        String primaryProfession = deceased.getPrimaryRoleDesc();
+        SkillLevel primarySkillLevel = deceased.getSkillLevel(campaign, false, true);
+        String primarySkillLabel = SkillType.getColoredExperienceLevelName(primarySkillLevel);
+        return primaryProfession + " (" + primarySkillLabel + ')';
+    }
+
+    private static String getSecondaryProfessionLabel(Person deceased, Campaign campaign) {
+        PersonnelRole secondaryRole = deceased.getSecondaryRole();
+        if (secondaryRole.isNone()) {
+            return "";
+        }
+
+        String secondaryProfession = deceased.getSecondaryRoleDesc();
+        SkillLevel secondarySkillLevel = deceased.getSkillLevel(campaign, true, true);
+        String secondarySkillLabel = SkillType.getColoredExperienceLevelName(secondarySkillLevel);
+
+        return secondaryProfession + " (" + secondarySkillLabel + ')';
+    }
+
+    private String getOutOfCharacterText(String nagConstant) {
+        String messageKey = "RandomDeathAnnouncement.outOfCharacter";
+        String classificationKey = messageKey + '.' + nagConstant;
+        return getFormattedTextAt(RESOURCE_BUNDLE, "RandomDeathAnnouncement.outOfCharacter", classificationKey);
+    }
+
+    public static boolean checkNag(String nagConstant) {
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(nagConstant);
+    }
+
+    @Override
+    protected void processDialogChoice(int choiceIndex, String nagConstant) {
+        DialogChoice choice = DialogChoice.fromIndex(choiceIndex);
+
+        switch (choice) {
+            case CHOICE_CANCEL -> MekHQ.triggerEvent(new InterruptAdvanceMultipleDaysEvent(campaign));
+            case CHOICE_CONTINUE -> cancelAdvanceDay = false;
+            case CHOICE_SUPPRESS -> {
+                MekHQ.getMHQOptions().setNagDialogIgnore(nagConstant, true);
+                cancelAdvanceDay = false;
+            }
+            default -> throw new IllegalStateException("Unexpected value in ImmersiveDialogNag/processDialogChoice: " +
+                                                             choiceIndex);
+        }
+    }
+
+    public static String getRandomDeathAnnouncementNagConstant(Person deceased) {
+        return switch (deceased) {
+            case Person d when d.getStatus().isCampFollower() -> NAG_SOMEONE_RANDOMLY_DIED_CAMP_FOLLOWER;
+            case Person d when d.getStatus().isRetired() -> NAG_SOMEONE_RANDOMLY_DIED_RETIREE;
+            case Person d when d.isCombat() -> NAG_SOMEONE_RANDOMLY_DIED_COMBAT;
+            case Person d when d.isTechExpanded() -> NAG_SOMEONE_RANDOMLY_DIED_TECH;
+            case Person d when d.isSupport() -> NAG_SOMEONE_RANDOMLY_DIED_OTHER_SUPPORT;
+            default -> NAG_SOMEONE_RANDOMLY_DIED_CIVILIAN;
+        };
     }
 }
