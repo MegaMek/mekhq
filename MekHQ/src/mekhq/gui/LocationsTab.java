@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2026 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -126,10 +126,7 @@ public class LocationsTab extends CampaignGuiTab {
         locationListScheduler.schedule();
     }
 
-    // =========================================================================
-    // Model
-    // =========================================================================
-
+    /** Model: owns the place list and current view mode; notifies the table of structural and data changes. */
     private static final class LocationsTabModel extends AbstractTableModel {
 
         private static final int COL_NAME = 0;
@@ -327,10 +324,7 @@ public class LocationsTab extends CampaignGuiTab {
         }
     }
 
-    // =========================================================================
-    // View
-    // =========================================================================
-
+    /** View: owns all widgets: the view-mode dropdown toolbar, the table, and the detail scroll pane. */
     private static final class LocationsTabView extends JPanel {
 
         private static final int PLACE_DETAIL_WIDTH = UIUtil.scaleForGUI(400);
@@ -380,10 +374,7 @@ public class LocationsTab extends CampaignGuiTab {
         }
     }
 
-    // =========================================================================
-    // Controller
-    // =========================================================================
-
+    /** Controller: wires selection, dropdown, and right-click events; drives model/view updates and campaign refresh. */
     private static final class LocationsTabController {
 
         private final LocationsTabModel model;

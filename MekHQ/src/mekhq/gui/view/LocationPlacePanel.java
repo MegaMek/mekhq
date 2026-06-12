@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2026 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -72,10 +72,7 @@ public class LocationPlacePanel extends JScrollablePanel {
         add(view, BorderLayout.CENTER);
     }
 
-    // =========================================================================
-    // Model
-    // =========================================================================
-
+    /** Model: computes all display strings for a single {@link IPlace} at construction time. */
     private static final class LocationPlacePanelModel {
 
         private final String name;
@@ -146,10 +143,7 @@ public class LocationPlacePanel extends JScrollablePanel {
         String getDestinationPlanet() {return destinationPlanet;}
     }
 
-    // =========================================================================
-    // View
-    // =========================================================================
-
+    /** View: renders place name, type, status, system, planet, and conditional destination rows. */
     private static final class LocationPlacePanelView extends JPanel {
 
         private static final int PADDING = UIUtil.scaleForGUI(10);
@@ -159,17 +153,17 @@ public class LocationPlacePanel extends JScrollablePanel {
         private final JLabel lblStatusValue = new JLabel();
         private final JLabel lblSystemValue = new JLabel();
         private final JLabel lblPlanetValue = new JLabel();
-        private final JLabel lblDestLabel;
-        private final JLabel lblDestValue = new JLabel();
-        private final JLabel lblDestSystemLabel;
-        private final JLabel lblDestSystemValue = new JLabel();
-        private final JLabel lblDestPlanetLabel;
-        private final JLabel lblDestPlanetValue = new JLabel();
+        private final JLabel lblDestinationLabel;
+        private final JLabel lblDestinationValue = new JLabel();
+        private final JLabel lblDestinationSystemLabel;
+        private final JLabel lblDestinationSystemValue = new JLabel();
+        private final JLabel lblDestinationPlanetLabel;
+        private final JLabel lblDestinationPlanetValue = new JLabel();
 
         LocationPlacePanelView() {
-            lblDestLabel = new JLabel(getTextAt(RESOURCE_BUNDLE, "LocationPlacePanel.label.destination"));
-            lblDestSystemLabel = new JLabel(getTextAt(RESOURCE_BUNDLE, "LocationPlacePanel.label.destinationSystem"));
-            lblDestPlanetLabel = new JLabel(getTextAt(RESOURCE_BUNDLE, "LocationPlacePanel.label.destinationPlanet"));
+            lblDestinationLabel = new JLabel(getTextAt(RESOURCE_BUNDLE, "LocationPlacePanel.label.destination"));
+            lblDestinationSystemLabel = new JLabel(getTextAt(RESOURCE_BUNDLE, "LocationPlacePanel.label.destinationSystem"));
+            lblDestinationPlanetLabel = new JLabel(getTextAt(RESOURCE_BUNDLE, "LocationPlacePanel.label.destinationPlanet"));
 
             lblName.setFont(lblName.getFont().deriveFont(Font.BOLD, lblName.getFont().getSize2D() + 2f));
             lblType.setFont(lblType.getFont().deriveFont(Font.ITALIC));
@@ -200,9 +194,9 @@ public class LocationPlacePanel extends JScrollablePanel {
             addRow(2, getTextAt(RESOURCE_BUNDLE, "LocationPlacePanel.label.status"), lblStatusValue, gbc);
             addRow(3, getTextAt(RESOURCE_BUNDLE, "LocationPlacePanel.label.system"), lblSystemValue, gbc);
             addRow(4, getTextAt(RESOURCE_BUNDLE, "LocationPlacePanel.label.planet"), lblPlanetValue, gbc);
-            addPairRow(5, lblDestLabel, lblDestValue, gbc);
-            addPairRow(6, lblDestSystemLabel, lblDestSystemValue, gbc);
-            addPairRow(7, lblDestPlanetLabel, lblDestPlanetValue, gbc);
+            addPairRow(5, lblDestinationLabel, lblDestinationValue, gbc);
+            addPairRow(6, lblDestinationSystemLabel, lblDestinationSystemValue, gbc);
+            addPairRow(7, lblDestinationPlanetLabel, lblDestinationPlanetValue, gbc);
 
             gbc.gridx = 0;
             gbc.gridy = 8;
@@ -237,25 +231,22 @@ public class LocationPlacePanel extends JScrollablePanel {
             lblPlanetValue.setText(model.getPlanet());
 
             boolean inTransit = model.isInTransit();
-            lblDestLabel.setVisible(inTransit);
-            lblDestValue.setVisible(inTransit);
-            lblDestSystemLabel.setVisible(inTransit);
-            lblDestSystemValue.setVisible(inTransit);
-            lblDestPlanetLabel.setVisible(inTransit);
-            lblDestPlanetValue.setVisible(inTransit);
+            lblDestinationLabel.setVisible(inTransit);
+            lblDestinationValue.setVisible(inTransit);
+            lblDestinationSystemLabel.setVisible(inTransit);
+            lblDestinationSystemValue.setVisible(inTransit);
+            lblDestinationPlanetLabel.setVisible(inTransit);
+            lblDestinationPlanetValue.setVisible(inTransit);
 
             if (inTransit) {
-                lblDestValue.setText(model.getDestinationName());
-                lblDestSystemValue.setText(model.getDestinationSystem());
-                lblDestPlanetValue.setText(model.getDestinationPlanet());
+                lblDestinationValue.setText(model.getDestinationName());
+                lblDestinationSystemValue.setText(model.getDestinationSystem());
+                lblDestinationPlanetValue.setText(model.getDestinationPlanet());
             }
         }
     }
 
-    // =========================================================================
-    // Controller
-    // =========================================================================
-
+    /** Controller: populates the view from the model on construction. */
     private static final class LocationPlacePanelController {
 
         LocationPlacePanelController(LocationPlacePanelModel model, LocationPlacePanelView view) {
