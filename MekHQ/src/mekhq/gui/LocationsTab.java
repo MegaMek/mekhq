@@ -37,31 +37,29 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTable;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 
 import megamek.client.ui.util.UIUtil;
+import megamek.common.event.Subscribe;
 import megamek.common.ui.FastJScrollPane;
 import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.base.AbstractBase;
+import mekhq.campaign.base.PlayerBase;
+import mekhq.campaign.events.LocationEvent;
 import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.parts.Part;
-import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.gui.dialog.BaseSettingsDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.LocationDisplay;
 import mekhq.gui.view.LocationPlacePanel;
@@ -98,6 +96,7 @@ public class LocationsTab extends CampaignGuiTab {
     }
 
     private LocationsTabController controller;
+    private final ActionScheduler locationListScheduler = new ActionScheduler(this::refreshAll);
 
     public LocationsTab(CampaignGUI gui, String tabName) {
         super(gui, tabName);
@@ -120,6 +119,11 @@ public class LocationsTab extends CampaignGuiTab {
     @Override
     public void refreshAll() {
         controller.refresh(getCampaign());
+    }
+
+    @Subscribe
+    public void handle(LocationEvent ev) {
+        locationListScheduler.schedule();
     }
 
     // =========================================================================
@@ -151,11 +155,6 @@ public class LocationsTab extends CampaignGuiTab {
               UnitType.NAVAL,
               };
 
-        // Personnel role breakdown columns (displayed in PEOPLE mode)
-        private static final int PEOPLE_COMBAT_COL = COL_EXTRA_START;
-        private static final int PEOPLE_SUPPORT_COL = COL_EXTRA_START + 1;
-        private static final int PEOPLE_CIVIL_COL = COL_EXTRA_START + 2;
-
         private List<IPlace> places = List.of();
         private Campaign campaign;
         private ViewMode viewMode = ViewMode.GENERAL;
@@ -186,39 +185,23 @@ public class LocationsTab extends CampaignGuiTab {
 
         @Override
         public int getColumnCount() {
-            return switch (viewMode) {
-                case UNITS -> COL_EXTRA_START + UNIT_TYPES.length;
-                case PEOPLE -> COL_EXTRA_START + 3;
-                default -> COL_EXTRA_START;
-            };
+            return viewMode == ViewMode.UNITS ? COL_EXTRA_START + UNIT_TYPES.length : COL_EXTRA_START;
         }
 
         @Override
         public String getColumnName(int col) {
-            if (col >= COL_EXTRA_START) {
-                int extra = col - COL_EXTRA_START;
-                return switch (viewMode) {
-                    case UNITS -> UnitType.getTypeDisplayableName(UNIT_TYPES[extra]);
-                    case PEOPLE -> switch (extra) {
-                        case 0 -> getTextAt(RESOURCE_BUNDLE, "LocationsTab.column.combat");
-                        case 1 -> getTextAt(RESOURCE_BUNDLE, "LocationsTab.column.support");
-                        case 2 -> getTextAt(RESOURCE_BUNDLE, "LocationsTab.column.civilian");
-                        default -> "";
-                    };
-                    default -> "";
-                };
+            if (col >= COL_EXTRA_START && viewMode == ViewMode.UNITS) {
+                return UnitType.getTypeDisplayableName(UNIT_TYPES[col - COL_EXTRA_START]);
             }
             return switch (col) {
                 case COL_NAME -> getTextAt(RESOURCE_BUNDLE, "LocationsTab.column.name");
                 case COL_TYPE -> getTextAt(RESOURCE_BUNDLE, "LocationsTab.column.type");
-                case COL_MODE_A -> switch (viewMode) {
-                    case GENERAL -> getTextAt(RESOURCE_BUNDLE, "LocationsTab.column.system");
-                    default -> getTextAt(RESOURCE_BUNDLE, "LocationsTab.column.atLocation");
-                };
-                case COL_MODE_B -> switch (viewMode) {
-                    case GENERAL -> getTextAt(RESOURCE_BUNDLE, "LocationsTab.column.planet");
-                    default -> getTextAt(RESOURCE_BUNDLE, "LocationsTab.column.inTransit");
-                };
+                case COL_MODE_A -> viewMode == ViewMode.GENERAL
+                                         ? getTextAt(RESOURCE_BUNDLE, "LocationsTab.column.system")
+                                         : getTextAt(RESOURCE_BUNDLE, "LocationsTab.column.atLocation");
+                case COL_MODE_B -> viewMode == ViewMode.GENERAL
+                                         ? getTextAt(RESOURCE_BUNDLE, "LocationsTab.column.planet")
+                                         : getTextAt(RESOURCE_BUNDLE, "LocationsTab.column.inTransit");
                 default -> "";
             };
         }
@@ -230,18 +213,8 @@ public class LocationsTab extends CampaignGuiTab {
             }
             IPlace place = places.get(row);
             LocalDate today = campaign.getLocalDate();
-            if (col >= COL_EXTRA_START) {
-                int extra = col - COL_EXTRA_START;
-                return switch (viewMode) {
-                    case UNITS -> countUnitsAtByType(place, UNIT_TYPES[extra]);
-                    case PEOPLE -> switch (extra) {
-                        case 0 -> countPeopleAtCombat(place);
-                        case 1 -> countPeopleAtSupport(place);
-                        case 2 -> countPeopleAtCivilian(place);
-                        default -> "";
-                    };
-                    default -> "";
-                };
+            if (col >= COL_EXTRA_START && viewMode == ViewMode.UNITS) {
+                return countUnitsAtByType(place, UNIT_TYPES[col - COL_EXTRA_START]);
             }
             return switch (col) {
                 case COL_NAME -> LocationDisplay.getLocationName(place, campaign, today);
@@ -329,45 +302,6 @@ public class LocationsTab extends CampaignGuiTab {
             int count = 0;
             for (Unit unit : place.getHangar().getUnits()) {
                 if (unit.getEntity() != null && unit.getEntity().getUnitType() == unitType) {
-                    count++;
-                }
-            }
-            return count;
-        }
-
-        private static int countPeopleAtCombat(IPlace place) {
-            if (place.getPersonnel() == null) {
-                return 0;
-            }
-            int count = 0;
-            for (Person person : place.getPersonnel().values()) {
-                if (person.isCombat()) {
-                    count++;
-                }
-            }
-            return count;
-        }
-
-        private static int countPeopleAtSupport(IPlace place) {
-            if (place.getPersonnel() == null) {
-                return 0;
-            }
-            int count = 0;
-            for (Person person : place.getPersonnel().values()) {
-                if (person.isSupport() && !person.isCivilian()) {
-                    count++;
-                }
-            }
-            return count;
-        }
-
-        private static int countPeopleAtCivilian(IPlace place) {
-            if (place.getPersonnel() == null) {
-                return 0;
-            }
-            int count = 0;
-            for (Person person : place.getPersonnel().values()) {
-                if (person.isCivilian()) {
                     count++;
                 }
             }
@@ -462,6 +396,48 @@ public class LocationsTab extends CampaignGuiTab {
             view.getTable().getSelectionModel().addListSelectionListener(ev -> onSelectionChanged());
             view.getViewDropdown().addActionListener(
                   e -> model.setViewMode((ViewMode) view.getViewDropdown().getSelectedItem()));
+            view.getTable().addMouseListener(new MouseAdapter() {
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    if (e.isPopupTrigger()) {
+                        showContextMenu(e);
+                    }
+                }
+
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    if (e.isPopupTrigger()) {
+                        showContextMenu(e);
+                    }
+                }
+
+                private void showContextMenu(MouseEvent e) {
+                    int row = view.getTable().rowAtPoint(e.getPoint());
+                    if (row < 0) {
+                        return;
+                    }
+                    view.getTable().setRowSelectionInterval(row, row);
+                    IPlace place = model.getPlace(view.getTable().convertRowIndexToModel(row));
+                    if (!(place instanceof PlayerBase base)) {
+                        return;
+                    }
+                    JPopupMenu menu = new JPopupMenu();
+                    JMenuItem configItem = new JMenuItem(
+                          getTextAt(RESOURCE_BUNDLE, "LocationsTab.menu.configureBase"));
+                    configItem.addActionListener(ev -> openBaseConfig(base));
+                    menu.add(configItem);
+                    menu.show(e.getComponent(), e.getX(), e.getY());
+                }
+
+                private void openBaseConfig(PlayerBase base) {
+                    Campaign campaign = model.getCampaign();
+                    if (campaign == null) {
+                        return;
+                    }
+                    JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(view.getTable());
+                    new BaseSettingsDialog(frame, campaign, base).setVisible(true);
+                }
+            });
         }
 
         void refresh(Campaign campaign) {
