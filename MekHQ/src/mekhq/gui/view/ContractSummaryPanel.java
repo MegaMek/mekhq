@@ -65,7 +65,6 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.enums.MHQTabType;
 
 /**
  * Contract summary view for ContractMarketDialog

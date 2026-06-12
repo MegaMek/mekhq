@@ -47,6 +47,7 @@ import java.util.Set;
 import java.util.StringJoiner;
 import java.util.UUID;
 
+import jakarta.annotation.Nonnull;
 import megamek.Version;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
@@ -69,6 +70,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.location.ILocation;
+import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.enums.PartRepairType;
@@ -126,9 +128,10 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
                                                                     AvailabilityValue.C)
                                                               .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
+    private final LocationNode locationNode = new LocationNode(this);
+
     protected String name;
     protected int id;
-    private LocationNode locationNode = new LocationNode(this);
 
     /**
      * This is the unitTonnage which needs to be tracked for some parts even when off the unit. Actual tonnage is
@@ -259,11 +262,6 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
         return campaign;
     }
 
-    @Override
-    public Warehouse getWarehouse() {
-        return campaign.getWarehouse();
-    }
-
     public String getName() {
         return name;
     }
@@ -392,6 +390,40 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
     }
 
     @Override
+    public @Nonnull LocationNode getLocationNode() {
+        return locationNode;
+    }
+
+    /**
+     * A part installed on a unit lives wherever the unit is, so its place resolves through the unit's
+     * {@link LocationNode} chain; spares resolve via their own node.
+     */
+    @Override
+    public @Nullable IPlace getPlace() {
+        Unit unit = getUnit();
+        if (unit != null) {
+            return ILocation.findPlace(unit.getLocationNode());
+        }
+        return ILocation.findPlace(getLocationNode());
+    }
+
+    @Override
+    public Warehouse getWarehouse() {
+        IPlace place = getPlace();
+        return place != null ? place.getWarehouse() : campaign.getWarehouse();
+    }
+
+    @Override
+    public Set<Part> fetchPartsAtLocation() {
+        return Set.of(this);
+    }
+
+    public PartInventory getPartInventory(Part forPart) {
+        IPlace place = getPlace();
+        return place != null ? place.getPartInventory(forPart) : campaign.getPartInventory(forPart);
+    }
+
+    @Override
     public @Nullable Unit getUnit() {
         return unit;
     }
@@ -475,8 +507,25 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
         if (this.isSalvaging()) {
             int inStock = 0;
             if (this instanceof mekhq.campaign.parts.equipment.AmmoBin ammoBin) {
-                if (campaign.getQuartermaster() != null) {
-                    inStock = campaign.getQuartermaster().getAmmoAvailable(ammoBin.getType());
+                Warehouse localWarehouse = getWarehouse();
+                if (localWarehouse != null) {
+                    megamek.common.equipment.AmmoType ammoType = ammoBin.getType();
+                    boolean useAmmoByType = campaign.getCampaignOptions().isUseAmmoByType();
+                    inStock = localWarehouse.streamSpareParts()
+                                    .filter(p -> p instanceof AmmoStorage
+                                                       && p.isPresent()
+                                                       && !p.isReservedForRefit())
+                                    .mapToInt(p -> {
+                                        AmmoStorage spare = (AmmoStorage) p;
+                                        if (spare.isSameAmmoType(ammoType)) {
+                                            return spare.getShots();
+                                        } else if (useAmmoByType && spare.isCompatibleAmmo(ammoType)) {
+                                            return mekhq.campaign.Quartermaster.convertShots(
+                                                  spare.getType(), spare.getShots(), ammoType);
+                                        }
+                                        return 0;
+                                    })
+                                    .sum();
                 }
             } else if (getWarehouse() != null) {
                 inStock = getWarehouse().getSparePartsCount(this);
@@ -2145,16 +2194,6 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
         private PartPersonRef(UUID id) {
             super(id);
         }
-    }
-
-    @Override
-    public LocationNode getLocationNode() {
-        return locationNode;
-    }
-
-    @Override
-    public Set<Part> fetchPartsAtLocation() {
-        return Set.of(this);
     }
 
     public static class PartUnitRef extends Unit {
