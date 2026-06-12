@@ -124,6 +124,14 @@ public class MekLabTab extends CampaignGuiTab {
     EntityPanel labPanel;
     JPanel emptyPanel;
 
+    /**
+     * Whether the {@link Refit} constructor has already proposed a new name for the entity being edited (see
+     * {@link Refit#suggestNewName()}). The proposal must only happen once per editing session, so it cannot clobber a
+     * chassis or model name the user has typed in the lab: the refit summary is refreshed - and a fresh {@link Refit}
+     * constructed - after every edit.
+     */
+    private boolean refitNameProposed;
+
     private JPanel summaryPane;
     private JLabel lblName;
 
@@ -263,6 +271,7 @@ public class MekLabTab extends CampaignGuiTab {
 
     public void loadUnit(Unit u) {
         unit = u;
+        refitNameProposed = false;
         MekSummary mekSummary = MekSummaryCache.getInstance().getMek(unit.getEntity().getShortNameRaw());
         Entity entity;
         try {
@@ -302,6 +311,7 @@ public class MekLabTab extends CampaignGuiTab {
     }
 
     public void resetUnit() {
+        refitNameProposed = false;
         MekSummary mekSummary = MekSummaryCache.getInstance().getMek(unit.getEntity().getShortName());
 
         if (mekSummary == null) {
@@ -334,7 +344,18 @@ public class MekLabTab extends CampaignGuiTab {
         if (null == entity) {
             return;
         }
+        // The Refit constructor proposes a new name for customized infantry (Refit#suggestNewName, Issue #9154).
+        // Allow that only on the first construction of the session; afterwards restore the name so the proposal
+        // cannot overwrite a chassis or model the user typed in the lab.
+        String chassisBeforeRefit = entity.getChassis();
+        String modelBeforeRefit = entity.getModel();
         refit = new Refit(unit, entity, true, false, true);
+        if (refitNameProposed) {
+            entity.setChassis(chassisBeforeRefit);
+            entity.setModel(modelBeforeRefit);
+        } else {
+            refitNameProposed = true;
+        }
         testEntity = null;
         if (entity instanceof SmallCraft) {
             testEntity = new TestSmallCraft((SmallCraft) entity, entityVerifier.aeroOption, null);

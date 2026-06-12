@@ -2740,24 +2740,15 @@ public class Refit extends Part implements IAcquisitionWork {
      */
     public void suggestNewName() {
         if (newEntity instanceof ConvInfantry infantry) {
-            // Auto-derive a model from the weapons when no model has been set yet, or when the unit still carries
-            // the name of an existing canonical design (Issue #9154: a saved customization must not keep the stock
-            // catalog name). A model the user typed in MegaMekLab matches no canonical design and is preserved, so
-            // the refit confirmation dialog shows what the user entered.
-            String currentModel = newEntity.getModel();
-            boolean modelMissing = (currentModel == null) || currentModel.isBlank() || currentModel.equals("?");
-            boolean matchesCanonicalDesign = MekSummaryCache.getInstance()
-                                                   .getMek(newEntity.getShortNameRaw()) != null;
-            newEntity.setChassis(getChassis(infantry));
-            if (modelMissing || matchesCanonicalDesign) {
-                String model = "?";
-                if (infantry.getSecondaryWeaponsPerSquad() > 1 && null != infantry.getSecondaryWeapon()) {
-                    model = "(" + infantry.getSecondaryWeapon().getInternalName() + ")";
-                } else if (null != infantry.getPrimaryWeapon()) {
-                    model = "(" + infantry.getPrimaryWeapon().getInternalName() + ")";
-                }
-                newEntity.setModel(model);
+            String chassis = getChassis(infantry);
+            newEntity.setChassis(chassis);
+            String model = "?";
+            if (infantry.getSecondaryWeaponsPerSquad() > 1 && null != infantry.getSecondaryWeapon()) {
+                model = "(" + infantry.getSecondaryWeapon().getInternalName() + ")";
+            } else if (null != infantry.getPrimaryWeapon()) {
+                model = "(" + infantry.getPrimaryWeapon().getInternalName() + ")";
             }
+            newEntity.setModel(model);
         }
     }
 
