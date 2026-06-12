@@ -32,7 +32,7 @@
  */
 package mekhq.gui.view;
 
-import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.MHQInternationalization.getText;
 
 import java.awt.BorderLayout;
 import java.awt.Font;
@@ -60,8 +60,6 @@ import mekhq.gui.model.LocationDisplay;
  * populate-on-construction update.</p>
  */
 public class LocationPlacePanel extends JScrollablePanel {
-
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.GUI";
 
     public LocationPlacePanel(IPlace place, Campaign campaign) {
         LocationPlacePanelModel model = new LocationPlacePanelModel(place, campaign);
@@ -100,28 +98,28 @@ public class LocationPlacePanel extends JScrollablePanel {
 
         private static String resolveType(IPlace place) {
             if (place instanceof Campaign) {
-                return getTextAt(RESOURCE_BUNDLE, "LocationPlacePanel.type.mainForce");
+                return getText("LocationPlacePanel.type.mainForce");
             }
             if (place instanceof AbstractBase base) {
                 String displayType = base.getDisplayType();
                 return (displayType != null && !displayType.isBlank())
                              ? displayType
-                             : getTextAt(RESOURCE_BUNDLE, "LocationPlacePanel.type.base");
+                             : getText("LocationPlacePanel.type.base");
             }
-            return getTextAt(RESOURCE_BUNDLE, "LocationPlacePanel.type.location");
+            return getText("LocationPlacePanel.type.location");
         }
 
         private static String resolveStatus(IPlace place) {
             if (place.isInTransit()) {
-                return getTextAt(RESOURCE_BUNDLE, "LocationPlacePanel.status.inTransit");
+                return getText("LocationPlacePanel.status.inTransit");
             }
             if (place.isAtJumpPoint()) {
-                return getTextAt(RESOURCE_BUNDLE, "LocationPlacePanel.status.atJumpPoint");
+                return getText("LocationPlacePanel.status.atJumpPoint");
             }
             if (place.isOnPlanet()) {
-                return getTextAt(RESOURCE_BUNDLE, "LocationPlacePanel.status.onPlanet");
+                return getText("LocationPlacePanel.status.onPlanet");
             }
-            return getTextAt(RESOURCE_BUNDLE, "LocationPlacePanel.status.unknown");
+            return getText("LocationPlacePanel.status.unknown");
         }
 
         String getName() {return name;}
@@ -161,9 +159,9 @@ public class LocationPlacePanel extends JScrollablePanel {
         private final JLabel lblDestinationPlanetValue = new JLabel();
 
         LocationPlacePanelView() {
-            lblDestinationLabel = new JLabel(getTextAt(RESOURCE_BUNDLE, "LocationPlacePanel.label.destination"));
-            lblDestinationSystemLabel = new JLabel(getTextAt(RESOURCE_BUNDLE, "LocationPlacePanel.label.destinationSystem"));
-            lblDestinationPlanetLabel = new JLabel(getTextAt(RESOURCE_BUNDLE, "LocationPlacePanel.label.destinationPlanet"));
+            lblDestinationLabel = new JLabel(getText("LocationPlacePanel.label.destination"));
+            lblDestinationSystemLabel = new JLabel(getText("LocationPlacePanel.label.destinationSystem"));
+            lblDestinationPlanetLabel = new JLabel(getText("LocationPlacePanel.label.destinationPlanet"));
 
             lblName.setFont(lblName.getFont().deriveFont(Font.BOLD, lblName.getFont().getSize2D() + 2f));
             lblType.setFont(lblType.getFont().deriveFont(Font.ITALIC));
@@ -191,9 +189,9 @@ public class LocationPlacePanel extends JScrollablePanel {
             gbc.fill = GridBagConstraints.NONE;
             gbc.weightx = 0.0;
 
-            addRow(2, getTextAt(RESOURCE_BUNDLE, "LocationPlacePanel.label.status"), lblStatusValue, gbc);
-            addRow(3, getTextAt(RESOURCE_BUNDLE, "LocationPlacePanel.label.system"), lblSystemValue, gbc);
-            addRow(4, getTextAt(RESOURCE_BUNDLE, "LocationPlacePanel.label.planet"), lblPlanetValue, gbc);
+            addRow(2, getText("LocationPlacePanel.label.status"), lblStatusValue, gbc);
+            addRow(3, getText("LocationPlacePanel.label.system"), lblSystemValue, gbc);
+            addRow(4, getText("LocationPlacePanel.label.planet"), lblPlanetValue, gbc);
             addPairRow(5, lblDestinationLabel, lblDestinationValue, gbc);
             addPairRow(6, lblDestinationSystemLabel, lblDestinationSystemValue, gbc);
             addPairRow(7, lblDestinationPlanetLabel, lblDestinationPlanetValue, gbc);

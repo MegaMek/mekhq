@@ -32,11 +32,11 @@
  */
 package mekhq.gui;
 
+import static mekhq.utilities.MHQInternationalization.getText;
+
 import java.awt.BorderLayout;
-import java.util.ResourceBundle;
 
 import megamek.common.ui.EnhancedTabbedPane;
-import mekhq.MekHQ;
 import mekhq.gui.enums.MHQTabType;
 
 /**
@@ -55,12 +55,9 @@ public class NavigationTab extends CampaignGuiTab {
     public void initTab() {
         setLayout(new BorderLayout());
 
-        ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
-              MekHQ.getMHQOptions().getLocale());
-
         innerTabs = new EnhancedTabbedPane(true, true);
-        mapTab = new MapTab(getCampaignGui(), resources.getString("NavigationTab.MapTab.title"));
-        locationsTab = new LocationsTab(getCampaignGui(), resources.getString("NavigationTab.LocationsTab.title"));
+        mapTab = new MapTab(getCampaignGui(), getText("NavigationTab.MapTab.title"));
+        locationsTab = new LocationsTab(getCampaignGui(), getText("NavigationTab.LocationsTab.title"));
 
         innerTabs.addTab(mapTab.getTabName(), mapTab);
         innerTabs.addTab(locationsTab.getTabName(), locationsTab);

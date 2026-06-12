@@ -32,7 +32,7 @@
  */
 package mekhq.gui;
 
-import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.MHQInternationalization.getText;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -46,6 +46,7 @@ import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 
 import megamek.client.ui.util.UIUtil;
+import megamek.codeUtilities.MathUtility;
 import megamek.common.event.Subscribe;
 import megamek.common.ui.FastJScrollPane;
 import megamek.common.units.UnitType;
@@ -75,8 +76,6 @@ import mekhq.gui.view.LocationPlacePanel;
  */
 public class LocationsTab extends CampaignGuiTab {
 
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.GUI";
-
     private enum ViewMode {
         GENERAL("LocationsTab.view.general"),
         UNITS("LocationsTab.view.units"),
@@ -91,7 +90,7 @@ public class LocationsTab extends CampaignGuiTab {
 
         @Override
         public String toString() {
-            return getTextAt(RESOURCE_BUNDLE, resourceKey);
+            return getText(resourceKey);
         }
     }
 
@@ -150,6 +149,8 @@ public class LocationsTab extends CampaignGuiTab {
               UnitType.JUMPSHIP,
               UnitType.WARSHIP,
               UnitType.NAVAL,
+              UnitType.SPACE_STATION,
+              UnitType.ADVANCED_BUILDING
               };
 
         private List<IPlace> places = List.of();
@@ -191,14 +192,14 @@ public class LocationsTab extends CampaignGuiTab {
                 return UnitType.getTypeDisplayableName(UNIT_TYPES[col - COL_EXTRA_START]);
             }
             return switch (col) {
-                case COL_NAME -> getTextAt(RESOURCE_BUNDLE, "LocationsTab.column.name");
-                case COL_TYPE -> getTextAt(RESOURCE_BUNDLE, "LocationsTab.column.type");
+                case COL_NAME -> getText("LocationsTab.column.name");
+                case COL_TYPE -> getText("LocationsTab.column.type");
                 case COL_MODE_A -> viewMode == ViewMode.GENERAL
-                                         ? getTextAt(RESOURCE_BUNDLE, "LocationsTab.column.system")
-                                         : getTextAt(RESOURCE_BUNDLE, "LocationsTab.column.atLocation");
+                                         ? getText("LocationsTab.column.system")
+                                         : getText("LocationsTab.column.atLocation");
                 case COL_MODE_B -> viewMode == ViewMode.GENERAL
-                                         ? getTextAt(RESOURCE_BUNDLE, "LocationsTab.column.planet")
-                                         : getTextAt(RESOURCE_BUNDLE, "LocationsTab.column.inTransit");
+                                         ? getText("LocationsTab.column.planet")
+                                         : getText("LocationsTab.column.inTransit");
                 default -> "";
             };
         }
@@ -239,15 +240,15 @@ public class LocationsTab extends CampaignGuiTab {
 
         private static String resolveType(IPlace place) {
             if (place instanceof Campaign) {
-                return getTextAt(RESOURCE_BUNDLE, "LocationPlacePanel.type.mainForce");
+                return getText("LocationPlacePanel.type.mainForce");
             }
             if (place instanceof AbstractBase base) {
                 String displayType = base.getDisplayType();
                 return (displayType != null && !displayType.isBlank())
                              ? displayType
-                             : getTextAt(RESOURCE_BUNDLE, "LocationPlacePanel.type.base");
+                             : getText("LocationPlacePanel.type.base");
             }
-            return getTextAt(RESOURCE_BUNDLE, "LocationPlacePanel.type.location");
+            return getText("LocationPlacePanel.type.location");
         }
 
         private static int countUnitsAt(IPlace place) {
@@ -339,7 +340,7 @@ public class LocationsTab extends CampaignGuiTab {
             viewDropdown = new JComboBox<>(ViewMode.values());
 
             JPanel toolbar = new JPanel(new FlowLayout(FlowLayout.LEFT));
-            toolbar.add(new JLabel(getTextAt(RESOURCE_BUNDLE, "LocationsTab.toolbar.view")));
+            toolbar.add(new JLabel(getText("LocationsTab.toolbar.view")));
             toolbar.add(viewDropdown);
 
             table = new JTable(model);
@@ -348,7 +349,8 @@ public class LocationsTab extends CampaignGuiTab {
             detailScrollPane = new FastJScrollPane();
             detailScrollPane.setBorder(RoundedLineBorder.createRoundedLineBorder());
             detailScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-            detailScrollPane.setMinimumSize(new Dimension((int) (PLACE_DETAIL_WIDTH * 0.9), 600));
+            detailScrollPane.setMinimumSize(new Dimension(MathUtility.roundAwayFromZero(PLACE_DETAIL_WIDTH * 0.9),
+                  600));
             detailScrollPane.setPreferredSize(new Dimension(PLACE_DETAIL_WIDTH, 600));
             detailScrollPane.setViewportView(null);
 
@@ -414,7 +416,7 @@ public class LocationsTab extends CampaignGuiTab {
                     }
                     JPopupMenu menu = new JPopupMenu();
                     JMenuItem configItem = new JMenuItem(
-                          getTextAt(RESOURCE_BUNDLE, "LocationsTab.menu.configureBase"));
+                          getText("LocationsTab.menu.configureBase"));
                     configItem.addActionListener(ev -> openBaseConfig(base));
                     menu.add(configItem);
                     menu.show(e.getComponent(), e.getX(), e.getY());
