@@ -97,66 +97,81 @@ public final class LocationDisplay {
      */
     public static String getLocationName(ILocation item, Campaign campaign, LocalDate today) {
         LocationNode node = item.getLocationNode();
-        AbstractLocation location = node != null ? node.getNearestAbstractLocation() : null;
-        boolean isTraveling = location instanceof CurrentLocation currentLocation
-                                    && currentLocation.getJumpPath() != null && !currentLocation.getJumpPath().isEmpty();
-
-        if (node != null) {
-            ILocation mainForcePersonnel = campaign.getMainForcePersonnel();
-            LocationNode cursor = node;
-            while (cursor != null) {
-                if (cursor.getLocatable() == mainForcePersonnel) {
-                    return campaign.getName();
-                }
-                cursor = cursor.getParent();
-            }
+        if (node == null) {
+            return campaign.getName();
+        }
+        if (isUnderMainForce(node, campaign)) {
+            return campaign.getName();
+        }
+        if (node.getNearestAbstractLocation() instanceof CurrentLocation currentLocation
+                  && currentLocation.getJumpPath() != null && !currentLocation.getJumpPath().isEmpty()) {
+            return getTravelStatus(currentLocation, campaign, today);
         }
 
-        if (!isTraveling && node != null) {
-            AbstractBase base = LocationUtils.findEffectiveBase(item);
-            if (base != null) {
-                return formatBaseName(base);
-            }
-            LocationNode cursor = node;
-            while (cursor != null) {
-                if (cursor.getLocatable() instanceof AcademyCampusLocation campus) {
-                    return campus.getAcademyName();
-                }
-                cursor = cursor.getParent();
-            }
+        AbstractBase base = LocationUtils.findEffectiveBase(item);
+        if (base != null) {
+            return formatBaseName(base);
         }
-
-        if (isTraveling) {
-            CurrentLocation currentLocation = (CurrentLocation) location;
-            JumpPath path = currentLocation.getJumpPath();
-            PlanetarySystem system = currentLocation.getCurrentSystem();
-
-            if (path.size() > 1 && currentLocation.isAtJumpPoint()) {
-                double neededHours = system.getRechargeTime(today, currentLocation.computeIsUseCommandCircuit(campaign));
-                double remainingHours = neededHours - currentLocation.getRechargeTime();
-                if (remainingHours > 0) {
-                    int days = (int) Math.ceil(remainingHours / HOURS_PER_DAY);
-                    return getFormattedTextAt(RESOURCE_BUNDLE,
-                          "PersonnelTableModelColumn.LOCATION_NAME.inTransit.recharging.text",
-                          days);
-                }
-                return getTextAt(RESOURCE_BUNDLE,
-                      "PersonnelTableModelColumn.LOCATION_NAME.inTransit.readyToJump.text");
-            } else if (path.size() == 1) {
-                int days = (int) Math.ceil(currentLocation.getTransitTime());
-                return getFormattedTextAt(RESOURCE_BUNDLE,
-                      "PersonnelTableModelColumn.LOCATION_NAME.inTransit.toPlanet.text",
-                      days);
-            } else {
-                double daysToJP = system.getTimeToJumpPoint(1.0) - currentLocation.getTransitTime();
-                int days = (int) Math.ceil(daysToJP);
-                return getFormattedTextAt(RESOURCE_BUNDLE,
-                      "PersonnelTableModelColumn.LOCATION_NAME.inTransit.toJumpPoint.text",
-                      days);
-            }
+        AcademyCampusLocation campus = findAncestorCampus(node);
+        if (campus != null) {
+            return campus.getAcademyName();
         }
-
         return campaign.getName();
+    }
+
+    /**
+     * The "In Transit (…)" status line for an actively traveling node: recharging or ready to
+     * jump at a jump point, days to the destination planet on the final leg, or days to the
+     * origin jump point otherwise.
+     */
+    private static String getTravelStatus(CurrentLocation currentLocation, Campaign campaign, LocalDate today) {
+        JumpPath path = currentLocation.getJumpPath();
+        PlanetarySystem system = currentLocation.getCurrentSystem();
+
+        if (path.size() > 1 && currentLocation.isAtJumpPoint()) {
+            double neededHours = system.getRechargeTime(today, currentLocation.computeIsUseCommandCircuit(campaign));
+            double remainingHours = neededHours - currentLocation.getRechargeTime();
+            if (remainingHours > 0) {
+                int days = (int) Math.ceil(remainingHours / HOURS_PER_DAY);
+                return getFormattedTextAt(RESOURCE_BUNDLE,
+                      "PersonnelTableModelColumn.LOCATION_NAME.inTransit.recharging.text",
+                      days);
+            }
+            return getTextAt(RESOURCE_BUNDLE,
+                  "PersonnelTableModelColumn.LOCATION_NAME.inTransit.readyToJump.text");
+        }
+        if (path.size() == 1) {
+            int days = (int) Math.ceil(currentLocation.getTransitTime());
+            return getFormattedTextAt(RESOURCE_BUNDLE,
+                  "PersonnelTableModelColumn.LOCATION_NAME.inTransit.toPlanet.text",
+                  days);
+        }
+        double daysToJP = system.getTimeToJumpPoint(1.0) - currentLocation.getTransitTime();
+        int days = (int) Math.ceil(daysToJP);
+        return getFormattedTextAt(RESOURCE_BUNDLE,
+              "PersonnelTableModelColumn.LOCATION_NAME.inTransit.toJumpPoint.text",
+              days);
+    }
+
+    /** Returns {@code true} when {@code node} or any ancestor is the campaign's main-force roster. */
+    private static boolean isUnderMainForce(LocationNode node, Campaign campaign) {
+        ILocation mainForcePersonnel = campaign.getMainForcePersonnel();
+        for (LocationNode cursor = node; cursor != null; cursor = cursor.getParent()) {
+            if (cursor.getLocatable() == mainForcePersonnel) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Returns the academy campus that {@code node} sits under, or {@code null} if there is none. */
+    private static @Nullable AcademyCampusLocation findAncestorCampus(LocationNode node) {
+        for (LocationNode cursor = node; cursor != null; cursor = cursor.getParent()) {
+            if (cursor.getLocatable() instanceof AcademyCampusLocation campus) {
+                return campus;
+            }
+        }
+        return null;
     }
 
     /**
@@ -166,13 +181,8 @@ public final class LocationDisplay {
      * as jumps complete), not the destination.</p>
      */
     public static String getLocationSystem(ILocation item, LocalDate today, Campaign campaign) {
-        LocationNode node = item.getLocationNode();
-        AbstractLocation location = node != null ? node.getNearestAbstractLocation() : null;
-        if (location != null) {
-            PlanetarySystem system = location.getCurrentSystem();
-            return system != null ? system.getPrintableName(today) : "-";
-        }
-        PlanetarySystem system = campaign.getCurrentSystem();
+        AbstractLocation location = getNearestAbstractLocation(item);
+        PlanetarySystem system = location != null ? location.getCurrentSystem() : campaign.getCurrentSystem();
         return system != null ? system.getPrintableName(today) : "-";
     }
 
@@ -182,18 +192,15 @@ public final class LocationDisplay {
      * <p>Falls back to the campaign's current system when the item has no location node.</p>
      */
     public static String getLocationPlanet(ILocation item, LocalDate today, Campaign campaign) {
-        LocationNode node = item.getLocationNode();
-        AbstractLocation location = node != null ? node.getNearestAbstractLocation() : null;
+        AbstractLocation location = getNearestAbstractLocation(item);
+        Planet planet;
         if (location != null) {
-            Planet planet = location.getPlanet();
-            return planet != null ? planet.getPrintableName(today) : "-";
+            planet = location.getPlanet();
+        } else {
+            PlanetarySystem system = campaign.getCurrentSystem();
+            planet = system != null ? system.getPrimaryPlanet() : null;
         }
-        PlanetarySystem system = campaign.getCurrentSystem();
-        if (system != null) {
-            Planet planet = system.getPrimaryPlanet();
-            return planet != null ? planet.getPrintableName(today) : "-";
-        }
-        return "-";
+        return planet != null ? planet.getPrintableName(today) : "-";
     }
 
     /**
@@ -204,41 +211,66 @@ public final class LocationDisplay {
      * Returns {@code "-"} when the item is not traveling.</p>
      */
     public static String getDestinationName(ILocation item, Campaign campaign, LocalDate today) {
-        AbstractLocation location = getNearestAbstractLocation(item);
-        if (location instanceof CurrentLocation currentLocation) {
-            JumpPath path = currentLocation.getJumpPath();
-            if (path != null && !path.isEmpty()) {
-                PlanetarySystem destination = path.getLastSystem();
-                LocationNode currentLocationNode = currentLocation.getLocationNode();
-                if (currentLocationNode != null) {
-                    LocationNode parent = currentLocationNode.getParent();
-                    while (parent != null) {
-                        if (parent.getLocatable() instanceof AbstractBase base) {
-                            return formatBaseName(base);
-                        }
-                        if (parent.getLocatable() instanceof AcademyCampusLocation campus) {
-                            LocationNode fixedNode = parent.getParent();
-                            if (fixedNode != null
-                                      && fixedNode.getLocatable() instanceof AbstractLocation campusLocation
-                                      && Objects.equals(campusLocation.getCurrentSystem(), destination)) {
-                                return campus.getAcademyName();
-                            }
-                            return campaign.getName();
-                        }
-                        parent = parent.getParent();
-                    }
-                }
-                if (destination != null) {
-                    for (PlayerBase base : campaign.getPlayerBases()) {
-                        if (destination.equals(base.getCurrentSystem())) {
-                            return formatBaseName(base);
-                        }
-                    }
-                    return destination.getPrintableName(today);
-                }
+        if (!(getNearestAbstractLocation(item) instanceof CurrentLocation currentLocation)) {
+            return "-";
+        }
+        JumpPath path = currentLocation.getJumpPath();
+        if (path == null || path.isEmpty()) {
+            return "-";
+        }
+        PlanetarySystem destination = path.getLastSystem();
+
+        String ancestorName = getDestinationNameFromAncestors(currentLocation, destination, campaign);
+        if (ancestorName != null) {
+            return ancestorName;
+        }
+        if (destination == null) {
+            return "-";
+        }
+
+        PlayerBase baseAtDestination = findBaseAtSystem(campaign, destination);
+        return baseAtDestination != null ? formatBaseName(baseAtDestination) : destination.getPrintableName(today);
+    }
+
+    /**
+     * Walks the travel node's ancestor chain for something that names the destination: a base's display name, the
+     * academy name when the campus is anchored at {@code destination}, or the campaign name when the location chain
+     * points elsewhere.
+     *
+     * @return the destination label, or {@code null} when no ancestor decides it
+     */
+    private static @Nullable String getDestinationNameFromAncestors(CurrentLocation currentLocation,
+          @Nullable PlanetarySystem destination, Campaign campaign) {
+        LocationNode node = currentLocation.getLocationNode();
+        LocationNode parent = node != null ? node.getParent() : null;
+        while (parent != null) {
+            if (parent.getLocatable() instanceof AbstractBase base) {
+                return formatBaseName(base);
+            }
+            if (parent.getLocatable() instanceof AcademyCampusLocation campus) {
+                return isCampusAtSystem(parent, destination) ? campus.getAcademyName() : campaign.getName();
+            }
+            parent = parent.getParent();
+        }
+        return null;
+    }
+
+    /** Returns {@code true} when the campus node's parent is anchored at {@code destination}. */
+    private static boolean isCampusAtSystem(LocationNode campusNode, @Nullable PlanetarySystem destination) {
+        LocationNode fixedNode = campusNode.getParent();
+        return fixedNode != null
+                     && fixedNode.getLocatable() instanceof AbstractLocation campusLocation
+                     && Objects.equals(campusLocation.getCurrentSystem(), destination);
+    }
+
+    /** Returns the player base anchored at {@code system}, or {@code null} if there is none. */
+    private static @Nullable PlayerBase findBaseAtSystem(Campaign campaign, PlanetarySystem system) {
+        for (PlayerBase base : campaign.getPlayerBases()) {
+            if (system.equals(base.getCurrentSystem())) {
+                return base;
             }
         }
-        return "-";
+        return null;
     }
 
     /**

@@ -287,9 +287,7 @@ public final class LocationDispatch {
      * @param destination the target {@link ILocation}; must not be {@code null}
      * @param campaign    the active campaign; must not be {@code null}
      */
-    public static void dispatchPartsToLocation(Collection<Part> parts,
-          ILocation destination,
-          Campaign campaign) {
+    public static void dispatchPartsToLocation(Collection<Part> parts, ILocation destination, Campaign campaign) {
 
         Warehouse arrivalWarehouse = (destination instanceof AbstractBase base)
               ? base.getBaseWarehouse()
