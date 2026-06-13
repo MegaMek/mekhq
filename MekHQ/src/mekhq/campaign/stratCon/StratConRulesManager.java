@@ -1642,7 +1642,7 @@ public class StratConRulesManager {
                     continue;
                 }
 
-boolean isUseEdge = campaignOptions.isUseEdge() && scout.getOptions().booleanOption(EDGE_RECON_FAIL);
+                boolean isUseEdge = campaignOptions.isUseEdge() && scout.getOptions().booleanOption(EDGE_RECON_FAIL);
                 for (int direction = 0; direction < 6; direction++) {
                     StratConCoords checkCoords = currentCoords.translate(direction);
 
@@ -2811,10 +2811,8 @@ boolean isUseEdge = campaignOptions.isUseEdge() && scout.getOptions().booleanOpt
     /**
      * Applies the relevant modifiers from a facility to the provided scenario.
      *
-     * <p>Local modifiers are used when the scenario occurs directly at the facility. If the scenario occurs directly
-     * at the facility, and the facility has no local modifiers, its shared modifiers are applied.</p>
-     *
-     * <p>Otherwise, if the scenario does not occur at the facility, its shared modifiers are applied.</p>
+     * <p>Local modifiers are used when the scenario occurs directly at the facility. Otherwise, if the scenario does
+     * not occur at the facility, its shared modifiers are applied.</p>
      *
      * <p>Then, the facility is marked as unavailable.</p>
      *
@@ -2836,7 +2834,7 @@ boolean isUseEdge = campaignOptions.isUseEdge() && scout.getOptions().booleanOpt
         List<String> localModifiers = facility.getLocalModifiers();
         List<String> globalModifiers = facility.getSharedModifiers();
 
-        if (!localModifiers.isEmpty() && isLocal) {
+        if (isLocal) {
             relevantModifiers.addAll(localModifiers);
         } else {
             relevantModifiers.addAll(globalModifiers);
