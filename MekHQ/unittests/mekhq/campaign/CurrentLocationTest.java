@@ -339,7 +339,7 @@ public class CurrentLocationTest {
 
 
     /**
-     * Tests for {@link CurrentLocation#newDay(Campaign)}
+     * Tests for {@link CurrentLocation#newDay(Campaign, boolean)}
      */
     @Nested
     class NewDay {
@@ -465,7 +465,6 @@ public class CurrentLocationTest {
             }
         }
     }
-
 
     @Nested
     class PersonChildSerialization {

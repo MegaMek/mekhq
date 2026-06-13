@@ -52,6 +52,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.FixedLocation;
+import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.location.LocationNode.LocationManager;
 import mekhq.campaign.universe.PlanetarySystem;
 import org.junit.jupiter.api.BeforeEach;
@@ -345,6 +346,59 @@ public class LocationNodeTest {
         private Node parseXml(String xml) throws Exception {
             DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             return db.parse(new ByteArrayInputStream(xml.getBytes())).getDocumentElement();
+        }
+    }
+
+    /** Tests for {@link ILocation#getPlace()}. */
+    @Nested
+    class GetPlace {
+
+        @Test
+        void returnsNullWithNoAncestors() {
+            ILocation leaf = mock(ILocation.class);
+            LocationNode node = new LocationNode(leaf);
+            when(leaf.getLocationNode()).thenReturn(node);
+            when(leaf.hasLocationNode()).thenReturn(true);
+
+            assertNull(leaf.getPlace());
+        }
+
+        @Test
+        void returnsNullWhenNoIPlaceInChain() {
+            ILocation leaf = mock(ILocation.class);
+            ILocation middle = mock(ILocation.class);
+            LocationNode leafNode = new LocationNode(leaf);
+            LocationNode middleNode = new LocationNode(middle);
+            LocationManager.setLocation(leafNode, middleNode);
+            when(leaf.getLocationNode()).thenReturn(leafNode);
+            when(leaf.hasLocationNode()).thenReturn(true);
+
+            assertNull(leaf.getPlace());
+        }
+
+        @Test
+        void returnsNearestIPlaceAncestor() {
+            PlayerBase base = new PlayerBase(new FixedLocation(mock(mekhq.campaign.universe.PlanetarySystem.class)));
+
+            // Hangar's parent is the base, so walking from the hangar should find the base.
+            assertSame(base, base.getBaseHangar().getPlace());
+        }
+
+        @Test
+        void sparePart_inBaseWarehouse_returnsBase() {
+            PlayerBase base = new PlayerBase(new FixedLocation(mock(mekhq.campaign.universe.PlanetarySystem.class)));
+
+            // Warehouse's parent is the base.
+            assertSame(base, base.getBaseWarehouse().getPlace());
+        }
+
+        @Test
+        void locationInBaseHangar_chainReachesBase() {
+            PlayerBase base = new PlayerBase(new FixedLocation(mock(mekhq.campaign.universe.PlanetarySystem.class)));
+
+            // The hangar is below the base: hangar.parent = base.
+            // The hangar itself is a concrete ILocation — getPlace() should find the base.
+            assertSame(base, base.getBaseHangar().getPlace());
         }
     }
 }

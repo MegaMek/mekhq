@@ -36,6 +36,7 @@ import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -43,6 +44,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import jakarta.annotation.Nonnull;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.location.ILocation;
@@ -58,8 +60,12 @@ public class Hangar implements ILocation {
     private final LocationNode locationNode = new LocationNode(this);
 
     @Override
-    public LocationNode getLocationNode() {
+    public @Nonnull LocationNode getLocationNode() {
         return locationNode;
+    }
+
+    public Set<Unit> getUnitsAtLocation() {
+        return Set.copyOf(units.values());
     }
 
     /**
