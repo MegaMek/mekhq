@@ -2824,7 +2824,7 @@ public class AlternateInjuries {
             super(AMPUTATION_RECOVERY_HEALING_DAYS,
                   false,
                   MINOR,
-                  NONE,
+                  InjuryEffect.BLOOD_LOSS,
                   Set.of(LEFT_HAND, RIGHT_HAND, LEFT_ARM, RIGHT_ARM, LEFT_FOOT, RIGHT_FOOT, LEFT_LEG, RIGHT_LEG));
             this.simpleName = getTextAt(RESOURCE_BUNDLE,
                   "AlternateInjuries.AMPUTATION_RECOVERY.simpleName");

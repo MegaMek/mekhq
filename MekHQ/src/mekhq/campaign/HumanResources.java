@@ -379,9 +379,7 @@ public class HumanResources {
         UUID doctorId = doctor.getId();
         for (Person person : getActivePersonnel(true, true)) {
             if ((null != person.getDoctorId()) && person.getDoctorId().equals(doctorId)) {
-                if (person.hasInjuries(true)) {
-                    patients++;
-                }
+                patients++;
             }
         }
         return patients;
