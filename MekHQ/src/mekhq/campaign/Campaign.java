@@ -1818,6 +1818,7 @@ public class Campaign implements ITechManager, IPlace {
             return;
         }
         playerBases.add(base);
+        MekHQ.triggerEvent(new LocationAddedEvent(base));
     }
 
     public void removePlayerBase(@Nullable PlayerBase base) {
@@ -1825,6 +1826,7 @@ public class Campaign implements ITechManager, IPlace {
             return;
         }
         playerBases.remove(base);
+        MekHQ.triggerEvent(new LocationRemovedEvent(base));
     }
 
     public Set<PlayerBase> getPlayerBases() {
