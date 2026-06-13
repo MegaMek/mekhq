@@ -42,6 +42,7 @@ import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.FixedLocation;
+import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.parts.Part;
@@ -122,11 +123,12 @@ public class PlayerBase extends AbstractBase {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personId", person.getId().toString());
             }
         }
-        // Travel nodes (CurrentLocation) sit directly under the base so they can carry
-        // units and parts alongside people in the future.
+        // Travel nodes (CurrentLocation) and homeSchool campuses sit directly under the base.
         for (LocationNode child : getLocationNode().getChildren()) {
             if (child.getLocatable() instanceof CurrentLocation currentLocation) {
                 currentLocation.writeToXML(pw, indent);
+            } else if (child.getLocatable() instanceof AcademyCampusLocation campus) {
+                campus.writeToXML(pw, indent);
             }
         }
         // Spare parts stored at this base's warehouse.
@@ -187,6 +189,11 @@ public class PlayerBase extends AbstractBase {
                     if (travelLocation != null) {
                         travelLocation.setParent(base);
                         campaign.addLocation(travelLocation);
+                    }
+                } else if (nodeName.equalsIgnoreCase("academyCampus")) {
+                    AcademyCampusLocation campus = AcademyCampusLocation.generateInstanceFromXML(wn2);
+                    if (campus != null) {
+                        LocationNode.LocationManager.setLocation(campus, base);
                     }
                 } else if (nodeName.equalsIgnoreCase("baseWarehouse")) {
                     NodeList partNodes = wn2.getChildNodes();

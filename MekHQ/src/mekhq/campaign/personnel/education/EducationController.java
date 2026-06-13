@@ -77,7 +77,9 @@ import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.location.AcademyCampusLocation;
+import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationDispatch;
+import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.log.PerformanceLogger;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.personnel.Person;
@@ -318,8 +320,20 @@ public class EducationController {
         if (academy.isHomeSchool()) {
             // if the student is being homeschooled, we skip the journey to the 'academy'
             person.setEduEducationStage(EducationStage.EDUCATION);
-            AcademyCampusLocation campusLocation =
-                  campaign.getOrCreateLocalCampusLocation(academy.getSet(), academy.getName());
+            IPlace home = findHomeLocation(person, campaign);
+            AcademyCampusLocation campusLocation = getOrCreateLocalCampusAt(
+                  home, academy.getSet(), academy.getName());
+            person.setParent(campusLocation.getPersonnel());
+        } else if (academy.isLocal()) {
+            // local academies are at the person's current system — no journey needed
+            person.setEduEducationStage(EducationStage.EDUCATION);
+            PlanetarySystem personSystem = person.getCurrentSystem();
+            String systemId = personSystem != null
+                  ? personSystem.getId()
+                  : campaign.getCurrentSystem().getId();
+            person.setEduAcademySystem(systemId);
+            AcademyCampusLocation campusLocation = campaign.getOrCreateCampusLocation(
+                  academy.getSet(), academy.getName(), systemId);
             person.setParent(campusLocation.getPersonnel());
         } else {
             person.setEduEducationStage(EducationStage.JOURNEY_TO_CAMPUS);
@@ -331,24 +345,19 @@ public class EducationController {
         person.setEduAcademyFaction(faction);
         person.setEduCourseIndex(courseIndex);
 
-        if (!academy.isHomeSchool()) {
-            if (academy.isLocal()) {
-                person.setEduJourneyTime(2);
-                person.setEduAcademySystem(campaign.getCurrentSystem().getId());
-            } else {
-                PlanetarySystem originSystem = person.getCurrentSystem();
-                person.setEduAcademySystem(campus);
-                AcademyCampusLocation campusLocation = campaign.getOrCreateCampusLocation(academy.getSet(),
-                      academy.getName(), academy.getLocationSystems().getFirst());
-                LocationDispatch.dispatchToLocation(List.of(person), campusLocation, campaign);
-                double startTransit = originSystem != null && originSystem.equals(campaign.getCurrentSystem())
-                                            ? LocationDispatch.computeStartTransit(originSystem, campaign)
-                                            : 0.0;
-                JumpPath jumpPath = person.getJumpPath();
-                person.setEduJourneyTime(jumpPath != null
-                      ? LocationDispatch.computeJourneyDays(jumpPath, campaign.getLocalDate(), startTransit)
-                      : max(2, campaign.getSimplifiedTravelTime(campaign.getSystemById(campus))));
-            }
+        if (!academy.isHomeSchool() && !academy.isLocal()) {
+            PlanetarySystem originSystem = person.getCurrentSystem();
+            person.setEduAcademySystem(campus);
+            AcademyCampusLocation campusLocation = campaign.getOrCreateCampusLocation(academy.getSet(),
+                  academy.getName(), academy.getLocationSystems().getFirst());
+            LocationDispatch.dispatchToLocation(List.of(person), campusLocation, campaign);
+            double startTransit = originSystem != null && originSystem.equals(campaign.getCurrentSystem())
+                                        ? LocationDispatch.computeStartTransit(originSystem, campaign)
+                                        : 0.0;
+            JumpPath jumpPath = person.getJumpPath();
+            person.setEduJourneyTime(jumpPath != null
+                  ? LocationDispatch.computeJourneyDays(jumpPath, campaign.getLocalDate(), startTransit)
+                  : max(2, campaign.getSimplifiedTravelTime(campaign.getSystemById(campus))));
         }
 
         Genealogy genealogy = person.getGenealogy();
@@ -414,9 +423,13 @@ public class EducationController {
 
         if (academy.isHomeSchool()) {
             person.setEduEducationStage(EducationStage.EDUCATION);
-            AcademyCampusLocation campusLocation =
-                  campaign.getOrCreateLocalCampusLocation(academy.getSet(), academy.getName());
+            IPlace home = findHomeLocation(person, campaign);
+            AcademyCampusLocation campusLocation = getOrCreateLocalCampusAt(
+                  home, academy.getSet(), academy.getName());
             person.setParent(campusLocation.getPersonnel());
+        } else if (academy.isLocal()) {
+            // already at the local campus — restart EDUCATION directly
+            person.setEduEducationStage(EducationStage.EDUCATION);
         } else {
             // Person is already at the campus — keep them there and restart the course.
             // The 2-day JOURNEY_TO_CAMPUS stage fires landAtCampus via the day-counter fallback
@@ -755,18 +768,27 @@ public class EducationController {
      */
     private static void beginJourneyHome(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
         if (academy.isHomeSchool()) {
-            person.setParent(campaign.getMainForcePersonnel());
+            IPlace home = findHomeLocation(person, campaign);
+            person.setParent(home.getPersonnel());
             person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
             return;
         }
+
+        // Capture the academy system before dispatch — dispatchToLocation moves the person out of
+        // the campus node, after which getEduAcademySystem() can no longer walk up to the campus
+        // and returns null, causing a NPE in getSimplifiedTravelTime.
+        String academySystemId = person.getEduAcademySystem();
+        PlanetarySystem academySystem = academySystemId != null
+              ? campaign.getSystemById(academySystemId)
+              : campaign.getCurrentSystem();
 
         LocationDispatch.dispatchToLocation(List.of(person), campaign, campaign);
 
         JumpPath returnPath = person.getJumpPath();
         int travelDays = returnPath != null
               ? LocationDispatch.computeJourneyDays(returnPath, campaign.getLocalDate(),
-                    LocationDispatch.computeStartTransit(campaign.getSystemById(person.getEduAcademySystem()), campaign))
-              : max(2, campaign.getSimplifiedTravelTime(campaign.getSystemById(person.getEduAcademySystem())));
+                    LocationDispatch.computeStartTransit(academySystem, campaign))
+              : max(2, campaign.getSimplifiedTravelTime(academySystem));
         person.setEduJourneyTime(travelDays);
         person.setEduDaysOfTravel(0);
 
@@ -774,6 +796,32 @@ public class EducationController {
               person.getHyperlinkedFullTitle(), person.getEduJourneyTime()));
 
         person.setEduEducationStage(EducationStage.JOURNEY_FROM_CAMPUS);
+    }
+
+    private static IPlace findHomeLocation(Person person, Campaign campaign) {
+        LocationNode node = person.getLocationNode().getParent();
+        while (node != null) {
+            if (node.getLocatable() instanceof IPlace place
+                      && !(place instanceof AcademyCampusLocation)) {
+                return place;
+            }
+            node = node.getParent();
+        }
+        return campaign;
+    }
+
+    private static AcademyCampusLocation getOrCreateLocalCampusAt(
+          IPlace parent, String academySet, String academyName) {
+        for (LocationNode child : parent.getLocationNode().getChildren()) {
+            if (child.getLocatable() instanceof AcademyCampusLocation campus
+                      && academySet.equals(campus.getAcademySet())
+                      && academyName.equals(campus.getAcademyName())) {
+                return campus;
+            }
+        }
+        AcademyCampusLocation campus = new AcademyCampusLocation(academySet, academyName);
+        LocationNode.LocationManager.setLocation(campus, parent);
+        return campus;
     }
 
     /**

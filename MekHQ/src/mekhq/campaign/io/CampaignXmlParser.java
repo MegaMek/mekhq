@@ -788,6 +788,16 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         }
 
 
+        // Backward compat: pre-refactor saves wrote the campaign's current location as the first
+        // entry in <locations> rather than as a top-level <location> tag. If no top-level
+        // <location> was found, promote the first CurrentLocation in the list.
+        if (campaign.getCurrentLocation() == null) {
+            campaign.getLocations().stream()
+                  .filter(loc -> loc instanceof CurrentLocation)
+                  .findFirst()
+                  .ifPresent(campaign::setLocation);
+        }
+
         migrateLegacyEducationTravel(campaign);
         reconnectPersonsToTravelLocations(campaign);
 
@@ -1443,20 +1453,13 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
     private static void processLocations(Campaign campaign, Node wn) {
         NodeList children = wn.getChildNodes();
-        boolean first = true;
         for (int i = 0; i < children.getLength(); i++) {
             Node child = children.item(i);
             if (child.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }
             AbstractLocation location = AbstractLocation.generateInstanceFromXML(child, campaign);
-            if (location == null) {
-                continue;
-            }
-            if (first) {
-                campaign.setLocation(location);
-                first = false;
-            } else {
+            if (location != null) {
                 campaign.addLocation(location);
             }
         }
@@ -1500,6 +1503,11 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                         Person person = campaign.getPerson(personId);
                         if (person != null) {
                             person.setParent(base.getBasePersonnel());
+                        }
+                    }
+                    for (LocationNode child : base.getLocationNode().getChildren()) {
+                        if (child.getLocatable() instanceof AcademyCampusLocation campus) {
+                            drainCampusPersons(campaign, campus);
                         }
                     }
                     for (Part part : base.drainPendingBaseWarehouseParts()) {
@@ -1790,18 +1798,21 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             // Persons at campus — parented under the campus's Personnel sub-node
             if (location instanceof FixedLocation fixedLocation) {
                 for (LocationNode campusNode : fixedLocation.getLocationNode().getChildren()) {
-                    if (!(campusNode.getLocatable() instanceof AcademyCampusLocation campusLocation)) {
-                        continue;
-                    }
-                    for (UUID personId : campusLocation.drainPendingPersonIds()) {
-                        Person person = campaign.getPerson(personId);
-                        if (person != null) {
-                            person.setParent(campusLocation.getPersonnel());
-                        } else {
-                            LOGGER.warn("reconnectPersonsToTravelLocations: person {} not found in campaign", personId);
-                        }
+                    if (campusNode.getLocatable() instanceof AcademyCampusLocation campusLocation) {
+                        drainCampusPersons(campaign, campusLocation);
                     }
                 }
+            }
+        }
+    }
+
+    private static void drainCampusPersons(Campaign campaign, AcademyCampusLocation campus) {
+        for (UUID personId : campus.drainPendingPersonIds()) {
+            Person person = campaign.getPerson(personId);
+            if (person != null) {
+                person.setParent(campus.getPersonnel());
+            } else {
+                LOGGER.warn("drainCampusPersons: person {} not found in campaign", personId);
             }
         }
     }
@@ -1865,17 +1876,33 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             LOGGER.info("migrateLegacyEducationTravel: processing {} (stage={}, academy='{}', set='{}')",
                   person.getFullTitle(), stage, person.getEduAcademyNameInSet(), person.getEduAcademySet());
 
+            Academy academy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
+            if (academy != null && academy.isHomeSchool()) {
+                skipped++;
+                continue;
+            }
+
             // Campus stages: Set the location's parent.
             // This covers EDUCATION, GRADUATING, and DROPPING_OUT.
             if (stage == EducationStage.EDUCATION
                       || stage == EducationStage.GRADUATING
                       || stage == EducationStage.DROPPING_OUT) {
-                // Skip persons already reconnected by reconnectPersonsToTravelLocations (post-refactor
-                // saves). Without this guard, resolveAcademySystemId may return the wrong system for
-                // multi-location academies, creating a duplicate campus and displacing the person.
+                // Skip persons whose parent was already set to a non-Campaign-Personnel node
+                // during XML parsing (e.g., reconnected by an earlier load step). Without this
+                // guard, resolveAcademySystemId may return the wrong system for multi-location
+                // academies, creating a duplicate campus and displacing the person.
                 LocationNode parentNode = person.getLocationNode().getParent();
                 if (parentNode != null
-                          && !(parentNode.getLocatable() instanceof Campaign)) {
+                          &&
+                          !(parentNode.getLocatable() instanceof Personnel personnel &&
+                                  personnel.getLocationNode().getParent() instanceof LocationNode node &&
+                                  node.getLocatable() instanceof Campaign)) {
+                    continue;
+                }
+                // If a FixedLocation campus already holds this person's ID (post-refactor save),
+                // reconnectPersonsToTravelLocations will handle them — skip migration silently.
+                if (hasFixedCampusPendingFor(campaign, person)) {
+                    skipped++;
                     continue;
                 }
                 String systemId = resolveAcademySystemId(campaign, person);
@@ -1901,12 +1928,9 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 continue;
             }
 
-            // Journey stages: skip if already under a CurrentLocation — reconnectPersonsToTravelLocations
-            // already placed this person (post-refactor saves). Legacy saves have mainForcePersonnel as parent.
-            LocationNode parentNode = person.getLocationNode().getParent();
-            if (parentNode != null && parentNode.getLocatable() instanceof CurrentLocation) {
-                LOGGER.info("migrateLegacyEducationTravel: {} already under CurrentLocation — skipping (post-refactor save)",
-                      person.getFullTitle());
+            // Journey stages: skip if a travel node already holds this person's pending ID —
+            // reconnectPersonsToTravelLocations will place them correctly (post-refactor saves).
+            if (hasTravelNodePendingFor(campaign, person)) {
                 skipped++;
                 continue;
             }
@@ -1949,6 +1973,31 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
         LOGGER.info("migrateLegacyEducationTravel: complete — {} placed at campus, {} given travel nodes, {} skipped",
               campusMigrated, travelMigrated, skipped);
+    }
+
+    private static boolean hasFixedCampusPendingFor(Campaign campaign, Person person) {
+        for (AbstractLocation location : campaign.getLocations()) {
+            if (!(location instanceof FixedLocation fixedLocation)) {
+                continue;
+            }
+            for (LocationNode child : fixedLocation.getLocationNode().getChildren()) {
+                if (child.getLocatable() instanceof AcademyCampusLocation campus
+                          && campus.containsPendingPersonId(person.getId())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private static boolean hasTravelNodePendingFor(Campaign campaign, Person person) {
+        for (AbstractLocation location : campaign.getLocations()) {
+            if (location instanceof CurrentLocation travelNode
+                      && travelNode.containsPendingPersonId(person.getId())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
