@@ -1256,16 +1256,16 @@ public class HumanResources {
     }
 
     /**
-     * Returns the highest-ranking doctor from {@code people}.
+     * Returns the highest-ranking characer from {@code people}.
      *
      * @param people          the collection of people to search
      * @param campaignOptions the campaign options
      * @param isClanCampaign  whether this is a Clan campaign
      * @param today           the current in-game date
      *
-     * @return the senior medical person, or {@code null} if none found
+     * @return the senior person, or {@code null} if none found
      */
-    public static @Nullable Person getSeniorMedicalPerson(Collection<Person> people,
+    public static @Nullable Person getSeniorPerson(Collection<Person> people,
           CampaignOptions campaignOptions, boolean isClanCampaign, LocalDate today) {
         Person senior = null;
 
@@ -1285,8 +1285,14 @@ public class HumanResources {
 
     public @Nullable Person getSeniorMedicalPerson(CampaignOptions campaignOptions, boolean isClanCampaign,
           LocalDate today) {
-        return getSeniorMedicalPerson(getDoctors(), campaignOptions, isClanCampaign, today);
+        return getSeniorPerson(getDoctors(), campaignOptions, isClanCampaign, today);
     }
+
+    public @Nullable Person getSeniorTechPerson(CampaignOptions campaignOptions, boolean isClanCampaign,
+          LocalDate today) {
+        return getSeniorPerson(getTechPersonnel(false), campaignOptions, isClanCampaign, today);
+    }
+
 
     /**
      * Retrieves the current campaign commander.
@@ -1423,6 +1429,12 @@ public class HumanResources {
     public List<Person> getTechs(Collection<Unit> units, CampaignOptions campaignOptions,
           boolean isClanCampaign, LocalDate today, boolean noZeroMinute, boolean eliteFirst) {
         return getTechsExpanded(units, campaignOptions, isClanCampaign, today, noZeroMinute, eliteFirst, false);
+    }
+
+    public List<Person> getTechPersonnel(boolean expanded) {
+        return getActivePersonnel(false, false).stream()
+                     .filter(person -> (expanded ? person.isTechExpanded() : person.isTech()))
+                     .toList();
     }
 
     /**

@@ -3325,6 +3325,10 @@ public class Campaign implements ITechManager, IPlace {
         return humanResources.getSeniorMedicalPerson(getCampaignOptions(), isClanCampaign(), getLocalDate());
     }
 
+    public @Nullable Person getSeniorTechPerson() {
+        return humanResources.getSeniorTechPerson(getCampaignOptions(), isClanCampaign(), getLocalDate());
+    }
+
     /**
      * Retrieves the current campaign commander.
      *
