@@ -53,6 +53,7 @@ import megamek.common.units.Tank;
 import megamek.common.units.VTOL;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.location.IPlace;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
@@ -168,13 +169,16 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
         // 1) Inactive
         // 2) Prisoner
         // 3) Already assigned to a unit
+        // 4) At a different IPlace than the unit
         // Then sorts the remainder based on their full title
-        List<Person> personnel = campaign.getPersonnel()
+        final IPlace unitPlace = units[0].getPlace();
+        List<Person> personnel = campaign.getPersonnel().values()
                                        .stream()
                                        .filter(person -> person.getStatus().isActive())
                                        .filter(person -> !person.getPrisonerStatus().isCurrentPrisoner())
                                        .filter(Person::isEmployed)
                                        .filter(person -> person.getUnit() == null)
+                                       .filter(person -> unitPlace == null || person.getPlace() == unitPlace)
                                        .sorted(new PersonTitleSorter().reversed())
                                        .collect(Collectors.toList());
 
