@@ -84,36 +84,37 @@ public class BaseSettingsDialog extends JDialog {
     private PlayerBase result;
 
     public BaseSettingsDialog(JFrame parent, Campaign campaign) {
-        this(parent, campaign, null, null, null);
+        this(parent, campaign, null, null, null, false);
     }
 
-    public BaseSettingsDialog(JFrame parent, Campaign campaign,
-          @Nullable PlanetarySystem defaultSystem,
+    public BaseSettingsDialog(JFrame parent, Campaign campaign, @Nullable PlanetarySystem defaultSystem,
           @Nullable Planet defaultPlanet) {
-        this(parent, campaign, defaultSystem, defaultPlanet, null);
+        this(parent, campaign, defaultSystem, defaultPlanet, null, false);
     }
 
-    public BaseSettingsDialog(JFrame parent, Campaign campaign,
-          @Nullable PlayerBase existingBase) {
-        this(parent, campaign, null, null, existingBase);
+    public BaseSettingsDialog(JFrame parent, Campaign campaign, @Nullable PlanetarySystem defaultSystem,
+          @Nullable Planet defaultPlanet, boolean lockLocation) {
+        this(parent, campaign, defaultSystem, defaultPlanet, null, lockLocation);
     }
 
-    private BaseSettingsDialog(JFrame parent, Campaign campaign,
-          @Nullable PlanetarySystem defaultSystem,
-          @Nullable Planet defaultPlanet,
-          @Nullable PlayerBase existingBase) {
+    public BaseSettingsDialog(JFrame parent, Campaign campaign, @Nullable PlayerBase existingBase) {
+        this(parent, campaign, null, null, existingBase, true);
+    }
+
+    private BaseSettingsDialog(JFrame parent, Campaign campaign, @Nullable PlanetarySystem defaultSystem,
+          @Nullable Planet defaultPlanet, @Nullable PlayerBase existingBase, boolean lockLocation) {
         super(parent, true);
         this.campaign = campaign;
         this.existingBase = existingBase;
-        initComponents(defaultSystem, defaultPlanet);
+        initComponents(defaultSystem, defaultPlanet, lockLocation);
         setLocationRelativeTo(parent);
     }
 
-    private void initComponents(@Nullable PlanetarySystem defaultSystem,
-          @Nullable Planet defaultPlanet) {
-        setTitle(existingBase == null
-                       ? getTextAt(RESOURCE_BUNDLE, "title.newBase.text")
-                       : getTextAt(RESOURCE_BUNDLE, "title.editBase.text"));
+    private void initComponents(@Nullable PlanetarySystem defaultSystem, @Nullable Planet defaultPlanet,
+          boolean lockLocation) {
+        setTitle(existingBase == null ?
+                       getTextAt(RESOURCE_BUNDLE, "title.newBase.text") :
+                       getTextAt(RESOURCE_BUNDLE, "title.editBase.text"));
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
         LocalDate today = campaign.getLocalDate();
@@ -192,6 +193,11 @@ public class BaseSettingsDialog extends JDialog {
         }
 
         if (existingBase != null) {
+            cboSystem.setEnabled(false);
+            cboPlanet.setEnabled(false);
+        }
+
+        if (existingBase != null || lockLocation) {
             cboSystem.setEnabled(false);
             cboPlanet.setEnabled(false);
         }
