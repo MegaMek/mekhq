@@ -1758,10 +1758,15 @@ public class Campaign implements ITechManager, IPlace {
     }
 
     public void setLocation(AbstractLocation location) {
-        if (!locations.contains(location)) {
+        AbstractLocation old = getCurrentLocation();
+        if (location != null && !locations.contains(location)) {
             addLocation(location);
         }
         setParent(location);
+        // After reparenting, old has one fewer child. Remove it only if nothing else remains under it.
+        if (old != null && old != location && old.getLocationNode().getChildren().isEmpty()) {
+            locations.remove(old);
+        }
     }
 
     public void addLocation(AbstractLocation location) {

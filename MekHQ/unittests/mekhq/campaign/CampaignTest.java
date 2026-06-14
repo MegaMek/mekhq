@@ -1142,19 +1142,6 @@ public class CampaignTest {
             }
 
             @Test
-            void setLocation_clearsAllPreviousLocations() {
-                PlanetarySystem extraSystem = mock(PlanetarySystem.class);
-                CurrentLocation extra = new CurrentLocation(extraSystem, 0.0);
-                campaign.addLocation(extra);
-
-                PlanetarySystem newSystem = mock(PlanetarySystem.class);
-                CurrentLocation newLocation = new CurrentLocation(newSystem, 0.0);
-                campaign.setLocation(newLocation);
-
-                assertEquals(1, campaign.getLocations().size());
-            }
-
-            @Test
             void setLocation_null_clearsLocations() {
                 campaign.setLocation(null);
 

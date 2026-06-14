@@ -320,21 +320,17 @@ public class EducationController {
         if (academy.isHomeSchool()) {
             // if the student is being homeschooled, we skip the journey to the 'academy'
             person.setEduEducationStage(EducationStage.EDUCATION);
-            IPlace home = findHomeLocation(person, campaign);
-            AcademyCampusLocation campusLocation = getOrCreateLocalCampusAt(
-                  home, academy.getSet(), academy.getName());
+            AcademyCampusLocation campusLocation = campaign.getOrCreateLocalCampusLocation(
+                  academy.getSet(), academy.getName());
             person.setParent(campusLocation.getPersonnel());
         } else if (academy.isLocal()) {
-            // local academies are at the person's current system — no journey needed
-            person.setEduEducationStage(EducationStage.EDUCATION);
+            person.setEduEducationStage(EducationStage.JOURNEY_TO_CAMPUS);
             PlanetarySystem personSystem = person.getCurrentSystem();
             String systemId = personSystem != null
                   ? personSystem.getId()
                   : campaign.getCurrentSystem().getId();
             person.setEduAcademySystem(systemId);
-            AcademyCampusLocation campusLocation = campaign.getOrCreateCampusLocation(
-                  academy.getSet(), academy.getName(), systemId);
-            person.setParent(campusLocation.getPersonnel());
+            person.setEduJourneyTime(2);
         } else {
             person.setEduEducationStage(EducationStage.JOURNEY_TO_CAMPUS);
         }
@@ -423,9 +419,8 @@ public class EducationController {
 
         if (academy.isHomeSchool()) {
             person.setEduEducationStage(EducationStage.EDUCATION);
-            IPlace home = findHomeLocation(person, campaign);
-            AcademyCampusLocation campusLocation = getOrCreateLocalCampusAt(
-                  home, academy.getSet(), academy.getName());
+            AcademyCampusLocation campusLocation = campaign.getOrCreateLocalCampusLocation(
+                  academy.getSet(), academy.getName());
             person.setParent(campusLocation.getPersonnel());
         } else if (academy.isLocal()) {
             // already at the local campus — restart EDUCATION directly
