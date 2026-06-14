@@ -51,6 +51,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Quartermaster;
 import mekhq.campaign.base.PlayerBase;
+import mekhq.campaign.location.LocationDispatch;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -227,9 +228,8 @@ public class JumpBlockers {
                 PlayerBase newBase = baseResult.get();
                 for (Unit unit : nonJumpCapableUnits) {
                     campaign.removeUnitFromFormation(unit);
-                    campaign.getHangar().removeUnit(unit.getId());
-                    newBase.getBaseHangar().addUnit(unit);
                 }
+                LocationDispatch.dispatchUnitsToLocation(nonJumpCapableUnits, newBase, campaign);
                 wasOverallConfirmed = true;
                 continue;
             }

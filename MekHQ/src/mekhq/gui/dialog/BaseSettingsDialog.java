@@ -192,11 +192,6 @@ public class BaseSettingsDialog extends JDialog {
             cboSystem.setSelectedIndex(-1);
         }
 
-        if (existingBase != null) {
-            cboSystem.setEnabled(false);
-            cboPlanet.setEnabled(false);
-        }
-
         if (existingBase != null || lockLocation) {
             cboSystem.setEnabled(false);
             cboPlanet.setEnabled(false);
