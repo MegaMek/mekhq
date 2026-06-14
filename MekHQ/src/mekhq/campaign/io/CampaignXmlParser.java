@@ -1805,6 +1805,15 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 }
             }
         }
+
+        // Persons at campaign-root campuses (homeSchool) — same pattern as FixedLocation campuses above.
+        // Campaign itself is not in campaign.getLocations(), so its direct campus children are never
+        // visited by the loop above.
+        for (LocationNode campusNode : campaign.getLocationNode().getChildren()) {
+            if (campusNode.getLocatable() instanceof AcademyCampusLocation campusLocation) {
+                drainCampusPersons(campaign, campusLocation);
+            }
+        }
     }
 
     private static void drainCampusPersons(Campaign campaign, AcademyCampusLocation campus) {

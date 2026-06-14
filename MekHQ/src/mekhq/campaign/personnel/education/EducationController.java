@@ -773,9 +773,21 @@ public class EducationController {
         // the campus node, after which getEduAcademySystem() can no longer walk up to the campus
         // and returns null, causing a NPE in getSimplifiedTravelTime.
         String academySystemId = person.getEduAcademySystem();
-        PlanetarySystem academySystem = academySystemId != null
-              ? campaign.getSystemById(academySystemId)
-              : campaign.getCurrentSystem();
+        PlanetarySystem academySystem = null;
+        if (academySystemId != null) {
+            academySystem = campaign.getSystemById(academySystemId);
+            if (academySystem == null) {
+                LOGGER.error("beginJourneyHome: could not find academy system '{}' for {} — falling back to campaign location",
+                      academySystemId, person.getFullTitle());
+            }
+        }
+        if (academySystem == null) {
+            academySystem = campaign.getCurrentSystem();
+            if (academySystem == null) {
+                LOGGER.error("beginJourneyHome: campaign current system is also null for {} — travel time calculation may fail",
+                      person.getFullTitle());
+            }
+        }
 
         LocationDispatch.dispatchToLocation(List.of(person), campaign, campaign);
 
