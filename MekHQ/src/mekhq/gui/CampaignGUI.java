@@ -163,7 +163,7 @@ public class CampaignGUI extends JPanel {
     private final TOETab toeTab;
     private final BriefingTab briefingRoomTab;
     private final StratConTab stratConTab;
-    private final MapTab interstellarMapTab;
+    private final NavigationTab navigationTab;
     private final PersonnelTab personnelTab;
     private final HangarTab hangarTab;
     private final WarehouseTab warehouseTab;
@@ -216,7 +216,7 @@ public class CampaignGUI extends JPanel {
         toeTab = new TOETab(this, MHQTabType.TOE.toString());
         briefingRoomTab = new BriefingTab(this, MHQTabType.BRIEFING_ROOM.toString());
         stratConTab = new StratConTab(this, MHQTabType.STRAT_CON.toString());
-        interstellarMapTab = new MapTab(this, MHQTabType.INTERSTELLAR_MAP.toString());
+        navigationTab = new NavigationTab(this, MHQTabType.NAVIGATION.toString());
         personnelTab = new PersonnelTab(this, MHQTabType.PERSONNEL.toString());
         hangarTab = new HangarTab(this, MHQTabType.HANGAR.toString());
         warehouseTab = new WarehouseTab(this, MHQTabType.WAREHOUSE.toString());
@@ -231,7 +231,7 @@ public class CampaignGUI extends JPanel {
         if (getCampaign().getCampaignOptions().isUseStratCon()) {
             activateTab(stratConTab);
         }
-        activateTab(interstellarMapTab);
+        activateTab(navigationTab);
         activateTab(personnelTab);
         activateTab(hangarTab);
         activateTab(warehouseTab);
@@ -577,8 +577,12 @@ public class CampaignGUI extends JPanel {
         return tabMain.indexOfComponent(stratConTab) >= 0 ? Optional.of(stratConTab) : Optional.empty();
     }
 
+    public NavigationTab getNavigationTab() {
+        return navigationTab;
+    }
+
     public MapTab getMapTab() {
-        return interstellarMapTab;
+        return navigationTab.getMapTab();
     }
 
     public PersonnelTab getPersonnelTab() {
@@ -631,7 +635,7 @@ public class CampaignGUI extends JPanel {
     public void setSelectedTab(MHQTabType tabType) {
         Optional<? extends CampaignGuiTab> tab = switch (tabType) {
             case COMMAND_CENTER -> Optional.of(getCommandCenterTab());
-            case INTERSTELLAR_MAP -> Optional.of(getMapTab());
+            case NAVIGATION, INTERSTELLAR_MAP -> Optional.of(getNavigationTab());
             case TOE -> Optional.of(getTOETab());
             case BRIEFING_ROOM -> Optional.of(getBriefingRoomTab());
             case STRAT_CON -> getStratConTab();

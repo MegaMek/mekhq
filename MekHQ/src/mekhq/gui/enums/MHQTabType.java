@@ -35,9 +35,8 @@ package mekhq.gui.enums;
 import java.awt.event.KeyEvent;
 import java.util.ResourceBundle;
 
-import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
-import mekhq.gui.*;
+import mekhq.gui.CampaignGUI;
 
 /**
  * Identifies the standard tabs and provides a creation method. The mnemonics used in this are included in the list at
@@ -49,6 +48,7 @@ import mekhq.gui.*;
 public enum MHQTabType {
     //region Enum Declaration
     COMMAND_CENTER("MHQTabType.COMMAND_CENTER.text", KeyEvent.VK_O),
+    NAVIGATION("MHQTabType.NAVIGATION.text", KeyEvent.VK_UNDEFINED),
     INTERSTELLAR_MAP("MHQTabType.INTERSTELLAR_MAP.text", KeyEvent.VK_S),
     TOE("MHQTabType.TOE.text", KeyEvent.VK_T),
     BRIEFING_ROOM("MHQTabType.BRIEFING_ROOM.text", KeyEvent.VK_B),
@@ -85,6 +85,10 @@ public enum MHQTabType {
     //region Boolean Comparison Methods
     public boolean isCommandCenter() {
         return this == COMMAND_CENTER;
+    }
+
+    public boolean isNavigation() {
+        return this == NAVIGATION;
     }
 
     public boolean isTOE() {
