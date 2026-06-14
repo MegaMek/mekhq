@@ -378,15 +378,19 @@ public class Systems {
             File[] zipFiles = dir.listFiles((dir1, name) -> name.toLowerCase(Locale.ROOT).endsWith(".zip"));
             if (zipFiles != null) {
                 for (File zipFile : zipFiles) {
+                    // The connector subtree ships as a zip (connector_systems.zip) whose entries are flat
+                    // filenames (e.g. HWY-Spinward-040.yml) with no connector_systems/ path. So derive
+                    // connector-ness from the zip's own name; the per-entry check below still catches the
+                    // case where a connector entry lives inside a zip that sits elsewhere.
+                    boolean zipIsConnector = isConnectorDir
+                          || isConnectorPath(zipFile.getName().replaceFirst("(?i)\\.zip$", ""));
                     try (ZipFile zip = new ZipFile(zipFile.getPath())) {
                         Enumeration<? extends ZipEntry> entries = zip.entries();
                         while (entries.hasMoreElements()) {
                             ZipEntry entry = entries.nextElement();
                             // Check if entry is a directory
                             if (!entry.isDirectory() && entry.getName().toLowerCase(Locale.ROOT).endsWith(".yml")) {
-                                // Zip entries carry their internal path; use it to detect connector entries
-                                // even when the zip itself sits in the canon tree.
-                                boolean entryIsConnector = isConnectorDir || isConnectorPath(entry.getName());
+                                boolean entryIsConnector = zipIsConnector || isConnectorPath(entry.getName());
                                 try (InputStream inputStream = zip.getInputStream(entry)) {
                                     loadPlanetarySystem(inputStream, mapper, entryIsConnector);
                                 } catch (Exception ex) {
