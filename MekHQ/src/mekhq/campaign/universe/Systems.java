@@ -482,11 +482,21 @@ public class Systems {
     }
 
     private void logVeryCloseSystems() {
-        // Planetary sanity check time!
+        // Planetary sanity check: this catches genuine canon coordinate data errors (two real
+        // systems at nearly the same spot). Connector systems are synthetic jump-path waypoints
+        // (see PlanetarySystem#isConnector / issue #8934) that are intentionally placed dense
+        // along routes, so they trip this check en masse with no data-error meaning. Skip them on
+        // both sides to keep the warning useful instead of flooding the log every startup.
         for (PlanetarySystem system : systemList.values()) {
+            if (system.isConnector()) {
+                continue;
+            }
             List<PlanetarySystem> veryCloseSystems = getNearbySystems(system, 1);
             if (veryCloseSystems.size() > 1) {
                 for (PlanetarySystem closeSystem : veryCloseSystems) {
+                    if (closeSystem.isConnector()) {
+                        continue;
+                    }
                     if (!system.getId().equals(closeSystem.getId())) {
                         logger.warn(String.format(Locale.ROOT,
                               "Extremely close systems detected. Data error? %s <-> %s: %.3f ly",
