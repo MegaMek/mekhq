@@ -320,7 +320,7 @@ public class EducationController {
             person.setEduEducationStage(EducationStage.EDUCATION);
             AcademyCampusLocation campusLocation =
                   campaign.getOrCreateLocalCampusLocation(academy.getSet(), academy.getName());
-            person.setParent(campusLocation.getCampusPersonnel());
+            person.setParent(campusLocation.getPersonnel());
         } else {
             person.setEduEducationStage(EducationStage.JOURNEY_TO_CAMPUS);
         }
@@ -414,9 +414,9 @@ public class EducationController {
 
         if (academy.isHomeSchool()) {
             person.setEduEducationStage(EducationStage.EDUCATION);
-            AcademyCampusLocation campusLoc =
+            AcademyCampusLocation campusLocation =
                   campaign.getOrCreateLocalCampusLocation(academy.getSet(), academy.getName());
-            person.setParent(campusLoc.getCampusPersonnel());
+            person.setParent(campusLocation.getPersonnel());
         } else {
             // Person is already at the campus — keep them there and restart the course.
             // The 2-day JOURNEY_TO_CAMPUS stage fires landAtCampus via the day-counter fallback
@@ -647,18 +647,18 @@ public class EducationController {
               getFormattedTextAt(BUNDLE_NAME, "arrived.text", person.getHyperlinkedFullTitle()));
 
         Academy landingAcademy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
-        AcademyCampusLocation campusLoc;
+        AcademyCampusLocation campusLocation;
         if (landingAcademy != null && landingAcademy.isHomeSchool()) {
-            campusLoc = campaign.getOrCreateLocalCampusLocation(
+            campusLocation = campaign.getOrCreateLocalCampusLocation(
                   person.getEduAcademySet(), person.getEduAcademyNameInSet());
         } else {
-            campusLoc = campaign.getOrCreateCampusLocation(
+            campusLocation = campaign.getOrCreateCampusLocation(
                   person.getEduAcademySet(), person.getEduAcademyNameInSet(), person.getEduAcademySystem());
-            if (campusLoc == null) {
+            if (campusLocation == null) {
                 throw new IllegalStateException("Campus location must exist for system " + person.getEduAcademySystem());
             }
         }
-        person.setParent(campusLoc.getCampusPersonnel());
+        person.setParent(campusLocation.getPersonnel());
         LocationDispatch.removeTravelNode(travelLocation, campaign);
         person.setEduEducationStage(EducationStage.EDUCATION);
     }
