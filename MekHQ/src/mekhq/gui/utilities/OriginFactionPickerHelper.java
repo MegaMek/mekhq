@@ -34,6 +34,7 @@ package mekhq.gui.utilities;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.DefaultComboBoxModel;
 
@@ -53,6 +54,31 @@ public final class OriginFactionPickerHelper {
     private OriginFactionPickerHelper() {}
 
     /**
+     * {@code SPECIAL}-tagged meta-factions that remain valid as a deliberate, manually chosen
+     * personal origin: Mercenary, Independent, and Pirate. These stay excluded from RANDOM origin
+     * assignment (see {@code RangedFactionSelector}, the primary purpose of the {@code SPECIAL}
+     * tag) but are legitimate choices in the manual picker. See issue #412.
+     */
+    private static final Set<String> ALLOWED_SPECIAL_ORIGINS = Set.of(
+          Faction.MERCENARY_FACTION_CODE, "IND", Faction.PIRATE_FACTION_CODE);
+
+    /**
+     * @return {@code true} if {@code faction} is a meta-faction that should never appear in the
+     *       origin picker regardless of era. This covers {@code HIDDEN} factions and
+     *       {@code SPECIAL}-tagged meta-factions other than the handful that are valid personal
+     *       origins ({@link #ALLOWED_SPECIAL_ORIGINS}). It excludes aggregates ({@code CLAN},
+     *       {@code IS}, {@code Periphery}), dead/no-government codes ({@code ABN}, {@code UND},
+     *       {@code NONE}), and administrative entities, while keeping Mercenary, Independent, and
+     *       Pirate selectable.
+     */
+    private static boolean isNonOriginMetaFaction(Faction faction) {
+        if (faction.is(FactionTag.HIDDEN)) {
+            return true;
+        }
+        return faction.is(FactionTag.SPECIAL) && !ALLOWED_SPECIAL_ORIGINS.contains(faction.getShortName());
+    }
+
+    /**
      * @return {@code true} if {@code faction} would survive the strict lifespan filter on its
      *       own (independent of the "always include person's origin" exception). Used at dialog
      *       open to decide whether to auto-check "Show All Factions" so the dropdown actually
@@ -67,7 +93,7 @@ public final class OriginFactionPickerHelper {
      */
     public static boolean wouldStrictFilterAdmit(Faction faction, Person person, int currentYear,
           LocalDate endDate) {
-        if (faction == null || faction.is(FactionTag.HIDDEN) || faction.is(FactionTag.SPECIAL)) {
+        if (faction == null || isNonOriginMetaFaction(faction)) {
             return false;
         }
         int endYear = (endDate != null) ? Math.min(endDate.getYear(), currentYear) : currentYear;
@@ -79,15 +105,17 @@ public final class OriginFactionPickerHelper {
      *
      * <p>Default ({@code showAllFactions == false}): only factions whose {@code yearsActive}
      * overlap the person's lifespan window {@code [birthYear .. min(endDate, currentYear)]}
-     * appear, with {@code HIDDEN} and {@code SPECIAL}-tagged factions always excluded. This is
-     * the canonically correct behavior — a 3151-era character cannot be born in the long-
+     * appear, with non-origin meta-factions always excluded (see {@link #isNonOriginMetaFaction}:
+     * {@code HIDDEN} and most {@code SPECIAL}-tagged factions, keeping Mercenary/Independent/Pirate).
+     * This is the canonically correct behavior - a 3151-era character cannot be born in the long-
      * dissolved Federated Commonwealth.</p>
      *
      * <p>When {@code showAllFactions == true}: drops the lifespan filter entirely. Useful for
      * legitimate but unusual cases (long-lived characters whose origin is now-defunct, deliberate
-     * "I want my Dark Age character to have a Word of Blake background" choices). {@code HIDDEN}
-     * and {@code SPECIAL} stay excluded — those are meta-factions and aggregates that aren't
-     * legitimate origins regardless of era.</p>
+     * "I want my Dark Age character to have a Word of Blake background" choices). Non-origin
+     * meta-factions stay excluded ({@link #isNonOriginMetaFaction}): aggregates and dead/no-
+     * government codes aren't legitimate origins regardless of era, but Mercenary, Independent,
+     * and Pirate remain selectable.</p>
      *
      * <p>The person's existing origin faction is always included in both modes so editing a
      * character whose origin is filtered out by the lifespan check does not silently lose the
@@ -116,7 +144,7 @@ public final class OriginFactionPickerHelper {
                 factionsModel.addElement(faction);
                 continue;
             }
-            if (faction.is(FactionTag.HIDDEN) || faction.is(FactionTag.SPECIAL)) {
+            if (isNonOriginMetaFaction(faction)) {
                 continue;
             }
             if (showAllFactions) {
