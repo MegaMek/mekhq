@@ -43,6 +43,7 @@ import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.base.AbstractBase;
+import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.HangarSorter;
@@ -86,13 +87,17 @@ public class AssignTechToUnitMenu extends JScrollableMenu {
 
         // Get all units that are:
         // 1) Available
-        // 2) Potentially maintained by the person
-        // 3) The unit can take a tech and the person can afford the time to maintain the unit
-        // Only show units co-located with the person (base hangar or main-force hangar)
+        // 2) Co-located with the person (same IPlace ancestor — handles in-transit units correctly)
+        // 3) Potentially maintained by the person
+        // 4) The unit can take a tech and the person can afford the time to maintain the unit
+        IPlace personPlace = person.getPlace();
         AbstractBase effectiveBase = LocationUtils.findEffectiveBase(person);
         Hangar sourceHangar = (effectiveBase != null) ? effectiveBase.getBaseHangar() : campaign.getHangar();
         final List<Unit> units = HangarSorter.defaultSorting()
-                                       .sort(sourceHangar.getUnitsStream().filter(Unit::isAvailable)
+                                       .sort(sourceHangar.getUnitsStream()
+                                                   .filter(Unit::isAvailable)
+                                                   .filter(unit -> LocationUtils.areSameEffectiveLocation(unit,
+                                                         personPlace))
                                                    .filter(unit -> person.canTech(unit.getEntity()))
                                                    .filter(unit -> unit.canTakeTech()
                                                                          &&

@@ -57,8 +57,12 @@ public final class LocationUtils {
     /**
      * Returns {@code true} if {@code a} and {@code b} are at the same effective location.
      *
-     * <p>Both items must be non-null, neither may currently be in transit, and they must share
-     * the same nearest {@link AbstractBase} ancestor (or both have none, meaning main force).</p>
+     * <ol>
+     *     <li>If either input is null, it is not the same effective location.</ul>
+     *     <li>If either input is in transit, they're only the same effective location if they share an {@code
+     *     AbstractLocation}</ul>
+     *     <li>If both inputs have the same {@code Base} they're in the same location.</li>
+     * </ol>
      *
      * @param firstLocation  first location item
      * @param secondLocation second location item
@@ -66,11 +70,18 @@ public final class LocationUtils {
      * @return {@code true} if the two items are co-located
      */
     public static boolean areSameEffectiveLocation(@Nullable ILocation firstLocation, @Nullable ILocation secondLocation) {
+        // A null location isn't in the same location as anything
         if (firstLocation == null || secondLocation == null) {
             return false;
         }
+
+        // When in transit, only consider two things to have the same location if it's the exact same location. Space
+        // is big and transit time is abstracted, so even if two things have two locations with identical values, the
+        // transit time is ambigous and we can't consider them in the same place. Unless it's the exact same location.
         if (isInTransit(firstLocation) || isInTransit(secondLocation)) {
-            return false;
+            // Intentionally using "==" over .equals - When stuff is in transit, let's explicitly check if these have
+            // the same AbstractLocation object
+            return firstLocation.getCurrentLocation() == secondLocation.getCurrentLocation();
         }
         return Objects.equals(findEffectiveBase(firstLocation), findEffectiveBase(secondLocation));
     }
