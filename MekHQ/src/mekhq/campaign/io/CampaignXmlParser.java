@@ -352,7 +352,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 } else if (nodeName.equalsIgnoreCase("playerBases")) {
                     processPlayerBaseNodes(campaign, workingNode, version);
                 } else if (nodeName.equalsIgnoreCase("location")) {
-                    // legacy single-location format: read and treat as the sole active location
+                    // Campaign's current location — written as a top-level tag in new saves;
+                    // same tag was used as the only location entry in pre-<locations>-list saves.
                     campaign.setLocation(CurrentLocation.generateInstanceFromXML(workingNode, campaign));
                 } else if (nodeName.equalsIgnoreCase("locationNodeChildren")) {
                     LocationNode.reconnectChildren(workingNode, campaign);
@@ -1857,13 +1858,10 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
      * arrive on planet within a day or two via normal {@code newDay()} processing.</p>
      */
     private static void migrateLegacyEducationTravel(Campaign campaign) {
-        LOGGER.info("migrateLegacyEducationTravel: scanning {} personnel for legacy education travel",
-              campaign.getPersonnel().size());
-        int campusMigrated = 0;
-        int travelMigrated = 0;
-        int skipped = 0;
-
-        for (Person person : List.copyOf(campaign.getPersonnel().values())) {
+        // Phase 1: scan for persons that need migration. All per-person logging here is DEBUG
+        // so post-refactor saves (where everyone is skipped) produce no INFO noise.
+        List<Person> toMigrate = new ArrayList<>();
+        for (Person person : campaign.getPersonnel().values()) {
             EducationStage stage = person.getEduEducationStage();
             if (stage != EducationStage.JOURNEY_TO_CAMPUS
                       && stage != EducationStage.JOURNEY_FROM_CAMPUS
@@ -1873,17 +1871,12 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 continue;
             }
 
-            LOGGER.info("migrateLegacyEducationTravel: processing {} (stage={}, academy='{}', set='{}')",
-                  person.getFullTitle(), stage, person.getEduAcademyNameInSet(), person.getEduAcademySet());
-
             Academy academy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
             if (academy != null && academy.isHomeSchool()) {
-                skipped++;
+                LOGGER.debug("migrateLegacyEducationTravel: skipping {} — homeSchool", person.getFullTitle());
                 continue;
             }
 
-            // Campus stages: Set the location's parent.
-            // This covers EDUCATION, GRADUATING, and DROPPING_OUT.
             if (stage == EducationStage.EDUCATION
                       || stage == EducationStage.GRADUATING
                       || stage == EducationStage.DROPPING_OUT) {
@@ -1893,23 +1886,55 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 // academies, creating a duplicate campus and displacing the person.
                 LocationNode parentNode = person.getLocationNode().getParent();
                 if (parentNode != null
-                          &&
-                          !(parentNode.getLocatable() instanceof Personnel personnel &&
-                                  personnel.getLocationNode().getParent() instanceof LocationNode node &&
-                                  node.getLocatable() instanceof Campaign)) {
+                          && !(parentNode.getLocatable() instanceof Personnel personnel
+                                && personnel.getLocationNode().getParent() instanceof LocationNode node
+                                && node.getLocatable() instanceof Campaign)) {
+                    LOGGER.debug("migrateLegacyEducationTravel: skipping {} — already reconnected (stage={})",
+                          person.getFullTitle(), stage);
                     continue;
                 }
                 // If a FixedLocation campus already holds this person's ID (post-refactor save),
-                // reconnectPersonsToTravelLocations will handle them — skip migration silently.
+                // reconnectPersonsToTravelLocations will handle them.
                 if (hasFixedCampusPendingFor(campaign, person)) {
-                    skipped++;
+                    LOGGER.debug("migrateLegacyEducationTravel: skipping {} — pending in FixedLocation campus (stage={})",
+                          person.getFullTitle(), stage);
                     continue;
                 }
+            } else {
+                // Journey stages: skip if a travel node already holds this person's pending ID
+                // (post-refactor save) — reconnectPersonsToTravelLocations will place them correctly.
+                if (hasTravelNodePendingFor(campaign, person)) {
+                    LOGGER.debug("migrateLegacyEducationTravel: skipping {} — pending in travel node (stage={})",
+                          person.getFullTitle(), stage);
+                    continue;
+                }
+            }
+
+            LOGGER.debug("migrateLegacyEducationTravel: {} needs migration (stage={}, academy='{}', set='{}')",
+                  person.getFullTitle(), stage, person.getEduAcademyNameInSet(), person.getEduAcademySet());
+            toMigrate.add(person);
+        }
+
+        // Phase 2: migrate. Only runs (and only logs at INFO) when legacy persons are found.
+        if (toMigrate.isEmpty()) {
+            LOGGER.debug("migrateLegacyEducationTravel: no persons need legacy migration");
+            return;
+        }
+
+        LOGGER.info("migrateLegacyEducationTravel: {} persons require legacy migration", toMigrate.size());
+        int campusMigrated = 0;
+        int travelMigrated = 0;
+
+        for (Person person : toMigrate) {
+            EducationStage stage = person.getEduEducationStage();
+
+            if (stage == EducationStage.EDUCATION
+                      || stage == EducationStage.GRADUATING
+                      || stage == EducationStage.DROPPING_OUT) {
                 String systemId = resolveAcademySystemId(campaign, person);
                 if (systemId == null) {
                     LOGGER.warn("migrateLegacyEducationTravel: could not resolve academy system for {} (stage={})"
                           + " — skipping campus placement", person.getFullTitle(), stage);
-                    skipped++;
                     continue;
                 }
                 AcademyCampusLocation campusLocation = campaign.getOrCreateCampusLocation(
@@ -1923,34 +1948,25 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     LOGGER.warn("migrateLegacyEducationTravel: getOrCreateCampusLocation returned null for {}"
                           + " (academy='{}', system='{}') — skipping", person.getFullTitle(),
                           person.getEduAcademyNameInSet(), systemId);
-                    skipped++;
                 }
                 continue;
             }
 
-            // Journey stages: skip if a travel node already holds this person's pending ID —
-            // reconnectPersonsToTravelLocations will place them correctly (post-refactor saves).
-            if (hasTravelNodePendingFor(campaign, person)) {
-                skipped++;
-                continue;
-            }
-
+            // Journey stages
             String systemId = resolveAcademySystemId(campaign, person);
             if (systemId == null) {
                 LOGGER.warn("migrateLegacyEducationTravel: could not resolve academy system for {} (stage={})"
                       + " — skipping travel node creation", person.getFullTitle(), stage);
-                skipped++;
                 continue;
             }
             PlanetarySystem targetSystem = campaign.getSystemById(systemId);
             if (targetSystem == null) {
                 LOGGER.warn("migrateLegacyEducationTravel: system '{}' not found for {} (stage={})"
                       + " — skipping travel node creation", systemId, person.getFullTitle(), stage);
-                skipped++;
                 continue;
             }
 
-            double transitTime = (double) Math.max(0, person.getEduJourneyTime() - person.getEduDaysOfTravel());
+            double transitTime = Math.max(0, person.getEduJourneyTime() - person.getEduDaysOfTravel());
             LOGGER.info("migrateLegacyEducationTravel: creating travel node for {} (stage={}, system={}, transitTime={} days)",
                   person.getFullTitle(), stage, targetSystem.getId(), transitTime);
 
@@ -1971,8 +1987,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             travelMigrated++;
         }
 
-        LOGGER.info("migrateLegacyEducationTravel: complete — {} placed at campus, {} given travel nodes, {} skipped",
-              campusMigrated, travelMigrated, skipped);
+        LOGGER.info("migrateLegacyEducationTravel: complete — {} placed at campus, {} given travel nodes",
+              campusMigrated, travelMigrated);
     }
 
     private static boolean hasFixedCampusPendingFor(Campaign campaign, Person person) {

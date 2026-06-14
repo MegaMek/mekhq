@@ -805,20 +805,6 @@ public class EducationController {
         return campaign;
     }
 
-    private static AcademyCampusLocation getOrCreateLocalCampusAt(
-          IPlace parent, String academySet, String academyName) {
-        for (LocationNode child : parent.getLocationNode().getChildren()) {
-            if (child.getLocatable() instanceof AcademyCampusLocation campus
-                      && academySet.equals(campus.getAcademySet())
-                      && academyName.equals(campus.getAcademyName())) {
-                return campus;
-            }
-        }
-        AcademyCampusLocation campus = new AcademyCampusLocation(academySet, academyName);
-        LocationNode.LocationManager.setLocation(campus, parent);
-        return campus;
-    }
-
     /**
      * Processes the journey home for a person.
      *

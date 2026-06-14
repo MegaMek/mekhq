@@ -1164,6 +1164,22 @@ public class CampaignTest {
 
                 assertSame(newLocation, campaign.getCurrentLocation());
             }
+
+            @Test
+            void setLocation_keepsOldLocationWhenItHasChildren() {
+                // The old CurrentLocation has a child (simulating a person in transit).
+                // setLocation must NOT remove it — only the daily prune may do so.
+                AbstractLocation old = campaign.getCurrentLocation();
+                PlanetarySystem childSystem = mock(PlanetarySystem.class);
+                CurrentLocation child = new CurrentLocation(childSystem, 0.0);
+                child.setParent(old);
+
+                PlanetarySystem newSystem = mock(PlanetarySystem.class);
+                CurrentLocation newLocation = new CurrentLocation(newSystem, 0.0);
+                campaign.setLocation(newLocation);
+
+                assertTrue(campaign.getLocations().contains(old));
+            }
         }
 
         /** Tests for {@link Campaign#addLocation(AbstractLocation)}. */

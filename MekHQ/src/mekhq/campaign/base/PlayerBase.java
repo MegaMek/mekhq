@@ -194,6 +194,20 @@ public class PlayerBase extends AbstractBase {
                     AcademyCampusLocation campus = AcademyCampusLocation.generateInstanceFromXML(wn2);
                     if (campus != null) {
                         LocationNode.LocationManager.setLocation(campus, base);
+                        NodeList campusChildren = wn2.getChildNodes();
+                        for (int ci = 0; ci < campusChildren.getLength(); ci++) {
+                            Node campusChild = campusChildren.item(ci);
+                            if (campusChild.getNodeType() != Node.ELEMENT_NODE) {
+                                continue;
+                            }
+                            if (campusChild.getNodeName().equalsIgnoreCase("location")) {
+                                CurrentLocation travelNode = CurrentLocation.generateInstanceFromXML(campusChild, campaign);
+                                if (travelNode != null) {
+                                    LocationNode.LocationManager.setLocation(travelNode, campus);
+                                    campaign.addLocation(travelNode);
+                                }
+                            }
+                        }
                     }
                 } else if (nodeName.equalsIgnoreCase("baseWarehouse")) {
                     NodeList partNodes = wn2.getChildNodes();
