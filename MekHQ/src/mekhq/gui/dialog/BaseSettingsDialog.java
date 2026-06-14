@@ -191,6 +191,11 @@ public class BaseSettingsDialog extends JDialog {
             cboSystem.setSelectedIndex(-1);
         }
 
+        if (existingBase != null) {
+            cboSystem.setEnabled(false);
+            cboPlanet.setEnabled(false);
+        }
+
         JButton btnOk = new JButton(getTextAt(RESOURCE_BUNDLE, "button.ok.text"));
         btnOk.addActionListener(e -> onOk());
         JButton btnCancel = new JButton(getTextAt(RESOURCE_BUNDLE, "button.cancel.text"));
