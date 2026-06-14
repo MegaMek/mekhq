@@ -436,17 +436,22 @@ public class Systems {
     }
 
     /**
-     * @return {@code true} if the path identifies a {@code connector_systems/} subtree entry.
-     *       Both {@code /} and {@code \} separators are normalized; the segment must be bounded by
-     *       directory separators on both sides (or sit at the path root) so a stray substring match
-     *       in a filename or unrelated directory doesn't get flagged. See issue #8934.
+     * @return {@code true} if the path identifies the {@code connector_systems} subtree - either the
+     *       directory itself (as passed to {@link #parsePlanetarySystemFiles} when recursing into it)
+     *       or an entry within it (e.g. a zip entry). {@code connector_systems} must be a full path
+     *       segment, bounded by directory separators or the path ends, so a stray substring match in a
+     *       filename or unrelated directory (e.g. {@code my_connector_systems_notes.yml}) is not flagged.
+     *       Both {@code /} and {@code \} separators are normalized. See issue #8934.
      */
     private static boolean isConnectorPath(String path) {
         if (path == null) {
             return false;
         }
         String normalized = path.replace('\\', '/');
-        return normalized.contains("/connector_systems/") || normalized.startsWith("connector_systems/");
+        return normalized.contains("/connector_systems/")    // an entry inside the subtree
+              || normalized.startsWith("connector_systems/")  // ... at the path root
+              || normalized.endsWith("/connector_systems")    // the directory itself (no trailing slash)
+              || normalized.equals("connector_systems");      // ... at the path root
     }
 
     private void cleanupSystems() {
