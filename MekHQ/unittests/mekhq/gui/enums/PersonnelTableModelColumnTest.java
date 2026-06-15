@@ -56,6 +56,7 @@ import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.FixedLocation;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.Personnel;
+import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.location.ILocation;
@@ -1007,7 +1008,7 @@ public class PersonnelTableModelColumnTest {
             Campaign campaign = mockCampaign();
             assertEquals("-", PersonnelTableModelColumn.LOCATION_SYSTEM.getCellValue(campaign, market, person, false, false));
             assertEquals("-", PersonnelTableModelColumn.LOCATION_PLANET.getCellValue(campaign, market, person, false, false));
-            assertEquals("-", PersonnelTableModelColumn.LOCATION_NAME.getCellValue(campaign, market, person, false, false));
+            assertEquals(CAMPAIGN_NAME, PersonnelTableModelColumn.LOCATION_NAME.getCellValue(campaign, market, person, false, false));
             assertEquals("-",
                   PersonnelTableModelColumn.DESTINATION_SYSTEM.getCellValue(campaign, market, person, false, false));
             assertEquals("-",
@@ -1241,6 +1242,53 @@ public class PersonnelTableModelColumnTest {
 
                 assertEquals(CAMPAIGN_NAME,
                       PersonnelTableModelColumn.DESTINATION_NAME.getCellValue(campaign, market, person, false, false));
+            }
+        }
+
+        @Nested
+        class BaseArrived {
+
+            private PlayerBase base;
+            private Person person;
+            private Campaign campaign;
+
+            @BeforeEach
+            void setUp() {
+                PlanetarySystem baseSys = mockSystem("Outreach", "Outreach");
+                FixedLocation fixedLoc = new FixedLocation(baseSys);
+                base = new PlayerBase(fixedLoc);
+                base.setDisplayName("Wolf's Dragoons HQ");
+                person = mockPerson();
+                wire(person, base.getBasePersonnel());
+                campaign = mockCampaign();
+            }
+
+            @Test
+            void locationName_returnsBaseName() {
+                assertEquals("Wolf's Dragoons HQ",
+                      PersonnelTableModelColumn.LOCATION_NAME.getCellValue(campaign, market, person, false, false));
+            }
+
+            @Test
+            void locationSystem_returnsBaseSystem() {
+                assertEquals("Outreach",
+                      PersonnelTableModelColumn.LOCATION_SYSTEM.getCellValue(campaign, market, person, false, false));
+            }
+
+            @Test
+            void locationPlanet_returnsBasePlanet() {
+                assertEquals("Outreach",
+                      PersonnelTableModelColumn.LOCATION_PLANET.getCellValue(campaign, market, person, false, false));
+            }
+
+            @Test
+            void destination_allDashWhenNotTraveling() {
+                assertEquals("-", PersonnelTableModelColumn.DESTINATION_SYSTEM.getCellValue(campaign, market, person,
+                      false, false));
+                assertEquals("-", PersonnelTableModelColumn.DESTINATION_PLANET.getCellValue(campaign, market, person,
+                      false, false));
+                assertEquals("-", PersonnelTableModelColumn.DESTINATION_NAME.getCellValue(campaign, market, person,
+                      false, false));
             }
         }
     }

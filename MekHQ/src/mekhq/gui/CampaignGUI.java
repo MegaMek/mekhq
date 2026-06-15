@@ -40,9 +40,11 @@ import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.P
 import static mekhq.campaign.personnel.skills.SkillType.getExperienceLevelName;
 import static mekhq.gui.dialog.nagDialogs.NagController.triggerDailyNags;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedOutputStream;
@@ -85,6 +87,7 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
+import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.campaignOptions.AcquisitionsType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DailyReportType;
@@ -117,6 +120,7 @@ import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.glossary.GlossaryDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.menus.MekHQMenuBar;
+import mekhq.gui.model.LocationFilterItem;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.gui.view.AdvanceTimePanel;
 import mekhq.gui.view.CommandSummaryPanel;
@@ -159,7 +163,7 @@ public class CampaignGUI extends JPanel {
     private final TOETab toeTab;
     private final BriefingTab briefingRoomTab;
     private final StratConTab stratConTab;
-    private final MapTab interstellarMapTab;
+    private final NavigationTab navigationTab;
     private final PersonnelTab personnelTab;
     private final HangarTab hangarTab;
     private final WarehouseTab warehouseTab;
@@ -170,6 +174,8 @@ public class CampaignGUI extends JPanel {
 
     /* Components for the status panel */
     private JPanel statusPanel;
+    private JLabel lblFunds;
+    private JComboBox<LocationFilterItem> choiceActiveLocation;
     private JLabel lblTempAsTechs;
     private JLabel lblTempMedics;
     private JLabel lblTempSoldiers;
@@ -210,7 +216,7 @@ public class CampaignGUI extends JPanel {
         toeTab = new TOETab(this, MHQTabType.TOE.toString());
         briefingRoomTab = new BriefingTab(this, MHQTabType.BRIEFING_ROOM.toString());
         stratConTab = new StratConTab(this, MHQTabType.STRAT_CON.toString());
-        interstellarMapTab = new MapTab(this, MHQTabType.INTERSTELLAR_MAP.toString());
+        navigationTab = new NavigationTab(this, MHQTabType.NAVIGATION.toString());
         personnelTab = new PersonnelTab(this, MHQTabType.PERSONNEL.toString());
         hangarTab = new HangarTab(this, MHQTabType.HANGAR.toString());
         warehouseTab = new WarehouseTab(this, MHQTabType.WAREHOUSE.toString());
@@ -225,7 +231,7 @@ public class CampaignGUI extends JPanel {
         if (getCampaign().getCampaignOptions().isUseStratCon()) {
             activateTab(stratConTab);
         }
-        activateTab(interstellarMapTab);
+        activateTab(navigationTab);
         activateTab(personnelTab);
         activateTab(hangarTab);
         activateTab(warehouseTab);
@@ -399,6 +405,10 @@ public class CampaignGUI extends JPanel {
         lblTempVesselCrew = new JLabel();
         lblPartsAvailabilityRating = new JLabel();
 
+        statusPanel.add(new JLabel(getTextAt(resourceMap.getBaseBundleName(), "lblActiveLocation.text")));
+        choiceActiveLocation = new JComboBox<>(buildActiveLocationModel());
+        choiceActiveLocation.addActionListener(ev -> refreshLocationFilteredTabs());
+        statusPanel.add(choiceActiveLocation);
         Border innerBorder = BorderFactory.createCompoundBorder(
               new RoundedLineBorder(UIUtil.uiIndependentGray(), 1, 8),
               BorderFactory.createEmptyBorder(1, 3, 1, 3));
@@ -567,8 +577,12 @@ public class CampaignGUI extends JPanel {
         return tabMain.indexOfComponent(stratConTab) >= 0 ? Optional.of(stratConTab) : Optional.empty();
     }
 
+    public NavigationTab getNavigationTab() {
+        return navigationTab;
+    }
+
     public MapTab getMapTab() {
-        return interstellarMapTab;
+        return navigationTab.getMapTab();
     }
 
     public PersonnelTab getPersonnelTab() {
@@ -621,7 +635,7 @@ public class CampaignGUI extends JPanel {
     public void setSelectedTab(MHQTabType tabType) {
         Optional<? extends CampaignGuiTab> tab = switch (tabType) {
             case COMMAND_CENTER -> Optional.of(getCommandCenterTab());
-            case INTERSTELLAR_MAP -> Optional.of(getMapTab());
+            case NAVIGATION, INTERSTELLAR_MAP -> Optional.of(getNavigationTab());
             case TOE -> Optional.of(getTOETab());
             case BRIEFING_ROOM -> Optional.of(getBriefingRoomTab());
             case STRAT_CON -> getStratConTab();
@@ -1377,6 +1391,7 @@ public class CampaignGUI extends JPanel {
     }
 
     public void refreshAllTabs() {
+        refreshActiveLocation();
         for (int i = 0; i < tabMain.getTabCount(); i++) {
             ((CampaignGuiTab) tabMain.getComponentAt(i)).refreshAll();
         }
@@ -1384,6 +1399,9 @@ public class CampaignGUI extends JPanel {
 
     public void refreshLab() {
         MekLabTab lab = getMekLabTab();
+        if (lab == null) {
+            return;
+        }
         Unit u = lab.getUnit();
         if (null == u) {
             return;
@@ -1412,6 +1430,81 @@ public class CampaignGUI extends JPanel {
             return "<html><b>" + label + "</b></html>";
         }
         return "<html><b>" + label + "</b>: " + args[0] + "</html>";
+    }
+
+    /**
+     * Returns the currently selected {@link LocationFilterItem}, defaulting to {@link LocationFilterItem#ALL} when the
+     * combo has not yet been initialized.
+     */
+    public LocationFilterItem getActiveLocation() {
+        if (choiceActiveLocation == null) {
+            return LocationFilterItem.ALL;
+        }
+        LocationFilterItem item = (LocationFilterItem) choiceActiveLocation.getSelectedItem();
+        return item != null ? item : LocationFilterItem.ALL;
+    }
+
+    /**
+     * Rebuilds the Active Location dropdown to reflect the current set of player bases. Always shows ALL and MAIN_FORCE
+     * sentinels plus every {@link PlayerBase} regardless of whether it has any units, parts, or personnel.
+     */
+    public void refreshActiveLocation() {
+        LocationFilterItem previous = getActiveLocation();
+        ActionListener[] listeners = choiceActiveLocation.getActionListeners();
+        if (listeners.length > 0) {
+            choiceActiveLocation.removeActionListener(listeners[0]);
+        }
+        DefaultComboBoxModel<LocationFilterItem> model = buildActiveLocationModel();
+        choiceActiveLocation.setModel(model);
+
+        // Restore previous selection by sentinel identity or base UUID
+        if (!previous.isAll()) {
+            for (int i = 0; i < model.getSize(); i++) {
+                LocationFilterItem item = model.getElementAt(i);
+                if (previous.isMainForce() && item.isMainForce()) {
+                    choiceActiveLocation.setSelectedIndex(i);
+                    break;
+                }
+                if (!previous.isMainForce() && !item.isAll() && !item.isMainForce()
+                          && previous.getBase() != null && item.getBase() != null
+                          && previous.getBase().getId().equals(item.getBase().getId())) {
+                    choiceActiveLocation.setSelectedIndex(i);
+                    break;
+                }
+            }
+        }
+
+        choiceActiveLocation.addActionListener(ev -> refreshLocationFilteredTabs());
+    }
+
+    private DefaultComboBoxModel<LocationFilterItem> buildActiveLocationModel() {
+        DefaultComboBoxModel<LocationFilterItem> model = new DefaultComboBoxModel<>();
+        model.addElement(LocationFilterItem.ALL);
+        model.addElement(LocationFilterItem.MAIN_FORCE);
+        for (PlayerBase base : getCampaign().getPlayerBases()) {
+            model.addElement(LocationFilterItem.forBase(base));
+        }
+        return model;
+    }
+
+    /** Refreshes the three location-filtered tabs when the Active Location selection changes. */
+    private void refreshLocationFilteredTabs() {
+        HangarTab hangarTab = getHangarTab();
+        if (hangarTab != null) {
+            hangarTab.refreshUnitList();
+        }
+        PersonnelTab personnelTab = getPersonnelTab();
+        if (personnelTab != null) {
+            personnelTab.refreshPersonnelList();
+        }
+        WarehouseTab wt = getWarehouseTab();
+        if (wt != null) {
+            wt.refreshPartsList();
+        }
+        RepairTab rt = (getRepairBayTab());
+        if (rt != null) {
+            rt.refreshServicedUnitList();
+        }
     }
 
     private void refreshTempAsTechs() {
@@ -1539,8 +1632,11 @@ public class CampaignGUI extends JPanel {
     }
 
     private void refreshCampaignControlButtons() {
-        boolean emptyHangar = getCampaign().getUnits().isEmpty();
-        boolean noPersonnel = getCampaign().getPersonnel().isEmpty();
+        boolean emptyHangar = getCampaign().getUnits().isEmpty() &&
+                                    getCampaign().getPlayerBases()
+                                          .stream()
+                                          .allMatch(base -> base.getBaseHangar().getUnits().isEmpty());
+        boolean noPersonnel = getCampaign().getAllPersonnel().isEmpty();
         btnCompanyGenerator.setVisible(emptyHangar && noPersonnel);
     }
 

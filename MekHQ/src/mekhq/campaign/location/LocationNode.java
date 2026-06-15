@@ -104,6 +104,21 @@ public class LocationNode {
         return children.add(childLocationNode);
     }
 
+    /**
+     * Returns {@code true} if {@code node} appears anywhere in the ancestor chain of {@code potentialAncestor}, which
+     * would indicate that making {@code potentialAncestor} an ancestor of {@code node} would create a cycle.
+     */
+    static boolean wouldCreateCycle(LocationNode node, LocationNode potentialAncestor) {
+        LocationNode cursor = potentialAncestor;
+        while (cursor != null) {
+            if (cursor == node) {
+                return true;
+            }
+            cursor = cursor.getParent();
+        }
+        return false;
+    }
+
     boolean removeChild(LocationNode childLocationNode) {
         return children.remove(childLocationNode);
     }
@@ -111,10 +126,12 @@ public class LocationNode {
     public void writeToXML(PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "locationNodeChildren");
         for (LocationNode child : children) {
-            if (child.getLocatable() instanceof AcademyCampusLocation campus) {
+            ILocation locatable = child.getLocatable();
+            if (locatable instanceof AcademyCampusLocation campus) {
                 campus.writeToXML(pw, indent);
+            } else if (locatable instanceof CurrentLocation travelNode) {
+                travelNode.writeToXML(pw, indent);
             }
-            // Future: Additional objects that need to be saved in a location-context other than the main force
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "locationNodeChildren");
     }
@@ -163,6 +180,12 @@ public class LocationNode {
                             }
                         }
                     }
+                } else if (wn.getNodeName().equalsIgnoreCase("location")) {
+                    CurrentLocation travelNode = CurrentLocation.generateInstanceFromXML(wn, campaign);
+                    if (travelNode != null) {
+                        LocationManager.setLocation(travelNode, parent);
+                        campaign.addLocation(travelNode);
+                    }
                 } else {
                     // Person, Unit, and Part reconnection will be added here
                     logger.warn("Unrecognized locationNodeChildren element '{}' — skipping", wn.getNodeName());
@@ -184,6 +207,13 @@ public class LocationNode {
         }
 
         public static void setLocation(LocationNode childLocationNode, @Nullable LocationNode parentLocationNode) {
+            if ((parentLocationNode != null) && wouldCreateCycle(childLocationNode, parentLocationNode)) {
+                logger.error("Refusing to parent {} under {}: would create a location-tree cycle",
+                      childLocationNode.getLocatable(),
+                      parentLocationNode.getLocatable());
+                return;
+            }
+
             if (childLocationNode.getParent() != null) {
                 childLocationNode.getParent().removeChild(childLocationNode);
             }

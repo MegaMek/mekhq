@@ -1142,19 +1142,6 @@ public class CampaignTest {
             }
 
             @Test
-            void setLocation_clearsAllPreviousLocations() {
-                PlanetarySystem extraSystem = mock(PlanetarySystem.class);
-                CurrentLocation extra = new CurrentLocation(extraSystem, 0.0);
-                campaign.addLocation(extra);
-
-                PlanetarySystem newSystem = mock(PlanetarySystem.class);
-                CurrentLocation newLocation = new CurrentLocation(newSystem, 0.0);
-                campaign.setLocation(newLocation);
-
-                assertEquals(1, campaign.getLocations().size());
-            }
-
-            @Test
             void setLocation_null_clearsLocations() {
                 campaign.setLocation(null);
 
@@ -1176,6 +1163,22 @@ public class CampaignTest {
                 campaign.setLocation(newLocation);
 
                 assertSame(newLocation, campaign.getCurrentLocation());
+            }
+
+            @Test
+            void setLocation_keepsOldLocationWhenItHasChildren() {
+                // The old CurrentLocation has a child (simulating a person in transit).
+                // setLocation must NOT remove it — only the daily prune may do so.
+                AbstractLocation old = campaign.getCurrentLocation();
+                PlanetarySystem childSystem = mock(PlanetarySystem.class);
+                CurrentLocation child = new CurrentLocation(childSystem, 0.0);
+                child.setParent(old);
+
+                PlanetarySystem newSystem = mock(PlanetarySystem.class);
+                CurrentLocation newLocation = new CurrentLocation(newSystem, 0.0);
+                campaign.setLocation(newLocation);
+
+                assertTrue(campaign.getLocations().contains(old));
             }
         }
 

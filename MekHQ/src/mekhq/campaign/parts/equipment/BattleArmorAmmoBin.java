@@ -219,7 +219,7 @@ public class BattleArmorAmmoBin extends AmmoBin {
         toReturn += ">";
         toReturn += "<b>" + getAcquisitionDisplayName() + "</b> " + getAcquisitionBonus() + "<br/>";
         toReturn += getAcquisitionExtraDesc() + "<br/>";
-        PartInventory inventories = campaign.getPartInventory(getAcquisitionPart());
+        PartInventory inventories = getPartInventory(getAcquisitionPart());
         toReturn += inventories.getTransitOrderedDetails() + "<br/>";
         toReturn += getBuyCost().toAmountAndSymbolString() + "<br/>";
         toReturn += "</font></html>";

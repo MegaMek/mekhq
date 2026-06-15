@@ -33,12 +33,18 @@
 
 package mekhq.campaign.location;
 
-import java.util.Collection;
+import java.util.ArrayList;
 
 import megamek.common.annotations.Nullable;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.Hangar;
+import mekhq.campaign.Personnel;
 import mekhq.campaign.Warehouse;
-import mekhq.campaign.personnel.Person;
+import mekhq.campaign.parts.AmmoStorage;
+import mekhq.campaign.parts.Armor;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.PartInventory;
 
 /**
  * A sub-interface of {@link ILocation} that marks a node in the {@link LocationNode} tree as a
@@ -88,7 +94,74 @@ public interface IPlace extends ILocation {
      */
     @Override
     @Nullable
-    default Collection<Person> getPersonnel() {
+    default Personnel getPersonnel() {
         return null;
+    }
+
+    /**
+     * Returns a {@link PartInventory} counting spare parts that match {@code part} in this place's warehouse.
+     *
+     * <p>Supply counts present spares; transit counts non-present spares. The ordered count is
+     * zero by default — {@link mekhq.campaign.Campaign} overrides this to add shopping-list orders.</p>
+     */
+    default PartInventory getPartInventory(Part part) {
+        PartInventory inventory = new PartInventory();
+        Warehouse warehouse = getWarehouse();
+        if (warehouse == null) {
+            return inventory;
+        }
+        int localSupplyCount = 0;
+        int countInTransit = 0;
+        for (Part warehousePart : warehouse.getParts()) {
+            if (!warehousePart.isSpare()) {
+                continue;
+            }
+            if (part.isSamePartType(warehousePart)) {
+                if (warehousePart.isPresent()) {
+                    localSupplyCount += warehousePart.getTotalQuantity();
+                } else {
+                    countInTransit += warehousePart.getTotalQuantity();
+                }
+            }
+        }
+        inventory.setSupply(localSupplyCount);
+        inventory.setTransit(countInTransit);
+
+        String countModifier = "";
+        if (part instanceof Armor) {
+            countModifier = "points";
+        }
+        if (part instanceof AmmoStorage) {
+            countModifier = "shots";
+        }
+        inventory.setCountModifier(countModifier);
+        return inventory;
+    }
+
+    /**
+     * Processes arriving travel nodes parented to this place.
+     *
+     * <p>Landing hangar and warehouse default to this place's own resources; if either is
+     * {@code null} (e.g. a campus that owns no hangar or warehouse) the campaign's resource is
+     * used as a fallback. {@link mekhq.campaign.Campaign} overrides this with its own
+     * implementation and is unaffected.</p>
+     */
+    @Override
+    default void processArrivals(Campaign campaign) {
+        Personnel personnel = getPersonnel();
+        if (personnel == null || !hasLocationNode()) {
+            return;
+        }
+        Hangar hangar = getHangar() != null ? getHangar() : campaign.getHangar();
+        Warehouse warehouse = getWarehouse() != null ? getWarehouse() : campaign.getWarehouse();
+        for (LocationNode child : new ArrayList<>(getLocationNode().getChildren())) {
+            if (!(child.getLocatable() instanceof CurrentLocation travelNode)) {
+                continue;
+            }
+            if (!travelNode.isOnPlanet()) {
+                continue;
+            }
+            LocationDispatch.landFromTravelNode(travelNode, personnel, hangar, warehouse, campaign);
+        }
     }
 }
