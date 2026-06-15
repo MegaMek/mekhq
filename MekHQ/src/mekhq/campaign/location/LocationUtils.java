@@ -58,9 +58,9 @@ public final class LocationUtils {
      * Returns {@code true} if {@code a} and {@code b} are at the same effective location.
      *
      * <ol>
-     *     <li>If either input is null, it is not the same effective location.</ul>
+     *     <li>If either input is null, it is not the same effective location.</li>
      *     <li>If either input is in transit, they're only the same effective location if they share an {@code
-     *     AbstractLocation}</ul>
+     *     AbstractLocation}</li>
      *     <li>If both inputs have the same {@code Base} they're in the same location.</li>
      * </ol>
      *
@@ -77,7 +77,7 @@ public final class LocationUtils {
 
         // When in transit, only consider two things to have the same location if it's the exact same location. Space
         // is big and transit time is abstracted, so even if two things have two locations with identical values, the
-        // transit time is ambigous and we can't consider them in the same place. Unless it's the exact same location.
+        // transit time is ambiguous and we can't consider them in the same place. Unless it's the exact same location.
         if (isInTransit(firstLocation) || isInTransit(secondLocation)) {
             // Intentionally using "==" over .equals - When stuff is in transit, let's explicitly check if these have
             // the same AbstractLocation object
