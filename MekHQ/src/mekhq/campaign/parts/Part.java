@@ -344,6 +344,10 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
         return brandNew;
     }
 
+    public boolean isDamagedBeyondRepair() {
+        return getSkillMin() > SkillType.EXP_LEGENDARY;
+    }
+
     public void setBrandNew(boolean b) {
         this.brandNew = b;
     }
@@ -494,7 +498,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
             toReturn.append("<br>");
         }
 
-        if (getSkillMin() <= SkillType.EXP_LEGENDARY) {
+        if (!isDamagedBeyondRepair()) {
             toReturn.append(getTimeLeft())
                   .append(" minutes")
                   .append(null != getTech() ? " (scheduled)" : "")
