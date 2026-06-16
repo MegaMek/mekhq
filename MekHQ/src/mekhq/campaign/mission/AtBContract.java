@@ -2095,19 +2095,23 @@ public class AtBContract extends Contract {
      * The logos are determined based on the provided game year and faction codes, scaled appropriately for the
      * GUI.</p>
      *
-     * @param gameYear the year used to determine which faction logos to display
+     * @param gameYear        the year used to determine which faction logos to display
+     * @param employerTooltip the tooltip to show on the employer (left) logo, or {@code null} for none
+     * @param enemyTooltip    the tooltip to show on the enemy (right) logo, or {@code null} for none
      *
      * @return a {@link JPanel} with the employer and enemy faction logos, with a divider in between
      *
      * @author Illiani
      * @since 0.50.06
      */
-    public JPanel getBelligerentsPanel(int gameYear) {
-        final int SIZE = 100;
+    public JPanel getBelligerentsPanel(int gameYear, @Nullable String employerTooltip, @Nullable String enemyTooltip) {
+        final int SIZE = 64;
 
         String employer = getEmployerCode();
         ImageIcon employerImage = getFactionLogo(gameYear, employer);
         employerImage = scaleImageIcon(employerImage, SIZE, true);
+        JLabel employerLabel = new JLabel(employerImage);
+        employerLabel.setToolTipText(employerTooltip);
 
         JLabel divider = new JLabel("/");
         divider.setHorizontalAlignment(SwingConstants.CENTER);
@@ -2118,11 +2122,13 @@ public class AtBContract extends Contract {
         String enemy = getEnemyCode();
         ImageIcon enemyImage = getFactionLogo(gameYear, enemy);
         enemyImage = scaleImageIcon(enemyImage, SIZE, true);
+        JLabel enemyLabel = new JLabel(enemyImage);
+        enemyLabel.setToolTipText(enemyTooltip);
 
         JPanel panel = new JPanel(new FlowLayout());
-        panel.add(new JLabel(employerImage));
+        panel.add(employerLabel);
         panel.add(divider);
-        panel.add(new JLabel(enemyImage));
+        panel.add(enemyLabel);
 
         return panel;
     }

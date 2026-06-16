@@ -38,7 +38,9 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import javax.swing.BorderFactory;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
@@ -92,8 +94,11 @@ public class MoraleBar extends JPanel {
      *                    contract-specific name such as "Peaceful"). Pass a blank string to show no label.
      */
     public MoraleBar(@Nonnull final AtBMoraleLevel moraleLevel, @Nonnull final String labelText) {
+        // The segments sit at the top of the wrapped bar, so the title is placed directly above them with no extra gap.
         super(new BorderLayout());
         setOpaque(false);
+        add(new JLabel(getTextAt(RESOURCE_BUNDLE, "contractMoraleBar.title.text"), SwingConstants.CENTER),
+              BorderLayout.NORTH);
         add(bar, BorderLayout.CENTER);
 
         final AtBMoraleLevel[] levels = AtBMoraleLevel.values();

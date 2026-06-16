@@ -34,9 +34,11 @@ package mekhq.gui.view;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JLabel;
@@ -52,25 +54,28 @@ import mekhq.gui.baseComponents.GradientMarkerBar.Marker;
 import mekhq.gui.baseComponents.GradientMarkerBar.MarkerStyle;
 
 /**
- * A continuous gauge that visualizes a contract metric (such as victory points or support points) as a current value
- * measured against an upper reference value.
+ * A continuous gauge that visualizes a contract metric as a current value placed on a track.
  *
  * <p>
- * The gauge reads from the player's perspective: a low or negative value is red, climbing through gold to green as it
- * approaches the reference total. It is the primary display for the value, so its markers carry the figures: the zero
- * baseline and the reference total are neutral reference ticks, while the current value is a thicker, accent-colored
- * marker so the figure the player is tracking stands out at a glance. Because the value is unbounded and may be
- * negative or exceed the reference, the track stretches to keep every marker in view and proportionally placed,
- * filling the stretched-in regions with flat darker colors (dark red below zero, dark green beyond the reference).
- * Those regions appear only when the value is actually outside the {@code 0..reference} range, so the bar stays
- * uncluttered in the common case.
+ * The component supports two visual languages. <b>Value meters</b> (victory points, support points, salvage) read from
+ * the player's perspective: a low value is red, climbing through gold to green as it approaches an upper reference, so
+ * "more is better" is conveyed by hue. A <b>progress</b> gauge (the contract timeline) instead uses a single neutral
+ * track, because time has no good or bad direction; a value-style red-to-green gradient there would imply a judgement
+ * that does not exist. In both cases the current value is a bold, accent-colored marker so the figure the player is
+ * tracking stands out, and the figures themselves are carried in the title so the bar reads as the primary display.
  * </p>
  *
  * <p>
- * Instances are created through the {@link #victoryPoints(int, int, boolean)} and {@link #supportPoints(int, int)}
- * factory methods, which supply the appropriate title, tooltip, and styling for each metric. When reaching the
- * reference is not, by itself, an achievable goal (for example a contract that cannot be ended early), the reference
- * tick is muted; the explanation is carried by the bar's tooltip rather than by the bar's colors.
+ * Because a value may be negative or exceed its reference, the track stretches to keep every marker in view and
+ * proportionally placed, filling any stretched-in regions of a value meter with flat darker colors (dark red below
+ * zero, dark green beyond the reference). Those regions appear only when the value is actually outside the
+ * {@code 0..reference} range, so the bar stays uncluttered in the common case.
+ * </p>
+ *
+ * <p>
+ * Instances are created through the {@link #victoryPoints(int, int, boolean)}, {@link #supportPoints(int, int)},
+ * {@link #salvage(int, int)}, and {@link #timeline(LocalDate, LocalDate, LocalDate, String, String, String)} factory
+ * methods, which supply the appropriate title, tooltip, and styling for each metric.
  * </p>
  *
  * @author The MegaMek Team
@@ -86,52 +91,71 @@ public class ContractMeterBar extends JPanel {
     private static final Color GREEN = new Color(0x36, 0xB3, 0x2B);
     /** Cool azure accent for the current-value marker, chosen to stand out against the warm red-gold-green gradient. */
     private static final Color CURRENT_MARKER_COLOR = new Color(0x29, 0xB6, 0xF6);
+    /** Neutral track for the progress (timeline) gauge: a muted slate that reads as "progress, not performance". */
+    private static final Color NEUTRAL_TRACK = new Color(0x6E, 0x76, 0x7E);
 
     /** The wrapped gauge. Kept private so the marker-level API is not exposed to callers. */
     private final GradientMarkerBar bar = new GradientMarkerBar();
 
     /**
-     * Creates a contract meter. Private; use the {@link #victoryPoints(int, int, boolean)} and
-     * {@link #supportPoints(int, int)} factory methods, which supply the appropriate title, tooltip, and styling.
+     * Creates a contract meter. Private; use the {@code victoryPoints}, {@code supportPoints}, {@code salvage}, and
+     * {@code timeline} factory methods, which supply the appropriate title, tooltip, gradient, and markers.
      *
-     * @param title          the title shown, centered, directly above the bar
-     * @param currentValue   the current value, drawn as the prominent accent-colored marker (may be negative)
-     * @param referenceValue the upper reference value (the green end of the gradient and a reference tick); should be
-     *                       positive (callers fall back to a plain-text display when it is not)
-     * @param tooltip        the tooltip shown when hovering anywhere on the bar
+     * @param title         the title shown, centered, directly above the bar
+     * @param gradientStart the value mapped to the left end of the gradient
+     * @param gradientEnd   the value mapped to the right end of the gradient
+     * @param gradient      the gradient colors, left to right (a single color fills the track neutrally)
+     * @param belowColor    the flat fill for values below the gradient range, or {@code null} for none
+     * @param aboveColor    the flat fill for values above the gradient range, or {@code null} for none
+     * @param markers       the markers to draw on the track
+     * @param tooltip       the tooltip shown when hovering anywhere on the bar
      */
-    private ContractMeterBar(final String title, final int currentValue, final int referenceValue,
-          final String tooltip) {
-        // A small vertical gap separates the title from the bar so they read as a grouped unit without crowding.
-        super(new BorderLayout(0, UIUtil.scaleForGUI(1)));
+    private ContractMeterBar(final String title, final double gradientStart, final double gradientEnd,
+          final @Nonnull Color[] gradient, final @Nullable Color belowColor, final @Nullable Color aboveColor,
+          final @Nonnull List<Marker> markers, final String tooltip) {
+        // The bar reserves a little headroom above its track for the current-value label; a small negative vertical
+        // gap pulls the title down into that headroom so it sits close to the value without crowding it.
+        super(new BorderLayout(0, -UIUtil.scaleForGUI(2)));
         setOpaque(false);
         add(buildTitle(title), BorderLayout.NORTH);
         add(bar, BorderLayout.CENTER);
 
-        bar.setGradientRange(0, referenceValue);
-        // Red climbs through gold to green as the value approaches the reference total.
-        bar.setGradient(new Color[] { DEEP_RED, GOLD, GREEN });
-        // The track stretches to fit the current value, keeping it proportional even when out of range. The flat
-        // out-of-gradient fills (dark red below zero, dark green beyond the reference) therefore appear only when the
-        // value actually falls outside the 0..reference range, so the bar stays uncluttered in the common case.
-        bar.setOutOfGradientColors(DEEP_RED.darker(), GREEN.darker());
+        bar.setGradientRange(gradientStart, gradientEnd);
+        bar.setGradient(gradient);
+        bar.setOutOfGradientColors(belowColor, aboveColor);
+        bar.setMarkers(markers);
 
+        setToolTipText(wordWrap(tooltip));
+    }
+
+    /**
+     * Builds a value meter: a red-to-green gradient spanning {@code 0..referenceValue}, with neutral {@code 0} and
+     * reference ticks and a bold, accent-colored current-value marker. The track stretches (with flat dark-red /
+     * dark-green fills) to keep a negative or overshooting current value in view.
+     *
+     * @param title          the title shown above the bar (typically carrying the figures)
+     * @param currentValue   the current value, drawn as the bold accent marker (may be negative)
+     * @param referenceValue the upper reference value (the green end and a reference tick)
+     * @param tooltip        the tooltip shown when hovering anywhere on the bar
+     *
+     * @return the configured value meter
+     */
+    private static @Nonnull ContractMeterBar valueMeter(final String title, final int currentValue,
+          final int referenceValue, final String tooltip) {
         final Color markerColor = markerColor();
         final List<Marker> markers = new ArrayList<>(3);
-        // The bar is the primary display, so its markers carry the figures, all labelled below the track so the title
-        // can sit flush above it. The zero baseline and the reference total are neutral thin reference ticks drawn in
-        // the same color (a different color reads as a bug without explanation); the current value is a bold, thicker,
-        // accent-colored solid marker, so the figure the player tracks stands out by weight, hue, and a bold label.
-        // Markers are painted in list order, so the current-value marker is added last to sit on top where markers
-        // coincide (for example a brand-new contract whose value is still zero).
+        // The zero baseline and the reference total are neutral thin reference ticks labelled below the track; the
+        // current value is a bold, accent-colored solid marker labelled above it. Splitting the labels across the two
+        // sides keeps the current value legible even when it sits right next to the reference (for example a salvage
+        // value of 71% against a 70% maximum). Markers are painted in list order, so the current-value marker is added
+        // last to sit on top where markers coincide.
         markers.add(new Marker(referenceValue, Integer.toString(referenceValue), markerColor, MarkerStyle.TICK,
               false));
         markers.add(new Marker(0, "0", markerColor, MarkerStyle.TICK, false));
         markers.add(new Marker(currentValue, Integer.toString(currentValue), CURRENT_MARKER_COLOR, MarkerStyle.SOLID,
-              false, true));
-        bar.setMarkers(markers);
-
-        setToolTipText(wordWrap(tooltip));
+              true, true));
+        return new ContractMeterBar(title, 0, referenceValue, new Color[] { DEEP_RED, GOLD, GREEN },
+              DEEP_RED.darker(), GREEN.darker(), markers, tooltip);
     }
 
     /**
@@ -151,9 +175,9 @@ public class ContractMeterBar extends JPanel {
         final String tooltip = getFormattedTextAt(RESOURCE_BUNDLE,
               canEndEarly ? "contractScoreBar.tooltip.canEndEarly" : "contractScoreBar.tooltip.cannotEndEarly",
               currentScore, requiredScore);
-        final String titleKey = canEndEarly ? "contractScoreBar.title.text" : "contractScoreBar.title.cannotEndEarly.text";
-        return new ContractMeterBar(getFormattedTextAt(RESOURCE_BUNDLE, titleKey, currentScore, requiredScore),
-              currentScore, requiredScore, tooltip);
+        final String titleKey = canEndEarly ? "contractScoreBar.title.text"
+              : "contractScoreBar.title.cannotEndEarly.text";
+        return valueMeter(getTextAt(RESOURCE_BUNDLE, titleKey), currentScore, requiredScore, tooltip);
     }
 
     /**
@@ -168,8 +192,56 @@ public class ContractMeterBar extends JPanel {
     public static @Nonnull ContractMeterBar supportPoints(final int currentPoints, final int maximumPoints) {
         final String tooltip = getFormattedTextAt(RESOURCE_BUNDLE, "contractSupportPointsBar.tooltip", currentPoints,
               maximumPoints);
-        return new ContractMeterBar(getFormattedTextAt(RESOURCE_BUNDLE, "contractSupportPointsBar.title.text",
-              currentPoints, maximumPoints), currentPoints, maximumPoints, tooltip);
+        return valueMeter(getTextAt(RESOURCE_BUNDLE, "contractSupportPointsBar.title.text"), currentPoints,
+              maximumPoints, tooltip);
+    }
+
+    /**
+     * Creates a gauge of the salvage percentage claimed so far against the negotiated maximum.
+     *
+     * @param currentPercent the salvage percentage claimed so far
+     * @param maximumPercent the negotiated maximum salvage percentage; should be positive (callers should fall back to
+     *                       a plain-text display for the no-salvage and salvage-exchange cases)
+     *
+     * @return the configured gauge
+     */
+    public static @Nonnull ContractMeterBar salvage(final int currentPercent, final int maximumPercent) {
+        final String tooltip = getFormattedTextAt(RESOURCE_BUNDLE, "contractSalvageBar.tooltip", currentPercent,
+              maximumPercent);
+        return valueMeter(getTextAt(RESOURCE_BUNDLE, "contractSalvageBar.title.text"), currentPercent, maximumPercent,
+              tooltip);
+    }
+
+    /**
+     * Creates a neutral progress gauge of how far the current date has advanced between a contract's start and end.
+     * Unlike the value meters, the track is a single neutral color: time has no good or bad direction, so a red-to-green
+     * gradient would imply a judgement that does not exist. The start and end are unlabeled ticks (the dates are carried
+     * in the title), and the current date is the bold accent marker.
+     *
+     * @param startDate   the contract start date (left end of the track)
+     * @param endDate     the contract end date (right end of the track)
+     * @param currentDate the current date, drawn as the bold accent marker
+     * @param startLabel  the formatted start date, shown in the title
+     * @param endLabel    the formatted end date, shown in the title
+     * @param currentLabel the formatted current date, shown beneath the current-date marker
+     *
+     * @return the configured gauge
+     */
+    public static @Nonnull ContractMeterBar timeline(final @Nonnull LocalDate startDate,
+          final @Nonnull LocalDate endDate, final @Nonnull LocalDate currentDate, final String startLabel,
+          final String endLabel, final String currentLabel) {
+        final double start = startDate.toEpochDay();
+        final double end = endDate.toEpochDay();
+        final double current = currentDate.toEpochDay();
+        final List<Marker> markers = new ArrayList<>(1);
+        // The track itself runs from start to end (the dates are carried in the title), so the only marker is the bold
+        // "today" marker that slides along it; no separate start or end ticks are drawn.
+        markers.add(new Marker(current, currentLabel, CURRENT_MARKER_COLOR, MarkerStyle.SOLID, true, true));
+        final String title = getFormattedTextAt(RESOURCE_BUNDLE, "contractTimelineBar.title.text", startLabel,
+              endLabel);
+        final String tooltip = getFormattedTextAt(RESOURCE_BUNDLE, "contractTimelineBar.tooltip", startLabel, endLabel,
+              currentLabel);
+        return new ContractMeterBar(title, start, end, new Color[] { NEUTRAL_TRACK }, null, null, markers, tooltip);
     }
 
     /**
