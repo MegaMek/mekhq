@@ -41,6 +41,9 @@ import javax.swing.JMenuItem;
 import megamek.common.units.EntityWeightClass;
 import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.Hangar;
+import mekhq.campaign.base.AbstractBase;
+import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.HangarSorter;
 import mekhq.campaign.unit.Unit;
@@ -85,8 +88,11 @@ public class AssignTechToUnitMenu extends JScrollableMenu {
         // 1) Available
         // 2) Potentially maintained by the person
         // 3) The unit can take a tech and the person can afford the time to maintain the unit
+        // Only show units co-located with the person (base hangar or main-force hangar)
+        AbstractBase effectiveBase = LocationUtils.findEffectiveBase(person);
+        Hangar sourceHangar = (effectiveBase != null) ? effectiveBase.getBaseHangar() : campaign.getHangar();
         final List<Unit> units = HangarSorter.defaultSorting()
-                                       .sort(campaign.getHangar().getUnitsStream().filter(Unit::isAvailable)
+                                       .sort(sourceHangar.getUnitsStream().filter(Unit::isAvailable)
                                                    .filter(unit -> person.canTech(unit.getEntity()))
                                                    .filter(unit -> unit.canTakeTech()
                                                                          &&

@@ -608,7 +608,7 @@ public class ProtoMekLocation extends Part {
 
     @Override
     public String getDesc() {
-        if ((!isBreached() && !isBlownOff()) || isSalvaging()) {
+        if (isDamagedBeyondRepair() || isSalvaging() || (!isBreached() && !isBlownOff())) {
             return super.getDesc();
         }
         StringBuilder toReturn = new StringBuilder();

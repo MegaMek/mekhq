@@ -36,9 +36,14 @@ package mekhq.campaign.location;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import jakarta.annotation.Nonnull;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.AbstractLocation;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.Hangar;
 import mekhq.campaign.JumpPath;
+import mekhq.campaign.Personnel;
+import mekhq.campaign.Warehouse;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -69,7 +74,7 @@ public interface ILocation {
     Planet NO_PLANET = null;
     JumpPath NO_JUMP_PATH = null;
 
-    @Nullable
+    @Nonnull
     LocationNode getLocationNode();
 
     default boolean hasLocationNode() {
@@ -258,7 +263,7 @@ public interface ILocation {
         if (!hasLocationNode() || !parent.hasLocationNode()) {
             return false;
         }
-        if (wouldCreateCycle(getLocationNode(), parent.getLocationNode())) {
+        if (LocationNode.wouldCreateCycle(getLocationNode(), parent.getLocationNode())) {
             return false;
         }
         return findRoot(parent.getLocationNode()).getLocatable() instanceof AbstractLocation;
@@ -324,44 +329,104 @@ public interface ILocation {
     }
 
     /**
-     * Returns {@code true} if {@code node} appears anywhere in the ancestor chain of {@code potentialAncestor}, which
-     * would indicate that making {@code potentialAncestor} an ancestor of {@code node} would create a cycle.
+     * Walks up the {@link LocationNode} tree and returns the nearest {@link IPlace} ancestor, or
+     * {@code null} if no IPlace ancestor exists.
      */
-    private static boolean wouldCreateCycle(LocationNode node, LocationNode potentialAncestor) {
-        LocationNode cursor = potentialAncestor;
-        while (cursor != null) {
-            if (cursor == node) {
-                return true;
+    @Nullable
+    default IPlace getPlace() {
+        return findPlace(hasLocationNode() ? getLocationNode() : null);
+    }
+
+    /**
+     * Walks up from {@code node} (inclusive) and returns the nearest {@link IPlace}, or
+     * {@code null} if the chain contains none.
+     */
+    @Nullable
+    static IPlace findPlace(@Nullable LocationNode node) {
+        while (node != null) {
+            if (node.getLocatable() instanceof IPlace place) {
+                return place;
             }
-            cursor = cursor.getParent();
+            node = node.getParent();
         }
-        return false;
+        return null;
     }
 
-    default Set<Person> getPersonnelAtLocation() {
+    /**
+     * Returns the {@link Hangar} owned by the nearest {@link mekhq.campaign.location.IPlace} ancestor of this location, or
+     * {@code null} if no such ancestor exists or it does not own a hangar.
+     */
+    @Nullable
+    default Hangar getHangar() {
+        if (!hasLocationNode() || getLocationNode().getParent() == null) {
+            return null;
+        }
+        return getLocationNode().getParent().getLocatable().getHangar();
+    }
+
+    /**
+     * Returns the {@link Warehouse} owned by the nearest {@link mekhq.campaign.location.IPlace} ancestor of this location,
+     * or {@code null} if no such ancestor exists or it does not own a warehouse.
+     */
+    @Nullable
+    default Warehouse getWarehouse() {
+        if (!hasLocationNode() || getLocationNode().getParent() == null) {
+            return null;
+        }
+        return getLocationNode().getParent().getLocatable().getWarehouse();
+    }
+
+    /**
+     * Returns the personnel roster owned by the nearest {@link mekhq.campaign.location.IPlace} ancestor of this location,
+     * or {@code null} if no such ancestor exists or it does not own a personnel roster.
+     */
+    @Nullable
+    default Personnel getPersonnel() {
+        if (!hasLocationNode() || getLocationNode().getParent() == null) {
+            return null;
+        }
+        return getLocationNode().getParent().getLocatable().getPersonnel();
+    }
+
+    default Set<Person> fetchPersonnelAtLocation() {
         if (!hasLocationNode()) {
             return Set.of();
         }
         return getLocationNode().getChildren().stream()
-                     .flatMap(loc -> loc.getLocatable().getPersonnelAtLocation().stream())
+                     .flatMap(loc -> loc.getLocatable().fetchPersonnelAtLocation().stream())
                      .collect(Collectors.toSet());
     }
 
-    default Set<Unit> getUnitsAtLocation() {
+    default Set<Unit> fetchUnitsAtLocation() {
         if (!hasLocationNode()) {
             return Set.of();
         }
         return getLocationNode().getChildren().stream()
-                     .flatMap(loc -> loc.getLocatable().getUnitsAtLocation().stream())
+                     .flatMap(loc -> loc.getLocatable().fetchUnitsAtLocation().stream())
                      .collect(Collectors.toSet());
     }
 
-    default Set<Part> getPartsAtLocation() {
+    default Set<Part> fetchPartsAtLocation() {
         if (!hasLocationNode()) {
             return Set.of();
         }
         return getLocationNode().getChildren().stream()
-                     .flatMap(loc -> loc.getLocatable().getPartsAtLocation().stream())
+                     .flatMap(loc -> loc.getLocatable().fetchPartsAtLocation().stream())
                      .collect(Collectors.toSet());
     }
+
+    /**
+     * Processes arriving travel nodes parented to this location.
+     *
+     * <p>For each completed {@link mekhq.campaign.CurrentLocation} child (one whose jump path has
+     * finished and which is on-planet), implementations should move all carried persons, units, and
+     * parts to the appropriate destination containers and call
+     * {@link LocationDispatch#removeTravelNode} to detach and de-register the node.</p>
+     *
+     * <p>The default implementation is a no-op; location types that host arriving travel nodes
+     * should override it.</p>
+     *
+     * @param campaign the active campaign
+     */
+    default void processArrivals(Campaign campaign) {}
 }

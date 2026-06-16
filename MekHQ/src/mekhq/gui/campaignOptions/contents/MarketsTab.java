@@ -207,7 +207,6 @@ public class MarketsTab {
       private JSpinner spnWarShipPercent;
       private JRadioButton btnContractPersonnel;
       private JCheckBox useInfantryDoseNotCountBox;
-      private JCheckBox chkMercSizeLimited;
       private JCheckBox chkBLCSaleValue;
       private JCheckBox chkOverageRepaymentInFinalPayment;
       // end Contract Market
@@ -611,7 +610,6 @@ public class MarketsTab {
             spnWarShipPercent = new JSpinner();
             btnContractPersonnel = new JRadioButton();
             useInfantryDoseNotCountBox = new JCheckBox();
-            chkMercSizeLimited = new JCheckBox();
             chkBLCSaleValue = new JCheckBox();
             chkOverageRepaymentInFinalPayment = new JCheckBox();
       }
@@ -851,9 +849,6 @@ public class MarketsTab {
             useInfantryDoseNotCountBox.addMouseListener(createTipPanelUpdater(contractMarketHeader,
                         "UseInfantryDoseNotCountBox"));
 
-            chkMercSizeLimited = new CampaignOptionsCheckBox("MercSizeLimited");
-            chkMercSizeLimited.addMouseListener(createTipPanelUpdater(contractMarketHeader, "MercSizeLimited"));
-
             chkOverageRepaymentInFinalPayment = new CampaignOptionsCheckBox("OverageRepaymentInFinalPayment");
             chkOverageRepaymentInFinalPayment.addMouseListener(createTipPanelUpdater(contractMarketHeader,
                         "OverageRepaymentInFinalPayment"));
@@ -880,7 +875,6 @@ public class MarketsTab {
             personnelPayPanel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
                         chkBLCSaleValue,
                         useInfantryDoseNotCountBox,
-                        chkMercSizeLimited,
                         chkOverageRepaymentInFinalPayment);
             pnlContractPayPersonnelOptions = personnelPayPanel;
 
@@ -1060,7 +1054,6 @@ public class MarketsTab {
             spnJumpShipPercent.setValue(model.jumpShipContractPercent);
             spnWarShipPercent.setValue(model.warShipContractPercent);
             useInfantryDoseNotCountBox.setSelected(model.infantryDontCount);
-            chkMercSizeLimited.setSelected(model.mercSizeLimited);
             chkBLCSaleValue.setSelected(model.blcSaleValue);
             chkOverageRepaymentInFinalPayment.setSelected(model.overageRepaymentInFinalPayment);
             updateContractPayEnabledState();
@@ -1127,7 +1120,6 @@ public class MarketsTab {
             model.useAlternatePaymentMode = chkUseAlternatePaymentMode.isSelected();
             model.useDiminishingContractPay = chkUseDiminishingContractPay.isSelected();
             model.equipmentContractSaleValue = chkEquipContractSaleValue.isSelected();
-            model.mercSizeLimited = chkMercSizeLimited.isSelected();
             model.blcSaleValue = chkBLCSaleValue.isSelected();
             model.infantryDontCount = useInfantryDoseNotCountBox.isSelected();
             model.overageRepaymentInFinalPayment = chkOverageRepaymentInFinalPayment.isSelected();

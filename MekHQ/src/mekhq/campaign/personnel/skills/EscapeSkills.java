@@ -36,6 +36,7 @@ import static java.lang.Math.floor;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.units.Crew.DEATH;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
+import static mekhq.campaign.personnel.PersonnelOptions.EDGE_ESCAPE_ATTEMPTS;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -96,13 +97,16 @@ public class EscapeSkills {
         }
 
         LocalDate today = campaign.getLocalDate();
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean useEdge = campaignOptions.isUseEdge() || campaignOptions.isUseSupportEdge();
+        useEdge = useEdge && person.getOptions().booleanOption(EDGE_ESCAPE_ATTEMPTS);
         SkillCheckUtility skillCheckUtility = new SkillCheckUtility(
               getTextAt(RESOURCE_BUNDLE, "EscapeArtist.skillCheck"),
               person,
               skillToUse,
               List.of(),
               0,
-              true,
+              useEdge,
               false,
               false,
               false,

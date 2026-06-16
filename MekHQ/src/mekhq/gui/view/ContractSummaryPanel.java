@@ -64,7 +64,7 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
-import mekhq.gui.enums.MHQTabType;
+import mekhq.gui.CampaignGUI;
 
 /**
  * Contract summary view for ContractMarketDialog
@@ -269,8 +269,9 @@ public class ContractSummaryPanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 // Display where it is on the interstellar map
-                campaign.getApp().getCampaigngui().getMapTab().switchSystemsMap(contract.getSystem());
-                campaign.getApp().getCampaigngui().setSelectedTab(MHQTabType.INTERSTELLAR_MAP);
+                CampaignGUI gui = campaign.getApp().getCampaigngui();
+                gui.getMapTab().switchSystemsMap(contract.getSystem());
+                gui.setSelectedTab(gui.getMapTab());
             }
         });
         gridBagConstraintsText.gridy = y;

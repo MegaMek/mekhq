@@ -79,12 +79,15 @@ import mekhq.campaign.events.parts.PartWorkEvent;
 import mekhq.campaign.events.persons.PersonEvent;
 import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
 import mekhq.campaign.events.units.UnitEvent;
+import mekhq.campaign.location.ILocation;
+import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PodSpace;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.stratCon.StratConRulesManager;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
 import mekhq.gui.adapter.ServicedUnitsTableMouseAdapter;
@@ -95,6 +98,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedMMToggleButton;
 import mekhq.gui.dialog.AcquisitionsDialog;
 import mekhq.gui.dialog.MRMSDialog;
 import mekhq.gui.enums.MHQTabType;
+import mekhq.gui.model.LocationFilterItem;
 import mekhq.gui.model.TaskTableModel;
 import mekhq.gui.model.TechTableModel;
 import mekhq.gui.model.UnitTableModel;
@@ -145,7 +149,6 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     // region Constructors
     public RepairTab(CampaignGUI gui, String name) {
         super(gui, name);
-        MekHQ.registerHandler(this);
         setUserPreferences();
     }
     // endregion Constructors
@@ -459,15 +462,12 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
 
         btnOvertime = new RoundedMMToggleButton(resourceMap.getString("btnOvertime.text"));
         btnOvertime.setToolTipText(resourceMap.getString("btnOvertime.toolTipText"));
-        btnOvertime.setSelected(getCampaign().isOvertimeAllowed());
         btnOvertime.addActionListener(evt -> {
             getCampaign().setOvertime(btnOvertime.isSelected());
             refreshAsTechPool();
             WarehouseTab warehouseTab = getCampaignGui().getWarehouseTab();
-            if (warehouseTab != null) {
-                warehouseTab.refreshAsTechPool();
-                warehouseTab.refreshOvertimeStatus();
-            }
+            warehouseTab.refreshAsTechPool();
+            warehouseTab.refreshOvertimeStatus();
         });
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -797,7 +797,19 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                 }
                 TechTableModel techModel = entry.getModel();
                 Person tech = techModel.getTechAt(entry.getIdentifier());
-                if (unit != null && unit.isSelfCrewed() && tech != unit.getEngineer()) {
+                // Tech must be at the same location as the unit being repaired
+                ILocation repairTarget = (unit != null) ? unit
+                      : (part instanceof Part partWithUnit && partWithUnit.getUnit() != null) ? partWithUnit.getUnit() : (ILocation) part;
+                if (!LocationUtils.areSameEffectiveLocation(tech, repairTarget)) {
+                    return false;
+                }
+                if ((unit != null) && unit.isSelfCrewed()) {
+                    if (!tech.getPrimaryRole().isVesselCrew()) {
+                        return false;
+                    }
+                    // check whether the engineer is assigned to the correct unit
+                    return unit.equals(tech.getUnit());
+                } else if (tech.getPrimaryRole().isVesselCrew() && (unit != null) && !unit.isSelfCrewed()) {
                     return false;
                 } else if (!tech.isRightTechTypeFor(part) && !btnShowAllTechs.isSelected()) {
                     return false;
@@ -852,8 +864,19 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     public void refreshServicedUnitList() {
         UUID uuid = (getSelectedServicedUnit() != null) ? getSelectedServicedUnit().getId() : null;
 
+        LocationFilterItem locationFilter = getCampaignGui().getActiveLocation();
+        List<Unit> candidates = locationFilter.selectUnits(getCampaign());
+
+        List<Unit> serviceable = new ArrayList<>();
+        for (Unit u : candidates) {
+            if (u.isAvailable() && u.isServiceable()
+                      && !StratConRulesManager.isUnitDeployedToStratCon(u)) {
+                serviceable.add(u);
+            }
+        }
+
         ignoreUnitTable = true;
-        servicedUnitModel.setData(getCampaign().getServiceableUnits());
+        servicedUnitModel.setData(serviceable);
         ignoreUnitTable = false;
 
         if (!focusOnUnit(uuid)) {

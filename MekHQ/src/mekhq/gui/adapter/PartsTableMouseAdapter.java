@@ -33,7 +33,10 @@
 package mekhq.gui.adapter;
 
 import java.awt.event.ActionEvent;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -47,6 +50,7 @@ import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.events.parts.PartModeChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.location.LocationDispatch;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
@@ -55,7 +59,9 @@ import mekhq.campaign.work.WorkTime;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.MRMSDialog;
 import mekhq.gui.dialog.PopupValueChoiceDialog;
+import mekhq.gui.menus.SendToLocationMenu;
 import mekhq.gui.model.PartsTableModel;
+import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.service.enums.MRMSMode;
 
 public class PartsTableMouseAdapter extends JPopupMenuAdapter {
@@ -521,6 +527,14 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
             popup.addSeparator();
             popup.add(menu);
         }
+
+        List<Part> spares = Arrays.stream(parts)
+                                  .filter(Part::isSpare)
+                                  .collect(Collectors.toList());
+        JMenuHelpers.addMenuIfNonEmpty(popup, new SendToLocationMenu(
+              gui.getCampaign(), gui.getFrame(), spares,
+              destination -> LocationDispatch.dispatchPartsToLocation(
+                    spares, destination, gui.getCampaign())));
 
         return Optional.of(popup);
     }

@@ -55,7 +55,9 @@ class EquipmentAndSuppliesOptionsModel {
     int autoLogisticsAmmunition;
     int autoLogisticsActuators;
     int autoLogisticsJumpJets;
+    int autoLogisticsHeadComponents;
     int autoLogisticsEngines;
+    int autoLogisticsGyros;
     int autoLogisticsHeatSink;
     int autoLogisticsWeapons;
     int autoLogisticsOther;
@@ -96,7 +98,9 @@ class EquipmentAndSuppliesOptionsModel {
         autoLogisticsAmmunition = options.getAutoLogisticsAmmunition();
         autoLogisticsActuators = options.getAutoLogisticsActuators();
         autoLogisticsJumpJets = options.getAutoLogisticsJumpJets();
+        autoLogisticsHeadComponents = options.getAutoLogisticsHeadComponents();
         autoLogisticsEngines = options.getAutoLogisticsEngines();
+        autoLogisticsGyros = options.getAutoLogisticsGyros();
         autoLogisticsHeatSink = options.getAutoLogisticsHeatSink();
         autoLogisticsWeapons = options.getAutoLogisticsWeapons();
         autoLogisticsOther = options.getAutoLogisticsOther();
@@ -148,7 +152,9 @@ class EquipmentAndSuppliesOptionsModel {
         options.setAutoLogisticsAmmunition(autoLogisticsAmmunition);
         options.setAutoLogisticsActuators(autoLogisticsActuators);
         options.setAutoLogisticsJumpJets(autoLogisticsJumpJets);
+        options.setAutoLogisticsHeadComponents(autoLogisticsHeadComponents);
         options.setAutoLogisticsEngines(autoLogisticsEngines);
+        options.setAutoLogisticsGyros(autoLogisticsGyros);
         options.setAutoLogisticsHeatSink(autoLogisticsHeatSink);
         options.setAutoLogisticsWeapons(autoLogisticsWeapons);
         options.setAutoLogisticsOther(autoLogisticsOther);

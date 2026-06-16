@@ -321,9 +321,13 @@ public class CampaignOptionsUnmarshaller {
             case "autoLogisticsJumpJets" -> campaignOptions.setAutoLogisticsJumpJets(parseInt(nodeContents));
             case "autoLogisticsEngines" -> campaignOptions.setAutoLogisticsEngines(parseInt(nodeContents));
             case "autoLogisticsWeapons" -> campaignOptions.setAutoLogisticsWeapons(parseInt(nodeContents));
+            case "autoLogisticsGyros" -> campaignOptions.setAutoLogisticsGyros(parseInt(nodeContents));
+            case "autoLogisticsHeadComponents" ->
+                  campaignOptions.setAutoLogisticsHeadComponents(parseInt(nodeContents));
             case "autoLogisticsOther" -> campaignOptions.setAutoLogisticsOther(parseInt(nodeContents));
             case "useTactics" -> campaignOptions.setUseTactics(parseBoolean(nodeContents));
             case "useInitiativeBonus" -> campaignOptions.setUseInitiativeBonus(parseBoolean(nodeContents));
+            case "useSensibleTactics" -> campaignOptions.setUseSensibleTactics(parseBoolean(nodeContents));
             case "useToughness" -> campaignOptions.setUseToughness(parseBoolean(nodeContents));
             case "useRandomToughness" -> campaignOptions.setUseRandomToughness(parseBoolean(nodeContents));
             case "useArtillery" -> campaignOptions.setUseArtillery(parseBoolean(nodeContents));
@@ -515,6 +519,9 @@ public class CampaignOptionsUnmarshaller {
                   nodeContents));
             case "announceOfficersOnly" -> campaignOptions.setAnnounceOfficersOnly(parseBoolean(nodeContents));
             case "announceChildBirthdays" -> campaignOptions.setAnnounceChildBirthdays(parseBoolean(nodeContents));
+            case "announceRetireeDeath" -> campaignOptions.setAnnounceRetireeDeath(parseBoolean(nodeContents));
+            case "announceRetireeDeathExpanded" ->
+                  campaignOptions.setAnnounceRetireeDeathExpanded(parseBoolean(nodeContents));
             case "showLifeEventDialogBirths" -> campaignOptions.setShowLifeEventDialogBirths(parseBoolean(
                   nodeContents));
             case "showLifeEventDialogComingOfAge" -> campaignOptions.setShowLifeEventDialogComingOfAge(parseBoolean(
@@ -895,7 +902,6 @@ public class CampaignOptionsUnmarshaller {
             case "opForLanceTypeMixed" -> campaignOptions.setOpForLanceTypeMixed(parseInt(nodeContents));
             case "opForLanceTypeVehicles" -> campaignOptions.setOpForLanceTypeVehicles(parseInt(nodeContents));
             case "useDropShips" -> campaignOptions.setUseDropShips(parseBoolean(nodeContents));
-            case "mercSizeLimited" -> campaignOptions.setMercSizeLimited(parseBoolean(nodeContents));
             case "moraleVictoryEffect" -> campaignOptions.setMoraleVictoryEffect(parseInt(nodeContents));
             case "moraleDecisiveVictoryEffect" ->
                   campaignOptions.setMoraleDecisiveVictoryEffect(parseInt(nodeContents));

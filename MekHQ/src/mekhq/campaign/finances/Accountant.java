@@ -179,7 +179,7 @@ public record Accountant(Campaign campaign) {
         int officerFoodUsage = 0;
 
         // Determine housing and food requirements
-        List<Person> personnel = new ArrayList<>(campaign().getPersonnel());
+        List<Person> personnel = new ArrayList<>(campaign().getAllPersonnel());
         for (Person person : personnel) {
             if (person.getStatus().isDepartedUnit()) {
                 // No paying for dead people or folks who left the campaign unit
@@ -570,7 +570,7 @@ public record Accountant(Campaign campaign) {
         if (getCampaignOptions().isUseAlternatePaymentMode()) {
             final Money forceValue = AlternatePaymentModelValues.getForceValue(campaign.getFaction(),
                   campaign.getAllFormations(),
-                  campaign.getHangar(),
+                  campaign.getAllHangar(),
                   useDiminishingContractPay,
                   excludeInfantry,
                   combatUnitContractPercent,

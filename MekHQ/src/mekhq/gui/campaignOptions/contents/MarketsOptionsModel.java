@@ -85,7 +85,6 @@ class MarketsOptionsModel {
     double jumpShipContractPercent;
     double warShipContractPercent;
     boolean infantryDontCount;
-    boolean mercSizeLimited;
     boolean blcSaleValue;
     boolean overageRepaymentInFinalPayment;
 
@@ -125,7 +124,6 @@ class MarketsOptionsModel {
         jumpShipContractPercent = options.getJumpShipContractPercent();
         warShipContractPercent = options.getWarShipContractPercent();
         infantryDontCount = options.isInfantryDontCount();
-        mercSizeLimited = options.isMercSizeLimited();
         blcSaleValue = options.isBLCSaleValue();
         overageRepaymentInFinalPayment = options.isOverageRepaymentInFinalPayment();
     }
@@ -182,7 +180,6 @@ class MarketsOptionsModel {
         options.setUseAlternatePaymentMode(useAlternatePaymentMode);
         options.setUseDiminishingContractPay(useDiminishingContractPay);
         options.setEquipmentContractSaleValue(equipmentContractSaleValue);
-        options.setMercSizeLimited(mercSizeLimited);
         options.setBLCSaleValue(blcSaleValue);
         options.setUseInfantryDontCount(infantryDontCount);
         options.setOverageRepaymentInFinalPayment(overageRepaymentInFinalPayment);

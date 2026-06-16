@@ -89,6 +89,7 @@ import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.enums.PersonnelTabView;
 import mekhq.gui.enums.PersonnelTableModelColumn;
+import mekhq.gui.model.LocationFilterItem;
 import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.view.PersonViewPanel;
@@ -118,9 +119,7 @@ public final class PersonnelTab extends CampaignGuiTab {
     // region Constructors
     public PersonnelTab(CampaignGUI gui, String name) {
         super(gui, name);
-        MekHQ.registerHandler(this);
         setUserPreferences();
-        GUIPreferences.getInstance().addPreferenceChangeListener(scalingChangeListener);
     }
     // endregion Constructors
 
@@ -361,8 +360,14 @@ public final class PersonnelTab extends CampaignGuiTab {
     }
 
     @Override
-    public void disposeTab() {
-        super.disposeTab();
+    public void activateTab() {
+        super.activateTab();
+        GUIPreferences.getInstance().addPreferenceChangeListener(scalingChangeListener);
+    }
+
+    @Override
+    public void deactivateTab() {
+        super.deactivateTab();
         GUIPreferences.getInstance().removePreferenceChangeListener(scalingChangeListener);
     }
 
@@ -489,22 +494,26 @@ public final class PersonnelTab extends CampaignGuiTab {
     }
 
     /**
-     * Refreshes personnel table model.
+     * Refreshes the personnel table model, applying the currently-selected location filter.
      */
     public void refreshPersonnelList() {
         UUID selectedUUID = null;
         int selectedRow = personnelTable.getSelectedRow();
         if (selectedRow != -1) {
-            Person p = personModel.getPerson(personnelTable.convertRowIndexToModel(selectedRow));
-            if (null != p) {
-                selectedUUID = p.getId();
+            Person person = personModel.getPerson(personnelTable.convertRowIndexToModel(selectedRow));
+            if (null != person) {
+                selectedUUID = person.getId();
             }
         }
-        personModel.refreshData();
-        // try to put the focus back on same person if they are still available
+
+        LocationFilterItem locationFilter = getCampaignGui().getActiveLocation();
+
+        List<Person> people = locationFilter.selectPersonnel(getCampaign());
+        personModel.setData(people);
+
         for (int row = 0; row < personnelTable.getRowCount(); row++) {
-            Person p = personModel.getPerson(personnelTable.convertRowIndexToModel(row));
-            if (p.getId().equals(selectedUUID)) {
+            Person person = personModel.getPerson(personnelTable.convertRowIndexToModel(row));
+            if (person != null && person.getId().equals(selectedUUID)) {
                 personnelTable.setRowSelectionInterval(row, row);
                 refreshPersonnelView();
                 break;

@@ -45,6 +45,7 @@ import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
 class PersonnelOptionsModel {
     boolean useTactics;
     boolean useInitiativeBonus;
+    boolean useSensibleTactics;
     boolean useToughness;
     boolean useRandomToughness;
     boolean useArtillery;
@@ -134,6 +135,7 @@ class PersonnelOptionsModel {
     PersonnelOptionsModel(@Nonnull CampaignOptions options) {
         useTactics = options.isUseTactics();
         useInitiativeBonus = options.isUseInitiativeBonus();
+        useSensibleTactics = options.isUseSensibleTactics();
         useToughness = options.isUseToughness();
         useRandomToughness = options.isUseRandomToughness();
         useArtillery = options.isUseArtillery();
@@ -224,6 +226,7 @@ class PersonnelOptionsModel {
     void applyTo(@Nonnull Campaign campaign, @Nonnull CampaignOptions options) {
         options.setUseTactics(useTactics);
         options.setUseInitiativeBonus(useInitiativeBonus);
+        options.setUseSensibleTactics(useSensibleTactics);
         options.setUseToughness(useToughness);
         options.setUseRandomToughness(useRandomToughness);
         options.setUseArtillery(useArtillery);

@@ -1128,7 +1128,7 @@ public class CampaignOptionsPane extends JPanel {
         final String planetId = (planet != null) ? planet.getId() : null;
         final String systemId = (planet != null) ? planet.getParentSystem().getId() : null;
 
-        for (Person person : campaign.getPersonnel()) {
+        for (Person person : campaign.getAllPersonnel()) {
             // Inoculate for current location, if applicable
             if (planet != null) {
                 inoculate(person, planet, planetId, systemId, currentDay, curesBySystem);

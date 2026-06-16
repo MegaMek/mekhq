@@ -34,7 +34,7 @@
 package mekhq.campaign.parts;
 
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
-import static mekhq.utilities.MHQInternationalization.getText;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
@@ -43,9 +43,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.StringJoiner;
 import java.util.UUID;
 
+import jakarta.annotation.Nonnull;
 import megamek.Version;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
@@ -67,6 +69,9 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.location.ILocation;
+import mekhq.campaign.location.IPlace;
+import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.EquipmentPart;
@@ -106,7 +111,7 @@ import org.w3c.dom.NodeList;
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
-public abstract class Part implements IPartWork, ITechnology {
+public abstract class Part implements IPartWork, ITechnology, ILocation {
     private static final MMLogger LOGGER = MMLogger.create(Part.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Parts";
 
@@ -122,6 +127,8 @@ public abstract class Part implements IPartWork, ITechnology {
                                                                     AvailabilityValue.C,
                                                                     AvailabilityValue.C)
                                                               .setStaticTechLevel(SimpleTechLevel.STANDARD);
+
+    private final LocationNode locationNode = new LocationNode(this);
 
     protected String name;
     protected int id;
@@ -255,11 +262,6 @@ public abstract class Part implements IPartWork, ITechnology {
         return campaign;
     }
 
-    @Override
-    public Warehouse getWarehouse() {
-        return campaign.getWarehouse();
-    }
-
     public String getName() {
         return name;
     }
@@ -340,6 +342,10 @@ public abstract class Part implements IPartWork, ITechnology {
         return brandNew;
     }
 
+    public boolean isDamagedBeyondRepair() {
+        return getSkillMin() > SkillType.EXP_LEGENDARY;
+    }
+
     public void setBrandNew(boolean b) {
         this.brandNew = b;
     }
@@ -385,6 +391,40 @@ public abstract class Part implements IPartWork, ITechnology {
 
     public void setOmniPodded(boolean omniPod) {
         this.omniPodded = omniPod;
+    }
+
+    @Override
+    public @Nonnull LocationNode getLocationNode() {
+        return locationNode;
+    }
+
+    /**
+     * A part installed on a unit lives wherever the unit is, so its place resolves through the unit's
+     * {@link LocationNode} chain; spares resolve via their own node.
+     */
+    @Override
+    public @Nullable IPlace getPlace() {
+        Unit unit = getUnit();
+        if (unit != null) {
+            return ILocation.findPlace(unit.getLocationNode());
+        }
+        return ILocation.findPlace(getLocationNode());
+    }
+
+    @Override
+    public Warehouse getWarehouse() {
+        IPlace place = getPlace();
+        return place != null ? place.getWarehouse() : campaign.getWarehouse();
+    }
+
+    @Override
+    public Set<Part> fetchPartsAtLocation() {
+        return Set.of(this);
+    }
+
+    public PartInventory getPartInventory(Part forPart) {
+        IPlace place = getPlace();
+        return place != null ? place.getPartInventory(forPart) : campaign.getPartInventory(forPart);
     }
 
     @Override
@@ -471,8 +511,25 @@ public abstract class Part implements IPartWork, ITechnology {
         if (this.isSalvaging()) {
             int inStock = 0;
             if (this instanceof mekhq.campaign.parts.equipment.AmmoBin ammoBin) {
-                if (campaign.getQuartermaster() != null) {
-                    inStock = campaign.getQuartermaster().getAmmoAvailable(ammoBin.getType());
+                Warehouse localWarehouse = getWarehouse();
+                if (localWarehouse != null) {
+                    megamek.common.equipment.AmmoType ammoType = ammoBin.getType();
+                    boolean useAmmoByType = campaign.getCampaignOptions().isUseAmmoByType();
+                    inStock = localWarehouse.streamSpareParts()
+                                    .filter(p -> p instanceof AmmoStorage
+                                                       && p.isPresent()
+                                                       && !p.isReservedForRefit())
+                                    .mapToInt(p -> {
+                                        AmmoStorage spare = (AmmoStorage) p;
+                                        if (spare.isSameAmmoType(ammoType)) {
+                                            return spare.getShots();
+                                        } else if (useAmmoByType && spare.isCompatibleAmmo(ammoType)) {
+                                            return mekhq.campaign.Quartermaster.convertShots(
+                                                  spare.getType(), spare.getShots(), ammoType);
+                                        }
+                                        return 0;
+                                    })
+                                    .sum();
                 }
             } else if (getWarehouse() != null) {
                 inStock = getWarehouse().getSparePartsCount(this);
@@ -490,7 +547,7 @@ public abstract class Part implements IPartWork, ITechnology {
             toReturn.append("<br>");
         }
 
-        if (getSkillMin() <= SkillType.EXP_LEGENDARY) {
+        if (!isDamagedBeyondRepair()) {
             toReturn.append(getTimeLeft())
                   .append(" minutes")
                   .append(null != getTech() ? " (scheduled)" : "")
@@ -503,7 +560,7 @@ public abstract class Part implements IPartWork, ITechnology {
         } else {
             toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
                   MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
-                  getText("Part.damaged.beyond.repair")));
+                  getTextAt(RESOURCE_BUNDLE, "Part.damaged.beyond.repair")));
         }
         toReturn.append("</html>");
         return toReturn.toString();

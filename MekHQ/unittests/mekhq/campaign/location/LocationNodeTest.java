@@ -32,20 +32,33 @@
  */
 package mekhq.campaign.location;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.ByteArrayInputStream;
+import java.util.Set;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
+import mekhq.campaign.FixedLocation;
+import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.location.LocationNode.LocationManager;
 import mekhq.campaign.universe.PlanetarySystem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.w3c.dom.Node;
 
 public class LocationNodeTest {
 
@@ -227,6 +240,165 @@ public class LocationNodeTest {
 
             assertSame(parentNode, childNode.getParent());
             assertTrue(parentNode.getChildren().contains(childNode));
+        }
+    }
+
+    @Nested
+    class ReconnectChildren {
+
+        Campaign mockCampaign;
+        FixedLocation parentFixed;
+
+        @BeforeEach
+        void setUp() {
+            mockCampaign = mock(Campaign.class);
+            parentFixed = new FixedLocation(mock(PlanetarySystem.class));
+        }
+
+        @Test
+        void parsesCampusAsChildOfParent() throws Exception {
+            String xml = "<locationNodeChildren>"
+                               + "<academyCampus>"
+                               + "<academySet>TestSet</academySet>"
+                               + "<academyName>TestAcademy</academyName>"
+                               + "</academyCampus>"
+                               + "</locationNodeChildren>";
+
+            LocationNode.reconnectChildren(parseXml(xml), parentFixed, mockCampaign);
+
+            Set<LocationNode> children = parentFixed.getLocationNode().getChildren();
+            assertEquals(1, children.size());
+            assertTrue(children.iterator().next().getLocatable() instanceof AcademyCampusLocation);
+        }
+
+        @Test
+        void campusHasCorrectSetAndName() throws Exception {
+            String xml = "<locationNodeChildren>"
+                               + "<academyCampus>"
+                               + "<academySet>TestSet</academySet>"
+                               + "<academyName>TestAcademy</academyName>"
+                               + "</academyCampus>"
+                               + "</locationNodeChildren>";
+
+            LocationNode.reconnectChildren(parseXml(xml), parentFixed, mockCampaign);
+
+            AcademyCampusLocation campus =
+                  (AcademyCampusLocation) parentFixed.getLocationNode().getChildren()
+                                                .iterator().next().getLocatable();
+            assertEquals("TestSet", campus.getAcademySet());
+            assertEquals("TestAcademy", campus.getAcademyName());
+        }
+
+        @Test
+        void parsesNestedCurrentLocationAsCampusChild() throws Exception {
+            when(mockCampaign.getSystemById(any())).thenReturn(mock(PlanetarySystem.class));
+
+            String xml = "<locationNodeChildren>"
+                               + "<academyCampus>"
+                               + "<academySet>TestSet</academySet>"
+                               + "<academyName>TestAcademy</academyName>"
+                               + "<location>"
+                               + "<system>Outreach</system>"
+                               + "<transitTime>5.0</transitTime>"
+                               + "</location>"
+                               + "</academyCampus>"
+                               + "</locationNodeChildren>";
+
+            LocationNode.reconnectChildren(parseXml(xml), parentFixed, mockCampaign);
+
+            AcademyCampusLocation campus =
+                  (AcademyCampusLocation) parentFixed.getLocationNode().getChildren()
+                                                .iterator().next().getLocatable();
+            Set<LocationNode> campusChildren = campus.getLocationNode().getChildren();
+            // campus has 2 children: the Personnel sub-container + the deserialized CurrentLocation
+            assertEquals(2, campusChildren.size());
+            assertTrue(campusChildren.stream().anyMatch(c -> c.getLocatable() instanceof CurrentLocation));
+        }
+
+        @Test
+        void addLocationCalledForNestedCurrentLocation() throws Exception {
+            when(mockCampaign.getSystemById(any())).thenReturn(mock(PlanetarySystem.class));
+
+            String xml = "<locationNodeChildren>"
+                               + "<academyCampus>"
+                               + "<academySet>TestSet</academySet>"
+                               + "<academyName>TestAcademy</academyName>"
+                               + "<location><system>Outreach</system><transitTime>5.0</transitTime></location>"
+                               + "</academyCampus>"
+                               + "</locationNodeChildren>";
+
+            LocationNode.reconnectChildren(parseXml(xml), parentFixed, mockCampaign);
+
+            verify(mockCampaign).addLocation(any(CurrentLocation.class));
+        }
+
+        @Test
+        void skipsUnrecognizedElements() throws Exception {
+            String xml = "<locationNodeChildren>"
+                               + "<unknownTag>someValue</unknownTag>"
+                               + "</locationNodeChildren>";
+
+            assertDoesNotThrow(() ->
+                                     LocationNode.reconnectChildren(parseXml(xml), parentFixed, mockCampaign));
+            assertTrue(parentFixed.getLocationNode().getChildren().isEmpty());
+        }
+
+        private Node parseXml(String xml) throws Exception {
+            DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            return db.parse(new ByteArrayInputStream(xml.getBytes())).getDocumentElement();
+        }
+    }
+
+    /** Tests for {@link ILocation#getPlace()}. */
+    @Nested
+    class GetPlace {
+
+        @Test
+        void returnsNullWithNoAncestors() {
+            ILocation leaf = mock(ILocation.class);
+            LocationNode node = new LocationNode(leaf);
+            when(leaf.getLocationNode()).thenReturn(node);
+            when(leaf.hasLocationNode()).thenReturn(true);
+
+            assertNull(leaf.getPlace());
+        }
+
+        @Test
+        void returnsNullWhenNoIPlaceInChain() {
+            ILocation leaf = mock(ILocation.class);
+            ILocation middle = mock(ILocation.class);
+            LocationNode leafNode = new LocationNode(leaf);
+            LocationNode middleNode = new LocationNode(middle);
+            LocationManager.setLocation(leafNode, middleNode);
+            when(leaf.getLocationNode()).thenReturn(leafNode);
+            when(leaf.hasLocationNode()).thenReturn(true);
+
+            assertNull(leaf.getPlace());
+        }
+
+        @Test
+        void returnsNearestIPlaceAncestor() {
+            PlayerBase base = new PlayerBase(new FixedLocation(mock(mekhq.campaign.universe.PlanetarySystem.class)));
+
+            // Hangar's parent is the base, so walking from the hangar should find the base.
+            assertSame(base, base.getBaseHangar().getPlace());
+        }
+
+        @Test
+        void sparePart_inBaseWarehouse_returnsBase() {
+            PlayerBase base = new PlayerBase(new FixedLocation(mock(mekhq.campaign.universe.PlanetarySystem.class)));
+
+            // Warehouse's parent is the base.
+            assertSame(base, base.getBaseWarehouse().getPlace());
+        }
+
+        @Test
+        void locationInBaseHangar_chainReachesBase() {
+            PlayerBase base = new PlayerBase(new FixedLocation(mock(mekhq.campaign.universe.PlanetarySystem.class)));
+
+            // The hangar is below the base: hangar.parent = base.
+            // The hangar itself is a concrete ILocation — getPlace() should find the base.
+            assertSame(base, base.getBaseHangar().getPlace());
         }
     }
 }

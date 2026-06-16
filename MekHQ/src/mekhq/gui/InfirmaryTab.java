@@ -101,7 +101,6 @@ public final class InfirmaryTab extends CampaignGuiTab {
     //region Constructors
     public InfirmaryTab(CampaignGUI gui, String name) {
         super(gui, name);
-        MekHQ.registerHandler(this);
     }
     //endregion Constructors
 

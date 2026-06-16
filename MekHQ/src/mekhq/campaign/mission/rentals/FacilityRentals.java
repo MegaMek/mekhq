@@ -328,7 +328,7 @@ public class FacilityRentals {
 
         List<Mission> activeMissions = campaign.getActiveMissions(false);
         Money totalAvailableFunds = finances.getBalance();
-        Collection<Unit> units = campaign.getHangar().getUnits();
+        Collection<Unit> units = campaign.getAllHangar().getUnits();
 
         Money totalCharge = Money.zero();
 

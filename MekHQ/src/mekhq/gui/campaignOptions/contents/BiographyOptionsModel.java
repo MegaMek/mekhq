@@ -57,6 +57,8 @@ class BiographyOptionsModel {
     boolean announceBirthdays;
     boolean announceChildBirthdays;
     boolean announceRecruitmentAnniversaries;
+    boolean announceRetireeDeath;
+    boolean announceRetireeDeathExpanded;
     boolean showLifeEventDialogBirths;
     boolean showLifeEventDialogComingOfAge;
     boolean showLifeEventDialogCelebrations;
@@ -113,6 +115,8 @@ class BiographyOptionsModel {
         announceBirthdays = options.isAnnounceBirthdays();
         announceChildBirthdays = options.isAnnounceChildBirthdays();
         announceRecruitmentAnniversaries = options.isAnnounceRecruitmentAnniversaries();
+        announceRetireeDeath = options.isAnnounceRetireeDeath();
+        announceRetireeDeathExpanded = options.isAnnounceRetireeDeathExpanded();
         showLifeEventDialogBirths = options.isShowLifeEventDialogBirths();
         showLifeEventDialogComingOfAge = options.isShowLifeEventDialogComingOfAge();
         showLifeEventDialogCelebrations = options.isShowLifeEventDialogCelebrations();
@@ -170,6 +174,8 @@ class BiographyOptionsModel {
         options.setAnnounceBirthdays(announceBirthdays);
         options.setAnnounceChildBirthdays(announceChildBirthdays);
         options.setAnnounceRecruitmentAnniversaries(announceRecruitmentAnniversaries);
+        options.setAnnounceRetireeDeath(announceRetireeDeath);
+        options.setAnnounceRetireeDeathExpanded(announceRetireeDeathExpanded);
         options.setShowLifeEventDialogBirths(showLifeEventDialogBirths);
         options.setShowLifeEventDialogComingOfAge(showLifeEventDialogComingOfAge);
         options.setShowLifeEventDialogCelebrations(showLifeEventDialogCelebrations);

@@ -49,18 +49,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
-import javax.swing.BorderFactory;
-import javax.swing.DefaultCellEditor;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
+import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 
@@ -109,7 +98,7 @@ final class PlanetarySystemSystemEventsPanel extends JPanel {
         tblSystemEvents.setName("tblPlanetarySystemSystemEvents");
         tblSystemEvents.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblSystemEvents.setRowHeight(UIUtil.scaleForGUI(22));
-            configureChargeColumns();
+        configureChargeColumns();
         tblSystemEvents.getSelectionModel().addListSelectionListener(evt -> updateButtonState());
         add(createTitledComponentPane("PlanetarySystemEditorDialog.systemEvents.events",
               new FastJScrollPane(tblSystemEvents)), BorderLayout.CENTER);
