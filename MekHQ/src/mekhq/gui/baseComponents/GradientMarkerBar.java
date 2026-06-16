@@ -97,8 +97,8 @@ public class GradientMarkerBar extends JComponent {
     /**
      * A single labeled point on the track.
      *
-     * @param value      the value the marker represents, in the same units as the gradient range; values outside the
-     *                   gradient range are pinned to the nearest overshoot cap
+     * @param value      the value the marker represents, in the same units as the gradient range; the track stretches
+     *                   to keep values outside the gradient range in view, so every marker stays on the track
      * @param label      an optional short label drawn next to the marker, or {@code null} for no label
      * @param color      the color used to draw the marker handle
      * @param style      whether the marker is drawn as a {@link MarkerStyle#SOLID} handle or a {@link MarkerStyle#TICK}

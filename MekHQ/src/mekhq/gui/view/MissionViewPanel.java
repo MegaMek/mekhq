@@ -530,10 +530,6 @@ public class MissionViewPanel extends JScrollablePanel {
         lblLocation = new JLabel();
         txtLocation = new JLabel();
         /* AtB Contract Parameters */
-        lblStartDate = new JLabel();
-        txtStartDate = new JLabel();
-        lblEndDate = new JLabel();
-        txtEndDate = new JLabel();
         lblPayout = new JLabel();
         txtPayout = new JLabel();
         lblCommand = new JLabel();
@@ -790,12 +786,12 @@ public class MissionViewPanel extends JScrollablePanel {
     }
 
     /**
-     * Adds a component that spans both stat columns and is not part of the label/value grid (the status header and the
-     * belligerents panel).
+     * Adds a component that spans both stat columns and is not part of the label/value grid (currently the belligerents
+     * panel).
      *
      * @param component the component to add
      * @param gridY     the grid row to place it on
-     * @param anchor    the {@link GridBagConstraints} anchor (the status is left-aligned, the belligerents centered)
+     * @param anchor    the {@link GridBagConstraints} anchor used to position the component within its row
      */
     private void addHeaderRow(JComponent component, int gridY, int anchor) {
         GridBagConstraints gbc = new GridBagConstraints();

@@ -228,8 +228,8 @@ public class ContractMeterBar extends JPanel {
      * @return the configured gauge
      */
     public static @Nonnull ContractMeterBar timeline(final @Nonnull LocalDate startDate,
-          final @Nonnull LocalDate endDate, final @Nonnull LocalDate currentDate, final String startLabel,
-          final String endLabel, final String currentLabel) {
+          final @Nonnull LocalDate endDate, final @Nonnull LocalDate currentDate, final @Nonnull String startLabel,
+          final @Nonnull String endLabel, final @Nonnull String currentLabel) {
         final double start = startDate.toEpochDay();
         final double end = endDate.toEpochDay();
         final double current = currentDate.toEpochDay();
