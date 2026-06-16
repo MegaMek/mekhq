@@ -85,9 +85,9 @@ public class ContractMeterBar extends JPanel {
 
     /** Deep red for a low or negative score; shared with {@link MoraleBar}'s palette for visual consistency. */
     private static final Color DEEP_RED = new Color(0xA8, 0x12, 0x12);
-    /** Gold for the mid range of the gradient. */
+    /** Gold for the mid range of the gradient; shared with {@link MoraleBar}'s palette for visual consistency. */
     private static final Color GOLD = new Color(0xE8, 0xC4, 0x0A);
-    /** Green for a score at the target; the gradient resolves here. */
+    /** Green for a score at the target; shared with {@link MoraleBar}'s palette for visual consistency. */
     private static final Color GREEN = new Color(0x36, 0xB3, 0x2B);
     /** Cool azure accent for the current-value marker, chosen to stand out against the warm red-gold-green gradient. */
     private static final Color CURRENT_MARKER_COLOR = new Color(0x29, 0xB6, 0xF6);
