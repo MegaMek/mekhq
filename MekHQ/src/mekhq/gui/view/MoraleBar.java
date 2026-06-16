@@ -86,6 +86,10 @@ public class MoraleBar extends JPanel {
      */
     private final SegmentedBar bar = new SegmentedBar();
 
+    /** The title drawn above the bar; kept so the component tooltip can be forwarded to it. */
+    private final JLabel titleLabel = new JLabel(getTextAt(RESOURCE_BUNDLE, "contractMoraleBar.title.text"),
+          SwingConstants.CENTER);
+
     /**
      * Creates a morale bar for the given morale level, with a label drawn beneath the active segment.
      *
@@ -97,8 +101,7 @@ public class MoraleBar extends JPanel {
         // The segments sit at the top of the wrapped bar, so the title is placed directly above them with no extra gap.
         super(new BorderLayout());
         setOpaque(false);
-        add(new JLabel(getTextAt(RESOURCE_BUNDLE, "contractMoraleBar.title.text"), SwingConstants.CENTER),
-              BorderLayout.NORTH);
+        add(titleLabel, BorderLayout.NORTH);
         add(bar, BorderLayout.CENTER);
 
         final AtBMoraleLevel[] levels = AtBMoraleLevel.values();
@@ -113,14 +116,17 @@ public class MoraleBar extends JPanel {
     }
 
     /**
-     * Forwards the tooltip to the wrapped gauge so that the area around the segments (gaps and the label) shows this
-     * fallback tooltip, while individual segments keep their own per-level tooltips.
+     * Forwards the tooltip across the whole component: to the wrapped gauge (so the area around the segments shows this
+     * fallback while individual segments keep their own per-level tooltips), to the title above it, and to the panel
+     * itself (covering any gaps), so the tooltip shows wherever the player hovers the bar.
      *
      * @param text the tooltip text, or {@code null} for none
      */
     @Override
     public void setToolTipText(final @Nullable String text) {
+        super.setToolTipText(text);
         bar.setToolTipText(text);
+        titleLabel.setToolTipText(text);
     }
 
     /**

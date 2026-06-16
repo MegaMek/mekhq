@@ -300,7 +300,9 @@ public class GradientMarkerBar extends JComponent {
             return 0;
         }
         final int left = padding();
-        final int right = getWidth() - padding();
+        // Clamp the right edge to at least the left edge: a layout can size the component narrower than 2 x padding
+        // (minimum sizes are advisory), which would otherwise make right < left and invert the value-to-x mapping.
+        final int right = Math.max(getWidth() - padding(), left);
         final double min = displayMin();
         final double max = displayMax();
         if (max <= min) {

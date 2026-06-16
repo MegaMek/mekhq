@@ -233,6 +233,19 @@ class GradientMarkerBarTest {
         assertDoesNotThrow(() -> bar.valueToX(5));
     }
 
+    @Test
+    void narrowComponentDoesNotInvertMapping() {
+        // A layout can size the component narrower than 2 x padding (minimum sizes are advisory). The value-to-x
+        // mapping must not invert in that case: a higher value must never map to the left of a lower one.
+        final GradientMarkerBar bar = new GradientMarkerBar();
+        bar.setSize(4, HEIGHT);
+        bar.setGradientRange(0, 10);
+
+        final int low = bar.valueToX(0);
+        final int high = bar.valueToX(10);
+        assertTrue(high >= low, "narrow component should collapse the mapping, not invert it");
+    }
+
     // endregion valueToX - degenerate ranges
 
     // region lenient setters
@@ -249,11 +262,19 @@ class GradientMarkerBarTest {
     @Test
     void markersListIsDefensivelyCopied() {
         final GradientMarkerBar bar = sizedBar();
+        bar.setGradientRange(0, 10);
         final java.util.List<Marker> source = new java.util.ArrayList<>();
         source.add(new Marker(5, null, Color.WHITE, MarkerStyle.SOLID, false));
         bar.setMarkers(source);
-        // Mutating the original list after the call must not affect the component.
-        assertDoesNotThrow(source::clear);
+
+        final double maxBeforeMutation = bar.displayMax();
+
+        // Mutating the original list after the call must not affect the component's derived state. Adding a marker
+        // beyond the gradient range would extend displayMax if the bar had retained the same list reference.
+        source.add(new Marker(100, null, Color.WHITE, MarkerStyle.SOLID, false));
+
+        assertEquals(maxBeforeMutation, bar.displayMax(),
+              "mutating the source list after setMarkers must not change the bar's state");
     }
 
     @Test

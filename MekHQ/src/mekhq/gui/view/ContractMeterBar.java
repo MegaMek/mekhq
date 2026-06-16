@@ -233,12 +233,13 @@ public class ContractMeterBar extends JPanel {
         final double start = startDate.toEpochDay();
         final double end = endDate.toEpochDay();
         final double current = currentDate.toEpochDay();
+        final long daysLeft = Math.max(0, endDate.toEpochDay() - currentDate.toEpochDay());
         final List<Marker> markers = new ArrayList<>(1);
         // The track itself runs from start to end (the dates are carried in the title), so the only marker is the bold
         // "today" marker that slides along it; no separate start or end ticks are drawn.
         markers.add(new Marker(current, currentLabel, CURRENT_MARKER_COLOR, MarkerStyle.SOLID, true, true));
         final String title = getFormattedTextAt(RESOURCE_BUNDLE, "contractTimelineBar.title.text", startLabel,
-              endLabel);
+              endLabel, daysLeft);
         final String tooltip = getFormattedTextAt(RESOURCE_BUNDLE, "contractTimelineBar.tooltip", startLabel, endLabel,
               currentLabel);
         return new ContractMeterBar(title, start, end, new Color[] { NEUTRAL_TRACK }, null, null, markers, tooltip);
