@@ -83,12 +83,6 @@ public class AdvancedMedicalAlternateHealing {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.AdvancedMedicalAlternateHealing";
     private static final int PROSTHETIC_PENALTY = 4; // Interstellar Operations page 70
 
-    private static Campaign campaign;
-
-    public static void setCampaign(Campaign campaign) {
-        AdvancedMedicalAlternateHealing.campaign = campaign;
-    }
-
     /**
      * Processes the start-of-day healing for a given patient.
      *
@@ -96,31 +90,24 @@ public class AdvancedMedicalAlternateHealing {
      * unassisted based on the presence of a doctor, and then performs the appropriate healing checks. It also handles
      * optional fatigue changes and the use of medical Edge.</p>
      *
-     * @param today        the current in-game date
-     * @param isUseFatigue {@code true} if fatigue effects from healing should be applied; {@code false} otherwise
-     * @param fatigueRate  the user-defined rate fatigue is gained
-     * @param patient      the person undergoing healing
-     * @param doctor       the doctor providing treatment, or {@code null} if the patient is healing naturally
+     * @param campaign the {@link Campaign} context
+     * @param patient  the person undergoing healing
+     * @param doctor   the doctor providing treatment, or {@code null} if the patient is healing naturally
      *
      * @author Illiani
      * @since 0.50.10
      */
-    public static void processNewDay(LocalDate today, boolean isUseFatigue, int fatigueRate, Person patient,
+    public static void processNewDay(Campaign campaign, Person patient,
           @Nullable Person doctor) {
         // Modifiers
         List<TargetRollModifier> modifiers = getSPAModifiers(patient);
         Set<BodyLocation> prostheticPenalties = getProstheticPenalties(patient);
 
         // Healing
-        boolean isUseEdge = campaign.getCampaignOptions().isUseSupportEdge();
         if (doctor == null) {
-            boolean patientUsesEdge = isUseEdge && patient.getOptions().booleanOption(EDGE_MEDICAL);
-            performUnassistedHealingCheck(today, isUseFatigue, fatigueRate, patient, modifiers, prostheticPenalties,
-                  patientUsesEdge);
+            performUnassistedHealingCheck(campaign, patient, modifiers, prostheticPenalties);
         } else {
-            boolean doctorUsesEdge = isUseEdge && doctor.getOptions().booleanOption(EDGE_MEDICAL);
-            performAssistedHealingCheck(today, isUseFatigue, fatigueRate, patient, doctor, modifiers,
-                  prostheticPenalties, doctorUsesEdge);
+            performAssistedHealingCheck(campaign, patient, doctor, modifiers, prostheticPenalties);
         }
     }
 
@@ -191,21 +178,16 @@ public class AdvancedMedicalAlternateHealing {
      * <p>A defensive copy of the injury list is used because successful healing may remove injuries from the
      * underlying collection.</p>
      *
-     * @param today               the current in-game date
-     * @param isUseFatigue        {@code true} if fatigue effects from healing should be applied; {@code false}
-     *                            otherwise
-     * @param fatigueRate         the user-defined rate fatigue is gained
+     * @param campaign            the {@link Campaign} context
      * @param patient             the person attempting to heal naturally
      * @param modifiers           the list of SPA-based and other modifiers applied to the natural healing roll
      * @param prostheticPenalties the set of body locations that should incur a prosthetic penalty
-     * @param useEdge             {@code true} if the patient is allowed to use medical Edge for rerolls; {@code false}
-     *                            otherwise
      *
      * @author Illiani
      * @since 0.50.10
      */
-    public static void performUnassistedHealingCheck(LocalDate today, boolean isUseFatigue, int fatigueRate,
-          Person patient, List<TargetRollModifier> modifiers, Set<BodyLocation> prostheticPenalties, boolean useEdge) {
+    private static void performUnassistedHealingCheck(Campaign campaign, Person patient,
+          List<TargetRollModifier> modifiers, Set<BodyLocation> prostheticPenalties) {
 
         PersonnelOptions personnelOptions = patient.getOptions();
         boolean hasTraumaSurgeon = personnelOptions.booleanOption(UNOFFICIAL_TRAUMA_SURGEON);
@@ -229,10 +211,13 @@ public class AdvancedMedicalAlternateHealing {
                       hasProthesisTechnician);
                 miscPenalty += hasHypochondriac ? 1 : 0;
 
+                boolean useEdge = campaign.getCampaignOptions().isUseSupportEdge();
+                useEdge = useEdge && patient.getOptions().booleanOption(EDGE_MEDICAL);
                 int marginOfSuccess = getMarginOfSuccessForUnassistedHealing(patient, modifiers, miscPenalty, useEdge);
 
+                LocalDate today = campaign.getLocalDate();
                 if (injury.getTime() <= 0) { // Time to try and fully heal the injury
-                    processHealingEffects(isUseFatigue, fatigueRate, patient, injury, marginOfSuccess, today);
+                    processHealingEffects(campaign, patient, injury, marginOfSuccess);
                     processTaskAwardsAndPersonnelLogUpdates(today, patient, null, injury, marginOfSuccess);
                 } else if (marginOfSuccess <= -6) { // The injury became permanent
                     injury.setPermanent(true);
@@ -351,23 +336,17 @@ public class AdvancedMedicalAlternateHealing {
      * <p>A defensive copy of the injury list is used because successful healing may remove injuries from the
      * underlying collection.</p>
      *
-     * @param today               the current in-game date
-     * @param isUseFatigue        {@code true} if fatigue effects from healing should be applied; {@code false}
-     *                            otherwise
-     * @param fatigueRate         the user-defined rate fatigue is gained
+     * @param campaign            the {@link Campaign} context
      * @param patient             the person being treated
      * @param doctor              the doctor performing the assisted healing
      * @param modifiers           the list of modifiers applied to the surgery check
      * @param prostheticPenalties the set of body locations that should incur a prosthetic penalty
-     * @param useEdge             {@code true} if the doctor is allowed to use medical Edge for rerolls; {@code false}
-     *                            otherwise
      *
      * @author Illiani
      * @since 0.50.10
      */
-    public static void performAssistedHealingCheck(LocalDate today, boolean isUseFatigue, int fatigueRate,
-          Person patient, Person doctor, List<TargetRollModifier> modifiers, Set<BodyLocation> prostheticPenalties,
-          boolean useEdge) {
+    private static void performAssistedHealingCheck(Campaign campaign, Person patient, Person doctor,
+          List<TargetRollModifier> modifiers, Set<BodyLocation> prostheticPenalties) {
 
         PersonnelOptions doctorPersonnelOptions = doctor.getOptions();
         boolean hasHolisticCareSPA = doctorPersonnelOptions.booleanOption(UNOFFICIAL_HOLISTIC_CARE);
@@ -394,9 +373,13 @@ public class AdvancedMedicalAlternateHealing {
                           hasTraumaSurgeon, hasProthesisTechnician);
                     miscPenalty += hasHypochondriac ? 1 : 0;
 
-                    int marginOfSuccess = getMarginOfSuccessForAssistedHealing(doctor, modifiers, miscPenalty, useEdge);
+                    boolean useEdge = campaign.getCampaignOptions().isUseSupportEdge();
+                    useEdge = useEdge && doctor.getOptions().booleanOption(EDGE_MEDICAL);
+                    int marginOfSuccess = getMarginOfSuccessForAssistedHealing(
+                          doctor, campaign, modifiers, miscPenalty, useEdge);
 
-                    processHealingEffects(isUseFatigue, fatigueRate, patient, injury, marginOfSuccess, today);
+                    LocalDate today = campaign.getLocalDate();
+                    processHealingEffects(campaign, patient, injury, marginOfSuccess);
                     processTaskAwardsAndPersonnelLogUpdates(today, patient, doctor, injury, marginOfSuccess);
                 }
             }
@@ -412,6 +395,7 @@ public class AdvancedMedicalAlternateHealing {
      * original.</p>
      *
      * @param doctor      the person performing the surgery check
+     * @param campaign    the {@link Campaign} context
      * @param modifiers   the list of modifiers applied to the surgery roll
      * @param miscPenalty the combined penalty for this healing attempt
      * @param useEdge     {@code true} if medical Edge may be used to reroll a potentially permanent injury;
@@ -422,9 +406,9 @@ public class AdvancedMedicalAlternateHealing {
      * @author Illiani
      * @since 0.50.10
      */
-    private static int getMarginOfSuccessForAssistedHealing(Person doctor, List<TargetRollModifier> modifiers,
-          int miscPenalty, boolean useEdge) {
-        SkillCheck skillCheck = doctor.checkSkill(S_SURGERY)
+    private static int getMarginOfSuccessForAssistedHealing(Person doctor, Campaign campaign,
+          List<TargetRollModifier> modifiers, int miscPenalty, boolean useEdge) {
+        SkillCheck skillCheck = doctor.checkSkill(S_SURGERY, campaign)
                                       .withMiscModifier(miscPenalty)
                                       .withExternalModifiers(modifiers);
         ActionCheckResult actionCheckResult = skillCheck.resolve(false, getTextAt(RESOURCE_BUNDLE,
@@ -488,8 +472,7 @@ public class AdvancedMedicalAlternateHealing {
      * fatigue is changed. If the effect indicates recovery, the injury is removed. If the effect indicates permanence,
      * the injury is marked permanent. Otherwise, the configured delay adjusts the injury's remaining healing time.</p>
      *
-     * @param isUseFatigue    {@code true} if fatigue effects from healing should be applied; {@code false} otherwise
-     * @param fatigueRate     the user-defined rate fatigue is gained
+     * @param campaign        the {@link Campaign} context
      * @param patient         the person undergoing healing
      * @param injury          the injury being updated
      * @param marginOfSuccess the final margin of success for the healing attempt
@@ -497,15 +480,15 @@ public class AdvancedMedicalAlternateHealing {
      * @author Illiani
      * @since 0.50.10
      */
-    private static void processHealingEffects(boolean isUseFatigue, int fatigueRate, Person patient, Injury injury,
-          int marginOfSuccess, LocalDate today) {
+    private static void processHealingEffects(Campaign campaign, Person patient, Injury injury, int marginOfSuccess) {
         HealingMarginOfSuccessEffects healingEffect = getEffectFromHealingAttempt(marginOfSuccess);
-        if (isUseFatigue) {
+        if (campaign.getCampaignOptions().isUseFatigue()) {
+            int fatigueRate = campaign.getCampaignOptions().getFatigueRate();
             patient.changeFatigue(healingEffect.getFatigueDamage() * fatigueRate);
         }
 
         if (healingEffect.isHealed()) {
-            patient.removeInjury(injury, today);
+            patient.removeInjury(injury, campaign.getLocalDate());
 
             if (patient.getInjuries().isEmpty()) {
                 if (!(null == patient.getDoctorId()) && patient.getPrisonerStatus().isFreeOrBondsman()) {
