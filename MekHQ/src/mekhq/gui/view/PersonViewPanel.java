@@ -131,6 +131,7 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.PersonnelEventLogModel;
 import mekhq.gui.model.PersonnelKillLogModel;
 import mekhq.gui.utilities.MarkdownRenderer;
@@ -1203,15 +1204,8 @@ public class PersonViewPanel extends JScrollablePanel {
                 lblOrigin2.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        PlanetarySystem system = person.getOriginPlanet().getParentSystem();
-                        // Stay on the interstellar map if their origin planet is the primary planet...
-                        if (system.getPrimaryPlanet().equals(person.getOriginPlanet())) {
-                            gui.getMapTab().switchSystemsMap(system);
-                        } else {
-                            // ...otherwise, dive on in to the system view!
-                            gui.getMapTab().switchPlanetaryMap(person.getOriginPlanet());
-                        }
-                        gui.setSelectedTab(gui.getMapTab());
+                        gui.getNavigationTab().showPlanet(person.getOriginPlanet());
+                        gui.setSelectedTab(gui.getNavigationTab());
                     }
                 });
             } else {

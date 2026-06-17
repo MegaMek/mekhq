@@ -541,7 +541,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public String getDesc() {
-        if (isSalvaging()) {
+        if (isDamagedBeyondRepair() || isSalvaging()) {
             return super.getDesc();
         }
 
