@@ -44,6 +44,7 @@ import java.util.stream.Collectors;
 import megamek.Version;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -56,14 +57,40 @@ public class AbstractMission {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.AbstractMission";
 
     private String name;
-    private String systemId;
-
-    private MissionStatus status = MissionStatus.ACTIVE;
-    private String description;
-    private String type;
-    private final List<Scenario> scenarios = new ArrayList<>();
     private int id = -1;
+    private MissionStatus status = MissionStatus.ACTIVE;
+    private String type;
+    private String description;
+
+    private String systemId;
     private String legacyPlanetName;
+
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private int lengthInMonths;
+
+    private String employer;
+
+    private double paymentMultiplier;
+    private ContractCommandRights commandRights;
+    private int overheadCompensation;
+    private int straightSupport;
+    private int battleLossCompensation;
+    private int salvagePercent;
+    private boolean salvageExchange;
+    private int transportCompensation;
+
+    private boolean mrbcFee;
+    private int advancePercent;
+    private int signingBonus;
+
+    private int hospitalBedsRented;
+    private int kitchensRented;
+    private int holdingCellsRented;
+
+    private final List<Scenario> scenarios = new ArrayList<>();
+
+    public final static int MRBC_FEE_PERCENTAGE = 5;
 
     public AbstractMission() {}
 
@@ -137,11 +164,49 @@ public class AbstractMission {
      *
      * @return the number and corresponding length of the contract in months as an integer
      */
-    public int getLength() {
-        // Missions don't have durations, so we treat it as always being 1 month long. This only really matters for
-        // faction standing.
-        return 1;
+    public int getLengthInMonths() {
+        return lengthInMonths;
     }
+
+    public void setLengthInMonths(int lengthInMonths) {
+        this.lengthInMonths = lengthInMonths;
+    }
+
+    public LocalDate getEndingDate() {
+        return endDate;
+    }
+
+    public void setEndingDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    /**
+     * This sets the Start Date and End Date of the Contract based on the length of the contract and the starting date
+     * provided
+     *
+     * @param startDate the date the contract starts at
+     */
+    public void setStartAndEndDate(LocalDate startDate) {
+        this.startDate = startDate;
+        this.endDate = startDate.plusMonths(getLengthInMonths());
+    }
+
+    public String getEmployer() {
+        return employer;
+    }
+
+    public void setEmployer(String employer) {
+        this.employer = employer;
+    }
+
 
     public String getDescription() {
         return description;
@@ -214,6 +279,142 @@ public class AbstractMission {
 
     public void setLegacyPlanetName(String legacyPlanetName) {
         this.legacyPlanetName = legacyPlanetName;
+    }
+
+    public int getSalvagePercent() {
+        return salvagePercent;
+    }
+
+    public void setSalvagePercent(int salvagePercent) {
+        this.salvagePercent = salvagePercent;
+    }
+
+    public String getSalvagePercentString() {
+        return getSalvagePercent() + "%";
+    }
+
+    public boolean canSalvage() {
+        return getSalvagePercent() > 0;
+    }
+
+    public double getPaymentMultiplier() {
+        return paymentMultiplier;
+    }
+
+    public void setPaymentMultiplier(double paymentMultiplier) {
+        this.paymentMultiplier = paymentMultiplier;
+    }
+
+    public ContractCommandRights getCommandRights() {
+        return commandRights;
+    }
+
+    public void setCommandRights(ContractCommandRights commandRights) {
+        this.commandRights = commandRights;
+    }
+
+    public int getOverheadCompensation() {
+        return overheadCompensation;
+    }
+
+    public void setOverheadCompensation(int overheadCompensation) {
+        this.overheadCompensation = overheadCompensation;
+    }
+
+    public int getStraightSupport() {
+        return straightSupport;
+    }
+
+    public void setStraightSupport(int straightSupport) {
+        this.straightSupport = Math.clamp(straightSupport, 0, 100);
+    }
+
+    public String getStraightSupportString() {
+        return getStraightSupport() + "%";
+    }
+
+    public int getBattleLossCompensation() {
+        return battleLossCompensation;
+    }
+
+    public void setBattleLossCompensation(int battleLossCompensation) {
+        this.battleLossCompensation = Math.clamp(battleLossCompensation, 0, 100);
+    }
+
+    public String getBattleLossCompString() {
+        return getBattleLossCompensation() + "%";
+    }
+
+    public boolean isSalvageExchange() {
+        return salvageExchange;
+    }
+
+    public void setSalvageExchange(boolean salvageExchange) {
+        this.salvageExchange = salvageExchange;
+    }
+
+    public int getTransportCompensation() {
+        return transportCompensation;
+    }
+
+    public void setTransportCompensation(int transportCompensation) {
+        this.transportCompensation = transportCompensation;
+    }
+
+    public String getTransportCompString() {
+        return getTransportCompensation() + "%";
+    }
+
+    public boolean isMRBCFee() {
+        return mrbcFee;
+    }
+
+    public void setMRBCFee(boolean mrbcFee) {
+        this.mrbcFee = mrbcFee;
+    }
+
+    public int getMRBCFeePercentage() {
+        return MRBC_FEE_PERCENTAGE;
+    }
+
+    public int getAdvancePercent() {
+        return advancePercent;
+    }
+
+    public void setAdvancePercent(int advancePercent) {
+        this.advancePercent = advancePercent;
+    }
+
+    public int getSigningBonus() {
+        return signingBonus;
+    }
+
+    public void setSigningBonus(int signingBonus) {
+        this.signingBonus = signingBonus;
+    }
+
+    public int getHospitalBedsRented() {
+        return hospitalBedsRented;
+    }
+
+    public void setHospitalBedsRented(int hospitalBedsRented) {
+        this.hospitalBedsRented = hospitalBedsRented;
+    }
+
+    public int getKitchensRented() {
+        return kitchensRented;
+    }
+
+    public void setKitchensRented(int kitchensRented) {
+        this.kitchensRented = kitchensRented;
+    }
+
+    public int getHoldingCellsRented() {
+        return holdingCellsRented;
+    }
+
+    public void setHoldingCellsRented(int holdingCellsRented) {
+        this.holdingCellsRented = holdingCellsRented;
     }
 
     /**

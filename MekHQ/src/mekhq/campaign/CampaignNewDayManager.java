@@ -1208,7 +1208,7 @@ public class CampaignNewDayManager {
                         int remainingMonths = contract.getMonthsLeft(adjustedDate);
                         Money finalPayout = contract.getMonthlyPayOut().multipliedBy(remainingMonths);
                         contract.setRoutedPayout(finalPayout);
-                        contract.setEndDate(adjustedDate);
+                        contract.setEndingDate(adjustedDate);
                     }
                 }
             }

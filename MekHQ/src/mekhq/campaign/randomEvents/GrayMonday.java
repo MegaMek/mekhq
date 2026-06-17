@@ -94,13 +94,13 @@ public class GrayMonday {
                     LocalDate startDate = contract.getStartDate();
                     if (!startDate.isBefore(today)) {
                         contract.setBaseAmount(Money.of(0));
-                        contract.setOverheadComp(0);
-                        contract.setBattleLossComp(0);
+                        contract.setOverheadCompensation(0);
+                        contract.setBattleLossCompensation(0);
                         contract.setStraightSupport(0);
-                        contract.setTransportComp(0);
+                        contract.setTransportCompensation(0);
                         contract.calculateContract(campaign);
 
-                        contract.setSalvagePct(100);
+                        contract.setSalvagePercent(100);
                     }
                 }
 

@@ -223,7 +223,7 @@ public class ContractMarketDialog extends JDialog {
         spnAdvance.addChangeListener(evt -> {
             advance = (Integer) spnAdvance.getValue();
             for (Contract c : contractMarket.getContracts()) {
-                c.setAdvancePct(advance);
+                c.setAdvancePercent(advance);
                 c.calculateContract(campaign);
             }
             if (contractView != null) {
@@ -235,7 +235,7 @@ public class ContractMarketDialog extends JDialog {
         spnSigningBonus.addChangeListener(evt -> {
             signingBonus = (Integer) spnSigningBonus.getValue();
             for (Contract c : contractMarket.getContracts()) {
-                c.setSigningBonusPct(signingBonus);
+                c.setSigningBonus(signingBonus);
                 c.calculateContract(campaign);
             }
             if (contractView != null) {
@@ -324,8 +324,8 @@ public class ContractMarketDialog extends JDialog {
             }
             contract.setStartDate(null);
             contract.setMRBCFee(payMRBC);
-            contract.setAdvancePct(advance);
-            contract.setSigningBonusPct(signingBonus);
+            contract.setAdvancePercent(advance);
+            contract.setSigningBonus(signingBonus);
             contract.calculateContract(campaign);
 
             Vector<String> row = new Vector<>();
@@ -352,9 +352,9 @@ public class ContractMarketDialog extends JDialog {
             final int days = (int) Math.ceil(path.getTotalTime(contract.getStartDate(),
                   campaign.getCurrentLocation().getTransitTime(), isUseCommandCircuit));
             row.add(Integer.toString(days));
-            row.add(String.valueOf(contract.getLength()));
+            row.add(String.valueOf(contract.getLengthInMonths()));
             row.add(contract.getTransportCompString());
-            row.add(contract.getSalvagePctString());
+            row.add(contract.getSalvagePercentString());
             row.add(contract.getStraightSupportString());
             row.add(contract.getBattleLossCompString());
             row.add(contract.getEstimatedTotalProfit(campaign).toAmountAndSymbolString());
@@ -509,8 +509,8 @@ public class ContractMarketDialog extends JDialog {
                                                0);
             contract.setStartDate(null);
             contract.setMRBCFee(payMRBC);
-            contract.setAdvancePct(advance);
-            contract.setSigningBonusPct(signingBonus);
+            contract.setAdvancePercent(advance);
+            contract.setSigningBonus(signingBonus);
 
             contract.calculateContract(campaign);
             Vector<String> row = new Vector<>();
@@ -521,9 +521,9 @@ public class ContractMarketDialog extends JDialog {
             final int days = (int) Math.ceil(path.getTotalTime(contract.getStartDate(),
                   campaign.getCurrentLocation().getTransitTime(), finalIsUseCommandCircuit));
             row.add(Integer.toString(days));
-            row.add(String.valueOf(contract.getLength()));
+            row.add(String.valueOf(contract.getLengthInMonths()));
             row.add(contract.getTransportCompString());
-            row.add(contract.getSalvagePctString());
+            row.add(contract.getSalvagePercentString());
             row.add(contract.getStraightSupportString());
             row.add(contract.getBattleLossCompString());
             row.add(contract.getEstimatedTotalProfit(campaign).toAmountAndSymbolString());

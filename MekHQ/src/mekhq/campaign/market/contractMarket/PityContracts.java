@@ -179,16 +179,16 @@ public class PityContracts {
         contract.setContractType(AtBContractType.PIRATE_HUNTING);
 
         int salvageRoll = d6(1) * 10;
-        contract.setSalvagePct(salvageRoll);
+        contract.setSalvagePercent(salvageRoll);
 
         int supportRoll = d6(1) * 10;
         contract.setStraightSupport(supportRoll);
-        contract.setOverheadComp(OH_NONE);
+        contract.setOverheadCompensation(OH_NONE);
 
         int battleLossRoll = d6(1) * 10;
-        contract.setBattleLossComp(battleLossRoll);
+        contract.setBattleLossCompensation(battleLossRoll);
 
         int transportRoll = (4 + d6(1)) * 10;
-        contract.setTransportComp(transportRoll);
+        contract.setTransportCompensation(transportRoll);
     }
 }

@@ -493,44 +493,44 @@ public abstract class AbstractContractMarket {
         contract.setSalvageExchange(false);
         int roll = min(d6(2) + mod, 13);
         if (roll < 2) {
-            contract.setSalvagePct(0);
+            contract.setSalvagePercent(0);
         } else if (roll < 4) {
             contract.setSalvageExchange(true);
             int r;
             do {
                 r = d6(2);
             } while (r < 4);
-            contract.setSalvagePct(min((r - 3) * 10, contractMaxSalvagePercentage));
+            contract.setSalvagePercent(min((r - 3) * 10, contractMaxSalvagePercentage));
         } else {
-            contract.setSalvagePct(min((roll - 3) * 10, contractMaxSalvagePercentage));
+            contract.setSalvagePercent(min((roll - 3) * 10, contractMaxSalvagePercentage));
         }
     }
 
     protected void rollSupportClause(AtBContract contract, int mod) {
         int roll = d6(2) + mod;
         contract.setStraightSupport(0);
-        contract.setBattleLossComp(0);
+        contract.setBattleLossCompensation(0);
         if (roll < 3) {
             contract.setStraightSupport(0);
         } else if (roll < 8) {
             contract.setStraightSupport((roll - 2) * 20);
         } else if (roll == 8) {
-            contract.setBattleLossComp(10);
+            contract.setBattleLossCompensation(10);
         } else {
-            contract.setBattleLossComp(min((roll - 8) * 20, 100));
+            contract.setBattleLossCompensation(min((roll - 8) * 20, 100));
         }
     }
 
     protected void rollTransportClause(AtBContract contract, int mod) {
         int roll = d6(2) + mod;
         if (roll < 2) {
-            contract.setTransportComp(0);
+            contract.setTransportCompensation(0);
         } else if (roll < 6) {
-            contract.setTransportComp((20 + (roll - 2) * 5));
+            contract.setTransportCompensation((20 + (roll - 2) * 5));
         } else if (roll < 10) {
-            contract.setTransportComp((45 + (roll - 6) * 5));
+            contract.setTransportCompensation((45 + (roll - 6) * 5));
         } else {
-            contract.setTransportComp(100);
+            contract.setTransportCompensation(100);
         }
     }
 

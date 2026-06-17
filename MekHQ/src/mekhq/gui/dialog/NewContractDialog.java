@@ -392,17 +392,17 @@ public class NewContractDialog extends JDialog {
         btnDate.addActionListener(evt -> changeStartDate());
 
         checkMRBC = new JCheckBox(resourceMap.getString("checkMRBC.text"));
-        checkMRBC.setSelected(contract.payMRBCFee());
+        checkMRBC.setSelected(contract.isMRBCFee());
         checkMRBC.addItemListener(contractUpdateItemListener);
 
         checkSalvageExchange = new JCheckBox(resourceMap.getString("checkSalvageExchange.text"));
         checkSalvageExchange.setSelected(contract.isSalvageExchange());
         checkSalvageExchange.addItemListener(contractUpdateItemListener);
 
-        spnLength = new JSpinner(new SpinnerNumberModel(contract.getLength(), 1, 120, 1));
+        spnLength = new JSpinner(new SpinnerNumberModel(contract.getLengthInMonths(), 1, 120, 1));
         spnLength.addChangeListener(contractUpdateChangeListener);
 
-        spnMultiplier = new JSpinner(new SpinnerNumberModel(contract.getMultiplier(), 0.5, 10.0, 0.1));
+        spnMultiplier = new JSpinner(new SpinnerNumberModel(contract.getPaymentMultiplier(), 0.5, 10.0, 0.1));
         spnMultiplier.addChangeListener(contractUpdateChangeListener);
 
         DefaultComboBoxModel<String> overheadModel = new DefaultComboBoxModel<>();
@@ -410,7 +410,7 @@ public class NewContractDialog extends JDialog {
             overheadModel.addElement(Contract.getOverheadCompName(i));
         }
         choiceOverhead = new JComboBox<>(overheadModel);
-        choiceOverhead.setSelectedIndex(contract.getOverheadComp());
+        choiceOverhead.setSelectedIndex(contract.getOverheadCompensation());
         choiceOverhead.addActionListener(contractUpdateActionListener);
         choiceOverhead.addFocusListener(contractUpdateFocusListener);
 
@@ -429,21 +429,21 @@ public class NewContractDialog extends JDialog {
         });
         choiceCommand.addActionListener(contractUpdateActionListener);
 
-        spnTransport = new JSpinner(new SpinnerNumberModel(contract.getTransportComp(), 0, 100, 10));
+        spnTransport = new JSpinner(new SpinnerNumberModel(contract.getTransportCompensation(), 0, 100, 10));
         spnTransport.addChangeListener(contractUpdateChangeListener);
 
-        spnSalvageRights = new JSpinner(new SpinnerNumberModel(contract.getSalvagePct(), 0, 100, 10));
+        spnSalvageRights = new JSpinner(new SpinnerNumberModel(contract.getSalvagePercent(), 0, 100, 10));
         spnSalvageRights.addChangeListener(contractUpdateChangeListener);
 
         spnStraightSupport = new JSpinner(new SpinnerNumberModel(contract.getStraightSupport(), 0, 100, 10));
         spnStraightSupport.addChangeListener(contractUpdateChangeListener);
 
-        spnBattleLossComp = new JSpinner(new SpinnerNumberModel(contract.getBattleLossComp(), 0, 100, 10));
+        spnBattleLossComp = new JSpinner(new SpinnerNumberModel(contract.getBattleLossCompensation(), 0, 100, 10));
         spnBattleLossComp.addChangeListener(contractUpdateChangeListener);
 
-        spnSignBonus = new JSpinner(new SpinnerNumberModel(contract.getSigningBonusPct(), 0, 10, 1));
+        spnSignBonus = new JSpinner(new SpinnerNumberModel(contract.getSigningBonus(), 0, 10, 1));
         spnSignBonus.addChangeListener(contractUpdateChangeListener);
-        spnAdvance = new JSpinner(new SpinnerNumberModel(contract.getAdvancePct(), 0, 25, 5));
+        spnAdvance = new JSpinner(new SpinnerNumberModel(contract.getAdvancePercent(), 0, 25, 5));
         spnAdvance.addChangeListener(contractUpdateChangeListener);
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -781,7 +781,7 @@ public class NewContractDialog extends JDialog {
                 contract.setStartDate(null);
             }
         } else if (choiceOverhead.equals(source)) {
-            contract.setOverheadComp(choiceOverhead.getSelectedIndex());
+            contract.setOverheadCompensation(choiceOverhead.getSelectedIndex());
         } else if (choiceCommand.equals(source)) {
             contract.setCommandRights(choiceCommand.getSelectedItem());
         } else if (checkMRBC.equals(source)) {
@@ -789,21 +789,21 @@ public class NewContractDialog extends JDialog {
         } else if (checkSalvageExchange.equals(source)) {
             contract.setSalvageExchange(checkSalvageExchange.isSelected());
         } else if (spnLength.equals(source)) {
-            contract.setLength((Integer) spnLength.getModel().getValue());
+            contract.setLengthInMonths((Integer) spnLength.getModel().getValue());
         } else if (spnMultiplier.equals(source)) {
-            contract.setMultiplier((Double) spnMultiplier.getModel().getValue());
+            contract.setPaymentMultiplier((Double) spnMultiplier.getModel().getValue());
         } else if (spnTransport.equals(source)) {
-            contract.setTransportComp((Integer) spnTransport.getModel().getValue());
+            contract.setTransportCompensation((Integer) spnTransport.getModel().getValue());
         } else if (spnSalvageRights.equals(source)) {
-            contract.setSalvagePct((Integer) spnSalvageRights.getModel().getValue());
+            contract.setSalvagePercent((Integer) spnSalvageRights.getModel().getValue());
         } else if (spnStraightSupport.equals(source)) {
             contract.setStraightSupport((Integer) spnStraightSupport.getModel().getValue());
         } else if (spnBattleLossComp.equals(source)) {
-            contract.setBattleLossComp((Integer) spnBattleLossComp.getModel().getValue());
+            contract.setBattleLossCompensation((Integer) spnBattleLossComp.getModel().getValue());
         } else if (spnSignBonus.equals(source)) {
-            contract.setSigningBonusPct((Integer) spnSignBonus.getModel().getValue());
+            contract.setSigningBonus((Integer) spnSignBonus.getModel().getValue());
         } else if (spnAdvance.equals(source)) {
-            contract.setAdvancePct((Integer) spnAdvance.getModel().getValue());
+            contract.setAdvancePercent((Integer) spnAdvance.getModel().getValue());
         }
 
         contract.calculateContract(campaign);

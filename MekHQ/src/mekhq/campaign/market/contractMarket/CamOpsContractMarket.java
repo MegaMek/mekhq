@@ -294,7 +294,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
               contract.getContractType().isCadreDuty(), false, varianceFactor));
         contract.setRequiredCombatElements(calculateRequiredCombatElements(campaign, contract, false, varianceFactor));
         // Step 8: Calculate the payment
-        contract.setMultiplier(calculatePaymentMultiplier(campaign, contract));
+        contract.setPaymentMultiplier(calculatePaymentMultiplier(campaign, contract));
         // Step 9: Determine parts availability
         // TODO: Rewrite this to be CamOps-compliant
         contract.setPartsAvailabilityLevel(contract.getContractType().calculatePartsAvailabilityLevel());
@@ -448,7 +448,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
             contract.setSalvageExchange(true);
         } else {
             contract.setSalvageExchange(false);
-            contract.setSalvagePct(terms.getSalvagePercentage(roll));
+            contract.setSalvagePercent(terms.getSalvagePercentage(roll));
         }
     }
 
@@ -457,7 +457,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         if (terms.isStraightSupport(roll)) {
             contract.setStraightSupport(terms.getSupportPercentage(roll));
         } else if (terms.isBattleLossComp(roll)) {
-            contract.setBattleLossComp(terms.getSupportPercentage(roll));
+            contract.setBattleLossCompensation(terms.getSupportPercentage(roll));
         } else {
             contract.setStraightSupport(0);
         }
@@ -465,7 +465,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
 
     private void setTransportRights(AtBContract contract, ContractTerms terms, int roll) {
         contract.setTransportRoll(roll);
-        contract.setTransportComp(terms.getTransportTerms(roll));
+        contract.setTransportCompensation(terms.getTransportTerms(roll));
     }
 
     private static class HiringHallModifiers {

@@ -289,11 +289,11 @@ public class AtBContract extends Contract {
         int battalionSize = getStandardFormationSize(campaign.getFaction(), BATTALION.getDepth());
 
         if (ContractUtilities.getEffectiveNumUnits(campaign) <= companySize) {
-            setOverheadComp(OH_FULL);
+            setOverheadCompensation(OH_FULL);
         } else if (ContractUtilities.getEffectiveNumUnits(campaign) <= battalionSize) {
-            setOverheadComp(OH_HALF);
+            setOverheadCompensation(OH_HALF);
         } else {
-            setOverheadComp(OH_NONE);
+            setOverheadCompensation(OH_NONE);
         }
 
         int currentYear = campaign.getGameYear();
@@ -365,7 +365,7 @@ public class AtBContract extends Contract {
     }
 
     public void calculateLength(final boolean variable) {
-        setLength(getContractType().calculateLength(variable));
+        setLengthInMonths(getContractType().calculateLength(variable));
     }
 
     /**
@@ -568,7 +568,7 @@ public class AtBContract extends Contract {
             if (tracksStanding) {
                 // Whenever we dynamically change the enemy faction, we update standing accordingly
                 String report = factionStandings.processContractAccept(campaignFactionCode, enemyFaction, today,
-                      regardMultiplier, getLength());
+                      regardMultiplier, getLengthInMonths());
                 if (report != null) {
                     campaign.addReport(POLITICS, report);
                 }
@@ -599,13 +599,13 @@ public class AtBContract extends Contract {
     private void checkForSpecialClanSalvageClause(Campaign campaign, LocalDate today, Faction enemyFaction) {
         if (!getEmployerFaction().isClan() && enemyFaction.isClan()) {
             if (!today.isAfter(BATTLE_OF_TUKAYYID)) {
-                int oldSalvagePercent = getSalvagePct();
+                int oldSalvagePercent = getSalvagePercent();
                 int newSalvagePercent = (int) max(100, round(oldSalvagePercent * 1.25));
 
                 boolean isAlreadyMax = oldSalvagePercent >= 100;
 
                 setSalvageExchange(true);
-                setSalvagePct(newSalvagePercent);
+                setSalvagePercent(newSalvagePercent);
 
                 String message = getTextAt(RESOURCE_BUNDLE, "emergencySalvageClause.message");
                 if (!isAlreadyMax) {
@@ -1022,7 +1022,7 @@ public class AtBContract extends Contract {
         int roll = d6();
 
         if (roll == 1) {
-            extension = max(1, getLength() / 2);
+            extension = max(1, getLengthInMonths() / 2);
         } else if (roll == 2) {
             extension = 1;
         } else {
@@ -1034,7 +1034,7 @@ public class AtBContract extends Contract {
               warName,
               extension,
               ((extension == 1) ? " month" : " months")));
-        setEndDate(getEndingDate().plusMonths(extension));
+        setEndingDate(getEndingDate().plusMonths(extension));
         extensionLength += extension;
 
         // We spike morale to create a jump in contract difficulty - essentially the reason why the employer is using
@@ -1067,14 +1067,14 @@ public class AtBContract extends Contract {
          * the base amount.
          */
 
-        if (getLength() <= 0) {
+        if (getLengthInMonths() <= 0) {
             return Money.zero();
         }
 
         return getBaseAmount().multipliedBy(1.5)
                      .plus(getSupportAmount())
                      .plus(getOverheadAmount())
-                     .dividedBy(getLength());
+                     .dividedBy(getLengthInMonths());
     }
 
     @Override
@@ -1686,26 +1686,26 @@ public class AtBContract extends Contract {
             addScenario(s);
         }
         setId(contract.getId());
-        setLength(contract.getLength());
+        setLengthInMonths(contract.getLengthInMonths());
         setStartDate(contract.getStartDate());
         /*
          * Set ending date; the other calculated values will be replaced
          * from the original contract
          */
         calculateContract(campaign);
-        setMultiplier(contract.getMultiplier());
-        setTransportComp(contract.getTransportComp());
+        setPaymentMultiplier(contract.getPaymentMultiplier());
+        setTransportCompensation(contract.getTransportCompensation());
         setStraightSupport(contract.getStraightSupport());
-        setOverheadComp(contract.getOverheadComp());
+        setOverheadCompensation(contract.getOverheadCompensation());
         setCommandRights(contract.getCommandRights());
-        setBattleLossComp(contract.getBattleLossComp());
-        setSalvagePct(contract.getSalvagePct());
+        setBattleLossCompensation(contract.getBattleLossCompensation());
+        setSalvagePercent(contract.getSalvagePercent());
         setSalvageExchange(contract.isSalvageExchange());
         setSalvagedByUnit(contract.getSalvagedByUnit());
         setSalvagedByEmployer(contract.getSalvagedByEmployer());
-        setSigningBonusPct(contract.getSigningBonusPct());
-        setAdvancePct(contract.getAdvancePct());
-        setMRBCFee(contract.payMRBCFee());
+        setSigningBonus(contract.getSigningBonus());
+        setAdvancePercent(contract.getAdvancePercent());
+        setMRBCFee(contract.isMRBCFee());
         setAdvanceAmount(contract.getAdvanceAmount());
         setFeeAmount(contract.getFeeAmount());
         setBaseAmount(contract.getBaseAmount());
@@ -1763,9 +1763,9 @@ public class AtBContract extends Contract {
         }
         /* Make a rough guess */
         if (contractType == null) {
-            if (contract.getLength() <= 3) {
+            if (contract.getLengthInMonths() <= 3) {
                 contractType = AtBContractType.OBJECTIVE_RAID;
-            } else if (contract.getLength() < 12) {
+            } else if (contract.getLengthInMonths() < 12) {
                 contractType = AtBContractType.GARRISON_DUTY;
             } else {
                 contractType = AtBContractType.PLANETARY_ASSAULT;
@@ -2414,7 +2414,7 @@ public class AtBContract extends Contract {
 
         double baseRequirement = getRequiredCombatTeams();
 
-        int duration = getLength();
+        int duration = getLengthInMonths();
         if (contractType.isGarrisonType()) {
             duration = (int) ceil(duration * 0.75); // We assume around 25% of the contract will be peaceful
         }

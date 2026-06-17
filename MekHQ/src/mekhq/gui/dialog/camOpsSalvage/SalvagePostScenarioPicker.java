@@ -255,13 +255,13 @@ public class SalvagePostScenarioPicker {
         setRecoveryTimeDataMap(campaign, scenario);
 
         boolean isContract = mission instanceof Contract;
-        boolean playerGetsNoSalvage = isContract && ((Contract) mission).getSalvagePct() <= 0;
+        boolean playerGetsNoSalvage = isContract && ((Contract) mission).getSalvagePercent() <= 0;
         if (playerGetsNoSalvage) {
             return; // There isn't going to be anything to process
         }
 
         if (isContract) {
-            salvagePercent = ((Contract) mission).getSalvagePct();
+            salvagePercent = ((Contract) mission).getSalvagePercent();
             employerSalvageMoneyInitial = ((Contract) mission).getSalvagedByEmployer();
             employerSalvageMoneyCurrent = employerSalvageMoneyInitial;
             unitSalvageMoneyInitial = ((Contract) mission).getSalvagedByUnit();

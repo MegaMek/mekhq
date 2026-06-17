@@ -144,7 +144,7 @@ public class NewAtBContractDialog extends NewContractDialog {
                                               campaign.getLocalDate())).getId());
         }
 
-        spnMultiplier.setModel(new SpinnerNumberModel(contract.getMultiplier(), 0.1, 10.0, 0.1));
+        spnMultiplier.setModel(new SpinnerNumberModel(contract.getPaymentMultiplier(), 0.1, 10.0, 0.1));
         updatePaymentMultiplier();
         contract.calculateContract(campaign);
         this.doUpdateContract(cbPlanets);
@@ -526,7 +526,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         if (((AtBContract) contract).getEmployerCode() != null && ((AtBContract) contract).getEnemyCode() != null) {
             double multiplier = campaign.getContractMarket()
                                       .calculatePaymentMultiplier(campaign, (AtBContract) contract);
-            contract.setMultiplier(multiplier);
+            contract.setPaymentMultiplier(multiplier);
             spnMultiplier.setValue(multiplier);
         }
     }
@@ -676,7 +676,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         } else if (source.equals(comboContractType)) {
             contract.setContractType(Objects.requireNonNull(comboContractType.getSelectedItem()));
             contract.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
-            spnLength.setValue(contract.getLength());
+            spnLength.setValue(contract.getLengthInMonths());
             updatePlanets();
             needUpdatePayment = true;
         } else if (source.equals(comboAllySkill)) {

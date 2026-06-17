@@ -519,7 +519,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         contract.setRequiredCombatTeams(ContractUtilities.calculateBaseNumberOfRequiredLances(campaign,
               contract.getContractType().isCadreDuty(), false, varianceFactor));
         contract.setRequiredCombatElements(calculateRequiredCombatElements(campaign, contract, false, varianceFactor));
-        contract.setMultiplier(calculatePaymentMultiplier(campaign, contract));
+        contract.setPaymentMultiplier(calculatePaymentMultiplier(campaign, contract));
 
         contract.setPartsAvailabilityLevel(contract.getContractType().calculatePartsAvailabilityLevel());
 
@@ -615,23 +615,23 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
         contract.setCommandRights(ContractCommandRights.values()[max(parent.getCommandRights().ordinal() - 1, 0)]);
         contract.setSalvageExchange(parent.isSalvageExchange());
-        contract.setSalvagePct(max(parent.getSalvagePct() - 10, 0));
+        contract.setSalvagePercent(max(parent.getSalvagePercent() - 10, 0));
         contract.setStraightSupport(max(parent.getStraightSupport() - 20, 0));
-        if (parent.getBattleLossComp() <= 10) {
-            contract.setBattleLossComp(0);
-        } else if (parent.getBattleLossComp() <= 20) {
-            contract.setBattleLossComp(10);
+        if (parent.getBattleLossCompensation() <= 10) {
+            contract.setBattleLossCompensation(0);
+        } else if (parent.getBattleLossCompensation() <= 20) {
+            contract.setBattleLossCompensation(10);
         } else {
-            contract.setBattleLossComp(parent.getBattleLossComp() - 20);
+            contract.setBattleLossCompensation(parent.getBattleLossCompensation() - 20);
         }
-        contract.setTransportComp(100);
+        contract.setTransportCompensation(100);
 
         double varianceFactor = ContractUtilities.calculateVarianceFactor();
         contract.setRequiredCombatTeams(ContractUtilities.calculateBaseNumberOfRequiredLances(campaign,
               contract.getContractType().isCadreDuty(), false, varianceFactor));
         contract.setRequiredCombatElements(calculateRequiredCombatElements(campaign, contract, false, varianceFactor));
 
-        contract.setMultiplier(calculatePaymentMultiplier(campaign, contract));
+        contract.setPaymentMultiplier(calculatePaymentMultiplier(campaign, contract));
         contract.setPartsAvailabilityLevel(contract.getContractType().calculatePartsAvailabilityLevel());
         contract.calculateContract(campaign);
 
@@ -753,7 +753,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
               followup.getContractType().isCadreDuty(), false, varianceFactor));
         followup.setRequiredCombatElements(calculateRequiredCombatElements(campaign, followup, false, varianceFactor));
 
-        followup.setMultiplier(calculatePaymentMultiplier(campaign, followup));
+        followup.setPaymentMultiplier(calculatePaymentMultiplier(campaign, followup));
         followup.setPartsAvailabilityLevel(followup.getContractType().calculatePartsAvailabilityLevel());
         followup.initContractDetails(campaign);
         followup.calculateContract(campaign);
@@ -868,10 +868,10 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         if (isPirateCampaign) {
             contract.setCommandRights(ContractCommandRights.INDEPENDENT);
             contract.setSalvageExchange(false);
-            contract.setSalvagePct(100);
-            contract.setTransportComp(0);
+            contract.setSalvagePercent(100);
+            contract.setTransportCompensation(0);
             contract.setStraightSupport(0);
-            contract.setBattleLossComp(0);
+            contract.setBattleLossCompensation(0);
             return;
         }
 

@@ -65,7 +65,6 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.enums.MHQTabType;
 
 /**
  * Contract summary view for ContractMarketDialog
@@ -348,7 +347,7 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsLabels.gridy = ++y;
         mainPanel.add(lblLength, gridBagConstraintsLabels);
 
-        JLabel txtLength = new JLabel(Integer.toString(contract.getLength()));
+        JLabel txtLength = new JLabel(Integer.toString(contract.getLengthInMonths()));
         txtLength.setName("txtLength");
         gridBagConstraintsText.gridy = y;
         mainPanel.add(txtLength, gridBagConstraintsText);
@@ -359,7 +358,7 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsLabels.gridy = ++y;
         mainPanel.add(lblOverhead, gridBagConstraintsLabels);
 
-        JLabel txtOverhead = new JLabel(Contract.getOverheadCompName(contract.getOverheadComp()));
+        JLabel txtOverhead = new JLabel(Contract.getOverheadCompName(contract.getOverheadCompensation()));
         txtOverhead.setName("txtOverhead");
         gridBagConstraintsText.gridy = y;
         mainPanel.add(txtOverhead, gridBagConstraintsText);
@@ -468,7 +467,7 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsLabels.gridy = ++y;
         mainPanel.add(lblSalvageRights, gridBagConstraintsLabels);
 
-        JLabel txtSalvageRights = new JLabel(contract.getSalvagePctString() +
+        JLabel txtSalvageRights = new JLabel(contract.getSalvagePercentString() +
                                                    (contract.isSalvageExchange() ? " (Exchange)" : ""));
         txtSalvageRights.setName("txtSalvageRights");
 
@@ -495,7 +494,7 @@ public class ContractSummaryPanel extends JPanel {
                     campaign.getContractMarket()
                           .rerollClause((AtBContract) contract, AbstractContractMarket.CLAUSE_SALVAGE, campaign);
                     setSalvageRerollButtonText((JButton) ev.getSource());
-                    txtSalvageRights.setText(contract.getSalvagePctString() +
+                    txtSalvageRights.setText(contract.getSalvagePercentString() +
                                                    (contract.isSalvageExchange() ? " (Exchange)" : ""));
                     if (campaign.getContractMarket().getRerollsUsed(contract, AbstractContractMarket.CLAUSE_SALVAGE) >=
                               logRerolls) {

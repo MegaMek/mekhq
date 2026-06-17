@@ -58,7 +58,6 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.JScrollablePanel;
-import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.utilities.BriefingStyle;
 import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.utilities.ReportingUtilities;
@@ -430,7 +429,7 @@ public class MissionViewPanel extends JScrollablePanel {
         pnlStats.add(lblBLC, gridBagConstraints);
 
         txtBLC.setName("txtBLC");
-        txtBLC.setText(contract.getBattleLossComp() + "%");
+        txtBLC.setText(contract.getBattleLossCompensation() + "%");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 8;
@@ -482,12 +481,12 @@ public class MissionViewPanel extends JScrollablePanel {
         JLabel lblSalvagePct2 = new JLabel();
 
         if (contract.isSalvageExchange()) {
-            lblSalvagePct2.setText(resourceMap.getString("exchange") + " (" + contract.getSalvagePct() + "%)");
-        } else if (contract.getSalvagePct() == 0) {
+            lblSalvagePct2.setText(resourceMap.getString("exchange") + " (" + contract.getSalvagePercent() + "%)");
+        } else if (contract.getSalvagePercent() == 0) {
             lblSalvagePct2.setText(resourceMap.getString("none"));
         } else {
             lblSalvagePct1.setText(resourceMap.getString("lblSalvagePct.text"));
-            int maxSalvagePct = contract.getSalvagePct();
+            int maxSalvagePct = contract.getSalvagePercent();
 
             int currentSalvagePct = contract.getCurrentSalvagePct();
 
@@ -623,9 +622,9 @@ public class MissionViewPanel extends JScrollablePanel {
 
         // Salvage gauge for a normal salvage percentage; the exchange / no-salvage cases are shown as text among the
         // reference terms below.
-        final boolean salvageIsMeter = !contract.isSalvageExchange() && (contract.getSalvagePct() > 0);
+        final boolean salvageIsMeter = !contract.isSalvageExchange() && (contract.getSalvagePercent() > 0);
         if (salvageIsMeter) {
-            addGaugeRow(ContractMeterBar.salvage(contract.getCurrentSalvagePct(), contract.getSalvagePct()), y++);
+            addGaugeRow(ContractMeterBar.salvage(contract.getCurrentSalvagePct(), contract.getSalvagePercent()), y++);
         }
 
         // Contract timeline: a neutral progress gauge from start to end with a marker for today, shown only while the
@@ -681,7 +680,7 @@ public class MissionViewPanel extends JScrollablePanel {
         lblBLC.setName("lblBLC");
         lblBLC.setText(resourceMap.getString("lblBLC.text"));
         txtBLC.setName("txtBLC");
-        txtBLC.setText(contract.getBattleLossComp() + "%");
+        txtBLC.setText(contract.getBattleLossCompensation() + "%");
         addStatRow(lblBLC, txtBLC, y++);
 
         lblSalvageValueMerc = new JLabel(resourceMap.getString("lblSalvageValueMerc.text"));
@@ -700,7 +699,7 @@ public class MissionViewPanel extends JScrollablePanel {
             JLabel txtSalvagePct = new JLabel();
             txtSalvagePct.setName("txtSalvagePct");
             if (contract.isSalvageExchange()) {
-                txtSalvagePct.setText(resourceMap.getString("exchange") + " (" + contract.getSalvagePct() + "%)");
+                txtSalvagePct.setText(resourceMap.getString("exchange") + " (" + contract.getSalvagePercent() + "%)");
             } else {
                 txtSalvagePct.setText(resourceMap.getString("none"));
             }
@@ -806,7 +805,8 @@ public class MissionViewPanel extends JScrollablePanel {
     }
 
     /**
-     * Adds a full-width gauge spanning both stat columns, with uniform spacing so the dashboard gauges read as a group.
+     * Adds a full-width gauge spanning both stat columns, with uniform spacing so the dashboard gauges read as a
+     * group.
      *
      * @param gauge the gauge component to add
      * @param gridY the grid row to place it on

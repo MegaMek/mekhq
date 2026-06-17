@@ -937,7 +937,7 @@ public final class BriefingTab extends CampaignGuiTab {
             if (mission instanceof AtBContract contract) {
                 Faction employer = contract.getEmployerFaction();
                 reports = factionStandings.processContractCompletion(getCampaign().getFaction(), employer, today,
-                      status, regardMultiplier, contract.getLength());
+                      status, regardMultiplier, contract.getLengthInMonths());
             } else {
                 SimulateMissionDialog dialog = getSimulateMissionDialog(mission, status);
 
@@ -1067,7 +1067,7 @@ public final class BriefingTab extends CampaignGuiTab {
               startDate,
               status,
               mission.getName(),
-              mission.getLength());
+              mission.getLengthInMonths());
     }
 
     /**

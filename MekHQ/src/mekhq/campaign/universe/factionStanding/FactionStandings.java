@@ -1736,7 +1736,7 @@ public class FactionStandings {
                 MissionStatus missionStatus = mission.getStatus();
 
                 if (mission instanceof AtBContract atbContract) {
-                    int contractLength = atbContract.getLength();
+                    int contractLength = atbContract.getLengthInMonths();
 
                     // First try and fetch the enemy mercenary employer if none exists (because the enemy faction
                     // isn't an employed mercenary), then fetch the actual enemy
@@ -1767,7 +1767,7 @@ public class FactionStandings {
                               today,
                               missionStatus,
                               mission.getName(),
-                              mission.getLength());
+                              mission.getLengthInMonths());
 
                         Faction employerChoice = dialog.getEmployerChoice();
                         Faction enemyChoice = dialog.getEnemyChoice();

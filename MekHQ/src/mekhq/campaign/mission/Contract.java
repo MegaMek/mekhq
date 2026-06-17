@@ -69,31 +69,6 @@ public class Contract extends Mission {
     public final static int OH_FULL = 2;
     public final static int OH_NUM = 3;
 
-    public final static int MRBC_FEE_PERCENTAGE = 5;
-
-    private LocalDate startDate;
-    private LocalDate endDate;
-    private int nMonths;
-
-    private String employer;
-
-    private double paymentMultiplier;
-    private ContractCommandRights commandRights;
-    private int overheadComp;
-    private int straightSupport;
-    private int battleLossComp;
-    private int salvagePct;
-    private boolean salvageExchange;
-    private int transportComp;
-
-    private boolean mrbcFee;
-    private int advancePct;
-    private int signBonus;
-
-    private int hospitalBedsRented;
-    private int kitchensRented;
-    private int holdingCellsRented;
-
     // this is a transient variable meant to keep track of a single jump path while
     // the contract
     // runs through initial calculations, as the same jump path is referenced
@@ -122,23 +97,23 @@ public class Contract extends Mission {
 
     public Contract(String name, String employer) {
         super(name);
-        this.employer = employer;
+        setEmployer(employer);
 
-        this.nMonths = 12;
-        this.paymentMultiplier = 2.0;
+        setLengthInMonths(12);
+        setPaymentMultiplier(2.0);
         setCommandRights(ContractCommandRights.HOUSE);
-        this.overheadComp = OH_NONE;
-        this.straightSupport = 50;
-        this.battleLossComp = 50;
-        this.salvagePct = 50;
-        this.salvageExchange = false;
-        this.transportComp = 50;
-        this.mrbcFee = true;
-        this.advancePct = 25;
-        this.signBonus = 0;
-        this.hospitalBedsRented = 0;
-        this.kitchensRented = 0;
-        this.holdingCellsRented = 0;
+        setOverheadCompensation(OH_NONE);
+        setStraightSupport(50);
+        setBattleLossCompensation(50);
+        setSalvagePercent(50);
+        setSalvageExchange(false);
+        setTransportCompensation(50);
+        setMRBCFee(true);
+        setAdvancePercent(25);
+        setSigningBonus(0);
+        setHospitalBedsRented(0);
+        setKitchensRented(0);
+        setHoldingCellsRented(0);
     }
 
     public static String getOverheadCompName(int i) {
@@ -150,137 +125,6 @@ public class Contract extends Mission {
         };
     }
 
-    public String getEmployer() {
-        return employer;
-    }
-
-    public void setEmployer(String s) {
-        this.employer = s;
-    }
-
-    /**
-     * Returns the contract length in months.
-     *
-     * @return the number and corresponding length of the contract in months as an integer
-     */
-    public int getLength() {
-        return nMonths;
-    }
-
-    public void setLength(int m) {
-        nMonths = m;
-    }
-
-    public LocalDate getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(LocalDate d) {
-        startDate = d;
-    }
-
-    public LocalDate getEndingDate() {
-        return endDate;
-    }
-
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
-    }
-
-    /**
-     * This sets the Start Date and End Date of the Contract based on the length of the contract and the starting date
-     * provided
-     *
-     * @param startDate the date the contract starts at
-     */
-    public void setStartAndEndDate(LocalDate startDate) {
-        this.startDate = startDate;
-        this.endDate = startDate.plusMonths(getLength());
-    }
-
-    public double getMultiplier() {
-        return paymentMultiplier;
-    }
-
-    public void setMultiplier(double s) {
-        paymentMultiplier = s;
-    }
-
-    public int getTransportComp() {
-        return transportComp;
-    }
-
-    public String getTransportCompString() {
-        return transportComp + "%";
-    }
-
-    public void setTransportComp(int s) {
-        transportComp = s;
-    }
-
-    public int getStraightSupport() {
-        return straightSupport;
-    }
-
-    public String getStraightSupportString() {
-        return straightSupport + "%";
-    }
-
-    public void setStraightSupport(int s) {
-        straightSupport = Math.clamp(s, 0, 100);
-    }
-
-    public int getOverheadComp() {
-        return overheadComp;
-    }
-
-    public void setOverheadComp(int s) {
-        overheadComp = s;
-    }
-
-    public ContractCommandRights getCommandRights() {
-        return commandRights;
-    }
-
-    public void setCommandRights(final ContractCommandRights commandRights) {
-        this.commandRights = commandRights;
-    }
-
-    public int getBattleLossComp() {
-        return battleLossComp;
-    }
-
-    public String getBattleLossCompString() {
-        return battleLossComp + "%";
-    }
-
-    public void setBattleLossComp(int s) {
-        battleLossComp = Math.clamp(s, 0, 100);
-    }
-
-    public int getSalvagePct() {
-        return salvagePct;
-    }
-
-    public String getSalvagePctString() {
-        return salvagePct + "%";
-    }
-
-    public void setSalvagePct(int s) {
-        salvagePct = s;
-    }
-
-    public boolean isSalvageExchange() {
-        return salvageExchange;
-    }
-
-    public void setSalvageExchange(boolean b) {
-        salvageExchange = b;
-    }
-
-    public boolean canSalvage() {
-        return salvagePct > 0;
-    }
 
     public Money getSalvagedByUnit() {
         return salvagedByUnit;
@@ -315,12 +159,12 @@ public class Contract extends Mission {
      * {@link java.math.RoundingMode#CEILING} (i.e. any fractional percentage rounds up to the next whole percent).
      *
      * <p>Rounding up is intentional from a gameplay standpoint: the percentage is compared against the contract's
-     * salvage cap, and a true value of e.g. 50.001% against a 50% cap is a breach and must be surfaced as such. It
-     * also fixes the truncation artifacts that previously could cause the displayed value to shift by a full
-     * percentage point after a small change to the salvage assignment (see issue #5683).</p>
+     * salvage cap, and a true value of e.g. 50.001% against a 50% cap is a breach and must be surfaced as such. It also
+     * fixes the truncation artifacts that previously could cause the displayed value to shift by a full percentage
+     * point after a small change to the salvage assignment (see issue #5683).</p>
      *
-     * @param playerShare    the salvage value assigned to the player (mercs)
-     * @param employerShare  the salvage value assigned to the employer
+     * @param playerShare   the salvage value assigned to the player (mercs)
+     * @param employerShare the salvage value assigned to the employer
      *
      * @return integer percentage in the range {@code [0, 100]}, or {@code 0} if there is no salvage to split
      */
@@ -342,58 +186,6 @@ public class Contract extends Mission {
      */
     public int getCurrentSalvagePct() {
         return calculateSalvagePercentage(getSalvagedByUnit(), getSalvagedByEmployer());
-    }
-
-    public int getSigningBonusPct() {
-        return signBonus;
-    }
-
-    public void setSigningBonusPct(int s) {
-        signBonus = s;
-    }
-
-    public int getHospitalBedsRented() {
-        return hospitalBedsRented;
-    }
-
-    public void setHospitalBedsRented(int count) {
-        hospitalBedsRented = count;
-    }
-
-    public int getKitchensRented() {
-        return kitchensRented;
-    }
-
-    public void setKitchensRented(int count) {
-        kitchensRented = count;
-    }
-
-    public int getHoldingCellsRented() {
-        return holdingCellsRented;
-    }
-
-    public void setHoldingCellsRented(int count) {
-        holdingCellsRented = count;
-    }
-
-    public int getAdvancePct() {
-        return advancePct;
-    }
-
-    public void setAdvancePct(int s) {
-        advancePct = s;
-    }
-
-    public boolean payMRBCFee() {
-        return mrbcFee;
-    }
-
-    public int getMRBCFeePercentage() {
-        return MRBC_FEE_PERCENTAGE;
-    }
-
-    public void setMRBCFee(boolean b) {
-        mrbcFee = b;
     }
 
     public Money getTotalAmountPlusFeesAndBonuses() {
@@ -522,13 +314,13 @@ public class Contract extends Mission {
     }
 
     public Money getMonthlyPayOut() {
-        if (getLength() <= 0) {
+        if (getLengthInMonths() <= 0) {
             return Money.zero();
         }
 
         return getTotalAmountPlusFeesAndBonuses()
                      .minus(getTotalAdvanceAmount())
-                     .dividedBy(getLength());
+                     .dividedBy(getLengthInMonths());
     }
 
     /**
@@ -538,7 +330,7 @@ public class Contract extends Mission {
      */
     public Money getTotalMonthlyPayOut(Campaign c) {
         return getMonthlyPayOut()
-                     .multipliedBy(getLength())
+                     .multipliedBy(getLengthInMonths())
                      .minus(getTotalEstimatedOverheadExpenses(c))
                      .minus(getTotalEstimatedMaintenanceExpenses(c))
                      .minus(getTotalEstimatedPayrollExpenses(c));
@@ -580,7 +372,7 @@ public class Contract extends Mission {
      */
     public int getLengthPlusTravel(Campaign c) {
         int travelMonths = (int) ceil(2 * getTravelDays(c) / 30.0);
-        return getLength() + travelMonths;
+        return getLengthInMonths() + travelMonths;
     }
 
     /**
@@ -654,7 +446,7 @@ public class Contract extends Mission {
         }
 
         Money fullTransportCost = getTransportCost(campaign, false);
-        return fullTransportCost.multipliedBy(transportComp / 100.0);
+        return fullTransportCost.multipliedBy(getTransportCompensation() / 100.0);
     }
 
     /**
@@ -705,11 +497,11 @@ public class Contract extends Mission {
      * @return the number of months left
      */
     public int getMonthsLeft(LocalDate date) {
-        int monthsLeft = Math.toIntExact(ChronoUnit.MONTHS.between(date, endDate));
+        int monthsLeft = Math.toIntExact(ChronoUnit.MONTHS.between(date, getEndingDate()));
         // Ensure partial months are counted based on the current day of the month, as
         // the above only
         // counts full months
-        if (date.getDayOfMonth() != endDate.getDayOfMonth()) {
+        if (date.getDayOfMonth() != getEndingDate().getDayOfMonth()) {
             monthsLeft++;
         }
         return monthsLeft;
@@ -733,18 +525,18 @@ public class Contract extends Mission {
 
         // calculate base amount
         baseAmount = accountant.getContractBase()
-                           .multipliedBy(getLength())
-                           .multipliedBy(paymentMultiplier);
+                           .multipliedBy(getLengthInMonths())
+                           .multipliedBy(getPaymentMultiplier());
 
         // calculate overhead
-        switch (overheadComp) {
+        switch (getOverheadCompensation()) {
             case OH_HALF:
                 overheadAmount = accountant.getOverheadExpenses()
-                                       .multipliedBy(getLength())
+                                       .multipliedBy(getLengthInMonths())
                                        .multipliedBy(0.5);
                 break;
             case OH_FULL:
-                overheadAmount = accountant.getOverheadExpenses().multipliedBy(getLength());
+                overheadAmount = accountant.getOverheadExpenses().multipliedBy(getLengthInMonths());
                 break;
             default:
                 overheadAmount = Money.zero();
@@ -753,16 +545,16 @@ public class Contract extends Mission {
         // calculate support amount
         if (campaign.getCampaignOptions().isUsePeacetimeCost()) {
             supportAmount = accountant.getPeacetimeCost()
-                                  .multipliedBy(getLength())
-                                  .multipliedBy(straightSupport)
+                                  .multipliedBy(getLengthInMonths())
+                                  .multipliedBy(getStraightSupport())
                                   .dividedBy(100);
         } else {
             Money maintCosts = campaign.getAllHangar().getUnitCosts(u -> !u.isConventionalInfantry(),
                   Unit::getWeeklyMaintenanceCost);
             maintCosts = maintCosts.multipliedBy(4);
             supportAmount = maintCosts
-                                  .multipliedBy(getLength())
-                                  .multipliedBy(straightSupport)
+                                  .multipliedBy(getLengthInMonths())
+                                  .multipliedBy(getStraightSupport())
                                   .dividedBy(100);
         }
 
@@ -792,10 +584,10 @@ public class Contract extends Mission {
                               .plus(transportAmount)
                               .plus(transitAmount)
                               .plus(supportAmount)
-                              .multipliedBy(signBonus)
+                              .multipliedBy(getSigningBonus())
                               .dividedBy(100);
 
-        if (mrbcFee) {
+        if (isMRBCFee()) {
             feeAmount = baseAmount
                               .plus(overheadAmount)
                               .plus(transportAmount)
@@ -808,7 +600,7 @@ public class Contract extends Mission {
         }
 
         advanceAmount = getTotalAmountPlusFees()
-                              .multipliedBy(advancePct)
+                              .multipliedBy(getAdvancePercent())
                               .dividedBy(100);
 
         // only adjust the start date for travel if the start date is currently null
@@ -819,7 +611,7 @@ public class Contract extends Mission {
             adjustStartDate = true;
         }
 
-        if (adjustStartDate && (campaign.getSystemByName(systemId) != null)) {
+        if (adjustStartDate && (campaign.getSystemByName(getSystemId()) != null)) {
             boolean isUseCommandCircuit =
                   FactionStandingUtilities.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(),
                         campaign.isGM(),
@@ -870,7 +662,7 @@ public class Contract extends Mission {
         transportCost = transportCost.multipliedBy(useTwoWayPay ? 2 : 1);
 
         if (includeTransportCompensation) {
-            Money transportCompensation = transportCost.multipliedBy(transportComp / 100.0);
+            Money transportCompensation = transportCost.multipliedBy(getTransportCompensation() / 100.0);
             transportCost = transportCost.minus(transportCompensation);
         }
 
@@ -890,24 +682,24 @@ public class Contract extends Mission {
     @Override
     protected int writeToXMLBegin(Campaign campaign, final PrintWriter pw, int indent) {
         indent = super.writeToXMLBegin(campaign, pw, indent);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "nMonths", nMonths);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "startDate", startDate);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "endDate", endDate);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "employer", employer);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "paymentMultiplier", paymentMultiplier);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "nMonths", getLengthInMonths());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "startDate", getStartDate());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "endDate", getEndingDate());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "employer", getEmployer());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "paymentMultiplier", getPaymentMultiplier());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commandRights", getCommandRights().name());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "overheadComp", overheadComp);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvagePct", salvagePct);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvageExchange", salvageExchange);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "straightSupport", straightSupport);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "battleLossComp", battleLossComp);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "transportComp", transportComp);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mrbcFee", mrbcFee);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "advancePct", advancePct);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "signBonus", signBonus);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hospitalBedsRented", hospitalBedsRented);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "kitchensRented", kitchensRented);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "holdingCellsRented", holdingCellsRented);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "overheadComp", getOverheadCompensation());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvagePct", getSalvagePercent());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvageExchange", isSalvageExchange());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "straightSupport", getStraightSupport());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "battleLossComp", getBattleLossCompensation());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "transportComp", getTransportCompensation());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mrbcFee", getMRBCFeePercentage());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "advancePct", getAdvancePercent());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "signBonus", getSigningBonus());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hospitalBedsRented", getHospitalBedsRented());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "kitchensRented", getKitchensRented());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "holdingCellsRented", getHoldingCellsRented());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "advanceAmount", advanceAmount);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "signingAmount", signingAmount);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "transportAmount", transportAmount);
@@ -931,41 +723,41 @@ public class Contract extends Mission {
 
             try {
                 if (wn2.getNodeName().equalsIgnoreCase("employer")) {
-                    employer = wn2.getTextContent();
+                    setEmployer(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("startDate")) {
-                    startDate = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
+                    setStartDate(MHQXMLUtility.parseDate(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("endDate")) {
-                    endDate = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
+                    setEndingDate(MHQXMLUtility.parseDate(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("nMonths")) {
-                    nMonths = Integer.parseInt(wn2.getTextContent().trim());
+                    setLengthInMonths(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("paymentMultiplier")) {
-                    paymentMultiplier = Double.parseDouble(wn2.getTextContent().trim());
+                    setPaymentMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("commandRights")) {
                     setCommandRights(ContractCommandRights.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("overheadComp")) {
-                    overheadComp = Integer.parseInt(wn2.getTextContent().trim());
+                    setOverheadCompensation(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("salvagePct")) {
-                    salvagePct = Integer.parseInt(wn2.getTextContent().trim());
+                    setSalvagePercent(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("salvageExchange")) {
-                    salvageExchange = wn2.getTextContent().trim().equals("true");
+                    setSalvageExchange(wn2.getTextContent().trim().equals("true"));
                 } else if (wn2.getNodeName().equalsIgnoreCase("straightSupport")) {
-                    straightSupport = Integer.parseInt(wn2.getTextContent().trim());
+                    setStraightSupport(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("battleLossComp")) {
-                    battleLossComp = Integer.parseInt(wn2.getTextContent().trim());
+                    setBattleLossCompensation(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("transportComp")) {
-                    transportComp = Integer.parseInt(wn2.getTextContent().trim());
+                    setTransportCompensation(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("advancePct")) {
-                    advancePct = Integer.parseInt(wn2.getTextContent().trim());
+                    setAdvancePercent(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("signBonus")) {
-                    signBonus = Integer.parseInt(wn2.getTextContent().trim());
+                    setSigningBonus(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("hospitalBedsRented")) {
-                    hospitalBedsRented = Integer.parseInt(wn2.getTextContent().trim());
+                    setHospitalBedsRented(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("kitchensRented")) {
-                    kitchensRented = Integer.parseInt(wn2.getTextContent().trim());
+                    setKitchensRented(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("holdingCellsRented")) {
-                    holdingCellsRented = Integer.parseInt(wn2.getTextContent().trim());
+                    setHoldingCellsRented(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("mrbcFee")) {
-                    mrbcFee = wn2.getTextContent().trim().equals("true");
+                    setMRBCFee(wn2.getTextContent().trim().equals("true"));
                 } else if (wn2.getNodeName().equalsIgnoreCase("advanceAmount")) {
                     advanceAmount = Money.fromXmlString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("signingAmount")) {

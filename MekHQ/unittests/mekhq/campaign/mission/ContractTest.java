@@ -257,17 +257,17 @@ public class ContractTest {
     private void initContract() {
         contract = spy(new Contract());
 
-        contract.setOverheadComp(2); // Full overhead compensation
-        contract.setMultiplier(1.3);
+        contract.setOverheadCompensation(2); // Full overhead compensation
+        contract.setPaymentMultiplier(1.3);
 
-        contract.setLength(10);
+        contract.setLengthInMonths(10);
 
         contract.setStraightSupport(100);
-        contract.setTransportComp(100);
+        contract.setTransportCompensation(100);
 
-        contract.setSigningBonusPct(10);
+        contract.setSigningBonus(10);
         contract.setMRBCFee(true);
-        contract.setAdvancePct(10);
+        contract.setAdvancePercent(10);
 
         when(contract.getSystem()).thenReturn(new PlanetarySystem());
         when(mockCampaign.isUseCommandCircuitForContract(contract)).thenReturn(false);
@@ -322,17 +322,17 @@ public class ContractTest {
     private void initContractWithTransportComp(int transportComp) {
         contract = spy(new Contract());
 
-        contract.setOverheadComp(2); // Full overhead compensation
-        contract.setMultiplier(1.3);
+        contract.setOverheadCompensation(2); // Full overhead compensation
+        contract.setPaymentMultiplier(1.3);
 
-        contract.setLength(10);
+        contract.setLengthInMonths(10);
 
         contract.setStraightSupport(100);
-        contract.setTransportComp(transportComp);
+        contract.setTransportCompensation(transportComp);
 
-        contract.setSigningBonusPct(10);
+        contract.setSigningBonus(10);
         contract.setMRBCFee(true);
-        contract.setAdvancePct(10);
+        contract.setAdvancePercent(10);
 
         when(contract.getSystem()).thenReturn(new PlanetarySystem());
         when(mockCampaign.isUseCommandCircuitForContract(contract)).thenReturn(false);

@@ -604,7 +604,7 @@ public class MHQMorale {
                       "stratCon.earlyContractEnd.objectives", contract.getName()), true);
                 int remainingMonths = contract.getMonthsLeft(campaign.getLocalDate().plusDays(1));
                 contract.setRoutedPayout(contract.getMonthlyPayOut().multipliedBy(remainingMonths));
-                contract.setEndDate(today.plusDays(1));
+                contract.setEndingDate(today.plusDays(1));
             }
         }
     }
