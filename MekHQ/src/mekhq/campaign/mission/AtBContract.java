@@ -37,14 +37,12 @@ import static java.lang.Math.ceil;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
-import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.parseFromString;
 import static megamek.common.units.UnitType.AEROSPACE_FIGHTER;
 import static megamek.common.units.UnitType.MEK;
 import static megamek.common.units.UnitType.TANK;
-import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.POLITICS;
@@ -59,13 +57,9 @@ import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.FREE;
 import static mekhq.campaign.stratCon.StratConContractDefinition.getContractDefinition;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
-import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import java.awt.Color;
-import java.awt.FlowLayout;
-import java.awt.Font;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
@@ -77,10 +71,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Stream;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.SwingConstants;
 
 import megamek.Version;
 import megamek.client.ui.util.PlayerColour;
@@ -1300,51 +1290,6 @@ public class AtBContract extends Contract {
         public AtBContractRef(int id) {
             setId(id);
         }
-    }
-
-    /**
-     * Creates and returns a {@link JPanel} containing the belligerent factions' logos for the specified game year.
-     *
-     * <p>This panel displays the employer and enemy faction logos side by side, separated by a styled divider.
-     * The logos are determined based on the provided game year and faction codes, scaled appropriately for the
-     * GUI.</p>
-     *
-     * @param gameYear        the year used to determine which faction logos to display
-     * @param employerTooltip the tooltip to show on the employer (left) logo, or {@code null} for none
-     * @param enemyTooltip    the tooltip to show on the enemy (right) logo, or {@code null} for none
-     *
-     * @return a {@link JPanel} with the employer and enemy faction logos, with a divider in between
-     *
-     * @author Illiani
-     * @since 0.50.06
-     */
-    public JPanel getBelligerentsPanel(int gameYear, @Nullable String employerTooltip, @Nullable String enemyTooltip) {
-        final int SIZE = 64;
-
-        String employer = getEmployerCode();
-        ImageIcon employerImage = getFactionLogo(gameYear, employer);
-        employerImage = scaleImageIcon(employerImage, SIZE, true);
-        JLabel employerLabel = new JLabel(employerImage);
-        employerLabel.setToolTipText(employerTooltip);
-
-        JLabel divider = new JLabel("/");
-        divider.setHorizontalAlignment(SwingConstants.CENTER);
-        int fontSize = scaleForGUI(SIZE); // scaleImageIcon already includes the necessary scaling
-        divider.setFont(new Font(Font.MONOSPACED, Font.PLAIN, fontSize));
-        divider.setForeground(new Color(0, 0, 0, 128));
-
-        String enemy = getEnemyCode();
-        ImageIcon enemyImage = getFactionLogo(gameYear, enemy);
-        enemyImage = scaleImageIcon(enemyImage, SIZE, true);
-        JLabel enemyLabel = new JLabel(enemyImage);
-        enemyLabel.setToolTipText(enemyTooltip);
-
-        JPanel panel = new JPanel(new FlowLayout());
-        panel.add(employerLabel);
-        panel.add(divider);
-        panel.add(enemyLabel);
-
-        return panel;
     }
 
     /**

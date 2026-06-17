@@ -33,10 +33,16 @@
 package mekhq.gui.view;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.estimateCargoRequirements;
+import static mekhq.campaign.universe.Factions.getFactionLogo;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -44,10 +50,12 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
+import javax.swing.SwingConstants;
 
 import megamek.client.ui.util.UIUtil;
 import mekhq.MekHQ;
@@ -562,7 +570,8 @@ public class MissionViewPanel extends JScrollablePanel {
               contract.getEmployerName(campaign.getGameYear()));
         final String enemyTooltip = MessageFormat.format(resourceMap.getString("belligerents.enemy.tooltip"),
               contract.getEnemyBotName());
-        lblBelligerents = contract.getBelligerentsPanel(gui.getCampaign().getGameYear(), employerTooltip, enemyTooltip);
+        lblBelligerents = getBelligerentsPanel(contract, gui.getCampaign().getGameYear(), employerTooltip,
+              enemyTooltip);
         addHeaderRow(lblBelligerents, y++, GridBagConstraints.NORTH);
 
         // === Identity: the orienting facts (where, who) ===
@@ -757,6 +766,52 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         pnlStats.add(verticalGlue, gridBagConstraints);
+    }
+
+    /**
+     * Creates and returns a {@link JPanel} containing the belligerent factions' logos for the specified game year.
+     *
+     * <p>This panel displays the employer and enemy faction logos side by side, separated by a styled divider.
+     * The logos are determined based on the provided game year and faction codes, scaled appropriately for the
+     * GUI.</p>
+     *
+     * @param gameYear        the year used to determine which faction logos to display
+     * @param employerTooltip the tooltip to show on the employer (left) logo, or {@code null} for none
+     * @param enemyTooltip    the tooltip to show on the enemy (right) logo, or {@code null} for none
+     *
+     * @return a {@link JPanel} with the employer and enemy faction logos, with a divider in between
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    private JPanel getBelligerentsPanel(AtBContract contract, int gameYear, String employerTooltip,
+          String enemyTooltip) {
+        final int SIZE = 64;
+
+        String employer = contract.getEmployerCode();
+        ImageIcon employerImage = getFactionLogo(gameYear, employer);
+        employerImage = scaleImageIcon(employerImage, SIZE, true);
+        JLabel employerLabel = new JLabel(employerImage);
+        employerLabel.setToolTipText(employerTooltip);
+
+        JLabel divider = new JLabel("/");
+        divider.setHorizontalAlignment(SwingConstants.CENTER);
+        int fontSize = scaleForGUI(SIZE); // scaleImageIcon already includes the necessary scaling
+        divider.setFont(new Font(Font.MONOSPACED, Font.PLAIN, fontSize));
+        divider.setForeground(new Color(0, 0, 0, 128));
+
+        String enemy = contract.getEnemyCode();
+        ImageIcon enemyImage = getFactionLogo(gameYear, enemy);
+        enemyImage = scaleImageIcon(enemyImage, SIZE, true);
+        JLabel enemyLabel = new JLabel(enemyImage);
+        enemyLabel.setToolTipText(enemyTooltip);
+
+        JPanel panel = new JPanel(new FlowLayout());
+        panel.add(employerLabel);
+        panel.add(divider);
+        panel.add(enemyLabel);
+
+        return panel;
     }
 
     /**
