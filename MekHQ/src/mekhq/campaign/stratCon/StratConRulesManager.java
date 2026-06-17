@@ -2122,7 +2122,7 @@ public class StratConRulesManager {
         campaign.addReport(BATTLE, reportStatus.toString());
 
         ActionCheckResult actionCheckResult =
-              commander.checkSkill(S_TACTICS)
+              commander.checkSkill(S_TACTICS, campaign)
                     .resolve(true, getTextAt(RESOURCE_BUNDLE, "StratConRulesManager.tacticsSkillCheck"), false);
 
         if (actionCheckResult.isSuccess()) {

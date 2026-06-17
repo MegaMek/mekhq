@@ -5809,26 +5809,6 @@ public class Person implements ILocation {
     }
 
     /**
-     * Use {@link #checkSkill(String, boolean, boolean, LocalDate)} or {@link #checkSkill(String, Campaign)} instead.
-     *
-     * <p>Prepares a skill check.</p>
-     *
-     * <p>This constructor creates a {@code SkillCheck} instance which calculates the target number for the
-     * skill check based the person's skill level.</p>
-     *
-     * <p><b>Usage:</b> This is a convenience method that excludes reputation and aging effect checks.</p>
-     *
-     * @param skillName the name of the skill being used, corresponding to a {@link SkillType}
-     *
-     * @return prepared skill check
-     */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    public SkillCheck checkSkill(String skillName) {
-        return new SkillCheck(this, skillName);
-    }
-
-
-    /**
      * Prepares a skill check based on individually passed options.
      *
      * <p>This method creates a {@code SkillCheck} instance which calculates the target number
