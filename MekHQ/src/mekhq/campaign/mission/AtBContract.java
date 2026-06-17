@@ -156,7 +156,6 @@ public class AtBContract extends Contract {
     protected int contractScoreArbitraryModifier;
 
     protected int moraleMod = 0;
-    private Money routedPayout = null;
 
     /* lasts for a month, then removed at next events roll */
     protected boolean priorLogisticsFailure;
@@ -990,8 +989,8 @@ public class AtBContract extends Contract {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "routEnd", getRoutEndDate());
         }
 
-        if (routedPayout != null) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "routedPayout", routedPayout);
+        if (getRoutedPayout() != null) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "routedPayout", getRoutedPayout());
         }
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "partsAvailabilityLevel", getPartsAvailabilityLevel());
@@ -1091,7 +1090,7 @@ public class AtBContract extends Contract {
                 } else if (item.getNodeName().equalsIgnoreCase("routedPayout")) {
                     String cleanValue = item.getTextContent().trim().replaceAll("[^0-9.]", "");
                     double value = Double.parseDouble(cleanValue);
-                    routedPayout = Money.of(value);
+                    setRoutedPayout(Money.of(value));
                 } else if (item.getNodeName().equalsIgnoreCase("partsAvailabilityLevel")) {
                     setPartsAvailabilityLevel(Integer.parseInt(item.getTextContent()));
                 } else if (item.getNodeName().equalsIgnoreCase("extensionLength")) {
@@ -1690,14 +1689,6 @@ public class AtBContract extends Contract {
      */
     public void setTransportRoll(int roll) {
         transportRoll = roll;
-    }
-
-    public void setRoutedPayout(@Nullable Money routedPayout) {
-        this.routedPayout = routedPayout;
-    }
-
-    public @Nullable Money getRoutedPayout() {
-        return routedPayout;
     }
 
     /**

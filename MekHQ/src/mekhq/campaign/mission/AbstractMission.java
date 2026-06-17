@@ -170,6 +170,7 @@ public class AbstractMission {
 
     private AtBMoraleLevel moraleLevel;
     private LocalDate routEndDate;
+    private Money routedPayout = null;
 
     private final List<Scenario> scenarios = new ArrayList<>();
 
@@ -1277,6 +1278,14 @@ public class AbstractMission {
 
     public boolean isPeaceful() {
         return getContractType().isGarrisonType() && getMoraleLevel().isRouted();
+    }
+
+    public @Nullable Money getRoutedPayout() {
+        return routedPayout;
+    }
+
+    public void setRoutedPayout(@Nullable Money routedPayout) {
+        this.routedPayout = routedPayout;
     }
 
     /**
