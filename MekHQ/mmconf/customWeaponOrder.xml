@@ -1,4 +1,9 @@
 <?xml version="1.0"?>
 <customWeaponOrders>
-
+	<unit>
+		<id>Brutus Assault Tank (PPC)</id>
+		<orderType>RANGE_HIGH_LOW</orderType>
+		<weaponList></weaponList>
+		<orderList></orderList>
+	</unit>
 </customWeaponOrders>
