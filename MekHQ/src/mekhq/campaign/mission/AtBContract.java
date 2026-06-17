@@ -711,7 +711,7 @@ public class AtBContract extends Contract {
     /**
      * Returns the support-point reserve this contract can be negotiated up to, used as the "full reserves" reference
      * when displaying support points. This mirrors the cap applied during initial support-point negotiation (see
-     * {@code SupportPointNegotiation}): three per required combat team.
+     * {@link mekhq.campaign.stratCon.SupportPointNegotiation}): three per required combat team.
      *
      * @return the maximum support points the contract can hold in reserve
      */
