@@ -43,7 +43,9 @@ import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
 import static mekhq.campaign.mission.enums.ContractCommandRights.INDEPENDENT;
 import static mekhq.campaign.personnel.ranks.Rank.RO_MIN;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
+import static mekhq.campaign.universe.Faction.INDEPENDENT_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.PrintWriter;
 import java.math.RoundingMode;
@@ -55,6 +57,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.client.ui.util.PlayerColour;
@@ -99,7 +102,7 @@ public class AbstractMission {
     private int id = -1;
     private StratConCampaignState stratConCampaignState;
     private MissionStatus status = MissionStatus.ACTIVE;
-    private String contractTypeName = "New Contract";
+    private String contractTypeName = getText("AbstractMission.contractTypeName.default");
     private AtBContractType contractType = UNDEFINED;
     private String description;
 
@@ -116,29 +119,29 @@ public class AbstractMission {
     private LocalDate endingDate;
     private int lengthInMonths = 1;
 
-    private String employerCode = "IND";
-    private String employerName = "Independent";
+    private String employerCode = INDEPENDENT_FACTION_CODE;
+    private String employerName = getText("AbstractMission.belligerentName.default");
     private Person employerLiaison;
     private SkillLevel allySkill = REGULAR;
     private int allyQuality = DragoonRating.DRAGOON_C.getRating();
-    private String allyBotName = "Ally";
+    private String allyBotName = getText("AbstractMission.allyBotName.default");
     private Camouflage allyCamouflage = new Camouflage(Camouflage.COLOUR_CAMOUFLAGE, PlayerColour.RED.name());
     private PlayerColour allyColour = RED;
 
-    private String enemyCode = "IND";
-    private String enemyName = "Independent";
+    private String enemyCode = INDEPENDENT_FACTION_CODE;
+    private String enemyName = getText("AbstractMission.belligerentName.default");
     private String enemyMercenaryEmployerCode;
     private Person clanOpponent;
     private boolean batchallAccepted = true;
     private SkillLevel enemySkill = REGULAR;
     private int enemyQuality = DragoonRating.DRAGOON_C.getRating();
-    private String enemyBotName = "Enemy";
+    private String enemyBotName = getText("AbstractMission.enemyBotName.default");
     private Camouflage enemyCamouflage = new Camouflage(Camouflage.COLOUR_CAMOUFLAGE, PlayerColour.BLUE.name());
     private PlayerColour enemyColour = BLUE;
 
-    private int difficulty = 5;
+    private int contractDifficulty = 5;
 
-    private double paymentMultiplier;
+    private double paymentMultiplier = 1.0;
     private ContractCommandRights commandRights = INDEPENDENT;
     private int overheadCompensation = OH_NONE;
     private int straightSupport;
@@ -360,19 +363,19 @@ public class AbstractMission {
         return monthsLeft;
     }
 
-    public LocalDate getEndingDate() {
+    public @Nullable LocalDate getEndingDate() {
         return endingDate;
     }
 
-    public void setEndingDate(LocalDate endDate) {
+    public void setEndingDate(@Nullable LocalDate endDate) {
         this.endingDate = endDate;
     }
 
-    public LocalDate getStartDate() {
+    public @Nullable LocalDate getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(LocalDate startDate) {
+    public void setStartDate(@Nullable LocalDate startDate) {
         this.startDate = startDate;
     }
 
@@ -382,7 +385,7 @@ public class AbstractMission {
      *
      * @param startDate the date the contract starts at
      */
-    public void setStartAndEndDate(LocalDate startDate) {
+    public void setStartAndEndDate(@Nonnull LocalDate startDate) {
         this.startDate = startDate;
         this.endingDate = startDate.plusMonths(getLengthInMonths());
     }
@@ -395,11 +398,11 @@ public class AbstractMission {
         this.employerName = employerName;
     }
 
-    public Person getEmployerLiaison() {
+    public @Nullable Person getEmployerLiaison() {
         return employerLiaison;
     }
 
-    public void setEmployerLiaison(Person employerLiaison) {
+    public void setEmployerLiaison(@Nullable Person employerLiaison) {
         this.employerLiaison = employerLiaison;
     }
 
@@ -530,7 +533,7 @@ public class AbstractMission {
         }
     }
 
-    public String getEnemyMercenaryEmployerCode() {
+    public @Nullable String getEnemyMercenaryEmployerCode() {
         return enemyMercenaryEmployerCode;
     }
 
@@ -547,16 +550,16 @@ public class AbstractMission {
      * @author Illiani
      * @since 0.50.10
      */
-    public void setEnemyMercenaryEmployerCode(String enemyMercenaryEmployerCode) {
+    public void setEnemyMercenaryEmployerCode(@Nullable String enemyMercenaryEmployerCode) {
         this.enemyMercenaryEmployerCode = enemyMercenaryEmployerCode;
     }
 
-    public int getDifficulty() {
-        return difficulty;
+    public int getContractDifficulty() {
+        return contractDifficulty;
     }
 
-    public void setDifficulty(int difficulty) {
-        this.difficulty = difficulty;
+    public void setContractDifficulty(int contractDifficulty) {
+        this.contractDifficulty = contractDifficulty;
     }
 
     public String getEnemyName() {
@@ -571,7 +574,7 @@ public class AbstractMission {
         return clanOpponent;
     }
 
-    public void setClanOpponent(Person clanOpponent) {
+    public void setClanOpponent(@Nullable Person clanOpponent) {
         this.clanOpponent = clanOpponent;
     }
 
@@ -1290,7 +1293,7 @@ public class AbstractMission {
         return requiredCombatTeams * 3;
     }
 
-    public LocalDate getRoutEndDate() {
+    public @Nullable LocalDate getRoutEndDate() {
         return routEndDate;
     }
 
@@ -1299,7 +1302,7 @@ public class AbstractMission {
      *
      * @param routEnd the {@code LocalDate} representing the end date of the rout
      */
-    public void setRoutEndDate(LocalDate routEnd) {
+    public void setRoutEndDate(@Nullable LocalDate routEnd) {
         this.routEndDate = routEnd;
     }
 
@@ -1405,5 +1408,9 @@ public class AbstractMission {
         return !getStatus().isCompleted() ?
                      getName() :
                      getFormattedTextAt(RESOURCE_BUNDLE, "AbstractMission.name.completed", getName());
+    }
+
+    private static String getText(String resourceKey) {
+        return getTextAt(RESOURCE_BUNDLE, resourceKey);
     }
 }

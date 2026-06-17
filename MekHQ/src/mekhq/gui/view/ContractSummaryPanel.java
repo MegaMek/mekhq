@@ -602,7 +602,7 @@ public class ContractSummaryPanel extends JPanel {
         ImageIcon skullFull = scaleImageIcon(new ImageIcon("data/images/misc/challenge_estimate_full.png"), 50, true);
         ImageIcon skullHalf = scaleImageIcon(new ImageIcon("data/images/misc/challenge_estimate_half.png"), 50, true);
 
-        int difficulty = contract.getDifficulty();
+        int difficulty = contract.getContractDifficulty();
         int iterations = difficulty;
 
         if (difficulty == ERROR) {

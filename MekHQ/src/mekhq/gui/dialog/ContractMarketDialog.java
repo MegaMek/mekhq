@@ -664,7 +664,7 @@ public class ContractMarketDialog extends JDialog {
      * @return {@code true} if the accept button is clicked, {@code false} if the refuse button is clicked
      */
     private boolean triggerConfirmationDialog() {
-        int difficulty = ((AtBContract) selectedContract).getDifficulty();
+        int difficulty = ((AtBContract) selectedContract).getContractDifficulty();
 
         // Get the resource string
         String inCharacterResourceKey = "";

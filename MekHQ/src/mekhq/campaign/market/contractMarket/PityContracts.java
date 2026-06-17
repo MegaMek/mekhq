@@ -137,7 +137,7 @@ public class PityContracts {
         int difficulty = calculateContractDifficulty(contract, campaign.getGameYear(),
               isUseGenericBattleValue,
               combatUnits);
-        contract.setDifficulty(difficulty);
+        contract.setContractDifficulty(difficulty);
 
         if (!campaign.isPirateCampaign()) { // Pirate campaigns have fixed contractual terms
             overrideContractTermsForPityContracts(contract);

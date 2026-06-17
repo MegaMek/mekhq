@@ -350,13 +350,13 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             if (contract != null) {
                 checkForEmployerOverride(campaign.getLocalDate(), contract, contract.getEmployerCode());
 
-                contract.setDifficulty(calculateContractDifficulty(contract,
+                contract.setContractDifficulty(calculateContractDifficulty(contract,
                       contract.getStartDate().getYear(),
                       true,
                       campaign.getAllCombatEntities()));
             }
         } catch (Exception e) {
-            contract.setDifficulty(5);
+            contract.setContractDifficulty(5);
             logger.error(e, "Unable to calculate difficulty for AtB contract {}", contract);
         }
 
@@ -812,7 +812,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                   && enemy.isClan()) {
             multiplier *= 0.5;
         } else if (campaignOptions.isUseGenericBattleValue()) {
-            int contractDifficulty = contract.getDifficulty();
+            int contractDifficulty = contract.getContractDifficulty();
             if (contractDifficulty != Integer.MIN_VALUE && contractDifficulty <= 2) {
                 multiplier /= 0.5; // ×2.0 bonus
             } else if (contractDifficulty >= 6 && contractDifficulty <= 7) {

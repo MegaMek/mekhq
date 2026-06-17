@@ -153,7 +153,7 @@ public class AtBContract extends Contract {
     }
 
     public AtBContract(String name) {
-        setDifficulty(Integer.MIN_VALUE);
+        setContractDifficulty(Integer.MIN_VALUE);
 
         parentContract = null;
         setContractType(AtBContractType.GARRISON_DUTY);
@@ -910,7 +910,7 @@ public class AtBContract extends Contract {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allyQuality", getAllyQuality());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enemySkill", getEnemySkill().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enemyQuality", getEnemyQuality());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "difficulty", getDifficulty());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "difficulty", getContractDifficulty());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allyBotName", getAllyBotName());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enemyBotName", getEnemyBotName());
 
@@ -1014,7 +1014,7 @@ public class AtBContract extends Contract {
                 } else if (item.getNodeName().equalsIgnoreCase("enemyQuality")) {
                     setEnemyQuality(Integer.parseInt(item.getTextContent()));
                 } else if (item.getNodeName().equalsIgnoreCase("difficulty")) {
-                    setDifficulty(Integer.parseInt(item.getTextContent()));
+                    setContractDifficulty(Integer.parseInt(item.getTextContent()));
                 } else if (item.getNodeName().equalsIgnoreCase("allyBotName")) {
                     setAllyBotName(item.getTextContent());
                 } else if (item.getNodeName().equalsIgnoreCase("enemyBotName")) {
@@ -1239,7 +1239,7 @@ public class AtBContract extends Contract {
         setEnemyBotName(generateEnemyName(currentYear));
         setEnemyCamouflage(pickRandomCamouflage(currentYear, getEnemyCode()));
 
-        setDifficulty(calculateContractDifficulty(contract, contract.getStartDate().getYear(),
+        setContractDifficulty(calculateContractDifficulty(contract, contract.getStartDate().getYear(),
               true, campaign.getAllCombatEntities()));
 
         clanTechSalvageOverride();
