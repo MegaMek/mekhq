@@ -3308,6 +3308,7 @@ public class Unit implements ITechnology, ILocation {
         Part motiveType = null;
         Part primaryW = null;
         Part secondaryW = null;
+        Part disposableWeaponPart = null;
         Part infantryArmor = null;
         Part dropCollar = null;
         Part kfBoom = null;
@@ -3352,6 +3353,8 @@ public class Unit implements ITechnology, ILocation {
                 motiveType = part;
             } else if (part instanceof InfantryArmorPart) {
                 infantryArmor = part;
+            } else if (part instanceof InfantryDisposableWeaponPart) {
+                disposableWeaponPart = part;
             } else if (part instanceof InfantryWeaponPart) {
                 if (((InfantryWeaponPart) part).isPrimary()) {
                     primaryW = part;
@@ -3897,7 +3900,22 @@ public class Unit implements ITechnology, ILocation {
             } else {
                 int equipmentNum = entity.getEquipmentNum(m);
                 EquipmentType type = m.getType();
-                if (entity instanceof BattleArmor) {
+                if ((entity instanceof BattleArmor) && (m instanceof WeaponMounted weaponMounted)
+                      && weaponMounted.isDisposableWeapon()) {
+                    // Disposable Weapon (TO:AuE p.116, Corrected Sixth Printing): one per trooper (squad size),
+                    // valued/bought/sold individually, instead of the per-trooper BattleArmorEquipmentPart used for
+                    // ordinary BA equipment.
+                    if (disposableWeaponPart == null) {
+                        int number = ((BattleArmor) entity).getSquadSize();
+                        while (number > 0) {
+                            disposableWeaponPart = new InfantryDisposableWeaponPart((int) entity.getWeight(), type, -1,
+                                  getCampaign());
+                            addPart(disposableWeaponPart);
+                            partsToAdd.add(disposableWeaponPart);
+                            number--;
+                        }
+                    }
+                } else if (entity instanceof BattleArmor) {
                     // for BattleArmor we have multiple parts per mount, one for each trooper
                     Part[] equipmentParts = baEquipParts.get(equipmentNum);
                     for (int i = 0; i < ((BattleArmor) entity).getSquadSize(); i++) {
@@ -4576,6 +4594,20 @@ public class Unit implements ITechnology, ILocation {
                           false);
                     addPart(secondaryW);
                     partsToAdd.add(secondaryW);
+                    number--;
+                }
+            }
+            // Disposable Weapons (TO:AuE p.116, Corrected Sixth Printing): one per trooper (like primary/secondary),
+            // so the loadout is valued, refit and bought/sold as that many individual weapons. The platoon shares one
+            // fireable mount in combat.
+            InfantryWeapon disposableType = infantry.getDisposableWeapon();
+            if ((null == disposableWeaponPart) && (null != disposableType)) {
+                int number = entity.getOInternal(ConvInfantry.LOC_INFANTRY);
+                while (number > 0) {
+                    disposableWeaponPart = new InfantryDisposableWeaponPart((int) entity.getWeight(), disposableType, -1,
+                          getCampaign());
+                    addPart(disposableWeaponPart);
+                    partsToAdd.add(disposableWeaponPart);
                     number--;
                 }
             }

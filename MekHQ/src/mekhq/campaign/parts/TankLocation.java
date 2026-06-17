@@ -337,7 +337,7 @@ public class TankLocation extends Part {
 
     @Override
     public String getDesc() {
-        if (!isBreached() || isSalvaging()) {
+        if (isDamagedBeyondRepair() || isSalvaging() || !isBreached()) {
             return super.getDesc();
         }
         String toReturn = "<html><font";

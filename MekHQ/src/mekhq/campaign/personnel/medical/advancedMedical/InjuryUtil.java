@@ -62,6 +62,7 @@ import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -188,8 +189,24 @@ public final class InjuryUtil {
 
         // We double-check the injury has been added, as it might have been removed by purgeIllogicalInjuries
         boolean hasNewInjuries = false;
+        boolean hasMissingLimbHandled = false;
+        Injury injuryToRemove = null;
+        // Prepare an amputation recovery injury in case we need it later
+        Injury amputationRecovery = AlternateInjuries.AMPUTATION_RECOVERY.newInjury(campaign, person,
+              BodyLocation.RIGHT_HAND, 1);
+        if (isUseKinderMode) {
+            int originalRecoveryTime = amputationRecovery.getOriginalTime();
+            int newRecoveryTime = (int) ceil(originalRecoveryTime / 2.0);
+            amputationRecovery.setOriginalTime(newRecoveryTime);
+            amputationRecovery.setTime(newRecoveryTime);
+        }
+
         List<Injury> currentInjuries = person.getInjuries();
         for (Injury injury : newInjuries) {
+            if (!injury.getType().impliesMissingLocation() && null == injuryToRemove) {
+                injuryToRemove = injury;
+            }
+
             if (!hasNewInjuries && currentInjuries.contains(injury)) {
                 hasNewInjuries = true;
             }
@@ -197,6 +214,21 @@ public final class InjuryUtil {
             if (injury.getType().impliesDead(injury.getLocation())) {
                 person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
             }
+            // For missing limbs, we add an amputation recovery so they always show up in the infirmary
+            if (!hasMissingLimbHandled && injury.getType().impliesMissingLocation() && injury.getLocation().isLimb()) {
+                hasMissingLimbHandled = true;
+                amputationRecovery.setLocation(injury.getLocation());
+                person.addInjury(amputationRecovery);
+            }
+        }
+
+        // We do not want to end up with six injuries on a person due to the amputation recovery being added
+        if (hasNewInjuries && hasMissingLimbHandled) {
+            if (newInjuries.size() == 5) {
+                person.removeInjury(injuryToRemove, campaign.getLocalDate());
+                newInjuries.remove(injuryToRemove);
+            }
+            newInjuries.add(amputationRecovery);
         }
 
         if (hasNewInjuries) {
@@ -239,6 +271,27 @@ public final class InjuryUtil {
         List<Injury> newInjuries = new ArrayList<>();
         for (Entry<BodyLocation, Integer> accEntry : hitAccumulator.entrySet()) {
             newInjuries.addAll(genInjuries(campaign, person, accEntry.getKey(), accEntry.getValue()));
+        }
+
+        Injury injuryToRemove = null;
+        // For missing limbs, we add an amputation recovery so they always show up in the infirmary
+        Injury amputationRecovery = null;
+        for (Injury injury : newInjuries) {
+            if (!injury.getType().impliesMissingLocation() && null == injuryToRemove) {
+                injuryToRemove = injury;
+            }
+            if (injury.getType().impliesMissingLocation()) {
+                amputationRecovery = InjuryTypes.AMPUTATION_RECOVERY.newInjury(campaign, person,
+                      injury.getLocation(), 1);
+                break;
+            }
+        }
+        // We do not want to end up with six injuries on a person due to the amputation recovery being added
+        if (null != amputationRecovery) {
+            if (newInjuries.size() == 5) {
+                newInjuries.remove(injuryToRemove);
+            }
+            newInjuries.add(amputationRecovery);
         }
         return newInjuries;
     }
