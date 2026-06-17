@@ -78,6 +78,7 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.utilities.JumpBlockers;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.dialog.JumpCostsSummary;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.utilities.JSuggestField;
@@ -214,6 +215,22 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         gridBagConstraints.weightx = 0.5;
         gridBagConstraints.weighty = 0.0;
         panTopButtons.add(chkUseCommandCircuits, gridBagConstraints);
+
+        RoundedJButton btnJumpFees = new RoundedJButton(resourceMap.getString("btnJumpFees.text"));
+        btnJumpFees.addActionListener(evt -> {
+            TransportCostCalculations transportCostCalculations =
+                  getCampaign().getTransportCostCalculation(EXP_REGULAR);
+            transportCostCalculations.calculateJumpCostForEachDay();
+            new JumpCostsSummary(getCampaignGui().getFrame(), transportCostCalculations);
+        });
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 6;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.weighty = 0.0;
+        panTopButtons.add(btnJumpFees, gridBagConstraints);
 
         panMapView.add(panTopButtons, BorderLayout.PAGE_START);
 
