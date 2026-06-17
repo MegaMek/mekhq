@@ -35,6 +35,7 @@ package mekhq.campaign.mission;
 
 import static java.lang.Math.ceil;
 
+import java.io.PrintWriter;
 import java.text.ParseException;
 import java.time.LocalDate;
 
@@ -195,6 +196,40 @@ public class Contract extends Mission {
         }
 
         setStartAndEndDate(startDate);
+    }
+
+    @Override
+    protected int writeToXMLBegin(Campaign campaign, final PrintWriter pw, int indent) {
+        indent = super.writeToXMLBegin(campaign, pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "nMonths", getLengthInMonths());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "startDate", getStartDate());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "endDate", getEndingDate());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "employer", getEmployerName());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "paymentMultiplier", getPaymentMultiplier());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commandRights", getCommandRights().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "overheadComp", getOverheadCompensation());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvagePct", getSalvagePercent());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvageExchange", isSalvageExchange());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "straightSupport", getStraightSupport());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "battleLossComp", getBattleLossCompensation());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "transportComp", getTransportCompensation());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mrbcFee", getMRBCFeePercentage());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "advancePct", getAdvancePercent());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "signBonus", getSigningBonus());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hospitalBedsRented", getHospitalBedsRented());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "kitchensRented", getKitchensRented());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "holdingCellsRented", getHoldingCellsRented());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "advanceAmount", getAdvanceAmount());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "signingAmount", getSigningBonusAmount());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "transportAmount", getTransportAmount());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "transitAmount", getTransitAmount());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "overheadAmount", getOverheadAmount());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "supportAmount", getSupportAmount());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "baseAmount", getBaseAmount());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "feeAmount", getFeeAmount());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvagedByUnit", getSalvagedByUnit());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvagedByEmployer", getSalvagedByEmployer());
+        return indent;
     }
 
     @Override
