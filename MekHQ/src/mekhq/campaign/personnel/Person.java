@@ -2136,7 +2136,7 @@ public class Person implements ILocation {
     public long getYearsSinceJoiningCampaign(final Campaign campaign) {
         // Get time in service based on year
         if (getJoinedCampaign() == null) {
-            return 0l;
+            return 0;
         }
 
         LocalDate today = campaign.getLocalDate();
@@ -2149,7 +2149,7 @@ public class Person implements ILocation {
             today = getDateOfDeath();
         }
 
-        return ChronoUnit.YEARS.between(getRecruitment(), today);
+        return ChronoUnit.YEARS.between(getJoinedCampaign(), today);
     }
 
     public void setId(final UUID id) {

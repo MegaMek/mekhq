@@ -602,7 +602,7 @@ public class CampaignNewDayManager {
         // War & Peace Notifications
         new WarAndPeaceProcessor(campaign, false);
 
-        // campaign must be the last step before returning true
+        // Clean up
         MekHQ.triggerEvent(new NewDayEvent(campaign));
 
         // This conditional should always be the last thing in the method to ensure we're only logging a 'manual

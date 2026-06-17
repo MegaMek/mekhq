@@ -41,7 +41,7 @@ import mekhq.campaign.CampaignNewDayManager;
  * day completes.
  *
  * <p>Listeners that wish to halt multi-day advancement should fire this event via {@code MekHQ.triggerEvent(new
- * InterruptAdvanceDayEvent(campaign))}. {@link CampaignNewDayManager} subscribes to this event and sets
+ * InterruptAdvanceMultipleDaysEvent(campaign))}. {@link CampaignNewDayManager} subscribes to this event and sets
  * {@code startDayWithNoInterruptions = false} upon receipt.</p>
  *
  * @author Illiani

@@ -328,6 +328,8 @@ public class Campaign implements ITechManager, IPlace {
     private LocalDate currentDay;
     private LocalDate campaignStartDate;
 
+    private transient CampaignNewDayManager newDayManager = null;
+
     // hierarchically structured Formation object to define TO&E
     private Formation formations;
     private Hashtable<Integer, CombatTeam> combatTeams; // AtB
@@ -1780,12 +1782,12 @@ public class Campaign implements ITechManager, IPlace {
     }
 
     /**
-     * Removes any {@link AbstractLocation} entries in {@link #locations} that have no personnel
-     * at any depth in their subtree, excluding the campaign's own current location.
+     * Removes any {@link AbstractLocation} entries in {@link #locations} that have no personnel at any depth in their
+     * subtree, excluding the campaign's own current location.
      *
      * <p>This handles two leak paths: {@link CurrentLocation} travel nodes whose passengers all
-     * died or were removed before arriving, and {@link FixedLocation}/{@link AcademyCampusLocation}
-     * pairs that were never cleaned up after the last student graduated.</p>
+     * died or were removed before arriving, and {@link FixedLocation}/{@link AcademyCampusLocation} pairs that were
+     * never cleaned up after the last student graduated.</p>
      *
      * <p>Call this once per day after all personnel processing has completed.</p>
      */
@@ -1887,9 +1889,8 @@ public class Campaign implements ITechManager, IPlace {
     }
 
     /**
-     * Returns the existing local {@link AcademyCampusLocation} (home-school or unit-education) for
-     * the given campus parented directly under this campaign, creating it on demand if it does not
-     * yet exist.
+     * Returns the existing local {@link AcademyCampusLocation} (home-school or unit-education) for the given campus
+     * parented directly under this campaign, creating it on demand if it does not yet exist.
      *
      * <p>Local campuses travel with the campaign and are not anchored to a {@link FixedLocation}.
      * Use {@link #getOrCreateCampusLocation} for academies at a fixed planetary system.</p>
@@ -2214,7 +2215,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all hangars across all locations associated with this campaign.
-     * TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     *                   TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
      */
     public Hangar getAllHangar() {
         return units;
@@ -2850,7 +2851,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all warehouses across all locations associated with this campaign.
-     * TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
+     *                   TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
      */
     public Warehouse getAllWarehouse() {
         return parts;
@@ -4553,14 +4554,16 @@ public class Campaign implements ITechManager, IPlace {
      * including personnel updates, contract management, financial transactions, maintenance tasks, and other
      * time-dependent campaign events.</p>
      *
-     * @return {@code true} if the new day processing completed successfully; {@code false} if it was cancelled or
-     *       failed
+     * @return {@code true} if the new day processing completed successfully; {@code false} if it was canceled or failed
      *
      * @see CampaignNewDayManager#newDay()
      */
     public boolean newDay() {
-        CampaignNewDayManager manager = new CampaignNewDayManager(this);
-        return manager.newDay();
+        if (newDayManager == null) {
+            newDayManager = new CampaignNewDayManager(this);
+        }
+
+        return newDayManager.newDay();
     }
 
     /**
