@@ -232,7 +232,7 @@ public class RandomDeathAnnouncement extends ImmersiveDialogNag {
     /**
      * Returns a display string combining the deceased's primary role description with a colored skill-level label.
      *
-     * <p>Example output: {@code "MechWarrior (Regular)"} where "Regular" is rendered in the skill-level color
+     * <p>Example output: {@code "MekWarrior (Regular)"} where "Regular" is rendered in the skill-level color
      * defined by {@link SkillType#getColoredExperienceLevelName}.</p>
      *
      * @param deceased the {@link Person} whose primary role is being described
@@ -289,7 +289,7 @@ public class RandomDeathAnnouncement extends ImmersiveDialogNag {
      */
     private String getOutOfCharacterText(String nagConstant) {
         String messageKey = "RandomDeathAnnouncement.outOfCharacter";
-        
+
         String classificationKey = messageKey + '.' + nagConstant;
         String classification = getFormattedTextAt(RESOURCE_BUNDLE, classificationKey);
 
