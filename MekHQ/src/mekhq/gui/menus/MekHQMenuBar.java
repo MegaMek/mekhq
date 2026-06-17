@@ -38,6 +38,7 @@ import static mekhq.gui.CampaignGUI.MAX_QUANTITY_SPINNER;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
@@ -47,7 +48,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.ResourceBundle;
 import java.util.UUID;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
@@ -213,8 +213,7 @@ public class MekHQMenuBar extends JMenuBar {
     }
 
     /**
-     * The File menu uses the following Mnemonic keys as of 25-MAR-2022:
-     * C, E, H, I, L, M, N, R, S, T, U, X
+     * The File menu uses the following Mnemonic keys as of 25-MAR-2022: C, E, H, I, L, M, N, R, S, T, U, X
      */
     private JMenu initFileMenu() {
         // TODO : Implement "Export All" versions for Personnel and Parts
@@ -289,8 +288,7 @@ public class MekHQMenuBar extends JMenuBar {
     }
 
     /**
-     * The Import menu uses the following Mnemonic keys as of 25-MAR-2022:
-     * A, C, F, I, P
+     * The Import menu uses the following Mnemonic keys as of 25-MAR-2022: A, C, F, I, P
      */
     private JMenu initImportMenu() {
         JMenu menuImport = new JMenu(getTextAt("menuImport.text"));
@@ -311,12 +309,9 @@ public class MekHQMenuBar extends JMenuBar {
     }
 
     /**
-     * The Export menu uses the following Mnemonic keys as of 25-MAR-2022:
-     * C, X, S
-     * The CSV menu uses the following Mnemonic keys as of 25-MAR-2022:
-     * F, P, U
-     * The XML menu uses the following Mnemonic keys as of 25-MAR-2022:
-     * C, I, P, R
+     * The Export menu uses the following Mnemonic keys as of 25-MAR-2022: C, X, S The CSV menu uses the following
+     * Mnemonic keys as of 25-MAR-2022: F, P, U The XML menu uses the following Mnemonic keys as of 25-MAR-2022: C, I,
+     * P, R
      */
     private JMenu initExportMenu() {
         JMenu menuExport = new JMenu(getTextAt("menuExport.text"));
@@ -342,7 +337,8 @@ public class MekHQMenuBar extends JMenuBar {
                     getCampaign().getRankSystem())));
 
         miExportXMLFile.add(createMenuItem("miExportIndividualRankSystem.text", KeyEvent.VK_I,
-              evt -> getCampaign().getRankSystem().writeToFile(FileDialogs.saveIndividualRankSystem(getFrame()).orElse(null))));
+              evt -> getCampaign().getRankSystem()
+                           .writeToFile(FileDialogs.saveIndividualRankSystem(getFrame()).orElse(null))));
 
         JMenuItem miExportPlanetsXML = createMenuItem("miExportPlanets.text", KeyEvent.VK_P, evt -> {
             try {
@@ -372,8 +368,7 @@ public class MekHQMenuBar extends JMenuBar {
     }
 
     /**
-     * The Refresh menu uses the following Mnemonic keys as of 12-APR-2022:
-     * A, C, D, F, P, R, U
+     * The Refresh menu uses the following Mnemonic keys as of 12-APR-2022: A, C, D, F, P, R, U
      */
     private JMenu initRefreshMenu() {
         JMenu menuRefresh = new JMenu(getTextAt("menuRefresh.text"));
@@ -413,8 +408,7 @@ public class MekHQMenuBar extends JMenuBar {
     }
 
     /**
-     * The Marketplace menu uses the following Mnemonic keys as of 19-March-2020:
-     * A, B, C, H, M, N, P, R, S, U
+     * The Marketplace menu uses the following Mnemonic keys as of 19-March-2020: A, B, C, H, M, N, P, R, S, U
      */
     private JMenu initMarketMenu() {
         JMenu menuMarket = new JMenu(getTextAt("menuMarket.text"));
@@ -492,10 +486,8 @@ public class MekHQMenuBar extends JMenuBar {
     }
 
     /**
-     * The Astech Pool menu uses the following Mnemonic keys as of 19-March-2020:
-     * B, E, F, H
-     * The Medic Pool menu uses the following Mnemonic keys as of 19-March-2020:
-     * B, E, H, R
+     * The Astech Pool menu uses the following Mnemonic keys as of 19-March-2020: B, E, F, H The Medic Pool menu uses
+     * the following Mnemonic keys as of 19-March-2020: B, E, H, R
      */
     private JMenu initTempPoolMenu() {
         JMenu menuTempPool = new JMenu(getTextAt("menuTempPool.text"));
@@ -692,8 +684,7 @@ public class MekHQMenuBar extends JMenuBar {
     }
 
     /**
-     * The Reports menu uses the following Mnemonic keys as of 19-March-2020:
-     * C, H, P, T, U
+     * The Reports menu uses the following Mnemonic keys as of 19-March-2020: C, H, P, T, U
      */
     private JMenu initReportsMenu() {
         JMenu menuReports = new JMenu(getTextAt("menuReports.text"));
@@ -712,19 +703,21 @@ public class MekHQMenuBar extends JMenuBar {
     }
 
     /**
-     * The View menu uses the following Mnemonic keys as of 02-June-2020:
-     * H, R
+     * The View menu uses the following Mnemonic keys as of 02-June-2020: H, R
      */
     private JMenu initViewMenu() {
         JMenu menuView = new JMenu(getTextAt("menuView.text"));
         menuView.setMnemonic(KeyEvent.VK_V);
 
-        JMenuItem miHistoricalDailyReportDialog = createMenuItem("miShowHistoricalReportLog.text", KeyEvent.VK_H, evt -> {
-            HistoricalDailyReportDialog histDailyReportDialog = new HistoricalDailyReportDialog(getFrame(), getGui());
-            histDailyReportDialog.setModal(true);
-            histDailyReportDialog.setVisible(true);
-            histDailyReportDialog.dispose();
-        });
+        JMenuItem miHistoricalDailyReportDialog = createMenuItem("miShowHistoricalReportLog.text",
+              KeyEvent.VK_H,
+              evt -> {
+                  HistoricalDailyReportDialog histDailyReportDialog = new HistoricalDailyReportDialog(getFrame(),
+                        getGui());
+                  histDailyReportDialog.setModal(true);
+                  histDailyReportDialog.setVisible(true);
+                  histDailyReportDialog.dispose();
+              });
         menuView.add(miHistoricalDailyReportDialog);
 
         miRetirementDefectionDialog = createMenuItem("miRetirementDefectionDialog.text", KeyEvent.VK_R,
@@ -770,27 +763,35 @@ public class MekHQMenuBar extends JMenuBar {
         miCompanyGenerator.setVisible(MekHQ.getMHQOptions().getShowCompanyGenerator());
         menuManage.add(miCompanyGenerator);
 
-        JMenuItem miAutoResolveBehaviorEditor = createMenuItem("miAutoResolveBehaviorSettings.text", KeyEvent.VK_T, evt -> {
-            var autoResolveBehaviorSettingsDialog = new AutoResolveBehaviorSettingsDialog(getFrame(), getCampaign());
-            autoResolveBehaviorSettingsDialog.setVisible(true);
-            autoResolveBehaviorSettingsDialog.pack();
-        });
+        JMenuItem miAutoResolveBehaviorEditor = createMenuItem("miAutoResolveBehaviorSettings.text",
+              KeyEvent.VK_T,
+              evt -> {
+                  var autoResolveBehaviorSettingsDialog = new AutoResolveBehaviorSettingsDialog(getFrame(),
+                        getCampaign());
+                  autoResolveBehaviorSettingsDialog.setVisible(true);
+                  autoResolveBehaviorSettingsDialog.pack();
+              });
 
         menuManage.add(miAutoResolveBehaviorEditor);
 
-        JMenu menuRoleplay = new JMenu(resourceMap.getString("menuRoleplay.text"));
-        JMenuItem miLifePathBuilder = new JMenuItem(resourceMap.getString("miLifePathBuilder.text"));
-        miLifePathBuilder.addActionListener(evt -> {
-            new LifePathBuilderDialog(getCampaign(), getFrame());
-        });
-        menuRoleplay.add(miLifePathBuilder);
-        menuManage.add(menuRoleplay);
+        initMenuRoleplay(menuManage);
 
         return menuManage;
+    }
+
+    private void initMenuRoleplay(JMenu menuManage) {
+        JMenu menuRoleplay = new JMenu(getTextAt("menuRoleplay.text"));
+        menuRoleplay.setMnemonic(KeyEvent.VK_R);
+        menuManage.setName("menuRoleplay");
+
+        JMenuItem miLifePathBuilder = createMenuItem("miLifePathBuilder.text", KeyEvent.VK_L,
+              evt -> new LifePathBuilderDialog(getCampaign(), getFrame()));
+        menuRoleplay.add(miLifePathBuilder);
+        menuManage.add(menuRoleplay);
+    }
 
     /**
-     * The Help menu uses the following Mnemonic keys as of 19-March-2020:
-     * A
+     * The Help menu uses the following Mnemonic keys as of 19-March-2020: A
      */
     private JMenu initHelpMenu() {
         JMenu menuHelp = new JMenu(getTextAt("menuHelp.text"));
