@@ -63,8 +63,9 @@ import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.medical.BodyLocation;
+import mekhq.campaign.personnel.skills.ActionCheckResult;
 import mekhq.campaign.personnel.skills.AttributeCheckUtility;
-import mekhq.campaign.personnel.skills.SkillCheckUtility;
+import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 
 
@@ -423,31 +424,20 @@ public class AdvancedMedicalAlternateHealing {
      */
     private static int getMarginOfSuccessForAssistedHealing(Person doctor, List<TargetRollModifier> modifiers,
           int miscPenalty, boolean useEdge) {
-        SkillCheckUtility surgery = new SkillCheckUtility(
-              getTextAt(RESOURCE_BUNDLE, "AdvancedMedicalAlternateHealing.assistedHealing.normal"),
-              doctor,
-              S_SURGERY,
-              modifiers,
-              miscPenalty,
-              false,
-              true);
-        int marginOfSuccess = surgery.getMarginOfSuccess();
+        SkillCheck skillCheck = doctor.checkSkill(S_SURGERY)
+                                      .withMiscModifier(miscPenalty)
+                                      .withExternalModifiers(modifiers);
+        ActionCheckResult actionCheckResult = skillCheck.resolve(false, getTextAt(RESOURCE_BUNDLE,
+              "AdvancedMedicalAlternateHealing.assistedHealing.normal"), true);
 
         // Edge
-        if (marginOfSuccess <= -6 && useEdge && doctor.getCurrentEdge() > 0) { // Permanent injury
+        if (actionCheckResult.marginOfSuccess() <= -6 && useEdge && doctor.getCurrentEdge() > 0) { // Permanent injury
             // manually update edge because if we pass useEdge == true, the doctor will get one free roll
             doctor.changeCurrentEdge(-1);
-            SkillCheckUtility edgeReroll = new SkillCheckUtility(
-                  getTextAt(RESOURCE_BUNDLE, "AdvancedMedicalAlternateHealing.assistedHealing.edge"),
-                  doctor,
-                  S_SURGERY,
-                  modifiers,
-                  miscPenalty,
-                  false,
-                  true);
-            marginOfSuccess = edgeReroll.getMarginOfSuccess(); // Edge always replaces the original
+            actionCheckResult = skillCheck.resolve(false, getTextAt(RESOURCE_BUNDLE,
+                  "AdvancedMedicalAlternateHealing.assistedHealing.edge"), true);
         }
-        return marginOfSuccess;
+        return actionCheckResult.marginOfSuccess();
     }
 
     /**

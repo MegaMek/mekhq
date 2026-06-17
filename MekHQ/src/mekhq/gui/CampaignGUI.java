@@ -581,10 +581,6 @@ public class CampaignGUI extends JPanel {
         return navigationTab;
     }
 
-    public MapTab getMapTab() {
-        return navigationTab.getMapTab();
-    }
-
     public PersonnelTab getPersonnelTab() {
         return personnelTab;
     }
@@ -621,10 +617,10 @@ public class CampaignGUI extends JPanel {
      * Sets the selected tab.
      */
     public void setSelectedTab(CampaignGuiTab tab) {
-        IntStream.range(0, tabMain.getTabCount())
-              .filter(ii -> Objects.equals(tabMain.getComponentAt(ii), tab))
-              .findFirst()
-              .ifPresent(ii -> tabMain.setSelectedIndex(ii));
+        int index = tabMain.indexOfComponent(tab);
+        if (index >= 0) {
+            tabMain.setSelectedIndex(index);
+        }
     }
 
     /**
@@ -635,7 +631,7 @@ public class CampaignGUI extends JPanel {
     public void setSelectedTab(MHQTabType tabType) {
         Optional<? extends CampaignGuiTab> tab = switch (tabType) {
             case COMMAND_CENTER -> Optional.of(getCommandCenterTab());
-            case NAVIGATION, INTERSTELLAR_MAP -> Optional.of(getNavigationTab());
+            case NAVIGATION -> Optional.of(getNavigationTab());
             case TOE -> Optional.of(getTOETab());
             case BRIEFING_ROOM -> Optional.of(getBriefingRoomTab());
             case STRAT_CON -> getStratConTab();

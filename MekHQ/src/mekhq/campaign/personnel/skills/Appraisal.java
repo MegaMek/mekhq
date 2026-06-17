@@ -32,13 +32,13 @@
  */
 package mekhq.campaign.personnel.skills;
 
+import static mekhq.campaign.personnel.skills.SkillType.S_APPRAISAL;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
@@ -78,21 +78,10 @@ public class Appraisal {
         if (person == null) {
             return 1.0;
         }
-
-        SkillCheckUtility skillCheckUtility = new SkillCheckUtility(
-              getTextAt(RESOURCE_BUNDLE, "Appraisal.skillCheck"),
-              person,
-              SkillType.S_APPRAISAL,
-              List.of(),
-              0,
-              isUseEdge,
-              false,
-              false,
-              false,
-              currentDay);
-        int marginOfSuccessValue = skillCheckUtility.getMarginOfSuccess();
-
-        return getAppraisalCostMultiplier(marginOfSuccessValue);
+        ActionCheckResult actionCheckResult =
+              person.checkSkill(S_APPRAISAL, false, false, currentDay)
+                    .resolve(isUseEdge, getTextAt(RESOURCE_BUNDLE, "Appraisal.skillCheck"), false);
+        return getAppraisalCostMultiplier(actionCheckResult.marginOfSuccess());
     }
 
     /**
