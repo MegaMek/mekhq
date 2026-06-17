@@ -44,6 +44,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 
 import jakarta.annotation.Nullable;
+import javax.swing.SwingUtilities;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
 
 /**
@@ -98,6 +99,9 @@ class CampaignOptionsContentHost extends JPanel {
         contentPanel.repaint();
         revalidate();
         repaint();
+        // Always show a freshly mounted page from the top. Deferred so it runs after the new content has been laid out
+        // (notably for the initial page, which now opens with its sections expanded and is taller than the viewport).
+        SwingUtilities.invokeLater(this::resetScrollPosition);
     }
 
     private boolean shouldShowHelpPanel(Component content, boolean defaultShowHelpPanel) {

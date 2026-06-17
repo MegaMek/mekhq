@@ -896,6 +896,7 @@ public class AdvancementTab {
 
         return CampaignOptionsPagePanel.builder("RecruitmentBonusesTab", "RecruitmentBonusesTab", imageAddress)
                 .header(recruitmentBonusesHeader)
+                .showDetailsPanel(false)
                 .section("lblRecruitmentBonusesCombatPanel.text",
                         "lblRecruitmentBonusesCombatPanel.summary",
                         pnlRecruitmentBonusesCombat)

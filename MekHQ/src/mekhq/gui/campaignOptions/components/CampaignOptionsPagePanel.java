@@ -85,7 +85,7 @@ public class CampaignOptionsPagePanel extends JPanel {
     private static final int QUOTE_TOP_PADDING = UIUtil.scaleForGUI(12);
     private static final int QUOTE_BOTTOM_PADDING = UIUtil.scaleForGUI(8);
     private static final int QUOTE_HORIZONTAL_PADDING = UIUtil.scaleForGUI(24);
-    private static final int DEFAULT_HEADER_IMAGE_SIZE = 64;
+    private static final int DEFAULT_HEADER_IMAGE_SIZE = 80;
     // Shared minimum width every sectioned page is floored to, so form pages render
     // at a consistent width across the
     // dialog instead of each page shrinking to its own widest section. Comfortably

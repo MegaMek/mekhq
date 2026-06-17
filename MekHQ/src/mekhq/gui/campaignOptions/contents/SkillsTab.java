@@ -41,7 +41,10 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FontMetrics;
 import java.awt.GridBagConstraints;
+import java.awt.Insets;
+import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
@@ -100,7 +103,8 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
  * <p>Each skill sub-type (Gunnery, Piloting, Support, Utility, Roleplay) is presented as a single table listing every
  * skill in that category alongside its base target number and a summary of its experience milestones. Per-level XP
  * costs and the milestone thresholds are edited through a dedicated "Advanced" pop-up so the main view stays compact.
- * Ctrl+C copies the selected row's full configuration and Ctrl+V applies it onto one or more selected rows.</p>
+ * The platform copy/paste shortcut (Ctrl+C on Windows/Linux, Cmd+C on macOS) copies the selected row's full
+ * configuration and the corresponding paste shortcut applies it onto one or more selected rows.</p>
  */
 public class SkillsTab {
     private final CampaignOptions campaignOptions;
@@ -244,7 +248,8 @@ public class SkillsTab {
 
         installCopyPasteBindings(table, tableModel);
 
-        JLabel hintLabel = new JLabel(getTextAt(getCampaignOptionsResourceBundle(), "lblSkillTableHint.text"));
+        JLabel hintLabel = new JLabel(String.format(
+              getTextAt(getCampaignOptionsResourceBundle(), "lblSkillTableHint.text"), shortcutModifierLabel()));
 
         layout.gridy = 0;
 
@@ -299,10 +304,10 @@ public class SkillsTab {
         DefaultCellEditor targetEditor = new DefaultCellEditor(targetEditorField) {
             @Override
             public boolean isCellEditable(EventObject anEvent) {
-                // Let Ctrl/Shift clicks extend the row selection instead of starting an edit, so multiple rows can be
-                // selected (and pasted onto) even when clicking within the TN column.
+                // Let menu-shortcut/Shift clicks extend the row selection instead of starting an edit, so multiple
+                // rows can be selected (and pasted onto) even when clicking within the TN column.
                 if (anEvent instanceof MouseEvent mouseEvent
-                          && (mouseEvent.isControlDown() || mouseEvent.isShiftDown())) {
+                          && (((mouseEvent.getModifiersEx() & shortcutMask()) != 0) || mouseEvent.isShiftDown())) {
                     return false;
                 }
                 return super.isCellEditable(anEvent);
@@ -321,6 +326,10 @@ public class SkillsTab {
         // Mirror the row copy/paste shortcuts onto the TN editor field so Ctrl+C/Ctrl+V still copy the whole row even
         // when a TN cell is in edit mode (the field would otherwise consume them as a plain text copy/paste).
         registerRowCopyPasteShortcuts(targetEditorField, JComponent.WHEN_FOCUSED, table, tableModel);
+
+        // Show the full skill name in a tooltip when the column is too narrow to display it without an ellipsis.
+        table.getColumnModel().getColumn(SkillsTableModel.SKILL_COLUMN)
+              .setCellRenderer(new TruncationTooltipRenderer());
 
         String editText = getTextAt(getCampaignOptionsResourceBundle(), "btnSkillAdvanced.text");
         table.getColumnModel().getColumn(SkillsTableModel.EDIT_COLUMN)
@@ -408,8 +417,8 @@ public class SkillsTab {
         InputMap inputMap = component.getInputMap(condition);
         ActionMap actionMap = component.getActionMap();
 
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK), "copySkill");
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK), "pasteSkill");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, shortcutMask()), "copySkill");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, shortcutMask()), "pasteSkill");
 
         actionMap.put("copySkill", new AbstractAction() {
             @Override
@@ -425,6 +434,18 @@ public class SkillsTab {
                 pasteToSelectedSkills(table, tableModel);
             }
         });
+    }
+
+    private static int shortcutMask() {
+        return Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
+    }
+
+    /**
+     * @return the human-readable name of the platform copy/paste modifier key: {@code "Cmd"} on macOS, {@code "Ctrl"}
+     *       elsewhere. Used to keep the on-screen hint consistent with the actual key bindings.
+     */
+    private static String shortcutModifierLabel() {
+        return (shortcutMask() & InputEvent.META_DOWN_MASK) != 0 ? "Cmd" : "Ctrl";
     }
 
     private void stopEditing(JTable table) {
@@ -731,11 +752,45 @@ public class SkillsTab {
     }
 
     /**
+     * A table cell renderer that shows the cell's full text as a tooltip only when the column is too narrow to display
+     * it without an ellipsis. Used for the skill-name column, where long names would otherwise be silently clipped.
+     */
+    private static final class TruncationTooltipRenderer extends DefaultTableCellRenderer {
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+              boolean hasFocus, int row, int column) {
+            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            String text = value == null ? "" : value.toString();
+            Insets insets = getInsets();
+            FontMetrics fontMetrics = getFontMetrics(getFont());
+            int textWidth = fontMetrics.stringWidth(text) + insets.left + insets.right;
+            int columnWidth = table.getColumnModel().getColumn(column).getWidth();
+            setToolTipText(textWidth > columnWidth ? text : null);
+            return this;
+        }
+    }
+
+    /**
+     * Applies the shared styling to the "Advanced" column button so the cell looks identical whether it is being
+     * painted by the renderer (at rest) or shown as the live cell editor (once clicked). The editor button gains focus
+     * the instant the cell starts editing; without matching styling - notably the same opacity and a disabled focus
+     * indicator - the button's label appears to shift alignment when it is clicked.
+     *
+     * @param button the renderer or editor button to style
+     */
+    private static void styleAdvancedButton(JButton button) {
+        button.setOpaque(true);
+        button.setHorizontalAlignment(SwingConstants.CENTER);
+        button.setFocusPainted(false);
+    }
+
+    /**
      * A table cell renderer that paints a button. Used to give every skill row an "Advanced" affordance.
      */
-    private static final class ButtonRenderer extends JButton implements TableCellRenderer {        private ButtonRenderer(String text) {
+    private static final class ButtonRenderer extends JButton implements TableCellRenderer {
+        private ButtonRenderer(String text) {
             super(text);
-            setOpaque(true);
+            styleAdvancedButton(this);
         }
 
         @Override
@@ -759,6 +814,7 @@ public class SkillsTab {
             this.table = table;
             this.tableModel = tableModel;
             this.button = new JButton(text);
+            styleAdvancedButton(this.button);
             this.button.addActionListener(e -> {
                 int row = editingModelRow;
                 fireEditingStopped();

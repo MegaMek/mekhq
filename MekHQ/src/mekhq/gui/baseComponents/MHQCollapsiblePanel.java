@@ -42,6 +42,7 @@ import java.awt.GridBagLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -56,6 +57,8 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 
 import megamek.common.annotations.Nullable;
@@ -77,7 +80,15 @@ public class MHQCollapsiblePanel extends JPanel {
     private final JPanel headerPanel;
     private final JLabel iconLabel = new JLabel();
     private final JLabel titleLabel = new JLabel();
-    private final JLabel summaryLabel = new JLabel();
+    private final JLabel summaryLabel = new JLabel() {
+        @Override
+        public String getToolTipText(MouseEvent event) {
+            // The summary is the header's flexible column, so when it is too long it is truncated with an ellipsis
+            // rather than widening the section. Surface the full text as a tooltip only while it is actually
+            // truncated, so sections whose summary already fits do not show a redundant tooltip.
+            return getPreferredSize().width > getWidth() ? getText() : null;
+        }
+    };
     private final JPanel trailingPanel = new JPanel(new BorderLayout());
     private final JPanel contentPanel = new JPanel(new BorderLayout());
     private final Action toggleAction = new AbstractAction(TOGGLE_ACTION) {
@@ -196,8 +207,11 @@ public class MHQCollapsiblePanel extends JPanel {
 
         titleLabel.putClientProperty("FlatLaf.styleClass", "h4");
 
-        summaryLabel.putClientProperty("FlatLaf.styleClass", "small");
+        // Render the summary at the default body font size. It previously used FlatLaf's smaller "small" type class,
+        // which reviewers found too small; the muted foreground still keeps it secondary to the bold section title.
         summaryLabel.setForeground(UIManager.getColor("Label.disabledForeground"));
+        // Register so the truncation-only tooltip from getToolTipText is shown even though no static tooltip is set.
+        ToolTipManager.sharedInstance().registerComponent(summaryLabel);
 
         trailingPanel.setOpaque(false);
         trailingPanel.setVisible(false);
@@ -225,7 +239,11 @@ public class MHQCollapsiblePanel extends JPanel {
         layout.fill = GridBagConstraints.NONE;
         headerPanel.add(trailingPanel, layout);
 
-        headerPanel.addMouseListener(new MouseAdapter() {
+        // Toggle the section from anywhere in the header. The listener is shared by the header panel and its
+        // non-interactive labels because Swing delivers a mouse event only to the deepest component under the pointer;
+        // without this, clicking directly on the title or the (full-width) summary label would not reach the header.
+        // The trailing panel is intentionally excluded so it can host its own interactive control.
+        MouseAdapter headerInteractionListener = new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent event) {
                 toggleExpanded();
@@ -239,10 +257,18 @@ public class MHQCollapsiblePanel extends JPanel {
 
             @Override
             public void mouseExited(MouseEvent event) {
-                headerHovered = false;
+                // A child label reports an exit when the pointer merely crosses onto it, so only clear the hover
+                // state once the pointer has actually left the header's bounds.
+                Point pointInHeader = SwingUtilities.convertPoint((java.awt.Component) event.getSource(),
+                        event.getPoint(), headerPanel);
+                headerHovered = headerPanel.contains(pointInHeader);
                 updateHeaderBackground();
             }
-        });
+        };
+        headerPanel.addMouseListener(headerInteractionListener);
+        iconLabel.addMouseListener(headerInteractionListener);
+        titleLabel.addMouseListener(headerInteractionListener);
+        summaryLabel.addMouseListener(headerInteractionListener);
         headerPanel.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent event) {

@@ -354,20 +354,34 @@ public class CampaignOptionsUtilities {
                     tipText = getTextAt(RESOURCE_BUNDLE, "lbl" + sourceComponentBaseName + ".tooltip");
                 }
 
-                if (tipText.isBlank()) {
-                    return;
-                }
-
-                tipText = wordWrap(tipText, 120);
-                if (!tipText.endsWith("</html>")) {
-                    tipText += "</html>";
-                }
-
-                if (tipTextConsumer != null) {
-                    tipTextConsumer.accept(tipText);
-                }
+                sendTipToDetailsPanel(tipText);
             }
         };
+    }
+
+    /**
+     * Sends the given raw text to the shared Campaign Options "Option Details" help surface, applying the same word
+     * wrapping and HTML wrapping used by {@link #createTipPanelUpdater}. Use this to drive the details panel from
+     * interactions that the static {@code createTipPanelUpdater} adapters cannot express, such as showing the
+     * description of whichever table row the mouse is currently over.
+     *
+     * <p>Blank or {@code null} text is ignored so the previously shown details are left in place.</p>
+     *
+     * @param rawText the unformatted text to display, or {@code null}/blank to leave the panel unchanged
+     */
+    public static void sendTipToDetailsPanel(@Nullable String rawText) {
+        if (rawText == null || rawText.isBlank()) {
+            return;
+        }
+
+        String tipText = wordWrap(rawText, 120);
+        if (!tipText.endsWith("</html>")) {
+            tipText += "</html>";
+        }
+
+        if (tipTextConsumer != null) {
+            tipTextConsumer.accept(tipText);
+        }
     }
 
     // region Badge Formatting

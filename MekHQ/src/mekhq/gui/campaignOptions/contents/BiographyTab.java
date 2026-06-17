@@ -49,6 +49,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.*;
+import javax.swing.event.TableModelEvent;
 import javax.swing.table.TableColumn;
 
 import jakarta.annotation.Nonnull;
@@ -109,11 +110,11 @@ public class BiographyTab {
     private static final int FORM_CONTROL_COLUMN_WIDTH = 240;
     private static final int CHECKBOX_GRID_COLUMNS = 2;
     private static final int RANK_SYSTEMS_PANEL_WIDTH = 860;
-    private static final int RANK_TABLE_HEIGHT = 260;
+    private static final int RANK_TABLE_HEIGHT = 420;
     private static final int RANK_RATE_COLUMN_WIDTH = 60;
-    private static final int RANK_NAME_COLUMN_WIDTH = 150;
-    private static final int RANK_OFFICER_COLUMN_WIDTH = 90;
-    private static final int RANK_PAY_MULTIPLIER_COLUMN_WIDTH = 120;
+    private static final int RANK_NAME_COLUMN_WIDTH = 100;
+    private static final int RANK_OFFICER_COLUMN_WIDTH = 75;
+    private static final int RANK_PAY_MULTIPLIER_COLUMN_WIDTH = 90;
 
     private final Campaign campaign;
     private final GeneralTab generalTab;
@@ -1481,6 +1482,7 @@ public class BiographyTab {
         JPanel rankSystemsPanel = createRankSystemsPanel();
         return CampaignOptionsPagePanel.builder("RankTab", "RankTab", imageAddress)
             .header(headerPanel)
+            .showDetailsPanel(false)
             .intro("lblRankTabBody.text")
             .quote("rankTab")
             .section("lblRankTab.text", "lblRankTab.summary", rankSystemsPanel)
@@ -1510,6 +1512,16 @@ public class BiographyTab {
         ranksTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         ranksTable.setFillsViewportHeight(true);
         configureEmbeddedRankTableColumns(ranksTable);
+
+        // When the rank system changes, RankTableModel.setRankSystem(...) calls setDataVector(...), which fires a
+        // structure-changed event. That rebuilds the table's columns from scratch and re-applies the wide
+        // standalone-pane widths. Re-apply the narrow embedded widths whenever the structure changes so switching
+        // rank systems doesn't blow the columns out to their full width.
+        ranksTable.getModel().addTableModelListener(event -> {
+            if (event.getFirstRow() == TableModelEvent.HEADER_ROW) {
+                SwingUtilities.invokeLater(() -> configureEmbeddedRankTableColumns(ranksTable));
+            }
+        });
 
         JScrollPane tableScrollPane = (JScrollPane) SwingUtilities.getAncestorOfClass(JScrollPane.class,
                 ranksTable);

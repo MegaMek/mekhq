@@ -57,7 +57,7 @@ import megamek.client.ui.util.UIUtil;
  * layout, and font scaling is applied to the labels to ensure consistent appearance.
  */
 public class CampaignOptionsHeaderPanel extends JPanel {
-    private static final int DEFAULT_IMAGE_SIZE = 64;
+    private static final int DEFAULT_IMAGE_SIZE = 80;
     private static final int DEFAULT_BODY_TEXT_WIDTH = 750;
 
     @Deprecated(since = "0.50.06", forRemoval = true)

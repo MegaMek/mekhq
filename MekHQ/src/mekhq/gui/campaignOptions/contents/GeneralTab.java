@@ -252,6 +252,7 @@ public class GeneralTab {
               .headerImageSize(GENERAL_HEADER_IMAGE_SIZE)
               .tintHeaderImage(false)
               .showDetailsPanel(false)
+              .sectionsExpandedByDefault(true)
               .quote("generalPanel")
               .intro("lblGeneralIconLegend.text")
               .section("lblGeneralCampaignBasicsPanel.text",

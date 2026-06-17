@@ -36,12 +36,14 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelU
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.sendTipToDetailsPanel;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -61,6 +63,7 @@ import javax.swing.JTextField;
 import javax.swing.RowFilter;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.AbstractTableModel;
@@ -429,25 +432,36 @@ public class SalariesTab {
     }
 
     private JTable createCivilianSalaryTable(SalaryTableModel tableModel, TableRowSorter<SalaryTableModel> sorter) {
-        JTable table = new JTable(tableModel) {
-            @Override
-            public String getToolTipText(MouseEvent event) {
-                int rowIndex = rowAtPoint(event.getPoint());
-                if (rowIndex < 0) {
-                    return super.getToolTipText(event);
-                }
-
-                int modelIndex = convertRowIndexToModel(rowIndex);
-                return tableModel.getRole(modelIndex).getDescription(false);
-            }
-        };
+        JTable table = new JTable(tableModel);
         table.setName("tblCivilianBaseSalaries");
         table.setRowSorter(sorter);
         table.setFillsViewportHeight(false);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         table.setShowVerticalLines(false);
         table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
-        table.addMouseListener(createTipPanelUpdater(salariesHeader, "CivilianBaseSalariesTable"));
+        // Surface the hovered role's profession description in the shared "Option Details" panel rather than as a hover
+        // tooltip, so the full description is comfortably readable. Tracking the last row keeps it from re-pushing the
+        // same text on every mouse move within a row.
+        table.addMouseMotionListener(new MouseMotionAdapter() {
+            private int lastModelRow = -1;
+
+            @Override
+            public void mouseMoved(MouseEvent event) {
+                int viewRow = table.rowAtPoint(event.getPoint());
+                if (viewRow < 0) {
+                    lastModelRow = -1;
+                    return;
+                }
+
+                int modelRow = table.convertRowIndexToModel(viewRow);
+                if (modelRow == lastModelRow) {
+                    return;
+                }
+
+                lastModelRow = modelRow;
+                sendTipToDetailsPanel(tableModel.getRole(modelRow).getDescription(false));
+            }
+        });
 
         table.getColumnModel().getColumn(SalaryTableModel.ROLE_COLUMN)
               .setPreferredWidth(UIUtil.scaleForGUI(CIVILIAN_ROLE_COLUMN_WIDTH));
@@ -470,6 +484,18 @@ public class SalariesTab {
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+
+        // The table is sized to show every row, so this inner scroll pane never scrolls. Left alone it still receives
+        // (and silently drops) mouse-wheel events while the cursor is over the table, preventing the surrounding
+        // Campaign Options page from scrolling. Forward wheel events to the nearest ancestor scroll pane so the page
+        // scrolls normally even when hovering the table.
+        scrollPane.addMouseWheelListener(event -> {
+            JScrollPane parentScrollPane = (JScrollPane) SwingUtilities.getAncestorOfClass(JScrollPane.class,
+                  scrollPane);
+            if (parentScrollPane != null) {
+                parentScrollPane.dispatchEvent(SwingUtilities.convertMouseEvent(scrollPane, event, parentScrollPane));
+            }
+        });
 
         return scrollPane;
     }
