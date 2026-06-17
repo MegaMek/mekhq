@@ -42,6 +42,8 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 public class FactionJudgmentTest {
+    private static final LocalDate today = LocalDate.of(3151, 1, 1);
+
     @Test
     public void testFactionHasCensureWhenFactionHasCensureAboveMinimum() {
         FactionJudgment factionJudgment = new FactionJudgment();
@@ -49,7 +51,7 @@ public class FactionJudgmentTest {
         FactionCensureLevel censureLevel = FactionCensureLevel.CENSURE_LEVEL_2; // Above minimum severity
 
         Map<String, CensureEntry> censures = new HashMap<>();
-        censures.put(factionCode, new CensureEntry(censureLevel, LocalDate.now()));
+        censures.put(factionCode, new CensureEntry(censureLevel, today));
         factionJudgment.setFactionCensures(censures);
 
         boolean result = factionJudgment.factionHasCensure(factionCode);
@@ -64,7 +66,7 @@ public class FactionJudgmentTest {
         FactionCensureLevel censureLevel = FactionCensureLevel.CENSURE_LEVEL_0; // At minimum severity
 
         Map<String, CensureEntry> censures = new HashMap<>();
-        censures.put(factionCode, new CensureEntry(censureLevel, LocalDate.now()));
+        censures.put(factionCode, new CensureEntry(censureLevel, today));
         factionJudgment.setFactionCensures(censures);
 
         boolean result = factionJudgment.factionHasCensure(factionCode);
