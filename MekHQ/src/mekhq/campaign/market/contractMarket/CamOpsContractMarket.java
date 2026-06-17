@@ -185,10 +185,14 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         ContractTerms terms = getContractTerms(campaign, contract);
 
         switch (clause) {
-            case CLAUSE_COMMAND -> setCommandRights(contract, terms, contract.getCommandRoll() + change);
-            case CLAUSE_SALVAGE -> setSalvageRights(contract, terms, contract.getSalvageRoll() + change);
-            case CLAUSE_SUPPORT -> setSupportRights(contract, terms, contract.getSupportRoll() + change);
-            case CLAUSE_TRANSPORT -> setTransportRights(contract, terms, contract.getTransportRoll() + change);
+            case CLAUSE_COMMAND ->
+                  setCommandRights(contract, terms, contract.getContractNegotiationCommandRoll() + change);
+            case CLAUSE_SALVAGE ->
+                  setSalvageRights(contract, terms, contract.getContractNegotiationSalvageRoll() + change);
+            case CLAUSE_SUPPORT ->
+                  setSupportRights(contract, terms, contract.getContractNegotiationSupportRoll() + change);
+            case CLAUSE_TRANSPORT ->
+                  setTransportRights(contract, terms, contract.getContractNegotiationTransportRoll() + change);
             default -> throw new IllegalStateException("Unexpected clause when rerolling contract clause: " + clause);
         }
         clauseMods.get(contract.getId()).rerollsUsed[clause]++;
@@ -438,12 +442,12 @@ public class CamOpsContractMarket extends AbstractContractMarket {
     }
 
     private void setCommandRights(AtBContract contract, ContractTerms terms, int roll) {
-        contract.setCommandRoll(roll);
+        contract.setContractNegotiationCommandRoll(roll);
         contract.setCommandRights(terms.getCommandRights(roll));
     }
 
     private void setSalvageRights(AtBContract contract, ContractTerms terms, int roll) {
-        contract.setSalvageRoll(roll);
+        contract.setContractNegotiationSalvageRoll(roll);
         if (terms.isSalvageExchange(roll)) {
             contract.setSalvageExchange(true);
         } else {
@@ -453,7 +457,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
     }
 
     private void setSupportRights(AtBContract contract, ContractTerms terms, int roll) {
-        contract.setSupportRoll(roll);
+        contract.setContractNegotiationSupportRoll(roll);
         if (terms.isStraightSupport(roll)) {
             contract.setStraightSupport(terms.getSupportPercentage(roll));
         } else if (terms.isBattleLossComp(roll)) {
@@ -464,7 +468,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
     }
 
     private void setTransportRights(AtBContract contract, ContractTerms terms, int roll) {
-        contract.setTransportRoll(roll);
+        contract.setContractNegotiationTransportRoll(roll);
         contract.setTransportCompensation(terms.getTransportTerms(roll));
     }
 

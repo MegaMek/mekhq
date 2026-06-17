@@ -567,11 +567,11 @@ public abstract class AbstractContractMarket {
         boolean isAttacker = !contract.getContractType().isGarrisonType() ||
                                    (contract.getContractType().isReliefDuty() && (d6() < 4)) ||
                                    contract.getEnemy().isRebel();
-        contract.setAttacker(isAttacker);
+        contract.setPlayerAttacker(isAttacker);
     }
 
     protected void setSystemId(AtBContract contract) throws NoContractLocationFoundException {
-        if (contract.isAttacker()) {
+        if (contract.isPlayerAttacker()) {
             contract.setSystemId(RandomFactionGenerator.getInstance()
                                        .getMissionTarget(contract.getEmployerCode(), contract.getEnemyCode()));
         } else {
@@ -622,7 +622,7 @@ public abstract class AbstractContractMarket {
         final Faction employerFaction = contract.getEmployerFaction();
 
         int mod = calculateFactionModifiers(contract.getEmployerFaction());
-        mod += calculateContractTypeModifiers(contract.getContractType(), contract.isAttacker());
+        mod += calculateContractTypeModifiers(contract.getContractType(), contract.isPlayerAttacker());
 
         // The less skilled the player, the easier their contract.
         mod += REGULAR.getExperienceLevel() - averageSkillLevel.getExperienceLevel();
@@ -633,7 +633,7 @@ public abstract class AbstractContractMarket {
         // Apply faction modifiers
         if (employerFaction.isClan()) {
             // Apply Clan clamping
-            if (contract.isAttacker()) {
+            if (contract.isPlayerAttacker()) {
                 if (contract.getAllySkill().ordinal() < VETERAN.ordinal()) {
                     contract.setAllySkill(VETERAN);
                 }
@@ -691,7 +691,7 @@ public abstract class AbstractContractMarket {
         int mod = calculateFactionModifiers(enemyFaction);
 
         // Adjust modifiers based on attack/defense roles
-        if (!contract.isAttacker()) {
+        if (!contract.isPlayerAttacker()) {
             mod += 1;
         }
 
@@ -704,7 +704,7 @@ public abstract class AbstractContractMarket {
         // Apply faction modifiers
         if (enemyFaction.isClan()) {
             // Apply Clan clamping
-            if (!contract.isAttacker()) {
+            if (!contract.isPlayerAttacker()) {
                 if (contract.getEnemySkill().ordinal() < VETERAN.ordinal()) {
                     contract.setEnemySkill(VETERAN);
                 }

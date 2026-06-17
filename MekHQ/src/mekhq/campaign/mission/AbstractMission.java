@@ -170,6 +170,12 @@ public class AbstractMission {
     private int requiredCombatTeams;
     private int requiredCombatElements;
 
+    private boolean isPlayerAttacker;
+    private int contractNegotiationCommandRoll;
+    private int contractNegotiationSalvageRoll;
+    private int contractNegotiationSupportRoll;
+    private int contractNegotiationTransportRoll;
+
     private AtBMoraleLevel moraleLevel;
     private LocalDate routEndDate;
     private Money routedPayout = null;
@@ -614,6 +620,46 @@ public class AbstractMission {
     public void setContractType(final AtBContractType contractType) {
         this.contractType = contractType;
         setContractTypeName(contractType.toString());
+    }
+
+    public boolean isPlayerAttacker() {
+        return isPlayerAttacker;
+    }
+
+    public void setPlayerAttacker(boolean playerAttacker) {
+        isPlayerAttacker = playerAttacker;
+    }
+
+    public int getContractNegotiationTransportRoll() {
+        return contractNegotiationTransportRoll;
+    }
+
+    public void setContractNegotiationTransportRoll(int contractNegotiationTransportRoll) {
+        this.contractNegotiationTransportRoll = contractNegotiationTransportRoll;
+    }
+
+    public int getContractNegotiationSupportRoll() {
+        return contractNegotiationSupportRoll;
+    }
+
+    public void setContractNegotiationSupportRoll(int contractNegotiationSupportRoll) {
+        this.contractNegotiationSupportRoll = contractNegotiationSupportRoll;
+    }
+
+    public int getContractNegotiationSalvageRoll() {
+        return contractNegotiationSalvageRoll;
+    }
+
+    public void setContractNegotiationSalvageRoll(int contractNegotiationSalvageRoll) {
+        this.contractNegotiationSalvageRoll = contractNegotiationSalvageRoll;
+    }
+
+    public int getContractNegotiationCommandRoll() {
+        return contractNegotiationCommandRoll;
+    }
+
+    public void setContractNegotiationCommandRoll(int contractNegotiationCommandRoll) {
+        this.contractNegotiationCommandRoll = contractNegotiationCommandRoll;
     }
 
     public List<Scenario> getScenarios() {

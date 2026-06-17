@@ -169,15 +169,7 @@ public class AtBContract extends Contract {
     /* Only applies to next week */
     protected int nextWeekBattleTypeMod;
 
-    private boolean isAttacker;
-
-
     private static final String RESOURCE_BUNDLE = "mekhq.resources.AtBContract";
-
-    private int commandRoll;
-    private int salvageRoll;
-    private int supportRoll;
-    private int transportRoll;
 
     protected AtBContract() {
         this(null);
@@ -192,7 +184,7 @@ public class AtBContract extends Contract {
 
         parentContract = null;
         mercSubcontract = false;
-        isAttacker = false;
+        setPlayerAttacker(false);
 
         setContractType(AtBContractType.GARRISON_DUTY);
 
@@ -683,14 +675,6 @@ public class AtBContract extends Contract {
         mercSubcontract = sub;
     }
 
-    public boolean isAttacker() {
-        return isAttacker;
-    }
-
-    public void setAttacker(boolean isAttacker) {
-        this.isAttacker = isAttacker;
-    }
-
     public void checkEvents(Campaign campaign) {
         if (campaign.getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
             nextWeekBattleTypeMod = 0;
@@ -1004,10 +988,10 @@ public class AtBContract extends Contract {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "priorLogisticsFailure", priorLogisticsFailure);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "battleTypeMod", battleTypeMod);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "nextWeekBattleTypeMod", nextWeekBattleTypeMod);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commandRoll", commandRoll);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvageRoll", salvageRoll);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "supportRoll", supportRoll);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "transportRoll", transportRoll);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commandRoll", getContractNegotiationCommandRoll());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvageRoll", getContractNegotiationSalvageRoll());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "supportRoll", getContractNegotiationSupportRoll());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "transportRoll", getContractNegotiationTransportRoll());
 
         if (parentContract != null) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "parentContractId", parentContract.getId());
@@ -1113,13 +1097,13 @@ public class AtBContract extends Contract {
                 } else if (item.getNodeName().equalsIgnoreCase("nextWeekBattleTypeMod")) {
                     nextWeekBattleTypeMod = Integer.parseInt(item.getTextContent());
                 } else if (item.getNodeName().equalsIgnoreCase("commandRoll")) {
-                    commandRoll = Integer.parseInt(item.getTextContent());
+                    setContractNegotiationCommandRoll(Integer.parseInt(item.getTextContent()));
                 } else if (item.getNodeName().equalsIgnoreCase("salvageRoll")) {
-                    salvageRoll = Integer.parseInt(item.getTextContent());
+                    setContractNegotiationSalvageRoll(Integer.parseInt(item.getTextContent()));
                 } else if (item.getNodeName().equalsIgnoreCase("supportRoll")) {
-                    supportRoll = Integer.parseInt(item.getTextContent());
+                    setContractNegotiationSupportRoll(Integer.parseInt(item.getTextContent()));
                 } else if (item.getNodeName().equalsIgnoreCase("transportRoll")) {
-                    transportRoll = Integer.parseInt(item.getTextContent());
+                    setContractNegotiationTransportRoll(Integer.parseInt(item.getTextContent()));
                 } else if (item.getNodeName().equalsIgnoreCase("specialEventScenarioDate")) {
                     specialEventScenarioDate = MHQXMLUtility.parseDate(item.getTextContent().trim());
                 } else if (item.getNodeName().equalsIgnoreCase("specialEventScenarioType")) {
@@ -1626,62 +1610,6 @@ public class AtBContract extends Contract {
         } else {
             return ((double) totalBattleValue) / rollingCount;
         }
-    }
-
-    /**
-     * @return the command roll that was used to determine command rights. Only used by CamOps Contract Market.
-     */
-    public int getCommandRoll() {
-        return commandRoll;
-    }
-
-    /**
-     * @param roll the command roll that was used to determine command rights. Only used by CamOps Contract Market.
-     */
-    public void setCommandRoll(int roll) {
-        commandRoll = roll;
-    }
-
-    /**
-     * @return the salvage roll that was used to determine salvage rights. Only used by CamOps Contract Market.
-     */
-    public int getSalvageRoll() {
-        return salvageRoll;
-    }
-
-    /**
-     * @param roll the salvage roll that was used to determine salvage rights. Only used by CamOps Contract Market.
-     */
-    public void setSalvageRoll(int roll) {
-        salvageRoll = roll;
-    }
-
-    /**
-     * @return the support roll that was used to determine support rights. Only used by CamOps Contract Market.
-     */
-    public int getSupportRoll() {
-        return supportRoll;
-    }
-
-    /**
-     * @param roll the support roll that was used to determine support rights. Only used by CamOps Contract Market.
-     */
-    public void setSupportRoll(int roll) {
-        supportRoll = roll;
-    }
-
-    /**
-     * @return the transport roll that was used to determine transport rights. Only used by CamOps Contract Market.
-     */
-    public int getTransportRoll() {
-        return transportRoll;
-    }
-
-    /**
-     * @param roll the transport roll that was used to determine transport rights. Only used by CamOps Contract Market.
-     */
-    public void setTransportRoll(int roll) {
-        transportRoll = roll;
     }
 
     /**
