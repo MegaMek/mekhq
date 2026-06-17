@@ -156,7 +156,6 @@ public class AtBContract extends Contract {
     protected AtBMoraleLevel moraleLevel;
     protected LocalDate routEnd;
     protected int partsAvailabilityLevel;
-    protected int sharesPct;
     private boolean batchallAccepted;
 
     protected int playerMinorBreaches;
@@ -218,7 +217,7 @@ public class AtBContract extends Contract {
 
         extensionLength = 0;
 
-        sharesPct = 0;
+        setSharesPercent(0);
         batchallAccepted = true;
         setMoraleLevel(STALEMATE);
         routEnd = null;
@@ -1013,7 +1012,7 @@ public class AtBContract extends Contract {
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "partsAvailabilityLevel", getPartsAvailabilityLevel());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "extensionLength", extensionLength);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sharesPct", sharesPct);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sharesPct", getSharesPercent());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "batchallAccepted", batchallAccepted);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "playerMinorBreaches", playerMinorBreaches);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "employerMinorBreaches", employerMinorBreaches);
@@ -1114,7 +1113,7 @@ public class AtBContract extends Contract {
                 } else if (item.getNodeName().equalsIgnoreCase("extensionLength")) {
                     extensionLength = Integer.parseInt(item.getTextContent());
                 } else if (item.getNodeName().equalsIgnoreCase("sharesPct")) {
-                    sharesPct = Integer.parseInt(item.getTextContent());
+                    setSharesPercent(Integer.parseInt(item.getTextContent()));
                 } else if (item.getNodeName().equalsIgnoreCase("batchallAccepted")) {
                     batchallAccepted = Boolean.parseBoolean(item.getTextContent());
                 } else if (item.getNodeName().equalsIgnoreCase("playerMinorBreaches")) {
@@ -1272,15 +1271,6 @@ public class AtBContract extends Contract {
 
     public void setRoutEnd(LocalDate routEnd) {
         this.routEnd = routEnd;
-    }
-
-    @Override
-    public int getSharesPercent() {
-        return sharesPct;
-    }
-
-    public void setAtBSharesPercent(int pct) {
-        sharesPct = pct;
     }
 
     /**

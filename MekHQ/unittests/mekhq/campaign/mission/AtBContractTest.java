@@ -201,7 +201,7 @@ public class AtBContractTest {
     @Test
     public void atbContractSharesPercentMatchesPreviousSetting() {
         AtBContract contract = new AtBContract("Test");
-        contract.setAtBSharesPercent(50);
+        contract.setSharesPercent(50);
         assertEquals(50, contract.getSharesPercent());
     }
 

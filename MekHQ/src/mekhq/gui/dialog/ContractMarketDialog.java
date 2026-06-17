@@ -251,7 +251,7 @@ public class ContractMarketDialog extends JDialog {
                 if (campaign.getCampaignOptions().isUseStratCon() &&
                           campaign.getCampaignOptions().isUseShareSystem() &&
                           c instanceof AtBContract) {
-                    ((AtBContract) c).setAtBSharesPercent(sharePct);
+                    ((AtBContract) c).setSharesPercent(sharePct);
                     c.calculateContract(campaign);
                 }
             }
@@ -314,9 +314,9 @@ public class ContractMarketDialog extends JDialog {
                 atbContract.initContractDetails(campaign);
                 campaign.getContractMarket().calculatePaymentMultiplier(campaign, atbContract);
                 atbContract.setPartsAvailabilityLevel(atbContract.getContractType().calculatePartsAvailabilityLevel());
-                atbContract.setAtBSharesPercent(campaign.getCampaignOptions().isUseShareSystem() ?
-                                                      (Integer) spnSharePct.getValue() :
-                                                      0);
+                atbContract.setSharesPercent(campaign.getCampaignOptions().isUseShareSystem() ?
+                                                   (Integer) spnSharePct.getValue() :
+                                                   0);
                 if (!isUseCommandCircuit) {
                     isUseCommandCircuit = FactionStandingUtilities.isUseCommandCircuit(isOverridingCommandCircuit, isGM,
                           isUseFactionStandingCommandCircuits, factionStandings, List.of(atbContract));
@@ -504,9 +504,9 @@ public class ContractMarketDialog extends JDialog {
 
             contract.initContractDetails(campaign);
             contract.setPartsAvailabilityLevel(contract.getContractType().calculatePartsAvailabilityLevel());
-            contract.setAtBSharesPercent(campaign.getCampaignOptions().isUseShareSystem() ?
-                                               (Integer) spnSharePct.getValue() :
-                                               0);
+            contract.setSharesPercent(campaign.getCampaignOptions().isUseShareSystem() ?
+                                            (Integer) spnSharePct.getValue() :
+                                            0);
             contract.setStartDate(null);
             contract.setPaidMRBCFee(payMRBC);
             contract.setAdvancePercent(advance);
