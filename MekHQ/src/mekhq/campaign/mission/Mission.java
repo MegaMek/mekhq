@@ -69,12 +69,6 @@ public class Mission extends AbstractMission {
     // endregion Constructors
 
     @Override
-    public void writeToXML(Campaign campaign, final PrintWriter pw, int indent) {
-        indent = writeToXMLBegin(campaign, pw, indent);
-        writeToXMLEnd(pw, indent);
-    }
-
-    @Override
     protected int writeToXMLBegin(Campaign campaign, final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "mission", "id", getId(), "type", getClass());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", getName());
@@ -93,11 +87,6 @@ public class Mission extends AbstractMission {
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "scenarios");
         return indent;
-    }
-
-    @Override
-    protected void writeToXMLEnd(final PrintWriter pw, int indent) {
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "mission");
     }
 
     @Override

@@ -91,6 +91,7 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.commons.lang3.NotImplementedException;
 import org.w3c.dom.Node;
 
@@ -353,6 +354,10 @@ public class AbstractMission {
      * @return the number of months left
      */
     public int getMonthsLeft(LocalDate date) {
+        if (getEndingDate() == null) {
+            return 0;
+        }
+
         int monthsLeft = Math.toIntExact(ChronoUnit.MONTHS.between(date, getEndingDate()));
         // Ensure partial months are counted based on the current day of the month, as
         // the above only
@@ -1376,8 +1381,8 @@ public class AbstractMission {
     }
 
     public void writeToXML(Campaign campaign, final PrintWriter pw, int indent) {
-        NotImplementedException error = new NotImplementedException();
-        LOGGER.error(error);
+        indent = writeToXMLBegin(campaign, pw, indent);
+        writeToXMLEnd(pw, indent);
     }
 
     protected int writeToXMLBegin(Campaign campaign, final PrintWriter pw, int indent) {
@@ -1387,8 +1392,7 @@ public class AbstractMission {
     }
 
     protected void writeToXMLEnd(final PrintWriter pw, int indent) {
-        NotImplementedException error = new NotImplementedException();
-        LOGGER.error(error);
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "mission");
     }
 
     public void loadFieldsFromXmlNode(Campaign campaign, Version version, Node wn) throws ParseException {
