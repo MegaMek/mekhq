@@ -179,7 +179,7 @@ public class LocationUtilsTest {
         }
 
         @Test
-        void eitherInTransit_returnsFalse() {
+        void oneInTransitOtherNot_returnsFalse() {
             PlanetarySystem sys = mock(PlanetarySystem.class);
             when(sys.getTimeToJumpPoint(1.0)).thenReturn(1.0);
             CurrentLocation travelNode = new CurrentLocation(sys, 0.0);
@@ -189,6 +189,36 @@ public class LocationUtilsTest {
             travelNode.setParent(base);
 
             assertFalse(LocationUtils.areSameEffectiveLocation(travelNode, base));
+        }
+
+        @Test
+        void bothInTransitDifferentNodes_returnsFalse() {
+            PlanetarySystem sys = mock(PlanetarySystem.class);
+            when(sys.getTimeToJumpPoint(1.0)).thenReturn(1.0);
+            JumpPath mockJumpPath = mock(JumpPath.class);
+            when(mockJumpPath.isEmpty()).thenReturn(false);
+
+            CurrentLocation travelNode1 = new CurrentLocation(sys, 0.0);
+            travelNode1.setJumpPath(mockJumpPath);
+
+            CurrentLocation travelNode2 = new CurrentLocation(sys, 0.0);
+            travelNode2.setJumpPath(mockJumpPath);
+
+            assertFalse(LocationUtils.areSameEffectiveLocation(travelNode1, travelNode2));
+        }
+
+        @Test
+        void bothInTransitSameNode_returnsTrue() {
+            PlanetarySystem sys = mock(PlanetarySystem.class);
+            when(sys.getTimeToJumpPoint(1.0)).thenReturn(1.0);
+            CurrentLocation travelNode = new CurrentLocation(sys, 0.0);
+            JumpPath mockJumpPath = mock(JumpPath.class);
+            when(mockJumpPath.isEmpty()).thenReturn(false);
+            travelNode.setJumpPath(mockJumpPath);
+            base.setParent(travelNode);
+
+            assertTrue(LocationUtils.areSameEffectiveLocation(
+                  base.getBaseHangar(), base.getBaseWarehouse()));
         }
     }
 }

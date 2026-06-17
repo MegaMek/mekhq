@@ -77,8 +77,8 @@ import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.skills.ActionCheckResult;
 import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillCheckUtility;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.Faction;
@@ -662,34 +662,21 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
 
     private static int getCommanderModifier(Campaign campaign) {
-        Person campaignCommander = campaign.getFlaggedCommander();
-        int connections = 0;
-        int negotiationsMarginOfSuccess = 0;
-        if (campaignCommander != null) {
-            connections = campaignCommander.getAdjustedConnections(false);
-
-            CampaignOptions campaignOptions = campaign.getCampaignOptions();
-            boolean isUseAgingEffects = campaignOptions.isUseAgeEffects();
-            boolean isClanCampaign = campaign.isClanCampaign();
-            boolean isUseEdge = campaignOptions.isUseEdge() || campaignOptions.isUseSupportEdge();
-            isUseEdge = isUseEdge && campaignCommander.getOptions().booleanOption(EDGE_COMMANDER_NEGOTIATION);
-            SkillCheckUtility checkUtility = new SkillCheckUtility(
-                  getTextAt(RESOURCE_BUNDLE, "AtbMonthlyContractMarket.contractSkillCheck"),
-                  campaignCommander,
-                  S_NEGOTIATION,
-                  null,
-                  0,
-                  isUseEdge,
-                  true,
-                  isUseAgingEffects,
-                  isClanCampaign,
-                  campaign.getLocalDate());
-            negotiationsMarginOfSuccess = max(0, checkUtility.getMarginOfSuccess());
-
-            campaign.addReport(SKILL_CHECKS, checkUtility.getResultsText());
+        Person commander = campaign.getFlaggedCommander();
+        if (commander == null) {
+            return 0;
         }
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        int connections = commander.getAdjustedConnections(false);
+        boolean isUseEdge = campaignOptions.isUseEdge() || campaignOptions.isUseSupportEdge();
+        isUseEdge = isUseEdge && commander.getOptions().booleanOption(EDGE_COMMANDER_NEGOTIATION);
 
-        return connections + negotiationsMarginOfSuccess;
+        ActionCheckResult actionCheckResult =
+              commander.checkSkill(S_NEGOTIATION, campaign)
+                    .resolve(isUseEdge, getTextAt(RESOURCE_BUNDLE, "AtbMonthlyContractMarket.contractSkillCheck"), true);
+        campaign.addReport(SKILL_CHECKS, actionCheckResult.resultsText());
+
+        return connections + Math.max(0, actionCheckResult.marginOfSuccess());
     }
 
     /**

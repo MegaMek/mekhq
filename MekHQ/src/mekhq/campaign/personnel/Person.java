@@ -146,6 +146,7 @@ import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.Skills;
@@ -5805,6 +5806,60 @@ public class Person implements ILocation {
             addSkill(skillName, 0, 0);
         }
         MekHQ.triggerEvent(new PersonChangedEvent(this));
+    }
+
+    /**
+     * Use {@link #checkSkill(String, boolean, boolean, LocalDate)} or {@link #checkSkill(String, Campaign)} instead.
+     *
+     * <p>Prepares a skill check.</p>
+     *
+     * <p>This constructor creates a {@code SkillCheck} instance which calculates the target number for the
+     * skill check based the person's skill level.</p>
+     *
+     * <p><b>Usage:</b> This is a convenience method that excludes reputation and aging effect checks.</p>
+     *
+     * @param skillName the name of the skill being used, corresponding to a {@link SkillType}
+     *
+     * @return prepared skill check
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
+    public SkillCheck checkSkill(String skillName) {
+        return new SkillCheck(this, skillName);
+    }
+
+
+    /**
+     * Prepares a skill check based on individually passed options.
+     *
+     * <p>This method creates a {@code SkillCheck} instance which calculates the target number
+     * for the skill check, based on the person's skill, aging effects, clan campaign rules,
+     * and the current date.</p>
+     *
+     * @param skillName         the name of the skill being checked, corresponding to a {@link SkillType}
+     * @param isUseAgingEffects if {@code true}, considers aging effects during the check
+     * @param isClanCampaign    if {@code true}, applies rules specific to clan campaigns
+     * @param date              the current date, used for time-dependent logic
+     *
+     * @return prepared skill check
+     */
+    public SkillCheck checkSkill(String skillName, boolean isUseAgingEffects, boolean isClanCampaign, LocalDate date) {
+        return new SkillCheck(this, skillName, isUseAgingEffects, isClanCampaign, date);
+    }
+
+    /**
+     * Prepares a skill check based on the campaign's options.
+     *
+     * <p>Automatically extracts aging effect setting, clan campaign status, and the current date from
+     * the provided {@link Campaign} context to calculate the target number.</p>
+     *
+     * @param skillName the name of the skill being checked, corresponding to a {@link SkillType}
+     * @param campaign  the current {@link Campaign} context
+     *
+     * @return prepared skill check
+     */
+    public SkillCheck checkSkill(String skillName, Campaign campaign) {
+        return new SkillCheck(this, skillName, campaign.getCampaignOptions().isUseAgeEffects(),
+              campaign.isClanCampaign(), campaign.getLocalDate());
     }
 
     /**
