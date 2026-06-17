@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -167,6 +167,7 @@ public enum GlossaryEntry {
     STRIPPING_AND_REPAIRING("STRIPPING_AND_REPAIRING", new Version("0.50.06")),
     SUPPORT_POINTS("SUPPORT_POINTS", new Version("0.50.06")),
     TECH_TIME("TECH_TIME", new Version("0.50.06")),
+    TEMP_CREWS("TEMP_CREWS", new Version("0.51.01")),
     TEMP_PERSONNEL("TEMP_PERSONNEL", new Version("0.50.06")),
     TOE("TOE", new Version("0.50.06")),
     TRAINING_COMBAT_TEAMS("TRAINING_COMBAT_TEAMS", new Version("0.50.10")),
