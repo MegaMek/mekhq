@@ -48,6 +48,10 @@ import org.w3c.dom.NodeList;
 
 /**
  * A simple node for forming a tree of {@link ILocation} implementations.
+ * <p>
+ *     Please do not expose the inner workings of {@code LocationNode}. Node logic should only be direcly utilized
+ *     within the {@code location} package.
+ * </p>
  */
 public class LocationNode {
     private static final MMLogger logger = MMLogger.create(LocationNode.class);
@@ -79,7 +83,7 @@ public class LocationNode {
     }
 
     @Nullable
-    public LocationNode getParent() {
+    LocationNode getParent() {
         return parent;
     }
 
@@ -92,7 +96,7 @@ public class LocationNode {
      *
      * @return immutable copy of the node's children in a {@code Set}
      */
-    public Set<LocationNode> getChildren() {
+    Set<LocationNode> getChildren() {
         return Set.copyOf(children);
     }
 
@@ -206,7 +210,7 @@ public class LocationNode {
             }
         }
 
-        public static void setLocation(LocationNode childLocationNode, @Nullable LocationNode parentLocationNode) {
+        private static void setLocation(LocationNode childLocationNode, @Nullable LocationNode parentLocationNode) {
             if ((parentLocationNode != null) && wouldCreateCycle(childLocationNode, parentLocationNode)) {
                 logger.error("Refusing to parent {} under {}: would create a location-tree cycle",
                       childLocationNode.getLocatable(),

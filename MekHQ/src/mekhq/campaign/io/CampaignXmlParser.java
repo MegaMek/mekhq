@@ -110,6 +110,7 @@ import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.location.AcademyCampusLocation;
+import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
@@ -783,7 +784,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         // Reconnect persons to the main-force personnel node. Skip persons already placed by
         // processPlayerBaseNodes or reconnectChildren (base / travel / campus persons).
         for (Person person : campaign.getAllPersonnel()) {
-            if (person.getLocationNode().getParent() == null) {
+            if (!person.isParented()) {
                 person.setParent(campaign.getMainForcePersonnel());
             }
         }
@@ -1506,8 +1507,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                             person.setParent(base.getBasePersonnel());
                         }
                     }
-                    for (LocationNode child : base.getLocationNode().getChildren()) {
-                        if (child.getLocatable() instanceof AcademyCampusLocation campus) {
+                    for (ILocation child : base.getChildLocations()) {
+                        if (child instanceof AcademyCampusLocation campus) {
                             drainCampusPersons(campaign, campus);
                         }
                     }
@@ -1735,7 +1736,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 // be re-parented here, as that would detach them from their base. Items whose
                 // save pre-dates the arrival-tracking fix fall back to main force so they
                 // remain visible rather than becoming invisible.
-                boolean isOrphaned = currentLocation.getLocationNode().getParent() == null;
+                boolean isOrphaned = !currentLocation.isParented();
                 boolean isActivelyInTransit = currentLocation.getJumpPath() != null
                                                     && !currentLocation.getJumpPath().isEmpty();
                 if (isOrphaned && !isActivelyInTransit) {
@@ -1743,7 +1744,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     // re-homed by processPlayerBaseNodes falls back to main force.
                     for (UUID personId : currentLocation.drainPendingPersonIds()) {
                         Person person = campaign.getPerson(personId);
-                        if (person != null && person.getLocationNode().getParent() == null) {
+                        if (person != null && !person.isParented()) {
                             person.setParent(campaign.getMainForcePersonnel());
                             LOGGER.warn("reconnectPersonsToTravelLocations: person {} had no parent "
                                   + "(orphaned arrived node); re-homed to main force", personId);
@@ -1751,7 +1752,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     }
                     for (UUID unitId : currentLocation.drainPendingUnitIds()) {
                         Unit unit = findUnitAnywhere(campaign, unitId);
-                        if (unit != null && unit.getLocationNode().getParent() == null) {
+                        if (unit != null && !unit.isParented()) {
                             LocationNode.LocationManager.setLocation(unit, campaign.getHangar());
                             LOGGER.warn("reconnectPersonsToTravelLocations: unit {} had no parent "
                                   + "(orphaned arrived node); re-homed to main hangar", unitId);
@@ -1759,7 +1760,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     }
                     for (int partId : currentLocation.drainPendingPartIds()) {
                         Part part = findPartAnywhere(campaign, partId);
-                        if (part != null && part.getLocationNode().getParent() == null) {
+                        if (part != null && !part.isParented()) {
                             LocationNode.LocationManager.setLocation(part, campaign.getWarehouse());
                             LOGGER.warn("reconnectPersonsToTravelLocations: part {} had no parent "
                                   + "(orphaned arrived node); re-homed to main warehouse", partId);
@@ -1798,8 +1799,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
             // Persons at campus — parented under the campus's Personnel sub-node
             if (location instanceof FixedLocation fixedLocation) {
-                for (LocationNode campusNode : fixedLocation.getLocationNode().getChildren()) {
-                    if (campusNode.getLocatable() instanceof AcademyCampusLocation campusLocation) {
+                for (ILocation campusNode : fixedLocation.getChildLocations()) {
+                    if (campusNode instanceof AcademyCampusLocation campusLocation) {
                         drainCampusPersons(campaign, campusLocation);
                     }
                 }
@@ -1809,8 +1810,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         // Persons at campaign-root campuses (homeSchool) — same pattern as FixedLocation campuses above.
         // Campaign itself is not in campaign.getLocations(), so its direct campus children are never
         // visited by the loop above.
-        for (LocationNode campusNode : campaign.getLocationNode().getChildren()) {
-            if (campusNode.getLocatable() instanceof AcademyCampusLocation campusLocation) {
+        for (ILocation location : campaign.getChildLocations()) {
+            if (location instanceof AcademyCampusLocation campusLocation) {
                 drainCampusPersons(campaign, campusLocation);
             }
         }
@@ -1893,11 +1894,10 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 // during XML parsing (e.g., reconnected by an earlier load step). Without this
                 // guard, resolveAcademySystemId may return the wrong system for multi-location
                 // academies, creating a duplicate campus and displacing the person.
-                LocationNode parentNode = person.getLocationNode().getParent();
-                if (parentNode != null
-                          && !(parentNode.getLocatable() instanceof Personnel personnel
-                                && personnel.getLocationNode().getParent() instanceof LocationNode node
-                                && node.getLocatable() instanceof Campaign)) {
+                ILocation parentLocation = person.getParentLocation();
+                if (parentLocation != null
+                          && !(parentLocation instanceof Personnel personnel
+                                && personnel.getParentLocation() instanceof Campaign)) {
                     LOGGER.debug("migrateLegacyEducationTravel: skipping {} — already reconnected (stage={})",
                           person.getFullTitle(), stage);
                     continue;
@@ -2005,8 +2005,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             if (!(location instanceof FixedLocation fixedLocation)) {
                 continue;
             }
-            for (LocationNode child : fixedLocation.getLocationNode().getChildren()) {
-                if (child.getLocatable() instanceof AcademyCampusLocation campus
+            for (ILocation child : fixedLocation.getChildLocations()) {
+                if (child instanceof AcademyCampusLocation campus
                           && campus.containsPendingPersonId(person.getId())) {
                     return true;
                 }

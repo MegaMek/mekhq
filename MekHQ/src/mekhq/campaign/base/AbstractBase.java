@@ -162,8 +162,7 @@ public abstract class AbstractBase implements IPlace {
      * Returns the immediate parent of this base in the location tree, or {@code null} if unparented.
      */
     public @Nullable ILocation getParent() {
-        LocationNode parent = locationNode.getParent();
-        return parent != null ? parent.getLocatable() : null;
+        return getParentLocation();
     }
 
     /**

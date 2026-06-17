@@ -55,8 +55,8 @@ import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.base.AbstractBase;
 import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.events.LocationEvent;
+import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.IPlace;
-import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
@@ -317,8 +317,8 @@ public class LocationsTab extends CampaignGuiTab {
                 return 0;
             }
             int total = 0;
-            for (LocationNode child : place.getLocationNode().getChildren()) {
-                if (child.getLocatable() instanceof CurrentLocation travel && !travel.isOnPlanet()) {
+            for (ILocation child : place.getChildLocations()) {
+                if (child instanceof CurrentLocation travel && !travel.isOnPlanet()) {
                     total += counter.count(travel);
                 }
             }

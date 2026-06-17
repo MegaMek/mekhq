@@ -44,7 +44,6 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.location.ILocation;
-import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.personnel.Person;
 import mekhq.utilities.ReportingUtilities;
 
@@ -583,20 +582,16 @@ public enum PersonnelStatus {
         if (person.getStatus().isAbsent()) {
             return false;
         }
-        LocationNode node = person.getLocationNode();
-        if (node == null) {
+        if (!person.hasLocationNode()) {
             return false;
         }
-        LocationNode parent = node.getParent();
-        while (parent != null) {
-            ILocation locatable = parent.getLocatable();
-            if (locatable == campaign) {
+        for (ILocation cursor = person.getParentLocation(); cursor != null; cursor = cursor.getParentLocation()) {
+            if (cursor == campaign) {
                 return false;
             }
-            if (locatable instanceof AbstractLocation) {
+            if (cursor instanceof AbstractLocation) {
                 return true;
             }
-            parent = parent.getParent();
         }
         return false;
     }

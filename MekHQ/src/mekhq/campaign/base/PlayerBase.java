@@ -44,7 +44,6 @@ import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.FixedLocation;
 import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.location.ILocation;
-import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -118,16 +117,16 @@ public class PlayerBase extends AbstractBase {
                   getCurrentLocation().getCurrentSystem().getId());
         }
         // Persons who have arrived live under basePersonnel.
-        for (LocationNode child : getBasePersonnel().getLocationNode().getChildren()) {
-            if (child.getLocatable() instanceof Person person) {
+        for (ILocation child : getBasePersonnel().getChildLocations()) {
+            if (child instanceof Person person) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personId", person.getId().toString());
             }
         }
         // Travel nodes (CurrentLocation) and homeSchool campuses sit directly under the base.
-        for (LocationNode child : getLocationNode().getChildren()) {
-            if (child.getLocatable() instanceof CurrentLocation currentLocation) {
+        for (ILocation child : getChildLocations()) {
+            if (child instanceof CurrentLocation currentLocation) {
                 currentLocation.writeToXML(pw, indent);
-            } else if (child.getLocatable() instanceof AcademyCampusLocation campus) {
+            } else if (child instanceof AcademyCampusLocation campus) {
                 campus.writeToXML(pw, indent);
             }
         }
@@ -193,7 +192,7 @@ public class PlayerBase extends AbstractBase {
                 } else if (nodeName.equalsIgnoreCase("academyCampus")) {
                     AcademyCampusLocation campus = AcademyCampusLocation.generateInstanceFromXML(wn2);
                     if (campus != null) {
-                        LocationNode.LocationManager.setLocation(campus, base);
+                        campus.setParent(base);
                         NodeList campusChildren = wn2.getChildNodes();
                         for (int ci = 0; ci < campusChildren.getLength(); ci++) {
                             Node campusChild = campusChildren.item(ci);
@@ -203,7 +202,7 @@ public class PlayerBase extends AbstractBase {
                             if (campusChild.getNodeName().equalsIgnoreCase("location")) {
                                 CurrentLocation travelNode = CurrentLocation.generateInstanceFromXML(campusChild, campaign);
                                 if (travelNode != null) {
-                                    LocationNode.LocationManager.setLocation(travelNode, campus);
+                                    travelNode.setParent(campus);
                                     campaign.addLocation(travelNode);
                                 }
                             }

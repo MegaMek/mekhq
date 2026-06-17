@@ -77,9 +77,9 @@ import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.location.AcademyCampusLocation;
+import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationDispatch;
-import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.log.PerformanceLogger;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.personnel.Person;
@@ -806,13 +806,12 @@ public class EducationController {
     }
 
     private static IPlace findHomeLocation(Person person, Campaign campaign) {
-        LocationNode node = person.getLocationNode().getParent();
-        while (node != null) {
-            if (node.getLocatable() instanceof IPlace place
-                      && !(place instanceof AcademyCampusLocation)) {
+        ILocation current = person.getParentLocation();
+        while (current != null) {
+            if (current instanceof IPlace place && !(place instanceof AcademyCampusLocation)) {
                 return place;
             }
-            node = node.getParent();
+            current = current.getParentLocation();
         }
         return campaign;
     }

@@ -47,7 +47,6 @@ import mekhq.campaign.base.AbstractBase;
 import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.location.ILocation;
-import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -55,7 +54,7 @@ import mekhq.campaign.universe.PlanetarySystem;
 /**
  * Generic display helpers for any {@link ILocation} item (unit, part, person, etc.).
  *
- * <p>All methods walk the item's {@link LocationNode} tree — the same mechanism used by
+ * <p>All methods walk the item's location tree — the same mechanism used by
  * {@code PersonnelTableModelColumn} for persons — so they work correctly for every
  * {@code ILocation} subtype without any per-type special-casing.</p>
  *
@@ -96,14 +95,13 @@ public final class LocationDisplay {
      * </ul>
      */
     public static String getLocationName(ILocation item, Campaign campaign, LocalDate today) {
-        LocationNode node = item.getLocationNode();
-        if (node == null) {
+        if (!item.hasLocationNode()) {
             return campaign.getName();
         }
-        if (isUnderMainForce(node, campaign)) {
+        if (isUnderMainForce(item, campaign)) {
             return campaign.getName();
         }
-        if (node.getNearestAbstractLocation() instanceof CurrentLocation currentLocation
+        if (item.getCurrentLocation() instanceof CurrentLocation currentLocation
                   && currentLocation.getJumpPath() != null && !currentLocation.getJumpPath().isEmpty()) {
             return getTravelStatus(currentLocation, campaign, today);
         }
@@ -112,7 +110,7 @@ public final class LocationDisplay {
         if (base != null) {
             return formatBaseName(base);
         }
-        AcademyCampusLocation campus = findAncestorCampus(node);
+        AcademyCampusLocation campus = findAncestorCampus(item);
         if (campus != null) {
             return campus.getAcademyName();
         }
@@ -153,21 +151,21 @@ public final class LocationDisplay {
               days);
     }
 
-    /** Returns {@code true} when {@code node} or any ancestor is the campaign's main-force roster. */
-    private static boolean isUnderMainForce(LocationNode node, Campaign campaign) {
+    /** Returns {@code true} when {@code item} or any ancestor is the campaign's main-force roster. */
+    private static boolean isUnderMainForce(ILocation item, Campaign campaign) {
         ILocation mainForcePersonnel = campaign.getMainForcePersonnel();
-        for (LocationNode cursor = node; cursor != null; cursor = cursor.getParent()) {
-            if (cursor.getLocatable() == mainForcePersonnel) {
+        for (ILocation cursor = item; cursor != null; cursor = cursor.getParentLocation()) {
+            if (cursor == mainForcePersonnel) {
                 return true;
             }
         }
         return false;
     }
 
-    /** Returns the academy campus that {@code node} sits under, or {@code null} if there is none. */
-    private static @Nullable AcademyCampusLocation findAncestorCampus(LocationNode node) {
-        for (LocationNode cursor = node; cursor != null; cursor = cursor.getParent()) {
-            if (cursor.getLocatable() instanceof AcademyCampusLocation campus) {
+    /** Returns the academy campus that {@code item} sits under, or {@code null} if there is none. */
+    private static @Nullable AcademyCampusLocation findAncestorCampus(ILocation item) {
+        for (ILocation cursor = item; cursor != null; cursor = cursor.getParentLocation()) {
+            if (cursor instanceof AcademyCampusLocation campus) {
                 return campus;
             }
         }
@@ -241,26 +239,22 @@ public final class LocationDisplay {
      */
     private static @Nullable String getDestinationNameFromAncestors(CurrentLocation currentLocation,
           @Nullable PlanetarySystem destination, Campaign campaign) {
-        LocationNode node = currentLocation.getLocationNode();
-        LocationNode parent = node != null ? node.getParent() : null;
-        while (parent != null) {
-            if (parent.getLocatable() instanceof AbstractBase base) {
+        for (ILocation cursor = currentLocation.getParentLocation(); cursor != null; cursor = cursor.getParentLocation()) {
+            if (cursor instanceof AbstractBase base) {
                 return formatBaseName(base);
             }
-            if (parent.getLocatable() instanceof AcademyCampusLocation campus) {
-                return isCampusAtSystem(parent, destination) ? campus.getAcademyName() : campaign.getName();
+            if (cursor instanceof AcademyCampusLocation campus) {
+                return isCampusAtSystem(campus, destination) ? campus.getAcademyName() : campaign.getName();
             }
-            parent = parent.getParent();
         }
         return null;
     }
 
-    /** Returns {@code true} when the campus node's parent is anchored at {@code destination}. */
-    private static boolean isCampusAtSystem(LocationNode campusNode, @Nullable PlanetarySystem destination) {
-        LocationNode fixedNode = campusNode.getParent();
-        return fixedNode != null
-                     && fixedNode.getLocatable() instanceof AbstractLocation campusLocation
-                     && Objects.equals(campusLocation.getCurrentSystem(), destination);
+    /** Returns {@code true} when the campus's parent is anchored at {@code destination}. */
+    private static boolean isCampusAtSystem(AcademyCampusLocation campus, @Nullable PlanetarySystem destination) {
+        ILocation parent = campus.getParentLocation();
+        return parent instanceof AbstractLocation parentLocation
+                     && Objects.equals(parentLocation.getCurrentSystem(), destination);
     }
 
     /** Returns the player base anchored at {@code system}, or {@code null} if there is none. */
@@ -311,7 +305,6 @@ public final class LocationDisplay {
     }
 
     private static AbstractLocation getNearestAbstractLocation(ILocation item) {
-        LocationNode node = item.getLocationNode();
-        return node != null ? node.getNearestAbstractLocation() : null;
+        return item.getCurrentLocation();
     }
 }
