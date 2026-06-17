@@ -33,7 +33,6 @@
  */
 package mekhq.campaign.mission;
 
-import java.io.PrintWriter;
 import java.text.ParseException;
 
 import megamek.Version;
@@ -42,7 +41,6 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -67,38 +65,6 @@ public class Mission extends AbstractMission {
         setSystemId("Unknown System");
     }
     // endregion Constructors
-
-    @Override
-    public void writeToXML(Campaign campaign, final PrintWriter pw, int indent) {
-        indent = writeToXMLBegin(campaign, pw, indent);
-        writeToXMLEnd(pw, indent);
-    }
-
-    @Override
-    protected int writeToXMLBegin(Campaign campaign, final PrintWriter pw, int indent) {
-        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "mission", "id", getId(), "type", getClass());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", getName());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "type", getContractTypeName());
-        if (getSystemId() != null) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "systemId", getSystemId());
-        } else {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetName", getLegacyPlanetName());
-        }
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "status", getStatus().name());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "desc", getDescription());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "id", getId());
-        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "scenarios");
-        for (Scenario s : getScenarios()) {
-            s.writeToXML(pw, indent);
-        }
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "scenarios");
-        return indent;
-    }
-
-    @Override
-    protected void writeToXMLEnd(final PrintWriter pw, int indent) {
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "mission");
-    }
 
     @Override
     public void loadFieldsFromXmlNode(Campaign campaign, Version version, Node wn) throws ParseException {

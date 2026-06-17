@@ -91,8 +91,11 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.commons.lang3.NotImplementedException;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 public class AbstractMission {
     private static final MMLogger LOGGER = MMLogger.create(AbstractMission.class);
@@ -1375,20 +1378,143 @@ public class AbstractMission {
     public void acceptContract(Campaign campaign) {
     }
 
-    public void writeToXML(Campaign campaign, final PrintWriter pw, int indent) {
-        NotImplementedException error = new NotImplementedException();
-        LOGGER.error(error);
+    public void writeToXML(Campaign campaign, final PrintWriter printWriter, int indent) {
+        MHQXMLUtility.writeSimpleXMLOpenTag(printWriter, indent++, "mission", "id", getId(), "type", getClass());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "name", getName());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "type", getContractTypeName());
+        if (getSystemId() != null) {
+            MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "systemId", getSystemId());
+        } else {
+            MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "planetName", getLegacyPlanetName());
+        }
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "status", getStatus().name());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "desc", getDescription());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "id", getId());
+        MHQXMLUtility.writeSimpleXMLOpenTag(printWriter, indent++, "scenarios");
+        for (Scenario scenario : getScenarios()) {
+            scenario.writeToXML(printWriter, indent);
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(printWriter, --indent, "scenarios");
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "nMonths", getLengthInMonths());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "startDate", getStartDate());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "endDate", getEndingDate());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "employer", getEmployerName());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "paymentMultiplier", getPaymentMultiplier());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "commandRights", getCommandRights().name());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "overheadComp", getOverheadCompensation());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "salvagePct", getSalvagePercent());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "salvageExchange", isSalvageExchange());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "straightSupport", getStraightSupport());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "battleLossComp", getBattleLossCompensation());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "transportComp", getTransportCompensation());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "mrbcFee", getMRBCFeePercentage());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "paidMRBCFee", isPaidMRBCFee());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "advancePct", getAdvancePercent());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "signBonus", getSigningBonus());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "hospitalBedsRented", getHospitalBedsRented());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "kitchensRented", getKitchensRented());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "holdingCellsRented", getHoldingCellsRented());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "advanceAmount", getAdvanceAmount());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "signingAmount", getSigningBonusAmount());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "transportAmount", getTransportAmount());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "transitAmount", getTransitAmount());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "overheadAmount", getOverheadAmount());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "supportAmount", getSupportAmount());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "baseAmount", getBaseAmount());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "feeAmount", getFeeAmount());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "salvagedByUnit", getSalvagedByUnit());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "salvagedByEmployer", getSalvagedByEmployer());
+
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "employerCode", getEmployerCode());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "enemyCode", getEnemyCode());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "enemyName", getEnemyName());
+
+        if (getEnemyMercenaryEmployerCode() != null) {
+            MHQXMLUtility.writeSimpleXMLTag(printWriter,
+                  indent,
+                  "enemyMercenaryEmployerCode",
+                  getEnemyMercenaryEmployerCode());
+        }
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "contractType", getContractType().name());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "allySkill", getAllySkill().name());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "allyQuality", getAllyQuality());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "enemySkill", getEnemySkill().name());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "enemyQuality", getEnemyQuality());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "difficulty", getContractDifficulty());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "allyBotName", getAllyBotName());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "enemyBotName", getEnemyBotName());
+
+        if (!getAllyCamouflage().hasDefaultCategory()) {
+            MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "allyCamoCategory", getAllyCamouflage().getCategory());
+        }
+
+        if (!getAllyCamouflage().hasDefaultFilename()) {
+            MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "allyCamoFileName", getAllyCamouflage().getFilename());
+        }
+
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "allyColour", getAllyColour().name());
+
+        if (!getEnemyCamouflage().hasDefaultCategory()) {
+            MHQXMLUtility.writeSimpleXMLTag(printWriter,
+                  indent,
+                  "enemyCamoCategory",
+                  getEnemyCamouflage().getCategory());
+        }
+
+        if (!getEnemyCamouflage().hasDefaultFilename()) {
+            MHQXMLUtility.writeSimpleXMLTag(printWriter,
+                  indent,
+                  "enemyCamoFileName",
+                  getEnemyCamouflage().getFilename());
+        }
+
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "enemyColour", getEnemyColour().name());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "requiredCombatTeams", getRequiredCombatTeams());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "requiredCombatElements", getRequiredCombatElements());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "isPlayerAttacker", isPlayerAttacker());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "moraleLevel", getMoraleLevel().name());
+
+        if (getRoutEndDate() != null) {
+            MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "routEnd", getRoutEndDate());
+        }
+
+        if (getRoutedPayout() != null) {
+            MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "routedPayout", getRoutedPayout());
+        }
+
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "partsAvailabilityLevel", getPartsAvailabilityLevel());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "sharesPct", getSharesPercent());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "batchallAccepted", isBatchallAccepted());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "commandRoll", getContractNegotiationCommandRoll());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "salvageRoll", getContractNegotiationSalvageRoll());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "supportRoll", getContractNegotiationSupportRoll());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "transportRoll", getContractNegotiationTransportRoll());
+
+        if (getStratConCampaignState() != null) {
+            getStratConCampaignState().Serialize(printWriter);
+        }
+
+        if (getEmployerLiaison() != null) {
+            MHQXMLUtility.writeSimpleXMLOpenTag(printWriter, indent++, "employerLiaison");
+            getEmployerLiaison().writeToXMLHeadless(printWriter, indent, campaign);
+            MHQXMLUtility.writeSimpleXMLCloseTag(printWriter, --indent, "employerLiaison");
+        }
+
+        if (getClanOpponent() != null) {
+            MHQXMLUtility.writeSimpleXMLOpenTag(printWriter, indent++, "clanOpponent");
+            getClanOpponent().writeToXMLHeadless(printWriter, indent, campaign);
+            MHQXMLUtility.writeSimpleXMLCloseTag(printWriter, --indent, "clanOpponent");
+        }
+
+        // Supplemental functions
+        writeToXMLSupplemental(campaign, printWriter, indent);
+
+        // Close off save action
+        MHQXMLUtility.writeSimpleXMLCloseTag(printWriter, --indent, "mission");
     }
 
-    protected int writeToXMLBegin(Campaign campaign, final PrintWriter pw, int indent) {
-        NotImplementedException error = new NotImplementedException();
-        LOGGER.error(error);
+    protected int writeToXMLSupplemental(Campaign campaign, final PrintWriter pw, int indent) {
         return indent;
-    }
-
-    protected void writeToXMLEnd(final PrintWriter pw, int indent) {
-        NotImplementedException error = new NotImplementedException();
-        LOGGER.error(error);
     }
 
     public void loadFieldsFromXmlNode(Campaign campaign, Version version, Node wn) throws ParseException {
@@ -1397,10 +1523,74 @@ public class AbstractMission {
     }
 
     public static AbstractMission generateInstanceFromXML(Node node, Campaign campaign, Version version) {
-        NotImplementedException error = new NotImplementedException();
-        LOGGER.error(error);
+        Mission retVal = null;
+        NamedNodeMap attrs = node.getAttributes();
+        Node classNameNode = attrs.getNamedItem("type");
+        String className = classNameNode.getTextContent();
 
-        return new AbstractMission();
+        try {
+            // Instantiate the correct child class, and call its parsing
+            // function.
+            retVal = (Mission) Class.forName(className).getDeclaredConstructor().newInstance();
+            retVal.loadFieldsFromXmlNode(campaign, version, node);
+
+            // Okay, now load mission-specific fields!
+            NodeList nl = node.getChildNodes();
+
+            for (int x = 0; x < nl.getLength(); x++) {
+                Node wn2 = nl.item(x);
+
+                if (wn2.getNodeName().equalsIgnoreCase("name")) {
+
+                    retVal.setName(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("planetId") ||
+                                 wn2.getNodeName().equalsIgnoreCase("systemId")) {
+                    retVal.setSystemId(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("planetName")) {
+                    PlanetarySystem system = campaign.getSystemByName(wn2.getTextContent());
+
+                    if (system != null) {
+                        retVal.setSystemId(campaign.getSystemByName(wn2.getTextContent()).getId());
+                    } else {
+                        retVal.setLegacyPlanetName(wn2.getTextContent());
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("status")) {
+                    retVal.setStatus(MissionStatus.parseFromString(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("id")) {
+                    retVal.setId(Integer.parseInt(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("desc")) {
+                    retVal.setDescription(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("type")) {
+                    retVal.setContractTypeName(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("scenarios")) {
+                    NodeList nl2 = wn2.getChildNodes();
+                    for (int y = 0; y < nl2.getLength(); y++) {
+                        Node wn3 = nl2.item(y);
+                        // If it's not an element node, we ignore it.
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                            continue;
+                        }
+
+                        if (!wn3.getNodeName().equalsIgnoreCase("scenario")) {
+                            // Error condition of sorts!
+                            // what should we do here?
+                            LOGGER.error("Unknown node type not loaded in Scenario nodes: {}", wn3.getNodeName());
+
+                            continue;
+                        }
+                        Scenario s = Scenario.generateInstanceFromXML(wn3, campaign, version);
+
+                        if (null != s) {
+                            retVal.addScenario(s);
+                        }
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            LOGGER.error("", ex);
+        }
+
+        return retVal;
     }
 
     @Override
