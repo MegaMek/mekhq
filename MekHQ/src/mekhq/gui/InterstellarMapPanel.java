@@ -375,7 +375,7 @@ public class InterstellarMapPanel extends JPanel {
                         }
                         center(selectedSystem);
                         // bring up a planetary system map
-                        hqView.getMapTab().switchPlanetaryMap(selectedSystem);
+                        hqView.getNavigationTab().getMapTab().switchPlanetaryMap(selectedSystem);
                     } else {
                         PlanetarySystem target = nearestNeighbour(scr2mapX(e.getX()), scr2mapY(e.getY()));
                         if (null == target) {

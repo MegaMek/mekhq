@@ -74,6 +74,7 @@ import mekhq.gui.view.LocationPlacePanel;
  * {@link LocationsTabView} owns the widgets, and {@link LocationsTabController} drives both data refresh and user
  * interaction.</p>
  */
+// FIXME: this class should not inherit from CampaignGuiTab because it is managed by NavigationTab now
 public class LocationsTab extends CampaignGuiTab {
 
     private enum ViewMode {
@@ -112,7 +113,7 @@ public class LocationsTab extends CampaignGuiTab {
 
     @Override
     public MHQTabType tabType() {
-        return MHQTabType.NAVIGATION;
+        return null;
     }
 
     @Override
