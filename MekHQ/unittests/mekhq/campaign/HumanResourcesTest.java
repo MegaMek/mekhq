@@ -36,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -50,6 +51,8 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import megamek.Version;
 import megamek.common.enums.SkillLevel;
@@ -1235,6 +1238,21 @@ public class HumanResourcesTest {
             // Assert
             assertTrue(fresh.getHumanResources().getPersonnel().isEmpty(),
                   "Empty <personnel/> node must produce an empty roster");
+        }
+
+        @Test
+        void usesExistingHRFromCampaign() throws Exception {
+            Campaign mockCampaign = mock(Campaign.class);
+            HumanResources existingHr = new HumanResources();
+            when(mockCampaign.getHumanResources()).thenReturn(existingHr);
+
+            String xml = "<humanResources></humanResources>";
+            DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            Node node = db.parse(new ByteArrayInputStream(xml.getBytes())).getDocumentElement();
+
+            HumanResources result = HumanResources.loadFromXML(node, mockCampaign, new Version("0.50.00"));
+
+            assertSame(existingHr, result);
         }
     }
 

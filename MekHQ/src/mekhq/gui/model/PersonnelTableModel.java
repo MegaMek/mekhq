@@ -55,6 +55,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
 import mekhq.gui.enums.PersonnelTabView;
@@ -137,12 +138,11 @@ public class PersonnelTableModel extends DataTableModel<Person> {
 
     public void refreshData() {
         if (!isGroupByUnit()) {
-            setData(new ArrayList<>(getCampaign().getPersonnel()));
+            setData(new ArrayList<>(getCampaign().getAllPersonnel()));
         } else {
-            Campaign c = getCampaign();
             List<Person> commanders = new ArrayList<>();
-            for (Person p : c.getPersonnel()) {
-                if ((p.getUnit() != null) && !p.equals(p.getUnit().getCommander())) {
+            for (Person person : getCampaign().getAllPersonnel()) {
+                if ((person.getUnit() != null) && !person.equals(person.getUnit().getCommander())) {
                     // this person is NOT the commander of their unit,
                     // skip them.
                     continue;
@@ -151,7 +151,7 @@ public class PersonnelTableModel extends DataTableModel<Person> {
                 // 1. If they don't have a unit, add them.
                 // 2. If their unit doesn't have a commander, add them.
                 // 3. If their unit doesn't exist (error?), add them.
-                commanders.add(p);
+                commanders.add(person);
             }
 
             setData(commanders);
@@ -194,6 +194,7 @@ public class PersonnelTableModel extends DataTableModel<Person> {
                                                     person.getPermanentFatigue(),
                                                     person.isClanPersonnel(),
                                                     person.getSkillLevel(campaign, false, true)) >= 5));
+            boolean personIsAwayFromMainForce = PersonnelStatus.computeIsAwayFromMainForce(campaign, person);
 
             // Collect all applicable color reasons for tooltip
             List<String> colorReasonKeys = new ArrayList<>();
@@ -211,6 +212,9 @@ public class PersonnelTableModel extends DataTableModel<Person> {
                 } else if (person.isDeployed()) {
                     setForeground(MekHQ.getMHQOptions().getDeployedForeground());
                     setBackground(MekHQ.getMHQOptions().getDeployedBackground());
+                } else if (personIsAwayFromMainForce) {
+                    setForeground(MekHQ.getMHQOptions().getAwayFromMainForceForeground());
+                    setBackground(MekHQ.getMHQOptions().getAwayFromMainForceBackground());
                 } else if (personIsDamaged) {
                     setForeground(MekHQ.getMHQOptions().getInjuredForeground());
                     setBackground(MekHQ.getMHQOptions().getInjuredBackground());

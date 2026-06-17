@@ -41,6 +41,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -74,6 +75,8 @@ import mekhq.campaign.events.persons.PersonEvent;
 import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.events.units.UnitRefitEvent;
 import mekhq.campaign.events.units.UnitRemovedEvent;
+import mekhq.campaign.location.ILocation;
+import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.market.PartsInUseManager;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
@@ -99,6 +102,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedMMToggleButton;
 import mekhq.gui.dialog.MRMSDialog;
 import mekhq.gui.dialog.PartsReportDialog;
 import mekhq.gui.enums.MHQTabType;
+import mekhq.gui.model.LocationFilterItem;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.gui.model.TechTableModel;
 import mekhq.gui.panels.TutorialHyperlinkPanel;
@@ -164,7 +168,6 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     // region Constructors
     public WarehouseTab(CampaignGUI gui, String name) {
         super(gui, name);
-        MekHQ.registerHandler(this);
         setUserPreferences();
     }
     // endregion Constructors
@@ -441,15 +444,12 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
 
         btnOvertime = new RoundedMMToggleButton(resourceMap.getString("btnOvertime.text"));
         btnOvertime.setToolTipText(resourceMap.getString("btnOvertime.toolTipText"));
-        btnOvertime.setSelected(getCampaign().isOvertimeAllowed());
         btnOvertime.addActionListener(evt -> {
             getCampaign().setOvertime(btnOvertime.isSelected());
             refreshAsTechPool();
             RepairTab repairBayTab = getCampaignGui().getRepairBayTab();
-            if (repairBayTab != null) {
-                repairBayTab.refreshOvertimeStatus();
-                repairBayTab.refreshAsTechPool();
-            }
+            repairBayTab.refreshOvertimeStatus();
+            repairBayTab.refreshAsTechPool();
         });
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -641,6 +641,11 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
                 }
                 TechTableModel techModel = entry.getModel();
                 Person tech = techModel.getTechAt(entry.getIdentifier());
+                // Tech must be at the same location as the repair target
+                ILocation repairTarget = (part.getUnit() != null) ? part.getUnit() : part;
+                if (!LocationUtils.areSameEffectiveLocation(tech, repairTarget)) {
+                    return false;
+                }
                 if (!tech.isRightTechTypeFor(part) && !btnShowAllTechsWarehouse.isSelected()) {
                     return false;
                 }
@@ -747,7 +752,10 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     }
 
     public void refreshPartsList() {
-        partsModel.setData(getCampaign().getWarehouse().getSpareParts());
+        LocationFilterItem locationFilter = getCampaignGui().getActiveLocation();
+
+        List<Part> parts = locationFilter.selectSpareParts(getCampaign());
+        partsModel.setData(parts);
         getCampaign().getShoppingList().removeZeroQuantityFromList(); // To
         // prevent
         // zero

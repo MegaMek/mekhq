@@ -286,7 +286,7 @@ public final class BatchXPDialog extends JDialog {
                     skillLevel.setEnabled(true);
                     ((SpinnerNumberModel) skillLevel.getModel()).setMaximum(maxSkillLevel);
                     skillLevel.getModel()
-                          .setValue(Math.clamp((Integer) skillLevel.getModel().getValue(), 1, maxSkillLevel));
+                          .setValue(Math.clamp((Integer) skillLevel.getModel().getValue(), 0, maxSkillLevel));
                     buttonSpendXP.setEnabled(true);
                 }
             }
@@ -389,6 +389,7 @@ public final class BatchXPDialog extends JDialog {
                 Skill skill = person.getSkill(skillName);
 
                 if (skill != null) {
+                    // Capture current XP progress so we can apply it as a discount, then consume progress up to the improvement cost.
                     int progress = skill.getXpProgress();
                     skill.changeXpProgress(-cost);
                     cost = max(0, cost - progress);

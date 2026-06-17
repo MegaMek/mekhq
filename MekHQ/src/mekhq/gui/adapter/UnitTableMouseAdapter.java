@@ -35,6 +35,9 @@ package mekhq.gui.adapter;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.common.enums.SkillLevel.ELITE;
 import static megamek.common.enums.SkillLevel.GREEN;
+import static megamek.common.enums.SkillLevel.HEROIC;
+import static megamek.common.enums.SkillLevel.LEGENDARY;
+import static megamek.common.enums.SkillLevel.NONE;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.enums.SkillLevel.ULTRA_GREEN;
 import static megamek.common.enums.SkillLevel.VETERAN;
@@ -102,6 +105,7 @@ import mekhq.campaign.events.RepairStatusChangedEvent;
 import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.location.LocationDispatch;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.rentals.FacilityRentals;
 import mekhq.campaign.parts.Part;
@@ -123,7 +127,6 @@ import mekhq.campaign.unit.actions.SwapAmmoTypeAction;
 import mekhq.campaign.unit.actions.UnloadAmmoTypeAction;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.HangarTab;
-import mekhq.gui.MekLabTab;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.dialog.BombsDialog;
 import mekhq.gui.dialog.ChooseRefitDialog;
@@ -139,6 +142,7 @@ import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.menus.AssignUnitToForceMenu;
 import mekhq.gui.menus.AssignUnitToPersonMenu;
 import mekhq.gui.menus.ExportUnitSpriteMenu;
+import mekhq.gui.menus.SendToLocationMenu;
 import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.StaticChecks;
@@ -206,6 +210,8 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     public static final String COMMAND_GM_ACTIVATE = COMMAND_ACTIVATE + COMMAND_GM;
     public static final String COMMAND_UNDEPLOY = "UNDEPLOY";
     public static final String COMMAND_HIRE_FULL_GM = COMMAND_HIRE_FULL + COMMAND_GM;
+    public static final String COMMAND_HIRE_FULL_GM_LEGENDARY = COMMAND_HIRE_FULL + COMMAND_GM + "LEGENDARY";
+    public static final String COMMAND_HIRE_FULL_GM_HEROIC = COMMAND_HIRE_FULL + COMMAND_GM + "HEROIC";
     public static final String COMMAND_HIRE_FULL_GM_ELITE = COMMAND_HIRE_FULL + COMMAND_GM + "ELITE";
     public static final String COMMAND_HIRE_FULL_GM_VETERAN = COMMAND_HIRE_FULL + COMMAND_GM + "VETERAN";
     public static final String COMMAND_HIRE_FULL_GM_REGULAR = COMMAND_HIRE_FULL + COMMAND_GM + "REGULAR";
@@ -472,23 +478,20 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
                 hireAction.execute(gui.getCampaign(), unit);
 
-                boolean fixSkillLevels = false;
 
-                SkillLevel skillLevel = REGULAR;
-                if (command.contains("ELITE")) {
-                    skillLevel = ELITE;
-                    fixSkillLevels = true;
-                } else if (command.contains("VETERAN")) {
-                    skillLevel = VETERAN;
-                    fixSkillLevels = true;
-                } else if (command.contains("ULTRA_GREEN")) {
-                    skillLevel = ULTRA_GREEN;
-                    fixSkillLevels = true;
-                } else if (command.contains("GREEN")) {
-                    skillLevel = GREEN;
-                    fixSkillLevels = true;
-                }
+                SkillLevel skillLevel = switch (command) {
+                    case String s when s.contains("LEGENDARY") -> LEGENDARY;
+                    case String s when s.contains("HEROIC") -> HEROIC;
+                    case String s when s.contains("ELITE") -> ELITE;
+                    case String s when s.contains("VETERAN") -> VETERAN;
+                    case String s when s.contains("REGULAR") -> REGULAR;
+                    // Must come before GREEN as ULTRA_GREEN contains GREEN
+                    case String s when s.contains("ULTRA_GREEN") -> ULTRA_GREEN;
+                    case String s when s.contains("GREEN") -> GREEN;
+                    default -> NONE;
+                };
 
+                boolean fixSkillLevels = skillLevel != NONE;
                 if (fixSkillLevels) {
                     for (Person person : unit.getCrew()) {
                         if (preExistingCrew.contains(person)) {
@@ -497,7 +500,11 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
                         Campaign campaign = gui.getCampaign();
                         boolean checkVeterancyEligibility = true;
-                        overrideSkills(campaign, person, person.getPrimaryRole(), VETERAN, checkVeterancyEligibility);
+                        overrideSkills(campaign,
+                              person,
+                              person.getPrimaryRole(),
+                              skillLevel,
+                              checkVeterancyEligibility);
                     }
                 }
             }
@@ -546,8 +553,8 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 }
             }
         } else if (command.equals(COMMAND_CUSTOMIZE)) { // Single Unit only
-            ((MekLabTab) gui.getTab(MHQTabType.MEK_LAB)).loadUnit(selectedUnit);
-            gui.getTabMain().setSelectedIndex(gui.getTabMain().getTabCount() - 1);
+            gui.getMekLabTab().loadUnit(selectedUnit);
+            gui.setSelectedTab(gui.getMekLabTab());
         } else if (command.equals(COMMAND_CANCEL_CUSTOMIZE)) {
             Stream.of(units).filter(Unit::isRefitting).forEach(unit -> unit.getRefit().cancel());
         } else if (command.equals(COMMAND_REFIT_GM_COMPLETE)) {
@@ -1052,6 +1059,12 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
             JMenuHelpers.addMenuIfNonEmpty(popup, new AssignUnitToForceMenu(gui.getCampaign(), units));
 
+            List<mekhq.campaign.unit.Unit> unitList = List.of(units);
+            JMenuHelpers.addMenuIfNonEmpty(popup, new SendToLocationMenu(
+                  gui.getCampaign(), gui.getFrame(), unitList,
+                  destination -> LocationDispatch.dispatchUnitsToLocation(
+                        unitList, destination, gui.getCampaign())));
+
             // if we're using maintenance and have selected something that requires
             // maintenance and
             // isn't mothballed or being mothballed
@@ -1142,7 +1155,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     menu.add(menuItem);
                 }
 
-                if (oneSelected && gui.hasTab(MHQTabType.MEK_LAB)) {
+                if (oneSelected) {
                     menuItem = new JMenuItem("Customize in Mek Lab...");
                     menuItem.setActionCommand(COMMAND_CUSTOMIZE);
                     menuItem.addActionListener(this);
@@ -1333,6 +1346,16 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
                     menuItem = new JMenuItem(getText("addMinimumComplementRandom.text"));
                     menuItem.setActionCommand(COMMAND_HIRE_FULL_GM);
+                    menuItem.addActionListener(this);
+                    menuMinimumComplement.add(menuItem);
+
+                    menuItem = new JMenuItem(getText("addMinimumComplementLegendary.text"));
+                    menuItem.setActionCommand(COMMAND_HIRE_FULL_GM_LEGENDARY);
+                    menuItem.addActionListener(this);
+                    menuMinimumComplement.add(menuItem);
+
+                    menuItem = new JMenuItem(getText("addMinimumComplementHeroic.text"));
+                    menuItem.setActionCommand(COMMAND_HIRE_FULL_GM_HEROIC);
                     menuItem.addActionListener(this);
                     menuMinimumComplement.add(menuItem);
 

@@ -45,6 +45,7 @@ import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.enums.DailyReportType.SKILL_CHECKS;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_NETWORKER;
+import static mekhq.campaign.personnel.PersonnelOptions.EDGE_COMMANDER_NEGOTIATION;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 import static mekhq.campaign.universe.Faction.COMSTAR_FACTION_CODE;
@@ -667,15 +668,18 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         if (campaignCommander != null) {
             connections = campaignCommander.getAdjustedConnections(false);
 
-            boolean isUseAgingEffects = campaign.getCampaignOptions().isUseAgeEffects();
+            CampaignOptions campaignOptions = campaign.getCampaignOptions();
+            boolean isUseAgingEffects = campaignOptions.isUseAgeEffects();
             boolean isClanCampaign = campaign.isClanCampaign();
+            boolean isUseEdge = campaignOptions.isUseEdge() || campaignOptions.isUseSupportEdge();
+            isUseEdge = isUseEdge && campaignCommander.getOptions().booleanOption(EDGE_COMMANDER_NEGOTIATION);
             SkillCheckUtility checkUtility = new SkillCheckUtility(
                   getTextAt(RESOURCE_BUNDLE, "AtbMonthlyContractMarket.contractSkillCheck"),
                   campaignCommander,
                   S_NEGOTIATION,
                   null,
                   0,
-                  false,
+                  isUseEdge,
                   true,
                   isUseAgingEffects,
                   isClanCampaign,
@@ -922,15 +926,6 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                   (null != campaign.getRetainerEmployerCode())) {
             for (int i = 0; i < CLAUSE_NUM; i++) {
                 mods.mods[i]++;
-            }
-        }
-
-        if (campaign.getCampaignOptions().isMercSizeLimited() && campaign.getFaction().isMercenary()) {
-            int max = (unitRatingMod + 1) * 12;
-            int numMods = (ContractUtilities.getEffectiveNumUnits(campaign) - max) / 2;
-            while (numMods > 0) {
-                mods.mods[Compute.randomInt(4)]--;
-                numMods--;
             }
         }
 

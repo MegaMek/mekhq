@@ -222,7 +222,6 @@ public final class BriefingTab extends CampaignGuiTab {
     public BriefingTab(CampaignGUI gui, String tabName) {
         super(gui, tabName);
         selectedScenario = -1;
-        MekHQ.registerHandler(this);
     }
     // endregion Constructors
 
@@ -710,8 +709,28 @@ public final class BriefingTab extends CampaignGuiTab {
             case TURNING_POINT -> scenarioModel.isTurningPointScenario(scenario);
             case ASSIGNED -> !scenario.getForces(getCampaign()).getAllUnits(false).isEmpty();
             case UNASSIGNED -> scenario.getForces(getCampaign()).getAllUnits(false).isEmpty();
-            case CURRENT_MONTH -> scenario.getDate().getMonth() == getCampaign().getLocalDate().getMonth();
+            case CURRENT_MONTH -> isScenarioInCurrentMonth(scenario);
         };
+    }
+
+    private boolean isScenarioInCurrentMonth(Scenario scenario) {
+        LocalDate scenarioDate = scenario.getDate();
+        if (scenarioDate == null) {
+            return false;
+        }
+
+
+        int scenarioYear = scenarioDate.getYear();
+        int scenarioMonth = scenarioDate.getMonthValue();
+
+        LocalDate campaignDate = getCampaign().getLocalDate();
+        int campaignYear = campaignDate.getYear();
+        int campaignMonth = campaignDate.getMonthValue();
+
+        boolean monthsMatch = scenarioMonth == campaignMonth;
+        boolean yearsMath = scenarioYear == campaignYear;
+
+        return monthsMatch && yearsMath;
     }
 
     private void refreshSelectedScenarioActions(@Nullable Scenario scenario) {
@@ -722,8 +741,8 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         boolean stratConScenario = isStratConScenario(scenario);
-        btnDeploySelectedScenario.setEnabled(stratConScenario &&
-                                                   (getCampaignGui().getTab(MHQTabType.STRAT_CON) instanceof StratConTab));
+        btnDeploySelectedScenario.setEnabled(
+              stratConScenario && getCampaignGui().getStratConTab().isPresent());
         refreshScenarioActionButtonEmphasis();
     }
 
@@ -740,9 +759,8 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
-        if (getCampaignGui().getTab(MHQTabType.STRAT_CON) instanceof StratConTab stratConTab) {
-            MaplessStratCon.deployWithoutMap(stratConTab.getStratconPanel(), getCampaign(), scenario);
-        }
+        getCampaignGui().getStratConTab().ifPresent(
+              tab -> MaplessStratCon.deployWithoutMap(tab.getStratconPanel(), getCampaign(), scenario));
     }
 
     private void addMission() {
@@ -2445,7 +2463,7 @@ public final class BriefingTab extends CampaignGuiTab {
         if (row < 0) {
             scrollScenarioView.setViewportView(null);
             panScenarioActions.setVisible(!isResolvedScenarioFilterSelected());
-            refreshAssignmentsTabAvailability(null);
+            refreshAssignmentsTabAvailability();
             clearScenarioActionButtons();
             selectedScenario = -1;
             return;
@@ -2454,7 +2472,7 @@ public final class BriefingTab extends CampaignGuiTab {
         if (scenario == null) {
             scrollScenarioView.setViewportView(null);
             panScenarioActions.setVisible(!isResolvedScenarioFilterSelected());
-            refreshAssignmentsTabAvailability(null);
+            refreshAssignmentsTabAvailability();
             clearScenarioActionButtons();
             selectedScenario = -1;
             return;
@@ -2463,7 +2481,7 @@ public final class BriefingTab extends CampaignGuiTab {
         scrollScenarioView.setViewportView(createScenarioViewPanel(scenario));
         refreshSelectedScenarioActions(scenario);
         panScenarioActions.setVisible(scenario.getStatus().isCurrent());
-        refreshAssignmentsTabAvailability(scenario);
+        refreshAssignmentsTabAvailability();
         // This odd code is to make sure that the scrollbar stays at the top
         // I can't just call it here, because it ends up getting reset somewhere
         // later
@@ -2500,10 +2518,8 @@ public final class BriefingTab extends CampaignGuiTab {
               ScenarioQueueFilter.ALL_ACTIVE) == ScenarioQueueFilter.ALL_RESOLVED;
     }
 
-    private void refreshAssignmentsTabAvailability(@Nullable Scenario scenario) {
-        boolean assignmentsEnabled = getCampaignOptions().isUseStratCon() &&
-                                           !isResolvedScenarioFilterSelected() &&
-                                           ((scenario == null) || scenario.getStatus().isCurrent());
+    private void refreshAssignmentsTabAvailability() {
+        boolean assignmentsEnabled = getCampaignOptions().isUseStratCon();
         scenarioWorkTabs.setEnabledAt(ASSIGNMENTS_TAB_INDEX, assignmentsEnabled);
         if (!assignmentsEnabled && (scenarioWorkTabs.getSelectedIndex() == ASSIGNMENTS_TAB_INDEX)) {
             scenarioWorkTabs.setSelectedIndex(SCENARIO_DETAILS_TAB_INDEX);
@@ -2533,7 +2549,7 @@ public final class BriefingTab extends CampaignGuiTab {
     public void refreshLanceAssignments() {
         panLanceAssignment.refresh();
         refreshSelectedScenarioActions(getSelectedScenario());
-        refreshAssignmentsTabAvailability(getSelectedScenario());
+        refreshAssignmentsTabAvailability();
         updateMissionDeploymentCoverage();
     }
 
@@ -2594,6 +2610,7 @@ public final class BriefingTab extends CampaignGuiTab {
         if (preserveResolvedSelection && (scenarioSelection >= 0) &&
                   (selectedFilter != ScenarioQueueFilter.ALL) &&
                   (selectedFilter != ScenarioQueueFilter.ALL_RESOLVED) &&
+                  (selectedFilter != ScenarioQueueFilter.CURRENT_MONTH) &&
                   isResolvedScenario(visibleScenarios, scenarioSelection)) {
             scenarioFilter.setSelectedItem(ScenarioQueueFilter.ALL_RESOLVED);
             return;
@@ -2741,7 +2758,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
     @Subscribe
     public void handle(OptionsChangedEvent ev) {
-        refreshAssignmentsTabAvailability(getSelectedScenario());
+        refreshAssignmentsTabAvailability();
     }
 
     @Subscribe

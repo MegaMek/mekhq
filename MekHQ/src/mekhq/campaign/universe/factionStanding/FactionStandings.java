@@ -755,11 +755,13 @@ public class FactionStandings {
      *
      * @param today the date to use when checking for censure expiration and applying any degradation
      *
+     * @return a {@link List} of HTML-formatted {@link String} reports of censure expiry events
+     *
      * @author Illiani
      * @since 0.50.07
      */
-    public void processCensureDegradation(final LocalDate today) {
-        factionJudgment.processCensureDegradation(today);
+    public List<String> processCensureDegradation(final LocalDate today) {
+        return factionJudgment.processCensureDegradation(today);
     }
 
     /**

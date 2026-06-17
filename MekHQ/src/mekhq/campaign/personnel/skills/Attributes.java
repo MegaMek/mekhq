@@ -481,6 +481,7 @@ public class Attributes {
         boolean hasExceptionalWillpower = options.booleanOption(EXCEPTIONAL_ATTRIBUTE_WILLPOWER);
         boolean hasExceptionalCharisma = options.booleanOption(EXCEPTIONAL_ATTRIBUTE_CHARISMA);
         boolean hasExceptionalEdge = options.booleanOption(EXCEPTIONAL_ATTRIBUTE_EDGE);
+        boolean hasBelovedPet = options.booleanOption(UNOFFICIAL_BELOVED_PET);
 
         cap += switch (attribute) {
             case STRENGTH -> {
@@ -494,7 +495,11 @@ public class Attributes {
             case INTELLIGENCE -> hasExceptionalIntelligence ? 1 : 0;
             case WILLPOWER -> hasExceptionalWillpower ? 1 : 0;
             case CHARISMA -> hasExceptionalCharisma ? 1 : 0;
-            case EDGE -> hasExceptionalEdge ? 1 : 0;
+            case EDGE -> {
+                int modifier = hasExceptionalEdge ? 1 : 0;
+                modifier += hasBelovedPet ? 1 : 0;
+                yield modifier;
+            }
             default -> {
                 LOGGER.error("(setAttributeScore) Invalid attribute requested for cap modifier: {}", attribute);
                 yield 0;

@@ -56,6 +56,7 @@ import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.Space;
 import static mekhq.campaign.mission.ScenarioMapParameters.MapLocation.SpecificGroundTerrain;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_COORDINATOR;
+import static mekhq.campaign.personnel.PersonnelOptions.EDGE_RECON_FAIL;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_TACTICS;
 import static mekhq.campaign.stratCon.StratConContractInitializer.getUnoccupiedCoords;
@@ -66,6 +67,8 @@ import static mekhq.campaign.stratCon.StratConRulesManager.ReinforcementResultsT
 import static mekhq.campaign.stratCon.StratConRulesManager.ReinforcementResultsType.INTERCEPTED;
 import static mekhq.campaign.stratCon.StratConRulesManager.ReinforcementResultsType.SUCCESS;
 import static mekhq.campaign.stratCon.StratConScenarioFactory.convertSpecificUnitTypeToGeneral;
+import static mekhq.utilities.EntityUtilities.hasActiveProbe;
+import static mekhq.utilities.EntityUtilities.hasImprovedSensors;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
@@ -125,7 +128,6 @@ import mekhq.campaign.stratCon.StratConScenario.ScenarioState;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.gui.dialog.nagDialogs.CombatChallengeNagDialog;
-import mekhq.utilities.EntityUtilities;
 import mekhq.utilities.ReportingUtilities;
 import org.apache.commons.math3.util.Pair;
 
@@ -269,7 +271,7 @@ public class StratConRulesManager {
         List<Integer> availableForceIDs = getAvailableForceIDs(campaign, contract, false);
 
         Map<MapLocation, List<Integer>> sortedAvailableForceIDs = sortForcesByMapType(availableForceIDs,
-              campaign.getHangar(),
+              campaign.getAllHangar(),
               campaign.getAllFormations());
 
         for (int scenarioIndex = 0; scenarioIndex < scenarioCount; scenarioIndex++) {
@@ -419,7 +421,7 @@ public class StratConRulesManager {
         // Grab the available lances and sort them by map type
         List<Integer> availableForceIDs = getAvailableForceIDs(campaign, contract, false);
         Map<MapLocation, List<Integer>> sortedAvailableForceIDs = sortForcesByMapType(availableForceIDs,
-              campaign.getHangar(),
+              campaign.getAllHangar(),
               campaign.getAllFormations());
 
         // Select the target coords.
@@ -1607,19 +1609,16 @@ public class StratConRulesManager {
 
         // Build a map of scouts and their information
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean isCommandersOnlyVehicles = campaignOptions.isOnlyCommandersMatterVehicles();
-        boolean isCommandersOnlyInfantry = campaignOptions.isOnlyCommandersMatterInfantry();
-        boolean isCommandersOnlyBattleArmor = campaignOptions.isOnlyCommandersMatterBattleArmor();
         Formation formation = campaign.getFormation(forceID);
-        Hangar hangar = campaign.getHangar();
-        List<ScoutRecord> scouts = formation == null ? new ArrayList<>() : buildScoutMap(formation, hangar,
-              isCommandersOnlyVehicles, isCommandersOnlyInfantry, isCommandersOnlyBattleArmor);
+        Hangar hangar = campaign.getAllHangar();
+        List<ScoutRecord> scouts = buildScoutMap(formation, hangar, campaignOptions,
+              campaign.isClanCampaign(), campaign.getLocalDate());
 
         boolean useAdvancedScouting = campaignOptions.isUseAdvancedScouting();
         // Each scout may scan up to scanMultiplier hexes
         // Each scout may scan up to a radius of individualScanRange hexes
         for (ScoutRecord scoutData : scouts) {
-            int individualScanRange = useAdvancedScouting && scoutData.entityWeight() <= 35 ?
+            int individualScanRange = useAdvancedScouting && scoutData.unitWeight() <= 35 ?
                                             scanRangeIncrease + 1 :
                                             scanRangeIncrease;
             int remainingScans = useAdvancedScouting ? 1 : Integer.MAX_VALUE;
@@ -1633,12 +1632,6 @@ public class StratConRulesManager {
             scoutQueue.add(new Pair<>(coords, 0));
             scoutVisited.add(coords); // starting hex is already processed separately
 
-            TargetRollModifier weightModifier = getUnitWeightModifier(scoutData.entityWeight());
-            TargetRollModifier speedModifier = getUnitSpeedModifier(scoutData.unitAtBSpeed());
-            TargetRollModifier skillModifier = getScoutComplementarySPAModifier(scout);
-            TargetRollModifier sensorsModifier = new TargetRollModifier(
-                  scoutData.hasEquipmentOrRelevantSPA() ? -1 : 0, "Unit Sensors");
-
             while (!scoutQueue.isEmpty() && remainingScans > 0) {
                 Pair<StratConCoords, Integer> current = scoutQueue.poll();
                 StratConCoords currentCoords = current.getKey();
@@ -1649,6 +1642,7 @@ public class StratConRulesManager {
                     continue;
                 }
 
+boolean isUseEdge = campaignOptions.isUseEdge() && scout.getOptions().booleanOption(EDGE_RECON_FAIL);
                 for (int direction = 0; direction < 6; direction++) {
                     StratConCoords checkCoords = currentCoords.translate(direction);
 
@@ -1684,13 +1678,13 @@ public class StratConRulesManager {
                         skillCheck = new SkillCheckUtility(
                               getTextAt(RESOURCE_BUNDLE, "StratConRulesManager.scoutingSkillCheck"),
                               scout,
-                              scoutData.skillName(),
-                              List.of(weightModifier, speedModifier, sensorsModifier, skillModifier),
+                              scoutData.bestScoutSkillName(),
+                              scoutData.getAllScoutRollModifiers(),
                               0,
+                              isUseEdge,
                               false,
-                              false,
-                              false, // Irrelevant
-                              false, // Irrelevant
+                              campaignOptions.isUseAgeEffects(),
+                              campaign.isClanCampaign(),
                               campaign.getLocalDate()
                         );
                         campaign.addReport(SKILL_CHECKS, skillCheck.getResultsText());
@@ -1746,7 +1740,7 @@ public class StratConRulesManager {
      * @author Illiani
      * @since 0.50.07
      */
-    private static TargetRollModifier getUnitWeightModifier(double unitWeight) {
+    static TargetRollModifier getUnitWeightModifier(double unitWeight) {
         int modifier = 6; // default for anything greater than 100t
 
         if (unitWeight <= 55) {
@@ -1780,7 +1774,7 @@ public class StratConRulesManager {
      * @author Illiani
      * @since 0.50.07
      */
-    private static TargetRollModifier getUnitSpeedModifier(int unitSpeed) {
+    static TargetRollModifier getUnitSpeedModifier(int unitSpeed) {
         int modifier;
         if (unitSpeed <= 3) {
             modifier = 1;
@@ -1794,9 +1788,23 @@ public class StratConRulesManager {
     }
 
     /**
+     * Generates a {@link TargetRollModifier} representing the effect of unit sensor equipment.
+     *
+     * @param unitHasSensorEquipment flag signifying presence of sensor equipment
+     *
+     * @return a {@link TargetRollModifier} reflecting bonuses from unit sensor equipment; will have a modifier value of
+     *       0 if no qualifying equipment is present
+     */
+    static TargetRollModifier getUnitEquipmentModifier(boolean unitHasSensorEquipment) {
+        int modifier = unitHasSensorEquipment ? -1 : 0;
+        return new TargetRollModifier(modifier, "Unit Sensor Equipment Modifier");
+    }
+
+    /**
      * Generates a {@link TargetRollModifier} representing the effect of complementary SPAs skills for a given scout.
      *
-     * @param scout the {@link Person} whose scouting SPAs are being evaluated
+     * @param scoutHasEagleEyes      flag signifying if the scout has Eagle Eyes SPA
+     * @param unitHasSensorEquipment flag signifying presence of sensor equipment
      *
      * @return a {@link TargetRollModifier} reflecting bonuses from complementary scouting skills; will have a modifier
      *       value of 0 if no qualifying skills are present
@@ -1804,11 +1812,31 @@ public class StratConRulesManager {
      * @author Illiani
      * @since 0.50.10
      */
-    private static TargetRollModifier getScoutComplementarySPAModifier(Person scout) {
-        PersonnelOptions options = scout.getOptions();
-        int complementaryModifier = options.booleanOption(OptionsConstants.MISC_EAGLE_EYES) ? -1 : 0;
+    static TargetRollModifier getScoutComplementarySPAModifier(boolean scoutHasEagleEyes,
+          boolean unitHasSensorEquipment) {
+        // Eagle Eyes adds +1 to the effective scout skill but does not stack with sensor equipment
+        int modifier = (scoutHasEagleEyes && !unitHasSensorEquipment) ? -1 : 0;
+        return new TargetRollModifier(modifier, "Scout Complementary SPA Modifier");
+    }
 
-        return new TargetRollModifier(complementaryModifier, "Complementary SPA Modifier");
+    /**
+     * Returns the full list of {@link TargetRollModifier}s for a given scout.
+     *
+     * @param unitWeight             the unit's weight in tons
+     * @param unitSpeed              the unit's speed
+     * @param scoutHasEagleEyes      flag signifying if the scout has Eagle Eyes SPA
+     * @param unitHasSensorEquipment flag signifying presence of sensor equipment
+     *
+     * @return a list of {@link TargetRollModifier} reflecting all bonuses scout has
+     */
+    static List<TargetRollModifier> getAllScoutRollModifiers(double unitWeight, int unitSpeed,
+          boolean scoutHasEagleEyes, boolean unitHasSensorEquipment) {
+        TargetRollModifier weightModifier = getUnitWeightModifier(unitWeight);
+        TargetRollModifier speedModifier = getUnitSpeedModifier(unitSpeed);
+        TargetRollModifier sensorEquipmentModifier = getUnitEquipmentModifier(unitHasSensorEquipment);
+        TargetRollModifier scoutModifier =
+              getScoutComplementarySPAModifier(scoutHasEagleEyes, unitHasSensorEquipment);
+        return List.of(weightModifier, speedModifier, sensorEquipmentModifier, scoutModifier);
     }
 
     /**
@@ -1816,8 +1844,8 @@ public class StratConRulesManager {
      * force.
      *
      * <p>For each unit retrieved from the {@code Force}, this method examines all crew members to determine which
-     * has the highest scouting-related skill (as evaluated by
-     * {@link ScoutingSkills#getBestScoutingSkill(Person)}).</p>
+     * has the highest scouting-related skill (as evaluated by {@link ScoutingSkills#getBestScoutingSkill(Person)}) in
+     * combination with scouting roll modifiers</p>
      *
      * <p>The crew member with the highest skill level becomes the designated scout for that unit. The method also
      * determines whether each unit is a "light unit" based on its weight class.</p>
@@ -1825,14 +1853,11 @@ public class StratConRulesManager {
      * <p>All such {@link ScoutRecord} entries are collected, sorted in descending order of scout skill level, and
      * returned as a list. Units with no crew are logged and skipped.</p>
      *
-     * @param formation                   the {@link Formation} containing units to evaluate
-     * @param hangar                      the {@link Hangar} used to help retrieve units from the force
-     * @param isCommandersOnlyVehicles    {@code true} to only use the skills possessed by the unit commander (if
-     *                                    vehicle)
-     * @param isCommandersOnlyInfantry    {@code true} to only use the skills possessed by the unit commander (if
-     *                                    conventional infantry)
-     * @param isCommandersOnlyBattleArmor {@code true} to only use the skills possessed by the unit commander (if battle
-     *                                    armor)
+     * @param formation       the {@link Formation} containing units to evaluate
+     * @param hangar          the {@link Hangar} used to help retrieve units from the force
+     * @param campaignOptions {@link CampaignOptions}, used to check useCommanderOnly options
+     * @param isClanCampaign  if {@code true}, applies rules specific to clan campaigns
+     * @param date            the current date, used for time-dependent logic
      *
      * @return a list of {@link ScoutRecord} objects, each representing the best scout and their skill details for a
      *       unit, sorted from the highest to lowest scout skill level
@@ -1840,8 +1865,12 @@ public class StratConRulesManager {
      * @author Illiani
      * @since 0.50.07
      */
-    private static List<ScoutRecord> buildScoutMap(Formation formation, Hangar hangar, boolean isCommandersOnlyVehicles,
-          boolean isCommandersOnlyInfantry, boolean isCommandersOnlyBattleArmor) {
+    static List<ScoutRecord> buildScoutMap(Formation formation, Hangar hangar, CampaignOptions campaignOptions,
+          boolean isClanCampaign, LocalDate date) {
+        if (formation == null) {
+            return new ArrayList<>();
+        }
+
         List<ScoutRecord> scouts = new ArrayList<>();
         for (Unit unit : formation.getAllUnitsAsUnits(hangar, false)) {
             List<Person> unitCrew = unit.getCrew();
@@ -1850,79 +1879,61 @@ public class StratConRulesManager {
                 continue;
             }
 
+            // defaults
+            double unitWeight = 200.0;
+            int unitSpeed = 0;
             boolean hasSensorEquipment = false;
+
             Entity entity = unit.getEntity();
             if (entity != null) {
-                boolean hasImprovedSensors = EntityUtilities.hasImprovedSensors(entity);
-                boolean hasActiveProbe = EntityUtilities.hasActiveProbe(entity);
-                hasSensorEquipment = hasImprovedSensors || hasActiveProbe;
+                unitWeight = entity.getWeight();
+                unitSpeed = AtBDynamicScenarioFactory.calculateAtBSpeed(entity);
+                hasSensorEquipment = hasImprovedSensors(entity) || hasActiveProbe(entity);
 
-                boolean useCommanderOnly = false;
-                if (entity.isVehicle() && isCommandersOnlyVehicles) {
-                    useCommanderOnly = true;
-                } else if (entity.isConventionalInfantry() && isCommandersOnlyInfantry) {
-                    useCommanderOnly = true;
-                } else if (entity.isBattleArmor() && isCommandersOnlyBattleArmor) {
-                    useCommanderOnly = true;
-                }
-
-                if (useCommanderOnly) {
+                if (unit.isOnlyCommandersMatter(campaignOptions)) {
                     Person commander = unit.getCommander();
                     if (commander == null) {
                         LOGGER.info("No commander for unit: {} {}", unit.getName(), unit.getId());
-                        continue;
+                        continue; // skip unit, because commander-only is enforced but no commander exists
                     }
                     unitCrew = Collections.singletonList(commander);
                 }
             }
 
             // Find the best scout in this unit, if any
-            Person bestScout = null;
-            String bestScoutSkillName = SkillType.S_SENSOR_OPERATIONS;
-            int bestScoutSkillLevel = -1;
+            ScoutRecord bestScout = null;
+            int bestScoutTargetNumber = Integer.MAX_VALUE;
             for (Person crewMember : unitCrew) {
-                if (bestScout == null) {
-                    bestScout = crewMember;
-                }
-
+                boolean hasEagleEyes = crewMember.getOptions().booleanOption(OptionsConstants.MISC_EAGLE_EYES);
                 String scoutSkillName = ScoutingSkills.getBestScoutingSkill(crewMember);
                 if (scoutSkillName == null) {
                     continue;
                 }
 
-                SkillModifierData skillModifierData = crewMember.getSkillModifierData();
+                TargetRoll targetNumber = SkillCheckUtility.determineTargetNumber(crewMember,
+                      SkillType.getType(scoutSkillName), 0, campaignOptions.isUseAgeEffects(), isClanCampaign, date);
+                getAllScoutRollModifiers(unitWeight, unitSpeed, hasEagleEyes, hasSensorEquipment)
+                      .forEach(targetNumber::addModifier);
 
-                Skill scoutSkill = crewMember.getSkill(scoutSkillName);
-                PersonnelOptions options = crewMember.getOptions();
-                int complementaryModifier = !hasSensorEquipment && // Doesn't stack with Sensor Equipment
-                                                  options.booleanOption(OptionsConstants.MISC_EAGLE_EYES) ?
-                                                  1 : 0;
-
-                int scoutSkillLevel = (scoutSkill == null) ? -1 : scoutSkill.getTotalSkillLevel(skillModifierData);
-                scoutSkillLevel += complementaryModifier;
-                if (scoutSkillLevel > bestScoutSkillLevel) {
-                    bestScout = crewMember;
-                    bestScoutSkillName = scoutSkillName;
-                    bestScoutSkillLevel = scoutSkillLevel;
+                if (bestScout == null || targetNumber.getValue() < bestScoutTargetNumber) {
+                    bestScout = new ScoutRecord(crewMember, targetNumber, scoutSkillName,
+                          hasEagleEyes, unitWeight, unitSpeed, hasSensorEquipment);
+                    bestScoutTargetNumber = targetNumber.getValue();
                 }
             }
 
-            double weight = 200.0;
-            if (entity != null) {
-                weight = entity.getWeight();
+            if (bestScout == null) {
+                continue;
             }
 
-            int unitSpeed = entity == null ? 0 : AtBDynamicScenarioFactory.calculateAtBSpeed(entity);
-
-            ScoutRecord scoutRecord = new ScoutRecord(bestScout, bestScoutSkillName, bestScoutSkillLevel, weight,
-                  unitSpeed, hasSensorEquipment);
-            LOGGER.info("Unit {} has best scout: {} with skill {} at level {} and is weight: {}t",
-                  unit.getId(), bestScout, bestScoutSkillName, bestScoutSkillLevel, weight);
-            scouts.add(scoutRecord);
+            LOGGER.info("Unit {} (weight: {}t, speed: {}) has best scout: {} with skill {} at TN {}",
+                  unit.getId(), unitWeight, unitSpeed, bestScout.scout(), bestScout.bestScoutSkillName(),
+                  bestScout.targetNumber().getValue());
+            scouts.add(bestScout);
         }
 
-        // Sort scouts by the skill level of their best scout skill, the highest first
-        scouts.sort(Comparator.comparingInt(ScoutRecord::scoutSkillLevel).reversed());
+        // Sort scouts by the target number of their best scout skill, the lowest first
+        scouts.sort(Comparator.comparingInt(a -> a.targetNumber().getValue()));
         return scouts;
     }
 
@@ -2152,7 +2163,7 @@ public class StratConRulesManager {
               roll,
               targetNumber));
 
-        ScenarioTemplate scenarioTemplate = getInterceptionScenarioTemplate(formation, campaign.getHangar());
+        ScenarioTemplate scenarioTemplate = getInterceptionScenarioTemplate(formation, campaign.getAllHangar());
 
         generateReinforcementInterceptionScenario(campaign, scenario, contract, track, scenarioTemplate, formation);
 
@@ -2363,7 +2374,7 @@ public class StratConRulesManager {
     /**
      * Utility method to determine if the current scenario's force commander's force is on defence
      */
-    private static boolean commanderLanceHasDefensiveAssignment(AtBDynamicScenario scenario, Campaign campaign) {
+    public static boolean commanderLanceHasDefensiveAssignment(AtBDynamicScenario scenario, Campaign campaign) {
         Person lanceCommander = scenario.getLanceCommander(campaign);
         if (lanceCommander != null) {
             Unit commanderUnit = lanceCommander.getUnit();
@@ -3141,7 +3152,7 @@ public class StratConRulesManager {
                                                              campaign,
                                                              campaignState) != ReinforcementEligibilityType.NONE);
 
-            List<Unit> allUnits = force.getAllUnitsAsUnits(campaign.getHangar(), false);
+            List<Unit> allUnits = force.getAllUnitsAsUnits(campaign.getAllHangar(), false);
             if ((force.getScenarioId() <= 0) &&
                       !allUnits.isEmpty() &&
                       !forcesInTracks.contains(force.getId()) &&
@@ -3818,7 +3829,7 @@ public class StratConRulesManager {
 
             if (formation.getCombatRoleInMemory().isPatrol()) {
                 boolean allLightUnits = true;
-                for (Unit unit : formation.getAllUnitsAsUnits(campaign.getHangar(), false)) {
+                for (Unit unit : formation.getAllUnitsAsUnits(campaign.getAllHangar(), false)) {
                     if (unit.getEntity() != null && unit.getEntity().getWeight() > 35) {
                         allLightUnits = false;
                         break;

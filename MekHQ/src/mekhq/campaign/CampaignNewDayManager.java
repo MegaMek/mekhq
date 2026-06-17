@@ -110,6 +110,7 @@ import megamek.logging.MMLogger;
 import mekhq.MHQOptions;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign.AdministratorSpecialization;
+import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.DayEndingEvent;
@@ -120,6 +121,8 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.location.ILocation;
+import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.market.PartsInUseManager;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
@@ -145,6 +148,7 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.RandomDependents;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
+import mekhq.campaign.personnel.death.RandomDeath;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.BloodmarkLevel;
@@ -234,10 +238,11 @@ public class CampaignNewDayManager {
         this.campaign = campaign;
         this.campaignOptions = campaign.getCampaignOptions();
         this.faction = campaign.getFaction();
-        this.hangar = campaign.getHangar();
-        this.warehouse = campaign.getWarehouse();
+        this.hangar = campaign.getAllHangar();
+        this.warehouse = campaign.getAllWarehouse();
         this.quartermaster = campaign.getQuartermaster();
         this.finances = campaign.getFinances();
+        this.updatedLocation = campaign.getCurrentLocation();
     }
 
     /**
@@ -428,12 +433,19 @@ public class CampaignNewDayManager {
 
         campaign.readNews();
 
-        campaign.getCurrentLocation().newDay(campaign);
+        for (AbstractLocation location : new ArrayList<>(campaign.getLocations())) {
+            location.newDay(campaign, location != updatedLocation);
+        }
         updatedLocation = campaign.getCurrentLocation();
+
 
         updateFacilities();
 
         processNewDayPersonnel();
+
+        processAllArrivals();
+
+        campaign.pruneEmptyLocations();
 
         if (campaignOptions.isUseRandomDiseases() && campaignOptions.isUseAlternativeAdvancedMedical()) {
             PlanetarySystem currentSystem = updatedLocation.getCurrentSystem();
@@ -645,6 +657,16 @@ public class CampaignNewDayManager {
      * @since 0.50.10
      */
 
+    private void processAllArrivals() {
+        for (AbstractLocation location : new ArrayList<>(campaign.getLocations())) {
+            location.processArrivals(campaign);
+        }
+        for (PlayerBase base : campaign.getPlayerBases()) {
+            base.processArrivals(campaign);
+        }
+        campaign.processArrivals(campaign);
+    }
+
     private void updateFacilities() {
         updateFieldKitchenCapacity();
         updateMASHTheatreCapacity();
@@ -741,6 +763,11 @@ public class CampaignNewDayManager {
         RecoverMIAPersonnel recovery = new RecoverMIAPersonnel(campaign, faction, campaign.getAtBUnitRatingMod());
         MedicalController medicalController = new MedicalController(campaign);
 
+        // Special New Week Processing
+        boolean isNewWeek = today.getDayOfWeek() == DayOfWeek.MONDAY;
+        RandomDeath randomDeath = campaign.getRandomDeath();
+        processPersonnelWhoHaveDepartedCampaign(isNewWeek, randomDeath);
+
         // campaign list ensures we don't hit a concurrent modification error
         List<Person> personnel = campaign.getPersonnelFilteringOutDeparted();
 
@@ -774,10 +801,6 @@ public class CampaignNewDayManager {
         boolean isUseAgeEffects = campaignOptions.isUseAgeEffects();
         boolean shouldEdgeRefreshToday = EdgeRefreshPeriod.shouldRefresh(campaignOptions.getEdgeRefreshPeriod(), today);
         for (Person person : personnel) {
-            if (person.getStatus().isDepartedUnit()) {
-                continue;
-            }
-
             int age = person.getAge(today);
             person.setAgeForAttributeModifiers(isUseAgeEffects ? age : IGNORE_AGE);
 
@@ -823,8 +846,8 @@ public class CampaignNewDayManager {
             }
 
             // Weekly events
-            if (today.getDayOfWeek() == DayOfWeek.MONDAY) {
-                if (!campaign.getRandomDeath().processNewWeek(campaign, today, person)) {
+            if (isNewWeek) {
+                if (!randomDeath.processNewWeek(campaign, today, person)) {
                     // If the character has died, we don't need to process relationship events
                     processWeeklyRelationshipEvents(person);
                 }
@@ -966,6 +989,17 @@ public class CampaignNewDayManager {
                   campaign,
                   quickTrainOptions,
                   true);
+        }
+    }
+
+    private void processPersonnelWhoHaveDepartedCampaign(boolean isNewWeek, RandomDeath randomDeath) {
+        List<Person> departedPersonnel = campaign.getAllPersonnel().stream()
+                                               .filter(person -> person.getStatus().isFollowAfterLeavingCampaign())
+                                               .toList();
+        for (Person person : departedPersonnel) {
+            if (isNewWeek) {
+                randomDeath.processNewWeek(campaign, today, person);
+            }
         }
     }
 
@@ -1340,6 +1374,17 @@ public class CampaignNewDayManager {
             }
 
             if (null != tech) {
+                // If the tech has moved to a different location since the assignment was made,
+                // cancel it and notify the player rather than silently failing.
+                ILocation repairTarget = (part.getUnit() != null) ? part.getUnit() : part;
+                if (!LocationUtils.areSameEffectiveLocation(tech, repairTarget)) {
+                    campaign.addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE,
+                          "CampaignNewDayManager.techAtDifferentLocation",
+                          tech.getHyperlinkedFullTitle(),
+                          part.getName()));
+                    part.cancelAssignment(true);
+                    continue;
+                }
                 if (null != tech.getSkillForWorkingOn(part)) {
                     try {
                         campaign.fixPart(part, tech);
@@ -1348,13 +1393,13 @@ public class CampaignNewDayManager {
                               "Could not perform overnight maintenance on {} ({}) due to an error",
                               part.getName(),
                               part.getId());
-                        campaign.addReport(TECHNICAL, String.format(
-                              "ERROR: an error occurred performing overnight maintenance on %s, check the log",
+                        campaign.addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE,
+                              "CampaignNewDayManager.maintenanceError.report",
                               part.getName()));
                     }
                 } else {
-                    campaign.addReport(TECHNICAL, String.format(
-                          "%s looks at %s, recalls his total lack of skill for working with such technology, then slowly puts the tools down before anybody gets hurt.",
+                    campaign.addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE,
+                          "CampaignNewDayManager.techAbort.report",
                           tech.getHyperlinkedFullTitle(),
                           part.getName()));
                     part.cancelAssignment(false);
@@ -1535,7 +1580,10 @@ public class CampaignNewDayManager {
         }
 
         // Censure degradation
-        campaign.getFactionStandings().processCensureDegradation(today);
+        List<String> reports = campaign.getFactionStandings().processCensureDegradation(today);
+        for (String report : reports) {
+            campaign.addReport(POLITICS, report);
+        }
     }
 
     /**

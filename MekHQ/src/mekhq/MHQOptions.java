@@ -587,6 +587,26 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.FATIGUED_BACKGROUND, value.getRGB());
     }
 
+    public Color getAwayFromMainForceForeground() {
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.AWAY_FROM_MAIN_FORCE_FOREGROUND, 0x000000));
+    }
+
+    public void setAwayFromMainForceForeground(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE)
+              .putInt(MHQConstants.AWAY_FROM_MAIN_FORCE_FOREGROUND, value.getRGB());
+    }
+
+    public Color getAwayFromMainForceBackground() {
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.AWAY_FROM_MAIN_FORCE_BACKGROUND, 0x5F9EA0));
+    }
+
+    public void setAwayFromMainForceBackground(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE)
+              .putInt(MHQConstants.AWAY_FROM_MAIN_FORCE_BACKGROUND, value.getRGB());
+    }
+
     public Color getStratConHexCoordForeground() {
         return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
                                .getInt(MHQConstants.STRAT_CON_HEX_COORD_FOREGROUND, Color.GREEN.getRGB()));
@@ -1034,7 +1054,7 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public boolean getNewDayMRMS() {
-        return userPreferences.node(MHQConstants.NEW_DAY_NODE).getBoolean(MHQConstants.NEW_DAY_MRMS, true);
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE).getBoolean(MHQConstants.NEW_DAY_MRMS, false);
     }
 
     public void setNewDayMRMS(final boolean value) {

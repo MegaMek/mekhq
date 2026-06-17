@@ -53,15 +53,14 @@ import megamek.common.equipment.AmmoMounted;
 import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.Mounted;
-import megamek.common.equipment.WeaponMounted;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.units.Aero;
 import megamek.common.units.Jumpship;
 import megamek.common.units.ProtoMek;
 import megamek.common.units.SmallCraft;
-import megamek.common.weapons.Weapon;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.Warehouse;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Availability;
@@ -344,18 +343,20 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
 
     /**
-     * Requisitions ammo of a given type from the quartermaster.
+     * Requisitions ammo of a given type from the unit's local warehouse (or campaign warehouse as
+     * fallback).
      *
      * @param ammoType    The {@code AmmoType} being requisitioned.
-     * @param shotsNeeded The number of shots needed from the quartermaster.
+     * @param shotsNeeded The number of shots needed.
      *
      * @return The number of shots requisitioned. This may be less than {@code shotsNeeded}.
      */
     protected int requisitionAmmo(AmmoType ammoType, int shotsNeeded) {
         Objects.requireNonNull(ammoType);
+        Warehouse warehouse = getWarehouse();
         int shotsLoaded = 0;
         while (shotsLoaded < shotsNeeded) {
-            int shots = campaign.getQuartermaster().removeAmmo(ammoType, shotsNeeded - shotsLoaded);
+            int shots = campaign.getQuartermaster().removeAmmo(warehouse, ammoType, shotsNeeded - shotsLoaded);
             if (shots < 1) {
                 return shotsLoaded;
             } else {
@@ -411,7 +412,8 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
 
     /**
-     * Returns ammo unloaded from the bin to the quartermaster.
+     * Returns ammo unloaded from the bin to the unit's local warehouse (or campaign warehouse as
+     * fallback).
      *
      * @param ammoType      The {@code AmmoType} unloaded.
      * @param shotsUnloaded The number of shots of ammo unloaded.
@@ -420,7 +422,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         Objects.requireNonNull(ammoType);
 
         if (shotsUnloaded > 0) {
-            getCampaign().getQuartermaster().addAmmo(ammoType, shotsUnloaded);
+            getCampaign().getQuartermaster().addAmmo(getWarehouse(), ammoType, shotsUnloaded);
         }
     }
 
@@ -432,7 +434,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         super.remove(salvage);
 
         // We don't keep around ammo bins anymore
-        getCampaign().getWarehouse().removePart(this);
+        getWarehouse().removePart(this);
     }
 
     @Override
@@ -539,7 +541,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public String getDesc() {
-        if (isSalvaging()) {
+        if (isDamagedBeyondRepair() || isSalvaging()) {
             return super.getDesc();
         }
 
@@ -567,7 +569,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         }
         if (null != unit) {
             int shotsAvailable = getAmountAvailable();
-            PartInventory inventories = campaign.getPartInventory(getNewPart());
+            PartInventory inventories = getPartInventory(getNewPart());
 
             StringBuilder toReturn = new StringBuilder();
             toReturn.append(getType().getDesc())
@@ -631,7 +633,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         toReturn += ">";
         toReturn += "<b>" + getAcquisitionDisplayName() + "</b> " + getAcquisitionBonus() + "<br/>";
         toReturn += getAcquisitionExtraDesc() + "<br/>";
-        PartInventory inventories = campaign.getPartInventory(getAcquisitionPart());
+        PartInventory inventories = getPartInventory(getAcquisitionPart());
         toReturn += inventories.getTransitOrderedDetails() + "<br/>";
         toReturn += getBuyCost().toAmountAndSymbolString() + "<br/>";
         toReturn += "</font></html>";

@@ -34,17 +34,12 @@ package mekhq.gui.enums;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
 
 import java.awt.event.KeyEvent;
 import java.util.ResourceBundle;
 
 import mekhq.MekHQ;
-import mekhq.gui.*;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class MHQTabTypeTest {
@@ -59,13 +54,24 @@ public class MHQTabTypeTest {
     @Test
     public void testGetMnemonic() {
         assertEquals(KeyEvent.VK_O, MHQTabType.COMMAND_CENTER.getMnemonic());
-        assertEquals(KeyEvent.VK_S, MHQTabType.INTERSTELLAR_MAP.getMnemonic());
+        assertEquals(KeyEvent.VK_UNDEFINED, MHQTabType.NAVIGATION.getMnemonic());
         assertEquals(KeyEvent.VK_H, MHQTabType.HANGAR.getMnemonic());
         assertEquals(KeyEvent.VK_L, MHQTabType.MEK_LAB.getMnemonic());
     }
     //endregion Getters
 
     //region Boolean Comparison Methods
+    @Test
+    public void testIsNavigation() {
+        for (final MHQTabType mhqTabType : types) {
+            if (mhqTabType == MHQTabType.NAVIGATION) {
+                assertTrue(mhqTabType.isNavigation());
+            } else {
+                assertFalse(mhqTabType.isNavigation());
+            }
+        }
+    }
+
     @Test
     public void testIsCommandCenter() {
         for (final MHQTabType mhqTabType : types) {
@@ -95,17 +101,6 @@ public class MHQTabTypeTest {
                 assertTrue(mhqTabType.isBriefingRoom());
             } else {
                 assertFalse(mhqTabType.isBriefingRoom());
-            }
-        }
-    }
-
-    @Test
-    public void testIsInterstellarMap() {
-        for (final MHQTabType mhqTabType : types) {
-            if (mhqTabType == MHQTabType.INTERSTELLAR_MAP) {
-                assertTrue(mhqTabType.isInterstellarMap());
-            } else {
-                assertFalse(mhqTabType.isInterstellarMap());
             }
         }
     }
@@ -198,61 +193,6 @@ public class MHQTabTypeTest {
         }
     }
     //endregion Boolean Comparison Methods
-
-    /**
-     * This test is disabled because it will run through all the GUI tabs and initialize them, which is not a quick
-     * process. This also requires lots more mock handling to actually go through the initializations too.
-     */
-    @Disabled
-    @Test
-    public void testCreateTab() {
-        final MekHQ mockMekHQ = mock(MekHQ.class);
-        final CampaignGUI gui = new CampaignGUI(mockMekHQ);
-        for (final MHQTabType mhqTabType : types) {
-            final CampaignGuiTab tab = mhqTabType.createTab(gui);
-            switch (mhqTabType) {
-                case COMMAND_CENTER:
-                    assertInstanceOf(CommandCenterTab.class, tab);
-                    break;
-                case TOE:
-                    assertInstanceOf(TOETab.class, tab);
-                    break;
-                case BRIEFING_ROOM:
-                    assertInstanceOf(BriefingTab.class, tab);
-                    break;
-                case INTERSTELLAR_MAP:
-                    assertInstanceOf(MapTab.class, tab);
-                    break;
-                case PERSONNEL:
-                    assertInstanceOf(PersonnelTab.class, tab);
-                    break;
-                case HANGAR:
-                    assertInstanceOf(HangarTab.class, tab);
-                    break;
-                case WAREHOUSE:
-                    assertInstanceOf(WarehouseTab.class, tab);
-                    break;
-                case REPAIR_BAY:
-                    assertInstanceOf(RepairTab.class, tab);
-                    break;
-                case INFIRMARY:
-                    assertInstanceOf(InfirmaryTab.class, tab);
-                    break;
-                case FINANCES:
-                    assertInstanceOf(FinancesTab.class, tab);
-                    break;
-                case MEK_LAB:
-                    assertInstanceOf(MekLabTab.class, tab);
-                    break;
-                case STRAT_CON:
-                    assertInstanceOf(StratConTab.class, tab);
-                    break;
-                default:
-                    assertNull(tab);
-                    break;
-            }
-        }
-    }
 
     @Test
     public void testToStringOverride() {

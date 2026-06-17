@@ -50,6 +50,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Set;
 
+import jakarta.annotation.Nonnull;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlTransient;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
@@ -58,6 +59,7 @@ import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.location.ILocation;
+import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.personnel.Injury;
@@ -71,12 +73,13 @@ import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
+import org.w3c.dom.Node;
 
 /**
  * Abstract implementation of a specific location. An {@code AbstractLocation} is expected as the
- * {@link ILocation ILocation locatable} of the root {@link LocationNode} in a {@code LocationNode} tree.
+ * {@link ILocation locatable} of the root {@link LocationNode} in a {@code LocationNode} tree.
  */
-public abstract class AbstractLocation implements ILocation {
+public abstract class AbstractLocation implements IPlace {
     protected static final MMLogger logger = MMLogger.create(AbstractLocation.class);
     static final String RESOURCE_BUNDLE = "mekhq.resources.CurrentLocation";
 
@@ -154,8 +157,12 @@ public abstract class AbstractLocation implements ILocation {
 
     @Override
     @Nullable
-    public LocationNode getLocationNode() {
+    public @Nonnull LocationNode getLocationNode() {
         return locationNode;
+    }
+
+    public boolean computeIsUseCommandCircuit(Campaign campaign) {
+        return computeIsUseCommandCircuit(campaign, campaign.getCampaignOptions());
     }
 
     protected boolean computeIsUseCommandCircuit(Campaign campaign, CampaignOptions campaignOptions) {
@@ -179,14 +186,16 @@ public abstract class AbstractLocation implements ILocation {
      * @return the number of hours actually used for recharging
      */
     protected double applyRechargeForHours(Campaign campaign, LocalDate today, boolean isUseCommandCircuit,
-          double availableHours) {
+          double availableHours, boolean isSilentProcessing) {
         double neededRechargeTime = currentSystem.getRechargeTime(today, isUseCommandCircuit);
         double usedRechargeTime = Math.min(availableHours, neededRechargeTime - getRechargeTime());
         if (usedRechargeTime > 0) {
-            campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, "getReport.recharge.hours",
-                  Math.round(100.0 * usedRechargeTime) / 100.0));
+            if (!isSilentProcessing) {
+                campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, "getReport.recharge.hours",
+                                                  Math.round(100.0 * usedRechargeTime) / 100.0));
+            }
             setRechargeTime(getRechargeTime() + usedRechargeTime);
-            if (getRechargeTime() >= neededRechargeTime) {
+            if (getRechargeTime() >= neededRechargeTime && !isSilentProcessing) {
                 campaign.addReport(GENERAL, getTextAt(RESOURCE_BUNDLE, "getReport.recharge.complete"));
             }
         }
@@ -194,10 +203,11 @@ public abstract class AbstractLocation implements ILocation {
     }
 
     // recharge even if there is no jump path because JumpShips don't go anywhere
-    public void newDay(Campaign campaign) {
+    public void newDay(Campaign campaign, boolean isSilentProcessing) {
         LocalDate today = campaign.getLocalDate();
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        applyRechargeForHours(campaign, today, computeIsUseCommandCircuit(campaign, campaignOptions), 24.0);
+        applyRechargeForHours(campaign, today, computeIsUseCommandCircuit(campaign, campaignOptions), 24.0,
+              isSilentProcessing);
     }
 
     void checkForDiseaseOrBioweaponOutbreaks(Campaign campaign, LocalDate today) {
@@ -295,6 +305,23 @@ public abstract class AbstractLocation implements ILocation {
     }
 
     public abstract void writeToXML(PrintWriter writer, int indent);
+
+    /**
+     * Dispatches XML deserialization to the correct {@link AbstractLocation} subclass based on the element name of
+     * {@code wn}.
+     *
+     * @return the deserialized location, or {@code null} if the node name is unrecognized
+     */
+    public static @Nullable AbstractLocation generateInstanceFromXML(Node wn, Campaign campaign) {
+        return switch (wn.getNodeName().toLowerCase()) {
+            case "location" -> CurrentLocation.generateInstanceFromXML(wn, campaign);
+            case "fixedlocation" -> FixedLocation.generateInstanceFromXML(wn, campaign);
+            default -> {
+                logger.warn("Unrecognized location node '{}' — skipping", wn.getNodeName());
+                yield null;
+            }
+        };
+    }
 
     static class PlanetarySystemAdapter extends XmlAdapter<String, PlanetarySystem> {
         private final Campaign campaign;

@@ -331,6 +331,49 @@ public class PersonViewPanel extends JScrollablePanel {
             gridY++;
         }
 
+        List<Skill> inProgressSkills = person.getInProgressSkills();
+        if (!inProgressSkills.isEmpty()) {
+            JPanel pnlProgressShow = new JPanel();
+            pnlProgressShow.setName("pnlProgress");
+            pnlProgressShow.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
+                  "pnlInProgress.show")));
+            pnlProgressShow.setVisible(true);
+
+            JPanel pnlProgressHide = fillInProgressSkills(inProgressSkills);
+
+            pnlProgressShow.addMouseListener(getSwitchListener(pnlProgressShow, pnlProgressHide));
+            pnlProgressHide.addMouseListener(getSwitchListener(pnlProgressHide, pnlProgressShow));
+
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = gridY;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            add(pnlProgressShow, gridBagConstraints);
+            add(pnlProgressHide, gridBagConstraints);
+            gridY++;
+        }
+
+        if (!person.getBiography().isBlank()) {
+            JTextPane txtDesc = new JTextPane();
+            txtDesc.setName("txtDesc");
+            txtDesc.setEditable(false);
+            txtDesc.setContentType("text/html");
+            txtDesc.setText(MarkdownRenderer.getRenderedHtml(person.getBiography()));
+            txtDesc.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("pnlDescription.title")));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = gridY;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            add(txtDesc, gridBagConstraints);
+            gridY++;
+        }
+
         if ((!person.getPersonalityDescription().isBlank()) &&
                   (campaignOptions.isUseRandomPersonalities()) &&
                   (!person.isHidePersonality()) &&
@@ -349,24 +392,6 @@ public class PersonViewPanel extends JScrollablePanel {
                 txtDesc.setText(person.getPersonalityDescription());
             }
             txtDesc.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(borderTitleKey)));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridY;
-            gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
-            gridBagConstraints.fill = GridBagConstraints.BOTH;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            add(txtDesc, gridBagConstraints);
-            gridY++;
-        }
-
-        if (!person.getBiography().isBlank()) {
-            JTextPane txtDesc = new JTextPane();
-            txtDesc.setName("txtDesc");
-            txtDesc.setEditable(false);
-            txtDesc.setContentType("text/html");
-            txtDesc.setText(MarkdownRenderer.getRenderedHtml(person.getBiography()));
-            txtDesc.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("pnlDescription.title")));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridY;
@@ -1179,15 +1204,8 @@ public class PersonViewPanel extends JScrollablePanel {
                 lblOrigin2.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        PlanetarySystem system = person.getOriginPlanet().getParentSystem();
-                        // Stay on the interstellar map if their origin planet is the primary planet...
-                        if (system.getPrimaryPlanet().equals(person.getOriginPlanet())) {
-                            gui.getMapTab().switchSystemsMap(system);
-                        } else {
-                            // ...otherwise, dive on in to the system view!
-                            gui.getMapTab().switchPlanetaryMap(person.getOriginPlanet());
-                        }
-                        gui.setSelectedTab(MHQTabType.INTERSTELLAR_MAP);
+                        gui.getNavigationTab().showPlanet(person.getOriginPlanet());
+                        gui.setSelectedTab(gui.getNavigationTab());
                     }
                 });
             } else {
@@ -2031,6 +2049,55 @@ public class PersonViewPanel extends JScrollablePanel {
         return pnlSkills;
     }
 
+    private JPanel fillInProgressSkills(List<Skill> relevantSkills) {
+        JPanel pnlProgressHide = new JPanel(new GridBagLayout());
+        pnlProgressHide.setName("pnlInProgress");
+        pnlProgressHide.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
+              "pnlInProgress.hide")));
+        pnlProgressHide.setVisible(false);
+
+        boolean isUseReasoning = campaignOptions.isUseReasoningXpMultiplier();
+
+        // Calculate how many rows per column for even distribution
+        double numColumns = 3.0;
+        int skillsPerColumn = (int) ceil(relevantSkills.size() / numColumns);
+        for (int i = 0; i < relevantSkills.size(); i++) {
+            int column = i / skillsPerColumn; // 0, 1, 2
+            int row = i % skillsPerColumn;
+            int gridX = column * 2; // Each column takes 2 grid positions: name + value
+
+            Skill skill = relevantSkills.get(i);
+            String skillName = skill.getType().getName();
+            String label = skillName.replaceAll(Pattern.quote(RP_ONLY_TAG), "");
+
+            JLabel lblName = new JLabel(label);
+
+            JLabel lblValue = new JLabel(String.format("<html>%s/%s</html>",
+                  skill.getXpProgress(),
+                  person.getCostToImprove(skillName, isUseReasoning)));
+            lblName.setLabelFor(lblValue);
+
+            // Name label constraints
+            GridBagConstraints nameConstraints = new GridBagConstraints();
+            nameConstraints.gridx = gridX;
+            nameConstraints.gridy = row;
+            nameConstraints.anchor = GridBagConstraints.NORTHWEST;
+
+            // Value label constraints
+            GridBagConstraints valueConstraints = new GridBagConstraints();
+            valueConstraints.gridx = gridX + 1;
+            valueConstraints.gridy = row;
+            valueConstraints.anchor = GridBagConstraints.NORTHWEST;
+            valueConstraints.insets = new Insets(0, 5, 0, 10);
+            valueConstraints.weightx = 1;
+
+            pnlProgressHide.add(lblName, nameConstraints);
+            pnlProgressHide.add(lblValue, valueConstraints);
+        }
+
+        return pnlProgressHide;
+    }
+
     private static String getSkillAdjustment(int attributeModifier, int spaModifier, int injuryModifier, int bonus) {
         int totalModifier = attributeModifier + spaModifier + injuryModifier + bonus;
 
@@ -2495,18 +2562,21 @@ public class PersonViewPanel extends JScrollablePanel {
                         educationLabel = resourceMap.getString("lblEducationStage.journeyTime");
 
                         if (educationStage.isJourneyToCampus()) {
+                            String systemId = person.getEduAcademySystem();
+                            PlanetarySystem system = systemId != null ? campaign.getSystemById(systemId) : null;
+                            String systemName = system != null ? system.getName(campaign.getLocalDate()) : "?";
                             educationValue = String.format(resourceMap.getString("lblEducationTravelTo.text"),
                                   person.getEduDaysOfTravel(),
                                   person.getEduJourneyTime(),
-                                  campaign.getSystemById(person.getEduAcademySystem())
-                                        .getName(campaign.getLocalDate()));
+                                  systemName);
                         } else {
+                            String systemId = person.getEduAcademySystem();
+                            PlanetarySystem system = systemId != null ? campaign.getSystemById(systemId) : null;
+                            String systemName = system != null ? system.getName(campaign.getLocalDate()) : "?";
                             educationValue = String.format(resourceMap.getString("lblEducationTravelFrom.text"),
                                   person.getEduDaysOfTravel(),
                                   person.getEduJourneyTime(),
-                                  campaign.getSystemById(person.getEduAcademySystem())
-                                        .getName(campaign.getLocalDate()));
-
+                                  systemName);
                         }
                     }
                     default -> {

@@ -40,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -76,6 +77,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.AbstractTransportedUnitsSummary;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.TestSystems;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -1112,4 +1114,147 @@ public class CampaignTest {
         }
     }
     // endregion Nested Test Classes for Temp Crew
+
+    // region Nested Test Classes for Location
+    @Nested
+    class Location {
+
+        Campaign campaign;
+
+        @BeforeEach
+        void setUp() {
+            campaign = MHQTestUtilities.getTestCampaign();
+        }
+
+        /** Tests for {@link Campaign#setLocation(AbstractLocation)}. */
+        @Nested
+        class SetLocation {
+
+            @Test
+            void setLocation_replacesExistingLocation() {
+                PlanetarySystem newSystem = mock(PlanetarySystem.class);
+                CurrentLocation newLocation = new CurrentLocation(newSystem, 0.0);
+
+                campaign.setLocation(newLocation);
+
+                assertEquals(1, campaign.getLocations().size());
+                assertSame(newLocation, campaign.getLocations().get(0));
+            }
+
+            @Test
+            void setLocation_null_clearsLocations() {
+                campaign.setLocation(null);
+
+                assertTrue(campaign.getLocations().isEmpty());
+            }
+
+            @Test
+            void setLocation_null_currentLocationBecomesNull() {
+                campaign.setLocation(null);
+
+                assertNull(campaign.getCurrentLocation());
+            }
+
+            @Test
+            void setLocation_updatesCurrentLocation() {
+                PlanetarySystem newSystem = mock(PlanetarySystem.class);
+                CurrentLocation newLocation = new CurrentLocation(newSystem, 0.0);
+
+                campaign.setLocation(newLocation);
+
+                assertSame(newLocation, campaign.getCurrentLocation());
+            }
+
+            @Test
+            void setLocation_keepsOldLocationWhenItHasChildren() {
+                // The old CurrentLocation has a child (simulating a person in transit).
+                // setLocation must NOT remove it — only the daily prune may do so.
+                AbstractLocation old = campaign.getCurrentLocation();
+                PlanetarySystem childSystem = mock(PlanetarySystem.class);
+                CurrentLocation child = new CurrentLocation(childSystem, 0.0);
+                child.setParent(old);
+
+                PlanetarySystem newSystem = mock(PlanetarySystem.class);
+                CurrentLocation newLocation = new CurrentLocation(newSystem, 0.0);
+                campaign.setLocation(newLocation);
+
+                assertTrue(campaign.getLocations().contains(old));
+            }
+        }
+
+        /** Tests for {@link Campaign#addLocation(AbstractLocation)}. */
+        @Nested
+        class AddLocation {
+
+            @Test
+            void addLocation_appendsToExistingList() {
+                int sizeBefore = campaign.getLocations().size();
+                PlanetarySystem system = mock(PlanetarySystem.class);
+                CurrentLocation extra = new CurrentLocation(system, 0.0);
+
+                campaign.addLocation(extra);
+
+                assertEquals(sizeBefore + 1, campaign.getLocations().size());
+            }
+
+            @Test
+            void addLocation_newLocationAppearsInList() {
+                PlanetarySystem system = mock(PlanetarySystem.class);
+                CurrentLocation extra = new CurrentLocation(system, 0.0);
+
+                campaign.addLocation(extra);
+
+                assertTrue(campaign.getLocations().contains(extra));
+            }
+
+            @Test
+            void addLocation_null_doesNotChangeList() {
+                int sizeBefore = campaign.getLocations().size();
+
+                campaign.addLocation(null);
+
+                assertEquals(sizeBefore, campaign.getLocations().size());
+            }
+
+            @Test
+            void addLocation_doesNotClearPrimaryLocation() {
+                AbstractLocation primary = campaign.getLocations().get(0);
+                PlanetarySystem system = mock(PlanetarySystem.class);
+
+                campaign.addLocation(new CurrentLocation(system, 0.0));
+
+                assertSame(primary, campaign.getLocations().get(0));
+            }
+        }
+
+        /** Tests for {@link Campaign#getLocations()}. */
+        @Nested
+        class GetLocations {
+
+            @Test
+            void getLocations_returnsUnmodifiableList() {
+                PlanetarySystem system = mock(PlanetarySystem.class);
+                CurrentLocation extra = new CurrentLocation(system, 0.0);
+
+                assertThrows(UnsupportedOperationException.class,
+                      () -> campaign.getLocations().add(extra));
+            }
+
+            @Test
+            void getLocations_initiallyContainsOneLocation() {
+                assertEquals(1, campaign.getLocations().size());
+            }
+
+            @Test
+            void getLocations_multipleCallsReflectCurrentState() {
+                int before = campaign.getLocations().size();
+
+                PlanetarySystem system = mock(PlanetarySystem.class);
+                campaign.addLocation(new CurrentLocation(system, 0.0));
+
+                assertEquals(before + 1, campaign.getLocations().size());
+            }
+        }
+    }
+    // endregion Nested Test Classes for Location
 }

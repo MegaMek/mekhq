@@ -3001,7 +3001,9 @@ public class AtBDynamicScenarioFactory {
         // Assign the crew to the unit
         entity.setCrew(entityCrew);
 
-        int tacticsInitiativeBonus = getTacticsModifier(skill, campaign.getRandomSkillPreferences(), faction);
+        int tacticsInitiativeBonus = getTacticsModifier(skill,
+              campaign.getRandomSkillPreferences(),
+              campaignOptions.isUseSensibleTactics());
         if (campaignOptions.isUseTactics()) {
             entity.getCrew().setCommandBonus(tacticsInitiativeBonus);
         } else if (campaignOptions.isUseInitiativeBonus()) {
@@ -3057,14 +3059,13 @@ public class AtBDynamicScenarioFactory {
      *
      * @param skill                  the skill level used to derive the base modifier.
      * @param randomSkillPreferences preferences that govern how command skills are adjusted and randomized.
-     * @param faction                the faction data used to determine leadership-related bonuses, such as formation
-     *                               size.
+     * @param isUseSensibleTactics   if {@code true} Tactics modifiers are reduced
      *
      * @return the calculated tactics modifier, factoring in skill level, preferences, randomization, and
      *       faction-specific adjustments.
      */
     private static int getTacticsModifier(SkillLevel skill, RandomSkillPreferences randomSkillPreferences,
-          Faction faction) {
+          boolean isUseSensibleTactics) {
         int skillLevel = 0;
         if (skill.isGreenOrGreater()) {
             int adjustedValue = min(skill.getAdjustedValue(), EXP_LEGENDARY);
@@ -3072,10 +3073,10 @@ public class AtBDynamicScenarioFactory {
 
             int skillRoll = Math.clamp(d6(2) + commandSkillsModifier, 2, 12);
             skillLevel = switch (skillRoll) {
-                case 3, 4, 5 -> 1;
-                case 6, 7, 8, 9 -> 2;
-                case 10, 11 -> 3;
-                case 12 -> 4;
+                case 3, 4, 5 -> isUseSensibleTactics ? 0 : 1;
+                case 6, 7, 8, 9 -> isUseSensibleTactics ? 1 : 2;
+                case 10, 11 -> isUseSensibleTactics ? 2 : 3; // We're not rounding down here on purpose
+                case 12 -> isUseSensibleTactics ? 2 : 4;
                 default -> 0; // 2
             };
         }
@@ -4471,17 +4472,17 @@ public class AtBDynamicScenarioFactory {
             setDeploymentTurnsStaggeredByLance(untransportedEntities);
         } else if (forceTemplate.getArrivalTurn() == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) {
             if (forceTemplate.getForceAlignment() == ForceAlignment.Opposing.ordinal()) {
-                setDeploymentTurnsForReinforcements(campaign.getHangar(),
+                setDeploymentTurnsForReinforcements(campaign.getAllHangar(),
                       scenario,
                       untransportedEntities,
                       scenario.getHostileReinforcementDelayReduction());
             } else if (forceTemplate.getForceAlignment() != ForceAlignment.Third.ordinal()) {
-                setDeploymentTurnsForReinforcements(campaign.getHangar(),
+                setDeploymentTurnsForReinforcements(campaign.getAllHangar(),
                       scenario,
                       untransportedEntities,
                       scenario.getFriendlyReinforcementDelayReduction());
             } else {
-                setDeploymentTurnsForReinforcements(campaign.getHangar(), scenario, untransportedEntities, 0);
+                setDeploymentTurnsForReinforcements(campaign.getAllHangar(), scenario, untransportedEntities, 0);
             }
         } else {
             for (Entity entity : untransportedEntities) {
@@ -4524,7 +4525,7 @@ public class AtBDynamicScenarioFactory {
         // deployment turn explicitly or use a stagger algorithm.
         // For player forces where there's not an associated force template, we calculate the
         // deployment turn as if they were reinforcements
-        Hangar hangar = campaign.getHangar();
+        Hangar hangar = campaign.getAllHangar();
         for (int forceID : scenario.getForceIDs()) {
             ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
 
@@ -4593,7 +4594,7 @@ public class AtBDynamicScenarioFactory {
             } else {
                 LOGGER.info("We're using a fallback deployment turn calculation for {}",
                       playerFormation.getName());
-                setDeploymentTurnsForReinforcements(campaign.getHangar(), scenario, forceEntities, strategy);
+                setDeploymentTurnsForReinforcements(campaign.getAllHangar(), scenario, forceEntities, strategy);
             }
         }
 
@@ -4615,7 +4616,7 @@ public class AtBDynamicScenarioFactory {
                 if (deployRound == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED_BY_LANCE) {
                     setDeploymentTurnsStaggeredByLance(Collections.singletonList(entity));
                 } else if (deployRound == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) {
-                    setDeploymentTurnsForReinforcements(campaign.getHangar(),
+                    setDeploymentTurnsForReinforcements(campaign.getAllHangar(),
                           scenario,
                           Collections.singletonList(entity),
                           strategy);
@@ -4623,7 +4624,7 @@ public class AtBDynamicScenarioFactory {
                     entity.setDeployRound(deployRound);
                 }
             } else {
-                setDeploymentTurnsForReinforcements(campaign.getHangar(),
+                setDeploymentTurnsForReinforcements(campaign.getAllHangar(),
                       scenario,
                       Collections.singletonList(entity),
                       strategy);

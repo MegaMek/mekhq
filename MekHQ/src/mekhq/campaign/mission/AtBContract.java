@@ -147,6 +147,7 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.campaign.universe.factionStanding.PerformBatchall;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.gui.view.MoraleBar;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -489,8 +490,9 @@ public class AtBContract extends Contract {
               campaignOptions.getMoraleDecisiveDefeatEffect(), campaignOptions.getMoraleDefeatEffect());
         String flavorText = MHQMorale.getFormattedTitle()
                                   + "<h2 style='text-align:center;'>" + getName() + "</h2>"
-                                  + moraleLevel.getToolTipText();
-        new ImmersiveDialogNotification(campaign, flavorText, moraleReport, true);
+                + MoraleBar.getMoraleDisplay(this).tooltip();
+        new ImmersiveDialogNotification(campaign, flavorText, moraleReport, MoraleBar.createDialogPanel(this),
+                true);
 
         MHQMorale.routedMoraleUpdate(campaign, this);
 
@@ -536,20 +538,19 @@ public class AtBContract extends Contract {
 
         // Update the Batchall information
         batchallAccepted = true;
-        Faction faction = getEnemy();
-        if (campaign.getCampaignOptions().isUseGenericBattleValue() && faction.performsBatchalls()) {
+        if (campaign.getCampaignOptions().isUseGenericBattleValue() && enemyFaction.performsBatchalls()) {
             boolean tracksStanding = campaign.getCampaignOptions().isTrackFactionStanding();
             FactionStandings factionStandings = campaign.getFactionStandings();
 
             boolean allowBatchalls = true;
             if (campaign.getCampaignOptions().isUseFactionStandingBatchallRestrictionsSafe()) {
-                double regard = factionStandings.getRegardForFaction(faction.getShortName(), true);
+                double regard = factionStandings.getRegardForFaction(enemyFaction.getShortName(), true);
                 allowBatchalls = FactionStandingUtilities.isBatchallAllowed(regard);
             }
 
             double regardMultiplier = campaign.getCampaignOptions().getRegardMultiplier();
             String campaignFactionCode = campaign.getFaction().getShortName();
-            if (faction.performsBatchalls() && allowBatchalls) {
+            if (enemyFaction.performsBatchalls() && allowBatchalls) {
                 PerformBatchall batchallDialog = new PerformBatchall(campaign, clanOpponent, enemyCode);
 
                 batchallAccepted = batchallDialog.isBatchallAccepted();
@@ -566,7 +567,7 @@ public class AtBContract extends Contract {
 
             if (tracksStanding) {
                 // Whenever we dynamically change the enemy faction, we update standing accordingly
-                String report = factionStandings.processContractAccept(campaignFactionCode, faction, today,
+                String report = factionStandings.processContractAccept(campaignFactionCode, enemyFaction, today,
                       regardMultiplier, getLength());
                 if (report != null) {
                     campaign.addReport(POLITICS, report);

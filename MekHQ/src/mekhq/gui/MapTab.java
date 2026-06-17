@@ -87,6 +87,7 @@ import mekhq.gui.view.PlanetViewPanel;
 /**
  * Displays interstellar map and contains transit controls.
  */
+// FIXME: this class should not inherit from CampaignGuiTab because it is managed by NavigationTab now
 public final class MapTab extends CampaignGuiTab implements ActionListener {
     private static final int PADDING = UIUtil.scaleForGUI(10);
 
@@ -100,13 +101,12 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
     //region Constructors
     public MapTab(CampaignGUI gui, String tabName) {
         super(gui, tabName);
-        MekHQ.registerHandler(this);
     }
     //endregion Constructors
 
     @Override
     public MHQTabType tabType() {
-        return MHQTabType.INTERSTELLAR_MAP;
+        return null;
     }
 
     /*

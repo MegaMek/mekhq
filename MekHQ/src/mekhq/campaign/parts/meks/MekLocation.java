@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -450,10 +450,10 @@ public class MekLocation extends Part {
 
             if (salvage) {
                 // Return this part to the warehouse as a spare
-                getCampaign().getWarehouse().addPart(this);
+                getWarehouse().addPart(this);
             } else {
                 // Remove this part from the campaign
-                getCampaign().getWarehouse().removePart(this);
+                getWarehouse().removePart(this);
             }
 
             if (getLoc() != Mek.LOC_CENTER_TORSO) {
@@ -933,7 +933,7 @@ public class MekLocation extends Part {
 
     @Override
     public String getDesc() {
-        if ((!isBreached() && !isBlownOff())) {
+        if (isDamagedBeyondRepair() || (!isBreached() && !isBlownOff())) {
             return super.getDesc();
         }
         StringBuilder toReturn = new StringBuilder();
