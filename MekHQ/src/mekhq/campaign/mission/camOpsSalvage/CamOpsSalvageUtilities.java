@@ -309,7 +309,7 @@ public class CamOpsSalvageUtilities {
      * @since 0.50.10
      */
     private static int getDeploymentTime(int scenarioId, AtBContract atbContract) {
-        StratConCampaignState campaignState = atbContract.getStratconCampaignState();
+        StratConCampaignState campaignState = atbContract.getStratConCampaignState();
         if (campaignState != null) {
             for (StratConTrackState track : campaignState.getTracks()) {
                 if (track.getBackingScenariosMap().get(scenarioId) != null) {
@@ -544,7 +544,7 @@ public class CamOpsSalvageUtilities {
             return;
         }
 
-        final StratConCampaignState state = contract.getStratconCampaignState();
+        final StratConCampaignState state = contract.getStratConCampaignState();
         if (state == null) {
             return;
         }

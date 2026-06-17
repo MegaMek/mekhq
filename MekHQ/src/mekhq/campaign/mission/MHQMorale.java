@@ -581,7 +581,7 @@ public class MHQMorale {
     public static void routedMoraleUpdate(Campaign campaign, AtBContract contract) {
         if (contract.getMoraleLevel().isRouted()) {
             LocalDate today = campaign.getLocalDate();
-            StratConCampaignState campaignState = contract.getStratconCampaignState();
+            StratConCampaignState campaignState = contract.getStratConCampaignState();
             boolean canEarlyFinish = campaignState == null || campaignState.allowEarlyVictory();
 
             // Additional morale updates if morale level is set to 'Routed' and the contract type is either a garrison

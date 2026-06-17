@@ -682,8 +682,8 @@ public class StratConContractInitializer {
             // scenarios for this contract
             // and set their backing scenario pointers to the existing scenarios stored in
             // the campaign for this contract
-            if (atbContract.getStratconCampaignState() != null) {
-                for (StratConTrackState track : atbContract.getStratconCampaignState().getTracks()) {
+            if (atbContract.getStratConCampaignState() != null) {
+                for (StratConTrackState track : atbContract.getStratConCampaignState().getTracks()) {
                     for (StratConScenario scenario : track.getScenarios().values()) {
                         Scenario campaignScenario = campaign.getScenario(scenario.getBackingScenarioID());
 

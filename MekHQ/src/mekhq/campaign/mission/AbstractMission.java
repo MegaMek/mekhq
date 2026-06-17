@@ -77,6 +77,7 @@ import mekhq.campaign.personnel.ranks.AutoAssignRankForCompanyGenerator;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.campaign.stratCon.SupportPointNegotiation;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -93,6 +94,7 @@ public class AbstractMission {
 
     private String name;
     private int id = -1;
+    private StratConCampaignState stratConCampaignState;
     private MissionStatus status = MissionStatus.ACTIVE;
     private String contractTypeName;
     private AtBContractType contractType;
@@ -661,6 +663,14 @@ public class AbstractMission {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public StratConCampaignState getStratConCampaignState() {
+        return stratConCampaignState;
+    }
+
+    public void setStratConCampaignState(StratConCampaignState stratConCampaignState) {
+        this.stratConCampaignState = stratConCampaignState;
     }
 
     public String getLegacyPlanetName() {

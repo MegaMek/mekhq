@@ -2213,7 +2213,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all hangars across all locations associated with this campaign.
-     *                   TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     *                         TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
      */
     public Hangar getAllHangar() {
         return units;
@@ -2849,7 +2849,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all warehouses across all locations associated with this campaign.
-     *                   TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
+     *                         TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
      */
     public Warehouse getAllWarehouse() {
         return parts;
@@ -4837,9 +4837,9 @@ public class Campaign implements ITechManager, IPlace {
             // run through the StratCon campaign state where applicable and remove the
             // "parent" scenario as well
             if ((mission instanceof AtBContract) &&
-                      (((AtBContract) mission).getStratconCampaignState() != null) &&
+                      (((AtBContract) mission).getStratConCampaignState() != null) &&
                       (scenario instanceof AtBDynamicScenario)) {
-                ((AtBContract) mission).getStratconCampaignState().removeStratConScenario(scenario.getId());
+                ((AtBContract) mission).getStratConCampaignState().removeStratConScenario(scenario.getId());
             }
         }
         scenarios.remove(scenario.getId());
@@ -4897,8 +4897,8 @@ public class Campaign implements ITechManager, IPlace {
 
         // clear out StratCon formation assignments
         for (AtBContract contract : getActiveAtBContracts()) {
-            if (contract.getStratconCampaignState() != null) {
-                for (StratConTrackState track : contract.getStratconCampaignState().getTracks()) {
+            if (contract.getStratConCampaignState() != null) {
+                for (StratConTrackState track : contract.getStratConCampaignState().getTracks()) {
                     track.unassignFormation(fid);
                 }
             }

@@ -750,7 +750,7 @@ public final class BriefingTab extends CampaignGuiTab {
         Mission mission = getCampaign().getMission(scenario.getMissionId());
         return (scenario instanceof AtBDynamicScenario) &&
                      (mission instanceof AtBContract contract) &&
-                     (contract.getStratconCampaignState() != null);
+                     (contract.getStratConCampaignState() != null);
     }
 
     private void deploySelectedScenario() {
@@ -1084,7 +1084,7 @@ public final class BriefingTab extends CampaignGuiTab {
             case SUCCESS, PARTIAL -> {
                 if ((getCampaignOptions().isUseStratCon()) &&
                           (mission instanceof AtBContract)) {
-                    StratConCampaignState stratConCampaignState = ((AtBContract) mission).getStratconCampaignState();
+                    StratConCampaignState stratConCampaignState = ((AtBContract) mission).getStratConCampaignState();
 
                     if (stratConCampaignState == null || stratConCampaignState.getVictoryPoints() < 3) {
                         yield getCampaignOptions().getMissionXpSuccess();
@@ -1147,7 +1147,7 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         if (comboMission.getSelectedItem() instanceof AtBContract contract) {
-            StratConCampaignState campaignState = contract.getStratconCampaignState();
+            StratConCampaignState campaignState = contract.getStratConCampaignState();
             if (campaignState != null) {
                 generateDailyScenariosForTrack(getCampaign(), campaignState, contract, 1);
                 this.refreshAll(); // We need to refresh otherwise the scenario won't show up in the GUI

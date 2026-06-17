@@ -631,7 +631,7 @@ public class StratConRulesManager {
      * @return The randomly chosen {@link StratConTrackState}, or {@code null} if no tracks are available.
      */
     public static @Nullable StratConTrackState getRandomTrack(AtBContract contract) {
-        List<StratConTrackState> tracks = contract.getStratconCampaignState().getTracks();
+        List<StratConTrackState> tracks = contract.getStratConCampaignState().getTracks();
         Random rand = new Random();
 
         if (!tracks.isEmpty()) {
@@ -2592,7 +2592,7 @@ public class StratConRulesManager {
         }
 
         applyGlobalModifiers(scenario,
-              contract.getStratconCampaignState(),
+              contract.getStratConCampaignState(),
               restrictAlliedModifiers,
               restrictEnemyModifiers);
 
@@ -3108,7 +3108,7 @@ public class StratConRulesManager {
         // assemble a set of all force IDs that are currently assigned to tracks
         Set<Integer> forcesInTracks = new HashSet<>();
         for (AtBContract contract : campaign.getActiveAtBContracts()) {
-            StratConCampaignState state = contract.getStratconCampaignState();
+            StratConCampaignState state = contract.getStratConCampaignState();
             if (state == null) {
                 continue;
             }
@@ -3434,16 +3434,16 @@ public class StratConRulesManager {
         return unit.getCampaign()
                      .getActiveAtBContracts()
                      .stream()
-                     .anyMatch(contract -> (contract.getStratconCampaignState() != null) &&
-                                                 contract.getStratconCampaignState()
+                     .anyMatch(contract -> (contract.getStratConCampaignState() != null) &&
+                                                 contract.getStratConCampaignState()
                                                        .isForceDeployedHere(unit.getFormationId()));
     }
 
     public static boolean isForceDeployedToStratCon(List<AtBContract> activeAtBContracts, int forceId) {
         return activeAtBContracts
                      .stream()
-                     .anyMatch(contract -> (contract.getStratconCampaignState() != null) &&
-                                                 contract.getStratconCampaignState()
+                     .anyMatch(contract -> (contract.getStratConCampaignState() != null) &&
+                                                 contract.getStratConCampaignState()
                                                        .isForceDeployedHere(forceId));
     }
 
@@ -3489,7 +3489,7 @@ public class StratConRulesManager {
         // if the force is deployed elsewhere, it cannot be deployed as reinforcements
         if (campaign.getActiveAtBContracts()
                   .stream()
-                  .flatMap(contract -> contract.getStratconCampaignState().getTracks().stream())
+                  .flatMap(contract -> contract.getStratConCampaignState().getTracks().stream())
                   .anyMatch(track -> !Objects.equals(track, trackState) &&
                                            track.getAssignedForceCoords().containsKey(forceID))) {
             return ReinforcementEligibilityType.NONE;
@@ -3604,7 +3604,7 @@ public class StratConRulesManager {
      */
     public static void updateFacilityForScenario(AtBScenario scenario, AtBContract contract, boolean destroy,
           boolean capture) {
-        if (contract.getStratconCampaignState() == null) {
+        if (contract.getStratConCampaignState() == null) {
             return;
         }
 
@@ -3614,7 +3614,7 @@ public class StratConRulesManager {
         // basically, we're looping through all scenarios on all the contract's tracks
         // if we find one with the same ID as the one being resolved, that's our
         // facility: get rid of it.
-        for (StratConTrackState trackState : contract.getStratconCampaignState().getTracks()) {
+        for (StratConTrackState trackState : contract.getStratConCampaignState().getTracks()) {
             for (StratConCoords coords : trackState.getScenarios().keySet()) {
                 StratConScenario potentialScenario = trackState.getScenario(coords);
                 if (potentialScenario.getBackingScenarioID() == scenario.getId()) {
@@ -3649,7 +3649,7 @@ public class StratConRulesManager {
         Mission mission = tracker.getMission();
 
         if (mission instanceof AtBContract) {
-            StratConCampaignState campaignState = ((AtBContract) mission).getStratconCampaignState();
+            StratConCampaignState campaignState = ((AtBContract) mission).getStratConCampaignState();
             if (campaignState == null) {
                 return;
             }
@@ -3714,7 +3714,7 @@ public class StratConRulesManager {
 
         if (nextScenario instanceof AtBScenario nextAtBScenario) {
 
-            StratConCampaignState campaignState = nextAtBScenario.getContract(campaign).getStratconCampaignState();
+            StratConCampaignState campaignState = nextAtBScenario.getContract(campaign).getStratConCampaignState();
             if (campaignState == null) {
                 return;
             }
@@ -3959,7 +3959,7 @@ public class StratConRulesManager {
 
         // run scenario generation routine for every track attached to an active contract
         for (AtBContract contract : campaign.getActiveAtBContracts()) {
-            StratConCampaignState campaignState = contract.getStratconCampaignState();
+            StratConCampaignState campaignState = contract.getStratConCampaignState();
 
             if (campaignState != null) {
                 List<StratConTrackState> tracks = campaignState.getTracks();

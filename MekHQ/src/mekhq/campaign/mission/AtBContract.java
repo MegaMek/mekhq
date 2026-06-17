@@ -148,7 +148,6 @@ public class AtBContract extends Contract {
 
     protected int difficulty;
 
-
     protected int extensionLength;
 
     protected int playerMinorBreaches;
@@ -170,7 +169,6 @@ public class AtBContract extends Contract {
     /* Only applies to next week */
     protected int nextWeekBattleTypeMod;
 
-    private StratConCampaignState stratconCampaignState;
     private boolean isAttacker;
 
 
@@ -325,11 +323,11 @@ public class AtBContract extends Contract {
                 };
 
                 // If we have a StratCon enabled contract, regenerate Scenario Odds
-                if (stratconCampaignState != null) {
+                if (getStratConCampaignState() != null) {
                     StratConContractDefinition contractDefinition = getContractDefinition(getContractType());
 
                     if (contractDefinition != null) {
-                        for (StratConTrackState trackState : stratconCampaignState.getTracks()) {
+                        for (StratConTrackState trackState : getStratConCampaignState().getTracks()) {
                             int scenarioOdds = StratConContractInitializer.getScenarioOdds(contractDefinition);
 
                             trackState.setScenarioOdds(scenarioOdds);
@@ -564,8 +562,8 @@ public class AtBContract extends Contract {
      * @return the total contract score, including victory points or scenario scores plus modifiers
      */
     public int getContractScore(boolean isUseMaplessMode) {
-        if (!isUseMaplessMode && stratconCampaignState != null) {
-            return stratconCampaignState.getVictoryPoints();
+        if (!isUseMaplessMode && getStratConCampaignState() != null) {
+            return getStratConCampaignState().getVictoryPoints();
         }
 
         return ContractScore.getContractScore(getCompletedScenarios()) + contractScoreArbitraryModifier;
@@ -579,11 +577,11 @@ public class AtBContract extends Contract {
      * @since 0.50.10
      */
     public int getCurrentSupportPoints() {
-        if (stratconCampaignState == null) {
+        if (getStratConCampaignState() == null) {
             return 0;
         }
 
-        return stratconCampaignState.getSupportPoints();
+        return getStratConCampaignState().getSupportPoints();
     }
 
     public int getContractScoreArbitraryModifier() {
@@ -621,40 +619,43 @@ public class AtBContract extends Contract {
                     }
                 } else {
                     campaign.addReport(GENERAL, "Bonus: Ronin");
-                    new RoninOffer(campaign, stratconCampaignState, getRequiredCombatElements());
+                    new RoninOffer(campaign, getStratConCampaignState(), getRequiredCombatElements());
                 }
                 yield false;
             }
             case 2 -> {
                 campaign.addReport(GENERAL, "Bonus: Ronin");
-                new RoninOffer(campaign, stratconCampaignState, getRequiredCombatElements());
+                new RoninOffer(campaign, getStratConCampaignState(), getRequiredCombatElements());
                 yield false;
             }
             case 3 -> { // Resupply
                 if (!campaignOptions.isUseStratCon()) {
                     campaign.addReport(GENERAL, "Bonus: Ronin");
-                    new RoninOffer(campaign, stratconCampaignState, getRequiredCombatElements());
+                    new RoninOffer(campaign, getStratConCampaignState(), getRequiredCombatElements());
                     yield false;
                 } else {
                     if (isPostScenario) {
                         yield true;
                     } else {
                         campaign.addReport(GENERAL, "Bonus: Support Point");
-                        stratconCampaignState.changeSupportPoints(1);
+                        getStratConCampaignState().changeSupportPoints(1);
                         yield false;
                     }
                 }
             }
             case 4 -> {
-                new MercenaryAuction(campaign, getRequiredCombatElements(), stratconCampaignState, TANK);
+                new MercenaryAuction(campaign, getRequiredCombatElements(), getStratConCampaignState(), TANK);
                 yield false;
             }
             case 5 -> {
-                new MercenaryAuction(campaign, getRequiredCombatElements(), stratconCampaignState, AEROSPACE_FIGHTER);
+                new MercenaryAuction(campaign,
+                      getRequiredCombatElements(),
+                      getStratConCampaignState(),
+                      AEROSPACE_FIGHTER);
                 yield false;
             }
             case 6 -> {
-                new MercenaryAuction(campaign, getRequiredCombatElements(), stratconCampaignState, MEK);
+                new MercenaryAuction(campaign, getRequiredCombatElements(), getStratConCampaignState(), MEK);
                 yield false;
             }
             default -> throw new IllegalStateException(
@@ -791,7 +792,7 @@ public class AtBContract extends Contract {
                                 specialEventScenarioDate = getRandomDayOfMonth(campaign.getLocalDate());
                                 specialEventScenarioType = AtBScenario.AMBUSH;
                             } else {
-                                StratConCampaignState campaignState = getStratconCampaignState();
+                                StratConCampaignState campaignState = getStratConCampaignState();
 
                                 if (campaignState != null) {
                                     text += ": -1 Support Point";
@@ -1017,8 +1018,8 @@ public class AtBContract extends Contract {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "specialEventScenarioType", specialEventScenarioType);
         }
 
-        if (stratconCampaignState != null) {
-            stratconCampaignState.Serialize(pw);
+        if (getStratConCampaignState() != null) {
+            getStratConCampaignState().Serialize(pw);
         }
 
         if (getEmployerLiaison() != null) {
@@ -1124,9 +1125,9 @@ public class AtBContract extends Contract {
                 } else if (item.getNodeName().equalsIgnoreCase("specialEventScenarioType")) {
                     specialEventScenarioType = Integer.parseInt(item.getTextContent());
                 } else if (item.getNodeName().equalsIgnoreCase(StratConCampaignState.ROOT_XML_ELEMENT_NAME)) {
-                    stratconCampaignState = StratConCampaignState.Deserialize(item);
-                    stratconCampaignState.setContract(this);
-                    this.setStratConCampaignState(stratconCampaignState);
+                    setStratConCampaignState(StratConCampaignState.Deserialize(item));
+                    getStratConCampaignState().setContract(this);
+                    this.setStratConCampaignState(getStratConCampaignState());
                 } else if (item.getNodeName().equalsIgnoreCase("parentContractId")) {
                     parentContract = new AtBContractRef(Integer.parseInt(item.getTextContent()));
                 } else if (item.getNodeName().equalsIgnoreCase("employerLiaison")) {
@@ -1212,14 +1213,6 @@ public class AtBContract extends Contract {
 
     public int getBattleTypeMod() {
         return battleTypeMod + nextWeekBattleTypeMod;
-    }
-
-    public StratConCampaignState getStratconCampaignState() {
-        return stratconCampaignState;
-    }
-
-    public void setStratConCampaignState(StratConCampaignState state) {
-        stratconCampaignState = state;
     }
 
     @Override
@@ -1714,7 +1707,7 @@ public class AtBContract extends Contract {
      * @since 0.50.10
      */
     public int getRequiredVictoryPoints() {
-        if (stratconCampaignState == null) {
+        if (getStratConCampaignState() == null) {
             return 0;
         }
 
@@ -1727,7 +1720,7 @@ public class AtBContract extends Contract {
 
         double trackCount = 0;
         int totalScenarioOdds = 0;
-        for (StratConTrackState trackState : stratconCampaignState.getTracks()) {
+        for (StratConTrackState trackState : getStratConCampaignState().getTracks()) {
             trackCount++;
             totalScenarioOdds += trackState.getScenarioOdds();
         }

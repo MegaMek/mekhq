@@ -279,7 +279,7 @@ public class StratConCampaignState {
             return null;
         }
 
-        StratConCampaignState campaignState = contract.getStratconCampaignState();
+        StratConCampaignState campaignState = contract.getStratConCampaignState();
         if (campaignState == null) {
             return null;
         }
