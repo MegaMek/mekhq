@@ -67,11 +67,9 @@ import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.FREE;
 import static mekhq.campaign.stratCon.StratConContractDefinition.getContractDefinition;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
-import static mekhq.campaign.universe.factionStanding.BatchallFactions.BATCHALL_FACTIONS;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -87,19 +85,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
-import java.util.ResourceBundle;
 import java.util.stream.Stream;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 
 import megamek.Version;
-import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ratgenerator.FactionRecord;
 import megamek.client.ratgenerator.RATGenerator;
 import megamek.client.ratgenerator.UnitTable;
@@ -141,7 +134,6 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RandomFactionGenerator;
-import mekhq.campaign.universe.factionStanding.BatchallFactions;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.campaign.universe.factionStanding.PerformBatchall;
@@ -160,12 +152,10 @@ import org.w3c.dom.NodeList;
 public class AtBContract extends Contract {
     private static final MMLogger logger = MMLogger.create(AtBContract.class);
 
-    /** The minimum intensity below which no scenarios will be generated */
-    public static final double MINIMUM_INTENSITY = 0.01;
-
     /* null unless subcontract */
     protected AtBContract parentContract;
-    /* hired by another mercenary unit on contract to a third-party employer */ boolean mercSubcontract;
+    /* hired by another mercenary unit on contract to a third-party employer */
+    boolean mercSubcontract;
 
     protected Person employerLiaison;
     protected Person clanOpponent;
@@ -223,9 +213,6 @@ public class AtBContract extends Contract {
 
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.AtBContract";
-    @Deprecated(since = "0.50.10")
-    private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.AtBContract",
-          MekHQ.getMHQOptions().getLocale());
 
     private int commandRoll;
     private int salvageRoll;
@@ -366,54 +353,6 @@ public class AtBContract extends Contract {
 
     public void calculateLength(final boolean variable) {
         setLengthInMonths(getContractType().calculateLength(variable));
-    }
-
-    /**
-     * @param campaign The campaign to reference.
-     *
-     * @return The number of lances required.
-     *
-     * @deprecated use {@link ContractUtilities#calculateBaseNumberOfRequiredLances(Campaign, boolean, boolean, double)}
-     *       <p>
-     *       Calculates the number of lances required for this contract, based on [campaign].
-     */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    public static int calculateBaseNumberOfRequiredLances(Campaign campaign) {
-        return ContractUtilities.calculateBaseNumberOfRequiredLances(campaign, false, true, 1.0);
-    }
-
-    /**
-     * @param campaign the campaign containing the combat teams and units to evaluate
-     *
-     * @return the effective number of units as an integer
-     *
-     * @deprecated use {@link ContractUtilities#getEffectiveNumUnits(Campaign)}
-     *       <p>
-     *       Calculates the effective number of units available in the given campaign based on unit types and roles.
-     *
-     *       <p>
-     *       This method iterates through all combat teams in the specified campaign, ignoring combat teams with the
-     *       auxiliary role. For each valid combat team, it retrieves the associated force and evaluates all units
-     *       within that force. The unit contribution to the total is determined based on its type:
-     *       <ul>
-     *       <li><b>TANK, VTOL, NAVAL, CONV_FIGHTER, AEROSPACE_FIGHTER:</b> Adds 1 for
-     *       non-clan factions,
-     *       and 0.5 for clan factions.</li>
-     *       <li><b>PROTOMEK:</b> Adds 0.2 to the total.</li>
-     *       <li><b>BATTLE_ARMOR, INFANTRY:</b> Adds 0 (excluded from the total).</li>
-     *       <li><b>Other types:</b> Adds 1 to the total.</li>
-     *       </ul>
-     *
-     *       <p>
-     *       Units that aren’t associated with a valid combat team or can’t be fetched due
-     *       to missing
-     *       data are ignored. The final result is returned as an integer by flooring the
-     *       calculated total.
-     *       </p>
-     */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    public static int getEffectiveNumUnits(Campaign campaign) {
-        return ContractUtilities.getEffectiveNumUnits(campaign);
     }
 
     /**
@@ -1315,11 +1254,6 @@ public class AtBContract extends Contract {
         return employerLiaison;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
-    public void setEmployerLiaison(Person employerLiaison) {
-        this.employerLiaison = employerLiaison;
-    }
-
     public void createEmployerLiaison(Campaign campaign) {
         employerLiaison = campaign.newPerson(PersonnelRole.MILITARY_LIAISON, getEmployerCode(), Gender.RANDOMIZE);
 
@@ -1328,11 +1262,6 @@ public class AtBContract extends Contract {
 
     public Person getClanOpponent() {
         return clanOpponent;
-    }
-
-    @Deprecated(since = "0.51.0", forRemoval = true)
-    public void setClanOpponent(Person clanOpponent) {
-        this.clanOpponent = clanOpponent;
     }
 
     public void createClanOpponent(Campaign campaign) {
@@ -1406,11 +1335,6 @@ public class AtBContract extends Contract {
         } else {
             return faction.getFullName(year);
         }
-    }
-
-    @Deprecated(since = "0.51.0", forRemoval = true)
-    public @Nullable String getEnemyMercenaryEmployerCode() {
-        return enemyMercenaryEmployerCode;
     }
 
     public @Nullable Faction getEnemyMercenaryEmployer() {
@@ -1597,11 +1521,6 @@ public class AtBContract extends Contract {
         return getContractType().isGarrisonType() && getMoraleLevel().isRouted();
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
-    public LocalDate getRoutEnd() {
-        return routEnd;
-    }
-
     public void setRoutEnd(LocalDate routEnd) {
         this.routEnd = routEnd;
     }
@@ -1639,14 +1558,6 @@ public class AtBContract extends Contract {
 
     public void addPlayerMinorBreaches(int num) {
         playerMinorBreaches += num;
-    }
-
-    /**
-     * @deprecated no indicated uses.
-     */
-    @Deprecated(since = "0.50.06", forRemoval = true)
-    public void addEmployerMinorBreaches(int num) {
-        employerMinorBreaches += num;
     }
 
     public void setContractScoreArbitraryModifier(int newModifier) {
@@ -1798,249 +1709,6 @@ public class AtBContract extends Contract {
         public AtBContractRef(int id) {
             setId(id);
         }
-    }
-
-    /**
-     * This method initiates a batchall, a challenge/dialog to decide on the conduct of a campaign. Prompts the player
-     * with a message and options to accept or refuse the batchall.
-     *
-     * @param campaign The current campaign.
-     *
-     * @return {@code true} if the batchall is accepted, {@code false} otherwise.
-     */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    public boolean initiateBatchall(Campaign campaign) {
-        // Retrieves the title from the resources
-        String title = resources.getString("incomingTransmission.title");
-
-        // Retrieves the batchall statement based on infamy and enemy code
-        String batchallStatement = BatchallFactions.getGreeting(campaign, enemyCode);
-
-        // An ImageIcon to hold the clan's faction icon
-        ImageIcon icon = getFactionLogo(campaign.getGameYear(), enemyCode);
-
-        // Set the commander's rank and use a name generator to generate the commander's
-        // name
-        String rank = resources.getString("starColonel.text");
-        RandomNameGenerator randomNameGenerator = new RandomNameGenerator();
-        String commander = randomNameGenerator.generate(Gender.RANDOMIZE, true, enemyCode);
-        commander += ' ' + Bloodname.randomBloodname(enemyCode, Phenotype.MEKWARRIOR, campaign.getGameYear()).getName();
-
-        // Construct the batchall message
-        String message = String.format(resources.getString("batchallOpener.text"),
-              this.getName(),
-              rank,
-              commander,
-              getEnemy().getFullName(campaign.getGameYear()),
-              getSystemName(campaign.getLocalDate()));
-        message = message + batchallStatement;
-
-        // Append additional message text if the fame is less than 5
-        if (campaign.getFameAndInfamy().getFameForFaction(enemyCode) < 5) {
-            message = message + resources.getString("batchallCloser.text");
-        }
-
-        // Create a text pane to display the message
-        JTextPane textPane = new JTextPane();
-        textPane.setContentType("text/html");
-        textPane.setText(message);
-        textPane.setEditable(false);
-
-        // Create a panel to display the icon and the batchall message
-        JPanel panel = new JPanel(new BorderLayout());
-        JLabel imageLabel = new JLabel(icon);
-        panel.add(imageLabel, BorderLayout.CENTER);
-        panel.add(textPane, BorderLayout.SOUTH);
-
-        // Choose dialog to display based on the fame
-        if (campaign.getFameAndInfamy().getFameForFaction(enemyCode) > 4) {
-            noBatchallOfferedDialog(panel, title);
-            return false;
-        } else {
-            return batchallDialog(campaign, panel, title);
-        }
-    }
-
-    /**
-     * This function creates a dialog with accept and refuse buttons.
-     *
-     * @param campaign the current campaign
-     * @param panel    the panel to display in the dialog
-     * @param title    the title of the dialog
-     *
-     * @return {@code true} if the batchall is accepted, {@code false} otherwise
-     */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    private boolean batchallDialog(Campaign campaign, JPanel panel, String title) {
-        // We use a single-element array to store the result, because we need to modify it inside the action
-        // listeners, which requires the variable to be effectively final
-        final boolean[] result = { false };
-
-        // Create a custom dialog
-        JDialog dialog = new JDialog();
-        dialog.setTitle(title); // Set the title of the dialog
-        dialog.setLayout(new BorderLayout()); // Set a border layout manager
-
-        // Create an accept button and add its action listener. When clicked, it will set the result to true and
-        // close the dialog
-        JButton acceptButton = new JButton(resources.getString("responseAccept.text"));
-        acceptButton.setToolTipText(resources.getString("responseAccept.tooltip"));
-        acceptButton.addActionListener(e -> {
-            result[0] = true;
-            dialog.dispose();
-        });
-
-        // Create a refuse button and add its action listener. When clicked, it will trigger a refusal confirmation
-        // dialog
-        String refusalOption = resources.getString("responseRefuse.text");
-
-        // If the campaign is not a Clan faction, check whether this is the first contact they've had with the Clans.
-        // If so, whether at least a month has passed since the Wolf's Dragoons conference on Outreach (which
-        // explained who and what the Clans were).
-        if (!campaign.getFaction().isClan() && campaign.getLocalDate().isBefore(LocalDate.of(3051, 2, 1))) {
-
-            boolean isFirstClanEncounter = BATCHALL_FACTIONS.stream()
-                                                 .mapToDouble(factionCode -> campaign.getFameAndInfamy()
-                                                                                   .getFameLevelForFaction(factionCode))
-                                                 .noneMatch(infamy -> infamy != 0);
-
-            if (isFirstClanEncounter) {
-                refusalOption = resources.getString("responseFirstEncounter.text");
-            }
-        }
-
-        JButton refuseButton = new JButton(refusalOption);
-
-        refuseButton.setToolTipText(resources.getString("responseRefuse.tooltip"));
-        refuseButton.addActionListener(e -> {
-            // Close the current dialog
-            dialog.dispose();
-
-            // Use another method to show a refusal confirmation dialog and store the result
-            result[0] = refusalConfirmationDialog(campaign);
-        });
-
-        // Create a panel for buttons and add buttons to it
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.add(acceptButton);
-        buttonPanel.add(refuseButton);
-
-        // Add the original panel and button panel to the dialog
-        dialog.add(panel, BorderLayout.CENTER);
-        dialog.add(buttonPanel, BorderLayout.SOUTH);
-
-        dialog.pack(); // Size the dialog to fit the preferred size and layouts of its components
-        dialog.setLocationRelativeTo(null); // Center the dialog on the screen
-        dialog.setModal(true); // Make the dialog block user input to other top-level windows
-        dialog.setVisible(true); // Show the dialog
-
-        return result[0]; // Return the result when the dialog is disposed
-    }
-
-    /**
-     * This function displays a dialog asking for final confirmation to refuse a batchall, and performs related actions
-     * if the refusal is confirmed.
-     *
-     * @param campaign the current campaign
-     *
-     * @return {@code true} if the user accepts the refusal, {@code false} if the user cancels the refusal
-     */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    private boolean refusalConfirmationDialog(Campaign campaign) {
-        // Create modal JDialog
-        JDialog dialog = new JDialog();
-        dialog.setLayout(new BorderLayout());
-
-        // Buffer for storing user response (acceptance/refusal)
-        final boolean[] response = { false };
-
-        // "Accept" Button
-        JButton acceptButton = new JButton(resources.getString("responseAccept.text"));
-        acceptButton.setToolTipText(resources.getString("responseAccept.tooltip"));
-        acceptButton.addActionListener(e -> {
-            response[0] = true; // User has accepted
-            dialog.dispose(); // Close dialog
-        });
-
-        // "Refuse" Button
-        JButton refuseButton = new JButton(resources.getString("responseRefuse.text"));
-        refuseButton.setToolTipText(resources.getString("responseRefuse.tooltip"));
-        refuseButton.addActionListener(e -> {
-            // Update the campaign state on refusal
-            campaign.addReport(GENERAL, resources.getString("refusalReport.text"));
-            campaign.getFameAndInfamy().updateFameForFaction(campaign, enemyCode, -1);
-            response[0] = false; // User has refused
-            dialog.dispose(); // Close dialog
-        });
-
-        // Panel for hosting buttons
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.add(acceptButton);
-        buttonPanel.add(refuseButton);
-
-        // Message Label
-        JLabel messageLabel = new JLabel(String.format(resources.getString("refusalConfirmation.text"),
-              getEnemy().getFullName(campaign.getGameYear())));
-
-        // Add Message and Buttons to the dialog
-        dialog.add(messageLabel, BorderLayout.CENTER);
-        dialog.add(buttonPanel, BorderLayout.SOUTH);
-
-        // Configure and display dialog
-        dialog.pack(); // Fit dialog to its contents
-        dialog.setLocationRelativeTo(null); // Center dialog
-        dialog.setModal(true); // Block access to other windows
-        dialog.setVisible(true); // Display dialog
-
-        // Return user response
-        return response[0];
-    }
-
-    /**
-     * Displays a dialog with a message for when the faction has refused to offer a Batchall due to past player
-     * refusals.
-     *
-     * @param panel The panel to display in the dialog.
-     * @param title The title of the dialog.
-     */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    private void noBatchallOfferedDialog(JPanel panel, String title) {
-        // Create a new JDialog
-        JDialog dialog = new JDialog();
-        dialog.setTitle(title);
-        dialog.setLayout(new BorderLayout());
-
-        JButton responseButton = new JButton(resources.getString("responseBringItOn.text"));
-        responseButton.setToolTipText(resources.getString("responseBringItOn.tooltip"));
-
-        // Dispose the dialog when the button is clicked
-        responseButton.addActionListener(e -> dialog.dispose());
-
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.add(responseButton); // Add the button to the panel
-
-        dialog.add(panel, BorderLayout.CENTER);
-        dialog.add(buttonPanel, BorderLayout.SOUTH);
-
-        // Size the dialog to fit the preferred size and layouts of its components
-        dialog.pack();
-
-        // Center the dialog on the screen
-        dialog.setLocationRelativeTo(null);
-
-        // Set the dialog to be modal
-        dialog.setModal(true);
-
-        // Show the dialog
-        dialog.setVisible(true);
-    }
-
-    /**
-     * @deprecated use {@link #getContractDifficultySkulls()} instead
-     */
-    @Deprecated(since = "0.50.06", forRemoval = true)
-    public JPanel getContractDifficultySkulls(Campaign campaign) {
-        return getContractDifficultySkulls();
     }
 
     /**
