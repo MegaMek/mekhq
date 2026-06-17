@@ -60,7 +60,7 @@ import org.w3c.dom.NodeList;
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
-public class Mission {
+public class Mission extends AbstractMission {
     private static final MMLogger LOGGER = MMLogger.create(Mission.class);
 
     // region Variable Declarations
