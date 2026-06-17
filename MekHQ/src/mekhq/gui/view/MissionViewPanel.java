@@ -201,8 +201,8 @@ public class MissionViewPanel extends JScrollablePanel {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     // Display where it is on the interstellar map
-                    gui.getMapTab().switchSystemsMap(mission.getSystem());
-                    gui.setSelectedTab(gui.getMapTab());
+                    gui.getNavigationTab().showSystem(mission.getSystem());
+                    gui.setSelectedTab(gui.getNavigationTab());
                 }
             });
             gridBagConstraints = new GridBagConstraints();
@@ -281,8 +281,8 @@ public class MissionViewPanel extends JScrollablePanel {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     // Display where it is on the interstellar map
-                    gui.getMapTab().switchSystemsMap(contract.getSystem());
-                    gui.setSelectedTab(gui.getMapTab());
+                    gui.getNavigationTab().showSystem(contract.getSystem());
+                    gui.setSelectedTab(gui.getNavigationTab());
                 }
             });
             gridBagConstraints = new GridBagConstraints();
@@ -577,8 +577,8 @@ public class MissionViewPanel extends JScrollablePanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 // Display where it is on the interstellar map
-                gui.getMapTab().switchSystemsMap(contract.getSystem());
-                gui.setSelectedTab(gui.getMapTab());
+                gui.getNavigationTab().showSystem(contract.getSystem());
+                gui.setSelectedTab(gui.getNavigationTab());
             }
         });
         addStatRow(lblLocation, txtLocation, y++);
