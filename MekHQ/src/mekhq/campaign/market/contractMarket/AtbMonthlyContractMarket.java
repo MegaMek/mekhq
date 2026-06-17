@@ -382,7 +382,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         // 1. ComStar co-opting check
         Faction comStar = Factions.getInstance().getFaction(COMSTAR_FACTION_CODE);
         if (comStar.validIn(today) && Compute.randomInt(COMSTAR_CO_OPT_CHANCE) == 0) {
-            contract.setEmployerCode(COMSTAR_FACTION_CODE, today.getYear());
+            contract.updateEmployer(COMSTAR_FACTION_CODE, today.getYear());
             return;
         }
 
@@ -396,7 +396,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                   && !Objects.equals("WOB", employerCode)
                   && !Objects.equals("WOB", contract.getEnemyCode())
                   && Compute.randomInt(WOB_CO_OPT_CHANCE) == 0) {
-            contract.setEmployerCode("WOB", today.getYear());
+            contract.updateEmployer("WOB", today.getYear());
         }
     }
 
@@ -433,7 +433,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                 return null;
             }
         }
-        contract.setEmployerCode(employer, campaign.getGameYear());
+        contract.updateEmployer(employer, campaign.getGameYear());
 
         getContractType(contract);
 
@@ -544,7 +544,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
     protected AtBContract generateAtBSubcontract(Campaign campaign, AtBContract parent, int unitRatingMod) {
         AtBContract contract = new AtBContract("New Subcontract");
-        contract.setEmployerCode(parent.getEmployerCode(), campaign.getGameYear());
+        contract.updateEmployer(parent.getEmployerCode(), campaign.getGameYear());
         getContractType(contract);
 
         if (contract.getContractType().isPirateHunting()) {
@@ -638,7 +638,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         contract.setName(String.format("%s - %s - %s Subcontract %s",
               contract.getStartDate()
                     .format(DateTimeFormatter.ofPattern("yyyy").withLocale(MekHQ.getMHQOptions().getDateLocale())),
-              contract.getEmployer(),
+              contract.getEmployerName(),
               contract.getSystem().getName(parent.getStartDate()),
               contract.getContractType()));
 
@@ -723,7 +723,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         followup.setId(lastId);
         contractIds.put(lastId, followup);
 
-        followup.setEmployerCode(contract.getEmployerCode(), campaign.getGameYear());
+        followup.updateEmployer(contract.getEmployerCode(), campaign.getGameYear());
         switch (contract.getContractType()) {
             case DIVERSIONARY_RAID:
                 followup.setContractType(AtBContractType.OBJECTIVE_RAID);
@@ -763,7 +763,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         followup.setName(String.format("(Followup) %s - %s - %s %s",
               followup.getStartDate()
                     .format(DateTimeFormatter.ofPattern("yyyy").withLocale(MekHQ.getMHQOptions().getDateLocale())),
-              followup.getEmployer(),
+              followup.getEmployerName(),
               followup.getSystem().getName(followup.getStartDate()),
               followup.getContractType()));
 

@@ -131,7 +131,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         updatePlanets();
 
         if (getCurrentEmployerCode() != null) {
-            ((AtBContract) contract).setEmployerCode(getCurrentEmployerCode(), campaign.getGameYear());
+            ((AtBContract) contract).updateEmployer(getCurrentEmployerCode(), campaign.getGameYear());
         }
 
         if (getCurrentEnemyCode() != null) {
@@ -578,7 +578,7 @@ public class NewAtBContractDialog extends NewContractDialog {
 
         contract.setName(txtName.getText());
         contract.setSystemId(selectedSystem.getId());
-        contract.setEmployerCode(getCurrentEmployerCode(), campaign.getGameYear());
+        contract.updateEmployer(getCurrentEmployerCode(), campaign.getGameYear());
         contract.setContractType(Objects.requireNonNull(comboContractType.getSelectedItem()));
         contract.setDescription(txtDesc.getText());
         contract.setCommandRights(choiceCommand.getSelectedItem());
@@ -601,7 +601,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         contract.setEnemySkill(comboEnemySkill.getSelectedItem());
         contract.setEnemyQuality(cbEnemyQuality.getSelectedIndex());
         contract.setAllyBotName(contract.getEmployerName(campaign.getGameYear()));
-        contract.setEnemyBotName(contract.getEnemyName(campaign.getGameYear()));
+        contract.setEnemyBotName(contract.generateEnemyName(campaign.getGameYear()));
         contract.setAtBSharesPercent((Integer) spnShares.getValue());
 
         contract.setPartsAvailabilityLevel(contract.getContractType().calculatePartsAvailabilityLevel());
@@ -658,7 +658,7 @@ public class NewAtBContractDialog extends NewContractDialog {
             LOGGER.info("Setting employer code to {}", getCurrentEmployerCode());
 
             long time = java.lang.System.currentTimeMillis();
-            contract.setEmployerCode(getCurrentEmployerCode(), campaign.getGameYear());
+            contract.updateEmployer(getCurrentEmployerCode(), campaign.getGameYear());
             LOGGER.info("to set employer code: {}", java.lang.System.currentTimeMillis() - time);
 
             time = java.lang.System.currentTimeMillis();

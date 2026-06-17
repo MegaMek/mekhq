@@ -2369,7 +2369,7 @@ public final class BriefingTab extends CampaignGuiTab {
             // Export allies
             chosen.clear();
             chosen.addAll(((AtBScenario) scenario).getAlliesPlayer());
-            file = determineMULFilePath(scenario, ((AtBContract) mission).getEmployer());
+            file = determineMULFilePath(scenario, ((AtBContract) mission).getEmployerName());
 
             int genericBattleValue = calculateGenericBattleValue(chosen);
 

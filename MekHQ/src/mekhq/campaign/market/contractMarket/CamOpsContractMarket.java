@@ -253,7 +253,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         contractIds.put(lastId, contract);
         // Step 1: Determine Employer
         Faction employer = determineEmployer(campaign, reputation.getReputationModifier(), hiringHallModifiers);
-        contract.setEmployerCode(employer.getShortName(), campaign.getGameYear());
+        contract.updateEmployer(employer.getShortName(), campaign.getGameYear());
         if (employer.isMercenary()) {
             contract.setMercSubcontract(true);
         }
@@ -304,7 +304,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         contract.setName(String.format("%s - %s - %s %s",
               contract.getStartDate()
                     .format(DateTimeFormatter.ofPattern("yyyy").withLocale(MekHQ.getMHQOptions().getDateLocale())),
-              contract.getEmployer(),
+              contract.getEmployerName(),
               contract.getSystem().getName(contract.getStartDate()),
               contract.getContractType()));
 

@@ -54,7 +54,6 @@ import javax.swing.SwingConstants;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.event.Subscribe;
 import megamek.common.ui.FastJScrollPane;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.events.NewDayEvent;
 import mekhq.campaign.events.StratConDeploymentEvent;

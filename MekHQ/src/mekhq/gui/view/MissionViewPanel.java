@@ -214,7 +214,7 @@ public class MissionViewPanel extends JScrollablePanel {
             pnlStats.add(txtLocation, gridBagConstraints);
         }
 
-        if ((null != mission.getType()) && !mission.getType().isEmpty()) {
+        if ((null != mission.getContractTypeName()) && !mission.getContractTypeName().isEmpty()) {
             lblType.setName("lblType");
             lblType.setText(resourceMap.getString("lblType.text"));
             gridBagConstraints = new GridBagConstraints();
@@ -225,7 +225,7 @@ public class MissionViewPanel extends JScrollablePanel {
             pnlStats.add(lblType, gridBagConstraints);
 
             txtType.setName("txtType");
-            txtType.setText(mission.getType());
+            txtType.setText(mission.getContractTypeName());
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = 2;
@@ -294,7 +294,7 @@ public class MissionViewPanel extends JScrollablePanel {
             pnlStats.add(txtLocation, gridBagConstraints);
         }
 
-        if ((null != contract.getEmployer()) && !contract.getEmployer().isEmpty()) {
+        if ((null != contract.getEmployerName()) && !contract.getEmployerName().isEmpty()) {
             lblEmployer.setName("lblEmployer");
             lblEmployer.setText(resourceMap.getString("lblEmployer.text"));
             gridBagConstraints = new GridBagConstraints();
@@ -305,7 +305,7 @@ public class MissionViewPanel extends JScrollablePanel {
             pnlStats.add(lblEmployer, gridBagConstraints);
 
             txtEmployer.setName("txtEmployer");
-            txtEmployer.setText(contract.getEmployer());
+            txtEmployer.setText(contract.getEmployerName());
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = 2;
@@ -316,7 +316,7 @@ public class MissionViewPanel extends JScrollablePanel {
             pnlStats.add(txtEmployer, gridBagConstraints);
         }
 
-        if ((null != contract.getType()) && !contract.getType().isEmpty()) {
+        if ((null != contract.getContractTypeName()) && !contract.getContractTypeName().isEmpty()) {
             lblType.setName("lblType");
             lblType.setText(resourceMap.getString("lblType.text"));
             gridBagConstraints = new GridBagConstraints();
@@ -327,7 +327,7 @@ public class MissionViewPanel extends JScrollablePanel {
             pnlStats.add(lblType, gridBagConstraints);
 
             txtType.setName("txtType");
-            txtType.setText(contract.getType());
+            txtType.setText(contract.getContractTypeName());
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = 3;

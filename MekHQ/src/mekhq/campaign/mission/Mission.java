@@ -85,7 +85,7 @@ public class Mission extends AbstractMission {
     protected int writeToXMLBegin(Campaign campaign, final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "mission", "id", getId(), "type", getClass());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", getName());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "type", getType());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "type", getContractTypeName());
         if (getSystemId() != null) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "systemId", getSystemId());
         } else {
@@ -151,7 +151,7 @@ public class Mission extends AbstractMission {
                 } else if (wn2.getNodeName().equalsIgnoreCase("desc")) {
                     retVal.setDescription(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("type")) {
-                    retVal.setType(wn2.getTextContent());
+                    retVal.setContractTypeName(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("scenarios")) {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y = 0; y < nl2.getLength(); y++) {

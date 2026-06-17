@@ -239,7 +239,7 @@ public class AtBContractTest {
     public void setContractTypeUpdatesParentMissionType() {
         contract.setContractType(AtBContractType.CADRE_DUTY);
         assertEquals(AtBContractType.CADRE_DUTY, contract.getContractType());
-        assertEquals("Cadre Duty", contract.getType());
+        assertEquals("Cadre Duty", contract.getContractTypeName());
     }
 
     private static Stream<Arguments> provideEnemyFactionAndYear() {
@@ -251,23 +251,23 @@ public class AtBContractTest {
 
     @ParameterizedTest
     @MethodSource("provideEnemyFactionAndYear")
-    public void getEnemyNameReturnsCorrectValueInYear(int year, String enemyCode, String fullName) {
+    public void generateEnemyNameReturnsCorrectValueInYear(int year, String enemyCode, String fullName) {
         contract.setEnemyCode(enemyCode);
-        assertEquals(fullName, contract.getEnemyName(year));
+        assertEquals(fullName, contract.generateEnemyName(year));
     }
 
     @Test
-    public void getEnemyNameReturnsCorrectValueWhenMerc() {
+    public void generateEnemyNameReturnsCorrectValueWhenMerc() {
         String name = "Testing Merc";
         contract.setEnemyCode(MERCENARY_FACTION_CODE);
         contract.setEnemyBotName(name);
-        assertEquals(name, contract.getEnemyName(3025));
+        assertEquals(name, contract.generateEnemyName(3025));
     }
 
     @Test
-    public void getEnemyNameReturnsNonNullWhenMercAndBotNameNotSet() {
+    public void generateEnemyNameReturnsNonNullWhenMercAndBotNameNotSet() {
         contract.setEnemyCode("MERC");
-        assertNotEquals("", contract.getEnemyName(3025));
+        assertNotEquals("", contract.generateEnemyName(3025));
     }
 
     private static Stream<Arguments> provideEmployerNamesAndMercStatus() {
@@ -283,7 +283,7 @@ public class AtBContractTest {
     @MethodSource("provideEmployerNamesAndMercStatus")
     public void getEmployerNameReturnsCorrectName(int year, boolean isMercSubcontract, String employerCode,
           String fullName) {
-        contract.setEmployerCode(employerCode, year);
+        contract.updateEmployer(employerCode, year);
         contract.setMercSubcontract(isMercSubcontract);
         assertEquals(fullName, contract.getEmployerName(year));
     }

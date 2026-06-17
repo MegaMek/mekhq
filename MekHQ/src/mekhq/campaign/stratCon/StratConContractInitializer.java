@@ -520,7 +520,7 @@ public class StratConContractInitializer {
 
             if (template == null) {
                 LOGGER.error("Unable to place objective scenario on track {}, as no scenario template was available.",
-                    trackState.getDisplayableName());
+                      trackState.getDisplayableName());
                 continue;
             }
 

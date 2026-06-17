@@ -217,7 +217,7 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsLabels.gridy = ++y;
         mainPanel.add(lblEmployer, gridBagConstraintsLabels);
 
-        JLabel txtEmployer = new JLabel(contract.getEmployer());
+        JLabel txtEmployer = new JLabel(contract.getEmployerName());
         txtEmployer.setName("txtEmployer");
         gridBagConstraintsText.gridy = y;
         mainPanel.add(txtEmployer, gridBagConstraintsText);
@@ -251,7 +251,7 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsLabels.gridy = ++y;
         mainPanel.add(lblMissionType, gridBagConstraintsLabels);
 
-        JLabel txtMissionType = new JLabel(contract.getType());
+        JLabel txtMissionType = new JLabel(contract.getContractTypeName());
         txtMissionType.setName("txtMissionType");
         gridBagConstraintsText.gridy = y;
         mainPanel.add(txtMissionType, gridBagConstraintsText);

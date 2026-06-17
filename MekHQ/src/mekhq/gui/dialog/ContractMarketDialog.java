@@ -332,7 +332,7 @@ public class ContractMarketDialog extends JDialog {
             if (contract instanceof AtBContract) {
                 row.add(((AtBContract) contract).getEmployerName(campaign.getGameYear()));
 
-                String enemyName = ((AtBContract) contract).getEnemyName(campaign.getGameYear());
+                String enemyName = ((AtBContract) contract).generateEnemyName(campaign.getGameYear());
                 if (((AtBContract) contract).getEnemy().isMercenary()) {
                     enemyName = resourceMap.getString("lblEnemy.mercenary");
                 }
@@ -343,9 +343,9 @@ public class ContractMarketDialog extends JDialog {
                     row.add(((AtBContract) contract).getContractType().toString());
                 }
             } else {
-                row.add(contract.getEmployer());
+                row.add(contract.getEmployerName());
                 row.add("");
-                row.add(contract.getType());
+                row.add(contract.getContractTypeName());
             }
 
             final JumpPath path = campaign.calculateJumpPath(campaign.getCurrentSystem(), contract.getSystem());
@@ -515,7 +515,7 @@ public class ContractMarketDialog extends JDialog {
             contract.calculateContract(campaign);
             Vector<String> row = new Vector<>();
             row.add(contract.getEmployerName(campaign.getGameYear()));
-            row.add(contract.getEnemyName(campaign.getGameYear()));
+            row.add(contract.generateEnemyName(campaign.getGameYear()));
             row.add(contract.getContractType().toString());
             final JumpPath path = campaign.calculateJumpPath(campaign.getCurrentSystem(), contract.getSystem());
             final int days = (int) Math.ceil(path.getTotalTime(contract.getStartDate(),

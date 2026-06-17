@@ -360,8 +360,8 @@ public class PerformResupply {
      *
      * @param resupply       the {@link Resupply} instance defining the resupply operation.
      * @param convoyContents a list of {@link Part} objects representing the contents of the convoy.
-     * @param playerConvoy   the {@link Formation} object representing the player's convoy. If {@code null}, the convoy is
-     *                       an NPC-controlled unit.
+     * @param playerConvoy   the {@link Formation} object representing the player's convoy. If {@code null}, the convoy
+     *                       is an NPC-controlled unit.
      */
     public static void processConvoy(Resupply resupply, List<Part> convoyContents, @Nullable Formation playerConvoy) {
         final Campaign campaign = resupply.getCampaign();
@@ -513,7 +513,8 @@ public class PerformResupply {
      * </ul>
      *
      * @param resupply       the {@link Resupply} instance representing the resupply mission.
-     * @param targetConvoy   the {@link Formation} representing the player's convoy. Can be {@code null} for NPC convoys.
+     * @param targetConvoy   the {@link Formation} representing the player's convoy. Can be {@code null} for NPC
+     *                       convoys.
      * @param convoyContents a list of {@link Part} objects representing the resupply cargo.
      */
     private static void processConvoyInterception(Resupply resupply, @Nullable Formation targetConvoy,

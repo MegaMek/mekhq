@@ -33,6 +33,10 @@
 package mekhq.campaign.mission;
 
 import static java.lang.Math.ceil;
+import static megamek.client.ui.util.PlayerColour.BLUE;
+import static megamek.client.ui.util.PlayerColour.RED;
+import static megamek.common.enums.SkillLevel.REGULAR;
+import static mekhq.campaign.personnel.ranks.Rank.RO_MIN;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
@@ -43,18 +47,37 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import jakarta.annotation.Nullable;
 import megamek.Version;
+import megamek.client.ui.util.PlayerColour;
+import megamek.common.enums.Gender;
+import megamek.common.enums.SkillLevel;
+import megamek.common.icons.Camouflage;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
+import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.mission.enums.MissionStatus;
+import mekhq.campaign.personnel.Bloodname;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.backgrounds.BackgroundsController;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.personnel.ranks.AutoAssignRankForCompanyGenerator;
+import mekhq.campaign.personnel.ranks.RankSystem;
+import mekhq.campaign.personnel.ranks.RankValidator;
+import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.stratCon.SupportPointNegotiation;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
@@ -68,7 +91,8 @@ public class AbstractMission {
     private String name;
     private int id = -1;
     private MissionStatus status = MissionStatus.ACTIVE;
-    private String type;
+    private String contractTypeName;
+    private AtBContractType contractType;
     private String description;
 
     private String systemId;
@@ -81,10 +105,27 @@ public class AbstractMission {
     private transient JumpPath cachedJumpPath;
 
     private LocalDate startDate;
-    private LocalDate endDate;
+    private LocalDate endingDate;
     private int lengthInMonths;
 
-    private String employer;
+    private String employerCode = "IND";
+    private String employerName = "Independent";
+    private Person employerLiaison;
+    private SkillLevel allySkill = REGULAR;
+    private int allyQuality = DragoonRating.DRAGOON_C.getRating();
+    private String allyBotName = "Ally";
+    private Camouflage allyCamouflage = new Camouflage(Camouflage.COLOUR_CAMOUFLAGE, PlayerColour.RED.name());
+    private PlayerColour allyColour = RED;
+
+    private String enemyCode = "IND";
+    private String enemyName = "Independent";
+    private String enemyMercenaryEmployerCode;
+    private Person clanOpponent;
+    private SkillLevel enemySkill = REGULAR;
+    private int enemyQuality = DragoonRating.DRAGOON_C.getRating();
+    private String enemyBotName = "Enemy";
+    private Camouflage enemyCamouflage = new Camouflage(Camouflage.COLOUR_CAMOUFLAGE, PlayerColour.BLUE.name());
+    private PlayerColour enemyColour = BLUE;
 
     private double paymentMultiplier;
     private ContractCommandRights commandRights;
@@ -118,6 +159,9 @@ public class AbstractMission {
     private int hospitalBedsRented;
     private int kitchensRented;
     private int holdingCellsRented;
+
+    private int requiredCombatTeams;
+    private int requiredCombatElements;
 
     private final List<Scenario> scenarios = new ArrayList<>();
 
@@ -295,11 +339,11 @@ public class AbstractMission {
     }
 
     public LocalDate getEndingDate() {
-        return endDate;
+        return endingDate;
     }
 
     public void setEndingDate(LocalDate endDate) {
-        this.endDate = endDate;
+        this.endingDate = endDate;
     }
 
     public LocalDate getStartDate() {
@@ -318,15 +362,214 @@ public class AbstractMission {
      */
     public void setStartAndEndDate(LocalDate startDate) {
         this.startDate = startDate;
-        this.endDate = startDate.plusMonths(getLengthInMonths());
+        this.endingDate = startDate.plusMonths(getLengthInMonths());
     }
 
-    public String getEmployer() {
-        return employer;
+    public String getEmployerName() {
+        return employerName;
     }
 
-    public void setEmployer(String employer) {
-        this.employer = employer;
+    public void setEmployerName(String employerName) {
+        this.employerName = employerName;
+    }
+
+    public Person getEmployerLiaison() {
+        return employerLiaison;
+    }
+
+    public void setEmployerLiaison(Person employerLiaison) {
+        this.employerLiaison = employerLiaison;
+    }
+
+    public void createEmployerLiaison(Campaign campaign) {
+        setEmployerLiaison(campaign.newPerson(PersonnelRole.MILITARY_LIAISON, getEmployerCode(), Gender.RANDOMIZE));
+
+        AutoAssignRankForCompanyGenerator.assignAscendingRank(getEmployerLiaison(), RO_MIN);
+    }
+
+    public int getAllyQuality() {
+        return allyQuality;
+    }
+
+    public void setAllyQuality(int allyQuality) {
+        this.allyQuality = allyQuality;
+    }
+
+    public SkillLevel getAllySkill() {
+        return allySkill;
+    }
+
+    public void setAllySkill(SkillLevel allySkill) {
+        this.allySkill = allySkill;
+    }
+
+    public String getAllyBotName() {
+        return allyBotName;
+    }
+
+    public void setAllyBotName(String allyBotName) {
+        this.allyBotName = allyBotName;
+    }
+
+    public Camouflage getAllyCamouflage() {
+        return allyCamouflage;
+    }
+
+    public void setAllyCamouflage(Camouflage allyCamouflage) {
+        this.allyCamouflage = allyCamouflage;
+    }
+
+    public PlayerColour getAllyColour() {
+        return allyColour;
+    }
+
+    public void setAllyColour(PlayerColour allyColour) {
+        this.allyColour = allyColour;
+    }
+
+    public SkillLevel getEnemySkill() {
+        return enemySkill;
+    }
+
+    public void setEnemySkill(SkillLevel enemySkill) {
+        this.enemySkill = enemySkill;
+    }
+
+    public int getEnemyQuality() {
+        return enemyQuality;
+    }
+
+    public void setEnemyQuality(int enemyQuality) {
+        this.enemyQuality = enemyQuality;
+    }
+
+    public String getEnemyBotName() {
+        return enemyBotName;
+    }
+
+    public void setEnemyBotName(String enemyBotName) {
+        this.enemyBotName = enemyBotName;
+    }
+
+    public Camouflage getEnemyCamouflage() {
+        return enemyCamouflage;
+    }
+
+    public void setEnemyCamouflage(Camouflage enemyCamouflage) {
+        this.enemyCamouflage = enemyCamouflage;
+    }
+
+    public PlayerColour getEnemyColour() {
+        return enemyColour;
+    }
+
+    public void setEnemyColour(PlayerColour enemyColour) {
+        this.enemyColour = enemyColour;
+    }
+
+    public @Nullable String getEmployerCode() {
+        return employerCode;
+    }
+
+    public void setEmployerCode(String employerCode) {
+        this.employerCode = employerCode;
+    }
+
+    public String getEnemyCode() {
+        return enemyCode;
+    }
+
+    public void setEnemyCode(String enemyCode) {
+        this.enemyCode = enemyCode;
+    }
+
+    public Faction getEnemy() {
+        return Factions.getInstance().getFaction(getEnemyCode());
+    }
+
+    /**
+     * Retrieves the name of the enemy for this contract.
+     *
+     * @param year The current year in the game.
+     *
+     * @return The name of the enemy.
+     */
+    public String generateEnemyName(int year) {
+        Faction faction = Factions.getInstance().getFaction(getEnemyCode());
+
+        if (faction.isMercenary() || faction.isPirate()) {
+            if (Objects.equals(enemyBotName, "Enemy")) {
+                return BackgroundsController.randomMercenaryCompanyNameGenerator(null);
+            } else {
+                return enemyBotName;
+            }
+        } else {
+            return faction.getFullName(year);
+        }
+    }
+
+    public String getEnemyMercenaryEmployerCode() {
+        return enemyMercenaryEmployerCode;
+    }
+
+    public @Nullable Faction getEnemyMercenaryEmployer() {
+        return enemyMercenaryEmployerCode == null ? null :
+                     Factions.getInstance().getFaction(enemyMercenaryEmployerCode);
+    }
+
+    /**
+     * Sets the faction code representing the employer of the enemy mercenary forces.
+     *
+     * @param enemyMercenaryEmployerCode the faction code to assign as the employer of opposing mercenary units
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public void setEnemyMercenaryEmployerCode(String enemyMercenaryEmployerCode) {
+        this.enemyMercenaryEmployerCode = enemyMercenaryEmployerCode;
+    }
+
+    public String getEnemyName() {
+        return enemyName;
+    }
+
+    public void setEnemyName(String enemyName) {
+        this.enemyName = enemyName;
+    }
+
+    public @Nullable Person getClanOpponent() {
+        return clanOpponent;
+    }
+
+    public void setClanOpponent(Person clanOpponent) {
+        this.clanOpponent = clanOpponent;
+    }
+
+    public void createClanOpponent(Campaign campaign) {
+        setClanOpponent(campaign.newPerson(PersonnelRole.MEKWARRIOR, getEnemyCode(), Gender.RANDOMIZE));
+        if (getClanOpponent() == null) {
+            return;
+        }
+
+        Bloodname bloodname = Bloodname.randomBloodname(enemyCode, Phenotype.MEKWARRIOR, campaign.getGameYear());
+
+        if (bloodname != null) {
+            getClanOpponent().setBloodname(bloodname.getName());
+        }
+
+        AutoAssignRankForCompanyGenerator.assignAscendingRank(getClanOpponent(), RO_MIN);
+
+        final RankSystem rankSystem = Ranks.getRankSystemFromCode("CLAN");
+
+        final RankValidator rankValidator = new RankValidator();
+        if (!rankValidator.validate(rankSystem, false)) {
+            return;
+        }
+
+        getClanOpponent().setRankSystem(rankValidator, rankSystem);
+
+        int targetClanRank = 38;
+        AutoAssignRankForCompanyGenerator.assignAscendingRank(getClanOpponent(), targetClanRank);
     }
 
     public String getDescription() {
@@ -337,12 +580,21 @@ public class AbstractMission {
         this.description = description;
     }
 
-    public String getType() {
-        return type;
+    public String getContractTypeName() {
+        return contractTypeName;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setContractTypeName(String contractTypeName) {
+        this.contractTypeName = contractTypeName;
+    }
+
+    public AtBContractType getContractType() {
+        return contractType;
+    }
+
+    public void setContractType(final AtBContractType contractType) {
+        this.contractType = contractType;
+        setContractTypeName(contractType.toString());
     }
 
     public List<Scenario> getScenarios() {
@@ -904,6 +1156,33 @@ public class AbstractMission {
 
     public void setHoldingCellsRented(int holdingCellsRented) {
         this.holdingCellsRented = holdingCellsRented;
+    }
+
+    public int getRequiredCombatElements() {
+        return requiredCombatElements;
+    }
+
+    public void setRequiredCombatElements(int requiredCombatElements) {
+        this.requiredCombatElements = requiredCombatElements;
+    }
+
+    public int getRequiredCombatTeams() {
+        return requiredCombatTeams;
+    }
+
+    public void setRequiredCombatTeams(int requiredCombatTeams) {
+        this.requiredCombatTeams = requiredCombatTeams;
+    }
+
+    /**
+     * Returns the support-point reserve this contract can be negotiated up to, used as the "full reserves" reference
+     * when displaying support points. This mirrors the cap applied during initial support-point negotiation (see
+     * {@link SupportPointNegotiation}): three per required combat team.
+     *
+     * @return the maximum support points the contract can hold in reserve
+     */
+    public int getMaximumSupportPoints() {
+        return requiredCombatTeams * 3;
     }
 
     /**

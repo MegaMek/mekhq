@@ -609,7 +609,7 @@ public class CustomizeAtBContractDialog extends JDialog {
 
     private void btnOKActionPerformed(ActionEvent evt) {
         contract.setName(txtName.getText());
-        contract.setEmployerCode(cbEmployer.getSelectedItemKey(), campaign.getGameYear());
+        contract.updateEmployer(cbEmployer.getSelectedItemKey(), campaign.getGameYear());
         contract.setEnemyCode(cbEnemy.getSelectedItemKey());
         contract.setContractType(comboContractType.getSelectedItem());
         contract.setAllySkill(comboAllySkill.getSelectedItem());

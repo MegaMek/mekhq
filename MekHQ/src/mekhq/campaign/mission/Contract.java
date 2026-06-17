@@ -66,7 +66,7 @@ public class Contract extends Mission {
 
     public Contract(String name, String employer) {
         super(name);
-        setEmployer(employer);
+        setEmployerName(employer);
 
         setLengthInMonths(12);
         setPaymentMultiplier(2.0);
@@ -211,7 +211,7 @@ public class Contract extends Mission {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "nMonths", getLengthInMonths());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "startDate", getStartDate());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "endDate", getEndingDate());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "employer", getEmployer());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "employer", getEmployerName());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "paymentMultiplier", getPaymentMultiplier());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commandRights", getCommandRights().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "overheadComp", getOverheadCompensation());
@@ -249,7 +249,7 @@ public class Contract extends Mission {
 
             try {
                 if (wn2.getNodeName().equalsIgnoreCase("employer")) {
-                    setEmployer(wn2.getTextContent());
+                    setEmployerName(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("startDate")) {
                     setStartDate(MHQXMLUtility.parseDate(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("endDate")) {

@@ -297,7 +297,7 @@ public class NewContractDialog extends JDialog {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         descPanel.add(lblType, gridBagConstraints);
 
-        txtType.setText(contract.getType());
+        txtType.setText(contract.getContractTypeName());
         txtType.setName("txtType");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -318,7 +318,7 @@ public class NewContractDialog extends JDialog {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         descPanel.add(lblEmployer, gridBagConstraints);
 
-        txtEmployer.setText(contract.getEmployer());
+        txtEmployer.setText(contract.getEmployerName());
         txtEmployer.setName("txtEmployer");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -701,8 +701,8 @@ public class NewContractDialog extends JDialog {
 
         contract.setName(txtName.getText());
         // contract.setPlanetName(suggestPlanet.getText());
-        contract.setEmployer(txtEmployer.getText());
-        contract.setType(txtType.getText());
+        contract.setEmployerName(txtEmployer.getText());
+        contract.setContractTypeName(txtType.getText());
         contract.setDescription(txtDesc.getText());
         contract.setCommandRights(choiceCommand.getSelectedItem());
         campaign.getFinances()
