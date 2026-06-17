@@ -114,6 +114,11 @@ public class AcademyCampusLocation implements IPlace {
     // Populated during XML load; drained by CampaignXmlParser to reconnect persons after load.
     private transient List<UUID> pendingPersonIds = new ArrayList<>();
 
+    /** Returns true if {@code personId} is in the pending reconnection list (non-destructive). */
+    public boolean containsPendingPersonId(UUID personId) {
+        return pendingPersonIds.contains(personId);
+    }
+
     /** Returns and clears the person UUIDs read from XML, for use during post-load reconnection. */
     public List<UUID> drainPendingPersonIds() {
         List<UUID> ids = new ArrayList<>(pendingPersonIds);

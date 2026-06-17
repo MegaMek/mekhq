@@ -202,9 +202,9 @@ import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.SpacecraftCoolingSystem;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
+import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.InfantryAmmoBin;
 import mekhq.campaign.parts.equipment.InfantryDisposableWeaponPart;
-import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.parts.meks.MekLocation;
 import mekhq.campaign.parts.missing.MissingPart;
@@ -1758,11 +1758,15 @@ public class Campaign implements ITechManager, IPlace {
     }
 
     public void setLocation(AbstractLocation location) {
-        locations.clear();
-        if (location != null) {
-            locations.add(location);
+        AbstractLocation old = getCurrentLocation();
+        if (location != null && !locations.contains(location)) {
+            addLocation(location);
         }
         setParent(location);
+        // After reparenting, old has one fewer child. Remove it only if nothing else remains under it.
+        if (old != null && old != location && old.getLocationNode().getChildren().isEmpty()) {
+            locations.remove(old);
+        }
     }
 
     public void addLocation(AbstractLocation location) {
@@ -1818,6 +1822,7 @@ public class Campaign implements ITechManager, IPlace {
             return;
         }
         playerBases.add(base);
+        MekHQ.triggerEvent(new LocationAddedEvent(base));
     }
 
     public void removePlayerBase(@Nullable PlayerBase base) {
@@ -1825,6 +1830,7 @@ public class Campaign implements ITechManager, IPlace {
             return;
         }
         playerBases.remove(base);
+        MekHQ.triggerEvent(new LocationRemovedEvent(base));
     }
 
     public Set<PlayerBase> getPlayerBases() {
@@ -5798,8 +5804,16 @@ public class Campaign implements ITechManager, IPlace {
         formations.writeToXML(writer, indent);
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "formations");
         finances.writeToXML(writer, indent);
+        // Write the campaign's own location separately so load order in <locations> doesn't matter.
+        AbstractLocation currentLoc = getCurrentLocation();
+        if (currentLoc != null) {
+            currentLoc.writeToXML(writer, indent);
+        }
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "locations");
         for (AbstractLocation location : locations) {
+            if (location == currentLoc) {
+                continue;
+            }
             // Skip locations parented to another node — they are serialized inside their parent's XML.
             if (location.getLocationNode().getParent() != null) {
                 continue;

@@ -101,8 +101,8 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType;
+import mekhq.campaign.personnel.skills.ActionCheckResult;
 import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillCheckUtility;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.utilities.glossary.GlossaryEntry;
@@ -1027,16 +1027,13 @@ public class AdvancedReplacementLimbDialog extends JDialog {
 
         for (PlannedSurgery surgery : new ArrayList<>(prioritizedSurgeries)) {
             int spaModifier = surgery.type != COSMETIC_SURGERY && hasMachinistSPA ? -2 : 0;
-            SkillCheckUtility skillCheckUtility = new SkillCheckUtility(
-                  getTextAt(RESOURCE_BUNDLE, "AdvancedReplacementLimbDialog.skillCheck"),
-                  surgeon,
-                  S_SURGERY,
-                  List.of(),
-                  spaModifier,
-                  isUseEdge,
-                  false);
-            campaign.addReport(SKILL_CHECKS, skillCheckUtility.getResultsText());
-            if (skillCheckUtility.isSuccess()) {
+            ActionCheckResult actionCheckResult =
+                  surgeon.checkSkill(S_SURGERY)
+                        .withMiscModifier(spaModifier)
+                        .resolve(isUseEdge, getTextAt(RESOURCE_BUNDLE,
+                              "AdvancedReplacementLimbDialog.skillCheck"), false);
+            campaign.addReport(SKILL_CHECKS, actionCheckResult.resultsText());
+            if (actionCheckResult.isSuccess()) {
                 successfulSurgeries.add(surgery);
                 MedicalLogger.successfulSurgery(patient, campaign.getLocalDate(), surgery.type.toString());
             } else {

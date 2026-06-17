@@ -83,6 +83,11 @@ public class CurrentLocation extends AbstractLocation {
     private transient List<UUID>    pendingUnitIds   = new ArrayList<>();
     private transient List<Integer> pendingPartIds   = new ArrayList<>();
 
+    /** Returns true if {@code personId} is in the pending reconnection list (non-destructive). */
+    public boolean containsPendingPersonId(UUID personId) {
+        return pendingPersonIds.contains(personId);
+    }
+
     /** Returns and clears the person UUIDs read from XML, for use during post-load reconnection. */
     public List<UUID> drainPendingPersonIds() {
         List<UUID> ids = new ArrayList<>(pendingPersonIds);
