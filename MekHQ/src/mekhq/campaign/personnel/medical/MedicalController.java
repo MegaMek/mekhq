@@ -55,7 +55,8 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternateHealing;
-import mekhq.campaign.personnel.skills.SkillCheckUtility;
+import mekhq.campaign.personnel.skills.ActionCheck;
+import mekhq.campaign.personnel.skills.ActionCheckResult;
 import mekhq.campaign.unit.Unit;
 
 /**
@@ -148,10 +149,7 @@ public class MedicalController {
             // Handle Advanced Medical
             if (isUseAdvancedMedical) {
                 if (isUseAltAdvancedMedical) {
-                    AdvancedMedicalAlternateHealing.setCampaign(campaign);
-                    AdvancedMedicalAlternateHealing.processNewDay(campaign.getLocalDate(),
-                          campaign.getCampaignOptions().isUseFatigue(), campaign.getCampaignOptions().getFatigueRate(),
-                          patient, doctor);
+                    AdvancedMedicalAlternateHealing.processNewDay(campaign, patient, doctor);
                 } else {
                     InjuryUtil.resolveDailyHealing(campaign, patient);
                 }
@@ -222,21 +220,14 @@ public class MedicalController {
         LOGGER.debug(getFormattedTextAt(RESOURCE_BUNDLE, "MedicalController.report.intro",
               doctor.getHyperlinkedFullTitle(), patient.getHyperlinkedFullTitle()));
 
-        SkillCheckUtility skillCheckUtility = new SkillCheckUtility(
-              getTextAt(RESOURCE_BUNDLE, "MedicalController.report.skillCheck"),
-              doctor,
-              S_SURGERY,
-              getAdditionalHealingModifiers(patient),
-              0,
-              isUseSupportEdge,
-              false,
-              isUseAgingEffects,
-              isClanCampaign,
-              today);
+        ActionCheckResult actionCheckResult =
+              doctor.checkSkill(S_SURGERY, isUseAgingEffects, isClanCampaign, today)
+                    .withExternalModifiers(getAdditionalHealingModifiers(patient))
+                    .resolve(isUseSupportEdge, getTextAt(RESOURCE_BUNDLE, "MedicalController.report.skillCheck"), false);
 
-        LOGGER.debug(skillCheckUtility.getResultsText());
+        LOGGER.debug(actionCheckResult.resultsText());
 
-        if (skillCheckUtility.isSuccess()) {
+        if (actionCheckResult.isSuccess()) {
             boolean inInfirmary = !(null == patient.getDoctorId());
             patient.heal();
             if (inInfirmary && !patient.needsFixing() && patient.getPrisonerStatus().isFreeOrBondsman()) {
