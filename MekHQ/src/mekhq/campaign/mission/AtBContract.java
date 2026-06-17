@@ -176,24 +176,14 @@ public class AtBContract extends Contract {
     }
 
     public AtBContract(String name) {
-        setEmployerLiaison(null);
-        setClanOpponent(null);
-        setEnemyMercenaryEmployerCode(null);
-
         difficulty = Integer.MIN_VALUE;
 
         parentContract = null;
-        mercSubcontract = false;
-        setPlayerAttacker(false);
-
         setContractType(AtBContractType.GARRISON_DUTY);
 
         extensionLength = 0;
 
         setSharesPercent(0);
-        setBatchallAccepted(true);
-        setMoraleLevel(STALEMATE);
-        setRoutEndDate(null);
         priorLogisticsFailure = false;
         specialEventScenarioDate = null;
         battleTypeMod = 0;

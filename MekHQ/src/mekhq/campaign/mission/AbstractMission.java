@@ -36,8 +36,11 @@ import static java.lang.Math.ceil;
 import static megamek.client.ui.util.PlayerColour.BLUE;
 import static megamek.client.ui.util.PlayerColour.RED;
 import static megamek.common.enums.SkillLevel.REGULAR;
+import static mekhq.campaign.mission.enums.AtBContractType.UNDEFINED;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.MAXIMUM_MORALE_LEVEL;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.MINIMUM_MORALE_LEVEL;
+import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
+import static mekhq.campaign.mission.enums.ContractCommandRights.INDEPENDENT;
 import static mekhq.campaign.personnel.ranks.Rank.RO_MIN;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -96,8 +99,8 @@ public class AbstractMission {
     private int id = -1;
     private StratConCampaignState stratConCampaignState;
     private MissionStatus status = MissionStatus.ACTIVE;
-    private String contractTypeName;
-    private AtBContractType contractType;
+    private String contractTypeName = "New Contract";
+    private AtBContractType contractType = UNDEFINED;
     private String description;
 
     private String systemId;
@@ -126,7 +129,7 @@ public class AbstractMission {
     private String enemyName = "Independent";
     private String enemyMercenaryEmployerCode;
     private Person clanOpponent;
-    private boolean batchallAccepted;
+    private boolean batchallAccepted = true;
     private SkillLevel enemySkill = REGULAR;
     private int enemyQuality = DragoonRating.DRAGOON_C.getRating();
     private String enemyBotName = "Enemy";
@@ -134,8 +137,8 @@ public class AbstractMission {
     private PlayerColour enemyColour = BLUE;
 
     private double paymentMultiplier;
-    private ContractCommandRights commandRights;
-    private int overheadCompensation;
+    private ContractCommandRights commandRights = INDEPENDENT;
+    private int overheadCompensation = OH_NONE;
     private int straightSupport;
     private int battleLossCompensation;
     private int salvagePercent;
@@ -156,7 +159,7 @@ public class AbstractMission {
     private Money baseAmount = Money.zero();
     private Money feeAmount = Money.zero();
 
-    private boolean paidMRBCFee;
+    private boolean paidMRBCFee = true;
     private int mrbcFeePercent = MRBC_FEE_PERCENTAGE;
     private int sharesPercent = DEFAULT_SHARES_PERCENT;
     private int advancePercent;
@@ -176,7 +179,7 @@ public class AbstractMission {
     private int contractNegotiationSupportRoll;
     private int contractNegotiationTransportRoll;
 
-    private AtBMoraleLevel moraleLevel;
+    private AtBMoraleLevel moraleLevel = STALEMATE;
     private LocalDate routEndDate;
     private Money routedPayout = null;
 
@@ -1353,6 +1356,12 @@ public class AbstractMission {
         return Unit.SITE_FACILITY_BASIC;
     }
 
+    /**
+     * Calculations to be performed once the contract has been accepted.
+     */
+    public void acceptContract(Campaign campaign) {
+    }
+
     public void writeToXML(Campaign campaign, final PrintWriter pw, int indent) {
         NotImplementedException error = new NotImplementedException();
         LOGGER.error(error);
@@ -1379,13 +1388,6 @@ public class AbstractMission {
         LOGGER.error(error);
 
         return new AbstractMission();
-    }
-
-    /**
-     * Calculations to be performed once the contract has been accepted.
-     */
-    public void acceptContract(Campaign campaign) {
-
     }
 
     @Override

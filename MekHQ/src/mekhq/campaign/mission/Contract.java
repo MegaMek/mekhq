@@ -71,18 +71,11 @@ public class Contract extends Mission {
         setLengthInMonths(12);
         setPaymentMultiplier(2.0);
         setCommandRights(ContractCommandRights.HOUSE);
-        setOverheadCompensation(OH_NONE);
         setStraightSupport(50);
         setBattleLossCompensation(50);
         setSalvagePercent(50);
-        setSalvageExchange(false);
         setTransportCompensation(50);
-        setPaidMRBCFee(true);
         setAdvancePercent(25);
-        setSigningBonus(0);
-        setHospitalBedsRented(0);
-        setKitchensRented(0);
-        setHoldingCellsRented(0);
     }
 
     @Override
