@@ -155,7 +155,6 @@ public class AtBContract extends Contract {
 
     protected AtBMoraleLevel moraleLevel;
     protected LocalDate routEnd;
-    protected int partsAvailabilityLevel;
     private boolean batchallAccepted;
 
     protected int playerMinorBreaches;
@@ -716,7 +715,7 @@ public class AtBContract extends Contract {
 
         if (campaign.getLocalDate().getDayOfMonth() == 1) {
             if (priorLogisticsFailure) {
-                partsAvailabilityLevel--;
+                changePartsAvailabilityLevel(-1);
                 priorLogisticsFailure = false;
             }
 
@@ -755,7 +754,7 @@ public class AtBContract extends Contract {
                     switch (d6()) {
                         case 1:
                             text += "Major logistics problem: parts availability level for the rest of the contract becomes one level lower.";
-                            partsAvailabilityLevel++;
+                            changePartsAvailabilityLevel(1);
                             break;
                         case 2:
                             text += "Transport: Player is abandoned in the field by employer transports; if he loses a Base Attack battle he loses all Meks on repair.";
@@ -787,7 +786,7 @@ public class AtBContract extends Contract {
                 case LOGISTICS_FAILURE:
                     campaign.addReport(GENERAL,
                           "<b>Special Event:</b> Logistics Failure<br />Parts availability for the next month are one level lower.");
-                    partsAvailabilityLevel++;
+                    changePartsAvailabilityLevel(1);
                     priorLogisticsFailure = true;
                     break;
                 case REINFORCEMENTS:
@@ -818,7 +817,7 @@ public class AtBContract extends Contract {
                             break;
                         case 3:
                             text += "ComStar Interdict: Base availability level decreases one level for the rest of the contract.";
-                            partsAvailabilityLevel++;
+                            changePartsAvailabilityLevel(1);
                             break;
                         case 4:
                             text += "Defectors: Next Enemy Morale roll gets a -1 modifier.";
@@ -826,7 +825,7 @@ public class AtBContract extends Contract {
                             break;
                         case 5:
                             text += "Free Trader: Base availability level increases one level for the rest of the contract.";
-                            partsAvailabilityLevel--;
+                            changePartsAvailabilityLevel(-1);
                             break;
                         case 6:
                             final String unitName = campaign.getUnitMarket()
@@ -1109,7 +1108,7 @@ public class AtBContract extends Contract {
                     double value = Double.parseDouble(cleanValue);
                     routedPayout = Money.of(value);
                 } else if (item.getNodeName().equalsIgnoreCase("partsAvailabilityLevel")) {
-                    partsAvailabilityLevel = Integer.parseInt(item.getTextContent());
+                    setPartsAvailabilityLevel(Integer.parseInt(item.getTextContent()));
                 } else if (item.getNodeName().equalsIgnoreCase("extensionLength")) {
                     extensionLength = Integer.parseInt(item.getTextContent());
                 } else if (item.getNodeName().equalsIgnoreCase("sharesPct")) {
@@ -1213,14 +1212,6 @@ public class AtBContract extends Contract {
 
     public void setDifficulty(int difficulty) {
         this.difficulty = difficulty;
-    }
-
-    public int getPartsAvailabilityLevel() {
-        return partsAvailabilityLevel;
-    }
-
-    public void setPartsAvailabilityLevel(final int partsAvailabilityLevel) {
-        this.partsAvailabilityLevel = partsAvailabilityLevel;
     }
 
     public AtBMoraleLevel getMoraleLevel() {

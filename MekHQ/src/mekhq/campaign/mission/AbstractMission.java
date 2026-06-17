@@ -159,14 +159,15 @@ public class AbstractMission {
     private int hospitalBedsRented;
     private int kitchensRented;
     private int holdingCellsRented;
+    private int partsAvailabilityLevel;
 
     private int requiredCombatTeams;
     private int requiredCombatElements;
 
     private final List<Scenario> scenarios = new ArrayList<>();
 
-    public final static int MRBC_FEE_PERCENTAGE = 5;
-    public final static int DEFAULT_SHARES_PERCENT = 30;
+    private final static int MRBC_FEE_PERCENTAGE = 5;
+    private final static int DEFAULT_SHARES_PERCENT = 30;
 
     public final static int OH_NONE = 0;
     public final static int OH_HALF = 1;
@@ -1156,6 +1157,25 @@ public class AbstractMission {
 
     public void setHoldingCellsRented(int holdingCellsRented) {
         this.holdingCellsRented = holdingCellsRented;
+    }
+
+    public int getPartsAvailabilityLevel() {
+        return partsAvailabilityLevel;
+    }
+
+    public void setPartsAvailabilityLevel(int partsAvailabilityLevel) {
+        this.partsAvailabilityLevel = partsAvailabilityLevel;
+    }
+
+    /**
+     * Adjusts the 'parts availability level' by applying the specified delta value. This is a direct modifier to
+     * procurement target numbers. This means that a negative delta is a <b>bonus</b> while a positive delta is a
+     * <b>malus</b>.
+     *
+     * @param delta the amount to change the current parts availability level (can be positive or negative).
+     */
+    public void changePartsAvailabilityLevel(int delta) {
+        partsAvailabilityLevel += delta;
     }
 
     public int getRequiredCombatElements() {
