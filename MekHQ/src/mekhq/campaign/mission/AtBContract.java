@@ -490,9 +490,9 @@ public class AtBContract extends Contract {
               campaignOptions.getMoraleDecisiveDefeatEffect(), campaignOptions.getMoraleDefeatEffect());
         String flavorText = MHQMorale.getFormattedTitle()
                                   + "<h2 style='text-align:center;'>" + getName() + "</h2>"
-                + MoraleBar.getMoraleDisplay(this).tooltip();
+                                  + MoraleBar.getMoraleDisplay(this).tooltip();
         new ImmersiveDialogNotification(campaign, flavorText, moraleReport, MoraleBar.createDialogPanel(this),
-                true);
+              true);
 
         MHQMorale.routedMoraleUpdate(campaign, this);
 
@@ -1680,7 +1680,7 @@ public class AtBContract extends Contract {
 
         setType(contract.getType());
         setSystemId(contract.getSystemId());
-        setDesc(contract.getDescription());
+        setDescription(contract.getDescription());
         setStatus(contract.getStatus());
         for (Scenario s : contract.getScenarios()) {
             addScenario(s);

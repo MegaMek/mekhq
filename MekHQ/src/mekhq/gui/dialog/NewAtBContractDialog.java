@@ -580,7 +580,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         contract.setSystemId(selectedSystem.getId());
         contract.setEmployerCode(getCurrentEmployerCode(), campaign.getGameYear());
         contract.setContractType(Objects.requireNonNull(comboContractType.getSelectedItem()));
-        contract.setDesc(txtDesc.getText());
+        contract.setDescription(txtDesc.getText());
         contract.setCommandRights(choiceCommand.getSelectedItem());
 
 

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,19 +35,13 @@ package mekhq.campaign.mission;
 
 import java.io.PrintWriter;
 import java.text.ParseException;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import megamek.Version;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.enums.MissionStatus;
-import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.universe.Systems;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -63,248 +57,50 @@ import org.w3c.dom.NodeList;
 public class Mission extends AbstractMission {
     private static final MMLogger LOGGER = MMLogger.create(Mission.class);
 
-    // region Variable Declarations
-    private String name;
-    protected String systemId;
-    private MissionStatus status;
-    private String desc;
-    private String type;
-    private final List<Scenario> scenarios;
-    private int id = -1;
-    private String legacyPlanetName;
-    // endregion Variable Declarations
-
     // region Constructors
     public Mission() {
         this(null);
     }
 
     public Mission(final @Nullable String name) {
-        this.name = name;
-        this.systemId = "Unknown System";
-        this.desc = "";
-        this.type = "";
-        this.status = MissionStatus.ACTIVE;
-        scenarios = new ArrayList<>();
+        setName(name);
+        setSystemId("Unknown System");
     }
     // endregion Constructors
 
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Returns the name of this object as an HTML hyperlink.
-     *
-     * <p>The hyperlink is formatted with a "MISSION:" protocol prefix followed by the object's ID. This allows UI
-     * components that support HTML to render the name as a clickable link, which can be used to navigate to or focus on
-     * this specific object when clicked.</p>
-     *
-     * @return An HTML formatted string containing the object's name as a hyperlink with its ID
-     *
-     * @author Illiani
-     * @since 0.50.05
-     */
-    public String getHyperlinkedName() {
-        return String.format("<a href='MISSION:%s'>%s</a>", getId(), getName());
-    }
-
-    public void setName(String n) {
-        this.name = n;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String t) {
-        this.type = t;
-    }
-
-    public String getSystemId() {
-        return getSystem().getId();
-    }
-
-    public void setSystemId(String n) {
-        this.systemId = n;
-    }
-
-    public PlanetarySystem getSystem() {
-        return Systems.getInstance().getSystemById(systemId);
-    }
-
-    /**
-     * Convenience property to return the name of the current planet. Sometimes, the "current planet" doesn't match up
-     * with an existing planet in our planet database, in which case we return whatever was stored.
-     *
-     */
-    public String getSystemName(LocalDate when) {
-        if (getSystem() == null) {
-            return legacyPlanetName;
-        }
-
-        return getSystem().getName(when);
-    }
-
-    public void setLegacyPlanetName(String name) {
-        legacyPlanetName = name;
-    }
-
-    public String getDescription() {
-        return desc;
-    }
-
-    public void setDesc(String d) {
-        this.desc = d;
-    }
-
-    public MissionStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(MissionStatus status) {
-        this.status = status;
-    }
-
-    public boolean isActiveOn(LocalDate date) {
-        return isActiveOn(date, false);
-    }
-
-    public boolean isActiveOn(LocalDate date, boolean excludeEndDateCheck) {
-        return getStatus().isActive();
-    }
-
-    // region Scenarios
-    public List<Scenario> getScenarios() {
-        return scenarios;
-    }
-
-    public List<Scenario> getVisibleScenarios() {
-        return getScenarios().stream().filter(scenario -> !scenario.isCloaked()).collect(Collectors.toList());
-    }
-
-    public List<Scenario> getCurrentScenarios() {
-        return getScenarios().stream()
-                     .filter(scenario -> scenario.getStatus().isCurrent())
-                     .collect(Collectors.toList());
-    }
-
-    public List<AtBScenario> getCurrentAtBScenarios() {
-        return getScenarios().stream()
-                     .filter(scenario -> scenario.getStatus().isCurrent() && (scenario instanceof AtBScenario))
-                     .map(scenario -> (AtBScenario) scenario)
-                     .collect(Collectors.toList());
-    }
-
-    public List<Scenario> getCompletedScenarios() {
-        return getScenarios().stream()
-                     .filter(scenario -> !scenario.getStatus().isCurrent())
-                     .collect(Collectors.toList());
-    }
-
-    /**
-     * Don't use this method directly as it will not add an id to the added scenario. Use Campaign#AddScenario instead
-     *
-     * @param scenario the scenario to add this mission
-     */
-    public void addScenario(final Scenario scenario) {
-        scenario.setMissionId(getId());
-        getScenarios().add(scenario);
-    }
-
-    public void clearScenarios() {
-        scenarios.clear();
-    }
-
-    @Deprecated(since = "0.51.0", forRemoval = true)
-    public boolean hasPendingScenarios() {
-        // scenarios that are pending, but have not been revealed don't count
-        return getScenarios().stream()
-                     .anyMatch(scenario -> (scenario.getStatus().isCurrent() && !scenario.isCloaked()));
-    }
-    // endregion Scenarios
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int i) {
-        this.id = i;
-    }
-
-    /**
-     * Returns the contract length in months.
-     *
-     * @return the number and corresponding length of the contract in months as an integer
-     */
-    public int getLength() {
-        // Missions don't have durations, so we treat it as always being 1 month long. This only really matters for
-        // faction standing.
-        return 1;
-    }
-
-    /**
-     * Returns the default repair location constant for the unit.
-     *
-     * @return the repair location constant {@code Unit.SITE_FACILITY_BASIC}
-     */
-    public int getRepairLocation() {
-        return Unit.SITE_FACILITY_BASIC;
-    }
-
-    // region File I/O
-
-    /**
-     * @deprecated use {@link #writeToXML(Campaign, PrintWriter, int) instead}
-     */
-    @Deprecated(since = "0.50.06", forRemoval = true)
-    public void writeToXML(final PrintWriter printWriter, int indent) {
-    }
-
+    @Override
     public void writeToXML(Campaign campaign, final PrintWriter pw, int indent) {
         indent = writeToXMLBegin(campaign, pw, indent);
         writeToXMLEnd(pw, indent);
     }
 
-    /**
-     * @deprecated use {@link #writeToXMLBegin(Campaign, PrintWriter, int)} instead;
-     */
-    @Deprecated(since = "0.50.06", forRemoval = true)
-    protected int writeToXMLBegin(final PrintWriter printWriter, int indent) {
-        return indent;
-    }
-
+    @Override
     protected int writeToXMLBegin(Campaign campaign, final PrintWriter pw, int indent) {
-        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "mission", "id", id, "type", getClass());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", name);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "type", type);
-        if (systemId != null) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "systemId", systemId);
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "mission", "id", getId(), "type", getClass());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", getName());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "type", getType());
+        if (getSystemId() != null) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "systemId", getSystemId());
         } else {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetName", legacyPlanetName);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetName", getLegacyPlanetName());
         }
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "status", status.name());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "desc", desc);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "id", id);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "status", getStatus().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "desc", getDescription());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "id", getId());
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "scenarios");
-        for (Scenario s : scenarios) {
+        for (Scenario s : getScenarios()) {
             s.writeToXML(pw, indent);
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "scenarios");
         return indent;
     }
 
+    @Override
     protected void writeToXMLEnd(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "mission");
     }
 
-    /**
-     * @deprecated use {@link #loadFieldsFromXmlNode(Campaign, Version, Node)}  instead;
-     */
-    @Deprecated(since = "0.50.06", forRemoval = true)
-    public void loadFieldsFromXmlNode(Node node) throws ParseException {
-    }
-
+    @Override
     public void loadFieldsFromXmlNode(Campaign campaign, Version version, Node wn) throws ParseException {
         // do nothing
     }
@@ -328,24 +124,25 @@ public class Mission extends AbstractMission {
                 Node wn2 = nl.item(x);
 
                 if (wn2.getNodeName().equalsIgnoreCase("name")) {
-                    retVal.name = wn2.getTextContent();
+
+                    retVal.setName(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("planetId") ||
                                  wn2.getNodeName().equalsIgnoreCase("systemId")) {
-                    retVal.systemId = wn2.getTextContent();
+                    retVal.setSystemId(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("planetName")) {
                     PlanetarySystem system = campaign.getSystemByName(wn2.getTextContent());
 
                     if (system != null) {
-                        retVal.systemId = campaign.getSystemByName(wn2.getTextContent()).getId();
+                        retVal.setSystemId(campaign.getSystemByName(wn2.getTextContent()).getId());
                     } else {
-                        retVal.legacyPlanetName = wn2.getTextContent();
+                        retVal.setLegacyPlanetName(wn2.getTextContent());
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("status")) {
                     retVal.setStatus(MissionStatus.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("id")) {
-                    retVal.id = Integer.parseInt(wn2.getTextContent());
+                    retVal.setId(Integer.parseInt(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("desc")) {
-                    retVal.setDesc(wn2.getTextContent());
+                    retVal.setDescription(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("type")) {
                     retVal.setType(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("scenarios")) {
@@ -382,6 +179,6 @@ public class Mission extends AbstractMission {
 
     @Override
     public String toString() {
-        return getStatus().isCompleted() ? name + " (Complete)" : name;
+        return getStatus().isCompleted() ? getName() + " (Complete)" : getName();
     }
 }

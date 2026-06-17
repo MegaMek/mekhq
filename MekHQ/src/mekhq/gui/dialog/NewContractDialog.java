@@ -703,7 +703,7 @@ public class NewContractDialog extends JDialog {
         // contract.setPlanetName(suggestPlanet.getText());
         contract.setEmployer(txtEmployer.getText());
         contract.setType(txtType.getText());
-        contract.setDesc(txtDesc.getText());
+        contract.setDescription(txtDesc.getText());
         contract.setCommandRights(choiceCommand.getSelectedItem());
         campaign.getFinances()
               .credit(TransactionType.CONTRACT_PAYMENT,

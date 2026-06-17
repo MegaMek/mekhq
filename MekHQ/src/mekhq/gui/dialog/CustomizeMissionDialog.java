@@ -248,7 +248,7 @@ public class CustomizeMissionDialog extends JDialog {
             // history of planet
         }
 
-        mission.setDesc(txtDesc.getText());
+        mission.setDescription(txtDesc.getText());
         if (newMission) {
             campaign.addMission(mission);
         }

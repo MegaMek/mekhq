@@ -639,7 +639,7 @@ public class CustomizeAtBContractDialog extends JDialog {
             // history of planet
         }
 
-        contract.setDesc(txtDesc.getText());
+        contract.setDescription(txtDesc.getText());
         this.setVisible(false);
     }
 
