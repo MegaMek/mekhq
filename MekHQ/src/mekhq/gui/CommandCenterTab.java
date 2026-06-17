@@ -117,8 +117,6 @@ import mekhq.utilities.ReportingUtilities;
  */
 public final class CommandCenterTab extends CampaignGuiTab {
 
-    private static final String LINK_SUFFIX = "&nbsp;<span style='font-size:0.8em'>ⓘ</span>";
-
     // basic info panel
     private JPanel panInfo;
     private ClickableLabel lblRating;
@@ -325,6 +323,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         lblRating = new ClickableLabel(
               evt -> new ReputationReportDialog(getCampaignGui().getFrame(),
                     getCampaign()).setVisible(true));
+        lblRating.setHyperlinkMode(true);
         lblRatingHead.setLabelFor(lblRating);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
@@ -369,6 +368,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         lblPersonnel = new ClickableLabel(
               evt -> new PersonnelReportDialog(getCampaignGui().getFrame(),
                     new PersonnelReport(getCampaign())).setVisible(true));
+        lblPersonnel.setHyperlinkMode(true);
         lblPersonnelHead.setLabelFor(lblPersonnel);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
@@ -402,6 +402,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         lblComposition = new ClickableLabel(
               evt -> new HangarReportDialog(getCampaignGui().getFrame(),
                     new HangarReport(getCampaign())).setVisible(true));
+        lblComposition.setHyperlinkMode(true);
         lblCompositionHead.setLabelFor(lblComposition);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
@@ -432,6 +433,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         lblTransportCapacity = new ClickableLabel(
               evt -> new TransportReportDialog(getCampaignGui().getFrame(),
                     new TransportReport(getCampaign())).setVisible(true));
+        lblTransportCapacity.setHyperlinkMode(true);
         lblTransportCapacityHead.setLabelFor(lblTransportCapacity);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
@@ -448,6 +450,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         lblCargoSummary = new ClickableLabel(
               evt -> new CargoReportDialog(getCampaignGui().getFrame(),
                     new CargoReport(getCampaign())).setVisible(true));
+        lblCargoSummary.setHyperlinkMode(true);
         lblCargoSummaryHead.setLabelFor(lblCargoSummary);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
@@ -864,13 +867,13 @@ public final class CommandCenterTab extends CampaignGuiTab {
         lblExperience.setText(experienceString);
 
         campaignSummary.updateInformation();
-        lblRating.setText(campaign.getUnitRatingText() + LINK_SUFFIX);
-        lblPersonnel.setText(campaignSummary.getPersonnelReport() + LINK_SUFFIX);
+        lblRating.setText(campaign.getUnitRatingText());
+        lblPersonnel.setText(campaignSummary.getPersonnelReport());
         lblMissionSuccess.setText(campaignSummary.getMissionSuccessReport());
-        lblComposition.setText(campaignSummary.getForceCompositionReport() + LINK_SUFFIX);
-        lblCargoSummary.setText(campaignSummary.getCargoCapacityReport() + LINK_SUFFIX);
+        lblComposition.setText(campaignSummary.getForceCompositionReport());
+        lblCargoSummary.setText(campaignSummary.getCargoCapacityReport());
         lblRepairStatus.setText(campaignSummary.getForceRepairReport());
-        lblTransportCapacity.setText(campaignSummary.getTransportCapacity() + LINK_SUFFIX);
+        lblTransportCapacity.setText(campaignSummary.getTransportCapacity());
 
         if (campaignOptions.isUseHRStrain()) {
             try {
