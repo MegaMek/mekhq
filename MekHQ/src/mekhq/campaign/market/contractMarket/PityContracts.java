@@ -37,6 +37,7 @@ import static megamek.common.compute.Compute.d6;
 import static megamek.common.enums.SkillLevel.GREEN;
 import static megamek.common.enums.SkillLevel.VETERAN;
 import static mekhq.campaign.mission.Contract.OH_NONE;
+import static mekhq.campaign.mission.ContractDifficulty.calculateContractDifficulty;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 
 import java.util.List;
@@ -133,7 +134,7 @@ public class PityContracts {
         // original enemy
         boolean isUseGenericBattleValue = campaign.getCampaignOptions().isUseGenericBattleValue();
         List<Entity> combatUnits = campaign.getAllCombatEntities();
-        int difficulty = contract.calculateContractDifficulty(campaign.getGameYear(),
+        int difficulty = calculateContractDifficulty(contract, campaign.getGameYear(),
               isUseGenericBattleValue,
               combatUnits);
         contract.setDifficulty(difficulty);

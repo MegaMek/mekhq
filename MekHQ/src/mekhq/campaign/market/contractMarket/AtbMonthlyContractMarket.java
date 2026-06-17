@@ -44,6 +44,7 @@ import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.enums.DailyReportType.SKILL_CHECKS;
+import static mekhq.campaign.mission.ContractDifficulty.calculateContractDifficulty;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_NETWORKER;
 import static mekhq.campaign.personnel.PersonnelOptions.EDGE_COMMANDER_NEGOTIATION;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
@@ -349,7 +350,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             if (contract != null) {
                 checkForEmployerOverride(campaign.getLocalDate(), contract, contract.getEmployerCode());
 
-                contract.setDifficulty(contract.calculateContractDifficulty(
+                contract.setDifficulty(calculateContractDifficulty(contract,
                       contract.getStartDate().getYear(),
                       true,
                       campaign.getAllCombatEntities()));

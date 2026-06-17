@@ -136,6 +136,8 @@ public class AbstractMission {
     private Camouflage enemyCamouflage = new Camouflage(Camouflage.COLOUR_CAMOUFLAGE, PlayerColour.BLUE.name());
     private PlayerColour enemyColour = BLUE;
 
+    private int difficulty = 5;
+
     private double paymentMultiplier;
     private ContractCommandRights commandRights = INDEPENDENT;
     private int overheadCompensation = OH_NONE;
@@ -547,6 +549,14 @@ public class AbstractMission {
      */
     public void setEnemyMercenaryEmployerCode(String enemyMercenaryEmployerCode) {
         this.enemyMercenaryEmployerCode = enemyMercenaryEmployerCode;
+    }
+
+    public int getDifficulty() {
+        return difficulty;
+    }
+
+    public void setDifficulty(int difficulty) {
+        this.difficulty = difficulty;
     }
 
     public String getEnemyName() {

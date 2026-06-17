@@ -37,13 +37,9 @@ import static java.lang.Math.ceil;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
-import static megamek.client.ratgenerator.ModelRecord.NETWORK_NONE;
-import static megamek.client.ratgenerator.UnitTable.findTable;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
-import static megamek.common.enums.SkillLevel.ELITE;
-import static megamek.common.enums.SkillLevel.parseFromInteger;
 import static megamek.common.enums.SkillLevel.parseFromString;
 import static megamek.common.units.UnitType.AEROSPACE_FIGHTER;
 import static megamek.common.units.UnitType.MEK;
@@ -55,6 +51,7 @@ import static mekhq.campaign.enums.DailyReportType.POLITICS;
 import static mekhq.campaign.force.CombatTeam.getStandardFormationSize;
 import static mekhq.campaign.force.FormationLevel.BATTALION;
 import static mekhq.campaign.force.FormationLevel.COMPANY;
+import static mekhq.campaign.mission.ContractDifficulty.calculateContractDifficulty;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.ADVANCING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.DOMINATING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.OVERWHELMING;
@@ -77,27 +74,19 @@ import java.nio.file.Paths;
 import java.text.ParseException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Random;
 import java.util.stream.Stream;
 import javax.swing.ImageIcon;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 import megamek.Version;
-import megamek.client.ratgenerator.FactionRecord;
-import megamek.client.ratgenerator.RATGenerator;
-import megamek.client.ratgenerator.UnitTable;
 import megamek.client.ui.util.PlayerColour;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
-import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
-import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -146,8 +135,6 @@ public class AtBContract extends Contract {
     /* hired by another mercenary unit on contract to a third-party employer */
     boolean mercSubcontract;
 
-    protected int difficulty;
-
     protected int extensionLength;
 
     protected int playerMinorBreaches;
@@ -176,7 +163,7 @@ public class AtBContract extends Contract {
     }
 
     public AtBContract(String name) {
-        difficulty = Integer.MIN_VALUE;
+        setDifficulty(Integer.MIN_VALUE);
 
         parentContract = null;
         setContractType(AtBContractType.GARRISON_DUTY);
@@ -1037,7 +1024,7 @@ public class AtBContract extends Contract {
                 } else if (item.getNodeName().equalsIgnoreCase("enemyQuality")) {
                     setEnemyQuality(Integer.parseInt(item.getTextContent()));
                 } else if (item.getNodeName().equalsIgnoreCase("difficulty")) {
-                    difficulty = Integer.parseInt(item.getTextContent());
+                    setDifficulty(Integer.parseInt(item.getTextContent()));
                 } else if (item.getNodeName().equalsIgnoreCase("allyBotName")) {
                     setAllyBotName(item.getTextContent());
                 } else if (item.getNodeName().equalsIgnoreCase("enemyBotName")) {
@@ -1165,14 +1152,6 @@ public class AtBContract extends Contract {
                      getEmployerFaction().getFullName(year);
     }
 
-    public int getDifficulty() {
-        return difficulty;
-    }
-
-    public void setDifficulty(int difficulty) {
-        this.difficulty = difficulty;
-    }
-
     public void addPlayerMinorBreach() {
         playerMinorBreaches++;
     }
@@ -1270,9 +1249,8 @@ public class AtBContract extends Contract {
         setEnemyBotName(generateEnemyName(currentYear));
         setEnemyCamouflage(pickRandomCamouflage(currentYear, getEnemyCode()));
 
-        difficulty = calculateContractDifficulty(contract.getStartDate().getYear(),
-              true,
-              campaign.getAllCombatEntities());
+        setDifficulty(calculateContractDifficulty(contract, contract.getStartDate().getYear(),
+              true, campaign.getAllCombatEntities()));
 
         clanTechSalvageOverride();
     }
@@ -1325,51 +1303,6 @@ public class AtBContract extends Contract {
     }
 
     /**
-     * This method returns a {@link JPanel} that represents the difficulty skulls for a given mission.
-     *
-     * @return a {@link JPanel} with the difficulty skulls displayed
-     */
-    public JPanel getContractDifficultySkulls() {
-        final int ERROR = -99;
-
-        // Create a new JFrame
-        JFrame frame = new JFrame();
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        // Create a pane with FlowLayout
-        JPanel panel = new JPanel(new FlowLayout());
-
-        // Load and scale the images
-        ImageIcon skullFull = scaleImageIcon(new ImageIcon("data/images/misc/challenge_estimate_full.png"), 50, true);
-        ImageIcon skullHalf = scaleImageIcon(new ImageIcon("data/images/misc/challenge_estimate_half.png"), 50, true);
-
-        int iterations = difficulty;
-
-        if (difficulty == ERROR) {
-            iterations = 5;
-        }
-
-        if (iterations % 2 != 0) {
-            iterations--;
-            iterations /= 2;
-
-            for (int i = 0; i < iterations; i++) {
-                panel.add(new JLabel(skullFull));
-            }
-
-            panel.add(new JLabel(skullHalf));
-        } else {
-            iterations /= 2;
-
-            for (int i = 0; i < iterations; i++) {
-                panel.add(new JLabel(skullFull));
-            }
-        }
-
-        return panel;
-    }
-
-    /**
      * Creates and returns a {@link JPanel} containing the belligerent factions' logos for the specified game year.
      *
      * <p>This panel displays the employer and enemy faction logos side by side, separated by a styled divider.
@@ -1412,194 +1345,6 @@ public class AtBContract extends Contract {
         panel.add(enemyLabel);
 
         return panel;
-    }
-
-    /**
-     * Calculates the difficulty rating of a contract by comparing the estimated combat strength of the opposing force
-     * to the combat strength of the player's participating units.
-     *
-     * <p>The method performs the following steps:</p>
-     * <ol>
-     *     <li>Determines the opposing force's effective skill level by applying any faction-based adjustments to
-     *     their base {@link SkillLevel}.</li>
-     *     <li>Computes a skill multiplier and applies it to the estimated enemy force power, derived from the game
-     *     year, force quality, and whether generic BV values are used.</li>
-     *     <li>Estimates the total combat power of the player's units based on their BV values and optionally using
-     *     generic BV rules.</li>
-     *     <li>Computes the percentage difference between enemy and player power.</li>
-     *     <li>Maps that percentage difference into a difficulty scale ranging from {@code 1} (easiest) to {@code 10}
-     *     (hardest), centered around {@code 5} as an even match.</li>
-     * </ol>
-     *
-     * <p>A negative percentage difference indicates that the player is stronger than the opposing force; a positive
-     * difference indicates the enemy is stronger. Each 20% shift away from parity increases (or decreases)
-     * difficulty by one step.</p>
-     *
-     * <p>If enemy combat strength cannot be computed, the method returns {@code -99} to signal an error.</p>
-     *
-     * @param gameYear          the current in-game year used for estimating enemy technology and BV baselines
-     * @param useGenericBV      whether generic BV values should be used instead of unit-specific BV calculations
-     * @param playerCombatUnits the list of player {@link Entity} objects expected to participate in the contract
-     *
-     * @return a difficulty rating from {@code 1} to {@code 10}, where {@code 5} represents roughly even forces; or
-     *       {@code -99} if the enemy power estimation fails
-     */
-    public int calculateContractDifficulty(int gameYear, boolean useGenericBV, List<Entity> playerCombatUnits) {
-        final int ERROR = -99;
-
-        // Estimate the power of the enemy forces
-        SkillLevel opposingSkill = modifySkillLevelBasedOnFaction(getEnemyCode(), getEnemySkill());
-        double enemySkillMultiplier = getSkillMultiplier(opposingSkill);
-        double enemyPower = estimateMekStrength(gameYear, useGenericBV, getEnemyCode(), getEnemyQuality());
-
-        // If we cannot calculate enemy power, abort.
-        if (enemyPower == 0) {
-            return ERROR;
-        }
-
-        enemyPower = (int) round(enemyPower * enemySkillMultiplier);
-
-        // Estimate player power
-        double playerPower = estimatePlayerPower(playerCombatUnits, useGenericBV);
-
-        // Calculate difficulty based on the percentage difference between the two forces.
-        double difference = enemyPower - playerPower;
-        // Divide by 0 protection
-        double percentDifference = (playerPower != 0 ? (difference / playerPower) : difference) * 100;
-
-        int mappedValue = (int) round(Math.abs(percentDifference) / 20);
-        if (percentDifference < 0) {
-            mappedValue = 5 - mappedValue;
-        } else {
-            mappedValue = 5 + mappedValue;
-        }
-
-        return Math.clamp(mappedValue, 1, 10);
-    }
-
-    /**
-     * Modifies the skill level based on the faction code.
-     *
-     * @param factionCode the code of the faction
-     * @param skillLevel  the original skill level
-     *
-     * @return the modified skill level
-     */
-    SkillLevel modifySkillLevelBasedOnFaction(String factionCode, SkillLevel skillLevel) {
-        if (Objects.equals(factionCode, "SOC")) {
-            return ELITE;
-        }
-
-        if (Factions.getInstance().getFaction(factionCode).isClan()) {
-            return parseFromInteger(skillLevel.ordinal() + 1);
-        }
-
-        return skillLevel;
-    }
-
-    double estimatePlayerPower(List<Entity> units, boolean useGenericBV) {
-        int playerPower = 0;
-        int playerGBV = 0;
-        int playerUnitCount = 0;
-        for (Entity unit : units) {
-            playerPower += unit.calculateBattleValue();
-            playerGBV += unit.getGenericBattleValue();
-            playerUnitCount++;
-        }
-
-        if (useGenericBV) {
-            return ((double) playerPower) / playerGBV;
-        } else {
-            return ((double) playerPower) / playerUnitCount;
-        }
-    }
-
-    /**
-     * Returns the skill BV multiplier based on the given skill level.
-     *
-     * @param skillLevel the skill level to determine the multiplier
-     *
-     * @return the skill multiplier
-     */
-    private static double getSkillMultiplier(SkillLevel skillLevel) {
-        return switch (skillLevel) {
-            case NONE -> 0.68;
-            case ULTRA_GREEN -> 0.77;
-            case GREEN -> 0.86;
-            case REGULAR -> 1.00;
-            case VETERAN -> 1.32;
-            case ELITE -> 1.68;
-            case HEROIC -> 2.02;
-            case LEGENDARY -> 2.31;
-        };
-    }
-
-    /**
-     * Estimates the relative strength for Mek units of a specific faction and quality. Excludes salvage.
-     *
-     * @param gameYear     the year of the current campaign
-     * @param useGenericBV whether to use generic BV for strength calculations
-     * @param factionCode  the code of the faction to estimate the average Mek strength for
-     * @param quality      the quality of the Meks to calculate the average strength for
-     *
-     * @return the average battle value OR total BV2 divided by total GBV for Meks of the specified faction and quality
-     *       OR 0 on error
-     */
-    double estimateMekStrength(int gameYear, boolean useGenericBV, String factionCode, int quality) {
-        final double ERROR = 0;
-
-        RATGenerator ratGenerator = Factions.getInstance().getRATGenerator();
-        FactionRecord faction = ratGenerator.getFaction(factionCode);
-
-        if (faction == null) {
-            return ERROR;
-        }
-
-        UnitTable unitTable;
-        try {
-            unitTable = findTable(faction,
-                  MEK,
-                  gameYear,
-                  String.valueOf(quality),
-                  new ArrayList<>(),
-                  NETWORK_NONE,
-                  new ArrayList<>(),
-                  new ArrayList<>(),
-                  new ArrayList<>(),
-                  0,
-                  faction);
-        } catch (Exception ignored) {
-            return ERROR;
-        }
-
-        // Otherwise, calculate the estimated power of the faction
-        int entries = unitTable.getNumEntries();
-
-        int totalBattleValue = 0;
-        int totalGBV = 0;
-        int rollingCount = 0;
-
-        for (int i = 0; i < entries; i++) {
-            int battleValue = unitTable.getBV(i); // 0 for salvage
-            if (0 == battleValue) {
-                // Removing this check will break things, see the other comments.
-                continue;
-            }
-
-            // getMekSummary(int index) is NULL for salvage.
-            int genericBattleValue = unitTable.getMekSummary(i).getGenericBattleValue();
-            int weight = unitTable.getEntryWeight(i); // NOT 0 for salvage
-
-            totalBattleValue += battleValue * weight;
-            totalGBV += genericBattleValue * weight;
-            rollingCount += weight;
-        }
-
-        if (useGenericBV) {
-            return ((double) totalBattleValue) / totalGBV;
-        } else {
-            return ((double) totalBattleValue) / rollingCount;
-        }
     }
 
     /**

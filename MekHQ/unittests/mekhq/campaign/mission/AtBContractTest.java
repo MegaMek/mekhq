@@ -36,7 +36,14 @@ import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -44,7 +51,6 @@ import java.util.Vector;
 import java.util.stream.Stream;
 
 import megamek.client.generator.RandomCallsignGenerator;
-import megamek.common.enums.SkillLevel;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.units.Entity;
 import megamek.common.units.UnitType;
@@ -203,36 +209,6 @@ public class AtBContractTest {
         AtBContract contract = new AtBContract("Test");
         contract.setSharesPercent(50);
         assertEquals(50, contract.getSharesPercent());
-    }
-
-    private static Stream<Arguments> provideContractDifficultyParameters() {
-        return Stream.of(Arguments.of(500.0, 0.0, true, 10),
-              Arguments.of(500.0, 0.0, false, 10),
-              Arguments.of(500.0, 500.0, true, 5),
-              Arguments.of(500.0, 500.0, false, 5),
-              Arguments.of(500.0, 2000.0, true, 1),
-              Arguments.of(500.0, 2000.0, false, 1),
-              Arguments.of(500.0, 525.0, true, 5),
-              Arguments.of(500.0, 525.0, false, 5),
-              Arguments.of(500.0, 350.0, true, 7),
-              Arguments.of(500.0, 350.0, false, 7),
-              Arguments.of(0.0, 0.0, true, -99),
-              Arguments.of(0.0, 0.0, false, -99));
-    }
-
-    @ParameterizedTest
-    @MethodSource("provideContractDifficultyParameters")
-    public void calculateContractDifficultySameSkillMatchesExpectedRating(double enemyBV, double playerBV,
-          boolean useGenericBattleValue, int expectedResult) {
-        contract = spy(contract);
-        doReturn(SkillLevel.REGULAR).when(contract).modifySkillLevelBasedOnFaction(anyString(), any(SkillLevel.class));
-        doReturn(enemyBV).when(contract).estimateMekStrength(anyInt(), anyBoolean(), anyString(), anyInt());
-        doReturn(playerBV).when(contract).estimatePlayerPower(anyList(), anyBoolean());
-        when(campaign.getGameYear()).thenReturn(3025);
-        when(options.isUseGenericBattleValue()).thenReturn(useGenericBattleValue);
-
-        int difficulty = contract.calculateContractDifficulty(3025, true, new ArrayList<>());
-        assertEquals(expectedResult, difficulty);
     }
 
     @Test

@@ -34,11 +34,13 @@
 package mekhq.gui.view;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
+import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 
 import java.awt.Cursor;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -47,7 +49,9 @@ import java.awt.event.MouseEvent;
 import java.util.List;
 import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -204,7 +208,7 @@ public class ContractSummaryPanel extends JPanel {
                 gridBagConstraintsLabels.gridy = ++y;
                 mainPanel.add(lblChallenge, gridBagConstraintsLabels);
 
-                JPanel txtChallenge = ((AtBContract) contract).getContractDifficultySkulls();
+                JPanel txtChallenge = getContractDifficultySkulls((AtBContract) contract);
                 txtChallenge.setToolTipText(wordWrap(resourceMap.getString("lblChallenge.tooltip")));
                 txtChallenge.setName("txtChallenge");
                 gridBagConstraintsText.gridy = y;
@@ -582,6 +586,47 @@ public class ContractSummaryPanel extends JPanel {
         }
 
         contractPaymentBreakdown.display(++y, 2);
+    }
+
+    private JPanel getContractDifficultySkulls(AtBContract contract) {
+        final int ERROR = -99;
+
+        // Create a new JFrame
+        JFrame frame = new JFrame();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        // Create a pane with FlowLayout
+        JPanel panel = new JPanel(new FlowLayout());
+
+        // Load and scale the images
+        ImageIcon skullFull = scaleImageIcon(new ImageIcon("data/images/misc/challenge_estimate_full.png"), 50, true);
+        ImageIcon skullHalf = scaleImageIcon(new ImageIcon("data/images/misc/challenge_estimate_half.png"), 50, true);
+
+        int difficulty = contract.getDifficulty();
+        int iterations = difficulty;
+
+        if (difficulty == ERROR) {
+            iterations = 5;
+        }
+
+        if (iterations % 2 != 0) {
+            iterations--;
+            iterations /= 2;
+
+            for (int i = 0; i < iterations; i++) {
+                panel.add(new JLabel(skullFull));
+            }
+
+            panel.add(new JLabel(skullHalf));
+        } else {
+            iterations /= 2;
+
+            for (int i = 0; i < iterations; i++) {
+                panel.add(new JLabel(skullFull));
+            }
+        }
+
+        return panel;
     }
 
     private boolean hasTransportRerolls() {
