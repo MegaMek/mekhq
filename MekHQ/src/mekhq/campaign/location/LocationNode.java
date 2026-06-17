@@ -129,8 +129,9 @@ public class LocationNode {
             ILocation locatable = child.getLocatable();
             if (locatable instanceof AcademyCampusLocation campus) {
                 campus.writeToXML(pw, indent);
+            } else if (locatable instanceof CurrentLocation travelNode) {
+                travelNode.writeToXML(pw, indent);
             }
-            // Future: Additional objects that need to be saved in a location-context other than the main force
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "locationNodeChildren");
     }
@@ -178,6 +179,12 @@ public class LocationNode {
                                 }
                             }
                         }
+                    }
+                } else if (wn.getNodeName().equalsIgnoreCase("location")) {
+                    CurrentLocation travelNode = CurrentLocation.generateInstanceFromXML(wn, campaign);
+                    if (travelNode != null) {
+                        LocationManager.setLocation(travelNode, parent);
+                        campaign.addLocation(travelNode);
                     }
                 } else {
                     // Person, Unit, and Part reconnection will be added here
