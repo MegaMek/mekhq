@@ -182,6 +182,7 @@ import mekhq.campaign.market.ShoppingList;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
+import mekhq.campaign.mission.AbstractMission;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBScenario;
@@ -861,9 +862,8 @@ public class Campaign implements ITechManager, IPlace {
         this.isOverridingCommandCircuitRequirements = isOverridingCommandCircuitRequirements;
     }
 
-    public boolean isUseCommandCircuitForContract(Contract contract) {
-        if (contract instanceof AtBContract atBContract) {
-
+    public boolean isUseCommandCircuitForContract(AbstractMission abstractMission) {
+        if (abstractMission instanceof AtBContract atBContract) {
             return FactionStandingUtilities.isUseCommandCircuit(
                   isOverridingCommandCircuitRequirements, gmMode,
                   campaignOptions.isUseFactionStandingCommandCircuitSafe(),
@@ -2213,7 +2213,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all hangars across all locations associated with this campaign.
-     *       TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     *             TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
      */
     public Hangar getAllHangar() {
         return units;
@@ -2849,7 +2849,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all warehouses across all locations associated with this campaign.
-     *       TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
+     *             TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
      */
     public Warehouse getAllWarehouse() {
         return parts;

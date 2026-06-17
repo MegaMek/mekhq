@@ -266,7 +266,7 @@ public class ContractTest {
         contract.setTransportCompensation(100);
 
         contract.setSigningBonus(10);
-        contract.setMRBCFee(true);
+        contract.setPaidMRBCFee(true);
         contract.setAdvancePercent(10);
 
         when(contract.getSystem()).thenReturn(new PlanetarySystem());
@@ -331,7 +331,7 @@ public class ContractTest {
         contract.setTransportCompensation(transportComp);
 
         contract.setSigningBonus(10);
-        contract.setMRBCFee(true);
+        contract.setPaidMRBCFee(true);
         contract.setAdvancePercent(10);
 
         when(contract.getSystem()).thenReturn(new PlanetarySystem());

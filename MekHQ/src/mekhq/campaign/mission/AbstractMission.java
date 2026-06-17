@@ -32,25 +32,32 @@
  */
 package mekhq.campaign.mission;
 
+import static java.lang.Math.ceil;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.io.PrintWriter;
 import java.math.RoundingMode;
 import java.text.ParseException;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.JumpPath;
+import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
+import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import org.apache.commons.lang3.NotImplementedException;
 import org.w3c.dom.Node;
 
@@ -66,6 +73,12 @@ public class AbstractMission {
 
     private String systemId;
     private String legacyPlanetName;
+    /*
+     * This is a transient variable meant to keep track of a single jump path while the contract runs through initial
+     * calculations, as the same jump path is referenced multiple times and calculating it each time is expensive. No
+     * need to preserve it in save data.
+     */
+    private transient JumpPath cachedJumpPath;
 
     private LocalDate startDate;
     private LocalDate endDate;
@@ -79,17 +92,16 @@ public class AbstractMission {
     private int straightSupport;
     private int battleLossCompensation;
     private int salvagePercent;
-    private boolean salvageExchange;
     private int transportCompensation;
 
     // need to keep track of total value salvaged for salvage rights
+    private boolean salvageExchange;
     private Money salvagedByUnit = Money.zero();
     private Money salvagedByEmployer = Money.zero();
 
     // actual amounts
     private Money advanceAmount = Money.zero();
-    private Money signingAmount = Money.zero();
-
+    private Money signingBonusAmount = Money.zero();
     private Money transportAmount = Money.zero();
     private Money transitAmount = Money.zero();
     private Money overheadAmount = Money.zero();
@@ -97,7 +109,9 @@ public class AbstractMission {
     private Money baseAmount = Money.zero();
     private Money feeAmount = Money.zero();
 
-    private boolean mrbcFee;
+    private boolean paidMRBCFee;
+    private int mrbcFeePercent = MRBC_FEE_PERCENTAGE;
+    private int sharesPercent = DEFAULT_SHARES_PERCENT;
     private int advancePercent;
     private int signingBonus;
 
@@ -108,6 +122,7 @@ public class AbstractMission {
     private final List<Scenario> scenarios = new ArrayList<>();
 
     public final static int MRBC_FEE_PERCENTAGE = 5;
+    public final static int DEFAULT_SHARES_PERCENT = 30;
 
     public final static int OH_NONE = 0;
     public final static int OH_HALF = 1;
@@ -165,6 +180,30 @@ public class AbstractMission {
         return getSystem().getName(when);
     }
 
+    public @Nullable JumpPath getCachedJumpPath() {
+        return cachedJumpPath;
+    }
+
+    public void setCachedJumpPath(JumpPath cachedJumpPath) {
+        this.cachedJumpPath = cachedJumpPath;
+    }
+
+    /**
+     * Gets the currently calculated jump path for this contract, only recalculating if it's not valid any longer or
+     * hasn't been calculated yet.
+     */
+    public @Nullable JumpPath getJumpPath(Campaign campaign) {
+        // if we don't have a cached jump path, or if the jump path's starting/ending point no longer match the
+        // campaign's current location or contract's destination
+        if ((getCachedJumpPath() == null) || getCachedJumpPath().isEmpty()
+                  || !getCachedJumpPath().getFirstSystem().equals(campaign.getCurrentSystem())
+                  || !getCachedJumpPath().getLastSystem().equals(getSystem())) {
+            setCachedJumpPath(campaign.calculateJumpPath(campaign.getCurrentSystem(), getSystem()));
+        }
+
+        return getCachedJumpPath();
+    }
+
     public MissionStatus getStatus() {
         return status;
     }
@@ -192,6 +231,67 @@ public class AbstractMission {
 
     public void setLengthInMonths(int lengthInMonths) {
         this.lengthInMonths = lengthInMonths;
+    }
+
+    /**
+     * Calculates the number of days required for travel based on the current campaign state.
+     *
+     * <p>This method determines if a valid destination system is set, computes if the command circuit should be used,
+     * retrieves the jump path, and totals the travel time (including recharge, start, and end times). The result is
+     * rounded to two decimal places and then to the nearest whole day.</p>
+     *
+     * @param campaign the {@link Campaign} instance containing context such as date, location, and command circuit
+     *                 options
+     *
+     * @return the total number of travel days required; returns 0 if there is no valid system to travel to
+     */
+    public int getTravelDays(Campaign campaign) {
+        if (null != this.getSystem()) {
+            boolean isUseCommandCircuit =
+                  FactionStandingUtilities.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(),
+                        campaign.isGM(),
+                        campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
+                        campaign.getFactionStandings(), campaign.getFutureAtBContracts());
+
+            JumpPath jumpPath = getJumpPath(campaign);
+            if (jumpPath == null) {
+                return 0;
+            }
+
+            double days = Math.round(jumpPath.getTotalTime(campaign.getLocalDate(),
+                  campaign.getCurrentLocation().getTransitTime(), isUseCommandCircuit) * 100.0)
+                                / 100.0;
+            return (int) ceil(days);
+        }
+        return 0;
+    }
+
+    /**
+     * @param campaign campaign loaded
+     *
+     * @return the approximate number of months for a 2-way trip + deployment, rounded up
+     */
+    public int getLengthPlusTravel(Campaign campaign) {
+        int travelMonths = (int) ceil(2 * getTravelDays(campaign) / 30.0);
+        return getLengthInMonths() + travelMonths;
+    }
+
+    /**
+     * Get the number of months left in this contract after the given date. Partial months are counted as full months.
+     *
+     * @param date the date to use in the calculation
+     *
+     * @return the number of months left
+     */
+    public int getMonthsLeft(LocalDate date) {
+        int monthsLeft = Math.toIntExact(ChronoUnit.MONTHS.between(date, getEndingDate()));
+        // Ensure partial months are counted based on the current day of the month, as
+        // the above only
+        // counts full months
+        if (date.getDayOfMonth() != getEndingDate().getDayOfMonth()) {
+            monthsLeft++;
+        }
+        return monthsLeft;
     }
 
     public LocalDate getEndingDate() {
@@ -228,7 +328,6 @@ public class AbstractMission {
     public void setEmployer(String employer) {
         this.employer = employer;
     }
-
 
     public String getDescription() {
         return description;
@@ -404,14 +503,6 @@ public class AbstractMission {
         };
     }
 
-    public LocalDate getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
-    }
-
     public Money getSalvagedByUnit() {
         return salvagedByUnit;
     }
@@ -491,11 +582,11 @@ public class AbstractMission {
     }
 
     public Money getSigningBonusAmount() {
-        return signingAmount;
+        return signingBonusAmount;
     }
 
-    public void setSigningBonusAmount(Money signingAmount) {
-        this.signingAmount = signingAmount;
+    public void setSigningBonusAmount(Money signingBonusAmount) {
+        this.signingBonusAmount = signingBonusAmount;
     }
 
     public Money getTransportAmount() {
@@ -538,24 +629,33 @@ public class AbstractMission {
         this.feeAmount = feeAmount;
     }
 
-    public boolean isMrbcFee() {
-        return mrbcFee;
+    public boolean isPaidMRBCFee() {
+        return paidMRBCFee;
     }
 
-    public void setMrbcFee(boolean mrbcFee) {
-        this.mrbcFee = mrbcFee;
-    }
-
-    public boolean isMRBCFee() {
-        return mrbcFee;
-    }
-
-    public void setMRBCFee(boolean mrbcFee) {
-        this.mrbcFee = mrbcFee;
+    public void setPaidMRBCFee(boolean paidMRBCFee) {
+        this.paidMRBCFee = paidMRBCFee;
     }
 
     public int getMRBCFeePercentage() {
-        return MRBC_FEE_PERCENTAGE;
+        return mrbcFeePercent;
+    }
+
+    public void setMRBCFeePercentage(int mrbcFeePercent) {
+        this.mrbcFeePercent = mrbcFeePercent;
+    }
+
+    /**
+     * Retrieves the percentage of shares for this contract. This currently returns a default value of 30.
+     *
+     * @return the percentage of shares
+     */
+    public int getSharesPercent() {
+        return sharesPercent;
+    }
+
+    public void setSharesPercent(int sharesPercent) {
+        this.sharesPercent = sharesPercent;
     }
 
     public int getAdvancePercent() {
@@ -588,6 +688,198 @@ public class AbstractMission {
                      .plus(getOverheadAmount())
                      .plus(getTransportAmount())
                      .plus(getTransitAmount());
+    }
+
+    public Money getMonthlyPayOut() {
+        if (getLengthInMonths() <= 0) {
+            return Money.zero();
+        }
+
+        return getTotalAmountPlusFeesAndBonuses()
+                     .minus(getTotalAdvanceAmount())
+                     .dividedBy(getLengthInMonths());
+    }
+
+    /**
+     * @param campaign campaign loaded
+     *
+     * @return the cumulative sum the estimated monthly incomes - expenses
+     */
+    public Money getTotalMonthlyPayOut(Campaign campaign) {
+        return getMonthlyPayOut()
+                     .multipliedBy(getLengthInMonths())
+                     .minus(getTotalEstimatedOverheadExpenses(campaign))
+                     .minus(getTotalEstimatedMaintenanceExpenses(campaign))
+                     .minus(getTotalEstimatedPayrollExpenses(campaign));
+    }
+
+    /**
+     * @param campaign campaign loaded
+     *
+     * @return the cumulative sum of estimated overhead expenses for the duration of travel + deployment
+     */
+    public Money getTotalEstimatedOverheadExpenses(Campaign campaign) {
+        return campaign.getAccountant().getOverheadExpenses().multipliedBy(getLengthPlusTravel(campaign));
+    }
+
+    /**
+     * @param campaign campaign loaded
+     *
+     * @return the cumulative sum of estimated maintenance expenses for the duration of travel + deployment
+     */
+    public Money getTotalEstimatedMaintenanceExpenses(Campaign campaign) {
+        return campaign.getAccountant().getMaintenanceCosts().multipliedBy(getLengthPlusTravel(campaign));
+    }
+
+    /**
+     * @param campaign campaign loaded
+     *
+     * @return the estimated payroll expenses for one month
+     */
+    public Money getEstimatedPayrollExpenses(Campaign campaign) {
+        Accountant accountant = campaign.getAccountant();
+        if (campaign.getCampaignOptions().isUsePeacetimeCost()) {
+            return accountant.getPeacetimeCost();
+        } else {
+            return accountant.getPayRoll();
+        }
+    }
+
+    /**
+     * @param campaign campaign loaded
+     *
+     * @return the cumulative sum of estimated payroll expenses for the duration of travel + deployment
+     */
+    public Money getTotalEstimatedPayrollExpenses(Campaign campaign) {
+        return getEstimatedPayrollExpenses(campaign).multipliedBy(getLengthPlusTravel(campaign));
+    }
+
+    /**
+     * @param campaign campaign loaded
+     *
+     * @return the total (2-way) estimated transportation fee from the player's current location to this contract's
+     *       planet
+     */
+    public Money getTotalTransportationFees(Campaign campaign) {
+        if ((null != getSystem()) && campaign.getCampaignOptions().isPayForTransport()) {
+            return getTransportCost(campaign, false);
+        }
+
+        return Money.zero();
+    }
+
+    /**
+     * Calculates the employer's transport reimbursement based on the contract's transport compensation percentage.
+     *
+     * <p>This represents the amount the employer pays toward your transport costs. For example, if transport
+     * compensation is 50% and the full transport cost is 1,000,000 C-bills, the employer reimburses you 500,000.</p>
+     *
+     * @param campaign the current {@link Campaign} used for transport cost calculation
+     *
+     * @return the {@link Money} amount the employer reimburses for transport
+     */
+    public Money getEmployerTransportReimbursement(Campaign campaign) {
+        if ((null == getSystem()) || !campaign.getCampaignOptions().isPayForTransport()) {
+            return Money.zero();
+        }
+
+        Money fullTransportCost = getTransportCost(campaign, false);
+        return fullTransportCost.multipliedBy(getTransportCompensation() / 100.0);
+    }
+
+    /**
+     * Calculates the player's out-of-pocket transport cost after the employer's reimbursement.
+     *
+     * <p>This is the full transport cost minus the employer's reimbursement. For example, if transport compensation
+     * is 50% and the full transport cost is 1,000,000 C-bills, the player pays 500,000.</p>
+     *
+     * @param campaign the current {@link Campaign} used for transport cost calculation
+     *
+     * @return the {@link Money} amount the player pays for transport after employer reimbursement
+     */
+    public Money getPlayerTransportCost(Campaign campaign) {
+        if ((null == getSystem()) || !campaign.getCampaignOptions().isPayForTransport()) {
+            return Money.zero();
+        }
+
+        Money fullTransportCost = getTransportCost(campaign, false);
+        Money employerReimbursement = getEmployerTransportReimbursement(campaign);
+        return fullTransportCost.minus(employerReimbursement);
+    }
+
+    /**
+     * Calculates the total transport cost for this contract based on the campaign's transport settings and the
+     * contract's jump path.
+     *
+     * <p>The calculation considers the following factors:</p>
+     * <ul>
+     *   <li>The jump path duration, including any command circuit adjustments</li>
+     *   <li>The campaign's transport cost tables (using the Regular experience level)</li>
+     *   <li>Whether the employer pays for a round trip (two-way pay)</li>
+     *   <li>Whether transport compensation should be applied to reduce the final cost</li>
+     * </ul>
+     * <p>When {@code includeTransportCompensation} is true, the method calculates the employer's compensation
+     * percentage and subtracts it from the final transport cost.</p>
+     *
+     * @param campaign                     the current {@link Campaign} used for jump path, transport options, and cost
+     *                                     calculation
+     * @param includeTransportCompensation whether to apply the contract's transport compensation percentage to reduce
+     *                                     the cost
+     *
+     * @return the total {@link Money} required for transport, after applying all applicable modifiers
+     */
+    private Money getTransportCost(Campaign campaign, boolean includeTransportCompensation) {
+        JumpPath jumpPath = getJumpPath(campaign);
+        if (jumpPath == null) {
+            return Money.zero();
+        }
+
+        TransportCostCalculations transportCostCalculations = campaign.getTransportCostCalculation(EXP_REGULAR);
+        boolean useTwoWayPay = campaign.getCampaignOptions().isUseTwoWayPay();
+        boolean isUseCommandCircuits = campaign.isUseCommandCircuitForContract(this);
+        int duration = (int) ceil(jumpPath.getTotalTime(campaign.getLocalDate(),
+              campaign.getCurrentLocation().getTransitTime(), isUseCommandCircuits));
+        Money transportCost = transportCostCalculations.calculateJumpCostForEntireJourney(duration,
+              jumpPath.getJumps());
+
+        // Is the employer paying for both ways?
+        transportCost = transportCost.multipliedBy(useTwoWayPay ? 2 : 1);
+
+        if (includeTransportCompensation) {
+            Money transportCompensation = transportCost.multipliedBy(getTransportCompensation() / 100.0);
+            transportCost = transportCost.minus(transportCompensation);
+        }
+
+        return transportCost;
+    }
+
+    /**
+     * Get the estimated total profit for this contract. The total profit is the total contract payment including fees
+     * and bonuses, minus overhead, maintenance, payroll, spare parts, and other monthly expenses. The duration used for
+     * monthly expenses is the contract duration plus the travel time from the unit's current world to the contract
+     * world and back.
+     *
+     * <p>Transport costs are handled as follows: the employer's transport reimbursement is included in the contract
+     * income (via {@link #getTotalAmount()}), and the full transport cost is subtracted here. The net effect is that
+     * profit is reduced by the player's out-of-pocket transport cost (full cost minus employer reimbursement).</p>
+     *
+     * @param campaign The campaign with which this contract is associated.
+     *
+     * @return The estimated profit in the current default currency.
+     */
+    public Money getEstimatedTotalProfit(Campaign campaign) {
+        return getTotalAdvanceAmount()
+                     .plus(getTotalMonthlyPayOut(campaign))
+                     .minus(getTotalTransportationFees(campaign));
+    }
+
+    /**
+     * Only do this at the time the contract is set up, otherwise amounts may change after the ink is signed, which is a
+     * no-no.
+     *
+     * @param campaign current campaign
+     */
+    public void calculateContract(Campaign campaign) {
     }
 
     public int getHospitalBedsRented() {
@@ -649,6 +941,13 @@ public class AbstractMission {
         LOGGER.error(error);
 
         return new AbstractMission();
+    }
+
+    /**
+     * Calculations to be performed once the contract has been accepted.
+     */
+    public void acceptContract(Campaign campaign) {
+
     }
 
     @Override

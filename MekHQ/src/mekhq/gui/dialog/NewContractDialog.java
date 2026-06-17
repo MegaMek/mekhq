@@ -392,7 +392,7 @@ public class NewContractDialog extends JDialog {
         btnDate.addActionListener(evt -> changeStartDate());
 
         checkMRBC = new JCheckBox(resourceMap.getString("checkMRBC.text"));
-        checkMRBC.setSelected(contract.isMRBCFee());
+        checkMRBC.setSelected(contract.isPaidMRBCFee());
         checkMRBC.addItemListener(contractUpdateItemListener);
 
         checkSalvageExchange = new JCheckBox(resourceMap.getString("checkSalvageExchange.text"));
@@ -785,7 +785,7 @@ public class NewContractDialog extends JDialog {
         } else if (choiceCommand.equals(source)) {
             contract.setCommandRights(choiceCommand.getSelectedItem());
         } else if (checkMRBC.equals(source)) {
-            contract.setMRBCFee(checkMRBC.isSelected());
+            contract.setPaidMRBCFee(checkMRBC.isSelected());
         } else if (checkSalvageExchange.equals(source)) {
             contract.setSalvageExchange(checkSalvageExchange.isSelected());
         } else if (spnLength.equals(source)) {

@@ -1705,7 +1705,7 @@ public class AtBContract extends Contract {
         setSalvagedByEmployer(contract.getSalvagedByEmployer());
         setSigningBonus(contract.getSigningBonus());
         setAdvancePercent(contract.getAdvancePercent());
-        setMRBCFee(contract.isMRBCFee());
+        setPaidMRBCFee(contract.isPaidMRBCFee());
         setAdvanceAmount(contract.getAdvanceAmount());
         setFeeAmount(contract.getFeeAmount());
         setBaseAmount(contract.getBaseAmount());

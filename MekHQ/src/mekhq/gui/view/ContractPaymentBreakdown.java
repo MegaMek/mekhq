@@ -170,7 +170,7 @@ public class ContractPaymentBreakdown {
         mainPanel.add(lblTransportAmount2, gridBagConstraintsText);
 
         JLabel lblFeeAmount1;
-        if (contract.isMRBCFee()) {
+        if (contract.isPaidMRBCFee()) {
             lblFeeAmount1 = new JLabel(indentation + resourceMap.getString("lblFeeAmount1.text")
                                              + " (-" + contract.getMRBCFeePercentage() + "% "
                                              + resourceMap.getString("lblOfGrossIncome.text") + ")");

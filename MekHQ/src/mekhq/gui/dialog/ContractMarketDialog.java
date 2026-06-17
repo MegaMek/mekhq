@@ -211,7 +211,7 @@ public class ContractMarketDialog extends JDialog {
         chkMRBC.addItemListener(evt -> {
             payMRBC = chkMRBC.isSelected();
             for (Contract c : contractMarket.getContracts()) {
-                c.setMRBCFee(payMRBC);
+                c.setPaidMRBCFee(payMRBC);
                 c.calculateContract(campaign);
             }
             if (contractView != null) {
@@ -323,7 +323,7 @@ public class ContractMarketDialog extends JDialog {
                 }
             }
             contract.setStartDate(null);
-            contract.setMRBCFee(payMRBC);
+            contract.setPaidMRBCFee(payMRBC);
             contract.setAdvancePercent(advance);
             contract.setSigningBonus(signingBonus);
             contract.calculateContract(campaign);
@@ -508,7 +508,7 @@ public class ContractMarketDialog extends JDialog {
                                                (Integer) spnSharePct.getValue() :
                                                0);
             contract.setStartDate(null);
-            contract.setMRBCFee(payMRBC);
+            contract.setPaidMRBCFee(payMRBC);
             contract.setAdvancePercent(advance);
             contract.setSigningBonus(signingBonus);
 
