@@ -575,7 +575,7 @@ public class PartsReportDialog extends JDialog {
 
     private Set<PartInUse> getPartsInUseFromTable() {
         Set<PartInUse> partsInUse = new HashSet<>();
-        for (int row = 0; row < overviewPartsInUseTable.getRowCount(); row++) {
+        for (int row = 0; row < overviewPartsModel.getRowCount(); row++) {
             partsInUse.add(overviewPartsModel.getPartInUse(row));
         }
         return partsInUse;
@@ -623,7 +623,7 @@ public class PartsReportDialog extends JDialog {
             stockMap.clear();
         }
 
-        for (int row = 0; row < overviewPartsInUseTable.getRowCount(); row++) {
+        for (int row = 0; row < overviewPartsModel.getRowCount(); row++) {
             PartInUse partInUse = overviewPartsModel.getPartInUse(row);
             stockMap.put(PartsInUseManager.getStockKey(partInUse), partInUse.getRequestedStock());
         }
