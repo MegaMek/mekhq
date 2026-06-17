@@ -111,7 +111,7 @@ public class AbstractMission {
 
     private LocalDate startDate;
     private LocalDate endingDate;
-    private int lengthInMonths;
+    private int lengthInMonths = 1;
 
     private String employerCode = "IND";
     private String employerName = "Independent";

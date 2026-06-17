@@ -69,13 +69,6 @@ public class Mission extends AbstractMission {
     // endregion Constructors
 
     @Override
-    public int getLengthInMonths() {
-        // Missions don't have durations, so we treat it as always being 1 month long. This only really matters for
-        // faction standing.
-        return 1;
-    }
-
-    @Override
     public void writeToXML(Campaign campaign, final PrintWriter pw, int indent) {
         indent = writeToXMLBegin(campaign, pw, indent);
         writeToXMLEnd(pw, indent);
