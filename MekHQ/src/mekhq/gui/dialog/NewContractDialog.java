@@ -407,7 +407,7 @@ public class NewContractDialog extends JDialog {
 
         DefaultComboBoxModel<String> overheadModel = new DefaultComboBoxModel<>();
         for (int i = 0; i < Contract.OH_NUM; i++) {
-            overheadModel.addElement(Contract.getOverheadCompName(i));
+            overheadModel.addElement(Contract.getOverheadCompensationName(i));
         }
         choiceOverhead = new JComboBox<>(overheadModel);
         choiceOverhead.setSelectedIndex(contract.getOverheadCompensation());

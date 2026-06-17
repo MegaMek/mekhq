@@ -358,7 +358,7 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsLabels.gridy = ++y;
         mainPanel.add(lblOverhead, gridBagConstraintsLabels);
 
-        JLabel txtOverhead = new JLabel(Contract.getOverheadCompName(contract.getOverheadCompensation()));
+        JLabel txtOverhead = new JLabel(Contract.getOverheadCompensationName(contract.getOverheadCompensation()));
         txtOverhead.setName("txtOverhead");
         gridBagConstraintsText.gridy = y;
         mainPanel.add(txtOverhead, gridBagConstraintsText);

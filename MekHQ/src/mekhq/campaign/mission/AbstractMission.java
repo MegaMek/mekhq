@@ -35,6 +35,7 @@ package mekhq.campaign.mission;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.io.PrintWriter;
+import java.math.RoundingMode;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -44,6 +45,7 @@ import java.util.stream.Collectors;
 import megamek.Version;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.unit.Unit;
@@ -80,6 +82,21 @@ public class AbstractMission {
     private boolean salvageExchange;
     private int transportCompensation;
 
+    // need to keep track of total value salvaged for salvage rights
+    private Money salvagedByUnit = Money.zero();
+    private Money salvagedByEmployer = Money.zero();
+
+    // actual amounts
+    private Money advanceAmount = Money.zero();
+    private Money signingAmount = Money.zero();
+
+    private Money transportAmount = Money.zero();
+    private Money transitAmount = Money.zero();
+    private Money overheadAmount = Money.zero();
+    private Money supportAmount = Money.zero();
+    private Money baseAmount = Money.zero();
+    private Money feeAmount = Money.zero();
+
     private boolean mrbcFee;
     private int advancePercent;
     private int signingBonus;
@@ -91,6 +108,11 @@ public class AbstractMission {
     private final List<Scenario> scenarios = new ArrayList<>();
 
     public final static int MRBC_FEE_PERCENTAGE = 5;
+
+    public final static int OH_NONE = 0;
+    public final static int OH_HALF = 1;
+    public final static int OH_FULL = 2;
+    public final static int OH_NUM = 3;
 
     public AbstractMission() {}
 
@@ -365,6 +387,165 @@ public class AbstractMission {
         return getTransportCompensation() + "%";
     }
 
+    public Money getOverheadAmount() {
+        return overheadAmount;
+    }
+
+    public void setOverheadAmount(Money overheadAmount) {
+        this.overheadAmount = overheadAmount;
+    }
+
+    public static String getOverheadCompensationName(int i) {
+        return switch (i) {
+            case OH_NONE -> "None";
+            case OH_HALF -> "Half";
+            case OH_FULL -> "Full";
+            default -> "?";
+        };
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
+    public Money getSalvagedByUnit() {
+        return salvagedByUnit;
+    }
+
+    public void setSalvagedByUnit(Money salvagedByUnit) {
+        this.salvagedByUnit = salvagedByUnit;
+    }
+
+    public void addSalvageByUnit(Money money) {
+        salvagedByUnit = salvagedByUnit.plus(money);
+    }
+
+    public void subtractSalvageByUnit(Money money) {
+        salvagedByUnit = salvagedByUnit.minus(money);
+    }
+
+    public Money getSalvagedByEmployer() {
+        return salvagedByEmployer;
+    }
+
+    public void setSalvagedByEmployer(Money salvagedByEmployer) {
+        this.salvagedByEmployer = salvagedByEmployer;
+    }
+
+    public void addSalvageByEmployer(Money money) {
+        salvagedByEmployer = salvagedByEmployer.plus(money);
+    }
+
+    /**
+     * Computes the player's share of the total salvage value as an integer percentage, using
+     * {@link RoundingMode#CEILING} (i.e. any fractional percentage rounds up to the next whole percent).
+     *
+     * <p>Rounding up is intentional from a gameplay standpoint: the percentage is compared against the contract's
+     * salvage cap, and a true value of e.g. 50.001% against a 50% cap is a breach and must be surfaced as such. It also
+     * fixes the truncation artifacts that previously could cause the displayed value to shift by a full percentage
+     * point after a small change to the salvage assignment (see issue #5683).</p>
+     *
+     * @param playerShare   the salvage value assigned to the player (mercs)
+     * @param employerShare the salvage value assigned to the employer
+     *
+     * @return integer percentage in the range {@code [0, 100]}, or {@code 0} if there is no salvage to split
+     */
+    public static int calculateSalvagePercentage(Money playerShare, Money employerShare) {
+        Money total = playerShare.plus(employerShare);
+        if (!total.isPositive()) {
+            return 0;
+        }
+        return playerShare.multipliedBy(100)
+                     .getAmount()
+                     .divide(total.getAmount(), 0, RoundingMode.CEILING)
+                     .intValue();
+    }
+
+
+    /**
+     * Convenience overload that computes the current salvage percentage from the values stored on this contract.
+     *
+     * @return integer percentage in the range {@code [0, 100]}, or {@code 0} if there is no salvage to split
+     */
+    public int getCurrentSalvagePct() {
+        return calculateSalvagePercentage(getSalvagedByUnit(), getSalvagedByEmployer());
+    }
+
+    public Money getAdvanceAmount() {
+        return advanceAmount;
+    }
+
+    public void setAdvanceAmount(Money advanceAmount) {
+        this.advanceAmount = advanceAmount;
+    }
+
+    /**
+     * @return total amount that will be paid on contract acceptance.
+     */
+    public Money getTotalAdvanceAmount() {
+        return advanceAmount.plus(getSigningBonusAmount());
+    }
+
+    public Money getSigningBonusAmount() {
+        return signingAmount;
+    }
+
+    public void setSigningBonusAmount(Money signingAmount) {
+        this.signingAmount = signingAmount;
+    }
+
+    public Money getTransportAmount() {
+        return transportAmount;
+    }
+
+    public void setTransportAmount(Money transportAmount) {
+        this.transportAmount = transportAmount;
+    }
+
+    public Money getTransitAmount() {
+        return transitAmount;
+    }
+
+    public void setTransitAmount(Money transitAmount) {
+        this.transitAmount = transitAmount;
+    }
+
+    public Money getSupportAmount() {
+        return supportAmount;
+    }
+
+    public void setSupportAmount(Money supportAmount) {
+        this.supportAmount = supportAmount;
+    }
+
+    public Money getBaseAmount() {
+        return baseAmount;
+    }
+
+    public void setBaseAmount(Money baseAmount) {
+        this.baseAmount = baseAmount;
+    }
+
+    public Money getFeeAmount() {
+        return feeAmount;
+    }
+
+    public void setFeeAmount(Money feeAmount) {
+        this.feeAmount = feeAmount;
+    }
+
+    public boolean isMrbcFee() {
+        return mrbcFee;
+    }
+
+    public void setMrbcFee(boolean mrbcFee) {
+        this.mrbcFee = mrbcFee;
+    }
+
     public boolean isMRBCFee() {
         return mrbcFee;
     }
@@ -391,6 +572,22 @@ public class AbstractMission {
 
     public void setSigningBonus(int signingBonus) {
         this.signingBonus = signingBonus;
+    }
+
+    public Money getTotalAmountPlusFeesAndBonuses() {
+        return getTotalAmountPlusFees().plus(getSigningBonusAmount());
+    }
+
+    public Money getTotalAmountPlusFees() {
+        return getTotalAmount().minus(getFeeAmount());
+    }
+
+    public Money getTotalAmount() {
+        return getBaseAmount()
+                     .plus(getSupportAmount())
+                     .plus(getOverheadAmount())
+                     .plus(getTransportAmount())
+                     .plus(getTransitAmount());
     }
 
     public int getHospitalBedsRented() {

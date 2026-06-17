@@ -64,11 +64,6 @@ import org.w3c.dom.NodeList;
 public class Contract extends Mission {
     private static final MMLogger logger = MMLogger.create(Contract.class);
 
-    public final static int OH_NONE = 0;
-    public final static int OH_HALF = 1;
-    public final static int OH_FULL = 2;
-    public final static int OH_NUM = 3;
-
     // this is a transient variable meant to keep track of a single jump path while
     // the contract
     // runs through initial calculations, as the same jump path is referenced
@@ -76,20 +71,6 @@ public class Contract extends Mission {
     // and calculating it each time is expensive. No need to preserve it in save
     // date.
     private transient JumpPath cachedJumpPath;
-
-    // need to keep track of total value salvaged for salvage rights
-    private Money salvagedByUnit = Money.zero();
-    private Money salvagedByEmployer = Money.zero();
-
-    // actual amounts
-    private Money advanceAmount = Money.zero();
-    private Money signingAmount = Money.zero();
-    private Money transportAmount = Money.zero();
-    private Money transitAmount = Money.zero();
-    private Money overheadAmount = Money.zero();
-    private Money supportAmount = Money.zero();
-    private Money baseAmount = Money.zero();
-    private Money feeAmount = Money.zero();
 
     public Contract() {
         this(null, null);
@@ -114,166 +95,6 @@ public class Contract extends Mission {
         setHospitalBedsRented(0);
         setKitchensRented(0);
         setHoldingCellsRented(0);
-    }
-
-    public static String getOverheadCompName(int i) {
-        return switch (i) {
-            case OH_NONE -> "None";
-            case OH_HALF -> "Half";
-            case OH_FULL -> "Full";
-            default -> "?";
-        };
-    }
-
-
-    public Money getSalvagedByUnit() {
-        return salvagedByUnit;
-    }
-
-    public void setSalvagedByUnit(Money l) {
-        this.salvagedByUnit = l;
-    }
-
-    public void addSalvageByUnit(Money l) {
-        salvagedByUnit = salvagedByUnit.plus(l);
-    }
-
-    public void subtractSalvageByUnit(Money money) {
-        salvagedByUnit = salvagedByUnit.minus(money);
-    }
-
-    public Money getSalvagedByEmployer() {
-        return salvagedByEmployer;
-    }
-
-    public void setSalvagedByEmployer(Money l) {
-        this.salvagedByEmployer = l;
-    }
-
-    public void addSalvageByEmployer(Money l) {
-        salvagedByEmployer = salvagedByEmployer.plus(l);
-    }
-
-    /**
-     * Computes the player's share of the total salvage value as an integer percentage, using
-     * {@link java.math.RoundingMode#CEILING} (i.e. any fractional percentage rounds up to the next whole percent).
-     *
-     * <p>Rounding up is intentional from a gameplay standpoint: the percentage is compared against the contract's
-     * salvage cap, and a true value of e.g. 50.001% against a 50% cap is a breach and must be surfaced as such. It also
-     * fixes the truncation artifacts that previously could cause the displayed value to shift by a full percentage
-     * point after a small change to the salvage assignment (see issue #5683).</p>
-     *
-     * @param playerShare   the salvage value assigned to the player (mercs)
-     * @param employerShare the salvage value assigned to the employer
-     *
-     * @return integer percentage in the range {@code [0, 100]}, or {@code 0} if there is no salvage to split
-     */
-    public static int calculateSalvagePercentage(Money playerShare, Money employerShare) {
-        Money total = playerShare.plus(employerShare);
-        if (!total.isPositive()) {
-            return 0;
-        }
-        return playerShare.multipliedBy(100)
-                     .getAmount()
-                     .divide(total.getAmount(), 0, java.math.RoundingMode.CEILING)
-                     .intValue();
-    }
-
-    /**
-     * Convenience overload that computes the current salvage percentage from the values stored on this contract.
-     *
-     * @return integer percentage in the range {@code [0, 100]}, or {@code 0} if there is no salvage to split
-     */
-    public int getCurrentSalvagePct() {
-        return calculateSalvagePercentage(getSalvagedByUnit(), getSalvagedByEmployer());
-    }
-
-    public Money getTotalAmountPlusFeesAndBonuses() {
-        return getTotalAmountPlusFees().plus(signingAmount);
-    }
-
-    public Money getTotalAmountPlusFees() {
-        return getTotalAmount().minus(feeAmount);
-    }
-
-    public Money getTotalAmount() {
-        return baseAmount
-                     .plus(supportAmount)
-                     .plus(overheadAmount)
-                     .plus(transportAmount)
-                     .plus(transitAmount);
-    }
-
-    public Money getAdvanceAmount() {
-        return advanceAmount;
-    }
-
-    /**
-     * @return total amount that will be paid on contract acceptance.
-     */
-    public Money getTotalAdvanceAmount() {
-        return advanceAmount.plus(signingAmount);
-    }
-
-    protected void setAdvanceAmount(Money amount) {
-        advanceAmount = amount;
-    }
-
-    public Money getFeeAmount() {
-        return feeAmount;
-    }
-
-    protected void setFeeAmount(Money amount) {
-        feeAmount = amount;
-    }
-
-    public Money getBaseAmount() {
-        return baseAmount;
-    }
-
-    public void setBaseAmount(Money amount) {
-        baseAmount = amount;
-    }
-
-    public Money getOverheadAmount() {
-        return overheadAmount;
-    }
-
-    protected void setOverheadAmount(Money amount) {
-        overheadAmount = amount;
-    }
-
-    public Money getSupportAmount() {
-        return supportAmount;
-    }
-
-    protected void setSupportAmount(Money amount) {
-        supportAmount = amount;
-    }
-
-    public Money getTransitAmount() {
-        return transitAmount;
-    }
-
-    @Deprecated(since = "0.51.0", forRemoval = true)
-    public void setTransitAmount(Money amount) {
-        transitAmount = amount;
-    }
-
-    public Money getTransportAmount() {
-        return transportAmount;
-    }
-
-    protected void setTransportAmount(Money amount) {
-        transportAmount = amount;
-    }
-
-    public Money getSigningBonusAmount() {
-        return signingAmount;
-    }
-
-    protected void setSigningBonusAmount(Money amount) {
-        signingAmount = amount;
     }
 
     @Override
@@ -524,46 +345,46 @@ public class Contract extends Mission {
         Accountant accountant = campaign.getAccountant();
 
         // calculate base amount
-        baseAmount = accountant.getContractBase()
-                           .multipliedBy(getLengthInMonths())
-                           .multipliedBy(getPaymentMultiplier());
+        setBaseAmount(accountant.getContractBase()
+                            .multipliedBy(getLengthInMonths())
+                            .multipliedBy(getPaymentMultiplier()));
 
         // calculate overhead
         switch (getOverheadCompensation()) {
             case OH_HALF:
-                overheadAmount = accountant.getOverheadExpenses()
-                                       .multipliedBy(getLengthInMonths())
-                                       .multipliedBy(0.5);
+                setOverheadAmount(accountant.getOverheadExpenses()
+                                        .multipliedBy(getLengthInMonths())
+                                        .multipliedBy(0.5));
                 break;
             case OH_FULL:
-                overheadAmount = accountant.getOverheadExpenses().multipliedBy(getLengthInMonths());
+                setOverheadAmount(accountant.getOverheadExpenses().multipliedBy(getLengthInMonths()));
                 break;
             default:
-                overheadAmount = Money.zero();
+                setOverheadAmount(Money.zero());
         }
 
         // calculate support amount
         if (campaign.getCampaignOptions().isUsePeacetimeCost()) {
-            supportAmount = accountant.getPeacetimeCost()
-                                  .multipliedBy(getLengthInMonths())
-                                  .multipliedBy(getStraightSupport())
-                                  .dividedBy(100);
+            setSupportAmount(accountant.getPeacetimeCost()
+                                   .multipliedBy(getLengthInMonths())
+                                   .multipliedBy(getStraightSupport())
+                                   .dividedBy(100));
         } else {
             Money maintCosts = campaign.getAllHangar().getUnitCosts(u -> !u.isConventionalInfantry(),
                   Unit::getWeeklyMaintenanceCost);
             maintCosts = maintCosts.multipliedBy(4);
-            supportAmount = maintCosts
-                                  .multipliedBy(getLengthInMonths())
-                                  .multipliedBy(getStraightSupport())
-                                  .dividedBy(100);
+            setSupportAmount(maintCosts
+                                   .multipliedBy(getLengthInMonths())
+                                   .multipliedBy(getStraightSupport())
+                                   .dividedBy(100));
         }
 
         // calculate employer's transport reimbursement (this is income - what they pay you toward transport)
         // The full transport cost will be subtracted in getEstimatedTotalProfit()
         if (null != getSystem() && campaign.getCampaignOptions().isPayForTransport()) {
-            transportAmount = getEmployerTransportReimbursement(campaign);
+            setTransportAmount(getEmployerTransportReimbursement(campaign));
         } else {
-            transportAmount = Money.zero();
+            setTransportAmount(Money.zero());
         }
 
         // calculate transit amount for CO
@@ -571,37 +392,38 @@ public class Contract extends Mission {
             // contract base * transport period * reputation * employer modifier
 
             boolean useTwoWayPay = campaign.getCampaignOptions().isUseTwoWayPay();
-            transitAmount = accountant.getContractBase()
-                                  .multipliedBy(((getJumpPath(campaign).getJumps()) * (useTwoWayPay ? 2.0 : 1.0)) / 4.0)
-                                  .multipliedBy(campaign.getAtBUnitRatingMod() * 0.2 + 0.5)
-                                  .multipliedBy(1.2);
+            setTransitAmount(accountant.getContractBase()
+                                   .multipliedBy(((getJumpPath(campaign).getJumps()) * (useTwoWayPay ? 2.0 : 1.0)) /
+                                                       4.0)
+                                   .multipliedBy(campaign.getAtBUnitRatingMod() * 0.2 + 0.5)
+                                   .multipliedBy(1.2));
         } else {
-            transitAmount = Money.zero();
+            setTransitAmount(Money.zero());
         }
 
-        signingAmount = baseAmount
-                              .plus(overheadAmount)
-                              .plus(transportAmount)
-                              .plus(transitAmount)
-                              .plus(supportAmount)
-                              .multipliedBy(getSigningBonus())
-                              .dividedBy(100);
+        setSigningBonusAmount(getBaseAmount()
+                                    .plus(getOverheadAmount())
+                                    .plus(getTransportAmount())
+                                    .plus(getTransitAmount())
+                                    .plus(getSupportAmount())
+                                    .multipliedBy(getSigningBonus())
+                                    .dividedBy(100));
 
         if (isMRBCFee()) {
-            feeAmount = baseAmount
-                              .plus(overheadAmount)
-                              .plus(transportAmount)
-                              .plus(transitAmount)
-                              .plus(supportAmount)
-                              .multipliedBy(getMRBCFeePercentage())
-                              .dividedBy(100);
+            setFeeAmount(getBaseAmount()
+                               .plus(getOverheadAmount())
+                               .plus(getTransportAmount())
+                               .plus(getTransitAmount())
+                               .plus(getSupportAmount())
+                               .multipliedBy(getMRBCFeePercentage())
+                               .dividedBy(100));
         } else {
-            feeAmount = Money.zero();
+            setFeeAmount(Money.zero());
         }
 
-        advanceAmount = getTotalAmountPlusFees()
-                              .multipliedBy(getAdvancePercent())
-                              .dividedBy(100);
+        setAdvanceAmount(getTotalAmountPlusFees()
+                               .multipliedBy(getAdvancePercent())
+                               .dividedBy(100));
 
         // only adjust the start date for travel if the start date is currently null
         boolean adjustStartDate = false;
@@ -700,16 +522,16 @@ public class Contract extends Mission {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hospitalBedsRented", getHospitalBedsRented());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "kitchensRented", getKitchensRented());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "holdingCellsRented", getHoldingCellsRented());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "advanceAmount", advanceAmount);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "signingAmount", signingAmount);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "transportAmount", transportAmount);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "transitAmount", transitAmount);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "overheadAmount", overheadAmount);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "supportAmount", supportAmount);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "baseAmount", baseAmount);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "feeAmount", feeAmount);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvagedByUnit", salvagedByUnit);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvagedByEmployer", salvagedByEmployer);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "advanceAmount", getAdvanceAmount());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "signingAmount", getSigningBonusAmount());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "transportAmount", getTransportAmount());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "transitAmount", getTransitAmount());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "overheadAmount", getOverheadAmount());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "supportAmount", getSupportAmount());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "baseAmount", getBaseAmount());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "feeAmount", getFeeAmount());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvagedByUnit", getSalvagedByUnit());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvagedByEmployer", getSalvagedByEmployer());
         return indent;
     }
 
@@ -759,25 +581,25 @@ public class Contract extends Mission {
                 } else if (wn2.getNodeName().equalsIgnoreCase("mrbcFee")) {
                     setMRBCFee(wn2.getTextContent().trim().equals("true"));
                 } else if (wn2.getNodeName().equalsIgnoreCase("advanceAmount")) {
-                    advanceAmount = Money.fromXmlString(wn2.getTextContent().trim());
+                    setAdvanceAmount(Money.fromXmlString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("signingAmount")) {
-                    signingAmount = Money.fromXmlString(wn2.getTextContent().trim());
+                    setSigningBonusAmount(Money.fromXmlString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("transportAmount")) {
-                    transportAmount = Money.fromXmlString(wn2.getTextContent().trim());
+                    setTransportAmount(Money.fromXmlString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("transitAmount")) {
-                    transitAmount = Money.fromXmlString(wn2.getTextContent().trim());
+                    setTransitAmount(Money.fromXmlString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("overheadAmount")) {
-                    overheadAmount = Money.fromXmlString(wn2.getTextContent().trim());
+                    setOverheadAmount(Money.fromXmlString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("supportAmount")) {
-                    supportAmount = Money.fromXmlString(wn2.getTextContent().trim());
+                    setSupportAmount(Money.fromXmlString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("baseAmount")) {
-                    baseAmount = Money.fromXmlString(wn2.getTextContent().trim());
+                    setBaseAmount(Money.fromXmlString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("feeAmount")) {
-                    feeAmount = Money.fromXmlString(wn2.getTextContent().trim());
+                    setFeeAmount(Money.fromXmlString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("salvagedByUnit")) {
-                    salvagedByUnit = Money.fromXmlString(wn2.getTextContent().trim());
+                    setSalvagedByUnit(Money.fromXmlString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("salvagedByEmployer")) {
-                    salvagedByEmployer = Money.fromXmlString(wn2.getTextContent().trim());
+                    setSalvagedByEmployer(Money.fromXmlString(wn2.getTextContent().trim()));
                 }
             } catch (Exception ex) {
                 logger.error("", ex);
@@ -788,9 +610,9 @@ public class Contract extends Mission {
         // transport cost. Now it stores the employer's transport reimbursement. Recalculate for old saves.
         if (version.isLowerThan(new Version("0.50.12"))) {
             if ((null != getSystem()) && campaign.getCampaignOptions().isPayForTransport()) {
-                transportAmount = getEmployerTransportReimbursement(campaign);
+                setTransportAmount(getEmployerTransportReimbursement(campaign));
             } else {
-                transportAmount = Money.zero();
+                setTransportAmount(Money.zero());
             }
         }
     }
