@@ -57,8 +57,6 @@ import static mekhq.campaign.force.FormationLevel.BATTALION;
 import static mekhq.campaign.force.FormationLevel.COMPANY;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.ADVANCING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.DOMINATING;
-import static mekhq.campaign.mission.enums.AtBMoraleLevel.MAXIMUM_MORALE_LEVEL;
-import static mekhq.campaign.mission.enums.AtBMoraleLevel.MINIMUM_MORALE_LEVEL;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.OVERWHELMING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
 import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.FREE;
@@ -153,10 +151,6 @@ public class AtBContract extends Contract {
 
     protected int extensionLength;
 
-    protected AtBMoraleLevel moraleLevel;
-    protected LocalDate routEnd;
-    private boolean batchallAccepted;
-
     protected int playerMinorBreaches;
     protected int employerMinorBreaches;
     protected int contractScoreArbitraryModifier;
@@ -192,15 +186,6 @@ public class AtBContract extends Contract {
         this(null);
     }
 
-    /**
-     * Sets the end date of the rout. This should only be applied on contracts whose morale equals ROUTED
-     *
-     * @param routEnd the {@code LocalDate} representing the end date of the rout
-     */
-    public void setRoutEndDate(LocalDate routEnd) {
-        this.routEnd = routEnd;
-    }
-
     public AtBContract(String name) {
         setEmployerLiaison(null);
         setClanOpponent(null);
@@ -217,9 +202,9 @@ public class AtBContract extends Contract {
         extensionLength = 0;
 
         setSharesPercent(0);
-        batchallAccepted = true;
+        setBatchallAccepted(true);
         setMoraleLevel(STALEMATE);
-        routEnd = null;
+        setRoutEndDate(null);
         priorLogisticsFailure = false;
         specialEventScenarioDate = null;
         battleTypeMod = 0;
@@ -319,7 +304,7 @@ public class AtBContract extends Contract {
     public void checkMorale(Campaign campaign, LocalDate today) {
 
         // If there is a rout end date, and it's past today, update morale and enemy state accordingly
-        if (routEnd != null) {
+        if (getRoutEndDate() != null) {
             // Check whether any current rout continues beyond its expected date. This is only applicable for
             // Garrison Type contracts. For all other types we reinforce immediately
             boolean routContinue = getContractType().isGarrisonType() && randomInt(4) == 0;
@@ -327,7 +312,7 @@ public class AtBContract extends Contract {
                 return;
             }
 
-            if (today.isAfter(routEnd)) {
+            if (today.isAfter(getRoutEndDate())) {
                 int roll = randomInt(8);
 
                 // We use variable morale levels to spike morale up to a value above Stalemate. This works with the
@@ -353,8 +338,8 @@ public class AtBContract extends Contract {
                     }
                 }
 
-                moraleLevel = newMoraleLevel;
-                routEnd = null;
+                setMoraleLevel(newMoraleLevel);
+                setRoutEndDate(null);
 
                 String key = "routEnded.reinforcements";
                 if (getContractType().isGarrisonDuty() || getContractType().isRetainer()) {
@@ -431,7 +416,7 @@ public class AtBContract extends Contract {
         setEnemyCamouflage(pickRandomCamouflage(today.getYear(), enemyCode));
 
         // Update the Batchall information
-        batchallAccepted = true;
+        setBatchallAccepted(true);
         if (campaign.getCampaignOptions().isUseGenericBattleValue() && enemyFaction.performsBatchalls()) {
             boolean tracksStanding = campaign.getCampaignOptions().isTrackFactionStanding();
             FactionStandings factionStandings = campaign.getFactionStandings();
@@ -447,9 +432,9 @@ public class AtBContract extends Contract {
             if (enemyFaction.performsBatchalls() && allowBatchalls) {
                 PerformBatchall batchallDialog = new PerformBatchall(campaign, getClanOpponent(), enemyCode);
 
-                batchallAccepted = batchallDialog.isBatchallAccepted();
+                setBatchallAccepted(batchallDialog.isBatchallAccepted());
 
-                if (!batchallAccepted && tracksStanding) {
+                if (!isBatchallAccepted() && tracksStanding) {
                     List<String> reports = factionStandings.processRefusedBatchall(campaignFactionCode, enemyCode,
                           today.getYear(), regardMultiplier);
 
@@ -922,18 +907,18 @@ public class AtBContract extends Contract {
 
         // We spike morale to create a jump in contract difficulty - essentially the reason why the employer is using
         // the emergency clause.
-        int moraleOrdinal = moraleLevel.ordinal();
+        int moraleOrdinal = getMoraleLevel().ordinal();
         roll = d6(2) / 2;
 
         // we need to reset routEnd to null otherwise we'll attempt to rally
-        if (routEnd != null) {
-            routEnd = null;
+        if (getRoutEndDate() != null) {
+            setRoutEndDate(null);
         }
 
         moraleOrdinal = min(moraleOrdinal + roll, OVERWHELMING.ordinal());
-        moraleLevel = AtBMoraleLevel.values()[moraleOrdinal];
+        setMoraleLevel(AtBMoraleLevel.values()[moraleOrdinal]);
 
-        campaign.addReport(GENERAL, moraleLevel.getToolTipText());
+        campaign.addReport(GENERAL, getMoraleLevel().getToolTipText());
 
         MekHQ.triggerEvent(new MissionChangedEvent(this));
         return true;
@@ -1001,8 +986,8 @@ public class AtBContract extends Contract {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "requiredCombatElements", getRequiredCombatElements());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "moraleLevel", getMoraleLevel().name());
 
-        if (routEnd != null) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "routEnd", routEnd);
+        if (getRoutEndDate() != null) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "routEnd", getRoutEndDate());
         }
 
         if (routedPayout != null) {
@@ -1012,7 +997,7 @@ public class AtBContract extends Contract {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "partsAvailabilityLevel", getPartsAvailabilityLevel());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "extensionLength", extensionLength);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sharesPct", getSharesPercent());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "batchallAccepted", batchallAccepted);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "batchallAccepted", isBatchallAccepted());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "playerMinorBreaches", playerMinorBreaches);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "employerMinorBreaches", employerMinorBreaches);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractScoreArbitraryModifier", contractScoreArbitraryModifier);
@@ -1102,7 +1087,7 @@ public class AtBContract extends Contract {
                 } else if (item.getNodeName().equalsIgnoreCase("moraleLevel")) {
                     setMoraleLevel(AtBMoraleLevel.parseFromString(item.getTextContent().trim()));
                 } else if (item.getNodeName().equalsIgnoreCase("routEnd")) {
-                    routEnd = MHQXMLUtility.parseDate(item.getTextContent().trim());
+                    setRoutEndDate(MHQXMLUtility.parseDate(item.getTextContent().trim()));
                 } else if (item.getNodeName().equalsIgnoreCase("routedPayout")) {
                     String cleanValue = item.getTextContent().trim().replaceAll("[^0-9.]", "");
                     double value = Double.parseDouble(cleanValue);
@@ -1114,7 +1099,7 @@ public class AtBContract extends Contract {
                 } else if (item.getNodeName().equalsIgnoreCase("sharesPct")) {
                     setSharesPercent(Integer.parseInt(item.getTextContent()));
                 } else if (item.getNodeName().equalsIgnoreCase("batchallAccepted")) {
-                    batchallAccepted = Boolean.parseBoolean(item.getTextContent());
+                    setBatchallAccepted(Boolean.parseBoolean(item.getTextContent()));
                 } else if (item.getNodeName().equalsIgnoreCase("playerMinorBreaches")) {
                     playerMinorBreaches = Integer.parseInt(item.getTextContent());
                 } else if (item.getNodeName().equalsIgnoreCase("employerMinorBreaches")) {
@@ -1212,74 +1197,6 @@ public class AtBContract extends Contract {
 
     public void setDifficulty(int difficulty) {
         this.difficulty = difficulty;
-    }
-
-    public AtBMoraleLevel getMoraleLevel() {
-        return moraleLevel;
-    }
-
-    public void setMoraleLevel(final AtBMoraleLevel moraleLevel) {
-        this.moraleLevel = moraleLevel;
-    }
-
-    /**
-     * Adjusts the current {@link AtBMoraleLevel} by the specified delta and returns the resulting morale level.
-     *
-     * <p>The method computes a new integer morale value by adding the given {@code delta} to the unit's current
-     * morale level, then clamps the result to the valid range defined by {@code MINIMUM_MORALE_LEVEL} and
-     * {@code MAXIMUM_MORALE_LEVEL}. It then attempts to resolve the resulting value to a corresponding
-     * {@link AtBMoraleLevel}.</p>
-     *
-     * <p>If the resolved morale level is valid (i.e., non-{@code null}), the unit's internal morale state is updated.
-     * If no valid enum constant exists for the computed level, the method leaves the current morale unchanged and
-     * returns the existing level.</p>
-     *
-     * <p><b>Note:</b> a positive delta improves the enemy morale, a negative delta decreases enemy morale.</p>
-     *
-     * @param delta the amount to adjust the current morale level by; may be positive or negative
-     *
-     * @return the new {@link AtBMoraleLevel} after applying the delta; if no corresponding morale level exists for the
-     *       computed value, the current morale level is returned unchanged
-     *
-     * @author Illiani
-     * @since 0.50.10
-     */
-    public AtBMoraleLevel changeMoraleLevel(final int delta) {
-        int currentLevel = moraleLevel.getLevel();
-        int newLevel = Math.clamp(currentLevel + delta, MINIMUM_MORALE_LEVEL, MAXIMUM_MORALE_LEVEL);
-
-        AtBMoraleLevel newMoraleLevel = AtBMoraleLevel.parseFromLevel(newLevel);
-        if (newMoraleLevel != null) {
-            moraleLevel = newMoraleLevel;
-        }
-
-        return newMoraleLevel != null ? newMoraleLevel : moraleLevel;
-    }
-
-    public boolean isPeaceful() {
-        return getContractType().isGarrisonType() && getMoraleLevel().isRouted();
-    }
-
-    public void setRoutEnd(LocalDate routEnd) {
-        this.routEnd = routEnd;
-    }
-
-    /**
-     * Checks if the Batchall has been accepted for the contract.
-     *
-     * @return {@code true} if the Batchall has been accepted, {@code false} otherwise.
-     */
-    public boolean isBatchallAccepted() {
-        return batchallAccepted;
-    }
-
-    /**
-     * Sets the {@code batchallAccepted} flag for this contract.
-     *
-     * @param batchallAccepted The value to set for the {@code batchallAccepted} flag.
-     */
-    public void setBatchallAccepted(final boolean batchallAccepted) {
-        this.batchallAccepted = batchallAccepted;
     }
 
     public void addPlayerMinorBreach() {

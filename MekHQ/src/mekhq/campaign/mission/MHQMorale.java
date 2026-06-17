@@ -587,7 +587,7 @@ public class MHQMorale {
             // Additional morale updates if morale level is set to 'Routed' and the contract type is either a garrison
             // type or doesn't allow early contract completion
             if (!canEarlyFinish || contract.getContractType().isGarrisonType()) {
-                contract.setRoutEnd(today.plusMonths(max(1, d6() - 3)).minusDays(1));
+                contract.setRoutEndDate(today.plusMonths(max(1, d6() - 3)).minusDays(1));
 
                 PrisonerMissionEndEvent prisoners = new PrisonerMissionEndEvent(campaign, contract);
                 if (!campaign.getFriendlyPrisoners().isEmpty()) {

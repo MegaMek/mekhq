@@ -36,6 +36,8 @@ import static java.lang.Math.ceil;
 import static megamek.client.ui.util.PlayerColour.BLUE;
 import static megamek.client.ui.util.PlayerColour.RED;
 import static megamek.common.enums.SkillLevel.REGULAR;
+import static mekhq.campaign.mission.enums.AtBMoraleLevel.MAXIMUM_MORALE_LEVEL;
+import static mekhq.campaign.mission.enums.AtBMoraleLevel.MINIMUM_MORALE_LEVEL;
 import static mekhq.campaign.personnel.ranks.Rank.RO_MIN;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -63,6 +65,7 @@ import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Bloodname;
@@ -121,6 +124,7 @@ public class AbstractMission {
     private String enemyName = "Independent";
     private String enemyMercenaryEmployerCode;
     private Person clanOpponent;
+    private boolean batchallAccepted;
     private SkillLevel enemySkill = REGULAR;
     private int enemyQuality = DragoonRating.DRAGOON_C.getRating();
     private String enemyBotName = "Enemy";
@@ -163,6 +167,9 @@ public class AbstractMission {
 
     private int requiredCombatTeams;
     private int requiredCombatElements;
+
+    private AtBMoraleLevel moraleLevel;
+    private LocalDate routEndDate;
 
     private final List<Scenario> scenarios = new ArrayList<>();
 
@@ -571,6 +578,14 @@ public class AbstractMission {
 
         int targetClanRank = 38;
         AutoAssignRankForCompanyGenerator.assignAscendingRank(getClanOpponent(), targetClanRank);
+    }
+
+    public boolean isBatchallAccepted() {
+        return batchallAccepted;
+    }
+
+    public void setBatchallAccepted(boolean batchallAccepted) {
+        this.batchallAccepted = batchallAccepted;
     }
 
     public String getDescription() {
@@ -1203,6 +1218,65 @@ public class AbstractMission {
      */
     public int getMaximumSupportPoints() {
         return requiredCombatTeams * 3;
+    }
+
+    public LocalDate getRoutEndDate() {
+        return routEndDate;
+    }
+
+    /**
+     * Sets the end date of the rout. This should only be applied on contracts whose morale equals ROUTED
+     *
+     * @param routEnd the {@code LocalDate} representing the end date of the rout
+     */
+    public void setRoutEndDate(LocalDate routEnd) {
+        this.routEndDate = routEnd;
+    }
+
+    public AtBMoraleLevel getMoraleLevel() {
+        return moraleLevel;
+    }
+
+    public void setMoraleLevel(AtBMoraleLevel moraleLevel) {
+        this.moraleLevel = moraleLevel;
+    }
+
+    /**
+     * Adjusts the current {@link AtBMoraleLevel} by the specified delta and returns the resulting morale level.
+     *
+     * <p>The method computes a new integer morale value by adding the given {@code delta} to the unit's current
+     * morale level, then clamps the result to the valid range defined by {@code MINIMUM_MORALE_LEVEL} and
+     * {@code MAXIMUM_MORALE_LEVEL}. It then attempts to resolve the resulting value to a corresponding
+     * {@link AtBMoraleLevel}.</p>
+     *
+     * <p>If the resolved morale level is valid (i.e., non-{@code null}), the unit's internal morale state is updated.
+     * If no valid enum constant exists for the computed level, the method leaves the current morale unchanged and
+     * returns the existing level.</p>
+     *
+     * <p><b>Note:</b> a positive delta improves the enemy morale, a negative delta decreases enemy morale.</p>
+     *
+     * @param delta the amount to adjust the current morale level by; may be positive or negative
+     *
+     * @return the new {@link AtBMoraleLevel} after applying the delta; if no corresponding morale level exists for the
+     *       computed value, the current morale level is returned unchanged
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public AtBMoraleLevel changeMoraleLevel(final int delta) {
+        int currentLevel = getMoraleLevel().getLevel();
+        int newLevel = Math.clamp(currentLevel + delta, MINIMUM_MORALE_LEVEL, MAXIMUM_MORALE_LEVEL);
+
+        AtBMoraleLevel newMoraleLevel = AtBMoraleLevel.parseFromLevel(newLevel);
+        if (newMoraleLevel != null) {
+            setMoraleLevel(newMoraleLevel);
+        }
+
+        return newMoraleLevel != null ? newMoraleLevel : getMoraleLevel();
+    }
+
+    public boolean isPeaceful() {
+        return getContractType().isGarrisonType() && getMoraleLevel().isRouted();
     }
 
     /**
