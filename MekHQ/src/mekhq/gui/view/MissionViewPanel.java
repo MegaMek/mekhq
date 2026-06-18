@@ -61,7 +61,6 @@ import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.JScrollablePanel;
-import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.utilities.BriefingStyle;
 import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.utilities.ReportingUtilities;
@@ -766,7 +765,7 @@ public class MissionViewPanel extends JScrollablePanel {
                      currentSystem.getId().equals(contractSystem.getId());
     }
 
-    private String contractTimelineFallbackTooltip(Campaign campaign, Contract contract) {
+    static String contractTimelineFallbackTooltip(Campaign campaign, Contract contract) {
         final String contractLocation = contract.getSystemName(campaign.getLocalDate());
         final String currentLocation = currentLocationDescription(campaign);
         return wordWrap(getFormattedTextAt(RESOURCE_BUNDLE, "contractTimelineBar.fallback.tooltip", contractLocation,
@@ -781,21 +780,17 @@ public class MissionViewPanel extends JScrollablePanel {
         }
 
         final LocalDate currentDate = campaign.getLocalDate();
-        final String locationName;
-        final String locationKey;
         if (currentLocation.isOnPlanet()) {
             final Planet currentPlanet = currentLocation.getPlanet();
-            locationName = (currentPlanet == null) ? currentSystem.getPrintableName(currentDate) :
-                                currentPlanet.getPrintableName(currentDate);
-            locationKey = "contractTimelineBar.location.landed";
-        } else if (currentLocation.isAtJumpPoint()) {
-            locationName = currentSystem.getPrintableName(currentDate);
-            locationKey = "contractTimelineBar.location.jumpPoint";
-        } else {
-            locationName = currentSystem.getPrintableName(currentDate);
-            locationKey = "contractTimelineBar.location.inTransit";
+            final String planetName = (currentPlanet == null) ? currentSystem.getPrintableName(currentDate) :
+                                            currentPlanet.getPrintableName(currentDate);
+            return getFormattedTextAt(RESOURCE_BUNDLE, "contractTimelineBar.location.landed", planetName);
         }
-        return getFormattedTextAt(RESOURCE_BUNDLE, locationKey, locationName);
+
+        final String systemName = currentSystem.getPrintableName(currentDate);
+        final String locationKey = currentLocation.isAtJumpPoint() ? "contractTimelineBar.location.jumpPoint" :
+                                         "contractTimelineBar.location.inTransit";
+        return getFormattedTextAt(RESOURCE_BUNDLE, locationKey, systemName);
     }
 
     /**

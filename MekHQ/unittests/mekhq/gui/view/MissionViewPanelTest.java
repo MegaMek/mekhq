@@ -68,6 +68,18 @@ class MissionViewPanelTest {
               MissionViewPanel.currentLocationDescription(campaignOnDate(OTHER_SYSTEM, true)));
     }
 
+    @Test
+    void atJumpPointCurrentLocationUsesSystemName() {
+        assertEquals("Somewhere Else (at jump point)",
+              MissionViewPanel.currentLocationDescription(campaignInSpace(OTHER_SYSTEM, true)));
+    }
+
+    @Test
+    void inTransitCurrentLocationUsesSystemName() {
+        assertEquals("Somewhere Else (in transit)",
+              MissionViewPanel.currentLocationDescription(campaignInSpace(OTHER_SYSTEM, false)));
+    }
+
     private static Campaign campaignOnDate(PlanetarySystem currentSystem, boolean onPlanet) {
         final Campaign campaign = mock(Campaign.class);
         final AbstractLocation currentLocation = mock(AbstractLocation.class);
@@ -83,6 +95,17 @@ class MissionViewPanelTest {
         when(campaign.getLocalDate()).thenReturn(CAMPAIGN_DATE);
         when(campaign.getCurrentSystem()).thenReturn(currentSystem);
         when(campaign.getCurrentLocation()).thenReturn(null);
+        return campaign;
+    }
+
+    private static Campaign campaignInSpace(PlanetarySystem currentSystem, boolean atJumpPoint) {
+        final Campaign campaign = mock(Campaign.class);
+        final AbstractLocation currentLocation = mock(AbstractLocation.class);
+        when(campaign.getLocalDate()).thenReturn(CAMPAIGN_DATE);
+        when(campaign.getCurrentSystem()).thenReturn(currentSystem);
+        when(campaign.getCurrentLocation()).thenReturn(currentLocation);
+        when(currentLocation.isOnPlanet()).thenReturn(false);
+        when(currentLocation.isAtJumpPoint()).thenReturn(atJumpPoint);
         return campaign;
     }
 
