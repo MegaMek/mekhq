@@ -32,6 +32,9 @@
  */
 package mekhq.campaign;
 
+import mekhq.MekHQ;
+import mekhq.campaign.market.PersonnelMarket;
+
 import java.util.UUID;
 
 /**
@@ -49,6 +52,29 @@ public class CampaignController {
      */
     public CampaignController(Campaign c) {
         localCampaign = c;
+    }
+
+    /**
+     * Manually registers campaign-related event bus listeners.
+     */
+    public void activate() {
+        PersonnelMarket personnelMarket = localCampaign.getHumanResources().getPersonnelMarket();
+        if (personnelMarket != null) {
+            MekHQ.registerHandler(personnelMarket);
+        }
+    }
+
+    /**
+     * Manually unregister campaign-related event bus listeners.
+     */
+    public void deactivate() {
+        if (localCampaign.getStoryArc() != null) {
+            MekHQ.unregisterHandler(localCampaign.getStoryArc());
+        }
+        PersonnelMarket personnelMarket = localCampaign.getHumanResources().getPersonnelMarket();
+        if (personnelMarket != null) {
+            MekHQ.unregisterHandler(personnelMarket);
+        }
     }
 
     /**
