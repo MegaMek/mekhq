@@ -49,6 +49,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -532,100 +534,25 @@ public class MekHQMenuBar extends JMenuBar {
 
         menuTempPool.addSeparator();
 
-        // region Astech Pool
-        JMenu menuAstechPool = new JMenu(getTextAt("menuAstechPool.text"));
-        menuAstechPool.setMnemonic(KeyEvent.VK_A);
-
-        JMenuItem miHireAstechs = createMenuItem("miHireAstechs.text", KeyEvent.VK_H, evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true, getTextAt("popupHireAstechsNum.text"), 1, 0, MAX_QUANTITY_SPINNER);
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().increaseAsTechPool(popupValueChoiceDialog.getValue());
-            }
-        });
-        menuAstechPool.add(miHireAstechs);
-
-        JMenuItem miFireAstechs = createMenuItem("miFireAstechs.text", KeyEvent.VK_E, evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true, getTextAt("popupFireAstechsNum.text"), 1, 0, getCampaign().getTemporaryAsTechPool());
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().decreaseAsTechPool(popupValueChoiceDialog.getValue());
-            }
-        });
-        menuAstechPool.add(miFireAstechs);
-
-        JMenuItem miFullStrengthAstechs = createMenuItem("miFullStrengthAstechs.text", KeyEvent.VK_B,
-              evt -> getCampaign().resetAsTechPool());
-        menuAstechPool.add(miFullStrengthAstechs);
-
-        JMenuItem miFireAllAstechs = createMenuItem("miFireAllAstechs.text", KeyEvent.VK_R,
-              evt -> getCampaign().emptyAsTechPool());
-        menuAstechPool.add(miFireAllAstechs);
-
-        menuAstechPool.addMenuListener(menuListenerFor(() -> {
-            int pool = getCampaign().getTemporaryAsTechPool();
-            int need = getCampaign().getAsTechNeed();
-            // need + pool = what would be needed if there were no temp pool at all;
-            // the action is a no-op only when pool == max(0, that real need)
-            int idealPool = Math.max(0, need + pool);
-            setMenuItemState(miFireAstechs, pool > 0, getTextAt("miFireAstechs.disabledTip"));
-            setMenuItemState(miFullStrengthAstechs, pool != idealPool, getTextAt("miFullStrengthAstechs.disabledTip"));
-            setMenuItemState(miFireAllAstechs, pool > 0, getTextAt("miFireAllAstechs.disabledTip"));
-        }));
-
+        JMenu menuAstechPool = buildSupportPoolSubMenu("menuAstechPool.text", KeyEvent.VK_A,
+              "miHireAstechs.text", "popupHireAstechsNum.text", "miFireAstechs.text", "popupFireAstechsNum.text",
+              "miFullStrengthAstechs.text", "miFireAllAstechs.text",
+              "miFireAstechs.disabledTip", "miFullStrengthAstechs.disabledTip", "miFireAllAstechs.disabledTip",
+              getCampaign()::getTemporaryAsTechPool, getCampaign()::getAsTechNeed,
+              getCampaign()::increaseAsTechPool, getCampaign()::decreaseAsTechPool,
+              getCampaign()::resetAsTechPool, getCampaign()::emptyAsTechPool
+        );
         menuTempPool.add(menuAstechPool);
-        // endregion Astech Pool
 
-        // region Medic Pool
-        JMenu menuMedicPool = new JMenu(getTextAt("menuMedicPool.text"));
-        menuMedicPool.setMnemonic(KeyEvent.VK_M);
-
-        JMenuItem miHireMedics = createMenuItem("miHireMedics.text", KeyEvent.VK_H, evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true, getTextAt("popupHireMedicsNum.text"), 1, 0, MAX_QUANTITY_SPINNER);
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().increaseMedicPool(popupValueChoiceDialog.getValue());
-            }
-        });
-        menuMedicPool.add(miHireMedics);
-
-        JMenuItem miFireMedics = createMenuItem("miFireMedics.text", KeyEvent.VK_E, evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true, getTextAt("popupFireMedicsNum.text"), 1, 0, getCampaign().getTemporaryMedicPool());
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().decreaseMedicPool(popupValueChoiceDialog.getValue());
-            }
-        });
-        menuMedicPool.add(miFireMedics);
-
-        JMenuItem miFullStrengthMedics = createMenuItem("miFullStrengthMedics.text", KeyEvent.VK_B,
-              evt -> getCampaign().resetMedicPool());
-        menuMedicPool.add(miFullStrengthMedics);
-
-        JMenuItem miFireAllMedics = createMenuItem("miFireAllMedics.text", KeyEvent.VK_R,
-              evt -> getCampaign().emptyMedicPool());
-        menuMedicPool.add(miFireAllMedics);
-
-        menuMedicPool.addMenuListener(menuListenerFor(() -> {
-            int pool = getCampaign().getTemporaryMedicPool();
-            int need = getCampaign().getMedicsNeed();
-            // need + pool = what would be needed if there were no temp pool at all;
-            // the action is a no-op only when pool == max(0, that real need)
-            int idealPool = Math.max(0, need + pool);
-            setMenuItemState(miFireMedics, pool > 0,
-                  getTextAt("miFireMedics.disabledTip"));
-            setMenuItemState(miFullStrengthMedics, pool != idealPool,
-                  getTextAt("miFullStrengthMedics.disabledTip"));
-            setMenuItemState(miFireAllMedics, pool > 0,
-                  getTextAt("miFireAllMedics.disabledTip"));
-        }));
-
+        JMenu menuMedicPool = buildSupportPoolSubMenu("menuMedicPool.text", KeyEvent.VK_M,
+              "miHireMedics.text", "popupHireMedicsNum.text", "miFireMedics.text", "popupFireMedicsNum.text",
+              "miFullStrengthMedics.text", "miFireAllMedics.text",
+              "miFireMedics.disabledTip", "miFullStrengthMedics.disabledTip", "miFireAllMedics.disabledTip",
+              getCampaign()::getTemporaryMedicPool, getCampaign()::getMedicsNeed,
+              getCampaign()::increaseMedicPool, getCampaign()::decreaseMedicPool,
+              getCampaign()::resetMedicPool, getCampaign()::emptyMedicPool
+        );
         menuTempPool.add(menuMedicPool);
-        // endregion Medic Pool
 
         // region Blob Crew Pools (Soldier, Battle Armor, Vehicle, Vessel)
         // Each pool follows the same 4-item structure; see buildBlobCrewPoolSubMenu.
@@ -688,6 +615,82 @@ public class MekHQMenuBar extends JMenuBar {
               "miFullStrengthVesselCrew.text", "miFireAllVesselCrew.text");
 
         return menuTempPool;
+    }
+
+    /**
+     * Builds a menu for managing temporary support personnel pools. Handles UI layout, quantity dialogs,
+     * and dynamic enable/disable states.
+     *
+     * @param menuKey                    resource key for the menu title
+     * @param mnemonic                   keyEvent integer for the menu mnemonic
+     * @param hireKey                    resource key for the "Hire" item text
+     * @param popupHireKey               resource key for the "Hire" dialog prompt
+     * @param fireKey                    resource key for the "Fire" item text
+     * @param popupFireKey               resource key for the "Fire" dialog prompt
+     * @param fullStrengthKey            resource key for the "Full Strength" item text
+     * @param fireAllKey                 resource key for the "Fire All" item text
+     * @param fireDisabledTipKey         tooltip key when firing is disabled (pool is empty)
+     * @param fullStrengthDisabledTipKey tooltip key when full strength is disabled (already met)
+     * @param fireAllDisabledTipKey      tooltip key when firing all is disabled (pool is empty)
+     * @param poolSupplier               returns the current temporary pool size
+     * @param needSupplier               returns the current need for this role
+     * @param increaseAction             adds the specified quantity to the pool
+     * @param decreaseAction             removes the specified quantity from the pool
+     * @param fullStrengthAction         resets the pool to match the need
+     * @param emptyAction                removes all personnel from the pool
+     *
+     * @return a {@link JMenu} for temporary personnel management
+     */
+    private JMenu buildSupportPoolSubMenu(String menuKey, int mnemonic,
+          String hireKey, String popupHireKey, String fireKey, String popupFireKey,
+          String fullStrengthKey, String fireAllKey,
+          String fireDisabledTipKey, String fullStrengthDisabledTipKey, String fireAllDisabledTipKey,
+          Supplier<Integer> poolSupplier, Supplier<Integer> needSupplier,
+          Consumer<Integer> increaseAction, Consumer<Integer> decreaseAction,
+          Runnable fullStrengthAction, Runnable emptyAction) {
+
+        JMenu menu = new JMenu(getTextAt(menuKey));
+        menu.setMnemonic(mnemonic);
+
+        JMenuItem miHire = createMenuItem(hireKey, KeyEvent.VK_H, evt -> {
+            PopupValueChoiceDialog dialog = new PopupValueChoiceDialog(getFrame(),
+                  true, getTextAt(popupHireKey), 1, 0, MAX_QUANTITY_SPINNER);
+            dialog.setVisible(true);
+            if (dialog.getValue() >= 0) {
+                increaseAction.accept(dialog.getValue());
+            }
+        });
+        menu.add(miHire);
+
+        JMenuItem miFire = createMenuItem(fireKey, KeyEvent.VK_E, evt -> {
+            PopupValueChoiceDialog dialog = new PopupValueChoiceDialog(getFrame(),
+                  true, getTextAt(popupFireKey), 1, 0, poolSupplier.get());
+            dialog.setVisible(true);
+            if (dialog.getValue() >= 0) {
+                decreaseAction.accept(dialog.getValue());
+            }
+        });
+        menu.add(miFire);
+
+        JMenuItem miFullStrength = createMenuItem(fullStrengthKey, KeyEvent.VK_B, evt -> fullStrengthAction.run());
+        menu.add(miFullStrength);
+
+        JMenuItem miFireAll = createMenuItem(fireAllKey, KeyEvent.VK_R, evt -> emptyAction.run());
+        menu.add(miFireAll);
+
+        menu.addMenuListener(menuListenerFor(() -> {
+            int pool = poolSupplier.get();
+            int need = needSupplier.get();
+            // need + pool = what would be needed if there were no temp pool at all;
+            // the action is a no-op only when pool == max(0, that real need)
+            int idealPool = Math.max(0, need + pool);
+
+            setMenuItemState(miFire, pool > 0, getTextAt(fireDisabledTipKey));
+            setMenuItemState(miFullStrength, pool != idealPool, getTextAt(fullStrengthDisabledTipKey));
+            setMenuItemState(miFireAll, pool > 0, getTextAt(fireAllDisabledTipKey));
+        }));
+
+        return menu;
     }
 
     /**
