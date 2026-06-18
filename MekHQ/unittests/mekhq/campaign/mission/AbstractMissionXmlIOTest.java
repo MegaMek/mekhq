@@ -278,7 +278,7 @@ public class AbstractMissionXmlIOTest {
 
         // Scenario.
         assertEquals(1, contract.getScenarios().size());
-        Scenario scenario = contract.getScenarios().get(0);
+        Scenario scenario = contract.getScenarios().getFirst();
         assertEquals("Assassination", scenario.getName());
         assertEquals(ScenarioStatus.CURRENT, scenario.getStatus());
 
@@ -423,6 +423,9 @@ public class AbstractMissionXmlIOTest {
         assertMoneyEquals(contract.getOverheadAmount(), reloaded.getOverheadAmount(), "overheadAmount");
         assertMoneyEquals(contract.getSupportAmount(), reloaded.getSupportAmount(), "supportAmount");
         assertMoneyEquals(contract.getFeeAmount(), reloaded.getFeeAmount(), "feeAmount");
+
+        assertNotNull(contract.getRoutedPayout());
+        assertNotNull(reloaded.getRoutedPayout());
         assertMoneyEquals(contract.getRoutedPayout(), reloaded.getRoutedPayout(), "routedPayout");
     }
 
@@ -543,7 +546,7 @@ public class AbstractMissionXmlIOTest {
 
         Contract contract = (Contract) parseMission(missionXml);
         assertEquals(1, contract.getScenarios().size(), "plain contract must load its scenarios");
-        assertEquals("Border Skirmish", contract.getScenarios().get(0).getName());
+        assertEquals("Border Skirmish", contract.getScenarios().getFirst().getName());
     }
 
     // endregion Non-AtB scenarios
@@ -610,7 +613,7 @@ public class AbstractMissionXmlIOTest {
 
     private static void assertMoneyEquals(Money expected, Money actual, String field) {
         // compareTo is scale-insensitive (1212 vs 1212.00), which the routedPayout reader can produce.
-        assertTrue(expected.compareTo(actual) == 0, field + ": expected " + expected + " but was " + actual);
+        assertEquals(0, expected.compareTo(actual), field + ": expected " + expected + " but was " + actual);
     }
 
     /**
@@ -620,7 +623,7 @@ public class AbstractMissionXmlIOTest {
     private AbstractMission loadFirstMissionFromFile(String fileName) throws Exception {
         byte[] bytes = Files.readAllBytes(MISSIONS_DIR.resolve(fileName));
         Document document = parseDocument(bytes);
-        Node missionNode = firstChildElement(document.getDocumentElement(), "mission");
+        Node missionNode = firstChildElement(document.getDocumentElement());
         assertNotNull(missionNode, "sample " + fileName + " must contain a <mission> element");
 
         AbstractMission mission = AbstractMission.generateInstanceFromXML(missionNode, campaign, VERSION);
@@ -659,11 +662,11 @@ public class AbstractMissionXmlIOTest {
         }
     }
 
-    private static Node firstChildElement(Element parent, String tagName) {
+    private static Node firstChildElement(Element parent) {
         NodeList children = parent.getChildNodes();
         for (int index = 0; index < children.getLength(); index++) {
             Node child = children.item(index);
-            if ((child.getNodeType() == Node.ELEMENT_NODE) && child.getNodeName().equalsIgnoreCase(tagName)) {
+            if ((child.getNodeType() == Node.ELEMENT_NODE) && child.getNodeName().equalsIgnoreCase("mission")) {
                 return child;
             }
         }
