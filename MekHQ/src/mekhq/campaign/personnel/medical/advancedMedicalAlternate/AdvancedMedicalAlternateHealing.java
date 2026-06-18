@@ -189,11 +189,11 @@ public class AdvancedMedicalAlternateHealing {
     private static void performUnassistedHealingCheck(Campaign campaign, Person patient,
           List<TargetRollModifier> modifiers, Set<BodyLocation> prostheticPenalties) {
 
-        PersonnelOptions personnelOptions = patient.getOptions();
-        boolean hasTraumaSurgeon = personnelOptions.booleanOption(UNOFFICIAL_TRAUMA_SURGEON);
-        boolean hasProthesisTechnician = personnelOptions.booleanOption(UNOFFICIAL_PROTHESIS_TECHNICIAN);
-        boolean hasPathologicInsight = personnelOptions.booleanOption(UNOFFICIAL_PATHOLOGIC_INSIGHT);
-        boolean hasHypochondriac = personnelOptions.booleanOption(UNOFFICIAL_HYPOCHONDRIAC);
+        PersonnelOptions patientOptions = patient.getOptions();
+        boolean hasTraumaSurgeon = patientOptions.booleanOption(UNOFFICIAL_TRAUMA_SURGEON);
+        boolean hasProthesisTechnician = patientOptions.booleanOption(UNOFFICIAL_PROTHESIS_TECHNICIAN);
+        boolean hasPathologicInsight = patientOptions.booleanOption(UNOFFICIAL_PATHOLOGIC_INSIGHT);
+        boolean hasHypochondriac = patientOptions.booleanOption(UNOFFICIAL_HYPOCHONDRIAC);
 
         // We need a defensive copy of the list as we're going to be removing injuries from it when successfully healing
         for (Injury injury : new ArrayList<>(patient.getInjuries())) {
@@ -212,7 +212,7 @@ public class AdvancedMedicalAlternateHealing {
                 miscPenalty += hasHypochondriac ? 1 : 0;
 
                 boolean useEdge = campaign.getCampaignOptions().isUseSupportEdge();
-                useEdge = useEdge && patient.getOptions().booleanOption(EDGE_MEDICAL);
+                useEdge = useEdge && patientOptions.booleanOption(EDGE_MEDICAL);
                 int marginOfSuccess = getMarginOfSuccessForUnassistedHealing(patient, modifiers, miscPenalty, useEdge);
 
                 LocalDate today = campaign.getLocalDate();
@@ -348,14 +348,14 @@ public class AdvancedMedicalAlternateHealing {
     private static void performAssistedHealingCheck(Campaign campaign, Person patient, Person doctor,
           List<TargetRollModifier> modifiers, Set<BodyLocation> prostheticPenalties) {
 
-        PersonnelOptions doctorPersonnelOptions = doctor.getOptions();
-        boolean hasHolisticCareSPA = doctorPersonnelOptions.booleanOption(UNOFFICIAL_HOLISTIC_CARE);
-        boolean hasTraumaSurgeon = doctorPersonnelOptions.booleanOption(UNOFFICIAL_TRAUMA_SURGEON);
-        boolean hasProthesisTechnician = doctorPersonnelOptions.booleanOption(UNOFFICIAL_PROTHESIS_TECHNICIAN);
-        boolean hasPathologicInsight = doctorPersonnelOptions.booleanOption(UNOFFICIAL_PATHOLOGIC_INSIGHT);
+        PersonnelOptions doctorOptions = doctor.getOptions();
+        boolean hasHolisticCareSPA = doctorOptions.booleanOption(UNOFFICIAL_HOLISTIC_CARE);
+        boolean hasTraumaSurgeon = doctorOptions.booleanOption(UNOFFICIAL_TRAUMA_SURGEON);
+        boolean hasProthesisTechnician = doctorOptions.booleanOption(UNOFFICIAL_PROTHESIS_TECHNICIAN);
+        boolean hasPathologicInsight = doctorOptions.booleanOption(UNOFFICIAL_PATHOLOGIC_INSIGHT);
 
-        PersonnelOptions patientPersonnelOptions = patient.getOptions();
-        boolean hasHypochondriac = patientPersonnelOptions.booleanOption(UNOFFICIAL_HYPOCHONDRIAC);
+        PersonnelOptions patientOptions = patient.getOptions();
+        boolean hasHypochondriac = patientOptions.booleanOption(UNOFFICIAL_HYPOCHONDRIAC);
 
         // We need a defensive copy of the list as we're going to be removing injuries from it when successfully healing
         for (Injury injury : new ArrayList<>(patient.getInjuries())) {
@@ -374,7 +374,7 @@ public class AdvancedMedicalAlternateHealing {
                     miscPenalty += hasHypochondriac ? 1 : 0;
 
                     boolean useEdge = campaign.getCampaignOptions().isUseSupportEdge();
-                    useEdge = useEdge && doctor.getOptions().booleanOption(EDGE_MEDICAL);
+                    useEdge = useEdge && doctorOptions.booleanOption(EDGE_MEDICAL);
                     int marginOfSuccess = getMarginOfSuccessForAssistedHealing(
                           doctor, campaign, modifiers, miscPenalty, useEdge);
 
