@@ -206,8 +206,8 @@ public class PersonViewPanel extends JScrollablePanel {
         tabbedPaneConstraints.fill = GridBagConstraints.BOTH;
         tabbedPaneConstraints.anchor = GridBagConstraints.NORTHWEST;
         tabbedPaneConstraints.insets = new Insets(0, 5, 0, 10);
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
+        tabbedPaneConstraints.weightx = 1.0;
+        tabbedPaneConstraints.weighty = 1.0;
         tabbedPaneConstraints.gridwidth = 2;
         add(tabbedPane, tabbedPaneConstraints);
         gridY++;
