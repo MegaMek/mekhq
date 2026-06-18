@@ -45,7 +45,6 @@ import static mekhq.campaign.personnel.enums.PersonnelStatus.ACTIVE;
 import static mekhq.campaign.personnel.skills.Skill.getIndividualAttributeModifier;
 import static mekhq.campaign.personnel.skills.Skill.getTotalAttributeModifier;
 import static mekhq.campaign.personnel.skills.SkillType.RP_ONLY_TAG;
-import static mekhq.campaign.personnel.skills.enums.SkillSubType.*;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -89,13 +88,13 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
-import javax.swing.JTextPane;
 import javax.swing.table.TableColumn;
 
 import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.IOption;
 import megamek.common.rolls.TargetRoll;
+import megamek.common.ui.EnhancedTabbedPane;
 import megamek.logging.MMLogger;
 import megamek.utilities.ImageUtilities;
 import mekhq.MHQStaticDirectoryManager;
@@ -131,10 +130,8 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
-import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.PersonnelEventLogModel;
 import mekhq.gui.model.PersonnelKillLogModel;
-import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.gui.utilities.WrapLayout;
 import mekhq.utilities.ReportingUtilities;
 
@@ -174,6 +171,7 @@ public class PersonViewPanel extends JScrollablePanel {
     }
 
     private void initComponents() {
+
         setLayout(new GridBagLayout());
         getAccessibleContext().setAccessibleName("Details for " + person.getFullName());
 
@@ -203,205 +201,309 @@ public class PersonViewPanel extends JScrollablePanel {
             gridY = applyAndDisplayAwards(awardController, pnlPortrait, gridY);
         }
 
-        JPanel pnlAttributes = null;
-        if (campaignOptions.isDisplayAllAttributes()) {
-            pnlAttributes = fillAttributeScores();
-        } else {
-            Map<SkillAttribute, Integer> relevantAttributes = getRelevantAttributes();
-            if (!relevantAttributes.isEmpty()) {
-                pnlAttributes = fillAttributeModifiers(relevantAttributes);
-            }
-        }
+        EnhancedTabbedPane tabbedPane = new EnhancedTabbedPane();
+        GridBagConstraints tabbedPaneConstraints = new GridBagConstraints();
+        tabbedPaneConstraints.gridx = 0;
+        tabbedPaneConstraints.gridy = gridY;
+        tabbedPaneConstraints.fill = GridBagConstraints.BOTH;
+        tabbedPaneConstraints.anchor = GridBagConstraints.NORTHWEST;
+        tabbedPaneConstraints.insets = new Insets(0, 5, 0, 10);
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        tabbedPaneConstraints.gridwidth = 2;
+        add(tabbedPane, tabbedPaneConstraints);
+        gridY++;
 
-        if (pnlAttributes != null) {
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridY;
-            gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
-            gridBagConstraints.fill = GridBagConstraints.BOTH;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            add(pnlAttributes, gridBagConstraints);
-            gridY++;
-        }
+        JPanel pnlLogTab = new JPanel();
+        pnlLogTab.setLayout(new GridBagLayout());
+        initializeLogs(pnlLogTab);
+        tabbedPane.addTab("LOGS", pnlLogTab); // TODO remove hard coded tab name
 
-        List<String> relevantSkills = person.getKnownSkillsBySkillSubType(List.of(COMBAT_GUNNERY, COMBAT_PILOTING,
-              SUPPORT, SUPPORT_TECHNICIAN));
-        if (!relevantSkills.isEmpty()) {
-            JPanel pnlCombatSkills = fillSkills(relevantSkills, "pnlSkills.profession");
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridY;
-            gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
-            gridBagConstraints.fill = GridBagConstraints.BOTH;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            add(pnlCombatSkills, gridBagConstraints);
-            gridY++;
-        }
+        //        JPanel pnlAttributes = null;
+        //        if (campaignOptions.isDisplayAllAttributes()) {
+        //            pnlAttributes = fillAttributeScores();
+        //        } else {
+        //            Map<SkillAttribute, Integer> relevantAttributes = getRelevantAttributes();
+        //            if (!relevantAttributes.isEmpty()) {
+        //                pnlAttributes = fillAttributeModifiers(relevantAttributes);
+        //            }
+        //        }
+        //
+        //        if (pnlAttributes != null) {
+        //            gridBagConstraints = new GridBagConstraints();
+        //            gridBagConstraints.gridx = 0;
+        //            gridBagConstraints.gridy = gridY;
+        //            gridBagConstraints.gridwidth = 2;
+        //            gridBagConstraints.weightx = 1.0;
+        //            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+        //            gridBagConstraints.fill = GridBagConstraints.BOTH;
+        //            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        //            add(pnlAttributes, gridBagConstraints);
+        //            gridY++;
+        //        }
+        //
+        //        List<String> relevantSkills = person.getKnownSkillsBySkillSubType(List.of(COMBAT_GUNNERY, COMBAT_PILOTING,
+        //              SUPPORT, SUPPORT_TECHNICIAN));
+        //        if (!relevantSkills.isEmpty()) {
+        //            JPanel pnlCombatSkills = fillSkills(relevantSkills, "pnlSkills.profession");
+        //            gridBagConstraints = new GridBagConstraints();
+        //            gridBagConstraints.gridx = 0;
+        //            gridBagConstraints.gridy = gridY;
+        //            gridBagConstraints.gridwidth = 2;
+        //            gridBagConstraints.weightx = 1.0;
+        //            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+        //            gridBagConstraints.fill = GridBagConstraints.BOTH;
+        //            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        //            add(pnlCombatSkills, gridBagConstraints);
+        //            gridY++;
+        //        }
+        //
+        //        relevantSkills = person.getKnownSkillsBySkillSubType(List.of(UTILITY, UTILITY_COMMAND));
+        //        if (!relevantSkills.isEmpty()) {
+        //            JPanel pnlSupportSkills = fillSkills(relevantSkills, "pnlSkills.utility");
+        //            gridBagConstraints = new GridBagConstraints();
+        //            gridBagConstraints.gridx = 0;
+        //            gridBagConstraints.gridy = gridY;
+        //            gridBagConstraints.gridwidth = 2;
+        //            gridBagConstraints.weightx = 1.0;
+        //            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+        //            gridBagConstraints.fill = GridBagConstraints.BOTH;
+        //            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        //            add(pnlSupportSkills, gridBagConstraints);
+        //            gridY++;
+        //        }
+        //
+        //        relevantSkills = person.getKnownSkillsBySkillSubType(List.of(ROLEPLAY_GENERAL,
+        //              ROLEPLAY_ART,
+        //              ROLEPLAY_INTEREST,
+        //              ROLEPLAY_SCIENCE,
+        //              ROLEPLAY_SECURITY));
+        //        if (!relevantSkills.isEmpty()) {
+        //            JPanel pnlRoleplaySkills = fillSkills(relevantSkills, "pnlSkills.roleplay");
+        //            gridBagConstraints = new GridBagConstraints();
+        //            gridBagConstraints.gridx = 0;
+        //            gridBagConstraints.gridy = gridY;
+        //            gridBagConstraints.gridwidth = 2;
+        //            gridBagConstraints.weightx = 1.0;
+        //            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+        //            gridBagConstraints.fill = GridBagConstraints.BOTH;
+        //            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        //            add(pnlRoleplaySkills, gridBagConstraints);
+        //            gridY++;
+        //        }
+        //
+        //        Map<IOption, String> relevantAbilities = getRelevantAbilities();
+        //        if (!relevantAbilities.isEmpty()) {
+        //            JPanel pnlAbilities = fillAbilitiesAndImplants(relevantAbilities);
+        //            gridBagConstraints = new GridBagConstraints();
+        //            gridBagConstraints.gridx = 0;
+        //            gridBagConstraints.gridy = gridY;
+        //            gridBagConstraints.gridwidth = 2;
+        //            gridBagConstraints.weightx = 1.0;
+        //            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+        //            gridBagConstraints.fill = GridBagConstraints.BOTH;
+        //            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        //            add(pnlAbilities, gridBagConstraints);
+        //            gridY++;
+        //        }
+        //
+        //        JPanel pnlOther = fillOther();
+        //        gridBagConstraints = new GridBagConstraints();
+        //        gridBagConstraints.gridx = 0;
+        //        gridBagConstraints.gridy = gridY;
+        //        gridBagConstraints.gridwidth = 2;
+        //        gridBagConstraints.weightx = 1.0;
+        //        gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+        //        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        //        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        //        add(pnlOther, gridBagConstraints);
+        //        gridY++;
+        //
+        //        List<Injury> injuries = person.getNonProstheticInjuries();
+        //        if (!injuries.isEmpty()) {
+        //            JPanel pnlInjuries = fillInjuries(injuries, false);
+        //            gridBagConstraints = new GridBagConstraints();
+        //            gridBagConstraints.gridx = 0;
+        //            gridBagConstraints.gridy = gridY;
+        //            gridBagConstraints.gridwidth = 2;
+        //            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+        //            gridBagConstraints.fill = GridBagConstraints.BOTH;
+        //            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        //            add(pnlInjuries, gridBagConstraints);
+        //            gridY++;
+        //        }
+        //
+        //        List<Injury> prosthetics = person.getProstheticInjuries();
+        //        if (!prosthetics.isEmpty()) {
+        //            JPanel pnlProsthetics = fillInjuries(prosthetics, true);
+        //            gridBagConstraints = new GridBagConstraints();
+        //            gridBagConstraints.gridx = 0;
+        //            gridBagConstraints.gridy = gridY;
+        //            gridBagConstraints.gridwidth = 2;
+        //            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+        //            gridBagConstraints.fill = GridBagConstraints.BOTH;
+        //            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        //            add(pnlProsthetics, gridBagConstraints);
+        //            gridY++;
+        //        }
+        //
+        //        List<Skill> inProgressSkills = person.getInProgressSkills();
+        //        if (!inProgressSkills.isEmpty()) {
+        //            JPanel pnlProgressShow = new JPanel();
+        //            pnlProgressShow.setName("pnlProgress");
+        //            pnlProgressShow.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
+        //                  "pnlInProgress.show")));
+        //            pnlProgressShow.setVisible(true);
+        //
+        //            JPanel pnlProgressHide = fillInProgressSkills(inProgressSkills);
+        //
+        //            pnlProgressShow.addMouseListener(getSwitchListener(pnlProgressShow, pnlProgressHide));
+        //            pnlProgressHide.addMouseListener(getSwitchListener(pnlProgressHide, pnlProgressShow));
+        //
+        //            gridBagConstraints = new GridBagConstraints();
+        //            gridBagConstraints.gridx = 0;
+        //            gridBagConstraints.gridy = gridY;
+        //            gridBagConstraints.gridwidth = 2;
+        //            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+        //            gridBagConstraints.fill = GridBagConstraints.BOTH;
+        //            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        //            add(pnlProgressShow, gridBagConstraints);
+        //            add(pnlProgressHide, gridBagConstraints);
+        //            gridY++;
+        //        }
+        //
+        //        if (!person.getBiography().isBlank()) {
+        //            JTextPane txtDesc = new JTextPane();
+        //            txtDesc.setName("txtDesc");
+        //            txtDesc.setEditable(false);
+        //            txtDesc.setContentType("text/html");
+        //            txtDesc.setText(MarkdownRenderer.getRenderedHtml(person.getBiography()));
+        //            txtDesc.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("pnlDescription.title")));
+        //            gridBagConstraints = new GridBagConstraints();
+        //            gridBagConstraints.gridx = 0;
+        //            gridBagConstraints.gridy = gridY;
+        //            gridBagConstraints.gridwidth = 2;
+        //            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+        //            gridBagConstraints.fill = GridBagConstraints.BOTH;
+        //            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        //            add(txtDesc, gridBagConstraints);
+        //            gridY++;
+        //        }
+        //
+        //        if ((!person.getPersonalityDescription().isBlank()) &&
+        //                  (campaignOptions.isUseRandomPersonalities()) &&
+        //                  (!person.isHidePersonality()) &&
+        //                  (!person.isChild(campaign.getLocalDate()))) { // we don't display for children, as most of the
+        //            // descriptions won't fit
+        //            JTextPane txtDesc = new JTextPane();
+        //            txtDesc.setName("personalityDescription");
+        //            txtDesc.setEditable(false);
+        //            txtDesc.setContentType("text/html");
+        //
+        //            String borderTitleKey = "pnlPersonality.normal";
+        //            if (person.getJoinedCampaign() == null) {
+        //                borderTitleKey = "pnlPersonality.interview";
+        //                txtDesc.setText(person.getPersonalityInterviewNotes());
+        //            } else {
+        //                txtDesc.setText(person.getPersonalityDescription());
+        //            }
+        //            txtDesc.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(borderTitleKey)));
+        //            gridBagConstraints = new GridBagConstraints();
+        //            gridBagConstraints.gridx = 0;
+        //            gridBagConstraints.gridy = gridY;
+        //            gridBagConstraints.gridwidth = 2;
+        //            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+        //            gridBagConstraints.fill = GridBagConstraints.BOTH;
+        //            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        //            add(txtDesc, gridBagConstraints);
+        //            gridY++;
+        //        }
+        //
+        //        if (!campaign.getKillsFor(person.getId()).isEmpty()) {
+        //            JPanel pnlKillsHeader = new JPanel();
+        //            pnlKillsHeader.setName("killsHeader");
+        //            pnlKillsHeader.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
+        //                  "pnlKillsHeader.title")));
+        //            pnlKillsHeader.setVisible(!campaignOptions.isDisplayKillRecord());
+        //
+        //            JPanel pnlKills = fillKillRecord();
+        //
+        //            pnlKills.setName("txtKills");
+        //            pnlKills.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("pnlKills.title")));
+        //            pnlKills.setVisible(campaignOptions.isDisplayKillRecord());
+        //
+        //            pnlKillsHeader.addMouseListener(getSwitchListener(pnlKillsHeader, pnlKills));
+        //            pnlKills.addMouseListener(getSwitchListener(pnlKills, pnlKillsHeader));
+        //
+        //            gridBagConstraints = new GridBagConstraints();
+        //            gridBagConstraints.gridx = 0;
+        //            gridBagConstraints.gridy = gridY;
+        //            gridBagConstraints.gridwidth = 2;
+        //            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+        //            gridBagConstraints.fill = GridBagConstraints.BOTH;
+        //            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        //            add(pnlKillsHeader, gridBagConstraints);
+        //            add(pnlKills, gridBagConstraints);
+        //            gridY++;
+        //        }
+        //
+        //        if (!person.getScenarioLog().isEmpty()) {
+        //            JPanel pnlScenariosLogHeader = new JPanel();
+        //            pnlScenariosLogHeader.setName("scenarioLogHeader");
+        //            pnlScenariosLogHeader.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
+        //                  "scenarioLogHeader.title")));
+        //            pnlScenariosLogHeader.setVisible(!campaignOptions.isDisplayScenarioLog());
+        //
+        //            JPanel pnlScenariosLog = fillScenarioLog();
+        //
+        //            pnlScenariosLog.setName("scenarioLog");
+        //            pnlScenariosLog.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
+        //                  "scenarioLog.title")));
+        //            pnlScenariosLog.setVisible(campaignOptions.isDisplayScenarioLog());
+        //
+        //            pnlScenariosLogHeader.addMouseListener(getSwitchListener(pnlScenariosLogHeader, pnlScenariosLog));
+        //            pnlScenariosLog.addMouseListener(getSwitchListener(pnlScenariosLog, pnlScenariosLogHeader));
+        //
+        //            gridBagConstraints = new GridBagConstraints();
+        //            gridBagConstraints.gridx = 0;
+        //            gridBagConstraints.gridy = gridY;
+        //            gridBagConstraints.gridwidth = 2;
+        //            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+        //            gridBagConstraints.fill = GridBagConstraints.BOTH;
+        //            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        //            add(pnlScenariosLogHeader, gridBagConstraints);
+        //            add(pnlScenariosLog, gridBagConstraints);
+        //            gridY++;
+        //        }
+        //
+        //        if (!person.getGenealogy().isEmpty()) {
+        //            JPanel pnlFamily = fillFamily();
+        //            gridBagConstraints = new GridBagConstraints();
+        //            gridBagConstraints.gridx = 0;
+        //            gridBagConstraints.gridy = gridY;
+        //            gridBagConstraints.gridwidth = 2;
+        //            gridBagConstraints.weightx = 1.0;
+        //            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+        //            gridBagConstraints.fill = GridBagConstraints.BOTH;
+        //            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        //            add(pnlFamily, gridBagConstraints);
+        //            gridY++;
+        //        }
 
-        relevantSkills = person.getKnownSkillsBySkillSubType(List.of(UTILITY, UTILITY_COMMAND));
-        if (!relevantSkills.isEmpty()) {
-            JPanel pnlSupportSkills = fillSkills(relevantSkills, "pnlSkills.utility");
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridY;
-            gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
-            gridBagConstraints.fill = GridBagConstraints.BOTH;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            add(pnlSupportSkills, gridBagConstraints);
-            gridY++;
-        }
-
-        relevantSkills = person.getKnownSkillsBySkillSubType(List.of(ROLEPLAY_GENERAL,
-              ROLEPLAY_ART,
-              ROLEPLAY_INTEREST,
-              ROLEPLAY_SCIENCE,
-              ROLEPLAY_SECURITY));
-        if (!relevantSkills.isEmpty()) {
-            JPanel pnlRoleplaySkills = fillSkills(relevantSkills, "pnlSkills.roleplay");
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridY;
-            gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
-            gridBagConstraints.fill = GridBagConstraints.BOTH;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            add(pnlRoleplaySkills, gridBagConstraints);
-            gridY++;
-        }
-
-        Map<IOption, String> relevantAbilities = getRelevantAbilities();
-        if (!relevantAbilities.isEmpty()) {
-            JPanel pnlAbilities = fillAbilitiesAndImplants(relevantAbilities);
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridY;
-            gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
-            gridBagConstraints.fill = GridBagConstraints.BOTH;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            add(pnlAbilities, gridBagConstraints);
-            gridY++;
-        }
-
-        JPanel pnlOther = fillOther();
+        // use glue to fill up the remaining space so everything is aligned to the top
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = gridY;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+        gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        add(pnlOther, gridBagConstraints);
-        gridY++;
+        add(Box.createGlue(), gridBagConstraints);
+    }
 
-        List<Injury> injuries = person.getNonProstheticInjuries();
-        if (!injuries.isEmpty()) {
-            JPanel pnlInjuries = fillInjuries(injuries, false);
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridY;
-            gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
-            gridBagConstraints.fill = GridBagConstraints.BOTH;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            add(pnlInjuries, gridBagConstraints);
-            gridY++;
-        }
-
-        List<Injury> prosthetics = person.getProstheticInjuries();
-        if (!prosthetics.isEmpty()) {
-            JPanel pnlProsthetics = fillInjuries(prosthetics, true);
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridY;
-            gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
-            gridBagConstraints.fill = GridBagConstraints.BOTH;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            add(pnlProsthetics, gridBagConstraints);
-            gridY++;
-        }
-
-        List<Skill> inProgressSkills = person.getInProgressSkills();
-        if (!inProgressSkills.isEmpty()) {
-            JPanel pnlProgressShow = new JPanel();
-            pnlProgressShow.setName("pnlProgress");
-            pnlProgressShow.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
-                  "pnlInProgress.show")));
-            pnlProgressShow.setVisible(true);
-
-            JPanel pnlProgressHide = fillInProgressSkills(inProgressSkills);
-
-            pnlProgressShow.addMouseListener(getSwitchListener(pnlProgressShow, pnlProgressHide));
-            pnlProgressHide.addMouseListener(getSwitchListener(pnlProgressHide, pnlProgressShow));
-
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridY;
-            gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
-            gridBagConstraints.fill = GridBagConstraints.BOTH;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            add(pnlProgressShow, gridBagConstraints);
-            add(pnlProgressHide, gridBagConstraints);
-            gridY++;
-        }
-
-        if (!person.getBiography().isBlank()) {
-            JTextPane txtDesc = new JTextPane();
-            txtDesc.setName("txtDesc");
-            txtDesc.setEditable(false);
-            txtDesc.setContentType("text/html");
-            txtDesc.setText(MarkdownRenderer.getRenderedHtml(person.getBiography()));
-            txtDesc.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("pnlDescription.title")));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridY;
-            gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
-            gridBagConstraints.fill = GridBagConstraints.BOTH;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            add(txtDesc, gridBagConstraints);
-            gridY++;
-        }
-
-        if ((!person.getPersonalityDescription().isBlank()) &&
-                  (campaignOptions.isUseRandomPersonalities()) &&
-                  (!person.isHidePersonality()) &&
-                  (!person.isChild(campaign.getLocalDate()))) { // we don't display for children, as most of the
-            // descriptions won't fit
-            JTextPane txtDesc = new JTextPane();
-            txtDesc.setName("personalityDescription");
-            txtDesc.setEditable(false);
-            txtDesc.setContentType("text/html");
-
-            String borderTitleKey = "pnlPersonality.normal";
-            if (person.getJoinedCampaign() == null) {
-                borderTitleKey = "pnlPersonality.interview";
-                txtDesc.setText(person.getPersonalityInterviewNotes());
-            } else {
-                txtDesc.setText(person.getPersonalityDescription());
-            }
-            txtDesc.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(borderTitleKey)));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridY;
-            gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
-            gridBagConstraints.fill = GridBagConstraints.BOTH;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            add(txtDesc, gridBagConstraints);
-            gridY++;
-        }
+    private void initializeLogs(JPanel pnlLogTab) {
+        int gridY = 0;
+        GridBagConstraints gridBagConstraints;
 
         if (!person.getPersonalLog().isEmpty()) {
             JPanel pnlPersonalLogHeader = new JPanel();
@@ -422,11 +524,13 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridY;
             gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 1.0;
             gridBagConstraints.insets = new Insets(0, 0, 10, 0);
-            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            add(pnlPersonalLogHeader, gridBagConstraints);
-            add(pnlPersonalLog, gridBagConstraints);
+            pnlLogTab.add(pnlPersonalLogHeader, gridBagConstraints);
+            pnlLogTab.add(pnlPersonalLog, gridBagConstraints);
             gridY++;
         }
 
@@ -450,11 +554,13 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridY;
             gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 1.0;
             gridBagConstraints.insets = new Insets(0, 0, 10, 0);
-            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            add(pnlPerformanceLogHeader, gridBagConstraints);
-            add(pnlPerformanceLog, gridBagConstraints);
+            pnlLogTab.add(pnlPerformanceLogHeader, gridBagConstraints);
+            pnlLogTab.add(pnlPerformanceLog, gridBagConstraints);
             gridY++;
         }
 
@@ -478,11 +584,13 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridY;
             gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 1.0;
             gridBagConstraints.insets = new Insets(0, 0, 10, 0);
-            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            add(pnlMedicalLogHeader, gridBagConstraints);
-            add(pnlMedicalLog, gridBagConstraints);
+            pnlLogTab.add(pnlMedicalLogHeader, gridBagConstraints);
+            pnlLogTab.add(pnlMedicalLog, gridBagConstraints);
             gridY++;
         }
 
@@ -506,11 +614,13 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridY;
             gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 1.0;
             gridBagConstraints.insets = new Insets(0, 0, 10, 0);
-            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            add(pnlPatientLogHeader, gridBagConstraints);
-            add(pnlPatientLog, gridBagConstraints);
+            pnlLogTab.add(pnlPatientLogHeader, gridBagConstraints);
+            pnlLogTab.add(pnlPatientLog, gridBagConstraints);
             gridY++;
         }
 
@@ -535,94 +645,15 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridY;
             gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
-            gridBagConstraints.fill = GridBagConstraints.BOTH;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            add(pnlAssignmentsLogHeader, gridBagConstraints);
-            add(pnlAssignmentsLog, gridBagConstraints);
-            gridY++;
-        }
-
-        if (!campaign.getKillsFor(person.getId()).isEmpty()) {
-            JPanel pnlKillsHeader = new JPanel();
-            pnlKillsHeader.setName("killsHeader");
-            pnlKillsHeader.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
-                  "pnlKillsHeader.title")));
-            pnlKillsHeader.setVisible(!campaignOptions.isDisplayKillRecord());
-
-            JPanel pnlKills = fillKillRecord();
-
-            pnlKills.setName("txtKills");
-            pnlKills.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("pnlKills.title")));
-            pnlKills.setVisible(campaignOptions.isDisplayKillRecord());
-
-            pnlKillsHeader.addMouseListener(getSwitchListener(pnlKillsHeader, pnlKills));
-            pnlKills.addMouseListener(getSwitchListener(pnlKills, pnlKillsHeader));
-
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridY;
-            gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
-            gridBagConstraints.fill = GridBagConstraints.BOTH;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            add(pnlKillsHeader, gridBagConstraints);
-            add(pnlKills, gridBagConstraints);
-            gridY++;
-        }
-
-        if (!person.getScenarioLog().isEmpty()) {
-            JPanel pnlScenariosLogHeader = new JPanel();
-            pnlScenariosLogHeader.setName("scenarioLogHeader");
-            pnlScenariosLogHeader.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
-                  "scenarioLogHeader.title")));
-            pnlScenariosLogHeader.setVisible(!campaignOptions.isDisplayScenarioLog());
-
-            JPanel pnlScenariosLog = fillScenarioLog();
-
-            pnlScenariosLog.setName("scenarioLog");
-            pnlScenariosLog.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
-                  "scenarioLog.title")));
-            pnlScenariosLog.setVisible(campaignOptions.isDisplayScenarioLog());
-
-            pnlScenariosLogHeader.addMouseListener(getSwitchListener(pnlScenariosLogHeader, pnlScenariosLog));
-            pnlScenariosLog.addMouseListener(getSwitchListener(pnlScenariosLog, pnlScenariosLogHeader));
-
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridY;
-            gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
-            gridBagConstraints.fill = GridBagConstraints.BOTH;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            add(pnlScenariosLogHeader, gridBagConstraints);
-            add(pnlScenariosLog, gridBagConstraints);
-            gridY++;
-        }
-
-        if (!person.getGenealogy().isEmpty()) {
-            JPanel pnlFamily = fillFamily();
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = gridY;
-            gridBagConstraints.gridwidth = 2;
             gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 1.0;
             gridBagConstraints.insets = new Insets(0, 0, 10, 0);
-            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            add(pnlFamily, gridBagConstraints);
+            pnlLogTab.add(pnlAssignmentsLogHeader, gridBagConstraints);
+            pnlLogTab.add(pnlAssignmentsLog, gridBagConstraints);
             gridY++;
         }
-
-        // use glue to fill up the remaining space so everything is aligned to the top
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = gridY;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        add(Box.createGlue(), gridBagConstraints);
     }
 
     /**
