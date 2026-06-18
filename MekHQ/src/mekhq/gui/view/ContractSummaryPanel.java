@@ -51,7 +51,6 @@ import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -590,10 +589,6 @@ public class ContractSummaryPanel extends JPanel {
 
     private JPanel getContractDifficultySkulls(AtBContract contract) {
         final int ERROR = -99;
-
-        // Create a new JFrame
-        JFrame frame = new JFrame();
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Create a pane with FlowLayout
         JPanel panel = new JPanel(new FlowLayout());

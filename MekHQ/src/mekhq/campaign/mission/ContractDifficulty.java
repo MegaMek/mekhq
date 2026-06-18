@@ -235,10 +235,14 @@ public class ContractDifficulty {
             totalBattleValue += battleValue * weight;
             totalGBV += genericBattleValue * weight;
             rollingCount += weight;
+            
+            if (rollingCount == 0) {
+                return ERROR;
+            }
         }
 
         if (useGenericBV) {
-            return ((double) totalBattleValue) / totalGBV;
+            return ((double) totalGBV) / rollingCount;
         } else {
             return ((double) totalBattleValue) / rollingCount;
         }

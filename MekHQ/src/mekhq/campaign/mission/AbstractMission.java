@@ -1425,7 +1425,7 @@ public class AbstractMission {
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "straightSupport", getStraightSupport());
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "battleLossComp", getBattleLossCompensation());
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "transportComp", getTransportCompensation());
-        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "mrbcFee", getMRBCFeePercentage());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "mrbcFee", isPaidMRBCFee());
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "advancePct", getAdvancePercent());
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "signBonus", getSigningBonus());
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "hospitalBedsRented", getHospitalBedsRented());
