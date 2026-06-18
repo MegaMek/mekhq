@@ -177,7 +177,7 @@ public class PityContracts {
      * @since 0.51.0
      */
     private static void overrideContractTermsForPityContracts(AtBContract contract) {
-        contract.setContractType(AtBContractType.PIRATE_HUNTING);
+        contract.setContractTypeAndName(AtBContractType.PIRATE_HUNTING);
 
         int salvageRoll = d6(1) * 10;
         contract.setSalvagePercent(salvageRoll);

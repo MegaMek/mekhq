@@ -154,7 +154,7 @@ public class AtBContract extends Contract {
         setContractDifficulty(Integer.MIN_VALUE);
 
         parentContract = null;
-        setContractType(AtBContractType.GARRISON_DUTY);
+        setContractTypeAndName(AtBContractType.GARRISON_DUTY);
 
         extensionLength = 0;
 
@@ -1083,7 +1083,7 @@ public class AtBContract extends Contract {
 
         /* Guess at AtBContract values */
         AtBContractType contractType = getAtBContractType(contract);
-        setContractType(contractType);
+        setContractTypeAndName(contractType);
 
         Faction f = Factions.getInstance()
                           .getFactionFromFullNameAndYear(contract.getEmployerName(), campaign.getGameYear());

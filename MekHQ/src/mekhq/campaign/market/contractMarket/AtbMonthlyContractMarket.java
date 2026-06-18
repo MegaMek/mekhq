@@ -454,9 +454,9 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                                Factions.getInstance().getFaction(contract.getEnemyCode()),
                                campaign.getLocalDate())) {
             if (contract.getContractType().isPlanetaryAssault()) {
-                contract.setContractType(AtBContractType.GARRISON_DUTY);
+                contract.setContractTypeAndName(AtBContractType.GARRISON_DUTY);
             } else if (contract.getContractType().isReliefDuty()) {
-                contract.setContractType(AtBContractType.SECURITY_DUTY);
+                contract.setContractTypeAndName(AtBContractType.SECURITY_DUTY);
             }
         }
         setAttacker(contract);
@@ -559,7 +559,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                                               contract.getContractType().isGarrisonType()));
         }
         if (contract.getContractType().isGarrisonDuty() && contract.getEnemy().isRebel()) {
-            contract.setContractType(AtBContractType.RIOT_DUTY);
+            contract.setContractTypeAndName(AtBContractType.RIOT_DUTY);
         }
 
         contract.setParentContract(parent);
@@ -658,7 +658,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
      */
     private void getContractType(AtBContract contract) {
         // Commander modifier is always 0 here as otherwise is skews AtB's results too much
-        contract.setContractType(ContractTypePicker.findMissionType(contract.getEmployerFaction(), 0));
+        contract.setContractTypeAndName(ContractTypePicker.findMissionType(contract.getEmployerFaction(), 0));
     }
 
 
@@ -674,7 +674,9 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
         ActionCheckResult actionCheckResult =
               commander.checkSkill(S_NEGOTIATION, campaign)
-                    .resolve(isUseEdge, getTextAt(RESOURCE_BUNDLE, "AtbMonthlyContractMarket.contractSkillCheck"), true);
+                    .resolve(isUseEdge,
+                          getTextAt(RESOURCE_BUNDLE, "AtbMonthlyContractMarket.contractSkillCheck"),
+                          true);
         campaign.addReport(SKILL_CHECKS, actionCheckResult.resultsText());
 
         return connections + Math.max(0, actionCheckResult.marginOfSuccess());
@@ -714,13 +716,13 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         followup.updateEmployer(contract.getEmployerCode(), campaign.getGameYear());
         switch (contract.getContractType()) {
             case DIVERSIONARY_RAID:
-                followup.setContractType(AtBContractType.OBJECTIVE_RAID);
+                followup.setContractTypeAndName(AtBContractType.OBJECTIVE_RAID);
                 break;
             case RECON_RAID:
-                followup.setContractType(AtBContractType.PLANETARY_ASSAULT);
+                followup.setContractTypeAndName(AtBContractType.PLANETARY_ASSAULT);
                 break;
             case RIOT_DUTY:
-                followup.setContractType(AtBContractType.GARRISON_DUTY);
+                followup.setContractTypeAndName(AtBContractType.GARRISON_DUTY);
                 break;
             default:
                 break;

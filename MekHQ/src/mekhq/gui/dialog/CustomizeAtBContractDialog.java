@@ -611,7 +611,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         contract.setName(txtName.getText());
         contract.updateEmployer(cbEmployer.getSelectedItemKey(), campaign.getGameYear());
         contract.setEnemyCode(cbEnemy.getSelectedItemKey());
-        contract.setContractType(comboContractType.getSelectedItem());
+        contract.setContractTypeAndName(comboContractType.getSelectedItem());
         contract.setAllySkill(comboAllySkill.getSelectedItem());
         contract.setAllyQuality(cbAllyQuality.getSelectedIndex());
         contract.setEnemySkill(comboEnemySkill.getSelectedItem());

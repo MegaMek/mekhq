@@ -640,9 +640,13 @@ public class AbstractMission {
         return contractType;
     }
 
-    public void setContractType(final AtBContractType contractType) {
+    public void setContractTypeAndName(final AtBContractType contractType) {
         this.contractType = contractType;
         setContractTypeName(contractType.toString());
+    }
+
+    public void setContractType(final AtBContractType contractType) {
+        this.contractType = contractType;
     }
 
     public boolean isPlayerAttacker() {

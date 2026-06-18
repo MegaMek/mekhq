@@ -579,7 +579,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         contract.setName(txtName.getText());
         contract.setSystemId(selectedSystem.getId());
         contract.updateEmployer(getCurrentEmployerCode(), campaign.getGameYear());
-        contract.setContractType(Objects.requireNonNull(comboContractType.getSelectedItem()));
+        contract.setContractTypeAndName(Objects.requireNonNull(comboContractType.getSelectedItem()));
         contract.setDescription(txtDesc.getText());
         contract.setCommandRights(choiceCommand.getSelectedItem());
 
@@ -674,7 +674,7 @@ public class NewAtBContractDialog extends NewContractDialog {
             updatePlanets();
             needUpdatePayment = true;
         } else if (source.equals(comboContractType)) {
-            contract.setContractType(Objects.requireNonNull(comboContractType.getSelectedItem()));
+            contract.setContractTypeAndName(Objects.requireNonNull(comboContractType.getSelectedItem()));
             contract.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
             spnLength.setValue(contract.getLengthInMonths());
             updatePlanets();

@@ -82,9 +82,9 @@ import testUtilities.MHQTestUtilities;
  * Save/load (XML serialization) regression tests for the {@link AbstractMission} hierarchy.
  *
  * <p>These tests guard the refactor that moved the shared mission/contract state onto {@link AbstractMission}, leaving
- * {@link Mission}, {@link Contract}, and {@link AtBContract} as thin subclasses. Because loading and saving of contracts
- * is a sensitive code path (a corrupted contract silently breaks a player's campaign), each sample file is checked in
- * two ways:</p>
+ * {@link Mission}, {@link Contract}, and {@link AtBContract} as thin subclasses. Because loading and saving of
+ * contracts is a sensitive code path (a corrupted contract silently breaks a player's campaign), each sample file is
+ * checked in two ways:</p>
  *
  * <ol>
  *     <li>The on-disk sample parses into the correct concrete type with the correct field values.</li>
@@ -108,6 +108,7 @@ public class AbstractMissionXmlIOTest {
     public static void initSingletons() {
         EquipmentType.initializeTypes();
         // Required by the AtBContract load path when it has to synthesize the contract's NPCs / merc company names.
+        // IntelliJ will tell you it's not being used, IntelliJ is lying
         RandomCallsignGenerator.getInstance(true);
         RandomCompanyNameGenerator.getInstance();
         try {
@@ -142,16 +143,14 @@ public class AbstractMissionXmlIOTest {
     }
 
     /**
-     * KNOWN BUG (contractType clobbers the free-text type name on save/load).
+     * Previously {@link AbstractMission#writeToXMLBegin} unconditionally wrote
+     * {@code <contractType>UNDEFINED</contractType>} for a plain mission. On reload, the {@code contractType} handler
+     * called {@code setContractTypeAndName(UNDEFINED)}, whose side effect overwrote the {@code contractTypeName} that
+     * was just read from {@code <type>}; the free-text type (here {@code "affdsf"}) became {@code "Undefined"}. A plain
+     * mission's type is therefore corrupted by a single save/load cycle. On {@code main} a plain mission never
+     * serialized {@code <contractType>} at all.
      *
-     * <p>{@link AbstractMission#writeToXMLBegin} unconditionally writes {@code <contractType>UNDEFINED</contractType>}
-     * for a plain mission. On reload, the {@code contractType} handler calls {@code setContractType(UNDEFINED)}, whose
-     * side effect overwrites the {@code contractTypeName} that was just read from {@code <type>}; the free-text type
-     * (here {@code "affdsf"}) becomes {@code "Undefined"}. A plain mission's type is therefore corrupted by a single
-     * save/load cycle. On {@code main} a plain mission never serialized {@code <contractType>} at all.</p>
-     *
-     * <p>Recommended fix: only write {@code <contractType>} when it is not {@code AtBContractType.UNDEFINED} (mirrors
-     * how the other optional tags are guarded). This test fails until that fix is applied.</p>
+     * <p>This bug has been since fixed. The test remains to protect against regression.</p>
      */
     @Test
     void plainMissionSurvivesRoundTrip() throws Exception {
@@ -198,10 +197,14 @@ public class AbstractMissionXmlIOTest {
     }
 
     /**
-     * KNOWN BUG (contractType clobbers the free-text type name on save/load) - see
-     * {@link #plainMissionSurvivesRoundTrip()} for the full description. Here the contract's {@code "Deception"} type
-     * is corrupted to {@code "Undefined"} by a single save/load cycle. This test fails until the writer guards the
-     * {@code contractType} tag.
+     * Previously {@link AbstractMission#writeToXMLBegin} unconditionally wrote
+     * {@code <contractType>UNDEFINED</contractType>} for a plain mission. On reload, the {@code contractType} handler
+     * called {@code setContractTypeAndName(UNDEFINED)}, whose side effect overwrote the {@code contractTypeName} that
+     * was just read from {@code <type>}; the free-text type (here {@code "affdsf"}) became {@code "Undefined"}. A plain
+     * mission's type is therefore corrupted by a single save/load cycle. On {@code main} a plain mission never
+     * serialized {@code <contractType>} at all.
+     *
+     * <p>This bug has been since fixed. The test remains to protect against regression.</p>
      */
     @Test
     void contractSurvivesRoundTrip() throws Exception {
@@ -308,8 +311,8 @@ public class AbstractMissionXmlIOTest {
      * The file samples only populate the fields that happen to appear in them. This builds a contract in code with a
      * non-default value in <em>every</em> serialized field - including those the samples leave at defaults
      * (enemyMercenaryEmployerCode, the negotiation rolls, routEnd/routedPayout, rented facilities, ally/enemy colours,
-     * etc.) - then writes and reads it back and asserts each value survives. This is the test that most directly
-     * guards against the "written-but-not-read" / "read-but-not-written" tag mismatch that corrupts contracts.
+     * etc.) - then writes and reads it back and asserts each value survives. This is the test that most directly guards
+     * against the "written-but-not-read" / "read-but-not-written" tag mismatch that corrupts contracts.
      *
      * <p>A real {@code contractType} is set (rather than {@code UNDEFINED}) so that {@code type}/{@code contractType}
      * round-trip consistently here; the {@code UNDEFINED}-specific clobber is covered by
@@ -323,7 +326,7 @@ public class AbstractMissionXmlIOTest {
         contract.setSystemId("Terra");
         contract.setStatus(MissionStatus.SUCCESS);
         contract.setDescription("a description");
-        contract.setContractType(AtBContractType.PIRATE_HUNTING);
+        contract.setContractTypeAndName(AtBContractType.PIRATE_HUNTING);
 
         contract.setLengthInMonths(9);
         contract.setStartDate(LocalDate.of(3055, 3, 4));
@@ -425,8 +428,8 @@ public class AbstractMissionXmlIOTest {
 
     /**
      * A freshly-constructed mission of each concrete type must serialize and deserialize without error and round-trip
-     * its core identity. This guards against null-field NPEs in the writer (e.g. unset dates or camouflage) and
-     * against a default object failing to reload as the same type.
+     * its core identity. This guards against null-field NPEs in the writer (e.g. unset dates or camouflage) and against
+     * a default object failing to reload as the same type.
      */
     @Test
     void freshlyConstructedMissionsSerializeWithoutError() throws Exception {
@@ -634,8 +637,8 @@ public class AbstractMissionXmlIOTest {
 
     /**
      * Instantiates a mission from a single {@code <mission>} XML string at the given save {@link Version}. Unlike
-     * {@link #parseMission}, this returns whatever {@link AbstractMission#generateInstanceFromXML} produces -
-     * including {@code null} for malformed input - so robustness and version-compatibility tests can assert on it.
+     * {@link #parseMission}, this returns whatever {@link AbstractMission#generateInstanceFromXML} produces - including
+     * {@code null} for malformed input - so robustness and version-compatibility tests can assert on it.
      */
     private AbstractMission generateFromXml(String missionXml, Version version) throws Exception {
         Document document = parseDocument(missionXml.getBytes(StandardCharsets.UTF_8));
