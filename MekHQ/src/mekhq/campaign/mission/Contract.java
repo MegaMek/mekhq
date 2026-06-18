@@ -47,9 +47,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
-import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * Contracts - we need to track static amounts here because changes in the underlying campaign don't change the figures
@@ -199,109 +197,15 @@ public class Contract extends Mission {
     }
 
     @Override
-    protected int writeToXMLBegin(Campaign campaign, final PrintWriter pw, int indent) {
-        indent = super.writeToXMLBegin(campaign, pw, indent);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "nMonths", getLengthInMonths());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "startDate", getStartDate());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "endDate", getEndingDate());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "employer", getEmployerName());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "paymentMultiplier", getPaymentMultiplier());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commandRights", getCommandRights().name());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "overheadComp", getOverheadCompensation());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvagePct", getSalvagePercent());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvageExchange", isSalvageExchange());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "straightSupport", getStraightSupport());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "battleLossComp", getBattleLossCompensation());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "transportComp", getTransportCompensation());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mrbcFee", getMRBCFeePercentage());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "advancePct", getAdvancePercent());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "signBonus", getSigningBonus());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hospitalBedsRented", getHospitalBedsRented());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "kitchensRented", getKitchensRented());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "holdingCellsRented", getHoldingCellsRented());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "advanceAmount", getAdvanceAmount());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "signingAmount", getSigningBonusAmount());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "transportAmount", getTransportAmount());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "transitAmount", getTransitAmount());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "overheadAmount", getOverheadAmount());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "supportAmount", getSupportAmount());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "baseAmount", getBaseAmount());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "feeAmount", getFeeAmount());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvagedByUnit", getSalvagedByUnit());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvagedByEmployer", getSalvagedByEmployer());
-        return indent;
+    protected int writeToXMLBegin(Campaign campaign, final PrintWriter printWriter, int indent) {
+        // All Contract-level fields are owned by AbstractMission.
+        return super.writeToXMLBegin(campaign, printWriter, indent);
     }
 
     @Override
-    public void loadFieldsFromXmlNode(Campaign campaign, Version version, Node wn) throws ParseException {
-        // Okay, now load mission-specific fields!
-        NodeList nl = wn.getChildNodes();
-
-        for (int x = 0; x < nl.getLength(); x++) {
-            Node wn2 = nl.item(x);
-
-            try {
-                if (wn2.getNodeName().equalsIgnoreCase("employer")) {
-                    setEmployerName(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("startDate")) {
-                    setStartDate(MHQXMLUtility.parseDate(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("endDate")) {
-                    setEndingDate(MHQXMLUtility.parseDate(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("nMonths")) {
-                    setLengthInMonths(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("paymentMultiplier")) {
-                    setPaymentMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("commandRights")) {
-                    setCommandRights(ContractCommandRights.parseFromString(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("overheadComp")) {
-                    setOverheadCompensation(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("salvagePct")) {
-                    setSalvagePercent(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("salvageExchange")) {
-                    setSalvageExchange(wn2.getTextContent().trim().equals("true"));
-                } else if (wn2.getNodeName().equalsIgnoreCase("straightSupport")) {
-                    setStraightSupport(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("battleLossComp")) {
-                    setBattleLossCompensation(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("transportComp")) {
-                    setTransportCompensation(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("advancePct")) {
-                    setAdvancePercent(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("signBonus")) {
-                    setSigningBonus(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("hospitalBedsRented")) {
-                    setHospitalBedsRented(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("kitchensRented")) {
-                    setKitchensRented(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("holdingCellsRented")) {
-                    setHoldingCellsRented(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("mrbcFee")) {
-                    setPaidMRBCFee(wn2.getTextContent().trim().equals("true"));
-                } else if (wn2.getNodeName().equalsIgnoreCase("advanceAmount")) {
-                    setAdvanceAmount(Money.fromXmlString(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("signingAmount")) {
-                    setSigningBonusAmount(Money.fromXmlString(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("transportAmount")) {
-                    setTransportAmount(Money.fromXmlString(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("transitAmount")) {
-                    setTransitAmount(Money.fromXmlString(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("overheadAmount")) {
-                    setOverheadAmount(Money.fromXmlString(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("supportAmount")) {
-                    setSupportAmount(Money.fromXmlString(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("baseAmount")) {
-                    setBaseAmount(Money.fromXmlString(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("feeAmount")) {
-                    setFeeAmount(Money.fromXmlString(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("salvagedByUnit")) {
-                    setSalvagedByUnit(Money.fromXmlString(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("salvagedByEmployer")) {
-                    setSalvagedByEmployer(Money.fromXmlString(wn2.getTextContent().trim()));
-                }
-            } catch (Exception ex) {
-                logger.error("", ex);
-            }
-        }
+    public void loadFieldsFromXmlNode(Campaign campaign, Version version, Node node) throws ParseException {
+        // All Contract-level fields are parsed by AbstractMission.
+        super.loadFieldsFromXmlNode(campaign, version, node);
 
         // Version compatibility fix: Prior to 0.50.12, transportAmount stored the player's out-of-pocket
         // transport cost. Now it stores the employer's transport reimbursement. Recalculate for old saves.

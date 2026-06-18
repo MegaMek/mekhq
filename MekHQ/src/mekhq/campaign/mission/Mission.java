@@ -40,12 +40,7 @@ import megamek.Version;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.enums.MissionStatus;
-import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.utilities.MHQXMLUtility;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * Missions are primarily holder objects for a set of scenarios.
@@ -69,102 +64,25 @@ public class Mission extends AbstractMission {
     // endregion Constructors
 
     @Override
-    protected int writeToXMLBegin(Campaign campaign, final PrintWriter pw, int indent) {
-        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "mission", "id", getId(), "type", getClass());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", getName());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "type", getContractTypeName());
-        if (getSystemId() != null) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "systemId", getSystemId());
-        } else {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetName", getLegacyPlanetName());
-        }
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "status", getStatus().name());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "desc", getDescription());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "id", getId());
-        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "scenarios");
-        for (Scenario s : getScenarios()) {
-            s.writeToXML(pw, indent);
-        }
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "scenarios");
-        return indent;
+    protected int writeToXMLBegin(Campaign campaign, final PrintWriter printWriter, int indent) {
+        // All Mission-level fields are owned by AbstractMission.
+        return super.writeToXMLBegin(campaign, printWriter, indent);
     }
 
     @Override
-    public void loadFieldsFromXmlNode(Campaign campaign, Version version, Node wn) throws ParseException {
-        // do nothing
+    public void loadFieldsFromXmlNode(Campaign campaign, Version version, Node node) throws ParseException {
+        // All Mission-level fields are parsed by AbstractMission.
+        super.loadFieldsFromXmlNode(campaign, version, node);
     }
 
+    /**
+     * @deprecated Call {@link AbstractMission#generateInstanceFromXML} directly. This delegate exists only so that
+     *       existing call sites in the campaign loader do not need to be updated immediately.
+     */
+    @Deprecated
     public static Mission generateInstanceFromXML(Node node, Campaign campaign, Version version) {
-        Mission retVal = null;
-        NamedNodeMap attrs = node.getAttributes();
-        Node classNameNode = attrs.getNamedItem("type");
-        String className = classNameNode.getTextContent();
-
-        try {
-            // Instantiate the correct child class, and call its parsing
-            // function.
-            retVal = (Mission) Class.forName(className).getDeclaredConstructor().newInstance();
-            retVal.loadFieldsFromXmlNode(campaign, version, node);
-
-            // Okay, now load mission-specific fields!
-            NodeList nl = node.getChildNodes();
-
-            for (int x = 0; x < nl.getLength(); x++) {
-                Node wn2 = nl.item(x);
-
-                if (wn2.getNodeName().equalsIgnoreCase("name")) {
-
-                    retVal.setName(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("planetId") ||
-                                 wn2.getNodeName().equalsIgnoreCase("systemId")) {
-                    retVal.setSystemId(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("planetName")) {
-                    PlanetarySystem system = campaign.getSystemByName(wn2.getTextContent());
-
-                    if (system != null) {
-                        retVal.setSystemId(campaign.getSystemByName(wn2.getTextContent()).getId());
-                    } else {
-                        retVal.setLegacyPlanetName(wn2.getTextContent());
-                    }
-                } else if (wn2.getNodeName().equalsIgnoreCase("status")) {
-                    retVal.setStatus(MissionStatus.parseFromString(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("id")) {
-                    retVal.setId(Integer.parseInt(wn2.getTextContent()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("desc")) {
-                    retVal.setDescription(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("type")) {
-                    retVal.setContractTypeName(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("scenarios")) {
-                    NodeList nl2 = wn2.getChildNodes();
-                    for (int y = 0; y < nl2.getLength(); y++) {
-                        Node wn3 = nl2.item(y);
-                        // If it's not an element node, we ignore it.
-                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
-                            continue;
-                        }
-
-                        if (!wn3.getNodeName().equalsIgnoreCase("scenario")) {
-                            // Error condition of sorts!
-                            // what should we do here?
-                            LOGGER.error("Unknown node type not loaded in Scenario nodes: {}", wn3.getNodeName());
-
-                            continue;
-                        }
-                        Scenario s = Scenario.generateInstanceFromXML(wn3, campaign, version);
-
-                        if (null != s) {
-                            retVal.addScenario(s);
-                        }
-                    }
-                }
-            }
-        } catch (Exception ex) {
-            LOGGER.error("", ex);
-        }
-
-        return retVal;
+        return (Mission) AbstractMission.generateInstanceFromXML(node, campaign, version);
     }
-    // endregion File I/O
 
     @Override
     public String toString() {

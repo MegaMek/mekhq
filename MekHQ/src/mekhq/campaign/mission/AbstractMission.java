@@ -36,6 +36,7 @@ import static java.lang.Math.ceil;
 import static megamek.client.ui.util.PlayerColour.BLUE;
 import static megamek.client.ui.util.PlayerColour.RED;
 import static megamek.common.enums.SkillLevel.REGULAR;
+import static megamek.common.enums.SkillLevel.parseFromString;
 import static mekhq.campaign.mission.enums.AtBContractType.UNDEFINED;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.MAXIMUM_MORALE_LEVEL;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.MINIMUM_MORALE_LEVEL;
@@ -92,8 +93,9 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.utilities.MHQXMLUtility;
-import org.apache.commons.lang3.NotImplementedException;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 public class AbstractMission {
     private static final MMLogger LOGGER = MMLogger.create(AbstractMission.class);
@@ -1380,14 +1382,141 @@ public class AbstractMission {
     public void acceptContract(Campaign campaign) {
     }
 
-    public void writeToXML(Campaign campaign, final PrintWriter pw, int indent) {
-        indent = writeToXMLBegin(campaign, pw, indent);
-        writeToXMLEnd(pw, indent);
+    public void writeToXML(Campaign campaign, final PrintWriter printWriter, int indent) {
+        indent = writeToXMLBegin(campaign, printWriter, indent);
+        writeToXMLEnd(printWriter, indent);
     }
 
-    protected int writeToXMLBegin(Campaign campaign, final PrintWriter pw, int indent) {
-        NotImplementedException error = new NotImplementedException();
-        LOGGER.error(error);
+    /**
+     * Writes all {@link AbstractMission} fields to XML. Subclasses that have their own private fields must override
+     * this, call {@code super.writeToXMLBegin(...)}, append only their private tags, and return the resulting indent.
+     */
+    protected int writeToXMLBegin(Campaign campaign, final PrintWriter printWriter, int indent) {
+        // opening tag and core identity
+        MHQXMLUtility.writeSimpleXMLOpenTag(printWriter, indent++, "mission", "id", getId(), "type", getClass());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "name", getName());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "type", getContractTypeName());
+        if (getSystemId() != null) {
+            MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "systemId", getSystemId());
+        } else {
+            MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "planetName", getLegacyPlanetName());
+        }
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "status", getStatus().name());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "desc", getDescription());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "id", getId());
+
+        // scenarios block
+        MHQXMLUtility.writeSimpleXMLOpenTag(printWriter, indent++, "scenarios");
+        for (Scenario s : getScenarios()) {
+            s.writeToXML(printWriter, indent);
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(printWriter, --indent, "scenarios");
+
+        // contract financials and terms
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "nMonths", getLengthInMonths());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "startDate", getStartDate());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "endDate", getEndingDate());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "employer", getEmployerName());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "paymentMultiplier", getPaymentMultiplier());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "commandRights", getCommandRights().name());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "overheadComp", getOverheadCompensation());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "salvagePct", getSalvagePercent());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "salvageExchange", isSalvageExchange());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "straightSupport", getStraightSupport());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "battleLossComp", getBattleLossCompensation());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "transportComp", getTransportCompensation());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "mrbcFee", getMRBCFeePercentage());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "advancePct", getAdvancePercent());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "signBonus", getSigningBonus());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "hospitalBedsRented", getHospitalBedsRented());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "kitchensRented", getKitchensRented());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "holdingCellsRented", getHoldingCellsRented());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "advanceAmount", getAdvanceAmount());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "signingAmount", getSigningBonusAmount());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "transportAmount", getTransportAmount());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "transitAmount", getTransitAmount());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "overheadAmount", getOverheadAmount());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "supportAmount", getSupportAmount());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "baseAmount", getBaseAmount());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "feeAmount", getFeeAmount());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "salvagedByUnit", getSalvagedByUnit());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "salvagedByEmployer", getSalvagedByEmployer());
+
+        // faction and force data
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "employerCode", getEmployerCode());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "enemyCode", getEnemyCode());
+        if (getEnemyMercenaryEmployerCode() != null) {
+            MHQXMLUtility.writeSimpleXMLTag(printWriter,
+                  indent,
+                  "enemyMercenaryEmployerCode",
+                  getEnemyMercenaryEmployerCode());
+        }
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "contractType", getContractType().name());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "allySkill", getAllySkill().name());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "allyQuality", getAllyQuality());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "enemySkill", getEnemySkill().name());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "enemyQuality", getEnemyQuality());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "difficulty", getContractDifficulty());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "allyBotName", getAllyBotName());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "enemyBotName", getEnemyBotName());
+        if (!getAllyCamouflage().hasDefaultCategory()) {
+            MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "allyCamoCategory", getAllyCamouflage().getCategory());
+        }
+        if (!getAllyCamouflage().hasDefaultFilename()) {
+            MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "allyCamoFileName", getAllyCamouflage().getFilename());
+        }
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "allyColour", getAllyColour().name());
+        if (!getEnemyCamouflage().hasDefaultCategory()) {
+            MHQXMLUtility.writeSimpleXMLTag(printWriter,
+                  indent,
+                  "enemyCamoCategory",
+                  getEnemyCamouflage().getCategory());
+        }
+        if (!getEnemyCamouflage().hasDefaultFilename()) {
+            MHQXMLUtility.writeSimpleXMLTag(printWriter,
+                  indent,
+                  "enemyCamoFileName",
+                  getEnemyCamouflage().getFilename());
+        }
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "enemyColour", getEnemyColour().name());
+
+        // combat requirements and state
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "requiredCombatTeams", getRequiredCombatTeams());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "requiredCombatElements", getRequiredCombatElements());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "moraleLevel", getMoraleLevel().name());
+        if (getRoutEndDate() != null) {
+            MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "routEnd", getRoutEndDate());
+        }
+        if (getRoutedPayout() != null) {
+            MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "routedPayout", getRoutedPayout());
+        }
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "partsAvailabilityLevel", getPartsAvailabilityLevel());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "sharesPct", getSharesPercent());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "batchallAccepted", isBatchallAccepted());
+
+        // negotiation roll results
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "commandRoll", getContractNegotiationCommandRoll());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "salvageRoll", getContractNegotiationSalvageRoll());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "supportRoll", getContractNegotiationSupportRoll());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "transportRoll", getContractNegotiationTransportRoll());
+
+        // StratCon state
+        if (getStratConCampaignState() != null) {
+            getStratConCampaignState().Serialize(printWriter);
+        }
+
+        // NPCs
+        if (getEmployerLiaison() != null) {
+            MHQXMLUtility.writeSimpleXMLOpenTag(printWriter, indent++, "employerLiaison");
+            getEmployerLiaison().writeToXMLHeadless(printWriter, indent, campaign);
+            MHQXMLUtility.writeSimpleXMLCloseTag(printWriter, --indent, "employerLiaison");
+        }
+        if (getClanOpponent() != null) {
+            MHQXMLUtility.writeSimpleXMLOpenTag(printWriter, indent++, "clanOpponent");
+            getClanOpponent().writeToXMLHeadless(printWriter, indent, campaign);
+            MHQXMLUtility.writeSimpleXMLCloseTag(printWriter, --indent, "clanOpponent");
+        }
+
         return indent;
     }
 
@@ -1395,16 +1524,222 @@ public class AbstractMission {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "mission");
     }
 
-    public void loadFieldsFromXmlNode(Campaign campaign, Version version, Node wn) throws ParseException {
-        NotImplementedException error = new NotImplementedException();
-        LOGGER.error(error);
+    /**
+     * Parses all {@link AbstractMission} fields from child nodes of the mission XML element. Subclasses with private
+     * fields must override this, call {@code super.loadFieldsFromXmlNode(...)}, then handle only their own nodes.
+     */
+    public void loadFieldsFromXmlNode(Campaign campaign, Version version, Node node) throws ParseException {
+        NodeList nodeList = node.getChildNodes();
+
+        for (int x = 0; x < nodeList.getLength(); x++) {
+            Node item = nodeList.item(x);
+
+            try {
+                String nodeName = item.getNodeName().trim();
+                String value = item.getTextContent();
+
+                // core identity
+                if (nodeName.equalsIgnoreCase("name")) {
+                    setName(value);
+                } else if (nodeName.equalsIgnoreCase("planetId")
+                                 || nodeName.equalsIgnoreCase("systemId")) {
+                    setSystemId(value);
+                } else if (nodeName.equalsIgnoreCase("planetName")) {
+                    PlanetarySystem system = campaign.getSystemByName(value);
+                    if (system != null) {
+                        setSystemId(system.getId());
+                    } else {
+                        setLegacyPlanetName(value);
+                    }
+                } else if (nodeName.equalsIgnoreCase("status")) {
+                    setStatus(MissionStatus.parseFromString(value.trim()));
+                } else if (nodeName.equalsIgnoreCase("id")) {
+                    setId(Integer.parseInt(value));
+                } else if (nodeName.equalsIgnoreCase("desc")) {
+                    setDescription(value);
+                } else if (nodeName.equalsIgnoreCase("type")) {
+                    setContractTypeName(value);
+
+                    // scenarios block
+                } else if (nodeName.equalsIgnoreCase("scenarios")) {
+                    NodeList nl2 = item.getChildNodes();
+                    for (int y = 0; y < nl2.getLength(); y++) {
+                        Node wn3 = nl2.item(y);
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                            continue;
+                        }
+                        if (!wn3.getNodeName().equalsIgnoreCase("scenario")) {
+                            LOGGER.error("Unknown node type not loaded in Scenario nodes: {}", wn3.getNodeName());
+                            continue;
+                        }
+                        Scenario s = Scenario.generateInstanceFromXML(wn3, campaign, version);
+                        if (s != null) {
+                            addScenario(s);
+                        }
+                    }
+
+                    // contract financials and terms
+                } else if (nodeName.equalsIgnoreCase("employer")) {
+                    setEmployerName(value);
+                } else if (nodeName.equalsIgnoreCase("startDate")) {
+                    setStartDate(MHQXMLUtility.parseDate(value.trim()));
+                } else if (nodeName.equalsIgnoreCase("endDate")) {
+                    setEndingDate(MHQXMLUtility.parseDate(value.trim()));
+                } else if (nodeName.equalsIgnoreCase("nMonths")) {
+                    setLengthInMonths(Integer.parseInt(value.trim()));
+                } else if (nodeName.equalsIgnoreCase("paymentMultiplier")) {
+                    setPaymentMultiplier(Double.parseDouble(value.trim()));
+                } else if (nodeName.equalsIgnoreCase("commandRights")) {
+                    setCommandRights(ContractCommandRights.parseFromString(value.trim()));
+                } else if (nodeName.equalsIgnoreCase("overheadComp")) {
+                    setOverheadCompensation(Integer.parseInt(value.trim()));
+                } else if (nodeName.equalsIgnoreCase("salvagePct")) {
+                    setSalvagePercent(Integer.parseInt(value.trim()));
+                } else if (nodeName.equalsIgnoreCase("salvageExchange")) {
+                    setSalvageExchange(value.trim().equals("true"));
+                } else if (nodeName.equalsIgnoreCase("straightSupport")) {
+                    setStraightSupport(Integer.parseInt(value.trim()));
+                } else if (nodeName.equalsIgnoreCase("battleLossComp")) {
+                    setBattleLossCompensation(Integer.parseInt(value.trim()));
+                } else if (nodeName.equalsIgnoreCase("transportComp")) {
+                    setTransportCompensation(Integer.parseInt(value.trim()));
+                } else if (nodeName.equalsIgnoreCase("advancePct")) {
+                    setAdvancePercent(Integer.parseInt(value.trim()));
+                } else if (nodeName.equalsIgnoreCase("signBonus")) {
+                    setSigningBonus(Integer.parseInt(value.trim()));
+                } else if (nodeName.equalsIgnoreCase("hospitalBedsRented")) {
+                    setHospitalBedsRented(Integer.parseInt(value.trim()));
+                } else if (nodeName.equalsIgnoreCase("kitchensRented")) {
+                    setKitchensRented(Integer.parseInt(value.trim()));
+                } else if (nodeName.equalsIgnoreCase("holdingCellsRented")) {
+                    setHoldingCellsRented(Integer.parseInt(value.trim()));
+                } else if (nodeName.equalsIgnoreCase("mrbcFee")) {
+                    setPaidMRBCFee(value.trim().equals("true"));
+                } else if (nodeName.equalsIgnoreCase("advanceAmount")) {
+                    setAdvanceAmount(Money.fromXmlString(value.trim()));
+                } else if (nodeName.equalsIgnoreCase("signingAmount")) {
+                    setSigningBonusAmount(Money.fromXmlString(value.trim()));
+                } else if (nodeName.equalsIgnoreCase("transportAmount")) {
+                    setTransportAmount(Money.fromXmlString(value.trim()));
+                } else if (nodeName.equalsIgnoreCase("transitAmount")) {
+                    setTransitAmount(Money.fromXmlString(value.trim()));
+                } else if (nodeName.equalsIgnoreCase("overheadAmount")) {
+                    setOverheadAmount(Money.fromXmlString(value.trim()));
+                } else if (nodeName.equalsIgnoreCase("supportAmount")) {
+                    setSupportAmount(Money.fromXmlString(value.trim()));
+                } else if (nodeName.equalsIgnoreCase("baseAmount")) {
+                    setBaseAmount(Money.fromXmlString(value.trim()));
+                } else if (nodeName.equalsIgnoreCase("feeAmount")) {
+                    setFeeAmount(Money.fromXmlString(value.trim()));
+                } else if (nodeName.equalsIgnoreCase("salvagedByUnit")) {
+                    setSalvagedByUnit(Money.fromXmlString(value.trim()));
+                } else if (nodeName.equalsIgnoreCase("salvagedByEmployer")) {
+                    setSalvagedByEmployer(Money.fromXmlString(value.trim()));
+
+                    // faction and force data
+                } else if (nodeName.equalsIgnoreCase("employerCode")) {
+                    setEmployerCode(value);
+                } else if (nodeName.equalsIgnoreCase("enemyCode")) {
+                    setEnemyCode(value);
+                } else if (nodeName.equalsIgnoreCase("enemyMercenaryEmployerCode")) {
+                    setEnemyMercenaryEmployerCode(value);
+                } else if (nodeName.equalsIgnoreCase("contractType")) {
+                    setContractType(AtBContractType.parseFromString(value.trim()));
+                } else if (nodeName.equalsIgnoreCase("allySkill")) {
+                    setAllySkill(parseFromString(value.trim()));
+                } else if (nodeName.equalsIgnoreCase("allyQuality")) {
+                    setAllyQuality(Integer.parseInt(value));
+                } else if (nodeName.equalsIgnoreCase("enemySkill")) {
+                    setEnemySkill(parseFromString(value.trim()));
+                } else if (nodeName.equalsIgnoreCase("enemyQuality")) {
+                    setEnemyQuality(Integer.parseInt(value));
+                } else if (nodeName.equalsIgnoreCase("difficulty")) {
+                    setContractDifficulty(Integer.parseInt(value));
+                } else if (nodeName.equalsIgnoreCase("allyBotName")) {
+                    setAllyBotName(value);
+                } else if (nodeName.equalsIgnoreCase("enemyBotName")) {
+                    setEnemyBotName(value);
+                } else if (nodeName.equalsIgnoreCase("allyCamoCategory")) {
+                    getAllyCamouflage().setCategory(value.trim());
+                } else if (nodeName.equalsIgnoreCase("allyCamoFileName")) {
+                    getAllyCamouflage().setFilename(value.trim());
+                } else if (nodeName.equalsIgnoreCase("allyColour")) {
+                    setAllyColour(PlayerColour.parseFromString(value.trim()));
+                } else if (nodeName.equalsIgnoreCase("enemyCamoCategory")) {
+                    getEnemyCamouflage().setCategory(value.trim());
+                } else if (nodeName.equalsIgnoreCase("enemyCamoFileName")) {
+                    getEnemyCamouflage().setFilename(value.trim());
+                } else if (nodeName.equalsIgnoreCase("enemyColour")) {
+                    setEnemyColour(PlayerColour.parseFromString(value.trim()));
+
+                    // combat requirements and state
+                } else if (nodeName.equalsIgnoreCase("requiredCombatTeams")) {
+                    setRequiredCombatTeams(Integer.parseInt(value));
+                } else if (nodeName.equalsIgnoreCase("requiredCombatElements")) {
+                    setRequiredCombatElements(Integer.parseInt(value));
+                } else if (nodeName.equalsIgnoreCase("moraleLevel")) {
+                    setMoraleLevel(AtBMoraleLevel.parseFromString(value.trim()));
+                } else if (nodeName.equalsIgnoreCase("routEnd")) {
+                    setRoutEndDate(MHQXMLUtility.parseDate(value.trim()));
+                } else if (nodeName.equalsIgnoreCase("routedPayout")) {
+                    String cleanValue = value.trim().replaceAll("[^0-9.]", "");
+                    setRoutedPayout(Money.of(Double.parseDouble(cleanValue)));
+                } else if (nodeName.equalsIgnoreCase("partsAvailabilityLevel")) {
+                    setPartsAvailabilityLevel(Integer.parseInt(value));
+                } else if (nodeName.equalsIgnoreCase("sharesPct")) {
+                    setSharesPercent(Integer.parseInt(value));
+                } else if (nodeName.equalsIgnoreCase("batchallAccepted")) {
+                    setBatchallAccepted(Boolean.parseBoolean(value));
+
+                    // negotiation roll results
+                } else if (nodeName.equalsIgnoreCase("commandRoll")) {
+                    setContractNegotiationCommandRoll(Integer.parseInt(value));
+                } else if (nodeName.equalsIgnoreCase("salvageRoll")) {
+                    setContractNegotiationSalvageRoll(Integer.parseInt(value));
+                } else if (nodeName.equalsIgnoreCase("supportRoll")) {
+                    setContractNegotiationSupportRoll(Integer.parseInt(value));
+                } else if (nodeName.equalsIgnoreCase("transportRoll")) {
+                    setContractNegotiationTransportRoll(Integer.parseInt(value));
+
+                    // stratcon state
+                    // Note: setContract() wiring (which requires an AtBContract reference) is handled in
+                    // AtBContract.loadFieldsFromXmlNode after super returns.
+                } else if (nodeName.equalsIgnoreCase(StratConCampaignState.ROOT_XML_ELEMENT_NAME)) {
+                    setStratConCampaignState(StratConCampaignState.Deserialize(item));
+
+                    // NPCs
+                } else if (nodeName.equalsIgnoreCase("employerLiaison")) {
+                    setEmployerLiaison(Person.generateInstanceFromXML(item, campaign, version));
+                } else if (nodeName.equalsIgnoreCase("clanOpponent")) {
+                    setClanOpponent(Person.generateInstanceFromXML(item, campaign, version));
+                }
+            } catch (Exception ex) {
+                LOGGER.error("", ex);
+            }
+        }
     }
 
+    /**
+     * Instantiates the correct {@link AbstractMission} subclass from XML and fully loads its state. The concrete type
+     * is determined by the {@code type} attribute on the node, identical to before.
+     * <p>
+     * Callers that previously used {@code Mission.generateInstanceFromXML} should migrate to this method; the static
+     * delegate on {@link Mission} is preserved only for backward compatibility.
+     */
     public static AbstractMission generateInstanceFromXML(Node node, Campaign campaign, Version version) {
-        NotImplementedException error = new NotImplementedException();
-        LOGGER.error(error);
+        AbstractMission retVal = null;
+        NamedNodeMap nodeAttributes = node.getAttributes();
+        Node classNameNode = nodeAttributes.getNamedItem("type");
+        String className = classNameNode.getTextContent();
 
-        return new AbstractMission();
+        try {
+            retVal = (AbstractMission) Class.forName(className).getDeclaredConstructor().newInstance();
+            retVal.loadFieldsFromXmlNode(campaign, version, node);
+        } catch (Exception ex) {
+            LOGGER.error("", ex);
+        }
+
+        return retVal;
     }
 
     @Override
