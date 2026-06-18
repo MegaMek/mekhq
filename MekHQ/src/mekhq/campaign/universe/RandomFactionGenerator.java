@@ -115,7 +115,6 @@ public class RandomFactionGenerator {
         borderTracker.setRegionCenter(location.getX(), location.getY());
         borderTracker.setRegionRadius(c.getCampaignOptions().getContractSearchRadius());
         MekHQ.registerHandler(borderTracker);
-        MekHQ.registerHandler(this);
         for (final Faction faction : Factions.getInstance().getFactions()) {
             if (faction.isDeepPeriphery()) {
                 borderTracker.setBorderSize(faction, MHQConstants.FACTION_GENERATOR_BORDER_RANGE_DEEP_PERIPHERY);
@@ -133,7 +132,6 @@ public class RandomFactionGenerator {
 
     public void dispose() {
         MekHQ.unregisterHandler(borderTracker);
-        MekHQ.unregisterHandler(this);
     }
 
     private LocalDate getCurrentDate() {

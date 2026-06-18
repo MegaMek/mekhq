@@ -203,8 +203,18 @@ public class TemporaryPersonnelManagementMenu extends JMenu {
               "miHireVesselCrew.text", "popupHireVesselCrewNum.text",
               "miFireVesselCrew.text", "popupFireVesselCrewNum.text",
               "miFullStrengthVesselCrew.text", "miFireAllVesselCrew.text");
+    }
 
+    @Override
+    public void addNotify() {
+        super.addNotify();
         MekHQ.registerHandler(this);
+    }
+
+    @Override
+    public void removeNotify() {
+        MekHQ.unregisterHandler(this);
+        super.removeNotify();
     }
 
     public Campaign getCampaign() {

@@ -99,7 +99,6 @@ import megamek.common.planetaryConditions.PlanetaryConditions;
 import megamek.logging.MMLogger;
 import megamek.server.Server;
 import megamek.server.totalWarfare.TWGameManager;
-import megameklab.MMLConstants;
 import megameklab.MegaMekLab;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
@@ -264,12 +263,7 @@ public class MekHQ implements GameListener {
      * restart back to the splash screen
      */
     public void restart() {
-
-        // Actually close MHQ
-        if (campaignGUI != null) {
-            campaignGUI.getFrame().dispose();
-        }
-
+        disposeGUI();
         new StartupScreenPanel(this).getFrame().setVisible(true);
     }
 
@@ -926,6 +920,18 @@ public class MekHQ implements GameListener {
 
     public static void unregisterHandler(Object handler) {
         EVENT_BUS.unregister(handler);
+    }
+
+    /**
+     * Disposes all CampaignGUI components. Since event bus registration is linked to UI lifecycle,
+     * it also unregisters them from the event bus. Logs remaining event bus listeners.
+     */
+    public void disposeGUI() {
+        if (campaignGUI != null) {
+            campaignGUI.getFrame().dispose();
+            campaignGUI = null;
+            EVENT_BUS.logActiveSubscribers();
+        }
     }
 
     /**
