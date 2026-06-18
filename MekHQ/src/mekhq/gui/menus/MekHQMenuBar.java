@@ -34,7 +34,6 @@
 
 package mekhq.gui.menus;
 
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -109,7 +108,6 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Systems;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.CampaignGuiTab;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog;
 import mekhq.gui.dialog.*;
@@ -167,8 +165,18 @@ public class MekHQMenuBar extends JMenuBar {
         add(initViewMenu());
         add(initManageCampaignMenu());
         add(initHelpMenu());
+    }
 
+    @Override
+    public void addNotify() {
+        super.addNotify();
         MekHQ.registerHandler(this);
+    }
+
+    @Override
+    public void removeNotify() {
+        MekHQ.unregisterHandler(this);
+        super.removeNotify();
     }
 
     private MekHQ getApplication() {
@@ -205,19 +213,12 @@ public class MekHQMenuBar extends JMenuBar {
             if (file == null) {
                 return;
             }
-            new DataLoadingDialog(getFrame(), getApplication(), file).setVisible(true);
-            // Unregister event handlers for CampaignGUI and tabs
-            for (int i = 0; i < getTabMain().getTabCount(); i++) {
-                if (getTabMain().getComponentAt(i) instanceof CampaignGuiTab) {
-                    ((CampaignGuiTab) getTabMain().getComponentAt(i)).deactivateTab();
-                }
-            }
-            MekHQ.unregisterHandler(this);
-            MekHQ.unregisterHandler(getGui());
-            // check for a loaded story arc and unregister that handler as well
+            getFrame().setVisible(false); // hide CampaignGUI
             if (null != getCampaign().getStoryArc()) {
                 MekHQ.unregisterHandler(getCampaign().getStoryArc());
             }
+            // load the campaign
+            new DataLoadingDialog(getFrame(), getApplication(), file).setVisible(true);
         });
         menuLoad.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, InputEvent.CTRL_DOWN_MASK));
         menuFile.add(menuLoad);
@@ -813,24 +814,11 @@ public class MekHQMenuBar extends JMenuBar {
                   (savePrompt == JOptionPane.YES_OPTION && !getGui().saveCampaign(null))) {
             return;
         }
-
-        // Unregister handlers for campaign tabs
-        for (int i = 0; i < getTabMain().getTabCount(); i++) {
-            Component tab = getTabMain().getComponentAt(i);
-            if (tab instanceof CampaignGuiTab) {
-                ((CampaignGuiTab) tab).deactivateTab();
-            }
-        }
-
-        // Unregister other handlers
-        MekHQ.unregisterHandler(this);
-        MekHQ.unregisterHandler(getGui());
-
-        if (getCampaign().getStoryArc() != null) {
+        getFrame().setVisible(false); // hide CampaignGUI
+        if (null != getCampaign().getStoryArc()) {
             MekHQ.unregisterHandler(getCampaign().getStoryArc());
         }
-
-        // Start a new campaign
+        // start a new campaign
         new DataLoadingDialog(getFrame(), getApplication(), null, null, true).setVisible(true);
     }
 

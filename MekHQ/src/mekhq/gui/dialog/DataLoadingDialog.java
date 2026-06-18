@@ -182,7 +182,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
 
     @Override
     protected Container createCenterPane() {
-        setSplash(UIUtil.createSplashComponent(getApplication().getIconPackage().getLoadingScreenImages(), getFrame()));
+        setSplash(UIUtil.createSplashComponent(getApplication().getIconPackage().getLoadingScreenImages(), this));
         return getSplash();
     }
 
@@ -201,7 +201,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
         setSize(getSplash().getPreferredSize());
         pack();
         fitAndCenter();
-        getFrame().setVisible(true);
+        setVisible(true);
     }
     // endregion Initialization
 
@@ -607,12 +607,16 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 campaign = null;
             }
 
-            setVisible(false);
+            // should be moved to callbacks to let callers handle the result
             if (campaign != null) {
+                if (getApplication().getCampaignController() == null) {
+                    getFrame().dispose();
+                } else {
+                    getApplication().disposeGUI();
+                }
                 getApplication().setCampaign(campaign);
                 getApplication().getCampaignController().setHost(campaign.getId());
                 getApplication().showNewView();
-                getFrame().dispose();
                 if (null != storyArcStub) {
                     StoryArc storyArc = storyArcStub.loadStoryArc(campaign);
                     if (null != storyArc) {
@@ -620,7 +624,9 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                     }
                 }
             } else {
+                setVisible(false);
                 cancel(true);
+                // return back to CampaignGUI or StartupScreen
                 getFrame().setVisible(true);
             }
         }

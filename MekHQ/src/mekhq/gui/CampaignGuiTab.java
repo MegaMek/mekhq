@@ -58,6 +58,18 @@ public abstract class CampaignGuiTab extends JPanel {
         initTab();
     }
 
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        MekHQ.registerHandler(this);
+    }
+
+    @Override
+    public void removeNotify() {
+        MekHQ.unregisterHandler(this);
+        super.removeNotify();
+    }
+
     public CampaignGUI getCampaignGui() {
         return gui;
     }
@@ -88,17 +100,4 @@ public abstract class CampaignGuiTab extends JPanel {
     abstract public void refreshAll();
 
     abstract public MHQTabType tabType();
-
-    /**
-     * Called when tab is activated.
-     */
-    public void activateTab() {
-        MekHQ.registerHandler(this);
-    }
-    /**
-     * Called when tab is deactivated.
-     */
-    public void deactivateTab() {
-        MekHQ.unregisterHandler(this);
-    }
 }

@@ -322,6 +322,7 @@ public class StartupScreenPanel extends AbstractMHQPanel {
     }
 
     private void startCampaign(final @Nullable File file, @Nullable StoryArcStub storyArcStub) {
+        getFrame().setVisible(false); // hide StartupScreen
         new DataLoadingDialog(getFrame(), app, file, storyArcStub, false).setVisible(true);
     }
 
