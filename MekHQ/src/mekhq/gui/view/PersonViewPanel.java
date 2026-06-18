@@ -200,11 +200,6 @@ public class PersonViewPanel extends JScrollablePanel {
 
         int gridY = 1;
 
-        PersonAwardController awardController = person.getAwardController();
-        if (awardController.hasAwards()) {
-            gridY = applyAndDisplayAwards(awardController, pnlPortrait, gridY);
-        }
-
         EnhancedTabbedPane tabbedPane = new EnhancedTabbedPane();
         GridBagConstraints tabbedPaneConstraints = new GridBagConstraints();
         tabbedPaneConstraints.gridx = 0;
@@ -225,7 +220,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
         JPanel pnlBiographyTab = new JPanel();
         pnlBiographyTab.setLayout(new GridBagLayout());
-        initializeLogs(pnlBiographyTab);
+        initializeLogs(pnlBiographyTab, pnlPortrait);
         tabbedPane.addTab(getTextAt(RESOURCE_BUNDLE, "pnlBiographyTab.title"), pnlBiographyTab);
 
         JPanel pnlGenealogy = new JPanel();
@@ -267,7 +262,7 @@ public class PersonViewPanel extends JScrollablePanel {
         addGlue(gridY, pnlGenealogy);
     }
 
-    private static void addGlue(int gridY, JPanel pnlGenealogy) {
+    private static void addGlue(int gridY, JPanel panel) {
         GridBagConstraints gridBagConstraints;
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -277,7 +272,7 @@ public class PersonViewPanel extends JScrollablePanel {
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlGenealogy.add(Box.createGlue(), gridBagConstraints);
+        panel.add(Box.createGlue(), gridBagConstraints);
     }
 
     private void initializeMechanics(JPanel pnlProfileTab) {
@@ -452,9 +447,14 @@ public class PersonViewPanel extends JScrollablePanel {
         addGlue(gridY, pnlProfileTab);
     }
 
-    private void initializeLogs(JPanel pnlBiographyTab) {
+    private void initializeLogs(JPanel pnlBiographyTab, JPanel pnlPortrait) {
         int gridY = 0;
         GridBagConstraints gridBagConstraints;
+
+        PersonAwardController awardController = person.getAwardController();
+        if (awardController.hasAwards()) {
+            gridY = applyAndDisplayAwards(awardController, pnlPortrait, pnlBiographyTab, gridY);
+        }
 
         if (!person.getBiography().isBlank()) {
             JTextPane txtDesc = new JTextPane();
@@ -732,6 +732,7 @@ public class PersonViewPanel extends JScrollablePanel {
      *
      * @param awardController the {@link PersonAwardController} providing award data and state
      * @param pnlPortrait     the portrait {@link JPanel} to which award ribbons may be added
+     * @param pnlBiographyTab
      * @param gridY           the starting Y grid position for layout
      *
      * @return the next available grid Y position after inserting any new panels
@@ -739,7 +740,8 @@ public class PersonViewPanel extends JScrollablePanel {
      * @author Illiani
      * @since 0.50.06
      */
-    private int applyAndDisplayAwards(PersonAwardController awardController, JPanel pnlPortrait, int gridY) {
+    private int applyAndDisplayAwards(PersonAwardController awardController, JPanel pnlPortrait, JPanel pnlBiographyTab,
+          int gridY) {
         GridBagConstraints gridBagConstraints;
         if (awardController.hasAwardsWithRibbons()) {
             Box boxRibbons = drawRibbons();
@@ -774,12 +776,14 @@ public class PersonViewPanel extends JScrollablePanel {
         if (awardController.hasAwardsWithMedals() || awardController.hasAwardsWithMiscs()) {
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.fill = GridBagConstraints.BOTH;
-            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.gridwidth = 1;
             gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 1.0;
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridY;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            add(pnlAllAwards, gridBagConstraints);
+            pnlBiographyTab.add(pnlAllAwards, gridBagConstraints);
             gridY++;
         }
         return gridY;
@@ -2014,6 +2018,9 @@ public class PersonViewPanel extends JScrollablePanel {
                     firstY++;
                 }
             }
+
+            // use glue to fill up the remaining space so everything is aligned to the top
+            addGlue(firstY, pnlFamily);
         }
 
         return pnlFamily;
