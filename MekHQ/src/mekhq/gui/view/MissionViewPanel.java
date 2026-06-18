@@ -43,6 +43,7 @@ import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.MessageFormat;
+import java.time.LocalDate;
 import java.util.ResourceBundle;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -51,6 +52,7 @@ import javax.swing.JTextPane;
 
 import megamek.client.ui.util.UIUtil;
 import mekhq.MekHQ;
+import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
@@ -628,27 +630,21 @@ public class MissionViewPanel extends JScrollablePanel {
             addGaugeRow(ContractMeterBar.salvage(contract.getCurrentSalvagePct(), contract.getSalvagePct()), y++);
         }
 
-        // Contract timeline: a neutral progress gauge from start to end with a marker for today, shown only while the
-        // contract is genuinely under way at its destination system, where the marker's position is meaningful. The
-        // engine shifts the start and end dates each day until the player reaches the contract's system (to track the
-        // ETA), so the gauge is only stable - and meaningful - once the player is at that system and today falls
-        // within start..end. Otherwise (in transit, or after the contract has ended) the dates are shown as a single
-        // compact text row instead.
+        // Contract timeline: a neutral progress gauge from start to end with a marker for today, shown once the
+        // contract is active and the player has landed at the destination. Contracts that have not started yet, are
+        // still in transit, or have been completed keep the compact dates row instead.
         final String startLabel = MekHQ.getMHQOptions().getDisplayFormattedDate(contract.getStartDate());
         final String endLabel = MekHQ.getMHQOptions().getDisplayFormattedDate(contract.getEndingDate());
-        final PlanetarySystem currentSystem = campaign.getCurrentSystem();
-        final boolean atContractSystem = (currentSystem != null) && (contract.getSystem() != null) &&
-                                               currentSystem.getId().equals(contract.getSystem().getId());
-        final boolean contractInProgress = atContractSystem &&
-                                                 !campaign.getLocalDate().isBefore(contract.getStartDate()) &&
-                                                 !campaign.getLocalDate().isAfter(contract.getEndingDate());
-        if (contractInProgress) {
+        if (shouldShowContractTimeline(campaign, contract)) {
             final String todayLabel = MekHQ.getMHQOptions().getDisplayFormattedDate(campaign.getLocalDate());
             addGaugeRow(ContractMeterBar.timeline(contract.getStartDate(), contract.getEndingDate(),
                   campaign.getLocalDate(), startLabel, endLabel, todayLabel), y++);
         } else {
             JLabel lblDates = new JLabel(resourceMap.getString("lblDates.text"));
             JLabel txtDates = new JLabel(startLabel + " \u2013 " + endLabel);
+            final String timelineFallbackTooltip = contractTimelineFallbackTooltip(campaign, contract);
+            lblDates.setToolTipText(timelineFallbackTooltip);
+            txtDates.setToolTipText(timelineFallbackTooltip);
             addStatRow(lblDates, txtDates, y++);
         }
 
@@ -758,6 +754,46 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         pnlStats.add(verticalGlue, gridBagConstraints);
+    }
+
+    static boolean shouldShowContractTimeline(Campaign campaign, Contract contract) {
+        final AbstractLocation currentLocation = campaign.getCurrentLocation();
+        final PlanetarySystem currentSystem = campaign.getCurrentSystem();
+        final PlanetarySystem contractSystem = contract.getSystem();
+        return contract.isActiveOn(campaign.getLocalDate()) &&
+                     (currentLocation != null) && currentLocation.isOnPlanet() &&
+                     (currentSystem != null) && (contractSystem != null) &&
+                     currentSystem.getId().equals(contractSystem.getId());
+    }
+
+    private String contractTimelineFallbackTooltip(Campaign campaign, Contract contract) {
+        final String contractLocation = contract.getSystemName(campaign.getLocalDate());
+        final String currentLocation = currentLocationDescription(campaign);
+        return wordWrap(MessageFormat.format(resourceMap.getString("contractTimelineBar.fallback.tooltip"),
+              contractLocation, currentLocation));
+    }
+
+    private String currentLocationDescription(Campaign campaign) {
+        final AbstractLocation currentLocation = campaign.getCurrentLocation();
+        final PlanetarySystem currentSystem = campaign.getCurrentSystem();
+        if ((currentLocation == null) || (currentSystem == null)) {
+            return resourceMap.getString("contractTimelineBar.location.unknown");
+        }
+
+        final LocalDate currentDate = campaign.getLocalDate();
+        final String locationName;
+        final String locationKey;
+        if (currentLocation.isOnPlanet()) {
+            locationName = currentLocation.getPlanet().getPrintableName(currentDate);
+            locationKey = "contractTimelineBar.location.landed";
+        } else if (currentLocation.isAtJumpPoint()) {
+            locationName = currentSystem.getPrintableName(currentDate);
+            locationKey = "contractTimelineBar.location.jumpPoint";
+        } else {
+            locationName = currentSystem.getPrintableName(currentDate);
+            locationKey = "contractTimelineBar.location.inTransit";
+        }
+        return MessageFormat.format(resourceMap.getString(locationKey), locationName);
     }
 
     /**
