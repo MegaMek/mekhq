@@ -250,14 +250,14 @@ public class PersonViewPanel extends JScrollablePanel {
         if (!campaign.getKillsFor(person.getId()).isEmpty()) {
             JPanel pnlKillsHeader = new JPanel();
             pnlKillsHeader.setName("killsHeader");
-            pnlKillsHeader.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
+            pnlKillsHeader.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
                   "pnlKillsHeader.title")));
             pnlKillsHeader.setVisible(!campaignOptions.isDisplayKillRecord());
 
             JPanel pnlKills = fillKillRecord();
 
             pnlKills.setName("txtKills");
-            pnlKills.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("pnlKills.title")));
+            pnlKills.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE, "pnlKills.title")));
             pnlKills.setVisible(campaignOptions.isDisplayKillRecord());
 
             pnlKillsHeader.addMouseListener(getSwitchListener(pnlKillsHeader, pnlKills));
@@ -280,14 +280,14 @@ public class PersonViewPanel extends JScrollablePanel {
         if (!person.getScenarioLog().isEmpty()) {
             JPanel pnlScenariosLogHeader = new JPanel();
             pnlScenariosLogHeader.setName("scenarioLogHeader");
-            pnlScenariosLogHeader.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
+            pnlScenariosLogHeader.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
                   "scenarioLogHeader.title")));
             pnlScenariosLogHeader.setVisible(!campaignOptions.isDisplayScenarioLog());
 
             JPanel pnlScenariosLog = fillScenarioLog();
 
             pnlScenariosLog.setName("scenarioLog");
-            pnlScenariosLog.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
+            pnlScenariosLog.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
                   "scenarioLog.title")));
             pnlScenariosLog.setVisible(campaignOptions.isDisplayScenarioLog());
 
@@ -311,13 +311,14 @@ public class PersonViewPanel extends JScrollablePanel {
         if (!person.getPersonalLog().isEmpty()) {
             JPanel pnlPersonalLogHeader = new JPanel();
             pnlPersonalLogHeader.setName("pnlLogHeader");
-            pnlPersonalLogHeader.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
+            pnlPersonalLogHeader.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
                   "pnlLogHeader.title")));
             pnlPersonalLogHeader.setVisible(!campaignOptions.isDisplayPersonnelLog());
 
             JPanel pnlPersonalLog = fillPersonalLog();
             pnlPersonalLog.setName("pnlLog");
-            pnlPersonalLog.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("pnlLog.title")));
+            pnlPersonalLog.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
+                  "pnlLog.title")));
             pnlPersonalLog.setVisible(campaignOptions.isDisplayPersonnelLog());
 
             pnlPersonalLogHeader.addMouseListener(getSwitchListener(pnlPersonalLogHeader, pnlPersonalLog));
@@ -340,13 +341,13 @@ public class PersonViewPanel extends JScrollablePanel {
         if (!person.getPerformanceLog().isEmpty()) {
             JPanel pnlPerformanceLogHeader = new JPanel();
             pnlPerformanceLogHeader.setName("pnlPerformanceLogHeader");
-            pnlPerformanceLogHeader.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
+            pnlPerformanceLogHeader.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
                   "pnlPerformanceLogHeader.title")));
             pnlPerformanceLogHeader.setVisible(!campaignOptions.isDisplayPerformanceRecord());
 
             JPanel pnlPerformanceLog = fillPerformanceLog();
             pnlPerformanceLog.setName("pnlPerformanceLog");
-            pnlPerformanceLog.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
+            pnlPerformanceLog.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
                   "pnlPerformanceLog.title")));
             pnlPerformanceLog.setVisible(campaignOptions.isDisplayPerformanceRecord());
 
@@ -370,13 +371,13 @@ public class PersonViewPanel extends JScrollablePanel {
         if (!person.getMedicalLog().isEmpty()) {
             JPanel pnlMedicalLogHeader = new JPanel();
             pnlMedicalLogHeader.setName("pnlMedicalLogHeader");
-            pnlMedicalLogHeader.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
+            pnlMedicalLogHeader.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
                   "pnlMedicalLogHeader.title")));
             pnlMedicalLogHeader.setVisible(!campaignOptions.isDisplayMedicalRecord());
 
             JPanel pnlMedicalLog = fillMedicalLog();
             pnlMedicalLog.setName("pnlMedicalLog");
-            pnlMedicalLog.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
+            pnlMedicalLog.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
                   "pnlMedicalLog.title")));
             pnlMedicalLog.setVisible(campaignOptions.isDisplayMedicalRecord());
 
@@ -400,13 +401,13 @@ public class PersonViewPanel extends JScrollablePanel {
         if (!person.getPatientLog().isEmpty()) {
             JPanel pnlPatientLogHeader = new JPanel();
             pnlPatientLogHeader.setName("pnlPatientLogHeader");
-            pnlPatientLogHeader.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
+            pnlPatientLogHeader.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
                   "pnlPatientLogHeader.title")));
             pnlPatientLogHeader.setVisible(!campaignOptions.isDisplayPatientRecord());
 
             JPanel pnlPatientLog = fillPatientLog();
             pnlPatientLog.setName("pnlPatientLog");
-            pnlPatientLog.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
+            pnlPatientLog.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
                   "pnlPatientLog.title")));
             pnlPatientLog.setVisible(campaignOptions.isDisplayPatientRecord());
 
@@ -430,14 +431,14 @@ public class PersonViewPanel extends JScrollablePanel {
         if (!person.getAssignmentLog().isEmpty()) {
             JPanel pnlAssignmentsLogHeader = new JPanel();
             pnlAssignmentsLogHeader.setName("assignmentLogHeader");
-            pnlAssignmentsLogHeader.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
+            pnlAssignmentsLogHeader.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
                   "assignmentLogHeader.title")));
             pnlAssignmentsLogHeader.setVisible(!campaignOptions.isDisplayAssignmentRecord());
 
             JPanel pnlAssignmentsLog = fillAssignmentLog();
 
             pnlAssignmentsLog.setName("assignmentLog");
-            pnlAssignmentsLog.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
+            pnlAssignmentsLog.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
                   "assignmentLog.title")));
             pnlAssignmentsLog.setVisible(campaignOptions.isDisplayAssignmentRecord());
 
@@ -642,7 +643,7 @@ public class PersonViewPanel extends JScrollablePanel {
         if (!inProgressSkills.isEmpty()) {
             JPanel pnlProgressShow = new JPanel();
             pnlProgressShow.setName("pnlProgress");
-            pnlProgressShow.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
+            pnlProgressShow.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
                   "pnlInProgress.show")));
             pnlProgressShow.setVisible(true);
 
@@ -684,7 +685,8 @@ public class PersonViewPanel extends JScrollablePanel {
             txtDesc.setEditable(false);
             txtDesc.setContentType("text/html");
             txtDesc.setText(MarkdownRenderer.getRenderedHtml(person.getBiography()));
-            txtDesc.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("pnlDescription.title")));
+            txtDesc.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
+                  "pnlDescription.title")));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridY;
@@ -715,7 +717,7 @@ public class PersonViewPanel extends JScrollablePanel {
             } else {
                 txtDesc.setText(person.getPersonalityDescription());
             }
-            txtDesc.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(borderTitleKey)));
+            txtDesc.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE, borderTitleKey)));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridY;
@@ -768,7 +770,8 @@ public class PersonViewPanel extends JScrollablePanel {
 
         JPanel pnlAllAwards = new JPanel();
         pnlAllAwards.setLayout(new BoxLayout(pnlAllAwards, BoxLayout.PAGE_AXIS));
-        pnlAllAwards.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("pnlAwards.title")));
+        pnlAllAwards.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
+              "pnlAwards.title")));
 
         if (awardController.hasAwardsWithMedals()) {
             JPanel pnlMedals = drawMedals();
@@ -1668,7 +1671,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
     private JPanel fillFamily() {
         JPanel pnlFamily = new JPanel(new GridBagLayout());
-        pnlFamily.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("pnlFamily.title")));
+        pnlFamily.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE, "pnlFamily.title")));
 
         // family panel
         JLabel lblSpouse2 = new JLabel();
@@ -1693,7 +1696,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
         final Person spouse = person.getGenealogy().getSpouse();
         if (spouse != null) {
-            JLabel lblSpouse1 = new JLabel(resourceMap.getString("lblSpouse1.text"));
+            JLabel lblSpouse1 = new JLabel(getTextAt(RESOURCE_BUNDLE, "lblSpouse1.text"));
             lblSpouse1.setName("lblSpouse1");
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -1722,7 +1725,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
         if (person.getGenealogy().hasFormerSpouse()) {
             lblFormerSpouses1.setName("lblFormerSpouses1");
-            lblFormerSpouses1.setText(resourceMap.getString("lblFormerSpouses1.text"));
+            lblFormerSpouses1.setText(getTextAt(RESOURCE_BUNDLE, "lblFormerSpouses1.text"));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = firstY;
@@ -1767,7 +1770,7 @@ public class PersonViewPanel extends JScrollablePanel {
             final List<Person> children = person.getGenealogy().getChildren();
             if (!children.isEmpty()) {
                 lblChildren1.setName("lblChildren1");
-                lblChildren1.setText(resourceMap.getString("lblChildren1.text"));
+                lblChildren1.setText(getTextAt(RESOURCE_BUNDLE, "lblChildren1.text"));
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 0;
                 gridBagConstraints.gridy = firstY;
@@ -1805,7 +1808,7 @@ public class PersonViewPanel extends JScrollablePanel {
             if (!grandchildren.isEmpty() &&
                       campaignOptions.getFamilyDisplayLevel().displayGrandparentsGrandchildren()) {
                 lblGrandchildren1.setName("lblGrandchildren1");
-                lblGrandchildren1.setText(resourceMap.getString("lblGrandchildren1.text"));
+                lblGrandchildren1.setText(getTextAt(RESOURCE_BUNDLE, "lblGrandchildren1.text"));
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 0;
                 gridBagConstraints.gridy = firstY;
@@ -1843,9 +1846,9 @@ public class PersonViewPanel extends JScrollablePanel {
             }
 
             for (Person parent : person.getGenealogy().getParents()) {
-                JLabel labelParent = new JLabel(resourceMap.getString(parent.getGender().isMale() ?
-                                                                            "lblFather1.text" :
-                                                                            "lblMother1.text"));
+                JLabel labelParent = new JLabel(getTextAt(RESOURCE_BUNDLE, parent.getGender().isMale() ?
+                                                                                 "lblFather1.text" :
+                                                                                 "lblMother1.text"));
                 labelParent.setName("lblParent");
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 0;
@@ -1874,7 +1877,7 @@ public class PersonViewPanel extends JScrollablePanel {
             final List<Person> siblings = person.getGenealogy().getSiblings();
             if (!siblings.isEmpty()) {
                 lblSiblings1.setName("lblSiblings1");
-                lblSiblings1.setText(resourceMap.getString("lblSiblings1.text"));
+                lblSiblings1.setText(getTextAt(RESOURCE_BUNDLE, "lblSiblings1.text"));
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 0;
                 gridBagConstraints.gridy = firstY;
@@ -1914,7 +1917,7 @@ public class PersonViewPanel extends JScrollablePanel {
             final List<Person> grandparents = person.getGenealogy().getGrandparents();
             if (!grandparents.isEmpty() && campaignOptions.getFamilyDisplayLevel().displayGrandparentsGrandchildren()) {
                 lblGrandparents1.setName("lblGrandparents1");
-                lblGrandparents1.setText(resourceMap.getString("lblGrandparents1.text"));
+                lblGrandparents1.setText(getTextAt(RESOURCE_BUNDLE, "lblGrandparents1.text"));
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 0;
                 gridBagConstraints.gridy = firstY;
@@ -1953,7 +1956,7 @@ public class PersonViewPanel extends JScrollablePanel {
             final List<Person> auntsAndUncles = person.getGenealogy().getsAuntsAndUncles();
             if (!auntsAndUncles.isEmpty() && campaignOptions.getFamilyDisplayLevel().isAuntsUnclesCousins()) {
                 lblAuntsOrUncles1.setName("lblAuntsOrUncles1");
-                lblAuntsOrUncles1.setText(resourceMap.getString("lblAuntsOrUncles1.text"));
+                lblAuntsOrUncles1.setText(getTextAt(RESOURCE_BUNDLE, "lblAuntsOrUncles1.text"));
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 0;
                 gridBagConstraints.gridy = firstY;
@@ -1993,7 +1996,7 @@ public class PersonViewPanel extends JScrollablePanel {
             final List<Person> cousins = person.getGenealogy().getCousins();
             if (!cousins.isEmpty() && campaignOptions.getFamilyDisplayLevel().isAuntsUnclesCousins()) {
                 lblCousins1.setName("lblCousins1");
-                lblCousins1.setText(resourceMap.getString("lblCousins1.text"));
+                lblCousins1.setText(getTextAt(RESOURCE_BUNDLE, "lblCousins1.text"));
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 0;
                 gridBagConstraints.gridy = firstY;
