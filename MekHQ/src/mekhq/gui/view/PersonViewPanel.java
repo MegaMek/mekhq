@@ -486,11 +486,10 @@ public class PersonViewPanel extends JScrollablePanel {
     }
 
     private static void addGlue(int gridY, JPanel panel) {
-        GridBagConstraints gridBagConstraints;
-        gridBagConstraints = new GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = gridY;
-        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.gridwidth = GridBagConstraints.REMAINDER;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
@@ -744,7 +743,7 @@ public class PersonViewPanel extends JScrollablePanel {
      *
      * @param awardController the {@link PersonAwardController} providing award data and state
      * @param pnlPortrait     the portrait {@link JPanel} to which award ribbons may be added
-     * @param pnlBiographyTab
+     * @param pnlBiographyTab the biography tab panel to which award panels are added
      * @param gridY           the starting Y grid position for layout
      *
      * @return the next available grid Y position after inserting any new panels
