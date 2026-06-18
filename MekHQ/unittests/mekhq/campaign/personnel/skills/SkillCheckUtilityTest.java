@@ -40,14 +40,10 @@ import static mekhq.campaign.personnel.skills.SkillCheckUtility.UNTRAINED_TARGET
 import static mekhq.campaign.personnel.skills.SkillCheckUtility.UNTRAINED_TARGET_NUMBER_TWO_LINKED_ATTRIBUTES;
 import static mekhq.campaign.personnel.skills.SkillCheckUtility.determineTargetNumber;
 import static mekhq.campaign.personnel.skills.SkillCheckUtility.getTotalAttributeScoreForSkill;
-import static mekhq.campaign.personnel.skills.SkillType.S_GUN_MEK;
-import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.DISASTROUS;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.DEXTERITY;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NONE;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.REFLEXES;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;

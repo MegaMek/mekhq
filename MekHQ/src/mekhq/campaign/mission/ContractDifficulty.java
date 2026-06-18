@@ -140,19 +140,22 @@ public class ContractDifficulty {
     }
 
     static double estimatePlayerPower(List<Entity> units, boolean useGenericBV) {
-        int playerPower = 0;
-        int playerGBV = 0;
-        int playerUnitCount = 0;
-        for (Entity unit : units) {
-            playerPower += unit.calculateBattleValue();
-            playerGBV += unit.getGenericBattleValue();
-            playerUnitCount++;
+        if (units.isEmpty()) {
+            return 0;
         }
 
+        int totalBV = 0;
+        int totalGBV = 0;
+        for (Entity unit : units) {
+            totalBV += unit.calculateBattleValue();
+            totalGBV += unit.getGenericBattleValue();
+        }
+
+        // Return an average per unit so this is comparable to the enemy strength estimate.
         if (useGenericBV) {
-            return ((double) playerPower) / playerGBV;
+            return ((double) totalGBV) / units.size();
         } else {
-            return ((double) playerPower) / playerUnitCount;
+            return ((double) totalBV) / units.size();
         }
     }
 
