@@ -263,7 +263,7 @@ public class MekHQ implements GameListener {
      * restart back to the splash screen
      */
     public void restart() {
-        disposeGUI();
+        deactivateCampaign();
         new StartupScreenPanel(this).getFrame().setVisible(true);
     }
 
@@ -346,8 +346,37 @@ public class MekHQ implements GameListener {
         System.exit(0);
     }
 
-    public void showNewView() {
+    /**
+     * Activates a campaign. Ensures that previously active campaign is disposed, then creates new
+     * {@link CampaignController} and {@link CampaignGUI} and initializes wiring between all of them.
+     *
+     * @param campaign the {@link Campaign} to be activated
+     */
+    public void activateCampaign(Campaign campaign) {
+        deactivateCampaign();
+        campaign.setApp(this);
+        campaignController = new CampaignController(campaign);
+        campaignController.setHost(campaign.getId());
         campaignGUI = new CampaignGUI(this);
+    }
+
+    /**
+     * Disposes all CampaignGUI components and deactivates the current campaign. Since event bus registration is
+     * linked to UI lifecycle, it also unregisters them from the event bus. Manually unsubscribes non-UI components.
+     * Logs remaining event bus listeners for debug purposes.
+     */
+    private void deactivateCampaign() {
+        if (campaignGUI != null) {
+            campaignGUI.getFrame().dispose();
+            campaignGUI = null;
+        }
+        if (campaignController != null) {
+            if (getCampaign() != null && getCampaign().getStoryArc() != null) {
+                MekHQ.unregisterHandler(getCampaign().getStoryArc());
+            }
+            campaignController = null;
+        }
+        EVENT_BUS.logActiveSubscribers();
     }
 
     /**
@@ -417,10 +446,6 @@ public class MekHQ implements GameListener {
 
     public Campaign getCampaign() {
         return campaignController.getLocalCampaign();
-    }
-
-    public void setCampaign(Campaign c) {
-        campaignController = new CampaignController(c);
     }
 
     public CampaignController getCampaignController() {
@@ -920,18 +945,6 @@ public class MekHQ implements GameListener {
 
     public static void unregisterHandler(Object handler) {
         EVENT_BUS.unregister(handler);
-    }
-
-    /**
-     * Disposes all CampaignGUI components. Since event bus registration is linked to UI lifecycle,
-     * it also unregisters them from the event bus. Logs remaining event bus listeners.
-     */
-    public void disposeGUI() {
-        if (campaignGUI != null) {
-            campaignGUI.getFrame().dispose();
-            campaignGUI = null;
-            EVENT_BUS.logActiveSubscribers();
-        }
     }
 
     /**
