@@ -45,6 +45,7 @@ import static mekhq.campaign.personnel.enums.PersonnelStatus.ACTIVE;
 import static mekhq.campaign.personnel.skills.Skill.getIndividualAttributeModifier;
 import static mekhq.campaign.personnel.skills.Skill.getTotalAttributeModifier;
 import static mekhq.campaign.personnel.skills.SkillType.RP_ONLY_TAG;
+import static mekhq.campaign.personnel.skills.enums.SkillSubType.*;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -214,163 +215,17 @@ public class PersonViewPanel extends JScrollablePanel {
         add(tabbedPane, tabbedPaneConstraints);
         gridY++;
 
+        JPanel pnlMechanicsTab = new JPanel();
+        pnlMechanicsTab.setLayout(new GridBagLayout());
+        initializeMechanics(pnlMechanicsTab);
+        tabbedPane.addTab("Mechanics", pnlMechanicsTab); // TODO remove hard coded tab name
+
         JPanel pnlLogTab = new JPanel();
         pnlLogTab.setLayout(new GridBagLayout());
         initializeLogs(pnlLogTab);
-        tabbedPane.addTab("LOGS", pnlLogTab); // TODO remove hard coded tab name
+        tabbedPane.addTab("Personnel Logs", pnlLogTab); // TODO remove hard coded tab name
 
-        //        JPanel pnlAttributes = null;
-        //        if (campaignOptions.isDisplayAllAttributes()) {
-        //            pnlAttributes = fillAttributeScores();
-        //        } else {
-        //            Map<SkillAttribute, Integer> relevantAttributes = getRelevantAttributes();
-        //            if (!relevantAttributes.isEmpty()) {
-        //                pnlAttributes = fillAttributeModifiers(relevantAttributes);
-        //            }
-        //        }
-        //
-        //        if (pnlAttributes != null) {
-        //            gridBagConstraints = new GridBagConstraints();
-        //            gridBagConstraints.gridx = 0;
-        //            gridBagConstraints.gridy = gridY;
-        //            gridBagConstraints.gridwidth = 2;
-        //            gridBagConstraints.weightx = 1.0;
-        //            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
-        //            gridBagConstraints.fill = GridBagConstraints.BOTH;
-        //            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        //            add(pnlAttributes, gridBagConstraints);
-        //            gridY++;
-        //        }
-        //
-        //        List<String> relevantSkills = person.getKnownSkillsBySkillSubType(List.of(COMBAT_GUNNERY, COMBAT_PILOTING,
-        //              SUPPORT, SUPPORT_TECHNICIAN));
-        //        if (!relevantSkills.isEmpty()) {
-        //            JPanel pnlCombatSkills = fillSkills(relevantSkills, "pnlSkills.profession");
-        //            gridBagConstraints = new GridBagConstraints();
-        //            gridBagConstraints.gridx = 0;
-        //            gridBagConstraints.gridy = gridY;
-        //            gridBagConstraints.gridwidth = 2;
-        //            gridBagConstraints.weightx = 1.0;
-        //            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
-        //            gridBagConstraints.fill = GridBagConstraints.BOTH;
-        //            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        //            add(pnlCombatSkills, gridBagConstraints);
-        //            gridY++;
-        //        }
-        //
-        //        relevantSkills = person.getKnownSkillsBySkillSubType(List.of(UTILITY, UTILITY_COMMAND));
-        //        if (!relevantSkills.isEmpty()) {
-        //            JPanel pnlSupportSkills = fillSkills(relevantSkills, "pnlSkills.utility");
-        //            gridBagConstraints = new GridBagConstraints();
-        //            gridBagConstraints.gridx = 0;
-        //            gridBagConstraints.gridy = gridY;
-        //            gridBagConstraints.gridwidth = 2;
-        //            gridBagConstraints.weightx = 1.0;
-        //            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
-        //            gridBagConstraints.fill = GridBagConstraints.BOTH;
-        //            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        //            add(pnlSupportSkills, gridBagConstraints);
-        //            gridY++;
-        //        }
-        //
-        //        relevantSkills = person.getKnownSkillsBySkillSubType(List.of(ROLEPLAY_GENERAL,
-        //              ROLEPLAY_ART,
-        //              ROLEPLAY_INTEREST,
-        //              ROLEPLAY_SCIENCE,
-        //              ROLEPLAY_SECURITY));
-        //        if (!relevantSkills.isEmpty()) {
-        //            JPanel pnlRoleplaySkills = fillSkills(relevantSkills, "pnlSkills.roleplay");
-        //            gridBagConstraints = new GridBagConstraints();
-        //            gridBagConstraints.gridx = 0;
-        //            gridBagConstraints.gridy = gridY;
-        //            gridBagConstraints.gridwidth = 2;
-        //            gridBagConstraints.weightx = 1.0;
-        //            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
-        //            gridBagConstraints.fill = GridBagConstraints.BOTH;
-        //            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        //            add(pnlRoleplaySkills, gridBagConstraints);
-        //            gridY++;
-        //        }
-        //
-        //        Map<IOption, String> relevantAbilities = getRelevantAbilities();
-        //        if (!relevantAbilities.isEmpty()) {
-        //            JPanel pnlAbilities = fillAbilitiesAndImplants(relevantAbilities);
-        //            gridBagConstraints = new GridBagConstraints();
-        //            gridBagConstraints.gridx = 0;
-        //            gridBagConstraints.gridy = gridY;
-        //            gridBagConstraints.gridwidth = 2;
-        //            gridBagConstraints.weightx = 1.0;
-        //            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
-        //            gridBagConstraints.fill = GridBagConstraints.BOTH;
-        //            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        //            add(pnlAbilities, gridBagConstraints);
-        //            gridY++;
-        //        }
-        //
-        //        JPanel pnlOther = fillOther();
-        //        gridBagConstraints = new GridBagConstraints();
-        //        gridBagConstraints.gridx = 0;
-        //        gridBagConstraints.gridy = gridY;
-        //        gridBagConstraints.gridwidth = 2;
-        //        gridBagConstraints.weightx = 1.0;
-        //        gridBagConstraints.insets = new Insets(0, 0, 10, 0);
-        //        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        //        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        //        add(pnlOther, gridBagConstraints);
-        //        gridY++;
-        //
-        //        List<Injury> injuries = person.getNonProstheticInjuries();
-        //        if (!injuries.isEmpty()) {
-        //            JPanel pnlInjuries = fillInjuries(injuries, false);
-        //            gridBagConstraints = new GridBagConstraints();
-        //            gridBagConstraints.gridx = 0;
-        //            gridBagConstraints.gridy = gridY;
-        //            gridBagConstraints.gridwidth = 2;
-        //            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
-        //            gridBagConstraints.fill = GridBagConstraints.BOTH;
-        //            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        //            add(pnlInjuries, gridBagConstraints);
-        //            gridY++;
-        //        }
-        //
-        //        List<Injury> prosthetics = person.getProstheticInjuries();
-        //        if (!prosthetics.isEmpty()) {
-        //            JPanel pnlProsthetics = fillInjuries(prosthetics, true);
-        //            gridBagConstraints = new GridBagConstraints();
-        //            gridBagConstraints.gridx = 0;
-        //            gridBagConstraints.gridy = gridY;
-        //            gridBagConstraints.gridwidth = 2;
-        //            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
-        //            gridBagConstraints.fill = GridBagConstraints.BOTH;
-        //            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        //            add(pnlProsthetics, gridBagConstraints);
-        //            gridY++;
-        //        }
-        //
-        //        List<Skill> inProgressSkills = person.getInProgressSkills();
-        //        if (!inProgressSkills.isEmpty()) {
-        //            JPanel pnlProgressShow = new JPanel();
-        //            pnlProgressShow.setName("pnlProgress");
-        //            pnlProgressShow.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
-        //                  "pnlInProgress.show")));
-        //            pnlProgressShow.setVisible(true);
-        //
-        //            JPanel pnlProgressHide = fillInProgressSkills(inProgressSkills);
-        //
-        //            pnlProgressShow.addMouseListener(getSwitchListener(pnlProgressShow, pnlProgressHide));
-        //            pnlProgressHide.addMouseListener(getSwitchListener(pnlProgressHide, pnlProgressShow));
-        //
-        //            gridBagConstraints = new GridBagConstraints();
-        //            gridBagConstraints.gridx = 0;
-        //            gridBagConstraints.gridy = gridY;
-        //            gridBagConstraints.gridwidth = 2;
-        //            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
-        //            gridBagConstraints.fill = GridBagConstraints.BOTH;
-        //            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        //            add(pnlProgressShow, gridBagConstraints);
-        //            add(pnlProgressHide, gridBagConstraints);
-        //            gridY++;
-        //        }
+
         //
         //        if (!person.getBiography().isBlank()) {
         //            JTextPane txtDesc = new JTextPane();
@@ -501,6 +356,185 @@ public class PersonViewPanel extends JScrollablePanel {
         add(Box.createGlue(), gridBagConstraints);
     }
 
+    private void initializeMechanics(JPanel pnlMechanicsTab) {
+        JPanel pnlAttributes = null;
+        if (campaignOptions.isDisplayAllAttributes()) {
+            pnlAttributes = fillAttributeScores();
+        } else {
+            Map<SkillAttribute, Integer> relevantAttributes = getRelevantAttributes();
+            if (!relevantAttributes.isEmpty()) {
+                pnlAttributes = fillAttributeModifiers(relevantAttributes);
+            }
+        }
+
+        int gridY = 0;
+        GridBagConstraints gridBagConstraints;
+        if (pnlAttributes != null) {
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = gridY;
+            gridBagConstraints.gridwidth = 1;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 1.0;
+            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlMechanicsTab.add(pnlAttributes, gridBagConstraints);
+            gridY++;
+        }
+
+        List<String> relevantSkills = person.getKnownSkillsBySkillSubType(List.of(COMBAT_GUNNERY, COMBAT_PILOTING,
+              SUPPORT, SUPPORT_TECHNICIAN));
+        if (!relevantSkills.isEmpty()) {
+            JPanel pnlCombatSkills = fillSkills(relevantSkills, "pnlSkills.profession");
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = gridY;
+            gridBagConstraints.gridwidth = 1;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 1.0;
+            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlMechanicsTab.add(pnlCombatSkills, gridBagConstraints);
+            gridY++;
+        }
+
+        relevantSkills = person.getKnownSkillsBySkillSubType(List.of(UTILITY, UTILITY_COMMAND));
+        if (!relevantSkills.isEmpty()) {
+            JPanel pnlSupportSkills = fillSkills(relevantSkills, "pnlSkills.utility");
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = gridY;
+            gridBagConstraints.gridwidth = 1;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 1.0;
+            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlMechanicsTab.add(pnlSupportSkills, gridBagConstraints);
+            gridY++;
+        }
+
+        relevantSkills = person.getKnownSkillsBySkillSubType(List.of(ROLEPLAY_GENERAL,
+              ROLEPLAY_ART,
+              ROLEPLAY_INTEREST,
+              ROLEPLAY_SCIENCE,
+              ROLEPLAY_SECURITY));
+        if (!relevantSkills.isEmpty()) {
+            JPanel pnlRoleplaySkills = fillSkills(relevantSkills, "pnlSkills.roleplay");
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = gridY;
+            gridBagConstraints.gridwidth = 1;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 1.0;
+            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlMechanicsTab.add(pnlRoleplaySkills, gridBagConstraints);
+            gridY++;
+        }
+
+        Map<IOption, String> relevantAbilities = getRelevantAbilities();
+        if (!relevantAbilities.isEmpty()) {
+            JPanel pnlAbilities = fillAbilitiesAndImplants(relevantAbilities);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = gridY;
+            gridBagConstraints.gridwidth = 1;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 1.0;
+            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlMechanicsTab.add(pnlAbilities, gridBagConstraints);
+            gridY++;
+        }
+
+        JPanel pnlOther = fillOther();
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = gridY;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlMechanicsTab.add(pnlOther, gridBagConstraints);
+        gridY++;
+
+        List<Injury> injuries = person.getNonProstheticInjuries();
+        if (!injuries.isEmpty()) {
+            JPanel pnlInjuries = fillInjuries(injuries, false);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = gridY;
+            gridBagConstraints.gridwidth = 1;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 1.0;
+            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlMechanicsTab.add(pnlInjuries, gridBagConstraints);
+            gridY++;
+        }
+
+        List<Injury> prosthetics = person.getProstheticInjuries();
+        if (!prosthetics.isEmpty()) {
+            JPanel pnlProsthetics = fillInjuries(prosthetics, true);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = gridY;
+            gridBagConstraints.gridwidth = 1;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 1.0;
+            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlMechanicsTab.add(pnlProsthetics, gridBagConstraints);
+            gridY++;
+        }
+
+        List<Skill> inProgressSkills = person.getInProgressSkills();
+        if (!inProgressSkills.isEmpty()) {
+            JPanel pnlProgressShow = new JPanel();
+            pnlProgressShow.setName("pnlProgress");
+            pnlProgressShow.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
+                  "pnlInProgress.show")));
+            pnlProgressShow.setVisible(true);
+
+            JPanel pnlProgressHide = fillInProgressSkills(inProgressSkills);
+
+            pnlProgressShow.addMouseListener(getSwitchListener(pnlProgressShow, pnlProgressHide));
+            pnlProgressHide.addMouseListener(getSwitchListener(pnlProgressHide, pnlProgressShow));
+
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = gridY;
+            gridBagConstraints.gridwidth = 1;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 1.0;
+            gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlMechanicsTab.add(pnlProgressShow, gridBagConstraints);
+            pnlMechanicsTab.add(pnlProgressHide, gridBagConstraints);
+            gridY++;
+        }
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = gridY;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlMechanicsTab.add(Box.createGlue(), gridBagConstraints);
+    }
+
     private void initializeLogs(JPanel pnlLogTab) {
         int gridY = 0;
         GridBagConstraints gridBagConstraints;
@@ -523,7 +557,7 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridY;
-            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.gridwidth = 1;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.weighty = 1.0;
             gridBagConstraints.insets = new Insets(0, 0, 10, 0);
@@ -553,7 +587,7 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridY;
-            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.gridwidth = 1;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.weighty = 1.0;
             gridBagConstraints.insets = new Insets(0, 0, 10, 0);
@@ -583,7 +617,7 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridY;
-            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.gridwidth = 1;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.weighty = 1.0;
             gridBagConstraints.insets = new Insets(0, 0, 10, 0);
@@ -613,7 +647,7 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridY;
-            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.gridwidth = 1;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.weighty = 1.0;
             gridBagConstraints.insets = new Insets(0, 0, 10, 0);
@@ -644,7 +678,7 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridY;
-            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.gridwidth = 1;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.weighty = 1.0;
             gridBagConstraints.insets = new Insets(0, 0, 10, 0);
@@ -654,6 +688,16 @@ public class PersonViewPanel extends JScrollablePanel {
             pnlLogTab.add(pnlAssignmentsLog, gridBagConstraints);
             gridY++;
         }
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = gridY;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlLogTab.add(Box.createGlue(), gridBagConstraints);
     }
 
     /**
