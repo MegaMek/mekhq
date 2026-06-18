@@ -245,8 +245,21 @@ public class MHQCollapsiblePanel extends JPanel {
         // The trailing panel is intentionally excluded so it can host its own interactive control.
         MouseAdapter headerInteractionListener = new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent event) {
-                toggleExpanded();
+            public void mouseReleased(MouseEvent event) {
+                if (!SwingUtilities.isLeftMouseButton(event)) {
+                    return;
+                }
+                // Toggle on release rather than click: mouseClicked only fires when the press and release land on the
+                // same component with negligible movement, so dragging the pointer horizontally across the header - or
+                // crossing between the icon/title/summary child labels between press and release - would swallow the
+                // click. mouseReleased is delivered to whichever component received the press regardless of movement;
+                // we just confirm the pointer is still within the header bounds so a press-then-drag-away gesture can
+                // still cancel the toggle.
+                Point pointInHeader = SwingUtilities.convertPoint((java.awt.Component) event.getSource(),
+                        event.getPoint(), headerPanel);
+                if (headerPanel.contains(pointInHeader)) {
+                    toggleExpanded();
+                }
             }
 
             @Override
