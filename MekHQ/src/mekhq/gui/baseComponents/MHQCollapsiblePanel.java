@@ -49,6 +49,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ResourceBundle;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -62,6 +63,7 @@ import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 
 import megamek.common.annotations.Nullable;
+import mekhq.MekHQ;
 
 /**
  * A lightweight, theme-friendly collapsible section panel for reusable MekHQ
@@ -70,6 +72,9 @@ import megamek.common.annotations.Nullable;
 public class MHQCollapsiblePanel extends JPanel {
     public static final String EXPANDED_PROPERTY = "expanded";
     public static final String TOGGLE_ACTION = "toggle";
+
+    private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
+          MekHQ.getMHQOptions().getLocale());
 
     private static final int HEADER_VERTICAL_PADDING = 6;
     private static final int HEADER_HORIZONTAL_PADDING = 8;
@@ -312,7 +317,9 @@ public class MHQCollapsiblePanel extends JPanel {
         iconLabel.setIcon(getDisclosureIcon());
         headerPanel.getAccessibleContext().setAccessibleName(title);
         headerPanel.getAccessibleContext()
-                .setAccessibleDescription(isExpanded() ? "Collapse section" : "Expand section");
+                .setAccessibleDescription(isExpanded()
+                        ? resources.getString("MHQCollapsiblePanel.collapse.accessibleDescription")
+                        : resources.getString("MHQCollapsiblePanel.expand.accessibleDescription"));
         updateHeaderBackground();
     }
 
