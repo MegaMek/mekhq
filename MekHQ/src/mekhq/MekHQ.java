@@ -357,6 +357,7 @@ public class MekHQ implements GameListener {
         campaign.setApp(this);
         campaignController = new CampaignController(campaign);
         campaignController.setHost(campaign.getId());
+        campaignController.activate();
         campaignGUI = new CampaignGUI(this);
     }
 
@@ -371,9 +372,7 @@ public class MekHQ implements GameListener {
             campaignGUI = null;
         }
         if (campaignController != null) {
-            if (getCampaign() != null && getCampaign().getStoryArc() != null) {
-                MekHQ.unregisterHandler(getCampaign().getStoryArc());
-            }
+            campaignController.deactivate();
             campaignController = null;
         }
         EVENT_BUS.logActiveSubscribers();
