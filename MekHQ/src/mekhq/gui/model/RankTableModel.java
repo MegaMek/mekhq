@@ -32,13 +32,18 @@
  */
 package mekhq.gui.model;
 
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.FontMetrics;
+import java.awt.Insets;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Vector;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
@@ -200,6 +205,57 @@ public class RankTableModel extends DefaultTableModel {
         };
     }
 
+    /**
+     * @param column a model column index
+     *
+     * @return the {@link Profession} represented by that column, or {@code null} for the non-profession columns (Rate,
+     *         Officer, Pay Multiplier)
+     */
+    public @Nullable Profession getProfession(final int column) {
+        return switch (column) {
+            case COL_NAME_MW -> Profession.MEKWARRIOR;
+            case COL_NAME_ASF -> Profession.AEROSPACE;
+            case COL_NAME_VEE -> Profession.VEHICLE;
+            case COL_NAME_NAVAL -> Profession.NAVAL;
+            case COL_NAME_INF -> Profession.INFANTRY;
+            case COL_NAME_TECH -> Profession.TECH;
+            case COL_NAME_MEDICAL -> Profession.MEDICAL;
+            case COL_NAME_ADMIN -> Profession.ADMINISTRATOR;
+            case COL_NAME_CIVILIAN -> Profession.CIVILIAN;
+            default -> null;
+        };
+    }
+
+    /**
+     * Builds the tooltip shown for a redirect cell (e.g. "--MW", rendered as "\u2192 MW"). Redirects mean "use another
+     * profession's rank name at this rate", so this follows the redirect chain via
+     * {@link Profession#getProfession(RankSystem, Rank)} and reports the profession and the actual rank name it
+     * resolves to.
+     *
+     * @param modelRow the model row index of the cell
+     * @param column   the model column index of the cell
+     *
+     * @return the resolved redirect tooltip, or {@code null} if it can't be resolved to a concrete rank name
+     */
+    private @Nullable String getRedirectToolTip(final int modelRow, final int column) {
+        final Profession profession = getProfession(column);
+        final RankSystem system = getRankSystem();
+        if ((profession == null) || (system == null)) {
+            return null;
+        }
+        final List<Rank> ranks = system.getRanks();
+        if ((modelRow < 0) || (modelRow >= ranks.size())) {
+            return null;
+        }
+        final Rank rank = ranks.get(modelRow);
+        final Profession resolved = profession.getProfession(system, rank);
+        final String name = rank.getNameWithLevels(resolved);
+        if ((name == null) || name.isBlank() || name.equals("-") || name.startsWith("--")) {
+            return null;
+        }
+        return MessageFormat.format(resources.getString("RankTableModel.redirectCell.toolTipText"), resolved, name);
+    }
+
     public List<Rank> getRanks() {
         try {
             final List<Rank> ranks = new ArrayList<>();
@@ -240,7 +296,48 @@ public class RankTableModel extends DefaultTableModel {
               final int row, final int column) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             final int actualCol = table.convertColumnIndexToModel(column);
-            setToolTipText(getToolTip(actualCol));
+            final String text = (value == null) ? "" : value.toString();
+
+            // Rename redirect markers ("--MW" -> "\u2192 MW") and mute their color so they read as secondary
+            // delegations rather than data. Rank.indicatesAlternativeSystem keys off the same "--" prefix.
+            final boolean redirect = text.startsWith("--") && text.length() > 2;
+            final String displayText = redirect ? "\u2192 " + text.substring(2) : text;
+            setText(displayText);
+            if (redirect && !isSelected) {
+                final Color muted = UIManager.getColor("Label.disabledForeground");
+                if (muted != null) {
+                    setForeground(muted);
+                }
+            }
+
+            // Tooltip resolution at the cell level (per-column profession descriptions live on the header):
+            //   - redirect cells ("\u2192 MW") report the profession and actual rank name they resolve to;
+            //   - empty profession cells ("-" or blank) explain that the profession has no rank at this rate, so the
+            //     gap reads as intentional rather than missing data;
+            //   - otherwise we only surface a tooltip when the rendered text doesn't fit the column width, so long
+            //     rank names ellipsized by a narrow layout are still readable.
+            final Profession profession = getProfession(actualCol);
+            final boolean empty = displayText.isBlank() || displayText.equals("-");
+            final int modelRow = table.convertRowIndexToModel(row);
+
+            final FontMetrics fontMetrics = getFontMetrics(getFont());
+            final Insets insets = getInsets();
+            final int textWidth = fontMetrics.stringWidth(displayText) + insets.left + insets.right;
+            final int columnWidth = table.getColumnModel().getColumn(column).getWidth();
+            final String clippedToolTip = (textWidth > columnWidth && !displayText.isEmpty()) ? displayText : null;
+
+            final String toolTip;
+            if (redirect) {
+                final String redirectToolTip = getRedirectToolTip(modelRow, actualCol);
+                toolTip = (redirectToolTip != null) ? redirectToolTip : clippedToolTip;
+            } else if ((profession != null) && empty) {
+                final Object rate = getValueAt(modelRow, COL_NAME_RATE);
+                toolTip = MessageFormat.format(resources.getString("RankTableModel.emptyCell.toolTipText"),
+                      profession, rate);
+            } else {
+                toolTip = clippedToolTip;
+            }
+            setToolTipText(toolTip);
             setOpaque(true);
             setHorizontalAlignment(getAlignment(actualCol));
             return this;

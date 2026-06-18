@@ -37,15 +37,21 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.IntUnaryOperator;
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.event.TableModelEvent;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 
 import megamek.client.ui.baseComponents.SpinnerCellEditor;
 import megamek.client.ui.buttons.MMButton;
@@ -84,7 +90,15 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
 
     // Ranks Table Panel
     private JTable ranksTable;
+    private JTable ranksRowHeaderTable;
     private RankTableModel ranksTableModel;
+    /**
+     * Single source of truth for column widths (model column index -> pixel width). Defaults to the model's wide
+     * standalone widths; callers embedding this pane in a narrower layout (e.g. the Campaign Options dialog) inject
+     * their own provider via {@link #setColumnWidthProvider(IntUnaryOperator)} so there is never a tug-of-war between
+     * competing width listeners.
+     */
+    private transient IntUnaryOperator columnWidthProvider;
     // endregion Variable Declarations
 
     // region Constructors
@@ -166,6 +180,28 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
 
     public void setRanksTableModel(final RankTableModel ranksTableModel) {
         this.ranksTableModel = ranksTableModel;
+    }
+
+    /**
+     * @return the JTable that renders the frozen Rate column as a row header, or {@code null} if the table pane has
+     *         not been built yet.
+     */
+    public @Nullable JTable getRanksRowHeaderTable() {
+        return ranksRowHeaderTable;
+    }
+
+    /**
+     * Sets the single source of truth for column widths (model column index -> pixel width) and immediately re-applies
+     * it. Callers that resize the table to fit a narrower layout should use this instead of poking column widths
+     * directly, so structure-changed events (rank system switches) and the "Restore default column widths" header menu
+     * item all honour the same widths.
+     *
+     * @param provider a function mapping a model column index to a preferred width, or {@code null} to fall back to the
+     *                 model's standalone widths
+     */
+    public void setColumnWidthProvider(final @Nullable IntUnaryOperator provider) {
+        this.columnWidthProvider = provider;
+        applyColumnWidthsAndRenderers();
     }
     // endregion Ranks Table Panel
     // endregion Getters/Setters
@@ -312,32 +348,223 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
         // Create Model
         setRanksTableModel(new RankTableModel(getSelectedRankSystem()));
 
-        // Create Table
-        setRanksTable(new JTable(getRanksTableModel()));
-        getRanksTable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        getRanksTable().setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        getRanksTable().setRowSelectionAllowed(false);
-        getRanksTable().setColumnSelectionAllowed(false);
-        getRanksTable().setCellSelectionEnabled(true);
-        getRanksTable().setIntercellSpacing(new Dimension(0, 0));
-        getRanksTable().setShowGrid(false);
-
-        for (int i = 0; i < RankTableModel.COL_NUM; i++) {
-            final TableColumn column = getRanksTable().getColumnModel().getColumn(i);
-            column.setPreferredWidth(getRanksTableModel().getColumnWidth(i));
-            column.setCellRenderer(getRanksTableModel().getRenderer());
-            if (i == RankTableModel.COL_PAY_MULTI) {
-                column.setCellEditor(new SpinnerCellEditor(new SpinnerNumberModel(1.0, 0.0, 10.0, 0.1), true));
+        // Main table. The custom JTableHeader surfaces RankTableModel.getToolTip(...) per column so users get the
+        // profession/category description by hovering the header. The getToolTipText override also falls back to that
+        // same per-column tooltip for the empty area below the last rank when the table fills its viewport.
+        setRanksTable(new JTable(getRanksTableModel()) {
+            @Override
+            protected JTableHeader createDefaultTableHeader() {
+                return createColumnTooltipHeader(this);
             }
-        }
 
-        // Create the Scroll Pane
-        final JScrollPane pane = new FastJScrollPane(getRanksTable());
+            @Override
+            public String getToolTipText(MouseEvent event) {
+                if (rowAtPoint(event.getPoint()) < 0) {
+                    int viewIndex = columnAtPoint(event.getPoint());
+                    if (viewIndex >= 0) {
+                        int modelIndex = convertColumnIndexToModel(viewIndex);
+                        return getRanksTableModel().getToolTip(modelIndex);
+                    }
+                }
+                return super.getToolTipText(event);
+            }
+        });
+        final JTable mainTable = getRanksTable();
+        mainTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        mainTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        mainTable.setRowSelectionAllowed(false);
+        mainTable.setColumnSelectionAllowed(false);
+        mainTable.setCellSelectionEnabled(true);
+        mainTable.setIntercellSpacing(new Dimension(0, 0));
+        mainTable.setShowGrid(false);
+
+        // Build the frozen Rate column as a row-header table that scrolls vertically with the main table but stays
+        // pinned horizontally. Auto-create-columns-from-model is disabled so the manually inserted Rate column
+        // survives a structure-changed event (rank system switch) without being clobbered.
+        ranksRowHeaderTable = createRanksRowHeaderTable(getRanksTableModel(), mainTable);
+
+        // Apply default widths + renderers, then remove the Rate column from the main table so it only shows in the
+        // row header. The TableModelListener re-applies these steps after every structure change (rank system switch).
+        applyColumnWidthsAndRenderers();
+        hideRateColumnFromMainTable();
+        getRanksTableModel().addTableModelListener(event -> {
+            if (event.getFirstRow() == TableModelEvent.HEADER_ROW) {
+                SwingUtilities.invokeLater(() -> {
+                    hideRateColumnFromMainTable();
+                    applyColumnWidthsAndRenderers();
+                });
+            }
+        });
+
+        // Header right-click menu (auto-fit / restore defaults) on both the main header and the frozen Rate header.
+        final JPopupMenu headerMenu = createHeaderPopupMenu();
+        mainTable.getTableHeader().setComponentPopupMenu(headerMenu);
+        ranksRowHeaderTable.getTableHeader().setComponentPopupMenu(headerMenu);
+
+        // Scroll pane with the row header view + corner so the Rate header strip lines up with the rest of the headers.
+        final JScrollPane pane = new FastJScrollPane(mainTable);
+        pane.setRowHeaderView(ranksRowHeaderTable);
+        pane.setCorner(JScrollPane.UPPER_LEFT_CORNER, ranksRowHeaderTable.getTableHeader());
         pane.setName("ranksTableScrollPane");
         pane.setMinimumSize(new Dimension(1200, 400));
         pane.setPreferredSize(new Dimension(1200, 500));
 
         return pane;
+    }
+
+    private JTableHeader createColumnTooltipHeader(final JTable forTable) {
+        return new JTableHeader(forTable.getColumnModel()) {
+            @Override
+            public String getToolTipText(MouseEvent event) {
+                final TableColumnModel cm = getColumnModel();
+                final int viewIndex = cm.getColumnIndexAtX(event.getPoint().x);
+                if (viewIndex < 0) {
+                    return null;
+                }
+                final int modelIndex = cm.getColumn(viewIndex).getModelIndex();
+                return getRanksTableModel().getToolTip(modelIndex);
+            }
+        };
+    }
+
+    private JTable createRanksRowHeaderTable(final RankTableModel model, final JTable mainTable) {
+        final JTable rh = new JTable(model) {
+            @Override
+            protected JTableHeader createDefaultTableHeader() {
+                return createColumnTooltipHeader(this);
+            }
+        };
+        rh.setAutoCreateColumnsFromModel(false);
+        rh.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        rh.setRowSelectionAllowed(false);
+        rh.setColumnSelectionAllowed(false);
+        rh.setCellSelectionEnabled(false);
+        rh.setIntercellSpacing(new Dimension(0, 0));
+        rh.setShowGrid(false);
+        rh.setFocusable(false);
+
+        // Replace the auto-created column set with a single column bound to the Rate model index. We do this on the
+        // row header (not the main table) so the wide profession columns survive auto-rebuilds after rank-system
+        // changes without us having to re-add the Rate TableColumn each time.
+        final TableColumnModel cm = rh.getColumnModel();
+        while (cm.getColumnCount() > 0) {
+            cm.removeColumn(cm.getColumn(0));
+        }
+        final TableColumn rateColumn = new TableColumn(RankTableModel.COL_NAME_RATE);
+        rateColumn.setHeaderValue(model.getColumnName(RankTableModel.COL_NAME_RATE));
+        rateColumn.setPreferredWidth(columnWidthFor(RankTableModel.COL_NAME_RATE));
+        rateColumn.setCellRenderer(model.getRenderer());
+        rh.addColumn(rateColumn);
+
+        rh.setRowHeight(mainTable.getRowHeight());
+        mainTable.addPropertyChangeListener("rowHeight", evt -> rh.setRowHeight(mainTable.getRowHeight()));
+        return rh;
+    }
+
+    private void hideRateColumnFromMainTable() {
+        final JTable table = getRanksTable();
+        if (table == null) {
+            return;
+        }
+        final TableColumnModel cm = table.getColumnModel();
+        for (int viewIndex = 0; viewIndex < cm.getColumnCount(); viewIndex++) {
+            final TableColumn column = cm.getColumn(viewIndex);
+            if (column.getModelIndex() == RankTableModel.COL_NAME_RATE) {
+                table.removeColumn(column);
+                return;
+            }
+        }
+    }
+
+    /**
+     * @param modelIndex a model column index
+     *
+     * @return the configured width for that column, using the injected {@link #columnWidthProvider} when present and
+     *         otherwise the model's standalone width
+     */
+    private int columnWidthFor(final int modelIndex) {
+        if (columnWidthProvider != null) {
+            return columnWidthProvider.applyAsInt(modelIndex);
+        }
+        return getRanksTableModel().getColumnWidth(modelIndex);
+    }
+
+    private void applyColumnWidthsAndRenderers() {
+        final RankTableModel model = getRanksTableModel();
+        final JTable table = getRanksTable();
+        if ((model == null) || (table == null)) {
+            return;
+        }
+        final TableColumnModel cm = table.getColumnModel();
+        for (int viewIndex = 0; viewIndex < cm.getColumnCount(); viewIndex++) {
+            final TableColumn column = cm.getColumn(viewIndex);
+            final int modelIndex = column.getModelIndex();
+            final int width = columnWidthFor(modelIndex);
+            column.setPreferredWidth(width);
+            column.setMinWidth(0);
+            column.setCellRenderer(model.getRenderer());
+            if (modelIndex == RankTableModel.COL_PAY_MULTI) {
+                column.setCellEditor(new SpinnerCellEditor(new SpinnerNumberModel(1.0, 0.0, 10.0, 0.1), true));
+            }
+        }
+        if (ranksRowHeaderTable != null) {
+            final TableColumn rateColumn = ranksRowHeaderTable.getColumnModel().getColumn(0);
+            final int rateWidth = columnWidthFor(RankTableModel.COL_NAME_RATE);
+            rateColumn.setPreferredWidth(rateWidth);
+            rateColumn.setMinWidth(rateWidth);
+            rateColumn.setMaxWidth(rateWidth);
+            rateColumn.setCellRenderer(model.getRenderer());
+            ranksRowHeaderTable.setPreferredScrollableViewportSize(
+                  new Dimension(rateWidth, ranksRowHeaderTable.getPreferredSize().height));
+            ranksRowHeaderTable.revalidate();
+        }
+    }
+
+    private JPopupMenu createHeaderPopupMenu() {
+        final JPopupMenu menu = new JPopupMenu();
+
+        final JMenuItem autoFit = new JMenuItem(resources.getString("ranksTable.headerMenu.autoFit.text"));
+        autoFit.addActionListener(evt -> autoFitAllColumns());
+        menu.add(autoFit);
+
+        final JMenuItem reset = new JMenuItem(resources.getString("ranksTable.headerMenu.reset.text"));
+        reset.addActionListener(evt -> applyColumnWidthsAndRenderers());
+        menu.add(reset);
+
+        return menu;
+    }
+
+    private void autoFitAllColumns() {
+        autoFitColumnWidths(getRanksTable());
+        if (ranksRowHeaderTable != null) {
+            autoFitColumnWidths(ranksRowHeaderTable);
+            ranksRowHeaderTable.revalidate();
+        }
+    }
+
+    private static void autoFitColumnWidths(final JTable table) {
+        if (table == null) {
+            return;
+        }
+        final TableColumnModel cm = table.getColumnModel();
+        final JTableHeader header = table.getTableHeader();
+        for (int viewIndex = 0; viewIndex < cm.getColumnCount(); viewIndex++) {
+            final TableColumn column = cm.getColumn(viewIndex);
+            TableCellRenderer headerRenderer = column.getHeaderRenderer();
+            if (headerRenderer == null) {
+                headerRenderer = header.getDefaultRenderer();
+            }
+            final Component headerComp = headerRenderer.getTableCellRendererComponent(table, column.getHeaderValue(),
+                  false, false, -1, viewIndex);
+            int width = headerComp.getPreferredSize().width;
+            for (int row = 0; row < table.getRowCount(); row++) {
+                final TableCellRenderer cellRenderer = table.getCellRenderer(row, viewIndex);
+                final Component cellComp = table.prepareRenderer(cellRenderer, row, viewIndex);
+                width = Math.max(width, cellComp.getPreferredSize().width);
+            }
+            // Small padding so glyphs don't visually touch the column border.
+            column.setPreferredWidth(width + 6);
+        }
     }
 
     private JPanel createRankSystemFileButtonsPanel() {
@@ -418,16 +645,13 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
             return;
         }
 
-        // Update the model with the new rank data
+        // Update the model with the new rank data. setRankSystem fires a structure-changed event that triggers JTable
+        // to rebuild its columns from scratch (which re-adds the Rate column). Re-hide it from the main table and
+        // re-apply widths/renderers/editors synchronously here; the TableModelListener registered in
+        // createRanksTablePane() will run the same steps again via invokeLater as a safety net.
         getRanksTableModel().setRankSystem(getSelectedRankSystem());
-        for (int i = 0; i < RankTableModel.COL_NUM; i++) {
-            final TableColumn column = getRanksTable().getColumnModel().getColumn(i);
-            column.setPreferredWidth(getRanksTableModel().getColumnWidth(i));
-            column.setCellRenderer(getRanksTableModel().getRenderer());
-            if (i == RankTableModel.COL_PAY_MULTI) {
-                column.setCellEditor(new SpinnerCellEditor(new SpinnerNumberModel(1.0, 0.0, 10.0, 0.1), true));
-            }
-        }
+        hideRateColumnFromMainTable();
+        applyColumnWidthsAndRenderers();
 
         if (getSelectedRankSystem().getType().isDefault()) {
             getComboRankSystemType().setEnabled(false);

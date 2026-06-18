@@ -49,8 +49,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.*;
-import javax.swing.event.TableModelEvent;
-import javax.swing.table.TableColumn;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
@@ -1511,17 +1509,16 @@ public class BiographyTab {
         JTable ranksTable = rankSystemsPane.getRanksTable();
         ranksTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         ranksTable.setFillsViewportHeight(true);
-        configureEmbeddedRankTableColumns(ranksTable);
 
-        // When the rank system changes, RankTableModel.setRankSystem(...) calls setDataVector(...), which fires a
-        // structure-changed event. That rebuilds the table's columns from scratch and re-applies the wide
-        // standalone-pane widths. Re-apply the narrow embedded widths whenever the structure changes so switching
-        // rank systems doesn't blow the columns out to their full width.
-        ranksTable.getModel().addTableModelListener(event -> {
-            if (event.getFirstRow() == TableModelEvent.HEADER_ROW) {
-                SwingUtilities.invokeLater(() -> configureEmbeddedRankTableColumns(ranksTable));
-            }
-        });
+        JTable ranksRowHeader = rankSystemsPane.getRanksRowHeaderTable();
+        if (ranksRowHeader != null) {
+            ranksRowHeader.setFillsViewportHeight(true);
+        }
+
+        // Single source of truth for embedded column widths. The pane re-applies this provider on every rank-system
+        // switch and when the "Restore default column widths" header menu item is used, so there is no competing
+        // width listener to fight (which previously let the wide standalone widths win).
+        rankSystemsPane.setColumnWidthProvider(BiographyTab::getEmbeddedRankColumnWidth);
 
         JScrollPane tableScrollPane = (JScrollPane) SwingUtilities.getAncestorOfClass(JScrollPane.class,
                 ranksTable);
@@ -1546,15 +1543,7 @@ public class BiographyTab {
         return new Dimension(RANK_SYSTEMS_PANEL_WIDTH, viewHeight + horizontalScrollBarHeight);
     }
 
-    private void configureEmbeddedRankTableColumns(JTable ranksTable) {
-        for (int index = 0; index < ranksTable.getColumnModel().getColumnCount(); index++) {
-            int modelIndex = ranksTable.convertColumnIndexToModel(index);
-            TableColumn column = ranksTable.getColumnModel().getColumn(index);
-            column.setPreferredWidth(getEmbeddedRankColumnWidth(modelIndex));
-        }
-    }
-
-    private int getEmbeddedRankColumnWidth(int modelIndex) {
+    private static int getEmbeddedRankColumnWidth(int modelIndex) {
         return switch (modelIndex) {
             case RankTableModel.COL_NAME_RATE -> RANK_RATE_COLUMN_WIDTH;
             case RankTableModel.COL_OFFICER -> RANK_OFFICER_COLUMN_WIDTH;
