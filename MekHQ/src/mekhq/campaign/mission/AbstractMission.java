@@ -689,8 +689,26 @@ public class AbstractMission {
         this.contractNegotiationCommandRoll = contractNegotiationCommandRoll;
     }
 
+    /**
+     * Retrieves the list of scenarios.
+     *
+     * <p><b>Note:</b> this returns the actual scenario array. Any changes made to the array will be directly
+     * modifying the version retained inside the {@link AbstractMission} object. If you just want to parse the list
+     * {@link #getScenariosCopy()} is a safer option.</p>
+     *
+     * @return a list of Scenario objects.
+     */
     public List<Scenario> getScenarios() {
         return scenarios;
+    }
+
+    /**
+     * Creates and returns an unmodifiable copy of the list of scenarios.
+     *
+     * @return an unmodifiable copy of the list of scenarios
+     */
+    public List<Scenario> getScenariosCopy() {
+        return List.copyOf(scenarios);
     }
 
     /**
