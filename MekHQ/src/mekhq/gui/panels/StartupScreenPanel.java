@@ -67,6 +67,7 @@ import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.Utilities;
+import mekhq.campaign.storyArc.StoryArc;
 import mekhq.campaign.storyArc.StoryArcStub;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.AbstractMHQPanel;
@@ -322,7 +323,21 @@ public class StartupScreenPanel extends AbstractMHQPanel {
     }
 
     private void startCampaign(final @Nullable File file, @Nullable StoryArcStub storyArcStub) {
-        new DataLoadingDialog(getFrame(), app, file, storyArcStub, false).setVisible(true);
+        getFrame().setVisible(false); // hide StartupScreen
+        new DataLoadingDialog(getFrame(), app, file, false, campaign -> {
+            if (campaign != null) {
+                app.activateCampaign(campaign);
+                if (storyArcStub != null) {
+                    StoryArc storyArc = storyArcStub.loadStoryArc(campaign);
+                    if (storyArc != null) {
+                        campaign.useStoryArc(storyArc, true);
+                    }
+                }
+                getFrame().dispose();
+            } else {
+                getFrame().setVisible(true); // return back to StartupScreen
+            }
+        }).setVisible(true);
     }
 
     private @Nullable File selectCampaignFile() {

@@ -1021,7 +1021,7 @@ public class CampaignNewDayManager {
      */
     private void embezzleFunds(Person person) {
         ActionCheckResult actionCheckResult =
-              person.checkSkill(S_ADMIN).resolve(false, getTextAt(RESOURCE_BUNDLE, "embezzle.roll"), true);
+              person.checkSkill(S_ADMIN, campaign).resolve(false, getTextAt(RESOURCE_BUNDLE, "embezzle.roll"), true);
         campaign.addReport(SKILL_CHECKS, actionCheckResult.resultsText());
 
         if (actionCheckResult.isSuccess()) {

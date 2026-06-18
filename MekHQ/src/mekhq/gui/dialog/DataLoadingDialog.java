@@ -51,6 +51,7 @@ import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -90,8 +91,6 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.storyArc.StoryArc;
-import mekhq.campaign.storyArc.StoryArcStub;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
@@ -114,25 +113,26 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
     private final Task task;
     private RawImagePanel splash;
     private JProgressBar progressBar;
-    private final StoryArcStub storyArcStub;
     private final boolean isInAppNewCampaign;
+    private final Consumer<Campaign> completionHandler;
 
     private final LocalDate DEFAULT_START_DATE = LocalDate.of(3051, 1, 1);
 
     // endregion Variable Declarations
 
     // region Constructors
-    public DataLoadingDialog(final JFrame frame, final MekHQ application, final @Nullable File campaignFile) {
-        this(frame, application, campaignFile, null, false);
+    public DataLoadingDialog(final JFrame frame, final MekHQ application, final @Nullable File campaignFile,
+          Consumer<Campaign> completionHandler) {
+        this(frame, application, campaignFile, false, completionHandler);
     }
 
     public DataLoadingDialog(final JFrame frame, final MekHQ application, final @Nullable File campaignFile,
-          StoryArcStub stub, final boolean isInAppNewCampaign) {
+          final boolean isInAppNewCampaign, Consumer<Campaign> completionHandler) {
         super(frame, "DataLoadingDialog", "DataLoadingDialog.title");
         this.application = application;
         this.campaignFile = campaignFile;
-        this.storyArcStub = stub;
         this.isInAppNewCampaign = isInAppNewCampaign;
+        this.completionHandler = completionHandler;
         this.task = new Task(this);
         getTask().addPropertyChangeListener(this);
         initialize();
@@ -182,7 +182,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
 
     @Override
     protected Container createCenterPane() {
-        setSplash(UIUtil.createSplashComponent(getApplication().getIconPackage().getLoadingScreenImages(), getFrame()));
+        setSplash(UIUtil.createSplashComponent(getApplication().getIconPackage().getLoadingScreenImages(), this));
         return getSplash();
     }
 
@@ -201,7 +201,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
         setSize(getSplash().getPreferredSize());
         pack();
         fitAndCenter();
-        getFrame().setVisible(true);
+        setVisible(true);
     }
     // endregion Initialization
 
@@ -485,7 +485,6 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
             // Generic event processor
             campaign.setCampaignEventProcessor(new CampaignEventProcessor(campaign));
 
-            campaign.setApp(getApplication());
             return campaign;
         }
 
@@ -574,11 +573,12 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
          */
         @Override
         public void done() {
-            Campaign campaign;
+            setVisible(false);
             try {
-                campaign = get();
+                Campaign campaign = get();
+                completionHandler.accept(campaign);
             } catch (InterruptedException | CancellationException ignored) {
-                campaign = null;
+                completionHandler.accept(null);
             } catch (ExecutionException ex) {
                 LOGGER.error("", ex);
                 if (ex.getCause() instanceof NullEntityException) {
@@ -604,24 +604,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                           resources.getString("DataLoadingDialog.ExecutionException.title"),
                           JOptionPane.ERROR_MESSAGE);
                 }
-                campaign = null;
-            }
-
-            setVisible(false);
-            if (campaign != null) {
-                getApplication().setCampaign(campaign);
-                getApplication().getCampaignController().setHost(campaign.getId());
-                getApplication().showNewView();
-                getFrame().dispose();
-                if (null != storyArcStub) {
-                    StoryArc storyArc = storyArcStub.loadStoryArc(campaign);
-                    if (null != storyArc) {
-                        campaign.useStoryArc(storyArc, true);
-                    }
-                }
-            } else {
-                cancel(true);
-                getFrame().setVisible(true);
+                completionHandler.accept(null);
             }
         }
     }

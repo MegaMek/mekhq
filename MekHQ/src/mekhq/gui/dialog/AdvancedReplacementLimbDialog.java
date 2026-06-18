@@ -1028,7 +1028,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         for (PlannedSurgery surgery : new ArrayList<>(prioritizedSurgeries)) {
             int spaModifier = surgery.type != COSMETIC_SURGERY && hasMachinistSPA ? -2 : 0;
             ActionCheckResult actionCheckResult =
-                  surgeon.checkSkill(S_SURGERY)
+                  surgeon.checkSkill(S_SURGERY, campaign)
                         .withMiscModifier(spaModifier)
                         .resolve(isUseEdge, getTextAt(RESOURCE_BUNDLE,
                               "AdvancedReplacementLimbDialog.skillCheck"), false);
