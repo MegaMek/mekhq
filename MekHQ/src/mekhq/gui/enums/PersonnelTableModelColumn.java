@@ -213,7 +213,15 @@ public enum PersonnelTableModelColumn {
     LOCATION_NAME("PersonnelTableModelColumn.LOCATION_NAME.text"),
     DESTINATION_SYSTEM("PersonnelTableModelColumn.DESTINATION_SYSTEM.text"),
     DESTINATION_PLANET("PersonnelTableModelColumn.DESTINATION_PLANET.text"),
-    DESTINATION_NAME("PersonnelTableModelColumn.DESTINATION_NAME.text");
+    DESTINATION_NAME("PersonnelTableModelColumn.DESTINATION_NAME.text"),
+    IS_MARRIED("PersonnelTableModelColumn.IS_MARRIED.text"),
+    FORMER_SPOUSES("PersonnelTableModelColumn.FORMER_SPOUSES.text"),
+    CHILDREN("PersonnelTableModelColumn.CHILDREN.text"),
+    SIBLINGS("PersonnelTableModelColumn.SIBLINGS.text"),
+    GRANDCHILDREN("PersonnelTableModelColumn.GRANDCHILDREN.text"),
+    GRANDPARENTS("PersonnelTableModelColumn.GRANDPARENTS.text"),
+    AUNTS_OR_UNCLES("PersonnelTableModelColumn.AUNTS_OR_UNCLES.text"),
+    COUSINS("PersonnelTableModelColumn.COUSINS.text");
 
     // endregion Enum Declarations
 
@@ -752,7 +760,7 @@ public enum PersonnelTableModelColumn {
             case DESTINATION_SYSTEM -> LocationDisplay.getDestinationSystem(person, today);
             case DEXTERITY -> getAttributeScoreDisplay(person, SkillAttribute.DEXTERITY);
             case DIVORCEABLE -> getText(person.getGenealogy().hasSpouse() ?
-                                                          (convertBooleanToYesNo(person.isDivorceable())) : "NA.text");
+                                              (convertBooleanToYesNo(person.isDivorceable())) : "NA.text");
             case DUE_DATE -> person.getDueDateAsString(campaign);
             case EDGE -> {
                 int currentAttributeValue = person.getAttributeScore(SkillAttribute.EDGE);
@@ -781,7 +789,7 @@ public enum PersonnelTableModelColumn {
             case HIDE_PERSONALITY -> getText(convertBooleanToYesNo(person.isHidePersonality()));
             case HIGHEST_EDUCATION -> person.getEduHighestEducation().toString();
             case IMMORTAL -> getText(person.getStatus().isDead() ? "NA.text"
-                                                       : (convertBooleanToYesNo(person.isImmortal())));
+                                           : (convertBooleanToYesNo(person.isImmortal())));
             case IMPLANT_COUNT -> Integer.toString(person.countOptions(PersonnelOptions.MD_ADVANTAGES));
             case MODIFICATION_COUNT -> Integer.toString(person.getProstheticInjuries().size());
             case INJURIES -> campaign.getCampaignOptions().isUseAdvancedMedical()
@@ -798,7 +806,7 @@ public enum PersonnelTableModelColumn {
             case LOYALTY -> String.valueOf(person.getAdjustedLoyalty(campaign.getFaction(),
                   campaignOptions.isUseAlternativeAdvancedMedical()));
             case MARRIAGEABLE -> getText(person.getGenealogy().hasSpouse() ? "NA.text"
-                                                           : (convertBooleanToYesNo(person.isMarriageable())));
+                                               : (convertBooleanToYesNo(person.isMarriageable())));
             case MEDICAL -> skillValue.apply(SkillType.S_SURGERY);
             case MEDICAL_CAPACITY -> person.isDoctor()
                                            ?
@@ -824,9 +832,9 @@ public enum PersonnelTableModelColumn {
             case POST_NOMINAL -> person.getPostNominal();
             case PRE_NOMINAL -> person.getPreNominal();
             case PREFERS_MEN -> getText(person.isChild(campaign.getLocalDate()) ? "NA.text" :
-                                                          convertBooleanToYesNo(person.isPrefersMen()));
+                                              convertBooleanToYesNo(person.isPrefersMen()));
             case PREFERS_WOMEN -> getText(person.isChild(campaign.getLocalDate()) ? "NA.text" :
-                                                            convertBooleanToYesNo(person.isPrefersWomen()));
+                                                convertBooleanToYesNo(person.isPrefersWomen()));
             case PROTOMEK -> skillValue.apply(SkillType.S_GUN_PROTO);
             case QUICK_TRAIN_IGNORE -> getText(convertBooleanToYesNo(person.isQuickTrainIgnore()));
             case RANK -> person.makeHTMLRank();
@@ -872,8 +880,8 @@ public enum PersonnelTableModelColumn {
                     }
                     yield surname + " (+" + crewSize +
                                 getText(unit.usesSoldiers()
-                                                          ? "PersonnelTableModelColumn.SURNAME.Soldiers.text"
-                                                          : "PersonnelTableModelColumn.SURNAME.Crew.text");
+                                              ? "PersonnelTableModelColumn.SURNAME.Soldiers.text"
+                                              : "PersonnelTableModelColumn.SURNAME.Crew.text");
                 }
             }
             case TACTICAL_TRANSPORT ->
@@ -891,10 +899,9 @@ public enum PersonnelTableModelColumn {
             case TOUGHNESS -> Integer.toString(person.getAdjustedToughness());
             case TRAINING -> skillValue.apply(SkillType.S_TRAINING);
             case WANTS_CHILDREN -> getText(person.isChild(campaign.getLocalDate()) ? "NA.text" :
-                                                             convertBooleanToYesNo(person.isWantsChildren()));
+                                                 convertBooleanToYesNo(person.isWantsChildren()));
             case UNDER_PROTECTION -> getText(convertBooleanToYesNo(person.isUnderProtection()));
-            case COVER_MEDICAL_EXPENSES ->
-                  getText(convertBooleanToYesNo(person.isCoverIllicitMedicalExpenses()));
+            case COVER_MEDICAL_EXPENSES -> getText(convertBooleanToYesNo(person.isCoverIllicitMedicalExpenses()));
             case BLOCK_MATERNITY_LEAVE -> getText(convertBooleanToYesNo(person.isBlockMaternityLeave()));
             case UNIT_ASSIGNMENT -> {
                 if (loadAssignmentFromMarket) {
@@ -980,6 +987,14 @@ public enum PersonnelTableModelColumn {
             case WORK_MINUTES -> person.isTechExpanded() ? String.valueOf(person.getMinutesLeft()) : "0";
             case XP -> Integer.toString(person.getXP());
             case ZERO_G -> skillValue.apply(SkillType.S_ZERO_G_OPERATIONS);
+            case IS_MARRIED -> person.getGenealogy().hasSpouse() ? getText("Yes.text") : getText("No.text");
+            case FORMER_SPOUSES -> person.getGenealogy().getFormerSpouses().size() + "";
+            case CHILDREN -> person.getGenealogy().getChildren().size() + "";
+            case SIBLINGS -> person.getGenealogy().getSiblings().size() + "";
+            case GRANDCHILDREN -> person.getGenealogy().getGrandchildren().size() + "";
+            case GRANDPARENTS -> person.getGenealogy().getGrandparents().size() + "";
+            case AUNTS_OR_UNCLES -> person.getGenealogy().getsAuntsAndUncles().size() + "";
+            case COUSINS -> person.getGenealogy().getCousins().size() + "";
         };
     }
 
@@ -1410,6 +1425,20 @@ public enum PersonnelTableModelColumn {
                      DESTINATION_SYSTEM,
                      DESTINATION_PLANET,
                      DESTINATION_NAME -> true;
+                default -> false;
+            };
+            case FAMILY -> switch (this) {
+                case RANK,
+                     FIRST_NAME,
+                     LAST_NAME,
+                     IS_MARRIED,
+                     FORMER_SPOUSES,
+                     CHILDREN,
+                     SIBLINGS,
+                     GRANDCHILDREN,
+                     GRANDPARENTS,
+                     AUNTS_OR_UNCLES,
+                     COUSINS -> true;
                 default -> false;
             };
             case OTHER -> switch (this) {
