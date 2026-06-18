@@ -57,7 +57,7 @@ class MHQCollapsiblePanelTest {
 
     @Test
     void newPanelIsExpandedByDefault() throws Exception {
-        runOnEdt(() -> {
+        runOnEDT(() -> {
             MHQCollapsiblePanel panel = new MHQCollapsiblePanel("Section");
             assertTrue(panel.isExpanded());
         });
@@ -65,7 +65,7 @@ class MHQCollapsiblePanelTest {
 
     @Test
     void collapsingHidesContentAndFiresExpandedEvent() throws Exception {
-        runOnEdt(() -> {
+        runOnEDT(() -> {
             JLabel content = new JLabel("Body");
             MHQCollapsiblePanel panel = new MHQCollapsiblePanel("Section", content);
 
@@ -88,7 +88,7 @@ class MHQCollapsiblePanelTest {
 
     @Test
     void expandingAgainShowsContentAndFiresExpandedEvent() throws Exception {
-        runOnEdt(() -> {
+        runOnEDT(() -> {
             JLabel content = new JLabel("Body");
             MHQCollapsiblePanel panel = new MHQCollapsiblePanel("Section", content);
             panel.setExpanded(false);
@@ -106,7 +106,7 @@ class MHQCollapsiblePanelTest {
 
     @Test
     void redundantSetExpandedDoesNotFireEvent() throws Exception {
-        runOnEdt(() -> {
+        runOnEDT(() -> {
             MHQCollapsiblePanel panel = new MHQCollapsiblePanel("Section");
             AtomicInteger eventCount = new AtomicInteger();
             panel.addPropertyChangeListener(MHQCollapsiblePanel.EXPANDED_PROPERTY, event -> eventCount.incrementAndGet());
@@ -121,7 +121,7 @@ class MHQCollapsiblePanelTest {
 
     @Test
     void toggleActionFlipsExpandedState() throws Exception {
-        runOnEdt(() -> {
+        runOnEDT(() -> {
             MHQCollapsiblePanel panel = new MHQCollapsiblePanel("Section");
             Action toggleAction = panel.getActionMap().get(MHQCollapsiblePanel.TOGGLE_ACTION);
 
@@ -137,7 +137,7 @@ class MHQCollapsiblePanelTest {
 
     @Test
     void contentPassedToConstructorIsMeasured() throws Exception {
-        runOnEdt(() -> {
+        runOnEDT(() -> {
             JPanel content = new JPanel();
             content.setPreferredSize(new Dimension(321, 50));
             MHQCollapsiblePanel panel = new MHQCollapsiblePanel("Section", content);
@@ -151,23 +151,29 @@ class MHQCollapsiblePanelTest {
      * Runs the supplied work synchronously on the Event Dispatch Thread, unwrapping any assertion failure or exception
      * so JUnit reports it directly rather than as an {@link InvocationTargetException}.
      */
-    private static void runOnEdt(CheckedRunnable runnable) throws Exception {
+    private static void runOnEDT(CheckedRunnable runnable) throws Exception {
         try {
             SwingUtilities.invokeAndWait(() -> {
                 try {
                     runnable.run();
-                } catch (Exception ex) {
-                    throw new RuntimeException(ex);
+                } catch (Throwable throwable) {
+                    // Catch Throwable, not just Exception, so an AssertionError from a failed assertion is carried
+                    // back across the EDT boundary too. It is unwrapped below so JUnit sees the original failure.
+                    throw new RuntimeException(throwable);
                 }
             });
         } catch (InvocationTargetException ex) {
-            Throwable cause = ex.getCause();
-            if (cause instanceof RuntimeException runtimeException
-                      && runtimeException.getCause() instanceof Exception exception) {
-                throw exception;
+            // invokeAndWait reports our wrapper RuntimeException as the cause; the real failure is one level deeper.
+            Throwable failure = ex.getCause();
+            if (failure instanceof RuntimeException && failure.getCause() != null) {
+                failure = failure.getCause();
             }
-            if (cause instanceof Error error) {
+            if (failure instanceof Error error) {
+                // e.g. a JUnit AssertionError - rethrow so it surfaces as the original assertion failure.
                 throw error;
+            }
+            if (failure instanceof Exception exception) {
+                throw exception;
             }
             throw ex;
         }
