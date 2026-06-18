@@ -32,6 +32,8 @@
  */
 package mekhq.gui.baseComponents;
 
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -71,6 +73,8 @@ public class MHQCollapsiblePanel extends JPanel {
     public static final String EXPANDED_PROPERTY = "expanded";
     public static final String TOGGLE_ACTION = "toggle";
 
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.GUI";
+
     private static final int HEADER_VERTICAL_PADDING = 6;
     private static final int HEADER_HORIZONTAL_PADDING = 8;
     private static final int CONTENT_LEFT_PADDING = 24;
@@ -85,8 +89,9 @@ public class MHQCollapsiblePanel extends JPanel {
         public String getToolTipText(MouseEvent event) {
             // The summary is the header's flexible column, so when it is too long it is truncated with an ellipsis
             // rather than widening the section. Surface the full text as a tooltip only while it is actually
-            // truncated, so sections whose summary already fits do not show a redundant tooltip.
-            return getPreferredSize().width > getWidth() ? getText() : null;
+            // truncated, so sections whose summary already fits do not show a redundant tooltip. Calls are qualified
+            // with this. so they resolve to this label's geometry, not the same-named methods on the enclosing panel.
+            return this.getPreferredSize().width > this.getWidth() ? this.getText() : null;
         }
     };
     private final JPanel trailingPanel = new JPanel(new BorderLayout());
@@ -203,6 +208,12 @@ public class MHQCollapsiblePanel extends JPanel {
                 HEADER_HORIZONTAL_PADDING));
         Cursor handCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
         headerPanel.setCursor(handCursor);
+        // Set the hand cursor on the clickable child labels too. They share the header's toggle listener, so the
+        // affordance should match; setting it explicitly keeps the cursor consistent regardless of any look-and-feel
+        // that overrides label cursors. The trailing panel is intentionally excluded so it can host its own control.
+        iconLabel.setCursor(handCursor);
+        titleLabel.setCursor(handCursor);
+        summaryLabel.setCursor(handCursor);
         headerPanel.setFocusable(true);
 
         titleLabel.putClientProperty("FlatLaf.styleClass", "h4");
@@ -244,6 +255,17 @@ public class MHQCollapsiblePanel extends JPanel {
         // without this, clicking directly on the title or the (full-width) summary label would not reach the header.
         // The trailing panel is intentionally excluded so it can host its own interactive control.
         MouseAdapter headerInteractionListener = new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent event) {
+                if (!SwingUtilities.isLeftMouseButton(event)) {
+                    return;
+                }
+                // Clicking a JPanel doesn't move focus on its own, so pull focus to the header on press. This keeps
+                // mouse and keyboard interaction in sync: after a click the Space/Enter toggle bindings work and the
+                // header shows its focused background without the user first having to tab to it.
+                headerPanel.requestFocusInWindow();
+            }
+
             @Override
             public void mouseReleased(MouseEvent event) {
                 if (!SwingUtilities.isLeftMouseButton(event)) {
@@ -312,7 +334,9 @@ public class MHQCollapsiblePanel extends JPanel {
         iconLabel.setIcon(getDisclosureIcon());
         headerPanel.getAccessibleContext().setAccessibleName(title);
         headerPanel.getAccessibleContext()
-                .setAccessibleDescription(isExpanded() ? "Collapse section" : "Expand section");
+                .setAccessibleDescription(isExpanded()
+                        ? getTextAt(RESOURCE_BUNDLE, "MHQCollapsiblePanel.collapse.accessibleDescription")
+                        : getTextAt(RESOURCE_BUNDLE, "MHQCollapsiblePanel.expand.accessibleDescription"));
         updateHeaderBackground();
     }
 
