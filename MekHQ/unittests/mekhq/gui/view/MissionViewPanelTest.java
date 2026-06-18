@@ -1,5 +1,6 @@
 package mekhq.gui.view;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -41,10 +42,30 @@ class MissionViewPanelTest {
     }
 
     @Test
+    void activeContractWithoutCurrentLocationDoesNotShowTimeline() {
+        assertFalse(MissionViewPanel.shouldShowContractTimeline(
+              campaignOnDateWithoutCurrentLocation(CONTRACT_SYSTEM),
+              contractAt(CONTRACT_SYSTEM, true)));
+    }
+
+    @Test
+    void activeContractWithoutContractSystemDoesNotShowTimeline() {
+        assertFalse(MissionViewPanel.shouldShowContractTimeline(
+              campaignOnDate(CONTRACT_SYSTEM, true),
+              contractAt(null, true)));
+    }
+
+    @Test
     void inactiveContractLandedAtDestinationDoesNotShowTimeline() {
         assertFalse(MissionViewPanel.shouldShowContractTimeline(
               campaignOnDate(CONTRACT_SYSTEM, true),
               contractAt(CONTRACT_SYSTEM, false)));
+    }
+
+    @Test
+    void landedCurrentLocationWithoutPlanetUsesSystemName() {
+        assertEquals("Somewhere Else (landed)",
+              MissionViewPanel.currentLocationDescription(campaignOnDate(OTHER_SYSTEM, true)));
     }
 
     private static Campaign campaignOnDate(PlanetarySystem currentSystem, boolean onPlanet) {
@@ -54,6 +75,14 @@ class MissionViewPanelTest {
         when(campaign.getCurrentSystem()).thenReturn(currentSystem);
         when(campaign.getCurrentLocation()).thenReturn(currentLocation);
         when(currentLocation.isOnPlanet()).thenReturn(onPlanet);
+        return campaign;
+    }
+
+    private static Campaign campaignOnDateWithoutCurrentLocation(PlanetarySystem currentSystem) {
+        final Campaign campaign = mock(Campaign.class);
+        when(campaign.getLocalDate()).thenReturn(CAMPAIGN_DATE);
+        when(campaign.getCurrentSystem()).thenReturn(currentSystem);
+        when(campaign.getCurrentLocation()).thenReturn(null);
         return campaign;
     }
 

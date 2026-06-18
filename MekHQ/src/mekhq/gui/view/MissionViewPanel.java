@@ -57,6 +57,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
+import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.JScrollablePanel;
@@ -772,7 +773,7 @@ public class MissionViewPanel extends JScrollablePanel {
               currentLocation));
     }
 
-    private String currentLocationDescription(Campaign campaign) {
+    static String currentLocationDescription(Campaign campaign) {
         final AbstractLocation currentLocation = campaign.getCurrentLocation();
         final PlanetarySystem currentSystem = campaign.getCurrentSystem();
         if ((currentLocation == null) || (currentSystem == null)) {
@@ -783,7 +784,9 @@ public class MissionViewPanel extends JScrollablePanel {
         final String locationName;
         final String locationKey;
         if (currentLocation.isOnPlanet()) {
-            locationName = currentLocation.getPlanet().getPrintableName(currentDate);
+            final Planet currentPlanet = currentLocation.getPlanet();
+            locationName = (currentPlanet == null) ? currentSystem.getPrintableName(currentDate) :
+                                currentPlanet.getPrintableName(currentDate);
             locationKey = "contractTimelineBar.location.landed";
         } else if (currentLocation.isAtJumpPoint()) {
             locationName = currentSystem.getPrintableName(currentDate);
