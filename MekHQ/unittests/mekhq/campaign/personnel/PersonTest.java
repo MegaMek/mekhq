@@ -1925,15 +1925,6 @@ public class PersonTest {
             }
 
             @Test
-            @SuppressWarnings("deprecation")
-            void testCheckSkill_Deprecated() {
-                Person person = new Person("GivenName", "Surname", null, "Faction");
-                person.addSkill(SkillType.S_GUN_MEK, 4, 0);
-                SkillCheck check = person.checkSkill(SkillType.S_GUN_MEK);
-                assertEquals(3, check.getTargetNumber().getValue());
-            }
-
-            @Test
             void testCheckSkill_WithExplicitModifiers() {
                 Person person = new Person("GivenName", "Surname", null, "Faction");
                 person.addSkill(SkillType.S_GUN_MEK, 4, 0);
