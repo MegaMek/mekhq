@@ -416,12 +416,6 @@ public class Campaign implements ITechManager, IPlace {
     private RandomSkillPreferences randomSkillPreferences = new RandomSkillPreferences();
     private MekHQ app;
 
-    /**
-     * This is not unused even if IDEA says it is. This event processor subscribes to various events that need to be
-     * applied to Campaign.
-     */
-    private transient CampaignEventProcessor campaignEventProcessor;
-
     private ShoppingList shoppingList;
 
     private AbstractContractMarket contractMarket;
@@ -1128,10 +1122,6 @@ public class Campaign implements ITechManager, IPlace {
             initUnitGenerator();
         }
         return unitGenerator;
-    }
-
-    public void setCampaignEventProcessor(CampaignEventProcessor processor) {
-        campaignEventProcessor = processor;
     }
 
     public void setAtBConfig(AtBConfiguration config) {
@@ -7341,7 +7331,7 @@ public class Campaign implements ITechManager, IPlace {
      * <p>Eligible personnel must have either a primary or secondary role as a medic, must not be currently deployed,
      * and must be employed.</p>
      *
-     * <p></p>For each eligible person, their total skill level in {@link SkillType#S_MEDTECH} (including all
+     * <p>For each eligible person, their total skill level in {@link SkillType#S_MEDTECH} (including all
      * modifiers) is added to the running total.</p>
      *
      * @return The total number of medics available.

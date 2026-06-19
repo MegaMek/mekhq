@@ -75,7 +75,6 @@ import mekhq.MekHQ;
 import mekhq.NullEntityException;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Campaign.AdministratorSpecialization;
-import mekhq.campaign.CampaignEventProcessor;
 import mekhq.campaign.CampaignFactory;
 import mekhq.campaign.camOpsReputation.ReputationController;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -481,9 +480,6 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
             if (isNewCampaign) {
                 new WarAndPeaceProcessor(campaign, true);
             }
-
-            // Generic event processor
-            campaign.setCampaignEventProcessor(new CampaignEventProcessor(campaign));
 
             return campaign;
         }
