@@ -305,6 +305,9 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         boolean foundContractMarket = false;
         boolean foundUnitMarket = false;
 
+        // Saves made in 0.51.00 do not have a <location> but will have a <locations> with a single item.
+        boolean foundMainForceLocation = false;
+
         // Okay, lets iterate through the children, eh?
         for (int x = 0; x < nl.getLength(); x++) {
             Node workingNode = nl.item(x);
@@ -356,6 +359,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     // Campaign's current location — written as a top-level tag in new saves;
                     // same tag was used as the only location entry in pre-<locations>-list saves.
                     campaign.setLocation(CurrentLocation.generateInstanceFromXML(workingNode, campaign));
+                    foundMainForceLocation = true;
                 } else if (nodeName.equalsIgnoreCase("locationNodeChildren")) {
                     LocationNode.reconnectChildren(workingNode, campaign);
                 } else if (nodeName.equalsIgnoreCase("isAvoidingEmptySystems")) {
@@ -790,10 +794,14 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         }
 
 
-        // Backward compat: pre-refactor saves wrote the campaign's current location as the first
-        // entry in <locations> rather than as a top-level <location> tag. If no top-level
-        // <location> was found, promote the first CurrentLocation in the list.
-        if (campaign.getCurrentLocation() == null) {
+        // Backward compat: Saves prior to 0.51.00 will have a single <location> tag, like we do now.
+        // However, saves from 0.51.00 will not have a location tag, but will have a <locations> tag with only
+        // one item. If we didn't find an explicit main force location, use that one. To check for this, if we didn't
+        // find a main force location, check if we have more than one location in our list (by default,
+        // will set and add a location to Campaign during the constructor.
+        if ((!foundMainForceLocation) && (campaign.getLocations().size() > 1)) {
+            // Remove the location that was set by default, then use a valid location out of our locations list.
+            campaign.removeLocation(campaign.getCurrentLocation());
             campaign.getLocations().stream()
                   .filter(loc -> loc instanceof CurrentLocation)
                   .findFirst()

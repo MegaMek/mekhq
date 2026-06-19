@@ -49,7 +49,7 @@ import org.w3c.dom.NodeList;
 /**
  * A simple node for forming a tree of {@link ILocation} implementations.
  * <p>
- *     Please do not expose the inner workings of {@code LocationNode}. Node logic should only be direcly utilized
+ *     Please do not expose the inner workings of {@code LocationNode}. Node logic should only be directly utilized
  *     within the {@code location} package.
  * </p>
  */
