@@ -221,7 +221,7 @@ public class RiotScenario {
         // skip the scenario
         StratConTrackState track;
         try {
-            final StratConCampaignState campaignState = contract.getStratconCampaignState();
+            final StratConCampaignState campaignState = contract.getStratConCampaignState();
             List<StratConTrackState> tracks = campaignState.getTracks();
             track = ObjectUtility.getRandomItem(tracks);
         } catch (NullPointerException e) {

@@ -170,7 +170,7 @@ public class SupportPointNegotiation {
         boolean isUseFactionStandingSupportPoints = campaign.getCampaignOptions()
                                                           .isUseFactionStandingSupportPointsSafe();
 
-        StratConCampaignState campaignState = contract.getStratconCampaignState();
+        StratConCampaignState campaignState = contract.getStratConCampaignState();
 
         if (campaignState == null) {
             return;

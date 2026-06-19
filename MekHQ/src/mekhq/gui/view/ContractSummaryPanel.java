@@ -34,11 +34,14 @@
 package mekhq.gui.view;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
+import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
+import static mekhq.campaign.mission.AbstractMission.UNKNOWN_DIFFICULTY;
 
 import java.awt.Cursor;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -47,6 +50,7 @@ import java.awt.event.MouseEvent;
 import java.util.List;
 import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -65,7 +69,6 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.enums.MHQTabType;
 
 /**
  * Contract summary view for ContractMarketDialog
@@ -205,7 +208,7 @@ public class ContractSummaryPanel extends JPanel {
                 gridBagConstraintsLabels.gridy = ++y;
                 mainPanel.add(lblChallenge, gridBagConstraintsLabels);
 
-                JPanel txtChallenge = ((AtBContract) contract).getContractDifficultySkulls();
+                JPanel txtChallenge = getContractDifficultySkulls((AtBContract) contract);
                 txtChallenge.setToolTipText(wordWrap(resourceMap.getString("lblChallenge.tooltip")));
                 txtChallenge.setName("txtChallenge");
                 gridBagConstraintsText.gridy = y;
@@ -218,7 +221,7 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsLabels.gridy = ++y;
         mainPanel.add(lblEmployer, gridBagConstraintsLabels);
 
-        JLabel txtEmployer = new JLabel(contract.getEmployer());
+        JLabel txtEmployer = new JLabel(contract.getEmployerName());
         txtEmployer.setName("txtEmployer");
         gridBagConstraintsText.gridy = y;
         mainPanel.add(txtEmployer, gridBagConstraintsText);
@@ -252,7 +255,7 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsLabels.gridy = ++y;
         mainPanel.add(lblMissionType, gridBagConstraintsLabels);
 
-        JLabel txtMissionType = new JLabel(contract.getType());
+        JLabel txtMissionType = new JLabel(contract.getContractTypeName());
         txtMissionType.setName("txtMissionType");
         gridBagConstraintsText.gridy = y;
         mainPanel.add(txtMissionType, gridBagConstraintsText);
@@ -348,7 +351,7 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsLabels.gridy = ++y;
         mainPanel.add(lblLength, gridBagConstraintsLabels);
 
-        JLabel txtLength = new JLabel(Integer.toString(contract.getLength()));
+        JLabel txtLength = new JLabel(Integer.toString(contract.getLengthInMonths()));
         txtLength.setName("txtLength");
         gridBagConstraintsText.gridy = y;
         mainPanel.add(txtLength, gridBagConstraintsText);
@@ -359,7 +362,7 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsLabels.gridy = ++y;
         mainPanel.add(lblOverhead, gridBagConstraintsLabels);
 
-        JLabel txtOverhead = new JLabel(Contract.getOverheadCompName(contract.getOverheadComp()));
+        JLabel txtOverhead = new JLabel(Contract.getOverheadCompensationName(contract.getOverheadCompensation()));
         txtOverhead.setName("txtOverhead");
         gridBagConstraintsText.gridy = y;
         mainPanel.add(txtOverhead, gridBagConstraintsText);
@@ -468,7 +471,7 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsLabels.gridy = ++y;
         mainPanel.add(lblSalvageRights, gridBagConstraintsLabels);
 
-        JLabel txtSalvageRights = new JLabel(contract.getSalvagePctString() +
+        JLabel txtSalvageRights = new JLabel(contract.getSalvagePercentString() +
                                                    (contract.isSalvageExchange() ? " (Exchange)" : ""));
         txtSalvageRights.setName("txtSalvageRights");
 
@@ -495,7 +498,7 @@ public class ContractSummaryPanel extends JPanel {
                     campaign.getContractMarket()
                           .rerollClause((AtBContract) contract, AbstractContractMarket.CLAUSE_SALVAGE, campaign);
                     setSalvageRerollButtonText((JButton) ev.getSource());
-                    txtSalvageRights.setText(contract.getSalvagePctString() +
+                    txtSalvageRights.setText(contract.getSalvagePercentString() +
                                                    (contract.isSalvageExchange() ? " (Exchange)" : ""));
                     if (campaign.getContractMarket().getRerollsUsed(contract, AbstractContractMarket.CLAUSE_SALVAGE) >=
                               logRerolls) {
@@ -583,6 +586,31 @@ public class ContractSummaryPanel extends JPanel {
         }
 
         contractPaymentBreakdown.display(++y, 2);
+    }
+
+    private JPanel getContractDifficultySkulls(AtBContract contract) {
+        JPanel panel = new JPanel(new FlowLayout());
+
+        ImageIcon skullFull = scaleImageIcon(new ImageIcon("data/images/misc/challenge_estimate_full.png"), 50, true);
+        ImageIcon skullHalf = scaleImageIcon(new ImageIcon("data/images/misc/challenge_estimate_half.png"), 50, true);
+
+        int difficulty = contract.getContractDifficulty();
+        if (difficulty == UNKNOWN_DIFFICULTY) {
+            difficulty = 5;
+        }
+
+        int fullSkulls = difficulty / 2;
+        boolean halfSkull = (difficulty % 2) != 0;
+
+        for (int i = 0; i < fullSkulls; i++) {
+            panel.add(new JLabel(skullFull));
+        }
+
+        if (halfSkull) {
+            panel.add(new JLabel(skullHalf));
+        }
+
+        return panel;
     }
 
     private boolean hasTransportRerolls() {

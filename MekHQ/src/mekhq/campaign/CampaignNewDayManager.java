@@ -1177,7 +1177,7 @@ public class CampaignNewDayManager {
                 }
             }
 
-            if (isMonday && contract.getContractType().isRiotDuty() && contract.getStratconCampaignState() != null) {
+            if (isMonday && contract.getContractType().isRiotDuty() && contract.getStratConCampaignState() != null) {
                 int riotChance = 4;
                 if (randomInt(riotChance) == 0) {
                     new RiotScenario(campaign, contract);
@@ -1185,7 +1185,7 @@ public class CampaignNewDayManager {
             }
 
             // Early Contract End (StratCon Only)
-            StratConCampaignState campaignState = contract.getStratconCampaignState();
+            StratConCampaignState campaignState = contract.getStratConCampaignState();
             if (campaignState != null) {
                 if (isMonday) {
                     List<StratConTrackState> tracks = campaignState.getTracks();
@@ -1207,7 +1207,7 @@ public class CampaignNewDayManager {
                         int remainingMonths = contract.getMonthsLeft(adjustedDate);
                         Money finalPayout = contract.getMonthlyPayOut().multipliedBy(remainingMonths);
                         contract.setRoutedPayout(finalPayout);
-                        contract.setEndDate(adjustedDate);
+                        contract.setEndingDate(adjustedDate);
                     }
                 }
             }
@@ -2171,7 +2171,7 @@ public class CampaignNewDayManager {
 
             if (today.getDayOfWeek() == DayOfWeek.MONDAY) {
                 int deficit = campaign.getDeploymentDeficit(contract);
-                StratConCampaignState campaignState = contract.getStratconCampaignState();
+                StratConCampaignState campaignState = contract.getStratConCampaignState();
 
                 if (campaignState != null && deficit > 0) {
                     campaign.addReport(GENERAL, String.format(resources.getString("contractBreach.text"),
@@ -2196,7 +2196,7 @@ public class CampaignNewDayManager {
                 if ((scenario.getDate() != null) && scenario.getDate().isBefore(today)) {
                     boolean hasForceDeployed = allScenariosWithAssignedStandardForces.contains(scenario.getId());
                     if (campaignOptions.isUseStratCon() && (scenario instanceof AtBDynamicScenario)) {
-                        StratConCampaignState campaignState = contract.getStratconCampaignState();
+                        StratConCampaignState campaignState = contract.getStratConCampaignState();
 
                         if (campaignState == null) {
                             LOGGER.warn("Scenario {} has no StratConCampaignState", scenario.getId());

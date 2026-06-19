@@ -652,7 +652,7 @@ class EventEffectsManagerTest {
         new EventEffectsManager(mockCampaign, eventData, 0, true);
 
         // Assert
-        int actualSupportPoints = contract.getStratconCampaignState().getSupportPoints();
+        int actualSupportPoints = contract.getStratConCampaignState().getSupportPoints();
 
         assertEquals(MAGNITUDE, actualSupportPoints);
     }

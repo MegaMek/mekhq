@@ -89,17 +89,17 @@ public class ContractAwards {
                 } else if (validTypes.contains(award.getRange().toLowerCase())) {
                     switch (award.getRange().toLowerCase()) {
                         case "duty":
-                            if (mission.getType().toLowerCase().contains("duty")) {
+                            if (mission.getContractTypeName().toLowerCase().contains("duty")) {
                                 eligibleAwards.add(award);
                             }
                             break;
                         case "raid":
-                            if (mission.getType().toLowerCase().contains("raid")) {
+                            if (mission.getContractTypeName().toLowerCase().contains("raid")) {
                                 eligibleAwards.add(award);
                             }
                             break;
                         default:
-                            if (mission.getType().equalsIgnoreCase(award.getRange())) {
+                            if (mission.getContractTypeName().equalsIgnoreCase(award.getRange())) {
                                 eligibleAwards.add(award);
                             }
                     }
