@@ -2664,7 +2664,7 @@ public final class BriefingTab extends CampaignGuiTab {
      * @since 0.50.05
      */
     public void focusOnScenario(int targetId) {
-        Mission targetMission = null;
+        AbstractMissionTransition targetMission = null;
         Scenario targetScenario = null;
 
         // First find the mission and scenario

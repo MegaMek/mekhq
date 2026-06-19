@@ -57,8 +57,7 @@ import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
@@ -449,11 +448,10 @@ public class CampaignExportWizard extends JDialog {
     }
 
     /**
-     * Parses the C-bill amount entered by the user using the supplied locale, so it accepts that locale's
-     * grouping and decimal separators (e.g. "1,000,000.50" in en-US, "1.000.000,50" in es-ES,
-     * "1 000 000,50" in fr-FR). Returns 0 for empty or null input. Throws {@link NumberFormatException}
-     * when the input is non-empty but not a valid number, so callers can surface the error rather than
-     * silently dropping the transfer (see issue #5939).
+     * Parses the C-bill amount entered by the user using the supplied locale, so it accepts that locale's grouping and
+     * decimal separators (e.g. "1,000,000.50" in en-US, "1.000.000,50" in es-ES, "1 000 000,50" in fr-FR). Returns 0
+     * for empty or null input. Throws {@link NumberFormatException} when the input is non-empty but not a valid number,
+     * so callers can surface the error rather than silently dropping the transfer (see issue #5939).
      *
      * <p>Note: C-bills are a real currency stored as {@link java.math.BigDecimal} inside {@link Money},
      * so fractional amounts are allowed.
@@ -529,13 +527,13 @@ public class CampaignExportWizard extends JDialog {
         }
 
         if (chkExportContractOffers.isSelected()) {
-            for (Contract contract : sourceCampaign.getContractMarket().getContracts()) {
+            for (AbstractMissionTransition contract : sourceCampaign.getContractMarket().getContracts()) {
                 destinationCampaign.getContractMarket().getContracts().add(contract);
             }
         }
 
         if (chkExportCompletedContracts.isSelected()) {
-            for (Mission mission : sourceCampaign.getCompletedMissions()) {
+            for (AbstractMissionTransition mission : sourceCampaign.getCompletedMissions()) {
                 destinationCampaign.importMission(mission);
             }
         }

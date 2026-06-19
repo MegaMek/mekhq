@@ -61,6 +61,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.market.enums.ContractMarketMethod;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.personnel.Person;
@@ -78,7 +79,7 @@ import mekhq.gui.CampaignGUI;
 public class ContractSummaryPanel extends JPanel {
     //region Variable Declarations
     private final Campaign campaign;
-    private final Contract contract;
+    private final AbstractMissionTransition contract;
     private final boolean allowRerolls;
     private int cmdRerolls;
     private int logRerolls;
@@ -107,7 +108,7 @@ public class ContractSummaryPanel extends JPanel {
     //endregion Variable Declarations
 
 
-    public ContractSummaryPanel(Contract contract, Campaign campaign, boolean allowRerolls) {
+    public ContractSummaryPanel(AbstractMissionTransition contract, Campaign campaign, boolean allowRerolls) {
         this.contract = contract;
         this.campaign = campaign;
         this.allowRerolls = allowRerolls;

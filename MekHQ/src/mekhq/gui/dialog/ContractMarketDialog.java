@@ -65,6 +65,7 @@ import mekhq.campaign.JumpPath;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.market.contractMarket.ContractAutomation;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.enums.AtBContractType;
@@ -99,7 +100,7 @@ public class ContractMarketDialog extends JDialog {
 
     private final Campaign campaign;
     private final AbstractContractMarket contractMarket;
-    private Contract selectedContract = null;
+    private AbstractMissionTransition selectedContract = null;
     private final List<String> possibleRetainerContracts;
 
     private JScrollPane scrollContractView;
@@ -210,9 +211,9 @@ public class ContractMarketDialog extends JDialog {
         chkMRBC = new JCheckBox();
         chkMRBC.addItemListener(evt -> {
             payMRBC = chkMRBC.isSelected();
-            for (Contract c : contractMarket.getContracts()) {
-                c.setPaidMRBCFee(payMRBC);
-                c.calculateContract(campaign);
+            for (AbstractMissionTransition contract : contractMarket.getContracts()) {
+                contract.setPaidMRBCFee(payMRBC);
+                contract.calculateContract(campaign);
             }
             if (contractView != null) {
                 contractView.refreshAmounts();
@@ -222,9 +223,9 @@ public class ContractMarketDialog extends JDialog {
         spnAdvance = new JSpinner(new SpinnerNumberModel(advance, 0, 25, 5));
         spnAdvance.addChangeListener(evt -> {
             advance = (Integer) spnAdvance.getValue();
-            for (Contract c : contractMarket.getContracts()) {
-                c.setAdvancePercent(advance);
-                c.calculateContract(campaign);
+            for (AbstractMissionTransition contract : contractMarket.getContracts()) {
+                contract.setAdvancePercent(advance);
+                contract.calculateContract(campaign);
             }
             if (contractView != null) {
                 contractView.refreshAmounts();
@@ -234,9 +235,9 @@ public class ContractMarketDialog extends JDialog {
         spnSigningBonus = new JSpinner(new SpinnerNumberModel(signingBonus, 0, 10, 1));
         spnSigningBonus.addChangeListener(evt -> {
             signingBonus = (Integer) spnSigningBonus.getValue();
-            for (Contract c : contractMarket.getContracts()) {
-                c.setSigningBonus(signingBonus);
-                c.calculateContract(campaign);
+            for (AbstractMissionTransition contract : contractMarket.getContracts()) {
+                contract.setSigningBonus(signingBonus);
+                contract.calculateContract(campaign);
             }
             if (contractView != null) {
                 contractView.refreshAmounts();
@@ -247,12 +248,12 @@ public class ContractMarketDialog extends JDialog {
         spnSharePct = new JSpinner(new SpinnerNumberModel(sharePct, 20, 50, 10));
         spnSharePct.addChangeListener(evt -> {
             sharePct = (Integer) spnSharePct.getValue();
-            for (Contract c : contractMarket.getContracts()) {
+            for (AbstractMissionTransition contract : contractMarket.getContracts()) {
                 if (campaign.getCampaignOptions().isUseStratCon() &&
                           campaign.getCampaignOptions().isUseShareSystem() &&
-                          c instanceof AtBContract) {
-                    ((AtBContract) c).setSharesPercent(sharePct);
-                    c.calculateContract(campaign);
+                          contract instanceof AtBContract) {
+                    ((AtBContract) contract).setSharesPercent(sharePct);
+                    contract.calculateContract(campaign);
                 }
             }
             if (contractView != null) {
@@ -308,7 +309,7 @@ public class ContractMarketDialog extends JDialog {
         FactionStandings factionStandings = campaign.getFactionStandings();
 
         Vector<Vector<String>> data = new Vector<>();
-        for (Contract contract : contractMarket.getContracts()) {
+        for (AbstractMissionTransition contract : contractMarket.getContracts()) {
             // Changes in rating or force size since creation can alter some details
             if (contract instanceof AtBContract atbContract) {
                 atbContract.initContractDetails(campaign);
