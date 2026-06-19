@@ -61,7 +61,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationNode;
-import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
@@ -192,7 +192,7 @@ public abstract class AbstractLocation implements IPlace {
         if (usedRechargeTime > 0) {
             if (!isSilentProcessing) {
                 campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, "getReport.recharge.hours",
-                                                  Math.round(100.0 * usedRechargeTime) / 100.0));
+                      Math.round(100.0 * usedRechargeTime) / 100.0));
             }
             setRechargeTime(getRechargeTime() + usedRechargeTime);
             if (getRechargeTime() >= neededRechargeTime && !isSilentProcessing) {
@@ -250,9 +250,15 @@ public abstract class AbstractLocation implements IPlace {
      * @param campaign The {@link Campaign} instance.
      */
     void testForEarlyArrival(Campaign campaign) {
-        for (Contract contract : campaign.getFutureContracts()) {
+        for (AbstractMissionTransition contract : campaign.getFutureContracts()) {
             if (Objects.equals(currentSystem, contract.getSystem())) {
-                int daysTillStart = campaign.getLocalDate().until(contract.getStartDate()).getDays();
+                LocalDate startDate = contract.getStartDate();
+                LocalDate today = campaign.getLocalDate();
+
+                int daysTillStart = startDate == null ? 0 : today.until(startDate).getDays();
+                if (startDate == null) {
+                    logger.warn("Contract {} has no start date", contract.getName());
+                }
 
                 String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
                       "contract.arrivedEarly.ic." + randomInt(10),

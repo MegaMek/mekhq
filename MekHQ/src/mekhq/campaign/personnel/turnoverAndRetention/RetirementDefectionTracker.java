@@ -932,7 +932,7 @@ public class RetirementDefectionTracker {
      * @return True if the person was successfully removed from the campaign, false otherwise.
      */
     public boolean removeFromCampaign(Person person, boolean killed, boolean sacked, Campaign campaign,
-          Mission contract) {
+          AbstractMissionTransition contract) {
         if (!person.getPrisonerStatus().isFree()) {
             return false;
         }

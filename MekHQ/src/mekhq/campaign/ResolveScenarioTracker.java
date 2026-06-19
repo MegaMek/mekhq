@@ -73,6 +73,7 @@ import mekhq.campaign.events.persons.PersonBattleFinishedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.log.ServiceLogger;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
@@ -1146,13 +1147,8 @@ public class ResolveScenarioTracker {
      *                       be in the salvageStatus hashtable.
      */
     private void processPrisonerCapture(List<TestUnit> unitsToProcess) {
-        Mission currentMission = campaign.getMission(scenario.getMissionId());
-        String enemyCode;
-        if (currentMission instanceof AtBContract) {
-            enemyCode = ((AtBContract) currentMission).getEnemyCode();
-        } else {
-            enemyCode = "IND";
-        }
+        AbstractMissionTransition currentMission = campaign.getMission(scenario.getMissionId());
+        String enemyCode = currentMission.getEnemyCode();
 
         for (Unit unit : unitsToProcess) {
             if (null == unit) {
@@ -1674,7 +1670,7 @@ public class ResolveScenarioTracker {
         return scenario;
     }
 
-    public Mission getMission() {
+    public AbstractMissionTransition getMission() {
         return campaign.getMission(scenario.getMissionId());
     }
 
@@ -1762,11 +1758,11 @@ public class ResolveScenarioTracker {
         // ok lets do the whole enchilada and go ahead and update campaign
         // first figure out if we need any battle loss comp
         double blc = 0;
-        final Mission mission = getMission();
+        final AbstractMissionTransition mission = getMission();
 
-        final boolean isContract = mission instanceof Contract;
+        final boolean isContract = !(mission instanceof Mission);
         if (isContract) {
-            blc = ((Contract) mission).getBattleLossCompensation() / 100.0;
+            blc = mission.getBattleLossCompensation() / 100.0;
         }
 
         // now lets update personnel

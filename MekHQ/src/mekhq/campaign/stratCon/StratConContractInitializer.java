@@ -49,9 +49,9 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioTemplate;
@@ -676,7 +676,7 @@ public class StratConContractInitializer {
      * Given a mission (that's an AtB contract), restore track state information, such as pointers from StratCon
      * scenario objects to AtB scenario objects.
      */
-    public static void restoreTransientStratconInformation(Mission m, Campaign campaign) {
+    public static void restoreTransientStratconInformation(AbstractMissionTransition m, Campaign campaign) {
         if (m instanceof AtBContract atbContract) {
             // Having loaded scenarios and such, we now need to go through any StratCon
             // scenarios for this contract

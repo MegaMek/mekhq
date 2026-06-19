@@ -75,6 +75,7 @@ import mekhq.campaign.Hangar;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
@@ -242,7 +243,7 @@ public class SalvagePostScenarioPicker {
      * @author Illiani
      * @since 0.50.10
      */
-    public SalvagePostScenarioPicker(Campaign campaign, Mission mission, Scenario scenario,
+    public SalvagePostScenarioPicker(Campaign campaign, AbstractMissionTransition mission, Scenario scenario,
           List<TestUnit> actualSalvage, List<TestUnit> soldSalvage) {
         this.isInSpace = scenario.getBoardType() == AtBScenario.T_SPACE;
 
@@ -254,8 +255,8 @@ public class SalvagePostScenarioPicker {
         arrangeUnits(actualSalvage, soldSalvage);
         setRecoveryTimeDataMap(campaign, scenario);
 
-        boolean isContract = mission instanceof Contract;
-        boolean playerGetsNoSalvage = isContract && ((Contract) mission).getSalvagePercent() <= 0;
+        boolean isContract = !(mission instanceof Mission);
+        boolean playerGetsNoSalvage = isContract && mission.getSalvagePercent() <= 0;
         if (playerGetsNoSalvage) {
             return; // There isn't going to be anything to process
         }

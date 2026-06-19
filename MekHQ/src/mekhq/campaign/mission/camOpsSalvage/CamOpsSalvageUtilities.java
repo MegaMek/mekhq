@@ -71,6 +71,7 @@ import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
@@ -209,7 +210,7 @@ public class CamOpsSalvageUtilities {
      * @author Illiani
      * @since 0.50.10
      */
-    public static void resolveSalvage(Campaign campaign, Mission mission, Scenario scenario,
+    public static void resolveSalvage(Campaign campaign, AbstractMissionTransition mission, Scenario scenario,
           List<TestUnit> keptSalvage, List<TestUnit> soldSalvage, List<TestUnit> employerSalvage) {
         int deliveryTime = 0;
         if (mission instanceof AtBContract atbContract) {
@@ -217,7 +218,7 @@ public class CamOpsSalvageUtilities {
         }
 
         // now let's take care of salvage
-        boolean isContract = mission instanceof Contract;
+        boolean isContract = !(mission instanceof Mission);
         for (TestUnit salvageUnit : keptSalvage) {
             ResolveScenarioTracker.UnitStatus salvageStatus = new ResolveScenarioTracker.UnitStatus(salvageUnit);
             if (salvageUnit.getEntity() instanceof Aero) {

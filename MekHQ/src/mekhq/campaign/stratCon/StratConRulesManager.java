@@ -98,12 +98,12 @@ import mekhq.campaign.events.StratConDeploymentEvent;
 import mekhq.campaign.events.scenarios.ScenarioChangedEvent;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
@@ -3630,10 +3630,10 @@ public class StratConRulesManager {
      */
     public static void processScenarioCompletion(ResolveScenarioTracker tracker) {
         Campaign campaign = tracker.getCampaign();
-        Mission mission = tracker.getMission();
+        AbstractMissionTransition mission = tracker.getMission();
 
         if (mission instanceof AtBContract) {
-            StratConCampaignState campaignState = ((AtBContract) mission).getStratConCampaignState();
+            StratConCampaignState campaignState = mission.getStratConCampaignState();
             if (campaignState == null) {
                 return;
             }

@@ -309,11 +309,11 @@ public class Loot {
      * @throws IllegalStateException if the contract is an instance of AtBContract and the enemy quality is not
      *                               recognized
      */
-    private static HashMap<String, Integer> getQualityAndModifier(Mission contract) {
+    private static HashMap<String, Integer> getQualityAndModifier(AbstractMissionTransition contract) {
         HashMap<String, Integer> qualityAndModifier = new HashMap<>();
 
         if (contract instanceof AtBContract) {
-            DragoonRating dragoonRating = DragoonRating.fromRating(((AtBContract) contract).getEnemyQuality());
+            DragoonRating dragoonRating = DragoonRating.fromRating(contract.getEnemyQuality());
             switch (dragoonRating) {
                 case DRAGOON_F:
                     qualityAndModifier.put("quality", PartQuality.QUALITY_A.toNumeric());
@@ -339,7 +339,7 @@ public class Loot {
                 default:
                     throw new IllegalStateException(
                           "Unexpected value in mekhq/campaign/mission/Loot.java/getQualityAndModifier: " +
-                                ((AtBContract) contract).getEnemyQuality());
+                                contract.getEnemyQuality());
             }
         } else {
             qualityAndModifier.put("quality", PartQuality.QUALITY_D.toNumeric());

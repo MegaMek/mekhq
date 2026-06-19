@@ -48,8 +48,8 @@ import megamek.common.util.weightedMaps.WeightedIntMap;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonUtility;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -118,7 +118,7 @@ public class NonCombatPrisoners {
      * keyed by the captive's {@link Person#getId() ID}.</p>
      *
      * @param campaign the campaign used to generate new personnel and read campaign options
-     * @param mission  the mission that produced these prisoners; may be an {@link AtBContract} to derive the target
+     * @param contract the mission that produced these prisoners; may be an {@link AtBContract} to derive the target
      *                 skill level
      *
      * @return a {@link Hashtable} mapping each captive's {@link UUID} to their corresponding opposition personnel
@@ -128,19 +128,11 @@ public class NonCombatPrisoners {
      * @since 0.50.10
      */
     public static Hashtable<UUID, ResolveScenarioTracker.OppositionPersonnelStatus> getCivilianCaptives(
-          Campaign campaign, Mission mission) {
+          Campaign campaign, AbstractMissionTransition contract) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean adminsHaveNegotiation = campaignOptions.isAdminsHaveNegotiation();
-        boolean doctorsHaveAdministration = campaignOptions.isDoctorsUseAdministration();
-        boolean techsHaveAdministration = campaignOptions.isTechsUseAdministration();
-        boolean isUseArtillery = campaignOptions.isUseArtillery();
         boolean isUseAdvancedMedical = campaignOptions.isUseAdvancedMedical();
-        boolean isUseExtraRandom = campaign.getRandomSkillPreferences().randomizeSkill();
 
-        SkillLevel targetSkillLevel = SkillLevel.REGULAR;
-        if (mission instanceof AtBContract contract) {
-            targetSkillLevel = contract.getEnemySkill();
-        }
+        SkillLevel targetSkillLevel = contract.getEnemySkill();
 
         int supportCount = d6(3); // Support Personnel
         int soldierCount = d6(5); // Guards
