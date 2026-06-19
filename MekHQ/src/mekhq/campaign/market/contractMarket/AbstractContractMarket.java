@@ -63,6 +63,7 @@ import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.market.enums.ContractMarketMethod;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
@@ -95,9 +96,9 @@ public abstract class AbstractContractMarket {
     private static final int NON_MERCENARY_THRESHOLD = 12;
 
 
-    protected List<Contract> contracts = new ArrayList<>();
+    protected List<AbstractMissionTransition> contracts = new ArrayList<>();
     protected int lastId = 0;
-    protected Map<Integer, Contract> contractIds = new HashMap<>();
+    protected Map<Integer, AbstractMissionTransition> contractIds = new HashMap<>();
     protected Map<Integer, ClauseMods> clauseMods = new HashMap<>();
 
     /**
@@ -167,13 +168,13 @@ public abstract class AbstractContractMarket {
     /**
      * Empty an available contract from the market.
      *
-     * @param c contract to remove
+     * @param mission contract to remove
      */
-    public void removeContract(Contract c) {
-        contracts.remove(c);
-        contractIds.remove(c.getId());
-        clauseMods.remove(c.getId());
-        followupContracts.remove(c.getId());
+    public void removeContract(AbstractMissionTransition mission) {
+        contracts.remove(mission);
+        contractIds.remove(mission.getId());
+        clauseMods.remove(mission.getId());
+        followupContracts.remove(mission.getId());
     }
 
     /**
@@ -231,7 +232,7 @@ public abstract class AbstractContractMarket {
     /**
      * @return a list of currently active contracts on the market
      */
-    public List<Contract> getContracts() {
+    public List<AbstractMissionTransition> getContracts() {
         return contracts;
     }
 
@@ -843,7 +844,7 @@ public abstract class AbstractContractMarket {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "contractMarket");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "method", method.toString());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastId", lastId);
-        for (final Contract contract : contracts) {
+        for (final AbstractMissionTransition contract : contracts) {
             contract.writeToXML(campaign, pw, indent);
         }
 
@@ -879,11 +880,13 @@ public abstract class AbstractContractMarket {
                 if (wn2.getNodeName().equalsIgnoreCase("lastId")) {
                     retVal.lastId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("mission")) {
-                    Mission m = Mission.generateInstanceFromXML(wn2, c, version);
+                    AbstractMissionTransition mission = AbstractMissionTransition.generateInstanceFromXML(wn2,
+                          c,
+                          version);
 
-                    if (m instanceof Contract) {
-                        retVal.contracts.add((Contract) m);
-                        retVal.contractIds.put(m.getId(), (Contract) m);
+                    if (!(mission instanceof Mission)) {
+                        retVal.contracts.add(mission);
+                        retVal.contractIds.put(mission.getId(), mission);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("clauseMods")) {
                     int key = Integer.parseInt(wn2.getAttributes().getNamedItem("id").getTextContent());
@@ -908,7 +911,7 @@ public abstract class AbstractContractMarket {
             }
 
             // Restore any parent contract references
-            for (Contract contract : retVal.contracts) {
+            for (AbstractMissionTransition contract : retVal.contracts) {
                 if (contract instanceof AtBContract atbContract) {
                     atbContract.restore(c);
                 }

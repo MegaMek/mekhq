@@ -46,8 +46,8 @@ import javax.xml.parsers.DocumentBuilder;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Contract;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -170,7 +170,7 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
             }
 
             // Use the currency of the Faction in any of our contracts, if it exists
-            for (Contract contract : this.campaign.getActiveContracts()) {
+            for (AbstractMissionTransition contract : this.campaign.getActiveContracts()) {
                 if (contract instanceof AtBContract) {
                     Currency currency = possibleCurrencies.getOrDefault(Factions.getInstance()
                                                                               .getFaction(((AtBContract) contract).getEmployerCode())

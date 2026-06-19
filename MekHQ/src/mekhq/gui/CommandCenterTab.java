@@ -82,7 +82,7 @@ import mekhq.campaign.events.units.UnitEvent;
 import mekhq.campaign.events.units.UnitRefitEvent;
 import mekhq.campaign.finances.FinancialReport;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.report.CargoReport;
@@ -902,7 +902,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
                 model.addElement(String.format(report));
             }
 
-            for (Mission mission : getCampaign().getActiveMissions(false)) {
+            for (AbstractMissionTransition mission : getCampaign().getActiveMissions(false)) {
                 List<Scenario> scenarios = mission.getScenarios();
 
                 scenarios.sort(Comparator.comparing(Scenario::getDate,
@@ -924,7 +924,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
                                                                            .getFontColorWarningHexColor() +
                                                                      "'>" +
                                                                      ChronoUnit.DAYS.between(getCampaign().getLocalDate(),
-                                                                           scenario.getDate())) + " days</font></html>");
+                                                                           scenario.getDate())) +
+                                                       " days</font></html>");
                             }
                         }
                     }

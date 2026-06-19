@@ -65,8 +65,8 @@ import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
@@ -1681,13 +1681,6 @@ public class FactionStandings {
         return regard;
     }
 
-    /** Use {@link #updateCampaignForPastMissions(List, ImageIcon, Faction, LocalDate, double)} instead */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    public List<String> updateCampaignForPastMissions(List<Mission> missions, ImageIcon campaignIcon,
-          Faction campaignFaction, LocalDate today) {
-        return updateCampaignForPastMissions(missions, campaignIcon, campaignFaction, today, 1.0);
-    }
-
     /**
      * Updates the campaign status for a list of past missions, adjusting faction standings, applying campaign icon and
      * faction, and generating a report of changes.
@@ -1707,7 +1700,7 @@ public class FactionStandings {
      * @author Illiani
      * @since 0.50.07
      */
-    public List<String> updateCampaignForPastMissions(List<Mission> missions, ImageIcon campaignIcon,
+    public List<String> updateCampaignForPastMissions(List<AbstractMissionTransition> missions, ImageIcon campaignIcon,
           Faction campaignFaction, LocalDate today, double regardMultiplier) {
         List<String> reports = new ArrayList<>();
 
@@ -1715,13 +1708,15 @@ public class FactionStandings {
 
         sortMissionsBasedOnStartDateAndClass(missions);
 
-        Map<Integer, List<Mission>> missionsByYear = new HashMap<>();
+        Map<Integer, List<AbstractMissionTransition>> missionsByYear = new HashMap<>();
         int currentYear = today.getYear();
 
-        for (Mission mission : missions) {
+        for (AbstractMissionTransition mission : missions) {
             int missionYear = currentYear;
-            if (mission instanceof Contract contract) {
-                missionYear = contract.getStartDate().getYear();
+
+            LocalDate startDate = mission.getStartDate();
+            if (startDate != null) {
+                missionYear = mission.getStartDate().getYear();
             }
 
             missionsByYear.computeIfAbsent(missionYear, y -> new ArrayList<>()).add(mission);
@@ -1731,8 +1726,8 @@ public class FactionStandings {
         List<Integer> sortedYears = new ArrayList<>(missionsByYear.keySet());
         Collections.sort(sortedYears);
         for (int year : sortedYears) {
-            List<Mission> missionsForYear = missionsByYear.get(year);
-            for (Mission mission : missionsForYear) {
+            List<AbstractMissionTransition> missionsForYear = missionsByYear.get(year);
+            for (AbstractMissionTransition mission : missionsForYear) {
                 MissionStatus missionStatus = mission.getStatus();
 
                 if (mission instanceof AtBContract atbContract) {
@@ -1797,19 +1792,19 @@ public class FactionStandings {
      *
      * @param missions the list of missions to sort in-place
      */
-    private static void sortMissionsBasedOnStartDateAndClass(List<Mission> missions) {
+    private static void sortMissionsBasedOnStartDateAndClass(List<AbstractMissionTransition> missions) {
         missions.sort((mission1, mission2) -> {
-            boolean m1IsContract = mission1 instanceof Contract;
-            boolean m2IsContract = mission2 instanceof Contract;
+            LocalDate date1 = mission1.getStartDate();
+            LocalDate date2 = mission2.getStartDate();
 
-            if (m1IsContract && m2IsContract) {
-                return ((Contract) mission1).getStartDate().compareTo(((Contract) mission2).getStartDate());
-            } else if (m1IsContract) {
-                return -1; // mission1 comes before mission2
-            } else if (m2IsContract) {
-                return 1; // mission1 comes after mission2
+            if (date1 != null && date2 != null) {
+                return date1.compareTo(date2);
+            } else if (date1 != null) {
+                return -1; // mission1 has a date, comes first
+            } else if (date2 != null) {
+                return 1; // mission2 has a date, comes first
             } else {
-                return 0; // both are non-Contract, maintain relative order
+                return 0; // neither has a date, maintain relative order
             }
         });
     }
