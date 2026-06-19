@@ -32,6 +32,7 @@
  */
 package mekhq.gui.baseComponents;
 
+import static megamek.codeUtilities.StringUtility.isNullOrBlank;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BasicStroke;
@@ -140,7 +141,7 @@ public class MHQCollapsiblePanel extends JPanel {
         // horizontal weight (weightx=1.0) in the GridBagLayout, so it absorbs the slack and keeps the icon and title
         // left-aligned. If it were hidden, GridBagLayout would drop its cell, and with every remaining cell at
         // weightx=0 the layout would center the icon+title in the header.
-        summaryLabel.setText((summary == null) || summary.isBlank() ? "" : summary);
+        summaryLabel.setText(isNullOrBlank(summary) ? "" : summary);
         summaryLabel.setVisible(true);
     }
 
