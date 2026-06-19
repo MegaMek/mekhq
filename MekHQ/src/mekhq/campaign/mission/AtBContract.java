@@ -108,7 +108,6 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.view.MoraleBar;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * Contract class for use with Against the Bot rules
@@ -924,53 +923,58 @@ public class AtBContract extends Contract {
     }
 
     @Override
+    protected void initializeFieldSetters() {
+        super.initializeFieldSetters();
+
+        fieldSetters.put("extensionlength",
+              (v, c) -> extensionLength = Integer.parseInt(v));
+        fieldSetters.put("playerminorbreaches",
+              (v, c) -> playerMinorBreaches = Integer.parseInt(v));
+        fieldSetters.put("employerminorbreaches",
+              (v, c) -> employerMinorBreaches = Integer.parseInt(v));
+        fieldSetters.put("contractscorearbitrarymodifier",
+              (v, c) -> contractScoreArbitraryModifier = Integer.parseInt(v));
+        fieldSetters.put("priorlogisticsfailure",
+              (v, c) -> priorLogisticsFailure = Boolean.parseBoolean(v));
+        fieldSetters.put("battletypemod",
+              (v, c) -> battleTypeMod = Integer.parseInt(v));
+        fieldSetters.put("nextweekbattletypemod",
+              (v, c) -> nextWeekBattleTypeMod = Integer.parseInt(v));
+        fieldSetters.put("parentcontractid",
+              (v, c) -> parentContract = new AtBContractRef(Integer.parseInt(v)));
+        fieldSetters.put("specialeventscenariodate",
+              (v, c) -> specialEventScenarioDate = MHQXMLUtility.parseDate(v.trim()));
+        fieldSetters.put("specialeventscenariotype",
+              (v, c) -> specialEventScenarioType = Integer.parseInt(v));
+    }
+
+    @Override
     public void loadFieldsFromXmlNode(Campaign campaign, Version version, Node node) throws ParseException {
-        // AbstractMission.loadFieldsFromXmlNode handles all shared fields. This override adds only the fields
-        // private to AtBContract.
         super.loadFieldsFromXmlNode(campaign, version, node);
 
-        NodeList childNodes = node.getChildNodes();
-        for (int x = 0; x < childNodes.getLength(); x++) {
-            Node item = childNodes.item(x);
-
-            try {
-                if (item.getNodeName().equalsIgnoreCase("extensionLength")) {
-                    extensionLength = Integer.parseInt(item.getTextContent());
-                } else if (item.getNodeName().equalsIgnoreCase("playerMinorBreaches")) {
-                    playerMinorBreaches = Integer.parseInt(item.getTextContent());
-                } else if (item.getNodeName().equalsIgnoreCase("employerMinorBreaches")) {
-                    employerMinorBreaches = Integer.parseInt(item.getTextContent());
-                } else if (item.getNodeName().equalsIgnoreCase("contractScoreArbitraryModifier")) {
-                    contractScoreArbitraryModifier = Integer.parseInt(item.getTextContent());
-                } else if (item.getNodeName().equalsIgnoreCase("priorLogisticsFailure")) {
-                    priorLogisticsFailure = Boolean.parseBoolean(item.getTextContent());
-                } else if (item.getNodeName().equalsIgnoreCase("battleTypeMod")) {
-                    battleTypeMod = Integer.parseInt(item.getTextContent());
-                } else if (item.getNodeName().equalsIgnoreCase("nextWeekBattleTypeMod")) {
-                    nextWeekBattleTypeMod = Integer.parseInt(item.getTextContent());
-                } else if (item.getNodeName().equalsIgnoreCase("parentContractId")) {
-                    parentContract = new AtBContractRef(Integer.parseInt(item.getTextContent()));
-                } else if (item.getNodeName().equalsIgnoreCase("specialEventScenarioDate")) {
-                    specialEventScenarioDate = MHQXMLUtility.parseDate(item.getTextContent().trim());
-                } else if (item.getNodeName().equalsIgnoreCase("specialEventScenarioType")) {
-                    specialEventScenarioType = Integer.parseInt(item.getTextContent());
-                }
-            } catch (Exception e) {
-                logger.error("", e);
-            }
-        }
-
+        // TODO Move this to AbstractMission once we've broken the chain of inheritance, Illiani Jun/18/2026
         // Wire up the StratCon campaign state to this contract now that we have a typed reference.
         if (getStratConCampaignState() != null) {
             getStratConCampaignState().setContract(this);
         }
 
-        // Create NPCs if they were not present in the save (e.g. older saves, or first load after feature addition).
+        // Create NPCs if they were not present in the save.
         if (getEmployerLiaison() == null) {
             createEmployerLiaison(campaign);
         }
-        if (getClanOpponent() == null && getEnemy().isClan()) {
+
+        if ((getClanOpponent() == null) && getEnemy().isClan()) {
             createClanOpponent(campaign);
+        }
+
+        // Prior to 0.50.12 transportAmount stored the player's cost. It now stores the employer reimbursement.
+        if (version.isLowerThan(new Version("0.50.12"))) {
+            if ((getSystem() != null)
+                      && campaign.getCampaignOptions().isPayForTransport()) {
+                setTransportAmount(getEmployerTransportReimbursement(campaign));
+            } else {
+                setTransportAmount(Money.zero());
+            }
         }
     }
 

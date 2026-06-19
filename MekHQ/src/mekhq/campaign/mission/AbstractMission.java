@@ -36,7 +36,6 @@ import static java.lang.Math.ceil;
 import static megamek.client.ui.util.PlayerColour.BLUE;
 import static megamek.client.ui.util.PlayerColour.RED;
 import static megamek.common.enums.SkillLevel.REGULAR;
-import static megamek.common.enums.SkillLevel.parseFromString;
 import static mekhq.campaign.mission.enums.AtBContractType.UNDEFINED;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.MAXIMUM_MORALE_LEVEL;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.MINIMUM_MORALE_LEVEL;
@@ -54,8 +53,11 @@ import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 import jakarta.annotation.Nonnull;
@@ -193,6 +195,9 @@ public class AbstractMission {
 
     private final List<Scenario> scenarios = new ArrayList<>();
 
+    protected final Map<String, BiConsumer<String, Campaign>> fieldSetters = new HashMap<>();
+    protected final Map<String, BiConsumer<Node, Campaign>> nodeSetters = new HashMap<>();
+
     private final static int MRBC_FEE_PERCENTAGE = 5;
     private final static int DEFAULT_SHARES_PERCENT = 30;
 
@@ -201,7 +206,9 @@ public class AbstractMission {
     public final static int OH_FULL = 2;
     public final static int OH_NUM = 3;
 
-    public AbstractMission() {}
+    public AbstractMission() {
+        initializeFieldSetters();
+    }
 
     public String getName() {
         return name;
@@ -1546,197 +1553,225 @@ public class AbstractMission {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "mission");
     }
 
-    /**
-     * Parses all {@link AbstractMission} fields from child nodes of the mission XML element. Subclasses with private
-     * fields must override this, call {@code super.loadFieldsFromXmlNode(...)}, then handle only their own nodes.
-     */
-    public void loadFieldsFromXmlNode(Campaign campaign, Version version, Node node) throws ParseException {
-        NodeList nodeList = node.getChildNodes();
+    protected void initializeFieldSetters() {
+        // core identity
+        fieldSetters.put("name",
+              (v, c) -> setName(v.trim()));
+        fieldSetters.put("planetid",
+              (v, c) -> setSystemId(v.trim()));
+        fieldSetters.put("systemid",
+              (v, c) -> setSystemId(v.trim()));
+        fieldSetters.put("planetname", this::parsePlanetName);
+        fieldSetters.put("status",
+              (v, c) -> setStatus(MissionStatus.parseFromString(v.trim())));
+        fieldSetters.put("id",
+              (v, c) -> setId(Integer.parseInt(v.trim())));
+        fieldSetters.put("desc",
+              (v, c) -> setDescription(v.trim()));
+        fieldSetters.put("type",
+              (v, c) -> setContractTypeName(v.trim()));
 
-        for (int x = 0; x < nodeList.getLength(); x++) {
-            Node item = nodeList.item(x);
+        // contract financials and terms
+        fieldSetters.put("employer",
+              (v, c) -> setEmployerName(v.trim()));
+        fieldSetters.put("startdate",
+              (v, c) -> setStartDate(MHQXMLUtility.parseDate(v.trim())));
+        fieldSetters.put("enddate",
+              (v, c) -> setEndingDate(MHQXMLUtility.parseDate(v.trim())));
+        fieldSetters.put("nmonths",
+              (v, c) -> setLengthInMonths(Integer.parseInt(v.trim())));
+        fieldSetters.put("paymentmultiplier",
+              (v, c) -> setPaymentMultiplier(Double.parseDouble(v.trim())));
+        fieldSetters.put("commandrights",
+              (v, c) -> setCommandRights(ContractCommandRights.parseFromString(v.trim())));
+        fieldSetters.put("overheadcomp",
+              (v, c) -> setOverheadCompensation(Integer.parseInt(v.trim())));
+        fieldSetters.put("salvagepct",
+              (v, c) -> setSalvagePercent(Integer.parseInt(v.trim())));
+        fieldSetters.put("salvageexchange",
+              (v, c) -> setSalvageExchange(Boolean.parseBoolean(v.trim())));
+        fieldSetters.put("straightsupport",
+              (v, c) -> setStraightSupport(Integer.parseInt(v.trim())));
+        fieldSetters.put("battlelosscomp",
+              (v, c) -> setBattleLossCompensation(Integer.parseInt(v.trim())));
+        fieldSetters.put("transportcomp",
+              (v, c) -> setTransportCompensation(Integer.parseInt(v.trim())));
+        fieldSetters.put("advancepct",
+              (v, c) -> setAdvancePercent(Integer.parseInt(v.trim())));
+        fieldSetters.put("signbonus",
+              (v, c) -> setSigningBonus(Integer.parseInt(v.trim())));
+        fieldSetters.put("hospitalbedsrented",
+              (v, c) -> setHospitalBedsRented(Integer.parseInt(v.trim())));
+        fieldSetters.put("kitchensrented",
+              (v, c) -> setKitchensRented(Integer.parseInt(v.trim())));
+        fieldSetters.put("holdingcellsrented",
+              (v, c) -> setHoldingCellsRented(Integer.parseInt(v.trim())));
+        fieldSetters.put("mrbcfee",
+              (v, c) -> setPaidMRBCFee(v.trim().equals("true")));
+        fieldSetters.put("advanceamount",
+              (v, c) -> setAdvanceAmount(Money.fromXmlString(v.trim())));
+        fieldSetters.put("signingamount",
+              (v, c) -> setSigningBonusAmount(Money.fromXmlString(v.trim())));
+        fieldSetters.put("transportamount",
+              (v, c) -> setTransportAmount(Money.fromXmlString(v.trim())));
+        fieldSetters.put("transitamount",
+              (v, c) -> setTransitAmount(Money.fromXmlString(v.trim())));
+        fieldSetters.put("overheadamount",
+              (v, c) -> setOverheadAmount(Money.fromXmlString(v.trim())));
+        fieldSetters.put("supportamount",
+              (v, c) -> setSupportAmount(Money.fromXmlString(v.trim())));
+        fieldSetters.put("baseamount",
+              (v, c) -> setBaseAmount(Money.fromXmlString(v.trim())));
+        fieldSetters.put("feeamount",
+              (v, c) -> setFeeAmount(Money.fromXmlString(v.trim())));
+        fieldSetters.put("salvagedbyunit",
+              (v, c) -> setSalvagedByUnit(Money.fromXmlString(v.trim())));
+        fieldSetters.put("salvagedbyemployer",
+              (v, c) -> setSalvagedByEmployer(Money.fromXmlString(v.trim())));
+
+        // faction and force data
+        fieldSetters.put("employercode",
+              (v, c) -> setEmployerCode(v.trim()));
+        fieldSetters.put("enemycode",
+              (v, c) -> setEnemyCode(v.trim()));
+        fieldSetters.put("enemymercenaryemployercode",
+              (v, c) -> setEnemyMercenaryEmployerCode(v.trim()));
+        fieldSetters.put("contracttype",
+              (v, c) -> setContractType(AtBContractType.parseFromString(v.trim())));
+        fieldSetters.put("allyskill",
+              (v, c) -> setAllySkill(SkillLevel.parseFromString(v.trim())));
+        fieldSetters.put("allyquality",
+              (v, c) -> setAllyQuality(Integer.parseInt(v.trim())));
+        fieldSetters.put("enemyskill",
+              (v, c) -> setAllySkill(SkillLevel.parseFromString(v.trim())));
+        fieldSetters.put("allyquality",
+              (v, c) -> setAllyQuality(Integer.parseInt(v.trim())));
+        fieldSetters.put("enemyskill",
+              (v, c) -> setEnemySkill(SkillLevel.parseFromString(v.trim())));
+        fieldSetters.put("enemyquality",
+              (v, c) -> setEnemyQuality(Integer.parseInt(v.trim())));
+        fieldSetters.put("difficulty",
+              (v, c) -> setContractDifficulty(Integer.parseInt(v.trim())));
+        fieldSetters.put("allybotname",
+              (v, c) -> setAllyBotName(v.trim()));
+        fieldSetters.put("enemybotname",
+              (v, c) -> setEnemyBotName(v.trim()));
+        fieldSetters.put("allycamocategory",
+              (v, c) -> getAllyCamouflage().setCategory(v.trim()));
+        fieldSetters.put("allycamofilename",
+              (v, c) -> getAllyCamouflage().setFilename(v.trim()));
+        fieldSetters.put("allycolour",
+              (v, c) -> setAllyColour(PlayerColour.parseFromString(v.trim())));
+        fieldSetters.put("enemycamocategory",
+              (v, c) -> getEnemyCamouflage().setCategory(v.trim()));
+        fieldSetters.put("enemycamofilename",
+              (v, c) -> getEnemyCamouflage().setFilename(v.trim()));
+        fieldSetters.put("enemycolour",
+              (v, c) -> setEnemyColour(PlayerColour.parseFromString(v.trim())));
+        fieldSetters.put("requiredcombatteams",
+              (v, c) -> setRequiredCombatTeams(Integer.parseInt(v.trim())));
+        fieldSetters.put("requiredcombatelements",
+              (v, c) -> setRequiredCombatElements(Integer.parseInt(v.trim())));
+        fieldSetters.put("moralelevel",
+              (v, c) -> setMoraleLevel(AtBMoraleLevel.parseFromString(v.trim())));
+        fieldSetters.put("routend",
+              (v, c) -> setRoutEndDate(MHQXMLUtility.parseDate(v.trim())));
+        fieldSetters.put("routedpayout",
+              (v, c) -> setRoutedPayout(Money.fromXmlString(v.trim())));
+        fieldSetters.put("partsavailabilitylevel",
+              (v, c) -> setPartsAvailabilityLevel(Integer.parseInt(v.trim())));
+        fieldSetters.put("sharespct",
+              (v, c) -> setSharesPercent(Integer.parseInt(v.trim())));
+        fieldSetters.put("batchallaccepted",
+              (v, c) -> setBatchallAccepted(Boolean.parseBoolean(v.trim())));
+
+        // negotiation roll results
+        fieldSetters.put("commandroll",
+              (v, c) -> setContractNegotiationCommandRoll(Integer.parseInt(v.trim())));
+        fieldSetters.put("salvageroll",
+              (v, c) -> setContractNegotiationSalvageRoll(Integer.parseInt(v.trim())));
+        fieldSetters.put("supportroll",
+              (v, c) -> setContractNegotiationSupportRoll(Integer.parseInt(v.trim())));
+        fieldSetters.put("transportroll",
+              (v, c) -> setContractNegotiationTransportRoll(Integer.parseInt(v.trim())));
+    }
+
+    private void parsePlanetName(String value, Campaign campaign) {
+        PlanetarySystem system = campaign.getSystemByName(value);
+
+        if (system != null) {
+            setSystemId(system.getId());
+        } else {
+            setLegacyPlanetName(value);
+        }
+    }
+
+    protected void initializeNodeSetters(final Version version) {
+        // scenario
+        nodeSetters.put("scenarios", (node, campaign) -> scenarioNodeSetter(version, node, campaign));
+        // StratCon state
+        nodeSetters.put(StratConCampaignState.ROOT_XML_ELEMENT_NAME.toLowerCase(),
+              (node, campaign) -> setStratConCampaignState(StratConCampaignState.Deserialize(node)));
+        // NPCs
+        nodeSetters.put("employerliaison",
+              (node, campaign) -> setEmployerLiaison(Person.generateInstanceFromXML(node, campaign, version)));
+        nodeSetters.put("clanopponent",
+              (node, campaign) -> setClanOpponent(Person.generateInstanceFromXML(node, campaign, version)));
+    }
+
+    private void scenarioNodeSetter(Version version, Node node, Campaign campaign) {
+        NodeList children = node.getChildNodes();
+
+        for (int i = 0; i < children.getLength(); i++) {
+            Node scenarioNode = children.item(i);
+
+            if (scenarioNode.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            if (!scenarioNode.getNodeName().equalsIgnoreCase("scenario")) {
+                LOGGER.error(
+                      "Unknown node type not loaded in Scenario nodes: {}",
+                      scenarioNode.getNodeName());
+                continue;
+            }
+
+            Scenario scenario = Scenario.generateInstanceFromXML(scenarioNode, campaign, version);
+
+            if (scenario != null) {
+                addScenario(scenario);
+            }
+        }
+    }
+
+    public void loadFieldsFromXmlNode(Campaign campaign, Version version, Node node) throws ParseException {
+        initializeNodeSetters(version);
+
+        NodeList nodeList = node.getChildNodes();
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            Node item = nodeList.item(i);
+
+            if (item.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            String nodeName = item.getNodeName().trim().toLowerCase();
 
             try {
-                String nodeName = item.getNodeName().trim();
-                String value = item.getTextContent();
+                BiConsumer<String, Campaign> fieldSetter = fieldSetters.get(nodeName);
 
-                // core identity
-                if (nodeName.equalsIgnoreCase("name")) {
-                    setName(value);
-                } else if (nodeName.equalsIgnoreCase("planetId")
-                                 || nodeName.equalsIgnoreCase("systemId")) {
-                    setSystemId(value);
-                } else if (nodeName.equalsIgnoreCase("planetName")) {
-                    PlanetarySystem system = campaign.getSystemByName(value);
-                    if (system != null) {
-                        setSystemId(system.getId());
-                    } else {
-                        setLegacyPlanetName(value);
-                    }
-                } else if (nodeName.equalsIgnoreCase("status")) {
-                    setStatus(MissionStatus.parseFromString(value.trim()));
-                } else if (nodeName.equalsIgnoreCase("id")) {
-                    setId(Integer.parseInt(value));
-                } else if (nodeName.equalsIgnoreCase("desc")) {
-                    setDescription(value);
-                } else if (nodeName.equalsIgnoreCase("type")) {
-                    setContractTypeName(value);
+                if (fieldSetter != null) {
+                    fieldSetter.accept(item.getTextContent(), campaign);
+                    continue;
+                }
 
-                    // scenarios block
-                } else if (nodeName.equalsIgnoreCase("scenarios")) {
-                    NodeList nl2 = item.getChildNodes();
-                    for (int y = 0; y < nl2.getLength(); y++) {
-                        Node wn3 = nl2.item(y);
-                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
-                            continue;
-                        }
-                        if (!wn3.getNodeName().equalsIgnoreCase("scenario")) {
-                            LOGGER.error("Unknown node type not loaded in Scenario nodes: {}", wn3.getNodeName());
-                            continue;
-                        }
-                        Scenario s = Scenario.generateInstanceFromXML(wn3, campaign, version);
-                        if (s != null) {
-                            addScenario(s);
-                        }
-                    }
+                BiConsumer<Node, Campaign> nodeSetter = nodeSetters.get(nodeName);
 
-                    // contract financials and terms
-                } else if (nodeName.equalsIgnoreCase("employer")) {
-                    setEmployerName(value);
-                } else if (nodeName.equalsIgnoreCase("startDate")) {
-                    setStartDate(MHQXMLUtility.parseDate(value.trim()));
-                } else if (nodeName.equalsIgnoreCase("endDate")) {
-                    setEndingDate(MHQXMLUtility.parseDate(value.trim()));
-                } else if (nodeName.equalsIgnoreCase("nMonths")) {
-                    setLengthInMonths(Integer.parseInt(value.trim()));
-                } else if (nodeName.equalsIgnoreCase("paymentMultiplier")) {
-                    setPaymentMultiplier(Double.parseDouble(value.trim()));
-                } else if (nodeName.equalsIgnoreCase("commandRights")) {
-                    setCommandRights(ContractCommandRights.parseFromString(value.trim()));
-                } else if (nodeName.equalsIgnoreCase("overheadComp")) {
-                    setOverheadCompensation(Integer.parseInt(value.trim()));
-                } else if (nodeName.equalsIgnoreCase("salvagePct")) {
-                    setSalvagePercent(Integer.parseInt(value.trim()));
-                } else if (nodeName.equalsIgnoreCase("salvageExchange")) {
-                    setSalvageExchange(value.trim().equals("true"));
-                } else if (nodeName.equalsIgnoreCase("straightSupport")) {
-                    setStraightSupport(Integer.parseInt(value.trim()));
-                } else if (nodeName.equalsIgnoreCase("battleLossComp")) {
-                    setBattleLossCompensation(Integer.parseInt(value.trim()));
-                } else if (nodeName.equalsIgnoreCase("transportComp")) {
-                    setTransportCompensation(Integer.parseInt(value.trim()));
-                } else if (nodeName.equalsIgnoreCase("advancePct")) {
-                    setAdvancePercent(Integer.parseInt(value.trim()));
-                } else if (nodeName.equalsIgnoreCase("signBonus")) {
-                    setSigningBonus(Integer.parseInt(value.trim()));
-                } else if (nodeName.equalsIgnoreCase("hospitalBedsRented")) {
-                    setHospitalBedsRented(Integer.parseInt(value.trim()));
-                } else if (nodeName.equalsIgnoreCase("kitchensRented")) {
-                    setKitchensRented(Integer.parseInt(value.trim()));
-                } else if (nodeName.equalsIgnoreCase("holdingCellsRented")) {
-                    setHoldingCellsRented(Integer.parseInt(value.trim()));
-                } else if (nodeName.equalsIgnoreCase("mrbcFee")) {
-                    setPaidMRBCFee(value.trim().equals("true"));
-                } else if (nodeName.equalsIgnoreCase("advanceAmount")) {
-                    setAdvanceAmount(Money.fromXmlString(value.trim()));
-                } else if (nodeName.equalsIgnoreCase("signingAmount")) {
-                    setSigningBonusAmount(Money.fromXmlString(value.trim()));
-                } else if (nodeName.equalsIgnoreCase("transportAmount")) {
-                    setTransportAmount(Money.fromXmlString(value.trim()));
-                } else if (nodeName.equalsIgnoreCase("transitAmount")) {
-                    setTransitAmount(Money.fromXmlString(value.trim()));
-                } else if (nodeName.equalsIgnoreCase("overheadAmount")) {
-                    setOverheadAmount(Money.fromXmlString(value.trim()));
-                } else if (nodeName.equalsIgnoreCase("supportAmount")) {
-                    setSupportAmount(Money.fromXmlString(value.trim()));
-                } else if (nodeName.equalsIgnoreCase("baseAmount")) {
-                    setBaseAmount(Money.fromXmlString(value.trim()));
-                } else if (nodeName.equalsIgnoreCase("feeAmount")) {
-                    setFeeAmount(Money.fromXmlString(value.trim()));
-                } else if (nodeName.equalsIgnoreCase("salvagedByUnit")) {
-                    setSalvagedByUnit(Money.fromXmlString(value.trim()));
-                } else if (nodeName.equalsIgnoreCase("salvagedByEmployer")) {
-                    setSalvagedByEmployer(Money.fromXmlString(value.trim()));
-
-                    // faction and force data
-                } else if (nodeName.equalsIgnoreCase("employerCode")) {
-                    setEmployerCode(value);
-                } else if (nodeName.equalsIgnoreCase("enemyCode")) {
-                    setEnemyCode(value);
-                } else if (nodeName.equalsIgnoreCase("enemyMercenaryEmployerCode")) {
-                    setEnemyMercenaryEmployerCode(value);
-                } else if (nodeName.equalsIgnoreCase("contractType")) {
-                    setContractType(AtBContractType.parseFromString(value.trim()));
-                } else if (nodeName.equalsIgnoreCase("allySkill")) {
-                    setAllySkill(parseFromString(value.trim()));
-                } else if (nodeName.equalsIgnoreCase("allyQuality")) {
-                    setAllyQuality(Integer.parseInt(value));
-                } else if (nodeName.equalsIgnoreCase("enemySkill")) {
-                    setEnemySkill(parseFromString(value.trim()));
-                } else if (nodeName.equalsIgnoreCase("enemyQuality")) {
-                    setEnemyQuality(Integer.parseInt(value));
-                } else if (nodeName.equalsIgnoreCase("difficulty")) {
-                    setContractDifficulty(Integer.parseInt(value));
-                } else if (nodeName.equalsIgnoreCase("allyBotName")) {
-                    setAllyBotName(value);
-                } else if (nodeName.equalsIgnoreCase("enemyBotName")) {
-                    setEnemyBotName(value);
-                } else if (nodeName.equalsIgnoreCase("allyCamoCategory")) {
-                    getAllyCamouflage().setCategory(value.trim());
-                } else if (nodeName.equalsIgnoreCase("allyCamoFileName")) {
-                    getAllyCamouflage().setFilename(value.trim());
-                } else if (nodeName.equalsIgnoreCase("allyColour")) {
-                    setAllyColour(PlayerColour.parseFromString(value.trim()));
-                } else if (nodeName.equalsIgnoreCase("enemyCamoCategory")) {
-                    getEnemyCamouflage().setCategory(value.trim());
-                } else if (nodeName.equalsIgnoreCase("enemyCamoFileName")) {
-                    getEnemyCamouflage().setFilename(value.trim());
-                } else if (nodeName.equalsIgnoreCase("enemyColour")) {
-                    setEnemyColour(PlayerColour.parseFromString(value.trim()));
-
-                    // combat requirements and state
-                } else if (nodeName.equalsIgnoreCase("requiredCombatTeams")) {
-                    setRequiredCombatTeams(Integer.parseInt(value));
-                } else if (nodeName.equalsIgnoreCase("requiredCombatElements")) {
-                    setRequiredCombatElements(Integer.parseInt(value));
-                } else if (nodeName.equalsIgnoreCase("moraleLevel")) {
-                    setMoraleLevel(AtBMoraleLevel.parseFromString(value.trim()));
-                } else if (nodeName.equalsIgnoreCase("routEnd")) {
-                    setRoutEndDate(MHQXMLUtility.parseDate(value.trim()));
-                } else if (nodeName.equalsIgnoreCase("routedPayout")) {
-                    String cleanValue = value.trim().replaceAll("[^0-9.]", "");
-                    setRoutedPayout(Money.of(Double.parseDouble(cleanValue)));
-                } else if (nodeName.equalsIgnoreCase("partsAvailabilityLevel")) {
-                    setPartsAvailabilityLevel(Integer.parseInt(value));
-                } else if (nodeName.equalsIgnoreCase("sharesPct")) {
-                    setSharesPercent(Integer.parseInt(value));
-                } else if (nodeName.equalsIgnoreCase("batchallAccepted")) {
-                    setBatchallAccepted(Boolean.parseBoolean(value));
-
-                    // negotiation roll results
-                } else if (nodeName.equalsIgnoreCase("commandRoll")) {
-                    setContractNegotiationCommandRoll(Integer.parseInt(value));
-                } else if (nodeName.equalsIgnoreCase("salvageRoll")) {
-                    setContractNegotiationSalvageRoll(Integer.parseInt(value));
-                } else if (nodeName.equalsIgnoreCase("supportRoll")) {
-                    setContractNegotiationSupportRoll(Integer.parseInt(value));
-                } else if (nodeName.equalsIgnoreCase("transportRoll")) {
-                    setContractNegotiationTransportRoll(Integer.parseInt(value));
-
-                    // stratcon state
-                    // Note: setContract() wiring (which requires an AtBContract reference) is handled in
-                    // AtBContract.loadFieldsFromXmlNode after super returns.
-                } else if (nodeName.equalsIgnoreCase(StratConCampaignState.ROOT_XML_ELEMENT_NAME)) {
-                    setStratConCampaignState(StratConCampaignState.Deserialize(item));
-
-                    // NPCs
-                } else if (nodeName.equalsIgnoreCase("employerLiaison")) {
-                    setEmployerLiaison(Person.generateInstanceFromXML(item, campaign, version));
-                } else if (nodeName.equalsIgnoreCase("clanOpponent")) {
-                    setClanOpponent(Person.generateInstanceFromXML(item, campaign, version));
+                if (nodeSetter != null) {
+                    nodeSetter.accept(item, campaign);
                 }
             } catch (Exception ex) {
-                LOGGER.error("", ex);
+                LOGGER.error("Failed to load node {}", nodeName, ex);
             }
         }
     }
