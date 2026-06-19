@@ -2769,11 +2769,10 @@ public class Person implements ILocation {
      * @return the campus system ID, or {@code null} if not derivable from either source
      */
     public @Nullable String getEduAcademySystem() {
-        LocationNode node = getLocationNode().getParent();
-        while (node != null) {
-            if (node.getLocatable() instanceof AcademyCampusLocation) {
-                LocationNode campusParent = node.getParent();
-                if (campusParent != null && campusParent.getLocatable() instanceof AbstractLocation location) {
+        for (ILocation cursor = getParentLocation(); cursor != null; cursor = cursor.getParentLocation()) {
+            if (cursor instanceof AcademyCampusLocation) {
+                ILocation campusParent = cursor.getParentLocation();
+                if (campusParent instanceof AbstractLocation location) {
                     PlanetarySystem system = location.getCurrentSystem();
                     if (system != null) {
                         return system.getId();
@@ -2781,7 +2780,6 @@ public class Person implements ILocation {
                 }
                 return legacyEduAcademySystem;
             }
-            node = node.getParent();
         }
         return legacyEduAcademySystem;
     }
@@ -9386,8 +9384,7 @@ public class Person implements ILocation {
 
     @Override
     public boolean setParent(ILocation parent) {
-        LocationNode parentNode = getLocationNode().getParent();
-        ILocation oldParent = parentNode != null ? parentNode.getLocatable() : null;
+        ILocation oldParent = getParentLocation();
         if (ILocation.super.setParent(parent)) {
             if (oldParent instanceof Personnel personnel) {
                 personnel.remove(getId());

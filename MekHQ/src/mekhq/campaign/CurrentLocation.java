@@ -50,7 +50,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.LocationChangedEvent;
 import mekhq.campaign.events.TransitCompleteEvent;
 import mekhq.campaign.events.TransitStatusChangedEvent;
-import mekhq.campaign.location.LocationNode;
+import mekhq.campaign.location.ILocation;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 import mekhq.campaign.unit.Unit;
@@ -362,12 +362,12 @@ public class CurrentLocation extends AbstractLocation {
         if (jumpPath != null) {
             jumpPath.writeToXML(pw, indent);
         }
-        for (LocationNode child : locationNode.getChildren()) {
-            if (child.getLocatable() instanceof mekhq.campaign.personnel.Person person) {
+        for (ILocation child : getChildLocations()) {
+            if (child instanceof mekhq.campaign.personnel.Person person) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personId", person.getId().toString());
-            } else if (child.getLocatable() instanceof Unit unit) {
+            } else if (child instanceof Unit unit) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitId", unit.getId().toString());
-            } else if (child.getLocatable() instanceof Part part) {
+            } else if (child instanceof Part part) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "partId", String.valueOf(part.getId()));
             }
         }
