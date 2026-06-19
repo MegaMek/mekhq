@@ -290,7 +290,9 @@ public class AbstractMissionTransition {
     }
 
     public boolean isActiveOn(LocalDate date, boolean excludeEndDateCheck) {
-        return getStatus().isActive();
+        return getStatus().isActive() &&
+                     !date.isBefore(getStartDate()) &&
+                     (excludeEndDateCheck || !date.isAfter(getEndingDate()));
     }
 
     /**

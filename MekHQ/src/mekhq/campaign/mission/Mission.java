@@ -35,6 +35,7 @@ package mekhq.campaign.mission;
 
 import java.io.PrintWriter;
 import java.text.ParseException;
+import java.time.LocalDate;
 
 import megamek.Version;
 import megamek.common.annotations.Nullable;
@@ -62,6 +63,11 @@ public class Mission extends AbstractMissionTransition {
         setSystemId("Unknown System");
     }
     // endregion Constructors
+
+    @Override
+    public boolean isActiveOn(LocalDate date, boolean excludeEndDateCheck) {
+        return getStatus().isActive();
+    }
 
     @Override
     protected int writeToXMLBegin(Campaign campaign, final PrintWriter printWriter, int indent) {
