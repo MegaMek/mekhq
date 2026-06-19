@@ -1457,7 +1457,7 @@ public class Campaign implements ITechManager, IPlace {
      *
      * @param mission The mission to be added
      */
-    public void addMission(Mission mission) {
+    public void addMission(AbstractMissionTransition mission) {
         int missionID = lastMissionId + 1;
         mission.setId(missionID);
         missions.put(missionID, mission);
@@ -1470,13 +1470,13 @@ public class Campaign implements ITechManager, IPlace {
      *
      * @param mission Mission to import into the campaign.
      */
-    public void importMission(final Mission mission) {
+    public void importMission(final AbstractMissionTransition mission) {
         mission.getScenarios().forEach(this::importScenario);
         addMissionWithoutId(mission);
         StratConContractInitializer.restoreTransientStratconInformation(mission, this);
     }
 
-    private void addMissionWithoutId(Mission m) {
+    private void addMissionWithoutId(AbstractMissionTransition m) {
         lastMissionId = max(lastMissionId, m.getId());
         missions.put(m.getId(), m);
         MekHQ.triggerEvent(new MissionNewEvent(m));
@@ -2224,7 +2224,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all hangars across all locations associated with this campaign.
-     *                                                                                                 TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     *                                                                                                             TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
      */
     public Hangar getAllHangar() {
         return units;
@@ -2860,7 +2860,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all warehouses across all locations associated with this campaign.
-     *                                                                                                 TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
+     *                                                                                                             TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
      */
     public Warehouse getAllWarehouse() {
         return parts;

@@ -41,6 +41,7 @@ import java.util.UUID;
 import megamek.Version;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.storyArc.StoryPoint;
@@ -68,7 +69,7 @@ public class MissionStoryPoint extends StoryPoint {
     private static final MMLogger LOGGER = MMLogger.create(MissionStoryPoint.class);
 
     /* A mission object to track the mission */
-    private Mission mission;
+    private AbstractMissionTransition mission;
 
     /**
      * A double that tracks what percent of scenarios must be successful for successful mission. This may not be

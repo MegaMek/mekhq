@@ -59,8 +59,6 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
 import mekhq.gui.dialog.BayRentalDialog;
@@ -116,7 +114,7 @@ public class FacilityRentals {
         return rentedFacilities;
     }
 
-    public static void offerContractRentalOpportunity(Campaign campaign, Contract contract) {
+    public static void offerContractRentalOpportunity(Campaign campaign, AbstractMissionTransition contract) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         int hospitalCost = campaignOptions.getRentedFacilitiesCostHospitalBeds();
         int kitchenCost = campaignOptions.getRentedFacilitiesCostKitchens();
@@ -329,7 +327,7 @@ public class FacilityRentals {
             return Money.zero();
         }
 
-        List<Mission> activeMissions = campaign.getActiveMissions(false);
+        List<AbstractMissionTransition> activeMissions = campaign.getActiveMissions(false);
         Money totalAvailableFunds = finances.getBalance();
         Collection<Unit> units = campaign.getAllHangar().getUnits();
 
@@ -416,13 +414,13 @@ public class FacilityRentals {
      * @author Illiani
      * @since 0.50.10
      */
-    private static int getFallbackRepairSite(List<Mission> activeMissions) {
+    private static int getFallbackRepairSite(List<AbstractMissionTransition> activeMissions) {
         if (activeMissions.isEmpty()) {
             return Unit.SITE_FACILITY_BASIC;
         }
 
         int fallbackSite = Unit.SITE_IMPROVISED;
-        for (Mission contract : activeMissions) {
+        for (AbstractMissionTransition contract : activeMissions) {
             int newSite = contract.getRepairLocation();
             if (newSite > fallbackSite) {
                 fallbackSite = newSite;

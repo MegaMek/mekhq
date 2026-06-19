@@ -849,7 +849,7 @@ public class RetirementDefectionTracker {
      * @param shareValue The value of each share in the unit; if not using the share system, this is zero.
      * @param campaign   the current campaign
      */
-    public void rollRetirement(final @Nullable Mission mission, final Map<UUID, TargetRoll> targets,
+    public void rollRetirement(final @Nullable AbstractMissionTransition mission, final Map<UUID, TargetRoll> targets,
           final Money shareValue, final Campaign campaign) {
         if ((mission != null) && !unresolvedPersonnel.containsKey(mission.getId())) {
             unresolvedPersonnel.put(mission.getId(), new HashSet<>());

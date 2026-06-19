@@ -124,11 +124,10 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.market.PartsInUseManager;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
@@ -1542,7 +1541,7 @@ public class CampaignNewDayManager {
             campaign.addReport(POLITICS, report);
         }
 
-        List<Mission> activeMissions = campaign.getActiveMissions(false);
+        List<AbstractMissionTransition> activeMissions = campaign.getActiveMissions(false);
         boolean isInTransit = !updatedLocation.isOnPlanet();
         Factions factions = Factions.getInstance();
 
@@ -2301,7 +2300,7 @@ public class CampaignNewDayManager {
      * @since 0.50.10
      */
     private void payForRentedFacilities() {
-        List<Contract> activeContracts = campaign.getActiveContracts();
+        List<AbstractMissionTransition> activeContracts = campaign.getActiveContracts();
         int hospitalRentalCost = campaignOptions.getRentedFacilitiesCostHospitalBeds();
         Money hospitalRentalFee = FacilityRentals.calculateContractRentalCost(hospitalRentalCost, activeContracts,
               ContractRentalType.HOSPITAL_BEDS);

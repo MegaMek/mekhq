@@ -539,7 +539,7 @@ public class CamOpsSalvageUtilities {
      * @since 0.50.10
      */
     public static void deploySalvageTeams(Campaign campaign, Scenario scenario) {
-        final Mission mission = campaign.getMission(scenario.getMissionId());
+        final AbstractMissionTransition mission = campaign.getMission(scenario.getMissionId());
 
         if (!(mission instanceof AtBContract contract)) {
             return;

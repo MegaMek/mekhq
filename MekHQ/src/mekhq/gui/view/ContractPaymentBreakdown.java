@@ -41,7 +41,7 @@ import javax.swing.JPanel;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.AbstractMissionTransition;
 
 /**
  * Contract payment breakdown, showing all incomes and expenses, finishing with the estimated profit.
@@ -51,7 +51,7 @@ import mekhq.campaign.mission.Contract;
 public class ContractPaymentBreakdown {
     private final JPanel mainPanel;
     private final Campaign campaign;
-    private final Contract contract;
+    private final AbstractMissionTransition contract;
 
     private final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractPaymentBreakdown",
           MekHQ.getMHQOptions().getLocale());
@@ -81,7 +81,7 @@ public class ContractPaymentBreakdown {
      * @param contract  that it is displaying
      * @param campaign  loaded
      */
-    public ContractPaymentBreakdown(JPanel mainPanel, Contract contract, Campaign campaign) {
+    public ContractPaymentBreakdown(JPanel mainPanel, AbstractMissionTransition contract, Campaign campaign) {
         this.mainPanel = mainPanel;
         this.campaign = campaign;
         this.contract = contract;

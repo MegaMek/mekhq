@@ -67,7 +67,6 @@ import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.market.contractMarket.ContractAutomation;
 import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.rentals.FacilityRentals;
 import mekhq.campaign.universe.Faction;
@@ -589,7 +588,7 @@ public class ContractMarketDialog extends JDialog {
         }
     }
 
-    public Contract getContract() {
+    public AbstractMissionTransition getContract() {
         return selectedContract;
     }
 

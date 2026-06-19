@@ -222,7 +222,7 @@ public abstract class AbstractContractMarket {
      * @param clause ID representing the type of clause.
      *
      */
-    public int getRerollsUsed(Contract contract, int clause) {
+    public int getRerollsUsed(AbstractMissionTransition contract, int clause) {
         if (null != clauseMods.get(contract.getId())) {
             return clauseMods.get(contract.getId()).rerollsUsed[clause];
         }

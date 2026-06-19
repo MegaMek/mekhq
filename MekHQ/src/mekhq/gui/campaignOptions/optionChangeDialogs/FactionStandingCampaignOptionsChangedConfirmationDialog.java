@@ -63,7 +63,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.HyperlinkEvent;
 
-import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
@@ -92,7 +92,7 @@ public class FactionStandingCampaignOptionsChangedConfirmationDialog extends JDi
     private final Faction campaignFaction;
     private final LocalDate today;
     private final FactionStandings factionStandings;
-    private final List<Mission> missions;
+    private final List<AbstractMissionTransition> missions;
     private final boolean isFactionStandingEnabled;
     private final double regardMultiplier;
 
@@ -119,7 +119,7 @@ public class FactionStandingCampaignOptionsChangedConfirmationDialog extends JDi
      */
     public FactionStandingCampaignOptionsChangedConfirmationDialog(JDialog parent, ImageIcon campaignIcon,
           Faction campaignFaction,
-          LocalDate today, FactionStandings factionStandings, Collection<Mission> missions,
+          LocalDate today, FactionStandings factionStandings, Collection<AbstractMissionTransition> missions,
           boolean isFactionStandingEnabled, double regardMultiplier) {
         this.campaignIcon = campaignIcon;
         this.campaignFaction = campaignFaction;

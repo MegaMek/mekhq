@@ -40,9 +40,9 @@ import java.util.Map;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.gui.StratConPanel;
 import mekhq.gui.stratCon.StratConScenarioWizard;
@@ -119,7 +119,7 @@ public class MaplessStratCon {
      * @since 0.50.10
      */
     private static @Nullable StratConDeploymentContext buildScenarioData(Campaign campaign, Scenario scenario) {
-        Mission mission = campaign.getMission(scenario.getMissionId());
+        AbstractMissionTransition mission = campaign.getMission(scenario.getMissionId());
         if (!(mission instanceof AtBContract atbContract)) {
             // We should have obstructed the user before they get to this point
             LOGGER.error("Mission is not an AtBContract: {}", mission);

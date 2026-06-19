@@ -44,8 +44,8 @@ import java.util.UUID;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.Person;
@@ -160,14 +160,15 @@ public class MiscAwards {
      * @param person   the person to check award eligibility for
      * @param isYesWar true if this is a Yes War Award
      */
-    private static boolean HouseWorldWar(Campaign campaign, @Nullable Mission mission, Award award, UUID person,
+    private static boolean HouseWorldWar(Campaign campaign, @Nullable AbstractMissionTransition mission, Award award,
+          UUID person,
           boolean isYesWar) {
         if (award.canBeAwarded(campaign.getPerson(person))) {
             if (mission != null) {
                 if (mission instanceof AtBContract) {
                     PlanetarySystem system = campaign.getSystemById(mission.getSystemId());
                     LocalDate date = campaign.getLocalDate();
-                    Faction enemyFaction = ((AtBContract) mission).getEnemy();
+                    Faction enemyFaction = mission.getEnemy();
 
                     for (Faction faction : system.getFactionSet(campaign.getLocalDate())) {
                         if (faction.isISMajorOrSuperPower()) {
@@ -244,12 +245,13 @@ public class MiscAwards {
      *
      * @return true if the person is eligible for the award, false otherwise
      */
-    private static boolean CeremonialDuty(Campaign campaign, Award award, UUID person, @Nullable Mission mission) {
+    private static boolean CeremonialDuty(Campaign campaign, Award award, UUID person,
+          @Nullable AbstractMissionTransition mission) {
         if (award.canBeAwarded(campaign.getPerson(person))) {
             if (mission != null) {
-                if (mission instanceof Contract) {
+                if (!(mission instanceof Mission)) {
                     PlanetarySystem capitalSystem = Factions.getInstance()
-                                                          .getFactionFromFullNameAndYear(((Contract) mission).getEmployerNameDirect(),
+                                                          .getFactionFromFullNameAndYear(mission.getEmployerNameDirect(),
                                                                 campaign.getGameYear())
                                                           .getStartingPlanet(campaign, campaign.getLocalDate());
                     try {

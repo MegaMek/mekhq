@@ -38,11 +38,12 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.util.List;
+import java.util.Objects;
 
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -94,13 +95,13 @@ public class FactionStandingGreeting {
      * @author Illiani
      * @since 0.50.07
      */
-    public FactionStandingGreeting(Campaign campaign, Contract contract) {
+    public FactionStandingGreeting(Campaign campaign, AbstractMissionTransition contract) {
         if (!(contract instanceof AtBContract atBContract)) {
             new FactionStandingGreeting(campaign);
             return;
         }
 
-        if (atBContract.getEmployerCode().equals(PIRATE_FACTION_CODE)) {
+        if (Objects.equals(atBContract.getEmployerCode(), PIRATE_FACTION_CODE)) {
             return;
         }
 

@@ -57,8 +57,8 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -689,8 +689,8 @@ public class NewContractDialog extends JDialog {
         }
 
         String chosenName = txtName.getText();
-        for (Mission m : campaign.getMissions()) {
-            if (m.getName().equals(chosenName)) {
+        for (AbstractMissionTransition mission : campaign.getMissions()) {
+            if (mission.getName().equals(chosenName)) {
                 JOptionPane.showMessageDialog(frame,
                       "There is already a mission with the name " + chosenName,
                       "Duplicate Mission Name",

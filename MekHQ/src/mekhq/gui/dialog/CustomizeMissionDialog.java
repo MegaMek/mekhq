@@ -89,7 +89,7 @@ public class CustomizeMissionDialog extends JDialog {
         pack();
     }
 
-    public Mission getMission() {
+    public AbstractMissionTransition getMission() {
         return mission;
     }
 

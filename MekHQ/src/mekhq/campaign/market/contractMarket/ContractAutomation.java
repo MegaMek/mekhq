@@ -51,8 +51,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.TransportCostCalculations;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -80,7 +80,7 @@ public class ContractAutomation {
      * @param campaign The current campaign.
      * @param contract Selected contract.
      */
-    public static void contractStartPrompt(Campaign campaign, Contract contract) {
+    public static void contractStartPrompt(Campaign campaign, AbstractMissionTransition contract) {
         // If we're already in the right system, there is no need to automate these actions
         if (Objects.equals(campaign.getCurrentLocation().getCurrentSystem(), contract.getSystem())) {
             return;
@@ -170,8 +170,8 @@ public class ContractAutomation {
     }
 
     /**
-     * This method identifies all non-mothballed units within a campaign that are currently assigned to a {@link Formation}.
-     * Those units are then GM Mothballed.
+     * This method identifies all non-mothballed units within a campaign that are currently assigned to a
+     * {@link Formation}. Those units are then GM Mothballed.
      *
      * @param campaign The current campaign.
      *
