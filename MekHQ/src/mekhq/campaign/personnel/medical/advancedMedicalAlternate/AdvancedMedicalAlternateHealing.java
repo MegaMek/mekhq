@@ -45,7 +45,6 @@ import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_TRAUMA_SURGEO
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.HealingMarginOfSuccessEffects.getEffectFromHealingAttempt;
 import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.BODY;
-import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NONE;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.time.LocalDate;
@@ -64,7 +63,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
-import mekhq.campaign.personnel.skills.AttributeCheckUtility;
+import mekhq.campaign.personnel.skills.AttributeCheck;
 import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 
@@ -298,31 +297,17 @@ public class AdvancedMedicalAlternateHealing {
      */
     private static int getMarginOfSuccessForUnassistedHealing(Person patient, List<TargetRollModifier> modifiers,
           int miscPenalty, boolean useEdge) {
-        AttributeCheckUtility naturalHealing = new AttributeCheckUtility(
-              getTextAt(RESOURCE_BUNDLE, "AdvancedMedicalAlternateHealing.naturalHealing.normal"),
-              patient,
-              BODY,
-              NONE,
-              modifiers,
-              miscPenalty,
-              false,
-              true);
-        int marginOfSuccess = naturalHealing.getMarginOfSuccess();
+        AttributeCheck naturalHealing =
+              patient.checkAttribute(BODY).withExternalModifiers(modifiers).withMiscModifier(miscPenalty);
+        ActionCheckResult result = naturalHealing.resolve(false, getTextAt(RESOURCE_BUNDLE,
+              "AdvancedMedicalAlternateHealing.naturalHealing.normal"), true);
 
-        // Edge
-        if (marginOfSuccess <= -6 && useEdge) { // Attempt to reroll a permanent injury
-            AttributeCheckUtility edgeReroll = new AttributeCheckUtility(
-                  getTextAt(RESOURCE_BUNDLE, "AdvancedMedicalAlternateHealing.naturalHealing.edge"),
-                  patient,
-                  BODY,
-                  NONE,
-                  modifiers,
-                  miscPenalty,
-                  false,
-                  true);
-            marginOfSuccess = edgeReroll.getMarginOfSuccess(); // Edge always replaces the original
+        if (result.marginOfSuccess() <= -6 && useEdge) { // Attempt to reroll a permanent injury with edge
+            // FIXME: we allow one free reroll here
+            result = naturalHealing.resolve(true, getTextAt(RESOURCE_BUNDLE,
+                  "AdvancedMedicalAlternateHealing.naturalHealing.edge"), true);
         }
-        return marginOfSuccess;
+        return result.marginOfSuccess();
     }
 
     /**
