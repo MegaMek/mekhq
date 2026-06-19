@@ -344,7 +344,10 @@ public class MedicalViewDialog extends JDialog {
                       && !person.isLocationMissing(bodyLocation.getParent())) {
                 doll.setLocTag(bodyLocation, "lost");
             } else if (!person.isLocationMissing(bodyLocation)) {
-                InjuryLevel level = getMaxInjuryLevel(bodyLocation, injuriesMappedToPrimaryLocations);
+                InjuryLevel level =
+                      getMaxInjuryLevel(person.hasProstheticInjuryNoImplant(bodyLocation.getParent()) ?
+                                              bodyLocation.getParent() : bodyLocation,
+                            injuriesMappedToPrimaryLocations);
                 Color col = switch (level) {
                     case CHRONIC -> new Color(255, 204, 255);
                     case DEADLY -> Color.RED;
