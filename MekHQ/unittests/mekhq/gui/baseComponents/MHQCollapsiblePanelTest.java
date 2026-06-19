@@ -150,6 +150,7 @@ class MHQCollapsiblePanelTest {
             assertTrue(panel.getContentPreferredWidth() >= 321);
         });
     }
+
     @Test
     void titleStaysLeftAlignedWhenNoSummaryIsSet() throws Exception {
         runOnEDT(() -> {
@@ -195,6 +196,7 @@ class MHQCollapsiblePanelTest {
         }
         return null;
     }
+
     /**
      * Runs the supplied work synchronously on the Event Dispatch Thread, unwrapping any assertion failure or exception
      * so JUnit reports it directly rather than as an {@link InvocationTargetException}.
