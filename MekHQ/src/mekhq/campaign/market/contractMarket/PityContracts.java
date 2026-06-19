@@ -37,6 +37,7 @@ import static megamek.common.compute.Compute.d6;
 import static megamek.common.enums.SkillLevel.GREEN;
 import static megamek.common.enums.SkillLevel.VETERAN;
 import static mekhq.campaign.mission.Contract.OH_NONE;
+import static mekhq.campaign.mission.ContractDifficulty.calculateContractDifficulty;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 
 import java.util.List;
@@ -133,16 +134,16 @@ public class PityContracts {
         // original enemy
         boolean isUseGenericBattleValue = campaign.getCampaignOptions().isUseGenericBattleValue();
         List<Entity> combatUnits = campaign.getAllCombatEntities();
-        int difficulty = contract.calculateContractDifficulty(campaign.getGameYear(),
+        int difficulty = calculateContractDifficulty(contract, campaign.getGameYear(),
               isUseGenericBattleValue,
               combatUnits);
-        contract.setDifficulty(difficulty);
+        contract.setContractDifficulty(difficulty);
 
         if (!campaign.isPirateCampaign()) { // Pirate campaigns have fixed contractual terms
             overrideContractTermsForPityContracts(contract);
         }
 
-        contract.setName(AtbMonthlyContractMarket.generateDefaultName(contract.getEmployer(), contract));
+        contract.setName(AtbMonthlyContractMarket.generateDefaultName(contract.getEmployerName(), contract));
     }
 
     /**
@@ -176,19 +177,19 @@ public class PityContracts {
      * @since 0.51.0
      */
     private static void overrideContractTermsForPityContracts(AtBContract contract) {
-        contract.setContractType(AtBContractType.PIRATE_HUNTING);
+        contract.setContractTypeAndName(AtBContractType.PIRATE_HUNTING);
 
         int salvageRoll = d6(1) * 10;
-        contract.setSalvagePct(salvageRoll);
+        contract.setSalvagePercent(salvageRoll);
 
         int supportRoll = d6(1) * 10;
         contract.setStraightSupport(supportRoll);
-        contract.setOverheadComp(OH_NONE);
+        contract.setOverheadCompensation(OH_NONE);
 
         int battleLossRoll = d6(1) * 10;
-        contract.setBattleLossComp(battleLossRoll);
+        contract.setBattleLossCompensation(battleLossRoll);
 
         int transportRoll = (4 + d6(1)) * 10;
-        contract.setTransportComp(transportRoll);
+        contract.setTransportCompensation(transportRoll);
     }
 }

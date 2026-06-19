@@ -148,7 +148,7 @@ public class TrainingCombatTeams {
                 continue;
             }
 
-            StratConCampaignState campaignState = contract.getStratconCampaignState();
+            StratConCampaignState campaignState = contract.getStratConCampaignState();
             boolean isForceDeployed = campaignState != null &&
                                             campaignState.isForceDeployedHere(combatTeam.getFormationId());
             if (isUsingStratCon) {

@@ -1,0 +1,40 @@
+<missions>
+    <mission id="1" type="mekhq.campaign.mission.Contract">
+        <name>New Contract</name>
+        <type>Deception</type>
+        <systemId>Terra</systemId>
+        <status>ACTIVE</status>
+        <desc></desc>
+        <id>1</id>
+        <scenarios>
+        </scenarios>
+        <nMonths>12</nMonths>
+        <startDate>3151-02-06</startDate>
+        <endDate>3152-02-06</endDate>
+        <employer>New Employer</employer>
+        <paymentMultiplier>2.0</paymentMultiplier>
+        <commandRights>HOUSE</commandRights>
+        <overheadComp>0</overheadComp>
+        <salvagePct>50</salvagePct>
+        <salvageExchange>false</salvageExchange>
+        <straightSupport>50</straightSupport>
+        <battleLossComp>50</battleLossComp>
+        <transportComp>50</transportComp>
+        <mrbcFee>true</mrbcFee>
+        <advancePct>25</advancePct>
+        <signBonus>0</signBonus>
+        <hospitalBedsRented>0</hospitalBedsRented>
+        <kitchensRented>0</kitchensRented>
+        <holdingCellsRented>0</holdingCellsRented>
+        <advanceAmount>0 CSB</advanceAmount>
+        <signingAmount>0 CSB</signingAmount>
+        <transportAmount>0 CSB</transportAmount>
+        <transitAmount>0 CSB</transitAmount>
+        <overheadAmount>0 CSB</overheadAmount>
+        <supportAmount>0 CSB</supportAmount>
+        <baseAmount>0 CSB</baseAmount>
+        <feeAmount>0 CSB</feeAmount>
+        <salvagedByUnit>0 CSB</salvagedByUnit>
+        <salvagedByEmployer>0 CSB</salvagedByEmployer>
+    </mission>
+</missions>

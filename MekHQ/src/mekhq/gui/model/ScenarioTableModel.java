@@ -76,7 +76,11 @@ public class ScenarioTableModel extends DataTableModel<Scenario> {
 
     private record ScenarioClassification(boolean hasStratConScenario, boolean strategic, boolean turningPoint,
           boolean crisis, boolean dual) {
-        private static final ScenarioClassification NONE = new ScenarioClassification(false, false, false, false, false);
+        private static final ScenarioClassification NONE = new ScenarioClassification(false,
+              false,
+              false,
+              false,
+              false);
 
         private boolean isPriority() {
             return strategic || turningPoint || crisis || dual;
@@ -264,7 +268,7 @@ public class ScenarioTableModel extends DataTableModel<Scenario> {
                     if (contract == null) {
                         return "-";
                     }
-                    StratConCampaignState campaignState = contract.getStratconCampaignState();
+                    StratConCampaignState campaignState = contract.getStratConCampaignState();
                     StratConScenario stratconScenario = atBScenario.getStratconScenario(contract, atBScenario);
 
                     if (campaignState != null && stratconScenario != null) {

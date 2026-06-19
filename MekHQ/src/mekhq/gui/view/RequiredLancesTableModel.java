@@ -74,7 +74,8 @@ class RequiredLancesTableModel extends DataTableModel<AtBContract> {
             }
 
             CombatRole role = combatTeam.getRole();
-            boolean isRoleSuitable = (contract.getContractType().isCadreDuty() && role.isCadre()) || role.isCombatRole();
+            boolean isRoleSuitable = (contract.getContractType().isCadreDuty() && role.isCadre()) ||
+                                           role.isCombatRole();
             if (isRoleSuitable && combatTeam.isEligible(campaign)) {
                 assignedCombatElements += combatTeam.getSize(campaign);
             }
@@ -91,7 +92,7 @@ class RequiredLancesTableModel extends DataTableModel<AtBContract> {
             int requiredCombatElements = contract.getRequiredCombatElements();
             if (assignedCombatElements < requiredCombatElements) {
                 contractShortfalls.add(columnNames[COL_TOTAL] + ' ' + assignedCombatElements + '/' +
-                                            requiredCombatElements);
+                                             requiredCombatElements);
             }
 
             CombatRole requiredRole = contract.getContractType().getRequiredCombatRole();
@@ -101,7 +102,7 @@ class RequiredLancesTableModel extends DataTableModel<AtBContract> {
                 int requiredRoleElements = Math.max(requiredCombatElements / 2, 1);
                 if (assignedRoleElements < requiredRoleElements) {
                     contractShortfalls.add(columnNames[requiredRoleColumn] + ' ' + assignedRoleElements + '/' +
-                                                requiredRoleElements);
+                                                 requiredRoleElements);
                 }
             }
 
