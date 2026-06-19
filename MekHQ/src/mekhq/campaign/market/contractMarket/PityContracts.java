@@ -143,7 +143,7 @@ public class PityContracts {
             overrideContractTermsForPityContracts(contract);
         }
 
-        contract.setName(AtbMonthlyContractMarket.generateDefaultName(contract.getEmployerName(), contract));
+        contract.setName(AtbMonthlyContractMarket.generateDefaultName(contract.getEmployerNameDirect(), contract));
     }
 
     /**

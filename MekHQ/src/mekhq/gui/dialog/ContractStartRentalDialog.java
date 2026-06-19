@@ -110,7 +110,7 @@ public class ContractStartRentalDialog extends ImmersiveDialogCore {
     }
 
     private static String getCenterMessage(String commanderAddress, Contract contract, int currentYear) {
-        String employerName = contract.getEmployerName();
+        String employerName = contract.getEmployerNameDirect();
         if (contract instanceof AtBContract atBContract) {
             Faction employerFaction = atBContract.getEmployerFaction();
             employerName = FactionStandingUtilities.getFactionName(employerFaction, currentYear);

@@ -249,7 +249,7 @@ public class MiscAwards {
             if (mission != null) {
                 if (mission instanceof Contract) {
                     PlanetarySystem capitalSystem = Factions.getInstance()
-                                                          .getFactionFromFullNameAndYear(((Contract) mission).getEmployerName(),
+                                                          .getFactionFromFullNameAndYear(((Contract) mission).getEmployerNameDirect(),
                                                                 campaign.getGameYear())
                                                           .getStartingPlanet(campaign, campaign.getLocalDate());
                     try {

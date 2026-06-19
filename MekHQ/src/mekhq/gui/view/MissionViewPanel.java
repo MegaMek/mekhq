@@ -302,7 +302,7 @@ public class MissionViewPanel extends JScrollablePanel {
             pnlStats.add(txtLocation, gridBagConstraints);
         }
 
-        if ((null != contract.getEmployerName()) && !contract.getEmployerName().isEmpty()) {
+        if ((null != contract.getEmployerNameDirect()) && !contract.getEmployerNameDirect().isEmpty()) {
             lblEmployer.setName("lblEmployer");
             lblEmployer.setText(resourceMap.getString("lblEmployer.text"));
             gridBagConstraints = new GridBagConstraints();
@@ -313,7 +313,7 @@ public class MissionViewPanel extends JScrollablePanel {
             pnlStats.add(lblEmployer, gridBagConstraints);
 
             txtEmployer.setName("txtEmployer");
-            txtEmployer.setText(contract.getEmployerName());
+            txtEmployer.setText(contract.getEmployerNameDirect());
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = 2;
@@ -567,7 +567,7 @@ public class MissionViewPanel extends JScrollablePanel {
         // faction names are shown as tooltips on their logos (employer left, enemy right) rather than as their own
         // label rows, to save vertical space.
         final String employerTooltip = MessageFormat.format(resourceMap.getString("belligerents.employer.tooltip"),
-              contract.getEmployerName(campaign.getGameYear()));
+              contract.getEmployerNameFromFaction(campaign.getGameYear()));
         final String enemyTooltip = MessageFormat.format(resourceMap.getString("belligerents.enemy.tooltip"),
               contract.getEnemyBotName());
         lblBelligerents = getBelligerentsPanel(contract, gui.getCampaign().getGameYear(), employerTooltip,

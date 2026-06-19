@@ -330,7 +330,7 @@ public class ContractMarketDialog extends JDialog {
 
             Vector<String> row = new Vector<>();
             if (contract instanceof AtBContract) {
-                row.add(((AtBContract) contract).getEmployerName(campaign.getGameYear()));
+                row.add(((AtBContract) contract).getEmployerNameFromFaction(campaign.getGameYear()));
 
                 String enemyName = ((AtBContract) contract).generateEnemyName(campaign.getGameYear());
                 if (((AtBContract) contract).getEnemy().isMercenary()) {
@@ -343,7 +343,7 @@ public class ContractMarketDialog extends JDialog {
                     row.add(((AtBContract) contract).getContractType().toString());
                 }
             } else {
-                row.add(contract.getEmployerName());
+                row.add(contract.getEmployerNameDirect());
                 row.add("");
                 row.add(contract.getContractTypeName());
             }
@@ -514,7 +514,7 @@ public class ContractMarketDialog extends JDialog {
 
             contract.calculateContract(campaign);
             Vector<String> row = new Vector<>();
-            row.add(contract.getEmployerName(campaign.getGameYear()));
+            row.add(contract.getEmployerNameFromFaction(campaign.getGameYear()));
             row.add(contract.generateEnemyName(campaign.getGameYear()));
             row.add(contract.getContractType().toString());
             final JumpPath path = campaign.calculateJumpPath(campaign.getCurrentSystem(), contract.getSystem());

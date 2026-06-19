@@ -37,6 +37,7 @@ import static megamek.client.ui.util.PlayerColour.BLUE;
 import static megamek.client.ui.util.PlayerColour.RED;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.enums.SkillLevel.parseFromString;
+import static mekhq.campaign.mission.RandomFactionCamouflage.pickRandomCamouflage;
 import static mekhq.campaign.mission.enums.AtBContractType.UNDEFINED;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.MAXIMUM_MORALE_LEVEL;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.MINIMUM_MORALE_LEVEL;
@@ -400,8 +401,12 @@ public class AbstractMissionTransition {
         this.endingDate = startDate.plusMonths(getLengthInMonths());
     }
 
-    public String getEmployerName() {
+    public String getEmployerNameDirect() {
         return employerName;
+    }
+
+    public String getEmployerNameFromFaction(int year) {
+        return getEmployerFaction().getFullName(year);
     }
 
     public void setEmployerName(String employerName) {
@@ -508,6 +513,16 @@ public class AbstractMissionTransition {
 
     public void setEmployerCode(String employerCode) {
         this.employerCode = employerCode;
+    }
+
+    public Faction getEmployerFaction() {
+        return Factions.getInstance().getFaction(getEmployerCode());
+    }
+
+    public void updateEmployer(String code, int year) {
+        this.setEmployerCode(code);
+        setEmployerName(getEmployerNameFromFaction(year));
+        setAllyCamouflage(pickRandomCamouflage(year, getEmployerCode()));
     }
 
     public String getEnemyCode() {
@@ -1442,7 +1457,7 @@ public class AbstractMissionTransition {
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "nMonths", getLengthInMonths());
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "startDate", getStartDate());
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "endDate", getEndingDate());
-        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "employer", getEmployerName());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "employer", getEmployerNameDirect());
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "paymentMultiplier", getPaymentMultiplier());
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "commandRights", getCommandRights().name());
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "overheadComp", getOverheadCompensation());

@@ -261,7 +261,7 @@ public class AtBContractTest {
           String fullName) {
         contract.updateEmployer(employerCode, year);
         contract.setMercSubcontract(isMercSubcontract);
-        assertEquals(fullName, contract.getEmployerName(year));
+        assertEquals(fullName, contract.getEmployerNameFromFaction(year));
     }
 
     @Nested

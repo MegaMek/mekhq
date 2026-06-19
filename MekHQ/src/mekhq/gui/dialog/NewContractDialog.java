@@ -318,7 +318,7 @@ public class NewContractDialog extends JDialog {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         descPanel.add(lblEmployer, gridBagConstraints);
 
-        txtEmployer.setText(contract.getEmployerName());
+        txtEmployer.setText(contract.getEmployerNameDirect());
         txtEmployer.setName("txtEmployer");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;

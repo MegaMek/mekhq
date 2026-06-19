@@ -48,6 +48,7 @@ import static megamek.common.units.UnitType.*;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.enums.DailyReportType.BATTLE;
 import static mekhq.campaign.mission.AtBScenario.selectBotTeamCommanders;
+import static mekhq.campaign.mission.RandomFactionCamouflage.pickRandomCamouflage;
 import static mekhq.campaign.mission.Scenario.T_GROUND;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_CIVILIANS;
@@ -177,7 +178,8 @@ public class AtBDynamicScenarioFactory {
      *
      * @return A new Scenario object with the provided settings
      */
-    public static AtBDynamicScenario initializeScenarioFromTemplate(ScenarioTemplate template, AtBContract contract,
+    public static AtBDynamicScenario initializeScenarioFromTemplate(ScenarioTemplate template,
+          AbstractMissionTransition contract,
           Campaign campaign) {
         AtBDynamicScenario scenario = new AtBDynamicScenario();
 
@@ -1124,7 +1126,7 @@ public class AtBDynamicScenarioFactory {
         generatedForce.setFixedEntityList(generatedEntities);
         setBotForceParameters(generatedForce, forceTemplate, forceAlignment, contract);
         if (unidentifiedThirdPartyPresent) {
-            generatedForce.setCamouflage(AtBContract.pickRandomCamouflage(currentDate.getYear(), factionCode));
+            generatedForce.setCamouflage(pickRandomCamouflage(currentDate.getYear(), factionCode));
         }
 
         boolean isDeployOffBoard = forceTemplate.getDeployOffboard();

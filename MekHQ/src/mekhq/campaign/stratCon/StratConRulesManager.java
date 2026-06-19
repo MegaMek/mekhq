@@ -2468,7 +2468,7 @@ public class StratConRulesManager {
      *
      * @return the generated {@link StratConScenario}, or {@code null} if scenario generation fails
      */
-    private static @Nullable StratConScenario generateScenario(Campaign campaign, AtBContract contract,
+    private static @Nullable StratConScenario generateScenario(Campaign campaign, AbstractMissionTransition contract,
           StratConTrackState track, @Nullable Integer forceID, StratConCoords coords,
           @Nullable Integer daysTilDeployment) {
         int unitType = MEK;
@@ -2516,7 +2516,7 @@ public class StratConRulesManager {
      *
      * @return the generated {@link StratConScenario}, or {@code null} if scenario generation failed
      */
-    static @Nullable StratConScenario generateScenario(Campaign campaign, AtBContract contract,
+    static @Nullable StratConScenario generateScenario(Campaign campaign, AbstractMissionTransition contract,
           StratConTrackState track, @Nullable Integer forceID, StratConCoords coords,
           @Nullable ScenarioTemplate template, @Nullable Integer daysTilDeployment) {
         StratConScenario scenario = new StratConScenario();
@@ -2903,7 +2903,7 @@ public class StratConRulesManager {
      *
      * @param contract The scenario's contract
      */
-    public static void setAttachedUnitsModifier(StratConScenario scenario, AtBContract contract) {
+    public static void setAttachedUnitsModifier(StratConScenario scenario, AbstractMissionTransition contract) {
         AtBDynamicScenario backingScenario = scenario.getBackingScenario();
         boolean airBattle = (backingScenario.getTemplate().mapParameters.getMapLocation() == LowAtmosphere) ||
                                   (backingScenario.getTemplate().mapParameters.getMapLocation() == Space);

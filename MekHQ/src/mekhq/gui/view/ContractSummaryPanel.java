@@ -221,7 +221,7 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsLabels.gridy = ++y;
         mainPanel.add(lblEmployer, gridBagConstraintsLabels);
 
-        JLabel txtEmployer = new JLabel(contract.getEmployerName());
+        JLabel txtEmployer = new JLabel(contract.getEmployerNameDirect());
         txtEmployer.setName("txtEmployer");
         gridBagConstraintsText.gridy = y;
         mainPanel.add(txtEmployer, gridBagConstraintsText);

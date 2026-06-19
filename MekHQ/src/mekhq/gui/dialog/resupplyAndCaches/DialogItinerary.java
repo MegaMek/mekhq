@@ -138,7 +138,7 @@ public class DialogItinerary {
             speakerIcon = getFactionLogo(campaign.getGameYear(), "PIR");
             speakerIcon = scaleImageIcon(speakerIcon, 200, true);
         } else {
-            speakerName = contract.getEmployerName(campaign.getGameYear());
+            speakerName = contract.getEmployerNameFromFaction(campaign.getGameYear());
 
             speakerIcon = getFactionLogo(campaign.getGameYear(), contract.getEmployerCode());
             speakerIcon = scaleImageIcon(speakerIcon, 200, true);

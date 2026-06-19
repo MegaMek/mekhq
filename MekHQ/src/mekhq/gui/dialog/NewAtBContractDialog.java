@@ -600,7 +600,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         contract.setAllyQuality(cbAllyQuality.getSelectedIndex());
         contract.setEnemySkill(comboEnemySkill.getSelectedItem());
         contract.setEnemyQuality(cbEnemyQuality.getSelectedIndex());
-        contract.setAllyBotName(contract.getEmployerName(campaign.getGameYear()));
+        contract.setAllyBotName(contract.getEmployerNameFromFaction(campaign.getGameYear()));
         contract.setEnemyBotName(contract.generateEnemyName(campaign.getGameYear()));
         contract.setSharesPercent((Integer) spnShares.getValue());
 

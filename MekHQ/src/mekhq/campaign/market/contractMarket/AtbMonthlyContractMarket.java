@@ -639,7 +639,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         contract.setName(String.format("%s - %s - %s Subcontract %s",
               contract.getStartDate()
                     .format(DateTimeFormatter.ofPattern("yyyy").withLocale(MekHQ.getMHQOptions().getDateLocale())),
-              contract.getEmployerName(),
+              contract.getEmployerNameDirect(),
               contract.getSystem().getName(parent.getStartDate()),
               contract.getContractType()));
 
@@ -753,7 +753,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         followup.setName(String.format("(Followup) %s - %s - %s %s",
               followup.getStartDate()
                     .format(DateTimeFormatter.ofPattern("yyyy").withLocale(MekHQ.getMHQOptions().getDateLocale())),
-              followup.getEmployerName(),
+              followup.getEmployerNameDirect(),
               followup.getSystem().getName(followup.getStartDate()),
               followup.getContractType()));
 
