@@ -123,7 +123,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         employerSet = RandomFactionGenerator.getInstance().getEmployerSet();
         contract = new AtBContract("New Contract");
         contract.calculateContract(campaign);
-        ((AtBContract) contract).initContractDetails(campaign);
+        contract.initContractDetails(campaign);
         dragoonRating = campaign.getAtBUnitRatingMod();
         super.initComponents();
 
@@ -131,11 +131,11 @@ public class NewAtBContractDialog extends NewContractDialog {
         updatePlanets();
 
         if (getCurrentEmployerCode() != null) {
-            ((AtBContract) contract).updateEmployer(getCurrentEmployerCode(), campaign.getGameYear());
+            contract.updateEmployer(getCurrentEmployerCode(), campaign.getGameYear());
         }
 
         if (getCurrentEnemyCode() != null) {
-            ((AtBContract) contract).setEnemyCode(getCurrentEnemyCode());
+            contract.setEnemyCode(getCurrentEnemyCode());
         }
 
         if (cbPlanets.getSelectedItem() != null) {

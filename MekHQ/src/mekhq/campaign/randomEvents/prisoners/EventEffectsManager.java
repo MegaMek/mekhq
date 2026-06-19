@@ -63,7 +63,7 @@ import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -930,9 +930,9 @@ public class EventEffectsManager {
 
         final int magnitude = result.magnitude();
 
-        Map<AtBContract, StratConCampaignState> potentialTargets = new HashMap<>();
+        Map<AbstractMissionTransition, StratConCampaignState> potentialTargets = new HashMap<>();
 
-        for (AtBContract contract : campaign.getActiveAtBContracts()) {
+        for (AbstractMissionTransition contract : campaign.getActiveAtBContracts()) {
             StratConCampaignState campaignState = contract.getStratConCampaignState();
 
             if (campaignState != null) {
@@ -944,7 +944,7 @@ public class EventEffectsManager {
             return "";
         }
 
-        AtBContract target = getRandomItem(potentialTargets.keySet());
+        AbstractMissionTransition target = getRandomItem(potentialTargets.keySet());
 
         StratConCampaignState targetState = potentialTargets.get(target);
         targetState.changeSupportPoints(magnitude);
@@ -1007,9 +1007,9 @@ public class EventEffectsManager {
      *       qualifies for the effect.
      */
     private String eventEffectUniqueBartering() {
-        List<AtBContract> potentialTargets = new ArrayList<>();
+        List<AbstractMissionTransition> potentialTargets = new ArrayList<>();
 
-        for (AtBContract contract : campaign.getActiveAtBContracts()) {
+        for (AbstractMissionTransition contract : campaign.getActiveAtBContracts()) {
             AtBMoraleLevel currentMorale = contract.getMoraleLevel();
 
             if (!currentMorale.isOverwhelming()) {
@@ -1021,7 +1021,7 @@ public class EventEffectsManager {
             return "";
         }
 
-        AtBContract target = getRandomItem(potentialTargets);
+        AbstractMissionTransition target = getRandomItem(potentialTargets);
 
         int moraleOrdinal = target.getMoraleLevel().ordinal();
         target.setMoraleLevel(AtBMoraleLevel.values()[moraleOrdinal + 1]);
@@ -1066,13 +1066,13 @@ public class EventEffectsManager {
      */
     private String eventEffectUniqueUndercover() {
         Person targetCharacter = getRandomTarget(false);
-        List<AtBContract> potentialContracts = campaign.getActiveAtBContracts();
+        List<AbstractMissionTransition> potentialContracts = campaign.getActiveAtBContracts();
 
         if (targetCharacter == null || potentialContracts.isEmpty()) {
             return "";
         }
 
-        AtBContract targetContract = getRandomItem(potentialContracts);
+        AbstractMissionTransition targetContract = getRandomItem(potentialContracts);
 
         Faction newFaction = targetContract.getEmployerFaction();
         targetCharacter.setOriginFaction(newFaction);
@@ -1167,8 +1167,8 @@ public class EventEffectsManager {
 
         int prisonerCount = d6();
 
-        List<AtBContract> potentialTargets = campaign.getActiveAtBContracts();
-        AtBContract targetContract = getRandomItem(potentialTargets);
+        List<AbstractMissionTransition> potentialTargets = campaign.getActiveAtBContracts();
+        AbstractMissionTransition targetContract = getRandomItem(potentialTargets);
         Faction targetFaction = targetContract.getEnemy();
 
         RandomOriginOptions originOptions = campaign.getCampaignOptions().getRandomOriginOptions();

@@ -58,7 +58,6 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.AbstractMissionTransition;
-import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
 import mekhq.gui.dialog.BayRentalDialog;
@@ -473,10 +472,10 @@ public class FacilityRentals {
      *       or location restrictions)
      */
     public static boolean processBayChangeRequest(Campaign campaign, Unit[] selectedUnits, int bayType) {
-        List<AtBContract> activeAtBContracts = campaign.getActiveAtBContracts();
+        List<AbstractMissionTransition> activeAtBContracts = campaign.getActiveAtBContracts();
         boolean isBayRentalAllowed = activeAtBContracts.isEmpty();
 
-        for (AtBContract atBContract : activeAtBContracts) {
+        for (AbstractMissionTransition atBContract : activeAtBContracts) {
             if (atBContract.getContractType().isGarrisonType()) {
                 isBayRentalAllowed = true;
                 break;

@@ -159,6 +159,7 @@ public class AtBContract extends AbstractMissionTransition {
         nextWeekBattleTypeMod = 0;
     }
 
+    @Override
     public void initContractDetails(Campaign campaign) {
         int companySize = getStandardFormationSize(campaign.getFaction(), COMPANY.getDepth());
         int battalionSize = getStandardFormationSize(campaign.getFaction(), BATTALION.getDepth());
@@ -424,13 +425,13 @@ public class AtBContract extends AbstractMissionTransition {
      * @return the numeric value of the best available repair location; returns {@link Unit#SITE_FACILITY_BASIC} if no
      *       contracts are active
      */
-    public static int getBestRepairLocation(List<AtBContract> activeContracts) {
+    public static int getBestRepairLocation(List<AbstractMissionTransition> activeContracts) {
         if (activeContracts.isEmpty()) {
             return Unit.SITE_FACILITY_BASIC;
         }
 
         int bestSite = Unit.SITE_IMPROVISED;
-        for (AtBContract contract : activeContracts) {
+        for (AbstractMissionTransition contract : activeContracts) {
             int repairLocation = contract.getRepairLocation();
             if (repairLocation > bestSite) {
                 bestSite = repairLocation;

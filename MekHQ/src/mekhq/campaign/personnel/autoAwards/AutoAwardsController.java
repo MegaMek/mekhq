@@ -324,7 +324,7 @@ public class AutoAwardsController {
         LocalDate today = campaign.getLocalDate();
 
         // Get the list of completed contracts from the campaign object.
-        List<AtBContract> completedContracts = campaign.getCompletedAtBContracts();
+        List<AbstractMissionTransition> completedContracts = campaign.getCompletedAtBContracts();
 
         // If there are no completed contracts, return the current date.
         if (completedContracts.isEmpty()) {
@@ -337,7 +337,7 @@ public class AutoAwardsController {
         return getLastContractEndingDate(completedContracts);
     }
 
-    private static LocalDate getLastContractEndingDate(List<AtBContract> completedContracts) {
+    private static LocalDate getLastContractEndingDate(List<AbstractMissionTransition> completedContracts) {
         LocalDate lastContractEndingDate = null;
 
         // Loop through each contract in the list of completed contracts.

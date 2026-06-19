@@ -1422,6 +1422,8 @@ public class AbstractMissionTransition {
     public void acceptContract(Campaign campaign) {
     }
 
+    public void initContractDetails(Campaign campaign) {}
+
     public void writeToXML(Campaign campaign, final PrintWriter printWriter, int indent) {
         indent = writeToXMLBegin(campaign, printWriter, indent);
         writeToXMLEnd(printWriter, indent);

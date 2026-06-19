@@ -2232,7 +2232,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all hangars across all locations associated with this campaign.
-     *                                                                                                                               TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     *                                                                                                                                     TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
      */
     public Hangar getAllHangar() {
         return units;
@@ -2868,7 +2868,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all warehouses across all locations associated with this campaign.
-     *                                                                                                                               TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
+     *                                                                                                                                     TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
      */
     public Warehouse getAllWarehouse() {
         return parts;
@@ -4528,8 +4528,8 @@ public class Campaign implements ITechManager, IPlace {
      *
      * @return the current deployment deficit for the contract
      */
-    public int getDeploymentDeficit(AtBContract contract) {
-        if (!contract.isActiveOn(getLocalDate()) || contract.getStartDate().isEqual(getLocalDate())) {
+    public int getDeploymentDeficit(AbstractMissionTransition contract) {
+        if (!contract.isActiveOn(getLocalDate()) || Objects.equals(contract.getStartDate(), getLocalDate())) {
             // Do not check for deficits if the contract has not started, or
             // it is the first day of the contract, as players won't have
             // had time to assign forces to the contract yet

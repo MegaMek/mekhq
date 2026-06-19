@@ -774,7 +774,7 @@ public class CampaignNewDayManager {
         int vocationalXpRate = campaignOptions.getVocationalXP();
         if (campaign.hasActiveContract()) {
             if (campaignOptions.isUseStratCon()) {
-                for (AtBContract contract : campaign.getActiveAtBContracts()) {
+                for (AbstractMissionTransition contract : campaign.getActiveAtBContracts()) {
                     if (!contract.getContractType().isGarrisonType()) {
                         vocationalXpRate *= 2;
                         break;
@@ -1081,7 +1081,7 @@ public class CampaignNewDayManager {
             /*
              * First of the month; roll Morale.
              */
-            for (AtBContract contract : campaign.getActiveAtBContracts()) {
+            for (AbstractMissionTransition contract : campaign.getActiveAtBContracts()) {
                 AtBMoraleLevel oldMorale = contract.getMoraleLevel();
 
                 contract.checkMorale(campaign, today);
@@ -1108,9 +1108,9 @@ public class CampaignNewDayManager {
             // campaign occurs at the end of the 1st day, each month to avoid an awkward mechanics interaction where
             // personnel might quit or get taken out of fatigue without the player having any opportunity to
             // intervene before their resupply attempt becomes active.
-            List<AtBContract> activeContracts = campaign.getActiveAtBContracts();
-            AtBContract firstNonSubcontract = null;
-            for (AtBContract contract : activeContracts) {
+            List<AbstractMissionTransition> activeContracts = campaign.getActiveAtBContracts();
+            AbstractMissionTransition firstNonSubcontract = null;
+            for (AbstractMissionTransition contract : activeContracts) {
                 if (!contract.isSubcontract()) {
                     firstNonSubcontract = contract;
                     break;
@@ -1140,7 +1140,7 @@ public class CampaignNewDayManager {
         processNewDayATBScenarios();
 
         // Daily events
-        for (AtBContract contract : campaign.getActiveAtBContracts()) {
+        for (AbstractMissionTransition contract : campaign.getActiveAtBContracts()) {
             if (campaignOptions.isUseGenericBattleValue() &&
                       !contract.getContractType().isGarrisonType() &&
                       contract.getStartDate().equals(today)) {
@@ -2140,11 +2140,11 @@ public class CampaignNewDayManager {
 
     private void processNewDayATBScenarios() {
         // First, we get the list of all active AtBContracts
-        List<AtBContract> contracts = campaign.getActiveAtBContracts(true);
+        List<AbstractMissionTransition> contracts = campaign.getActiveAtBContracts(true);
         Set<Integer> allScenariosWithAssignedStandardForces = getAllScenariosWithAssignedStandardForces();
 
         // Second, we process them and any already generated scenarios
-        for (AtBContract contract : contracts) {
+        for (AbstractMissionTransition contract : contracts) {
             /*
              * Situations like a delayed start or running out of funds during transit can delay arrival until after
              * the contract start. In that case, shift the starting and ending dates before making any battle rolls.

@@ -45,6 +45,7 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.Vector;
 import javax.swing.*;
@@ -153,8 +154,8 @@ public class ContractMarketDialog extends JDialog {
     private static List<String> getPossibleRetainerContracts(Campaign campaign) {
         HashMap<String, Integer> successfulContracts = new HashMap<>();
         List<String> retainers = new ArrayList<>();
-        for (AtBContract contract : campaign.getCompletedAtBContracts()) {
-            if (contract.getEmployerCode().equals(campaign.getRetainerEmployerCode())) {
+        for (AbstractMissionTransition contract : campaign.getCompletedAtBContracts()) {
+            if (Objects.equals(contract.getEmployerCode(), campaign.getRetainerEmployerCode())) {
                 continue;
             }
             int num = successfulContracts.getOrDefault(contract.getEmployerCode(), 0);

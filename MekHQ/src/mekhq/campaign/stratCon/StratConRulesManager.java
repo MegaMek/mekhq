@@ -405,7 +405,8 @@ public class StratConRulesManager {
      *
      * @throws IllegalArgumentException If {@code scenarioCoords} is specified while {@code track} is {@code null}.
      */
-    public static @Nullable StratConScenario generateExternalScenario(Campaign campaign, AtBContract contract,
+    public static @Nullable StratConScenario generateExternalScenario(Campaign campaign,
+          AbstractMissionTransition contract,
           @Nullable StratConTrackState track, @Nullable StratConCoords scenarioCoords,
           @Nullable ScenarioTemplate template, boolean allowPlayerFacilities, boolean allowPlayerForces,
           boolean emphasizeStrategicTargets, @Nullable Integer daysTilDeployment) {
@@ -627,11 +628,11 @@ public class StratConRulesManager {
      * Fetches a random {@link StratConTrackState} from the {@link StratConCampaignState}. If no tracks are present, it
      * logs an error message and returns {@code null}.
      *
-     * @param contract The {@link AtBContract} from which the track state will be fetched.
+     * @param contract The {@link AbstractMissionTransition} from which the track state will be fetched.
      *
      * @return The randomly chosen {@link StratConTrackState}, or {@code null} if no tracks are available.
      */
-    public static @Nullable StratConTrackState getRandomTrack(AtBContract contract) {
+    public static @Nullable StratConTrackState getRandomTrack(AbstractMissionTransition contract) {
         List<StratConTrackState> tracks = contract.getStratConCampaignState().getTracks();
         Random rand = new Random();
 

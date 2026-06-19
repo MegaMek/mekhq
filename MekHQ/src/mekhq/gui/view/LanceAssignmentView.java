@@ -56,6 +56,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.gui.model.DataTableModel;
@@ -80,7 +81,7 @@ public class LanceAssignmentView extends JPanel {
     private JTable tblAssignments;
     private JLabel lblDeploymentSummary;
     private JPanel panRequiredLances;
-    private JComboBox<AtBContract> cbContract;
+    private JComboBox<AbstractMissionTransition> cbContract;
     private RequiredLancesTableModel requiredLancesModel;
     private LanceAssignmentTableModel lanceAssignmentModel;
     private Runnable assignmentChangeListener;
@@ -227,20 +228,20 @@ public class LanceAssignmentView extends JPanel {
         tblAssignments.setFillsViewportHeight(true);
         styleAssignmentTable(tblAssignments);
 
-                JPanel deploymentSummaryPanel = BriefingStyle.createSectionPanel(
+        JPanel deploymentSummaryPanel = BriefingStyle.createSectionPanel(
               resourceMap.getString("briefingTab.assignments.coverage.title"));
         lblDeploymentSummary = new JLabel();
         styleCompactComponent(lblDeploymentSummary);
         deploymentSummaryPanel.add(lblDeploymentSummary, BorderLayout.CENTER);
         add(deploymentSummaryPanel, BorderLayout.PAGE_START);
 
-                panRequiredLances = BriefingStyle.createSectionPanel(resourceMap.getString(
+        panRequiredLances = BriefingStyle.createSectionPanel(resourceMap.getString(
               "briefingTab.assignments.requirements.title"));
         JScrollPane requiredLancesScrollPane = new FastJScrollPane(tblRequiredLances);
         requiredLancesScrollPane.setBorder(BorderFactory.createEmptyBorder());
         panRequiredLances.add(requiredLancesScrollPane, BorderLayout.CENTER);
 
-                JPanel panAssignments = BriefingStyle.createSectionPanel(resourceMap.getString(
+        JPanel panAssignments = BriefingStyle.createSectionPanel(resourceMap.getString(
               "briefingTab.assignments.current.title"));
         JScrollPane assignmentsScrollPane = new FastJScrollPane(tblAssignments);
         assignmentsScrollPane.setBorder(BorderFactory.createEmptyBorder());
@@ -288,11 +289,11 @@ public class LanceAssignmentView extends JPanel {
 
     public void refresh() {
         cbContract.removeAllItems();
-        List<AtBContract> activeContracts = campaign.getActiveAtBContracts();
-        for (AtBContract contract : activeContracts) {
+        List<AbstractMissionTransition> activeContracts = campaign.getActiveAtBContracts();
+        for (AbstractMissionTransition contract : activeContracts) {
             cbContract.addItem(contract);
         }
-        AtBContract defaultContract = activeContracts.isEmpty() ? null : activeContracts.getFirst();
+        AbstractMissionTransition defaultContract = activeContracts.isEmpty() ? null : activeContracts.getFirst();
         for (CombatTeam combatTeam : campaign.getCombatTeamsAsMap().values()) {
             if ((combatTeam.getContract(campaign) == null) ||
                       !combatTeam.getContract(campaign).isActiveOn(campaign.getLocalDate(), true)) {
@@ -300,7 +301,7 @@ public class LanceAssignmentView extends JPanel {
             }
         }
 
-        ((DataTableModel<AtBContract>) tblRequiredLances.getModel()).setData(activeContracts);
+        ((DataTableModel<AbstractMissionTransition>) tblRequiredLances.getModel()).setData(activeContracts);
         ((DataTableModel<CombatTeam>) tblAssignments.getModel()).setData(campaign.getCombatTeamsAsList());
         panRequiredLances.setVisible(tblRequiredLances.getRowCount() > 0);
         updateDeploymentSummary();
@@ -314,9 +315,9 @@ public class LanceAssignmentView extends JPanel {
         }
 
         List<String> shortfalls = requiredLancesModel.getDeploymentShortfallSummaries()
-                                      .stream()
-                                      .map(this::escapeHtml)
-                                      .toList();
+                                        .stream()
+                                        .map(this::escapeHtml)
+                                        .toList();
 
         if (shortfalls.isEmpty()) {
             lblDeploymentSummary.setForeground(null);

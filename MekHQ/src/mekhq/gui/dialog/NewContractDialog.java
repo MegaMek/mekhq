@@ -75,7 +75,7 @@ public class NewContractDialog extends JDialog {
     private static final MMLogger LOGGER = MMLogger.create(NewContractDialog.class);
 
     protected JFrame frame;
-    protected Contract contract;
+    protected AbstractMissionTransition contract;
     protected Campaign campaign;
     private JComboBox<Person> cboNegotiator;
 

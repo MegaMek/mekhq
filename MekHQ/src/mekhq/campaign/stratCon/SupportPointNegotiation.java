@@ -153,13 +153,14 @@ public class SupportPointNegotiation {
      * assigned, and support points are added to the contract if successfully negotiated.</p>
      *
      * @param campaign             The {@link Campaign} instance managing the current game state.
-     * @param contract             The {@link AtBContract} instance for which support points are being processed.
+     * @param contract             The {@link AbstractMissionTransition} instance for which support points are being
+     *                             processed.
      * @param adminTransport       A {@link List} of available {@link Person} objects representing Admin/Transport
      *                             personnel.
      * @param isInitialNegotiation {@code true} if the negotiation took place at the beginning of the contract,
      *                             otherwise {@code false}
      */
-    private static void processContractSupportPoints(Campaign campaign, AtBContract contract,
+    private static void processContractSupportPoints(Campaign campaign, AbstractMissionTransition contract,
           List<Person> adminTransport, boolean isInitialNegotiation) {
         int negotiatedSupportPoints = 0;
         int maxSupportPoints = isInitialNegotiation ?

@@ -155,11 +155,11 @@ public class CombatTeam {
         return missionId;
     }
 
-    public AtBContract getContract(Campaign campaign) {
-        return (AtBContract) campaign.getMission(missionId);
+    public AbstractMissionTransition getContract(Campaign campaign) {
+        return (AbstractMissionTransition) campaign.getMission(missionId);
     }
 
-    public void setContract(AtBContract atBContract) {
+    public void setContract(AbstractMissionTransition atBContract) {
         if (null == atBContract) {
             missionId = NO_MISSION;
         } else {

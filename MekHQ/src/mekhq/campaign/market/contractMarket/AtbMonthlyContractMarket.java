@@ -293,7 +293,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         }
     }
 
-    private void checkForSubcontracts(Campaign campaign, AtBContract contract, int unitRatingMod) {
+    private void checkForSubcontracts(Campaign campaign, AbstractMissionTransition contract, int unitRatingMod) {
         if (contract.getContractType().isGarrisonDuty()) {
             int numSubcontracts = 0;
             for (AbstractMissionTransition mission : campaign.getAtBContracts()) {
@@ -306,7 +306,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             for (int i = numSubcontracts; i < unitRatingMod - 1; i++) {
                 int roll = d6(2);
                 if (roll >= 10) {
-                    AtBContract sub = generateAtBSubcontract(campaign, contract, unitRatingMod);
+                    AbstractMissionTransition sub = generateAtBSubcontract(campaign, contract, unitRatingMod);
                     LocalDate subEndingDate = sub.getEndingDate();
                     LocalDate contractEndingDate = contract.getEndingDate();
 
@@ -554,8 +554,9 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
               contract.getContractType());
     }
 
-    protected AtBContract generateAtBSubcontract(Campaign campaign, AtBContract parent, int unitRatingMod) {
-        AtBContract contract = new AtBContract("New Subcontract");
+    protected AtBContract generateAtBSubcontract(Campaign campaign, AbstractMissionTransition parent,
+          int unitRatingMod) {
+        AbstractMissionTransition contract = new AtBContract("New Subcontract");
         contract.updateEmployer(parent.getEmployerCode(), campaign.getGameYear());
         getContractType(contract);
 
@@ -667,7 +668,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
      * @author Illiani
      * @since 0.50.10
      */
-    private void getContractType(AtBContract contract) {
+    private void getContractType(AbstractMissionTransition contract) {
         // Commander modifier is always 0 here as otherwise is skews AtB's results too much
         contract.setContractTypeAndName(ContractTypePicker.findMissionType(contract.getEmployerFaction(), 0));
     }
