@@ -54,7 +54,7 @@ import java.util.List;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.AbstractMissionTransition;
-import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -254,8 +254,8 @@ public class PrisonerMissionEndEvent {
      */
     private LocalDate getContractOrMissionStartDate() {
         LocalDate startDate = null;
-        if (mission instanceof Contract) {
-            startDate = ((Contract) mission).getStartDate();
+        if (!(mission instanceof Mission)) {
+            startDate = mission.getStartDate();
         } else {
             for (Scenario scenario : mission.getCompletedScenarios()) {
                 LocalDate scenarioDate = scenario.getDate();

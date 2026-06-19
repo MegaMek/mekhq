@@ -1723,7 +1723,7 @@ public class Campaign implements ITechManager, IPlace {
      */
     public void setHasActiveContract() {
         hasActiveContract = getMissions().stream()
-                                  .anyMatch(c -> (c instanceof Contract) && c.isActiveOn(getLocalDate()));
+                                  .anyMatch(c -> !(c instanceof Mission) && c.isActiveOn(getLocalDate()));
     }
     // endregion Missions/Contracts
 
@@ -2232,7 +2232,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all hangars across all locations associated with this campaign.
-     *                                                                                                                                     TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     *                                                                                                                                                 TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
      */
     public Hangar getAllHangar() {
         return units;
@@ -2868,7 +2868,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all warehouses across all locations associated with this campaign.
-     *                                                                                                                                     TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
+     *                                                                                                                                                 TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
      */
     public Warehouse getAllWarehouse() {
         return parts;
@@ -8614,10 +8614,10 @@ public class Campaign implements ITechManager, IPlace {
             /*
              * Switch all contracts to AtBContract's
              */
-            for (Entry<Integer, AbstractMissionTransition> me : missions.entrySet()) {
-                AbstractMissionTransition m = me.getValue();
-                if (m instanceof Contract && !(m instanceof AtBContract)) {
-                    me.setValue(new AtBContract((Contract) m, this));
+            for (Entry<Integer, AbstractMissionTransition> missionEntry : missions.entrySet()) {
+                AbstractMissionTransition mission = missionEntry.getValue();
+                if (!(mission instanceof Mission)) {
+                    missionEntry.setValue(new AtBContract((Contract) mission, this));
                 }
             }
 

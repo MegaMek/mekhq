@@ -37,7 +37,7 @@ import java.util.Objects;
 
 import megamek.common.event.MMEvent;
 import mekhq.campaign.mission.AbstractMissionTransition;
-import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.Mission;
 
 /**
  * Abstract base class for events involving missions or contracts.
@@ -55,6 +55,6 @@ public abstract class MissionEvent extends MMEvent {
     }
 
     public boolean isContract() {
-        return mission instanceof Contract;
+        return !(mission instanceof Mission);
     }
 }

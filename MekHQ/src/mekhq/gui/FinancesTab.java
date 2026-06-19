@@ -71,7 +71,7 @@ import mekhq.campaign.finances.FinancialReport;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.finances.WeeklyNetWorth;
-import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.Mission;
 import mekhq.gui.adapter.FinanceTableMouseAdapter;
 import mekhq.gui.adapter.LoanTableMouseAdapter;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
@@ -690,14 +690,14 @@ public final class FinancesTab extends CampaignGuiTab {
 
     @Subscribe
     public void handle(MissionNewEvent ev) {
-        if (ev.getMission() instanceof Contract) {
+        if (!(ev.getMission() instanceof Mission)) {
             financialReportScheduler.schedule();
         }
     }
 
     @Subscribe
     public void handle(MissionChangedEvent ev) {
-        if (ev.getMission() instanceof Contract) {
+        if (!(ev.getMission() instanceof Mission)) {
             financialReportScheduler.schedule();
         }
     }

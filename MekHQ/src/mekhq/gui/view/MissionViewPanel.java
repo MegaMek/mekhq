@@ -63,6 +63,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.Mission;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.JScrollablePanel;
@@ -172,7 +173,7 @@ public class MissionViewPanel extends JScrollablePanel {
     private void fillStats() {
         if (mission instanceof AtBContract) {
             fillStatsAtBContract();
-        } else if (mission instanceof Contract) {
+        } else if (!(mission instanceof Mission)) {
             fillStatsContract();
         } else {
             fillStatsBasic();

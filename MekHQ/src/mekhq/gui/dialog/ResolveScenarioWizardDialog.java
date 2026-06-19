@@ -82,10 +82,12 @@ import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
 import mekhq.campaign.ResolveScenarioTracker.UnitStatus;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.MHQMorale;
+import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.ScenarioObjectiveProcessor;
 import mekhq.campaign.mission.enums.ScenarioStatus;
@@ -217,7 +219,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
         loots = tracker.getPotentialLoot();
         salvageableUnites = new ArrayList<>();
         isUseCamOpsSalvage = campaign.getCampaignOptions().isUseCamOpsSalvage();
-        if (tracker.getMission() instanceof Contract contract) {
+        AbstractMissionTransition contract = tracker.getMission();
+        if (!(contract instanceof Mission)) {
             salvageEmployer = contract.getSalvagedByEmployer();
             salvageUnit = contract.getSalvagedByUnit();
             maxSalvagePct = contract.getSalvagePercent();
@@ -605,7 +608,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         int gridx = 0;
         int gridY = 0;
         GridBagConstraints gridBagConstraints;
-        if ((tracker.getMission() instanceof Contract) && !tracker.usesSalvageExchange()) {
+        if (!(tracker.getMission() instanceof Mission) && !tracker.usesSalvageExchange()) {
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridwidth = 1;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
@@ -1723,7 +1726,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
                 case PILOT_PANEL -> !tracker.getPeopleStatus().isEmpty();
                 case PRISONER_PANEL -> !tracker.getOppositionPersonnel().isEmpty();
                 case SALVAGE_PANEL -> !tracker.getPotentialSalvage().isEmpty() &&
-                                            (!(tracker.getMission() instanceof Contract) ||
+                                            (tracker.getMission() instanceof Mission ||
                                                    ((Contract) tracker.getMission()).canSalvage());
                 case KILLS_PANEL -> !tracker.getKillCredits().isEmpty();
                 case REWARD_PANEL -> !loots.isEmpty();
@@ -1838,7 +1841,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             }
         }
 
-        if (!(tracker.getMission() instanceof Contract) || tracker.usesSalvageExchange()) {
+        if (tracker.getMission() instanceof Mission || tracker.usesSalvageExchange()) {
             return;
         }
         salvageEmployer = ((Contract) tracker.getMission()).getSalvagedByEmployer();

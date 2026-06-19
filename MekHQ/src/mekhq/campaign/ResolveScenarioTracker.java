@@ -77,7 +77,6 @@ import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
-import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
@@ -2120,8 +2119,9 @@ public class ResolveScenarioTracker {
      * @return {@code true} if the current mission uses a salvage exchange, {@code false} otherwise.
      */
     public boolean usesSalvageExchange() {
-        if (getMission() instanceof Contract contract) {
-            if (contract.isSalvageExchange()) {
+        AbstractMissionTransition mission = getMission();
+        if (!(mission instanceof Mission)) {
+            if (mission.isSalvageExchange()) {
                 return true;
             }
         }
