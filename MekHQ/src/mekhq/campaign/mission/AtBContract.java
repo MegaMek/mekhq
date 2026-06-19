@@ -109,7 +109,7 @@ import org.w3c.dom.NodeList;
  *
  * @author Neoancient
  */
-public class AtBContract extends Contract {
+public class AtBContract extends AbstractMissionTransition {
     private static final MMLogger logger = MMLogger.create(AtBContract.class);
 
     /* null unless subcontract */
