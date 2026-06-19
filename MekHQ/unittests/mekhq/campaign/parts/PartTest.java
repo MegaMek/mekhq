@@ -459,8 +459,8 @@ public class PartTest {
             when(mockUnit.getId()).thenReturn(UUID.randomUUID());
             when(mockUnit.getEntity()).thenReturn(mockEntity);
             LocationNode unitNode = new LocationNode(mockUnit);
-            LocationNode.LocationManager.setLocation(unitNode, base.getBaseHangar().getLocationNode());
             when(mockUnit.getLocationNode()).thenReturn(unitNode);
+            LocationNode.LocationManager.setLocation(mockUnit, base.getBaseHangar());
 
             Part part = new MekSensor();
             part.setCampaign(mockCampaign);
