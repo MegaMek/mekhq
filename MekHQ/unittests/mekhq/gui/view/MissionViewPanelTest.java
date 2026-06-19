@@ -76,7 +76,7 @@ class MissionViewPanelTest {
     @Test
     void activeContractWithoutCurrentLocationDoesNotShowTimeline() {
         assertFalse(MissionViewPanel.shouldShowContractTimeline(
-              campaignOnDateWithoutCurrentLocation(CONTRACT_SYSTEM),
+              campaignOnDateWithoutCurrentLocation(),
               contractAt(CONTRACT_SYSTEM, true)));
     }
 
@@ -116,16 +116,15 @@ class MissionViewPanelTest {
         final Campaign campaign = mock(Campaign.class);
         final AbstractLocation currentLocation = mock(AbstractLocation.class);
         when(campaign.getLocalDate()).thenReturn(CAMPAIGN_DATE);
-        when(campaign.getCurrentSystem()).thenReturn(currentSystem);
         when(campaign.getCurrentLocation()).thenReturn(currentLocation);
+        when(currentLocation.getCurrentSystem()).thenReturn(currentSystem);
         when(currentLocation.isOnPlanet()).thenReturn(onPlanet);
         return campaign;
     }
 
-    private static Campaign campaignOnDateWithoutCurrentLocation(PlanetarySystem currentSystem) {
+    private static Campaign campaignOnDateWithoutCurrentLocation() {
         final Campaign campaign = mock(Campaign.class);
         when(campaign.getLocalDate()).thenReturn(CAMPAIGN_DATE);
-        when(campaign.getCurrentSystem()).thenReturn(currentSystem);
         when(campaign.getCurrentLocation()).thenReturn(null);
         return campaign;
     }
@@ -134,8 +133,8 @@ class MissionViewPanelTest {
         final Campaign campaign = mock(Campaign.class);
         final AbstractLocation currentLocation = mock(AbstractLocation.class);
         when(campaign.getLocalDate()).thenReturn(CAMPAIGN_DATE);
-        when(campaign.getCurrentSystem()).thenReturn(currentSystem);
         when(campaign.getCurrentLocation()).thenReturn(currentLocation);
+        when(currentLocation.getCurrentSystem()).thenReturn(currentSystem);
         when(currentLocation.isOnPlanet()).thenReturn(false);
         when(currentLocation.isAtJumpPoint()).thenReturn(atJumpPoint);
         return campaign;
