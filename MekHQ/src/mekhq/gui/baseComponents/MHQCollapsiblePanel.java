@@ -139,11 +139,12 @@ public class MHQCollapsiblePanel extends JPanel {
     }
 
     public void setSummary(String summary) {
-        summaryLabel.setText(summary == null ? "" : summary);
-        // Deliberately keep the summary label showing even when empty. It is the only header cell carrying horizontal
-        // weight (weightx=1.0) in the GridBagLayout, so it absorbs the slack and keeps the icon and title left-aligned.
-        // If it were hidden, GridBagLayout would drop its cell, and with every remaining cell at weightx=0 the layout
-        // would center the icon+title in the header - making the title look centered for callers that set no summary.
+        // Normalize null or whitespace-only input to the empty string so an "unset" summary can't introduce stray
+        // header spacing or a tooltip. The label is still kept visible because it is the only header cell carrying
+        // horizontal weight (weightx=1.0) in the GridBagLayout, so it absorbs the slack and keeps the icon and title
+        // left-aligned. If it were hidden, GridBagLayout would drop its cell, and with every remaining cell at
+        // weightx=0 the layout would center the icon+title in the header.
+        summaryLabel.setText((summary == null) || summary.isBlank() ? "" : summary);
         summaryLabel.setVisible(true);
     }
 
