@@ -107,8 +107,6 @@ import mekhq.Utilities;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ExtraData;
-import mekhq.campaign.FixedLocation;
-import mekhq.campaign.JumpPath;
 import mekhq.campaign.Personnel;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.persons.PersonChangedEvent;
@@ -2721,7 +2719,8 @@ public class Person implements ILocation {
      *
      * <p>This value is a snapshot recorded at enrollment or journey-start and may not reflect the
      * actual remaining travel time. The person's {@link AbstractLocation} (accessible via
-     * {@link #getCurrentLocation()}) holds the authoritative travel state including the live {@link JumpPath}.</p>
+     * {@link #getCurrentLocation()}) holds the authoritative travel state including the live
+     * {@link mekhq.campaign.JumpPath}.</p>
      */
     public int getEduJourneyTime() {
         return eduJourneyTime;
@@ -2736,7 +2735,8 @@ public class Person implements ILocation {
      *
      * <p>This counter is incremented each day during JOURNEY_TO_CAMPUS and JOURNEY_FROM_CAMPUS
      * stages as a rough progress indicator. The person's {@link AbstractLocation} (accessible via
-     * {@link #getCurrentLocation()}) holds the authoritative travel state including the live {@link JumpPath}.</p>
+     * {@link #getCurrentLocation()}) holds the authoritative travel state including the live
+     * {@link mekhq.campaign.JumpPath}.</p>
      */
     public int getEduDaysOfTravel() {
         return eduDaysOfTravel;
@@ -2760,7 +2760,7 @@ public class Person implements ILocation {
      *
      * <p>The primary source is the location tree: this walks the person's parent chain to find
      * the nearest {@link AcademyCampusLocation}, then returns the system ID from its parent {@link AbstractLocation}
-     * (typically a {@link FixedLocation}).</p>
+     * (typically a {@link mekhq.campaign.FixedLocation}).</p>
      *
      * <p>If no campus node is reachable in the tree — for example, during JOURNEY_FROM_CAMPUS,
      * a local-academy transit before campus arrival, or when loading a pre-location-tree save file — this falls back to
@@ -6547,8 +6547,8 @@ public class Person implements ILocation {
         // Techs get support time adjusted by skill and administration multipliers
         if (isTechExpanded() && isTechsUseAdministration) {
             double multiplier = calculateTechTimeMultiplier(isTechsUseAdministration);
-            this.minutesLeft = (int) round(minutesLeft * multiplier);
-            this.overtimeLeft = (int) round(overtimeLeft * multiplier);
+            this.minutesLeft = (int) Math.round(minutesLeft * multiplier);
+            this.overtimeLeft = (int) Math.round(overtimeLeft * multiplier);
         }
     }
 
@@ -6790,7 +6790,7 @@ public class Person implements ILocation {
         // Infantry don't need techs to reload or swap out their ammo
         boolean isForConventionalInfantry = unit != null && unit.isConventionalInfantry();
         if (isForConventionalInfantry) {
-            SkillType mechanicSkillType = getType(S_TECH_MECHANIC);
+            SkillType mechanicSkillType = SkillType.getType(S_TECH_MECHANIC);
             return new Skill(S_TECH_MECHANIC, mechanicSkillType.getRegularLevel(), 0);
         }
 
@@ -7566,7 +7566,7 @@ public class Person implements ILocation {
 
     public List<InjuryEffect> getActiveInjuryEffects() {
         boolean isAmbidextrous = options.booleanOption(ATOW_AMBIDEXTROUS);
-        return getAllActiveInjuryEffects(isAmbidextrous, injuries);
+        return AdvancedMedicalAlternate.getAllActiveInjuryEffects(isAmbidextrous, injuries);
     }
 
     public int getTotalInjurySeverity() {
@@ -8041,8 +8041,8 @@ public class Person implements ILocation {
     }
 
     @Override
-    public Set<Person> fetchPersonnelAtLocation() {
-        return Set.of(this);
+    public java.util.Set<Person> fetchPersonnelAtLocation() {
+        return java.util.Set.of(this);
     }
 
     public List<Skill> getInProgressSkills() {
@@ -9278,7 +9278,7 @@ public class Person implements ILocation {
      * @since 0.50.10
      */
     public SkillModifierData getSkillModifierData(boolean excludeInjuryEffects) {
-        boolean isAmbidextrous = options.booleanOption(ATOW_AMBIDEXTROUS);
+        boolean isAmbidextrous = options.booleanOption(PersonnelOptions.ATOW_AMBIDEXTROUS);
         List<InjuryEffect> injuryEffects = excludeInjuryEffects ? new ArrayList<>() :
                                                  getAllActiveInjuryEffects(isAmbidextrous,
                                                        injuries);
@@ -9331,7 +9331,7 @@ public class Person implements ILocation {
           boolean excludeInjuryEffects) {
         int adjustedReputation = getAdjustedReputation(isUseAgingEffects, isClanCampaign, today, rank);
 
-        boolean isAmbidextrous = options.booleanOption(ATOW_AMBIDEXTROUS);
+        boolean isAmbidextrous = options.booleanOption(PersonnelOptions.ATOW_AMBIDEXTROUS);
         List<InjuryEffect> injuryEffects = excludeInjuryEffects ?
                                                  new ArrayList<>() :
                                                  getAllActiveInjuryEffects(isAmbidextrous,
