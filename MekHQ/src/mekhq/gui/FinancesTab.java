@@ -82,6 +82,7 @@ import mekhq.gui.dialog.NewLoanDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.FinanceTableModel;
 import mekhq.gui.model.LoanTableModel;
+import mekhq.gui.sorter.DateStringComparator;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -148,6 +149,7 @@ public final class FinancesTab extends CampaignGuiTab {
         JTable financeTable = new JTable(financeModel);
         // make column headers in the table clickable and sortable
         TableRowSorter<TableModel> sorter = new TableRowSorter<>(financeTable.getModel());
+        sorter.setComparator(FinanceTableModel.COL_DATE, new DateStringComparator());
         sorter.setComparator(FinanceTableModel.COL_DEBIT, new FormattedNumberSorter());
         sorter.setComparator(FinanceTableModel.COL_CREDIT, new FormattedNumberSorter());
         sorter.setComparator(FinanceTableModel.COL_BALANCE, new FormattedNumberSorter());
