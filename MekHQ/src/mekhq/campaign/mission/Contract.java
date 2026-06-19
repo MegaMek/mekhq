@@ -55,7 +55,7 @@ import org.w3c.dom.Node;
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
-public class Contract extends Mission {
+public class Contract extends AbstractMissionTransition {
     private static final MMLogger logger = MMLogger.create(Contract.class);
 
     public Contract() {
@@ -63,7 +63,8 @@ public class Contract extends Mission {
     }
 
     public Contract(String name, String employer) {
-        super(name);
+        super();
+        setName(name);
         setEmployerName(employer);
 
         setLengthInMonths(12);

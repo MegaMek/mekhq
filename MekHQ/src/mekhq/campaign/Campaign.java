@@ -1487,7 +1487,7 @@ public class Campaign implements ITechManager, IPlace {
      *
      * @return the mission in question
      */
-    public @Nullable Mission getMission(int id) {
+    public @Nullable AbstractMissionTransition getMission(int id) {
         return missions.get(id);
     }
 
@@ -1701,8 +1701,8 @@ public class Campaign implements ITechManager, IPlace {
     /**
      * Adds scenario to existing mission, generating a report.
      */
-    public void addScenario(Scenario s, Mission m) {
-        addScenario(s, m, false);
+    public void addScenario(Scenario scenario, AbstractMissionTransition mission) {
+        addScenario(scenario, mission, false);
     }
 
     /**
@@ -1715,24 +1715,24 @@ public class Campaign implements ITechManager, IPlace {
      * <code>createScenariosForNewWeek</code> to
      * ensure that scenarios are generated properly.
      *
-     * @param s              - the Scenario to add
-     * @param m              - the mission to add the new scenario to
+     * @param scenario       - the Scenario to add
+     * @param mission        - the mission to add the new scenario to
      * @param suppressReport - whether to suppress the campaign report
      */
-    public void addScenario(Scenario s, Mission m, boolean suppressReport) {
-        final boolean newScenario = s.getId() == Scenario.S_DEFAULT_ID;
-        final int id = newScenario ? ++lastScenarioId : s.getId();
-        s.setId(id);
-        m.addScenario(s);
-        scenarios.put(id, s);
+    public void addScenario(Scenario scenario, AbstractMissionTransition mission, boolean suppressReport) {
+        final boolean newScenario = scenario.getId() == Scenario.S_DEFAULT_ID;
+        final int id = newScenario ? ++lastScenarioId : scenario.getId();
+        scenario.setId(id);
+        mission.addScenario(scenario);
+        scenarios.put(id, scenario);
 
         if (newScenario && !suppressReport) {
             addReport(BATTLE, MessageFormat.format(resources.getString("newAtBScenario.format"),
-                  s.getHyperlinkedName(),
-                  MekHQ.getMHQOptions().getDisplayFormattedDate(s.getDate())));
+                  scenario.getHyperlinkedName(),
+                  MekHQ.getMHQOptions().getDisplayFormattedDate(scenario.getDate())));
         }
 
-        MekHQ.triggerEvent(new ScenarioNewEvent(s));
+        MekHQ.triggerEvent(new ScenarioNewEvent(scenario));
     }
 
     public Scenario getScenario(int id) {
@@ -2203,7 +2203,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all hangars across all locations associated with this campaign.
-     *                               TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     *                                     TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
      */
     public Hangar getAllHangar() {
         return units;
@@ -2839,7 +2839,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all warehouses across all locations associated with this campaign.
-     *                               TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
+     *                                     TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
      */
     public Warehouse getAllWarehouse() {
         return parts;

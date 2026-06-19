@@ -981,7 +981,7 @@ public class AtBContract extends Contract {
      */
     public void restore(Campaign c) {
         if (parentContract != null) {
-            Mission m = c.getMission(parentContract.getId());
+            AbstractMissionTransition m = c.getMission(parentContract.getId());
             if (m != null) {
                 if (m instanceof AtBContract) {
                     setParentContract((AtBContract) m);
