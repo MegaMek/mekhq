@@ -97,6 +97,12 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+/*
+ * This is a utility class designed to facilitate the transition old Mission, Contract, and AtBContract objects to
+ * modern classes. It is effectively deprecated on day of birth as it is not intended to outlive the old Mission,
+ * Contract, or AtBContract classes.
+ */
+@Deprecated(since = "0.51.01", forRemoval = false)
 public class AbstractMission {
     private static final MMLogger LOGGER = MMLogger.create(AbstractMission.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.AbstractMission";

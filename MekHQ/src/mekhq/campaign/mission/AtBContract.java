@@ -115,6 +115,7 @@ import org.w3c.dom.NodeList;
  *
  * @author Neoancient
  */
+@Deprecated(since = "0.51.01", forRemoval = false)
 public class AtBContract extends Contract {
     private static final MMLogger logger = MMLogger.create(AtBContract.class);
 
