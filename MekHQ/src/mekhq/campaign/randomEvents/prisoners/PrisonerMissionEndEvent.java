@@ -53,8 +53,8 @@ import java.util.List;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -73,7 +73,7 @@ public class PrisonerMissionEndEvent {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
 
     private final Campaign campaign;
-    private final Mission mission;
+    private final AbstractMissionTransition mission;
     private boolean isSuccess;
     private boolean isAllied;
 
@@ -89,7 +89,7 @@ public class PrisonerMissionEndEvent {
      * @param campaign The current campaign instance, providing context and data about prisoners and finances.
      * @param mission  The current mission related to this event.
      */
-    public PrisonerMissionEndEvent(Campaign campaign, Mission mission) {
+    public PrisonerMissionEndEvent(Campaign campaign, AbstractMissionTransition mission) {
         this.campaign = campaign;
         this.mission = mission;
     }

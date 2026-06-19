@@ -51,6 +51,7 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
@@ -63,7 +64,7 @@ import mekhq.gui.utilities.MarkdownEditorPanel;
 public class CustomizeMissionDialog extends JDialog {
     private static final MMLogger LOGGER = MMLogger.create(CustomizeMissionDialog.class);
 
-    private final Mission mission;
+    private final AbstractMissionTransition mission;
     private final Campaign campaign;
     private final boolean newMission;
 
@@ -72,7 +73,7 @@ public class CustomizeMissionDialog extends JDialog {
     private MarkdownEditorPanel txtDesc;
     private JSuggestField suggestPlanet;
 
-    public CustomizeMissionDialog(JFrame parent, boolean modal, Mission m, Campaign c) {
+    public CustomizeMissionDialog(JFrame parent, boolean modal, AbstractMissionTransition m, Campaign c) {
         super(parent, modal);
         if (null == m) {
             mission = new Mission("New Mission");

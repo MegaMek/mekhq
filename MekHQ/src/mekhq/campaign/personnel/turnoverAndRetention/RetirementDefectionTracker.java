@@ -1017,7 +1017,7 @@ public class RetirementDefectionTracker {
         return getRetirees(null);
     }
 
-    public Set<UUID> getRetirees(final @Nullable Mission mission) {
+    public Set<UUID> getRetirees(final @Nullable AbstractMissionTransition mission) {
         return (mission == null) ? payouts.keySet() : unresolvedPersonnel.get(mission.getId());
     }
 

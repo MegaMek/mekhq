@@ -267,7 +267,7 @@ public class StratConRulesManager {
      * @param scenarioCount The number of scenarios to generate.
      */
     public static void generateDailyScenariosForTrack(Campaign campaign, StratConCampaignState campaignState,
-          AtBContract contract, int scenarioCount) {
+          AbstractMissionTransition contract, int scenarioCount) {
         // get this list just so we have it available
         List<Integer> availableForceIDs = getAvailableForceIDs(campaign, contract, false);
 

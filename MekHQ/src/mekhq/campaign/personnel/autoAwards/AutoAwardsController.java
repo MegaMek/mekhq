@@ -51,6 +51,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
@@ -148,7 +149,8 @@ public class AutoAwardsController {
      * @param missionWasSuccessful true if the Mission was a complete Success, otherwise false
      * @param POWPersonnel         a list of persons that have been a prisoner of war in the current mission
      */
-    public void PostMissionController(Campaign campaign, Mission mission, Boolean missionWasSuccessful,
+    public void PostMissionController(Campaign campaign, AbstractMissionTransition mission,
+          Boolean missionWasSuccessful,
           @Nullable List<Person> POWPersonnel) {
         logger.info("autoAwards (Mission Conclusion) has started");
 

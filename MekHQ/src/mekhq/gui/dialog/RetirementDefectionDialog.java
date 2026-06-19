@@ -71,7 +71,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.unit.Unit;
@@ -97,7 +97,7 @@ public class RetirementDefectionDialog extends JDialog {
     private String currentPanel;
 
     final private CampaignGUI hqView;
-    final private Mission contract;
+    final private AbstractMissionTransition contract;
     final private RetirementDefectionTracker rdTracker;
 
     private Map<UUID, TargetRoll> targetRolls;
@@ -139,7 +139,7 @@ public class RetirementDefectionDialog extends JDialog {
     private final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.RetirementDefectionDialog",
           MekHQ.getMHQOptions().getLocale());
 
-    public RetirementDefectionDialog(CampaignGUI gui, Mission mission, boolean doRetirement) {
+    public RetirementDefectionDialog(CampaignGUI gui, AbstractMissionTransition mission, boolean doRetirement) {
         super(gui.getFrame(), true);
         hqView = gui;
         unitAssignments = new HashMap<>();

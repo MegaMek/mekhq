@@ -33,14 +33,14 @@
 
 package mekhq.campaign.events.missions;
 
-import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.AbstractMissionTransition;
 
 /**
  * Triggered when a mission is resolved.
  */
 public class MissionCompletedEvent extends MissionChangedEvent {
 
-    public MissionCompletedEvent(Mission mission) {
+    public MissionCompletedEvent(AbstractMissionTransition mission) {
         super(mission);
     }
 
