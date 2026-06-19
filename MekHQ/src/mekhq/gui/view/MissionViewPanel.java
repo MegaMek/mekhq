@@ -33,22 +33,30 @@
 package mekhq.gui.view;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.estimateCargoRequirements;
+import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.LocalDate;
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
+import javax.swing.SwingConstants;
 
 import megamek.client.ui.util.UIUtil;
 import mekhq.MekHQ;
@@ -217,7 +225,7 @@ public class MissionViewPanel extends JScrollablePanel {
             pnlStats.add(txtLocation, gridBagConstraints);
         }
 
-        if ((null != mission.getType()) && !mission.getType().isEmpty()) {
+        if ((null != mission.getContractTypeName()) && !mission.getContractTypeName().isEmpty()) {
             lblType.setName("lblType");
             lblType.setText(getTextAt(RESOURCE_BUNDLE, "lblType.text"));
             gridBagConstraints = new GridBagConstraints();
@@ -228,7 +236,7 @@ public class MissionViewPanel extends JScrollablePanel {
             pnlStats.add(lblType, gridBagConstraints);
 
             txtType.setName("txtType");
-            txtType.setText(mission.getType());
+            txtType.setText(mission.getContractTypeName());
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = 2;
@@ -297,7 +305,7 @@ public class MissionViewPanel extends JScrollablePanel {
             pnlStats.add(txtLocation, gridBagConstraints);
         }
 
-        if ((null != contract.getEmployer()) && !contract.getEmployer().isEmpty()) {
+        if ((null != contract.getEmployerName()) && !contract.getEmployerName().isEmpty()) {
             lblEmployer.setName("lblEmployer");
             lblEmployer.setText(getTextAt(RESOURCE_BUNDLE, "lblEmployer.text"));
             gridBagConstraints = new GridBagConstraints();
@@ -308,7 +316,7 @@ public class MissionViewPanel extends JScrollablePanel {
             pnlStats.add(lblEmployer, gridBagConstraints);
 
             txtEmployer.setName("txtEmployer");
-            txtEmployer.setText(contract.getEmployer());
+            txtEmployer.setText(contract.getEmployerName());
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = 2;
@@ -319,7 +327,7 @@ public class MissionViewPanel extends JScrollablePanel {
             pnlStats.add(txtEmployer, gridBagConstraints);
         }
 
-        if ((null != contract.getType()) && !contract.getType().isEmpty()) {
+        if ((null != contract.getContractTypeName()) && !contract.getContractTypeName().isEmpty()) {
             lblType.setName("lblType");
             lblType.setText(getTextAt(RESOURCE_BUNDLE, "lblType.text"));
             gridBagConstraints = new GridBagConstraints();
@@ -330,7 +338,7 @@ public class MissionViewPanel extends JScrollablePanel {
             pnlStats.add(lblType, gridBagConstraints);
 
             txtType.setName("txtType");
-            txtType.setText(contract.getType());
+            txtType.setText(contract.getContractTypeName());
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = 3;
@@ -432,7 +440,7 @@ public class MissionViewPanel extends JScrollablePanel {
         pnlStats.add(lblBLC, gridBagConstraints);
 
         txtBLC.setName("txtBLC");
-        txtBLC.setText(contract.getBattleLossComp() + "%");
+        txtBLC.setText(contract.getBattleLossCompensation() + "%");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 8;
@@ -484,12 +492,12 @@ public class MissionViewPanel extends JScrollablePanel {
         JLabel lblSalvagePct2 = new JLabel();
 
         if (contract.isSalvageExchange()) {
-            lblSalvagePct2.setText(getTextAt(RESOURCE_BUNDLE, "exchange") + " (" + contract.getSalvagePct() + "%)");
-        } else if (contract.getSalvagePct() == 0) {
+            lblSalvagePct2.setText(getTextAt(RESOURCE_BUNDLE, "exchange") + " (" + contract.getSalvagePercent() + "%)");
+        } else if (contract.getSalvagePercent() == 0) {
             lblSalvagePct2.setText(getTextAt(RESOURCE_BUNDLE, "none"));
         } else {
             lblSalvagePct1.setText(getTextAt(RESOURCE_BUNDLE, "lblSalvagePct.text"));
-            int maxSalvagePct = contract.getSalvagePct();
+            int maxSalvagePct = contract.getSalvagePercent();
 
             int currentSalvagePct = contract.getCurrentSalvagePct();
 
@@ -565,7 +573,8 @@ public class MissionViewPanel extends JScrollablePanel {
               contract.getEmployerName(campaign.getGameYear()));
         final String enemyTooltip = getFormattedTextAt(RESOURCE_BUNDLE, "belligerents.enemy.tooltip",
               contract.getEnemyBotName());
-        lblBelligerents = contract.getBelligerentsPanel(gui.getCampaign().getGameYear(), employerTooltip, enemyTooltip);
+        lblBelligerents = getBelligerentsPanel(contract, gui.getCampaign().getGameYear(), employerTooltip,
+              enemyTooltip);
         addHeaderRow(lblBelligerents, y++, GridBagConstraints.NORTH);
 
         // === Identity: the orienting facts (where, who) ===
@@ -598,8 +607,8 @@ public class MissionViewPanel extends JScrollablePanel {
             int currentScore = contract.getContractScore(campaign.getCampaignOptions().isUseStratConMaplessMode());
             int neededScore = contract.getRequiredVictoryPoints();
             if (neededScore > 0) {
-                final boolean canEndEarly = (contract.getStratconCampaignState() == null) ||
-                                                  contract.getStratconCampaignState().allowEarlyVictory();
+                final boolean canEndEarly = (contract.getStratConCampaignState() == null) ||
+                                                  contract.getStratConCampaignState().allowEarlyVictory();
                 addGaugeRow(ContractMeterBar.victoryPoints(currentScore, neededScore, canEndEarly), y++);
             } else {
                 lblScore.setName("lblScore");
@@ -625,9 +634,9 @@ public class MissionViewPanel extends JScrollablePanel {
 
         // Salvage gauge for a normal salvage percentage; the exchange / no-salvage cases are shown as text among the
         // reference terms below.
-        final boolean salvageIsMeter = !contract.isSalvageExchange() && (contract.getSalvagePct() > 0);
+        final boolean salvageIsMeter = !contract.isSalvageExchange() && (contract.getSalvagePercent() > 0);
         if (salvageIsMeter) {
-            addGaugeRow(ContractMeterBar.salvage(contract.getCurrentSalvagePct(), contract.getSalvagePct()), y++);
+            addGaugeRow(ContractMeterBar.salvage(contract.getCurrentSalvagePct(), contract.getSalvagePercent()), y++);
         }
 
         // Contract timeline: a neutral progress gauge from start to end with a marker for today, shown once the
@@ -677,7 +686,7 @@ public class MissionViewPanel extends JScrollablePanel {
         lblBLC.setName("lblBLC");
         lblBLC.setText(getTextAt(RESOURCE_BUNDLE, "lblBLC.text"));
         txtBLC.setName("txtBLC");
-        txtBLC.setText(contract.getBattleLossComp() + "%");
+        txtBLC.setText(contract.getBattleLossCompensation() + "%");
         addStatRow(lblBLC, txtBLC, y++);
 
         lblSalvageValueMerc = new JLabel(getTextAt(RESOURCE_BUNDLE, "lblSalvageValueMerc.text"));
@@ -696,7 +705,7 @@ public class MissionViewPanel extends JScrollablePanel {
             JLabel txtSalvagePct = new JLabel();
             txtSalvagePct.setName("txtSalvagePct");
             if (contract.isSalvageExchange()) {
-                txtSalvagePct.setText(getTextAt(RESOURCE_BUNDLE, "exchange") + " (" + contract.getSalvagePct() + "%)");
+                txtSalvagePct.setText(getTextAt(RESOURCE_BUNDLE, "exchange") + " (" + contract.getSalvagePercent() + "%)");
             } else {
                 txtSalvagePct.setText(getTextAt(RESOURCE_BUNDLE, "none"));
             }
@@ -799,6 +808,52 @@ public class MissionViewPanel extends JScrollablePanel {
     }
 
     /**
+     * Creates and returns a {@link JPanel} containing the belligerent factions' logos for the specified game year.
+     *
+     * <p>This panel displays the employer and enemy faction logos side by side, separated by a styled divider.
+     * The logos are determined based on the provided game year and faction codes, scaled appropriately for the
+     * GUI.</p>
+     *
+     * @param gameYear        the year used to determine which faction logos to display
+     * @param employerTooltip the tooltip to show on the employer (left) logo, or {@code null} for none
+     * @param enemyTooltip    the tooltip to show on the enemy (right) logo, or {@code null} for none
+     *
+     * @return a {@link JPanel} with the employer and enemy faction logos, with a divider in between
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    private JPanel getBelligerentsPanel(AtBContract contract, int gameYear, String employerTooltip,
+          String enemyTooltip) {
+        final int SIZE = 64;
+
+        String employer = contract.getEmployerCode();
+        ImageIcon employerImage = getFactionLogo(gameYear, employer);
+        employerImage = scaleImageIcon(employerImage, SIZE, true);
+        JLabel employerLabel = new JLabel(employerImage);
+        employerLabel.setToolTipText(employerTooltip);
+
+        JLabel divider = new JLabel("/");
+        divider.setHorizontalAlignment(SwingConstants.CENTER);
+        int fontSize = scaleForGUI(SIZE); // scaleImageIcon already includes the necessary scaling
+        divider.setFont(new Font(Font.MONOSPACED, Font.PLAIN, fontSize));
+        divider.setForeground(new Color(0, 0, 0, 128));
+
+        String enemy = contract.getEnemyCode();
+        ImageIcon enemyImage = getFactionLogo(gameYear, enemy);
+        enemyImage = scaleImageIcon(enemyImage, SIZE, true);
+        JLabel enemyLabel = new JLabel(enemyImage);
+        enemyLabel.setToolTipText(enemyTooltip);
+
+        JPanel panel = new JPanel(new FlowLayout());
+        panel.add(employerLabel);
+        panel.add(divider);
+        panel.add(enemyLabel);
+
+        return panel;
+    }
+
+    /**
      * Adds a standard two-column stat row: {@code label} in the left column and {@code value} in the right.
      *
      * @param label the label component (left column)
@@ -844,7 +899,8 @@ public class MissionViewPanel extends JScrollablePanel {
     }
 
     /**
-     * Adds a full-width gauge spanning both stat columns, with uniform spacing so the dashboard gauges read as a group.
+     * Adds a full-width gauge spanning both stat columns, with uniform spacing so the dashboard gauges read as a
+     * group.
      *
      * @param gauge the gauge component to add
      * @param gridY the grid row to place it on

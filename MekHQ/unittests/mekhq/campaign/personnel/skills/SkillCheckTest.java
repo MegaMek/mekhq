@@ -104,22 +104,6 @@ class SkillCheckTest {
         assertEquals(4, check.getTargetNumber().getValue()); // == 10 - 4 - 2 (aging effect)
     }
 
-    @Test
-    void testDeprecatedConstructor_CalculatesTargetNumber() {
-        Person person = mock(Person.class);
-        when(person.hasSkill(eq(SkillType.S_TACTICS))).thenReturn(true);
-        when(person.getSkill(eq(SkillType.S_TACTICS)))
-              .thenReturn(new Skill(SkillType.getType(SkillType.S_TACTICS), 4, 0));
-        when(person.getSkillModifierData(anyBoolean(), anyBoolean(), any())).thenReturn(mock(SkillModifierData.class));
-        @SuppressWarnings("deprecation")
-        SkillCheck check = new SkillCheck(person, SkillType.S_TACTICS);
-
-        assertEquals(5, check.getTargetNumber().getValue()); // == 9 - 4
-        assertEquals(SkillType.S_TACTICS, check.getActionName());
-        assertFalse(check.isCountUp());
-        assertFalse(check.hasNaturalAptitude());
-    }
-
     @ParameterizedTest
     @CsvSource({ "true", "false" })
     void testHasNaturalAptitude(boolean hasNaturalAptitude) {

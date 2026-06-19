@@ -484,10 +484,6 @@ public class CampaignConfiguration {
         this.campaignOptions = campaignOptions;
     }
 
-    public void setPersonnelMarket(PersonnelMarket personnelMarket) {
-        this.personnelMarket = personnelMarket;
-    }
-
     public void setContractMarket(AbstractContractMarket contractMarket) {
         this.contractMarket = contractMarket;
     }

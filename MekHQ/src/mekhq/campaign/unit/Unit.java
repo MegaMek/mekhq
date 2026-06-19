@@ -3901,7 +3901,7 @@ public class Unit implements ITechnology, ILocation {
                 int equipmentNum = entity.getEquipmentNum(m);
                 EquipmentType type = m.getType();
                 if ((entity instanceof BattleArmor) && (m instanceof WeaponMounted weaponMounted)
-                      && weaponMounted.isDisposableWeapon()) {
+                          && weaponMounted.isDisposableWeapon()) {
                     // Disposable Weapon (TO:AuE p.116, Corrected Sixth Printing): one per trooper (squad size),
                     // valued/bought/sold individually, instead of the per-trooper BattleArmorEquipmentPart used for
                     // ordinary BA equipment.
@@ -4604,7 +4604,9 @@ public class Unit implements ITechnology, ILocation {
             if ((null == disposableWeaponPart) && (null != disposableType)) {
                 int number = entity.getOInternal(ConvInfantry.LOC_INFANTRY);
                 while (number > 0) {
-                    disposableWeaponPart = new InfantryDisposableWeaponPart((int) entity.getWeight(), disposableType, -1,
+                    disposableWeaponPart = new InfantryDisposableWeaponPart((int) entity.getWeight(),
+                          disposableType,
+                          -1,
                           getCampaign());
                     addPart(disposableWeaponPart);
                     partsToAdd.add(disposableWeaponPart);
@@ -7124,8 +7126,8 @@ public class Unit implements ITechnology, ILocation {
      * <p>A tech at a different location does not count as maintaining the unit — they cannot
      * physically reach it.</p>
      *
-     * @return true if unit requires maintenance, has a tech assigned, and that tech is co-located
-     *       with the unit, false otherwise.
+     * @return true if unit requires maintenance, has a tech assigned, and that tech is co-located with the unit, false
+     *       otherwise.
      *
      * @see #isUnmaintained()
      */
@@ -7141,11 +7143,11 @@ public class Unit implements ITechnology, ILocation {
      * Not always opposite to isMaintained() - both are false for units that do not require maintenance.
      *
      * <p>A unit is also considered unmaintained when its assigned tech is at a different location —
-     * the tech cannot physically perform maintenance, so the unit incurs the same penalties as if
-     * no tech were assigned.</p>
+     * the tech cannot physically perform maintenance, so the unit incurs the same penalties as if no tech were
+     * assigned.</p>
      *
-     * @return true if unit requires maintenance and either has no tech assigned or the tech is at a
-     *       different location, false otherwise.
+     * @return true if unit requires maintenance and either has no tech assigned or the tech is at a different location,
+     *       false otherwise.
      *
      * @see #isMaintained()
      */

@@ -1,0 +1,12 @@
+<missions>
+    <mission id="1" type="mekhq.campaign.mission.Mission">
+        <name>New Mission</name>
+        <type>affdsf</type>
+        <planetName>afadfadf</planetName>
+        <status>ACTIVE</status>
+        <desc>afdfadefadefd</desc>
+        <id>1</id>
+        <scenarios>
+        </scenarios>
+    </mission>
+</missions>

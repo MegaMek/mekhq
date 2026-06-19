@@ -992,10 +992,7 @@ public class PersonnelTableModelColumnTest {
         }
 
         private Person mockPerson() {
-            Person person = mock(Person.class);
-            LocationNode node = new LocationNode(person);
-            when(person.getLocationNode()).thenReturn(node);
-            return person;
+            return new Person("Test", "Person", null, "MERC");
         }
 
         private void wire(ILocation child, ILocation parent) {

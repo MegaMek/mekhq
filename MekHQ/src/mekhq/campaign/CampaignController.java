@@ -34,6 +34,9 @@ package mekhq.campaign;
 
 import java.util.UUID;
 
+import mekhq.MekHQ;
+import mekhq.campaign.market.PersonnelMarket;
+
 /**
  * Manages the timeline of a {@link Campaign}.
  */
@@ -41,14 +44,41 @@ public class CampaignController {
     private final Campaign localCampaign;
     private boolean isHost;
     private UUID host;
+    private final CampaignEventProcessor campaignEventProcessor;
 
     /**
      * Creates a new {@code CampaignController} for the given {@link Campaign}
      *
-     * @param c The {@link Campaign} being used locally.
+     * @param campaign The {@link Campaign} being used locally.
      */
-    public CampaignController(Campaign c) {
-        localCampaign = c;
+    public CampaignController(Campaign campaign) {
+        localCampaign = campaign;
+        campaignEventProcessor = new CampaignEventProcessor(campaign);
+    }
+
+    /**
+     * Manually registers campaign-related event bus listeners.
+     */
+    public void activate() {
+        PersonnelMarket personnelMarket = localCampaign.getHumanResources().getPersonnelMarket();
+        if (personnelMarket != null) {
+            MekHQ.registerHandler(personnelMarket);
+        }
+        MekHQ.registerHandler(campaignEventProcessor);
+    }
+
+    /**
+     * Manually unregister campaign-related event bus listeners.
+     */
+    public void deactivate() {
+        if (localCampaign.getStoryArc() != null) {
+            MekHQ.unregisterHandler(localCampaign.getStoryArc());
+        }
+        PersonnelMarket personnelMarket = localCampaign.getHumanResources().getPersonnelMarket();
+        if (personnelMarket != null) {
+            MekHQ.unregisterHandler(personnelMarket);
+        }
+        MekHQ.unregisterHandler(campaignEventProcessor);
     }
 
     /**
