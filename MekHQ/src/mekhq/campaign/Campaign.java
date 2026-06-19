@@ -2224,7 +2224,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all hangars across all locations associated with this campaign.
-     *                                                                               TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     *                                                                                     TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
      */
     public Hangar getAllHangar() {
         return units;
@@ -2860,7 +2860,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all warehouses across all locations associated with this campaign.
-     *                                                                               TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
+     *                                                                                     TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
      */
     public Warehouse getAllWarehouse() {
         return parts;
@@ -4856,7 +4856,7 @@ public class Campaign implements ITechManager, IPlace {
         MekHQ.triggerEvent(new ScenarioRemovedEvent(scenario));
     }
 
-    public void removeMission(final Mission mission) {
+    public void removeMission(final AbstractMissionTransition mission) {
         // Loop through scenarios here! We need to remove them as well.
         for (Scenario scenario : mission.getScenarios()) {
             scenario.clearAllFormationsAndPersonnel(this);

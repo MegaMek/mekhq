@@ -652,7 +652,7 @@ public class StratConRulesManager {
      * @param autoAssignLances Flag indicating whether lances are to be auto-assigned.
      * @param scenario         The {@link StratConScenario} scenario to be finalized.
      */
-    public static void finalizeBackingScenario(Campaign campaign, AtBContract contract,
+    public static void finalizeBackingScenario(Campaign campaign, AbstractMissionTransition contract,
           @Nullable StratConTrackState track, boolean autoAssignLances, StratConScenario scenario) {
         final AtBDynamicScenario backingScenario = scenario.getBackingScenario();
 
@@ -752,7 +752,7 @@ public class StratConRulesManager {
      * @param isCombatChallenge {@code true} if attached units should be skipped, and if the scenario is barred from
      *                          being a Turning Point
      */
-    private static void determineIfTurningPointScenario(AtBContract contract, StratConScenario scenario,
+    private static void determineIfTurningPointScenario(AbstractMissionTransition contract, StratConScenario scenario,
           boolean isCombatChallenge) {
         ScenarioType scenarioType = scenario.getBackingScenario().getStratConScenarioType();
         boolean isObjective = scenario.isStrategicObjective();
@@ -1079,7 +1079,7 @@ public class StratConRulesManager {
      * @return The newly generated {@link StratConScenario}.
      */
     public static @Nullable StratConScenario generateScenarioForExistingForces(StratConCoords scenarioCoords,
-          Set<Integer> forceIDs, AtBContract contract, Campaign campaign, StratConTrackState track) {
+          Set<Integer> forceIDs, AbstractMissionTransition contract, Campaign campaign, StratConTrackState track) {
         return generateScenarioForExistingForces(scenarioCoords, forceIDs, contract, campaign, track, null, null);
     }
 
@@ -1100,7 +1100,7 @@ public class StratConRulesManager {
      * @return The newly generated {@link StratConScenario}.
      */
     public static @Nullable StratConScenario generateScenarioForExistingForces(StratConCoords scenarioCoords,
-          Set<Integer> forceIDs, AtBContract contract, Campaign campaign, StratConTrackState track,
+          Set<Integer> forceIDs, AbstractMissionTransition contract, Campaign campaign, StratConTrackState track,
           @Nullable ScenarioTemplate template, @Nullable Integer daysTilDeployment) {
         boolean firstForce = true;
         StratConScenario scenario = null;
@@ -1386,7 +1386,7 @@ public class StratConRulesManager {
      * @return The newly set up {@link StratConScenario}.
      */
     public static @Nullable StratConScenario setupScenario(StratConCoords coords, @Nullable Integer forceID,
-          Campaign campaign, AtBContract contract, StratConTrackState track) {
+          Campaign campaign, AbstractMissionTransition contract, StratConTrackState track) {
         return setupScenario(coords,
               forceID,
               campaign,
@@ -1420,7 +1420,8 @@ public class StratConRulesManager {
      * @return The newly set up {@link StratConScenario}.
      */
     public static @Nullable StratConScenario setupScenario(StratConCoords coords, @Nullable Integer forceID,
-          Campaign campaign, AtBContract contract, StratConTrackState track, @Nullable ScenarioTemplate template,
+          Campaign campaign, AbstractMissionTransition contract, StratConTrackState track,
+          @Nullable ScenarioTemplate template,
           boolean ignoreFacilities, @Nullable Integer daysTilDeployment) {
         StratConScenario scenario;
 
@@ -2999,7 +3000,7 @@ public class StratConRulesManager {
      * @return A {@link List} of {@link Integer} force IDs representing combat teams that are ready and suitable for
      *       deployment.
      */
-    public static List<Integer> getAvailableForceIDs(Campaign campaign, AtBContract contract,
+    public static List<Integer> getAvailableForceIDs(Campaign campaign, AbstractMissionTransition contract,
           boolean bypassRoleRestrictions) {
         // First, build a list of all combat teams in the campaign
         ArrayList<CombatTeam> combatTeams = campaign.getCombatTeamsAsList();

@@ -83,7 +83,7 @@ public class CustomizeScenarioDialog extends JDialog {
     // region Variable declarations
     private final JFrame frame;
     private final Scenario scenario;
-    private final Mission mission;
+    private final AbstractMissionTransition mission;
     private final Campaign campaign;
     private final boolean newScenario;
     private LocalDate date;
@@ -162,54 +162,55 @@ public class CustomizeScenarioDialog extends JDialog {
     private MarkdownEditorPanel txtReport;
     // endregion Variable declarations
 
-    public CustomizeScenarioDialog(JFrame parent, boolean modal, Scenario s, Mission m, CampaignGUI gui) {
+    public CustomizeScenarioDialog(JFrame parent, boolean modal, Scenario scenario, AbstractMissionTransition mission,
+          CampaignGUI gui) {
         super(parent, modal);
         this.frame = parent;
-        this.mission = m;
-        if (null == s) {
-            scenario = new Scenario("New Scenario");
+        this.mission = mission;
+        if (null == scenario) {
+            this.scenario = new Scenario("New Scenario");
             newScenario = true;
         } else {
-            scenario = s;
+            this.scenario = scenario;
             newScenario = false;
         }
         campaign = gui.getCampaign();
-        if (scenario.getDate() == null) {
-            scenario.setDate(campaign.getLocalDate());
+        if (this.scenario.getDate() == null) {
+            this.scenario.setDate(campaign.getLocalDate());
         }
-        date = scenario.getDate();
+        date = this.scenario.getDate();
 
-        if (scenario.getDeploymentLimit() != null) {
-            deploymentLimits = scenario.getDeploymentLimit().getCopy();
+        if (this.scenario.getDeploymentLimit() != null) {
+            deploymentLimits = this.scenario.getDeploymentLimit().getCopy();
         }
 
-        player = Utilities.createPlayer(scenario);
+        player = Utilities.createPlayer(this.scenario);
 
-        planetaryConditions = scenario.createPlanetaryConditions();
+        planetaryConditions = this.scenario.createPlanetaryConditions();
 
         botForces = new ArrayList<>();
-        for (BotForce bf : scenario.getBotForces()) {
+        for (BotForce bf : this.scenario.getBotForces()) {
             botForces.add(bf.clone());
         }
         forcesModel = new BotForceTableModel(botForces, campaign);
 
         loots = new ArrayList<>();
-        for (Loot loot : scenario.getLoot()) {
+        for (Loot loot : this.scenario.getLoot()) {
             loots.add((Loot) loot.clone());
         }
         lootModel = new LootTableModel(loots);
 
         objectives = new ArrayList<>();
-        for (ScenarioObjective objective : scenario.getScenarioObjectives()) {
+        for (ScenarioObjective objective : this.scenario.getScenarioObjectives()) {
             objectives.add(new ScenarioObjective(objective));
         }
         objectiveModel = new ObjectiveTableModel(objectives);
 
-        map = scenario.getMap();
-        mapSizeX = scenario.getMapSizeX();
-        mapSizeY = scenario.getMapSizeY();
-        usingFixedMap = scenario.isUsingFixedMap();
-        boardType = scenario.getBoardType();
+        map = this.scenario.getMap();
+        mapSizeX = this.scenario.getMapSizeX();
+        mapSizeY = this.scenario.getMapSizeY();
+        usingFixedMap = this.scenario.isUsingFixedMap();
+        boardType = this.scenario.getBoardType();
 
         initComponents(gui);
         setLocationRelativeTo(parent);

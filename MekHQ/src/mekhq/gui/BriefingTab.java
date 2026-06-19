@@ -1092,7 +1092,7 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private void deleteMission() {
-        final Mission mission = comboMission.getSelectedItem();
+        final AbstractMissionTransition mission = comboMission.getSelectedItem();
         if (mission == null) {
             logger.error("Cannot remove null mission");
             return;
@@ -1153,7 +1153,7 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private void addScenario() {
-        final Mission mission = comboMission.getSelectedItem();
+        final AbstractMissionTransition mission = comboMission.getSelectedItem();
         if (mission == null) {
             return;
         }
@@ -2096,7 +2096,7 @@ public final class BriefingTab extends CampaignGuiTab {
      * @return the enemy faction
      */
     private Faction getEnemyFactionFromScenario(Scenario scenario) {
-        Mission mission = null;
+        AbstractMissionTransition mission = null;
         if (scenario.getMissionId() != -1) {
             mission = getCampaign().getMission(scenario.getMissionId());
         }
@@ -2124,7 +2124,7 @@ public final class BriefingTab extends CampaignGuiTab {
      * @return the employer faction
      */
     private Faction getAlliedFactionFromScenario(Scenario scenario) {
-        Mission mission = null;
+        AbstractMissionTransition mission = null;
         if (scenario.getMissionId() != -1) {
             mission = getCampaign().getMission(scenario.getMissionId());
         }
@@ -2165,7 +2165,7 @@ public final class BriefingTab extends CampaignGuiTab {
         int allowedYear = cGame.getOptions().intOption(OptionsConstants.ALLOWED_YEAR);
 
         // This had better be an AtB contract...
-        final Mission mission = comboMission.getSelectedItem();
+        final AbstractMissionTransition mission = comboMission.getSelectedItem();
         if (mission instanceof AtBContract atbContract) {
             opForFactionCode = (atbContract.getEnemyCode().isBlank()) ? opForFactionCode : atbContract.getEnemyCode();
             opForQuality = atbContract.getEnemyQuality();
@@ -2353,14 +2353,14 @@ public final class BriefingTab extends CampaignGuiTab {
             logger.error("", ex);
         }
 
-        final Mission mission = comboMission.getSelectedItem();
+        final AbstractMissionTransition mission = comboMission.getSelectedItem();
         if ((mission instanceof AtBContract) &&
                   (scenario instanceof AtBScenario) &&
                   !((AtBScenario) scenario).getAlliesPlayer().isEmpty()) {
             // Export allies
             chosen.clear();
             chosen.addAll(((AtBScenario) scenario).getAlliesPlayer());
-            file = determineMULFilePath(scenario, ((AtBContract) mission).getEmployerName());
+            file = determineMULFilePath(scenario, mission.getEmployerName());
 
             int genericBattleValue = calculateGenericBattleValue(chosen);
 
@@ -2434,8 +2434,8 @@ public final class BriefingTab extends CampaignGuiTab {
 
     public void refreshMissions() {
         comboMission.removeAllItems();
-        final List<Mission> missions = getCampaign().getSortedMissions();
-        for (final Mission mission : missions) {
+        final List<AbstractMissionTransition> missions = getCampaign().getSortedMissions();
+        for (final AbstractMissionTransition mission : missions) {
             comboMission.addItem(mission);
         }
 
@@ -2562,7 +2562,7 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     public void changeMission() {
-        final Mission mission = comboMission.getSelectedItem();
+        final AbstractMissionTransition mission = comboMission.getSelectedItem();
         if (mission == null) {
             scrollMissionView.setViewportView(null);
             missionViewPanel = null;
@@ -2596,7 +2596,7 @@ public final class BriefingTab extends CampaignGuiTab {
         int scenarioSelection = getSelectedScenarioId(scenarioTable, scenarioModel);
         ScenarioQueueFilter selectedFilter = getSelectedScenarioFilter(scenarioFilter,
               ScenarioQueueFilter.ALL);
-        final Mission mission = comboMission.getSelectedItem();
+        final AbstractMissionTransition mission = comboMission.getSelectedItem();
         List<Scenario> visibleScenarios = (mission == null) ? new ArrayList<>() : mission.getVisibleScenarios();
         if (preserveResolvedSelection && (scenarioSelection >= 0) &&
                   (selectedFilter != ScenarioQueueFilter.ALL) &&
@@ -2668,7 +2668,7 @@ public final class BriefingTab extends CampaignGuiTab {
         Scenario targetScenario = null;
 
         // First find the mission and scenario
-        for (Mission mission : getCampaign().getMissions()) {
+        for (AbstractMissionTransition mission : getCampaign().getMissions()) {
             for (Scenario scenario : mission.getScenarios()) {
                 if (scenario.getId() == targetId) {
                     targetMission = mission;
@@ -2727,7 +2727,7 @@ public final class BriefingTab extends CampaignGuiTab {
      * @since 0.50.05
      */
     public void focusOnMission(int targetId) {
-        Mission mission = getCampaign().getMission(targetId);
+        AbstractMissionTransition mission = getCampaign().getMission(targetId);
 
         if (mission == null) {
             return;
@@ -2754,7 +2754,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
     @Subscribe
     public void handle(ScenarioChangedEvent evt) {
-        final Mission mission = comboMission.getSelectedItem();
+        final AbstractMissionTransition mission = comboMission.getSelectedItem();
         if ((evt.getScenario() != null) &&
                   (evt.getScenario().getMissionId() == (mission == null ? -1 : mission.getId()))) {
             scenarioTable.repaint();
@@ -2816,7 +2816,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
     @Subscribe
     public void handle(MissionChangedEvent evt) {
-        final Mission mission = comboMission.getSelectedItem();
+        final AbstractMissionTransition mission = comboMission.getSelectedItem();
         if ((mission != null) && (evt.getMission().getId() == mission.getId())) {
             changeMission();
         }

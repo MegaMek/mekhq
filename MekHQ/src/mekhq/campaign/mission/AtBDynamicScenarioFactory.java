@@ -252,7 +252,8 @@ public class AtBDynamicScenarioFactory {
      * @param contract Contract in which the scenario is occurring
      * @param campaign Current campaign.
      */
-    public static void finalizeScenario(AtBDynamicScenario scenario, AtBContract contract, Campaign campaign) {
+    public static void finalizeScenario(AtBDynamicScenario scenario, AbstractMissionTransition contract,
+          Campaign campaign) {
         // if scenario already had bots, then we need to reset the briefing to remove
         // text related to old scenario modifiers
         if (scenario.getNumBots() > 0) {
