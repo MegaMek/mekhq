@@ -54,6 +54,7 @@ import megamek.client.ui.util.UIUtil;
 import mekhq.MekHQ;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.location.ILocation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
@@ -757,7 +758,11 @@ public class MissionViewPanel extends JScrollablePanel {
 
     static boolean shouldShowContractTimeline(Campaign campaign, Contract contract) {
         final AbstractLocation currentLocation = campaign.getCurrentLocation();
-        final PlanetarySystem currentSystem = campaign.getCurrentSystem();
+        if (currentLocation == ILocation.NO_LOCATION) {
+            return false;
+        }
+
+        final PlanetarySystem currentSystem = currentLocation.getCurrentSystem();
         final PlanetarySystem contractSystem = contract.getSystem();
         return contract.isActiveOn(campaign.getLocalDate()) &&
                      (currentLocation != null) && currentLocation.isOnPlanet() &&
@@ -774,11 +779,11 @@ public class MissionViewPanel extends JScrollablePanel {
 
     static String currentLocationDescription(Campaign campaign) {
         final AbstractLocation currentLocation = campaign.getCurrentLocation();
-        final PlanetarySystem currentSystem = campaign.getCurrentSystem();
-        if ((currentLocation == null) || (currentSystem == null)) {
+        if (currentLocation == ILocation.NO_LOCATION) {
             return getTextAt(RESOURCE_BUNDLE, "contractTimelineBar.location.unknown");
         }
 
+        final PlanetarySystem currentSystem = currentLocation.getCurrentSystem();
         final LocalDate currentDate = campaign.getLocalDate();
         if (currentLocation.isOnPlanet()) {
             final Planet currentPlanet = currentLocation.getPlanet();
