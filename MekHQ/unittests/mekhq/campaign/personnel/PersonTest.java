@@ -1775,7 +1775,7 @@ public class PersonTest {
 
         @Test
         void getLocationNode_noParentByDefault() {
-            assertNull(person.getLocationNode().getParent());
+            assertFalse(person.isParented());
         }
 
         @Test
@@ -1810,27 +1810,27 @@ public class PersonTest {
             @Test
             void setParent_toCampus_wiresParentLink() {
                 person.setParent(campus);
-                assertSame(campus.getLocationNode(), person.getLocationNode().getParent());
+                assertSame(campus, person.getParentLocation());
             }
 
             @Test
             void setParent_toCampus_addsToChildrenOfCampus() {
                 person.setParent(campus);
-                assertTrue(campus.getLocationNode().getChildren().contains(person.getLocationNode()));
+                assertTrue(campus.getChildLocations().contains(person));
             }
 
             @Test
             void setParent_null_clearsParentLink() {
                 person.setParent(campus);
                 person.setParent(null);
-                assertNull(person.getLocationNode().getParent());
+                assertFalse(person.isParented());
             }
 
             @Test
             void setParent_null_removesFromCampusChildren() {
                 person.setParent(campus);
                 person.setParent(null);
-                assertFalse(campus.getLocationNode().getChildren().contains(person.getLocationNode()));
+                assertFalse(campus.getChildLocations().contains(person));
             }
 
             @Test

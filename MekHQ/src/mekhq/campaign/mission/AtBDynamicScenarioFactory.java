@@ -1361,7 +1361,7 @@ public class AtBDynamicScenarioFactory {
      */
     private static @Nullable StratConTrackState getStratconTrackState(AtBDynamicScenario scenario,
           AtBContract contract) {
-        List<StratConTrackState> tracks = contract.getStratconCampaignState().getTracks();
+        List<StratConTrackState> tracks = contract.getStratConCampaignState().getTracks();
         StratConTrackState scenarioHomeTrack = null;
 
         for (StratConTrackState track : tracks) {
@@ -4504,7 +4504,7 @@ public class AtBDynamicScenarioFactory {
 
         if (campaign.getCampaignOptions().isUseStratCon()) {
             AtBContract contract = scenario.getContract(campaign);
-            StratConCampaignState campaignState = contract.getStratconCampaignState();
+            StratConCampaignState campaignState = contract.getStratConCampaignState();
 
             for (StratConTrackState track : campaignState.getTracks()) {
                 StratConScenario stratconScenario = track.getBackingScenariosMap().get(scenario.getId());

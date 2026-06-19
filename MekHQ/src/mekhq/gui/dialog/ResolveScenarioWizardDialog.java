@@ -220,7 +220,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         if (tracker.getMission() instanceof Contract contract) {
             salvageEmployer = contract.getSalvagedByEmployer();
             salvageUnit = contract.getSalvagedByUnit();
-            maxSalvagePct = contract.getSalvagePct();
+            maxSalvagePct = contract.getSalvagePercent();
 
             currentSalvagePct = Contract.calculateSalvagePercentage(salvageUnit, salvageEmployer);
         }

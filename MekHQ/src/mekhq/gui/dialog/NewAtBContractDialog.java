@@ -131,7 +131,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         updatePlanets();
 
         if (getCurrentEmployerCode() != null) {
-            ((AtBContract) contract).setEmployerCode(getCurrentEmployerCode(), campaign.getGameYear());
+            ((AtBContract) contract).updateEmployer(getCurrentEmployerCode(), campaign.getGameYear());
         }
 
         if (getCurrentEnemyCode() != null) {
@@ -144,7 +144,7 @@ public class NewAtBContractDialog extends NewContractDialog {
                                               campaign.getLocalDate())).getId());
         }
 
-        spnMultiplier.setModel(new SpinnerNumberModel(contract.getMultiplier(), 0.1, 10.0, 0.1));
+        spnMultiplier.setModel(new SpinnerNumberModel(contract.getPaymentMultiplier(), 0.1, 10.0, 0.1));
         updatePaymentMultiplier();
         contract.calculateContract(campaign);
         this.doUpdateContract(cbPlanets);
@@ -526,7 +526,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         if (((AtBContract) contract).getEmployerCode() != null && ((AtBContract) contract).getEnemyCode() != null) {
             double multiplier = campaign.getContractMarket()
                                       .calculatePaymentMultiplier(campaign, (AtBContract) contract);
-            contract.setMultiplier(multiplier);
+            contract.setPaymentMultiplier(multiplier);
             spnMultiplier.setValue(multiplier);
         }
     }
@@ -578,9 +578,9 @@ public class NewAtBContractDialog extends NewContractDialog {
 
         contract.setName(txtName.getText());
         contract.setSystemId(selectedSystem.getId());
-        contract.setEmployerCode(getCurrentEmployerCode(), campaign.getGameYear());
-        contract.setContractType(Objects.requireNonNull(comboContractType.getSelectedItem()));
-        contract.setDesc(txtDesc.getText());
+        contract.updateEmployer(getCurrentEmployerCode(), campaign.getGameYear());
+        contract.setContractTypeAndName(Objects.requireNonNull(comboContractType.getSelectedItem()));
+        contract.setDescription(txtDesc.getText());
         contract.setCommandRights(choiceCommand.getSelectedItem());
 
 
@@ -601,8 +601,8 @@ public class NewAtBContractDialog extends NewContractDialog {
         contract.setEnemySkill(comboEnemySkill.getSelectedItem());
         contract.setEnemyQuality(cbEnemyQuality.getSelectedIndex());
         contract.setAllyBotName(contract.getEmployerName(campaign.getGameYear()));
-        contract.setEnemyBotName(contract.getEnemyName(campaign.getGameYear()));
-        contract.setAtBSharesPercent((Integer) spnShares.getValue());
+        contract.setEnemyBotName(contract.generateEnemyName(campaign.getGameYear()));
+        contract.setSharesPercent((Integer) spnShares.getValue());
 
         contract.setPartsAvailabilityLevel(contract.getContractType().calculatePartsAvailabilityLevel());
 
@@ -658,7 +658,7 @@ public class NewAtBContractDialog extends NewContractDialog {
             LOGGER.info("Setting employer code to {}", getCurrentEmployerCode());
 
             long time = java.lang.System.currentTimeMillis();
-            contract.setEmployerCode(getCurrentEmployerCode(), campaign.getGameYear());
+            contract.updateEmployer(getCurrentEmployerCode(), campaign.getGameYear());
             LOGGER.info("to set employer code: {}", java.lang.System.currentTimeMillis() - time);
 
             time = java.lang.System.currentTimeMillis();
@@ -674,9 +674,9 @@ public class NewAtBContractDialog extends NewContractDialog {
             updatePlanets();
             needUpdatePayment = true;
         } else if (source.equals(comboContractType)) {
-            contract.setContractType(Objects.requireNonNull(comboContractType.getSelectedItem()));
+            contract.setContractTypeAndName(Objects.requireNonNull(comboContractType.getSelectedItem()));
             contract.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
-            spnLength.setValue(contract.getLength());
+            spnLength.setValue(contract.getLengthInMonths());
             updatePlanets();
             needUpdatePayment = true;
         } else if (source.equals(comboAllySkill)) {
