@@ -213,7 +213,7 @@ public class CampaignGUI extends JPanel {
 
         commandCenterTab = new CommandCenterTab(this, MHQTabType.COMMAND_CENTER.toString());
         toeTab = new TOETab(this, MHQTabType.TOE.toString());
-        briefingRoomTab = new BriefingTab(this, MHQTabType.BRIEFING_ROOM.toString());
+        briefingRoomTab = new BriefingTab(app, this, MHQTabType.BRIEFING_ROOM.toString());
         stratConTab = new StratConTab(this, MHQTabType.STRAT_CON.toString());
         navigationTab = new NavigationTab(this, MHQTabType.NAVIGATION.toString());
         personnelTab = new PersonnelTab(this, MHQTabType.PERSONNEL.toString());

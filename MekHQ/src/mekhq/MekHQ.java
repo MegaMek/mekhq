@@ -354,11 +354,11 @@ public class MekHQ implements GameListener {
      */
     public void activateCampaign(Campaign campaign) {
         deactivateCampaign();
-        campaign.setApp(this);
-        campaignController = new CampaignController(campaign);
+        campaignController = new CampaignController(this, campaign);
         campaignController.setHost(campaign.getId());
-        campaignController.activate();
         campaignGUI = new CampaignGUI(this);
+        campaign.setGUI(campaignGUI);
+        campaignController.activate();
     }
 
     /**

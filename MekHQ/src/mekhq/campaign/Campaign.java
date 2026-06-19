@@ -261,6 +261,7 @@ import mekhq.campaign.universe.selectors.factionSelectors.AbstractFactionSelecto
 import mekhq.campaign.universe.selectors.planetSelectors.AbstractPlanetSelector;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
+import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
@@ -414,7 +415,7 @@ public class Campaign implements ITechManager, IPlace {
 
     private CampaignOptions campaignOptions;
     private RandomSkillPreferences randomSkillPreferences = new RandomSkillPreferences();
-    private MekHQ app;
+    private CampaignGUI gui;
 
     private ShoppingList shoppingList;
 
@@ -704,18 +705,15 @@ public class Campaign implements ITechManager, IPlace {
         this.humanResources = humanResources;
     }
 
-    /**
-     * @return the app
-     */
-    public MekHQ getApp() {
-        return app;
+    public void setGUI(CampaignGUI gui) {
+        this.gui = gui;
     }
 
     /**
-     * @param app the app to set
+     * @return the {@link CampaignGUI}
      */
-    public void setApp(MekHQ app) {
-        this.app = app;
+    public CampaignGUI getGUI() {
+        return gui;
     }
 
     /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -30,37 +30,16 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.storyArc.storytrigger;
+package mekhq.campaign.events;
 
-import java.io.PrintWriter;
-import java.text.ParseException;
-
-import megamek.Version;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.events.StoryFinishedEvent;
-import mekhq.campaign.storyArc.StoryTrigger;
-import org.w3c.dom.Node;
+import mekhq.campaign.storyArc.storytrigger.GameOverStoryTrigger;
 
 /**
- * A StoryTrigger to end the game by killing the current campaign and putting the player back in the startup screen.
- * This would typically be used for game failure (i.e. main character is killed).
+ * An event triggered when a story arc finishes and the current campaign should end. See {@link GameOverStoryTrigger}.
  */
-public class GameOverStoryTrigger extends StoryTrigger {
-
-    @Override
-    protected void execute() {
-        MekHQ.triggerEvent(new StoryFinishedEvent(getCampaign()));
-    }
-
-    @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent++);
-        writeToXmlEnd(pw1, --indent);
-    }
-
-    @Override
-    protected void loadFieldsFromXmlNode(Node wn, Campaign c, Version v) throws ParseException {
-        // nothing to load
+public final class StoryFinishedEvent extends CampaignEvent {
+    public StoryFinishedEvent(Campaign campaign) {
+        super(campaign);
     }
 }

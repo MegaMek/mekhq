@@ -399,7 +399,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_MEDICAL_RECORDS: {
-                MedicalViewDialog medDialog = new MedicalViewDialog(null, getCampaign(), selectedPerson);
+                MedicalViewDialog medDialog =
+                      new MedicalViewDialog(null, getCampaign(), selectedPerson, gui.getIconPackage());
                 medDialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
                 medDialog.setVisible(true);
                 break;
@@ -2511,7 +2512,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                               selectedPerson.getHyperlinkedFullTitle());
                         getCampaign().addReport(MEDICAL, report);
                     } else {
-                        new AdvancedReplacementLimbDialog(getCampaign(), selectedPerson, false);
+                        new AdvancedReplacementLimbDialog(getCampaign(), gui.getIconPackage(), selectedPerson, false);
                     }
                 }
             });
