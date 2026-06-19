@@ -195,6 +195,7 @@ public class AbstractMission {
 
     private final static int MRBC_FEE_PERCENTAGE = 5;
     private final static int DEFAULT_SHARES_PERCENT = 30;
+    public static final int UNKNOWN_DIFFICULTY = -99;
 
     public final static int OH_NONE = 0;
     public final static int OH_HALF = 1;
