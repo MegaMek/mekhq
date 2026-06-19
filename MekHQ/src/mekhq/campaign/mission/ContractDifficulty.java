@@ -52,80 +52,62 @@ import mekhq.campaign.universe.Factions;
 
 public class ContractDifficulty {
     /**
-     * Calculates the difficulty rating of a contract by comparing the estimated combat strength of the opposing force
-     * to the combat strength of the player's participating units.
+     * Calculates a difficulty rating for a mission by comparing the estimated combat strength of the opposing force
+     * against the player's participating units.
      *
-     * <p>The method performs the following steps:</p>
-     * <ol>
-     *     <li>Determines the opposing force's effective skill level by applying any faction-based adjustments to
-     *     their base {@link SkillLevel}.</li>
-     *     <li>Computes a skill multiplier and applies it to the estimated enemy force power, derived from the game
-     *     year, force quality, and whether generic BV values are used.</li>
-     *     <li>Estimates the total combat power of the player's units based on their BV values and optionally using
-     *     generic BV rules.</li>
-     *     <li>Computes the percentage difference between enemy and player power.</li>
-     *     <li>Maps that percentage difference into a difficulty scale ranging from {@code 1} (easiest) to {@code 10}
-     *     (hardest), centered around {@code 5} as an even match.</li>
-     * </ol>
+     * <p>A value of {@code 5} represents roughly even forces. Every 20% difference in relative strength shifts the
+     * rating by one point, producing values in the range {@code 1} (easiest) to {@code 10} (hardest). If the enemy
+     * force strength cannot be estimated, {@code -99} is returned.</p>
      *
-     * <p>A negative percentage difference indicates that the player is stronger than the opposing force; a positive
-     * difference indicates the enemy is stronger. Each 20% shift away from parity increases (or decreases)
-     * difficulty by one step.</p>
+     * @param mission           the mission being evaluated
+     * @param gameYear          the current campaign year
+     * @param useGenericBV      whether to use generic BV values instead of unit-specific BV
+     * @param playerCombatUnits the player's participating combat units
      *
-     * <p>If enemy combat strength cannot be computed, the method returns {@code -99} to signal an error.</p>
-     *
-     * @param gameYear          the current in-game year used for estimating enemy technology and BV baselines
-     * @param useGenericBV      whether generic BV values should be used instead of unit-specific BV calculations
-     * @param playerCombatUnits the list of player {@link Entity} objects expected to participate in the contract
-     *
-     * @return a difficulty rating from {@code 1} to {@code 10}, where {@code 5} represents roughly even forces; or
-     *       {@code -99} if the enemy power estimation fails
+     * @return a difficulty rating from {@code 1} to {@code 10}, or {@code -99} if enemy strength estimation fails
      */
-    public static int calculateContractDifficulty(AbstractMission mission, int gameYear, boolean useGenericBV,
-          List<Entity> playerCombatUnits) {
+    public static int calculateContractDifficulty(AbstractMission mission, int gameYear,
+          boolean useGenericBV, List<Entity> playerCombatUnits) {
+
         final int ERROR = -99;
 
-        // Estimate the power of the enemy forces
-        String enemyCode = mission.getEnemyCode();
-        SkillLevel enemySkill = mission.getEnemySkill();
-        int enemyQuality = mission.getEnemyQuality();
+        SkillLevel opposingSkill = modifySkillLevelBasedOnFaction(
+              mission.getEnemyCode(), mission.getEnemySkill());
 
-        SkillLevel opposingSkill = modifySkillLevelBasedOnFaction(enemyCode, enemySkill);
-        double enemySkillMultiplier = getSkillMultiplier(opposingSkill);
-        double enemyPower = estimateMekStrength(gameYear, useGenericBV, enemyCode, enemyQuality);
+        double enemyPower = estimateMekStrength(
+              gameYear,
+              useGenericBV,
+              mission.getEnemyCode(),
+              mission.getEnemyQuality());
 
-        // If we cannot calculate enemy power, abort.
         if (enemyPower == 0) {
             return ERROR;
         }
 
-        enemyPower = (int) round(enemyPower * enemySkillMultiplier);
+        enemyPower = round(enemyPower * getSkillMultiplier(opposingSkill));
 
-        // Estimate player power
         double playerPower = estimatePlayerPower(playerCombatUnits, useGenericBV);
 
-        // Calculate difficulty based on the percentage difference between the two forces.
         double difference = enemyPower - playerPower;
-        // Divide by 0 protection
-        double percentDifference = (playerPower != 0 ? (difference / playerPower) : difference) * 100;
+        double percentDifference =
+              (playerPower != 0 ? difference / playerPower : difference) * 100;
 
-        int mappedValue = (int) round(Math.abs(percentDifference) / 20);
-        if (percentDifference < 0) {
-            mappedValue = 5 - mappedValue;
-        } else {
-            mappedValue = 5 + mappedValue;
-        }
+        int difficulty = (int) round(Math.abs(percentDifference) / 20);
+        difficulty = (percentDifference < 0) ? 5 - difficulty : 5 + difficulty;
 
-        return Math.clamp(mappedValue, 1, 10);
+        return Math.clamp(difficulty, 1, 10);
     }
 
     /**
-     * Modifies the skill level based on the faction code.
+     * Adjusts a faction's effective skill level to account for special training characteristics.
      *
-     * @param factionCode the code of the faction
-     * @param skillLevel  the original skill level
+     * <p>ComStar Special Operations ({@code SOC}) forces are always treated as {@link SkillLevel#ELITE}. Clan
+     * factions are treated as one skill level higher than their nominal rating.</p>
      *
-     * @return the modified skill level
+     * @param factionCode the faction code
+     * @param skillLevel  the base skill level
+     *
+     * @return the effective skill level used for BV calculations
      */
     static SkillLevel modifySkillLevelBasedOnFaction(String factionCode, SkillLevel skillLevel) {
         if (Objects.equals(factionCode, "SOC")) {
@@ -139,6 +121,14 @@ public class ContractDifficulty {
         return skillLevel;
     }
 
+    /**
+     * Estimates the average combat power of a group of units.
+     *
+     * @param units        the units to evaluate
+     * @param useGenericBV whether to use generic BV values
+     *
+     * @return the average BV per unit, or {@code 0} if no units are supplied
+     */
     static double estimatePlayerPower(List<Entity> units, boolean useGenericBV) {
         if (units.isEmpty()) {
             return 0;
@@ -146,17 +136,13 @@ public class ContractDifficulty {
 
         int totalBV = 0;
         int totalGBV = 0;
+
         for (Entity unit : units) {
             totalBV += unit.calculateBattleValue();
             totalGBV += unit.getGenericBattleValue();
         }
 
-        // Return an average per unit so this is comparable to the enemy strength estimate.
-        if (useGenericBV) {
-            return ((double) totalGBV) / units.size();
-        } else {
-            return ((double) totalBV) / units.size();
-        }
+        return averageBattleValue(totalBV, totalGBV, units.size(), useGenericBV);
     }
 
     /**
@@ -180,17 +166,18 @@ public class ContractDifficulty {
     }
 
     /**
-     * Estimates the relative strength for Mek units of a specific faction and quality. Excludes salvage.
+     * Estimates the average combat power of non-salvage 'Meks available to a faction at a given quality level.
      *
-     * @param gameYear     the year of the current campaign
-     * @param useGenericBV whether to use generic BV for strength calculations
-     * @param factionCode  the code of the faction to estimate the average Mek strength for
-     * @param quality      the quality of the Meks to calculate the average strength for
+     * @param gameYear     the campaign year
+     * @param useGenericBV whether to use generic BV values
+     * @param factionCode  the faction to evaluate
+     * @param quality      the RAT quality level
      *
-     * @return the average battle value OR total BV2 divided by total GBV for Meks of the specified faction and quality
-     *       OR 0 on error
+     * @return the weighted average BV per unit, or {@code 0} if the estimate cannot be generated
      */
-    static double estimateMekStrength(int gameYear, boolean useGenericBV, String factionCode, int quality) {
+    static double estimateMekStrength(int gameYear, boolean useGenericBV,
+          String factionCode, int quality) {
+
         final double ERROR = 0;
 
         RATGenerator ratGenerator = Factions.getInstance().getRATGenerator();
@@ -217,37 +204,43 @@ public class ContractDifficulty {
             return ERROR;
         }
 
-        // Otherwise, calculate the estimated power of the faction
-        int entries = unitTable.getNumEntries();
-
-        int totalBattleValue = 0;
+        int totalBV = 0;
         int totalGBV = 0;
-        int rollingCount = 0;
+        int totalWeight = 0;
 
-        for (int i = 0; i < entries; i++) {
-            int battleValue = unitTable.getBV(i); // 0 for salvage
-            if (0 == battleValue) {
-                // Removing this check will break things, see the other comments.
+        for (int i = 0; i < unitTable.getNumEntries(); i++) {
+            int battleValue = unitTable.getBV(i);
+
+            // Salvage entries have no associated unit data.
+            if (battleValue == 0) {
                 continue;
             }
 
-            // getMekSummary(int index) is NULL for salvage.
-            int genericBattleValue = unitTable.getMekSummary(i).getGenericBattleValue();
-            int weight = unitTable.getEntryWeight(i); // NOT 0 for salvage
+            int weight = unitTable.getEntryWeight(i);
 
-            totalBattleValue += battleValue * weight;
-            totalGBV += genericBattleValue * weight;
-            rollingCount += weight;
-            
-            if (rollingCount == 0) {
-                return ERROR;
-            }
+            totalBV += battleValue * weight;
+            totalGBV += unitTable.getMekSummary(i).getGenericBattleValue() * weight;
+            totalWeight += weight;
         }
 
-        if (useGenericBV) {
-            return ((double) totalGBV) / rollingCount;
-        } else {
-            return ((double) totalBattleValue) / rollingCount;
+        if (totalWeight == 0) {
+            return ERROR;
         }
+
+        return averageBattleValue(totalBV, totalGBV, totalWeight, useGenericBV);
+    }
+
+    /**
+     * Computes an average battle value.
+     *
+     * @param totalBV      summed BV values
+     * @param totalGBV     summed generic BV values
+     * @param divisor      number of units or total weight
+     * @param useGenericBV whether generic BV values should be used
+     *
+     * @return the average battle value
+     */
+    private static double averageBattleValue(int totalBV, int totalGBV, int divisor, boolean useGenericBV) {
+        return useGenericBV ? ((double) totalGBV) / divisor : ((double) totalBV) / divisor;
     }
 }
