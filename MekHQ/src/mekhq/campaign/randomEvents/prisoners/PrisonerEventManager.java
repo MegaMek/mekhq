@@ -62,6 +62,7 @@ import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.rentals.ContractRentalType;
@@ -346,7 +347,7 @@ public class PrisonerEventManager {
 
         if (!escapees.isEmpty() && campaign.hasActiveAtBContract()) {
             if (randomInt(100) < escapees.size()) {
-                List<AtBContract> contracts = campaign.getActiveAtBContracts();
+                List<AbstractMissionTransition> contracts = campaign.getActiveAtBContracts();
                 Collections.shuffle(contracts);
 
                 new PrisonEscapeScenario(campaign, contracts.getFirst(), escapees);
@@ -503,7 +504,7 @@ public class PrisonerEventManager {
             return;
         }
 
-        List<AtBContract> activeContracts = campaign.getActiveAtBContracts();
+        List<AbstractMissionTransition> activeContracts = campaign.getActiveAtBContracts();
         activeContracts.removeIf(contract -> contract.getMoraleLevel().isOverwhelming() ||
                                                    contract.getMoraleLevel().isRouted());
         if (activeContracts.isEmpty()) {
@@ -515,7 +516,7 @@ public class PrisonerEventManager {
         boolean hadIntelBreach = freedPrisonerCount > 0 && Compute.randomInt(baseChance) < freedPrisonerCount;
 
         if (hadIntelBreach) {
-            AtBContract relevantContract = ObjectUtility.getRandomItem(activeContracts);
+            AbstractMissionTransition relevantContract = ObjectUtility.getRandomItem(activeContracts);
             AtBMoraleLevel oldMorale = relevantContract.getMoraleLevel();
             AtBMoraleLevel newMorale = relevantContract.changeMoraleLevel(1);
 
@@ -788,9 +789,9 @@ public class PrisonerEventManager {
                     }
 
                     prisonerCapacity += unit.getTotalTempCrew() * (isMekHQCaptureStyle ?
-                                              PRISONER_CAPACITY_BATTLE_ARMOR :
-                                              PRISONER_CAPACITY_BATTLE_ARMOR *
-                                              PRISONER_CAPACITY_CAM_OPS_MULTIPLIER);
+                                                                         PRISONER_CAPACITY_BATTLE_ARMOR :
+                                                                         PRISONER_CAPACITY_BATTLE_ARMOR *
+                                                                         PRISONER_CAPACITY_CAM_OPS_MULTIPLIER);
 
                     continue;
                 }
@@ -806,9 +807,9 @@ public class PrisonerEventManager {
                     }
 
                     prisonerCapacity += unit.getTotalTempCrew() * (isMekHQCaptureStyle ?
-                                              PRISONER_CAPACITY_CONVENTIONAL_INFANTRY :
-                                              PRISONER_CAPACITY_CONVENTIONAL_INFANTRY *
-                                              PRISONER_CAPACITY_CAM_OPS_MULTIPLIER);
+                                                                         PRISONER_CAPACITY_CONVENTIONAL_INFANTRY :
+                                                                         PRISONER_CAPACITY_CONVENTIONAL_INFANTRY *
+                                                                         PRISONER_CAPACITY_CAM_OPS_MULTIPLIER);
 
                     continue;
                 }

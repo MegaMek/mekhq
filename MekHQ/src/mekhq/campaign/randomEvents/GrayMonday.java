@@ -44,6 +44,7 @@ import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Factions;
@@ -90,9 +91,9 @@ public class GrayMonday {
             }
 
             if (isEmployerBegging) {
-                for (AtBContract contract : campaign.getAtBContracts()) {
+                for (AbstractMissionTransition contract : campaign.getAtBContracts()) {
                     LocalDate startDate = contract.getStartDate();
-                    if (!startDate.isBefore(today)) {
+                    if (startDate != null && !startDate.isBefore(today)) {
                         contract.setBaseAmount(Money.of(0));
                         contract.setOverheadCompensation(0);
                         contract.setBattleLossCompensation(0);
@@ -120,9 +121,9 @@ public class GrayMonday {
         Person speaker = null;
 
         if (isEmployerBegging) {
-            for (AtBContract contract : campaign.getAtBContracts()) {
+            for (AbstractMissionTransition contract : campaign.getAtBContracts()) {
                 LocalDate startDate = contract.getStartDate();
-                if (!startDate.isBefore(today)) {
+                if (startDate != null && !startDate.isBefore(today)) {
                     speaker = getEmployerSpeaker(contract);
                     break;
                 }
@@ -177,7 +178,7 @@ public class GrayMonday {
      * @author Illiani
      * @since 0.50.06
      */
-    private Person getEmployerSpeaker(AtBContract contract) {
+    private Person getEmployerSpeaker(AbstractMissionTransition contract) {
         String employer = contract.getEmployerFaction().getShortName();
         Person speaker = campaign.newPerson(ADMINISTRATOR_COMMAND, employer, Gender.RANDOMIZE);
         speaker.setOriginFaction(Factions.getInstance().getFaction(employer));

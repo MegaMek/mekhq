@@ -61,6 +61,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.OrganizationChangedEvent;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
@@ -138,8 +139,10 @@ public class CombatTeam {
         role = formation != null ? formation.getCombatRoleInMemory() : CombatRole.FRONTLINE;
 
         missionId = -1;
-        for (AtBContract contract : campaign.getActiveAtBContracts()) {
-            missionId = ((contract.getParentContract() == null) ? contract : contract.getParentContract()).getId();
+        for (AbstractMissionTransition mission : campaign.getActiveAtBContracts()) {
+            if (mission instanceof AtBContract contract) {
+                missionId = ((contract.getParentContract() == null) ? contract : contract.getParentContract()).getId();
+            }
         }
         commanderId = findCommander(this.formationId, campaign);
     }

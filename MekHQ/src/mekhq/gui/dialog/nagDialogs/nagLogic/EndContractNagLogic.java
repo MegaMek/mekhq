@@ -35,8 +35,8 @@ package mekhq.gui.dialog.nagDialogs.nagLogic;
 import java.time.LocalDate;
 import java.util.List;
 
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Contract;
 
 public class EndContractNagLogic {
     /**
@@ -56,15 +56,18 @@ public class EndContractNagLogic {
      *
      * @return {@code true} if any contract ends on the specified date; {@code false} otherwise.
      */
-    public static boolean isContractEnded(LocalDate today, List<AtBContract> activeContracts) {
+    public static boolean isContractEnded(LocalDate today, List<AbstractMissionTransition> activeContracts) {
         // We can't use 'is date y after x', as once the end date has passed,
         // the contract is removed from the list of active contracts.
 
         // There is no reason to use a stream here, as there won't be enough iterations to warrant it.
-        for (Contract contract : activeContracts) {
-            if (contract.getEndingDate().equals(today)) {
-                return true;
+        for (AbstractMissionTransition contract : activeContracts) {
+            LocalDate endingDate = contract.getEndingDate();
+            if (endingDate == null) {
+                return false;
             }
+
+            return endingDate.equals(today);
         }
 
         return false;

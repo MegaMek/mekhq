@@ -441,7 +441,8 @@ public abstract class AbstractContractMarket {
      * @param isMercenary Indicates whether the contract applies to a mercenary, which affects the thresholds used for
      *                    determining command rights.
      */
-    protected void rollCommandClause(final Contract contract, final int modifier, boolean isMercenary) {
+    protected void rollCommandClause(final AbstractMissionTransition contract, final int modifier,
+          boolean isMercenary) {
         final int roll = d6(2) + modifier;
 
         if (isMercenary) {

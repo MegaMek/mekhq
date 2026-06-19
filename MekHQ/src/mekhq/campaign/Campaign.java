@@ -1609,7 +1609,7 @@ public class Campaign implements ITechManager, IPlace {
         return activeContracts;
     }
 
-    public List<AtBContract> getAtBContracts() {
+    public List<AbstractMissionTransition> getAtBContracts() {
         return getMissions().stream()
                      .filter(c -> c instanceof AtBContract)
                      .map(c -> (AtBContract) c)
@@ -1678,24 +1678,31 @@ public class Campaign implements ITechManager, IPlace {
      *
      * @return a list of future AtBContract objects whose start date is after the current day
      */
-    public List<AtBContract> getFutureAtBContracts() {
-        return getAtBContracts().stream()
-                     .filter(c -> c.getStartDate().isAfter(currentDay))
-                     .collect(Collectors.toList());
+    public List<AbstractMissionTransition> getFutureAtBContracts() {
+        List<AbstractMissionTransition> futureContracts = new ArrayList<>();
+
+        for (AbstractMissionTransition contract : getAtBContracts()) {
+            LocalDate startDate = contract.getStartDate();
+            if (startDate != null && startDate.isAfter(currentDay)) {
+                futureContracts.add(contract);
+            }
+        }
+
+        return futureContracts;
     }
 
-    public List<AtBContract> getActiveAtBContracts() {
+    public List<AbstractMissionTransition> getActiveAtBContracts() {
         return getActiveAtBContracts(false);
     }
 
-    public List<AtBContract> getActiveAtBContracts(boolean excludeEndDateCheck) {
+    public List<AbstractMissionTransition> getActiveAtBContracts(boolean excludeEndDateCheck) {
         return getMissions().stream()
                      .filter(c -> (c instanceof AtBContract) && c.isActiveOn(getLocalDate(), excludeEndDateCheck))
                      .map(c -> (AtBContract) c)
                      .collect(Collectors.toList());
     }
 
-    public List<AtBContract> getCompletedAtBContracts() {
+    public List<AbstractMissionTransition> getCompletedAtBContracts() {
         return getMissions().stream()
                      .filter(c -> (c instanceof AtBContract) && c.getStatus().isCompleted())
                      .map(c -> (AtBContract) c)
@@ -2224,7 +2231,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all hangars across all locations associated with this campaign.
-     *                                                                                                             TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     *                                                                                                                   TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
      */
     public Hangar getAllHangar() {
         return units;
@@ -2860,7 +2867,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all warehouses across all locations associated with this campaign.
-     *                                                                                                             TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
+     *                                                                                                                   TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
      */
     public Warehouse getAllWarehouse() {
         return parts;
