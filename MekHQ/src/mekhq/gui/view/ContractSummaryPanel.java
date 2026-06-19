@@ -38,6 +38,7 @@ import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
+import static mekhq.campaign.mission.AbstractMission.UNKNOWN_DIFFICULTY;
 
 import java.awt.Cursor;
 import java.awt.FlowLayout;
@@ -588,37 +589,25 @@ public class ContractSummaryPanel extends JPanel {
     }
 
     private JPanel getContractDifficultySkulls(AtBContract contract) {
-        final int ERROR = -99;
-
-        // Create a pane with FlowLayout
         JPanel panel = new JPanel(new FlowLayout());
 
-        // Load and scale the images
         ImageIcon skullFull = scaleImageIcon(new ImageIcon("data/images/misc/challenge_estimate_full.png"), 50, true);
         ImageIcon skullHalf = scaleImageIcon(new ImageIcon("data/images/misc/challenge_estimate_half.png"), 50, true);
 
         int difficulty = contract.getContractDifficulty();
-        int iterations = difficulty;
-
-        if (difficulty == ERROR) {
-            iterations = 5;
+        if (difficulty == UNKNOWN_DIFFICULTY) {
+            difficulty = 5;
         }
 
-        if (iterations % 2 != 0) {
-            iterations--;
-            iterations /= 2;
+        int fullSkulls = difficulty / 2;
+        boolean halfSkull = (difficulty % 2) != 0;
 
-            for (int i = 0; i < iterations; i++) {
-                panel.add(new JLabel(skullFull));
-            }
+        for (int i = 0; i < fullSkulls; i++) {
+            panel.add(new JLabel(skullFull));
+        }
 
+        if (halfSkull) {
             panel.add(new JLabel(skullHalf));
-        } else {
-            iterations /= 2;
-
-            for (int i = 0; i < iterations; i++) {
-                panel.add(new JLabel(skullFull));
-            }
         }
 
         return panel;
