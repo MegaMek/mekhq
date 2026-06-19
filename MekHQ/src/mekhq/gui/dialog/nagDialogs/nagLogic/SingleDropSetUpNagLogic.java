@@ -34,7 +34,7 @@ package mekhq.gui.dialog.nagDialogs.nagLogic;
 
 import java.util.List;
 
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AbstractMissionTransition;
 
 /**
  * Provides nag logic related to the single-drop setup flow.
@@ -51,8 +51,8 @@ public class SingleDropSetUpNagLogic {
      * @return {@code true} if at least one contract has a non-{@code null} StratCon campaign state; otherwise
      *       {@code false}
      */
-    public static boolean hasActiveStratConContract(List<AtBContract> activeContracts) {
-        for (AtBContract atBContract : activeContracts) {
+    public static boolean hasActiveStratConContract(List<AbstractMissionTransition> activeContracts) {
+        for (AbstractMissionTransition atBContract : activeContracts) {
             if (atBContract.getStratConCampaignState() != null) {
                 return true;
             }

@@ -221,7 +221,7 @@ public class StratConRulesManager {
      * @param isUseStratConSingles If {@code true} only a single scenario will be generated
      */
     public static void generateScenariosDatesForWeek(Campaign campaign, StratConCampaignState campaignState,
-          AtBContract contract, StratConTrackState track, boolean isUseStratConSingles) {
+          AbstractMissionTransition contract, StratConTrackState track, boolean isUseStratConSingles) {
         // Important note: we don't check to see whether the OpFor has been routed when scheduling scenario dates.
         // This is because it's possible the OpFor will rally between the start of the week and when the scenario is
         // scheduled.
@@ -3092,7 +3092,7 @@ public class StratConRulesManager {
 
         // assemble a set of all force IDs that are currently assigned to tracks
         Set<Integer> forcesInTracks = new HashSet<>();
-        for (AtBContract contract : campaign.getActiveAtBContracts()) {
+        for (AbstractMissionTransition contract : campaign.getActiveAtBContracts()) {
             StratConCampaignState state = contract.getStratConCampaignState();
             if (state == null) {
                 continue;
@@ -3424,7 +3424,7 @@ public class StratConRulesManager {
                                                        .isForceDeployedHere(unit.getFormationId()));
     }
 
-    public static boolean isForceDeployedToStratCon(List<AtBContract> activeAtBContracts, int forceId) {
+    public static boolean isForceDeployedToStratCon(List<AbstractMissionTransition> activeAtBContracts, int forceId) {
         return activeAtBContracts
                      .stream()
                      .anyMatch(contract -> (contract.getStratConCampaignState() != null) &&
@@ -3561,7 +3561,8 @@ public class StratConRulesManager {
      *       {@link AtBMoraleLevel#ROUTED}, indicating no scenarios should occur. Otherwise, returns the sum of the base
      *       scenario odds, morale modifier (if applicable), and data center modifier.
      */
-    public static int calculateScenarioOdds(StratConTrackState track, AtBContract contract, boolean isReinforcements) {
+    public static int calculateScenarioOdds(StratConTrackState track, AbstractMissionTransition contract,
+          boolean isReinforcements) {
         if (contract.getMoraleLevel().isRouted()) {
             return -1;
         }
@@ -3943,7 +3944,7 @@ public class StratConRulesManager {
         boolean isStartOfMonth = today.getDayOfMonth() == 1;
 
         // run scenario generation routine for every track attached to an active contract
-        for (AtBContract contract : campaign.getActiveAtBContracts()) {
+        for (AbstractMissionTransition contract : campaign.getActiveAtBContracts()) {
             StratConCampaignState campaignState = contract.getStratConCampaignState();
 
             if (campaignState != null) {

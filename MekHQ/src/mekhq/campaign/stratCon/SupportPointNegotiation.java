@@ -48,6 +48,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
@@ -89,13 +90,13 @@ public class SupportPointNegotiation {
      */
     public static void negotiateAdditionalSupportPoints(Campaign campaign) {
         // Fetch all active contracts and sort them by start date (oldest -> newest)
-        List<AtBContract> activeContracts = campaign.getActiveAtBContracts();
+        List<AbstractMissionTransition> activeContracts = campaign.getActiveAtBContracts();
 
         if (activeContracts.isEmpty()) {
             return;
         }
 
-        List<AtBContract> sortedContracts = getSortedContractsByStartDate(activeContracts);
+        List<AbstractMissionTransition> sortedContracts = getSortedContractsByStartDate(activeContracts);
 
         // Get sorted Admin/Transport personnel
         List<Person> adminTransport = getSortedAdminTransportPersonnel(campaign);
@@ -107,7 +108,7 @@ public class SupportPointNegotiation {
         }
 
         // Iterate over contracts and negotiate support points
-        for (AtBContract contract : sortedContracts) {
+        for (AbstractMissionTransition contract : sortedContracts) {
             if (adminTransport.isEmpty()) {
                 break;
             }
@@ -281,8 +282,10 @@ public class SupportPointNegotiation {
      *
      * @return A {@link List} of {@link AtBContract} instances, sorted by start date.
      */
-    private static List<AtBContract> getSortedContractsByStartDate(List<AtBContract> activeContracts) {
-        activeContracts.sort(Comparator.comparing(AtBContract::getStartDate));
+    private static List<AbstractMissionTransition> getSortedContractsByStartDate(
+          List<AbstractMissionTransition> activeContracts) {
+        activeContracts.sort(Comparator.comparing(AbstractMissionTransition::getStartDate,
+              Comparator.nullsFirst(Comparator.naturalOrder())));
         return activeContracts;
     }
 

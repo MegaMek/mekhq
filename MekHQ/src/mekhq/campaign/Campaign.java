@@ -1661,11 +1661,12 @@ public class Campaign implements ITechManager, IPlace {
      *       Otherwise, false.
      */
     public boolean hasFutureAtBContract() {
-        List<AtBContract> contracts = getAtBContracts();
+        List<AbstractMissionTransition> contracts = getAtBContracts();
 
-        for (AtBContract contract : contracts) {
+        for (AbstractMissionTransition contract : contracts) {
             // This catches any contracts that have been accepted, but haven't yet started
-            if (contract.getStartDate().isAfter(currentDay)) {
+            LocalDate startDate = contract.getStartDate();
+            if (startDate != null && startDate.isAfter(currentDay)) {
                 return true;
             }
         }
@@ -2231,7 +2232,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all hangars across all locations associated with this campaign.
-     *                                                                                                                   TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     *                                                                                                                               TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
      */
     public Hangar getAllHangar() {
         return units;
@@ -2867,7 +2868,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all warehouses across all locations associated with this campaign.
-     *                                                                                                                   TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
+     *                                                                                                                               TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
      */
     public Warehouse getAllWarehouse() {
         return parts;
@@ -4913,7 +4914,7 @@ public class Campaign implements ITechManager, IPlace {
         }
 
         // clear out StratCon formation assignments
-        for (AtBContract contract : getActiveAtBContracts()) {
+        for (AbstractMissionTransition contract : getActiveAtBContracts()) {
             if (contract.getStratConCampaignState() != null) {
                 for (StratConTrackState track : contract.getStratConCampaignState().getTracks()) {
                     track.unassignFormation(fid);
@@ -6228,7 +6229,7 @@ public class Campaign implements ITechManager, IPlace {
             return new JumpPath();
         }
 
-        List<AtBContract> activeAtBContracts = getActiveAtBContracts();
+        List<AbstractMissionTransition> activeAtBContracts = getActiveAtBContracts();
 
         FactionHints factionHints = FactionHints.getInstance();
         if (!skipAccessCheck && campaignOptions.isUseFactionStandingOutlawedSafe()) {
@@ -7063,7 +7064,7 @@ public class Campaign implements ITechManager, IPlace {
 
     public int findAtBPartsAvailabilityLevel() {
         Integer availabilityModifier = null;
-        for (AtBContract contract : getActiveAtBContracts()) {
+        for (AbstractMissionTransition contract : getActiveAtBContracts()) {
             int contractAvailability = contract.getPartsAvailabilityLevel();
 
             if (availabilityModifier == null || contractAvailability < availabilityModifier) {

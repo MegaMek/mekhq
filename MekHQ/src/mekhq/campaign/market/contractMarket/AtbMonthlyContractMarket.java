@@ -72,6 +72,7 @@ import mekhq.campaign.camOpsReputation.ReputationController;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.market.enums.ContractMarketMethod;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.ContractCommandRights;
@@ -151,7 +152,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                 unitRatingMod = REGULAR.getExperienceLevel();
             }
 
-            for (AtBContract contract : campaign.getActiveAtBContracts()) {
+            for (AbstractMissionTransition contract : campaign.getActiveAtBContracts()) {
                 checkForSubcontracts(campaign, contract, unitRatingMod);
 
                 if (!contracts.isEmpty() && hasActiveContract) {
@@ -295,16 +296,26 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
     private void checkForSubcontracts(Campaign campaign, AtBContract contract, int unitRatingMod) {
         if (contract.getContractType().isGarrisonDuty()) {
             int numSubcontracts = 0;
-            for (AtBContract c : campaign.getAtBContracts()) {
-                if (contract.equals(c.getParentContract())) {
-                    numSubcontracts++;
+            for (AbstractMissionTransition mission : campaign.getAtBContracts()) {
+                if (mission instanceof AtBContract atbContract) {
+                    if (contract.equals(atbContract.getParentContract())) {
+                        numSubcontracts++;
+                    }
                 }
             }
             for (int i = numSubcontracts; i < unitRatingMod - 1; i++) {
                 int roll = d6(2);
                 if (roll >= 10) {
                     AtBContract sub = generateAtBSubcontract(campaign, contract, unitRatingMod);
-                    if (sub.getEndingDate().isBefore(contract.getEndingDate())) {
+                    LocalDate subEndingDate = sub.getEndingDate();
+                    LocalDate contractEndingDate = contract.getEndingDate();
+
+                    if (subEndingDate == null) {
+                        continue;
+                    }
+
+                    boolean subEndingDateInPast = subEndingDate.isBefore(contractEndingDate);
+                    if (contractEndingDate == null || subEndingDateInPast) {
                         contracts.add(sub);
                     }
                 }

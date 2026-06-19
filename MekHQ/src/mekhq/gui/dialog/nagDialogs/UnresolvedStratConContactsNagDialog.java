@@ -43,6 +43,7 @@ import java.util.List;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
 
@@ -78,7 +79,8 @@ public class UnresolvedStratConContactsNagDialog extends ImmersiveDialogNag {
      *
      * @return {@code true} if all conditions are met and the nag dialog should be displayed; {@code false} otherwise.
      */
-    public static boolean checkNag(boolean isUseStratCon, List<AtBContract> activeContracts, LocalDate today) {
+    public static boolean checkNag(boolean isUseStratCon, List<AbstractMissionTransition> activeContracts,
+          LocalDate today) {
 
         return isUseStratCon &&
                      !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_UNRESOLVED_STRAT_CON_CONTACTS) &&

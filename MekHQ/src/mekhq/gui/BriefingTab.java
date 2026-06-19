@@ -1559,7 +1559,7 @@ public final class BriefingTab extends CampaignGuiTab {
         List<SalvageFormationData> salvageFormationOptions = new ArrayList<>();
 
         // Collect eligible salvage forces (We want salvage forces first)
-        List<AtBContract> activeContracts = getCampaign().getActiveAtBContracts();
+        List<AbstractMissionTransition> activeContracts = getCampaign().getActiveAtBContracts();
         Hangar hangar = campaign.getHangar();
         List<Formation> eligibleSalvageFormations = new ArrayList<>();
         for (Formation formation : getCampaign().getAllFormations()) {

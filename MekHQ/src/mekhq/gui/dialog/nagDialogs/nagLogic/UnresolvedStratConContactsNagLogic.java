@@ -38,6 +38,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import java.time.LocalDate;
 import java.util.List;
 
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.stratCon.StratConScenario;
@@ -59,7 +60,7 @@ public class UnresolvedStratConContactsNagLogic {
      *
      * @return {@code true} if there are unresolved StratCon contacts in the report; {@code false} otherwise.
      */
-    public static boolean hasUnresolvedContacts(List<AtBContract> activeContracts, LocalDate today) {
+    public static boolean hasUnresolvedContacts(List<AbstractMissionTransition> activeContracts, LocalDate today) {
         String unresolvedContactsReport = determineUnresolvedContacts(activeContracts, today);
         return !unresolvedContactsReport.isEmpty();
     }
@@ -84,12 +85,12 @@ public class UnresolvedStratConContactsNagLogic {
      * @return A formatted HTML string summarizing all unresolved scenarios, with critical scenarios (e.g., Turning
      *       Points) marked.
      */
-    public static String determineUnresolvedContacts(List<AtBContract> activeContracts, LocalDate today) {
+    public static String determineUnresolvedContacts(List<AbstractMissionTransition> activeContracts, LocalDate today) {
         StringBuilder unresolvedContacts = new StringBuilder();
 
         // check every track attached to an active contract for unresolved scenarios
         // to which the player can deploy forces
-        for (AtBContract contract : activeContracts) {
+        for (AbstractMissionTransition contract : activeContracts) {
             if (contract.getStratConCampaignState() == null) {
                 continue; // Skip contracts without a Stratcon campaign state
             }

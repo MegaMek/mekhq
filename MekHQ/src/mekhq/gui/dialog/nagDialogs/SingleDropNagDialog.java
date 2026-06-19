@@ -38,45 +38,40 @@ import java.util.List;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
 import mekhq.gui.dialog.nagDialogs.nagLogic.SingleDropSetUpNagLogic;
 
 /**
- * Nag dialog reminding the player to configure a single-drop setup when using
- * StratCon singles mode with at least one active StratCon contract.
+ * Nag dialog reminding the player to configure a single-drop setup when using StratCon singles mode with at least one
+ * active StratCon contract.
  * <p>
- * This dialog is typically shown at campaign time progression (e.g. weekly on
- * Sundays) when {@link #checkNag(List, boolean, boolean)} evaluates to
- * {@code true} and the corresponding
- * {@link mekhq.MHQConstants#NAG_SINGLE_DROP_SET_UP} nag option has not been
- * disabled in {@link MekHQ#getMHQOptions()}.
+ * This dialog is typically shown at campaign time progression (e.g. weekly on Sundays) when
+ * {@link #checkNag(List, boolean, boolean)} evaluates to {@code true} and the corresponding
+ * {@link mekhq.MHQConstants#NAG_SINGLE_DROP_SET_UP} nag option has not been disabled in {@link MekHQ#getMHQOptions()}.
  * </p>
  * <p>
- * It extends {@link ImmersiveDialogNag} to provide a themed, immersive warning
- * that the current campaign configuration may not match the expected single-drop
- * StratCon setup.
+ * It extends {@link ImmersiveDialogNag} to provide a themed, immersive warning that the current campaign configuration
+ * may not match the expected single-drop StratCon setup.
  * </p>
  */
 public class SingleDropNagDialog extends ImmersiveDialogNag {
     /**
-     * Creates a new nag dialog reminding the user to configure single-drop mode
-     * for eligible StratCon contracts in the current campaign.
+     * Creates a new nag dialog reminding the user to configure single-drop mode for eligible StratCon contracts in the
+     * current campaign.
      * <p>
-     * This initializes the underlying {@link ImmersiveDialogNag} with the
-     * {@code NAG_SINGLE_DROP_SET_UP} option key and the dialog identifier
-     * {@code "SingleDropNagDialog"} so that user preferences and localization
-     * can be applied consistently with other nag dialogs.
+     * This initializes the underlying {@link ImmersiveDialogNag} with the {@code NAG_SINGLE_DROP_SET_UP} option key and
+     * the dialog identifier {@code "SingleDropNagDialog"} so that user preferences and localization can be applied
+     * consistently with other nag dialogs.
      *
-     * @param campaign
-     *            the {@link Campaign} whose active contracts and options are used
-     *            to configure and display this nag dialog
+     * @param campaign the {@link Campaign} whose active contracts and options are used to configure and display this
+     *                 nag dialog
      */
     public SingleDropNagDialog(final Campaign campaign) {
         super(campaign, null, NAG_SINGLE_DROP_SET_UP, "SingleDropNagDialog");
     }
 
-    public static boolean checkNag(List<AtBContract> activeContracts, boolean isSunday,
+    public static boolean checkNag(List<AbstractMissionTransition> activeContracts, boolean isSunday,
           boolean isUseStratConSinglesMode) {
         return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_SINGLE_DROP_SET_UP) &&
                      SingleDropSetUpNagLogic.hasActiveStratConContract(activeContracts) &&
