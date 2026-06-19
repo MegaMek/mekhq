@@ -34,9 +34,13 @@ package mekhq.gui.baseComponents;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -146,7 +150,51 @@ class MHQCollapsiblePanelTest {
             assertTrue(panel.getContentPreferredWidth() >= 321);
         });
     }
+    @Test
+    void titleStaysLeftAlignedWhenNoSummaryIsSet() throws Exception {
+        runOnEDT(() -> {
+            MHQCollapsiblePanel panel = new MHQCollapsiblePanel("Section");
+            // Lay the panel out far wider than its content so a centering regression is obvious: the only header cell
+            // carrying horizontal weight is the (possibly empty) summary, and if it stops holding that weight the
+            // GridBagLayout centers the icon+title instead of left-aligning them.
+            panel.setSize(600, Math.max(40, panel.getPreferredSize().height));
+            layoutTree(panel);
 
+            JLabel title = findLabelByText(panel, "Section");
+            assertNotNull(title, "the title label should exist");
+            Point titleInPanel = SwingUtilities.convertPoint(title.getParent(), title.getLocation(), panel);
+            assertTrue(titleInPanel.x < 150,
+                    "the title should be left-aligned, but was rendered at x=" + titleInPanel.x);
+        });
+    }
+
+    /**
+     * Lays out a component tree top-down without needing a displayable peer: each container positions its children,
+     * then we recurse so those children lay out their own descendants at the size they were just given.
+     */
+    private static void layoutTree(Component component) {
+        if (component instanceof Container container) {
+            container.doLayout();
+            for (Component child : container.getComponents()) {
+                layoutTree(child);
+            }
+        }
+    }
+
+    private static JLabel findLabelByText(Container root, String text) {
+        for (Component child : root.getComponents()) {
+            if (child instanceof JLabel label && text.equals(label.getText())) {
+                return label;
+            }
+            if (child instanceof Container container) {
+                JLabel match = findLabelByText(container, text);
+                if (match != null) {
+                    return match;
+                }
+            }
+        }
+        return null;
+    }
     /**
      * Runs the supplied work synchronously on the Event Dispatch Thread, unwrapping any assertion failure or exception
      * so JUnit reports it directly rather than as an {@link InvocationTargetException}.
