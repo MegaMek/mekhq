@@ -106,6 +106,7 @@ public class AbstractMissionTransition {
     private String name;
     private int id = -1;
     private StratConCampaignState stratConCampaignState;
+    private int contractScoreArbitraryModifier;
     private MissionStatus status = MissionStatus.ACTIVE;
     private String contractTypeName = getText("AbstractMission.contractTypeName.default");
     private AtBContractType contractType = UNDEFINED;
@@ -781,6 +782,14 @@ public class AbstractMissionTransition {
 
     public void setStratConCampaignState(StratConCampaignState stratConCampaignState) {
         this.stratConCampaignState = stratConCampaignState;
+    }
+
+    public int getContractScoreArbitraryModifier() {
+        return contractScoreArbitraryModifier;
+    }
+
+    public void setContractScoreArbitraryModifier(int contractScoreArbitraryModifier) {
+        this.contractScoreArbitraryModifier = contractScoreArbitraryModifier;
     }
 
     public String getLegacyPlanetName() {
@@ -1468,6 +1477,26 @@ public class AbstractMissionTransition {
     }
 
     /**
+     * Calculates the overall contract score based on scenario outcomes and modifiers.
+     *
+     * <p>For StratCon campaigns, this returns the current victory points from the campaign state.</p>
+     *
+     * <p>For standard contracts, this aggregates scores from all completed scenarios and applies any arbitrary
+     * modifiers that have been set for this contract.</p>
+     *
+     * @param isUseMaplessMode {@code true} if mapless mode is enabled in StratCon
+     *
+     * @return the total contract score, including victory points or scenario scores plus modifiers
+     */
+    public int getContractScore(boolean isUseMaplessMode) {
+        if (!isUseMaplessMode && getStratConCampaignState() != null) {
+            return getStratConCampaignState().getVictoryPoints();
+        }
+
+        return ContractScore.getContractScore(getCompletedScenarios()) + contractScoreArbitraryModifier;
+    }
+
+    /**
      * Calculations to be performed once the contract has been accepted.
      */
     public void acceptContract(Campaign campaign) {
@@ -1598,6 +1627,10 @@ public class AbstractMissionTransition {
         if (getStratConCampaignState() != null) {
             getStratConCampaignState().Serialize(printWriter);
         }
+        MHQXMLUtility.writeSimpleXMLTag(printWriter,
+              indent,
+              "contractScoreArbitraryModifier",
+              getContractScoreArbitraryModifier());
 
         // NPCs
         if (getEmployerLiaison() != null) {
@@ -1801,6 +1834,8 @@ public class AbstractMissionTransition {
                     // AtBContract.loadFieldsFromXmlNode after super returns.
                 } else if (nodeName.equalsIgnoreCase(StratConCampaignState.ROOT_XML_ELEMENT_NAME)) {
                     setStratConCampaignState(StratConCampaignState.Deserialize(item));
+                } else if (nodeName.equalsIgnoreCase("contractScoreArbitraryModifier")) {
+                    setContractScoreArbitraryModifier(Integer.parseInt(value));
 
                     // NPCs
                 } else if (nodeName.equalsIgnoreCase("employerLiaison")) {

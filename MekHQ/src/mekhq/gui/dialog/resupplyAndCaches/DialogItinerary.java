@@ -66,7 +66,7 @@ import javax.swing.ScrollPaneConstants;
 import megamek.client.ui.util.UIUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Campaign.AdministratorSpecialization;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
@@ -102,7 +102,7 @@ public class DialogItinerary {
      */
     public static void itineraryDialog(Resupply resupply) {
         final Campaign campaign = resupply.getCampaign();
-        final AtBContract contract = resupply.getContract();
+        final AbstractMissionTransition contract = resupply.getContract();
         final ResupplyType resupplyType = resupply.getResupplyType();
 
         final int DIALOG_WIDTH = UIUtil.scaleForGUI(700);
@@ -354,7 +354,7 @@ public class DialogItinerary {
 
         return switch (resupplyType) {
             case RESUPPLY_NORMAL -> {
-                AtBContract contract = resupply.getContract();
+                AbstractMissionTransition contract = resupply.getContract();
                 AtBMoraleLevel morale = contract.getMoraleLevel();
 
                 yield getFormattedTextAt(RESOURCE_BUNDLE,

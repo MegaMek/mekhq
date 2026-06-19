@@ -2185,7 +2185,9 @@ public class CampaignNewDayManager {
 
                     campaignState.updateVictoryPoints(-1);
                 } else if (deficit > 0) {
-                    contract.addPlayerMinorBreaches(deficit);
+                    if (contract instanceof AtBContract atbContract) {
+                        atbContract.addPlayerMinorBreaches(deficit);
+                    }
                     campaign.addReport(GENERAL, "Failure to meet " +
                                                       contract.getHyperlinkedName() +
                                                       " requirements resulted in " +
@@ -2216,7 +2218,9 @@ public class CampaignNewDayManager {
 
                         scenario.clearAllFormationsAndPersonnel(campaign);
                     } else {
-                        contract.addPlayerMinorBreach();
+                        if (contract instanceof AtBContract atBContract) {
+                            atBContract.addPlayerMinorBreach();
+                        }
 
                         campaign.addReport(BATTLE, "Failure to deploy for " +
                                                          scenario.getHyperlinkedName() +
@@ -2238,8 +2242,10 @@ public class CampaignNewDayManager {
         }
 
         // Fourth, we look at deployments for pre-existing and new scenarios
-        for (AtBContract contract : contracts) {
-            contract.checkEvents(campaign);
+        for (AbstractMissionTransition contract : contracts) {
+            if (contract instanceof AtBContract atbContract) {
+                atbContract.checkEvents(campaign);
+            }
 
             // If there is a standard battle set for today, deploy the lance.
             for (final AtBScenario atBScenario : contract.getCurrentAtBScenarios()) {

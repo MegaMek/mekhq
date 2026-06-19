@@ -341,7 +341,7 @@ public class AutoAwardsController {
         LocalDate lastContractEndingDate = null;
 
         // Loop through each contract in the list of completed contracts.
-        for (AtBContract contract : completedContracts) {
+        for (AbstractMissionTransition contract : completedContracts) {
             // Get the ending date of the current contract.
             LocalDate endingDate = contract.getEndingDate();
 

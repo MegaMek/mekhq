@@ -50,6 +50,7 @@ import megamek.common.compute.Compute;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.personnel.Person;
@@ -94,7 +95,7 @@ public class ResupplyUtilities {
      * @param contract the {@link AtBContract} related to the abandoned convoy scenario.
      * @param scenario the {@link AtBDynamicScenario} containing details of the abandoned convoy event.
      */
-    public static void processAbandonedConvoy(Campaign campaign, AtBContract contract,
+    public static void processAbandonedConvoy(Campaign campaign, AbstractMissionTransition contract,
           AtBDynamicScenario scenario) {
         final int scenarioId = scenario.getId();
 
@@ -151,7 +152,7 @@ public class ResupplyUtilities {
      * @param campaign the {@link Campaign} instance for date tracking and updating crew member status.
      * @param person   the {@link Person} representing the crew member whose fate is being decided.
      */
-    private static void decideCrewMemberFate(Campaign campaign, AtBContract contract, Person person) {
+    private static void decideCrewMemberFate(Campaign campaign, AbstractMissionTransition contract, Person person) {
         PersonnelStatus status = KIA;
 
         if (Compute.d6(2) > 7) {

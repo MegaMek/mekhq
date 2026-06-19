@@ -119,7 +119,6 @@ public class AtBContract extends AbstractMissionTransition {
 
     protected int playerMinorBreaches;
     protected int employerMinorBreaches;
-    protected int contractScoreArbitraryModifier;
 
     protected int moraleMod = 0;
 
@@ -439,26 +438,6 @@ public class AtBContract extends AbstractMissionTransition {
         return bestSite;
     }
 
-    /**
-     * Calculates the overall contract score based on scenario outcomes and modifiers.
-     *
-     * <p>For StratCon campaigns, this returns the current victory points from the campaign state.</p>
-     *
-     * <p>For standard contracts, this aggregates scores from all completed scenarios and applies any arbitrary
-     * modifiers that have been set for this contract.</p>
-     *
-     * @param isUseMaplessMode {@code true} if mapless mode is enabled in StratCon
-     *
-     * @return the total contract score, including victory points or scenario scores plus modifiers
-     */
-    public int getContractScore(boolean isUseMaplessMode) {
-        if (!isUseMaplessMode && getStratConCampaignState() != null) {
-            return getStratConCampaignState().getVictoryPoints();
-        }
-
-        return ContractScore.getContractScore(getCompletedScenarios()) + contractScoreArbitraryModifier;
-    }
-
 
     /**
      * @return the total available support points, or 0 if StratCon is not enabled for this contract
@@ -472,10 +451,6 @@ public class AtBContract extends AbstractMissionTransition {
         }
 
         return getStratConCampaignState().getSupportPoints();
-    }
-
-    public int getContractScoreArbitraryModifier() {
-        return contractScoreArbitraryModifier;
     }
 
     /**
@@ -557,7 +532,7 @@ public class AtBContract extends AbstractMissionTransition {
         return parentContract != null;
     }
 
-    public AtBContract getParentContract() {
+    public AbstractMissionTransition getParentContract() {
         return parentContract;
     }
 
@@ -840,10 +815,6 @@ public class AtBContract extends AbstractMissionTransition {
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "extensionLength", extensionLength);
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "playerMinorBreaches", playerMinorBreaches);
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "employerMinorBreaches", employerMinorBreaches);
-        MHQXMLUtility.writeSimpleXMLTag(printWriter,
-              indent,
-              "contractScoreArbitraryModifier",
-              contractScoreArbitraryModifier);
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "priorLogisticsFailure", priorLogisticsFailure);
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "battleTypeMod", battleTypeMod);
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "nextWeekBattleTypeMod", nextWeekBattleTypeMod);
@@ -873,8 +844,6 @@ public class AtBContract extends AbstractMissionTransition {
                     playerMinorBreaches = Integer.parseInt(item.getTextContent());
                 } else if (item.getNodeName().equalsIgnoreCase("employerMinorBreaches")) {
                     employerMinorBreaches = Integer.parseInt(item.getTextContent());
-                } else if (item.getNodeName().equalsIgnoreCase("contractScoreArbitraryModifier")) {
-                    contractScoreArbitraryModifier = Integer.parseInt(item.getTextContent());
                 } else if (item.getNodeName().equalsIgnoreCase("priorLogisticsFailure")) {
                     priorLogisticsFailure = Boolean.parseBoolean(item.getTextContent());
                 } else if (item.getNodeName().equalsIgnoreCase("battleTypeMod")) {
@@ -946,10 +915,6 @@ public class AtBContract extends AbstractMissionTransition {
 
     public void addPlayerMinorBreaches(int num) {
         playerMinorBreaches += num;
-    }
-
-    public void setContractScoreArbitraryModifier(int newModifier) {
-        contractScoreArbitraryModifier = newModifier;
     }
 
     public int getBattleTypeMod() {

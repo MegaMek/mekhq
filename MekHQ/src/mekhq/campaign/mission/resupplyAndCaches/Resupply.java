@@ -171,7 +171,7 @@ public class Resupply {
      *
      * @return An {@link AtBContract} representing the current contract.
      */
-    public AtBContract getContract() {
+    public AbstractMissionTransition getContract() {
         return contract;
     }
 
@@ -403,7 +403,7 @@ public class Resupply {
         this.usePlayerConvoy = usePlayerConvoy;
     }
 
-    static int calculateTargetCargoTonnage(Campaign campaign, AtBContract contract) {
+    static int calculateTargetCargoTonnage(Campaign campaign, AbstractMissionTransition contract) {
         double unitTonnage = 0;
 
         // First, calculate the total tonnage across all combat units in the campaign.
@@ -448,7 +448,7 @@ public class Resupply {
         return (int) max(CARGO_MINIMUM_WEIGHT, round(dropSize));
     }
 
-    private static double getDropSize(AtBContract contract, double unitTonnage) {
+    private static double getDropSize(AbstractMissionTransition contract, double unitTonnage) {
         final int INDIVIDUAL_TONNAGE_ALLOWANCE = 80; // This is how many tons the employer will budget per unit
         final int tonnageCap = contract.getRequiredCombatElements() * INDIVIDUAL_TONNAGE_ALLOWANCE;
 
