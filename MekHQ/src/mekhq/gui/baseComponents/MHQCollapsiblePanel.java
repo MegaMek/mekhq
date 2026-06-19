@@ -33,7 +33,7 @@
 package mekhq.gui.baseComponents;
 
 import static megamek.codeUtilities.StringUtility.isNullOrBlank;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.MHQInternationalization.getText;
 
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
@@ -73,8 +73,6 @@ import megamek.common.annotations.Nullable;
 public class MHQCollapsiblePanel extends JPanel {
     public static final String EXPANDED_PROPERTY = "expanded";
     public static final String TOGGLE_ACTION = "toggle";
-
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.GUI";
 
     private static final int HEADER_VERTICAL_PADDING = 6;
     private static final int HEADER_HORIZONTAL_PADDING = 8;
@@ -351,8 +349,8 @@ public class MHQCollapsiblePanel extends JPanel {
         headerPanel.getAccessibleContext().setAccessibleName(title);
         headerPanel.getAccessibleContext()
                 .setAccessibleDescription(isExpanded()
-                        ? getTextAt(RESOURCE_BUNDLE, "MHQCollapsiblePanel.collapse.accessibleDescription")
-                        : getTextAt(RESOURCE_BUNDLE, "MHQCollapsiblePanel.expand.accessibleDescription"));
+                        ? getText("MHQCollapsiblePanel.collapse.accessibleDescription")
+                        : getText("MHQCollapsiblePanel.expand.accessibleDescription"));
         updateHeaderBackground();
     }
 
