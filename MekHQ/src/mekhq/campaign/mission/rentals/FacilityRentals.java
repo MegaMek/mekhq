@@ -57,6 +57,7 @@ import mekhq.campaign.events.RepairStatusChangedEvent;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
@@ -84,7 +85,8 @@ public class FacilityRentals {
     private static final int CAPACITY_INCREASE_KITCHENS = 150; // One Field Kitchen
     private static final int CAPACITY_INCREASE_SECURITY = 35; // One squad of 7 soldiers
 
-    public static int getCapacityIncreaseFromRentals(List<Contract> activeContracts, ContractRentalType rentalType) {
+    public static int getCapacityIncreaseFromRentals(List<AbstractMissionTransition> activeContracts,
+          ContractRentalType rentalType) {
         if (rentalType == ContractRentalType.MAINTENANCE_BAYS || rentalType == ContractRentalType.FACTORY_CONDITIONS) {
             return 0;
         }
@@ -100,9 +102,10 @@ public class FacilityRentals {
         return rentedFacilities * capacityMultiplier;
     }
 
-    private static int getRentedFacilities(List<Contract> activeContracts, ContractRentalType rentalType) {
+    private static int getRentedFacilities(List<AbstractMissionTransition> activeContracts,
+          ContractRentalType rentalType) {
         int rentedFacilities = 0;
-        for (Contract contract : activeContracts) {
+        for (AbstractMissionTransition contract : activeContracts) {
             rentedFacilities += switch (rentalType) {
                 case HOSPITAL_BEDS -> contract.getHospitalBedsRented();
                 case KITCHENS -> contract.getKitchensRented();
@@ -220,7 +223,7 @@ public class FacilityRentals {
      * @author Illiani
      * @since 0.50.10
      */
-    public static Money calculateContractRentalCost(int cost, List<Contract> activeContracts,
+    public static Money calculateContractRentalCost(int cost, List<AbstractMissionTransition> activeContracts,
           ContractRentalType rentalType) {
         int rentalCount = getRentedFacilities(activeContracts, rentalType);
 

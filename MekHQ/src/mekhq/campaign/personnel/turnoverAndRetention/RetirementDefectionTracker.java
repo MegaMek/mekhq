@@ -55,8 +55,8 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.personnel.Injury;
@@ -132,7 +132,8 @@ public class RetirementDefectionTracker {
      *
      * @return A map with person ids as key and calculated target roll as value.
      */
-    public Map<UUID, TargetRoll> getTargetNumbers(final @Nullable Mission mission, final Campaign campaign) {
+    public Map<UUID, TargetRoll> getTargetNumbers(final @Nullable AbstractMissionTransition mission,
+          final Campaign campaign) {
         final Map<UUID, TargetRoll> targets = new HashMap<>();
 
         if (null != mission) {
@@ -451,14 +452,15 @@ public class RetirementDefectionTracker {
               AtBContractType.SECURITY_DUTY,
               AtBContractType.RIOT_DUTY);
 
-        List<Contract> activeContracts = campaign.getActiveContracts();
+        List<AbstractMissionTransition> activeContracts = campaign.getActiveContracts();
 
         if (!activeContracts.isEmpty()) {
             if (campaign.getCampaignOptions().isUseStratCon()) {
-                Optional<Contract> defensiveContract = activeContracts.stream()
-                                                             .filter(contract -> contract instanceof AtBContract)
-                                                             .filter(atBContract -> !defensiveContracts.contains(((AtBContract) atBContract).getContractType()))
-                                                             .findFirst();
+                Optional<AbstractMissionTransition> defensiveContract = activeContracts.stream()
+                                                                              .filter(contract -> contract instanceof AtBContract)
+                                                                              .filter(atBContract -> !defensiveContracts.contains(
+                                                                                    atBContract.getContractType()))
+                                                                              .findFirst();
 
                 return defensiveContract.isPresent();
             } else {

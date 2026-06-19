@@ -302,7 +302,7 @@ public class Campaign implements ITechManager, IPlace {
     CampaignTransporterMap towTransporters = new CampaignTransporterMap(this, CampaignTransportType.TOW_TRANSPORT);
     private Warehouse parts = new Warehouse();
     private final TreeMap<Integer, Formation> formationIds = new TreeMap<>();
-    private final TreeMap<Integer, Mission> missions = new TreeMap<>();
+    private final TreeMap<Integer, AbstractMissionTransition> missions = new TreeMap<>();
     private final TreeMap<Integer, Scenario> scenarios = new TreeMap<>();
     private final Map<UUID, List<Kill>> kills = new HashMap<>();
 
@@ -1494,29 +1494,49 @@ public class Campaign implements ITechManager, IPlace {
     /**
      * @return an <code>Collection</code> of missions in the campaign
      */
-    public Collection<Mission> getMissions() {
+    public Collection<AbstractMissionTransition> getMissions() {
         return missions.values();
     }
 
     /**
      * @return missions List sorted with complete missions at the bottom
      */
-    public List<Mission> getSortedMissions() {
-        return getMissions().stream()
-                     .sorted(Comparator.comparing(Mission::getStatus)
-                                   .thenComparing(m -> (m instanceof Contract) ?
-                                                             ((Contract) m).getStartDate() :
-                                                             LocalDate.now()))
-                     .collect(Collectors.toList());
+    public List<AbstractMissionTransition> getSortedMissions() {
+        List<AbstractMissionTransition> missions = new ArrayList<>(getMissions());
+
+        missions.sort(Campaign::sortMissionByStartDateAndStatus);
+
+        return missions;
     }
 
-    public List<Mission> getActiveMissions(final boolean excludeEndDateCheck) {
+    private static int sortMissionByStartDateAndStatus(AbstractMissionTransition mission1,
+          AbstractMissionTransition mission2) {
+        int statusCompare = mission1.getStatus().compareTo(mission2.getStatus());
+        if (statusCompare != 0) {
+            return statusCompare;
+        }
+
+        LocalDate date1 = mission1.getStartDate();
+        LocalDate date2 = mission2.getStartDate();
+
+        if (date1 == null && date2 == null) {
+            return 0;
+        } else if (date1 == null) {
+            return -1;
+        } else if (date2 == null) {
+            return 1;
+        }
+
+        return date1.compareTo(date2);
+    }
+
+    public List<AbstractMissionTransition> getActiveMissions(final boolean excludeEndDateCheck) {
         return getMissions().stream()
                      .filter(m -> m.isActiveOn(getLocalDate(), excludeEndDateCheck))
                      .collect(Collectors.toList());
     }
 
-    public List<Mission> getCompletedMissions() {
+    public List<AbstractMissionTransition> getCompletedMissions() {
         return getMissions().stream().filter(m -> m.getStatus().isCompleted()).collect(Collectors.toList());
     }
 
@@ -1529,7 +1549,7 @@ public class Campaign implements ITechManager, IPlace {
      *
      * @return A list of {@link Contract} objects that are currently active.
      */
-    public List<Contract> getActiveContracts() {
+    public List<AbstractMissionTransition> getActiveContracts() {
         return getActiveContracts(false);
     }
 
@@ -1546,17 +1566,17 @@ public class Campaign implements ITechManager, IPlace {
      *
      * @return A list of {@link Contract} objects that match the active criteria.
      */
-    public List<Contract> getActiveContracts(boolean includeFutureContracts) {
-        List<Contract> activeContracts = new ArrayList<>();
+    public List<AbstractMissionTransition> getActiveContracts(boolean includeFutureContracts) {
+        List<AbstractMissionTransition> activeContracts = new ArrayList<>();
 
-        for (Mission mission : getMissions()) {
+        for (AbstractMissionTransition mission : getMissions()) {
             // Skip if the mission is not a Contract
-            if (!(mission instanceof Contract contract)) {
+            if (mission instanceof Mission) {
                 continue;
             }
 
-            if (contract.isActiveOn(getLocalDate(), includeFutureContracts)) {
-                activeContracts.add(contract);
+            if (mission.isActiveOn(getLocalDate(), includeFutureContracts)) {
+                activeContracts.add(mission);
             }
         }
 
@@ -1571,17 +1591,18 @@ public class Campaign implements ITechManager, IPlace {
      *
      * @return A list of {@link Contract} objects whose start dates are in the future.
      */
-    public List<Contract> getFutureContracts() {
-        List<Contract> activeContracts = new ArrayList<>();
+    public List<AbstractMissionTransition> getFutureContracts() {
+        List<AbstractMissionTransition> activeContracts = new ArrayList<>();
 
-        for (Mission mission : getMissions()) {
+        for (AbstractMissionTransition mission : getMissions()) {
             // Skip if the mission is not a Contract
-            if (!(mission instanceof Contract contract)) {
+            if (mission instanceof Mission) {
                 continue;
             }
 
-            if (contract.getStartDate().isAfter(currentDay)) {
-                activeContracts.add(contract);
+            LocalDate startDate = mission.getStartDate();
+            if (startDate != null && startDate.isAfter(currentDay)) {
+                activeContracts.add(mission);
             }
         }
 
@@ -2203,7 +2224,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all hangars across all locations associated with this campaign.
-     *                                     TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     *                                                                               TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
      */
     public Hangar getAllHangar() {
         return units;
@@ -2839,7 +2860,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all warehouses across all locations associated with this campaign.
-     *                                     TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
+     *                                                                               TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
      */
     public Warehouse getAllWarehouse() {
         return parts;
@@ -4568,7 +4589,7 @@ public class Campaign implements ITechManager, IPlace {
      * @since 0.50.10
      */
     public Money getTotalRentFeesExcludingBays() {
-        List<Contract> activeContracts = getActiveContracts();
+        List<AbstractMissionTransition> activeContracts = getActiveContracts();
         int hospitalRentalCost = campaignOptions.getRentedFacilitiesCostHospitalBeds();
         Money hospitalRentalFee = FacilityRentals.calculateContractRentalCost(hospitalRentalCost, activeContracts,
               ContractRentalType.HOSPITAL_BEDS);
@@ -4820,16 +4841,15 @@ public class Campaign implements ITechManager, IPlace {
 
     public void removeScenario(final Scenario scenario) {
         scenario.clearAllFormationsAndPersonnel(this);
-        final Mission mission = getMission(scenario.getMissionId());
+        final AbstractMissionTransition mission = getMission(scenario.getMissionId());
         if (mission != null) {
             mission.getScenarios().remove(scenario);
 
-            // run through the StratCon campaign state where applicable and remove the
-            // "parent" scenario as well
+            // run through the StratCon campaign state where applicable and remove the "parent" scenario as well
             if ((mission instanceof AtBContract) &&
-                      (((AtBContract) mission).getStratConCampaignState() != null) &&
+                      (mission.getStratConCampaignState() != null) &&
                       (scenario instanceof AtBDynamicScenario)) {
-                ((AtBContract) mission).getStratConCampaignState().removeStratConScenario(scenario.getId());
+                mission.getStratConCampaignState().removeStratConScenario(scenario.getId());
             }
         }
         scenarios.remove(scenario.getId());
@@ -5782,7 +5802,7 @@ public class Campaign implements ITechManager, IPlace {
         humanResources.writeToXML(writer, indent, this);
 
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "missions");
-        for (final Mission mission : getMissions()) {
+        for (final AbstractMissionTransition mission : getMissions()) {
             mission.writeToXML(this, writer, indent);
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "missions");
@@ -8188,20 +8208,20 @@ public class Campaign implements ITechManager, IPlace {
         });
     }
 
-    public void completeMission(@Nullable Mission mission, MissionStatus status) {
+    public void completeMission(@Nullable AbstractMissionTransition mission, MissionStatus status) {
         if (mission == null) {
             return;
         }
         mission.setStatus(status);
-        if (mission instanceof Contract contract) {
+        if (!(mission instanceof Mission)) {
             Money remainingMoney = Money.zero();
             // check for money in escrow According to FMM(r) pg 179, both failure and breach lead to no further
             // payment even though this seems foolish
-            if (contract.getStatus().isSuccess()) {
-                remainingMoney = contract.getMonthlyPayOut().multipliedBy(contract.getMonthsLeft(getLocalDate()));
+            if (mission.getStatus().isSuccess()) {
+                remainingMoney = mission.getMonthlyPayOut().multipliedBy(mission.getMonthsLeft(getLocalDate()));
 
-                if (contract instanceof AtBContract) {
-                    Money routedPayout = ((AtBContract) contract).getRoutedPayout();
+                if (mission instanceof AtBContract) {
+                    Money routedPayout = mission.getRoutedPayout();
 
                     remainingMoney = routedPayout == null ? remainingMoney : routedPayout;
                 }
@@ -8213,14 +8233,14 @@ public class Campaign implements ITechManager, IPlace {
             // Then, we check if the salvage percent is less than the percent salvaged by
             // the
             // unit in question. If it is, then they owe the assigner some cash
-            if (getCampaignOptions().isOverageRepaymentInFinalPayment() && (contract.getSalvagePercent() < 100.0)) {
-                final double salvagePercent = contract.getSalvagePercent() / 100.0;
-                final Money maxSalvage = contract.getSalvagedByEmployer()
+            if (getCampaignOptions().isOverageRepaymentInFinalPayment() && (mission.getSalvagePercent() < 100.0)) {
+                final double salvagePercent = mission.getSalvagePercent() / 100.0;
+                final Money maxSalvage = mission.getSalvagedByEmployer()
                                                .multipliedBy(salvagePercent / (1 - salvagePercent));
-                if (contract.getSalvagedByUnit().isGreaterThan(maxSalvage)) {
-                    final Money amountToRepay = contract.getSalvagedByUnit().minus(maxSalvage);
+                if (mission.getSalvagedByUnit().isGreaterThan(maxSalvage)) {
+                    final Money amountToRepay = mission.getSalvagedByUnit().minus(maxSalvage);
                     remainingMoney = remainingMoney.minus(amountToRepay);
-                    contract.subtractSalvageByUnit(amountToRepay);
+                    mission.subtractSalvageByUnit(amountToRepay);
                 }
             }
 
@@ -8229,13 +8249,13 @@ public class Campaign implements ITechManager, IPlace {
                       MekHQ.getMHQOptions().getLocale());
 
                 if (remainingMoney.isGreaterThan(Money.zero())) {
-                    Money shares = remainingMoney.multipliedBy(contract.getSharesPercent()).dividedBy(100);
+                    Money shares = remainingMoney.multipliedBy(mission.getSharesPercent()).dividedBy(100);
                     remainingMoney = remainingMoney.minus(shares);
 
                     if (getFinances().debit(TransactionType.SALARIES,
                           getLocalDate(),
                           shares,
-                          String.format(financeResources.getString("ContractSharePayment.text"), contract.getName()))) {
+                          String.format(financeResources.getString("ContractSharePayment.text"), mission.getName()))) {
                         addReport(FINANCES, financeResources.getString("DistributedShares.text"),
                               shares.toAmountAndSymbolString());
 
@@ -8248,20 +8268,20 @@ public class Campaign implements ITechManager, IPlace {
                 getFinances().credit(TransactionType.CONTRACT_PAYMENT,
                       getLocalDate(),
                       remainingMoney,
-                      "Remaining payment for " + contract.getName());
+                      "Remaining payment for " + mission.getName());
                 addReport(FINANCES, "Your account has been credited for " +
                                           remainingMoney.toAmountAndSymbolString() +
                                           " for the remaining payout from contract " +
-                                          contract.getHyperlinkedName());
+                                          mission.getHyperlinkedName());
             } else if (remainingMoney.isNegative()) {
                 getFinances().credit(TransactionType.CONTRACT_PAYMENT,
                       getLocalDate(),
                       remainingMoney,
-                      "Repaying payment overages for " + contract.getName());
+                      "Repaying payment overages for " + mission.getName());
                 addReport(FINANCES, "Your account has been debited for " +
                                           remainingMoney.absolute().toAmountAndSymbolString() +
                                           " to repay payment overages occurred during the contract " +
-                                          contract.getHyperlinkedName());
+                                          mission.getHyperlinkedName());
             }
 
             // This relies on the mission being a Contract, and AtB to be on
@@ -8586,8 +8606,8 @@ public class Campaign implements ITechManager, IPlace {
             /*
              * Switch all contracts to AtBContract's
              */
-            for (Entry<Integer, Mission> me : missions.entrySet()) {
-                Mission m = me.getValue();
+            for (Entry<Integer, AbstractMissionTransition> me : missions.entrySet()) {
+                AbstractMissionTransition m = me.getValue();
                 if (m instanceof Contract && !(m instanceof AtBContract)) {
                     me.setValue(new AtBContract((Contract) m, this));
                 }
