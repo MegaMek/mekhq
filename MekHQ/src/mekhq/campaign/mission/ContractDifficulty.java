@@ -66,7 +66,7 @@ public class ContractDifficulty {
      *
      * @return a difficulty rating from {@code 1} to {@code 10}, or {@code -99} if enemy strength estimation fails
      */
-    public static int calculateContractDifficulty(AbstractMission mission, int gameYear,
+    public static int calculateContractDifficulty(AbstractMissionTransition mission, int gameYear,
           boolean useGenericBV, List<Entity> playerCombatUnits) {
 
         final int ERROR = -99;

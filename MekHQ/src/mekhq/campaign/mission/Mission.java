@@ -49,7 +49,7 @@ import org.w3c.dom.Node;
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
-public class Mission extends AbstractMission {
+public class Mission extends AbstractMissionTransition {
     private static final MMLogger LOGGER = MMLogger.create(Mission.class);
 
     // region Constructors
@@ -76,12 +76,12 @@ public class Mission extends AbstractMission {
     }
 
     /**
-     * @deprecated Call {@link AbstractMission#generateInstanceFromXML} directly. This delegate exists only so that
-     *       existing call sites in the campaign loader do not need to be updated immediately.
+     * @deprecated Call {@link AbstractMissionTransition#generateInstanceFromXML} directly. This delegate exists only so
+     *       that existing call sites in the campaign loader do not need to be updated immediately.
      */
     @Deprecated
     public static Mission generateInstanceFromXML(Node node, Campaign campaign, Version version) {
-        return (Mission) AbstractMission.generateInstanceFromXML(node, campaign, version);
+        return (Mission) AbstractMissionTransition.generateInstanceFromXML(node, campaign, version);
     }
 
     @Override
