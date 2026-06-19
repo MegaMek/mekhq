@@ -40,7 +40,7 @@ import megamek.Version;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.storyArc.StoryPoint;
@@ -93,11 +93,11 @@ public class ScenarioStoryPoint extends StoryPoint {
         super.start();
         StoryPoint missionStoryPoint = getStoryArc().getStoryPoint(missionStoryPointId);
         if (missionStoryPoint instanceof MissionStoryPoint) {
-            Mission m = ((MissionStoryPoint) missionStoryPoint).getMission();
-            if (null != m & null != scenario) {
+            AbstractMissionTransition mission = ((MissionStoryPoint) missionStoryPoint).getMission();
+            if (null != mission & null != scenario) {
                 // set date for the scenario
                 scenario.setDate(getStoryArc().getCampaign().getLocalDate().plusDays(days));
-                getStoryArc().getCampaign().addScenario(scenario, m);
+                getStoryArc().getCampaign().addScenario(scenario, mission);
                 Formation formation = getCampaign().getFormation(deployedForceId);
                 if (null != formation) {
                     scenario.addForces(formation.getId());

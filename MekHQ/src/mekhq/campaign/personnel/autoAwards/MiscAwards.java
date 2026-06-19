@@ -73,7 +73,8 @@ public class MiscAwards {
      *
      * @return a map of eligible awards grouped by their respective IDs
      */
-    public static Map<Integer, List<Object>> MiscAwardsProcessor(Campaign campaign, @Nullable Mission mission,
+    public static Map<Integer, List<Object>> MiscAwardsProcessor(Campaign campaign,
+          @Nullable AbstractMissionTransition mission,
           UUID person, List<Award> awards, Boolean missionWasSuccessful, boolean isCivilianHelp,
           @Nullable Integer killCount, @Nullable Integer injuryCount, @Nullable UUID supportPersonOfTheYear,
           @Nullable List<Person> POWPersonnel) {
@@ -198,7 +199,8 @@ public class MiscAwards {
      *
      * @return true if the person is eligible for the award, false otherwise
      */
-    private static boolean Periphery(Campaign campaign, @Nullable Mission mission, Award award, UUID person) {
+    private static boolean Periphery(Campaign campaign, @Nullable AbstractMissionTransition mission, Award award,
+          UUID person) {
         if (award.canBeAwarded(campaign.getPerson(person))) {
             if (mission != null) {
                 try {

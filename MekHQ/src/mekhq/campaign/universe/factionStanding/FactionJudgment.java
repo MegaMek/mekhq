@@ -49,7 +49,7 @@ import java.util.Map;
 
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
-import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.utilities.MHQXMLUtility;
@@ -250,7 +250,7 @@ public class FactionJudgment {
      * @since 0.50.07
      */
     public @Nullable FactionCensureLevel increaseCensureForFaction(final Faction faction, final LocalDate today,
-          final List<Mission> activeMissions, final boolean campaignInTransit) {
+          final List<AbstractMissionTransition> activeMissions, final boolean campaignInTransit) {
         String factionCode = faction.getShortName();
         CensureEntry censureEntry = factionCensures.get(factionCode);
 

@@ -67,7 +67,6 @@ import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
@@ -727,7 +726,7 @@ public class FactionStandings {
      * @since 0.50.07
      */
     public @Nullable FactionCensureLevel checkForCensure(Faction faction, LocalDate today,
-          List<Mission> activeMissions, boolean campaignInTransit) {
+          List<AbstractMissionTransition> activeMissions, boolean campaignInTransit) {
         if (faction.isAggregate()) {
             return null;
         }

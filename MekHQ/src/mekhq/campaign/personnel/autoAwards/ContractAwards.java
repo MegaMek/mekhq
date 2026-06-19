@@ -33,6 +33,7 @@
 
 package mekhq.campaign.personnel.autoAwards;
 
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,8 +43,7 @@ import java.util.UUID;
 
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.personnel.Award;
 
 public class ContractAwards {
@@ -58,15 +58,15 @@ public class ContractAwards {
      * @param person   the person to check award eligibility for
      * @param awards   the awards to be processed (should only include awards where item == Kill)
      */
-    public static Map<Integer, List<Object>> ContractAwardsProcessor(Campaign campaign, Mission mission,
+    public static Map<Integer, List<Object>> ContractAwardsProcessor(Campaign campaign,
+          AbstractMissionTransition mission,
           UUID person, List<Award> awards) {
         List<Award> eligibleAwards = new ArrayList<>();
         List<Award> bestEligibleAwards = new ArrayList<>();
         Award bestAward = new Award();
 
-        long contractDuration = ChronoUnit.MONTHS.between(
-              ((Contract) mission).getStartDate(),
-              campaign.getLocalDate());
+        LocalDate startDate = mission.getStartDate();
+        long contractDuration = startDate == null ? 0 : ChronoUnit.MONTHS.between(startDate, campaign.getLocalDate());
 
         // these entries should always be in lower case
         List<String> validTypes = Arrays.asList("months", "duty", "garrison duty", "cadre duty", "security duty",

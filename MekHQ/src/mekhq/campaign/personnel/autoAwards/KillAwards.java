@@ -56,7 +56,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationLevel;
-import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.personnel.Award;
 
 public class KillAwards {
@@ -71,7 +71,8 @@ public class KillAwards {
      * @param awards   the awards to be processed (should only include awards where item == Kill)
      * @param killData the pre-processed list of kills mapped to Force ID
      */
-    public static Map<Integer, List<Object>> KillAwardProcessor(Campaign campaign, Mission mission, UUID person,
+    public static Map<Integer, List<Object>> KillAwardProcessor(Campaign campaign, AbstractMissionTransition mission,
+          UUID person,
           List<Award> awards, Map<Integer, List<Kill>> killData) {
         List<Award> individualAwards = new ArrayList<>();
 
@@ -205,7 +206,9 @@ public class KillAwards {
                                     // the award depth
                                     while (depth < awardDepth.getDepth()) {
                                         // Get the ID of the origin force's parent force
-                                        int parentForce = campaign.getFormation(originForce).getParentFormation().getId();
+                                        int parentForce = campaign.getFormation(originForce)
+                                                                .getParentFormation()
+                                                                .getId();
 
                                         // If the depth is greater or equal to the maximum depth, exit the loop
                                         if (depth >= maximumDepth.getDepth()) {

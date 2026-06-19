@@ -131,7 +131,7 @@ public class MissionStoryPoint extends StoryPoint {
         super.complete();
     }
 
-    public Mission getMission() {
+    public AbstractMissionTransition getMission() {
         return mission;
     }
 

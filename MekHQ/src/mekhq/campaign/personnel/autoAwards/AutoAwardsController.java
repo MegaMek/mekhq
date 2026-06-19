@@ -53,7 +53,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
 import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.AwardsFactory;
@@ -62,7 +61,7 @@ import mekhq.gui.dialog.AutoAwardsDialog;
 
 public class AutoAwardsController {
     private Campaign campaign;
-    private Mission mission;
+    private AbstractMissionTransition mission;
 
     final private List<Award> contractAwards = new ArrayList<>();
     final private List<Award> factionHunterAwards = new ArrayList<>();
@@ -695,7 +694,7 @@ public class AutoAwardsController {
         Map<Integer, List<Object>> processedData;
         int allAwardDataKey = 0;
 
-        if ((!contractAwards.isEmpty()) && (mission instanceof Contract)) {
+        if ((!contractAwards.isEmpty()) && !(mission instanceof Mission)) {
             processedData = ContractAwardsManager(personnel);
 
             // if processedData == null, nobody was eligible for this type of award, so they should be skipped
@@ -771,7 +770,7 @@ public class AutoAwardsController {
             }
         }
 
-        if ((!theatreOfWarAwards.isEmpty()) && (mission instanceof Contract)) {
+        if ((!theatreOfWarAwards.isEmpty()) && !(mission instanceof Mission)) {
             processedData = TheatreOfWarAwardsManager(personnel);
 
             if (processedData != null) {

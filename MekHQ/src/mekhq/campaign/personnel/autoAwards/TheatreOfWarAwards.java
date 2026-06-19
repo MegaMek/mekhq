@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.personnel.autoAwards;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -40,9 +41,8 @@ import java.util.stream.IntStream;
 
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -59,7 +59,8 @@ public class TheatreOfWarAwards {
      * @param person   the person to check award eligibility for
      * @param awards   the awards to be processed (should only include awards where item == TheatreOfWar)
      */
-    public static Map<Integer, List<Object>> TheatreOfWarAwardsProcessor(Campaign campaign, Mission mission,
+    public static Map<Integer, List<Object>> TheatreOfWarAwardsProcessor(Campaign campaign,
+          AbstractMissionTransition mission,
           UUID person, List<Award> awards) {
         boolean isEligible;
         List<Award> eligibleAwards = new ArrayList<>();
@@ -70,10 +71,16 @@ public class TheatreOfWarAwards {
             return AutoAwardsController.prepareAwardData(person, eligibleAwards);
         }
 
-        String employer = ((AtBContract) mission).getEmployerCode();
+        String employer = mission.getEmployerCode();
 
-        int contractStartYear = ((Contract) mission).getStartDate().getYear();
         int currentYear = campaign.getGameYear();
+
+        LocalDate startDate = mission.getStartDate();
+        int contractStartYear = startDate == null ? currentYear : startDate.getYear();
+
+        if (startDate == null) {
+            LOGGER.warn("Theatre of War Award processing failed. Contract start date is null.");
+        }
 
         for (Award award : awards) {
             List<String> attackers = new ArrayList<>();
