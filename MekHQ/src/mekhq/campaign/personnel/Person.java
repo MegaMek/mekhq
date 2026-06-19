@@ -8041,8 +8041,8 @@ public class Person implements ILocation {
     }
 
     @Override
-    public Set<Person> fetchPersonnelAtLocation() {
-        return Set.of(this);
+    public java.util.Set<Person> fetchPersonnelAtLocation() {
+        return java.util.Set.of(this);
     }
 
     public List<Skill> getInProgressSkills() {
@@ -9278,7 +9278,7 @@ public class Person implements ILocation {
      * @since 0.50.10
      */
     public SkillModifierData getSkillModifierData(boolean excludeInjuryEffects) {
-        boolean isAmbidextrous = options.booleanOption(ATOW_AMBIDEXTROUS);
+        boolean isAmbidextrous = options.booleanOption(PersonnelOptions.ATOW_AMBIDEXTROUS);
         List<InjuryEffect> injuryEffects = excludeInjuryEffects ? new ArrayList<>() :
                                                  getAllActiveInjuryEffects(isAmbidextrous,
                                                        injuries);
@@ -9331,7 +9331,7 @@ public class Person implements ILocation {
           boolean excludeInjuryEffects) {
         int adjustedReputation = getAdjustedReputation(isUseAgingEffects, isClanCampaign, today, rank);
 
-        boolean isAmbidextrous = options.booleanOption(ATOW_AMBIDEXTROUS);
+        boolean isAmbidextrous = options.booleanOption(PersonnelOptions.ATOW_AMBIDEXTROUS);
         List<InjuryEffect> injuryEffects = excludeInjuryEffects ?
                                                  new ArrayList<>() :
                                                  getAllActiveInjuryEffects(isAmbidextrous,
