@@ -54,7 +54,7 @@ import megamek.common.loaders.MekSummaryCache;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.mission.ScenarioTemplate;
@@ -101,7 +101,7 @@ public class RiotScenario {
      * @author Illiani
      * @since 0.50.10
      */
-    public RiotScenario(Campaign campaign, AtBContract contract) {
+    public RiotScenario(Campaign campaign, AbstractMissionTransition contract) {
         this.campaign = campaign;
 
         List<Unit> allMobs = findMobsForRiots(contract.getEnemy());
@@ -205,7 +205,7 @@ public class RiotScenario {
      * @author Illiani
      * @since 0.50.10
      */
-    private void createRiotScenario(AtBContract contract, List<Unit> mobUnits) {
+    private void createRiotScenario(AbstractMissionTransition contract, List<Unit> mobUnits) {
         final String DIRECTORY = "data" + separator + "scenariotemplates" + separator;
         final String SCENARIO_FILE = DIRECTORY + "Crowd Control.xml";
 

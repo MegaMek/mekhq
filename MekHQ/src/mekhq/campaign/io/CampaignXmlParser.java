@@ -117,6 +117,7 @@ import mekhq.campaign.market.ShoppingList;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
 import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.AmmoStorage;
@@ -2405,7 +2406,9 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
         // Restore references on AtBContracts
         for (AbstractMissionTransition contract : retVal.getAtBContracts()) {
-            contract.restore(retVal);
+            if (contract instanceof AtBContract atbContract) {
+                atbContract.restore(retVal);
+            }
         }
 
         LOGGER.info("Load Mission Nodes Complete!");

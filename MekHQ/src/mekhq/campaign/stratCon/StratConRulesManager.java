@@ -3294,7 +3294,7 @@ public class StratConRulesManager {
             return false;
         }
 
-        AtBContract forceContract = combatTeam.getContract(campaign);
+        AbstractMissionTransition forceContract = combatTeam.getContract(campaign);
         AtBContract scenarioContract = currentScenario.getBackingContract(campaign);
 
         return forceContract.equals(scenarioContract);

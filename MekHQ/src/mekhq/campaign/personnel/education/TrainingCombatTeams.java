@@ -68,7 +68,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.log.PerformanceLogger;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -143,7 +143,7 @@ public class TrainingCombatTeams {
                 continue;
             }
 
-            AtBContract contract = combatTeam.getContract(campaign);
+            AbstractMissionTransition contract = combatTeam.getContract(campaign);
             if (contract == null || !contract.isActiveOn(today, false)) {
                 continue;
             }

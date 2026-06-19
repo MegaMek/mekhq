@@ -556,7 +556,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
     protected AtBContract generateAtBSubcontract(Campaign campaign, AbstractMissionTransition parent,
           int unitRatingMod) {
-        AbstractMissionTransition contract = new AtBContract("New Subcontract");
+        AtBContract contract = new AtBContract("New Subcontract");
         contract.updateEmployer(parent.getEmployerCode(), campaign.getGameYear());
         getContractType(contract);
 

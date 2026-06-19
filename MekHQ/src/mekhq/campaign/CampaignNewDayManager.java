@@ -1084,7 +1084,10 @@ public class CampaignNewDayManager {
             for (AbstractMissionTransition contract : campaign.getActiveAtBContracts()) {
                 AtBMoraleLevel oldMorale = contract.getMoraleLevel();
 
-                contract.checkMorale(campaign, today);
+                if (contract instanceof AtBContract atbContract) {
+                    atbContract.checkMorale(campaign, today);
+                }
+
                 AtBMoraleLevel newMorale = contract.getMoraleLevel();
 
                 String report = "";
@@ -1111,9 +1114,11 @@ public class CampaignNewDayManager {
             List<AbstractMissionTransition> activeContracts = campaign.getActiveAtBContracts();
             AbstractMissionTransition firstNonSubcontract = null;
             for (AbstractMissionTransition contract : activeContracts) {
-                if (!contract.isSubcontract()) {
-                    firstNonSubcontract = contract;
-                    break;
+                if (contract instanceof AtBContract atbContract) {
+                    if (!atbContract.isSubcontract()) {
+                        firstNonSubcontract = contract;
+                        break;
+                    }
                 }
             }
 
@@ -2034,7 +2039,7 @@ public class CampaignNewDayManager {
      *
      * @param contract the {@link AtBContract} for which resupply is being processed
      */
-    private void processResupply(AtBContract contract) {
+    private void processResupply(AbstractMissionTransition contract) {
         boolean isGuerrilla = contract.getContractType().isGuerrillaType()
                                     || PIRATE_FACTION_CODE.equals(contract.getEmployerCode());
 

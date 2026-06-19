@@ -484,7 +484,11 @@ public class CombatTeam {
         int battleTypeMod = 1 +
                                   (AtBMoraleLevel.STALEMATE.ordinal() -
                                          getContract(campaign).getMoraleLevel().ordinal()) * 5;
-        battleTypeMod += getContract(campaign).getBattleTypeMod();
+
+        AbstractMissionTransition contract = getContract(campaign);
+        if (contract instanceof AtBContract atbContract) {
+            battleTypeMod += atbContract.getBattleTypeMod();
+        }
 
         // debugging code that will allow you to force the generation of a particular
         // scenario.

@@ -295,11 +295,12 @@ public class StratConTab extends CampaignGuiTab {
             expandedObjectivePanel.setVisible(false);
             return;
         }
-        AtBContract currentContract = currentTDI.contract;
+        AbstractMissionTransition currentContract = currentTDI.contract;
 
         LocalDate currentDate = getCampaignGui().getCampaign().getLocalDate();
 
-        if (currentContract.getStartDate().isAfter(currentDate)) {
+        LocalDate startDate = currentContract.getStartDate();
+        if (startDate != null && startDate.isAfter(currentDate)) {
             campaignStatusText.setText("Contract has not started.");
             expandedObjectivePanel.setVisible(false);
             return;

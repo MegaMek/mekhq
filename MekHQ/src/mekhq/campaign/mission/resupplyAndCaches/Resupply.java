@@ -61,6 +61,7 @@ import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.market.PartsInUseManager;
 import mekhq.campaign.market.procurement.Procurement;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.enums.PartQuality;
@@ -92,7 +93,7 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
  */
 public class Resupply {
     private final Campaign campaign;
-    private final AtBContract contract;
+    private final AbstractMissionTransition contract;
     private final ResupplyType resupplyType;
     private final Faction employerFaction;
     private final int currentYear;
@@ -131,7 +132,7 @@ public class Resupply {
      * @param campaign The current campaign.
      * @param contract The specific contract under which the resupply process is conducted.
      */
-    public Resupply(Campaign campaign, AtBContract contract, ResupplyType resupplyType) {
+    public Resupply(Campaign campaign, AbstractMissionTransition contract, ResupplyType resupplyType) {
         this.campaign = campaign;
         this.contract = contract;
         this.resupplyType = resupplyType;

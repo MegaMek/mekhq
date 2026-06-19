@@ -115,7 +115,7 @@ public class NewContractDialog extends JDialog {
         setUserPreferences();
     }
 
-    public Contract getContract() {
+    public AbstractMissionTransition getContract() {
         return contract;
     }
 
