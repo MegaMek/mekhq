@@ -87,11 +87,7 @@ public class MHQCollapsiblePanel extends JPanel {
     private final JLabel summaryLabel = new JLabel() {
         @Override
         public String getToolTipText(MouseEvent event) {
-            // The summary is the header's flexible column, so when it is too long it is truncated with an ellipsis
-            // rather than widening the section. Surface the full text as a tooltip only while it is actually
-            // truncated, so sections whose summary already fits do not show a redundant tooltip. Calls are qualified
-            // with this. so they resolve to this label's geometry, not the same-named methods on the enclosing panel.
-            return this.getPreferredSize().width > this.getWidth() ? this.getText() : null;
+            return truncatedSummaryToolTip(this);
         }
     };
     private final JPanel trailingPanel = new JPanel(new BorderLayout());
@@ -146,6 +142,20 @@ public class MHQCollapsiblePanel extends JPanel {
         // weightx=0 the layout would center the icon+title in the header.
         summaryLabel.setText((summary == null) || summary.isBlank() ? "" : summary);
         summaryLabel.setVisible(true);
+    }
+
+    /**
+     * The summary is the header's flexible column, so a long summary is truncated with an ellipsis rather than
+     * widening the section. This surfaces the full text as a tooltip only while it is actually truncated, so a summary
+     * that already fits does not show a redundant tooltip. The label is passed in so the width and text reads are made
+     * on an explicit reference.
+     *
+     * @param label the summary label to measure
+     *
+     * @return the label's full text when it is too narrow to display without an ellipsis, otherwise {@code null}
+     */
+    private static String truncatedSummaryToolTip(JLabel label) {
+        return label.getPreferredSize().width > label.getWidth() ? label.getText() : null;
     }
 
     /**
