@@ -126,7 +126,7 @@ public class Fatigue {
             if (!personnelRole.isCombat() && isUseFieldKitchenIgnoreNonCombatants) {
                 continue;
             }
-            fieldKitchenUsage+=campaign.getTempCrewPool(personnelRole);
+            fieldKitchenUsage += campaign.getTempCrewPool(personnelRole);
         }
 
         for (Person person : activePersonnel) {
