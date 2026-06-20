@@ -272,12 +272,12 @@ public class TrainingCombatTeams {
                         SkillType skillType = traineeSkill.getType();
                         int targetLevel = skillType.getRegularLevel();
 
-                        int traineeSkillLevel = traineeSkill.getLevel();
-                        if (traineeSkillLevel >= targetLevel) {
+                        int traineeExperienceLevel = traineeSkill.getExperienceLevel(null);
+                        if (traineeExperienceLevel >= targetLevel) {
                             continue;
                         }
 
-                        if (traineeSkillLevel < educatorSkills.get(commanderSkill)) {
+                        if (traineeExperienceLevel < educatorSkills.get(commanderSkill)) {
                             skillsBeingTrained.add(traineeSkill);
                         }
                     }
