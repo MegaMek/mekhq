@@ -64,6 +64,7 @@ public class AcademyCampusLocation implements IPlace {
     private final Personnel personnel = new Personnel();
     private final String academySet;
     private final String academyName;
+    private final LocationNewDayManager locationNewDayManager = new LocationNewDayManager(this);
 
     public AcademyCampusLocation(String academySet, String academyName) {
         this.academySet = academySet;
@@ -78,6 +79,10 @@ public class AcademyCampusLocation implements IPlace {
 
     public String getAcademyName() {
         return academyName;
+    }
+
+    public LocationNewDayManager getLocationNewDayManager() {
+        return locationNewDayManager;
     }
 
     public @Nullable Academy getAcademy() {

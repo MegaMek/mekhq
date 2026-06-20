@@ -171,6 +171,7 @@ import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationDispatch;
+import mekhq.campaign.location.LocationNewDayManager;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.log.HistoricalLogEntry;
@@ -402,6 +403,7 @@ public class Campaign implements ITechManager, IPlace {
     private LocationNode locationNode;
     private List<AbstractLocation> locations = new ArrayList<>();
     private final Set<PlayerBase> playerBases = new LinkedHashSet<>();
+    private final LocationNewDayManager locationNewDayManager = new LocationNewDayManager(this);
     private final Personnel mainForcePersonnel = new Personnel();
     private boolean isAvoidingEmptySystems;
     private boolean isOverridingCommandCircuitRequirements;
@@ -1805,6 +1807,10 @@ public class Campaign implements ITechManager, IPlace {
 
     public List<AbstractLocation> getLocations() {
         return Collections.unmodifiableList(locations);
+    }
+
+    public LocationNewDayManager getLocationNewDayManager() {
+        return locationNewDayManager;
     }
 
     public void addPlayerBase(@Nullable PlayerBase base) {
