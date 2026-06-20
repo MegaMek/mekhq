@@ -707,7 +707,7 @@ public class CampaignNewDayManager {
                   checkFieldKitchenCapacity(campaign.getFormation(FORMATION_ORIGIN).getAllUnitsAsUnits(hangar,
                         false), campaignOptions.getFieldKitchenCapacity());
             int fieldKitchenUsage = checkFieldKitchenUsage(campaign.getActivePersonnel(false, false),
-                  campaignOptions.isUseFieldKitchenIgnoreNonCombatants());
+                  campaignOptions.isUseFieldKitchenIgnoreNonCombatants(), campaign);
             boolean withinCapacity = !campaign.isOnContractAndPlanetside() ||
                                            areFieldKitchensWithinCapacity(fieldKitchenCapacity, fieldKitchenUsage);
             campaign.setFieldKitchenWithinCapacity(withinCapacity);

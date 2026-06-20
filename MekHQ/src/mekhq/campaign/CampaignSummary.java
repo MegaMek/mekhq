@@ -451,7 +451,7 @@ public class CampaignSummary {
                   ContractRentalType.KITCHENS);
 
             int fieldKitchenUsage = checkFieldKitchenUsage(campaign.getActivePersonnel(false, true),
-                  campaignOptions.isUseFieldKitchenIgnoreNonCombatants());
+                  campaignOptions.isUseFieldKitchenIgnoreNonCombatants(), campaign);
 
             boolean isWithinCapacity = areFieldKitchensWithinCapacity(fieldKitchenCapacity, fieldKitchenUsage);
             color = isWithinCapacity ?

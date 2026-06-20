@@ -53,6 +53,7 @@ import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.stratCon.StratConRulesManager;
 import mekhq.campaign.stratCon.StratConTrackState;
@@ -118,8 +119,15 @@ public class Fatigue {
      * @return the total number of personnel requiring field kitchen support.
      */
     public static int checkFieldKitchenUsage(List<Person> activePersonnel,
-          boolean isUseFieldKitchenIgnoreNonCombatants) {
+          boolean isUseFieldKitchenIgnoreNonCombatants, Campaign campaign) {
         int fieldKitchenUsage = 0;
+
+        for (PersonnelRole personnelRole : campaign.getTempCrewRoleKeys()) {
+            if (!personnelRole.isCombat() && isUseFieldKitchenIgnoreNonCombatants) {
+                continue;
+            }
+            fieldKitchenUsage += campaign.getTempCrewPool(personnelRole);
+        }
 
         for (Person person : activePersonnel) {
             if (!person.isCombat() && isUseFieldKitchenIgnoreNonCombatants) {
