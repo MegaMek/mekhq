@@ -39,7 +39,6 @@ import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Mounted;
 import megamek.common.equipment.Sensor;
 import megamek.common.options.OptionsConstants;
-import megamek.common.options.Quirks;
 import megamek.common.units.Entity;
 import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
@@ -97,7 +96,7 @@ public class EntityUtilities {
      * that matches either {@link Sensor#IS_IMPROVED} or {@link Sensor#CL_IMPROVED}.</p>
      *
      * @param entity the {@link Entity} to check for improved sensors. They are also checked for
-     * {@link Quirks} Improved Sensors.
+     * the Improved Sensors quirk.
      *
      * @return {@code true} if the entity has Improved Sensors
      */
