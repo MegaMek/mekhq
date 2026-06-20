@@ -33,8 +33,6 @@
  */
 package mekhq.campaign.mission;
 
-import static java.lang.Math.ceil;
-
 import java.io.PrintWriter;
 import java.text.ParseException;
 import java.time.LocalDate;
@@ -42,11 +40,8 @@ import java.time.LocalDate;
 import megamek.Version;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.enums.ContractCommandRights;
-import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import org.w3c.dom.Node;
 
 /**
@@ -87,114 +82,6 @@ public class Contract extends AbstractMissionTransition {
     public boolean isActiveOn(LocalDate date, boolean excludeEndDateCheck) {
         return super.isActiveOn(date, excludeEndDateCheck) && !date.isBefore(getStartDate())
                      && (excludeEndDateCheck || !date.isAfter(getEndingDate()));
-    }
-
-    @Override
-    public void calculateContract(Campaign campaign) {
-        Accountant accountant = campaign.getAccountant();
-
-        // calculate base amount
-        setBaseAmount(accountant.getContractBase()
-                            .multipliedBy(getLengthInMonths())
-                            .multipliedBy(getPaymentMultiplier()));
-
-        // calculate overhead
-        switch (getOverheadCompensation()) {
-            case OH_HALF:
-                setOverheadAmount(accountant.getOverheadExpenses()
-                                        .multipliedBy(getLengthInMonths())
-                                        .multipliedBy(0.5));
-                break;
-            case OH_FULL:
-                setOverheadAmount(accountant.getOverheadExpenses().multipliedBy(getLengthInMonths()));
-                break;
-            default:
-                setOverheadAmount(Money.zero());
-        }
-
-        // calculate support amount
-        if (campaign.getCampaignOptions().isUsePeacetimeCost()) {
-            setSupportAmount(accountant.getPeacetimeCost()
-                                   .multipliedBy(getLengthInMonths())
-                                   .multipliedBy(getStraightSupport())
-                                   .dividedBy(100));
-        } else {
-            Money maintCosts = campaign.getAllHangar().getUnitCosts(u -> !u.isConventionalInfantry(),
-                  Unit::getWeeklyMaintenanceCost);
-            maintCosts = maintCosts.multipliedBy(4);
-            setSupportAmount(maintCosts
-                                   .multipliedBy(getLengthInMonths())
-                                   .multipliedBy(getStraightSupport())
-                                   .dividedBy(100));
-        }
-
-        // calculate employer's transport reimbursement (this is income - what they pay you toward transport)
-        // The full transport cost will be subtracted in getEstimatedTotalProfit()
-        if (null != getSystem() && campaign.getCampaignOptions().isPayForTransport()) {
-            setTransportAmount(getEmployerTransportReimbursement(campaign));
-        } else {
-            setTransportAmount(Money.zero());
-        }
-
-        // calculate transit amount for CO
-        if (campaign.getCampaignOptions().isUsePeacetimeCost()) {
-            // contract base * transport period * reputation * employer modifier
-
-            boolean useTwoWayPay = campaign.getCampaignOptions().isUseTwoWayPay();
-            setTransitAmount(accountant.getContractBase()
-                                   .multipliedBy(((getJumpPath(campaign).getJumps()) * (useTwoWayPay ? 2.0 : 1.0)) /
-                                                       4.0)
-                                   .multipliedBy(campaign.getAtBUnitRatingMod() * 0.2 + 0.5)
-                                   .multipliedBy(1.2));
-        } else {
-            setTransitAmount(Money.zero());
-        }
-
-        setSigningBonusAmount(getBaseAmount()
-                                    .plus(getOverheadAmount())
-                                    .plus(getTransportAmount())
-                                    .plus(getTransitAmount())
-                                    .plus(getSupportAmount())
-                                    .multipliedBy(getSigningBonus())
-                                    .dividedBy(100));
-
-        if (isPaidMRBCFee()) {
-            setFeeAmount(getBaseAmount()
-                               .plus(getOverheadAmount())
-                               .plus(getTransportAmount())
-                               .plus(getTransitAmount())
-                               .plus(getSupportAmount())
-                               .multipliedBy(getMRBCFeePercentage())
-                               .dividedBy(100));
-        } else {
-            setFeeAmount(Money.zero());
-        }
-
-        setAdvanceAmount(getTotalAmountPlusFees()
-                               .multipliedBy(getAdvancePercent())
-                               .dividedBy(100));
-
-        // only adjust the start date for travel if the start date is currently null
-        boolean adjustStartDate = false;
-        LocalDate startDate = getStartDate();
-        if (startDate == null) {
-            startDate = campaign.getLocalDate();
-            adjustStartDate = true;
-        }
-
-        if (adjustStartDate && (campaign.getSystemByName(getSystemId()) != null)) {
-            boolean isUseCommandCircuit =
-                  FactionStandingUtilities.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(),
-                        campaign.isGM(),
-                        campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
-                        campaign.getFactionStandings(), campaign.getFutureAtBContracts());
-
-            int days = (int) ceil(getJumpPath(campaign).getTotalTime(campaign.getLocalDate(),
-                  campaign.getCurrentLocation().getTransitTime(), isUseCommandCircuit));
-            startDate = startDate.plusDays(days);
-        }
-
-        setStartAndEndDate(startDate);
     }
 
     @Override

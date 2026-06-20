@@ -65,6 +65,10 @@ public class Mission extends AbstractMissionTransition {
     // endregion Constructors
 
     @Override
+    public void calculateContract(Campaign campaign) {
+    }
+
+    @Override
     public boolean isActiveOn(LocalDate date, boolean excludeEndDateCheck) {
         return getStatus().isActive();
     }

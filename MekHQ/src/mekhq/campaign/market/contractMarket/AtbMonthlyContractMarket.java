@@ -111,11 +111,11 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
     @Override
     public AtBContract addAtBContract(Campaign campaign) {
-        AtBContract c = generateAtBContract(campaign, campaign.getAtBUnitRatingMod());
-        if (c != null) {
-            contracts.add(c);
+        AtBContract contract = generateAtBContract(campaign, campaign.getAtBUnitRatingMod());
+        if (contract != null) {
+            contracts.add(contract);
         }
-        return c;
+        return contract;
     }
 
     @Override

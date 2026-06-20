@@ -63,11 +63,11 @@ public class EndContractNagLogic {
         // There is no reason to use a stream here, as there won't be enough iterations to warrant it.
         for (AbstractMissionTransition contract : activeContracts) {
             LocalDate endingDate = contract.getEndingDate();
-            if (endingDate == null) {
-                return false;
+            if (endingDate == null || !endingDate.equals(today)) {
+                continue;
             }
 
-            return endingDate.equals(today);
+            return true;
         }
 
         return false;
