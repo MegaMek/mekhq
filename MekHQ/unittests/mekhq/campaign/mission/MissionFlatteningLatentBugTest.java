@@ -52,7 +52,8 @@ import testUtilities.MHQTestUtilities;
  * Characterization tests for latent defects uncovered while reviewing PR #9417 (the flattening of
  * {@code AtBContract -> Contract -> Mission} into a common {@link AbstractMissionTransition} base).
  *
- * <p><b>Every test in this class is {@link Disabled} on purpose.</b> Each one asserts the behavior the code <i>should</i>
+ * <p><b>Every test in this class is {@link Disabled} on purpose.</b> Each one asserts the behavior the code
+ * <i>should</i>
  * have once the corresponding defect is fixed, and currently fails. They are committed disabled so the project's CI
  * stays green while the findings are tracked in code; remove the {@code @Disabled} annotation as each underlying defect
  * is addressed. A companion write-up lives in
@@ -85,20 +86,18 @@ class MissionFlatteningLatentBugTest {
      *     missionEntry.setValue(new AtBContract((Contract) mission, this));
      * }
      * }</pre>
-     *
+     * <p>
      * (Campaign.java, around line 8620). Before the flattening this was safe because every {@link AtBContract} was also
-     * a {@link Contract}. After the flattening an {@link AtBContract} is <i>not</i> a {@link Contract}, yet it is still
-     * not a {@link Mission}, so it enters the conversion branch and the {@code (Contract)} cast throws a
-     * {@link ClassCastException}. This bites any campaign that already contains an AtB contract when AtB is
+     * a {@link Contract}. After the flattening an {@link AtBContract} was <i>no longer</i> a {@link Contract}, yet it
+     * is also not a {@link Mission}, so it entered the conversion branch and the {@code (Contract)} cast thew a
+     * {@link ClassCastException}. This hit any campaign that already contained an AtB contract when AtB was
      * (re)initialized.
      *
-     * <p>The fix is to skip entries that are already {@link AtBContract} (e.g. guard with
-     * {@code instanceof AtBContract}). Once that guard is in place this test should pass: re-initializing AtB must leave
-     * an existing AtB contract intact rather than throwing.</p>
+     * <p>The fix was to skip entries that were already {@link AtBContract} (e.g., guard with
+     * {@code instanceof AtBContract}).</p>
+     *
+     * <p>While the bug has been fixed, this test exists to protect against regression.</p>
      */
-    @Disabled("reveals bug: Campaign.initAtB() casts (Contract) mission ~Campaign.java:8620; an AtBContract is no longer "
-                    + "a Contract, so re-init throws ClassCastException. Enable once the conversion branch guards on "
-                    + "instanceof AtBContract.")
     @Test
     void initAtBDoesNotClassCastAnAlreadyStoredAtBContract() {
         Campaign campaign = MHQTestUtilities.getTestCampaign();

@@ -931,7 +931,7 @@ public class AtBContract extends AbstractMissionTransition {
         }
     }
 
-    public AtBContract(Contract contract, Campaign campaign) {
+    public AtBContract(AbstractMissionTransition contract, Campaign campaign) {
         this(contract.getName());
 
         setContractTypeName(contract.getContractTypeName());
@@ -1008,7 +1008,7 @@ public class AtBContract extends AbstractMissionTransition {
         clanTechSalvageOverride();
     }
 
-    private static AtBContractType getAtBContractType(Contract contract) {
+    private static AtBContractType getAtBContractType(AbstractMissionTransition contract) {
         AtBContractType contractType = null;
         for (final AtBContractType type : AtBContractType.values()) {
             if (type.toString().equalsIgnoreCase(contract.getContractTypeName())) {

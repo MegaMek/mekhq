@@ -2232,7 +2232,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all hangars across all locations associated with this campaign.
-     *                                                                                                                                                 TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     *                                                                                                                                                                         TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
      */
     public Hangar getAllHangar() {
         return units;
@@ -2868,7 +2868,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all warehouses across all locations associated with this campaign.
-     *                                                                                                                                                 TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
+     *                                                                                                                                                                         TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
      */
     public Warehouse getAllWarehouse() {
         return parts;
@@ -8616,8 +8616,10 @@ public class Campaign implements ITechManager, IPlace {
              */
             for (Entry<Integer, AbstractMissionTransition> missionEntry : missions.entrySet()) {
                 AbstractMissionTransition mission = missionEntry.getValue();
-                if (!(mission instanceof Mission)) {
-                    missionEntry.setValue(new AtBContract((Contract) mission, this));
+
+                // Only Contract objects should be passed in here, not Mission or AtBContract
+                if (mission instanceof Contract) {
+                    missionEntry.setValue(new AtBContract(mission, this));
                 }
             }
 
