@@ -441,7 +441,7 @@ public class Utilities {
     }
 
     public static Map<CrewType, Collection<Person>> genRandomCrewWithCombinedSkill(Campaign campaign, Unit unit,
-          String factionCode) {
+          @Nullable String factionCode) {
         Objects.requireNonNull(campaign);
         Objects.requireNonNull(unit);
         Objects.requireNonNull(unit.getEntity(), "Unit needs to have a valid Entity attached");
@@ -1170,8 +1170,7 @@ public class Utilities {
      * @param table the table to save to csv
      * @param file  the file to save to
      *
-     * @return a report summarizing how many rows were written if the operation succeeded
-     *         or an error report otherwise
+     * @return a report summarizing how many rows were written if the operation succeeded or an error report otherwise
      */
     public static String exportTableToCSV(JTable table, File file) {
         TableModel model = table.getModel();

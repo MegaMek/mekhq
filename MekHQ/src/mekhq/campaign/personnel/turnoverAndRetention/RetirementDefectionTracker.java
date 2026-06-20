@@ -255,14 +255,7 @@ public class RetirementDefectionTracker {
                 // In the case of multiple active contracts, pick the one with the best
                 // percentage.
 
-                AbstractMissionTransition contract;
-
-                try {
-                    contract = mission;
-                } catch (Exception e) {
-                    contract = null;
-                }
-
+                AbstractMissionTransition contract = mission;
                 if (contract == null) {
                     List<AbstractMissionTransition> atbContracts = campaign.getActiveAtBContracts();
 

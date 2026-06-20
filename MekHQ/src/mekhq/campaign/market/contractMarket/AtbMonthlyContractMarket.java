@@ -314,8 +314,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                         continue;
                     }
 
-                    boolean subEndingDateInPast = subEndingDate.isBefore(contractEndingDate);
-                    if (contractEndingDate == null || subEndingDateInPast) {
+                    if (contractEndingDate == null || subEndingDate.isBefore(contractEndingDate)) {
                         contracts.add(sub);
                     }
                 }

@@ -35,7 +35,6 @@ package mekhq.campaign.mission;
 
 import java.io.PrintWriter;
 import java.text.ParseException;
-import java.time.LocalDate;
 
 import megamek.Version;
 import megamek.logging.MMLogger;
@@ -76,12 +75,6 @@ public class Contract extends AbstractMissionTransition {
     public void setSystemId(String n) {
         super.setSystemId(n);
         setCachedJumpPath(null);
-    }
-
-    @Override
-    public boolean isActiveOn(LocalDate date, boolean excludeEndDateCheck) {
-        return super.isActiveOn(date, excludeEndDateCheck) && !date.isBefore(getStartDate())
-                     && (excludeEndDateCheck || !date.isAfter(getEndingDate()));
     }
 
     @Override
