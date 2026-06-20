@@ -118,7 +118,6 @@ import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
 import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.EnginePart;
@@ -2397,10 +2396,10 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 continue;
             }
 
-            Mission m = Mission.generateInstanceFromXML(wn2, retVal, version);
+            AbstractMissionTransition mission = AbstractMissionTransition.generateInstanceFromXML(wn2, retVal, version);
 
-            if (m != null) {
-                retVal.importMission(m);
+            if (mission != null) {
+                retVal.importMission(mission);
             }
         }
 

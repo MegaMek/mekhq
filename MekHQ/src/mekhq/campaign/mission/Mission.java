@@ -85,15 +85,6 @@ public class Mission extends AbstractMissionTransition {
         super.loadFieldsFromXmlNode(campaign, version, node);
     }
 
-    /**
-     * @deprecated Call {@link AbstractMissionTransition#generateInstanceFromXML} directly. This delegate exists only so
-     *       that existing call sites in the campaign loader do not need to be updated immediately.
-     */
-    @Deprecated
-    public static Mission generateInstanceFromXML(Node node, Campaign campaign, Version version) {
-        return (Mission) AbstractMissionTransition.generateInstanceFromXML(node, campaign, version);
-    }
-
     @Override
     public String toString() {
         return getStatus().isCompleted() ? getName() + " (Complete)" : getName();
