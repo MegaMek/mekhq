@@ -218,40 +218,40 @@ public class RepairAndMaintenanceTab {
 
         chkTechsUseAdministration = new CampaignOptionsCheckBox("TechsUseAdministration",
                 getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
-        chkTechsUseAdministration.addMouseListener(createTipPanelUpdater(repairHeader, "TechsUseAdministration"));
+        chkTechsUseAdministration.addMouseListener(createTipPanelUpdater("TechsUseAdministration"));
 
         chkUsefulAsTechs = new CampaignOptionsCheckBox("UsefulAsTechs",
                 getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
-        chkUsefulAsTechs.addMouseListener(createTipPanelUpdater(repairHeader, "UsefulAsTechs"));
+        chkUsefulAsTechs.addMouseListener(createTipPanelUpdater("UsefulAsTechs"));
 
         useEraModsCheckBox = new CampaignOptionsCheckBox("UseEraModsCheckBox");
-        useEraModsCheckBox.addMouseListener(createTipPanelUpdater(repairHeader, "UseEraModsCheckBox"));
+        useEraModsCheckBox.addMouseListener(createTipPanelUpdater("UseEraModsCheckBox"));
 
         assignedTechFirstCheckBox = new CampaignOptionsCheckBox("AssignedTechFirstCheckBox");
-        assignedTechFirstCheckBox.addMouseListener(createTipPanelUpdater(repairHeader, "AssignedTechFirstCheckBox"));
+        assignedTechFirstCheckBox.addMouseListener(createTipPanelUpdater("AssignedTechFirstCheckBox"));
         resetToFirstTechCheckBox = new CampaignOptionsCheckBox("ResetToFirstTechCheckBox");
-        resetToFirstTechCheckBox.addMouseListener(createTipPanelUpdater(repairHeader, "ResetToFirstTechCheckBox"));
+        resetToFirstTechCheckBox.addMouseListener(createTipPanelUpdater("ResetToFirstTechCheckBox"));
 
         useQuirksBox = new CampaignOptionsCheckBox("UseQuirksBox");
-        useQuirksBox.addMouseListener(createTipPanelUpdater(repairHeader, "UseQuirksBox"));
+        useQuirksBox.addMouseListener(createTipPanelUpdater("UseQuirksBox"));
 
         useAeroSystemHitsBox = new CampaignOptionsCheckBox("UseAeroSystemHitsBox");
-        useAeroSystemHitsBox.addMouseListener(createTipPanelUpdater(repairHeader, "UseAeroSystemHitsBox"));
+        useAeroSystemHitsBox.addMouseListener(createTipPanelUpdater("UseAeroSystemHitsBox"));
 
         useDamageMargin = new CampaignOptionsCheckBox("UseDamageMargin");
-        useDamageMargin.addMouseListener(createTipPanelUpdater(repairHeader, "UseDamageMargin"));
+        useDamageMargin.addMouseListener(createTipPanelUpdater("UseDamageMargin"));
 
         lblDamageMargin = new CampaignOptionsLabel("DamageMargin");
-        lblDamageMargin.addMouseListener(createTipPanelUpdater(repairHeader, "DamageMargin"));
+        lblDamageMargin.addMouseListener(createTipPanelUpdater("DamageMargin"));
         spnDamageMargin = new CampaignOptionsSpinner("DamageMargin",
                 1, 1, 20, 1);
-        spnDamageMargin.addMouseListener(createTipPanelUpdater(repairHeader, "DamageMargin"));
+        spnDamageMargin.addMouseListener(createTipPanelUpdater("DamageMargin"));
 
         lblDestroyPartTarget = new CampaignOptionsLabel("DestroyPartTarget");
-        lblDestroyPartTarget.addMouseListener(createTipPanelUpdater(repairHeader, "DestroyPartTarget"));
+        lblDestroyPartTarget.addMouseListener(createTipPanelUpdater("DestroyPartTarget"));
         spnDestroyPartTarget = new CampaignOptionsSpinner("DestroyPartTarget",
                 2, 2, 13, 1);
-        spnDestroyPartTarget.addMouseListener(createTipPanelUpdater(repairHeader, "DestroyPartTarget"));
+        spnDestroyPartTarget.addMouseListener(createTipPanelUpdater("DestroyPartTarget"));
 
         JPanel repairOptionsPanel = createRepairOptionsPanel();
         JPanel componentDamagePanel = createComponentDamagePanel();
@@ -318,50 +318,50 @@ public class RepairAndMaintenanceTab {
 
         // Contents
         checkMaintenance = new CampaignOptionsCheckBox("CheckMaintenance");
-        checkMaintenance.addMouseListener(createTipPanelUpdater(maintenanceHeader, "CheckMaintenance"));
+        checkMaintenance.addMouseListener(createTipPanelUpdater("CheckMaintenance"));
 
         lblMaintenanceDays = new CampaignOptionsLabel("MaintenanceDays");
-        lblMaintenanceDays.addMouseListener(createTipPanelUpdater(maintenanceHeader, "MaintenanceDays"));
+        lblMaintenanceDays.addMouseListener(createTipPanelUpdater("MaintenanceDays"));
         spnMaintenanceDays = new CampaignOptionsSpinner("MaintenanceDays",
                 7, 1, 365, 1);
-        spnMaintenanceDays.addMouseListener(createTipPanelUpdater(maintenanceHeader, "MaintenanceDays"));
+        spnMaintenanceDays.addMouseListener(createTipPanelUpdater("MaintenanceDays"));
 
         lblMaintenanceBonus = new CampaignOptionsLabel("MaintenanceBonus");
-        lblMaintenanceBonus.addMouseListener(createTipPanelUpdater(maintenanceHeader, "MaintenanceBonus"));
+        lblMaintenanceBonus.addMouseListener(createTipPanelUpdater("MaintenanceBonus"));
         spnMaintenanceBonus = new CampaignOptionsSpinner("MaintenanceBonus",
                 0, -13, 13, 1);
-        spnMaintenanceBonus.addMouseListener(createTipPanelUpdater(maintenanceHeader, "MaintenanceBonus"));
+        spnMaintenanceBonus.addMouseListener(createTipPanelUpdater("MaintenanceBonus"));
 
         lblDefaultMaintenanceTime = new CampaignOptionsLabel("DefaultMaintenanceTime",
                 getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.RECOMMENDED));
-        lblDefaultMaintenanceTime.addMouseListener(createTipPanelUpdater(maintenanceHeader, "DefaultMaintenanceTime"));
+        lblDefaultMaintenanceTime.addMouseListener(createTipPanelUpdater("DefaultMaintenanceTime"));
         spnDefaultMaintenanceTime = new CampaignOptionsSpinner("DefaultMaintenanceTime",
                 1, 1, 4, 1);
-        spnDefaultMaintenanceTime.addMouseListener(createTipPanelUpdater(maintenanceHeader, "DefaultMaintenanceTime"));
+        spnDefaultMaintenanceTime.addMouseListener(createTipPanelUpdater("DefaultMaintenanceTime"));
 
         useQualityMaintenance = new CampaignOptionsCheckBox("UseQualityMaintenance",
                 getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.RECOMMENDED));
-        useQualityMaintenance.addMouseListener(createTipPanelUpdater(maintenanceHeader, "UseQualityMaintenance"));
+        useQualityMaintenance.addMouseListener(createTipPanelUpdater("UseQualityMaintenance"));
 
         reverseQualityNames = new CampaignOptionsCheckBox("ReverseQualityNames",
                 getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM,
                         CampaignOptionFlag.IMPORTANT));
-        reverseQualityNames.addMouseListener(createTipPanelUpdater(maintenanceHeader, "ReverseQualityNames"));
+        reverseQualityNames.addMouseListener(createTipPanelUpdater("ReverseQualityNames"));
 
         chkUseRandomUnitQualities = new CampaignOptionsCheckBox("UseRandomUnitQualities",
                 getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
-        chkUseRandomUnitQualities.addMouseListener(createTipPanelUpdater(maintenanceHeader, "UseRandomUnitQualities"));
+        chkUseRandomUnitQualities.addMouseListener(createTipPanelUpdater("UseRandomUnitQualities"));
 
         chkUsePlanetaryModifiers = new CampaignOptionsCheckBox("UsePlanetaryModifiers");
-        chkUsePlanetaryModifiers.addMouseListener(createTipPanelUpdater(maintenanceHeader, "UsePlanetaryModifiers"));
+        chkUsePlanetaryModifiers.addMouseListener(createTipPanelUpdater("UsePlanetaryModifiers"));
 
         useUnofficialMaintenance = new CampaignOptionsCheckBox("UseUnofficialMaintenance",
                 getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM,
                         CampaignOptionFlag.IMPORTANT));
-        useUnofficialMaintenance.addMouseListener(createTipPanelUpdater(maintenanceHeader, "UseUnofficialMaintenance"));
+        useUnofficialMaintenance.addMouseListener(createTipPanelUpdater("UseUnofficialMaintenance"));
 
         logMaintenance = new CampaignOptionsCheckBox("LogMaintenance");
-        logMaintenance.addMouseListener(createTipPanelUpdater(maintenanceHeader, "LogMaintenance"));
+        logMaintenance.addMouseListener(createTipPanelUpdater("LogMaintenance"));
 
         JPanel schedulePanel = createMaintenanceSchedulePanel();
         JPanel qualityPanel = createMaintenanceQualityPanel();

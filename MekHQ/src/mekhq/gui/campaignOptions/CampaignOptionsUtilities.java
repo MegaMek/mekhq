@@ -62,7 +62,6 @@ import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.client.ui.util.UIUtil;
 import mekhq.gui.baseComponents.MHQCollapsiblePanel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 
 /**
@@ -312,7 +311,6 @@ public class CampaignOptionsUtilities {
     * associated with that component and sends the formatted text to the sticky help panel owned by the shell.
      * </p>
      *
-     * @param associatedHeaderPanel   the {@link JPanel} containing the label to update
      * @param sourceComponentBaseName the name of the component whose tip string will be shown in the label
      *
      * @return a {@link MouseAdapter} instance that updates the label with formatted tip text on mouse enter
@@ -320,9 +318,8 @@ public class CampaignOptionsUtilities {
      * @author Illiani
      * @since 0.50.06
      */
-    public static @Nonnull MouseAdapter createTipPanelUpdater(CampaignOptionsHeaderPanel associatedHeaderPanel,
-          @Nullable String sourceComponentBaseName) {
-        return createTipPanelUpdater(associatedHeaderPanel, sourceComponentBaseName, null);
+    public static @Nonnull MouseAdapter createTipPanelUpdater(@Nullable String sourceComponentBaseName) {
+        return createTipPanelUpdater(sourceComponentBaseName, null);
     }
 
     /**
@@ -334,7 +331,6 @@ public class CampaignOptionsUtilities {
     * associated with that component and sends the formatted text to the sticky help panel owned by the shell.
      * </p>
      *
-     * @param associatedHeaderPanel   the {@link JPanel} containing the label to update
      * @param sourceComponentBaseName the name of the component whose tip string will be shown in the label
      * @param replacementText         the specific text to use, or {@code null} if the text should be dynamically
      *                                fetched from the source component.
@@ -344,8 +340,8 @@ public class CampaignOptionsUtilities {
      * @author Illiani
      * @since 0.50.06
      */
-    public static @Nonnull MouseAdapter createTipPanelUpdater(CampaignOptionsHeaderPanel associatedHeaderPanel,
-          @Nullable String sourceComponentBaseName, @Nullable String replacementText) {
+    public static @Nonnull MouseAdapter createTipPanelUpdater(@Nullable String sourceComponentBaseName,
+          @Nullable String replacementText) {
         return new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent mouseEvent) {

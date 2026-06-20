@@ -62,7 +62,7 @@ public class CampaignOptionsHeaderPanel extends JPanel {
 
     @Deprecated(since = "0.50.06", forRemoval = true)
     public CampaignOptionsHeaderPanel(@Nonnull String name, @Nonnull String imageAddress, boolean includeBodyText) {
-        this(name, imageAddress, includeBodyText, false, 0, DEFAULT_IMAGE_SIZE);
+        this(name, imageAddress, includeBodyText, DEFAULT_IMAGE_SIZE, true);
     }
 
     /**
@@ -76,22 +76,7 @@ public class CampaignOptionsHeaderPanel extends JPanel {
      * @param imageAddress the path to the image file displayed in the panel
      */
     public CampaignOptionsHeaderPanel(@Nonnull String name, @Nonnull String imageAddress) {
-        this(name, imageAddress, false, false, 0, DEFAULT_IMAGE_SIZE);
-    }
-
-    /**
-     * Constructs a {@code CampaignOptionsHeaderPanel} that displays a header label and an image.
-     *
-     * <p>The panel is named {@code "pnl" + name + "HeaderPanel"}. The header label's text is fetched from a resource
-     * bundle using {@code "lbl" + name + ".text"}. The image is loaded from the specified file path and scaled
-     * appropriately.</p>
-     *
-     * @param name           a unique identifier used to fetch resource bundle entries and to form the panel's name
-     * @param imageAddress   the path to the image file displayed in the panel
-     * @param tipPanelHeight retained for constructor compatibility; contextual help is shown in the shell
-     */
-    public CampaignOptionsHeaderPanel(@Nonnull String name, @Nonnull String imageAddress, int tipPanelHeight) {
-        this(name, imageAddress, false, true, tipPanelHeight, DEFAULT_IMAGE_SIZE);
+        this(name, imageAddress, false, DEFAULT_IMAGE_SIZE, true);
     }
 
     /**
@@ -117,66 +102,6 @@ public class CampaignOptionsHeaderPanel extends JPanel {
      */
     public CampaignOptionsHeaderPanel(@Nonnull String name, @Nonnull String imageAddress, boolean includeBodyText, int imageSize,
           boolean tintImage) {
-        this(name, imageAddress, includeBodyText, false, 0, imageSize, tintImage);
-    }
-
-    /**
-     * Constructs a {@code CampaignOptionsHeaderPanel} that displays a header label, an image, and optionally includes
-     * additional descriptive body text.
-     *
-     * <p>The panel is named {@code "pnl" + name + "HeaderPanel"}. The header label's text is fetched from a resource
-     * bundle using {@code "lbl" + name + ".text"}. The image is loaded from the specified file path and scaled
-     * appropriately.</p>
-     *
-     * @param name            a unique identifier used for resource bundle lookups and to form the panel's name
-     * @param imageAddress    the path to the image file to display at the top of the panel
-     * @param includeBodyText if true, includes a body label beneath the image with descriptive text
-     * @param includeTipPanel retained for constructor compatibility; contextual help is shown in the shell
-     * @param tipPanelHeight  retained for constructor compatibility; contextual help is shown in the shell
-     */
-    public CampaignOptionsHeaderPanel(@Nonnull String name, @Nonnull String imageAddress, boolean includeBodyText,
-          boolean includeTipPanel, int tipPanelHeight) {
-        this(name, imageAddress, includeBodyText, includeTipPanel, tipPanelHeight, DEFAULT_IMAGE_SIZE);
-    }
-
-    /**
-     * Constructs a {@code CampaignOptionsHeaderPanel} that displays a header label, an image, and optionally includes
-     * additional descriptive body text.
-     *
-     * <p>The panel is named {@code "pnl" + name + "HeaderPanel"}. The header label's text is fetched from a resource
-     * bundle using {@code "lbl" + name + ".text"}. The image is loaded from the specified file path and scaled
-     * appropriately.</p>
-     *
-     * @param name            a unique identifier used for resource bundle lookups and to form the panel's name
-     * @param imageAddress    the path to the image file to display at the top of the panel
-     * @param includeBodyText if true, includes a body label beneath the image with descriptive text
-     * @param includeTipPanel retained for constructor compatibility; contextual help is shown in the shell
-     * @param tipPanelHeight  retained for constructor compatibility; contextual help is shown in the shell
-     * @param imageSize       the target width or height for the header image
-     */
-    public CampaignOptionsHeaderPanel(@Nonnull String name, @Nonnull String imageAddress, boolean includeBodyText,
-          boolean includeTipPanel, int tipPanelHeight, int imageSize) {
-        this(name, imageAddress, includeBodyText, includeTipPanel, tipPanelHeight, imageSize, true);
-    }
-
-    /**
-     * Constructs a {@code CampaignOptionsHeaderPanel} that displays a header label, an image, and optionally includes
-     * additional descriptive body text.
-     *
-     * <p>The panel is named {@code "pnl" + name + "HeaderPanel"}. The header label's text is fetched from a resource
-     * bundle using {@code "lbl" + name + ".text"}. The image is loaded from the specified file path and scaled
-     * appropriately.</p>
-     *
-     * @param name            a unique identifier used for resource bundle lookups and to form the panel's name
-     * @param imageAddress    the path to the image file to display at the top of the panel
-     * @param includeBodyText if true, includes a body label beneath the image with descriptive text
-     * @param includeTipPanel retained for constructor compatibility; contextual help is shown in the shell
-     * @param tipPanelHeight  retained for constructor compatibility; contextual help is shown in the shell
-     * @param imageSize       the target width or height for the header image
-     * @param tintImage       if true, tints the image black to match the standard options header style
-     */
-    public CampaignOptionsHeaderPanel(@Nonnull String name, @Nonnull String imageAddress, boolean includeBodyText,
-          boolean includeTipPanel, int tipPanelHeight, int imageSize, boolean tintImage) {
         // Load and scale the image using the provided file path
         ImageIcon imageIcon = new ImageIcon(imageAddress);
         imageIcon = scaleImageIcon(imageIcon, imageSize, true);

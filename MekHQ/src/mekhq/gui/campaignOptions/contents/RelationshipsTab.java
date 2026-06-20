@@ -304,7 +304,7 @@ public class RelationshipsTab {
     public @Nonnull JPanel createMarriageTab() {
         // Header
         String imageAddress = getImageDirectory() + "logo_morgrains_valkyrate.png";
-        marriageHeader = new CampaignOptionsHeaderPanel("MarriageTab", imageAddress, 4);
+        marriageHeader = new CampaignOptionsHeaderPanel("MarriageTab", imageAddress);
 
         // Contents
         pnlMarriageGeneralOptions = createMarriageGeneralOptionsPanel();
@@ -334,23 +334,20 @@ public class RelationshipsTab {
     private @Nonnull JPanel createMarriageGeneralOptionsPanel() {
         // Contents
         chkUseManualMarriages = new CampaignOptionsCheckBox("UseManualMarriages");
-        chkUseManualMarriages.addMouseListener(createTipPanelUpdater(marriageHeader, "UseManualMarriages"));
+        chkUseManualMarriages.addMouseListener(createTipPanelUpdater("UseManualMarriages"));
         chkUseClanPersonnelMarriages = new CampaignOptionsCheckBox("UseClanPersonnelMarriages");
-        chkUseClanPersonnelMarriages.addMouseListener(createTipPanelUpdater(marriageHeader,
-                "UseClanPersonnelMarriages"));
+        chkUseClanPersonnelMarriages.addMouseListener(createTipPanelUpdater("UseClanPersonnelMarriages"));
         chkUsePrisonerMarriages = new CampaignOptionsCheckBox("UsePrisonerMarriages");
-        chkUsePrisonerMarriages.addMouseListener(createTipPanelUpdater(marriageHeader, "UsePrisonerMarriages"));
+        chkUsePrisonerMarriages.addMouseListener(createTipPanelUpdater("UsePrisonerMarriages"));
 
         lblCheckMutualAncestorsDepth = new CampaignOptionsLabel("CheckMutualAncestorsDepth");
-        lblCheckMutualAncestorsDepth.addMouseListener(createTipPanelUpdater(marriageHeader,
-                "CheckMutualAncestorsDepth"));
+        lblCheckMutualAncestorsDepth.addMouseListener(createTipPanelUpdater("CheckMutualAncestorsDepth"));
         spnCheckMutualAncestorsDepth = new CampaignOptionsSpinner("CheckMutualAncestorsDepth",
                 4, 0, 20, 1);
-        spnCheckMutualAncestorsDepth.addMouseListener(createTipPanelUpdater(marriageHeader,
-                "CheckMutualAncestorsDepth"));
+        spnCheckMutualAncestorsDepth.addMouseListener(createTipPanelUpdater("CheckMutualAncestorsDepth"));
 
         chkLogMarriageNameChanges = new CampaignOptionsCheckBox("LogMarriageNameChanges");
-        chkLogMarriageNameChanges.addMouseListener(createTipPanelUpdater(marriageHeader, "LogMarriageNameChanges"));
+        chkLogMarriageNameChanges.addMouseListener(createTipPanelUpdater("LogMarriageNameChanges"));
 
         // Layout the Panel
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("MarriageGeneralOptionsPanel",
@@ -376,7 +373,7 @@ public class RelationshipsTab {
     private @Nonnull JPanel createRandomMarriagePanel() {
         // Contents
         lblRandomMarriageMethod = new CampaignOptionsLabel("RandomMarriageMethod");
-        lblRandomMarriageMethod.addMouseListener(createTipPanelUpdater(marriageHeader, "RandomMarriageMethod"));
+        lblRandomMarriageMethod.addMouseListener(createTipPanelUpdater("RandomMarriageMethod"));
         comboRandomMarriageMethod.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
@@ -389,36 +386,30 @@ public class RelationshipsTab {
                 return this;
             }
         });
-        comboRandomMarriageMethod.addMouseListener(createTipPanelUpdater(marriageHeader, "RandomMarriageMethod"));
+        comboRandomMarriageMethod.addMouseListener(createTipPanelUpdater("RandomMarriageMethod"));
 
         chkUseRandomClanPersonnelMarriages = new CampaignOptionsCheckBox("UseRandomClanPersonnelMarriages");
-        chkUseRandomClanPersonnelMarriages.addMouseListener(createTipPanelUpdater(marriageHeader,
-                "UseRandomClanPersonnelMarriages"));
+        chkUseRandomClanPersonnelMarriages.addMouseListener(createTipPanelUpdater("UseRandomClanPersonnelMarriages"));
         chkUseRandomPrisonerMarriages = new CampaignOptionsCheckBox("UseRandomPrisonerMarriages");
-        chkUseRandomPrisonerMarriages.addMouseListener(createTipPanelUpdater(marriageHeader,
-                "UseRandomPrisonerMarriages"));
+        chkUseRandomPrisonerMarriages.addMouseListener(createTipPanelUpdater("UseRandomPrisonerMarriages"));
 
         lblRandomMarriageAgeRange = new CampaignOptionsLabel("RandomMarriageAgeRange");
-        lblRandomMarriageAgeRange.addMouseListener(createTipPanelUpdater(marriageHeader, "RandomMarriageAgeRange"));
+        lblRandomMarriageAgeRange.addMouseListener(createTipPanelUpdater("RandomMarriageAgeRange"));
         spnRandomMarriageAgeRange = new CampaignOptionsSpinner("RandomMarriageAgeRange",
                 10, 0, 100, 1);
-        spnRandomMarriageAgeRange.addMouseListener(createTipPanelUpdater(marriageHeader, "RandomMarriageAgeRange"));
+        spnRandomMarriageAgeRange.addMouseListener(createTipPanelUpdater("RandomMarriageAgeRange"));
 
         lblRandomMarriageDiceSize = new CampaignOptionsLabel("RandomMarriageDiceSize");
-        lblRandomMarriageDiceSize.addMouseListener(createTipPanelUpdater(marriageHeader,
-                "RandomMarriageDiceSize"));
+        lblRandomMarriageDiceSize.addMouseListener(createTipPanelUpdater("RandomMarriageDiceSize"));
         spnRandomMarriageDiceSize = new CampaignOptionsSpinner("RandomMarriageDiceSize",
                 5000, 0, 100000, 1);
-        spnRandomMarriageDiceSize.addMouseListener(createTipPanelUpdater(marriageHeader,
-                "RandomMarriageDiceSize"));
+        spnRandomMarriageDiceSize.addMouseListener(createTipPanelUpdater("RandomMarriageDiceSize"));
 
         lblRandomNewDependentMarriage = new CampaignOptionsLabel("RandomNewDependentMarriage");
-        lblRandomNewDependentMarriage.addMouseListener(createTipPanelUpdater(marriageHeader,
-                "RandomNewDependentMarriage"));
+        lblRandomNewDependentMarriage.addMouseListener(createTipPanelUpdater("RandomNewDependentMarriage"));
         spnRandomNewDependentMarriage = new CampaignOptionsSpinner("RandomNewDependentMarriage",
                 20, 0, 100000, 1);
-        spnRandomNewDependentMarriage.addMouseListener(createTipPanelUpdater(marriageHeader,
-                "RandomNewDependentMarriage"));
+        spnRandomNewDependentMarriage.addMouseListener(createTipPanelUpdater("RandomNewDependentMarriage"));
 
         // Layout the Panel
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("RandomMarriages",
@@ -442,7 +433,7 @@ public class RelationshipsTab {
     public @Nonnull JPanel createDivorceTab() {
         // Header
         String imageAddress = getImageDirectory() + "logo_escorpion_imperio.png";
-        divorceHeader = new CampaignOptionsHeaderPanel("DivorceTab", imageAddress, 3);
+        divorceHeader = new CampaignOptionsHeaderPanel("DivorceTab", imageAddress);
 
         // Contents
         JPanel divorceGeneralOptionsPanel = createDivorceGeneralOptionsPanel();
@@ -465,12 +456,12 @@ public class RelationshipsTab {
     private @Nonnull JPanel createDivorceGeneralOptionsPanel() {
         // Contents
         chkUseManualDivorce = new CampaignOptionsCheckBox("UseManualDivorce");
-        chkUseManualDivorce.addMouseListener(createTipPanelUpdater(divorceHeader, "UseManualDivorce"));
+        chkUseManualDivorce.addMouseListener(createTipPanelUpdater("UseManualDivorce"));
         chkUseClanPersonnelDivorce = new CampaignOptionsCheckBox("UseClanPersonnelDivorce");
         chkUseClanPersonnelDivorce
-                .addMouseListener(createTipPanelUpdater(divorceHeader, "UseClanPersonnelDivorce"));
+                .addMouseListener(createTipPanelUpdater("UseClanPersonnelDivorce"));
         chkUsePrisonerDivorce = new CampaignOptionsCheckBox("UsePrisonerDivorce");
-        chkUsePrisonerDivorce.addMouseListener(createTipPanelUpdater(divorceHeader, "UsePrisonerDivorce"));
+        chkUsePrisonerDivorce.addMouseListener(createTipPanelUpdater("UsePrisonerDivorce"));
 
         // Layout the Panel
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("DivorceGeneralOptionsPanel",
@@ -494,7 +485,7 @@ public class RelationshipsTab {
     private @Nonnull JPanel createRandomDivorcePanel() {
         // Contents
         lblRandomDivorceMethod = new CampaignOptionsLabel("RandomDivorceMethod");
-        lblRandomDivorceMethod.addMouseListener(createTipPanelUpdater(divorceHeader, "RandomDivorceMethod"));
+        lblRandomDivorceMethod.addMouseListener(createTipPanelUpdater("RandomDivorceMethod"));
         comboRandomDivorceMethod.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
@@ -507,26 +498,24 @@ public class RelationshipsTab {
                 return this;
             }
         });
-        comboRandomDivorceMethod.addMouseListener(createTipPanelUpdater(divorceHeader, "RandomDivorceMethod"));
+        comboRandomDivorceMethod.addMouseListener(createTipPanelUpdater("RandomDivorceMethod"));
 
         chkUseRandomOppositeSexDivorce = new CampaignOptionsCheckBox("UseRandomOppositeSexDivorce");
-        chkUseRandomOppositeSexDivorce.addMouseListener(createTipPanelUpdater(divorceHeader,
-                "UseRandomOppositeSexDivorce"));
+        chkUseRandomOppositeSexDivorce.addMouseListener(createTipPanelUpdater("UseRandomOppositeSexDivorce"));
         chkUseRandomSameSexDivorce = new CampaignOptionsCheckBox("UseRandomSameSexDivorce");
         chkUseRandomSameSexDivorce
-                .addMouseListener(createTipPanelUpdater(divorceHeader, "UseRandomSameSexDivorce"));
+                .addMouseListener(createTipPanelUpdater("UseRandomSameSexDivorce"));
         chkUseRandomClanPersonnelDivorce = new CampaignOptionsCheckBox("UseRandomClanPersonnelDivorce");
-        chkUseRandomClanPersonnelDivorce.addMouseListener(createTipPanelUpdater(divorceHeader,
-                "UseRandomClanPersonnelDivorce"));
+        chkUseRandomClanPersonnelDivorce.addMouseListener(createTipPanelUpdater("UseRandomClanPersonnelDivorce"));
         chkUseRandomPrisonerDivorce = new CampaignOptionsCheckBox("UseRandomPrisonerDivorce");
         chkUseRandomPrisonerDivorce
-                .addMouseListener(createTipPanelUpdater(divorceHeader, "UseRandomPrisonerDivorce"));
+                .addMouseListener(createTipPanelUpdater("UseRandomPrisonerDivorce"));
 
         lblRandomDivorceDiceSize = new CampaignOptionsLabel("RandomDivorceDiceSize");
-        lblRandomDivorceDiceSize.addMouseListener(createTipPanelUpdater(divorceHeader, "RandomDivorceDiceSize"));
+        lblRandomDivorceDiceSize.addMouseListener(createTipPanelUpdater("RandomDivorceDiceSize"));
         spnRandomDivorceDiceSize = new CampaignOptionsSpinner("RandomDivorceDiceSize",
                 900, 0, 100000, 1);
-        spnRandomDivorceDiceSize.addMouseListener(createTipPanelUpdater(divorceHeader, "RandomDivorceDiceSize"));
+        spnRandomDivorceDiceSize.addMouseListener(createTipPanelUpdater("RandomDivorceDiceSize"));
 
         // Layout the Panel
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("RandomDivorcePanel",
@@ -552,7 +541,7 @@ public class RelationshipsTab {
     public @Nonnull JPanel createProcreationTab() {
         // Header
         String imageAddress = getImageDirectory() + "logo_hanseatic_league.png";
-        procreationHeader = new CampaignOptionsHeaderPanel("ProcreationTab", imageAddress, 6);
+        procreationHeader = new CampaignOptionsHeaderPanel("ProcreationTab", imageAddress);
 
         // Contents
         pnlProcreationGeneralOptionsPanel = createProcreationGeneralOptionsPanel();
@@ -586,24 +575,21 @@ public class RelationshipsTab {
     private @Nonnull JPanel createProcreationGeneralOptionsPanel() {
         // Contents
         chkUseManualProcreation = new CampaignOptionsCheckBox("UseManualProcreation");
-        chkUseManualProcreation.addMouseListener(createTipPanelUpdater(procreationHeader, "UseManualProcreation"));
+        chkUseManualProcreation.addMouseListener(createTipPanelUpdater("UseManualProcreation"));
         chkUseClanPersonnelProcreation = new CampaignOptionsCheckBox("UseClanPersonnelProcreation");
-        chkUseClanPersonnelProcreation.addMouseListener(createTipPanelUpdater(procreationHeader,
-                "UseClanPersonnelProcreation"));
+        chkUseClanPersonnelProcreation.addMouseListener(createTipPanelUpdater("UseClanPersonnelProcreation"));
         chkUsePrisonerProcreation = new CampaignOptionsCheckBox("UsePrisonerProcreation");
         chkUsePrisonerProcreation
-                .addMouseListener(createTipPanelUpdater(procreationHeader, "UsePrisonerProcreation"));
+                .addMouseListener(createTipPanelUpdater("UsePrisonerProcreation"));
 
         lblMultiplePregnancyOccurrences = new CampaignOptionsLabel("MultiplePregnancyOccurrences");
-        lblMultiplePregnancyOccurrences.addMouseListener(createTipPanelUpdater(procreationHeader,
-                "MultiplePregnancyOccurrences"));
+        lblMultiplePregnancyOccurrences.addMouseListener(createTipPanelUpdater("MultiplePregnancyOccurrences"));
         spnMultiplePregnancyOccurrences = new CampaignOptionsSpinner("MultiplePregnancyOccurrences",
                 50, 1, 1000, 1);
-        spnMultiplePregnancyOccurrences.addMouseListener(createTipPanelUpdater(procreationHeader,
-                "MultiplePregnancyOccurrences"));
+        spnMultiplePregnancyOccurrences.addMouseListener(createTipPanelUpdater("MultiplePregnancyOccurrences"));
 
         lblBabySurnameStyle = new CampaignOptionsLabel("BabySurnameStyle");
-        lblBabySurnameStyle.addMouseListener(createTipPanelUpdater(procreationHeader, "BabySurnameStyle"));
+        lblBabySurnameStyle.addMouseListener(createTipPanelUpdater("BabySurnameStyle"));
         comboBabySurnameStyle.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
@@ -616,32 +602,28 @@ public class RelationshipsTab {
                 return this;
             }
         });
-        comboBabySurnameStyle.addMouseListener(createTipPanelUpdater(procreationHeader, "BabySurnameStyle"));
+        comboBabySurnameStyle.addMouseListener(createTipPanelUpdater("BabySurnameStyle"));
 
         chkAssignNonPrisonerBabiesFounderTag = new CampaignOptionsCheckBox("AssignNonPrisonerBabiesFounderTag");
-        chkAssignNonPrisonerBabiesFounderTag.addMouseListener(createTipPanelUpdater(procreationHeader,
-                "AssignNonPrisonerBabiesFounderTag"));
+        chkAssignNonPrisonerBabiesFounderTag.addMouseListener(createTipPanelUpdater("AssignNonPrisonerBabiesFounderTag"));
         chkAssignChildrenOfFoundersFounderTag = new CampaignOptionsCheckBox("AssignChildrenOfFoundersFounderTag");
-        chkAssignChildrenOfFoundersFounderTag.addMouseListener(createTipPanelUpdater(procreationHeader,
-                "AssignChildrenOfFoundersFounderTag"));
+        chkAssignChildrenOfFoundersFounderTag.addMouseListener(createTipPanelUpdater("AssignChildrenOfFoundersFounderTag"));
         chkDetermineFatherAtBirth = new CampaignOptionsCheckBox("DetermineFatherAtBirth");
         chkDetermineFatherAtBirth
-                .addMouseListener(createTipPanelUpdater(procreationHeader, "DetermineFatherAtBirth"));
+                .addMouseListener(createTipPanelUpdater("DetermineFatherAtBirth"));
         chkDisplayTrueDueDate = new CampaignOptionsCheckBox("DisplayTrueDueDate");
-        chkDisplayTrueDueDate.addMouseListener(createTipPanelUpdater(procreationHeader, "DisplayTrueDueDate"));
+        chkDisplayTrueDueDate.addMouseListener(createTipPanelUpdater("DisplayTrueDueDate"));
 
         lblNoInterestInChildrenDiceSize = new CampaignOptionsLabel("NoInterestInChildrenDiceSize");
-        lblNoInterestInChildrenDiceSize.addMouseListener(createTipPanelUpdater(procreationHeader,
-                "NoInterestInChildrenDiceSize"));
+        lblNoInterestInChildrenDiceSize.addMouseListener(createTipPanelUpdater("NoInterestInChildrenDiceSize"));
         spnNoInterestInChildrenDiceSize = new CampaignOptionsSpinner("NoInterestInChildrenDiceSize",
                 3, 1, 100000, 1);
-        spnNoInterestInChildrenDiceSize.addMouseListener(createTipPanelUpdater(procreationHeader,
-                "NoInterestInChildrenDiceSize"));
+        spnNoInterestInChildrenDiceSize.addMouseListener(createTipPanelUpdater("NoInterestInChildrenDiceSize"));
 
         chkUseMaternityLeave = new CampaignOptionsCheckBox("UseMaternityLeave");
-        chkUseMaternityLeave.addMouseListener(createTipPanelUpdater(procreationHeader, "UseMaternityLeave"));
+        chkUseMaternityLeave.addMouseListener(createTipPanelUpdater("UseMaternityLeave"));
         chkLogProcreation = new CampaignOptionsCheckBox("LogProcreation");
-        chkLogProcreation.addMouseListener(createTipPanelUpdater(procreationHeader, "LogProcreation"));
+        chkLogProcreation.addMouseListener(createTipPanelUpdater("LogProcreation"));
 
         // Layout the Panel
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("ProcreationGeneralOptionsPanel",
@@ -674,8 +656,7 @@ public class RelationshipsTab {
     private @Nonnull JPanel createRandomProcreationPanel() {
         // Contents
         lblRandomProcreationMethod = new CampaignOptionsLabel("RandomProcreationMethod");
-        lblRandomProcreationMethod.addMouseListener(createTipPanelUpdater(procreationHeader,
-                "RandomProcreationMethod"));
+        lblRandomProcreationMethod.addMouseListener(createTipPanelUpdater("RandomProcreationMethod"));
         comboRandomProcreationMethod.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
@@ -688,42 +669,34 @@ public class RelationshipsTab {
                 return this;
             }
         });
-        comboRandomProcreationMethod.addMouseListener(createTipPanelUpdater(procreationHeader,
-                "RandomProcreationMethod"));
+        comboRandomProcreationMethod.addMouseListener(createTipPanelUpdater("RandomProcreationMethod"));
 
         chkUseRelationshiplessRandomProcreation = new CampaignOptionsCheckBox(
                 "UseRelationshiplessRandomProcreation");
-        chkUseRelationshiplessRandomProcreation.addMouseListener(createTipPanelUpdater(procreationHeader,
-                "UseRelationshiplessRandomProcreation"));
+        chkUseRelationshiplessRandomProcreation.addMouseListener(createTipPanelUpdater("UseRelationshiplessRandomProcreation"));
         chkUseRandomClanPersonnelProcreation = new CampaignOptionsCheckBox("UseRandomClanPersonnelProcreation");
-        chkUseRandomClanPersonnelProcreation.addMouseListener(createTipPanelUpdater(procreationHeader,
-                "UseRandomClanPersonnelProcreation"));
+        chkUseRandomClanPersonnelProcreation.addMouseListener(createTipPanelUpdater("UseRandomClanPersonnelProcreation"));
         chkUseRandomPrisonerProcreation = new CampaignOptionsCheckBox("UseRandomPrisonerProcreation");
-        chkUseRandomPrisonerProcreation.addMouseListener(createTipPanelUpdater(procreationHeader,
-                "UseRandomPrisonerProcreation"));
+        chkUseRandomPrisonerProcreation.addMouseListener(createTipPanelUpdater("UseRandomPrisonerProcreation"));
 
         lblRandomProcreationRelationshipDiceSize = new CampaignOptionsLabel(
                 "RandomProcreationRelationshipDiceSize");
-        lblRandomProcreationRelationshipDiceSize.addMouseListener(createTipPanelUpdater(procreationHeader,
-                "RandomProcreationRelationshipDiceSize"));
+        lblRandomProcreationRelationshipDiceSize.addMouseListener(createTipPanelUpdater("RandomProcreationRelationshipDiceSize"));
         spnRandomProcreationRelationshipDiceSize = new CampaignOptionsSpinner(
                 "RandomProcreationRelationshipDiceSize",
                 621, 0, 100000, 1);
-        spnRandomProcreationRelationshipDiceSize.addMouseListener(createTipPanelUpdater(procreationHeader,
-                "RandomProcreationRelationshipDiceSize"));
+        spnRandomProcreationRelationshipDiceSize.addMouseListener(createTipPanelUpdater("RandomProcreationRelationshipDiceSize"));
 
         lblRandomProcreationRelationshiplessDiceSize = new CampaignOptionsLabel(
                 "RandomProcreationRelationshiplessDiceSize");
-        lblRandomProcreationRelationshiplessDiceSize.addMouseListener(createTipPanelUpdater(procreationHeader,
-                "RandomProcreationRelationshiplessDiceSize"));
+        lblRandomProcreationRelationshiplessDiceSize.addMouseListener(createTipPanelUpdater("RandomProcreationRelationshiplessDiceSize"));
         spnRandomProcreationRelationshiplessDiceSize = new CampaignOptionsSpinner(
                 "RandomProcreationRelationshiplessDiceSize",
                 1861,
                 0,
                 100000,
                 1);
-        spnRandomProcreationRelationshiplessDiceSize.addMouseListener(createTipPanelUpdater(procreationHeader,
-                "RandomProcreationRelationshiplessDiceSize"));
+        spnRandomProcreationRelationshiplessDiceSize.addMouseListener(createTipPanelUpdater("RandomProcreationRelationshiplessDiceSize"));
 
         // Layout the Panel
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("RandomProcreationPanel",
@@ -744,30 +717,24 @@ public class RelationshipsTab {
         // Contents
         lblNoInterestInRelationshipsDiceSize = new CampaignOptionsLabel("NoInterestInRelationshipsDiceSize",
                 getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
-        lblNoInterestInRelationshipsDiceSize.addMouseListener(createTipPanelUpdater(procreationHeader,
-                "NoInterestInRelationshipsDiceSize"));
+        lblNoInterestInRelationshipsDiceSize.addMouseListener(createTipPanelUpdater("NoInterestInRelationshipsDiceSize"));
         spnNoInterestInRelationshipsDiceSize = new CampaignOptionsSpinner("NoInterestInRelationshipsDiceSize",
                 10, 1, 100000, 1);
-        spnNoInterestInRelationshipsDiceSize.addMouseListener(createTipPanelUpdater(procreationHeader,
-                "NoInterestInRelationshipsDiceSize"));
+        spnNoInterestInRelationshipsDiceSize.addMouseListener(createTipPanelUpdater("NoInterestInRelationshipsDiceSize"));
 
         lblPrefersSameSexDiceSize = new CampaignOptionsLabel("PrefersSameSexDiceSize",
                 getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
-        lblPrefersSameSexDiceSize.addMouseListener(createTipPanelUpdater(procreationHeader,
-                "PrefersSameSexDiceSize"));
+        lblPrefersSameSexDiceSize.addMouseListener(createTipPanelUpdater("PrefersSameSexDiceSize"));
         spnPrefersSameSexDiceSize = new CampaignOptionsSpinner("PrefersSameSexDiceSize",
                 14, 0, 100000, 1);
-        spnPrefersSameSexDiceSize.addMouseListener(createTipPanelUpdater(procreationHeader,
-                "PrefersSameSexDiceSize"));
+        spnPrefersSameSexDiceSize.addMouseListener(createTipPanelUpdater("PrefersSameSexDiceSize"));
 
         lblPrefersBothSexesDiceSize = new CampaignOptionsLabel("PrefersBothSexesDiceSize",
                 getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
-        lblPrefersBothSexesDiceSize.addMouseListener(createTipPanelUpdater(procreationHeader,
-                "PrefersBothSexesDiceSize"));
+        lblPrefersBothSexesDiceSize.addMouseListener(createTipPanelUpdater("PrefersBothSexesDiceSize"));
         spnPrefersBothSexesDiceSize = new CampaignOptionsSpinner("PrefersBothSexesDiceSize",
                 20, 0, 100000, 1);
-        spnPrefersBothSexesDiceSize.addMouseListener(createTipPanelUpdater(procreationHeader,
-                "PrefersBothSexesDiceSize"));
+        spnPrefersBothSexesDiceSize.addMouseListener(createTipPanelUpdater("PrefersBothSexesDiceSize"));
 
         // Layout the Panel
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("RandomSexualityPanel",

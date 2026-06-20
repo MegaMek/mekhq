@@ -504,89 +504,74 @@ public class RulesetsTab {
         // we ever introduce a new Digital GM. So, as this content is initialized before
         // the stratConHeader, we need
         // to wait until now to add the mouse listeners. It's awkward, but it works.
-        lblAutoResolveMethod.addMouseListener(createTipPanelUpdater(stratConHeader, "AutoResolveMethod"));
-        comboAutoResolveMethod.addMouseListener(createTipPanelUpdater(stratConHeader, "AutoResolveMethod"));
-        lblMinimapTheme.addMouseListener(createTipPanelUpdater(stratConHeader, "MinimapTheme"));
-        minimapThemeSelector.addMouseListener(createTipPanelUpdater(stratConHeader, "MinimapTheme"));
-        lblAutoResolveNumberOfScenarios.addMouseListener(createTipPanelUpdater(stratConHeader,
-                "AutoResolveNumberOfScenarios"));
-        spnAutoResolveNumberOfScenarios.addMouseListener(createTipPanelUpdater(stratConHeader,
-                "AutoResolveNumberOfScenarios"));
-        chkAutoResolveVictoryChanceEnabled.addMouseListener(createTipPanelUpdater(stratConHeader,
-                "AutoResolveVictoryChanceEnabled"));
-        chkAutoResolveExperimentalPacarGuiEnabled.addMouseListener(createTipPanelUpdater(stratConHeader,
-                "AutoResolveExperimentalPacarGuiEnabled"));
-        lblMoraleVictory.addMouseListener(createTipPanelUpdater(stratConHeader, "MoraleVictory"));
-        spnMoraleVictory.addMouseListener(createTipPanelUpdater(stratConHeader, "MoraleVictory"));
-        lblMoraleDecisiveVictory.addMouseListener(createTipPanelUpdater(stratConHeader, "MoraleDecisiveVictory"));
-        spnMoraleDecisiveVictory.addMouseListener(createTipPanelUpdater(stratConHeader, "MoraleDecisiveVictory"));
-        lblMoraleDefeat.addMouseListener(createTipPanelUpdater(stratConHeader, "MoraleDefeat"));
-        spnMoraleDefeat.addMouseListener(createTipPanelUpdater(stratConHeader, "MoraleDefeat"));
-        lblMoraleDecisiveDefeat.addMouseListener(createTipPanelUpdater(stratConHeader, "MoraleDecisiveDefeat"));
-        spnMoraleDecisiveDefeat.addMouseListener(createTipPanelUpdater(stratConHeader, "MoraleDecisiveDefeat"));
-        chkRestrictPartsByMission.addMouseListener(createTipPanelUpdater(stratConHeader, "RestrictPartsByMission"));
-        chkUseWeatherConditions.addMouseListener(createTipPanelUpdater(stratConHeader, "UseWeatherConditions"));
-        chkUseLightConditions.addMouseListener(createTipPanelUpdater(stratConHeader, "UseLightConditions"));
-        chkUsePlanetaryConditions.addMouseListener(createTipPanelUpdater(stratConHeader, "UsePlanetaryConditions"));
-        chkUseNoTornadoes.addMouseListener(createTipPanelUpdater(stratConHeader, "UseNoTornadoes"));
-        lblFixedMapChance.addMouseListener(createTipPanelUpdater(stratConHeader, "FixedMapChance"));
-        spnFixedMapChance.addMouseListener(createTipPanelUpdater(stratConHeader, "FixedMapChance"));
-        chkClansObeyBiddingRules.addMouseListener(createTipPanelUpdater(stratConHeader, "ClansObeyBiddingRules"));
-        lblEnemyFacilityModifierDieSize.addMouseListener(createTipPanelUpdater(stratConHeader,
-                "EnemyFacilityModifierDieSize"));
-        spnEnemyFacilityModifierDieSize.addMouseListener(createTipPanelUpdater(stratConHeader,
-                "EnemyFacilityModifierDieSize"));
-        lblAlliedFacilityModifierDieSize.addMouseListener(createTipPanelUpdater(stratConHeader,
-                "AlliedFacilityModifierDieSize"));
-        spnAlliedFacilityModifierDieSize.addMouseListener(createTipPanelUpdater(stratConHeader,
-                "AlliedFacilityModifierDieSize"));
-        lblScenarioModMax.addMouseListener(createTipPanelUpdater(stratConHeader, "ScenarioModMax"));
-        spnScenarioModMax.addMouseListener(createTipPanelUpdater(stratConHeader, "ScenarioModMax"));
-        lblScenarioModChance.addMouseListener(createTipPanelUpdater(stratConHeader, "ScenarioModChance"));
-        spnScenarioModChance.addMouseListener(createTipPanelUpdater(stratConHeader, "ScenarioModChance"));
-        lblScenarioModBV.addMouseListener(createTipPanelUpdater(stratConHeader, "ScenarioModBV"));
-        spnScenarioModBV.addMouseListener(createTipPanelUpdater(stratConHeader, "ScenarioModBV"));
-        lblSkillLevel.addMouseListener(createTipPanelUpdater(stratConHeader, "SkillLevel"));
-        comboSkillLevel.addMouseListener(createTipPanelUpdater(stratConHeader, "SkillLevel"));
-        lblBoardScalingType.addMouseListener(createTipPanelUpdater(stratConHeader, "BoardScalingType"));
-        comboBoardScalingType.addMouseListener(createTipPanelUpdater(stratConHeader, "BoardScalingType"));
-        chkAutoGenerateOpForCallSigns.addMouseListener(createTipPanelUpdater(stratConHeader,
-                "AutoGenerateOpForCallSigns"));
-        lblMinimumCallsignSkillLevel.addMouseListener(createTipPanelUpdater(stratConHeader,
-                "MinimumCallsignSkillLevel"));
-        comboMinimumCallsignSkillLevel.addMouseListener(createTipPanelUpdater(stratConHeader,
-                "MinimumCallsignSkillLevel"));
-        chkUseDropShips.addMouseListener(createTipPanelUpdater(stratConHeader, "UseDropShips"));
-        chkRegionalMekVariations.addMouseListener(createTipPanelUpdater(stratConHeader, "RegionalMekVariations"));
+        lblAutoResolveMethod.addMouseListener(createTipPanelUpdater("AutoResolveMethod"));
+        comboAutoResolveMethod.addMouseListener(createTipPanelUpdater("AutoResolveMethod"));
+        lblMinimapTheme.addMouseListener(createTipPanelUpdater("MinimapTheme"));
+        minimapThemeSelector.addMouseListener(createTipPanelUpdater("MinimapTheme"));
+        lblAutoResolveNumberOfScenarios.addMouseListener(createTipPanelUpdater("AutoResolveNumberOfScenarios"));
+        spnAutoResolveNumberOfScenarios.addMouseListener(createTipPanelUpdater("AutoResolveNumberOfScenarios"));
+        chkAutoResolveVictoryChanceEnabled.addMouseListener(createTipPanelUpdater("AutoResolveVictoryChanceEnabled"));
+        chkAutoResolveExperimentalPacarGuiEnabled.addMouseListener(createTipPanelUpdater("AutoResolveExperimentalPacarGuiEnabled"));
+        lblMoraleVictory.addMouseListener(createTipPanelUpdater("MoraleVictory"));
+        spnMoraleVictory.addMouseListener(createTipPanelUpdater("MoraleVictory"));
+        lblMoraleDecisiveVictory.addMouseListener(createTipPanelUpdater("MoraleDecisiveVictory"));
+        spnMoraleDecisiveVictory.addMouseListener(createTipPanelUpdater("MoraleDecisiveVictory"));
+        lblMoraleDefeat.addMouseListener(createTipPanelUpdater("MoraleDefeat"));
+        spnMoraleDefeat.addMouseListener(createTipPanelUpdater("MoraleDefeat"));
+        lblMoraleDecisiveDefeat.addMouseListener(createTipPanelUpdater("MoraleDecisiveDefeat"));
+        spnMoraleDecisiveDefeat.addMouseListener(createTipPanelUpdater("MoraleDecisiveDefeat"));
+        chkRestrictPartsByMission.addMouseListener(createTipPanelUpdater("RestrictPartsByMission"));
+        chkUseWeatherConditions.addMouseListener(createTipPanelUpdater("UseWeatherConditions"));
+        chkUseLightConditions.addMouseListener(createTipPanelUpdater("UseLightConditions"));
+        chkUsePlanetaryConditions.addMouseListener(createTipPanelUpdater("UsePlanetaryConditions"));
+        chkUseNoTornadoes.addMouseListener(createTipPanelUpdater("UseNoTornadoes"));
+        lblFixedMapChance.addMouseListener(createTipPanelUpdater("FixedMapChance"));
+        spnFixedMapChance.addMouseListener(createTipPanelUpdater("FixedMapChance"));
+        chkClansObeyBiddingRules.addMouseListener(createTipPanelUpdater("ClansObeyBiddingRules"));
+        lblEnemyFacilityModifierDieSize.addMouseListener(createTipPanelUpdater("EnemyFacilityModifierDieSize"));
+        spnEnemyFacilityModifierDieSize.addMouseListener(createTipPanelUpdater("EnemyFacilityModifierDieSize"));
+        lblAlliedFacilityModifierDieSize.addMouseListener(createTipPanelUpdater("AlliedFacilityModifierDieSize"));
+        spnAlliedFacilityModifierDieSize.addMouseListener(createTipPanelUpdater("AlliedFacilityModifierDieSize"));
+        lblScenarioModMax.addMouseListener(createTipPanelUpdater("ScenarioModMax"));
+        spnScenarioModMax.addMouseListener(createTipPanelUpdater("ScenarioModMax"));
+        lblScenarioModChance.addMouseListener(createTipPanelUpdater("ScenarioModChance"));
+        spnScenarioModChance.addMouseListener(createTipPanelUpdater("ScenarioModChance"));
+        lblScenarioModBV.addMouseListener(createTipPanelUpdater("ScenarioModBV"));
+        spnScenarioModBV.addMouseListener(createTipPanelUpdater("ScenarioModBV"));
+        lblSkillLevel.addMouseListener(createTipPanelUpdater("SkillLevel"));
+        comboSkillLevel.addMouseListener(createTipPanelUpdater("SkillLevel"));
+        lblBoardScalingType.addMouseListener(createTipPanelUpdater("BoardScalingType"));
+        comboBoardScalingType.addMouseListener(createTipPanelUpdater("BoardScalingType"));
+        chkAutoGenerateOpForCallSigns.addMouseListener(createTipPanelUpdater("AutoGenerateOpForCallSigns"));
+        lblMinimumCallsignSkillLevel.addMouseListener(createTipPanelUpdater("MinimumCallsignSkillLevel"));
+        comboMinimumCallsignSkillLevel.addMouseListener(createTipPanelUpdater("MinimumCallsignSkillLevel"));
+        chkUseDropShips.addMouseListener(createTipPanelUpdater("UseDropShips"));
+        chkRegionalMekVariations.addMouseListener(createTipPanelUpdater("RegionalMekVariations"));
         chkAttachedPlayerCamouflage
-                .addMouseListener(createTipPanelUpdater(stratConHeader, "AttachedPlayerCamouflage"));
-        chkPlayerControlsAttachedUnits.addMouseListener(createTipPanelUpdater(stratConHeader,
-                "PlayerControlsAttachedUnits"));
-        chkUseAdvancedBuildingGunEmplacements.addMouseListener(createTipPanelUpdater(stratConHeader,
-                "UseAdvancedBuildingGunEmplacements"));
-        lblSPAUpgradeIntensity.addMouseListener(createTipPanelUpdater(stratConHeader, "SPAUpgradeIntensity"));
-        spnSPAUpgradeIntensity.addMouseListener(createTipPanelUpdater(stratConHeader, "SPAUpgradeIntensity"));
-        lblReinforcementBaseTargetNumber.addMouseListener(createTipPanelUpdater(stratConHeader,
-                "ReinforcementBaseTargetNumber"));
-        spnReinforcementBaseTargetNumber.addMouseListener(createTipPanelUpdater(stratConHeader,
-                "ReinforcementBaseTargetNumber"));
-        chkAutoConfigMunitions.addMouseListener(createTipPanelUpdater(stratConHeader, "AutoConfigMunitions"));
+                .addMouseListener(createTipPanelUpdater("AttachedPlayerCamouflage"));
+        chkPlayerControlsAttachedUnits.addMouseListener(createTipPanelUpdater("PlayerControlsAttachedUnits"));
+        chkUseAdvancedBuildingGunEmplacements.addMouseListener(createTipPanelUpdater("UseAdvancedBuildingGunEmplacements"));
+        lblSPAUpgradeIntensity.addMouseListener(createTipPanelUpdater("SPAUpgradeIntensity"));
+        spnSPAUpgradeIntensity.addMouseListener(createTipPanelUpdater("SPAUpgradeIntensity"));
+        lblReinforcementBaseTargetNumber.addMouseListener(createTipPanelUpdater("ReinforcementBaseTargetNumber"));
+        spnReinforcementBaseTargetNumber.addMouseListener(createTipPanelUpdater("ReinforcementBaseTargetNumber"));
+        chkAutoConfigMunitions.addMouseListener(createTipPanelUpdater("AutoConfigMunitions"));
 
         // Content
         lblStratConPlayType = new CampaignOptionsLabel("StratConPlayType",
                 getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.DOCUMENTED));
-        lblStratConPlayType.addMouseListener(createTipPanelUpdater(stratConHeader, "StratConPlayType"));
-        comboStratConPlayType.addMouseListener(createTipPanelUpdater(stratConHeader, "StratConPlayType"));
+        lblStratConPlayType.addMouseListener(createTipPanelUpdater("StratConPlayType"));
+        comboStratConPlayType.addMouseListener(createTipPanelUpdater("StratConPlayType"));
         chkUseAdvancedScouting = new CampaignOptionsCheckBox("UseAdvancedScouting",
                 getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
-        chkUseAdvancedScouting.addMouseListener(createTipPanelUpdater(stratConHeader, "UseAdvancedScouting"));
+        chkUseAdvancedScouting.addMouseListener(createTipPanelUpdater("UseAdvancedScouting"));
         chkNoSeedForces = new CampaignOptionsCheckBox("NoSeedForces",
                 getMetadata(MILESTONE_BEFORE_METADATA));
-        chkNoSeedForces.addMouseListener(createTipPanelUpdater(stratConHeader, "NoSeedForces"));
+        chkNoSeedForces.addMouseListener(createTipPanelUpdater("NoSeedForces"));
         chkUseGenericBattleValue = new CampaignOptionsCheckBox("UseGenericBattleValue");
-        chkUseGenericBattleValue.addMouseListener(createTipPanelUpdater(stratConHeader, "UseGenericBattleValue"));
+        chkUseGenericBattleValue.addMouseListener(createTipPanelUpdater("UseGenericBattleValue"));
         chkUseVerboseBidding = new CampaignOptionsCheckBox("UseVerboseBidding");
-        chkUseVerboseBidding.addMouseListener(createTipPanelUpdater(stratConHeader, "UseVerboseBidding"));
+        chkUseVerboseBidding.addMouseListener(createTipPanelUpdater("UseVerboseBidding"));
 
         JPanel generalOptionsPanel = createStratConGeneralOptionsPanel();
         JPanel scenarioGenerationPanel = createStratConScenarioGenerationPanel();
@@ -746,11 +731,12 @@ public class RulesetsTab {
      * @return a {@link JPanel} containing all Legacy AtB settings.
      */
     @Deprecated(since = "0.51.0", forRemoval = true)
+    @SuppressWarnings("removal")
     public @Nonnull JPanel createLegacyTab() {
         // Header
         legacyHeader = new CampaignOptionsHeaderPanel("LegacyTab",
                 getImageDirectory() + "logo_free_rasalhague_republic.png",
-                true, true, 5);
+                true);
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("LegacyTab", true);

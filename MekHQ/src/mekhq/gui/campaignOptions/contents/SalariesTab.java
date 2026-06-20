@@ -200,8 +200,7 @@ public class SalariesTab {
         if (type == PersonnelRoleSubType.COMBAT) {
             chkDisableSecondaryRoleSalary = new CampaignOptionsCheckBox("DisableSecondaryRoleSalary",
                 getMetadata(null, CampaignOptionFlag.CUSTOM_SYSTEM));
-            chkDisableSecondaryRoleSalary.addMouseListener(createTipPanelUpdater(salariesHeader,
-                "DisableSecondaryRoleSalary"));
+            chkDisableSecondaryRoleSalary.addMouseListener(createTipPanelUpdater("DisableSecondaryRoleSalary"));
 
             builder.section("lblSalaryRulesPanel.text", "lblSalaryRulesPanel.summary", createSalaryRulesPanel())
                     .section("lblSalaryMultipliersPanel.text",
@@ -264,16 +263,14 @@ public class SalariesTab {
     private @Nonnull JPanel createSalaryMultipliersPanel() {
         // Contents
         lblAntiMekSalary = new CampaignOptionsLabel("AntiMekSalary");
-        lblAntiMekSalary.addMouseListener(createTipPanelUpdater(salariesHeader, "AntiMekSalary"));
+        lblAntiMekSalary.addMouseListener(createTipPanelUpdater("AntiMekSalary"));
         spnAntiMekSalary = new CampaignOptionsSpinner("AntiMekSalary", 0, 0, 100, 0.01);
-        spnAntiMekSalary.addMouseListener(createTipPanelUpdater(salariesHeader, "AntiMekSalary"));
+        spnAntiMekSalary.addMouseListener(createTipPanelUpdater("AntiMekSalary"));
 
         lblSpecialistInfantrySalary = new CampaignOptionsLabel("SpecialistInfantrySalary");
-        lblSpecialistInfantrySalary.addMouseListener(createTipPanelUpdater(salariesHeader,
-              "SpecialistInfantrySalary"));
+        lblSpecialistInfantrySalary.addMouseListener(createTipPanelUpdater("SpecialistInfantrySalary"));
         spnSpecialistInfantrySalary = new CampaignOptionsSpinner("SpecialistInfantrySalary", 0, 0, 100, 0.01);
-        spnSpecialistInfantrySalary.addMouseListener(createTipPanelUpdater(salariesHeader,
-              "SpecialistInfantrySalary"));
+        spnSpecialistInfantrySalary.addMouseListener(createTipPanelUpdater("SpecialistInfantrySalary"));
 
         // Layout the Panel
         JComponent[] labels = { lblAntiMekSalary, lblSpecialistInfantrySalary };
@@ -298,12 +295,12 @@ public class SalariesTab {
         for (final SkillLevel skillLevel : skillLevels) {
             final JLabel label = new CampaignOptionsLabel("SkillLevel" + skillLevel.toString(), null, true);
             label.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(), "lblSkillLevelMultiplier.tooltip"));
-            label.addMouseListener(createTipPanelUpdater(salariesHeader, "SkillLevelMultiplier"));
+            label.addMouseListener(createTipPanelUpdater("SkillLevelMultiplier"));
             lblSalaryExperienceMultipliers.put(skillLevel, label);
 
-            final JSpinner spinner = new CampaignOptionsSpinner("SkillLevel" + skillLevel, null, 0, 0, 100, 0.1, true);
+            final JSpinner spinner = new CampaignOptionsSpinner("SkillLevel" + skillLevel, 0, 0, 100, 0.1, true);
             spinner.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(), "lblSkillLevelMultiplier.tooltip"));
-            spinner.addMouseListener(createTipPanelUpdater(salariesHeader, "SkillLevelMultiplier"));
+            spinner.addMouseListener(createTipPanelUpdater("SkillLevelMultiplier"));
             spnSalaryExperienceMultipliers.put(skillLevel, spinner);
         }
 
@@ -377,7 +374,7 @@ public class SalariesTab {
         String componentName = personnelRole.toString().replace(" ", "");
         JLabel label = new JLabel(personnelRole.toString());
         label.setToolTipText(personnelRole.getDescription(false));
-        label.addMouseListener(createTipPanelUpdater(salariesHeader, null, personnelRole.getDescription(false)));
+        label.addMouseListener(createTipPanelUpdater(null, personnelRole.getDescription(false)));
         label.setName("lbl" + componentName);
 
         return label;
@@ -387,7 +384,7 @@ public class SalariesTab {
         String componentName = personnelRole.toString().replace(" ", "");
         JSpinner spinner = new JSpinner();
         spinner.setToolTipText(personnelRole.getDescription(false));
-        spinner.addMouseListener(createTipPanelUpdater(salariesHeader, null, personnelRole.getDescription(false)));
+        spinner.addMouseListener(createTipPanelUpdater(null, personnelRole.getDescription(false)));
         spinner.setModel(new SpinnerNumberModel(250.0, 0.0, 1000000, 10.0));
         spinner.setName("spn" + componentName);
 
@@ -527,11 +524,11 @@ public class SalariesTab {
 
     private JPanel createCivilianSalaryFilterPanel(TableRowSorter<SalaryTableModel> sorter) {
         JLabel filterLabel = new CampaignOptionsLabel("CivilianSalaryFilter");
-        filterLabel.addMouseListener(createTipPanelUpdater(salariesHeader, "CivilianSalaryFilter"));
+        filterLabel.addMouseListener(createTipPanelUpdater("CivilianSalaryFilter"));
 
         JTextField filterField = new JTextField(24);
         filterField.setName("txtCivilianSalaryFilter");
-        filterField.addMouseListener(createTipPanelUpdater(salariesHeader, "CivilianSalaryFilter"));
+        filterField.addMouseListener(createTipPanelUpdater("CivilianSalaryFilter"));
         filterField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent event) {

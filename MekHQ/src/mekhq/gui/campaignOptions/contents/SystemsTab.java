@@ -197,15 +197,14 @@ public class SystemsTab {
     private @Nonnull JPanel createReputationGeneralPanel() {
         // Contents
         JLabel lblManualUnitRatingModifier = new CampaignOptionsLabel("ManualUnitRatingModifier");
-        lblManualUnitRatingModifier.addMouseListener(createTipPanelUpdater(reputationHeader,
-                "ManualUnitRatingModifier"));
+        lblManualUnitRatingModifier.addMouseListener(createTipPanelUpdater("ManualUnitRatingModifier"));
         manualUnitRatingModifier = new CampaignOptionsSpinner("ManualUnitRatingModifier", 0, -1000, 1000, 1);
         manualUnitRatingModifier
-                .addMouseListener(createTipPanelUpdater(reputationHeader, "ManualUnitRatingModifier"));
+                .addMouseListener(createTipPanelUpdater("ManualUnitRatingModifier"));
 
         JLabel lblResetCriminalRecord = new CampaignOptionsLabel("ResetCriminalRecord",
                 getResetCriminalRecordMetadata());
-        lblResetCriminalRecord.addMouseListener(createTipPanelUpdater(reputationHeader, "ResetCriminalRecord"));
+        lblResetCriminalRecord.addMouseListener(createTipPanelUpdater("ResetCriminalRecord"));
         btnResetCriminalRecord = createResetCriminalRecordButton();
 
         // Layout the Panel
@@ -223,7 +222,7 @@ public class SystemsTab {
         button.setName("btnResetCriminalRecord");
         button.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(), "lblResetCriminalRecord.tooltip"));
         button.putClientProperty("JComponent.sizeVariant", "small");
-        button.addMouseListener(createTipPanelUpdater(reputationHeader, "ResetCriminalRecord"));
+        button.addMouseListener(createTipPanelUpdater("ResetCriminalRecord"));
         button.addActionListener(event -> {
             if (model != null) {
                 model.resetCriminalRecord = true;
@@ -254,26 +253,22 @@ public class SystemsTab {
         // Contents
         chkRequireSupportForceTransportation = new CampaignOptionsCheckBox("RequireSupportForceTransportation",
                 getMetadata(new Version(0, 51, 0)));
-        chkRequireSupportForceTransportation.addMouseListener(createTipPanelUpdater(reputationHeader,
-                "RequireSupportForceTransportation"));
+        chkRequireSupportForceTransportation.addMouseListener(createTipPanelUpdater("RequireSupportForceTransportation"));
 
         chkClampReputationPayMultiplier = new CampaignOptionsCheckBox("ClampReputationPayMultiplier",
                 getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT,
                         CampaignOptionFlag.RECOMMENDED));
-        chkClampReputationPayMultiplier.addMouseListener(createTipPanelUpdater(reputationHeader,
-                "ClampReputationPayMultiplier"));
+        chkClampReputationPayMultiplier.addMouseListener(createTipPanelUpdater("ClampReputationPayMultiplier"));
 
         chkReduceReputationPerformanceModifier = new CampaignOptionsCheckBox("ReduceReputationPerformanceModifier",
                 getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT,
                         CampaignOptionFlag.RECOMMENDED));
-        chkReduceReputationPerformanceModifier.addMouseListener(createTipPanelUpdater(reputationHeader,
-                "ReduceReputationPerformanceModifier"));
+        chkReduceReputationPerformanceModifier.addMouseListener(createTipPanelUpdater("ReduceReputationPerformanceModifier"));
 
         chkReputationPerformanceModifierCutOff = new CampaignOptionsCheckBox("ReputationPerformanceModifierCutOff",
                 getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT,
                         CampaignOptionFlag.RECOMMENDED));
-        chkReputationPerformanceModifierCutOff.addMouseListener(createTipPanelUpdater(reputationHeader,
-                "ReputationPerformanceModifierCutOff"));
+        chkReputationPerformanceModifierCutOff.addMouseListener(createTipPanelUpdater("ReputationPerformanceModifierCutOff"));
 
         // Layout the Panel
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("ReputationSanityOptionsPanel",
@@ -333,18 +328,17 @@ public class SystemsTab {
                 getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM,
                         CampaignOptionFlag.DOCUMENTED));
         chkTrackFactionStanding
-                .addMouseListener(createTipPanelUpdater(factionStandingHeader, "TrackFactionStanding"));
+                .addMouseListener(createTipPanelUpdater("TrackFactionStanding"));
 
         chkTrackClimateRegardChanges = new CampaignOptionsCheckBox("TrackClimateRegardChanges",
                 getMetadata(MILESTONE_BEFORE_METADATA));
-        chkTrackClimateRegardChanges.addMouseListener(createTipPanelUpdater(factionStandingHeader,
-                "TrackClimateRegardChanges"));
+        chkTrackClimateRegardChanges.addMouseListener(createTipPanelUpdater("TrackClimateRegardChanges"));
 
         JLabel lblRegardMultiplier = new CampaignOptionsLabel("RegardMultiplier",
                 getMetadata(MILESTONE_BEFORE_METADATA));
-        lblRegardMultiplier.addMouseListener(createTipPanelUpdater(factionStandingHeader, "RegardMultiplier"));
+        lblRegardMultiplier.addMouseListener(createTipPanelUpdater("RegardMultiplier"));
         spnRegardMultiplier = new CampaignOptionsSpinner("RegardMultiplier", 1.0, 0.1, 3.0, 0.1);
-        spnRegardMultiplier.addMouseListener(createTipPanelUpdater(factionStandingHeader, "RegardMultiplier"));
+        spnRegardMultiplier.addMouseListener(createTipPanelUpdater("RegardMultiplier"));
 
         // Layout the Panel
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("FactionStandingTrackingPanel",
@@ -372,54 +366,44 @@ public class SystemsTab {
         // Contents
         chkUseFactionStandingNegotiation = new CampaignOptionsCheckBox("UseFactionStandingNegotiation",
                 getMetadata(MILESTONE_BEFORE_METADATA));
-        chkUseFactionStandingNegotiation.addMouseListener(createTipPanelUpdater(factionStandingHeader,
-                "UseFactionStandingNegotiation"));
+        chkUseFactionStandingNegotiation.addMouseListener(createTipPanelUpdater("UseFactionStandingNegotiation"));
 
         chkUseFactionStandingResupply = new CampaignOptionsCheckBox("UseFactionStandingResupply",
                 getMetadata(MILESTONE_BEFORE_METADATA));
-        chkUseFactionStandingResupply.addMouseListener(createTipPanelUpdater(factionStandingHeader,
-                "UseFactionStandingResupply"));
+        chkUseFactionStandingResupply.addMouseListener(createTipPanelUpdater("UseFactionStandingResupply"));
 
         chkUseFactionStandingCommandCircuit = new CampaignOptionsCheckBox("UseFactionStandingCommandCircuit",
                 getMetadata(MILESTONE_BEFORE_METADATA));
-        chkUseFactionStandingCommandCircuit.addMouseListener(createTipPanelUpdater(factionStandingHeader,
-                "UseFactionStandingCommandCircuit"));
+        chkUseFactionStandingCommandCircuit.addMouseListener(createTipPanelUpdater("UseFactionStandingCommandCircuit"));
 
         chkUseFactionStandingOutlawed = new CampaignOptionsCheckBox("UseFactionStandingOutlawed",
                 getMetadata(MILESTONE_BEFORE_METADATA));
-        chkUseFactionStandingOutlawed.addMouseListener(createTipPanelUpdater(factionStandingHeader,
-                "UseFactionStandingOutlawed"));
+        chkUseFactionStandingOutlawed.addMouseListener(createTipPanelUpdater("UseFactionStandingOutlawed"));
 
         chkUseFactionStandingBatchallRestrictions = new CampaignOptionsCheckBox(
                 "UseFactionStandingBatchallRestrictions",
                 getMetadata(MILESTONE_BEFORE_METADATA));
-        chkUseFactionStandingBatchallRestrictions.addMouseListener(createTipPanelUpdater(factionStandingHeader,
-                "UseFactionStandingBatchallRestrictions"));
+        chkUseFactionStandingBatchallRestrictions.addMouseListener(createTipPanelUpdater("UseFactionStandingBatchallRestrictions"));
 
         chkUseFactionStandingRecruitment = new CampaignOptionsCheckBox("UseFactionStandingRecruitment",
                 getMetadata(MILESTONE_BEFORE_METADATA));
-        chkUseFactionStandingRecruitment.addMouseListener(createTipPanelUpdater(factionStandingHeader,
-                "UseFactionStandingRecruitment"));
+        chkUseFactionStandingRecruitment.addMouseListener(createTipPanelUpdater("UseFactionStandingRecruitment"));
 
         chkUseFactionStandingBarracksCosts = new CampaignOptionsCheckBox("UseFactionStandingBarracksCosts",
                 getMetadata(MILESTONE_BEFORE_METADATA));
-        chkUseFactionStandingBarracksCosts.addMouseListener(createTipPanelUpdater(factionStandingHeader,
-                "UseFactionStandingBarracksCosts"));
+        chkUseFactionStandingBarracksCosts.addMouseListener(createTipPanelUpdater("UseFactionStandingBarracksCosts"));
 
         chkUseFactionStandingUnitMarket = new CampaignOptionsCheckBox("UseFactionStandingUnitMarket",
                 getMetadata(MILESTONE_BEFORE_METADATA));
-        chkUseFactionStandingUnitMarket.addMouseListener(createTipPanelUpdater(factionStandingHeader,
-                "UseFactionStandingUnitMarket"));
+        chkUseFactionStandingUnitMarket.addMouseListener(createTipPanelUpdater("UseFactionStandingUnitMarket"));
 
         chkUseFactionStandingContractPay = new CampaignOptionsCheckBox("UseFactionStandingContractPay",
                 getMetadata(MILESTONE_BEFORE_METADATA));
-        chkUseFactionStandingContractPay.addMouseListener(createTipPanelUpdater(factionStandingHeader,
-                "UseFactionStandingContractPay"));
+        chkUseFactionStandingContractPay.addMouseListener(createTipPanelUpdater("UseFactionStandingContractPay"));
 
         chkUseFactionStandingSupportPoints = new CampaignOptionsCheckBox("UseFactionStandingSupportPoints",
                 getMetadata(MILESTONE_BEFORE_METADATA));
-        chkUseFactionStandingSupportPoints.addMouseListener(createTipPanelUpdater(factionStandingHeader,
-                "UseFactionStandingSupportPoints"));
+        chkUseFactionStandingSupportPoints.addMouseListener(createTipPanelUpdater("UseFactionStandingSupportPoints"));
 
         // Layout the Panel
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("FactionStandingEffectsPanel",
@@ -484,33 +468,29 @@ public class SystemsTab {
         // Contents
         chkUseAttributes = new CampaignOptionsCheckBox("UseAttributes",
                 getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
-        chkUseAttributes.addMouseListener(createTipPanelUpdater(atowHeader, "UseAttributes"));
+        chkUseAttributes.addMouseListener(createTipPanelUpdater("UseAttributes"));
         chkRandomizeAttributes = new CampaignOptionsCheckBox("RandomizeAttributes");
-        chkRandomizeAttributes.addMouseListener(createTipPanelUpdater(atowHeader, "RandomizeAttributes"));
+        chkRandomizeAttributes.addMouseListener(createTipPanelUpdater("RandomizeAttributes"));
         chkDisplayAllAttributes = new CampaignOptionsCheckBox("DisplayAllAttributes",
                 getMetadata(MILESTONE_BEFORE_METADATA));
-        chkDisplayAllAttributes.addMouseListener(createTipPanelUpdater(atowHeader, "DisplayAllAttributes"));
+        chkDisplayAllAttributes.addMouseListener(createTipPanelUpdater("DisplayAllAttributes"));
         chkUseAgeEffects = new CampaignOptionsCheckBox("UseAgeEffects",
                 getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT,
                         CampaignOptionFlag.CUSTOM_SYSTEM));
-        chkUseAgeEffects.addMouseListener(createTipPanelUpdater(atowHeader, "UseAgeEffects"));
+        chkUseAgeEffects.addMouseListener(createTipPanelUpdater("UseAgeEffects"));
         chkRandomizeTraits = new CampaignOptionsCheckBox("RandomizeTraits");
-        chkRandomizeTraits.addMouseListener(createTipPanelUpdater(atowHeader, "RandomizeTraits"));
+        chkRandomizeTraits.addMouseListener(createTipPanelUpdater("RandomizeTraits"));
         chkAllowMonthlyReinvestment = new CampaignOptionsCheckBox("AllowMonthlyReinvestment");
-        chkAllowMonthlyReinvestment.addMouseListener(createTipPanelUpdater(atowHeader,
-                "AllowMonthlyReinvestment"));
+        chkAllowMonthlyReinvestment.addMouseListener(createTipPanelUpdater("AllowMonthlyReinvestment"));
         chkAllowMonthlyConnections = new CampaignOptionsCheckBox("AllowMonthlyConnections",
                 getMetadata(MILESTONE_BEFORE_METADATA));
-        chkAllowMonthlyConnections.addMouseListener(createTipPanelUpdater(atowHeader,
-                "AllowMonthlyConnections"));
+        chkAllowMonthlyConnections.addMouseListener(createTipPanelUpdater("AllowMonthlyConnections"));
         chkUseBetterExtraIncome = new CampaignOptionsCheckBox("UseBetterExtraIncome",
                 getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
-        chkUseBetterExtraIncome.addMouseListener(createTipPanelUpdater(atowHeader,
-                "UseBetterExtraIncome"));
+        chkUseBetterExtraIncome.addMouseListener(createTipPanelUpdater("UseBetterExtraIncome"));
         chkUseSmallArmsOnly = new CampaignOptionsCheckBox("UseSmallArmsOnly",
                 getMetadata(MILESTONE_BEFORE_METADATA));
-        chkUseSmallArmsOnly.addMouseListener(createTipPanelUpdater(atowHeader,
-                "UseSmallArmsOnly"));
+        chkUseSmallArmsOnly.addMouseListener(createTipPanelUpdater("UseSmallArmsOnly"));
 
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("ATOWAttributesPanel",
                 FORM_LABEL_COLUMN_WIDTH,

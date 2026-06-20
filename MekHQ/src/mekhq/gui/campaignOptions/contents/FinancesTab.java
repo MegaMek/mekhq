@@ -288,7 +288,7 @@ public class FinancesTab {
         // Header
         String imageAddress = getImageDirectory() + "logo_star_league.png";
         financesGeneralOptions = new CampaignOptionsHeaderPanel("FinancesGeneralTab",
-                imageAddress, 8);
+                imageAddress);
 
         // Contents
         pnlGeneralOptions = createGeneralOptionsPanel();
@@ -343,28 +343,28 @@ public class FinancesTab {
     private @Nonnull JPanel createPaymentsPanel() {
         // Contents
         payForPartsBox = new CampaignOptionsCheckBox("PayForPartsBox");
-        payForPartsBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "PayForPartsBox"));
+        payForPartsBox.addMouseListener(createTipPanelUpdater("PayForPartsBox"));
         payForRepairsBox = new CampaignOptionsCheckBox("PayForRepairsBox");
-        payForRepairsBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "PayForRepairsBox"));
+        payForRepairsBox.addMouseListener(createTipPanelUpdater("PayForRepairsBox"));
         payForUnitsBox = new CampaignOptionsCheckBox("PayForUnitsBox");
-        payForUnitsBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "PayForUnitsBox"));
+        payForUnitsBox.addMouseListener(createTipPanelUpdater("PayForUnitsBox"));
         payForSalariesBox = new CampaignOptionsCheckBox("PayForSalariesBox");
-        payForSalariesBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "PayForSalariesBox"));
+        payForSalariesBox.addMouseListener(createTipPanelUpdater("PayForSalariesBox"));
         payForOverheadBox = new CampaignOptionsCheckBox("PayForOverheadBox");
-        payForOverheadBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "PayForOverheadBox"));
+        payForOverheadBox.addMouseListener(createTipPanelUpdater("PayForOverheadBox"));
         payForMaintainBox = new CampaignOptionsCheckBox("PayForMaintainBox");
-        payForMaintainBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "PayForMaintainBox"));
+        payForMaintainBox.addMouseListener(createTipPanelUpdater("PayForMaintainBox"));
         payForTransportBox = new CampaignOptionsCheckBox("PayForTransportBox");
-        payForTransportBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "PayForTransportBox"));
+        payForTransportBox.addMouseListener(createTipPanelUpdater("PayForTransportBox"));
         payForRecruitmentBox = new CampaignOptionsCheckBox("PayForRecruitmentBox");
         payForRecruitmentBox
-                .addMouseListener(createTipPanelUpdater(financesGeneralOptions, "PayForRecruitmentBox"));
+                .addMouseListener(createTipPanelUpdater("PayForRecruitmentBox"));
         payForFoodBox = new CampaignOptionsCheckBox("PayForFoodBox",
                 getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
-        payForFoodBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "PayForFoodBox"));
+        payForFoodBox.addMouseListener(createTipPanelUpdater("PayForFoodBox"));
         payForHousingBox = new CampaignOptionsCheckBox("PayForHousingBox",
                 getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
-        payForHousingBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "PayForHousingBox"));
+        payForHousingBox.addMouseListener(createTipPanelUpdater("PayForHousingBox"));
 
         // Layout the Panel
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("PaymentsPanel",
@@ -399,34 +399,29 @@ public class FinancesTab {
         // Contents
         useLoanLimitsBox = new CampaignOptionsCheckBox("UseLoanLimitsBox",
                 getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
-        useLoanLimitsBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "UseLoanLimitsBox"));
+        useLoanLimitsBox.addMouseListener(createTipPanelUpdater("UseLoanLimitsBox"));
         usePercentageMaintenanceBox = new CampaignOptionsCheckBox("UsePercentageMaintenanceBox",
                 getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
-        usePercentageMaintenanceBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
-                "UsePercentageMaintenanceBox"));
+        usePercentageMaintenanceBox.addMouseListener(createTipPanelUpdater("UsePercentageMaintenanceBox"));
         useExtendedPartsModifierBox = new CampaignOptionsCheckBox("UseExtendedPartsModifierBox");
-        useExtendedPartsModifierBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
-                "UseExtendedPartsModifierBox"));
+        useExtendedPartsModifierBox.addMouseListener(createTipPanelUpdater("UseExtendedPartsModifierBox"));
         usePeacetimeCostBox = new CampaignOptionsCheckBox("UsePeacetimeCostBox");
-        usePeacetimeCostBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "UsePeacetimeCostBox"));
+        usePeacetimeCostBox.addMouseListener(createTipPanelUpdater("UsePeacetimeCostBox"));
         showPeacetimeCostBox = new CampaignOptionsCheckBox("ShowPeacetimeCostBox");
         showPeacetimeCostBox
-                .addMouseListener(createTipPanelUpdater(financesGeneralOptions, "ShowPeacetimeCostBox"));
+                .addMouseListener(createTipPanelUpdater("ShowPeacetimeCostBox"));
 
         lblFinancialYearDuration = new CampaignOptionsLabel("FinancialYearDuration",
                 getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
-        lblFinancialYearDuration.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
-                "FinancialYearDuration"));
-        comboFinancialYearDuration.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
-                "FinancialYearDuration"));
+        lblFinancialYearDuration.addMouseListener(createTipPanelUpdater("FinancialYearDuration"));
+        comboFinancialYearDuration.addMouseListener(createTipPanelUpdater("FinancialYearDuration"));
 
         newFinancialYearFinancesToCSVExportBox = new CampaignOptionsCheckBox(
                 "NewFinancialYearFinancesToCSVExportBox");
-        newFinancialYearFinancesToCSVExportBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
-                "NewFinancialYearFinancesToCSVExportBox"));
+        newFinancialYearFinancesToCSVExportBox.addMouseListener(createTipPanelUpdater("NewFinancialYearFinancesToCSVExportBox"));
 
         chkSimulateGrayMonday = new CampaignOptionsCheckBox("SimulateGrayMonday");
-        chkSimulateGrayMonday.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "SimulateGrayMonday"));
+        chkSimulateGrayMonday.addMouseListener(createTipPanelUpdater("SimulateGrayMonday"));
 
         // Layout the Panel
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("GeneralOptionsPanel",
@@ -457,9 +452,9 @@ public class FinancesTab {
     private @Nonnull JPanel createSalesPanel() {
         // Contents
         sellUnitsBox = new CampaignOptionsCheckBox("SellUnitsBox");
-        sellUnitsBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "SellUnitsBox"));
+        sellUnitsBox.addMouseListener(createTipPanelUpdater("SellUnitsBox"));
         sellPartsBox = new CampaignOptionsCheckBox("SellPartsBox");
-        sellPartsBox.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "SellPartsBox"));
+        sellPartsBox.addMouseListener(createTipPanelUpdater("SellPartsBox"));
 
         // Layout the Panel
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("SalesPanel",
@@ -481,12 +476,12 @@ public class FinancesTab {
     private @Nonnull JPanel createTaxesPanel() {
         // Contents
         chkUseTaxes = new CampaignOptionsCheckBox("UseTaxesBox");
-        chkUseTaxes.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "UseTaxesBox"));
+        chkUseTaxes.addMouseListener(createTipPanelUpdater("UseTaxesBox"));
 
         lblTaxesPercentage = new CampaignOptionsLabel("TaxesPercentage");
-        lblTaxesPercentage.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "TaxesPercentage"));
+        lblTaxesPercentage.addMouseListener(createTipPanelUpdater("TaxesPercentage"));
         spnTaxesPercentage = new CampaignOptionsSpinner("TaxesPercentage", 30, 1, 100, 1);
-        spnTaxesPercentage.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "TaxesPercentage"));
+        spnTaxesPercentage.addMouseListener(createTipPanelUpdater("TaxesPercentage"));
 
         // Layout the Panel
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("TaxesPanel",
@@ -511,9 +506,9 @@ public class FinancesTab {
     private @Nonnull JPanel createSharesPanel() {
         // Contents
         chkUseShareSystem = new CampaignOptionsCheckBox("UseShareSystem");
-        chkUseShareSystem.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "UseShareSystem"));
+        chkUseShareSystem.addMouseListener(createTipPanelUpdater("UseShareSystem"));
         chkSharesForAll = new CampaignOptionsCheckBox("SharesForAll");
-        chkSharesForAll.addMouseListener(createTipPanelUpdater(financesGeneralOptions, "SharesForAll"));
+        chkSharesForAll.addMouseListener(createTipPanelUpdater("SharesForAll"));
 
         // Layout the Panel
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("SharesPanel",
@@ -528,39 +523,31 @@ public class FinancesTab {
         // Contents
         lblRentedFacilitiesCostHospitalBeds = new CampaignOptionsLabel("RentedFacilitiesCostHospitalBeds",
                 getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
-        lblRentedFacilitiesCostHospitalBeds.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
-                "RentedFacilitiesCostHospitalBeds"));
+        lblRentedFacilitiesCostHospitalBeds.addMouseListener(createTipPanelUpdater("RentedFacilitiesCostHospitalBeds"));
         spnRentedFacilitiesCostHospitalBeds = new CampaignOptionsSpinner("RentedFacilitiesCostHospitalBeds",
                 4100, 0, 1000000, 1);
-        spnRentedFacilitiesCostHospitalBeds.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
-                "RentedFacilitiesCostHospitalBeds"));
+        spnRentedFacilitiesCostHospitalBeds.addMouseListener(createTipPanelUpdater("RentedFacilitiesCostHospitalBeds"));
 
         lblRentedFacilitiesCostKitchens = new CampaignOptionsLabel("RentedFacilitiesCostKitchens",
                 getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
-        lblRentedFacilitiesCostKitchens.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
-                "RentedFacilitiesCostKitchens"));
+        lblRentedFacilitiesCostKitchens.addMouseListener(createTipPanelUpdater("RentedFacilitiesCostKitchens"));
         spnRentedFacilitiesCostKitchens = new CampaignOptionsSpinner("RentedFacilitiesCostKitchens",
                 3700, 0, 1000000, 1);
-        spnRentedFacilitiesCostKitchens.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
-                "RentedFacilitiesCostKitchens"));
+        spnRentedFacilitiesCostKitchens.addMouseListener(createTipPanelUpdater("RentedFacilitiesCostKitchens"));
 
         lblRentedFacilitiesCostHoldingCells = new CampaignOptionsLabel("RentedFacilitiesCostHoldingCells",
                 getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
-        lblRentedFacilitiesCostHoldingCells.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
-                "RentedFacilitiesCostHoldingCells"));
+        lblRentedFacilitiesCostHoldingCells.addMouseListener(createTipPanelUpdater("RentedFacilitiesCostHoldingCells"));
         spnRentedFacilitiesCostHoldingCells = new CampaignOptionsSpinner("RentedFacilitiesCostHoldingCells",
                 6400, 0, 1000000, 1);
-        spnRentedFacilitiesCostHoldingCells.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
-                "RentedFacilitiesCostHoldingCells"));
+        spnRentedFacilitiesCostHoldingCells.addMouseListener(createTipPanelUpdater("RentedFacilitiesCostHoldingCells"));
 
         lblRentedFacilitiesCostRepairBays = new CampaignOptionsLabel("RentedFacilitiesCostRepairBays",
                 getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
-        lblRentedFacilitiesCostRepairBays.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
-                "RentedFacilitiesCostRepairBays"));
+        lblRentedFacilitiesCostRepairBays.addMouseListener(createTipPanelUpdater("RentedFacilitiesCostRepairBays"));
         spnRentedFacilitiesCostRepairBays = new CampaignOptionsSpinner("RentedFacilitiesCostRepairBays",
                 25000, 0, 1000000, 1);
-        spnRentedFacilitiesCostRepairBays.addMouseListener(createTipPanelUpdater(financesGeneralOptions,
-                "RentedFacilitiesCostRepairBays"));
+        spnRentedFacilitiesCostRepairBays.addMouseListener(createTipPanelUpdater("RentedFacilitiesCostRepairBays"));
 
         // Layout the Panel
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("RentedFacilitiesPanel",
@@ -622,8 +609,7 @@ public class FinancesTab {
         // Header
         String imageAddress = getImageDirectory() + "logo_clan_stone_lion.png";
         priceMultipliersHeader = new CampaignOptionsHeaderPanel("PriceMultipliersTab",
-                imageAddress,
-                1);
+                imageAddress);
 
         // Contents
         pnlGeneralMultipliers = createGeneralMultipliersPanel();
@@ -664,58 +650,46 @@ public class FinancesTab {
     private @Nonnull JPanel createGeneralMultipliersPanel() {
         // Contents
         lblCommonPartPriceMultiplier = new CampaignOptionsLabel("CommonPartPriceMultiplier");
-        lblCommonPartPriceMultiplier.addMouseListener(createTipPanelUpdater(priceMultipliersHeader,
-                "CommonPartPriceMultiplier"));
+        lblCommonPartPriceMultiplier.addMouseListener(createTipPanelUpdater("CommonPartPriceMultiplier"));
         spnCommonPartPriceMultiplier = new CampaignOptionsSpinner("CommonPartPriceMultiplier", 1.0, 0.1, 100, 0.1);
-        spnCommonPartPriceMultiplier.addMouseListener(createTipPanelUpdater(priceMultipliersHeader,
-                "CommonPartPriceMultiplier"));
+        spnCommonPartPriceMultiplier.addMouseListener(createTipPanelUpdater("CommonPartPriceMultiplier"));
 
         lblInnerSphereUnitPriceMultiplier = new CampaignOptionsLabel("InnerSphereUnitPriceMultiplier");
-        lblInnerSphereUnitPriceMultiplier.addMouseListener(createTipPanelUpdater(priceMultipliersHeader,
-                "InnerSphereUnitPriceMultiplier"));
+        lblInnerSphereUnitPriceMultiplier.addMouseListener(createTipPanelUpdater("InnerSphereUnitPriceMultiplier"));
         spnInnerSphereUnitPriceMultiplier = new CampaignOptionsSpinner("InnerSphereUnitPriceMultiplier",
                 1.0,
                 0.1,
                 100,
                 0.1);
-        spnInnerSphereUnitPriceMultiplier.addMouseListener(createTipPanelUpdater(priceMultipliersHeader,
-                "InnerSphereUnitPriceMultiplier"));
+        spnInnerSphereUnitPriceMultiplier.addMouseListener(createTipPanelUpdater("InnerSphereUnitPriceMultiplier"));
 
         lblInnerSpherePartPriceMultiplier = new CampaignOptionsLabel("InnerSpherePartPriceMultiplier");
-        lblInnerSpherePartPriceMultiplier.addMouseListener(createTipPanelUpdater(priceMultipliersHeader,
-                "InnerSpherePartPriceMultiplier"));
+        lblInnerSpherePartPriceMultiplier.addMouseListener(createTipPanelUpdater("InnerSpherePartPriceMultiplier"));
         spnInnerSpherePartPriceMultiplier = new CampaignOptionsSpinner("InnerSpherePartPriceMultiplier",
                 1.0,
                 0.1,
                 100,
                 0.1);
-        spnInnerSpherePartPriceMultiplier.addMouseListener(createTipPanelUpdater(priceMultipliersHeader,
-                "InnerSpherePartPriceMultiplier"));
+        spnInnerSpherePartPriceMultiplier.addMouseListener(createTipPanelUpdater("InnerSpherePartPriceMultiplier"));
 
         lblClanUnitPriceMultiplier = new CampaignOptionsLabel("ClanUnitPriceMultiplier");
-        lblClanUnitPriceMultiplier.addMouseListener(createTipPanelUpdater(priceMultipliersHeader,
-                "ClanUnitPriceMultiplier"));
+        lblClanUnitPriceMultiplier.addMouseListener(createTipPanelUpdater("ClanUnitPriceMultiplier"));
         spnClanUnitPriceMultiplier = new CampaignOptionsSpinner("ClanUnitPriceMultiplier", 1.0, 0.1, 100, 0.1);
-        spnClanUnitPriceMultiplier.addMouseListener(createTipPanelUpdater(priceMultipliersHeader,
-                "ClanUnitPriceMultiplier"));
+        spnClanUnitPriceMultiplier.addMouseListener(createTipPanelUpdater("ClanUnitPriceMultiplier"));
 
         lblClanPartPriceMultiplier = new CampaignOptionsLabel("ClanPartPriceMultiplier");
-        lblClanPartPriceMultiplier.addMouseListener(createTipPanelUpdater(priceMultipliersHeader,
-                "ClanPartPriceMultiplier"));
+        lblClanPartPriceMultiplier.addMouseListener(createTipPanelUpdater("ClanPartPriceMultiplier"));
         spnClanPartPriceMultiplier = new CampaignOptionsSpinner("ClanPartPriceMultiplier", 1.0, 0.1, 100, 0.1);
-        spnClanPartPriceMultiplier.addMouseListener(createTipPanelUpdater(priceMultipliersHeader,
-                "ClanPartPriceMultiplier"));
+        spnClanPartPriceMultiplier.addMouseListener(createTipPanelUpdater("ClanPartPriceMultiplier"));
 
         lblMixedTechUnitPriceMultiplier = new CampaignOptionsLabel("MixedTechUnitPriceMultiplier");
-        lblMixedTechUnitPriceMultiplier.addMouseListener(createTipPanelUpdater(priceMultipliersHeader,
-                "MixedTechUnitPriceMultiplier"));
+        lblMixedTechUnitPriceMultiplier.addMouseListener(createTipPanelUpdater("MixedTechUnitPriceMultiplier"));
         spnMixedTechUnitPriceMultiplier = new CampaignOptionsSpinner("MixedTechUnitPriceMultiplier",
                 1.0,
                 0.1,
                 100,
                 0.1);
-        spnMixedTechUnitPriceMultiplier.addMouseListener(createTipPanelUpdater(priceMultipliersHeader,
-                "MixedTechUnitPriceMultiplier"));
+        spnMixedTechUnitPriceMultiplier.addMouseListener(createTipPanelUpdater("MixedTechUnitPriceMultiplier"));
 
         // Layout the Panel
         JComponent[] labels = { lblCommonPartPriceMultiplier, lblMixedTechUnitPriceMultiplier,
@@ -792,37 +766,31 @@ public class FinancesTab {
     private @Nonnull JPanel createOtherMultipliersPanel() {
         // Contents
         lblDamagedPartsValueMultiplier = new CampaignOptionsLabel("DamagedPartsValueMultiplier");
-        lblDamagedPartsValueMultiplier.addMouseListener(createTipPanelUpdater(priceMultipliersHeader,
-                "DamagedPartsValueMultiplier"));
+        lblDamagedPartsValueMultiplier.addMouseListener(createTipPanelUpdater("DamagedPartsValueMultiplier"));
         spnDamagedPartsValueMultiplier = new CampaignOptionsSpinner("DamagedPartsValueMultiplier",
                 0.33,
                 0.00,
                 1.00,
                 0.05);
-        spnDamagedPartsValueMultiplier.addMouseListener(createTipPanelUpdater(priceMultipliersHeader,
-                "DamagedPartsValueMultiplier"));
+        spnDamagedPartsValueMultiplier.addMouseListener(createTipPanelUpdater("DamagedPartsValueMultiplier"));
 
         lblUnrepairablePartsValueMultiplier = new CampaignOptionsLabel("UnrepairablePartsValueMultiplier");
-        lblUnrepairablePartsValueMultiplier.addMouseListener(createTipPanelUpdater(priceMultipliersHeader,
-                "UnrepairablePartsValueMultiplier"));
+        lblUnrepairablePartsValueMultiplier.addMouseListener(createTipPanelUpdater("UnrepairablePartsValueMultiplier"));
         spnUnrepairablePartsValueMultiplier = new CampaignOptionsSpinner("UnrepairablePartsValueMultiplier",
                 0.10,
                 0.00,
                 1.00,
                 0.05);
-        spnUnrepairablePartsValueMultiplier.addMouseListener(createTipPanelUpdater(priceMultipliersHeader,
-                "UnrepairablePartsValueMultiplier"));
+        spnUnrepairablePartsValueMultiplier.addMouseListener(createTipPanelUpdater("UnrepairablePartsValueMultiplier"));
 
         lblCancelledOrderRefundMultiplier = new CampaignOptionsLabel("CancelledOrderRefundMultiplier");
-        lblCancelledOrderRefundMultiplier.addMouseListener(createTipPanelUpdater(priceMultipliersHeader,
-                "CancelledOrderRefundMultiplier"));
+        lblCancelledOrderRefundMultiplier.addMouseListener(createTipPanelUpdater("CancelledOrderRefundMultiplier"));
         spnCancelledOrderRefundMultiplier = new CampaignOptionsSpinner("CancelledOrderRefundMultiplier",
                 0.50,
                 0.00,
                 1.00,
                 0.05);
-        spnCancelledOrderRefundMultiplier.addMouseListener(createTipPanelUpdater(priceMultipliersHeader,
-                "CancelledOrderRefundMultiplier"));
+        spnCancelledOrderRefundMultiplier.addMouseListener(createTipPanelUpdater("CancelledOrderRefundMultiplier"));
 
         // Layout the Panel
         JComponent[] labels = { lblDamagedPartsValueMultiplier, lblUnrepairablePartsValueMultiplier,

@@ -402,35 +402,34 @@ public class EquipmentAndSuppliesTab {
     private @Nonnull JPanel createAcquisitionPanel() {
         // Content
         lblChoiceAcquireSkill = new CampaignOptionsLabel("ChoiceAcquireSkill");
-        lblChoiceAcquireSkill.addMouseListener(createTipPanelUpdater(acquisitionHeader, "ChoiceAcquireSkill"));
+        lblChoiceAcquireSkill.addMouseListener(createTipPanelUpdater("ChoiceAcquireSkill"));
 
         chkUseFunctionalAppraisal = new CampaignOptionsCheckBox("UseFunctionalAppraisal",
               getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
-        chkUseFunctionalAppraisal.addMouseListener(createTipPanelUpdater(acquisitionHeader, "UseFunctionalAppraisal"));
+        chkUseFunctionalAppraisal.addMouseListener(createTipPanelUpdater("UseFunctionalAppraisal"));
 
         lblProcurementPersonnelPick = new CampaignOptionsLabel("ProcurementPersonnelPick");
-        lblProcurementPersonnelPick.addMouseListener(createTipPanelUpdater(acquisitionHeader,
-              "ProcurementPersonnelPick"));
+        lblProcurementPersonnelPick.addMouseListener(createTipPanelUpdater("ProcurementPersonnelPick"));
 
         lblAcquireClanPenalty = new CampaignOptionsLabel("AcquireClanPenalty");
-        lblAcquireClanPenalty.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AcquireClanPenalty"));
+        lblAcquireClanPenalty.addMouseListener(createTipPanelUpdater("AcquireClanPenalty"));
         spnAcquireClanPenalty = new CampaignOptionsSpinner("AcquireClanPenalty", 0, 0, 13, 1);
-        spnAcquireClanPenalty.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AcquireClanPenalty"));
+        spnAcquireClanPenalty.addMouseListener(createTipPanelUpdater("AcquireClanPenalty"));
 
         lblAcquireIsPenalty = new CampaignOptionsLabel("AcquireISPenalty");
-        lblAcquireIsPenalty.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AcquireISPenalty"));
+        lblAcquireIsPenalty.addMouseListener(createTipPanelUpdater("AcquireISPenalty"));
         spnAcquireIsPenalty = new CampaignOptionsSpinner("AcquireISPenalty", 0, 0, 13, 1);
-        spnAcquireIsPenalty.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AcquireISPenalty"));
+        spnAcquireIsPenalty.addMouseListener(createTipPanelUpdater("AcquireISPenalty"));
 
         lblAcquireWaitingPeriod = new CampaignOptionsLabel("AcquireWaitingPeriod");
-        lblAcquireWaitingPeriod.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AcquireWaitingPeriod"));
+        lblAcquireWaitingPeriod.addMouseListener(createTipPanelUpdater("AcquireWaitingPeriod"));
         spnAcquireWaitingPeriod = new CampaignOptionsSpinner("AcquireWaitingPeriod", 1, 1, 365, 1);
-        spnAcquireWaitingPeriod.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AcquireWaitingPeriod"));
+        spnAcquireWaitingPeriod.addMouseListener(createTipPanelUpdater("AcquireWaitingPeriod"));
 
         lblMaxAcquisitions = new CampaignOptionsLabel("MaxAcquisitions");
-        lblMaxAcquisitions.addMouseListener(createTipPanelUpdater(acquisitionHeader, "MaxAcquisitions"));
+        lblMaxAcquisitions.addMouseListener(createTipPanelUpdater("MaxAcquisitions"));
         spnMaxAcquisitions = new CampaignOptionsSpinner("MaxAcquisitions", 0, 0, 100, 1);
-        spnMaxAcquisitions.addMouseListener(createTipPanelUpdater(acquisitionHeader, "MaxAcquisitions"));
+        spnMaxAcquisitions.addMouseListener(createTipPanelUpdater("MaxAcquisitions"));
 
         // Layout the Panel
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("AcquisitionPanel",
@@ -449,12 +448,12 @@ public class EquipmentAndSuppliesTab {
 
     private @Nonnull JPanel createDeliveryPanel() {
         lblTransitTimeUnits = new CampaignOptionsLabel("TransitTimeUnits");
-        lblTransitTimeUnits.addMouseListener(createTipPanelUpdater(acquisitionHeader, "TransitTimeUnits"));
-        choiceTransitTimeUnits.addMouseListener(createTipPanelUpdater(acquisitionHeader, "TransitTimeUnits"));
+        lblTransitTimeUnits.addMouseListener(createTipPanelUpdater("TransitTimeUnits"));
+        choiceTransitTimeUnits.addMouseListener(createTipPanelUpdater("TransitTimeUnits"));
 
         chkNoDeliveriesInTransit = new CampaignOptionsCheckBox("NoDeliveriesInTransit",
               getMetadata(MILESTONE_BEFORE_METADATA));
-        chkNoDeliveriesInTransit.addMouseListener(createTipPanelUpdater(acquisitionHeader, "NoDeliveriesInTransit"));
+        chkNoDeliveriesInTransit.addMouseListener(createTipPanelUpdater("NoDeliveriesInTransit"));
 
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("DeliveryPanel",
                 acquisitionSectionLabelWidth,
@@ -475,82 +474,74 @@ public class EquipmentAndSuppliesTab {
     private @Nonnull JPanel createAutoLogisticsPanel() {
         // Content
         lblAutoLogisticsMekHead = new CampaignOptionsLabel("AutoLogisticsMekHead");
-        lblAutoLogisticsMekHead.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AutoLogisticsMekHead"));
+        lblAutoLogisticsMekHead.addMouseListener(createTipPanelUpdater("AutoLogisticsMekHead"));
         spnAutoLogisticsMekHead = new CampaignOptionsSpinner("AutoLogisticsMekHead", 200, 0, 10000, 1);
-        spnAutoLogisticsMekHead.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AutoLogisticsMekHead"));
+        spnAutoLogisticsMekHead.addMouseListener(createTipPanelUpdater("AutoLogisticsMekHead"));
 
         lblAutoLogisticsMekLocation = new CampaignOptionsLabel("AutoLogisticsMekLocation");
-        lblAutoLogisticsMekLocation.addMouseListener(createTipPanelUpdater(acquisitionHeader,
-              "AutoLogisticsMekLocation"));
+        lblAutoLogisticsMekLocation.addMouseListener(createTipPanelUpdater("AutoLogisticsMekLocation"));
         spnAutoLogisticsMekLocation = new CampaignOptionsSpinner("AutoLogisticsMekLocation", 100, 0, 10000, 1);
-        spnAutoLogisticsMekLocation.addMouseListener(createTipPanelUpdater(acquisitionHeader,
-              "AutoLogisticsMekLocation"));
+        spnAutoLogisticsMekLocation.addMouseListener(createTipPanelUpdater("AutoLogisticsMekLocation"));
 
         lblAutoLogisticsNonRepairableLocation = new CampaignOptionsLabel("AutoLogisticsNonRepairableLocation");
-        lblAutoLogisticsNonRepairableLocation.addMouseListener(createTipPanelUpdater(acquisitionHeader,
-              "AutoLogisticsNonRepairableLocation"));
+        lblAutoLogisticsNonRepairableLocation.addMouseListener(createTipPanelUpdater("AutoLogisticsNonRepairableLocation"));
         spnAutoLogisticsNonRepairableLocation = new CampaignOptionsSpinner("AutoLogisticsNonRepairableLocation",
               0,
               0,
               10000,
               1);
-        spnAutoLogisticsNonRepairableLocation.addMouseListener(createTipPanelUpdater(acquisitionHeader,
-              "AutoLogisticsNonRepairableLocation"));
+        spnAutoLogisticsNonRepairableLocation.addMouseListener(createTipPanelUpdater("AutoLogisticsNonRepairableLocation"));
 
         lblAutoLogisticsArmor = new CampaignOptionsLabel("AutoLogisticsArmor");
-        lblAutoLogisticsArmor.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AutoLogisticsArmor"));
+        lblAutoLogisticsArmor.addMouseListener(createTipPanelUpdater("AutoLogisticsArmor"));
         spnAutoLogisticsArmor = new CampaignOptionsSpinner("AutoLogisticsArmor", 500, 0, 10000, 1);
-        spnAutoLogisticsArmor.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AutoLogisticsArmor"));
+        spnAutoLogisticsArmor.addMouseListener(createTipPanelUpdater("AutoLogisticsArmor"));
 
         lblAutoLogisticsAmmunition = new CampaignOptionsLabel("AutoLogisticsAmmunition");
-        lblAutoLogisticsAmmunition.addMouseListener(createTipPanelUpdater(acquisitionHeader,
-              "AutoLogisticsAmmunition"));
+        lblAutoLogisticsAmmunition.addMouseListener(createTipPanelUpdater("AutoLogisticsAmmunition"));
         spnAutoLogisticsAmmunition = new CampaignOptionsSpinner("AutoLogisticsAmmunition", 500, 0, 10000, 1);
-        spnAutoLogisticsAmmunition.addMouseListener(createTipPanelUpdater(acquisitionHeader,
-              "AutoLogisticsAmmunition"));
+        spnAutoLogisticsAmmunition.addMouseListener(createTipPanelUpdater("AutoLogisticsAmmunition"));
 
         lblAutoLogisticsHeatSink = new CampaignOptionsLabel("AutoLogisticsHeatSink");
-        lblAutoLogisticsHeatSink.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AutoLogisticsHeatSink"));
+        lblAutoLogisticsHeatSink.addMouseListener(createTipPanelUpdater("AutoLogisticsHeatSink"));
         spnAutoLogisticsHeatSink = new CampaignOptionsSpinner("AutoLogisticsHeatSink", 250, 0, 10000, 1);
-        spnAutoLogisticsHeatSink.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AutoLogisticsHeatSink"));
+        spnAutoLogisticsHeatSink.addMouseListener(createTipPanelUpdater("AutoLogisticsHeatSink"));
 
         lblAutoLogisticsWeapons = new CampaignOptionsLabel("AutoLogisticsWeapons");
-        lblAutoLogisticsWeapons.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AutoLogisticsWeapons"));
+        lblAutoLogisticsWeapons.addMouseListener(createTipPanelUpdater("AutoLogisticsWeapons"));
         spnAutoLogisticsWeapons = new CampaignOptionsSpinner("AutoLogisticsWeapons", 50, 0, 10000, 1);
-        spnAutoLogisticsWeapons.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AutoLogisticsWeapons"));
+        spnAutoLogisticsWeapons.addMouseListener(createTipPanelUpdater("AutoLogisticsWeapons"));
 
         lblAutoLogisticsActuators = new CampaignOptionsLabel("AutoLogisticsActuators");
-        lblAutoLogisticsActuators.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AutoLogisticsActuators"));
+        lblAutoLogisticsActuators.addMouseListener(createTipPanelUpdater("AutoLogisticsActuators"));
         spnAutoLogisticsActuators = new CampaignOptionsSpinner("AutoLogisticsActuators", 250, 0, 10000, 1);
-        spnAutoLogisticsActuators.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AutoLogisticsActuators"));
+        spnAutoLogisticsActuators.addMouseListener(createTipPanelUpdater("AutoLogisticsActuators"));
 
         lblAutoLogisticsJumpJets = new CampaignOptionsLabel("AutoLogisticsJumpJets");
-        lblAutoLogisticsJumpJets.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AutoLogisticsJumpJets"));
+        lblAutoLogisticsJumpJets.addMouseListener(createTipPanelUpdater("AutoLogisticsJumpJets"));
         spnAutoLogisticsJumpJets = new CampaignOptionsSpinner("AutoLogisticsJumpJets", 250, 0, 10000, 1);
-        spnAutoLogisticsJumpJets.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AutoLogisticsJumpJets"));
+        spnAutoLogisticsJumpJets.addMouseListener(createTipPanelUpdater("AutoLogisticsJumpJets"));
 
         lblAutoLogisticsHeadComponents = new CampaignOptionsLabel("AutoLogisticsHeadComponents",
               getMetadata(new Version(0, 51, 1)));
-        lblAutoLogisticsHeadComponents.addMouseListener(createTipPanelUpdater(acquisitionHeader,
-              "AutoLogisticsHeadComponents"));
+        lblAutoLogisticsHeadComponents.addMouseListener(createTipPanelUpdater("AutoLogisticsHeadComponents"));
         spnAutoLogisticsHeadComponents = new CampaignOptionsSpinner("AutoLogisticsHeadComponents", 15, 0, 10000, 1);
-        spnAutoLogisticsHeadComponents.addMouseListener(createTipPanelUpdater(acquisitionHeader,
-              "AutoLogisticsHeadComponents"));
+        spnAutoLogisticsHeadComponents.addMouseListener(createTipPanelUpdater("AutoLogisticsHeadComponents"));
 
         lblAutoLogisticsEngines = new CampaignOptionsLabel("AutoLogisticsEngines");
-        lblAutoLogisticsEngines.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AutoLogisticsEngines"));
+        lblAutoLogisticsEngines.addMouseListener(createTipPanelUpdater("AutoLogisticsEngines"));
         spnAutoLogisticsEngines = new CampaignOptionsSpinner("AutoLogisticsEngines", 250, 0, 10000, 1);
-        spnAutoLogisticsEngines.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AutoLogisticsEngines"));
+        spnAutoLogisticsEngines.addMouseListener(createTipPanelUpdater("AutoLogisticsEngines"));
 
         lblAutoLogisticsGyros = new CampaignOptionsLabel("AutoLogisticsGyros", getMetadata(new Version(0, 51, 1)));
-        lblAutoLogisticsGyros.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AutoLogisticsGyros"));
+        lblAutoLogisticsGyros.addMouseListener(createTipPanelUpdater("AutoLogisticsGyros"));
         spnAutoLogisticsGyros = new CampaignOptionsSpinner("AutoLogisticsGyros", 0, 0, 10000, 1);
-        spnAutoLogisticsGyros.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AutoLogisticsGyros"));
+        spnAutoLogisticsGyros.addMouseListener(createTipPanelUpdater("AutoLogisticsGyros"));
 
         lblAutoLogisticsOther = new CampaignOptionsLabel("AutoLogisticsOther");
-        lblAutoLogisticsOther.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AutoLogisticsOther"));
+        lblAutoLogisticsOther.addMouseListener(createTipPanelUpdater("AutoLogisticsOther"));
         spnAutoLogisticsOther = new CampaignOptionsSpinner("AutoLogisticsOther", 50, 0, 10000, 1);
-        spnAutoLogisticsOther.addMouseListener(createTipPanelUpdater(acquisitionHeader, "AutoLogisticsOther"));
+        spnAutoLogisticsOther.addMouseListener(createTipPanelUpdater("AutoLogisticsOther"));
 
         // Layout the Panel
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("AutoLogisticsPanel",
@@ -664,40 +655,31 @@ public class EquipmentAndSuppliesTab {
     private @Nonnull JPanel createOptionsPanel() {
         usePlanetaryAcquisitions = new CampaignOptionsCheckBox("UsePlanetaryAcquisitions",
               getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT, CampaignOptionFlag.RECOMMENDED));
-        usePlanetaryAcquisitions.addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
-              "UsePlanetaryAcquisitions"));
+        usePlanetaryAcquisitions.addMouseListener(createTipPanelUpdater("UsePlanetaryAcquisitions"));
 
         lblMaxJumpPlanetaryAcquisitions = new CampaignOptionsLabel("MaxJumpPlanetaryAcquisitions");
-        lblMaxJumpPlanetaryAcquisitions.addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
-              "MaxJumpPlanetaryAcquisitions"));
+        lblMaxJumpPlanetaryAcquisitions.addMouseListener(createTipPanelUpdater("MaxJumpPlanetaryAcquisitions"));
         spnMaxJumpPlanetaryAcquisitions = new CampaignOptionsSpinner("MaxJumpPlanetaryAcquisitions", 2, 0, 5, 1);
-        spnMaxJumpPlanetaryAcquisitions.addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
-              "MaxJumpPlanetaryAcquisitions"));
+        spnMaxJumpPlanetaryAcquisitions.addMouseListener(createTipPanelUpdater("MaxJumpPlanetaryAcquisitions"));
 
         lblPlanetaryAcquisitionsFactionLimits = new CampaignOptionsLabel("PlanetaryAcquisitionsFactionLimits");
-        lblPlanetaryAcquisitionsFactionLimits.addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
-              "PlanetaryAcquisitionsFactionLimits"));
+        lblPlanetaryAcquisitionsFactionLimits.addMouseListener(createTipPanelUpdater("PlanetaryAcquisitionsFactionLimits"));
 
         disallowPlanetaryAcquisitionClanCrossover = new CampaignOptionsCheckBox(
               "DisallowPlanetaryAcquisitionClanCrossover");
-        disallowPlanetaryAcquisitionClanCrossover.addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
-              "DisallowPlanetaryAcquisitionClanCrossover"));
+        disallowPlanetaryAcquisitionClanCrossover.addMouseListener(createTipPanelUpdater("DisallowPlanetaryAcquisitionClanCrossover"));
 
         disallowClanPartsFromIS = new CampaignOptionsCheckBox("DisallowClanPartsFromIS");
-        disallowClanPartsFromIS.addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
-              "DisallowClanPartsFromIS"));
+        disallowClanPartsFromIS.addMouseListener(createTipPanelUpdater("DisallowClanPartsFromIS"));
 
         lblPenaltyClanPartsFromIS = new CampaignOptionsLabel("PenaltyClanPartsFromIS");
-        lblPenaltyClanPartsFromIS.addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
-              "PenaltyClanPartsFromIS"));
+        lblPenaltyClanPartsFromIS.addMouseListener(createTipPanelUpdater("PenaltyClanPartsFromIS"));
         spnPenaltyClanPartsFromIS = new CampaignOptionsSpinner("PenaltyClanPartsFromIS", 0, 0, 12, 1);
-        spnPenaltyClanPartsFromIS.addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
-              "PenaltyClanPartsFromIS"));
+        spnPenaltyClanPartsFromIS.addMouseListener(createTipPanelUpdater("PenaltyClanPartsFromIS"));
 
         usePlanetaryAcquisitionsVerbose = new CampaignOptionsCheckBox("UsePlanetaryAcquisitionsVerbose",
               getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
-        usePlanetaryAcquisitionsVerbose.addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader,
-              "UsePlanetaryAcquisitionsVerbose"));
+        usePlanetaryAcquisitionsVerbose.addMouseListener(createTipPanelUpdater("UsePlanetaryAcquisitionsVerbose"));
 
         // Layout the Panel
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("PlanetaryAcquisitionOptionsPanel",
@@ -715,17 +697,14 @@ public class EquipmentAndSuppliesTab {
     }
 
     private @Nonnull JPanel createModifiersPanel() {
-        int i = 0;
-        for (PlanetarySophistication ignored : PlanetarySophistication.values()) {
+        int i;
+        for (i = 0; i < PlanetarySophistication.values().length; i++) {
             spnPlanetAcquireTechBonus[i] = createModifierSpinner("TechLabel");
-            i++;
         }
 
-        i = 0;
-        for (PlanetaryRating ignored : PlanetaryRating.values()) {
+        for (i = 0; i < PlanetaryRating.values().length; i++) {
             spnPlanetAcquireIndustryBonus[i] = createModifierSpinner("IndustryLabel");
             spnPlanetAcquireOutputBonus[i] = createModifierSpinner("OutputLabel");
-            i++;
         }
 
         final CampaignOptionsModifierTablePanel tablePanel = new CampaignOptionsModifierTablePanel(
@@ -756,19 +735,19 @@ public class EquipmentAndSuppliesTab {
 
     private @Nonnull JLabel createModifierColumnHeader(String name) {
         JLabel label = new CampaignOptionsLabel(name);
-        label.addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader, name));
+        label.addMouseListener(createTipPanelUpdater(name));
         return label;
     }
 
     private @Nonnull JLabel createModifierRowLabel(String text) {
         JLabel label = new JLabel(String.format("<html>%s</html>", text));
-        label.addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader, "TechLabel"));
+        label.addMouseListener(createTipPanelUpdater("TechLabel"));
         return label;
     }
 
     private @Nonnull JSpinner createModifierSpinner(String tipKey) {
         JSpinner spinner = new JSpinner(new SpinnerNumberModel(0, -12, 12, 1));
-        spinner.addMouseListener(createTipPanelUpdater(planetaryAcquisitionHeader, tipKey));
+        spinner.addMouseListener(createTipPanelUpdater(tipKey));
         CampaignOptionsSpinner.installSelectAllOnFocus(spinner);
         return spinner;
     }
@@ -851,39 +830,39 @@ public class EquipmentAndSuppliesTab {
         CampaignOptionsHeaderPanel techLimitsHeader = new CampaignOptionsHeaderPanel("TechLimitsTab", imageAddress);
 
         limitByYearBox = new CampaignOptionsCheckBox("LimitByYearBox");
-        limitByYearBox.addMouseListener(createTipPanelUpdater(techLimitsHeader, "LimitByYearBox"));
+        limitByYearBox.addMouseListener(createTipPanelUpdater("LimitByYearBox"));
 
         disallowExtinctStuffBox = new CampaignOptionsCheckBox("DisallowExtinctStuffBox");
-        disallowExtinctStuffBox.addMouseListener(createTipPanelUpdater(techLimitsHeader, "DisallowExtinctStuffBox"));
+        disallowExtinctStuffBox.addMouseListener(createTipPanelUpdater("DisallowExtinctStuffBox"));
 
         allowClanPurchasesBox = new CampaignOptionsCheckBox("AllowClanPurchasesBox");
-        allowClanPurchasesBox.addMouseListener(createTipPanelUpdater(techLimitsHeader, "AllowClanPurchasesBox"));
+        allowClanPurchasesBox.addMouseListener(createTipPanelUpdater("AllowClanPurchasesBox"));
         allowISPurchasesBox = new CampaignOptionsCheckBox("AllowISPurchasesBox");
-        allowISPurchasesBox.addMouseListener(createTipPanelUpdater(techLimitsHeader, "AllowISPurchasesBox"));
+        allowISPurchasesBox.addMouseListener(createTipPanelUpdater("AllowISPurchasesBox"));
 
         // Canon Purchases/Refits
         allowCanonOnlyBox = new CampaignOptionsCheckBox("AllowCanonOnlyBox");
-        allowCanonOnlyBox.addMouseListener(createTipPanelUpdater(techLimitsHeader, "AllowCanonOnlyBox"));
+        allowCanonOnlyBox.addMouseListener(createTipPanelUpdater("AllowCanonOnlyBox"));
         allowCanonRefitOnlyBox = new CampaignOptionsCheckBox("AllowCanonRefitOnlyBox");
-        allowCanonRefitOnlyBox.addMouseListener(createTipPanelUpdater(techLimitsHeader, "AllowCanonRefitOnlyBox"));
+        allowCanonRefitOnlyBox.addMouseListener(createTipPanelUpdater("AllowCanonRefitOnlyBox"));
 
         // Maximum Tech Level
         lblChoiceTechLevel = new CampaignOptionsLabel("ChoiceTechLevel");
-        lblChoiceTechLevel.addMouseListener(createTipPanelUpdater(techLimitsHeader, "ChoiceTechLevel"));
+        lblChoiceTechLevel.addMouseListener(createTipPanelUpdater("ChoiceTechLevel"));
         choiceTechLevel = new MMComboBox<>("choiceTechLevel", getMaximumTechLevelOptions());
-        choiceTechLevel.addMouseListener(createTipPanelUpdater(techLimitsHeader, "ChoiceTechLevel"));
+        choiceTechLevel.addMouseListener(createTipPanelUpdater("ChoiceTechLevel"));
         choiceTechLevel.setToolTipText(String.format("<html>%s</html>",
               getTextAt(getCampaignOptionsResourceBundle(), "lblChoiceTechLevel.tooltip")));
 
         // Variable Tech Level
         variableTechLevelBox = new CampaignOptionsCheckBox("VariableTechLevelBox",
               getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
-        variableTechLevelBox.addMouseListener(createTipPanelUpdater(techLimitsHeader, "VariableTechLevelBox"));
+        variableTechLevelBox.addMouseListener(createTipPanelUpdater("VariableTechLevelBox"));
 
         // Ammo by Type
         useAmmoByTypeBox = new CampaignOptionsCheckBox("UseAmmoByTypeBox",
               getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
-        useAmmoByTypeBox.addMouseListener(createTipPanelUpdater(techLimitsHeader, "UseAmmoByTypeBox"));
+        useAmmoByTypeBox.addMouseListener(createTipPanelUpdater("UseAmmoByTypeBox"));
 
         JPanel techLevelPanel = createTechLevelPanel();
         JPanel purchaseRulesPanel = createPurchaseRulesPanel();
