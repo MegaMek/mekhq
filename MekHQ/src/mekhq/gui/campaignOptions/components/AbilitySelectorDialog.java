@@ -32,6 +32,9 @@
  */
 package mekhq.gui.campaignOptions.components;
 
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Window;
@@ -95,7 +98,8 @@ public class AbilitySelectorDialog extends JDialog {
         getContentPane().setLayout(new BorderLayout());
 
         JTextField filterField = new JTextField();
-        filterField.putClientProperty("JTextField.placeholderText", "Filter…");
+        filterField.putClientProperty("JTextField.placeholderText",
+              getTextAt(getCampaignOptionsResourceBundle(), "abilitySelectorFilter.placeholder"));
         filterField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -140,9 +144,9 @@ public class AbilitySelectorDialog extends JDialog {
 
         getContentPane().add(new FastJScrollPane(checklistPanel), BorderLayout.CENTER);
 
-        JButton btnOK = new JButton("OK");
+        JButton btnOK = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "btnOK.text"));
         btnOK.addActionListener(evt -> confirm());
-        JButton btnCancel = new JButton("Cancel");
+        JButton btnCancel = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "btnCancel.text"));
         btnCancel.addActionListener(evt -> cancel());
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(btnOK);

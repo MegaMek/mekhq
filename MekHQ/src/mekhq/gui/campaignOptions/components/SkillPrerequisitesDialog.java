@@ -32,6 +32,9 @@
  */
 package mekhq.gui.campaignOptions.components;
 
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Component;
@@ -103,7 +106,8 @@ public class SkillPrerequisitesDialog extends JDialog {
      */
     @SuppressWarnings("unchecked")
     public SkillPrerequisitesDialog(@Nullable Window parent, @Nonnull SpecialAbility ability) {
-        super(parent, "Edit Skill Requirements", ModalityType.APPLICATION_MODAL);
+        super(parent, getTextAt(getCampaignOptionsResourceBundle(), "skillPrerequisitesTitle.text"),
+              ModalityType.APPLICATION_MODAL);
         // Work on a clone so a cancel leaves the ability untouched.
         this.prerequisiteSkills = (Vector<SkillPrerequisite>) ability.getPrereqSkills().clone();
         this.changed = false;
@@ -133,17 +137,17 @@ public class SkillPrerequisitesDialog extends JDialog {
      */
     private JPanel createTopPanel() {
         JLabel hint = new JLabel("<html><div style='width:" + UIUtil.scaleForGUI(420) + "px'>"
-                + "A character qualifies when they satisfy <b>every</b> skill set listed below. Within a set, meeting "
-                + "<b>any one</b> of its skills is enough.</div></html>");
+                + getTextAt(getCampaignOptionsResourceBundle(), "skillPrerequisitesHint.text")
+                + "</div></html>");
         hint.setForeground(UIManager.getColor("Label.disabledForeground"));
 
-        JButton addButton = new JButton("Add Skill Set");
+        JButton addButton = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "skillPrerequisitesAdd.text"));
         addButton.addActionListener(evt -> addSkillSet());
-        editButton = new JButton("Edit");
+        editButton = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "skillPrerequisitesEdit.text"));
         editButton.addActionListener(evt -> editSelectedSkillSet());
-        removeButton = new JButton("Remove");
+        removeButton = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "skillPrerequisitesRemove.text"));
         removeButton.addActionListener(evt -> removeSelectedSkillSet());
-        clearButton = new JButton("Clear All");
+        clearButton = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "skillPrerequisitesClear.text"));
         clearButton.addActionListener(evt -> clearSkillSets());
 
         JPanel toolbar = new JPanel(new FlowLayout(FlowLayout.LEADING, UIUtil.scaleForGUI(4), 0));
@@ -189,7 +193,7 @@ public class SkillPrerequisitesDialog extends JDialog {
         FastJScrollPane scrollPane = new FastJScrollPane(skillSetList);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
 
-        JLabel emptyLabel = new JLabel("No skill sets yet \u2014 use \u201CAdd Skill Set\u201D to create one.");
+        JLabel emptyLabel = new JLabel(getTextAt(getCampaignOptionsResourceBundle(), "skillPrerequisitesEmpty.text"));
         emptyLabel.setForeground(UIManager.getColor("Label.disabledForeground"));
         JPanel emptyPanel = new JPanel(new GridBagLayout());
         emptyPanel.setOpaque(false);
@@ -213,13 +217,13 @@ public class SkillPrerequisitesDialog extends JDialog {
      * button.
      */
     private JPanel createConfirmationPanel(SpecialAbility ability) {
-        JButton okButton = new JButton("OK");
+        JButton okButton = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "btnOK.text"));
         okButton.addActionListener(evt -> {
             ability.setPrereqSkills(prerequisiteSkills);
             changed = true;
             dispose();
         });
-        JButton cancelButton = new JButton("Cancel");
+        JButton cancelButton = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "btnCancel.text"));
         cancelButton.addActionListener(evt -> dispose());
 
         // GridBagLayout (rather than a trailing FlowLayout) lets the trailing margin

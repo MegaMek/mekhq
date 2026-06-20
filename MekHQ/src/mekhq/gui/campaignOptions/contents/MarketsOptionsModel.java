@@ -96,7 +96,7 @@ class MarketsOptionsModel {
         personnelMarketDylansWeight = options.getPersonnelMarketDylansWeight();
         personnelMarketRandomRemovalTargets = new HashMap<>(options.getPersonnelMarketRandomRemovalTargets());
         unitMarketMethod = options.getUnitMarketMethod();
-        unitMarketRegionalMekVariations = options.isRegionalMekVariations();
+        unitMarketRegionalMekVariations = options.isUnitMarketRegionalMekVariations();
         unitMarketArtilleryUnitChance = options.getUnitMarketArtilleryUnitChance();
         unitMarketRarityModifier = options.getUnitMarketRarityModifier();
         instantUnitMarketDelivery = options.isInstantUnitMarketDelivery();

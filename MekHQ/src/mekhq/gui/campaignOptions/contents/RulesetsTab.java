@@ -453,7 +453,6 @@ public class RulesetsTab {
      * Initializes the StratCon (Strategic Context) section of the tab.
      */
     private void initializeStratConTab() {
-        lblStratConPlayType = new JLabel("StratConPlayType");
         comboStratConPlayType = new MMComboBox<>("StratConPlayType", StratConPlayType.values());
         comboStratConPlayType.setRenderer(new DefaultListCellRenderer() {
             @Override

@@ -604,8 +604,10 @@ public class AbilitiesTab {
                                             getTextAt(getCampaignOptionsResourceBundle(), "skillRequirements.text") +
                                             "</html>");
 
-            JButton btnEditSkills = new JButton("Edit\u2026");
-            btnEditSkills.setToolTipText("Edit skill requirements");
+            JButton btnEditSkills = new JButton(getTextAt(getCampaignOptionsResourceBundle(),
+                  "abilityEditSkills.text"));
+            btnEditSkills.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(),
+                  "abilityEditSkills.tooltip"));
             btnEditSkills.addActionListener(e -> {
                 SkillPrerequisitesDialog dialog = new SkillPrerequisitesDialog(SwingUtilities.getWindowAncestor(this),
                       ability);
@@ -666,7 +668,7 @@ public class AbilitiesTab {
 
             JLabel title = new JLabel("<html>" + getTextAt(getCampaignOptionsResourceBundle(), titleKey) + "</html>");
 
-            JButton btnAdd = new JButton("Add\u2026");
+            JButton btnAdd = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "abilityAdd.text"));
             btnAdd.addActionListener(e -> {
                 AbilitySelectorDialog dialog = new AbilitySelectorDialog(SwingUtilities.getWindowAncestor(this),
                       getTextAt(getCampaignOptionsResourceBundle(), titleKey).replaceAll("<[^>]*>", "").trim(),
@@ -735,7 +737,7 @@ public class AbilitiesTab {
             JButton btnRemove = new JButton("\u2715");
             btnRemove.putClientProperty("JButton.buttonType", "borderless");
             btnRemove.setMargin(new Insets(0, UIUtil.scaleForGUI(4), 0, UIUtil.scaleForGUI(4)));
-            btnRemove.setToolTipText("Remove");
+            btnRemove.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(), "abilityRemove.tooltip"));
             btnRemove.addActionListener(e -> onRemove.run());
             row.add(btnRemove, BorderLayout.EAST);
 
