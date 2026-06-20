@@ -141,6 +141,18 @@ public final class HangarTab extends CampaignGuiTab {
     // endregion Constructors
 
     @Override
+    public void addNotify() {
+        super.addNotify();
+        GUIPreferences.getInstance().addPreferenceChangeListener(scalingChangeListener);
+    }
+
+    @Override
+    public void removeNotify() {
+        GUIPreferences.getInstance().removePreferenceChangeListener(scalingChangeListener);
+        super.removeNotify();
+    }
+
+    @Override
     public MHQTabType tabType() {
         return MHQTabType.HANGAR;
     }
@@ -678,18 +690,6 @@ public final class HangarTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DESTINATION_PLANET),
                   true);
         }
-    }
-
-    @Override
-    public void activateTab() {
-        super.activateTab();
-        GUIPreferences.getInstance().addPreferenceChangeListener(scalingChangeListener);
-    }
-
-    @Override
-    public void deactivateTab() {
-        super.deactivateTab();
-        GUIPreferences.getInstance().removePreferenceChangeListener(scalingChangeListener);
     }
 
     public void focusOnUnit(UUID id) {

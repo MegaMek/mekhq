@@ -68,7 +68,8 @@ public enum AtBContractType {
     OBSERVATION_RAID("AtBContractType.OBSERVATION_RAID.text", "AtBContractType.OBSERVATION_RAID.toolTipText", 3, 1.6),
     RETAINER("AtBContractType.RETAINER.text", "AtBContractType.RETAINER.toolTipText", 12, 1.3),
     SABOTAGE("AtBContractType.SABOTAGE.text", "AtBContractType.SABOTAGE.toolTipText", 24, 2.4),
-    TERRORISM("AtBContractType.TERRORISM.text", "AtBContractType.TERRORISM.toolTipText", 3, 1.9);
+    TERRORISM("AtBContractType.TERRORISM.text", "AtBContractType.TERRORISM.toolTipText", 3, 1.9),
+    UNDEFINED("AtBContractType.UNDEFINED.text", "AtBContractType.UNDEFINED.toolTipText", 1, 1.0);
     // endregion Enum Declarations
 
     // region Variable Declarations
@@ -273,7 +274,7 @@ public enum AtBContractType {
             case CADRE_DUTY -> CombatRole.CADRE;
             case GARRISON_DUTY, SECURITY_DUTY, RIOT_DUTY, SABOTAGE, TERRORISM, RETAINER, ASSASSINATION ->
                   CombatRole.MANEUVER;
-            case GUERRILLA_WARFARE, PIRATE_HUNTING, PLANETARY_ASSAULT, RELIEF_DUTY -> CombatRole.FRONTLINE;
+            case GUERRILLA_WARFARE, PIRATE_HUNTING, PLANETARY_ASSAULT, RELIEF_DUTY, UNDEFINED -> CombatRole.FRONTLINE;
             case DIVERSIONARY_RAID, EXTRACTION_RAID, OBJECTIVE_RAID, RECON_RAID, OBSERVATION_RAID, MOLE_HUNTING,
                  ESPIONAGE -> CombatRole.PATROL;
         };

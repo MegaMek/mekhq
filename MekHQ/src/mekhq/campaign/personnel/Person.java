@@ -2770,11 +2770,10 @@ public class Person implements ILocation {
      * @return the campus system ID, or {@code null} if not derivable from either source
      */
     public @Nullable String getEduAcademySystem() {
-        LocationNode node = getLocationNode().getParent();
-        while (node != null) {
-            if (node.getLocatable() instanceof AcademyCampusLocation) {
-                LocationNode campusParent = node.getParent();
-                if (campusParent != null && campusParent.getLocatable() instanceof AbstractLocation location) {
+        for (ILocation cursor = getParentLocation(); cursor != null; cursor = cursor.getParentLocation()) {
+            if (cursor instanceof AcademyCampusLocation) {
+                ILocation campusParent = cursor.getParentLocation();
+                if (campusParent instanceof AbstractLocation location) {
                     PlanetarySystem system = location.getCurrentSystem();
                     if (system != null) {
                         return system.getId();
@@ -2782,7 +2781,6 @@ public class Person implements ILocation {
                 }
                 return legacyEduAcademySystem;
             }
-            node = node.getParent();
         }
         return legacyEduAcademySystem;
     }
@@ -5807,26 +5805,6 @@ public class Person implements ILocation {
         }
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
-
-    /**
-     * Use {@link #checkSkill(String, boolean, boolean, LocalDate)} or {@link #checkSkill(String, Campaign)} instead.
-     *
-     * <p>Prepares a skill check.</p>
-     *
-     * <p>This constructor creates a {@code SkillCheck} instance which calculates the target number for the
-     * skill check based the person's skill level.</p>
-     *
-     * <p><b>Usage:</b> This is a convenience method that excludes reputation and aging effect checks.</p>
-     *
-     * @param skillName the name of the skill being used, corresponding to a {@link SkillType}
-     *
-     * @return prepared skill check
-     */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    public SkillCheck checkSkill(String skillName) {
-        return new SkillCheck(this, skillName);
-    }
-
 
     /**
      * Prepares a skill check based on individually passed options.
@@ -9399,8 +9377,7 @@ public class Person implements ILocation {
 
     @Override
     public boolean setParent(ILocation parent) {
-        LocationNode parentNode = getLocationNode().getParent();
-        ILocation oldParent = parentNode != null ? parentNode.getLocatable() : null;
+        ILocation oldParent = getParentLocation();
         if (ILocation.super.setParent(parent)) {
             if (oldParent instanceof Personnel personnel) {
                 personnel.remove(getId());

@@ -77,20 +77,6 @@ public class SkillCheckUtility {
     protected static final int UNTRAINED_SKILL_MODIFIER = 4; // ATOW pg 43
 
     /**
-     * Use {@link #determineTargetNumber(Person, SkillType, boolean, boolean, LocalDate)} instead.
-     *
-     * <p>Determines the target number for a skill check ignoring aging effects and clan campaign status.</p>
-     *
-     * @param person    the {@link Person} performing the skill check
-     * @param skillType the associated {@link SkillType} being checked
-     * @return the {@link TargetRoll} for the skill check
-     */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    static TargetRoll determineTargetNumber(Person person, SkillType skillType) {
-        return determineTargetNumber(person, skillType, false, false, LocalDate.of(3151, 1, 1));
-    }
-
-    /**
      * Determines the target number for a skill check based on the person's attributes, skill type, and whether they are
      * trained in the skill.
      *

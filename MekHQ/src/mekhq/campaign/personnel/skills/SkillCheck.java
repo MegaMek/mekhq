@@ -64,15 +64,6 @@ public class SkillCheck extends ActionCheck<SkillCheck> {
     }
 
     /**
-     * Please see {@link Person#checkSkill(String)} and use it instead.
-     */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    public SkillCheck(Person person, String skillName) {
-        super(person, SkillCheckUtility.determineTargetNumber(person, SkillType.getType(skillName)));
-        this.skillType = SkillType.getType(skillName);
-    }
-
-    /**
      * Please see {@link Person#checkSkill(String, boolean, boolean, LocalDate)} and use it instead.
      */
     public SkillCheck(Person person, String skillName,

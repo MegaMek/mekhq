@@ -104,17 +104,4 @@ public class NavigationTab extends CampaignGuiTab {
         locationsTab.refreshAll();
     }
 
-    @Override
-    public void activateTab() {
-        super.activateTab();
-        mapTab.activateTab();
-        locationsTab.activateTab();
-    }
-
-    @Override
-    public void deactivateTab() {
-        mapTab.deactivateTab();
-        locationsTab.deactivateTab();
-        super.deactivateTab();
-    }
 }

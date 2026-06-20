@@ -153,7 +153,18 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
         add(btnRecruitment, gridBagConstraints);
 
         refresh();
+    }
+
+    @Override
+    public void addNotify() {
+        super.addNotify();
         MekHQ.registerHandler(this);
+    }
+
+    @Override
+    public void removeNotify() {
+        MekHQ.unregisterHandler(this);
+        super.removeNotify();
     }
 
     /**
