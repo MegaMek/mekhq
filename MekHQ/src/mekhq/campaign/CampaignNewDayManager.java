@@ -168,10 +168,10 @@ import mekhq.campaign.personnel.medical.MedicalController;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternateImplants;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
+import mekhq.campaign.personnel.skills.ActionCheckResult;
 import mekhq.campaign.personnel.skills.AttributeCheckUtility;
 import mekhq.campaign.personnel.skills.EscapeSkills;
 import mekhq.campaign.personnel.skills.QuickTrain;
-import mekhq.campaign.personnel.skills.SkillCheckUtility;
 import mekhq.campaign.personnel.skills.enums.AgingMilestone;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
@@ -1020,12 +1020,11 @@ public class CampaignNewDayManager {
      * @since 0.51.0
      */
     private void embezzleFunds(Person person) {
-        String reason = getTextAt(RESOURCE_BUNDLE, "embezzle.roll");
-        SkillCheckUtility skillCheck = new SkillCheckUtility(reason, person, S_ADMIN, List.of(), 0, false, true);
-        String report = skillCheck.getResultsText();
-        campaign.addReport(SKILL_CHECKS, report);
+        ActionCheckResult actionCheckResult =
+              person.checkSkill(S_ADMIN, campaign).resolve(false, getTextAt(RESOURCE_BUNDLE, "embezzle.roll"), true);
+        campaign.addReport(SKILL_CHECKS, actionCheckResult.resultsText());
 
-        if (skillCheck.isSuccess()) {
+        if (actionCheckResult.isSuccess()) {
             Money currentCampaignFunds = finances.getBalance();
             double embezzlePercentile = 0.001;
 
@@ -1178,7 +1177,7 @@ public class CampaignNewDayManager {
                 }
             }
 
-            if (isMonday && contract.getContractType().isRiotDuty() && contract.getStratconCampaignState() != null) {
+            if (isMonday && contract.getContractType().isRiotDuty() && contract.getStratConCampaignState() != null) {
                 int riotChance = 4;
                 if (randomInt(riotChance) == 0) {
                     new RiotScenario(campaign, contract);
@@ -1186,7 +1185,7 @@ public class CampaignNewDayManager {
             }
 
             // Early Contract End (StratCon Only)
-            StratConCampaignState campaignState = contract.getStratconCampaignState();
+            StratConCampaignState campaignState = contract.getStratConCampaignState();
             if (campaignState != null) {
                 if (isMonday) {
                     List<StratConTrackState> tracks = campaignState.getTracks();
@@ -1208,7 +1207,7 @@ public class CampaignNewDayManager {
                         int remainingMonths = contract.getMonthsLeft(adjustedDate);
                         Money finalPayout = contract.getMonthlyPayOut().multipliedBy(remainingMonths);
                         contract.setRoutedPayout(finalPayout);
-                        contract.setEndDate(adjustedDate);
+                        contract.setEndingDate(adjustedDate);
                     }
                 }
             }
@@ -2172,7 +2171,7 @@ public class CampaignNewDayManager {
 
             if (today.getDayOfWeek() == DayOfWeek.MONDAY) {
                 int deficit = campaign.getDeploymentDeficit(contract);
-                StratConCampaignState campaignState = contract.getStratconCampaignState();
+                StratConCampaignState campaignState = contract.getStratConCampaignState();
 
                 if (campaignState != null && deficit > 0) {
                     campaign.addReport(GENERAL, String.format(resources.getString("contractBreach.text"),
@@ -2197,7 +2196,7 @@ public class CampaignNewDayManager {
                 if ((scenario.getDate() != null) && scenario.getDate().isBefore(today)) {
                     boolean hasForceDeployed = allScenariosWithAssignedStandardForces.contains(scenario.getId());
                     if (campaignOptions.isUseStratCon() && (scenario instanceof AtBDynamicScenario)) {
-                        StratConCampaignState campaignState = contract.getStratconCampaignState();
+                        StratConCampaignState campaignState = contract.getStratConCampaignState();
 
                         if (campaignState == null) {
                             LOGGER.warn("Scenario {} has no StratConCampaignState", scenario.getId());

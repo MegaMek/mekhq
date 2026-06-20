@@ -37,6 +37,8 @@ import static mekhq.utilities.MHQInternationalization.getText;
 import java.awt.BorderLayout;
 
 import megamek.common.ui.EnhancedTabbedPane;
+import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.enums.MHQTabType;
 
 /**
@@ -69,6 +71,28 @@ public class NavigationTab extends CampaignGuiTab {
         return mapTab;
     }
 
+    public void showSystem(PlanetarySystem planetarySystem) {
+        mapTab.switchSystemsMap(planetarySystem);
+        int index = innerTabs.indexOfComponent(mapTab);
+        if (index >= 0) {
+            innerTabs.setSelectedIndex(index);
+        }
+    }
+
+    public void showPlanet(Planet planet) {
+        // Stay on the interstellar map if their origin planet is the primary planet...
+        if (planet.getParentSystem().getPrimaryPlanet().equals(planet)) {
+            showSystem(planet.getParentSystem());
+        } else {
+            // ...otherwise, dive on in to the system view!
+            mapTab.switchPlanetaryMap(planet);
+            int index = innerTabs.indexOfComponent(mapTab);
+            if (index >= 0) {
+                innerTabs.setSelectedIndex(index);
+            }
+        }
+    }
+
     @Override
     public MHQTabType tabType() {
         return MHQTabType.NAVIGATION;
@@ -80,17 +104,4 @@ public class NavigationTab extends CampaignGuiTab {
         locationsTab.refreshAll();
     }
 
-    @Override
-    public void activateTab() {
-        super.activateTab();
-        mapTab.activateTab();
-        locationsTab.activateTab();
-    }
-
-    @Override
-    public void deactivateTab() {
-        mapTab.deactivateTab();
-        locationsTab.deactivateTab();
-        super.deactivateTab();
-    }
 }

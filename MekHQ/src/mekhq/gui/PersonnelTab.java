@@ -124,6 +124,18 @@ public final class PersonnelTab extends CampaignGuiTab {
     // endregion Constructors
 
     @Override
+    public void addNotify() {
+        super.addNotify();
+        GUIPreferences.getInstance().addPreferenceChangeListener(scalingChangeListener);
+    }
+
+    @Override
+    public void removeNotify() {
+        GUIPreferences.getInstance().removePreferenceChangeListener(scalingChangeListener);
+        super.removeNotify();
+    }
+
+    @Override
     public MHQTabType tabType() {
         return MHQTabType.PERSONNEL;
     }
@@ -357,18 +369,6 @@ public final class PersonnelTab extends CampaignGuiTab {
         PersonnelTableMouseAdapter.connect(getCampaignGui(), personnelTable, personModel, splitPersonnel);
 
         filterPersonnel();
-    }
-
-    @Override
-    public void activateTab() {
-        super.activateTab();
-        GUIPreferences.getInstance().addPreferenceChangeListener(scalingChangeListener);
-    }
-
-    @Override
-    public void deactivateTab() {
-        super.deactivateTab();
-        GUIPreferences.getInstance().removePreferenceChangeListener(scalingChangeListener);
     }
 
     private DefaultComboBoxModel<PersonnelFilter> createPersonGroupModel() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -39,6 +39,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.StringJoiner;
 
@@ -49,10 +50,15 @@ import megamek.common.units.SpaceStation;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Quartermaster;
+import mekhq.campaign.base.PlayerBase;
+import mekhq.campaign.location.LocationDispatch;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
+import mekhq.gui.dialog.BaseSettingsDialog;
 
 public class JumpBlockers {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.JumpBlockers";
@@ -143,12 +149,15 @@ public class JumpBlockers {
     /**
      * Notifies the player that some units are preventing a jump and processes the chosen resolution.
      *
-     * <p>The dialog offers three choices:</p>
+     * <p>The dialog offers four choices:</p>
      * <ul>
      *     <li><b>Cancel</b> — abort the jump ({@code false}).</li>
      *     <li><b>GM override</b> — proceed with the jump despite blockers ({@code true}).</li>
      *     <li><b>Abandon units</b> — remove all blocking units from the campaign, then proceed ({@code true}). This
      *     option may require confirmation depending on campaign nag/confirmation settings.</li>
+     *     <li><b>Leave at New Base</b> — opens {@link BaseSettingsDialog} with the current system pre-selected and
+     *     locked. If the player creates a base, blocking units are dispatched there and the jump proceeds
+     *     ({@code true}). If the player cancels, the main dialog is shown again.</li>
      * </ul>
      *
      * @param campaign            the current {@link Campaign}; must not be {@code null}
@@ -175,11 +184,13 @@ public class JumpBlockers {
         final String buttonGM = getTextAt(RESOURCE_BUNDLE, "JumpBlockers.unableToJump.button.gm");
         final String buttonSell = getTextAt(RESOURCE_BUNDLE, "JumpBlockers.unableToJump.button.sell");
         final String buttonAbandon = getTextAt(RESOURCE_BUNDLE, "JumpBlockers.unableToJump.button.abandon");
+        final String buttonLeaveAtNewBase = getTextAt(RESOURCE_BUNDLE, "JumpBlockers.unableToJump.button.leaveAtNewBase");
 
         final int cancelJumpChoiceIndex = 0;
         final int gmOverrideChoiceIndex = 1;
         final int sellUnits = 2;
         final int abandonUnits = 3;
+        final int leaveAtNewBase = 4;
 
         int choiceIndex = cancelJumpChoiceIndex;
         boolean wasOverallConfirmed = false;
@@ -188,7 +199,7 @@ public class JumpBlockers {
                   campaign.getSeniorAdminPerson(Campaign.AdministratorSpecialization.TRANSPORT),
                   null,
                   centerMessage,
-                  List.of(buttonCancel, buttonGM, buttonSell, buttonAbandon),
+                  List.of(buttonCancel, buttonGM, buttonSell, buttonAbandon, buttonLeaveAtNewBase),
                   bottomMessage,
                   null,
                   true,
@@ -204,11 +215,31 @@ public class JumpBlockers {
                 }
             }
 
+            if (choiceIndex == leaveAtNewBase) {
+                PlanetarySystem currentSystem = campaign.getCurrentSystem();
+                Planet currentPlanet = campaign.getPlanet();
+                BaseSettingsDialog baseDialog = new BaseSettingsDialog(null, campaign,
+                      currentSystem, currentPlanet, true);
+                baseDialog.setVisible(true);
+                Optional<PlayerBase> baseResult = baseDialog.getResult();
+                if (baseResult.isEmpty()) {
+                    continue;
+                }
+                PlayerBase newBase = baseResult.get();
+                for (Unit unit : nonJumpCapableUnits) {
+                    campaign.removeUnitFromFormation(unit);
+                }
+                LocationDispatch.dispatchUnitsToLocation(nonJumpCapableUnits, newBase, campaign);
+                wasOverallConfirmed = true;
+                continue;
+            }
+
             wasOverallConfirmed = true;
         }
 
         return switch (choiceIndex) {
             case gmOverrideChoiceIndex -> true;
+            case leaveAtNewBase -> true; // units dispatched to base in loop above
             case sellUnits -> {
                 Quartermaster quartermaster = campaign.getQuartermaster();
                 for (Unit unit : nonJumpCapableUnits) {

@@ -609,9 +609,9 @@ public class CustomizeAtBContractDialog extends JDialog {
 
     private void btnOKActionPerformed(ActionEvent evt) {
         contract.setName(txtName.getText());
-        contract.setEmployerCode(cbEmployer.getSelectedItemKey(), campaign.getGameYear());
+        contract.updateEmployer(cbEmployer.getSelectedItemKey(), campaign.getGameYear());
         contract.setEnemyCode(cbEnemy.getSelectedItemKey());
-        contract.setContractType(comboContractType.getSelectedItem());
+        contract.setContractTypeAndName(comboContractType.getSelectedItem());
         contract.setAllySkill(comboAllySkill.getSelectedItem());
         contract.setAllyQuality(cbAllyQuality.getSelectedIndex());
         contract.setEnemySkill(comboEnemySkill.getSelectedItem());
@@ -639,7 +639,7 @@ public class CustomizeAtBContractDialog extends JDialog {
             // history of planet
         }
 
-        contract.setDesc(txtDesc.getText());
+        contract.setDescription(txtDesc.getText());
         this.setVisible(false);
     }
 

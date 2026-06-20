@@ -78,6 +78,7 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.utilities.JumpBlockers;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.dialog.JumpCostsSummary;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.utilities.JSuggestField;
@@ -87,6 +88,7 @@ import mekhq.gui.view.PlanetViewPanel;
 /**
  * Displays interstellar map and contains transit controls.
  */
+// FIXME: this class should not inherit from CampaignGuiTab because it is managed by NavigationTab now
 public final class MapTab extends CampaignGuiTab implements ActionListener {
     private static final int PADDING = UIUtil.scaleForGUI(10);
 
@@ -105,7 +107,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
 
     @Override
     public MHQTabType tabType() {
-        return MHQTabType.INTERSTELLAR_MAP;
+        return null;
     }
 
     /*
@@ -213,6 +215,22 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         gridBagConstraints.weightx = 0.5;
         gridBagConstraints.weighty = 0.0;
         panTopButtons.add(chkUseCommandCircuits, gridBagConstraints);
+
+        RoundedJButton btnJumpFees = new RoundedJButton(resourceMap.getString("btnJumpFees.text"));
+        btnJumpFees.addActionListener(evt -> {
+            TransportCostCalculations transportCostCalculations =
+                  getCampaign().getTransportCostCalculation(EXP_REGULAR);
+            transportCostCalculations.calculateJumpCostForEachDay();
+            new JumpCostsSummary(getCampaignGui().getFrame(), transportCostCalculations);
+        });
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 6;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.weighty = 0.0;
+        panTopButtons.add(btnJumpFees, gridBagConstraints);
 
         panMapView.add(panTopButtons, BorderLayout.PAGE_START);
 

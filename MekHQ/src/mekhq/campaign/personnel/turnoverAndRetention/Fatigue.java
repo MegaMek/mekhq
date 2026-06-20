@@ -295,8 +295,8 @@ public class Fatigue {
 
             if (fatiguedUnits >= (unitsInForce.size() + 1) / 2) {
                 for (AtBContract contract : campaign.getActiveAtBContracts()) {
-                    if (contract.getStratconCampaignState() != null) {
-                        for (StratConTrackState track : contract.getStratconCampaignState().getTracks()) {
+                    if (contract.getStratConCampaignState() != null) {
+                        for (StratConTrackState track : contract.getStratConCampaignState().getTracks()) {
                             track.unassignFormation(formation.getId());
                         }
                     }

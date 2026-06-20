@@ -55,7 +55,6 @@ public class MHQTabTypeTest {
     public void testGetMnemonic() {
         assertEquals(KeyEvent.VK_O, MHQTabType.COMMAND_CENTER.getMnemonic());
         assertEquals(KeyEvent.VK_UNDEFINED, MHQTabType.NAVIGATION.getMnemonic());
-        assertEquals(KeyEvent.VK_S, MHQTabType.INTERSTELLAR_MAP.getMnemonic());
         assertEquals(KeyEvent.VK_H, MHQTabType.HANGAR.getMnemonic());
         assertEquals(KeyEvent.VK_L, MHQTabType.MEK_LAB.getMnemonic());
     }
@@ -102,17 +101,6 @@ public class MHQTabTypeTest {
                 assertTrue(mhqTabType.isBriefingRoom());
             } else {
                 assertFalse(mhqTabType.isBriefingRoom());
-            }
-        }
-    }
-
-    @Test
-    public void testIsInterstellarMap() {
-        for (final MHQTabType mhqTabType : types) {
-            if (mhqTabType == MHQTabType.INTERSTELLAR_MAP) {
-                assertTrue(mhqTabType.isInterstellarMap());
-            } else {
-                assertFalse(mhqTabType.isInterstellarMap());
             }
         }
     }

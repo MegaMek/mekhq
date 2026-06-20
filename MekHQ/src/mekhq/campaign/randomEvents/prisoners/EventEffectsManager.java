@@ -933,7 +933,7 @@ public class EventEffectsManager {
         Map<AtBContract, StratConCampaignState> potentialTargets = new HashMap<>();
 
         for (AtBContract contract : campaign.getActiveAtBContracts()) {
-            StratConCampaignState campaignState = contract.getStratconCampaignState();
+            StratConCampaignState campaignState = contract.getStratConCampaignState();
 
             if (campaignState != null) {
                 potentialTargets.put(contract, campaignState);

@@ -69,11 +69,9 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
         // Immediate Return for Illegal Assignment
         // 1) No people to assign
         // 2) Any of the people you are trying to assign are currently deployed
-        // 3) Any person is currently in transit (no fixed location to match units against)
         if ((people.length == 0) ||
                   Stream.of(people).anyMatch(Person::isDeployed) ||
-                  !StaticChecks.areAllEmployed(people) ||
-                  Stream.of(people).anyMatch(LocationUtils::isInTransit)) {
+                  !StaticChecks.areAllEmployed(people)) {
             return;
         }
 

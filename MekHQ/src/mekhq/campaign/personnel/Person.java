@@ -146,6 +146,7 @@ import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.Skills;
@@ -2769,11 +2770,10 @@ public class Person implements ILocation {
      * @return the campus system ID, or {@code null} if not derivable from either source
      */
     public @Nullable String getEduAcademySystem() {
-        LocationNode node = getLocationNode().getParent();
-        while (node != null) {
-            if (node.getLocatable() instanceof AcademyCampusLocation) {
-                LocationNode campusParent = node.getParent();
-                if (campusParent != null && campusParent.getLocatable() instanceof AbstractLocation location) {
+        for (ILocation cursor = getParentLocation(); cursor != null; cursor = cursor.getParentLocation()) {
+            if (cursor instanceof AcademyCampusLocation) {
+                ILocation campusParent = cursor.getParentLocation();
+                if (campusParent instanceof AbstractLocation location) {
                     PlanetarySystem system = location.getCurrentSystem();
                     if (system != null) {
                         return system.getId();
@@ -2781,7 +2781,6 @@ public class Person implements ILocation {
                 }
                 return legacyEduAcademySystem;
             }
-            node = node.getParent();
         }
         return legacyEduAcademySystem;
     }
@@ -5805,6 +5804,40 @@ public class Person implements ILocation {
             addSkill(skillName, 0, 0);
         }
         MekHQ.triggerEvent(new PersonChangedEvent(this));
+    }
+
+    /**
+     * Prepares a skill check based on individually passed options.
+     *
+     * <p>This method creates a {@code SkillCheck} instance which calculates the target number
+     * for the skill check, based on the person's skill, aging effects, clan campaign rules,
+     * and the current date.</p>
+     *
+     * @param skillName         the name of the skill being checked, corresponding to a {@link SkillType}
+     * @param isUseAgingEffects if {@code true}, considers aging effects during the check
+     * @param isClanCampaign    if {@code true}, applies rules specific to clan campaigns
+     * @param date              the current date, used for time-dependent logic
+     *
+     * @return prepared skill check
+     */
+    public SkillCheck checkSkill(String skillName, boolean isUseAgingEffects, boolean isClanCampaign, LocalDate date) {
+        return new SkillCheck(this, skillName, isUseAgingEffects, isClanCampaign, date);
+    }
+
+    /**
+     * Prepares a skill check based on the campaign's options.
+     *
+     * <p>Automatically extracts aging effect setting, clan campaign status, and the current date from
+     * the provided {@link Campaign} context to calculate the target number.</p>
+     *
+     * @param skillName the name of the skill being checked, corresponding to a {@link SkillType}
+     * @param campaign  the current {@link Campaign} context
+     *
+     * @return prepared skill check
+     */
+    public SkillCheck checkSkill(String skillName, Campaign campaign) {
+        return new SkillCheck(this, skillName, campaign.getCampaignOptions().isUseAgeEffects(),
+              campaign.isClanCampaign(), campaign.getLocalDate());
     }
 
     /**
@@ -9344,8 +9377,7 @@ public class Person implements ILocation {
 
     @Override
     public boolean setParent(ILocation parent) {
-        LocationNode parentNode = getLocationNode().getParent();
-        ILocation oldParent = parentNode != null ? parentNode.getLocatable() : null;
+        ILocation oldParent = getParentLocation();
         if (ILocation.super.setParent(parent)) {
             if (oldParent instanceof Personnel personnel) {
                 personnel.remove(getId());

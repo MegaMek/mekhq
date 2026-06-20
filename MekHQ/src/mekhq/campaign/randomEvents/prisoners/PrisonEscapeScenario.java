@@ -251,7 +251,7 @@ public class PrisonEscapeScenario {
         // we log an error and make the delivery, in the same manner as above.
         StratConTrackState track;
         try {
-            final StratConCampaignState campaignState = contract.getStratconCampaignState();
+            final StratConCampaignState campaignState = contract.getStratConCampaignState();
             List<StratConTrackState> tracks = campaignState.getTracks();
             track = ObjectUtility.getRandomItem(tracks);
         } catch (NullPointerException e) {

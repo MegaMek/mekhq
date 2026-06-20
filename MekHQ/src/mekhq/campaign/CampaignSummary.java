@@ -327,15 +327,21 @@ public class CampaignSummary {
     }
 
     /**
-     * Generates an HTML report about the current and maximum cargo capacity. The current cargo capacity (cargoTons) and
-     * maximum cargo capacity (cargoCapacity) are rounded to 1 decimal place. The comparison between the current and
-     * maximum cargo capacity determines the font's color in the report. - If the current cargo exceeds the maximum
-     * capacity, the color is set to MHQ's defined negative color. - If the current cargo equals the maximum capacity,
-     * the color is set to MHQ's defined warning color. - In other cases, the regular color is used.
+     * Generates a report string with the current and maximum cargo capacity. It is intended to be embedded into
+     * HTML documents.
+     * <p>The comparison between the current and maximum cargo capacity determines the font's color in the report.</p>
+     * <ul>
+     *     <li>If the current cargo exceeds the maximum capacity, the color is set to MHQ's defined negative color.</li>
+     *     <li>If the current cargo equals the maximum capacity, the color is set to MHQ's defined warning color.</li>
+     *     <li>In other cases, the regular color is used.</li>
+     * </ul>
+     * <p>The current cargo capacity (cargoTons) and maximum cargo capacity (cargoCapacity) are rounded to 1 decimal
+     * place.</p>
      *
-     * @return A {@link StringBuilder} object containing the HTML formatted report of cargo usage against capacity.
+     * @return A string containing the cargo capacity report; may contain HTML tags, but it's not wrapped
+     * into &lt;html&gt;
      */
-    public StringBuilder getCargoCapacityReport() {
+    public String getCargoCapacityReport() {
         BigDecimal roundedCargo = new BigDecimal(Double.toString(cargoTons));
         roundedCargo = roundedCargo.setScale(1, RoundingMode.HALF_UP);
 
@@ -344,21 +350,17 @@ public class CampaignSummary {
 
         int comparison = roundedCargo.compareTo(roundedCapacity);
 
-        StringBuilder report = new StringBuilder("<html>");
+        StringBuilder report = new StringBuilder();
 
         if (comparison > 0) {
             report.append("<font color='").append(getWarningColor()).append("'>");
         }
-
         report.append(roundedCargo).append(" tons (").append(roundedCapacity).append(" tons capacity)");
-
-        if (!report.toString().equals(roundedCargo + " tons (" + roundedCapacity + " tons capacity)")) {
-            report.append("</font></html>");
-        } else {
-            report.append("</html>");
+        if (comparison > 0) {
+            report.append("</font>");
         }
 
-        return report;
+        return report.toString();
     }
 
     /**

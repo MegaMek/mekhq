@@ -209,7 +209,6 @@ public class CampaignGUI extends JPanel {
         this.app = app;
         reportHLL = new ReportHyperlinkListener(this);
         initComponents();
-        MekHQ.registerHandler(this);
         setUserPreferences();
 
         commandCenterTab = new CommandCenterTab(this, MHQTabType.COMMAND_CENTER.toString());
@@ -241,6 +240,18 @@ public class CampaignGUI extends JPanel {
         activateTab(financesTab);
     }
     // endregion Constructors
+
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        MekHQ.registerHandler(this);
+    }
+
+    @Override
+    public void removeNotify() {
+        MekHQ.unregisterHandler(this);
+        super.removeNotify();
+    }
 
     // region Getters/Setters
     public JFrame getFrame() {
@@ -581,10 +592,6 @@ public class CampaignGUI extends JPanel {
         return navigationTab;
     }
 
-    public MapTab getMapTab() {
-        return navigationTab.getMapTab();
-    }
-
     public PersonnelTab getPersonnelTab() {
         return personnelTab;
     }
@@ -621,10 +628,10 @@ public class CampaignGUI extends JPanel {
      * Sets the selected tab.
      */
     public void setSelectedTab(CampaignGuiTab tab) {
-        IntStream.range(0, tabMain.getTabCount())
-              .filter(ii -> Objects.equals(tabMain.getComponentAt(ii), tab))
-              .findFirst()
-              .ifPresent(ii -> tabMain.setSelectedIndex(ii));
+        int index = tabMain.indexOfComponent(tab);
+        if (index >= 0) {
+            tabMain.setSelectedIndex(index);
+        }
     }
 
     /**
@@ -635,7 +642,7 @@ public class CampaignGUI extends JPanel {
     public void setSelectedTab(MHQTabType tabType) {
         Optional<? extends CampaignGuiTab> tab = switch (tabType) {
             case COMMAND_CENTER -> Optional.of(getCommandCenterTab());
-            case NAVIGATION, INTERSTELLAR_MAP -> Optional.of(getNavigationTab());
+            case NAVIGATION -> Optional.of(getNavigationTab());
             case TOE -> Optional.of(getTOETab());
             case BRIEFING_ROOM -> Optional.of(getBriefingRoomTab());
             case STRAT_CON -> getStratConTab();
@@ -667,10 +674,7 @@ public class CampaignGUI extends JPanel {
                     .orElse(tabMain.getTabCount());
         tabMain.insertTab(tab.getTabName(), null, tab, null, index);
         tabMain.setMnemonicAt(index, tab.tabType().getMnemonic());
-        SwingUtilities.invokeLater(() -> {
-            tab.refreshAll();
-            tab.activateTab();
-        });
+        SwingUtilities.invokeLater(tab::refreshAll);
     }
 
     /**
@@ -679,7 +683,6 @@ public class CampaignGUI extends JPanel {
      * @param tab The tab to deactivate
      */
     private void deactivateTab(CampaignGuiTab tab) {
-        tab.deactivateTab();
         tabMain.remove(tab);
     }
 

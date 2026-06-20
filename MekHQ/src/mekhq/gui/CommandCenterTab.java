@@ -34,7 +34,6 @@ package mekhq.gui;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.campaign.enums.DailyReportType.*;
-import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
@@ -56,6 +55,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
+import megamek.client.ui.util.ClickableLabel;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.event.Subscribe;
 import megamek.common.ui.EnhancedTabbedPane;
@@ -84,7 +84,6 @@ import mekhq.campaign.finances.FinancialReport;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.mission.TransportCostCalculations;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.report.CargoReport;
 import mekhq.campaign.report.HangarReport;
@@ -97,7 +96,6 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.AcquisitionsDialog;
 import mekhq.gui.dialog.DiplomacyReport;
-import mekhq.gui.dialog.JumpCostsSummary;
 import mekhq.gui.dialog.PartsReportDialog;
 import mekhq.gui.dialog.ShoppingListPriorityDialog;
 import mekhq.gui.dialog.factionStanding.FactionStandingReport;
@@ -121,16 +119,15 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
     // basic info panel
     private JPanel panInfo;
-    private JLabel lblRatingHead;
-    private JLabel lblRating;
+    private ClickableLabel lblRating;
     private JLabel lblExperience;
-    private JLabel lblPersonnel;
+    private ClickableLabel lblPersonnel;
     private JLabel lblHRCapacity;
     private JLabel lblMissionSuccess;
-    private JLabel lblComposition;
+    private ClickableLabel lblComposition;
     private JLabel lblRepairStatus;
-    private JLabel lblTransportCapacity;
-    private JLabel lblCargoSummary;
+    private ClickableLabel lblTransportCapacity;
+    private ClickableLabel lblCargoSummary;
     private JLabel lblFacilityCapacities;
 
     // faction panel
@@ -173,10 +170,6 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private RoundedJButton btnPauseProcurement;
     private RoundedJButton btnResumeProcurement;
     private RoundedJButton btnMRMSInstant;
-
-    // available reports
-    private JPanel panReports;
-    private RoundedJButton btnUnitRating;
 
     private JLabel lblIcon;
 
@@ -246,7 +239,6 @@ public final class CommandCenterTab extends CampaignGuiTab {
         initInfoPanel();
         initFactionPanel();
         initLogPanel();
-        initReportsPanel();
         initProcurementPanel();
         initObjectivesPanel();
 
@@ -263,19 +255,11 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridheight = 1;
-        gridBagConstraints.gridwidth = 4;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         panCommand.add(panProcurement, gridBagConstraints);
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.weighty = 0.0;
-        panCommand.add(panReports, gridBagConstraints);
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 1;
@@ -328,7 +312,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         int y = 0;
 
         /* Unit Rating */
-        lblRatingHead = new JLabel(resourceMap.getString("lblRating.text"));
+        JLabel lblRatingHead = new JLabel(resourceMap.getString("lblRating.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y++;
@@ -336,7 +320,10 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 1, 5);
         panInfo.add(lblRatingHead, gridBagConstraints);
-        lblRating = new JLabel(getCampaign().getUnitRatingText());
+        lblRating = new ClickableLabel(
+              evt -> new ReputationReportDialog(getCampaignGui().getFrame(),
+                    getCampaign()).setVisible(true));
+        lblRating.setHyperlinkMode(true);
         lblRatingHead.setLabelFor(lblRating);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
@@ -350,15 +337,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(1, 5, 1, 5);
         panInfo.add(lblExperienceHead, gridBagConstraints);
-
         lblExperience = new JLabel();
-        // This seems to be overwritten completely and immediately by refresh
-        String experienceString = "<html><b>" +
-                                        SkillType.getColoredExperienceLevelName(getCampaign().getReputation()
-                                                                                      .getAverageSkillLevel()) +
-                                        "</b></html>";
-        lblExperience.setText(experienceString);
-
         lblExperienceHead.setLabelFor(lblExperience);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
@@ -372,7 +351,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(1, 5, 1, 5);
         panInfo.add(lblMissionSuccessHead, gridBagConstraints);
-        lblMissionSuccess = new JLabel(getCampaign().getCampaignSummary().getMissionSuccessReport());
+        lblMissionSuccess = new JLabel();
         lblMissionSuccessHead.setLabelFor(lblMissionSuccess);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
@@ -386,7 +365,10 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(1, 5, 1, 5);
         panInfo.add(lblPersonnelHead, gridBagConstraints);
-        lblPersonnel = new JLabel(getCampaign().getCampaignSummary().getPersonnelReport());
+        lblPersonnel = new ClickableLabel(
+              evt -> new PersonnelReportDialog(getCampaignGui().getFrame(),
+                    new PersonnelReport(getCampaign())).setVisible(true));
+        lblPersonnel.setHyperlinkMode(true);
         lblPersonnelHead.setLabelFor(lblPersonnel);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
@@ -402,8 +384,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             gridBagConstraints.insets = new Insets(1, 5, 1, 5);
             panInfo.add(lblHRCapacityHead, gridBagConstraints);
-            lblHRCapacity = new JLabel(getCampaign().getCampaignSummary()
-                                             .getHRCapacityReport(getCampaign()));
+            lblHRCapacity = new JLabel();
             lblHRCapacityHead.setLabelFor(lblHRCapacity);
             gridBagConstraints.gridx = 1;
             gridBagConstraints.weightx = 1.0;
@@ -418,7 +399,10 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(1, 5, 1, 5);
         panInfo.add(lblCompositionHead, gridBagConstraints);
-        lblComposition = new JLabel(getCampaign().getCampaignSummary().getForceCompositionReport());
+        lblComposition = new ClickableLabel(
+              evt -> new HangarReportDialog(getCampaignGui().getFrame(),
+                    new HangarReport(getCampaign())).setVisible(true));
+        lblComposition.setHyperlinkMode(true);
         lblCompositionHead.setLabelFor(lblComposition);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
@@ -432,7 +416,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(1, 5, 1, 5);
         panInfo.add(lblRepairStatusHead, gridBagConstraints);
-        lblRepairStatus = new JLabel(getCampaign().getCampaignSummary().getForceRepairReport());
+        lblRepairStatus = new JLabel();
         lblRepairStatusHead.setLabelFor(lblRepairStatus);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
@@ -446,7 +430,10 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(1, 5, 1, 5);
         panInfo.add(lblTransportCapacityHead, gridBagConstraints);
-        lblTransportCapacity = new JLabel(getCampaign().getCampaignSummary().getTransportCapacity());
+        lblTransportCapacity = new ClickableLabel(
+              evt -> new TransportReportDialog(getCampaignGui().getFrame(),
+                    new TransportReport(getCampaign())).setVisible(true));
+        lblTransportCapacity.setHyperlinkMode(true);
         lblTransportCapacityHead.setLabelFor(lblTransportCapacity);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
@@ -460,7 +447,10 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(1, 5, 1, 5);
         panInfo.add(lblCargoSummaryHead, gridBagConstraints);
-        lblCargoSummary = new JLabel(getCampaign().getCampaignSummary().getCargoCapacityReport().toString());
+        lblCargoSummary = new ClickableLabel(
+              evt -> new CargoReportDialog(getCampaignGui().getFrame(),
+                    new CargoReport(getCampaign())).setVisible(true));
+        lblCargoSummary.setHyperlinkMode(true);
         lblCargoSummaryHead.setLabelFor(lblCargoSummary);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
@@ -477,7 +467,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             gridBagConstraints.insets = new Insets(1, 5, 1, 5);
             panInfo.add(lblFacilityCapacitiesHead, gridBagConstraints);
-            lblFacilityCapacities = new JLabel(getCampaign().getCampaignSummary().getFacilityReport());
+            lblFacilityCapacities = new JLabel();
             lblFacilityCapacitiesHead.setLabelFor(lblFacilityCapacities);
             gridBagConstraints.gridx = 1;
             gridBagConstraints.weightx = 1.0;
@@ -499,12 +489,35 @@ public final class CommandCenterTab extends CampaignGuiTab {
         btnGoRogue.addActionListener(e -> new GoingRogue(getCampaign(), getCampaign().getCommander(),
               getCampaign().getSecondInCommand()));
 
+        RoundedJButton btnFacStanding = new RoundedJButton(resourceMap.getString("btnFactionStanding.text"));
+        btnFacStanding.setMaximumSize(new Dimension(Integer.MAX_VALUE, btnFacStanding.getPreferredSize().height));
+        btnFacStanding.addActionListener(evt -> {
+            FactionStandingReport factionStandingReport = new FactionStandingReport(getCampaignGui().getFrame(),
+                  getCampaign());
+
+            for (String report : factionStandingReport.getReports()) {
+                if (report != null && !report.isBlank()) {
+                    getCampaign().addReport(POLITICS, report);
+                }
+            }
+        });
+
+        RoundedJButton btnDiplomacy = new RoundedJButton(resourceMap.getString("btnDiplomacy.text"));
+        btnDiplomacy.setMaximumSize(new Dimension(Integer.MAX_VALUE, btnDiplomacy.getPreferredSize().height));
+        btnDiplomacy.addActionListener(evt -> new DiplomacyReport(getCampaignGui().getFrame(),
+              getCampaign().isClanCampaign(),
+              getCampaign().getLocalDate()));
+
         panFaction = new JPanel();
         panFaction.setLayout(new BoxLayout(panFaction, BoxLayout.Y_AXIS));
+
         panFaction.add(lblIcon);
         panFaction.add(Box.createVerticalStrut(5));
         panFaction.add(btnGoRogue);
-
+        panFaction.add(Box.createVerticalStrut(5));
+        panFaction.add(btnFacStanding);
+        panFaction.add(Box.createVerticalStrut(5));
+        panFaction.add(btnDiplomacy);
     }
 
     /**
@@ -808,68 +821,6 @@ public final class CommandCenterTab extends CampaignGuiTab {
         panProcurement.add(procurementTotalCostLabel, gridBagConstraints);
     }
 
-    /**
-     * Initialize the panel for displaying available reports
-     */
-    private void initReportsPanel() {
-        panReports = new JPanel(new GridLayout(8, 1, 0, 5));
-
-        RoundedJButton btnTransportReport = new RoundedJButton(resourceMap.getString("btnTransportReport.text"));
-        btnTransportReport.addActionListener(ev -> new TransportReportDialog(getCampaignGui().getFrame(),
-              new TransportReport(getCampaign())).setVisible(true));
-        panReports.add(btnTransportReport);
-
-        RoundedJButton btnHangarOverview = new RoundedJButton(resourceMap.getString("btnHangarOverview.text"));
-        btnHangarOverview.addActionListener(evt -> new HangarReportDialog(getCampaignGui().getFrame(),
-              new HangarReport(getCampaign())).setVisible(true));
-        panReports.add(btnHangarOverview);
-
-        RoundedJButton btnPersonnelOverview = new RoundedJButton(resourceMap.getString("btnPersonnelOverview.text"));
-        btnPersonnelOverview.addActionListener(evt -> new PersonnelReportDialog(getCampaignGui().getFrame(),
-              new PersonnelReport(getCampaign())).setVisible(true));
-        panReports.add(btnPersonnelOverview);
-
-        RoundedJButton btnCargoCapacity = new RoundedJButton(resourceMap.getString("btnCargoCapacity.text"));
-        btnCargoCapacity.addActionListener(evt -> new CargoReportDialog(getCampaignGui().getFrame(),
-              new CargoReport(getCampaign())).setVisible(true));
-        panReports.add(btnCargoCapacity);
-
-        btnUnitRating = new RoundedJButton(resourceMap.getString("btnUnitRating.text"));
-        btnUnitRating.addActionListener(evt -> new ReputationReportDialog(getCampaignGui().getFrame(),
-              getCampaign()).setVisible(true));
-        panReports.add(btnUnitRating);
-
-        RoundedJButton btnFactionStanding = new RoundedJButton(resourceMap.getString("btnFactionStanding.text"));
-        btnFactionStanding.addActionListener(evt -> {
-            FactionStandingReport factionStandingReport = new FactionStandingReport(getCampaignGui().getFrame(),
-                  getCampaign());
-
-            for (String report : factionStandingReport.getReports()) {
-                if (report != null && !report.isBlank()) {
-                    getCampaign().addReport(POLITICS, report);
-                }
-            }
-        });
-        panReports.add(btnFactionStanding);
-
-        RoundedJButton btnDiplomacy = new RoundedJButton(resourceMap.getString("btnDiplomacy.text"));
-        btnDiplomacy.addActionListener(evt -> new DiplomacyReport(getCampaignGui().getFrame(),
-              getCampaign().isClanCampaign(),
-              getCampaign().getLocalDate()));
-        panReports.add(btnDiplomacy);
-
-        RoundedJButton btnJumpFees = new RoundedJButton(resourceMap.getString("btnJumpFees.text"));
-        btnJumpFees.addActionListener(evt -> {
-            TransportCostCalculations transportCostCalculations =
-                  getCampaign().getTransportCostCalculation(EXP_REGULAR);
-            transportCostCalculations.calculateJumpCostForEachDay();
-            new JumpCostsSummary(getCampaignGui().getFrame(), transportCostCalculations);
-        });
-        panReports.add(btnJumpFees);
-
-        panReports.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString("panReports.title")));
-    }
-
     @Override
     public MHQTabType tabType() {
         return MHQTabType.COMMAND_CENTER;
@@ -920,7 +871,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         lblPersonnel.setText(campaignSummary.getPersonnelReport());
         lblMissionSuccess.setText(campaignSummary.getMissionSuccessReport());
         lblComposition.setText(campaignSummary.getForceCompositionReport());
-        lblCargoSummary.setText(campaignSummary.getCargoCapacityReport().toString());
+        lblCargoSummary.setText(campaignSummary.getCargoCapacityReport());
         lblRepairStatus.setText(campaignSummary.getForceRepairReport());
         lblTransportCapacity.setText(campaignSummary.getTransportCapacity());
 
@@ -973,7 +924,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
                                                                            .getFontColorWarningHexColor() +
                                                                      "'>" +
                                                                      ChronoUnit.DAYS.between(getCampaign().getLocalDate(),
-                                                                           scenario.getDate())) + " days</font</html>");
+                                                                           scenario.getDate())) + " days</font></html>");
                             }
                         }
                     }

@@ -96,11 +96,11 @@ public class FixedLocationTest {
 
     @Test
     void getLocationNode_noParentByDefault() {
-        assertNull(location.getLocationNode().getParent());
+        assertFalse(location.isParented());
     }
 
     @Test
     void getLocationNode_noChildrenByDefault() {
-        assertTrue(location.getLocationNode().getChildren().isEmpty());
+        assertTrue(location.getChildLocations().isEmpty());
     }
 }
