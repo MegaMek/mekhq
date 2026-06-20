@@ -88,10 +88,6 @@ public class LocationNewDayManager {
         Hangar hangar = place.getHangar();
         Warehouse warehouse = place.getWarehouse();
 
-        if (hangar == null && warehouse == null) {
-            return;
-        }
-
         if (hangar != null) {
             for (Unit unit : hangar.getUnits()) {
                 try {
@@ -128,11 +124,11 @@ public class LocationNewDayManager {
                 if (!part.isPresent()) {
                     int newDaysToArrival = part.getDaysToArrival() - 1;
                     if (campaign.getCampaignOptions().isNoDeliveriesInTransit() &&
-                              !campaign.getCurrentLocation().isOnPlanet() &&
+                              !place.isOnPlanet() &&
                               newDaysToArrival <= 0) {
                         return;
                     }
-                    part.setDaysToArrival(part.getDaysToArrival() - 1);
+                    part.setDaysToArrival(newDaysToArrival);
                     if (part.isPresent()) {
                         arrivedParts.add(part);
                     }
@@ -188,6 +184,7 @@ public class LocationNewDayManager {
                                 part.getUnit().getHyperlinkedName(),
                           "Invalid Auto-continue",
                           JOptionPane.ERROR_MESSAGE);
+                    continue;
                 }
 
                 if (part.isSpare() && (part.getQuantity() > 0)) {
@@ -207,7 +204,7 @@ public class LocationNewDayManager {
                     campaign.workOnMothballingOrActivation(unit);
                 }
                 if (!unit.isPresent()) {
-                    unit.checkArrival(!campaign.getCurrentLocation().isOnPlanet() &&
+                    unit.checkArrival(!place.isOnPlanet() &&
                                             campaign.getCampaignOptions().isNoDeliveriesInTransit());
                     if (unit.isPresent()) {
                         campaign.addReport(ACQUISITIONS, getFormattedTextAt(RESOURCE_BUNDLE,
@@ -224,19 +221,33 @@ public class LocationNewDayManager {
             }
             unitsToRemove.forEach(campaign::removeUnit);
         }
+
+        // Recursively process any child IPlaces (e.g., AcademyCampusLocations under this place,
+        // including bases that host their own on-campus academies).
+        if (place.hasLocationNode()) {
+            for (LocationNode child : place.getLocationNode().getChildren()) {
+                if (child.getLocatable() instanceof AcademyCampusLocation campus) {
+                    campus.getLocationNewDayManager().processNewDayUnits(campaign);
+                }
+            }
+        }
     }
 
     /**
-     * Runs {@link #processNewDayUnits(Campaign)} for every {@link IPlace} in the campaign: the main force, each
-     * {@link PlayerBase}, and each {@link AcademyCampusLocation} nested under the campaign's fixed locations.
+     * Runs {@link #processNewDayUnits(Campaign)} for every top-level {@link IPlace} in the
+     * campaign. Each call propagates recursively to child places (e.g., academy campuses hosted
+     * under a base or under a fixed planet location).
      */
     public static void processAllLocationUnits(Campaign campaign) {
+        // Main force — also picks up any local campus locations parented to Campaign's LocationNode
         campaign.getLocationNewDayManager().processNewDayUnits(campaign);
 
+        // Player bases — each propagates to its own child campuses via processNewDayUnits
         for (PlayerBase base : campaign.getPlayerBases()) {
             base.getLocationNewDayManager().processNewDayUnits(campaign);
         }
 
+        // Fixed planet locations — seed campus children; each campus propagates further
         for (AbstractLocation loc : campaign.getLocations()) {
             for (LocationNode child : loc.getLocationNode().getChildren()) {
                 if (child.getLocatable() instanceof AcademyCampusLocation campus) {
