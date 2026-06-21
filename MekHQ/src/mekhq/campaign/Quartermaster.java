@@ -621,9 +621,11 @@ public record Quartermaster(Campaign campaign) {
         //       quantity in the warehouse.
         campaign().addReport(ACQUISITIONS, part.getArrivalReport());
 
-        // Add the part back to the Warehouse, asking that
-        // it be merged with any existing spare part.
-        part = getWarehouse().addPart(part, true);
+        // Add the part back to the Warehouse it belongs to, asking that it be merged with
+        // any existing spare part. Use the part's own warehouse (e.g., a base warehouse)
+        // rather than always defaulting to the campaign's main warehouse.
+        Warehouse target = (part.getWarehouse() != null) ? part.getWarehouse() : getWarehouse();
+        part = target.addPart(part, true);
         MekHQ.triggerEvent(new PartArrivedEvent(part));
     }
 

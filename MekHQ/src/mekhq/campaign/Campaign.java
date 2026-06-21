@@ -1758,7 +1758,7 @@ public class Campaign implements ITechManager, IPlace {
     }
 
     public void addLocation(AbstractLocation location) {
-        if (location != null) {
+        if (location != null && !locations.contains(location)) {
             locations.add(location);
         }
     }
@@ -1805,11 +1805,16 @@ public class Campaign implements ITechManager, IPlace {
         return Collections.unmodifiableList(locations);
     }
 
+
     public void addPlayerBase(@Nullable PlayerBase base) {
         if (base == null) {
             return;
         }
         playerBases.add(base);
+        ILocation parent = base.getParent();
+        if (parent instanceof AbstractLocation abstractLocation) {
+            addLocation(abstractLocation);
+        }
         MekHQ.triggerEvent(new LocationAddedEvent(base));
     }
 
@@ -2254,6 +2259,18 @@ public class Campaign implements ITechManager, IPlace {
 
     public Collection<Unit> getUnits() {
         return getHangar().getUnits();
+    }
+
+    /**
+     * @return All player's units in {@code campaign}, not just the ones located with the main force.
+     */
+    public Collection<Unit> getAllUnits() {
+        List<Unit> units = new ArrayList<>();
+        for (AbstractLocation location : getLocations()) {
+            Set<Unit> found = location.fetchUnitsAtLocation();
+            units.addAll(found);
+        }
+        return units;
     }
 
     /**

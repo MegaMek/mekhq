@@ -102,7 +102,6 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.UUID;
-import javax.swing.JOptionPane;
 
 import megamek.codeUtilities.StringUtility;
 import megamek.common.options.OptionsConstants;
@@ -121,8 +120,7 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.location.ILocation;
-import mekhq.campaign.location.LocationUtils;
+import mekhq.campaign.location.LocationNewDayUtil;
 import mekhq.campaign.market.PartsInUseManager;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
@@ -137,9 +135,7 @@ import mekhq.campaign.mission.enums.ScenarioType;
 import mekhq.campaign.mission.rentals.ContractRentalType;
 import mekhq.campaign.mission.rentals.FacilityRentals;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
-import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInUse;
-import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.Bloodmark;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.InjuryType;
@@ -227,9 +223,6 @@ public class CampaignNewDayManager {
     private final Campaign campaign;
     private final CampaignOptions campaignOptions;
     private final Faction faction;
-    private final Hangar hangar;
-    private final Warehouse warehouse;
-    private final Quartermaster quartermaster;
     private final Finances finances;
     private LocalDate today;
     private AbstractLocation updatedLocation;
@@ -238,9 +231,6 @@ public class CampaignNewDayManager {
         this.campaign = campaign;
         this.campaignOptions = campaign.getCampaignOptions();
         this.faction = campaign.getFaction();
-        this.hangar = campaign.getAllHangar();
-        this.warehouse = campaign.getAllWarehouse();
-        this.quartermaster = campaign.getQuartermaster();
         this.finances = campaign.getFinances();
         this.updatedLocation = campaign.getCurrentLocation();
     }
@@ -705,7 +695,8 @@ public class CampaignNewDayManager {
     private void updateFieldKitchenCapacity() {
         if (campaignOptions.isUseFatigue()) {
             int fieldKitchenCapacity =
-                  checkFieldKitchenCapacity(campaign.getFormation(FORMATION_ORIGIN).getAllUnitsAsUnits(hangar,
+                  checkFieldKitchenCapacity(campaign.getFormation(FORMATION_ORIGIN)
+                                                  .getAllUnitsAsUnits(campaign.getHangar(),
                         false), campaignOptions.getFieldKitchenCapacity());
             int fieldKitchenUsage = checkFieldKitchenUsage(campaign.getActivePersonnel(false, false),
                   campaignOptions.isUseFieldKitchenIgnoreNonCombatants(), campaign);
@@ -1299,156 +1290,7 @@ public class CampaignNewDayManager {
             Maintenance.checkAndCorrectMaintenanceSchedule(campaign);
         }
 
-        // need to loop through units twice, the first time to do all maintenance and
-        // the second time to do whatever else. Otherwise, maintenance minutes might
-        // get sucked up by other stuff. campaign is also a good place to ensure that a
-        // unit's engineer gets reset and updated.
-        for (Unit unit : hangar.getUnits()) {
-            // do maintenance checks
-            try {
-                unit.resetEngineer();
-                if (null != unit.getEngineer()) {
-                    unit.getEngineer().resetMinutesLeft(campaignOptions.isTechsUseAdministration());
-                }
-
-                Maintenance.doMaintenance(campaign, unit);
-            } catch (Exception ex) {
-                LOGGER.error(ex,
-                      "Unable to perform maintenance on {} ({}) due to an error",
-                      unit.getName(),
-                      unit.getId().toString());
-                campaign.addReport(TECHNICAL, String.format("ERROR: An error occurred performing maintenance on %s, " +
-                                                                  "check the log",
-                      unit.getName()));
-            }
-        }
-
-        // need to check for assigned tasks in two steps to avoid
-        // concurrent modification problems
-        List<Part> assignedParts = new ArrayList<>();
-        List<Part> arrivedParts = new ArrayList<>();
-        warehouse.forEachPart(part -> {
-            if (part instanceof Refit) {
-                return;
-            }
-
-            if (part.getTech() != null) {
-                assignedParts.add(part);
-            }
-
-            // If the part is currently in-transit...
-            if (!part.isPresent()) {
-                // ... decrement the number of days until it arrives...
-                int newDaysToArrival = part.getDaysToArrival() - 1;
-
-                // If we're in transit and we don't allow deliveries while in transit the part will remain fixed with
-                // a delivery time of 1 day until we arrive at our destination.
-                if (campaignOptions.isNoDeliveriesInTransit() &&
-                          !campaign.getCurrentLocation().isOnPlanet() &&
-                          newDaysToArrival <= 0) {
-                    return;
-                }
-
-                part.setDaysToArrival(part.getDaysToArrival() - 1);
-
-                if (part.isPresent()) {
-                    // ... and mark the part as arrived if it is now here.
-                    arrivedParts.add(part);
-                }
-            }
-        });
-
-        // arrive parts before attempting refit or parts will not get reserved that day
-        for (Part part : arrivedParts) {
-            quartermaster.arrivePart(part);
-        }
-
-        // finish up any overnight assigned tasks
-        for (Part part : assignedParts) {
-            Person tech;
-            if ((part.getUnit() != null) && (part.getUnit().getEngineer() != null)) {
-                tech = part.getUnit().getEngineer();
-            } else {
-                tech = part.getTech();
-            }
-
-            if (null != tech) {
-                // If the tech has moved to a different location since the assignment was made,
-                // cancel it and notify the player rather than silently failing.
-                ILocation repairTarget = (part.getUnit() != null) ? part.getUnit() : part;
-                if (!LocationUtils.areSameEffectiveLocation(tech, repairTarget)) {
-                    campaign.addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE,
-                          "CampaignNewDayManager.techAtDifferentLocation",
-                          tech.getHyperlinkedFullTitle(),
-                          part.getName()));
-                    part.cancelAssignment(true);
-                    continue;
-                }
-                if (null != tech.getSkillForWorkingOn(part)) {
-                    try {
-                        campaign.fixPart(part, tech);
-                    } catch (Exception ex) {
-                        LOGGER.error(ex,
-                              "Could not perform overnight maintenance on {} ({}) due to an error",
-                              part.getName(),
-                              part.getId());
-                        campaign.addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE,
-                              "CampaignNewDayManager.maintenanceError.report",
-                              part.getName()));
-                    }
-                } else {
-                    campaign.addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE,
-                          "CampaignNewDayManager.techAbort.report",
-                          tech.getHyperlinkedFullTitle(),
-                          part.getName()));
-                    part.cancelAssignment(false);
-                }
-            } else {
-                JOptionPane.showMessageDialog(null,
-                      "Could not find tech for part: " +
-                            part.getName() +
-                            " on unit: " +
-                            part.getUnit().getHyperlinkedName(),
-                      "Invalid Auto-continue",
-                      JOptionPane.ERROR_MESSAGE);
-            }
-
-            // check to see if campaign part can now be combined with other spare parts
-            if (part.isSpare() && (part.getQuantity() > 0)) {
-                quartermaster.addPart(part, 0, false);
-            }
-        }
-
-        // ok now we can check for other stuff we might need to do to units
-        int defaultRepairSite = AtBContract.getBestRepairLocation(campaign.getActiveAtBContracts());
-        List<UUID> unitsToRemove = new ArrayList<>();
-        for (Unit unit : hangar.getUnits()) {
-            if (unit.isRefitting()) {
-                campaign.refit(unit.getRefit());
-            }
-            if (unit.isMothballing()) {
-                campaign.workOnMothballingOrActivation(unit);
-            }
-            if (!unit.isPresent()) {
-                unit.checkArrival(!campaign.getCurrentLocation().isOnPlanet() &&
-                                        campaignOptions.isNoDeliveriesInTransit());
-
-                // Has unit just been delivered?
-                if (unit.isPresent()) {
-                    campaign.addReport(ACQUISITIONS, String.format(resources.getString("unitArrived.text"),
-                          unit.getHyperlinkedName(),
-                          spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-                          CLOSING_SPAN_TAG));
-                    unit.setSite(defaultRepairSite);
-                }
-            }
-
-            if (!unit.isRepairable() && !unit.hasSalvageableParts()) {
-                unitsToRemove.add(unit.getId());
-            }
-        }
-        // Remove any unrepairable, unsalvageable units
-        unitsToRemove.forEach(campaign::removeUnit);
+        LocationNewDayUtil.processAllLocationUnits(campaign);
 
         // Finally, run Mass Repair Mass Salvage if desired
         if (MekHQ.getMHQOptions().getNewDayMRMS()) {
@@ -2166,7 +2008,7 @@ public class CampaignNewDayManager {
             }
 
             if (today.equals(contract.getStartDate())) {
-                hangar.getUnits().forEach(unit -> unit.setSite(contract.getRepairLocation()));
+                campaign.getHangar().getUnits().forEach(unit -> unit.setSite(contract.getRepairLocation()));
             }
 
             if (today.getDayOfWeek() == DayOfWeek.MONDAY) {
@@ -2247,8 +2089,8 @@ public class CampaignNewDayManager {
                         // Merely removing the unit from deployment would break with user expectation
                         boolean forceUnderRepair = false;
                         for (UUID uid : campaign.getFormationIds().get(forceId).getAllUnits(false)) {
-                            Unit u = hangar.getUnit(uid);
-                            if ((u != null) && u.isUnderRepair()) {
+                            Unit unit = campaign.getUnit(uid);
+                            if ((unit != null) && unit.isUnderRepair()) {
                                 forceUnderRepair = true;
                                 break;
                             }
@@ -2334,7 +2176,8 @@ public class CampaignNewDayManager {
     private void updateMASHTheatreCapacity() {
         if (campaignOptions.isUseMASHTheatres()) {
             int mashTheatreCapacity =
-                  MASHCapacity.checkMASHCapacity(campaign.getFormation(FORMATION_ORIGIN).getAllUnitsAsUnits(hangar,
+                  MASHCapacity.checkMASHCapacity(campaign.getFormation(FORMATION_ORIGIN)
+                                                       .getAllUnitsAsUnits(campaign.getHangar(),
                         false), campaignOptions.getMASHTheatreCapacity());
             mashTheatreCapacity += FacilityRentals.getCapacityIncreaseFromRentals(campaign.getActiveContracts(),
                   ContractRentalType.HOSPITAL_BEDS);
