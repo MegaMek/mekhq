@@ -36,22 +36,28 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOpti
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.Desktop;
 import java.awt.FlowLayout;
 import java.awt.GridBagLayout;
 import java.io.File;
 import java.util.ResourceBundle;
 import javax.swing.BoxLayout;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.UIManager;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.client.ui.util.UIUtil;
+import megamek.logging.MMLogger;
 import mekhq.CampaignPreset;
 import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
@@ -77,6 +83,8 @@ import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
  * </ul>
  */
 public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
+    private static final MMLogger LOGGER = MMLogger.create(CampaignOptionsDialog.class);
+
     private static final int BUTTON_GAP = UIUtil.scaleForGUI(8);
 
     private final Campaign campaign;
@@ -266,37 +274,51 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
     }
 
     /**
-     * Handles the "Save Preset" button action. Opens a dialog to create a new preset and save the campaign
-     * configuration to a file if confirmed.
+     * Handles the "Save Preset" button action. Opens the preset builder dialog and, when confirmed, saves the preset
+     * to the user campaign-preset directory.
+     *
+     * <p>If saving would overwrite an existing preset and the user declines, the builder is re-opened seeded with the
+     * just-entered selections so the user can adjust the name (or anything else) without recreating the preset from
+     * scratch.</p>
      */
     private void btnSaveActionPerformed() {
-        final CreateCampaignPreset createCampaignPresetDialog = new CreateCampaignPreset(null, campaign, null);
+        CampaignPreset preset = null;
 
-        if (!createCampaignPresetDialog.showDialog().isConfirmed()) {
+        while (true) {
+            final CreateCampaignPreset createCampaignPresetDialog = new CreateCampaignPreset(null, campaign, preset);
+
+            if (!createCampaignPresetDialog.showDialog().isConfirmed()) {
+                return;
+            }
+
+            preset = createCampaignPresetDialog.getPreset();
+            if (preset == null) {
+                return;
+            }
+
+            final File presetFile = resolveUserPresetFile(preset);
+            if (presetFile.exists() && !confirmPresetOverwrite(preset)) {
+                // The user declined to overwrite: loop to re-open the builder seeded with their selections.
+                continue;
+            }
+
+            campaignOptionsPane.applyCampaignOptionsToCampaign(preset, mode, true);
+            preset.writeToFile(getFrame(), presetFile);
+            showSavePresetSuccessDialog(preset, presetFile.getParentFile(), presetFile);
             return;
         }
-
-        final CampaignPreset preset = createCampaignPresetDialog.getPreset();
-        if (preset == null) {
-            return;
-        }
-
-        campaignOptionsPane.applyCampaignOptionsToCampaign(preset, mode, true);
-
-        savePresetToUserDirectory(preset);
     }
 
     /**
-     * Saves the given preset directly into the user campaign-preset directory (the folder the "Load Preset" picker
-     * scans), so it is immediately available to load without a separate file chooser.
+     * Resolves the destination file for the given preset within the user campaign-preset directory (the folder the
+     * "Load Preset" picker scans), creating the directory if it does not yet exist. The preset title is sanitized into
+     * a valid file name.
      *
-     * <p>The directory is created if it does not exist, and the preset title is sanitized into a valid file name. If a
-     * preset file of the same name already exists, the user is asked to confirm overwriting it; on success a
-     * confirmation is shown.</p>
+     * @param preset the preset to resolve a file for
      *
-     * @param preset the preset to save
+     * @return the file the preset should be written to
      */
-    private void savePresetToUserDirectory(final CampaignPreset preset) {
+    private File resolveUserPresetFile(final CampaignPreset preset) {
         final File presetDirectory = new File(MHQConstants.USER_CAMPAIGN_PRESET_DIRECTORY);
         if (!presetDirectory.exists()) {
             presetDirectory.mkdirs();
@@ -306,25 +328,74 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
         if (fileName.isBlank()) {
             fileName = "Campaign Preset";
         }
-        final File presetFile = new File(presetDirectory, fileName + " Preset.xml");
+        return new File(presetDirectory, fileName + " Preset.xml");
+    }
 
-        if (presetFile.exists()) {
-            int choice = JOptionPane.showConfirmDialog(getFrame(),
-                  getFormattedTextAt(getCampaignOptionsResourceBundle(), "savePresetOverwrite.text", preset.toString()),
-                  getTextAt(getCampaignOptionsResourceBundle(), "savePresetOverwrite.title"),
-                  JOptionPane.YES_NO_OPTION,
-                  JOptionPane.WARNING_MESSAGE);
-            if (choice != JOptionPane.YES_OPTION) {
-                return;
+    /**
+     * Asks the user to confirm overwriting an existing preset file of the same name.
+     *
+     * @param preset the preset being saved
+     *
+     * @return {@code true} if the user chose to overwrite the existing file
+     */
+    private boolean confirmPresetOverwrite(final CampaignPreset preset) {
+        final int choice = JOptionPane.showConfirmDialog(getFrame(),
+              getFormattedTextAt(getCampaignOptionsResourceBundle(), "savePresetOverwrite.text", preset.toString()),
+              getTextAt(getCampaignOptionsResourceBundle(), "savePresetOverwrite.title"),
+              JOptionPane.YES_NO_OPTION,
+              JOptionPane.WARNING_MESSAGE);
+        return choice == JOptionPane.YES_OPTION;
+    }
+
+    /**
+     * Shows a confirmation that the preset was saved, including a selectable field with the full file path so the user
+     * can copy it. When desktop integration supports it, an inline folder button beside the path opens the preset
+     * directory in the system file manager without closing this dialog.
+     *
+     * @param preset          the preset that was saved
+     * @param presetDirectory the directory the preset was saved into
+     * @param presetFile      the file the preset was saved to
+     */
+    private void showSavePresetSuccessDialog(final CampaignPreset preset, final File presetDirectory,
+          final File presetFile) {
+        final String bundle = getCampaignOptionsResourceBundle();
+
+        final JTextField pathField = new JTextField(presetFile.getAbsolutePath());
+        pathField.setEditable(false);
+        pathField.setCaretPosition(0);
+        pathField.setColumns(Math.min(pathField.getText().length() + 1, 50));
+
+        final JPanel pathPanel = new JPanel(new BorderLayout(BUTTON_GAP, 0));
+        pathPanel.add(pathField, BorderLayout.CENTER);
+
+        if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.OPEN)) {
+            final JButton openFolderButton = new JButton();
+            final Icon folderIcon = UIManager.getIcon("FileView.directoryIcon");
+            if (folderIcon != null) {
+                openFolderButton.setIcon(folderIcon);
+            } else {
+                openFolderButton.setText(getTextAt(bundle, "savePresetSuccess.openFolder"));
             }
+            openFolderButton.setToolTipText(getTextAt(bundle, "savePresetSuccess.openFolder"));
+            openFolderButton.addActionListener(evt -> {
+                try {
+                    Desktop.getDesktop().open(presetDirectory);
+                } catch (Exception ex) {
+                    LOGGER.error(ex, "Failed to open campaign preset folder: {}", presetDirectory);
+                }
+            });
+            pathPanel.add(openFolderButton, BorderLayout.LINE_END);
         }
 
-        preset.writeToFile(getFrame(), presetFile);
+        final Object[] message = {
+              getFormattedTextAt(bundle, "savePresetSuccess.text", preset.toString()),
+              " ",
+              getTextAt(bundle, "savePresetSuccess.location"),
+              pathPanel };
 
         JOptionPane.showMessageDialog(getFrame(),
-              getFormattedTextAt(getCampaignOptionsResourceBundle(), "savePresetSuccess.text",
-                    preset.toString(), presetFile.getAbsolutePath()),
-              getTextAt(getCampaignOptionsResourceBundle(), "savePresetSuccess.title"),
+              message,
+              getTextAt(bundle, "savePresetSuccess.title"),
               JOptionPane.INFORMATION_MESSAGE);
     }
 

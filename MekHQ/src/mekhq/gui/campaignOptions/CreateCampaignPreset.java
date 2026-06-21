@@ -126,8 +126,8 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         super(frame, "CreateCampaignPresetDialog", "CreateCampaignPresetDialog.title");
         this.campaign = campaign;
         setPreset(preset);
-        setDate(campaign.getLocalDate());
-        setCompanyGenerationOptions(null);
+        setDate(((preset == null) || (preset.getDate() == null)) ? campaign.getLocalDate() : preset.getDate());
+        setCompanyGenerationOptions((preset == null) ? null : preset.getCompanyGenerationOptions());
         this.gameOptions = ((preset == null) || (preset.getGameOptions() == null))
                                  ? campaign.getGameOptions() : preset.getGameOptions();
         this.campaignOptions = ((preset == null) || (preset.getCampaignOptions() == null))
@@ -798,6 +798,10 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         }
         getChkGM().setSelected((getPreset() == null) ? getCampaign().isGM() : getPreset().isGM());
 
+        if (getPreset() != null) {
+            restorePresetSelections(getPreset());
+        }
+
         // Size to the preferred (layout) height so the buttons sit directly under the
         // content, with no band of empty
         // space above them. The height is set explicitly rather than via
@@ -810,6 +814,40 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         final Dimension preferredSize = getPreferredSize();
         setMinimumSize(preferredSize);
         setSize(Math.max(getWidth(), preferredSize.width), preferredSize.height);
+    }
+
+    /**
+     * Repopulates the editable fields and "Specify ..." toggles from an existing preset, so re-opening this dialog
+     * with a previously created preset preserves the user's selections rather than resetting to defaults. The combo
+     * boxes, contract count and GM flag are already restored from the preset earlier in
+     * {@link #finalizeInitialization()}.
+     *
+     * @param preset the preset whose selections should be restored
+     */
+    private void restorePresetSelections(final CampaignPreset preset) {
+        getTxtPresetName().setText(preset.getTitle());
+        getTxtPresetDescription().setText(preset.getDescription());
+
+        setSpecifyToggle(getChkSpecifyDate(), preset.getDate() != null);
+        setSpecifyToggle(getChkSpecifyFaction(), preset.getFaction() != null);
+        setSpecifyToggle(getChkSpecifyPlanet(), preset.getPlanet() != null);
+        setSpecifyToggle(getChkSpecifyRankSystem(), preset.getRankSystem() != null);
+        setSpecifyToggle(getChkSpecifyCompanyGenerationOptions(), preset.getCompanyGenerationOptions() != null);
+        setSpecifyToggle(getChkSpecifyGameOptions(), preset.getGameOptions() != null);
+        setSpecifyToggle(getChkSpecifyCampaignOptions(), preset.getCampaignOptions() != null);
+    }
+
+    /**
+     * Sets a "Specify ..." checkbox to the desired state, using {@link JCheckBox#doClick()} when the state actually
+     * needs to change so its action listener fires and enables or disables the dependent controls accordingly.
+     *
+     * @param checkBox the checkbox to update
+     * @param selected the desired selected state
+     */
+    private static void setSpecifyToggle(final JCheckBox checkBox, final boolean selected) {
+        if (checkBox.isSelected() != selected) {
+            checkBox.doClick();
+        }
     }
 
     @Override
