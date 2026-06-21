@@ -34,13 +34,18 @@ package mekhq.campaign;
 
 import java.util.UUID;
 
+import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
+import mekhq.campaign.events.StoryFinishedEvent;
 import mekhq.campaign.market.PersonnelMarket;
+
+import javax.swing.SwingUtilities;
 
 /**
  * Manages the timeline of a {@link Campaign}.
  */
 public class CampaignController {
+    private final MekHQ app;
     private final Campaign localCampaign;
     private boolean isHost;
     private UUID host;
@@ -51,7 +56,8 @@ public class CampaignController {
      *
      * @param campaign The {@link Campaign} being used locally.
      */
-    public CampaignController(Campaign campaign) {
+    public CampaignController(MekHQ app, Campaign campaign) {
+        this.app = app;
         localCampaign = campaign;
         campaignEventProcessor = new CampaignEventProcessor(campaign);
     }
@@ -65,6 +71,7 @@ public class CampaignController {
             MekHQ.registerHandler(personnelMarket);
         }
         MekHQ.registerHandler(campaignEventProcessor);
+        MekHQ.registerHandler(this);
     }
 
     /**
@@ -79,6 +86,7 @@ public class CampaignController {
             MekHQ.unregisterHandler(personnelMarket);
         }
         MekHQ.unregisterHandler(campaignEventProcessor);
+        MekHQ.unregisterHandler(this);
     }
 
     /**
@@ -124,4 +132,12 @@ public class CampaignController {
     public void advanceDay() {
         getLocalCampaign().newDay();
     }
+
+    @Subscribe
+    public void handle(StoryFinishedEvent event) {
+        // do on a different thread, because restart will trigger event bus registrations which can
+        // lead to ConcurrentModificationException if done on the event bus trigger thread
+        SwingUtilities.invokeLater(app::restart);
+    }
+
 }

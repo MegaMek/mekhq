@@ -73,6 +73,14 @@ public class SkillCheck extends ActionCheck<SkillCheck> {
         this.skillType = SkillType.getType(skillName);
     }
 
+    public SkillType getSkillType() {
+        return skillType;
+    }
+
+    public boolean isEasierThan(SkillCheck other) {
+        return !targetNumber.cannotSucceed() && (targetNumber.getValue() < other.targetNumber.getValue());
+    }
+
     @Override
     protected SkillCheck getThis() {
         return this;

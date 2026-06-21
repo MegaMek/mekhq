@@ -38,6 +38,7 @@ import java.text.ParseException;
 import megamek.Version;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.events.StoryFinishedEvent;
 import mekhq.campaign.storyArc.StoryTrigger;
 import org.w3c.dom.Node;
 
@@ -49,8 +50,7 @@ public class GameOverStoryTrigger extends StoryTrigger {
 
     @Override
     protected void execute() {
-        MekHQ.unregisterHandler(getCampaign().getStoryArc());
-        getCampaign().getApp().restart();
+        MekHQ.triggerEvent(new StoryFinishedEvent(getCampaign()));
     }
 
     @Override
