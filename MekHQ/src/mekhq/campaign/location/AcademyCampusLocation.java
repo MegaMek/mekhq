@@ -79,8 +79,7 @@ public class AcademyCampusLocation implements IPlace {
     public String getAcademyName() {
         return academyName;
     }
-
-
+    
     public @Nullable Academy getAcademy() {
         return AcademyFactory.getInstance().getAcademy(academySet, academyName);
     }
