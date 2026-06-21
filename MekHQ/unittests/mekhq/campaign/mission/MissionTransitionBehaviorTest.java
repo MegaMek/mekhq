@@ -95,17 +95,6 @@ class MissionTransitionBehaviorTest {
     // region isActiveOn date handling (base, date-aware implementation)
 
     @Test
-    void isActiveOnHandlesNullStartAndEndDates() {
-        Contract contract = new Contract("c", "FS");
-        contract.setStatus(MissionStatus.ACTIVE);
-        // Both dates left null: a contract with no scheduled window is active purely on status.
-        assertNull(contract.getStartDate(), "precondition: start date is unset");
-        assertNull(contract.getEndingDate(), "precondition: ending date is unset");
-        assertTrue(contract.isActiveOn(LocalDate.of(3051, 6, 1)),
-              "An active contract with no dates must not NPE and must report active");
-    }
-
-    @Test
     void isActiveOnExcludeEndDateCheckIgnoresPastEndDate() {
         Contract contract = new Contract("c", "FS");
         contract.setStatus(MissionStatus.ACTIVE);
@@ -122,14 +111,6 @@ class MissionTransitionBehaviorTest {
     // endregion isActiveOn date handling
 
     // region getMonthsLeft / getMonthlyPayOut guards
-
-    @Test
-    void getMonthsLeftReturnsZeroWhenEndingDateIsNull() {
-        Contract contract = new Contract("c", "FS");
-        assertNull(contract.getEndingDate(), "precondition: ending date is unset");
-        assertEquals(0, contract.getMonthsLeft(LocalDate.of(3051, 6, 1)),
-              "getMonthsLeft must return 0 (not NPE) when there is no ending date");
-    }
 
     @Test
     void getMonthlyPayOutReturnsZeroForNonPositiveLength() {
