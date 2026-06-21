@@ -439,8 +439,8 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
         return (getMarketTable().getSelectedRow() < 0) ?
                      null :
                      getMarketModel().getOffer(getMarketTable().convertRowIndexToModel(getMarketTable().getSelectedRow()))
-                     .map(UnitMarketOffer::getEntity)
-                     .orElse(null);
+                           .map(UnitMarketOffer::getEntity)
+                           .orElse(null);
     }
 
     /**
@@ -518,7 +518,8 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
                               entity.getShortName()));
         }
 
-        finalizeEntityAcquisition(offers, getCampaign().getCampaignOptions().isInstantUnitMarketDelivery());
+        boolean isInstantDelivery = getCampaign().getCampaignOptions().isInstantUnitMarketDelivery();
+        finalizeEntityAcquisition(offers, isInstantDelivery);
     }
 
     public void addSelectedOffers() {
@@ -538,9 +539,12 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
      */
     private void finalizeEntityAcquisition(final List<UnitMarketOffer> offers, final boolean instantDelivery) {
         for (final UnitMarketOffer offer : offers) {
+            boolean isEmployerMarket = offer.getMarketType().isEmployer();
+            int transitDuration = instantDelivery || isEmployerMarket ? 0 : offer.getTransitDuration();
+
             getCampaign().addNewUnit(offer.getEntity(),
                   false,
-                  instantDelivery ? 0 : offer.getTransitDuration(),
+                  transitDuration,
                   UnitMarketType.getQuality(campaign, offer.getMarketType()));
 
             if (!instantDelivery) {
