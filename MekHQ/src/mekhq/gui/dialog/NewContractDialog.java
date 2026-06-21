@@ -406,7 +406,7 @@ public class NewContractDialog extends JDialog {
         spnMultiplier.addChangeListener(contractUpdateChangeListener);
 
         DefaultComboBoxModel<String> overheadModel = new DefaultComboBoxModel<>();
-        for (int i = 0; i < Contract.OH_NUM; i++) {
+        for (int i = 0; i < Contract.OVERHEAD_COMPENSATION_OPTION_COUNT; i++) {
             overheadModel.addElement(Contract.getOverheadCompensationName(i));
         }
         choiceOverhead = new JComboBox<>(overheadModel);

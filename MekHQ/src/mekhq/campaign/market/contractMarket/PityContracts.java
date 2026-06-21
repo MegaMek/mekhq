@@ -36,7 +36,7 @@ import static java.lang.Math.max;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.enums.SkillLevel.GREEN;
 import static megamek.common.enums.SkillLevel.VETERAN;
-import static mekhq.campaign.mission.Contract.OH_NONE;
+import static mekhq.campaign.mission.Contract.OVERHEAD_COMPENSATION_NONE;
 import static mekhq.campaign.mission.ContractDifficulty.calculateContractDifficulty;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 
@@ -185,7 +185,7 @@ public class PityContracts {
 
         int supportRoll = d6(1) * 10;
         contract.setStraightSupport(supportRoll);
-        contract.setOverheadCompensation(OH_NONE);
+        contract.setOverheadCompensation(OVERHEAD_COMPENSATION_NONE);
 
         int battleLossRoll = d6(1) * 10;
         contract.setBattleLossCompensation(battleLossRoll);

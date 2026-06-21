@@ -33,6 +33,7 @@
 package mekhq.campaign.mission;
 
 import static java.lang.Math.ceil;
+import static megamek.client.generator.RandomNameGenerator.KEY_DEFAULT_FACTION;
 import static megamek.client.ui.util.PlayerColour.BLUE;
 import static megamek.client.ui.util.PlayerColour.RED;
 import static megamek.common.enums.SkillLevel.REGULAR;
@@ -45,7 +46,6 @@ import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
 import static mekhq.campaign.mission.enums.ContractCommandRights.INDEPENDENT;
 import static mekhq.campaign.personnel.ranks.Rank.RO_MIN;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
-import static mekhq.campaign.universe.Faction.INDEPENDENT_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -99,45 +99,56 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class AbstractMissionTransition {
+public abstract class AbstractMissionTransition {
     private static final MMLogger LOGGER = MMLogger.create(AbstractMissionTransition.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.AbstractMission";
 
-    private String name;
-    private int id = -1;
-    private StratConCampaignState stratConCampaignState;
-    private int contractScoreArbitraryModifier;
+    private final static int NO_ID = -1;
+
+    private final static int MRBC_FEE_PERCENTAGE = 5;
+    private final static int DEFAULT_SHARES_PERCENT = 30;
+    public static final int UNKNOWN_DIFFICULTY = -99;
+
+    public final static int OVERHEAD_COMPENSATION_NONE = 0;
+    public final static int OVERHEAD_COMPENSATION_OH_HALF = 1;
+    public final static int OVERHEAD_COMPENSATION_FULL = 2;
+    public final static int OVERHEAD_COMPENSATION_OPTION_COUNT = 3;
+
+    private String name = getText("AbstractMission.contractTypeName.default");
+    private int id = NO_ID;
+    private StratConCampaignState stratConCampaignState = null;
+    private int contractScoreArbitraryModifier = 0;
     private MissionStatus status = MissionStatus.ACTIVE;
     private String contractTypeName = getText("AbstractMission.contractTypeName.default");
     private AtBContractType contractType = UNDEFINED;
-    private String description;
+    private String description = "";
 
-    private String systemId;
-    private String legacyPlanetName;
+    private String systemId = "";
+    private String legacyPlanetName = "";
     /*
      * This is a transient variable meant to keep track of a single jump path while the contract runs through initial
      * calculations, as the same jump path is referenced multiple times and calculating it each time is expensive. No
      * need to preserve it in save data.
      */
-    private transient JumpPath cachedJumpPath;
+    private transient JumpPath cachedJumpPath = new JumpPath();
 
-    private LocalDate startDate;
-    private LocalDate endingDate;
+    private LocalDate startDate = LocalDate.of(1, 1, 1);
+    private LocalDate endingDate = LocalDate.of(999999, 1, 1);
     private int lengthInMonths = 1;
 
-    private String employerCode = INDEPENDENT_FACTION_CODE;
-    private String employerName = getText("AbstractMission.belligerentName.default");
-    private Person employerLiaison;
+    private String employerCode = KEY_DEFAULT_FACTION;
+    private String employerName = getText("AbstractMission.allyBotName.default");
+    private Person employerLiaison = null;
     private SkillLevel allySkill = REGULAR;
     private int allyQuality = DragoonRating.DRAGOON_C.getRating();
     private String allyBotName = getText("AbstractMission.allyBotName.default");
     private Camouflage allyCamouflage = new Camouflage(Camouflage.COLOUR_CAMOUFLAGE, PlayerColour.RED.name());
     private PlayerColour allyColour = RED;
 
-    private String enemyCode = INDEPENDENT_FACTION_CODE;
-    private String enemyName = getText("AbstractMission.belligerentName.default");
-    private String enemyMercenaryEmployerCode;
-    private Person clanOpponent;
+    private String enemyCode = KEY_DEFAULT_FACTION;
+    private String enemyName = getText("AbstractMission.enemyBotName.default");
+    private String enemyMercenaryEmployerCode = null;
+    private Person clanOpponent = null;
     private boolean batchallAccepted = true;
     private SkillLevel enemySkill = REGULAR;
     private int enemyQuality = DragoonRating.DRAGOON_C.getRating();
@@ -149,14 +160,14 @@ public class AbstractMissionTransition {
 
     private double paymentMultiplier = 1.0;
     private ContractCommandRights commandRights = INDEPENDENT;
-    private int overheadCompensation = OH_NONE;
-    private int straightSupport;
-    private int battleLossCompensation;
-    private int salvagePercent;
-    private int transportCompensation;
+    private int overheadCompensation = OVERHEAD_COMPENSATION_NONE;
+    private int straightSupport = 0;
+    private int battleLossCompensation = 0;
+    private int salvagePercent = 0;
+    private int transportCompensation = 0;
 
     // need to keep track of total value salvaged for salvage rights
-    private boolean salvageExchange;
+    private boolean salvageExchange = false;
     private Money salvagedByUnit = Money.zero();
     private Money salvagedByEmployer = Money.zero();
 
@@ -173,37 +184,28 @@ public class AbstractMissionTransition {
     private boolean paidMRBCFee = true;
     private int mrbcFeePercent = MRBC_FEE_PERCENTAGE;
     private int sharesPercent = DEFAULT_SHARES_PERCENT;
-    private int advancePercent;
-    private int signingBonus;
+    private int advancePercent = 0;
+    private int signingBonus = 0;
 
-    private int hospitalBedsRented;
-    private int kitchensRented;
-    private int holdingCellsRented;
-    private int partsAvailabilityLevel;
+    private int hospitalBedsRented = 0;
+    private int kitchensRented = 0;
+    private int holdingCellsRented = 0;
+    private int partsAvailabilityLevel = 0;
 
-    private int requiredCombatTeams;
-    private int requiredCombatElements;
+    private int requiredCombatTeams = 0;
+    private int requiredCombatElements = 0;
 
-    private boolean isPlayerAttacker;
-    private int contractNegotiationCommandRoll;
-    private int contractNegotiationSalvageRoll;
-    private int contractNegotiationSupportRoll;
-    private int contractNegotiationTransportRoll;
+    private boolean isPlayerAttacker = false;
+    private int contractNegotiationCommandRoll = 0;
+    private int contractNegotiationSalvageRoll = 0;
+    private int contractNegotiationSupportRoll = 0;
+    private int contractNegotiationTransportRoll = 0;
 
     private AtBMoraleLevel moraleLevel = STALEMATE;
-    private LocalDate routEndDate;
-    private Money routedPayout = null;
+    private LocalDate routEndDate = null;
+    private Money routedPayout = Money.zero();
 
     private final List<Scenario> scenarios = new ArrayList<>();
-
-    private final static int MRBC_FEE_PERCENTAGE = 5;
-    private final static int DEFAULT_SHARES_PERCENT = 30;
-    public static final int UNKNOWN_DIFFICULTY = -99;
-
-    public final static int OH_NONE = 0;
-    public final static int OH_HALF = 1;
-    public final static int OH_FULL = 2;
-    public final static int OH_NUM = 3;
 
     public AbstractMissionTransition() {}
 
@@ -897,9 +899,9 @@ public class AbstractMissionTransition {
 
     public static String getOverheadCompensationName(int i) {
         return switch (i) {
-            case OH_NONE -> "None";
-            case OH_HALF -> "Half";
-            case OH_FULL -> "Full";
+            case OVERHEAD_COMPENSATION_NONE -> "None";
+            case OVERHEAD_COMPENSATION_OH_HALF -> "Half";
+            case OVERHEAD_COMPENSATION_FULL -> "Full";
             default -> "?";
         };
     }
@@ -1291,12 +1293,12 @@ public class AbstractMissionTransition {
 
         // calculate overhead
         switch (getOverheadCompensation()) {
-            case OH_HALF:
+            case OVERHEAD_COMPENSATION_OH_HALF:
                 setOverheadAmount(accountant.getOverheadExpenses()
                                         .multipliedBy(getLengthInMonths())
                                         .multipliedBy(0.5));
                 break;
-            case OH_FULL:
+            case OVERHEAD_COMPENSATION_FULL:
                 setOverheadAmount(accountant.getOverheadExpenses().multipliedBy(getLengthInMonths()));
                 break;
             default:

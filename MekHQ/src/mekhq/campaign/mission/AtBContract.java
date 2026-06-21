@@ -162,11 +162,11 @@ public class AtBContract extends AbstractMissionTransition {
         int battalionSize = getStandardFormationSize(campaign.getFaction(), BATTALION.getDepth());
 
         if (ContractUtilities.getEffectiveNumUnits(campaign) <= companySize) {
-            setOverheadCompensation(OH_FULL);
+            setOverheadCompensation(OVERHEAD_COMPENSATION_FULL);
         } else if (ContractUtilities.getEffectiveNumUnits(campaign) <= battalionSize) {
-            setOverheadCompensation(OH_HALF);
+            setOverheadCompensation(OVERHEAD_COMPENSATION_OH_HALF);
         } else {
-            setOverheadCompensation(OH_NONE);
+            setOverheadCompensation(OVERHEAD_COMPENSATION_NONE);
         }
 
         int currentYear = campaign.getGameYear();
