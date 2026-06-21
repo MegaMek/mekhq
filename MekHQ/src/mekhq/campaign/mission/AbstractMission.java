@@ -196,7 +196,7 @@ public class AbstractMission {
     private final List<Scenario> scenarios = new ArrayList<>();
 
     protected final Map<String, BiConsumer<String, Campaign>> fieldSetters = new HashMap<>();
-    protected final Map<String, BiConsumer<Node, Campaign>> nodeSetters = new HashMap<>();
+    protected final Map<String, NodeSetter> nodeSetters = new HashMap<>();
 
     private final static int MRBC_FEE_PERCENTAGE = 5;
     private final static int DEFAULT_SHARES_PERCENT = 30;
@@ -209,6 +209,7 @@ public class AbstractMission {
 
     public AbstractMission() {
         initializeFieldSetters();
+        initializeNodeSetters();
     }
 
     public String getName() {
@@ -1707,17 +1708,19 @@ public class AbstractMission {
         }
     }
 
-    protected void initializeNodeSetters(final Version version) {
+    protected void initializeNodeSetters() {
         // scenario
-        nodeSetters.put("scenarios", (node, campaign) -> scenarioNodeSetter(version, node, campaign));
+        nodeSetters.put("scenarios", (node, campaign, version) -> scenarioNodeSetter(version, node, campaign));
+
         // StratCon state
         nodeSetters.put(StratConCampaignState.ROOT_XML_ELEMENT_NAME.toLowerCase(),
-              (node, campaign) -> setStratConCampaignState(StratConCampaignState.Deserialize(node)));
+              (node, campaign, version) -> setStratConCampaignState(StratConCampaignState.Deserialize(node)));
+
         // NPCs
         nodeSetters.put("employerliaison",
-              (node, campaign) -> setEmployerLiaison(Person.generateInstanceFromXML(node, campaign, version)));
+              (node, campaign, version) -> setEmployerLiaison(Person.generateInstanceFromXML(node, campaign, version)));
         nodeSetters.put("clanopponent",
-              (node, campaign) -> setClanOpponent(Person.generateInstanceFromXML(node, campaign, version)));
+              (node, campaign, version) -> setClanOpponent(Person.generateInstanceFromXML(node, campaign, version)));
     }
 
     private void scenarioNodeSetter(Version version, Node node, Campaign campaign) {
@@ -1746,8 +1749,6 @@ public class AbstractMission {
     }
 
     public void loadFieldsFromXmlNode(Campaign campaign, Version version, Node node) throws ParseException {
-        initializeNodeSetters(version);
-
         NodeList nodeList = node.getChildNodes();
         for (int i = 0; i < nodeList.getLength(); i++) {
             Node item = nodeList.item(i);
@@ -1766,10 +1767,10 @@ public class AbstractMission {
                     continue;
                 }
 
-                BiConsumer<Node, Campaign> nodeSetter = nodeSetters.get(nodeName);
+                NodeSetter nodeSetter = nodeSetters.get(nodeName);
 
                 if (nodeSetter != null) {
-                    nodeSetter.accept(item, campaign);
+                    nodeSetter.accept(item, campaign, version);
                 }
             } catch (Exception ex) {
                 LOGGER.error("Failed to load node {}", nodeName, ex);
@@ -1809,5 +1810,10 @@ public class AbstractMission {
 
     private static String getText(String resourceKey) {
         return getTextAt(RESOURCE_BUNDLE, resourceKey);
+    }
+
+    @FunctionalInterface
+    public interface NodeSetter {
+        void accept(Node node, Campaign campaign, Version version);
     }
 }
