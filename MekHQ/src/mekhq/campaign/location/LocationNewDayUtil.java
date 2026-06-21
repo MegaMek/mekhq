@@ -36,6 +36,7 @@ package mekhq.campaign.location;
 import static mekhq.campaign.enums.DailyReportType.ACQUISITIONS;
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
@@ -182,11 +183,9 @@ public final class LocationNewDayUtil {
                     }
                 } else {
                     JOptionPane.showMessageDialog(null,
-                          "Could not find tech for part: " +
-                                part.getName() +
-                                " on unit: " +
-                                part.getUnit().getHyperlinkedName(),
-                          "Invalid Auto-continue",
+                          getFormattedTextAt(RESOURCE_BUNDLE, "LocationNewDayUtil.noTechForPart.message",
+                                part.getName(), part.getUnit().getHyperlinkedName()),
+                          getTextAt(RESOURCE_BUNDLE, "LocationNewDayUtil.noTechForPart.title"),
                           JOptionPane.ERROR_MESSAGE);
                     continue;
                 }

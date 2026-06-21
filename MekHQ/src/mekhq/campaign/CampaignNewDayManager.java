@@ -2089,8 +2089,8 @@ public class CampaignNewDayManager {
                         // Merely removing the unit from deployment would break with user expectation
                         boolean forceUnderRepair = false;
                         for (UUID uid : campaign.getFormationIds().get(forceId).getAllUnits(false)) {
-                            Unit u = campaign.getUnit(uid);
-                            if ((u != null) && u.isUnderRepair()) {
+                            Unit unit = campaign.getUnit(uid);
+                            if ((unit != null) && unit.isUnderRepair()) {
                                 forceUnderRepair = true;
                                 break;
                             }

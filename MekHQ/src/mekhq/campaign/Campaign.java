@@ -2266,8 +2266,8 @@ public class Campaign implements ITechManager, IPlace {
      */
     public Collection<Unit> getAllUnits() {
         List<Unit> units = new ArrayList<>();
-        for (AbstractLocation loc : getLocations()) {
-            Set<Unit> found = loc.fetchUnitsAtLocation();
+        for (AbstractLocation location : getLocations()) {
+            Set<Unit> found = location.fetchUnitsAtLocation();
             units.addAll(found);
         }
         return units;
