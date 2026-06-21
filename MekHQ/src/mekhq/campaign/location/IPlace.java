@@ -139,6 +139,19 @@ public interface IPlace extends ILocation {
     }
 
     /**
+     * Called when this place has just completed in-system transit and is now on-planet.
+     *
+     * <p>The default is a no-op. Implementors such as {@link mekhq.campaign.Campaign} override this
+     * to perform place-specific arrival behaviors (mothball activation, inoculation prompts,
+     * early-arrival contract checks, personnel market refresh, etc.).</p>
+     *
+     * @param campaign          the root campaign context
+     * @param isSilentProcessing {@code true} when processing happens without user interaction (e.g.
+     *                           fast-forward), which suppresses dialog prompts
+     */
+    default void onArrival(Campaign campaign, boolean isSilentProcessing) {}
+
+    /**
      * Processes arriving travel nodes parented to this place.
      *
      * <p>Landing hangar and warehouse default to this place's own resources; if either is

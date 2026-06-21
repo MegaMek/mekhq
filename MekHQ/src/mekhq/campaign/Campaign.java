@@ -1931,6 +1931,39 @@ public class Campaign implements ITechManager, IPlace {
     }
 
     @Override
+    public void onArrival(Campaign campaign, boolean isSilentProcessing) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        LocalDate today = campaign.getLocalDate();
+
+        // This should be before inoculations so that we can correctly read the TO&E
+        if (!campaign.getAutomatedMothballUnits().isEmpty()) {
+            performAutomatedActivation(campaign);
+        }
+
+        if (getParentLocation() instanceof AbstractLocation loc) {
+            if (campaignOptions.isUseRandomDiseases() && campaignOptions.isUseAlternativeAdvancedMedical()) {
+                loc.checkForDiseaseOrBioweaponOutbreaks(campaign, today);
+            }
+
+            if (campaignOptions.isUseRandomDiseases() && campaignOptions.isUseAlternativeAdvancedMedical()) {
+                if (!isSilentProcessing) {
+                    Inoculations.triggerInoculationPrompt(campaign, false);
+                } else {
+                    Inoculations.autoInoculateAll(campaign, loc);
+                }
+            }
+
+            loc.testForEarlyArrival(campaign);
+        }
+
+        // We've just stopped traveling, so we should see if there are any local applicants.
+        if (!HumanResources.isUsingLegacyPersonnelMarket(campaignOptions)) {
+            campaign.refreshApplicants(true);
+            CampaignNewDayManager.showRarePersonnelDialog(campaign, false);
+        }
+    }
+
+    @Override
     public void processArrivals(Campaign campaign) {
         if (locationNode == null) {
             return;
