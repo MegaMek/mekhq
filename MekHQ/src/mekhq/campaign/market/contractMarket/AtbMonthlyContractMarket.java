@@ -51,6 +51,7 @@ import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 import static mekhq.campaign.universe.Faction.COMSTAR_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
+import static mekhq.campaign.universe.Faction.WORD_OF_BLAKE_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -380,24 +381,47 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
      * @param employerCode the faction code of the current employer
      */
     private static void checkForEmployerOverride(LocalDate today, AtBContract contract, String employerCode) {
-        // 1. ComStar co-opting check
-        Faction comStar = Factions.getInstance().getFaction(COMSTAR_FACTION_CODE);
-        if (comStar.validIn(today) && Compute.randomInt(COMSTAR_CO_OPT_CHANCE) == 0) {
-            contract.updateEmployer(COMSTAR_FACTION_CODE, today.getYear());
-            return;
+        if (!Objects.equals(employerCode, COMSTAR_FACTION_CODE)) {
+            doesComStarCoOpt(today, contract);
         }
 
-        // 2. Word of Blake co-opting during Jihad period
-        Faction wordOfBlake = Factions.getInstance().getFaction("WOB");
+        if (!Objects.equals(employerCode, WORD_OF_BLAKE_FACTION_CODE)) {
+            doesWordOfBlakeCoOpt(today, contract);
+        }
+    }
+
+    private static void doesWordOfBlakeCoOpt(LocalDate today, AtBContract contract) {
+        Faction wordOfBlake = Factions.getInstance().getFaction(WORD_OF_BLAKE_FACTION_CODE);
+
         boolean isDuringJihad = !today.isBefore(MHQConstants.JIHAD_START) &&
                                       !today.isAfter(MHQConstants.NOMINAL_JIHAD_END);
+        boolean wordOfBlakeActive = wordOfBlake.validIn(today);
+        boolean wordOfBlakeCoOptRoll = Compute.randomInt(WOB_CO_OPT_CHANCE) == 0;
+        boolean canCoOpt = !contract.getEnemy().isWoB();
 
-        if (isDuringJihad
-                  && wordOfBlake.validIn(today)
-                  && !Objects.equals("WOB", employerCode)
-                  && !Objects.equals("WOB", contract.getEnemyCode())
-                  && Compute.randomInt(WOB_CO_OPT_CHANCE) == 0) {
-            contract.updateEmployer("WOB", today.getYear());
+        boolean willCoOpt = isDuringJihad &&
+                                  wordOfBlakeActive &&
+                                  wordOfBlakeCoOptRoll &&
+                                  canCoOpt;
+
+        if (willCoOpt) {
+            contract.updateEmployer(WORD_OF_BLAKE_FACTION_CODE, today.getYear());
+        }
+    }
+
+    private static void doesComStarCoOpt(LocalDate today, AtBContract contract) {
+        Faction comStar = Factions.getInstance().getFaction(COMSTAR_FACTION_CODE);
+
+        boolean comStarActive = comStar.validIn(today);
+        boolean comStarCoOptRoll = Compute.randomInt(COMSTAR_CO_OPT_CHANCE) == 0;
+        boolean canCoOpt = !contract.getEnemy().isComStar();
+
+        boolean willCoOpt = comStarActive &&
+                                  comStarCoOptRoll &&
+                                  canCoOpt;
+
+        if (willCoOpt) {
+            contract.updateEmployer(COMSTAR_FACTION_CODE, today.getYear());
         }
     }
 
