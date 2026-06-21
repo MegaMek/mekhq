@@ -251,7 +251,7 @@ public class CampaignNewDayManager {
     public boolean newDay() {
         // Clear previous daily report nags (we want this up top so that we can make sure no messages have been
         // posted prior to this point).
-        CommandCenterTab commandCenter = campaign.getApp().getCampaigngui().getCommandCenterTab();
+        CommandCenterTab commandCenter = campaign.getGUI().getCommandCenterTab();
         for (DailyReportType type : DailyReportType.values()) {
             commandCenter.clearDailyReportNag(type.getTabIndex());
         }
