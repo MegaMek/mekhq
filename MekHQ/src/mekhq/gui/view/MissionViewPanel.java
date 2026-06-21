@@ -37,6 +37,8 @@ import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.estimateCargoRequirements;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -48,8 +50,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.text.MessageFormat;
-import java.util.ResourceBundle;
+import java.time.LocalDate;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -59,10 +60,13 @@ import javax.swing.SwingConstants;
 
 import megamek.client.ui.util.UIUtil;
 import mekhq.MekHQ;
+import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.location.ILocation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
+import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.JScrollablePanel;
@@ -76,6 +80,8 @@ import mekhq.utilities.ReportingUtilities;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MissionViewPanel extends JScrollablePanel {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.ContractViewPanel";
+
     private final Mission mission;
     protected CampaignGUI gui;
 
@@ -107,9 +113,6 @@ public class MissionViewPanel extends JScrollablePanel {
     private JLabel lblSalvageValueEmployer;
     private JLabel txtSalvageValueEmployer;
     private JLabel txtDeploymentCoverage;
-
-    private final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractViewPanel",
-          MekHQ.getMHQOptions().getLocale());
 
     public MissionViewPanel(Mission m, CampaignGUI gui) {
         super();
@@ -192,7 +195,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
         if ((null != mission.getSystemName(null)) && !mission.getSystemName(null).isEmpty()) {
             lblLocation.setName("lblLocation");
-            lblLocation.setText(resourceMap.getString("lblLocation.text"));
+            lblLocation.setText(getTextAt(RESOURCE_BUNDLE, "lblLocation.text"));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = 1;
@@ -224,7 +227,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
         if ((null != mission.getContractTypeName()) && !mission.getContractTypeName().isEmpty()) {
             lblType.setName("lblType");
-            lblType.setText(resourceMap.getString("lblType.text"));
+            lblType.setText(getTextAt(RESOURCE_BUNDLE, "lblType.text"));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = 2;
@@ -272,7 +275,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
         if ((null != contract.getSystemName(null)) && !contract.getSystemName(null).isEmpty()) {
             lblLocation.setName("lblLocation");
-            lblLocation.setText(resourceMap.getString("lblLocation.text"));
+            lblLocation.setText(getTextAt(RESOURCE_BUNDLE, "lblLocation.text"));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = 1;
@@ -304,7 +307,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
         if ((null != contract.getEmployerName()) && !contract.getEmployerName().isEmpty()) {
             lblEmployer.setName("lblEmployer");
-            lblEmployer.setText(resourceMap.getString("lblEmployer.text"));
+            lblEmployer.setText(getTextAt(RESOURCE_BUNDLE, "lblEmployer.text"));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = 2;
@@ -326,7 +329,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
         if ((null != contract.getContractTypeName()) && !contract.getContractTypeName().isEmpty()) {
             lblType.setName("lblType");
-            lblType.setText(resourceMap.getString("lblType.text"));
+            lblType.setText(getTextAt(RESOURCE_BUNDLE, "lblType.text"));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = 3;
@@ -347,7 +350,7 @@ public class MissionViewPanel extends JScrollablePanel {
         }
 
         lblStartDate.setName("lblStartDate");
-        lblStartDate.setText(resourceMap.getString("lblStartDate.text"));
+        lblStartDate.setText(getTextAt(RESOURCE_BUNDLE, "lblStartDate.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
@@ -367,7 +370,7 @@ public class MissionViewPanel extends JScrollablePanel {
         pnlStats.add(txtStartDate, gridBagConstraints);
 
         lblEndDate.setName("lblEndDate");
-        lblEndDate.setText(resourceMap.getString("lblEndDate.text"));
+        lblEndDate.setText(getTextAt(RESOURCE_BUNDLE, "lblEndDate.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 5;
@@ -387,7 +390,7 @@ public class MissionViewPanel extends JScrollablePanel {
         pnlStats.add(txtEndDate, gridBagConstraints);
 
         lblPayout.setName("lblPayout");
-        lblPayout.setText(resourceMap.getString("lblPayout.text"));
+        lblPayout.setText(getTextAt(RESOURCE_BUNDLE, "lblPayout.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 6;
@@ -407,7 +410,7 @@ public class MissionViewPanel extends JScrollablePanel {
         pnlStats.add(txtPayout, gridBagConstraints);
 
         lblCommand.setName("lblCommand");
-        lblCommand.setText(resourceMap.getString("lblCommand.text"));
+        lblCommand.setText(getTextAt(RESOURCE_BUNDLE, "lblCommand.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 7;
@@ -428,7 +431,7 @@ public class MissionViewPanel extends JScrollablePanel {
         pnlStats.add(txtCommand, gridBagConstraints);
 
         lblBLC.setName("lblBLC");
-        lblBLC.setText(resourceMap.getString("lblBLC.text"));
+        lblBLC.setText(getTextAt(RESOURCE_BUNDLE, "lblBLC.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 8;
@@ -448,7 +451,7 @@ public class MissionViewPanel extends JScrollablePanel {
         pnlStats.add(txtBLC, gridBagConstraints);
 
         int i = 9;
-        lblSalvageValueMerc = new JLabel(resourceMap.getString("lblSalvageValueMerc.text"));
+        lblSalvageValueMerc = new JLabel(getTextAt(RESOURCE_BUNDLE, "lblSalvageValueMerc.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = i;
@@ -466,7 +469,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtSalvageValueMerc, gridBagConstraints);
         i++;
-        lblSalvageValueEmployer = new JLabel(resourceMap.getString("lblSalvageValueEmployer.text"));
+        lblSalvageValueEmployer = new JLabel(getTextAt(RESOURCE_BUNDLE, "lblSalvageValueEmployer.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = i;
@@ -485,15 +488,15 @@ public class MissionViewPanel extends JScrollablePanel {
         pnlStats.add(txtSalvageValueEmployer, gridBagConstraints);
         i++;
 
-        JLabel lblSalvagePct1 = new JLabel(resourceMap.getString("lblSalvage.text"));
+        JLabel lblSalvagePct1 = new JLabel(getTextAt(RESOURCE_BUNDLE, "lblSalvage.text"));
         JLabel lblSalvagePct2 = new JLabel();
 
         if (contract.isSalvageExchange()) {
-            lblSalvagePct2.setText(resourceMap.getString("exchange") + " (" + contract.getSalvagePercent() + "%)");
+            lblSalvagePct2.setText(getTextAt(RESOURCE_BUNDLE, "exchange") + " (" + contract.getSalvagePercent() + "%)");
         } else if (contract.getSalvagePercent() == 0) {
-            lblSalvagePct2.setText(resourceMap.getString("none"));
+            lblSalvagePct2.setText(getTextAt(RESOURCE_BUNDLE, "none"));
         } else {
-            lblSalvagePct1.setText(resourceMap.getString("lblSalvagePct.text"));
+            lblSalvagePct1.setText(getTextAt(RESOURCE_BUNDLE, "lblSalvagePct.text"));
             int maxSalvagePct = contract.getSalvagePercent();
 
             int currentSalvagePct = contract.getCurrentSalvagePct();
@@ -566,9 +569,9 @@ public class MissionViewPanel extends JScrollablePanel {
         // === Header: belligerents (the status is shown in the section's title border). The employer and enemy
         // faction names are shown as tooltips on their logos (employer left, enemy right) rather than as their own
         // label rows, to save vertical space.
-        final String employerTooltip = MessageFormat.format(resourceMap.getString("belligerents.employer.tooltip"),
+        final String employerTooltip = getFormattedTextAt(RESOURCE_BUNDLE, "belligerents.employer.tooltip",
               contract.getEmployerName(campaign.getGameYear()));
-        final String enemyTooltip = MessageFormat.format(resourceMap.getString("belligerents.enemy.tooltip"),
+        final String enemyTooltip = getFormattedTextAt(RESOURCE_BUNDLE, "belligerents.enemy.tooltip",
               contract.getEnemyBotName());
         lblBelligerents = getBelligerentsPanel(contract, gui.getCampaign().getGameYear(), employerTooltip,
               enemyTooltip);
@@ -576,7 +579,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
         // === Identity: the orienting facts (where, who) ===
         lblLocation.setName("lblLocation");
-        lblLocation.setText(resourceMap.getString("lblLocation.text"));
+        lblLocation.setText(getTextAt(RESOURCE_BUNDLE, "lblLocation.text"));
         txtLocation.setName("txtLocation");
         String systemName = contract.getSystemName(campaign.getLocalDate());
         txtLocation.setText(String.format("<html><a href='#'>%s</a></html>", systemName));
@@ -609,7 +612,7 @@ public class MissionViewPanel extends JScrollablePanel {
                 addGaugeRow(ContractMeterBar.victoryPoints(currentScore, neededScore, canEndEarly), y++);
             } else {
                 lblScore.setName("lblScore");
-                lblScore.setText(resourceMap.getString("lblScore.text"));
+                lblScore.setText(getTextAt(RESOURCE_BUNDLE, "lblScore.text"));
                 txtScore.setName("txtScore");
                 txtScore.setText(currentScore + " / " + neededScore);
                 addStatRow(lblScore, txtScore, y++);
@@ -622,7 +625,7 @@ public class MissionViewPanel extends JScrollablePanel {
                 addGaugeRow(ContractMeterBar.supportPoints(currentSupportPoints, maximumSupportPoints), y++);
             } else {
                 lblSupportPoints.setName("lblSupportPoints");
-                lblSupportPoints.setText(resourceMap.getString("lblSupportPoints.text"));
+                lblSupportPoints.setText(getTextAt(RESOURCE_BUNDLE, "lblSupportPoints.text"));
                 txtSupport.setName("txtSupport");
                 txtSupport.setText(Integer.toString(currentSupportPoints));
                 addStatRow(lblSupportPoints, txtSupport, y++);
@@ -636,88 +639,82 @@ public class MissionViewPanel extends JScrollablePanel {
             addGaugeRow(ContractMeterBar.salvage(contract.getCurrentSalvagePct(), contract.getSalvagePercent()), y++);
         }
 
-        // Contract timeline: a neutral progress gauge from start to end with a marker for today, shown only while the
-        // contract is genuinely under way at its destination system, where the marker's position is meaningful. The
-        // engine shifts the start and end dates each day until the player reaches the contract's system (to track the
-        // ETA), so the gauge is only stable - and meaningful - once the player is at that system and today falls
-        // within start..end. Otherwise (in transit, or after the contract has ended) the dates are shown as a single
-        // compact text row instead.
+        // Contract timeline: a neutral progress gauge from start to end with a marker for today, shown once the
+        // contract is active and the player has landed at the destination. Contracts that have not started yet, are
+        // still in transit, or have been completed keep the compact dates row instead.
         final String startLabel = MekHQ.getMHQOptions().getDisplayFormattedDate(contract.getStartDate());
         final String endLabel = MekHQ.getMHQOptions().getDisplayFormattedDate(contract.getEndingDate());
-        final PlanetarySystem currentSystem = campaign.getCurrentSystem();
-        final boolean atContractSystem = (currentSystem != null) && (contract.getSystem() != null) &&
-                                               currentSystem.getId().equals(contract.getSystem().getId());
-        final boolean contractInProgress = atContractSystem &&
-                                                 !campaign.getLocalDate().isBefore(contract.getStartDate()) &&
-                                                 !campaign.getLocalDate().isAfter(contract.getEndingDate());
-        if (contractInProgress) {
+        if (shouldShowContractTimeline(campaign, contract)) {
             final String todayLabel = MekHQ.getMHQOptions().getDisplayFormattedDate(campaign.getLocalDate());
             addGaugeRow(ContractMeterBar.timeline(contract.getStartDate(), contract.getEndingDate(),
                   campaign.getLocalDate(), startLabel, endLabel, todayLabel), y++);
         } else {
-            JLabel lblDates = new JLabel(resourceMap.getString("lblDates.text"));
+            JLabel lblDates = new JLabel(getTextAt(RESOURCE_BUNDLE, "lblDates.text"));
             JLabel txtDates = new JLabel(startLabel + " \u2013 " + endLabel);
+            final String timelineFallbackTooltip = contractTimelineFallbackTooltip(campaign, contract);
+            lblDates.setToolTipText(timelineFallbackTooltip);
+            txtDates.setToolTipText(timelineFallbackTooltip);
             addStatRow(lblDates, txtDates, y++);
         }
 
         // === Reference terms: the static contract details ===
         lblAllyRating.setName("lblAllyRating");
-        lblAllyRating.setText(resourceMap.getString("lblAllyRating.text"));
+        lblAllyRating.setText(getTextAt(RESOURCE_BUNDLE, "lblAllyRating.text"));
         txtAllyRating.setName("txtAllyRating");
         txtAllyRating.setText(contract.getAllySkill() + "/" + ratingNames[contract.getAllyQuality()]);
         addStatRow(lblAllyRating, txtAllyRating, y++);
 
         lblEnemyRating.setName("lblEnemyRating");
-        lblEnemyRating.setText(resourceMap.getString("lblEnemyRating.text"));
+        lblEnemyRating.setText(getTextAt(RESOURCE_BUNDLE, "lblEnemyRating.text"));
         txtEnemyRating.setName("txtEnemyRating");
         txtEnemyRating.setText(contract.getEnemySkill() + "/" + ratingNames[contract.getEnemyQuality()]);
         addStatRow(lblEnemyRating, txtEnemyRating, y++);
 
         lblPayout.setName("lblPayout");
-        lblPayout.setText(resourceMap.getString("lblPayout.text"));
+        lblPayout.setText(getTextAt(RESOURCE_BUNDLE, "lblPayout.text"));
         txtPayout.setName("txtPayout");
         txtPayout.setText(contract.getMonthlyPayOut().toAmountAndSymbolString());
         addStatRow(lblPayout, txtPayout, y++);
 
         lblCommand.setName("lblCommand");
-        lblCommand.setText(resourceMap.getString("lblCommand.text"));
+        lblCommand.setText(getTextAt(RESOURCE_BUNDLE, "lblCommand.text"));
         txtCommand.setName("txtCommand");
         txtCommand.setText(contract.getCommandRights().toString());
         txtCommand.setToolTipText(wordWrap(contract.getCommandRights().getToolTipText()));
         addStatRow(lblCommand, txtCommand, y++);
 
         lblBLC.setName("lblBLC");
-        lblBLC.setText(resourceMap.getString("lblBLC.text"));
+        lblBLC.setText(getTextAt(RESOURCE_BUNDLE, "lblBLC.text"));
         txtBLC.setName("txtBLC");
         txtBLC.setText(contract.getBattleLossCompensation() + "%");
         addStatRow(lblBLC, txtBLC, y++);
 
-        lblSalvageValueMerc = new JLabel(resourceMap.getString("lblSalvageValueMerc.text"));
+        lblSalvageValueMerc = new JLabel(getTextAt(RESOURCE_BUNDLE, "lblSalvageValueMerc.text"));
         txtSalvageValueMerc = new JLabel();
         txtSalvageValueMerc.setText(contract.getSalvagedByUnit().toAmountAndSymbolString());
         addStatRow(lblSalvageValueMerc, txtSalvageValueMerc, y++);
 
-        lblSalvageValueEmployer = new JLabel(resourceMap.getString("lblSalvageValueEmployer.text"));
+        lblSalvageValueEmployer = new JLabel(getTextAt(RESOURCE_BUNDLE, "lblSalvageValueEmployer.text"));
         txtSalvageValueEmployer = new JLabel();
         txtSalvageValueEmployer.setText(contract.getSalvagedByEmployer().toAmountAndSymbolString());
         addStatRow(lblSalvageValueEmployer, txtSalvageValueEmployer, y++);
 
         // Salvage as text for the exchange / no-salvage cases (the normal case is the gauge in the dashboard above).
         if (!salvageIsMeter) {
-            JLabel lblSalvagePct = new JLabel(resourceMap.getString("lblSalvage.text"));
+            JLabel lblSalvagePct = new JLabel(getTextAt(RESOURCE_BUNDLE, "lblSalvage.text"));
             JLabel txtSalvagePct = new JLabel();
             txtSalvagePct.setName("txtSalvagePct");
             if (contract.isSalvageExchange()) {
-                txtSalvagePct.setText(resourceMap.getString("exchange") + " (" + contract.getSalvagePercent() + "%)");
+                txtSalvagePct.setText(getTextAt(RESOURCE_BUNDLE, "exchange") + " (" + contract.getSalvagePercent() + "%)");
             } else {
-                txtSalvagePct.setText(resourceMap.getString("none"));
+                txtSalvagePct.setText(getTextAt(RESOURCE_BUNDLE, "none"));
             }
             addStatRow(lblSalvagePct, txtSalvagePct, y++);
         }
 
         if (campaign.getCampaignOptions().isUseShareSystem()) {
             lblSharePct.setName("lblSharePct");
-            lblSharePct.setText(resourceMap.getString("lblSharePct.text"));
+            lblSharePct.setText(getTextAt(RESOURCE_BUNDLE, "lblSharePct.text"));
             lblSharePct.setToolTipText(wordWrap(contract.getMoraleLevel().getToolTipText()));
             txtSharePct.setName("txtSharePct");
             txtSharePct.setText(contract.getSharesPercent() + "%");
@@ -727,15 +724,15 @@ public class MissionViewPanel extends JScrollablePanel {
 
         if (useStratCon) {
             lblCargoRequirement.setName("lblCargoRequirement");
-            lblCargoRequirement.setText(resourceMap.getString("lblCargoRequirement.text"));
+            lblCargoRequirement.setText(getTextAt(RESOURCE_BUNDLE, "lblCargoRequirement.text"));
             txtCargoRequirement.setName("txtCargoRequirement");
             txtCargoRequirement.setText("~" + estimateCargoRequirements(campaign, contract) + 't');
             addStatRow(lblCargoRequirement, txtCargoRequirement, y++);
 
             if (contract.isActiveOn(campaign.getLocalDate())) {
-                String deploymentCoverageTooltip = wordWrap(resourceMap.getString("txtDeploymentCoverage.tooltip"));
+                String deploymentCoverageTooltip = wordWrap(getTextAt(RESOURCE_BUNDLE, "txtDeploymentCoverage.tooltip"));
                 lblDeploymentCoverage.setName("lblDeploymentCoverage");
-                lblDeploymentCoverage.setText(resourceMap.getString("lblDeploymentCoverage.text"));
+                lblDeploymentCoverage.setText(getTextAt(RESOURCE_BUNDLE, "lblDeploymentCoverage.text"));
                 lblDeploymentCoverage.setToolTipText(deploymentCoverageTooltip);
 
                 int assignedCombatElements = RequiredLancesTableModel.getAssignedCombatElementCount(campaign, contract);
@@ -766,6 +763,48 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         pnlStats.add(verticalGlue, gridBagConstraints);
+    }
+
+    static boolean shouldShowContractTimeline(Campaign campaign, Contract contract) {
+        final AbstractLocation currentLocation = campaign.getCurrentLocation();
+        if (currentLocation == ILocation.NO_LOCATION) {
+            return false;
+        }
+
+        final PlanetarySystem currentSystem = currentLocation.getCurrentSystem();
+        final PlanetarySystem contractSystem = contract.getSystem();
+        return contract.isActiveOn(campaign.getLocalDate()) &&
+                     (currentLocation != null) && currentLocation.isOnPlanet() &&
+                     (currentSystem != null) && (contractSystem != null) &&
+                     currentSystem.getId().equals(contractSystem.getId());
+    }
+
+    static String contractTimelineFallbackTooltip(Campaign campaign, Contract contract) {
+        final String contractLocation = contract.getSystemName(campaign.getLocalDate());
+        final String currentLocation = currentLocationDescription(campaign);
+        return wordWrap(getFormattedTextAt(RESOURCE_BUNDLE, "contractTimelineBar.fallback.tooltip", contractLocation,
+              currentLocation));
+    }
+
+    static String currentLocationDescription(Campaign campaign) {
+        final AbstractLocation currentLocation = campaign.getCurrentLocation();
+        if (currentLocation == ILocation.NO_LOCATION) {
+            return getTextAt(RESOURCE_BUNDLE, "contractTimelineBar.location.unknown");
+        }
+
+        final PlanetarySystem currentSystem = currentLocation.getCurrentSystem();
+        final LocalDate currentDate = campaign.getLocalDate();
+        if (currentLocation.isOnPlanet()) {
+            final Planet currentPlanet = currentLocation.getPlanet();
+            final String planetName = (currentPlanet == null) ? currentSystem.getPrintableName(currentDate) :
+                                            currentPlanet.getPrintableName(currentDate);
+            return getFormattedTextAt(RESOURCE_BUNDLE, "contractTimelineBar.location.landed", planetName);
+        }
+
+        final String systemName = currentSystem.getPrintableName(currentDate);
+        final String locationKey = currentLocation.isAtJumpPoint() ? "contractTimelineBar.location.jumpPoint" :
+                                         "contractTimelineBar.location.inTransit";
+        return getFormattedTextAt(RESOURCE_BUNDLE, locationKey, systemName);
     }
 
     /**

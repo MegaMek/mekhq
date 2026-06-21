@@ -261,6 +261,7 @@ import mekhq.campaign.universe.selectors.factionSelectors.AbstractFactionSelecto
 import mekhq.campaign.universe.selectors.planetSelectors.AbstractPlanetSelector;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
+import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
@@ -414,7 +415,7 @@ public class Campaign implements ITechManager, IPlace {
 
     private CampaignOptions campaignOptions;
     private RandomSkillPreferences randomSkillPreferences = new RandomSkillPreferences();
-    private MekHQ app;
+    private CampaignGUI gui;
 
     private ShoppingList shoppingList;
 
@@ -704,18 +705,15 @@ public class Campaign implements ITechManager, IPlace {
         this.humanResources = humanResources;
     }
 
-    /**
-     * @return the app
-     */
-    public MekHQ getApp() {
-        return app;
+    public void setGUI(CampaignGUI gui) {
+        this.gui = gui;
     }
 
     /**
-     * @param app the app to set
+     * @return the {@link CampaignGUI}
      */
-    public void setApp(MekHQ app) {
-        this.app = app;
+    public CampaignGUI getGUI() {
+        return gui;
     }
 
     /**
@@ -1928,6 +1926,37 @@ public class Campaign implements ITechManager, IPlace {
     @Nullable
     public @Nonnull LocationNode getLocationNode() {
         return locationNode;
+    }
+
+    @Override
+    public void onArrival(Campaign campaign, boolean isSilentProcessing) {
+        // We are intentionally using the passed in Campaign. When Campaign is split into Force and Campaign, Force
+        // will be an IPlace, so this method will move to Force, but we'll still need Campaign for some information.
+
+        // This should be before inoculations so that we can correctly read the TO&E
+        if (!campaign.getAutomatedMothballUnits().isEmpty()) {
+            performAutomatedActivation(campaign);
+        }
+
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        if (campaignOptions.isUseRandomDiseases() && campaignOptions.isUseAlternativeAdvancedMedical()) {
+            if (getParentLocation() instanceof AbstractLocation loc) {
+                loc.checkForDiseaseOrBioweaponOutbreaks(campaign, campaign.getLocalDate());
+            }
+        }
+
+        // Inoculations (generic IPlace behavior)
+        IPlace.super.onArrival(campaign, isSilentProcessing);
+
+        if (getParentLocation() instanceof AbstractLocation loc) {
+            loc.testForEarlyArrival(campaign);
+        }
+
+        // We've just stopped traveling, so we should see if there are any local applicants.
+        if (!HumanResources.isUsingLegacyPersonnelMarket(campaign.getCampaignOptions())) {
+            campaign.refreshApplicants(true);
+            CampaignNewDayManager.showRarePersonnelDialog(campaign, false);
+        }
     }
 
     @Override

@@ -33,7 +33,8 @@
 package mekhq.gui.enums;
 
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
-import static mekhq.utilities.MHQInternationalization.getText;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.time.LocalDate;
 import java.util.Comparator;
@@ -87,566 +88,158 @@ import mekhq.gui.sorter.EducationLevelSorter;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.IntegerStringSorter;
 import mekhq.gui.sorter.LevelSorter;
-import mekhq.gui.sorter.PersonRankStringSorter;
+import mekhq.gui.sorter.PersonRankSorter;
 import mekhq.gui.sorter.ReasoningSorter;
+import mekhq.utilities.MHQInternationalization;
 import mekhq.utilities.ReportingUtilities;
 import org.jspecify.annotations.NonNull;
 
 public enum PersonnelTableModelColumn {
     // region Enum Declarations
-    PERSON("PersonnelTableModelColumn.PERSON.text"),
-    RANK("PersonnelTableModelColumn.RANK.text"),
-    FIRST_NAME("PersonnelTableModelColumn.FIRST_NAME.text"),
-    LAST_NAME("PersonnelTableModelColumn.LAST_NAME.text"),
-    PRE_NOMINAL("PersonnelTableModelColumn.PRE_NOMINAL.text"),
-    GIVEN_NAME("PersonnelTableModelColumn.GIVEN_NAME.text"),
-    SURNAME("PersonnelTableModelColumn.SURNAME.text"),
-    BLOODNAME("PersonnelTableModelColumn.BLOODNAME.text"),
-    POST_NOMINAL("PersonnelTableModelColumn.POST_NOMINAL.text"),
-    CALLSIGN("PersonnelTableModelColumn.CALLSIGN.text"),
-    AGE("PersonnelTableModelColumn.AGE.text"),
-    PERSONNEL_STATUS("PersonnelTableModelColumn.PERSONNEL_STATUS.text"),
-    GENDER("PersonnelTableModelColumn.GENDER.text"),
-    SKILL_LEVEL("PersonnelTableModelColumn.SKILL_LEVEL.text"),
-    PERSONNEL_ROLE("PersonnelTableModelColumn.PERSONNEL_ROLE.text"),
-    UNIT_ASSIGNMENT("PersonnelTableModelColumn.UNIT_ASSIGNMENT.text"),
-    FORCE("PersonnelTableModelColumn.FORCE.text"),
-    DEPLOYED("PersonnelTableModelColumn.DEPLOYED.text"),
-    MEK("PersonnelTableModelColumn.MEK.text"),
-    GROUND_VEHICLE("PersonnelTableModelColumn.GROUND_VEHICLE.text"),
-    NAVAL_VEHICLE("PersonnelTableModelColumn.NAVAL_VEHICLE.text"),
-    VTOL("PersonnelTableModelColumn.VTOL.text"),
-    AEROSPACE("PersonnelTableModelColumn.AEROSPACE.text"),
-    CONVENTIONAL_AIRCRAFT("PersonnelTableModelColumn.CONVENTIONAL_AIRCRAFT.text"),
-    VESSEL("PersonnelTableModelColumn.VESSEL.text"),
-    PROTOMEK("PersonnelTableModelColumn.PROTOMEK.text"),
-    BATTLE_ARMOUR("PersonnelTableModelColumn.BATTLE_ARMOUR.text"),
-    AGGREGATE_COMBAT("PersonnelTableModelColumn.AGGREGATE_COMBAT.text"),
-    SMALL_ARMS("PersonnelTableModelColumn.SMALL_ARMS.text"),
-    ANTI_MEK("PersonnelTableModelColumn.ANTI_MEK.text"),
-    ARTILLERY("PersonnelTableModelColumn.ARTILLERY.text"),
-    NAVIGATION("PersonnelTableModelColumn.NAVIGATION.text"),
-    TACTICS("PersonnelTableModelColumn.TACTICS.text"),
-    STRATEGY("PersonnelTableModelColumn.STRATEGY.text"),
-    LEADERSHIP("PersonnelTableModelColumn.LEADERSHIP.text"),
-    SCOUTING("PersonnelTableModelColumn.SCOUTING.text"),
-    ASTECH("PersonnelTableModelColumn.ASTECH.text"),
-    TECH_MEK("PersonnelTableModelColumn.TECH_MEK.text"),
-    TECH_AERO("PersonnelTableModelColumn.TECH_AERO.text"),
-    TECH_MECHANIC("PersonnelTableModelColumn.TECH_MECHANIC.text"),
-    TECH_BA("PersonnelTableModelColumn.TECH_BA.text"),
-    TECH_VESSEL("PersonnelTableModelColumn.TECH_VESSEL.text"),
-    ZERO_G("PersonnelTableModelColumn.ZERO_G.text"),
-    MEDTECH("PersonnelTableModelColumn.MEDTECH.text"),
-    MEDICAL("PersonnelTableModelColumn.MEDICAL.text"),
-    WORK_MINUTES("PersonnelTableModelColumn.WORK_MINUTES.text"),
-    TECH_MINUTES("PersonnelTableModelColumn.TECH_MINUTES.text"),
-    MEDICAL_CAPACITY("PersonnelTableModelColumn.MEDICAL_CAPACITY.text"),
-    APPRAISAL("PersonnelTableModelColumn.APPRAISAL.text"),
-    TRAINING("PersonnelTableModelColumn.TRAINING.text"),
-    ADMINISTRATION("PersonnelTableModelColumn.ADMINISTRATION.text"),
-    NEGOTIATION("PersonnelTableModelColumn.NEGOTIATION.text"),
-    INJURIES("PersonnelTableModelColumn.INJURIES.text"),
-    KILLS("PersonnelTableModelColumn.KILLS.text"),
-    SALARY("PersonnelTableModelColumn.SALARY.text"),
-    XP("PersonnelTableModelColumn.XP.text"),
-    ORIGIN_FACTION("PersonnelTableModelColumn.ORIGIN_FACTION.text"),
-    ORIGIN_PLANET("PersonnelTableModelColumn.ORIGIN_PLANET.text"),
-    BIRTHDAY("PersonnelTableModelColumn.BIRTHDAY.text"),
-    RECRUITMENT_DATE("PersonnelTableModelColumn.RECRUITMENT_DATE.text"),
-    LAST_RANK_CHANGE_DATE("PersonnelTableModelColumn.LAST_RANK_CHANGE_DATE.text"),
-    DUE_DATE("PersonnelTableModelColumn.DUE_DATE.text"),
-    RETIREMENT_DATE("PersonnelTableModelColumn.RETIREMENT_DATE.text"),
-    DEATH_DATE("PersonnelTableModelColumn.DEATH_DATE.text"),
-    CLAN_PERSONNEL("PersonnelTableModelColumn.CLAN_PERSONNEL.text"),
-    COMMANDER("PersonnelTableModelColumn.COMMANDER.text"),
-    DIVORCEABLE("PersonnelTableModelColumn.DIVORCEABLE.text"),
-    EMPLOYED("PersonnelTableModelColumn.EMPLOYED.text"),
-    FOUNDER("PersonnelTableModelColumn.FOUNDER.text"),
-    HIDE_PERSONALITY("PersonnelTableModelColumn.HIDE_PERSONALITY.text"),
-    IMMORTAL("PersonnelTableModelColumn.IMMORTAL.text"),
-    MARRIAGEABLE("PersonnelTableModelColumn.MARRIAGEABLE.text"),
-    NEVER_ASSIGN_AUTO_MAINTENANCE("PersonnelTableModelColumn.NEVER_ASSIGN_AUTO_MAINTENANCE.text"),
-    PREFERS_MEN("PersonnelTableModelColumn.PREFERS_MEN.text"),
-    PREFERS_WOMEN("PersonnelTableModelColumn.PREFERS_WOMEN.text"),
-    QUICK_TRAIN_IGNORE("PersonnelTableModelColumn.QUICK_TRAIN_IGNORE.text"),
-    SALVAGE_SUPERVISOR("PersonnelTableModelColumn.SALVAGE_SUPERVISOR.text"),
-    SECOND_IN_COMMAND("PersonnelTableModelColumn.SECOND_IN_COMMAND.text"),
-    WANTS_CHILDREN("PersonnelTableModelColumn.WANTS_CHILDREN.text"),
-    UNDER_PROTECTION("PersonnelTableModelColumn.UNDER_PROTECTION.text"),
-    COVER_MEDICAL_EXPENSES("PersonnelTableModelColumn.COVER_MEDICAL_EXPENSES.text"),
-    BLOCK_MATERNITY_LEAVE("PersonnelTableModelColumn.BLOCK_MATERNITY_LEAVE.text"),
-    TOUGHNESS("PersonnelTableModelColumn.TOUGHNESS.text"),
-    CONNECTIONS("PersonnelTableModelColumn.CONNECTIONS.text"),
-    WEALTH("PersonnelTableModelColumn.WEALTH.text"),
-    EXTRA_INCOME("PersonnelTableModelColumn.EXTRA_INCOME.text"),
-    REPUTATION("PersonnelTableModelColumn.REPUTATION.text"),
-    UNLUCKY("PersonnelTableModelColumn.UNLUCKY.text"),
-    BLOODMARK("PersonnelTableModelColumn.BLOODMARK.text"),
-    FATIGUE("PersonnelTableModelColumn.FATIGUE.text"),
-    SPA_COUNT("PersonnelTableModelColumn.SPA_COUNT.text"),
-    MODIFICATION_COUNT("PersonnelTableModelColumn.MODIFICATION_COUNT.text"),
-    IMPLANT_COUNT("PersonnelTableModelColumn.IMPLANT_COUNT.text"),
-    LOYALTY("PersonnelTableModelColumn.LOYALTY.text"),
-    HIGHEST_EDUCATION("PersonnelTableModelColumn.HIGHEST_EDUCATION.text"),
-    CURRENT_EDUCATION("PersonnelTableModelColumn.CURRENT_EDUCATION.text"),
-    ACADEMY("PersonnelTableModelColumn.ACADEMY.text"),
-    COURSE("PersonnelTableModelColumn.COURSE.text"),
-    ACADEMY_DURATION("PersonnelTableModelColumn.ACADEMY_DURATION.text"),
-    AGGRESSION("PersonnelTableModelColumn.AGGRESSION.text"),
-    AMBITION("PersonnelTableModelColumn.AMBITION.text"),
-    GREED("PersonnelTableModelColumn.GREED.text"),
-    SOCIAL("PersonnelTableModelColumn.SOCIAL.text"),
-    REASONING("PersonnelTableModelColumn.REASONING.text"),
-    STRENGTH("PersonnelTableModelColumn.STRENGTH.text"),
-    BODY("PersonnelTableModelColumn.BODY.text"),
-    REFLEXES("PersonnelTableModelColumn.REFLEXES.text"),
-    DEXTERITY("PersonnelTableModelColumn.DEXTERITY.text"),
-    INTELLIGENCE("PersonnelTableModelColumn.INTELLIGENCE.text"),
-    WILLPOWER("PersonnelTableModelColumn.WILLPOWER.text"),
-    CHARISMA("PersonnelTableModelColumn.CHARISMA.text"),
-    EDGE("PersonnelTableModelColumn.EDGE.text"),
-    SHIP_TRANSPORT("PersonnelTableModelColumn.SHIP_TRANSPORT.text"),
-    TACTICAL_TRANSPORT("PersonnelTableModelColumn.TACTICAL_TRANSPORT.text"),
-    LOCATION_SYSTEM("PersonnelTableModelColumn.LOCATION_SYSTEM.text"),
-    LOCATION_PLANET("PersonnelTableModelColumn.LOCATION_PLANET.text"),
-    LOCATION_NAME("PersonnelTableModelColumn.LOCATION_NAME.text"),
-    DESTINATION_SYSTEM("PersonnelTableModelColumn.DESTINATION_SYSTEM.text"),
-    DESTINATION_PLANET("PersonnelTableModelColumn.DESTINATION_PLANET.text"),
-    DESTINATION_NAME("PersonnelTableModelColumn.DESTINATION_NAME.text");
+    PERSON("Column.PERSON.title"),
+    RANK("Column.RANK.title"),
+    FIRST_NAME("Column.FIRST_NAME.title"),
+    LAST_NAME("Column.LAST_NAME.title"),
+    PRE_NOMINAL("Column.PRE_NOMINAL.title"),
+    GIVEN_NAME("Column.GIVEN_NAME.title"),
+    SURNAME("Column.SURNAME.title"),
+    BLOODNAME("Column.BLOODNAME.title"),
+    POST_NOMINAL("Column.POST_NOMINAL.title"),
+    CALLSIGN("Column.CALLSIGN.title"),
+    AGE("Column.AGE.title"),
+    PERSONNEL_STATUS("Column.PERSONNEL_STATUS.title"),
+    GENDER("Column.GENDER.title"),
+    SKILL_LEVEL("Column.SKILL_LEVEL.title"),
+    PERSONNEL_ROLE("Column.PERSONNEL_ROLE.title"),
+    UNIT_ASSIGNMENT("Column.UNIT_ASSIGNMENT.title"),
+    FORCE("Column.FORCE.title"),
+    DEPLOYED("Column.DEPLOYED.title"),
+    MEK("Column.MEK.title"),
+    GROUND_VEHICLE("Column.GROUND_VEHICLE.title"),
+    NAVAL_VEHICLE("Column.NAVAL_VEHICLE.title"),
+    VTOL("Column.VTOL.title"),
+    AEROSPACE("Column.AEROSPACE.title"),
+    CONVENTIONAL_AIRCRAFT("Column.CONVENTIONAL_AIRCRAFT.title"),
+    VESSEL("Column.VESSEL.title"),
+    PROTOMEK("Column.PROTOMEK.title"),
+    BATTLE_ARMOUR("Column.BATTLE_ARMOUR.title"),
+    AGGREGATE_COMBAT("Column.AGGREGATE_COMBAT.title"),
+    SMALL_ARMS("Column.SMALL_ARMS.title"),
+    ANTI_MEK("Column.ANTI_MEK.title"),
+    ARTILLERY("Column.ARTILLERY.title"),
+    NAVIGATION("Column.NAVIGATION.title"),
+    TACTICS("Column.TACTICS.title"),
+    STRATEGY("Column.STRATEGY.title"),
+    LEADERSHIP("Column.LEADERSHIP.title"),
+    SCOUTING("Column.SCOUTING.title"),
+    ASTECH("Column.ASTECH.title"),
+    TECH_MEK("Column.TECH_MEK.title"),
+    TECH_AERO("Column.TECH_AERO.title"),
+    TECH_MECHANIC("Column.TECH_MECHANIC.title"),
+    TECH_BA("Column.TECH_BA.title"),
+    TECH_VESSEL("Column.TECH_VESSEL.title"),
+    ZERO_G("Column.ZERO_G.title"),
+    MEDTECH("Column.MEDTECH.title"),
+    MEDICAL("Column.MEDICAL.title"),
+    WORK_MINUTES("Column.WORK_MINUTES.title"),
+    TECH_MINUTES("Column.TECH_MINUTES.title"),
+    MEDICAL_CAPACITY("Column.MEDICAL_CAPACITY.title"),
+    APPRAISAL("Column.APPRAISAL.title"),
+    TRAINING("Column.TRAINING.title"),
+    ADMINISTRATION("Column.ADMINISTRATION.title"),
+    NEGOTIATION("Column.NEGOTIATION.title"),
+    INJURIES("Column.INJURIES.title"),
+    KILLS("Column.KILLS.title"),
+    SALARY("Column.SALARY.title"),
+    XP("Column.XP.title"),
+    ORIGIN_FACTION("Column.ORIGIN_FACTION.title"),
+    ORIGIN_PLANET("Column.ORIGIN_PLANET.title"),
+    BIRTHDAY("Column.BIRTHDAY.title"),
+    RECRUITMENT_DATE("Column.RECRUITMENT_DATE.title"),
+    LAST_RANK_CHANGE_DATE("Column.LAST_RANK_CHANGE_DATE.title"),
+    DUE_DATE("Column.DUE_DATE.title"),
+    RETIREMENT_DATE("Column.RETIREMENT_DATE.title"),
+    DEATH_DATE("Column.DEATH_DATE.title"),
+    CLAN_PERSONNEL("Column.CLAN_PERSONNEL.title"),
+    COMMANDER("Column.COMMANDER.title"),
+    DIVORCEABLE("Column.DIVORCEABLE.title"),
+    EMPLOYED("Column.EMPLOYED.title"),
+    FOUNDER("Column.FOUNDER.title"),
+    HIDE_PERSONALITY("Column.HIDE_PERSONALITY.title"),
+    IMMORTAL("Column.IMMORTAL.title"),
+    MARRIAGEABLE("Column.MARRIAGEABLE.title"),
+    NEVER_ASSIGN_AUTO_MAINTENANCE("Column.NEVER_ASSIGN_AUTO_MAINTENANCE.title"),
+    PREFERS_MEN("Column.PREFERS_MEN.title"),
+    PREFERS_WOMEN("Column.PREFERS_WOMEN.title"),
+    QUICK_TRAIN_IGNORE("Column.QUICK_TRAIN_IGNORE.title"),
+    SALVAGE_SUPERVISOR("Column.SALVAGE_SUPERVISOR.title"),
+    SECOND_IN_COMMAND("Column.SECOND_IN_COMMAND.title"),
+    WANTS_CHILDREN("Column.WANTS_CHILDREN.title"),
+    UNDER_PROTECTION("Column.UNDER_PROTECTION.title"),
+    COVER_MEDICAL_EXPENSES("Column.COVER_MEDICAL_EXPENSES.title"),
+    BLOCK_MATERNITY_LEAVE("Column.BLOCK_MATERNITY_LEAVE.title"),
+    TOUGHNESS("Column.TOUGHNESS.title"),
+    CONNECTIONS("Column.CONNECTIONS.title"),
+    WEALTH("Column.WEALTH.title"),
+    EXTRA_INCOME("Column.EXTRA_INCOME.title"),
+    REPUTATION("Column.REPUTATION.title"),
+    UNLUCKY("Column.UNLUCKY.title"),
+    BLOODMARK("Column.BLOODMARK.title"),
+    FATIGUE("Column.FATIGUE.title"),
+    SPA_COUNT("Column.SPA_COUNT.title"),
+    MODIFICATION_COUNT("Column.MODIFICATION_COUNT.title"),
+    IMPLANT_COUNT("Column.IMPLANT_COUNT.title"),
+    LOYALTY("Column.LOYALTY.title"),
+    HIGHEST_EDUCATION("Column.HIGHEST_EDUCATION.title"),
+    CURRENT_EDUCATION("Column.CURRENT_EDUCATION.title"),
+    ACADEMY("Column.ACADEMY.title"),
+    COURSE("Column.COURSE.title"),
+    ACADEMY_DURATION("Column.ACADEMY_DURATION.title"),
+    AGGRESSION("Column.AGGRESSION.title"),
+    AMBITION("Column.AMBITION.title"),
+    GREED("Column.GREED.title"),
+    SOCIAL("Column.SOCIAL.title"),
+    REASONING("Column.REASONING.title"),
+    STRENGTH("Column.STRENGTH.title"),
+    BODY("Column.BODY.title"),
+    REFLEXES("Column.REFLEXES.title"),
+    DEXTERITY("Column.DEXTERITY.title"),
+    INTELLIGENCE("Column.INTELLIGENCE.title"),
+    WILLPOWER("Column.WILLPOWER.title"),
+    CHARISMA("Column.CHARISMA.title"),
+    EDGE("Column.EDGE.title"),
+    SHIP_TRANSPORT("Column.SHIP_TRANSPORT.title"),
+    TACTICAL_TRANSPORT("Column.TACTICAL_TRANSPORT.title"),
+    LOCATION_SYSTEM("Column.LOCATION_SYSTEM.title"),
+    LOCATION_PLANET("Column.LOCATION_PLANET.title"),
+    LOCATION_NAME("Column.LOCATION_NAME.title"),
+    DESTINATION_SYSTEM("Column.DESTINATION_SYSTEM.title"),
+    DESTINATION_PLANET("Column.DESTINATION_PLANET.title"),
+    DESTINATION_NAME("Column.DESTINATION_NAME.title");
 
-    // endregion Enum Declarations
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.PersonnelTable";
+    private static final MMLogger LOGGER = MMLogger.create(PersonnelTableModelColumn.class);
 
-    // region Variable Declarations
     private final String name;
 
-    private static final MMLogger LOGGER = MMLogger.create(PersonnelTableModelColumn.class);
-    // endregion Variable Declarations
-
-    // region Constructors
     PersonnelTableModelColumn(final String name) {
-        this.name = getText(name);
+        this.name = getTextAt(RESOURCE_BUNDLE, name);
     }
-    // endregion Constructors
 
-    // region Boolean Comparison Methods
-
-    public boolean isPerson() {
-        return this == PERSON;
-    }
-
-    public boolean isRank() {
-        return this == RANK;
-    }
-
-    public boolean isFirstName() {
-        return this == FIRST_NAME;
-    }
-
-    public boolean isLastName() {
-        return this == LAST_NAME;
-    }
-
-    public boolean isPreNominal() {
-        return this == PRE_NOMINAL;
-    }
-
-    public boolean isGivenName() {
-        return this == GIVEN_NAME;
-    }
-
-    public boolean isSurname() {
-        return this == SURNAME;
-    }
-
-    public boolean isBloodname() {
-        return this == BLOODNAME;
-    }
-
-    public boolean isPostNominal() {
-        return this == POST_NOMINAL;
-    }
-
-    public boolean isCallsign() {
-        return this == CALLSIGN;
-    }
-
-    public boolean isAge() {
-        return this == AGE;
-    }
-
-    public boolean isPersonnelStatus() {
-        return this == PERSONNEL_STATUS;
-    }
-
-    public boolean isGender() {
-        return this == GENDER;
-    }
-
-    public boolean isSkillLevel() {
-        return this == SKILL_LEVEL;
-    }
-
-    public boolean isPersonnelRole() {
-        return this == PERSONNEL_ROLE;
-    }
-
-    public boolean isUnitAssignment() {
-        return this == UNIT_ASSIGNMENT;
-    }
-
-    public boolean isForce() {
-        return this == FORCE;
-    }
-
-    public boolean isDeployed() {
-        return this == DEPLOYED;
-    }
-
-    public boolean isMek() {
-        return this == MEK;
-    }
-
-    public boolean isGroundVehicle() {
-        return this == GROUND_VEHICLE;
-    }
-
-    public boolean isNavalVehicle() {
-        return this == NAVAL_VEHICLE;
-    }
-
-    public boolean isVTOL() {
-        return this == VTOL;
-    }
-
-    public boolean isAerospace() {
-        return this == AEROSPACE;
-    }
-
-    public boolean isConventionalAircraft() {
-        return this == CONVENTIONAL_AIRCRAFT;
-    }
-
-    public boolean isVessel() {
-        return this == VESSEL;
-    }
-
-    public boolean isProtoMek() {
-        return this == PROTOMEK;
-    }
-
-    public boolean isBattleArmour() {
-        return this == BATTLE_ARMOUR;
-    }
-
-    public boolean isSmallArms() {
-        return this == SMALL_ARMS;
-    }
-
-    public boolean isAntiMek() {
-        return this == ANTI_MEK;
-    }
-
-    public boolean isArtillery() {
-        return this == ARTILLERY;
-    }
-
-    public boolean isNavigation() {
-        return this == NAVIGATION;
-    }
-
-    public boolean isTactics() {
-        return this == TACTICS;
-    }
-
-    public boolean isStrategy() {
-        return this == STRATEGY;
-    }
-
-    public boolean isLeadership() {
-        return this == LEADERSHIP;
-    }
-
-    public boolean isScouting() {
-        return this == SCOUTING;
-    }
-
-    @Deprecated(since = "0.51.0", forRemoval = true)
-    public boolean isAsTech() {
-        return this == ASTECH;
-    }
-
-    public boolean isTechMek() {
-        return this == TECH_MEK;
-    }
-
-    public boolean isTechAero() {
-        return this == TECH_AERO;
-    }
-
-    public boolean isTechMechanic() {
-        return this == TECH_MECHANIC;
-    }
-
-    public boolean isTechBA() {
-        return this == TECH_BA;
-    }
-
-    public boolean isTechVessel() {
-        return this == TECH_VESSEL;
-    }
-
-    @Deprecated(since = "0.51.0", forRemoval = true)
-    public boolean isZeroG() {
-        return this == ZERO_G;
-    }
-
-    @Deprecated(since = "0.51.0", forRemoval = true)
-    public boolean isMedTech() {
-        return this == MEDTECH;
-    }
-
-    public boolean isMedical() {
-        return this == MEDICAL;
-    }
-
-    @Deprecated(since = "0.51.0", forRemoval = true)
-    public boolean isTechMinutes() {
-        return this == TECH_MINUTES;
-    }
-
-    @Deprecated(since = "0.51.0", forRemoval = true)
-    public boolean isWorkMinutes() {
-        return this == WORK_MINUTES;
-    }
-
-    @Deprecated(since = "0.51.0", forRemoval = true)
-    public boolean isMedicalCapacity() {
-        return this == MEDICAL_CAPACITY;
-    }
-
-    public boolean isAppraisal() {
-        return this == APPRAISAL;
-    }
-
-    public boolean isTraining() {
-        return this == TRAINING;
-    }
-
-    public boolean isAdministration() {
-        return this == ADMINISTRATION;
-    }
-
-    public boolean isNegotiation() {
-        return this == NEGOTIATION;
-    }
-
-    public boolean isInjuries() {
-        return this == INJURIES;
-    }
-
-    public boolean isKills() {
-        return this == KILLS;
-    }
-
-    public boolean isSalary() {
-        return this == SALARY;
-    }
-
-    public boolean isXP() {
-        return this == XP;
-    }
-
-    public boolean isOriginFaction() {
-        return this == ORIGIN_FACTION;
-    }
-
-    public boolean isOriginPlanet() {
-        return this == ORIGIN_PLANET;
-    }
-
-    public boolean isBirthday() {
-        return this == BIRTHDAY;
-    }
-
-    public boolean isRecruitmentDate() {
-        return this == RECRUITMENT_DATE;
-    }
-
-    public boolean isLastRankChangeDate() {
-        return this == LAST_RANK_CHANGE_DATE;
-    }
-
-    public boolean isDueDate() {
-        return this == DUE_DATE;
-    }
-
-    public boolean isRetirementDate() {
-        return this == RETIREMENT_DATE;
-    }
-
-    public boolean isDeathDate() {
-        return this == DEATH_DATE;
-    }
-
-    public boolean isCommander() {
-        return this == COMMANDER;
-    }
-
-    public boolean isFounder() {
-        return this == FOUNDER;
-    }
-
-    public boolean isClanPersonnel() {
-        return this == CLAN_PERSONNEL;
-    }
-
-    public boolean isMarriageable() {
-        return this == MARRIAGEABLE;
-    }
-
-    public boolean isDivorceable() {
-        return this == DIVORCEABLE;
-    }
-
-    public boolean isWantsChildren() {return this == WANTS_CHILDREN;}
-
-    public boolean isImmortal() {
-        return this == IMMORTAL;
-    }
-
-    public boolean isEmployed() {
-        return this == EMPLOYED;
-    }
-
-    public boolean isToughness() {
-        return this == TOUGHNESS;
-    }
-
-    public boolean isConnections() {
-        return this == CONNECTIONS;
-    }
-
-    public boolean isWealth() {
-        return this == WEALTH;
-    }
-
-    public boolean isExtraIncome() {
-        return this == EXTRA_INCOME;
-    }
-
-    public boolean isReputation() {
-        return this == REPUTATION;
-    }
-
-    public boolean isUnlucky() {
-        return this == UNLUCKY;
-    }
-
-    public boolean isBloodmark() {
-        return this == BLOODMARK;
-    }
-
-    public boolean isFatigue() {
-        return this == FATIGUE;
-    }
-
-    public boolean isEdge() {
-        return this == EDGE;
-    }
-
-    public boolean isSPACount() {
-        return this == SPA_COUNT;
-    }
-
-    public boolean isImplantCount() {
-        return this == IMPLANT_COUNT;
-    }
-
-    public boolean isLoyalty() {
-        return this == LOYALTY;
-    }
-
-    public boolean isAggression() {
-        return this == AGGRESSION;
-    }
-
-    public boolean isAmbition() {
-        return this == AMBITION;
-    }
-
-    public boolean isGreed() {
-        return this == GREED;
-    }
-
-    public boolean isSocial() {
-        return this == SOCIAL;
-    }
-
-    public boolean isReasoning() {
-        return this == REASONING;
-    }
-
-    public boolean isStrength() {
-        return this == STRENGTH;
-    }
-
-    public boolean isBody() {
-        return this == BODY;
-    }
-
-    public boolean isReflexes() {
-        return this == REFLEXES;
-    }
-
-    public boolean isDexterity() {
-        return this == DEXTERITY;
-    }
-
-    public boolean isATOWIntelligence() {
-        return this == INTELLIGENCE;
-    }
-
-    public boolean isWillpower() {
-        return this == WILLPOWER;
-    }
-
-    public boolean isCharisma() {
-        return this == CHARISMA;
-    }
-
-    public boolean isShipTransport() {return this == SHIP_TRANSPORT;}
-
-    public boolean isTacticalTransport() {return this == TACTICAL_TRANSPORT;}
-
-    @Deprecated(since = "0.51.0", forRemoval = true)
-    public boolean isATOWAttribute() {
-        return isStrength() ||
-                     isBody() ||
-                     isReflexes() ||
-                     isDexterity() ||
-                     isATOWIntelligence() ||
-                     isWillpower() ||
-                     isCharisma() ||
-                     isEdge();
-    }
-
-
-    public boolean isPersonality() {
-        return isAggression() || isAmbition() || isGreed() || isSocial() || isReasoning();
+    private String convertBooleanToYesNo(boolean yesNoValue) {
+        return MHQInternationalization.getText(yesNoValue ? "Yes.text" : "No.text");
     }
-    // endregion Boolean Comparison Methods
 
-    public String convertBooleanToYesNo(boolean yesNoValue) {
-        return yesNoValue ? "Yes.text" : "No.text";
+    private String getNAText() {
+        return MHQInternationalization.getText("NA.text");
     }
 
-    public String getCellValue(final Campaign campaign, final PersonnelMarket personnelMarket, final Person person,
+    public Object getCellValue(final Campaign campaign, final PersonnelMarket personnelMarket, final Person person,
           final boolean loadAssignmentFromMarket, final boolean groupByUnit) {
-        return getDisplayString(campaign, personnelMarket, person, loadAssignmentFromMarket, groupByUnit);
+        return getDisplayObject(campaign, personnelMarket, person, loadAssignmentFromMarket, groupByUnit);
     }
 
-    private String getDisplayString(Campaign campaign, PersonnelMarket personnelMarket, Person person,
+    private Object getDisplayObject(Campaign campaign, PersonnelMarket personnelMarket, Person person,
           boolean loadAssignmentFromMarket, boolean groupByUnit) {
 
         final boolean isClanCampaign = campaign.isClanCampaign();
@@ -717,8 +310,8 @@ public enum PersonnelTableModelColumn {
             case BODY -> getAttributeScoreDisplay(person, SkillAttribute.BODY);
             case CALLSIGN -> person.getCallsign();
             case CHARISMA -> getAttributeScoreDisplay(person, SkillAttribute.CHARISMA);
-            case CLAN_PERSONNEL -> getText(convertBooleanToYesNo(person.isClanPersonnel()));
-            case COMMANDER -> getText(convertBooleanToYesNo(person.isCommander()));
+            case CLAN_PERSONNEL -> convertBooleanToYesNo(person.isClanPersonnel());
+            case COMMANDER -> convertBooleanToYesNo(person.isCommander());
             case CONNECTIONS -> person.getBurnedConnectionsEndDate() != null
                                       ?
                                       "<html><b><font color='gray'>" +
@@ -751,15 +344,15 @@ public enum PersonnelTableModelColumn {
             case DESTINATION_PLANET -> LocationDisplay.getDestinationPlanet(person, today);
             case DESTINATION_SYSTEM -> LocationDisplay.getDestinationSystem(person, today);
             case DEXTERITY -> getAttributeScoreDisplay(person, SkillAttribute.DEXTERITY);
-            case DIVORCEABLE -> getText(person.getGenealogy().hasSpouse() ?
-                                                          (convertBooleanToYesNo(person.isDivorceable())) : "NA.text");
+            case DIVORCEABLE -> person.getGenealogy().hasSpouse() ?
+                                      convertBooleanToYesNo(person.isDivorceable()) : getNAText();
             case DUE_DATE -> person.getDueDateAsString(campaign);
             case EDGE -> {
                 int currentAttributeValue = person.getAttributeScore(SkillAttribute.EDGE);
                 int attributeCap = person.getAttributeCap(SkillAttribute.EDGE);
                 yield currentAttributeValue + " / " + attributeCap;
             }
-            case EMPLOYED -> getText(convertBooleanToYesNo(person.isEmployed()));
+            case EMPLOYED -> convertBooleanToYesNo(person.isEmployed());
             case EXTRA_INCOME -> Integer.toString(person.getExtraIncomeTraitLevel());
             case FATIGUE -> Integer.toString(getEffectiveFatigue(person.getAdjustedFatigue(),
                   person.getPermanentFatigue(), person.isClanPersonnel(),
@@ -769,7 +362,7 @@ public enum PersonnelTableModelColumn {
                 final Formation formation = campaign.getFormationFor(person);
                 yield (formation == null) ? "-" : formation.getName();
             }
-            case FOUNDER -> getText(convertBooleanToYesNo(person.isFounder()));
+            case FOUNDER -> convertBooleanToYesNo(person.isFounder());
             case GENDER -> GenderDescriptors.MALE_FEMALE_OTHER.getDescriptorCapitalized(person.getGender());
             case GIVEN_NAME -> person.getGivenName();
             case GREED -> {
@@ -778,10 +371,10 @@ public enum PersonnelTableModelColumn {
                 yield trait + " (" + (trait.isTraitMajor() ? sign + sign : sign) + ')';
             }
             case GROUND_VEHICLE -> gunneryPilotingValue.apply(SkillType.S_GUN_VEE, SkillType.S_PILOT_GVEE);
-            case HIDE_PERSONALITY -> getText(convertBooleanToYesNo(person.isHidePersonality()));
+            case HIDE_PERSONALITY -> convertBooleanToYesNo(person.isHidePersonality());
             case HIGHEST_EDUCATION -> person.getEduHighestEducation().toString();
-            case IMMORTAL -> getText(person.getStatus().isDead() ? "NA.text"
-                                                       : (convertBooleanToYesNo(person.isImmortal())));
+            case IMMORTAL -> person.getStatus().isDead() ? getNAText()
+                                                       : convertBooleanToYesNo(person.isImmortal());
             case IMPLANT_COUNT -> Integer.toString(person.countOptions(PersonnelOptions.MD_ADVANTAGES));
             case MODIFICATION_COUNT -> Integer.toString(person.getProstheticInjuries().size());
             case INJURIES -> campaign.getCampaignOptions().isUseAdvancedMedical()
@@ -797,8 +390,8 @@ public enum PersonnelTableModelColumn {
             case LOCATION_SYSTEM -> LocationDisplay.getLocationSystem(person, today, campaign);
             case LOYALTY -> String.valueOf(person.getAdjustedLoyalty(campaign.getFaction(),
                   campaignOptions.isUseAlternativeAdvancedMedical()));
-            case MARRIAGEABLE -> getText(person.getGenealogy().hasSpouse() ? "NA.text"
-                                                           : (convertBooleanToYesNo(person.isMarriageable())));
+            case MARRIAGEABLE -> person.getGenealogy().hasSpouse() ? getNAText()
+                                                           : convertBooleanToYesNo(person.isMarriageable());
             case MEDICAL -> skillValue.apply(SkillType.S_SURGERY);
             case MEDICAL_CAPACITY -> person.isDoctor()
                                            ?
@@ -812,7 +405,7 @@ public enum PersonnelTableModelColumn {
             case NAVIGATION -> skillValue.apply(SkillType.S_NAVIGATION);
             case NEGOTIATION -> skillValue.apply(SkillType.S_NEGOTIATION);
             case NEVER_ASSIGN_AUTO_MAINTENANCE ->
-                  getText(convertBooleanToYesNo(person.isNeverAssignMaintenanceAutomatically()));
+                  convertBooleanToYesNo(person.isNeverAssignMaintenanceAutomatically());
             case ORIGIN_FACTION -> person.getOriginFaction().getFullName(campaign.getGameYear());
             case ORIGIN_PLANET -> {
                 final Planet originPlanet = person.getOriginPlanet();
@@ -823,23 +416,23 @@ public enum PersonnelTableModelColumn {
             case PERSONNEL_STATUS -> person.getStatus().toString();
             case POST_NOMINAL -> person.getPostNominal();
             case PRE_NOMINAL -> person.getPreNominal();
-            case PREFERS_MEN -> getText(person.isChild(campaign.getLocalDate()) ? "NA.text" :
-                                                          convertBooleanToYesNo(person.isPrefersMen()));
-            case PREFERS_WOMEN -> getText(person.isChild(campaign.getLocalDate()) ? "NA.text" :
-                                                            convertBooleanToYesNo(person.isPrefersWomen()));
+            case PREFERS_MEN -> person.isChild(campaign.getLocalDate()) ? getNAText() :
+                                                          convertBooleanToYesNo(person.isPrefersMen());
+            case PREFERS_WOMEN -> person.isChild(campaign.getLocalDate()) ? getNAText() :
+                                                            convertBooleanToYesNo(person.isPrefersWomen());
             case PROTOMEK -> skillValue.apply(SkillType.S_GUN_PROTO);
-            case QUICK_TRAIN_IGNORE -> getText(convertBooleanToYesNo(person.isQuickTrainIgnore()));
-            case RANK -> person.makeHTMLRank();
+            case QUICK_TRAIN_IGNORE -> convertBooleanToYesNo(person.isQuickTrainIgnore());
+            case RANK -> person;
             case REASONING -> person.getReasoning().getLabel();
             case RECRUITMENT_DATE -> MekHQ.getMHQOptions().getDisplayFormattedDate(person.getRecruitment());
             case REFLEXES -> getAttributeScoreDisplay(person, SkillAttribute.REFLEXES);
             case REPUTATION -> Integer.toString(adjustedReputation);
             case RETIREMENT_DATE -> MekHQ.getMHQOptions().getDisplayFormattedDate(person.getRetirement());
             case SALARY -> person.getSalary(campaign).toAmountAndSymbolString();
-            case SALVAGE_SUPERVISOR -> getText(person.isSalvageSupervisor() ? "Yes.text" : "No.text");
+            case SALVAGE_SUPERVISOR -> convertBooleanToYesNo(person.isSalvageSupervisor());
             case SCOUTING -> getAggregateSmallArmsOrScouting(ScoutingSkills.getBestScoutingSkill(person),
                   person, skillModifierData);
-            case SECOND_IN_COMMAND -> getText(person.isSecondInCommand() ? "Yes.text" : "No.text");
+            case SECOND_IN_COMMAND -> convertBooleanToYesNo(person.isSecondInCommand());
             case SHIP_TRANSPORT -> person.getUnit() != null && person.getUnit().getTransportShipAssignment() != null
                                          ? person.getUnit().getTransportShipAssignment().getTransportShip().getName()
                                          : "-";
@@ -870,10 +463,8 @@ public enum PersonnelTableModelColumn {
                     if (crewSize <= 0) {
                         yield surname;
                     }
-                    yield surname + " (+" + crewSize +
-                                getText(unit.usesSoldiers()
-                                                          ? "PersonnelTableModelColumn.SURNAME.Soldiers.text"
-                                                          : "PersonnelTableModelColumn.SURNAME.Crew.text");
+                    String key = unit.usesSoldiers() ? "Cell.SURNAME.Soldiers.suffix" : "Cell.SURNAME.Crew.suffix";
+                    yield surname + " " + getFormattedTextAt(RESOURCE_BUNDLE, key, crewSize);
                 }
             }
             case TACTICAL_TRANSPORT ->
@@ -890,12 +481,11 @@ public enum PersonnelTableModelColumn {
             case TECH_VESSEL -> skillValue.apply(SkillType.S_TECH_VESSEL);
             case TOUGHNESS -> Integer.toString(person.getAdjustedToughness());
             case TRAINING -> skillValue.apply(SkillType.S_TRAINING);
-            case WANTS_CHILDREN -> getText(person.isChild(campaign.getLocalDate()) ? "NA.text" :
-                                                             convertBooleanToYesNo(person.isWantsChildren()));
-            case UNDER_PROTECTION -> getText(convertBooleanToYesNo(person.isUnderProtection()));
-            case COVER_MEDICAL_EXPENSES ->
-                  getText(convertBooleanToYesNo(person.isCoverIllicitMedicalExpenses()));
-            case BLOCK_MATERNITY_LEAVE -> getText(convertBooleanToYesNo(person.isBlockMaternityLeave()));
+            case WANTS_CHILDREN -> person.isChild(campaign.getLocalDate()) ? getNAText() :
+                                                             convertBooleanToYesNo(person.isWantsChildren());
+            case UNDER_PROTECTION -> convertBooleanToYesNo(person.isUnderProtection());
+            case COVER_MEDICAL_EXPENSES -> convertBooleanToYesNo(person.isCoverIllicitMedicalExpenses());
+            case BLOCK_MATERNITY_LEAVE -> convertBooleanToYesNo(person.isBlockMaternityLeave());
             case UNIT_ASSIGNMENT -> {
                 if (loadAssignmentFromMarket) {
                     final Entity entity = personnelMarket.getAttachedEntity(person);
@@ -1063,6 +653,8 @@ public enum PersonnelTableModelColumn {
     public @Nullable String getDisplayText(final Campaign campaign, final Person person) {
         if (this == PersonnelTableModelColumn.AGE) {
             return Integer.toString(person.getAge(campaign.getLocalDate()));
+        } else if (this == PersonnelTableModelColumn.RANK) {
+            return person.getRankName();
         }
         return null;
     }
@@ -1091,7 +683,7 @@ public enum PersonnelTableModelColumn {
                 if (!colorReasons.isEmpty()) {
                     colorReasons.append("<br>");
                 }
-                colorReasons.append(getText(key));
+                colorReasons.append(MHQInternationalization.getText(key));
             }
 
             if (baseTooltip != null) {
@@ -1428,7 +1020,7 @@ public enum PersonnelTableModelColumn {
 
     public Comparator<?> getComparator(final Campaign campaign) {
         return switch (this) {
-            case RANK -> new PersonRankStringSorter(campaign);
+            case RANK -> new PersonRankSorter(new NaturalOrderComparator());
             case HIGHEST_EDUCATION, CURRENT_EDUCATION -> new EducationLevelSorter();
             case AGE, BIRTHDAY, RECRUITMENT_DATE, LAST_RANK_CHANGE_DATE, DUE_DATE, RETIREMENT_DATE, DEATH_DATE ->
                   new DateStringComparator();
