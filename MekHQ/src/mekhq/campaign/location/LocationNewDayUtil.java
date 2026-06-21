@@ -50,7 +50,6 @@ import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.Warehouse;
-import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
@@ -59,32 +58,21 @@ import mekhq.campaign.unit.Maintenance;
 import mekhq.campaign.unit.Unit;
 
 /**
- * Handles the new-day processing for a single {@link IPlace}: maintenance, parts arrival, and unit state transitions
- * (refitting, mothballing, delivery).
- *
- * <p>Each {@link IPlace} implementation ({@link mekhq.campaign.Campaign},
- * {@link mekhq.campaign.base.AbstractBase}, {@link AcademyCampusLocation}) owns one instance.
- * {@link mekhq.campaign.CampaignNewDayManager} iterates all places and calls {@link #processNewDay(Campaign)} on
- * each.</p>
- *
- * @since 0.50.10
+ * Utility class for new-day processing of a single {@link IPlace}: maintenance, parts arrival, and unit state
+ * transitions (refitting, mothballing, delivery).
  */
-public class LocationNewDayManager {
-    private static final MMLogger LOGGER = MMLogger.create(LocationNewDayManager.class);
+public final class LocationNewDayUtil {
+    private static final MMLogger LOGGER = MMLogger.create(LocationNewDayUtil.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Campaign";
 
-    private final IPlace place;
-
-    public LocationNewDayManager(IPlace place) {
-        this.place = place;
-    }
+    private LocationNewDayUtil() {}
 
     /**
-     * Runs the per-place unit new-day cycle for the owned {@link IPlace}: maintenance on all units in the hangar, parts
-     * transit and arrival in the warehouse, and unit state transitions (refit, mothball, delivery). Places that own
-     * neither a hangar nor a warehouse return immediately.
+     * Runs the per-place unit new-day cycle for {@code place}: maintenance on all units in the hangar, parts transit
+     * and arrival in the warehouse, and unit state transitions (refit, mothball, delivery). Places that own neither a
+     * hangar nor a warehouse return immediately.
      */
-    public void processNewDayUnits(Campaign campaign) {
+    public static void processNewDayUnits(IPlace place, Campaign campaign) {
         Hangar hangar = place.getHangar();
         Warehouse warehouse = place.getWarehouse();
 
@@ -227,31 +215,22 @@ public class LocationNewDayManager {
         if (place.hasLocationNode()) {
             for (LocationNode child : place.getLocationNode().getChildren()) {
                 if (child.getLocatable() instanceof AcademyCampusLocation campus) {
-                    campus.getLocationNewDayManager().processNewDayUnits(campaign);
+                    processNewDayUnits(campus, campaign);
                 }
             }
         }
     }
 
     /**
-     * Runs {@link #processNewDayUnits(Campaign)} for every top-level {@link IPlace} in the
-     * campaign. Each call propagates recursively to child places (e.g., academy campuses hosted
-     * under a base or under a fixed planet location).
+     * Runs {@link #processNewDayUnits(IPlace, Campaign)} for every top-level {@link IPlace} in the campaign. Each
+     * call propagates recursively to child places (e.g., academy campuses hosted under a base or under a fixed planet
+     * location).
      */
     public static void processAllLocationUnits(Campaign campaign) {
-        // Main force — also picks up any local campus locations parented to Campaign's LocationNode
-        campaign.getLocationNewDayManager().processNewDayUnits(campaign);
-
-        // Player bases — each propagates to its own child campuses via processNewDayUnits
-        for (PlayerBase base : campaign.getPlayerBases()) {
-            base.getLocationNewDayManager().processNewDayUnits(campaign);
-        }
-
-        // Fixed planet locations — seed campus children; each campus propagates further
         for (AbstractLocation loc : campaign.getLocations()) {
-            for (LocationNode child : loc.getLocationNode().getChildren()) {
-                if (child.getLocatable() instanceof AcademyCampusLocation campus) {
-                    campus.getLocationNewDayManager().processNewDayUnits(campaign);
+            for (ILocation child : loc.getChildLocations()) {
+                if (child instanceof IPlace place) {
+                    processNewDayUnits(place, campaign);
                 }
             }
         }

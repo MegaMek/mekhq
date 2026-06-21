@@ -45,7 +45,6 @@ import mekhq.campaign.Personnel;
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.IPlace;
-import mekhq.campaign.location.LocationNewDayManager;
 import mekhq.campaign.location.LocationNode;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -68,7 +67,6 @@ public abstract class AbstractBase implements IPlace {
     private final Personnel basePersonnel = new Personnel();
     private final Warehouse baseWarehouse = new Warehouse();
     private final Hangar baseHangar = new Hangar();
-    private final LocationNewDayManager locationNewDayManager = new LocationNewDayManager(this);
 
     /**
      * Creates a new base anchored under {@code parentLocation}.
@@ -117,9 +115,6 @@ public abstract class AbstractBase implements IPlace {
         return baseHangar;
     }
 
-    public LocationNewDayManager getLocationNewDayManager() {
-        return locationNewDayManager;
-    }
 
     @Override
     public Warehouse getWarehouse() {

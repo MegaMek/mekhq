@@ -120,7 +120,7 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.location.LocationNewDayManager;
+import mekhq.campaign.location.LocationNewDayUtil;
 import mekhq.campaign.market.PartsInUseManager;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
@@ -1290,7 +1290,7 @@ public class CampaignNewDayManager {
             Maintenance.checkAndCorrectMaintenanceSchedule(campaign);
         }
 
-        LocationNewDayManager.processAllLocationUnits(campaign);
+        LocationNewDayUtil.processAllLocationUnits(campaign);
 
         // Finally, run Mass Repair Mass Salvage if desired
         if (MekHQ.getMHQOptions().getNewDayMRMS()) {
