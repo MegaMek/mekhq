@@ -1520,12 +1520,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                             drainCampusPersons(campaign, campus);
                         }
                     }
-                    for (Part part : base.drainPendingBaseWarehouseParts()) {
-                        LocationNode.LocationManager.setLocation(part, base.getBaseWarehouse());
-                    }
-                    for (Unit unit : base.drainPendingBaseHangarUnits()) {
-                        LocationNode.LocationManager.setLocation(unit, base.getBaseHangar());
-                    }
+                    base.drainPendingBaseWarehouseParts();
+                    base.drainPendingBaseHangarUnits();
                 }
             }
         }
