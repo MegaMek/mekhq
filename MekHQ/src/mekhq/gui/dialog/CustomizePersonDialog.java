@@ -92,7 +92,6 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.control.EditKillLogControl;
 import mekhq.gui.control.EditLogControl;
@@ -129,8 +128,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     private JButton btnRetirementDate;
     private JComboBox<Gender> choiceGender;
     private JLabel lblAge;
-    private AbstractMHQScrollablePanel skillsPanel;
-    private AbstractMHQScrollablePanel optionsPanel;
+    private DefaultMHQScrollablePanel skillsPanel;
+    private DefaultMHQScrollablePanel optionsPanel;
     private JTextField textToughness;
     private JTextField textConnections;
     private JTextField textWealth;

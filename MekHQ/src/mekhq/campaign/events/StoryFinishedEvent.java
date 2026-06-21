@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -30,13 +30,16 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.stratCon;
+package mekhq.campaign.events;
 
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.SkillCheck;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.storyArc.storytrigger.GameOverStoryTrigger;
 
-public record ScoutRecord(
-      Person scout,
-      SkillCheck skillCheck,
-      double unitWeight
-) {}
+/**
+ * An event triggered when a story arc finishes and the current campaign should end. See {@link GameOverStoryTrigger}.
+ */
+public final class StoryFinishedEvent extends CampaignEvent {
+    public StoryFinishedEvent(Campaign campaign) {
+        super(campaign);
+    }
+}
