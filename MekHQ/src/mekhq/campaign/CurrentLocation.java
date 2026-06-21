@@ -34,9 +34,7 @@
 package mekhq.campaign;
 
 import static megamek.common.compute.Compute.randomInt;
-import static mekhq.campaign.HumanResources.isUsingLegacyPersonnelMarket;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
-import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
@@ -51,8 +49,8 @@ import mekhq.campaign.events.LocationChangedEvent;
 import mekhq.campaign.events.TransitCompleteEvent;
 import mekhq.campaign.events.TransitStatusChangedEvent;
 import mekhq.campaign.location.ILocation;
+import mekhq.campaign.location.IPlace;
 import mekhq.campaign.parts.Part;
-import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.utilities.MHQXMLUtility;
@@ -322,33 +320,13 @@ public class CurrentLocation extends AbstractLocation {
             MekHQ.triggerEvent(new TransitStatusChangedEvent(this));
         }
 
-        // If we were previously traveling and now aren't, we should check to see if we have arrived at a contract
-        // system earlier than necessary. And, if appropriate, trigger inoculation prompts and activate mothballed
-        // units
+        // If we were previously traveling and now aren't, notify each IPlace child that it has
+        // arrived. The IPlace implementation handles place-specific arrival logic.
         if (wasTraveling && isOnPlanet()) {
-            // This should be before inoculations so that we can correctly read the TO&E
-            if (!campaign.getAutomatedMothballUnits().isEmpty()) {
-                performAutomatedActivation(campaign);
-            }
-
-            if (campaignOptions.isUseRandomDiseases() && campaignOptions.isUseAlternativeAdvancedMedical()) {
-                checkForDiseaseOrBioweaponOutbreaks(campaign, today);
-            }
-
-            if (campaignOptions.isUseRandomDiseases() && campaignOptions.isUseAlternativeAdvancedMedical()) {
-                if (!isSilentProcessing) {
-                    Inoculations.triggerInoculationPrompt(campaign, false);
-                } else {
-                    Inoculations.autoInoculateAll(campaign, this);
+            for (ILocation child : getChildLocations()) {
+                if (child instanceof IPlace place) {
+                    place.onArrival(campaign, isSilentProcessing);
                 }
-            }
-
-            testForEarlyArrival(campaign);
-
-            // We've just stopped traveling, so we should see if there are any local applicants.
-            if (!isUsingLegacyPersonnelMarket(campaignOptions)) {
-                campaign.refreshApplicants(true);
-                CampaignNewDayManager.showRarePersonnelDialog(campaign, false);
             }
         }
     }

@@ -1929,6 +1929,37 @@ public class Campaign implements ITechManager, IPlace {
     }
 
     @Override
+    public void onArrival(Campaign campaign, boolean isSilentProcessing) {
+        // We are intentionally using the passed in Campaign. When Campaign is split into Force and Campaign, Force
+        // will be an IPlace, so this method will move to Force, but we'll still need Campaign for some information.
+
+        // This should be before inoculations so that we can correctly read the TO&E
+        if (!campaign.getAutomatedMothballUnits().isEmpty()) {
+            performAutomatedActivation(campaign);
+        }
+
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        if (campaignOptions.isUseRandomDiseases() && campaignOptions.isUseAlternativeAdvancedMedical()) {
+            if (getParentLocation() instanceof AbstractLocation loc) {
+                loc.checkForDiseaseOrBioweaponOutbreaks(campaign, campaign.getLocalDate());
+            }
+        }
+
+        // Inoculations (generic IPlace behavior)
+        IPlace.super.onArrival(campaign, isSilentProcessing);
+
+        if (getParentLocation() instanceof AbstractLocation loc) {
+            loc.testForEarlyArrival(campaign);
+        }
+
+        // We've just stopped traveling, so we should see if there are any local applicants.
+        if (!HumanResources.isUsingLegacyPersonnelMarket(campaign.getCampaignOptions())) {
+            campaign.refreshApplicants(true);
+            CampaignNewDayManager.showRarePersonnelDialog(campaign, false);
+        }
+    }
+
+    @Override
     public void processArrivals(Campaign campaign) {
         if (locationNode == null) {
             return;
