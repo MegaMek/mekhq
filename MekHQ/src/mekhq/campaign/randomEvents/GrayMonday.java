@@ -44,8 +44,8 @@ import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
@@ -93,7 +93,7 @@ public class GrayMonday {
             if (isEmployerBegging) {
                 for (MissionTransition contract : campaign.getAtBContracts()) {
                     LocalDate startDate = contract.getStartDate();
-                    if (startDate != null && !startDate.isBefore(today)) {
+                    if (!startDate.isBefore(today)) {
                         contract.setBaseAmount(Money.of(0));
                         contract.setOverheadCompensation(0);
                         contract.setBattleLossCompensation(0);
@@ -123,7 +123,7 @@ public class GrayMonday {
         if (isEmployerBegging) {
             for (MissionTransition contract : campaign.getAtBContracts()) {
                 LocalDate startDate = contract.getStartDate();
-                if (startDate != null && !startDate.isBefore(today)) {
+                if (!startDate.isBefore(today)) {
                     speaker = getEmployerSpeaker(contract);
                     break;
                 }

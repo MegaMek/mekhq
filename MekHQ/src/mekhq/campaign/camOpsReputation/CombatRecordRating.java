@@ -42,8 +42,8 @@ import java.util.stream.Collectors;
 
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.enums.MissionStatus;
 
 public class CombatRecordRating {
@@ -89,13 +89,7 @@ public class CombatRecordRating {
 
             if (usePerformanceCutOff) {
                 if (mission instanceof AtBContract) {
-                    LocalDate localDate = mission.getEndingDate();
-
-                    // This should never be true under normal operations
-                    if (localDate == null) {
-                        LOGGER.warn("Contract {} has no ending date. Skipping.", mission.getName());
-                        continue;
-                    } else if (localDate.isBefore(cutOffDate)) {
+                    if (((AtBContract) mission).getEndingDate().isBefore(cutOffDate)) {
                         continue;
                     }
                 }

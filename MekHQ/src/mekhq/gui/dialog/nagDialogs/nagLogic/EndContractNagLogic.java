@@ -35,8 +35,8 @@ package mekhq.gui.dialog.nagDialogs.nagLogic;
 import java.time.LocalDate;
 import java.util.List;
 
-import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.MissionTransition;
 
 public class EndContractNagLogic {
     /**
@@ -63,7 +63,7 @@ public class EndContractNagLogic {
         // There is no reason to use a stream here, as there won't be enough iterations to warrant it.
         for (MissionTransition contract : activeContracts) {
             LocalDate endingDate = contract.getEndingDate();
-            if (endingDate == null || !endingDate.equals(today)) {
+            if (!endingDate.equals(today)) {
                 continue;
             }
 

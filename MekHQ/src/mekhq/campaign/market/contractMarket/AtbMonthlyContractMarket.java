@@ -72,8 +72,8 @@ import mekhq.campaign.camOpsReputation.ReputationController;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.market.enums.ContractMarketMethod;
-import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.mission.utilities.ContractUtilities;
@@ -306,15 +306,8 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             for (int i = numSubcontracts; i < unitRatingMod - 1; i++) {
                 int roll = d6(2);
                 if (roll >= 10) {
-                    MissionTransition sub = generateAtBSubcontract(campaign, contract, unitRatingMod);
-                    LocalDate subEndingDate = sub.getEndingDate();
-                    LocalDate contractEndingDate = contract.getEndingDate();
-
-                    if (subEndingDate == null) {
-                        continue;
-                    }
-
-                    if (contractEndingDate == null || subEndingDate.isBefore(contractEndingDate)) {
+                    AtBContract sub = generateAtBSubcontract(campaign, contract, unitRatingMod);
+                    if (sub.getEndingDate().isBefore(contract.getEndingDate())) {
                         contracts.add(sub);
                     }
                 }

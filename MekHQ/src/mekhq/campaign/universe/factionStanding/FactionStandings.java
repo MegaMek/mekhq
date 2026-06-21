@@ -65,8 +65,8 @@ import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
-import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
@@ -1714,9 +1714,7 @@ public class FactionStandings {
             int missionYear = currentYear;
 
             LocalDate startDate = mission.getStartDate();
-            if (startDate != null) {
-                missionYear = mission.getStartDate().getYear();
-            }
+            missionYear = startDate.getYear();
 
             missionsByYear.computeIfAbsent(missionYear, y -> new ArrayList<>()).add(mission);
         }
@@ -1796,15 +1794,7 @@ public class FactionStandings {
             LocalDate date1 = mission1.getStartDate();
             LocalDate date2 = mission2.getStartDate();
 
-            if (date1 != null && date2 != null) {
-                return date1.compareTo(date2);
-            } else if (date1 != null) {
-                return -1; // mission1 has a date, comes first
-            } else if (date2 != null) {
-                return 1; // mission2 has a date, comes first
-            } else {
-                return 0; // neither has a date, maintain relative order
-            }
+            return date1.compareTo(date2);
         });
     }
 }

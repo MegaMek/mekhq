@@ -182,12 +182,12 @@ import mekhq.campaign.market.ShoppingList;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
-import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.TransportCostCalculations;
 import mekhq.campaign.mission.enums.CombatRole;
@@ -1519,14 +1519,6 @@ public class Campaign implements ITechManager, IPlace {
         LocalDate date1 = mission1.getStartDate();
         LocalDate date2 = mission2.getStartDate();
 
-        if (date1 == null && date2 == null) {
-            return 0;
-        } else if (date1 == null) {
-            return -1;
-        } else if (date2 == null) {
-            return 1;
-        }
-
         return date1.compareTo(date2);
     }
 
@@ -1601,7 +1593,7 @@ public class Campaign implements ITechManager, IPlace {
             }
 
             LocalDate startDate = mission.getStartDate();
-            if (startDate != null && startDate.isAfter(currentDay)) {
+            if (startDate.isAfter(currentDay)) {
                 activeContracts.add(mission);
             }
         }
@@ -1666,7 +1658,7 @@ public class Campaign implements ITechManager, IPlace {
         for (MissionTransition contract : contracts) {
             // This catches any contracts that have been accepted, but haven't yet started
             LocalDate startDate = contract.getStartDate();
-            if (startDate != null && startDate.isAfter(currentDay)) {
+            if (startDate.isAfter(currentDay)) {
                 return true;
             }
         }
@@ -1684,7 +1676,7 @@ public class Campaign implements ITechManager, IPlace {
 
         for (MissionTransition contract : getAtBContracts()) {
             LocalDate startDate = contract.getStartDate();
-            if (startDate != null && startDate.isAfter(currentDay)) {
+            if (startDate.isAfter(currentDay)) {
                 futureContracts.add(contract);
             }
         }
@@ -2232,7 +2224,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all hangars across all locations associated with this campaign.
-     *                                                                                                                                                                               TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     *                                                                                                                                                                                     TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
      */
     public Hangar getAllHangar() {
         return units;
@@ -2868,7 +2860,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all warehouses across all locations associated with this campaign.
-     *                                                                                                                                                                               TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
+     *                                                                                                                                                                                     TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
      */
     public Warehouse getAllWarehouse() {
         return parts;

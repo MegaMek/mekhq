@@ -59,8 +59,8 @@ import mekhq.campaign.events.NewDayEvent;
 import mekhq.campaign.events.StratConDeploymentEvent;
 import mekhq.campaign.events.missions.MissionCompletedEvent;
 import mekhq.campaign.events.missions.MissionRemovedEvent;
-import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.campaign.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.stratCon.StratConStrategicObjective;
@@ -300,7 +300,7 @@ public class StratConTab extends CampaignGuiTab {
         LocalDate currentDate = getCampaignGui().getCampaign().getLocalDate();
 
         LocalDate startDate = currentContract.getStartDate();
-        if (startDate != null && startDate.isAfter(currentDate)) {
+        if (startDate.isAfter(currentDate)) {
             campaignStatusText.setText("Contract has not started.");
             expandedObjectivePanel.setVisible(false);
             return;

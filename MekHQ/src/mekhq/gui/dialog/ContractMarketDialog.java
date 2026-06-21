@@ -45,7 +45,6 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.Vector;
 import javax.swing.*;
@@ -66,8 +65,8 @@ import mekhq.campaign.JumpPath;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.market.contractMarket.ContractAutomation;
-import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.rentals.FacilityRentals;
 import mekhq.campaign.universe.Faction;
@@ -155,7 +154,7 @@ public class ContractMarketDialog extends JDialog {
         HashMap<String, Integer> successfulContracts = new HashMap<>();
         List<String> retainers = new ArrayList<>();
         for (MissionTransition contract : campaign.getCompletedAtBContracts()) {
-            if (Objects.equals(contract.getEmployerCode(), campaign.getRetainerEmployerCode())) {
+            if (contract.getEmployerCode().equals(campaign.getRetainerEmployerCode())) {
                 continue;
             }
             int num = successfulContracts.getOrDefault(contract.getEmployerCode(), 0);
@@ -331,17 +330,17 @@ public class ContractMarketDialog extends JDialog {
 
             Vector<String> row = new Vector<>();
             if (contract instanceof AtBContract) {
-                row.add(((AtBContract) contract).getEmployerNameFromFaction(campaign.getGameYear()));
+                row.add(contract.getEmployerNameFromFaction(campaign.getGameYear()));
 
-                String enemyName = ((AtBContract) contract).generateEnemyName(campaign.getGameYear());
-                if (((AtBContract) contract).getEnemy().isMercenary()) {
+                String enemyName = contract.generateEnemyName(campaign.getGameYear());
+                if (contract.getEnemy().isMercenary()) {
                     enemyName = resourceMap.getString("lblEnemy.mercenary");
                 }
                 row.add(enemyName);
                 if (((AtBContract) contract).isSubcontract()) {
-                    row.add(((AtBContract) contract).getContractType() + " (Subcontract)");
+                    row.add(contract.getContractType() + " (Subcontract)");
                 } else {
-                    row.add(((AtBContract) contract).getContractType().toString());
+                    row.add(contract.getContractType().toString());
                 }
             } else {
                 row.add(contract.getEmployerNameDirect());

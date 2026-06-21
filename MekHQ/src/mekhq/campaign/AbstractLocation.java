@@ -255,10 +255,9 @@ public abstract class AbstractLocation implements IPlace {
                 LocalDate startDate = contract.getStartDate();
                 LocalDate today = campaign.getLocalDate();
 
-                int daysTillStart = startDate == null ? 0 : today.until(startDate).getDays();
-                if (startDate == null) {
-                    logger.warn("Contract {} has no start date", contract.getName());
-                }
+                int daysTillStart = today.until(startDate).getDays();
+                logger.warn("Contract {} has no start date", contract.getName());
+
 
                 String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
                       "contract.arrivedEarly.ic." + randomInt(10),
