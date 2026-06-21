@@ -83,7 +83,7 @@ public class CustomizeScenarioDialog extends JDialog {
     // region Variable declarations
     private final JFrame frame;
     private final Scenario scenario;
-    private final AbstractMissionTransition mission;
+    private final MissionTransition mission;
     private final Campaign campaign;
     private final boolean newScenario;
     private LocalDate date;
@@ -162,7 +162,7 @@ public class CustomizeScenarioDialog extends JDialog {
     private MarkdownEditorPanel txtReport;
     // endregion Variable declarations
 
-    public CustomizeScenarioDialog(JFrame parent, boolean modal, Scenario scenario, AbstractMissionTransition mission,
+    public CustomizeScenarioDialog(JFrame parent, boolean modal, Scenario scenario, MissionTransition mission,
           CampaignGUI gui) {
         super(parent, modal);
         this.frame = parent;

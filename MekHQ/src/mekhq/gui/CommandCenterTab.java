@@ -82,7 +82,7 @@ import mekhq.campaign.events.units.UnitEvent;
 import mekhq.campaign.events.units.UnitRefitEvent;
 import mekhq.campaign.finances.FinancialReport;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.report.CargoReport;
@@ -902,7 +902,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
                 model.addElement(String.format(report));
             }
 
-            for (AbstractMissionTransition mission : getCampaign().getActiveMissions(false)) {
+            for (MissionTransition mission : getCampaign().getActiveMissions(false)) {
                 List<Scenario> scenarios = mission.getScenarios();
 
                 scenarios.sort(Comparator.comparing(Scenario::getDate,

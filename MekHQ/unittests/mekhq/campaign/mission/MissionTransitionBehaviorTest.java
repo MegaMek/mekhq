@@ -59,7 +59,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 /**
- * Behavioral tests for the shared {@link AbstractMissionTransition} base class created by PR #9417.
+ * Behavioral tests for the shared {@link MissionTransition} base class created by PR #9417.
  *
  * <p>All of the contract/mission state and arithmetic now lives on the single flattened base class, so the most
  * valuable coverage is (a) the financial helper math that every mission type now inherits, and (b) the null-tolerant
@@ -69,7 +69,7 @@ import org.junit.jupiter.params.provider.CsvSource;
  *
  * @author Claude (test author for PR #9417 review)
  */
-class AbstractMissionTransitionBehaviorTest {
+class MissionTransitionBehaviorTest {
     private static final String UNKNOWN_SYSTEM_ID = "NoSuchSystem_ZZZ";
 
     @BeforeAll
@@ -252,7 +252,7 @@ class AbstractMissionTransitionBehaviorTest {
     })
     void calculateSalvagePercentageRoundsUp(long playerShare, long employerShare, int expectedPercent) {
         assertEquals(expectedPercent,
-              AbstractMissionTransition.calculateSalvagePercentage(Money.of(playerShare), Money.of(employerShare)),
+              MissionTransition.calculateSalvagePercentage(Money.of(playerShare), Money.of(employerShare)),
               "Salvage percentage must round up (CEILING)");
     }
 

@@ -72,7 +72,7 @@ import mekhq.campaign.camOpsReputation.ReputationController;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.market.enums.ContractMarketMethod;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.ContractCommandRights;
@@ -152,7 +152,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                 unitRatingMod = REGULAR.getExperienceLevel();
             }
 
-            for (AbstractMissionTransition contract : campaign.getActiveAtBContracts()) {
+            for (MissionTransition contract : campaign.getActiveAtBContracts()) {
                 checkForSubcontracts(campaign, contract, unitRatingMod);
 
                 if (!contracts.isEmpty() && hasActiveContract) {
@@ -293,10 +293,10 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         }
     }
 
-    private void checkForSubcontracts(Campaign campaign, AbstractMissionTransition contract, int unitRatingMod) {
+    private void checkForSubcontracts(Campaign campaign, MissionTransition contract, int unitRatingMod) {
         if (contract.getContractType().isGarrisonDuty()) {
             int numSubcontracts = 0;
-            for (AbstractMissionTransition mission : campaign.getAtBContracts()) {
+            for (MissionTransition mission : campaign.getAtBContracts()) {
                 if (mission instanceof AtBContract atbContract) {
                     if (contract.equals(atbContract.getParentContract())) {
                         numSubcontracts++;
@@ -306,7 +306,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             for (int i = numSubcontracts; i < unitRatingMod - 1; i++) {
                 int roll = d6(2);
                 if (roll >= 10) {
-                    AbstractMissionTransition sub = generateAtBSubcontract(campaign, contract, unitRatingMod);
+                    MissionTransition sub = generateAtBSubcontract(campaign, contract, unitRatingMod);
                     LocalDate subEndingDate = sub.getEndingDate();
                     LocalDate contractEndingDate = contract.getEndingDate();
 
@@ -553,7 +553,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
               contract.getContractType());
     }
 
-    protected AtBContract generateAtBSubcontract(Campaign campaign, AbstractMissionTransition parent,
+    protected AtBContract generateAtBSubcontract(Campaign campaign, MissionTransition parent,
           int unitRatingMod) {
         AtBContract contract = new AtBContract("New Subcontract");
         contract.updateEmployer(parent.getEmployerCode(), campaign.getGameYear());
@@ -667,7 +667,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
      * @author Illiani
      * @since 0.50.10
      */
-    private void getContractType(AbstractMissionTransition contract) {
+    private void getContractType(MissionTransition contract) {
         // Commander modifier is always 0 here as otherwise is skews AtB's results too much
         contract.setContractTypeAndName(ContractTypePicker.findMissionType(contract.getEmployerFaction(), 0));
     }

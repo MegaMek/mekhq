@@ -40,7 +40,7 @@ import java.util.List;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
 
 /**
@@ -78,12 +78,11 @@ public class EndContractNagDialog extends ImmersiveDialogNag {
      * </ul>
      *
      * @param today           The current local date used to check against the contracts' ending dates.
-     * @param activeContracts A list of {@link AbstractMissionTransition} objects representing the campaign's active
-     *                        contracts.
+     * @param activeContracts A list of {@link MissionTransition} objects representing the campaign's active contracts.
      *
      * @return {@code true} if the nag dialog should be displayed; {@code false} otherwise.
      */
-    public static boolean checkNag(LocalDate today, List<AbstractMissionTransition> activeContracts) {
+    public static boolean checkNag(LocalDate today, List<MissionTransition> activeContracts) {
 
         return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_CONTRACT_ENDED) && isContractEnded(today, activeContracts);
     }

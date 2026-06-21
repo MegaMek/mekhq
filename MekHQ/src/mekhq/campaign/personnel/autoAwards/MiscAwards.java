@@ -44,7 +44,7 @@ import java.util.UUID;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Award;
@@ -74,7 +74,7 @@ public class MiscAwards {
      * @return a map of eligible awards grouped by their respective IDs
      */
     public static Map<Integer, List<Object>> MiscAwardsProcessor(Campaign campaign,
-          @Nullable AbstractMissionTransition mission,
+          @Nullable MissionTransition mission,
           UUID person, List<Award> awards, Boolean missionWasSuccessful, boolean isCivilianHelp,
           @Nullable Integer killCount, @Nullable Integer injuryCount, @Nullable UUID supportPersonOfTheYear,
           @Nullable List<Person> POWPersonnel) {
@@ -161,7 +161,7 @@ public class MiscAwards {
      * @param person   the person to check award eligibility for
      * @param isYesWar true if this is a Yes War Award
      */
-    private static boolean HouseWorldWar(Campaign campaign, @Nullable AbstractMissionTransition mission, Award award,
+    private static boolean HouseWorldWar(Campaign campaign, @Nullable MissionTransition mission, Award award,
           UUID person,
           boolean isYesWar) {
         if (award.canBeAwarded(campaign.getPerson(person))) {
@@ -199,7 +199,7 @@ public class MiscAwards {
      *
      * @return true if the person is eligible for the award, false otherwise
      */
-    private static boolean Periphery(Campaign campaign, @Nullable AbstractMissionTransition mission, Award award,
+    private static boolean Periphery(Campaign campaign, @Nullable MissionTransition mission, Award award,
           UUID person) {
         if (award.canBeAwarded(campaign.getPerson(person))) {
             if (mission != null) {
@@ -248,7 +248,7 @@ public class MiscAwards {
      * @return true if the person is eligible for the award, false otherwise
      */
     private static boolean CeremonialDuty(Campaign campaign, Award award, UUID person,
-          @Nullable AbstractMissionTransition mission) {
+          @Nullable MissionTransition mission) {
         if (award.canBeAwarded(campaign.getPerson(person))) {
             if (mission != null) {
                 if (!(mission instanceof Mission)) {

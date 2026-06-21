@@ -61,7 +61,7 @@ import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.market.PartsInUseManager;
 import mekhq.campaign.market.procurement.Procurement;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.enums.PartQuality;
@@ -93,7 +93,7 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
  */
 public class Resupply {
     private final Campaign campaign;
-    private final AbstractMissionTransition contract;
+    private final MissionTransition contract;
     private final ResupplyType resupplyType;
     private final Faction employerFaction;
     private final int currentYear;
@@ -132,7 +132,7 @@ public class Resupply {
      * @param campaign The current campaign.
      * @param contract The specific contract under which the resupply process is conducted.
      */
-    public Resupply(Campaign campaign, AbstractMissionTransition contract, ResupplyType resupplyType) {
+    public Resupply(Campaign campaign, MissionTransition contract, ResupplyType resupplyType) {
         this.campaign = campaign;
         this.contract = contract;
         this.resupplyType = resupplyType;
@@ -171,7 +171,7 @@ public class Resupply {
      *
      * @return An {@link AtBContract} representing the current contract.
      */
-    public AbstractMissionTransition getContract() {
+    public MissionTransition getContract() {
         return contract;
     }
 
@@ -403,7 +403,7 @@ public class Resupply {
         this.usePlayerConvoy = usePlayerConvoy;
     }
 
-    static int calculateTargetCargoTonnage(Campaign campaign, AbstractMissionTransition contract) {
+    static int calculateTargetCargoTonnage(Campaign campaign, MissionTransition contract) {
         double unitTonnage = 0;
 
         // First, calculate the total tonnage across all combat units in the campaign.
@@ -448,7 +448,7 @@ public class Resupply {
         return (int) max(CARGO_MINIMUM_WEIGHT, round(dropSize));
     }
 
-    private static double getDropSize(AbstractMissionTransition contract, double unitTonnage) {
+    private static double getDropSize(MissionTransition contract, double unitTonnage) {
         final int INDIVIDUAL_TONNAGE_ALLOWANCE = 80; // This is how many tons the employer will budget per unit
         final int tonnageCap = contract.getRequiredCombatElements() * INDIVIDUAL_TONNAGE_ALLOWANCE;
 

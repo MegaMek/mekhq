@@ -56,7 +56,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.gui.model.DataTableModel;
@@ -81,7 +81,7 @@ public class LanceAssignmentView extends JPanel {
     private JTable tblAssignments;
     private JLabel lblDeploymentSummary;
     private JPanel panRequiredLances;
-    private JComboBox<AbstractMissionTransition> cbContract;
+    private JComboBox<MissionTransition> cbContract;
     private RequiredLancesTableModel requiredLancesModel;
     private LanceAssignmentTableModel lanceAssignmentModel;
     private Runnable assignmentChangeListener;
@@ -289,11 +289,11 @@ public class LanceAssignmentView extends JPanel {
 
     public void refresh() {
         cbContract.removeAllItems();
-        List<AbstractMissionTransition> activeContracts = campaign.getActiveAtBContracts();
-        for (AbstractMissionTransition contract : activeContracts) {
+        List<MissionTransition> activeContracts = campaign.getActiveAtBContracts();
+        for (MissionTransition contract : activeContracts) {
             cbContract.addItem(contract);
         }
-        AbstractMissionTransition defaultContract = activeContracts.isEmpty() ? null : activeContracts.getFirst();
+        MissionTransition defaultContract = activeContracts.isEmpty() ? null : activeContracts.getFirst();
         for (CombatTeam combatTeam : campaign.getCombatTeamsAsMap().values()) {
             if ((combatTeam.getContract(campaign) == null) ||
                       !combatTeam.getContract(campaign).isActiveOn(campaign.getLocalDate(), true)) {
@@ -301,7 +301,7 @@ public class LanceAssignmentView extends JPanel {
             }
         }
 
-        ((DataTableModel<AbstractMissionTransition>) tblRequiredLances.getModel()).setData(activeContracts);
+        ((DataTableModel<MissionTransition>) tblRequiredLances.getModel()).setData(activeContracts);
         ((DataTableModel<CombatTeam>) tblAssignments.getModel()).setData(campaign.getCombatTeamsAsList());
         panRequiredLances.setVisible(tblRequiredLances.getRowCount() > 0);
         updateDeploymentSummary();

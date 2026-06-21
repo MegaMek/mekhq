@@ -66,7 +66,7 @@ import mekhq.campaign.JumpPath;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.market.contractMarket.ContractAutomation;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.rentals.FacilityRentals;
@@ -100,7 +100,7 @@ public class ContractMarketDialog extends JDialog {
 
     private final Campaign campaign;
     private final AbstractContractMarket contractMarket;
-    private AbstractMissionTransition selectedContract = null;
+    private MissionTransition selectedContract = null;
     private final List<String> possibleRetainerContracts;
 
     private JScrollPane scrollContractView;
@@ -154,7 +154,7 @@ public class ContractMarketDialog extends JDialog {
     private static List<String> getPossibleRetainerContracts(Campaign campaign) {
         HashMap<String, Integer> successfulContracts = new HashMap<>();
         List<String> retainers = new ArrayList<>();
-        for (AbstractMissionTransition contract : campaign.getCompletedAtBContracts()) {
+        for (MissionTransition contract : campaign.getCompletedAtBContracts()) {
             if (Objects.equals(contract.getEmployerCode(), campaign.getRetainerEmployerCode())) {
                 continue;
             }
@@ -211,7 +211,7 @@ public class ContractMarketDialog extends JDialog {
         chkMRBC = new JCheckBox();
         chkMRBC.addItemListener(evt -> {
             payMRBC = chkMRBC.isSelected();
-            for (AbstractMissionTransition contract : contractMarket.getContracts()) {
+            for (MissionTransition contract : contractMarket.getContracts()) {
                 contract.setPaidMRBCFee(payMRBC);
                 contract.calculateContract(campaign);
             }
@@ -223,7 +223,7 @@ public class ContractMarketDialog extends JDialog {
         spnAdvance = new JSpinner(new SpinnerNumberModel(advance, 0, 25, 5));
         spnAdvance.addChangeListener(evt -> {
             advance = (Integer) spnAdvance.getValue();
-            for (AbstractMissionTransition contract : contractMarket.getContracts()) {
+            for (MissionTransition contract : contractMarket.getContracts()) {
                 contract.setAdvancePercent(advance);
                 contract.calculateContract(campaign);
             }
@@ -235,7 +235,7 @@ public class ContractMarketDialog extends JDialog {
         spnSigningBonus = new JSpinner(new SpinnerNumberModel(signingBonus, 0, 10, 1));
         spnSigningBonus.addChangeListener(evt -> {
             signingBonus = (Integer) spnSigningBonus.getValue();
-            for (AbstractMissionTransition contract : contractMarket.getContracts()) {
+            for (MissionTransition contract : contractMarket.getContracts()) {
                 contract.setSigningBonus(signingBonus);
                 contract.calculateContract(campaign);
             }
@@ -248,7 +248,7 @@ public class ContractMarketDialog extends JDialog {
         spnSharePct = new JSpinner(new SpinnerNumberModel(sharePct, 20, 50, 10));
         spnSharePct.addChangeListener(evt -> {
             sharePct = (Integer) spnSharePct.getValue();
-            for (AbstractMissionTransition contract : contractMarket.getContracts()) {
+            for (MissionTransition contract : contractMarket.getContracts()) {
                 if (campaign.getCampaignOptions().isUseStratCon() &&
                           campaign.getCampaignOptions().isUseShareSystem() &&
                           contract instanceof AtBContract) {
@@ -309,7 +309,7 @@ public class ContractMarketDialog extends JDialog {
         FactionStandings factionStandings = campaign.getFactionStandings();
 
         Vector<Vector<String>> data = new Vector<>();
-        for (AbstractMissionTransition contract : contractMarket.getContracts()) {
+        for (MissionTransition contract : contractMarket.getContracts()) {
             // Changes in rating or force size since creation can alter some details
             if (contract instanceof AtBContract atbContract) {
                 atbContract.initContractDetails(campaign);
@@ -589,7 +589,7 @@ public class ContractMarketDialog extends JDialog {
         }
     }
 
-    public AbstractMissionTransition getContract() {
+    public MissionTransition getContract() {
         return selectedContract;
     }
 

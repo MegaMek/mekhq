@@ -47,7 +47,7 @@ import megamek.common.compute.Compute;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
 import mekhq.campaign.parts.Part;
@@ -252,7 +252,7 @@ public class GenerateResupplyContents {
         final Campaign campaign = resupply.getCampaign();
         final Faction campaignFaction = campaign.getFaction();
 
-        final AbstractMissionTransition contract = resupply.getContract();
+        final MissionTransition contract = resupply.getContract();
         final Faction employerFaction = contract.getEmployerFaction();
 
         if (campaignFaction.equals(employerFaction) && !campaignFaction.isMercenary()

@@ -167,7 +167,7 @@ public final class BriefingTab extends CampaignGuiTab {
     private LanceAssignmentView panLanceAssignment;
     private JTabbedPane scenarioWorkTabs;
     private JTable scenarioTable;
-    private MMComboBox<AbstractMissionTransition> comboMission;
+    private MMComboBox<MissionTransition> comboMission;
     private MMComboBox<ScenarioQueueFilter> scenarioFilter;
     private JScrollPane scrollMissionView;
     private JScrollPane scrollScenarioView;
@@ -747,7 +747,7 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private boolean isStratConScenario(Scenario scenario) {
-        AbstractMissionTransition mission = getCampaign().getMission(scenario.getMissionId());
+        MissionTransition mission = getCampaign().getMission(scenario.getMissionId());
         return (scenario instanceof AtBDynamicScenario) &&
                      (mission instanceof AtBContract contract) &&
                      (contract.getStratConCampaignState() != null);
@@ -781,7 +781,7 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private void editMission() {
-        final AbstractMissionTransition mission = comboMission.getSelectedItem();
+        final MissionTransition mission = comboMission.getSelectedItem();
         if (mission == null) {
             return;
         }
@@ -802,7 +802,7 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private void completeMission() {
-        final AbstractMissionTransition mission = comboMission.getSelectedItem();
+        final MissionTransition mission = comboMission.getSelectedItem();
         if (mission == null) {
             return;
         }
@@ -1013,7 +1013,7 @@ public final class BriefingTab extends CampaignGuiTab {
         // end to ensure there isn't any risk of us accidentally killing the data when it's still required.
         mission.setStratConCampaignState(null);
 
-        final List<AbstractMissionTransition> missions = getCampaign().getSortedMissions();
+        final List<MissionTransition> missions = getCampaign().getSortedMissions();
         comboMission.setSelectedItem(missions.isEmpty() ? null : missions.getFirst());
     }
 
@@ -1038,7 +1038,7 @@ public final class BriefingTab extends CampaignGuiTab {
      * @author Illiani
      * @since 0.50.07
      */
-    private SimulateMissionDialog getSimulateMissionDialog(AbstractMissionTransition mission, MissionStatus status) {
+    private SimulateMissionDialog getSimulateMissionDialog(MissionTransition mission, MissionStatus status) {
         LocalDate startDate = mission.getStartDate();
         LocalDate today = getCampaign().getLocalDate();
         if (startDate == null) {
@@ -1071,7 +1071,7 @@ public final class BriefingTab extends CampaignGuiTab {
      *
      * @return The XP award for completing the mission.
      */
-    private int getMissionXpAward(MissionStatus missionStatus, AbstractMissionTransition mission) {
+    private int getMissionXpAward(MissionStatus missionStatus, MissionTransition mission) {
         return switch (missionStatus) {
             case FAILED, BREACH -> getCampaignOptions().getMissionXpFail();
             case SUCCESS, PARTIAL -> {
@@ -1092,7 +1092,7 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private void deleteMission() {
-        final AbstractMissionTransition mission = comboMission.getSelectedItem();
+        final MissionTransition mission = comboMission.getSelectedItem();
         if (mission == null) {
             logger.error("Cannot remove null mission");
             return;
@@ -1116,7 +1116,7 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         getCampaign().removeMission(mission);
-        final List<AbstractMissionTransition> missions = getCampaign().getSortedMissions();
+        final List<MissionTransition> missions = getCampaign().getSortedMissions();
         comboMission.setSelectedItem(missions.isEmpty() ? null : missions.getFirst());
         MekHQ.triggerEvent(new MissionRemovedEvent(mission));
     }
@@ -1138,7 +1138,7 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
-        AbstractMissionTransition contract = comboMission.getSelectedItem();
+        MissionTransition contract = comboMission.getSelectedItem();
         StratConCampaignState campaignState = contract.getStratConCampaignState();
         if (campaignState != null) {
             generateDailyScenariosForTrack(getCampaign(), campaignState, contract, 1);
@@ -1153,7 +1153,7 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private void addScenario() {
-        final AbstractMissionTransition mission = comboMission.getSelectedItem();
+        final MissionTransition mission = comboMission.getSelectedItem();
         if (mission == null) {
             return;
         }
@@ -1333,7 +1333,7 @@ public final class BriefingTab extends CampaignGuiTab {
      */
     private boolean isHasSalvageOpportunity(int missionId) {
         boolean hasSalvageOpportunity = true;
-        AbstractMissionTransition mission = getCampaign().getMission(missionId);
+        MissionTransition mission = getCampaign().getMission(missionId);
         if (!(mission instanceof Mission)) {
             hasSalvageOpportunity = mission.canSalvage();
         }
@@ -1559,7 +1559,7 @@ public final class BriefingTab extends CampaignGuiTab {
         List<SalvageFormationData> salvageFormationOptions = new ArrayList<>();
 
         // Collect eligible salvage forces (We want salvage forces first)
-        List<AbstractMissionTransition> activeContracts = getCampaign().getActiveAtBContracts();
+        List<MissionTransition> activeContracts = getCampaign().getActiveAtBContracts();
         Hangar hangar = campaign.getHangar();
         List<Formation> eligibleSalvageFormations = new ArrayList<>();
         for (Formation formation : getCampaign().getAllFormations()) {
@@ -1654,7 +1654,7 @@ public final class BriefingTab extends CampaignGuiTab {
             return true;
         }
 
-        AbstractMissionTransition mission = null;
+        MissionTransition mission = null;
         if (scenario.getMissionId() != -1) {
             mission = getCampaign().getMission(scenario.getMissionId());
         }
@@ -2096,7 +2096,7 @@ public final class BriefingTab extends CampaignGuiTab {
      * @return the enemy faction
      */
     private Faction getEnemyFactionFromScenario(Scenario scenario) {
-        AbstractMissionTransition mission = null;
+        MissionTransition mission = null;
         if (scenario.getMissionId() != -1) {
             mission = getCampaign().getMission(scenario.getMissionId());
         }
@@ -2124,7 +2124,7 @@ public final class BriefingTab extends CampaignGuiTab {
      * @return the employer faction
      */
     private Faction getAlliedFactionFromScenario(Scenario scenario) {
-        AbstractMissionTransition mission = null;
+        MissionTransition mission = null;
         if (scenario.getMissionId() != -1) {
             mission = getCampaign().getMission(scenario.getMissionId());
         }
@@ -2165,7 +2165,7 @@ public final class BriefingTab extends CampaignGuiTab {
         int allowedYear = cGame.getOptions().intOption(OptionsConstants.ALLOWED_YEAR);
 
         // This had better be an AtB contract...
-        final AbstractMissionTransition mission = comboMission.getSelectedItem();
+        final MissionTransition mission = comboMission.getSelectedItem();
         if (mission instanceof AtBContract atbContract) {
             opForFactionCode = (atbContract.getEnemyCode().isBlank()) ? opForFactionCode : atbContract.getEnemyCode();
             opForQuality = atbContract.getEnemyQuality();
@@ -2353,7 +2353,7 @@ public final class BriefingTab extends CampaignGuiTab {
             logger.error("", ex);
         }
 
-        final AbstractMissionTransition mission = comboMission.getSelectedItem();
+        final MissionTransition mission = comboMission.getSelectedItem();
         if ((mission instanceof AtBContract) &&
                   (scenario instanceof AtBScenario) &&
                   !((AtBScenario) scenario).getAlliesPlayer().isEmpty()) {
@@ -2434,8 +2434,8 @@ public final class BriefingTab extends CampaignGuiTab {
 
     public void refreshMissions() {
         comboMission.removeAllItems();
-        final List<AbstractMissionTransition> missions = getCampaign().getSortedMissions();
-        for (final AbstractMissionTransition mission : missions) {
+        final List<MissionTransition> missions = getCampaign().getSortedMissions();
+        for (final MissionTransition mission : missions) {
             comboMission.addItem(mission);
         }
 
@@ -2562,7 +2562,7 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     public void changeMission() {
-        final AbstractMissionTransition mission = comboMission.getSelectedItem();
+        final MissionTransition mission = comboMission.getSelectedItem();
         if (mission == null) {
             scrollMissionView.setViewportView(null);
             missionViewPanel = null;
@@ -2596,7 +2596,7 @@ public final class BriefingTab extends CampaignGuiTab {
         int scenarioSelection = getSelectedScenarioId(scenarioTable, scenarioModel);
         ScenarioQueueFilter selectedFilter = getSelectedScenarioFilter(scenarioFilter,
               ScenarioQueueFilter.ALL);
-        final AbstractMissionTransition mission = comboMission.getSelectedItem();
+        final MissionTransition mission = comboMission.getSelectedItem();
         List<Scenario> visibleScenarios = (mission == null) ? new ArrayList<>() : mission.getVisibleScenarios();
         if (preserveResolvedSelection && (scenarioSelection >= 0) &&
                   (selectedFilter != ScenarioQueueFilter.ALL) &&
@@ -2664,11 +2664,11 @@ public final class BriefingTab extends CampaignGuiTab {
      * @since 0.50.05
      */
     public void focusOnScenario(int targetId) {
-        AbstractMissionTransition targetMission = null;
+        MissionTransition targetMission = null;
         Scenario targetScenario = null;
 
         // First find the mission and scenario
-        for (AbstractMissionTransition mission : getCampaign().getMissions()) {
+        for (MissionTransition mission : getCampaign().getMissions()) {
             for (Scenario scenario : mission.getScenarios()) {
                 if (scenario.getId() == targetId) {
                     targetMission = mission;
@@ -2727,7 +2727,7 @@ public final class BriefingTab extends CampaignGuiTab {
      * @since 0.50.05
      */
     public void focusOnMission(int targetId) {
-        AbstractMissionTransition mission = getCampaign().getMission(targetId);
+        MissionTransition mission = getCampaign().getMission(targetId);
 
         if (mission == null) {
             return;
@@ -2754,7 +2754,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
     @Subscribe
     public void handle(ScenarioChangedEvent evt) {
-        final AbstractMissionTransition mission = comboMission.getSelectedItem();
+        final MissionTransition mission = comboMission.getSelectedItem();
         if ((evt.getScenario() != null) &&
                   (evt.getScenario().getMissionId() == (mission == null ? -1 : mission.getId()))) {
             scenarioTable.repaint();
@@ -2816,7 +2816,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
     @Subscribe
     public void handle(MissionChangedEvent evt) {
-        final AbstractMissionTransition mission = comboMission.getSelectedItem();
+        final MissionTransition mission = comboMission.getSelectedItem();
         if ((mission != null) && (evt.getMission().getId() == mission.getId())) {
             changeMission();
         }

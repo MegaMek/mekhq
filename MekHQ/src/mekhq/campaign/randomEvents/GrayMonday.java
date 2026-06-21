@@ -44,7 +44,7 @@ import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Factions;
@@ -91,7 +91,7 @@ public class GrayMonday {
             }
 
             if (isEmployerBegging) {
-                for (AbstractMissionTransition contract : campaign.getAtBContracts()) {
+                for (MissionTransition contract : campaign.getAtBContracts()) {
                     LocalDate startDate = contract.getStartDate();
                     if (startDate != null && !startDate.isBefore(today)) {
                         contract.setBaseAmount(Money.of(0));
@@ -121,7 +121,7 @@ public class GrayMonday {
         Person speaker = null;
 
         if (isEmployerBegging) {
-            for (AbstractMissionTransition contract : campaign.getAtBContracts()) {
+            for (MissionTransition contract : campaign.getAtBContracts()) {
                 LocalDate startDate = contract.getStartDate();
                 if (startDate != null && !startDate.isBefore(today)) {
                     speaker = getEmployerSpeaker(contract);
@@ -178,7 +178,7 @@ public class GrayMonday {
      * @author Illiani
      * @since 0.50.06
      */
-    private Person getEmployerSpeaker(AbstractMissionTransition contract) {
+    private Person getEmployerSpeaker(MissionTransition contract) {
         String employer = contract.getEmployerFaction().getShortName();
         Person speaker = campaign.newPerson(ADMINISTRATOR_COMMAND, employer, Gender.RANDOMIZE);
         speaker.setOriginFaction(Factions.getInstance().getFaction(employer));

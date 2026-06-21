@@ -48,7 +48,7 @@ import megamek.common.util.weightedMaps.WeightedIntMap;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonUtility;
@@ -128,7 +128,7 @@ public class NonCombatPrisoners {
      * @since 0.50.10
      */
     public static Hashtable<UUID, ResolveScenarioTracker.OppositionPersonnelStatus> getCivilianCaptives(
-          Campaign campaign, AbstractMissionTransition contract) {
+          Campaign campaign, MissionTransition contract) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         boolean isUseAdvancedMedical = campaignOptions.isUseAdvancedMedical();
 

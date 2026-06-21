@@ -41,7 +41,7 @@ import javax.swing.JTable;
 
 import mekhq.MekHQ;
 import mekhq.campaign.events.scenarios.ScenarioChangedEvent;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.stratCon.MaplessStratCon;
@@ -114,7 +114,7 @@ public class ScenarioTableMouseAdapter extends JPopupMenuAdapter {
     }
 
     private void editScenario(Scenario scenario) {
-        AbstractMissionTransition mission = gui.getCampaign().getMission(scenario.getMissionId());
+        MissionTransition mission = gui.getCampaign().getMission(scenario.getMissionId());
         if (mission != null) {
             CustomizeScenarioDialog csd = new CustomizeScenarioDialog(gui.getFrame(), true,
                   scenario, mission, gui);

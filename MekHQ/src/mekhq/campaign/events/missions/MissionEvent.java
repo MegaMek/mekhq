@@ -36,7 +36,7 @@ package mekhq.campaign.events.missions;
 import java.util.Objects;
 
 import megamek.common.event.MMEvent;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.Mission;
 
 /**
@@ -44,13 +44,13 @@ import mekhq.campaign.mission.Mission;
  */
 public abstract class MissionEvent extends MMEvent {
 
-    private final AbstractMissionTransition mission;
+    private final MissionTransition mission;
 
-    public MissionEvent(AbstractMissionTransition mission) {
+    public MissionEvent(MissionTransition mission) {
         this.mission = Objects.requireNonNull(mission);
     }
 
-    public AbstractMissionTransition getMission() {
+    public MissionTransition getMission() {
         return mission;
     }
 

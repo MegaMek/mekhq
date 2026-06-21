@@ -42,7 +42,7 @@ import java.util.Objects;
 
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities;
 import mekhq.campaign.personnel.Person;
@@ -95,7 +95,7 @@ public class FactionStandingGreeting {
      * @author Illiani
      * @since 0.50.07
      */
-    public FactionStandingGreeting(Campaign campaign, AbstractMissionTransition contract) {
+    public FactionStandingGreeting(Campaign campaign, MissionTransition contract) {
         if (!(contract instanceof AtBContract atBContract)) {
             new FactionStandingGreeting(campaign);
             return;

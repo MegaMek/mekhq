@@ -60,7 +60,7 @@ import javax.swing.SwingConstants;
 import megamek.client.ui.util.UIUtil;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
@@ -77,7 +77,7 @@ import mekhq.utilities.ReportingUtilities;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MissionViewPanel extends JScrollablePanel {
-    private final AbstractMissionTransition mission;
+    private final MissionTransition mission;
     protected CampaignGUI gui;
 
     protected JPanel pnlStats;
@@ -112,7 +112,7 @@ public class MissionViewPanel extends JScrollablePanel {
     private final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractViewPanel",
           MekHQ.getMHQOptions().getLocale());
 
-    public MissionViewPanel(AbstractMissionTransition mission, CampaignGUI gui) {
+    public MissionViewPanel(MissionTransition mission, CampaignGUI gui) {
         super();
         this.mission = mission;
         this.gui = gui;

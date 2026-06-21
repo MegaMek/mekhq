@@ -124,7 +124,7 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.market.PartsInUseManager;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBScenario;
@@ -774,7 +774,7 @@ public class CampaignNewDayManager {
         int vocationalXpRate = campaignOptions.getVocationalXP();
         if (campaign.hasActiveContract()) {
             if (campaignOptions.isUseStratCon()) {
-                for (AbstractMissionTransition contract : campaign.getActiveAtBContracts()) {
+                for (MissionTransition contract : campaign.getActiveAtBContracts()) {
                     if (!contract.getContractType().isGarrisonType()) {
                         vocationalXpRate *= 2;
                         break;
@@ -1081,7 +1081,7 @@ public class CampaignNewDayManager {
             /*
              * First of the month; roll Morale.
              */
-            for (AbstractMissionTransition contract : campaign.getActiveAtBContracts()) {
+            for (MissionTransition contract : campaign.getActiveAtBContracts()) {
                 AtBMoraleLevel oldMorale = contract.getMoraleLevel();
 
                 if (contract instanceof AtBContract atbContract) {
@@ -1111,9 +1111,9 @@ public class CampaignNewDayManager {
             // campaign occurs at the end of the 1st day, each month to avoid an awkward mechanics interaction where
             // personnel might quit or get taken out of fatigue without the player having any opportunity to
             // intervene before their resupply attempt becomes active.
-            List<AbstractMissionTransition> activeContracts = campaign.getActiveAtBContracts();
-            AbstractMissionTransition firstNonSubcontract = null;
-            for (AbstractMissionTransition contract : activeContracts) {
+            List<MissionTransition> activeContracts = campaign.getActiveAtBContracts();
+            MissionTransition firstNonSubcontract = null;
+            for (MissionTransition contract : activeContracts) {
                 if (contract instanceof AtBContract atbContract) {
                     if (!atbContract.isSubcontract()) {
                         firstNonSubcontract = contract;
@@ -1145,7 +1145,7 @@ public class CampaignNewDayManager {
         processNewDayATBScenarios();
 
         // Daily events
-        for (AbstractMissionTransition contract : campaign.getActiveAtBContracts()) {
+        for (MissionTransition contract : campaign.getActiveAtBContracts()) {
             if (campaignOptions.isUseGenericBattleValue() &&
                       !contract.getContractType().isGarrisonType() &&
                       contract.getStartDate().equals(today)) {
@@ -1546,7 +1546,7 @@ public class CampaignNewDayManager {
             campaign.addReport(POLITICS, report);
         }
 
-        List<AbstractMissionTransition> activeMissions = campaign.getActiveMissions(false);
+        List<MissionTransition> activeMissions = campaign.getActiveMissions(false);
         boolean isInTransit = !updatedLocation.isOnPlanet();
         Factions factions = Factions.getInstance();
 
@@ -2039,7 +2039,7 @@ public class CampaignNewDayManager {
      *
      * @param contract the {@link AtBContract} for which resupply is being processed
      */
-    private void processResupply(AbstractMissionTransition contract) {
+    private void processResupply(MissionTransition contract) {
         boolean isGuerrilla = contract.getContractType().isGuerrillaType()
                                     || PIRATE_FACTION_CODE.equals(contract.getEmployerCode());
 
@@ -2145,11 +2145,11 @@ public class CampaignNewDayManager {
 
     private void processNewDayATBScenarios() {
         // First, we get the list of all active AtBContracts
-        List<AbstractMissionTransition> contracts = campaign.getActiveAtBContracts(true);
+        List<MissionTransition> contracts = campaign.getActiveAtBContracts(true);
         Set<Integer> allScenariosWithAssignedStandardForces = getAllScenariosWithAssignedStandardForces();
 
         // Second, we process them and any already generated scenarios
-        for (AbstractMissionTransition contract : contracts) {
+        for (MissionTransition contract : contracts) {
             /*
              * Situations like a delayed start or running out of funds during transit can delay arrival until after
              * the contract start. In that case, shift the starting and ending dates before making any battle rolls.
@@ -2242,7 +2242,7 @@ public class CampaignNewDayManager {
         }
 
         // Fourth, we look at deployments for pre-existing and new scenarios
-        for (AbstractMissionTransition contract : contracts) {
+        for (MissionTransition contract : contracts) {
             if (contract instanceof AtBContract atbContract) {
                 atbContract.checkEvents(campaign);
             }
@@ -2311,7 +2311,7 @@ public class CampaignNewDayManager {
      * @since 0.50.10
      */
     private void payForRentedFacilities() {
-        List<AbstractMissionTransition> activeContracts = campaign.getActiveContracts();
+        List<MissionTransition> activeContracts = campaign.getActiveContracts();
         int hospitalRentalCost = campaignOptions.getRentedFacilitiesCostHospitalBeds();
         Money hospitalRentalFee = FacilityRentals.calculateContractRentalCost(hospitalRentalCost, activeContracts,
               ContractRentalType.HOSPITAL_BEDS);

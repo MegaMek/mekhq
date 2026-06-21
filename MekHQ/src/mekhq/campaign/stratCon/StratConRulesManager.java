@@ -98,7 +98,7 @@ import mekhq.campaign.events.StratConDeploymentEvent;
 import mekhq.campaign.events.scenarios.ScenarioChangedEvent;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
@@ -221,7 +221,7 @@ public class StratConRulesManager {
      * @param isUseStratConSingles If {@code true} only a single scenario will be generated
      */
     public static void generateScenariosDatesForWeek(Campaign campaign, StratConCampaignState campaignState,
-          AbstractMissionTransition contract, StratConTrackState track, boolean isUseStratConSingles) {
+          MissionTransition contract, StratConTrackState track, boolean isUseStratConSingles) {
         // Important note: we don't check to see whether the OpFor has been routed when scheduling scenario dates.
         // This is because it's possible the OpFor will rally between the start of the week and when the scenario is
         // scheduled.
@@ -267,7 +267,7 @@ public class StratConRulesManager {
      * @param scenarioCount The number of scenarios to generate.
      */
     public static void generateDailyScenariosForTrack(Campaign campaign, StratConCampaignState campaignState,
-          AbstractMissionTransition contract, int scenarioCount) {
+          MissionTransition contract, int scenarioCount) {
         // get this list just so we have it available
         List<Integer> availableForceIDs = getAvailableForceIDs(campaign, contract, false);
 
@@ -406,7 +406,7 @@ public class StratConRulesManager {
      * @throws IllegalArgumentException If {@code scenarioCoords} is specified while {@code track} is {@code null}.
      */
     public static @Nullable StratConScenario generateExternalScenario(Campaign campaign,
-          AbstractMissionTransition contract,
+          MissionTransition contract,
           @Nullable StratConTrackState track, @Nullable StratConCoords scenarioCoords,
           @Nullable ScenarioTemplate template, boolean allowPlayerFacilities, boolean allowPlayerForces,
           boolean emphasizeStrategicTargets, @Nullable Integer daysTilDeployment) {
@@ -628,11 +628,11 @@ public class StratConRulesManager {
      * Fetches a random {@link StratConTrackState} from the {@link StratConCampaignState}. If no tracks are present, it
      * logs an error message and returns {@code null}.
      *
-     * @param contract The {@link AbstractMissionTransition} from which the track state will be fetched.
+     * @param contract The {@link MissionTransition} from which the track state will be fetched.
      *
      * @return The randomly chosen {@link StratConTrackState}, or {@code null} if no tracks are available.
      */
-    public static @Nullable StratConTrackState getRandomTrack(AbstractMissionTransition contract) {
+    public static @Nullable StratConTrackState getRandomTrack(MissionTransition contract) {
         List<StratConTrackState> tracks = contract.getStratConCampaignState().getTracks();
         Random rand = new Random();
 
@@ -653,7 +653,7 @@ public class StratConRulesManager {
      * @param autoAssignLances Flag indicating whether lances are to be auto-assigned.
      * @param scenario         The {@link StratConScenario} scenario to be finalized.
      */
-    public static void finalizeBackingScenario(Campaign campaign, AbstractMissionTransition contract,
+    public static void finalizeBackingScenario(Campaign campaign, MissionTransition contract,
           @Nullable StratConTrackState track, boolean autoAssignLances, StratConScenario scenario) {
         final AtBDynamicScenario backingScenario = scenario.getBackingScenario();
 
@@ -753,7 +753,7 @@ public class StratConRulesManager {
      * @param isCombatChallenge {@code true} if attached units should be skipped, and if the scenario is barred from
      *                          being a Turning Point
      */
-    private static void determineIfTurningPointScenario(AbstractMissionTransition contract, StratConScenario scenario,
+    private static void determineIfTurningPointScenario(MissionTransition contract, StratConScenario scenario,
           boolean isCombatChallenge) {
         ScenarioType scenarioType = scenario.getBackingScenario().getStratConScenarioType();
         boolean isObjective = scenario.isStrategicObjective();
@@ -1080,7 +1080,7 @@ public class StratConRulesManager {
      * @return The newly generated {@link StratConScenario}.
      */
     public static @Nullable StratConScenario generateScenarioForExistingForces(StratConCoords scenarioCoords,
-          Set<Integer> forceIDs, AbstractMissionTransition contract, Campaign campaign, StratConTrackState track) {
+          Set<Integer> forceIDs, MissionTransition contract, Campaign campaign, StratConTrackState track) {
         return generateScenarioForExistingForces(scenarioCoords, forceIDs, contract, campaign, track, null, null);
     }
 
@@ -1101,7 +1101,7 @@ public class StratConRulesManager {
      * @return The newly generated {@link StratConScenario}.
      */
     public static @Nullable StratConScenario generateScenarioForExistingForces(StratConCoords scenarioCoords,
-          Set<Integer> forceIDs, AbstractMissionTransition contract, Campaign campaign, StratConTrackState track,
+          Set<Integer> forceIDs, MissionTransition contract, Campaign campaign, StratConTrackState track,
           @Nullable ScenarioTemplate template, @Nullable Integer daysTilDeployment) {
         boolean firstForce = true;
         StratConScenario scenario = null;
@@ -1387,7 +1387,7 @@ public class StratConRulesManager {
      * @return The newly set up {@link StratConScenario}.
      */
     public static @Nullable StratConScenario setupScenario(StratConCoords coords, @Nullable Integer forceID,
-          Campaign campaign, AbstractMissionTransition contract, StratConTrackState track) {
+          Campaign campaign, MissionTransition contract, StratConTrackState track) {
         return setupScenario(coords,
               forceID,
               campaign,
@@ -1421,7 +1421,7 @@ public class StratConRulesManager {
      * @return The newly set up {@link StratConScenario}.
      */
     public static @Nullable StratConScenario setupScenario(StratConCoords coords, @Nullable Integer forceID,
-          Campaign campaign, AbstractMissionTransition contract, StratConTrackState track,
+          Campaign campaign, MissionTransition contract, StratConTrackState track,
           @Nullable ScenarioTemplate template,
           boolean ignoreFacilities, @Nullable Integer daysTilDeployment) {
         StratConScenario scenario;
@@ -2469,7 +2469,7 @@ public class StratConRulesManager {
      *
      * @return the generated {@link StratConScenario}, or {@code null} if scenario generation fails
      */
-    private static @Nullable StratConScenario generateScenario(Campaign campaign, AbstractMissionTransition contract,
+    private static @Nullable StratConScenario generateScenario(Campaign campaign, MissionTransition contract,
           StratConTrackState track, @Nullable Integer forceID, StratConCoords coords,
           @Nullable Integer daysTilDeployment) {
         int unitType = MEK;
@@ -2517,7 +2517,7 @@ public class StratConRulesManager {
      *
      * @return the generated {@link StratConScenario}, or {@code null} if scenario generation failed
      */
-    static @Nullable StratConScenario generateScenario(Campaign campaign, AbstractMissionTransition contract,
+    static @Nullable StratConScenario generateScenario(Campaign campaign, MissionTransition contract,
           StratConTrackState track, @Nullable Integer forceID, StratConCoords coords,
           @Nullable ScenarioTemplate template, @Nullable Integer daysTilDeployment) {
         StratConScenario scenario = new StratConScenario();
@@ -2904,7 +2904,7 @@ public class StratConRulesManager {
      *
      * @param contract The scenario's contract
      */
-    public static void setAttachedUnitsModifier(StratConScenario scenario, AbstractMissionTransition contract) {
+    public static void setAttachedUnitsModifier(StratConScenario scenario, MissionTransition contract) {
         AtBDynamicScenario backingScenario = scenario.getBackingScenario();
         boolean airBattle = (backingScenario.getTemplate().mapParameters.getMapLocation() == LowAtmosphere) ||
                                   (backingScenario.getTemplate().mapParameters.getMapLocation() == Space);
@@ -3001,7 +3001,7 @@ public class StratConRulesManager {
      * @return A {@link List} of {@link Integer} force IDs representing combat teams that are ready and suitable for
      *       deployment.
      */
-    public static List<Integer> getAvailableForceIDs(Campaign campaign, AbstractMissionTransition contract,
+    public static List<Integer> getAvailableForceIDs(Campaign campaign, MissionTransition contract,
           boolean bypassRoleRestrictions) {
         // First, build a list of all combat teams in the campaign
         ArrayList<CombatTeam> combatTeams = campaign.getCombatTeamsAsList();
@@ -3093,7 +3093,7 @@ public class StratConRulesManager {
 
         // assemble a set of all force IDs that are currently assigned to tracks
         Set<Integer> forcesInTracks = new HashSet<>();
-        for (AbstractMissionTransition contract : campaign.getActiveAtBContracts()) {
+        for (MissionTransition contract : campaign.getActiveAtBContracts()) {
             StratConCampaignState state = contract.getStratConCampaignState();
             if (state == null) {
                 continue;
@@ -3294,7 +3294,7 @@ public class StratConRulesManager {
             return false;
         }
 
-        AbstractMissionTransition forceContract = combatTeam.getContract(campaign);
+        MissionTransition forceContract = combatTeam.getContract(campaign);
         AtBContract scenarioContract = currentScenario.getBackingContract(campaign);
 
         return forceContract.equals(scenarioContract);
@@ -3425,7 +3425,7 @@ public class StratConRulesManager {
                                                        .isForceDeployedHere(unit.getFormationId()));
     }
 
-    public static boolean isForceDeployedToStratCon(List<AbstractMissionTransition> activeAtBContracts, int forceId) {
+    public static boolean isForceDeployedToStratCon(List<MissionTransition> activeAtBContracts, int forceId) {
         return activeAtBContracts
                      .stream()
                      .anyMatch(contract -> (contract.getStratConCampaignState() != null) &&
@@ -3562,7 +3562,7 @@ public class StratConRulesManager {
      *       {@link AtBMoraleLevel#ROUTED}, indicating no scenarios should occur. Otherwise, returns the sum of the base
      *       scenario odds, morale modifier (if applicable), and data center modifier.
      */
-    public static int calculateScenarioOdds(StratConTrackState track, AbstractMissionTransition contract,
+    public static int calculateScenarioOdds(StratConTrackState track, MissionTransition contract,
           boolean isReinforcements) {
         if (contract.getMoraleLevel().isRouted()) {
             return -1;
@@ -3633,7 +3633,7 @@ public class StratConRulesManager {
      */
     public static void processScenarioCompletion(ResolveScenarioTracker tracker) {
         Campaign campaign = tracker.getCampaign();
-        AbstractMissionTransition mission = tracker.getMission();
+        MissionTransition mission = tracker.getMission();
 
         if (mission instanceof AtBContract) {
             StratConCampaignState campaignState = mission.getStratConCampaignState();
@@ -3945,7 +3945,7 @@ public class StratConRulesManager {
         boolean isStartOfMonth = today.getDayOfMonth() == 1;
 
         // run scenario generation routine for every track attached to an active contract
-        for (AbstractMissionTransition contract : campaign.getActiveAtBContracts()) {
+        for (MissionTransition contract : campaign.getActiveAtBContracts()) {
             StratConCampaignState campaignState = contract.getStratConCampaignState();
 
             if (campaignState != null) {

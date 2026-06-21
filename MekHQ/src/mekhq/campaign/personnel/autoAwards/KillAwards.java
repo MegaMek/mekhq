@@ -56,7 +56,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationLevel;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.personnel.Award;
 
 public class KillAwards {
@@ -71,7 +71,7 @@ public class KillAwards {
      * @param awards   the awards to be processed (should only include awards where item == Kill)
      * @param killData the pre-processed list of kills mapped to Force ID
      */
-    public static Map<Integer, List<Object>> KillAwardProcessor(Campaign campaign, AbstractMissionTransition mission,
+    public static Map<Integer, List<Object>> KillAwardProcessor(Campaign campaign, MissionTransition mission,
           UUID person,
           List<Award> awards, Map<Integer, List<Kill>> killData) {
         List<Award> individualAwards = new ArrayList<>();

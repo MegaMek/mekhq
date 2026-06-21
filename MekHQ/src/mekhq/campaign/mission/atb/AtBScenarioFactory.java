@@ -46,7 +46,7 @@ import megamek.codeUtilities.ObjectUtility;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.CombatTeam;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.atb.scenario.*;
 
@@ -159,7 +159,7 @@ public class AtBScenarioFactory {
         boolean hasBaseAttackAttacker;
 
         // We only need to process active AtB contracts that haven't hit their end date
-        for (final AbstractMissionTransition contract : campaign.getActiveAtBContracts()) {
+        for (final MissionTransition contract : campaign.getActiveAtBContracts()) {
             // region Value Initialization
             scenarios = new ArrayList<>();
             dontGenerateForces = new ArrayList<>();

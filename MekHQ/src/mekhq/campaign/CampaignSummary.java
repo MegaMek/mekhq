@@ -57,7 +57,7 @@ import megamek.common.units.Entity;
 import megamek.common.units.Infantry;
 import megamek.common.units.UnitType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.mission.rentals.ContractRentalType;
 import mekhq.campaign.mission.rentals.FacilityRentals;
@@ -189,7 +189,7 @@ public class CampaignSummary {
 
         // missions
         countMissionByStatus = new int[MissionStatus.values().length];
-        for (AbstractMissionTransition mission : campaign.getMissions()) {
+        for (MissionTransition mission : campaign.getMissions()) {
             countMissionByStatus[mission.getStatus().ordinal()]++;
         }
 

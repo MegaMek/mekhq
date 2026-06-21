@@ -60,7 +60,7 @@ import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
 import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.events.units.UnitRemovedEvent;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.Scenario;
@@ -174,8 +174,8 @@ public final class TOETab extends CampaignGuiTab {
      */
     private void deploymentButton() {
         // Build scenario list with mission mapping
-        Map<Scenario, AbstractMissionTransition> scenarioMissionMap = new HashMap<>();
-        for (AbstractMissionTransition mission : getCampaign().getActiveMissions(false)) {
+        Map<Scenario, MissionTransition> scenarioMissionMap = new HashMap<>();
+        for (MissionTransition mission : getCampaign().getActiveMissions(false)) {
             for (Scenario scenario : mission.getCurrentScenarios()) {
                 scenarioMissionMap.put(scenario, mission);
             }
@@ -194,7 +194,7 @@ public final class TOETab extends CampaignGuiTab {
         }
 
         Scenario selectedScenario = sortedScenarios.get(scenarioPicker.getComboBoxChoiceIndex());
-        AbstractMissionTransition selectedMission = scenarioMissionMap.get(selectedScenario);
+        MissionTransition selectedMission = scenarioMissionMap.get(selectedScenario);
 
         // Check if this is a StratCon scenario
         boolean isStratConScenario = selectedScenario instanceof AtBDynamicScenario &&

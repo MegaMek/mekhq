@@ -51,7 +51,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Award;
@@ -61,7 +61,7 @@ import mekhq.gui.dialog.AutoAwardsDialog;
 
 public class AutoAwardsController {
     private Campaign campaign;
-    private AbstractMissionTransition mission;
+    private MissionTransition mission;
 
     final private List<Award> contractAwards = new ArrayList<>();
     final private List<Award> factionHunterAwards = new ArrayList<>();
@@ -148,7 +148,7 @@ public class AutoAwardsController {
      * @param missionWasSuccessful true if the Mission was a complete Success, otherwise false
      * @param POWPersonnel         a list of persons that have been a prisoner of war in the current mission
      */
-    public void PostMissionController(Campaign campaign, AbstractMissionTransition mission,
+    public void PostMissionController(Campaign campaign, MissionTransition mission,
           Boolean missionWasSuccessful,
           @Nullable List<Person> POWPersonnel) {
         logger.info("autoAwards (Mission Conclusion) has started");
@@ -324,7 +324,7 @@ public class AutoAwardsController {
         LocalDate today = campaign.getLocalDate();
 
         // Get the list of completed contracts from the campaign object.
-        List<AbstractMissionTransition> completedContracts = campaign.getCompletedAtBContracts();
+        List<MissionTransition> completedContracts = campaign.getCompletedAtBContracts();
 
         // If there are no completed contracts, return the current date.
         if (completedContracts.isEmpty()) {
@@ -337,11 +337,11 @@ public class AutoAwardsController {
         return getLastContractEndingDate(completedContracts);
     }
 
-    private static LocalDate getLastContractEndingDate(List<AbstractMissionTransition> completedContracts) {
+    private static LocalDate getLastContractEndingDate(List<MissionTransition> completedContracts) {
         LocalDate lastContractEndingDate = null;
 
         // Loop through each contract in the list of completed contracts.
-        for (AbstractMissionTransition contract : completedContracts) {
+        for (MissionTransition contract : completedContracts) {
             // Get the ending date of the current contract.
             LocalDate endingDate = contract.getEndingDate();
 

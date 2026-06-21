@@ -75,7 +75,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.Loot;
@@ -126,7 +126,7 @@ public class PerformResupply {
      * @param contract the {@link AtBContract} representing the current contract, which provides the operational context
      *                 for the resupply, including permissions and restrictions.
      */
-    public static void performResupply(Resupply resupply, AbstractMissionTransition contract) {
+    public static void performResupply(Resupply resupply, MissionTransition contract) {
         performResupply(resupply, contract, 1);
     }
 
@@ -150,7 +150,7 @@ public class PerformResupply {
      * @param dropCount the number of supply drops planned for this resupply operation. If zero, the method exits
      *                  early.
      */
-    public static void performResupply(Resupply resupply, AbstractMissionTransition contract, int dropCount) {
+    public static void performResupply(Resupply resupply, MissionTransition contract, int dropCount) {
         // These early exits should only occur if the player literally has no units.
         if (dropCount == 0) {
             logger.info("Resupply exited early, as DropCount is 0");
@@ -275,7 +275,7 @@ public class PerformResupply {
      * @param resupply the {@link Resupply} instance defining the resupply context.
      */
     public static void makeSmugglerDelivery(Resupply resupply) {
-        final AbstractMissionTransition contract = resupply.getContract();
+        final MissionTransition contract = resupply.getContract();
         int swindleChance = contract.getMoraleLevel().ordinal();
 
         if (randomInt(10) < swindleChance) {
@@ -366,7 +366,7 @@ public class PerformResupply {
      */
     public static void processConvoy(Resupply resupply, List<Part> convoyContents, @Nullable Formation playerConvoy) {
         final Campaign campaign = resupply.getCampaign();
-        final AbstractMissionTransition contract = resupply.getContract();
+        final MissionTransition contract = resupply.getContract();
 
         // First, we need to identify whether the convoy has been intercepted.
         AtBMoraleLevel morale = contract.getMoraleLevel();
@@ -434,7 +434,7 @@ public class PerformResupply {
     private static void generateInterceptionOrConvoyEvent(Resupply resupply, @Nullable Formation convoy,
           @Nullable List<Part> convoyContents, int interceptionChance) {
         final Campaign campaign = resupply.getCampaign();
-        final AbstractMissionTransition contract = resupply.getContract();
+        final MissionTransition contract = resupply.getContract();
 
         if (randomInt(10) < interceptionChance) {
             processConvoyInterception(resupply, convoy, convoyContents);
@@ -527,7 +527,7 @@ public class PerformResupply {
         final String PLAYER_CONVOY = DIRECTORY + "Emergency Convoy Defense - Player.xml";
 
         final Campaign campaign = resupply.getCampaign();
-        final AbstractMissionTransition contract = resupply.getContract();
+        final MissionTransition contract = resupply.getContract();
 
         // Trigger a dialog to inform the user that an interception has taken place
         displayDialog(targetConvoy, campaign, contract);
@@ -642,7 +642,7 @@ public class PerformResupply {
         }
     }
 
-    private static void displayDialog(Formation targetConvoy, Campaign campaign, AbstractMissionTransition contract) {
+    private static void displayDialog(Formation targetConvoy, Campaign campaign, MissionTransition contract) {
         Person speaker;
         String inCharacterMessage = "";
         String commanderAddress = campaign.getCommanderAddress();

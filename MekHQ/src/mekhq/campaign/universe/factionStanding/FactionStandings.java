@@ -65,7 +65,7 @@ import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
@@ -726,7 +726,7 @@ public class FactionStandings {
      * @since 0.50.07
      */
     public @Nullable FactionCensureLevel checkForCensure(Faction faction, LocalDate today,
-          List<AbstractMissionTransition> activeMissions, boolean campaignInTransit) {
+          List<MissionTransition> activeMissions, boolean campaignInTransit) {
         if (faction.isAggregate()) {
             return null;
         }
@@ -1699,7 +1699,7 @@ public class FactionStandings {
      * @author Illiani
      * @since 0.50.07
      */
-    public List<String> updateCampaignForPastMissions(List<AbstractMissionTransition> missions, ImageIcon campaignIcon,
+    public List<String> updateCampaignForPastMissions(List<MissionTransition> missions, ImageIcon campaignIcon,
           Faction campaignFaction, LocalDate today, double regardMultiplier) {
         List<String> reports = new ArrayList<>();
 
@@ -1707,10 +1707,10 @@ public class FactionStandings {
 
         sortMissionsBasedOnStartDateAndClass(missions);
 
-        Map<Integer, List<AbstractMissionTransition>> missionsByYear = new HashMap<>();
+        Map<Integer, List<MissionTransition>> missionsByYear = new HashMap<>();
         int currentYear = today.getYear();
 
-        for (AbstractMissionTransition mission : missions) {
+        for (MissionTransition mission : missions) {
             int missionYear = currentYear;
 
             LocalDate startDate = mission.getStartDate();
@@ -1725,8 +1725,8 @@ public class FactionStandings {
         List<Integer> sortedYears = new ArrayList<>(missionsByYear.keySet());
         Collections.sort(sortedYears);
         for (int year : sortedYears) {
-            List<AbstractMissionTransition> missionsForYear = missionsByYear.get(year);
-            for (AbstractMissionTransition mission : missionsForYear) {
+            List<MissionTransition> missionsForYear = missionsByYear.get(year);
+            for (MissionTransition mission : missionsForYear) {
                 MissionStatus missionStatus = mission.getStatus();
 
                 if (mission instanceof AtBContract atbContract) {
@@ -1791,7 +1791,7 @@ public class FactionStandings {
      *
      * @param missions the list of missions to sort in-place
      */
-    private static void sortMissionsBasedOnStartDateAndClass(List<AbstractMissionTransition> missions) {
+    private static void sortMissionsBasedOnStartDateAndClass(List<MissionTransition> missions) {
         missions.sort((mission1, mission2) -> {
             LocalDate date1 = mission1.getStartDate();
             LocalDate date2 = mission2.getStartDate();

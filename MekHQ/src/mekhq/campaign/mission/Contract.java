@@ -49,7 +49,7 @@ import org.w3c.dom.Node;
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
-public class Contract extends AbstractMissionTransition {
+public class Contract extends MissionTransition {
     private static final MMLogger logger = MMLogger.create(Contract.class);
 
     public Contract() {

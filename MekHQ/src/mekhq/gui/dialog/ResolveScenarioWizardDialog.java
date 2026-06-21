@@ -82,7 +82,7 @@ import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
 import mekhq.campaign.ResolveScenarioTracker.UnitStatus;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Loot;
@@ -219,7 +219,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         loots = tracker.getPotentialLoot();
         salvageableUnites = new ArrayList<>();
         isUseCamOpsSalvage = campaign.getCampaignOptions().isUseCamOpsSalvage();
-        AbstractMissionTransition contract = tracker.getMission();
+        MissionTransition contract = tracker.getMission();
         if (!(contract instanceof Mission)) {
             salvageEmployer = contract.getSalvagedByEmployer();
             salvageUnit = contract.getSalvagedByUnit();

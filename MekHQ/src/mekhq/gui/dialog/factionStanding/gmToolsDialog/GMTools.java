@@ -61,7 +61,7 @@ import javax.swing.event.HyperlinkEvent;
 
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.factionStanding.FactionAccoladeEvent;
 import mekhq.campaign.universe.factionStanding.FactionAccoladeLevel;
@@ -98,7 +98,7 @@ public class GMTools extends JDialog {
     private final LocalDate today;
     private final int gameYear;
     private final FactionStandings factionStandings;
-    private final List<AbstractMissionTransition> missions;
+    private final List<MissionTransition> missions;
     private final double regardMultiplier;
 
     private final List<String> reports = new ArrayList<>();

@@ -35,7 +35,7 @@ package mekhq.gui.dialog.nagDialogs.nagLogic;
 import java.time.DayOfWeek;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 
 public class DeploymentShortfallNagLogic {
     /**
@@ -63,7 +63,7 @@ public class DeploymentShortfallNagLogic {
         }
 
         // There is no need to use a stream here, as the number of iterations doesn't warrant it.
-        for (AbstractMissionTransition contract : campaign.getActiveAtBContracts()) {
+        for (MissionTransition contract : campaign.getActiveAtBContracts()) {
             if (campaign.getDeploymentDeficit(contract) > 0) {
                 return true;
             }

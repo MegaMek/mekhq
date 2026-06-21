@@ -59,7 +59,7 @@ import mekhq.campaign.events.NewDayEvent;
 import mekhq.campaign.events.StratConDeploymentEvent;
 import mekhq.campaign.events.missions.MissionCompletedEvent;
 import mekhq.campaign.events.missions.MissionRemovedEvent;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.campaign.stratCon.StratConContractDefinition.StrategicObjectiveType;
@@ -295,7 +295,7 @@ public class StratConTab extends CampaignGuiTab {
             expandedObjectivePanel.setVisible(false);
             return;
         }
-        AbstractMissionTransition currentContract = currentTDI.contract;
+        MissionTransition currentContract = currentTDI.contract;
 
         LocalDate currentDate = getCampaignGui().getCampaign().getLocalDate();
 
@@ -515,7 +515,7 @@ public class StratConTab extends CampaignGuiTab {
 
         Campaign campaign = getCampaignGui().getCampaign();
         PlanetarySystem currentSystem = campaign.getCurrentSystem();
-        for (AbstractMissionTransition contract : campaign.getActiveAtBContracts(false)) {
+        for (MissionTransition contract : campaign.getActiveAtBContracts(false)) {
             PlanetarySystem targetSystem = contract.getSystem();
             if (!currentSystem.equals(targetSystem)) {
                 continue;
@@ -587,10 +587,10 @@ public class StratConTab extends CampaignGuiTab {
      * @author NickAragua
      */
     private static class TrackDropdownItem {
-        AbstractMissionTransition contract;
+        MissionTransition contract;
         StratConTrackState track;
 
-        public TrackDropdownItem(AbstractMissionTransition contract, StratConTrackState track) {
+        public TrackDropdownItem(MissionTransition contract, StratConTrackState track) {
             this.contract = contract;
             this.track = track;
         }

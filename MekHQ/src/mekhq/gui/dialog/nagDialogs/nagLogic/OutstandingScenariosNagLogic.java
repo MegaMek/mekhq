@@ -41,7 +41,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.stratCon.StratConScenario;
@@ -81,11 +81,11 @@ public class OutstandingScenariosNagLogic {
      * and others, with additional formatting for StratCon-specific scenarios where applicable.
      */
     public static String getOutstandingScenarios(Campaign campaign) {
-        List<AbstractMissionTransition> activeContracts = campaign.getActiveAtBContracts(true);
+        List<MissionTransition> activeContracts = campaign.getActiveAtBContracts(true);
         LocalDate today = campaign.getLocalDate();
         StringBuilder activeScenarios = new StringBuilder();
 
-        for (AbstractMissionTransition contract : activeContracts) {
+        for (MissionTransition contract : activeContracts) {
             for (AtBScenario scenario : contract.getCurrentAtBScenarios()) {
                 LocalDate scenarioDate = scenario.getDate();
 

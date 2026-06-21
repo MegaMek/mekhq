@@ -48,7 +48,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
@@ -90,13 +90,13 @@ public class SupportPointNegotiation {
      */
     public static void negotiateAdditionalSupportPoints(Campaign campaign) {
         // Fetch all active contracts and sort them by start date (oldest -> newest)
-        List<AbstractMissionTransition> activeContracts = campaign.getActiveAtBContracts();
+        List<MissionTransition> activeContracts = campaign.getActiveAtBContracts();
 
         if (activeContracts.isEmpty()) {
             return;
         }
 
-        List<AbstractMissionTransition> sortedContracts = getSortedContractsByStartDate(activeContracts);
+        List<MissionTransition> sortedContracts = getSortedContractsByStartDate(activeContracts);
 
         // Get sorted Admin/Transport personnel
         List<Person> adminTransport = getSortedAdminTransportPersonnel(campaign);
@@ -108,7 +108,7 @@ public class SupportPointNegotiation {
         }
 
         // Iterate over contracts and negotiate support points
-        for (AbstractMissionTransition contract : sortedContracts) {
+        for (MissionTransition contract : sortedContracts) {
             if (adminTransport.isEmpty()) {
                 break;
             }
@@ -153,14 +153,13 @@ public class SupportPointNegotiation {
      * assigned, and support points are added to the contract if successfully negotiated.</p>
      *
      * @param campaign             The {@link Campaign} instance managing the current game state.
-     * @param contract             The {@link AbstractMissionTransition} instance for which support points are being
-     *                             processed.
+     * @param contract             The {@link MissionTransition} instance for which support points are being processed.
      * @param adminTransport       A {@link List} of available {@link Person} objects representing Admin/Transport
      *                             personnel.
      * @param isInitialNegotiation {@code true} if the negotiation took place at the beginning of the contract,
      *                             otherwise {@code false}
      */
-    private static void processContractSupportPoints(Campaign campaign, AbstractMissionTransition contract,
+    private static void processContractSupportPoints(Campaign campaign, MissionTransition contract,
           List<Person> adminTransport, boolean isInitialNegotiation) {
         int negotiatedSupportPoints = 0;
         int maxSupportPoints = isInitialNegotiation ?
@@ -283,9 +282,9 @@ public class SupportPointNegotiation {
      *
      * @return A {@link List} of {@link AtBContract} instances, sorted by start date.
      */
-    private static List<AbstractMissionTransition> getSortedContractsByStartDate(
-          List<AbstractMissionTransition> activeContracts) {
-        activeContracts.sort(Comparator.comparing(AbstractMissionTransition::getStartDate,
+    private static List<MissionTransition> getSortedContractsByStartDate(
+          List<MissionTransition> activeContracts) {
+        activeContracts.sort(Comparator.comparing(MissionTransition::getStartDate,
               Comparator.nullsFirst(Comparator.naturalOrder())));
         return activeContracts;
     }

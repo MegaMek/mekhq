@@ -59,7 +59,7 @@ import megamek.common.units.Crew;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.mission.ScenarioTemplate;
@@ -84,7 +84,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
  */
 public class PrisonEscapeScenario {
     private final Campaign campaign;
-    private final AbstractMissionTransition contract;
+    private final MissionTransition contract;
     private final Set<Person> escapees;
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
@@ -101,7 +101,7 @@ public class PrisonEscapeScenario {
      * @param escapees A set of {@link Person} objects representing the escaped prisoners to be included in the
      *                 scenario.
      */
-    public PrisonEscapeScenario(Campaign campaign, AbstractMissionTransition contract, Set<Person> escapees) {
+    public PrisonEscapeScenario(Campaign campaign, MissionTransition contract, Set<Person> escapees) {
         this.campaign = campaign;
         this.contract = contract;
         this.escapees = escapees;

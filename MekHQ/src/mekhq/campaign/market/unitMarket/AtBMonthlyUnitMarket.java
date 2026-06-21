@@ -64,7 +64,7 @@ import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketRarity;
 import mekhq.campaign.market.enums.UnitMarketType;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.IUnitGenerator;
@@ -105,8 +105,8 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
      */
     @Override
     public void generateUnitOffers(final Campaign campaign) {
-        final List<AbstractMissionTransition> contracts = campaign.getActiveAtBContracts();
-        final AbstractMissionTransition contract = contracts.isEmpty() ? null : contracts.getFirst();
+        final List<MissionTransition> contracts = campaign.getActiveAtBContracts();
+        final MissionTransition contract = contracts.isEmpty() ? null : contracts.getFirst();
 
         Faction faction = campaign.getFaction();
         int rarityModifier = campaign.getCampaignOptions().getUnitMarketRarityModifier();

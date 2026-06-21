@@ -57,7 +57,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.personnel.Person;
@@ -75,7 +75,7 @@ public class NewContractDialog extends JDialog {
     private static final MMLogger LOGGER = MMLogger.create(NewContractDialog.class);
 
     protected JFrame frame;
-    protected AbstractMissionTransition contract;
+    protected MissionTransition contract;
     protected Campaign campaign;
     private JComboBox<Person> cboNegotiator;
 
@@ -115,7 +115,7 @@ public class NewContractDialog extends JDialog {
         setUserPreferences();
     }
 
-    public AbstractMissionTransition getContract() {
+    public MissionTransition getContract() {
         return contract;
     }
 
@@ -689,7 +689,7 @@ public class NewContractDialog extends JDialog {
         }
 
         String chosenName = txtName.getText();
-        for (AbstractMissionTransition mission : campaign.getMissions()) {
+        for (MissionTransition mission : campaign.getMissions()) {
             if (mission.getName().equals(chosenName)) {
                 JOptionPane.showMessageDialog(frame,
                       "There is already a mission with the name " + chosenName,

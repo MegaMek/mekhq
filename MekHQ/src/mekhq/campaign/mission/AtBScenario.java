@@ -455,7 +455,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         setEMI(emi);
     }
 
-    public void setPlanetaryConditions(AbstractMissionTransition mission, Campaign campaign) {
+    public void setPlanetaryConditions(MissionTransition mission, Campaign campaign) {
         if (null != mission) {
             PlanetarySystem planetarySystem = Systems.getInstance().getSystemById(mission.getSystemId());
             // assume primary planet for now

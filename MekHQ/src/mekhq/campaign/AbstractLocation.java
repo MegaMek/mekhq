@@ -61,7 +61,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationNode;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
@@ -250,7 +250,7 @@ public abstract class AbstractLocation implements IPlace {
      * @param campaign The {@link Campaign} instance.
      */
     void testForEarlyArrival(Campaign campaign) {
-        for (AbstractMissionTransition contract : campaign.getFutureContracts()) {
+        for (MissionTransition contract : campaign.getFutureContracts()) {
             if (Objects.equals(currentSystem, contract.getSystem())) {
                 LocalDate startDate = contract.getStartDate();
                 LocalDate today = campaign.getLocalDate();

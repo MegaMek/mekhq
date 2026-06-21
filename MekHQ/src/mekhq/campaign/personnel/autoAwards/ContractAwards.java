@@ -43,7 +43,7 @@ import java.util.UUID;
 
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.personnel.Award;
 
 public class ContractAwards {
@@ -59,7 +59,7 @@ public class ContractAwards {
      * @param awards   the awards to be processed (should only include awards where item == Kill)
      */
     public static Map<Integer, List<Object>> ContractAwardsProcessor(Campaign campaign,
-          AbstractMissionTransition mission,
+          MissionTransition mission,
           UUID person, List<Award> awards) {
         List<Award> eligibleAwards = new ArrayList<>();
         List<Award> bestEligibleAwards = new ArrayList<>();

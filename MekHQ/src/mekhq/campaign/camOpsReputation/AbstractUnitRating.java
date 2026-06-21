@@ -52,7 +52,7 @@ import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.DragoonRating;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.unit.Unit;
@@ -157,7 +157,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
         setPartialCount(0);
         setFailCount(0);
         setBreachCount(0);
-        for (AbstractMissionTransition mission : getCampaign().getCompletedMissions()) {
+        for (MissionTransition mission : getCampaign().getCompletedMissions()) {
             switch (mission.getStatus()) {
                 case SUCCESS:
                     setSuccessCount(getSuccessCount() + 1);

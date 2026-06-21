@@ -59,7 +59,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.personnelMarket.records.PersonnelMarketEntry;
 import mekhq.campaign.market.personnelMarket.yaml.PersonnelMarketLibraries;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Faction;
@@ -221,7 +221,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
                   closingBrace);
         }
 
-        for (AbstractMissionTransition contract : getCampaign().getActiveAtBContracts()) {
+        for (MissionTransition contract : getCampaign().getActiveAtBContracts()) {
             if (!contract.getContractType().isGarrisonType()) {
                 color = MekHQ.getMHQOptions().getFontColorNegativeHexColor();
 

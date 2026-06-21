@@ -57,7 +57,7 @@ import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
@@ -527,13 +527,13 @@ public class CampaignExportWizard extends JDialog {
         }
 
         if (chkExportContractOffers.isSelected()) {
-            for (AbstractMissionTransition contract : sourceCampaign.getContractMarket().getContracts()) {
+            for (MissionTransition contract : sourceCampaign.getContractMarket().getContracts()) {
                 destinationCampaign.getContractMarket().getContracts().add(contract);
             }
         }
 
         if (chkExportCompletedContracts.isSelected()) {
-            for (AbstractMissionTransition mission : sourceCampaign.getCompletedMissions()) {
+            for (MissionTransition mission : sourceCampaign.getCompletedMissions()) {
                 destinationCampaign.importMission(mission);
             }
         }

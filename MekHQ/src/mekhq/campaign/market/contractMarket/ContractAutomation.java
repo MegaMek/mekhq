@@ -51,7 +51,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.TransportCostCalculations;
 import mekhq.campaign.personnel.Person;
@@ -80,7 +80,7 @@ public class ContractAutomation {
      * @param campaign The current campaign.
      * @param contract Selected contract.
      */
-    public static void contractStartPrompt(Campaign campaign, AbstractMissionTransition contract) {
+    public static void contractStartPrompt(Campaign campaign, MissionTransition contract) {
         // If we're already in the right system, there is no need to automate these actions
         if (Objects.equals(campaign.getCurrentLocation().getCurrentSystem(), contract.getSystem())) {
             return;

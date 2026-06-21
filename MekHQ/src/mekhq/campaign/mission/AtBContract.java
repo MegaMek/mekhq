@@ -107,11 +107,11 @@ import org.w3c.dom.NodeList;
  *
  * @author Neoancient
  */
-public class AtBContract extends AbstractMissionTransition {
+public class AtBContract extends MissionTransition {
     private static final MMLogger logger = MMLogger.create(AtBContract.class);
 
     /* null unless subcontract */
-    protected AbstractMissionTransition parentContract;
+    protected MissionTransition parentContract;
     /* hired by another mercenary unit on contract to a third-party employer */
     boolean mercSubcontract;
 
@@ -422,13 +422,13 @@ public class AtBContract extends AbstractMissionTransition {
      * @return the numeric value of the best available repair location; returns {@link Unit#SITE_FACILITY_BASIC} if no
      *       contracts are active
      */
-    public static int getBestRepairLocation(List<AbstractMissionTransition> activeContracts) {
+    public static int getBestRepairLocation(List<MissionTransition> activeContracts) {
         if (activeContracts.isEmpty()) {
             return Unit.SITE_FACILITY_BASIC;
         }
 
         int bestSite = Unit.SITE_IMPROVISED;
-        for (AbstractMissionTransition contract : activeContracts) {
+        for (MissionTransition contract : activeContracts) {
             int repairLocation = contract.getRepairLocation();
             if (repairLocation > bestSite) {
                 bestSite = repairLocation;
@@ -532,11 +532,11 @@ public class AtBContract extends AbstractMissionTransition {
         return parentContract != null;
     }
 
-    public AbstractMissionTransition getParentContract() {
+    public MissionTransition getParentContract() {
         return parentContract;
     }
 
-    public void setParentContract(AbstractMissionTransition parent) {
+    public void setParentContract(MissionTransition parent) {
         parentContract = parent;
     }
 
@@ -883,7 +883,7 @@ public class AtBContract extends AbstractMissionTransition {
      */
     public void restore(Campaign c) {
         if (parentContract != null) {
-            AbstractMissionTransition m = c.getMission(parentContract.getId());
+            MissionTransition m = c.getMission(parentContract.getId());
             if (m != null) {
                 if (m instanceof AtBContract) {
                     setParentContract((AtBContract) m);
@@ -931,7 +931,7 @@ public class AtBContract extends AbstractMissionTransition {
         }
     }
 
-    public AtBContract(AbstractMissionTransition contract, Campaign campaign) {
+    public AtBContract(MissionTransition contract, Campaign campaign) {
         this(contract.getName());
 
         setContractTypeName(contract.getContractTypeName());
@@ -1008,7 +1008,7 @@ public class AtBContract extends AbstractMissionTransition {
         clanTechSalvageOverride();
     }
 
-    private static AtBContractType getAtBContractType(AbstractMissionTransition contract) {
+    private static AtBContractType getAtBContractType(MissionTransition contract) {
         AtBContractType contractType = null;
         for (final AtBContractType type : AtBContractType.values()) {
             if (type.toString().equalsIgnoreCase(contract.getContractTypeName())) {

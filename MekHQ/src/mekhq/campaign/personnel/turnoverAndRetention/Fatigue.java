@@ -51,7 +51,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -265,7 +265,7 @@ public class Fatigue {
         }
 
         int leaveThreshold = campaignOptions.getFatigueUndeploymentThreshold();
-        List<AbstractMissionTransition> activeContracts = campaign.getActiveAtBContracts();
+        List<MissionTransition> activeContracts = campaign.getActiveAtBContracts();
 
         for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
             Formation formation = combatTeam.getFormation(campaign);
@@ -302,7 +302,7 @@ public class Fatigue {
             }
 
             if (fatiguedUnits >= (unitsInForce.size() + 1) / 2) {
-                for (AbstractMissionTransition contract : campaign.getActiveAtBContracts()) {
+                for (MissionTransition contract : campaign.getActiveAtBContracts()) {
                     if (contract.getStratConCampaignState() != null) {
                         for (StratConTrackState track : contract.getStratConCampaignState().getTracks()) {
                             track.unassignFormation(formation.getId());

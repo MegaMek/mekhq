@@ -44,7 +44,7 @@ import megamek.common.units.ProtoMek;
 import megamek.common.units.Tank;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 
 public class FinancialReport {
     private Money assets = Money.zero();
@@ -214,7 +214,7 @@ public class FinancialReport {
 
         financialReport.contracts = financialReport.contracts.plus(
               campaign.getActiveContracts()
-                    .stream().map(AbstractMissionTransition::getMonthlyPayOut)
+                    .stream().map(MissionTransition::getMonthlyPayOut)
                     .collect(Collectors.toList()));
 
         return financialReport;

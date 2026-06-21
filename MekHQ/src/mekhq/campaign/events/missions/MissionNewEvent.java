@@ -33,14 +33,14 @@
 
 package mekhq.campaign.events.missions;
 
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 
 /**
  * Triggered when a new mission or contract is added to the campaign.
  */
 public class MissionNewEvent extends MissionEvent {
 
-    public MissionNewEvent(AbstractMissionTransition mission) {
+    public MissionNewEvent(MissionTransition mission) {
         super(mission);
     }
 }

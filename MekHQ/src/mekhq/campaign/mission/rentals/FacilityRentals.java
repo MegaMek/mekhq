@@ -57,7 +57,7 @@ import mekhq.campaign.events.RepairStatusChangedEvent;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
 import mekhq.gui.dialog.BayRentalDialog;
@@ -82,7 +82,7 @@ public class FacilityRentals {
     private static final int CAPACITY_INCREASE_KITCHENS = 150; // One Field Kitchen
     private static final int CAPACITY_INCREASE_SECURITY = 35; // One squad of 7 soldiers
 
-    public static int getCapacityIncreaseFromRentals(List<AbstractMissionTransition> activeContracts,
+    public static int getCapacityIncreaseFromRentals(List<MissionTransition> activeContracts,
           ContractRentalType rentalType) {
         if (rentalType == ContractRentalType.MAINTENANCE_BAYS || rentalType == ContractRentalType.FACTORY_CONDITIONS) {
             return 0;
@@ -99,10 +99,10 @@ public class FacilityRentals {
         return rentedFacilities * capacityMultiplier;
     }
 
-    private static int getRentedFacilities(List<AbstractMissionTransition> activeContracts,
+    private static int getRentedFacilities(List<MissionTransition> activeContracts,
           ContractRentalType rentalType) {
         int rentedFacilities = 0;
-        for (AbstractMissionTransition contract : activeContracts) {
+        for (MissionTransition contract : activeContracts) {
             rentedFacilities += switch (rentalType) {
                 case HOSPITAL_BEDS -> contract.getHospitalBedsRented();
                 case KITCHENS -> contract.getKitchensRented();
@@ -113,7 +113,7 @@ public class FacilityRentals {
         return rentedFacilities;
     }
 
-    public static void offerContractRentalOpportunity(Campaign campaign, AbstractMissionTransition contract) {
+    public static void offerContractRentalOpportunity(Campaign campaign, MissionTransition contract) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         int hospitalCost = campaignOptions.getRentedFacilitiesCostHospitalBeds();
         int kitchenCost = campaignOptions.getRentedFacilitiesCostKitchens();
@@ -220,7 +220,7 @@ public class FacilityRentals {
      * @author Illiani
      * @since 0.50.10
      */
-    public static Money calculateContractRentalCost(int cost, List<AbstractMissionTransition> activeContracts,
+    public static Money calculateContractRentalCost(int cost, List<MissionTransition> activeContracts,
           ContractRentalType rentalType) {
         int rentalCount = getRentedFacilities(activeContracts, rentalType);
 
@@ -326,7 +326,7 @@ public class FacilityRentals {
             return Money.zero();
         }
 
-        List<AbstractMissionTransition> activeMissions = campaign.getActiveMissions(false);
+        List<MissionTransition> activeMissions = campaign.getActiveMissions(false);
         Money totalAvailableFunds = finances.getBalance();
         Collection<Unit> units = campaign.getAllHangar().getUnits();
 
@@ -413,13 +413,13 @@ public class FacilityRentals {
      * @author Illiani
      * @since 0.50.10
      */
-    private static int getFallbackRepairSite(List<AbstractMissionTransition> activeMissions) {
+    private static int getFallbackRepairSite(List<MissionTransition> activeMissions) {
         if (activeMissions.isEmpty()) {
             return Unit.SITE_FACILITY_BASIC;
         }
 
         int fallbackSite = Unit.SITE_IMPROVISED;
-        for (AbstractMissionTransition contract : activeMissions) {
+        for (MissionTransition contract : activeMissions) {
             int newSite = contract.getRepairLocation();
             if (newSite > fallbackSite) {
                 fallbackSite = newSite;
@@ -472,10 +472,10 @@ public class FacilityRentals {
      *       or location restrictions)
      */
     public static boolean processBayChangeRequest(Campaign campaign, Unit[] selectedUnits, int bayType) {
-        List<AbstractMissionTransition> activeAtBContracts = campaign.getActiveAtBContracts();
+        List<MissionTransition> activeAtBContracts = campaign.getActiveAtBContracts();
         boolean isBayRentalAllowed = activeAtBContracts.isEmpty();
 
-        for (AbstractMissionTransition atBContract : activeAtBContracts) {
+        for (MissionTransition atBContract : activeAtBContracts) {
             if (atBContract.getContractType().isGarrisonType()) {
                 isBayRentalAllowed = true;
                 break;

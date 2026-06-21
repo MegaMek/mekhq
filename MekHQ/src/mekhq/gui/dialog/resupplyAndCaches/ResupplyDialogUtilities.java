@@ -40,7 +40,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
@@ -152,7 +152,7 @@ public class ResupplyDialogUtilities {
      * @return a {@link String} containing the enemy faction reference.
      */
     public static String getEnemyFactionReference(Resupply resupply) {
-        final AbstractMissionTransition contract = resupply.getContract();
+        final MissionTransition contract = resupply.getContract();
 
         String enemyFactionReference = contract.getEnemyBotName();
 

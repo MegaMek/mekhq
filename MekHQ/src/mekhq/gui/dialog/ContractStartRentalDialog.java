@@ -45,7 +45,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
@@ -94,7 +94,7 @@ public class ContractStartRentalDialog extends ImmersiveDialogCore {
         return (int) spnSecurity.getValue();
     }
 
-    public ContractStartRentalDialog(Campaign campaign, AbstractMissionTransition contract, int hospitalBedCost,
+    public ContractStartRentalDialog(Campaign campaign, MissionTransition contract, int hospitalBedCost,
           int kitchenCost,
           int holdingCellCost) {
         super(campaign,
@@ -110,7 +110,7 @@ public class ContractStartRentalDialog extends ImmersiveDialogCore {
               true);
     }
 
-    private static String getCenterMessage(String commanderAddress, AbstractMissionTransition contract,
+    private static String getCenterMessage(String commanderAddress, MissionTransition contract,
           int currentYear) {
         String employerName = contract.getEmployerNameDirect();
         if (contract instanceof AtBContract atBContract) {

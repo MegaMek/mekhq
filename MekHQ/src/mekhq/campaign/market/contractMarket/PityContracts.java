@@ -44,7 +44,7 @@ import java.util.List;
 
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBContractType;
 
@@ -103,7 +103,7 @@ public class PityContracts {
      */
     private static int getSuccessfulContractCount(Campaign campaign) {
         int successfulContractCount = 0;
-        for (AbstractMissionTransition contract : campaign.getCompletedAtBContracts()) {
+        for (MissionTransition contract : campaign.getCompletedAtBContracts()) {
             if (contract.getStatus().isSuccess()) {
                 successfulContractCount++;
             }

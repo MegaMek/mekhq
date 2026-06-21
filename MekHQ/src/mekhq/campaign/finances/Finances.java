@@ -64,7 +64,7 @@ import mekhq.campaign.events.loans.LoanDefaultedEvent;
 import mekhq.campaign.events.transactions.TransactionCreditEvent;
 import mekhq.campaign.events.transactions.TransactionDebitEvent;
 import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.io.FileType;
@@ -372,7 +372,7 @@ public class Finances {
 
         // Handle contract payments
         if (isNewMonth) {
-            for (AbstractMissionTransition contract : campaign.getActiveContracts()) {
+            for (MissionTransition contract : campaign.getActiveContracts()) {
                 credit(TransactionType.CONTRACT_PAYMENT,
                       today,
                       contract.getMonthlyPayOut(),
@@ -590,7 +590,7 @@ public class Finances {
         debit(TransactionType.TAXES, campaign.getLocalDate(), taxAmount, resourceMap.getString("Taxes.finances"));
     }
 
-    private void payoutShares(Campaign campaign, AbstractMissionTransition contract, LocalDate date) {
+    private void payoutShares(Campaign campaign, MissionTransition contract, LocalDate date) {
         if (campaign.getCampaignOptions().isUseStratCon() &&
                   campaign.getCampaignOptions().isUseShareSystem() &&
                   (contract instanceof AtBContract)) {

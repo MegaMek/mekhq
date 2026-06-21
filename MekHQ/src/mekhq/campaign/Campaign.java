@@ -182,7 +182,7 @@ import mekhq.campaign.market.ShoppingList;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBScenario;
@@ -302,7 +302,7 @@ public class Campaign implements ITechManager, IPlace {
     CampaignTransporterMap towTransporters = new CampaignTransporterMap(this, CampaignTransportType.TOW_TRANSPORT);
     private Warehouse parts = new Warehouse();
     private final TreeMap<Integer, Formation> formationIds = new TreeMap<>();
-    private final TreeMap<Integer, AbstractMissionTransition> missions = new TreeMap<>();
+    private final TreeMap<Integer, MissionTransition> missions = new TreeMap<>();
     private final TreeMap<Integer, Scenario> scenarios = new TreeMap<>();
     private final Map<UUID, List<Kill>> kills = new HashMap<>();
 
@@ -856,7 +856,7 @@ public class Campaign implements ITechManager, IPlace {
         this.isOverridingCommandCircuitRequirements = isOverridingCommandCircuitRequirements;
     }
 
-    public boolean isUseCommandCircuitForContract(AbstractMissionTransition abstractMission) {
+    public boolean isUseCommandCircuitForContract(MissionTransition abstractMission) {
         if (abstractMission instanceof AtBContract atBContract) {
             return FactionStandingUtilities.isUseCommandCircuit(
                   isOverridingCommandCircuitRequirements, gmMode,
@@ -1457,7 +1457,7 @@ public class Campaign implements ITechManager, IPlace {
      *
      * @param mission The mission to be added
      */
-    public void addMission(AbstractMissionTransition mission) {
+    public void addMission(MissionTransition mission) {
         int missionID = lastMissionId + 1;
         mission.setId(missionID);
         missions.put(missionID, mission);
@@ -1470,13 +1470,13 @@ public class Campaign implements ITechManager, IPlace {
      *
      * @param mission Mission to import into the campaign.
      */
-    public void importMission(final AbstractMissionTransition mission) {
+    public void importMission(final MissionTransition mission) {
         mission.getScenarios().forEach(this::importScenario);
         addMissionWithoutId(mission);
         StratConContractInitializer.restoreTransientStratconInformation(mission, this);
     }
 
-    private void addMissionWithoutId(AbstractMissionTransition m) {
+    private void addMissionWithoutId(MissionTransition m) {
         lastMissionId = max(lastMissionId, m.getId());
         missions.put(m.getId(), m);
         MekHQ.triggerEvent(new MissionNewEvent(m));
@@ -1487,30 +1487,30 @@ public class Campaign implements ITechManager, IPlace {
      *
      * @return the mission in question
      */
-    public @Nullable AbstractMissionTransition getMission(int id) {
+    public @Nullable MissionTransition getMission(int id) {
         return missions.get(id);
     }
 
     /**
      * @return an <code>Collection</code> of missions in the campaign
      */
-    public Collection<AbstractMissionTransition> getMissions() {
+    public Collection<MissionTransition> getMissions() {
         return missions.values();
     }
 
     /**
      * @return missions List sorted with complete missions at the bottom
      */
-    public List<AbstractMissionTransition> getSortedMissions() {
-        List<AbstractMissionTransition> missions = new ArrayList<>(getMissions());
+    public List<MissionTransition> getSortedMissions() {
+        List<MissionTransition> missions = new ArrayList<>(getMissions());
 
         missions.sort(Campaign::sortMissionByStartDateAndStatus);
 
         return missions;
     }
 
-    private static int sortMissionByStartDateAndStatus(AbstractMissionTransition mission1,
-          AbstractMissionTransition mission2) {
+    private static int sortMissionByStartDateAndStatus(MissionTransition mission1,
+          MissionTransition mission2) {
         int statusCompare = mission1.getStatus().compareTo(mission2.getStatus());
         if (statusCompare != 0) {
             return statusCompare;
@@ -1530,13 +1530,13 @@ public class Campaign implements ITechManager, IPlace {
         return date1.compareTo(date2);
     }
 
-    public List<AbstractMissionTransition> getActiveMissions(final boolean excludeEndDateCheck) {
+    public List<MissionTransition> getActiveMissions(final boolean excludeEndDateCheck) {
         return getMissions().stream()
                      .filter(m -> m.isActiveOn(getLocalDate(), excludeEndDateCheck))
                      .collect(Collectors.toList());
     }
 
-    public List<AbstractMissionTransition> getCompletedMissions() {
+    public List<MissionTransition> getCompletedMissions() {
         return getMissions().stream().filter(m -> m.getStatus().isCompleted()).collect(Collectors.toList());
     }
 
@@ -1549,7 +1549,7 @@ public class Campaign implements ITechManager, IPlace {
      *
      * @return A list of {@link Contract} objects that are currently active.
      */
-    public List<AbstractMissionTransition> getActiveContracts() {
+    public List<MissionTransition> getActiveContracts() {
         return getActiveContracts(false);
     }
 
@@ -1566,10 +1566,10 @@ public class Campaign implements ITechManager, IPlace {
      *
      * @return A list of {@link Contract} objects that match the active criteria.
      */
-    public List<AbstractMissionTransition> getActiveContracts(boolean includeFutureContracts) {
-        List<AbstractMissionTransition> activeContracts = new ArrayList<>();
+    public List<MissionTransition> getActiveContracts(boolean includeFutureContracts) {
+        List<MissionTransition> activeContracts = new ArrayList<>();
 
-        for (AbstractMissionTransition mission : getMissions()) {
+        for (MissionTransition mission : getMissions()) {
             // Skip if the mission is not a Contract
             if (mission instanceof Mission) {
                 continue;
@@ -1591,10 +1591,10 @@ public class Campaign implements ITechManager, IPlace {
      *
      * @return A list of {@link Contract} objects whose start dates are in the future.
      */
-    public List<AbstractMissionTransition> getFutureContracts() {
-        List<AbstractMissionTransition> activeContracts = new ArrayList<>();
+    public List<MissionTransition> getFutureContracts() {
+        List<MissionTransition> activeContracts = new ArrayList<>();
 
-        for (AbstractMissionTransition mission : getMissions()) {
+        for (MissionTransition mission : getMissions()) {
             // Skip if the mission is not a Contract
             if (mission instanceof Mission) {
                 continue;
@@ -1609,7 +1609,7 @@ public class Campaign implements ITechManager, IPlace {
         return activeContracts;
     }
 
-    public List<AbstractMissionTransition> getAtBContracts() {
+    public List<MissionTransition> getAtBContracts() {
         return getMissions().stream()
                      .filter(c -> c instanceof AtBContract)
                      .map(c -> (AtBContract) c)
@@ -1661,9 +1661,9 @@ public class Campaign implements ITechManager, IPlace {
      *       Otherwise, false.
      */
     public boolean hasFutureAtBContract() {
-        List<AbstractMissionTransition> contracts = getAtBContracts();
+        List<MissionTransition> contracts = getAtBContracts();
 
-        for (AbstractMissionTransition contract : contracts) {
+        for (MissionTransition contract : contracts) {
             // This catches any contracts that have been accepted, but haven't yet started
             LocalDate startDate = contract.getStartDate();
             if (startDate != null && startDate.isAfter(currentDay)) {
@@ -1679,10 +1679,10 @@ public class Campaign implements ITechManager, IPlace {
      *
      * @return a list of future AtBContract objects whose start date is after the current day
      */
-    public List<AbstractMissionTransition> getFutureAtBContracts() {
-        List<AbstractMissionTransition> futureContracts = new ArrayList<>();
+    public List<MissionTransition> getFutureAtBContracts() {
+        List<MissionTransition> futureContracts = new ArrayList<>();
 
-        for (AbstractMissionTransition contract : getAtBContracts()) {
+        for (MissionTransition contract : getAtBContracts()) {
             LocalDate startDate = contract.getStartDate();
             if (startDate != null && startDate.isAfter(currentDay)) {
                 futureContracts.add(contract);
@@ -1692,18 +1692,18 @@ public class Campaign implements ITechManager, IPlace {
         return futureContracts;
     }
 
-    public List<AbstractMissionTransition> getActiveAtBContracts() {
+    public List<MissionTransition> getActiveAtBContracts() {
         return getActiveAtBContracts(false);
     }
 
-    public List<AbstractMissionTransition> getActiveAtBContracts(boolean excludeEndDateCheck) {
+    public List<MissionTransition> getActiveAtBContracts(boolean excludeEndDateCheck) {
         return getMissions().stream()
                      .filter(c -> (c instanceof AtBContract) && c.isActiveOn(getLocalDate(), excludeEndDateCheck))
                      .map(c -> (AtBContract) c)
                      .collect(Collectors.toList());
     }
 
-    public List<AbstractMissionTransition> getCompletedAtBContracts() {
+    public List<MissionTransition> getCompletedAtBContracts() {
         return getMissions().stream()
                      .filter(c -> (c instanceof AtBContract) && c.getStatus().isCompleted())
                      .map(c -> (AtBContract) c)
@@ -1730,7 +1730,7 @@ public class Campaign implements ITechManager, IPlace {
     /**
      * Adds scenario to existing mission, generating a report.
      */
-    public void addScenario(Scenario scenario, AbstractMissionTransition mission) {
+    public void addScenario(Scenario scenario, MissionTransition mission) {
         addScenario(scenario, mission, false);
     }
 
@@ -1748,7 +1748,7 @@ public class Campaign implements ITechManager, IPlace {
      * @param mission        - the mission to add the new scenario to
      * @param suppressReport - whether to suppress the campaign report
      */
-    public void addScenario(Scenario scenario, AbstractMissionTransition mission, boolean suppressReport) {
+    public void addScenario(Scenario scenario, MissionTransition mission, boolean suppressReport) {
         final boolean newScenario = scenario.getId() == Scenario.S_DEFAULT_ID;
         final int id = newScenario ? ++lastScenarioId : scenario.getId();
         scenario.setId(id);
@@ -2232,7 +2232,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all hangars across all locations associated with this campaign.
-     *                                                                                                                                                                         TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     *                                                                                                                                                                               TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
      */
     public Hangar getAllHangar() {
         return units;
@@ -2868,7 +2868,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all warehouses across all locations associated with this campaign.
-     *                                                                                                                                                                         TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
+     *                                                                                                                                                                               TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
      */
     public Warehouse getAllWarehouse() {
         return parts;
@@ -4528,7 +4528,7 @@ public class Campaign implements ITechManager, IPlace {
      *
      * @return the current deployment deficit for the contract
      */
-    public int getDeploymentDeficit(AbstractMissionTransition contract) {
+    public int getDeploymentDeficit(MissionTransition contract) {
         if (!contract.isActiveOn(getLocalDate()) || Objects.equals(contract.getStartDate(), getLocalDate())) {
             // Do not check for deficits if the contract has not started, or
             // it is the first day of the contract, as players won't have
@@ -4597,7 +4597,7 @@ public class Campaign implements ITechManager, IPlace {
      * @since 0.50.10
      */
     public Money getTotalRentFeesExcludingBays() {
-        List<AbstractMissionTransition> activeContracts = getActiveContracts();
+        List<MissionTransition> activeContracts = getActiveContracts();
         int hospitalRentalCost = campaignOptions.getRentedFacilitiesCostHospitalBeds();
         Money hospitalRentalFee = FacilityRentals.calculateContractRentalCost(hospitalRentalCost, activeContracts,
               ContractRentalType.HOSPITAL_BEDS);
@@ -4849,7 +4849,7 @@ public class Campaign implements ITechManager, IPlace {
 
     public void removeScenario(final Scenario scenario) {
         scenario.clearAllFormationsAndPersonnel(this);
-        final AbstractMissionTransition mission = getMission(scenario.getMissionId());
+        final MissionTransition mission = getMission(scenario.getMissionId());
         if (mission != null) {
             mission.getScenarios().remove(scenario);
 
@@ -4864,7 +4864,7 @@ public class Campaign implements ITechManager, IPlace {
         MekHQ.triggerEvent(new ScenarioRemovedEvent(scenario));
     }
 
-    public void removeMission(final AbstractMissionTransition mission) {
+    public void removeMission(final MissionTransition mission) {
         // Loop through scenarios here! We need to remove them as well.
         for (Scenario scenario : mission.getScenarios()) {
             scenario.clearAllFormationsAndPersonnel(this);
@@ -4914,7 +4914,7 @@ public class Campaign implements ITechManager, IPlace {
         }
 
         // clear out StratCon formation assignments
-        for (AbstractMissionTransition contract : getActiveAtBContracts()) {
+        for (MissionTransition contract : getActiveAtBContracts()) {
             if (contract.getStratConCampaignState() != null) {
                 for (StratConTrackState track : contract.getStratConCampaignState().getTracks()) {
                     track.unassignFormation(fid);
@@ -5810,7 +5810,7 @@ public class Campaign implements ITechManager, IPlace {
         humanResources.writeToXML(writer, indent, this);
 
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "missions");
-        for (final AbstractMissionTransition mission : getMissions()) {
+        for (final MissionTransition mission : getMissions()) {
             mission.writeToXML(this, writer, indent);
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "missions");
@@ -6229,7 +6229,7 @@ public class Campaign implements ITechManager, IPlace {
             return new JumpPath();
         }
 
-        List<AbstractMissionTransition> activeAtBContracts = getActiveAtBContracts();
+        List<MissionTransition> activeAtBContracts = getActiveAtBContracts();
 
         FactionHints factionHints = FactionHints.getInstance();
         if (!skipAccessCheck && campaignOptions.isUseFactionStandingOutlawedSafe()) {
@@ -7064,7 +7064,7 @@ public class Campaign implements ITechManager, IPlace {
 
     public int findAtBPartsAvailabilityLevel() {
         Integer availabilityModifier = null;
-        for (AbstractMissionTransition contract : getActiveAtBContracts()) {
+        for (MissionTransition contract : getActiveAtBContracts()) {
             int contractAvailability = contract.getPartsAvailabilityLevel();
 
             if (availabilityModifier == null || contractAvailability < availabilityModifier) {
@@ -8216,7 +8216,7 @@ public class Campaign implements ITechManager, IPlace {
         });
     }
 
-    public void completeMission(@Nullable AbstractMissionTransition mission, MissionStatus status) {
+    public void completeMission(@Nullable MissionTransition mission, MissionStatus status) {
         if (mission == null) {
             return;
         }
@@ -8614,8 +8614,8 @@ public class Campaign implements ITechManager, IPlace {
             /*
              * Switch all contracts to AtBContract's
              */
-            for (Entry<Integer, AbstractMissionTransition> missionEntry : missions.entrySet()) {
-                AbstractMissionTransition mission = missionEntry.getValue();
+            for (Entry<Integer, MissionTransition> missionEntry : missions.entrySet()) {
+                MissionTransition mission = missionEntry.getValue();
 
                 // Only Contract objects should be passed in here, not Mission or AtBContract
                 if (mission instanceof Contract) {

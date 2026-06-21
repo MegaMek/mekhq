@@ -55,7 +55,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.AtBContractType;
@@ -132,7 +132,7 @@ public class RetirementDefectionTracker {
      *
      * @return A map with person ids as key and calculated target roll as value.
      */
-    public Map<UUID, TargetRoll> getTargetNumbers(final @Nullable AbstractMissionTransition mission,
+    public Map<UUID, TargetRoll> getTargetNumbers(final @Nullable MissionTransition mission,
           final Campaign campaign) {
         final Map<UUID, TargetRoll> targets = new HashMap<>();
 
@@ -255,12 +255,12 @@ public class RetirementDefectionTracker {
                 // In the case of multiple active contracts, pick the one with the best
                 // percentage.
 
-                AbstractMissionTransition contract = mission;
+                MissionTransition contract = mission;
                 if (contract == null) {
-                    List<AbstractMissionTransition> atbContracts = campaign.getActiveAtBContracts();
+                    List<MissionTransition> atbContracts = campaign.getActiveAtBContracts();
 
                     if (!atbContracts.isEmpty()) {
-                        for (AbstractMissionTransition atbContract : atbContracts) {
+                        for (MissionTransition atbContract : atbContracts) {
                             if ((contract == null) || (contract.getSharesPercent() > atbContract.getSharesPercent())) {
                                 contract = atbContract;
                             }
@@ -445,15 +445,15 @@ public class RetirementDefectionTracker {
               AtBContractType.SECURITY_DUTY,
               AtBContractType.RIOT_DUTY);
 
-        List<AbstractMissionTransition> activeContracts = campaign.getActiveContracts();
+        List<MissionTransition> activeContracts = campaign.getActiveContracts();
 
         if (!activeContracts.isEmpty()) {
             if (campaign.getCampaignOptions().isUseStratCon()) {
-                Optional<AbstractMissionTransition> defensiveContract = activeContracts.stream()
-                                                                              .filter(contract -> contract instanceof AtBContract)
-                                                                              .filter(atBContract -> !defensiveContracts.contains(
-                                                                                    atBContract.getContractType()))
-                                                                              .findFirst();
+                Optional<MissionTransition> defensiveContract = activeContracts.stream()
+                                                                      .filter(contract -> contract instanceof AtBContract)
+                                                                      .filter(atBContract -> !defensiveContracts.contains(
+                                                                            atBContract.getContractType()))
+                                                                      .findFirst();
 
                 return defensiveContract.isPresent();
             } else {
@@ -842,7 +842,7 @@ public class RetirementDefectionTracker {
      * @param shareValue The value of each share in the unit; if not using the share system, this is zero.
      * @param campaign   the current campaign
      */
-    public void rollRetirement(final @Nullable AbstractMissionTransition mission, final Map<UUID, TargetRoll> targets,
+    public void rollRetirement(final @Nullable MissionTransition mission, final Map<UUID, TargetRoll> targets,
           final Money shareValue, final Campaign campaign) {
         if ((mission != null) && !unresolvedPersonnel.containsKey(mission.getId())) {
             unresolvedPersonnel.put(mission.getId(), new HashSet<>());
@@ -925,7 +925,7 @@ public class RetirementDefectionTracker {
      * @return True if the person was successfully removed from the campaign, false otherwise.
      */
     public boolean removeFromCampaign(Person person, boolean killed, boolean sacked, Campaign campaign,
-          AbstractMissionTransition contract) {
+          MissionTransition contract) {
         if (!person.getPrisonerStatus().isFree()) {
             return false;
         }
@@ -1010,7 +1010,7 @@ public class RetirementDefectionTracker {
         return getRetirees(null);
     }
 
-    public Set<UUID> getRetirees(final @Nullable AbstractMissionTransition mission) {
+    public Set<UUID> getRetirees(final @Nullable MissionTransition mission) {
         return (mission == null) ? payouts.keySet() : unresolvedPersonnel.get(mission.getId());
     }
 

@@ -38,7 +38,7 @@ import java.util.List;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
 import mekhq.gui.dialog.nagDialogs.nagLogic.SingleDropSetUpNagLogic;
 
@@ -71,7 +71,7 @@ public class SingleDropNagDialog extends ImmersiveDialogNag {
         super(campaign, null, NAG_SINGLE_DROP_SET_UP, "SingleDropNagDialog");
     }
 
-    public static boolean checkNag(List<AbstractMissionTransition> activeContracts, boolean isSunday,
+    public static boolean checkNag(List<MissionTransition> activeContracts, boolean isSunday,
           boolean isUseStratConSinglesMode) {
         return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_SINGLE_DROP_SET_UP) &&
                      SingleDropSetUpNagLogic.hasActiveStratConContract(activeContracts) &&

@@ -41,7 +41,7 @@ import java.util.stream.IntStream;
 
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.universe.Faction;
@@ -60,7 +60,7 @@ public class TheatreOfWarAwards {
      * @param awards   the awards to be processed (should only include awards where item == TheatreOfWar)
      */
     public static Map<Integer, List<Object>> TheatreOfWarAwardsProcessor(Campaign campaign,
-          AbstractMissionTransition mission,
+          MissionTransition mission,
           UUID person, List<Award> awards) {
         boolean isEligible;
         List<Award> eligibleAwards = new ArrayList<>();

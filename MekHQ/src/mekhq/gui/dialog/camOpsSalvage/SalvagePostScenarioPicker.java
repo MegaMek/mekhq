@@ -75,7 +75,7 @@ import mekhq.campaign.Hangar;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
@@ -243,7 +243,7 @@ public class SalvagePostScenarioPicker {
      * @author Illiani
      * @since 0.50.10
      */
-    public SalvagePostScenarioPicker(Campaign campaign, AbstractMissionTransition mission, Scenario scenario,
+    public SalvagePostScenarioPicker(Campaign campaign, MissionTransition mission, Scenario scenario,
           List<TestUnit> actualSalvage, List<TestUnit> soldSalvage) {
         this.isInSpace = scenario.getBoardType() == AtBScenario.T_SPACE;
 

@@ -42,7 +42,7 @@ import java.util.List;
 
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.common.equipment.EquipmentType;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
@@ -143,7 +143,7 @@ class CampaignMissionContractAccessorsTest {
 
     @Test
     void getActiveContractsExcludesPlainMissionsAndIncludesActiveContractsOfBothKinds() {
-        List<AbstractMissionTransition> activeContracts = campaign.getActiveContracts();
+        List<MissionTransition> activeContracts = campaign.getActiveContracts();
 
         assertEquals(2, activeContracts.size(), "Only the two active contracts should be returned");
         assertTrue(activeContracts.contains(activeContract), "the active plain contract must be included");
@@ -155,7 +155,7 @@ class CampaignMissionContractAccessorsTest {
 
     @Test
     void getFutureContractsReturnsFutureStartContractsOfBothKindsOnly() {
-        List<AbstractMissionTransition> futureContracts = campaign.getFutureContracts();
+        List<MissionTransition> futureContracts = campaign.getFutureContracts();
 
         assertEquals(2, futureContracts.size(), "Only the two future-start contracts should be returned");
         assertTrue(futureContracts.contains(futureContract), "the future plain contract must be included");
@@ -166,7 +166,7 @@ class CampaignMissionContractAccessorsTest {
 
     @Test
     void getAtBContractsReturnsEveryAtBContractRegardlessOfStatus() {
-        List<AbstractMissionTransition> atbContracts = campaign.getAtBContracts();
+        List<MissionTransition> atbContracts = campaign.getAtBContracts();
 
         assertEquals(3, atbContracts.size(), "All three AtB contracts must be returned regardless of status");
         assertTrue(atbContracts.contains(activeAtBContract));
@@ -178,7 +178,7 @@ class CampaignMissionContractAccessorsTest {
 
     @Test
     void getActiveAtBContractsReturnsOnlyActiveAtBContracts() {
-        List<AbstractMissionTransition> activeAtB = campaign.getActiveAtBContracts();
+        List<MissionTransition> activeAtB = campaign.getActiveAtBContracts();
 
         assertEquals(1, activeAtB.size(), "Only the active AtB contract should be returned");
         assertTrue(activeAtB.contains(activeAtBContract));
@@ -187,7 +187,7 @@ class CampaignMissionContractAccessorsTest {
 
     @Test
     void getCompletedAtBContractsReturnsOnlyCompletedAtBContracts() {
-        List<AbstractMissionTransition> completedAtB = campaign.getCompletedAtBContracts();
+        List<MissionTransition> completedAtB = campaign.getCompletedAtBContracts();
 
         assertEquals(1, completedAtB.size(), "Only the completed AtB contract should be returned");
         assertTrue(completedAtB.contains(completedAtBContract));
@@ -195,7 +195,7 @@ class CampaignMissionContractAccessorsTest {
 
     @Test
     void getActiveMissionsIncludesActiveContractsAndActivePlainMissions() {
-        List<AbstractMissionTransition> activeMissions = campaign.getActiveMissions(false);
+        List<MissionTransition> activeMissions = campaign.getActiveMissions(false);
 
         assertTrue(activeMissions.contains(plainMission),
               "a status-active plain Mission must be reported by getActiveMissions (it ignores dates)");
@@ -208,7 +208,7 @@ class CampaignMissionContractAccessorsTest {
 
     @Test
     void getFutureAtBContractsReturnsOnlyFutureStartAtBContracts() {
-        List<AbstractMissionTransition> futureAtB = campaign.getFutureAtBContracts();
+        List<MissionTransition> futureAtB = campaign.getFutureAtBContracts();
 
         assertEquals(1, futureAtB.size(), "Only the future-start AtB contract should be returned");
         assertTrue(futureAtB.contains(futureAtBContract));

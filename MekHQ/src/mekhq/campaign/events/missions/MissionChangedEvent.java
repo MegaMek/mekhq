@@ -33,7 +33,7 @@
 
 package mekhq.campaign.events.missions;
 
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 
 /**
  * Triggered when a mission or contract is modified. Specific changes not involving addition or deletion should extend
@@ -41,7 +41,7 @@ import mekhq.campaign.mission.AbstractMissionTransition;
  */
 public class MissionChangedEvent extends MissionEvent {
 
-    public MissionChangedEvent(AbstractMissionTransition mission) {
+    public MissionChangedEvent(MissionTransition mission) {
         super(mission);
     }
 }

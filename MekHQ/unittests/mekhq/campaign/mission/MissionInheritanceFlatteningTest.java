@@ -59,10 +59,10 @@ import org.junit.jupiter.api.Test;
  * {@code AtBContract -> Contract -> Mission} inheritance chain.
  *
  * <p>After the flattening, {@link Mission}, {@link Contract}, and {@link AtBContract} each extend
- * {@link AbstractMissionTransition} directly. The most consequential behavioral change is that {@link AtBContract} is
- * no longer an {@code instanceof Contract} and is no longer an {@code instanceof Mission}, and a {@link Contract} is no
- * longer an {@code instanceof Mission}. A large amount of campaign code filters and dispatches on exactly these
- * relationships, so these tests pin the relationships down to catch any accidental re-parenting in future work.</p>
+ * {@link MissionTransition} directly. The most consequential behavioral change is that {@link AtBContract} is no longer
+ * an {@code instanceof Contract} and is no longer an {@code instanceof Mission}, and a {@link Contract} is no longer an
+ * {@code instanceof Mission}. A large amount of campaign code filters and dispatches on exactly these relationships, so
+ * these tests pin the relationships down to catch any accidental re-parenting in future work.</p>
  *
  * @author Claude (test author for PR #9417 review)
  */
@@ -85,11 +85,11 @@ class MissionInheritanceFlatteningTest {
 
     @Test
     void allConcreteTypesAreAbstractMissionTransition() {
-        assertInstanceOf(AbstractMissionTransition.class, new Mission("plain"),
+        assertInstanceOf(MissionTransition.class, new Mission("plain"),
               "Mission must extend AbstractMissionTransition");
-        assertInstanceOf(AbstractMissionTransition.class, new Contract("contract", "FS"),
+        assertInstanceOf(MissionTransition.class, new Contract("contract", "FS"),
               "Contract must extend AbstractMissionTransition");
-        assertInstanceOf(AbstractMissionTransition.class, new AtBContract("atb"),
+        assertInstanceOf(MissionTransition.class, new AtBContract("atb"),
               "AtBContract must extend AbstractMissionTransition");
     }
 
@@ -99,28 +99,28 @@ class MissionInheritanceFlatteningTest {
 
     @Test
     void atBContractIsNoLongerAContract() {
-        AbstractMissionTransition atbContract = new AtBContract("atb");
+        MissionTransition atbContract = new AtBContract("atb");
         assertFalse(atbContract instanceof Contract,
               "After flattening, AtBContract must NOT be an instanceof Contract - campaign filters depend on this");
     }
 
     @Test
     void atBContractIsNoLongerAMission() {
-        AbstractMissionTransition atbContract = new AtBContract("atb");
+        MissionTransition atbContract = new AtBContract("atb");
         assertFalse(atbContract instanceof Mission,
               "After flattening, AtBContract must NOT be an instanceof Mission");
     }
 
     @Test
     void contractIsNoLongerAMission() {
-        AbstractMissionTransition contract = new Contract("contract", "FS");
+        MissionTransition contract = new Contract("contract", "FS");
         assertFalse(contract instanceof Mission,
               "After flattening, Contract must NOT be an instanceof Mission - this is what getActiveContracts() relies on");
     }
 
     @Test
     void plainMissionIsNotAContractOrAtBContract() {
-        AbstractMissionTransition mission = new Mission("plain");
+        MissionTransition mission = new Mission("plain");
         assertFalse(mission instanceof Contract, "A plain Mission must not be a Contract");
         assertFalse(mission instanceof AtBContract, "A plain Mission must not be an AtBContract");
     }
@@ -193,9 +193,9 @@ class MissionInheritanceFlatteningTest {
 
     /**
      * {@link Mission} overrides {@code calculateContract} as a no-op so that plain missions never accrue contract
-     * money. The base implementation immediately reaches into {@code campaign.getAccountant()}; verifying the accountant
-     * is never touched (and the amounts stay zero) proves the override is in force and that a plain mission cannot NPE
-     * its way through a contract calculation.
+     * money. The base implementation immediately reaches into {@code campaign.getAccountant()}; verifying the
+     * accountant is never touched (and the amounts stay zero) proves the override is in force and that a plain mission
+     * cannot NPE its way through a contract calculation.
      */
     @Test
     void missionCalculateContractIsNoOp() {

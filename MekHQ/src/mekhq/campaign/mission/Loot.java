@@ -309,7 +309,7 @@ public class Loot {
      * @throws IllegalStateException if the contract is an instance of AtBContract and the enemy quality is not
      *                               recognized
      */
-    private static HashMap<String, Integer> getQualityAndModifier(AbstractMissionTransition contract) {
+    private static HashMap<String, Integer> getQualityAndModifier(MissionTransition contract) {
         HashMap<String, Integer> qualityAndModifier = new HashMap<>();
 
         if (contract instanceof AtBContract) {

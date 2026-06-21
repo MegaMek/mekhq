@@ -99,9 +99,9 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public abstract class AbstractMissionTransition {
-    private static final MMLogger LOGGER = MMLogger.create(AbstractMissionTransition.class);
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.AbstractMission";
+public class MissionTransition {
+    private static final MMLogger LOGGER = MMLogger.create(MissionTransition.class);
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.MissionTransition";
 
     private final static int NO_ID = -1;
 
@@ -114,12 +114,12 @@ public abstract class AbstractMissionTransition {
     public final static int OVERHEAD_COMPENSATION_FULL = 2;
     public final static int OVERHEAD_COMPENSATION_OPTION_COUNT = 3;
 
-    private String name = getText("AbstractMission.contractTypeName.default");
+    private String name = getText("MissionTransition.contractTypeName.default");
     private int id = NO_ID;
     private StratConCampaignState stratConCampaignState = null;
     private int contractScoreArbitraryModifier = 0;
     private MissionStatus status = MissionStatus.ACTIVE;
-    private String contractTypeName = getText("AbstractMission.contractTypeName.default");
+    private String contractTypeName = getText("MissionTransition.contractTypeName.default");
     private AtBContractType contractType = UNDEFINED;
     private String description = "";
 
@@ -137,22 +137,22 @@ public abstract class AbstractMissionTransition {
     private int lengthInMonths = 1;
 
     private String employerCode = KEY_DEFAULT_FACTION;
-    private String employerName = getText("AbstractMission.allyBotName.default");
+    private String employerName = getText("MissionTransition.allyBotName.default");
     private Person employerLiaison = null;
     private SkillLevel allySkill = REGULAR;
     private int allyQuality = DragoonRating.DRAGOON_C.getRating();
-    private String allyBotName = getText("AbstractMission.allyBotName.default");
+    private String allyBotName = getText("MissionTransition.allyBotName.default");
     private Camouflage allyCamouflage = new Camouflage(Camouflage.COLOUR_CAMOUFLAGE, PlayerColour.RED.name());
     private PlayerColour allyColour = RED;
 
     private String enemyCode = KEY_DEFAULT_FACTION;
-    private String enemyName = getText("AbstractMission.enemyBotName.default");
+    private String enemyName = getText("MissionTransition.enemyBotName.default");
     private String enemyMercenaryEmployerCode = null;
     private Person clanOpponent = null;
     private boolean batchallAccepted = true;
     private SkillLevel enemySkill = REGULAR;
     private int enemyQuality = DragoonRating.DRAGOON_C.getRating();
-    private String enemyBotName = getText("AbstractMission.enemyBotName.default");
+    private String enemyBotName = getText("MissionTransition.enemyBotName.default");
     private Camouflage enemyCamouflage = new Camouflage(Camouflage.COLOUR_CAMOUFLAGE, PlayerColour.BLUE.name());
     private PlayerColour enemyColour = BLUE;
 
@@ -207,7 +207,7 @@ public abstract class AbstractMissionTransition {
 
     private final List<Scenario> scenarios = new ArrayList<>();
 
-    public AbstractMissionTransition() {}
+    public MissionTransition() {}
 
     public String getName() {
         return name;
@@ -718,8 +718,8 @@ public abstract class AbstractMissionTransition {
      * Retrieves the list of scenarios.
      *
      * <p><b>Note:</b> this returns the actual scenario array. Any changes made to the array will be directly
-     * modifying the version retained inside the {@link AbstractMissionTransition} object. If you just want to parse the
-     * list {@link #getScenariosCopy()} is a safer option.</p>
+     * modifying the version retained inside the {@link MissionTransition} object. If you just want to parse the list
+     * {@link #getScenariosCopy()} is a safer option.</p>
      *
      * @return a list of Scenario objects.
      */
@@ -1620,9 +1620,8 @@ public abstract class AbstractMissionTransition {
     }
 
     /**
-     * Writes all {@link AbstractMissionTransition} fields to XML. Subclasses that have their own private fields must
-     * override this, call {@code super.writeToXMLBegin(...)}, append only their private tags, and return the resulting
-     * indent.
+     * Writes all {@link MissionTransition} fields to XML. Subclasses that have their own private fields must override
+     * this, call {@code super.writeToXMLBegin(...)}, append only their private tags, and return the resulting indent.
      */
     protected int writeToXMLBegin(Campaign campaign, final PrintWriter printWriter, int indent) {
         // opening tag and core identity
@@ -1760,9 +1759,8 @@ public abstract class AbstractMissionTransition {
     }
 
     /**
-     * Parses all {@link AbstractMissionTransition} fields from child nodes of the mission XML element. Subclasses with
-     * private fields must override this, call {@code super.loadFieldsFromXmlNode(...)}, then handle only their own
-     * nodes.
+     * Parses all {@link MissionTransition} fields from child nodes of the mission XML element. Subclasses with private
+     * fields must override this, call {@code super.loadFieldsFromXmlNode(...)}, then handle only their own nodes.
      */
     public void loadFieldsFromXmlNode(Campaign campaign, Version version, Node node) throws ParseException {
         NodeList nodeList = node.getChildNodes();
@@ -1958,20 +1956,20 @@ public abstract class AbstractMissionTransition {
     }
 
     /**
-     * Instantiates the correct {@link AbstractMissionTransition} subclass from XML and fully loads its state. The
-     * concrete type is determined by the {@code type} attribute on the node, identical to before.
+     * Instantiates the correct {@link MissionTransition} subclass from XML and fully loads its state. The concrete type
+     * is determined by the {@code type} attribute on the node, identical to before.
      * <p>
      * Callers that previously used {@code Mission.generateInstanceFromXML} should migrate to this method; the static
      * delegate on {@link Mission} is preserved only for backward compatibility.
      */
-    public static AbstractMissionTransition generateInstanceFromXML(Node node, Campaign campaign, Version version) {
-        AbstractMissionTransition retVal = null;
+    public static MissionTransition generateInstanceFromXML(Node node, Campaign campaign, Version version) {
+        MissionTransition retVal = null;
         NamedNodeMap nodeAttributes = node.getAttributes();
         Node classNameNode = nodeAttributes.getNamedItem("type");
         String className = classNameNode.getTextContent();
 
         try {
-            retVal = (AbstractMissionTransition) Class.forName(className).getDeclaredConstructor().newInstance();
+            retVal = (MissionTransition) Class.forName(className).getDeclaredConstructor().newInstance();
             retVal.loadFieldsFromXmlNode(campaign, version, node);
         } catch (Exception ex) {
             LOGGER.error("", ex);
@@ -1984,7 +1982,7 @@ public abstract class AbstractMissionTransition {
     public String toString() {
         return !getStatus().isCompleted() ?
                      getName() :
-                     getFormattedTextAt(RESOURCE_BUNDLE, "AbstractMission.name.completed", getName());
+                     getFormattedTextAt(RESOURCE_BUNDLE, "MissionTransition.name.completed", getName());
     }
 
     private static String getText(String resourceKey) {

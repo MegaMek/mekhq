@@ -61,7 +61,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.OrganizationChangedEvent;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
@@ -139,7 +139,7 @@ public class CombatTeam {
         role = formation != null ? formation.getCombatRoleInMemory() : CombatRole.FRONTLINE;
 
         missionId = -1;
-        for (AbstractMissionTransition mission : campaign.getActiveAtBContracts()) {
+        for (MissionTransition mission : campaign.getActiveAtBContracts()) {
             if (mission instanceof AtBContract contract) {
                 missionId = ((contract.getParentContract() == null) ? contract : contract.getParentContract()).getId();
             }
@@ -155,11 +155,11 @@ public class CombatTeam {
         return missionId;
     }
 
-    public AbstractMissionTransition getContract(Campaign campaign) {
-        return (AbstractMissionTransition) campaign.getMission(missionId);
+    public MissionTransition getContract(Campaign campaign) {
+        return (MissionTransition) campaign.getMission(missionId);
     }
 
-    public void setContract(AbstractMissionTransition atBContract) {
+    public void setContract(MissionTransition atBContract) {
         if (null == atBContract) {
             missionId = NO_MISSION;
         } else {
@@ -485,7 +485,7 @@ public class CombatTeam {
                                   (AtBMoraleLevel.STALEMATE.ordinal() -
                                          getContract(campaign).getMoraleLevel().ordinal()) * 5;
 
-        AbstractMissionTransition contract = getContract(campaign);
+        MissionTransition contract = getContract(campaign);
         if (contract instanceof AtBContract atbContract) {
             battleTypeMod += atbContract.getBattleTypeMod();
         }

@@ -50,7 +50,7 @@ import testUtilities.MHQTestUtilities;
 
 /**
  * Characterization tests for latent defects uncovered while reviewing PR #9417 (the flattening of
- * {@code AtBContract -> Contract -> Mission} into a common {@link AbstractMissionTransition} base).
+ * {@code AtBContract -> Contract -> Mission} into a common {@link MissionTransition} base).
  *
  * <p><b>Every test in this class is {@link Disabled} on purpose.</b> Each one asserts the behavior the code
  * <i>should</i>

@@ -116,7 +116,7 @@ import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.AmmoStorage;
@@ -2396,7 +2396,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 continue;
             }
 
-            AbstractMissionTransition mission = AbstractMissionTransition.generateInstanceFromXML(wn2, retVal, version);
+            MissionTransition mission = MissionTransition.generateInstanceFromXML(wn2, retVal, version);
 
             if (mission != null) {
                 retVal.importMission(mission);
@@ -2404,7 +2404,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         }
 
         // Restore references on AtBContracts
-        for (AbstractMissionTransition contract : retVal.getAtBContracts()) {
+        for (MissionTransition contract : retVal.getAtBContracts()) {
             if (contract instanceof AtBContract atbContract) {
                 atbContract.restore(retVal);
             }

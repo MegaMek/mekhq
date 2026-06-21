@@ -59,7 +59,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.Scenario;
 
 /**
@@ -81,7 +81,7 @@ public class AddOrEditKillEntryDialog extends JDialog {
     private JTextField txtKill;
     private JTextField txtKiller;
     private JButton btnDate;
-    private MMComboBox<AbstractMissionTransition> cboMissionId;
+    private MMComboBox<MissionTransition> cboMissionId;
     private ArrayList<Integer> missionIdList;
     private MMComboBox<String> cboScenarioId;
     private ArrayList<Integer> scenarioIdList;
@@ -367,7 +367,7 @@ public class AddOrEditKillEntryDialog extends JDialog {
             // the default value should be the first value
             idList.add(0);
 
-            for (AbstractMissionTransition mission : campaign.getSortedMissions()) {
+            for (MissionTransition mission : campaign.getSortedMissions()) {
                 idList.add(mission.getId());
             }
         } else {

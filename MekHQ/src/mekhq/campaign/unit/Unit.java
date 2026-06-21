@@ -120,7 +120,7 @@ import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.log.AssignmentLogger;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.camOpsSalvage.CamOpsSalvageUtilities;
@@ -6978,10 +6978,10 @@ public class Unit implements ITechnology, ILocation {
     }
 
     public void incrementDaysSinceMaintenance(Campaign campaign, boolean maintained, int asTechs) {
-        List<AbstractMissionTransition> activeMissions = campaign.getActiveMissions(false);
+        List<MissionTransition> activeMissions = campaign.getActiveMissions(false);
         double timeIncrease = 0.25;
 
-        for (AbstractMissionTransition mission : activeMissions) {
+        for (MissionTransition mission : activeMissions) {
             if (mission instanceof AtBContract atBContract) {
                 if (atBContract.getContractType().isGarrisonDuty() || atBContract.getContractType().isRetainer()) {
                     continue;

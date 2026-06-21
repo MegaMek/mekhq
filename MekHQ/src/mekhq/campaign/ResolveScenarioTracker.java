@@ -73,7 +73,7 @@ import mekhq.campaign.events.persons.PersonBattleFinishedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.log.ServiceLogger;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
@@ -1146,7 +1146,7 @@ public class ResolveScenarioTracker {
      *                       be in the salvageStatus hashtable.
      */
     private void processPrisonerCapture(List<TestUnit> unitsToProcess) {
-        AbstractMissionTransition currentMission = campaign.getMission(scenario.getMissionId());
+        MissionTransition currentMission = campaign.getMission(scenario.getMissionId());
         String enemyCode = currentMission.getEnemyCode();
 
         for (Unit unit : unitsToProcess) {
@@ -1669,7 +1669,7 @@ public class ResolveScenarioTracker {
         return scenario;
     }
 
-    public AbstractMissionTransition getMission() {
+    public MissionTransition getMission() {
         return campaign.getMission(scenario.getMissionId());
     }
 
@@ -1757,7 +1757,7 @@ public class ResolveScenarioTracker {
         // ok lets do the whole enchilada and go ahead and update campaign
         // first figure out if we need any battle loss comp
         double blc = 0;
-        final AbstractMissionTransition mission = getMission();
+        final MissionTransition mission = getMission();
 
         final boolean isContract = !(mission instanceof Mission);
         if (isContract) {
@@ -2119,7 +2119,7 @@ public class ResolveScenarioTracker {
      * @return {@code true} if the current mission uses a salvage exchange, {@code false} otherwise.
      */
     public boolean usesSalvageExchange() {
-        AbstractMissionTransition mission = getMission();
+        MissionTransition mission = getMission();
         if (!(mission instanceof Mission)) {
             if (mission.isSalvageExchange()) {
                 return true;

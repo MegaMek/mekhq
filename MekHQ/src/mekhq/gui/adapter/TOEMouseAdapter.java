@@ -73,7 +73,7 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.force.FormationType;
 import mekhq.campaign.log.AssignmentLogger;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.enums.CombatRole;
@@ -1258,7 +1258,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 menu = new JMenu("Deploy Force");
 
                 JMenu missionMenu;
-                for (final AbstractMissionTransition mission : gui.getCampaign().getActiveMissions(true)) {
+                for (final MissionTransition mission : gui.getCampaign().getActiveMissions(true)) {
                     missionMenu = new JMenu(mission.getName());
                     for (final Scenario scenario : mission.getCurrentScenarios()) {
                         if (scenario.isCloaked() || !scenario.canDeployForces(formations, gui.getCampaign())) {
@@ -1563,7 +1563,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 // Deploy unit to a scenario - includes submenus for scenario selection
                 menu = new JMenu("Deploy Unit");
                 JMenu missionMenu;
-                for (final AbstractMissionTransition mission : gui.getCampaign().getActiveMissions(true)) {
+                for (final MissionTransition mission : gui.getCampaign().getActiveMissions(true)) {
                     missionMenu = new JMenu(mission.getName());
                     for (final Scenario scenario : mission.getCurrentScenarios()) {
                         if (scenario.isCloaked() || !scenario.canDeployUnits(units, gui.getCampaign())) {

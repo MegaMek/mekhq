@@ -54,7 +54,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.market.contractMarket.AlternatePaymentModelValues;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.education.EducationController;
@@ -268,7 +268,7 @@ public record Accountant(Campaign campaign) {
         boolean foundContract = false;
 
         // Consider contracts in the current system
-        for (AbstractMissionTransition contract : campaign.getActiveAtBContracts()) {
+        for (MissionTransition contract : campaign.getActiveAtBContracts()) {
             if (contract.getSystem().equals(currentSystem)) {
                 double currentRegard = factionStandings.getRegardForFaction(contract.getEmployerCode(), true);
                 if (currentRegard > maxRegard) {

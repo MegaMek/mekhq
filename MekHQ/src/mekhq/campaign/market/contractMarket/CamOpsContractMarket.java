@@ -56,7 +56,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.camOpsReputation.ReputationController;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.market.enums.ContractMarketMethod;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.ContractCommandRights;
@@ -318,7 +318,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
     }
 
     @Override
-    protected void rollCommandClause(final AbstractMissionTransition contract, final int modifier,
+    protected void rollCommandClause(final MissionTransition contract, final int modifier,
           boolean isMercenary) {
         final int roll = d6(2) + modifier;
 

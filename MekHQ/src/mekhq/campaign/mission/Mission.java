@@ -50,7 +50,7 @@ import org.w3c.dom.Node;
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
-public class Mission extends AbstractMissionTransition {
+public class Mission extends MissionTransition {
     private static final MMLogger LOGGER = MMLogger.create(Mission.class);
 
     // region Constructors

@@ -179,7 +179,7 @@ public class AtBDynamicScenarioFactory {
      * @return A new Scenario object with the provided settings
      */
     public static AtBDynamicScenario initializeScenarioFromTemplate(ScenarioTemplate template,
-          AbstractMissionTransition contract,
+          MissionTransition contract,
           Campaign campaign) {
         AtBDynamicScenario scenario = new AtBDynamicScenario();
 
@@ -254,7 +254,7 @@ public class AtBDynamicScenarioFactory {
      * @param contract Contract in which the scenario is occurring
      * @param campaign Current campaign.
      */
-    public static void finalizeScenario(AtBDynamicScenario scenario, AbstractMissionTransition contract,
+    public static void finalizeScenario(AtBDynamicScenario scenario, MissionTransition contract,
           Campaign campaign) {
         // if scenario already had bots, then we need to reset the briefing to remove
         // text related to old scenario modifiers
@@ -317,7 +317,7 @@ public class AtBDynamicScenarioFactory {
      *
      * @return How many "lances" or other individual units were generated?
      */
-    private static int generateForces(AtBDynamicScenario scenario, AbstractMissionTransition contract,
+    private static int generateForces(AtBDynamicScenario scenario, MissionTransition contract,
           Campaign campaign) {
         LOGGER.info("GENERATING FORCES FOR: {}", scenario.getName().toUpperCase());
         int generatedLanceCount = 0;
@@ -382,7 +382,7 @@ public class AtBDynamicScenarioFactory {
     /**
      * "Meaty" function that generates a force for the given scenario using the fixed MUL
      */
-    public static int generateFixedForce(AtBDynamicScenario scenario, AbstractMissionTransition contract,
+    public static int generateFixedForce(AtBDynamicScenario scenario, MissionTransition contract,
           Campaign campaign,
           ScenarioForceTemplate forceTemplate) {
         File mulFile = new File(MHQConstants.STRAT_CON_MUL_FILES_DIRECTORY + forceTemplate.getFixedMul());
@@ -457,7 +457,7 @@ public class AtBDynamicScenarioFactory {
      *
      * @return The number of "lances" or other unit groups successfully generated.
      */
-    public static int generateForce(AtBDynamicScenario scenario, AbstractMissionTransition contract, Campaign campaign,
+    public static int generateForce(AtBDynamicScenario scenario, MissionTransition contract, Campaign campaign,
           int effectiveBV, int effectiveUnitCount, int weightClass, ScenarioForceTemplate forceTemplate,
           boolean isScenarioModifier) {
         // don't generate forces flagged as player-supplied
@@ -1365,7 +1365,7 @@ public class AtBDynamicScenarioFactory {
      *       {@link AtBDynamicScenario}, or {@code null} if no matching track is found.
      */
     private static @Nullable StratConTrackState getStratconTrackState(AtBDynamicScenario scenario,
-          AbstractMissionTransition contract) {
+          MissionTransition contract) {
         List<StratConTrackState> tracks = contract.getStratConCampaignState().getTracks();
         StratConTrackState scenarioHomeTrack = null;
 
@@ -1897,7 +1897,7 @@ public class AtBDynamicScenarioFactory {
      * @param mission  The active mission for the scenario
      * @param campaign The current campaign
      */
-    private static void setPlanetaryConditions(AtBDynamicScenario scenario, AbstractMissionTransition mission,
+    private static void setPlanetaryConditions(AtBDynamicScenario scenario, MissionTransition mission,
           Campaign campaign) {
         if (scenario.getBoardType() == AtBScenario.T_SPACE) {
             return;
@@ -4254,7 +4254,7 @@ public class AtBDynamicScenarioFactory {
      * @param contract       The contract from which to set parameters
      */
     private static void setBotForceParameters(BotForce generatedForce, ScenarioForceTemplate forceTemplate,
-          ForceAlignment forceAlignment, AbstractMissionTransition contract) {
+          ForceAlignment forceAlignment, MissionTransition contract) {
         if (forceAlignment == ForceAlignment.Allied) {
             generatedForce.setName(java.lang.String.format("%s %s",
                   contract.getAllyBotName(),
@@ -5111,7 +5111,7 @@ public class AtBDynamicScenarioFactory {
      *
      * @return Faction code.
      */
-    public static String getPlanetOwnerFaction(AbstractMissionTransition contract, LocalDate currentDate) {
+    public static String getPlanetOwnerFaction(MissionTransition contract, LocalDate currentDate) {
         String factionCode = "MERC";
 
         // planet owner is the first of the factions that owns the current planet.
@@ -5138,7 +5138,7 @@ public class AtBDynamicScenarioFactory {
      *
      * @return ForceAlignment.
      */
-    public static ForceAlignment getPlanetOwnerAlignment(AbstractMissionTransition contract, String factionCode,
+    public static ForceAlignment getPlanetOwnerAlignment(MissionTransition contract, String factionCode,
           LocalDate currentDate) {
         // if the faction is one of the planet owners, see if it's either the employer
         // or op for. If it's not, third-party.
@@ -5177,7 +5177,7 @@ public class AtBDynamicScenarioFactory {
      * Highly paranoid function that will check if the given faction is one of the owners of the contract's location at
      * the current date.
      */
-    private static boolean isPlanetOwner(AbstractMissionTransition contract, LocalDate currentDate,
+    private static boolean isPlanetOwner(MissionTransition contract, LocalDate currentDate,
           String factionCode) {
         if ((contract == null) ||
                   (contract.getSystem() == null) ||

@@ -44,7 +44,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
@@ -358,7 +358,7 @@ public class FactionStandingUtilities {
      */
     public static boolean isUseCommandCircuit(boolean overridingCommandCircuitRequirements, boolean isGM,
           boolean useFactionStandingCommandCircuit, FactionStandings factionStandings,
-          List<AbstractMissionTransition> activeContracts) {
+          List<MissionTransition> activeContracts) {
         boolean useCommandCircuit = overridingCommandCircuitRequirements && isGM;
 
         if (useCommandCircuit) {
@@ -371,7 +371,7 @@ public class FactionStandingUtilities {
 
         double highestRegard = FactionStandingLevel.STANDING_LEVEL_0.getMinimumRegard();
         if (useFactionStandingCommandCircuit) {
-            for (AbstractMissionTransition contract : activeContracts) {
+            for (MissionTransition contract : activeContracts) {
                 double currentRegard = factionStandings.getRegardForFaction(contract.getEmployerCode(), true);
                 if (currentRegard > highestRegard) {
                     highestRegard = currentRegard;
@@ -414,7 +414,7 @@ public class FactionStandingUtilities {
      */
     public static boolean canEnterTargetSystem(Faction campaignFaction, FactionStandings factionStandings,
           @Nullable PlanetarySystem currentSystem, PlanetarySystem targetSystem, LocalDate when,
-          List<AbstractMissionTransition> activeAtBContracts, FactionHints factionHints) {
+          List<MissionTransition> activeAtBContracts, FactionHints factionHints) {
         // Always allowed in empty systems
         if (targetSystem.getPopulation(when) == 0) {
             LOGGER.debug("Target system is empty, access granted");
@@ -425,7 +425,7 @@ public class FactionStandingUtilities {
 
         Set<Faction> contractEmployers = new HashSet<>();
         Set<Faction> contractTargets = new HashSet<>();
-        for (AbstractMissionTransition contract : activeAtBContracts) {
+        for (MissionTransition contract : activeAtBContracts) {
             contractEmployers.add(contract.getEmployerFaction());
             contractTargets.add(contract.getEnemy());
         }

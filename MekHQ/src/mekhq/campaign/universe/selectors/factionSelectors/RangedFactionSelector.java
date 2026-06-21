@@ -43,7 +43,7 @@ import megamek.common.universe.FactionTag;
 import megamek.common.util.weightedMaps.WeightedDoubleMap;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomOriginOptions;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
@@ -242,7 +242,7 @@ public class RangedFactionSelector extends AbstractFactionSelector {
     private Set<Faction> getEnemies(final Campaign campaign) {
         return campaign.getActiveAtBContracts()
                      .stream()
-                     .map(AbstractMissionTransition::getEnemy)
+                     .map(MissionTransition::getEnemy)
                      .collect(Collectors.toSet());
     }
 

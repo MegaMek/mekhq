@@ -63,7 +63,7 @@ import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.market.enums.ContractMarketMethod;
-import mekhq.campaign.mission.AbstractMissionTransition;
+import mekhq.campaign.mission.MissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
@@ -96,9 +96,9 @@ public abstract class AbstractContractMarket {
     private static final int NON_MERCENARY_THRESHOLD = 12;
 
 
-    protected List<AbstractMissionTransition> contracts = new ArrayList<>();
+    protected List<MissionTransition> contracts = new ArrayList<>();
     protected int lastId = 0;
-    protected Map<Integer, AbstractMissionTransition> contractIds = new HashMap<>();
+    protected Map<Integer, MissionTransition> contractIds = new HashMap<>();
     protected Map<Integer, ClauseMods> clauseMods = new HashMap<>();
 
     /**
@@ -170,7 +170,7 @@ public abstract class AbstractContractMarket {
      *
      * @param mission contract to remove
      */
-    public void removeContract(AbstractMissionTransition mission) {
+    public void removeContract(MissionTransition mission) {
         contracts.remove(mission);
         contractIds.remove(mission.getId());
         clauseMods.remove(mission.getId());
@@ -222,7 +222,7 @@ public abstract class AbstractContractMarket {
      * @param clause ID representing the type of clause.
      *
      */
-    public int getRerollsUsed(AbstractMissionTransition contract, int clause) {
+    public int getRerollsUsed(MissionTransition contract, int clause) {
         if (null != clauseMods.get(contract.getId())) {
             return clauseMods.get(contract.getId()).rerollsUsed[clause];
         }
@@ -232,7 +232,7 @@ public abstract class AbstractContractMarket {
     /**
      * @return a list of currently active contracts on the market
      */
-    public List<AbstractMissionTransition> getContracts() {
+    public List<MissionTransition> getContracts() {
         return contracts;
     }
 
@@ -441,7 +441,7 @@ public abstract class AbstractContractMarket {
      * @param isMercenary Indicates whether the contract applies to a mercenary, which affects the thresholds used for
      *                    determining command rights.
      */
-    protected void rollCommandClause(final AbstractMissionTransition contract, final int modifier,
+    protected void rollCommandClause(final MissionTransition contract, final int modifier,
           boolean isMercenary) {
         final int roll = d6(2) + modifier;
 
@@ -845,7 +845,7 @@ public abstract class AbstractContractMarket {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "contractMarket");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "method", method.toString());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastId", lastId);
-        for (final AbstractMissionTransition contract : contracts) {
+        for (final MissionTransition contract : contracts) {
             contract.writeToXML(campaign, pw, indent);
         }
 
@@ -881,7 +881,7 @@ public abstract class AbstractContractMarket {
                 if (wn2.getNodeName().equalsIgnoreCase("lastId")) {
                     retVal.lastId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("mission")) {
-                    AbstractMissionTransition mission = AbstractMissionTransition.generateInstanceFromXML(wn2,
+                    MissionTransition mission = MissionTransition.generateInstanceFromXML(wn2,
                           c,
                           version);
 
@@ -912,7 +912,7 @@ public abstract class AbstractContractMarket {
             }
 
             // Restore any parent contract references
-            for (AbstractMissionTransition contract : retVal.contracts) {
+            for (MissionTransition contract : retVal.contracts) {
                 if (contract instanceof AtBContract atbContract) {
                     atbContract.restore(c);
                 }
