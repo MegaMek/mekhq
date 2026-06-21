@@ -111,6 +111,14 @@ public class PersonnelTableModel extends DataTableModel<Person> {
         return PERSONNEL_COLUMNS[column].toString();
     }
 
+    @Override
+    public Class<?> getColumnClass(int column) {
+        if (PERSONNEL_COLUMNS[column] == PersonnelTableModelColumn.RANK) {
+            return Person.class;
+        }
+        return String.class;
+    }
+
     public @Nullable Person getPerson(final int row) {
         return (row < getRowCount()) ? (Person) getData().get(row) : null;
     }
@@ -120,7 +128,7 @@ public class PersonnelTableModel extends DataTableModel<Person> {
         return getValueAt(getPerson(row), PERSONNEL_COLUMNS[column]);
     }
 
-    public String getValueAt(final @Nullable Person person,
+    public Object getValueAt(final @Nullable Person person,
           final PersonnelTableModelColumn column) {
         if (getData().isEmpty()) {
             return "";
@@ -275,9 +283,12 @@ public class PersonnelTableModel extends DataTableModel<Person> {
             final PersonnelTableModelColumn personnelColumn = PERSONNEL_COLUMNS[table.convertColumnIndexToModel(column)];
             final Person person = getPerson(modelRow);
 
-            setText(getValueAt(person, personnelColumn));
+            setText(String.valueOf(getValueAt(person, personnelColumn)));
 
             switch (personnelColumn) {
+                case RANK:
+                    setHtmlText(person.getRankName());
+                    break;
                 case PERSON:
                     setText(person.getFullDesc(getCampaign()));
                     setImage(person.getPortraitImageIconWithFallback(true, 54).getImage());

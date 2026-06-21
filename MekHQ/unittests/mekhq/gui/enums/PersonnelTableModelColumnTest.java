@@ -69,7 +69,7 @@ import mekhq.gui.sorter.EducationLevelSorter;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.IntegerStringSorter;
 import mekhq.gui.sorter.LevelSorter;
-import mekhq.gui.sorter.PersonRankStringSorter;
+import mekhq.gui.sorter.PersonRankSorter;
 import mekhq.gui.sorter.ReasoningSorter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -165,7 +165,7 @@ public class PersonnelTableModelColumnTest {
         final Campaign mockCampaign = mock(Campaign.class);
         for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
             switch (personnelTableModelColumn) {
-                case RANK -> assertInstanceOf(PersonRankStringSorter.class,
+                case RANK -> assertInstanceOf(PersonRankSorter.class,
                       personnelTableModelColumn.getComparator(mockCampaign));
                 case HIGHEST_EDUCATION, CURRENT_EDUCATION -> assertInstanceOf(EducationLevelSorter.class,
                       personnelTableModelColumn.getComparator(mockCampaign));

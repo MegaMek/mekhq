@@ -88,7 +88,7 @@ import mekhq.gui.sorter.EducationLevelSorter;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.IntegerStringSorter;
 import mekhq.gui.sorter.LevelSorter;
-import mekhq.gui.sorter.PersonRankStringSorter;
+import mekhq.gui.sorter.PersonRankSorter;
 import mekhq.gui.sorter.ReasoningSorter;
 import mekhq.utilities.MHQInternationalization;
 import mekhq.utilities.ReportingUtilities;
@@ -234,12 +234,12 @@ public enum PersonnelTableModelColumn {
         return MHQInternationalization.getText("NA.text");
     }
 
-    public String getCellValue(final Campaign campaign, final PersonnelMarket personnelMarket, final Person person,
+    public Object getCellValue(final Campaign campaign, final PersonnelMarket personnelMarket, final Person person,
           final boolean loadAssignmentFromMarket, final boolean groupByUnit) {
-        return getDisplayString(campaign, personnelMarket, person, loadAssignmentFromMarket, groupByUnit);
+        return getDisplayObject(campaign, personnelMarket, person, loadAssignmentFromMarket, groupByUnit);
     }
 
-    private String getDisplayString(Campaign campaign, PersonnelMarket personnelMarket, Person person,
+    private Object getDisplayObject(Campaign campaign, PersonnelMarket personnelMarket, Person person,
           boolean loadAssignmentFromMarket, boolean groupByUnit) {
 
         final boolean isClanCampaign = campaign.isClanCampaign();
@@ -422,7 +422,7 @@ public enum PersonnelTableModelColumn {
                                                             convertBooleanToYesNo(person.isPrefersWomen());
             case PROTOMEK -> skillValue.apply(SkillType.S_GUN_PROTO);
             case QUICK_TRAIN_IGNORE -> convertBooleanToYesNo(person.isQuickTrainIgnore());
-            case RANK -> person.makeHTMLRank();
+            case RANK -> person;
             case REASONING -> person.getReasoning().getLabel();
             case RECRUITMENT_DATE -> MekHQ.getMHQOptions().getDisplayFormattedDate(person.getRecruitment());
             case REFLEXES -> getAttributeScoreDisplay(person, SkillAttribute.REFLEXES);
@@ -653,6 +653,8 @@ public enum PersonnelTableModelColumn {
     public @Nullable String getDisplayText(final Campaign campaign, final Person person) {
         if (this == PersonnelTableModelColumn.AGE) {
             return Integer.toString(person.getAge(campaign.getLocalDate()));
+        } else if (this == PersonnelTableModelColumn.RANK) {
+            return person.getRankName();
         }
         return null;
     }
@@ -1018,7 +1020,7 @@ public enum PersonnelTableModelColumn {
 
     public Comparator<?> getComparator(final Campaign campaign) {
         return switch (this) {
-            case RANK -> new PersonRankStringSorter(campaign);
+            case RANK -> new PersonRankSorter(new NaturalOrderComparator());
             case HIGHEST_EDUCATION, CURRENT_EDUCATION -> new EducationLevelSorter();
             case AGE, BIRTHDAY, RECRUITMENT_DATE, LAST_RANK_CHANGE_DATE, DUE_DATE, RETIREMENT_DATE, DEATH_DATE ->
                   new DateStringComparator();
