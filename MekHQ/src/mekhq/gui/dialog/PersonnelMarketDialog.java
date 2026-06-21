@@ -278,7 +278,7 @@ public class PersonnelMarketDialog extends JDialog {
             tableColumn.setCellRenderer(getRenderer());
             columnModel.setColumnVisible(tableColumn, true);
 
-            final Comparator<?> comparator = column.getComparator(campaign);
+            final Comparator<?> comparator = column.getComparator();
             sorter.setComparator(column.ordinal(), comparator);
             final SortOrder sortOrder = column.getDefaultSortOrder();
             if (sortOrder != null) {

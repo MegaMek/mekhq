@@ -162,18 +162,16 @@ public class PersonnelTableModelColumnTest {
 
     @Test
     public void testGetComparator() {
-        final Campaign mockCampaign = mock(Campaign.class);
         for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
             switch (personnelTableModelColumn) {
-                case RANK -> assertInstanceOf(PersonRankSorter.class,
-                      personnelTableModelColumn.getComparator(mockCampaign));
-                case HIGHEST_EDUCATION, CURRENT_EDUCATION -> assertInstanceOf(EducationLevelSorter.class,
-                      personnelTableModelColumn.getComparator(mockCampaign));
+                case RANK ->
+                      assertInstanceOf(PersonRankSorter.class, personnelTableModelColumn.getComparator());
+                case HIGHEST_EDUCATION, CURRENT_EDUCATION ->
+                      assertInstanceOf(EducationLevelSorter.class, personnelTableModelColumn.getComparator());
                 case AGE, BIRTHDAY, RECRUITMENT_DATE, LAST_RANK_CHANGE_DATE, DUE_DATE, RETIREMENT_DATE, DEATH_DATE ->
-                      assertInstanceOf(DateStringComparator.class,
-                            personnelTableModelColumn.getComparator(mockCampaign));
+                      assertInstanceOf(DateStringComparator.class, personnelTableModelColumn.getComparator());
                 case SKILL_LEVEL ->
-                      assertInstanceOf(LevelSorter.class, personnelTableModelColumn.getComparator(mockCampaign));
+                      assertInstanceOf(LevelSorter.class, personnelTableModelColumn.getComparator());
                 case MEK,
                      GROUND_VEHICLE,
                      NAVAL_VEHICLE,
@@ -204,7 +202,7 @@ public class PersonnelTableModelColumnTest {
                      TRAINING,
                      ADMINISTRATION,
                      NEGOTIATION ->
-                      assertInstanceOf(BonusSorter.class, personnelTableModelColumn.getComparator(mockCampaign));
+                      assertInstanceOf(BonusSorter.class, personnelTableModelColumn.getComparator());
                 case INJURIES,
                      KILLS,
                      XP,
@@ -218,17 +216,16 @@ public class PersonnelTableModelColumnTest {
                      SPA_COUNT,
                      MODIFICATION_COUNT,
                      IMPLANT_COUNT,
-                     LOYALTY -> assertInstanceOf(IntegerStringSorter.class,
-                      personnelTableModelColumn.getComparator(mockCampaign));
-                case REASONING -> assertInstanceOf(ReasoningSorter.class,
-                      personnelTableModelColumn.getComparator(mockCampaign));
-                case STRENGTH, BODY, REFLEXES, DEXTERITY, INTELLIGENCE, WILLPOWER, CHARISMA, EDGE -> assertInstanceOf(
-                      AttributeScoreSorter.class,
-                      personnelTableModelColumn.getComparator(mockCampaign));
-                case SALARY -> assertInstanceOf(FormattedNumberSorter.class,
-                      personnelTableModelColumn.getComparator(mockCampaign));
-                default -> assertInstanceOf(NaturalOrderComparator.class,
-                      personnelTableModelColumn.getComparator(mockCampaign));
+                     LOYALTY ->
+                      assertInstanceOf(IntegerStringSorter.class, personnelTableModelColumn.getComparator());
+                case REASONING ->
+                      assertInstanceOf(ReasoningSorter.class, personnelTableModelColumn.getComparator());
+                case STRENGTH, BODY, REFLEXES, DEXTERITY, INTELLIGENCE, WILLPOWER, CHARISMA, EDGE ->
+                      assertInstanceOf(AttributeScoreSorter.class, personnelTableModelColumn.getComparator());
+                case SALARY ->
+                      assertInstanceOf(FormattedNumberSorter.class, personnelTableModelColumn.getComparator());
+                default ->
+                      assertInstanceOf(NaturalOrderComparator.class, personnelTableModelColumn.getComparator());
             }
         }
     }

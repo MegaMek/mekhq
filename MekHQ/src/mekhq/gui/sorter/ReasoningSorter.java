@@ -49,6 +49,9 @@ import java.util.regex.Pattern;
  * @since 0.50.07
  */
 public class ReasoningSorter implements Comparator<String> {
+
+    public static final ReasoningSorter INSTANCE = new ReasoningSorter();
+
     private static final Pattern NUM_PATTERN = Pattern.compile("\\((\\d+)\\)\\s*$");
 
     /**
