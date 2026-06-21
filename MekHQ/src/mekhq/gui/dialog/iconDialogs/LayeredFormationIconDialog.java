@@ -40,14 +40,15 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import megamek.client.ui.buttons.MMButton;
+import megamek.client.ui.dialogs.buttonDialogs.AbstractButtonDialog;
 import megamek.client.ui.preferences.JSplitPanePreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
+import mekhq.MekHQ;
 import mekhq.campaign.icons.LayeredFormationIcon;
 import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.campaign.icons.UnitIcon;
-import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 import mekhq.gui.panels.LayeredFormationIconCreationPanel;
 import mekhq.gui.panels.StandardFormationIconChooser;
 
@@ -60,7 +61,7 @@ import mekhq.gui.panels.StandardFormationIconChooser;
  *
  * @since 0.50.12
  */
-public class LayeredFormationIconDialog extends AbstractMHQButtonDialog {
+public class LayeredFormationIconDialog extends AbstractButtonDialog {
     private static final MMLogger LOGGER = MMLogger.create(LayeredFormationIconDialog.class);
 
     // region Variable Declarations
@@ -73,7 +74,8 @@ public class LayeredFormationIconDialog extends AbstractMHQButtonDialog {
 
     // region Constructors
     public LayeredFormationIconDialog(final JFrame parent, final @Nullable StandardFormationIcon originalFormationIcon) {
-        super(parent, "LayeredFormationIconDialog", "LayeredFormationIconDialog.title");
+        super(parent, true, MekHQ.getDefaultResourceBundle(),
+              "LayeredFormationIconDialog", "LayeredFormationIconDialog.title");
         if (originalFormationIcon instanceof UnitIcon) {
             LOGGER.error(
                   "This dialog was never designed for Unit Icon selection. Creating a standard formation icon based on it, using the base null protections that provides.");
@@ -192,4 +194,9 @@ public class LayeredFormationIconDialog extends AbstractMHQButtonDialog {
         getLayeredFormationIconCreationPanel().refreshDirectory(false);
     }
     // endregion Button Actions
+
+    @Override
+    protected void setPreferences() throws Exception {
+        setPreferences(MekHQ.getMHQPreferences().forClass(getClass()));
+    }
 }
