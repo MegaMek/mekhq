@@ -37,6 +37,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Rectangle;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.Scrollable;
@@ -45,7 +46,11 @@ import javax.swing.SwingConstants;
 
 import jakarta.annotation.Nullable;
 import javax.swing.SwingUtilities;
+import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
+import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
+import mekhq.gui.campaignOptions.components.CampaignOptionsTextField;
 
 /**
  * Owns the central Campaign Options content area and sticky contextual help surface.
@@ -92,9 +97,17 @@ class CampaignOptionsContentHost extends JPanel {
 
     void setContent(Component content, @Nullable String quoteResourceName, boolean showHelpPanel) {
         helpPanel.clearHelpText();
-        helpPanel.setVisible(shouldShowHelpPanel(content, showHelpPanel));
+        boolean detailsPanelShown = shouldShowHelpPanel(content, showHelpPanel);
+        helpPanel.setVisible(detailsPanelShown);
         contentPanel.removeAll();
-        contentPanel.add(getDisplayContent(content, quoteResourceName), BorderLayout.CENTER);
+        Component displayContent = getDisplayContent(content, quoteResourceName);
+        contentPanel.add(displayContent, BorderLayout.CENTER);
+        if (detailsPanelShown) {
+            // The Option Details box already shows each control's help on hover, so drop the now-redundant floating
+            // tooltips from the option inputs on this page. Pages that hide the box keep their tooltips as the only
+            // hover help.
+            clearRedundantOptionToolTips(displayContent);
+        }
         contentPanel.revalidate();
         contentPanel.repaint();
         revalidate();
@@ -102,6 +115,28 @@ class CampaignOptionsContentHost extends JPanel {
         // Always show a freshly mounted page from the top. Deferred so it runs after the new content has been laid out
         // (notably for the initial page, which now opens with its sections expanded and is taller than the viewport).
         SwingUtilities.invokeLater(this::resetScrollPosition);
+    }
+
+    /**
+     * Recursively clears the Swing tooltips on the option-input controls of a page that shows the Option Details box,
+     * since that box already presents the same help text on hover. Buttons keep their tooltips, and pages that hide the
+     * box are left untouched so their tooltips remain the only hover help.
+     *
+     * @param component the content subtree to process
+     */
+    private static void clearRedundantOptionToolTips(Component component) {
+        if (component instanceof CampaignOptionsCheckBox
+                  || component instanceof CampaignOptionsSpinner
+                  || component instanceof CampaignOptionsLabel
+                  || component instanceof CampaignOptionsTextField) {
+            ((JComponent) component).setToolTipText(null);
+        }
+
+        if (component instanceof Container container) {
+            for (Component child : container.getComponents()) {
+                clearRedundantOptionToolTips(child);
+            }
+        }
     }
 
     private boolean shouldShowHelpPanel(Component content, boolean defaultShowHelpPanel) {

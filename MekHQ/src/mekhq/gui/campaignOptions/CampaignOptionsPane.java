@@ -59,6 +59,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
+import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JSplitPane;
 import javax.swing.JPanel;
@@ -66,6 +67,7 @@ import javax.swing.SwingUtilities;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import megamek.client.ui.util.UIUtil;
 import mekhq.CampaignPreset;
 import mekhq.MekHQ;
 import mekhq.campaign.AbstractLocation;
@@ -118,6 +120,7 @@ import mekhq.gui.campaignOptions.optionChangeDialogs.*;
 public class CampaignOptionsPane extends JPanel {
     private static final int SCROLL_SPEED = 16;
     private static final int NAVIGATION_WIDTH = 240;
+    private static final int CONTENT_MARGIN = UIUtil.scaleForGUI(4);
 
     private final JFrame frame;
     private final Campaign campaign;
@@ -190,6 +193,7 @@ public class CampaignOptionsPane extends JPanel {
         splitPane.setName("campaignOptionsSplitPane");
         splitPane.setResizeWeight(0.0);
         splitPane.setDividerLocation(NAVIGATION_WIDTH);
+        setBorder(BorderFactory.createEmptyBorder(CONTENT_MARGIN, CONTENT_MARGIN, CONTENT_MARGIN, CONTENT_MARGIN));
         add(splitPane, BorderLayout.CENTER);
         navigationPanel.selectRoute(navigationTargets.get(0));
     }

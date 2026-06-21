@@ -36,16 +36,21 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOpti
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Graphics;
+import javax.swing.BorderFactory;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.UIManager;
+import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
 
 import jakarta.annotation.Nonnull;
 import megamek.client.ui.util.UIUtil;
-import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
 /**
  * Sticky contextual help surface for Campaign Options.
@@ -59,7 +64,14 @@ class CampaignOptionsHelpPanel extends JPanel {
     CampaignOptionsHelpPanel() {
         super(new BorderLayout());
         setName("campaignOptionsHelpPanel");
-        setBorder(RoundedLineBorder.createRoundedLineBorder(
+        // Draw the caption on the same flush frame border the navigation and content panels use. A standard
+        // TitledBorder insets its line a couple of pixels (which misaligned this box with those squared frames), so
+        // FlushTitledBorder paints the line flush while keeping the title on the line.
+        Border frameBorder = UIManager.getBorder("ScrollPane.border");
+        if (frameBorder == null) {
+            frameBorder = BorderFactory.createLineBorder(UIManager.getColor("Component.borderColor"));
+        }
+        setBorder(new FlushTitledBorder(frameBorder,
               getTextAt(getCampaignOptionsResourceBundle(), "campaignOptionsHelp.title")));
 
         helpTextPane = new JEditorPane();
@@ -107,5 +119,26 @@ class CampaignOptionsHelpPanel extends JPanel {
     public @Nonnull Dimension getMinimumSize() {
         Dimension minimumSize = super.getMinimumSize();
         return new Dimension(minimumSize.width, UIUtil.scaleForGUI(HELP_PANEL_HEIGHT));
+    }
+
+    /**
+     * A {@link TitledBorder} that paints its line flush with the component bounds instead of inset by the standard
+     * two-pixel edge spacing, so this box lines up exactly with the squared frame borders beside it while still
+     * drawing the caption on the border line.
+     */
+    private static class FlushTitledBorder extends TitledBorder {
+        private static final int EDGE_SPACING = 2;
+
+        FlushTitledBorder(Border border, String title) {
+            super(border, title);
+        }
+
+        @Override
+        public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
+            // Expand the paint rectangle by the edge spacing on the left, right, and bottom so TitledBorder's internal
+            // inset lands exactly on the component edges. The top is left untouched so the caption keeps its place on
+            // the line.
+            super.paintBorder(c, g, x - EDGE_SPACING, y, width + (2 * EDGE_SPACING), height + EDGE_SPACING);
+        }
     }
 }

@@ -43,7 +43,6 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.Map;
 import javax.swing.*;
-import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -74,6 +73,7 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
 import mekhq.gui.baseComponents.AbstractMHQValidationButtonDialog;
 import mekhq.gui.baseComponents.SortedComboBoxModel;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.CompanyGenerationOptionsDialog;
 import mekhq.gui.dialog.DateChooser;
 import mekhq.gui.displayWrappers.FactionDisplay;
@@ -419,7 +419,7 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
 
         final int padding = UIUtil.scaleForGUI(5);
         final JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBorder(new TitledBorder(resources.getString("detailsCampaignPresetPanel.title")));
+        panel.setBorder(RoundedLineBorder.createRoundedLineBorder(resources.getString("detailsCampaignPresetPanel.title")));
         panel.setToolTipText(resources.getString("detailsCampaignPresetPanel.toolTipText"));
         panel.setName("detailsCampaignPresetPanel");
 
@@ -611,7 +611,7 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
 
         // Layout the UI
         final JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBorder(new TitledBorder(resources.getString("startupCampaignPresetPanel.title")));
+        panel.setBorder(RoundedLineBorder.createRoundedLineBorder(resources.getString("startupCampaignPresetPanel.title")));
         panel.setToolTipText(resources.getString("startupCampaignPresetPanel.toolTipText"));
         panel.setName("startupCampaignPresetPanel");
 
@@ -728,7 +728,7 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
 
         // Layout the UI
         final JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBorder(new TitledBorder(resources.getString("continuousCampaignPresetPanel.title")));
+        panel.setBorder(RoundedLineBorder.createRoundedLineBorder(resources.getString("continuousCampaignPresetPanel.title")));
         panel.setToolTipText(resources.getString("continuousCampaignPresetPanel.toolTipText"));
         panel.setName("continuousCampaignPresetPanel");
 
