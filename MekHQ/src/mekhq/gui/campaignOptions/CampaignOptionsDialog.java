@@ -33,11 +33,13 @@
 package mekhq.gui.campaignOptions;
 
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.GridBagLayout;
+import java.io.File;
 import java.util.ResourceBundle;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -51,9 +53,9 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.client.ui.util.UIUtil;
 import mekhq.CampaignPreset;
+import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 
 /**
@@ -281,7 +283,49 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
 
         campaignOptionsPane.applyCampaignOptionsToCampaign(preset, mode, true);
 
-        preset.writeToFile(null, FileDialogs.saveCampaignPreset(null, preset).orElse(null));
+        savePresetToUserDirectory(preset);
+    }
+
+    /**
+     * Saves the given preset directly into the user campaign-preset directory (the folder the "Load Preset" picker
+     * scans), so it is immediately available to load without a separate file chooser.
+     *
+     * <p>The directory is created if it does not exist, and the preset title is sanitized into a valid file name. If a
+     * preset file of the same name already exists, the user is asked to confirm overwriting it; on success a
+     * confirmation is shown.</p>
+     *
+     * @param preset the preset to save
+     */
+    private void savePresetToUserDirectory(final CampaignPreset preset) {
+        final File presetDirectory = new File(MHQConstants.USER_CAMPAIGN_PRESET_DIRECTORY);
+        if (!presetDirectory.exists()) {
+            presetDirectory.mkdirs();
+        }
+
+        String fileName = preset.toString().replaceAll("[^A-Za-z0-9 ._-]", "_").trim();
+        if (fileName.isBlank()) {
+            fileName = "Campaign Preset";
+        }
+        final File presetFile = new File(presetDirectory, fileName + " Preset.xml");
+
+        if (presetFile.exists()) {
+            int choice = JOptionPane.showConfirmDialog(getFrame(),
+                  getFormattedTextAt(getCampaignOptionsResourceBundle(), "savePresetOverwrite.text", preset.toString()),
+                  getTextAt(getCampaignOptionsResourceBundle(), "savePresetOverwrite.title"),
+                  JOptionPane.YES_NO_OPTION,
+                  JOptionPane.WARNING_MESSAGE);
+            if (choice != JOptionPane.YES_OPTION) {
+                return;
+            }
+        }
+
+        preset.writeToFile(getFrame(), presetFile);
+
+        JOptionPane.showMessageDialog(getFrame(),
+              getFormattedTextAt(getCampaignOptionsResourceBundle(), "savePresetSuccess.text",
+                    preset.toString(), presetFile.getAbsolutePath()),
+              getTextAt(getCampaignOptionsResourceBundle(), "savePresetSuccess.title"),
+              JOptionPane.INFORMATION_MESSAGE);
     }
 
     /**
