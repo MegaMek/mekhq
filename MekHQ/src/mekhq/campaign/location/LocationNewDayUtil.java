@@ -77,7 +77,12 @@ public final class LocationNewDayUtil {
         Warehouse warehouse = place.getWarehouse();
 
         if (hangar != null) {
+            // need to loop through units twice, the first time to do all maintenance and
+            // the second time to do whatever else. Otherwise, maintenance minutes might
+            // get sucked up by other stuff. This is also a good place to ensure that a
+            // unit's engineer gets reset and updated.
             for (Unit unit : hangar.getUnits()) {
+                // do maintenance checks
                 try {
                     unit.resetEngineer();
                     if (unit.getEngineer() != null) {
@@ -98,6 +103,7 @@ public final class LocationNewDayUtil {
         }
 
         if (warehouse != null) {
+            // need to check for assigned tasks in two steps to avoid concurrent modification problems
             List<Part> assignedParts = new ArrayList<>();
             List<Part> arrivedParts = new ArrayList<>();
             warehouse.forEachPart(part -> {
@@ -109,8 +115,13 @@ public final class LocationNewDayUtil {
                     assignedParts.add(part);
                 }
 
+                // If the part is currently in-transit...
                 if (!part.isPresent()) {
+                    // ... decrement the number of days until it arrives...
                     int newDaysToArrival = part.getDaysToArrival() - 1;
+
+                    // If we're in transit and we don't allow deliveries while in transit the part will remain fixed
+                    // with a delivery time of 1 day until we arrive at our destination.
                     if (campaign.getCampaignOptions().isNoDeliveriesInTransit() &&
                               !place.isOnPlanet() &&
                               newDaysToArrival <= 0) {
@@ -118,15 +129,18 @@ public final class LocationNewDayUtil {
                     }
                     part.setDaysToArrival(newDaysToArrival);
                     if (part.isPresent()) {
+                        // ... and mark the part as arrived if it is now here.
                         arrivedParts.add(part);
                     }
                 }
             });
 
+            // arrive parts before attempting refit or parts will not get reserved that day
             for (Part part : arrivedParts) {
                 campaign.getQuartermaster().arrivePart(part);
             }
 
+            // finish up any overnight assigned tasks
             for (Part part : assignedParts) {
                 Person tech;
                 if ((part.getUnit() != null) && (part.getUnit().getEngineer() != null)) {
@@ -137,6 +151,8 @@ public final class LocationNewDayUtil {
 
                 if (tech != null) {
                     ILocation repairTarget = (part.getUnit() != null) ? part.getUnit() : part;
+                    // If the tech has moved to a different location since the assignment was made,
+                    // cancel it and notify the player rather than silently failing.
                     if (!LocationUtils.areSameEffectiveLocation(tech, repairTarget)) {
                         campaign.addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE,
                               "CampaignNewDayManager.techAtDifferentLocation",
@@ -175,6 +191,7 @@ public final class LocationNewDayUtil {
                     continue;
                 }
 
+                // check to see if this part can now be combined with other spare parts
                 if (part.isSpare() && (part.getQuantity() > 0)) {
                     campaign.getQuartermaster().addPart(part, 0, false);
                 }
@@ -182,6 +199,7 @@ public final class LocationNewDayUtil {
         }
 
         if (hangar != null) {
+            // ok now we can check for other stuff we might need to do to units
             int defaultRepairSite = AtBContract.getBestRepairLocation(campaign.getActiveAtBContracts());
             List<UUID> unitsToRemove = new ArrayList<>();
             for (Unit unit : hangar.getUnits()) {
@@ -194,6 +212,7 @@ public final class LocationNewDayUtil {
                 if (!unit.isPresent()) {
                     unit.checkArrival(!place.isOnPlanet() &&
                                             campaign.getCampaignOptions().isNoDeliveriesInTransit());
+                    // Has unit just been delivered?
                     if (unit.isPresent()) {
                         campaign.addReport(ACQUISITIONS, getFormattedTextAt(RESOURCE_BUNDLE,
                               "unitArrived.text",
@@ -207,6 +226,7 @@ public final class LocationNewDayUtil {
                     unitsToRemove.add(unit.getId());
                 }
             }
+            // Remove any unrepairable, unsalvageable units
             unitsToRemove.forEach(campaign::removeUnit);
         }
 
@@ -227,8 +247,8 @@ public final class LocationNewDayUtil {
      * location).
      */
     public static void processAllLocationUnits(Campaign campaign) {
-        for (AbstractLocation loc : campaign.getLocations()) {
-            for (ILocation child : loc.getChildLocations()) {
+        for (AbstractLocation location : campaign.getLocations()) {
+            for (ILocation child : location.getChildLocations()) {
                 if (child instanceof IPlace place) {
                     processNewDayUnits(place, campaign);
                 }
