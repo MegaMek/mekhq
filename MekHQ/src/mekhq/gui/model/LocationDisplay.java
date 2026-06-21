@@ -131,24 +131,17 @@ public final class LocationDisplay {
             double remainingHours = neededHours - currentLocation.getRechargeTime();
             if (remainingHours > 0) {
                 int days = (int) Math.ceil(remainingHours / HOURS_PER_DAY);
-                return getFormattedTextAt(RESOURCE_BUNDLE,
-                      "PersonnelTableModelColumn.LOCATION_NAME.inTransit.recharging.text",
-                      days);
+                return getFormattedTextAt(RESOURCE_BUNDLE, "LocationDisplay.inTransit.recharging.text", days);
             }
-            return getTextAt(RESOURCE_BUNDLE,
-                  "PersonnelTableModelColumn.LOCATION_NAME.inTransit.readyToJump.text");
+            return getTextAt(RESOURCE_BUNDLE, "LocationDisplay.inTransit.readyToJump.text");
         }
         if (path.size() == 1) {
             int days = (int) Math.ceil(currentLocation.getTransitTime());
-            return getFormattedTextAt(RESOURCE_BUNDLE,
-                  "PersonnelTableModelColumn.LOCATION_NAME.inTransit.toPlanet.text",
-                  days);
+            return getFormattedTextAt(RESOURCE_BUNDLE, "LocationDisplay.inTransit.toPlanet.text", days);
         }
         double daysToJP = system.getTimeToJumpPoint(1.0) - currentLocation.getTransitTime();
         int days = (int) Math.ceil(daysToJP);
-        return getFormattedTextAt(RESOURCE_BUNDLE,
-              "PersonnelTableModelColumn.LOCATION_NAME.inTransit.toJumpPoint.text",
-              days);
+        return getFormattedTextAt(RESOURCE_BUNDLE, "LocationDisplay.inTransit.toJumpPoint.text", days);
     }
 
     /** Returns {@code true} when {@code item} or any ancestor is the campaign's main-force roster. */
