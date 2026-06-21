@@ -258,7 +258,7 @@ public abstract class AbstractMissionTransition {
         return getSystem().getName(when);
     }
 
-    public @Nullable JumpPath getCachedJumpPath() {
+    public JumpPath getCachedJumpPath() {
         return cachedJumpPath;
     }
 
@@ -270,7 +270,7 @@ public abstract class AbstractMissionTransition {
      * Gets the currently calculated jump path for this contract, only recalculating if it's not valid any longer or
      * hasn't been calculated yet.
      */
-    public @Nullable JumpPath getJumpPath(Campaign campaign) {
+    public JumpPath getJumpPath(Campaign campaign) {
         // if we don't have a cached jump path, or if the jump path's starting/ending point no longer match the
         // campaign's current location or contract's destination
         if ((getCachedJumpPath() == null) || getCachedJumpPath().isEmpty()
@@ -381,19 +381,19 @@ public abstract class AbstractMissionTransition {
         return monthsLeft;
     }
 
-    public @Nullable LocalDate getEndingDate() {
+    public LocalDate getEndingDate() {
         return endingDate;
     }
 
-    public void setEndingDate(@Nullable LocalDate endDate) {
+    public void setEndingDate(LocalDate endDate) {
         this.endingDate = endDate;
     }
 
-    public @Nullable LocalDate getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(@Nullable LocalDate startDate) {
+    public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 
@@ -514,7 +514,7 @@ public abstract class AbstractMissionTransition {
         this.enemyColour = enemyColour;
     }
 
-    public @Nullable String getEmployerCode() {
+    public String getEmployerCode() {
         return employerCode;
     }
 
@@ -781,11 +781,11 @@ public abstract class AbstractMissionTransition {
         this.id = id;
     }
 
-    public StratConCampaignState getStratConCampaignState() {
+    public @Nullable StratConCampaignState getStratConCampaignState() {
         return stratConCampaignState;
     }
 
-    public void setStratConCampaignState(StratConCampaignState stratConCampaignState) {
+    public void setStratConCampaignState(@Nullable StratConCampaignState stratConCampaignState) {
         this.stratConCampaignState = stratConCampaignState;
     }
 
@@ -1519,11 +1519,11 @@ public abstract class AbstractMissionTransition {
         return getContractType().isGarrisonType() && getMoraleLevel().isRouted();
     }
 
-    public @Nullable Money getRoutedPayout() {
+    public Money getRoutedPayout() {
         return routedPayout;
     }
 
-    public void setRoutedPayout(@Nullable Money routedPayout) {
+    public void setRoutedPayout(Money routedPayout) {
         this.routedPayout = routedPayout;
     }
 
@@ -1720,9 +1720,7 @@ public abstract class AbstractMissionTransition {
         if (getRoutEndDate() != null) {
             MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "routEnd", getRoutEndDate());
         }
-        if (getRoutedPayout() != null) {
-            MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "routedPayout", getRoutedPayout());
-        }
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "routedPayout", getRoutedPayout());
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "partsAvailabilityLevel", getPartsAvailabilityLevel());
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "sharesPct", getSharesPercent());
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "batchallAccepted", isBatchallAccepted());
