@@ -73,7 +73,7 @@ class ContractDifficultyTest {
     @MethodSource("provideContractDifficultyParameters")
     public void calculateContractDifficultySameSkillMatchesExpectedRating(double enemyBV, double playerBV,
           boolean useGenericBattleValue, int expectedResult) {
-        AbstractMission mission = new AbstractMission();
+        AbstractMissionTransition mission = new AbstractMissionTransition();
         List<Entity> playerCombatUnits = new ArrayList<>();
 
         try (MockedStatic<ContractDifficulty> mockedDifficulty = mockStatic(ContractDifficulty.class,

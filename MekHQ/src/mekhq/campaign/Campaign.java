@@ -182,7 +182,7 @@ import mekhq.campaign.market.ShoppingList;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
-import mekhq.campaign.mission.AbstractMission;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBScenario;
@@ -415,12 +415,6 @@ public class Campaign implements ITechManager, IPlace {
     private CampaignOptions campaignOptions;
     private RandomSkillPreferences randomSkillPreferences = new RandomSkillPreferences();
     private MekHQ app;
-
-    /**
-     * This is not unused even if IDEA says it is. This event processor subscribes to various events that need to be
-     * applied to Campaign.
-     */
-    private transient CampaignEventProcessor campaignEventProcessor;
 
     private ShoppingList shoppingList;
 
@@ -862,7 +856,7 @@ public class Campaign implements ITechManager, IPlace {
         this.isOverridingCommandCircuitRequirements = isOverridingCommandCircuitRequirements;
     }
 
-    public boolean isUseCommandCircuitForContract(AbstractMission abstractMission) {
+    public boolean isUseCommandCircuitForContract(AbstractMissionTransition abstractMission) {
         if (abstractMission instanceof AtBContract atBContract) {
             return FactionStandingUtilities.isUseCommandCircuit(
                   isOverridingCommandCircuitRequirements, gmMode,
@@ -1128,10 +1122,6 @@ public class Campaign implements ITechManager, IPlace {
             initUnitGenerator();
         }
         return unitGenerator;
-    }
-
-    public void setCampaignEventProcessor(CampaignEventProcessor processor) {
-        campaignEventProcessor = processor;
     }
 
     public void setAtBConfig(AtBConfiguration config) {
@@ -1764,7 +1754,7 @@ public class Campaign implements ITechManager, IPlace {
         }
         setParent(location);
         // After reparenting, old has one fewer child. Remove it only if nothing else remains under it.
-        if (old != null && old != location && old.getLocationNode().getChildren().isEmpty()) {
+        if (old != null && old != location && old.getChildLocations().isEmpty()) {
             locations.remove(old);
         }
     }
@@ -1803,8 +1793,8 @@ public class Campaign implements ITechManager, IPlace {
             if (location instanceof CurrentLocation) {
                 location.setParent(null);
             } else if (location instanceof FixedLocation) {
-                for (LocationNode child : new ArrayList<>(location.getLocationNode().getChildren())) {
-                    if (child.getLocatable() instanceof AcademyCampusLocation campus) {
+                for (ILocation child : new ArrayList<>(location.getChildLocations())) {
+                    if (child instanceof AcademyCampusLocation campus) {
                         campus.setParent(null);
                     }
                 }
@@ -1875,8 +1865,8 @@ public class Campaign implements ITechManager, IPlace {
             if (!fixedLocation.getCurrentSystem().getId().equals(systemId)) {
                 continue;
             }
-            for (LocationNode child : fixedLocation.getLocationNode().getChildren()) {
-                if (child.getLocatable() instanceof AcademyCampusLocation campus
+            for (ILocation child : fixedLocation.getChildLocations()) {
+                if (child instanceof AcademyCampusLocation campus
                           && academySet.equals(campus.getAcademySet())
                           && academyName.equals(campus.getAcademyName())) {
                     return campus;
@@ -1894,8 +1884,8 @@ public class Campaign implements ITechManager, IPlace {
      * Use {@link #getOrCreateCampusLocation} for academies at a fixed planetary system.</p>
      */
     public AcademyCampusLocation getOrCreateLocalCampusLocation(String academySet, String academyName) {
-        for (LocationNode child : locationNode.getChildren()) {
-            if (child.getLocatable() instanceof AcademyCampusLocation campus
+        for (ILocation child : getChildLocations()) {
+            if (child instanceof AcademyCampusLocation campus
                       && academySet.equals(campus.getAcademySet())
                       && academyName.equals(campus.getAcademyName())) {
                 return campus;
@@ -1945,8 +1935,8 @@ public class Campaign implements ITechManager, IPlace {
         if (locationNode == null) {
             return;
         }
-        for (LocationNode child : new ArrayList<>(locationNode.getChildren())) {
-            if (!(child.getLocatable() instanceof CurrentLocation travelLocation)) {
+        for (ILocation child : new ArrayList<>(getChildLocations())) {
+            if (!(child instanceof CurrentLocation travelLocation)) {
                 continue;
             }
             if (!travelLocation.isOnPlanet()) {
@@ -2213,7 +2203,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all hangars across all locations associated with this campaign.
-     *                         TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     *                               TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
      */
     public Hangar getAllHangar() {
         return units;
@@ -2849,7 +2839,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all warehouses across all locations associated with this campaign.
-     *                         TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
+     *                               TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
      */
     public Warehouse getAllWarehouse() {
         return parts;
@@ -5814,7 +5804,7 @@ public class Campaign implements ITechManager, IPlace {
                 continue;
             }
             // Skip locations parented to another node — they are serialized inside their parent's XML.
-            if (location.getLocationNode().getParent() != null) {
+            if (location.isParented()) {
                 continue;
             }
             location.writeToXML(writer, indent);
@@ -7341,7 +7331,7 @@ public class Campaign implements ITechManager, IPlace {
      * <p>Eligible personnel must have either a primary or secondary role as a medic, must not be currently deployed,
      * and must be employed.</p>
      *
-     * <p></p>For each eligible person, their total skill level in {@link SkillType#S_MEDTECH} (including all
+     * <p>For each eligible person, their total skill level in {@link SkillType#S_MEDTECH} (including all
      * modifiers) is added to the running total.</p>
      *
      * @return The total number of medics available.

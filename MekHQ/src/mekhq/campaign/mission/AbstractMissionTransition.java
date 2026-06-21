@@ -99,8 +99,8 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class AbstractMission {
-    private static final MMLogger LOGGER = MMLogger.create(AbstractMission.class);
+public class AbstractMissionTransition {
+    private static final MMLogger LOGGER = MMLogger.create(AbstractMissionTransition.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.AbstractMission";
 
     private String name;
@@ -207,7 +207,7 @@ public class AbstractMission {
     public final static int OH_FULL = 2;
     public final static int OH_NUM = 3;
 
-    public AbstractMission() {
+    public AbstractMissionTransition() {
         initializeFieldSetters();
         initializeNodeSetters();
     }
@@ -702,8 +702,8 @@ public class AbstractMission {
      * Retrieves the list of scenarios.
      *
      * <p><b>Note:</b> this returns the actual scenario array. Any changes made to the array will be directly
-     * modifying the version retained inside the {@link AbstractMission} object. If you just want to parse the list
-     * {@link #getScenariosCopy()} is a safer option.</p>
+     * modifying the version retained inside the {@link AbstractMissionTransition} object. If you just want to parse the
+     * list {@link #getScenariosCopy()} is a safer option.</p>
      *
      * @return a list of Scenario objects.
      */
@@ -1419,8 +1419,9 @@ public class AbstractMission {
     }
 
     /**
-     * Writes all {@link AbstractMission} fields to XML. Subclasses that have their own private fields must override
-     * this, call {@code super.writeToXMLBegin(...)}, append only their private tags, and return the resulting indent.
+     * Writes all {@link AbstractMissionTransition} fields to XML. Subclasses that have their own private fields must
+     * override this, call {@code super.writeToXMLBegin(...)}, append only their private tags, and return the resulting
+     * indent.
      */
     protected int writeToXMLBegin(Campaign campaign, final PrintWriter printWriter, int indent) {
         // opening tag and core identity
@@ -1779,20 +1780,20 @@ public class AbstractMission {
     }
 
     /**
-     * Instantiates the correct {@link AbstractMission} subclass from XML and fully loads its state. The concrete type
-     * is determined by the {@code type} attribute on the node, identical to before.
+     * Instantiates the correct {@link AbstractMissionTransition} subclass from XML and fully loads its state. The
+     * concrete type is determined by the {@code type} attribute on the node, identical to before.
      * <p>
      * Callers that previously used {@code Mission.generateInstanceFromXML} should migrate to this method; the static
      * delegate on {@link Mission} is preserved only for backward compatibility.
      */
-    public static AbstractMission generateInstanceFromXML(Node node, Campaign campaign, Version version) {
-        AbstractMission retVal = null;
+    public static AbstractMissionTransition generateInstanceFromXML(Node node, Campaign campaign, Version version) {
+        AbstractMissionTransition retVal = null;
         NamedNodeMap nodeAttributes = node.getAttributes();
         Node classNameNode = nodeAttributes.getNamedItem("type");
         String className = classNameNode.getTextContent();
 
         try {
-            retVal = (AbstractMission) Class.forName(className).getDeclaredConstructor().newInstance();
+            retVal = (AbstractMissionTransition) Class.forName(className).getDeclaredConstructor().newInstance();
             retVal.loadFieldsFromXmlNode(campaign, version, node);
         } catch (Exception ex) {
             LOGGER.error("", ex);

@@ -36,6 +36,7 @@ import java.io.PrintWriter;
 
 import megamek.logging.MMLogger;
 import mekhq.campaign.location.AcademyCampusLocation;
+import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
@@ -59,8 +60,8 @@ public class FixedLocation extends AbstractLocation {
 
     @Override
     public void processArrivals(Campaign campaign) {
-        for (LocationNode child : getLocationNode().getChildren()) {
-            if (child.getLocatable() instanceof AcademyCampusLocation campus) {
+        for (ILocation child : getChildLocations()) {
+            if (child instanceof AcademyCampusLocation campus) {
                 campus.processArrivals(campaign);
             }
         }

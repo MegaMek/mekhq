@@ -38,7 +38,7 @@ import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
-import static mekhq.campaign.mission.AbstractMission.UNKNOWN_DIFFICULTY;
+import static mekhq.campaign.mission.AbstractMissionTransition.UNKNOWN_DIFFICULTY;
 
 import java.awt.Cursor;
 import java.awt.FlowLayout;

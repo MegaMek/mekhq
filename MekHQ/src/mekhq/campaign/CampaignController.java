@@ -32,10 +32,10 @@
  */
 package mekhq.campaign;
 
+import java.util.UUID;
+
 import mekhq.MekHQ;
 import mekhq.campaign.market.PersonnelMarket;
-
-import java.util.UUID;
 
 /**
  * Manages the timeline of a {@link Campaign}.
@@ -44,14 +44,16 @@ public class CampaignController {
     private final Campaign localCampaign;
     private boolean isHost;
     private UUID host;
+    private final CampaignEventProcessor campaignEventProcessor;
 
     /**
      * Creates a new {@code CampaignController} for the given {@link Campaign}
      *
-     * @param c The {@link Campaign} being used locally.
+     * @param campaign The {@link Campaign} being used locally.
      */
-    public CampaignController(Campaign c) {
-        localCampaign = c;
+    public CampaignController(Campaign campaign) {
+        localCampaign = campaign;
+        campaignEventProcessor = new CampaignEventProcessor(campaign);
     }
 
     /**
@@ -62,6 +64,7 @@ public class CampaignController {
         if (personnelMarket != null) {
             MekHQ.registerHandler(personnelMarket);
         }
+        MekHQ.registerHandler(campaignEventProcessor);
     }
 
     /**
@@ -75,6 +78,7 @@ public class CampaignController {
         if (personnelMarket != null) {
             MekHQ.unregisterHandler(personnelMarket);
         }
+        MekHQ.unregisterHandler(campaignEventProcessor);
     }
 
     /**
