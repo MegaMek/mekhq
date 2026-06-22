@@ -76,6 +76,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
+import mekhq.gui.dialog.RandomEventDialog;
 import mekhq.utilities.ReportingUtilities;
 
 /**
@@ -400,23 +401,8 @@ public class PrisonerEventManager {
      * @since 0.50.06
      */
     private int getChoiceIndex(RandomEventType event) {
-        String commanderAddress = campaign.getCommanderAddress();
-        String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
-              "event." + event.name() + ".message",
-              commanderAddress);
-        List<String> options = List.of(getFormattedTextAt(RESOURCE_BUNDLE, "response.0." + event.name() + ".button"),
-              getFormattedTextAt(RESOURCE_BUNDLE, "response.1." + event.name() + ".button"),
-              getFormattedTextAt(RESOURCE_BUNDLE, "response.2." + event.name() + ".button"));
-        ImmersiveDialogSimple eventDialog = new ImmersiveDialogSimple(campaign,
-              speaker,
-              null,
-              inCharacterMessage,
-              options,
-              getFormattedTextAt(RESOURCE_BUNDLE, "result.ooc"),
-              null,
-              true);
-
-        return eventDialog.getDialogChoice();
+        RandomEventDialog dialog = new RandomEventDialog(campaign, speaker, event, RESOURCE_BUNDLE);
+        return dialog.getDialogChoice();
     }
 
     /**
