@@ -149,7 +149,7 @@ public class CampaignOptionsPagePanel extends JPanel {
 
     /**
      * Returns the concatenated, resolved title and summary text of every collapsible section on this page. This is used
-     * by the navigation filter so a search can match a section title or summary, not only the page (tab) title.
+     * by the navigation filter so a search can match a section title or summary, not only the page (page) title.
      *
      * @return the section search text, or an empty string if the page has no sections
      */

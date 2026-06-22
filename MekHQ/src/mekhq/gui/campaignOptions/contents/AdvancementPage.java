@@ -66,10 +66,10 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsPairedFieldGridPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 
 /**
- * The {@code AdvancementTab} class is responsible for rendering and managing
- * two primary tabs in the campaign options
- * interface: the Experience Awards (XP Awards) tab and the Skill Randomization
- * tab. These tabs allow for customization
+ * The {@code AdvancementPage} class is responsible for rendering and managing
+ * two primary pages in the campaign options
+ * interface: the Experience Awards (XP Awards) page and the Skill Randomization
+ * page. These pages allow for customization
  * of experience point distribution, randomization preferences, and skill
  * probabilities in the campaign.
  *
@@ -79,7 +79,7 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
  * from the campaign options, and update the options based on user input.
  * </p>
  */
-public class AdvancementTab {
+public class AdvancementPage {
     private static final int ADVANCEMENT_LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
     private static final int ADVANCEMENT_CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
     private static final int ADVANCEMENT_LABEL_CONTROL_GAP = 12;
@@ -110,7 +110,7 @@ public class AdvancementTab {
     private boolean randomizationPageCreated;
     private boolean recruitmentBonusesPageCreated;
 
-    // start XP Awards Tab
+    // start XP Awards Page
     private CampaignOptionsHeaderPanel xpAwardsHeader;
     private JLabel lblXpCostMultiplier;
     private JSpinner spnXpCostMultiplier;
@@ -154,9 +154,9 @@ public class AdvancementTab {
     private JSpinner spnAdminWeeklyXP;
     private JLabel lblAdminWeeklyXPPeriod;
     private JSpinner spnAdminWeeklyXPPeriod;
-    // end XP Awards Tab
+    // end XP Awards Page
 
-    // start Skill Randomization Tab
+    // start Skill Randomization Page
     private CampaignOptionsHeaderPanel skillRandomizationHeader;
     private JCheckBox chkExtraRandomness;
 
@@ -216,7 +216,7 @@ public class AdvancementTab {
     private JSpinner spnSecondBonus;
     private JLabel lblRoleplaySkillsModifier;
     private JSpinner spnRoleplaySkillsModifier;
-    // end Skill Randomization Tab
+    // end Skill Randomization Page
 
     private JPanel pnlRecruitmentBonusesCombat;
     private JLabel[] lblRecruitmentBonusCombat;
@@ -225,17 +225,17 @@ public class AdvancementTab {
     private JPanel pnlRecruitmentBonusesSupport;
     private JLabel[] lblRecruitmentBonusSupport;
     private JSpinner[] spnRecruitmentBonusSupport;
-    // end Recruitment Bonus Tab
+    // end Recruitment Bonus Page
 
     /**
-     * Constructs an {@code AdvancementTab} object for rendering and managing
+     * Constructs an {@code AdvancementPage} object for rendering and managing
      * campaign advancement configurations.
      *
      * @param campaign The {@code Campaign} instance from which the campaign options
      *                 and random skill preferences are
      *                 retrieved.
      */
-    public AdvancementTab(@Nonnull Campaign campaign) {
+    public AdvancementPage(@Nonnull Campaign campaign) {
         this.campaign = campaign;
         this.randomSkillPreferences = campaign.getRandomSkillPreferences();
         this.campaignOptions = campaign.getCampaignOptions();
@@ -245,22 +245,22 @@ public class AdvancementTab {
     }
 
     /**
-     * Initializes the UI components for the XP Awards and Skill Randomization tabs.
+     * Initializes the UI components for the XP Awards and Skill Randomization pages.
      * This includes setting up the
      * labels, panels, and spinners for each of the categories within the respective
-     * tabs.
+     * pages.
      */
     private void initialize() {
-        initializeXPAwardsTab();
-        initializeSkillRandomizationTab();
+        initializeXPAwardsPage();
+        initializeSkillRandomizationPage();
     }
 
     /**
-     * Initializes the XP Awards tab by setting up the UI components, such as
+     * Initializes the XP Awards page by setting up the UI components, such as
      * labels, panels, and spinners, for various
      * experience-related options within the campaign.
      */
-    private void initializeXPAwardsTab() {
+    private void initializeXPAwardsPage() {
         lblXpCostMultiplier = new JLabel();
         spnXpCostMultiplier = new JSpinner();
 
@@ -306,7 +306,7 @@ public class AdvancementTab {
     }
 
     /**
-     * Creates and returns the Experience Awards (XP Awards) tab panel. This tab
+     * Creates and returns the Experience Awards (XP Awards) page panel. This page
      * allows users to configure experience
      * awards for tasks, scenarios, missions, and administrators, as well as set the
      * overall XP cost multiplier.
@@ -314,10 +314,10 @@ public class AdvancementTab {
      * @return A {@code JPanel} containing the configuration options for XP Awards
      *         in the campaign.
      */
-    public @Nonnull JPanel xpAwardsTab() {
+    public @Nonnull JPanel xpAwardsPage() {
         // Header
         String imageAddress = getImageDirectory() + "logo_clan_steel_viper.png";
-        xpAwardsHeader = new CampaignOptionsHeaderPanel("XpAwardsTab", imageAddress);
+        xpAwardsHeader = new CampaignOptionsHeaderPanel("XpAwardsPage", imageAddress);
 
         // Contents
         JPanel xpAwardOptions = createXpAwardOptionsPanel();
@@ -328,10 +328,10 @@ public class AdvancementTab {
         xpAwardsPageCreated = true;
         updateXpAwardsControlsFromModel();
 
-        return CampaignOptionsPagePanel.builder("XpAwardsTab", "XpAwardsTab", imageAddress)
+        return CampaignOptionsPagePanel.builder("XpAwardsPage", "XpAwardsPage", imageAddress)
                 .header(xpAwardsHeader)
-                .section("lblXpAwardsTab.text",
-                        "lblXpAwardsTab.summary",
+                .section("lblXpAwardsPage.text",
+                        "lblXpAwardsPage.summary",
                         xpAwardOptions)
                 .section("lblTasksPanel.text",
                         "lblTasksPanel.summary",
@@ -547,11 +547,11 @@ public class AdvancementTab {
     }
 
     /**
-     * Initializes the Skill Randomization tab by setting up the UI components,
+     * Initializes the Skill Randomization page by setting up the UI components,
      * including phenotype configurations,
      * random abilities, skill groups, and other randomization settings.
      */
-    private void initializeSkillRandomizationTab() {
+    private void initializeSkillRandomizationPage() {
         chkExtraRandomness = new JCheckBox();
 
         pnlPhenotype = new JPanel();
@@ -622,7 +622,7 @@ public class AdvancementTab {
     }
 
     /**
-     * Creates and returns the Skill Randomization tab panel. This tab allows users
+     * Creates and returns the Skill Randomization page panel. This page allows users
      * to configure settings related to
      * skill randomization, including phenotype probabilities and skill bonuses for
      * different experience levels and
@@ -631,10 +631,10 @@ public class AdvancementTab {
      * @return A {@code JPanel} containing the configuration options for skill
      *         randomization.
      */
-    public @Nonnull JPanel skillRandomizationTab() {
+    public @Nonnull JPanel skillRandomizationPage() {
         // Header
         String imageAddress = getImageDirectory() + "logo_republic_of_the_sphere.png";
-        skillRandomizationHeader = new CampaignOptionsHeaderPanel("SkillRandomizationTab", imageAddress);
+        skillRandomizationHeader = new CampaignOptionsHeaderPanel("SkillRandomizationPage", imageAddress);
 
         // Contents
         JPanel randomizationOptions = createSkillRandomizationOptionsPanel();
@@ -644,10 +644,10 @@ public class AdvancementTab {
         randomizationPageCreated = true;
         updateRandomizationControlsFromModel();
 
-        return CampaignOptionsPagePanel.builder("SkillRandomizationTab", "SkillRandomizationTab", imageAddress)
+        return CampaignOptionsPagePanel.builder("SkillRandomizationPage", "SkillRandomizationPage", imageAddress)
                 .header(skillRandomizationHeader)
-                .section("lblSkillRandomizationTab.text",
-                        "lblSkillRandomizationTab.summary",
+                .section("lblSkillRandomizationPage.text",
+                        "lblSkillRandomizationPage.summary",
                         randomizationOptions)
                 .section("lblPhenotypesPanel.text",
                         "lblPhenotypesPanel.summary",
@@ -875,11 +875,11 @@ public class AdvancementTab {
      *
      * @return the fully configured {@link JPanel} for recruitment bonus settings
      */
-    public @Nonnull JPanel recruitmentBonusesTab() {
+    public @Nonnull JPanel recruitmentBonusesPage() {
         // Header
-        // start Recruitment Bonus Tab
+        // start Recruitment Bonus Page
         String imageAddress = getImageDirectory() + "logo_calderon_protectorate.png";
-        CampaignOptionsHeaderPanel recruitmentBonusesHeader = new CampaignOptionsHeaderPanel("RecruitmentBonusesTab",
+        CampaignOptionsHeaderPanel recruitmentBonusesHeader = new CampaignOptionsHeaderPanel("RecruitmentBonusesPage",
                 imageAddress);
 
         // Contents
@@ -888,7 +888,7 @@ public class AdvancementTab {
         recruitmentBonusesPageCreated = true;
         updateRecruitmentBonusControlsFromModel();
 
-        return CampaignOptionsPagePanel.builder("RecruitmentBonusesTab", "RecruitmentBonusesTab", imageAddress)
+        return CampaignOptionsPagePanel.builder("RecruitmentBonusesPage", "RecruitmentBonusesPage", imageAddress)
                 .header(recruitmentBonusesHeader)
                 .showDetailsPanel(false)
                 .section("lblRecruitmentBonusesCombatPanel.text",
@@ -1016,7 +1016,7 @@ public class AdvancementTab {
     }
 
     /**
-     * Applies the current values from the XP Awards and Skill Randomization tabs to
+     * Applies the current values from the XP Awards and Skill Randomization pages to
      * the specified
      * {@code CampaignOptions} and {@code RandomSkillPreferences}.
      *
@@ -1045,7 +1045,7 @@ public class AdvancementTab {
         model.applyTo(options, skillPreferences);
 
         // Finishing Touches
-        // This must be the last item, after all other tabs, no matter what.
+        // This must be the last item, after all other pages, no matter what.
         if (presetRandomSkillPreferences == null) {
             campaign.setRandomSkillPreferences(randomSkillPreferences);
         }

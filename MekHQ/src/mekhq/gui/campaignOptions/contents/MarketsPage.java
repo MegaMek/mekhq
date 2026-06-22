@@ -86,8 +86,8 @@ import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
 
 /**
- * The {@code MarketsTab} class represents the campaign options tab related to
- * market settings. This tab provides
+ * The {@code MarketsPage} class represents the campaign options page related to
+ * market settings. This page provides
  * configurations for three key market areas:
  * <ul>
  * <li><b>Personnel Market</b>: Settings for managing personnel hiring, removal
@@ -109,7 +109,7 @@ import mekhq.module.api.PersonnelMarketMethod;
  * It also utilizes Swing components for building the UI.
  * </p>
  */
-public class MarketsTab {
+public class MarketsPage {
       private static final int FORM_LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
       private static final int FORM_CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
       private static final int FORM_LABEL_CONTROL_GAP = 12;
@@ -212,15 +212,15 @@ public class MarketsTab {
       // end Contract Market
 
       /**
-       * Constructs a {@code MarketsTab} with the provided campaign. Initializes the
+       * Constructs a {@code MarketsPage} with the provided campaign. Initializes the
        * market configuration options based on
        * the settings of the given {@link Campaign}.
        *
-       * @param campaign The {@link Campaign} associated with this market tab. This
+       * @param campaign The {@link Campaign} associated with this market page. This
        *                 campaign is used to retrieve and
        *                 modify {@link CampaignOptions}.
        */
-      public MarketsTab(@Nonnull Campaign campaign) {
+      public MarketsPage(@Nonnull Campaign campaign) {
             this.campaign = campaign;
             this.campaignOptions = campaign.getCampaignOptions();
 
@@ -229,7 +229,7 @@ public class MarketsTab {
       }
 
       /**
-       * Initializes the market-related options tabs by setting up configurations for
+       * Initializes the market-related options pages by setting up configurations for
        * the Personnel Market, Unit Market,
        * and Contract Market.
        * <p>
@@ -289,27 +289,27 @@ public class MarketsTab {
 
       /**
        * Creates and returns the JPanel representing the Personnel Market
-       * configuration tab.
+       * configuration page.
        * <p>
-       * This tab includes general personnel market settings, as well as removal
+       * This page includes general personnel market settings, as well as removal
        * target configuration options for various
        * skill levels.
        *
-       * @return A {@link JPanel} for the Personnel Market configuration tab.
+       * @return A {@link JPanel} for the Personnel Market configuration page.
        */
-      public @Nonnull JPanel createPersonnelMarketTab() {
+      public @Nonnull JPanel createPersonnelMarketPage() {
             // Header
             String imageAddress = getImageDirectory() + "logo_st_ives_compact.png";
-            personnelMarketHeader = new CampaignOptionsHeaderPanel("PersonnelMarketTab", imageAddress);
+            personnelMarketHeader = new CampaignOptionsHeaderPanel("PersonnelMarketPage", imageAddress);
 
             // Contents
             pnlPersonnelMarketGeneralOptions = createPersonnelMarketGeneralOptionsPanel();
             pnlRemovalTargets = createPersonnelMarketRemovalOptionsPanel();
 
-            final JPanel panel = CampaignOptionsPagePanel.builder("PersonnelMarketTab", "PersonnelMarketTab",
+            final JPanel panel = CampaignOptionsPagePanel.builder("PersonnelMarketPage", "PersonnelMarketPage",
                         imageAddress)
                         .header(personnelMarketHeader)
-                        .quote("personnelMarketTab")
+                        .quote("personnelMarketPage")
                         .section("lblPersonnelMarketGeneralOptionsPanel.text",
                                     "lblPersonnelMarketGeneralOptionsPanel.summary",
                                     pnlPersonnelMarketGeneralOptions)
@@ -326,14 +326,14 @@ public class MarketsTab {
       }
 
       /**
-       * Builds the general options panel for the Personnel Market tab, which includes
+       * Builds the general options panel for the Personnel Market page, which includes
        * settings such as the personnel
        * market type, Dylan's weight, and options like report refresh toggles.
        * <p>
        * These components are laid out into a panel and returned for use in the UI.
        *
        * @return A {@link JPanel} representing the general options within the
-       *         Personnel Market tab.
+       *         Personnel Market page.
        */
       private @Nonnull JPanel createPersonnelMarketGeneralOptionsPanel() {
             // Contents
@@ -379,7 +379,7 @@ public class MarketsTab {
 
       /**
        * Creates and configures the removal options panel for the Personnel Market
-       * tab.
+       * page.
        * <p>
        * This panel includes settings for removal targets, which are based on various
        * {@link SkillLevel} entries. Each
@@ -447,7 +447,7 @@ public class MarketsTab {
       }
 
       /**
-       * Initializes the settings and UI components related to the Unit Market tab.
+       * Initializes the settings and UI components related to the Unit Market page.
        * <p>
        * This includes various elements such as labels, combo boxes, checkboxes, and
        * spinners for settings like unit
@@ -468,18 +468,18 @@ public class MarketsTab {
 
       /**
        * Creates and returns the JPanel representing the Unit Market configuration
-       * tab.
+       * page.
        * <p>
-       * This tab includes options such as unit market methods, rarity modifiers,
+       * This page includes options such as unit market methods, rarity modifiers,
        * special unit change settings, and more.
        *
-       * @return A {@link JPanel} for the Unit Market configuration tab.
+       * @return A {@link JPanel} for the Unit Market configuration page.
        */
-      public @Nonnull JPanel createUnitMarketTab() {
+      public @Nonnull JPanel createUnitMarketPage() {
             // Header
             // start Unit Market
             String imageAddress = getImageDirectory() + "logo_clan_ice_hellion.png";
-            CampaignOptionsHeaderPanel unitMarketHeader = new CampaignOptionsHeaderPanel("UnitMarketTab", imageAddress);
+            CampaignOptionsHeaderPanel unitMarketHeader = new CampaignOptionsHeaderPanel("UnitMarketPage", imageAddress);
 
             // Contents
             lblUnitMarketMethod = new CampaignOptionsLabel("UnitMarketMethod");
@@ -514,9 +514,9 @@ public class MarketsTab {
             JPanel generationPanel = createUnitMarketGenerationPanel();
             JPanel deliveryPanel = createUnitMarketDeliveryPanel();
 
-            final JPanel panel = CampaignOptionsPagePanel.builder("UnitMarketTab", "UnitMarketTab", imageAddress)
+            final JPanel panel = CampaignOptionsPagePanel.builder("UnitMarketPage", "UnitMarketPage", imageAddress)
                         .header(unitMarketHeader)
-                        .quote("unitMarketTab")
+                        .quote("unitMarketPage")
                         .section("lblUnitMarketGenerationPanel.text",
                                     "lblUnitMarketGenerationPanel.summary",
                                     generationPanel)
@@ -604,26 +604,26 @@ public class MarketsTab {
 
       /**
        * Creates and returns the JPanel representing the Contract Market configuration
-       * tab.
+       * page.
        * <p>
-       * This tab includes settings for configuring various aspects of contract
+       * This page includes settings for configuring various aspects of contract
        * acquisition, such as methods, search
        * radius, payment options, and variable contract length.
        *
-       * @return A {@link JPanel} for the Contract Market configuration tab.
+       * @return A {@link JPanel} for the Contract Market configuration page.
        */
-      public @Nonnull JPanel createContractMarketTab() {
+      public @Nonnull JPanel createContractMarketPage() {
             // Header
             String imageAddress = getImageDirectory() + "logo_federated_suns.png";
-            contractMarketHeader = new CampaignOptionsHeaderPanel("ContractMarketTab", imageAddress);
+            contractMarketHeader = new CampaignOptionsHeaderPanel("ContractMarketPage", imageAddress);
             // Contents
             pnlContractMarketGeneralOptions = createContractMarketGeneralOptionsPanel();
             pnlContractPay = createContractPayPanel();
 
-            final JPanel panel = CampaignOptionsPagePanel.builder("ContractMarketTab", "ContractMarketTab",
+            final JPanel panel = CampaignOptionsPagePanel.builder("ContractMarketPage", "ContractMarketPage",
                         imageAddress)
                         .header(contractMarketHeader)
-                        .quote("contractMarketTab")
+                        .quote("contractMarketPage")
                         .section("lblContractMarketGeneralOptionsPanel.text",
                                     "lblContractMarketGeneralOptionsPanel.summary",
                                     pnlContractMarketGeneralOptions)
@@ -639,12 +639,12 @@ public class MarketsTab {
       }
 
       /**
-       * Builds the general settings panel for the Contract Market tab, which includes
+       * Builds the general settings panel for the Contract Market page, which includes
        * options for the contract market
        * method, search radius, salvage percentages, and other general configurations.
        *
        * @return A {@link JPanel} representing general options within the Contract
-       *         Market tab.
+       *         Market page.
        */
       private @Nonnull JPanel createContractMarketGeneralOptionsPanel() {
             // Contents
@@ -740,7 +740,7 @@ public class MarketsTab {
 
       /**
        * Creates the panel for configuring payment settings in the Contract Market
-       * tab.
+       * page.
        * <p>
        * This panel contains options for configuring equipment-based payment
        * percentages, override repayment rules, and
@@ -928,7 +928,7 @@ public class MarketsTab {
 
       /**
        * Loads the campaign options from the associated {@link Campaign} into the UI
-       * components of the market tabs. This
+       * components of the market pages. This
        * includes personnel, unit, and contract market settings.
        * <p>
        * If no preset options are provided, the current campaign options are loaded.

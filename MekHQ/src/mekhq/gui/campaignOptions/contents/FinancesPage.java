@@ -66,7 +66,7 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsPairedFieldGridPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 
 /**
- * The FinancesTab class represents a UI tab within a larger financial
+ * The FinancesPage class represents a UI page within a larger financial
  * management system for a campaign. It provides
  * panels, checkboxes, spinners, combo boxes, and other controls to manage and
  * configure various financial options,
@@ -75,7 +75,7 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
  * It is primarily composed of multiple `JPanel` sections organized inside the campaign options page shell for
  * modularity and clarity.
  */
-public class FinancesTab {
+public class FinancesPage {
     private static final int FINANCES_LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
     private static final int FINANCES_CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
     private static final int FINANCES_LABEL_CONTROL_GAP = 12;
@@ -176,15 +176,15 @@ public class FinancesTab {
     // end Price Multipliers
 
     /**
-     * Constructs a `FinancesTab` instance which manages the financial settings and
+     * Constructs a `FinancesPage` instance which manages the financial settings and
      * configurations for a specific
      * campaign.
      *
-     * @param campaign The `Campaign` object that this `FinancesTab` will be
+     * @param campaign The `Campaign` object that this `FinancesPage` will be
      *                 associated with. Provides access to
      *                 campaign-related options and data.
      */
-    public FinancesTab(@Nonnull Campaign campaign) {
+    public FinancesPage(@Nonnull Campaign campaign) {
         this.campaignOptions = campaign.getCampaignOptions();
 
         initialize();
@@ -192,19 +192,19 @@ public class FinancesTab {
     }
 
     /**
-     * Initializes the primary components and subcomponents of the `FinancesTab`.
+     * Initializes the primary components and subcomponents of the `FinancesPage`.
      * Specifically, sets up the 'General
-     * Options' and 'Price Multipliers' tabs through their respective initialization
+     * Options' and 'Price Multipliers' pages through their respective initialization
      * methods. This method ensures that
-     * the tabs are prepared prior to being displayed or used.
+     * the pages are prepared prior to being displayed or used.
      */
     private void initialize() {
-        initializeGeneralOptionsTab();
-        initializePriceMultipliersTab();
+        initializeGeneralOptionsPage();
+        initializePriceMultipliersPage();
     }
 
     /**
-     * Initializes the General Options tab within the application's UI.
+     * Initializes the General Options page within the application's UI.
      * <p>
      * This method sets up various UI components and panels that provide
      * configurable options for general settings,
@@ -216,7 +216,7 @@ public class FinancesTab {
      * layout placements, listeners, or actual
      * visibility might need to be completed separately.
      */
-    private void initializeGeneralOptionsTab() {
+    private void initializeGeneralOptionsPage() {
         // General Options
         pnlGeneralOptions = new JPanel();
         useLoanLimitsBox = new JCheckBox();
@@ -274,20 +274,20 @@ public class FinancesTab {
     }
 
     /**
-     * Creates and configures the Finances General Options tab, assembling its
+     * Creates and configures the Finances General Options page, assembling its
      * components, layout, and panels which
      * include general options, other systems, payments, and sales. This method
      * initializes required sub-panels and
-     * arranges them within the overall structure to create a fully constructed tab
+     * arranges them within the overall structure to create a fully constructed page
      * for financial general options.
      *
      * @return A fully configured JPanel representing the Finances General Options
-     *         tab.
+     *         page.
      */
-    public @Nonnull JPanel createFinancesGeneralOptionsTab() {
+    public @Nonnull JPanel createFinancesGeneralOptionsPage() {
         // Header
         String imageAddress = getImageDirectory() + "logo_star_league.png";
-        financesGeneralOptions = new CampaignOptionsHeaderPanel("FinancesGeneralTab",
+        financesGeneralOptions = new CampaignOptionsHeaderPanel("FinancesGeneralPage",
                 imageAddress);
 
         // Contents
@@ -298,9 +298,9 @@ public class FinancesTab {
         pnlShares = createSharesPanel();
         pnlRentedFacilities = createRentedFacilitiesPanel();
 
-        JPanel panel = CampaignOptionsPagePanel.builder("FinancesGeneralTab", "FinancesGeneralTab", imageAddress)
+        JPanel panel = CampaignOptionsPagePanel.builder("FinancesGeneralPage", "FinancesGeneralPage", imageAddress)
                 .header(financesGeneralOptions)
-                .quote("financesGeneralTab")
+                .quote("financesGeneralPage")
                 .section("lblFinancialRulesPanel.text",
                         "lblFinancialRulesPanel.summary",
                         pnlGeneralOptions)
@@ -441,7 +441,7 @@ public class FinancesTab {
     }
 
     /**
-     * Creates and configures the sales panel within the finance tab. The panel
+     * Creates and configures the sales panel within the finance page. The panel
      * contains checkboxes for options related
      * to sales, including "Sell Units" and "Sell Parts". These checkboxes are added
      * to a layout that organizes the
@@ -495,7 +495,7 @@ public class FinancesTab {
 
     /**
      * Creates and returns a JPanel representing the 'Shares Panel' within the
-     * finance tab.
+     * finance page.
      * <p>
      * The panel is laid out using grid-based constraints to position the components
      * in a structured vertical
@@ -562,7 +562,7 @@ public class FinancesTab {
     }
 
     /**
-     * Initializes the components and layout for the price multipliers tab. This tab
+     * Initializes the components and layout for the price multipliers page. This page
      * includes controls for setting
      * various price multipliers such as - General multipliers for unit and part
      * prices. - Multipliers for used parts. -
@@ -572,7 +572,7 @@ public class FinancesTab {
      * spinners to their respective class
      * fields. Each field corresponds to a specific category of price multiplier.
      */
-    private void initializePriceMultipliersTab() {
+    private void initializePriceMultipliersPage() {
         pnlGeneralMultipliers = new JPanel();
         lblCommonPartPriceMultiplier = new JLabel();
         spnCommonPartPriceMultiplier = new JSpinner();
@@ -601,14 +601,14 @@ public class FinancesTab {
     }
 
     /**
-     * Builds the Price Multipliers tab.
+     * Builds the Price Multipliers page.
      *
-     * @return a JPanel representing the Price Multipliers tab
+     * @return a JPanel representing the Price Multipliers page
      */
-    public @Nonnull JPanel createPriceMultipliersTab() {
+    public @Nonnull JPanel createPriceMultipliersPage() {
         // Header
         String imageAddress = getImageDirectory() + "logo_clan_stone_lion.png";
-        priceMultipliersHeader = new CampaignOptionsHeaderPanel("PriceMultipliersTab",
+        priceMultipliersHeader = new CampaignOptionsHeaderPanel("PriceMultipliersPage",
                 imageAddress);
 
         // Contents
@@ -616,10 +616,10 @@ public class FinancesTab {
         pnlUsedPartsMultipliers = createUsedPartsMultiplierPanel();
         pnlOtherMultipliers = createOtherMultipliersPanel();
 
-        JPanel panel = CampaignOptionsPagePanel.builder("PriceMultipliersTab", "PriceMultipliersTab", imageAddress)
+        JPanel panel = CampaignOptionsPagePanel.builder("PriceMultipliersPage", "PriceMultipliersPage", imageAddress)
                 .header(priceMultipliersHeader)
-                .intro("lblPriceMultipliersTabBody.text")
-                .quote("priceMultipliersTab")
+                .intro("lblPriceMultipliersPageBody.text")
+                .quote("priceMultipliersPage")
                 .section("lblGeneralMultipliersPanel.text",
                         "lblGeneralMultipliersPanel.summary",
                         pnlGeneralMultipliers)
@@ -830,7 +830,7 @@ public class FinancesTab {
     /**
      * Loads configuration values from the current campaign options to populate the
      * financial settings and related UI
-     * components in the `FinancesTab`.
+     * components in the `FinancesPage`.
      * <p>
      * This method is a convenience overload that invokes the overloaded
      * {@link #loadValuesFromCampaignOptions(CampaignOptions)} method with a `null`

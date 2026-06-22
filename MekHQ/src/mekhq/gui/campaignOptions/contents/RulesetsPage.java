@@ -76,7 +76,7 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 
 /**
- * Represents a tab in the campaign options UI for managing ruleset
+ * Represents a page in the campaign options UI for managing ruleset
  * configurations in campaigns.
  * <p>
  * This class organizes and manages options related to universal rules, legacy
@@ -86,7 +86,7 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
  * scenario rules, equipment behavior, and campaign-specific variations.
  * </p>
  *
- * <strong>Tab Sections:</strong>
+ * <strong>Page Sections:</strong>
  * <ul>
  * <li><b>Universal Options:</b> Handles features applicable to all campaigns,
  * such as skill levels, unit ratios, map conditions, and auto-resolve
@@ -98,7 +98,7 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
  * (Battle Values) and verbose bidding options.</li>
  * </ul>
  */
-public class RulesetsTab {
+public class RulesetsPage {
         private static final int FORM_LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
         private static final int FORM_CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
         private static final int CHECKBOX_GRID_COLUMNS = 2;
@@ -199,13 +199,13 @@ public class RulesetsTab {
     // end StratCon
 
     /**
-     * Constructs a {@code RulesetsTab} instance for managing ruleset options.
+     * Constructs a {@code RulesetsPage} instance for managing ruleset options.
      *
      * @param campaignOptions the {@link CampaignOptions} object to manage repair,
      *                        maintenance, and other ruleset
      *                        options.
      */
-    public RulesetsTab(@Nonnull CampaignOptions campaignOptions) {
+    public RulesetsPage(@Nonnull CampaignOptions campaignOptions) {
         this.campaignOptions = campaignOptions;
 
         initialize();
@@ -213,21 +213,21 @@ public class RulesetsTab {
     }
 
     /**
-     * Initializes the tab by setting up all three sections:
+     * Initializes the page by setting up all three sections:
      * <p>
      * <li>Universal Options</li>
-     * <li>StratCon Tab</li>
-     * <li>Legacy Tab</li>
+     * <li>StratCon Page</li>
+     * <li>Legacy Page</li>
      * </p>
      */
     private void initialize() {
         initializeUniversalOptions();
-        initializeStratConTab();
-        initializeLegacyTab();
+        initializeStratConPage();
+        initializeLegacyPage();
     }
 
     /**
-     * Initializes the universal options section of the tab.
+     * Initializes the universal options section of the page.
      * <p>
      * Universal options include settings like skill levels, scenario modifiers, map
      * generation parameters, and
@@ -313,7 +313,7 @@ public class RulesetsTab {
     }
 
     /**
-     * Configures and initializes universal options components for use across tabs.
+     * Configures and initializes universal options components for use across pages.
      * <p>
      * This method sets up and organizes the various UI elements for universal
      * options, such as skill levels, scenario
@@ -450,9 +450,9 @@ public class RulesetsTab {
 
 
     /**
-     * Initializes the StratCon (Strategic Context) section of the tab.
+     * Initializes the StratCon (Strategic Context) section of the page.
      */
-    private void initializeStratConTab() {
+    private void initializeStratConPage() {
         comboStratConPlayType = new MMComboBox<>("StratConPlayType", StratConPlayType.values());
         comboStratConPlayType.setRenderer(new DefaultListCellRenderer() {
             @Override
@@ -490,16 +490,16 @@ public class RulesetsTab {
      *
      * @return a {@link JPanel} containing all StratCon settings.
      */
-    public @Nonnull JPanel createStratConTab() {
+    public @Nonnull JPanel createStratConPage() {
         // Header
         // start StratCon
         String imageAddress = getImageDirectory() + "logo_clan_wolf.png";
-        CampaignOptionsHeaderPanel stratConHeader = new CampaignOptionsHeaderPanel("StratConTab", imageAddress);
+        CampaignOptionsHeaderPanel stratConHeader = new CampaignOptionsHeaderPanel("StratConPage", imageAddress);
 
         // Universal Content
         substantializeUniversalOptions();
 
-        // Right now the universal content all lives in the StratCon tab, but that might
+        // Right now the universal content all lives in the StratCon page, but that might
         // not always be the case if
         // we ever introduce a new Digital GM. So, as this content is initialized before
         // the stratConHeader, we need
@@ -584,11 +584,11 @@ public class RulesetsTab {
         updateStratConControlsFromModel();
 
         // Layout the Panel
-        return CampaignOptionsPagePanel.builder("StratConTab", "StratConTab", imageAddress)
+        return CampaignOptionsPagePanel.builder("StratConPage", "StratConPage", imageAddress)
                 .header(stratConHeader)
-                .quote("stratConTab")
-                .section("lblStratConTab.text",
-                        "lblStratConTab.summary",
+                .quote("stratConPage")
+                .section("lblStratConPage.text",
+                        "lblStratConPage.summary",
                         generalOptionsPanel)
                 .section("lblUniversalScenarioGenerationPanel.text",
                         "lblUniversalScenarioGenerationPanel.summary",
@@ -715,9 +715,9 @@ public class RulesetsTab {
     }
 
     /**
-     * Initializes the Legacy Options section of the tab.
+     * Initializes the Legacy Options section of the page.
      */
-    private void initializeLegacyTab() {
+    private void initializeLegacyPage() {
     }
 
     /**
@@ -732,14 +732,14 @@ public class RulesetsTab {
      */
     @Deprecated(since = "0.51.0", forRemoval = true)
     @SuppressWarnings("removal")
-    public @Nonnull JPanel createLegacyTab() {
+    public @Nonnull JPanel createLegacyPage() {
         // Header
-        legacyHeader = new CampaignOptionsHeaderPanel("LegacyTab",
+        legacyHeader = new CampaignOptionsHeaderPanel("LegacyPage",
                 getImageDirectory() + "logo_free_rasalhague_republic.png",
                 true);
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("LegacyTab", true);
+        final JPanel panel = new CampaignOptionsStandardPanel("LegacyPage", true);
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridwidth = 5;
@@ -748,7 +748,7 @@ public class RulesetsTab {
         panel.add(legacyHeader, layout);
 
         // Create panel and return
-        return createParentPanel(panel, "LegacyTab");
+        return createParentPanel(panel, "LegacyPage");
     }
 
     /**
@@ -783,12 +783,12 @@ public class RulesetsTab {
     }
 
     /**
-     * Applies the current values configured in the tab back to the provided
+     * Applies the current values configured in the page back to the provided
      * {@link CampaignOptions}.
      * <p>
      * If no custom {@link CampaignOptions} is provided, it uses the default
      * {@link CampaignOptions} associated with the
-     * tab.
+     * page.
      * </p>
      *
      * @param presetCampaignOptions an optional custom {@link CampaignOptions}

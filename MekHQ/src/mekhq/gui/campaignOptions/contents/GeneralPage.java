@@ -84,7 +84,7 @@ import mekhq.gui.dialog.iconDialogs.UnitIconDialog;
 import mekhq.gui.displayWrappers.FactionDisplay;
 
 /**
- * Represents a tab within the campaign options UI that allows the user to configure general campaign settings. This
+ * Represents a page within the campaign options UI that allows the user to configure general campaign settings. This
  * includes options for:
  * <ul>
  *     <li>Configuring the campaign name</li>
@@ -96,7 +96,7 @@ import mekhq.gui.displayWrappers.FactionDisplay;
  * <p>
  * This class extends the user interface features provided by {@link AbstractMHQTabbedPane}.
  */
-public class GeneralTab {
+public class GeneralPage {
     // Intentional exception to the shared CampaignOptionsFormPanel default widths: the landing page uses a narrow
     // label column and a wide control column to fit the faction and date pickers.
     private static final int FORM_LABEL_COLUMN_WIDTH = 150;
@@ -132,14 +132,14 @@ public class GeneralTab {
     private StandardFormationIcon unitIcon;
 
     /**
-     * Constructs a new instance of the {@code GeneralTab} using the provided {@link Campaign} and {@link JFrame}.
+     * Constructs a new instance of the {@code GeneralPage} using the provided {@link Campaign} and {@link JFrame}.
      *
-     * @param campaign The {@link Campaign} associated with this tab, which contains the core game data.
-     * @param frame    The parent {@link JFrame} used to display this tab.
+     * @param campaign The {@link Campaign} associated with this page, which contains the core game data.
+     * @param frame    The parent {@link JFrame} used to display this page.
      * @param mode     The {@link CampaignOptionsDialogMode} enum determining what state caused the dialog to be
      *                 triggered.
      */
-    public GeneralTab(@Nonnull Campaign campaign, JFrame frame, CampaignOptionsDialogMode mode) {
+    public GeneralPage(@Nonnull Campaign campaign, JFrame frame, CampaignOptionsDialogMode mode) {
         // region Variable Declarations
         this.frame = frame;
         this.campaign = campaign;
@@ -175,9 +175,9 @@ public class GeneralTab {
     }
 
     /**
-     * Creates the UI components displayed in the general tab.
+     * Creates the UI components displayed in the general page.
      * <p>
-     * The general tab includes various configurable fields and panels:
+     * The general page includes various configurable fields and panels:
      * </p>
      * <ul>
      *     <li>An editable text field for setting the campaign name</li>
@@ -187,9 +187,9 @@ public class GeneralTab {
      *     <li>Buttons for choosing camouflage and unit icons</li>
      * </ul>
      *
-     * @return A {@link JPanel} containing the general tab content.
+     * @return A {@link JPanel} containing the general page content.
      */
-    public @Nonnull JPanel createGeneralTab() {
+    public @Nonnull JPanel createGeneralPage() {
         // Campaign name
         lblName = new CampaignOptionsLabel("Name");
         txtName = new CampaignOptionsTextField("Name");
@@ -248,7 +248,7 @@ public class GeneralTab {
         btnIcon.addActionListener(this::btnIconActionPerformed);
         btnIcon.setIcon(unitIcon.getImageIcon(UIUtil.scaleForGUI(75)));
 
-        return CampaignOptionsPagePanel.builder("GeneralTab", "General", "data/images/misc/MekHQ.png")
+        return CampaignOptionsPagePanel.builder("GeneralPage", "General", "data/images/misc/MekHQ.png")
               .headerImageSize(GENERAL_HEADER_IMAGE_SIZE)
               .tintHeaderImage(false)
               .showDetailsPanel(false)
@@ -330,7 +330,7 @@ public class GeneralTab {
     }
 
     /**
-     * Initializes the UI components used throughout the general tab.
+     * Initializes the UI components used throughout the general page.
      * <p>
      * This method sets up the components for all editable campaign settings, including:
      * <p>
@@ -540,7 +540,7 @@ public class GeneralTab {
     }
 
     /**
-     * Applies the updated campaign options from the general tab's UI components to the {@link Campaign}. This method
+     * Applies the updated campaign options from the general page's UI components to the {@link Campaign}. This method
      * ensures that any changes made in the UI are reflected in the campaign's settings.
      *
      * @param isStartUp    A boolean indicating if the campaign is in a startup state.

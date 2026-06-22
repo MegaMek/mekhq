@@ -64,47 +64,47 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 
 /**
- * The {@code PersonnelTab} class represents the user interface components for
+ * The {@code PersonnelPage} class represents the user interface components for
  * configuring personnel-related options in
  * the MekHQ Campaign Options dialog. This class handles the initialization,
  * layout, and logic for various personnel
- * settings spanning multiple tabs, such as general personnel options, personnel
+ * settings spanning multiple pages, such as general personnel options, personnel
  * logs, information, awards, medical
  * options, salaries, and prisoners and dependents.
  * <p>
- * The class is organized into multiple tabs that encapsulate settings under
+ * The class is organized into multiple pages that encapsulate settings under
  * specific categories:
  * </p>
  * <ul>
- * <li><b>General Tab:</b> General settings for personnel management such as
+ * <li><b>General Page:</b> General settings for personnel management such as
  * tactics,
  * initiative bonus, toughness, and edge settings.</li>
- * <li><b>Personnel Logs Tab:</b> Settings for logging activities like skill or
+ * <li><b>Personnel Logs Page:</b> Settings for logging activities like skill or
  * ability
  * gains, personnel transfers, and kill records.</li>
- * <li><b>Personnel Information Tab:</b> Configuration of options for displaying
+ * <li><b>Personnel Information Page:</b> Configuration of options for displaying
  * personnel details like time in service, time in rank, and earnings
  * tracking.</li>
- * <li><b>Awards Tab:</b> Options for managing awards given during play,
+ * <li><b>Awards Page:</b> Options for managing awards given during play,
  * including
  * auto-awards, tier size configurations, and specific award filters.</li>
- * <li><b>Medical Tab:</b> Medical-related settings such as healing time,
+ * <li><b>Medical Page:</b> Medical-related settings such as healing time,
  * advanced medical usage, and tougher healing options.</li>
- * <li><b>Prisoners and Dependents Tab:</b> Configuration of prisoner handling
+ * <li><b>Prisoners and Dependents Page:</b> Configuration of prisoner handling
  * and dependent-related rules.</li>
- * <li><b>Salaries Tab:</b> Configuration of salaries based on roles, experience
+ * <li><b>Salaries Page:</b> Configuration of salaries based on roles, experience
  * multipliers, and base salary rates.</li>
  * </ul>
  *
  * <p>
  * This class serves as the main controller for the UI components of the
- * Personnel Tab,
+ * Personnel Page,
  * bridging the user interface with the {@link CampaignOptions} and ensuring the
  * appropriate
  * application of configuration settings.
  * </p>
  */
-public class PersonnelTab {
+public class PersonnelPage {
         private static final int PERSONNEL_LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
         private static final int PERSONNEL_CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
 
@@ -116,7 +116,7 @@ public class PersonnelTab {
     private boolean informationPageCreated;
     private boolean prisonersAndDependentsPageCreated;
 
-    // start General Tab
+    // start General Page
     private CampaignOptionsHeaderPanel generalHeader;
     private JPanel pnlPersonnelGeneralOptions;
     private JCheckBox chkUseTactics;
@@ -156,9 +156,9 @@ public class PersonnelTab {
     private JCheckBox chkUseBlobVesselPilot;
     private JCheckBox chkUseBlobVesselGunner;
     private JCheckBox chkUseBlobVesselCrew;
-    // end General Tab
+    // end General Page
 
-    // start Personnel Logs Tab
+    // start Personnel Logs Page
     private JCheckBox chkUseTransfers;
     private JCheckBox chkUseExtendedTOEForceName;
     private JCheckBox chkPersonnelLogSkillGain;
@@ -171,9 +171,9 @@ public class PersonnelTab {
     private JCheckBox chkDisplayPatientRecord;
     private JCheckBox chkDisplayAssignmentRecord;
     private JCheckBox chkDisplayPerformanceRecord;
-    // end Personnel Logs Tab
+    // end Personnel Logs Page
 
-    // start Personnel Information Tab
+    // start Personnel Information Page
     private CampaignOptionsHeaderPanel personnelInformationHeader;
     private JCheckBox chkUseTimeInService;
     private JLabel lblTimeInServiceDisplayFormat;
@@ -184,9 +184,9 @@ public class PersonnelTab {
     private JCheckBox chkTrackTotalEarnings;
     private JCheckBox chkTrackTotalXPEarnings;
     private JCheckBox chkShowOriginFaction;
-    // end Personnel Information Tab
+    // end Personnel Information Page
 
-    // start Awards Tab
+    // start Awards Page
     private CampaignOptionsHeaderPanel awardsHeader;
     private JPanel pnlAwardsGeneralOptions;
     private JLabel lblAwardBonusStyle;
@@ -212,7 +212,7 @@ public class PersonnelTab {
     private JCheckBox chkEnableTrainingAwards;
     private JCheckBox chkEnableMiscAwards;
     private JTextArea txtAwardSetFilterList;
-    // end Awards Tab
+    // end Awards Page
 
         private CampaignOptionsHeaderPanel medicalHeader;
         private JCheckBox chkUseAdvancedMedical;
@@ -234,9 +234,9 @@ public class PersonnelTab {
     private JCheckBox chkUseMASHTheatres;
     private JLabel lblMASHTheatreCapacity;
     private JSpinner spnMASHTheatreCapacity;
-    // end Medical Tab
+    // end Medical Page
 
-    // start Prisoners and Dependents Tab
+    // start Prisoners and Dependents Page
     private CampaignOptionsHeaderPanel prisonersAndDependentsHeader;
     private JPanel prisonerPanel;
     private JLabel lblPrisonerCaptureStyle;
@@ -251,17 +251,17 @@ public class PersonnelTab {
     private JSpinner spnDependentProfessionDieSize;
     private JLabel lblCivilianProfessionDieSize;
     private JSpinner spnCivilianProfessionDieSize;
-    // end Prisoners and Dependents Tab
-    // end Salaries Tab
+    // end Prisoners and Dependents Page
+    // end Salaries Page
 
     /**
-     * Constructs the {@code PersonnelTab} object with the given campaign options.
+     * Constructs the {@code PersonnelPage} object with the given campaign options.
      *
      * @param campaignOptions the {@link CampaignOptions} instance to be used for
      *                        initializing and managing personnel
      *                        options.
      */
-    public PersonnelTab(@Nonnull CampaignOptions campaignOptions) {
+    public PersonnelPage(@Nonnull CampaignOptions campaignOptions) {
         this.campaignOptions = campaignOptions;
 
         initialize();
@@ -269,23 +269,23 @@ public class PersonnelTab {
     }
 
     /**
-     * Initializes all tabs and their components within the PersonnelTab.
+     * Initializes all pages and their components within the PersonnelPage.
      */
     private void initialize() {
-        initializeGeneralTab();
-        initializePersonnelLogsTab();
-        initializePersonnelInformationTab();
-        initializeAwardsTab();
-        initializeMedicalTab();
-        initializePrisonersAndDependentsTab();
+        initializeGeneralPage();
+        initializePersonnelLogsPage();
+        initializePersonnelInformationPage();
+        initializeAwardsPage();
+        initializeMedicalPage();
+        initializePrisonersAndDependentsPage();
     }
 
     /**
-     * Initializes the components of the Prisoners and Dependents Tab. This includes
+     * Initializes the components of the Prisoners and Dependents Page. This includes
      * settings related to prisoners and
      * handling of dependents.
      */
-    private void initializePrisonersAndDependentsTab() {
+    private void initializePrisonersAndDependentsPage() {
         prisonerPanel = new JPanel();
         lblPrisonerCaptureStyle = new JLabel();
         comboPrisonerCaptureStyle = new MMComboBox<>("comboPrisonerCaptureStyle", PrisonerCaptureStyle.values());
@@ -302,11 +302,11 @@ public class PersonnelTab {
     }
 
     /**
-     * Initializes the components of the Medical Tab. This includes medical-related
+     * Initializes the components of the Medical Page. This includes medical-related
      * options such as recovery time,
      * random hits for vehicles, and limits on patients.
      */
-    private void initializeMedicalTab() {
+    private void initializeMedicalPage() {
         chkUseAdvancedMedical = new JCheckBox();
 
         lblHealWaitingPeriod = new JLabel();
@@ -334,11 +334,11 @@ public class PersonnelTab {
     }
 
     /**
-     * Initializes the components of the Awards Tab. This includes settings for
+     * Initializes the components of the Awards Page. This includes settings for
      * managing awards, such as automatic
      * awards issuance, tier configurations, and award filters.
      */
-    private void initializeAwardsTab() {
+    private void initializeAwardsPage() {
         pnlAwardsGeneralOptions = new JPanel();
         lblAwardBonusStyle = new JLabel();
         comboAwardBonusStyle = new MMComboBox<>("comboAwardBonusStyle", AwardBonus.values());
@@ -367,11 +367,11 @@ public class PersonnelTab {
     }
 
     /**
-     * Initializes the components of the Personnel Information Tab. This includes
+     * Initializes the components of the Personnel Information Page. This includes
      * settings for tracking and displaying
      * information like service time, rank time, and earnings.
      */
-    private void initializePersonnelInformationTab() {
+    private void initializePersonnelInformationPage() {
         chkUseTimeInService = new JCheckBox();
 
         lblTimeInServiceDisplayFormat = new JLabel();
@@ -390,11 +390,11 @@ public class PersonnelTab {
     }
 
     /**
-     * Initializes the components of the Personnel Logs Tab. This includes options
+     * Initializes the components of the Personnel Logs Page. This includes options
      * for personnel log-keeping, such as
      * tracking skill and ability gains, as well as transfers.
      */
-    private void initializePersonnelLogsTab() {
+    private void initializePersonnelLogsPage() {
         chkUseTransfers = new JCheckBox();
         chkUseExtendedTOEForceName = new JCheckBox();
         chkPersonnelLogSkillGain = new JCheckBox();
@@ -410,11 +410,11 @@ public class PersonnelTab {
     }
 
     /**
-     * Initializes the components of the General Tab. This includes general
+     * Initializes the components of the General Page. This includes general
      * personnel-related options, such as tactics,
      * edge, initiative bonuses, and personnel cleanup settings.
      */
-    private void initializeGeneralTab() {
+    private void initializeGeneralPage() {
         pnlPersonnelGeneralOptions = new JPanel();
         chkUseTactics = new JCheckBox();
         chkUseInitiativeBonus = new JCheckBox();
@@ -456,27 +456,27 @@ public class PersonnelTab {
     }
 
     /**
-     * Creates the components and layout for the General Tab, organizing personnel
+     * Creates the components and layout for the General Page, organizing personnel
      * management settings into specific
      * groups.
      *
-     * @return a {@link JPanel} representing the General Tab.
+     * @return a {@link JPanel} representing the General Page.
      */
-    public @Nonnull JPanel createGeneralTab() {
+    public @Nonnull JPanel createGeneralPage() {
         // Header
         String imageAddress = getImageDirectory() + "logo_clan_wolverine.png";
-        generalHeader = new CampaignOptionsHeaderPanel("PersonnelGeneralTab", imageAddress);
+        generalHeader = new CampaignOptionsHeaderPanel("PersonnelGeneralPage", imageAddress);
 
         // Contents
         pnlPersonnelGeneralOptions = createGeneralOptionsPanel();
         pnlPersonnelCleanup = createPersonnelCleanUpPanel();
         pnlAdministrators = createAdministratorsPanel();
         pnlBlobCrew = createBlobCrewPanel();
-        JPanel panel = CampaignOptionsPagePanel.builder("PersonnelGeneralTab", "PersonnelGeneralTab", imageAddress)
+        JPanel panel = CampaignOptionsPagePanel.builder("PersonnelGeneralPage", "PersonnelGeneralPage", imageAddress)
                 .header(generalHeader)
-                .quote("personnelGeneralTab")
-                .section("lblPersonnelGeneralTab.text",
-                        "lblPersonnelGeneralTab.summary",
+                .quote("personnelGeneralPage")
+                .section("lblPersonnelGeneralPage.text",
+                        "lblPersonnelGeneralPage.summary",
                         pnlPersonnelGeneralOptions)
                 .section("lblPersonnelCleanUpPanel.text",
                         "lblPersonnelCleanUpPanel.summary",
@@ -499,7 +499,7 @@ public class PersonnelTab {
     }
 
     /**
-     * Creates the panel for general personnel options in the General Tab.
+     * Creates the panel for general personnel options in the General Page.
      *
      * @return a {@link JPanel} containing checkboxes for various personnel
      *         management settings.
@@ -565,7 +565,7 @@ public class PersonnelTab {
         chkUseAlternativeQualityAveraging.addMouseListener(createTipPanelUpdater("UseAlternativeQualityAveraging"));
 
         // Layout the Panel
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("PersonnelGeneralTab",
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("PersonnelGeneralPage",
                 PERSONNEL_LABEL_COLUMN_WIDTH,
                 PERSONNEL_CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(2,
@@ -590,7 +590,7 @@ public class PersonnelTab {
     }
 
     /**
-     * Creates the panel for personnel cleanup options in the General Tab.
+     * Creates the panel for personnel cleanup options in the General Page.
      *
      * @return a {@link JPanel} containing options for personnel cleanup, such as
      *         removal exemptions.
@@ -619,7 +619,7 @@ public class PersonnelTab {
     }
 
     /**
-     * Creates the panel for administrative settings in the General Tab.
+     * Creates the panel for administrative settings in the General Page.
      *
      * @return a {@link JPanel} containing settings related to administrators, such
      *         as negotiation options.
@@ -644,7 +644,7 @@ public class PersonnelTab {
     }
 
     /**
-     * Creates the panel for blob crew settings in the General Tab.
+     * Creates the panel for blob crew settings in the General Page.
      *
      * @return a {@link JPanel} containing settings related to blob crews (temporary
      *         personnel pools).
@@ -695,15 +695,15 @@ public class PersonnelTab {
     }
 
     /**
-     * Creates the panels and layout for the Awards Tab, including its general and
+     * Creates the panels and layout for the Awards Page, including its general and
      * filter components.
      *
-     * @return a {@link JPanel} representing the Awards Tab.
+     * @return a {@link JPanel} representing the Awards Page.
      */
-    public @Nonnull JPanel createAwardsTab() {
+    public @Nonnull JPanel createAwardsPage() {
         // Header
                 String imageAddress = getImageDirectory() + "logo_outworld_alliance.png";
-                awardsHeader = new CampaignOptionsHeaderPanel("AwardsTab", imageAddress);
+                awardsHeader = new CampaignOptionsHeaderPanel("AwardsPage", imageAddress);
 
         // Contents
         pnlAwardsGeneralOptions = createAwardsGeneralOptionsPanel();
@@ -721,15 +721,15 @@ public class PersonnelTab {
         scrollAwardSetFilterList.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollAwardSetFilterList.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         JPanel pnlAwardSetFilter = createAwardSetFilterPanel(scrollAwardSetFilterList);
-        JPanel panel = CampaignOptionsPagePanel.builder("AwardsTab", "AwardsTab", imageAddress)
+        JPanel panel = CampaignOptionsPagePanel.builder("AwardsPage", "AwardsPage", imageAddress)
                 .header(awardsHeader)
-                .quote("awardsTab")
-                .section("lblAwardsTab.text", "lblAwardsTab.summary", pnlAwardsGeneralOptions)
+                .quote("awardsPage")
+                .section("lblAwardsPage.text", "lblAwardsPage.summary", pnlAwardsGeneralOptions)
                 .section("lblAutoAwardsFilterPanel.text",
                         "lblAutoAwardsFilterPanel.summary",
                         pnlAutoAwardsFilter)
-                .section("lblAwardsTabBottom.text",
-                        "lblAwardsTabBottom.summary",
+                .section("lblAwardsPageBottom.text",
+                        "lblAwardsPageBottom.summary",
                         pnlAwardSetFilter,
                         getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT))
                 .build();
@@ -741,7 +741,7 @@ public class PersonnelTab {
     }
 
     /**
-     * Creates the panel for general award configuration settings in the Awards Tab.
+     * Creates the panel for general award configuration settings in the Awards Page.
      *
      * @return a {@link JPanel} containing settings for awards, such as bonus style
      *         and auto awards.
@@ -797,7 +797,7 @@ public class PersonnelTab {
     }
 
     /**
-     * Creates the panel for filtering auto-awards settings in the Awards Tab.
+     * Creates the panel for filtering auto-awards settings in the Awards Page.
      *
      * @return a {@link JPanel} containing checkboxes for various award filters.
      */
@@ -865,16 +865,16 @@ public class PersonnelTab {
     }
 
     /**
-     * Creates the layout for the Medical Tab, combining components related to
+     * Creates the layout for the Medical Page, combining components related to
      * medical settings.
      *
      * @return a {@link JPanel} containing medical-related settings.
      */
-    public @Nonnull JPanel createMedicalTab() {
+    public @Nonnull JPanel createMedicalPage() {
         // Header
-        // start Medical Tab
+        // start Medical Page
                 String imageAddress = getImageDirectory() + "logo_duchy_of_tamarind_abbey.png";
-                medicalHeader = new CampaignOptionsHeaderPanel("MedicalTab", imageAddress);
+                medicalHeader = new CampaignOptionsHeaderPanel("MedicalPage", imageAddress);
 
         // Contents
         chkUseAdvancedMedical = new CampaignOptionsCheckBox("UseAdvancedMedical",
@@ -975,9 +975,9 @@ public class PersonnelTab {
                 chkUseAlternativeAdvancedMedical,
                 chkUseKinderAlternativeAdvancedMedical,
                 chkUseRandomDiseases);
-        JPanel panel = CampaignOptionsPagePanel.builder("MedicalTab", "MedicalTab", imageAddress)
+        JPanel panel = CampaignOptionsPagePanel.builder("MedicalPage", "MedicalPage", imageAddress)
                 .header(medicalHeader)
-                .quote("medicalTab")
+                .quote("medicalPage")
                 .section("lblMedicalCapacityPanel.text", "lblMedicalCapacityPanel.summary", medicalCapacityPanel)
                 .section("lblHealingChecksPanel.text", "lblHealingChecksPanel.summary", healingChecksPanel)
                 .section("lblAdvancedMedicalRulesPanel.text",
@@ -992,13 +992,13 @@ public class PersonnelTab {
     }
 
     /**
-     * Creates the layout for the Personnel Information Tab, including its
+     * Creates the layout for the Personnel Information Page, including its
      * components for displaying personnel
      * information and logs.
      *
-     * @return a {@link JPanel} representing the Personnel Information Tab.
+     * @return a {@link JPanel} representing the Personnel Information Page.
      */
-    public @Nonnull JPanel createPersonnelInformationTab() {
+    public @Nonnull JPanel createPersonnelInformationPage() {
         // Header
                 String imageAddress = getImageDirectory() + "logo_rasalhague_dominion.png";
                 personnelInformationHeader = new CampaignOptionsHeaderPanel("PersonnelInformation", imageAddress);
@@ -1039,7 +1039,7 @@ public class PersonnelTab {
                 chkShowOriginFaction);
         JPanel panel = CampaignOptionsPagePanel.builder("PersonnelInformation", "PersonnelInformation", imageAddress)
                 .header(personnelInformationHeader)
-                .quote("personnelInformationTab")
+                .quote("personnelInformationPage")
                 .section("lblPersonnelInformation.text",
                         "lblPersonnelInformation.summary",
                         personnelInformationPanel,
@@ -1055,7 +1055,7 @@ public class PersonnelTab {
 
     /**
      * Creates a sub-panel for managing personnel log settings within the Personnel
-     * Information Tab.
+     * Information Page.
      *
      * @return a {@link JPanel} containing log settings for personnel activities.
      */
@@ -1112,26 +1112,26 @@ public class PersonnelTab {
     }
 
     /**
-     * Creates the layout for the Prisoners and Dependents Tab, organizing settings
+     * Creates the layout for the Prisoners and Dependents Page, organizing settings
      * for prisoner handling and dependent
      * management.
      *
-     * @return a {@link JPanel} containing the Prisoners and Dependents Tab
+     * @return a {@link JPanel} containing the Prisoners and Dependents Page
      *         components.
      */
-    public @Nonnull JPanel createPrisonersAndDependentsTab() {
+    public @Nonnull JPanel createPrisonersAndDependentsPage() {
         // Header
         String imageAddress = getImageDirectory() + "logo_illyrian_palatinate.png";
-        prisonersAndDependentsHeader = new CampaignOptionsHeaderPanel("PrisonersAndDependentsTab", imageAddress);
+        prisonersAndDependentsHeader = new CampaignOptionsHeaderPanel("PrisonersAndDependentsPage", imageAddress);
 
         // Contents
         prisonerPanel = createPrisonersPanel();
         dependentsPanel = createDependentsPanel();
-        JPanel panel = CampaignOptionsPagePanel.builder("PrisonersAndDependentsTab",
-                        "PrisonersAndDependentsTab",
+        JPanel panel = CampaignOptionsPagePanel.builder("PrisonersAndDependentsPage",
+                        "PrisonersAndDependentsPage",
                         imageAddress)
                 .header(prisonersAndDependentsHeader)
-                .quote("prisonersAndDependentsTab")
+                .quote("prisonersAndDependentsPage")
                 .section("lblPrisonersPanel.text",
                         "lblPrisonersPanel.summary",
                         prisonerPanel,
@@ -1150,7 +1150,7 @@ public class PersonnelTab {
 
     /**
      * Creates the panel for configuring prisoner settings in the Prisoners and
-     * Dependents Tab.
+     * Dependents Page.
      *
      * @return a {@link JPanel} containing prisoner-related options such as capture
      *         style and status.
@@ -1194,7 +1194,7 @@ public class PersonnelTab {
 
     /**
      * Creates the panel for configuring dependent settings in the Prisoners and
-     * Dependents Tab.
+     * Dependents Page.
      *
      * @return a {@link JPanel} containing dependent management options.
      */
@@ -1234,7 +1234,7 @@ public class PersonnelTab {
     }
 
     /**
-     * Shortcut method to load default {@link CampaignOptions} values into the tab
+     * Shortcut method to load default {@link CampaignOptions} values into the page
      * components.
      */
     public void loadValuesFromCampaignOptions(Version version) {
@@ -1267,7 +1267,7 @@ public class PersonnelTab {
     }
 
     /**
-     * Applies the modified personnel tab settings to the repository's campaign
+     * Applies the modified personnel page settings to the repository's campaign
      * options. If no preset
      * {@link CampaignOptions} is provided, the changes are applied to the current
      * options.

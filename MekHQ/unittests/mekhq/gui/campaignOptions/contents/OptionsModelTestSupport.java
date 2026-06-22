@@ -48,7 +48,7 @@ import java.util.Set;
  * <p>
  * The campaign-option models are plain data holders: their constructor copies every value out of {@code CampaignOptions}
  * (and friends) and {@code applyTo} writes every value back. The danger is a field that loads from one option but saves
- * to another (a real example was found where the Markets tab loaded {@code regionalMekVariations} but saved
+ * to another (a real example was found where the Markets page loaded {@code regionalMekVariations} but saved
  * {@code unitMarketRegionalMekVariations}). To catch that for <em>every</em> field, a test mutates each field to a value
  * that differs from its default, runs it through {@code applyTo} and a fresh re-read, and asserts the re-read model
  * equals the mutated one.

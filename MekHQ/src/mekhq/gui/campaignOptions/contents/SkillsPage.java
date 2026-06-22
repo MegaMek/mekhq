@@ -97,7 +97,7 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 
 /**
- * SkillsTab is a component of the campaign options user interface that allows players to configure the rules and costs
+ * SkillsPage is a component of the campaign options user interface that allows players to configure the rules and costs
  * associated with skills in their campaign.
  *
  * <p>Each skill sub-type (Gunnery, Piloting, Support, Utility, Roleplay) is presented as a single table listing every
@@ -106,11 +106,11 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
  * The platform copy/paste shortcut (Ctrl+C on Windows/Linux, Cmd+C on macOS) copies the selected row's full
  * configuration and the corresponding paste shortcut applies it onto one or more selected rows.</p>
  */
-public class SkillsTab {
+public class SkillsPage {
     private final CampaignOptions campaignOptions;
 
     private SkillsOptionsModel model;
-    private Map<SkillSubType, CampaignOptionsPagePanel> createdCategoryTabs;
+    private Map<SkillSubType, CampaignOptionsPagePanel> createdCategoryPages;
     private List<SkillsTableModel> tableModels;
     private SkillConfiguration storedConfiguration;
 
@@ -120,69 +120,69 @@ public class SkillsTab {
     private JSpinner spnAttributeCost;
 
     /**
-     * Constructs a new {@code SkillsTab} instance and initializes the necessary data structures for managing skill
+     * Constructs a new {@code SkillsPage} instance and initializes the necessary data structures for managing skill
      * configurations.
      *
      * @param campaignOptions the {@code CampaignOptions} instance that holds the settings to be modified or displayed
-     *                        in this tab.
+     *                        in this page.
      */
-    public SkillsTab(@Nonnull CampaignOptions campaignOptions) {
+    public SkillsPage(@Nonnull CampaignOptions campaignOptions) {
         this.campaignOptions = campaignOptions;
         initialize();
         loadValuesFromCampaignOptions();
     }
 
     /**
-     * Sets up the data structures needed for skill configuration in the SkillsTab.
+     * Sets up the data structures needed for skill configuration in the SkillsPage.
      */
     private void initialize() {
-        createdCategoryTabs = new EnumMap<>(SkillSubType.class);
+        createdCategoryPages = new EnumMap<>(SkillSubType.class);
         tableModels = new ArrayList<>();
         storedConfiguration = null;
     }
 
     /**
-     * Creates the main panel for the SkillsTab UI based on the provided {@link SkillSubType} category.
+     * Creates the main panel for the SkillsPage UI based on the provided {@link SkillSubType} category.
      *
      * @param category the {@link SkillSubType} representing the skill category to display.
      *
      * @return a {@link JPanel} containing the skill table and supporting controls for the selected category.
      */
-    public @Nonnull JPanel createSkillsTab(SkillSubType category) {
+    public @Nonnull JPanel createSkillsPage(SkillSubType category) {
         // The page never rebuilds in place (only its table models refresh), so the CampaignOptionsPagePanel can be
         // cached and returned directly rather than wrapping it in a container.
-        return createdCategoryTabs.computeIfAbsent(category, this::createSkillsPage);
+        return createdCategoryPages.computeIfAbsent(category, this::buildSkillsPage);
     }
 
-    private @Nonnull CampaignOptionsPagePanel createSkillsPage(SkillSubType category) {
+    private @Nonnull CampaignOptionsPagePanel buildSkillsPage(SkillSubType category) {
         // Header
         CampaignOptionsHeaderPanel headerPanel;
         String panelName;
         switch (category) {
             case COMBAT_GUNNERY -> {
-                headerPanel = new CampaignOptionsHeaderPanel("GunnerySkillsTab",
+                headerPanel = new CampaignOptionsHeaderPanel("GunnerySkillsPage",
                       getImageDirectory() + "logo_clan_diamond_sharks.png");
-                panelName = "GunnerySkillsTab";
+                panelName = "GunnerySkillsPage";
             }
             case COMBAT_PILOTING -> {
-                headerPanel = new CampaignOptionsHeaderPanel("PilotingSkillsTab",
+                headerPanel = new CampaignOptionsHeaderPanel("PilotingSkillsPage",
                       getImageDirectory() + "logo_capellan_confederation.png");
-                panelName = "PilotingSkillsTab";
+                panelName = "PilotingSkillsPage";
             }
             case SUPPORT -> {
-                headerPanel = new CampaignOptionsHeaderPanel("SupportSkillsTab",
+                headerPanel = new CampaignOptionsHeaderPanel("SupportSkillsPage",
                       getImageDirectory() + "logo_clan_goliath_scorpion.png");
-                panelName = "SupportSkillsTab";
+                panelName = "SupportSkillsPage";
             }
             case UTILITY -> {
-                headerPanel = new CampaignOptionsHeaderPanel("UtilitySkillsTab",
+                headerPanel = new CampaignOptionsHeaderPanel("UtilitySkillsPage",
                       getImageDirectory() + "logo_axumite_providence.png");
-                panelName = "UtilitySkillsTab";
+                panelName = "UtilitySkillsPage";
             }
             default -> { // ROLEPLAY
-                headerPanel = new CampaignOptionsHeaderPanel("RoleplaySkillsTab",
+                headerPanel = new CampaignOptionsHeaderPanel("RoleplaySkillsPage",
                       getImageDirectory() + "logo_clan_jade_falcon.png");
-                panelName = "RoleplaySkillsTab";
+                panelName = "RoleplaySkillsPage";
             }
         }
 
@@ -362,7 +362,7 @@ public class SkillsTab {
 
     /**
      * Creates the borderless "Misc Costs" row containing the per-rank Edge cost and per-improvement Attribute cost
-     * controls laid out side by side. Only shown on the Gunnery tab.
+     * controls laid out side by side. Only shown on the Gunnery page.
      *
      * @return a {@link JPanel} containing the Edge and Attribute cost controls.
      */
@@ -537,7 +537,7 @@ public class SkillsTab {
     }
 
     /**
-     * Transfers the configured skill values from the SkillsTab into the campaign's underlying data model.
+     * Transfers the configured skill values from the SkillsPage into the campaign's underlying data model.
      *
      * @param presetCampaignOptions the {@link CampaignOptions} instance to save settings to, or {@code null} to update
      *                              the current campaign options.

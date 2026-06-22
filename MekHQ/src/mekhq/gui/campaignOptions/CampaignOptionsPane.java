@@ -90,35 +90,33 @@ import mekhq.gui.campaignOptions.contents.*;
 import mekhq.gui.campaignOptions.optionChangeDialogs.*;
 
 /**
- * The {@code CampaignOptionsPane} class represents a tabbed pane used for
- * displaying and managing various campaign
- * options in MekHQ. It organizes these options into tabs and sub-tabs, enabling
- * users to configure different aspects of
- * a campaign. This component serves as the central UI for campaign settings
- * management.
+ * {@code CampaignOptionsPane} is the central panel of the Campaign Options dialog. It presents every campaign setting
+ * through a searchable navigation tree on the left (a {@link CampaignOptionsNavigationPanel}) paired with a scrollable
+ * content host on the right (a {@link CampaignOptionsContentHost}) inside a {@link javax.swing.JSplitPane}. This
+ * replaces the older nested tabbed-pane layout, so the dialog is navigated by selecting entries in the tree rather than
+ * by clicking through pages and sub-pages.
  *
- * <p>
- * The pane is initialized with a {@link Campaign} instance, which provides the
- * campaign's data and allows options to be
- * applied directly to the active campaign. The dialog supports multiple modes,
- * such as {@code NORMAL},
- * {@code ABRIDGED}, and {@code STARTUP}, to determine the level of detail and
- * features shown.
- * </p>
+ * <p>Rather than building every screen up front, the pane registers a flat set of {@link CampaignOptionsRoute}s - each
+ * describing a navigable destination and its hierarchical path - and maps each one to a page factory. Pages are built
+ * lazily the first time they are shown (or when the navigation search index is warmed) and then cached. The per-area
+ * builders ({@link mekhq.gui.campaignOptions.contents.GeneralPage GeneralPage},
+ * {@link mekhq.gui.campaignOptions.contents.PersonnelPage PersonnelPage}, and the other per-area {@code *Page}
+ * classes) are likewise only instantiated the first time their section is needed.</p>
  *
- * <strong>Key Features:</strong>
+ * <p>The pane is constructed with a {@link Campaign} and a {@link CampaignOptionsDialogMode} ({@code NORMAL},
+ * {@code STARTUP}, {@code STARTUP_ABRIDGED}, or {@code CAMPAIGN_UPGRADE}), and also bridges the UI back to the domain:
+ * it applies the edited settings to the campaign, loads {@link CampaignPreset}s, and fires the one-time
+ * confirmation/compensation handlers needed when a major ruleset is switched on.</p>
+ *
+ * <strong>Responsibilities:</strong>
  * <ul>
- * <li>Organizes options into logical groups, such as General, Human Resources,
- * Advancement, Logistics, and Operations.</li>
- * <li>Supports loading and applying campaign presets for streamlined
- * configuration.</li>
- * <li>Dynamically handles UI scaling and scrolling speed based on environment
- * properties.</li>
- * <li>Allows scalability for future addition of new campaign settings.</li>
+ *   <li>Builds the navigation tree and content host and keeps them in sync as the user navigates.</li>
+ *   <li>Lazily creates and caches the option pages, and the section builders that produce them.</li>
+ *   <li>Feeds the navigation search index so the filter can match page and section titles.</li>
+ *   <li>Applies the configured options to the active {@link Campaign} and supports saving and loading presets.</li>
  * </ul>
  */
 public class CampaignOptionsPane extends JPanel {
-    private static final int SCROLL_SPEED = 16;
     private static final int NAVIGATION_WIDTH = 240;
     private static final int CONTENT_MARGIN = UIUtil.scaleForGUI(4);
 
@@ -135,28 +133,26 @@ public class CampaignOptionsPane extends JPanel {
     private CampaignOptionsNavigationPanel navigationPanel;
     private boolean isSyncingNavigationSelection;
 
-    private GeneralTab generalTab;
-    private PersonnelTab personnelTab;
-    private BiographyTab biographyTab;
-    private RelationshipsTab relationshipsTab;
-    private SalariesTab salariesTab;
-    private TurnoverAndRetentionTab turnoverAndRetentionTab;
-    private AdvancementTab advancementTab;
-    private SkillsTab skillsTab;
-    private AbilitiesTab abilitiesTab;
-    private RepairAndMaintenanceTab repairAndMaintenanceTab;
-    private EquipmentAndSuppliesTab equipmentAndSuppliesTab;
-    private FinancesTab financesTab;
-    private MarketsTab marketsTab;
-    private SystemsTab systemsTab;
-    private RulesetsTab rulesetsTab;
+    private GeneralPage generalPage;
+    private PersonnelPage personnelPage;
+    private BiographyPage biographyPage;
+    private RelationshipsPage relationshipsPage;
+    private SalariesPage salariesPage;
+    private TurnoverAndRetentionPage turnoverAndRetentionPage;
+    private AdvancementPage advancementPage;
+    private SkillsPage skillsPage;
+    private AbilitiesPage abilitiesPage;
+    private RepairAndMaintenancePage repairAndMaintenancePage;
+    private EquipmentAndSuppliesPage equipmentAndSuppliesPage;
+    private FinancesPage financesPage;
+    private MarketsPage marketsPage;
+    private SystemsPage systemsPage;
+    private RulesetsPage rulesetsPage;
     private CampaignGUI campaignGui;
 
     /**
-     * Constructs a {@code CampaignOptionsPane} for managing campaign settings. This
-     * initializes the tabbed pane and
-     * populates it with categories and sub-tabs based on the provided
-     * {@link Campaign} instance and dialog mode.
+     * Constructs a {@code CampaignOptionsPane} for managing campaign settings. This builds the navigation tree and
+     * content host from the provided {@link Campaign} instance and dialog mode.
      *
      * @param frame    the parent {@link JFrame} for this pane
      * @param campaign the {@link Campaign} object representing the current campaign
@@ -177,13 +173,11 @@ public class CampaignOptionsPane extends JPanel {
     }
 
     /**
-     * Initializes the campaign options pane by creating all parent tabs and adding
-     * sub-tabs for various campaign
-     * settings categories. Dynamically adjusts tab fonts and layout based on UI
-     * scaling settings.
+     * Builds the pane: creates the eagerly-loaded General page, registers every navigation route, and assembles the
+     * navigation tree and content host into the split pane.
      */
     protected void initialize() {
-        JPanel generalPage = createGeneralTab(mode);
+        JPanel generalPage = createGeneralPage(mode);
         registerRoutes(generalPage);
         CampaignOptionsRoute initialRoute = navigationTargets.get(0);
 
@@ -214,133 +208,133 @@ public class CampaignOptionsPane extends JPanel {
     private void registerRoutes(JPanel generalPage) {
         registerDirectRoute("general", () -> generalPage, "generalPanel");
 
-        registerParentRoute("human-resources", "humanResourcesParentTab");
-        registerParentRoute("human-resources.personnel", "humanResourcesParentTab", "personnelContentTabs");
-        registerDirectRoute("human-resources.personnel.general", this::createPersonnelGeneralTab,
-                "humanResourcesParentTab", "personnelContentTabs", "personnelGeneralTab");
-        registerDirectRoute("human-resources.personnel.awards", this::createPersonnelAwardsTab,
-                "humanResourcesParentTab", "personnelContentTabs", "awardsTab");
-        registerDirectRoute("human-resources.personnel.medical", this::createPersonnelMedicalTab,
-                "humanResourcesParentTab", "personnelContentTabs", "medicalTab");
-        registerDirectRoute("human-resources.personnel.information", this::createPersonnelInformationTab,
-                "humanResourcesParentTab", "personnelContentTabs", "personnelInformationTab");
+        registerParentRoute("human-resources", "humanResourcesCategory");
+        registerParentRoute("human-resources.personnel", "humanResourcesCategory", "personnelCategory");
+        registerDirectRoute("human-resources.personnel.general", this::createPersonnelGeneralPage,
+                "humanResourcesCategory", "personnelCategory", "personnelGeneralPage");
+        registerDirectRoute("human-resources.personnel.awards", this::createPersonnelAwardsPage,
+                "humanResourcesCategory", "personnelCategory", "awardsPage");
+        registerDirectRoute("human-resources.personnel.medical", this::createPersonnelMedicalPage,
+                "humanResourcesCategory", "personnelCategory", "medicalPage");
+        registerDirectRoute("human-resources.personnel.information", this::createPersonnelInformationPage,
+                "humanResourcesCategory", "personnelCategory", "personnelInformationPage");
         registerDirectRoute("human-resources.personnel.prisoners-and-civilians",
-                this::createPersonnelPrisonersAndDependentsTab,
-                "humanResourcesParentTab", "personnelContentTabs", "prisonersAndDependentsTab");
-        registerParentRoute("human-resources.biography", "humanResourcesParentTab", "biographyContentTabs");
-        registerDirectRoute("human-resources.biography.general", this::createBiographyGeneralTab,
-                "humanResourcesParentTab", "biographyContentTabs", "biographyGeneralTab");
-        registerDirectRoute("human-resources.biography.backgrounds", this::createBiographyBackgroundsTab,
-                "humanResourcesParentTab", "biographyContentTabs", "backgroundsTab");
-        registerDirectRoute("human-resources.biography.death", this::createBiographyDeathTab,
-                "humanResourcesParentTab", "biographyContentTabs", "deathTab");
-        registerDirectRoute("human-resources.biography.education", this::createBiographyEducationTab,
-                "humanResourcesParentTab", "biographyContentTabs", "educationTab");
+                this::createPersonnelPrisonersAndDependentsPage,
+                "humanResourcesCategory", "personnelCategory", "prisonersAndDependentsPage");
+        registerParentRoute("human-resources.biography", "humanResourcesCategory", "biographyCategory");
+        registerDirectRoute("human-resources.biography.general", this::createBiographyGeneralPage,
+                "humanResourcesCategory", "biographyCategory", "biographyGeneralPage");
+        registerDirectRoute("human-resources.biography.backgrounds", this::createBiographyBackgroundsPage,
+                "humanResourcesCategory", "biographyCategory", "backgroundsPage");
+        registerDirectRoute("human-resources.biography.death", this::createBiographyDeathPage,
+                "humanResourcesCategory", "biographyCategory", "deathPage");
+        registerDirectRoute("human-resources.biography.education", this::createBiographyEducationPage,
+                "humanResourcesCategory", "biographyCategory", "educationPage");
         registerDirectRoute("human-resources.biography.name-and-portraits",
-                this::createBiographyNameAndPortraitGenerationTab,
-                "humanResourcesParentTab", "biographyContentTabs", "nameAndPortraitGenerationTab");
-        registerDirectRoute("human-resources.biography.rank", this::createBiographyRankTab,
-                "humanResourcesParentTab", "biographyContentTabs", "rankTab");
-        registerParentRoute("human-resources.relationships", "humanResourcesParentTab", "relationshipsContentTabs");
-        registerDirectRoute("human-resources.relationships.marriage", this::createRelationshipMarriageTab,
-                "humanResourcesParentTab", "relationshipsContentTabs", "marriageTab");
-        registerDirectRoute("human-resources.relationships.divorce", this::createRelationshipDivorceTab,
-                "humanResourcesParentTab", "relationshipsContentTabs", "divorceTab");
-        registerDirectRoute("human-resources.relationships.procreation", this::createRelationshipProcreationTab,
-                "humanResourcesParentTab", "relationshipsContentTabs", "procreationTab");
-        registerParentRoute("human-resources.salaries", "humanResourcesParentTab", "salariesContentTabs");
-        registerDirectRoute("human-resources.salaries.combat", this::createCombatSalariesTab,
-                "humanResourcesParentTab", "salariesContentTabs", "0combatSalariesTab");
-        registerDirectRoute("human-resources.salaries.support", this::createSupportSalariesTab,
-                "humanResourcesParentTab", "salariesContentTabs", "1supportSalariesTab");
-        registerDirectRoute("human-resources.salaries.civilian", this::createCivilianSalariesTab,
-                "humanResourcesParentTab", "salariesContentTabs", "2civilianSalariesTab");
-        registerParentRoute("human-resources.turnover-and-retention", "humanResourcesParentTab",
-                "turnoverAndRetentionContentTabs");
+                this::createBiographyNameAndPortraitGenerationPage,
+                "humanResourcesCategory", "biographyCategory", "nameAndPortraitGenerationPage");
+        registerDirectRoute("human-resources.biography.rank", this::createBiographyRankPage,
+                "humanResourcesCategory", "biographyCategory", "rankPage");
+        registerParentRoute("human-resources.relationships", "humanResourcesCategory", "relationshipsCategory");
+        registerDirectRoute("human-resources.relationships.marriage", this::createRelationshipMarriagePage,
+                "humanResourcesCategory", "relationshipsCategory", "marriagePage");
+        registerDirectRoute("human-resources.relationships.divorce", this::createRelationshipDivorcePage,
+                "humanResourcesCategory", "relationshipsCategory", "divorcePage");
+        registerDirectRoute("human-resources.relationships.procreation", this::createRelationshipProcreationPage,
+                "humanResourcesCategory", "relationshipsCategory", "procreationPage");
+        registerParentRoute("human-resources.salaries", "humanResourcesCategory", "salariesCategory");
+        registerDirectRoute("human-resources.salaries.combat", this::createCombatSalariesPage,
+                "humanResourcesCategory", "salariesCategory", "0combatSalariesPage");
+        registerDirectRoute("human-resources.salaries.support", this::createSupportSalariesPage,
+                "humanResourcesCategory", "salariesCategory", "1supportSalariesPage");
+        registerDirectRoute("human-resources.salaries.civilian", this::createCivilianSalariesPage,
+                "humanResourcesCategory", "salariesCategory", "2civilianSalariesPage");
+        registerParentRoute("human-resources.turnover-and-retention", "humanResourcesCategory",
+                "turnoverAndRetentionCategory");
         registerDirectRoute("human-resources.turnover-and-retention.turnover",
-                this::createTurnoverAndRetentionTurnoverTab,
-                "humanResourcesParentTab", "turnoverAndRetentionContentTabs", "turnoverTab");
+                this::createTurnoverAndRetentionTurnoverPage,
+                "humanResourcesCategory", "turnoverAndRetentionCategory", "turnoverPage");
         registerDirectRoute("human-resources.turnover-and-retention.fatigue",
-                this::createTurnoverAndRetentionFatigueTab,
-                "humanResourcesParentTab", "turnoverAndRetentionContentTabs", "fatigueTab");
+                this::createTurnoverAndRetentionFatiguePage,
+                "humanResourcesCategory", "turnoverAndRetentionCategory", "fatiguePage");
 
-        registerParentRoute("advancement", "advancementParentTab");
-        registerParentRoute("advancement.awards-and-randomization", "advancementParentTab",
-                "awardsAndRandomizationContentTabs");
+        registerParentRoute("advancement", "advancementCategory");
+        registerParentRoute("advancement.awards-and-randomization", "advancementCategory",
+                "awardsAndRandomizationCategory");
         registerDirectRoute("advancement.awards-and-randomization.randomization",
-                this::createAdvancementRandomizationTab,
-                "advancementParentTab", "awardsAndRandomizationContentTabs", "0randomizationTab");
-        registerDirectRoute("advancement.awards-and-randomization.xp-awards", this::createAdvancementXpAwardsTab,
-                "advancementParentTab", "awardsAndRandomizationContentTabs", "1xpAwardsTab");
+                this::createAdvancementRandomizationPage,
+                "advancementCategory", "awardsAndRandomizationCategory", "0randomizationPage");
+        registerDirectRoute("advancement.awards-and-randomization.xp-awards", this::createAdvancementXpAwardsPage,
+                "advancementCategory", "awardsAndRandomizationCategory", "1xpAwardsPage");
         registerDirectRoute("advancement.awards-and-randomization.recruitment-bonuses",
-                this::createAdvancementRecruitmentBonusesTab,
+                this::createAdvancementRecruitmentBonusesPage,
                 CampaignOptionsRouteOptions.withoutHelpPanel(),
-                "advancementParentTab", "awardsAndRandomizationContentTabs", "2recruitmentBonusesTab");
-        registerParentRoute("advancement.skills", "advancementParentTab", "skillsContentTabs");
-        registerDirectRoute("advancement.skills.gunnery", this::createAdvancementGunnerySkillsTab,
-                "advancementParentTab", "skillsContentTabs", "0gunnerySkillsTab");
-        registerDirectRoute("advancement.skills.piloting", this::createAdvancementPilotingSkillsTab,
-                "advancementParentTab", "skillsContentTabs", "1pilotingSkillsTab");
-        registerDirectRoute("advancement.skills.support", this::createAdvancementSupportSkillsTab,
-                "advancementParentTab", "skillsContentTabs", "2supportSkillsTab");
-        registerDirectRoute("advancement.skills.utility", this::createAdvancementUtilitySkillsTab,
-                "advancementParentTab", "skillsContentTabs", "3utilitySkillsTab");
-        registerDirectRoute("advancement.skills.roleplay", this::createAdvancementRoleplaySkillsTab,
-                "advancementParentTab", "skillsContentTabs", "4roleplaySkillsTab");
-        registerParentRoute("advancement.abilities", "advancementParentTab", "abilityContentTabs");
-        registerDirectRoute("advancement.abilities.combat", this::createAdvancementCombatAbilitiesTab,
-                "advancementParentTab", "abilityContentTabs", "0combatAbilitiesTab");
-        registerDirectRoute("advancement.abilities.maneuvering", this::createAdvancementManeuveringAbilitiesTab,
-                "advancementParentTab", "abilityContentTabs", "1maneuveringAbilitiesTab");
-        registerDirectRoute("advancement.abilities.utility", this::createAdvancementUtilityAbilitiesTab,
-                "advancementParentTab", "abilityContentTabs", "2utilityAbilitiesTab");
-        registerDirectRoute("advancement.abilities.character-flaws", this::createAdvancementCharacterFlawsTab,
-                "advancementParentTab", "abilityContentTabs", "3characterFlawsTab");
+                "advancementCategory", "awardsAndRandomizationCategory", "2recruitmentBonusesPage");
+        registerParentRoute("advancement.skills", "advancementCategory", "skillsCategory");
+        registerDirectRoute("advancement.skills.gunnery", this::createAdvancementGunnerySkillsPage,
+                "advancementCategory", "skillsCategory", "0gunnerySkillsPage");
+        registerDirectRoute("advancement.skills.piloting", this::createAdvancementPilotingSkillsPage,
+                "advancementCategory", "skillsCategory", "1pilotingSkillsPage");
+        registerDirectRoute("advancement.skills.support", this::createAdvancementSupportSkillsPage,
+                "advancementCategory", "skillsCategory", "2supportSkillsPage");
+        registerDirectRoute("advancement.skills.utility", this::createAdvancementUtilitySkillsPage,
+                "advancementCategory", "skillsCategory", "3utilitySkillsPage");
+        registerDirectRoute("advancement.skills.roleplay", this::createAdvancementRoleplaySkillsPage,
+                "advancementCategory", "skillsCategory", "4roleplaySkillsPage");
+        registerParentRoute("advancement.abilities", "advancementCategory", "abilityCategory");
+        registerDirectRoute("advancement.abilities.combat", this::createAdvancementCombatAbilitiesPage,
+                "advancementCategory", "abilityCategory", "0combatAbilitiesPage");
+        registerDirectRoute("advancement.abilities.maneuvering", this::createAdvancementManeuveringAbilitiesPage,
+                "advancementCategory", "abilityCategory", "1maneuveringAbilitiesPage");
+        registerDirectRoute("advancement.abilities.utility", this::createAdvancementUtilityAbilitiesPage,
+                "advancementCategory", "abilityCategory", "2utilityAbilitiesPage");
+        registerDirectRoute("advancement.abilities.character-flaws", this::createAdvancementCharacterFlawsPage,
+                "advancementCategory", "abilityCategory", "3characterFlawsPage");
         registerDirectRoute("advancement.abilities.character-creation-only",
-                this::createAdvancementCharacterCreationOnlyTab,
-                "advancementParentTab", "abilityContentTabs", "4characterCreationOnlyTab");
+                this::createAdvancementCharacterCreationOnlyPage,
+                "advancementCategory", "abilityCategory", "4characterCreationOnlyPage");
 
-        registerParentRoute("logistics", "logisticsAndMaintenanceParentTab");
-        registerParentRoute("logistics.repairs-and-maintenance", "logisticsAndMaintenanceParentTab",
-                "repairsAndMaintenanceContentTabs");
-        registerDirectRoute("logistics.repairs-and-maintenance.repairs", this::createLogisticsRepairsTab,
-                "logisticsAndMaintenanceParentTab", "repairsAndMaintenanceContentTabs", "repairTab");
-        registerDirectRoute("logistics.repairs-and-maintenance.maintenance", this::createLogisticsMaintenanceTab,
-                "logisticsAndMaintenanceParentTab", "repairsAndMaintenanceContentTabs", "maintenanceTab");
-        registerParentRoute("logistics.supplies-and-acquisition", "logisticsAndMaintenanceParentTab",
-                "suppliesAndAcquisitionContentTabs");
-        registerDirectRoute("logistics.supplies-and-acquisition.acquisition", this::createLogisticsAcquisitionTab,
-                "logisticsAndMaintenanceParentTab", "suppliesAndAcquisitionContentTabs", "acquisitionTab");
+        registerParentRoute("logistics", "logisticsAndMaintenanceCategory");
+        registerParentRoute("logistics.repairs-and-maintenance", "logisticsAndMaintenanceCategory",
+                "repairsAndMaintenanceCategory");
+        registerDirectRoute("logistics.repairs-and-maintenance.repairs", this::createLogisticsRepairsPage,
+                "logisticsAndMaintenanceCategory", "repairsAndMaintenanceCategory", "repairPage");
+        registerDirectRoute("logistics.repairs-and-maintenance.maintenance", this::createLogisticsMaintenancePage,
+                "logisticsAndMaintenanceCategory", "repairsAndMaintenanceCategory", "maintenancePage");
+        registerParentRoute("logistics.supplies-and-acquisition", "logisticsAndMaintenanceCategory",
+                "suppliesAndAcquisitionCategory");
+        registerDirectRoute("logistics.supplies-and-acquisition.acquisition", this::createLogisticsAcquisitionPage,
+                "logisticsAndMaintenanceCategory", "suppliesAndAcquisitionCategory", "acquisitionPage");
         registerDirectRoute("logistics.supplies-and-acquisition.planetary-acquisition",
-                this::createLogisticsPlanetaryAcquisitionTab,
-                "logisticsAndMaintenanceParentTab", "suppliesAndAcquisitionContentTabs",
-                "planetaryAcquisitionTab");
-        registerDirectRoute("logistics.supplies-and-acquisition.tech-limits", this::createLogisticsTechLimitsTab,
-                "logisticsAndMaintenanceParentTab", "suppliesAndAcquisitionContentTabs", "techLimitsTab");
+                this::createLogisticsPlanetaryAcquisitionPage,
+                "logisticsAndMaintenanceCategory", "suppliesAndAcquisitionCategory",
+                "planetaryAcquisitionPage");
+        registerDirectRoute("logistics.supplies-and-acquisition.tech-limits", this::createLogisticsTechLimitsPage,
+                "logisticsAndMaintenanceCategory", "suppliesAndAcquisitionCategory", "techLimitsPage");
 
-        registerParentRoute("operations", "strategicOperationsParentTab");
-        registerParentRoute("operations.finances", "strategicOperationsParentTab", "financesContentTabs");
-        registerDirectRoute("operations.finances.general", this::createOperationsFinancesGeneralTab,
-                "strategicOperationsParentTab", "financesContentTabs", "financesGeneralTab");
-        registerDirectRoute("operations.finances.price-multipliers", this::createOperationsPriceMultipliersTab,
-                "strategicOperationsParentTab", "financesContentTabs", "priceMultipliersTab");
-        registerParentRoute("operations.markets", "strategicOperationsParentTab", "marketsContentTabs");
-        registerDirectRoute("operations.markets.personnel", this::createOperationsPersonnelMarketTab,
-                "strategicOperationsParentTab", "marketsContentTabs", "personnelMarketTab");
-        registerDirectRoute("operations.markets.units", this::createOperationsUnitMarketTab,
-                "strategicOperationsParentTab", "marketsContentTabs", "unitMarketTab");
-        registerDirectRoute("operations.markets.contracts", this::createOperationsContractMarketTab,
-                "strategicOperationsParentTab", "marketsContentTabs", "contractMarketTab");
-        registerParentRoute("operations.systems", "strategicOperationsParentTab", "systemsContentTabs");
-        registerDirectRoute("operations.systems.reputation", this::createOperationsReputationTab,
-                "strategicOperationsParentTab", "systemsContentTabs", "reputationTab");
-        registerDirectRoute("operations.systems.faction-standing", this::createOperationsFactionStandingTab,
-                "strategicOperationsParentTab", "systemsContentTabs", "factionStandingTab");
-        registerDirectRoute("operations.systems.a-time-of-war", this::createOperationsATimeOfWarTab,
-                "strategicOperationsParentTab", "systemsContentTabs", "atowTab");
-        registerParentRoute("operations.rulesets", "strategicOperationsParentTab", "rulesetsContentTabs");
-        registerDirectRoute("operations.rulesets.stratcon", this::createOperationsStratConTab,
-                "strategicOperationsParentTab", "rulesetsContentTabs", "stratConGeneralTab");
+        registerParentRoute("operations", "strategicOperationsCategory");
+        registerParentRoute("operations.finances", "strategicOperationsCategory", "financesCategory");
+        registerDirectRoute("operations.finances.general", this::createOperationsFinancesGeneralPage,
+                "strategicOperationsCategory", "financesCategory", "financesGeneralPage");
+        registerDirectRoute("operations.finances.price-multipliers", this::createOperationsPriceMultipliersPage,
+                "strategicOperationsCategory", "financesCategory", "priceMultipliersPage");
+        registerParentRoute("operations.markets", "strategicOperationsCategory", "marketsCategory");
+        registerDirectRoute("operations.markets.personnel", this::createOperationsPersonnelMarketPage,
+                "strategicOperationsCategory", "marketsCategory", "personnelMarketPage");
+        registerDirectRoute("operations.markets.units", this::createOperationsUnitMarketPage,
+                "strategicOperationsCategory", "marketsCategory", "unitMarketPage");
+        registerDirectRoute("operations.markets.contracts", this::createOperationsContractMarketPage,
+                "strategicOperationsCategory", "marketsCategory", "contractMarketPage");
+        registerParentRoute("operations.systems", "strategicOperationsCategory", "systemsCategory");
+        registerDirectRoute("operations.systems.reputation", this::createOperationsReputationPage,
+                "strategicOperationsCategory", "systemsCategory", "reputationPage");
+        registerDirectRoute("operations.systems.faction-standing", this::createOperationsFactionStandingPage,
+                "strategicOperationsCategory", "systemsCategory", "factionStandingPage");
+        registerDirectRoute("operations.systems.a-time-of-war", this::createOperationsATimeOfWarPage,
+                "strategicOperationsCategory", "systemsCategory", "atowPage");
+        registerParentRoute("operations.rulesets", "strategicOperationsCategory", "rulesetsCategory");
+        registerDirectRoute("operations.rulesets.stratcon", this::createOperationsStratConPage,
+                "strategicOperationsCategory", "rulesetsCategory", "stratConGeneralPage");
 
     }
 
@@ -475,23 +469,23 @@ public class CampaignOptionsPane extends JPanel {
 
     private void ensureSectionLoaded(String topLevelResourceName) {
         switch (topLevelResourceName) {
-            case "humanResourcesParentTab" -> {
-                if (personnelTab == null) {
+            case "humanResourcesCategory" -> {
+                if (personnelPage == null) {
                     initializeHumanResourcesSection();
                 }
             }
-            case "advancementParentTab" -> {
-                if (advancementTab == null) {
+            case "advancementCategory" -> {
+                if (advancementPage == null) {
                     initializeAdvancementSection();
                 }
             }
-            case "logisticsAndMaintenanceParentTab" -> {
-                if (equipmentAndSuppliesTab == null) {
+            case "logisticsAndMaintenanceCategory" -> {
+                if (equipmentAndSuppliesPage == null) {
                     initializeLogisticsSection();
                 }
             }
-            case "strategicOperationsParentTab" -> {
-                if (financesTab == null) {
+            case "strategicOperationsCategory" -> {
+                if (financesPage == null) {
                     initializeOperationsSection();
                 }
             }
@@ -502,36 +496,36 @@ public class CampaignOptionsPane extends JPanel {
     }
 
     private void ensureAllSectionsLoaded() {
-        ensureSectionLoaded("humanResourcesParentTab");
-        ensureSectionLoaded("advancementParentTab");
-        ensureSectionLoaded("logisticsAndMaintenanceParentTab");
-        ensureSectionLoaded("strategicOperationsParentTab");
+        ensureSectionLoaded("humanResourcesCategory");
+        ensureSectionLoaded("advancementCategory");
+        ensureSectionLoaded("logisticsAndMaintenanceCategory");
+        ensureSectionLoaded("strategicOperationsCategory");
     }
 
     private void initializeHumanResourcesSection() {
-        personnelTab = new PersonnelTab(campaignOptions);
-        biographyTab = new BiographyTab(campaign, generalTab);
-        relationshipsTab = new RelationshipsTab(campaignOptions);
-        salariesTab = new SalariesTab(campaignOptions);
-        turnoverAndRetentionTab = new TurnoverAndRetentionTab(campaignOptions);
+        personnelPage = new PersonnelPage(campaignOptions);
+        biographyPage = new BiographyPage(campaign, generalPage);
+        relationshipsPage = new RelationshipsPage(campaignOptions);
+        salariesPage = new SalariesPage(campaignOptions);
+        turnoverAndRetentionPage = new TurnoverAndRetentionPage(campaignOptions);
     }
 
     private void initializeAdvancementSection() {
-        advancementTab = new AdvancementTab(campaign);
-        skillsTab = new SkillsTab(campaignOptions);
-        abilitiesTab = new AbilitiesTab();
+        advancementPage = new AdvancementPage(campaign);
+        skillsPage = new SkillsPage(campaignOptions);
+        abilitiesPage = new AbilitiesPage();
     }
 
     private void initializeLogisticsSection() {
-        repairAndMaintenanceTab = new RepairAndMaintenanceTab(campaignOptions);
-        equipmentAndSuppliesTab = new EquipmentAndSuppliesTab(campaignOptions);
+        repairAndMaintenancePage = new RepairAndMaintenancePage(campaignOptions);
+        equipmentAndSuppliesPage = new EquipmentAndSuppliesPage(campaignOptions);
     }
 
     private void initializeOperationsSection() {
-        financesTab = new FinancesTab(campaign);
-        marketsTab = new MarketsTab(campaign);
-        systemsTab = new SystemsTab(campaign);
-        rulesetsTab = new RulesetsTab(campaignOptions);
+        financesPage = new FinancesPage(campaign);
+        marketsPage = new MarketsPage(campaign);
+        systemsPage = new SystemsPage(campaign);
+        rulesetsPage = new RulesetsPage(campaignOptions);
     }
 
     private void registerParentRoute(String id, String... titleResourceNames) {
@@ -633,249 +627,249 @@ public class CampaignOptionsPane extends JPanel {
      *
      * @param mode the state in which the dialog was triggered.
      *
-     * @return a {@link JScrollPane} containing the general tab panel
+     * @return a {@link JScrollPane} containing the general page panel
      */
-    private JPanel createGeneralTab(CampaignOptionsDialogMode mode) {
-        generalTab = new GeneralTab(campaign, frame, mode);
-        JPanel createdGeneralTab = generalTab.createGeneralTab();
-        generalTab.loadValuesFromCampaignOptions();
+    private JPanel createGeneralPage(CampaignOptionsDialogMode mode) {
+        generalPage = new GeneralPage(campaign, frame, mode);
+        JPanel createdGeneralPage = generalPage.createGeneralPage();
+        generalPage.loadValuesFromCampaignOptions();
 
-        return createdGeneralTab;
+        return createdGeneralPage;
     }
 
-    private JPanel createPersonnelGeneralTab() {
-        ensureSectionLoaded("humanResourcesParentTab");
-        return personnelTab.createGeneralTab();
+    private JPanel createPersonnelGeneralPage() {
+        ensureSectionLoaded("humanResourcesCategory");
+        return personnelPage.createGeneralPage();
     }
 
-    private JPanel createPersonnelAwardsTab() {
-        ensureSectionLoaded("humanResourcesParentTab");
-        return personnelTab.createAwardsTab();
+    private JPanel createPersonnelAwardsPage() {
+        ensureSectionLoaded("humanResourcesCategory");
+        return personnelPage.createAwardsPage();
     }
 
-    private JPanel createPersonnelMedicalTab() {
-        ensureSectionLoaded("humanResourcesParentTab");
-        return personnelTab.createMedicalTab();
+    private JPanel createPersonnelMedicalPage() {
+        ensureSectionLoaded("humanResourcesCategory");
+        return personnelPage.createMedicalPage();
     }
 
-    private JPanel createPersonnelInformationTab() {
-        ensureSectionLoaded("humanResourcesParentTab");
-        return personnelTab.createPersonnelInformationTab();
+    private JPanel createPersonnelInformationPage() {
+        ensureSectionLoaded("humanResourcesCategory");
+        return personnelPage.createPersonnelInformationPage();
     }
 
-    private JPanel createPersonnelPrisonersAndDependentsTab() {
-        ensureSectionLoaded("humanResourcesParentTab");
-        return personnelTab.createPrisonersAndDependentsTab();
+    private JPanel createPersonnelPrisonersAndDependentsPage() {
+        ensureSectionLoaded("humanResourcesCategory");
+        return personnelPage.createPrisonersAndDependentsPage();
     }
 
-    private JPanel createBiographyGeneralTab() {
-        ensureSectionLoaded("humanResourcesParentTab");
-        return biographyTab.createGeneralTab();
+    private JPanel createBiographyGeneralPage() {
+        ensureSectionLoaded("humanResourcesCategory");
+        return biographyPage.createGeneralPage();
     }
 
-    private JPanel createBiographyBackgroundsTab() {
-        ensureSectionLoaded("humanResourcesParentTab");
-        return biographyTab.createBackgroundsTab();
+    private JPanel createBiographyBackgroundsPage() {
+        ensureSectionLoaded("humanResourcesCategory");
+        return biographyPage.createBackgroundsPage();
     }
 
-    private JPanel createBiographyDeathTab() {
-        ensureSectionLoaded("humanResourcesParentTab");
-        return biographyTab.createDeathTab();
+    private JPanel createBiographyDeathPage() {
+        ensureSectionLoaded("humanResourcesCategory");
+        return biographyPage.createDeathPage();
     }
 
-    private JPanel createBiographyEducationTab() {
-        ensureSectionLoaded("humanResourcesParentTab");
-        return biographyTab.createEducationTab();
+    private JPanel createBiographyEducationPage() {
+        ensureSectionLoaded("humanResourcesCategory");
+        return biographyPage.createEducationPage();
     }
 
-    private JPanel createBiographyNameAndPortraitGenerationTab() {
-        ensureSectionLoaded("humanResourcesParentTab");
-        return biographyTab.createNameAndPortraitGenerationTab();
+    private JPanel createBiographyNameAndPortraitGenerationPage() {
+        ensureSectionLoaded("humanResourcesCategory");
+        return biographyPage.createNameAndPortraitGenerationPage();
     }
 
-    private JPanel createBiographyRankTab() {
-        ensureSectionLoaded("humanResourcesParentTab");
-        return biographyTab.createRankTab();
+    private JPanel createBiographyRankPage() {
+        ensureSectionLoaded("humanResourcesCategory");
+        return biographyPage.createRankPage();
     }
 
-    private JPanel createRelationshipMarriageTab() {
-        ensureSectionLoaded("humanResourcesParentTab");
-        return relationshipsTab.createMarriageTab();
+    private JPanel createRelationshipMarriagePage() {
+        ensureSectionLoaded("humanResourcesCategory");
+        return relationshipsPage.createMarriagePage();
     }
 
-    private JPanel createRelationshipDivorceTab() {
-        ensureSectionLoaded("humanResourcesParentTab");
-        return relationshipsTab.createDivorceTab();
+    private JPanel createRelationshipDivorcePage() {
+        ensureSectionLoaded("humanResourcesCategory");
+        return relationshipsPage.createDivorcePage();
     }
 
-    private JPanel createRelationshipProcreationTab() {
-        ensureSectionLoaded("humanResourcesParentTab");
-        return relationshipsTab.createProcreationTab();
+    private JPanel createRelationshipProcreationPage() {
+        ensureSectionLoaded("humanResourcesCategory");
+        return relationshipsPage.createProcreationPage();
     }
 
-    private JPanel createCombatSalariesTab() {
-        ensureSectionLoaded("humanResourcesParentTab");
-        return salariesTab.createSalariesTab(PersonnelRoleSubType.COMBAT);
+    private JPanel createCombatSalariesPage() {
+        ensureSectionLoaded("humanResourcesCategory");
+        return salariesPage.createSalariesPage(PersonnelRoleSubType.COMBAT);
     }
 
-    private JPanel createSupportSalariesTab() {
-        ensureSectionLoaded("humanResourcesParentTab");
-        return salariesTab.createSalariesTab(PersonnelRoleSubType.SUPPORT);
+    private JPanel createSupportSalariesPage() {
+        ensureSectionLoaded("humanResourcesCategory");
+        return salariesPage.createSalariesPage(PersonnelRoleSubType.SUPPORT);
     }
 
-    private JPanel createCivilianSalariesTab() {
-        ensureSectionLoaded("humanResourcesParentTab");
-        return salariesTab.createSalariesTab(PersonnelRoleSubType.CIVILIAN);
+    private JPanel createCivilianSalariesPage() {
+        ensureSectionLoaded("humanResourcesCategory");
+        return salariesPage.createSalariesPage(PersonnelRoleSubType.CIVILIAN);
     }
 
-    private JPanel createTurnoverAndRetentionTurnoverTab() {
-        ensureSectionLoaded("humanResourcesParentTab");
-        return turnoverAndRetentionTab.createTurnoverTab();
+    private JPanel createTurnoverAndRetentionTurnoverPage() {
+        ensureSectionLoaded("humanResourcesCategory");
+        return turnoverAndRetentionPage.createTurnoverPage();
     }
 
-    private JPanel createTurnoverAndRetentionFatigueTab() {
-        ensureSectionLoaded("humanResourcesParentTab");
-        return turnoverAndRetentionTab.createFatigueTab();
+    private JPanel createTurnoverAndRetentionFatiguePage() {
+        ensureSectionLoaded("humanResourcesCategory");
+        return turnoverAndRetentionPage.createFatiguePage();
     }
 
-    private JPanel createAdvancementRandomizationTab() {
-        ensureSectionLoaded("advancementParentTab");
-        return advancementTab.skillRandomizationTab();
+    private JPanel createAdvancementRandomizationPage() {
+        ensureSectionLoaded("advancementCategory");
+        return advancementPage.skillRandomizationPage();
     }
 
-    private JPanel createAdvancementXpAwardsTab() {
-        ensureSectionLoaded("advancementParentTab");
-        return advancementTab.xpAwardsTab();
+    private JPanel createAdvancementXpAwardsPage() {
+        ensureSectionLoaded("advancementCategory");
+        return advancementPage.xpAwardsPage();
     }
 
-    private JPanel createAdvancementRecruitmentBonusesTab() {
-        ensureSectionLoaded("advancementParentTab");
-        return advancementTab.recruitmentBonusesTab();
+    private JPanel createAdvancementRecruitmentBonusesPage() {
+        ensureSectionLoaded("advancementCategory");
+        return advancementPage.recruitmentBonusesPage();
     }
 
-    private JPanel createAdvancementGunnerySkillsTab() {
-        ensureSectionLoaded("advancementParentTab");
-        return skillsTab.createSkillsTab(COMBAT_GUNNERY);
+    private JPanel createAdvancementGunnerySkillsPage() {
+        ensureSectionLoaded("advancementCategory");
+        return skillsPage.createSkillsPage(COMBAT_GUNNERY);
     }
 
-    private JPanel createAdvancementPilotingSkillsTab() {
-        ensureSectionLoaded("advancementParentTab");
-        return skillsTab.createSkillsTab(COMBAT_PILOTING);
+    private JPanel createAdvancementPilotingSkillsPage() {
+        ensureSectionLoaded("advancementCategory");
+        return skillsPage.createSkillsPage(COMBAT_PILOTING);
     }
 
-    private JPanel createAdvancementSupportSkillsTab() {
-        ensureSectionLoaded("advancementParentTab");
-        return skillsTab.createSkillsTab(SUPPORT);
+    private JPanel createAdvancementSupportSkillsPage() {
+        ensureSectionLoaded("advancementCategory");
+        return skillsPage.createSkillsPage(SUPPORT);
     }
 
-    private JPanel createAdvancementUtilitySkillsTab() {
-        ensureSectionLoaded("advancementParentTab");
-        return skillsTab.createSkillsTab(UTILITY);
+    private JPanel createAdvancementUtilitySkillsPage() {
+        ensureSectionLoaded("advancementCategory");
+        return skillsPage.createSkillsPage(UTILITY);
     }
 
-    private JPanel createAdvancementRoleplaySkillsTab() {
-        ensureSectionLoaded("advancementParentTab");
-        return skillsTab.createSkillsTab(ROLEPLAY_GENERAL);
+    private JPanel createAdvancementRoleplaySkillsPage() {
+        ensureSectionLoaded("advancementCategory");
+        return skillsPage.createSkillsPage(ROLEPLAY_GENERAL);
     }
 
-    private JPanel createAdvancementCombatAbilitiesTab() {
-        ensureSectionLoaded("advancementParentTab");
-        return abilitiesTab.createAbilitiesTab(COMBAT_ABILITY);
+    private JPanel createAdvancementCombatAbilitiesPage() {
+        ensureSectionLoaded("advancementCategory");
+        return abilitiesPage.createAbilitiesPage(COMBAT_ABILITY);
     }
 
-    private JPanel createAdvancementManeuveringAbilitiesTab() {
-        ensureSectionLoaded("advancementParentTab");
-        return abilitiesTab.createAbilitiesTab(MANEUVERING_ABILITY);
+    private JPanel createAdvancementManeuveringAbilitiesPage() {
+        ensureSectionLoaded("advancementCategory");
+        return abilitiesPage.createAbilitiesPage(MANEUVERING_ABILITY);
     }
 
-    private JPanel createAdvancementUtilityAbilitiesTab() {
-        ensureSectionLoaded("advancementParentTab");
-        return abilitiesTab.createAbilitiesTab(UTILITY_ABILITY);
+    private JPanel createAdvancementUtilityAbilitiesPage() {
+        ensureSectionLoaded("advancementCategory");
+        return abilitiesPage.createAbilitiesPage(UTILITY_ABILITY);
     }
 
-    private JPanel createAdvancementCharacterFlawsTab() {
-        ensureSectionLoaded("advancementParentTab");
-        return abilitiesTab.createAbilitiesTab(CHARACTER_FLAW);
+    private JPanel createAdvancementCharacterFlawsPage() {
+        ensureSectionLoaded("advancementCategory");
+        return abilitiesPage.createAbilitiesPage(CHARACTER_FLAW);
     }
 
-    private JPanel createAdvancementCharacterCreationOnlyTab() {
-        ensureSectionLoaded("advancementParentTab");
-        return abilitiesTab.createAbilitiesTab(CHARACTER_CREATION_ONLY);
+    private JPanel createAdvancementCharacterCreationOnlyPage() {
+        ensureSectionLoaded("advancementCategory");
+        return abilitiesPage.createAbilitiesPage(CHARACTER_CREATION_ONLY);
     }
 
-    private JPanel createLogisticsRepairsTab() {
-        ensureSectionLoaded("logisticsAndMaintenanceParentTab");
-        return repairAndMaintenanceTab.createRepairTab();
+    private JPanel createLogisticsRepairsPage() {
+        ensureSectionLoaded("logisticsAndMaintenanceCategory");
+        return repairAndMaintenancePage.createRepairPage();
     }
 
-    private JPanel createLogisticsMaintenanceTab() {
-        ensureSectionLoaded("logisticsAndMaintenanceParentTab");
-        return repairAndMaintenanceTab.createMaintenanceTab();
+    private JPanel createLogisticsMaintenancePage() {
+        ensureSectionLoaded("logisticsAndMaintenanceCategory");
+        return repairAndMaintenancePage.createMaintenancePage();
     }
 
-    private JPanel createLogisticsAcquisitionTab() {
-        ensureSectionLoaded("logisticsAndMaintenanceParentTab");
-        return equipmentAndSuppliesTab.createAcquisitionTab();
+    private JPanel createLogisticsAcquisitionPage() {
+        ensureSectionLoaded("logisticsAndMaintenanceCategory");
+        return equipmentAndSuppliesPage.createAcquisitionPage();
     }
 
-    private JPanel createLogisticsPlanetaryAcquisitionTab() {
-        ensureSectionLoaded("logisticsAndMaintenanceParentTab");
-        return equipmentAndSuppliesTab.createPlanetaryAcquisitionTab();
+    private JPanel createLogisticsPlanetaryAcquisitionPage() {
+        ensureSectionLoaded("logisticsAndMaintenanceCategory");
+        return equipmentAndSuppliesPage.createPlanetaryAcquisitionPage();
     }
 
-    private JPanel createLogisticsTechLimitsTab() {
-        ensureSectionLoaded("logisticsAndMaintenanceParentTab");
-        return equipmentAndSuppliesTab.createTechLimitsTab();
+    private JPanel createLogisticsTechLimitsPage() {
+        ensureSectionLoaded("logisticsAndMaintenanceCategory");
+        return equipmentAndSuppliesPage.createTechLimitsPage();
     }
 
-    private JPanel createOperationsFinancesGeneralTab() {
-        ensureSectionLoaded("strategicOperationsParentTab");
-        return financesTab.createFinancesGeneralOptionsTab();
+    private JPanel createOperationsFinancesGeneralPage() {
+        ensureSectionLoaded("strategicOperationsCategory");
+        return financesPage.createFinancesGeneralOptionsPage();
     }
 
-    private JPanel createOperationsPriceMultipliersTab() {
-        ensureSectionLoaded("strategicOperationsParentTab");
-        return financesTab.createPriceMultipliersTab();
+    private JPanel createOperationsPriceMultipliersPage() {
+        ensureSectionLoaded("strategicOperationsCategory");
+        return financesPage.createPriceMultipliersPage();
     }
 
-    private JPanel createOperationsPersonnelMarketTab() {
-        ensureSectionLoaded("strategicOperationsParentTab");
-        return marketsTab.createPersonnelMarketTab();
+    private JPanel createOperationsPersonnelMarketPage() {
+        ensureSectionLoaded("strategicOperationsCategory");
+        return marketsPage.createPersonnelMarketPage();
     }
 
-    private JPanel createOperationsUnitMarketTab() {
-        ensureSectionLoaded("strategicOperationsParentTab");
-        return marketsTab.createUnitMarketTab();
+    private JPanel createOperationsUnitMarketPage() {
+        ensureSectionLoaded("strategicOperationsCategory");
+        return marketsPage.createUnitMarketPage();
     }
 
-    private JPanel createOperationsContractMarketTab() {
-        ensureSectionLoaded("strategicOperationsParentTab");
-        return marketsTab.createContractMarketTab();
+    private JPanel createOperationsContractMarketPage() {
+        ensureSectionLoaded("strategicOperationsCategory");
+        return marketsPage.createContractMarketPage();
     }
 
-    private JPanel createOperationsReputationTab() {
-        ensureSectionLoaded("strategicOperationsParentTab");
-        return systemsTab.createReputationTab();
+    private JPanel createOperationsReputationPage() {
+        ensureSectionLoaded("strategicOperationsCategory");
+        return systemsPage.createReputationPage();
     }
 
-    private JPanel createOperationsFactionStandingTab() {
-        ensureSectionLoaded("strategicOperationsParentTab");
-        return systemsTab.createFactionStandingTab();
+    private JPanel createOperationsFactionStandingPage() {
+        ensureSectionLoaded("strategicOperationsCategory");
+        return systemsPage.createFactionStandingPage();
     }
 
-    private JPanel createOperationsATimeOfWarTab() {
-        ensureSectionLoaded("strategicOperationsParentTab");
-        return systemsTab.createATOWTab();
+    private JPanel createOperationsATimeOfWarPage() {
+        ensureSectionLoaded("strategicOperationsCategory");
+        return systemsPage.createATOWPage();
     }
 
-    private JPanel createOperationsStratConTab() {
-        ensureSectionLoaded("strategicOperationsParentTab");
-        return rulesetsTab.createStratConTab();
+    private JPanel createOperationsStratConPage() {
+        ensureSectionLoaded("strategicOperationsCategory");
+        return rulesetsPage.createStratConPage();
     }
 
     /**
      * Applies the currently configured campaign options to the active
-     * {@link Campaign}. This method processes all tabs
+     * {@link Campaign}. This method processes all pages
      * in the dialog, applying the options to the campaign in logical order (e.g.,
      * "General" first, followed by other
      * categories).
@@ -906,40 +900,40 @@ public class CampaignOptionsPane extends JPanel {
         CampaignOptionsFreebieTracker oldCampaignOptions = new CampaignOptionsFreebieTracker(
                 campaign.getCampaignOptions());
 
-        // Everything assumes general tab will be the first applied.
+        // Everything assumes general page will be the first applied.
         // While this shouldn't break anything, it's not worth moving around.
-        // For all other tabs, it makes sense to apply them in the order they
+        // For all other pages, it makes sense to apply them in the order they
         // appear in the dialog; however, this shouldn't make any major difference.
-        generalTab.applyCampaignOptionsToCampaign(isStartUp, isSaveAction);
+        generalPage.applyCampaignOptionsToCampaign(isStartUp, isSaveAction);
 
         // Human Resources
-        if (personnelTab != null) {
-            personnelTab.applyCampaignOptionsToCampaign(campaign, options);
-            biographyTab.applyCampaignOptionsToCampaign(options);
-            relationshipsTab.applyCampaignOptionsToCampaign(options);
-            salariesTab.applyCampaignOptionsToCampaign(options);
-            turnoverAndRetentionTab.applyCampaignOptionsToCampaign(options);
+        if (personnelPage != null) {
+            personnelPage.applyCampaignOptionsToCampaign(campaign, options);
+            biographyPage.applyCampaignOptionsToCampaign(options);
+            relationshipsPage.applyCampaignOptionsToCampaign(options);
+            salariesPage.applyCampaignOptionsToCampaign(options);
+            turnoverAndRetentionPage.applyCampaignOptionsToCampaign(options);
         }
 
         // Advancement
-        if (advancementTab != null) {
-            advancementTab.applyCampaignOptionsToCampaign(options, presetRandomSkillPreferences);
-            skillsTab.applyCampaignOptionsToCampaign(options, presetSkills);
-            abilitiesTab.applyCampaignOptionsToCampaign(preset);
+        if (advancementPage != null) {
+            advancementPage.applyCampaignOptionsToCampaign(options, presetRandomSkillPreferences);
+            skillsPage.applyCampaignOptionsToCampaign(options, presetSkills);
+            abilitiesPage.applyCampaignOptionsToCampaign(preset);
         }
 
         // Logistics
-        if (equipmentAndSuppliesTab != null) {
-            equipmentAndSuppliesTab.applyCampaignOptionsToCampaign(options);
-            repairAndMaintenanceTab.applyCampaignOptionsToCampaign(options);
+        if (equipmentAndSuppliesPage != null) {
+            equipmentAndSuppliesPage.applyCampaignOptionsToCampaign(options);
+            repairAndMaintenancePage.applyCampaignOptionsToCampaign(options);
         }
 
         // Operations
-        if (financesTab != null) {
-            financesTab.applyCampaignOptionsToCampaign(options);
-            marketsTab.applyCampaignOptionsToCampaign(options);
-            rulesetsTab.applyCampaignOptionsToCampaign(options);
-            systemsTab.applyCampaignOptionsToCampaign(options, presetRandomSkillPreferences);
+        if (financesPage != null) {
+            financesPage.applyCampaignOptionsToCampaign(options);
+            marketsPage.applyCampaignOptionsToCampaign(options);
+            rulesetsPage.applyCampaignOptionsToCampaign(options);
+            systemsPage.applyCampaignOptionsToCampaign(options, presetRandomSkillPreferences);
         }
 
         // Tidy up
@@ -1181,9 +1175,9 @@ public class CampaignOptionsPane extends JPanel {
     }
 
     /**
-     * Applies the values from a {@link CampaignPreset} to all tabs in the dialog.
+     * Applies the values from a {@link CampaignPreset} to all pages in the dialog.
      * This propagates preset-specific
-     * configuration to all associated components and sub-tabs, including
+     * configuration to all associated components and sub-pages, including
      * campaign-related properties such as dates,
      * factions, and skills.
      *
@@ -1207,31 +1201,31 @@ public class CampaignOptionsPane extends JPanel {
             presetFaction = campaignPreset.getFaction();
         }
 
-        generalTab.loadValuesFromCampaignOptions(presetDate, presetFaction);
+        generalPage.loadValuesFromCampaignOptions(presetDate, presetFaction);
 
         // Human Resources
-        personnelTab.loadValuesFromCampaignOptions(presetCampaignOptions, campaign.getVersion());
-        biographyTab.loadValuesFromCampaignOptions(presetCampaignOptions,
+        personnelPage.loadValuesFromCampaignOptions(presetCampaignOptions, campaign.getVersion());
+        biographyPage.loadValuesFromCampaignOptions(presetCampaignOptions,
                 presetCampaignOptions.getRandomOriginOptions(),
                 campaignPreset.getRankSystem());
-        relationshipsTab.loadValuesFromCampaignOptions(presetCampaignOptions);
-        turnoverAndRetentionTab.loadValuesFromCampaignOptions(presetCampaignOptions);
+        relationshipsPage.loadValuesFromCampaignOptions(presetCampaignOptions);
+        turnoverAndRetentionPage.loadValuesFromCampaignOptions(presetCampaignOptions);
 
         // Advancement
-        advancementTab.loadValuesFromCampaignOptions(presetCampaignOptions,
+        advancementPage.loadValuesFromCampaignOptions(presetCampaignOptions,
                 campaignPreset.getRandomSkillPreferences());
-        skillsTab.loadValuesFromCampaignOptions(presetCampaignOptions, campaignPreset.getSkills());
-        // The ability tab is a special case, so handled differently to other tabs
-        abilitiesTab.buildAllAbilityInfo(campaignPreset.getSpecialAbilities());
+        skillsPage.loadValuesFromCampaignOptions(presetCampaignOptions, campaignPreset.getSkills());
+        // The ability page is a special case, so handled differently to other pages
+        abilitiesPage.buildAllAbilityInfo(campaignPreset.getSpecialAbilities());
 
         // Logistics
-        equipmentAndSuppliesTab.loadValuesFromCampaignOptions(presetCampaignOptions);
-        repairAndMaintenanceTab.loadValuesFromCampaignOptions(presetCampaignOptions);
+        equipmentAndSuppliesPage.loadValuesFromCampaignOptions(presetCampaignOptions);
+        repairAndMaintenancePage.loadValuesFromCampaignOptions(presetCampaignOptions);
 
         // Operations
-        financesTab.loadValuesFromCampaignOptions(presetCampaignOptions);
-        marketsTab.loadValuesFromCampaignOptions(presetCampaignOptions);
-        rulesetsTab.loadValuesFromCampaignOptions(presetCampaignOptions);
-        systemsTab.loadValuesFromCampaignOptions(presetCampaignOptions, campaignPreset.getRandomSkillPreferences());
+        financesPage.loadValuesFromCampaignOptions(presetCampaignOptions);
+        marketsPage.loadValuesFromCampaignOptions(presetCampaignOptions);
+        rulesetsPage.loadValuesFromCampaignOptions(presetCampaignOptions);
+        systemsPage.loadValuesFromCampaignOptions(presetCampaignOptions, campaignPreset.getRandomSkillPreferences());
     }
 }

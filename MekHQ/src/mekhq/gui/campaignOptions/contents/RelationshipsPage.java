@@ -62,29 +62,29 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 
 /**
- * Represents a tab in the campaign options UI for configuring
+ * Represents a page in the campaign options UI for configuring
  * relationship-related options, such as marriage, divorce,
  * and procreation settings.
  * <p>
- * This tab allows users to manage manual and random settings for the
+ * This page allows users to manage manual and random settings for the
  * relationships between personnel in a campaign,
  * applying user-defined rules and configurations. The class generates UI
  * components for the respective configurations
  * and interacts with {@link CampaignOptions} to store and apply these settings.
  * </p>
  * <p>
- * The tab is divided into three main sections:
+ * The page is divided into three main sections:
  * </p>
  * <ul>
- * <li>Marriage Tab: Manages configurations for manual and random marriage
+ * <li>Marriage Page: Manages configurations for manual and random marriage
  * settings.</li>
- * <li>Divorce Tab: Manages configurations for manual and random divorce
+ * <li>Divorce Page: Manages configurations for manual and random divorce
  * settings.</li>
- * <li>Procreation Tab: Manages configurations for manual and random procreation
+ * <li>Procreation Page: Manages configurations for manual and random procreation
  * settings.</li>
  * </ul>
  */
-public class RelationshipsTab {
+public class RelationshipsPage {
     private static final int RELATIONSHIPS_LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
     private static final int RELATIONSHIPS_CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
 
@@ -94,7 +94,7 @@ public class RelationshipsTab {
     private boolean divorcePageCreated;
     private boolean procreationPageCreated;
 
-    // start Marriage Tab
+    // start Marriage Page
     private CampaignOptionsHeaderPanel marriageHeader;
     private JPanel pnlMarriageGeneralOptions;
     private JCheckBox chkUseManualMarriages;
@@ -115,9 +115,9 @@ public class RelationshipsTab {
     private JSpinner spnRandomMarriageDiceSize;
     private JLabel lblRandomNewDependentMarriage;
     private JSpinner spnRandomNewDependentMarriage;
-    // end Marriage Tab
+    // end Marriage Page
 
-    // start Divorce Tab
+    // start Divorce Page
     private CampaignOptionsHeaderPanel divorceHeader;
     private JCheckBox chkUseManualDivorce;
     private JCheckBox chkUseClanPersonnelDivorce;
@@ -132,9 +132,9 @@ public class RelationshipsTab {
     private JCheckBox chkUseRandomPrisonerDivorce;
     private JLabel lblRandomDivorceDiceSize;
     private JSpinner spnRandomDivorceDiceSize;
-    // end Divorce Tab
+    // end Divorce Page
 
-    // start Procreation Tab
+    // start Procreation Page
     private JCheckBox chkUseManualProcreation;
     private JCheckBox chkUseClanPersonnelProcreation;
     private JCheckBox chkUsePrisonerProcreation;
@@ -171,16 +171,16 @@ public class RelationshipsTab {
     private JSpinner spnPrefersSameSexDiceSize;
     private JLabel lblPrefersBothSexesDiceSize;
     private JSpinner spnPrefersBothSexesDiceSize;
-    // end Procreation Tab
+    // end Procreation Page
 
     /**
-     * Constructs a {@code RelationshipsTab} instance for configuring
+     * Constructs a {@code RelationshipsPage} instance for configuring
      * relationships-related campaign options.
      *
      * @param campaignOptions the {@link CampaignOptions} instance to be used for
      *                        managing relationship settings.
      */
-    public RelationshipsTab(@Nonnull CampaignOptions campaignOptions) {
+    public RelationshipsPage(@Nonnull CampaignOptions campaignOptions) {
         this.campaignOptions = campaignOptions;
 
         initialize();
@@ -188,21 +188,21 @@ public class RelationshipsTab {
     }
 
     /**
-     * Initializes the various tabs within the RelationshipsTab, including Marriage,
-     * Divorce, and Procreation Tabs.
+     * Initializes the various pages within the RelationshipsPage, including Marriage,
+     * Divorce, and Procreation Pages.
      */
     private void initialize() {
-        initializeMarriageTab();
-        initializeDivorceTab();
-        initializeProcreationTab();
+        initializeMarriagePage();
+        initializeDivorcePage();
+        initializeProcreationPage();
     }
 
     /**
-     * Initializes the Procreation Tab and its components. This tab controls general
+     * Initializes the Procreation Page and its components. This page controls general
      * procreation settings and allows
      * configuring random procreation options.
      */
-    private void initializeProcreationTab() {
+    private void initializeProcreationPage() {
         pnlProcreationGeneralOptionsPanel = new JPanel();
         chkUseManualProcreation = new JCheckBox();
         chkUseClanPersonnelProcreation = new JCheckBox();
@@ -234,11 +234,11 @@ public class RelationshipsTab {
     }
 
     /**
-     * Initializes the Divorce Tab and its components. This tab controls general
+     * Initializes the Divorce Page and its components. This page controls general
      * divorce settings and allows configuring
      * random divorce options.
      */
-    private void initializeDivorceTab() {
+    private void initializeDivorcePage() {
         chkUseManualDivorce = new JCheckBox();
         chkUseClanPersonnelDivorce = new JCheckBox();
         chkUsePrisonerDivorce = new JCheckBox();
@@ -255,11 +255,11 @@ public class RelationshipsTab {
     }
 
     /**
-     * Initializes the Marriage Tab and its components. This tab controls general
+     * Initializes the Marriage Page and its components. This page controls general
      * marriage settings and allows
      * configuring random marriage options.
      */
-    private void initializeMarriageTab() {
+    private void initializeMarriagePage() {
         pnlMarriageGeneralOptions = new JPanel();
         chkUseManualMarriages = new JCheckBox();
         chkUseClanPersonnelMarriages = new JCheckBox();
@@ -296,22 +296,22 @@ public class RelationshipsTab {
     }
 
     /**
-     * Creates the UI for the Marriage Tab, including components for managing manual
+     * Creates the UI for the Marriage Page, including components for managing manual
      * and random marriage options.
      *
-     * @return a {@link JPanel} representing the Marriage Tab.
+     * @return a {@link JPanel} representing the Marriage Page.
      */
-    public @Nonnull JPanel createMarriageTab() {
+    public @Nonnull JPanel createMarriagePage() {
         // Header
         String imageAddress = getImageDirectory() + "logo_morgrains_valkyrate.png";
-        marriageHeader = new CampaignOptionsHeaderPanel("MarriageTab", imageAddress);
+        marriageHeader = new CampaignOptionsHeaderPanel("MarriagePage", imageAddress);
 
         // Contents
         pnlMarriageGeneralOptions = createMarriageGeneralOptionsPanel();
         pnlRandomMarriage = createRandomMarriagePanel();
-        JPanel panel = CampaignOptionsPagePanel.builder("MarriageTab", "MarriageTab", imageAddress)
+        JPanel panel = CampaignOptionsPagePanel.builder("MarriagePage", "MarriagePage", imageAddress)
                 .header(marriageHeader)
-                .quote("marriageTab")
+                .quote("marriagePage")
                 .section("lblMarriageGeneralOptionsPanel.text",
                         "lblMarriageGeneralOptionsPanel.summary",
                         pnlMarriageGeneralOptions)
@@ -425,22 +425,22 @@ public class RelationshipsTab {
     }
 
     /**
-     * Creates the UI for the Divorce Tab, including components for managing manual
+     * Creates the UI for the Divorce Page, including components for managing manual
      * and random divorce options.
      *
-     * @return a {@link JPanel} representing the Divorce Tab.
+     * @return a {@link JPanel} representing the Divorce Page.
      */
-    public @Nonnull JPanel createDivorceTab() {
+    public @Nonnull JPanel createDivorcePage() {
         // Header
         String imageAddress = getImageDirectory() + "logo_escorpion_imperio.png";
-        divorceHeader = new CampaignOptionsHeaderPanel("DivorceTab", imageAddress);
+        divorceHeader = new CampaignOptionsHeaderPanel("DivorcePage", imageAddress);
 
         // Contents
         JPanel divorceGeneralOptionsPanel = createDivorceGeneralOptionsPanel();
         pnlRandomDivorce = createRandomDivorcePanel();
-        JPanel panel = CampaignOptionsPagePanel.builder("DivorceTab", "DivorceTab", imageAddress)
+        JPanel panel = CampaignOptionsPagePanel.builder("DivorcePage", "DivorcePage", imageAddress)
                 .header(divorceHeader)
-                .quote("divorceTab")
+                .quote("divorcePage")
                 .section("lblDivorceGeneralOptionsPanel.text",
                         "lblDivorceGeneralOptionsPanel.summary",
                         divorceGeneralOptionsPanel)
@@ -533,23 +533,23 @@ public class RelationshipsTab {
     }
 
     /**
-     * Creates the UI for the Procreation Tab, including components for managing
+     * Creates the UI for the Procreation Page, including components for managing
      * manual and random procreation options.
      *
-     * @return a {@link JPanel} representing the Procreation Tab.
+     * @return a {@link JPanel} representing the Procreation Page.
      */
-    public @Nonnull JPanel createProcreationTab() {
+    public @Nonnull JPanel createProcreationPage() {
         // Header
         String imageAddress = getImageDirectory() + "logo_hanseatic_league.png";
-        procreationHeader = new CampaignOptionsHeaderPanel("ProcreationTab", imageAddress);
+        procreationHeader = new CampaignOptionsHeaderPanel("ProcreationPage", imageAddress);
 
         // Contents
         pnlProcreationGeneralOptionsPanel = createProcreationGeneralOptionsPanel();
         pnlRandomProcreationPanel = createRandomProcreationPanel();
         pnlRandomSexualityPanel = createRandomSexualityPanel();
-        JPanel panel = CampaignOptionsPagePanel.builder("ProcreationTab", "ProcreationTab", imageAddress)
+        JPanel panel = CampaignOptionsPagePanel.builder("ProcreationPage", "ProcreationPage", imageAddress)
                 .header(procreationHeader)
-                .quote("procreationTab")
+                .quote("procreationPage")
                 .section("lblProcreationGeneralOptionsPanel.text",
                         "lblProcreationGeneralOptionsPanel.summary",
                         pnlProcreationGeneralOptionsPanel)
@@ -748,7 +748,7 @@ public class RelationshipsTab {
     }
 
     /**
-     * Loads the default {@link CampaignOptions} values into the RelationshipsTab
+     * Loads the default {@link CampaignOptions} values into the RelationshipsPage
      * components. This is a shortcut for
      * calling {@link #loadValuesFromCampaignOptions(CampaignOptions)} with
      * {@code null}.
@@ -759,7 +759,7 @@ public class RelationshipsTab {
 
     /**
      * Loads values from the specified {@link CampaignOptions} instance into the
-     * RelationshipsTab components. If no
+     * RelationshipsPage components. If no
      * custom options are provided, the current {@link CampaignOptions} instance is
      * used.
      *
@@ -778,7 +778,7 @@ public class RelationshipsTab {
     }
 
     /**
-     * Applies the current settings from the RelationshipsTab components to the
+     * Applies the current settings from the RelationshipsPage components to the
      * specified {@link CampaignOptions}. If no
      * custom options are provided, changes are applied to the current
      * {@link CampaignOptions} instance.

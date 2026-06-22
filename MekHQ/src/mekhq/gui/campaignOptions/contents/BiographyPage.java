@@ -77,8 +77,8 @@ import mekhq.gui.model.RankTableModel;
 import mekhq.gui.panes.RankSystemsPane;
 
 /**
- * The `BiographyTab` class is responsible for managing the biography-related
- * settings in the campaign options tab
+ * The `BiographyPage` class is responsible for managing the biography-related
+ * settings in the campaign options page
  * within the MekHQ application. It provides an interface for configuring
  * various campaign settings, such as:
  * <ul>
@@ -100,9 +100,9 @@ import mekhq.gui.panes.RankSystemsPane;
  * interaction. It also integrates with the current `Campaign` and
  * `CampaignOptions` objects to synchronize settings.
  * This class serves as the backbone for displaying and managing the "Biography"
- * tab in the campaign options dialog.
+ * page in the campaign options dialog.
  */
-public class BiographyTab {
+public class BiographyPage {
     private static final int FORM_LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
     // Wider than the default control column because the Biography combo boxes need the extra room.
     private static final int FORM_CONTROL_COLUMN_WIDTH = 240;
@@ -115,7 +115,7 @@ public class BiographyTab {
     private static final int RANK_PAY_MULTIPLIER_COLUMN_WIDTH = 90;
 
     private final Campaign campaign;
-    private final GeneralTab generalTab;
+    private final GeneralPage generalPage;
     private final CampaignOptions campaignOptions;
     private final RandomOriginOptions randomOriginOptions;
     private BiographyOptionsModel model;
@@ -125,7 +125,7 @@ public class BiographyTab {
     private boolean educationPageCreated;
     private boolean nameAndPortraitPageCreated;
 
-    // start General Tab
+    // start General Page
     private CampaignOptionsHeaderPanel generalHeader;
     private JCheckBox chkUseDylansRandomXP;
     private JLabel lblGender;
@@ -150,9 +150,9 @@ public class BiographyTab {
     private JCheckBox chkAwardRelevantVeterancySPAs;
     private JCheckBox chkComingOfAgeSPAs;
     private JCheckBox chkRewardComingOfAgeRPSkills;
-    // end General Tab
+    // end General Page
 
-    // start Backgrounds Tab
+    // start Backgrounds Page
     private CampaignOptionsHeaderPanel backgroundHeader;
     private JPanel pnlRandomBackgrounds;
     private JCheckBox chkUseRandomPersonalities;
@@ -174,9 +174,9 @@ public class BiographyTab {
     private JSpinner spnOriginDistanceScale;
     private JCheckBox chkAllowClanOrigins;
     private JCheckBox chkExtraRandomOrigin;
-    // end Backgrounds Tab
+    // end Backgrounds Page
 
-    // start Death Tab
+    // start Death Page
     private CampaignOptionsHeaderPanel deathHeader;
     private JCheckBox chkUseRandomDeathSuicideCause;
     private JLabel lblRandomDeathMultiplier;
@@ -184,9 +184,9 @@ public class BiographyTab {
 
     private JPanel pnlDeathAgeGroup;
     private Map<AgeGroup, JCheckBox> chkEnabledRandomDeathAgeGroups;
-    // end Death Tab
+    // end Death Page
 
-    // start Education Tab
+    // start Education Page
     private CampaignOptionsHeaderPanel educationHeader;
     private JCheckBox chkUseEducationModule;
     private JLabel lblCurriculumXpRate;
@@ -219,9 +219,9 @@ public class BiographyTab {
     private JCheckBox chkAllAges;
     private JLabel lblMilitaryAcademyAccidents;
     private JSpinner spnMilitaryAcademyAccidents;
-    // end Education Tab
+    // end Education Page
 
-    // start Name and Portrait Tab
+    // start Name and Portrait Page
     private JCheckBox chkUseOriginFactionForNames;
     private JLabel lblFactionNames;
     private MMComboBox<String> comboFactionNames;
@@ -237,24 +237,24 @@ public class BiographyTab {
     private JCheckBox chkUseGenderedPortraitsOnly;
     private JCheckBox chkNoRandomPortraitsForChildren;
     private JCheckBox chkChildPortraitsWhenComingOfAge;
-    // end Name and Portrait Tab
+    // end Name and Portrait Page
 
-    // start Rank Tab
+    // start Rank Page
     private RankSystemsPane rankSystemsPane;
-    // end Rank Tab
+    // end Rank Page
 
     /**
-     * Constructs the `BiographyTab` and initializes the campaign and its dependent
+     * Constructs the `BiographyPage` and initializes the campaign and its dependent
      * options.
      *
-     * @param campaign   The current `Campaign` object to which the BiographyTab is
+     * @param campaign   The current `Campaign` object to which the BiographyPage is
      *                   linked. The campaign options and
      *                   origin options are derived from this object.
-     * @param generalTab The currently active General Tab.
+     * @param generalPage The currently active General Page.
      */
-    public BiographyTab(@Nonnull Campaign campaign, GeneralTab generalTab) {
+    public BiographyPage(@Nonnull Campaign campaign, GeneralPage generalPage) {
         this.campaign = campaign;
-        this.generalTab = generalTab;
+        this.generalPage = generalPage;
         this.campaignOptions = campaign.getCampaignOptions();
         this.randomOriginOptions = campaignOptions.getRandomOriginOptions();
 
@@ -263,41 +263,41 @@ public class BiographyTab {
     }
 
     /**
-     * Initializes the various sections and settings tabs within the BiographyTab.
+     * Initializes the various sections and settings pages within the BiographyPage.
      * This method organizes the following
-     * tabs:
+     * pages:
      * <p>
-     * <li>General Tab: Handles general campaign settings such as gender
+     * <li>General Page: Handles general campaign settings such as gender
      * distribution and
      * relationship displays.</li>
-     * <li>Background Tab: Configures randomized backgrounds for campaign
+     * <li>Background Page: Configures randomized backgrounds for campaign
      * characters.</li>
-     * <li>Death Tab: Sets up random death rules and options.</li>
-     * <li>Education Tab: Defines education-related gameplay settings.</li>
-     * <li>Name and Portrait Tab: Configures rules for name and portrait
+     * <li>Death Page: Sets up random death rules and options.</li>
+     * <li>Education Page: Defines education-related gameplay settings.</li>
+     * <li>Name and Portrait Page: Configures rules for name and portrait
      * generation.</li>
-     * <li>Rank Tab: Manages the rank systems for campaign personnel.</li>
+     * <li>Rank Page: Manages the rank systems for campaign personnel.</li>
      * </p>
      */
     private void initialize() {
-        initializeGeneralTab();
-        initializeBackgroundsTab();
-        initializeDeathTab();
-        initializeEducationTab();
-        initializeNameAndPortraitTab();
+        initializeGeneralPage();
+        initializeBackgroundsPage();
+        initializeDeathPage();
+        initializeEducationPage();
+        initializeNameAndPortraitPage();
 
         rankSystemsPane = new RankSystemsPane(null, campaign);
     }
 
     /**
-     * Initializes the Name and Portrait tab. The tab allows users to:
+     * Initializes the Name and Portrait page. The page allows users to:
      * <ul>
      * <li>Enable or disable the use of origin factions for name generation.</li>
      * <li>Assign portraits to personnel upon role changes.</li>
      * <li>Customize which portraits should be used randomly based on roles.</li>
      * </ul>
      */
-    private void initializeNameAndPortraitTab() {
+    private void initializeNameAndPortraitPage() {
         chkUseOriginFactionForNames = new JCheckBox();
         lblFactionNames = new JLabel();
         comboFactionNames = new MMComboBox<>("comboFactionNames", getFactionNamesModel());
@@ -316,7 +316,7 @@ public class BiographyTab {
     }
 
     /**
-     * Initializes the Education tab, providing settings such as:
+     * Initializes the Education page, providing settings such as:
      * <ul>
      * <li>Setting curriculum XP rates.</li>
      * <li>Enabling re-education camps or specific academy requirements.</li>
@@ -325,7 +325,7 @@ public class BiographyTab {
      * events.</li>
      * </ul>
      */
-    private void initializeEducationTab() {
+    private void initializeEducationPage() {
         chkUseEducationModule = new JCheckBox();
         lblCurriculumXpRate = new JLabel();
         spnCurriculumXpRate = new JSpinner();
@@ -360,7 +360,7 @@ public class BiographyTab {
     }
 
     /**
-     * Initializes the Death tab, focusing on:
+     * Initializes the Death page, focusing on:
      * <ul>
      * <li>Allowing configuration of random death probabilities for personnel.</li>
      * <li>Customizing age-group-specific death settings.</li>
@@ -368,7 +368,7 @@ public class BiographyTab {
      * accidents).</li>
      * </ul>
      */
-    private void initializeDeathTab() {
+    private void initializeDeathPage() {
         chkUseRandomDeathSuicideCause = new JCheckBox();
         lblRandomDeathMultiplier = new JLabel();
         spnRandomDeathMultiplier = new JSpinner();
@@ -378,7 +378,7 @@ public class BiographyTab {
     }
 
     /**
-     * Initializes the Backgrounds tab, which handles:
+     * Initializes the Backgrounds page, which handles:
      * <p>
      * <li>Randomized background settings for characters.</li>
      * <li>Options for specifying origins (e.g., faction-specific planetary
@@ -386,7 +386,7 @@ public class BiographyTab {
      * <li>Custom search radius and distance scaling for randomized origins.</li>
      * </p>
      */
-    private void initializeBackgroundsTab() {
+    private void initializeBackgroundsPage() {
         pnlRandomBackgrounds = new JPanel();
         chkUseRandomPersonalities = new JCheckBox();
         chkUseRandomPersonalityReputation = new JCheckBox();
@@ -411,7 +411,7 @@ public class BiographyTab {
     }
 
     /**
-     * Initializes the General tab, which provides options for:
+     * Initializes the General page, which provides options for:
      * <p>
      * <li>General gameplay settings such as gender distribution sliders.</li>
      * <li>Configuration of familial display levels and other general campaign
@@ -420,7 +420,7 @@ public class BiographyTab {
      * milestones.</li>
      * </p>
      */
-    private void initializeGeneralTab() {
+    private void initializeGeneralPage() {
         chkUseDylansRandomXP = new JCheckBox();
         lblGender = new JLabel();
         spnGender = new JSpinner();
@@ -466,20 +466,20 @@ public class BiographyTab {
     }
 
     /**
-     * Creates and lays out the General tab, including its components like:
+     * Creates and lays out the General page, including its components like:
      * <ul>
      * <li>Checkboxes for random XP distribution.</li>
      * <li>Sliders for gender representation customization.</li>
      * <li>Combo boxes for family display level settings within the GUI.</li>
      * </ul>
      *
-     * @return A `JPanel` representing the General tab in the campaign options
+     * @return A `JPanel` representing the General page in the campaign options
      *         dialog.
      */
-    public @Nonnull JPanel createGeneralTab() {
+    public @Nonnull JPanel createGeneralPage() {
         // Header
         String imageAddress = getImageDirectory() + "logo_clan_blood_spirit.png";
-        generalHeader = new CampaignOptionsHeaderPanel("BiographyGeneralTab", imageAddress);
+        generalHeader = new CampaignOptionsHeaderPanel("BiographyGeneralPage", imageAddress);
 
         // Contents
         chkUseDylansRandomXP = new CampaignOptionsCheckBox("UseDylansRandomXP");
@@ -505,11 +505,11 @@ public class BiographyTab {
         pnlAnniversariesPanel = createAnniversariesPanel();
         pnlLifeEvents = createLifeEventsPanel();
         pnlComingOfAge = createComingOfAgePanel();
-        JPanel panel = CampaignOptionsPagePanel.builder("BiographyGeneralTab", "BiographyGeneralTab", imageAddress)
+        JPanel panel = CampaignOptionsPagePanel.builder("BiographyGeneralPage", "BiographyGeneralPage", imageAddress)
             .header(generalHeader)
-            .quote("biographyGeneralTab")
-            .section("lblBiographyGeneralTab.text",
-                "lblBiographyGeneralTab.summary",
+            .quote("biographyGeneralPage")
+            .section("lblBiographyGeneralPage.text",
+                "lblBiographyGeneralPage.summary",
                 generalOptionsPanel,
                 getMetadata(null, CampaignOptionFlag.CUSTOM_SYSTEM))
             .section("lblAnniversariesPanel.text", "lblAnniversariesPanel.summary", pnlAnniversariesPanel)
@@ -536,7 +536,7 @@ public class BiographyTab {
     }
 
     /**
-     * Creates the Anniversaries panel within the General tab for managing
+     * Creates the Anniversaries panel within the General page for managing
      * announcement-related settings:
      * <p>
      * <li>Enabling birthday and recruitment anniversary announcements.</li>
@@ -632,27 +632,27 @@ public class BiographyTab {
     }
 
     /**
-     * Creates and lays out the Backgrounds tab, which includes:
+     * Creates and lays out the Backgrounds page, which includes:
      * <ul>
      * <li>Settings for enabling randomized personalities and relationships.</li>
      * <li>Random origin configurations such as faction specificity and distance
      * scaling.</li>
      * </ul>
      *
-     * @return A `JPanel` representing the Backgrounds tab in the campaign options
+     * @return A `JPanel` representing the Backgrounds page in the campaign options
      *         dialog.
      */
-    public @Nonnull JPanel createBackgroundsTab() {
+    public @Nonnull JPanel createBackgroundsPage() {
         // Header
         String imageAddress = getImageDirectory() + "logo_nueva_castile.png";
-        backgroundHeader = new CampaignOptionsHeaderPanel("BackgroundsTab", imageAddress);
+        backgroundHeader = new CampaignOptionsHeaderPanel("BackgroundsPage", imageAddress);
 
         // Contents
         pnlRandomOriginOptions = createRandomOriginOptionsPanel();
         pnlRandomBackgrounds = createRandomBackgroundsPanel();
-        JPanel panel = CampaignOptionsPagePanel.builder("BackgroundsTab", "BackgroundsTab", imageAddress)
+        JPanel panel = CampaignOptionsPagePanel.builder("BackgroundsPage", "BackgroundsPage", imageAddress)
             .header(backgroundHeader)
-            .quote("backgroundsTab")
+            .quote("backgroundsPage")
             .section("lblRandomOriginOptionsPanel.text",
                 "lblRandomOriginOptionsPanel.summary",
                 pnlRandomOriginOptions,
@@ -738,14 +738,14 @@ public class BiographyTab {
         lblSpecifiedSystem = new CampaignOptionsLabel("SpecifiedSystem");
         lblSpecifiedSystem.addMouseListener(createTipPanelUpdater("SpecifiedSystem"));
         comboSpecifiedSystem.setModel(new DefaultComboBoxModel<>(
-                getPlanetarySystems(chkSpecifiedSystemFactionSpecific.isSelected() ? generalTab.getFaction() : null)));
+                getPlanetarySystems(chkSpecifiedSystemFactionSpecific.isSelected() ? generalPage.getFaction() : null)));
         comboSpecifiedSystem.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
                     final boolean isSelected, final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof PlanetarySystem) {
-                    setText(((PlanetarySystem) value).getName(generalTab.getDate()));
+                    setText(((PlanetarySystem) value).getName(generalPage.getDate()));
                 }
                 return this;
             }
@@ -772,7 +772,7 @@ public class BiographyTab {
                     final boolean isSelected, final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof Planet) {
-                    setText(((Planet) value).getName(generalTab.getDate()));
+                    setText(((Planet) value).getName(generalPage.getDate()));
                 }
                 return this;
             }
@@ -798,7 +798,7 @@ public class BiographyTab {
         // The system/planet combos are backed by the whole universe, so an unprototyped
         // combo would size itself to
         // the widest entry and stretch this section wider than the other Biography
-        // sub-tabs. Pin them to the control
+        // sub-pages. Pin them to the control
         // column and surface the full selected value as a tooltip (it remains fully
         // visible in the dropdown).
         capComboWidthWithTooltip(comboSpecifiedSystem);
@@ -832,7 +832,7 @@ public class BiographyTab {
      * tooltip (and in the dropdown). Without this, an unprototyped
      * {@link javax.swing.JComboBox} measures every model
      * entry and adopts the widest, which made the Backgrounds page noticeably wider
-     * than the other Biography sub-tabs.
+     * than the other Biography sub-pages.
      *
      * @param combo the combo box to constrain and decorate with a full-value
      *              tooltip
@@ -854,9 +854,9 @@ public class BiographyTab {
     private void updateComboTooltip(MMComboBox<?> combo) {
         final Object selected = combo.getSelectedItem();
         if (selected instanceof PlanetarySystem system) {
-            combo.setToolTipText(system.getName(generalTab.getDate()));
+            combo.setToolTipText(system.getName(generalPage.getDate()));
         } else if (selected instanceof Planet planet) {
-            combo.setToolTipText(planet.getName(generalTab.getDate()));
+            combo.setToolTipText(planet.getName(generalPage.getDate()));
         } else {
             combo.setToolTipText(null);
         }
@@ -920,7 +920,7 @@ public class BiographyTab {
         comboSpecifiedSystem.removeAllItems();
 
         comboSpecifiedSystem.setModel(new DefaultComboBoxModel<>(
-                getPlanetarySystems(chkSpecifiedSystemFactionSpecific.isSelected() ? generalTab.getFaction() : null)));
+                getPlanetarySystems(chkSpecifiedSystemFactionSpecific.isSelected() ? generalPage.getFaction() : null)));
 
         restoreComboSpecifiedPlanet();
     }
@@ -940,32 +940,32 @@ public class BiographyTab {
 
         // Filter systems
         for (PlanetarySystem planetarySystem : systems) {
-            if ((faction == null) || planetarySystem.getFactionSet(generalTab.getDate()).contains(faction)) {
+            if ((faction == null) || planetarySystem.getFactionSet(generalPage.getDate()).contains(faction)) {
                 filteredSystems.add(planetarySystem);
             }
         }
 
         // Sort systems
-        filteredSystems.sort(Comparator.comparing(p -> p.getName(generalTab.getDate())));
+        filteredSystems.sort(Comparator.comparing(p -> p.getName(generalPage.getDate())));
 
         // Convert to array
         return filteredSystems.toArray(new PlanetarySystem[0]);
     }
 
     /**
-     * Configures and creates the Death tab. This includes options like:
+     * Configures and creates the Death page. This includes options like:
      * <ul>
      * <li>Methods for random death.</li>
      * <li>Percentage-based chances for random death events.</li>
      * <li>Check boxes to enable or disable age-specific death events.</li>
      * </ul>
      *
-     * @return A `JPanel` representing the Death tab.
+     * @return A `JPanel` representing the Death page.
      */
-    public @Nonnull JPanel createDeathTab() {
+    public @Nonnull JPanel createDeathPage() {
         // Header
         String imageAddress = getImageDirectory() + "logo_clan_fire_mandrills.png";
-        deathHeader = new CampaignOptionsHeaderPanel("DeathTab", imageAddress);
+        deathHeader = new CampaignOptionsHeaderPanel("DeathPage", imageAddress);
 
         // Contents
         lblRandomDeathMultiplier = new CampaignOptionsLabel("RandomDeathMultiplier",
@@ -979,10 +979,10 @@ public class BiographyTab {
 
         JPanel deathOptionsPanel = createDeathOptionsPanel();
         pnlDeathAgeGroup = createDeathAgeGroupsPanel();
-        JPanel panel = CampaignOptionsPagePanel.builder("DeathTab", "DeathTab", imageAddress)
+        JPanel panel = CampaignOptionsPagePanel.builder("DeathPage", "DeathPage", imageAddress)
             .header(deathHeader)
-            .quote("deathTab")
-            .section("lblDeathTab.text", "lblDeathTab.summary", deathOptionsPanel)
+            .quote("deathPage")
+            .section("lblDeathPage.text", "lblDeathPage.summary", deathOptionsPanel)
             .section("lblDeathAgeGroupsPanel.text", "lblDeathAgeGroupsPanel.summary", pnlDeathAgeGroup)
             .build();
 
@@ -1034,7 +1034,7 @@ public class BiographyTab {
     }
 
     /**
-     * Creates the Education tab, which allows managing educational settings within
+     * Creates the Education page, which allows managing educational settings within
      * the campaign.
      * <p>
      * This includes:
@@ -1046,12 +1046,12 @@ public class BiographyTab {
      * events.</li>
      * </ul>
      *
-     * @return A {@code JPanel} representing the Education tab in the campaign UI.
+     * @return A {@code JPanel} representing the Education page in the campaign UI.
      */
-    public @Nonnull JPanel createEducationTab() {
+    public @Nonnull JPanel createEducationPage() {
         // Header
         String imageAddress = getImageDirectory() + "logo_taurian_concordat.png";
-        educationHeader = new CampaignOptionsHeaderPanel("EducationTab", imageAddress);
+        educationHeader = new CampaignOptionsHeaderPanel("EducationPage", imageAddress);
 
         // Contents
         chkUseEducationModule = new CampaignOptionsCheckBox("UseEducationModule");
@@ -1088,10 +1088,10 @@ public class BiographyTab {
         pnlXpAndSkillBonuses = createXpAndSkillBonusesPanel();
         pnlDropoutChance = createDropoutChancePanel();
         pnlAccidentsAndEvents = createAccidentsAndEventsPanel();
-        JPanel panel = CampaignOptionsPagePanel.builder("EducationTab", "EducationTab", imageAddress)
+        JPanel panel = CampaignOptionsPagePanel.builder("EducationPage", "EducationPage", imageAddress)
             .header(educationHeader)
-            .quote("educationTab")
-            .section("lblEducationTab.text", "lblEducationTab.summary", educationOptionsPanel)
+            .quote("educationPage")
+            .section("lblEducationPage.text", "lblEducationPage.summary", educationOptionsPanel)
             .section("lblEnableStandardSetsPanel.text", "lblEnableStandardSetsPanel.summary", pnlEnableStandardSets)
             .section("lblXpAndSkillBonusesPanel.text", "lblXpAndSkillBonusesPanel.summary", pnlXpAndSkillBonuses)
             .section("lblDropoutChancePanel.text", "lblDropoutChancePanel.summary", pnlDropoutChance)
@@ -1249,9 +1249,9 @@ public class BiographyTab {
     }
 
     /**
-     * Creates the Name and Portrait Generation tab for the campaign options.
+     * Creates the Name and Portrait Generation page for the campaign options.
      * <p>
-     * This tab allows users to:
+     * This page allows users to:
      * </p>
      * <ul>
      * <li>Enable or disable the use of origin factions for name generation.</li>
@@ -1259,12 +1259,12 @@ public class BiographyTab {
      * <li>Customize which portraits are randomly used for specific roles.</li>
      * </ul>
      *
-     * @return A {@code JPanel} representing the Name and Portrait Generation tab.
+     * @return A {@code JPanel} representing the Name and Portrait Generation page.
      */
-    public @Nonnull JPanel createNameAndPortraitGenerationTab() {
+    public @Nonnull JPanel createNameAndPortraitGenerationPage() {
         // Header
         String imageAddress = getImageDirectory() + "logo_clan_nova_cat.png";
-        nameAndPortraitGenerationHeader = new CampaignOptionsHeaderPanel("NameAndPortraitGenerationTab",
+        nameAndPortraitGenerationHeader = new CampaignOptionsHeaderPanel("NameAndPortraitGenerationPage",
             imageAddress);
 
         // Contents
@@ -1296,11 +1296,11 @@ public class BiographyTab {
         JPanel nameGenerationPanel = createNameGenerationPanel();
         JPanel portraitRulesPanel = createPortraitRulesPanel();
         pnlRandomPortrait = createRandomPortraitPanel();
-        JPanel panel = CampaignOptionsPagePanel.builder("NameAndPortraitGenerationTab",
-                "NameAndPortraitGenerationTab",
+        JPanel panel = CampaignOptionsPagePanel.builder("NameAndPortraitGenerationPage",
+                "NameAndPortraitGenerationPage",
                 imageAddress)
             .header(nameAndPortraitGenerationHeader)
-            .quote("nameAndPortraitGenerationTab")
+            .quote("nameAndPortraitGenerationPage")
             .section("lblNameGenerationPanel.text", "lblNameGenerationPanel.summary", nameGenerationPanel)
             .section("lblPortraitRulesPanel.text", "lblPortraitRulesPanel.summary", portraitRulesPanel)
             .section("lblRandomPortraitPanel.text", "lblRandomPortraitPanel.summary", pnlRandomPortrait)
@@ -1428,30 +1428,30 @@ public class BiographyTab {
     }
 
     /**
-     * Creates the Rank tab for configuring rank systems within the campaign.
+     * Creates the Rank page for configuring rank systems within the campaign.
      * <p>
-     * This tab provides options for:
+     * This page provides options for:
      * <ul>
      * <li>Managing rank systems for personnel in the campaign.</li>
      * <li>Displaying rank-related UI components for user configuration.</li>
      * </ul>
      *
-     * @return A {@code JPanel} representing the Rank tab in the campaign
+     * @return A {@code JPanel} representing the Rank page in the campaign
      *         configuration.
      */
-    public @Nonnull JPanel createRankTab() {
+    public @Nonnull JPanel createRankPage() {
         // Header
         String imageAddress = getImageDirectory() + "logo_umayyad_caliphate.png";
-        CampaignOptionsHeaderPanel headerPanel = new CampaignOptionsHeaderPanel("RankTab", imageAddress);
+        CampaignOptionsHeaderPanel headerPanel = new CampaignOptionsHeaderPanel("RankPage", imageAddress);
 
         // Contents
         JPanel rankSystemsPanel = createRankSystemsPanel();
-        return CampaignOptionsPagePanel.builder("RankTab", "RankTab", imageAddress)
+        return CampaignOptionsPagePanel.builder("RankPage", "RankPage", imageAddress)
             .header(headerPanel)
             .showDetailsPanel(false)
-            .intro("lblRankTabBody.text")
-            .quote("rankTab")
-            .section("lblRankTab.text", "lblRankTab.summary", rankSystemsPanel)
+            .intro("lblRankPageBody.text")
+            .quote("rankPage")
+            .section("lblRankPage.text", "lblRankPage.summary", rankSystemsPanel)
             .build();
     }
 
@@ -1486,7 +1486,7 @@ public class BiographyTab {
         // Single source of truth for embedded column widths. The pane re-applies this provider on every rank-system
         // switch and when the "Restore default column widths" header menu item is used, so there is no competing
         // width listener to fight (which previously let the wide standalone widths win).
-        rankSystemsPane.setColumnWidthProvider(BiographyTab::getEmbeddedRankColumnWidth);
+        rankSystemsPane.setColumnWidthProvider(BiographyPage::getEmbeddedRankColumnWidth);
 
         JScrollPane tableScrollPane = (JScrollPane) SwingUtilities.getAncestorOfClass(JScrollPane.class,
                 ranksTable);

@@ -63,15 +63,15 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 
 /**
- * The {@code SystemsTab} class is responsible for managing and displaying the
- * "Reputation" tab within the campaign
+ * The {@code SystemsPage} class is responsible for managing and displaying the
+ * "Reputation" page within the campaign
  * options UI. It provides Swing components for configuring reputation-related
  * settings in a {@link Campaign}, including
  * unit rating methods, manual modifiers, and various campaign mechanics
  * toggles.
  *
  * <p>
- * The tab is constructed using helper panels and controls, grouped under
+ * The page is constructed using helper panels and controls, grouped under
  * "General" and "Sanity" sub-panels,
  * facilitating a user-friendly way to view and adjust reputation options.
  * </p>
@@ -79,7 +79,7 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
  * @author Illiani
  * @since 0.50.07
  */
-public class SystemsTab {
+public class SystemsPage {
     private static final int FORM_LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
     private static final int FORM_CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
     private static final int CHECKBOX_GRID_COLUMNS = 2;
@@ -92,7 +92,7 @@ public class SystemsTab {
     private boolean factionStandingPageCreated;
     private boolean atowPageCreated;
 
-    // Reputation Tab
+    // Reputation Page
     private CampaignOptionsHeaderPanel reputationHeader;
 
     private JButton btnResetCriminalRecord;
@@ -103,7 +103,7 @@ public class SystemsTab {
     private JCheckBox chkReduceReputationPerformanceModifier;
     private JCheckBox chkReputationPerformanceModifierCutOff;
 
-    // Faction Standing Tab
+    // Faction Standing Page
     private CampaignOptionsHeaderPanel factionStandingHeader;
     private JCheckBox chkTrackFactionStanding;
     private JCheckBox chkTrackClimateRegardChanges;
@@ -120,7 +120,7 @@ public class SystemsTab {
     private JCheckBox chkUseFactionStandingContractPay;
     private JCheckBox chkUseFactionStandingSupportPoints;
 
-    // A Time of War Tab
+    // A Time of War Page
     private CampaignOptionsHeaderPanel atowHeader;
 
     private JCheckBox chkUseAttributes;
@@ -134,14 +134,14 @@ public class SystemsTab {
     private JCheckBox chkUseSmallArmsOnly;
 
     /**
-     * Constructs a new {@code SystemsTab} for the specified campaign.
+     * Constructs a new {@code SystemsPage} for the specified campaign.
      *
-     * @param campaign the campaign associated with this tab
+     * @param campaign the campaign associated with this page
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public SystemsTab(@Nonnull Campaign campaign) {
+    public SystemsPage(@Nonnull Campaign campaign) {
         this.campaign = campaign;
         this.campaignOptions = campaign.getCampaignOptions();
         this.randomSkillPreferences = campaign.getRandomSkillPreferences();
@@ -149,18 +149,18 @@ public class SystemsTab {
     }
 
     /**
-     * Creates the Reputation tab panel, containing grouped UI elements for
+     * Creates the Reputation page panel, containing grouped UI elements for
      * reputation options and its header.
      *
-     * @return a {@link JPanel} component representing the entire Reputation tab UI
+     * @return a {@link JPanel} component representing the entire Reputation page UI
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public @Nonnull JPanel createReputationTab() {
+    public @Nonnull JPanel createReputationPage() {
         // Header
         String imageAddress = getImageDirectory() + "logo_morgrains_valkyrate.png";
-        reputationHeader = new CampaignOptionsHeaderPanel("ReputationTab", imageAddress);
+        reputationHeader = new CampaignOptionsHeaderPanel("ReputationPage", imageAddress);
 
         // Contents
         JPanel pnlReputationGeneralOptions = createReputationGeneralPanel();
@@ -170,9 +170,9 @@ public class SystemsTab {
         updateReputationControlsFromModel();
 
         // Layout the Panel
-        final JPanel panel = CampaignOptionsPagePanel.builder("ReputationTab", "ReputationTab", imageAddress)
+        final JPanel panel = CampaignOptionsPagePanel.builder("ReputationPage", "ReputationPage", imageAddress)
                 .header(reputationHeader)
-                .quote("reputationTab")
+                .quote("reputationPage")
                 .section("lblReputationGeneralOptionsPanel.text",
                         "lblReputationGeneralOptionsPanel.summary",
                         pnlReputationGeneralOptions)
@@ -284,20 +284,20 @@ public class SystemsTab {
     }
 
     /**
-     * Creates the Faction Standing tab panel, containing grouped UI elements for
+     * Creates the Faction Standing page panel, containing grouped UI elements for
      * Faction Standing options and its
      * header.
      *
      * @return a {@link JPanel} component representing the entire Faction Standing
-     *         tab UI
+     *         page UI
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public @Nonnull JPanel createFactionStandingTab() {
+    public @Nonnull JPanel createFactionStandingPage() {
         // Header
         String imageAddress = getImageDirectory() + "logo_morgrains_valkyrate.png";
-        factionStandingHeader = new CampaignOptionsHeaderPanel("FactionStandingTab", imageAddress);
+        factionStandingHeader = new CampaignOptionsHeaderPanel("FactionStandingPage", imageAddress);
 
         // Contents
         JPanel pnlFactionStandingTrackingPanel = createFactionStandingTrackingPanel();
@@ -307,10 +307,10 @@ public class SystemsTab {
         updateFactionStandingControlsFromModel();
 
         // Layout the Panel
-        final JPanel panel = CampaignOptionsPagePanel.builder("FactionStandingTab", "FactionStandingTab",
+        final JPanel panel = CampaignOptionsPagePanel.builder("FactionStandingPage", "FactionStandingPage",
                         imageAddress)
                 .header(factionStandingHeader)
-                .quote("factionStandingTab")
+                .quote("factionStandingPage")
                 .section("lblFactionStandingTrackingPanel.text",
                         "lblFactionStandingTrackingPanel.summary",
                         pnlFactionStandingTrackingPanel)
@@ -425,18 +425,18 @@ public class SystemsTab {
     }
 
     /**
-     * Creates the ATOW tab panel, containing grouped UI elements for configuring
+     * Creates the ATOW page panel, containing grouped UI elements for configuring
      * ATOW-related options and its header.
      *
-     * @return a {@link JPanel} component representing the entire ATOW tab UI
+     * @return a {@link JPanel} component representing the entire ATOW page UI
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public @Nonnull JPanel createATOWTab() {
+    public @Nonnull JPanel createATOWPage() {
         // Header
         String imageAddress = getImageDirectory() + "logo_elysian_fields.png";
-        atowHeader = new CampaignOptionsHeaderPanel("ATimeOfWarTab", imageAddress);
+        atowHeader = new CampaignOptionsHeaderPanel("ATimeOfWarPage", imageAddress);
 
         // Contents
         JPanel pnlATOWAttributes = createATOWAttributesPanel();
@@ -445,9 +445,9 @@ public class SystemsTab {
         updateATOWControlsFromModel();
 
         // Layout the Panel
-        final JPanel panel = CampaignOptionsPagePanel.builder("ATimeOfWarTab", "ATimeOfWarTab", imageAddress)
+        final JPanel panel = CampaignOptionsPagePanel.builder("ATimeOfWarPage", "ATimeOfWarPage", imageAddress)
                 .header(atowHeader)
-                .quote("atowTab")
+                .quote("atowPage")
                 .section("lblATOWAttributesPanel.text",
                         "lblATOWAttributesPanel.summary",
                         pnlATOWAttributes)

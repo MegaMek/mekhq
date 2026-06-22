@@ -68,22 +68,22 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
 
 /**
- * The {@code EquipmentAndSuppliesTab} class represents a graphical user interface (GUI) tab containing various options
+ * The {@code EquipmentAndSuppliesPage} class represents a graphical user interface (GUI) page containing various options
  * and settings related to equipment and supplies in a campaign simulation. This class is responsible for building and
- * managing multiple sub-tabs and panels for customization purposes, including acquisition settings, delivery settings,
+ * managing multiple sub-pages and panels for customization purposes, including acquisition settings, delivery settings,
  * planetary acquisition settings, and more. It also provides methods to initialize, create, and manage these different
  * components.
  * <p>
  * Fields in this class include labels, spinners, combo boxes, checkboxes, and panels used for displaying and managing
- * options in the tab. They allow the user to configure various parameters like transit times, penalties, acquisition
+ * options in the page. They allow the user to configure various parameters like transit times, penalties, acquisition
  * limits, faction-specific settings, and modifiers to influence game mechanics. Multiple constants are defined for
  * units of time, representing days, weeks, and months, among others.
  * <p>
- * The class includes initialization methods for different sections of the tab, as well as methods to create panels for
+ * The class includes initialization methods for different sections of the page, as well as methods to create panels for
  * specific functionality. Utility methods are also provided for configuring spinners and combo boxes or formatting
  * options and labels.
  */
-public class EquipmentAndSuppliesTab {
+public class EquipmentAndSuppliesPage {
     private static final int EQUIPMENT_LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
     private static final int EQUIPMENT_CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
     private static final int AUTO_LOGISTICS_LABEL_COLUMN_WIDTH = 190;
@@ -93,7 +93,7 @@ public class EquipmentAndSuppliesTab {
     private static final int MODIFIER_CONTROL_COLUMN_WIDTH = 104;
 
     /**
-     * Label-column width for the Acquisition tab's single-control sections
+     * Label-column width for the Acquisition page's single-control sections
      * (Acquisitions, Deliveries). It is computed
      * at runtime from the AutoLogistics grid (see
      * {@link #createAutoLogisticsPanel()}) so those sections' control
@@ -108,7 +108,7 @@ public class EquipmentAndSuppliesTab {
     private boolean planetaryAcquisitionPageCreated;
     private boolean techLimitsPageCreated;
 
-    //start Acquisition Tab
+    //start Acquisition Page
     private CampaignOptionsHeaderPanel acquisitionHeader;
     private JPanel pnlAcquisitions;
     private JLabel lblChoiceAcquireSkill;
@@ -124,9 +124,9 @@ public class EquipmentAndSuppliesTab {
     private JSpinner spnAcquireWaitingPeriod;
     private JLabel lblMaxAcquisitions;
     private JSpinner spnMaxAcquisitions;
-    //end Acquisition Tab
+    //end Acquisition Page
 
-    //start autoLogistics Tab
+    //start autoLogistics Page
     private JPanel pnlAutoLogistics;
     private JLabel lblAutoLogisticsHeatSink;
     private JSpinner spnAutoLogisticsHeatSink;
@@ -154,9 +154,9 @@ public class EquipmentAndSuppliesTab {
     private JSpinner spnAutoLogisticsGyros;
     private JLabel lblAutoLogisticsOther;
     private JSpinner spnAutoLogisticsOther;
-    //end autoLogistics Tab
+    //end autoLogistics Page
 
-    //start Delivery Tab
+    //start Delivery Page
     private JLabel lblTransitTimeUnits;
     private MMComboBox<String> choiceTransitTimeUnits;
     private static final int TRANSIT_UNIT_DAY = 0;
@@ -164,9 +164,9 @@ public class EquipmentAndSuppliesTab {
     private static final int TRANSIT_UNIT_MONTH = 2;
     private static final int TRANSIT_UNIT_NUM = 3;
     private JCheckBox chkNoDeliveriesInTransit;
-    //end Delivery Tab
+    //end Delivery Page
 
-    //start Planetary Acquisition Tab
+    //start Planetary Acquisition Page
     private CampaignOptionsHeaderPanel planetaryAcquisitionHeader;
     private JCheckBox usePlanetaryAcquisitions;
     private JLabel lblMaxJumpPlanetaryAcquisitions;
@@ -182,7 +182,7 @@ public class EquipmentAndSuppliesTab {
     private JSpinner[] spnPlanetAcquireTechBonus;
     private JSpinner[] spnPlanetAcquireIndustryBonus;
     private JSpinner[] spnPlanetAcquireOutputBonus;
-    //end Planetary Acquisition Tab
+    //end Planetary Acquisition Page
 
     private JCheckBox limitByYearBox;
     private JCheckBox disallowExtinctStuffBox;
@@ -194,14 +194,14 @@ public class EquipmentAndSuppliesTab {
     private MMComboBox<String> choiceTechLevel;
     private JCheckBox variableTechLevelBox;
     private JCheckBox useAmmoByTypeBox;
-    //end Tech Limits Tab
+    //end Tech Limits Page
 
     /**
-     * Constructs the EquipmentAndSuppliesTab with the given campaign options.
+     * Constructs the EquipmentAndSuppliesPage with the given campaign options.
      *
      * @param campaignOptions the {@link CampaignOptions} object containing configuration settings for the campaign
      */
-    public EquipmentAndSuppliesTab(@Nonnull CampaignOptions campaignOptions) {
+    public EquipmentAndSuppliesPage(@Nonnull CampaignOptions campaignOptions) {
         this.campaignOptions = campaignOptions;
 
         initialize();
@@ -209,19 +209,19 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Initializes the EquipmentAndSuppliesTab by configuring its various components and panels. This includes setting
-     * up the acquisitions tab, delivery tab, planetary acquisitions tab, and tech limits tab.
+     * Initializes the EquipmentAndSuppliesPage by configuring its various components and panels. This includes setting
+     * up the acquisitions page, delivery page, planetary acquisitions page, and tech limits page.
      */
     void initialize() {
-        initializeAcquisitionTab();
-        initializeAutoLogisticsTab();
+        initializeAcquisitionPage();
+        initializeAutoLogisticsPage();
         initializeDelivery();
-        initializePlanetaryAcquisitionsTab();
-        initializeTechLimitsTab();
+        initializePlanetaryAcquisitionsPage();
+        initializeTechLimitsPage();
     }
 
     /**
-     * Initializes the components and configurations for the Planetary Acquisitions tab in the EquipmentAndSuppliesTab.
+     * Initializes the components and configurations for the Planetary Acquisitions page in the EquipmentAndSuppliesPage.
      * This includes setting up options, labels, spinners, combo boxes, checkboxes, and panels related to planetary
      * acquisitions.
      * <p>
@@ -231,7 +231,7 @@ public class EquipmentAndSuppliesTab {
      * <li> Panels and components for modifiers, including technology bonuses, industry bonuses,
      * and output bonuses.</li>
      */
-    private void initializePlanetaryAcquisitionsTab() {
+    private void initializePlanetaryAcquisitionsPage() {
         // Options
         usePlanetaryAcquisitions = new JCheckBox();
 
@@ -258,7 +258,7 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Initializes the components and configurations for the delivery tab within the EquipmentAndSuppliesTab. This
+     * Initializes the components and configurations for the delivery page within the EquipmentAndSuppliesPage. This
      * method sets up panels, labels, spinners, and combo boxes required for managing delivery-related settings and
      * options.
      * <p>
@@ -275,11 +275,11 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Initializes the components and settings for the acquisitions tab in the EquipmentAndSuppliesTab. This method sets
+     * Initializes the components and settings for the acquisitions page in the EquipmentAndSuppliesPage. This method sets
      * up the GUI components required for configuring acquisition-related options, including panels, labels, spinners,
      * combo boxes, and checkboxes.
      */
-    private void initializeAcquisitionTab() {
+    private void initializeAcquisitionPage() {
         pnlAcquisitions = new JPanel();
         lblChoiceAcquireSkill = new JLabel();
         choiceAcquireSkill = new MMComboBox<>("choiceAcquireSkill", AcquisitionsType.values());
@@ -304,11 +304,11 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Initializes the components and settings for the autoLogistics tab in the EquipmentAndSuppliesTab. This method
+     * Initializes the components and settings for the autoLogistics page in the EquipmentAndSuppliesPage. This method
      * sets up the GUI components required for configuring acquisition-related options, including panels, labels,
      * spinners, combo boxes, and checkboxes.
      */
-    private void initializeAutoLogisticsTab() {
+    private void initializeAutoLogisticsPage() {
         pnlAutoLogistics = new JPanel();
         lblAutoLogisticsHeatSink = new JLabel();
         spnAutoLogisticsHeatSink = new JSpinner();
@@ -339,10 +339,10 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Initializes the components and settings for the Tech Limits tab in the EquipmentAndSuppliesTab. This method sets
+     * Initializes the components and settings for the Tech Limits page in the EquipmentAndSuppliesPage. This method sets
      * up a series of checkboxes, labels, and combo boxes to configure technology-related limits and options.
      */
-    private void initializeTechLimitsTab() {
+    private void initializeTechLimitsPage() {
         limitByYearBox = new JCheckBox();
         disallowExtinctStuffBox = new JCheckBox();
         allowClanPurchasesBox = new JCheckBox();
@@ -356,16 +356,16 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Creates and configures the acquisition tab panel for the user interface. This method initializes and organizes
+     * Creates and configures the acquisition page panel for the user interface. This method initializes and organizes
      * the components such as the header, acquisition panel, and delivery panel, and then returns the fully constructed
-     * acquisition tab panel.
+     * acquisition page panel.
      *
-     * @return A {@code JPanel} instance representing the complete acquisition tab.
+     * @return A {@code JPanel} instance representing the complete acquisition page.
      */
-    public @Nonnull JPanel createAcquisitionTab() {
+    public @Nonnull JPanel createAcquisitionPage() {
         // Header
         String imageAddress = getImageDirectory() + "logo_clan_cloud_cobra.png";
-        acquisitionHeader = new CampaignOptionsHeaderPanel("AcquisitionTab", imageAddress);
+        acquisitionHeader = new CampaignOptionsHeaderPanel("AcquisitionPage", imageAddress);
 
         // Build AutoLogistics first: it measures its grid and sets
         // acquisitionSectionLabelWidth, which the
@@ -377,9 +377,9 @@ public class EquipmentAndSuppliesTab {
         acquisitionPageCreated = true;
         updateAcquisitionControlsFromModel();
 
-        return CampaignOptionsPagePanel.builder("AcquisitionTab", "AcquisitionTab", imageAddress)
+        return CampaignOptionsPagePanel.builder("AcquisitionPage", "AcquisitionPage", imageAddress)
                 .header(acquisitionHeader)
-                .quote("acquisitionTab")
+                .quote("acquisitionPage")
                 .section("lblAcquisitionPanel.text",
                         "lblAcquisitionPanel.summary",
                         pnlAcquisitions)
@@ -614,17 +614,17 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Creates and configures the planetary acquisition tab panel in a campaign options interface. The panel includes a
+     * Creates and configures the planetary acquisition page panel in a campaign options interface. The panel includes a
      * header, options, and modifiers section, arranged using layout constraints. Once configured, it is wrapped within
      * a parent panel and returned.
      *
-     * @return a {@code JPanel} object representing the planetary acquisition tab with its configured components and
+     * @return a {@code JPanel} object representing the planetary acquisition page with its configured components and
      *       layout.
      */
-    public @Nonnull JPanel createPlanetaryAcquisitionTab() {
+    public @Nonnull JPanel createPlanetaryAcquisitionPage() {
         // Header
         String imageAddress = getImageDirectory() + "logo_rim_worlds_republic.png";
-        planetaryAcquisitionHeader = new CampaignOptionsHeaderPanel("PlanetaryAcquisitionTab", imageAddress);
+        planetaryAcquisitionHeader = new CampaignOptionsHeaderPanel("PlanetaryAcquisitionPage", imageAddress);
 
         // Sub-Panels
         JPanel options = createOptionsPanel();
@@ -632,11 +632,11 @@ public class EquipmentAndSuppliesTab {
         planetaryAcquisitionPageCreated = true;
         updatePlanetaryAcquisitionControlsFromModel();
 
-        return CampaignOptionsPagePanel.builder("PlanetaryAcquisitionTab", "PlanetaryAcquisitionTab", imageAddress)
+        return CampaignOptionsPagePanel.builder("PlanetaryAcquisitionPage", "PlanetaryAcquisitionPage", imageAddress)
                 .header(planetaryAcquisitionHeader)
-                .quote("planetaryAcquisitionTab")
-                .section("lblPlanetaryAcquisitionTab.text",
-                        "lblPlanetaryAcquisitionTab.summary",
+                .quote("planetaryAcquisitionPage")
+                .section("lblPlanetaryAcquisitionPage.text",
+                        "lblPlanetaryAcquisitionPage.summary",
                         options)
                 .section("lblModifiersPanel.text",
                         "lblModifiersPanel.summary",
@@ -708,7 +708,7 @@ public class EquipmentAndSuppliesTab {
         }
 
         final CampaignOptionsModifierTablePanel tablePanel = new CampaignOptionsModifierTablePanel(
-              "PlanetaryAcquisitionTabModifiers",
+              "PlanetaryAcquisitionPageModifiers",
               MODIFIER_ROW_LABEL_COLUMN_WIDTH,
               MODIFIER_CONTROL_COLUMN_WIDTH,
               createModifierColumnHeader("TechLabel"),
@@ -725,7 +725,7 @@ public class EquipmentAndSuppliesTab {
             i++;
         }
 
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("PlanetaryAcquisitionTabModifiersPanel",
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("PlanetaryAcquisitionPageModifiersPanel",
               MODIFIER_ROW_LABEL_COLUMN_WIDTH,
               MODIFIER_CONTROL_COLUMN_WIDTH);
         panel.addFullWidthComponent(tablePanel);
@@ -816,18 +816,18 @@ public class EquipmentAndSuppliesTab {
     }
 
     /**
-     * Creates and initializes the "Tech Limits" tab panel within a user interface. The tab includes various settings
+     * Creates and initializes the "Tech Limits" page panel within a user interface. The page includes various settings
      * and options related to technical limitations, such as limiting by year, disallowing extinct technologies,
      * allowing faction-specific purchases, enabling canon-only restrictions, setting maximum tech levels, and more. The
      * method arranges the components in a structured layout and constructs the required parent panel.
      *
-     * @return the {@code JPanel} representing the "Tech Limits" tab, fully configured with its components and layout.
+     * @return the {@code JPanel} representing the "Tech Limits" page, fully configured with its components and layout.
      */
-    public @Nonnull JPanel createTechLimitsTab() {
+    public @Nonnull JPanel createTechLimitsPage() {
         // Header
-        //start Tech Limits Tab
+        //start Tech Limits Page
         String imageAddress = getImageDirectory() + "logo_clan_ghost_bear.png";
-        CampaignOptionsHeaderPanel techLimitsHeader = new CampaignOptionsHeaderPanel("TechLimitsTab", imageAddress);
+        CampaignOptionsHeaderPanel techLimitsHeader = new CampaignOptionsHeaderPanel("TechLimitsPage", imageAddress);
 
         limitByYearBox = new CampaignOptionsCheckBox("LimitByYearBox");
         limitByYearBox.addMouseListener(createTipPanelUpdater("LimitByYearBox"));
@@ -869,11 +869,11 @@ public class EquipmentAndSuppliesTab {
         techLimitsPageCreated = true;
         updateTechLimitsControlsFromModel();
 
-        return CampaignOptionsPagePanel.builder("TechLimitsTab", "TechLimitsTab", imageAddress)
+        return CampaignOptionsPagePanel.builder("TechLimitsPage", "TechLimitsPage", imageAddress)
                 .header(techLimitsHeader)
-                .quote("techLimitsTab")
-                .section("lblTechLimitsTab.text",
-                        "lblTechLimitsTab.summary",
+                .quote("techLimitsPage")
+                .section("lblTechLimitsPage.text",
+                        "lblTechLimitsPage.summary",
                         techLevelPanel)
                 .section("lblTechPurchaseRulesPanel.text",
                         "lblTechPurchaseRulesPanel.summary",

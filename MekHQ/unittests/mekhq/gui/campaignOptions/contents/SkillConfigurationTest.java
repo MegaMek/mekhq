@@ -41,7 +41,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
- * Unit tests for {@link SkillConfiguration}, the per-skill DTO used by the Skills tab. The class exists so a skill's
+ * Unit tests for {@link SkillConfiguration}, the per-skill DTO used by the Skills page. The class exists so a skill's
  * editable values can be read from a {@link SkillType}, copied for the table's Copy/Paste feature, and written back; the
  * tests pin down that round-trip and the deep-copy independence the Copy/Paste feature relies on.
  */

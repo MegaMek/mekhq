@@ -88,7 +88,7 @@ class CampaignOptionsRoute {
 
     /**
      * Adds resolved section title and summary text to this route's search index so the navigation filter can match a
-     * section heading, not only the page (tab) title.
+     * section heading, not only the page (page) title.
      *
      * @param text the raw section text to index; ignored when {@code null} or blank
      */

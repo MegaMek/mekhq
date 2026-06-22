@@ -89,11 +89,11 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 
 /**
- * The {@link SalariesTab} class represents the user interface components for configuring salary-related options in the
+ * The {@link SalariesPage} class represents the user interface components for configuring salary-related options in the
  * MekHQ Campaign Options dialog. This class handles the initialization, layout, and logic for various salary settings
- * spanning multiple tabs.
+ * spanning multiple pages.
  */
-public class SalariesTab {
+public class SalariesPage {
     private static final int FORM_LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
     // Wider than the default control column so the salary-amount spinners have room for large figures.
     private static final int FORM_CONTROL_COLUMN_WIDTH = 300;
@@ -111,7 +111,7 @@ public class SalariesTab {
     private boolean supportPageCreated;
     private boolean civilianPageCreated;
 
-    //start Combat Salaries Tab
+    //start Combat Salaries Page
     private CampaignOptionsHeaderPanel salariesHeader;
     private JCheckBox chkDisableSecondaryRoleSalary;
 
@@ -135,15 +135,15 @@ public class SalariesTab {
     private SalaryTableModel civilianSalaryTableModel;
     private JTable civilianSalaryTable;
     private JScrollPane civilianSalaryTableScrollPane;
-    //end Salaries Tab
+    //end Salaries Page
 
     /**
-     * Constructs the {@code PersonnelTab} object with the given campaign options.
+     * Constructs the {@code PersonnelPage} object with the given campaign options.
      *
      * @param campaignOptions the {@link CampaignOptions} instance to be used for initializing and managing personnel
      *                        options.
      */
-    public SalariesTab(@Nonnull CampaignOptions campaignOptions) {
+    public SalariesPage(@Nonnull CampaignOptions campaignOptions) {
         this.campaignOptions = campaignOptions;
 
         initialize();
@@ -151,7 +151,7 @@ public class SalariesTab {
     }
 
     /**
-     * Initializes all tabs and their components within the PersonnelTab.
+     * Initializes all pages and their components within the PersonnelPage.
      */
     private void initialize() {
         chkDisableSecondaryRoleSalary = new JCheckBox();
@@ -184,11 +184,11 @@ public class SalariesTab {
     }
 
     /**
-     * Creates the layout for the Salaries Tab, including components for salary multipliers and base salary settings.
+     * Creates the layout for the Salaries Page, including components for salary multipliers and base salary settings.
      *
-     * @return a {@link JPanel} representing the Salaries Tab.
+     * @return a {@link JPanel} representing the Salaries Page.
      */
-    public @Nonnull JPanel createSalariesTab(PersonnelRoleSubType type) {
+    public @Nonnull JPanel createSalariesPage(PersonnelRoleSubType type) {
         // Header
         String imageAddress = getImageDirectory() + "logo_clan_coyote.png";
         String headerName = getHeaderName(type);
@@ -224,17 +224,17 @@ public class SalariesTab {
 
     private String getHeaderName(PersonnelRoleSubType type) {
         return switch (type) {
-            case COMBAT -> "CombatSalariesTab";
-            case SUPPORT -> "SupportSalariesTab";
-            case CIVILIAN -> "CivilianSalariesTab";
+            case COMBAT -> "CombatSalariesPage";
+            case SUPPORT -> "SupportSalariesPage";
+            case CIVILIAN -> "CivilianSalariesPage";
         };
     }
 
     private String getQuoteResourceName(PersonnelRoleSubType type) {
         return switch (type) {
-            case COMBAT -> "0combatSalariesTab";
-            case SUPPORT -> "1supportSalariesTab";
-            case CIVILIAN -> "2civilianSalariesTab";
+            case COMBAT -> "0combatSalariesPage";
+            case SUPPORT -> "1supportSalariesPage";
+            case CIVILIAN -> "2civilianSalariesPage";
         };
     }
 
@@ -256,7 +256,7 @@ public class SalariesTab {
     }
 
     /**
-     * Creates the panel for configuring salary multipliers for specific roles in the Salaries Tab.
+     * Creates the panel for configuring salary multipliers for specific roles in the Salaries Page.
      *
      * @return a {@link JPanel} containing salary multiplier options.
      */
@@ -284,7 +284,7 @@ public class SalariesTab {
     }
 
     /**
-     * Creates the panel for configuring experience multipliers based on skill levels in the Salaries Tab.
+     * Creates the panel for configuring experience multipliers based on skill levels in the Salaries Page.
      *
      * @return a {@link JPanel} containing settings for skill-based experience multipliers.
      */
@@ -322,7 +322,7 @@ public class SalariesTab {
     }
 
     /**
-     * Creates the panel for configuring base salaries for various personnel roles in the Salaries Tab.
+     * Creates the panel for configuring base salaries for various personnel roles in the Salaries Page.
      *
      * @return a {@link JPanel} containing settings for base salaries.
      */
@@ -578,7 +578,7 @@ public class SalariesTab {
     }
 
     /**
-     * Shortcut method to load default {@link CampaignOptions} values into the tab components.
+     * Shortcut method to load default {@link CampaignOptions} values into the page components.
      */
     public void loadValuesFromCampaignOptions() {
         loadValuesFromCampaignOptions(null);
@@ -604,7 +604,7 @@ public class SalariesTab {
     }
 
     /**
-     * Applies the modified salary tab settings to the repository's campaign options. If no preset
+     * Applies the modified salary page settings to the repository's campaign options. If no preset
      * {@link CampaignOptions} is provided, the changes are applied to the current options.
      *
      * @param presetCampaignOptions optional custom {@link CampaignOptions} to apply changes to.

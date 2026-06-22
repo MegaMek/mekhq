@@ -67,7 +67,7 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 /**
  * The {@code CampaignOptionsUtilities} class provides utility methods and constants for managing, creating, and
  * organizing user interface components related to the campaign options dialog in the MekHQ application. This class
- * focuses on assisting in the creation and layout of panels, tabs, and other related components.
+ * focuses on assisting in the creation and layout of panels, pages, and other related components.
  *
  * <p>
  * This class is designed to be stateless and does not rely on any specific instance variables, making its methods
@@ -77,8 +77,8 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
  * <strong>Key Features:</strong>
  * <ul>
  *   <li>Provides reusable methods to create and configure {@link JPanel} objects.</li>
- *   <li>Handles creation of organized, alphabetized tab groups with specialized handling for
- *       "general options" tabs.</li>
+ *   <li>Handles creation of organized, alphabetized page groups with specialized handling for
+ *       "general options" pages.</li>
  *   <li>Offers UI utility methods for processing resource names, image directories,
  *       and dynamic content scaling.</li>
  *   <li>Supports internationalization through the {@link ResourceBundle} for localized strings.</li>

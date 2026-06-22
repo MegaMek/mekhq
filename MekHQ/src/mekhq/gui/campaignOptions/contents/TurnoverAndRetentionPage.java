@@ -60,8 +60,8 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 
 /**
- * The {@code TurnoverAndRetentionTab} class represents a graphical user
- * interface (GUI) configuration tab in the
+ * The {@code TurnoverAndRetentionPage} class represents a graphical user
+ * interface (GUI) configuration page in the
  * campaign options for managing unit turnover, retention, and fatigue settings.
  * <p>
  * This class provides functionality to define and customize gameplay-related
@@ -80,14 +80,14 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
  * configurations. It consists of two main panels:
  * </p>
  * <ul>
- * <li><strong>Turnover Tab:</strong> Controls unit turnover, payouts, and
+ * <li><strong>Turnover Page:</strong> Controls unit turnover, payouts, and
  * related modifiers.</li>
- * <li><strong>Fatigue Tab:</strong> Manages fatigue-related options like
+ * <li><strong>Fatigue Page:</strong> Manages fatigue-related options like
  * kitchen capacity
  * and fatigue rates.</li>
  * </ul>
  */
-public class TurnoverAndRetentionTab {
+public class TurnoverAndRetentionPage {
 
     private static final int TURNOVER_LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
     private static final int TURNOVER_CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
@@ -97,7 +97,7 @@ public class TurnoverAndRetentionTab {
     private boolean turnoverPageCreated;
     private boolean fatiguePageCreated;
 
-    // start Turnover Tab
+    // start Turnover Page
     private CampaignOptionsHeaderPanel turnoverHeader;
     private JCheckBox chkUseRandomRetirement;
 
@@ -151,7 +151,7 @@ public class TurnoverAndRetentionTab {
     private JCheckBox chkUseCommanderLeadershipOnly;
     private JLabel lblManagementSkillPenalty;
     private JSpinner spnManagementSkillPenalty;
-    // end Turnover Tab
+    // end Turnover Page
 
     private JCheckBox chkUseFatigue;
     private JLabel lblFatigueRate;
@@ -164,18 +164,18 @@ public class TurnoverAndRetentionTab {
     private JSpinner spnFatigueUndeploymentThreshold;
     private JLabel lblFatigueLeaveThreshold;
     private JSpinner spnFatigueLeaveThreshold;
-    // end Fatigue Tab
+    // end Fatigue Page
 
     /**
-     * Constructs a {@code TurnoverAndRetentionTab} and initializes the tab with the
+     * Constructs a {@code TurnoverAndRetentionPage} and initializes the page with the
      * given {@link CampaignOptions}. This
      * sets up necessary UI components and their default configurations.
      *
      * @param campaignOptions the {@code CampaignOptions} instance that holds the
      *                        settings to be modified or displayed
-     *                        in this tab.
+     *                        in this page.
      */
-    public TurnoverAndRetentionTab(@Nonnull CampaignOptions campaignOptions) {
+    public TurnoverAndRetentionPage(@Nonnull CampaignOptions campaignOptions) {
         this.campaignOptions = campaignOptions;
 
         initialize();
@@ -183,21 +183,21 @@ public class TurnoverAndRetentionTab {
     }
 
     /**
-     * Initializes the content and configuration of the turnover and fatigue tabs.
+     * Initializes the content and configuration of the turnover and fatigue pages.
      * This method sets up their respective
      * panels and components.
      */
     private void initialize() {
-        initializeTurnoverTab();
-        initializeFatigueTab();
+        initializeTurnoverPage();
+        initializeFatiguePage();
     }
 
     /**
-     * Initializes the content of the fatigue configuration tab. Includes settings
+     * Initializes the content of the fatigue configuration page. Includes settings
      * such as fatigue rate, injury fatigue,
      * field kitchen capacity, and fatigue leave thresholds.
      */
-    private void initializeFatigueTab() {
+    private void initializeFatiguePage() {
         chkUseFatigue = new JCheckBox();
         lblFatigueRate = new JLabel();
         spnFatigueRate = new JSpinner();
@@ -212,11 +212,11 @@ public class TurnoverAndRetentionTab {
     }
 
     /**
-     * Initializes the content of the turnover configuration tab. Includes settings
+     * Initializes the content of the turnover configuration page. Includes settings
      * such as turnover frequencies,
      * service contract details, and retirement/payout modifiers.
      */
-    private void initializeTurnoverTab() {
+    private void initializeTurnoverPage() {
         chkUseRandomRetirement = new JCheckBox();
 
         lblTurnoverFixedTargetNumber = new JLabel();
@@ -272,18 +272,18 @@ public class TurnoverAndRetentionTab {
     }
 
     /**
-     * Creates and configures the "Fatigue" tab with its relevant components. These
+     * Creates and configures the "Fatigue" page with its relevant components. These
      * include options related to enabling
      * fatigue, fatigue rates, injury fatigue, kitchen capacities, and leave
      * thresholds.
      *
-     * @return the {@link JPanel} representing the constructed Fatigue tab.
+     * @return the {@link JPanel} representing the constructed Fatigue page.
      */
-    public @Nonnull JPanel createFatigueTab() {
+    public @Nonnull JPanel createFatiguePage() {
         // Header
-        // start Fatigue Tab
+        // start Fatigue Page
                 String imageAddress = getImageDirectory() + "logo_clan_mongoose.png";
-                CampaignOptionsHeaderPanel fatigueHeader = new CampaignOptionsHeaderPanel("FatigueTab", imageAddress);
+                CampaignOptionsHeaderPanel fatigueHeader = new CampaignOptionsHeaderPanel("FatiguePage", imageAddress);
 
         // Contents
         chkUseFatigue = new CampaignOptionsCheckBox("UseFatigue");
@@ -325,9 +325,9 @@ public class TurnoverAndRetentionTab {
                 13, 0, 17, 1);
         spnFatigueLeaveThreshold.addMouseListener(createTipPanelUpdater("FatigueLeaveThreshold"));
 
-        JPanel panel = CampaignOptionsPagePanel.builder("FatigueTab", "FatigueTab", imageAddress)
+        JPanel panel = CampaignOptionsPagePanel.builder("FatiguePage", "FatiguePage", imageAddress)
                 .header(fatigueHeader)
-                .quote("fatigueTab")
+                .quote("fatiguePage")
                 .section("lblFatigueRulesPanel.text", "lblFatigueRulesPanel.summary", createFatigueRulesPanel())
                 .section("lblFatigueFieldKitchenPanel.text",
                         "lblFatigueFieldKitchenPanel.summary",
@@ -374,22 +374,22 @@ public class TurnoverAndRetentionTab {
     }
 
     /**
-     * Creates and configures the "Turnover" tab with its relevant components. These
+     * Creates and configures the "Turnover" page with its relevant components. These
      * include options for turnover
      * control, random retirement, payout settings, and modifiers for HR Strain and
      * cohesion.
      *
-     * @return the {@link JPanel} representing the constructed Turnover tab.
+     * @return the {@link JPanel} representing the constructed Turnover page.
      */
-    public @Nonnull JPanel createTurnoverTab() {
+    public @Nonnull JPanel createTurnoverPage() {
         // Header
         String imageAddress = getImageDirectory() + "logo_duchy_of_andurien.png";
-        turnoverHeader = new CampaignOptionsHeaderPanel("TurnoverTab", imageAddress);
+        turnoverHeader = new CampaignOptionsHeaderPanel("TurnoverPage", imageAddress);
 
         // Contents
-        JPanel panel = CampaignOptionsPagePanel.builder("TurnoverTab", "TurnoverTab", imageAddress)
+        JPanel panel = CampaignOptionsPagePanel.builder("TurnoverPage", "TurnoverPage", imageAddress)
                 .header(turnoverHeader)
-                .quote("turnoverTab")
+                .quote("turnoverPage")
                 .section("lblTurnoverGeneralPanel.text",
                         "lblTurnoverGeneralPanel.summary",
                         createTurnoverGeneralPanel())
@@ -531,7 +531,7 @@ public class TurnoverAndRetentionTab {
     }
 
     /**
-     * Creates the modifiers panel for the "Turnover" tab, which contains gameplay
+     * Creates the modifiers panel for the "Turnover" page, which contains gameplay
      * modifiers such as age, skill,
      * faction, and loyalty.
      *
@@ -583,7 +583,7 @@ public class TurnoverAndRetentionTab {
     }
 
     /**
-     * Creates the payouts panel for the "Turnover" tab. This panel holds settings
+     * Creates the payouts panel for the "Turnover" page. This panel holds settings
      * related to payout rates for officers
      * and enlisted personnel, service bonuses, and retirement multipliers.
      *
@@ -632,7 +632,7 @@ public class TurnoverAndRetentionTab {
     }
 
     /**
-     * Creates the unit cohesion panel for the "Turnover" tab, which includes
+     * Creates the unit cohesion panel for the "Turnover" page, which includes
      * settings like HR strain and management
      * skills.
      *
@@ -685,7 +685,7 @@ public class TurnoverAndRetentionTab {
     /**
      * Loads the current configuration values from the provided
      * {@link CampaignOptions} object and updates the
-     * associated UI components in both the Turnover and Fatigue tabs. If no options
+     * associated UI components in both the Turnover and Fatigue pages. If no options
      * are provided, the existing campaign
      * options are used.
      *

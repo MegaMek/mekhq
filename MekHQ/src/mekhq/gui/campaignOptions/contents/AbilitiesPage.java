@@ -94,13 +94,13 @@ import mekhq.utilities.ReportingUtilities;
 import mekhq.utilities.spaUtilities.enums.AbilityCategory;
 
 /**
- * The {@code AbilitiesTab} class represents a GUI tab for configuring and managing special abilities in a campaign.
+ * The {@code AbilitiesPage} class represents a GUI page for configuring and managing special abilities in a campaign.
  * This class handles the initialization, categorization, and display of abilities, providing functionality for
  * enabling, disabling, and customizing abilities within the combat, maneuvering, and utility categories.
  * <p>
- * This tab is used as part of the MekHQ campaign options UI for managing personnel-related abilities.
+ * This page is used as part of the MekHQ campaign options UI for managing personnel-related abilities.
  */
-public class AbilitiesTab {
+public class AbilitiesPage {
     /**
      * Pre-scaling width (in pixels) for each of the three prerequisite/incompatible/removed list columns. Keeps long
      * lists wrapping within the column instead of expanding the ability panel past the page width cap.
@@ -109,13 +109,13 @@ public class AbilitiesTab {
 
     private ArrayList<String> level3Abilities;
     private Map<String, CampaignOptionsAbilityInfo> allAbilityInfo;
-    private Map<AbilityCategory, JPanel> createdCategoryTabs;
+    private Map<AbilityCategory, JPanel> createdCategoryPages;
 
     /**
-     * Constructor for the {@code AbilitiesTab} class. Initializes the tab by creating containers for ability categories
+     * Constructor for the {@code AbilitiesPage} class. Initializes the page by creating containers for ability categories
      * and populating them with related ability information.
      */
-    public AbilitiesTab() {
+    public AbilitiesPage() {
         initialize();
     }
 
@@ -127,7 +127,7 @@ public class AbilitiesTab {
     private void initialize() {
         allAbilityInfo = new HashMap<>();
         level3Abilities = new ArrayList<>();
-        createdCategoryTabs = new EnumMap<>(AbilityCategory.class);
+        createdCategoryPages = new EnumMap<>(AbilityCategory.class);
         buildAllAbilityInfo(SpecialAbility.getSpecialAbilities());
     }
 
@@ -173,39 +173,39 @@ public class AbilitiesTab {
             buildAbilityInfo(missingAbilities, false);
         }
 
-        refreshCreatedTabs();
+        refreshCreatedPages();
     }
 
     /**
-     * Refreshes and updates created tabs related to abilities by clearing their contents and reloading the data.
+     * Refreshes and updates created pages related to abilities by clearing their contents and reloading the data.
      */
-    private void refreshCreatedTabs() {
-        for (AbilityCategory category : new ArrayList<>(createdCategoryTabs.keySet())) {
-            refreshTabContents(category);
+    private void refreshCreatedPages() {
+        for (AbilityCategory category : new ArrayList<>(createdCategoryPages.keySet())) {
+            refreshPageContents(category);
         }
     }
 
     /**
-     * Updates the contents of a specific ability category tab by rebuilding its layout and content based on the
+     * Updates the contents of a specific ability category page by rebuilding its layout and content based on the
      * category.
      *
-     * @param category The ability category associated with the tab.
+     * @param category The ability category associated with the page.
      */
-    private void refreshTabContents(AbilityCategory category) {
-        JPanel tab = createdCategoryTabs.get(category);
-        if (tab == null) {
+    private void refreshPageContents(AbilityCategory category) {
+        JPanel page = createdCategoryPages.get(category);
+        if (page == null) {
             return;
         }
 
-        tab.removeAll();
-        JPanel newContents = createAbilitiesPage(category);
+        page.removeAll();
+        JPanel newContents = buildAbilitiesPage(category);
 
         // Add new content to the same panel
-        tab.setLayout(new BorderLayout());
-        tab.add(newContents, BorderLayout.CENTER);
+        page.setLayout(new BorderLayout());
+        page.add(newContents, BorderLayout.CENTER);
 
-        tab.revalidate();
-        tab.repaint();
+        page.revalidate();
+        page.repaint();
     }
 
     /**
@@ -232,37 +232,37 @@ public class AbilitiesTab {
     }
 
     /**
-     * Creates a new abilities configuration tab for a specific category. This includes adding controls, headers, and
+     * Creates a new abilities configuration page for a specific category. This includes adding controls, headers, and
      * listed abilities.
      *
-     * @param abilityCategory The {@code AbilityCategory} to generate a tab for.
+     * @param abilityCategory The {@code AbilityCategory} to generate a page for.
      *
-     * @return A {@code JPanel} representing the generated abilities tab.
+     * @return A {@code JPanel} representing the generated abilities page.
      */
-    public @Nonnull JPanel createAbilitiesTab(AbilityCategory abilityCategory) {
-        JPanel tab = createdCategoryTabs.computeIfAbsent(abilityCategory, category -> new JPanel(new BorderLayout()));
-        if (tab.getComponentCount() == 0) {
-            refreshTabContents(abilityCategory);
+    public @Nonnull JPanel createAbilitiesPage(AbilityCategory abilityCategory) {
+        JPanel page = createdCategoryPages.computeIfAbsent(abilityCategory, category -> new JPanel(new BorderLayout()));
+        if (page.getComponentCount() == 0) {
+            refreshPageContents(abilityCategory);
         }
 
-        return tab;
+        return page;
     }
 
-    private @Nonnull JPanel createAbilitiesPage(AbilityCategory abilityCategory) {
+    private @Nonnull JPanel buildAbilitiesPage(AbilityCategory abilityCategory) {
         // Header name and logo image per category.
         String[] headerInfo = switch (abilityCategory) {
-            case COMBAT_ABILITY -> new String[] { "CombatAbilitiesTab", "logo_aurigan_coalition.png" };
-            case MANEUVERING_ABILITY -> new String[] { "ManeuveringAbilitiesTab", "logo_clan_hells_horses.png" };
-            case UTILITY_ABILITY -> new String[] { "UtilityAbilitiesTab", "logo_circinus_federation.png" };
-            case CHARACTER_FLAW -> new String[] { "CharacterFlawsTab", "logo_word_of_blake.png" };
-            case CHARACTER_CREATION_ONLY -> new String[] { "CharacterCreationOnlyTab", "logo_tortuga_dominions.png" };
+            case COMBAT_ABILITY -> new String[] { "CombatAbilitiesPage", "logo_aurigan_coalition.png" };
+            case MANEUVERING_ABILITY -> new String[] { "ManeuveringAbilitiesPage", "logo_clan_hells_horses.png" };
+            case UTILITY_ABILITY -> new String[] { "UtilityAbilitiesPage", "logo_circinus_federation.png" };
+            case CHARACTER_FLAW -> new String[] { "CharacterFlawsPage", "logo_word_of_blake.png" };
+            case CHARACTER_CREATION_ONLY -> new String[] { "CharacterCreationOnlyPage", "logo_tortuga_dominions.png" };
         };
         String headerName = headerInfo[0];
         String imageAddress = getImageDirectory() + headerInfo[1];
 
         CampaignOptionsHeaderPanel headerPanel = new CampaignOptionsHeaderPanel(headerName, imageAddress);
 
-        CampaignOptionsPagePanel.Builder builder = CampaignOptionsPagePanel.builder("AbilitiesTab" +
+        CampaignOptionsPagePanel.Builder builder = CampaignOptionsPagePanel.builder("AbilitiesPage" +
                                                                                           abilityCategory.name(),
                     headerName,
                     imageAddress)
@@ -298,7 +298,7 @@ public class AbilitiesTab {
     /**
      * Builds the top action bar containing the four enable/disable buttons for the given category.
      *
-     * @param abilityCategory the category these buttons act on for the "current tab" actions
+     * @param abilityCategory the category these buttons act on for the "current page" actions
      *
      * @return a left-aligned panel with the four action buttons
      */
@@ -352,7 +352,7 @@ public class AbilitiesTab {
      * Enables or disables abilities in the specified category, or all abilities if the category is {@code null}.
      *
      * <p>Iterates through all abilities and applies the {@code enable} status as indicated, then refreshes all ability
-     * tabs to reflect the changes.</p>
+     * pages to reflect the changes.</p>
      *
      * @param abilityCategory the {@link AbilityCategory} to filter abilities, or {@code null} to affect all categories
      * @param enable          {@code true} to enable the abilities; {@code false} to disable them
@@ -369,9 +369,9 @@ public class AbilitiesTab {
         }
 
         if (abilityCategory == null) {
-            refreshCreatedTabs();
+            refreshCreatedPages();
         } else {
-            refreshTabContents(abilityCategory);
+            refreshPageContents(abilityCategory);
         }
     }
 

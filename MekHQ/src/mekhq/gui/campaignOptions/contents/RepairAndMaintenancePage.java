@@ -55,17 +55,17 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 
 /**
- * Represents a tab in the campaign options UI used to configure settings
+ * Represents a page in the campaign options UI used to configure settings
  * related to repair and maintenance in a
  * campaign.
  * <p>
- * This tab is divided into two sections:
+ * This page is divided into two sections:
  * </p>
  * <ul>
- * <li><b>Repair Tab:</b> Manages options for era modifications, tech
+ * <li><b>Repair Page:</b> Manages options for era modifications, tech
  * assignments,
  * equipment quirks handling, destruction margins, and more.</li>
- * <li><b>Maintenance Tab:</b> Handles maintenance settings such as cycle
+ * <li><b>Maintenance Page:</b> Handles maintenance settings such as cycle
  * frequency, quality standards,
  * planetary modifiers, and unofficial maintenance rules.</li>
  * </ul>
@@ -75,7 +75,7 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
  * and application of repair and maintenance configuration settings.
  * </p>
  */
-public class RepairAndMaintenanceTab {
+public class RepairAndMaintenancePage {
     private static final int FORM_LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
     private static final int FORM_CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
     private static final int CHECKBOX_GRID_COLUMNS = 2;
@@ -97,7 +97,7 @@ public class RepairAndMaintenanceTab {
     private JSpinner spnDamageMargin;
     private JLabel lblDestroyPartTarget;
     private JSpinner spnDestroyPartTarget;
-    // end Repair Tab
+    // end Repair Page
 
     private JCheckBox checkMaintenance;
     private JLabel lblMaintenanceDays;
@@ -112,17 +112,17 @@ public class RepairAndMaintenanceTab {
     private JCheckBox chkUsePlanetaryModifiers;
     private JCheckBox useUnofficialMaintenance;
     private JCheckBox logMaintenance;
-    // end Maintenance Tab
+    // end Maintenance Page
 
     /**
-     * Constructs a {@code RepairAndMaintenanceTab} instance for configuring repair
+     * Constructs a {@code RepairAndMaintenancePage} instance for configuring repair
      * and maintenance-related settings.
      *
      * @param campaignOptions the {@link CampaignOptions} object to be used for
      *                        managing repair and maintenance
      *                        options.
      */
-    public RepairAndMaintenanceTab(@Nonnull CampaignOptions campaignOptions) {
+    public RepairAndMaintenancePage(@Nonnull CampaignOptions campaignOptions) {
         this.campaignOptions = campaignOptions;
 
         initialize();
@@ -130,23 +130,23 @@ public class RepairAndMaintenanceTab {
     }
 
     /**
-     * Initializes the components of the tab, including both the Repair and
+     * Initializes the components of the page, including both the Repair and
      * Maintenance sections.
      */
     void initialize() {
-        initializeRepairTab();
-        initializeMaintenanceTab();
+        initializeRepairPage();
+        initializeMaintenancePage();
     }
 
     /**
-     * Initializes the components for the Repair Tab.
+     * Initializes the components for the Repair Page.
      * <p>
-     * The Repair Tab includes settings for era-based modifications, technician
+     * The Repair Page includes settings for era-based modifications, technician
      * assignment, equipment quirks, damage
      * margins, and destruction thresholds.
      * </p>
      */
-    private void initializeRepairTab() {
+    private void initializeRepairPage() {
         chkTechsUseAdministration = new JCheckBox();
         chkUsefulAsTechs = new JCheckBox();
         useEraModsCheckBox = new JCheckBox();
@@ -168,14 +168,14 @@ public class RepairAndMaintenanceTab {
     }
 
     /**
-     * Initializes the components for the Maintenance Tab.
+     * Initializes the components for the Maintenance Page.
      * <p>
-     * The Maintenance Tab includes settings for maintenance scheduling, quality
+     * The Maintenance Page includes settings for maintenance scheduling, quality
      * rules, randomization factors, and
      * logging options.
      * </p>
      */
-    private void initializeMaintenanceTab() {
+    private void initializeMaintenancePage() {
         checkMaintenance = new JCheckBox();
 
         lblMaintenanceDays = new JLabel();
@@ -201,20 +201,20 @@ public class RepairAndMaintenanceTab {
     }
 
     /**
-     * Creates the panel for the Repair Tab.
+     * Creates the panel for the Repair Page.
      * <p>
-     * This tab provides configurable options for managing repair rules, handling
+     * This page provides configurable options for managing repair rules, handling
      * quirks, setting margins for equipment
      * survival, and incorporating era modifications.
      * </p>
      *
-     * @return a {@link JPanel} representing the Repair Tab.
+     * @return a {@link JPanel} representing the Repair Page.
      */
-    public @Nonnull JPanel createRepairTab() {
+    public @Nonnull JPanel createRepairPage() {
         // Header
-        // start Repair Tab
+        // start Repair Page
         String imageAddress = getImageDirectory() + "logo_clan_burrock.png";
-        CampaignOptionsHeaderPanel repairHeader = new CampaignOptionsHeaderPanel("RepairTab", imageAddress);
+        CampaignOptionsHeaderPanel repairHeader = new CampaignOptionsHeaderPanel("RepairPage", imageAddress);
 
         chkTechsUseAdministration = new CampaignOptionsCheckBox("TechsUseAdministration",
                 getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
@@ -259,14 +259,14 @@ public class RepairAndMaintenanceTab {
         repairPageCreated = true;
         updateRepairControlsFromModel();
 
-        return CampaignOptionsPagePanel.builder("RepairTab", "RepairTab", imageAddress)
+        return CampaignOptionsPagePanel.builder("RepairPage", "RepairPage", imageAddress)
                 .header(repairHeader)
-                .quote("repairTab")
-                .section("lblRepairTab.text",
-                        "lblRepairTab.summary",
+                .quote("repairPage")
+                .section("lblRepairPage.text",
+                        "lblRepairPage.summary",
                         repairOptionsPanel)
-                .section("lblRepairTabRight.text",
-                        "lblRepairTabRight.summary",
+                .section("lblRepairPageRight.text",
+                        "lblRepairPageRight.summary",
                         componentDamagePanel,
                         getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM))
                 .build();
@@ -301,20 +301,20 @@ public class RepairAndMaintenanceTab {
     }
 
     /**
-     * Creates the panel for the Maintenance Tab.
+     * Creates the panel for the Maintenance Page.
      * <p>
-     * This tab provides configurable options for managing maintenance cycles,
+     * This page provides configurable options for managing maintenance cycles,
      * quality standards, planetary effects, and
      * custom rules for units' upkeep.
      * </p>
      *
-     * @return a {@link JPanel} representing the Maintenance Tab.
+     * @return a {@link JPanel} representing the Maintenance Page.
      */
-    public @Nonnull JPanel createMaintenanceTab() {
+    public @Nonnull JPanel createMaintenancePage() {
         // Header
-        // start Maintenance Tab
+        // start Maintenance Page
         String imageAddress = getImageDirectory() + "logo_magistracy_of_canopus.png";
-        CampaignOptionsHeaderPanel maintenanceHeader = new CampaignOptionsHeaderPanel("MaintenanceTab", imageAddress);
+        CampaignOptionsHeaderPanel maintenanceHeader = new CampaignOptionsHeaderPanel("MaintenancePage", imageAddress);
 
         // Contents
         checkMaintenance = new CampaignOptionsCheckBox("CheckMaintenance");
@@ -369,11 +369,11 @@ public class RepairAndMaintenanceTab {
         maintenancePageCreated = true;
         updateMaintenanceControlsFromModel();
 
-        return CampaignOptionsPagePanel.builder("MaintenanceTab", "MaintenanceTab", imageAddress)
+        return CampaignOptionsPagePanel.builder("MaintenancePage", "MaintenancePage", imageAddress)
                 .header(maintenanceHeader)
-                .quote("maintenanceTab")
-                .section("lblMaintenanceTab.text",
-                        "lblMaintenanceTab.summary",
+                .quote("maintenancePage")
+                .section("lblMaintenancePage.text",
+                        "lblMaintenancePage.summary",
                         schedulePanel)
                 .section("lblMaintenanceQualityPanel.text",
                         "lblMaintenanceQualityPanel.summary",
@@ -411,7 +411,7 @@ public class RepairAndMaintenanceTab {
 
     /**
      * Loads the repair and maintenance settings from the default
-     * {@link CampaignOptions} into the tab's UI components.
+     * {@link CampaignOptions} into the page's UI components.
      */
     public void loadValuesFromCampaignOptions() {
         loadValuesFromCampaignOptions(null);
@@ -419,10 +419,10 @@ public class RepairAndMaintenanceTab {
 
     /**
      * Loads the repair and maintenance settings from the {@link CampaignOptions}
-     * object into the tab's UI components.
+     * object into the page's UI components.
      * <p>
      * If no custom {@link CampaignOptions} are provided, the default
-     * {@link CampaignOptions} associated with this tab
+     * {@link CampaignOptions} associated with this page
      * is used.
      * </p>
      *
@@ -441,13 +441,13 @@ public class RepairAndMaintenanceTab {
     }
 
     /**
-     * Applies the current tab's repair and maintenance settings from the UI
+     * Applies the current page's repair and maintenance settings from the UI
      * components to the provided
      * {@link CampaignOptions}.
      * <p>
      * If no custom {@link CampaignOptions} are provided, uses the default
      * {@link CampaignOptions} associated with this
-     * tab.
+     * page.
      * </p>
      *
      * @param presetCampaignOptions optional custom {@link CampaignOptions} object
