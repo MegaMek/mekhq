@@ -97,8 +97,8 @@ import mekhq.gui.campaignOptions.optionChangeDialogs.*;
  * <p>The pane registers a flat set of {@link CampaignOptionsRoute}s - each describing a navigable destination and its
  * hierarchical path - and maps each one to a page factory. Pages are built lazily the first time they are shown (or
  * when the navigation search index is warmed) and then cached. The per-area builders
- * ({@link mekhq.gui.campaignOptions.contents.GeneralPage GeneralPage},
- * {@link mekhq.gui.campaignOptions.contents.PersonnelPage PersonnelPage}, and the other per-area {@code *Page}
+ * ({@link mekhq.gui.campaignOptions.contents.GeneralPages GeneralPages},
+ * {@link mekhq.gui.campaignOptions.contents.PersonnelPages PersonnelPages}, and the other per-area {@code *Pages}
  * classes) are likewise only instantiated the first time their section is needed.</p>
  *
  * <p>The pane is constructed with a {@link Campaign} and a {@link CampaignOptionsDialogMode} ({@code NORMAL},
@@ -131,21 +131,21 @@ public class CampaignOptionsPane extends JPanel {
     private CampaignOptionsNavigationPanel navigationPanel;
     private boolean isSyncingNavigationSelection;
 
-    private GeneralPage generalPage;
-    private PersonnelPage personnelPage;
-    private BiographyPage biographyPage;
-    private RelationshipsPage relationshipsPage;
-    private SalariesPage salariesPage;
-    private TurnoverAndRetentionPage turnoverAndRetentionPage;
-    private AdvancementPage advancementPage;
-    private SkillsPage skillsPage;
-    private AbilitiesPage abilitiesPage;
-    private RepairAndMaintenancePage repairAndMaintenancePage;
-    private EquipmentAndSuppliesPage equipmentAndSuppliesPage;
-    private FinancesPage financesPage;
-    private MarketsPage marketsPage;
-    private SystemsPage systemsPage;
-    private RulesetsPage rulesetsPage;
+    private GeneralPages generalPage;
+    private PersonnelPages personnelPage;
+    private BiographyPages biographyPage;
+    private RelationshipsPages relationshipsPage;
+    private SalariesPages salariesPage;
+    private TurnoverAndRetentionPages turnoverAndRetentionPage;
+    private AwardsAndRandomizationPages awardsAndRandomizationPage;
+    private SkillsPages skillsPage;
+    private AbilitiesPages abilitiesPage;
+    private RepairAndMaintenancePages repairAndMaintenancePage;
+    private EquipmentAndSuppliesPages equipmentAndSuppliesPage;
+    private FinancesPages financesPage;
+    private MarketsPages marketsPage;
+    private SystemsPages systemsPage;
+    private RulesetsPages rulesetsPage;
     private CampaignGUI campaignGui;
 
     /**
@@ -473,7 +473,7 @@ public class CampaignOptionsPane extends JPanel {
                 }
             }
             case "advancementCategory" -> {
-                if (advancementPage == null) {
+                if (awardsAndRandomizationPage == null) {
                     initializeAdvancementSection();
                 }
             }
@@ -501,29 +501,29 @@ public class CampaignOptionsPane extends JPanel {
     }
 
     private void initializeHumanResourcesSection() {
-        personnelPage = new PersonnelPage(campaignOptions);
-        biographyPage = new BiographyPage(campaign, generalPage);
-        relationshipsPage = new RelationshipsPage(campaignOptions);
-        salariesPage = new SalariesPage(campaignOptions);
-        turnoverAndRetentionPage = new TurnoverAndRetentionPage(campaignOptions);
+        personnelPage = new PersonnelPages(campaignOptions);
+        biographyPage = new BiographyPages(campaign, generalPage);
+        relationshipsPage = new RelationshipsPages(campaignOptions);
+        salariesPage = new SalariesPages(campaignOptions);
+        turnoverAndRetentionPage = new TurnoverAndRetentionPages(campaignOptions);
     }
 
     private void initializeAdvancementSection() {
-        advancementPage = new AdvancementPage(campaign);
-        skillsPage = new SkillsPage(campaignOptions);
-        abilitiesPage = new AbilitiesPage();
+        awardsAndRandomizationPage = new AwardsAndRandomizationPages(campaign);
+        skillsPage = new SkillsPages(campaignOptions);
+        abilitiesPage = new AbilitiesPages();
     }
 
     private void initializeLogisticsSection() {
-        repairAndMaintenancePage = new RepairAndMaintenancePage(campaignOptions);
-        equipmentAndSuppliesPage = new EquipmentAndSuppliesPage(campaignOptions);
+        repairAndMaintenancePage = new RepairAndMaintenancePages(campaignOptions);
+        equipmentAndSuppliesPage = new EquipmentAndSuppliesPages(campaignOptions);
     }
 
     private void initializeOperationsSection() {
-        financesPage = new FinancesPage(campaign);
-        marketsPage = new MarketsPage(campaign);
-        systemsPage = new SystemsPage(campaign);
-        rulesetsPage = new RulesetsPage(campaignOptions);
+        financesPage = new FinancesPages(campaign);
+        marketsPage = new MarketsPages(campaign);
+        systemsPage = new SystemsPages(campaign);
+        rulesetsPage = new RulesetsPages(campaignOptions);
     }
 
     private void registerParentRoute(String id, String... titleResourceNames) {
@@ -628,7 +628,7 @@ public class CampaignOptionsPane extends JPanel {
      * @return a {@link JScrollPane} containing the general page panel
      */
     private JPanel createGeneralPage(CampaignOptionsDialogMode mode) {
-        generalPage = new GeneralPage(campaign, frame, mode);
+        generalPage = new GeneralPages(campaign, frame, mode);
         JPanel createdGeneralPage = generalPage.createGeneralPage();
         generalPage.loadValuesFromCampaignOptions();
 
@@ -732,17 +732,17 @@ public class CampaignOptionsPane extends JPanel {
 
     private JPanel createAdvancementRandomizationPage() {
         ensureSectionLoaded("advancementCategory");
-        return advancementPage.skillRandomizationPage();
+        return awardsAndRandomizationPage.skillRandomizationPage();
     }
 
     private JPanel createAdvancementXpAwardsPage() {
         ensureSectionLoaded("advancementCategory");
-        return advancementPage.xpAwardsPage();
+        return awardsAndRandomizationPage.xpAwardsPage();
     }
 
     private JPanel createAdvancementRecruitmentBonusesPage() {
         ensureSectionLoaded("advancementCategory");
-        return advancementPage.recruitmentBonusesPage();
+        return awardsAndRandomizationPage.recruitmentBonusesPage();
     }
 
     private JPanel createAdvancementGunnerySkillsPage() {
@@ -914,8 +914,8 @@ public class CampaignOptionsPane extends JPanel {
         }
 
         // Advancement
-        if (advancementPage != null) {
-            advancementPage.applyCampaignOptionsToCampaign(options, presetRandomSkillPreferences);
+        if (awardsAndRandomizationPage != null) {
+            awardsAndRandomizationPage.applyCampaignOptionsToCampaign(options, presetRandomSkillPreferences);
             skillsPage.applyCampaignOptionsToCampaign(options, presetSkills);
             abilitiesPage.applyCampaignOptionsToCampaign(preset);
         }
@@ -1210,7 +1210,7 @@ public class CampaignOptionsPane extends JPanel {
         turnoverAndRetentionPage.loadValuesFromCampaignOptions(presetCampaignOptions);
 
         // Advancement
-        advancementPage.loadValuesFromCampaignOptions(presetCampaignOptions,
+        awardsAndRandomizationPage.loadValuesFromCampaignOptions(presetCampaignOptions,
                 campaignPreset.getRandomSkillPreferences());
         skillsPage.loadValuesFromCampaignOptions(presetCampaignOptions, campaignPreset.getSkills());
         // The ability page is a special case, so handled differently to other pages

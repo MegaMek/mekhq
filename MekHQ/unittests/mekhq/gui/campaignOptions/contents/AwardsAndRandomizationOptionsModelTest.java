@@ -40,16 +40,16 @@ import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import org.junit.jupiter.api.Test;
 
 /**
- * Exhaustive round-trip test for {@link AdvancementOptionsModel}, whose fields live partly on {@link CampaignOptions}
+ * Exhaustive round-trip test for {@link AwardsAndRandomizationOptionsModel}, whose fields live partly on {@link CampaignOptions}
  * and partly on {@link RandomSkillPreferences}. Every scalar field plus the phenotype and experience-level bonus arrays
  * are mutated and verified through a save/reload. The {@code recruitmentBonuses} map is written through an accumulating
  * setter, so it is asserted explicitly for a single role rather than by full-map equality.
  */
-class AdvancementOptionsModelTest {
+class AwardsAndRandomizationOptionsModelTest {
     @Test
     void applyToRoundTripsEveryField() {
-        AdvancementOptionsModel model =
-              new AdvancementOptionsModel(new CampaignOptions(), new RandomSkillPreferences());
+        AwardsAndRandomizationOptionsModel model =
+              new AwardsAndRandomizationOptionsModel(new CampaignOptions(), new RandomSkillPreferences());
         OptionsModelTestSupport.mutateScalarFields(model);
         model.phenotypeProbabilities[0] += 1;
         model.specialAbilityBonus[0] += 1;
@@ -60,8 +60,8 @@ class AdvancementOptionsModelTest {
         CampaignOptions destinationOptions = new CampaignOptions();
         RandomSkillPreferences destinationPreferences = new RandomSkillPreferences();
         model.applyTo(destinationOptions, destinationPreferences);
-        AdvancementOptionsModel roundTripped =
-              new AdvancementOptionsModel(destinationOptions, destinationPreferences);
+        AwardsAndRandomizationOptionsModel roundTripped =
+              new AwardsAndRandomizationOptionsModel(destinationOptions, destinationPreferences);
 
         OptionsModelTestSupport.assertAllFieldsMatch(model, roundTripped, "recruitmentBonuses");
         assertEquals(model.recruitmentBonuses.get(PersonnelRole.MEKWARRIOR),

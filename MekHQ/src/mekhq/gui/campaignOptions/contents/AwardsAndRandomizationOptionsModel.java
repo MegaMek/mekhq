@@ -41,7 +41,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillType;
 
-class AdvancementOptionsModel {
+class AwardsAndRandomizationOptionsModel {
     private static final int[] EXPERIENCE_LEVELS = new int[] { SkillType.EXP_ULTRA_GREEN,
                                                                SkillType.EXP_GREEN,
                                                                SkillType.EXP_REGULAR,
@@ -82,7 +82,7 @@ class AdvancementOptionsModel {
     int secondSkillBonus;
     Map<PersonnelRole, Integer> recruitmentBonuses;
 
-    AdvancementOptionsModel(@Nonnull CampaignOptions options, @Nonnull RandomSkillPreferences skillPreferences) {
+    AwardsAndRandomizationOptionsModel(@Nonnull CampaignOptions options, @Nonnull RandomSkillPreferences skillPreferences) {
         xpCostMultiplier = options.getXpCostMultiplier();
         taskXP = options.getTaskXP();
         nTasksXP = options.getNTasksXP();

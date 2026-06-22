@@ -151,7 +151,7 @@ class CampaignOptionsContentHost extends JPanel {
      * Finds the {@link CampaignOptionsPagePanel} for the supplied content, whether it is the content itself or nested
      * inside a wrapper panel.
      *
-     * <p>Most pages hand their page panel in directly. The recursive lookup exists for {@code AbilitiesPage}, which
+     * <p>Most pages hand their page panel in directly. The recursive lookup exists for {@code AbilitiesPages}, which
      * wraps its page in a {@link java.awt.BorderLayout} container so it can rebuild the page in place when the special
      * ability list changes (the content host keeps a stable container reference while the inner page is swapped).</p>
      *
