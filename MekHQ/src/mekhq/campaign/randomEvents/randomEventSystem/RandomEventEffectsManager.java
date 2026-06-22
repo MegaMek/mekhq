@@ -41,6 +41,11 @@ import static mekhq.campaign.force.FormationType.SECURITY;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_POISON_RESISTANCE;
 import static mekhq.campaign.personnel.enums.PersonnelRole.DEPENDENT;
 import static mekhq.campaign.personnel.enums.PersonnelRole.NONE;
+import static mekhq.campaign.randomEvents.randomEventSystem.RandomEventEffectedPersonnelType.CAMP_FOLLOWERS;
+import static mekhq.campaign.randomEvents.randomEventSystem.RandomEventEffectedPersonnelType.COMBAT_PERSONNEL;
+import static mekhq.campaign.randomEvents.randomEventSystem.RandomEventEffectedPersonnelType.PRISONERS;
+import static mekhq.campaign.randomEvents.randomEventSystem.RandomEventEffectedPersonnelType.SECURITY_GUARD;
+import static mekhq.campaign.randomEvents.randomEventSystem.RandomEventEffectedPersonnelType.SUPPORT_PERSONNEL;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
@@ -52,7 +57,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
@@ -79,6 +83,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.selectors.factionSelectors.DefaultFactionSelector;
 import mekhq.campaign.universe.selectors.planetSelectors.DefaultPlanetSelector;
 import mekhq.utilities.ReportingUtilities;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Manages the resolution and effects of random events during a campaign.
@@ -123,10 +128,17 @@ public class RandomEventEffectsManager {
                                                 responseEntry.effectsSuccess() :
                                                 responseEntry.effectsFailure();
 
+        StringBuilder report = buildMechanicalEffectsReport(eventData, results);
+        eventReport = report.toString();
+    }
+
+    private @NonNull StringBuilder buildMechanicalEffectsReport(RandomEventData eventData,
+          List<RandomEventResult> results) {
         StringBuilder report = new StringBuilder();
         for (RandomEventResult result : results) {
             RandomEventResultEffect effect = result.effect();
 
+            // TODO change to Map-Lookup Pattern, Illiani Jun/22/26
             String mechanicalEffectsReport = switch (effect) {
                 case NONE -> "";
                 case PRISONER_CAPACITY -> eventEffectPrisonerCapacity(result);
@@ -149,8 +161,7 @@ public class RandomEventEffectsManager {
                 report.append("- ").append(mechanicalEffectsReport).append("<br>");
             }
         }
-
-        eventReport = report.toString();
+        return report;
     }
 
     /**
@@ -166,10 +177,12 @@ public class RandomEventEffectsManager {
     }
 
     /**
-     * Retrieves the set of prisoners who escaped as a result of the processed event.
+     * Retrieves the set of personnel who have been returned by the processed event.
      *
-     * <p>The returned set can be used to track and handle additional consequences of the escapes,
-     * such as updating campaign statistics or creating follow-up events.</p>
+     * <p>The returned set can be used to track and handle additional consequences, such as updating campaign
+     * statistics or creating follow-up events.</p>
+     *
+     * <p><b>Example:</b> some events use this to return a set of escaped prisoners.</p>
      *
      * @return A {@link Set} of {@link Person} objects representing the prisoners who escaped, or an empty set if no
      *       escapes occurred.
@@ -184,12 +197,13 @@ public class RandomEventEffectsManager {
      * <p>Guards are selected from security forces, while prisoners are selected from the current
      * prisoner list. The selection excludes any invalid targets.</p>
      *
-     * @param isGuard {@code true} to select a guard, {@code false} to select a prisoner.
+     * @param effectedPersonnelTypes a list of {@link RandomEventEffectedPersonnelType} representing the types of
+     *                               personnel to be considered for selection.
      *
      * @return The randomly selected {@link Person}, or {@code null} if no valid target exists.
      */
-    private @Nullable Person getRandomTarget(final boolean isGuard) {
-        List<Person> potentialTargets = getAllPotentialTargets(isGuard);
+    private @Nullable Person getRandomTarget(final List<RandomEventEffectedPersonnelType> effectedPersonnelTypes) {
+        Set<Person> potentialTargets = getAllPotentialTargets(effectedPersonnelTypes);
 
         if (potentialTargets.isEmpty()) {
             return null;
@@ -201,35 +215,58 @@ public class RandomEventEffectsManager {
     /**
      * Retrieves all potential targets for an event effect, either guards or prisoners.
      *
-     * @param isGuard {@code true} to retrieve guards, {@code false} to retrieve prisoners.
+     * @param effectedPersonnelTypes a list of {@link RandomEventEffectedPersonnelType} representing the types of
+     *                               personnel to be considered for selection.
      *
      * @return A {@link List} of {@link Person} objects representing the potential targets.
      */
-    private List<Person> getAllPotentialTargets(final boolean isGuard) {
-        List<Person> potentialTargets = new ArrayList<>();
-        if (isGuard) {
-            for (Formation formation : campaign.getAllFormations()) {
-                if (!formation.isFormationType(SECURITY)) {
-                    continue;
-                }
+    private Set<Person> getAllPotentialTargets(final List<RandomEventEffectedPersonnelType> effectedPersonnelTypes) {
+        boolean includePrisoners = effectedPersonnelTypes.contains(PRISONERS);
+        boolean includeCombatPersonnel = effectedPersonnelTypes.contains(COMBAT_PERSONNEL);
+        boolean includeSupportPersonnel = effectedPersonnelTypes.contains(SUPPORT_PERSONNEL);
+        boolean includeCampFollowers = effectedPersonnelTypes.contains(CAMP_FOLLOWERS);
+        boolean includeSecurityGuards = effectedPersonnelTypes.contains(SECURITY_GUARD);
 
-                for (UUID unitId : formation.getAllUnits(false)) {
-                    Unit unit = campaign.getUnit(unitId);
-
-                    if (unit != null) {
-                        potentialTargets.addAll(unit.getActiveCrew());
-                    }
-                }
+        Set<Person> potentialTargets = new HashSet<>();
+        for (Person person : campaign.getAllPersonnel()) {
+            PersonnelStatus personStatus = person.getStatus();
+            if (personStatus.isDepartedUnit() || !personStatus.isActive()) {
+                continue;
             }
-        } else {
-            for (Person prisoner : campaign.getCurrentPrisoners()) {
-                // This allows us to injury multiple people in the same event without risking the
-                // same person being hit twice.
-                if (!prisoner.needsFixing()) {
-                    potentialTargets.add(prisoner);
+
+            // Prisoner early continue
+            if (person.getPrisonerStatus().isCurrentPrisoner()) {
+                if (includePrisoners) {
+                    potentialTargets.add(person);
+                }
+                continue;
+            }
+
+            // Non-prisoners
+            if (includeCombatPersonnel && person.isCombat()) {
+                potentialTargets.add(person);
+                continue;
+            }
+
+            if (includeSupportPersonnel && person.isSupport()) {
+                potentialTargets.add(person);
+                continue;
+            }
+
+            if (includeCampFollowers && personStatus.isCampFollower()) {
+                potentialTargets.add(person);
+                continue;
+            }
+
+            if (includeSecurityGuards) {
+                Unit unit = person.getUnit();
+                Formation formation = unit.getCampaign().getFormationFor(unit);
+                if (formation != null && formation.isFormationType(SECURITY)) {
+                    potentialTargets.add(person);
                 }
             }
         }
+
         return potentialTargets;
     }
 
@@ -272,10 +309,10 @@ public class RandomEventEffectsManager {
      * @return A {@link String} summarizing the injury effect.
      */
     String eventEffectInjury(RandomEventResult result) {
-        final boolean isGuard = result.isGuard();
+        final List<RandomEventEffectedPersonnelType> affectedPersonnelTypes = result.affectedPersonnelTypes();
         final int magnitude = result.magnitude();
 
-        Person target = getRandomTarget(isGuard);
+        Person target = getRandomTarget(affectedPersonnelTypes);
 
         if (target == null) {
             return "";
@@ -304,9 +341,9 @@ public class RandomEventEffectsManager {
 
         MekHQ.triggerEvent(new PersonChangedEvent(target));
 
-        String colorOpen = isGuard ?
-                                 spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()) :
-                                 spanOpeningWithCustomColor(ReportingUtilities.getWarningColor());
+        String colorOpen = target.getPrisonerStatus().isCurrentPrisoner() ?
+                                 spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()) :
+                                 spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());
 
         String context = getFormattedTextAt(RESOURCE_BUNDLE,
               magnitude > 0 ? "context.guard.singular" : "context.prisoner.singular");
@@ -326,10 +363,10 @@ public class RandomEventEffectsManager {
      */
     String eventEffectInjuryPercent(RandomEventResult result) {
         final boolean isUseAdvancedMedical = campaign.getCampaignOptions().isUseAdvancedMedical();
-        final boolean isGuard = result.isGuard();
+        final List<RandomEventEffectedPersonnelType> affectedPersonnelTypes = result.affectedPersonnelTypes();
         final double magnitude = (double) result.magnitude() / 100;
 
-        List<Person> potentialTargets = getAllPotentialTargets(isGuard);
+        Set<Person> potentialTargets = getAllPotentialTargets(affectedPersonnelTypes);
 
         if (potentialTargets.isEmpty()) {
             return "";
@@ -365,17 +402,19 @@ public class RandomEventEffectsManager {
             potentialTargets.remove(target);
         }
 
-        String colorOpen = isGuard ?
-                                 spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()) :
-                                 spanOpeningWithCustomColor(ReportingUtilities.getWarningColor());
+        boolean isOnlyPrisonersAffected = affectedPersonnelTypes.size() == 1 &&
+                                                affectedPersonnelTypes.contains(PRISONERS);
+        String colorOpen = isOnlyPrisonersAffected ?
+                                 spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()) :
+                                 spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());
 
         String context;
-        if (isGuard) {
-            context = getFormattedTextAt(RESOURCE_BUNDLE,
-                  targetCount != 1 ? "context.guard.plural" : "context.guard.singular");
-        } else {
+        if (isOnlyPrisonersAffected) {
             context = getFormattedTextAt(RESOURCE_BUNDLE,
                   targetCount != 1 ? "context.prisoner.plural" : "context.prisoner.singular");
+        } else {
+            context = getFormattedTextAt(RESOURCE_BUNDLE,
+                  targetCount != 1 ? "context.guard.plural" : "context.guard.singular");
         }
 
         String haveOrHas = getFormattedTextAt(RESOURCE_BUNDLE, targetCount != 1 ? "pluralizer.have" : "pluralizer.has");
@@ -400,12 +439,12 @@ public class RandomEventEffectsManager {
      * @return A {@link String} summarizing the escape effect.
      */
     String eventEffectDeath(RandomEventResult result) {
-        final boolean isGuard = result.isGuard();
+        final List<RandomEventEffectedPersonnelType> affectedPersonnelTypes = result.affectedPersonnelTypes();
         int magnitude = result.magnitude();
 
         final LocalDate today = campaign.getLocalDate();
 
-        List<Person> potentialTargets = getAllPotentialTargets(isGuard);
+        Set<Person> potentialTargets = getAllPotentialTargets(affectedPersonnelTypes);
 
         if (potentialTargets.isEmpty()) {
             return "";
@@ -416,10 +455,10 @@ public class RandomEventEffectsManager {
         for (int i = 0; i < magnitude; i++) {
             Person target = getRandomItem(potentialTargets);
 
-            if (isGuard) {
-                target.changeStatus(campaign, today, PersonnelStatus.KIA);
-            } else {
+            if (target.getPrisonerStatus().isCurrentPrisoner()) {
                 campaign.removePerson(target, false);
+            } else {
+                target.changeStatus(campaign, today, PersonnelStatus.KIA);
             }
 
             MekHQ.triggerEvent(new PersonChangedEvent(target));
@@ -427,17 +466,19 @@ public class RandomEventEffectsManager {
             potentialTargets.remove(target);
         }
 
-        String colorOpen = isGuard ?
-                                 spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()) :
-                                 spanOpeningWithCustomColor(ReportingUtilities.getWarningColor());
+        boolean isOnlyPrisonersAffected = affectedPersonnelTypes.size() == 1 &&
+                                                affectedPersonnelTypes.contains(PRISONERS);
+        String colorOpen = isOnlyPrisonersAffected ?
+                                 spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()) :
+                                 spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());
 
         String context;
-        if (isGuard) {
-            context = getFormattedTextAt(RESOURCE_BUNDLE,
-                  magnitude != 1 ? "context.guard.plural" : "context.guard.singular");
-        } else {
+        if (isOnlyPrisonersAffected) {
             context = getFormattedTextAt(RESOURCE_BUNDLE,
                   magnitude != 1 ? "context.prisoner.plural" : "context.prisoner.singular");
+        } else {
+            context = getFormattedTextAt(RESOURCE_BUNDLE,
+                  magnitude != 1 ? "context.guard.plural" : "context.guard.singular");
         }
 
         String haveOrHas = getFormattedTextAt(RESOURCE_BUNDLE, magnitude != 1 ? "pluralizer.have" : "pluralizer.has");
@@ -466,26 +507,28 @@ public class RandomEventEffectsManager {
      * @return A {@link String} summarizing the unique effect.
      */
     private String eventEffectDeathPercent(RandomEventResult result) {
-        final boolean isGuard = result.isGuard();
+        final List<RandomEventEffectedPersonnelType> affectedPersonnelTypes = result.affectedPersonnelTypes();
         final double magnitude = (double) result.magnitude() / 100;
 
         final LocalDate today = campaign.getLocalDate();
 
-        List<Person> potentialTargets = getAllPotentialTargets(isGuard);
+        Set<Person> potentialTargets = getAllPotentialTargets(affectedPersonnelTypes);
 
         if (potentialTargets.isEmpty()) {
             return "";
         }
 
         int targetCount = (int) max(1, potentialTargets.size() * magnitude);
+        boolean isOnlyPrisonersAffected = affectedPersonnelTypes.size() == 1 &&
+                                                affectedPersonnelTypes.contains(PRISONERS);
 
         for (int i = 0; i < targetCount; i++) {
             Person target = getRandomItem(potentialTargets);
 
-            if (isGuard) {
-                target.changeStatus(campaign, today, PersonnelStatus.KIA);
-            } else {
+            if (isOnlyPrisonersAffected) {
                 campaign.removePerson(target, false);
+            } else {
+                target.changeStatus(campaign, today, PersonnelStatus.KIA);
             }
 
             MekHQ.triggerEvent(new PersonChangedEvent(target));
@@ -493,17 +536,17 @@ public class RandomEventEffectsManager {
             potentialTargets.remove(target);
         }
 
-        String colorOpen = isGuard ?
-                                 spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()) :
-                                 spanOpeningWithCustomColor(ReportingUtilities.getWarningColor());
+        String colorOpen = isOnlyPrisonersAffected ?
+                                 spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()) :
+                                 spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());
 
         String context;
-        if (isGuard) {
-            context = getFormattedTextAt(RESOURCE_BUNDLE,
-                  targetCount != 1 ? "context.guard.plural" : "context.guard.singular");
-        } else {
+        if (isOnlyPrisonersAffected) {
             context = getFormattedTextAt(RESOURCE_BUNDLE,
                   targetCount != 1 ? "context.prisoner.plural" : "context.prisoner.singular");
+        } else {
+            context = getFormattedTextAt(RESOURCE_BUNDLE,
+                  targetCount != 1 ? "context.guard.plural" : "context.guard.singular");
         }
 
         String haveOrHas = getFormattedTextAt(RESOURCE_BUNDLE, targetCount != 1 ? "pluralizer.have" : "pluralizer.has");
@@ -533,7 +576,7 @@ public class RandomEventEffectsManager {
      * @return A {@link String} summarizing the fatigue effect.
      */
     private String eventEffectSkill(RandomEventResult result) {
-        final boolean isGuard = result.isGuard();
+        final List<RandomEventEffectedPersonnelType> affectedPersonnelTypes = result.affectedPersonnelTypes();
         final int magnitude = result.magnitude();
 
         // Get skill
@@ -546,7 +589,7 @@ public class RandomEventEffectsManager {
         String skillName = skillType.getName();
 
         // Get target
-        Person target = getRandomTarget(isGuard);
+        Person target = getRandomTarget(affectedPersonnelTypes);
 
         if (target == null) {
             return "";
@@ -578,7 +621,7 @@ public class RandomEventEffectsManager {
         String colorOpen = spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor());
 
         String context = getFormattedTextAt(RESOURCE_BUNDLE,
-              isGuard ? "context.guard.singular" : "context.prisoner.singular");
+              target.getPrisonerStatus().isCurrentPrisoner() ? "context.prisoner.singular" : "context.guard.singular");
 
         // We can reuse the same report as the DEATH effect, here too
         return getFormattedTextAt(RESOURCE_BUNDLE,
@@ -607,10 +650,10 @@ public class RandomEventEffectsManager {
             return "";
         }
 
-        final boolean isGuard = result.isGuard();
+        final List<RandomEventEffectedPersonnelType> affectedPersonnelTypes = result.affectedPersonnelTypes();
         final int magnitude = result.magnitude();
 
-        Person target = getRandomTarget(isGuard);
+        Person target = getRandomTarget(affectedPersonnelTypes);
 
         if (target == null) {
             return "";
@@ -656,10 +699,10 @@ public class RandomEventEffectsManager {
             return "";
         }
 
-        final boolean isGuard = result.isGuard();
+        final List<RandomEventEffectedPersonnelType> affectedPersonnelTypes = result.affectedPersonnelTypes();
         final int magnitude = result.magnitude();
 
-        List<Person> targets = getAllPotentialTargets(isGuard);
+        Set<Person> targets = getAllPotentialTargets(affectedPersonnelTypes);
 
         if (targets.isEmpty()) {
             return "";
@@ -671,13 +714,16 @@ public class RandomEventEffectsManager {
             MekHQ.triggerEvent(new PersonChangedEvent(target));
         }
 
+        boolean isOnlyPrisonersAffected = affectedPersonnelTypes.size() == 1 &&
+                                                affectedPersonnelTypes.contains(PRISONERS);
+
         String context;
-        if (isGuard) {
-            context = getFormattedTextAt(RESOURCE_BUNDLE,
-                  targets.size() != 1 ? "context.guard.plural" : "context.guard.singular");
-        } else {
+        if (isOnlyPrisonersAffected) {
             context = getFormattedTextAt(RESOURCE_BUNDLE,
                   targets.size() != 1 ? "context.prisoner.plural" : "context.prisoner.singular");
+        } else {
+            context = getFormattedTextAt(RESOURCE_BUNDLE,
+                  targets.size() != 1 ? "context.guard.plural" : "context.guard.singular");
         }
 
         String colorOpen = magnitude > 0 ?
@@ -708,7 +754,7 @@ public class RandomEventEffectsManager {
     private String eventEffectEscape(RandomEventResult result) {
         int magnitude = result.magnitude();
 
-        List<Person> allPotentialTargets = getAllPotentialTargets(false);
+        Set<Person> allPotentialTargets = getAllPotentialTargets(result.affectedPersonnelTypes());
 
         if (allPotentialTargets.isEmpty()) {
             return "";
@@ -757,7 +803,7 @@ public class RandomEventEffectsManager {
     private String eventEffectEscapePercent(RandomEventResult result) {
         final double magnitude = (double) result.magnitude() / 100;
 
-        List<Person> potentialTargets = getAllPotentialTargets(false);
+        Set<Person> potentialTargets = getAllPotentialTargets(result.affectedPersonnelTypes());
 
         if (potentialTargets.isEmpty()) {
             return "";
@@ -814,10 +860,10 @@ public class RandomEventEffectsManager {
             return "";
         }
 
-        final boolean isGuard = result.isGuard();
+        final List<RandomEventEffectedPersonnelType> affectedPersonnelTypes = result.affectedPersonnelTypes();
         int magnitude = result.magnitude();
 
-        Person target = getRandomTarget(isGuard);
+        Person target = getRandomTarget(affectedPersonnelTypes);
 
         if (target == null) {
             return "";
@@ -868,10 +914,10 @@ public class RandomEventEffectsManager {
             return "";
         }
 
-        final boolean isGuard = result.isGuard();
+        final List<RandomEventEffectedPersonnelType> affectedPersonnelTypes = result.affectedPersonnelTypes();
         final int magnitude = result.magnitude();
 
-        List<Person> targets = getAllPotentialTargets(isGuard);
+        Set<Person> targets = getAllPotentialTargets(affectedPersonnelTypes);
 
         if (targets.isEmpty()) {
             return "";
@@ -887,13 +933,16 @@ public class RandomEventEffectsManager {
             }
         }
 
+        boolean isOnlyPrisonersAffected = affectedPersonnelTypes.size() == 1 &&
+                                                affectedPersonnelTypes.contains(PRISONERS);
+
         String context;
-        if (isGuard) {
-            context = getFormattedTextAt(RESOURCE_BUNDLE,
-                  targets.size() != 1 ? "context.guard.plural" : "context.guard.singular");
-        } else {
+        if (isOnlyPrisonersAffected) {
             context = getFormattedTextAt(RESOURCE_BUNDLE,
                   targets.size() != 1 ? "context.prisoner.plural" : "context.prisoner.singular");
+        } else {
+            context = getFormattedTextAt(RESOURCE_BUNDLE,
+                  targets.size() != 1 ? "context.guard.plural" : "context.guard.singular");
         }
 
         String colorOpen = magnitude > 0 ?
@@ -984,9 +1033,9 @@ public class RandomEventEffectsManager {
             // The OpFor has their morale bumped by one level
             case BARTERING -> eventEffectUniqueBartering();
             // Remove all combat skills from a random Prisoner
-            case MISTAKE -> eventEffectUniqueMistake();
+            case MISTAKE -> eventEffectUniqueMistake(result);
             // Change the origin faction of one prisoner to match employer
-            case UNDERCOVER -> eventEffectUniqueUndercover();
+            case UNDERCOVER -> eventEffectUniqueUndercover(result);
             // 'Poison' (xd6 Fatigue) 10% of personnel. x = magnitude
             case POISON -> eventEffectUniquePoison(result);
             // Generate 2d6 new prisoners & xd6 crime. x = magnitude
@@ -1037,8 +1086,8 @@ public class RandomEventEffectsManager {
      *
      * @return A {@link String} summarizing the changes to the prisoner's skills and roles.
      */
-    private String eventEffectUniqueMistake() {
-        Person target = getRandomTarget(false);
+    private String eventEffectUniqueMistake(RandomEventResult result) {
+        Person target = getRandomTarget(result.affectedPersonnelTypes());
 
         if (target == null) {
             return "";
@@ -1062,8 +1111,8 @@ public class RandomEventEffectsManager {
      * @return A {@link String} summarizing the faction change for the affected prisoner, or an empty string if no
      *       prisoner qualifies.
      */
-    private String eventEffectUniqueUndercover() {
-        Person targetCharacter = getRandomTarget(false);
+    private String eventEffectUniqueUndercover(RandomEventResult result) {
+        Person targetCharacter = getRandomTarget(result.affectedPersonnelTypes());
         List<AtBContract> potentialContracts = campaign.getActiveAtBContracts();
 
         if (targetCharacter == null || potentialContracts.isEmpty()) {
@@ -1104,7 +1153,7 @@ public class RandomEventEffectsManager {
 
         final int magnitude = result.magnitude();
 
-        List<Person> potentialTargets = campaign.getActivePersonnel(false, true);
+        Set<Person> potentialTargets = getAllPotentialTargets(result.affectedPersonnelTypes());
 
         if (potentialTargets.isEmpty()) {
             return "";
