@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
+import static megamek.common.universe.Factions2.FACTIONS2_TEST_DIRECTORY;
 import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_3;
 import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_4;
 import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_5;
@@ -53,6 +54,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Stream;
 
+import megamek.common.universe.Factions2;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
@@ -73,6 +75,7 @@ class FactionStandingsTest {
 
         assertDoesNotThrow(() -> {
             Factions.setInstance(Factions.loadDefault(true));
+            Factions2.setInstance(new Factions2(FACTIONS2_TEST_DIRECTORY));
             factions = Factions.getInstance();
         });
 
