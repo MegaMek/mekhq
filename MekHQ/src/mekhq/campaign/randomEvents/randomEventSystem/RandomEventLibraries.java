@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.randomEvents;
+package mekhq.campaign.randomEvents.randomEventSystem;
 
 import static java.io.File.separator;
 
@@ -42,7 +42,6 @@ import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import mekhq.campaign.randomEvents.prisoners.prisonerEvents.PrisonerEventDataWrapper;
-import mekhq.campaign.randomEvents.randomEventSystem.RandomEventData;
 
 /**
  * A utility class that manages the loading and retrieval of random event data from YAML files. Organizes the events
