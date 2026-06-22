@@ -103,6 +103,7 @@ public enum PersonnelTableModelColumn {
     PRE_NOMINAL("Column.PRE_NOMINAL.title", NaturalOrderComparator.INSTANCE),
     GIVEN_NAME("Column.GIVEN_NAME.title", NaturalOrderComparator.INSTANCE),
     SURNAME("Column.SURNAME.title", NaturalOrderComparator.INSTANCE),
+    SURNAME_GROUPED_BY_UNIT("Column.SURNAME.title", NaturalOrderComparator.INSTANCE),
     BLOODNAME("Column.BLOODNAME.title", NaturalOrderComparator.INSTANCE),
     POST_NOMINAL("Column.POST_NOMINAL.title", NaturalOrderComparator.INSTANCE),
     CALLSIGN("Column.CALLSIGN.title", NaturalOrderComparator.INSTANCE),
@@ -112,6 +113,7 @@ public enum PersonnelTableModelColumn {
     SKILL_LEVEL("Column.SKILL_LEVEL.title", LevelSorter.INSTANCE),
     PERSONNEL_ROLE("Column.PERSONNEL_ROLE.title", NaturalOrderComparator.INSTANCE),
     UNIT_ASSIGNMENT("Column.UNIT_ASSIGNMENT.title", NaturalOrderComparator.INSTANCE),
+    MARKET_UNIT_ASSIGNMENT("Column.UNIT_ASSIGNMENT.title", NaturalOrderComparator.INSTANCE),
     FORCE("Column.FORCE.title", NaturalOrderComparator.INSTANCE),
     DEPLOYED("Column.DEPLOYED.title", NaturalOrderComparator.INSTANCE),
     MEK("Column.MEK.title", BonusSorter.INSTANCE),
@@ -240,14 +242,7 @@ public enum PersonnelTableModelColumn {
         return MHQInternationalization.getText("NA.text");
     }
 
-    public Object getCellValue(final Campaign campaign, final PersonnelMarket personnelMarket, final Person person,
-          final boolean loadAssignmentFromMarket, final boolean groupByUnit) {
-        return getDisplayObject(campaign, personnelMarket, person, loadAssignmentFromMarket, groupByUnit);
-    }
-
-    private Object getDisplayObject(Campaign campaign, PersonnelMarket personnelMarket, Person person,
-          boolean loadAssignmentFromMarket, boolean groupByUnit) {
-
+    public Object getCellValue(Campaign campaign, Person person) {
         final boolean isClanCampaign = campaign.isClanCampaign();
         final LocalDate today = campaign.getLocalDate();
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
@@ -458,8 +453,14 @@ public enum PersonnelTableModelColumn {
                 final String surname = person.getSurname();
                 if (StringUtility.isNullOrBlank(surname)) {
                     yield "";
-                } else if (!groupByUnit) {
+                } else {
                     yield surname;
+                }
+            }
+            case SURNAME_GROUPED_BY_UNIT -> {
+                final String surname = person.getSurname();
+                if (StringUtility.isNullOrBlank(surname)) {
+                    yield "";
                 } else {
                     final Unit unit = person.getUnit();
                     if (unit == null) {
@@ -492,79 +493,78 @@ public enum PersonnelTableModelColumn {
             case UNDER_PROTECTION -> convertBooleanToYesNo(person.isUnderProtection());
             case COVER_MEDICAL_EXPENSES -> convertBooleanToYesNo(person.isCoverIllicitMedicalExpenses());
             case BLOCK_MATERNITY_LEAVE -> convertBooleanToYesNo(person.isBlockMaternityLeave());
+            case MARKET_UNIT_ASSIGNMENT -> {
+                PersonnelMarket market = campaign.getPersonnelMarket();
+                Entity entity = (market == null) ? null : market.getAttachedEntity(person);
+                yield (entity == null) ? "-" : entity.getDisplayName();
+            }
             case UNIT_ASSIGNMENT -> {
-                if (loadAssignmentFromMarket) {
-                    final Entity entity = personnelMarket.getAttachedEntity(person);
-                    yield (entity == null) ? "-" : entity.getDisplayName();
-                } else {
-                    Unit unit = person.getUnit();
-                    if (unit != null) {
-                        String name = unit.getName();
-                        Entity entity = unit.getEntity();
-                        String role = null;
+                Unit unit = person.getUnit();
+                if (unit != null) {
+                    String name = unit.getName();
+                    Entity entity = unit.getEntity();
+                    String role = null;
 
-                        if (entity instanceof SmallCraft || entity instanceof Jumpship || entity instanceof Tank) {
-                            if (unit.isNavigator(person)) {
-                                role = "Navigator";
-                            } else if (unit.isDriver(person)) {
-                                role = (entity instanceof Tank) ? "Driver" : "Pilot";
-                            } else if (unit.isGunner(person)) {
-                                role = "Gunner";
-                            } else if (unit.isCommander(person)
-                                             || ((entity instanceof Tank) && unit.isTechOfficer(person))) {
-                                role = "Commander";
-                            } else {
-                                role = "Crew";
-                            }
-                        } else if (entity instanceof Mek && unit.getFullCrewSize() > 1) {
-                            if (unit.isDriver(person)) {
-                                role = "Pilot";
-                            } else if (unit.isGunner(person)) {
-                                role = "Gunner";
-                            } else if (unit.isTechOfficer(person)) {
-                                role = "Tech Officer";
-                            } else if (unit.isCommander(person)) {
-                                role = "Commander";
-                            }
+                    if (entity instanceof SmallCraft || entity instanceof Jumpship || entity instanceof Tank) {
+                        if (unit.isNavigator(person)) {
+                            role = "Navigator";
+                        } else if (unit.isDriver(person)) {
+                            role = (entity instanceof Tank) ? "Driver" : "Pilot";
+                        } else if (unit.isGunner(person)) {
+                            role = "Gunner";
+                        } else if (unit.isCommander(person)
+                                         || ((entity instanceof Tank) && unit.isTechOfficer(person))) {
+                            role = "Commander";
+                        } else {
+                            role = "Crew";
                         }
-
-                        if (role != null) {
-                            name += " [" + role + "]";
+                    } else if (entity instanceof Mek && unit.getFullCrewSize() > 1) {
+                        if (unit.isDriver(person)) {
+                            role = "Pilot";
+                        } else if (unit.isGunner(person)) {
+                            role = "Gunner";
+                        } else if (unit.isTechOfficer(person)) {
+                            role = "Tech Officer";
+                        } else if (unit.isCommander(person)) {
+                            role = "Commander";
                         }
-
-                        yield name;
                     }
 
-                    // Check for tech units
-                    if (!person.getTechUnits().isEmpty()) {
-                        Unit refitUnit = person.getTechUnits()
-                                               .stream()
-                                               .filter(u -> u.isRefitting() && u.getRefit().getTech() == person)
-                                               .findFirst()
-                                               .orElse(null);
-                        String refitString = null != refitUnit ? "<b>Refitting</b> " + refitUnit.getName() : "";
-                        if (person.getTechUnits().size() == 1) {
-                            unit = person.getTechUnits().getFirst();
-                            if (unit != null) {
-                                yield "<html>" +
-                                            ReportingUtilities.separateIf(refitString,
-                                                  ", ",
-                                                  unit.getName() + " (" + person.getMaintenanceTimeUsing() + "m)") +
-                                            "</html>";
-                            }
-                        } else {
+                    if (role != null) {
+                        name += " [" + role + "]";
+                    }
+
+                    yield name;
+                }
+
+                // Check for tech units
+                if (!person.getTechUnits().isEmpty()) {
+                    Unit refitUnit = person.getTechUnits()
+                                           .stream()
+                                           .filter(u -> u.isRefitting() && u.getRefit().getTech() == person)
+                                           .findFirst()
+                                           .orElse(null);
+                    String refitString = null != refitUnit ? "<b>Refitting</b> " + refitUnit.getName() : "";
+                    if (person.getTechUnits().size() == 1) {
+                        unit = person.getTechUnits().getFirst();
+                        if (unit != null) {
                             yield "<html>" +
                                         ReportingUtilities.separateIf(refitString,
                                               ", ",
-                                              person.getTechUnits().size() +
-                                                    " units (" +
-                                                    person.getMaintenanceTimeUsing() +
-                                                    "m)") +
+                                              unit.getName() + " (" + person.getMaintenanceTimeUsing() + "m)") +
                                         "</html>";
                         }
+                    } else {
+                        yield "<html>" +
+                                    ReportingUtilities.separateIf(refitString,
+                                          ", ",
+                                          person.getTechUnits().size() +
+                                                " units (" +
+                                                person.getMaintenanceTimeUsing() +
+                                                "m)") +
+                                    "</html>";
                     }
                 }
-
                 // Final fallback return of nothing
                 yield "-";
             }
@@ -665,22 +665,16 @@ public enum PersonnelTableModelColumn {
         return null;
     }
 
-    public @Nullable String getToolTipText(final Person person, final boolean loadAssignmentFromMarket) {
-        return getToolTipText(person, loadAssignmentFromMarket, null);
-    }
-
     /**
      * Returns the tooltip text for this column, optionally including color reason explanations.
      *
      * @param person                   the person for this row
-     * @param loadAssignmentFromMarket whether to load assignment from market
      * @param colorReasonKeys          list of i18n keys for color reasons, or null/empty if no special coloring
      *
      * @return the tooltip text, or null if no tooltip
      */
-    public @Nullable String getToolTipText(final Person person, final boolean loadAssignmentFromMarket,
-          final @Nullable java.util.List<String> colorReasonKeys) {
-        String baseTooltip = getBaseToolTipText(person, loadAssignmentFromMarket);
+    public @Nullable String getToolTipText(Person person, @Nullable java.util.List<String> colorReasonKeys) {
+        String baseTooltip = getBaseToolTipText(person);
 
         // For name, rank, and status columns, append color reasons if present
         if (colorReasonKeys != null && !colorReasonKeys.isEmpty() && isNameRankOrStatusColumn()) {
@@ -707,12 +701,12 @@ public enum PersonnelTableModelColumn {
         return baseTooltip;
     }
 
-    private @Nullable String getBaseToolTipText(final Person person, final boolean loadAssignmentFromMarket) {
+    private @Nullable String getBaseToolTipText(Person person) {
         switch (this) {
             case PERSONNEL_STATUS:
                 return person.getStatus().getToolTipText();
             case UNIT_ASSIGNMENT: {
-                if ((person.getTechUnits().size() > 1) && !loadAssignmentFromMarket) {
+                if (person.getTechUnits().size() > 1) {
                     return person.getTechUnits()
                                  .stream()
                                  .map(u1 -> u1.getName() + "<br>")
@@ -742,16 +736,22 @@ public enum PersonnelTableModelColumn {
      * status column.
      */
     private boolean isNameRankOrStatusColumn() {
-        return this == PERSON || this == FIRST_NAME || this == LAST_NAME ||
-                     this == GIVEN_NAME || this == SURNAME || this == BLOODNAME ||
-                     this == RANK || this == PERSONNEL_STATUS;
+        return (this == PERSON) ||
+                     (this == FIRST_NAME) ||
+                     (this == LAST_NAME) ||
+                     (this == GIVEN_NAME) ||
+                     (this == SURNAME) ||
+                     (this == SURNAME_GROUPED_BY_UNIT) ||
+                     (this == BLOODNAME) ||
+                     (this == RANK) ||
+                     (this == PERSONNEL_STATUS);
     }
 
     public int getWidth() {
         return switch (this) {
-            case PERSON, UNIT_ASSIGNMENT -> 125;
+            case PERSON, UNIT_ASSIGNMENT, MARKET_UNIT_ASSIGNMENT -> 125;
             case RANK, FIRST_NAME, GIVEN_NAME, DEPLOYED -> 70;
-            case LAST_NAME, SURNAME, BLOODNAME, CALLSIGN, SKILL_LEVEL, SALARY -> 50;
+            case LAST_NAME, SURNAME, SURNAME_GROUPED_BY_UNIT, BLOODNAME, CALLSIGN, SKILL_LEVEL, SALARY -> 50;
             case PERSONNEL_ROLE -> 150;
             case FORCE -> 100;
             case LOCATION_SYSTEM, LOCATION_PLANET, DESTINATION_SYSTEM, DESTINATION_PLANET -> 100;
@@ -769,6 +769,7 @@ public enum PersonnelTableModelColumn {
                  PRE_NOMINAL,
                  GIVEN_NAME,
                  SURNAME,
+                 SURNAME_GROUPED_BY_UNIT,
                  BLOODNAME,
                  POST_NOMINAL,
                  CALLSIGN,
@@ -776,6 +777,7 @@ public enum PersonnelTableModelColumn {
                  SKILL_LEVEL,
                  PERSONNEL_ROLE,
                  UNIT_ASSIGNMENT,
+                 MARKET_UNIT_ASSIGNMENT,
                  FORCE,
                  DEPLOYED,
                  LOCATION_SYSTEM,
@@ -789,12 +791,15 @@ public enum PersonnelTableModelColumn {
         };
     }
 
-    public boolean isVisible(final Campaign campaign, final PersonnelTabView view, final JTable table) {
+    public boolean isVisible(Campaign campaign, PersonnelTabView view, JTable table,
+          boolean loadAssignmentFromMarket, boolean groupByUnit) {
         return switch (view) {
             case GRAPHIC -> {
                 table.setRowHeight(UIUtil.scaleForGUI(60));
                 yield switch (this) {
-                    case PERSON, UNIT_ASSIGNMENT, FORCE -> true;
+                    case PERSON, FORCE -> true;
+                    case UNIT_ASSIGNMENT -> !loadAssignmentFromMarket;
+                    case MARKET_UNIT_ASSIGNMENT -> loadAssignmentFromMarket;
                     default -> false;
                 };
             }
@@ -804,11 +809,12 @@ public enum PersonnelTableModelColumn {
                      LAST_NAME,
                      SKILL_LEVEL,
                      PERSONNEL_ROLE,
-                     UNIT_ASSIGNMENT,
                      FORCE,
                      DEPLOYED,
                      INJURIES,
                      XP -> true;
+                case UNIT_ASSIGNMENT -> !loadAssignmentFromMarket;
+                case MARKET_UNIT_ASSIGNMENT -> loadAssignmentFromMarket;
                 default -> false;
             };
             case COMBAT -> switch (this) {
@@ -892,9 +898,10 @@ public enum PersonnelTableModelColumn {
                      LAST_NAME,
                      SKILL_LEVEL,
                      PERSONNEL_ROLE,
-                     UNIT_ASSIGNMENT,
                      SHIP_TRANSPORT,
                      TACTICAL_TRANSPORT -> true;
+                case UNIT_ASSIGNMENT -> !loadAssignmentFromMarket;
+                case MARKET_UNIT_ASSIGNMENT -> loadAssignmentFromMarket;
                 default -> false;
             };
             case BIOGRAPHICAL -> switch (this) {
@@ -907,13 +914,14 @@ public enum PersonnelTableModelColumn {
                 case RANK,
                      PRE_NOMINAL,
                      GIVEN_NAME,
-                     SURNAME,
                      BLOODNAME,
                      POST_NOMINAL,
                      CALLSIGN,
                      GENDER,
                      PERSONNEL_ROLE,
                      KILLS -> true;
+                case SURNAME -> !groupByUnit;
+                case SURNAME_GROUPED_BY_UNIT -> groupByUnit;
                 default -> false;
             };
             case DATES -> switch (this) {
