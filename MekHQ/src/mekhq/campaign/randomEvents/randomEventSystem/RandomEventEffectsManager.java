@@ -231,7 +231,7 @@ public class RandomEventEffectsManager {
         Set<Person> potentialTargets = new HashSet<>();
         for (Person person : campaign.getAllPersonnel()) {
             PersonnelStatus personStatus = person.getStatus();
-            if (personStatus.isDepartedUnit() || !personStatus.isActive()) {
+            if (personStatus.isDepartedUnit() || !personStatus.isActiveFlexible()) {
                 continue;
             }
 
@@ -902,8 +902,7 @@ public class RandomEventEffectsManager {
      * Applies a fatigue effect to all eligible targets in the campaign.
      *
      * <p>If fatigue effects are enabled, this effect adjusts the fatigue level of all affected characters, based on
-     * the
-     * event effect's magnitude.</p>
+     * the event effect's magnitude.</p>
      *
      * @param result The {@link RandomEventResult} specifying the fatigue effect and its magnitude.
      *
