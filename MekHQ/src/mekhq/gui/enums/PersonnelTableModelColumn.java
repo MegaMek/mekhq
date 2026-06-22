@@ -70,22 +70,11 @@ import mekhq.campaign.personnel.skills.ScoutingSkills;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
-import mekhq.campaign.randomEvents.personalities.enums.Aggression;
-import mekhq.campaign.randomEvents.personalities.enums.Ambition;
-import mekhq.campaign.randomEvents.personalities.enums.Greed;
-import mekhq.campaign.randomEvents.personalities.enums.Social;
+import mekhq.campaign.randomEvents.personalities.PersonalityTrait;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.gui.model.LocationDisplay;
-import mekhq.gui.sorter.AttributeScoreSorter;
-import mekhq.gui.sorter.BonusSorter;
-import mekhq.gui.sorter.DateStringComparator;
-import mekhq.gui.sorter.EducationLevelSorter;
-import mekhq.gui.sorter.FormattedNumberSorter;
-import mekhq.gui.sorter.IntegerStringSorter;
-import mekhq.gui.sorter.LevelSorter;
-import mekhq.gui.sorter.PersonRankSorter;
-import mekhq.gui.sorter.ReasoningSorter;
+import mekhq.gui.sorter.*;
 import mekhq.utilities.MHQInternationalization;
 import mekhq.utilities.ReportingUtilities;
 import org.jspecify.annotations.NonNull;
@@ -95,7 +84,7 @@ public enum PersonnelTableModelColumn {
     PERSON("Column.PERSON.title", NaturalOrderComparator.INSTANCE,
           person -> ""),
     RANK("Column.RANK.title", PersonRankSorter.INSTANCE,
-          (person, campaign) -> person, Person::getRankName),
+          person -> person, Person::getRankName),
     FIRST_NAME("Column.FIRST_NAME.title", NaturalOrderComparator.INSTANCE,
           Person::getFirstName),
     LAST_NAME("Column.LAST_NAME.title", NaturalOrderComparator.INSTANCE,
@@ -350,30 +339,14 @@ public enum PersonnelTableModelColumn {
                     person.getEduAcademyNameInSet());
               return currentAcademy == null ? "" : String.valueOf(person.getEduEducationTime());
           }),
-    AGGRESSION("Column.AGGRESSION.title", NaturalOrderComparator.INSTANCE,
-          person -> {
-              Aggression trait = person.getAggression();
-              String sign = trait.isTraitPositive() ? "+" : "-";
-              return trait + " (" + (trait.isTraitMajor() ? sign + sign : sign) + ')';
-          }),
-    AMBITION("Column.AMBITION.title", NaturalOrderComparator.INSTANCE,
-          person -> {
-              Ambition trait = person.getAmbition();
-              String sign = trait.isTraitPositive() ? "+" : "-";
-              return trait + " (" + (trait.isTraitMajor() ? sign + sign : sign) + ')';
-          }),
-    GREED("Column.GREED.title", NaturalOrderComparator.INSTANCE,
-          person -> {
-              Greed trait = person.getGreed();
-              String sign = trait.isTraitPositive() ? "+" : "-";
-              return trait + " (" + (trait.isTraitMajor() ? sign + sign : sign) + ')';
-          }),
-    SOCIAL("Column.SOCIAL.title", NaturalOrderComparator.INSTANCE,
-          person -> {
-              Social trait = person.getSocial();
-              String sign = trait.isTraitPositive() ? "+" : "-";
-              return trait + " (" + (trait.isTraitMajor() ? sign + sign : sign) + ')';
-          }),
+    AGGRESSION("Column.AGGRESSION.title", PersonalityTraitSorter.INSTANCE,
+          Person::getAggression, PersonnelTableModelColumn::traitToText),
+    AMBITION("Column.AMBITION.title", PersonalityTraitSorter.INSTANCE,
+          Person::getAmbition, PersonnelTableModelColumn::traitToText),
+    GREED("Column.GREED.title", PersonalityTraitSorter.INSTANCE,
+          Person::getGreed, PersonnelTableModelColumn::traitToText),
+    SOCIAL("Column.SOCIAL.title", PersonalityTraitSorter.INSTANCE,
+          Person::getSocial, PersonnelTableModelColumn::traitToText),
     REASONING("Column.REASONING.title", ReasoningSorter.INSTANCE,
           person -> person.getReasoning().getLabel()),
     STRENGTH("Column.STRENGTH.title", AttributeScoreSorter.INSTANCE,
@@ -448,6 +421,16 @@ public enum PersonnelTableModelColumn {
         this.modelComparator = (Comparator<Object>) modelComparator;
         this.modelExtractor = (BiFunction<Person, Campaign, Object>) modelExtractor;
         this.modelToText = (Function<Object, String>) modelToText;
+    }
+
+    /**
+     * Defines a personnel table column model, how it's sorted and visualised.
+     * This is a simplified column implementation that only depends on {@link Person}.
+     * See {@link #PersonnelTableModelColumn(String, Comparator, BiFunction)}.
+     */
+    <Model> PersonnelTableModelColumn(String name, Comparator<Model> modelComparator,
+          Function<Person, Model> modelExtractor, Function<Model, String> modelToText) {
+        this(name, modelComparator, (person, campaign) -> modelExtractor.apply(person), modelToText);
     }
 
     /**
@@ -675,6 +658,14 @@ public enum PersonnelTableModelColumn {
 
             return currentAttributeValue + " / " + attributeCap + " (" + sign + attributeModifier + ")";
         };
+    }
+
+    private static String traitToText(PersonalityTrait trait) {
+        if (trait.isNone()) {
+            return trait.toString();
+        }
+        String sign = trait.isTraitPositive() ? "+" : "-";
+        return trait + " (" + (trait.isTraitMajor() ? sign + sign : sign) + ')';
     }
 
     /**
