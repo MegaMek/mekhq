@@ -119,7 +119,7 @@ public class PersonnelMarketDialog extends JDialog {
           PersonnelTableModelColumn.GENDER,
           PersonnelTableModelColumn.SKILL_LEVEL,
           PersonnelTableModelColumn.PERSONNEL_ROLE,
-          PersonnelTableModelColumn.UNIT_ASSIGNMENT);
+          PersonnelTableModelColumn.MARKET_UNIT_ASSIGNMENT);
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle(
           "mekhq.resources.PersonnelMarketDialog",
