@@ -172,7 +172,7 @@ public class PersonnelTableModelColumnTest {
                       assertInstanceOf(PersonRankSorter.class, personnelTableModelColumn.getComparator());
                 case HIGHEST_EDUCATION, CURRENT_EDUCATION ->
                       assertInstanceOf(EducationLevelSorter.class, personnelTableModelColumn.getComparator());
-                case AGE, BIRTHDAY, RECRUITMENT_DATE, LAST_RANK_CHANGE_DATE, DUE_DATE, RETIREMENT_DATE, DEATH_DATE ->
+                case BIRTHDAY, RECRUITMENT_DATE, LAST_RANK_CHANGE_DATE, DUE_DATE, RETIREMENT_DATE, DEATH_DATE ->
                       assertInstanceOf(DateStringComparator.class, personnelTableModelColumn.getComparator());
                 case SKILL_LEVEL ->
                       assertInstanceOf(LevelSorter.class, personnelTableModelColumn.getComparator());
@@ -208,6 +208,7 @@ public class PersonnelTableModelColumnTest {
                      NEGOTIATION ->
                       assertInstanceOf(BonusSorter.class, personnelTableModelColumn.getComparator());
                 case INJURIES,
+                     AGE,
                      KILLS,
                      XP,
                      TOUGHNESS,

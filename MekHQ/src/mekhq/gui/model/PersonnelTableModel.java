@@ -174,11 +174,7 @@ public class PersonnelTableModel extends DataTableModel<Person> {
             setOpaque(true);
             setHorizontalAlignment(personnelColumn.getAlignment());
 
-            // Display Text
-            final String displayText = personnelColumn.getDisplayText(campaign, person);
-            if (displayText != null) {
-                setText(displayText);
-            }
+            setText(personnelColumn.getText(value));
 
             // Colouring - determine color and collect ALL applicable color reasons
             boolean personIsDamaged;
