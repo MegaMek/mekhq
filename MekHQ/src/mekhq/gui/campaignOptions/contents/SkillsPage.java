@@ -49,6 +49,7 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -56,9 +57,9 @@ import java.util.EventObject;
 import java.util.List;
 import java.util.Map;
 import javax.swing.AbstractAction;
-import javax.swing.AbstractCellEditor;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
+import javax.swing.ButtonModel;
 import javax.swing.DefaultCellEditor;
 import javax.swing.InputMap;
 import javax.swing.JButton;
@@ -332,10 +333,61 @@ public class SkillsPage {
               .setCellRenderer(new TruncationTooltipRenderer());
 
         String editText = getTextAt(getCampaignOptionsResourceBundle(), "btnSkillAdvanced.text");
-        table.getColumnModel().getColumn(SkillsTableModel.EDIT_COLUMN)
-              .setCellRenderer(new ButtonRenderer(editText));
-        table.getColumnModel().getColumn(SkillsTableModel.EDIT_COLUMN)
-              .setCellEditor(new AdvancedButtonEditor(table, tableModel, editText));
+        // The Edit column is renderer-only (never an editable cell): a live cell-editor button would visibly shift its
+        // label between the static renderer and the focused/pressed editor instance. To still give button-like feedback,
+        // the renderer tracks the hovered/pressed row and a single listener drives hover, press, and the click that
+        // opens the advanced editor.
+        ButtonRenderer editRenderer = new ButtonRenderer(editText);
+        table.getColumnModel().getColumn(SkillsTableModel.EDIT_COLUMN).setCellRenderer(editRenderer);
+
+        MouseAdapter editColumnMouse = new MouseAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent mouseEvent) {
+                repaintIfChanged(editRenderer.setHoverRow(editColumnRow(mouseEvent)));
+            }
+
+            @Override
+            public void mousePressed(MouseEvent mouseEvent) {
+                repaintIfChanged(editRenderer.setPressedRow(editColumnRow(mouseEvent)));
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent mouseEvent) {
+                repaintIfChanged(editRenderer.setPressedRow(-1));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent mouseEvent) {
+                boolean changed = editRenderer.setHoverRow(-1);
+                changed = editRenderer.setPressedRow(-1) || changed;
+                repaintIfChanged(changed);
+            }
+
+            @Override
+            public void mouseClicked(MouseEvent mouseEvent) {
+                int viewRow = editColumnRow(mouseEvent);
+                if (viewRow >= 0) {
+                    openAdvancedEditor(table, tableModel, table.convertRowIndexToModel(viewRow));
+                }
+            }
+
+            // Returns the view row under the event when it is over the Edit column, otherwise -1.
+            private int editColumnRow(MouseEvent mouseEvent) {
+                int viewColumn = table.columnAtPoint(mouseEvent.getPoint());
+                if (viewColumn < 0 || table.convertColumnIndexToModel(viewColumn) != SkillsTableModel.EDIT_COLUMN) {
+                    return -1;
+                }
+                return table.rowAtPoint(mouseEvent.getPoint());
+            }
+
+            private void repaintIfChanged(boolean changed) {
+                if (changed) {
+                    table.repaint();
+                }
+            }
+        };
+        table.addMouseListener(editColumnMouse);
+        table.addMouseMotionListener(editColumnMouse);
 
         return table;
     }
@@ -669,7 +721,7 @@ public class SkillsPage {
 
         @Override
         public boolean isCellEditable(int rowIndex, int columnIndex) {
-            return columnIndex == TARGET_COLUMN || columnIndex == EDIT_COLUMN;
+            return columnIndex == TARGET_COLUMN;
         }
 
         @Override
@@ -771,69 +823,67 @@ public class SkillsPage {
     }
 
     /**
-     * Applies the shared styling to the "Advanced" column button so the cell looks identical whether it is being
-     * painted by the renderer (at rest) or shown as the live cell editor (once clicked). The editor button gains focus
-     * the instant the cell starts editing; without matching styling - notably the same opacity and a disabled focus
-     * indicator - the button's label appears to shift alignment when it is clicked.
+     * Styles the "Advanced" column's renderer button so the painted cell reads as a centered button.
      *
-     * @param button the renderer or editor button to style
+     * @param button the renderer button to style
      */
     private static void styleAdvancedButton(JButton button) {
         button.setOpaque(true);
         button.setHorizontalAlignment(SwingConstants.CENTER);
-        button.setFocusPainted(false);
     }
 
     /**
      * A table cell renderer that paints a button. Used to give every skill row an "Advanced" affordance.
      */
     private static final class ButtonRenderer extends JButton implements TableCellRenderer {
+        private int hoverRow = -1;
+        private int pressedRow = -1;
+
         private ButtonRenderer(String text) {
             super(text);
             styleAdvancedButton(this);
+            setRolloverEnabled(true);
+        }
+
+        /**
+         * Records the row the mouse is hovering so that row's button paints its rollover (hover) background.
+         *
+         * @param row the hovered view row, or {@code -1} for none
+         *
+         * @return {@code true} if the hovered row changed (so the column should be repainted)
+         */
+        private boolean setHoverRow(int row) {
+            if (hoverRow == row) {
+                return false;
+            }
+            hoverRow = row;
+            return true;
+        }
+
+        /**
+         * Records the row whose button is currently pressed so it paints its pressed background.
+         *
+         * @param row the pressed view row, or {@code -1} for none
+         *
+         * @return {@code true} if the pressed row changed (so the column should be repainted)
+         */
+        private boolean setPressedRow(int row) {
+            if (pressedRow == row) {
+                return false;
+            }
+            pressedRow = row;
+            return true;
         }
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
               boolean hasFocus, int row, int column) {
+            boolean pressed = row == pressedRow;
+            ButtonModel model = getModel();
+            model.setRollover(row == hoverRow);
+            model.setArmed(pressed);
+            model.setPressed(pressed);
             return this;
-        }
-    }
-
-    /**
-     * A table cell editor that turns the "Advanced" column into a clickable button. Clicking it opens the advanced
-     * editor dialog for that row.
-     */
-    private final class AdvancedButtonEditor extends AbstractCellEditor implements TableCellEditor {
-        private final JButton button;
-        private final JTable table;
-        private final SkillsTableModel tableModel;
-        private int editingModelRow = -1;
-
-        private AdvancedButtonEditor(JTable table, SkillsTableModel tableModel, String text) {
-            this.table = table;
-            this.tableModel = tableModel;
-            this.button = new JButton(text);
-            styleAdvancedButton(this.button);
-            this.button.addActionListener(e -> {
-                int row = editingModelRow;
-                fireEditingStopped();
-                if (row >= 0) {
-                    openAdvancedEditor(this.table, this.tableModel, row);
-                }
-            });
-        }
-
-        @Override
-        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row,
-              int column) {
-            editingModelRow = table.convertRowIndexToModel(row);
-            return button;
-        }
-
-        @Override
-        public Object getCellEditorValue() {
-            return "";
         }
     }
 }
