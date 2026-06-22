@@ -556,7 +556,7 @@ public class CampaignPreset {
                             final Node wn2 = nl2.item(y);
                             if (wn2.getNodeType() != Node.ELEMENT_NODE) {
                                 continue;
-                            } else if (!wn2.getNodeName().equalsIgnoreCase("skillType")) {
+                            } else if (!wn2.getNodeName().equalsIgnoreCase("affectedSkill")) {
                                 String message = String.format("Unknown node type not loaded in Skill Type nodes: %s",
                                       wn2.getNodeName());
                                 LOGGER.error(message);

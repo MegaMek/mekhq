@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.personnel.skills;
 
-import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NONE;
+import static mekhq.campaign.personnel.skills.enums.SkillAttribute.ATTRIBUTE_NONE;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
@@ -96,7 +96,7 @@ class SkillTypeTest {
         SkillAttribute attribute = skillType.getFirstAttribute();
 
         // Assert
-        assertNotSame(SkillAttribute.NONE,
+        assertNotSame(SkillAttribute.ATTRIBUTE_NONE,
               attribute,
               "Invalid first attribute for skill: " + skillType.getName() + " cannot be NONE");
         assertNotSame(null, attribute, "Invalid first attribute for skill: " + skillType.getName() + " cannot be null");
@@ -216,8 +216,8 @@ class SkillTypeTest {
 
         // Assert
         SkillAttribute firstAttribute = skillType.getFirstAttribute();
-        assertNotSame(NONE, firstAttribute, "First Attribute is NONE for Skill: " + skillType.getName());
-        if (firstAttribute != NONE) {
+        assertNotSame(ATTRIBUTE_NONE, firstAttribute, "First Attribute is NONE for Skill: " + skillType.getName());
+        if (firstAttribute != ATTRIBUTE_NONE) {
             assertTrue(flavorText.contains(firstAttribute.getLabel()),
                   "Did not include first Attribute: " +
                         firstAttribute +
@@ -226,7 +226,7 @@ class SkillTypeTest {
         }
 
         SkillAttribute secondAttribute = skillType.getSecondAttribute();
-        if (secondAttribute != NONE) {
+        if (secondAttribute != ATTRIBUTE_NONE) {
             assertTrue(flavorText.contains(secondAttribute.getLabel()),
                   "Did not include second Attribute: " +
                         secondAttribute +
@@ -251,8 +251,8 @@ class SkillTypeTest {
         assertTrue(flavorText.contains("</html>"), "Did not include html closing tag: " + skillType.getName());
 
         SkillAttribute firstAttribute = skillType.getFirstAttribute();
-        assertNotSame(NONE, firstAttribute, "First Attribute is NONE for Skill: " + skillType.getName());
-        if (firstAttribute != NONE) {
+        assertNotSame(ATTRIBUTE_NONE, firstAttribute, "First Attribute is NONE for Skill: " + skillType.getName());
+        if (firstAttribute != ATTRIBUTE_NONE) {
             assertTrue(flavorText.contains(firstAttribute.getLabel()),
                   "Did not include first Attribute: " +
                         firstAttribute +
@@ -261,7 +261,7 @@ class SkillTypeTest {
         }
 
         SkillAttribute secondAttribute = skillType.getSecondAttribute();
-        if (secondAttribute != NONE) {
+        if (secondAttribute != ATTRIBUTE_NONE) {
             assertTrue(flavorText.contains(secondAttribute.getLabel()),
                   "Did not include second Attribute: " +
                         secondAttribute +

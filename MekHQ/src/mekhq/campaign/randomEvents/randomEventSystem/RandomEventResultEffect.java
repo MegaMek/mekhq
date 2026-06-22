@@ -77,7 +77,7 @@ public enum RandomEventResultEffect {
     DEATH_PERCENT,
 
     /**
-     * Grants a character a new skill, as defined by {@code skillType}. The level of the skill is equal to
+     * Grants a character a new skill, as defined by {@code affectedSkill}. The level of the skill is equal to
      * {@code magnitude}. If the character already has the specified skill, they improve it instead. If the skill is
      * already at the specified level, nothing happens.
      */

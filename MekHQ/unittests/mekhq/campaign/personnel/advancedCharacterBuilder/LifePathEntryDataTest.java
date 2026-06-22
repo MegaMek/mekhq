@@ -35,7 +35,7 @@ package mekhq.campaign.personnel.advancedCharacterBuilder;
 import static mekhq.campaign.personnel.advancedCharacterBuilder.LifePathCategory.FIELD_ARCHAEOLOGIST;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
-import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NONE;
+import static mekhq.campaign.personnel.skills.enums.SkillAttribute.ATTRIBUTE_NONE;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.STRENGTH;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -218,7 +218,7 @@ class LifePathEntryDataTest {
     @ParameterizedTest
     @EnumSource(SkillAttribute.class)
     void testGetSkillAttribute_ValidCategory(SkillAttribute attribute) {
-        if (attribute == NONE) {
+        if (attribute == ATTRIBUTE_NONE) {
             return;
         }
 
@@ -229,8 +229,8 @@ class LifePathEntryDataTest {
 
     @Test
     void testGetSkillAttribute_NoneSpecialHandler() {
-        LifePathEntryData data = new LifePathEntryData("SKILL_ATTRIBUTE", NONE.getLookupName(), 5);
-        assertEquals(0, data.getSkillAttribute(NONE),
+        LifePathEntryData data = new LifePathEntryData("SKILL_ATTRIBUTE", ATTRIBUTE_NONE.getLookupName(), 5);
+        assertEquals(0, data.getSkillAttribute(ATTRIBUTE_NONE),
               "NONE should always return 0.");
     }
 

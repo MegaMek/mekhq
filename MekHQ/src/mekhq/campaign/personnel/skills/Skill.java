@@ -552,7 +552,7 @@ public class Skill {
      *   <li>The {@link TargetRoll}, where the attribute modifier is applied as a negative value.</li>
      * </ul>
      *
-     * <p>Attributes that are set to {@link SkillAttribute#NONE} are ignored during this process.</p>
+     * <p>Attributes that are set to {@link SkillAttribute#ATTRIBUTE_NONE} are ignored during this process.</p>
      *
      * <p>The calculated attribute modifiers are applied directly to the {@link TargetRoll} using
      * {@link TargetRoll#addModifier(int, String)}, where the negative modifier is associated with the
@@ -582,7 +582,7 @@ public class Skill {
 
         int totalModifier = 0;
         for (SkillAttribute attribute : linkedAttributes) {
-            if (attribute == SkillAttribute.NONE) {
+            if (attribute == SkillAttribute.ATTRIBUTE_NONE) {
                 continue;
             }
 
@@ -922,7 +922,7 @@ public class Skill {
               (firstLinkedAttributeModifier > 0 ? additionSymbol : "") + firstLinkedAttributeModifier));
 
         SkillAttribute secondLinkedAttribute = type.getSecondAttribute();
-        if (secondLinkedAttribute != SkillAttribute.NONE) {
+        if (secondLinkedAttribute != SkillAttribute.ATTRIBUTE_NONE) {
             int secondLinkedAttributeModifier = attributes.getAttributeModifier(secondLinkedAttribute,
                   activeInjuryEffects, options, skillModifierData.age());
             tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,

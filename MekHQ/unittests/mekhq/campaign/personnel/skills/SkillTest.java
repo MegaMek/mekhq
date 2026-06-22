@@ -37,7 +37,7 @@ import static mekhq.campaign.personnel.skills.Skill.getIndividualAttributeModifi
 import static mekhq.campaign.personnel.skills.Skill.getTotalAttributeModifier;
 import static mekhq.campaign.personnel.skills.SkillModifierData.IGNORE_AGE;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.DEXTERITY;
-import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NONE;
+import static mekhq.campaign.personnel.skills.enums.SkillAttribute.ATTRIBUTE_NONE;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.REFLEXES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -55,7 +55,7 @@ public class SkillTest {
         // Setup
         SkillType testSkillType = new SkillType();
         testSkillType.setFirstAttribute(REFLEXES);
-        testSkillType.setSecondAttribute(NONE);
+        testSkillType.setSecondAttribute(ATTRIBUTE_NONE);
 
         Attributes attributes = new Attributes(DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE,
@@ -108,8 +108,8 @@ public class SkillTest {
     void testGetTotalAttributeModifier_NoLinkedAttributes() {
         // Setup
         SkillType testSkillType = new SkillType();
-        testSkillType.setFirstAttribute(NONE);
-        testSkillType.setSecondAttribute(NONE);
+        testSkillType.setFirstAttribute(ATTRIBUTE_NONE);
+        testSkillType.setSecondAttribute(ATTRIBUTE_NONE);
 
         Attributes attributes = new Attributes(DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE,

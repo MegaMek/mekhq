@@ -33,7 +33,7 @@
 package mekhq.campaign.personnel.skills.enums;
 
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.DEXTERITY;
-import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NONE;
+import static mekhq.campaign.personnel.skills.enums.SkillAttribute.ATTRIBUTE_NONE;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -51,21 +51,21 @@ public class SkillAttributeTest {
     public void testFromString_InvalidStatus() {
         SkillAttribute status = SkillAttribute.fromString("INVALID_STATUS");
 
-        assertEquals(NONE, status);
+        assertEquals(ATTRIBUTE_NONE, status);
     }
 
     @Test
     public void testFromString_NullStatus() {
         SkillAttribute status = SkillAttribute.fromString(null);
 
-        assertEquals(NONE, status);
+        assertEquals(ATTRIBUTE_NONE, status);
     }
 
     @Test
     public void testFromString_EmptyString() {
         SkillAttribute status = SkillAttribute.fromString("");
 
-        assertEquals(NONE, status);
+        assertEquals(ATTRIBUTE_NONE, status);
     }
 
     @Test

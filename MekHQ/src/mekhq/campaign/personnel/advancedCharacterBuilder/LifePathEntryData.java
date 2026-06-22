@@ -272,7 +272,7 @@ public record LifePathEntryData(
             return minimumScore;
         }
 
-        if (attribute == SkillAttribute.NONE) {
+        if (attribute == SkillAttribute.ATTRIBUTE_NONE) {
             return 0;
         }
 

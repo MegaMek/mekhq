@@ -45,7 +45,7 @@ import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_TRAUMA_SURGEO
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.HealingMarginOfSuccessEffects.getEffectFromHealingAttempt;
 import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.BODY;
-import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NONE;
+import static mekhq.campaign.personnel.skills.enums.SkillAttribute.ATTRIBUTE_NONE;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.time.LocalDate;
@@ -302,7 +302,7 @@ public class AdvancedMedicalAlternateHealing {
               getTextAt(RESOURCE_BUNDLE, "AdvancedMedicalAlternateHealing.naturalHealing.normal"),
               patient,
               BODY,
-              NONE,
+              ATTRIBUTE_NONE,
               modifiers,
               miscPenalty,
               false,
@@ -315,7 +315,7 @@ public class AdvancedMedicalAlternateHealing {
                   getTextAt(RESOURCE_BUNDLE, "AdvancedMedicalAlternateHealing.naturalHealing.edge"),
                   patient,
                   BODY,
-                  NONE,
+                  ATTRIBUTE_NONE,
                   modifiers,
                   miscPenalty,
                   false,

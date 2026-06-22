@@ -36,7 +36,7 @@ package mekhq.campaign.personnel.skills;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.CHARISMA;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.DEXTERITY;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.INTELLIGENCE;
-import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NONE;
+import static mekhq.campaign.personnel.skills.enums.SkillAttribute.ATTRIBUTE_NONE;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.REFLEXES;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.STRENGTH;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.WILLPOWER;
@@ -502,7 +502,7 @@ public class SkillType {
      * @param firstAttribute  The primary {@link SkillAttribute} associated with the skill, influencing its calculation
      *                        or behavior. <b>Cannot</b> be {@code null}.
      * @param secondAttribute The secondary {@link SkillAttribute} associated with the skill. If {@code null}, the
-     *                        default value is {@link SkillAttribute#NONE}.
+     *                        default value is {@link SkillAttribute#ATTRIBUTE_NONE}.
      * @param greenLvl        The value representing the skill's "Green" proficiency level. If {@code null}, the default
      *                        value is {@code 1}.
      * @param regLvl          The value representing the skill's "Regular" proficiency level. If {@code null}, the
@@ -529,7 +529,7 @@ public class SkillType {
         this.countUp = isCountUp != null && isCountUp;
         this.subType = subType;
         this.firstAttribute = firstAttribute;
-        this.secondAttribute = secondAttribute == null ? NONE : secondAttribute;
+        this.secondAttribute = secondAttribute == null ? ATTRIBUTE_NONE : secondAttribute;
         this.greenLvl = greenLvl == null ? 1 : greenLvl;
         this.regLvl = regLvl == null ? 3 : regLvl;
         this.vetLvl = vetLvl == null ? 4 : vetLvl;
@@ -607,7 +607,7 @@ public class SkillType {
 
         String flavorText = htmlOpenTag + rawFlavorText + "<br>(" + firstAttribute.getLabel();
 
-        if (secondAttribute != NONE) {
+        if (secondAttribute != ATTRIBUTE_NONE) {
             flavorText += ", " + secondAttribute.getLabel() + ')';
         } else {
             flavorText += ")";
@@ -788,8 +788,8 @@ public class SkillType {
      */
     public int getLinkedAttributeCount() {
         int count = 0;
-        count += (firstAttribute != null && firstAttribute != NONE) ? 1 : 0;
-        count += (secondAttribute != null && secondAttribute != NONE) ? 1 : 0;
+        count += (firstAttribute != null && firstAttribute != ATTRIBUTE_NONE) ? 1 : 0;
+        count += (secondAttribute != null && secondAttribute != ATTRIBUTE_NONE) ? 1 : 0;
         return count;
     }
 
@@ -869,7 +869,7 @@ public class SkillType {
      * @since 0.50.05
      */
     public void setFirstAttribute(@Nullable SkillAttribute firstAttribute) {
-        this.firstAttribute = firstAttribute == null ? NONE : firstAttribute;
+        this.firstAttribute = firstAttribute == null ? ATTRIBUTE_NONE : firstAttribute;
     }
 
     /**
@@ -885,7 +885,7 @@ public class SkillType {
      * @since 0.50.05
      */
     public void setSecondAttribute(@Nullable SkillAttribute secondAttribute) {
-        this.secondAttribute = secondAttribute == null ? NONE : secondAttribute;
+        this.secondAttribute = secondAttribute == null ? ATTRIBUTE_NONE : secondAttribute;
     }
 
     public int getCost(int lvl) {
@@ -1259,7 +1259,7 @@ public class SkillType {
     }
 
     public void writeToXML(final PrintWriter pw, int indent) {
-        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "skillType");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "affectedSkill");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", name);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "target", target);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "isCountUp", countUp);
@@ -1273,7 +1273,7 @@ public class SkillType {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "heroicLvl", heroicLvl);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "legendaryLvl", legendaryLvl);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "costs", StringUtils.join(costs, ','));
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "skillType");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "affectedSkill");
     }
 
     /**
@@ -1290,7 +1290,7 @@ public class SkillType {
             for (int x = 0; x < nodeList.getLength(); x++) {
                 Node wn2 = nodeList.item(x);
                 if (wn2.getNodeName().equalsIgnoreCase("name")) {
-                    // skillType.name = wn2.getTextContent();
+                    // affectedSkill.name = wn2.getTextContent();
 
                     // The above code can be uncommented once these handlers have been removed
                     String name = wn2.getTextContent().trim();
@@ -1818,7 +1818,7 @@ public class SkillType {
               false,
               COMBAT_GUNNERY,
               DEXTERITY,
-              NONE,
+              ATTRIBUTE_NONE,
               2,
               null,
               null,
@@ -1836,7 +1836,7 @@ public class SkillType {
               false,
               COMBAT_PILOTING,
               DEXTERITY,
-              NONE,
+              ATTRIBUTE_NONE,
               2,
               null,
               null,
@@ -1949,7 +1949,7 @@ public class SkillType {
               false,
               SUPPORT_TECHNICIAN,
               INTELLIGENCE,
-              NONE,
+              ATTRIBUTE_NONE,
               null,
               null,
               null,
@@ -1987,7 +1987,7 @@ public class SkillType {
               false,
               SUPPORT,
               INTELLIGENCE,
-              NONE,
+              ATTRIBUTE_NONE,
               null,
               null,
               null,
@@ -2007,7 +2007,7 @@ public class SkillType {
               false,
               SUPPORT,
               INTELLIGENCE,
-              NONE,
+              ATTRIBUTE_NONE,
               null,
               null,
               null,
@@ -2093,7 +2093,7 @@ public class SkillType {
               false,
               SUPPORT,
               CHARISMA,
-              NONE,
+              ATTRIBUTE_NONE,
               null,
               null,
               null,
@@ -2110,7 +2110,7 @@ public class SkillType {
               false,
               ROLEPLAY_GENERAL,
               REFLEXES,
-              NONE,
+              ATTRIBUTE_NONE,
               null,
               null,
               null,
@@ -2127,7 +2127,7 @@ public class SkillType {
               false,
               UTILITY,
               CHARISMA,
-              NONE,
+              ATTRIBUTE_NONE,
               null,
               null,
               null,
@@ -2144,7 +2144,7 @@ public class SkillType {
               false,
               ROLEPLAY_GENERAL,
               WILLPOWER,
-              NONE,
+              ATTRIBUTE_NONE,
               null,
               null,
               null,
@@ -2161,7 +2161,7 @@ public class SkillType {
               false,
               UTILITY,
               INTELLIGENCE,
-              NONE,
+              ATTRIBUTE_NONE,
               null,
               null,
               null,
@@ -2178,7 +2178,7 @@ public class SkillType {
               false,
               COMBAT_GUNNERY,
               DEXTERITY,
-              NONE,
+              ATTRIBUTE_NONE,
               null,
               null,
               null,
@@ -2367,7 +2367,7 @@ public class SkillType {
               false,
               UTILITY,
               INTELLIGENCE,
-              NONE,
+              ATTRIBUTE_NONE,
               null,
               null,
               null,
@@ -2384,7 +2384,7 @@ public class SkillType {
               false,
               ROLEPLAY_GENERAL,
               INTELLIGENCE,
-              NONE,
+              ATTRIBUTE_NONE,
               null,
               null,
               null,
@@ -2435,7 +2435,7 @@ public class SkillType {
               false,
               UTILITY,
               CHARISMA,
-              NONE,
+              ATTRIBUTE_NONE,
               null,
               null,
               null,
@@ -2945,7 +2945,7 @@ public class SkillType {
               false,
               UTILITY,
               INTELLIGENCE,
-              NONE,
+              ATTRIBUTE_NONE,
               null,
               null,
               null,
@@ -3253,7 +3253,7 @@ public class SkillType {
               false,
               ROLEPLAY_GENERAL,
               CHARISMA,
-              NONE,
+              ATTRIBUTE_NONE,
               null,
               null,
               null,
@@ -3321,7 +3321,7 @@ public class SkillType {
               false,
               ROLEPLAY_GENERAL,
               INTELLIGENCE,
-              NONE,
+              ATTRIBUTE_NONE,
               null,
               null,
               null,
@@ -3338,7 +3338,7 @@ public class SkillType {
               false,
               UTILITY,
               REFLEXES,
-              NONE,
+              ATTRIBUTE_NONE,
               null,
               null,
               null,
@@ -3372,7 +3372,7 @@ public class SkillType {
               false,
               COMBAT_GUNNERY,
               DEXTERITY,
-              NONE,
+              ATTRIBUTE_NONE,
               null,
               null,
               null,
@@ -3389,7 +3389,7 @@ public class SkillType {
               false,
               COMBAT_GUNNERY,
               DEXTERITY,
-              NONE,
+              ATTRIBUTE_NONE,
               null,
               null,
               null,
@@ -3406,7 +3406,7 @@ public class SkillType {
               false,
               ROLEPLAY_GENERAL,
               STRENGTH,
-              NONE,
+              ATTRIBUTE_NONE,
               null,
               null,
               null,

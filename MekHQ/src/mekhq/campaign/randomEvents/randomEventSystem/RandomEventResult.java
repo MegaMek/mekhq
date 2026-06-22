@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.randomEvents.randomEventSystem;
 
+import static mekhq.campaign.personnel.skills.SkillType.SKILL_NONE;
 import static mekhq.campaign.randomEvents.randomEventSystem.RandomEventResultEffect.NONE;
 
 import java.util.ArrayList;
@@ -46,18 +47,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @param effect                 The type of effect this result describes
  * @param affectedPersonnelTypes Whether this result applies to a guard
  * @param magnitude              The intensity or magnitude of the effect
- * @param skillType              An optional skill type associated with the effect
+ * @param affectedSkill          An optional skill type associated with the effect
  */
 public record RandomEventResult(
       @JsonProperty(value = "effect") RandomEventResultEffect effect,
       @JsonProperty(value = "affectedPersonnelTypes") List<RandomEventEffectedPersonnelType> affectedPersonnelTypes,
       @JsonProperty(value = "magnitude") int magnitude,
-      @JsonProperty(value = "skillType") String skillType
+      @JsonProperty(value = "affectedSkill") String affectedSkill
 ) {
     // Additional logic to provide defaults for missing properties
     public RandomEventResult {
         effect = (effect != null) ? effect : NONE;
         affectedPersonnelTypes = (affectedPersonnelTypes != null) ? affectedPersonnelTypes : new ArrayList<>();
-        skillType = (skillType != null) ? skillType : "";
+        affectedSkill = (affectedSkill != null) ? affectedSkill : "";
     }
 }

@@ -41,6 +41,7 @@ import static mekhq.campaign.force.FormationType.SECURITY;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_POISON_RESISTANCE;
 import static mekhq.campaign.personnel.enums.PersonnelRole.DEPENDENT;
 import static mekhq.campaign.personnel.enums.PersonnelRole.NONE;
+import static mekhq.campaign.personnel.skills.SkillType.SKILL_NONE;
 import static mekhq.campaign.randomEvents.randomEventSystem.RandomEventEffectedPersonnelType.CAMP_FOLLOWERS;
 import static mekhq.campaign.randomEvents.randomEventSystem.RandomEventEffectedPersonnelType.COMBAT_PERSONNEL;
 import static mekhq.campaign.randomEvents.randomEventSystem.RandomEventEffectedPersonnelType.PRISONERS;
@@ -567,21 +568,28 @@ public class RandomEventEffectsManager {
     }
 
     /**
-     * Handles the "fatigue all" effect, applying fatigue to all targeted personnel.
+     * Applies the effects of a random event to the skill of a target personnel, modifying their skill level as
+     * specified by the event result. This method updates the target's skill and triggers an event indicating the
+     * change, if applicable.
      *
-     * <p>The magnitude of the event determines the level of fatigue applied. The outcome is
-     * added to the event report.</p>
+     * @param result The {@code RandomEventResult} containing the details of the affected personnel types, the targeted
+     *               skill, and the magnitude of the change to be applied.
      *
-     * @param result The {@link RandomEventResult} specifying the fatigue effect and its magnitude.
-     *
-     * @return A {@link String} summarizing the fatigue effect.
+     * @return A formatted string representing the report of the change, or an empty string if no changes were made to
+     *       the target's skills.
      */
     private String eventEffectSkill(RandomEventResult result) {
         final List<RandomEventEffectedPersonnelType> affectedPersonnelTypes = result.affectedPersonnelTypes();
         final int magnitude = result.magnitude();
 
         // Get skill
-        SkillType skillType = SkillType.getType(result.skillType());
+        String affectedSkill = result.affectedSkill();
+        if (affectedSkill.equals(SKILL_NONE)) {
+            return "";
+        }
+
+
+        SkillType skillType = SkillType.getType(affectedSkill);
 
         if (skillType == null) {
             return "";
