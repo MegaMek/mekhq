@@ -127,7 +127,7 @@ public class RandomEventEffectsManager {
         for (RandomEventResult result : results) {
             RandomEventResultEffect effect = result.effect();
 
-            String incidentReport = switch (effect) {
+            String mechanicalEffectsReport = switch (effect) {
                 case NONE -> "";
                 case PRISONER_CAPACITY -> eventEffectPrisonerCapacity(result);
                 case INJURY -> eventEffectInjury(result);
@@ -145,8 +145,8 @@ public class RandomEventEffectsManager {
                 case UNIQUE -> eventEffectUnique(eventData, result);
             };
 
-            if (!incidentReport.isEmpty()) {
-                report.append("- ").append(incidentReport).append("<br>");
+            if (!mechanicalEffectsReport.isEmpty()) {
+                report.append("- ").append(mechanicalEffectsReport).append("<br>");
             }
         }
 
