@@ -98,7 +98,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class AbstractMissionTransition {
+public abstract class AbstractMissionTransition {
     private static final MMLogger LOGGER = MMLogger.create(AbstractMissionTransition.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.AbstractMission";
 
