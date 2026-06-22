@@ -60,6 +60,7 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.TechConstants;
+import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.options.IOption;
@@ -1583,26 +1584,32 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
      *
      * <ul>
      *   <li>The snapshot is a {@code DIS} (Disputed) marker — to the victor goes the spoils.</li>
-     *   <li>The snapshot owner is a faction with a defined dissolution year that falls within
-     *   100 years of {@code when}. This catches FedCom-era births (FC ends 3067, well within a
-     *   3047 character's lifespan) without retroactively rewriting deep-history births where the
-     *   dissolution is centuries off (a 2470 Star League birth keeps SL — the player chose that
-     *   era deliberately).</li>
+     *   <li>The snapshot owner is a faction with a defined dissolution year within 100 years of {@code when}
+     *   <b>and</b> the eventual owner already held this world at or before {@code when}. The second condition
+     *   restricts substitution to a transient umbrella/overlay state the world reverts out of, and excludes a
+     *   continuous polity that merely renames into a brand-new successor (see below). This catches FedCom-era
+     *   births (FC ends 3067, well within a 3047 character's lifespan) without retroactively rewriting
+     *   deep-history births where the dissolution is centuries off (a 2470 Star League birth keeps SL — the
+     *   player chose that era deliberately).</li>
      * </ul>
      *
      * <p>"Eventual stable owner" is the most-recent non-{@code DIS} faction event in the planet's
      * own future timeline. If the world has no future faction events (data ends at the snapshot),
      * or if the eventual owner is the same as the snapshot, the snapshot is used as-is. The
-     * {@code ABN} (Abandoned) marker is dropped only when other real owners are present.</p>
+     * {@code ABN} (Abandoned) marker is dropped only when other real owners are present. The owner decision
+     * itself lives in {@link #chooseDisplayedOwner}.</p>
      *
      * <p>Concrete cases:</p>
      *
      * <ul>
-     *   <li>New Avalon at 3047, snapshot {@code FC} (ends 3067, within 100y), eventual {@code FS}:
-     *   substitutes — a 3047-born NA citizen is FedSuns-stock regardless of the FedCom overlay.</li>
-     *   <li>Tharkad at 3047, snapshot {@code FC}, eventual {@code LA}: substitutes to {@code LA},
-     *   putting the world on the Lyran side as it ends up.</li>
+     *   <li>New Avalon at 3047, snapshot {@code FC} (ends 3067, within 100y), eventual {@code FS} (held it
+     *   before the FedCom overlay): substitutes — a 3047-born NA citizen is FedSuns-stock.</li>
+     *   <li>Tharkad at 3047, snapshot {@code FC}, eventual {@code LA} (held it before): substitutes to
+     *   {@code LA}, putting the world on the Lyran side as it ends up.</li>
      *   <li>New Avalon at 3070, snapshot {@code DIS}, eventual {@code FS}: substitutes.</li>
+     *   <li>Mishkadrill at 3025, snapshot {@code OA} (Outworlds Alliance, ends 3082, within 100y), eventual
+     *   {@code RA} (Raven Alliance — the rename, never owned the world before 3083): kept as {@code OA}. A
+     *   pre-3083 character is Outworlds-stock, and the OA origin filter still finds the world.</li>
      *   <li>Terra at 2470, snapshot {@code SL} (ends ~2786, 316y off), eventual modern owner: kept
      *   as {@code SL} — the era is intentional.</li>
      *   <li>Hesperus II at 3047, snapshot {@code LA} (no end year), eventual {@code LA}: kept.</li>
@@ -1620,37 +1627,94 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             if (events == null) {
                 continue;
             }
-            java.util.List<String> snapshot = null;
-            java.util.List<String> eventualOwner = null;
+            List<String> snapshot = null;
+            List<String> eventualOwner = null;
+            // Every faction code that owned this world at or before `when`. Lets us tell a transient
+            // overlay the world reverts out of (the eventual owner also held it earlier — e.g. FedCom
+            // over Davion/Lyran worlds) from a continuous polity that simply renames into a brand-new
+            // successor (the eventual owner is new — e.g. Outworlds Alliance -> Raven Alliance). Only
+            // the former is substituted; see chooseDisplayedOwner.
+            Set<String> priorOwnerCodes = new HashSet<>();
             for (Planet.PlanetaryEvent event : events) {
                 if (event.date == null || event.faction == null || event.faction.getValue() == null) {
                     continue;
                 }
-                java.util.List<String> codes = event.faction.getValue();
+                List<String> codes = event.faction.getValue();
                 if (event.date.isAfter(when)) {
                     if (!isDisputedOnly(codes)) {
                         eventualOwner = codes;
                     }
                 } else {
                     snapshot = codes;
+                    priorOwnerCodes.addAll(codes);
                 }
             }
             // No snapshot means the world wasn't owned at `when` — uncolonized. Don't substitute a
             // future colonization event, or we'd incorrectly mark pre-colonial dates as inhabited
             // and pollute the picker (Copilot review on PR #8935).
-            java.util.List<String> displayed;
-            if (snapshot != null && eventualOwner != null && !sameCodes(snapshot, eventualOwner)
-                      && (isDisputedOnly(snapshot) || anyDissolvesNear(snapshot, when))) {
-                displayed = eventualOwner;
-            } else {
-                displayed = snapshot;
-            }
+            List<String> displayed = chooseDisplayedOwner(snapshot, eventualOwner, priorOwnerCodes,
+                  anyDissolvesNear(snapshot, when));
             addCodes(result, displayed);
         }
         if (result.size() > 1) {
             result.remove(Factions.getInstance().getFaction("ABN"));
         }
         return result;
+    }
+
+    /**
+     * Decides which owner code list to credit a world to: the era-correct {@code snapshot} owner, or its
+     * {@code eventualOwner} when the snapshot is merely a transient state the world ends up leaving.
+     *
+     * <p>The snapshot is replaced by the eventual owner only when it is genuinely transient:</p>
+     * <ul>
+     *   <li>The snapshot is a {@code DIS} (Disputed) marker — to the victor goes the spoils; always substitute.</li>
+     *   <li>The snapshot faction dissolves within {@link #DISSOLUTION_PROXIMITY_YEARS} of {@code when}
+     *   ({@code snapshotDissolvesNear}) <b>and</b> the eventual owner already held this world at or before
+     *   {@code when} (its codes intersect {@code priorOwnerCodes}).</li>
+     * </ul>
+     *
+     * <p>The second clause is the key distinction. A temporary umbrella/overlay state that the world reverts out
+     * of has the eventual owner present earlier in the timeline (FedCom over Davion/Lyran worlds reverts to
+     * {@code FS}/{@code LA}), so it substitutes. A continuous polity that merely renames into a brand-new successor
+     * (Outworlds Alliance -> Raven Alliance, Clan Wolf -> Wolf Empire) has a successor that never owned the world
+     * before the rename, so it is <b>not</b> substituted and the era-correct owner is kept. Substituting it would
+     * credit a pre-rename character to a state that does not yet exist and, worse, make the origin-faction world
+     * filter return no worlds for the still-extant pre-rename faction.</p>
+     *
+     * @param snapshot              the owner code(s) at {@code when}, or {@code null} if the world was uncolonized
+     * @param eventualOwner         the world's latest future non-disputed owner code(s), or {@code null} if none
+     * @param priorOwnerCodes       every faction code that owned the world at or before {@code when}
+     * @param snapshotDissolvesNear whether a snapshot faction dissolves within the proximity window of {@code when}
+     *
+     * @return the owner code list to credit: {@code eventualOwner} when substituting, otherwise {@code snapshot}
+     */
+    @Nullable
+    static List<String> chooseDisplayedOwner(@Nullable List<String> snapshot, @Nullable List<String> eventualOwner,
+          Set<String> priorOwnerCodes, boolean snapshotDissolvesNear) {
+        boolean canSubstitute = (snapshot != null) && (eventualOwner != null) && !sameCodes(snapshot, eventualOwner);
+        if (!canSubstitute) {
+            return snapshot;
+        }
+        boolean eventualOwnerHeldWorldBefore = intersects(eventualOwner, priorOwnerCodes);
+        boolean snapshotIsTransient = isDisputedOnly(snapshot)
+                                            || (snapshotDissolvesNear && eventualOwnerHeldWorldBefore);
+        return snapshotIsTransient ? eventualOwner : snapshot;
+    }
+
+    /**
+     * @return {@code true} if any code in {@code codes} is present in {@code priorOwnerCodes}
+     */
+    private static boolean intersects(@Nullable List<String> codes, Set<String> priorOwnerCodes) {
+        if (codes == null) {
+            return false;
+        }
+        for (String code : codes) {
+            if (priorOwnerCodes.contains(code)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static boolean anyDissolvesNear(java.util.List<String> codes, LocalDate when) {
