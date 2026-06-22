@@ -98,13 +98,17 @@ import org.jspecify.annotations.NonNull;
  */
 public class RandomEventEffectsManager {
     private static final MMLogger LOGGER = MMLogger.create(RandomEventEffectsManager.class);
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
+
+    private static final String SINGULAR_CHARACTER_RESOURCE_KEY = "context.character.singular";
+    private static final String PLURAL_CHARACTER_RESOURCE_KEY = "context.character.plural";
+    private static final String SINGULAR_PRISONER_RESOURCE_KEY = "context.prisoner.singular";
+    private static final String PLURAL_PRISONER_RESOURCE_KEY = "context.prisoner.plural";
 
     private final Campaign campaign;
 
     private String eventReport = "";
     private final Set<Person> personHashSet = new HashSet<>();
-
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
 
     /**
      * Constructs an {@link RandomEventEffectsManager} object and processes the given event effects.
@@ -192,10 +196,7 @@ public class RandomEventEffectsManager {
     }
 
     /**
-     * Selects a random target for an event effect based on whether the target is a guard or a prisoner.
-     *
-     * <p>Guards are selected from security forces, while prisoners are selected from the current
-     * prisoner list. The selection excludes any invalid targets.</p>
+     * Selects a random target for an event effect.
      *
      * @param effectedPersonnelTypes a list of {@link RandomEventEffectedPersonnelType} representing the types of
      *                               personnel to be considered for selection.
@@ -213,7 +214,7 @@ public class RandomEventEffectsManager {
     }
 
     /**
-     * Retrieves all potential targets for an event effect, either guards or prisoners.
+     * Retrieves all potential targets for an event effect.
      *
      * @param effectedPersonnelTypes a list of {@link RandomEventEffectedPersonnelType} representing the types of
      *                               personnel to be considered for selection.
@@ -346,7 +347,7 @@ public class RandomEventEffectsManager {
                                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());
 
         String context = getFormattedTextAt(RESOURCE_BUNDLE,
-              magnitude > 0 ? "context.guard.singular" : "context.prisoner.singular");
+              magnitude > 0 ? SINGULAR_CHARACTER_RESOURCE_KEY : SINGULAR_PRISONER_RESOURCE_KEY);
 
         return getFormattedTextAt(RESOURCE_BUNDLE, "INJURY.report", colorOpen, context, CLOSING_SPAN_TAG);
     }
@@ -354,7 +355,7 @@ public class RandomEventEffectsManager {
     /**
      * Handles the effects of a "death" event, removing personnel from the campaign due to fatalities.
      *
-     * <p>The affected individuals are determined based on the event's magnitude, with guards being
+     * <p>The affected individuals are determined based on the event's magnitude, with normal characters being
      * marked as KIA and prisoners being removed completely. The outcome is added to the event report.</p>
      *
      * @param result The {@link RandomEventResult} detailing the death effect.
@@ -411,10 +412,10 @@ public class RandomEventEffectsManager {
         String context;
         if (isOnlyPrisonersAffected) {
             context = getFormattedTextAt(RESOURCE_BUNDLE,
-                  targetCount != 1 ? "context.prisoner.plural" : "context.prisoner.singular");
+                  targetCount != 1 ? PLURAL_PRISONER_RESOURCE_KEY : SINGULAR_PRISONER_RESOURCE_KEY);
         } else {
             context = getFormattedTextAt(RESOURCE_BUNDLE,
-                  targetCount != 1 ? "context.guard.plural" : "context.guard.singular");
+                  targetCount != 1 ? PLURAL_CHARACTER_RESOURCE_KEY : SINGULAR_CHARACTER_RESOURCE_KEY);
         }
 
         String haveOrHas = getFormattedTextAt(RESOURCE_BUNDLE, targetCount != 1 ? "pluralizer.have" : "pluralizer.has");
@@ -475,10 +476,10 @@ public class RandomEventEffectsManager {
         String context;
         if (isOnlyPrisonersAffected) {
             context = getFormattedTextAt(RESOURCE_BUNDLE,
-                  magnitude != 1 ? "context.prisoner.plural" : "context.prisoner.singular");
+                  magnitude != 1 ? PLURAL_PRISONER_RESOURCE_KEY : SINGULAR_PRISONER_RESOURCE_KEY);
         } else {
             context = getFormattedTextAt(RESOURCE_BUNDLE,
-                  magnitude != 1 ? "context.guard.plural" : "context.guard.singular");
+                  magnitude != 1 ? PLURAL_CHARACTER_RESOURCE_KEY : SINGULAR_CHARACTER_RESOURCE_KEY);
         }
 
         String haveOrHas = getFormattedTextAt(RESOURCE_BUNDLE, magnitude != 1 ? "pluralizer.have" : "pluralizer.has");
@@ -543,10 +544,10 @@ public class RandomEventEffectsManager {
         String context;
         if (isOnlyPrisonersAffected) {
             context = getFormattedTextAt(RESOURCE_BUNDLE,
-                  targetCount != 1 ? "context.prisoner.plural" : "context.prisoner.singular");
+                  targetCount != 1 ? PLURAL_PRISONER_RESOURCE_KEY : SINGULAR_PRISONER_RESOURCE_KEY);
         } else {
             context = getFormattedTextAt(RESOURCE_BUNDLE,
-                  targetCount != 1 ? "context.guard.plural" : "context.guard.singular");
+                  targetCount != 1 ? PLURAL_CHARACTER_RESOURCE_KEY : SINGULAR_CHARACTER_RESOURCE_KEY);
         }
 
         String haveOrHas = getFormattedTextAt(RESOURCE_BUNDLE, targetCount != 1 ? "pluralizer.have" : "pluralizer.has");
@@ -621,7 +622,9 @@ public class RandomEventEffectsManager {
         String colorOpen = spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor());
 
         String context = getFormattedTextAt(RESOURCE_BUNDLE,
-              target.getPrisonerStatus().isCurrentPrisoner() ? "context.prisoner.singular" : "context.guard.singular");
+              target.getPrisonerStatus().isCurrentPrisoner() ?
+                    SINGULAR_PRISONER_RESOURCE_KEY :
+                    SINGULAR_CHARACTER_RESOURCE_KEY);
 
         // We can reuse the same report as the DEATH effect, here too
         return getFormattedTextAt(RESOURCE_BUNDLE,
@@ -664,7 +667,7 @@ public class RandomEventEffectsManager {
         MekHQ.triggerEvent(new PersonChangedEvent(target));
 
         String context = getFormattedTextAt(RESOURCE_BUNDLE,
-              magnitude > 0 ? "context.guard.singular" : "context.prisoner.singular");
+              magnitude > 0 ? SINGULAR_CHARACTER_RESOURCE_KEY : SINGULAR_PRISONER_RESOURCE_KEY);
 
         String colorOpen = magnitude > 0 ?
                                  spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()) :
@@ -684,8 +687,8 @@ public class RandomEventEffectsManager {
     /**
      * Adjusts the loyalty level of all eligible targets in the campaign.
      *
-     * <p>If loyalty modifiers are enabled, this effect changes the loyalty of all guards or
-     * prisoners, as determined by the event effect's configuration.</p>
+     * <p>If loyalty modifiers are enabled, this effect changes the loyalty of all affected characters, as determined
+     * by the event effect's configuration.</p>
      *
      * @param result The {@link RandomEventResult} detailing the loyalty effect and its magnitude.
      *
@@ -720,10 +723,10 @@ public class RandomEventEffectsManager {
         String context;
         if (isOnlyPrisonersAffected) {
             context = getFormattedTextAt(RESOURCE_BUNDLE,
-                  targets.size() != 1 ? "context.prisoner.plural" : "context.prisoner.singular");
+                  targets.size() != 1 ? PLURAL_PRISONER_RESOURCE_KEY : SINGULAR_PRISONER_RESOURCE_KEY);
         } else {
             context = getFormattedTextAt(RESOURCE_BUNDLE,
-                  targets.size() != 1 ? "context.guard.plural" : "context.guard.singular");
+                  targets.size() != 1 ? PLURAL_CHARACTER_RESOURCE_KEY : SINGULAR_CHARACTER_RESOURCE_KEY);
         }
 
         String colorOpen = magnitude > 0 ?
@@ -777,7 +780,7 @@ public class RandomEventEffectsManager {
         String colorOpen = spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());
 
         String context = getFormattedTextAt(RESOURCE_BUNDLE,
-              magnitude != 1 ? "context.prisoner.plural" : "context.prisoner.singular");
+              magnitude != 1 ? PLURAL_PRISONER_RESOURCE_KEY : SINGULAR_PRISONER_RESOURCE_KEY);
 
         String haveOrHas = getFormattedTextAt(RESOURCE_BUNDLE, magnitude != 1 ? "pluralizer.have" : "pluralizer.has");
 
@@ -827,7 +830,7 @@ public class RandomEventEffectsManager {
         String colorOpen = spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());
 
         String context = getFormattedTextAt(RESOURCE_BUNDLE,
-              targetCount != 1 ? "context.prisoner.plural" : "context.prisoner.singular");
+              targetCount != 1 ? PLURAL_PRISONER_RESOURCE_KEY : SINGULAR_PRISONER_RESOURCE_KEY);
 
         String haveOrHas = getFormattedTextAt(RESOURCE_BUNDLE, targetCount != 1 ? "pluralizer.have" : "pluralizer.has");
 
@@ -878,7 +881,7 @@ public class RandomEventEffectsManager {
         }
 
         String context = getFormattedTextAt(RESOURCE_BUNDLE,
-              magnitude > 0 ? "context.guard.singular" : "context.prisoner.singular");
+              magnitude > 0 ? SINGULAR_CHARACTER_RESOURCE_KEY : SINGULAR_PRISONER_RESOURCE_KEY);
 
         String colorOpen = magnitude > 0 ?
                                  spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()) :
@@ -898,8 +901,9 @@ public class RandomEventEffectsManager {
     /**
      * Applies a fatigue effect to all eligible targets in the campaign.
      *
-     * <p>If fatigue effects are enabled, this effect adjusts the fatigue level of all guards or
-     * prisoners, based on the event effect's magnitude.</p>
+     * <p>If fatigue effects are enabled, this effect adjusts the fatigue level of all affected characters, based on
+     * the
+     * event effect's magnitude.</p>
      *
      * @param result The {@link RandomEventResult} specifying the fatigue effect and its magnitude.
      *
@@ -939,10 +943,10 @@ public class RandomEventEffectsManager {
         String context;
         if (isOnlyPrisonersAffected) {
             context = getFormattedTextAt(RESOURCE_BUNDLE,
-                  targets.size() != 1 ? "context.prisoner.plural" : "context.prisoner.singular");
+                  targets.size() != 1 ? PLURAL_PRISONER_RESOURCE_KEY : SINGULAR_PRISONER_RESOURCE_KEY);
         } else {
             context = getFormattedTextAt(RESOURCE_BUNDLE,
-                  targets.size() != 1 ? "context.guard.plural" : "context.guard.singular");
+                  targets.size() != 1 ? PLURAL_CHARACTER_RESOURCE_KEY : SINGULAR_CHARACTER_RESOURCE_KEY);
         }
 
         String colorOpen = magnitude > 0 ?
@@ -1236,7 +1240,7 @@ public class RandomEventEffectsManager {
         String colorOpen = spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());
 
         String context = getFormattedTextAt(RESOURCE_BUNDLE,
-              prisonerCount != 1 ? "context.prisoner.plural" : "context.prisoner.singular");
+              prisonerCount != 1 ? PLURAL_PRISONER_RESOURCE_KEY : SINGULAR_PRISONER_RESOURCE_KEY);
 
         String haveOrHas = getFormattedTextAt(RESOURCE_BUNDLE,
               prisonerCount != 1 ? "pluralizer.have" : "pluralizer.has");

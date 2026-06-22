@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.randomEvents.other;
+package mekhq.campaign.randomEvents;
 
 import static java.io.File.separator;
 
