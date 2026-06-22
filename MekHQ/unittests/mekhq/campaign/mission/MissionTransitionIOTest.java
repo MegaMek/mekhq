@@ -96,7 +96,7 @@ import testUtilities.MHQTestUtilities;
  * plain {@link Mission}, a {@link Contract}, and a fully-populated {@link AtBContract} (scenarios, StratCon state and
  * NPCs included).</p>
  */
-public class MissionTransitionIOTest {
+public class AbstractMissionTransitionIOTest {
     private static final Path MISSIONS_DIR = Path.of("testresources", "data", "missions");
 
     /** Any version at or above the current release; keeps the version-gated compatibility branches dormant. */
