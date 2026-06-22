@@ -37,7 +37,7 @@ import static megamek.client.ui.util.PlayerColour.BLUE;
 import static megamek.client.ui.util.PlayerColour.RED;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.enums.SkillLevel.parseFromString;
-import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
+import static mekhq.campaign.mission.RandomFactionCamouflage.pickRandomCamouflage;
 import static mekhq.campaign.mission.enums.AtBContractType.UNDEFINED;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.MAXIMUM_MORALE_LEVEL;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.MINIMUM_MORALE_LEVEL;

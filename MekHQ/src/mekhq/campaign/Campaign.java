@@ -52,7 +52,7 @@ import static mekhq.campaign.force.Formation.FORMATION_ORIGIN;
 import static mekhq.campaign.force.Formation.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.force.FormationType.STANDARD;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
-import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
+import static mekhq.campaign.mission.RandomFactionCamouflage.pickRandomCamouflage;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_INTERSTELLAR_NEGOTIATOR;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_LOGISTICIAN;
@@ -2237,7 +2237,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all hangars across all locations associated with this campaign.
-     *                               TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     *                                     TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
      */
     public Hangar getAllHangar() {
         return units;
@@ -2885,7 +2885,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all warehouses across all locations associated with this campaign.
-     *                               TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
+     *                                     TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
      */
     public Warehouse getAllWarehouse() {
         return parts;
