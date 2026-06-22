@@ -97,7 +97,7 @@ import mekhq.gui.campaignOptions.optionChangeDialogs.*;
  * <p>The pane registers a flat set of {@link CampaignOptionsRoute}s - each describing a navigable destination and its
  * hierarchical path - and maps each one to a page factory. Pages are built lazily the first time they are shown (or
  * when the navigation search index is warmed) and then cached. The per-area builders
- * ({@link mekhq.gui.campaignOptions.contents.GeneralPages GeneralPages},
+ * ({@link mekhq.gui.campaignOptions.contents.GeneralPage GeneralPage},
  * {@link mekhq.gui.campaignOptions.contents.PersonnelPages PersonnelPages}, and the other per-area {@code *Pages}
  * classes) are likewise only instantiated the first time their section is needed.</p>
  *
@@ -131,7 +131,7 @@ public class CampaignOptionsPane extends JPanel {
     private CampaignOptionsNavigationPanel navigationPanel;
     private boolean isSyncingNavigationSelection;
 
-    private GeneralPages generalPage;
+    private GeneralPage generalPage;
     private PersonnelPages personnelPage;
     private BiographyPages biographyPage;
     private RelationshipsPages relationshipsPage;
@@ -628,7 +628,7 @@ public class CampaignOptionsPane extends JPanel {
      * @return a {@link JScrollPane} containing the general page panel
      */
     private JPanel createGeneralPage(CampaignOptionsDialogMode mode) {
-        generalPage = new GeneralPages(campaign, frame, mode);
+        generalPage = new GeneralPage(campaign, frame, mode);
         JPanel createdGeneralPage = generalPage.createGeneralPage();
         generalPage.loadValuesFromCampaignOptions();
 
