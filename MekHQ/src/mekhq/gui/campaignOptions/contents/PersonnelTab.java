@@ -225,6 +225,7 @@ public class PersonnelTab {
     private MMComboBox<PrisonerCaptureStyle> comboPrisonerCaptureStyle;
     private JCheckBox chkResetTemporaryPrisonerCapacity;
     private JCheckBox chkUseFunctionalEscapeArtist;
+    private JCheckBox chkDisableIntelBreachChance;
 
     private JPanel dependentsPanel;
     private JCheckBox chkUseRandomDependentAddition;
@@ -270,6 +271,7 @@ public class PersonnelTab {
         comboPrisonerCaptureStyle = new MMComboBox<>("comboPrisonerCaptureStyle", PrisonerCaptureStyle.values());
         chkResetTemporaryPrisonerCapacity = new JCheckBox();
         chkUseFunctionalEscapeArtist = new JCheckBox();
+        chkDisableIntelBreachChance = new JCheckBox();
 
         dependentsPanel = new JPanel();
         chkUseRandomDependentAddition = new JCheckBox();
@@ -1366,6 +1368,14 @@ public class PersonnelTab {
         });
         comboPrisonerCaptureStyle.addMouseListener(createTipPanelUpdater(prisonersAndDependentsHeader,
               "PrisonerCaptureStyle"));
+        comboPrisonerCaptureStyle.addItemListener(e -> {
+            PrisonerCaptureStyle selectedStyle = comboPrisonerCaptureStyle.getSelectedItem();
+            boolean isMekHQ = selectedStyle != null && selectedStyle.isMekHQ();
+            chkDisableIntelBreachChance.setEnabled(isMekHQ);
+            if (!isMekHQ) {
+                chkDisableIntelBreachChance.setSelected(false);
+            }
+        });
 
         chkResetTemporaryPrisonerCapacity = new CampaignOptionsCheckBox("ResetTemporaryPrisonerCapacity");
         chkResetTemporaryPrisonerCapacity.addMouseListener(createTipPanelUpdater(prisonersAndDependentsHeader,
@@ -1375,6 +1385,10 @@ public class PersonnelTab {
               getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseFunctionalEscapeArtist.addMouseListener(createTipPanelUpdater(prisonersAndDependentsHeader,
               "UseFunctionalEscapeArtist"));
+
+        chkDisableIntelBreachChance = new CampaignOptionsCheckBox("DisableIntelBreachChance");
+        chkDisableIntelBreachChance.addMouseListener(createTipPanelUpdater(prisonersAndDependentsHeader,
+              "DisableIntelBreachChance"));
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PrisonersPanel", true, "PrisonersPanel");
@@ -1396,6 +1410,11 @@ public class PersonnelTab {
         layout.gridx = 0;
         layout.gridwidth = 2;
         panel.add(chkResetTemporaryPrisonerCapacity, layout);
+
+        layout.gridy++;
+        layout.gridx = 0;
+        layout.gridwidth = 2;
+        panel.add(chkDisableIntelBreachChance, layout);
 
         return panel;
     }
@@ -1604,6 +1623,8 @@ public class PersonnelTab {
         // Prisoners and Dependents
         comboPrisonerCaptureStyle.setSelectedItem(options.getPrisonerCaptureStyle());
         chkUseFunctionalEscapeArtist.setSelected(options.isUseFunctionalEscapeArtist());
+        chkDisableIntelBreachChance.setSelected(options.isDisableIntelBreachChance());
+        chkDisableIntelBreachChance.setEnabled(options.getPrisonerCaptureStyle().isMekHQ());
         chkUseRandomDependentAddition.setSelected(options.isUseRandomDependentAddition());
         chkUseRandomDependentRemoval.setSelected(options.isUseRandomDependentRemoval());
         spnDependentProfessionDieSize.setValue(options.getDependentProfessionDieSize());
@@ -1717,6 +1738,7 @@ public class PersonnelTab {
         // Prisoners and Dependents
         options.setPrisonerCaptureStyle(comboPrisonerCaptureStyle.getSelectedItem());
         options.setUseFunctionalEscapeArtist(chkUseFunctionalEscapeArtist.isSelected());
+        options.setDisableIntelBreachChance(chkDisableIntelBreachChance.isSelected());
         if (chkResetTemporaryPrisonerCapacity.isSelected()) {
             campaign.setTemporaryPrisonerCapacity(DEFAULT_TEMPORARY_CAPACITY);
         }
