@@ -505,7 +505,7 @@ public class CampaignOptionsUnmarshaller {
                 campaignOptions.setRandomOriginOptions(randomOriginOptions);
             }
             case "useRandomPersonalities" -> campaignOptions.setUseRandomPersonalities(parseBoolean(nodeContents));
-            case "usePersonalityTagsOnly" -> campaignOptions.setUsePersonalityTagsOnly(parseBoolean(nodeContents));
+            case "usePersonalityLabelsOnly" -> campaignOptions.setUsePersonalityLabelsOnly(parseBoolean(nodeContents));
             case "useRandomPersonalityReputation" -> campaignOptions.setUseRandomPersonalityReputation(parseBoolean(
                   nodeContents));
             case "useReasoningXpMultiplier" -> campaignOptions.setUseReasoningXpMultiplier(parseBoolean(

@@ -667,7 +667,7 @@ public class BiographyTab {
         // Header
         backgroundHeader = new CampaignOptionsHeaderPanel("BackgroundsTab",
               getImageDirectory() + "logo_nueva_castile.png",
-              3);
+              4);
 
         // Contents
         pnlRandomOriginOptions = createRandomOriginOptionsPanel();
@@ -1623,7 +1623,7 @@ public class BiographyTab {
 
         // Backgrounds
         chkUseRandomPersonalities.setSelected(options.isUseRandomPersonalities());
-        chkUsePersonalityTagsOnly.setSelected(options.isUsePersonalityTagsOnly());
+        chkUsePersonalityTagsOnly.setSelected(options.isUsePersonalityLabelsOnly());
         chkUseRandomPersonalityReputation.setSelected(options.isUseRandomPersonalityReputation());
         chkUseReasoningXpMultiplier.setSelected(options.isUseReasoningXpMultiplier());
         chkUseSimulatedRelationships.setSelected(options.isUseSimulatedRelationships());
@@ -1724,7 +1724,7 @@ public class BiographyTab {
 
         // Backgrounds
         options.setUseRandomPersonalities(chkUseRandomPersonalities.isSelected());
-        options.setUsePersonalityTagsOnly(chkUsePersonalityTagsOnly.isSelected());
+        options.setUsePersonalityLabelsOnly(chkUsePersonalityTagsOnly.isSelected());
         options.setUseRandomPersonalityReputation(chkUseRandomPersonalityReputation.isSelected());
         options.setUseReasoningXpMultiplier(chkUseReasoningXpMultiplier.isSelected());
         options.setUseSimulatedRelationships(chkUseSimulatedRelationships.isSelected());

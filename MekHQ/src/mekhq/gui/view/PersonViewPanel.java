@@ -129,6 +129,7 @@ import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
+import mekhq.campaign.randomEvents.personalities.PersonalityController;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.JScrollablePanel;
@@ -700,11 +701,32 @@ public class PersonViewPanel extends JScrollablePanel {
             gridY++;
         }
 
-        if ((!person.getPersonalityDescription().isBlank()) &&
-                  (campaignOptions.isUseRandomPersonalities()) &&
-                  (!person.isHidePersonality()) &&
-                  (!person.isChild(campaign.getLocalDate()))) { // we don't display for children, as most of the
-            // descriptions won't fit
+        gridY = initPersonalityDescription(pnlBiographyTab, gridY);
+
+        // use glue to fill up the remaining space so everything is aligned to the top
+        addGlue(gridY, pnlBiographyTab);
+    }
+
+    private int initPersonalityDescription(JPanel pnlBiographyTab, int gridY) {
+        GridBagConstraints gridBagConstraints;
+        boolean isChild = person.isChild(campaign.getLocalDate());
+
+        boolean isUseRandomPersonality = campaignOptions.isUseRandomPersonalities();
+        boolean isShowLabelsOnly = campaignOptions.isUsePersonalityLabelsOnly();
+        boolean isHidePersonality = person.isHidePersonality();
+        boolean isRecruit = person.getJoinedCampaign() == null;
+
+        String personalityLabels = PersonalityController.getPersonalityLabels(person);
+        String personalityDescription = person.getPersonalityDescription();
+        String interviewerNotes = person.getPersonalityInterviewNotes();
+
+        String fullPersonalityDescription = isRecruit ? interviewerNotes : personalityDescription;
+        String personality = isShowLabelsOnly || isChild ? personalityLabels : fullPersonalityDescription;
+
+        boolean isPersonalityBlank = personality.isBlank();
+        boolean isShowPersonality = isUseRandomPersonality && !isHidePersonality && !isPersonalityBlank;
+
+        if (isShowPersonality) {
             JTextPane txtDesc = new JTextPane();
             txtDesc.setName("personalityDescription");
             txtDesc.setEditable(false);
@@ -715,7 +737,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 borderTitleKey = "pnlPersonality.interview";
                 txtDesc.setText(person.getPersonalityInterviewNotes());
             } else {
-                txtDesc.setText(person.getPersonalityDescription());
+                txtDesc.setText(personality);
             }
             txtDesc.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE, borderTitleKey)));
             gridBagConstraints = new GridBagConstraints();
@@ -730,9 +752,7 @@ public class PersonViewPanel extends JScrollablePanel {
             pnlBiographyTab.add(txtDesc, gridBagConstraints);
             gridY++;
         }
-
-        // use glue to fill up the remaining space so everything is aligned to the top
-        addGlue(gridY, pnlBiographyTab);
+        return gridY;
     }
 
     /**

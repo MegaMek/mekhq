@@ -247,6 +247,59 @@ public class PersonalityController {
     }
 
     /**
+     * Generates a concatenated string of personality labels based on the attributes of the given person.
+     *
+     * <p>The method checks various personality traits and appends their respective labels to the result if they are
+     * not in their default or neutral state.</p>
+     *
+     * @param person The person whose personality traits are being analyzed and converted to labels.
+     *
+     * @return A string containing all applicable personality labels concatenated together. If no labels are applicable,
+     *       an empty string is returned.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static String getPersonalityLabels(Person person) {
+        StringBuilder personalityLabels = new StringBuilder();
+
+        Aggression aggression = person.getAggression();
+        if (!aggression.isNone()) {
+            appendLabel(personalityLabels, aggression.getLabel());
+        }
+
+        Ambition ambition = person.getAmbition();
+        if (!ambition.isNone()) {
+            appendLabel(personalityLabels, ambition.getLabel());
+        }
+
+        Greed greed = person.getGreed();
+        if (!greed.isNone()) {
+            appendLabel(personalityLabels, greed.getLabel());
+        }
+
+        Social social = person.getSocial();
+        if (!social.isNone()) {
+            appendLabel(personalityLabels, social.getLabel());
+        }
+
+        PersonalityQuirk personalityQuirk = person.getPersonalityQuirk();
+        if (!personalityQuirk.isNone()) {
+            appendLabel(personalityLabels, personalityQuirk.getLabel());
+        }
+
+        return personalityLabels.toString();
+    }
+
+    private static void appendLabel(StringBuilder personalityLabels, String label) {
+        if (!personalityLabels.isEmpty()) {
+            personalityLabels.append(", ");
+        }
+
+        personalityLabels.append(label);
+    }
+
+    /**
      * Retrieves the descriptions of all personality traits (other than Reasoning and Quirks) for the given person. This
      * method processes various personality traits such as aggression, ambition, greed, and social behavior, generating
      * descriptions based on the specified indices, gender, and given name of the person.
