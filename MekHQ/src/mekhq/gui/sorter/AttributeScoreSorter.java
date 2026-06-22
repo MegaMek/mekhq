@@ -46,6 +46,9 @@ import megamek.logging.MMLogger;
  * {@link mekhq.gui.enums.PersonnelTableModelColumn}.</p>
  */
 public class AttributeScoreSorter implements Comparator<String> {
+
+    public static final AttributeScoreSorter INSTANCE = new AttributeScoreSorter();
+
     private static final MMLogger LOGGER = MMLogger.create(AttributeScoreSorter.class);
 
     private final String DIVIDER_STRING = " / ";

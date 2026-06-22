@@ -92,7 +92,7 @@ public class AutoAwardsDialog extends JDialog {
 
     public AutoAwardsDialog(Campaign c, Map<Integer, Map<Integer, List<Object>>> allAwardData, int ceremonyCount) {
         campaign = c;
-        gui = campaign.getApp().getCampaigngui();
+        gui = campaign.getGUI();
         allData = allAwardData;
         logger.info("attempting to extract a single page");
         data = allAwardData.get(ceremonyCount);

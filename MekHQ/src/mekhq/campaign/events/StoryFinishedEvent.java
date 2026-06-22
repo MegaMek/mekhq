@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -30,42 +30,16 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.sorter;
+package mekhq.campaign.events;
 
-import java.time.LocalDate;
-import java.util.Comparator;
-import java.util.Objects;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.storyArc.storytrigger.GameOverStoryTrigger;
 
-import mekhq.MekHQ;
-
-public class DateStringComparator implements Comparator<String> {
-
-    public static final DateStringComparator INSTANCE = new DateStringComparator();
-
-    @Override
-    public int compare(String o1, String o2) {
-        if (Objects.equals(o1, o2)) {
-            return 0;
-        } else if ("-".equals(o1)) {
-            return -1;
-        } else if ("-".equals(o2)) {
-            return 1;
-        }
-
-        LocalDate dateA;
-        LocalDate dateB;
-        try {
-            dateA = MekHQ.getMHQOptions().parseDisplayFormattedDate(o1);
-        } catch (Exception ignored) {
-            return -1;
-        }
-
-        try {
-            dateB = MekHQ.getMHQOptions().parseDisplayFormattedDate(o2);
-        } catch (Exception ignored) {
-            return 1;
-        }
-
-        return dateA.compareTo(dateB);
+/**
+ * An event triggered when a story arc finishes and the current campaign should end. See {@link GameOverStoryTrigger}.
+ */
+public final class StoryFinishedEvent extends CampaignEvent {
+    public StoryFinishedEvent(Campaign campaign) {
+        super(campaign);
     }
 }

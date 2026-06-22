@@ -56,20 +56,21 @@ import javax.swing.UIManager;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import megamek.client.ui.dialogs.buttonDialogs.AbstractButtonDialog;
 import megamek.client.ui.util.UIUtil;
 import megamek.logging.MMLogger;
 import mekhq.CampaignPreset;
 import mekhq.MHQConstants;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 
 /**
  * The {@code CampaignOptionsDialog} class represents a dialog window for presenting and modifying the campaign options
  * in MekHQ. It provides a user interface for accessing, editing, and applying various gameplay-related settings for a
  * campaign. The dialog also supports applying presets and saving settings for future use.
  * <p>
- * This dialog is an extension of {@link AbstractMHQButtonDialog} and integrates closely with a {@link Campaign}
+ * This dialog is an extension of {@link AbstractButtonDialog} and integrates closely with a {@link Campaign}
  * instance, representing the current or a predefined campaign setup. It facilitates user interaction for fine-tuning
  * the game campaign experience.
  * </p>
@@ -82,7 +83,7 @@ import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
  *   <li>Visual notifications, such as a notice about StratCon activation during the campaign.</li>
  * </ul>
  */
-public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
+public class CampaignOptionsDialog extends AbstractButtonDialog {
     private static final MMLogger LOGGER = MMLogger.create(CampaignOptionsDialog.class);
 
     private static final int BUTTON_GAP = UIUtil.scaleForGUI(8);
@@ -473,5 +474,10 @@ public class CampaignOptionsDialog extends AbstractMHQButtonDialog {
               null,
               options,
               options[0]);
+    }
+
+    @Override
+    protected void setPreferences() throws Exception {
+        setPreferences(MekHQ.getMHQPreferences().forClass(getClass()));
     }
 }

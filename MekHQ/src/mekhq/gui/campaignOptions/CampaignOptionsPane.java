@@ -164,9 +164,7 @@ public class CampaignOptionsPane extends JPanel {
         this.campaign = campaign;
         this.campaignOptions = campaign.getCampaignOptions();
         this.mode = mode;
-        if (campaign.getApp() != null) {
-            campaignGui = campaign.getApp().getCampaigngui();
-        }
+        this.campaignGui = campaign.getGUI();
         initialize();
     }
 
