@@ -68,14 +68,12 @@ import mekhq.gui.utilities.MekHqTableCellRenderer;
  * @author Jay lawson
  */
 public class PersonnelTableModel extends DataTableModel<Person> {
-    //region Variable Declarations
+
     public static final PersonnelTableModelColumn[] PERSONNEL_COLUMNS = PersonnelTableModelColumn.values();
 
     private final Campaign campaign;
     private PersonnelMarket personnelMarket;
-    private boolean loadAssignmentFromMarket;
     private boolean groupByUnit;
-    //endregion Variable Declarations
 
     public PersonnelTableModel(Campaign c) {
         data = new ArrayList<>();
@@ -128,28 +126,22 @@ public class PersonnelTableModel extends DataTableModel<Person> {
         return getValueAt(getPerson(row), PERSONNEL_COLUMNS[column]);
     }
 
-    public Object getValueAt(final @Nullable Person person,
-          final PersonnelTableModelColumn column) {
+    public Object getValueAt(@Nullable Person person, PersonnelTableModelColumn column) {
         if (getData().isEmpty()) {
             return "";
         } else if (person == null) {
             return "?";
         } else {
-            return column.getCellValue(getCampaign(), personnelMarket, person,
-                  loadAssignmentFromMarket, isGroupByUnit());
+            return column.getCellValue(campaign, person);
         }
-    }
-
-    private Campaign getCampaign() {
-        return campaign;
     }
 
     public void refreshData() {
         if (!isGroupByUnit()) {
-            setData(new ArrayList<>(getCampaign().getAllPersonnel()));
+            setData(new ArrayList<>(campaign.getAllPersonnel()));
         } else {
             List<Person> commanders = new ArrayList<>();
-            for (Person person : getCampaign().getAllPersonnel()) {
+            for (Person person : campaign.getAllPersonnel()) {
                 if ((person.getUnit() != null) && !person.equals(person.getUnit().getCommander())) {
                     // this person is NOT the commander of their unit,
                     // skip them.
@@ -182,11 +174,7 @@ public class PersonnelTableModel extends DataTableModel<Person> {
             setOpaque(true);
             setHorizontalAlignment(personnelColumn.getAlignment());
 
-            // Display Text
-            final String displayText = personnelColumn.getDisplayText(getCampaign(), person);
-            if (displayText != null) {
-                setText(displayText);
-            }
+            setText(personnelColumn.getText(value));
 
             // Colouring - determine color and collect ALL applicable color reasons
             boolean personIsDamaged;
@@ -265,7 +253,7 @@ public class PersonnelTableModel extends DataTableModel<Person> {
             }
 
             // Tool Tips - includes all applicable color reasons for name/rank/status columns
-            setToolTipText(personnelColumn.getToolTipText(person, loadAssignmentFromMarket, colorReasonKeys));
+            setToolTipText(personnelColumn.getToolTipText(person, colorReasonKeys));
 
             return this;
         }
@@ -290,40 +278,39 @@ public class PersonnelTableModel extends DataTableModel<Person> {
                     setHtmlText(person.getRankName());
                     break;
                 case PERSON:
-                    setText(person.getFullDesc(getCampaign()));
+                    setText(person.getFullDesc(campaign));
                     setImage(person.getPortraitImageIconWithFallback(true, 54).getImage());
                     break;
+                case MARKET_UNIT_ASSIGNMENT:
+                    Entity entity = campaign.getPersonnelMarket().getAttachedEntity(person);
+                    setText((entity != null) ? entity.getDisplayName() : "-");
+                    break;
                 case UNIT_ASSIGNMENT:
-                    if (loadAssignmentFromMarket) {
-                        final Entity en = personnelMarket.getAttachedEntity(person);
-                        setText((en != null) ? en.getDisplayName() : "-");
-                    } else {
-                        Unit u = person.getUnit();
-                        if ((u == null) && !person.getTechUnits().isEmpty()) {
-                            u = person.getTechUnits().getFirst();
-                        }
+                    Unit unit = person.getUnit();
+                    if ((unit == null) && !person.getTechUnits().isEmpty()) {
+                        unit = person.getTechUnits().getFirst();
+                    }
 
-                        if (u != null) {
-                            String desc = "<b>" + u.getName() + "</b><br>";
-                            desc += u.getEntity().getWeightClassName();
-                            if ((!(u.getEntity() instanceof SmallCraft) || !(u.getEntity() instanceof Jumpship))) {
-                                desc += " " + UnitType.getTypeDisplayableName(u.getEntity().getUnitType());
-                            }
-                            desc += "<br>" + u.getStatus();
-                            setText(desc);
-                            Image mekImage = u.getImage(this);
-                            if (mekImage != null) {
-                                setImage(mekImage);
-                            } else {
-                                clearImage();
-                            }
+                    if (unit != null) {
+                        String description = "<b>" + unit.getName() + "</b><br>";
+                        description += unit.getEntity().getWeightClassName();
+                        if ((!(unit.getEntity() instanceof SmallCraft) || !(unit.getEntity() instanceof Jumpship))) {
+                            description += " " + UnitType.getTypeDisplayableName(unit.getEntity().getUnitType());
+                        }
+                        description += "<br>" + unit.getStatus();
+                        setText(description);
+                        Image mekImage = unit.getImage(this);
+                        if (mekImage != null) {
+                            setImage(mekImage);
                         } else {
                             clearImage();
                         }
+                    } else {
+                        clearImage();
                     }
                     break;
                 case FORCE:
-                    Formation formation = getCampaign().getFormationFor(person);
+                    Formation formation = campaign.getFormationFor(person);
                     if (formation != null) {
                         StringBuilder desc = new StringBuilder("<html><b>").append(formation.getName())
                                                    .append("</b>");
@@ -379,6 +366,9 @@ public class PersonnelTableModel extends DataTableModel<Person> {
 
     public void loadAssignmentFromMarket(PersonnelMarket personnelMarket) {
         this.personnelMarket = personnelMarket;
-        this.loadAssignmentFromMarket = (null != personnelMarket);
+    }
+
+    public boolean isLoadAssignmentFromMarket() {
+        return personnelMarket != null;
     }
 }

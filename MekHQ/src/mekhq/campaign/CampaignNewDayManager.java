@@ -165,7 +165,6 @@ import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedical
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
-import mekhq.campaign.personnel.skills.AttributeCheckUtility;
 import mekhq.campaign.personnel.skills.EscapeSkills;
 import mekhq.campaign.personnel.skills.QuickTrain;
 import mekhq.campaign.personnel.skills.enums.AgingMilestone;
@@ -1753,19 +1752,12 @@ public class CampaignNewDayManager {
      * @since 0.51.0
      */
     private static boolean performPersonalityBreakCheck(Campaign campaign, Person person, int modifier) {
-        String reason = getTextAt(RESOURCE_BUNDLE, "mentalBreak.check");
-        AttributeCheckUtility attributeCheck = new AttributeCheckUtility(reason,
-              person,
-              SkillAttribute.WILLPOWER,
-              null,
-              null,
-              modifier,
-              true,
-              true);
+        ActionCheckResult attributeCheckResult =
+              person.checkAttribute(SkillAttribute.WILLPOWER).withMiscModifier(modifier)
+                    .resolve(true, getTextAt(RESOURCE_BUNDLE, "mentalBreak.check"), true);
+        campaign.addReport(SKILL_CHECKS, attributeCheckResult.resultsText());
 
-        campaign.addReport(SKILL_CHECKS, attributeCheck.getResultsText());
-
-        return !attributeCheck.isSuccess();
+        return !attributeCheckResult.isSuccess();
     }
 
     /**
@@ -1841,19 +1833,12 @@ public class CampaignNewDayManager {
           boolean isUseAltAdvancedMedical, boolean isUseFatigue, int fatigueRate) {
         int modifier = getCompulsionCheckModifier(COMPULSION_ADDICTION);
 
-        String reason = getTextAt(RESOURCE_BUNDLE, "discontinuationSyndrome.check");
-        AttributeCheckUtility attributeCheck = new AttributeCheckUtility(reason,
-              person,
-              SkillAttribute.WILLPOWER,
-              null,
-              null,
-              modifier,
-              true,
-              true);
+        ActionCheckResult attributeCheckResult =
+              person.checkAttribute(SkillAttribute.WILLPOWER).withMiscModifier(modifier)
+                    .resolve(true, getTextAt(RESOURCE_BUNDLE, "discontinuationSyndrome.check"), true);
+        campaign.addReport(SKILL_CHECKS, attributeCheckResult.resultsText());
 
-        campaign.addReport(SKILL_CHECKS, attributeCheck.getResultsText());
-
-        boolean failedWillpowerCheck = attributeCheck.isSuccess();
+        boolean failedWillpowerCheck = attributeCheckResult.isSuccess();
         person.processDiscontinuationSyndrome(campaign,
               isUseAdvancedMedical,
               isUseAltAdvancedMedical,
