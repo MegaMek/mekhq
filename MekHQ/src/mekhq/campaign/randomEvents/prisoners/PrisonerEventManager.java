@@ -342,7 +342,7 @@ public class PrisonerEventManager {
               eventData,
               choiceIndex,
               isSuccessful);
-        String eventReport = effectsManager.getEventReport();
+        String eventReport = effectsManager.getMechanicalEffectsReport();
 
         showDialog(isSuccessful, choiceIndex, event, eventReport);
 

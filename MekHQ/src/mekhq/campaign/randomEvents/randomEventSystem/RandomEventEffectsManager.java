@@ -161,7 +161,7 @@ public class RandomEventEffectsManager {
      *
      * @return The event report as a {@link String}.
      */
-    public String getEventReport() {
+    public String getMechanicalEffectsReport() {
         return eventReport;
     }
 

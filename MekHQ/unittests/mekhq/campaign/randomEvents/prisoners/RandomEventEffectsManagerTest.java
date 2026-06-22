@@ -110,7 +110,7 @@ class RandomEventEffectsManagerTest {
 
         // Act
         RandomEventEffectsManager effectsManager = new RandomEventEffectsManager(mockCampaign, eventData, 0, true);
-        String report = effectsManager.getEventReport();
+        String report = effectsManager.getMechanicalEffectsReport();
         return report;
     }
 
@@ -290,7 +290,7 @@ class RandomEventEffectsManagerTest {
 
         // Act
         RandomEventEffectsManager effectsManager = new RandomEventEffectsManager(mockCampaign, eventData, 0, true);
-        String report = effectsManager.getEventReport();
+        String report = effectsManager.getMechanicalEffectsReport();
 
         // Assert
         // Because we remove NPC Prisoners, on death, we need to instead check whether the report
@@ -332,7 +332,7 @@ class RandomEventEffectsManagerTest {
 
         // Act
         RandomEventEffectsManager effectsManager = new RandomEventEffectsManager(mockCampaign, eventData, 0, true);
-        String report = effectsManager.getEventReport();
+        String report = effectsManager.getMechanicalEffectsReport();
 
         // Assert
         // Because we remove NPC Prisoners, on death, we need to instead check whether the report
@@ -486,7 +486,7 @@ class RandomEventEffectsManagerTest {
         new RandomEventEffectsManager(mockCampaign, eventData, 0, true);
 
         RandomEventEffectsManager effectsManager = new RandomEventEffectsManager(mockCampaign, eventData, 0, true);
-        String report = effectsManager.getEventReport();
+        String report = effectsManager.getMechanicalEffectsReport();
 
         // Assert
         // Because we remove NPC Prisoners, on escape, we need to instead check whether the report
@@ -524,7 +524,7 @@ class RandomEventEffectsManagerTest {
         new RandomEventEffectsManager(mockCampaign, eventData, 0, true);
 
         RandomEventEffectsManager effectsManager = new RandomEventEffectsManager(mockCampaign, eventData, 0, true);
-        String report = effectsManager.getEventReport();
+        String report = effectsManager.getMechanicalEffectsReport();
 
         // Assert
         // Because we remove NPC Prisoners, on escape, we need to instead check whether the report
