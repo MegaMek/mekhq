@@ -886,7 +886,6 @@ public class AtBContract extends Contract {
     public void loadFieldsFromXmlNode(Campaign campaign, Version version, Node node) throws ParseException {
         super.loadFieldsFromXmlNode(campaign, version, node);
 
-        // TODO Move this to AbstractMission once we've broken the chain of inheritance, Illiani Jun/18/2026
         // Wire up the StratCon campaign state to this contract now that we have a typed reference.
         if (getStratConCampaignState() != null) {
             getStratConCampaignState().setContract(this);
