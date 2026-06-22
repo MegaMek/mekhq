@@ -168,7 +168,7 @@ public class TechTableModel extends DataTableModel<Person> {
 
         toReturn.append(String.format(" (%d XP", tech.getXP()));
         // if Edge usage is allowed for techs, display remaining edge in the dialogue
-        if (getCampaign().getCampaignOptions().isUseSupportEdge() &&
+        if (getCampaign().getCampaignOptions().isUseEdge() &&
                   tech.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_BREAK_PART)) {
             toReturn.append(String.format(", %d Edge)", tech.getCurrentEdge()));
         } else {

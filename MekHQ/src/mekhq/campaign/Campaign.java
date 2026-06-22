@@ -2237,7 +2237,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all hangars across all locations associated with this campaign.
-     *                               TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     *                                     TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
      */
     public Hangar getAllHangar() {
         return units;
@@ -2885,7 +2885,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all warehouses across all locations associated with this campaign.
-     *                               TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
+     *                                     TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
      */
     public Warehouse getAllWarehouse() {
         return parts;
@@ -3883,8 +3883,8 @@ public class Campaign implements ITechManager, IPlace {
         report += " and rolls " + roll + ':';
         // Edge reroll, if applicable
         int targetValue = target.getValue();
-        boolean isUseSupportEdge = getCampaignOptions().isUseSupportEdge();
-        boolean hasEdgeTrigger = isUseSupportEdge && person != null;
+        boolean isUseEdge = getCampaignOptions().isUseEdge();
+        boolean hasEdgeTrigger = isUseEdge && person != null;
         if (hasEdgeTrigger) {
             if (targetValue >= 11) {
                 hasEdgeTrigger = person.getOptions().booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL_ELEVEN);
@@ -3894,7 +3894,7 @@ public class Campaign implements ITechManager, IPlace {
                 hasEdgeTrigger = person.getOptions().booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL_OTHER);
             }
         }
-        if (isUseSupportEdge &&
+        if (isUseEdge &&
                   (roll < target.getValue()) &&
                   hasEdgeTrigger &&
                   (person.getCurrentEdge() > 0)) {
@@ -3905,9 +3905,9 @@ public class Campaign implements ITechManager, IPlace {
         int xpGained = 0;
         if (roll >= target.getValue()) {
             boolean useFunctionalAppraisal = campaignOptions.isUseFunctionalAppraisal();
-            boolean isUseEdge = person != null &&
-                                      campaignOptions.isUseSupportEdge() &&
-                                      person.getOptions().booleanOption(EDGE_ADMIN_APPRAISAL_FAIL);
+            hasEdgeTrigger = person != null &&
+                                   isUseEdge &&
+                                   person.getOptions().booleanOption(EDGE_ADMIN_APPRAISAL_FAIL);
             double valueChange = useFunctionalAppraisal ? Appraisal.performAppraisalMultiplierCheck(person,
                   currentDay, isUseEdge) : 1.0;
             String appraisalReport = useFunctionalAppraisal ? Appraisal.getAppraisalReport(valueChange) : "";
@@ -4195,7 +4195,7 @@ public class Campaign implements ITechManager, IPlace {
                     wrongType = " <b>Warning: wrong tech type for this refit.</b>";
                 }
                 report = report + ",  needs " + target.getValueAsString() + " and rolls " + roll + ": ";
-                if (getCampaignOptions().isUseSupportEdge() &&
+                if (getCampaignOptions().isUseEdge() &&
                           (roll < target.getValue()) &&
                           tech.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_FAILED_REFIT) &&
                           (tech.getCurrentEdge() > 0)) {
@@ -4415,7 +4415,7 @@ public class Campaign implements ITechManager, IPlace {
         int xpGained = 0;
         // if we fail and would break apart, here's a chance to use Edge for a
         // re-roll...
-        if (getCampaignOptions().isUseSupportEdge() &&
+        if (getCampaignOptions().isUseEdge() &&
                   tech.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_BREAK_PART) &&
                   (tech.getCurrentEdge() > 0) &&
                   (target.getValue() != TargetRoll.AUTOMATIC_SUCCESS)) {

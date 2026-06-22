@@ -1025,7 +1025,6 @@ public class AdvancedReplacementLimbDialog extends JDialog {
           List<PlannedSurgery> successfulSurgeries, List<PlannedSurgery> unsuccessfulSurgeries) {
         boolean hasMachinistSPA = surgeon.getOptions().booleanOption(UNOFFICIAL_BIOLOGICAL_MACHINIST);
         boolean isUseEdge = campaignOptions.isUseEdge() &&
-                                  campaignOptions.isUseSupportEdge() &&
                                   surgeon.getOptions().booleanOption(EDGE_ADVANCED_SURGERY);
 
         for (PlannedSurgery surgery : new ArrayList<>(prioritizedSurgeries)) {

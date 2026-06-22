@@ -238,7 +238,6 @@ public class CampaignOptions {
     private boolean onlyCommandersMatterBattleArmor;
     private EdgeRefreshPeriod edgeRefreshPeriod;
     private boolean useEdge;
-    private boolean useSupportEdge;
     private boolean useImplants;
     private boolean alternativeQualityAveraging;
     private boolean useAgeEffects;
@@ -859,7 +858,6 @@ public class CampaignOptions {
         edgeRefreshPeriod = EdgeRefreshPeriod.WEEKLY;
         setOnlyCommandersMatterBattleArmor(false);
         setUseEdge(false);
-        setUseSupportEdge(false);
         setUseImplants(false);
         setAlternativeQualityAveraging(false);
         setUseAgeEffects(false);
@@ -1734,14 +1732,6 @@ public class CampaignOptions {
 
     public void setUseEdge(final boolean useEdge) {
         this.useEdge = useEdge;
-    }
-
-    public boolean isUseSupportEdge() {
-        return useSupportEdge;
-    }
-
-    public void setUseSupportEdge(final boolean useSupportEdge) {
-        this.useSupportEdge = useSupportEdge;
     }
 
     public boolean isUseImplants() {

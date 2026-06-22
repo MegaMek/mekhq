@@ -669,7 +669,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         }
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         int connections = commander.getAdjustedConnections(false);
-        boolean isUseEdge = campaignOptions.isUseEdge() || campaignOptions.isUseSupportEdge();
+        boolean isUseEdge = campaignOptions.isUseEdge();
         isUseEdge = isUseEdge && commander.getOptions().booleanOption(EDGE_COMMANDER_NEGOTIATION);
 
         ActionCheckResult actionCheckResult =
