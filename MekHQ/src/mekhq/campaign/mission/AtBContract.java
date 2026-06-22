@@ -151,6 +151,7 @@ public class AtBContract extends Contract {
     }
 
     public AtBContract(String name) {
+        setName(name);
         setContractDifficulty(Integer.MIN_VALUE);
 
         parentContract = null;
@@ -1000,16 +1001,7 @@ public class AtBContract extends Contract {
         }
     }
 
-    public Faction getEmployerFaction() {
-        return Factions.getInstance().getFaction(getEmployerCode());
-    }
-
-    public void updateEmployer(String code, int year) {
-        this.setEmployerCode(code);
-        setEmployerName(getEmployerName(year));
-        setAllyCamouflage(pickRandomCamouflage(year, getEmployerCode()));
-    }
-
+    @Override
     public String getEmployerName(int year) {
         return isMercSubcontract() ?
                      "Mercenary (" + getEmployerFaction().getFullName(year) + ')' :

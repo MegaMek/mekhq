@@ -82,10 +82,9 @@ import testUtilities.MHQTestUtilities;
  * Save/load (XML serialization) regression tests for the {@link AbstractMissionTransition} hierarchy.
  *
  * <p>These tests guard the refactor that moved the shared mission/contract state onto
- * {@link AbstractMissionTransition}, leaving
- * {@link Mission}, {@link Contract}, and {@link AtBContract} as thin subclasses. Because loading and saving of
- * contracts is a sensitive code path (a corrupted contract silently breaks a player's campaign), each sample file is
- * checked in two ways:</p>
+ * {@link AbstractMissionTransition}, leaving {@link Mission}, {@link Contract}, and {@link AtBContract} as thin
+ * subclasses. Because loading and saving of contracts is a sensitive code path (a corrupted contract silently breaks a
+ * player's campaign), each sample file is checked in two ways:</p>
  *
  * <ol>
  *     <li>The on-disk sample parses into the correct concrete type with the correct field values.</li>
@@ -97,7 +96,7 @@ import testUtilities.MHQTestUtilities;
  * plain {@link Mission}, a {@link Contract}, and a fully-populated {@link AtBContract} (scenarios, StratCon state and
  * NPCs included).</p>
  */
-public class AbstractMissionTransitionIOTest {
+public class MissionTransitionIOTest {
     private static final Path MISSIONS_DIR = Path.of("testresources", "data", "missions");
 
     /** Any version at or above the current release; keeps the version-gated compatibility branches dormant. */
