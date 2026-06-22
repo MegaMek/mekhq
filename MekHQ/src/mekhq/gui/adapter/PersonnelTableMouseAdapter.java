@@ -5306,10 +5306,14 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             } else if (academy.isLocal()) {
                 // are any of the local academies accepting applicants from person's Faction or
                 // campaign's Faction? Use the campus-aware variant so faction-restricted local academies
-                // resolve against the system's faction history (handles mergers/splits — see #8915).
-                String faction = academy.getFilteredFactionAtCampus(campaign,
-                      person,
-                      campaign.getCurrentSystem().getId());
+                // resolve against the system's faction history (handles mergers/splits — see #8915). Use
+                // the person's location if possible, not the campaign's.
+                mekhq.campaign.universe.PlanetarySystem personSystem = person.getCurrentSystem();
+                String localCampusId = personSystem != null
+                                             ? personSystem.getId()
+                                             : campaign.getCurrentSystem().getId();
+
+                String faction = academy.getFilteredFactionAtCampus(campaign, person, localCampusId);
 
                 if (faction == null) {
                     if (showIneligibleAcademies) {
@@ -5327,7 +5331,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                           academy,
                           List.of(person),
                           academyOption,
-                          campaign.getCurrentSystem().getId(),
+                          localCampusId,
                           faction);
                 }
             } else if (academy.isHomeSchool()) {
@@ -5598,12 +5602,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         courses.setToolTipText(academy.getTooltip(campaign,
                               personnel,
                               courseIndex,
-                              campaign.getCurrentSystem()));
+                              campaign.getSystemById(campus)));
                         courses.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION_ENROLLMENT,
                               academy.getSet(),
                               academy.getName(),
                               String.valueOf(courseIndex),
-                              campaign.getCurrentSystem().getId(),
+                              campus,
                               faction));
                     } else {
                         courses.setToolTipText(academy.getTooltip(campaign,

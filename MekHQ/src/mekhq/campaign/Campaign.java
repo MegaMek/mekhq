@@ -1880,6 +1880,27 @@ public class Campaign implements ITechManager, IPlace {
     }
 
     /**
+     * Returns the existing {@link AcademyCampusLocation} parented under {@code parent}, creating it on demand if it
+     * does not yet exist.
+     *
+     * <p>Used for home-school campuses that travel with the campaign or a player base rather than being anchored to a
+     * fixed planetary system.</p>
+     */
+    public AcademyCampusLocation getOrCreateCampusUnderLocation(String academySet, String academyName,
+          ILocation parent) {
+        for (ILocation child : parent.getChildLocations()) {
+            if (child instanceof AcademyCampusLocation campus
+                      && academySet.equals(campus.getAcademySet())
+                      && academyName.equals(campus.getAcademyName())) {
+                return campus;
+            }
+        }
+        AcademyCampusLocation campus = new AcademyCampusLocation(academySet, academyName);
+        LocationNode.LocationManager.setLocation(campus, parent);
+        return campus;
+    }
+
+    /**
      * Returns the existing local {@link AcademyCampusLocation} (home-school or unit-education) for the given campus
      * parented directly under this campaign, creating it on demand if it does not yet exist.
      *
