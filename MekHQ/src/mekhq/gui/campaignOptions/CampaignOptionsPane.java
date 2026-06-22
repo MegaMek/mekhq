@@ -92,14 +92,12 @@ import mekhq.gui.campaignOptions.optionChangeDialogs.*;
 /**
  * {@code CampaignOptionsPane} is the central panel of the Campaign Options dialog. It presents every campaign setting
  * through a searchable navigation tree on the left (a {@link CampaignOptionsNavigationPanel}) paired with a scrollable
- * content host on the right (a {@link CampaignOptionsContentHost}) inside a {@link javax.swing.JSplitPane}. This
- * replaces the older nested tabbed-pane layout, so the dialog is navigated by selecting entries in the tree rather than
- * by clicking through pages and sub-pages.
+ * content host on the right (a {@link CampaignOptionsContentHost}) inside a {@link javax.swing.JSplitPane}.
  *
- * <p>Rather than building every screen up front, the pane registers a flat set of {@link CampaignOptionsRoute}s - each
- * describing a navigable destination and its hierarchical path - and maps each one to a page factory. Pages are built
- * lazily the first time they are shown (or when the navigation search index is warmed) and then cached. The per-area
- * builders ({@link mekhq.gui.campaignOptions.contents.GeneralPage GeneralPage},
+ * <p>The pane registers a flat set of {@link CampaignOptionsRoute}s - each describing a navigable destination and its
+ * hierarchical path - and maps each one to a page factory. Pages are built lazily the first time they are shown (or
+ * when the navigation search index is warmed) and then cached. The per-area builders
+ * ({@link mekhq.gui.campaignOptions.contents.GeneralPage GeneralPage},
  * {@link mekhq.gui.campaignOptions.contents.PersonnelPage PersonnelPage}, and the other per-area {@code *Page}
  * classes) are likewise only instantiated the first time their section is needed.</p>
  *
