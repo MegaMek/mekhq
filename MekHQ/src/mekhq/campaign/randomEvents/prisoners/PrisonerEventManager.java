@@ -346,7 +346,7 @@ public class PrisonerEventManager {
 
         showDialog(isSuccessful, choiceIndex, event, eventReport);
 
-        Set<Person> escapees = effectsManager.getEscapees();
+        Set<Person> escapees = effectsManager.getPersonHashSet();
 
         if (!escapees.isEmpty() && campaign.hasActiveAtBContract()) {
             if (randomInt(100) < escapees.size()) {

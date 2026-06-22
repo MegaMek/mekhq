@@ -97,7 +97,7 @@ public class RandomEventEffectsManager {
     private final Campaign campaign;
 
     private String eventReport = "";
-    private final Set<Person> escapees = new HashSet<>();
+    private final Set<Person> personHashSet = new HashSet<>();
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
 
@@ -174,8 +174,8 @@ public class RandomEventEffectsManager {
      * @return A {@link Set} of {@link Person} objects representing the prisoners who escaped, or an empty set if no
      *       escapes occurred.
      */
-    public Set<Person> getEscapees() {
-        return escapees;
+    public Set<Person> getPersonHashSet() {
+        return personHashSet;
     }
 
     /**
@@ -719,14 +719,14 @@ public class RandomEventEffectsManager {
         for (int i = 0; i < magnitude; i++) {
             Person target = getRandomItem(allPotentialTargets);
 
-            escapees.add(target);
+            personHashSet.add(target);
 
             campaign.removePerson(target, false);
 
             allPotentialTargets.remove(target);
         }
 
-        LOGGER.info(escapees.toString());
+        LOGGER.info(personHashSet.toString());
 
         String colorOpen = spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());
 
@@ -768,7 +768,7 @@ public class RandomEventEffectsManager {
         for (int i = 0; i < targetCount; i++) {
             Person target = getRandomItem(potentialTargets);
 
-            escapees.add(target);
+            personHashSet.add(target);
 
             campaign.removePerson(target, false);
 
@@ -776,7 +776,7 @@ public class RandomEventEffectsManager {
         }
 
         MMLogger logger = MMLogger.create(RandomEventEffectsManager.class);
-        logger.info(escapees.toString());
+        logger.info(personHashSet.toString());
 
         String colorOpen = spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());
 
