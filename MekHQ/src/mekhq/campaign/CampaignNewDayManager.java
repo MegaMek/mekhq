@@ -77,9 +77,9 @@ import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKi
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenUsage;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.processFatigueRecovery;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.RETIREMENT_AGE;
-import static mekhq.campaign.randomEvents.GrayMonday.GRAY_MONDAY_EVENTS_BEGIN;
-import static mekhq.campaign.randomEvents.GrayMonday.GRAY_MONDAY_EVENTS_END;
-import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.BONDSMAN;
+import static mekhq.campaign.randomEvents.other.GrayMonday.GRAY_MONDAY_EVENTS_BEGIN;
+import static mekhq.campaign.randomEvents.other.GrayMonday.GRAY_MONDAY_EVENTS_END;
+import static mekhq.campaign.randomEvents.prisoners.PrisonerStatus.BONDSMAN;
 import static mekhq.campaign.stratCon.StratConRulesManager.processIgnoredDynamicScenario;
 import static mekhq.campaign.stratCon.SupportPointNegotiation.negotiateAdditionalSupportPoints;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
@@ -171,9 +171,9 @@ import mekhq.campaign.personnel.skills.QuickTrain;
 import mekhq.campaign.personnel.skills.enums.AgingMilestone;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
-import mekhq.campaign.randomEvents.GrayMonday;
-import mekhq.campaign.randomEvents.RiotScenario;
-import mekhq.campaign.randomEvents.VoiceOfKerensky;
+import mekhq.campaign.randomEvents.other.GrayMonday;
+import mekhq.campaign.randomEvents.other.RiotScenario;
+import mekhq.campaign.randomEvents.other.VoiceOfKerensky;
 import mekhq.campaign.randomEvents.prisoners.PrisonerEventManager;
 import mekhq.campaign.randomEvents.prisoners.RecoverMIAPersonnel;
 import mekhq.campaign.stratCon.StratConCampaignState;
@@ -697,7 +697,7 @@ public class CampaignNewDayManager {
             int fieldKitchenCapacity =
                   checkFieldKitchenCapacity(campaign.getFormation(FORMATION_ORIGIN)
                                                   .getAllUnitsAsUnits(campaign.getHangar(),
-                        false), campaignOptions.getFieldKitchenCapacity());
+                                                        false), campaignOptions.getFieldKitchenCapacity());
             int fieldKitchenUsage = checkFieldKitchenUsage(campaign.getActivePersonnel(false, false),
                   campaignOptions.isUseFieldKitchenIgnoreNonCombatants(), campaign);
             boolean withinCapacity = !campaign.isOnContractAndPlanetside() ||
@@ -2178,7 +2178,7 @@ public class CampaignNewDayManager {
             int mashTheatreCapacity =
                   MASHCapacity.checkMASHCapacity(campaign.getFormation(FORMATION_ORIGIN)
                                                        .getAllUnitsAsUnits(campaign.getHangar(),
-                        false), campaignOptions.getMASHTheatreCapacity());
+                                                             false), campaignOptions.getMASHTheatreCapacity());
             mashTheatreCapacity += FacilityRentals.getCapacityIncreaseFromRentals(campaign.getActiveContracts(),
                   ContractRentalType.HOSPITAL_BEDS);
             campaign.setMashTheatreCapacity(mashTheatreCapacity);

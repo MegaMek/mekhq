@@ -30,31 +30,32 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.randomEvents.prisoners.records;
+package mekhq.campaign.randomEvents.prisoners.prisonerEvents;
 
-import static mekhq.campaign.randomEvents.prisoners.enums.EventResultEffect.NONE;
+import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import mekhq.campaign.randomEvents.prisoners.enums.EventResultEffect;
+import mekhq.campaign.randomEvents.randomEventSystem.RandomEventData;
 
 /**
- * Represents the result of an event response, including the effect type, the guard flag, the magnitude, and an optional
- * skill type.
- *
- * @param effect    The type of effect this result describes
- * @param isGuard   Whether this result applies to a guard
- * @param magnitude The intensity or magnitude of the effect
- * @param skillType An optional skill type associated with the effect
+ * A wrapper class for managing a list of {@link RandomEventData}. This class provides getter and setter methods to
+ * access and modify the list of prisoner events.
  */
-public record EventResult(
-      @JsonProperty(value = "effect") EventResultEffect effect,
-      @JsonProperty(value = "isGuard") boolean isGuard,
-      @JsonProperty(value = "magnitude") int magnitude,
-      @JsonProperty(value = "skillType") String skillType
-) {
-    // Additional logic to provide defaults for missing properties
-    public EventResult {
-        effect = (effect != null) ? effect : NONE;
-        skillType = (skillType != null) ? skillType : "";
+public class PrisonerEventDataWrapper {
+    private List<RandomEventData> events;
+
+    /**
+     * @return a {@link List} of {@link RandomEventData} objects representing the prisoner events.
+     */
+    public List<RandomEventData> getEvents() {
+        return events;
+    }
+
+    /**
+     * Sets the list of {@link RandomEventData} for this wrapper.
+     *
+     * @param events a {@link List} of {@link RandomEventData} objects to be associated with this wrapper.
+     */
+    public void setEvents(List<RandomEventData> events) {
+        this.events = events;
     }
 }

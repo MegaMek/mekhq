@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.randomEvents;
+package mekhq.campaign.randomEvents.other;
 
 import static java.io.File.separator;
 
@@ -41,8 +41,8 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import mekhq.campaign.randomEvents.prisoners.records.PrisonerEventData;
-import mekhq.campaign.randomEvents.prisoners.yaml.PrisonerEventDataWrapper;
+import mekhq.campaign.randomEvents.prisoners.prisonerEvents.PrisonerEventDataWrapper;
+import mekhq.campaign.randomEvents.randomEventSystem.RandomEventData;
 
 /**
  * A utility class that manages the loading and retrieval of random event data from YAML files. Organizes the events
@@ -64,8 +64,8 @@ public class RandomEventLibraries {
     private final String PRISONER_EVENTS_MINOR = DIRECTORY + "PrisonerMinorEventData" + EXTENSION;
 
     // lists
-    private final List<PrisonerEventData> prisonerEventsMajor = new ArrayList<>();
-    private final List<PrisonerEventData> prisonerEventsMinor = new ArrayList<>();
+    private final List<RandomEventData> prisonerEventsMajor = new ArrayList<>();
+    private final List<RandomEventData> prisonerEventsMinor = new ArrayList<>();
 
     /**
      * Constructs a {@code RandomEventLibraries} object and initializes the event data by loading it from the YAML
@@ -80,9 +80,9 @@ public class RandomEventLibraries {
      *
      * @param isMajor {@code true} to retrieve major prisoner events, {@code false} to retrieve minor prisoner events.
      *
-     * @return a {@link List} of {@link PrisonerEventData} corresponding to the specified event severity.
+     * @return a {@link List} of {@link RandomEventData} corresponding to the specified event severity.
      */
-    public List<PrisonerEventData> getPrisonerEvents(boolean isMajor) {
+    public List<RandomEventData> getPrisonerEvents(boolean isMajor) {
         if (isMajor) {
             return prisonerEventsMajor;
         } else {
@@ -112,9 +112,9 @@ public class RandomEventLibraries {
                 );
 
                 // Access and sort individual events
-                List<PrisonerEventData> events = wrapper.getEvents();
+                List<RandomEventData> events = wrapper.getEvents();
 
-                for (PrisonerEventData event : events) {
+                for (RandomEventData event : events) {
                     if (eventFiles.indexOf(eventFile) == 0) {
                         prisonerEventsMajor.add(event);
                     } else {

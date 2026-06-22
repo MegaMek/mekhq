@@ -30,22 +30,30 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.randomEvents.prisoners.enums;
+package mekhq.campaign.randomEvents.randomEventSystem;
+
+import static mekhq.campaign.randomEvents.randomEventSystem.RandomEventResultEffect.NONE;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Represents the collection of possible events related to prisoners in MekHQ.
+ * Represents the result of an event response, including the effect type, the guard flag, the magnitude, and an optional
+ * skill type.
  *
- * <p>The {@code PrisonerEvent} enumeration is used to define various prisoner-related random
- * events that can occur during a campaign. These events include interactions and behaviors among prisoners, as well as
- * outcomes that can affect morale, resources, and the overall state of the campaign. Each event describes a unique
- * scenario or theme triggered under certain circumstances.</p>
+ * @param effect    The type of effect this result describes
+ * @param isGuard   Whether this result applies to a guard
+ * @param magnitude The intensity or magnitude of the effect
+ * @param skillType An optional skill type associated with the effect
  */
-public enum PrisonerEvent {
-    ARGUMENT, WILD_STORIES, TAMPERING, CONVERSATIONS, RATIONS, TRADE, DRAINED, RESCUE, REPAIRS,
-    SICKNESS, VETERAN, GRAFFITI, PRAYER, BARTERING, OFFICER, DICE, LOVERS, SOBBING, PROPAGANDA,
-    SONGS, REFUSE_RATIONS, PLOTTING, EQUIPMENT, PLANNED_RESCUE, MISTAKE, LETTER, ILLNESS,
-    DO_ANDROIDS_DREAM_OF_ELECTRONIC_SHEEP, HEAVY_METAL, PARANOIA, TUNNEL, PET_RODENT, ESCAPE_ROPE,
-    UNDERCOVER, BRAND, SILENCE, SINGING, PAPER, HOLIDAY, WHISPERS, LEADER, ARGUMENTS, SENTIMENTAL_ITEM,
-    MALNUTRITION, INJURIES, TERROR, SCREAMING, PHOTO, GHOSTS, VOICES, BREAKOUT, RIOT, MURDER, FIRE,
-    POISON, HOSTAGE, BOMB, EXECUTION, ABANDONED_TO_DIE, UNITED
+public record RandomEventResult(
+      @JsonProperty(value = "effect") RandomEventResultEffect effect,
+      @JsonProperty(value = "isGuard") boolean isGuard,
+      @JsonProperty(value = "magnitude") int magnitude,
+      @JsonProperty(value = "skillType") String skillType
+) {
+    // Additional logic to provide defaults for missing properties
+    public RandomEventResult {
+        effect = (effect != null) ? effect : NONE;
+        skillType = (skillType != null) ? skillType : "";
+    }
 }

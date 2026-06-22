@@ -30,15 +30,15 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.randomEvents;
+package mekhq.campaign.randomEvents.other;
 
 import static java.io.File.separator;
 import static megamek.common.compute.Compute.d6;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.createEntityWithCrew;
-import static mekhq.campaign.randomEvents.prisoners.enums.MobType.HUGE;
-import static mekhq.campaign.randomEvents.prisoners.enums.MobType.LARGE;
-import static mekhq.campaign.randomEvents.prisoners.enums.MobType.MEDIUM;
-import static mekhq.campaign.randomEvents.prisoners.enums.MobType.SMALL;
+import static mekhq.campaign.randomEvents.prisoners.prisonerEvents.MobType.HUGE;
+import static mekhq.campaign.randomEvents.prisoners.prisonerEvents.MobType.LARGE;
+import static mekhq.campaign.randomEvents.prisoners.prisonerEvents.MobType.MEDIUM;
+import static mekhq.campaign.randomEvents.prisoners.prisonerEvents.MobType.SMALL;
 import static mekhq.campaign.stratCon.StratConContractInitializer.getUnoccupiedCoords;
 import static mekhq.campaign.stratCon.StratConRulesManager.generateExternalScenario;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;

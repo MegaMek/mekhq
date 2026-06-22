@@ -30,9 +30,9 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.randomEvents.personalities.enums;
+package mekhq.campaign.randomEvents.personalities;
 
-import static mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType.GREED;
+import static mekhq.campaign.randomEvents.personalities.PersonalityTraitType.AMBITION;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -41,7 +41,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.PronounData;
 
 /**
- * Represents various levels and traits of greed in a personality.
+ * Represents various levels and traits of ambition in a personality.
  *
  * <p>This enumeration defines a wide range of traits that can be associated with a person's
  * personality. Traits are characterized as either "positive" or not and can optionally be "major" traits. The
@@ -50,40 +50,40 @@ import mekhq.campaign.personnel.PronounData;
  * <p>Some traits, referred to as "Major Traits," denote stronger personality attributes
  * and are to be handled distinctly. These traits are always listed at the end of the enumeration.</p>
  */
-public enum Greed {
+public enum Ambition {
     // region Enum Declarations
     NONE(false, false),
-    ASTUTE(true, false),
-    ADEPT(true, false),
-    AVARICIOUS(false, false),
-    DYNAMIC(true, false),
-    EAGER(true, false),
-    EXPLOITATIVE(false, false),
-    FRAUDULENT(false, false),
-    GENEROUS(true, false),
-    GREEDY(false, false),
-    HOARDING(false, false),
-    INSATIABLE(false, false),
-    INSIGHTFUL(true, false),
-    JUDICIOUS(true, false),
-    LUSTFUL(false, false),
-    MERCENARY(false, false),
-    OVERREACHING(false, false),
-    PROFITABLE(true, false),
-    SAVVY(true, false),
-    SELF_SERVING(false, false),
-    SHAMELESS(false, false),
-    SHREWD(true, false),
-    TACTICAL(true, false),
-    UNPRINCIPLED(false, false),
-    VORACIOUS(true, false),
+    AMBITIOUS(true, false),
+    ARROGANT(false, false),
+    ASPIRING(true, false),
+    CALCULATING(true, false),
+    CONNIVING(false, false),
+    CONTROLLING(false, false),
+    CUTTHROAT(false, false),
+    DILIGENT(true, false),
+    DRIVEN(true, false),
+    ENERGETIC(true, false),
+    EXCESSIVE(false, false),
+    FOCUSED(true, false),
+    GOAL_ORIENTED(true, false),
+    MOTIVATED(true, false),
+    OPPORTUNISTIC(true, false),
+    OVERCONFIDENT(false, false),
+    PERSISTENT(true, false),
+    PROACTIVE(true, false),
+    RESILIENT(true, false),
+    RUTHLESS(false, false),
+    SELFISH(false, false),
+    STRATEGIC(true, false),
+    UNAMBITIOUS(false, false),
+    UNSCRUPULOUS(false, false),
     // Major Traits should always be last
-    INTUITIVE(true, true),
-    ENTERPRISING(true, true),
-    CORRUPT(false, true),
-    METICULOUS(true, true),
-    NEFARIOUS(false, true),
-    THIEF(false, true);
+    DISHONEST(false, true),
+    INNOVATIVE(true, true),
+    MANIPULATIVE(false, true),
+    RESOURCEFUL(true, true),
+    TYRANNICAL(false, true),
+    VISIONARY(true, true);
     // endregion Enum Declarations
 
     // region Variable Declarations
@@ -93,8 +93,8 @@ public enum Greed {
     // endregion Variable Declarations
 
     // region Constructors
-    Greed(boolean isPositive, boolean isMajor) {
-        this.label = generateLabel();
+    Ambition(boolean isPositive, boolean isMajor) {
+        this.label = this.generateLabel();
         this.isPositive = isPositive;
         this.isMajor = isMajor;
     }
@@ -112,22 +112,20 @@ public enum Greed {
      */
     public final static int MAJOR_TRAITS_START_INDEX = 25;
 
-    public String getLabel() {
-        return label;
-    }
+    // region Getters
 
     /**
-     * @return the {@link PersonalityTraitType} representing greed
+     * @return the {@link PersonalityTraitType} representing ambition
      *
      * @author Illiani
      * @since 0.50.06
      */
     public PersonalityTraitType getPersonalityTraitType() {
-        return GREED;
+        return AMBITION;
     }
 
     /**
-     * @return the label string for the greed personality trait type
+     * @return the label string for the ambition personality trait type
      *
      * @author Illiani
      * @since 0.50.06
@@ -135,6 +133,10 @@ public enum Greed {
     @Deprecated(since = "0.51.0", forRemoval = true)
     public String getPersonalityTraitTypeLabel() {
         return getPersonalityTraitType().getLabel();
+    }
+
+    public String getLabel() {
+        return label;
     }
 
     /**
@@ -145,7 +147,6 @@ public enum Greed {
      *
      * @return the localized label string corresponding to the enumeration value.
      */
-    // region Getters
     private String generateLabel() {
         final String RESOURCE_KEY = name() + ".label";
 
@@ -160,21 +161,21 @@ public enum Greed {
      * the individual's given name, and other localized text from the resource bundle.
      * </p>
      *
-     * @param greedDescriptionIndex an index representing the type/variation of the description. This value is clamped
-     *                              to ensure it falls within a valid range.
-     * @param gender                the {@link Gender} of the individual, used to determine appropriate pronouns for the
-     *                              description.
-     * @param givenName             the given name of the person. This <b>MUST</b> use 'person.getGivenName()' and
-     *                              <b>NOT</b> 'person.getFirstName()'
+     * @param ambitionDescriptionIndex an index representing the type/variation of the description. This value is
+     *                                 clamped to ensure it falls within a valid range.
+     * @param gender                   the {@link Gender} of the individual, used to determine appropriate pronouns for
+     *                                 the description.
+     * @param givenName                the given name of the person. This <b>MUST</b> use 'person.getGivenName()' and
+     *                                 <b>NOT</b> 'person.getFirstName()'
      *
      * @return a formatted description string based on the enum, the individual's gender, name, and aggression
      *       description index.
      */
-    public String getDescription(int greedDescriptionIndex, final Gender gender,
+    public String getDescription(int ambitionDescriptionIndex, final Gender gender,
           final String givenName) {
-        greedDescriptionIndex = Math.clamp(greedDescriptionIndex, 0, MAXIMUM_VARIATIONS - 1);
+        ambitionDescriptionIndex = Math.clamp(ambitionDescriptionIndex, 0, MAXIMUM_VARIATIONS - 1);
 
-        final String RESOURCE_KEY = name() + ".description." + greedDescriptionIndex;
+        final String RESOURCE_KEY = name() + ".description." + ambitionDescriptionIndex;
         final PronounData pronounData = new PronounData(gender);
 
         // {0} = givenName
@@ -208,20 +209,20 @@ public enum Greed {
     }
 
     /**
-     * Retrieves the formatted interviewer notes for a specific greed description index.
+     * Retrieves the formatted interviewer notes for a specific ambition description index.
      *
      * <p>Constructs a resource key by combining the enum name, "interviewerNote", and the provided index,
      * then fetches the formatted text for that key from the resource bundle.</p>
      *
-     * @param greedDescriptionIndex the index of the greed description to retrieve notes for
+     * @param ambitionDescriptionIndex the index of the ambition description to retrieve notes for
      *
      * @return the formatted interviewer notes text corresponding to the specified index.
      *
      * @author Illiani
      * @since 0.50.06
      */
-    public String getInterviewersNotes(int greedDescriptionIndex) {
-        final String RESOURCE_KEY = name() + ".interviewerNote." + greedDescriptionIndex;
+    public String getInterviewersNotes(int ambitionDescriptionIndex) {
+        final String RESOURCE_KEY = name() + ".interviewerNote." + ambitionDescriptionIndex;
 
         return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
     }
@@ -248,28 +249,29 @@ public enum Greed {
     // endregion Boolean Comparison Methods
 
     /**
-     * Parses a string to return the corresponding {@code Greed} enum instance. It attempts to match the string either
-     * to a valid enum constant name or an integer representing the ordinal of the desired enum value. If neither
-     * interpretation is valid, it defaults to returning {@code NONE}.
+     * Converts the specified string into its corresponding Ambition enum value. The method attempts to interpret the
+     * string as either the name of an enum constant or an ordinal value of the enum. If the conversion fails, the
+     * method logs an error and returns the default value {@code NONE}.
      *
-     * @param text the input string to parse, representing either the name or the ordinal of the {@code Greed} enum.
+     * @param text the string to be converted into an Ambition enum value. It can be the name of the enum constant or
+     *             its ordinal value as a string.
      *
-     * @return the corresponding {@code Greed} enum instance for the given input string, or {@code NONE} if no valid
-     *       match is found.
+     * @return the corresponding Ambition enum constant if the string matches a name or ordinal value, otherwise
+     *       {@code NONE}.
      */
     // region File I/O
-    public static Greed fromString(String text) {
+    public static Ambition fromString(String text) {
         try {
-            return Greed.valueOf(text.toUpperCase().replace(" ", "_"));
+            return Ambition.valueOf(text.toUpperCase().replace(" ", "_"));
         } catch (Exception ignored) {}
 
         try {
-            return Greed.values()[Integer.parseInt(text)];
+            return Ambition.values()[Integer.parseInt(text)];
         } catch (Exception ignored) {}
 
 
-        MMLogger logger = MMLogger.create(Greed.class);
-        logger.error("Unknown Greed ordinal: {} - returning {}.", text, NONE);
+        MMLogger logger = MMLogger.create(Ambition.class);
+        logger.error("Unknown Ambition ordinal: {} - returning {}.", text, NONE);
 
         return NONE;
     }

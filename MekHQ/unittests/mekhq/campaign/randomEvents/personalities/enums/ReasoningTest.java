@@ -32,14 +32,15 @@
  */
 package mekhq.campaign.randomEvents.personalities.enums;
 
-import static mekhq.campaign.randomEvents.personalities.enums.Reasoning.AVERAGE;
-import static mekhq.campaign.randomEvents.personalities.enums.Reasoning.OBTUSE;
-import static mekhq.campaign.randomEvents.personalities.enums.Reasoning.UNDER_PERFORMING;
+import static mekhq.campaign.randomEvents.personalities.Reasoning.AVERAGE;
+import static mekhq.campaign.randomEvents.personalities.Reasoning.OBTUSE;
+import static mekhq.campaign.randomEvents.personalities.Reasoning.UNDER_PERFORMING;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import mekhq.campaign.randomEvents.personalities.Reasoning;
 import org.junit.jupiter.api.Test;
 
 public class ReasoningTest {

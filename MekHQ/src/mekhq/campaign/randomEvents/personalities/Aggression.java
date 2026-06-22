@@ -30,9 +30,9 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.randomEvents.personalities.enums;
+package mekhq.campaign.randomEvents.personalities;
 
-import static mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType.AMBITION;
+import static mekhq.campaign.randomEvents.personalities.PersonalityTraitType.AGGRESSION;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -41,7 +41,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.PronounData;
 
 /**
- * Represents various levels and traits of ambition in a personality.
+ * Represents various levels and traits of aggression in a personality.
  *
  * <p>This enumeration defines a wide range of traits that can be associated with a person's
  * personality. Traits are characterized as either "positive" or not and can optionally be "major" traits. The
@@ -50,40 +50,41 @@ import mekhq.campaign.personnel.PronounData;
  * <p>Some traits, referred to as "Major Traits," denote stronger personality attributes
  * and are to be handled distinctly. These traits are always listed at the end of the enumeration.</p>
  */
-public enum Ambition {
+public enum Aggression {
     // region Enum Declarations
     NONE(false, false),
-    AMBITIOUS(true, false),
-    ARROGANT(false, false),
-    ASPIRING(true, false),
-    CALCULATING(true, false),
-    CONNIVING(false, false),
-    CONTROLLING(false, false),
-    CUTTHROAT(false, false),
-    DILIGENT(true, false),
-    DRIVEN(true, false),
-    ENERGETIC(true, false),
-    EXCESSIVE(false, false),
-    FOCUSED(true, false),
-    GOAL_ORIENTED(true, false),
-    MOTIVATED(true, false),
-    OPPORTUNISTIC(true, false),
-    OVERCONFIDENT(false, false),
-    PERSISTENT(true, false),
-    PROACTIVE(true, false),
-    RESILIENT(true, false),
-    RUTHLESS(false, false),
-    SELFISH(false, false),
-    STRATEGIC(true, false),
-    UNAMBITIOUS(false, false),
-    UNSCRUPULOUS(false, false),
+    AGGRESSIVE(false, false),
+    ASSERTIVE(true, false),
+    BELLIGERENT(false, false),
+    BOLD(true, false),
+    BRASH(false, false),
+    CONFIDENT(true, false),
+    COURAGEOUS(true, false),
+    DARING(true, false),
+    DECISIVE(true, false),
+    DETERMINED(true, false),
+    DOMINEERING(false, false),
+    FEARLESS(true, false),
+    HOSTILE(false, false),
+    HOT_HEADED(false, false),
+    IMPETUOUS(false, false),
+    IMPULSIVE(false, false),
+    INFLEXIBLE(false, false),
+    INTREPID(true, false),
+    OVERBEARING(false, false),
+    RECKLESS(false, false),
+    RESOLUTE(true, false),
+    STUBBORN(false, false),
+    TENACIOUS(true, false),
+    VIGILANT(true, false),
     // Major Traits should always be last
-    DISHONEST(false, true),
-    INNOVATIVE(true, true),
-    MANIPULATIVE(false, true),
-    RESOURCEFUL(true, true),
-    TYRANNICAL(false, true),
-    VISIONARY(true, true);
+    BLOODTHIRSTY(false, true),
+    DIPLOMATIC(true, true),
+    MURDEROUS(false, true),
+    PACIFISTIC(true, true),
+    SAVAGE(false, true),
+    SADISTIC(false, true);
+
     // endregion Enum Declarations
 
     // region Variable Declarations
@@ -93,7 +94,7 @@ public enum Ambition {
     // endregion Variable Declarations
 
     // region Constructors
-    Ambition(boolean isPositive, boolean isMajor) {
+    Aggression(boolean isPositive, boolean isMajor) {
         this.label = this.generateLabel();
         this.isPositive = isPositive;
         this.isMajor = isMajor;
@@ -112,20 +113,18 @@ public enum Ambition {
      */
     public final static int MAJOR_TRAITS_START_INDEX = 25;
 
-    // region Getters
-
     /**
-     * @return the {@link PersonalityTraitType} representing ambition
+     * @return the {@link PersonalityTraitType} representing aggression
      *
      * @author Illiani
      * @since 0.50.06
      */
     public PersonalityTraitType getPersonalityTraitType() {
-        return AMBITION;
+        return AGGRESSION;
     }
 
     /**
-     * @return the label string for the ambition personality trait type
+     * @return the label string for the aggression personality trait type
      *
      * @author Illiani
      * @since 0.50.06
@@ -138,6 +137,8 @@ public enum Ambition {
     public String getLabel() {
         return label;
     }
+
+    // region Getters
 
     /**
      * Retrieves the label associated with the current enumeration value.
@@ -157,25 +158,27 @@ public enum Ambition {
      * Generates a localized and personalized description for the current enumeration value.
      * <p>
      * This method retrieves a description using the enumeration's name and a specific key suffix derived from the given
-     * ambition description index. The description is further customized using the provided gender-specific pronouns,
+     * aggression description index. The description is further customized using the provided gender-specific pronouns,
      * the individual's given name, and other localized text from the resource bundle.
      * </p>
      *
-     * @param ambitionDescriptionIndex an index representing the type/variation of the description. This value is
-     *                                 clamped to ensure it falls within a valid range.
-     * @param gender                   the {@link Gender} of the individual, used to determine appropriate pronouns for
-     *                                 the description.
-     * @param givenName                the given name of the person. This <b>MUST</b> use 'person.getGivenName()' and
-     *                                 <b>NOT</b> 'person.getFirstName()'
+     * @param aggressionDescriptionIndex an index representing the type/variation of the description. This value is
+     *                                   clamped to ensure it falls within a valid range.
+     * @param gender                     the {@link Gender} of the individual, used to determine appropriate pronouns
+     *                                   for the description.
+     * @param givenName                  the given name of the person. This <b>MUST</b> use 'person.getGivenName()' and
+     *                                   <b>NOT</b> 'person.getFirstName()'
      *
      * @return a formatted description string based on the enum, the individual's gender, name, and aggression
      *       description index.
+     *
+     * @see Gender
      */
-    public String getDescription(int ambitionDescriptionIndex, final Gender gender,
+    public String getDescription(int aggressionDescriptionIndex, final Gender gender,
           final String givenName) {
-        ambitionDescriptionIndex = Math.clamp(ambitionDescriptionIndex, 0, MAXIMUM_VARIATIONS - 1);
+        aggressionDescriptionIndex = Math.clamp(aggressionDescriptionIndex, 0, MAXIMUM_VARIATIONS - 1);
 
-        final String RESOURCE_KEY = name() + ".description." + ambitionDescriptionIndex;
+        final String RESOURCE_KEY = name() + ".description." + aggressionDescriptionIndex;
         final PronounData pronounData = new PronounData(gender);
 
         // {0} = givenName
@@ -209,20 +212,20 @@ public enum Ambition {
     }
 
     /**
-     * Retrieves the formatted interviewer notes for a specific ambition description index.
+     * Retrieves the formatted interviewer notes for a specific aggression description index.
      *
      * <p>Constructs a resource key by combining the enum name, "interviewerNote", and the provided index,
      * then fetches the formatted text for that key from the resource bundle.</p>
      *
-     * @param ambitionDescriptionIndex the index of the ambition description to retrieve notes for
+     * @param aggressionDescriptionIndex the index of the aggression description to retrieve notes for
      *
      * @return the formatted interviewer notes text corresponding to the specified index.
      *
      * @author Illiani
      * @since 0.50.06
      */
-    public String getInterviewersNotes(int ambitionDescriptionIndex) {
-        final String RESOURCE_KEY = name() + ".interviewerNote." + ambitionDescriptionIndex;
+    public String getInterviewersNotes(int aggressionDescriptionIndex) {
+        final String RESOURCE_KEY = name() + ".interviewerNote." + aggressionDescriptionIndex;
 
         return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
     }
@@ -243,35 +246,37 @@ public enum Ambition {
     // endregion Getters
 
     // region Boolean Comparison Methods
+
     public boolean isNone() {
         return this == NONE;
     }
     // endregion Boolean Comparison Methods
 
-    /**
-     * Converts the specified string into its corresponding Ambition enum value. The method attempts to interpret the
-     * string as either the name of an enum constant or an ordinal value of the enum. If the conversion fails, the
-     * method logs an error and returns the default value {@code NONE}.
-     *
-     * @param text the string to be converted into an Ambition enum value. It can be the name of the enum constant or
-     *             its ordinal value as a string.
-     *
-     * @return the corresponding Ambition enum constant if the string matches a name or ordinal value, otherwise
-     *       {@code NONE}.
-     */
     // region File I/O
-    public static Ambition fromString(String text) {
+
+    /**
+     * Converts the given string into an instance of the {@code Aggression} enum. The method tries to interpret the
+     * string as both a name of an enumeration constant and as an ordinal index. If neither interpretation succeeds, it
+     * logs an error and returns {@code NONE}.
+     *
+     * @param text the string representation of the aggression; can be either the name of an enumeration constant or the
+     *             ordinal string.
+     *
+     * @return the corresponding {@code Aggression} enum instance if the string is a valid name or ordinal; otherwise,
+     *       returns {@code NONE}.
+     */
+    public static Aggression fromString(String text) {
         try {
-            return Ambition.valueOf(text.toUpperCase().replace(" ", "_"));
+            return Aggression.valueOf(text.toUpperCase().replace(" ", "_"));
         } catch (Exception ignored) {}
 
         try {
-            return Ambition.values()[Integer.parseInt(text)];
+            return Aggression.values()[Integer.parseInt(text)];
         } catch (Exception ignored) {}
 
 
-        MMLogger logger = MMLogger.create(Ambition.class);
-        logger.error("Unknown Ambition ordinal: {} - returning {}.", text, NONE);
+        MMLogger logger = MMLogger.create(Aggression.class);
+        logger.error("Unknown Aggression ordinal: {} - returning {}.", text, NONE);
 
         return NONE;
     }

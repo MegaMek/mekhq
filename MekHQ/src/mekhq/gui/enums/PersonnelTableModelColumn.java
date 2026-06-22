@@ -74,10 +74,10 @@ import mekhq.campaign.personnel.skills.ScoutingSkills;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
-import mekhq.campaign.randomEvents.personalities.enums.Aggression;
-import mekhq.campaign.randomEvents.personalities.enums.Ambition;
-import mekhq.campaign.randomEvents.personalities.enums.Greed;
-import mekhq.campaign.randomEvents.personalities.enums.Social;
+import mekhq.campaign.randomEvents.personalities.Aggression;
+import mekhq.campaign.randomEvents.personalities.Ambition;
+import mekhq.campaign.randomEvents.personalities.Greed;
+import mekhq.campaign.randomEvents.personalities.Social;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.gui.model.LocationDisplay;
@@ -374,7 +374,7 @@ public enum PersonnelTableModelColumn {
             case HIDE_PERSONALITY -> convertBooleanToYesNo(person.isHidePersonality());
             case HIGHEST_EDUCATION -> person.getEduHighestEducation().toString();
             case IMMORTAL -> person.getStatus().isDead() ? getNAText()
-                                                       : convertBooleanToYesNo(person.isImmortal());
+                                   : convertBooleanToYesNo(person.isImmortal());
             case IMPLANT_COUNT -> Integer.toString(person.countOptions(PersonnelOptions.MD_ADVANTAGES));
             case MODIFICATION_COUNT -> Integer.toString(person.getProstheticInjuries().size());
             case INJURIES -> campaign.getCampaignOptions().isUseAdvancedMedical()
@@ -391,7 +391,7 @@ public enum PersonnelTableModelColumn {
             case LOYALTY -> String.valueOf(person.getAdjustedLoyalty(campaign.getFaction(),
                   campaignOptions.isUseAlternativeAdvancedMedical()));
             case MARRIAGEABLE -> person.getGenealogy().hasSpouse() ? getNAText()
-                                                           : convertBooleanToYesNo(person.isMarriageable());
+                                       : convertBooleanToYesNo(person.isMarriageable());
             case MEDICAL -> skillValue.apply(SkillType.S_SURGERY);
             case MEDICAL_CAPACITY -> person.isDoctor()
                                            ?
@@ -404,8 +404,7 @@ public enum PersonnelTableModelColumn {
             case NAVAL_VEHICLE -> gunneryPilotingValue.apply(SkillType.S_GUN_VEE, SkillType.S_PILOT_NVEE);
             case NAVIGATION -> skillValue.apply(SkillType.S_NAVIGATION);
             case NEGOTIATION -> skillValue.apply(SkillType.S_NEGOTIATION);
-            case NEVER_ASSIGN_AUTO_MAINTENANCE ->
-                  convertBooleanToYesNo(person.isNeverAssignMaintenanceAutomatically());
+            case NEVER_ASSIGN_AUTO_MAINTENANCE -> convertBooleanToYesNo(person.isNeverAssignMaintenanceAutomatically());
             case ORIGIN_FACTION -> person.getOriginFaction().getFullName(campaign.getGameYear());
             case ORIGIN_PLANET -> {
                 final Planet originPlanet = person.getOriginPlanet();
@@ -417,9 +416,9 @@ public enum PersonnelTableModelColumn {
             case POST_NOMINAL -> person.getPostNominal();
             case PRE_NOMINAL -> person.getPreNominal();
             case PREFERS_MEN -> person.isChild(campaign.getLocalDate()) ? getNAText() :
-                                                          convertBooleanToYesNo(person.isPrefersMen());
+                                      convertBooleanToYesNo(person.isPrefersMen());
             case PREFERS_WOMEN -> person.isChild(campaign.getLocalDate()) ? getNAText() :
-                                                            convertBooleanToYesNo(person.isPrefersWomen());
+                                        convertBooleanToYesNo(person.isPrefersWomen());
             case PROTOMEK -> skillValue.apply(SkillType.S_GUN_PROTO);
             case QUICK_TRAIN_IGNORE -> convertBooleanToYesNo(person.isQuickTrainIgnore());
             case RANK -> person;
@@ -482,7 +481,7 @@ public enum PersonnelTableModelColumn {
             case TOUGHNESS -> Integer.toString(person.getAdjustedToughness());
             case TRAINING -> skillValue.apply(SkillType.S_TRAINING);
             case WANTS_CHILDREN -> person.isChild(campaign.getLocalDate()) ? getNAText() :
-                                                             convertBooleanToYesNo(person.isWantsChildren());
+                                         convertBooleanToYesNo(person.isWantsChildren());
             case UNDER_PROTECTION -> convertBooleanToYesNo(person.isUnderProtection());
             case COVER_MEDICAL_EXPENSES -> convertBooleanToYesNo(person.isCoverIllicitMedicalExpenses());
             case BLOCK_MATERNITY_LEAVE -> convertBooleanToYesNo(person.isBlockMaternityLeave());

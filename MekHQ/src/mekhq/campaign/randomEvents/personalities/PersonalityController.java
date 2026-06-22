@@ -33,7 +33,7 @@
 package mekhq.campaign.randomEvents.personalities;
 
 import static megamek.common.compute.Compute.randomInt;
-import static mekhq.campaign.randomEvents.personalities.enums.Reasoning.*;
+import static mekhq.campaign.randomEvents.personalities.Reasoning.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,13 +41,6 @@ import java.util.List;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.enums.Gender;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.randomEvents.personalities.enums.Aggression;
-import mekhq.campaign.randomEvents.personalities.enums.Ambition;
-import mekhq.campaign.randomEvents.personalities.enums.Greed;
-import mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk;
-import mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType;
-import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
-import mekhq.campaign.randomEvents.personalities.enums.Social;
 
 /**
  * This class is responsible for generating and managing personalities for characters. It assigns traits such as

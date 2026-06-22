@@ -66,7 +66,7 @@ import static mekhq.campaign.personnel.skills.SkillType.S_STRATEGY;
 import static mekhq.campaign.personnel.skills.SkillType.S_TECH_MECHANIC;
 import static mekhq.campaign.personnel.skills.SkillType.getType;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
-import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
+import static mekhq.campaign.randomEvents.other.GrayMonday.isGrayMonday;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.MINIMUM_TEMPORARY_CAPACITY;
 import static mekhq.campaign.unit.Unit.TECH_WORK_DAY;
@@ -233,8 +233,8 @@ import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
-import mekhq.campaign.randomEvents.RandomEventLibraries;
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
+import mekhq.campaign.randomEvents.other.RandomEventLibraries;
+import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.storyArc.StoryArc;
 import mekhq.campaign.stratCon.StratConContractInitializer;
 import mekhq.campaign.stratCon.StratConRulesManager;
@@ -2237,7 +2237,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all hangars across all locations associated with this campaign.
-     *                               TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     *                                     TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
      */
     public Hangar getAllHangar() {
         return units;
@@ -2885,7 +2885,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all warehouses across all locations associated with this campaign.
-     *                               TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
+     *                                     TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
      */
     public Warehouse getAllWarehouse() {
         return parts;

@@ -78,7 +78,7 @@ import mekhq.campaign.personnel.lifeEvents.BirthAnnouncement;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries;
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
+import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 

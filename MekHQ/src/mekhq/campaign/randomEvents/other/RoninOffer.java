@@ -31,7 +31,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.randomEvents;
+package mekhq.campaign.randomEvents.other;
 
 import static java.lang.Math.max;
 import static megamek.common.compute.Compute.randomInt;
@@ -43,10 +43,10 @@ import static mekhq.campaign.personnel.PersonUtility.reRollAdvantages;
 import static mekhq.campaign.personnel.PersonUtility.reRollLoyalty;
 import static mekhq.campaign.personnel.enums.PersonnelRole.AEROSPACE_PILOT;
 import static mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR;
-import static mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType.AGGRESSION;
-import static mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType.AMBITION;
-import static mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType.GREED;
-import static mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType.SOCIAL;
+import static mekhq.campaign.randomEvents.personalities.PersonalityTraitType.AGGRESSION;
+import static mekhq.campaign.randomEvents.personalities.PersonalityTraitType.AMBITION;
+import static mekhq.campaign.randomEvents.personalities.PersonalityTraitType.GREED;
+import static mekhq.campaign.randomEvents.personalities.PersonalityTraitType.SOCIAL;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.ArrayList;
@@ -60,11 +60,11 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.randomEvents.personalities.enums.Aggression;
-import mekhq.campaign.randomEvents.personalities.enums.Ambition;
-import mekhq.campaign.randomEvents.personalities.enums.Greed;
-import mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType;
-import mekhq.campaign.randomEvents.personalities.enums.Social;
+import mekhq.campaign.randomEvents.personalities.Aggression;
+import mekhq.campaign.randomEvents.personalities.Ambition;
+import mekhq.campaign.randomEvents.personalities.Greed;
+import mekhq.campaign.randomEvents.personalities.PersonalityTraitType;
+import mekhq.campaign.randomEvents.personalities.Social;
 import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.dialog.randomEvents.RoninEventDialog;
@@ -268,7 +268,7 @@ public class RoninOffer {
             }
         }
 
-        mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType chosenTrait = null;
+        PersonalityTraitType chosenTrait = null;
 
         if (!majorTraits.isEmpty()) {
             chosenTrait = ObjectUtility.getRandomItem(majorTraits);

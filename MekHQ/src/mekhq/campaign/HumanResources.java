@@ -105,7 +105,7 @@ import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
+import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -1795,58 +1795,58 @@ public class HumanResources {
                 case MEKWARRIOR: {
                     bloodnameTarget += person.hasSkill(SkillType.S_GUN_MEK) ?
                                              person.getSkill(SkillType.S_GUN_MEK)
-                                             .getFinalSkillValue(skillModifierData) :
+                                                   .getFinalSkillValue(skillModifierData) :
                                              TargetRoll.AUTOMATIC_FAIL;
                     bloodnameTarget += person.hasSkill(SkillType.S_PILOT_MEK) ?
                                              person.getSkill(SkillType.S_PILOT_MEK)
-                                             .getFinalSkillValue(skillModifierData) :
+                                                   .getFinalSkillValue(skillModifierData) :
                                              TargetRoll.AUTOMATIC_FAIL;
                     break;
                 }
                 case AEROSPACE: {
                     bloodnameTarget += person.hasSkill(SkillType.S_GUN_AERO) ?
                                              person.getSkill(SkillType.S_GUN_AERO)
-                                             .getFinalSkillValue(skillModifierData) :
+                                                   .getFinalSkillValue(skillModifierData) :
                                              TargetRoll.AUTOMATIC_FAIL;
                     bloodnameTarget += person.hasSkill(SkillType.S_PILOT_AERO) ?
                                              person.getSkill(SkillType.S_PILOT_AERO)
-                                             .getFinalSkillValue(skillModifierData) :
+                                                   .getFinalSkillValue(skillModifierData) :
                                              TargetRoll.AUTOMATIC_FAIL;
                     break;
                 }
                 case ELEMENTAL: {
                     bloodnameTarget += person.hasSkill(SkillType.S_GUN_BA) ?
                                              person.getSkill(SkillType.S_GUN_BA)
-                                             .getFinalSkillValue(skillModifierData) :
+                                                   .getFinalSkillValue(skillModifierData) :
                                              TargetRoll.AUTOMATIC_FAIL;
                     bloodnameTarget += person.hasSkill(SkillType.S_ANTI_MEK) ?
                                              person.getSkill(SkillType.S_ANTI_MEK)
-                                             .getFinalSkillValue(skillModifierData) :
+                                                   .getFinalSkillValue(skillModifierData) :
                                              TargetRoll.AUTOMATIC_FAIL;
                     break;
                 }
                 case VEHICLE: {
                     bloodnameTarget += person.hasSkill(SkillType.S_GUN_VEE) ?
                                              person.getSkill(SkillType.S_GUN_VEE)
-                                             .getFinalSkillValue(skillModifierData) :
+                                                   .getFinalSkillValue(skillModifierData) :
                                              TargetRoll.AUTOMATIC_FAIL;
                     switch (person.getPrimaryRole()) {
                         case VEHICLE_CREW_GROUND:
                             bloodnameTarget += person.hasSkill(SkillType.S_PILOT_GVEE) ?
                                                      person.getSkill(SkillType.S_PILOT_GVEE)
-                                                     .getFinalSkillValue(skillModifierData) :
+                                                           .getFinalSkillValue(skillModifierData) :
                                                      TargetRoll.AUTOMATIC_FAIL;
                             break;
                         case VEHICLE_CREW_NAVAL:
                             bloodnameTarget += person.hasSkill(SkillType.S_PILOT_NVEE) ?
                                                      person.getSkill(SkillType.S_PILOT_NVEE)
-                                                     .getFinalSkillValue(skillModifierData) :
+                                                           .getFinalSkillValue(skillModifierData) :
                                                      TargetRoll.AUTOMATIC_FAIL;
                             break;
                         case VEHICLE_CREW_VTOL:
                             bloodnameTarget += person.hasSkill(SkillType.S_PILOT_VTOL) ?
                                                      person.getSkill(SkillType.S_PILOT_VTOL)
-                                                     .getFinalSkillValue(skillModifierData) :
+                                                           .getFinalSkillValue(skillModifierData) :
                                                      TargetRoll.AUTOMATIC_FAIL;
                             break;
                         default:
@@ -1858,7 +1858,7 @@ public class HumanResources {
                     bloodnameTarget += 2 *
                                              (person.hasSkill(SkillType.S_GUN_PROTO) ?
                                                     person.getSkill(SkillType.S_GUN_PROTO)
-                                                    .getFinalSkillValue(skillModifierData) :
+                                                          .getFinalSkillValue(skillModifierData) :
                                                     TargetRoll.AUTOMATIC_FAIL);
                     break;
                 }
@@ -1868,28 +1868,28 @@ public class HumanResources {
                             bloodnameTarget += 2 *
                                                      (person.hasSkill(SkillType.S_PILOT_SPACE) ?
                                                             person.getSkill(SkillType.S_PILOT_SPACE)
-                                                            .getFinalSkillValue(skillModifierData) :
+                                                                  .getFinalSkillValue(skillModifierData) :
                                                             TargetRoll.AUTOMATIC_FAIL);
                             break;
                         case VESSEL_GUNNER:
                             bloodnameTarget += 2 *
                                                      (person.hasSkill(SkillType.S_GUN_SPACE) ?
                                                             person.getSkill(SkillType.S_GUN_SPACE)
-                                                            .getFinalSkillValue(skillModifierData) :
+                                                                  .getFinalSkillValue(skillModifierData) :
                                                             TargetRoll.AUTOMATIC_FAIL);
                             break;
                         case VESSEL_CREW:
                             bloodnameTarget += 2 *
                                                      (person.hasSkill(SkillType.S_TECH_VESSEL) ?
                                                             person.getSkill(SkillType.S_TECH_VESSEL)
-                                                            .getFinalSkillValue(skillModifierData) :
+                                                                  .getFinalSkillValue(skillModifierData) :
                                                             TargetRoll.AUTOMATIC_FAIL);
                             break;
                         case VESSEL_NAVIGATOR:
                             bloodnameTarget += 2 *
                                                      (person.hasSkill(SkillType.S_NAVIGATION) ?
                                                             person.getSkill(SkillType.S_NAVIGATION)
-                                                            .getFinalSkillValue(skillModifierData) :
+                                                                  .getFinalSkillValue(skillModifierData) :
                                                             TargetRoll.AUTOMATIC_FAIL);
                             break;
                         default:

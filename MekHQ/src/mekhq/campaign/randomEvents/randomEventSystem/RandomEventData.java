@@ -30,32 +30,18 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.randomEvents.prisoners.yaml;
+package mekhq.campaign.randomEvents.randomEventSystem;
 
 import java.util.List;
 
-import mekhq.campaign.randomEvents.prisoners.records.PrisonerEventData;
-
 /**
- * A wrapper class for managing a list of {@link PrisonerEventData}. This class provides getter and setter methods to
- * access and modify the list of prisoner events.
+ * Represents data relevant to a random event, including its type, severity, and response map structure.
+ *
+ * @param randomEventType The type of random event as a {@link RandomEventType}. This represents the name of the event.
+ * @param responseEntries A list of {@link RandomEventResponseEntry} defining the responses and their associated
+ *                        qualities and effects.
  */
-public class PrisonerEventDataWrapper {
-    private List<PrisonerEventData> events;
-
-    /**
-     * @return a {@link List} of {@link PrisonerEventData} objects representing the prisoner events.
-     */
-    public List<PrisonerEventData> getEvents() {
-        return events;
-    }
-
-    /**
-     * Sets the list of {@link PrisonerEventData} for this wrapper.
-     *
-     * @param events a {@link List} of {@link PrisonerEventData} objects to be associated with this wrapper.
-     */
-    public void setEvents(List<PrisonerEventData> events) {
-        this.events = events;
-    }
-}
+public record RandomEventData(
+      RandomEventType randomEventType,
+      List<RandomEventResponseEntry> responseEntries
+) {}

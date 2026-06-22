@@ -40,13 +40,13 @@ import static mekhq.campaign.personnel.enums.PersonnelRole.SOLDIER;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_SMALL_ARMS;
 import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
-import static mekhq.campaign.randomEvents.prisoners.enums.EventResultEffect.*;
-import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerEvent.BARTERING;
-import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerEvent.BREAKOUT;
-import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerEvent.MISTAKE;
-import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerEvent.POISON;
-import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerEvent.UNDERCOVER;
-import static mekhq.campaign.randomEvents.prisoners.enums.ResponseQuality.RESPONSE_NEUTRAL;
+import static mekhq.campaign.randomEvents.randomEventSystem.RandomEventResponseQuality.RESPONSE_NEUTRAL;
+import static mekhq.campaign.randomEvents.randomEventSystem.RandomEventResultEffect.*;
+import static mekhq.campaign.randomEvents.randomEventSystem.RandomEventType.BARTERING;
+import static mekhq.campaign.randomEvents.randomEventSystem.RandomEventType.BREAKOUT;
+import static mekhq.campaign.randomEvents.randomEventSystem.RandomEventType.MISTAKE;
+import static mekhq.campaign.randomEvents.randomEventSystem.RandomEventType.POISON;
+import static mekhq.campaign.randomEvents.randomEventSystem.RandomEventType.UNDERCOVER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -66,21 +66,22 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.randomEvents.prisoners.records.EventResult;
-import mekhq.campaign.randomEvents.prisoners.records.PrisonerEventData;
-import mekhq.campaign.randomEvents.prisoners.records.PrisonerResponseEntry;
+import mekhq.campaign.randomEvents.randomEventSystem.RandomEventData;
+import mekhq.campaign.randomEvents.randomEventSystem.RandomEventEffectsManager;
+import mekhq.campaign.randomEvents.randomEventSystem.RandomEventResponseEntry;
+import mekhq.campaign.randomEvents.randomEventSystem.RandomEventResult;
 import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.Test;
 
 /**
- * Unit test class for the {@link EventEffectsManager}.
+ * Unit test class for the {@link RandomEventEffectsManager}.
  *
  * <p>This class contains test cases to verify the behavior and effects of different events
- * handled by the {@link EventEffectsManager}. Each test method corresponds to a specific event effect and evaluates its
- * outcomes under various conditions.</p>
+ * handled by the {@link RandomEventEffectsManager}. Each test method corresponds to a specific event effect and
+ * evaluates its outcomes under various conditions.</p>
  */
-class EventEffectsManagerTest {
+class RandomEventEffectsManagerTest {
     @Test
     void testEventEffectPrisonerCapacity() {
         final int MAGNITUDE = 5;
@@ -101,14 +102,14 @@ class EventEffectsManagerTest {
     }
 
     private static String getReport(int MAGNITUDE, Campaign mockCampaign) {
-        EventResult eventResult = new EventResult(PRISONER_CAPACITY, false, MAGNITUDE, "");
-        PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
-              List.of(eventResult),
-              List.of(eventResult));
-        PrisonerEventData eventData = new PrisonerEventData(BREAKOUT, List.of(responseEntry));
+        RandomEventResult randomEventResult = new RandomEventResult(PRISONER_CAPACITY, false, MAGNITUDE, "");
+        RandomEventResponseEntry responseEntry = new RandomEventResponseEntry(RESPONSE_NEUTRAL,
+              List.of(randomEventResult),
+              List.of(randomEventResult));
+        RandomEventData eventData = new RandomEventData(BREAKOUT, List.of(responseEntry));
 
         // Act
-        EventEffectsManager effectsManager = new EventEffectsManager(mockCampaign, eventData, 0, true);
+        RandomEventEffectsManager effectsManager = new RandomEventEffectsManager(mockCampaign, eventData, 0, true);
         String report = effectsManager.getEventReport();
         return report;
     }
@@ -127,17 +128,17 @@ class EventEffectsManagerTest {
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
-        EventResult eventResult = new EventResult(INJURY, false, MAGNITUDE, "");
-        PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
-              List.of(eventResult),
-              List.of(eventResult));
-        PrisonerEventData eventData = new PrisonerEventData(BREAKOUT, List.of(responseEntry));
+        RandomEventResult randomEventResult = new RandomEventResult(INJURY, false, MAGNITUDE, "");
+        RandomEventResponseEntry responseEntry = new RandomEventResponseEntry(RESPONSE_NEUTRAL,
+              List.of(randomEventResult),
+              List.of(randomEventResult));
+        RandomEventData eventData = new RandomEventData(BREAKOUT, List.of(responseEntry));
 
         Person prisoner = new Person(mockCampaign);
         when(mockCampaign.getCurrentPrisoners()).thenReturn(List.of(prisoner));
 
         // Act
-        new EventEffectsManager(mockCampaign, eventData, 0, true);
+        new RandomEventEffectsManager(mockCampaign, eventData, 0, true);
 
         // Assert
         assertEquals(MAGNITUDE, prisoner.getHits());
@@ -161,17 +162,17 @@ class EventEffectsManagerTest {
         LocalDate today = LocalDate.of(3151, 1, 1);
         when(mockCampaign.getLocalDate()).thenReturn(today);
 
-        EventResult eventResult = new EventResult(INJURY, false, MAGNITUDE, "");
-        PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
-              List.of(eventResult),
-              List.of(eventResult));
-        PrisonerEventData eventData = new PrisonerEventData(BREAKOUT, List.of(responseEntry));
+        RandomEventResult randomEventResult = new RandomEventResult(INJURY, false, MAGNITUDE, "");
+        RandomEventResponseEntry responseEntry = new RandomEventResponseEntry(RESPONSE_NEUTRAL,
+              List.of(randomEventResult),
+              List.of(randomEventResult));
+        RandomEventData eventData = new RandomEventData(BREAKOUT, List.of(responseEntry));
 
         Person prisoner = new Person(mockCampaign);
         when(mockCampaign.getCurrentPrisoners()).thenReturn(List.of(prisoner));
 
         // Act
-        new EventEffectsManager(mockCampaign, eventData, 0, true);
+        new RandomEventEffectsManager(mockCampaign, eventData, 0, true);
 
         // Assert
         // Advanced Medical applies a degree of randomization to the number of injuries caused by a
@@ -194,11 +195,11 @@ class EventEffectsManagerTest {
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
-        EventResult eventResult = new EventResult(INJURY_PERCENT, false, MAGNITUDE, "");
-        PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
-              List.of(eventResult),
-              List.of(eventResult));
-        PrisonerEventData eventData = new PrisonerEventData(BREAKOUT, List.of(responseEntry));
+        RandomEventResult randomEventResult = new RandomEventResult(INJURY_PERCENT, false, MAGNITUDE, "");
+        RandomEventResponseEntry responseEntry = new RandomEventResponseEntry(RESPONSE_NEUTRAL,
+              List.of(randomEventResult),
+              List.of(randomEventResult));
+        RandomEventData eventData = new RandomEventData(BREAKOUT, List.of(responseEntry));
 
         Person prisoner0 = new Person(mockCampaign);
         Person prisoner1 = new Person(mockCampaign);
@@ -207,7 +208,7 @@ class EventEffectsManagerTest {
         when(mockCampaign.getCurrentPrisoners()).thenReturn(List.of(prisoner0, prisoner1, prisoner2, prisoner3));
 
         // Act
-        new EventEffectsManager(mockCampaign, eventData, 0, true);
+        new RandomEventEffectsManager(mockCampaign, eventData, 0, true);
 
         // Assert
         int injuredCharacters = 0;
@@ -238,11 +239,11 @@ class EventEffectsManagerTest {
         LocalDate today = LocalDate.of(3151, 1, 1);
         when(mockCampaign.getLocalDate()).thenReturn(today);
 
-        EventResult eventResult = new EventResult(INJURY_PERCENT, false, MAGNITUDE, "");
-        PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
-              List.of(eventResult),
-              List.of(eventResult));
-        PrisonerEventData eventData = new PrisonerEventData(BREAKOUT, List.of(responseEntry));
+        RandomEventResult randomEventResult = new RandomEventResult(INJURY_PERCENT, false, MAGNITUDE, "");
+        RandomEventResponseEntry responseEntry = new RandomEventResponseEntry(RESPONSE_NEUTRAL,
+              List.of(randomEventResult),
+              List.of(randomEventResult));
+        RandomEventData eventData = new RandomEventData(BREAKOUT, List.of(responseEntry));
 
         Person prisoner0 = new Person(mockCampaign);
         Person prisoner1 = new Person(mockCampaign);
@@ -251,7 +252,7 @@ class EventEffectsManagerTest {
         when(mockCampaign.getCurrentPrisoners()).thenReturn(List.of(prisoner0, prisoner1, prisoner2, prisoner3));
 
         // Act
-        new EventEffectsManager(mockCampaign, eventData, 0, true);
+        new RandomEventEffectsManager(mockCampaign, eventData, 0, true);
 
         // Assert
         int injuredCharacters = 0;
@@ -278,17 +279,17 @@ class EventEffectsManagerTest {
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
-        EventResult eventResult = new EventResult(DEATH, false, MAGNITUDE, "");
-        PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
-              List.of(eventResult),
-              List.of(eventResult));
-        PrisonerEventData eventData = new PrisonerEventData(BREAKOUT, List.of(responseEntry));
+        RandomEventResult randomEventResult = new RandomEventResult(DEATH, false, MAGNITUDE, "");
+        RandomEventResponseEntry responseEntry = new RandomEventResponseEntry(RESPONSE_NEUTRAL,
+              List.of(randomEventResult),
+              List.of(randomEventResult));
+        RandomEventData eventData = new RandomEventData(BREAKOUT, List.of(responseEntry));
 
         Person prisoner = new Person(mockCampaign);
         when(mockCampaign.getCurrentPrisoners()).thenReturn(List.of(prisoner));
 
         // Act
-        EventEffectsManager effectsManager = new EventEffectsManager(mockCampaign, eventData, 0, true);
+        RandomEventEffectsManager effectsManager = new RandomEventEffectsManager(mockCampaign, eventData, 0, true);
         String report = effectsManager.getEventReport();
 
         // Assert
@@ -317,11 +318,11 @@ class EventEffectsManagerTest {
         LocalDate today = LocalDate.of(3151, 1, 1);
         when(mockCampaign.getLocalDate()).thenReturn(today);
 
-        EventResult eventResult = new EventResult(DEATH_PERCENT, false, MAGNITUDE, "");
-        PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
-              List.of(eventResult),
-              List.of(eventResult));
-        PrisonerEventData eventData = new PrisonerEventData(BREAKOUT, List.of(responseEntry));
+        RandomEventResult randomEventResult = new RandomEventResult(DEATH_PERCENT, false, MAGNITUDE, "");
+        RandomEventResponseEntry responseEntry = new RandomEventResponseEntry(RESPONSE_NEUTRAL,
+              List.of(randomEventResult),
+              List.of(randomEventResult));
+        RandomEventData eventData = new RandomEventData(BREAKOUT, List.of(responseEntry));
 
         Person prisoner0 = new Person(mockCampaign);
         Person prisoner1 = new Person(mockCampaign);
@@ -330,7 +331,7 @@ class EventEffectsManagerTest {
         when(mockCampaign.getCurrentPrisoners()).thenReturn(List.of(prisoner0, prisoner1, prisoner2, prisoner3));
 
         // Act
-        EventEffectsManager effectsManager = new EventEffectsManager(mockCampaign, eventData, 0, true);
+        RandomEventEffectsManager effectsManager = new RandomEventEffectsManager(mockCampaign, eventData, 0, true);
         String report = effectsManager.getEventReport();
 
         // Assert
@@ -357,11 +358,11 @@ class EventEffectsManagerTest {
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
         when(mockCampaignOptions.isUseLoyaltyModifiers()).thenReturn(true);
 
-        EventResult eventResult = new EventResult(SKILL, false, MAGNITUDE, S_ADMIN);
-        PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
-              List.of(eventResult),
-              List.of(eventResult));
-        PrisonerEventData eventData = new PrisonerEventData(BREAKOUT, List.of(responseEntry));
+        RandomEventResult randomEventResult = new RandomEventResult(SKILL, false, MAGNITUDE, S_ADMIN);
+        RandomEventResponseEntry responseEntry = new RandomEventResponseEntry(RESPONSE_NEUTRAL,
+              List.of(randomEventResult),
+              List.of(randomEventResult));
+        RandomEventData eventData = new RandomEventData(BREAKOUT, List.of(responseEntry));
 
         Person prisoner = new Person(mockCampaign);
         when(mockCampaign.getCurrentPrisoners()).thenReturn(List.of(prisoner));
@@ -369,7 +370,7 @@ class EventEffectsManagerTest {
         SkillType.initializeTypes();
 
         // Act
-        new EventEffectsManager(mockCampaign, eventData, 0, true);
+        new RandomEventEffectsManager(mockCampaign, eventData, 0, true);
 
         // Assert
         assertTrue(prisoner.hasSkill(skill));
@@ -391,18 +392,18 @@ class EventEffectsManagerTest {
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
         when(mockCampaignOptions.isUseLoyaltyModifiers()).thenReturn(true);
 
-        EventResult eventResult = new EventResult(LOYALTY_ONE, false, MAGNITUDE, "");
-        PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
-              List.of(eventResult),
-              List.of(eventResult));
-        PrisonerEventData eventData = new PrisonerEventData(BREAKOUT, List.of(responseEntry));
+        RandomEventResult randomEventResult = new RandomEventResult(LOYALTY_ONE, false, MAGNITUDE, "");
+        RandomEventResponseEntry responseEntry = new RandomEventResponseEntry(RESPONSE_NEUTRAL,
+              List.of(randomEventResult),
+              List.of(randomEventResult));
+        RandomEventData eventData = new RandomEventData(BREAKOUT, List.of(responseEntry));
 
         Person prisoner = new Person(mockCampaign);
         when(mockCampaign.getCurrentPrisoners()).thenReturn(List.of(prisoner));
         int oldLoyalty = prisoner.getBaseLoyalty();
 
         // Act
-        new EventEffectsManager(mockCampaign, eventData, 0, true);
+        new RandomEventEffectsManager(mockCampaign, eventData, 0, true);
 
         // Assert
         int expectedLoyalty = oldLoyalty + MAGNITUDE;
@@ -426,11 +427,11 @@ class EventEffectsManagerTest {
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
         when(mockCampaignOptions.isUseLoyaltyModifiers()).thenReturn(true);
 
-        EventResult eventResult = new EventResult(LOYALTY_ALL, false, MAGNITUDE, "");
-        PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
-              List.of(eventResult),
-              List.of(eventResult));
-        PrisonerEventData eventData = new PrisonerEventData(BREAKOUT, List.of(responseEntry));
+        RandomEventResult randomEventResult = new RandomEventResult(LOYALTY_ALL, false, MAGNITUDE, "");
+        RandomEventResponseEntry responseEntry = new RandomEventResponseEntry(RESPONSE_NEUTRAL,
+              List.of(randomEventResult),
+              List.of(randomEventResult));
+        RandomEventData eventData = new RandomEventData(BREAKOUT, List.of(responseEntry));
 
         Person prisoner0 = new Person(mockCampaign);
         Person prisoner1 = new Person(mockCampaign);
@@ -443,7 +444,7 @@ class EventEffectsManagerTest {
               prisoner3.getBaseLoyalty());
 
         // Act
-        new EventEffectsManager(mockCampaign, eventData, 0, true);
+        new RandomEventEffectsManager(mockCampaign, eventData, 0, true);
 
         // Assert
         List<Person> currentPrisoners = mockCampaign.getCurrentPrisoners();
@@ -469,11 +470,11 @@ class EventEffectsManagerTest {
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
-        EventResult eventResult = new EventResult(ESCAPE, false, MAGNITUDE, "");
-        PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
-              List.of(eventResult),
-              List.of(eventResult));
-        PrisonerEventData eventData = new PrisonerEventData(BREAKOUT, List.of(responseEntry));
+        RandomEventResult randomEventResult = new RandomEventResult(ESCAPE, false, MAGNITUDE, "");
+        RandomEventResponseEntry responseEntry = new RandomEventResponseEntry(RESPONSE_NEUTRAL,
+              List.of(randomEventResult),
+              List.of(randomEventResult));
+        RandomEventData eventData = new RandomEventData(BREAKOUT, List.of(responseEntry));
 
         Person prisoner0 = new Person(mockCampaign);
         Person prisoner1 = new Person(mockCampaign);
@@ -482,9 +483,9 @@ class EventEffectsManagerTest {
         when(mockCampaign.getCurrentPrisoners()).thenReturn(List.of(prisoner0, prisoner1, prisoner2, prisoner3));
 
         // Act
-        new EventEffectsManager(mockCampaign, eventData, 0, true);
+        new RandomEventEffectsManager(mockCampaign, eventData, 0, true);
 
-        EventEffectsManager effectsManager = new EventEffectsManager(mockCampaign, eventData, 0, true);
+        RandomEventEffectsManager effectsManager = new RandomEventEffectsManager(mockCampaign, eventData, 0, true);
         String report = effectsManager.getEventReport();
 
         // Assert
@@ -507,11 +508,11 @@ class EventEffectsManagerTest {
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
-        EventResult eventResult = new EventResult(ESCAPE_PERCENT, false, MAGNITUDE, "");
-        PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
-              List.of(eventResult),
-              List.of(eventResult));
-        PrisonerEventData eventData = new PrisonerEventData(BREAKOUT, List.of(responseEntry));
+        RandomEventResult randomEventResult = new RandomEventResult(ESCAPE_PERCENT, false, MAGNITUDE, "");
+        RandomEventResponseEntry responseEntry = new RandomEventResponseEntry(RESPONSE_NEUTRAL,
+              List.of(randomEventResult),
+              List.of(randomEventResult));
+        RandomEventData eventData = new RandomEventData(BREAKOUT, List.of(responseEntry));
 
         Person prisoner0 = new Person(mockCampaign);
         Person prisoner1 = new Person(mockCampaign);
@@ -520,9 +521,9 @@ class EventEffectsManagerTest {
         when(mockCampaign.getCurrentPrisoners()).thenReturn(List.of(prisoner0, prisoner1, prisoner2, prisoner3));
 
         // Act
-        new EventEffectsManager(mockCampaign, eventData, 0, true);
+        new RandomEventEffectsManager(mockCampaign, eventData, 0, true);
 
-        EventEffectsManager effectsManager = new EventEffectsManager(mockCampaign, eventData, 0, true);
+        RandomEventEffectsManager effectsManager = new RandomEventEffectsManager(mockCampaign, eventData, 0, true);
         String report = effectsManager.getEventReport();
 
         // Assert
@@ -552,18 +553,18 @@ class EventEffectsManagerTest {
         Warehouse mockWarehouse = mock(Warehouse.class);
         when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
 
-        EventResult eventResult = new EventResult(FATIGUE_ONE, false, MAGNITUDE, "");
-        PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
-              List.of(eventResult),
-              List.of(eventResult));
-        PrisonerEventData eventData = new PrisonerEventData(BREAKOUT, List.of(responseEntry));
+        RandomEventResult randomEventResult = new RandomEventResult(FATIGUE_ONE, false, MAGNITUDE, "");
+        RandomEventResponseEntry responseEntry = new RandomEventResponseEntry(RESPONSE_NEUTRAL,
+              List.of(randomEventResult),
+              List.of(randomEventResult));
+        RandomEventData eventData = new RandomEventData(BREAKOUT, List.of(responseEntry));
 
         Person prisoner = new Person(mockCampaign);
         when(mockCampaign.getCurrentPrisoners()).thenReturn(List.of(prisoner));
         int oldFatigue = prisoner.getFatigueDirect();
 
         // Act
-        new EventEffectsManager(mockCampaign, eventData, 0, true);
+        new RandomEventEffectsManager(mockCampaign, eventData, 0, true);
 
         // Assert
         int expectedFatigue = oldFatigue + MAGNITUDE;
@@ -593,11 +594,11 @@ class EventEffectsManagerTest {
         Warehouse mockWarehouse = mock(Warehouse.class);
         when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
 
-        EventResult eventResult = new EventResult(FATIGUE_ALL, false, MAGNITUDE, "");
-        PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
-              List.of(eventResult),
-              List.of(eventResult));
-        PrisonerEventData eventData = new PrisonerEventData(BREAKOUT, List.of(responseEntry));
+        RandomEventResult randomEventResult = new RandomEventResult(FATIGUE_ALL, false, MAGNITUDE, "");
+        RandomEventResponseEntry responseEntry = new RandomEventResponseEntry(RESPONSE_NEUTRAL,
+              List.of(randomEventResult),
+              List.of(randomEventResult));
+        RandomEventData eventData = new RandomEventData(BREAKOUT, List.of(responseEntry));
 
         Person prisoner0 = new Person(mockCampaign);
         Person prisoner1 = new Person(mockCampaign);
@@ -610,7 +611,7 @@ class EventEffectsManagerTest {
               prisoner3.getFatigueDirect());
 
         // Act
-        new EventEffectsManager(mockCampaign, eventData, 0, true);
+        new RandomEventEffectsManager(mockCampaign, eventData, 0, true);
 
         // Assert
         List<Person> currentPrisoners = mockCampaign.getCurrentPrisoners();
@@ -642,14 +643,14 @@ class EventEffectsManagerTest {
         contract.setStratConCampaignState(campaignState);
         when(mockCampaign.getActiveAtBContracts()).thenReturn(List.of(contract));
 
-        EventResult eventResult = new EventResult(SUPPORT_POINT, false, MAGNITUDE, "");
-        PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
-              List.of(eventResult),
-              List.of(eventResult));
-        PrisonerEventData eventData = new PrisonerEventData(BREAKOUT, List.of(responseEntry));
+        RandomEventResult randomEventResult = new RandomEventResult(SUPPORT_POINT, false, MAGNITUDE, "");
+        RandomEventResponseEntry responseEntry = new RandomEventResponseEntry(RESPONSE_NEUTRAL,
+              List.of(randomEventResult),
+              List.of(randomEventResult));
+        RandomEventData eventData = new RandomEventData(BREAKOUT, List.of(responseEntry));
 
         // Act
-        new EventEffectsManager(mockCampaign, eventData, 0, true);
+        new RandomEventEffectsManager(mockCampaign, eventData, 0, true);
 
         // Assert
         int actualSupportPoints = contract.getStratConCampaignState().getSupportPoints();
@@ -676,14 +677,14 @@ class EventEffectsManagerTest {
         contract.setMoraleLevel(STALEMATE);
         when(mockCampaign.getActiveAtBContracts()).thenReturn(List.of(contract));
 
-        EventResult eventResult = new EventResult(UNIQUE, false, MAGNITUDE, "");
-        PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
-              List.of(eventResult),
-              List.of(eventResult));
-        PrisonerEventData eventData = new PrisonerEventData(BARTERING, List.of(responseEntry));
+        RandomEventResult randomEventResult = new RandomEventResult(UNIQUE, false, MAGNITUDE, "");
+        RandomEventResponseEntry responseEntry = new RandomEventResponseEntry(RESPONSE_NEUTRAL,
+              List.of(randomEventResult),
+              List.of(randomEventResult));
+        RandomEventData eventData = new RandomEventData(BARTERING, List.of(responseEntry));
 
         // Act
-        new EventEffectsManager(mockCampaign, eventData, 0, true);
+        new RandomEventEffectsManager(mockCampaign, eventData, 0, true);
 
         // Assert
         int expectedMorale = STALEMATE.ordinal() + MAGNITUDE;
@@ -707,11 +708,11 @@ class EventEffectsManagerTest {
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
         when(mockCampaignOptions.isUseLoyaltyModifiers()).thenReturn(true);
 
-        EventResult eventResult = new EventResult(UNIQUE, false, MAGNITUDE, "");
-        PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
-              List.of(eventResult),
-              List.of(eventResult));
-        PrisonerEventData eventData = new PrisonerEventData(MISTAKE, List.of(responseEntry));
+        RandomEventResult randomEventResult = new RandomEventResult(UNIQUE, false, MAGNITUDE, "");
+        RandomEventResponseEntry responseEntry = new RandomEventResponseEntry(RESPONSE_NEUTRAL,
+              List.of(randomEventResult),
+              List.of(randomEventResult));
+        RandomEventData eventData = new RandomEventData(MISTAKE, List.of(responseEntry));
 
         SkillType.initializeTypes();
 
@@ -727,7 +728,7 @@ class EventEffectsManagerTest {
         prisoner.setSecondaryRole(ADMINISTRATOR_LOGISTICS);
 
         // Act
-        new EventEffectsManager(mockCampaign, eventData, 0, true);
+        new RandomEventEffectsManager(mockCampaign, eventData, 0, true);
 
         // Assert
         assertNull(prisoner.getSkill(S_ADMIN));
@@ -759,11 +760,11 @@ class EventEffectsManagerTest {
         Faction employerFaction = new Faction();
         when(contract.getEmployerFaction()).thenReturn(employerFaction);
 
-        EventResult eventResult = new EventResult(UNIQUE, false, MAGNITUDE, "");
-        PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
-              List.of(eventResult),
-              List.of(eventResult));
-        PrisonerEventData eventData = new PrisonerEventData(UNDERCOVER, List.of(responseEntry));
+        RandomEventResult randomEventResult = new RandomEventResult(UNIQUE, false, MAGNITUDE, "");
+        RandomEventResponseEntry responseEntry = new RandomEventResponseEntry(RESPONSE_NEUTRAL,
+              List.of(randomEventResult),
+              List.of(randomEventResult));
+        RandomEventData eventData = new RandomEventData(UNDERCOVER, List.of(responseEntry));
 
         Person prisoner = new Person(mockCampaign);
         Faction prisonerFaction = new Faction();
@@ -771,7 +772,7 @@ class EventEffectsManagerTest {
         when(mockCampaign.getCurrentPrisoners()).thenReturn(List.of(prisoner));
 
         // Act
-        new EventEffectsManager(mockCampaign, eventData, 0, true);
+        new RandomEventEffectsManager(mockCampaign, eventData, 0, true);
 
         // Assert
         Faction actualFaction = prisoner.getOriginFaction();
@@ -800,11 +801,11 @@ class EventEffectsManagerTest {
         Warehouse mockWarehouse = mock(Warehouse.class);
         when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
 
-        EventResult eventResult = new EventResult(UNIQUE, false, MAGNITUDE, "");
-        PrisonerResponseEntry responseEntry = new PrisonerResponseEntry(RESPONSE_NEUTRAL,
-              List.of(eventResult),
-              List.of(eventResult));
-        PrisonerEventData eventData = new PrisonerEventData(POISON, List.of(responseEntry));
+        RandomEventResult randomEventResult = new RandomEventResult(UNIQUE, false, MAGNITUDE, "");
+        RandomEventResponseEntry responseEntry = new RandomEventResponseEntry(RESPONSE_NEUTRAL,
+              List.of(randomEventResult),
+              List.of(randomEventResult));
+        RandomEventData eventData = new RandomEventData(POISON, List.of(responseEntry));
 
         Person soldier0 = new Person(mockCampaign);
         Person soldier1 = new Person(mockCampaign);
@@ -813,7 +814,7 @@ class EventEffectsManagerTest {
         when(mockCampaign.getActivePersonnel(false, true)).thenReturn(new ArrayList<>(potentialTargets));
 
         // Act
-        new EventEffectsManager(mockCampaign, eventData, 0, true);
+        new RandomEventEffectsManager(mockCampaign, eventData, 0, true);
 
         // Assert
         int fatiguedCharacters = 0;

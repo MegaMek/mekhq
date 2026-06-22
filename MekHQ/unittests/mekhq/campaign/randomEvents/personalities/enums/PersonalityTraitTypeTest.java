@@ -35,6 +35,7 @@ package mekhq.campaign.randomEvents.personalities.enums;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import mekhq.campaign.randomEvents.personalities.PersonalityTraitType;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 

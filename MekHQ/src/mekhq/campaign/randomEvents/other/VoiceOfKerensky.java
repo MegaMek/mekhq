@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.randomEvents;
+package mekhq.campaign.randomEvents.other;
 
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -49,13 +49,11 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
  * Easter egg event: The Voice of Kerensky.
  *
  * <p>On September 9, 2786, General Aleksandr Kerensky transmitted a broadband microwave radio
- * message from the Pentagon Worlds. Unlike HPG transmissions, this broadcast travels at the speed
- * of light (1 light-year per year). The signal expands as a spherical wavefront from the Pentagon
- * Worlds.</p>
+ * message from the Pentagon Worlds. Unlike HPG transmissions, this broadcast travels at the speed of light (1
+ * light-year per year). The signal expands as a spherical wavefront from the Pentagon Worlds.</p>
  *
  * <p>This event triggers when the player's current system falls within {@value #DETECTION_BAND_LY}
- * light-years of the expanding wavefront on September 9th, the anniversary of the original
- * broadcast.</p>
+ * light-years of the expanding wavefront on September 9th, the anniversary of the original broadcast.</p>
  *
  * @since 0.50.07
  */
@@ -70,21 +68,20 @@ public class VoiceOfKerensky {
     private static final int BROADCAST_DAY = 9;
 
     /**
-     * Approximate center of the Pentagon Worlds in map coordinates (light-years).
-     * Averaged from Arcadia (Clan), Babylon, Circe, Dagda (Clan), and Eden.
+     * Approximate center of the Pentagon Worlds in map coordinates (light-years). Averaged from Arcadia (Clan),
+     * Babylon, Circe, Dagda (Clan), and Eden.
      */
     private static final double PENTAGON_WORLDS_X = -125.491;
     private static final double PENTAGON_WORLDS_Y = 1608.425;
 
     /**
-     * The detection band in light-years. The event can fire when the player's system distance from
-     * the Pentagon Worlds is within this many light-years of the current wavefront radius.
+     * The detection band in light-years. The event can fire when the player's system distance from the Pentagon Worlds
+     * is within this many light-years of the current wavefront radius.
      */
     private static final double DETECTION_BAND_LY = 30.0;
 
     /**
-     * Checks whether the Voice of Kerensky event should trigger on the given date for the given
-     * campaign location.
+     * Checks whether the Voice of Kerensky event should trigger on the given date for the given campaign location.
      *
      * <p>The event triggers when all of the following conditions are met:</p>
      * <ul>
@@ -93,7 +90,7 @@ public class VoiceOfKerensky {
      *     <li>The player's current system is within the detection band of the wavefront</li>
      * </ul>
      *
-     * @param today the current campaign date
+     * @param today         the current campaign date
      * @param currentSystem the player's current planetary system, or {@code null} if unavailable
      *
      * @return {@code true} if the event should trigger
@@ -120,7 +117,7 @@ public class VoiceOfKerensky {
 
         double distanceFromPentagonWorlds = Math.sqrt(
               Math.pow(systemX - PENTAGON_WORLDS_X, 2) +
-              Math.pow(systemY - PENTAGON_WORLDS_Y, 2));
+                    Math.pow(systemY - PENTAGON_WORLDS_Y, 2));
 
         double wavefrontRadius = campaignYear - BROADCAST_YEAR;
 
@@ -137,8 +134,8 @@ public class VoiceOfKerensky {
      * Displays the Voice of Kerensky easter egg dialog.
      *
      * <p>Shows an immersive dialog where the senior command administrator reports picking up
-     * Kerensky's ancient broadcast. The dialog includes the decoded transmission text and an
-     * out-of-character explanation of the easter egg.</p>
+     * Kerensky's ancient broadcast. The dialog includes the decoded transmission text and an out-of-character
+     * explanation of the easter egg.</p>
      *
      * @param campaign the current campaign
      */
@@ -162,7 +159,7 @@ public class VoiceOfKerensky {
 
         double distanceFromPentagonWorlds = Math.sqrt(
               Math.pow(systemX - PENTAGON_WORLDS_X, 2) +
-              Math.pow(systemY - PENTAGON_WORLDS_Y, 2));
+                    Math.pow(systemY - PENTAGON_WORLDS_Y, 2));
         int yearsInTransit = campaign.getGameYear() - BROADCAST_YEAR;
 
         String outOfCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,

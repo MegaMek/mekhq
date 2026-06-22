@@ -67,10 +67,11 @@ import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.rentals.ContractRentalType;
 import mekhq.campaign.mission.rentals.FacilityRentals;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerEvent;
-import mekhq.campaign.randomEvents.prisoners.enums.ResponseQuality;
-import mekhq.campaign.randomEvents.prisoners.records.PrisonerEventData;
+import mekhq.campaign.randomEvents.prisoners.prisonerEvents.PrisonEscapeScenario;
+import mekhq.campaign.randomEvents.randomEventSystem.RandomEventData;
+import mekhq.campaign.randomEvents.randomEventSystem.RandomEventEffectsManager;
+import mekhq.campaign.randomEvents.randomEventSystem.RandomEventResponseQuality;
+import mekhq.campaign.randomEvents.randomEventSystem.RandomEventType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
@@ -325,19 +326,22 @@ public class PrisonerEventManager {
      * @param majorEvent {@code true} if the event is classified as a major event, {@code false} for a minor event.
      */
     private void processRandomEvent(boolean majorEvent) {
-        PrisonerEventData eventData;
+        RandomEventData eventData;
         if (majorEvent) {
             eventData = pickEvent(true);
         } else {
             eventData = pickEvent(false);
         }
-        PrisonerEvent event = eventData.prisonerEvent();
+        RandomEventType event = eventData.randomEventType();
 
         int choiceIndex = getChoiceIndex(event);
 
         boolean isSuccessful = makeEventCheck(eventData, choiceIndex);
 
-        EventEffectsManager effectsManager = new EventEffectsManager(campaign, eventData, choiceIndex, isSuccessful);
+        RandomEventEffectsManager effectsManager = new RandomEventEffectsManager(campaign,
+              eventData,
+              choiceIndex,
+              isSuccessful);
         String eventReport = effectsManager.getEventReport();
 
         showDialog(isSuccessful, choiceIndex, event, eventReport);
@@ -365,13 +369,13 @@ public class PrisonerEventManager {
      *
      * @param isSuccessful {@code true} if the player's response to the event was successful, {@code false} otherwise
      * @param choiceIndex  the index of the response option chosen by the player
-     * @param event        the {@link PrisonerEvent} associated with the dialog
+     * @param event        the {@link RandomEventType} associated with the dialog
      * @param eventReport  additional report or commentary to display in the dialog (maybe {@code null})
      *
      * @author Illiani
      * @since 0.50.06
      */
-    private void showDialog(boolean isSuccessful, int choiceIndex, PrisonerEvent event, String eventReport) {
+    private void showDialog(boolean isSuccessful, int choiceIndex, RandomEventType event, String eventReport) {
         String commanderAddress = campaign.getCommanderAddress();
         String suffix = isSuccessful ? ".success" : ".failure";
         String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
@@ -388,14 +392,14 @@ public class PrisonerEventManager {
      * Displays a dialog to the player (using the campaign context and speaker), allowing them to choose a course of
      * action. Returns the index of the player's selected option.</p>
      *
-     * @param event the {@link PrisonerEvent} for which a response choice is required
+     * @param event the {@link RandomEventType} for which a response choice is required
      *
      * @return the index of the selected response option as chosen by the player in the dialog
      *
      * @author Illiani
      * @since 0.50.06
      */
-    private int getChoiceIndex(PrisonerEvent event) {
+    private int getChoiceIndex(RandomEventType event) {
         String commanderAddress = campaign.getCommanderAddress();
         String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
               "event." + event.name() + ".message",
@@ -574,10 +578,10 @@ public class PrisonerEventManager {
      *
      * @param isMajor {@code true} to select a major event, {@code false} to select a minor event.
      *
-     * @return A randomly selected {@link PrisonerEventData} object representing the event.
+     * @return A randomly selected {@link RandomEventData} object representing the event.
      */
-    private PrisonerEventData pickEvent(boolean isMajor) {
-        List<PrisonerEventData> allMajorEvents = campaign.getRandomEventLibraries().getPrisonerEvents(isMajor);
+    private RandomEventData pickEvent(boolean isMajor) {
+        List<RandomEventData> allMajorEvents = campaign.getRandomEventLibraries().getPrisonerEvents(isMajor);
         Collections.shuffle(allMajorEvents);
         return ObjectUtility.getRandomItem(allMajorEvents);
     }
@@ -593,7 +597,7 @@ public class PrisonerEventManager {
      *
      * @return {@code true} if the player's response is deemed successful, {@code false} otherwise.
      */
-    private boolean makeEventCheck(PrisonerEventData eventData, int choiceIndex) {
+    private boolean makeEventCheck(RandomEventData eventData, int choiceIndex) {
         int responseModifier = 0;
         if (speaker != null) {
             responseModifier = getPersonalityValue(campaign.getCampaignOptions().isUseRandomPersonalities(),
@@ -607,8 +611,8 @@ public class PrisonerEventManager {
             responseModifier = -12; // this deliberately renders the check impossible
         }
 
-        ResponseQuality responseQuality = eventData.responseEntries().get(choiceIndex).quality();
-        switch (responseQuality) {
+        RandomEventResponseQuality randomEventResponseQuality = eventData.responseEntries().get(choiceIndex).quality();
+        switch (randomEventResponseQuality) {
             case RESPONSE_NEUTRAL -> {
             } // No modifier
             case RESPONSE_POSITIVE -> responseModifier += 3;
@@ -788,9 +792,9 @@ public class PrisonerEventManager {
                     }
 
                     prisonerCapacity += unit.getTotalTempCrew() * (isMekHQCaptureStyle ?
-                                              PRISONER_CAPACITY_BATTLE_ARMOR :
-                                              PRISONER_CAPACITY_BATTLE_ARMOR *
-                                              PRISONER_CAPACITY_CAM_OPS_MULTIPLIER);
+                                                                         PRISONER_CAPACITY_BATTLE_ARMOR :
+                                                                         PRISONER_CAPACITY_BATTLE_ARMOR *
+                                                                         PRISONER_CAPACITY_CAM_OPS_MULTIPLIER);
 
                     continue;
                 }
@@ -806,9 +810,9 @@ public class PrisonerEventManager {
                     }
 
                     prisonerCapacity += unit.getTotalTempCrew() * (isMekHQCaptureStyle ?
-                                              PRISONER_CAPACITY_CONVENTIONAL_INFANTRY :
-                                              PRISONER_CAPACITY_CONVENTIONAL_INFANTRY *
-                                              PRISONER_CAPACITY_CAM_OPS_MULTIPLIER);
+                                                                         PRISONER_CAPACITY_CONVENTIONAL_INFANTRY :
+                                                                         PRISONER_CAPACITY_CONVENTIONAL_INFANTRY *
+                                                                         PRISONER_CAPACITY_CAM_OPS_MULTIPLIER);
 
                     continue;
                 }

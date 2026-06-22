@@ -30,60 +30,35 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.randomEvents.prisoners.enums;
+package mekhq.campaign.randomEvents.randomEventSystem;
 
-public enum MobType {
-    SMALL("Mob (Small)", 1, 5),
-    MEDIUM("Mob (Medium)", 6, 10),
-    LARGE("Mob (Large)", 11, 20),
-    HUGE("Mob (Huge)", 21, 30);
-
-    private final String name;
-    private final int minimum;
-    private final int maximum;
+/**
+ * Represents the quality of a response in random events.
+ *
+ * <p>This enumeration defines three levels of response quality, which influence how various
+ * random events and interactions are processed in the campaign. It is used to categorize reactions or results in random
+ * event situations.</p>
+ */
+public enum RandomEventResponseQuality {
+    /**
+     * Represents a neutral response quality.
+     *
+     * <p>Indicates that the response neither has a positive nor a negative influence, but reflects a balanced or
+     * indifferent outcome.</p>
+     */
+    RESPONSE_NEUTRAL,
 
     /**
-     * Constructor for MobType, which assigns attributes to each enum constant.
+     * Represents a positive response quality.
      *
-     * @param name    the name of the mob
-     * @param minimum the minimum value associated with the mob
-     * @param maximum the maximum value associated with the mob
+     * <p>Indicates a favorable interaction or result, often leading to improved outcomes.</p>
      */
-    MobType(String name, int minimum, int maximum) {
-        this.name = name;
-        this.minimum = minimum;
-        this.maximum = maximum;
-    }
+    RESPONSE_POSITIVE,
 
     /**
-     * Gets the name of this mob type.
+     * Represents a negative response quality.
      *
-     * @return the name of the mob
+     * <p>Indicates an unfavorable interaction or result, often leading to deteriorated outcomes.</p>
      */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Gets the minimum value associated with this mob type.
-     *
-     * @return the minimum value
-     */
-    public int getMinimum() {
-        return minimum;
-    }
-
-    /**
-     * Gets the maximum value associated with this mob type.
-     *
-     * @return the maximum value
-     */
-    public int getMaximum() {
-        return maximum;
-    }
-
-    @Override
-    public String toString() {
-        return String.format("%s (Min: %d, Max: %d)", name, minimum, maximum);
-    }
+    RESPONSE_NEGATIVE
 }
