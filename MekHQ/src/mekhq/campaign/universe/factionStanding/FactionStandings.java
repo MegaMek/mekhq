@@ -609,14 +609,16 @@ public class FactionStandings {
         factionCode = convertSpecialFaction(factionCode, gameYear);
 
         double regardValue = Math.clamp(newRegard, MINIMUM_REGARD, maximumRegard);
-        double currentRegard = getRegardForFaction(factionCode, false);
+
+        // We want the true value, adjusted for climate, for reporting purposes
+        double originalRegard = getRegardForFaction(factionCode, true);
 
         factionRegard.put(factionCode, regardValue);
 
-        double change = regardValue - currentRegard;
-
         if (includeReport) {
-            return getRegardChangedReport(change, gameYear, factionCode, regardValue, currentRegard);
+            double change = regardValue - originalRegard;
+            double newRegardAdjustedForClimate = getRegardForFaction(factionCode, true);
+            return getRegardChangedReport(change, gameYear, factionCode, newRegardAdjustedForClimate, originalRegard);
         }
 
         return "";
@@ -694,7 +696,10 @@ public class FactionStandings {
 
         double adjustedDelta = delta * regardMultiplier;
 
+        // We want the current raw value, not including climate as this value will be used to update the regard map
         double originalRegard = getRegardForFaction(factionCode, false);
+        // We also want the true value, adjusted for climate, for reporting purposes
+        double originalRegardAdjustedForClimate = getRegardForFaction(factionCode, true);
 
         double maximumRegard = Objects.equals(campaignFactionCode, factionCode) || campaignFactionCode == null
                                      ? MAXIMUM_SAME_FACTION_REGARD
@@ -703,7 +708,13 @@ public class FactionStandings {
 
         factionRegard.put(factionCode, newRegard);
 
-        return getRegardChangedReport(adjustedDelta, gameYear, factionCode, newRegard, originalRegard);
+        // We want the true value, adjusted for climate, for reporting purposes
+        double newRegardAdjustedForClimate = getRegardForFaction(factionCode, true);
+        return getRegardChangedReport(adjustedDelta,
+              gameYear,
+              factionCode,
+              newRegardAdjustedForClimate,
+              originalRegardAdjustedForClimate);
     }
 
     /**
@@ -1028,8 +1039,8 @@ public class FactionStandings {
      * @param delta          the amount of Regard gained or lost
      * @param gameYear       the current in-game year, used to render the appropriate faction name
      * @param factionCode    unique identifier for the faction whose Regard should be adjusted
-     * @param newRegard      the Regard value after the delta is applied
-     * @param originalRegard the Regard value before the delta is applied
+     * @param newRegard      the Regard value after the delta is applied (usually adjusted for political climate)
+     * @param originalRegard the Regard value before the delta is applied (usually adjusted for political climate)
      *
      * @return a formatted {@link String} describing the regard change, direction, and any milestone transition
      *

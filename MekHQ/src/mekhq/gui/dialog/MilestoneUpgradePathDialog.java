@@ -53,6 +53,7 @@ import megamek.common.util.milestoneReleaseInformation.MilestoneData;
 import megamek.logging.MMLogger;
 import megamek.utilities.ImageUtilities;
 import mekhq.MHQConstants;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
@@ -75,13 +76,14 @@ public class MilestoneUpgradePathDialog {
      *
      * <p>If the dialog is shown, once it has been acknowledged, the application will exit.</p>
      *
+     * @param app                    the application context
      * @param campaign               the {@link Campaign} for which to check upgrade requirements
      * @param currentCampaignVersion the current {@link Version} of the campaign
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public MilestoneUpgradePathDialog(Campaign campaign, Version currentCampaignVersion) {
+    public MilestoneUpgradePathDialog(MekHQ app, Campaign campaign, Version currentCampaignVersion) {
         // Are any upgrades necessary?
         final List<MilestoneData> upgradePath = getUpgradePath(currentCampaignVersion);
         if (upgradePath.isEmpty()) {
@@ -103,7 +105,7 @@ public class MilestoneUpgradePathDialog {
               true);
 
         // If upgrades were necessary, exit the app once the dialog has been confirmed
-        campaign.getApp().exit(false);
+        app.exit(false);
     }
 
     /**

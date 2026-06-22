@@ -48,6 +48,7 @@ import javax.swing.JSpinner.NumberEditor;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.enums.ValidationState;
 import megamek.client.ui.panels.JDisableablePanel;
+import megamek.client.ui.panels.abstractPanels.AbstractScrollablePanel;
 import megamek.common.annotations.Nullable;
 import megamek.common.units.EntityWeightClass;
 import mekhq.MekHQ;
@@ -60,16 +61,14 @@ import mekhq.campaign.universe.enums.BattleMekQualityGenerationMethod;
 import mekhq.campaign.universe.enums.BattleMekWeightClassGenerationMethod;
 import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 import mekhq.campaign.universe.enums.ForceNamingMethod;
-import mekhq.campaign.universe.enums.MysteryBoxType;
 import mekhq.campaign.universe.enums.PartGenerationMethod;
 import mekhq.gui.FileDialogs;
-import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
 import mekhq.gui.displayWrappers.FactionDisplay;
 
 /**
  * @author Justin "Windchild" Bowen
  */
-public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
+public class CompanyGenerationOptionsPanel extends AbstractScrollablePanel {
     // region Variable Declarations
     private final Campaign campaign;
 
@@ -141,17 +140,12 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
     private JSpinner spnNumberReloadsPerWeapon;
     private JCheckBox chkGenerateFractionalMachineGunAmmunition;
 
-    // Contracts
-    private JCheckBox chkSelectStartingContract;
-    private JCheckBox chkStartCourseToContractPlanet;
-
     // Finances
     private JCheckBox chkProcessFinances;
     private JSpinner spnStartingCash;
     private JCheckBox chkRandomizeStartingCash;
     private JSpinner spnRandomStartingCashDiceCount;
     private JSpinner spnMinimumStartingFloat;
-    private JCheckBox chkIncludeInitialContractPayment;
     private JCheckBox chkStartingLoan;
     private JCheckBox chkPayForSetup;
     private JCheckBox chkPayForPersonnel;
@@ -160,16 +154,13 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
     private JCheckBox chkPayForArmour;
     private JCheckBox chkPayForAmmunition;
 
-    // Surprises
-    private JCheckBox chkGenerateSurprises;
-    private JCheckBox chkGenerateMysteryBoxes;
-    private Map<MysteryBoxType, JCheckBox> chkGenerateMysteryBoxTypes;
     // endregion Variable Declarations
 
     // region Constructors
     public CompanyGenerationOptionsPanel(final JFrame frame, final Campaign campaign,
           final @Nullable CompanyGenerationOptions companyGenerationOptions) {
-        super(frame, "CompanyGenerationOptionsPanel", new GridBagLayout());
+        super(frame, MekHQ.getDefaultResourceBundle(),
+              "CompanyGenerationOptionsPanel", new GridBagLayout(), true);
         this.campaign = campaign;
         setTracksViewportWidth(false);
 

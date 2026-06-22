@@ -55,7 +55,7 @@ public class SwitchTabStoryTrigger extends StoryTrigger {
 
     @Override
     protected void execute() {
-        getCampaign().getApp().getCampaigngui().setSelectedTab(tab);
+        getCampaign().getGUI().setSelectedTab(tab);
     }
 
     @Override
