@@ -4879,6 +4879,12 @@ public class Campaign implements ITechManager, IPlace {
             }
         }
         scenarios.remove(scenario.getId());
+
+        // https://github.com/MegaMek/mekhq/pull/7761
+        // there's a bug preventing clearAllFormationsAndPersonnel from removing all scenario links,
+        // hence we have to do an extra clean up here:
+        cleanUp();
+
         MekHQ.triggerEvent(new ScenarioRemovedEvent(scenario));
     }
 
@@ -4891,6 +4897,12 @@ public class Campaign implements ITechManager, IPlace {
         mission.clearScenarios();
 
         missions.remove(mission.getId());
+
+        // https://github.com/MegaMek/mekhq/pull/7761
+        // there's a bug preventing clearAllFormationsAndPersonnel from removing all scenario links,
+        // hence we have to do an extra clean up here:
+        cleanUp();
+
         MekHQ.triggerEvent(new MissionRemovedEvent(mission));
     }
 
@@ -5102,12 +5114,20 @@ public class Campaign implements ITechManager, IPlace {
             for (UUID unitID : orphanFormationUnitIDs) {
                 formation.removeUnit(this, unitID, false);
             }
+
+            int scenarioId = formation.getScenarioId();
+            if ((scenarioId != Scenario.S_DEFAULT_ID) && (getScenario(scenarioId) == null)) {
+                formation.setScenarioId(Scenario.S_DEFAULT_ID, this);
+                LOGGER.error(String.format("Fixing a broken scenario link for formation %s", formation.getName()));
+            }
         }
 
         // clean up units that are assigned to non-existing scenarios
         for (Unit unit : this.getUnits()) {
-            if (this.getScenario(unit.getScenarioId()) == null) {
+            int scenarioId = unit.getScenarioId();
+            if ((scenarioId != Scenario.S_DEFAULT_ID) && (getScenario(scenarioId) == null)) {
                 unit.setScenarioId(Scenario.S_DEFAULT_ID);
+                LOGGER.error(String.format("Fixing a broken scenario link for unit %s", unit.getName()));
             }
         }
     }

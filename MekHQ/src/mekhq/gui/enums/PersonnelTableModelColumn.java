@@ -518,11 +518,7 @@ public enum PersonnelTableModelColumn {
             return "-";
         }
         Scenario scenario = campaign.getScenario(unit.getScenarioId());
-        if (scenario == null) {
-            unit.setScenarioId(Scenario.S_DEFAULT_ID);
-            return "-";
-        }
-        return scenario.getName();
+        return scenario == null ? "-" : scenario.getName();
     }
 
     private static BiFunction<Person, Campaign, String> skillModelExtractor(String skillName) {
