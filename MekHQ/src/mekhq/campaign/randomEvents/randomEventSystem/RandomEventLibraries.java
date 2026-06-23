@@ -41,7 +41,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import mekhq.campaign.randomEvents.prisoners.prisonerEvents.PrisonerEventDataWrapper;
 
 /**
  * A utility class that manages the loading and retrieval of random event data from YAML files. Organizes the events
@@ -105,9 +104,9 @@ public class RandomEventLibraries {
         for (String eventFile : eventFiles) {
             try {
                 // Deserialize YAML into PrisonerEventDataWrapper
-                PrisonerEventDataWrapper wrapper = objectMapper.readValue(
+                RandomEventDataWrapper wrapper = objectMapper.readValue(
                       new File(eventFile),
-                      PrisonerEventDataWrapper.class
+                      RandomEventDataWrapper.class
                 );
 
                 // Access and sort individual events

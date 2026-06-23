@@ -41,11 +41,11 @@ import java.util.List;
 import java.util.Map;
 
 import jakarta.annotation.Nullable;
+import megamek.codeUtilities.StringUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.AttributeCheck;
 import mekhq.campaign.personnel.skills.SkillCheck;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.randomEvents.randomEventSystem.RandomEventData;
 import mekhq.campaign.randomEvents.randomEventSystem.RandomEventResponseEntry;
@@ -105,10 +105,9 @@ public class RandomEventDialog {
         for (int i = 0; i < event.responseEntries().size(); i++) {
             RandomEventResponseEntry response = responseEntries.get(i);
 
-            SkillType skillType = response.skillCheckSkill();
-            if (skillType != null) {
-                String skillCheckSkill = skillType.getName();
-                SkillCheck skillCheck = speaker.checkSkill(skillCheckSkill,
+            String skillName = response.skillCheckSkill();
+            if (!StringUtility.isNullOrBlank(skillName)) {
+                SkillCheck skillCheck = speaker.checkSkill(skillName,
                       isUseAgingEffects,
                       isClanCampaign,
                       today);

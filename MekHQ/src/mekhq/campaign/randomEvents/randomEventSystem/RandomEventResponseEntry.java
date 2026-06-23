@@ -37,8 +37,6 @@ import static mekhq.campaign.personnel.skills.enums.SkillAttribute.ATTRIBUTE_NON
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.annotation.Nullable;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 
 /**
@@ -55,7 +53,7 @@ import mekhq.campaign.personnel.skills.enums.SkillAttribute;
  */
 public record RandomEventResponseEntry(
       RandomEventResponseQuality quality,
-      @Nullable SkillType skillCheckSkill,
+      String skillCheckSkill,
       SkillAttribute abilityCheckType,
       List<RandomEventResult> effectsSuccess,
       List<RandomEventResult> effectsFailure
@@ -67,4 +65,6 @@ public record RandomEventResponseEntry(
         effectsSuccess = new ArrayList<>();
         effectsFailure = new ArrayList<>();
     }
+
+
 }

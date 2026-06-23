@@ -30,17 +30,15 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.randomEvents.prisoners.prisonerEvents;
+package mekhq.campaign.randomEvents.randomEventSystem;
 
 import java.util.List;
-
-import mekhq.campaign.randomEvents.randomEventSystem.RandomEventData;
 
 /**
  * A wrapper class for managing a list of {@link RandomEventData}. This class provides getter and setter methods to
  * access and modify the list of prisoner events.
  */
-public class PrisonerEventDataWrapper {
+public class RandomEventDataWrapper {
     private List<RandomEventData> events;
 
     /**
