@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -30,42 +30,22 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.sorter;
 
-import java.time.LocalDate;
-import java.util.Comparator;
-import java.util.Objects;
+package mekhq.campaign.randomEvents.personalities;
 
-import mekhq.MekHQ;
+public interface PersonalityTrait {
+    /**
+     * @return {@code true} if the personality trait is considered positive, {@code false} otherwise.
+     */
+    boolean isTraitPositive();
 
-public class DateStringComparator implements Comparator<String> {
+    /**
+     * @return {@code true} if the personality trait is considered a major trait, {@code false} otherwise.
+     */
+    boolean isTraitMajor();
 
-    public static final DateStringComparator INSTANCE = new DateStringComparator();
-
-    @Override
-    public int compare(String o1, String o2) {
-        if (Objects.equals(o1, o2)) {
-            return 0;
-        } else if ("-".equals(o1)) {
-            return -1;
-        } else if ("-".equals(o2)) {
-            return 1;
-        }
-
-        LocalDate dateA;
-        LocalDate dateB;
-        try {
-            dateA = MekHQ.getMHQOptions().parseDisplayFormattedDate(o1);
-        } catch (Exception ignored) {
-            return -1;
-        }
-
-        try {
-            dateB = MekHQ.getMHQOptions().parseDisplayFormattedDate(o2);
-        } catch (Exception ignored) {
-            return 1;
-        }
-
-        return dateA.compareTo(dateB);
-    }
+    /**
+     * @return {@code true} if the personality trait is neutral, {@code false} otherwise.
+     */
+    boolean isNone();
 }
