@@ -72,14 +72,16 @@ import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.JumpPath;
+import mekhq.campaign.Personnel;
+import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.location.AcademyCampusLocation;
+import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationDispatch;
-import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.log.PerformanceLogger;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.personnel.Person;
@@ -320,8 +322,9 @@ public class EducationController {
         if (academy.isHomeSchool()) {
             // if the student is being homeschooled, we skip the journey to the 'academy'
             person.setEduEducationStage(EducationStage.EDUCATION);
-            AcademyCampusLocation campusLocation = campaign.getOrCreateLocalCampusLocation(
-                  academy.getSet(), academy.getName());
+            IPlace homeSchoolLocation = findHomeLocation(person, campaign);
+            AcademyCampusLocation campusLocation = campaign.getOrCreateCampusUnderLocation(
+                  academy.getSet(), academy.getName(), homeSchoolLocation);
             person.setParent(campusLocation.getPersonnel());
         } else if (academy.isLocal()) {
             person.setEduEducationStage(EducationStage.JOURNEY_TO_CAMPUS);
@@ -389,7 +392,7 @@ public class EducationController {
         if (academy.isHomeSchool()) {
             person.setEduAcademyName(campaign.getName());
         } else if (academy.isLocal()) {
-            person.setEduAcademyName(generateName(academy, campus));
+            person.setEduAcademyName(generateName(academy, person.getEduAcademySystem()));
         } else {
             person.setEduAcademyName(person.getEduAcademyNameInSet() +
                                            " (" +
@@ -419,8 +422,9 @@ public class EducationController {
 
         if (academy.isHomeSchool()) {
             person.setEduEducationStage(EducationStage.EDUCATION);
-            AcademyCampusLocation campusLocation = campaign.getOrCreateLocalCampusLocation(
-                  academy.getSet(), academy.getName());
+            IPlace homeBase = findHomeLocation(person, campaign);
+            AcademyCampusLocation campusLocation = campaign.getOrCreateCampusUnderLocation(
+                  academy.getSet(), academy.getName(), homeBase);
             person.setParent(campusLocation.getPersonnel());
         } else if (academy.isLocal()) {
             // already at the local campus — restart EDUCATION directly
@@ -654,17 +658,10 @@ public class EducationController {
         campaign.addReport(PERSONNEL,
               getFormattedTextAt(BUNDLE_NAME, "arrived.text", person.getHyperlinkedFullTitle()));
 
-        Academy landingAcademy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
-        AcademyCampusLocation campusLocation;
-        if (landingAcademy != null && landingAcademy.isHomeSchool()) {
-            campusLocation = campaign.getOrCreateLocalCampusLocation(
-                  person.getEduAcademySet(), person.getEduAcademyNameInSet());
-        } else {
-            campusLocation = campaign.getOrCreateCampusLocation(
-                  person.getEduAcademySet(), person.getEduAcademyNameInSet(), person.getEduAcademySystem());
-            if (campusLocation == null) {
-                throw new IllegalStateException("Campus location must exist for system " + person.getEduAcademySystem());
-            }
+        AcademyCampusLocation campusLocation = campaign.getOrCreateCampusLocation(
+              person.getEduAcademySet(), person.getEduAcademyNameInSet(), person.getEduAcademySystem());
+        if (campusLocation == null) {
+            throw new IllegalStateException("Campus location must exist for system " + person.getEduAcademySystem());
         }
         person.setParent(campusLocation.getPersonnel());
         LocationDispatch.removeTravelNode(travelLocation, campaign);
@@ -769,6 +766,18 @@ public class EducationController {
             return;
         }
 
+        if (academy.isLocal()) {
+            // Local academy: the campus is on the person's own system. The return is a 2-day
+            // local transit — no inter-system dispatch needed, and the person stays in their
+            // current base location rather than being moved to main force.
+            person.setEduJourneyTime(2);
+            person.setEduDaysOfTravel(0);
+            campaign.addReport(PERSONNEL, String.format(resources.getString("returningFromSchool.text"),
+                  person.getHyperlinkedFullTitle(), 2));
+            person.setEduEducationStage(EducationStage.JOURNEY_FROM_CAMPUS);
+            return;
+        }
+
         // Capture the academy system before dispatch — dispatchToLocation moves the person out of
         // the campus node, after which getEduAcademySystem() can no longer walk up to the campus
         // and returns null, causing a NPE in getSimplifiedTravelTime.
@@ -806,13 +815,12 @@ public class EducationController {
     }
 
     private static IPlace findHomeLocation(Person person, Campaign campaign) {
-        LocationNode node = person.getLocationNode().getParent();
-        while (node != null) {
-            if (node.getLocatable() instanceof IPlace place
-                      && !(place instanceof AcademyCampusLocation)) {
+        ILocation current = person.getParentLocation();
+        while (current != null) {
+            if (current instanceof IPlace place && !(place instanceof AcademyCampusLocation)) {
                 return place;
             }
-            node = node.getParent();
+            current = current.getParentLocation();
         }
         return campaign;
     }
@@ -846,10 +854,15 @@ public class EducationController {
         AbstractLocation travelLocation = person.getCurrentLocation();
 
         if (!(travelLocation instanceof CurrentLocation currentLocation)) {
-            int travelTime = max(2,
-                  campaign.getSimplifiedTravelTime(campaign.getSystemById(person.getEduAcademySystem())));
-            if (travelTime != person.getEduJourneyTime()) {
-                person.setEduJourneyTime(travelTime);
+            // Local academies are same-system 2-day transits; their travel time must not be
+            // recalculated from the campaign's current position (which may be on a different planet).
+            Academy fallbackAcademy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
+            if (fallbackAcademy == null || !fallbackAcademy.isLocal()) {
+                int travelTime = max(2,
+                      campaign.getSimplifiedTravelTime(campaign.getSystemById(person.getEduAcademySystem())));
+                if (travelTime != person.getEduJourneyTime()) {
+                    person.setEduJourneyTime(travelTime);
+                }
             }
             if (person.getEduDaysOfTravel() >= person.getEduJourneyTime()) {
                 onDayCounterArrival.run();
@@ -882,18 +895,36 @@ public class EducationController {
 
     private static void arriveHome(Campaign campaign, Person person,
           @Nullable CurrentLocation returnLocation) {
-        person.setParent(campaign.getMainForcePersonnel());
+        Academy returningFromAcademy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
+        boolean isLocal = returningFromAcademy != null && returningFromAcademy.isLocal();
+        Personnel arrivingAtPersonnel = isLocal ?
+                                              findPersonnelWhenReturningFromLocal(campaign,
+                                                    person.getEduAcademySystem()) :
+                                              campaign.getMainForcePersonnel();
+        person.setParent(arrivingAtPersonnel);
         person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
 
         for (UUID tagAlong : person.getEduTagAlongs()) {
             Person companion = campaign.getPerson(tagAlong);
             if (companion != null) {
-                companion.setParent(campaign.getMainForcePersonnel());
+                companion.setParent(arrivingAtPersonnel);
                 companion.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
             }
         }
 
         LocationDispatch.removeTravelNode(returnLocation, campaign);
+    }
+
+    private static Personnel findPersonnelWhenReturningFromLocal(Campaign campaign, @Nullable String systemId) {
+        if (systemId != null) {
+            for (PlayerBase base : campaign.getPlayerBases()) {
+                PlanetarySystem system = base.getCurrentSystem();
+                if (system != null && systemId.equals(system.getId())) {
+                    return base.getPersonnel();
+                }
+            }
+        }
+        return campaign.getMainForcePersonnel();
     }
 
     /**

@@ -206,7 +206,10 @@ public class ScenarioObjectiveProcessor {
                     case Preserve:
                         entityMeetsObjective = forceEntityEscape ||
                                                      (!forceEntityDestruction &&
-                                                           (!entityIsDestroyed(entity, opponentHasBattlefieldControl) || entityIsCaptured(entity, opponentHasBattlefieldControl)));
+                                                            (!entityIsDestroyed(entity,
+                                                                  opponentHasBattlefieldControl) ||
+                                                                   entityIsCaptured(entity,
+                                                                         opponentHasBattlefieldControl)));
                         break;
                     case ReachMapEdge:
                         entityMeetsObjective = forceEntityEscape ||
@@ -243,7 +246,7 @@ public class ScenarioObjectiveProcessor {
                 case Capture -> entityIsCaptured(entity, opponentHasBattlefieldControl);
                 case PreventReachMapEdge -> !entityHasReachedDestinationEdge(entity, objective);
                 case Preserve -> !entityIsDestroyed(entity, opponentHasBattlefieldControl)
-                        || entityIsCaptured(entity, opponentHasBattlefieldControl);
+                                       || entityIsCaptured(entity, opponentHasBattlefieldControl);
                 case ReachMapEdge -> entityHasReachedDestinationEdge(entity, objective);
                 default -> false;
             };
@@ -449,13 +452,13 @@ public class ScenarioObjectiveProcessor {
                 break;
             case SupportPointUpdate:
                 if (tracker.getMission() instanceof AtBContract contract) {
-                    if (contract.getStratconCampaignState() != null) {
+                    if (contract.getStratConCampaignState() != null) {
                         int effectMultiplier = effect.effectScaling == EffectScalingType.Fixed ? 1 : scaleFactor;
                         int numSupportPoints = effect.howMuch * effectMultiplier;
                         if (dryRun) {
                             return String.format("%d support points will be added", numSupportPoints);
                         } else {
-                            contract.getStratconCampaignState().changeSupportPoints(numSupportPoints);
+                            contract.getStratConCampaignState().changeSupportPoints(numSupportPoints);
                         }
                     }
                 }

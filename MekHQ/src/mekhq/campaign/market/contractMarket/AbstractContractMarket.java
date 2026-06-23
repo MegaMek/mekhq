@@ -493,44 +493,44 @@ public abstract class AbstractContractMarket {
         contract.setSalvageExchange(false);
         int roll = min(d6(2) + mod, 13);
         if (roll < 2) {
-            contract.setSalvagePct(0);
+            contract.setSalvagePercent(0);
         } else if (roll < 4) {
             contract.setSalvageExchange(true);
             int r;
             do {
                 r = d6(2);
             } while (r < 4);
-            contract.setSalvagePct(min((r - 3) * 10, contractMaxSalvagePercentage));
+            contract.setSalvagePercent(min((r - 3) * 10, contractMaxSalvagePercentage));
         } else {
-            contract.setSalvagePct(min((roll - 3) * 10, contractMaxSalvagePercentage));
+            contract.setSalvagePercent(min((roll - 3) * 10, contractMaxSalvagePercentage));
         }
     }
 
     protected void rollSupportClause(AtBContract contract, int mod) {
         int roll = d6(2) + mod;
         contract.setStraightSupport(0);
-        contract.setBattleLossComp(0);
+        contract.setBattleLossCompensation(0);
         if (roll < 3) {
             contract.setStraightSupport(0);
         } else if (roll < 8) {
             contract.setStraightSupport((roll - 2) * 20);
         } else if (roll == 8) {
-            contract.setBattleLossComp(10);
+            contract.setBattleLossCompensation(10);
         } else {
-            contract.setBattleLossComp(min((roll - 8) * 20, 100));
+            contract.setBattleLossCompensation(min((roll - 8) * 20, 100));
         }
     }
 
     protected void rollTransportClause(AtBContract contract, int mod) {
         int roll = d6(2) + mod;
         if (roll < 2) {
-            contract.setTransportComp(0);
+            contract.setTransportCompensation(0);
         } else if (roll < 6) {
-            contract.setTransportComp((20 + (roll - 2) * 5));
+            contract.setTransportCompensation((20 + (roll - 2) * 5));
         } else if (roll < 10) {
-            contract.setTransportComp((45 + (roll - 6) * 5));
+            contract.setTransportCompensation((45 + (roll - 6) * 5));
         } else {
-            contract.setTransportComp(100);
+            contract.setTransportCompensation(100);
         }
     }
 
@@ -567,11 +567,11 @@ public abstract class AbstractContractMarket {
         boolean isAttacker = !contract.getContractType().isGarrisonType() ||
                                    (contract.getContractType().isReliefDuty() && (d6() < 4)) ||
                                    contract.getEnemy().isRebel();
-        contract.setAttacker(isAttacker);
+        contract.setPlayerAttacker(isAttacker);
     }
 
     protected void setSystemId(AtBContract contract) throws NoContractLocationFoundException {
-        if (contract.isAttacker()) {
+        if (contract.isPlayerAttacker()) {
             contract.setSystemId(RandomFactionGenerator.getInstance()
                                        .getMissionTarget(contract.getEmployerCode(), contract.getEnemyCode()));
         } else {
@@ -622,7 +622,7 @@ public abstract class AbstractContractMarket {
         final Faction employerFaction = contract.getEmployerFaction();
 
         int mod = calculateFactionModifiers(contract.getEmployerFaction());
-        mod += calculateContractTypeModifiers(contract.getContractType(), contract.isAttacker());
+        mod += calculateContractTypeModifiers(contract.getContractType(), contract.isPlayerAttacker());
 
         // The less skilled the player, the easier their contract.
         mod += REGULAR.getExperienceLevel() - averageSkillLevel.getExperienceLevel();
@@ -633,7 +633,7 @@ public abstract class AbstractContractMarket {
         // Apply faction modifiers
         if (employerFaction.isClan()) {
             // Apply Clan clamping
-            if (contract.isAttacker()) {
+            if (contract.isPlayerAttacker()) {
                 if (contract.getAllySkill().ordinal() < VETERAN.ordinal()) {
                     contract.setAllySkill(VETERAN);
                 }
@@ -691,7 +691,7 @@ public abstract class AbstractContractMarket {
         int mod = calculateFactionModifiers(enemyFaction);
 
         // Adjust modifiers based on attack/defense roles
-        if (!contract.isAttacker()) {
+        if (!contract.isPlayerAttacker()) {
             mod += 1;
         }
 
@@ -704,7 +704,7 @@ public abstract class AbstractContractMarket {
         // Apply faction modifiers
         if (enemyFaction.isClan()) {
             // Apply Clan clamping
-            if (!contract.isAttacker()) {
+            if (!contract.isPlayerAttacker()) {
                 if (contract.getEnemySkill().ordinal() < VETERAN.ordinal()) {
                     contract.setEnemySkill(VETERAN);
                 }

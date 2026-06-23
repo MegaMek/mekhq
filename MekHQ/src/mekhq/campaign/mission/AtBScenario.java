@@ -2360,7 +2360,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         }
 
         // Fetch campaign state
-        StratConCampaignState campaignState = contract.getStratconCampaignState();
+        StratConCampaignState campaignState = contract.getStratConCampaignState();
         if (campaignState == null) {
             return null;
         }

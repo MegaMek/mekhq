@@ -320,7 +320,44 @@ public interface ILocation {
         return child.setParent(this);
     }
 
-    /** Walks up via {@link LocationNode#getParent()} until reaching the root node. */
+    /**
+     * Returns {@code true} if this location has a parent in the location tree.
+     *
+     * @return {@code true} if this location's node has a parent node
+     */
+    default boolean isParented() {
+        return hasLocationNode() && getLocationNode().getParent() != null;
+    }
+
+    /**
+     * Returns the parent {@link ILocation} in the location tree, or {@code null} if this location has no parent (it is
+     * a root node).
+     *
+     * @return the parent locatable, or {@code null}
+     */
+    @Nullable
+    default ILocation getParentLocation() {
+        if (!isParented()) {
+            return null;
+        }
+        return getLocationNode().getParent().getLocatable();
+    }
+
+    /**
+     * Returns an immutable snapshot of this location's direct children as {@link ILocation} instances.
+     *
+     * @return the set of child locatables; empty if this location has no node or no children
+     */
+    default Set<ILocation> getChildLocations() {
+        if (!hasLocationNode()) {
+            return Set.of();
+        }
+        return getLocationNode().getChildren().stream()
+                     .map(LocationNode::getLocatable)
+                     .collect(Collectors.toUnmodifiableSet());
+    }
+
+    /** Walks up via parent until reaching the root node. */
     private static LocationNode findRoot(LocationNode node) {
         while (node.getParent() != null) {
             node = node.getParent();

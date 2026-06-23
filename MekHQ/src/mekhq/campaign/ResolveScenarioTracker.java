@@ -1766,7 +1766,7 @@ public class ResolveScenarioTracker {
 
         final boolean isContract = mission instanceof Contract;
         if (isContract) {
-            blc = ((Contract) mission).getBattleLossComp() / 100.0;
+            blc = ((Contract) mission).getBattleLossCompensation() / 100.0;
         }
 
         // now lets update personnel

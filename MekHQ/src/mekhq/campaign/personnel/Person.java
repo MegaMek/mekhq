@@ -144,6 +144,7 @@ import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.personnel.skills.AttributeCheck;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillCheck;
@@ -2759,22 +2760,20 @@ public class Person implements ILocation {
      * Returns the ID of the planetary system where the person's academy campus is located.
      *
      * <p>The primary source is the location tree: this walks the person's parent chain to find
-     * the nearest {@link AcademyCampusLocation}, then returns the system ID from its parent
-     * {@link AbstractLocation} (typically a {@link mekhq.campaign.FixedLocation}).</p>
+     * the nearest {@link AcademyCampusLocation}, then returns the system ID from its parent {@link AbstractLocation}
+     * (typically a {@link mekhq.campaign.FixedLocation}).</p>
      *
      * <p>If no campus node is reachable in the tree — for example, during JOURNEY_FROM_CAMPUS,
-     * a local-academy transit before campus arrival, or when loading a pre-location-tree save
-     * file — this falls back to a transient value populated from the legacy {@code eduAcademySystem}
-     * XML tag.</p>
+     * a local-academy transit before campus arrival, or when loading a pre-location-tree save file — this falls back to
+     * a transient value populated from the legacy {@code eduAcademySystem} XML tag.</p>
      *
      * @return the campus system ID, or {@code null} if not derivable from either source
      */
     public @Nullable String getEduAcademySystem() {
-        LocationNode node = getLocationNode().getParent();
-        while (node != null) {
-            if (node.getLocatable() instanceof AcademyCampusLocation) {
-                LocationNode campusParent = node.getParent();
-                if (campusParent != null && campusParent.getLocatable() instanceof AbstractLocation location) {
+        for (ILocation cursor = getParentLocation(); cursor != null; cursor = cursor.getParentLocation()) {
+            if (cursor instanceof AcademyCampusLocation) {
+                ILocation campusParent = cursor.getParentLocation();
+                if (campusParent instanceof AbstractLocation location) {
                     PlanetarySystem system = location.getCurrentSystem();
                     if (system != null) {
                         return system.getId();
@@ -2782,7 +2781,6 @@ public class Person implements ILocation {
                 }
                 return legacyEduAcademySystem;
             }
-            node = node.getParent();
         }
         return legacyEduAcademySystem;
     }
@@ -5812,8 +5810,7 @@ public class Person implements ILocation {
      * Prepares a skill check based on individually passed options.
      *
      * <p>This method creates a {@code SkillCheck} instance which calculates the target number
-     * for the skill check, based on the person's skill, aging effects, clan campaign rules,
-     * and the current date.</p>
+     * for the skill check, based on the person's skill, aging effects, clan campaign rules, and the current date.</p>
      *
      * @param skillName         the name of the skill being checked, corresponding to a {@link SkillType}
      * @param isUseAgingEffects if {@code true}, considers aging effects during the check
@@ -5840,6 +5837,35 @@ public class Person implements ILocation {
     public SkillCheck checkSkill(String skillName, Campaign campaign) {
         return new SkillCheck(this, skillName, campaign.getCampaignOptions().isUseAgeEffects(),
               campaign.isClanCampaign(), campaign.getLocalDate());
+    }
+
+    /**
+     * Prepares an attribute check.
+     *
+     * <p>This method creates an {@link AttributeCheck} instance which calculates the target number
+     * for the attribute check.</p>
+     *
+     * @param attribute the {@link SkillAttribute} to be checked
+     *
+     * @return prepared attribute check
+     */
+    public AttributeCheck checkAttribute(SkillAttribute attribute) {
+        return new AttributeCheck(this, attribute);
+    }
+
+    /**
+     * Prepares a double attribute check.
+     *
+     * <p>This method creates an {@link AttributeCheck} instance which calculates the target number
+     * for the attribute check.</p>
+     *
+     * @param firstAttribute  first {@link SkillAttribute} to be checked
+     * @param secondAttribute second {@link SkillAttribute} to be checked
+     *
+     * @return prepared attribute check
+     */
+    public AttributeCheck checkAttributes(SkillAttribute firstAttribute, SkillAttribute secondAttribute) {
+        return new AttributeCheck(this, firstAttribute, secondAttribute);
     }
 
     /**
@@ -6129,6 +6155,15 @@ public class Person implements ILocation {
 
     public void changeCurrentEdge(final int amount) {
         atowAttributes.changeCurrentEdge(amount);
+    }
+
+    public void spendEdge() {
+        if (getCurrentEdge() > 0) {
+            atowAttributes.changeCurrentEdge(-1);
+            MekHQ.triggerEvent(new PersonChangedEvent(this));
+        } else {
+            LOGGER.error("Trying to spend edge, but it is at {}", getCurrentEdge(), new IllegalArgumentException());
+        }
     }
 
     /**
@@ -7620,6 +7655,15 @@ public class Person implements ILocation {
         return injuries.stream()
                      .filter(i -> !i.getSubType().isPermanentModification())
                      .collect(Collectors.toList());
+    }
+
+    public boolean hasProstheticInjuryNoImplant(BodyLocation location) {
+        for (Injury injury : getInjuriesByLocation(location)) {
+            if (injury.getSubType().isProsthetic()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public List<Injury> getNonPermanentInjuries() {
@@ -9379,8 +9423,7 @@ public class Person implements ILocation {
 
     @Override
     public boolean setParent(ILocation parent) {
-        LocationNode parentNode = getLocationNode().getParent();
-        ILocation oldParent = parentNode != null ? parentNode.getLocatable() : null;
+        ILocation oldParent = getParentLocation();
         if (ILocation.super.setParent(parent)) {
             if (oldParent instanceof Personnel personnel) {
                 personnel.remove(getId());

@@ -72,13 +72,13 @@ public class MoraleBar extends JPanel {
      * colors are deliberately deep and well separated so that adjacent segments remain easy to tell apart.
      */
     private static final Color[] MORALE_GRADIENT = {
-            new Color(0x12, 0x7C, 0x1E), // deep green - lowest enemy morale, most favourable for the player
-            new Color(0x36, 0xB3, 0x2B), // green
-            new Color(0x8C, 0xC6, 0x1A), // lime
-            new Color(0xE8, 0xC4, 0x0A), // gold
-            new Color(0xF2, 0x86, 0x00), // orange
-            new Color(0xD2, 0x44, 0x10), // red-orange
-            new Color(0xA8, 0x12, 0x12) // deep red - highest enemy morale, most dangerous for the player
+          new Color(0x12, 0x7C, 0x1E), // deep green - lowest enemy morale, most favourable for the player
+          new Color(0x36, 0xB3, 0x2B), // green
+          new Color(0x8C, 0xC6, 0x1A), // lime
+          new Color(0xE8, 0xC4, 0x0A), // gold
+          new Color(0xF2, 0x86, 0x00), // orange
+          new Color(0xD2, 0x44, 0x10), // red-orange
+          new Color(0xA8, 0x12, 0x12) // deep red - highest enemy morale, most dangerous for the player
     };
 
     /**
@@ -145,7 +145,7 @@ public class MoraleBar extends JPanel {
         final int horizontalPadding = UIUtil.scaleForGUI(40);
         final int verticalPadding = UIUtil.scaleForGUI(6);
         panel.setBorder(BorderFactory.createEmptyBorder(verticalPadding, horizontalPadding, verticalPadding,
-                horizontalPadding));
+              horizontalPadding));
 
         final MoraleDisplay display = getMoraleDisplay(contract);
         final MoraleBar moraleBar = new MoraleBar(contract.getMoraleLevel(), display.label());
@@ -175,9 +175,9 @@ public class MoraleBar extends JPanel {
     public static @Nonnull MoraleDisplay getMoraleDisplay(@Nonnull final AtBContract contract) {
         final AtBMoraleLevel level = contract.getMoraleLevel();
         if ((contract.getContractType().isGarrisonDuty() || contract.getContractType().isRetainer()) &&
-                level.isRouted()) {
+                  level.isRouted()) {
             return new MoraleDisplay(getTextAt(RESOURCE_BUNDLE, "txtGarrisonMoraleRouted.text"),
-                    getTextAt(RESOURCE_BUNDLE, "txtGarrisonMoraleRouted.tooltip"));
+                  getTextAt(RESOURCE_BUNDLE, "txtGarrisonMoraleRouted.tooltip"));
         }
         return new MoraleDisplay(level.toString(), level.getToolTipText());
     }

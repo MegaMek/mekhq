@@ -124,6 +124,18 @@ public final class PersonnelTab extends CampaignGuiTab {
     // endregion Constructors
 
     @Override
+    public void addNotify() {
+        super.addNotify();
+        GUIPreferences.getInstance().addPreferenceChangeListener(scalingChangeListener);
+    }
+
+    @Override
+    public void removeNotify() {
+        GUIPreferences.getInstance().removePreferenceChangeListener(scalingChangeListener);
+        super.removeNotify();
+    }
+
+    @Override
     public MHQTabType tabType() {
         return MHQTabType.PERSONNEL;
     }
@@ -312,7 +324,7 @@ public final class PersonnelTab extends CampaignGuiTab {
         personnelSorter = new TableRowSorter<>(personModel);
         final ArrayList<SortKey> sortKeys = new ArrayList<>();
         for (final PersonnelTableModelColumn column : PersonnelTableModel.PERSONNEL_COLUMNS) {
-            final Comparator<?> comparator = column.getComparator(getCampaign());
+            final Comparator<?> comparator = column.getComparator();
             personnelSorter.setComparator(column.ordinal(), comparator);
             final SortOrder sortOrder = column.getDefaultSortOrder();
             if (sortOrder != null) {
@@ -357,18 +369,6 @@ public final class PersonnelTab extends CampaignGuiTab {
         PersonnelTableMouseAdapter.connect(getCampaignGui(), personnelTable, personModel, splitPersonnel);
 
         filterPersonnel();
-    }
-
-    @Override
-    public void activateTab() {
-        super.activateTab();
-        GUIPreferences.getInstance().addPreferenceChangeListener(scalingChangeListener);
-    }
-
-    @Override
-    public void deactivateTab() {
-        super.deactivateTab();
-        GUIPreferences.getInstance().removePreferenceChangeListener(scalingChangeListener);
     }
 
     private DefaultComboBoxModel<PersonnelFilter> createPersonGroupModel() {
@@ -463,7 +463,8 @@ public final class PersonnelTab extends CampaignGuiTab {
             final TableColumn tableColumn = columnModel.getColumnByModelIndex(column.ordinal());
             tableColumn.setCellRenderer(getPersonModel().getRenderer(choicePersonView.getSelectedItem()));
             tableColumn.setPreferredWidth(column.getWidth());
-            columnModel.setColumnVisible(tableColumn, column.isVisible(getCampaign(), view, getPersonnelTable()));
+            columnModel.setColumnVisible(tableColumn, column.isVisible(getCampaign(), view, getPersonnelTable(),
+                  personModel.isLoadAssignmentFromMarket(), personModel.isGroupByUnit()));
         }
     }
 

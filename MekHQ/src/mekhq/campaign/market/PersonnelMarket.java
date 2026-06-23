@@ -99,13 +99,11 @@ public class PersonnelMarket {
 
     public PersonnelMarket() {
         method = new PersonnelMarketDisabled();
-        MekHQ.registerHandler(this);
     }
 
     public PersonnelMarket(Campaign c) {
         generatePersonnelForDay(c);
         setType(c.getCampaignOptions().getPersonnelMarketName());
-        MekHQ.registerHandler(this);
     }
 
     /**
