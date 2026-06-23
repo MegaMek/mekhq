@@ -30,17 +30,17 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.randomEvents.prisoners.prisonerEvents;
+package mekhq.campaign.randomEvents.prisoners;
 
 import static java.io.File.separator;
 import static megamek.common.board.Board.START_SW;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.personnel.enums.PersonnelRole.SOLDIER;
 import static mekhq.campaign.personnel.skills.SkillType.S_SMALL_ARMS;
-import static mekhq.campaign.randomEvents.prisoners.prisonerEvents.MobType.HUGE;
-import static mekhq.campaign.randomEvents.prisoners.prisonerEvents.MobType.LARGE;
-import static mekhq.campaign.randomEvents.prisoners.prisonerEvents.MobType.MEDIUM;
-import static mekhq.campaign.randomEvents.prisoners.prisonerEvents.MobType.SMALL;
+import static mekhq.campaign.randomEvents.prisoners.MobType.HUGE;
+import static mekhq.campaign.randomEvents.prisoners.MobType.LARGE;
+import static mekhq.campaign.randomEvents.prisoners.MobType.MEDIUM;
+import static mekhq.campaign.randomEvents.prisoners.MobType.SMALL;
 import static mekhq.campaign.stratCon.StratConContractInitializer.getUnoccupiedCoords;
 import static mekhq.campaign.stratCon.StratConRulesManager.generateExternalScenario;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;

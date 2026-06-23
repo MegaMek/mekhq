@@ -34,7 +34,7 @@ package mekhq.campaign.randomEvents.prisoners.enums;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import mekhq.campaign.randomEvents.prisoners.prisonerEvents.MobType;
+import mekhq.campaign.randomEvents.prisoners.MobType;
 import org.junit.jupiter.api.Test;
 
 /**

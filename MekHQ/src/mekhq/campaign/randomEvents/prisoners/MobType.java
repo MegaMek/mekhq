@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.randomEvents.prisoners.prisonerEvents;
+package mekhq.campaign.randomEvents.prisoners;
 
 public enum MobType {
     SMALL("Mob (Small)", 1, 5),

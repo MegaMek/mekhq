@@ -68,7 +68,6 @@ import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.rentals.ContractRentalType;
 import mekhq.campaign.mission.rentals.FacilityRentals;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.randomEvents.prisoners.prisonerEvents.PrisonEscapeScenario;
 import mekhq.campaign.randomEvents.randomEventSystem.RandomEventData;
 import mekhq.campaign.randomEvents.randomEventSystem.RandomEventEffectsManager;
 import mekhq.campaign.randomEvents.randomEventSystem.RandomEventResponseQuality;
