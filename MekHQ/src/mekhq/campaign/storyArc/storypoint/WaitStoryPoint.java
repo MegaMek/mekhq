@@ -81,7 +81,7 @@ public class WaitStoryPoint extends StoryPoint {
         // convert number of days to an actual date that we can check
         date = getCampaign().getLocalDate().plusDays(days);
         // refresh for objectives
-        getCampaign().getApp().getCampaigngui().refreshAllTabs();
+        getCampaign().getGUI().refreshAllTabs();
     }
 
     public LocalDate getDate() {

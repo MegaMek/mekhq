@@ -412,7 +412,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
     }
 
     @Override
-    public Warehouse getWarehouse() {
+    public @Nullable Warehouse getWarehouse() {
         IPlace place = getPlace();
         return place != null ? place.getWarehouse() : campaign.getWarehouse();
     }

@@ -324,7 +324,7 @@ public final class PersonnelTab extends CampaignGuiTab {
         personnelSorter = new TableRowSorter<>(personModel);
         final ArrayList<SortKey> sortKeys = new ArrayList<>();
         for (final PersonnelTableModelColumn column : PersonnelTableModel.PERSONNEL_COLUMNS) {
-            final Comparator<?> comparator = column.getComparator(getCampaign());
+            final Comparator<?> comparator = column.getComparator();
             personnelSorter.setComparator(column.ordinal(), comparator);
             final SortOrder sortOrder = column.getDefaultSortOrder();
             if (sortOrder != null) {
@@ -463,7 +463,8 @@ public final class PersonnelTab extends CampaignGuiTab {
             final TableColumn tableColumn = columnModel.getColumnByModelIndex(column.ordinal());
             tableColumn.setCellRenderer(getPersonModel().getRenderer(choicePersonView.getSelectedItem()));
             tableColumn.setPreferredWidth(column.getWidth());
-            columnModel.setColumnVisible(tableColumn, column.isVisible(getCampaign(), view, getPersonnelTable()));
+            columnModel.setColumnVisible(tableColumn, column.isVisible(getCampaign(), view, getPersonnelTable(),
+                  personModel.isLoadAssignmentFromMarket(), personModel.isGroupByUnit()));
         }
     }
 

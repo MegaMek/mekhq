@@ -419,7 +419,7 @@ public class CamOpsSalvageUtilities {
             campaign.addReport(PERSONNEL,
                   getFormattedTextAt(RESOURCE_BUNDLE, "CamOpsSalvageUtilities.reroll",
                         victim.getHyperlinkedName()));
-            victim.changeCurrentEdge(-1);
+            victim.spendEdge();
 
             int roll = d6(2);
             return roll != 2;
