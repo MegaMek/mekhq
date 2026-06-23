@@ -48,6 +48,7 @@ import static megamek.common.units.UnitType.*;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.enums.DailyReportType.BATTLE;
 import static mekhq.campaign.mission.AtBScenario.selectBotTeamCommanders;
+import static mekhq.campaign.mission.RandomFactionCamouflage.pickRandomCamouflage;
 import static mekhq.campaign.mission.Scenario.T_GROUND;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_CIVILIANS;
@@ -1123,7 +1124,7 @@ public class AtBDynamicScenarioFactory {
         generatedForce.setFixedEntityList(generatedEntities);
         setBotForceParameters(generatedForce, forceTemplate, forceAlignment, contract);
         if (unidentifiedThirdPartyPresent) {
-            generatedForce.setCamouflage(AtBContract.pickRandomCamouflage(currentDate.getYear(), factionCode));
+            generatedForce.setCamouflage(pickRandomCamouflage(currentDate.getYear(), factionCode));
         }
 
         boolean isDeployOffBoard = forceTemplate.getDeployOffboard();
@@ -1361,7 +1362,7 @@ public class AtBDynamicScenarioFactory {
      */
     private static @Nullable StratConTrackState getStratconTrackState(AtBDynamicScenario scenario,
           AtBContract contract) {
-        List<StratConTrackState> tracks = contract.getStratconCampaignState().getTracks();
+        List<StratConTrackState> tracks = contract.getStratConCampaignState().getTracks();
         StratConTrackState scenarioHomeTrack = null;
 
         for (StratConTrackState track : tracks) {
@@ -4504,7 +4505,7 @@ public class AtBDynamicScenarioFactory {
 
         if (campaign.getCampaignOptions().isUseStratCon()) {
             AtBContract contract = scenario.getContract(campaign);
-            StratConCampaignState campaignState = contract.getStratconCampaignState();
+            StratConCampaignState campaignState = contract.getStratConCampaignState();
 
             for (StratConTrackState track : campaignState.getTracks()) {
                 StratConScenario stratconScenario = track.getBackingScenariosMap().get(scenario.getId());

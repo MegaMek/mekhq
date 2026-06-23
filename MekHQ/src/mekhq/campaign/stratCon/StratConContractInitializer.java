@@ -520,7 +520,7 @@ public class StratConContractInitializer {
 
             if (template == null) {
                 LOGGER.error("Unable to place objective scenario on track {}, as no scenario template was available.",
-                    trackState.getDisplayableName());
+                      trackState.getDisplayableName());
                 continue;
             }
 
@@ -682,8 +682,8 @@ public class StratConContractInitializer {
             // scenarios for this contract
             // and set their backing scenario pointers to the existing scenarios stored in
             // the campaign for this contract
-            if (atbContract.getStratconCampaignState() != null) {
-                for (StratConTrackState track : atbContract.getStratconCampaignState().getTracks()) {
+            if (atbContract.getStratConCampaignState() != null) {
+                for (StratConTrackState track : atbContract.getStratConCampaignState().getTracks()) {
                     for (StratConScenario scenario : track.getScenarios().values()) {
                         Scenario campaignScenario = campaign.getScenario(scenario.getBackingScenarioID());
 

@@ -146,7 +146,7 @@ public class CustomizeMissionDialog extends JDialog {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(lblType, gridBagConstraints);
 
-        txtType.setText(mission.getType());
+        txtType.setText(mission.getContractTypeName());
         txtType.setName("txtType");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -235,7 +235,7 @@ public class CustomizeMissionDialog extends JDialog {
 
     private void btnOKActionPerformed(ActionEvent evt) {
         mission.setName(txtName.getText());
-        mission.setType(txtType.getText());
+        mission.setContractTypeName(txtType.getText());
 
         PlanetarySystem canonSystem = Systems.getInstance()
                                             .getSystemByName(suggestPlanet.getText(), campaign.getLocalDate());
@@ -248,7 +248,7 @@ public class CustomizeMissionDialog extends JDialog {
             // history of planet
         }
 
-        mission.setDesc(txtDesc.getText());
+        mission.setDescription(txtDesc.getText());
         if (newMission) {
             campaign.addMission(mission);
         }

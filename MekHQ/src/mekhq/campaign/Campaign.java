@@ -52,7 +52,7 @@ import static mekhq.campaign.force.Formation.FORMATION_ORIGIN;
 import static mekhq.campaign.force.Formation.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.force.FormationType.STANDARD;
 import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
-import static mekhq.campaign.mission.AtBContract.pickRandomCamouflage;
+import static mekhq.campaign.mission.RandomFactionCamouflage.pickRandomCamouflage;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_A;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_INTERSTELLAR_NEGOTIATOR;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_LOGISTICIAN;
@@ -104,6 +104,7 @@ import megamek.codeUtilities.ObjectUtility;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.Player;
 import megamek.common.SimpleTechLevel;
+import megamek.common.TargetRollModifier;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.Gender;
@@ -182,6 +183,7 @@ import mekhq.campaign.market.ShoppingList;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBScenario;
@@ -260,6 +262,7 @@ import mekhq.campaign.universe.selectors.factionSelectors.AbstractFactionSelecto
 import mekhq.campaign.universe.selectors.planetSelectors.AbstractPlanetSelector;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
+import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
@@ -384,6 +387,8 @@ public class Campaign implements ITechManager, IPlace {
     private int mashTheatreCapacity;
     private int repairBaysRented;
 
+    private Person genericAcquisitionPerson;
+
     // this is updated and used per gaming session, it is enabled/disabled via the Campaign options we're re-using
     // the LogEntry class used to store Personnel entries
     public LinkedList<LogEntry> inMemoryLogHistory = new LinkedList<>();
@@ -415,13 +420,7 @@ public class Campaign implements ITechManager, IPlace {
 
     private CampaignOptions campaignOptions;
     private RandomSkillPreferences randomSkillPreferences = new RandomSkillPreferences();
-    private MekHQ app;
-
-    /**
-     * This is not unused even if IDEA says it is. This event processor subscribes to various events that need to be
-     * applied to Campaign.
-     */
-    private transient CampaignEventProcessor campaignEventProcessor;
+    private CampaignGUI gui;
 
     private ShoppingList shoppingList;
 
@@ -711,18 +710,15 @@ public class Campaign implements ITechManager, IPlace {
         this.humanResources = humanResources;
     }
 
-    /**
-     * @return the app
-     */
-    public MekHQ getApp() {
-        return app;
+    public void setGUI(CampaignGUI gui) {
+        this.gui = gui;
     }
 
     /**
-     * @param app the app to set
+     * @return the {@link CampaignGUI}
      */
-    public void setApp(MekHQ app) {
-        this.app = app;
+    public CampaignGUI getGUI() {
+        return gui;
     }
 
     /**
@@ -863,9 +859,8 @@ public class Campaign implements ITechManager, IPlace {
         this.isOverridingCommandCircuitRequirements = isOverridingCommandCircuitRequirements;
     }
 
-    public boolean isUseCommandCircuitForContract(Contract contract) {
-        if (contract instanceof AtBContract atBContract) {
-
+    public boolean isUseCommandCircuitForContract(AbstractMissionTransition abstractMission) {
+        if (abstractMission instanceof AtBContract atBContract) {
             return FactionStandingUtilities.isUseCommandCircuit(
                   isOverridingCommandCircuitRequirements, gmMode,
                   campaignOptions.isUseFactionStandingCommandCircuitSafe(),
@@ -1130,10 +1125,6 @@ public class Campaign implements ITechManager, IPlace {
             initUnitGenerator();
         }
         return unitGenerator;
-    }
-
-    public void setCampaignEventProcessor(CampaignEventProcessor processor) {
-        campaignEventProcessor = processor;
     }
 
     public void setAtBConfig(AtBConfiguration config) {
@@ -1766,13 +1757,13 @@ public class Campaign implements ITechManager, IPlace {
         }
         setParent(location);
         // After reparenting, old has one fewer child. Remove it only if nothing else remains under it.
-        if (old != null && old != location && old.getLocationNode().getChildren().isEmpty()) {
+        if (old != null && old != location && old.getChildLocations().isEmpty()) {
             locations.remove(old);
         }
     }
 
     public void addLocation(AbstractLocation location) {
-        if (location != null) {
+        if (location != null && !locations.contains(location)) {
             locations.add(location);
         }
     }
@@ -1805,8 +1796,8 @@ public class Campaign implements ITechManager, IPlace {
             if (location instanceof CurrentLocation) {
                 location.setParent(null);
             } else if (location instanceof FixedLocation) {
-                for (LocationNode child : new ArrayList<>(location.getLocationNode().getChildren())) {
-                    if (child.getLocatable() instanceof AcademyCampusLocation campus) {
+                for (ILocation child : new ArrayList<>(location.getChildLocations())) {
+                    if (child instanceof AcademyCampusLocation campus) {
                         campus.setParent(null);
                     }
                 }
@@ -1819,11 +1810,16 @@ public class Campaign implements ITechManager, IPlace {
         return Collections.unmodifiableList(locations);
     }
 
+
     public void addPlayerBase(@Nullable PlayerBase base) {
         if (base == null) {
             return;
         }
         playerBases.add(base);
+        ILocation parent = base.getParent();
+        if (parent instanceof AbstractLocation abstractLocation) {
+            addLocation(abstractLocation);
+        }
         MekHQ.triggerEvent(new LocationAddedEvent(base));
     }
 
@@ -1877,8 +1873,8 @@ public class Campaign implements ITechManager, IPlace {
             if (!fixedLocation.getCurrentSystem().getId().equals(systemId)) {
                 continue;
             }
-            for (LocationNode child : fixedLocation.getLocationNode().getChildren()) {
-                if (child.getLocatable() instanceof AcademyCampusLocation campus
+            for (ILocation child : fixedLocation.getChildLocations()) {
+                if (child instanceof AcademyCampusLocation campus
                           && academySet.equals(campus.getAcademySet())
                           && academyName.equals(campus.getAcademyName())) {
                     return campus;
@@ -1889,6 +1885,27 @@ public class Campaign implements ITechManager, IPlace {
     }
 
     /**
+     * Returns the existing {@link AcademyCampusLocation} parented under {@code parent}, creating it on demand if it
+     * does not yet exist.
+     *
+     * <p>Used for home-school campuses that travel with the campaign or a player base rather than being anchored to a
+     * fixed planetary system.</p>
+     */
+    public AcademyCampusLocation getOrCreateCampusUnderLocation(String academySet, String academyName,
+          ILocation parent) {
+        for (ILocation child : parent.getChildLocations()) {
+            if (child instanceof AcademyCampusLocation campus
+                      && academySet.equals(campus.getAcademySet())
+                      && academyName.equals(campus.getAcademyName())) {
+                return campus;
+            }
+        }
+        AcademyCampusLocation campus = new AcademyCampusLocation(academySet, academyName);
+        LocationNode.LocationManager.setLocation(campus, parent);
+        return campus;
+    }
+
+    /**
      * Returns the existing local {@link AcademyCampusLocation} (home-school or unit-education) for the given campus
      * parented directly under this campaign, creating it on demand if it does not yet exist.
      *
@@ -1896,8 +1913,8 @@ public class Campaign implements ITechManager, IPlace {
      * Use {@link #getOrCreateCampusLocation} for academies at a fixed planetary system.</p>
      */
     public AcademyCampusLocation getOrCreateLocalCampusLocation(String academySet, String academyName) {
-        for (LocationNode child : locationNode.getChildren()) {
-            if (child.getLocatable() instanceof AcademyCampusLocation campus
+        for (ILocation child : getChildLocations()) {
+            if (child instanceof AcademyCampusLocation campus
                       && academySet.equals(campus.getAcademySet())
                       && academyName.equals(campus.getAcademyName())) {
                 return campus;
@@ -1943,12 +1960,43 @@ public class Campaign implements ITechManager, IPlace {
     }
 
     @Override
+    public void onArrival(Campaign campaign, boolean isSilentProcessing) {
+        // We are intentionally using the passed in Campaign. When Campaign is split into Force and Campaign, Force
+        // will be an IPlace, so this method will move to Force, but we'll still need Campaign for some information.
+
+        // This should be before inoculations so that we can correctly read the TO&E
+        if (!campaign.getAutomatedMothballUnits().isEmpty()) {
+            performAutomatedActivation(campaign);
+        }
+
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        if (campaignOptions.isUseRandomDiseases() && campaignOptions.isUseAlternativeAdvancedMedical()) {
+            if (getParentLocation() instanceof AbstractLocation loc) {
+                loc.checkForDiseaseOrBioweaponOutbreaks(campaign, campaign.getLocalDate());
+            }
+        }
+
+        // Inoculations (generic IPlace behavior)
+        IPlace.super.onArrival(campaign, isSilentProcessing);
+
+        if (getParentLocation() instanceof AbstractLocation loc) {
+            loc.testForEarlyArrival(campaign);
+        }
+
+        // We've just stopped traveling, so we should see if there are any local applicants.
+        if (!HumanResources.isUsingLegacyPersonnelMarket(campaign.getCampaignOptions())) {
+            campaign.refreshApplicants(true);
+            CampaignNewDayManager.showRarePersonnelDialog(campaign, false);
+        }
+    }
+
+    @Override
     public void processArrivals(Campaign campaign) {
         if (locationNode == null) {
             return;
         }
-        for (LocationNode child : new ArrayList<>(locationNode.getChildren())) {
-            if (!(child.getLocatable() instanceof CurrentLocation travelLocation)) {
+        for (ILocation child : new ArrayList<>(getChildLocations())) {
+            if (!(child instanceof CurrentLocation travelLocation)) {
                 continue;
             }
             if (!travelLocation.isOnPlanet()) {
@@ -2215,7 +2263,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all hangars across all locations associated with this campaign.
-     *                   TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     *                                     TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
      */
     public Hangar getAllHangar() {
         return units;
@@ -2237,6 +2285,18 @@ public class Campaign implements ITechManager, IPlace {
 
     public Collection<Unit> getUnits() {
         return getHangar().getUnits();
+    }
+
+    /**
+     * @return All player's units in {@code campaign}, not just the ones located with the main force.
+     */
+    public Collection<Unit> getAllUnits() {
+        List<Unit> units = new ArrayList<>();
+        for (AbstractLocation location : getLocations()) {
+            Set<Unit> found = location.fetchUnitsAtLocation();
+            units.addAll(found);
+        }
+        return units;
     }
 
     /**
@@ -2851,7 +2911,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all warehouses across all locations associated with this campaign.
-     *                   TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
+     *                                     TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
      */
     public Warehouse getAllWarehouse() {
         return parts;
@@ -3696,12 +3756,9 @@ public class Campaign implements ITechManager, IPlace {
             return PartAcquisitionResult.PartInherentFailure;
         }
 
-        target = system.getPrimaryPlanet()
-                       .getAcquisitionMods(target,
-                             getLocalDate(),
-                             getCampaignOptions(),
-                             getFaction(),
-                             acquisition.getTechBase() == TechBase.CLAN);
+        List<TargetRollModifier> acquisitionMods = system.getPrimaryPlanet().getAcquisitionMods(
+              getLocalDate(), getCampaignOptions(), getFaction(), acquisition.getTechBase() == TechBase.CLAN);
+        acquisitionMods.forEach(target::addModifier);
 
         if (target.getValue() == TargetRoll.IMPOSSIBLE) {
             if (getCampaignOptions().isPlanetAcquisitionVerbose()) {
@@ -3783,7 +3840,7 @@ public class Campaign implements ITechManager, IPlace {
      * @return a boolean indicating whether the attempt to acquire equipment was
      *         successful.
      */
-    public boolean acquireEquipment(IAcquisitionWork acquisition, Person person) {
+    public boolean acquireEquipment(IAcquisitionWork acquisition, @Nullable Person person) {
         return acquireEquipment(acquisition, person, null, -1);
     }
 
@@ -3804,7 +3861,7 @@ public class Campaign implements ITechManager, IPlace {
      * @return a boolean indicating whether the attempt to acquire equipment was
      *         successful.
      */
-    private boolean acquireEquipment(IAcquisitionWork acquisition, Person person, PlanetarySystem system,
+    private boolean acquireEquipment(IAcquisitionWork acquisition, @Nullable Person person, PlanetarySystem system,
           int transitDays) {
         boolean found = false;
         String report = "";
@@ -3821,12 +3878,9 @@ public class Campaign implements ITechManager, IPlace {
         }
 
         if (null != system) {
-            target = system.getPrimaryPlanet()
-                           .getAcquisitionMods(target,
-                                 getLocalDate(),
-                                 getCampaignOptions(),
-                                 getFaction(),
-                                 acquisition.getTechBase() == TechBase.CLAN);
+            List<TargetRollModifier> acquisitionMods = system.getPrimaryPlanet().getAcquisitionMods(
+                  getLocalDate(), getCampaignOptions(), getFaction(), acquisition.getTechBase() == TechBase.CLAN);
+            acquisitionMods.forEach(target::addModifier);
         }
         report += "attempts to find " + acquisition.getAcquisitionName();
 
@@ -3864,7 +3918,7 @@ public class Campaign implements ITechManager, IPlace {
                   (roll < target.getValue()) &&
                   hasEdgeTrigger &&
                   (person.getCurrentEdge() > 0)) {
-            person.changeCurrentEdge(-1);
+            person.spendEdge();
             roll = d6(2);
             report += " <b>failed!</b> but uses Edge to reroll...getting a " + roll + ": ";
         }
@@ -4165,7 +4219,7 @@ public class Campaign implements ITechManager, IPlace {
                           (roll < target.getValue()) &&
                           tech.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_FAILED_REFIT) &&
                           (tech.getCurrentEdge() > 0)) {
-                    tech.changeCurrentEdge(-1);
+                    tech.spendEdge();
                     roll = tech.isRightTechTypeFor(theRefit) ? d6(2) : Utilities.roll3d6();
                     // This is needed to update the edge values of individual crewmen
                     if (tech.isEngineer()) {
@@ -4393,7 +4447,7 @@ public class Campaign implements ITechManager, IPlace {
                              ((tech.getExperienceLevel(this, false, true) == SkillType.EXP_LEGENDARY) ||
                                     tech.getPrimaryRole().isVesselCrew())) // For vessel crews
                             && (roll < target.getValue())) {
-                tech.changeCurrentEdge(-1);
+                tech.spendEdge();
                 roll = tech.isRightTechTypeFor(partWork) ? d6(2) : Utilities.roll3d6();
                 // This is needed to update the edge values of individual crewmen
                 if (tech.isEngineer()) {
@@ -4841,12 +4895,18 @@ public class Campaign implements ITechManager, IPlace {
             // run through the StratCon campaign state where applicable and remove the
             // "parent" scenario as well
             if ((mission instanceof AtBContract) &&
-                      (((AtBContract) mission).getStratconCampaignState() != null) &&
+                      (((AtBContract) mission).getStratConCampaignState() != null) &&
                       (scenario instanceof AtBDynamicScenario)) {
-                ((AtBContract) mission).getStratconCampaignState().removeStratConScenario(scenario.getId());
+                ((AtBContract) mission).getStratConCampaignState().removeStratConScenario(scenario.getId());
             }
         }
         scenarios.remove(scenario.getId());
+
+        // https://github.com/MegaMek/mekhq/pull/7761
+        // there's a bug preventing clearAllFormationsAndPersonnel from removing all scenario links,
+        // hence we have to do an extra clean up here:
+        cleanUp();
+
         MekHQ.triggerEvent(new ScenarioRemovedEvent(scenario));
     }
 
@@ -4859,6 +4919,12 @@ public class Campaign implements ITechManager, IPlace {
         mission.clearScenarios();
 
         missions.remove(mission.getId());
+
+        // https://github.com/MegaMek/mekhq/pull/7761
+        // there's a bug preventing clearAllFormationsAndPersonnel from removing all scenario links,
+        // hence we have to do an extra clean up here:
+        cleanUp();
+
         MekHQ.triggerEvent(new MissionRemovedEvent(mission));
     }
 
@@ -4901,8 +4967,8 @@ public class Campaign implements ITechManager, IPlace {
 
         // clear out StratCon formation assignments
         for (AtBContract contract : getActiveAtBContracts()) {
-            if (contract.getStratconCampaignState() != null) {
-                for (StratConTrackState track : contract.getStratconCampaignState().getTracks()) {
+            if (contract.getStratConCampaignState() != null) {
+                for (StratConTrackState track : contract.getStratConCampaignState().getTracks()) {
                     track.unassignFormation(fid);
                 }
             }
@@ -5070,12 +5136,20 @@ public class Campaign implements ITechManager, IPlace {
             for (UUID unitID : orphanFormationUnitIDs) {
                 formation.removeUnit(this, unitID, false);
             }
+
+            int scenarioId = formation.getScenarioId();
+            if ((scenarioId != Scenario.S_DEFAULT_ID) && (getScenario(scenarioId) == null)) {
+                formation.setScenarioId(Scenario.S_DEFAULT_ID, this);
+                LOGGER.error(String.format("Fixing a broken scenario link for formation %s", formation.getName()));
+            }
         }
 
         // clean up units that are assigned to non-existing scenarios
         for (Unit unit : this.getUnits()) {
-            if (this.getScenario(unit.getScenarioId()) == null) {
+            int scenarioId = unit.getScenarioId();
+            if ((scenarioId != Scenario.S_DEFAULT_ID) && (getScenario(scenarioId) == null)) {
                 unit.setScenarioId(Scenario.S_DEFAULT_ID);
+                LOGGER.error(String.format("Fixing a broken scenario link for unit %s", unit.getName()));
             }
         }
     }
@@ -5818,7 +5892,7 @@ public class Campaign implements ITechManager, IPlace {
                 continue;
             }
             // Skip locations parented to another node — they are serialized inside their parent's XML.
-            if (location.getLocationNode().getParent() != null) {
+            if (location.isParented()) {
                 continue;
             }
             location.writeToXML(writer, indent);
@@ -6883,24 +6957,40 @@ public class Campaign implements ITechManager, IPlace {
      *
      * @return a {@link TargetRoll} indicating the outcome or difficulty of the acquisition attempt
      */
-    public TargetRoll getTargetForAcquisition(final IAcquisitionWork acquisition, final @Nullable Person person) {
-        return getTargetForAcquisition(acquisition, person, false, false);
+    public TargetRoll getTargetForAcquisition(IAcquisitionWork acquisition, @Nullable Person person) {
+        return getTargetForAcquisition(acquisition, person, false);
     }
 
     /**
-     * Calculates the target roll for acquiring the specified item or unit while optionally ignoring real acquisitions
-     * personnel. A synthetic person with baseline skill is used if personnel are ignored.
+     * Calculates the target roll for acquiring the specified item or unit while ignoring real acquisition
+     * personnel. A synthetic person with baseline skill is used.
      *
-     * @param acquisition                 the {@link IAcquisitionWork} describing the part, supply, or unit to be
-     *                                    acquired
-     * @param ignoreAcquisitionsPersonnel if {@code true}, ignores available personnel and uses a synthetic baseline
-     *                                    person for the roll
+     * @param acquisition the {@link IAcquisitionWork} describing the part, supply, or unit to be acquired
      *
      * @return a {@link TargetRoll} indicating the outcome or difficulty of the acquisition attempt
      */
-    public TargetRoll getTargetForAcquisition(final IAcquisitionWork acquisition,
-          final boolean ignoreAcquisitionsPersonnel) {
-        return getTargetForAcquisition(acquisition, null, false, ignoreAcquisitionsPersonnel);
+    public TargetRoll getTargetForGenericAcquisition(final IAcquisitionWork acquisition) {
+        return getTargetForAcquisition(acquisition, getGenericAcquisitionPerson(), false);
+    }
+
+
+    private Person getGenericAcquisitionPerson() {
+        if (genericAcquisitionPerson == null) {
+            genericAcquisitionPerson = createGenericAcquisitionPerson(S_NEGOTIATION, S_ADMIN, S_TECH_MECHANIC);
+        }
+        return genericAcquisitionPerson;
+    }
+
+    /**
+     * Creates a person used for generic acquisitions. See {@link #getTargetForGenericAcquisition(IAcquisitionWork)}
+     * @param skills the list of skills to prepopulate
+     */
+    private Person createGenericAcquisitionPerson(String... skills) {
+        Person person = new Person(this);
+        Arrays.stream(skills).forEach(skillName -> {
+            person.addSkill(skillName, SkillType.getType(skillName).getRegularLevel(), 0);
+        });
+        return person;
     }
 
     public PlanetaryConditions getCurrentPlanetaryConditions(Scenario scenario) {
@@ -6958,72 +7048,46 @@ public class Campaign implements ITechManager, IPlace {
      *                                    if no one is available/allowed, or if personnel are ignored
      * @param checkDaysToWait             if {@code true}, checks for shopping list/cooldown period before allowing the
      *                                    roll
-     * @param ignoreAcquisitionsPersonnel if {@code true}, constructs a synthetic person with default skill for the
-     *                                    roll, ignoring actual acquisitions personnel and their availability
      *
      * @return a {@link TargetRoll} describing the acquisition result, either as a constant value
      *       (automatic/impossible/fail) or a calculated result reflecting all applicable rules and modifiers
      */
-    public TargetRoll getTargetForAcquisition(final IAcquisitionWork acquisition, @Nullable Person person,
-          final boolean checkDaysToWait, final boolean ignoreAcquisitionsPersonnel) {
-        if (getCampaignOptions().getAcquisitionType() == AcquisitionsType.AUTOMATIC) {
-            return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "Automatic Success");
-        }
-
-        final AcquisitionsType acquisitionsType = campaignOptions.getAcquisitionType();
-        String fixedSkillName = "";
-        boolean isAnyTech = false;
-
-        switch (acquisitionsType) {
-            case ADMINISTRATION -> fixedSkillName = S_ADMIN;
-            case ANY_TECH -> isAnyTech = true;
-            case AUTOMATIC -> {
-                return null;
-            }
-            case NEGOTIATION -> fixedSkillName = S_NEGOTIATION;
-        }
-
-        if (ignoreAcquisitionsPersonnel) {
-            person = new Person(this);
-            fixedSkillName = acquisitionsType == AcquisitionsType.ANY_TECH ? S_TECH_MECHANIC : fixedSkillName;
-            SkillType skillType = getType(fixedSkillName);
-            if (skillType != null) {
-                int regularLevel = skillType.getRegularLevel();
-                person.addSkill(fixedSkillName, regularLevel, 0);
-            }
-        }
-
-        if (null == person) {
+    public TargetRoll getTargetForAcquisition(IAcquisitionWork acquisition, @Nullable Person person,
+          boolean checkDaysToWait) {
+        if (person == null) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE,
                   "Your procurement personnel have used up all their acquisition attempts for this period");
-        }
-
-        final Skill skill = isAnyTech ? person.getBestTechSkill() : person.getSkillForWorkingOn(fixedSkillName);
-        if (skill == null) {
-            return new TargetRoll(TargetRoll.AUTOMATIC_FAIL, "No skill");
-        }
-        if (null != getShoppingList().getShoppingItem(acquisition.getNewEquipment()) && checkDaysToWait) {
+        } else if (campaignOptions.getAcquisitionType() == AcquisitionsType.AUTOMATIC) {
+            return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "Automatic Success");
+        } else if (null != getShoppingList().getShoppingItem(acquisition.getNewEquipment()) && checkDaysToWait) {
             return new TargetRoll(TargetRoll.AUTOMATIC_FAIL,
                   "You must wait until the new cycle to check for this part. Further" +
                         " attempts will be added to the shopping list.");
-        }
-        if (acquisition.getTechBase() == TechBase.CLAN && !getCampaignOptions().isAllowClanPurchases()) {
+        } else if (acquisition.getTechBase() == TechBase.CLAN && !getCampaignOptions().isAllowClanPurchases()) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "You cannot acquire clan parts");
-        }
-        if (acquisition.getTechBase() == TechBase.IS && !getCampaignOptions().isAllowISPurchases()) {
+        } else if (acquisition.getTechBase() == TechBase.IS && !getCampaignOptions().isAllowISPurchases()) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "You cannot acquire inner sphere parts");
-        }
-        if (getCampaignOptions().getTechLevel() < Utilities.getSimpleTechLevel(acquisition.getTechLevel())) {
+        } else if (getCampaignOptions().getTechLevel() < Utilities.getSimpleTechLevel(acquisition.getTechLevel())) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "You cannot acquire parts of this tech level");
-        }
-        if (getCampaignOptions().isLimitByYear() &&
+        } else if (getCampaignOptions().isLimitByYear() &&
                   !acquisition.isIntroducedBy(getGameYear(), useClanTechBase(), getTechFaction())) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "It has not been invented yet!");
-        }
-        if (getCampaignOptions().isDisallowExtinctStuff() &&
+        } else if (getCampaignOptions().isDisallowExtinctStuff() &&
                   (acquisition.isExtinctIn(getGameYear(), useClanTechBase(), getTechFaction()) ||
                          acquisition.getAvailability().equals(AvailabilityValue.X))) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "It is extinct!");
+        }
+
+        // if you change skill mappings here, make sure to update createGenericAcquisitionPerson,
+        // so that it has skills for any case of campaignOptions.getAcquisitionType()
+        Skill skill = switch (campaignOptions.getAcquisitionType()) {
+            case ADMINISTRATION -> person.getSkillForWorkingOn(S_ADMIN);
+            case NEGOTIATION -> person.getSkillForWorkingOn(S_NEGOTIATION);
+            case ANY_TECH -> person.getBestTechSkill();
+            case AUTOMATIC -> null; // should never happen, because we auto-succeed above
+        };
+        if (skill == null) {
+            return new TargetRoll(TargetRoll.AUTOMATIC_FAIL, "No skill");
         }
 
         SkillModifierData skillModifierData = person.getSkillModifierData(campaignOptions.isUseAgeEffects(),
@@ -7345,7 +7409,7 @@ public class Campaign implements ITechManager, IPlace {
      * <p>Eligible personnel must have either a primary or secondary role as a medic, must not be currently deployed,
      * and must be employed.</p>
      *
-     * <p></p>For each eligible person, their total skill level in {@link SkillType#S_MEDTECH} (including all
+     * <p>For each eligible person, their total skill level in {@link SkillType#S_MEDTECH} (including all
      * modifiers) is added to the running total.</p>
      *
      * @return The total number of medics available.
@@ -8227,8 +8291,8 @@ public class Campaign implements ITechManager, IPlace {
             // Then, we check if the salvage percent is less than the percent salvaged by
             // the
             // unit in question. If it is, then they owe the assigner some cash
-            if (getCampaignOptions().isOverageRepaymentInFinalPayment() && (contract.getSalvagePct() < 100.0)) {
-                final double salvagePercent = contract.getSalvagePct() / 100.0;
+            if (getCampaignOptions().isOverageRepaymentInFinalPayment() && (contract.getSalvagePercent() < 100.0)) {
+                final double salvagePercent = contract.getSalvagePercent() / 100.0;
                 final Money maxSalvage = contract.getSalvagedByEmployer()
                                                .multipliedBy(salvagePercent / (1 - salvagePercent));
                 if (contract.getSalvagedByUnit().isGreaterThan(maxSalvage)) {

@@ -169,7 +169,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
                           person.getHyperlinkedFullTitle());
                     getCampaign().addReport(MEDICAL, report);
                 } else {
-                    new AdvancedReplacementLimbDialog(getCampaign(), person, false);
+                    new AdvancedReplacementLimbDialog(getCampaign(), getCampaignGui().getIconPackage(), person, false);
                 }
             }
         });
@@ -207,8 +207,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
                         Person selectedPatient = listAssignedPatient.getSelectedValue();
                         if (selectedPatient != null) {
                             MedicalViewDialog medicalViewDialog = new MedicalViewDialog(null,
-                                  getCampaign(),
-                                  selectedPatient);
+                                  getCampaign(), selectedPatient, getCampaignGui().getIconPackage());
                             medicalViewDialog.setVisible(true);
                         }
                     }
@@ -257,8 +256,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
                         Person selectedPatient = listUnassignedPatient.getSelectedValue();
                         if (selectedPatient != null) {
                             MedicalViewDialog medicalViewDialog = new MedicalViewDialog(null,
-                                  getCampaign(),
-                                  selectedPatient);
+                                  getCampaign(), selectedPatient, getCampaignGui().getIconPackage());
                             medicalViewDialog.setVisible(true);
                         }
                     }

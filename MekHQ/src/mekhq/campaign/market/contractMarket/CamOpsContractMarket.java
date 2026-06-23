@@ -185,10 +185,14 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         ContractTerms terms = getContractTerms(campaign, contract);
 
         switch (clause) {
-            case CLAUSE_COMMAND -> setCommandRights(contract, terms, contract.getCommandRoll() + change);
-            case CLAUSE_SALVAGE -> setSalvageRights(contract, terms, contract.getSalvageRoll() + change);
-            case CLAUSE_SUPPORT -> setSupportRights(contract, terms, contract.getSupportRoll() + change);
-            case CLAUSE_TRANSPORT -> setTransportRights(contract, terms, contract.getTransportRoll() + change);
+            case CLAUSE_COMMAND ->
+                  setCommandRights(contract, terms, contract.getContractNegotiationCommandRoll() + change);
+            case CLAUSE_SALVAGE ->
+                  setSalvageRights(contract, terms, contract.getContractNegotiationSalvageRoll() + change);
+            case CLAUSE_SUPPORT ->
+                  setSupportRights(contract, terms, contract.getContractNegotiationSupportRoll() + change);
+            case CLAUSE_TRANSPORT ->
+                  setTransportRights(contract, terms, contract.getContractNegotiationTransportRoll() + change);
             default -> throw new IllegalStateException("Unexpected clause when rerolling contract clause: " + clause);
         }
         clauseMods.get(contract.getId()).rerollsUsed[clause]++;
@@ -253,12 +257,12 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         contractIds.put(lastId, contract);
         // Step 1: Determine Employer
         Faction employer = determineEmployer(campaign, reputation.getReputationModifier(), hiringHallModifiers);
-        contract.setEmployerCode(employer.getShortName(), campaign.getGameYear());
+        contract.updateEmployer(employer.getShortName(), campaign.getGameYear());
         if (employer.isMercenary()) {
             contract.setMercSubcontract(true);
         }
         // Step 2: Determine the mission type
-        contract.setContractType(determineMission(campaign, employer, reputation.getReputationModifier()));
+        contract.setContractTypeAndName(determineMission(campaign, employer, reputation.getReputationModifier()));
         ContractTerms contractTerms = getContractTerms(campaign, contract);
         setEnemyCode(contract);
         setAttacker(contract);
@@ -294,7 +298,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
               contract.getContractType().isCadreDuty(), false, varianceFactor));
         contract.setRequiredCombatElements(calculateRequiredCombatElements(campaign, contract, false, varianceFactor));
         // Step 8: Calculate the payment
-        contract.setMultiplier(calculatePaymentMultiplier(campaign, contract));
+        contract.setPaymentMultiplier(calculatePaymentMultiplier(campaign, contract));
         // Step 9: Determine parts availability
         // TODO: Rewrite this to be CamOps-compliant
         contract.setPartsAvailabilityLevel(contract.getContractType().calculatePartsAvailabilityLevel());
@@ -304,7 +308,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         contract.setName(String.format("%s - %s - %s %s",
               contract.getStartDate()
                     .format(DateTimeFormatter.ofPattern("yyyy").withLocale(MekHQ.getMHQOptions().getDateLocale())),
-              contract.getEmployer(),
+              contract.getEmployerName(),
               contract.getSystem().getName(contract.getStartDate()),
               contract.getContractType()));
 
@@ -438,34 +442,34 @@ public class CamOpsContractMarket extends AbstractContractMarket {
     }
 
     private void setCommandRights(AtBContract contract, ContractTerms terms, int roll) {
-        contract.setCommandRoll(roll);
+        contract.setContractNegotiationCommandRoll(roll);
         contract.setCommandRights(terms.getCommandRights(roll));
     }
 
     private void setSalvageRights(AtBContract contract, ContractTerms terms, int roll) {
-        contract.setSalvageRoll(roll);
+        contract.setContractNegotiationSalvageRoll(roll);
         if (terms.isSalvageExchange(roll)) {
             contract.setSalvageExchange(true);
         } else {
             contract.setSalvageExchange(false);
-            contract.setSalvagePct(terms.getSalvagePercentage(roll));
+            contract.setSalvagePercent(terms.getSalvagePercentage(roll));
         }
     }
 
     private void setSupportRights(AtBContract contract, ContractTerms terms, int roll) {
-        contract.setSupportRoll(roll);
+        contract.setContractNegotiationSupportRoll(roll);
         if (terms.isStraightSupport(roll)) {
             contract.setStraightSupport(terms.getSupportPercentage(roll));
         } else if (terms.isBattleLossComp(roll)) {
-            contract.setBattleLossComp(terms.getSupportPercentage(roll));
+            contract.setBattleLossCompensation(terms.getSupportPercentage(roll));
         } else {
             contract.setStraightSupport(0);
         }
     }
 
     private void setTransportRights(AtBContract contract, ContractTerms terms, int roll) {
-        contract.setTransportRoll(roll);
-        contract.setTransportComp(terms.getTransportTerms(roll));
+        contract.setContractNegotiationTransportRoll(roll);
+        contract.setTransportCompensation(terms.getTransportTerms(roll));
     }
 
     private static class HiringHallModifiers {

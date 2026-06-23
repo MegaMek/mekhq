@@ -40,6 +40,8 @@ import mekhq.MekHQ;
 
 public class DateStringComparator implements Comparator<String> {
 
+    public static final DateStringComparator INSTANCE = new DateStringComparator();
+
     @Override
     public int compare(String o1, String o2) {
         if (Objects.equals(o1, o2)) {

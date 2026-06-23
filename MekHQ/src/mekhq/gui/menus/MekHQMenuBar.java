@@ -34,9 +34,6 @@
 
 package mekhq.gui.menus;
 
-import static mekhq.gui.CampaignGUI.MAX_QUANTITY_SPINNER;
-
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -58,8 +55,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
 import javax.xml.parsers.DocumentBuilder;
 
 import megamek.Version;
@@ -113,7 +108,6 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Systems;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.CampaignGuiTab;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog;
 import mekhq.gui.dialog.*;
@@ -146,22 +140,6 @@ public class MekHQMenuBar extends JMenuBar {
     private JMenuItem miCompanyGenerator;
     private JMenuItem miPlanetarySystemEditor;
 
-    // Blob crew menu references for visibility control
-    private JMenu menuSoldierPool;
-    private JMenu menuBattleArmorPool;
-    private JMenu menuVehicleCrewGroundPool;
-    private JMenu menuVehicleCrewVTOLPool;
-    private JMenu menuVehicleCrewNavalPool;
-    private JMenu menuVesselPilotPool;
-    private JMenu menuVesselGunnerPool;
-    private JMenu menuVesselCrewPool;
-
-    private static final List<PersonnelRole> BLOB_CREW_ROLES = List.of(
-          PersonnelRole.SOLDIER, PersonnelRole.BATTLE_ARMOUR,
-          PersonnelRole.VEHICLE_CREW_GROUND, PersonnelRole.VEHICLE_CREW_VTOL,
-          PersonnelRole.VEHICLE_CREW_NAVAL, PersonnelRole.VESSEL_PILOT,
-          PersonnelRole.VESSEL_GUNNER, PersonnelRole.VESSEL_CREW);
-
     /**
      * This is used to initialize the top menu bar. All the top level menu bar and {@link MHQTabType} mnemonics must be
      * unique, as they are both accessed through the same GUI page. The following mnemonic keys are being used as of
@@ -187,8 +165,18 @@ public class MekHQMenuBar extends JMenuBar {
         add(initViewMenu());
         add(initManageCampaignMenu());
         add(initHelpMenu());
+    }
 
+    @Override
+    public void addNotify() {
+        super.addNotify();
         MekHQ.registerHandler(this);
+    }
+
+    @Override
+    public void removeNotify() {
+        MekHQ.unregisterHandler(this);
+        super.removeNotify();
     }
 
     private MekHQ getApplication() {
@@ -225,19 +213,15 @@ public class MekHQMenuBar extends JMenuBar {
             if (file == null) {
                 return;
             }
-            new DataLoadingDialog(getFrame(), getApplication(), file).setVisible(true);
-            // Unregister event handlers for CampaignGUI and tabs
-            for (int i = 0; i < getTabMain().getTabCount(); i++) {
-                if (getTabMain().getComponentAt(i) instanceof CampaignGuiTab) {
-                    ((CampaignGuiTab) getTabMain().getComponentAt(i)).deactivateTab();
+            getFrame().setVisible(false); // hide CampaignGUI
+            // load the campaign
+            new DataLoadingDialog(getFrame(), getApplication(), file, campaign -> {
+                if (campaign != null) {
+                    getApplication().activateCampaign(campaign);
+                } else {
+                    getFrame().setVisible(true); // return back to CampaignGUI if loading fails
                 }
-            }
-            MekHQ.unregisterHandler(this);
-            MekHQ.unregisterHandler(getGui());
-            // check for a loaded story arc and unregister that handler as well
-            if (null != getCampaign().getStoryArc()) {
-                MekHQ.unregisterHandler(getCampaign().getStoryArc());
-            }
+            }).setVisible(true);
         });
         menuLoad.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, InputEvent.CTRL_DOWN_MASK));
         menuFile.add(menuLoad);
@@ -362,7 +346,7 @@ public class MekHQMenuBar extends JMenuBar {
         // endregion XML Export
 
         JMenuItem miExportCampaignSubset = createMenuItem("miExportCampaignSubset.text", KeyEvent.VK_S, evt -> {
-            CampaignExportWizard cew = new CampaignExportWizard(getCampaign());
+            CampaignExportWizard cew = new CampaignExportWizard(getApplication(), getCampaign());
             cew.display(CampaignExportWizard.CampaignExportWizardState.ForceSelection);
         });
         menuExport.add(miExportCampaignSubset);
@@ -485,210 +469,15 @@ public class MekHQMenuBar extends JMenuBar {
         menuRecruitment.add(menuCivilianRecruitment);
         menuMarket.add(menuRecruitment);
 
-        menuMarket.add(initTempPoolMenu());
+        menuMarket.add(new TemporaryPersonnelManagementMenu(getCampaign(), (title, maxCount) -> {
+            PopupValueChoiceDialog dialog = new PopupValueChoiceDialog(getFrame(), true, title, 1, 0, maxCount);
+            dialog.setVisible(true);
+            return dialog.getValue();
+        }));
 
         return menuMarket;
     }
 
-    /**
-     * The Astech Pool menu uses the following Mnemonic keys as of 19-March-2020:
-     * B, E, F, H
-     * The Medic Pool menu uses the following Mnemonic keys as of 19-March-2020:
-     * B, E, H, R
-     */
-    private JMenu initTempPoolMenu() {
-        JMenu menuTempPool = new JMenu(getTextAt("menuTempPool.text"));
-
-        JMenuItem miTempPoolFullStrength = createMenuItem("miTempPoolFullStrength.text", KeyEvent.VK_UNDEFINED,
-              evt -> bringAllTempCrewsToFullStrength());
-        menuTempPool.add(miTempPoolFullStrength);
-
-        JMenuItem miTempPoolReleaseAll = createMenuItem("miTempPoolReleaseAll.text", KeyEvent.VK_UNDEFINED,
-              evt -> releaseAllTempCrews());
-        menuTempPool.add(miTempPoolReleaseAll);
-
-        JMenuItem miTempPoolReleaseSurplus = createMenuItem("miTempPoolReleaseSurplus.text", KeyEvent.VK_UNDEFINED,
-              evt -> releaseSurplusTempCrews());
-        menuTempPool.add(miTempPoolReleaseSurplus);
-
-        menuTempPool.addMenuListener(menuListenerFor(() -> {
-            // For Astech/Medic: need + pool = what would be needed if there were no temp pool at all.
-            // resetAsTechPool/resetMedicPool is a no-op only when pool == max(0, real need).
-            int astechPool = getCampaign().getTemporaryAsTechPool();
-            int astechIdealPool = Math.max(0, getCampaign().getAsTechNeed() + astechPool);
-            int medicPool = getCampaign().getTemporaryMedicPool();
-            int medicIdealPool = Math.max(0, getCampaign().getMedicsNeed() + medicPool);
-
-            boolean anyNeed = (astechPool != astechIdealPool) || (medicPool != medicIdealPool) || anyBlobRoleHasNeed();
-            setMenuItemState(miTempPoolFullStrength, anyNeed, getTextAt("miTempPoolFullStrength.disabledTip"));
-
-            boolean anyPool = (astechPool > 0) || (medicPool > 0) || anyBlobRoleHasPool();
-            setMenuItemState(miTempPoolReleaseAll, anyPool, getTextAt("miTempPoolReleaseAll.disabledTip"));
-
-            boolean anySurplus =
-                  (astechPool > astechIdealPool) || (medicPool > medicIdealPool) || anyBlobRoleHasSurplus();
-            setMenuItemState(miTempPoolReleaseSurplus, anySurplus, getTextAt("miTempPoolReleaseSurplus.disabledTip"));
-        }));
-
-        menuTempPool.addSeparator();
-
-        // region Astech Pool
-        JMenu menuAstechPool = new JMenu(getTextAt("menuAstechPool.text"));
-        menuAstechPool.setMnemonic(KeyEvent.VK_A);
-
-        JMenuItem miHireAstechs = createMenuItem("miHireAstechs.text", KeyEvent.VK_H, evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true, getTextAt("popupHireAstechsNum.text"), 1, 0, MAX_QUANTITY_SPINNER);
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().increaseAsTechPool(popupValueChoiceDialog.getValue());
-            }
-        });
-        menuAstechPool.add(miHireAstechs);
-
-        JMenuItem miFireAstechs = createMenuItem("miFireAstechs.text", KeyEvent.VK_E, evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true, getTextAt("popupFireAstechsNum.text"), 1, 0, getCampaign().getTemporaryAsTechPool());
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().decreaseAsTechPool(popupValueChoiceDialog.getValue());
-            }
-        });
-        menuAstechPool.add(miFireAstechs);
-
-        JMenuItem miFullStrengthAstechs = createMenuItem("miFullStrengthAstechs.text", KeyEvent.VK_B,
-              evt -> getCampaign().resetAsTechPool());
-        menuAstechPool.add(miFullStrengthAstechs);
-
-        JMenuItem miFireAllAstechs = createMenuItem("miFireAllAstechs.text", KeyEvent.VK_R,
-              evt -> getCampaign().emptyAsTechPool());
-        menuAstechPool.add(miFireAllAstechs);
-
-        menuAstechPool.addMenuListener(menuListenerFor(() -> {
-            int pool = getCampaign().getTemporaryAsTechPool();
-            int need = getCampaign().getAsTechNeed();
-            // need + pool = what would be needed if there were no temp pool at all;
-            // the action is a no-op only when pool == max(0, that real need)
-            int idealPool = Math.max(0, need + pool);
-            setMenuItemState(miFireAstechs, pool > 0, getTextAt("miFireAstechs.disabledTip"));
-            setMenuItemState(miFullStrengthAstechs, pool != idealPool, getTextAt("miFullStrengthAstechs.disabledTip"));
-            setMenuItemState(miFireAllAstechs, pool > 0, getTextAt("miFireAllAstechs.disabledTip"));
-        }));
-
-        menuTempPool.add(menuAstechPool);
-        // endregion Astech Pool
-
-        // region Medic Pool
-        JMenu menuMedicPool = new JMenu(getTextAt("menuMedicPool.text"));
-        menuMedicPool.setMnemonic(KeyEvent.VK_M);
-
-        JMenuItem miHireMedics = createMenuItem("miHireMedics.text", KeyEvent.VK_H, evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true, getTextAt("popupHireMedicsNum.text"), 1, 0, MAX_QUANTITY_SPINNER);
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().increaseMedicPool(popupValueChoiceDialog.getValue());
-            }
-        });
-        menuMedicPool.add(miHireMedics);
-
-        JMenuItem miFireMedics = createMenuItem("miFireMedics.text", KeyEvent.VK_E, evt -> {
-            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(getFrame(),
-                  true, getTextAt("popupFireMedicsNum.text"), 1, 0, getCampaign().getTemporaryMedicPool());
-            popupValueChoiceDialog.setVisible(true);
-            if (popupValueChoiceDialog.getValue() >= 0) {
-                getCampaign().decreaseMedicPool(popupValueChoiceDialog.getValue());
-            }
-        });
-        menuMedicPool.add(miFireMedics);
-
-        JMenuItem miFullStrengthMedics = createMenuItem("miFullStrengthMedics.text", KeyEvent.VK_B,
-              evt -> getCampaign().resetMedicPool());
-        menuMedicPool.add(miFullStrengthMedics);
-
-        JMenuItem miFireAllMedics = createMenuItem("miFireAllMedics.text", KeyEvent.VK_R,
-              evt -> getCampaign().emptyMedicPool());
-        menuMedicPool.add(miFireAllMedics);
-
-        menuMedicPool.addMenuListener(menuListenerFor(() -> {
-            int pool = getCampaign().getTemporaryMedicPool();
-            int need = getCampaign().getMedicsNeed();
-            // need + pool = what would be needed if there were no temp pool at all;
-            // the action is a no-op only when pool == max(0, that real need)
-            int idealPool = Math.max(0, need + pool);
-            setMenuItemState(miFireMedics, pool > 0,
-                  getTextAt("miFireMedics.disabledTip"));
-            setMenuItemState(miFullStrengthMedics, pool != idealPool,
-                  getTextAt("miFullStrengthMedics.disabledTip"));
-            setMenuItemState(miFireAllMedics, pool > 0,
-                  getTextAt("miFireAllMedics.disabledTip"));
-        }));
-
-        menuTempPool.add(menuMedicPool);
-        // endregion Medic Pool
-
-        // region Blob Crew Pools (Soldier, Battle Armor, Vehicle, Vessel)
-        // Each pool follows the same 4-item structure; see buildBlobCrewPoolSubMenu.
-        CampaignOptions opts = getCampaign().getCampaignOptions();
-
-        menuSoldierPool = buildBlobCrewPoolSubMenu(menuTempPool, PersonnelRole.SOLDIER,
-              opts.isUseBlobInfantry(),
-              "menuSoldierPool.text",
-              "miHireSoldiers.text", "popupHireSoldiersNum.text",
-              "miFireSoldiers.text", "popupFireSoldiersNum.text",
-              "miFullStrengthSoldiers.text", "miFireAllSoldiers.text");
-
-        menuBattleArmorPool = buildBlobCrewPoolSubMenu(menuTempPool, PersonnelRole.BATTLE_ARMOUR,
-              opts.isUseBlobBattleArmor(),
-              "menuBattleArmorPool.text",
-              "miHireBattleArmor.text", "popupHireBattleArmorNum.text",
-              "miFireBattleArmor.text", "popupFireBattleArmorNum.text",
-              "miFullStrengthBattleArmor.text", "miFireAllBattleArmor.text");
-
-        menuVehicleCrewGroundPool = buildBlobCrewPoolSubMenu(menuTempPool, PersonnelRole.VEHICLE_CREW_GROUND,
-              opts.isUseBlobVehicleCrewGround(),
-              "menuVehicleCrewGroundPool.text",
-              "miHireVehicleCrewGround.text", "popupHireVehicleCrewGroundNum.text",
-              "miFireVehicleCrewGround.text", "popupFireVehicleCrewGroundNum.text",
-              "miFullStrengthVehicleCrewGround.text", "miFireAllVehicleCrewGround.text");
-
-        menuVehicleCrewVTOLPool = buildBlobCrewPoolSubMenu(menuTempPool, PersonnelRole.VEHICLE_CREW_VTOL,
-              opts.isUseBlobVehicleCrewVTOL(),
-              "menuVehicleCrewVTOLPool.text",
-              "miHireVehicleCrewVTOL.text", "popupHireVehicleCrewVTOLNum.text",
-              "miFireVehicleCrewVTOL.text", "popupFireVehicleCrewVTOLNum.text",
-              "miFullStrengthVehicleCrewVTOL.text", "miFireAllVehicleCrewVTOL.text");
-
-        menuVehicleCrewNavalPool = buildBlobCrewPoolSubMenu(menuTempPool, PersonnelRole.VEHICLE_CREW_NAVAL,
-              opts.isUseBlobVehicleCrewNaval(),
-              "menuVehicleCrewNavalPool.text",
-              "miHireVehicleCrewNaval.text", "popupHireVehicleCrewNavalNum.text",
-              "miFireVehicleCrewNaval.text", "popupFireVehicleCrewNavalNum.text",
-              "miFullStrengthVehicleCrewNaval.text", "miFireAllVehicleCrewNaval.text");
-
-        menuVesselPilotPool = buildBlobCrewPoolSubMenu(menuTempPool, PersonnelRole.VESSEL_PILOT,
-              opts.isUseBlobVesselPilot(),
-              "menuVesselPilotPool.text",
-              "miHireVesselPilot.text", "popupHireVesselPilotNum.text",
-              "miFireVesselPilot.text", "popupFireVesselPilotNum.text",
-              "miFullStrengthVesselPilot.text", "miFireAllVesselPilot.text");
-
-        menuVesselGunnerPool = buildBlobCrewPoolSubMenu(menuTempPool, PersonnelRole.VESSEL_GUNNER,
-              opts.isUseBlobVesselGunner(),
-              "menuVesselGunnerPool.text",
-              "miHireVesselGunner.text", "popupHireVesselGunnerNum.text",
-              "miFireVesselGunner.text", "popupFireVesselGunnerNum.text",
-              "miFullStrengthVesselGunner.text", "miFireAllVesselGunner.text");
-
-        menuVesselCrewPool = buildBlobCrewPoolSubMenu(menuTempPool, PersonnelRole.VESSEL_CREW,
-              opts.isUseBlobVesselCrew(),
-              "menuVesselCrewPool.text",
-              "miHireVesselCrew.text", "popupHireVesselCrewNum.text",
-              "miFireVesselCrew.text", "popupFireVesselCrewNum.text",
-              "miFullStrengthVesselCrew.text", "miFireAllVesselCrew.text");
-
-        return menuTempPool;
-    }
 
     /**
      * The Reports menu uses the following Mnemonic keys as of 19-March-2020:
@@ -1028,25 +817,15 @@ public class MekHQMenuBar extends JMenuBar {
                   (savePrompt == JOptionPane.YES_OPTION && !getGui().saveCampaign(null))) {
             return;
         }
-
-        // Unregister handlers for campaign tabs
-        for (int i = 0; i < getTabMain().getTabCount(); i++) {
-            Component tab = getTabMain().getComponentAt(i);
-            if (tab instanceof CampaignGuiTab) {
-                ((CampaignGuiTab) tab).deactivateTab();
+        getFrame().setVisible(false); // hide CampaignGUI
+        // start a new campaign
+        new DataLoadingDialog(getFrame(), getApplication(), null, true, campaign -> {
+            if (campaign != null) {
+                getApplication().activateCampaign(campaign);
+            } else {
+                getFrame().setVisible(true); // return back to CampaignGUI if creation fails
             }
-        }
-
-        // Unregister other handlers
-        MekHQ.unregisterHandler(this);
-        MekHQ.unregisterHandler(getGui());
-
-        if (getCampaign().getStoryArc() != null) {
-            MekHQ.unregisterHandler(getCampaign().getStoryArc());
-        }
-
-        // Start a new campaign
-        new DataLoadingDialog(getFrame(), getApplication(), null, null, true).setVisible(true);
+        }).setVisible(true);
     }
 
 
@@ -1067,114 +846,6 @@ public class MekHQMenuBar extends JMenuBar {
         NewRecruitDialog npd = new NewRecruitDialog(getGui(), true,
               getCampaign().newPerson(PersonnelRole.valueOf(evt.getActionCommand())));
         npd.setVisible(true);
-    }
-
-    private boolean anyBlobRoleHasNeed() {
-        return BLOB_CREW_ROLES.stream().anyMatch(this::blobRoleHasUnitsNeedingCrew);
-    }
-
-    private boolean anyBlobRoleHasPool() {
-        Campaign c = getCampaign();
-        return BLOB_CREW_ROLES.stream().anyMatch(role -> c.isBlobCrewEnabled(role) && c.getTempCrewPool(role) > 0);
-    }
-
-    private boolean anyBlobRoleHasSurplus() {
-        Campaign c = getCampaign();
-        for (PersonnelRole role : BLOB_CREW_ROLES) {
-            if (!c.isBlobCrewEnabled(role)) {
-                continue;
-            }
-            if (c.getAvailableTempCrewPool(role) > 0) {
-                return true;
-            }
-            for (Unit unit : c.getUnits()) {
-                int tempCrew = unit.getTempCrewByPersonnelRole(role);
-                if (tempCrew > 0) {
-                    int excess = (unit.getActiveCrew().size() + tempCrew) - unit.getFullCrewSize();
-                    if (excess > 0) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    private boolean blobRoleHasUnitsNeedingCrew(PersonnelRole role) {
-        Campaign c = getCampaign();
-        if (!c.isBlobCrewEnabled(role)) {
-            return false;
-        }
-        for (Unit unit : c.getUnits()) {
-            boolean unitMatchesRole = (role == PersonnelRole.VESSEL_CREW)
-                                            ? unit.canTakeMoreVesselCrew()
-                                            : (role == unit.getDriverRole() || role == unit.getGunnerRole());
-            if (!unitMatchesRole || unit.getActiveCrew().isEmpty()) {
-                continue;
-            }
-            // Use total temp crew across all roles (mirrors distributeTempCrewPoolToUnits logic)
-            // so a vessel already full of another role's temp crew is not counted as needing crew
-            int current = unit.getActiveCrew().size() + unit.getTotalTempCrew();
-            if (current < unit.getFullCrewSize()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private void updateBlobCrewPoolMenuItems(PersonnelRole role,
-          JMenuItem fireItem, JMenuItem fullStrengthItem, JMenuItem fireAllItem) {
-        int pool = getCampaign().getTempCrewPool(role);
-        boolean unitsNeedCrew = blobRoleHasUnitsNeedingCrew(role);
-
-        setMenuItemState(fireItem, pool > 0, getTextAt("miFireBlobCrew.disabledTip"));
-        setMenuItemState(fullStrengthItem, unitsNeedCrew, getTextAt("miFullStrengthBlobCrew.disabledTip"));
-        setMenuItemState(fireAllItem, pool > 0, getTextAt("miFireAllBlobCrew.disabledTip"));
-    }
-
-    private JMenu buildBlobCrewPoolSubMenu(JMenu parentMenu, PersonnelRole role, boolean isVisible,
-          String menuKey, String hireKey, String hirePopupKey,
-          String fireSomeKey, String fireSomePopupKey,
-          String fullStrengthKey, String fireAllKey) {
-        JMenu menu = new JMenu(getTextAt(menuKey));
-        menu.setVisible(isVisible);
-
-        JMenuItem miHire = createMenuItem(hireKey, KeyEvent.VK_UNDEFINED, evt -> {
-            PopupValueChoiceDialog dialog = new PopupValueChoiceDialog(getFrame(),
-                  true, getTextAt(hirePopupKey), 1, 0, MAX_QUANTITY_SPINNER);
-            dialog.setVisible(true);
-            if (dialog.getValue() >= 0) {
-                getCampaign().increaseTempCrewPool(role, dialog.getValue());
-            }
-        });
-        menu.add(miHire);
-
-        JMenuItem miFireSome = createMenuItem(fireSomeKey, KeyEvent.VK_UNDEFINED, evt -> {
-            PopupValueChoiceDialog dialog = new PopupValueChoiceDialog(getFrame(),
-                  true, getTextAt(fireSomePopupKey), 1, 0,
-                  getCampaign().getTempCrewPool(role));
-            dialog.setVisible(true);
-            if (dialog.getValue() >= 0) {
-                getCampaign().decreaseTempCrewPool(role, dialog.getValue());
-            }
-        });
-        menu.add(miFireSome);
-
-        JMenuItem miFullStrength = createMenuItem(fullStrengthKey, KeyEvent.VK_UNDEFINED, evt -> {
-            getCampaign().resetTempCrewPoolForRole(role);
-            getCampaign().distributeTempCrewPoolToUnits(role);
-        });
-        menu.add(miFullStrength);
-
-        JMenuItem miFireAll = createMenuItem(fireAllKey, KeyEvent.VK_UNDEFINED,
-              evt -> getCampaign().setTempCrewPool(role, 0));
-        menu.add(miFireAll);
-
-        menu.addMenuListener(menuListenerFor(
-              () -> updateBlobCrewPoolMenuItems(role, miFireSome, miFullStrength, miFireAll)));
-
-        parentMenu.add(menu);
-        return menu;
     }
 
     /**
@@ -1200,125 +871,6 @@ public class MekHQMenuBar extends JMenuBar {
         item.addActionListener(action);
         return item;
     }
-
-    private void bringAllTempCrewsToFullStrength() {
-        getCampaign().resetAsTechPool();
-        getCampaign().resetMedicPool();
-        if (getCampaign().getCampaignOptions().isUseBlobInfantry()) {
-            getCampaign().resetTempCrewPoolForRole(PersonnelRole.SOLDIER);
-            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.SOLDIER);
-        }
-        if (getCampaign().getCampaignOptions().isUseBlobBattleArmor()) {
-            getCampaign().resetTempCrewPoolForRole(PersonnelRole.BATTLE_ARMOUR);
-            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.BATTLE_ARMOUR);
-        }
-        if (getCampaign().getCampaignOptions().isUseBlobVehicleCrewGround()) {
-            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_GROUND);
-            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_GROUND);
-        }
-        if (getCampaign().getCampaignOptions().isUseBlobVehicleCrewVTOL()) {
-            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_VTOL);
-            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_VTOL);
-        }
-        if (getCampaign().getCampaignOptions().isUseBlobVehicleCrewNaval()) {
-            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_NAVAL);
-            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_NAVAL);
-        }
-        if (getCampaign().getCampaignOptions().isUseBlobVesselPilot()) {
-            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VESSEL_PILOT);
-            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_PILOT);
-        }
-        if (getCampaign().getCampaignOptions().isUseBlobVesselGunner()) {
-            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VESSEL_GUNNER);
-            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_GUNNER);
-        }
-        if (getCampaign().getCampaignOptions().isUseBlobVesselCrew()) {
-            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VESSEL_CREW);
-            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_CREW);
-        }
-    }
-
-    private void releaseAllTempCrews() {
-        getCampaign().emptyAsTechPool();
-        getCampaign().emptyMedicPool();
-        CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
-        if (campaignOptions.isUseBlobInfantry()) {
-            getCampaign().clearBlobCrewForRole(PersonnelRole.SOLDIER);
-        }
-        if (campaignOptions.isUseBlobBattleArmor()) {
-            getCampaign().clearBlobCrewForRole(PersonnelRole.BATTLE_ARMOUR);
-        }
-        if (campaignOptions.isUseBlobVehicleCrewGround()) {
-            getCampaign().clearBlobCrewForRole(PersonnelRole.VEHICLE_CREW_GROUND);
-        }
-        if (campaignOptions.isUseBlobVehicleCrewVTOL()) {
-            getCampaign().clearBlobCrewForRole(PersonnelRole.VEHICLE_CREW_VTOL);
-        }
-        if (campaignOptions.isUseBlobVehicleCrewNaval()) {
-            getCampaign().clearBlobCrewForRole(PersonnelRole.VEHICLE_CREW_NAVAL);
-        }
-        if (campaignOptions.isUseBlobVesselPilot()) {
-            getCampaign().clearBlobCrewForRole(PersonnelRole.VESSEL_PILOT);
-        }
-        if (campaignOptions.isUseBlobVesselGunner()) {
-            getCampaign().clearBlobCrewForRole(PersonnelRole.VESSEL_GUNNER);
-        }
-        if (campaignOptions.isUseBlobVesselCrew()) {
-            getCampaign().clearBlobCrewForRole(PersonnelRole.VESSEL_CREW);
-        }
-    }
-
-    private void releaseSurplusTempCrews() {
-        getCampaign().releaseSurplusAsTechPool();
-        getCampaign().releaseSurplusMedicPool();
-        CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
-        if (campaignOptions.isUseBlobInfantry()) {
-            getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.SOLDIER);
-        }
-        if (campaignOptions.isUseBlobBattleArmor()) {
-            getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.BATTLE_ARMOUR);
-        }
-        if (campaignOptions.isUseBlobVehicleCrewGround()) {
-            getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.VEHICLE_CREW_GROUND);
-        }
-        if (campaignOptions.isUseBlobVehicleCrewVTOL()) {
-            getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.VEHICLE_CREW_VTOL);
-        }
-        if (campaignOptions.isUseBlobVehicleCrewNaval()) {
-            getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.VEHICLE_CREW_NAVAL);
-        }
-        if (campaignOptions.isUseBlobVesselPilot()) {
-            getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.VESSEL_PILOT);
-        }
-        if (campaignOptions.isUseBlobVesselGunner()) {
-            getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.VESSEL_GUNNER);
-        }
-        if (campaignOptions.isUseBlobVesselCrew()) {
-            getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.VESSEL_CREW);
-        }
-    }
-
-
-    private static MenuListener menuListenerFor(Runnable onSelected) {
-        return new MenuListener() {
-            @Override
-            public void menuSelected(MenuEvent e) {
-                onSelected.run();
-            }
-
-            @Override
-            public void menuDeselected(MenuEvent e) {}
-
-            @Override
-            public void menuCanceled(MenuEvent e) {}
-        };
-    }
-
-    private static void setMenuItemState(JMenuItem item, boolean enabled, String disabledTip) {
-        item.setEnabled(enabled);
-        item.setToolTipText(enabled ? null : disabledTip);
-    }
-
 
     /**
      * @param evt the event triggering the opening of the Campaign Options Dialog
@@ -1528,6 +1080,17 @@ public class MekHQMenuBar extends JMenuBar {
     }
 
     /**
+     * Retrieves localized text from the panel's resource bundle.
+     */
+    private static String getTextAt(String key) {
+        return MHQInternationalization.getTextAt(RESOURCE_BUNDLE, key);
+    }
+
+    // ======================================
+    // Event handlers for UI synchronization
+    // ======================================
+
+    /**
      * Processes changes in campaign options.
      *
      * <p>Updates the visibility and availability of UI tabs and menu items based on the new campaign settings.
@@ -1540,30 +1103,9 @@ public class MekHQMenuBar extends JMenuBar {
      */
     @Subscribe
     public void handle(final OptionsChangedEvent optionsChangedEvent) {
-        // Update blob crew menu visibility based on campaign options
-        menuSoldierPool.setVisible(getCampaign().getCampaignOptions().isUseBlobInfantry());
-        menuBattleArmorPool.setVisible(getCampaign().getCampaignOptions().isUseBlobBattleArmor());
-        menuVehicleCrewGroundPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVehicleCrewGround());
-        menuVehicleCrewVTOLPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVehicleCrewVTOL());
-        menuVehicleCrewNavalPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVehicleCrewNaval());
-        menuVesselPilotPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVesselPilot());
-        menuVesselGunnerPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVesselGunner());
-        menuVesselCrewPool.setVisible(getCampaign().getCampaignOptions().isUseBlobVesselCrew());
-
         miRetirementDefectionDialog.setVisible(optionsChangedEvent.getOptions().isUseRandomRetirement());
         miAwardEligibilityDialog.setVisible((optionsChangedEvent.getOptions().isEnableAutoAwards()));
     }
-
-    /**
-     * Retrieves localized text from the panel's resource bundle.
-     */
-    private static String getTextAt(String key) {
-        return MHQInternationalization.getTextAt(RESOURCE_BUNDLE, key);
-    }
-
-    // ======================================
-    // Event handlers for UI synchronization
-    // ======================================
 
     /**
      * Handles changes to general application options.

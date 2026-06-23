@@ -48,7 +48,6 @@ import javax.swing.JMenuItem;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.location.ILocation;
-import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.baseComponents.JScrollableMenu;
@@ -101,10 +100,7 @@ public class SendToLocationMenu extends JScrollableMenu {
         // match, hiding every base from the menu. Use an identity-keyed set instead.
         Set<ILocation> currentLocations = Collections.newSetFromMap(new IdentityHashMap<>());
         for (ILocation item : items) {
-            LocationNode node = item.getLocationNode();
-            currentLocations.add((node == null || node.getParent() == null)
-                                       ? null
-                                       : node.getParent().getLocatable());
+            currentLocations.add(item.isParented() ? item.getParentLocation() : null);
         }
 
         ILocation sharedCurrent = currentLocations.size() == 1
