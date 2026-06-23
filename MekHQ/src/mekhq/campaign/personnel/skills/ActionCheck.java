@@ -195,8 +195,7 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
             roll = SkillCheckUtility.getRoll(hasNaturalAptitude());
             usedEdge = true;
 
-            person.changeCurrentEdge(-1);
-            MekHQ.triggerEvent(new PersonChangedEvent(person));
+            person.spendEdge();
         }
 
         int difference = targetNumber.getValue() - roll;

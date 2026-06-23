@@ -193,7 +193,7 @@ class ActionCheckTest {
         assertTrue(result.isSuccess());
         assertTrue(result.usedEdge());
         assertEquals(9, result.roll());
-        verify(person).changeCurrentEdge(-1);
+        verify(person).spendEdge();
     }
 
     @Test
@@ -210,7 +210,7 @@ class ActionCheckTest {
         assertFalse(result.isSuccess());
         assertTrue(result.usedEdge());
         assertEquals(6, result.roll());
-        verify(person).changeCurrentEdge(-1);
+        verify(person).spendEdge();
     }
 
     @ParameterizedTest

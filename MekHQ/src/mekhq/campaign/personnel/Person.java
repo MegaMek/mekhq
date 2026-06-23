@@ -144,6 +144,7 @@ import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.personnel.skills.AttributeCheck;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillCheck;
@@ -5839,6 +5840,35 @@ public class Person implements ILocation {
     }
 
     /**
+     * Prepares an attribute check.
+     *
+     * <p>This method creates an {@link AttributeCheck} instance which calculates the target number
+     * for the attribute check.</p>
+     *
+     * @param attribute the {@link SkillAttribute} to be checked
+     *
+     * @return prepared attribute check
+     */
+    public AttributeCheck checkAttribute(SkillAttribute attribute) {
+        return new AttributeCheck(this, attribute);
+    }
+
+    /**
+     * Prepares a double attribute check.
+     *
+     * <p>This method creates an {@link AttributeCheck} instance which calculates the target number
+     * for the attribute check.</p>
+     *
+     * @param firstAttribute  first {@link SkillAttribute} to be checked
+     * @param secondAttribute second {@link SkillAttribute} to be checked
+     *
+     * @return prepared attribute check
+     */
+    public AttributeCheck checkAttributes(SkillAttribute firstAttribute, SkillAttribute secondAttribute) {
+        return new AttributeCheck(this, firstAttribute, secondAttribute);
+    }
+
+    /**
      * Calculates the cost to improve a specific skill, at a specified skill level, with an optional reasoning
      * multiplier.
      *
@@ -6125,6 +6155,15 @@ public class Person implements ILocation {
 
     public void changeCurrentEdge(final int amount) {
         atowAttributes.changeCurrentEdge(amount);
+    }
+
+    public void spendEdge() {
+        if (getCurrentEdge() > 0) {
+            atowAttributes.changeCurrentEdge(-1);
+            MekHQ.triggerEvent(new PersonChangedEvent(this));
+        } else {
+            LOGGER.error("Trying to spend edge, but it is at {}", getCurrentEdge(), new IllegalArgumentException());
+        }
     }
 
     /**
