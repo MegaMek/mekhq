@@ -38,7 +38,12 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
 /**
- * Describes a navigable Campaign Options route.
+ * Describes one navigable destination in the Campaign Options navigation tree: its {@code id}, its place in the
+ * hierarchy ({@code path}), the resource keys for its displayed titles, and the normalized text used to match it
+ * while filtering.
+ *
+ * <p>{@link CampaignOptionsPane} registers one route per page; {@link CampaignOptionsNavigationPanel} renders the
+ * routes as a searchable tree and reports the selected route back so the pane can show the matching page.</p>
  */
 class CampaignOptionsRoute {
     private final String id;
@@ -88,7 +93,7 @@ class CampaignOptionsRoute {
 
     /**
      * Adds resolved section title and summary text to this route's search index so the navigation filter can match a
-     * section heading, not only the page (page) title.
+     * section heading, not only the page title.
      *
      * @param text the raw section text to index; ignored when {@code null} or blank
      */

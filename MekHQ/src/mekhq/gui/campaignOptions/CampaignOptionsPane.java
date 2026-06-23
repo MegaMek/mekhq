@@ -132,20 +132,20 @@ public class CampaignOptionsPane extends JPanel {
     private boolean isSyncingNavigationSelection;
 
     private GeneralPage generalPage;
-    private PersonnelPages personnelPage;
-    private BiographyPages biographyPage;
-    private RelationshipsPages relationshipsPage;
-    private SalariesPages salariesPage;
-    private TurnoverAndRetentionPages turnoverAndRetentionPage;
-    private AwardsAndRandomizationPages awardsAndRandomizationPage;
-    private SkillsPages skillsPage;
-    private AbilitiesPages abilitiesPage;
-    private RepairAndMaintenancePages repairAndMaintenancePage;
-    private EquipmentAndSuppliesPages equipmentAndSuppliesPage;
-    private FinancesPages financesPage;
-    private MarketsPages marketsPage;
-    private SystemsPages systemsPage;
-    private RulesetsPages rulesetsPage;
+    private PersonnelPages personnelPages;
+    private BiographyPages biographyPages;
+    private RelationshipsPages relationshipsPages;
+    private SalariesPages salariesPages;
+    private TurnoverAndRetentionPages turnoverAndRetentionPages;
+    private AwardsAndRandomizationPages awardsAndRandomizationPages;
+    private SkillsPages skillsPages;
+    private AbilitiesPages abilitiesPages;
+    private RepairAndMaintenancePages repairAndMaintenancePages;
+    private EquipmentAndSuppliesPages equipmentAndSuppliesPages;
+    private FinancesPages financesPages;
+    private MarketsPages marketsPages;
+    private SystemsPages systemsPages;
+    private RulesetsPages rulesetsPages;
     private CampaignGUI campaignGui;
 
     /**
@@ -463,25 +463,25 @@ public class CampaignOptionsPane extends JPanel {
         return route;
     }
 
-    private void ensureSectionLoaded(String topLevelResourceName) {
+    private void ensureCategoryLoaded(String topLevelResourceName) {
         switch (topLevelResourceName) {
             case "humanResourcesCategory" -> {
-                if (personnelPage == null) {
+                if (personnelPages == null) {
                     initializeHumanResourcesSection();
                 }
             }
             case "advancementCategory" -> {
-                if (awardsAndRandomizationPage == null) {
+                if (awardsAndRandomizationPages == null) {
                     initializeAdvancementSection();
                 }
             }
             case "logisticsAndMaintenanceCategory" -> {
-                if (equipmentAndSuppliesPage == null) {
+                if (equipmentAndSuppliesPages == null) {
                     initializeLogisticsSection();
                 }
             }
             case "strategicOperationsCategory" -> {
-                if (financesPage == null) {
+                if (financesPages == null) {
                     initializeOperationsSection();
                 }
             }
@@ -492,36 +492,36 @@ public class CampaignOptionsPane extends JPanel {
     }
 
     private void ensureAllSectionsLoaded() {
-        ensureSectionLoaded("humanResourcesCategory");
-        ensureSectionLoaded("advancementCategory");
-        ensureSectionLoaded("logisticsAndMaintenanceCategory");
-        ensureSectionLoaded("strategicOperationsCategory");
+        ensureCategoryLoaded("humanResourcesCategory");
+        ensureCategoryLoaded("advancementCategory");
+        ensureCategoryLoaded("logisticsAndMaintenanceCategory");
+        ensureCategoryLoaded("strategicOperationsCategory");
     }
 
     private void initializeHumanResourcesSection() {
-        personnelPage = new PersonnelPages(campaignOptions);
-        biographyPage = new BiographyPages(campaign, generalPage);
-        relationshipsPage = new RelationshipsPages(campaignOptions);
-        salariesPage = new SalariesPages(campaignOptions);
-        turnoverAndRetentionPage = new TurnoverAndRetentionPages(campaignOptions);
+        personnelPages = new PersonnelPages(campaignOptions);
+        biographyPages = new BiographyPages(campaign, generalPage);
+        relationshipsPages = new RelationshipsPages(campaignOptions);
+        salariesPages = new SalariesPages(campaignOptions);
+        turnoverAndRetentionPages = new TurnoverAndRetentionPages(campaignOptions);
     }
 
     private void initializeAdvancementSection() {
-        awardsAndRandomizationPage = new AwardsAndRandomizationPages(campaign);
-        skillsPage = new SkillsPages(campaignOptions);
-        abilitiesPage = new AbilitiesPages();
+        awardsAndRandomizationPages = new AwardsAndRandomizationPages(campaign);
+        skillsPages = new SkillsPages(campaignOptions);
+        abilitiesPages = new AbilitiesPages();
     }
 
     private void initializeLogisticsSection() {
-        repairAndMaintenancePage = new RepairAndMaintenancePages(campaignOptions);
-        equipmentAndSuppliesPage = new EquipmentAndSuppliesPages(campaignOptions);
+        repairAndMaintenancePages = new RepairAndMaintenancePages(campaignOptions);
+        equipmentAndSuppliesPages = new EquipmentAndSuppliesPages(campaignOptions);
     }
 
     private void initializeOperationsSection() {
-        financesPage = new FinancesPages(campaign);
-        marketsPage = new MarketsPages(campaign);
-        systemsPage = new SystemsPages(campaign);
-        rulesetsPage = new RulesetsPages(campaignOptions);
+        financesPages = new FinancesPages(campaign);
+        marketsPages = new MarketsPages(campaign);
+        systemsPages = new SystemsPages(campaign);
+        rulesetsPages = new RulesetsPages(campaignOptions);
     }
 
     private void registerParentRoute(String id, String... titleResourceNames) {
@@ -634,233 +634,233 @@ public class CampaignOptionsPane extends JPanel {
     }
 
     private JPanel createPersonnelGeneralPage() {
-        ensureSectionLoaded("humanResourcesCategory");
-        return personnelPage.createGeneralPage();
+        ensureCategoryLoaded("humanResourcesCategory");
+        return personnelPages.createGeneralPage();
     }
 
     private JPanel createPersonnelAwardsPage() {
-        ensureSectionLoaded("humanResourcesCategory");
-        return personnelPage.createAwardsPage();
+        ensureCategoryLoaded("humanResourcesCategory");
+        return personnelPages.createAwardsPage();
     }
 
     private JPanel createPersonnelMedicalPage() {
-        ensureSectionLoaded("humanResourcesCategory");
-        return personnelPage.createMedicalPage();
+        ensureCategoryLoaded("humanResourcesCategory");
+        return personnelPages.createMedicalPage();
     }
 
     private JPanel createPersonnelInformationPage() {
-        ensureSectionLoaded("humanResourcesCategory");
-        return personnelPage.createPersonnelInformationPage();
+        ensureCategoryLoaded("humanResourcesCategory");
+        return personnelPages.createPersonnelInformationPage();
     }
 
     private JPanel createPersonnelPrisonersAndDependentsPage() {
-        ensureSectionLoaded("humanResourcesCategory");
-        return personnelPage.createPrisonersAndDependentsPage();
+        ensureCategoryLoaded("humanResourcesCategory");
+        return personnelPages.createPrisonersAndDependentsPage();
     }
 
     private JPanel createBiographyGeneralPage() {
-        ensureSectionLoaded("humanResourcesCategory");
-        return biographyPage.createGeneralPage();
+        ensureCategoryLoaded("humanResourcesCategory");
+        return biographyPages.createGeneralPage();
     }
 
     private JPanel createBiographyBackgroundsPage() {
-        ensureSectionLoaded("humanResourcesCategory");
-        return biographyPage.createBackgroundsPage();
+        ensureCategoryLoaded("humanResourcesCategory");
+        return biographyPages.createBackgroundsPage();
     }
 
     private JPanel createBiographyDeathPage() {
-        ensureSectionLoaded("humanResourcesCategory");
-        return biographyPage.createDeathPage();
+        ensureCategoryLoaded("humanResourcesCategory");
+        return biographyPages.createDeathPage();
     }
 
     private JPanel createBiographyEducationPage() {
-        ensureSectionLoaded("humanResourcesCategory");
-        return biographyPage.createEducationPage();
+        ensureCategoryLoaded("humanResourcesCategory");
+        return biographyPages.createEducationPage();
     }
 
     private JPanel createBiographyNameAndPortraitGenerationPage() {
-        ensureSectionLoaded("humanResourcesCategory");
-        return biographyPage.createNameAndPortraitGenerationPage();
+        ensureCategoryLoaded("humanResourcesCategory");
+        return biographyPages.createNameAndPortraitGenerationPage();
     }
 
     private JPanel createBiographyRankPage() {
-        ensureSectionLoaded("humanResourcesCategory");
-        return biographyPage.createRankPage();
+        ensureCategoryLoaded("humanResourcesCategory");
+        return biographyPages.createRankPage();
     }
 
     private JPanel createRelationshipMarriagePage() {
-        ensureSectionLoaded("humanResourcesCategory");
-        return relationshipsPage.createMarriagePage();
+        ensureCategoryLoaded("humanResourcesCategory");
+        return relationshipsPages.createMarriagePage();
     }
 
     private JPanel createRelationshipDivorcePage() {
-        ensureSectionLoaded("humanResourcesCategory");
-        return relationshipsPage.createDivorcePage();
+        ensureCategoryLoaded("humanResourcesCategory");
+        return relationshipsPages.createDivorcePage();
     }
 
     private JPanel createRelationshipProcreationPage() {
-        ensureSectionLoaded("humanResourcesCategory");
-        return relationshipsPage.createProcreationPage();
+        ensureCategoryLoaded("humanResourcesCategory");
+        return relationshipsPages.createProcreationPage();
     }
 
     private JPanel createCombatSalariesPage() {
-        ensureSectionLoaded("humanResourcesCategory");
-        return salariesPage.createSalariesPage(PersonnelRoleSubType.COMBAT);
+        ensureCategoryLoaded("humanResourcesCategory");
+        return salariesPages.createSalariesPage(PersonnelRoleSubType.COMBAT);
     }
 
     private JPanel createSupportSalariesPage() {
-        ensureSectionLoaded("humanResourcesCategory");
-        return salariesPage.createSalariesPage(PersonnelRoleSubType.SUPPORT);
+        ensureCategoryLoaded("humanResourcesCategory");
+        return salariesPages.createSalariesPage(PersonnelRoleSubType.SUPPORT);
     }
 
     private JPanel createCivilianSalariesPage() {
-        ensureSectionLoaded("humanResourcesCategory");
-        return salariesPage.createSalariesPage(PersonnelRoleSubType.CIVILIAN);
+        ensureCategoryLoaded("humanResourcesCategory");
+        return salariesPages.createSalariesPage(PersonnelRoleSubType.CIVILIAN);
     }
 
     private JPanel createTurnoverAndRetentionTurnoverPage() {
-        ensureSectionLoaded("humanResourcesCategory");
-        return turnoverAndRetentionPage.createTurnoverPage();
+        ensureCategoryLoaded("humanResourcesCategory");
+        return turnoverAndRetentionPages.createTurnoverPage();
     }
 
     private JPanel createTurnoverAndRetentionFatiguePage() {
-        ensureSectionLoaded("humanResourcesCategory");
-        return turnoverAndRetentionPage.createFatiguePage();
+        ensureCategoryLoaded("humanResourcesCategory");
+        return turnoverAndRetentionPages.createFatiguePage();
     }
 
     private JPanel createAdvancementRandomizationPage() {
-        ensureSectionLoaded("advancementCategory");
-        return awardsAndRandomizationPage.skillRandomizationPage();
+        ensureCategoryLoaded("advancementCategory");
+        return awardsAndRandomizationPages.skillRandomizationPage();
     }
 
     private JPanel createAdvancementXpAwardsPage() {
-        ensureSectionLoaded("advancementCategory");
-        return awardsAndRandomizationPage.xpAwardsPage();
+        ensureCategoryLoaded("advancementCategory");
+        return awardsAndRandomizationPages.xpAwardsPage();
     }
 
     private JPanel createAdvancementRecruitmentBonusesPage() {
-        ensureSectionLoaded("advancementCategory");
-        return awardsAndRandomizationPage.recruitmentBonusesPage();
+        ensureCategoryLoaded("advancementCategory");
+        return awardsAndRandomizationPages.recruitmentBonusesPage();
     }
 
     private JPanel createAdvancementGunnerySkillsPage() {
-        ensureSectionLoaded("advancementCategory");
-        return skillsPage.createSkillsPage(COMBAT_GUNNERY);
+        ensureCategoryLoaded("advancementCategory");
+        return skillsPages.createSkillsPage(COMBAT_GUNNERY);
     }
 
     private JPanel createAdvancementPilotingSkillsPage() {
-        ensureSectionLoaded("advancementCategory");
-        return skillsPage.createSkillsPage(COMBAT_PILOTING);
+        ensureCategoryLoaded("advancementCategory");
+        return skillsPages.createSkillsPage(COMBAT_PILOTING);
     }
 
     private JPanel createAdvancementSupportSkillsPage() {
-        ensureSectionLoaded("advancementCategory");
-        return skillsPage.createSkillsPage(SUPPORT);
+        ensureCategoryLoaded("advancementCategory");
+        return skillsPages.createSkillsPage(SUPPORT);
     }
 
     private JPanel createAdvancementUtilitySkillsPage() {
-        ensureSectionLoaded("advancementCategory");
-        return skillsPage.createSkillsPage(UTILITY);
+        ensureCategoryLoaded("advancementCategory");
+        return skillsPages.createSkillsPage(UTILITY);
     }
 
     private JPanel createAdvancementRoleplaySkillsPage() {
-        ensureSectionLoaded("advancementCategory");
-        return skillsPage.createSkillsPage(ROLEPLAY_GENERAL);
+        ensureCategoryLoaded("advancementCategory");
+        return skillsPages.createSkillsPage(ROLEPLAY_GENERAL);
     }
 
     private JPanel createAdvancementCombatAbilitiesPage() {
-        ensureSectionLoaded("advancementCategory");
-        return abilitiesPage.createAbilitiesPage(COMBAT_ABILITY);
+        ensureCategoryLoaded("advancementCategory");
+        return abilitiesPages.createAbilitiesPage(COMBAT_ABILITY);
     }
 
     private JPanel createAdvancementManeuveringAbilitiesPage() {
-        ensureSectionLoaded("advancementCategory");
-        return abilitiesPage.createAbilitiesPage(MANEUVERING_ABILITY);
+        ensureCategoryLoaded("advancementCategory");
+        return abilitiesPages.createAbilitiesPage(MANEUVERING_ABILITY);
     }
 
     private JPanel createAdvancementUtilityAbilitiesPage() {
-        ensureSectionLoaded("advancementCategory");
-        return abilitiesPage.createAbilitiesPage(UTILITY_ABILITY);
+        ensureCategoryLoaded("advancementCategory");
+        return abilitiesPages.createAbilitiesPage(UTILITY_ABILITY);
     }
 
     private JPanel createAdvancementCharacterFlawsPage() {
-        ensureSectionLoaded("advancementCategory");
-        return abilitiesPage.createAbilitiesPage(CHARACTER_FLAW);
+        ensureCategoryLoaded("advancementCategory");
+        return abilitiesPages.createAbilitiesPage(CHARACTER_FLAW);
     }
 
     private JPanel createAdvancementCharacterCreationOnlyPage() {
-        ensureSectionLoaded("advancementCategory");
-        return abilitiesPage.createAbilitiesPage(CHARACTER_CREATION_ONLY);
+        ensureCategoryLoaded("advancementCategory");
+        return abilitiesPages.createAbilitiesPage(CHARACTER_CREATION_ONLY);
     }
 
     private JPanel createLogisticsRepairsPage() {
-        ensureSectionLoaded("logisticsAndMaintenanceCategory");
-        return repairAndMaintenancePage.createRepairPage();
+        ensureCategoryLoaded("logisticsAndMaintenanceCategory");
+        return repairAndMaintenancePages.createRepairPage();
     }
 
     private JPanel createLogisticsMaintenancePage() {
-        ensureSectionLoaded("logisticsAndMaintenanceCategory");
-        return repairAndMaintenancePage.createMaintenancePage();
+        ensureCategoryLoaded("logisticsAndMaintenanceCategory");
+        return repairAndMaintenancePages.createMaintenancePage();
     }
 
     private JPanel createLogisticsAcquisitionPage() {
-        ensureSectionLoaded("logisticsAndMaintenanceCategory");
-        return equipmentAndSuppliesPage.createAcquisitionPage();
+        ensureCategoryLoaded("logisticsAndMaintenanceCategory");
+        return equipmentAndSuppliesPages.createAcquisitionPage();
     }
 
     private JPanel createLogisticsPlanetaryAcquisitionPage() {
-        ensureSectionLoaded("logisticsAndMaintenanceCategory");
-        return equipmentAndSuppliesPage.createPlanetaryAcquisitionPage();
+        ensureCategoryLoaded("logisticsAndMaintenanceCategory");
+        return equipmentAndSuppliesPages.createPlanetaryAcquisitionPage();
     }
 
     private JPanel createLogisticsTechLimitsPage() {
-        ensureSectionLoaded("logisticsAndMaintenanceCategory");
-        return equipmentAndSuppliesPage.createTechLimitsPage();
+        ensureCategoryLoaded("logisticsAndMaintenanceCategory");
+        return equipmentAndSuppliesPages.createTechLimitsPage();
     }
 
     private JPanel createOperationsFinancesGeneralPage() {
-        ensureSectionLoaded("strategicOperationsCategory");
-        return financesPage.createFinancesGeneralOptionsPage();
+        ensureCategoryLoaded("strategicOperationsCategory");
+        return financesPages.createFinancesGeneralOptionsPage();
     }
 
     private JPanel createOperationsPriceMultipliersPage() {
-        ensureSectionLoaded("strategicOperationsCategory");
-        return financesPage.createPriceMultipliersPage();
+        ensureCategoryLoaded("strategicOperationsCategory");
+        return financesPages.createPriceMultipliersPage();
     }
 
     private JPanel createOperationsPersonnelMarketPage() {
-        ensureSectionLoaded("strategicOperationsCategory");
-        return marketsPage.createPersonnelMarketPage();
+        ensureCategoryLoaded("strategicOperationsCategory");
+        return marketsPages.createPersonnelMarketPage();
     }
 
     private JPanel createOperationsUnitMarketPage() {
-        ensureSectionLoaded("strategicOperationsCategory");
-        return marketsPage.createUnitMarketPage();
+        ensureCategoryLoaded("strategicOperationsCategory");
+        return marketsPages.createUnitMarketPage();
     }
 
     private JPanel createOperationsContractMarketPage() {
-        ensureSectionLoaded("strategicOperationsCategory");
-        return marketsPage.createContractMarketPage();
+        ensureCategoryLoaded("strategicOperationsCategory");
+        return marketsPages.createContractMarketPage();
     }
 
     private JPanel createOperationsReputationPage() {
-        ensureSectionLoaded("strategicOperationsCategory");
-        return systemsPage.createReputationPage();
+        ensureCategoryLoaded("strategicOperationsCategory");
+        return systemsPages.createReputationPage();
     }
 
     private JPanel createOperationsFactionStandingPage() {
-        ensureSectionLoaded("strategicOperationsCategory");
-        return systemsPage.createFactionStandingPage();
+        ensureCategoryLoaded("strategicOperationsCategory");
+        return systemsPages.createFactionStandingPage();
     }
 
     private JPanel createOperationsATimeOfWarPage() {
-        ensureSectionLoaded("strategicOperationsCategory");
-        return systemsPage.createATOWPage();
+        ensureCategoryLoaded("strategicOperationsCategory");
+        return systemsPages.createATOWPage();
     }
 
     private JPanel createOperationsStratConPage() {
-        ensureSectionLoaded("strategicOperationsCategory");
-        return rulesetsPage.createStratConPage();
+        ensureCategoryLoaded("strategicOperationsCategory");
+        return rulesetsPages.createStratConPage();
     }
 
     /**
@@ -896,40 +896,37 @@ public class CampaignOptionsPane extends JPanel {
         CampaignOptionsFreebieTracker oldCampaignOptions = new CampaignOptionsFreebieTracker(
                 campaign.getCampaignOptions());
 
-        // Everything assumes general page will be the first applied.
-        // While this shouldn't break anything, it's not worth moving around.
-        // For all other pages, it makes sense to apply them in the order they
-        // appear in the dialog; however, this shouldn't make any major difference.
+        // Options get applied in the order they are defined in the UI
         generalPage.applyCampaignOptionsToCampaign(isStartUp, isSaveAction);
 
         // Human Resources
-        if (personnelPage != null) {
-            personnelPage.applyCampaignOptionsToCampaign(campaign, options);
-            biographyPage.applyCampaignOptionsToCampaign(options);
-            relationshipsPage.applyCampaignOptionsToCampaign(options);
-            salariesPage.applyCampaignOptionsToCampaign(options);
-            turnoverAndRetentionPage.applyCampaignOptionsToCampaign(options);
+        if (personnelPages != null) {
+            personnelPages.applyCampaignOptionsToCampaign(campaign, options);
+            biographyPages.applyCampaignOptionsToCampaign(options);
+            relationshipsPages.applyCampaignOptionsToCampaign(options);
+            salariesPages.applyCampaignOptionsToCampaign(options);
+            turnoverAndRetentionPages.applyCampaignOptionsToCampaign(options);
         }
 
         // Advancement
-        if (awardsAndRandomizationPage != null) {
-            awardsAndRandomizationPage.applyCampaignOptionsToCampaign(options, presetRandomSkillPreferences);
-            skillsPage.applyCampaignOptionsToCampaign(options, presetSkills);
-            abilitiesPage.applyCampaignOptionsToCampaign(preset);
+        if (awardsAndRandomizationPages != null) {
+            awardsAndRandomizationPages.applyCampaignOptionsToCampaign(options, presetRandomSkillPreferences);
+            skillsPages.applyCampaignOptionsToCampaign(options, presetSkills);
+            abilitiesPages.applyCampaignOptionsToCampaign(preset);
         }
 
         // Logistics
-        if (equipmentAndSuppliesPage != null) {
-            equipmentAndSuppliesPage.applyCampaignOptionsToCampaign(options);
-            repairAndMaintenancePage.applyCampaignOptionsToCampaign(options);
+        if (equipmentAndSuppliesPages != null) {
+            equipmentAndSuppliesPages.applyCampaignOptionsToCampaign(options);
+            repairAndMaintenancePages.applyCampaignOptionsToCampaign(options);
         }
 
         // Operations
-        if (financesPage != null) {
-            financesPage.applyCampaignOptionsToCampaign(options);
-            marketsPage.applyCampaignOptionsToCampaign(options);
-            rulesetsPage.applyCampaignOptionsToCampaign(options);
-            systemsPage.applyCampaignOptionsToCampaign(options, presetRandomSkillPreferences);
+        if (financesPages != null) {
+            financesPages.applyCampaignOptionsToCampaign(options);
+            marketsPages.applyCampaignOptionsToCampaign(options);
+            rulesetsPages.applyCampaignOptionsToCampaign(options);
+            systemsPages.applyCampaignOptionsToCampaign(options, presetRandomSkillPreferences);
         }
 
         // Tidy up
@@ -1200,28 +1197,28 @@ public class CampaignOptionsPane extends JPanel {
         generalPage.loadValuesFromCampaignOptions(presetDate, presetFaction);
 
         // Human Resources
-        personnelPage.loadValuesFromCampaignOptions(presetCampaignOptions, campaign.getVersion());
-        biographyPage.loadValuesFromCampaignOptions(presetCampaignOptions,
+        personnelPages.loadValuesFromCampaignOptions(presetCampaignOptions, campaign.getVersion());
+        biographyPages.loadValuesFromCampaignOptions(presetCampaignOptions,
                 presetCampaignOptions.getRandomOriginOptions(),
                 campaignPreset.getRankSystem());
-        relationshipsPage.loadValuesFromCampaignOptions(presetCampaignOptions);
-        turnoverAndRetentionPage.loadValuesFromCampaignOptions(presetCampaignOptions);
+        relationshipsPages.loadValuesFromCampaignOptions(presetCampaignOptions);
+        turnoverAndRetentionPages.loadValuesFromCampaignOptions(presetCampaignOptions);
 
         // Advancement
-        awardsAndRandomizationPage.loadValuesFromCampaignOptions(presetCampaignOptions,
+        awardsAndRandomizationPages.loadValuesFromCampaignOptions(presetCampaignOptions,
                 campaignPreset.getRandomSkillPreferences());
-        skillsPage.loadValuesFromCampaignOptions(presetCampaignOptions, campaignPreset.getSkills());
+        skillsPages.loadValuesFromCampaignOptions(presetCampaignOptions, campaignPreset.getSkills());
         // The ability page is a special case, so handled differently to other pages
-        abilitiesPage.buildAllAbilityInfo(campaignPreset.getSpecialAbilities());
+        abilitiesPages.buildAllAbilityInfo(campaignPreset.getSpecialAbilities());
 
         // Logistics
-        equipmentAndSuppliesPage.loadValuesFromCampaignOptions(presetCampaignOptions);
-        repairAndMaintenancePage.loadValuesFromCampaignOptions(presetCampaignOptions);
+        equipmentAndSuppliesPages.loadValuesFromCampaignOptions(presetCampaignOptions);
+        repairAndMaintenancePages.loadValuesFromCampaignOptions(presetCampaignOptions);
 
         // Operations
-        financesPage.loadValuesFromCampaignOptions(presetCampaignOptions);
-        marketsPage.loadValuesFromCampaignOptions(presetCampaignOptions);
-        rulesetsPage.loadValuesFromCampaignOptions(presetCampaignOptions);
-        systemsPage.loadValuesFromCampaignOptions(presetCampaignOptions, campaignPreset.getRandomSkillPreferences());
+        financesPages.loadValuesFromCampaignOptions(presetCampaignOptions);
+        marketsPages.loadValuesFromCampaignOptions(presetCampaignOptions);
+        rulesetsPages.loadValuesFromCampaignOptions(presetCampaignOptions);
+        systemsPages.loadValuesFromCampaignOptions(presetCampaignOptions, campaignPreset.getRandomSkillPreferences());
     }
 }
