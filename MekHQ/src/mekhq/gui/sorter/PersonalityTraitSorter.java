@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,40 +32,40 @@
  */
 package mekhq.gui.sorter;
 
-import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.Objects;
 
-import mekhq.MekHQ;
+import mekhq.campaign.randomEvents.personalities.PersonalityTrait;
 
-public class DateStringComparator implements Comparator<String> {
+public class PersonalityTraitSorter implements Comparator<PersonalityTrait> {
 
-    public static final DateStringComparator INSTANCE = new DateStringComparator();
+    public static final PersonalityTraitSorter INSTANCE = new PersonalityTraitSorter();
 
     @Override
-    public int compare(String o1, String o2) {
-        if (Objects.equals(o1, o2)) {
+    public int compare(PersonalityTrait first, PersonalityTrait second) {
+        if (Objects.equals(first, second)) {
             return 0;
-        } else if ("-".equals(o1)) {
+        } else if (first == null) {
             return -1;
-        } else if ("-".equals(o2)) {
+        } else if (second == null) {
             return 1;
+        } else if ((first.isNone() && second.isNone())) {
+            return 0;
+        } else {
+            int firstIntScore = first.isTraitPositive() ? 1 : (first.isNone() ? 0 : -1);
+            int secondIntScore = second.isTraitPositive() ? 1 : (second.isNone() ? 0 : -1);
+            int scoreComparison = Integer.compare(firstIntScore, secondIntScore);
+            if (scoreComparison != 0) {
+                return scoreComparison;
+            }
+            int majorComparison = Boolean.compare(first.isTraitMajor(), second.isTraitMajor());
+            if (!first.isTraitPositive()) {
+                majorComparison = -majorComparison;
+            }
+            if (majorComparison != 0) {
+                return majorComparison;
+            }
+            return first.toString().compareTo(second.toString());
         }
-
-        LocalDate dateA;
-        LocalDate dateB;
-        try {
-            dateA = MekHQ.getMHQOptions().parseDisplayFormattedDate(o1);
-        } catch (Exception ignored) {
-            return -1;
-        }
-
-        try {
-            dateB = MekHQ.getMHQOptions().parseDisplayFormattedDate(o2);
-        } catch (Exception ignored) {
-            return 1;
-        }
-
-        return dateA.compareTo(dateB);
     }
 }

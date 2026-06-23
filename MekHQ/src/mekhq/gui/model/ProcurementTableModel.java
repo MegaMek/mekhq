@@ -132,7 +132,7 @@ public class ProcurementTableModel extends DataTableModel<IAcquisitionWork> {
             case COL_TOTAL_COST:
                 return shoppingItem.getTotalBuyCost().toAmountAndSymbolString();
             case COL_TARGET:
-                final TargetRoll target = getCampaign().getTargetForAcquisition(shoppingItem, true);
+                final TargetRoll target = getCampaign().getTargetForGenericAcquisition(shoppingItem);
                 String value = target.getValueAsString();
                 if (IntStream.of(TargetRoll.IMPOSSIBLE, TargetRoll.AUTOMATIC_SUCCESS, TargetRoll.AUTOMATIC_FAIL)
                           .allMatch(i -> (target.getValue() != i))) {
