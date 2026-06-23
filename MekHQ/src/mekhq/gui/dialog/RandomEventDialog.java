@@ -41,8 +41,6 @@ import java.util.List;
 import java.util.Map;
 
 import jakarta.annotation.Nullable;
-import megamek.codeUtilities.StringUtility;
-import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.AttributeCheck;
@@ -55,8 +53,6 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import org.jspecify.annotations.NonNull;
 
 public class RandomEventDialog {
-    private static final MMLogger LOGGER = MMLogger.create(RandomEventDialog.class);
-
     private final static String RESPONSE_PREFIX = "response.";
     private final static String BUTTON_SUFFIX = ".button";
 
@@ -109,8 +105,9 @@ public class RandomEventDialog {
         for (int i = 0; i < event.responseEntries().size(); i++) {
             RandomEventResponseEntry response = responseEntries.get(i);
 
-            String skillCheckSkill = response.skillCheckSkill();
-            if (!StringUtility.isNullOrBlank(skillCheckSkill)) {
+            SkillType skillType = response.skillCheckSkill();
+            if (skillType != null) {
+                String skillCheckSkill = skillType.getName();
                 SkillCheck skillCheck = speaker.checkSkill(skillCheckSkill,
                       isUseAgingEffects,
                       isClanCampaign,
@@ -158,35 +155,6 @@ public class RandomEventDialog {
             String attributeName = attributeCheck.getActionName();
             int targetNumber = attributeCheck.getTargetNumber().getValue();
             optionText = "(" + attributeName + ", " + targetNumber + "+) " + optionText;
-        }
-        return optionText;
-    }
-
-    private static String getSkillCheckString(Person speaker, RandomEventResponseEntry responseEntry, String optionText,
-          boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today) {
-        String skillCheckSkill = responseEntry.skillCheckSkill();
-        if (!StringUtility.isNullOrBlank(skillCheckSkill)) {
-            SkillType skillType = SkillType.getType(skillCheckSkill);
-            if (skillType == null) {
-                LOGGER.error("Unknown skill type {} in Random Event Dialog. Skipping", skillCheckSkill);
-                return optionText;
-            }
-
-            SkillCheck skillCheck = speaker.checkSkill(skillCheckSkill, isUseAgingEffects, isClanCampaign, today);
-            int targetNumber = skillCheck.getTargetNumber().getValue();
-            return " (" + skillCheckSkill + ", " + targetNumber + "+) " + optionText;
-        }
-
-        return optionText;
-    }
-
-    private static String getAbilityCheckString(Person speaker, RandomEventResponseEntry responseEntry,
-          String optionText) {
-        SkillAttribute attributeChecked = responseEntry.abilityCheckType();
-        if (attributeChecked != SkillAttribute.ATTRIBUTE_NONE) {
-            AttributeCheck attributeCheck = speaker.checkAttribute(attributeChecked);
-            int targetNumber = attributeCheck.getTargetNumber().getValue();
-            optionText = " (" + attributeChecked.getLabel() + ", " + targetNumber + "+) " + optionText;
         }
         return optionText;
     }

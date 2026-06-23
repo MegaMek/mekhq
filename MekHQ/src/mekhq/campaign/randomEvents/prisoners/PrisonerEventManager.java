@@ -100,6 +100,7 @@ public class PrisonerEventManager {
     // However, that lacks nuance, so we've changed it to -1 per prisoner to a maximum of -50.
     public static final int MAX_CRIME_PENALTY = 50;
     static final int RANSOM_EVENT_CHANCE = 10;
+    static final int PRISONER_EVENT_CHANCE = 10;
     private final int MINIMUM_PRISONER_COUNT = 25;
     private final int RESPONSE_TARGET_NUMBER = 7;
 
@@ -284,7 +285,7 @@ public class PrisonerEventManager {
         }
 
         // Generate an event roll
-        int eventRoll = randomInt(50);
+        int eventRoll = randomInt(PRISONER_EVENT_CHANCE);
 
         // Minor event occurs if the random roll is less than the overflow percentage
         boolean minorEvent = eventRoll < overflowPercentage;
@@ -333,7 +334,6 @@ public class PrisonerEventManager {
         } else {
             eventData = pickEvent(false);
         }
-        RandomEventType event = eventData.randomEventType();
 
         int choiceIndex = showDialogAndReturnChoiceIndex(eventData);
 
