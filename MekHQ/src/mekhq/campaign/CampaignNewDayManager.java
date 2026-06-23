@@ -222,9 +222,9 @@ public class CampaignNewDayManager {
           MekHQ.getMHQOptions().getLocale());
 
     private final Campaign campaign;
-    private final CampaignOptions campaignOptions;
-    private final Faction faction;
-    private final Finances finances;
+    private CampaignOptions campaignOptions;
+    private Faction faction;
+    private Finances finances;
     private LocalDate today;
     private AbstractLocation updatedLocation;
 
@@ -248,8 +248,11 @@ public class CampaignNewDayManager {
         this.updatedLocation = campaign.getCurrentLocation();
     }
 
-    public void dispose() {
-        MekHQ.unregisterHandler(this);
+    public void reset() {
+        faction = campaign.getFaction();
+        updatedLocation = campaign.getCurrentLocation();
+
+        startDayWithNoInterruptions = true;
     }
 
     @Subscribe
@@ -273,6 +276,8 @@ public class CampaignNewDayManager {
      * @return {@code true} if the new day concluded successfully, {@code false} if the new day failed.
      */
     public boolean newDay() {
+        reset(); // refresh non-dynamic variables
+
         // Clear previous daily report nags (we want this up top so that we can make sure no messages have been
         // posted prior to this point).
         CommandCenterTab commandCenter = campaign.getGUI().getCommandCenterTab();
@@ -739,7 +744,7 @@ public class CampaignNewDayManager {
             int fieldKitchenCapacity =
                   checkFieldKitchenCapacity(campaign.getFormation(FORMATION_ORIGIN)
                                                   .getAllUnitsAsUnits(campaign.getHangar(),
-                        false), campaignOptions.getFieldKitchenCapacity());
+                                                        false), campaignOptions.getFieldKitchenCapacity());
             int fieldKitchenUsage = checkFieldKitchenUsage(campaign.getActivePersonnel(false, false),
                   campaignOptions.isUseFieldKitchenIgnoreNonCombatants(), campaign);
             boolean withinCapacity = !campaign.isOnContractAndPlanetside() ||
@@ -2206,7 +2211,7 @@ public class CampaignNewDayManager {
             int mashTheatreCapacity =
                   MASHCapacity.checkMASHCapacity(campaign.getFormation(FORMATION_ORIGIN)
                                                        .getAllUnitsAsUnits(campaign.getHangar(),
-                        false), campaignOptions.getMASHTheatreCapacity());
+                                                             false), campaignOptions.getMASHTheatreCapacity());
             mashTheatreCapacity += FacilityRentals.getCapacityIncreaseFromRentals(campaign.getActiveContracts(),
                   ContractRentalType.HOSPITAL_BEDS);
             campaign.setMashTheatreCapacity(mashTheatreCapacity);
