@@ -71,7 +71,7 @@ import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.randomEvents.personalities.PersonalityTrait;
-import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
+import mekhq.campaign.randomEvents.personalities.Reasoning;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.gui.model.LocationDisplay;
@@ -157,7 +157,8 @@ public enum PersonnelTableModelColumn {
     AGGREGATE_COMBAT("Column.AGGREGATE_COMBAT.title", NaturalOrderComparator.INSTANCE,
           PersonnelTableModelColumn::getAggregateSkillValue),
     SMALL_ARMS("Column.SMALL_ARMS.title", Integer::compare,
-          (person, campaign) -> getSkillValue(person, campaign).apply(InfantryGunnerySkills.getBestInfantryGunnerySkill(person,
+          (person, campaign) -> getSkillValue(person, campaign).apply(InfantryGunnerySkills.getBestInfantryGunnerySkill(
+                person,
                 campaign.getCampaignOptions().isUseSmallArmsOnly())), PersonnelTableModelColumn::skillToText),
     ANTI_MEK("Column.ANTI_MEK.title", Integer::compare,
           skillModelExtractor(SkillType.S_ANTI_MEK), PersonnelTableModelColumn::skillToText),
@@ -305,9 +306,9 @@ public enum PersonnelTableModelColumn {
           Person::getBloodmark, Object::toString),
     FATIGUE("Column.FATIGUE.title", Integer::compare,
           (person, campaign) ->
-              getEffectiveFatigue(person.getAdjustedFatigue(),
-                    person.getPermanentFatigue(), person.isClanPersonnel(),
-                    person.getSkillLevel(campaign, false, true)), Object::toString),
+                getEffectiveFatigue(person.getAdjustedFatigue(),
+                      person.getPermanentFatigue(), person.isClanPersonnel(),
+                      person.getSkillLevel(campaign, false, true)), Object::toString),
     SPA_COUNT("Column.SPA_COUNT.title", Integer::compare,
           person -> person.countOptions(PersonnelOptions.LVL3_ADVANTAGES), Object::toString),
     MODIFICATION_COUNT("Column.MODIFICATION_COUNT.title", Integer::compare,
@@ -324,7 +325,8 @@ public enum PersonnelTableModelColumn {
               Academy currentAcademy = EducationController.getAcademy(person.getEduAcademySet(),
                     person.getEduAcademyNameInSet());
               return currentAcademy == null ? "" :
-                           EducationLevel.fromString(String.valueOf(currentAcademy.getEducationLevel(person))).toString();
+                           EducationLevel.fromString(String.valueOf(currentAcademy.getEducationLevel(person)))
+                                 .toString();
           }),
     ACADEMY("Column.ACADEMY.title", NaturalOrderComparator.INSTANCE,
           person -> {
@@ -429,9 +431,9 @@ public enum PersonnelTableModelColumn {
     }
 
     /**
-     * Defines a personnel table column model, how it's sorted and visualised.
-     * This is a simplified column implementation that only depends on {@link Person}.
-     * See {@link #PersonnelTableModelColumn(String, Comparator, BiFunction)}.
+     * Defines a personnel table column model, how it's sorted and visualised. This is a simplified column
+     * implementation that only depends on {@link Person}. See
+     * {@link #PersonnelTableModelColumn(String, Comparator, BiFunction)}.
      */
     <Model> PersonnelTableModelColumn(String name, Comparator<Model> modelComparator,
           Function<Person, Model> modelExtractor, Function<Model, String> modelToText) {
@@ -439,9 +441,9 @@ public enum PersonnelTableModelColumn {
     }
 
     /**
-     * Defines a personnel table column model, how it's sorted and visualised.
-     * This is a simplified column implementation based on the String model.
-     * See {@link #PersonnelTableModelColumn(String, Comparator, BiFunction)}.
+     * Defines a personnel table column model, how it's sorted and visualised. This is a simplified column
+     * implementation based on the String model. See
+     * {@link #PersonnelTableModelColumn(String, Comparator, BiFunction)}.
      */
     PersonnelTableModelColumn(String name, Comparator<String> modelComparator,
           BiFunction<Person, Campaign, String> modelExtractor) {
@@ -449,9 +451,9 @@ public enum PersonnelTableModelColumn {
     }
 
     /**
-     * Defines a personnel table column model, how it's sorted and visualised.
-     * This is a simplified column implementation based on the String model that only depends on {@link Person}.
-     * See {@link #PersonnelTableModelColumn(String, Comparator, BiFunction)}.
+     * Defines a personnel table column model, how it's sorted and visualised. This is a simplified column
+     * implementation based on the String model that only depends on {@link Person}. See
+     * {@link #PersonnelTableModelColumn(String, Comparator, BiFunction)}.
      */
     PersonnelTableModelColumn(String name, Comparator<String> modelComparator,
           Function<Person, String> modelExtractor) {
@@ -513,7 +515,8 @@ public enum PersonnelTableModelColumn {
         return (person, campaign) -> getSkillValue(person, campaign).apply(skillName);
     }
 
-    private static BiFunction<Person, Campaign, String> skillPairModelExtractor(String gunnerySkill, String pilotingSkill) {
+    private static BiFunction<Person, Campaign, String> skillPairModelExtractor(String gunnerySkill,
+          String pilotingSkill) {
         return (person, campaign) -> {
             Function<String, String> skillValue = getStringSkillValue(person, campaign);
             return skillValue.apply(gunnerySkill) + '/' + skillValue.apply(pilotingSkill);
@@ -539,7 +542,7 @@ public enum PersonnelTableModelColumn {
         return switch (primaryProfession) {
             case PersonnelRole.LAM_PILOT ->
                   skillValue.apply(SkillType.S_GUN_MEK) + '/' + skillValue.apply(SkillType.S_PILOT_MEK) + " / " +
-                              skillValue.apply(SkillType.S_GUN_AERO) + '/' + skillValue.apply(SkillType.S_PILOT_AERO);
+                        skillValue.apply(SkillType.S_GUN_AERO) + '/' + skillValue.apply(SkillType.S_PILOT_AERO);
             case PersonnelRole.MEKWARRIOR ->
                   skillValue.apply(SkillType.S_GUN_MEK) + '/' + skillValue.apply(SkillType.S_PILOT_MEK);
             case PersonnelRole.VEHICLE_CREW_VTOL ->
@@ -554,15 +557,13 @@ public enum PersonnelTableModelColumn {
                   skillValue.apply(SkillType.S_GUN_SPACE) + '/' + skillValue.apply(SkillType.S_PILOT_SPACE);
             case PersonnelRole.AEROSPACE_PILOT ->
                   skillValue.apply(SkillType.S_GUN_AERO) + '/' + skillValue.apply(SkillType.S_PILOT_AERO);
-            case PersonnelRole.BATTLE_ARMOUR ->
-                  skillValue.apply(SkillType.S_GUN_BA);
+            case PersonnelRole.BATTLE_ARMOUR -> skillValue.apply(SkillType.S_GUN_BA);
             case PersonnelRole.SOLDIER -> {
                 String gunnerySkill = InfantryGunnerySkills.getBestInfantryGunnerySkill(person,
                       campaignOptions.isUseSmallArmsOnly());
                 yield skillValue.apply(gunnerySkill) + '/' + skillValue.apply(SkillType.S_ANTI_MEK);
             }
-            case PersonnelRole.PROTOMEK_PILOT ->
-                  skillValue.apply(SkillType.S_GUN_PROTO);
+            case PersonnelRole.PROTOMEK_PILOT -> skillValue.apply(SkillType.S_GUN_PROTO);
             default -> "-/-";
         };
     }
@@ -643,8 +644,8 @@ public enum PersonnelTableModelColumn {
     }
 
     /**
-     * Constructs a visualisation function of a person's skill attribute, including their current score,
-     * maximum possible score (cap), and attribute modifier.
+     * Constructs a visualisation function of a person's skill attribute, including their current score, maximum
+     * possible score (cap), and attribute modifier.
      *
      * @param attribute the specific skill attribute being evaluated
      *
@@ -680,8 +681,8 @@ public enum PersonnelTableModelColumn {
     /**
      * Returns the tooltip text for this column, optionally including color reason explanations.
      *
-     * @param person                   the person for this row
-     * @param colorReasonKeys          list of i18n keys for color reasons, or null/empty if no special coloring
+     * @param person          the person for this row
+     * @param colorReasonKeys list of i18n keys for color reasons, or null/empty if no special coloring
      *
      * @return the tooltip text, or null if no tooltip
      */
