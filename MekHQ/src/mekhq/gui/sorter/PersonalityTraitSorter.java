@@ -43,7 +43,13 @@ public class PersonalityTraitSorter implements Comparator<PersonalityTrait> {
 
     @Override
     public int compare(PersonalityTrait first, PersonalityTrait second) {
-        if (Objects.equals(first, second) || (first.isNone() && second.isNone())) {
+        if (Objects.equals(first, second)) {
+            return 0;
+        } else if (first == null) {
+            return -1;
+        } else if (second == null) {
+            return 1;
+        } else if ((first.isNone() && second.isNone())) {
             return 0;
         } else {
             int firstIntScore = first.isTraitPositive() ? 1 : (first.isNone() ? 0 : -1);

@@ -169,7 +169,7 @@ public class PartsAcquisitionService {
         for (List<IAcquisitionWork> awList : acquisitionMap.values()) {
             IAcquisitionWork awFirst = awList.getFirst();
             Part part = awFirst.getAcquisitionPart();
-            TargetRoll target = campaign.getTargetForAcquisition(awFirst, admin, true, false);
+            TargetRoll target = campaign.getTargetForAcquisition(awFirst, admin, true);
             PartCountInfo pci = new PartCountInfo();
 
             PartInventory inventories = campaign.getPartInventory(part);
