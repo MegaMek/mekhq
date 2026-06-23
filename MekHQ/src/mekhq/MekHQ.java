@@ -49,6 +49,7 @@ import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import javax.swing.InputMap;
 import javax.swing.JOptionPane;
@@ -166,6 +167,10 @@ public class MekHQ implements GameListener {
     // endregion Variable Declarations
     private static final SanityInputFilter sanityInputFilter = new SanityInputFilter();
     private static final String defaultTheme = "com.formdev.flatlaf.FlatDarculaLaf";
+
+    public static ResourceBundle getDefaultResourceBundle() {
+        return ResourceBundle.getBundle("mekhq.resources.GUI", MekHQ.getMHQOptions().getLocale());
+    }
 
     public static SuitePreferences getMHQPreferences() {
         return mhqPreferences;
@@ -354,11 +359,11 @@ public class MekHQ implements GameListener {
      */
     public void activateCampaign(Campaign campaign) {
         deactivateCampaign();
-        campaign.setApp(this);
-        campaignController = new CampaignController(campaign);
+        campaignController = new CampaignController(this, campaign);
         campaignController.setHost(campaign.getId());
-        campaignController.activate();
         campaignGUI = new CampaignGUI(this);
+        campaign.setGUI(campaignGUI);
+        campaignController.activate();
     }
 
     /**

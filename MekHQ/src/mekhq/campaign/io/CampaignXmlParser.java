@@ -191,7 +191,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         LOGGER.info("Starting load of campaign file from XML...");
         // Initialize variables.
         Campaign campaign = CampaignFactory.createCampaign();
-        campaign.setApp(app);
+        campaign.setGUI(app.getCampaigngui());
 
         Document xmlDoc;
 
@@ -217,7 +217,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         // Confirm the campaign version is compatible with the current MekHQ version. This function lives here so that
         // we don't attempt to load incompatible campaigns and risk running into errors that might prevent the player
         // from viewing this dialog
-        new MilestoneUpgradePathDialog(campaign, version);
+        new MilestoneUpgradePathDialog(app, campaign, version);
 
         // Assuming there is no upgrade path, we set version and continue parsing the campaign.
         campaign.setVersion(version);
@@ -1520,12 +1520,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                             drainCampusPersons(campaign, campus);
                         }
                     }
-                    for (Part part : base.drainPendingBaseWarehouseParts()) {
-                        LocationNode.LocationManager.setLocation(part, base.getBaseWarehouse());
-                    }
-                    for (Unit unit : base.drainPendingBaseHangarUnits()) {
-                        LocationNode.LocationManager.setLocation(unit, base.getBaseHangar());
-                    }
+                    base.drainPendingBaseWarehouseParts();
+                    base.drainPendingBaseHangarUnits();
                 }
             }
         }
@@ -1697,7 +1693,6 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
      *
      * <p><b>Note B:</b> This approach has to be used, rather than self-correcting during person-load, as the spouse
      * may not have been substantiated when person is loaded.</p>
-     * </p>
      *
      * @param personnel the collection of {@link Person} objects to process
      *

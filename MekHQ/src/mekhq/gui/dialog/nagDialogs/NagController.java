@@ -159,7 +159,7 @@ public class NagController {
         }
 
         // Unmaintained Units
-        final Collection<Unit> units = campaign.getUnits();
+        final Collection<Unit> units = campaign.getAllUnits();
         final boolean isCheckMaintenance = campaignOptions.isCheckMaintenance();
 
         if (UnmaintainedUnitsNagDialog.checkNag(units, isCheckMaintenance)) {
