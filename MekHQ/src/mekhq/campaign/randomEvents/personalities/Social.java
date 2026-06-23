@@ -39,6 +39,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.PronounData;
+import mekhq.campaign.randomEvents.personalities.PersonalityTrait;
 
 /**
  * Represents various levels and traits of social skills in a personality.
@@ -50,7 +51,7 @@ import mekhq.campaign.personnel.PronounData;
  * <p>Some traits, referred to as "Major Traits," denote stronger personality attributes
  * and are to be handled distinctly. These traits are always listed at the end of the enumeration.</p>
  */
-public enum Social {
+public enum Social implements PersonalityTrait {
     // region Enum Declarations
     NONE(false, false),
     APATHETIC(false, false),

@@ -1078,8 +1078,14 @@ public class SkillType {
     }
 
     public static @Nullable SkillType getType(String skillName) {
-        skillName = updateSkillName(skillName);
-        return lookupHash.get(skillName);
+        SkillType result = lookupHash.get(skillName);
+        if (result == null) {
+            result = lookupHash.get(updateSkillName(skillName));
+        }
+        if (result == null) {
+            LOGGER.error(String.format("Failed to resolve a skill type '%s'", skillName));
+        }
+        return result;
     }
 
     /**
