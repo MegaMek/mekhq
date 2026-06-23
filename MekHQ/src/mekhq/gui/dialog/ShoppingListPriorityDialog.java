@@ -388,7 +388,7 @@ public class ShoppingListPriorityDialog extends JDialog {
                 case COL_COST -> item.getBuyCost().toAmountAndSymbolString();
                 case COL_TOTAL_COST -> item.getTotalBuyCost().toAmountAndSymbolString();
                 case COL_TARGET -> {
-                    final TargetRoll target = campaign.getTargetForAcquisition(item, true);
+                    final TargetRoll target = campaign.getTargetForGenericAcquisition(item);
 
                     String value = target.getValueAsString();
 
