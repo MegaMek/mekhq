@@ -44,6 +44,7 @@ import megamek.logging.MMLogger;
  * @author Jay Lawson
  */
 public class FormattedNumberSorter implements Comparator<String> {
+    public static final FormattedNumberSorter INSTANCE = new FormattedNumberSorter();
     private static final MMLogger LOGGER = MMLogger.create(FormattedNumberSorter.class);
 
     private static final String PLUS_SIGN = "+";

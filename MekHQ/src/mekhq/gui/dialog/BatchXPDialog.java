@@ -146,7 +146,7 @@ public final class BatchXPDialog extends JDialog {
             tableColumn.setCellRenderer(getRenderer());
             columnModel.setColumnVisible(tableColumn, true);
 
-            personnelSorter.setComparator(column.ordinal(), column.getComparator(campaign));
+            personnelSorter.setComparator(column.ordinal(), column.getComparator());
             final SortOrder sortOrder = column.getDefaultSortOrder();
             if (sortOrder != null) {
                 sortKeys.add(new SortKey(column.ordinal(), sortOrder));
