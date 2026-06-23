@@ -43,11 +43,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
+import static mekhq.campaign.force.Formation.FORMATION_NONE;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -69,6 +72,8 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.ScenarioForceTemplate;
+import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
+import mekhq.campaign.mission.ScenarioMapParameters;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.enums.CombatRole;
@@ -81,6 +86,7 @@ import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.stratCon.StratConContractDefinition.StrategicObjectiveType;
+import mekhq.campaign.unit.TransportShipAssignment;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Atmosphere;
 import mekhq.campaign.universe.Planet;
@@ -668,6 +674,365 @@ class StratConRulesManagerTest {
               (Campaign) mocks[2], MapLocation.AllGroundTerrain);
 
         assertFalse(result);
+    }
+
+    // -- findPotentialUnits / swapInPlayerUnits tests (regression coverage for #9436) --
+
+    /**
+     * Regression coverage for
+     * <a href="https://github.com/MegaMek/mekhq/issues/9436">issue #9436</a> — the "Use Player DropShip" option
+     * (and player-unit substitution generally) always selected the same unit.
+     *
+     * <p>These tests exercise the private static {@code findPotentialUnits} and {@code swapInPlayerUnits} workers
+     * via reflection, mocking the surrounding scenario/campaign graph. The core regression test is
+     * {@link #swapInPlayerUnits_doesNotAlwaysSelectTheSameUnit()}, which proves that with a single substitution
+     * slot and several eligible units, selection varies across runs rather than deterministically picking one
+     * unit.</p>
+     */
+    @Nested
+    class PlayerUnitSubstitution {
+
+        /**
+         * Invokes the private static {@code findPotentialUnits(Campaign, int)} via reflection.
+         */
+        @SuppressWarnings("unchecked")
+        private Collection<Unit> invokeFindPotentialUnits(Campaign campaign, int explicitForceID) throws Exception {
+            Method method = StratConRulesManager.class.getDeclaredMethod("findPotentialUnits",
+                  Campaign.class, int.class);
+            method.setAccessible(true);
+            return (Collection<Unit>) method.invoke(null, campaign, explicitForceID);
+        }
+
+        /**
+         * Invokes the private static {@code swapInPlayerUnits(StratConScenario, Campaign, int)} via reflection.
+         */
+        private void invokeSwapInPlayerUnits(StratConScenario scenario, Campaign campaign, int explicitForceID)
+              throws Exception {
+            Method method = StratConRulesManager.class.getDeclaredMethod("swapInPlayerUnits",
+                  StratConScenario.class, Campaign.class, int.class);
+            method.setAccessible(true);
+            method.invoke(null, scenario, campaign, explicitForceID);
+        }
+
+        /**
+         * Builds a mock {@link Unit} that {@code isValidUnitForScenario} will accept (or reject when
+         * {@code valid} is {@code false}). Valid units are functional ground Meks with no disqualifying quirks.
+         *
+         * @param valid whether the unit should pass validation; invalid units report {@code isFunctional() == false}
+         */
+        private Unit mockPoolUnit(boolean valid) {
+            Entity entity = mock(Entity.class);
+            when(entity.getUnitType()).thenReturn(UnitType.MEK);
+            when(entity.hasQuirk(OptionsConstants.QUIRK_NEG_UNSTREAMLINED)).thenReturn(false);
+            when(entity.doomedOnGround()).thenReturn(false);
+            when(entity.doomedInAtmosphere()).thenReturn(false);
+            when(entity.doomedInSpace()).thenReturn(false);
+
+            Unit unit = mock(Unit.class);
+            when(unit.getId()).thenReturn(UUID.randomUUID());
+            when(unit.getEntity()).thenReturn(entity);
+            when(unit.isAvailable()).thenReturn(true);
+            when(unit.isFunctional()).thenReturn(valid);
+            return unit;
+        }
+
+        /**
+         * Sets up the full scenario/campaign mock graph for a {@code swapInPlayerUnits} run and executes it,
+         * returning the {@link Unit}s that were actually substituted into the scenario (in selection order).
+         *
+         * @param pool        the campaign TO&amp;E units available for substitution
+         * @param desiredUnitCount the number of bot slots to substitute (drives {@code calculateUnitCount})
+         */
+        private List<Unit> runSwapInPlayerUnits(List<Unit> pool, int desiredUnitCount) throws Exception {
+            final String forceName = "Allied Reinforcements";
+
+            StratConScenario scenario = mock(StratConScenario.class);
+            AtBDynamicScenario backingScenario = mock(AtBDynamicScenario.class);
+            when(scenario.getBackingScenario()).thenReturn(backingScenario);
+
+            // Scenario template -> single "player or fixed unit count" force template, ground map.
+            ScenarioTemplate scenarioTemplate = mock(ScenarioTemplate.class);
+            when(scenario.getScenarioTemplate()).thenReturn(scenarioTemplate);
+
+            ScenarioForceTemplate forceTemplate = mock(ScenarioForceTemplate.class);
+            when(forceTemplate.getGenerationMethod())
+                  .thenReturn(ForceGenerationMethod.PlayerOrFixedUnitCount.ordinal());
+            when(forceTemplate.getForceName()).thenReturn(forceName);
+            when(forceTemplate.getAllowedUnitType()).thenReturn(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX);
+            when(scenarioTemplate.getAllScenarioForces()).thenReturn(List.of(forceTemplate));
+
+            // mapParameters is a public field, not a getter; assign it directly on the mock.
+            ScenarioMapParameters mapParameters = mock(ScenarioMapParameters.class);
+            when(mapParameters.getMapLocation()).thenReturn(MapLocation.AllGroundTerrain);
+            scenarioTemplate.mapParameters = mapParameters;
+
+            // calculateUnitCount derives the slot count from matching bot unit templates.
+            Map<UUID, ScenarioForceTemplate> botUnitTemplates = new HashMap<>();
+            for (int i = 0; i < desiredUnitCount; i++) {
+                ScenarioForceTemplate botTemplate = mock(ScenarioForceTemplate.class);
+                when(botTemplate.getForceName()).thenReturn(forceName);
+                botUnitTemplates.put(UUID.randomUUID(), botTemplate);
+            }
+            when(backingScenario.getBotUnitTemplates()).thenReturn(botUnitTemplates);
+            when(backingScenario.getBotForceTemplates()).thenReturn(new HashMap<>());
+
+            // Campaign with the TO&E pool (explicitForceID == FORMATION_NONE path).
+            Campaign campaign = mock(Campaign.class);
+            CampaignOptions options = mock(CampaignOptions.class);
+            when(options.isUseDropShips()).thenReturn(true);
+            when(campaign.getCampaignOptions()).thenReturn(options);
+            when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 15));
+            CurrentLocation location = mock(CurrentLocation.class);
+            when(location.getPlanet()).thenReturn(null);
+            when(campaign.getCurrentLocation()).thenReturn(location);
+
+            List<UUID> toe = new ArrayList<>();
+            for (Unit unit : pool) {
+                toe.add(unit.getId());
+                when(campaign.getUnit(unit.getId())).thenReturn(unit);
+            }
+            when(campaign.getAllUnitsInTheTOE(false)).thenReturn(toe);
+
+            List<Unit> substituted = new ArrayList<>();
+            doAnswer(invocation -> {
+                substituted.add(invocation.getArgument(0));
+                return null;
+            }).when(scenario).addUnit(any(Unit.class), eq(forceName), eq(false));
+
+            try (MockedStatic<AtBDynamicScenarioFactory> ignored = mockStatic(AtBDynamicScenarioFactory.class)) {
+                invokeSwapInPlayerUnits(scenario, campaign, FORMATION_NONE);
+            }
+            return substituted;
+        }
+
+        @Test
+        void findPotentialUnits_formationNone_returnsAllToeUnits() throws Exception {
+            Campaign campaign = mock(Campaign.class);
+            Unit unitA = mock(Unit.class);
+            Unit unitB = mock(Unit.class);
+            UUID idA = UUID.randomUUID();
+            UUID idB = UUID.randomUUID();
+            when(campaign.getAllUnitsInTheTOE(false)).thenReturn(new ArrayList<>(List.of(idA, idB)));
+            when(campaign.getUnit(idA)).thenReturn(unitA);
+            when(campaign.getUnit(idB)).thenReturn(unitB);
+
+            Collection<Unit> potentialUnits = invokeFindPotentialUnits(campaign, FORMATION_NONE);
+
+            assertEquals(2, potentialUnits.size());
+            assertTrue(potentialUnits.contains(unitA));
+            assertTrue(potentialUnits.contains(unitB));
+        }
+
+        @Test
+        void findPotentialUnits_explicitForceWithNoFormation_returnsEmpty() throws Exception {
+            Campaign campaign = mock(Campaign.class);
+            when(campaign.getFormation(7)).thenReturn(null);
+
+            Collection<Unit> potentialUnits = invokeFindPotentialUnits(campaign, 7);
+
+            assertTrue(potentialUnits.isEmpty());
+        }
+
+        @Test
+        void findPotentialUnits_explicitForce_returnsTransportShipsAndSkipsUnassignedUnits() throws Exception {
+            Campaign campaign = mock(Campaign.class);
+
+            UUID transportedId = UUID.randomUUID();
+            UUID footSlogId = UUID.randomUUID();
+            Vector<UUID> formationUnits = new Vector<>(List.of(transportedId, footSlogId));
+
+            Formation formation = mock(Formation.class);
+            when(formation.getUnits()).thenReturn(formationUnits);
+            when(campaign.getFormation(3)).thenReturn(formation);
+
+            Unit dropShip = mock(Unit.class);
+            Unit transportedUnit = mock(Unit.class);
+            TransportShipAssignment assignment = mock(TransportShipAssignment.class);
+            when(assignment.getTransportShip()).thenReturn(dropShip);
+            when(transportedUnit.getTransportShipAssignment()).thenReturn(assignment);
+            when(campaign.getUnit(transportedId)).thenReturn(transportedUnit);
+
+            Unit footSlogger = mock(Unit.class);
+            when(footSlogger.getTransportShipAssignment()).thenReturn(null);
+            when(campaign.getUnit(footSlogId)).thenReturn(footSlogger);
+
+            Collection<Unit> potentialUnits = invokeFindPotentialUnits(campaign, 3);
+
+            assertEquals(1, potentialUnits.size());
+            assertTrue(potentialUnits.contains(dropShip));
+        }
+
+        @Test
+        void swapInPlayerUnits_doesNotAlwaysSelectTheSameUnit() throws Exception {
+            // The heart of #9436: one substitution slot, several eligible units. The old code iterated a
+            // HashSet in deterministic order and always took the first valid unit. The fix samples randomly,
+            // so over many runs more than one unit must be selected.
+            final int eligibleUnitCount = 5;
+            final int runs = 60;
+
+            Set<UUID> selectedUnitIds = new HashSet<>();
+            for (int run = 0; run < runs; run++) {
+                List<Unit> pool = new ArrayList<>();
+                for (int i = 0; i < eligibleUnitCount; i++) {
+                    pool.add(mockPoolUnit(true));
+                }
+
+                List<Unit> substituted = runSwapInPlayerUnits(pool, 1);
+
+                assertEquals(1, substituted.size());
+                selectedUnitIds.add(substituted.getFirst().getId());
+            }
+
+            assertTrue(selectedUnitIds.size() > 1,
+                  "Expected substitution to vary across runs, but the same unit was always selected");
+        }
+
+        @Test
+        void swapInPlayerUnits_selectsWithoutReplacement() throws Exception {
+            List<Unit> pool = new ArrayList<>();
+            for (int i = 0; i < 4; i++) {
+                pool.add(mockPoolUnit(true));
+            }
+
+            List<Unit> substituted = runSwapInPlayerUnits(pool, 4);
+
+            assertEquals(4, substituted.size());
+            // No unit may be selected twice within a single substitution pass.
+            Set<Unit> distinct = new HashSet<>(substituted);
+            assertEquals(4, distinct.size());
+            assertTrue(distinct.containsAll(pool));
+        }
+
+        @Test
+        void swapInPlayerUnits_respectsRequestedUnitCount() throws Exception {
+            List<Unit> pool = new ArrayList<>();
+            for (int i = 0; i < 5; i++) {
+                pool.add(mockPoolUnit(true));
+            }
+
+            List<Unit> substituted = runSwapInPlayerUnits(pool, 2);
+
+            assertEquals(2, substituted.size());
+        }
+
+        @Test
+        void swapInPlayerUnits_stopsWhenEligiblePoolExhausted() throws Exception {
+            // Two eligible units but three requested slots: only the two eligible units are substituted,
+            // and the loop terminates instead of spinning or adding nulls.
+            List<Unit> pool = new ArrayList<>(List.of(mockPoolUnit(true), mockPoolUnit(true)));
+
+            List<Unit> substituted = runSwapInPlayerUnits(pool, 3);
+
+            assertEquals(2, substituted.size());
+            assertTrue(new HashSet<>(substituted).containsAll(pool));
+        }
+
+        @Test
+        void swapInPlayerUnits_filtersOutInvalidUnits() throws Exception {
+            Unit validUnit = mockPoolUnit(true);
+            Unit brokenUnit = mockPoolUnit(false);
+            List<Unit> pool = new ArrayList<>(List.of(validUnit, brokenUnit));
+
+            List<Unit> substituted = runSwapInPlayerUnits(pool, 2);
+
+            assertEquals(1, substituted.size());
+            assertSame(validUnit, substituted.getFirst());
+        }
+
+        @Test
+        void swapInPlayerUnits_noEligibleUnits_substitutesNothing() throws Exception {
+            List<Unit> pool = new ArrayList<>(List.of(mockPoolUnit(false), mockPoolUnit(false)));
+
+            List<Unit> substituted = runSwapInPlayerUnits(pool, 2);
+
+            assertTrue(substituted.isEmpty());
+        }
+
+        @Test
+        void swapInPlayerUnits_benchesEachSubstitutedUnit() throws Exception {
+            final String forceName = "Allied Reinforcements";
+
+            StratConScenario scenario = mock(StratConScenario.class);
+            AtBDynamicScenario backingScenario = mock(AtBDynamicScenario.class);
+            when(scenario.getBackingScenario()).thenReturn(backingScenario);
+
+            ScenarioTemplate scenarioTemplate = mock(ScenarioTemplate.class);
+            when(scenario.getScenarioTemplate()).thenReturn(scenarioTemplate);
+
+            ScenarioForceTemplate forceTemplate = mock(ScenarioForceTemplate.class);
+            when(forceTemplate.getGenerationMethod())
+                  .thenReturn(ForceGenerationMethod.PlayerOrFixedUnitCount.ordinal());
+            when(forceTemplate.getForceName()).thenReturn(forceName);
+            when(forceTemplate.getAllowedUnitType()).thenReturn(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX);
+            when(scenarioTemplate.getAllScenarioForces()).thenReturn(List.of(forceTemplate));
+
+            ScenarioMapParameters mapParameters = mock(ScenarioMapParameters.class);
+            when(mapParameters.getMapLocation()).thenReturn(MapLocation.AllGroundTerrain);
+            scenarioTemplate.mapParameters = mapParameters;
+
+            Map<UUID, ScenarioForceTemplate> botUnitTemplates = new HashMap<>();
+            for (int i = 0; i < 2; i++) {
+                ScenarioForceTemplate botTemplate = mock(ScenarioForceTemplate.class);
+                when(botTemplate.getForceName()).thenReturn(forceName);
+                botUnitTemplates.put(UUID.randomUUID(), botTemplate);
+            }
+            when(backingScenario.getBotUnitTemplates()).thenReturn(botUnitTemplates);
+            when(backingScenario.getBotForceTemplates()).thenReturn(new HashMap<>());
+
+            Campaign campaign = mock(Campaign.class);
+            CampaignOptions options = mock(CampaignOptions.class);
+            when(options.isUseDropShips()).thenReturn(true);
+            when(campaign.getCampaignOptions()).thenReturn(options);
+            when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 15));
+            CurrentLocation location = mock(CurrentLocation.class);
+            when(location.getPlanet()).thenReturn(null);
+            when(campaign.getCurrentLocation()).thenReturn(location);
+
+            Unit unitA = mockPoolUnit(true);
+            Unit unitB = mockPoolUnit(true);
+            UUID idA = unitA.getId();
+            UUID idB = unitB.getId();
+            when(campaign.getAllUnitsInTheTOE(false)).thenReturn(new ArrayList<>(List.of(idA, idB)));
+            when(campaign.getUnit(idA)).thenReturn(unitA);
+            when(campaign.getUnit(idB)).thenReturn(unitB);
+
+            try (MockedStatic<AtBDynamicScenarioFactory> factory = mockStatic(AtBDynamicScenarioFactory.class)) {
+                invokeSwapInPlayerUnits(scenario, campaign, FORMATION_NONE);
+
+                verify(scenario, times(2)).addUnit(any(Unit.class), eq(forceName), eq(false));
+                factory.verify(() -> AtBDynamicScenarioFactory.benchAllyUnit(any(UUID.class), eq(forceName),
+                      eq(backingScenario)), times(2));
+            }
+        }
+
+        @Test
+        void swapInPlayerUnits_zeroUnitCount_substitutesNothing() throws Exception {
+            // No matching bot templates -> calculateUnitCount returns 0 -> the force is skipped entirely.
+            StratConScenario scenario = mock(StratConScenario.class);
+            AtBDynamicScenario backingScenario = mock(AtBDynamicScenario.class);
+            when(scenario.getBackingScenario()).thenReturn(backingScenario);
+
+            ScenarioTemplate scenarioTemplate = mock(ScenarioTemplate.class);
+            when(scenario.getScenarioTemplate()).thenReturn(scenarioTemplate);
+
+            ScenarioForceTemplate forceTemplate = mock(ScenarioForceTemplate.class);
+            when(forceTemplate.getGenerationMethod())
+                  .thenReturn(ForceGenerationMethod.PlayerOrFixedUnitCount.ordinal());
+            when(forceTemplate.getForceName()).thenReturn("Allied Reinforcements");
+            when(scenarioTemplate.getAllScenarioForces()).thenReturn(List.of(forceTemplate));
+
+            when(backingScenario.getBotUnitTemplates()).thenReturn(new HashMap<>());
+            when(backingScenario.getBotForceTemplates()).thenReturn(new HashMap<>());
+
+            Campaign campaign = mock(Campaign.class);
+
+            try (MockedStatic<AtBDynamicScenarioFactory> factory = mockStatic(AtBDynamicScenarioFactory.class)) {
+                invokeSwapInPlayerUnits(scenario, campaign, FORMATION_NONE);
+
+                verify(scenario, never()).addUnit(any(), any(), anyBoolean());
+                factory.verifyNoInteractions();
+            }
+        }
     }
 
     @Nested
