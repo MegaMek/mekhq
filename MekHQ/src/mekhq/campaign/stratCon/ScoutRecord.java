@@ -32,30 +32,11 @@
  */
 package mekhq.campaign.stratCon;
 
-import megamek.common.TargetRollModifier;
-import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.personnel.Person;
-
-import java.util.List;
+import mekhq.campaign.personnel.skills.SkillCheck;
 
 public record ScoutRecord(
       Person scout,
-      TargetRoll targetNumber,
-      String bestScoutSkillName,
-      boolean scoutHasEagleEyes,
-      double unitWeight,
-      int unitSpeed,
-      boolean unitHasSensorEquipment
-) {
-
-    /**
-     * Returns the full list of {@link TargetRollModifier}s affecting scouting.
-     *
-     * @return a list of {@link TargetRollModifier} reflecting all bonuses scout has
-     */
-    public List<TargetRollModifier> getAllScoutRollModifiers() {
-        return StratConRulesManager.getAllScoutRollModifiers(unitWeight, unitSpeed,
-              scoutHasEagleEyes, unitHasSensorEquipment);
-    }
-
-}
+      SkillCheck skillCheck,
+      double unitWeight
+) {}

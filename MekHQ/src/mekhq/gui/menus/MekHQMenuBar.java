@@ -346,7 +346,7 @@ public class MekHQMenuBar extends JMenuBar {
         // endregion XML Export
 
         JMenuItem miExportCampaignSubset = createMenuItem("miExportCampaignSubset.text", KeyEvent.VK_S, evt -> {
-            CampaignExportWizard cew = new CampaignExportWizard(getCampaign());
+            CampaignExportWizard cew = new CampaignExportWizard(getApplication(), getCampaign());
             cew.display(CampaignExportWizard.CampaignExportWizardState.ForceSelection);
         });
         menuExport.add(miExportCampaignSubset);

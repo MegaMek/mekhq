@@ -40,6 +40,8 @@ import java.util.Comparator;
  */
 public class LevelSorter implements Comparator<String> {
 
+    public static final LevelSorter INSTANCE = new LevelSorter();
+
     @Override
     public int compare(String s0, String s1) {
         if (s0.equals("-") && s1.equals("-")) {
