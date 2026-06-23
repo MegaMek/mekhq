@@ -1159,6 +1159,9 @@ public class Academy implements Comparable<Academy> {
             // we need to do a little extra work to get travel time, to cover academies with
             // multiple campuses
             if (!isHomeSchool) {
+                if (destination == null) {
+                    destination = campaign.getCurrentSystem();
+                }
                 int distance = campaign.getSimplifiedTravelTime(destination);
 
                 tooltip.append("<b>").append(resources.getString("distance.text")).append("</b> ");
