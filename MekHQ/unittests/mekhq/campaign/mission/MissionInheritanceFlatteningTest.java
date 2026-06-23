@@ -54,24 +54,12 @@ import org.apache.logging.log4j.LogManager;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-/**
- * Regression tests that lock in the core invariants introduced by PR #9417, which flattened the
- * {@code AtBContract -> Contract -> Mission} inheritance chain.
- *
- * <p>After the flattening, {@link Mission}, {@link Contract}, and {@link AtBContract} each extend
- * {@link AbstractMissionTransition} directly. The most consequential behavioral change is that {@link AtBContract} is
- * no longer an {@code instanceof Contract} and is no longer an {@code instanceof Mission}, and a {@link Contract} is no
- * longer an {@code instanceof Mission}. A large amount of campaign code filters and dispatches on exactly these
- * relationships, so these tests pin the relationships down to catch any accidental re-parenting in future work.</p>
- *
- * @author Claude (test author for PR #9417 review)
- */
 class MissionInheritanceFlatteningTest {
 
     @BeforeAll
     static void initSingletons() {
         EquipmentType.initializeTypes();
-        RandomCallsignGenerator.getInstance(true);
+        RandomCallsignGenerator.getInstance(true); // Ignore IntelliJ telling you this is ignored
         RandomCompanyNameGenerator.getInstance();
         try {
             Factions.setInstance(Factions.loadDefault(true));
