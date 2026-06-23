@@ -335,7 +335,7 @@ public class PrisonerEventManager {
         }
         RandomEventType event = eventData.randomEventType();
 
-        int choiceIndex = getChoiceIndex(event);
+        int choiceIndex = showDialogAndReturnChoiceIndex(eventData);
 
         boolean isSuccessful = makeEventCheck(eventData, choiceIndex);
 
@@ -345,7 +345,7 @@ public class PrisonerEventManager {
               isSuccessful);
         String eventReport = effectsManager.getMechanicalEffectsReport();
 
-        showDialog(isSuccessful, choiceIndex, event, eventReport);
+        showDialog(isSuccessful, choiceIndex, eventData, eventReport);
 
         Set<Person> escapees = effectsManager.getPersonHashSet();
 
@@ -370,18 +370,19 @@ public class PrisonerEventManager {
      *
      * @param isSuccessful {@code true} if the player's response to the event was successful, {@code false} otherwise
      * @param choiceIndex  the index of the response option chosen by the player
-     * @param event        the {@link RandomEventType} associated with the dialog
+     * @param event        the {@link RandomEventData} associated with the dialog
      * @param eventReport  additional report or commentary to display in the dialog (maybe {@code null})
      *
      * @author Illiani
      * @since 0.50.06
      */
-    private void showDialog(boolean isSuccessful, int choiceIndex, RandomEventType event, String eventReport) {
+    private void showDialog(boolean isSuccessful, int choiceIndex, RandomEventData event, String eventReport) {
         String commanderAddress = campaign.getCommanderAddress();
+
         String suffix = isSuccessful ? ".success" : ".failure";
-        String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
-              "response." + choiceIndex + '.' + event.name() + suffix,
-              commanderAddress);
+
+        String resourceKey = "response." + choiceIndex + '.' + event.randomEventType().name() + suffix;
+        String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, resourceKey, commanderAddress);
 
         new ImmersiveDialogSimple(campaign, speaker, null, inCharacterMessage, null, eventReport, null, false);
     }
@@ -400,8 +401,9 @@ public class PrisonerEventManager {
      * @author Illiani
      * @since 0.50.06
      */
-    private int getChoiceIndex(RandomEventType event) {
-        RandomEventDialog dialog = new RandomEventDialog(campaign, speaker, event, RESOURCE_BUNDLE);
+    private int showDialogAndReturnChoiceIndex(RandomEventData event) {
+        RandomEventDialog dialog = new RandomEventDialog(campaign, speaker, null, event, RESOURCE_BUNDLE);
+
         return dialog.getDialogChoice();
     }
 
@@ -426,7 +428,7 @@ public class PrisonerEventManager {
         String commanderAddress = campaign.getCommanderAddress();
         String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "warning.message", commanderAddress);
 
-        int choice = getChoiceIndex(setFree, executions, inCharacterMessage);
+        int choice = showDialogAndReturnChoiceIndex(setFree, executions, inCharacterMessage);
 
         String outOfCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "result.ooc");
         if (choice == CHOICE_FREE) {
@@ -542,7 +544,7 @@ public class PrisonerEventManager {
      * @author Illiani
      * @since 0.50.06
      */
-    private int getChoiceIndex(int setFree, int executions, String inCharacterMessage) {
+    private int showDialogAndReturnChoiceIndex(int setFree, int executions, String inCharacterMessage) {
         List<String> options = List.of(getFormattedTextAt(RESOURCE_BUNDLE, "btnDoNothing.button"),
               getFormattedTextAt(RESOURCE_BUNDLE, "free.button", setFree),
               getFormattedTextAt(RESOURCE_BUNDLE, "execute.button", executions));

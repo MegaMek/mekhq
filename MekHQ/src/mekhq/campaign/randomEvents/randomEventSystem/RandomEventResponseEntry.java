@@ -32,20 +32,19 @@
  */
 package mekhq.campaign.randomEvents.randomEventSystem;
 
-import mekhq.campaign.personnel.skills.enums.SkillAttribute;
+import static mekhq.campaign.personnel.skills.enums.SkillAttribute.ATTRIBUTE_NONE;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static mekhq.campaign.personnel.skills.enums.SkillAttribute.ATTRIBUTE_NONE;
-import static mekhq.campaign.randomEvents.randomEventSystem.RandomEventResultEffect.NONE;
+import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 
 /**
  * Represents an individual response entry for a random event. Each response entry defines a response quality and its
  * associated effects.
  *
  * @param quality          the quality of the response, as defined by the {@link RandomEventResponseQuality} enum
- * @param skillCheckType   the skill used in skill checks related to this response
+ * @param skillCheckSkill  the skill used in skill checks related to this response
  * @param abilityCheckType the ability used in ability checks related to this response
  * @param effectsSuccess   a list of effects resulting from successful resolution of the event, as defined by the
  *                         {@link RandomEventResult} record
@@ -54,7 +53,7 @@ import static mekhq.campaign.randomEvents.randomEventSystem.RandomEventResultEff
  */
 public record RandomEventResponseEntry(
       RandomEventResponseQuality quality,
-      String skillCheckType,
+      String skillCheckSkill,
       SkillAttribute abilityCheckType,
       List<RandomEventResult> effectsSuccess,
       List<RandomEventResult> effectsFailure
@@ -62,7 +61,7 @@ public record RandomEventResponseEntry(
     // Additional logic to provide defaults for missing properties
     public RandomEventResponseEntry {
         quality = (quality != null) ? quality : RandomEventResponseQuality.RESPONSE_NEUTRAL;
-        skillCheckType = (skillCheckType != null) ? skillCheckType : "";
+        skillCheckSkill = (skillCheckSkill != null) ? skillCheckSkill : "";
         abilityCheckType = (abilityCheckType != null) ? abilityCheckType : ATTRIBUTE_NONE;
         effectsSuccess = new ArrayList<>();
         effectsFailure = new ArrayList<>();
