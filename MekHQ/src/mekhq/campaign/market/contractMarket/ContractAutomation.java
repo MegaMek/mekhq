@@ -149,7 +149,7 @@ public class ContractAutomation {
 
             campaign.getCurrentLocation().setJumpPath(jumpPath);
             campaign.getUnits().forEach(unit -> unit.setSite(Unit.SITE_FACILITY_BASIC));
-            campaign.getApp().getCampaigngui().refreshAllTabs();
+            campaign.getGUI().refreshAllTabs();
             boolean useTwoWayPay = campaign.getCampaignOptions().isUseTwoWayPay();
 
             // This will return an empty string if the transaction was successful

@@ -155,7 +155,8 @@ public class LocationNodeTest {
             // child is not a CurrentLocation; its parent is
             ILocation childLocatable = mock(ILocation.class);
             LocationNode child = new LocationNode(childLocatable);
-            LocationManager.setLocation(child, currentLocation.getLocationNode());
+            when(childLocatable.getLocationNode()).thenReturn(child);
+            LocationManager.setLocation(childLocatable, currentLocation);
 
             assertSame(currentLocation, child.getNearestAbstractLocation());
         }
@@ -175,52 +176,62 @@ public class LocationNodeTest {
             ILocation leafLocatable = mock(ILocation.class);
             LocationNode leaf = new LocationNode(leafLocatable);
 
-            LocationManager.setLocation(mid, currentLocation.getLocationNode());
-            LocationManager.setLocation(leaf, mid);
+            when(midLocatable.getLocationNode()).thenReturn(mid);
+            when(leafLocatable.getLocationNode()).thenReturn(leaf);
+            LocationManager.setLocation(midLocatable, currentLocation);
+            LocationManager.setLocation(leafLocatable, midLocatable);
 
             assertSame(currentLocation, leaf.getNearestAbstractLocation());
         }
     }
 
-    /** Tests for {@link LocationNode.LocationManager#setLocation(LocationNode, LocationNode)}. */
+    /** Tests for {@link LocationNode.LocationManager#setLocation(ILocation, ILocation)}. */
     @Nested
     class LocationManagerTests {
 
+        ILocation parentLoc;
+        ILocation childLoc;
         LocationNode parent;
         LocationNode child;
 
         @BeforeEach
         void setUp() {
-            parent = new LocationNode(mock(ILocation.class));
-            child = new LocationNode(mock(ILocation.class));
+            parentLoc = mock(ILocation.class);
+            childLoc = mock(ILocation.class);
+            parent = new LocationNode(parentLoc);
+            child = new LocationNode(childLoc);
+            when(parentLoc.getLocationNode()).thenReturn(parent);
+            when(childLoc.getLocationNode()).thenReturn(child);
         }
 
         @Test
         void setLocation_wiresParentAndChild() {
-            LocationManager.setLocation(child, parent);
+            LocationManager.setLocation(childLoc, parentLoc);
             assertSame(parent, child.getParent());
             assertTrue(parent.getChildren().contains(child));
         }
 
         @Test
         void setLocation_nullParent_clearsParentLink() {
-            LocationManager.setLocation(child, parent);
-            LocationManager.setLocation(child, (LocationNode) null);
+            LocationManager.setLocation(childLoc, parentLoc);
+            LocationManager.setLocation(childLoc, null);
             assertNull(child.getParent());
         }
 
         @Test
         void setLocation_nullParent_removesFromOldParentsChildren() {
-            LocationManager.setLocation(child, parent);
-            LocationManager.setLocation(child, (LocationNode) null);
+            LocationManager.setLocation(childLoc, parentLoc);
+            LocationManager.setLocation(childLoc, null);
             assertFalse(parent.getChildren().contains(child));
         }
 
         @Test
         void setLocation_movesChildFromOldParentToNew() {
-            LocationNode newParent = new LocationNode(mock(ILocation.class));
-            LocationManager.setLocation(child, parent);
-            LocationManager.setLocation(child, newParent);
+            ILocation newParentLoc = mock(ILocation.class);
+            LocationNode newParent = new LocationNode(newParentLoc);
+            when(newParentLoc.getLocationNode()).thenReturn(newParent);
+            LocationManager.setLocation(childLoc, parentLoc);
+            LocationManager.setLocation(childLoc, newParentLoc);
 
             assertFalse(parent.getChildren().contains(child));
             assertTrue(newParent.getChildren().contains(child));
@@ -229,17 +240,10 @@ public class LocationNodeTest {
 
         @Test
         void setLocation_ILocation_overload_wiresCorrectly() {
-            ILocation childLoc = mock(ILocation.class);
-            ILocation parentLoc = mock(ILocation.class);
-            LocationNode childNode = new LocationNode(childLoc);
-            LocationNode parentNode = new LocationNode(parentLoc);
-            when(childLoc.getLocationNode()).thenReturn(childNode);
-            when(parentLoc.getLocationNode()).thenReturn(parentNode);
-
             LocationManager.setLocation(childLoc, parentLoc);
 
-            assertSame(parentNode, childNode.getParent());
-            assertTrue(parentNode.getChildren().contains(childNode));
+            assertSame(parent, child.getParent());
+            assertTrue(parent.getChildren().contains(child));
         }
     }
 
@@ -369,9 +373,10 @@ public class LocationNodeTest {
             ILocation middle = mock(ILocation.class);
             LocationNode leafNode = new LocationNode(leaf);
             LocationNode middleNode = new LocationNode(middle);
-            LocationManager.setLocation(leafNode, middleNode);
             when(leaf.getLocationNode()).thenReturn(leafNode);
+            when(middle.getLocationNode()).thenReturn(middleNode);
             when(leaf.hasLocationNode()).thenReturn(true);
+            LocationManager.setLocation(leaf, middle);
 
             assertNull(leaf.getPlace());
         }

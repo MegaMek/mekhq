@@ -46,7 +46,6 @@ import mekhq.campaign.FixedLocation;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.Personnel;
 import mekhq.campaign.Warehouse;
-import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.parts.meks.MekSensor;
@@ -109,23 +108,20 @@ public class AbstractBaseTest {
     class LocationTreeWiring {
         @Test
         void baseHangar_parentIsBase() {
-            LocationNode hangarNode = base.getBaseHangar().getLocationNode();
-            assertNotNull(hangarNode.getParent());
-            assertSame(base.getLocationNode(), hangarNode.getParent());
+            assertTrue(base.getBaseHangar().isParented());
+            assertSame(base, base.getBaseHangar().getParentLocation());
         }
 
         @Test
         void baseWarehouse_parentIsBase() {
-            LocationNode warehouseNode = base.getBaseWarehouse().getLocationNode();
-            assertNotNull(warehouseNode.getParent());
-            assertSame(base.getLocationNode(), warehouseNode.getParent());
+            assertTrue(base.getBaseWarehouse().isParented());
+            assertSame(base, base.getBaseWarehouse().getParentLocation());
         }
 
         @Test
         void basePersonnel_parentIsBase() {
-            LocationNode personnelNode = base.getBasePersonnel().getLocationNode();
-            assertNotNull(personnelNode.getParent());
-            assertSame(base.getLocationNode(), personnelNode.getParent());
+            assertTrue(base.getBasePersonnel().isParented());
+            assertSame(base, base.getBasePersonnel().getParentLocation());
         }
 
         @Test

@@ -39,11 +39,12 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import megamek.client.ui.buttons.MMButton;
+import megamek.client.ui.dialogs.buttonDialogs.AbstractButtonDialog;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 import mekhq.gui.panes.UnitMarketPane;
 
-public class UnitMarketDialog extends AbstractMHQButtonDialog {
+public class UnitMarketDialog extends AbstractButtonDialog {
     //region Variable Declarations
     private final Campaign campaign;
 
@@ -57,7 +58,7 @@ public class UnitMarketDialog extends AbstractMHQButtonDialog {
 
     //region Constructors
     public UnitMarketDialog(final JFrame frame, final Campaign campaign) {
-        super(frame, "UnitMarketDialog", "UnitMarketDialog.title");
+        super(frame, true, MekHQ.getDefaultResourceBundle(), "UnitMarketDialog", "UnitMarketDialog.title");
         this.campaign = campaign;
         initialize();
     }
@@ -149,5 +150,10 @@ public class UnitMarketDialog extends AbstractMHQButtonDialog {
         if (getRemoveButton() != null) {
             getRemoveButton().setEnabled(enabled);
         }
+    }
+
+    @Override
+    protected void setPreferences() throws Exception {
+        setPreferences(MekHQ.getMHQPreferences().forClass(getClass()));
     }
 }

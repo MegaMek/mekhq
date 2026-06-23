@@ -136,7 +136,18 @@ public class AdvanceTimePanel extends ScalingWidthConstrainedPanel {
         add(btnAdvanceNDays);
 
         refresh(date);
+    }
+
+    @Override
+    public void addNotify() {
+        super.addNotify();
         MekHQ.registerHandler(this);
+    }
+
+    @Override
+    public void removeNotify() {
+        MekHQ.unregisterHandler(this);
+        super.removeNotify();
     }
 
     /**

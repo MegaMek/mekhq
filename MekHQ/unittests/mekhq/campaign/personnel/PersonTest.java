@@ -80,6 +80,8 @@ import mekhq.campaign.personnel.enums.AwardBonus;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
+import mekhq.campaign.personnel.skills.SkillCheck;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.randomEvents.personalities.enums.Aggression;
 import mekhq.campaign.randomEvents.personalities.enums.Ambition;
 import mekhq.campaign.randomEvents.personalities.enums.Greed;
@@ -90,6 +92,7 @@ import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -1583,6 +1586,8 @@ public class PersonTest {
                       .thenReturn(new AcademyCampusLocation(ACADEMY_SET, ACADEMY_NAME));
                 when(campaign.getOrCreateLocalCampusLocation(any(), any()))
                       .thenReturn(new AcademyCampusLocation(ACADEMY_SET, ACADEMY_NAME));
+                when(campaign.getOrCreateCampusUnderLocation(any(), any(), any()))
+                      .thenReturn(new AcademyCampusLocation(ACADEMY_SET, ACADEMY_NAME));
             }
 
             @Test
@@ -1772,7 +1777,7 @@ public class PersonTest {
 
         @Test
         void getLocationNode_noParentByDefault() {
-            assertNull(person.getLocationNode().getParent());
+            assertFalse(person.isParented());
         }
 
         @Test
@@ -1807,27 +1812,27 @@ public class PersonTest {
             @Test
             void setParent_toCampus_wiresParentLink() {
                 person.setParent(campus);
-                assertSame(campus.getLocationNode(), person.getLocationNode().getParent());
+                assertSame(campus, person.getParentLocation());
             }
 
             @Test
             void setParent_toCampus_addsToChildrenOfCampus() {
                 person.setParent(campus);
-                assertTrue(campus.getLocationNode().getChildren().contains(person.getLocationNode()));
+                assertTrue(campus.getChildLocations().contains(person));
             }
 
             @Test
             void setParent_null_clearsParentLink() {
                 person.setParent(campus);
                 person.setParent(null);
-                assertNull(person.getLocationNode().getParent());
+                assertFalse(person.isParented());
             }
 
             @Test
             void setParent_null_removesFromCampusChildren() {
                 person.setParent(campus);
                 person.setParent(null);
-                assertFalse(campus.getLocationNode().getChildren().contains(person.getLocationNode()));
+                assertFalse(campus.getChildLocations().contains(person));
             }
 
             @Test
@@ -1909,6 +1914,47 @@ public class PersonTest {
 
                 person.setEduAcademySystem("OtherSystem");
                 assertEquals("Outreach", person.getEduAcademySystem());
+            }
+        }
+
+        /** smoke tests, actual test coverage is in {@link mekhq.campaign.personnel.skills.SkillCheckTest} */
+        @Nested
+        class CheckSkill {
+
+            @BeforeAll
+            static void beforeAll() {
+                SkillType.initializeTypes();
+            }
+
+            @Test
+            void testCheckSkill_WithExplicitModifiers() {
+                Person person = new Person("GivenName", "Surname", null, "Faction");
+                person.addSkill(SkillType.S_GUN_MEK, 4, 0);
+                SkillCheck check = person.checkSkill(SkillType.S_GUN_MEK, true, true, LocalDate.of(3151, 1, 1));
+                assertEquals(3, check.getTargetNumber().getValue());
+            }
+
+            @Test
+            void testCheckSkill_WithCampaignContext() {
+                Person person = new Person("GivenName", "Surname", null, "Faction");
+                person.addSkill(SkillType.S_GUN_MEK, 4, 0);
+                Campaign campaign = mock(Campaign.class);
+                CampaignOptions options = mock(CampaignOptions.class);
+                LocalDate date = LocalDate.of(3151, 1, 1);
+
+                when(campaign.getCampaignOptions()).thenReturn(options);
+                when(options.isUseAgeEffects()).thenReturn(true);
+                when(campaign.isClanCampaign()).thenReturn(false);
+                when(campaign.getLocalDate()).thenReturn(date);
+
+                SkillCheck check = person.checkSkill(SkillType.S_GUN_MEK, campaign);
+
+                assertNotNull(check);
+                assertEquals(3, check.getTargetNumber().getValue());
+                verify(campaign).getCampaignOptions();
+                verify(options).isUseAgeEffects();
+                verify(campaign).isClanCampaign();
+                verify(campaign).getLocalDate();
             }
         }
     }

@@ -100,19 +100,12 @@ public class EscapeSkills {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         boolean useEdge = campaignOptions.isUseEdge() || campaignOptions.isUseSupportEdge();
         useEdge = useEdge && person.getOptions().booleanOption(EDGE_ESCAPE_ATTEMPTS);
-        SkillCheckUtility skillCheckUtility = new SkillCheckUtility(
-              getTextAt(RESOURCE_BUNDLE, "EscapeArtist.skillCheck"),
-              person,
-              skillToUse,
-              List.of(),
-              0,
-              useEdge,
-              false,
-              false,
-              false,
-              today);
-        int marginOfSuccessValue = skillCheckUtility.getMarginOfSuccess();
-        MarginOfSuccess marginOfSuccess = MarginOfSuccess.getMarginOfSuccessObjectFromMarginValue(marginOfSuccessValue);
+        ActionCheckResult actionCheckResult =
+              person.checkSkill(skillToUse, false, false, today)
+                    .resolve(useEdge, getTextAt(RESOURCE_BUNDLE, "EscapeArtist.skillCheck"), false);
+
+        MarginOfSuccess marginOfSuccess =
+              MarginOfSuccess.getMarginOfSuccessObjectFromMarginValue(actionCheckResult.marginOfSuccess());
 
         // Nothing happens for these cases, so we can just early exit
         List<MarginOfSuccess> noFurtherActionCases = List.of(MarginOfSuccess.IT_WILL_DO, MarginOfSuccess.BARELY_MADE_IT,

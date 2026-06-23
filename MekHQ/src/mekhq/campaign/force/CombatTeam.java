@@ -471,7 +471,7 @@ public class CombatTeam {
 
         // if we are using StratCon, don't *also* generate legacy scenarios
         if (campaign.getCampaignOptions().isUseStratCon() &&
-                  (getContract(campaign).getStratconCampaignState() != null)) {
+                  (getContract(campaign).getStratConCampaignState() != null)) {
             return null;
         }
 

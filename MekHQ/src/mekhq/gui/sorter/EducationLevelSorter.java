@@ -51,6 +51,9 @@ import mekhq.campaign.personnel.enums.education.EducationLevel;
  * @since 0.50.07
  */
 public class EducationLevelSorter implements Comparator<String> {
+
+    public static final EducationLevelSorter INSTANCE = new EducationLevelSorter();
+
     private static final MMLogger LOGGER = MMLogger.create(EducationLevelSorter.class);
 
     @Override

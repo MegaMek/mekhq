@@ -38,7 +38,9 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import javax.swing.BorderFactory;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
@@ -70,19 +72,23 @@ public class MoraleBar extends JPanel {
      * colors are deliberately deep and well separated so that adjacent segments remain easy to tell apart.
      */
     private static final Color[] MORALE_GRADIENT = {
-            new Color(0x12, 0x7C, 0x1E), // deep green - lowest enemy morale, most favourable for the player
-            new Color(0x36, 0xB3, 0x2B), // green
-            new Color(0x8C, 0xC6, 0x1A), // lime
-            new Color(0xE8, 0xC4, 0x0A), // gold
-            new Color(0xF2, 0x86, 0x00), // orange
-            new Color(0xD2, 0x44, 0x10), // red-orange
-            new Color(0xA8, 0x12, 0x12) // deep red - highest enemy morale, most dangerous for the player
+          new Color(0x12, 0x7C, 0x1E), // deep green - lowest enemy morale, most favourable for the player
+          new Color(0x36, 0xB3, 0x2B), // green
+          new Color(0x8C, 0xC6, 0x1A), // lime
+          new Color(0xE8, 0xC4, 0x0A), // gold
+          new Color(0xF2, 0x86, 0x00), // orange
+          new Color(0xD2, 0x44, 0x10), // red-orange
+          new Color(0xA8, 0x12, 0x12) // deep red - highest enemy morale, most dangerous for the player
     };
 
     /**
      * The wrapped gauge. Kept private so the segment-level API is not exposed to callers.
      */
     private final SegmentedBar bar = new SegmentedBar();
+
+    /** The title drawn above the bar; kept so the component tooltip can be forwarded to it. */
+    private final JLabel titleLabel = new JLabel(getTextAt(RESOURCE_BUNDLE, "contractMoraleBar.title.text"),
+          SwingConstants.CENTER);
 
     /**
      * Creates a morale bar for the given morale level, with a label drawn beneath the active segment.
@@ -92,8 +98,10 @@ public class MoraleBar extends JPanel {
      *                    contract-specific name such as "Peaceful"). Pass a blank string to show no label.
      */
     public MoraleBar(@Nonnull final AtBMoraleLevel moraleLevel, @Nonnull final String labelText) {
+        // The segments sit at the top of the wrapped bar, so the title is placed directly above them with no extra gap.
         super(new BorderLayout());
         setOpaque(false);
+        add(titleLabel, BorderLayout.NORTH);
         add(bar, BorderLayout.CENTER);
 
         final AtBMoraleLevel[] levels = AtBMoraleLevel.values();
@@ -108,14 +116,17 @@ public class MoraleBar extends JPanel {
     }
 
     /**
-     * Forwards the tooltip to the wrapped gauge so that the area around the segments (gaps and the label) shows this
-     * fallback tooltip, while individual segments keep their own per-level tooltips.
+     * Forwards the tooltip across the whole component: to the wrapped gauge (so the area around the segments shows this
+     * fallback while individual segments keep their own per-level tooltips), to the title above it, and to the panel
+     * itself (covering any gaps), so the tooltip shows wherever the player hovers the bar.
      *
      * @param text the tooltip text, or {@code null} for none
      */
     @Override
     public void setToolTipText(final @Nullable String text) {
+        super.setToolTipText(text);
         bar.setToolTipText(text);
+        titleLabel.setToolTipText(text);
     }
 
     /**
@@ -134,7 +145,7 @@ public class MoraleBar extends JPanel {
         final int horizontalPadding = UIUtil.scaleForGUI(40);
         final int verticalPadding = UIUtil.scaleForGUI(6);
         panel.setBorder(BorderFactory.createEmptyBorder(verticalPadding, horizontalPadding, verticalPadding,
-                horizontalPadding));
+              horizontalPadding));
 
         final MoraleDisplay display = getMoraleDisplay(contract);
         final MoraleBar moraleBar = new MoraleBar(contract.getMoraleLevel(), display.label());
@@ -164,9 +175,9 @@ public class MoraleBar extends JPanel {
     public static @Nonnull MoraleDisplay getMoraleDisplay(@Nonnull final AtBContract contract) {
         final AtBMoraleLevel level = contract.getMoraleLevel();
         if ((contract.getContractType().isGarrisonDuty() || contract.getContractType().isRetainer()) &&
-                level.isRouted()) {
+                  level.isRouted()) {
             return new MoraleDisplay(getTextAt(RESOURCE_BUNDLE, "txtGarrisonMoraleRouted.text"),
-                    getTextAt(RESOURCE_BUNDLE, "txtGarrisonMoraleRouted.tooltip"));
+                  getTextAt(RESOURCE_BUNDLE, "txtGarrisonMoraleRouted.tooltip"));
         }
         return new MoraleDisplay(level.toString(), level.getToolTipText());
     }

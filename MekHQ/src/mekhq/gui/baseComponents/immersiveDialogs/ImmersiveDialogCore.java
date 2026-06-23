@@ -432,7 +432,7 @@ public class ImmersiveDialogCore extends JDialog {
         String commandKey = splitReference[0];
         String entryKey = splitReference[1];
 
-        CampaignGUI campaignGUI = campaign.getApp().getCampaigngui();
+        CampaignGUI campaignGUI = campaign.getGUI();
 
         if (commandKey.equalsIgnoreCase(GLOSSARY_COMMAND_STRING)) {
             GlossaryEntry glossaryEntry = GlossaryEntry.getGlossaryEntryFromLookUpName(entryKey);

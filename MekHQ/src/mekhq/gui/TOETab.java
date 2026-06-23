@@ -199,7 +199,7 @@ public final class TOETab extends CampaignGuiTab {
         // Check if this is a StratCon scenario
         boolean isStratConScenario = selectedScenario instanceof AtBDynamicScenario &&
                                            selectedMission instanceof AtBContract atbContract &&
-                                           atbContract.getStratconCampaignState() != null;
+                                           atbContract.getStratConCampaignState() != null;
 
         if (isStratConScenario) {
             deployToStratCon(selectedScenario);

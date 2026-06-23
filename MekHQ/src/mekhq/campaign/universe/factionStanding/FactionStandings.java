@@ -609,14 +609,16 @@ public class FactionStandings {
         factionCode = convertSpecialFaction(factionCode, gameYear);
 
         double regardValue = Math.clamp(newRegard, MINIMUM_REGARD, maximumRegard);
-        double currentRegard = getRegardForFaction(factionCode, false);
+
+        // We want the true value, adjusted for climate, for reporting purposes
+        double originalRegard = getRegardForFaction(factionCode, true);
 
         factionRegard.put(factionCode, regardValue);
 
-        double change = regardValue - currentRegard;
-
         if (includeReport) {
-            return getRegardChangedReport(change, gameYear, factionCode, regardValue, currentRegard);
+            double change = regardValue - originalRegard;
+            double newRegardAdjustedForClimate = getRegardForFaction(factionCode, true);
+            return getRegardChangedReport(change, gameYear, factionCode, newRegardAdjustedForClimate, originalRegard);
         }
 
         return "";
@@ -694,7 +696,10 @@ public class FactionStandings {
 
         double adjustedDelta = delta * regardMultiplier;
 
+        // We want the current raw value, not including climate as this value will be used to update the regard map
         double originalRegard = getRegardForFaction(factionCode, false);
+        // We also want the true value, adjusted for climate, for reporting purposes
+        double originalRegardAdjustedForClimate = getRegardForFaction(factionCode, true);
 
         double maximumRegard = Objects.equals(campaignFactionCode, factionCode) || campaignFactionCode == null
                                      ? MAXIMUM_SAME_FACTION_REGARD
@@ -703,7 +708,13 @@ public class FactionStandings {
 
         factionRegard.put(factionCode, newRegard);
 
-        return getRegardChangedReport(adjustedDelta, gameYear, factionCode, newRegard, originalRegard);
+        // We want the true value, adjusted for climate, for reporting purposes
+        double newRegardAdjustedForClimate = getRegardForFaction(factionCode, true);
+        return getRegardChangedReport(adjustedDelta,
+              gameYear,
+              factionCode,
+              newRegardAdjustedForClimate,
+              originalRegardAdjustedForClimate);
     }
 
     /**
@@ -805,12 +816,6 @@ public class FactionStandings {
         return null;
     }
 
-    /** Use {@link #updateClimateRegard(Faction, LocalDate, double, boolean)} instead */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    public String updateClimateRegard(final Faction campaignFaction, final LocalDate today) {
-        return updateClimateRegard(campaignFaction, today, 1.0, false);
-    }
-
     /**
      * Updates the internal map representing the "climate regard"—an attitude or relationship level—between the
      * specified campaign faction and all other factions for the given date.
@@ -835,40 +840,9 @@ public class FactionStandings {
      * @since 0.50.07
      */
     public String updateClimateRegard(final Faction campaignFaction, final LocalDate today,
-          final double regardMultiplier, final boolean enableVerboseClimateRegard) {
-        return updateClimateRegard(campaignFaction, today, regardMultiplier, enableVerboseClimateRegard, false);
-    }
-
-    /**
-     * Updates the internal map representing the "climate regard"—an attitude or relationship level—between the
-     * specified campaign faction and all other factions for the given date.
-     *
-     * <p>The method iterates over all factions and assigns a regard value based on alliances, wars, rivalry, and
-     * whether the faction is untracked or invalid for the specified year.</p>
-     *
-     * <p>Existing climateRegard entries are removed.</p>
-     *
-     * <p>After updating, this method generates and returns an HTML-formatted report summarizing the new climate
-     * regard standings for all relevant factions.</p>
-     *
-     * @param campaignFaction            the {@link Faction} representing the campaign's primary faction
-     * @param today                      the {@link LocalDate} to use for validating factions and determining
-     *                                   relationships
-     * @param regardMultiplier           the regard multiplier set in campaign options
-     * @param enableVerboseClimateRegard {@code true} if the verbose climate regard campaign option is enabled
-     * @param useTestDirectory           {@code true} if called from within a Unit Test
-     *
-     * @return an HTML-formatted {@link String} report of faction climate regard changes
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    public String updateClimateRegard(final Faction campaignFaction, final LocalDate today,
-          final double regardMultiplier, boolean enableVerboseClimateRegard, boolean useTestDirectory) {
+          final double regardMultiplier, boolean enableVerboseClimateRegard) {
         Collection<Faction> allFactions = Factions.getInstance().getActiveFactions(today);
-        FactionHints factionHints = useTestDirectory ?
-                                          FactionHints.initializeTestInstance() :
-                                          FactionHints.getInstance();
+        FactionHints factionHints = FactionHints.getInstance();
         boolean isPirate = campaignFaction.isPirate();
 
         // Clear any existing climate regard entries
@@ -1028,8 +1002,8 @@ public class FactionStandings {
      * @param delta          the amount of Regard gained or lost
      * @param gameYear       the current in-game year, used to render the appropriate faction name
      * @param factionCode    unique identifier for the faction whose Regard should be adjusted
-     * @param newRegard      the Regard value after the delta is applied
-     * @param originalRegard the Regard value before the delta is applied
+     * @param newRegard      the Regard value after the delta is applied (usually adjusted for political climate)
+     * @param originalRegard the Regard value before the delta is applied (usually adjusted for political climate)
      *
      * @return a formatted {@link String} describing the regard change, direction, and any milestone transition
      *
@@ -1736,7 +1710,7 @@ public class FactionStandings {
                 MissionStatus missionStatus = mission.getStatus();
 
                 if (mission instanceof AtBContract atbContract) {
-                    int contractLength = atbContract.getLength();
+                    int contractLength = atbContract.getLengthInMonths();
 
                     // First try and fetch the enemy mercenary employer if none exists (because the enemy faction
                     // isn't an employed mercenary), then fetch the actual enemy
@@ -1767,7 +1741,7 @@ public class FactionStandings {
                               today,
                               missionStatus,
                               mission.getName(),
-                              mission.getLength());
+                              mission.getLengthInMonths());
 
                         Faction employerChoice = dialog.getEmployerChoice();
                         Faction enemyChoice = dialog.getEnemyChoice();

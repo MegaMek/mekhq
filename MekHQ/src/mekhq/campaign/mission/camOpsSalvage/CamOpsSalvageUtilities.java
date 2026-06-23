@@ -269,7 +269,7 @@ public class CamOpsSalvageUtilities {
 
         if (isContract) {
             if (((Contract) mission).isSalvageExchange()) {
-                int playerPercent = ((Contract) mission).getSalvagePct();
+                int playerPercent = ((Contract) mission).getSalvagePercent();
 
                 Money playerTakeHome = employerTakeHome.multipliedBy(playerPercent).dividedBy(100);
                 employerTakeHome = employerTakeHome.minus(playerTakeHome);
@@ -309,7 +309,7 @@ public class CamOpsSalvageUtilities {
      * @since 0.50.10
      */
     private static int getDeploymentTime(int scenarioId, AtBContract atbContract) {
-        StratConCampaignState campaignState = atbContract.getStratconCampaignState();
+        StratConCampaignState campaignState = atbContract.getStratConCampaignState();
         if (campaignState != null) {
             for (StratConTrackState track : campaignState.getTracks()) {
                 if (track.getBackingScenariosMap().get(scenarioId) != null) {
@@ -419,7 +419,7 @@ public class CamOpsSalvageUtilities {
             campaign.addReport(PERSONNEL,
                   getFormattedTextAt(RESOURCE_BUNDLE, "CamOpsSalvageUtilities.reroll",
                         victim.getHyperlinkedName()));
-            victim.changeCurrentEdge(-1);
+            victim.spendEdge();
 
             int roll = d6(2);
             return roll != 2;
@@ -544,7 +544,7 @@ public class CamOpsSalvageUtilities {
             return;
         }
 
-        final StratConCampaignState state = contract.getStratconCampaignState();
+        final StratConCampaignState state = contract.getStratConCampaignState();
         if (state == null) {
             return;
         }
