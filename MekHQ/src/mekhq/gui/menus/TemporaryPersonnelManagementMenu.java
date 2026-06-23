@@ -38,7 +38,10 @@ import static mekhq.gui.CampaignGUI.MAX_QUANTITY_SPINNER;
 
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -50,7 +53,6 @@ import javax.swing.event.MenuListener;
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
@@ -60,24 +62,73 @@ public class TemporaryPersonnelManagementMenu extends JMenu {
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.MekHQMenuBar";
     private static final String MENU_ITEM_TEXT_SUFFIX = ".text";
-    private static final List<PersonnelRole> BLOB_CREW_ROLES = List.of(
-          PersonnelRole.SOLDIER, PersonnelRole.BATTLE_ARMOUR,
-          PersonnelRole.VEHICLE_CREW_GROUND, PersonnelRole.VEHICLE_CREW_VTOL,
-          PersonnelRole.VEHICLE_CREW_NAVAL, PersonnelRole.VESSEL_PILOT,
-          PersonnelRole.VESSEL_GUNNER, PersonnelRole.VESSEL_CREW);
+
+    /**
+     * Holds i18n key configuration for each {@link PersonnelRole}.
+     */
+    private enum BlobCrewConfig {
+        SOLDIER(PersonnelRole.SOLDIER,
+              "menuSoldierPool.text", "miHireSoldiers.text", "popupHireSoldiersNum.text",
+              "miFireSoldiers.text", "popupFireSoldiersNum.text",
+              "miFullStrengthSoldiers.text", "miFireAllSoldiers.text"),
+        BATTLE_ARMOR(PersonnelRole.BATTLE_ARMOUR,
+              "menuBattleArmorPool.text", "miHireBattleArmor.text", "popupHireBattleArmorNum.text",
+              "miFireBattleArmor.text", "popupFireBattleArmorNum.text",
+              "miFullStrengthBattleArmor.text", "miFireAllBattleArmor.text"),
+        VEHICLE_GROUND(PersonnelRole.VEHICLE_CREW_GROUND,
+              "menuVehicleCrewGroundPool.text", "miHireVehicleCrewGround.text", "popupHireVehicleCrewGroundNum.text",
+              "miFireVehicleCrewGround.text", "popupFireVehicleCrewGroundNum.text",
+              "miFullStrengthVehicleCrewGround.text", "miFireAllVehicleCrewGround.text"),
+        VEHICLE_VTOL(PersonnelRole.VEHICLE_CREW_VTOL,
+              "menuVehicleCrewVTOLPool.text", "miHireVehicleCrewVTOL.text", "popupHireVehicleCrewVTOLNum.text",
+              "miFireVehicleCrewVTOL.text", "popupFireVehicleCrewVTOLNum.text",
+              "miFullStrengthVehicleCrewVTOL.text", "miFireAllVehicleCrewVTOL.text"),
+        VEHICLE_NAVAL(PersonnelRole.VEHICLE_CREW_NAVAL,
+              "menuVehicleCrewNavalPool.text", "miHireVehicleCrewNaval.text", "popupHireVehicleCrewNavalNum.text",
+              "miFireVehicleCrewNaval.text", "popupFireVehicleCrewNavalNum.text",
+              "miFullStrengthVehicleCrewNaval.text", "miFireAllVehicleCrewNaval.text"),
+        VESSEL_PILOT(PersonnelRole.VESSEL_PILOT,
+              "menuVesselPilotPool.text", "miHireVesselPilot.text", "popupHireVesselPilotNum.text",
+              "miFireVesselPilot.text", "popupFireVesselPilotNum.text",
+              "miFullStrengthVesselPilot.text", "miFireAllVesselPilot.text"),
+        VESSEL_GUNNER(PersonnelRole.VESSEL_GUNNER,
+              "menuVesselGunnerPool.text", "miHireVesselGunner.text", "popupHireVesselGunnerNum.text",
+              "miFireVesselGunner.text", "popupFireVesselGunnerNum.text",
+              "miFullStrengthVesselGunner.text", "miFireAllVesselGunner.text"),
+        VESSEL_CREW(PersonnelRole.VESSEL_CREW,
+              "menuVesselCrewPool.text", "miHireVesselCrew.text", "popupHireVesselCrewNum.text",
+              "miFireVesselCrew.text", "popupFireVesselCrewNum.text",
+              "miFullStrengthVesselCrew.text", "miFireAllVesselCrew.text");
+
+        final PersonnelRole role;
+        final String menuKey;
+        final String hireKey;
+        final String hirePopupKey;
+        final String fireKey;
+        final String firePopupKey;
+        final String fullStrengthKey;
+        final String fireAllKey;
+
+        BlobCrewConfig(PersonnelRole role, String menuKey, String hireKey, String hirePopupKey,
+              String fireKey, String firePopupKey, String fullStrengthKey, String fireAllKey) {
+            this.role = role;
+            this.menuKey = menuKey;
+            this.hireKey = hireKey;
+            this.hirePopupKey = hirePopupKey;
+            this.fireKey = fireKey;
+            this.firePopupKey = firePopupKey;
+            this.fullStrengthKey = fullStrengthKey;
+            this.fireAllKey = fireAllKey;
+        }
+    }
+
+    private static final List<PersonnelRole> BLOB_CREW_ROLES =
+          Arrays.stream(BlobCrewConfig.values()).map(c -> c.role).toList();
 
     private final Campaign campaign;
     private final BiFunction<String, Integer, Integer> getUserIntInput;
 
-    // Blob crew menu references for visibility control
-    private JMenu menuSoldierPool;
-    private JMenu menuBattleArmorPool;
-    private JMenu menuVehicleCrewGroundPool;
-    private JMenu menuVehicleCrewVTOLPool;
-    private JMenu menuVehicleCrewNavalPool;
-    private JMenu menuVesselPilotPool;
-    private JMenu menuVesselGunnerPool;
-    private JMenu menuVesselCrewPool;
+    private final Map<PersonnelRole, JMenu> blobRoleMenus = new EnumMap<>(PersonnelRole.class);
 
     /**
      * The Astech Pool menu uses the following Mnemonic keys as of 19-March-2020:
@@ -144,65 +195,9 @@ public class TemporaryPersonnelManagementMenu extends JMenu {
         );
         add(menuMedicPool);
 
-        // region Blob Crew Pools (Soldier, Battle Armor, Vehicle, Vessel)
-        // Each pool follows the same 4-item structure; see buildBlobCrewPoolSubMenu.
-        CampaignOptions opts = getCampaign().getCampaignOptions();
-
-        menuSoldierPool = buildBlobCrewPoolSubMenu(this, PersonnelRole.SOLDIER,
-              opts.isUseBlobInfantry(),
-              "menuSoldierPool.text",
-              "miHireSoldiers.text", "popupHireSoldiersNum.text",
-              "miFireSoldiers.text", "popupFireSoldiersNum.text",
-              "miFullStrengthSoldiers.text", "miFireAllSoldiers.text");
-
-        menuBattleArmorPool = buildBlobCrewPoolSubMenu(this, PersonnelRole.BATTLE_ARMOUR,
-              opts.isUseBlobBattleArmor(),
-              "menuBattleArmorPool.text",
-              "miHireBattleArmor.text", "popupHireBattleArmorNum.text",
-              "miFireBattleArmor.text", "popupFireBattleArmorNum.text",
-              "miFullStrengthBattleArmor.text", "miFireAllBattleArmor.text");
-
-        menuVehicleCrewGroundPool = buildBlobCrewPoolSubMenu(this, PersonnelRole.VEHICLE_CREW_GROUND,
-              opts.isUseBlobVehicleCrewGround(),
-              "menuVehicleCrewGroundPool.text",
-              "miHireVehicleCrewGround.text", "popupHireVehicleCrewGroundNum.text",
-              "miFireVehicleCrewGround.text", "popupFireVehicleCrewGroundNum.text",
-              "miFullStrengthVehicleCrewGround.text", "miFireAllVehicleCrewGround.text");
-
-        menuVehicleCrewVTOLPool = buildBlobCrewPoolSubMenu(this, PersonnelRole.VEHICLE_CREW_VTOL,
-              opts.isUseBlobVehicleCrewVTOL(),
-              "menuVehicleCrewVTOLPool.text",
-              "miHireVehicleCrewVTOL.text", "popupHireVehicleCrewVTOLNum.text",
-              "miFireVehicleCrewVTOL.text", "popupFireVehicleCrewVTOLNum.text",
-              "miFullStrengthVehicleCrewVTOL.text", "miFireAllVehicleCrewVTOL.text");
-
-        menuVehicleCrewNavalPool = buildBlobCrewPoolSubMenu(this, PersonnelRole.VEHICLE_CREW_NAVAL,
-              opts.isUseBlobVehicleCrewNaval(),
-              "menuVehicleCrewNavalPool.text",
-              "miHireVehicleCrewNaval.text", "popupHireVehicleCrewNavalNum.text",
-              "miFireVehicleCrewNaval.text", "popupFireVehicleCrewNavalNum.text",
-              "miFullStrengthVehicleCrewNaval.text", "miFireAllVehicleCrewNaval.text");
-
-        menuVesselPilotPool = buildBlobCrewPoolSubMenu(this, PersonnelRole.VESSEL_PILOT,
-              opts.isUseBlobVesselPilot(),
-              "menuVesselPilotPool.text",
-              "miHireVesselPilot.text", "popupHireVesselPilotNum.text",
-              "miFireVesselPilot.text", "popupFireVesselPilotNum.text",
-              "miFullStrengthVesselPilot.text", "miFireAllVesselPilot.text");
-
-        menuVesselGunnerPool = buildBlobCrewPoolSubMenu(this, PersonnelRole.VESSEL_GUNNER,
-              opts.isUseBlobVesselGunner(),
-              "menuVesselGunnerPool.text",
-              "miHireVesselGunner.text", "popupHireVesselGunnerNum.text",
-              "miFireVesselGunner.text", "popupFireVesselGunnerNum.text",
-              "miFullStrengthVesselGunner.text", "miFireAllVesselGunner.text");
-
-        menuVesselCrewPool = buildBlobCrewPoolSubMenu(this, PersonnelRole.VESSEL_CREW,
-              opts.isUseBlobVesselCrew(),
-              "menuVesselCrewPool.text",
-              "miHireVesselCrew.text", "popupHireVesselCrewNum.text",
-              "miFireVesselCrew.text", "popupFireVesselCrewNum.text",
-              "miFullStrengthVesselCrew.text", "miFireAllVesselCrew.text");
+        for (BlobCrewConfig config : BlobCrewConfig.values()) {
+            blobRoleMenus.put(config.role, buildBlobCrewPoolSubMenu(config));
+        }
     }
 
     @Override
@@ -356,140 +351,72 @@ public class TemporaryPersonnelManagementMenu extends JMenu {
         setMenuItemState(fireAllItem, pool > 0, getTextAt("miFireAllBlobCrew.disabledTip"));
     }
 
-    private JMenu buildBlobCrewPoolSubMenu(JMenu parentMenu, PersonnelRole role, boolean isVisible,
-          String menuKey, String hireKey, String hirePopupKey,
-          String fireSomeKey, String fireSomePopupKey,
-          String fullStrengthKey, String fireAllKey) {
-        JMenu menu = new JMenu(getTextAt(menuKey));
-        menu.setVisible(isVisible);
+    private JMenu buildBlobCrewPoolSubMenu(BlobCrewConfig config) {
+        PersonnelRole role = config.role;
+        JMenu menu = new JMenu(getTextAt(config.menuKey));
+        menu.setVisible(getCampaign().isBlobCrewEnabled(role));
 
-        JMenuItem miHire = createMenuItem(hireKey, KeyEvent.VK_UNDEFINED, evt -> {
-            int value = getUserIntInput.apply(getTextAt(hirePopupKey), MAX_QUANTITY_SPINNER);
+        JMenuItem miHire = createMenuItem(config.hireKey, KeyEvent.VK_UNDEFINED, evt -> {
+            int value = getUserIntInput.apply(getTextAt(config.hirePopupKey), MAX_QUANTITY_SPINNER);
             if (value >= 0) {
                 getCampaign().increaseTempCrewPool(role, value);
             }
         });
         menu.add(miHire);
 
-        JMenuItem miFireSome = createMenuItem(fireSomeKey, KeyEvent.VK_UNDEFINED, evt -> {
-            int value = getUserIntInput.apply(getTextAt(fireSomePopupKey), getCampaign().getTempCrewPool(role));
+        JMenuItem miFireSome = createMenuItem(config.fireKey, KeyEvent.VK_UNDEFINED, evt -> {
+            int value = getUserIntInput.apply(getTextAt(config.firePopupKey), getCampaign().getTempCrewPool(role));
             if (value >= 0) {
                 getCampaign().decreaseTempCrewPool(role, value);
             }
         });
         menu.add(miFireSome);
 
-        JMenuItem miFullStrength = createMenuItem(fullStrengthKey, KeyEvent.VK_UNDEFINED, evt -> {
+        JMenuItem miFullStrength = createMenuItem(config.fullStrengthKey, KeyEvent.VK_UNDEFINED, evt -> {
             getCampaign().resetTempCrewPoolForRole(role);
             getCampaign().distributeTempCrewPoolToUnits(role);
         });
         menu.add(miFullStrength);
 
-        JMenuItem miFireAll = createMenuItem(fireAllKey, KeyEvent.VK_UNDEFINED,
+        JMenuItem miFireAll = createMenuItem(config.fireAllKey, KeyEvent.VK_UNDEFINED,
               evt -> getCampaign().setTempCrewPool(role, 0));
         menu.add(miFireAll);
 
         menu.addMenuListener(menuListenerFor(
               () -> updateBlobCrewPoolMenuItems(role, miFireSome, miFullStrength, miFireAll)));
 
-        parentMenu.add(menu);
+        this.add(menu);
         return menu;
     }
 
     private void bringAllTempCrewsToFullStrength() {
         getCampaign().resetAsTechPool();
         getCampaign().resetMedicPool();
-        if (getCampaign().getCampaignOptions().isUseBlobInfantry()) {
-            getCampaign().resetTempCrewPoolForRole(PersonnelRole.SOLDIER);
-            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.SOLDIER);
-        }
-        if (getCampaign().getCampaignOptions().isUseBlobBattleArmor()) {
-            getCampaign().resetTempCrewPoolForRole(PersonnelRole.BATTLE_ARMOUR);
-            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.BATTLE_ARMOUR);
-        }
-        if (getCampaign().getCampaignOptions().isUseBlobVehicleCrewGround()) {
-            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_GROUND);
-            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_GROUND);
-        }
-        if (getCampaign().getCampaignOptions().isUseBlobVehicleCrewVTOL()) {
-            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_VTOL);
-            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_VTOL);
-        }
-        if (getCampaign().getCampaignOptions().isUseBlobVehicleCrewNaval()) {
-            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_NAVAL);
-            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_NAVAL);
-        }
-        if (getCampaign().getCampaignOptions().isUseBlobVesselPilot()) {
-            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VESSEL_PILOT);
-            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_PILOT);
-        }
-        if (getCampaign().getCampaignOptions().isUseBlobVesselGunner()) {
-            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VESSEL_GUNNER);
-            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_GUNNER);
-        }
-        if (getCampaign().getCampaignOptions().isUseBlobVesselCrew()) {
-            getCampaign().resetTempCrewPoolForRole(PersonnelRole.VESSEL_CREW);
-            getCampaign().distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_CREW);
+        for (PersonnelRole role : BLOB_CREW_ROLES) {
+            if (getCampaign().isBlobCrewEnabled(role)) {
+                getCampaign().resetTempCrewPoolForRole(role);
+                getCampaign().distributeTempCrewPoolToUnits(role);
+            }
         }
     }
 
     private void releaseAllTempCrews() {
         getCampaign().emptyAsTechPool();
         getCampaign().emptyMedicPool();
-        CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
-        if (campaignOptions.isUseBlobInfantry()) {
-            getCampaign().clearBlobCrewForRole(PersonnelRole.SOLDIER);
-        }
-        if (campaignOptions.isUseBlobBattleArmor()) {
-            getCampaign().clearBlobCrewForRole(PersonnelRole.BATTLE_ARMOUR);
-        }
-        if (campaignOptions.isUseBlobVehicleCrewGround()) {
-            getCampaign().clearBlobCrewForRole(PersonnelRole.VEHICLE_CREW_GROUND);
-        }
-        if (campaignOptions.isUseBlobVehicleCrewVTOL()) {
-            getCampaign().clearBlobCrewForRole(PersonnelRole.VEHICLE_CREW_VTOL);
-        }
-        if (campaignOptions.isUseBlobVehicleCrewNaval()) {
-            getCampaign().clearBlobCrewForRole(PersonnelRole.VEHICLE_CREW_NAVAL);
-        }
-        if (campaignOptions.isUseBlobVesselPilot()) {
-            getCampaign().clearBlobCrewForRole(PersonnelRole.VESSEL_PILOT);
-        }
-        if (campaignOptions.isUseBlobVesselGunner()) {
-            getCampaign().clearBlobCrewForRole(PersonnelRole.VESSEL_GUNNER);
-        }
-        if (campaignOptions.isUseBlobVesselCrew()) {
-            getCampaign().clearBlobCrewForRole(PersonnelRole.VESSEL_CREW);
+        for (PersonnelRole role : BLOB_CREW_ROLES) {
+            if (getCampaign().isBlobCrewEnabled(role)) {
+                getCampaign().clearBlobCrewForRole(role);
+            }
         }
     }
 
     private void releaseSurplusTempCrews() {
         getCampaign().releaseSurplusAsTechPool();
         getCampaign().releaseSurplusMedicPool();
-        CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
-        if (campaignOptions.isUseBlobInfantry()) {
-            getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.SOLDIER);
-        }
-        if (campaignOptions.isUseBlobBattleArmor()) {
-            getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.BATTLE_ARMOUR);
-        }
-        if (campaignOptions.isUseBlobVehicleCrewGround()) {
-            getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.VEHICLE_CREW_GROUND);
-        }
-        if (campaignOptions.isUseBlobVehicleCrewVTOL()) {
-            getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.VEHICLE_CREW_VTOL);
-        }
-        if (campaignOptions.isUseBlobVehicleCrewNaval()) {
-            getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.VEHICLE_CREW_NAVAL);
-        }
-        if (campaignOptions.isUseBlobVesselPilot()) {
-            getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.VESSEL_PILOT);
-        }
-        if (campaignOptions.isUseBlobVesselGunner()) {
-            getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.VESSEL_GUNNER);
-        }
-        if (campaignOptions.isUseBlobVesselCrew()) {
-            getCampaign().releaseSurplusBlobCrewForRole(PersonnelRole.VESSEL_CREW);
+        for (PersonnelRole role : BLOB_CREW_ROLES) {
+            if (getCampaign().isBlobCrewEnabled(role)) {
+                getCampaign().releaseSurplusBlobCrewForRole(role);
+            }
         }
     }
 
@@ -561,16 +488,7 @@ public class TemporaryPersonnelManagementMenu extends JMenu {
      */
     @Subscribe
     public void handle(final OptionsChangedEvent event) {
-        // Update blob crew menu visibility based on campaign options
-        CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
-        menuSoldierPool.setVisible(campaignOptions.isUseBlobInfantry());
-        menuBattleArmorPool.setVisible(campaignOptions.isUseBlobBattleArmor());
-        menuVehicleCrewGroundPool.setVisible(campaignOptions.isUseBlobVehicleCrewGround());
-        menuVehicleCrewVTOLPool.setVisible(campaignOptions.isUseBlobVehicleCrewVTOL());
-        menuVehicleCrewNavalPool.setVisible(campaignOptions.isUseBlobVehicleCrewNaval());
-        menuVesselPilotPool.setVisible(campaignOptions.isUseBlobVesselPilot());
-        menuVesselGunnerPool.setVisible(campaignOptions.isUseBlobVesselGunner());
-        menuVesselCrewPool.setVisible(campaignOptions.isUseBlobVesselCrew());
+        blobRoleMenus.forEach((role, menu) -> menu.setVisible(getCampaign().isBlobCrewEnabled(role)));
     }
 
 }
