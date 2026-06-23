@@ -114,7 +114,7 @@ public abstract class AbstractBase implements IPlace {
     public Hangar getBaseHangar() {
         return baseHangar;
     }
-
+    
     @Override
     public Warehouse getWarehouse() {
         return baseWarehouse;

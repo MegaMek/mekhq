@@ -1586,6 +1586,8 @@ public class PersonTest {
                       .thenReturn(new AcademyCampusLocation(ACADEMY_SET, ACADEMY_NAME));
                 when(campaign.getOrCreateLocalCampusLocation(any(), any()))
                       .thenReturn(new AcademyCampusLocation(ACADEMY_SET, ACADEMY_NAME));
+                when(campaign.getOrCreateCampusUnderLocation(any(), any(), any()))
+                      .thenReturn(new AcademyCampusLocation(ACADEMY_SET, ACADEMY_NAME));
             }
 
             @Test

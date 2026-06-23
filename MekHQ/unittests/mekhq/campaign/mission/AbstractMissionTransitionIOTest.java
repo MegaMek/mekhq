@@ -79,12 +79,12 @@ import org.w3c.dom.NodeList;
 import testUtilities.MHQTestUtilities;
 
 /**
- * Save/load (XML serialization) regression tests for the {@link AbstractMission} hierarchy.
+ * Save/load (XML serialization) regression tests for the {@link AbstractMissionTransition} hierarchy.
  *
- * <p>These tests guard the refactor that moved the shared mission/contract state onto {@link AbstractMission}, leaving
- * {@link Mission}, {@link Contract}, and {@link AtBContract} as thin subclasses. Because loading and saving of
- * contracts is a sensitive code path (a corrupted contract silently breaks a player's campaign), each sample file is
- * checked in two ways:</p>
+ * <p>These tests guard the refactor that moved the shared mission/contract state onto
+ * {@link AbstractMissionTransition}, leaving {@link Mission}, {@link Contract}, and {@link AtBContract} as thin
+ * subclasses. Because loading and saving of contracts is a sensitive code path (a corrupted contract silently breaks a
+ * player's campaign), each sample file is checked in two ways:</p>
  *
  * <ol>
  *     <li>The on-disk sample parses into the correct concrete type with the correct field values.</li>
@@ -96,7 +96,7 @@ import testUtilities.MHQTestUtilities;
  * plain {@link Mission}, a {@link Contract}, and a fully-populated {@link AtBContract} (scenarios, StratCon state and
  * NPCs included).</p>
  */
-public class AbstractMissionXmlIOTest {
+public class AbstractMissionTransitionIOTest {
     private static final Path MISSIONS_DIR = Path.of("testresources", "data", "missions");
 
     /** Any version at or above the current release; keeps the version-gated compatibility branches dormant. */
@@ -128,7 +128,7 @@ public class AbstractMissionXmlIOTest {
 
     @Test
     void plainMissionLoadsAsMissionWithExpectedFields() throws Exception {
-        AbstractMission mission = loadFirstMissionFromFile("Mission.cpnx");
+        AbstractMissionTransition mission = loadFirstMissionFromFile("Mission.cpnx");
 
         // A plain mission must NOT be promoted to a Contract / AtBContract.
         assertEquals(Mission.class, mission.getClass(), "plain mission must load as exactly Mission");
@@ -143,7 +143,7 @@ public class AbstractMissionXmlIOTest {
     }
 
     /**
-     * Previously {@link AbstractMission#writeToXMLBegin} unconditionally wrote
+     * Previously {@link AbstractMissionTransition#writeToXMLBegin} unconditionally wrote
      * {@code <contractType>UNDEFINED</contractType>} for a plain mission. On reload, the {@code contractType} handler
      * called {@code setContractTypeAndName(UNDEFINED)}, whose side effect overwrote the {@code contractTypeName} that
      * was just read from {@code <type>}; the free-text type (here {@code "affdsf"}) became {@code "Undefined"}. A plain
@@ -163,7 +163,7 @@ public class AbstractMissionXmlIOTest {
 
     @Test
     void contractLoadsAsContractWithExpectedFields() throws Exception {
-        AbstractMission mission = loadFirstMissionFromFile("Contract.cpnx");
+        AbstractMissionTransition mission = loadFirstMissionFromFile("Contract.cpnx");
 
         assertEquals(Contract.class, mission.getClass(), "sample must load as exactly Contract");
         Contract contract = (Contract) mission;
@@ -197,7 +197,7 @@ public class AbstractMissionXmlIOTest {
     }
 
     /**
-     * Previously {@link AbstractMission#writeToXMLBegin} unconditionally wrote
+     * Previously {@link AbstractMissionTransition#writeToXMLBegin} unconditionally wrote
      * {@code <contractType>UNDEFINED</contractType>} for a plain mission. On reload, the {@code contractType} handler
      * called {@code setContractTypeAndName(UNDEFINED)}, whose side effect overwrote the {@code contractTypeName} that
      * was just read from {@code <type>}; the free-text type (here {@code "affdsf"}) became {@code "Undefined"}. A plain
@@ -217,7 +217,7 @@ public class AbstractMissionXmlIOTest {
 
     @Test
     void atbContractLoadsAsAtBContractWithExpectedFields() throws Exception {
-        AbstractMission mission = loadFirstMissionFromFile("AtBContract.cpnx");
+        AbstractMissionTransition mission = loadFirstMissionFromFile("AtBContract.cpnx");
 
         assertEquals(AtBContract.class, mission.getClass(), "sample must load as exactly AtBContract");
         AtBContract contract = (AtBContract) mission;
@@ -443,10 +443,10 @@ public class AbstractMissionXmlIOTest {
         AtBContract atbContract = new AtBContract();
         atbContract.setName("New AtB Contract");
 
-        List<AbstractMission> missions = List.of(plainMission, contract, atbContract);
+        List<AbstractMissionTransition> missions = List.of(plainMission, contract, atbContract);
 
-        for (AbstractMission mission : missions) {
-            AbstractMission reloaded = parseMission(writeMission(mission));
+        for (AbstractMissionTransition mission : missions) {
+            AbstractMissionTransition reloaded = parseMission(writeMission(mission));
             assertEquals(mission.getClass(), reloaded.getClass(), "type must survive for " + mission.getClass());
             assertEquals(mission.getName(), reloaded.getName(), "name must survive for " + mission.getClass());
             assertEquals(mission.getStatus(), reloaded.getStatus(), "status must survive for " + mission.getClass());
@@ -559,10 +559,10 @@ public class AbstractMissionXmlIOTest {
      * second write onward must be idempotent; any writer/reader disagreement on a tag shows up here as a mismatch.
      */
     private void assertRoundTripStable(String fileName) throws Exception {
-        AbstractMission original = loadFirstMissionFromFile(fileName);
+        AbstractMissionTransition original = loadFirstMissionFromFile(fileName);
 
         String firstWrite = writeMission(original);
-        AbstractMission reloaded = parseMission(firstWrite);
+        AbstractMissionTransition reloaded = parseMission(firstWrite);
         String secondWrite = writeMission(reloaded);
 
         assertEquals(original.getClass(), reloaded.getClass(), "concrete type must survive a save/load cycle");
@@ -570,7 +570,7 @@ public class AbstractMissionXmlIOTest {
         assertEquals(firstWrite, secondWrite, "serialized form must be stable across a save/load/save cycle");
     }
 
-    private void assertCoreFieldsEqual(AbstractMission expected, AbstractMission actual) {
+    private void assertCoreFieldsEqual(AbstractMissionTransition expected, AbstractMissionTransition actual) {
         assertEquals(expected.getName(), actual.getName(), "name");
         assertEquals(expected.getContractTypeName(), actual.getContractTypeName(), "contractTypeName");
         assertEquals(expected.getStatus(), actual.getStatus(), "status");
@@ -618,37 +618,39 @@ public class AbstractMissionXmlIOTest {
 
     /**
      * Reads a {@code <missions>} sample file and instantiates the first {@code <mission>} element through the real
-     * production entry point, {@link AbstractMission#generateInstanceFromXML}.
+     * production entry point, {@link AbstractMissionTransition#generateInstanceFromXML}.
      */
-    private AbstractMission loadFirstMissionFromFile(String fileName) throws Exception {
+    private AbstractMissionTransition loadFirstMissionFromFile(String fileName) throws Exception {
         byte[] bytes = Files.readAllBytes(MISSIONS_DIR.resolve(fileName));
         Document document = parseDocument(bytes);
         Node missionNode = firstChildElement(document.getDocumentElement());
         assertNotNull(missionNode, "sample " + fileName + " must contain a <mission> element");
 
-        AbstractMission mission = AbstractMission.generateInstanceFromXML(missionNode, campaign, VERSION);
+        AbstractMissionTransition mission = AbstractMissionTransition.generateInstanceFromXML(missionNode,
+              campaign,
+              VERSION);
         assertNotNull(mission, "generateInstanceFromXML returned null for " + fileName);
         return mission;
     }
 
     /** Parses a single {@code <mission>} element (as produced by {@link #writeMission}) back into an object. */
-    private AbstractMission parseMission(String missionXml) throws Exception {
-        AbstractMission mission = generateFromXml(missionXml, VERSION);
+    private AbstractMissionTransition parseMission(String missionXml) throws Exception {
+        AbstractMissionTransition mission = generateFromXml(missionXml, VERSION);
         assertNotNull(mission, "re-parse of a written mission returned null");
         return mission;
     }
 
     /**
      * Instantiates a mission from a single {@code <mission>} XML string at the given save {@link Version}. Unlike
-     * {@link #parseMission}, this returns whatever {@link AbstractMission#generateInstanceFromXML} produces - including
-     * {@code null} for malformed input - so robustness and version-compatibility tests can assert on it.
+     * {@link #parseMission}, this returns whatever {@link AbstractMissionTransition#generateInstanceFromXML} produces -
+     * including {@code null} for malformed input - so robustness and version-compatibility tests can assert on it.
      */
-    private AbstractMission generateFromXml(String missionXml, Version version) throws Exception {
+    private AbstractMissionTransition generateFromXml(String missionXml, Version version) throws Exception {
         Document document = parseDocument(missionXml.getBytes(StandardCharsets.UTF_8));
-        return AbstractMission.generateInstanceFromXML(document.getDocumentElement(), campaign, version);
+        return AbstractMissionTransition.generateInstanceFromXML(document.getDocumentElement(), campaign, version);
     }
 
-    private String writeMission(AbstractMission mission) {
+    private String writeMission(AbstractMissionTransition mission) {
         StringWriter stringWriter = new StringWriter();
         try (PrintWriter printWriter = new PrintWriter(stringWriter)) {
             mission.writeToXML(campaign, printWriter, 0);

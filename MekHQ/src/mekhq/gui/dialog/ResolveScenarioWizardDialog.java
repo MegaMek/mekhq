@@ -1962,7 +1962,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         }
         PersonViewPanel personViewPanel = new PersonViewPanel(person,
               tracker.getCampaign(),
-              tracker.getCampaign().getApp().getCampaigngui());
+              tracker.getCampaign().getGUI());
         final JDialog dialog = new JDialog(frame, isPrisoner ? "Prisoner View" : "Personnel View", true);
         dialog.getContentPane().setLayout(new GridBagLayout());
 

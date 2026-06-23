@@ -49,6 +49,7 @@ import static mekhq.campaign.force.CombatTeam.getStandardFormationSize;
 import static mekhq.campaign.force.FormationLevel.BATTALION;
 import static mekhq.campaign.force.FormationLevel.COMPANY;
 import static mekhq.campaign.mission.ContractDifficulty.calculateContractDifficulty;
+import static mekhq.campaign.mission.RandomFactionCamouflage.pickRandomCamouflage;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.ADVANCING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.DOMINATING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.OVERWHELMING;
@@ -59,22 +60,15 @@ import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import java.io.IOException;
 import java.io.PrintWriter;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.ParseException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Random;
-import java.util.stream.Stream;
 
 import megamek.Version;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
-import megamek.common.icons.Camouflage;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -152,6 +146,7 @@ public class AtBContract extends Contract {
     }
 
     public AtBContract(String name) {
+        setName(name);
         setContractDifficulty(Integer.MIN_VALUE);
 
         parentContract = null;
@@ -186,66 +181,6 @@ public class AtBContract extends Contract {
         setEnemyCamouflage(pickRandomCamouflage(currentYear, getEnemyCode()));
     }
 
-    /**
-     * Selects a random camouflage for the given faction based on the faction code and year. If there are no available
-     * files in the faction directory, it logs a warning and uses default camouflage.
-     *
-     * @param currentYear the current year in the game.
-     * @param factionCode the code representing the faction for which the camouflage is to be selected.
-     */
-    public static Camouflage pickRandomCamouflage(int currentYear, String factionCode) {
-        // Define the root directory and get the faction-specific camouflage directory
-        final String ROOT_DIRECTORY = "data/images/camo/";
-
-        String camouflageDirectory = "Standard Camouflage";
-
-        if (factionCode != null) {
-            camouflageDirectory = getCamouflageDirectory(currentYear, factionCode);
-        }
-
-        // Gather all files
-        List<Path> allPaths = null;
-
-        try (Stream<Path> stream = Files.find(Paths.get(ROOT_DIRECTORY + camouflageDirectory + '/'),
-              Integer.MAX_VALUE,
-              (path, bfa) -> bfa.isRegularFile())) {
-            allPaths = stream.toList();
-        } catch (IOException e) {
-            logger.error("Error getting list of camouflages", e);
-        }
-
-        // Select a random file to set camouflage, if there are files available
-        if ((null != allPaths) && (!allPaths.isEmpty())) {
-            Path randomPath = allPaths.get(new Random().nextInt(allPaths.size()));
-
-            String fileName = randomPath.getFileName().toString();
-            String fileCategory = randomPath.getParent()
-                                        .toString()
-                                        .replaceAll("\\\\", "/"); // This is necessary for Windows machines
-            fileCategory = fileCategory.replace(ROOT_DIRECTORY, "");
-
-            return new Camouflage(fileCategory, fileName);
-        } else {
-            // Log if no files were found in the directory
-            logger.warn("No files in directory {} - using default camouflage", camouflageDirectory);
-            return new Camouflage(); // return no camouflage
-        }
-    }
-
-    /**
-     * Returns the directory for the camouflages of a faction based on the year and faction code.
-     *
-     * @param year        The year
-     * @param factionCode The code representing the faction, e.g. FS or HL
-     *
-     * @return The directory under data/images/camo for the camouflages of the faction
-     */
-    private static String getCamouflageDirectory(int year, String factionCode) {
-        return Factions.getInstance().getFaction(factionCode)
-                     .getCamosFolder(year)
-                     .orElse("Standard Camouflage");
-    }
-
     public void calculateLength(final boolean variable) {
         setLengthInMonths(getContractType().calculateLength(variable));
     }
@@ -257,7 +192,6 @@ public class AtBContract extends Contract {
      * @param today The current date in the context.
      */
     public void checkMorale(Campaign campaign, LocalDate today) {
-
         // If there is a rout end date, and it's past today, update morale and enemy state accordingly
         if (getRoutEndDate() != null) {
             // Check whether any current rout continues beyond its expected date. This is only applicable for
@@ -1001,16 +935,7 @@ public class AtBContract extends Contract {
         }
     }
 
-    public Faction getEmployerFaction() {
-        return Factions.getInstance().getFaction(getEmployerCode());
-    }
-
-    public void updateEmployer(String code, int year) {
-        this.setEmployerCode(code);
-        setEmployerName(getEmployerName(year));
-        setAllyCamouflage(pickRandomCamouflage(year, getEmployerCode()));
-    }
-
+    @Override
     public String getEmployerName(int year) {
         return isMercSubcontract() ?
                      "Mercenary (" + getEmployerFaction().getFullName(year) + ')' :

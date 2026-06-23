@@ -79,7 +79,7 @@ public class RoninEventDialog extends ImmersiveDialogCore {
     @Override
     protected JPanel buildRightSpeakerPanel(@Nullable Person speaker, Campaign campaign) {
         JPanel speakerBox = new JPanel();
-        PersonViewPanel personViewPanel = new PersonViewPanel(speaker, campaign, campaign.getApp().getCampaigngui());
+        PersonViewPanel personViewPanel = new PersonViewPanel(speaker, campaign, campaign.getGUI());
         speakerBox.add(personViewPanel);
         speakerBox.setAlignmentX(CENTER_ALIGNMENT);
 
