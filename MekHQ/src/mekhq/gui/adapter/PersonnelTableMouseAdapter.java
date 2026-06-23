@@ -952,12 +952,18 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_CHANGE_STATUS: {
                 PersonnelStatus status = PersonnelStatus.valueOf(data[1]);
-                for (Person person : people) {
-                    if (status.isActive() ||
-                              (JOptionPane.showConfirmDialog(null,
-                                    String.format(resources.getString("confirmRetireQ.format"), person.getFullTitle()),
-                                    status.toString(),
-                                    JOptionPane.YES_NO_OPTION) == 0)) {
+
+                boolean singleCharacter = people.length == 1;
+                String question = singleCharacter ?
+                                        getFormattedText("confirmRetireQ.single", people[0].getFullTitle()) :
+                                        getFormattedText("confirmRetireQ.multiple", people.length);
+
+                if (status.isActive() ||
+                          (JOptionPane.showConfirmDialog(null,
+                                question,
+                                status.toString(),
+                                JOptionPane.YES_NO_OPTION) == 0)) {
+                    for (Person person : people) {
                         person.changeStatus(getCampaign(), getCampaign().getLocalDate(), status);
                     }
                 }
