@@ -111,4 +111,12 @@ public class AttributeCheck extends ActionCheck<AttributeCheck> {
         return label;
     }
 
+    public SkillAttribute getFirstAttribute() {
+        return firstAttribute;
+    }
+
+    public SkillAttribute getSecondAttribute() {
+        return secondAttribute;
+    }
+
 }

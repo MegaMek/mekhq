@@ -72,7 +72,6 @@ import mekhq.campaign.randomEvents.prisoners.prisonerEvents.PrisonEscapeScenario
 import mekhq.campaign.randomEvents.randomEventSystem.RandomEventData;
 import mekhq.campaign.randomEvents.randomEventSystem.RandomEventEffectsManager;
 import mekhq.campaign.randomEvents.randomEventSystem.RandomEventResponseQuality;
-import mekhq.campaign.randomEvents.randomEventSystem.RandomEventType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
@@ -103,7 +102,6 @@ public class PrisonerEventManager {
     static final int RANSOM_EVENT_CHANCE = 10;
     static final int PRISONER_EVENT_CHANCE = 50;
     private final int MINIMUM_PRISONER_COUNT = 25;
-    private final int RESPONSE_TARGET_NUMBER = 7;
 
     public static final int DEFAULT_TEMPORARY_CAPACITY = 100;
     // The temporary prisoner capacity should never go below 0.
@@ -337,9 +335,9 @@ public class PrisonerEventManager {
             eventData = pickEvent(false);
         }
 
-        int choiceIndex = showDialogAndReturnChoiceIndex(eventData);
-
-        boolean isSuccessful = makeEventCheck(eventData, choiceIndex);
+        RandomEventDialog dialog = new RandomEventDialog(campaign, speaker, null, eventData, RESOURCE_BUNDLE);
+        int choiceIndex = dialog.getDialogChoice();
+        boolean isSuccessful = dialog.wasSuccessful();
 
         RandomEventEffectsManager effectsManager = new RandomEventEffectsManager(campaign,
               eventData,
@@ -390,26 +388,6 @@ public class PrisonerEventManager {
     }
 
     /**
-     * Presents an immersive dialog to the player to select a response option for the given prisoner event.
-     *
-     * <p>Constructs a message and a set of response buttons from localized resources based on the specific event.
-     * Displays a dialog to the player (using the campaign context and speaker), allowing them to choose a course of
-     * action. Returns the index of the player's selected option.</p>
-     *
-     * @param event the {@link RandomEventType} for which a response choice is required
-     *
-     * @return the index of the selected response option as chosen by the player in the dialog
-     *
-     * @author Illiani
-     * @since 0.50.06
-     */
-    private int showDialogAndReturnChoiceIndex(RandomEventData event) {
-        RandomEventDialog dialog = new RandomEventDialog(campaign, speaker, null, event, RESOURCE_BUNDLE);
-
-        return dialog.getDialogChoice();
-    }
-
-    /**
      * Processes a warning event when the prisoner overflow exceeds acceptable limits.
      *
      * <p>Presents a dialog to the player, allowing them to take corrective actions by choosing to
@@ -430,7 +408,7 @@ public class PrisonerEventManager {
         String commanderAddress = campaign.getCommanderAddress();
         String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "warning.message", commanderAddress);
 
-        int choice = showDialogAndReturnChoiceIndex(setFree, executions, inCharacterMessage);
+        int choice = triggerRandomEventDialog(setFree, executions, inCharacterMessage);
 
         String outOfCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "result.ooc");
         if (choice == CHOICE_FREE) {
@@ -546,7 +524,7 @@ public class PrisonerEventManager {
      * @author Illiani
      * @since 0.50.06
      */
-    private int showDialogAndReturnChoiceIndex(int setFree, int executions, String inCharacterMessage) {
+    private int triggerRandomEventDialog(int setFree, int executions, String inCharacterMessage) {
         List<String> options = List.of(getFormattedTextAt(RESOURCE_BUNDLE, "btnDoNothing.button"),
               getFormattedTextAt(RESOURCE_BUNDLE, "free.button", setFree),
               getFormattedTextAt(RESOURCE_BUNDLE, "execute.button", executions));
@@ -611,7 +589,8 @@ public class PrisonerEventManager {
 
         int responseCheck = d6(2) + responseModifier;
 
-        return responseCheck >= RESPONSE_TARGET_NUMBER;
+
+        return responseCheck >= 7;
     }
 
     /**

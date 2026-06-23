@@ -36,12 +36,14 @@ import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.personnel.skills.Skill.getIndividualAttributeModifier;
 import static mekhq.campaign.personnel.skills.SkillModifierData.IGNORE_AGE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.PrintWriter;
 import java.util.List;
 
 import megamek.codeUtilities.MathUtility;
 import megamek.logging.MMLogger;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
@@ -649,6 +651,34 @@ public class Attributes {
         }
 
         return tooltip.toString();
+    }
+
+    /**
+     * Determines the attribute level description for the given person and skill attribute.
+     *
+     * @param person    the person whose attribute score is being evaluated
+     * @param attribute the skill attribute being assessed
+     *
+     * @return a string representing the descriptive level of the attribute
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static String getAttributeLevel(Person person, SkillAttribute attribute) {
+        int actualScore = person.getAttributeScore(attribute);
+
+        // corresponds to the attribute modifiers on ATOW pg 41 (6th printing)
+        String resourceKey = switch (actualScore) {
+            case 0 -> "incapacitated";
+            case 1 -> "terrible";
+            case 2, 3 -> "bad";
+            case 4, 5, 6 -> "average";
+            case 7, 8, 9 -> "great";
+            case 10 -> "amazing";
+            default -> "heroic";
+        };
+
+        return getTextAt(RESOURCE_BUNDLE, "attributeLevel." + resourceKey);
     }
 
     // Reading and Writing

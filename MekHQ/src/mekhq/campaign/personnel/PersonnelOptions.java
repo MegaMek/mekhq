@@ -71,6 +71,7 @@ public class PersonnelOptions extends PilotOptions {
     public static final String EDGE_COMMANDER_NEGOTIATION = "edge_when_commander_negotiation_fail";
     public static final String EDGE_RECON_FAIL = "edge_when_recon_fail";
     public static final String EDGE_TRAINING = "edge_when_training_fail";
+    public static final String EDGE_RANDOM_EVENTS = "edge_when_random_event_fail";
 
     public static final String TECH_WEAPON_SPECIALIST = "tech_weapon_specialist";
     public static final String TECH_ARMOR_SPECIALIST = "tech_armor_specialist";
@@ -406,6 +407,7 @@ public class PersonnelOptions extends PilotOptions {
         addOption(edge, EDGE_COMMANDER_NEGOTIATION, true);
         addOption(edge, EDGE_RECON_FAIL, false);
         addOption(edge, EDGE_TRAINING, true);
+        addOption(edge, EDGE_RANDOM_EVENTS, false);
 
         List<CustomOption> customs = CustomOption.getCustomAbilities();
         for (CustomOption option : customs) {
