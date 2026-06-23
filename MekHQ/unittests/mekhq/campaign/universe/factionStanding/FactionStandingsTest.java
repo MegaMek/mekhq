@@ -75,9 +75,9 @@ class FactionStandingsTest {
         TestSystems.resetAndGetInstance();
 
         assertDoesNotThrow(() -> {
-            FactionHints.initializeTestInstance();
-            Factions.setInstance(Factions.loadDefault(true));
             Factions2.setInstance(new Factions2(FACTIONS2_TEST_DIRECTORY));
+            Factions.setInstance(Factions.loadDefault(true));
+            FactionHints.initializeTestInstance();
             factions = Factions.getInstance();
         });
 

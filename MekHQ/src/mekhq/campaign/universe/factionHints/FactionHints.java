@@ -104,7 +104,7 @@ public class FactionHints {
      * @return the singleton {@link FactionHints} instance, loaded from the specified data source
      */
     private static FactionHints getOrInitializeInstance(boolean useTestDirectory) {
-        return getOrInitializeInstance(useTestDirectory, true);
+        return getOrInitializeInstance(useTestDirectory, false);
     }
 
     /**
