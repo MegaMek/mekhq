@@ -49,6 +49,7 @@ import org.w3c.dom.Node;
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
+@Deprecated(since = "0.51.01", forRemoval = false)
 public class Mission extends AbstractMissionTransition {
     private static final MMLogger LOGGER = MMLogger.create(Mission.class);
 
