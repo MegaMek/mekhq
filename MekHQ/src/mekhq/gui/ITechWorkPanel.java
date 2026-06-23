@@ -46,4 +46,8 @@ public interface ITechWorkPanel {
     IPartWork getSelectedTask();
 
     Person getSelectedTech();
+
+    Person getTempTech();
+
+    void setTempTech(Person tempTech);
 }
