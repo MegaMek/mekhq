@@ -5309,9 +5309,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 // resolve against the system's faction history (handles mergers/splits — see #8915). Use
                 // the person's location if possible, not the campaign's.
                 mekhq.campaign.universe.PlanetarySystem personSystem = person.getCurrentSystem();
-                String localCampusId = personSystem != null
-                                             ? personSystem.getId()
-                                             : campaign.getCurrentSystem().getId();
+                String localCampusId = personSystem != null ?
+                                             personSystem.getId() :
+                                             campaign.getCurrentSystem().getId();
 
                 String faction = academy.getFilteredFactionAtCampus(campaign, person, localCampusId);
 
@@ -5598,29 +5598,16 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     String course = academy.getQualifications().get(courseIndex);
                     courses = new JMenuItem(course);
 
-                    if ((academy.isLocal()) || (academy.isHomeSchool())) {
-                        courses.setToolTipText(academy.getTooltip(campaign,
-                              personnel,
-                              courseIndex,
-                              campaign.getSystemById(campus)));
-                        courses.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION_ENROLLMENT,
-                              academy.getSet(),
-                              academy.getName(),
-                              String.valueOf(courseIndex),
-                              campus,
-                              faction));
-                    } else {
-                        courses.setToolTipText(academy.getTooltip(campaign,
-                              personnel,
-                              courseIndex,
-                              campaign.getSystemById(campus)));
-                        courses.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION_ENROLLMENT,
-                              academy.getSet(),
-                              academy.getName(),
-                              String.valueOf(courseIndex),
-                              campus,
-                              faction));
-                    }
+                    courses.setToolTipText(academy.getTooltip(campaign,
+                          personnel,
+                          courseIndex,
+                          campaign.getSystemById(campus)));
+                    courses.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION_ENROLLMENT,
+                          academy.getSet(),
+                          academy.getName(),
+                          String.valueOf(courseIndex),
+                          campus,
+                          faction));
                     courses.addActionListener(this);
                     academyOption.add(courses);
                 }

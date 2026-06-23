@@ -897,11 +897,9 @@ public class EducationController {
           @Nullable CurrentLocation returnLocation) {
         Academy returningFromAcademy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
         boolean isLocal = returningFromAcademy != null && returningFromAcademy.isLocal();
-        Personnel arrivingAtPersonnel = isLocal
-                                              ?
+        Personnel arrivingAtPersonnel = isLocal ?
                                               findPersonnelWhenReturningFromLocal(campaign,
-                                                    person.getEduAcademySystem())
-                                              :
+                                                    person.getEduAcademySystem()) :
                                               campaign.getMainForcePersonnel();
         person.setParent(arrivingAtPersonnel);
         person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
