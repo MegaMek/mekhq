@@ -46,19 +46,29 @@ public enum RandomEventResponseQuality {
      * <p>Indicates that the response neither has a positive nor a negative influence, but reflects a balanced or
      * indifferent outcome.</p>
      */
-    RESPONSE_NEUTRAL,
+    RESPONSE_NEUTRAL(0),
 
     /**
      * Represents a positive response quality.
      *
      * <p>Indicates a favorable interaction or result, often leading to improved outcomes.</p>
      */
-    RESPONSE_POSITIVE,
+    RESPONSE_POSITIVE(-3),
 
     /**
      * Represents a negative response quality.
      *
      * <p>Indicates an unfavorable interaction or result, often leading to deteriorated outcomes.</p>
      */
-    RESPONSE_NEGATIVE
+    RESPONSE_NEGATIVE(3);
+
+    private final int targetNumberModifier;
+
+    RandomEventResponseQuality(final int targetNumberModifier) {
+        this.targetNumberModifier = targetNumberModifier;
+    }
+
+    public int getTargetNumberModifier() {
+        return targetNumberModifier;
+    }
 }

@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.randomEvents.prisoners;
 
+import static java.lang.Math.floor;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
@@ -100,7 +101,7 @@ public class PrisonerEventManager {
     // However, that lacks nuance, so we've changed it to -1 per prisoner to a maximum of -50.
     public static final int MAX_CRIME_PENALTY = 50;
     static final int RANSOM_EVENT_CHANCE = 10;
-    static final int PRISONER_EVENT_CHANCE = 10;
+    static final int PRISONER_EVENT_CHANCE = 50;
     private final int MINIMUM_PRISONER_COUNT = 25;
     private final int RESPONSE_TARGET_NUMBER = 7;
 
@@ -277,7 +278,8 @@ public class PrisonerEventManager {
     List<Boolean> checkForPrisonerEvents(boolean isHeadless, int totalPrisoners, int prisonerCapacityUsage,
           int prisonerCapacity) {
         // Calculate overflow as the percentage over prisonerCapacity
-        double overflowPercentage = ((double) (prisonerCapacityUsage - prisonerCapacity) / prisonerCapacity);
+        double overflow = prisonerCapacityUsage - prisonerCapacity;
+        int overflowPercentage = (int) round((overflow / prisonerCapacity) * 100);
 
         // If no overflow and total prisoners are below the minimum count, no risk of event
         if (overflowPercentage <= 0 && totalPrisoners < MINIMUM_PRISONER_COUNT) {
@@ -305,7 +307,7 @@ public class PrisonerEventManager {
         // something about the situation.
         if (!minorEvent) {
             if (overflowPercentage > 0 && !isHeadless) {
-                processWarning((int) round(totalPrisoners * overflowPercentage));
+                processWarning((int) floor(overflow));
             }
 
             return List.of(false, false);

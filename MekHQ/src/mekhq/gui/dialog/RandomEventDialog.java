@@ -32,7 +32,9 @@
  */
 package mekhq.gui.dialog;
 
+import static mekhq.campaign.randomEvents.personalities.PersonalityController.getPersonalityValue;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -42,18 +44,27 @@ import java.util.Map;
 
 import jakarta.annotation.Nullable;
 import megamek.codeUtilities.StringUtility;
+import megamek.common.TargetRollModifier;
+import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.AttributeCheck;
+import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillCheck;
+import mekhq.campaign.personnel.skills.SkillModifierData;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.randomEvents.randomEventSystem.RandomEventData;
 import mekhq.campaign.randomEvents.randomEventSystem.RandomEventResponseEntry;
+import mekhq.campaign.randomEvents.randomEventSystem.RandomEventResponseQuality;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import org.jspecify.annotations.NonNull;
 
 public class RandomEventDialog {
-    private final static String RESPONSE_PREFIX = "response.";
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.RandomEventDialog";
+
+    private final static String RESPONSE_PREFIX = "response";
     private final static String BUTTON_SUFFIX = ".button";
 
     private final static String RESULT_OOC = "result.ooc";
@@ -72,11 +83,20 @@ public class RandomEventDialog {
     public RandomEventDialog(Campaign campaign, Person eventParticipant, @Nullable Person otherEventParticipant,
           RandomEventData eventData, String externalResourceBundle) {
         // Build check maps
-        boolean isUseAgingEffects = campaign.getCampaignOptions().isUseAgeEffects();
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean isUseAgingEffects = campaignOptions.isUseAgeEffects();
+        boolean isUseRandomPersonalities = campaignOptions.isUseRandomPersonalities();
+
         boolean isClanCampaign = campaign.isClanCampaign();
         LocalDate today = campaign.getLocalDate();
 
-        buildCheckMaps(eventParticipant, eventData, isUseAgingEffects, isClanCampaign, today);
+        int personalityModifier = -getPersonalityValue(isUseRandomPersonalities,
+              eventParticipant.getAggression(),
+              eventParticipant.getAmbition(),
+              eventParticipant.getGreed(),
+              eventParticipant.getSocial());
+
+        buildCheckMaps(eventParticipant, eventData, isUseAgingEffects, isClanCampaign, today, personalityModifier);
 
         String eventName = eventData.randomEventType().name();
         String commanderAddress = getCommanderAddress(campaign);
@@ -84,7 +104,8 @@ public class RandomEventDialog {
         String inCharacterMessage = getInCharacterMessage(eventName, externalResourceBundle, commanderAddress);
         String outOfCharacterMessage = getOutOfCharacterMessage(externalResourceBundle);
 
-        List<String> options = getOptions(eventData, eventName, externalResourceBundle);
+        List<String> options = getOptions(eventParticipant, eventData, eventName, externalResourceBundle,
+              isUseAgingEffects, isClanCampaign, today);
 
         ImmersiveDialogSimple eventDialog = new ImmersiveDialogSimple(campaign,
               eventParticipant,
@@ -99,11 +120,12 @@ public class RandomEventDialog {
     }
 
     private void buildCheckMaps(Person speaker, RandomEventData event, boolean isUseAgingEffects,
-          boolean isClanCampaign,
-          LocalDate today) {
+          boolean isClanCampaign, LocalDate today, int personalityModifier) {
         List<RandomEventResponseEntry> responseEntries = event.responseEntries();
         for (int i = 0; i < event.responseEntries().size(); i++) {
             RandomEventResponseEntry response = responseEntries.get(i);
+            RandomEventResponseQuality quality = response.quality();
+            int difficultyModifier = quality.getTargetNumberModifier();
 
             String skillName = response.skillCheckSkill();
             if (!StringUtility.isNullOrBlank(skillName)) {
@@ -111,6 +133,9 @@ public class RandomEventDialog {
                       isUseAgingEffects,
                       isClanCampaign,
                       today);
+
+                applyExternalModifiers(personalityModifier, difficultyModifier, skillCheck);
+
                 skillCheckMap.put(i, skillCheck);
             }
 
@@ -122,38 +147,69 @@ public class RandomEventDialog {
         }
     }
 
+    private static void applyExternalModifiers(int personalityModifier, int difficultyModifier, SkillCheck skillCheck) {
+        List<TargetRollModifier> externalModifiers = new ArrayList<>();
+        if (personalityModifier != 0) {
+            String modifierLabel = getTextAt(RESOURCE_BUNDLE, "RandomEventDialog.modifier.personality");
+
+            // Polarity change is intentional. Positive is a penalty, negative is a bonus
+            externalModifiers.add(new TargetRollModifier(-personalityModifier, modifierLabel));
+        }
+
+        if (difficultyModifier != 0) {
+            String modifierLabel = getTextAt(RESOURCE_BUNDLE, "RandomEventDialog.modifier.difficulty");
+            externalModifiers.add(new TargetRollModifier(personalityModifier, modifierLabel));
+        }
+
+        if (!externalModifiers.isEmpty()) {
+            skillCheck.withExternalModifiers(externalModifiers);
+        }
+    }
+
     private static @NonNull String getOutOfCharacterMessage(String RESOURCE_BUNDLE) {
         return getFormattedTextAt(RESOURCE_BUNDLE, RESULT_OOC);
     }
 
-    private List<String> getOptions(RandomEventData event, String eventName, String RESOURCE_BUNDLE) {
+    private List<String> getOptions(Person speaker, RandomEventData event, String eventName, String RESOURCE_BUNDLE,
+          boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today) {
         List<String> options = new ArrayList<>();
 
         List<RandomEventResponseEntry> responseEntries = event.responseEntries();
-        for (int i = 0; i < responseEntries.size(); i++) {
-            String optionText = getOptionText(eventName, RESOURCE_BUNDLE, i);
+        for (int responseIndex = 0; responseIndex < responseEntries.size(); responseIndex++) {
+            String optionText = getOptionText(speaker, eventName, RESOURCE_BUNDLE, responseIndex, isUseAgingEffects,
+                  isClanCampaign, today);
             options.add(optionText);
         }
 
         return options;
     }
 
-    private @NonNull String getOptionText(String eventName, String RESOURCE_BUNDLE, int i) {
-        String resourceKey = RESPONSE_PREFIX + eventName + i + BUTTON_SUFFIX;
+    private @NonNull String getOptionText(Person speaker, String eventName, String RESOURCE_BUNDLE, int responseIndex,
+          boolean isUseAgingEffects, boolean isClanCampaign, LocalDate today) {
+        String resourceKey = RESPONSE_PREFIX + "." + responseIndex + "." + eventName + BUTTON_SUFFIX;
         String optionText = getFormattedTextAt(RESOURCE_BUNDLE, resourceKey);
 
-        SkillCheck skillCheck = skillCheckMap.get(i);
+        SkillCheck skillCheck = skillCheckMap.get(responseIndex);
         if (skillCheck != null) {
-            String skillName = skillCheck.getSkillType().getName();
-            int targetNumber = skillCheck.getTargetNumber().getValue();
-            optionText = "(" + skillName + ", " + targetNumber + "+) " + optionText;
+            SkillType skillType = skillCheck.getSkillType();
+            String skillName = skillType.getName();
+
+            Skill skill = speaker.getSkill(skillName);
+            String skillLevelLabel = "Unskilled"; // TODO remove hardcoded value
+            if (skill != null) {
+                SkillModifierData skillModifierData = speaker.getSkillModifierData(isUseAgingEffects, isClanCampaign,
+                      today);
+                SkillLevel skillLevel = skill.getSkillLevel(skillModifierData);
+                skillLevelLabel = skillLevel.getShortName();
+            }
+            optionText = "<b>(" + skillName + ", " + skillLevelLabel + ")</b> " + optionText;
         }
 
-        AttributeCheck attributeCheck = attributeCheckMap.get(i);
+        AttributeCheck attributeCheck = attributeCheckMap.get(responseIndex);
         if (attributeCheck != null) {
             String attributeName = attributeCheck.getActionName();
             int targetNumber = attributeCheck.getTargetNumber().getValue();
-            optionText = "(" + attributeName + ", " + targetNumber + "+) " + optionText;
+            optionText = "<b>(" + attributeName + ", " + targetNumber + "+)</b> " + optionText;
         }
         return optionText;
     }
