@@ -3919,7 +3919,7 @@ public class Campaign implements ITechManager, IPlace {
                   (roll < target.getValue()) &&
                   hasEdgeTrigger &&
                   (person.getCurrentEdge() > 0)) {
-            person.changeCurrentEdge(-1);
+            person.spendEdge();
             roll = d6(2);
             report += " <b>failed!</b> but uses Edge to reroll...getting a " + roll + ": ";
         }
@@ -4220,7 +4220,7 @@ public class Campaign implements ITechManager, IPlace {
                           (roll < target.getValue()) &&
                           tech.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_FAILED_REFIT) &&
                           (tech.getCurrentEdge() > 0)) {
-                    tech.changeCurrentEdge(-1);
+                    tech.spendEdge();
                     roll = tech.isRightTechTypeFor(theRefit) ? d6(2) : Utilities.roll3d6();
                     // This is needed to update the edge values of individual crewmen
                     if (tech.isEngineer()) {
@@ -4448,7 +4448,7 @@ public class Campaign implements ITechManager, IPlace {
                              ((tech.getExperienceLevel(this, false, true) == SkillType.EXP_LEGENDARY) ||
                                     tech.getPrimaryRole().isVesselCrew())) // For vessel crews
                             && (roll < target.getValue())) {
-                tech.changeCurrentEdge(-1);
+                tech.spendEdge();
                 roll = tech.isRightTechTypeFor(partWork) ? d6(2) : Utilities.roll3d6();
                 // This is needed to update the edge values of individual crewmen
                 if (tech.isEngineer()) {
