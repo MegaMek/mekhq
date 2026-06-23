@@ -6157,6 +6157,15 @@ public class Person implements ILocation {
         atowAttributes.changeCurrentEdge(amount);
     }
 
+    public void spendEdge() {
+        if (getCurrentEdge() > 0) {
+            atowAttributes.changeCurrentEdge(-1);
+            MekHQ.triggerEvent(new PersonChangedEvent(this));
+        } else {
+            LOGGER.error("Trying to spend edge, but it is at {}", getCurrentEdge(), new IllegalArgumentException());
+        }
+    }
+
     /**
      * @return this person's currently available edge points. Used for weekly refresh.
      */
