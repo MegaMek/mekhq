@@ -30,37 +30,30 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.randomEvents.prisoners.enums;
+package mekhq.campaign.randomEvents.randomEventsSystem;
+
+import static mekhq.campaign.randomEvents.randomEventsSystem.EventResultEffect.NONE;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Represents the quality of a response in prisoner-related random events.
+ * Represents the result of an event response, including the effect type, the guard flag, the magnitude, and an optional
+ * skill type.
  *
- * <p>This enumeration defines three levels of response quality, which influence how various
- * prisoner events and interactions are processed in the campaign. It is used to categorize reactions or results in
- * situations involving prisoners.</p>
+ * @param effect    The type of effect this result describes
+ * @param isGuard   Whether this result applies to a guard
+ * @param magnitude The intensity or magnitude of the effect
+ * @param skillType An optional skill type associated with the effect
  */
-public enum ResponseQuality {
-    /**
-     * Represents a neutral response quality.
-     *
-     * <p>Indicates that the response neither has a positive nor a negative influence, but
-     * reflects a balanced or indifferent outcome from the associated prisoner interaction.</p>
-     */
-    RESPONSE_NEUTRAL,
-
-    /**
-     * Represents a positive response quality.
-     *
-     * <p>Indicates a favorable interaction or result, often leading to improved outcomes
-     * during prisoner-related events, such as successful negotiations or rescues.</p>
-     */
-    RESPONSE_POSITIVE,
-
-    /**
-     * Represents a negative response quality.
-     *
-     * <p>Indicates an unfavorable interaction or result, often leading to deteriorated
-     * outcomes during prisoner-related events, such as failed negotiations or missed rescues.</p>
-     */
-    RESPONSE_NEGATIVE
+public record EventResult(
+      @JsonProperty(value = "effect") EventResultEffect effect,
+      @JsonProperty(value = "isGuard") boolean isGuard,
+      @JsonProperty(value = "magnitude") int magnitude,
+      @JsonProperty(value = "skillType") String skillType
+) {
+    // Additional logic to provide defaults for missing properties
+    public EventResult {
+        effect = (effect != null) ? effect : NONE;
+        skillType = (skillType != null) ? skillType : "";
+    }
 }

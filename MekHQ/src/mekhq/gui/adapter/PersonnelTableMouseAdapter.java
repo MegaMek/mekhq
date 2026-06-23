@@ -161,7 +161,7 @@ import mekhq.campaign.personnel.skills.Skills;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
 import mekhq.campaign.randomEvents.personalities.PersonalityController;
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
+import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
@@ -1344,7 +1344,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_FAMILY_TREE: {
-                new FamilyTreeDialog(gui.getFrame(), selectedPerson.getGenealogy(), getCampaign().getPersonnel().values());
+                new FamilyTreeDialog(gui.getFrame(),
+                      selectedPerson.getGenealogy(),
+                      getCampaign().getPersonnel().values());
                 break;
             }
             case CMD_EDIT: {
@@ -4125,11 +4127,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       .stream()
                       .filter(Person::isSecondInCommand)
                       .forEach(secondInCommand -> {
-                    secondInCommand.setSecondInCommand(false);
-                    getCampaign().addReport(PERSONNEL, getFormattedText("removedSecondInCommand.format",
-                          secondInCommand.getHyperlinkedFullTitle()));
-                    MekHQ.triggerEvent(new PersonChangedEvent(secondInCommand));
-                });
+                          secondInCommand.setSecondInCommand(false);
+                          getCampaign().addReport(PERSONNEL, getFormattedText("removedSecondInCommand.format",
+                                secondInCommand.getHyperlinkedFullTitle()));
+                          MekHQ.triggerEvent(new PersonChangedEvent(secondInCommand));
+                      });
                 if (miSecondInCommand.isSelected()) {
                     person.setSecondInCommand(true);
                     person.setCommander(false);

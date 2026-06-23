@@ -49,10 +49,10 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
-import mekhq.campaign.randomEvents.personalities.enums.Aggression;
-import mekhq.campaign.randomEvents.personalities.enums.Ambition;
-import mekhq.campaign.randomEvents.personalities.enums.Greed;
-import mekhq.campaign.randomEvents.personalities.enums.Social;
+import mekhq.campaign.randomEvents.personalities.Aggression;
+import mekhq.campaign.randomEvents.personalities.Ambition;
+import mekhq.campaign.randomEvents.personalities.Greed;
+import mekhq.campaign.randomEvents.personalities.Social;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -109,14 +109,14 @@ class CommandRatingTest {
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {0, 1, 2, 5, 10})
+    @ValueSource(ints = { 0, 1, 2, 5, 10 })
     void testLeadership(int leadership) {
         var commander = commanderWithLeadership(leadership);
         assertRating(commander, Map.of("leadership", leadership, "total", Math.max(1, leadership)));
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {1, 2, 5, 10})
+    @ValueSource(ints = { 1, 2, 5, 10 })
     void testTactics(int tactics) {
         var commander = commanderWithLeadership(5);
         commander.addSkill(SkillType.S_TACTICS, tactics, 0);
@@ -124,7 +124,7 @@ class CommandRatingTest {
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {1, 3, 6, 10})
+    @ValueSource(ints = { 1, 3, 6, 10 })
     void testNegotiation(int negotiation) {
         var commander = commanderWithLeadership(5);
         commander.addSkill(SkillType.S_NEGOTIATION, negotiation, 0);
@@ -132,7 +132,7 @@ class CommandRatingTest {
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {1, 4, 7, 10})
+    @ValueSource(ints = { 1, 4, 7, 10 })
     void testStrategy(int strategy) {
         var commander = commanderWithLeadership(5);
         commander.addSkill(SkillType.S_STRATEGY, strategy, 0);
@@ -166,7 +166,7 @@ class CommandRatingTest {
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {1, 2, 5, 10})
+    @ValueSource(ints = { 1, 2, 5, 10 })
     void testConnections(int connections) {
         var commander = commanderWithLeadership(9);
         commander.setConnections(connections);
@@ -174,7 +174,7 @@ class CommandRatingTest {
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {-1, 1, 6, 7, 10})
+    @ValueSource(ints = { -1, 1, 6, 7, 10 })
     void testWealth(int wealth) {
         var commander = commanderWithLeadership(5);
         commander.setWealth(wealth);
@@ -183,7 +183,7 @@ class CommandRatingTest {
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {-5, -1, 1, 5})
+    @ValueSource(ints = { -5, -1, 1, 5 })
     void testReputation(int reputation) {
         var commander = commanderWithLeadership(5);
         commander.setReputation(reputation);
@@ -192,7 +192,7 @@ class CommandRatingTest {
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {0, 1, 3, 4, 6, 7, 10})
+    @ValueSource(ints = { 0, 1, 3, 4, 6, 7, 10 })
     void testCharisma(int charisma) {
         var commander = commanderWithLeadership(9);
         commander.setAttributeScore(SkillAttribute.CHARISMA, charisma);
@@ -206,7 +206,7 @@ class CommandRatingTest {
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {1, 2, 5})
+    @ValueSource(ints = { 1, 2, 5 })
     void testUnlucky(int unlucky) {
         var commander = commanderWithLeadership(5);
         commander.setUnlucky(unlucky);

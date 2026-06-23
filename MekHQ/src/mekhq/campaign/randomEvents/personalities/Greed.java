@@ -30,16 +30,15 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.randomEvents.personalities.enums;
+package mekhq.campaign.randomEvents.personalities;
 
-import static mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType.GREED;
+import static mekhq.campaign.randomEvents.personalities.PersonalityTraitType.GREED;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.PronounData;
-import mekhq.campaign.randomEvents.personalities.PersonalityTrait;
 
 /**
  * Represents various levels and traits of greed in a personality.

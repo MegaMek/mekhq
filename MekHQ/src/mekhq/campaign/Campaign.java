@@ -66,7 +66,7 @@ import static mekhq.campaign.personnel.skills.SkillType.S_STRATEGY;
 import static mekhq.campaign.personnel.skills.SkillType.S_TECH_MECHANIC;
 import static mekhq.campaign.personnel.skills.SkillType.getType;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
-import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
+import static mekhq.campaign.randomEvents.other.GrayMonday.isGrayMonday;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.MINIMUM_TEMPORARY_CAPACITY;
 import static mekhq.campaign.unit.Unit.TECH_WORK_DAY;
@@ -234,8 +234,8 @@ import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
-import mekhq.campaign.randomEvents.RandomEventLibraries;
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
+import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
+import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventLibraries;
 import mekhq.campaign.storyArc.StoryArc;
 import mekhq.campaign.stratCon.StratConContractInitializer;
 import mekhq.campaign.stratCon.StratConRulesManager;
@@ -2261,7 +2261,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all hangars across all locations associated with this campaign.
-     *                               TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     *                                           TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
      */
     public Hangar getAllHangar() {
         return units;
@@ -2909,7 +2909,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all warehouses across all locations associated with this campaign.
-     *                               TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
+     *                                           TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
      */
     public Warehouse getAllWarehouse() {
         return parts;
@@ -6958,8 +6958,8 @@ public class Campaign implements ITechManager, IPlace {
     }
 
     /**
-     * Calculates the target roll for acquiring the specified item or unit while ignoring real acquisition
-     * personnel. A synthetic person with baseline skill is used.
+     * Calculates the target roll for acquiring the specified item or unit while ignoring real acquisition personnel. A
+     * synthetic person with baseline skill is used.
      *
      * @param acquisition the {@link IAcquisitionWork} describing the part, supply, or unit to be acquired
      *
@@ -6979,6 +6979,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * Creates a person used for generic acquisitions. See {@link #getTargetForGenericAcquisition(IAcquisitionWork)}
+     *
      * @param skills the list of skills to prepopulate
      */
     private Person createGenericAcquisitionPerson(String... skills) {
@@ -7038,12 +7039,11 @@ public class Campaign implements ITechManager, IPlace {
      *   item/campaign modifiers, if the acquisition is allowed and requires a roll.</li>
      * </ul>
      *
-     * @param acquisition                 an {@link IAcquisitionWork} object describing the item or unit being requested
-     *                                    (contains info such as tech base, tech level, and availability)
-     * @param person                      the {@link Person} assigned to make the acquisition roll; may be {@code null}
-     *                                    if no one is available/allowed, or if personnel are ignored
-     * @param checkDaysToWait             if {@code true}, checks for shopping list/cooldown period before allowing the
-     *                                    roll
+     * @param acquisition     an {@link IAcquisitionWork} object describing the item or unit being requested (contains
+     *                        info such as tech base, tech level, and availability)
+     * @param person          the {@link Person} assigned to make the acquisition roll; may be {@code null} if no one is
+     *                        available/allowed, or if personnel are ignored
+     * @param checkDaysToWait if {@code true}, checks for shopping list/cooldown period before allowing the roll
      *
      * @return a {@link TargetRoll} describing the acquisition result, either as a constant value
      *       (automatic/impossible/fail) or a calculated result reflecting all applicable rules and modifiers
@@ -7066,11 +7066,11 @@ public class Campaign implements ITechManager, IPlace {
         } else if (getCampaignOptions().getTechLevel() < Utilities.getSimpleTechLevel(acquisition.getTechLevel())) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "You cannot acquire parts of this tech level");
         } else if (getCampaignOptions().isLimitByYear() &&
-                  !acquisition.isIntroducedBy(getGameYear(), useClanTechBase(), getTechFaction())) {
+                         !acquisition.isIntroducedBy(getGameYear(), useClanTechBase(), getTechFaction())) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "It has not been invented yet!");
         } else if (getCampaignOptions().isDisallowExtinctStuff() &&
-                  (acquisition.isExtinctIn(getGameYear(), useClanTechBase(), getTechFaction()) ||
-                         acquisition.getAvailability().equals(AvailabilityValue.X))) {
+                         (acquisition.isExtinctIn(getGameYear(), useClanTechBase(), getTechFaction()) ||
+                                acquisition.getAvailability().equals(AvailabilityValue.X))) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "It is extinct!");
         }
 

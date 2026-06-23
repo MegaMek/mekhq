@@ -30,11 +30,11 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.randomEvents.personalities.enums;
+package mekhq.campaign.randomEvents.personalities;
 
 import static java.lang.Math.round;
 import static megamek.common.compute.Compute.randomInt;
-import static mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType.REASONING;
+import static mekhq.campaign.randomEvents.personalities.PersonalityTraitType.REASONING;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import megamek.codeUtilities.MathUtility;

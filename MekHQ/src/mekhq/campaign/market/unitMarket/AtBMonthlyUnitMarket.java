@@ -41,7 +41,7 @@ import static mekhq.campaign.market.enums.UnitMarketRarity.UNCOMMON;
 import static mekhq.campaign.market.enums.UnitMarketRarity.VERY_COMMON;
 import static mekhq.campaign.market.enums.UnitMarketRarity.VERY_RARE;
 import static mekhq.campaign.market.enums.UnitMarketType.getPricePercentage;
-import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
+import static mekhq.campaign.randomEvents.other.GrayMonday.isGrayMonday;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getAmazingColor;

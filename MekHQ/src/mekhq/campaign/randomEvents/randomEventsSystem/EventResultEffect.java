@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.randomEvents.prisoners.enums;
+package mekhq.campaign.randomEvents.randomEventsSystem;
 
 /**
  * Defines the possible effects of an event within the prisoner system. Each effect represents a specific outcome or

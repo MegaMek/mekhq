@@ -65,7 +65,6 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.Nested;
@@ -777,12 +776,12 @@ public class PrisonerEventManagerTest {
         }
 
         /**
-         * Documents the intended behavior of {@link PrisonerEventManager#calculatePrisonerCapacity(Campaign)}
-         * with respect to blob crew (temporary personnel stored as integers rather than {@link Person} objects).
+         * Documents the intended behavior of {@link PrisonerEventManager#calculatePrisonerCapacity(Campaign)} with
+         * respect to blob crew (temporary personnel stored as integers rather than {@link Person} objects).
          *
          * <p>Blob crew should count equally toward prisoner capacity alongside regular {@link Person} crew.
-         * These tests are expected to <strong>fail</strong> until {@code calculatePrisonerCapacity} is updated
-         * to include {@link mekhq.campaign.unit.Unit#getTotalTempCrew()} in its calculations.</p>
+         * These tests are expected to <strong>fail</strong> until {@code calculatePrisonerCapacity} is updated to
+         * include {@link mekhq.campaign.unit.Unit#getTotalTempCrew()} in its calculations.</p>
          *
          * <p>Note: tank capacity is derived from {@code otherUnitMultiplier} which does not examine crew
          * at all, so the tank blob-crew tests pass under the current implementation.</p>
