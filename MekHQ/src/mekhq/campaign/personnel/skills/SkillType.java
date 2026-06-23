@@ -1105,6 +1105,7 @@ public class SkillType {
         final String RP_ONLY_TAG = " (RP Only)";
 
         skillName = switch (skillName) {
+            // <51.01 compatibility handler
             case "Acrobatics" + RP_ONLY_TAG -> "Acrobatics";
             case "Animal Handling" + RP_ONLY_TAG -> "Animal Handling";
             case "Art/Dancing" + RP_ONLY_TAG -> "Art/Dancing";
@@ -1359,12 +1360,6 @@ public class SkillType {
                 }
             }
 
-            // Skill settings from prior to this are incompatible and cannot be used, so we use the default values instead.
-            boolean preDatesLastSkillChanges = version.isLowerThan(new Version("0.50.11"));
-            if (preDatesLastSkillChanges) {
-                compatibilityHandler(skillType);
-            }
-
             lookupHash.put(skillType.name, skillType);
         } catch (Exception ex) {
             LOGGER.error("", ex);
@@ -1412,165 +1407,9 @@ public class SkillType {
                 }
             }
 
-            // Skill settings from prior to this are incompatible and cannot be used, so we use the default values instead.
-            boolean preDatesSkillChanges = version.isLowerThan(new Version("0.50.11"));
-            if (preDatesSkillChanges) {
-                compatibilityHandler(skillType);
-            }
-
             hash.put(skillType.name, skillType);
         } catch (Exception ex) {
             LOGGER.error("", ex);
-        }
-    }
-
-    /**
-     * Updates {@link SkillType} from <0.50.05 by setting its subtype and attributes based on the skill name.
-     *
-     * <p>The method creates a temporary {@link SkillType} with the correct configuration based on the input skill
-     * name, then copies the {@link SkillType#subType}, {@link SkillType#firstAttribute}, and
-     * {@link SkillType#secondAttribute} values to the provided {@link SkillType}.<p>
-     *
-     * <p>For each skill type, it logs the updates made to help with debugging and tracking compatibility changes.</p>
-     *
-     * @param skillType the {@link SkillType} to update with compatible configuration If {@code null}, the method logs
-     *                  an error and returns without making changes
-     */
-    private static void compatibilityHandler(SkillType skillType) {
-        if (skillType == null) {
-            LOGGER.info("SkillType is null, unable to update compatibility. " +
-                              "This suggests a deeper issue and should be reported.");
-            return;
-        }
-
-        SkillType temporarySkillType = switch (skillType.getName()) {
-            case S_PILOT_MEK -> createPilotingMek();
-            case S_GUN_MEK -> createGunneryMek();
-            case S_PILOT_AERO -> createPilotingAero();
-            case S_GUN_AERO -> createGunneryAero();
-            case S_PILOT_JET -> createPilotingJet();
-            case S_GUN_JET -> createGunneryJet();
-            case S_PILOT_SPACE -> createPilotingSpace();
-            case S_GUN_SPACE -> createGunnerySpace();
-            case S_PILOT_GVEE -> createPilotingGroundVee();
-            case S_PILOT_NVEE -> createPilotingNavalVee();
-            case S_PILOT_VTOL -> createPilotingVTOL();
-            case S_GUN_VEE -> createGunneryVehicle();
-            case S_ARTILLERY -> createArtillery();
-            case S_GUN_BA -> createGunneryBA();
-            case S_GUN_PROTO -> createGunneryProto();
-            case S_SMALL_ARMS -> createSmallArms();
-            case S_ANTI_MEK -> createAntiMek();
-            case S_TECH_MEK -> createTechMek();
-            case S_TECH_MECHANIC -> createTechMechanic();
-            case S_TECH_AERO -> createTechAero();
-            case S_TECH_BA -> createTechBA();
-            case S_TECH_VESSEL -> createTechVessel();
-            case S_ASTECH -> createAstech();
-            case S_SURGERY -> createSurgery();
-            case S_MEDTECH -> createMedTech();
-            case S_NAVIGATION -> createNavigation();
-            case S_ADMIN -> createAdmin();
-            case S_NEGOTIATION -> createNegotiation();
-            case S_LEADER -> createLeadership();
-            case S_STRATEGY -> createStrategy();
-            case S_TACTICS -> createTactics();
-            case S_ACROBATICS -> createAcrobatics();
-            case S_ACTING, "Acting (RP Only)" -> createActing();
-            case S_ANIMAL_HANDLING -> createAnimalHandling();
-            case S_APPRAISAL, "Appraisal (RP Only)" -> createAppraisal();
-            case S_ARCHERY, "Archery (RP Only)" -> createArchery();
-            case S_ART_DANCING -> createArtDancing();
-            case S_ART_DRAWING -> createArtDrawing();
-            case S_ART_PAINTING -> createArtPainting();
-            case S_ART_WRITING -> createArtWriting();
-            case S_ART_COOKING -> createArtCooking();
-            case S_ART_POETRY -> createArtPoetry();
-            case S_ART_SCULPTURE -> createArtSculpture();
-            case S_ART_INSTRUMENT -> createArtInstrument();
-            case S_ART_SINGING -> createArtSinging();
-            case S_ART_OTHER -> createArtOther();
-            case S_COMMUNICATIONS, "Communications/Any (RP Only)" -> createCommunications();
-            case S_COMPUTERS -> createComputers();
-            case S_CRYPTOGRAPHY -> createCryptography();
-            case S_DEMOLITIONS, "Demolitions (RP Only)" -> createDemolitions();
-            case S_DISGUISE, "Disguise (RP Only)" -> createDisguise();
-            case S_ESCAPE_ARTIST, "Escape Artist (RP Only)" -> createEscapeArtist();
-            case S_FORGERY, "Forgery (RP Only)" -> createForgery();
-            case S_INTEREST_HISTORY -> createInterestHistory();
-            case S_INTEREST_LITERATURE -> createInterestLiterature();
-            case S_INTEREST_HOLO_GAMES -> createInterestHoloGames();
-            case S_INTEREST_SPORTS -> createInterestSports();
-            case S_INTEREST_FASHION -> createInterestFashion();
-            case S_INTEREST_MUSIC -> createInterestMusic();
-            case S_INTEREST_MILITARY -> createInterestMilitary();
-            case S_INTEREST_ANTIQUES -> createInterestAntiques();
-            case S_INTEREST_THEOLOGY -> createInterestTheology();
-            case S_INTEREST_GAMBLING -> createInterestGambling();
-            case S_INTEREST_POLITICS -> createInterestPolitics();
-            case S_INTEREST_PHILOSOPHY -> createInterestPhilosophy();
-            case S_INTEREST_ECONOMICS -> createInterestEconomics();
-            case S_INTEREST_POP_CULTURE -> createInterestPopCulture();
-            case S_INTEREST_ASTROLOGY -> createInterestAstrology();
-            case S_INTEREST_FISHING -> createInterestFishing();
-            case S_INTEREST_MYTHOLOGY -> createInterestMythology();
-            case S_INTEREST_CARTOGRAPHY -> createInterestCartography();
-            case S_INTEREST_ARCHEOLOGY -> createInterestArcheology();
-            case S_INTEREST_HOLO_CINEMA -> createInterestHoloCinema();
-            case S_INTEREST_EXOTIC_ANIMALS -> createInterestExoticAnimals();
-            case S_INTEREST_LAW -> createInterestLaw();
-            case S_INTEREST_OTHER -> createInterestOther();
-            case S_INTERROGATION -> createInterrogation();
-            case S_INVESTIGATION -> createInvestigation();
-            case S_LANGUAGES -> createLanguage();
-            case S_MARTIAL_ARTS, "Martial Arts (RP Only)" -> createMartialArts();
-            case S_PERCEPTION, "Perception (RP Only)" -> createPerception();
-            case S_SLEIGHT_OF_HAND, "Sleight of Hand/Any (RP Only)" -> createSleightOfHand();
-            case S_PROTOCOLS -> createProtocols();
-            case S_SCIENCE_BIOLOGY -> createScienceBiology();
-            case S_SCIENCE_CHEMISTRY -> createScienceChemistry();
-            case S_SCIENCE_MATHEMATICS -> createScienceMathematics();
-            case S_SCIENCE_PHYSICS -> createSciencePhysics();
-            case S_SCIENCE_MILITARY -> createScienceMilitary();
-            case S_SCIENCE_GEOLOGY -> createScienceGeology();
-            case S_SCIENCE_XENOBIOLOGY -> createScienceXenobiology();
-            case S_SCIENCE_PHARMACOLOGY -> createSciencePharmacology();
-            case S_SCIENCE_GENETICS -> createScienceGenetics();
-            case S_SCIENCE_PSYCHOLOGY -> createSciencePsychology();
-            case S_SCIENCE_OTHER -> createScienceOther();
-            case S_SECURITY_SYSTEMS_ELECTRONIC -> createSecuritySystemsElectronic();
-            case S_SECURITY_SYSTEMS_MECHANICAL -> createSecuritySystemsMechanical();
-            case S_SENSOR_OPERATIONS, "Sensor Operations (RP Only)" -> createSensorOperations();
-            case S_STEALTH, "Stealth (RP Only)" -> createStealth();
-            case S_STREETWISE -> createStreetwise();
-            case S_SURVIVAL -> createSurvival();
-            case S_TRACKING, "Tracking/Any (RP Only)" -> createTracking();
-            case S_TRAINING, "Training (RP Only)" -> createTraining();
-            case S_CAREER_ANY -> createCareer();
-            case S_SWIMMING -> createSwimming();
-            case S_ZERO_G_OPERATIONS, "Zero-G Operations (RP Only)" -> createZeroGOperations();
-            case S_MELEE_WEAPONS, "Melee Weapons (RP Only)" -> createMeleeWeapons();
-            case S_THROWN_WEAPONS, "Thrown Weapons (RP Only)" -> createThrownWeapons();
-            case S_SUPPORT_WEAPONS, "Support Weapons (RP Only)" -> createSupportWeapons();
-            case S_RUNNING -> createRunning();
-            default -> {
-                LOGGER.warn("Unexpected value in compatibilityHandler: {}", skillType.getName());
-                yield null;
-            }
-        };
-
-        if (temporarySkillType == null) {
-            return;
-        }
-
-        // <50.07 compatibility handlers.
-        skillType.subType = temporarySkillType.getSubType();
-        skillType.firstAttribute = temporarySkillType.getFirstAttribute();
-        skillType.secondAttribute = temporarySkillType.getSecondAttribute();
-        skillType.countUp = temporarySkillType.isCountUp();
-
-        if (skillType.subType == UTILITY_COMMAND) {
-            skillType.target = temporarySkillType.getTarget();
         }
     }
 
