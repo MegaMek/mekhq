@@ -911,22 +911,27 @@ public class StratConRulesManager {
             Collection<Unit> potentialUnits = findPotentialUnits(campaign, explicitForceID);
 
             // Iterate through the potential units and substitute up to `unitCount` units
-            for (Unit unit : potentialUnits) {
-                if (isValidUnitForScenario(unit,
-                      scenarioForceTemplate,
-                      campaign,
-                      scenario.getScenarioTemplate().mapParameters.getMapLocation())) {
-                    scenario.addUnit(unit, scenarioForceTemplate.getForceName(), false);
-                    AtBDynamicScenarioFactory.benchAllyUnit(unit.getId(),
-                          scenarioForceTemplate.getForceName(),
-                          scenario.getBackingScenario());
-                    unitCount--;
-
-
-                    if (unitCount == 0) {
-                        break; // Stop once enough units have been substituted
-                    }
+            List<Unit> vettedUnits = new ArrayList<>();
+            MapLocation scenarioLocation = scenario.getScenarioTemplate().mapParameters.getMapLocation();
+            for (Unit potentialUnit : potentialUnits) {
+                if (isValidUnitForScenario(potentialUnit, scenarioForceTemplate, campaign, scenarioLocation)) {
+                    vettedUnits.add(potentialUnit);
                 }
+            }
+
+            for (int i = 0; i < unitCount; i++) {
+                if (vettedUnits.isEmpty()) {
+                    break;
+                }
+
+                Unit selectedUnit = ObjectUtility.getRandomItem(vettedUnits);
+                vettedUnits.remove(selectedUnit);
+
+                scenario.addUnit(selectedUnit, scenarioForceTemplate.getForceName(), false);
+
+                AtBDynamicScenarioFactory.benchAllyUnit(selectedUnit.getId(),
+                      scenarioForceTemplate.getForceName(),
+                      scenario.getBackingScenario());
             }
         }
     }
@@ -1840,9 +1845,9 @@ public class StratConRulesManager {
      * <p>All such {@link ScoutRecord} entries are collected, sorted in descending order of scout skill level, and
      * returned as a list. Units with no crew are logged and skipped.</p>
      *
-     * @param formation       the {@link Formation} containing units to evaluate
-     * @param hangar          the {@link Hangar} used to help retrieve units from the force
-     * @param campaign        the {@link Campaign} context
+     * @param formation the {@link Formation} containing units to evaluate
+     * @param hangar    the {@link Hangar} used to help retrieve units from the force
+     * @param campaign  the {@link Campaign} context
      *
      * @return a list of {@link ScoutRecord} objects, each representing the best scout and their skill details for a
      *       unit, sorted from the highest to lowest scout skill level
