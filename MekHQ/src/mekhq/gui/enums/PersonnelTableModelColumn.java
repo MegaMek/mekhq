@@ -80,7 +80,6 @@ import mekhq.gui.sorter.BonusSorter;
 import mekhq.gui.sorter.DateStringComparator;
 import mekhq.gui.sorter.EducationLevelSorter;
 import mekhq.gui.sorter.FormattedNumberSorter;
-import mekhq.gui.sorter.IntegerStringSorter;
 import mekhq.gui.sorter.LevelSorter;
 import mekhq.gui.sorter.PersonRankSorter;
 import mekhq.gui.sorter.PersonalityTraitSorter;
@@ -112,8 +111,8 @@ public enum PersonnelTableModelColumn {
           Person::getPostNominal),
     CALLSIGN("Column.CALLSIGN.title", NaturalOrderComparator.INSTANCE,
           Person::getCallsign),
-    AGE("Column.AGE.title", IntegerStringSorter.INSTANCE,
-          (person, campaign) -> Integer.toString(person.getAge(campaign.getLocalDate()))),
+    AGE("Column.AGE.title", Integer::compare,
+          (person, campaign) -> person.getAge(campaign.getLocalDate()), Object::toString),
     PERSONNEL_STATUS("Column.PERSONNEL_STATUS.title", NaturalOrderComparator.INSTANCE,
           person -> person.getStatus().toString()),
     GENDER("Column.GENDER.title", NaturalOrderComparator.INSTANCE,
@@ -201,8 +200,8 @@ public enum PersonnelTableModelColumn {
           skillModelExtractor(SkillType.S_ADMIN)),
     NEGOTIATION("Column.NEGOTIATION.title", BonusSorter.INSTANCE,
           skillModelExtractor(SkillType.S_NEGOTIATION)),
-    WORK_MINUTES("Column.WORK_MINUTES.title", NaturalOrderComparator.INSTANCE,
-          person -> person.isTechExpanded() ? String.valueOf(person.getMinutesLeft()) : "0"),
+    WORK_MINUTES("Column.WORK_MINUTES.title", Integer::compare,
+          person -> person.isTechExpanded() ? person.getMinutesLeft() : 0, Object::toString),
     TECH_MINUTES("Column.TECH_MINUTES.title", NaturalOrderComparator.INSTANCE,
           (person, campaign) -> {
               boolean isUseTechAdmin = campaign.getCampaignOptions().isTechsUseAdministration();
@@ -214,15 +213,16 @@ public enum PersonnelTableModelColumn {
               return person.isDoctor() ? String.valueOf(person.getDoctorMedicalCapacity(
                     campaign.getCampaignOptions().isDoctorsUseAdministration(), baseBedCapacity)) : "0";
           }),
-    INJURIES("Column.INJURIES.title", IntegerStringSorter.INSTANCE,
-          (person, campaign) -> Integer.toString(campaign.getCampaignOptions().isUseAdvancedMedical() ?
-                                                       person.getInjuries().size() : person.getHits())),
-    KILLS("Column.KILLS.title", IntegerStringSorter.INSTANCE,
-          (person, campaign) -> Integer.toString(campaign.getKillsFor(person.getId()).size())),
+    INJURIES("Column.INJURIES.title", Integer::compare,
+          (person, campaign) ->
+                campaign.getCampaignOptions().isUseAdvancedMedical() ? person.getInjuries().size() : person.getHits(),
+          Object::toString),
+    KILLS("Column.KILLS.title", Integer::compare,
+          (person, campaign) -> campaign.getKillsFor(person.getId()).size(), Object::toString),
     SALARY("Column.SALARY.title", FormattedNumberSorter.INSTANCE,
           (person, campaign) -> person.getSalary(campaign).toAmountAndSymbolString()),
-    XP("Column.XP.title", IntegerStringSorter.INSTANCE,
-          person -> Integer.toString(person.getXP())),
+    XP("Column.XP.title", Integer::compare,
+          Person::getXP, Object::toString),
     ORIGIN_FACTION("Column.ORIGIN_FACTION.title", NaturalOrderComparator.INSTANCE,
           (person, campaign) ->
                 person.getOriginFaction() == null ? "-" :
@@ -283,44 +283,40 @@ public enum PersonnelTableModelColumn {
           person -> convertBooleanToYesNo(person.isCoverIllicitMedicalExpenses())),
     BLOCK_MATERNITY_LEAVE("Column.BLOCK_MATERNITY_LEAVE.title", NaturalOrderComparator.INSTANCE,
           person -> convertBooleanToYesNo(person.isBlockMaternityLeave())),
-    TOUGHNESS("Column.TOUGHNESS.title", IntegerStringSorter.INSTANCE,
-          person -> Integer.toString(person.getAdjustedToughness())),
-    CONNECTIONS("Column.CONNECTIONS.title", IntegerStringSorter.INSTANCE,
-          (person, campaign) -> {
-              if (person.getBurnedConnectionsEndDate() != null) {
-                  // FIXME: IntegerStringSorter will fail here
-                  return "<html><b><font color='gray'>" + person.getAdjustedConnections(true) + "</font></b></html>";
-              }
-              return Integer.toString(person.getAdjustedConnections(true));
-          }),
-    WEALTH("Column.WEALTH.title", IntegerStringSorter.INSTANCE,
-          person -> Integer.toString(person.getWealth())),
-    EXTRA_INCOME("Column.EXTRA_INCOME.title", IntegerStringSorter.INSTANCE,
-          person -> Integer.toString(person.getExtraIncomeTraitLevel())),
-    REPUTATION("Column.REPUTATION.title", IntegerStringSorter.INSTANCE,
-          (person, campaign) -> {
-              int adjustedReputation = person.getAdjustedReputation(campaign.getCampaignOptions().isUseAgeEffects(),
-                    campaign.isClanCampaign(), campaign.getLocalDate(), person.getRankNumeric());
-              return Integer.toString(adjustedReputation);
-          }),
-    UNLUCKY("Column.UNLUCKY.title", IntegerStringSorter.INSTANCE,
-          person -> Integer.toString(person.getUnlucky())),
-    BLOODMARK("Column.BLOODMARK.title", IntegerStringSorter.INSTANCE,
-          person -> Integer.toString(person.getBloodmark())),
-    FATIGUE("Column.FATIGUE.title", NaturalOrderComparator.INSTANCE,
+    TOUGHNESS("Column.TOUGHNESS.title", Integer::compare,
+          Person::getAdjustedToughness, Object::toString),
+    CONNECTIONS("Column.CONNECTIONS.title", fieldBasedSorter(person -> person.getAdjustedConnections(true)),
+          person -> person, person -> {
+        if (person.getBurnedConnectionsEndDate() != null) {
+            return "<html><b><font color='gray'>" + person.getAdjustedConnections(true) + "</font></b></html>";
+        }
+        return Integer.toString(person.getAdjustedConnections(true));
+    }),
+    WEALTH("Column.WEALTH.title", Integer::compare,
+          Person::getWealth, Object::toString),
+    EXTRA_INCOME("Column.EXTRA_INCOME.title", Integer::compare,
+          Person::getExtraIncomeTraitLevel, Object::toString),
+    REPUTATION("Column.REPUTATION.title", Integer::compare,
+          (person, campaign) -> person.getAdjustedReputation(campaign.getCampaignOptions().isUseAgeEffects(),
+                campaign.isClanCampaign(), campaign.getLocalDate(), person.getRankNumeric()), Object::toString),
+    UNLUCKY("Column.UNLUCKY.title", Integer::compare,
+          Person::getUnlucky, Object::toString),
+    BLOODMARK("Column.BLOODMARK.title", Integer::compare,
+          Person::getBloodmark, Object::toString),
+    FATIGUE("Column.FATIGUE.title", Integer::compare,
           (person, campaign) ->
-              Integer.toString(getEffectiveFatigue(person.getAdjustedFatigue(),
+              getEffectiveFatigue(person.getAdjustedFatigue(),
                     person.getPermanentFatigue(), person.isClanPersonnel(),
-                    person.getSkillLevel(campaign, false, true)))),
-    SPA_COUNT("Column.SPA_COUNT.title", IntegerStringSorter.INSTANCE,
-          person -> Integer.toString(person.countOptions(PersonnelOptions.LVL3_ADVANTAGES))),
-    MODIFICATION_COUNT("Column.MODIFICATION_COUNT.title", IntegerStringSorter.INSTANCE,
-          person -> Integer.toString(person.getProstheticInjuries().size())),
-    IMPLANT_COUNT("Column.IMPLANT_COUNT.title", IntegerStringSorter.INSTANCE,
-          person -> Integer.toString(person.countOptions(PersonnelOptions.MD_ADVANTAGES))),
-    LOYALTY("Column.LOYALTY.title", IntegerStringSorter.INSTANCE,
-          (person, campaign) -> String.valueOf(person.getAdjustedLoyalty(campaign.getFaction(),
-                campaign.getCampaignOptions().isUseAlternativeAdvancedMedical()))),
+                    person.getSkillLevel(campaign, false, true)), Object::toString),
+    SPA_COUNT("Column.SPA_COUNT.title", Integer::compare,
+          person -> person.countOptions(PersonnelOptions.LVL3_ADVANTAGES), Object::toString),
+    MODIFICATION_COUNT("Column.MODIFICATION_COUNT.title", Integer::compare,
+          person -> person.getProstheticInjuries().size(), Object::toString),
+    IMPLANT_COUNT("Column.IMPLANT_COUNT.title", Integer::compare,
+          person -> person.countOptions(PersonnelOptions.MD_ADVANTAGES), Object::toString),
+    LOYALTY("Column.LOYALTY.title", Integer::compare,
+          (person, campaign) -> person.getAdjustedLoyalty(campaign.getFaction(),
+                campaign.getCampaignOptions().isUseAlternativeAdvancedMedical()), Object::toString),
     HIGHEST_EDUCATION("Column.HIGHEST_EDUCATION.title", EducationLevelSorter.INSTANCE,
           person -> person.getEduHighestEducation().toString()),
     CURRENT_EDUCATION("Column.CURRENT_EDUCATION.title", EducationLevelSorter.INSTANCE,
