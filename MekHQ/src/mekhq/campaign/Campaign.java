@@ -104,6 +104,7 @@ import megamek.codeUtilities.ObjectUtility;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.Player;
 import megamek.common.SimpleTechLevel;
+import megamek.common.TargetRollModifier;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.AvailabilityValue;
 import megamek.common.enums.Gender;
@@ -383,6 +384,8 @@ public class Campaign implements ITechManager, IPlace {
     private boolean fieldKitchenWithinCapacity;
     private int mashTheatreCapacity;
     private int repairBaysRented;
+
+    private Person genericAcquisitionPerson;
 
     // this is updated and used per gaming session, it is enabled/disabled via the Campaign options we're re-using
     // the LogEntry class used to store Personnel entries
@@ -3751,12 +3754,9 @@ public class Campaign implements ITechManager, IPlace {
             return PartAcquisitionResult.PartInherentFailure;
         }
 
-        target = system.getPrimaryPlanet()
-                       .getAcquisitionMods(target,
-                             getLocalDate(),
-                             getCampaignOptions(),
-                             getFaction(),
-                             acquisition.getTechBase() == TechBase.CLAN);
+        List<TargetRollModifier> acquisitionMods = system.getPrimaryPlanet().getAcquisitionMods(
+              getLocalDate(), getCampaignOptions(), getFaction(), acquisition.getTechBase() == TechBase.CLAN);
+        acquisitionMods.forEach(target::addModifier);
 
         if (target.getValue() == TargetRoll.IMPOSSIBLE) {
             if (getCampaignOptions().isPlanetAcquisitionVerbose()) {
@@ -3838,7 +3838,7 @@ public class Campaign implements ITechManager, IPlace {
      * @return a boolean indicating whether the attempt to acquire equipment was
      *         successful.
      */
-    public boolean acquireEquipment(IAcquisitionWork acquisition, Person person) {
+    public boolean acquireEquipment(IAcquisitionWork acquisition, @Nullable Person person) {
         return acquireEquipment(acquisition, person, null, -1);
     }
 
@@ -3859,7 +3859,7 @@ public class Campaign implements ITechManager, IPlace {
      * @return a boolean indicating whether the attempt to acquire equipment was
      *         successful.
      */
-    private boolean acquireEquipment(IAcquisitionWork acquisition, Person person, PlanetarySystem system,
+    private boolean acquireEquipment(IAcquisitionWork acquisition, @Nullable Person person, PlanetarySystem system,
           int transitDays) {
         boolean found = false;
         String report = "";
@@ -3876,12 +3876,9 @@ public class Campaign implements ITechManager, IPlace {
         }
 
         if (null != system) {
-            target = system.getPrimaryPlanet()
-                           .getAcquisitionMods(target,
-                                 getLocalDate(),
-                                 getCampaignOptions(),
-                                 getFaction(),
-                                 acquisition.getTechBase() == TechBase.CLAN);
+            List<TargetRollModifier> acquisitionMods = system.getPrimaryPlanet().getAcquisitionMods(
+                  getLocalDate(), getCampaignOptions(), getFaction(), acquisition.getTechBase() == TechBase.CLAN);
+            acquisitionMods.forEach(target::addModifier);
         }
         report += "attempts to find " + acquisition.getAcquisitionName();
 
@@ -6956,24 +6953,40 @@ public class Campaign implements ITechManager, IPlace {
      *
      * @return a {@link TargetRoll} indicating the outcome or difficulty of the acquisition attempt
      */
-    public TargetRoll getTargetForAcquisition(final IAcquisitionWork acquisition, final @Nullable Person person) {
-        return getTargetForAcquisition(acquisition, person, false, false);
+    public TargetRoll getTargetForAcquisition(IAcquisitionWork acquisition, @Nullable Person person) {
+        return getTargetForAcquisition(acquisition, person, false);
     }
 
     /**
-     * Calculates the target roll for acquiring the specified item or unit while optionally ignoring real acquisitions
-     * personnel. A synthetic person with baseline skill is used if personnel are ignored.
+     * Calculates the target roll for acquiring the specified item or unit while ignoring real acquisition
+     * personnel. A synthetic person with baseline skill is used.
      *
-     * @param acquisition                 the {@link IAcquisitionWork} describing the part, supply, or unit to be
-     *                                    acquired
-     * @param ignoreAcquisitionsPersonnel if {@code true}, ignores available personnel and uses a synthetic baseline
-     *                                    person for the roll
+     * @param acquisition the {@link IAcquisitionWork} describing the part, supply, or unit to be acquired
      *
      * @return a {@link TargetRoll} indicating the outcome or difficulty of the acquisition attempt
      */
-    public TargetRoll getTargetForAcquisition(final IAcquisitionWork acquisition,
-          final boolean ignoreAcquisitionsPersonnel) {
-        return getTargetForAcquisition(acquisition, null, false, ignoreAcquisitionsPersonnel);
+    public TargetRoll getTargetForGenericAcquisition(final IAcquisitionWork acquisition) {
+        return getTargetForAcquisition(acquisition, getGenericAcquisitionPerson(), false);
+    }
+
+
+    private Person getGenericAcquisitionPerson() {
+        if (genericAcquisitionPerson == null) {
+            genericAcquisitionPerson = createGenericAcquisitionPerson(S_NEGOTIATION, S_ADMIN, S_TECH_MECHANIC);
+        }
+        return genericAcquisitionPerson;
+    }
+
+    /**
+     * Creates a person used for generic acquisitions. See {@link #getTargetForGenericAcquisition(IAcquisitionWork)}
+     * @param skills the list of skills to prepopulate
+     */
+    private Person createGenericAcquisitionPerson(String... skills) {
+        Person person = new Person(this);
+        Arrays.stream(skills).forEach(skillName -> {
+            person.addSkill(skillName, SkillType.getType(skillName).getRegularLevel(), 0);
+        });
+        return person;
     }
 
     public PlanetaryConditions getCurrentPlanetaryConditions(Scenario scenario) {
@@ -7031,72 +7044,46 @@ public class Campaign implements ITechManager, IPlace {
      *                                    if no one is available/allowed, or if personnel are ignored
      * @param checkDaysToWait             if {@code true}, checks for shopping list/cooldown period before allowing the
      *                                    roll
-     * @param ignoreAcquisitionsPersonnel if {@code true}, constructs a synthetic person with default skill for the
-     *                                    roll, ignoring actual acquisitions personnel and their availability
      *
      * @return a {@link TargetRoll} describing the acquisition result, either as a constant value
      *       (automatic/impossible/fail) or a calculated result reflecting all applicable rules and modifiers
      */
-    public TargetRoll getTargetForAcquisition(final IAcquisitionWork acquisition, @Nullable Person person,
-          final boolean checkDaysToWait, final boolean ignoreAcquisitionsPersonnel) {
-        if (getCampaignOptions().getAcquisitionType() == AcquisitionsType.AUTOMATIC) {
-            return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "Automatic Success");
-        }
-
-        final AcquisitionsType acquisitionsType = campaignOptions.getAcquisitionType();
-        String fixedSkillName = "";
-        boolean isAnyTech = false;
-
-        switch (acquisitionsType) {
-            case ADMINISTRATION -> fixedSkillName = S_ADMIN;
-            case ANY_TECH -> isAnyTech = true;
-            case AUTOMATIC -> {
-                return null;
-            }
-            case NEGOTIATION -> fixedSkillName = S_NEGOTIATION;
-        }
-
-        if (ignoreAcquisitionsPersonnel) {
-            person = new Person(this);
-            fixedSkillName = acquisitionsType == AcquisitionsType.ANY_TECH ? S_TECH_MECHANIC : fixedSkillName;
-            SkillType skillType = getType(fixedSkillName);
-            if (skillType != null) {
-                int regularLevel = skillType.getRegularLevel();
-                person.addSkill(fixedSkillName, regularLevel, 0);
-            }
-        }
-
-        if (null == person) {
+    public TargetRoll getTargetForAcquisition(IAcquisitionWork acquisition, @Nullable Person person,
+          boolean checkDaysToWait) {
+        if (person == null) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE,
                   "Your procurement personnel have used up all their acquisition attempts for this period");
-        }
-
-        final Skill skill = isAnyTech ? person.getBestTechSkill() : person.getSkillForWorkingOn(fixedSkillName);
-        if (skill == null) {
-            return new TargetRoll(TargetRoll.AUTOMATIC_FAIL, "No skill");
-        }
-        if (null != getShoppingList().getShoppingItem(acquisition.getNewEquipment()) && checkDaysToWait) {
+        } else if (campaignOptions.getAcquisitionType() == AcquisitionsType.AUTOMATIC) {
+            return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "Automatic Success");
+        } else if (null != getShoppingList().getShoppingItem(acquisition.getNewEquipment()) && checkDaysToWait) {
             return new TargetRoll(TargetRoll.AUTOMATIC_FAIL,
                   "You must wait until the new cycle to check for this part. Further" +
                         " attempts will be added to the shopping list.");
-        }
-        if (acquisition.getTechBase() == TechBase.CLAN && !getCampaignOptions().isAllowClanPurchases()) {
+        } else if (acquisition.getTechBase() == TechBase.CLAN && !getCampaignOptions().isAllowClanPurchases()) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "You cannot acquire clan parts");
-        }
-        if (acquisition.getTechBase() == TechBase.IS && !getCampaignOptions().isAllowISPurchases()) {
+        } else if (acquisition.getTechBase() == TechBase.IS && !getCampaignOptions().isAllowISPurchases()) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "You cannot acquire inner sphere parts");
-        }
-        if (getCampaignOptions().getTechLevel() < Utilities.getSimpleTechLevel(acquisition.getTechLevel())) {
+        } else if (getCampaignOptions().getTechLevel() < Utilities.getSimpleTechLevel(acquisition.getTechLevel())) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "You cannot acquire parts of this tech level");
-        }
-        if (getCampaignOptions().isLimitByYear() &&
+        } else if (getCampaignOptions().isLimitByYear() &&
                   !acquisition.isIntroducedBy(getGameYear(), useClanTechBase(), getTechFaction())) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "It has not been invented yet!");
-        }
-        if (getCampaignOptions().isDisallowExtinctStuff() &&
+        } else if (getCampaignOptions().isDisallowExtinctStuff() &&
                   (acquisition.isExtinctIn(getGameYear(), useClanTechBase(), getTechFaction()) ||
                          acquisition.getAvailability().equals(AvailabilityValue.X))) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "It is extinct!");
+        }
+
+        // if you change skill mappings here, make sure to update createGenericAcquisitionPerson,
+        // so that it has skills for any case of campaignOptions.getAcquisitionType()
+        Skill skill = switch (campaignOptions.getAcquisitionType()) {
+            case ADMINISTRATION -> person.getSkillForWorkingOn(S_ADMIN);
+            case NEGOTIATION -> person.getSkillForWorkingOn(S_NEGOTIATION);
+            case ANY_TECH -> person.getBestTechSkill();
+            case AUTOMATIC -> null; // should never happen, because we auto-succeed above
+        };
+        if (skill == null) {
+            return new TargetRoll(TargetRoll.AUTOMATIC_FAIL, "No skill");
         }
 
         SkillModifierData skillModifierData = person.getSkillModifierData(campaignOptions.isUseAgeEffects(),
