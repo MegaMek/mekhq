@@ -302,9 +302,11 @@ public class AdvancedMedicalAlternateHealing {
         ActionCheckResult result = naturalHealing.resolve(false, getTextAt(RESOURCE_BUNDLE,
               "AdvancedMedicalAlternateHealing.naturalHealing.normal"), true);
 
-        if (result.marginOfSuccess() <= -6 && useEdge) { // Attempt to reroll a permanent injury with edge
-            // FIXME: we allow one free reroll here
-            result = naturalHealing.resolve(true, getTextAt(RESOURCE_BUNDLE,
+        // Attempt to reroll a permanent injury with edge
+        if ((result.marginOfSuccess() <= -6) && useEdge &&  (patient.getCurrentEdge() > 0)) {
+            // manually update edge because if we pass useEdge == true, the patient will get one free roll
+            patient.spendEdge();
+            result = naturalHealing.resolve(false, getTextAt(RESOURCE_BUNDLE,
                   "AdvancedMedicalAlternateHealing.naturalHealing.edge"), true);
         }
         return result.marginOfSuccess();
@@ -402,7 +404,7 @@ public class AdvancedMedicalAlternateHealing {
         // Edge
         if (actionCheckResult.marginOfSuccess() <= -6 && useEdge && doctor.getCurrentEdge() > 0) { // Permanent injury
             // manually update edge because if we pass useEdge == true, the doctor will get one free roll
-            doctor.changeCurrentEdge(-1);
+            doctor.spendEdge();
             actionCheckResult = skillCheck.resolve(false, getTextAt(RESOURCE_BUNDLE,
                   "AdvancedMedicalAlternateHealing.assistedHealing.edge"), true);
         }
