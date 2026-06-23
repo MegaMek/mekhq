@@ -104,8 +104,8 @@ import org.w3c.dom.NodeList;
  * Contract, or AtBContract classes.
  */
 @Deprecated(since = "0.51.01", forRemoval = false)
-public abstract class AbstractMission {
-    private static final MMLogger LOGGER = MMLogger.create(AbstractMission.class);
+public abstract class AbstractMissionTransition {
+    private static final MMLogger LOGGER = MMLogger.create(AbstractMissionTransition.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.AbstractMission";
 
     private String name;
