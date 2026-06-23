@@ -71,10 +71,19 @@ import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.randomEvents.personalities.PersonalityTrait;
+import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.gui.model.LocationDisplay;
-import mekhq.gui.sorter.*;
+import mekhq.gui.sorter.AttributeScoreSorter;
+import mekhq.gui.sorter.BonusSorter;
+import mekhq.gui.sorter.DateStringComparator;
+import mekhq.gui.sorter.EducationLevelSorter;
+import mekhq.gui.sorter.FormattedNumberSorter;
+import mekhq.gui.sorter.IntegerStringSorter;
+import mekhq.gui.sorter.LevelSorter;
+import mekhq.gui.sorter.PersonRankSorter;
+import mekhq.gui.sorter.PersonalityTraitSorter;
 import mekhq.utilities.MHQInternationalization;
 import mekhq.utilities.ReportingUtilities;
 import org.jspecify.annotations.NonNull;
@@ -347,8 +356,8 @@ public enum PersonnelTableModelColumn {
           Person::getGreed, PersonnelTableModelColumn::traitToText),
     SOCIAL("Column.SOCIAL.title", PersonalityTraitSorter.INSTANCE,
           Person::getSocial, PersonnelTableModelColumn::traitToText),
-    REASONING("Column.REASONING.title", ReasoningSorter.INSTANCE,
-          person -> person.getReasoning().getLabel()),
+    REASONING("Column.REASONING.title", fieldBasedSorter(Reasoning::getLevel),
+          Person::getReasoning, Reasoning::getLabel),
     STRENGTH("Column.STRENGTH.title", AttributeScoreSorter.INSTANCE,
           attributeExtractor(SkillAttribute.STRENGTH)),
     BODY("Column.BODY.title", AttributeScoreSorter.INSTANCE,
@@ -1036,6 +1045,15 @@ public enum PersonnelTableModelColumn {
             case RANK, FIRST_NAME, LAST_NAME, SKILL_LEVEL -> SortOrder.DESCENDING;
             default -> null;
         };
+    }
+
+    /**
+     * Generates a {@link Comparator} that orders elements naturally based on a field.
+     *
+     * @param fieldExtractor the field to be used for ordering
+     */
+    private static <T, U extends Comparable<? super U>> Comparator<T> fieldBasedSorter(Function<T, U> fieldExtractor) {
+        return Comparator.nullsFirst(Comparator.comparing(fieldExtractor));
     }
 
     @Override
