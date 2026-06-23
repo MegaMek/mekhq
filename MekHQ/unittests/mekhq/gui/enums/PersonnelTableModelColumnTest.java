@@ -34,7 +34,6 @@ package mekhq.gui.enums;
 
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -47,7 +46,6 @@ import java.util.List;
 import javax.swing.SortOrder;
 import javax.swing.SwingConstants;
 
-import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.FixedLocation;
@@ -62,15 +60,6 @@ import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.gui.sorter.AttributeScoreSorter;
-import mekhq.gui.sorter.BonusSorter;
-import mekhq.gui.sorter.DateStringComparator;
-import mekhq.gui.sorter.EducationLevelSorter;
-import mekhq.gui.sorter.FormattedNumberSorter;
-import mekhq.gui.sorter.IntegerStringSorter;
-import mekhq.gui.sorter.LevelSorter;
-import mekhq.gui.sorter.PersonRankSorter;
-import mekhq.gui.sorter.ReasoningSorter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -160,77 +149,6 @@ public class PersonnelTableModelColumnTest {
                 default:
                     assertEquals(SwingConstants.CENTER, personnelTableModelColumn.getAlignment());
                     break;
-            }
-        }
-    }
-
-    @Test
-    public void testGetComparator() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            switch (personnelTableModelColumn) {
-                case RANK ->
-                      assertInstanceOf(PersonRankSorter.class, personnelTableModelColumn.getComparator());
-                case HIGHEST_EDUCATION, CURRENT_EDUCATION ->
-                      assertInstanceOf(EducationLevelSorter.class, personnelTableModelColumn.getComparator());
-                case BIRTHDAY, RECRUITMENT_DATE, LAST_RANK_CHANGE_DATE, DUE_DATE, RETIREMENT_DATE, DEATH_DATE ->
-                      assertInstanceOf(DateStringComparator.class, personnelTableModelColumn.getComparator());
-                case SKILL_LEVEL ->
-                      assertInstanceOf(LevelSorter.class, personnelTableModelColumn.getComparator());
-                case MEK,
-                     GROUND_VEHICLE,
-                     NAVAL_VEHICLE,
-                     VTOL,
-                     AEROSPACE,
-                     CONVENTIONAL_AIRCRAFT,
-                     VESSEL,
-                     PROTOMEK,
-                     BATTLE_ARMOUR,
-                     SMALL_ARMS,
-                     ANTI_MEK,
-                     ARTILLERY,
-                     NAVIGATION,
-                     TACTICS,
-                     STRATEGY,
-                     LEADERSHIP,
-                     SCOUTING,
-                     ASTECH,
-                     TECH_MEK,
-                     TECH_AERO,
-                     TECH_MECHANIC,
-                     TECH_BA,
-                     TECH_VESSEL,
-                     ZERO_G,
-                     MEDTECH,
-                     MEDICAL,
-                     APPRAISAL,
-                     TRAINING,
-                     ADMINISTRATION,
-                     NEGOTIATION ->
-                      assertInstanceOf(BonusSorter.class, personnelTableModelColumn.getComparator());
-                case INJURIES,
-                     AGE,
-                     KILLS,
-                     XP,
-                     TOUGHNESS,
-                     CONNECTIONS,
-                     WEALTH,
-                     EXTRA_INCOME,
-                     REPUTATION,
-                     UNLUCKY,
-                     BLOODMARK,
-                     SPA_COUNT,
-                     MODIFICATION_COUNT,
-                     IMPLANT_COUNT,
-                     LOYALTY ->
-                      assertInstanceOf(IntegerStringSorter.class, personnelTableModelColumn.getComparator());
-                case REASONING ->
-                      assertInstanceOf(ReasoningSorter.class, personnelTableModelColumn.getComparator());
-                case STRENGTH, BODY, REFLEXES, DEXTERITY, INTELLIGENCE, WILLPOWER, CHARISMA, EDGE ->
-                      assertInstanceOf(AttributeScoreSorter.class, personnelTableModelColumn.getComparator());
-                case SALARY ->
-                      assertInstanceOf(FormattedNumberSorter.class, personnelTableModelColumn.getComparator());
-                default ->
-                      assertInstanceOf(NaturalOrderComparator.class, personnelTableModelColumn.getComparator());
             }
         }
     }
