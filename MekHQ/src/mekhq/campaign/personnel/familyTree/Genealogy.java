@@ -165,7 +165,10 @@ public class Genealogy {
           final @Nullable Person person) {
         if (person != null) {
             getFamily().putIfAbsent(relationshipType, new ArrayList<>());
-            getFamily().get(relationshipType).add(person);
+            List<Person> relevantFamily = getFamily().get(relationshipType);
+            if (!relevantFamily.contains(person)) {
+                getFamily().get(relationshipType).add(person);
+            }
         }
     }
 
