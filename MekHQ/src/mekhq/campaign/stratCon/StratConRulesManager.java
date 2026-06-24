@@ -922,16 +922,21 @@ public class StratConRulesManager {
             while (unitCount > 0 && !(vettedUnits.isEmpty())) {
                 unitCount--;
 
-                int selectedIndex = randomInt(vettedUnits.size());
-                Unit selectedUnit = vettedUnits.remove(selectedIndex);
-
-                scenario.addUnit(selectedUnit, scenarioForceTemplate.getForceName(), false);
-
-                AtBDynamicScenarioFactory.benchAllyUnit(selectedUnit.getId(),
-                      scenarioForceTemplate.getForceName(),
-                      scenario.getBackingScenario());
+                substituteUnit(scenario, scenarioForceTemplate, vettedUnits);
             }
         }
+    }
+
+    private static void substituteUnit(StratConScenario scenario, ScenarioForceTemplate scenarioForceTemplate,
+          List<Unit> vettedUnits) {
+        int selectedIndex = randomInt(vettedUnits.size());
+        Unit selectedUnit = vettedUnits.remove(selectedIndex);
+
+        scenario.addUnit(selectedUnit, scenarioForceTemplate.getForceName(), false);
+
+        AtBDynamicScenarioFactory.benchAllyUnit(selectedUnit.getId(),
+              scenarioForceTemplate.getForceName(),
+              scenario.getBackingScenario());
     }
 
     /**
