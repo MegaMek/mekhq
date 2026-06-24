@@ -130,6 +130,7 @@ import mekhq.campaign.universe.Planet;
 import mekhq.gui.dialog.nagDialogs.CombatChallengeNagDialog;
 import mekhq.utilities.ReportingUtilities;
 import org.apache.commons.math3.util.Pair;
+import org.jspecify.annotations.NonNull;
 
 /**
  * This class contains "rules" logic for the AtB-StratCon state
@@ -910,14 +911,8 @@ public class StratConRulesManager {
             // Find potential units to substitute based on the explicitForceID
             Collection<Unit> potentialUnits = findPotentialUnits(campaign, explicitForceID);
 
-            // Iterate through the potential units and substitute up to `unitCount` units
-            List<Unit> vettedUnits = new ArrayList<>();
-            MapLocation scenarioLocation = scenario.getScenarioTemplate().mapParameters.getMapLocation();
-            for (Unit potentialUnit : potentialUnits) {
-                if (isValidUnitForScenario(potentialUnit, scenarioForceTemplate, campaign, scenarioLocation)) {
-                    vettedUnits.add(potentialUnit);
-                }
-            }
+            // Iterate through the potential units and vet based on scenario eligibility
+            List<Unit> vettedUnits = getVettedUnits(scenario, campaign, scenarioForceTemplate, potentialUnits);
 
             while (unitCount > 0 && !(vettedUnits.isEmpty())) {
                 unitCount--;
@@ -925,6 +920,18 @@ public class StratConRulesManager {
                 substituteUnit(scenario, scenarioForceTemplate, vettedUnits);
             }
         }
+    }
+
+    private static @NonNull List<Unit> getVettedUnits(StratConScenario scenario, Campaign campaign,
+          ScenarioForceTemplate scenarioForceTemplate, Collection<Unit> potentialUnits) {
+        List<Unit> vettedUnits = new ArrayList<>();
+        MapLocation scenarioLocation = scenario.getScenarioTemplate().mapParameters.getMapLocation();
+        for (Unit potentialUnit : potentialUnits) {
+            if (isValidUnitForScenario(potentialUnit, scenarioForceTemplate, campaign, scenarioLocation)) {
+                vettedUnits.add(potentialUnit);
+            }
+        }
+        return vettedUnits;
     }
 
     private static void substituteUnit(StratConScenario scenario, ScenarioForceTemplate scenarioForceTemplate,
