@@ -919,10 +919,8 @@ public class StratConRulesManager {
                 }
             }
 
-            for (int i = 0; i < unitCount; i++) {
-                if (vettedUnits.isEmpty()) {
-                    break;
-                }
+            while (unitCount > 0 && !(vettedUnits.isEmpty())) {
+                unitCount--;
 
                 int selectedIndex = randomInt(vettedUnits.size());
                 Unit selectedUnit = vettedUnits.remove(selectedIndex);
