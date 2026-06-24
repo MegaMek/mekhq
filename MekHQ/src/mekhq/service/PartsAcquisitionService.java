@@ -37,12 +37,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 
@@ -169,7 +169,6 @@ public class PartsAcquisitionService {
         for (List<IAcquisitionWork> awList : acquisitionMap.values()) {
             IAcquisitionWork awFirst = awList.getFirst();
             Part part = awFirst.getAcquisitionPart();
-            TargetRoll target = campaign.getTargetForAcquisition(awFirst, admin, true);
             PartCountInfo pci = new PartCountInfo();
 
             PartInventory inventories = campaign.getPartInventory(part);
@@ -197,9 +196,10 @@ public class PartsAcquisitionService {
             pci.setStickerPrice(part.getStickerPrice());
             pci.setMissingCount(missing);
 
-            if (target.getValue() == TargetRoll.IMPOSSIBLE) {
+            SkillCheck skillCheck = campaign.checkAcquisition(awFirst, admin, true);
+            if (skillCheck.getTargetNumber().isImpossible()) {
                 pci.setCanBeAcquired(false);
-                pci.setFailedMessage(target.getPlainDesc());
+                pci.setFailedMessage(skillCheck.getTargetNumber().getPlainDesc());
             } else {
                 pci.setInTransitCount(inTransit);
                 pci.setOnOrderCount(onOrder);
