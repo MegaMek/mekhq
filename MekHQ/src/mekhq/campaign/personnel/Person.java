@@ -144,6 +144,7 @@ import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.personnel.skills.AttributeCheck;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillCheck;
@@ -5836,6 +5837,35 @@ public class Person implements ILocation {
     public SkillCheck checkSkill(String skillName, Campaign campaign) {
         return new SkillCheck(this, skillName, campaign.getCampaignOptions().isUseAgeEffects(),
               campaign.isClanCampaign(), campaign.getLocalDate());
+    }
+
+    /**
+     * Prepares an attribute check.
+     *
+     * <p>This method creates an {@link AttributeCheck} instance which calculates the target number
+     * for the attribute check.</p>
+     *
+     * @param attribute the {@link SkillAttribute} to be checked
+     *
+     * @return prepared attribute check
+     */
+    public AttributeCheck checkAttribute(SkillAttribute attribute) {
+        return new AttributeCheck(this, attribute);
+    }
+
+    /**
+     * Prepares a double attribute check.
+     *
+     * <p>This method creates an {@link AttributeCheck} instance which calculates the target number
+     * for the attribute check.</p>
+     *
+     * @param firstAttribute  first {@link SkillAttribute} to be checked
+     * @param secondAttribute second {@link SkillAttribute} to be checked
+     *
+     * @return prepared attribute check
+     */
+    public AttributeCheck checkAttributes(SkillAttribute firstAttribute, SkillAttribute secondAttribute) {
+        return new AttributeCheck(this, firstAttribute, secondAttribute);
     }
 
     /**
