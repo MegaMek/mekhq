@@ -39,7 +39,6 @@ import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -166,10 +165,10 @@ public class MRMSService {
             return msg;
         } else if ((!unit.isSalvage() && !configuredOptions.useRepair()) ||
                          (unit.isSalvage() && !configuredOptions.useSalvage())) {
-            String msg = getFormattedTextAt(RESOURCE_BUNDLE, "MRMS.CompleteTypeDisabled.report",
+            String message = getFormattedTextAt(RESOURCE_BUNDLE, "MRMS.CompleteTypeDisabled.report",
                   unit.isSalvage() ? getTextAt(RESOURCE_BUNDLE, "Salvage") : getTextAt(RESOURCE_BUNDLE, "Repair"));
-            campaign.addReport(TECHNICAL, msg);
-            return msg;
+            campaign.addReport(TECHNICAL, message);
+            return message;
         } else if (campaign.requiresAdditionalAsTechs()) {
             String message = resources.getString("MRMS.InsufficientAstechs.report");
             campaign.addReport(TECHNICAL, message);

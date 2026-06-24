@@ -73,8 +73,7 @@ public class QuickStripDialog {
     private List<String> getOptions() {
         String mrms = getTextAt(RESOURCE_BUNDLE, "TaskTableMouseAdapter.quickStrip.button.mrms");
         String manual = getTextAt(RESOURCE_BUNDLE, "TaskTableMouseAdapter.quickStrip.button.manual");
-        String cancel = getTextAt(RESOURCE_BUNDLE, "TaskTableMouseAdapter.quickStrip.button.cancel");
 
-        return List.of(mrms, manual, cancel);
+        return List.of(mrms, manual);
     }
 }
