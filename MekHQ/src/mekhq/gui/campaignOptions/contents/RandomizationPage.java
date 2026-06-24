@@ -122,22 +122,22 @@ class RandomizationPage {
     private JSpinner spnUtilitySkillsHeroic;
     private JSpinner spnUtilitySkillsLegendary;
 
-    private JLabel lblCombatSA;
-    private JSpinner spnCombatSA;
-    private JLabel lblSupportSA;
-    private JSpinner spnSupportSA;
+    private JLabel lblCombatSmallArms;
+    private JSpinner spnCombatSmallArms;
+    private JLabel lblNonCombatSmallArms;
+    private JSpinner spnNonCombatSmallArms;
 
-    private JLabel lblArtyProb;
-    private JSpinner spnArtyProb;
-    private JLabel lblArtyBonus;
-    private JSpinner spnArtyBonus;
+    private JLabel lblArtilleryChance;
+    private JSpinner spnArtilleryChance;
+    private JLabel lblArtilleryBonus;
+    private JSpinner spnArtilleryBonus;
 
     private JLabel lblAntiMekSkill;
     private JSpinner spnAntiMekSkill;
-    private JLabel lblSecondProb;
-    private JSpinner spnSecondProb;
-    private JLabel lblSecondBonus;
-    private JSpinner spnSecondBonus;
+    private JLabel lblSecondarySkillChance;
+    private JSpinner spnSecondarySkillChance;
+    private JLabel lblSecondarySkillBonus;
+    private JSpinner spnSecondarySkillBonus;
     private JLabel lblRoleplaySkillsModifier;
     private JSpinner spnRoleplaySkillsModifier;
 
@@ -335,10 +335,12 @@ class RandomizationPage {
         createArtilleryControls();
         createSmallArmsControls();
 
-        JComponent[] labels = { lblRoleplaySkillsModifier, lblAntiMekSkill, lblSecondProb, lblSecondBonus,
-                lblArtyProb, lblArtyBonus, lblCombatSA, lblSupportSA };
-        JComponent[] controls = { spnRoleplaySkillsModifier, spnAntiMekSkill, spnSecondProb, spnSecondBonus,
-                spnArtyProb, spnArtyBonus, spnCombatSA, spnSupportSA };
+        JComponent[] labels = { lblRoleplaySkillsModifier, lblAntiMekSkill, lblSecondarySkillChance,
+                lblSecondarySkillBonus, lblArtilleryChance, lblArtilleryBonus, lblCombatSmallArms,
+                lblNonCombatSmallArms };
+        JComponent[] controls = { spnRoleplaySkillsModifier, spnAntiMekSkill, spnSecondarySkillChance,
+                spnSecondarySkillBonus, spnArtilleryChance, spnArtilleryBonus, spnCombatSmallArms,
+                spnNonCombatSmallArms };
 
         return createAdvancementPairedGrid("SpecialSkillModifiersPanel", labels, controls,
                 ADVANCEMENT_GRID_MEDIUM_PAIR_COLUMN_WIDTH);
@@ -356,39 +358,39 @@ class RandomizationPage {
         spnAntiMekSkill = new CampaignOptionsSpinner("AntiMekChance", 0, 0, 100, 1);
         spnAntiMekSkill.addMouseListener(createTipPanelUpdater("AntiMekChance"));
 
-        lblSecondProb = new CampaignOptionsLabel("SecondarySkillChance");
-        lblSecondProb.addMouseListener(createTipPanelUpdater("SecondarySkillChance"));
-        spnSecondProb = new CampaignOptionsSpinner("SecondarySkillChance", 0, 0, 100, 1);
-        spnSecondProb.addMouseListener(createTipPanelUpdater("SecondarySkillChance"));
+        lblSecondarySkillChance = new CampaignOptionsLabel("SecondarySkillChance");
+        lblSecondarySkillChance.addMouseListener(createTipPanelUpdater("SecondarySkillChance"));
+        spnSecondarySkillChance = new CampaignOptionsSpinner("SecondarySkillChance", 0, 0, 100, 1);
+        spnSecondarySkillChance.addMouseListener(createTipPanelUpdater("SecondarySkillChance"));
 
-        lblSecondBonus = new CampaignOptionsLabel("SecondarySkillBonus");
-        lblSecondBonus.addMouseListener(createTipPanelUpdater("SecondarySkillBonus"));
-        spnSecondBonus = new CampaignOptionsSpinner("SecondarySkillBonus", 0, -12, 12, 1);
-        spnSecondBonus.addMouseListener(createTipPanelUpdater("SecondarySkillBonus"));
+        lblSecondarySkillBonus = new CampaignOptionsLabel("SecondarySkillBonus");
+        lblSecondarySkillBonus.addMouseListener(createTipPanelUpdater("SecondarySkillBonus"));
+        spnSecondarySkillBonus = new CampaignOptionsSpinner("SecondarySkillBonus", 0, -12, 12, 1);
+        spnSecondarySkillBonus.addMouseListener(createTipPanelUpdater("SecondarySkillBonus"));
     }
 
     private void createArtilleryControls() {
-        lblArtyProb = new CampaignOptionsLabel("ArtilleryChance");
-        lblArtyProb.addMouseListener(createTipPanelUpdater("ArtilleryChance"));
-        spnArtyProb = new CampaignOptionsSpinner("ArtilleryChance", 0, 0, 100, 1);
-        spnArtyProb.addMouseListener(createTipPanelUpdater("ArtilleryChance"));
+        lblArtilleryChance = new CampaignOptionsLabel("ArtilleryChance");
+        lblArtilleryChance.addMouseListener(createTipPanelUpdater("ArtilleryChance"));
+        spnArtilleryChance = new CampaignOptionsSpinner("ArtilleryChance", 0, 0, 100, 1);
+        spnArtilleryChance.addMouseListener(createTipPanelUpdater("ArtilleryChance"));
 
-        lblArtyBonus = new CampaignOptionsLabel("ArtilleryBonus");
-        lblArtyBonus.addMouseListener(createTipPanelUpdater("ArtilleryBonus"));
-        spnArtyBonus = new CampaignOptionsSpinner("ArtilleryBonus", 0, -12, 12, 1);
-        spnArtyBonus.addMouseListener(createTipPanelUpdater("ArtilleryBonus"));
+        lblArtilleryBonus = new CampaignOptionsLabel("ArtilleryBonus");
+        lblArtilleryBonus.addMouseListener(createTipPanelUpdater("ArtilleryBonus"));
+        spnArtilleryBonus = new CampaignOptionsSpinner("ArtilleryBonus", 0, -12, 12, 1);
+        spnArtilleryBonus.addMouseListener(createTipPanelUpdater("ArtilleryBonus"));
     }
 
     private void createSmallArmsControls() {
-        lblCombatSA = new CampaignOptionsLabel("CombatSmallArms");
-        lblCombatSA.addMouseListener(createTipPanelUpdater("CombatSmallArms"));
-        spnCombatSA = new CampaignOptionsSpinner("CombatSmallArms", 0, -12, 12, 1);
-        spnCombatSA.addMouseListener(createTipPanelUpdater("CombatSmallArms"));
+        lblCombatSmallArms = new CampaignOptionsLabel("CombatSmallArms");
+        lblCombatSmallArms.addMouseListener(createTipPanelUpdater("CombatSmallArms"));
+        spnCombatSmallArms = new CampaignOptionsSpinner("CombatSmallArms", 0, -12, 12, 1);
+        spnCombatSmallArms.addMouseListener(createTipPanelUpdater("CombatSmallArms"));
 
-        lblSupportSA = new CampaignOptionsLabel("NonCombatSmallArms");
-        lblSupportSA.addMouseListener(createTipPanelUpdater("NonCombatSmallArms"));
-        spnSupportSA = new CampaignOptionsSpinner("NonCombatSmallArms", 0, -12, 12, 1);
-        spnSupportSA.addMouseListener(createTipPanelUpdater("NonCombatSmallArms"));
+        lblNonCombatSmallArms = new CampaignOptionsLabel("NonCombatSmallArms");
+        lblNonCombatSmallArms.addMouseListener(createTipPanelUpdater("NonCombatSmallArms"));
+        spnNonCombatSmallArms = new CampaignOptionsSpinner("NonCombatSmallArms", 0, -12, 12, 1);
+        spnNonCombatSmallArms.addMouseListener(createTipPanelUpdater("NonCombatSmallArms"));
     }
 
     private @Nonnull CampaignOptionsPairedFieldGridPanel createAdvancementPairedGrid(String name, JComponent[] labels,
@@ -444,13 +446,13 @@ class RandomizationPage {
         spnUtilitySkillsLegendary.setValue(model.utilitySkillsModifier[SkillType.EXP_LEGENDARY]);
 
         spnRoleplaySkillsModifier.setValue(model.roleplaySkillsModifier);
-        spnCombatSA.setValue(model.combatSmallArmsBonus);
-        spnSupportSA.setValue(model.supportSmallArmsBonus);
-        spnArtyProb.setValue(model.artilleryProb);
-        spnArtyBonus.setValue(model.artilleryBonus);
+        spnCombatSmallArms.setValue(model.combatSmallArmsBonus);
+        spnNonCombatSmallArms.setValue(model.supportSmallArmsBonus);
+        spnArtilleryChance.setValue(model.artilleryProb);
+        spnArtilleryBonus.setValue(model.artilleryBonus);
         spnAntiMekSkill.setValue(model.antiMekProb);
-        spnSecondProb.setValue(model.secondSkillProb);
-        spnSecondBonus.setValue(model.secondSkillBonus);
+        spnSecondarySkillChance.setValue(model.secondSkillProb);
+        spnSecondarySkillBonus.setValue(model.secondSkillBonus);
     }
 
     /**
@@ -494,12 +496,12 @@ class RandomizationPage {
         model.utilitySkillsModifier[SkillType.EXP_LEGENDARY] = (int) spnUtilitySkillsLegendary.getValue();
 
         model.roleplaySkillsModifier = (int) spnRoleplaySkillsModifier.getValue();
-        model.combatSmallArmsBonus = (int) spnCombatSA.getValue();
-        model.supportSmallArmsBonus = (int) spnSupportSA.getValue();
-        model.artilleryProb = (int) spnArtyProb.getValue();
-        model.artilleryBonus = (int) spnArtyBonus.getValue();
+        model.combatSmallArmsBonus = (int) spnCombatSmallArms.getValue();
+        model.supportSmallArmsBonus = (int) spnNonCombatSmallArms.getValue();
+        model.artilleryProb = (int) spnArtilleryChance.getValue();
+        model.artilleryBonus = (int) spnArtilleryBonus.getValue();
         model.antiMekProb = (int) spnAntiMekSkill.getValue();
-        model.secondSkillProb = (int) spnSecondProb.getValue();
-        model.secondSkillBonus = (int) spnSecondBonus.getValue();
+        model.secondSkillProb = (int) spnSecondarySkillChance.getValue();
+        model.secondSkillBonus = (int) spnSecondarySkillBonus.getValue();
     }
 }

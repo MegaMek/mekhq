@@ -42,6 +42,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 import jakarta.annotation.Nonnull;
+import megamek.client.ui.util.UIUtil;
 
 /**
  * A dense, column-aligned grid of label/control pairs for sections that hold
@@ -99,9 +100,9 @@ public class CampaignOptionsPairedFieldGridPanel extends JPanel {
             throw new IllegalArgumentException("Paired field grids require at least one column.");
         }
 
-        this.firstPairWidth = firstPairWidth;
-        this.followingPairWidth = followingPairWidth;
-        this.controlWidth = controlWidth;
+        this.firstPairWidth = UIUtil.scaleForGUI(firstPairWidth);
+        this.followingPairWidth = UIUtil.scaleForGUI(followingPairWidth);
+        this.controlWidth = UIUtil.scaleForGUI(controlWidth);
         this.columnCount = columnCount;
 
         setName("pnl" + name);

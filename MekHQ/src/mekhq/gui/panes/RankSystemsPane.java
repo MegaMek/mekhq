@@ -56,6 +56,7 @@ import javax.swing.table.TableColumnModel;
 import megamek.client.ui.baseComponents.SpinnerCellEditor;
 import megamek.client.ui.buttons.MMButton;
 import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import megamek.common.ui.FastJScrollPane;
 import megamek.common.util.sorter.NaturalOrderComparator;
@@ -415,49 +416,49 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
         return new JTableHeader(forTable.getColumnModel()) {
             @Override
             public String getToolTipText(MouseEvent event) {
-                final TableColumnModel cm = getColumnModel();
-                final int viewIndex = cm.getColumnIndexAtX(event.getPoint().x);
+                final TableColumnModel columnModel = getColumnModel();
+                final int viewIndex = columnModel.getColumnIndexAtX(event.getPoint().x);
                 if (viewIndex < 0) {
                     return null;
                 }
-                final int modelIndex = cm.getColumn(viewIndex).getModelIndex();
+                final int modelIndex = columnModel.getColumn(viewIndex).getModelIndex();
                 return getRanksTableModel().getToolTip(modelIndex);
             }
         };
     }
 
     private JTable createRanksRowHeaderTable(final RankTableModel model, final JTable mainTable) {
-        final JTable rh = new JTable(model) {
+        final JTable rowHeaderTable = new JTable(model) {
             @Override
             protected JTableHeader createDefaultTableHeader() {
                 return createColumnTooltipHeader(this);
             }
         };
-        rh.setAutoCreateColumnsFromModel(false);
-        rh.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        rh.setRowSelectionAllowed(false);
-        rh.setColumnSelectionAllowed(false);
-        rh.setCellSelectionEnabled(false);
-        rh.setIntercellSpacing(new Dimension(0, 0));
-        rh.setShowGrid(false);
-        rh.setFocusable(false);
+        rowHeaderTable.setAutoCreateColumnsFromModel(false);
+        rowHeaderTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        rowHeaderTable.setRowSelectionAllowed(false);
+        rowHeaderTable.setColumnSelectionAllowed(false);
+        rowHeaderTable.setCellSelectionEnabled(false);
+        rowHeaderTable.setIntercellSpacing(new Dimension(0, 0));
+        rowHeaderTable.setShowGrid(false);
+        rowHeaderTable.setFocusable(false);
 
         // Replace the auto-created column set with a single column bound to the Rate model index. We do this on the
         // row header (not the main table) so the wide profession columns survive auto-rebuilds after rank-system
         // changes without us having to re-add the Rate TableColumn each time.
-        final TableColumnModel cm = rh.getColumnModel();
-        while (cm.getColumnCount() > 0) {
-            cm.removeColumn(cm.getColumn(0));
+        final TableColumnModel columnModel = rowHeaderTable.getColumnModel();
+        while (columnModel.getColumnCount() > 0) {
+            columnModel.removeColumn(columnModel.getColumn(0));
         }
         final TableColumn rateColumn = new TableColumn(RankTableModel.COL_NAME_RATE);
         rateColumn.setHeaderValue(model.getColumnName(RankTableModel.COL_NAME_RATE));
         rateColumn.setPreferredWidth(columnWidthFor(RankTableModel.COL_NAME_RATE));
         rateColumn.setCellRenderer(model.getRenderer());
-        rh.addColumn(rateColumn);
+        rowHeaderTable.addColumn(rateColumn);
 
-        rh.setRowHeight(mainTable.getRowHeight());
-        mainTable.addPropertyChangeListener("rowHeight", evt -> rh.setRowHeight(mainTable.getRowHeight()));
-        return rh;
+        rowHeaderTable.setRowHeight(mainTable.getRowHeight());
+        mainTable.addPropertyChangeListener("rowHeight", event -> rowHeaderTable.setRowHeight(mainTable.getRowHeight()));
+        return rowHeaderTable;
     }
 
     private void hideRateColumnFromMainTable() {
@@ -465,9 +466,9 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
         if (table == null) {
             return;
         }
-        final TableColumnModel cm = table.getColumnModel();
-        for (int viewIndex = 0; viewIndex < cm.getColumnCount(); viewIndex++) {
-            final TableColumn column = cm.getColumn(viewIndex);
+        final TableColumnModel columnModel = table.getColumnModel();
+        for (int viewIndex = 0; viewIndex < columnModel.getColumnCount(); viewIndex++) {
+            final TableColumn column = columnModel.getColumn(viewIndex);
             if (column.getModelIndex() == RankTableModel.COL_NAME_RATE) {
                 table.removeColumn(column);
                 return;
@@ -494,9 +495,9 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
         if ((model == null) || (table == null)) {
             return;
         }
-        final TableColumnModel cm = table.getColumnModel();
-        for (int viewIndex = 0; viewIndex < cm.getColumnCount(); viewIndex++) {
-            final TableColumn column = cm.getColumn(viewIndex);
+        final TableColumnModel columnModel = table.getColumnModel();
+        for (int viewIndex = 0; viewIndex < columnModel.getColumnCount(); viewIndex++) {
+            final TableColumn column = columnModel.getColumn(viewIndex);
             final int modelIndex = column.getModelIndex();
             final int width = columnWidthFor(modelIndex);
             column.setPreferredWidth(width);
@@ -523,11 +524,11 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
         final JPopupMenu menu = new JPopupMenu();
 
         final JMenuItem autoFit = new JMenuItem(resources.getString("ranksTable.headerMenu.autoFit.text"));
-        autoFit.addActionListener(evt -> autoFitAllColumns());
+        autoFit.addActionListener(event -> autoFitAllColumns());
         menu.add(autoFit);
 
         final JMenuItem reset = new JMenuItem(resources.getString("ranksTable.headerMenu.reset.text"));
-        reset.addActionListener(evt -> applyColumnWidthsAndRenderers());
+        reset.addActionListener(event -> applyColumnWidthsAndRenderers());
         menu.add(reset);
 
         return menu;
@@ -545,10 +546,10 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
         if (table == null) {
             return;
         }
-        final TableColumnModel cm = table.getColumnModel();
+        final TableColumnModel columnModel = table.getColumnModel();
         final JTableHeader header = table.getTableHeader();
-        for (int viewIndex = 0; viewIndex < cm.getColumnCount(); viewIndex++) {
-            final TableColumn column = cm.getColumn(viewIndex);
+        for (int viewIndex = 0; viewIndex < columnModel.getColumnCount(); viewIndex++) {
+            final TableColumn column = columnModel.getColumn(viewIndex);
             TableCellRenderer headerRenderer = column.getHeaderRenderer();
             if (headerRenderer == null) {
                 headerRenderer = header.getDefaultRenderer();
@@ -562,7 +563,7 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
                 width = Math.max(width, cellComp.getPreferredSize().width);
             }
             // Small padding so glyphs don't visually touch the column border.
-            column.setPreferredWidth(width + 6);
+            column.setPreferredWidth(width + UIUtil.scaleForGUI(6));
         }
     }
 

@@ -96,6 +96,11 @@ public class CampaignOptionsUtilities {
     public final static int CAMPAIGN_OPTIONS_PAGE_CONTENT_WIDTH = scaleForGUI(860);
     private static final int QUOTE_TOP_PADDING = scaleForGUI(12);
     private static final int QUOTE_BOTTOM_PADDING = scaleForGUI(8);
+    // Ambient sink for contextual help text. Campaign Options is a single-instance modal dialog, and this sink is
+    // reached from hundreds of hover registrations across every page (see createTipPanelUpdater), so it is
+    // deliberately static rather than a parameter threaded through the whole page-construction tree. The owning
+    // CampaignOptionsContentHost registers its consumer in its constructor and clears it (compare-and-clear) on
+    // teardown so a reparented or superseded host can never wipe a still-active wiring.
     private static Consumer<String> tipTextConsumer;
 
 
@@ -154,6 +159,19 @@ public class CampaignOptionsUtilities {
 
     static void setTipTextConsumer(@Nullable Consumer<String> tipTextConsumer) {
         CampaignOptionsUtilities.tipTextConsumer = tipTextConsumer;
+    }
+
+    /**
+     * Clears the active tip-text sink, but only if it is still the {@code expected} consumer. This compare-and-clear
+     * lets a host release its own wiring on teardown without wiping a sink that a different (still-live) host has since
+     * registered.
+     *
+     * @param expected the consumer the caller previously registered via {@link #setTipTextConsumer(Consumer)}
+     */
+    static void clearTipTextConsumer(Consumer<String> expected) {
+        if (tipTextConsumer == expected) {
+            tipTextConsumer = null;
+        }
     }
 
     /**

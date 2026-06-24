@@ -61,12 +61,13 @@ import javax.swing.tree.TreePath;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import megamek.client.ui.util.UIUtil;
 
 /**
  * Left-side navigation tree and filter for the Campaign Options dialog.
  */
 class CampaignOptionsNavigationPanel extends JPanel {
-    private static final int NAVIGATION_WIDTH = 240;
+    static final int NAVIGATION_WIDTH = 240;
     private static final int SCROLL_SPEED = 16;
 
     private final List<CampaignOptionsRoute> routes;
@@ -94,7 +95,7 @@ class CampaignOptionsNavigationPanel extends JPanel {
         }
         setBorder(BorderFactory.createCompoundBorder(frameBorder,
               BorderFactory.createEmptyBorder(6, 6, 6, 6)));
-        setPreferredSize(new Dimension(NAVIGATION_WIDTH, 1));
+        setPreferredSize(new Dimension(UIUtil.scaleForGUI(NAVIGATION_WIDTH), 1));
 
         filterField = new JTextField();
         filterField.setName("txtCampaignOptionsFilter");

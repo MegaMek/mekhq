@@ -321,8 +321,8 @@ public class CampaignOptionsDialog extends AbstractButtonDialog {
      */
     private File resolveUserPresetFile(final CampaignPreset preset) {
         final File presetDirectory = new File(MHQConstants.USER_CAMPAIGN_PRESET_DIRECTORY);
-        if (!presetDirectory.exists()) {
-            presetDirectory.mkdirs();
+        if (!presetDirectory.exists() && !presetDirectory.mkdirs()) {
+            LOGGER.error("Failed to create campaign preset directory: {}", presetDirectory);
         }
 
         String fileName = preset.toString().replaceAll("[^A-Za-z0-9 ._-]", "_").trim();

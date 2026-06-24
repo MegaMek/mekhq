@@ -32,6 +32,7 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -85,5 +86,39 @@ class SkillsOptionsModelTest {
         model.applyTo(new CampaignOptions(), null);
 
         assertEquals(12, SkillType.getType(skillName).getTarget());
+    }
+
+    @Test
+    void applyToRoundTripsSkillConfigurationCostsAndMilestones() {
+        String skillName = SkillType.getSkillList()[0];
+        SkillsOptionsModel model = new SkillsOptionsModel(new CampaignOptions(), null);
+        SkillConfiguration configuration = model.getSkillConfiguration(skillName);
+        assertNotNull(configuration);
+
+        configuration.targetNumber = 11;
+        configuration.greenLevel = 3;
+        configuration.regularLevel = 4;
+        configuration.veteranLevel = 5;
+        configuration.eliteLevel = 6;
+        configuration.heroicLevel = 7;
+        configuration.legendaryLevel = 8;
+        for (int level = 0; level < configuration.costs.length; level++) {
+            configuration.costs[level] = level + 1;
+        }
+
+        // applyTo writes each configuration back to the global SkillType registry; a fresh model reads it back out.
+        model.applyTo(new CampaignOptions(), null);
+        SkillsOptionsModel reloaded = new SkillsOptionsModel(new CampaignOptions(), null);
+        SkillConfiguration roundTripped = reloaded.getSkillConfiguration(skillName);
+        assertNotNull(roundTripped);
+
+        assertEquals(11, roundTripped.targetNumber);
+        assertEquals(3, roundTripped.greenLevel);
+        assertEquals(4, roundTripped.regularLevel);
+        assertEquals(5, roundTripped.veteranLevel);
+        assertEquals(6, roundTripped.eliteLevel);
+        assertEquals(7, roundTripped.heroicLevel);
+        assertEquals(8, roundTripped.legendaryLevel);
+        assertArrayEquals(configuration.costs, roundTripped.costs);
     }
 }

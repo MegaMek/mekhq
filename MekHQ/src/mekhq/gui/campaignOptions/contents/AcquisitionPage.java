@@ -96,7 +96,7 @@ class AcquisitionPage {
     private JCheckBox chkUseFunctionalAppraisal;
     private JLabel lblAcquireClanPenalty;
     private JLabel lblProcurementPersonnelPick;
-    private MMComboBox<String> cboProcurementPersonnelPick;
+    private MMComboBox<ProcurementPersonnelPick> cboProcurementPersonnelPick;
     private JSpinner spnAcquireClanPenalty;
     private JLabel lblAcquireIsPenalty;
     private JSpinner spnAcquireIsPenalty;
@@ -447,19 +447,19 @@ class AcquisitionPage {
      * values.
      *
      * <p>This method iterates through all the values of the {@link ProcurementPersonnelPick}
-     * enumeration and adds their names as string elements to the combo box model. The resulting model can be used to
+     * enumeration and adds them as elements to the combo box model. The resulting model can be used to
      * populate a combo box in the user interface, allowing users to select a personnel category for procurement
      * purposes.</p>
      *
-     * @return A {@link DefaultComboBoxModel} populated with the names of all {@link ProcurementPersonnelPick} values.
+     * @return A {@link DefaultComboBoxModel} populated with all {@link ProcurementPersonnelPick} values.
      *
      * @see ProcurementPersonnelPick#values() Retrieves all defined personnel pick options.
      */
-    private static DefaultComboBoxModel<String> buildProcurementPersonnelPickComboOptions() {
-        DefaultComboBoxModel<String> procurementPersonnelPick = new DefaultComboBoxModel<>();
+    private static DefaultComboBoxModel<ProcurementPersonnelPick> buildProcurementPersonnelPickComboOptions() {
+        DefaultComboBoxModel<ProcurementPersonnelPick> procurementPersonnelPick = new DefaultComboBoxModel<>();
 
         for (ProcurementPersonnelPick pick : ProcurementPersonnelPick.values()) {
-            procurementPersonnelPick.addElement(pick.toString());
+            procurementPersonnelPick.addElement(pick);
         }
 
         return procurementPersonnelPick;
@@ -478,7 +478,7 @@ class AcquisitionPage {
 
         choiceAcquireSkill.setSelectedItem(model.acquisitionType);
         chkUseFunctionalAppraisal.setSelected(model.useFunctionalAppraisal);
-        cboProcurementPersonnelPick.setSelectedItem(model.acquisitionPersonnelCategory.toString());
+        cboProcurementPersonnelPick.setSelectedItem(model.acquisitionPersonnelCategory);
         spnAcquireClanPenalty.setValue(model.clanAcquisitionPenalty);
         spnAcquireIsPenalty.setValue(model.isAcquisitionPenalty);
         spnAcquireWaitingPeriod.setValue(model.waitingPeriod);
@@ -513,7 +513,7 @@ class AcquisitionPage {
 
         model.acquisitionType = choiceAcquireSkill.getSelectedItem();
         model.useFunctionalAppraisal = chkUseFunctionalAppraisal.isSelected();
-        model.acquisitionPersonnelCategory = ProcurementPersonnelPick.values()[cboProcurementPersonnelPick.getSelectedIndex()];
+        model.acquisitionPersonnelCategory = cboProcurementPersonnelPick.getSelectedItem();
         model.clanAcquisitionPenalty = (int) spnAcquireClanPenalty.getValue();
         model.isAcquisitionPenalty = (int) spnAcquireIsPenalty.getValue();
         model.waitingPeriod = (int) spnAcquireWaitingPeriod.getValue();

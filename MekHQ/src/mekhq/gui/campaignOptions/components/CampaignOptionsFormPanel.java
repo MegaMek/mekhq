@@ -42,6 +42,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 import jakarta.annotation.Nonnull;
+import megamek.client.ui.util.UIUtil;
 
 /**
  * A compact, vertically stacked form panel for campaign option pages.
@@ -428,7 +429,7 @@ public class CampaignOptionsFormPanel extends JPanel {
 
     private void setMinimumWidth(JComponent component, int minimumWidth) {
         Dimension preferredSize = component.getPreferredSize();
-        int width = Math.max(preferredSize.width, minimumWidth);
+        int width = Math.max(preferredSize.width, UIUtil.scaleForGUI(minimumWidth));
         Dimension adjustedSize = new Dimension(width, preferredSize.height);
         component.setPreferredSize(adjustedSize);
         component.setMinimumSize(adjustedSize);

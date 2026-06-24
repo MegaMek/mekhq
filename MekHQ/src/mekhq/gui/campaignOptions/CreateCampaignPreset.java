@@ -406,8 +406,8 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         getTxtPresetDescription().setName("txtPresetDescription");
         getTxtPresetDescription().setLineWrap(true);
         getTxtPresetDescription().setWrapStyleWord(true);
-        getTxtPresetDescription().putClientProperty("JTextField.placeholderText",
-                resources.getString("txtPresetDescription.text"));
+        // No inline placeholder here: FlatLaf's JTextField.placeholderText is ignored on a JTextArea. The field is
+        // labelled and has a tooltip, so the hint isn't needed.
 
         final JScrollPane descriptionScrollPane = new JScrollPane(getTxtPresetDescription());
         descriptionScrollPane.setName("txtPresetDescriptionScrollPane");

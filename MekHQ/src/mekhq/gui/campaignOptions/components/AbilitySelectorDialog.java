@@ -102,17 +102,17 @@ public class AbilitySelectorDialog extends JDialog {
               getTextAt(getCampaignOptionsResourceBundle(), "abilitySelectorFilter.placeholder"));
         filterField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
-            public void insertUpdate(DocumentEvent e) {
+            public void insertUpdate(DocumentEvent event) {
                 applyFilter(filterField.getText());
             }
 
             @Override
-            public void removeUpdate(DocumentEvent e) {
+            public void removeUpdate(DocumentEvent event) {
                 applyFilter(filterField.getText());
             }
 
             @Override
-            public void changedUpdate(DocumentEvent e) {
+            public void changedUpdate(DocumentEvent event) {
                 applyFilter(filterField.getText());
             }
         });
@@ -132,8 +132,8 @@ public class AbilitySelectorDialog extends JDialog {
 
         for (SpecialAbility spa : allSPAs.values()
                                         .stream()
-                                        .sorted((a, b) -> new NaturalOrderComparator().compare(a.getDisplayName(),
-                                              b.getDisplayName()))
+                                        .sorted((left, right) -> NaturalOrderComparator.INSTANCE.compare(
+                                              left.getDisplayName(), right.getDisplayName()))
                                         .toList()) {
             JCheckBox checkBox = new JCheckBox(spa.getDisplayName());
             checkBox.setSelected(currentSelection.contains(spa.getName()));

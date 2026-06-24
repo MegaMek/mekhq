@@ -453,7 +453,7 @@ public class GeneralPage {
         CamoChooserDialog camoChooserDialog = new CamoChooserDialog(frame, camouflage);
         if (camoChooserDialog.showDialog().isConfirmed()) {
             camouflage = camoChooserDialog.getSelectedItem();
-            btnCamo.setIcon(camouflage.getImageIcon());
+            btnCamo.setIcon(camouflage.getImageIcon(UIUtil.scaleForGUI(75)));
         }
     }
 

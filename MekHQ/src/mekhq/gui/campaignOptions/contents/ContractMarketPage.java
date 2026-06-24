@@ -129,7 +129,7 @@ class ContractMarketPage {
     private JLabel lblWarShipPercent;
     private JSpinner spnWarShipPercent;
     private JRadioButton btnContractPersonnel;
-    private JCheckBox useInfantryDoseNotCountBox;
+    private JCheckBox chkUseInfantryDoesNotCount;
     private JCheckBox chkBLCSaleValue;
     private JCheckBox chkOverageRepaymentInFinalPayment;
 
@@ -345,8 +345,8 @@ class ContractMarketPage {
         chkBLCSaleValue = new CampaignOptionsCheckBox("BLCSaleValue");
         chkBLCSaleValue.addMouseListener(createTipPanelUpdater("BLCSaleValue"));
 
-        useInfantryDoseNotCountBox = new CampaignOptionsCheckBox("UseInfantryDoseNotCountBox");
-        useInfantryDoseNotCountBox.addMouseListener(createTipPanelUpdater("UseInfantryDoseNotCountBox"));
+        chkUseInfantryDoesNotCount = new CampaignOptionsCheckBox("UseInfantryDoesNotCount");
+        chkUseInfantryDoesNotCount.addMouseListener(createTipPanelUpdater("UseInfantryDoesNotCount"));
 
         chkOverageRepaymentInFinalPayment = new CampaignOptionsCheckBox("OverageRepaymentInFinalPayment");
         chkOverageRepaymentInFinalPayment.addMouseListener(createTipPanelUpdater("OverageRepaymentInFinalPayment"));
@@ -372,7 +372,7 @@ class ContractMarketPage {
                 CONTROL_COLUMN_WIDTH);
         personnelPayPanel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
                 chkBLCSaleValue,
-                useInfantryDoseNotCountBox,
+                chkUseInfantryDoesNotCount,
                 chkOverageRepaymentInFinalPayment);
         pnlContractPayPersonnelOptions = personnelPayPanel;
 
@@ -486,7 +486,7 @@ class ContractMarketPage {
         spnDropShipPercent.setValue(model.dropShipContractPercent);
         spnJumpShipPercent.setValue(model.jumpShipContractPercent);
         spnWarShipPercent.setValue(model.warShipContractPercent);
-        useInfantryDoseNotCountBox.setSelected(model.infantryDontCount);
+        chkUseInfantryDoesNotCount.setSelected(model.infantryDontCount);
         chkBLCSaleValue.setSelected(model.blcSaleValue);
         chkOverageRepaymentInFinalPayment.setSelected(model.overageRepaymentInFinalPayment);
         updateContractPayEnabledState();
@@ -525,7 +525,7 @@ class ContractMarketPage {
         model.useDiminishingContractPay = chkUseDiminishingContractPay.isSelected();
         model.equipmentContractSaleValue = chkEquipContractSaleValue.isSelected();
         model.blcSaleValue = chkBLCSaleValue.isSelected();
-        model.infantryDontCount = useInfantryDoseNotCountBox.isSelected();
+        model.infantryDontCount = chkUseInfantryDoesNotCount.isSelected();
         model.overageRepaymentInFinalPayment = chkOverageRepaymentInFinalPayment.isSelected();
     }
 }

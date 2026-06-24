@@ -47,6 +47,7 @@ import javax.swing.UIManager;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import megamek.client.ui.util.UIUtil;
 
 /**
  * A compact matrix panel for option groups that compare numeric modifiers across shared row labels.
@@ -103,8 +104,8 @@ public class CampaignOptionsModifierTablePanel extends JPanel {
      */
     public CampaignOptionsModifierTablePanel(@Nonnull String name, int rowLabelWidth, int controlWidth,
           @Nonnull JComponent... columnHeaders) {
-        this.rowLabelWidth = rowLabelWidth;
-        this.controlWidth = controlWidth;
+        this.rowLabelWidth = UIUtil.scaleForGUI(rowLabelWidth);
+        this.controlWidth = UIUtil.scaleForGUI(controlWidth);
         this.columnCount = columnHeaders.length;
         this.columnWidths = new int[columnCount];
 
@@ -141,7 +142,7 @@ public class CampaignOptionsModifierTablePanel extends JPanel {
             rowPanel.add(cell,
                     createCellLayout(column + 1, GridBagConstraints.CENTER, getColumnRightPadding(column), 1.0));
         }
-        rowPanel.add(createSpacer(TRAILING_RAIL_WIDTH),
+        rowPanel.add(createSpacer(UIUtil.scaleForGUI(TRAILING_RAIL_WIDTH)),
                         createCellLayout(columnCount + 1, GridBagConstraints.CENTER, 0, 0.0));
 
         addTableRow(rowPanel);
@@ -182,7 +183,7 @@ public class CampaignOptionsModifierTablePanel extends JPanel {
                     createCellLayout(column + 1, GridBagConstraints.CENTER, getColumnRightPadding(column), 1.0,
                             GridBagConstraints.HORIZONTAL));
         }
-        headerPanel.add(createSpacer(TRAILING_RAIL_WIDTH),
+        headerPanel.add(createSpacer(UIUtil.scaleForGUI(TRAILING_RAIL_WIDTH)),
                 createCellLayout(columnCount + 1, GridBagConstraints.CENTER, 0, 0.0));
 
         addTableRow(headerPanel);
@@ -264,8 +265,8 @@ public class CampaignOptionsModifierTablePanel extends JPanel {
     }
 
     private void setLabelAlignment(JComponent component, int alignment) {
-        if (component instanceof JLabel) {
-            ((JLabel) component).setHorizontalAlignment(alignment);
+        if (component instanceof JLabel label) {
+            label.setHorizontalAlignment(alignment);
         }
     }
 
@@ -275,8 +276,7 @@ public class CampaignOptionsModifierTablePanel extends JPanel {
             component.setForeground(headerForeground);
         }
 
-        if (component instanceof JLabel) {
-            JLabel label = (JLabel) component;
+        if (component instanceof JLabel label) {
             label.setFont(label.getFont().deriveFont(Font.BOLD));
         }
     }

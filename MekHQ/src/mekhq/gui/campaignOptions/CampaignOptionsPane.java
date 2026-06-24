@@ -115,7 +115,6 @@ import mekhq.gui.campaignOptions.optionChangeDialogs.*;
  * </ul>
  */
 public class CampaignOptionsPane extends JPanel {
-    private static final int NAVIGATION_WIDTH = 240;
     private static final int CONTENT_MARGIN = UIUtil.scaleForGUI(4);
 
     private final JFrame frame;
@@ -182,7 +181,7 @@ public class CampaignOptionsPane extends JPanel {
                 createContentHost(generalPage, initialRoute));
         splitPane.setName("campaignOptionsSplitPane");
         splitPane.setResizeWeight(0.0);
-        splitPane.setDividerLocation(NAVIGATION_WIDTH);
+        splitPane.setDividerLocation(UIUtil.scaleForGUI(CampaignOptionsNavigationPanel.NAVIGATION_WIDTH));
         setBorder(BorderFactory.createEmptyBorder(CONTENT_MARGIN, CONTENT_MARGIN, CONTENT_MARGIN, CONTENT_MARGIN));
         add(splitPane, BorderLayout.CENTER);
         navigationPanel.selectRoute(navigationTargets.get(0));

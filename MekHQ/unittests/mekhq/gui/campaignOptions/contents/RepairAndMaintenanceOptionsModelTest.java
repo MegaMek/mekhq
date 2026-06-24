@@ -32,66 +32,25 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import org.junit.jupiter.api.Test;
 
 /**
- * Round-trip tests for {@link RepairAndMaintenanceOptionsModel}. Every field this model exposes is a plain boolean or
- * int copied straight to and from {@link CampaignOptions}, so the test assigns a distinct value to each field, writes
- * the model out with {@link RepairAndMaintenanceOptionsModel#applyTo(CampaignOptions)}, reads it back into a fresh
- * model, and asserts nothing was lost &mdash; which catches any field that {@code applyTo} or the constructor forgets.
+ * Exhaustive round-trip test for {@link RepairAndMaintenanceOptionsModel}. Every field is a plain boolean or int copied
+ * straight to and from {@link CampaignOptions}, so {@link OptionsModelTestSupport#mutateScalarFields} flips and bumps
+ * them all and {@link OptionsModelTestSupport#assertAllFieldsMatch} verifies each one survives a save/reload &mdash;
+ * catching any field that {@code applyTo} or the constructor forgets, including fields added in the future.
  */
 class RepairAndMaintenanceOptionsModelTest {
     @Test
     void applyToPreservesEveryField() {
         RepairAndMaintenanceOptionsModel model = new RepairAndMaintenanceOptionsModel(new CampaignOptions());
-
-        model.techsUseAdministration = true;
-        model.useUsefulAsTechs = false;
-        model.useEraMods = true;
-        model.assignedTechFirst = false;
-        model.resetToFirstTech = true;
-        model.useQuirks = false;
-        model.useAeroSystemHits = true;
-        model.destroyByMargin = false;
-        model.destroyMargin = 7;
-        model.destroyPartTarget = 11;
-        model.checkMaintenance = true;
-        model.maintenanceCycleDays = 13;
-        model.maintenanceBonus = 17;
-        model.defaultMaintenanceTime = 19;
-        model.useQualityMaintenance = false;
-        model.reverseQualityNames = true;
-        model.useRandomUnitQualities = false;
-        model.usePlanetaryModifiers = true;
-        model.useUnofficialMaintenance = false;
-        model.logMaintenance = true;
+        OptionsModelTestSupport.mutateScalarFields(model);
 
         CampaignOptions destination = new CampaignOptions();
         model.applyTo(destination);
         RepairAndMaintenanceOptionsModel roundTripped = new RepairAndMaintenanceOptionsModel(destination);
 
-        assertEquals(model.techsUseAdministration, roundTripped.techsUseAdministration);
-        assertEquals(model.useUsefulAsTechs, roundTripped.useUsefulAsTechs);
-        assertEquals(model.useEraMods, roundTripped.useEraMods);
-        assertEquals(model.assignedTechFirst, roundTripped.assignedTechFirst);
-        assertEquals(model.resetToFirstTech, roundTripped.resetToFirstTech);
-        assertEquals(model.useQuirks, roundTripped.useQuirks);
-        assertEquals(model.useAeroSystemHits, roundTripped.useAeroSystemHits);
-        assertEquals(model.destroyByMargin, roundTripped.destroyByMargin);
-        assertEquals(model.destroyMargin, roundTripped.destroyMargin);
-        assertEquals(model.destroyPartTarget, roundTripped.destroyPartTarget);
-        assertEquals(model.checkMaintenance, roundTripped.checkMaintenance);
-        assertEquals(model.maintenanceCycleDays, roundTripped.maintenanceCycleDays);
-        assertEquals(model.maintenanceBonus, roundTripped.maintenanceBonus);
-        assertEquals(model.defaultMaintenanceTime, roundTripped.defaultMaintenanceTime);
-        assertEquals(model.useQualityMaintenance, roundTripped.useQualityMaintenance);
-        assertEquals(model.reverseQualityNames, roundTripped.reverseQualityNames);
-        assertEquals(model.useRandomUnitQualities, roundTripped.useRandomUnitQualities);
-        assertEquals(model.usePlanetaryModifiers, roundTripped.usePlanetaryModifiers);
-        assertEquals(model.useUnofficialMaintenance, roundTripped.useUnofficialMaintenance);
-        assertEquals(model.logMaintenance, roundTripped.logMaintenance);
+        OptionsModelTestSupport.assertAllFieldsMatch(model, roundTripped);
     }
 }

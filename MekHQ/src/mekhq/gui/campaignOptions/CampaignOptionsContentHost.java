@@ -37,6 +37,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Rectangle;
+import java.util.function.Consumer;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -61,6 +62,7 @@ class CampaignOptionsContentHost extends JPanel {
     private final JPanel contentPanel;
     private final JScrollPane contentScrollPane;
     private final CampaignOptionsHelpPanel helpPanel;
+    private final Consumer<String> tipConsumer;
 
     CampaignOptionsContentHost(Component content) {
         this(content, null, true);
@@ -71,7 +73,8 @@ class CampaignOptionsContentHost extends JPanel {
         setName("campaignOptionsContentHost");
 
         helpPanel = new CampaignOptionsHelpPanel();
-        CampaignOptionsUtilities.setTipTextConsumer(helpPanel::setHelpText);
+        tipConsumer = helpPanel::setHelpText;
+        CampaignOptionsUtilities.setTipTextConsumer(tipConsumer);
 
         contentPanel = new CampaignOptionsContentPanel();
         contentPanel.setName("campaignOptionsContentPanel");
@@ -125,11 +128,12 @@ class CampaignOptionsContentHost extends JPanel {
      * @param component the content subtree to process
      */
     private static void clearRedundantOptionToolTips(Component component) {
-        if (component instanceof CampaignOptionsCheckBox
+        if (component instanceof JComponent jComponent
+                  && (component instanceof CampaignOptionsCheckBox
                   || component instanceof CampaignOptionsSpinner
                   || component instanceof CampaignOptionsLabel
-                  || component instanceof CampaignOptionsTextField) {
-            ((JComponent) component).setToolTipText(null);
+                  || component instanceof CampaignOptionsTextField)) {
+            jComponent.setToolTipText(null);
         }
 
         if (component instanceof Container container) {
@@ -187,7 +191,7 @@ class CampaignOptionsContentHost extends JPanel {
 
     @Override
     public void removeNotify() {
-        CampaignOptionsUtilities.setTipTextConsumer(null);
+        CampaignOptionsUtilities.clearTipTextConsumer(tipConsumer);
         super.removeNotify();
     }
 

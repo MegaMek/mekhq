@@ -310,9 +310,23 @@ class NameAndPortraitGenerationPage {
         chkChildPortraitsWhenComingOfAge.setSelected(model.childPortraitsWhenComingOfAge);
 
         for (int i = 0; i < Math.min(chkUsePortrait.length, model.usePortraitForRole.length); i++) {
-            if (chkUsePortrait[i] != null) {
-                chkUsePortrait[i].setSelected(model.usePortraitForRole[i]);
+            if (chkUsePortrait[i] == null) {
+                continue;
             }
+            if (i == chkUsePortrait.length - 1) {
+                // The last checkbox is the shared "Civilian" toggle; writeToModel spreads it across every civilian
+                // role, so read it back from a civilian role's slot to keep the two sides symmetric.
+                boolean civilianSelected = false;
+                for (PersonnelRole role : PersonnelRole.getCivilianRoles()) {
+                    if (role.ordinal() < model.usePortraitForRole.length) {
+                        civilianSelected = model.usePortraitForRole[role.ordinal()];
+                        break;
+                    }
+                }
+                chkUsePortrait[i].setSelected(civilianSelected);
+                continue;
+            }
+            chkUsePortrait[i].setSelected(model.usePortraitForRole[i]);
         }
     }
 

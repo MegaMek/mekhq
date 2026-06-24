@@ -41,6 +41,8 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.GridBagConstraints;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -59,6 +61,10 @@ import megamek.client.ui.util.UIUtil;
 public class CampaignOptionsHeaderPanel extends JPanel {
     private static final int DEFAULT_IMAGE_SIZE = 80;
     private static final int DEFAULT_BODY_TEXT_WIDTH = 750;
+
+    // Header images are reused across every page build; cache the loaded/scaled/tinted icon by (address, size, tint)
+    // so we don't reload from disk and re-tint each time. Accessed only on the EDT, so a plain HashMap is safe.
+    private static final Map<String, ImageIcon> HEADER_IMAGE_CACHE = new HashMap<>();
 
     @Deprecated(since = "0.50.06", forRemoval = true)
     public CampaignOptionsHeaderPanel(@Nonnull String name, @Nonnull String imageAddress, boolean includeBodyText) {
@@ -102,12 +108,12 @@ public class CampaignOptionsHeaderPanel extends JPanel {
      */
     public CampaignOptionsHeaderPanel(@Nonnull String name, @Nonnull String imageAddress, boolean includeBodyText, int imageSize,
           boolean tintImage) {
-        // Load and scale the image using the provided file path
-        ImageIcon imageIcon = new ImageIcon(imageAddress);
-        imageIcon = scaleImageIcon(imageIcon, imageSize, true);
-        if (tintImage) {
-            imageIcon = addTintToImageIcon(imageIcon.getImage(), BLACK);
-        }
+        // Build the header image once per (address, size, tint) and reuse it; see HEADER_IMAGE_CACHE.
+        ImageIcon imageIcon = HEADER_IMAGE_CACHE.computeIfAbsent(imageAddress + '|' + imageSize + '|' + tintImage,
+              key -> {
+                  ImageIcon icon = scaleImageIcon(new ImageIcon(imageAddress), imageSize, true);
+                  return tintImage ? addTintToImageIcon(icon.getImage(), BLACK) : icon;
+              });
 
         // Create a JLabel to display the image in the panel
         JLabel lblImage = new JLabel(imageIcon);

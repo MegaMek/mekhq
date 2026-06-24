@@ -621,7 +621,7 @@ public class SkillsPages {
      * @return a compact milestone summary string
      */
     private static String buildProgressionSummary(SkillConfiguration configuration) {
-        return String.format("G %d  ·  R %d  ·  V %d  ·  E %d  ·  H %d  ·  L %d",
+        return String.format("G %d  \u00B7  R %d  \u00B7  V %d  \u00B7  E %d  \u00B7  H %d  \u00B7  L %d",
               configuration.greenLevel,
               configuration.regularLevel,
               configuration.veteranLevel,
@@ -642,10 +642,10 @@ public class SkillsPages {
         StringBuilder summary = new StringBuilder();
         for (int i = 0; i < configuration.costs.length; i++) {
             if (i > 0) {
-                summary.append(" · ");
+                summary.append(" \u00B7 ");
             }
             Integer cost = configuration.costs[i];
-            summary.append((cost == null || cost < 0) ? "—" : cost);
+            summary.append((cost == null || cost < 0) ? "\u2014" : cost);
         }
         return summary.toString();
     }

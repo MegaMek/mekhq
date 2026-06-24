@@ -307,7 +307,11 @@ class PersonnelMarketPage {
         chkUsePersonnelHireHiringHallOnly.setSelected(model.usePersonnelHireHiringHallOnly);
         spnPersonnelMarketDylansWeight.setValue(model.personnelMarketDylansWeight);
         for (final Entry<SkillLevel, JSpinner> entry : spnPersonnelMarketRandomRemovalTargets.entrySet()) {
-            entry.getValue().setValue(model.personnelMarketRandomRemovalTargets.get(entry.getKey()));
+            // An older save may not hold every SkillLevel; skip missing entries so JSpinner.setValue(null) can't throw.
+            Integer target = model.personnelMarketRandomRemovalTargets.get(entry.getKey());
+            if (target != null) {
+                entry.getValue().setValue(target);
+            }
         }
     }
 
