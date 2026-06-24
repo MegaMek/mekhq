@@ -354,27 +354,15 @@ public class Genealogy {
     public List<Person> getGrandparents() {
         List<Person> parents = getParents();
         // Pre-size: most people have ≤ 2 parents each with ≤ 2 parents → 4 grandparents.
-        Set<Person> seen = new HashSet<>(8);
-        List<Person> grandparents = new ArrayList<>(4);
+        Set<Person> seen = new HashSet<>(4);
         for (Person parent : parents) {
-            for (Person grandparent : parent.getGenealogy().getParents()) {
-                if (seen.add(grandparent)) {
-                    grandparents.add(grandparent);
-                }
-            }
+            seen.addAll(parent.getGenealogy().getParents());
         }
-        return grandparents;
+        return new ArrayList<>(seen);
     }
 
     public int getGrandparentsCount() {
-        Set<Person> seen = new HashSet<>();
-        int count = 0;
-        for (Person parent : getParents()) {
-            for (Person grandparent : parent.getGenealogy().getParents()) {
-                if (seen.add(grandparent)) {count++;}
-            }
-        }
-        return count;
+        return getGrandparents().size();
     }
 
     /**
@@ -394,7 +382,7 @@ public class Genealogy {
      * @return a list of the person's parent(s) of the specified gender
      */
     public List<Person> getParentsByGender(final Gender gender) {
-        List<Person> all = getFamily().getOrDefault(FamilialRelationshipType.PARENT, new ArrayList<>());
+        List<Person> all = getParents();
         List<Person> result = new ArrayList<>(2);
         for (Person parent : all) {
             if (parent.getGender() == gender) {
@@ -425,32 +413,19 @@ public class Genealogy {
      */
     public List<Person> getSiblings() {
         List<Person> parents = getParents();
-        // Typical upper-bound: a few dozen siblings at most.
-        Set<Person> seen = new HashSet<>();
-        seen.add(getOrigin()); // exclude self up-front
-        List<Person> siblings = new ArrayList<>();
+        // 4 siblings should be average outside blended families
+        Set<Person> seen = new HashSet<>(4);
         for (Person parent : parents) {
-            for (Person child : parent.getGenealogy().getChildren()) {
-                if (seen.add(child)) {
-                    siblings.add(child);
-                }
-            }
+            seen.addAll(parent.getGenealogy().getChildren());
         }
-        return siblings;
+
+        seen.remove(getOrigin()); // exclude self
+
+        return new ArrayList<>(seen);
     }
 
     public int getSiblingCount() {
-        Set<Person> seen = new HashSet<>();
-        seen.add(origin);
-        int count = 0;
-        for (Person parent : getParents()) {
-            for (Person child : parent.getGenealogy().getChildren()) {
-                if (seen.add(child)) {
-                    count++;
-                }
-            }
-        }
-        return count;
+        return getSiblings().size();
     }
 
     /**
@@ -486,26 +461,14 @@ public class Genealogy {
     public List<Person> getGrandchildren() {
         List<Person> children = getChildren();
         Set<Person> seen = new HashSet<>();
-        List<Person> grandchildren = new ArrayList<>();
         for (Person child : children) {
-            for (Person grandchild : child.getGenealogy().getChildren()) {
-                if (seen.add(grandchild)) {
-                    grandchildren.add(grandchild);
-                }
-            }
+            seen.addAll(child.getGenealogy().getChildren());
         }
-        return grandchildren;
+        return new ArrayList<>(seen);
     }
 
     public int getGrandchildrenCount() {
-        Set<Person> seen = new HashSet<>();
-        int count = 0;
-        for (Person child : getChildren()) {
-            for (Person grandchild : child.getGenealogy().getChildren()) {
-                if (seen.add(grandchild)) {count++;}
-            }
-        }
-        return count;
+        return getGrandchildren().size();
     }
 
     /**
@@ -514,26 +477,14 @@ public class Genealogy {
     public List<Person> getsAuntsAndUncles() {
         List<Person> parents = getParents();
         Set<Person> seen = new HashSet<>();
-        List<Person> auntsAndUncles = new ArrayList<>();
         for (Person parent : parents) {
-            for (Person auntOrUncle : parent.getGenealogy().getSiblingsAndSpouses()) {
-                if (seen.add(auntOrUncle)) {
-                    auntsAndUncles.add(auntOrUncle);
-                }
-            }
+            seen.addAll(parent.getGenealogy().getSiblingsAndSpouses());
         }
-        return auntsAndUncles;
+        return new ArrayList<>(seen);
     }
 
     public int getAuntsAndUnclesCount() {
-        Set<Person> seen = new HashSet<>();
-        int count = 0;
-        for (Person parent : getParents()) {
-            for (Person auntOrUncle : parent.getGenealogy().getSiblingsAndSpouses()) {
-                if (seen.add(auntOrUncle)) {count++;}
-            }
-        }
-        return count;
+        return getsAuntsAndUncles().size();
     }
 
     /**
@@ -542,26 +493,14 @@ public class Genealogy {
     public List<Person> getCousins() {
         List<Person> auntsAndUncles = getsAuntsAndUncles();
         Set<Person> seen = new HashSet<>();
-        List<Person> cousins = new ArrayList<>();
         for (Person auntOrUncle : auntsAndUncles) {
-            for (Person cousin : auntOrUncle.getGenealogy().getChildren()) {
-                if (seen.add(cousin)) {
-                    cousins.add(cousin);
-                }
-            }
+            seen.addAll(auntOrUncle.getGenealogy().getChildren());
         }
-        return cousins;
+        return new ArrayList<>(seen);
     }
 
     public int getCousinsCount() {
-        Set<Person> seen = new HashSet<>();
-        int count = 0;
-        for (Person auntOrUncle : getsAuntsAndUncles()) {
-            for (Person cousin : auntOrUncle.getGenealogy().getChildren()) {
-                if (seen.add(cousin)) {count++;}
-            }
-        }
-        return count;
+        return getCousins().size();
     }
     // endregion Basic Family Getters
 
