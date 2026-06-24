@@ -403,7 +403,7 @@ public enum PersonnelTableModelColumn {
     DESTINATION_NAME("Column.DESTINATION_NAME.title", NaturalOrderComparator.INSTANCE,
           (person, campaign) -> LocationDisplay.getDestinationName(person, campaign, campaign.getLocalDate())),
     IS_MARRIED("Column.IS_MARRIED.title", NaturalOrderComparator.INSTANCE,
-          person -> person.getGenealogy().hasSpouse() ? convertBooleanToYesNo(person.isDivorceable()) : getNAText()),
+          person -> convertBooleanToYesNo(person.getGenealogy().hasSpouse())),
     FORMER_SPOUSES("Column.FORMER_SPOUSES.title", Integer::compare,
           person -> person.getGenealogy().getFormerSpouses().size(), Object::toString),
     CHILDREN("Column.CHILDREN.title", Integer::compare,
