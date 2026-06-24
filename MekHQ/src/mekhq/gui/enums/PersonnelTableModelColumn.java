@@ -76,7 +76,6 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.gui.model.LocationDisplay;
 import mekhq.gui.sorter.AttributeScoreSorter;
-import mekhq.gui.sorter.BonusSorter;
 import mekhq.gui.sorter.DateStringComparator;
 import mekhq.gui.sorter.EducationLevelSorter;
 import mekhq.gui.sorter.FormattedNumberSorter;
@@ -136,20 +135,20 @@ public enum PersonnelTableModelColumn {
           }),
     DEPLOYED("Column.DEPLOYED.title", NaturalOrderComparator.INSTANCE,
           PersonnelTableModelColumn::getDeployedScenarioName),
-    MEK("Column.MEK.title", BonusSorter.INSTANCE,
-          skillPairModelExtractor(SkillType.S_GUN_MEK, SkillType.S_PILOT_MEK)),
-    GROUND_VEHICLE("Column.GROUND_VEHICLE.title", BonusSorter.INSTANCE,
-          skillPairModelExtractor(SkillType.S_GUN_VEE, SkillType.S_PILOT_GVEE)),
-    NAVAL_VEHICLE("Column.NAVAL_VEHICLE.title", BonusSorter.INSTANCE,
-          skillPairModelExtractor(SkillType.S_GUN_VEE, SkillType.S_PILOT_NVEE)),
-    VTOL("Column.VTOL.title", BonusSorter.INSTANCE,
-          skillPairModelExtractor(SkillType.S_GUN_VEE, SkillType.S_PILOT_VTOL)),
-    AEROSPACE("Column.AEROSPACE.title", BonusSorter.INSTANCE,
-          skillPairModelExtractor(SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO)),
-    CONVENTIONAL_AIRCRAFT("Column.CONVENTIONAL_AIRCRAFT.title", BonusSorter.INSTANCE,
-          skillPairModelExtractor(SkillType.S_GUN_JET, SkillType.S_PILOT_JET)),
-    VESSEL("Column.VESSEL.title", BonusSorter.INSTANCE,
-          skillPairModelExtractor(SkillType.S_GUN_SPACE, SkillType.S_PILOT_SPACE)),
+    MEK("Column.MEK.title", SkillPair.COMPARATOR,
+          skillPairModelExtractor(SkillType.S_GUN_MEK, SkillType.S_PILOT_MEK), SkillPair::toString),
+    GROUND_VEHICLE("Column.GROUND_VEHICLE.title", SkillPair.COMPARATOR,
+          skillPairModelExtractor(SkillType.S_GUN_VEE, SkillType.S_PILOT_GVEE), SkillPair::toString),
+    NAVAL_VEHICLE("Column.NAVAL_VEHICLE.title", SkillPair.COMPARATOR,
+          skillPairModelExtractor(SkillType.S_GUN_VEE, SkillType.S_PILOT_NVEE), SkillPair::toString),
+    VTOL("Column.VTOL.title", SkillPair.COMPARATOR,
+          skillPairModelExtractor(SkillType.S_GUN_VEE, SkillType.S_PILOT_VTOL), SkillPair::toString),
+    AEROSPACE("Column.AEROSPACE.title", SkillPair.COMPARATOR,
+          skillPairModelExtractor(SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO), SkillPair::toString),
+    CONVENTIONAL_AIRCRAFT("Column.CONVENTIONAL_AIRCRAFT.title", SkillPair.COMPARATOR,
+          skillPairModelExtractor(SkillType.S_GUN_JET, SkillType.S_PILOT_JET), SkillPair::toString),
+    VESSEL("Column.VESSEL.title", SkillPair.COMPARATOR,
+          skillPairModelExtractor(SkillType.S_GUN_SPACE, SkillType.S_PILOT_SPACE), SkillPair::toString),
     PROTOMEK("Column.PROTOMEK.title", Integer::compare,
           skillModelExtractor(SkillType.S_GUN_PROTO), PersonnelTableModelColumn::skillToText),
     BATTLE_ARMOUR("Column.BATTLE_ARMOUR.title", Integer::compare,
@@ -513,10 +512,12 @@ public enum PersonnelTableModelColumn {
         return (person, campaign) -> getSkillValue(person, campaign).apply(skillName);
     }
 
-    private static BiFunction<Person, Campaign, String> skillPairModelExtractor(String gunnerySkill, String pilotingSkill) {
+    private static BiFunction<Person, Campaign, SkillPair> skillPairModelExtractor(
+          String gunnerySkill, String pilotingSkill) {
         return (person, campaign) -> {
-            Function<String, String> skillValue = getStringSkillValue(person, campaign);
-            return skillValue.apply(gunnerySkill) + '/' + skillValue.apply(pilotingSkill);
+            Function<String, Integer> skillValue = getSkillValue(person, campaign);
+            return new SkillPair(skillValue.apply(gunnerySkill), gunnerySkill,
+                  skillValue.apply(pilotingSkill), pilotingSkill);
         };
     }
 
@@ -1063,5 +1064,31 @@ public enum PersonnelTableModelColumn {
     @Override
     public String toString() {
         return name;
+    }
+
+    /**
+     * Models cells that display two skills simultaneously.
+     */
+    private record SkillPair(@Nullable Integer primaryValue, String primaryName,
+          @Nullable Integer secondaryValue, String secondaryName) {
+
+        // sort by sum, then primary skill value
+        private static final Comparator<SkillPair> COMPARATOR =
+              Comparator.comparing(SkillPair::getValueSum, Comparator.reverseOrder())
+                    .thenComparing(SkillPair::primaryValue, Comparator.nullsFirst(Comparator.reverseOrder()));
+
+        private int getValueSum() {
+            int primary = primaryValue == null ? (SkillType.getType(primaryName).getTarget() + 1) : primaryValue;
+            int secondary = secondaryValue == null ? (SkillType.getType(secondaryName).getTarget() + 1) : secondaryValue;
+            return primary + secondary;
+        }
+
+        @Override
+        @NonNull
+        public String toString() {
+            String primaryString = primaryValue == null ? "-" : primaryValue.toString();
+            String secondaryString = secondaryValue == null ? "-" : secondaryValue.toString();
+            return primaryString + '/' + secondaryString;
+        }
     }
 }
