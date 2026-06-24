@@ -608,7 +608,7 @@ public class HumanResourcesTest {
      * Tests for {@link HumanResources#getSeniorPerson(Collection, CampaignOptions, boolean, LocalDate)}
      */
     @Nested
-    class GetSeniorMedicalPerson {
+    class GetSeniorPerson {
 
         @Test
         void emptyInputReturnsNull() {
