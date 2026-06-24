@@ -1008,7 +1008,7 @@ public class CampaignOptions {
         // Random Histories
         setRandomOriginOptions(new RandomOriginOptions(true));
         setUseRandomPersonalities(false);
-        usePersonalityLabelsOnly = false;
+        setUsePersonalityLabelsOnly(false);
         setUseRandomPersonalityReputation(true);
         setUseReasoningXpMultiplier(true);
         setUseSimulatedRelationships(false);
