@@ -409,15 +409,17 @@ public enum PersonnelTableModelColumn {
     CHILDREN("Column.CHILDREN.title", Integer::compare,
           person -> person.getGenealogy().getChildren().size(), Object::toString),
     SIBLINGS("Column.SIBLINGS.title", Integer::compare,
-          person -> person.getGenealogy().getSiblings().size(), Object::toString),
+          person -> person.getGenealogy().getSiblingCount(), Object::toString),
+    PARENTS("Column.PARENTS.title", Integer::compare,
+          person -> person.getGenealogy().getParentsCount(), Object::toString),
     GRANDCHILDREN("Column.GRANDCHILDREN.title", Integer::compare,
-          person -> person.getGenealogy().getGrandchildren().size(), Object::toString),
+          person -> person.getGenealogy().getGrandchildrenCount(), Object::toString),
     GRANDPARENTS("Column.GRANDPARENTS.title", Integer::compare,
-          person -> person.getGenealogy().getGrandparents().size(), Object::toString),
+          person -> person.getGenealogy().getGrandparentsCount(), Object::toString),
     AUNTS_OR_UNCLES("Column.AUNTS_OR_UNCLES.title", Integer::compare,
-          person -> person.getGenealogy().getsAuntsAndUncles().size(), Object::toString),
+          person -> person.getGenealogy().getAuntsAndUnclesCount(), Object::toString),
     COUSINS("Column.COUSINS.title", Integer::compare,
-          person -> person.getGenealogy().getCousins().size(), Object::toString);
+          person -> person.getGenealogy().getCousinsCount(), Object::toString);
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PersonnelTable";
 
@@ -1055,6 +1057,7 @@ public enum PersonnelTableModelColumn {
                      FORMER_SPOUSES,
                      CHILDREN,
                      SIBLINGS,
+                     PARENTS,
                      GRANDCHILDREN,
                      GRANDPARENTS,
                      AUNTS_OR_UNCLES,
