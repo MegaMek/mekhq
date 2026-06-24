@@ -249,8 +249,10 @@ public class CampaignNewDayManager {
     }
 
     public void reset() {
-        faction = campaign.getFaction();
-        updatedLocation = campaign.getCurrentLocation();
+        this.campaignOptions = campaign.getCampaignOptions();
+        this.faction = campaign.getFaction();
+        this.finances = campaign.getFinances();
+        this.updatedLocation = campaign.getCurrentLocation();
 
         startDayWithNoInterruptions = true;
     }
@@ -276,9 +278,9 @@ public class CampaignNewDayManager {
      * @return {@code true} if the new day concluded successfully, {@code false} if the new day failed.
      */
     public boolean newDay() {
-        reset(); // refresh non-dynamic variables
+        reset(); // refresh cached values
 
-        // Clear previous daily report nags (we want this up top so that we can make sure no messages have been
+        // Clear previous daily report nags (we want this near the top so that we can make sure no messages have been
         // posted prior to this point).
         CommandCenterTab commandCenter = campaign.getGUI().getCommandCenterTab();
         for (DailyReportType type : DailyReportType.values()) {
