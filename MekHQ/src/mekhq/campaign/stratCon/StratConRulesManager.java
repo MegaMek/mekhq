@@ -924,8 +924,8 @@ public class StratConRulesManager {
                     break;
                 }
 
-                Unit selectedUnit = ObjectUtility.getRandomItem(vettedUnits);
-                vettedUnits.remove(selectedUnit);
+                int selectedIndex = randomInt(vettedUnits.size());
+                Unit selectedUnit = vettedUnits.remove(selectedIndex);
 
                 scenario.addUnit(selectedUnit, scenarioForceTemplate.getForceName(), false);
 
