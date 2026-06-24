@@ -815,6 +815,7 @@ public class MRMSService {
         if (parts.isEmpty()) {
             if (scrappingLimbMode) {
                 unit.setSalvage(false);
+                configuredOptions.setAllowCarryover(originalAllowCarryover);
             }
 
             return new MRMSUnitAction(unit, isSalvaging, MRMSUnitAction.STATUS.NO_PARTS);
