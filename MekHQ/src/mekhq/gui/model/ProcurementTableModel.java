@@ -36,7 +36,6 @@ import java.awt.Component;
 import java.text.DecimalFormat;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.stream.IntStream;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -132,10 +131,9 @@ public class ProcurementTableModel extends DataTableModel<IAcquisitionWork> {
             case COL_TOTAL_COST:
                 return shoppingItem.getTotalBuyCost().toAmountAndSymbolString();
             case COL_TARGET:
-                final TargetRoll target = getCampaign().getTargetForGenericAcquisition(shoppingItem);
+                TargetRoll target = getCampaign().checkGenericAcquisition(shoppingItem).getTargetNumber();
                 String value = target.getValueAsString();
-                if (IntStream.of(TargetRoll.IMPOSSIBLE, TargetRoll.AUTOMATIC_SUCCESS, TargetRoll.AUTOMATIC_FAIL)
-                          .allMatch(i -> (target.getValue() != i))) {
+                if (!target.cannotSucceed() && !target.isAutomaticSuccess()) {
                     value += "+";
                 }
                 return value;
@@ -185,7 +183,7 @@ public class ProcurementTableModel extends DataTableModel<IAcquisitionWork> {
 
     private String getTooltipFor(final IAcquisitionWork shoppingItem, final int column) {
         if (column == COL_TARGET) {
-            return getCampaign().getTargetForAcquisition(shoppingItem).getDesc();
+            return getCampaign().checkAcquisition(shoppingItem).getTargetNumber().getDesc();
         }
         return resources.getString("ProcurementTableModel.defaultToolTip.toolTipText");
     }
