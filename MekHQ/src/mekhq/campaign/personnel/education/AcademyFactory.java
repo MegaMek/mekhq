@@ -45,6 +45,7 @@ import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
 import megamek.client.ui.dialogs.buttonDialogs.CommonSettingsDialog;
+import megamek.common.annotations.Nullable;
 import megamek.common.preference.PreferenceManager;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
@@ -102,6 +103,19 @@ public class AcademyFactory {
      */
     public List<Academy> getAllAcademiesForSet(String setName) {
         return new ArrayList<>(academyMap.get(setName).values());
+    }
+
+    /**
+     * Retrieves a specific academy by set name and academy name.
+     *
+     * @param setName     the name of the set
+     * @param academyName the name of the academy within the set
+     *
+     * @return the matching {@link Academy}, or {@code null} if not found
+     */
+    public @Nullable Academy getAcademy(String setName, String academyName) {
+        Map<String, Academy> setMap = academyMap.get(setName);
+        return setMap != null ? setMap.get(academyName) : null;
     }
 
     /**

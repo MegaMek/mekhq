@@ -34,17 +34,12 @@ package mekhq.gui.enums;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
 
 import java.awt.event.KeyEvent;
 import java.util.ResourceBundle;
 
 import mekhq.MekHQ;
-import mekhq.gui.*;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class MHQTabTypeTest {
@@ -59,13 +54,24 @@ public class MHQTabTypeTest {
     @Test
     public void testGetMnemonic() {
         assertEquals(KeyEvent.VK_O, MHQTabType.COMMAND_CENTER.getMnemonic());
-        assertEquals(KeyEvent.VK_S, MHQTabType.INTERSTELLAR_MAP.getMnemonic());
+        assertEquals(KeyEvent.VK_UNDEFINED, MHQTabType.NAVIGATION.getMnemonic());
         assertEquals(KeyEvent.VK_H, MHQTabType.HANGAR.getMnemonic());
         assertEquals(KeyEvent.VK_L, MHQTabType.MEK_LAB.getMnemonic());
     }
     //endregion Getters
 
     //region Boolean Comparison Methods
+    @Test
+    public void testIsNavigation() {
+        for (final MHQTabType mhqTabType : types) {
+            if (mhqTabType == MHQTabType.NAVIGATION) {
+                assertTrue(mhqTabType.isNavigation());
+            } else {
+                assertFalse(mhqTabType.isNavigation());
+            }
+        }
+    }
+
     @Test
     public void testIsCommandCenter() {
         for (final MHQTabType mhqTabType : types) {
@@ -95,17 +101,6 @@ public class MHQTabTypeTest {
                 assertTrue(mhqTabType.isBriefingRoom());
             } else {
                 assertFalse(mhqTabType.isBriefingRoom());
-            }
-        }
-    }
-
-    @Test
-    public void testIsInterstellarMap() {
-        for (final MHQTabType mhqTabType : types) {
-            if (mhqTabType == MHQTabType.INTERSTELLAR_MAP) {
-                assertTrue(mhqTabType.isInterstellarMap());
-            } else {
-                assertFalse(mhqTabType.isInterstellarMap());
             }
         }
     }

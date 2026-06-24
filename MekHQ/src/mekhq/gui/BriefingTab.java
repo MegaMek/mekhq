@@ -164,6 +164,8 @@ public final class BriefingTab extends CampaignGuiTab {
     private static final int BRIEFING_SPLIT_DIVIDER_SIZE = 10;
     private static final int SCENARIO_TABLE_ROW_HEIGHT = 24;
 
+    private final MekHQ app;
+
     private LanceAssignmentView panLanceAssignment;
     private JTabbedPane scenarioWorkTabs;
     private JTable scenarioTable;
@@ -219,8 +221,9 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     // region Constructors
-    public BriefingTab(CampaignGUI gui, String tabName) {
+    public BriefingTab(MekHQ app, CampaignGUI gui, String tabName) {
         super(gui, tabName);
+        this.app = app;
         selectedScenario = -1;
     }
     // endregion Constructors
@@ -750,7 +753,7 @@ public final class BriefingTab extends CampaignGuiTab {
         Mission mission = getCampaign().getMission(scenario.getMissionId());
         return (scenario instanceof AtBDynamicScenario) &&
                      (mission instanceof AtBContract contract) &&
-                     (contract.getStratconCampaignState() != null);
+                     (contract.getStratConCampaignState() != null);
     }
 
     private void deploySelectedScenario() {
@@ -810,7 +813,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
         CampaignOptions campaignOptions = getCampaignOptions();
 
-        getCampaign().getApp().getAutosaveService().requestBeforeMissionEndAutosave(getCampaign());
+        app.getAutosaveService().requestBeforeMissionEndAutosave(getCampaign());
 
         final CompleteMissionDialog cmd = new CompleteMissionDialog(getFrame());
         if (!cmd.showDialog().isConfirmed()) {
@@ -937,7 +940,7 @@ public final class BriefingTab extends CampaignGuiTab {
             if (mission instanceof AtBContract contract) {
                 Faction employer = contract.getEmployerFaction();
                 reports = factionStandings.processContractCompletion(getCampaign().getFaction(), employer, today,
-                      status, regardMultiplier, contract.getLength());
+                      status, regardMultiplier, contract.getLengthInMonths());
             } else {
                 SimulateMissionDialog dialog = getSimulateMissionDialog(mission, status);
 
@@ -1067,7 +1070,7 @@ public final class BriefingTab extends CampaignGuiTab {
               startDate,
               status,
               mission.getName(),
-              mission.getLength());
+              mission.getLengthInMonths());
     }
 
     /**
@@ -1084,7 +1087,7 @@ public final class BriefingTab extends CampaignGuiTab {
             case SUCCESS, PARTIAL -> {
                 if ((getCampaignOptions().isUseStratCon()) &&
                           (mission instanceof AtBContract)) {
-                    StratConCampaignState stratConCampaignState = ((AtBContract) mission).getStratconCampaignState();
+                    StratConCampaignState stratConCampaignState = ((AtBContract) mission).getStratConCampaignState();
 
                     if (stratConCampaignState == null || stratConCampaignState.getVictoryPoints() < 3) {
                         yield getCampaignOptions().getMissionXpSuccess();
@@ -1147,7 +1150,7 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         if (comboMission.getSelectedItem() instanceof AtBContract contract) {
-            StratConCampaignState campaignState = contract.getStratconCampaignState();
+            StratConCampaignState campaignState = contract.getStratConCampaignState();
             if (campaignState != null) {
                 generateDailyScenariosForTrack(getCampaign(), campaignState, contract, 1);
                 this.refreshAll(); // We need to refresh otherwise the scenario won't show up in the GUI
@@ -1730,7 +1733,7 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
-        getCampaign().getApp().resolveScenario(scenario);
+        app.resolveScenario(scenario);
     }
 
     /**
@@ -1753,7 +1756,7 @@ public final class BriefingTab extends CampaignGuiTab {
         if (chosen.isEmpty()) {
             return;
         }
-        getCampaign().getApp().startAutoResolve(scenario, chosen);
+        app.startAutoResolve(scenario, chosen);
     }
 
     private void runPrincessAutoResolve() {
@@ -2369,7 +2372,7 @@ public final class BriefingTab extends CampaignGuiTab {
             // Export allies
             chosen.clear();
             chosen.addAll(((AtBScenario) scenario).getAlliesPlayer());
-            file = determineMULFilePath(scenario, ((AtBContract) mission).getEmployer());
+            file = determineMULFilePath(scenario, ((AtBContract) mission).getEmployerName());
 
             int genericBattleValue = calculateGenericBattleValue(chosen);
 

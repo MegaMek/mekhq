@@ -761,6 +761,6 @@ public class PlanetarySystemMapPanel extends JPanel {
      * Switch back to the interstellar map
      */
     private void back() {
-        hqView.getMapTab().switchSystemsMap();
+        hqView.getNavigationTab().getMapTab().switchSystemsMap();
     }
 }

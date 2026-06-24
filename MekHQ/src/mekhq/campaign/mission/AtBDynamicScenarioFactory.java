@@ -48,6 +48,7 @@ import static megamek.common.units.UnitType.*;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.enums.DailyReportType.BATTLE;
 import static mekhq.campaign.mission.AtBScenario.selectBotTeamCommanders;
+import static mekhq.campaign.mission.RandomFactionCamouflage.pickRandomCamouflage;
 import static mekhq.campaign.mission.Scenario.T_GROUND;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_CIVILIANS;
@@ -1123,7 +1124,7 @@ public class AtBDynamicScenarioFactory {
         generatedForce.setFixedEntityList(generatedEntities);
         setBotForceParameters(generatedForce, forceTemplate, forceAlignment, contract);
         if (unidentifiedThirdPartyPresent) {
-            generatedForce.setCamouflage(AtBContract.pickRandomCamouflage(currentDate.getYear(), factionCode));
+            generatedForce.setCamouflage(pickRandomCamouflage(currentDate.getYear(), factionCode));
         }
 
         boolean isDeployOffBoard = forceTemplate.getDeployOffboard();
@@ -1361,7 +1362,7 @@ public class AtBDynamicScenarioFactory {
      */
     private static @Nullable StratConTrackState getStratconTrackState(AtBDynamicScenario scenario,
           AtBContract contract) {
-        List<StratConTrackState> tracks = contract.getStratconCampaignState().getTracks();
+        List<StratConTrackState> tracks = contract.getStratConCampaignState().getTracks();
         StratConTrackState scenarioHomeTrack = null;
 
         for (StratConTrackState track : tracks) {
@@ -3001,7 +3002,9 @@ public class AtBDynamicScenarioFactory {
         // Assign the crew to the unit
         entity.setCrew(entityCrew);
 
-        int tacticsInitiativeBonus = getTacticsModifier(skill, campaign.getRandomSkillPreferences(), faction);
+        int tacticsInitiativeBonus = getTacticsModifier(skill,
+              campaign.getRandomSkillPreferences(),
+              campaignOptions.isUseSensibleTactics());
         if (campaignOptions.isUseTactics()) {
             entity.getCrew().setCommandBonus(tacticsInitiativeBonus);
         } else if (campaignOptions.isUseInitiativeBonus()) {
@@ -3057,14 +3060,13 @@ public class AtBDynamicScenarioFactory {
      *
      * @param skill                  the skill level used to derive the base modifier.
      * @param randomSkillPreferences preferences that govern how command skills are adjusted and randomized.
-     * @param faction                the faction data used to determine leadership-related bonuses, such as formation
-     *                               size.
+     * @param isUseSensibleTactics   if {@code true} Tactics modifiers are reduced
      *
      * @return the calculated tactics modifier, factoring in skill level, preferences, randomization, and
      *       faction-specific adjustments.
      */
     private static int getTacticsModifier(SkillLevel skill, RandomSkillPreferences randomSkillPreferences,
-          Faction faction) {
+          boolean isUseSensibleTactics) {
         int skillLevel = 0;
         if (skill.isGreenOrGreater()) {
             int adjustedValue = min(skill.getAdjustedValue(), EXP_LEGENDARY);
@@ -3072,10 +3074,10 @@ public class AtBDynamicScenarioFactory {
 
             int skillRoll = Math.clamp(d6(2) + commandSkillsModifier, 2, 12);
             skillLevel = switch (skillRoll) {
-                case 3, 4, 5 -> 1;
-                case 6, 7, 8, 9 -> 2;
-                case 10, 11 -> 3;
-                case 12 -> 4;
+                case 3, 4, 5 -> isUseSensibleTactics ? 0 : 1;
+                case 6, 7, 8, 9 -> isUseSensibleTactics ? 1 : 2;
+                case 10, 11 -> isUseSensibleTactics ? 2 : 3; // We're not rounding down here on purpose
+                case 12 -> isUseSensibleTactics ? 2 : 4;
                 default -> 0; // 2
             };
         }
@@ -4503,7 +4505,7 @@ public class AtBDynamicScenarioFactory {
 
         if (campaign.getCampaignOptions().isUseStratCon()) {
             AtBContract contract = scenario.getContract(campaign);
-            StratConCampaignState campaignState = contract.getStratconCampaignState();
+            StratConCampaignState campaignState = contract.getStratConCampaignState();
 
             for (StratConTrackState track : campaignState.getTracks()) {
                 StratConScenario stratconScenario = track.getBackingScenariosMap().get(scenario.getId());

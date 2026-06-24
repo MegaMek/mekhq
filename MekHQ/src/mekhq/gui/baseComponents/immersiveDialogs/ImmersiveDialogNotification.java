@@ -35,7 +35,9 @@ package mekhq.gui.baseComponents.immersiveDialogs;
 import static mekhq.utilities.MHQInternationalization.getText;
 
 import java.util.List;
+import javax.swing.JPanel;
 
+import jakarta.annotation.Nullable;
 import mekhq.campaign.Campaign;
 
 /**
@@ -122,6 +124,40 @@ public class ImmersiveDialogNotification extends ImmersiveDialogCore {
               null,
               null,
               isModal);
+    }
+
+    /**
+     * Constructs a notification dialog with the specified campaign context,
+     * message, bottom message, a supplemental
+     * panel shown between the message and the buttons, and modality.
+     *
+     * @param campaign          the current campaign context
+     * @param centerMessage     the main message to display in the center of the
+     *                          dialog
+     * @param bottomMessage     the message to display in the bottom of the dialog,
+     *                          or {@code null} for none
+     * @param supplementalPanel an optional panel (for example a gauge or chart)
+     *                          rendered between the message and the
+     *                          buttons, or {@code null} for none
+     * @param isModal           {@code true} if the dialog should be modal,
+     *                          {@code false} otherwise
+     *
+     * @author VicenteCartas
+     * @since 0.51.01
+     */
+    public ImmersiveDialogNotification(Campaign campaign, String centerMessage, @Nullable String bottomMessage,
+            @Nullable JPanel supplementalPanel, boolean isModal) {
+        super(campaign,
+                null,
+                null,
+                centerMessage,
+                createButtons(),
+                bottomMessage,
+                ImmersiveDialogWidth.MEDIUM.getWidth(),
+                false,
+                supplementalPanel,
+                null,
+                isModal);
     }
 
     /**

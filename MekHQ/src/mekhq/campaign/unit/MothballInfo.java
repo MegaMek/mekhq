@@ -211,7 +211,7 @@ public class MothballInfo {
             boolean isUseStratCon = campaign.getCampaignOptions().isUseStratCon();
             if (isUseStratCon) {
                 for (AtBContract contract : campaign.getActiveAtBContracts()) {
-                    StratConCampaignState campaignState = contract.getStratconCampaignState();
+                    StratConCampaignState campaignState = contract.getStratConCampaignState();
 
                     if (campaignState != null) {
                         if (campaignState.isForceDeployedHere(forceId)) {

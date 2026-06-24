@@ -318,8 +318,7 @@ public class PartsStoreModel extends AbstractTableModel {
                     shoppingItem = (IAcquisitionWork) part;
                 }
                 if (null != shoppingItem) {
-                    TargetRoll target = campaign.getTargetForAcquisition(shoppingItem, getLogisticsPerson(), true,
-                          false);
+                    TargetRoll target = campaign.getTargetForAcquisition(shoppingItem, getLogisticsPerson(), true);
                     targetProxy = new TargetProxy(target);
                 } else {
                     targetProxy = new TargetProxy(null);

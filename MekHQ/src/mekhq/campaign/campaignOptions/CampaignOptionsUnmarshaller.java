@@ -327,6 +327,7 @@ public class CampaignOptionsUnmarshaller {
             case "autoLogisticsOther" -> campaignOptions.setAutoLogisticsOther(parseInt(nodeContents));
             case "useTactics" -> campaignOptions.setUseTactics(parseBoolean(nodeContents));
             case "useInitiativeBonus" -> campaignOptions.setUseInitiativeBonus(parseBoolean(nodeContents));
+            case "useSensibleTactics" -> campaignOptions.setUseSensibleTactics(parseBoolean(nodeContents));
             case "useToughness" -> campaignOptions.setUseToughness(parseBoolean(nodeContents));
             case "useRandomToughness" -> campaignOptions.setUseRandomToughness(parseBoolean(nodeContents));
             case "useArtillery" -> campaignOptions.setUseArtillery(parseBoolean(nodeContents));

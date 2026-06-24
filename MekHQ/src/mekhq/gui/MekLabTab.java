@@ -124,6 +124,14 @@ public class MekLabTab extends CampaignGuiTab {
     EntityPanel labPanel;
     JPanel emptyPanel;
 
+    /**
+     * Whether the {@link Refit} constructor has already proposed a new name for the entity being edited (see
+     * {@link Refit#suggestNewName()}). The proposal must only happen once per editing session, so it cannot clobber a
+     * chassis or model name the user has typed in the lab: the refit summary is refreshed - and a fresh {@link Refit}
+     * constructed - after every edit.
+     */
+    private boolean refitNameProposed;
+
     private JPanel summaryPane;
     private JLabel lblName;
 
@@ -263,6 +271,7 @@ public class MekLabTab extends CampaignGuiTab {
 
     public void loadUnit(Unit u) {
         unit = u;
+        refitNameProposed = false;
         MekSummary mekSummary = MekSummaryCache.getInstance().getMek(unit.getEntity().getShortNameRaw());
         Entity entity;
         try {
@@ -302,6 +311,7 @@ public class MekLabTab extends CampaignGuiTab {
     }
 
     public void resetUnit() {
+        refitNameProposed = false;
         MekSummary mekSummary = MekSummaryCache.getInstance().getMek(unit.getEntity().getShortName());
 
         if (mekSummary == null) {
@@ -334,7 +344,18 @@ public class MekLabTab extends CampaignGuiTab {
         if (null == entity) {
             return;
         }
+        // The Refit constructor proposes a new name for customized infantry (Refit#suggestNewName, Issue #9154).
+        // Allow that only on the first construction of the session; afterwards restore the name so the proposal
+        // cannot overwrite a chassis or model the user typed in the lab.
+        String chassisBeforeRefit = entity.getChassis();
+        String modelBeforeRefit = entity.getModel();
         refit = new Refit(unit, entity, true, false, true);
+        if (refitNameProposed) {
+            entity.setChassis(chassisBeforeRefit);
+            entity.setModel(modelBeforeRefit);
+        } else {
+            refitNameProposed = true;
+        }
         testEntity = null;
         if (entity instanceof SmallCraft) {
             testEntity = new TestSmallCraft((SmallCraft) entity, entityVerifier.aeroOption, null);
@@ -378,6 +399,8 @@ public class MekLabTab extends CampaignGuiTab {
             tonnage = battleArmor.getTrooperWeight() * battleArmor.getSquadSize();
         }
 
+        String refitCheckFixable = refit.checkFixable();
+
         if (tonnage < testEntity.calculateWeight()) {
             btnRefit.setEnabled(false);
             btnRefit.setToolTipText("Unit is overweight.");
@@ -392,9 +415,9 @@ public class MekLabTab extends CampaignGuiTab {
             btnRefit.setEnabled(false);
             btnRefit.setToolTipText(sb.toString());
             btnSaveForLater.setEnabled(true);
-        } else if (null != refit.checkFixable()) {
+        } else if (null != refitCheckFixable) {
             btnRefit.setEnabled(false);
-            btnRefit.setToolTipText(refit.checkFixable());
+            btnRefit.setToolTipText(refitCheckFixable);
             btnSaveForLater.setEnabled(true);
         } else if (refit.getRefitClass() == Refit.NO_CHANGE && entity.getWeight() == testEntity.calculateWeight()) {
             btnRefit.setEnabled(false);
@@ -626,6 +649,9 @@ public class MekLabTab extends CampaignGuiTab {
             buildTab.refresh();
             previewTab.refresh();
             refreshSummary();
+            // A full refresh (e.g. an infantry Disposable Weapon or primary/secondary weapon change) must also
+            // re-evaluate the refit so the Begin Refit button reflects the change, not just the MML preview.
+            refreshRefitSummary();
         }
 
         @Override
@@ -757,6 +783,8 @@ public class MekLabTab extends CampaignGuiTab {
             transportTab.refresh();
             previewTab.refresh();
             refreshSummary();
+            // Re-evaluate the refit so a weapon/equipment change enables the Begin Refit button.
+            refreshRefitSummary();
         }
 
         @Override
@@ -883,6 +911,9 @@ public class MekLabTab extends CampaignGuiTab {
             buildTab.refresh();
             previewTab.refresh();
             refreshSummary();
+            // A full refresh (e.g. an infantry Disposable Weapon or primary/secondary weapon change) must also
+            // re-evaluate the refit so the Begin Refit button reflects the change, not just the MML preview.
+            refreshRefitSummary();
         }
 
         @Override
@@ -1007,6 +1038,9 @@ public class MekLabTab extends CampaignGuiTab {
             buildTab.refresh();
             previewTab.refresh();
             refreshSummary();
+            // A full refresh (e.g. an infantry Disposable Weapon or primary/secondary weapon change) must also
+            // re-evaluate the refit so the Begin Refit button reflects the change, not just the MML preview.
+            refreshRefitSummary();
         }
 
         @Override
@@ -1141,6 +1175,8 @@ public class MekLabTab extends CampaignGuiTab {
             transportTab.refresh();
             previewTab.refresh();
             refreshSummary();
+            // Re-evaluate the refit so a weapon/equipment change enables the Begin Refit button.
+            refreshRefitSummary();
         }
 
         @Override
@@ -1267,6 +1303,9 @@ public class MekLabTab extends CampaignGuiTab {
             buildTab.refresh();
             previewTab.refresh();
             refreshSummary();
+            // A full refresh (e.g. an infantry Disposable Weapon or primary/secondary weapon change) must also
+            // re-evaluate the refit so the Begin Refit button reflects the change, not just the MML preview.
+            refreshRefitSummary();
         }
 
         @Override
@@ -1381,6 +1420,8 @@ public class MekLabTab extends CampaignGuiTab {
             structureTab.refresh();
             previewTab.refresh();
             refreshSummary();
+            // Re-evaluate the refit so a weapon/equipment change enables the Begin Refit button (infantry et al.).
+            refreshRefitSummary();
         }
 
         @Override
@@ -1503,6 +1544,9 @@ public class MekLabTab extends CampaignGuiTab {
             buildTab.refresh();
             previewTab.refresh();
             refreshSummary();
+            // A full refresh (e.g. an infantry Disposable Weapon or primary/secondary weapon change) must also
+            // re-evaluate the refit so the Begin Refit button reflects the change, not just the MML preview.
+            refreshRefitSummary();
         }
 
         @Override
@@ -1635,6 +1679,8 @@ public class MekLabTab extends CampaignGuiTab {
             transportTab.refresh();
             previewTab.refresh();
             refreshSummary();
+            // Re-evaluate the refit so a weapon/equipment change enables the Begin Refit button.
+            refreshRefitSummary();
         }
 
         @Override

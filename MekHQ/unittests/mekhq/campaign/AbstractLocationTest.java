@@ -145,7 +145,7 @@ public class AbstractLocationTest {
         assertSame(planet, location.getPlanet());
     }
 
-    /** Tests for {@link AbstractLocation#applyRechargeForHours(Campaign, java.time.LocalDate, boolean, double)}. */
+    /** Tests for {@link AbstractLocation#applyRechargeForHours(Campaign, java.time.LocalDate, boolean, double, boolean)}. */
     @Nested
     class ApplyRechargeForHours {
 
@@ -162,7 +162,7 @@ public class AbstractLocationTest {
         void noReportAndZeroReturnedWhenNoRechargeNeeded() {
             when(system.getRechargeTime(today, false)).thenReturn(0.0);
 
-            double used = location.applyRechargeForHours(campaign, today, false, 24.0);
+            double used = location.applyRechargeForHours(campaign, today, false, 24.0, false);
 
             assertEquals(0.0, used);
             verify(campaign, never()).addReport(any(), anyString());
@@ -172,7 +172,7 @@ public class AbstractLocationTest {
         void returnsHoursAvailableAndAddsReportWhenPartialRecharge() {
             when(system.getRechargeTime(today, false)).thenReturn(176.0);
 
-            double used = location.applyRechargeForHours(campaign, today, false, 24.0);
+            double used = location.applyRechargeForHours(campaign, today, false, 24.0, false);
 
             assertEquals(24.0, used);
             verify(campaign).addReport(eq(GENERAL), anyString());
@@ -184,9 +184,18 @@ public class AbstractLocationTest {
             // AbstractLocation.getRechargeTime() is always 0, so usedTime = min(24, 10-0) = 10
             when(system.getRechargeTime(today, false)).thenReturn(10.0);
 
-            double used = location.applyRechargeForHours(campaign, today, false, 24.0);
+            double used = location.applyRechargeForHours(campaign, today, false, 24.0, false);
 
             assertEquals(10.0, used);
+        }
+
+        @Test
+        void noReportWhenSuppressed() {
+            when(system.getRechargeTime(today, false)).thenReturn(176.0);
+
+            location.applyRechargeForHours(campaign, today, false, 24.0, true);
+
+            verify(campaign, never()).addReport(any(), anyString());
         }
     }
 }

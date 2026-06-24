@@ -933,7 +933,7 @@ public class MekLocation extends Part {
 
     @Override
     public String getDesc() {
-        if ((!isBreached() && !isBlownOff())) {
+        if (isDamagedBeyondRepair() || (!isBreached() && !isBlownOff())) {
             return super.getDesc();
         }
         StringBuilder toReturn = new StringBuilder();

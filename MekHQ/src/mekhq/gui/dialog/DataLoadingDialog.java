@@ -51,6 +51,7 @@ import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -73,7 +74,7 @@ import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignEventProcessor;
+import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.CampaignFactory;
 import mekhq.campaign.camOpsReputation.ReputationController;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -82,17 +83,13 @@ import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
-import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.backgrounds.RandomCompanyNameGenerator;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.storyArc.StoryArc;
-import mekhq.campaign.storyArc.StoryArcStub;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
@@ -101,6 +98,7 @@ import mekhq.campaign.universe.eras.Eras;
 import mekhq.campaign.universe.factionHints.WarAndPeaceProcessor;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.baseComponents.AbstractMHQDialogBasic;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
 import mekhq.gui.campaignOptions.CampaignOptionsPresetPicker;
@@ -114,25 +112,26 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
     private final Task task;
     private RawImagePanel splash;
     private JProgressBar progressBar;
-    private final StoryArcStub storyArcStub;
     private final boolean isInAppNewCampaign;
+    private final Consumer<Campaign> completionHandler;
 
     private final LocalDate DEFAULT_START_DATE = LocalDate.of(3051, 1, 1);
 
     // endregion Variable Declarations
 
     // region Constructors
-    public DataLoadingDialog(final JFrame frame, final MekHQ application, final @Nullable File campaignFile) {
-        this(frame, application, campaignFile, null, false);
+    public DataLoadingDialog(final JFrame frame, final MekHQ application, final @Nullable File campaignFile,
+          Consumer<Campaign> completionHandler) {
+        this(frame, application, campaignFile, false, completionHandler);
     }
 
     public DataLoadingDialog(final JFrame frame, final MekHQ application, final @Nullable File campaignFile,
-          StoryArcStub stub, final boolean isInAppNewCampaign) {
+          final boolean isInAppNewCampaign, Consumer<Campaign> completionHandler) {
         super(frame, "DataLoadingDialog", "DataLoadingDialog.title");
         this.application = application;
         this.campaignFile = campaignFile;
-        this.storyArcStub = stub;
         this.isInAppNewCampaign = isInAppNewCampaign;
+        this.completionHandler = completionHandler;
         this.task = new Task(this);
         getTask().addPropertyChangeListener(this);
         initialize();
@@ -182,7 +181,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
 
     @Override
     protected Container createCenterPane() {
-        setSplash(UIUtil.createSplashComponent(getApplication().getIconPackage().getLoadingScreenImages(), getFrame()));
+        setSplash(UIUtil.createSplashComponent(getApplication().getIconPackage().getLoadingScreenImages(), this));
         return getSplash();
     }
 
@@ -201,7 +200,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
         setSize(getSplash().getPreferredSize());
         pack();
         fitAndCenter();
-        getFrame().setVisible(true);
+        setVisible(true);
     }
     // endregion Initialization
 
@@ -473,7 +472,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 // This needs to be the final stage in Progress 7 as otherwise the display of any confirmation
                 // dialogs will get 'stuck' behind other dialogs
                 if (campaignVersion.isLowerThan(MHQConstants.VERSION)) {
-                    handleCampaignUpgrading(campaign);
+                    handleCampaignUpgrading(application, campaign);
                 }
                 // endregion Progress 7
             }
@@ -482,10 +481,6 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 new WarAndPeaceProcessor(campaign, true);
             }
 
-            // Generic event processor
-            campaign.setCampaignEventProcessor(new CampaignEventProcessor(campaign));
-
-            campaign.setApp(getApplication());
             return campaign;
         }
 
@@ -503,13 +498,14 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
          * <p><b>Note:</b> This method should not be called from the Event Dispatch Thread (EDT), as it will block
          * the thread until the upgrade is finished.</p>
          *
+         * @param app      the application context
          * @param campaign the {@link Campaign} instance to be upgraded
          *
          * @author Illiani
          * @since 0.50.07
          */
-        private static void handleCampaignUpgrading(Campaign campaign) {
-            CampaignUpgradeDialog.campaignUpgradeDialog(campaign);
+        private static void handleCampaignUpgrading(MekHQ app, Campaign campaign) {
+            CampaignUpgradeDialog.campaignUpgradeDialog(app, campaign);
         }
 
         /**
@@ -574,11 +570,12 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
          */
         @Override
         public void done() {
-            Campaign campaign;
+            setVisible(false);
             try {
-                campaign = get();
+                Campaign campaign = get();
+                completionHandler.accept(campaign);
             } catch (InterruptedException | CancellationException ignored) {
-                campaign = null;
+                completionHandler.accept(null);
             } catch (ExecutionException ex) {
                 LOGGER.error("", ex);
                 if (ex.getCause() instanceof NullEntityException) {
@@ -604,24 +601,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                           resources.getString("DataLoadingDialog.ExecutionException.title"),
                           JOptionPane.ERROR_MESSAGE);
                 }
-                campaign = null;
-            }
-
-            setVisible(false);
-            if (campaign != null) {
-                getApplication().setCampaign(campaign);
-                getApplication().getCampaignController().setHost(campaign.getId());
-                getApplication().showNewView();
-                getFrame().dispose();
-                if (null != storyArcStub) {
-                    StoryArc storyArc = storyArcStub.loadStoryArc(campaign);
-                    if (null != storyArc) {
-                        campaign.useStoryArc(storyArc, true);
-                    }
-                }
-            } else {
-                cancel(true);
-                getFrame().setVisible(true);
+                completionHandler.accept(null);
             }
         }
     }

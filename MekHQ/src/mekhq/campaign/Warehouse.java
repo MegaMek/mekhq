@@ -43,6 +43,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import jakarta.annotation.Nonnull;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -62,11 +63,11 @@ import mekhq.utilities.MHQXMLUtility;
 public class Warehouse implements ILocation {
     private static final MMLogger LOGGER = MMLogger.create(Warehouse.class);
 
-    private final TreeMap<Integer, Part> parts = new TreeMap<>();
     private final LocationNode locationNode = new LocationNode(this);
+    private final TreeMap<Integer, Part> parts = new TreeMap<>();
 
     @Override
-    public LocationNode getLocationNode() {
+    public @Nonnull LocationNode getLocationNode() {
         return locationNode;
     }
 

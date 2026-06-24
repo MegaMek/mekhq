@@ -39,6 +39,7 @@ import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.enums.DailyReportType.SKILL_CHECKS;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
+import static mekhq.campaign.personnel.PersonnelOptions.EDGE_TRAINING;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
 import static mekhq.campaign.personnel.skills.SkillType.S_TRAINING;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.BARELY_MADE_IT;
@@ -71,10 +72,10 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.skills.ActionCheckResult;
 import mekhq.campaign.personnel.skills.InfantryGunnerySkills;
 import mekhq.campaign.personnel.skills.ScoutingSkills;
 import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillCheckUtility;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
@@ -147,7 +148,7 @@ public class TrainingCombatTeams {
                 continue;
             }
 
-            StratConCampaignState campaignState = contract.getStratconCampaignState();
+            StratConCampaignState campaignState = contract.getStratConCampaignState();
             boolean isForceDeployed = campaignState != null &&
                                             campaignState.isForceDeployedHere(combatTeam.getFormationId());
             if (isUsingStratCon) {
@@ -271,12 +272,12 @@ public class TrainingCombatTeams {
                         SkillType skillType = traineeSkill.getType();
                         int targetLevel = skillType.getRegularLevel();
 
-                        int traineeSkillLevel = traineeSkill.getLevel();
-                        if (traineeSkillLevel >= targetLevel) {
+                        int traineeExperienceLevel = traineeSkill.getExperienceLevel(null);
+                        if (traineeExperienceLevel >= targetLevel) {
                             continue;
                         }
 
-                        if (traineeSkillLevel < educatorSkills.get(commanderSkill)) {
+                        if (traineeExperienceLevel < educatorSkills.get(commanderSkill)) {
                             skillsBeingTrained.add(traineeSkill);
                         }
                     }
@@ -555,34 +556,22 @@ public class TrainingCombatTeams {
     }
 
     private static int performTrainingSkillCheck(Campaign campaign, Person educator) {
-        final LocalDate today = campaign.getLocalDate();
-        final boolean isClanCampaign = campaign.isClanCampaign();
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        final boolean useAgingEffects = campaignOptions.isUseAgeEffects();
+        boolean isUseEdge = campaignOptions.isUseEdge();
+        isUseEdge = isUseEdge && educator.getOptions().booleanOption(EDGE_TRAINING);
 
-        SkillCheckUtility skillCheck = new SkillCheckUtility(
-              getTextAt(RESOURCE_BUNDLE, "trainingCombatTeam.skillCheck"),
-              educator,
-              S_TRAINING,
-              new ArrayList<>(),
-              0,
-              true,
-              true,
-              useAgingEffects,
-              isClanCampaign,
-              today);
-        int raw = skillCheck.getMarginOfSuccess();
-        MarginOfSuccess marginOfSuccess = getMarginOfSuccessObject(raw);
+        ActionCheckResult actionCheckResult =
+              educator.checkSkill(S_TRAINING, campaign)
+                    .resolve(isUseEdge, getTextAt(RESOURCE_BUNDLE, "trainingCombatTeam.skillCheck"), true);
+        campaign.addReport(SKILL_CHECKS, actionCheckResult.resultsText());
 
+        MarginOfSuccess marginOfSuccess = getMarginOfSuccessObject(actionCheckResult.marginOfSuccess());
         String personnelReport = getFormattedTextAt(RESOURCE_BUNDLE, "learnedProgress.text",
               educator.getHyperlinkedFullTitle(), spanOpeningWithCustomColor(marginOfSuccess.getColor()),
               marginOfSuccess.getLabel(), CLOSING_SPAN_TAG);
         campaign.addReport(PERSONNEL, personnelReport);
 
-        String skillRollReport = skillCheck.getResultsText();
-        campaign.addReport(SKILL_CHECKS, skillRollReport);
-
-        return raw;
+        return actionCheckResult.marginOfSuccess();
     }
 
     /**

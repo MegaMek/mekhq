@@ -321,7 +321,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         toReturn += ">";
         toReturn += "<b>" + getAcquisitionDisplayName() + "</b> " + getAcquisitionBonus() + "<br/>";
         toReturn += getAcquisitionExtraDesc() + "<br/>";
-        PartInventory inventories = getCampaign().getPartInventory(getAcquisitionPart());
+        PartInventory inventories = getPartInventory(getAcquisitionPart());
         toReturn += inventories.getTransitOrderedDetails() + "<br/>";
         toReturn += getActualValue().toAmountAndSymbolString() + "<br/>";
         toReturn += "</font></html>";

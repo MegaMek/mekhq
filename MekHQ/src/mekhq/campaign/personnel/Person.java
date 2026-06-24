@@ -82,6 +82,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javax.swing.ImageIcon;
 
+import jakarta.annotation.Nonnull;
 import megamek.Version;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.codeUtilities.MathUtility;
@@ -103,8 +104,10 @@ import megamek.common.units.*;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
+import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ExtraData;
+import mekhq.campaign.Personnel;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.events.persons.PersonStatusChangedEvent;
@@ -112,6 +115,7 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.log.LogEntry;
@@ -140,8 +144,10 @@ import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.personnel.skills.AttributeCheck;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.Skills;
@@ -362,12 +368,12 @@ public class Person implements ILocation {
     private String eduAcademySet;
     private String eduAcademyNameInSet;
     private String eduAcademyFaction;
-    private String eduAcademySystem;
     private int eduCourseIndex;
     private EducationStage eduEducationStage;
     private int eduJourneyTime;
     private int eduEducationTime;
     private int eduDaysOfTravel;
+    private transient String legacyEduAcademySystem;
     private List<UUID> eduTagAlongs;
     private List<String> eduFailedApplications;
     private double trainingForceEducationTime;
@@ -601,7 +607,6 @@ public class Person implements ILocation {
         acquisitions = 0;
         eduHighestEducation = EducationLevel.EARLY_CHILDHOOD;
         eduAcademyName = null;
-        eduAcademySystem = null;
         eduCourseIndex = 0;
         eduEducationStage = EducationStage.NONE;
         eduJourneyTime = 0;
@@ -1722,8 +1727,8 @@ public class Person implements ILocation {
         this.setEduAcademySystem(null);
         this.setEduCourseIndex(0);
         this.setEduEducationStage(EducationStage.NONE);
-        this.setEduEducationTime(0);
         this.setEduJourneyTime(0);
+        this.setEduEducationTime(0);
         this.setEduDaysOfTravel(0);
 
         for (UUID tagAlongId : eduTagAlongs) {
@@ -2710,6 +2715,14 @@ public class Person implements ILocation {
         this.eduHighestEducation = eduHighestEducation;
     }
 
+    /**
+     * Returns an estimated journey time in days to or from the academy.
+     *
+     * <p>This value is a snapshot recorded at enrollment or journey-start and may not reflect the
+     * actual remaining travel time. The person's {@link AbstractLocation} (accessible via
+     * {@link #getCurrentLocation()}) holds the authoritative travel state including the live
+     * {@link mekhq.campaign.JumpPath}.</p>
+     */
     public int getEduJourneyTime() {
         return eduJourneyTime;
     }
@@ -2718,12 +2731,66 @@ public class Person implements ILocation {
         this.eduJourneyTime = eduJourneyTime;
     }
 
+    /**
+     * Returns an estimated count of days elapsed since the person began their current journey.
+     *
+     * <p>This counter is incremented each day during JOURNEY_TO_CAMPUS and JOURNEY_FROM_CAMPUS
+     * stages as a rough progress indicator. The person's {@link AbstractLocation} (accessible via
+     * {@link #getCurrentLocation()}) holds the authoritative travel state including the live
+     * {@link mekhq.campaign.JumpPath}.</p>
+     */
     public int getEduDaysOfTravel() {
         return eduDaysOfTravel;
     }
 
     public void setEduDaysOfTravel(final int eduDaysOfTravel) {
         this.eduDaysOfTravel = eduDaysOfTravel;
+    }
+
+    /**
+     * Increments the number of educational travel days by 1.
+     *
+     * <p>See {@link #getEduDaysOfTravel()} for caveats about accuracy.</p>
+     */
+    public void incrementEduDaysOfTravel() {
+        this.eduDaysOfTravel++;
+    }
+
+    /**
+     * Returns the ID of the planetary system where the person's academy campus is located.
+     *
+     * <p>The primary source is the location tree: this walks the person's parent chain to find
+     * the nearest {@link AcademyCampusLocation}, then returns the system ID from its parent {@link AbstractLocation}
+     * (typically a {@link mekhq.campaign.FixedLocation}).</p>
+     *
+     * <p>If no campus node is reachable in the tree — for example, during JOURNEY_FROM_CAMPUS,
+     * a local-academy transit before campus arrival, or when loading a pre-location-tree save file — this falls back to
+     * a transient value populated from the legacy {@code eduAcademySystem} XML tag.</p>
+     *
+     * @return the campus system ID, or {@code null} if not derivable from either source
+     */
+    public @Nullable String getEduAcademySystem() {
+        for (ILocation cursor = getParentLocation(); cursor != null; cursor = cursor.getParentLocation()) {
+            if (cursor instanceof AcademyCampusLocation) {
+                ILocation campusParent = cursor.getParentLocation();
+                if (campusParent instanceof AbstractLocation location) {
+                    PlanetarySystem system = location.getCurrentSystem();
+                    if (system != null) {
+                        return system.getId();
+                    }
+                }
+                return legacyEduAcademySystem;
+            }
+        }
+        return legacyEduAcademySystem;
+    }
+
+    public void setEduAcademySystem(final String academySystem) {
+        // The authoritative source is the location tree (see getEduAcademySystem()).
+        // This value is stored transiently as a fallback for callers that set the system
+        // before a travel CurrentLocation is established (e.g. test setup, enrollment).
+        // It is not persisted to XML.
+        this.legacyEduAcademySystem = academySystem;
     }
 
     public List<UUID> getEduTagAlongs() {
@@ -2746,27 +2813,12 @@ public class Person implements ILocation {
         eduFailedApplications.add(failedApplication);
     }
 
-    /**
-     * Increments the number educational travel days by 1.
-     */
-    public void incrementEduDaysOfTravel() {
-        this.eduDaysOfTravel++;
-    }
-
     public int getEduEducationTime() {
         return eduEducationTime;
     }
 
     public void setEduEducationTime(final int eduEducationTime) {
         this.eduEducationTime = eduEducationTime;
-    }
-
-    public String getEduAcademySystem() {
-        return eduAcademySystem;
-    }
-
-    public void setEduAcademySystem(final String eduAcademySystem) {
-        this.eduAcademySystem = eduAcademySystem;
     }
 
     public String getEduAcademyNameInSet() {
@@ -3629,10 +3681,6 @@ public class Person implements ILocation {
                 MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "eduFailedApplications");
             }
 
-            if (eduAcademySystem != null) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduAcademySystem", eduAcademySystem);
-            }
-
             if (eduAcademyNameInSet != null) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduAcademyNameInSet", eduAcademyNameInSet);
             }
@@ -4301,6 +4349,10 @@ public class Person implements ILocation {
                     person.eduJourneyTime = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("eduDaysOfTravel")) {
                     person.eduDaysOfTravel = MathUtility.parseInt(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("eduAcademySystem")) {
+                    // Legacy tag — academy system is now derived from the location tree.
+                    // Stored transiently so mid-journey persons on old saves can still function.
+                    person.legacyEduAcademySystem = wn2.getTextContent().trim();
                 } else if (nodeName.equalsIgnoreCase("eduTagAlongs")) {
                     if (nodeName.equalsIgnoreCase("eduTagAlongs")) {
                         NodeList uuidNodes = wn2.getChildNodes();
@@ -4329,8 +4381,6 @@ public class Person implements ILocation {
                             }
                         }
                     }
-                } else if (nodeName.equalsIgnoreCase("eduAcademySystem")) {
-                    person.eduAcademySystem = String.valueOf(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("eduAcademyName")) {
                     person.eduAcademyName = String.valueOf(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("eduAcademySet")) {
@@ -5757,6 +5807,68 @@ public class Person implements ILocation {
     }
 
     /**
+     * Prepares a skill check based on individually passed options.
+     *
+     * <p>This method creates a {@code SkillCheck} instance which calculates the target number
+     * for the skill check, based on the person's skill, aging effects, clan campaign rules, and the current date.</p>
+     *
+     * @param skillName         the name of the skill being checked, corresponding to a {@link SkillType}
+     * @param isUseAgingEffects if {@code true}, considers aging effects during the check
+     * @param isClanCampaign    if {@code true}, applies rules specific to clan campaigns
+     * @param date              the current date, used for time-dependent logic
+     *
+     * @return prepared skill check
+     */
+    public SkillCheck checkSkill(String skillName, boolean isUseAgingEffects, boolean isClanCampaign, LocalDate date) {
+        return new SkillCheck(this, skillName, isUseAgingEffects, isClanCampaign, date);
+    }
+
+    /**
+     * Prepares a skill check based on the campaign's options.
+     *
+     * <p>Automatically extracts aging effect setting, clan campaign status, and the current date from
+     * the provided {@link Campaign} context to calculate the target number.</p>
+     *
+     * @param skillName the name of the skill being checked, corresponding to a {@link SkillType}
+     * @param campaign  the current {@link Campaign} context
+     *
+     * @return prepared skill check
+     */
+    public SkillCheck checkSkill(String skillName, Campaign campaign) {
+        return new SkillCheck(this, skillName, campaign.getCampaignOptions().isUseAgeEffects(),
+              campaign.isClanCampaign(), campaign.getLocalDate());
+    }
+
+    /**
+     * Prepares an attribute check.
+     *
+     * <p>This method creates an {@link AttributeCheck} instance which calculates the target number
+     * for the attribute check.</p>
+     *
+     * @param attribute the {@link SkillAttribute} to be checked
+     *
+     * @return prepared attribute check
+     */
+    public AttributeCheck checkAttribute(SkillAttribute attribute) {
+        return new AttributeCheck(this, attribute);
+    }
+
+    /**
+     * Prepares a double attribute check.
+     *
+     * <p>This method creates an {@link AttributeCheck} instance which calculates the target number
+     * for the attribute check.</p>
+     *
+     * @param firstAttribute  first {@link SkillAttribute} to be checked
+     * @param secondAttribute second {@link SkillAttribute} to be checked
+     *
+     * @return prepared attribute check
+     */
+    public AttributeCheck checkAttributes(SkillAttribute firstAttribute, SkillAttribute secondAttribute) {
+        return new AttributeCheck(this, firstAttribute, secondAttribute);
+    }
+
+    /**
      * Calculates the cost to improve a specific skill, at a specified skill level, with an optional reasoning
      * multiplier.
      *
@@ -6043,6 +6155,15 @@ public class Person implements ILocation {
 
     public void changeCurrentEdge(final int amount) {
         atowAttributes.changeCurrentEdge(amount);
+    }
+
+    public void spendEdge() {
+        if (getCurrentEdge() > 0) {
+            atowAttributes.changeCurrentEdge(-1);
+            MekHQ.triggerEvent(new PersonChangedEvent(this));
+        } else {
+            LOGGER.error("Trying to spend edge, but it is at {}", getCurrentEdge(), new IllegalArgumentException());
+        }
     }
 
     /**
@@ -7536,6 +7657,15 @@ public class Person implements ILocation {
                      .collect(Collectors.toList());
     }
 
+    public boolean hasProstheticInjuryNoImplant(BodyLocation location) {
+        for (Injury injury : getInjuriesByLocation(location)) {
+            if (injury.getSubType().isProsthetic()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public List<Injury> getNonPermanentInjuries() {
         return injuries.stream()
                      .filter(i -> !i.isPermanent())
@@ -7945,13 +8075,28 @@ public class Person implements ILocation {
     }
 
     @Override
-    public LocationNode getLocationNode() {
+    public @Nonnull LocationNode getLocationNode() {
         return locationNode;
     }
 
     @Override
     public java.util.Set<Person> fetchPersonnelAtLocation() {
         return java.util.Set.of(this);
+    }
+
+    public List<Skill> getInProgressSkills() {
+        Collection<Skill> allTrainedSkills = skills.getSkills();
+        List<Skill> inProgressSkills = new ArrayList<>();
+
+        for (Skill skill : allTrainedSkills) {
+            if (skill.getXpProgress() > 0) {
+                inProgressSkills.add(skill);
+            }
+        }
+
+        inProgressSkills.sort(Comparator.comparing(s -> s.getType().getName()));
+
+        return inProgressSkills;
     }
 
     public static class PersonUnitRef extends Unit {
@@ -9274,5 +9419,20 @@ public class Person implements ILocation {
 
     public void setAdvancedAsTechContribution(int contribution) {
         advancedAsTechContribution = contribution;
+    }
+
+    @Override
+    public boolean setParent(ILocation parent) {
+        ILocation oldParent = getParentLocation();
+        if (ILocation.super.setParent(parent)) {
+            if (oldParent instanceof Personnel personnel) {
+                personnel.remove(getId());
+            }
+            if (parent instanceof Personnel personnel) {
+                personnel.put(getId(), this);
+            }
+            return true;
+        }
+        return false;
     }
 }

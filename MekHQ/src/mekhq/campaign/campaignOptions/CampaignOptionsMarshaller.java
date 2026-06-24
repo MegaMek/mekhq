@@ -267,6 +267,7 @@ public class CampaignOptionsMarshaller {
         // region General Personnel
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useTactics", campaignOptions.isUseTactics());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useInitiativeBonus", campaignOptions.isUseInitiativeBonus());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSensibleTactics", campaignOptions.isUseSensibleTactics());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useToughness", campaignOptions.isUseToughness());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomToughness", campaignOptions.isUseRandomToughness());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useArtillery", campaignOptions.isUseArtillery());

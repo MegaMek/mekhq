@@ -34,12 +34,13 @@
 package mekhq.campaign;
 
 import static megamek.common.compute.Compute.randomInt;
-import static mekhq.campaign.HumanResources.isUsingLegacyPersonnelMarket;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
-import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -47,7 +48,10 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.LocationChangedEvent;
 import mekhq.campaign.events.TransitCompleteEvent;
 import mekhq.campaign.events.TransitStatusChangedEvent;
-import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
+import mekhq.campaign.location.ILocation;
+import mekhq.campaign.location.IPlace;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -71,6 +75,37 @@ public class CurrentLocation extends AbstractLocation {
     private double transitTime;
     // JumpShip at nadir or zenith
     private boolean jumpZenith;
+
+    // Populated during XML load; drained by CampaignXmlParser to reconnect ILocations after load.
+    private transient List<UUID>    pendingPersonIds = new ArrayList<>();
+    private transient List<UUID>    pendingUnitIds   = new ArrayList<>();
+    private transient List<Integer> pendingPartIds   = new ArrayList<>();
+
+    /** Returns true if {@code personId} is in the pending reconnection list (non-destructive). */
+    public boolean containsPendingPersonId(UUID personId) {
+        return pendingPersonIds.contains(personId);
+    }
+
+    /** Returns and clears the person UUIDs read from XML, for use during post-load reconnection. */
+    public List<UUID> drainPendingPersonIds() {
+        List<UUID> ids = new ArrayList<>(pendingPersonIds);
+        pendingPersonIds.clear();
+        return ids;
+    }
+
+    /** Returns and clears the unit UUIDs read from XML, for use during post-load reconnection. */
+    public List<UUID> drainPendingUnitIds() {
+        List<UUID> ids = new ArrayList<>(pendingUnitIds);
+        pendingUnitIds.clear();
+        return ids;
+    }
+
+    /** Returns and clears the part IDs read from XML, for use during post-load reconnection. */
+    public List<Integer> drainPendingPartIds() {
+        List<Integer> ids = new ArrayList<>(pendingPartIds);
+        pendingPartIds.clear();
+        return ids;
+    }
 
     public CurrentLocation() {
         this(null, 0d);
@@ -188,7 +223,7 @@ public class CurrentLocation extends AbstractLocation {
      * Check for a jump path and if found, do whatever needs to be done to move forward
      */
     @Override
-    public void newDay(Campaign campaign) {
+    public void newDay(Campaign campaign, boolean isSilentProcessing) {
         final boolean wasTraveling = !isOnPlanet();
         LocalDate today = campaign.getLocalDate();
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
@@ -199,11 +234,13 @@ public class CurrentLocation extends AbstractLocation {
         double neededRechargeTime = currentSystem.getRechargeTime(today, campaign.isUseCommandCircuit());
         double usedRechargeTime = Math.min(hours, neededRechargeTime - rechargeTime);
         if (usedRechargeTime > 0) {
-            campaign.addReport(GENERAL, "JumpShips spent " +
-                                              (Math.round(100.0 * usedRechargeTime) / 100.0) +
-                                              " hours recharging drives");
+            if (!isSilentProcessing) {
+                campaign.addReport(GENERAL, "JumpShips spent " +
+                                                  (Math.round(100.0 * usedRechargeTime) / 100.0) +
+                                                  " hours recharging drives");
+            }
             rechargeTime += usedRechargeTime;
-            if (rechargeTime >= neededRechargeTime) {
+            if (rechargeTime >= neededRechargeTime && !isSilentProcessing) {
                 campaign.addReport(GENERAL, "JumpShip drives fully charged");
             }
         }
@@ -217,11 +254,13 @@ public class CurrentLocation extends AbstractLocation {
             double usedTransitTime = Math.min(hours, 24.0 * (currentSystem.getTimeToJumpPoint(1.0) - transitTime));
             if (usedTransitTime > 0) {
                 transitTime += usedTransitTime / 24.0;
-                campaign.addReport(GENERAL, "DropShips spent " +
-                                                  (Math.round(100.0 * usedTransitTime) / 100.0) +
-                                                  " hours in transit to jump point");
-                if (isAtJumpPoint()) {
-                    campaign.addReport(GENERAL, "Jump point reached");
+                if (!isSilentProcessing) {
+                    campaign.addReport(GENERAL, "DropShips spent " +
+                                                      (Math.round(100.0 * usedTransitTime) / 100.0) +
+                                                      " hours in transit to jump point");
+                    if (isAtJumpPoint()) {
+                        campaign.addReport(GENERAL, "Jump point reached");
+                    }
                 }
             }
             if (isAtJumpPoint() && (rechargeTime >= neededRechargeTime)) {
@@ -229,7 +268,9 @@ public class CurrentLocation extends AbstractLocation {
                 if (campaignOptions.isUseAbilities()) {
                     checkForTransitDisorientationSyndrome(campaign, campaignOptions);
                 }
-                campaign.addReport(GENERAL, "Jumping to " + jumpPath.get(1).getPrintableName(today));
+                if (!isSilentProcessing) {
+                    campaign.addReport(GENERAL, "Jumping to " + jumpPath.get(1).getPrintableName(today));
+                }
                 currentSystem = jumpPath.get(1);
                 jumpZenith = pickJumpPoint(today);
                 jumpPath.removeFirstSystem();
@@ -242,11 +283,13 @@ public class CurrentLocation extends AbstractLocation {
                 // if there are hours remaining, then begin recharging jump drive
                 usedRechargeTime = Math.min(hours, neededRechargeTime - rechargeTime);
                 if (usedRechargeTime > 0) {
-                    campaign.addReport(GENERAL, "JumpShips spent " +
-                                                      (Math.round(100.0 * usedRechargeTime) / 100.0) +
-                                                      " hours recharging drives");
+                    if (!isSilentProcessing) {
+                        campaign.addReport(GENERAL, "JumpShips spent " +
+                                                          (Math.round(100.0 * usedRechargeTime) / 100.0) +
+                                                          " hours recharging drives");
+                    }
                     rechargeTime += usedRechargeTime;
-                    if (rechargeTime >= neededRechargeTime) {
+                    if (rechargeTime >= neededRechargeTime && !isSilentProcessing) {
                         campaign.addReport(GENERAL, "JumpShip drives fully charged");
                     }
                 }
@@ -255,13 +298,17 @@ public class CurrentLocation extends AbstractLocation {
         // if we are now at the final jump point, then lets begin in-system transit
         if (jumpPath.size() == 1) {
             double usedTransitTime = Math.min(hours, 24.0 * transitTime);
-            campaign.addReport(GENERAL, "DropShips spent " +
-                                              (Math.round(100.0 * usedTransitTime) / 100.0) +
-                                              " hours transiting into system");
+            if (!isSilentProcessing) {
+                campaign.addReport(GENERAL, "DropShips spent " +
+                                                  (Math.round(100.0 * usedTransitTime) / 100.0) +
+                                                  " hours transiting into system");
+            }
             transitTime -= usedTransitTime / 24.0;
             if (transitTime <= 0) {
-                campaign.addReport(GENERAL,
-                      jumpPath.getLastSystem().getPrintableName(campaign.getLocalDate()) + " reached.");
+                if (!isSilentProcessing) {
+                    campaign.addReport(GENERAL,
+                          jumpPath.getLastSystem().getPrintableName(campaign.getLocalDate()) + " reached.");
+                }
                 // we are here!
                 transitTime = 0;
                 jumpPath = null;
@@ -273,29 +320,13 @@ public class CurrentLocation extends AbstractLocation {
             MekHQ.triggerEvent(new TransitStatusChangedEvent(this));
         }
 
-        // If we were previously traveling and now aren't, we should check to see if we have arrived at a contract
-        // system earlier than necessary. And, if appropriate, trigger inoculation prompts and activate mothballed
-        // units
+        // If we were previously traveling and now aren't, notify each IPlace child that it has
+        // arrived. The IPlace implementation handles place-specific arrival logic.
         if (wasTraveling && isOnPlanet()) {
-            // This should be before inoculations so that we can correctly read the TO&E
-            if (!campaign.getAutomatedMothballUnits().isEmpty()) {
-                performAutomatedActivation(campaign);
-            }
-
-            if (campaignOptions.isUseRandomDiseases() && campaignOptions.isUseAlternativeAdvancedMedical()) {
-                checkForDiseaseOrBioweaponOutbreaks(campaign, today);
-            }
-
-            if (campaignOptions.isUseRandomDiseases() && campaignOptions.isUseAlternativeAdvancedMedical()) {
-                Inoculations.triggerInoculationPrompt(campaign, false);
-            }
-
-            testForEarlyArrival(campaign);
-
-            // We've just stopped traveling, so we should see if there are any local applicants.
-            if (!isUsingLegacyPersonnelMarket(campaignOptions)) {
-                campaign.refreshApplicants(true);
-                CampaignNewDayManager.showRarePersonnelDialog(campaign, false);
+            for (ILocation child : getChildLocations()) {
+                if (child instanceof IPlace place) {
+                    place.onArrival(campaign, isSilentProcessing);
+                }
             }
         }
     }
@@ -308,6 +339,15 @@ public class CurrentLocation extends AbstractLocation {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "jumpZenith", jumpZenith);
         if (jumpPath != null) {
             jumpPath.writeToXML(pw, indent);
+        }
+        for (ILocation child : getChildLocations()) {
+            if (child instanceof mekhq.campaign.personnel.Person person) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personId", person.getId().toString());
+            } else if (child instanceof Unit unit) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitId", unit.getId().toString());
+            } else if (child instanceof Part part) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "partId", String.valueOf(part.getId()));
+            }
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "location");
     }
@@ -343,6 +383,12 @@ public class CurrentLocation extends AbstractLocation {
                     retVal.jumpZenith = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("jumpPath")) {
                     retVal.jumpPath = JumpPath.generateInstanceFromXML(wn2, c);
+                } else if (wn2.getNodeName().equalsIgnoreCase("personId")) {
+                    retVal.pendingPersonIds.add(UUID.fromString(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("unitId")) {
+                    retVal.pendingUnitIds.add(UUID.fromString(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("partId")) {
+                    retVal.pendingPartIds.add(Integer.parseInt(wn2.getTextContent().trim()));
                 }
             }
         } catch (Exception ex) {

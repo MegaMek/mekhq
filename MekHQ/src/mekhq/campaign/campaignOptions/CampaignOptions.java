@@ -228,6 +228,7 @@ public class CampaignOptions {
     // General Personnel
     private boolean useTactics;
     private boolean useInitiativeBonus;
+    private boolean useSensibleTactics;
     private boolean useToughness;
     private boolean useRandomToughness;
     private boolean useArtillery;
@@ -848,6 +849,7 @@ public class CampaignOptions {
         // General Personnel
         setUseTactics(false);
         setUseInitiativeBonus(false);
+        useSensibleTactics = false;
         setUseToughness(false);
         setUseRandomToughness(false);
         setUseArtillery(false);
@@ -1652,6 +1654,14 @@ public class CampaignOptions {
 
     public void setUseInitiativeBonus(final boolean useInitiativeBonus) {
         this.useInitiativeBonus = useInitiativeBonus;
+    }
+
+    public boolean isUseSensibleTactics() {
+        return useSensibleTactics;
+    }
+
+    public void setUseSensibleTactics(final boolean useSensibleTactics) {
+        this.useSensibleTactics = useSensibleTactics;
     }
 
     public boolean isUseToughness() {

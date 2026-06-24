@@ -33,14 +33,16 @@
 
 package mekhq.campaign.location;
 
-import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import jakarta.annotation.Nonnull;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.AbstractLocation;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.JumpPath;
+import mekhq.campaign.Personnel;
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
@@ -72,7 +74,7 @@ public interface ILocation {
     Planet NO_PLANET = null;
     JumpPath NO_JUMP_PATH = null;
 
-    @Nullable
+    @Nonnull
     LocationNode getLocationNode();
 
     default boolean hasLocationNode() {
@@ -261,7 +263,7 @@ public interface ILocation {
         if (!hasLocationNode() || !parent.hasLocationNode()) {
             return false;
         }
-        if (wouldCreateCycle(getLocationNode(), parent.getLocationNode())) {
+        if (LocationNode.wouldCreateCycle(getLocationNode(), parent.getLocationNode())) {
             return false;
         }
         return findRoot(parent.getLocationNode()).getLocatable() instanceof AbstractLocation;
@@ -318,7 +320,44 @@ public interface ILocation {
         return child.setParent(this);
     }
 
-    /** Walks up via {@link LocationNode#getParent()} until reaching the root node. */
+    /**
+     * Returns {@code true} if this location has a parent in the location tree.
+     *
+     * @return {@code true} if this location's node has a parent node
+     */
+    default boolean isParented() {
+        return hasLocationNode() && getLocationNode().getParent() != null;
+    }
+
+    /**
+     * Returns the parent {@link ILocation} in the location tree, or {@code null} if this location has no parent (it is
+     * a root node).
+     *
+     * @return the parent locatable, or {@code null}
+     */
+    @Nullable
+    default ILocation getParentLocation() {
+        if (!isParented()) {
+            return null;
+        }
+        return getLocationNode().getParent().getLocatable();
+    }
+
+    /**
+     * Returns an immutable snapshot of this location's direct children as {@link ILocation} instances.
+     *
+     * @return the set of child locatables; empty if this location has no node or no children
+     */
+    default Set<ILocation> getChildLocations() {
+        if (!hasLocationNode()) {
+            return Set.of();
+        }
+        return getLocationNode().getChildren().stream()
+                     .map(LocationNode::getLocatable)
+                     .collect(Collectors.toUnmodifiableSet());
+    }
+
+    /** Walks up via parent until reaching the root node. */
     private static LocationNode findRoot(LocationNode node) {
         while (node.getParent() != null) {
             node = node.getParent();
@@ -327,23 +366,31 @@ public interface ILocation {
     }
 
     /**
-     * Returns {@code true} if {@code node} appears anywhere in the ancestor chain of {@code potentialAncestor}, which
-     * would indicate that making {@code potentialAncestor} an ancestor of {@code node} would create a cycle.
+     * Walks up the {@link LocationNode} tree and returns the nearest {@link IPlace} ancestor, or
+     * {@code null} if no IPlace ancestor exists.
      */
-    private static boolean wouldCreateCycle(LocationNode node, LocationNode potentialAncestor) {
-        LocationNode cursor = potentialAncestor;
-        while (cursor != null) {
-            if (cursor == node) {
-                return true;
-            }
-            cursor = cursor.getParent();
-        }
-        return false;
+    @Nullable
+    default IPlace getPlace() {
+        return findPlace(hasLocationNode() ? getLocationNode() : null);
     }
 
+    /**
+     * Walks up from {@code node} (inclusive) and returns the nearest {@link IPlace}, or
+     * {@code null} if the chain contains none.
+     */
+    @Nullable
+    static IPlace findPlace(@Nullable LocationNode node) {
+        while (node != null) {
+            if (node.getLocatable() instanceof IPlace place) {
+                return place;
+            }
+            node = node.getParent();
+        }
+        return null;
+    }
 
     /**
-     * Returns the {@link Hangar} owned by the nearest {@link IPlace} ancestor of this location, or
+     * Returns the {@link Hangar} owned by the nearest {@link mekhq.campaign.location.IPlace} ancestor of this location, or
      * {@code null} if no such ancestor exists or it does not own a hangar.
      */
     @Nullable
@@ -355,7 +402,7 @@ public interface ILocation {
     }
 
     /**
-     * Returns the {@link Warehouse} owned by the nearest {@link IPlace} ancestor of this location,
+     * Returns the {@link Warehouse} owned by the nearest {@link mekhq.campaign.location.IPlace} ancestor of this location,
      * or {@code null} if no such ancestor exists or it does not own a warehouse.
      */
     @Nullable
@@ -367,11 +414,11 @@ public interface ILocation {
     }
 
     /**
-     * Returns the personnel roster owned by the nearest {@link IPlace} ancestor of this location,
+     * Returns the personnel roster owned by the nearest {@link mekhq.campaign.location.IPlace} ancestor of this location,
      * or {@code null} if no such ancestor exists or it does not own a personnel roster.
      */
     @Nullable
-    default Collection<Person> getPersonnel() {
+    default Personnel getPersonnel() {
         if (!hasLocationNode() || getLocationNode().getParent() == null) {
             return null;
         }
@@ -404,4 +451,19 @@ public interface ILocation {
                      .flatMap(loc -> loc.getLocatable().fetchPartsAtLocation().stream())
                      .collect(Collectors.toSet());
     }
+
+    /**
+     * Processes arriving travel nodes parented to this location.
+     *
+     * <p>For each completed {@link mekhq.campaign.CurrentLocation} child (one whose jump path has
+     * finished and which is on-planet), implementations should move all carried persons, units, and
+     * parts to the appropriate destination containers and call
+     * {@link LocationDispatch#removeTravelNode} to detach and de-register the node.</p>
+     *
+     * <p>The default implementation is a no-op; location types that host arriving travel nodes
+     * should override it.</p>
+     *
+     * @param campaign the active campaign
+     */
+    default void processArrivals(Campaign campaign) {}
 }

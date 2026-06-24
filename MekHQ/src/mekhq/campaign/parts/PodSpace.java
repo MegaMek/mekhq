@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import jakarta.annotation.Nonnull;
 import megamek.common.annotations.Nullable;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.units.Aero;
@@ -48,6 +49,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.missing.MissingPart;
@@ -68,6 +70,7 @@ public class PodSpace implements IPartWork {
     protected Unit unit;
     protected int location;
     protected List<Integer> childPartIds = new ArrayList<>();
+    private final LocationNode locationNode = new LocationNode(this);
 
     protected Person tech;
     protected int timeSpent = 0;
@@ -305,6 +308,11 @@ public class PodSpace implements IPartWork {
     }
 
     @Override
+    public @Nonnull LocationNode getLocationNode() {
+        return locationNode;
+    }
+
+    @Override
     public Warehouse getWarehouse() {
         return campaign.getWarehouse();
     }
@@ -458,7 +466,7 @@ public class PodSpace implements IPartWork {
                         replacements++;
                     } else {
                         //FIXME: This won't work if there are multiple items of the same type that need replacing and the number on order or in transit is less than the required number
-                        PartInventory inventories = campaign.getPartInventory(missing.getNewPart());
+                        PartInventory inventories = missing.getPartInventory(missing.getNewPart());
                         if (inventories.getTransit() > 0) {
                             inTransit++;
                         }

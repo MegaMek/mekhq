@@ -96,6 +96,17 @@ public interface IAcquisitionWork extends IWork {
         return getBuyCost().multipliedBy(getQuantity());
     }
 
+    /**
+     * Infantry weapons and ammo are ordered for the whole platoon at once. When this is true, a single successful
+     * acquisition roll supplies the entire remaining {@link #getQuantity() quantity} (and counts as just one
+     * acquisition toward the daily limit), instead of rolling once per individual weapon or clip.
+     *
+     * @return true if this acquisition is filled as a single bulk order
+     */
+    default boolean isBulkAcquisition() {
+        return false;
+    }
+
     boolean isIntroducedBy(int year, boolean clan, Faction techFaction);
 
     boolean isExtinctIn(int year, boolean clan, Faction techFaction);

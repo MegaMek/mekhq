@@ -94,7 +94,13 @@ public class UnitTableModel extends DataTableModel<Unit> {
     public static final int COL_MODE = 21;
     public static final int COL_SHIP_TRANSPORT = 22;
     public static final int COL_TAC_TRANSPORT = 23;
-    public static final int N_COL = 24;
+    public static final int COL_LOCATION_SYSTEM = 24;
+    public static final int COL_LOCATION_PLANET = 25;
+    public static final int COL_LOCATION_NAME = 26;
+    public static final int COL_DESTINATION_SYSTEM = 27;
+    public static final int COL_DESTINATION_PLANET = 28;
+    public static final int COL_DESTINATION_NAME = 29;
+    public static final int N_COL = 30;
 
     private final Campaign campaign;
     //endregion Variable Declarations
@@ -136,6 +142,12 @@ public class UnitTableModel extends DataTableModel<Unit> {
             case COL_MODE -> "Mode";
             case COL_SHIP_TRANSPORT -> "Ship Transport";
             case COL_TAC_TRANSPORT -> "Tactical Transport";
+            case COL_LOCATION_NAME -> getTextAt(RESOURCE_BUNDLE, "UnitTableModel.col.locationName");
+            case COL_LOCATION_SYSTEM -> getTextAt(RESOURCE_BUNDLE, "UnitTableModel.col.locationSystem");
+            case COL_LOCATION_PLANET -> getTextAt(RESOURCE_BUNDLE, "UnitTableModel.col.locationPlanet");
+            case COL_DESTINATION_NAME -> getTextAt(RESOURCE_BUNDLE, "UnitTableModel.col.destinationName");
+            case COL_DESTINATION_SYSTEM -> getTextAt(RESOURCE_BUNDLE, "UnitTableModel.col.destinationSystem");
+            case COL_DESTINATION_PLANET -> getTextAt(RESOURCE_BUNDLE, "UnitTableModel.col.destinationPlanet");
             default -> "?";
         };
     }
@@ -146,6 +158,9 @@ public class UnitTableModel extends DataTableModel<Unit> {
             case COL_TYPE, COL_WEIGHT_CLASS, COL_SITE -> 50;
             case COL_COST, COL_STATUS, COL_MODE, COL_CREW -> 40;
             case COL_PARTS -> 10;
+            case COL_LOCATION_NAME, COL_DESTINATION_NAME -> 130;
+            case COL_LOCATION_SYSTEM, COL_LOCATION_PLANET,
+                  COL_DESTINATION_SYSTEM, COL_DESTINATION_PLANET -> 100;
             default -> 20;
         };
     }
@@ -347,7 +362,11 @@ public class UnitTableModel extends DataTableModel<Unit> {
             case COL_QUALITY -> unit.getQualityName();
             case COL_PILOT -> (unit.getCommander() != null) ? unit.getCommander().getHTMLTitle() : "-";
             case COL_FORCE -> {
-                Formation formation = unit.getCampaign().getFormation(unit.getFormationId());
+                Campaign unitCampaign = unit.getCampaign();
+                if (unitCampaign == null) {
+                    yield "-";
+                }
+                Formation formation = unitCampaign.getFormation(unit.getFormationId());
                 yield (formation != null) ? formation.getFullName() : "-";
             }
             case COL_CREW -> {
@@ -387,6 +406,12 @@ public class UnitTableModel extends DataTableModel<Unit> {
                                              unit.getTransportShipAssignment().getTransportShip().getName() : "-";
             case COL_TAC_TRANSPORT -> (unit.getTacticalTransportAssignment() != null) ?
                                             unit.getTacticalTransportAssignment().getTransport().getName() : "-";
+            case COL_LOCATION_SYSTEM -> LocationDisplay.getLocationSystem(unit, campaign.getLocalDate(), campaign);
+            case COL_LOCATION_PLANET -> LocationDisplay.getLocationPlanet(unit, campaign.getLocalDate(), campaign);
+            case COL_LOCATION_NAME -> LocationDisplay.getLocationName(unit, campaign, campaign.getLocalDate());
+            case COL_DESTINATION_SYSTEM -> LocationDisplay.getDestinationSystem(unit, campaign.getLocalDate());
+            case COL_DESTINATION_PLANET -> LocationDisplay.getDestinationPlanet(unit, campaign.getLocalDate());
+            case COL_DESTINATION_NAME -> LocationDisplay.getDestinationName(unit, campaign, campaign.getLocalDate());
             default -> "?";
         };
     }
@@ -415,7 +440,7 @@ public class UnitTableModel extends DataTableModel<Unit> {
 
             // Get base tooltip and potentially append all color reasons for key columns
             String tooltip = getTooltip(actualRow, actualCol);
-            if (isColorTooltipColumn(actualCol)) {
+            if (isColorTooltipColumn(actualCol) && u.getCampaign() != null) {
                 List<String> colorReasonKeys = u.getColorReasonKeys();
                 if (!colorReasonKeys.isEmpty()) {
                     StringBuilder colorReasons = new StringBuilder();
@@ -437,7 +462,7 @@ public class UnitTableModel extends DataTableModel<Unit> {
             }
             setToolTipText(tooltip);
 
-            if (!isSelected) {
+            if (!isSelected && u.getCampaign() != null) {
                 setForeground(u.determineForegroundColor("Table"));
                 setBackground(u.determineBackgroundColor("Table"));
             }

@@ -36,6 +36,7 @@ import java.io.PrintWriter;
 import java.util.LinkedHashMap;
 import java.util.UUID;
 
+import jakarta.annotation.Nonnull;
 import megamek.Version;
 import megamek.logging.MMLogger;
 import mekhq.campaign.location.ILocation;
@@ -58,7 +59,7 @@ public class Personnel extends LinkedHashMap<UUID, Person> implements ILocation 
     private final LocationNode locationNode = new LocationNode(this);
 
     @Override
-    public LocationNode getLocationNode() {
+    public @Nonnull LocationNode getLocationNode() {
         return locationNode;
     }
 

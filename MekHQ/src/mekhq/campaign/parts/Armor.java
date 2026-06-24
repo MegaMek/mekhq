@@ -216,7 +216,7 @@ public class Armor extends Part implements IAcquisitionWork {
                 }
             }
 
-            PartInventory inventories = campaign.getPartInventory(getNewPart());
+            PartInventory inventories = getPartInventory(getNewPart());
             String orderTransitString = inventories.getTransitOrderedDetails();
             if (!orderTransitString.isEmpty()) {
                 toReturn.append(spanOpeningWithCustomColor(getWarningColor()))
@@ -531,7 +531,7 @@ public class Armor extends Part implements IAcquisitionWork {
         toReturn += ">";
         toReturn += "<b>" + getAcquisitionDisplayName() + "</b> " + getAcquisitionBonus() + "<br/>";
         toReturn += getAcquisitionExtraDesc() + "<br/>";
-        PartInventory inventories = campaign.getPartInventory(getAcquisitionPart());
+        PartInventory inventories = getPartInventory(getAcquisitionPart());
         toReturn += inventories.getTransitOrderedDetails() + "<br/>";
         toReturn += adjustCostsForCampaignOptions(getStickerPrice()).toAmountAndSymbolString() + "<br/>";
         toReturn += "</font></html>";

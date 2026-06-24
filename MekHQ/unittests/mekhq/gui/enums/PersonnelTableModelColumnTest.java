@@ -32,729 +32,48 @@
  */
 package mekhq.gui.enums;
 
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-import java.util.ResourceBundle;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.SortOrder;
 import javax.swing.SwingConstants;
 
-import megamek.common.util.sorter.NaturalOrderComparator;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.gui.sorter.AttributeScoreSorter;
-import mekhq.gui.sorter.BonusSorter;
-import mekhq.gui.sorter.DateStringComparator;
-import mekhq.gui.sorter.EducationLevelSorter;
-import mekhq.gui.sorter.FormattedNumberSorter;
-import mekhq.gui.sorter.IntegerStringSorter;
-import mekhq.gui.sorter.LevelSorter;
-import mekhq.gui.sorter.PersonRankStringSorter;
-import mekhq.gui.sorter.ReasoningSorter;
+import mekhq.campaign.CurrentLocation;
+import mekhq.campaign.FixedLocation;
+import mekhq.campaign.JumpPath;
+import mekhq.campaign.Personnel;
+import mekhq.campaign.base.PlayerBase;
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.location.AcademyCampusLocation;
+import mekhq.campaign.location.ILocation;
+import mekhq.campaign.location.LocationNode;
+import mekhq.campaign.market.PersonnelMarket;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.PlanetarySystem;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 public class PersonnelTableModelColumnTest {
     //region Variable Declarations
     private static final PersonnelTableModelColumn[] columns = PersonnelTableModelColumn.values();
 
-    private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
-          MekHQ.getMHQOptions().getLocale());
-    //endregion Variable Declarations
-
-    //region Boolean Comparison Methods
-    @Test
-    public void testIsRank() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.RANK) {
-                assertTrue(personnelTableModelColumn.isRank());
-            } else {
-                assertFalse(personnelTableModelColumn.isRank());
-            }
-        }
-    }
-
-    @Test
-    public void testIsFirstName() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.FIRST_NAME) {
-                assertTrue(personnelTableModelColumn.isFirstName());
-            } else {
-                assertFalse(personnelTableModelColumn.isFirstName());
-            }
-        }
-    }
-
-    @Test
-    public void testIsLastName() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.LAST_NAME) {
-                assertTrue(personnelTableModelColumn.isLastName());
-            } else {
-                assertFalse(personnelTableModelColumn.isLastName());
-            }
-        }
-    }
-
-    @Test
-    public void testIsPreNominal() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.PRE_NOMINAL) {
-                assertTrue(personnelTableModelColumn.isPreNominal());
-            } else {
-                assertFalse(personnelTableModelColumn.isPreNominal());
-            }
-        }
-    }
-
-    @Test
-    public void testIsGivenName() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.GIVEN_NAME) {
-                assertTrue(personnelTableModelColumn.isGivenName());
-            } else {
-                assertFalse(personnelTableModelColumn.isGivenName());
-            }
-        }
-    }
-
-    @Test
-    public void testIsSurname() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.SURNAME) {
-                assertTrue(personnelTableModelColumn.isSurname());
-            } else {
-                assertFalse(personnelTableModelColumn.isSurname());
-            }
-        }
-    }
-
-    @Test
-    public void testIsBloodname() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.BLOODNAME) {
-                assertTrue(personnelTableModelColumn.isBloodname());
-            } else {
-                assertFalse(personnelTableModelColumn.isBloodname());
-            }
-        }
-    }
-
-    @Test
-    public void testIsPostNominal() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.POST_NOMINAL) {
-                assertTrue(personnelTableModelColumn.isPostNominal());
-            } else {
-                assertFalse(personnelTableModelColumn.isPostNominal());
-            }
-        }
-    }
-
-    @Test
-    public void testIsCallsign() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.CALLSIGN) {
-                assertTrue(personnelTableModelColumn.isCallsign());
-            } else {
-                assertFalse(personnelTableModelColumn.isCallsign());
-            }
-        }
-    }
-
-    @Test
-    public void testIsAge() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.AGE) {
-                assertTrue(personnelTableModelColumn.isAge());
-            } else {
-                assertFalse(personnelTableModelColumn.isAge());
-            }
-        }
-    }
-
-    @Test
-    public void testIsPersonnelStatus() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.PERSONNEL_STATUS) {
-                assertTrue(personnelTableModelColumn.isPersonnelStatus());
-            } else {
-                assertFalse(personnelTableModelColumn.isPersonnelStatus());
-            }
-        }
-    }
-
-    @Test
-    public void testIsGender() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.GENDER) {
-                assertTrue(personnelTableModelColumn.isGender());
-            } else {
-                assertFalse(personnelTableModelColumn.isGender());
-            }
-        }
-    }
-
-    @Test
-    public void testIsSkillLevel() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.SKILL_LEVEL) {
-                assertTrue(personnelTableModelColumn.isSkillLevel());
-            } else {
-                assertFalse(personnelTableModelColumn.isSkillLevel());
-            }
-        }
-    }
-
-    @Test
-    public void testIsPersonnelRole() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.PERSONNEL_ROLE) {
-                assertTrue(personnelTableModelColumn.isPersonnelRole());
-            } else {
-                assertFalse(personnelTableModelColumn.isPersonnelRole());
-            }
-        }
-    }
-
-    @Test
-    public void testIsUnitAssignment() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.UNIT_ASSIGNMENT) {
-                assertTrue(personnelTableModelColumn.isUnitAssignment());
-            } else {
-                assertFalse(personnelTableModelColumn.isUnitAssignment());
-            }
-        }
-    }
-
-    @Test
-    public void testIsForce() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.FORCE) {
-                assertTrue(personnelTableModelColumn.isForce());
-            } else {
-                assertFalse(personnelTableModelColumn.isForce());
-            }
-        }
-    }
-
-    @Test
-    public void testIsDeployed() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.DEPLOYED) {
-                assertTrue(personnelTableModelColumn.isDeployed());
-            } else {
-                assertFalse(personnelTableModelColumn.isDeployed());
-            }
-        }
-    }
-
-    @Test
-    public void testIsMek() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.MEK) {
-                assertTrue(personnelTableModelColumn.isMek());
-            } else {
-                assertFalse(personnelTableModelColumn.isMek());
-            }
-        }
-    }
-
-    @Test
-    public void testIsGroundVehicle() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.GROUND_VEHICLE) {
-                assertTrue(personnelTableModelColumn.isGroundVehicle());
-            } else {
-                assertFalse(personnelTableModelColumn.isGroundVehicle());
-            }
-        }
-    }
-
-    @Test
-    public void testIsNavalVehicle() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.NAVAL_VEHICLE) {
-                assertTrue(personnelTableModelColumn.isNavalVehicle());
-            } else {
-                assertFalse(personnelTableModelColumn.isNavalVehicle());
-            }
-        }
-    }
-
-    @Test
-    public void testIsVTOL() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.VTOL) {
-                assertTrue(personnelTableModelColumn.isVTOL());
-            } else {
-                assertFalse(personnelTableModelColumn.isVTOL());
-            }
-        }
-    }
-
-    @Test
-    public void testIsAerospace() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.AEROSPACE) {
-                assertTrue(personnelTableModelColumn.isAerospace());
-            } else {
-                assertFalse(personnelTableModelColumn.isAerospace());
-            }
-        }
-    }
-
-    @Test
-    public void testIsConventionalAircraft() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.CONVENTIONAL_AIRCRAFT) {
-                assertTrue(personnelTableModelColumn.isConventionalAircraft());
-            } else {
-                assertFalse(personnelTableModelColumn.isConventionalAircraft());
-            }
-        }
-    }
-
-    @Test
-    public void testIsVessel() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.VESSEL) {
-                assertTrue(personnelTableModelColumn.isVessel());
-            } else {
-                assertFalse(personnelTableModelColumn.isVessel());
-            }
-        }
-    }
-
-    @Test
-    public void testIsBattleArmour() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.BATTLE_ARMOUR) {
-                assertTrue(personnelTableModelColumn.isBattleArmour());
-            } else {
-                assertFalse(personnelTableModelColumn.isBattleArmour());
-            }
-        }
-    }
-
-    @Test
-    public void testIsSmallArms() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.SMALL_ARMS) {
-                assertTrue(personnelTableModelColumn.isSmallArms());
-            } else {
-                assertFalse(personnelTableModelColumn.isSmallArms());
-            }
-        }
-    }
-
-    @Test
-    public void testIsAntiMek() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.ANTI_MEK) {
-                assertTrue(personnelTableModelColumn.isAntiMek());
-            } else {
-                assertFalse(personnelTableModelColumn.isAntiMek());
-            }
-        }
-    }
-
-    @Test
-    public void testIsArtillery() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.ARTILLERY) {
-                assertTrue(personnelTableModelColumn.isArtillery());
-            } else {
-                assertFalse(personnelTableModelColumn.isArtillery());
-            }
-        }
-    }
-
-    @Test
-    public void testIsTactics() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.TACTICS) {
-                assertTrue(personnelTableModelColumn.isTactics());
-            } else {
-                assertFalse(personnelTableModelColumn.isTactics());
-            }
-        }
-    }
-
-    @Test
-    public void testIsStrategy() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.STRATEGY) {
-                assertTrue(personnelTableModelColumn.isStrategy());
-            } else {
-                assertFalse(personnelTableModelColumn.isStrategy());
-            }
-        }
-    }
-
-    @Test
-    public void testIsLeadership() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.LEADERSHIP) {
-                assertTrue(personnelTableModelColumn.isLeadership());
-            } else {
-                assertFalse(personnelTableModelColumn.isLeadership());
-            }
-        }
-    }
-
-    @Test
-    public void testIsTechMek() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.TECH_MEK) {
-                assertTrue(personnelTableModelColumn.isTechMek());
-            } else {
-                assertFalse(personnelTableModelColumn.isTechMek());
-            }
-        }
-    }
-
-    @Test
-    public void testIsTechAero() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.TECH_AERO) {
-                assertTrue(personnelTableModelColumn.isTechAero());
-            } else {
-                assertFalse(personnelTableModelColumn.isTechAero());
-            }
-        }
-    }
-
-    @Test
-    public void testIsTechMechanic() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.TECH_MECHANIC) {
-                assertTrue(personnelTableModelColumn.isTechMechanic());
-            } else {
-                assertFalse(personnelTableModelColumn.isTechMechanic());
-            }
-        }
-    }
-
-    @Test
-    public void testIsTechBA() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.TECH_BA) {
-                assertTrue(personnelTableModelColumn.isTechBA());
-            } else {
-                assertFalse(personnelTableModelColumn.isTechBA());
-            }
-        }
-    }
-
-    @Test
-    public void testIsTechVessel() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.TECH_VESSEL) {
-                assertTrue(personnelTableModelColumn.isTechVessel());
-            } else {
-                assertFalse(personnelTableModelColumn.isTechVessel());
-            }
-        }
-    }
-
-    @Test
-    public void testIsMedical() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.MEDICAL) {
-                assertTrue(personnelTableModelColumn.isMedical());
-            } else {
-                assertFalse(personnelTableModelColumn.isMedical());
-            }
-        }
-    }
-
-    @Test
-    public void testIsAdministration() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.ADMINISTRATION) {
-                assertTrue(personnelTableModelColumn.isAdministration());
-            } else {
-                assertFalse(personnelTableModelColumn.isAdministration());
-            }
-        }
-    }
-
-    @Test
-    public void testIsNegotiation() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.NEGOTIATION) {
-                assertTrue(personnelTableModelColumn.isNegotiation());
-            } else {
-                assertFalse(personnelTableModelColumn.isNegotiation());
-            }
-        }
-    }
-
-    @Test
-    public void testIsInjuries() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.INJURIES) {
-                assertTrue(personnelTableModelColumn.isInjuries());
-            } else {
-                assertFalse(personnelTableModelColumn.isInjuries());
-            }
-        }
-    }
-
-    @Test
-    public void testIsKills() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.KILLS) {
-                assertTrue(personnelTableModelColumn.isKills());
-            } else {
-                assertFalse(personnelTableModelColumn.isKills());
-            }
-        }
-    }
-
-    @Test
-    public void testIsSalary() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.SALARY) {
-                assertTrue(personnelTableModelColumn.isSalary());
-            } else {
-                assertFalse(personnelTableModelColumn.isSalary());
-            }
-        }
-    }
-
-    @Test
-    public void testIsXP() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.XP) {
-                assertTrue(personnelTableModelColumn.isXP());
-            } else {
-                assertFalse(personnelTableModelColumn.isXP());
-            }
-        }
-    }
-
-    @Test
-    public void testIsOriginFaction() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.ORIGIN_FACTION) {
-                assertTrue(personnelTableModelColumn.isOriginFaction());
-            } else {
-                assertFalse(personnelTableModelColumn.isOriginFaction());
-            }
-        }
-    }
-
-    @Test
-    public void testIsOriginPlanet() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.ORIGIN_PLANET) {
-                assertTrue(personnelTableModelColumn.isOriginPlanet());
-            } else {
-                assertFalse(personnelTableModelColumn.isOriginPlanet());
-            }
-        }
-    }
-
-    @Test
-    public void testIsBirthday() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.BIRTHDAY) {
-                assertTrue(personnelTableModelColumn.isBirthday());
-            } else {
-                assertFalse(personnelTableModelColumn.isBirthday());
-            }
-        }
-    }
-
-    @Test
-    public void testIsRecruitmentDate() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.RECRUITMENT_DATE) {
-                assertTrue(personnelTableModelColumn.isRecruitmentDate());
-            } else {
-                assertFalse(personnelTableModelColumn.isRecruitmentDate());
-            }
-        }
-    }
-
-    @Test
-    public void testIsLastRankChangeDate() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.LAST_RANK_CHANGE_DATE) {
-                assertTrue(personnelTableModelColumn.isLastRankChangeDate());
-            } else {
-                assertFalse(personnelTableModelColumn.isLastRankChangeDate());
-            }
-        }
-    }
-
-    @Test
-    public void testIsDueDate() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.DUE_DATE) {
-                assertTrue(personnelTableModelColumn.isDueDate());
-            } else {
-                assertFalse(personnelTableModelColumn.isDueDate());
-            }
-        }
-    }
-
-    @Test
-    public void testIsRetirementDate() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.RETIREMENT_DATE) {
-                assertTrue(personnelTableModelColumn.isRetirementDate());
-            } else {
-                assertFalse(personnelTableModelColumn.isRetirementDate());
-            }
-        }
-    }
-
-    @Test
-    public void testIsDeathDate() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.DEATH_DATE) {
-                assertTrue(personnelTableModelColumn.isDeathDate());
-            } else {
-                assertFalse(personnelTableModelColumn.isDeathDate());
-            }
-        }
-    }
-
-    @Test
-    public void testIsCommander() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.COMMANDER) {
-                assertTrue(personnelTableModelColumn.isCommander());
-            } else {
-                assertFalse(personnelTableModelColumn.isCommander());
-            }
-        }
-    }
-
-    @Test
-    public void testIsFounder() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.FOUNDER) {
-                assertTrue(personnelTableModelColumn.isFounder());
-            } else {
-                assertFalse(personnelTableModelColumn.isFounder());
-            }
-        }
-    }
-
-    @Test
-    public void testIsClanPersonnel() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.CLAN_PERSONNEL) {
-                assertTrue(personnelTableModelColumn.isClanPersonnel());
-            } else {
-                assertFalse(personnelTableModelColumn.isClanPersonnel());
-            }
-        }
-    }
-
-    @Test
-    public void testIsMarriageable() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.MARRIAGEABLE) {
-                assertTrue(personnelTableModelColumn.isMarriageable());
-            } else {
-                assertFalse(personnelTableModelColumn.isMarriageable());
-            }
-        }
-    }
-
-    @Test
-    public void testIsDivorceable() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.DIVORCEABLE) {
-                assertTrue(personnelTableModelColumn.isDivorceable());
-            } else {
-                assertFalse(personnelTableModelColumn.isDivorceable());
-            }
-        }
-    }
-
-    @Test
-    public void testIsWantsChildren() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.WANTS_CHILDREN) {
-                assertTrue(personnelTableModelColumn.isWantsChildren());
-            } else {
-                assertFalse(personnelTableModelColumn.isWantsChildren());
-            }
-        }
-    }
-
-    @Test
-    public void testIsImmortal() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.IMMORTAL) {
-                assertTrue(personnelTableModelColumn.isImmortal());
-            } else {
-                assertFalse(personnelTableModelColumn.isImmortal());
-            }
-        }
-    }
-
-    @Test
-    public void testIsToughness() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.TOUGHNESS) {
-                assertTrue(personnelTableModelColumn.isToughness());
-            } else {
-                assertFalse(personnelTableModelColumn.isToughness());
-            }
-        }
-    }
-
-    @Test
-    public void testIsEdge() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.EDGE) {
-                assertTrue(personnelTableModelColumn.isEdge());
-            } else {
-                assertFalse(personnelTableModelColumn.isEdge());
-            }
-        }
-    }
-
-    @Test
-    public void testIsSPACount() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.SPA_COUNT) {
-                assertTrue(personnelTableModelColumn.isSPACount());
-            } else {
-                assertFalse(personnelTableModelColumn.isSPACount());
-            }
-        }
-    }
-
-    @Test
-    public void testIsImplantCount() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.IMPLANT_COUNT) {
-                assertTrue(personnelTableModelColumn.isImplantCount());
-            } else {
-                assertFalse(personnelTableModelColumn.isImplantCount());
-            }
-        }
-    }
-
-    //endregion Boolean Comparison Methods
-
     @Test
     public void testGetWidth() {
         for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
             switch (personnelTableModelColumn) {
                 case PERSON:
+                case MARKET_UNIT_ASSIGNMENT:
                 case UNIT_ASSIGNMENT:
                     assertEquals(125, personnelTableModelColumn.getWidth());
                     break;
@@ -766,6 +85,7 @@ public class PersonnelTableModelColumnTest {
                     break;
                 case LAST_NAME:
                 case SURNAME:
+                case SURNAME_GROUPED_BY_UNIT:
                 case BLOODNAME:
                 case CALLSIGN:
                 case SKILL_LEVEL:
@@ -776,7 +96,15 @@ public class PersonnelTableModelColumnTest {
                     assertEquals(150, personnelTableModelColumn.getWidth());
                     break;
                 case FORCE:
+                case LOCATION_SYSTEM:
+                case LOCATION_PLANET:
+                case DESTINATION_SYSTEM:
+                case DESTINATION_PLANET:
                     assertEquals(100, personnelTableModelColumn.getWidth());
+                    break;
+                case LOCATION_NAME:
+                case DESTINATION_NAME:
+                    assertEquals(150, personnelTableModelColumn.getWidth());
                     break;
                 default:
                     assertEquals(20, personnelTableModelColumn.getWidth());
@@ -796,6 +124,7 @@ public class PersonnelTableModelColumnTest {
                 case PRE_NOMINAL:
                 case GIVEN_NAME:
                 case SURNAME:
+                case SURNAME_GROUPED_BY_UNIT:
                 case BLOODNAME:
                 case POST_NOMINAL:
                 case CALLSIGN:
@@ -803,8 +132,15 @@ public class PersonnelTableModelColumnTest {
                 case SKILL_LEVEL:
                 case PERSONNEL_ROLE:
                 case UNIT_ASSIGNMENT:
+                case MARKET_UNIT_ASSIGNMENT:
                 case FORCE:
                 case DEPLOYED:
+                case LOCATION_SYSTEM:
+                case LOCATION_PLANET:
+                case LOCATION_NAME:
+                case DESTINATION_SYSTEM:
+                case DESTINATION_PLANET:
+                case DESTINATION_NAME:
                     assertEquals(SwingConstants.LEFT, personnelTableModelColumn.getAlignment());
                     break;
                 case SALARY:
@@ -813,79 +149,6 @@ public class PersonnelTableModelColumnTest {
                 default:
                     assertEquals(SwingConstants.CENTER, personnelTableModelColumn.getAlignment());
                     break;
-            }
-        }
-    }
-
-    @Test
-    public void testGetComparator() {
-        final Campaign mockCampaign = mock(Campaign.class);
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            switch (personnelTableModelColumn) {
-                case RANK -> assertInstanceOf(PersonRankStringSorter.class,
-                      personnelTableModelColumn.getComparator(mockCampaign));
-                case HIGHEST_EDUCATION, CURRENT_EDUCATION -> assertInstanceOf(EducationLevelSorter.class,
-                      personnelTableModelColumn.getComparator(mockCampaign));
-                case AGE, BIRTHDAY, RECRUITMENT_DATE, LAST_RANK_CHANGE_DATE, DUE_DATE, RETIREMENT_DATE, DEATH_DATE ->
-                      assertInstanceOf(DateStringComparator.class,
-                            personnelTableModelColumn.getComparator(mockCampaign));
-                case SKILL_LEVEL ->
-                      assertInstanceOf(LevelSorter.class, personnelTableModelColumn.getComparator(mockCampaign));
-                case MEK,
-                     GROUND_VEHICLE,
-                     NAVAL_VEHICLE,
-                     VTOL,
-                     AEROSPACE,
-                     CONVENTIONAL_AIRCRAFT,
-                     VESSEL,
-                     PROTOMEK,
-                     BATTLE_ARMOUR,
-                     SMALL_ARMS,
-                     ANTI_MEK,
-                     ARTILLERY,
-                     NAVIGATION,
-                     TACTICS,
-                     STRATEGY,
-                     LEADERSHIP,
-                     SCOUTING,
-                     ASTECH,
-                     TECH_MEK,
-                     TECH_AERO,
-                     TECH_MECHANIC,
-                     TECH_BA,
-                     TECH_VESSEL,
-                     ZERO_G,
-                     MEDTECH,
-                     MEDICAL,
-                     APPRAISAL,
-                     TRAINING,
-                     ADMINISTRATION,
-                     NEGOTIATION ->
-                      assertInstanceOf(BonusSorter.class, personnelTableModelColumn.getComparator(mockCampaign));
-                case INJURIES,
-                     KILLS,
-                     XP,
-                     TOUGHNESS,
-                     CONNECTIONS,
-                     WEALTH,
-                     EXTRA_INCOME,
-                     REPUTATION,
-                     UNLUCKY,
-                     BLOODMARK,
-                     SPA_COUNT,
-                     MODIFICATION_COUNT,
-                     IMPLANT_COUNT,
-                     LOYALTY -> assertInstanceOf(IntegerStringSorter.class,
-                      personnelTableModelColumn.getComparator(mockCampaign));
-                case REASONING -> assertInstanceOf(ReasoningSorter.class,
-                      personnelTableModelColumn.getComparator(mockCampaign));
-                case STRENGTH, BODY, REFLEXES, DEXTERITY, INTELLIGENCE, WILLPOWER, CHARISMA, EDGE -> assertInstanceOf(
-                      AttributeScoreSorter.class,
-                      personnelTableModelColumn.getComparator(mockCampaign));
-                case SALARY -> assertInstanceOf(FormattedNumberSorter.class,
-                      personnelTableModelColumn.getComparator(mockCampaign));
-                default -> assertInstanceOf(NaturalOrderComparator.class,
-                      personnelTableModelColumn.getComparator(mockCampaign));
             }
         }
     }
@@ -909,15 +172,293 @@ public class PersonnelTableModelColumnTest {
 
     @Test
     public void testToStringOverride() {
-        assertEquals(resources.getString("PersonnelTableModelColumn.RANK.text"),
+        String bundle = "mekhq.resources.PersonnelTable";
+        assertEquals(getTextAt(bundle, "Column.RANK.title"),
               PersonnelTableModelColumn.RANK.toString());
-        assertEquals(resources.getString("PersonnelTableModelColumn.PERSONNEL_STATUS.text"),
+        assertEquals(getTextAt(bundle, "Column.PERSONNEL_STATUS.title"),
               PersonnelTableModelColumn.PERSONNEL_STATUS.toString());
-        assertEquals(resources.getString("PersonnelTableModelColumn.FORCE.text"),
+        assertEquals(getTextAt(bundle, "Column.FORCE.title"),
               PersonnelTableModelColumn.FORCE.toString());
-        assertEquals(resources.getString("PersonnelTableModelColumn.TECH_MECHANIC.text"),
+        assertEquals(getTextAt(bundle, "Column.TECH_MECHANIC.title"),
               PersonnelTableModelColumn.TECH_MECHANIC.toString());
-        assertEquals(resources.getString("PersonnelTableModelColumn.RECRUITMENT_DATE.text"),
+        assertEquals(getTextAt(bundle, "Column.RECRUITMENT_DATE.title"),
               PersonnelTableModelColumn.RECRUITMENT_DATE.toString());
+    }
+
+    @Nested
+    class LocationColumnCellValues {
+
+        private static final LocalDate TODAY = LocalDate.of(3025, 1, 1);
+        private static final String CAMPAIGN_NAME = "Test Mercs";
+
+        private PersonnelMarket market;
+        private Personnel mainForce;
+
+        @BeforeEach
+        void setUp() {
+            market = mock(PersonnelMarket.class);
+            mainForce = new Personnel();
+        }
+
+        private PlanetarySystem mockSystem(String sysName, String planetName) {
+            PlanetarySystem sys = mock(PlanetarySystem.class);
+            when(sys.getPrintableName(any())).thenReturn(sysName);
+            Planet planet = mock(Planet.class);
+            when(planet.getPrintableName(any())).thenReturn(planetName);
+            when(sys.getPrimaryPlanet()).thenReturn(planet);
+            return sys;
+        }
+
+        private Campaign mockCampaign() {
+            Campaign campaign = mock(Campaign.class);
+            CampaignOptions opts = mock(CampaignOptions.class);
+            when(campaign.getLocalDate()).thenReturn(TODAY);
+            when(campaign.getName()).thenReturn(CAMPAIGN_NAME);
+            when(campaign.getMainForcePersonnel()).thenReturn(mainForce);
+            when(campaign.getCampaignOptions()).thenReturn(opts);
+            when(campaign.isOverridingCommandCircuitRequirements()).thenReturn(false);
+            when(campaign.isGM()).thenReturn(false);
+            when(opts.isUseFactionStandingCommandCircuitSafe()).thenReturn(false);
+            when(campaign.getFutureAtBContracts()).thenReturn(List.of());
+            return campaign;
+        }
+
+        private Person mockPerson() {
+            return new Person("Test", "Person", null, "MERC");
+        }
+
+        private void wire(ILocation child, ILocation parent) {
+            LocationNode.LocationManager.setLocation(child, parent);
+        }
+
+        @Test
+        void noParent_allColumnsReturnDash() {
+            Person person = mockPerson();
+            Campaign campaign = mockCampaign();
+            assertEquals("-", PersonnelTableModelColumn.LOCATION_SYSTEM.getCellValue(campaign, person));
+            assertEquals("-", PersonnelTableModelColumn.LOCATION_PLANET.getCellValue(campaign, person));
+            assertEquals(CAMPAIGN_NAME, PersonnelTableModelColumn.LOCATION_NAME.getCellValue(campaign, person));
+            assertEquals("-",
+                  PersonnelTableModelColumn.DESTINATION_SYSTEM.getCellValue(campaign, person));
+            assertEquals("-",
+                  PersonnelTableModelColumn.DESTINATION_PLANET.getCellValue(campaign, person));
+            assertEquals("-",
+                  PersonnelTableModelColumn.DESTINATION_NAME.getCellValue(campaign, person));
+        }
+
+        @Nested
+        class MainForce {
+
+            private PlanetarySystem mainSys;
+            private CurrentLocation mainLoc;
+            private Person person;
+            private Campaign campaign;
+
+            @BeforeEach
+            void setUp() {
+                mainSys = mockSystem("Galatea", "Galatea");
+                mainLoc = new CurrentLocation(mainSys, 0.0);
+                wire(mainForce, mainLoc);
+                person = mockPerson();
+                wire(person, mainForce);
+                campaign = mockCampaign();
+            }
+
+            @Test
+            void locationSystem_returnsCampaignSystem() {
+                assertEquals("Galatea",
+                      PersonnelTableModelColumn.LOCATION_SYSTEM.getCellValue(campaign, person));
+            }
+
+            @Test
+            void locationPlanet_returnsCampaignPlanet() {
+                assertEquals("Galatea",
+                      PersonnelTableModelColumn.LOCATION_PLANET.getCellValue(campaign, person));
+            }
+
+            @Test
+            void locationName_returnsCampaignName() {
+                assertEquals(CAMPAIGN_NAME,
+                      PersonnelTableModelColumn.LOCATION_NAME.getCellValue(campaign, person));
+            }
+
+            @Test
+            void locationName_stillReturnsCampaignNameWhenTraveling() {
+                PlanetarySystem destSys = mockSystem("Terra", "Terra");
+                when(mainSys.getTimeToJumpPoint(1.0)).thenReturn(10.0);
+                mainLoc.setJumpPath(new JumpPath(new ArrayList<>(List.of(mainSys, destSys))));
+
+                assertEquals(CAMPAIGN_NAME,
+                      PersonnelTableModelColumn.LOCATION_NAME.getCellValue(campaign, person));
+            }
+
+            @Test
+            void destination_allDashWhenNotTraveling() {
+                assertEquals("-", PersonnelTableModelColumn.DESTINATION_SYSTEM.getCellValue(campaign, person));
+                assertEquals("-", PersonnelTableModelColumn.DESTINATION_PLANET.getCellValue(campaign, person));
+                assertEquals("-", PersonnelTableModelColumn.DESTINATION_NAME.getCellValue(campaign, person));
+            }
+        }
+
+        @Nested
+        class AcademyArrived {
+
+            private AcademyCampusLocation campus;
+            private Person person;
+            private Campaign campaign;
+
+            @BeforeEach
+            void setUp() {
+                PlanetarySystem academySys = mockSystem("New Avalon", "New Avalon");
+                FixedLocation fixedLoc = new FixedLocation(academySys);
+                campus = new AcademyCampusLocation("SLDFNaval", "SLDF Naval Academy");
+                wire(campus, fixedLoc);
+                CurrentLocation cl = new CurrentLocation(academySys, 0.0);
+                wire(cl, campus);
+                person = mockPerson();
+                wire(person, cl);
+                campaign = mockCampaign();
+            }
+
+            @Test
+            void locationSystem_returnsAcademySystem() {
+                assertEquals("New Avalon",
+                      PersonnelTableModelColumn.LOCATION_SYSTEM.getCellValue(campaign, person));
+            }
+
+            @Test
+            void locationPlanet_returnsAcademyPlanet() {
+                assertEquals("New Avalon",
+                      PersonnelTableModelColumn.LOCATION_PLANET.getCellValue(campaign, person));
+            }
+
+            @Test
+            void locationName_returnsAcademyName() {
+                assertEquals("SLDF Naval Academy",
+                      PersonnelTableModelColumn.LOCATION_NAME.getCellValue(campaign, person));
+            }
+
+            @Test
+            void destination_allDashWhenNotTraveling() {
+                assertEquals("-", PersonnelTableModelColumn.DESTINATION_SYSTEM.getCellValue(campaign, person));
+                assertEquals("-", PersonnelTableModelColumn.DESTINATION_PLANET.getCellValue(campaign, person));
+                assertEquals("-", PersonnelTableModelColumn.DESTINATION_NAME.getCellValue(campaign, person));
+            }
+        }
+
+        @Nested
+        class InTransit {
+
+            private PlanetarySystem originSys;
+            private PlanetarySystem academySys;
+            private FixedLocation fixedLoc;
+            private AcademyCampusLocation campus;
+            private Campaign campaign;
+
+            @BeforeEach
+            void setUp() {
+                originSys = mockSystem("Galatea", "Galatea");
+                academySys = mockSystem("New Avalon", "New Avalon");
+                fixedLoc = new FixedLocation(academySys);
+                campus = new AcademyCampusLocation("SLDFNaval", "SLDF Naval Academy");
+                wire(campus, fixedLoc);
+                campaign = mockCampaign();
+            }
+
+            private Person buildTravelingPerson(CurrentLocation cl) {
+                wire(cl, campus);
+                Person person = mockPerson();
+                wire(person, cl);
+                return person;
+            }
+
+            @Test
+            void destinationSystem_returnsLastSystemInPath() {
+                when(originSys.getTimeToJumpPoint(1.0)).thenReturn(10.0);
+                CurrentLocation cl = new CurrentLocation(originSys, 3.0);
+                cl.setJumpPath(new JumpPath(new ArrayList<>(List.of(originSys, academySys))));
+                Person person = buildTravelingPerson(cl);
+
+                assertEquals("New Avalon", PersonnelTableModelColumn.DESTINATION_SYSTEM.getCellValue(campaign, person));
+            }
+
+            @Test
+            void destinationPlanet_returnsLastSystemPrimaryPlanet() {
+                when(originSys.getTimeToJumpPoint(1.0)).thenReturn(10.0);
+                CurrentLocation cl = new CurrentLocation(originSys, 3.0);
+                cl.setJumpPath(new JumpPath(new ArrayList<>(List.of(originSys, academySys))));
+                Person person = buildTravelingPerson(cl);
+
+                assertEquals("New Avalon", PersonnelTableModelColumn.DESTINATION_PLANET.getCellValue(campaign, person));
+            }
+
+            @Test
+            void destinationName_outboundToAcademy_returnsAcademyName() {
+                when(originSys.getTimeToJumpPoint(1.0)).thenReturn(10.0);
+                CurrentLocation cl = new CurrentLocation(originSys, 3.0);
+                cl.setJumpPath(new JumpPath(new ArrayList<>(List.of(originSys, academySys))));
+                Person person = buildTravelingPerson(cl);
+
+                assertEquals("SLDF Naval Academy",
+                      PersonnelTableModelColumn.DESTINATION_NAME.getCellValue(campaign, person));
+            }
+
+            @Test
+            void destinationName_returnFromAcademy_returnsCampaignName() {
+                PlanetarySystem homeSys = mockSystem("Galatea", "Galatea");
+                when(academySys.getTimeToJumpPoint(1.0)).thenReturn(10.0);
+                when(academySys.getRechargeTime(any(), anyBoolean())).thenReturn(0.0);
+                CurrentLocation cl = new CurrentLocation(academySys, 10.0);
+                cl.setJumpPath(new JumpPath(new ArrayList<>(List.of(academySys, homeSys))));
+                Person person = buildTravelingPerson(cl);
+
+                assertEquals(CAMPAIGN_NAME,
+                      PersonnelTableModelColumn.DESTINATION_NAME.getCellValue(campaign, person));
+            }
+        }
+
+        @Nested
+        class BaseArrived {
+
+            private PlayerBase base;
+            private Person person;
+            private Campaign campaign;
+
+            @BeforeEach
+            void setUp() {
+                PlanetarySystem baseSys = mockSystem("Outreach", "Outreach");
+                FixedLocation fixedLoc = new FixedLocation(baseSys);
+                base = new PlayerBase(fixedLoc);
+                base.setDisplayName("Wolf's Dragoons HQ");
+                person = mockPerson();
+                wire(person, base.getBasePersonnel());
+                campaign = mockCampaign();
+            }
+
+            @Test
+            void locationName_returnsBaseName() {
+                assertEquals("Wolf's Dragoons HQ",
+                      PersonnelTableModelColumn.LOCATION_NAME.getCellValue(campaign, person));
+            }
+
+            @Test
+            void locationSystem_returnsBaseSystem() {
+                assertEquals("Outreach",
+                      PersonnelTableModelColumn.LOCATION_SYSTEM.getCellValue(campaign, person));
+            }
+
+            @Test
+            void locationPlanet_returnsBasePlanet() {
+                assertEquals("Outreach",
+                      PersonnelTableModelColumn.LOCATION_PLANET.getCellValue(campaign, person));
+            }
+
+            @Test
+            void destination_allDashWhenNotTraveling() {
+                assertEquals("-", PersonnelTableModelColumn.DESTINATION_SYSTEM.getCellValue(campaign, person));
+                assertEquals("-", PersonnelTableModelColumn.DESTINATION_PLANET.getCellValue(campaign, person));
+                assertEquals("-", PersonnelTableModelColumn.DESTINATION_NAME.getCellValue(campaign, person));
+            }
+        }
     }
 }
