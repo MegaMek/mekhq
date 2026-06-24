@@ -45,6 +45,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.util.StdConverter;
 import megamek.codeUtilities.ObjectUtility;
+import megamek.common.TargetRollModifier;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.TechRating;
 import megamek.common.rolls.TargetRoll;
@@ -785,14 +786,14 @@ public class Planet {
      * A function to return any planetary related modifiers to a target roll for acquiring parts. Feeds in the campaign
      * options because this will include important information about these mods as well as faction information.
      *
-     * @param target  - current TargetRoll for acquisitions
      * @param when    - a LocalDate object for the campaign to retrieve information from the planet
      * @param options - the campaign options from which important values need to be determined
      *
      * @return an updated TargetRoll with planet specific mods
      */
-    public TargetRoll getAcquisitionMods(TargetRoll target, LocalDate when, CampaignOptions options, Faction faction,
-          boolean clanPart) {
+    public List<TargetRollModifier> getAcquisitionMods(LocalDate when, CampaignOptions options,
+          Faction faction, boolean clanPart) {
+        List<TargetRollModifier> result = new ArrayList<>();
         // check faction limitations
         Set<Faction> planetFactions = getFactionSet(when);
         if (null != planetFactions) {
@@ -828,23 +829,26 @@ public class Planet {
                           !neutrals &&
                           !allies &&
                           !options.getPlanetAcquisitionFactionLimit().generateOnEnemyPlanets()) {
-                    return new TargetRoll(TargetRoll.IMPOSSIBLE, "No supplies from enemy planets");
+                    return List.of(new TargetRollModifier(TargetRoll.IMPOSSIBLE, "No supplies from enemy planets"));
                 } else if (neutrals &&
                                  !allies &&
                                  !options.getPlanetAcquisitionFactionLimit().generateOnNeutralPlanets()) {
-                    return new TargetRoll(TargetRoll.IMPOSSIBLE, "No supplies from neutral planets");
+                    return List.of(new TargetRollModifier(TargetRoll.IMPOSSIBLE, "No supplies from neutral planets"));
                 } else if (allies && !options.getPlanetAcquisitionFactionLimit().generateOnAlliedPlanets()) {
-                    return new TargetRoll(TargetRoll.IMPOSSIBLE, "No supplies from allied planets");
+                    return List.of(new TargetRollModifier(TargetRoll.IMPOSSIBLE, "No supplies from allied planets"));
                 } else if (clanCrossover && options.isPlanetAcquisitionNoClanCrossover()) {
-                    return new TargetRoll(TargetRoll.IMPOSSIBLE, "The clans and inner sphere do not trade supplies");
+                    return List.of(new TargetRollModifier(TargetRoll.IMPOSSIBLE,
+                          "The clans and inner sphere do not trade supplies"));
                 }
             }
 
             if (noClansPresent && clanPart) {
                 if (options.isNoClanPartsFromIS()) {
-                    return new TargetRoll(TargetRoll.IMPOSSIBLE, "No clan parts from non-clan factions");
+                    return List.of(new TargetRollModifier(TargetRoll.IMPOSSIBLE,
+                          "No clan parts from non-clan factions"));
                 }
-                target.addModifier(options.getPenaltyClanPartsFromIS(), "clan parts from non-clan faction");
+                result.add(new TargetRollModifier(options.getPenaltyClanPartsFromIS(),
+                      "clan parts from non-clan faction"));
             }
         }
 
@@ -858,18 +862,17 @@ public class Planet {
         if ((socioIndustrial.tech == PlanetarySophistication.REGRESSED) ||
                   (socioIndustrial.industry == PlanetaryRating.F) ||
                   (socioIndustrial.output == PlanetaryRating.F)) {
-            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Regressed: Pre-industrial world");
+            return List.of(new TargetRollModifier(TargetRoll.IMPOSSIBLE, "Regressed: Pre-industrial world"));
         }
 
-        target.addModifier(options.getPlanetTechAcquisitionBonus(socioIndustrial.tech),
-              "planet tech: " + socioIndustrial.tech.getName());
-        target.addModifier(options.getPlanetIndustryAcquisitionBonus(socioIndustrial.industry),
-              "planet industry: " + socioIndustrial.industry.getName());
-        target.addModifier(options.getPlanetOutputAcquisitionBonus(socioIndustrial.output),
-              "planet output: " + socioIndustrial.output.getName());
+        result.add(new TargetRollModifier(options.getPlanetTechAcquisitionBonus(socioIndustrial.tech),
+              "planet tech: " + socioIndustrial.tech.getName()));
+        result.add(new TargetRollModifier(options.getPlanetIndustryAcquisitionBonus(socioIndustrial.industry),
+              "planet industry: " + socioIndustrial.industry.getName()));
+        result.add(new TargetRollModifier(options.getPlanetOutputAcquisitionBonus(socioIndustrial.output),
+              "planet output: " + socioIndustrial.output.getName()));
 
-        return target;
-
+        return result;
     }
 
     @Override
