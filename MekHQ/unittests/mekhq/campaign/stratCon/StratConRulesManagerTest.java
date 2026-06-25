@@ -762,6 +762,15 @@ class StratConRulesManagerTest {
         }
 
         @Test
+        void testBuildScoutMap_Unskilled() {
+            Person person = mockPerson(null, false);
+            ScoutRecord bestScout = getBestScoutForUnit(List.of(person), 45, 5, false, false);
+            assertEquals(person, bestScout.scout());
+            assertEquals(S_SENSOR_OPERATIONS, bestScout.skillCheck().getSkillType().getName());
+            assertEquals(12, bestScout.skillCheck().getTargetNumber().getValue());
+        }
+
+        @Test
         void testBuildScoutMap_Sorting_EqualTN() {
             Person person1 = mockPerson(1, false);
             Person person2 = mockPerson(1, false);
@@ -847,11 +856,13 @@ class StratConRulesManagerTest {
             assertTrue(scouts.isEmpty());
         }
 
-        private Person mockPerson(int sensorOperationsSkill, boolean hasEagleEye) {
+        private Person mockPerson(Integer sensorOperationsSkill, boolean hasEagleEye) {
             Person person = new Person("GivenName", "Surname", null, "Faction");
-            Skill skill = mock(Skill.class);
-            when(skill.getFinalSkillValue(any(SkillModifierData.class))).thenReturn(sensorOperationsSkill);
-            person.addSkill(S_SENSOR_OPERATIONS, skill);
+            if (sensorOperationsSkill != null) {
+                Skill skill = mock(Skill.class);
+                when(skill.getFinalSkillValue(any(SkillModifierData.class))).thenReturn(sensorOperationsSkill);
+                person.addSkill(S_SENSOR_OPERATIONS, skill);
+            }
             PersonnelOptions options = mock(PersonnelOptions.class);
             when(options.booleanOption(OptionsConstants.MISC_EAGLE_EYES)).thenReturn(hasEagleEye);
             person.setOptions(options);
@@ -889,15 +900,11 @@ class StratConRulesManagerTest {
             when(entity.getWeight()).thenReturn(unitWeight);
 
             try (MockedStatic<AtBDynamicScenarioFactory> scenarioFactory = mockStatic(AtBDynamicScenarioFactory.class);
-                  MockedStatic<EntityUtilities> entityUtils = mockStatic(EntityUtilities.class);
-                  MockedStatic<ScoutingSkills> scoutingSkills = mockStatic(ScoutingSkills.class)) {
+                  MockedStatic<EntityUtilities> entityUtils = mockStatic(EntityUtilities.class)) {
 
                 scenarioFactory.when(() -> AtBDynamicScenarioFactory.calculateAtBSpeed(entity)).thenReturn(unitSpeed);
                 entityUtils.when(() -> EntityUtilities.hasImprovedSensors(entity)).thenReturn(hasImprovedSensors);
                 entityUtils.when(() -> EntityUtilities.hasActiveProbe(entity)).thenReturn(hasActiveProbe);
-                crew.forEach(crewMember -> scoutingSkills.when(() ->
-                                                                     ScoutingSkills.getBestScoutingSkill(crewMember))
-                                                 .thenReturn(S_SENSOR_OPERATIONS));
 
                 Campaign campaign = mockCampaign(useAgingEffects, isClanCampaign);
                 List<ScoutRecord> scouts = StratConRulesManager.buildScoutMap(formation, hangar, campaign);
