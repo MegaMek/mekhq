@@ -277,7 +277,8 @@ public class PrisonerEventManager {
           int prisonerCapacity) {
         // Calculate overflow as the percentage over prisonerCapacity
         double overflow = prisonerCapacityUsage - prisonerCapacity;
-        int overflowPercentage = (int) round((overflow / prisonerCapacity) * 100);
+        int effectiveCapacity = max(1, prisonerCapacity);
+        int overflowPercentage = (int) round((overflow / effectiveCapacity) * 100);
 
         // If no overflow and total prisoners are below the minimum count, no risk of event
         if (overflowPercentage <= 0 && totalPrisoners < MINIMUM_PRISONER_COUNT) {
