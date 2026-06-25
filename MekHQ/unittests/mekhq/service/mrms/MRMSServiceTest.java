@@ -54,8 +54,11 @@ import megamek.common.compute.Compute;
 import megamek.common.enums.SkillLevel;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.rolls.TargetRoll;
+import megamek.common.units.Aero;
 import megamek.common.units.Entity;
 import megamek.common.units.Mek;
+import megamek.common.units.ProtoMek;
+import megamek.common.units.Tank;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Quartermaster;
 import mekhq.campaign.Warehouse;
@@ -260,6 +263,45 @@ public class MRMSServiceTest {
     }
 
     @Test
+    public void testIsValidMRMSUnitAcceptsSupportedSalvageUnit() {
+        Unit unit = mock(Unit.class);
+        MRMSConfiguredOptions options = mock(MRMSConfiguredOptions.class);
+
+        when(unit.isSelfCrewed()).thenReturn(false);
+        when(unit.isSalvage()).thenReturn(true);
+        when(unit.getEntity()).thenReturn(mock(Tank.class));
+        when(options.useSalvage()).thenReturn(true);
+
+        assertTrue(MRMSService.isValidMRMSUnit(unit, options));
+    }
+
+    @Test
+    public void testIsValidMRMSUnitAcceptsAeroRepairUnit() {
+        Unit unit = mock(Unit.class);
+        MRMSConfiguredOptions options = mock(MRMSConfiguredOptions.class);
+
+        when(unit.isSelfCrewed()).thenReturn(false);
+        when(unit.isSalvage()).thenReturn(false);
+        when(unit.getEntity()).thenReturn(mock(Aero.class));
+        when(options.useRepair()).thenReturn(true);
+
+        assertTrue(MRMSService.isValidMRMSUnit(unit, options));
+    }
+
+    @Test
+    public void testIsValidMRMSUnitRejectsUnsupportedEntityType() {
+        Unit unit = mock(Unit.class);
+        MRMSConfiguredOptions options = mock(MRMSConfiguredOptions.class);
+
+        when(unit.isSelfCrewed()).thenReturn(false);
+        when(unit.isSalvage()).thenReturn(false);
+        when(unit.getEntity()).thenReturn(mock(ProtoMek.class));
+        when(options.useRepair()).thenReturn(true);
+
+        assertFalse(MRMSService.isValidMRMSUnit(unit, options));
+    }
+
+    @Test
     public void testMRMSUnitsWhenConfiguredOptionsDisabledAddsDisabledReport() {
         configuredOptions = mock(MRMSConfiguredOptions.class);
         when(configuredOptions.isEnabled()).thenReturn(false);
@@ -309,6 +351,162 @@ public class MRMSServiceTest {
 
         verify(mockCampaign, times(0)).fixPart(any(IPartWork.class), any(Person.class));
         verify(mockCampaign, times(2)).addReport(any(), any(String.class));
+    }
+
+    @Test
+    public void testMRMSUnitsWithTechUnableToWorkOnUnitDoesNotRepair() {
+        when(mockCampaignOptions.isMRMSUseRepair()).thenReturn(true);
+
+        Entity entity = getUrbanMek();
+        Unit unit = new Unit(entity, mockCampaign);
+        unit.initializeParts(true);
+
+        Person mockTech = mock(Person.class);
+        when(mockCampaign.getTechs(anyBoolean())).thenReturn(new ArrayList<>(List.of(mockTech)));
+        when(mockCampaign.getTechs()).thenReturn(new ArrayList<>(List.of(mockTech)));
+        when(mockTech.canTech(unit.getEntity())).thenReturn(false);
+        when(mockTech.getSkillForWorkingOn(any(IPartWork.class))).thenReturn(new Skill(SkillType.S_TECH_MEK,
+              SkillLevel.VETERAN.getExperienceLevel(),
+              0));
+        when(mockTech.getMinutesLeft()).thenReturn(480);
+        when(mockTech.getSkillModifierData()).thenReturn(TestSkillModifierData.createDefault());
+
+        addMRMSOption(PartRepairType.ARMOUR,
+              SkillLevel.ULTRA_GREEN.getExperienceLevel(),
+              SkillLevel.LEGENDARY.getExperienceLevel(),
+              DEFAULT_TARGET_NUMBER,
+              DEFAULT_TARGET_NUMBER,
+              0);
+        configuredOptions = new MRMSConfiguredOptions(mockCampaign);
+
+        unit.getParts()
+              .stream()
+              .filter(p -> p instanceof Armor)
+              .map(p -> (Armor) p)
+              .forEach(this::breakArmor);
+
+        MRMSService.mrmsUnits(mockCampaign, List.of(unit), configuredOptions);
+
+        verify(mockCampaign, times(0)).fixPart(any(IPartWork.class), any(Person.class));
+    }
+
+    @Test
+    public void testMRMSUnitsWithNoActiveOptionForPartTypeDoesNotRepair() {
+        when(mockCampaignOptions.isMRMSUseRepair()).thenReturn(true);
+
+        Entity entity = getUrbanMek();
+        Unit unit = new Unit(entity, mockCampaign);
+        unit.initializeParts(true);
+
+        addMRMSOption(PartRepairType.AMMUNITION,
+              SkillLevel.ULTRA_GREEN.getExperienceLevel(),
+              SkillLevel.LEGENDARY.getExperienceLevel(),
+              DEFAULT_TARGET_NUMBER,
+              DEFAULT_TARGET_NUMBER,
+              0);
+        configuredOptions = new MRMSConfiguredOptions(mockCampaign);
+
+        addMockTech();
+
+        unit.getParts()
+              .stream()
+              .filter(p -> p instanceof Armor)
+              .map(p -> (Armor) p)
+              .forEach(this::breakArmor);
+
+        MRMSService.mrmsUnits(mockCampaign, List.of(unit), configuredOptions);
+
+        verify(mockCampaign, times(0)).fixPart(any(IPartWork.class), any(Person.class));
+    }
+
+    @Test
+    public void testMRMSUnitsWithDailyTimeMinimumHigherThanTechTimeDoesNotRepair() {
+        when(mockCampaignOptions.isMRMSUseRepair()).thenReturn(true);
+
+        Entity entity = getUrbanMek();
+        Unit unit = new Unit(entity, mockCampaign);
+        unit.initializeParts(true);
+
+        addMRMSOption(PartRepairType.ARMOUR,
+              SkillLevel.ULTRA_GREEN.getExperienceLevel(),
+              SkillLevel.LEGENDARY.getExperienceLevel(),
+              DEFAULT_TARGET_NUMBER,
+              DEFAULT_TARGET_NUMBER,
+              481);
+        configuredOptions = new MRMSConfiguredOptions(mockCampaign);
+
+        addMockTech();
+
+        unit.getParts()
+              .stream()
+              .filter(p -> p instanceof Armor)
+              .map(p -> (Armor) p)
+              .forEach(this::breakArmor);
+
+        MRMSService.mrmsUnits(mockCampaign, List.of(unit), configuredOptions);
+
+        verify(mockCampaign, times(0)).fixPart(any(IPartWork.class), any(Person.class));
+    }
+
+    @Test
+    public void testMRMSUnitsFiltersImpossibleTargetRolls() {
+        TargetRoll impossibleTargetRoll = mock(TargetRoll.class);
+        when(impossibleTargetRoll.getValue()).thenReturn(TargetRoll.IMPOSSIBLE);
+        when(mockCampaign.getTargetFor(any(IPartWork.class), any(Person.class))).thenReturn(impossibleTargetRoll);
+        when(mockCampaign.getTargetFor(any(Part.class), any(Person.class))).thenReturn(impossibleTargetRoll);
+        when(mockCampaignOptions.isMRMSUseRepair()).thenReturn(true);
+
+        Entity entity = getUrbanMek();
+        Unit unit = new Unit(entity, mockCampaign);
+        unit.initializeParts(true);
+
+        addMRMSOption(PartRepairType.ARMOUR,
+              SkillLevel.ULTRA_GREEN.getExperienceLevel(),
+              SkillLevel.LEGENDARY.getExperienceLevel(),
+              DEFAULT_TARGET_NUMBER,
+              DEFAULT_TARGET_NUMBER,
+              0);
+        configuredOptions = new MRMSConfiguredOptions(mockCampaign);
+
+        addMockTech();
+
+        unit.getParts()
+              .stream()
+              .filter(p -> p instanceof Armor)
+              .map(p -> (Armor) p)
+              .forEach(this::breakArmor);
+
+        MRMSService.mrmsUnits(mockCampaign, List.of(unit), configuredOptions);
+
+        verify(mockCampaign, times(0)).fixPart(any(IPartWork.class), any(Person.class));
+    }
+
+    @Test
+    public void testMRMSUnitsRemovesUnitThatIsNoLongerRepairableOrSalvageable() {
+        when(mockCampaignOptions.isMRMSUseRepair()).thenReturn(true);
+
+        Unit unit = mock(Unit.class);
+        Entity entity = mock(Mek.class);
+        when(unit.getEntity()).thenReturn(entity);
+        when(unit.isSalvage()).thenReturn(false);
+        when(unit.getPartsNeedingService(true)).thenReturn(new ArrayList<>());
+        when(unit.getPartsNeedingService(false)).thenReturn(new ArrayList<>());
+        when(unit.isRepairable()).thenReturn(false);
+        when(unit.hasSalvageableParts()).thenReturn(false);
+
+        addMRMSOption(PartRepairType.ARMOUR,
+              SkillLevel.ULTRA_GREEN.getExperienceLevel(),
+              SkillLevel.LEGENDARY.getExperienceLevel(),
+              DEFAULT_TARGET_NUMBER,
+              DEFAULT_TARGET_NUMBER,
+              0);
+        configuredOptions = new MRMSConfiguredOptions(mockCampaign);
+
+        addMockTech();
+
+        MRMSService.mrmsUnits(mockCampaign, List.of(unit), configuredOptions);
+
+        verify(mockCampaign, times(1)).removeUnit(unit.getId());
     }
 
     @Test
@@ -391,6 +589,286 @@ public class MRMSServiceTest {
         assertTrue(unitAction.getPartSet().getPartActions().isEmpty());
     }
 
+    @Test
+    public void testMRMSUnitActionSettersAndStatusHelpers() {
+        Unit originalUnit = mock(Unit.class);
+        Unit replacementUnit = mock(Unit.class);
+        MRMSService.MRMSPartSet replacementPartSet = new MRMSService.MRMSPartSet();
+
+        MRMSService.MRMSUnitAction unitAction = new MRMSService.MRMSUnitAction(originalUnit,
+              false,
+              MRMSService.MRMSUnitAction.STATUS.NO_TECHS);
+
+        assertTrue(unitAction.isStatusNoTechs());
+        assertFalse(unitAction.isStatusNoActions());
+        assertFalse(unitAction.isStatusActionsPerformed());
+        assertFalse(unitAction.isStatusUnfixableLimb());
+        assertFalse(unitAction.isStatusNoParts());
+
+        unitAction.setUnit(replacementUnit);
+        unitAction.setPartSet(replacementPartSet);
+        unitAction.setStatus(MRMSService.MRMSUnitAction.STATUS.UNFIXABLE_LIMB);
+
+        assertEquals(replacementUnit, unitAction.getUnit());
+        assertEquals(replacementPartSet, unitAction.getPartSet());
+        assertTrue(unitAction.isStatusUnfixableLimb());
+
+        unitAction.setStatus(MRMSService.MRMSUnitAction.STATUS.NO_PARTS);
+        assertTrue(unitAction.isStatusNoParts());
+    }
+
+    @Test
+    public void testMRMSPartActionSetters() {
+        IPartWork originalPartWork = mock(IPartWork.class);
+        IPartWork replacementPartWork = mock(IPartWork.class);
+
+        MRMSService.MRMSPartAction partAction = new MRMSService.MRMSPartAction(originalPartWork);
+
+        assertEquals(originalPartWork, partAction.getPartWork());
+
+        partAction.setPartWork(replacementPartWork);
+        partAction.setStatus(MRMSService.MRMSPartAction.STATUS.NO_TECHS);
+        partAction.setMaxTechSkill(SkillLevel.ELITE.getExperienceLevel());
+        partAction.setConfiguredTargetNumberPreferred(5);
+
+        assertEquals(replacementPartWork, partAction.getPartWork());
+        assertEquals(MRMSService.MRMSPartAction.STATUS.NO_TECHS, partAction.getStatus());
+        assertEquals(SkillLevel.ELITE.getExperienceLevel(), partAction.getMaxTechSkill());
+        assertEquals(5, partAction.getConfiguredTargetNumberPreferred());
+    }
+
+    @Test
+    public void testPerformWarehouseMRMSDisabledReturnsEmptyPartSet() {
+        configuredOptions = mock(MRMSConfiguredOptions.class);
+        when(configuredOptions.useRepair()).thenReturn(false);
+
+        MRMSService.MRMSPartSet partSet = MRMSService.performWarehouseMRMS(new ArrayList<>(),
+              configuredOptions,
+              mockCampaign);
+
+        assertTrue(partSet.getPartActions().isEmpty());
+        verify(mockCampaign, times(1)).addReport(any(), any(String.class));
+        verify(mockCampaign, times(0)).fixWarehousePart(any(Part.class), any(Person.class));
+    }
+
+    @Test
+    public void testPerformWarehouseMRMSWithNoTechsReturnsEmptyPartSet() {
+        configuredOptions = mock(MRMSConfiguredOptions.class);
+        when(configuredOptions.useRepair()).thenReturn(true);
+        when(mockCampaign.getTechs(anyBoolean())).thenReturn(new ArrayList<>());
+
+        MRMSService.MRMSPartSet partSet = MRMSService.performWarehouseMRMS(new ArrayList<>(),
+              configuredOptions,
+              mockCampaign);
+
+        assertTrue(partSet.getPartActions().isEmpty());
+        verify(mockCampaign, times(2)).addReport(any(), any(String.class));
+        verify(mockCampaign, times(0)).fixWarehousePart(any(Part.class), any(Person.class));
+    }
+
+    @Test
+    public void testPerformWarehouseMRMSRepairsSelectedWarehousePart() {
+        when(mockCampaignOptions.isMRMSUseRepair()).thenReturn(true);
+        addMRMSOption(PartRepairType.ARMOUR,
+              SkillLevel.ULTRA_GREEN.getExperienceLevel(),
+              SkillLevel.LEGENDARY.getExperienceLevel(),
+              DEFAULT_TARGET_NUMBER,
+              DEFAULT_TARGET_NUMBER,
+              0);
+        configuredOptions = new MRMSConfiguredOptions(mockCampaign);
+
+        Entity entity = getUrbanMek();
+        Unit unit = new Unit(entity, mockCampaign);
+        unit.initializeParts(true);
+
+        Armor armor = unit.getParts()
+                            .stream()
+                            .filter(p -> p instanceof Armor)
+                            .map(p -> (Armor) p)
+                            .findFirst()
+                            .orElseThrow();
+
+        warehouse.addPart(armor.clone(), true);
+
+        Person mockTech = mock(Person.class);
+        when(mockCampaign.getTechs(anyBoolean())).thenReturn(List.of(mockTech));
+        when(mockTech.isRightTechTypeFor(any(IPartWork.class))).thenReturn(true);
+        when(mockTech.getSkillForWorkingOn(any(IPartWork.class))).thenReturn(new Skill(SkillType.S_TECH_MEK,
+              SkillLevel.VETERAN.getExperienceLevel(),
+              0));
+        when(mockTech.getMinutesLeft()).thenReturn(480);
+        when(mockTech.getSkillModifierData()).thenReturn(TestSkillModifierData.createDefault());
+
+        MRMSService.MRMSPartSet partSet = MRMSService.performWarehouseMRMS(List.of(armor),
+              configuredOptions,
+              mockCampaign);
+
+        assertTrue(partSet.isHasRepairs());
+        assertEquals(1, partSet.countRepairs());
+        verify(mockCampaign, times(1)).fixWarehousePart(any(Part.class), any(Person.class));
+        verify(mockCampaign, times(0)).fixPart(any(IPartWork.class), any(Person.class));
+    }
+
+    @Test
+    public void testPerformWarehouseMRMSFiltersWrongTechType() {
+        when(mockCampaignOptions.isMRMSUseRepair()).thenReturn(true);
+        addMRMSOption(PartRepairType.ARMOUR,
+              SkillLevel.ULTRA_GREEN.getExperienceLevel(),
+              SkillLevel.LEGENDARY.getExperienceLevel(),
+              DEFAULT_TARGET_NUMBER,
+              DEFAULT_TARGET_NUMBER,
+              0);
+        configuredOptions = new MRMSConfiguredOptions(mockCampaign);
+
+        Entity entity = getUrbanMek();
+        Unit unit = new Unit(entity, mockCampaign);
+        unit.initializeParts(true);
+
+        Armor armor = unit.getParts()
+                            .stream()
+                            .filter(p -> p instanceof Armor)
+                            .map(p -> (Armor) p)
+                            .findFirst()
+                            .orElseThrow();
+
+        warehouse.addPart(armor.clone(), true);
+
+        Person mockTech = mock(Person.class);
+        when(mockCampaign.getTechs(anyBoolean())).thenReturn(List.of(mockTech));
+        when(mockTech.isRightTechTypeFor(any(IPartWork.class))).thenReturn(false);
+        when(mockTech.getSkillForWorkingOn(any(IPartWork.class))).thenReturn(new Skill(SkillType.S_TECH_MEK,
+              SkillLevel.VETERAN.getExperienceLevel(),
+              0));
+        when(mockTech.getMinutesLeft()).thenReturn(480);
+        when(mockTech.getSkillModifierData()).thenReturn(TestSkillModifierData.createDefault());
+
+        MRMSService.MRMSPartSet partSet = MRMSService.performWarehouseMRMS(List.of(armor),
+              configuredOptions,
+              mockCampaign);
+
+        assertFalse(partSet.isHasRepairs());
+        assertEquals(0, partSet.countRepairs());
+        verify(mockCampaign, times(0)).fixWarehousePart(any(Part.class), any(Person.class));
+    }
+
+    @Test
+    public void testPerformSingleUnitMRMSDisabledReturnsDisabledMessage() {
+        when(mockCampaignOptions.isMRMSUseRepair()).thenReturn(false);
+        when(mockCampaignOptions.isMRMSUseSalvage()).thenReturn(false);
+
+        Unit unit = mock(Unit.class);
+
+        String message = MRMSService.performSingleUnitMRMS(mockCampaign, unit);
+
+        assertNotNull(message);
+        verify(mockCampaign, times(1)).addReport(any(), any(String.class));
+        verify(mockCampaign, times(0)).fixPart(any(IPartWork.class), any(Person.class));
+    }
+
+    @Test
+    public void testPerformSingleUnitMRMSRepairTypeDisabled() {
+        when(mockCampaignOptions.isMRMSUseRepair()).thenReturn(false);
+        when(mockCampaignOptions.isMRMSUseSalvage()).thenReturn(true);
+
+        Unit unit = mock(Unit.class);
+        when(unit.isSalvage()).thenReturn(false);
+
+        String message = MRMSService.performSingleUnitMRMS(mockCampaign, unit);
+
+        assertNotNull(message);
+        verify(mockCampaign, times(1)).addReport(any(), any(String.class));
+        verify(mockCampaign, times(0)).fixPart(any(IPartWork.class), any(Person.class));
+    }
+
+    @Test
+    public void testPerformSingleUnitMRMSSalvageTypeDisabled() {
+        when(mockCampaignOptions.isMRMSUseRepair()).thenReturn(true);
+        when(mockCampaignOptions.isMRMSUseSalvage()).thenReturn(false);
+
+        Unit unit = mock(Unit.class);
+        when(unit.isSalvage()).thenReturn(true);
+
+        String message = MRMSService.performSingleUnitMRMS(mockCampaign, unit);
+
+        assertNotNull(message);
+        verify(mockCampaign, times(1)).addReport(any(), any(String.class));
+        verify(mockCampaign, times(0)).fixPart(any(IPartWork.class), any(Person.class));
+    }
+
+    @Test
+    public void testPerformSingleUnitMRMSRequiresAdditionalAstechs() {
+        when(mockCampaignOptions.isMRMSUseRepair()).thenReturn(true);
+        when(mockCampaignOptions.isMRMSUseSalvage()).thenReturn(true);
+        when(mockCampaign.requiresAdditionalAsTechs()).thenReturn(true);
+
+        Unit unit = mock(Unit.class);
+        when(unit.isSalvage()).thenReturn(false);
+
+        String message = MRMSService.performSingleUnitMRMS(mockCampaign, unit);
+
+        assertNotNull(message);
+        verify(mockCampaign, times(1)).addReport(any(), any(String.class));
+        verify(mockCampaign, times(0)).fixPart(any(IPartWork.class), any(Person.class));
+    }
+
+    @Test
+    public void testPerformSingleUnitMRMSNoParts() {
+        when(mockCampaignOptions.isMRMSUseRepair()).thenReturn(true);
+        when(mockCampaignOptions.isMRMSUseSalvage()).thenReturn(true);
+
+        Person mockTech = mock(Person.class);
+        when(mockCampaign.getTechs(anyBoolean())).thenReturn(new ArrayList<>(List.of(mockTech)));
+        when(mockCampaign.getTechs()).thenReturn(new ArrayList<>(List.of(mockTech)));
+
+        Unit unit = mock(Unit.class);
+        when(unit.isSalvage()).thenReturn(false);
+        when(unit.getName()).thenReturn("Test Unit");
+        when(unit.getPartsNeedingService(true)).thenReturn(new ArrayList<>());
+        when(unit.getPartsNeedingService(false)).thenReturn(new ArrayList<>());
+
+        String message = MRMSService.performSingleUnitMRMS(mockCampaign, unit);
+
+        assertEquals("Mass Repair complete on Test Unit.", message);
+        verify(mockCampaign, times(1)).addReport(any(), any(String.class));
+        verify(mockCampaign, times(0)).fixPart(any(IPartWork.class), any(Person.class));
+    }
+
+    @Test
+    public void testMRMSAllUnitsDisabledAddsReportAndDoesNotQueryUnits() {
+        when(mockCampaignOptions.isMRMSUseRepair()).thenReturn(false);
+        when(mockCampaignOptions.isMRMSUseSalvage()).thenReturn(false);
+
+        MRMSService.mrmsAllUnits(mockCampaign);
+
+        verify(mockCampaign, times(1)).addReport(any(), any(String.class));
+        verify(mockCampaign, times(0)).getServiceableUnits();
+    }
+
+    @Test
+    public void testMRMSAllUnitsRequiresAdditionalAstechsAddsReportAndDoesNotQueryUnits() {
+        when(mockCampaignOptions.isMRMSUseRepair()).thenReturn(true);
+        when(mockCampaignOptions.isMRMSUseSalvage()).thenReturn(true);
+        when(mockCampaign.requiresAdditionalAsTechs()).thenReturn(true);
+
+        MRMSService.mrmsAllUnits(mockCampaign);
+
+        verify(mockCampaign, times(1)).addReport(any(), any(String.class));
+        verify(mockCampaign, times(0)).getServiceableUnits();
+    }
+
+    @Test
+    public void testMRMSAllUnitsWithNoServiceableUnitsAddsNoUnitsReport() {
+        when(mockCampaignOptions.isMRMSUseRepair()).thenReturn(true);
+        when(mockCampaignOptions.isMRMSUseSalvage()).thenReturn(true);
+        when(mockCampaign.getServiceableUnits()).thenReturn(new ArrayList<>());
+
+        MRMSService.mrmsAllUnits(mockCampaign);
+
+        verify(mockCampaign, times(1)).getServiceableUnits();
+        verify(mockCampaign, times(1)).addReport(any(), any(String.class));
+        verify(mockCampaign, times(0)).fixPart(any(IPartWork.class), any(Person.class));
+    }
+
     private static Entity getUrbanMek() {
         String unitName = "UrbanMech UM-R69";
         Entity entity = getEntityForUnitTesting(unitName, false);
@@ -467,7 +945,7 @@ public class MRMSServiceTest {
                   targetNumberMax, dailyTimeMin);
             configuredOptions = new MRMSConfiguredOptions(mockCampaign);
 
-            addMockTech(SkillType.S_TECH_MEK, SkillLevel.VETERAN);
+            addMockTech();
 
             unit.getParts()
                   .stream()
@@ -727,7 +1205,7 @@ public class MRMSServiceTest {
                   dailyTimeMin);
             configuredOptions = new MRMSConfiguredOptions(mockCampaign);
 
-            addMockTech(SkillType.S_TECH_MEK, SkillLevel.VETERAN);
+            addMockTech();
 
             unit.getParts()
                   .stream()
@@ -854,13 +1332,13 @@ public class MRMSServiceTest {
         }
     }
 
-    private void addMockTech(String skillType, SkillLevel skillLevel) {
+    private void addMockTech() {
         Person mockTech = mock(Person.class);
         when(mockCampaign.getTechs(anyBoolean())).thenReturn(List.of(mockTech));
         when(mockTech.canTech(any(Entity.class))).thenReturn(true);
-        when(mockTech.getSkillLevel(any(Campaign.class), anyBoolean())).thenReturn(skillLevel);
-        when(mockTech.getSkillForWorkingOn(any(IPartWork.class))).thenReturn(new Skill(skillType,
-              skillLevel.getExperienceLevel(),
+        when(mockTech.getSkillLevel(any(Campaign.class), anyBoolean())).thenReturn(SkillLevel.VETERAN);
+        when(mockTech.getSkillForWorkingOn(any(IPartWork.class))).thenReturn(new Skill(SkillType.S_TECH_MEK,
+              SkillLevel.VETERAN.getExperienceLevel(),
               0));
         when(mockTech.getMinutesLeft()).thenReturn(480);
         when(mockTech.getSkillModifierData()).thenReturn(TestSkillModifierData.createDefault());
@@ -1113,7 +1591,7 @@ public class MRMSServiceTest {
                   targetNumberPreferred, targetNumberMax, dailyTimeMin);
             configuredOptions = new MRMSConfiguredOptions(mockCampaign);
 
-            addMockTech(SkillType.S_TECH_MEK, SkillLevel.VETERAN);
+            addMockTech();
 
             // Make all AmmoBins need reloading
             List<AmmoBin> ammoBins = unit.getParts().stream()

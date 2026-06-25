@@ -1715,7 +1715,6 @@ public class MRMSService {
             return partSet;
         }
 
-        @Deprecated(since = "0.51.0", forRemoval = true)
         public void setPartSet(MRMSPartSet partSet) {
             this.partSet = partSet;
         }
@@ -1744,17 +1743,14 @@ public class MRMSService {
             return status == STATUS.ACTIONS_PERFORMED;
         }
 
-        @Deprecated(since = "0.51.0", forRemoval = true)
         public boolean isStatusNoTechs() {
             return status == STATUS.NO_TECHS;
         }
 
-        @Deprecated(since = "0.51.0", forRemoval = true)
         public boolean isStatusUnfixableLimb() {
             return status == STATUS.UNFIXABLE_LIMB;
         }
 
-        @Deprecated(since = "0.51.0", forRemoval = true)
         public boolean isStatusNoParts() {
             return status == STATUS.NO_PARTS;
         }
