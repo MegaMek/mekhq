@@ -1412,27 +1412,22 @@ public class MRMSService {
             this.status = status;
         }
 
-        @Deprecated(since = "0.51.0", forRemoval = true)
         public boolean isStatusRepaired() {
             return status == STATUS.REPAIRED;
         }
 
-        @Deprecated(since = "0.51.0", forRemoval = true)
         public boolean isStatusMaxSkillReached() {
             return status == STATUS.MAX_SKILL_REACHED;
         }
 
-        @Deprecated(since = "0.51.0", forRemoval = true)
         public boolean isStatusOptionDisabled() {
             return status == STATUS.MRO_DISABLED;
         }
 
-        @Deprecated(since = "0.51.0", forRemoval = true)
         public boolean isStatusNoTechs() {
             return status == STATUS.NO_TECHS;
         }
 
-        @Deprecated(since = "0.51.0", forRemoval = true)
         public int getMaxTechSkill() {
             return maxTechSkill;
         }
@@ -1441,7 +1436,6 @@ public class MRMSService {
             this.maxTechSkill = maxTechSkill;
         }
 
-        @Deprecated(since = "0.51.0", forRemoval = true)
         public int getConfiguredTargetNumberPreferred() {
             return configuredTargetNumberPreferred;
         }
@@ -1563,7 +1557,6 @@ public class MRMSService {
             return status == STATUS.NO_ACTIONS;
         }
 
-        @Deprecated(since = "0.51.0", forRemoval = true)
         public boolean isStatusActionsPerformed() {
             return status == STATUS.ACTIONS_PERFORMED;
         }
