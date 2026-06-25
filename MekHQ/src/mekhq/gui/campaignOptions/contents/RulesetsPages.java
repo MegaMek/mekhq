@@ -32,25 +32,17 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createParentPanel;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
-
-import java.awt.GridBagConstraints;
 import javax.swing.JPanel;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
-import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 
 /**
  * Represents a page in the campaign options UI for managing ruleset
  * configurations in campaigns.
  * <p>
- * This class organizes and manages options related to universal rules, legacy
- * AtB rules (Against the Bot), and StratCon
+ * This class organizes and manages options related to universal rules and StratCon
  * (Strategic Context) settings. It provides a UI to customize configurations
  * such as opponent force generation,
  * scenario rules, equipment behavior, and campaign-specific variations.
@@ -61,8 +53,6 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
  * <li><b>Universal Options:</b> Handles features applicable to all campaigns,
  * such as skill levels, unit ratios, map conditions, and auto-resolve
  * settings.</li>
- * <li><b>Legacy AtB:</b> Legacy-specific rules for opponent force generation,
- * scenario generation probabilities, and battle intensity configurations.</li>
  * <li><b>StratCon:</b> Settings for Strategic Context campaigns, including BV
  * usage
  * (Battle Values) and verbose bidding options.</li>
@@ -71,10 +61,6 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 public class RulesetsPages {
     private final CampaignOptions campaignOptions;
     private RulesetsOptionsModel model;
-
-    // start Legacy Options
-    private CampaignOptionsHeaderPanel legacyHeader;
-    // end Legacy Options
 
     private final StratConPage stratConPage = new StratConPage();
 
@@ -103,37 +89,6 @@ public class RulesetsPages {
      */
     public @Nonnull JPanel createStratConPage() {
         return stratConPage.createPanel(model);
-    }
-
-    /**
-     * Creates the UI panel for the Legacy AtB configuration.
-     * <p>
-     * This section configures opponent force generation, scenario generation
-     * probabilities, and customization of battle
-     * intensities for "Against the Bot" campaigns.
-     * </p>
-     *
-     * @return a {@link JPanel} containing all Legacy AtB settings.
-     */
-    @Deprecated(since = "0.51.0", forRemoval = true)
-    @SuppressWarnings("removal")
-    public @Nonnull JPanel createLegacyPage() {
-        // Header
-        legacyHeader = new CampaignOptionsHeaderPanel("LegacyPage",
-                getImageDirectory() + "logo_free_rasalhague_republic.png",
-                true);
-
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("LegacyPage", true);
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
-
-        layout.gridwidth = 5;
-        layout.gridx = 0;
-        layout.gridy = 0;
-        panel.add(legacyHeader, layout);
-
-        // Create panel and return
-        return createParentPanel(panel, "LegacyPage");
     }
 
     /**

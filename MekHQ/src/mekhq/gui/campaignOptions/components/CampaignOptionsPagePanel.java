@@ -36,6 +36,7 @@ import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.CAMPAIGN_OPTIONS_PANEL_WIDTH;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.formatBadges;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.setSmallSizeVariant;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
@@ -371,7 +372,7 @@ public class CampaignOptionsPagePanel extends JPanel {
 
     private JButton createSectionActionButton(String resourceKey) {
         JButton button = new JButton(getTextAt(getCampaignOptionsResourceBundle(), resourceKey));
-        button.putClientProperty("JComponent.sizeVariant", "small");
+        setSmallSizeVariant(button);
         return button;
     }
 

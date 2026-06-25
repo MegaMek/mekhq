@@ -1159,14 +1159,6 @@ public class CampaignOptionsPane extends JPanel {
     }
 
     /**
-     * Use {@link #applyPreset(CampaignPreset, boolean)} instead
-     */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    public void applyPreset(@Nullable CampaignPreset campaignPreset) {
-        applyPreset(campaignPreset, false);
-    }
-
-    /**
      * Applies the values from a {@link CampaignPreset} to all pages in the dialog.
      * This propagates preset-specific
      * configuration to all associated components and sub-pages, including

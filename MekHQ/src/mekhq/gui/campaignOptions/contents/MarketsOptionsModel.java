@@ -32,13 +32,8 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
-import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.market.enums.ContractMarketMethod;
@@ -51,11 +46,8 @@ import mekhq.campaign.market.personnelMarket.markets.PersonnelMarketMekHQ;
 
 class MarketsOptionsModel {
     @Nullable PersonnelMarketStyle personnelMarketStyle;
-    String personnelMarketName;
     boolean personnelMarketReportRefresh;
     boolean usePersonnelHireHiringHallOnly;
-    double personnelMarketDylansWeight;
-    Map<SkillLevel, Integer> personnelMarketRandomRemovalTargets;
     UnitMarketMethod unitMarketMethod;
     boolean unitMarketRegionalMekVariations;
     int unitMarketArtilleryUnitChance;
@@ -90,11 +82,8 @@ class MarketsOptionsModel {
 
     MarketsOptionsModel(@Nonnull CampaignOptions options) {
         personnelMarketStyle = options.getPersonnelMarketStyle();
-        personnelMarketName = options.getPersonnelMarketName();
         personnelMarketReportRefresh = options.isPersonnelMarketReportRefresh();
         usePersonnelHireHiringHallOnly = options.isUsePersonnelHireHiringHallOnly();
-        personnelMarketDylansWeight = options.getPersonnelMarketDylansWeight();
-        personnelMarketRandomRemovalTargets = new HashMap<>(options.getPersonnelMarketRandomRemovalTargets());
         unitMarketMethod = options.getUnitMarketMethod();
         unitMarketRegionalMekVariations = options.isUnitMarketRegionalMekVariations();
         unitMarketArtilleryUnitChance = options.getUnitMarketArtilleryUnitChance();
@@ -144,14 +133,8 @@ class MarketsOptionsModel {
             options.setPersonnelMarketStyle(personnelMarketStyle);
         }
 
-        options.setPersonnelMarketName(personnelMarketName);
-        if (Objects.equals(personnelMarketName, "Campaign Ops")) {
-            campaign.getPersonnelMarket().setPaidRecruitment(false);
-        }
-        options.setPersonnelMarketDylansWeight(personnelMarketDylansWeight);
         options.setUsePersonnelHireHiringHallOnly(usePersonnelHireHiringHallOnly);
         options.setPersonnelMarketReportRefresh(personnelMarketReportRefresh);
-        options.getPersonnelMarketRandomRemovalTargets().putAll(personnelMarketRandomRemovalTargets);
         options.setUnitMarketMethod(unitMarketMethod);
         options.setUnitMarketRegionalMekVariations(unitMarketRegionalMekVariations);
         options.setUnitMarketArtilleryUnitChance(unitMarketArtilleryUnitChance);

@@ -56,6 +56,7 @@ import megamek.client.ui.preferences.JToggleButtonPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.options.GameOptions;
+import megamek.common.ui.FastJScrollPane;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.CampaignPreset;
 import mekhq.MekHQ;
@@ -409,7 +410,7 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         // No inline placeholder here: FlatLaf's JTextField.placeholderText is ignored on a JTextArea. The field is
         // labelled and has a tooltip, so the hint isn't needed.
 
-        final JScrollPane descriptionScrollPane = new JScrollPane(getTxtPresetDescription());
+        final JScrollPane descriptionScrollPane = new FastJScrollPane(getTxtPresetDescription());
         descriptionScrollPane.setName("txtPresetDescriptionScrollPane");
         // Pin the minimum to the 3-row preferred size so a remembered (shorter) window
         // size can't squash the box below

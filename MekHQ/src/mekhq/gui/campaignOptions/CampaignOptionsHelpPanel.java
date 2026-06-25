@@ -51,6 +51,7 @@ import javax.swing.border.TitledBorder;
 
 import jakarta.annotation.Nonnull;
 import megamek.client.ui.util.UIUtil;
+import megamek.common.ui.FastJScrollPane;
 
 /**
  * Sticky contextual help surface for Campaign Options.
@@ -82,7 +83,7 @@ class CampaignOptionsHelpPanel extends JPanel {
         helpTextPane.setBorder(new EmptyBorder(4, 8, 4, 8));
         helpTextPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
 
-        JScrollPane helpScrollPane = new JScrollPane(helpTextPane,
+        JScrollPane helpScrollPane = new FastJScrollPane(helpTextPane,
               ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
               ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         helpScrollPane.setName("campaignOptionsHelpScrollPane");

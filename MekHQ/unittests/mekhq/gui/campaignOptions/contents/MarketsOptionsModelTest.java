@@ -32,20 +32,17 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
-import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import org.junit.jupiter.api.Test;
 
 /**
- * Exhaustive round-trip test for {@link MarketsOptionsModel}. Every scalar field is mutated automatically, with four
- * exclusions handled explicitly: {@code personnelMarketStyle} (changing it drives a market-replacement branch that
- * needs a live campaign, so it is left at its default) and the four contract-percent doubles (their setters clamp, so
- * they are set to in-range values). The personnel-market removal-target map is asserted explicitly. {@code applyTo}
- * takes a {@link Campaign}, which a bare mock satisfies because neither the style nor the "Campaign Ops" name branch is
+ * Exhaustive round-trip test for {@link MarketsOptionsModel}. Every scalar field is mutated automatically, except
+ * {@code personnelMarketStyle} (changing it drives a market-replacement branch that needs a live campaign, so it is
+ * left at its default) and the four contract-percent doubles (their setters clamp, so they are set to in-range values
+ * explicitly). {@code applyTo} takes a {@link Campaign}, which a bare mock satisfies because the style branch is not
  * taken.
  */
 class MarketsOptionsModelTest {
@@ -63,15 +60,11 @@ class MarketsOptionsModelTest {
         model.dropShipContractPercent = 0.5;
         model.jumpShipContractPercent = 0.5;
         model.warShipContractPercent = 0.5;
-        model.personnelMarketName = "Test Market";
-        model.personnelMarketRandomRemovalTargets.put(SkillLevel.GREEN, 5);
 
         CampaignOptions destination = new CampaignOptions();
         model.applyTo(campaign, destination);
         MarketsOptionsModel roundTripped = new MarketsOptionsModel(destination);
 
-        OptionsModelTestSupport.assertAllFieldsMatch(model, roundTripped, "personnelMarketRandomRemovalTargets");
-        assertEquals(model.personnelMarketRandomRemovalTargets.get(SkillLevel.GREEN),
-              roundTripped.personnelMarketRandomRemovalTargets.get(SkillLevel.GREEN));
+        OptionsModelTestSupport.assertAllFieldsMatch(model, roundTripped);
     }
 }

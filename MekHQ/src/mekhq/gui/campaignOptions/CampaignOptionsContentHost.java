@@ -47,6 +47,7 @@ import javax.swing.SwingConstants;
 
 import jakarta.annotation.Nullable;
 import javax.swing.SwingUtilities;
+import megamek.common.ui.FastJScrollPane;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -79,7 +80,7 @@ class CampaignOptionsContentHost extends JPanel {
         contentPanel = new CampaignOptionsContentPanel();
         contentPanel.setName("campaignOptionsContentPanel");
 
-        contentScrollPane = new JScrollPane(contentPanel,
+        contentScrollPane = new FastJScrollPane(contentPanel,
               ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
               ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         contentScrollPane.setName("campaignOptionsContentScrollPane");

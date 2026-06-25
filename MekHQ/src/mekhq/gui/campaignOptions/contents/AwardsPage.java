@@ -55,6 +55,7 @@ import javax.swing.ScrollPaneConstants;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.common.ui.FastJScrollPane;
 import mekhq.campaign.personnel.enums.AwardBonus;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
@@ -132,7 +133,7 @@ class AwardsPage {
                 "lblAwardSetFilterList.tooltip")));
         txtAwardSetFilterList.setName("txtAwardSetFilterList");
         txtAwardSetFilterList.setText("");
-        JScrollPane scrollAwardSetFilterList = new JScrollPane(txtAwardSetFilterList);
+        JScrollPane scrollAwardSetFilterList = new FastJScrollPane(txtAwardSetFilterList);
         scrollAwardSetFilterList.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollAwardSetFilterList.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         JPanel pnlAwardSetFilter = createAwardSetFilterPanel(scrollAwardSetFilterList);

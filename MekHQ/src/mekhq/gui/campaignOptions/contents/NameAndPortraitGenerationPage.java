@@ -37,6 +37,7 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelU
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.setSmallSizeVariant;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
@@ -286,7 +287,7 @@ class NameAndPortraitGenerationPage {
         JButton button = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".text"));
         button.setName("btn" + name);
         button.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".tooltip"));
-        button.putClientProperty("JComponent.sizeVariant", "small");
+        setSmallSizeVariant(button);
         return button;
     }
 

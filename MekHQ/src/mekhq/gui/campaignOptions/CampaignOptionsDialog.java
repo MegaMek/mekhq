@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -146,36 +146,6 @@ public class CampaignOptionsDialog extends AbstractButtonDialog {
         }
 
         setLocationRelativeTo(frame);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-    }
-
-    /**
-     * Constructs a {@code CampaignOptionsDialog} for the specified campaign and applies the given preset if provided.
-     *
-     * <p>This constructor initializes the dialog using the {@code NORMAL} mode, providing a user interface for
-     * viewing and modifying campaign options. If a {@link CampaignPreset} is supplied (i.e., {@code preset} is not
-     * {@code null}), the options from the preset are automatically applied to the dialog upon creation. </p>
-     *
-     * @param campaign the {@link Campaign} instance whose options will be displayed and edited
-     * @param preset   an optional {@link CampaignPreset} to apply initial settings (maybe {@code null})
-     */
-    @Deprecated(since = "0.51.0", forRemoval = true)
-    public CampaignOptionsDialog(@Nonnull final Campaign campaign, @Nullable CampaignPreset preset) {
-        super(null,
-              false,
-              ResourceBundle.getBundle(getCampaignOptionsResourceBundle()),
-              "CampaignOptionsDialog",
-              "campaignOptions.title");
-        this.campaign = campaign;
-        this.campaignOptionsPane = new CampaignOptionsPane(null, campaign, CampaignOptionsDialogMode.NORMAL);
-        this.mode = CampaignOptionsDialogMode.NORMAL;
-        initialize();
-
-        if (preset != null) {
-            applyPreset(preset, false);
-        }
-
-        setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
 
@@ -410,17 +380,6 @@ public class CampaignOptionsDialog extends AbstractButtonDialog {
         if (!campaignOptionsPresetPicker.wasCanceled()) {
             campaignOptionsPane.applyPreset(campaignOptionsPresetPicker.getSelectedPreset(), false);
         }
-    }
-
-    /**
-     * Applies a preset to the campaign options pane. This allows the user to quickly configure the campaign settings
-     * based on predefined presets.
-     *
-     * @param preset the {@link CampaignPreset} instance to apply
-     */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    public void applyPreset(@Nullable CampaignPreset preset) {
-        campaignOptionsPane.applyPreset(preset, true);
     }
 
     /**

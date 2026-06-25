@@ -87,6 +87,7 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.client.ui.util.UIUtil;
+import megamek.common.ui.FastJScrollPane;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
@@ -393,7 +394,7 @@ public class SkillsPages {
     }
 
     private JScrollPane createTableScrollPane(JTable table) {
-        JScrollPane scrollPane = new JScrollPane(table);
+        JScrollPane scrollPane = new FastJScrollPane(table);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);

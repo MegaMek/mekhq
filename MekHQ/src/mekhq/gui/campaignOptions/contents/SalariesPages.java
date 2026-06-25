@@ -74,6 +74,7 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.enums.SkillLevel;
+import megamek.common.ui.FastJScrollPane;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelRoleSubType;
@@ -476,7 +477,7 @@ public class SalariesPages {
     }
 
     private JScrollPane createCivilianSalaryTableScrollPane(JTable table) {
-        JScrollPane scrollPane = new JScrollPane(table);
+        JScrollPane scrollPane = new FastJScrollPane(table);
         scrollPane.setName("scrCivilianBaseSalaries");
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);

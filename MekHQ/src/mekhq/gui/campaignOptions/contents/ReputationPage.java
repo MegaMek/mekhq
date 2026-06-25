@@ -37,6 +37,7 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelU
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.setSmallSizeVariant;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.FlowLayout;
@@ -158,7 +159,7 @@ class ReputationPage {
         JButton button = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "btnResetCriminalRecord.text"));
         button.setName("btnResetCriminalRecord");
         button.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(), "lblResetCriminalRecord.tooltip"));
-        button.putClientProperty("JComponent.sizeVariant", "small");
+        setSmallSizeVariant(button);
         button.addMouseListener(createTipPanelUpdater("ResetCriminalRecord"));
         button.addActionListener(event -> {
             if (model != null) {

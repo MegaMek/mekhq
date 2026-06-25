@@ -45,7 +45,6 @@ import java.awt.GridBagLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -54,15 +53,14 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.Version;
-import megamek.client.ui.util.UIUtil;
 import mekhq.gui.baseComponents.MHQCollapsiblePanel;
-import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
 
 /**
  * The {@code CampaignOptionsUtilities} class provides utility methods and constants for managing, creating, and
@@ -155,6 +153,16 @@ public class CampaignOptionsUtilities {
 
     public static @Nonnull String getCampaignOptionsResourceBundle() {
         return RESOURCE_BUNDLE;
+    }
+
+    /**
+     * Applies the FlatLaf "small" size variant to the given component. Centralizes the
+     * {@code "JComponent.sizeVariant"} / {@code "small"} client-property strings so they live in one place.
+     *
+     * @param component the component to render at the small size variant
+     */
+    public static void setSmallSizeVariant(@Nonnull JComponent component) {
+        component.putClientProperty("JComponent.sizeVariant", "small");
     }
 
     static void setTipTextConsumer(@Nullable Consumer<String> tipTextConsumer) {

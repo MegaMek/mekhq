@@ -66,11 +66,6 @@ public class CampaignOptionsHeaderPanel extends JPanel {
     // so we don't reload from disk and re-tint each time. Accessed only on the EDT, so a plain HashMap is safe.
     private static final Map<String, ImageIcon> HEADER_IMAGE_CACHE = new HashMap<>();
 
-    @Deprecated(since = "0.50.06", forRemoval = true)
-    public CampaignOptionsHeaderPanel(@Nonnull String name, @Nonnull String imageAddress, boolean includeBodyText) {
-        this(name, imageAddress, includeBodyText, DEFAULT_IMAGE_SIZE, true);
-    }
-
     /**
      * Constructs a {@code CampaignOptionsHeaderPanel} that displays a header label and an image.
      *

@@ -62,6 +62,7 @@ import javax.swing.tree.TreePath;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.client.ui.util.UIUtil;
+import megamek.common.ui.FastJScrollPane;
 
 /**
  * Left-side navigation tree and filter for the Campaign Options dialog.
@@ -137,7 +138,7 @@ class CampaignOptionsNavigationPanel extends JPanel {
         navigationTree.setShowsRootHandles(true);
         navigationTree.addTreeSelectionListener(evt -> notifySelectedRoute());
 
-        JScrollPane navigationScrollPane = new JScrollPane(navigationTree,
+        JScrollPane navigationScrollPane = new FastJScrollPane(navigationTree,
               ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
               ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         navigationScrollPane.setName("campaignOptionsNavigationScrollPane");

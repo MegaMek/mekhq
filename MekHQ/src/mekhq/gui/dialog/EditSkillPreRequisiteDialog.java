@@ -33,6 +33,8 @@
  */
 package mekhq.gui.dialog;
 
+import static mekhq.utilities.MHQInternationalization.getText;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -110,17 +112,17 @@ public class EditSkillPreRequisiteDialog extends JDialog {
         }
 
         JPanel panButtons = new JPanel();
-        btnOK.setText("OK");
+        btnOK.setText(getText("Ok.text"));
         btnOK.addActionListener(evt -> done());
 
-        btnClose.setText("Cancel");
+        btnClose.setText(getText("Cancel.text"));
         btnClose.addActionListener(evt -> cancel());
 
         panButtons.add(btnOK);
         panButtons.add(btnClose);
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Select Abilities");
+        setTitle(getText("EditSkillPreRequisiteDialog.title"));
         getContentPane().setLayout(new BorderLayout());
 
         getContentPane().add(new FastJScrollPane(panMain), BorderLayout.CENTER);

@@ -45,7 +45,6 @@ import java.util.List;
 import java.util.stream.IntStream;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
@@ -56,6 +55,7 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.rolls.TargetRoll;
+import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -134,7 +134,7 @@ public class ShoppingListPriorityDialog extends JDialog {
                   .setPreferredWidth(tableModel.getColumnWidth(modelColumn));
         }
 
-        add(new JScrollPane(shoppingTable), BorderLayout.CENTER);
+        add(new FastJScrollPane(shoppingTable), BorderLayout.CENTER);
         add(createButtonPanel(), BorderLayout.SOUTH);
 
         setTitle(getTextAt(RESOURCE_BUNDLE, "shoppingListPriorityDialog.title"));
