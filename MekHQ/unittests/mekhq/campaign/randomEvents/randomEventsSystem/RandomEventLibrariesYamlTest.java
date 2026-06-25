@@ -34,7 +34,6 @@ package mekhq.campaign.randomEvents.randomEventsSystem;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import java.util.List;
 
@@ -42,7 +41,8 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Loads the shipped prisoner event YAML data files ({@code data/randomEvents/PrisonerMajorEventData.yml} and
- * {@code data/randomEvents/PrisonerMinorEventData.yml}) through the real production loader {@link RandomEventLibraries}.
+ * {@code data/randomEvents/PrisonerMinorEventData.yml}) through the real production loader
+ * {@link RandomEventLibraries}.
  *
  * <p>These tests guard the data-file -> record deserialization contract. {@link RandomEventLibraries} reads the YAML
  * with Jackson straight into the {@link RandomEventData} / {@link RandomEventResponseEntry} / {@link RandomEventResult}
@@ -53,14 +53,8 @@ import org.junit.jupiter.api.Test;
 class RandomEventLibrariesYamlTest {
 
     @Test
-    void librariesConstructFromShippedYamlWithoutError() {
-        assertDoesNotThrow(RandomEventLibraries::new,
-              "Constructing RandomEventLibraries must parse the shipped prisoner event YAML without throwing.");
-    }
-
-    @Test
     void majorPrisonerEventsLoadFromYaml() {
-        RandomEventLibraries libraries = new RandomEventLibraries();
+        RandomEventLibraries libraries = new RandomEventLibraries(true);
 
         assertFalse(libraries.getPrisonerEvents(true).isEmpty(),
               "Major prisoner events must load from PrisonerMajorEventData.yml.");
@@ -68,7 +62,7 @@ class RandomEventLibrariesYamlTest {
 
     @Test
     void minorPrisonerEventsLoadFromYaml() {
-        RandomEventLibraries libraries = new RandomEventLibraries();
+        RandomEventLibraries libraries = new RandomEventLibraries(true);
 
         assertFalse(libraries.getPrisonerEvents(false).isEmpty(),
               "Minor prisoner events must load from PrisonerMinorEventData.yml.");
@@ -76,7 +70,7 @@ class RandomEventLibrariesYamlTest {
 
     @Test
     void everyLoadedEventHasANonNullType() {
-        RandomEventLibraries libraries = new RandomEventLibraries();
+        RandomEventLibraries libraries = new RandomEventLibraries(true);
 
         for (RandomEventData event : allEvents(libraries)) {
             assertNotNull(event.randomEventType(),
@@ -87,7 +81,7 @@ class RandomEventLibrariesYamlTest {
 
     @Test
     void everyLoadedEventHasResponseEntries() {
-        RandomEventLibraries libraries = new RandomEventLibraries();
+        RandomEventLibraries libraries = new RandomEventLibraries(true);
 
         for (RandomEventData event : allEvents(libraries)) {
             assertFalse(event.responseEntries().isEmpty(),

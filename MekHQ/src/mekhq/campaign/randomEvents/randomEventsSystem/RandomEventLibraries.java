@@ -57,6 +57,7 @@ public class RandomEventLibraries {
      * File extension for the YAML files.
      */
     private final String EXTENSION = ".yml";
+    private final String TEST_RESOURCE_PREFIX = "testresources" + separator;
 
     private final String PRISONER_EVENTS_MAJOR = DIRECTORY + "PrisonerMajorEventData" + EXTENSION;
     private final String PRISONER_EVENTS_MINOR = DIRECTORY + "PrisonerMinorEventData" + EXTENSION;
@@ -70,7 +71,11 @@ public class RandomEventLibraries {
      * files.
      */
     public RandomEventLibraries() {
-        buildPrisonerEventData();
+        buildPrisonerEventData(false);
+    }
+
+    public RandomEventLibraries(boolean isUseTestResources) {
+        buildPrisonerEventData(isUseTestResources);
     }
 
     /**
@@ -95,11 +100,15 @@ public class RandomEventLibraries {
      * Uses Jackson for YAML deserialization via the {@link ObjectMapper}.
      * </p>
      */
-    private void buildPrisonerEventData() {
+    private void buildPrisonerEventData(boolean isUseTestResources) {
         ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
 
         // List of file paths for major and minor events
-        List<String> eventFiles = List.of(PRISONER_EVENTS_MAJOR, PRISONER_EVENTS_MINOR);
+        List<String> eventFiles = new ArrayList<>(List.of(PRISONER_EVENTS_MAJOR, PRISONER_EVENTS_MINOR));
+
+        if (isUseTestResources) {
+            eventFiles.replaceAll(s -> TEST_RESOURCE_PREFIX + s);
+        }
 
         for (String eventFile : eventFiles) {
             try {
