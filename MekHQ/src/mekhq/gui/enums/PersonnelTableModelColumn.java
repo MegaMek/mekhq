@@ -77,7 +77,6 @@ import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.gui.model.LocationDisplay;
-import mekhq.gui.sorter.AttributeScoreSorter;
 import mekhq.gui.sorter.EducationLevelSorter;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.PersonRankSorter;
@@ -359,26 +358,22 @@ public enum PersonnelTableModelColumn {
           Person::getSocial, PersonnelTableModelColumn::traitToText),
     REASONING("Column.REASONING.title", fieldBasedSorter(Reasoning::getLevel),
           Person::getReasoning, Reasoning::getLabel),
-    STRENGTH("Column.STRENGTH.title", AttributeScoreSorter.INSTANCE,
-          attributeExtractor(SkillAttribute.STRENGTH)),
-    BODY("Column.BODY.title", AttributeScoreSorter.INSTANCE,
-          attributeExtractor(SkillAttribute.BODY)),
-    REFLEXES("Column.REFLEXES.title", AttributeScoreSorter.INSTANCE,
-          attributeExtractor(SkillAttribute.REFLEXES)),
-    DEXTERITY("Column.DEXTERITY.title", AttributeScoreSorter.INSTANCE,
-          attributeExtractor(SkillAttribute.DEXTERITY)),
-    INTELLIGENCE("Column.INTELLIGENCE.title", AttributeScoreSorter.INSTANCE,
-          attributeExtractor(SkillAttribute.INTELLIGENCE)),
-    WILLPOWER("Column.WILLPOWER.title", AttributeScoreSorter.INSTANCE,
-          attributeExtractor(SkillAttribute.WILLPOWER)),
-    CHARISMA("Column.CHARISMA.title", AttributeScoreSorter.INSTANCE,
-          attributeExtractor(SkillAttribute.CHARISMA)),
-    EDGE("Column.EDGE.title", AttributeScoreSorter.INSTANCE,
-          person -> {
-              int currentAttributeValue = person.getAttributeScore(SkillAttribute.EDGE);
-              int attributeCap = person.getAttributeCap(SkillAttribute.EDGE);
-              return currentAttributeValue + " / " + attributeCap;
-          }),
+    STRENGTH("Column.STRENGTH.title", SkillAttributeCell.COMPARATOR,
+          attributeExtractor(SkillAttribute.STRENGTH), Object::toString),
+    BODY("Column.BODY.title", SkillAttributeCell.COMPARATOR,
+          attributeExtractor(SkillAttribute.BODY), Object::toString),
+    REFLEXES("Column.REFLEXES.title", SkillAttributeCell.COMPARATOR,
+          attributeExtractor(SkillAttribute.REFLEXES), Object::toString),
+    DEXTERITY("Column.DEXTERITY.title", SkillAttributeCell.COMPARATOR,
+          attributeExtractor(SkillAttribute.DEXTERITY), Object::toString),
+    INTELLIGENCE("Column.INTELLIGENCE.title", SkillAttributeCell.COMPARATOR,
+          attributeExtractor(SkillAttribute.INTELLIGENCE), Object::toString),
+    WILLPOWER("Column.WILLPOWER.title", SkillAttributeCell.COMPARATOR,
+          attributeExtractor(SkillAttribute.WILLPOWER), Object::toString),
+    CHARISMA("Column.CHARISMA.title", SkillAttributeCell.COMPARATOR,
+          attributeExtractor(SkillAttribute.CHARISMA), Object::toString),
+    EDGE("Column.EDGE.title", SkillAttributeCell.COMPARATOR,
+          attributeExtractor(SkillAttribute.EDGE), Object::toString),
     SHIP_TRANSPORT("Column.SHIP_TRANSPORT.title", NaturalOrderComparator.INSTANCE,
           person -> {
               if (person.getUnit() == null || person.getUnit().getTransportShipAssignment() == null) {
@@ -664,26 +659,9 @@ public enum PersonnelTableModelColumn {
         return skillName -> skillToText(getSkillValue(person, campaign).apply(skillName));
     }
 
-    /**
-     * Constructs a visualisation function of a person's skill attribute, including their current score, maximum
-     * possible score (cap), and attribute modifier.
-     *
-     * @param attribute the specific skill attribute being evaluated
-     *
-     * @return a function generating "currentScore / attributeCap (+/- modifier)" string for a person
-     *
-     * @author Illiani
-     * @since 0.51.00
-     */
-    private static Function<Person, String> attributeExtractor(SkillAttribute attribute) {
-        return person -> {
-            int currentAttributeValue = person.getAttributeScore(attribute);
-            int attributeCap = person.getAttributeCap(attribute);
-            int attributeModifier = Skill.getIndividualAttributeModifier(currentAttributeValue);
-            String sign = attributeModifier >= 0 ? "+" : "";
-
-            return currentAttributeValue + " / " + attributeCap + " (" + sign + attributeModifier + ")";
-        };
+    private static Function<Person, SkillAttributeCell> attributeExtractor(SkillAttribute attribute) {
+        return person -> new SkillAttributeCell(person.getAttributeScore(attribute), person.getAttributeCap(attribute),
+              attribute != SkillAttribute.EDGE);
     }
 
     private static String traitToText(PersonalityTrait trait) {
@@ -1106,6 +1084,27 @@ public enum PersonnelTableModelColumn {
         private static final Comparator<Integer> INT_COMPARATOR = Comparator.naturalOrder();
         private static final Comparator<LocalDate> DATE_COMPARATOR = Comparator.naturalOrder();
         private static final Comparator<Boolean> YES_NO_NA_COMPARATOR = Comparator.nullsLast(Comparator.naturalOrder());
+    }
+
+    /**
+     * Models cells that display attributes.
+     */
+    private record SkillAttributeCell(int value, int cap, boolean showModifier) {
+        // sort by value, then cap
+        private static final Comparator<SkillAttributeCell> COMPARATOR =
+              Comparator.comparing(SkillAttributeCell::value).thenComparing(SkillAttributeCell::cap);
+
+        @Override
+        @NonNull
+        public String toString() {
+            StringBuilder result = new StringBuilder();
+            result.append(value).append(" / ").append(cap);
+            if (showModifier) {
+                int attributeModifier = Skill.getIndividualAttributeModifier(value);
+                result.append(" (").append(attributeModifier >= 0 ? "+" : "").append(attributeModifier).append(")");
+            }
+            return result.toString();
+        }
     }
 
     /**
