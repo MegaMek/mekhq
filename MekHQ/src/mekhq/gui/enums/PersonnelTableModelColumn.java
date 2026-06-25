@@ -55,6 +55,7 @@ import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.mission.Scenario;
@@ -65,6 +66,7 @@ import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.skills.InfantryGunnerySkills;
 import mekhq.campaign.personnel.skills.ScoutingSkills;
@@ -77,8 +79,6 @@ import mekhq.campaign.randomEvents.personalities.Reasoning;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.gui.model.LocationDisplay;
-import mekhq.gui.sorter.EducationLevelSorter;
-import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.PersonRankSorter;
 import mekhq.gui.sorter.PersonalityTraitSorter;
 import mekhq.utilities.MHQInternationalization;
@@ -111,8 +111,8 @@ public enum PersonnelTableModelColumn {
           Person::getCallsign),
     AGE("Column.AGE.title", Comparators.INT_COMPARATOR,
           (person, campaign) -> person.getAge(campaign.getLocalDate()), Object::toString),
-    PERSONNEL_STATUS("Column.PERSONNEL_STATUS.title", NaturalOrderComparator.INSTANCE,
-          person -> person.getStatus().toString()),
+    PERSONNEL_STATUS("Column.PERSONNEL_STATUS.title", fieldBasedSorter(PersonnelStatus::getLabel),
+          Person::getStatus, PersonnelStatus::getLabel),
     GENDER("Column.GENDER.title", NaturalOrderComparator.INSTANCE,
           person -> GenderDescriptors.MALE_FEMALE_OTHER.getDescriptorCapitalized(person.getGender())),
     SKILL_LEVEL("Column.SKILL_LEVEL.title", Comparators.INT_COMPARATOR,
@@ -202,25 +202,25 @@ public enum PersonnelTableModelColumn {
           skillModelExtractor(SkillType.S_NEGOTIATION), PersonnelTableModelColumn::skillToText),
     WORK_MINUTES("Column.WORK_MINUTES.title", Comparators.INT_COMPARATOR,
           person -> person.isTechExpanded() ? person.getMinutesLeft() : 0, Object::toString),
-    TECH_MINUTES("Column.TECH_MINUTES.title", NaturalOrderComparator.INSTANCE,
+    TECH_MINUTES("Column.TECH_MINUTES.title", Comparators.INT_COMPARATOR,
           (person, campaign) -> {
               boolean isUseTechAdmin = campaign.getCampaignOptions().isTechsUseAdministration();
-              return person.isTechExpanded() ? String.valueOf(person.getDailyAvailableTechTime(isUseTechAdmin)) : "0";
-          }),
-    MEDICAL_CAPACITY("Column.MEDICAL_CAPACITY.title", NaturalOrderComparator.INSTANCE,
+              return person.isTechExpanded() ? person.getDailyAvailableTechTime(isUseTechAdmin) : 0;
+          }, Object::toString),
+    MEDICAL_CAPACITY("Column.MEDICAL_CAPACITY.title", Comparators.INT_COMPARATOR,
           (person, campaign) -> {
               int baseBedCapacity = campaign.getCampaignOptions().getMaximumPatients();
-              return person.isDoctor() ? String.valueOf(person.getDoctorMedicalCapacity(
-                    campaign.getCampaignOptions().isDoctorsUseAdministration(), baseBedCapacity)) : "0";
-          }),
+              return person.isDoctor() ? person.getDoctorMedicalCapacity(
+                    campaign.getCampaignOptions().isDoctorsUseAdministration(), baseBedCapacity) : 0;
+          }, Object::toString),
     INJURIES("Column.INJURIES.title", Comparators.INT_COMPARATOR,
           (person, campaign) ->
                 campaign.getCampaignOptions().isUseAdvancedMedical() ? person.getInjuries().size() : person.getHits(),
           Object::toString),
     KILLS("Column.KILLS.title", Comparators.INT_COMPARATOR,
           (person, campaign) -> campaign.getKillsFor(person.getId()).size(), Object::toString),
-    SALARY("Column.SALARY.title", FormattedNumberSorter.INSTANCE,
-          (person, campaign) -> person.getSalary(campaign).toAmountAndSymbolString()),
+    SALARY("Column.SALARY.title", fieldBasedSorter(Money::getAmount),
+          Person::getSalary, Money::toAmountAndSymbolString),
     XP("Column.XP.title", Comparators.INT_COMPARATOR,
           Person::getXP, Object::toString),
     ORIGIN_FACTION("Column.ORIGIN_FACTION.title", NaturalOrderComparator.INSTANCE,
@@ -320,15 +320,15 @@ public enum PersonnelTableModelColumn {
     LOYALTY("Column.LOYALTY.title", Comparators.INT_COMPARATOR,
           (person, campaign) -> person.getAdjustedLoyalty(campaign.getFaction(),
                 campaign.getCampaignOptions().isUseAlternativeAdvancedMedical()), Object::toString),
-    HIGHEST_EDUCATION("Column.HIGHEST_EDUCATION.title", EducationLevelSorter.INSTANCE,
-          person -> person.getEduHighestEducation().toString()),
-    CURRENT_EDUCATION("Column.CURRENT_EDUCATION.title", EducationLevelSorter.INSTANCE,
+    HIGHEST_EDUCATION("Column.HIGHEST_EDUCATION.title", fieldBasedSorter(EducationLevel::getLevel),
+          Person::getEduHighestEducation, Object::toString),
+    CURRENT_EDUCATION("Column.CURRENT_EDUCATION.title", fieldBasedSorter(EducationLevel::getLevel),
           person -> {
-              Academy currentAcademy = EducationController.getAcademy(person.getEduAcademySet(),
+              Academy academy = EducationController.getAcademy(person.getEduAcademySet(),
                     person.getEduAcademyNameInSet());
-              return currentAcademy == null ? "" :
-                           EducationLevel.fromLevel(currentAcademy.getEducationLevel(person)).toString();
-          }),
+              return (academy == null) ? null : EducationLevel.fromLevel(academy.getEducationLevel(person));
+          },
+          level -> (level == null) ? "" : level.toString()),
     ACADEMY("Column.ACADEMY.title", NaturalOrderComparator.INSTANCE,
           person -> {
               Academy currentAcademy = EducationController.getAcademy(person.getEduAcademySet(),
@@ -341,12 +341,12 @@ public enum PersonnelTableModelColumn {
                     person.getEduAcademyNameInSet());
               return currentAcademy == null ? "" : currentAcademy.getQualifications().get(person.getEduCourseIndex());
           }),
-    ACADEMY_DURATION("Column.ACADEMY_DURATION.title", NaturalOrderComparator.INSTANCE,
+    ACADEMY_DURATION("Column.ACADEMY_DURATION.title", Comparators.INT_COMPARATOR,
           person -> {
               Academy currentAcademy = EducationController.getAcademy(person.getEduAcademySet(),
                     person.getEduAcademyNameInSet());
-              return currentAcademy == null ? "" : String.valueOf(person.getEduEducationTime());
-          }),
+              return currentAcademy == null ? null : person.getEduEducationTime();
+          }, time -> (time == null) ? "" : time.toString()),
     AGGRESSION("Column.AGGRESSION.title", PersonalityTraitSorter.INSTANCE,
           Person::getAggression, PersonnelTableModelColumn::traitToText),
     AMBITION("Column.AMBITION.title", PersonalityTraitSorter.INSTANCE,
@@ -399,8 +399,8 @@ public enum PersonnelTableModelColumn {
           (person, campaign) -> LocationDisplay.getDestinationPlanet(person, campaign.getLocalDate())),
     DESTINATION_NAME("Column.DESTINATION_NAME.title", NaturalOrderComparator.INSTANCE,
           (person, campaign) -> LocationDisplay.getDestinationName(person, campaign, campaign.getLocalDate())),
-    IS_MARRIED("Column.IS_MARRIED.title", NaturalOrderComparator.INSTANCE,
-          person -> convertBooleanToYesNoNA(person.getGenealogy().hasSpouse())),
+    IS_MARRIED("Column.IS_MARRIED.title", Comparators.YES_NO_NA_COMPARATOR,
+          person -> person.getGenealogy().hasSpouse(), PersonnelTableModelColumn::convertBooleanToYesNoNA),
     FORMER_SPOUSES("Column.FORMER_SPOUSES.title", Integer::compare,
           person -> person.getGenealogy().getFormerSpouses().size(), Object::toString),
     CHILDREN("Column.CHILDREN.title", Integer::compare,
@@ -1070,7 +1070,7 @@ public enum PersonnelTableModelColumn {
      * @param fieldExtractor the field to be used for ordering
      */
     private static <T, U extends Comparable<? super U>> Comparator<T> fieldBasedSorter(Function<T, U> fieldExtractor) {
-        return Comparator.nullsFirst(Comparator.comparing(fieldExtractor));
+        return Comparator.nullsLast(Comparator.comparing(fieldExtractor));
     }
 
     @Override
@@ -1080,8 +1080,8 @@ public enum PersonnelTableModelColumn {
 
     private static class Comparators {
         private static final Comparator<Integer> SKILL_COMPARATOR = Comparator.reverseOrder();
-        private static final Comparator<Integer> INT_COMPARATOR = Comparator.naturalOrder();
-        private static final Comparator<LocalDate> DATE_COMPARATOR = Comparator.naturalOrder();
+        private static final Comparator<Integer> INT_COMPARATOR = Comparator.nullsLast(Comparator.naturalOrder());
+        private static final Comparator<LocalDate> DATE_COMPARATOR = Comparator.nullsLast(Comparator.naturalOrder());
         private static final Comparator<Boolean> YES_NO_NA_COMPARATOR = Comparator.nullsLast(Comparator.naturalOrder());
     }
 
