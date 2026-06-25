@@ -317,12 +317,11 @@ public class RandomEventDialog {
         }
 
         // Fallback
-        int roll = d6(2);
         int externalModifiers = difficultyMap.get(choiceIndex) + personalityModifier;
-        int total = roll + externalModifiers;
+        final int RESPONSE_TARGET_NUMBER = 7 + externalModifiers;
 
-        final int RESPONSE_TARGET_NUMBER = 7;
-        wasSuccessful = total >= RESPONSE_TARGET_NUMBER;
+        int roll = d6(2);
+        wasSuccessful = roll <= RESPONSE_TARGET_NUMBER;
     }
 
     private void resolveAttributeCheck(boolean useEdge, AttributeCheck attributeCheck, String reason) {
