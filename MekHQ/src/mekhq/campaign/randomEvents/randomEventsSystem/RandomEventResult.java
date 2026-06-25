@@ -32,8 +32,6 @@
  */
 package mekhq.campaign.randomEvents.randomEventsSystem;
 
-import static mekhq.campaign.randomEvents.randomEventsSystem.RandomEventResultEffect.NONE;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,7 +54,7 @@ public record RandomEventResult(
 ) {
     // Additional logic to provide defaults for missing properties
     public RandomEventResult {
-        effect = (effect != null) ? effect : NONE;
+        effect = (effect != null) ? effect : RandomEventResultEffect.NONE;
         affectedPersonnelTypes = (affectedPersonnelTypes != null) ? affectedPersonnelTypes : new ArrayList<>();
         affectedSkill = (affectedSkill != null) ? affectedSkill : "";
     }

@@ -39,7 +39,6 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.PronounData;
-import mekhq.campaign.randomEvents.personalities.PersonalityTrait;
 
 /**
  * Represents various levels and traits of greed in a personality.

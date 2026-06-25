@@ -35,7 +35,7 @@
             <skill>Gunnery/Aerospace::Regular</skill>
             <skill>Piloting/Aerospace::Regular</skill>
             <skill>Gunnery/ProtoMek::Regular</skill>
-            <skill>Anti-Mek::Regular</skill>
+            <skill>Anti-Mek (Climbing)::Regular</skill>
             <skill>Piloting/Ground Vehicle::Regular</skill>
             <skill>Gunnery/Aircraft::Regular</skill>
             <skill>Gunnery/Vehicle::Regular</skill>
@@ -150,7 +150,7 @@
         <xpCost>150</xpCost>
         <weight>3</weight>
         <skillPrereq>
-            <skill>Anti-Mek::Veteran</skill>
+            <skill>Anti-Mek (Climbing)::Veteran</skill>
             <skill>Gunnery/ProtoMek::Veteran</skill>
             <skill>Piloting/Ground Vehicle::Veteran</skill>
             <skill>Piloting/Mek::Veteran</skill>
@@ -170,7 +170,7 @@
         <xpCost>150</xpCost>
         <weight>3</weight>
         <skillPrereq>
-            <skill>Anti-Mek::Veteran</skill>
+            <skill>Anti-Mek (Climbing)::Veteran</skill>
             <skill>Gunnery/ProtoMek::Veteran</skill>
             <skill>Piloting/Ground Vehicle::Veteran</skill>
             <skill>Piloting/Mek::Veteran</skill>
@@ -181,7 +181,7 @@
         <xpCost>150</xpCost>
         <weight>3</weight>
         <skillPrereq>
-            <skill>Anti-Mek::Veteran</skill>
+            <skill>Anti-Mek (Climbing)::Veteran</skill>
             <skill>Gunnery/ProtoMek::Veteran</skill>
             <skill>Piloting/Ground Vehicle::Veteran</skill>
             <skill>Piloting/Mek::Veteran</skill>
@@ -192,7 +192,7 @@
         <xpCost>150</xpCost>
         <weight>1</weight>
         <skillPrereq>
-            <skill>Anti-Mek::Veteran</skill>
+            <skill>Anti-Mek (Climbing)::Veteran</skill>
             <skill>Gunnery/ProtoMek::Veteran</skill>
             <skill>Piloting/Ground Vehicle::Veteran</skill>
             <skill>Piloting/Mek::Veteran</skill>
@@ -929,7 +929,7 @@ This SPA increases that maximum by 1, but does not increase the Attribute itself
             <skill>Gunnery/Aerospace::Regular</skill>
             <skill>Piloting/Aerospace::Regular</skill>
             <skill>Gunnery/ProtoMek::Regular</skill>
-            <skill>Anti-Mek::Regular</skill>
+            <skill>Anti-Mek (Climbing)::Regular</skill>
             <skill>Piloting/Ground Vehicle::Regular</skill>
             <skill>Gunnery/Aircraft::Regular</skill>
             <skill>Gunnery/Vehicle::Regular</skill>
@@ -951,7 +951,7 @@ This SPA increases that maximum by 1, but does not increase the Attribute itself
             <skill>Gunnery/Aerospace::Regular</skill>
             <skill>Piloting/Aerospace::Regular</skill>
             <skill>Gunnery/ProtoMek::Regular</skill>
-            <skill>Anti-Mek::Regular</skill>
+            <skill>Anti-Mek (Climbing)::Regular</skill>
             <skill>Piloting/Ground Vehicle::Regular</skill>
             <skill>Gunnery/Aircraft::Regular</skill>
             <skill>Gunnery/Vehicle::Regular</skill>
@@ -973,7 +973,7 @@ This SPA increases that maximum by 1, but does not increase the Attribute itself
             <skill>Gunnery/Aerospace::Regular</skill>
             <skill>Piloting/Aerospace::Regular</skill>
             <skill>Gunnery/ProtoMek::Regular</skill>
-            <skill>Anti-Mek::Regular</skill>
+            <skill>Anti-Mek (Climbing)::Regular</skill>
             <skill>Piloting/Ground Vehicle::Regular</skill>
             <skill>Gunnery/Aircraft::Regular</skill>
             <skill>Gunnery/Vehicle::Regular</skill>
@@ -1012,7 +1012,7 @@ If individual initiative is enabled, this bonus applies only to the pilot's unit
             <skill>Gunnery/Aerospace::Veteran</skill>
             <skill>Piloting/Aerospace::Veteran</skill>
             <skill>Gunnery/ProtoMek::Veteran</skill>
-            <skill>Anti-Mek::Veteran</skill>
+            <skill>Anti-Mek (Climbing)::Veteran</skill>
             <skill>Piloting/Ground Vehicle::Veteran</skill>
             <skill>Gunnery/Aircraft::Veteran</skill>
             <skill>Gunnery/Vehicle::Veteran</skill>
@@ -1035,7 +1035,7 @@ If individual initiative is enabled, this bonus applies only to the pilot's unit
             <skill>Gunnery/Aerospace::Veteran</skill>
             <skill>Piloting/Aerospace::Veteran</skill>
             <skill>Gunnery/ProtoMek::Veteran</skill>
-            <skill>Anti-Mek::Veteran</skill>
+            <skill>Anti-Mek (Climbing)::Veteran</skill>
             <skill>Piloting/Ground Vehicle::Veteran</skill>
             <skill>Gunnery/Aircraft::Veteran</skill>
             <skill>Gunnery/Vehicle::Veteran</skill>

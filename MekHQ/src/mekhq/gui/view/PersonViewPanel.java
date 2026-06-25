@@ -44,7 +44,6 @@ import static mekhq.campaign.personnel.Person.getLoyaltyName;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.ACTIVE;
 import static mekhq.campaign.personnel.skills.Skill.getIndividualAttributeModifier;
 import static mekhq.campaign.personnel.skills.Skill.getTotalAttributeModifier;
-import static mekhq.campaign.personnel.skills.SkillType.RP_ONLY_TAG;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.*;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -81,7 +80,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.function.BiConsumer;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.accessibility.AccessibleRelation;
 import javax.swing.Box;
@@ -129,6 +127,7 @@ import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
+import mekhq.campaign.randomEvents.personalities.PersonalityController;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.JScrollablePanel;
@@ -700,11 +699,32 @@ public class PersonViewPanel extends JScrollablePanel {
             gridY++;
         }
 
-        if ((!person.getPersonalityDescription().isBlank()) &&
-                  (campaignOptions.isUseRandomPersonalities()) &&
-                  (!person.isHidePersonality()) &&
-                  (!person.isChild(campaign.getLocalDate()))) { // we don't display for children, as most of the
-            // descriptions won't fit
+        gridY = initPersonalityDescription(pnlBiographyTab, gridY);
+
+        // use glue to fill up the remaining space so everything is aligned to the top
+        addGlue(gridY, pnlBiographyTab);
+    }
+
+    private int initPersonalityDescription(JPanel pnlBiographyTab, int gridY) {
+        GridBagConstraints gridBagConstraints;
+        boolean isChild = person.isChild(campaign.getLocalDate());
+
+        boolean isUseRandomPersonality = campaignOptions.isUseRandomPersonalities();
+        boolean isShowLabelsOnly = campaignOptions.isUsePersonalityLabelsOnly();
+        boolean isHidePersonality = person.isHidePersonality();
+        boolean isRecruit = person.getJoinedCampaign() == null;
+
+        String personalityLabels = PersonalityController.getPersonalityLabels(person);
+        String personalityDescription = person.getPersonalityDescription();
+        String interviewerNotes = person.getPersonalityInterviewNotes();
+
+        String fullPersonalityDescription = isRecruit ? interviewerNotes : personalityDescription;
+        String personality = isShowLabelsOnly || isChild ? personalityLabels : fullPersonalityDescription;
+
+        boolean isPersonalityBlank = personality.isBlank();
+        boolean isShowPersonality = isUseRandomPersonality && !isHidePersonality && !isPersonalityBlank;
+
+        if (isShowPersonality) {
             JTextPane txtDesc = new JTextPane();
             txtDesc.setName("personalityDescription");
             txtDesc.setEditable(false);
@@ -715,7 +735,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 borderTitleKey = "pnlPersonality.interview";
                 txtDesc.setText(person.getPersonalityInterviewNotes());
             } else {
-                txtDesc.setText(person.getPersonalityDescription());
+                txtDesc.setText(personality);
             }
             txtDesc.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE, borderTitleKey)));
             gridBagConstraints = new GridBagConstraints();
@@ -730,9 +750,7 @@ public class PersonViewPanel extends JScrollablePanel {
             pnlBiographyTab.add(txtDesc, gridBagConstraints);
             gridY++;
         }
-
-        // use glue to fill up the remaining space so everything is aligned to the top
-        addGlue(gridY, pnlBiographyTab);
+        return gridY;
     }
 
     /**
@@ -2109,19 +2127,18 @@ public class PersonViewPanel extends JScrollablePanel {
 
             String skillName = relevantSkills.get(i);
             Skill skill = person.getSkill(skillName);
-            String formattedSkillName = skillName.replaceAll(Pattern.quote(RP_ONLY_TAG), "");
 
             String label;
             if (primaryProfessionSkills.contains(skillName)) {
                 label = String.format(resourceMap.getString("format.itemHeader.profession"),
                       ReportingUtilities.spanOpeningWithCustomColor(getAmazingColor()), CLOSING_SPAN_TAG,
-                      formattedSkillName);
+                      skillName);
             } else if (secondaryProfessionSkills.contains(skillName)) {
                 label = String.format(resourceMap.getString("format.itemHeader.profession"),
                       ReportingUtilities.spanOpeningWithCustomColor(getPositiveColor()), CLOSING_SPAN_TAG,
-                      formattedSkillName);
+                      skillName);
             } else {
-                label = formattedSkillName;
+                label = skillName;
             }
             JLabel lblName = new JLabel(label);
             List<InjuryEffect> injuryEffects = person.getActiveInjuryEffects();
@@ -2187,9 +2204,8 @@ public class PersonViewPanel extends JScrollablePanel {
 
             Skill skill = relevantSkills.get(i);
             String skillName = skill.getType().getName();
-            String label = skillName.replaceAll(Pattern.quote(RP_ONLY_TAG), "");
 
-            JLabel lblName = new JLabel(label);
+            JLabel lblName = new JLabel(skillName);
 
             JLabel lblValue = new JLabel(String.format("<html>%s/%s</html>",
                   skill.getXpProgress(),

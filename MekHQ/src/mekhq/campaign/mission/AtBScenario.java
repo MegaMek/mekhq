@@ -35,6 +35,8 @@ package mekhq.campaign.mission;
 
 import static megamek.common.options.OptionsConstants.ATOW_COMBAT_PARALYSIS;
 import static megamek.common.options.OptionsConstants.ATOW_COMBAT_SENSE;
+import static mekhq.campaign.universe.Faction.COMSTAR_FACTION_CODE;
+import static mekhq.campaign.universe.Faction.WORD_OF_BLAKE_FACTION_CODE;
 
 import java.io.PrintWriter;
 import java.text.ParseException;
@@ -1302,7 +1304,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         if (Factions.getInstance().getFaction(faction).isClan()) {
             addStar(list, faction, skill, quality, weightClass, maxWeight, campaign, arrivalTurn);
             return;
-        } else if (faction.equals("CS") || faction.equals("WOB")) {
+        } else if (faction.equals(COMSTAR_FACTION_CODE) || faction.equals(WORD_OF_BLAKE_FACTION_CODE)) {
             addLevelII(list, faction, skill, quality, weightClass, maxWeight, campaign, arrivalTurn);
             return;
         }

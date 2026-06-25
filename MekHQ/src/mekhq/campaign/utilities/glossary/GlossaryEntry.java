@@ -165,7 +165,7 @@ public enum GlossaryEntry {
     STRATCON_SINGLE_DROP("STRATCON_SINGLE_DROP", new Version("0.50.10")),
     STRATEGIC_OBJECTIVES("STRATEGIC_OBJECTIVES", new Version("0.50.06")),
     STRIPPING_AND_REPAIRING("STRIPPING_AND_REPAIRING", new Version("0.50.06")),
-    SUPPORT_POINTS("SUPPORT_POINTS", new Version("0.50.06")),
+    SUPPORT_POINTS("SUPPORT_POINTS", new Version("0.51.01")),
     TECH_TIME("TECH_TIME", new Version("0.50.06")),
     TEMP_CREWS("TEMP_CREWS", new Version("0.51.01")),
     TEMP_PERSONNEL("TEMP_PERSONNEL", new Version("0.50.06")),
