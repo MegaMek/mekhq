@@ -132,6 +132,7 @@ public class BiographyTab {
     private CampaignOptionsHeaderPanel backgroundHeader;
     private JPanel pnlRandomBackgrounds;
     private JCheckBox chkUseRandomPersonalities;
+    private JCheckBox chkUsePersonalityTagsOnly;
     private JCheckBox chkUseRandomPersonalityReputation;
     private JCheckBox chkUseReasoningXpMultiplier;
     private JCheckBox chkUseSimulatedRelationships;
@@ -355,6 +356,7 @@ public class BiographyTab {
     private void initializeBackgroundsTab() {
         pnlRandomBackgrounds = new JPanel();
         chkUseRandomPersonalities = new JCheckBox();
+        chkUsePersonalityTagsOnly = new JCheckBox();
         chkUseRandomPersonalityReputation = new JCheckBox();
         chkUseReasoningXpMultiplier = new JCheckBox();
         chkUseSimulatedRelationships = new JCheckBox();
@@ -665,7 +667,7 @@ public class BiographyTab {
         // Header
         backgroundHeader = new CampaignOptionsHeaderPanel("BackgroundsTab",
               getImageDirectory() + "logo_nueva_castile.png",
-              3);
+              4);
 
         // Contents
         pnlRandomOriginOptions = createRandomOriginOptionsPanel();
@@ -710,6 +712,9 @@ public class BiographyTab {
         chkUseRandomPersonalities = new CampaignOptionsCheckBox("UseRandomPersonalities",
               getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.DOCUMENTED));
         chkUseRandomPersonalities.addMouseListener(createTipPanelUpdater(backgroundHeader, "UseRandomPersonalities"));
+        chkUsePersonalityTagsOnly = new CampaignOptionsCheckBox("UsePersonalityTagsOnly",
+              getMetadata(new Version(0, 51, 1), CampaignOptionFlag.IMPORTANT));
+        chkUsePersonalityTagsOnly.addMouseListener(createTipPanelUpdater(backgroundHeader, "UsePersonalityTagsOnly"));
         chkUseRandomPersonalityReputation = new CampaignOptionsCheckBox("UseRandomPersonalityReputation");
         chkUseRandomPersonalityReputation.addMouseListener(createTipPanelUpdater(backgroundHeader,
               "UseRandomPersonalityReputation"));
@@ -729,6 +734,9 @@ public class BiographyTab {
         layout.gridx = 0;
         layout.gridy = 0;
         panel.add(chkUseRandomPersonalities, layout);
+
+        layout.gridy++;
+        panel.add(chkUsePersonalityTagsOnly, layout);
 
         layout.gridy++;
         panel.add(chkUseRandomPersonalityReputation, layout);
@@ -1615,6 +1623,7 @@ public class BiographyTab {
 
         // Backgrounds
         chkUseRandomPersonalities.setSelected(options.isUseRandomPersonalities());
+        chkUsePersonalityTagsOnly.setSelected(options.isUsePersonalityLabelsOnly());
         chkUseRandomPersonalityReputation.setSelected(options.isUseRandomPersonalityReputation());
         chkUseReasoningXpMultiplier.setSelected(options.isUseReasoningXpMultiplier());
         chkUseSimulatedRelationships.setSelected(options.isUseSimulatedRelationships());
@@ -1715,6 +1724,7 @@ public class BiographyTab {
 
         // Backgrounds
         options.setUseRandomPersonalities(chkUseRandomPersonalities.isSelected());
+        options.setUsePersonalityLabelsOnly(chkUsePersonalityTagsOnly.isSelected());
         options.setUseRandomPersonalityReputation(chkUseRandomPersonalityReputation.isSelected());
         options.setUseReasoningXpMultiplier(chkUseReasoningXpMultiplier.isSelected());
         options.setUseSimulatedRelationships(chkUseSimulatedRelationships.isSelected());

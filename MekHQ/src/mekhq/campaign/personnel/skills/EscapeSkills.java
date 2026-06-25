@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -98,7 +98,7 @@ public class EscapeSkills {
 
         LocalDate today = campaign.getLocalDate();
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean useEdge = campaignOptions.isUseEdge() || campaignOptions.isUseSupportEdge();
+        boolean useEdge = campaignOptions.isUseEdge();
         useEdge = useEdge && person.getOptions().booleanOption(EDGE_ESCAPE_ATTEMPTS);
         ActionCheckResult actionCheckResult =
               person.checkSkill(skillToUse, false, false, today)

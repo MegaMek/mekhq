@@ -3564,103 +3564,101 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 cbMenuItem.addActionListener(this);
                 menu.add(cbMenuItem);
 
-                // Support Edge
-                if (getCampaignOptions().isUseSupportEdge()) {
-                    // Doctors
-                    cbMenuItem = new JCheckBoxMenuItem(resources.getString("edgeTriggerHealCheck.text"));
-                    cbMenuItem.setSelected(person.getOptions().booleanOption(PersonnelOptions.EDGE_MEDICAL));
-                    cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_MEDICAL));
-                    if (!person.getPrimaryRole().isDoctor()) {
-                        cbMenuItem.setForeground(new Color(150, 150, 150));
-                    }
-                    cbMenuItem.addActionListener(this);
-                    menu.add(cbMenuItem);
-                    cbMenuItem = new JCheckBoxMenuItem(resources.getString("edgeTriggerAdvancedSurgery.text"));
-                    cbMenuItem.setSelected(person.getOptions().booleanOption(PersonnelOptions.EDGE_ADVANCED_SURGERY));
-                    cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_ADVANCED_SURGERY));
-                    if (!person.getPrimaryRole().isDoctor()) {
-                        cbMenuItem.setForeground(new Color(150, 150, 150));
-                    }
-                    cbMenuItem.addActionListener(this);
-                    menu.add(cbMenuItem);
-
-                    // Techs
-                    cbMenuItem = new JCheckBoxMenuItem(resources.getString("edgeTriggerBreakPart.text"));
-                    cbMenuItem.setSelected(person.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_BREAK_PART));
-                    cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_REPAIR_BREAK_PART));
-                    if (!person.getPrimaryRole().isTech()) {
-                        cbMenuItem.setForeground(new Color(150, 150, 150));
-                    }
-                    cbMenuItem.addActionListener(this);
-                    menu.add(cbMenuItem);
-
-                    cbMenuItem = new JCheckBoxMenuItem(resources.getString("edgeTriggerFailedRefit.text"));
-                    cbMenuItem.setSelected(person.getOptions()
-                                                 .booleanOption(PersonnelOptions.EDGE_REPAIR_FAILED_REFIT));
-                    cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER,
-                          PersonnelOptions.EDGE_REPAIR_FAILED_REFIT));
-                    if (!person.getPrimaryRole().isTech()) {
-                        cbMenuItem.setForeground(new Color(150, 150, 150));
-                    }
-                    cbMenuItem.addActionListener(this);
-                    menu.add(cbMenuItem);
-
-                    cbMenuItem = new JCheckBoxMenuItem(resources.getString("edgeTriggerFatalAccident.text"));
-                    cbMenuItem.setSelected(person.getOptions()
-                                                 .booleanOption(PersonnelOptions.EDGE_SALVAGE_ACCIDENTS));
-                    cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER,
-                          PersonnelOptions.EDGE_SALVAGE_ACCIDENTS));
-                    if (!person.getPrimaryRole().isTech()) {
-                        cbMenuItem.setForeground(new Color(150, 150, 150));
-                    }
-                    cbMenuItem.addActionListener(this);
-                    menu.add(cbMenuItem);
-
-                    // Admins
-                    cbMenuItem = new JCheckBoxMenuItem(resources.getString("edgeTriggerAcquireCheckOther.text"));
-                    cbMenuItem.setSelected(person.getOptions()
-                                                 .booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL_OTHER));
-                    cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER,
-                          PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL_OTHER));
-                    if (!person.getPrimaryRole().isAdministrator()) {
-                        cbMenuItem.setForeground(new Color(150, 150, 150));
-                    }
-                    cbMenuItem.addActionListener(this);
-                    menu.add(cbMenuItem);
-
-                    cbMenuItem = new JCheckBoxMenuItem(resources.getString("edgeTriggerAcquireCheckEight.text"));
-                    cbMenuItem.setSelected(person.getOptions()
-                                                 .booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL_EIGHT));
-                    cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER,
-                          PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL_EIGHT));
-                    if (!person.getPrimaryRole().isAdministrator()) {
-                        cbMenuItem.setForeground(new Color(150, 150, 150));
-                    }
-                    cbMenuItem.addActionListener(this);
-                    menu.add(cbMenuItem);
-
-                    cbMenuItem = new JCheckBoxMenuItem(resources.getString("edgeTriggerAcquireCheckEleven.text"));
-                    cbMenuItem.setSelected(person.getOptions()
-                                                 .booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL_ELEVEN));
-                    cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER,
-                          PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL_ELEVEN));
-                    if (!person.getPrimaryRole().isAdministrator()) {
-                        cbMenuItem.setForeground(new Color(150, 150, 150));
-                    }
-                    cbMenuItem.addActionListener(this);
-                    menu.add(cbMenuItem);
-
-                    cbMenuItem = new JCheckBoxMenuItem(resources.getString("edgeTriggerAppraisalCheck.text"));
-                    cbMenuItem.setSelected(person.getOptions()
-                                                 .booleanOption(PersonnelOptions.EDGE_ADMIN_APPRAISAL_FAIL));
-                    cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER,
-                          PersonnelOptions.EDGE_ADMIN_APPRAISAL_FAIL));
-                    if (!person.getPrimaryRole().isAdministrator()) {
-                        cbMenuItem.setForeground(new Color(150, 150, 150));
-                    }
-                    cbMenuItem.addActionListener(this);
-                    menu.add(cbMenuItem);
+                // Doctors
+                cbMenuItem = new JCheckBoxMenuItem(resources.getString("edgeTriggerHealCheck.text"));
+                cbMenuItem.setSelected(person.getOptions().booleanOption(PersonnelOptions.EDGE_MEDICAL));
+                cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_MEDICAL));
+                if (!person.getPrimaryRole().isDoctor()) {
+                    cbMenuItem.setForeground(new Color(150, 150, 150));
                 }
+                cbMenuItem.addActionListener(this);
+                menu.add(cbMenuItem);
+                cbMenuItem = new JCheckBoxMenuItem(resources.getString("edgeTriggerAdvancedSurgery.text"));
+                cbMenuItem.setSelected(person.getOptions().booleanOption(PersonnelOptions.EDGE_ADVANCED_SURGERY));
+                cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_ADVANCED_SURGERY));
+                if (!person.getPrimaryRole().isDoctor()) {
+                    cbMenuItem.setForeground(new Color(150, 150, 150));
+                }
+                cbMenuItem.addActionListener(this);
+                menu.add(cbMenuItem);
+
+                // Techs
+                cbMenuItem = new JCheckBoxMenuItem(resources.getString("edgeTriggerBreakPart.text"));
+                cbMenuItem.setSelected(person.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_BREAK_PART));
+                cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_REPAIR_BREAK_PART));
+                if (!person.getPrimaryRole().isTech()) {
+                    cbMenuItem.setForeground(new Color(150, 150, 150));
+                }
+                cbMenuItem.addActionListener(this);
+                menu.add(cbMenuItem);
+
+                cbMenuItem = new JCheckBoxMenuItem(resources.getString("edgeTriggerFailedRefit.text"));
+                cbMenuItem.setSelected(person.getOptions()
+                                             .booleanOption(PersonnelOptions.EDGE_REPAIR_FAILED_REFIT));
+                cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER,
+                      PersonnelOptions.EDGE_REPAIR_FAILED_REFIT));
+                if (!person.getPrimaryRole().isTech()) {
+                    cbMenuItem.setForeground(new Color(150, 150, 150));
+                }
+                cbMenuItem.addActionListener(this);
+                menu.add(cbMenuItem);
+
+                cbMenuItem = new JCheckBoxMenuItem(resources.getString("edgeTriggerFatalAccident.text"));
+                cbMenuItem.setSelected(person.getOptions()
+                                             .booleanOption(PersonnelOptions.EDGE_SALVAGE_ACCIDENTS));
+                cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER,
+                      PersonnelOptions.EDGE_SALVAGE_ACCIDENTS));
+                if (!person.getPrimaryRole().isTech()) {
+                    cbMenuItem.setForeground(new Color(150, 150, 150));
+                }
+                cbMenuItem.addActionListener(this);
+                menu.add(cbMenuItem);
+
+                // Admins
+                cbMenuItem = new JCheckBoxMenuItem(resources.getString("edgeTriggerAcquireCheckOther.text"));
+                cbMenuItem.setSelected(person.getOptions()
+                                             .booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL_OTHER));
+                cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER,
+                      PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL_OTHER));
+                if (!person.getPrimaryRole().isAdministrator()) {
+                    cbMenuItem.setForeground(new Color(150, 150, 150));
+                }
+                cbMenuItem.addActionListener(this);
+                menu.add(cbMenuItem);
+
+                cbMenuItem = new JCheckBoxMenuItem(resources.getString("edgeTriggerAcquireCheckEight.text"));
+                cbMenuItem.setSelected(person.getOptions()
+                                             .booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL_EIGHT));
+                cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER,
+                      PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL_EIGHT));
+                if (!person.getPrimaryRole().isAdministrator()) {
+                    cbMenuItem.setForeground(new Color(150, 150, 150));
+                }
+                cbMenuItem.addActionListener(this);
+                menu.add(cbMenuItem);
+
+                cbMenuItem = new JCheckBoxMenuItem(resources.getString("edgeTriggerAcquireCheckEleven.text"));
+                cbMenuItem.setSelected(person.getOptions()
+                                             .booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL_ELEVEN));
+                cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER,
+                      PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL_ELEVEN));
+                if (!person.getPrimaryRole().isAdministrator()) {
+                    cbMenuItem.setForeground(new Color(150, 150, 150));
+                }
+                cbMenuItem.addActionListener(this);
+                menu.add(cbMenuItem);
+
+                cbMenuItem = new JCheckBoxMenuItem(resources.getString("edgeTriggerAppraisalCheck.text"));
+                cbMenuItem.setSelected(person.getOptions()
+                                             .booleanOption(PersonnelOptions.EDGE_ADMIN_APPRAISAL_FAIL));
+                cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER,
+                      PersonnelOptions.EDGE_ADMIN_APPRAISAL_FAIL));
+                if (!person.getPrimaryRole().isAdministrator()) {
+                    cbMenuItem.setForeground(new Color(150, 150, 150));
+                }
+                cbMenuItem.addActionListener(this);
+                menu.add(cbMenuItem);
+
                 JMenuHelpers.addMenuIfNonEmpty(popup, menu);
             }
             // endregion Edge Triggers
@@ -3748,7 +3746,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 menuItem.addActionListener(this);
                 submenu.add(menuItem);
 
-                if (getCampaignOptions().isUseSupportEdge()) {
+                if (getCampaignOptions().isUseEdge()) {
                     menuItem = new JMenuItem(resources.getString("edgeTriggerHealCheck.text"));
                     menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_MEDICAL, TRUE));
                     menuItem.addActionListener(this);
@@ -3891,7 +3889,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 menuItem.addActionListener(this);
                 submenu.add(menuItem);
 
-                if (getCampaignOptions().isUseSupportEdge()) {
+                if (getCampaignOptions().isUseEdge()) {
                     menuItem = new JMenuItem(resources.getString("edgeTriggerHealCheck.text"));
                     menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_MEDICAL, FALSE));
                     menuItem.addActionListener(this);
@@ -4640,7 +4638,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
     private void addEdgeRefreshOption(boolean oneSelected, Person person, boolean isUseReasoningMultiplier,
           JMenu menu) {
-        final boolean isUseEdge = getCampaignOptions().isUseEdge() || getCampaignOptions().isUseSupportEdge();
+        final boolean isUseEdge = getCampaignOptions().isUseEdge();
         int replenishEdgeCost = getCampaignOptions().getEdgeRefreshCost();
 
         JMenuItem replenishEdge = new JMenuItem();

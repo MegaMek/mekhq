@@ -210,7 +210,7 @@ public class AdvancedMedicalAlternateHealing {
                       hasProthesisTechnician);
                 miscPenalty += hasHypochondriac ? 1 : 0;
 
-                boolean useEdge = campaign.getCampaignOptions().isUseSupportEdge();
+                boolean useEdge = campaign.getCampaignOptions().isUseEdge();
                 useEdge = useEdge && patientOptions.booleanOption(EDGE_MEDICAL);
                 int marginOfSuccess = getMarginOfSuccessForUnassistedHealing(patient, modifiers, miscPenalty, useEdge);
 
@@ -360,7 +360,7 @@ public class AdvancedMedicalAlternateHealing {
                           hasTraumaSurgeon, hasProthesisTechnician);
                     miscPenalty += hasHypochondriac ? 1 : 0;
 
-                    boolean useEdge = campaign.getCampaignOptions().isUseSupportEdge();
+                    boolean useEdge = campaign.getCampaignOptions().isUseEdge();
                     useEdge = useEdge && doctorOptions.booleanOption(EDGE_MEDICAL);
                     int marginOfSuccess = getMarginOfSuccessForAssistedHealing(
                           doctor, campaign, modifiers, miscPenalty, useEdge);
