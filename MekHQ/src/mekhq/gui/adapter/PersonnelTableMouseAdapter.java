@@ -161,7 +161,7 @@ import mekhq.campaign.personnel.skills.Skills;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
 import mekhq.campaign.randomEvents.personalities.PersonalityController;
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
+import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;

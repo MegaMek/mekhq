@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.randomEvents;
+package mekhq.campaign.randomEvents.other;
 
 import static java.lang.Math.max;
 import static megamek.common.compute.Compute.d6;

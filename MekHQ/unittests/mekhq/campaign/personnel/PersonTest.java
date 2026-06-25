@@ -82,13 +82,13 @@ import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.randomEvents.personalities.enums.Aggression;
-import mekhq.campaign.randomEvents.personalities.enums.Ambition;
-import mekhq.campaign.randomEvents.personalities.enums.Greed;
-import mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk;
-import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
-import mekhq.campaign.randomEvents.personalities.enums.Social;
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
+import mekhq.campaign.randomEvents.personalities.Aggression;
+import mekhq.campaign.randomEvents.personalities.Ambition;
+import mekhq.campaign.randomEvents.personalities.Greed;
+import mekhq.campaign.randomEvents.personalities.PersonalityQuirk;
+import mekhq.campaign.randomEvents.personalities.Reasoning;
+import mekhq.campaign.randomEvents.personalities.Social;
+import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -1395,7 +1395,7 @@ public class PersonTest {
         person.setCommander(true);
 
         try (EventSpy eventSpy = new EventSpy()) {
-            person.changeStatus(mockCampaign, LocalDate.of(3001,1,1), PersonnelStatus.KIA);
+            person.changeStatus(mockCampaign, LocalDate.of(3001, 1, 1), PersonnelStatus.KIA);
 
             // Verify event was emitted
             PersonStatusChangedEvent personStatusChangedEvent = eventSpy.findEvent(PersonStatusChangedEvent.class,
@@ -1434,7 +1434,7 @@ public class PersonTest {
         person.setSecondInCommand(true);
 
         try (EventSpy eventSpy = new EventSpy()) {
-            person.changeStatus(mockCampaign, LocalDate.of(3001,1,1), PersonnelStatus.KIA);
+            person.changeStatus(mockCampaign, LocalDate.of(3001, 1, 1), PersonnelStatus.KIA);
 
             // Verify event was emitted
             PersonStatusChangedEvent personStatusChangedEvent = eventSpy.findEvent(PersonStatusChangedEvent.class,

@@ -105,7 +105,7 @@ import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
+import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;

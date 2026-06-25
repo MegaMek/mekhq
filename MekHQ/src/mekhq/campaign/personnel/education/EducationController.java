@@ -92,7 +92,7 @@ import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
+import mekhq.campaign.randomEvents.personalities.Reasoning;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.utilities.ReportingUtilities;
@@ -330,8 +330,8 @@ public class EducationController {
             person.setEduEducationStage(EducationStage.JOURNEY_TO_CAMPUS);
             PlanetarySystem personSystem = person.getCurrentSystem();
             String systemId = personSystem != null
-                  ? personSystem.getId()
-                  : campaign.getCurrentSystem().getId();
+                                    ? personSystem.getId()
+                                    : campaign.getCurrentSystem().getId();
             person.setEduAcademySystem(systemId);
             person.setEduJourneyTime(2);
         } else {
@@ -355,8 +355,12 @@ public class EducationController {
                                         : 0.0;
             JumpPath jumpPath = person.getJumpPath();
             person.setEduJourneyTime(jumpPath != null
-                  ? LocationDispatch.computeJourneyDays(jumpPath, campaign.getLocalDate(), startTransit)
-                  : max(2, campaign.getSimplifiedTravelTime(campaign.getSystemById(campus))));
+                                           ?
+                                           LocationDispatch.computeJourneyDays(jumpPath,
+                                                 campaign.getLocalDate(),
+                                                 startTransit)
+                                           :
+                                           max(2, campaign.getSimplifiedTravelTime(campaign.getSystemById(campus))));
         }
 
         Genealogy genealogy = person.getGenealogy();
@@ -786,14 +790,17 @@ public class EducationController {
         if (academySystemId != null) {
             academySystem = campaign.getSystemById(academySystemId);
             if (academySystem == null) {
-                LOGGER.error("beginJourneyHome: could not find academy system '{}' for {} — falling back to campaign location",
-                      academySystemId, person.getFullTitle());
+                LOGGER.error(
+                      "beginJourneyHome: could not find academy system '{}' for {} — falling back to campaign location",
+                      academySystemId,
+                      person.getFullTitle());
             }
         }
         if (academySystem == null) {
             academySystem = campaign.getCurrentSystem();
             if (academySystem == null) {
-                LOGGER.error("beginJourneyHome: campaign current system is also null for {} — travel time calculation may fail",
+                LOGGER.error(
+                      "beginJourneyHome: campaign current system is also null for {} — travel time calculation may fail",
                       person.getFullTitle());
             }
         }
@@ -802,9 +809,9 @@ public class EducationController {
 
         JumpPath returnPath = person.getJumpPath();
         int travelDays = returnPath != null
-              ? LocationDispatch.computeJourneyDays(returnPath, campaign.getLocalDate(),
-                    LocationDispatch.computeStartTransit(academySystem, campaign))
-              : max(2, campaign.getSimplifiedTravelTime(academySystem));
+                               ? LocationDispatch.computeJourneyDays(returnPath, campaign.getLocalDate(),
+              LocationDispatch.computeStartTransit(academySystem, campaign))
+                               : max(2, campaign.getSimplifiedTravelTime(academySystem));
         person.setEduJourneyTime(travelDays);
         person.setEduDaysOfTravel(0);
 

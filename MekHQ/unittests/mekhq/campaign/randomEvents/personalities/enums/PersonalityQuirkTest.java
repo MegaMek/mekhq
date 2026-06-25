@@ -33,7 +33,7 @@
 package mekhq.campaign.randomEvents.personalities.enums;
 
 import static mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR;
-import static mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk.NONE;
+import static mekhq.campaign.randomEvents.personalities.PersonalityQuirk.NONE;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -44,6 +44,7 @@ import java.util.stream.Stream;
 
 import megamek.common.enums.Gender;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.randomEvents.personalities.PersonalityQuirk;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import org.junit.jupiter.params.ParameterizedTest;

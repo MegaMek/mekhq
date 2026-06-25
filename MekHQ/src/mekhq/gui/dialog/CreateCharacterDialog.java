@@ -37,7 +37,7 @@ import static mekhq.campaign.personnel.Person.*;
 import static mekhq.campaign.personnel.skills.Skill.getCountUpMaxValue;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeInterviewersNotes;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
-import static mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk.personalityQuirksSortedAlphabetically;
+import static mekhq.campaign.randomEvents.personalities.PersonalityQuirk.personalityQuirksSortedAlphabetically;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -90,12 +90,12 @@ import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.randomEvents.personalities.enums.Aggression;
-import mekhq.campaign.randomEvents.personalities.enums.Ambition;
-import mekhq.campaign.randomEvents.personalities.enums.Greed;
-import mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk;
-import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
-import mekhq.campaign.randomEvents.personalities.enums.Social;
+import mekhq.campaign.randomEvents.personalities.Aggression;
+import mekhq.campaign.randomEvents.personalities.Ambition;
+import mekhq.campaign.randomEvents.personalities.Greed;
+import mekhq.campaign.randomEvents.personalities.PersonalityQuirk;
+import mekhq.campaign.randomEvents.personalities.Reasoning;
+import mekhq.campaign.randomEvents.personalities.Social;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -1152,11 +1152,10 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
     }
 
     /**
-     * Rebuilds {@code choiceFaction}'s model after a "Show All Factions" toggle, preserving the
-     * current selection across the swap. If there was no current selection (or the previously
-     * selected faction has been filtered out by the new model), the index is explicitly set to
-     * {@code -1} — otherwise Swing's combobox auto-selects the first item on a model swap, which
-     * would silently assign an unintended origin when OK is clicked.
+     * Rebuilds {@code choiceFaction}'s model after a "Show All Factions" toggle, preserving the current selection
+     * across the swap. If there was no current selection (or the previously selected faction has been filtered out by
+     * the new model), the index is explicitly set to {@code -1} — otherwise Swing's combobox auto-selects the first
+     * item on a model swap, which would silently assign an unintended origin when OK is clicked.
      */
     private void rebuildFactionsModelPreservingSelection() {
         Faction current = (Faction) choiceFaction.getSelectedItem();

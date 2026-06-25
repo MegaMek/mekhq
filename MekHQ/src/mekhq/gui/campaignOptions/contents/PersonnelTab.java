@@ -56,7 +56,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.AwardBonus;
 import mekhq.campaign.personnel.enums.EdgeRefreshPeriod;
 import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
+import mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;

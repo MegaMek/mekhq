@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.randomEvents.personalities.enums;
+package mekhq.campaign.randomEvents.personalities;
 
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 

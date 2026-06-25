@@ -61,7 +61,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
-import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
+import mekhq.campaign.randomEvents.personalities.Reasoning;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

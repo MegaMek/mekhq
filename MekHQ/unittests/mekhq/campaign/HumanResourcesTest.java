@@ -66,7 +66,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
+import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
 import mekhq.utilities.MHQXMLUtility;

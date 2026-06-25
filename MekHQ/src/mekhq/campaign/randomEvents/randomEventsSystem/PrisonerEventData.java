@@ -30,24 +30,18 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.randomEvents.prisoners.records;
+package mekhq.campaign.randomEvents.randomEventsSystem;
 
 import java.util.List;
 
-import mekhq.campaign.randomEvents.prisoners.enums.ResponseQuality;
-
 /**
- * Represents an individual response entry for a prisoner event. Each response entry defines a response quality and its
- * associated effects.
+ * Represents data relevant to a random prisoner event, including its type, severity, and response map structure.
  *
- * @param quality        the quality of the response, as defined by the {@link ResponseQuality} enum
- * @param effectsSuccess a list of effects resulting from successful resolution of the event, as defined by the
- *                       {@link EventResult} record
- * @param effectsFailure a list of effects resulting from failing to resolve the event, as defined by the
- *                       {@link EventResult} record
+ * @param prisonerEvent   The type of prisoner event as a {@link PrisonerEvent}. This represents the name of the event.
+ * @param responseEntries A list of {@link PrisonerResponseEntry} defining the responses and their associated qualities
+ *                        and effects.
  */
-public record PrisonerResponseEntry(
-      ResponseQuality quality,
-      List<EventResult> effectsSuccess,
-      List<EventResult> effectsFailure
+public record PrisonerEventData(
+      PrisonerEvent prisonerEvent,
+      List<PrisonerResponseEntry> responseEntries
 ) {}

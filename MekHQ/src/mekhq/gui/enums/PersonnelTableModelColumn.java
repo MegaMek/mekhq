@@ -73,7 +73,7 @@ import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.randomEvents.personalities.PersonalityTrait;
-import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
+import mekhq.campaign.randomEvents.personalities.Reasoning;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.gui.model.LocationDisplay;
