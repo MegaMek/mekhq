@@ -42,7 +42,6 @@ import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.enums.DailyReportType.POLITICS;
 import static mekhq.campaign.force.FormationType.SECURITY;
-import static mekhq.campaign.randomEvents.personalities.PersonalityController.getPersonalityValue;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
@@ -71,7 +70,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.randomEvents.prisoners.prisonerEvents.PrisonEscapeScenario;
 import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventData;
 import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventEffectsManager;
-import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventResponseQuality;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
@@ -553,45 +551,6 @@ public class PrisonerEventManager {
         List<RandomEventData> allMajorEvents = campaign.getRandomEventLibraries().getPrisonerEvents(isMajor);
         Collections.shuffle(allMajorEvents);
         return ObjectUtility.getRandomItem(allMajorEvents);
-    }
-
-    /**
-     * Performs a check to determine if the player's response to an event is successful.
-     *
-     * <p>The success of the check depends on the attributes of the event, the chosen response
-     * option, and modifiers such as the speaker's personality.</p>
-     *
-     * @param eventData   The data for the prisoner event being processed.
-     * @param choiceIndex The index of the choice made by the player in the event dialog.
-     *
-     * @return {@code true} if the player's response is deemed successful, {@code false} otherwise.
-     */
-    private boolean makeEventCheck(RandomEventData eventData, int choiceIndex) {
-        int responseModifier = 0;
-        if (speaker != null) {
-            responseModifier = getPersonalityValue(campaign.getCampaignOptions().isUseRandomPersonalities(),
-                  speaker.getAggression(),
-                  speaker.getAmbition(),
-                  speaker.getGreed(),
-                  speaker.getSocial());
-        }
-
-        if (speaker == null) {
-            responseModifier = -12; // this deliberately renders the check impossible
-        }
-
-        RandomEventResponseQuality randomEventResponseQuality = eventData.responseEntries().get(choiceIndex).quality();
-        switch (randomEventResponseQuality) {
-            case RESPONSE_NEUTRAL -> {
-            } // No modifier
-            case RESPONSE_POSITIVE -> responseModifier += 3;
-            case RESPONSE_NEGATIVE -> responseModifier -= 3;
-        }
-
-        int responseCheck = d6(2) + responseModifier;
-
-
-        return responseCheck >= 7;
     }
 
     /**

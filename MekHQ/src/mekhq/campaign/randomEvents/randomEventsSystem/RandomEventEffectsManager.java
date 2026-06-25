@@ -832,9 +832,6 @@ public class RandomEventEffectsManager {
             potentialTargets.remove(target);
         }
 
-        MMLogger logger = MMLogger.create(RandomEventEffectsManager.class);
-        logger.info(personHashSet.toString());
-
         String colorOpen = spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());
 
         String context = getFormattedTextAt(RESOURCE_BUNDLE,
