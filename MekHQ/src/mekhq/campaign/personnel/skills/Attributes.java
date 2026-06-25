@@ -426,11 +426,6 @@ public class Attributes {
         }
 
         int cap = getAttributeCap(phenotype, options, attribute);
-
-        // This ensures we never fall outside the hard boundaries, no matter how many SPAs or other weirdness the
-        // player piles on.
-        cap = Math.clamp(cap, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
-
         switch (attribute) {
             case STRENGTH -> strength = Math.clamp(score, MINIMUM_ATTRIBUTE_SCORE, cap);
             case BODY -> body = Math.clamp(score, MINIMUM_ATTRIBUTE_SCORE, cap);
@@ -472,32 +467,21 @@ public class Attributes {
         int cap = phenotype.getAttributeCap(attribute);
 
         // This is where you'd use options to verify if a character has SPAs that modify their maximum attribute score
-        boolean hasExceptionalStrength = options.booleanOption(EXCEPTIONAL_ATTRIBUTE_STRENGTH);
-        boolean hasFreakishStrength = options.booleanOption(MUTATION_FREAKISH_STRENGTH);
-        boolean hasExceptionalBody = options.booleanOption(EXCEPTIONAL_ATTRIBUTE_BODY);
-        boolean hasExceptionalReflexes = options.booleanOption(EXCEPTIONAL_ATTRIBUTE_REFLEXES);
-        boolean hasExceptionalDexterity = options.booleanOption(EXCEPTIONAL_ATTRIBUTE_DEXTERITY);
-        boolean hasExceptionalIntelligence = options.booleanOption(EXCEPTIONAL_ATTRIBUTE_INTELLIGENCE);
-        boolean hasExceptionalWillpower = options.booleanOption(EXCEPTIONAL_ATTRIBUTE_WILLPOWER);
-        boolean hasExceptionalCharisma = options.booleanOption(EXCEPTIONAL_ATTRIBUTE_CHARISMA);
-        boolean hasExceptionalEdge = options.booleanOption(EXCEPTIONAL_ATTRIBUTE_EDGE);
-        boolean hasBelovedPet = options.booleanOption(UNOFFICIAL_BELOVED_PET);
-
         cap += switch (attribute) {
             case STRENGTH -> {
-                int modifier = hasExceptionalStrength ? 1 : 0;
-                modifier += hasFreakishStrength ? 1 : 0;
+                int modifier =  options.booleanOption(EXCEPTIONAL_ATTRIBUTE_STRENGTH) ? 1 : 0;
+                modifier += options.booleanOption(MUTATION_FREAKISH_STRENGTH) ? 1 : 0;
                 yield modifier;
             }
-            case BODY -> hasExceptionalBody ? 1 : 0;
-            case DEXTERITY -> hasExceptionalReflexes ? 1 : 0;
-            case REFLEXES -> hasExceptionalDexterity ? 1 : 0;
-            case INTELLIGENCE -> hasExceptionalIntelligence ? 1 : 0;
-            case WILLPOWER -> hasExceptionalWillpower ? 1 : 0;
-            case CHARISMA -> hasExceptionalCharisma ? 1 : 0;
+            case BODY -> options.booleanOption(EXCEPTIONAL_ATTRIBUTE_BODY) ? 1 : 0;
+            case DEXTERITY -> options.booleanOption(EXCEPTIONAL_ATTRIBUTE_REFLEXES) ? 1 : 0;
+            case REFLEXES -> options.booleanOption(EXCEPTIONAL_ATTRIBUTE_DEXTERITY) ? 1 : 0;
+            case INTELLIGENCE -> options.booleanOption(EXCEPTIONAL_ATTRIBUTE_INTELLIGENCE) ? 1 : 0;
+            case WILLPOWER -> options.booleanOption(EXCEPTIONAL_ATTRIBUTE_WILLPOWER) ? 1 : 0;
+            case CHARISMA -> options.booleanOption(EXCEPTIONAL_ATTRIBUTE_CHARISMA) ? 1 : 0;
             case EDGE -> {
-                int modifier = hasExceptionalEdge ? 1 : 0;
-                modifier += hasBelovedPet ? 1 : 0;
+                int modifier = options.booleanOption(EXCEPTIONAL_ATTRIBUTE_EDGE) ? 1 : 0;
+                modifier += options.booleanOption(UNOFFICIAL_BELOVED_PET) ? 1 : 0;
                 yield modifier;
             }
             default -> {
@@ -505,7 +489,11 @@ public class Attributes {
                 yield 0;
             }
         };
-        return cap;
+
+        // This ensures we never fall outside the hard boundaries, no matter how many SPAs or other weirdness the
+        // player piles on.
+        int minimumValue = attribute == SkillAttribute.EDGE ? MINIMUM_EDGE_SCORE : MINIMUM_ATTRIBUTE_SCORE;
+        return Math.clamp(cap, minimumValue, MAXIMUM_ATTRIBUTE_SCORE);
     }
 
     // Utility Methods
