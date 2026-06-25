@@ -195,15 +195,14 @@ public class PartsAcquisitionService {
             pci.setRequiredCount(awList.size());
             pci.setStickerPrice(part.getStickerPrice());
             pci.setMissingCount(missing);
+            pci.setOmniPodCount(omniPod);
+            pci.setInTransitCount(inTransit);
+            pci.setOnOrderCount(onOrder);
 
             SkillCheck skillCheck = campaign.checkAcquisition(awFirst, admin, true);
             if (skillCheck.getTargetNumber().isImpossible()) {
                 pci.setCanBeAcquired(false);
                 pci.setFailedMessage(skillCheck.getTargetNumber().getPlainDesc());
-            } else {
-                pci.setInTransitCount(inTransit);
-                pci.setOnOrderCount(onOrder);
-                pci.setOmniPodCount(omniPod);
             }
 
             partCountInfoMap.put(awList.getFirst().getAcquisitionDisplayName(), pci);

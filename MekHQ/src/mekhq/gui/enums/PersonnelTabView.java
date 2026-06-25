@@ -57,12 +57,13 @@ public enum PersonnelTabView {
     BIOGRAPHICAL("PersonnelTabView.BIOGRAPHICAL.text", "PersonnelTabView.BIOGRAPHICAL.toolTipText"),
     FLUFF("PersonnelTabView.FLUFF.text", "PersonnelTabView.FLUFF.toolTipText"),
     DATES("PersonnelTabView.DATES.text", "PersonnelTabView.DATES.toolTipText"),
-    FLAGS_A("PersonnelTabView.FLAGS_A.text", "PersonnelTabView.FLAGS_A.toolTipText"),
-    FLAGS_B("PersonnelTabView.FLAGS_B.text", "PersonnelTabView.FLAGS_B.toolTipText"),
-    FLAGS_C("PersonnelTabView.FLAGS_C.text", "PersonnelTabView.FLAGS_C.toolTipText"),
+    FAMILY("PersonnelTabView.FAMILY.text", "PersonnelTabView.FAMILY.toolTipText"),
     TRANSPORT("PersonnelTabView.TRANSPORT.text", "PersonnelTabView.TRANSPORT.toolTipText"),
     EDUCATION("PersonnelTabView.EDUCATION.text", "PersonnelTabView.EDUCATION.toolTipText"),
     LOCATION("PersonnelTabView.LOCATION.text", "PersonnelTabView.LOCATION.toolTipText"),
+    FLAGS_A("PersonnelTabView.FLAGS_A.text", "PersonnelTabView.FLAGS_A.toolTipText"),
+    FLAGS_B("PersonnelTabView.FLAGS_B.text", "PersonnelTabView.FLAGS_B.toolTipText"),
+    FLAGS_C("PersonnelTabView.FLAGS_C.text", "PersonnelTabView.FLAGS_C.toolTipText"),
     OTHER("PersonnelTabView.OTHER.text", "PersonnelTabView.OTHER.toolTipText");
     //endregion Enum Declarations
 
