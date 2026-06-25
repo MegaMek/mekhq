@@ -487,6 +487,7 @@ public class Campaign implements ITechManager, IPlace {
           MekHQ.getMHQOptions().getLocale());
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Campaign";
+    private static final String ACTION_CHECK_BUNDLE = "mekhq.resources.ActionCheck";
 
     private HumanResources humanResources = new HumanResources();
 
@@ -3722,10 +3723,9 @@ public class Campaign implements ITechManager, IPlace {
      * Make an acquisition roll for a given planet to see if you can identify a contact. Used for planetary based
      * acquisition.
      *
-     * @param acquisition - The <code> IAcquisitionWork</code> being acquired.
-     * @param person      - The <code>Person</code> object attempting to do the acquiring. may be null if no one on the
-     *                    force has the skill or the user is using automatic acquisition.
-     * @param system      - The <code>PlanetarySystem</code> object where the acquisition is being attempted. This may
+     * @param acquisition The <code> IAcquisitionWork</code> being acquired.
+     * @param person      The <code>Person</code> object attempting to do the acquiring
+     * @param system      The <code>PlanetarySystem</code> object where the acquisition is being attempted. This may
      *                    be null if the user is not using planetary acquisition.
      *
      * @return The result of the rolls.
@@ -3733,106 +3733,40 @@ public class Campaign implements ITechManager, IPlace {
     public PartAcquisitionResult findContactForAcquisition(IAcquisitionWork acquisition, Person person,
           PlanetarySystem system) {
         SkillCheck skillCheck = checkAcquisition(acquisition, person);
-
-        String impossibleSentencePrefix = person == null ?
-                                                "Can't search for " :
-                                                person.getFullName() + " can't search for ";
-        String failedSentencePrefix = person == null ?
-                                            "No contacts available for " :
-                                            person.getFullName() + " is unable to find contacts for ";
-        String succeededSentencePrefix = person == null ?
-                                               "Possible contact for " :
-                                               person.getFullName() + " has found a contact for ";
-
-        // if it's already impossible, don't bother with the rest
-        if (skillCheck.getTargetNumber().isImpossible()) {
-            if (getCampaignOptions().isPlanetAcquisitionVerbose()) {
-                addReport(ACQUISITIONS, "<font color='" +
-                                              ReportingUtilities.getNegativeColor() +
-                                              "'><b>" +
-                                              impossibleSentencePrefix +
-                                              acquisition.getAcquisitionName() +
-                                              " on " +
-                                              system.getPrintableName(getLocalDate()) +
-                                              " because:</b></font> " +
-                                              skillCheck.getTargetNumber().getDesc());
-            }
-            return PartAcquisitionResult.PartInherentFailure;
-        }
-
+        boolean inherentFailure = skillCheck.getTargetNumber().isImpossible();
         List<TargetRollModifier> acquisitionMods = system.getPrimaryPlanet().getAcquisitionMods(
               getLocalDate(), getCampaignOptions(), getFaction(), acquisition.getTechBase() == TechBase.CLAN);
         skillCheck.withExternalModifiers(acquisitionMods);
 
+        // if it's already impossible, don't bother with the rest
         if (skillCheck.getTargetNumber().isImpossible()) {
             if (getCampaignOptions().isPlanetAcquisitionVerbose()) {
-                addReport(ACQUISITIONS, "<font color='" +
-                                              ReportingUtilities.getNegativeColor() +
-                                              "'><b>" +
-                                              impossibleSentencePrefix +
-                                              acquisition.getAcquisitionName() +
-                                              " on " +
-                                              system.getPrintableName(getLocalDate()) +
-                                              " because:</b></font> " +
-                                              skillCheck.getTargetNumber().getDesc());
+                addReport(ACQUISITIONS, getFormattedTextAt(ACTION_CHECK_BUNDLE, "contractAcquisition.impossible",
+                      ReportingUtilities.getNegativeColor(), person.getFullName(), acquisition.getAcquisitionName(),
+                      system.getPrintableName(getLocalDate()), skillCheck.getTargetNumber().getDesc()));
             }
-            return PartAcquisitionResult.PlanetSpecificFailure;
+            return inherentFailure ? PartAcquisitionResult.PartInherentFailure :
+                         PartAcquisitionResult.PlanetSpecificFailure;
         }
-        SocioIndustrialData socioIndustrial = system.getPrimaryPlanet().getSocioIndustrial(getLocalDate());
-        CampaignOptions options = getCampaignOptions();
-        int techBonus = options.getPlanetTechAcquisitionBonus(socioIndustrial.tech);
-        int industryBonus = options.getPlanetIndustryAcquisitionBonus(socioIndustrial.industry);
-        int outputsBonus = options.getPlanetOutputAcquisitionBonus(socioIndustrial.output);
 
-        ActionCheckResult skillCheckResult = skillCheck.resolve(false, null, false);
-        if (!skillCheckResult.isSuccess()) {
-            // no contacts on this planet, move along
-            if (getCampaignOptions().isPlanetAcquisitionVerbose()) {
-                addReport(ACQUISITIONS, "<font color='" +
-                                              ReportingUtilities.getNegativeColor() +
-                                              "'><b>" +
-                                              failedSentencePrefix +
-                                              acquisition.getAcquisitionName() +
-                                              " on " +
-                                              system.getPrintableName(getLocalDate()) +
-                                              " at TN: " +
-                                              skillCheck.getTargetNumber().getValue() +
-                                              " - Modifiers (Tech: " +
-                                              (techBonus > 0 ? "+" : "") +
-                                              techBonus +
-                                              ", Industry: " +
-                                              (industryBonus > 0 ? "+" : "") +
-                                              industryBonus +
-                                              ", Outputs: " +
-                                              (outputsBonus > 0 ? "+" : "") +
-                                              outputsBonus +
-                                              ") </font>");
-            }
-            return PartAcquisitionResult.PlanetSpecificFailure;
-        } else {
-            if (getCampaignOptions().isPlanetAcquisitionVerbose()) {
-                addReport(ACQUISITIONS, "<font color='" +
-                                              ReportingUtilities.getPositiveColor() +
-                                              "'>" +
-                                              succeededSentencePrefix +
-                                              acquisition.getAcquisitionName() +
-                                              " on " +
-                                              system.getPrintableName(getLocalDate()) +
-                                              " at TN: " +
-                                              skillCheck.getTargetNumber().getValue() +
-                                              " - Modifiers (Tech: " +
-                                              (techBonus > 0 ? "+" : "") +
-                                              techBonus +
-                                              ", Industry: " +
-                                              (industryBonus > 0 ? "+" : "") +
-                                              industryBonus +
-                                              ", Outputs: " +
-                                              (outputsBonus > 0 ? "+" : "") +
-                                              outputsBonus +
-                                              ") </font>");
-            }
-            return PartAcquisitionResult.Success;
+        ActionCheckResult result = skillCheck.resolve(false, null, false);
+        if (getCampaignOptions().isPlanetAcquisitionVerbose()) {
+            SocioIndustrialData socioIndustrial = system.getPrimaryPlanet().getSocioIndustrial(getLocalDate());
+            CampaignOptions options = getCampaignOptions();
+            int techBonus = options.getPlanetTechAcquisitionBonus(socioIndustrial.tech);
+            int industryBonus = options.getPlanetIndustryAcquisitionBonus(socioIndustrial.industry);
+            int outputsBonus = options.getPlanetOutputAcquisitionBonus(socioIndustrial.output);
+
+            String reportType = result.isSuccess() ? "contractAcquisition.success" : "contractAcquisition.failure";
+            String highlightColor = result.isSuccess() ? ReportingUtilities.getPositiveColor() :
+                                 ReportingUtilities.getNegativeColor();
+
+            addReport(ACQUISITIONS, getFormattedTextAt(ACTION_CHECK_BUNDLE, reportType,
+                  highlightColor, person.getFullName(), acquisition.getAcquisitionName(),
+                  system.getPrintableName(getLocalDate()), skillCheck.getTargetNumber().getValue(),
+                  techBonus,  industryBonus, outputsBonus));
         }
+        return result.isSuccess() ? PartAcquisitionResult.Success : PartAcquisitionResult.PlanetSpecificFailure;
     }
 
     /***
