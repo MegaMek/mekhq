@@ -108,9 +108,9 @@ public enum SkillAttribute {
     /**
      * Checks if the current instance is {@link #NO_ATTRIBUTE}.
      *
-     * @return {@code true} if the current instance is {@code NONE}, {@code false} otherwise.
+     * @return {@code true} if the current instance is {@code NO_ATTRIBUTE}, {@code false} otherwise.
      */
-    public boolean isNone() {
+    public boolean isNoAttribute() {
         return this == NO_ATTRIBUTE;
     }
 

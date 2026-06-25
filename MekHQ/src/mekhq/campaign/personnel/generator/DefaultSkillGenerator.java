@@ -228,7 +228,7 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
 
         // Reset Attribute Scores to default
         for (SkillAttribute attribute : SkillAttribute.values()) {
-            if (attribute.isNone()) {
+            if (attribute.isNoAttribute()) {
                 continue;
             }
 
@@ -249,7 +249,7 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
         PersonnelRole profession = person.getPrimaryRole();
         Phenotype phenotype = person.getPhenotype();
         for (SkillAttribute attribute : SkillAttribute.values()) {
-            if (attribute.isNone()) {
+            if (attribute.isNoAttribute()) {
                 continue;
             }
 

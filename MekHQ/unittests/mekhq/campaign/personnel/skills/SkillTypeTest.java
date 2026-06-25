@@ -98,7 +98,7 @@ class SkillTypeTest {
         // Assert
         assertNotSame(SkillAttribute.NO_ATTRIBUTE,
               attribute,
-              "Invalid first attribute for skill: " + skillType.getName() + " cannot be NONE");
+              "Invalid first attribute for skill: " + skillType.getName() + " cannot be NO_ATTRIBUTE");
         assertNotSame(null, attribute, "Invalid first attribute for skill: " + skillType.getName() + " cannot be null");
     }
 
@@ -216,7 +216,9 @@ class SkillTypeTest {
 
         // Assert
         SkillAttribute firstAttribute = skillType.getFirstAttribute();
-        assertNotSame(NO_ATTRIBUTE, firstAttribute, "First Attribute is NONE for Skill: " + skillType.getName());
+        assertNotSame(NO_ATTRIBUTE,
+              firstAttribute,
+              "First Attribute is NO_ATTRIBUTE for Skill: " + skillType.getName());
         if (firstAttribute != NO_ATTRIBUTE) {
             assertTrue(flavorText.contains(firstAttribute.getLabel()),
                   "Did not include first Attribute: " +
@@ -251,7 +253,9 @@ class SkillTypeTest {
         assertTrue(flavorText.contains("</html>"), "Did not include html closing tag: " + skillType.getName());
 
         SkillAttribute firstAttribute = skillType.getFirstAttribute();
-        assertNotSame(NO_ATTRIBUTE, firstAttribute, "First Attribute is NONE for Skill: " + skillType.getName());
+        assertNotSame(NO_ATTRIBUTE,
+              firstAttribute,
+              "First Attribute is NO_ATTRIBUTE for Skill: " + skillType.getName());
         if (firstAttribute != NO_ATTRIBUTE) {
             assertTrue(flavorText.contains(firstAttribute.getLabel()),
                   "Did not include first Attribute: " +

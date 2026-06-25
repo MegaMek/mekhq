@@ -60,7 +60,7 @@ public class AttributeCheck extends ActionCheck<AttributeCheck> {
     public AttributeCheck(Person person, TargetRoll targetNumber,
           SkillAttribute firstAttribute, SkillAttribute secondAttribute) {
         super(person, targetNumber);
-        if (firstAttribute == null || firstAttribute.isNone()) {
+        if (firstAttribute == null || firstAttribute.isNoAttribute()) {
             throw new IllegalArgumentException("First attribute for an attribute check is not present");
         }
         this.firstAttribute = firstAttribute;
