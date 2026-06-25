@@ -348,6 +348,7 @@ public class CampaignOptions {
     // Random Histories
     private RandomOriginOptions randomOriginOptions;
     private boolean useRandomPersonalities;
+    private boolean usePersonalityLabelsOnly;
     private boolean useRandomPersonalityReputation;
     private boolean useReasoningXpMultiplier;
     private boolean useSimulatedRelationships;
@@ -1007,6 +1008,7 @@ public class CampaignOptions {
         // Random Histories
         setRandomOriginOptions(new RandomOriginOptions(true));
         setUseRandomPersonalities(false);
+        setUsePersonalityLabelsOnly(false);
         setUseRandomPersonalityReputation(true);
         setUseReasoningXpMultiplier(true);
         setUseSimulatedRelationships(false);
@@ -2327,6 +2329,14 @@ public class CampaignOptions {
 
     public void setUseRandomPersonalities(final boolean useRandomPersonalities) {
         this.useRandomPersonalities = useRandomPersonalities;
+    }
+
+    public boolean isUsePersonalityLabelsOnly() {
+        return usePersonalityLabelsOnly;
+    }
+
+    public void setUsePersonalityLabelsOnly(final boolean usePersonalityLabelsOnly) {
+        this.usePersonalityLabelsOnly = usePersonalityLabelsOnly;
     }
 
     public boolean isUseRandomPersonalityReputation() {

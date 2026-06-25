@@ -521,6 +521,10 @@ public class CampaignOptionsMarshaller {
               campaignOptions.isUseRandomPersonalities());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
+              "usePersonalityLabelsOnly",
+              campaignOptions.isUsePersonalityLabelsOnly());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
               "useRandomPersonalityReputation",
               campaignOptions.isUseRandomPersonalityReputation());
         MHQXMLUtility.writeSimpleXMLTag(pw,
