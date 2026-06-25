@@ -33,13 +33,12 @@
 package mekhq.campaign;
 
 import java.util.UUID;
+import javax.swing.SwingUtilities;
 
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
 import mekhq.campaign.events.StoryFinishedEvent;
 import mekhq.campaign.market.PersonnelMarket;
-
-import javax.swing.SwingUtilities;
 
 /**
  * Manages the timeline of a {@link Campaign}.
@@ -87,6 +86,10 @@ public class CampaignController {
         }
         MekHQ.unregisterHandler(campaignEventProcessor);
         MekHQ.unregisterHandler(this);
+        CampaignNewDayManager newDayManager = localCampaign.getNewDayManager();
+        if (newDayManager != null) {
+            MekHQ.unregisterHandler(newDayManager);
+        }
     }
 
     /**

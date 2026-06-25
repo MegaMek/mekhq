@@ -245,6 +245,10 @@ public enum Reasoning {
     public boolean isAverageType() {
         return this.comparison == ReasoningComparison.AVERAGE;
     }
+
+    public boolean isAverage() {
+        return this == AVERAGE;
+    }
     // endregion Boolean Comparison Methods
 
     /**

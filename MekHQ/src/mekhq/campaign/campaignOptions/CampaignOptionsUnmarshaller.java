@@ -341,7 +341,6 @@ public class CampaignOptionsUnmarshaller {
             case "edgeRefreshPeriod" ->
                   campaignOptions.setEdgeRefreshPeriod(EdgeRefreshPeriod.fromString(nodeContents));
             case "useEdge" -> campaignOptions.setUseEdge(parseBoolean(nodeContents));
-            case "useSupportEdge" -> campaignOptions.setUseSupportEdge(parseBoolean(nodeContents));
             case "useImplants" -> campaignOptions.setUseImplants(parseBoolean(nodeContents));
             case "alternativeQualityAveraging" -> campaignOptions.setAlternativeQualityAveraging(parseBoolean(
                   nodeContents));
@@ -505,6 +504,7 @@ public class CampaignOptionsUnmarshaller {
                 campaignOptions.setRandomOriginOptions(randomOriginOptions);
             }
             case "useRandomPersonalities" -> campaignOptions.setUseRandomPersonalities(parseBoolean(nodeContents));
+            case "usePersonalityLabelsOnly" -> campaignOptions.setUsePersonalityLabelsOnly(parseBoolean(nodeContents));
             case "useRandomPersonalityReputation" -> campaignOptions.setUseRandomPersonalityReputation(parseBoolean(
                   nodeContents));
             case "useReasoningXpMultiplier" -> campaignOptions.setUseReasoningXpMultiplier(parseBoolean(

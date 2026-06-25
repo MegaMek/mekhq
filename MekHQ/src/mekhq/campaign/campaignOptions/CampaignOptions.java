@@ -238,7 +238,6 @@ public class CampaignOptions {
     private boolean onlyCommandersMatterBattleArmor;
     private EdgeRefreshPeriod edgeRefreshPeriod;
     private boolean useEdge;
-    private boolean useSupportEdge;
     private boolean useImplants;
     private boolean alternativeQualityAveraging;
     private boolean useAgeEffects;
@@ -348,6 +347,7 @@ public class CampaignOptions {
     // Random Histories
     private RandomOriginOptions randomOriginOptions;
     private boolean useRandomPersonalities;
+    private boolean usePersonalityLabelsOnly;
     private boolean useRandomPersonalityReputation;
     private boolean useReasoningXpMultiplier;
     private boolean useSimulatedRelationships;
@@ -859,7 +859,6 @@ public class CampaignOptions {
         edgeRefreshPeriod = EdgeRefreshPeriod.WEEKLY;
         setOnlyCommandersMatterBattleArmor(false);
         setUseEdge(false);
-        setUseSupportEdge(false);
         setUseImplants(false);
         setAlternativeQualityAveraging(false);
         setUseAgeEffects(false);
@@ -1007,6 +1006,7 @@ public class CampaignOptions {
         // Random Histories
         setRandomOriginOptions(new RandomOriginOptions(true));
         setUseRandomPersonalities(false);
+        setUsePersonalityLabelsOnly(false);
         setUseRandomPersonalityReputation(true);
         setUseReasoningXpMultiplier(true);
         setUseSimulatedRelationships(false);
@@ -1736,14 +1736,6 @@ public class CampaignOptions {
         this.useEdge = useEdge;
     }
 
-    public boolean isUseSupportEdge() {
-        return useSupportEdge;
-    }
-
-    public void setUseSupportEdge(final boolean useSupportEdge) {
-        this.useSupportEdge = useSupportEdge;
-    }
-
     public boolean isUseImplants() {
         return useImplants;
     }
@@ -2327,6 +2319,14 @@ public class CampaignOptions {
 
     public void setUseRandomPersonalities(final boolean useRandomPersonalities) {
         this.useRandomPersonalities = useRandomPersonalities;
+    }
+
+    public boolean isUsePersonalityLabelsOnly() {
+        return usePersonalityLabelsOnly;
+    }
+
+    public void setUsePersonalityLabelsOnly(final boolean usePersonalityLabelsOnly) {
+        this.usePersonalityLabelsOnly = usePersonalityLabelsOnly;
     }
 
     public boolean isUseRandomPersonalityReputation() {

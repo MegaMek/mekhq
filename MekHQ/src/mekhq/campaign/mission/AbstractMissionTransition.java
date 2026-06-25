@@ -37,6 +37,7 @@ import static megamek.client.ui.util.PlayerColour.BLUE;
 import static megamek.client.ui.util.PlayerColour.RED;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.enums.SkillLevel.parseFromString;
+import static mekhq.campaign.mission.RandomFactionCamouflage.pickRandomCamouflage;
 import static mekhq.campaign.mission.enums.AtBContractType.UNDEFINED;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.MAXIMUM_MORALE_LEVEL;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.MINIMUM_MORALE_LEVEL;
@@ -97,7 +98,13 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class AbstractMissionTransition {
+/*
+ * This is a utility class designed to facilitate the transition old Mission, Contract, and AtBContract objects to
+ * modern classes. It is effectively deprecated on day of birth as it is not intended to outlive the old Mission,
+ * Contract, or AtBContract classes.
+ */
+@Deprecated(since = "0.51.01", forRemoval = false)
+public abstract class AbstractMissionTransition {
     private static final MMLogger LOGGER = MMLogger.create(AbstractMissionTransition.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.AbstractMission";
 
@@ -406,8 +413,22 @@ public class AbstractMissionTransition {
         this.employerName = employerName;
     }
 
+    public String getEmployerName(int year) {
+        return getEmployerFaction().getFullName(year);
+    }
+
+    public void updateEmployer(String code, int year) {
+        this.setEmployerCode(code);
+        setEmployerName(getEmployerName(year));
+        setAllyCamouflage(pickRandomCamouflage(year, getEmployerCode()));
+    }
+
     public @Nullable Person getEmployerLiaison() {
         return employerLiaison;
+    }
+
+    public Faction getEmployerFaction() {
+        return Factions.getInstance().getFaction(getEmployerCode());
     }
 
     public void setEmployerLiaison(@Nullable Person employerLiaison) {

@@ -157,6 +157,9 @@ import mekhq.campaign.randomEvents.personalities.Aggression;
 import mekhq.campaign.randomEvents.personalities.Ambition;
 import mekhq.campaign.randomEvents.personalities.Greed;
 import mekhq.campaign.randomEvents.personalities.PersonalityController;
+import mekhq.campaign.randomEvents.personalities.Aggression;
+import mekhq.campaign.randomEvents.personalities.Ambition;
+import mekhq.campaign.randomEvents.personalities.Greed;
 import mekhq.campaign.randomEvents.personalities.PersonalityQuirk;
 import mekhq.campaign.randomEvents.personalities.PersonalityTraitType;
 import mekhq.campaign.randomEvents.personalities.Reasoning;
@@ -2133,6 +2136,25 @@ public class Person implements ILocation {
         return campaign.getCampaignOptions()
                      .getTimeInRankDisplayFormat()
                      .getDisplayFormattedOutput(getLastRankChangeDate(), today);
+    }
+
+    public long getYearsSinceJoiningCampaign(final Campaign campaign) {
+        // Get time in service based on year
+        if (getJoinedCampaign() == null) {
+            return 0;
+        }
+
+        LocalDate today = campaign.getLocalDate();
+
+        // If the person is dead or has left the unit, we only care about how long they
+        // spent in service to the company
+        if (getRetirement() != null) {
+            today = getRetirement();
+        } else if (getDateOfDeath() != null) {
+            today = getDateOfDeath();
+        }
+
+        return ChronoUnit.YEARS.between(getJoinedCampaign(), today);
     }
 
     public void setId(final UUID id) {
@@ -7433,6 +7455,7 @@ public class Person implements ILocation {
 
     /**
      * Retrieves the modifier value for a specified skill attribute.
+     * Equivalent to <code>Skill.getIndividualAttributeModifier(person.getAttributeScore(attribute))</code>.
      *
      * @param attribute the skill attribute for which the modifier is to be calculated; if the attribute is null or
      *                  represents "none", a warning is logged and the method returns 0
