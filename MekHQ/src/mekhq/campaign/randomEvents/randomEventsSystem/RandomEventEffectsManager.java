@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.randomEvents.randomEventSystem;
+package mekhq.campaign.randomEvents.randomEventsSystem;
 
 import static java.lang.Math.ceil;
 import static java.lang.Math.max;
@@ -42,11 +42,11 @@ import static mekhq.campaign.personnel.PersonnelOptions.ATOW_POISON_RESISTANCE;
 import static mekhq.campaign.personnel.enums.PersonnelRole.DEPENDENT;
 import static mekhq.campaign.personnel.enums.PersonnelRole.NONE;
 import static mekhq.campaign.personnel.skills.SkillType.SKILL_NONE;
-import static mekhq.campaign.randomEvents.randomEventSystem.RandomEventEffectedPersonnelType.CAMP_FOLLOWERS;
-import static mekhq.campaign.randomEvents.randomEventSystem.RandomEventEffectedPersonnelType.COMBAT_PERSONNEL;
-import static mekhq.campaign.randomEvents.randomEventSystem.RandomEventEffectedPersonnelType.PRISONERS;
-import static mekhq.campaign.randomEvents.randomEventSystem.RandomEventEffectedPersonnelType.SECURITY_GUARD;
-import static mekhq.campaign.randomEvents.randomEventSystem.RandomEventEffectedPersonnelType.SUPPORT_PERSONNEL;
+import static mekhq.campaign.randomEvents.randomEventsSystem.RandomEventEffectedPersonnelType.CAMP_FOLLOWERS;
+import static mekhq.campaign.randomEvents.randomEventsSystem.RandomEventEffectedPersonnelType.COMBAT_PERSONNEL;
+import static mekhq.campaign.randomEvents.randomEventsSystem.RandomEventEffectedPersonnelType.PRISONERS;
+import static mekhq.campaign.randomEvents.randomEventsSystem.RandomEventEffectedPersonnelType.SECURITY_GUARD;
+import static mekhq.campaign.randomEvents.randomEventsSystem.RandomEventEffectedPersonnelType.SUPPORT_PERSONNEL;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;

@@ -30,10 +30,9 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.randomEvents.randomEventSystem;
+package mekhq.campaign.randomEvents.randomEventsSystem;
 
-import static mekhq.campaign.personnel.skills.SkillType.SKILL_NONE;
-import static mekhq.campaign.randomEvents.randomEventSystem.RandomEventResultEffect.NONE;
+import static mekhq.campaign.randomEvents.randomEventsSystem.RandomEventResultEffect.NONE;
 
 import java.util.ArrayList;
 import java.util.List;

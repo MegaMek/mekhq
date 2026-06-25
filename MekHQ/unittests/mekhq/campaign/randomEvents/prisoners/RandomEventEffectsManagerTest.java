@@ -42,15 +42,15 @@ import static mekhq.campaign.personnel.enums.PersonnelRole.SOLDIER;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_SMALL_ARMS;
 import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
-import static mekhq.campaign.randomEvents.randomEventSystem.RandomEventEffectedPersonnelType.COMBAT_PERSONNEL;
-import static mekhq.campaign.randomEvents.randomEventSystem.RandomEventEffectedPersonnelType.PRISONERS;
-import static mekhq.campaign.randomEvents.randomEventSystem.RandomEventResponseQuality.RESPONSE_NEUTRAL;
-import static mekhq.campaign.randomEvents.randomEventSystem.RandomEventResultEffect.*;
-import static mekhq.campaign.randomEvents.randomEventSystem.RandomEventType.BARTERING;
-import static mekhq.campaign.randomEvents.randomEventSystem.RandomEventType.BREAKOUT;
-import static mekhq.campaign.randomEvents.randomEventSystem.RandomEventType.MISTAKE;
-import static mekhq.campaign.randomEvents.randomEventSystem.RandomEventType.POISON;
-import static mekhq.campaign.randomEvents.randomEventSystem.RandomEventType.UNDERCOVER;
+import static mekhq.campaign.randomEvents.randomEventsSystem.RandomEventEffectedPersonnelType.COMBAT_PERSONNEL;
+import static mekhq.campaign.randomEvents.randomEventsSystem.RandomEventEffectedPersonnelType.PRISONERS;
+import static mekhq.campaign.randomEvents.randomEventsSystem.RandomEventResponseQuality.RESPONSE_NEUTRAL;
+import static mekhq.campaign.randomEvents.randomEventsSystem.RandomEventResultEffect.*;
+import static mekhq.campaign.randomEvents.randomEventsSystem.RandomEventType.BARTERING;
+import static mekhq.campaign.randomEvents.randomEventsSystem.RandomEventType.BREAKOUT;
+import static mekhq.campaign.randomEvents.randomEventsSystem.RandomEventType.MISTAKE;
+import static mekhq.campaign.randomEvents.randomEventsSystem.RandomEventType.POISON;
+import static mekhq.campaign.randomEvents.randomEventsSystem.RandomEventType.UNDERCOVER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -71,10 +71,10 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.randomEvents.randomEventSystem.RandomEventData;
-import mekhq.campaign.randomEvents.randomEventSystem.RandomEventEffectsManager;
-import mekhq.campaign.randomEvents.randomEventSystem.RandomEventResponseEntry;
-import mekhq.campaign.randomEvents.randomEventSystem.RandomEventResult;
+import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventData;
+import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventEffectsManager;
+import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventResponseEntry;
+import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventResult;
 import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.BeforeEach;
@@ -116,7 +116,7 @@ class RandomEventEffectsManagerTest {
     }
 
     private static RandomEventData buildEventData(
-          mekhq.campaign.randomEvents.randomEventSystem.RandomEventType type,
+          mekhq.campaign.randomEvents.randomEventsSystem.RandomEventType type,
           RandomEventResult result) {
         RandomEventResponseEntry entry = new RandomEventResponseEntry(
               RESPONSE_NEUTRAL,

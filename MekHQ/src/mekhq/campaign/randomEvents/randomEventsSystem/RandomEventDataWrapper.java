@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2026 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -30,12 +30,30 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.randomEvents.randomEventSystem;
+package mekhq.campaign.randomEvents.randomEventsSystem;
 
-public enum RandomEventEffectedPersonnelType {
-    CAMP_FOLLOWERS,
-    COMBAT_PERSONNEL,
-    PRISONERS,
-    SECURITY_GUARD,
-    SUPPORT_PERSONNEL
+import java.util.List;
+
+/**
+ * A wrapper class for managing a list of {@link RandomEventData}. This class provides getter and setter methods to
+ * access and modify the list of prisoner events.
+ */
+public class RandomEventDataWrapper {
+    private List<RandomEventData> events;
+
+    /**
+     * @return a {@link List} of {@link RandomEventData} objects representing the prisoner events.
+     */
+    public List<RandomEventData> getEvents() {
+        return events;
+    }
+
+    /**
+     * Sets the list of {@link RandomEventData} for this wrapper.
+     *
+     * @param events a {@link List} of {@link RandomEventData} objects to be associated with this wrapper.
+     */
+    public void setEvents(List<RandomEventData> events) {
+        this.events = events;
+    }
 }

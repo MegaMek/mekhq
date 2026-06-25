@@ -60,9 +60,9 @@ import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
-import mekhq.campaign.randomEvents.randomEventSystem.RandomEventData;
-import mekhq.campaign.randomEvents.randomEventSystem.RandomEventResponseEntry;
-import mekhq.campaign.randomEvents.randomEventSystem.RandomEventResponseQuality;
+import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventData;
+import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventResponseEntry;
+import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventResponseQuality;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import org.jspecify.annotations.NonNull;
 
