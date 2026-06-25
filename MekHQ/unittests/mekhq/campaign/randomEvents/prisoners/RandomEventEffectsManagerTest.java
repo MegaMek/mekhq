@@ -919,7 +919,7 @@ class RandomEventEffectsManagerTest {
         prisoner.addSkill(S_ADMIN, 1, 0);
         prisoner.addSkill(S_SMALL_ARMS, 1, 0);
         prisoner.addSkill(S_SURGERY, 1, 0);
-        prisoner.setPrimaryRole(mockCampaign, SOLDIER);
+        prisoner.setPrimaryRoleDirect(SOLDIER);
         prisoner.setSecondaryRole(ADMINISTRATOR_LOGISTICS);
         stubAllPersonnel(prisoner);
 
