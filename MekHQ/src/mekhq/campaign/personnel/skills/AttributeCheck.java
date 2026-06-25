@@ -71,7 +71,7 @@ public class AttributeCheck extends ActionCheck<AttributeCheck> {
      * Please see {@link Person#checkAttribute(SkillAttribute)} and use it instead.
      */
     public AttributeCheck(Person person, SkillAttribute attribute) {
-        this(person, attribute, SkillAttribute.NONE);
+        this(person, attribute, SkillAttribute.NO_ATTRIBUTE);
     }
 
     /**
@@ -105,7 +105,7 @@ public class AttributeCheck extends ActionCheck<AttributeCheck> {
     @Override
     protected String getActionName() {
         String label = firstAttribute.getLabel();
-        if (secondAttribute != null && secondAttribute != SkillAttribute.NONE) {
+        if (secondAttribute != null && secondAttribute != SkillAttribute.NO_ATTRIBUTE) {
             label = label + "-" + secondAttribute.getLabel();
         }
         return label;

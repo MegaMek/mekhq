@@ -45,7 +45,7 @@ import megamek.logging.MMLogger;
  */
 public enum SkillAttribute {
     /** Represents no specific attribute. */
-    NONE("NONE"),
+    NO_ATTRIBUTE("NONE"),
     /** Represents physical strength or power. */
     STRENGTH("STRENGTH"),
     /** Represents overall physical condition and health. */
@@ -106,12 +106,12 @@ public enum SkillAttribute {
     }
 
     /**
-     * Checks if the current instance is {@link #NONE}.
+     * Checks if the current instance is {@link #NO_ATTRIBUTE}.
      *
      * @return {@code true} if the current instance is {@code NONE}, {@code false} otherwise.
      */
     public boolean isNone() {
-        return this == NONE;
+        return this == NO_ATTRIBUTE;
     }
 
     /**
@@ -172,13 +172,13 @@ public enum SkillAttribute {
      *     spaces are replaced with underscores ("_").</li>
      *     <li>If the above fails, converts the input string to an integer and matches it to an ordinal value
      *     of {@link SkillAttribute}.</li>
-     *     <li>If both attempts fail, logs an error and returns {@link #NONE} as the default value.</li>
+     *     <li>If both attempts fail, logs an error and returns {@link #NO_ATTRIBUTE} as the default value.</li>
      * </ul>
      *
      * @param text The input string or integer representing the skill attribute.
      *
-     * @return The corresponding {@link SkillAttribute} value if the input is valid, or {@link #NONE} as the default if
-     *       fault is it is not.
+     * @return The corresponding {@link SkillAttribute} value if the input is valid, or {@link #NO_ATTRIBUTE} as the
+     *       default if fault is it is not.
      */
     public static SkillAttribute fromString(String text) {
         try {
@@ -195,8 +195,8 @@ public enum SkillAttribute {
 
         // Log error if parsing fails and return default value.
         MMLogger logger = MMLogger.create(SkillAttribute.class);
-        logger.error("Unknown SkillAttribute ordinal: {} - returning {}.", text, NONE);
+        logger.error("Unknown SkillAttribute ordinal: {} - returning {}.", text, NO_ATTRIBUTE);
 
-        return NONE;
+        return NO_ATTRIBUTE;
     }
 }
