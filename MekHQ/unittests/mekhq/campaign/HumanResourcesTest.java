@@ -605,10 +605,10 @@ public class HumanResourcesTest {
     }
 
     /**
-     * Tests for {@link HumanResources#getSeniorMedicalPerson(Collection, CampaignOptions, boolean, LocalDate)}
+     * Tests for {@link HumanResources#getSeniorPerson(Collection, CampaignOptions, boolean, LocalDate)}
      */
     @Nested
-    class GetSeniorMedicalPerson {
+    class GetSeniorPerson {
 
         @Test
         void emptyInputReturnsNull() {
@@ -616,7 +616,7 @@ public class HumanResourcesTest {
             List<Person> people = List.of();
 
             // Act
-            Person result = HumanResources.getSeniorMedicalPerson(people, campaignOptions, false, today);
+            Person result = HumanResources.getSeniorPerson(people, campaignOptions, false, today);
 
             // Assert
             assertNull(result);
@@ -628,7 +628,7 @@ public class HumanResourcesTest {
             Person doctor = mock(Person.class);
 
             // Act
-            Person result = HumanResources.getSeniorMedicalPerson(List.of(doctor), campaignOptions, false, today);
+            Person result = HumanResources.getSeniorPerson(List.of(doctor), campaignOptions, false, today);
 
             // Assert
             assertEquals(doctor, result);
@@ -644,7 +644,7 @@ public class HumanResourcesTest {
             when(senior.outRanksUsingSkillTiebreaker(any(), anyBoolean(), any(), any())).thenReturn(true);
 
             // Act
-            Person result = HumanResources.getSeniorMedicalPerson(List.of(junior, senior),
+            Person result = HumanResources.getSeniorPerson(List.of(junior, senior),
                   campaignOptions, false, today);
 
             // Assert

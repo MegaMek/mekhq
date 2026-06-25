@@ -54,8 +54,11 @@ import megamek.common.compute.Compute;
 import megamek.common.enums.SkillLevel;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.rolls.TargetRoll;
+import megamek.common.units.Aero;
 import megamek.common.units.Entity;
 import megamek.common.units.Mek;
+import megamek.common.units.ProtoMek;
+import megamek.common.units.Tank;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Quartermaster;
 import mekhq.campaign.Warehouse;
@@ -467,7 +470,7 @@ public class MRMSServiceTest {
                   targetNumberMax, dailyTimeMin);
             configuredOptions = new MRMSConfiguredOptions(mockCampaign);
 
-            addMockTech(SkillType.S_TECH_MEK, SkillLevel.VETERAN);
+            addMockTech();
 
             unit.getParts()
                   .stream()
@@ -727,7 +730,7 @@ public class MRMSServiceTest {
                   dailyTimeMin);
             configuredOptions = new MRMSConfiguredOptions(mockCampaign);
 
-            addMockTech(SkillType.S_TECH_MEK, SkillLevel.VETERAN);
+            addMockTech();
 
             unit.getParts()
                   .stream()
@@ -854,13 +857,13 @@ public class MRMSServiceTest {
         }
     }
 
-    private void addMockTech(String skillType, SkillLevel skillLevel) {
+    private void addMockTech() {
         Person mockTech = mock(Person.class);
         when(mockCampaign.getTechs(anyBoolean())).thenReturn(List.of(mockTech));
         when(mockTech.canTech(any(Entity.class))).thenReturn(true);
-        when(mockTech.getSkillLevel(any(Campaign.class), anyBoolean())).thenReturn(skillLevel);
-        when(mockTech.getSkillForWorkingOn(any(IPartWork.class))).thenReturn(new Skill(skillType,
-              skillLevel.getExperienceLevel(),
+        when(mockTech.getSkillLevel(any(Campaign.class), anyBoolean())).thenReturn(SkillLevel.VETERAN);
+        when(mockTech.getSkillForWorkingOn(any(IPartWork.class))).thenReturn(new Skill(SkillType.S_TECH_MEK,
+              SkillLevel.VETERAN.getExperienceLevel(),
               0));
         when(mockTech.getMinutesLeft()).thenReturn(480);
         when(mockTech.getSkillModifierData()).thenReturn(TestSkillModifierData.createDefault());
@@ -1113,7 +1116,7 @@ public class MRMSServiceTest {
                   targetNumberPreferred, targetNumberMax, dailyTimeMin);
             configuredOptions = new MRMSConfiguredOptions(mockCampaign);
 
-            addMockTech(SkillType.S_TECH_MEK, SkillLevel.VETERAN);
+            addMockTech();
 
             // Make all AmmoBins need reloading
             List<AmmoBin> ammoBins = unit.getParts().stream()
