@@ -1716,16 +1716,18 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
     }
 
     /**
-     * Reconnects persons, units, and parts to their travel {@link CurrentLocation} nodes after a save/load.
+     * Reconnects persons, units, and parts to their travel {@link CurrentLocation} nodes after a
+     * save/load.
      *
      * <p>During save, each {@link CurrentLocation} writes the IDs of its direct children
-     * ({@link Person}, {@link Unit}, {@link Part}). On load those parent links are lost because the
-     * {@link LocationNode} tree is not serialized directly. This pass restores them by looking each item up in the
-     * campaign's data structures and re-parenting it under the correct travel node.</p>
+     * ({@link Person}, {@link Unit}, {@link Part}). On load those parent links are lost because
+     * the {@link LocationNode} tree is not serialized directly. This pass
+     * restores them by looking each item up in the campaign's data structures and re-parenting it
+     * under the correct travel node.</p>
      *
      * <p>Units and parts in transit have already been placed in their destination hangar/warehouse
-     * data structure at dispatch time, so the lookup searches base hangars/warehouses as well as the campaign's main
-     * collections.</p>
+     * data structure at dispatch time, so the lookup searches base hangars/warehouses as well as
+     * the campaign's main collections.</p>
      */
     private static void reconnectPersonsToTravelLocations(Campaign campaign) {
         for (AbstractLocation location : campaign.getLocations()) {
@@ -1748,7 +1750,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                         if (person != null && !person.isParented()) {
                             person.setParent(campaign.getMainForcePersonnel());
                             LOGGER.warn("reconnectPersonsToTravelLocations: person {} had no parent "
-                                              + "(orphaned arrived node); re-homed to main force", personId);
+                                  + "(orphaned arrived node); re-homed to main force", personId);
                         }
                     }
                     for (UUID unitId : currentLocation.drainPendingUnitIds()) {
@@ -1756,7 +1758,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                         if (unit != null && !unit.isParented()) {
                             LocationNode.LocationManager.setLocation(unit, campaign.getHangar());
                             LOGGER.warn("reconnectPersonsToTravelLocations: unit {} had no parent "
-                                              + "(orphaned arrived node); re-homed to main hangar", unitId);
+                                  + "(orphaned arrived node); re-homed to main hangar", unitId);
                         }
                     }
                     for (int partId : currentLocation.drainPendingPartIds()) {
@@ -1764,7 +1766,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                         if (part != null && !part.isParented()) {
                             LocationNode.LocationManager.setLocation(part, campaign.getWarehouse());
                             LOGGER.warn("reconnectPersonsToTravelLocations: part {} had no parent "
-                                              + "(orphaned arrived node); re-homed to main warehouse", partId);
+                                  + "(orphaned arrived node); re-homed to main warehouse", partId);
                         }
                     }
                     continue;
@@ -1898,7 +1900,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 ILocation parentLocation = person.getParentLocation();
                 if (parentLocation != null
                           && !(parentLocation instanceof Personnel personnel
-                                     && personnel.getParentLocation() instanceof Campaign)) {
+                                && personnel.getParentLocation() instanceof Campaign)) {
                     LOGGER.debug("migrateLegacyEducationTravel: skipping {} — already reconnected (stage={})",
                           person.getFullTitle(), stage);
                     continue;
@@ -1906,10 +1908,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 // If a FixedLocation campus already holds this person's ID (post-refactor save),
                 // reconnectPersonsToTravelLocations will handle them.
                 if (hasFixedCampusPendingFor(campaign, person)) {
-                    LOGGER.debug(
-                          "migrateLegacyEducationTravel: skipping {} — pending in FixedLocation campus (stage={})",
-                          person.getFullTitle(),
-                          stage);
+                    LOGGER.debug("migrateLegacyEducationTravel: skipping {} — pending in FixedLocation campus (stage={})",
+                          person.getFullTitle(), stage);
                     continue;
                 }
             } else {
@@ -1946,7 +1946,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 String systemId = resolveAcademySystemId(campaign, person);
                 if (systemId == null) {
                     LOGGER.warn("migrateLegacyEducationTravel: could not resolve academy system for {} (stage={})"
-                                      + " — skipping campus placement", person.getFullTitle(), stage);
+                          + " — skipping campus placement", person.getFullTitle(), stage);
                     continue;
                 }
                 AcademyCampusLocation campusLocation = campaign.getOrCreateCampusLocation(
@@ -1958,7 +1958,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     campusMigrated++;
                 } else {
                     LOGGER.warn("migrateLegacyEducationTravel: getOrCreateCampusLocation returned null for {}"
-                                      + " (academy='{}', system='{}') — skipping", person.getFullTitle(),
+                          + " (academy='{}', system='{}') — skipping", person.getFullTitle(),
                           person.getEduAcademyNameInSet(), systemId);
                 }
                 continue;
@@ -1968,23 +1968,19 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             String systemId = resolveAcademySystemId(campaign, person);
             if (systemId == null) {
                 LOGGER.warn("migrateLegacyEducationTravel: could not resolve academy system for {} (stage={})"
-                                  + " — skipping travel node creation", person.getFullTitle(), stage);
+                      + " — skipping travel node creation", person.getFullTitle(), stage);
                 continue;
             }
             PlanetarySystem targetSystem = campaign.getSystemById(systemId);
             if (targetSystem == null) {
                 LOGGER.warn("migrateLegacyEducationTravel: system '{}' not found for {} (stage={})"
-                                  + " — skipping travel node creation", systemId, person.getFullTitle(), stage);
+                      + " — skipping travel node creation", systemId, person.getFullTitle(), stage);
                 continue;
             }
 
             double transitTime = Math.max(0, person.getEduJourneyTime() - person.getEduDaysOfTravel());
-            LOGGER.info(
-                  "migrateLegacyEducationTravel: creating travel node for {} (stage={}, system={}, transitTime={} days)",
-                  person.getFullTitle(),
-                  stage,
-                  targetSystem.getId(),
-                  transitTime);
+            LOGGER.info("migrateLegacyEducationTravel: creating travel node for {} (stage={}, system={}, transitTime={} days)",
+                  person.getFullTitle(), stage, targetSystem.getId(), transitTime);
 
             CurrentLocation travelLocation = new CurrentLocation(targetSystem, transitTime);
             AcademyCampusLocation campusLocation = campaign.getOrCreateCampusLocation(
@@ -1995,7 +1991,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 travelLocation.setParent(campusLocation);
             } else if (stage == EducationStage.JOURNEY_FROM_CAMPUS) {
                 LOGGER.info("migrateLegacyEducationTravel: no campus found for {} (JOURNEY_FROM_CAMPUS)"
-                                  + " — parenting travel node under Campaign root", person.getFullTitle());
+                      + " — parenting travel node under Campaign root", person.getFullTitle());
                 travelLocation.setParent(campaign);
             }
             person.setParent(travelLocation);
@@ -2104,7 +2100,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
             if (wn2.getNodeName().startsWith("ability-")) {
                 continue;
-            } else if (!wn2.getNodeName().equalsIgnoreCase("affectedSkill")) {
+            } else if (!wn2.getNodeName().equalsIgnoreCase("skillType")) {
                 // Error condition of sorts!
                 // Errr, what should we do here?
                 LOGGER.error("Unknown node type not loaded in Skill Type nodes: {}", wn2.getNodeName());
@@ -2520,10 +2516,11 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
     }
 
     /**
-     * After {@link #postProcessParts} wires up unit references, parts that belong to base-hangar units are still
-     * locationNode-parented to the campaign warehouse (where they were loaded). Move them to the correct base warehouse
-     * so that {@link Part#getWarehouse()} returns the local warehouse for that base, keeping spare-part searches and
-     * fix-button availability scoped to the base the unit is stationed at.
+     * After {@link #postProcessParts} wires up unit references, parts that belong to base-hangar
+     * units are still locationNode-parented to the campaign warehouse (where they were loaded).
+     * Move them to the correct base warehouse so that {@link Part#getWarehouse()} returns the
+     * local warehouse for that base, keeping spare-part searches and fix-button availability
+     * scoped to the base the unit is stationed at.
      */
     private static void rehomeBaseHangarUnitParts(Campaign campaign) {
         for (PlayerBase base : campaign.getPlayerBases()) {

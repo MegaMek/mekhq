@@ -33,7 +33,6 @@
 
 package mekhq.campaign.personnel.skills;
 
-import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NO_ATTRIBUTE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -105,13 +104,13 @@ class AttributeCheckTest {
     @Test
     void testConstructor_NullFirstAttribute() {
         Person person = mock(Person.class);
-        assertThrows(IllegalArgumentException.class, () -> new AttributeCheck(person, null));
+        assertThrows(IllegalArgumentException.class, () -> new AttributeCheck(person, (SkillAttribute) null));
     }
 
     @Test
     void testConstructor_NoneFirstAttribute() {
         Person person = mock(Person.class);
-        assertThrows(IllegalArgumentException.class, () -> new AttributeCheck(person, NO_ATTRIBUTE));
+        assertThrows(IllegalArgumentException.class, () -> new AttributeCheck(person, SkillAttribute.NO_ATTRIBUTE));
     }
 
     @Test

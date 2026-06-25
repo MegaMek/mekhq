@@ -180,7 +180,7 @@ public class SkillCheckUtility {
         // Validation
         if (targetNumber == null || characterAttributes == null || skillType == null) {
             LOGGER.error("Null parameter passed into SkillCheckUtility.getTotalAttributeScoreForSkill." +
-                               " targetNumber: {}, characterAttributes: {}, affectedSkill: {}",
+                               " targetNumber: {}, characterAttributes: {}, skillType: {}",
                   targetNumber,
                   characterAttributes,
                   skillType);

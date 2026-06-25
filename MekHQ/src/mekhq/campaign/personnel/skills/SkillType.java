@@ -1286,7 +1286,7 @@ public class SkillType {
     }
 
     public void writeToXML(final PrintWriter pw, int indent) {
-        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "affectedSkill");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "skillType");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", name);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "target", target);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "isCountUp", countUp);
@@ -1300,7 +1300,7 @@ public class SkillType {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "heroicLvl", heroicLvl);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "legendaryLvl", legendaryLvl);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "costs", StringUtils.join(costs, ','));
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "affectedSkill");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "skillType");
     }
 
     /**
@@ -1317,7 +1317,7 @@ public class SkillType {
             for (int x = 0; x < nodeList.getLength(); x++) {
                 Node wn2 = nodeList.item(x);
                 if (wn2.getNodeName().equalsIgnoreCase("name")) {
-                    // affectedSkill.name = wn2.getTextContent();
+                    // skillType.name = wn2.getTextContent();
 
                     // The above code can be uncommented once these handlers have been removed
                     String name = wn2.getTextContent().trim();
