@@ -44,6 +44,8 @@ public class ScoutingSkills {
     public static final List<String> SCOUTING_SKILLS = List.of(SkillType.S_COMMUNICATIONS,
           SkillType.S_PERCEPTION, SkillType.S_SENSOR_OPERATIONS, SkillType.S_STEALTH, SkillType.S_TRACKING);
 
+    public static final String DEFAULT_UNSKILLED_CHECK = SkillType.S_SENSOR_OPERATIONS;
+
     public static @Nullable String getBestScoutingSkill(Person person) {
         String bestSkill = null;
         int highestLevel = -1;

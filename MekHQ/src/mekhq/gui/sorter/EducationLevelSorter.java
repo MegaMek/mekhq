@@ -42,7 +42,7 @@ import mekhq.campaign.personnel.enums.education.EducationLevel;
  *
  * <p>This comparator relies on the {@link EducationLevel#fromString(String)} method to convert string
  * representations into {@link EducationLevel} objects, and then orders them based on their
- * {@link EducationLevel#getOrder()} value.</p>
+ * {@link EducationLevel#getLevel()} value.</p>
  *
  * <p>If either string cannot be parsed into a valid {@code EducationLevel}, an error will be logged and the
  * malformed string will be placed after valid entries.</p>
@@ -61,13 +61,13 @@ public class EducationLevelSorter implements Comparator<String> {
         int firstOrder;
         int secondOrder;
         try {
-            firstOrder = EducationLevel.fromString(firstString).getOrder();
+            firstOrder = EducationLevel.fromString(firstString).getLevel();
         } catch (Exception e) {
             LOGGER.error("Error parsing education level: {}", firstString, e);
             firstOrder = Integer.MAX_VALUE;
         }
         try {
-            secondOrder = EducationLevel.fromString(secondString).getOrder();
+            secondOrder = EducationLevel.fromString(secondString).getLevel();
         } catch (Exception e) {
             LOGGER.error("Error parsing education level: {}", secondString, e);
             secondOrder = Integer.MAX_VALUE;

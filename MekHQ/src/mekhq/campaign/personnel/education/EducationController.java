@@ -1600,7 +1600,7 @@ public class EducationController {
      */
     private static void reportMastersOrDoctorateGain(Campaign campaign, Person person, Academy academy, int education,
           ResourceBundle resources) {
-        EducationLevel educationLevel = EducationLevel.fromString(String.valueOf(education));
+        EducationLevel educationLevel = EducationLevel.fromLevel(education);
 
         String qualification = academy.getQualifications().get(person.getEduCourseIndex());
         String personName = person.getHyperlinkedFullTitle();
@@ -1757,8 +1757,8 @@ public class EducationController {
 
         int educationLevel = academy.getEducationLevel(person);
 
-        if (EducationLevel.parseToInt(person.getEduHighestEducation()) < educationLevel) {
-            person.setEduHighestEducation(EducationLevel.fromString(String.valueOf(educationLevel)));
+        if (person.getEduHighestEducation().getLevel() < educationLevel) {
+            person.setEduHighestEducation(EducationLevel.fromLevel(educationLevel));
         }
 
         if (academy.isReeducationCamp()) {
@@ -1971,7 +1971,7 @@ public class EducationController {
 
         double bonusPercentage = (double) bonusCount / 5;
 
-        if (EducationLevel.parseToInt(person.getEduHighestEducation()) < academy.getEducationLevel(person)) {
+        if (person.getEduHighestEducation().getLevel() < academy.getEducationLevel(person)) {
             int xpRate = max(1, (12 - academy.getFacultySkill()) * (academyDuration / 600));
 
             xpRate *= campaign.getCampaignOptions().getFacultyXpRate();
