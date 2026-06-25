@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -238,7 +238,6 @@ public class CampaignOptions {
     private boolean onlyCommandersMatterBattleArmor;
     private EdgeRefreshPeriod edgeRefreshPeriod;
     private boolean useEdge;
-    private boolean useSupportEdge;
     private boolean useImplants;
     private boolean alternativeQualityAveraging;
     private boolean useAgeEffects;
@@ -860,7 +859,6 @@ public class CampaignOptions {
         edgeRefreshPeriod = EdgeRefreshPeriod.WEEKLY;
         setOnlyCommandersMatterBattleArmor(false);
         setUseEdge(false);
-        setUseSupportEdge(false);
         setUseImplants(false);
         setAlternativeQualityAveraging(false);
         setUseAgeEffects(false);
@@ -1736,14 +1734,6 @@ public class CampaignOptions {
 
     public void setUseEdge(final boolean useEdge) {
         this.useEdge = useEdge;
-    }
-
-    public boolean isUseSupportEdge() {
-        return useSupportEdge;
-    }
-
-    public void setUseSupportEdge(final boolean useSupportEdge) {
-        this.useSupportEdge = useSupportEdge;
     }
 
     public boolean isUseImplants() {
