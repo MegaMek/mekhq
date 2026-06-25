@@ -509,7 +509,7 @@ public enum PersonnelRole {
 
             if (skillType != null) {
                 List<SkillAttribute> linkedAttributes = new ArrayList<>(skillType.getAttributes());
-                linkedAttributes.remove(SkillAttribute.ATTRIBUTE_NONE);
+                linkedAttributes.remove(SkillAttribute.NO_ATTRIBUTE);
 
                 for (SkillAttribute attribute : linkedAttributes) {
                     if (linkedAttributes.indexOf(attribute) == 0) {
@@ -540,7 +540,7 @@ public enum PersonnelRole {
      * <p>This method determines the modifier by matching the input {@link SkillAttribute}
      * to its associated property within the class. The mapping is as follows:</p>
      * <ul>
-     *     <li>{@link SkillAttribute#ATTRIBUTE_NONE}: Returns {@code 0} as no modification is applicable.</li>
+     *     <li>{@link SkillAttribute#NO_ATTRIBUTE}: Returns {@code 0} as no modification is applicable.</li>
      *     <li>{@link SkillAttribute#STRENGTH}: Returns the value of the {@code strength} modifier.</li>
      *     <li>{@link SkillAttribute#BODY}: Returns the value of the {@code body} modifier.</li>
      *     <li>{@link SkillAttribute#REFLEXES}: Returns the value of the {@code reflexes} modifier.</li>
@@ -560,7 +560,7 @@ public enum PersonnelRole {
         }
 
         return switch (attribute) {
-            case ATTRIBUTE_NONE, EDGE -> 0;
+            case NO_ATTRIBUTE, EDGE -> 0;
             case STRENGTH -> strength;
             case BODY -> body;
             case REFLEXES -> reflexes;

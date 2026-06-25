@@ -192,7 +192,7 @@ public enum Phenotype {
             case BODY -> body;
             case REFLEXES -> reflexes;
             case DEXTERITY -> dexterity;
-            case ATTRIBUTE_NONE, INTELLIGENCE, WILLPOWER, CHARISMA, EDGE -> 0;
+            case NO_ATTRIBUTE, INTELLIGENCE, WILLPOWER, CHARISMA, EDGE -> 0;
         };
     }
 

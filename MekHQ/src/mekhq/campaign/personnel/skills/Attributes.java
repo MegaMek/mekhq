@@ -265,7 +265,7 @@ public class Attributes {
 
         int attributeScore = 0;
         return switch (attribute) {
-            case ATTRIBUTE_NONE, BODY, REFLEXES, DEXTERITY, WILLPOWER, EDGE -> 0;
+            case NO_ATTRIBUTE, BODY, REFLEXES, DEXTERITY, WILLPOWER, EDGE -> 0;
             case INTELLIGENCE -> {
                 if (hasAgeraniumsDisease) {
                     attributeScore -= 2;
@@ -368,7 +368,7 @@ public class Attributes {
                 case INTELLIGENCE -> effect.getIntelligenceModifier();
                 case WILLPOWER -> effect.getWillpowerModifier();
                 case CHARISMA -> effect.getCharismaModifier();
-                case ATTRIBUTE_NONE, EDGE -> 0; // There are no Edge modifying injury effects
+                case NO_ATTRIBUTE, EDGE -> 0; // There are no Edge modifying injury effects
             };
         }
 
@@ -471,7 +471,7 @@ public class Attributes {
         // This is where you'd use options to verify if a character has SPAs that modify their maximum attribute score
         cap += switch (attribute) {
             case STRENGTH -> {
-                int modifier =  options.booleanOption(EXCEPTIONAL_ATTRIBUTE_STRENGTH) ? 1 : 0;
+                int modifier = options.booleanOption(EXCEPTIONAL_ATTRIBUTE_STRENGTH) ? 1 : 0;
                 modifier += options.booleanOption(MUTATION_FREAKISH_STRENGTH) ? 1 : 0;
                 yield modifier;
             }
@@ -507,7 +507,7 @@ public class Attributes {
      * modifying their scores accordingly. Attribute values are clamped within valid bounds as defined by the
      * {@code changeAttribute} and {@code setAttributeScore} methods, ensuring no invalid scores are set.</p>
      *
-     * <p>Attributes marked as {@link SkillAttribute#ATTRIBUTE_NONE} are skipped during the iteration and are not
+     * <p>Attributes marked as {@link SkillAttribute#NO_ATTRIBUTE} are skipped during the iteration and are not
      * modified.</p>
      *
      * @param phenotype The {@link Phenotype} used to determine the caps for all skill attributes.

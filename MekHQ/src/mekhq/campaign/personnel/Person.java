@@ -157,9 +157,6 @@ import mekhq.campaign.randomEvents.personalities.Aggression;
 import mekhq.campaign.randomEvents.personalities.Ambition;
 import mekhq.campaign.randomEvents.personalities.Greed;
 import mekhq.campaign.randomEvents.personalities.PersonalityController;
-import mekhq.campaign.randomEvents.personalities.Aggression;
-import mekhq.campaign.randomEvents.personalities.Ambition;
-import mekhq.campaign.randomEvents.personalities.Greed;
 import mekhq.campaign.randomEvents.personalities.PersonalityQuirk;
 import mekhq.campaign.randomEvents.personalities.PersonalityTraitType;
 import mekhq.campaign.randomEvents.personalities.Reasoning;
@@ -7400,7 +7397,7 @@ public class Person implements ILocation {
      * @since 0.50.05
      */
     public void setAttributeScore(final SkillAttribute attribute, final int newScore) {
-        if (attribute == null || attribute == SkillAttribute.ATTRIBUTE_NONE) {
+        if (attribute == null || attribute == SkillAttribute.NO_ATTRIBUTE) {
             LOGGER.warn("(setAttributeScore) SkillAttribute is null or NONE.");
             return;
         }
@@ -7428,15 +7425,14 @@ public class Person implements ILocation {
     /**
      * Retrieves the maximum allowed value (cap) for the specified {@link SkillAttribute}.
      *
-     * <p>If the attribute is {@code null} or marked as {@link SkillAttribute#ATTRIBUTE_NONE}, a default maximum
-     * attribute score
-     * is returned, and a warning is logged.</p>
+     * <p>If the attribute is {@code null} or marked as {@link SkillAttribute#NO_ATTRIBUTE}, a default maximum
+     * attribute score is returned, and a warning is logged.</p>
      *
      * <p>For valid attributes, this method delegates to
      * {@link Attributes#getAttributeCap(Phenotype, PersonnelOptions, SkillAttribute)}.</p>
      *
      * @param attribute The {@link SkillAttribute} for which the maximum value is being retrieved. Must not be
-     *                  {@code null} or {@link SkillAttribute#ATTRIBUTE_NONE}.
+     *                  {@code null} or {@link SkillAttribute#NO_ATTRIBUTE}.
      *
      * @return The maximum allowed value (cap) for the given attribute. Returns the default maximum value if the input
      *       attribute is invalid.
@@ -7454,8 +7450,8 @@ public class Person implements ILocation {
     }
 
     /**
-     * Retrieves the modifier value for a specified skill attribute.
-     * Equivalent to <code>Skill.getIndividualAttributeModifier(person.getAttributeScore(attribute))</code>.
+     * Retrieves the modifier value for a specified skill attribute. Equivalent to
+     * <code>Skill.getIndividualAttributeModifier(person.getAttributeScore(attribute))</code>.
      *
      * @param attribute the skill attribute for which the modifier is to be calculated; if the attribute is null or
      *                  represents "none", a warning is logged and the method returns 0
@@ -7496,7 +7492,7 @@ public class Person implements ILocation {
      * Modifies the score of a specified skill attribute by a given delta value.
      *
      * <p>This method adjusts the current score of the provided {@link SkillAttribute} by adding the specified delta
-     * to it. If the attribute is {@code null} or {@link SkillAttribute#ATTRIBUTE_NONE}, a warning is logged, and the
+     * to it. If the attribute is {@code null} or {@link SkillAttribute#NO_ATTRIBUTE}, a warning is logged, and the
      * method exits without making any changes.</p>
      *
      * <p>The new score is computed as the sum of the current score and the delta, and it is passed

@@ -191,7 +191,7 @@ public class RandomEventDialog {
 
     private void addAttributeCheck(SkillAttribute attribute, List<TargetRollModifier> externalModifiers,
           int responseIndex) {
-        if (attribute != SkillAttribute.ATTRIBUTE_NONE) {
+        if (attribute != SkillAttribute.NO_ATTRIBUTE) {
             AttributeCheck attributeCheck = eventParticipant.checkAttribute(attribute)
                                                   .withExternalModifiers(externalModifiers);
 

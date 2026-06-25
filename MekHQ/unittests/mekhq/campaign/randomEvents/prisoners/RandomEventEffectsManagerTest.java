@@ -42,6 +42,7 @@ import static mekhq.campaign.personnel.enums.PersonnelRole.SOLDIER;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_SMALL_ARMS;
 import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
+import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NO_ATTRIBUTE;
 import static mekhq.campaign.randomEvents.randomEventsSystem.RandomEventEffectedPersonnelType.COMBAT_PERSONNEL;
 import static mekhq.campaign.randomEvents.randomEventsSystem.RandomEventEffectedPersonnelType.PRISONERS;
 import static mekhq.campaign.randomEvents.randomEventsSystem.RandomEventResponseQuality.RESPONSE_NEUTRAL;
@@ -120,6 +121,8 @@ class RandomEventEffectsManagerTest {
           RandomEventResult result) {
         RandomEventResponseEntry entry = new RandomEventResponseEntry(
               RESPONSE_NEUTRAL,
+              "",
+              NO_ATTRIBUTE,
               List.of(result),
               List.of(result));
         return new RandomEventData(type, List.of(entry));
@@ -1099,6 +1102,8 @@ class RandomEventEffectsManagerTest {
 
         RandomEventResponseEntry entry = new RandomEventResponseEntry(
               RESPONSE_NEUTRAL,
+              "",
+              NO_ATTRIBUTE,
               List.of(successResult),
               List.of(failureResult));
         RandomEventData eventData = new RandomEventData(BREAKOUT, List.of(entry));

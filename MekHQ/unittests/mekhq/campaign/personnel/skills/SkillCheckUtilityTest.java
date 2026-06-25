@@ -41,7 +41,7 @@ import static mekhq.campaign.personnel.skills.SkillCheckUtility.UNTRAINED_TARGET
 import static mekhq.campaign.personnel.skills.SkillCheckUtility.determineTargetNumber;
 import static mekhq.campaign.personnel.skills.SkillCheckUtility.getTotalAttributeScoreForSkill;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.DEXTERITY;
-import static mekhq.campaign.personnel.skills.enums.SkillAttribute.ATTRIBUTE_NONE;
+import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NO_ATTRIBUTE;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.REFLEXES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -98,7 +98,7 @@ class SkillCheckUtilityTest {
         // Setup
         SkillType testSkillType = new SkillType();
         testSkillType.setFirstAttribute(REFLEXES);
-        testSkillType.setSecondAttribute(ATTRIBUTE_NONE);
+        testSkillType.setSecondAttribute(NO_ATTRIBUTE);
 
         Attributes attributes = new Attributes(DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE,
@@ -149,8 +149,8 @@ class SkillCheckUtilityTest {
     void testGetTotalAttributeScoreForSkill_NoLinkedAttributes() {
         // Setup
         SkillType testSkillType = new SkillType();
-        testSkillType.setFirstAttribute(ATTRIBUTE_NONE);
-        testSkillType.setSecondAttribute(ATTRIBUTE_NONE);
+        testSkillType.setFirstAttribute(NO_ATTRIBUTE);
+        testSkillType.setSecondAttribute(NO_ATTRIBUTE);
 
         Attributes attributes = new Attributes(DEFAULT_ATTRIBUTE_SCORE,
               DEFAULT_ATTRIBUTE_SCORE,
@@ -175,7 +175,7 @@ class SkillCheckUtilityTest {
     void testGetTotalAttributeScoreForSkill_SingleLinkedAttribute_None() {
         // Setup
         SkillType testSkillType = new SkillType();
-        testSkillType.setFirstAttribute(ATTRIBUTE_NONE);
+        testSkillType.setFirstAttribute(NO_ATTRIBUTE);
         testSkillType.setSecondAttribute(REFLEXES);
 
         Attributes attributes = new Attributes(DEFAULT_ATTRIBUTE_SCORE,
@@ -208,7 +208,7 @@ class SkillCheckUtilityTest {
 
         try (MockedStatic<SkillType> mockSkillType = Mockito.mockStatic(SkillType.class)) {
             SkillType testSkillType = new SkillType();
-            testSkillType.setSecondAttribute(ATTRIBUTE_NONE);
+            testSkillType.setSecondAttribute(NO_ATTRIBUTE);
 
             mockSkillType.when(() -> SkillType.getType("MISSING_NAME")).thenReturn(testSkillType);
 
@@ -253,7 +253,7 @@ class SkillCheckUtilityTest {
         for (int attributeScore = MINIMUM_ATTRIBUTE_SCORE; attributeScore < MAXIMUM_ATTRIBUTE_SCORE; attributeScore++) {
             // Setup
             SkillType testSkillType = new SkillType();
-            testSkillType.setSecondAttribute(ATTRIBUTE_NONE);
+            testSkillType.setSecondAttribute(NO_ATTRIBUTE);
 
             Skill skill = new Skill(testSkillType, 0, 0);
 
@@ -301,7 +301,7 @@ class SkillCheckUtilityTest {
     void testDetermineTargetNumber_TrainedWithOneLinkedAttribute_AboveNormalAttributeScore() {
         // Setup
         SkillType testSkillType = new SkillType();
-        testSkillType.setSecondAttribute(ATTRIBUTE_NONE);
+        testSkillType.setSecondAttribute(NO_ATTRIBUTE);
 
         Skill skill = new Skill(testSkillType, 0, 0);
 
@@ -428,8 +428,8 @@ class SkillCheckUtilityTest {
 
         // Using default attributes.
         SkillType edgeCaseSkillType = new SkillType();
-        edgeCaseSkillType.setFirstAttribute(ATTRIBUTE_NONE); // No attributes linked
-        edgeCaseSkillType.setSecondAttribute(ATTRIBUTE_NONE);
+        edgeCaseSkillType.setFirstAttribute(NO_ATTRIBUTE); // No attributes linked
+        edgeCaseSkillType.setSecondAttribute(NO_ATTRIBUTE);
         person.setATOWAttributes(new Attributes());
 
         try (MockedStatic<SkillType> mockSkillType = Mockito.mockStatic(SkillType.class)) {

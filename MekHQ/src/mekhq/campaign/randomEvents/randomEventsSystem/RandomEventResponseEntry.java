@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.randomEvents.randomEventsSystem;
 
-import static mekhq.campaign.personnel.skills.enums.SkillAttribute.ATTRIBUTE_NONE;
+import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NO_ATTRIBUTE;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +61,7 @@ public record RandomEventResponseEntry(
     // Additional logic to provide defaults for missing properties
     public RandomEventResponseEntry {
         quality = (quality != null) ? quality : RandomEventResponseQuality.RESPONSE_NEUTRAL;
-        abilityCheckType = (abilityCheckType != null) ? abilityCheckType : ATTRIBUTE_NONE;
+        abilityCheckType = (abilityCheckType != null) ? abilityCheckType : NO_ATTRIBUTE;
         effectsSuccess = new ArrayList<>();
         effectsFailure = new ArrayList<>();
     }

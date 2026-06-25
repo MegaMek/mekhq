@@ -153,7 +153,7 @@ public class SkillCheckUtility {
      *   <li>The target roll by applying modifiers (negative of the attribute values), and</li>
      *   <li>The total attribute score, which it returns as an integer.</li>
      * </ul>
-     * <p>Attributes that are set to {@link SkillAttribute#ATTRIBUTE_NONE} are ignored during this process.</p>
+     * <p>Attributes that are set to {@link SkillAttribute#NO_ATTRIBUTE} are ignored during this process.</p>
      *
      * <p>For each relevant attribute:</p>
      * <ul>
@@ -191,7 +191,7 @@ public class SkillCheckUtility {
         List<SkillAttribute> linkedAttributes = List.of(skillType.getFirstAttribute(), skillType.getSecondAttribute());
 
         for (SkillAttribute attribute : linkedAttributes) {
-            if (attribute == SkillAttribute.ATTRIBUTE_NONE) {
+            if (attribute == SkillAttribute.NO_ATTRIBUTE) {
                 continue;
             }
 
