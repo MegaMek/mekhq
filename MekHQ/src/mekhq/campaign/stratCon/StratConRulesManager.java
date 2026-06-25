@@ -1905,7 +1905,8 @@ public class StratConRulesManager {
                 boolean hasEagleEyes = crewMember.getOptions().booleanOption(OptionsConstants.MISC_EAGLE_EYES);
                 String scoutSkillName = ScoutingSkills.getBestScoutingSkill(crewMember);
                 if (scoutSkillName == null) {
-                    continue;
+                    // default to unskilled check
+                    scoutSkillName = ScoutingSkills.DEFAULT_UNSKILLED_CHECK;
                 }
 
                 List<TargetRollModifier> mods = getAllScoutRollModifiers(
