@@ -231,7 +231,7 @@ class LifePathEntryDataTest {
     void testGetSkillAttribute_NoneSpecialHandler() {
         LifePathEntryData data = new LifePathEntryData("SKILL_ATTRIBUTE", NO_ATTRIBUTE.getLookupName(), 5);
         assertEquals(0, data.getSkillAttribute(NO_ATTRIBUTE),
-              "NONE should always return 0.");
+              "NO_ATTRIBUTE should always return 0.");
     }
 
     @Test

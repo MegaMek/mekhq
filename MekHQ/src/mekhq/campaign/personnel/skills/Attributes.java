@@ -315,7 +315,7 @@ public class Attributes {
      * @since 0.50.05
      */
     public int getBaseAttributeScore(SkillAttribute attribute) {
-        if (attribute == null || attribute.isNone()) {
+        if (attribute == null || attribute.isNoAttribute()) {
             LOGGER.warn("(getAttributeScore) attribute is null or NONE.");
             return DEFAULT_ATTRIBUTE_SCORE;
         }
@@ -420,7 +420,7 @@ public class Attributes {
      * @since 0.50.05
      */
     public void setAttributeScore(Phenotype phenotype, PersonnelOptions options, SkillAttribute attribute, int score) {
-        if (attribute == null || attribute.isNone()) {
+        if (attribute == null || attribute.isNoAttribute()) {
             LOGGER.warn("(setAttributeScore) attribute is null or NONE.");
             return;
         }
@@ -529,7 +529,7 @@ public class Attributes {
         }
 
         for (SkillAttribute attribute : SkillAttribute.values()) {
-            if (attribute.isNone()) {
+            if (attribute.isNoAttribute()) {
                 continue;
             }
 
@@ -567,7 +567,7 @@ public class Attributes {
             return;
         }
 
-        if (attribute == null || attribute.isNone()) {
+        if (attribute == null || attribute.isNoAttribute()) {
             LOGGER.warn("(changeAttribute) attribute is null or NONE.");
             return;
         }

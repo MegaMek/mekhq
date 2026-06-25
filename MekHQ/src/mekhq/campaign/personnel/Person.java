@@ -7390,7 +7390,8 @@ public class Person implements ILocation {
      *
      * <p>The actual attribute score update is delegated to the underlying attribute handler.</p>
      *
-     * @param attribute The {@link SkillAttribute} to be updated. Must not be <code>null</code> or "NONE".
+     * @param attribute The {@link SkillAttribute} to be updated. Must not be {@code null} or
+     *                  {@link SkillAttribute#NO_ATTRIBUTE}.
      * @param newScore  The new score to assign to the specified skill attribute.
      *
      * @author Illiani
@@ -7441,7 +7442,7 @@ public class Person implements ILocation {
      * @since 0.50.05
      */
     public int getAttributeCap(final SkillAttribute attribute) {
-        if (attribute == null || attribute.isNone()) {
+        if (attribute == null || attribute.isNoAttribute()) {
             LOGGER.warn("(getAttributeCap) SkillAttribute is null or NONE.");
             return MAXIMUM_ATTRIBUTE_SCORE;
         }
@@ -7462,7 +7463,7 @@ public class Person implements ILocation {
      * @since 0.51.00
      */
     public int getAttributeModifier(final SkillAttribute attribute) {
-        if (attribute == null || attribute.isNone()) {
+        if (attribute == null || attribute.isNoAttribute()) {
             LOGGER.warn("(getAttributeModifier) SkillAttribute is null or NONE.");
             return 0;
         }
@@ -7506,7 +7507,7 @@ public class Person implements ILocation {
      * @since 0.50.05
      */
     public void changeAttributeScore(final SkillAttribute attribute, final int delta) {
-        if (attribute == null || attribute.isNone()) {
+        if (attribute == null || attribute.isNoAttribute()) {
             LOGGER.warn("(changeAttributeScore) SkillAttribute is null or NONE.");
             return;
         }
