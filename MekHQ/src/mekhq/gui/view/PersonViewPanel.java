@@ -866,10 +866,10 @@ public class PersonViewPanel extends JScrollablePanel {
     /**
      * Returns a map of relevant skill attributes and their corresponding modifiers for the person.
      *
-     * <p>This method iterates over all possible {@link SkillAttribute} values (excluding {@link SkillAttribute#NONE}),
-     * retrieves each attribute's score for the person, and computes the associated modifier using
-     * {@link Skill#getIndividualAttributeModifier(int)}. Only attributes with a non-zero modifier are included in the
-     * result map.</p>
+     * <p>This method iterates over all possible {@link SkillAttribute} values (excluding
+     * {@link SkillAttribute#NO_ATTRIBUTE}), retrieves each attribute's score for the person, and computes the
+     * associated modifier using {@link Skill#getIndividualAttributeModifier(int)}. Only attributes with a non-zero
+     * modifier are included in the result map.</p>
      *
      * @return a {@link Map} mapping each relevant {@link SkillAttribute} to its computed modifier for the person
      *
@@ -879,7 +879,7 @@ public class PersonViewPanel extends JScrollablePanel {
     private Map<SkillAttribute, Integer> getRelevantAttributes() {
         Map<SkillAttribute, Integer> relevantAttributes = new HashMap<>();
         for (SkillAttribute attribute : SkillAttribute.values()) {
-            if (attribute == SkillAttribute.NONE) {
+            if (attribute == SkillAttribute.NO_ATTRIBUTE) {
                 continue;
             }
 
@@ -2390,7 +2390,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
         int i = 0;
         for (SkillAttribute attribute : allAttributes) {
-            if (attribute == SkillAttribute.NONE) {
+            if (attribute == SkillAttribute.NO_ATTRIBUTE) {
                 continue;
             }
 

@@ -133,6 +133,7 @@ public class SkillCheckUtility {
      * Generates the roll value for a check, applying the natural aptitude if applicable.
      *
      * @param hasNaturalAptitude {@code true} to roll 3d6 and keep the highest 2; {@code false} to roll 2d6
+     *
      * @return the result of the dice roll
      */
     static int getRoll(boolean hasNaturalAptitude) {
@@ -152,7 +153,7 @@ public class SkillCheckUtility {
      *   <li>The target roll by applying modifiers (negative of the attribute values), and</li>
      *   <li>The total attribute score, which it returns as an integer.</li>
      * </ul>
-     * <p>Attributes that are set to {@link SkillAttribute#NONE} are ignored during this process.</p>
+     * <p>Attributes that are set to {@link SkillAttribute#NO_ATTRIBUTE} are ignored during this process.</p>
      *
      * <p>For each relevant attribute:</p>
      * <ul>
@@ -190,7 +191,7 @@ public class SkillCheckUtility {
         List<SkillAttribute> linkedAttributes = List.of(skillType.getFirstAttribute(), skillType.getSecondAttribute());
 
         for (SkillAttribute attribute : linkedAttributes) {
-            if (attribute == SkillAttribute.NONE) {
+            if (attribute == SkillAttribute.NO_ATTRIBUTE) {
                 continue;
             }
 

@@ -265,7 +265,7 @@ public class Attributes {
 
         int attributeScore = 0;
         return switch (attribute) {
-            case NONE, BODY, REFLEXES, DEXTERITY, WILLPOWER, EDGE -> 0;
+            case NO_ATTRIBUTE, BODY, REFLEXES, DEXTERITY, WILLPOWER, EDGE -> 0;
             case INTELLIGENCE -> {
                 if (hasAgeraniumsDisease) {
                     attributeScore -= 2;
@@ -317,7 +317,7 @@ public class Attributes {
      * @since 0.50.05
      */
     public int getBaseAttributeScore(SkillAttribute attribute) {
-        if (attribute == null || attribute.isNone()) {
+        if (attribute == null || attribute.isNoAttribute()) {
             LOGGER.warn("(getAttributeScore) attribute is null or NONE.");
             return DEFAULT_ATTRIBUTE_SCORE;
         }
@@ -368,7 +368,7 @@ public class Attributes {
                 case INTELLIGENCE -> effect.getIntelligenceModifier();
                 case WILLPOWER -> effect.getWillpowerModifier();
                 case CHARISMA -> effect.getCharismaModifier();
-                case NONE, EDGE -> 0; // There are no Edge modifying injury effects
+                case NO_ATTRIBUTE, EDGE -> 0; // There are no Edge modifying injury effects
             };
         }
 
@@ -422,7 +422,7 @@ public class Attributes {
      * @since 0.50.05
      */
     public void setAttributeScore(Phenotype phenotype, PersonnelOptions options, SkillAttribute attribute, int score) {
-        if (attribute == null || attribute.isNone()) {
+        if (attribute == null || attribute.isNoAttribute()) {
             LOGGER.warn("(setAttributeScore) attribute is null or NONE.");
             return;
         }
@@ -507,7 +507,7 @@ public class Attributes {
      * modifying their scores accordingly. Attribute values are clamped within valid bounds as defined by the
      * {@code changeAttribute} and {@code setAttributeScore} methods, ensuring no invalid scores are set.</p>
      *
-     * <p>Attributes marked as {@link SkillAttribute#NONE} are skipped during the iteration and are not
+     * <p>Attributes marked as {@link SkillAttribute#NO_ATTRIBUTE} are skipped during the iteration and are not
      * modified.</p>
      *
      * @param phenotype The {@link Phenotype} used to determine the caps for all skill attributes.
@@ -531,7 +531,7 @@ public class Attributes {
         }
 
         for (SkillAttribute attribute : SkillAttribute.values()) {
-            if (attribute.isNone()) {
+            if (attribute.isNoAttribute()) {
                 continue;
             }
 
@@ -569,7 +569,7 @@ public class Attributes {
             return;
         }
 
-        if (attribute == null || attribute.isNone()) {
+        if (attribute == null || attribute.isNoAttribute()) {
             LOGGER.warn("(changeAttribute) attribute is null or NONE.");
             return;
         }
