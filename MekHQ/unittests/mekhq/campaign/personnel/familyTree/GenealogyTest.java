@@ -33,6 +33,7 @@
 package mekhq.campaign.personnel.familyTree;
 
 import static mekhq.campaign.personnel.PersonnelTestUtilities.matchPersonUUID;
+import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -96,28 +97,28 @@ public class GenealogyTest {
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
         when(mockCampaign.getFaction()).thenReturn(campaignFaction);
-        when(campaignFaction.getShortName()).thenReturn("MERC");
+        when(campaignFaction.getShortName()).thenReturn(MERCENARY_FACTION_CODE);
 
         // Create a bunch of people
-        alpha = new Person("Alpha", "Alpha", mockCampaign, "MERC");
-        beta = new Person("Beta", "Beta", mockCampaign, "MERC");
-        gamma = new Person("Gamma", "Gamma", mockCampaign, "MERC");
-        delta = new Person("Delta", "Delta", mockCampaign, "MERC");
-        epsilon = new Person("Epsilon", "Epsilon", mockCampaign, "MERC");
-        zeta = new Person("Zeta", "Zeta", mockCampaign, "MERC");
-        eta = new Person("Eta", "Eta", mockCampaign, "MERC");
-        theta = new Person("Theta", "Theta", mockCampaign, "MERC");
-        iota = new Person("Iota", "Iota", mockCampaign, "MERC");
-        kappa = new Person("Kappa", "Kappa", mockCampaign, "MERC");
-        lambda = new Person("Lambda", "Lambda", mockCampaign, "MERC");
-        mu = new Person("Mu", "Mu", mockCampaign, "MERC");
-        nu = new Person("Nu", "Nu", mockCampaign, "MERC");
-        xi = new Person("Xi", "Xi", mockCampaign, "MERC");
-        omicron = new Person("Omicron", "Omicron", mockCampaign, "MERC");
-        pi = new Person("Pi", "Pi", mockCampaign, "MERC");
-        rho = new Person("Rho", "Rho", mockCampaign, "MERC");
-        sigma = new Person("Sigma", "Sigma", mockCampaign, "MERC");
-        tau = new Person("Tau", "Tau", mockCampaign, "MERC");
+        alpha = new Person("Alpha", "Alpha", mockCampaign, MERCENARY_FACTION_CODE);
+        beta = new Person("Beta", "Beta", mockCampaign, MERCENARY_FACTION_CODE);
+        gamma = new Person("Gamma", "Gamma", mockCampaign, MERCENARY_FACTION_CODE);
+        delta = new Person("Delta", "Delta", mockCampaign, MERCENARY_FACTION_CODE);
+        epsilon = new Person("Epsilon", "Epsilon", mockCampaign, MERCENARY_FACTION_CODE);
+        zeta = new Person("Zeta", "Zeta", mockCampaign, MERCENARY_FACTION_CODE);
+        eta = new Person("Eta", "Eta", mockCampaign, MERCENARY_FACTION_CODE);
+        theta = new Person("Theta", "Theta", mockCampaign, MERCENARY_FACTION_CODE);
+        iota = new Person("Iota", "Iota", mockCampaign, MERCENARY_FACTION_CODE);
+        kappa = new Person("Kappa", "Kappa", mockCampaign, MERCENARY_FACTION_CODE);
+        lambda = new Person("Lambda", "Lambda", mockCampaign, MERCENARY_FACTION_CODE);
+        mu = new Person("Mu", "Mu", mockCampaign, MERCENARY_FACTION_CODE);
+        nu = new Person("Nu", "Nu", mockCampaign, MERCENARY_FACTION_CODE);
+        xi = new Person("Xi", "Xi", mockCampaign, MERCENARY_FACTION_CODE);
+        omicron = new Person("Omicron", "Omicron", mockCampaign, MERCENARY_FACTION_CODE);
+        pi = new Person("Pi", "Pi", mockCampaign, MERCENARY_FACTION_CODE);
+        rho = new Person("Rho", "Rho", mockCampaign, MERCENARY_FACTION_CODE);
+        sigma = new Person("Sigma", "Sigma", mockCampaign, MERCENARY_FACTION_CODE);
+        tau = new Person("Tau", "Tau", mockCampaign, MERCENARY_FACTION_CODE);
 
         // Setup the getPerson methods
         given(mockCampaign.getPerson(argThat(matchPersonUUID(alpha.getId())))).willReturn(alpha);
@@ -220,14 +221,14 @@ public class GenealogyTest {
 
     @Test
     public void testAddAndRemoveFormerSpouse() {
-        final FormerSpouse formerSpouse1 = new FormerSpouse(new Person(mockCampaign, "MERC"),
+        final FormerSpouse formerSpouse1 = new FormerSpouse(new Person(mockCampaign, MERCENARY_FACTION_CODE),
               LocalDate.now(),
               FormerSpouseReason.DIVORCE);
-        final FormerSpouse formerSpouse2 = new FormerSpouse(new Person(mockCampaign, "MERC"),
+        final FormerSpouse formerSpouse2 = new FormerSpouse(new Person(mockCampaign, MERCENARY_FACTION_CODE),
               LocalDate.now(),
               FormerSpouseReason.DIVORCE);
 
-        final Person person = new Person(mockCampaign, "MERC");
+        final Person person = new Person(mockCampaign, MERCENARY_FACTION_CODE);
         person.getGenealogy().addFormerSpouse(formerSpouse1);
         person.getGenealogy().addFormerSpouse(formerSpouse2);
         assertEquals(2, person.getGenealogy().getFormerSpouses().size());
@@ -241,23 +242,98 @@ public class GenealogyTest {
 
     @Test
     public void testAddFamilyMember() {
-        final Person person = new Person(mockCampaign, "MERC");
+        final Person person = new Person(mockCampaign, MERCENARY_FACTION_CODE);
         person.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, null);
         assertTrue(person.getGenealogy()
                          .getFamily()
                          .getOrDefault(FamilialRelationshipType.CHILD, new ArrayList<>())
                          .isEmpty());
 
-        person.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, new Person(mockCampaign, "MERC"));
+        person.getGenealogy()
+              .addFamilyMember(FamilialRelationshipType.PARENT, new Person(mockCampaign, MERCENARY_FACTION_CODE));
         assertEquals(1, person.getGenealogy().getParents().size());
     }
 
     @Test
+    public void testAddFamilyMemberDoesNotDuplicateSamePerson() {
+        final Person origin = new Person(mockCampaign, MERCENARY_FACTION_CODE);
+        final Person child = new Person(mockCampaign, MERCENARY_FACTION_CODE);
+
+        origin.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, child);
+        origin.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, child);
+
+        assertEquals(1, origin.getGenealogy().getChildren().size());
+        assertEquals(child, origin.getGenealogy().getChildren().getFirst());
+    }
+
+    @Test
+    public void testSetAndClearSpouse() {
+        final Person origin = new Person(mockCampaign, MERCENARY_FACTION_CODE);
+        final Person spouse = new Person(mockCampaign, MERCENARY_FACTION_CODE);
+
+        assertFalse(origin.getGenealogy().hasSpouse());
+
+        origin.getGenealogy().setSpouse(spouse);
+        assertTrue(origin.getGenealogy().hasSpouse());
+        assertEquals(spouse, origin.getGenealogy().getSpouse());
+
+        origin.getGenealogy().setSpouse(null);
+        assertFalse(origin.getGenealogy().hasSpouse());
+        assertNull(origin.getGenealogy().getSpouse());
+    }
+
+    @Test
+    public void testRemoveFormerSpouseNotPresentDoesNothing() {
+        final Person origin = new Person(mockCampaign, MERCENARY_FACTION_CODE);
+        final Person formerSpouse = new Person(mockCampaign, MERCENARY_FACTION_CODE);
+        final Person unrelated = new Person(mockCampaign, MERCENARY_FACTION_CODE);
+        final FormerSpouse formerSpouseEntry = new FormerSpouse(formerSpouse,
+              LocalDate.of(3025, 1, 1),
+              FormerSpouseReason.DIVORCE);
+
+        origin.getGenealogy().addFormerSpouse(formerSpouseEntry);
+
+        origin.getGenealogy().removeFormerSpouse(unrelated);
+
+        assertEquals(1, origin.getGenealogy().getFormerSpouses().size());
+        assertEquals(formerSpouse, origin.getGenealogy().getFormerSpouses().getFirst().getFormerSpouse());
+    }
+
+    @Test
+    public void testRemoveFamilyMemberNullPersonDoesNothing() {
+        final Person origin = new Person(mockCampaign, MERCENARY_FACTION_CODE);
+        final Person child = new Person(mockCampaign, MERCENARY_FACTION_CODE);
+
+        origin.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, child);
+
+        origin.getGenealogy().removeFamilyMember(FamilialRelationshipType.CHILD, null);
+
+        assertEquals(1, origin.getGenealogy().getFamily().size());
+        assertEquals(1, origin.getGenealogy().getChildren().size());
+        assertEquals(child, origin.getGenealogy().getChildren().getFirst());
+    }
+
+    @Test
+    public void testRemoveFamilyMemberNullRelationshipTypeWithUnknownPersonDoesNothing() {
+        final Person origin = new Person(mockCampaign, MERCENARY_FACTION_CODE);
+        final Person child = new Person(mockCampaign, MERCENARY_FACTION_CODE);
+        final Person unrelated = new Person(mockCampaign, MERCENARY_FACTION_CODE);
+
+        origin.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, child);
+
+        origin.getGenealogy().removeFamilyMember(null, unrelated);
+
+        assertEquals(1, origin.getGenealogy().getFamily().size());
+        assertEquals(1, origin.getGenealogy().getChildren().size());
+        assertEquals(child, origin.getGenealogy().getChildren().getFirst());
+    }
+
+    @Test
     public void testRemoveFamilyMemberNullRelationshipType() {
-        final Person parent = new Person(mockCampaign, "MERC");
-        final Person origin = new Person(mockCampaign, "MERC");
-        final Person child1 = new Person(mockCampaign, "MERC");
-        final Person child2 = new Person(mockCampaign, "MERC");
+        final Person parent = new Person(mockCampaign, MERCENARY_FACTION_CODE);
+        final Person origin = new Person(mockCampaign, MERCENARY_FACTION_CODE);
+        final Person child1 = new Person(mockCampaign, MERCENARY_FACTION_CODE);
+        final Person child2 = new Person(mockCampaign, MERCENARY_FACTION_CODE);
 
         origin.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, parent);
         origin.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, child1);
@@ -304,9 +380,9 @@ public class GenealogyTest {
 
     @Test
     public void testRemoveFamilyMemberCorrectRelationshipType() {
-        final Person origin = new Person(mockCampaign, "MERC");
-        final Person child1 = new Person(mockCampaign, "MERC");
-        final Person child2 = new Person(mockCampaign, "MERC");
+        final Person origin = new Person(mockCampaign, MERCENARY_FACTION_CODE);
+        final Person child1 = new Person(mockCampaign, MERCENARY_FACTION_CODE);
+        final Person child2 = new Person(mockCampaign, MERCENARY_FACTION_CODE);
 
         origin.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, child1);
         origin.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, child2);
@@ -324,7 +400,7 @@ public class GenealogyTest {
     //region Boolean Checks
     @Test
     public void testIsEmpty() {
-        assertTrue(new Person(mockCampaign, "MERC").getGenealogy().isEmpty());
+        assertTrue(new Person(mockCampaign, MERCENARY_FACTION_CODE).getGenealogy().isEmpty());
         assertFalse(alpha.getGenealogy().isEmpty());
         assertFalse(mu.getGenealogy().isEmpty());
         assertFalse(lambda.getGenealogy().isEmpty());
@@ -538,6 +614,54 @@ public class GenealogyTest {
 
         assertEquals(answer, cousins);
     }
+
+    @Test
+    public void testGetGrandparentsWhenNoParents() {
+        assertTrue(beta.getGenealogy().getGrandparents().isEmpty());
+        assertTrue(lambda.getGenealogy().getGrandparents().isEmpty());
+    }
+
+    @Test
+    public void testGetSiblingsWhenOnlyChild() {
+        Person parent = new Person(mockCampaign, MERCENARY_FACTION_CODE);
+        Person child1 = new Person(mockCampaign, MERCENARY_FACTION_CODE);
+        Person child2 = new Person(mockCampaign, MERCENARY_FACTION_CODE);
+        Person onlyChild = new Person(mockCampaign, MERCENARY_FACTION_CODE);
+
+        child1.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, parent);
+        child2.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, parent);
+        parent.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, child1);
+        parent.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, child2);
+
+        assertTrue(child1.getGenealogy().getSiblings().contains(child2));
+        assertTrue(onlyChild.getGenealogy().getSiblings().isEmpty());
+    }
+
+    @Test
+    public void testGetSiblingsAndSpousesExcludesSiblingWithoutSpouse() {
+        final List<Person> siblingsAndSpouses = nu.getGenealogy().getSiblingsAndSpouses();
+
+        assertEquals(1, siblingsAndSpouses.size());
+        assertEquals(omicron, siblingsAndSpouses.getFirst());
+    }
+
+    @Test
+    public void testGetAuntsAndUnclesWhenNoneExist() {
+        assertTrue(alpha.getGenealogy().getsAuntsAndUncles().isEmpty());
+        assertTrue(beta.getGenealogy().getsAuntsAndUncles().isEmpty());
+    }
+
+    @Test
+    public void testGetCousinsWhenNoneExist() {
+        assertTrue(alpha.getGenealogy().getCousins().isEmpty());
+        assertTrue(nu.getGenealogy().getCousins().isEmpty());
+    }
+
+    @Test
+    public void testGetGrandchildrenWhenChildHasNoChildren() {
+        assertTrue(theta.getGenealogy().getGrandchildren().isEmpty());
+        assertTrue(lambda.getGenealogy().getGrandchildren().isEmpty());
+    }
     //endregion Basic Family Getters
 
     //region File I/O
@@ -581,18 +705,18 @@ public class GenealogyTest {
     }
 
     @Test
-    public void testGenerateInstanceFromXML() throws Exception {
-        final Person spouse = new Person(mockCampaign);
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(spouse.getId())))).willReturn(spouse);
-        final Person formerSpouse = new Person(mockCampaign);
-        given(mockCampaign.getPerson(argThat(matchPersonUUID(formerSpouse.getId())))).willReturn(formerSpouse);
+    public void testGenerateInstanceFromXMLWithMultipleFamilyRelationships() throws Exception {
+        final Person parent = new Person(mockCampaign);
+        given(mockCampaign.getPerson(argThat(matchPersonUUID(parent.getId())))).willReturn(parent);
         final Person child = new Person(mockCampaign);
         given(mockCampaign.getPerson(argThat(matchPersonUUID(child.getId())))).willReturn(child);
 
         final String text = String.format(
-              "<genealogy>\t<spouse>%s</spouse>\t<formerSpouses>\t\t<formerSpouse>\t\t\t<id>%s</id>\t\t\t<date>3025-01-01</date>\t\t\t<reason>DIVORCE</reason>\t\t</formerSpouse>\t</formerSpouses>\t<family>\t\t<relationship>\t\t\t<type>CHILD</type>\t\t\t<personId>%s</personId>\t\t</relationship>\t</family></genealogy>",
-              spouse.getId(),
-              formerSpouse.getId(),
+              "<genealogy><family>"
+                    + "<relationship><type>PARENT</type><personId>%s</personId></relationship>"
+                    + "<relationship><type>CHILD</type><personId>%s</personId></relationship>"
+                    + "</family></genealogy>",
+              parent.getId(),
               child.getId());
 
         final Document document;
@@ -603,26 +727,39 @@ public class GenealogyTest {
         final Element element = document.getDocumentElement();
         element.normalize();
 
-        assertTrue(element.hasChildNodes());
-
         final Genealogy genealogy = new Genealogy(mock(Person.class));
         genealogy.fillFromXML(element.getChildNodes());
 
-        assertEquals(spouse.getId(), genealogy.getSpouse().getId());
-        assertEquals(1, genealogy.getFormerSpouses().size());
-        assertEquals(formerSpouse.getId(), genealogy.getFormerSpouses().getFirst().getFormerSpouse().getId());
-        assertEquals(LocalDate.of(3025, 1, 1), genealogy.getFormerSpouses().getFirst().getDate());
-        assertEquals(FormerSpouseReason.DIVORCE, genealogy.getFormerSpouses().getFirst().getReason());
-        assertEquals(1, genealogy.getFamily().size());
-        assertTrue(genealogy.getFamily().containsKey(FamilialRelationshipType.CHILD));
-        assertEquals(1, genealogy.getFamily().get(FamilialRelationshipType.CHILD).size());
-        assertEquals(child.getId(), genealogy.getFamily().get(FamilialRelationshipType.CHILD).getFirst().getId());
+        assertEquals(2, genealogy.getFamily().size());
+        assertEquals(1, genealogy.getParents().size());
+        assertEquals(parent.getId(), genealogy.getParents().getFirst().getId());
+        assertEquals(1, genealogy.getChildren().size());
+        assertEquals(child.getId(), genealogy.getChildren().getFirst().getId());
+    }
+
+    @Test
+    public void testWriteToXMLWithFormerSpousesOnly() throws IOException {
+        final Genealogy genealogy = new Genealogy(mock(Person.class));
+        final UUID formerSpouseId = UUID.randomUUID();
+        final Person mockFormerSpouse = mock(Person.class);
+        when(mockFormerSpouse.getId()).thenReturn(formerSpouseId);
+
+        genealogy.addFormerSpouse(new FormerSpouse(mockFormerSpouse,
+              LocalDate.of(3026, 12, 31),
+              FormerSpouseReason.WIDOWED));
+
+        try (StringWriter sw = new StringWriter(); PrintWriter pw = new PrintWriter(sw)) {
+            genealogy.writeToXML(pw, 0);
+
+            assertEquals(String.format(
+                  "<genealogy>\t<formerSpouses>\t\t<formerSpouse>\t\t\t<id>%s</id>\t\t\t<date>3026-12-31</date>\t\t\t<reason>WIDOWED</reason>\t\t</formerSpouse>\t</formerSpouses></genealogy>",
+                  formerSpouseId), sw.toString().replaceAll("\\n|\\r\\n", ""));
+        }
     }
 
     @Test
     public void testGenerateInstanceFromXMLErrorCases() throws Exception {
         final String text = "<genealogy><formerSpouses></formerSpouses><formerSpouses><formerSpouse></formerSpouse></formerSpouses><family></family><family><relationship><type>break</type></relationship></family><john></john></genealogy>";
-
         final Document document;
         try (ByteArrayInputStream bais = new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8))) {
             document = MHQXMLUtility.newSafeDocumentBuilder().parse(bais);
@@ -652,8 +789,8 @@ public class GenealogyTest {
     //region Clear Genealogy
     @Test
     public void clearGenealogyLinksSpouseOnly() {
-        final Person origin = new Person(mockCampaign, "MERC");
-        final Person spouse = new Person(mockCampaign, "MERC");
+        final Person origin = new Person(mockCampaign, MERCENARY_FACTION_CODE);
+        final Person spouse = new Person(mockCampaign, MERCENARY_FACTION_CODE);
 
         origin.getGenealogy().setSpouse(spouse);
         spouse.getGenealogy().setSpouse(origin);
@@ -665,8 +802,8 @@ public class GenealogyTest {
 
     @Test
     public void clearGenealogyLinksFormerSpouseOnly() {
-        final Person origin = new Person(mockCampaign, "MERC");
-        final Person formerSpouse = new Person(mockCampaign, "MERC");
+        final Person origin = new Person(mockCampaign, MERCENARY_FACTION_CODE);
+        final Person formerSpouse = new Person(mockCampaign, MERCENARY_FACTION_CODE);
 
         origin.getGenealogy()
               .addFormerSpouse(new FormerSpouse(formerSpouse, LocalDate.now(), FormerSpouseReason.WIDOWED));
@@ -680,8 +817,8 @@ public class GenealogyTest {
 
     @Test
     public void clearGenealogyLinksFamilyOnly() {
-        final Person origin = new Person(mockCampaign, "MERC");
-        final Person child = new Person(mockCampaign, "MERC");
+        final Person origin = new Person(mockCampaign, MERCENARY_FACTION_CODE);
+        final Person child = new Person(mockCampaign, MERCENARY_FACTION_CODE);
 
         origin.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, child);
         child.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, origin);
@@ -693,10 +830,10 @@ public class GenealogyTest {
 
     @Test
     public void clearGenealogyLinksAllTypesExist() {
-        final Person origin = new Person(mockCampaign, "MERC");
-        final Person spouse = new Person(mockCampaign, "MERC");
-        final Person formerSpouse = new Person(mockCampaign, "MERC");
-        final Person child = new Person(mockCampaign, "MERC");
+        final Person origin = new Person(mockCampaign, MERCENARY_FACTION_CODE);
+        final Person spouse = new Person(mockCampaign, MERCENARY_FACTION_CODE);
+        final Person formerSpouse = new Person(mockCampaign, MERCENARY_FACTION_CODE);
+        final Person child = new Person(mockCampaign, MERCENARY_FACTION_CODE);
 
         origin.getGenealogy().setSpouse(spouse);
         spouse.getGenealogy().setSpouse(origin);

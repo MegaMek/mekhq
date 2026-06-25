@@ -156,7 +156,8 @@ public enum PersonnelTableModelColumn {
     AGGREGATE_COMBAT("Column.AGGREGATE_COMBAT.title", NaturalOrderComparator.INSTANCE,
           PersonnelTableModelColumn::getAggregateSkillValue),
     SMALL_ARMS("Column.SMALL_ARMS.title", Comparators.SKILL_COMPARATOR,
-          (person, campaign) -> getSkillValue(person, campaign).apply(InfantryGunnerySkills.getBestInfantryGunnerySkill(person,
+          (person, campaign) -> getSkillValue(person, campaign).apply(InfantryGunnerySkills.getBestInfantryGunnerySkill(
+                person,
                 campaign.getCampaignOptions().isUseSmallArmsOnly())), PersonnelTableModelColumn::skillToText),
     ANTI_MEK("Column.ANTI_MEK.title", Comparators.SKILL_COMPARATOR,
           skillModelExtractor(SkillType.S_ANTI_MEK), PersonnelTableModelColumn::skillToText),
@@ -307,9 +308,9 @@ public enum PersonnelTableModelColumn {
           Person::getBloodmark, Object::toString),
     FATIGUE("Column.FATIGUE.title", Comparators.INT_COMPARATOR,
           (person, campaign) ->
-              getEffectiveFatigue(person.getAdjustedFatigue(),
-                    person.getPermanentFatigue(), person.isClanPersonnel(),
-                    person.getSkillLevel(campaign, false, true)), Object::toString),
+                getEffectiveFatigue(person.getAdjustedFatigue(),
+                      person.getPermanentFatigue(), person.isClanPersonnel(),
+                      person.getSkillLevel(campaign, false, true)), Object::toString),
     SPA_COUNT("Column.SPA_COUNT.title", Comparators.INT_COMPARATOR,
           person -> person.countOptions(PersonnelOptions.LVL3_ADVANTAGES), Object::toString),
     MODIFICATION_COUNT("Column.MODIFICATION_COUNT.title", Comparators.INT_COMPARATOR,
@@ -326,7 +327,8 @@ public enum PersonnelTableModelColumn {
               Academy currentAcademy = EducationController.getAcademy(person.getEduAcademySet(),
                     person.getEduAcademyNameInSet());
               return currentAcademy == null ? "" :
-                           EducationLevel.fromString(String.valueOf(currentAcademy.getEducationLevel(person))).toString();
+                           EducationLevel.fromString(String.valueOf(currentAcademy.getEducationLevel(person)))
+                                 .toString();
           }),
     ACADEMY("Column.ACADEMY.title", NaturalOrderComparator.INSTANCE,
           person -> {
@@ -401,10 +403,28 @@ public enum PersonnelTableModelColumn {
     DESTINATION_PLANET("Column.DESTINATION_PLANET.title", NaturalOrderComparator.INSTANCE,
           (person, campaign) -> LocationDisplay.getDestinationPlanet(person, campaign.getLocalDate())),
     DESTINATION_NAME("Column.DESTINATION_NAME.title", NaturalOrderComparator.INSTANCE,
-          (person, campaign) -> LocationDisplay.getDestinationName(person, campaign, campaign.getLocalDate()));
+          (person, campaign) -> LocationDisplay.getDestinationName(person, campaign, campaign.getLocalDate())),
+    IS_MARRIED("Column.IS_MARRIED.title", NaturalOrderComparator.INSTANCE,
+          person -> convertBooleanToYesNoNA(person.getGenealogy().hasSpouse())),
+    FORMER_SPOUSES("Column.FORMER_SPOUSES.title", Integer::compare,
+          person -> person.getGenealogy().getFormerSpouses().size(), Object::toString),
+    CHILDREN("Column.CHILDREN.title", Integer::compare,
+          person -> person.getGenealogy().getChildren().size(), Object::toString),
+    SIBLINGS("Column.SIBLINGS.title", Integer::compare,
+          person -> person.getGenealogy().getSiblingCount(), Object::toString),
+    PARENTS("Column.PARENTS.title", Integer::compare,
+          person -> person.getGenealogy().getParentsCount(), Object::toString),
+    GRANDCHILDREN("Column.GRANDCHILDREN.title", Integer::compare,
+          person -> person.getGenealogy().getGrandchildrenCount(), Object::toString),
+    GRANDPARENTS("Column.GRANDPARENTS.title", Integer::compare,
+          person -> person.getGenealogy().getGrandparentsCount(), Object::toString),
+    AUNTS_OR_UNCLES("Column.AUNTS_OR_UNCLES.title", Integer::compare,
+          person -> person.getGenealogy().getAuntsAndUnclesCount(), Object::toString),
+    COUSINS("Column.COUSINS.title", Integer::compare,
+          person -> person.getGenealogy().getCousinsCount(), Object::toString);
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PersonnelTable";
-    
+
     private final String name;
     private final Comparator<Object> modelComparator;
     private final BiFunction<Person, Campaign, Object> modelExtractor;
@@ -431,9 +451,9 @@ public enum PersonnelTableModelColumn {
     }
 
     /**
-     * Defines a personnel table column model, how it's sorted and visualised.
-     * This is a simplified column implementation that only depends on {@link Person}.
-     * See {@link #PersonnelTableModelColumn(String, Comparator, BiFunction)}.
+     * Defines a personnel table column model, how it's sorted and visualised. This is a simplified column
+     * implementation that only depends on {@link Person}. See
+     * {@link #PersonnelTableModelColumn(String, Comparator, BiFunction)}.
      */
     <Model> PersonnelTableModelColumn(String name, Comparator<Model> modelComparator,
           Function<Person, Model> modelExtractor, Function<Model, String> modelToText) {
@@ -441,9 +461,9 @@ public enum PersonnelTableModelColumn {
     }
 
     /**
-     * Defines a personnel table column model, how it's sorted and visualised.
-     * This is a simplified column implementation based on the String model.
-     * See {@link #PersonnelTableModelColumn(String, Comparator, BiFunction)}.
+     * Defines a personnel table column model, how it's sorted and visualised. This is a simplified column
+     * implementation based on the String model. See
+     * {@link #PersonnelTableModelColumn(String, Comparator, BiFunction)}.
      */
     PersonnelTableModelColumn(String name, Comparator<String> modelComparator,
           BiFunction<Person, Campaign, String> modelExtractor) {
@@ -451,9 +471,9 @@ public enum PersonnelTableModelColumn {
     }
 
     /**
-     * Defines a personnel table column model, how it's sorted and visualised.
-     * This is a simplified column implementation based on the String model that only depends on {@link Person}.
-     * See {@link #PersonnelTableModelColumn(String, Comparator, BiFunction)}.
+     * Defines a personnel table column model, how it's sorted and visualised. This is a simplified column
+     * implementation based on the String model that only depends on {@link Person}. See
+     * {@link #PersonnelTableModelColumn(String, Comparator, BiFunction)}.
      */
     PersonnelTableModelColumn(String name, Comparator<String> modelComparator,
           Function<Person, String> modelExtractor) {
@@ -542,7 +562,7 @@ public enum PersonnelTableModelColumn {
         return switch (primaryProfession) {
             case PersonnelRole.LAM_PILOT ->
                   skillValue.apply(SkillType.S_GUN_MEK) + '/' + skillValue.apply(SkillType.S_PILOT_MEK) + " / " +
-                              skillValue.apply(SkillType.S_GUN_AERO) + '/' + skillValue.apply(SkillType.S_PILOT_AERO);
+                        skillValue.apply(SkillType.S_GUN_AERO) + '/' + skillValue.apply(SkillType.S_PILOT_AERO);
             case PersonnelRole.MEKWARRIOR ->
                   skillValue.apply(SkillType.S_GUN_MEK) + '/' + skillValue.apply(SkillType.S_PILOT_MEK);
             case PersonnelRole.VEHICLE_CREW_VTOL ->
@@ -557,15 +577,13 @@ public enum PersonnelTableModelColumn {
                   skillValue.apply(SkillType.S_GUN_SPACE) + '/' + skillValue.apply(SkillType.S_PILOT_SPACE);
             case PersonnelRole.AEROSPACE_PILOT ->
                   skillValue.apply(SkillType.S_GUN_AERO) + '/' + skillValue.apply(SkillType.S_PILOT_AERO);
-            case PersonnelRole.BATTLE_ARMOUR ->
-                  skillValue.apply(SkillType.S_GUN_BA);
+            case PersonnelRole.BATTLE_ARMOUR -> skillValue.apply(SkillType.S_GUN_BA);
             case PersonnelRole.SOLDIER -> {
                 String gunnerySkill = InfantryGunnerySkills.getBestInfantryGunnerySkill(person,
                       campaignOptions.isUseSmallArmsOnly());
                 yield skillValue.apply(gunnerySkill) + '/' + skillValue.apply(SkillType.S_ANTI_MEK);
             }
-            case PersonnelRole.PROTOMEK_PILOT ->
-                  skillValue.apply(SkillType.S_GUN_PROTO);
+            case PersonnelRole.PROTOMEK_PILOT -> skillValue.apply(SkillType.S_GUN_PROTO);
             default -> "-/-";
         };
     }
@@ -646,8 +664,8 @@ public enum PersonnelTableModelColumn {
     }
 
     /**
-     * Constructs a visualisation function of a person's skill attribute, including their current score,
-     * maximum possible score (cap), and attribute modifier.
+     * Constructs a visualisation function of a person's skill attribute, including their current score, maximum
+     * possible score (cap), and attribute modifier.
      *
      * @param attribute the specific skill attribute being evaluated
      *
@@ -683,8 +701,8 @@ public enum PersonnelTableModelColumn {
     /**
      * Returns the tooltip text for this column, optionally including color reason explanations.
      *
-     * @param person                   the person for this row
-     * @param colorReasonKeys          list of i18n keys for color reasons, or null/empty if no special coloring
+     * @param person          the person for this row
+     * @param colorReasonKeys list of i18n keys for color reasons, or null/empty if no special coloring
      *
      * @return the tooltip text, or null if no tooltip
      */
@@ -1033,6 +1051,21 @@ public enum PersonnelTableModelColumn {
                      DESTINATION_NAME -> true;
                 default -> false;
             };
+            case FAMILY -> switch (this) {
+                case RANK,
+                     FIRST_NAME,
+                     LAST_NAME,
+                     IS_MARRIED,
+                     FORMER_SPOUSES,
+                     CHILDREN,
+                     SIBLINGS,
+                     PARENTS,
+                     GRANDCHILDREN,
+                     GRANDPARENTS,
+                     AUNTS_OR_UNCLES,
+                     COUSINS -> true;
+                default -> false;
+            };
             case OTHER -> switch (this) {
                 case RANK, FIRST_NAME, LAST_NAME -> true;
                 case TOUGHNESS -> campaign.getCampaignOptions().isUseToughness();
@@ -1089,7 +1122,9 @@ public enum PersonnelTableModelColumn {
 
         private int getValueSum() {
             int primary = primaryValue == null ? (SkillType.getType(primaryName).getTarget() + 1) : primaryValue;
-            int secondary = secondaryValue == null ? (SkillType.getType(secondaryName).getTarget() + 1) : secondaryValue;
+            int secondary = secondaryValue == null ?
+                                  (SkillType.getType(secondaryName).getTarget() + 1) :
+                                  secondaryValue;
             return primary + secondary;
         }
 

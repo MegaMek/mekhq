@@ -333,6 +333,8 @@ public class Campaign implements ITechManager, IPlace {
     private LocalDate currentDay;
     private LocalDate campaignStartDate;
 
+    private transient CampaignNewDayManager newDayManager = null;
+
     // hierarchically structured Formation object to define TO&E
     private Formation formations;
     private Hashtable<Integer, CombatTeam> combatTeams; // AtB
@@ -4540,14 +4542,20 @@ public class Campaign implements ITechManager, IPlace {
      * including personnel updates, contract management, financial transactions, maintenance tasks, and other
      * time-dependent campaign events.</p>
      *
-     * @return {@code true} if the new day processing completed successfully; {@code false} if it was cancelled or
-     *       failed
+     * @return {@code true} if the new day processing completed successfully; {@code false} if it was canceled or failed
      *
      * @see CampaignNewDayManager#newDay()
      */
     public boolean newDay() {
-        CampaignNewDayManager manager = new CampaignNewDayManager(this);
-        return manager.newDay();
+        if (newDayManager == null) {
+            newDayManager = new CampaignNewDayManager(this);
+        }
+
+        return newDayManager.newDay();
+    }
+
+    public CampaignNewDayManager getNewDayManager() {
+        return newDayManager;
     }
 
     /**
