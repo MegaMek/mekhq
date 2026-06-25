@@ -113,7 +113,7 @@ public class SkillCheckRulesTest {
             Person extractedPerson = (Person) personField.get(result);
             assertEquals("Unnamed", extractedPerson.getFirstName());
 
-            assertTrue(result.getTargetNumber().isImpossible());
+            assertTrue(result.getTargetNumber().isAutomaticFail());
             assertTrue(result.getTargetNumber().getDesc().contains("used up all their acquisition attempts"));
         }
 
