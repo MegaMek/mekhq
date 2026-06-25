@@ -64,9 +64,8 @@ class SkillTypeXmlIOTest {
     }
 
     /**
-     * The writer must emit the historically-stable {@code <skillType>} element. Currently it emits
-     * {@code <affectedSkill>}, which neither older releases nor the load gate recognise, so this test is RED until the
-     * writer is reverted to {@code skillType}.
+     * The writer must emit the historically-stable {@code <skillType>} wrapper element; changing it would break
+     * backwards compatibility with existing saves/presets and any loader gates that check element names.
      */
     @Test
     void writeToXmlUsesBackwardCompatibleElementName() throws Exception {

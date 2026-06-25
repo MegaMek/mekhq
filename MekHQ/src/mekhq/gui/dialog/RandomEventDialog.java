@@ -69,7 +69,7 @@ import org.jspecify.annotations.NonNull;
 public class RandomEventDialog {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.RandomEventDialog";
 
-    private final static String CHECK_REASON_KEY = "skillOrAttributeCheck.reason";
+    private final static String CHECK_REASON_KEY = "RandomEventDialog.check.reason";
 
     private final static String RESPONSE_PREFIX = "response";
     private final static String BUTTON_SUFFIX = ".button";
@@ -321,7 +321,7 @@ public class RandomEventDialog {
         final int RESPONSE_TARGET_NUMBER = 7 + externalModifiers;
 
         int roll = d6(2);
-        wasSuccessful = roll <= RESPONSE_TARGET_NUMBER;
+        wasSuccessful = roll >= RESPONSE_TARGET_NUMBER;
     }
 
     private void resolveAttributeCheck(boolean useEdge, AttributeCheck attributeCheck, String reason) {
