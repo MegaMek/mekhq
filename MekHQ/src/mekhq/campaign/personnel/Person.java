@@ -2135,6 +2135,25 @@ public class Person implements ILocation {
                      .getDisplayFormattedOutput(getLastRankChangeDate(), today);
     }
 
+    public long getYearsSinceJoiningCampaign(final Campaign campaign) {
+        // Get time in service based on year
+        if (getJoinedCampaign() == null) {
+            return 0;
+        }
+
+        LocalDate today = campaign.getLocalDate();
+
+        // If the person is dead or has left the unit, we only care about how long they
+        // spent in service to the company
+        if (getRetirement() != null) {
+            today = getRetirement();
+        } else if (getDateOfDeath() != null) {
+            today = getDateOfDeath();
+        }
+
+        return ChronoUnit.YEARS.between(getJoinedCampaign(), today);
+    }
+
     public void setId(final UUID id) {
         this.id = id;
     }

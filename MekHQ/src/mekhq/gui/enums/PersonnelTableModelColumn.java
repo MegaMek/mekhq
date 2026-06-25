@@ -156,7 +156,8 @@ public enum PersonnelTableModelColumn {
     AGGREGATE_COMBAT("Column.AGGREGATE_COMBAT.title", NaturalOrderComparator.INSTANCE,
           PersonnelTableModelColumn::getAggregateSkillValue),
     SMALL_ARMS("Column.SMALL_ARMS.title", Comparators.SKILL_COMPARATOR,
-          (person, campaign) -> getSkillValue(person, campaign).apply(InfantryGunnerySkills.getBestInfantryGunnerySkill(person,
+          (person, campaign) -> getSkillValue(person, campaign).apply(InfantryGunnerySkills.getBestInfantryGunnerySkill(
+                person,
                 campaign.getCampaignOptions().isUseSmallArmsOnly())), PersonnelTableModelColumn::skillToText),
     ANTI_MEK("Column.ANTI_MEK.title", Comparators.SKILL_COMPARATOR,
           skillModelExtractor(SkillType.S_ANTI_MEK), PersonnelTableModelColumn::skillToText),
@@ -307,9 +308,9 @@ public enum PersonnelTableModelColumn {
           Person::getBloodmark, Object::toString),
     FATIGUE("Column.FATIGUE.title", Comparators.INT_COMPARATOR,
           (person, campaign) ->
-              getEffectiveFatigue(person.getAdjustedFatigue(),
-                    person.getPermanentFatigue(), person.isClanPersonnel(),
-                    person.getSkillLevel(campaign, false, true)), Object::toString),
+                getEffectiveFatigue(person.getAdjustedFatigue(),
+                      person.getPermanentFatigue(), person.isClanPersonnel(),
+                      person.getSkillLevel(campaign, false, true)), Object::toString),
     SPA_COUNT("Column.SPA_COUNT.title", Comparators.INT_COMPARATOR,
           person -> person.countOptions(PersonnelOptions.LVL3_ADVANTAGES), Object::toString),
     MODIFICATION_COUNT("Column.MODIFICATION_COUNT.title", Comparators.INT_COMPARATOR,
@@ -402,7 +403,25 @@ public enum PersonnelTableModelColumn {
     DESTINATION_PLANET("Column.DESTINATION_PLANET.title", NaturalOrderComparator.INSTANCE,
           (person, campaign) -> LocationDisplay.getDestinationPlanet(person, campaign.getLocalDate())),
     DESTINATION_NAME("Column.DESTINATION_NAME.title", NaturalOrderComparator.INSTANCE,
-          (person, campaign) -> LocationDisplay.getDestinationName(person, campaign, campaign.getLocalDate()));
+          (person, campaign) -> LocationDisplay.getDestinationName(person, campaign, campaign.getLocalDate())),
+    IS_MARRIED("Column.IS_MARRIED.title", NaturalOrderComparator.INSTANCE,
+          person -> convertBooleanToYesNoNA(person.getGenealogy().hasSpouse())),
+    FORMER_SPOUSES("Column.FORMER_SPOUSES.title", Integer::compare,
+          person -> person.getGenealogy().getFormerSpouses().size(), Object::toString),
+    CHILDREN("Column.CHILDREN.title", Integer::compare,
+          person -> person.getGenealogy().getChildren().size(), Object::toString),
+    SIBLINGS("Column.SIBLINGS.title", Integer::compare,
+          person -> person.getGenealogy().getSiblingCount(), Object::toString),
+    PARENTS("Column.PARENTS.title", Integer::compare,
+          person -> person.getGenealogy().getParentsCount(), Object::toString),
+    GRANDCHILDREN("Column.GRANDCHILDREN.title", Integer::compare,
+          person -> person.getGenealogy().getGrandchildrenCount(), Object::toString),
+    GRANDPARENTS("Column.GRANDPARENTS.title", Integer::compare,
+          person -> person.getGenealogy().getGrandparentsCount(), Object::toString),
+    AUNTS_OR_UNCLES("Column.AUNTS_OR_UNCLES.title", Integer::compare,
+          person -> person.getGenealogy().getAuntsAndUnclesCount(), Object::toString),
+    COUSINS("Column.COUSINS.title", Integer::compare,
+          person -> person.getGenealogy().getCousinsCount(), Object::toString);
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PersonnelTable";
 
@@ -1032,6 +1051,21 @@ public enum PersonnelTableModelColumn {
                      DESTINATION_NAME -> true;
                 default -> false;
             };
+            case FAMILY -> switch (this) {
+                case RANK,
+                     FIRST_NAME,
+                     LAST_NAME,
+                     IS_MARRIED,
+                     FORMER_SPOUSES,
+                     CHILDREN,
+                     SIBLINGS,
+                     PARENTS,
+                     GRANDCHILDREN,
+                     GRANDPARENTS,
+                     AUNTS_OR_UNCLES,
+                     COUSINS -> true;
+                default -> false;
+            };
             case OTHER -> switch (this) {
                 case RANK, FIRST_NAME, LAST_NAME -> true;
                 case TOUGHNESS -> campaign.getCampaignOptions().isUseToughness();
@@ -1088,7 +1122,9 @@ public enum PersonnelTableModelColumn {
 
         private int getValueSum() {
             int primary = primaryValue == null ? (SkillType.getType(primaryName).getTarget() + 1) : primaryValue;
-            int secondary = secondaryValue == null ? (SkillType.getType(secondaryName).getTarget() + 1) : secondaryValue;
+            int secondary = secondaryValue == null ?
+                                  (SkillType.getType(secondaryName).getTarget() + 1) :
+                                  secondaryValue;
             return primary + secondary;
         }
 
