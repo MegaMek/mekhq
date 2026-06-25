@@ -333,6 +333,8 @@ public class Campaign implements ITechManager, IPlace {
     private LocalDate currentDay;
     private LocalDate campaignStartDate;
 
+    private transient CampaignNewDayManager newDayManager = null;
+
     // hierarchically structured Formation object to define TO&E
     private Formation formations;
     private Hashtable<Integer, CombatTeam> combatTeams; // AtB
@@ -2264,7 +2266,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all hangars across all locations associated with this campaign.
-     *                                     TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     *                                           TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
      */
     public Hangar getAllHangar() {
         return units;
@@ -2912,7 +2914,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all warehouses across all locations associated with this campaign.
-     *                                     TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
+     *                                           TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
      */
     public Warehouse getAllWarehouse() {
         return parts;
@@ -4540,14 +4542,20 @@ public class Campaign implements ITechManager, IPlace {
      * including personnel updates, contract management, financial transactions, maintenance tasks, and other
      * time-dependent campaign events.</p>
      *
-     * @return {@code true} if the new day processing completed successfully; {@code false} if it was cancelled or
-     *       failed
+     * @return {@code true} if the new day processing completed successfully; {@code false} if it was canceled or failed
      *
      * @see CampaignNewDayManager#newDay()
      */
     public boolean newDay() {
-        CampaignNewDayManager manager = new CampaignNewDayManager(this);
-        return manager.newDay();
+        if (newDayManager == null) {
+            newDayManager = new CampaignNewDayManager(this);
+        }
+
+        return newDayManager.newDay();
+    }
+
+    public CampaignNewDayManager getNewDayManager() {
+        return newDayManager;
     }
 
     /**

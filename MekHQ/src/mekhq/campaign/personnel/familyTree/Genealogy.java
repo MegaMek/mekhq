@@ -35,14 +35,13 @@ package mekhq.campaign.personnel.familyTree;
 import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
@@ -58,7 +57,7 @@ import org.w3c.dom.NodeList;
 
 /**
  * The Genealogy class is used to track immediate familial relationships, spouses, and former spouses. It is also used
- * to determine familial relationships between people
+ * to determine familial relationships between people.
  */
 public class Genealogy {
     private static final MMLogger LOGGER = MMLogger.create(Genealogy.class);
@@ -66,7 +65,7 @@ public class Genealogy {
     // region Variables
     private final Person origin;
     private Person spouse;
-    private Person originSpouse; // the person who originated the marriage
+    private Person originSpouse;
     private final List<FormerSpouse> formerSpouses = new ArrayList<>();
     private final Map<FamilialRelationshipType, List<Person>> family = new HashMap<>();
     // endregion Variables
@@ -157,7 +156,7 @@ public class Genealogy {
     }
 
     /**
-     * This is used to add a new family member
+     * This is used to add a new family member.
      *
      * @param relationshipType the relationship type between the two people
      * @param person           the person to add
@@ -166,7 +165,10 @@ public class Genealogy {
           final @Nullable Person person) {
         if (person != null) {
             getFamily().putIfAbsent(relationshipType, new ArrayList<>());
-            getFamily().get(relationshipType).add(person);
+            List<Person> relevantFamily = getFamily().get(relationshipType);
+            if (!relevantFamily.contains(person)) {
+                getFamily().get(relationshipType).add(person);
+            }
         }
     }
 
@@ -177,28 +179,30 @@ public class Genealogy {
     public void removeFamilyMember(final @Nullable FamilialRelationshipType relationshipType,
           final Person person) {
         if (relationshipType == null) {
+            // Search all types — break as soon as we find and remove the person.
             for (final FamilialRelationshipType type : FamilialRelationshipType.values()) {
-                final List<Person> familyMembers = getFamily().getOrDefault(type, new ArrayList<>());
-                if (!familyMembers.isEmpty() && familyMembers.contains(person)) {
-                    familyMembers.remove(person);
-                    if (familyMembers.isEmpty()) {
+                final List<Person> members = getFamily().get(type);
+                if (members != null && members.remove(person)) {
+                    if (members.isEmpty()) {
                         getFamily().remove(type);
                     }
                     break;
                 }
             }
-        } else if (getFamily().get(relationshipType) == null) {
-            LOGGER.error(
-                  "Could not remove family member of unknown relationship {} between person {}and unknown potential relation {} {}.",
-                  relationshipType.name(),
-                  person.getFullTitle(),
-                  person.getFullTitle(),
-                  person.getId());
         } else {
-            final List<Person> familyTypeMembers = getFamily().get(relationshipType);
-            familyTypeMembers.remove(person);
-            if (familyTypeMembers.isEmpty()) {
-                getFamily().remove(relationshipType);
+            final List<Person> members = getFamily().get(relationshipType);
+            if (members == null) {
+                LOGGER.error(
+                      "Could not remove family member of unknown relationship {} between person {} and unknown potential relation {} {}.",
+                      relationshipType.name(),
+                      person.getFullTitle(),
+                      person.getFullTitle(),
+                      person.getId());
+            } else {
+                members.remove(person);
+                if (members.isEmpty()) {
+                    getFamily().remove(relationshipType);
+                }
             }
         }
     }
@@ -243,10 +247,16 @@ public class Genealogy {
     }
 
     /**
-     * @return {@code true} if the person has at least one child, {@code false} otherwise
+     * @return {@code true} if the person has at least one non-adult child, {@code false} otherwise
      */
     public boolean hasNonAdultChildren(LocalDate localDate) {
-        return getChildren().stream().anyMatch(child -> child.isChild(localDate));
+        // Avoid stream — early-exit loop is cheaper when children is typically short.
+        for (Person child : getChildren()) {
+            if (child.isChild(localDate)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -257,20 +267,21 @@ public class Genealogy {
     }
 
     /**
-     * @return {@code true} if the person at least one living parent, otherwise {@code false}. Will also return false if
-     *       the person has no parents
+     * @return {@code true} if the person has at least one living parent, otherwise {@code false}. Will also return
+     *       false if the person has no parents.
      */
     public boolean hasLivingParents() {
-        if (hasParents()) {
-            return getFamily().get(FamilialRelationshipType.PARENT).stream()
-                         .anyMatch(parent -> !parent.getStatus().isDead());
+        // Avoid stream — early-exit loop once we find a living parent.
+        for (Person parent : getParents()) {
+            if (!parent.getStatus().isDead()) {
+                return true;
+            }
         }
-
         return false;
     }
 
     /**
-     * This is used to determine if two people have mutual ancestors based on their genealogies
+     * This is used to determine if two people have mutual ancestors based on their genealogies.
      *
      * @param person the person to check if they are related or not
      * @param depth  the depth to check mutual ancestry up to
@@ -279,44 +290,62 @@ public class Genealogy {
      */
     public boolean checkMutualAncestors(final Person person, final int depth) {
         if (getOrigin().equals(person)) {
-            // Same person will always return true, to prevent any weirdness
             return true;
         } else if (depth == 0) {
-            // Check is disabled, return false for no mutual ancestors
             return false;
         } else {
-            final Set<Person> originAncestors = getAncestors(depth);
-            return person.getGenealogy().getAncestors(depth).stream().anyMatch(originAncestors::contains);
+            final Set<Person> originAncestors = new HashSet<>();
+            collectAncestors(getOrigin(), depth, originAncestors);
+
+            // Check the other person's ancestors against the pre-built set — no need to
+            // collect them all first; we can short-circuit as soon as a hit is found.
+            return containsAnyAncestor(person, depth, originAncestors);
         }
     }
 
     /**
-     * @param depth the depth of ancestors to get
+     * Accumulates ancestors of {@code person} up to {@code depth} generations into {@code accumulator}. Passing the set
+     * down avoids the per-level allocation and repeated {@code addAll} merges that the original recursive pattern
+     * required.
      *
-     * @return a set of all unique ancestors of a person back depth generations
-     *
-     * @note this is a recursive search to ensure it goes to a specified depth of relation
+     * @param person      the starting person
+     * @param depth       remaining generations to traverse
+     * @param accumulator the set to add ancestors into (modified in place)
      */
-    private Set<Person> getAncestors(int depth) {
-        // Create the return value
-        final Set<Person> ancestors = new HashSet<>();
-
-        // Add this person to the return set
-        ancestors.add(getOrigin());
-
-        // Then check if we need to continue down the tree
+    private static void collectAncestors(Person person, int depth, Set<Person> accumulator) {
+        if (!accumulator.add(person)) {
+            // Already visited — prevents infinite loops on malformed data.
+            return;
+        }
         if (depth > 0) {
-            // If so, decrease remaining search depth
-            depth--;
-            // Then parse through the parents
-            for (final Person parent : getParents()) {
-                // And add all of their returned ancestors to the list
-                ancestors.addAll(parent.getGenealogy().getAncestors(depth));
+            for (Person parent : person.getGenealogy().getParents()) {
+                collectAncestors(parent, depth - 1, accumulator);
             }
         }
+    }
 
-        // Finally, return the ancestors
-        return ancestors;
+    /**
+     * Returns {@code true} as soon as any ancestor of {@code person} (up to {@code depth} generations) is found in
+     * {@code targetSet}, short-circuiting without collecting all ancestors first.
+     *
+     * @param person    the person whose ancestry to search
+     * @param depth     remaining generations to traverse
+     * @param targetSet the set of known ancestors to check against
+     *
+     * @return {@code true} if a mutual ancestor is found
+     */
+    private static boolean containsAnyAncestor(Person person, int depth, Set<Person> targetSet) {
+        if (targetSet.contains(person)) {
+            return true;
+        }
+        if (depth > 0) {
+            for (Person parent : person.getGenealogy().getParents()) {
+                if (containsAnyAncestor(parent, depth - 1, targetSet)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
     // endregion Boolean Checks
 
@@ -326,10 +355,17 @@ public class Genealogy {
      * @return a list of the current person's grandparent(s)
      */
     public List<Person> getGrandparents() {
-        return getParents().stream()
-                     .flatMap(parent -> parent.getGenealogy().getParents().stream())
-                     .distinct()
-                     .collect(Collectors.toList());
+        List<Person> parents = getParents();
+        // Pre-size: most people have ≤ 2 parents each with ≤ 2 parents → 4 grandparents.
+        Set<Person> seen = new HashSet<>(4);
+        for (Person parent : parents) {
+            seen.addAll(parent.getGenealogy().getParents());
+        }
+        return new ArrayList<>(seen);
+    }
+
+    public int getGrandparentsCount() {
+        return getGrandparents().size();
     }
 
     /**
@@ -339,18 +375,24 @@ public class Genealogy {
         return getFamily().getOrDefault(FamilialRelationshipType.PARENT, new ArrayList<>());
     }
 
+    public int getParentsCount() {
+        return getParents().size();
+    }
+
     /**
      * @param gender the gender of the parent(s) to get
      *
      * @return a list of the person's parent(s) of the specified gender
      */
     public List<Person> getParentsByGender(final Gender gender) {
-        return getFamily()
-                     .getOrDefault(FamilialRelationshipType.PARENT, new ArrayList<>())
-                     .stream()
-                     .filter(parent -> parent.getGender() == gender)
-                     .distinct()
-                     .collect(Collectors.toList());
+        List<Person> all = getParents();
+        List<Person> result = new ArrayList<>(2);
+        for (Person parent : all) {
+            if (parent.getGender() == gender) {
+                result.add(parent);
+            }
+        }
+        return result;
     }
 
     /**
@@ -368,32 +410,45 @@ public class Genealogy {
     }
 
     /**
-     * Siblings are defined as sharing either parent. In laws are not counted.
+     * Siblings are defined as sharing either parent. In-laws are not counted.
      *
      * @return the siblings of the current person
      */
     public List<Person> getSiblings() {
-        return getParents().stream()
-                     .flatMap(parent -> parent.getGenealogy().getChildren().stream())
-                     .distinct()
-                     .filter(sibling -> !getOrigin().equals(sibling))
-                     .collect(Collectors.toList());
+        List<Person> parents = getParents();
+        // 4 siblings should be average outside blended families
+        Set<Person> seen = new HashSet<>(4);
+        for (Person parent : parents) {
+            seen.addAll(parent.getGenealogy().getChildren());
+        }
+
+        seen.remove(getOrigin()); // exclude self
+
+        return new ArrayList<>(seen);
+    }
+
+    public int getSiblingCount() {
+        return getSiblings().size();
     }
 
     /**
      * @return a list of the person's siblings with spouses (if any)
+     *
+     *       <p>Uses a {@link LinkedHashSet} to maintain insertion order while deduplicating —
+     *       cheaper than the original remove-then-add pattern on an {@link ArrayList}.</p>
      */
     public List<Person> getSiblingsAndSpouses() {
-        final List<Person> siblingsAndSpouses = new ArrayList<>();
-        for (final Person sibling : getSiblings()) {
-            siblingsAndSpouses.remove(sibling);
-            siblingsAndSpouses.add(sibling);
-            if (sibling.getGenealogy().hasSpouse()) {
-                siblingsAndSpouses.remove(sibling.getGenealogy().getSpouse());
-                siblingsAndSpouses.add(sibling.getGenealogy().getSpouse());
+        List<Person> siblings = getSiblings();
+        // Each sibling may have a spouse → capacity hint of 2× is reasonable.
+        LinkedHashSet<Person> result = new LinkedHashSet<>(siblings.size() * 2);
+        for (Person sibling : siblings) {
+            result.add(sibling);
+            Person siblingSpouse = sibling.getGenealogy().getSpouse();
+            if (siblingSpouse != null) {
+                result.add(siblingSpouse);
             }
         }
-        return siblingsAndSpouses;
+        return new ArrayList<>(result);
     }
 
     /**
@@ -407,30 +462,48 @@ public class Genealogy {
      * @return a list of the person's grandchildren
      */
     public List<Person> getGrandchildren() {
-        return getChildren().stream()
-                     .flatMap(child -> child.getGenealogy().getChildren().stream())
-                     .distinct()
-                     .collect(Collectors.toList());
+        List<Person> children = getChildren();
+        Set<Person> seen = new HashSet<>();
+        for (Person child : children) {
+            seen.addAll(child.getGenealogy().getChildren());
+        }
+        return new ArrayList<>(seen);
+    }
+
+    public int getGrandchildrenCount() {
+        return getGrandchildren().size();
     }
 
     /**
      * @return a list of the person's Aunts and Uncles
      */
     public List<Person> getsAuntsAndUncles() {
-        return getParents().stream()
-                     .flatMap(parent -> parent.getGenealogy().getSiblingsAndSpouses().stream())
-                     .distinct()
-                     .collect(Collectors.toList());
+        List<Person> parents = getParents();
+        Set<Person> seen = new HashSet<>();
+        for (Person parent : parents) {
+            seen.addAll(parent.getGenealogy().getSiblingsAndSpouses());
+        }
+        return new ArrayList<>(seen);
+    }
+
+    public int getAuntsAndUnclesCount() {
+        return getsAuntsAndUncles().size();
     }
 
     /**
      * @return a list of the person's cousins
      */
     public List<Person> getCousins() {
-        return getsAuntsAndUncles().stream()
-                     .flatMap(auntOrUncle -> auntOrUncle.getGenealogy().getChildren().stream())
-                     .distinct()
-                     .collect(Collectors.toList());
+        List<Person> auntsAndUncles = getsAuntsAndUncles();
+        Set<Person> seen = new HashSet<>();
+        for (Person auntOrUncle : auntsAndUncles) {
+            seen.addAll(auntOrUncle.getGenealogy().getChildren());
+        }
+        return new ArrayList<>(seen);
+    }
+
+    public int getCousinsCount() {
+        return getCousins().size();
     }
     // endregion Basic Family Getters
 
@@ -439,22 +512,23 @@ public class Genealogy {
      * person during their removal.
      */
     public void clearGenealogyLinks() {
-        // Clear Spouse
+        // Clear spouse
         if (getSpouse() != null) {
             getSpouse().getGenealogy().setSpouse(null);
         }
 
-        // Clear Former Spouses
-        if (!getFormerSpouses().isEmpty()) {
-            getFormerSpouses().forEach(
-                  formerSpouse -> formerSpouse.getFormerSpouse().getGenealogy().removeFormerSpouse(getOrigin()));
+        // Clear former spouses — plain loop, no stream overhead
+        for (FormerSpouse formerSpouse : getFormerSpouses()) {
+            formerSpouse.getFormerSpouse().getGenealogy().removeFormerSpouse(getOrigin());
         }
 
-        // Clear Family
+        // Clear family — nested loops avoid the stream/flatMap allocation chain
         if (!familyIsEmpty()) {
-            getFamily().values().stream()
-                  .flatMap(Collection::stream)
-                  .forEach(person -> person.getGenealogy().removeFamilyMember(null, getOrigin()));
+            for (List<Person> members : getFamily().values()) {
+                for (Person person : members) {
+                    person.getGenealogy().removeFamilyMember(null, getOrigin());
+                }
+            }
         }
     }
 
@@ -462,9 +536,9 @@ public class Genealogy {
      * Determines whether this family unit is considered "active" by checking whether any member of the extended family
      * network is currently active (i.e., has not left the unit).
      *
-     * <p>Traverses the full genealogical graph rooted at {@code origin}, including parents, children, current and
-     * former spouses, and pregnancy fathers, returning {@code true} as soon as any such relative is found to be
-     * active.</p>
+     * <p>Traverses the full genealogical graph rooted at {@code origin}, including parents,
+     * children, current and former spouses, and pregnancy fathers, returning {@code true} as soon as any such relative
+     * is found to be active.</p>
      *
      * @param humanResources the {@link HumanResources} registry used to resolve person lookups by ID (e.g., pregnancy
      *                       father resolution)
@@ -490,18 +564,18 @@ public class Genealogy {
      *     <li>Children</li>
      *     <li>Former spouses (via {@link FormerSpouse} wrapper)</li>
      *     <li>Current spouse</li>
-     *     <li>Pregnancy father, resolved through {@link HumanResources} when the current person is pregnant and
-     *     father ID data is present</li>
+     *     <li>Pregnancy father, resolved through {@link HumanResources} when the current person
+     *     is pregnant and father ID data is present</li>
      * </ul>
      *
-     * <p>Already-visited persons are tracked in {@code allFamilyMembers} to prevent infinite recursion across
-     * cyclical or bidirectional relationships.</p>
+     * <p>Already-visited persons are tracked in {@code allFamilyMembers} to prevent infinite
+     * recursion across cyclical or bidirectional relationships.</p>
      *
      * @param humanResources          the {@link HumanResources} registry for resolving persons by UUID
      * @param currentPerson           the person whose relatives are currently being examined
-     * @param allFamilyMembers        the set of already-visited persons; modified in place to prevent revisiting nodes
+     * @param allFamilyMembers        the set of already-visited persons; modified in place
      * @param checkForActiveGenealogy if {@code true}, the traversal will return {@code true} immediately upon finding
-     *                                any non-departed relative; if {@code false}, no activity check is performed
+     *                                any non-departed relative
      *
      * @return {@code true} if {@code checkForActiveGenealogy} is {@code true} and an active relative was found;
      *       {@code false} otherwise
@@ -511,8 +585,6 @@ public class Genealogy {
      */
     private static boolean collectRelatives(HumanResources humanResources, Person currentPerson,
           HashSet<Person> allFamilyMembers, boolean checkForActiveGenealogy) {
-        // Short-circuit if already visited (prevents infinite recursion on bidirectional links)
-        // or if this person is themselves active
         if (!allFamilyMembers.add(currentPerson)) {
             return false;
         }
@@ -523,50 +595,37 @@ public class Genealogy {
 
         Genealogy currentGenealogy = currentPerson.getGenealogy();
 
-        // Lots of null protection throughout to make sure we're not processing null entries. That shouldn't
-        // happen, but it is a possibility with very old campaigns from before we had better protections
         for (Person parent : currentGenealogy.getParents()) {
-            if (parent != null) {
-                if (collectRelatives(humanResources, parent, allFamilyMembers, checkForActiveGenealogy)) {
-                    return true;
-                }
+            if (parent != null && collectRelatives(humanResources, parent, allFamilyMembers, checkForActiveGenealogy)) {
+                return true;
             }
         }
 
         for (Person child : currentGenealogy.getChildren()) {
-            if (child != null) {
-                if (collectRelatives(humanResources, child, allFamilyMembers, checkForActiveGenealogy)) {
-                    return true;
-                }
+            if (child != null && collectRelatives(humanResources, child, allFamilyMembers, checkForActiveGenealogy)) {
+                return true;
             }
         }
 
         for (FormerSpouse formerSpouse : currentGenealogy.getFormerSpouses()) {
             if (formerSpouse != null) {
                 Person formerSpousePerson = formerSpouse.getFormerSpouse();
-                if (formerSpousePerson != null) {
-                    if (collectRelatives(humanResources,
-                          formerSpousePerson,
-                          allFamilyMembers,
-                          checkForActiveGenealogy)) {
-                        return true;
-                    }
+                if (formerSpousePerson != null && collectRelatives(humanResources, formerSpousePerson,
+                      allFamilyMembers, checkForActiveGenealogy)) {
+                    return true;
                 }
             }
         }
 
         Person spouse = currentGenealogy.getSpouse();
-        if (spouse != null) {
-            if (collectRelatives(humanResources, spouse, allFamilyMembers, checkForActiveGenealogy)) {
-                return true;
-            }
+        if (spouse != null && collectRelatives(humanResources, spouse, allFamilyMembers, checkForActiveGenealogy)) {
+            return true;
         }
 
         if (currentPerson.isPregnant()) {
             String fatherIdString = currentPerson.getExtraData().get(AbstractProcreation.PREGNANCY_FATHER_DATA);
-            UUID fatherId = (fatherIdString != null) ? UUID.fromString(fatherIdString) : null;
-            if (fatherId != null) {
-                Person father = humanResources.getPerson(fatherId);
+            if (fatherIdString != null) {
+                Person father = humanResources.getPerson(UUID.fromString(fatherIdString));
                 if (father != null) {
                     return collectRelatives(humanResources, father, allFamilyMembers, checkForActiveGenealogy);
                 }
@@ -579,11 +638,10 @@ public class Genealogy {
     /**
      * Evaluates whether a given person should be considered genealogically active.
      *
-     * <p>A person is considered active if the activity check is enabled, and they have not left the unit. Returns
-     * {@code false} unconditionally for {@code null} persons.</p>
+     * <p>A person is considered active if the activity check is enabled, and they have not left
+     * the unit. Returns {@code false} unconditionally for {@code null} persons.</p>
      *
-     * @param checkForActiveGenealogy {@code true} to apply the active status check; {@code false} to always return
-     *                                {@code false}
+     * @param checkForActiveGenealogy {@code true} to apply the active status check
      * @param currentPerson           the person to evaluate; may be {@code null}
      *
      * @return {@code true} if {@code checkForActiveGenealogy} is {@code true}, {@code currentPerson} is non-null, and
@@ -596,7 +654,6 @@ public class Genealogy {
         if (currentPerson == null) {
             return false;
         }
-
         return checkForActiveGenealogy && !currentPerson.getStatus().isDepartedUnit();
     }
 
@@ -662,7 +719,8 @@ public class Genealogy {
                         if (wn.hasChildNodes()) {
                             loadFamily(wn.getChildNodes());
                         } else {
-                            LOGGER.error("Cannot parse a family node without child nodes for {}", getOrigin().getId());
+                            LOGGER.error("Cannot parse a family node without child nodes for {}",
+                                  getOrigin().getId());
                         }
                         break;
                     default:
@@ -679,7 +737,7 @@ public class Genealogy {
     }
 
     /**
-     * This loads the FormerSpouses from their saved nodes Note: This must be public for migration reasons
+     * This loads the FormerSpouses from their saved nodes. Note: This must be public for migration reasons.
      *
      * @param nl the NodeList containing the saved former spouses
      */
@@ -697,7 +755,7 @@ public class Genealogy {
     }
 
     /**
-     * This loads the familial relationships from their saved nodes
+     * This loads the familial relationships from their saved nodes.
      *
      * @param nl the NodeList containing the saved Genealogy familial relationships
      */
@@ -710,7 +768,7 @@ public class Genealogy {
             final NodeList nl2 = wn.getChildNodes();
 
             // The default value should never be used, but we need a default to prevent IDE
-            // complaints
+            // complaints.
             FamilialRelationshipType type = FamilialRelationshipType.PARENT;
             final List<Person> people = new ArrayList<>();
             for (int i = 0; i < nl2.getLength(); i++) {
