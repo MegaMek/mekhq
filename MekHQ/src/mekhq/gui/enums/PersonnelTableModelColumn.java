@@ -327,8 +327,7 @@ public enum PersonnelTableModelColumn {
               Academy currentAcademy = EducationController.getAcademy(person.getEduAcademySet(),
                     person.getEduAcademyNameInSet());
               return currentAcademy == null ? "" :
-                           EducationLevel.fromString(String.valueOf(currentAcademy.getEducationLevel(person)))
-                                 .toString();
+                           EducationLevel.fromLevel(currentAcademy.getEducationLevel(person)).toString();
           }),
     ACADEMY("Column.ACADEMY.title", NaturalOrderComparator.INSTANCE,
           person -> {

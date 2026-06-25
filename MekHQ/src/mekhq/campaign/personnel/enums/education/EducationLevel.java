@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.personnel.enums.education;
 
+import java.util.Arrays;
 import java.util.ResourceBundle;
 
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
@@ -47,19 +48,26 @@ public enum EducationLevel {
     DOCTORATE("EducationLevel.DOCTORATE.text", "EducationLevel.DOCTORATE.toolTipText", 4);
     // endregion Enum Declarations
 
+    private static final MMLogger LOGGER = MMLogger.create(EducationLevel.class);
+
+    public static final int MIN_LEVEL =
+          Arrays.stream(EducationLevel.values()).mapToInt(EducationLevel::getLevel).min().getAsInt();
+    public static final int MAX_LEVEL =
+          Arrays.stream(EducationLevel.values()).mapToInt(EducationLevel::getLevel).max().getAsInt();
+
     // region Variable Declarations
     private final String name;
     private final String toolTipText;
-    private final int order;
+    private final int level;
     // endregion Variable Declarations
 
     // region Constructors
-    EducationLevel(final String name, final String toolTipText, final int order) {
+    EducationLevel(String name, String toolTipText, int level) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
               MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
-        this.order = order;
+        this.level = level;
     }
     // endregion Constructors
 
@@ -68,8 +76,8 @@ public enum EducationLevel {
         return toolTipText;
     }
 
-    public int getOrder() {
-        return order;
+    public int getLevel() {
+        return level;
     }
     // endregion Getters
 
@@ -106,7 +114,7 @@ public enum EducationLevel {
      * <p>This method attempts to map the input string to an {@link EducationLevel} in multiple ways:</p>
      * <ul>
      *   <li>First, it checks if the string matches an enum name exactly.</li>
-     *   <li>Next, it attempts to parse the string as an integer and map it to the ordinal of the enum.</li>
+     *   <li>Next, it attempts to parse the string as an integer and map it to the level of the enum.</li>
      *   <li>Finally, it checks for a case-insensitive match against the enum names.</li>
      * </ul>
      *
@@ -125,8 +133,13 @@ public enum EducationLevel {
         }
 
         try {
-            return EducationLevel.values()[Integer.parseInt(text)];
-        } catch (Exception ignored) {
+            int level = Integer.parseInt(text);
+            for (EducationLevel education : EducationLevel.values()) {
+                if (education.level == level) {
+                    return education;
+                }
+            }
+        } catch (NumberFormatException ignored) {
         }
 
         try {
@@ -138,30 +151,18 @@ public enum EducationLevel {
         } catch (Exception ignored) {
         }
 
-
-        MMLogger logger = MMLogger.create(EducationLevel.class);
-        logger.error("Unknown EducationLevel ordinal: {} - returning {}.", text, EARLY_CHILDHOOD);
-
+        LOGGER.error("Unknown education level: {} - returning {}.", text, EARLY_CHILDHOOD);
         return EARLY_CHILDHOOD;
     }
 
-    /**
-     * Parses the given EducationLevel enum value to an integer.
-     *
-     * @param educationLevel the EducationLevel enum value to be parsed
-     *
-     * @return the integer value representing the parsed EducationLevel
-     *
-     * @throws IllegalStateException if the given EducationLevel is unexpected
-     */
-    public static int parseToInt(final EducationLevel educationLevel) {
-        return switch (educationLevel) {
-            case EARLY_CHILDHOOD -> 0;
-            case HIGH_SCHOOL -> 1;
-            case COLLEGE -> 2;
-            case POST_GRADUATE -> 3;
-            case DOCTORATE -> 4;
-        };
+    public static EducationLevel fromLevel(int level) {
+        for (EducationLevel education : EducationLevel.values()) {
+            if (education.level == level) {
+                return education;
+            }
+        }
+        LOGGER.error("Unknown education level: {}", level, new IllegalArgumentException());
+        return EARLY_CHILDHOOD;
     }
     // endregion File I/O
 
