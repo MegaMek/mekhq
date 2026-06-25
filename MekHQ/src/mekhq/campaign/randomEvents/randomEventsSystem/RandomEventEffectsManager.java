@@ -1170,26 +1170,27 @@ public class RandomEventEffectsManager {
             return "";
         }
 
-        int targetCount = potentialTargets.size();
+        boolean madeChange = false;
 
-        for (int i = 0; i < targetCount; i++) {
-            Person target = getRandomItem(potentialTargets);
-
-            int fatigueChange = d6(magnitude) * fatigueRate;
-
+        for (Person target : potentialTargets) {
             if (target.getOptions().booleanOption(ATOW_POISON_RESISTANCE)) {
                 continue;
             }
 
+            int fatigueChange = d6(magnitude) * fatigueRate;
+
             target.changeFatigue(fatigueChange);
+            madeChange = true;
 
             if (campaign.getCampaignOptions().isUseFatigue()) {
                 Fatigue.processFatigueActions(campaign, target);
             }
 
             MekHQ.triggerEvent(new PersonChangedEvent(target));
+        }
 
-            potentialTargets.remove(target);
+        if (!madeChange) {
+            return "";
         }
 
         String colorOpen = magnitude > 1 ?

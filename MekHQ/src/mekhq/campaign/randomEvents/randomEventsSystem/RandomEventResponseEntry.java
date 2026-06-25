@@ -62,8 +62,8 @@ public record RandomEventResponseEntry(
     public RandomEventResponseEntry {
         quality = (quality != null) ? quality : RandomEventResponseQuality.RESPONSE_NEUTRAL;
         abilityCheckType = (abilityCheckType != null) ? abilityCheckType : NO_ATTRIBUTE;
-        effectsSuccess = new ArrayList<>();
-        effectsFailure = new ArrayList<>();
+        effectsSuccess = (effectsSuccess != null) ? effectsSuccess : new ArrayList<>();
+        effectsFailure = (effectsFailure != null) ? effectsFailure : new ArrayList<>();
     }
 
 
