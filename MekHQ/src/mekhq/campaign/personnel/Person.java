@@ -7451,6 +7451,7 @@ public class Person implements ILocation {
 
     /**
      * Retrieves the modifier value for a specified skill attribute.
+     * Equivalent to <code>Skill.getIndividualAttributeModifier(person.getAttributeScore(attribute))</code>.
      *
      * @param attribute the skill attribute for which the modifier is to be calculated; if the attribute is null or
      *                  represents "none", a warning is logged and the method returns 0

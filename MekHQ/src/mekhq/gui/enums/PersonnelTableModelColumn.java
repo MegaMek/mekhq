@@ -68,6 +68,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.skills.InfantryGunnerySkills;
 import mekhq.campaign.personnel.skills.ScoutingSkills;
+import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
@@ -678,8 +679,7 @@ public enum PersonnelTableModelColumn {
         return person -> {
             int currentAttributeValue = person.getAttributeScore(attribute);
             int attributeCap = person.getAttributeCap(attribute);
-
-            int attributeModifier = person.getAttributeModifier(attribute);
+            int attributeModifier = Skill.getIndividualAttributeModifier(currentAttributeValue);
             String sign = attributeModifier >= 0 ? "+" : "";
 
             return currentAttributeValue + " / " + attributeCap + " (" + sign + attributeModifier + ")";
