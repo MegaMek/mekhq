@@ -644,6 +644,10 @@ public class Attributes {
     /**
      * Determines the attribute level description for the given person and skill attribute.
      *
+     * <p><b>Note:</b> Currently MekHQ uses a 0+ scale for Edge which doesn't quite map to these values. These
+     * values are set up for ATOW Edge where 5 is average. Avoid using for Edge until we adopt an ATOW-style scaling for
+     * Edge.</p>
+     *
      * @param person    the person whose attribute score is being evaluated
      * @param attribute the skill attribute being assessed
      *
@@ -653,7 +657,12 @@ public class Attributes {
      * @since 0.51.01
      */
     public static String getAttributeLevel(Person person, SkillAttribute attribute) {
-        int actualScore = person.getAttributeScore(attribute);
+        int actualScore = 0;
+        if (person == null) {
+            LOGGER.warn("(getAttributeLevel) person is null.");
+        } else {
+            actualScore = person.getAttributeScore(attribute);
+        }
 
         // corresponds to the attribute modifiers on ATOW pg 41 (6th printing)
         String resourceKey = switch (actualScore) {
