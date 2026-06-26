@@ -1798,6 +1798,7 @@ public class Campaign implements ITechManager, IPlace {
         return mainForcePersonnel;
     }
 
+    @Nullable
     public AcademyCampusLocation getOrCreateCampusLocation(String academySet, String academyName,
           String systemId) {
         return getCampaignLocationManager().getOrCreateCampusLocation(this, academySet, academyName, systemId);

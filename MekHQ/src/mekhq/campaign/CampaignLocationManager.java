@@ -170,7 +170,10 @@ public class CampaignLocationManager {
     /**
      * Returns the existing {@link AcademyCampusLocation} for the given campus at the given system, creating it on
      * demand if it does not yet exist.
+     *
+     * @return the existing or newly created campus location, or {@code null} if {@code systemId} could not be resolved
      */
+    @Nullable
     public AcademyCampusLocation getOrCreateCampusLocation(Campaign campaign, String academySet, String academyName,
           String systemId) {
         for (AbstractLocation location : locations) {
