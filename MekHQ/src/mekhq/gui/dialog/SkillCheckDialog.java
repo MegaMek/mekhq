@@ -165,10 +165,10 @@ public class SkillCheckDialog {
         ActionCheckResult actionCheckResult =
               character.checkSkill(skillName, isUseAgingEffects, isClanCampaign, today)
                     .withMiscModifier(selectedModifier)
-                    .resolve(useEdge, null, true);
+                    .resolve(useEdge, null);
 
         isSuccess = actionCheckResult.isSuccess();
-        return actionCheckResult.resultsText();
+        return actionCheckResult.getReport(true);
     }
 
 

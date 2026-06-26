@@ -38,8 +38,6 @@ import static mekhq.campaign.enums.DailyReportType.GENERAL;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import megamek.logging.MMLogger;
@@ -49,7 +47,6 @@ import mekhq.campaign.events.LocationChangedEvent;
 import mekhq.campaign.events.TransitCompleteEvent;
 import mekhq.campaign.events.TransitStatusChangedEvent;
 import mekhq.campaign.location.ILocation;
-import mekhq.campaign.location.IPlace;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -64,63 +61,24 @@ import org.w3c.dom.NodeList;
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
-public class CurrentLocation extends AbstractLocation {
+public class CurrentLocation extends AbstractMobileLocation {
     private static final MMLogger logger = MMLogger.create(CurrentLocation.class);
 
     // keep track of jump path
     private JumpPath jumpPath;
     // recharge time in hours
     private double rechargeTime;
-    // transit time in days
-    private double transitTime;
     // JumpShip at nadir or zenith
     private boolean jumpZenith;
-
-    // Populated during XML load; drained by CampaignXmlParser to reconnect ILocations after load.
-    private transient List<UUID>    pendingPersonIds = new ArrayList<>();
-    private transient List<UUID>    pendingUnitIds   = new ArrayList<>();
-    private transient List<Integer> pendingPartIds   = new ArrayList<>();
-
-    /** Returns true if {@code personId} is in the pending reconnection list (non-destructive). */
-    public boolean containsPendingPersonId(UUID personId) {
-        return pendingPersonIds.contains(personId);
-    }
-
-    /** Returns and clears the person UUIDs read from XML, for use during post-load reconnection. */
-    public List<UUID> drainPendingPersonIds() {
-        List<UUID> ids = new ArrayList<>(pendingPersonIds);
-        pendingPersonIds.clear();
-        return ids;
-    }
-
-    /** Returns and clears the unit UUIDs read from XML, for use during post-load reconnection. */
-    public List<UUID> drainPendingUnitIds() {
-        List<UUID> ids = new ArrayList<>(pendingUnitIds);
-        pendingUnitIds.clear();
-        return ids;
-    }
-
-    /** Returns and clears the part IDs read from XML, for use during post-load reconnection. */
-    public List<Integer> drainPendingPartIds() {
-        List<Integer> ids = new ArrayList<>(pendingPartIds);
-        pendingPartIds.clear();
-        return ids;
-    }
 
     public CurrentLocation() {
         this(null, 0d);
     }
 
     public CurrentLocation(PlanetarySystem system, double transitTime) {
-        super(system);
-        this.transitTime = transitTime;
+        super(system, transitTime);
         this.rechargeTime = 0d;
         this.jumpZenith = true;
-    }
-
-    @Override
-    public void setTransitTime(double time) {
-        transitTime = time;
     }
 
     @Override
@@ -141,11 +99,6 @@ public class CurrentLocation extends AbstractLocation {
     @Override
     public boolean isInTransit() {
         return !isOnPlanet() && !isAtJumpPoint();
-    }
-
-    @Override
-    public double getTransitTime() {
-        return transitTime;
     }
 
     /**
@@ -323,11 +276,7 @@ public class CurrentLocation extends AbstractLocation {
         // If we were previously traveling and now aren't, notify each IPlace child that it has
         // arrived. The IPlace implementation handles place-specific arrival logic.
         if (wasTraveling && isOnPlanet()) {
-            for (ILocation child : getChildLocations()) {
-                if (child instanceof IPlace place) {
-                    place.onArrival(campaign, isSilentProcessing);
-                }
-            }
+            notifyChildrenArrived(campaign, isSilentProcessing);
         }
     }
 

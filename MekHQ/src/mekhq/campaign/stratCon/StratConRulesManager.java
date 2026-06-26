@@ -1688,8 +1688,8 @@ public class StratConRulesManager {
                     ActionCheckResult actionCheckResult = null;
                     if (useAdvancedScouting) {
                         actionCheckResult = scoutData.skillCheck().resolve(
-                              isUseEdge, getTextAt(RESOURCE_BUNDLE, "StratConRulesManager.scoutingSkillCheck"), false);
-                        campaign.addReport(SKILL_CHECKS, actionCheckResult.resultsText());
+                              isUseEdge, getTextAt(RESOURCE_BUNDLE, "StratConRulesManager.scoutingSkillCheck"));
+                        campaign.addReport(SKILL_CHECKS, actionCheckResult.getReport(false));
                     }
 
                     remainingScans--;
@@ -2125,7 +2125,7 @@ public class StratConRulesManager {
 
         ActionCheckResult actionCheckResult =
               commander.checkSkill(S_TACTICS, campaign)
-                    .resolve(true, getTextAt(RESOURCE_BUNDLE, "StratConRulesManager.tacticsSkillCheck"), false);
+                    .resolve(true, getTextAt(RESOURCE_BUNDLE, "StratConRulesManager.tacticsSkillCheck"));
 
         if (actionCheckResult.isSuccess()) {
             String reportString = commander.getSkill(S_TACTICS) != null ?

@@ -48,6 +48,7 @@ import megamek.common.TargetRollModifier;
 import megamek.common.enums.Gender;
 import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.personnel.Person;
+import mekhq.utilities.ReportingUtilities;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -93,7 +94,7 @@ class ActionCheckTest {
           int firstRoll, int secondRoll) {
         try (MockedStatic<SkillCheckUtility> utils = mockStatic(SkillCheckUtility.class)) {
             utils.when(() -> SkillCheckUtility.getRoll(anyBoolean())).thenReturn(firstRoll, secondRoll);
-            return check.resolve(useEdge, null, false);
+            return check.resolve(useEdge, null);
         }
     }
 
@@ -143,6 +144,9 @@ class ActionCheckTest {
         assertTrue(result.isSuccess());
         assertFalse(result.usedEdge());
         assertEquals(8, result.roll());
+        assertEquals("<a href='PERSON:link'>F L</a> <span color=\"#7fcf43\"><b>Passed</b></span> his <b>Action</b> " +
+                           "check with a roll of <b>8</b> vs. a target number of <b>7</b>.",
+              result.getReport(false).replace(person.getId().toString(), "link"));
     }
 
     @Test
@@ -155,6 +159,10 @@ class ActionCheckTest {
         assertFalse(result.isSuccess());
         assertFalse(result.usedEdge());
         assertEquals(5, result.roll());
+        assertEquals("<a href='PERSON:link'>F L</a> <span color=\"negative\"><b>Failed</b></span> his <b>Action</b> " +
+                           "check with a roll of <b>5</b> vs. a target number of <b>7</b>.",
+              result.getReport(false).replace(person.getId().toString(), "link")
+                    .replace(ReportingUtilities.getNegativeColor(), "negative"));
     }
 
     @Test
@@ -167,6 +175,10 @@ class ActionCheckTest {
 
         assertFalse(result.isSuccess());
         assertFalse(result.usedEdge());
+        assertEquals("<a href='PERSON:link'>F L</a> <span color=\"negative\"><b>Failed</b></span> his <b>Action</b> " +
+                           "check with a roll of <b>5</b> vs. a target number of <b>7</b>.",
+              result.getReport(false).replace(person.getId().toString(), "link")
+                    .replace(ReportingUtilities.getNegativeColor(), "negative"));
     }
 
     @Test
@@ -183,7 +195,7 @@ class ActionCheckTest {
     @Test
     void testResolve_UsesEdgeAndSucceeds() {
         Person person = mock(Person.class);
-        when(person.getHyperlinkedFullTitle()).thenReturn("Title");
+        when(person.getHyperlinkedFullTitle()).thenReturn("Person");
         when(person.getGender()).thenReturn(Gender.FEMALE);
         when(person.getCurrentEdge()).thenReturn(1);
         TargetRoll target = new TargetRoll(7, "");
@@ -194,12 +206,15 @@ class ActionCheckTest {
         assertTrue(result.usedEdge());
         assertEquals(9, result.roll());
         verify(person).spendEdge();
+        assertEquals("Person <span color=\"positive\"><b>Passed</b></span> her <b>Action</b> check with a roll of " +
+                           "<b>9</b> vs. a target number of <b>7</b>. Used a point of <b>Edge</b>.",
+              result.getReport(false).replace(ReportingUtilities.getPositiveColor(), "positive"));
     }
 
     @Test
     void testResolve_UsesEdgeAndFails() {
         Person person = mock(Person.class);
-        when(person.getHyperlinkedFullTitle()).thenReturn("Title");
+        when(person.getHyperlinkedFullTitle()).thenReturn("Person");
         when(person.getGender()).thenReturn(Gender.MALE);
         when(person.getCurrentEdge()).thenReturn(1);
 
@@ -211,6 +226,9 @@ class ActionCheckTest {
         assertTrue(result.usedEdge());
         assertEquals(6, result.roll());
         verify(person).spendEdge();
+        assertEquals("Person <span color=\"negative\"><b>Failed</b></span> his <b>Action</b> check with a roll of " +
+                           "<b>6</b> vs. a target number of <b>7</b>. Used a point of <b>Edge</b>.",
+              result.getReport(false).replace(ReportingUtilities.getNegativeColor(), "negative"));
     }
 
     @ParameterizedTest
@@ -222,7 +240,7 @@ class ActionCheckTest {
 
         try (MockedStatic<SkillCheckUtility> utils = mockStatic(SkillCheckUtility.class)) {
             utils.when(() -> SkillCheckUtility.getRoll(anyBoolean())).thenReturn(8);
-            check.resolve(false, null, false);
+            check.resolve(false, null);
             utils.verify(() -> SkillCheckUtility.getRoll(naturalAptitude));
         }
     }

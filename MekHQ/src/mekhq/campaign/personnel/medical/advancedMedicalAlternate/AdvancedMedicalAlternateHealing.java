@@ -337,7 +337,7 @@ public class AdvancedMedicalAlternateHealing {
                                       .withMiscModifier(miscPenalty)
                                       .withExternalModifiers(modifiers);
         ActionCheckResult actionCheckResult = skillCheck.resolve(false, getTextAt(RESOURCE_BUNDLE,
-              "AdvancedMedicalAlternateHealing.assistedHealing.normal"), true);
+              "AdvancedMedicalAlternateHealing.assistedHealing.normal"));
 
         // Edge
         if (actionCheckResult.marginOfSuccess() <= PERMANENT_INJURY_THRESHOLD &&
@@ -346,7 +346,7 @@ public class AdvancedMedicalAlternateHealing {
             // manually update edge because if we pass useEdge == true, the doctor will get one free roll
             doctor.spendEdge();
             actionCheckResult = skillCheck.resolve(false, getTextAt(RESOURCE_BUNDLE,
-                  "AdvancedMedicalAlternateHealing.assistedHealing.edge"), true);
+                  "AdvancedMedicalAlternateHealing.assistedHealing.edge"));
         }
 
         return actionCheckResult.marginOfSuccess();

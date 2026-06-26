@@ -1796,7 +1796,7 @@ public class Campaign implements ITechManager, IPlace {
                       !location.fetchUnitsAtLocation().isEmpty()) {
                 return false;
             }
-            if (location instanceof CurrentLocation) {
+            if (location instanceof AbstractMobileLocation) {
                 location.setParent(null);
             } else if (location instanceof FixedLocation) {
                 for (ILocation child : new ArrayList<>(location.getChildLocations())) {
@@ -1999,10 +1999,10 @@ public class Campaign implements ITechManager, IPlace {
             return;
         }
         for (ILocation child : new ArrayList<>(getChildLocations())) {
-            if (!(child instanceof CurrentLocation travelLocation)) {
+            if (!(child instanceof AbstractMobileLocation travelLocation)) {
                 continue;
             }
-            if (!travelLocation.isOnPlanet()) {
+            if (!travelLocation.hasArrived()) {
                 continue;
             }
             LocationDispatch.landFromTravelNode(
@@ -3751,7 +3751,7 @@ public class Campaign implements ITechManager, IPlace {
                          PartAcquisitionResult.PlanetSpecificFailure;
         }
 
-        ActionCheckResult result = skillCheck.resolve(false, null, false);
+        ActionCheckResult result = skillCheck.resolve(false, null);
         if (getCampaignOptions().isPlanetAcquisitionVerbose()) {
             SocioIndustrialData socioIndustrial = system.getPrimaryPlanet().getSocioIndustrial(getLocalDate());
             CampaignOptions options = getCampaignOptions();
@@ -3854,7 +3854,7 @@ public class Campaign implements ITechManager, IPlace {
         boolean useEdge = getCampaignOptions().isUseEdge() &&
                                 person != null && person.getOptions().booleanOption(useEdgeOption);
 
-        ActionCheckResult skillCheckResult = skillCheck.resolve(useEdge, null, false);
+        ActionCheckResult skillCheckResult = skillCheck.resolve(useEdge, null);
         if (skillCheckResult.usedEdge()) {
             report += " and <b>fails!</b> but uses Edge to reroll...getting a " + skillCheckResult.roll() + ": ";
         } else {
