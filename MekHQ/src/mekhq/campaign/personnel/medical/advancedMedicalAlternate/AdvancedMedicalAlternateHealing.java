@@ -346,6 +346,7 @@ public class AdvancedMedicalAlternateHealing {
             actionCheckResult = skillCheck.resolve(false, getTextAt(RESOURCE_BUNDLE,
                   "AdvancedMedicalAlternateHealing.assistedHealing.edge"), true);
         }
+
         return actionCheckResult.marginOfSuccess();
     }
 
@@ -369,28 +370,21 @@ public class AdvancedMedicalAlternateHealing {
      */
     private static void processTaskAwardsAndPersonnelLogUpdates(LocalDate today, Person patient,
           @Nullable Person doctor, Injury injury, HealingMarginOfSuccessEffects marginOfSuccess) {
-        if (marginOfSuccess.isHealed()) { // 0+ is a success, the injury will have been removed
-            if (doctor != null) {
+        if (marginOfSuccess.isHealed()) {
+            if (doctor != null && !Objects.equals(doctor, patient)) {
                 doctor.changeNTasks(1);
-                PatientLogger.successfullyTreatedAltAdvancedMedical(doctor,
-                      patient,
-                      today,
-                      injury.getName());
+                PatientLogger.successfullyTreatedAltAdvancedMedical(doctor, patient, today, injury.getName());
             } else {
-                patient.changeNTasks(1); // Patient gets credit for their own medical prowess
-                PatientLogger.successfullyTreatedOwnInjuryAltAdvancedMedical(patient,
-                      today,
-                      injury.getName());
+                patient.changeNTasks(1);
+                PatientLogger.successfullyTreatedOwnInjuryAltAdvancedMedical(patient, today, injury.getName());
             }
         }
 
-        // We no longer log 'healing was delayed' results as that was spamming the medical log like crazy.
-
-        if (marginOfSuccess.isPermanent()) { // Injury has become permanent
+        if (marginOfSuccess.isPermanent()) {
             MedicalLogger.permanentInjuryAltAdvancedMedical(patient, today, injury.getName());
         }
 
-        if (marginOfSuccess.isHasComplication()) { // Injury has complications
+        if (marginOfSuccess.isHasComplication()) {
             MedicalLogger.medicalComplicationAltAdvancedMedical(patient, today, injury.getName());
         }
     }

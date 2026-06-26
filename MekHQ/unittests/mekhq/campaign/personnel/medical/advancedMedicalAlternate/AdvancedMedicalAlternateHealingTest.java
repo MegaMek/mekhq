@@ -213,7 +213,7 @@ class AdvancedMedicalAlternateHealingTest {
         when(injury.isDisease()).thenReturn(false);
         when(injury.getSubType()).thenReturn(NORMAL);
         when(injury.getLocation()).thenReturn(GENERIC);
-        when(injury.getTime()).thenReturn(1, 0);
+        when(injury.getTime()).thenReturn(0); // Timer already elapsed; ready to resolve
         when(injury.getOriginalTime()).thenReturn(1);
         when(injury.getName()).thenReturn("Broken arm");
         when(patient.checkSkill(S_SURGERY, campaign)).thenReturn(skillCheck);
@@ -303,12 +303,11 @@ class AdvancedMedicalAlternateHealingTest {
         when(permanentMod.getLocation()).thenReturn(RIGHT_FOREARM);
         when(patient.getTotalInjurySeverity()).thenReturn(0);
         when(patient.getAdjustedToughness()).thenReturn(0);
-        when(patient.getInjuries()).thenReturn(List.of(injury));
         when(injury.isPermanent()).thenReturn(false);
         when(injury.isDisease()).thenReturn(true);
         when(injury.getSubType()).thenReturn(DISEASE_GENERIC);
         when(injury.getLocation()).thenReturn(RIGHT_FOREARM);
-        when(injury.getTime()).thenReturn(1, 0);
+        when(injury.getOriginalTime()).thenReturn(1);
         when(injury.getOriginalTime()).thenReturn(1);
         when(injury.getName()).thenReturn("Illness");
         when(doctor.checkSkill(S_SURGERY, campaign)).thenReturn(skillCheck);
