@@ -34,6 +34,7 @@ package mekhq.campaign.personnel.generator;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Vector;
@@ -67,7 +68,7 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
 
     /**
      * Rolls and assigns a random Special Personnel Ability (SPA) to the specified person within the given campaign,
-     * using default behavior (eligibility and weighting are both considered).
+     * using default behavior (eligibility, weighting, and flaws are all considered).
      *
      * @param campaign the campaign context to use for ability selection
      * @param person   the person to whom the special ability should be assigned
@@ -75,7 +76,7 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
      * @return the display name of the assigned special ability, or {@code null} if no ability was assigned
      */
     public @Nullable String rollSPA(final Campaign campaign, final Person person) {
-        return rollSPA(campaign, person, false, false, false);
+        return rollSPA(campaign, person, false, false, false, false);
     }
 
     /**
@@ -92,18 +93,20 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
      * @param useAlternativeWeighting if {@code true}, positive-cost abilities are weighted more heavily in the
      *                                selection
      * @param ignoreEligibility       if {@code true}, skips eligibility checks and considers all abilities available
-     * @param isVeterancyAward        if {@code true}, some SPAs may be excluded based on veterancy award eligibility
+     * @param excludeOriginAwards     if {@code true}, some SPAs may be excluded based on veterancy award eligibility
      *                                status
+     * @param noNegativeAbilities     if {@code true}, negative abilities are not considered in the selection
      *
      * @return the display name (including specialization if applicable) of the assigned special ability, or
      *       {@code null} if no ability could be rolled or assigned
      */
     public @Nullable String rollSPA(final Campaign campaign, final Person person, boolean useAlternativeWeighting,
-          boolean ignoreEligibility, boolean isVeterancyAward) {
+          boolean ignoreEligibility, boolean excludeOriginAwards, boolean noNegativeAbilities) {
         List<SpecialAbility> abilityList = getSpecialAbilities(person,
               useAlternativeWeighting,
               ignoreEligibility,
-              isVeterancyAward);
+              excludeOriginAwards,
+              noNegativeAbilities);
         if (person.isClanPersonnel()) {
             filterOutMeleeSPA(campaign.getLocalDate(), person.getOriginFaction(), abilityList);
         }
@@ -222,80 +225,147 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
      * Compiles and returns a list of {@link SpecialAbility} objects available to the given person, according to
      * eligibility and weighting rules.
      *
-     * <p>If {@code ignoreEligibility} is true, all valid special abilities (excluding those limited to character
-     * creation or restricted by currently present invalid abilities) are considered, and positive-cost abilities may be
-     * emphasized using alternative weighting if specified. Otherwise, the list of eligible special abilities is
-     * determined by {@link #getEligibleSPAs(Person, boolean)}.</p>
+     * <p>Abilities are first partitioned into positive-cost and negative-cost buckets. When
+     * {@code useAlternativeWeighting} is {@code true}, the bucket to draw from is chosen randomly (1-in-40 chance of
+     * selecting from negatives); standard weighting via {@link SpecialAbility#getWeightedSpecialAbilities(Collection)}
+     * is applied otherwise. When {@code noNegativeAbilities} is {@code true}, negative-cost abilities are excluded
+     * regardless of the weighting mode chosen.</p>
      *
-     * <p>If the resulting list is empty, {@code null} is returned.</p>
+     * <p>When {@code ignoreEligibility} is {@code true}, every registered ability is considered (subject only to
+     * {@code excludeOriginAwards} and invalid-ability checks). Otherwise, the candidate set is produced by
+     * {@link #getEligibleSPAs(Person, boolean)}.</p>
      *
      * @param person                  the person for whom to collect available special abilities
      * @param useAlternativeWeighting if {@code true}, positive-cost abilities are weighted more heavily (reducing the
      *                                chance of characters receiving flaws)
      * @param ignoreEligibility       if {@code true}, all valid abilities are considered regardless of other
      *                                eligibility requirements
-     * @param isVeterancyAward        if {@code true}, some SPAs may be excluded based on veterancy award eligibility
+     * @param excludeOriginAwards     if {@code true}, some SPAs may be excluded based on veterancy award eligibility
      *                                status
+     * @param noNegativeAbilities     if {@code true}, negative abilities are excluded from selection
      *
-     * @return a list of available special abilities based on the criteria, or an empty list is none are found
+     * @return a list of available special abilities based on the criteria, or an empty list if none are found
      *
      * @author Illiani
      * @since 0.50.10
      */
     private List<SpecialAbility> getSpecialAbilities(Person person, boolean useAlternativeWeighting,
-          boolean ignoreEligibility, boolean isVeterancyAward) {
-        final PersonnelOptions options = person.getOptions();
-        List<SpecialAbility> abilityList = new ArrayList<>();
+          boolean ignoreEligibility, boolean excludeOriginAwards, boolean noNegativeAbilities) {
+
+        final List<SpecialAbility> candidates = ignoreEligibility
+                                                      ?
+                                                      getValidAbilitiesIgnoringEligibility(person, excludeOriginAwards)
+                                                      :
+                                                      getEligibleSPAs(person, excludeOriginAwards);
+
+        return applyAbilityWeighting(candidates, useAlternativeWeighting, noNegativeAbilities);
+    }
+
+    List<SpecialAbility> applyAbilityWeighting(List<SpecialAbility> candidates, boolean useAlternativeWeighting,
+          boolean noNegativeAbilities) {
         final List<SpecialAbility> positiveAbilities = new ArrayList<>();
         final List<SpecialAbility> negativeAbilities = new ArrayList<>();
 
-        if (ignoreEligibility) {
-            for (SpecialAbility ability : SpecialAbility.getSpecialAbilities().values()) {
-                if (isVeterancyAward && ability.getOriginOnly()) {
-                    continue;
-                }
-
-                Vector<String> invalidAbilities = ability.getInvalidAbilities();
-                boolean isValid = true;
-                if (!invalidAbilities.isEmpty()) {
-                    for (String abilityCode : invalidAbilities) {
-                        if (options.booleanOption(abilityCode)) {
-                            isValid = false;
-                            break; // Invalid if any code is present
-                        }
-                    }
-                }
-                if (isValid) {
-                    abilityList.add(ability);
-                    if (ability.getCost() >= 0) {
-                        positiveAbilities.add(ability);
-                    } else {
-                        negativeAbilities.add(ability);
-                    }
-                }
+        for (SpecialAbility ability : candidates) {
+            if (ability.getCost() >= 0) {
+                positiveAbilities.add(ability);
+            } else if (!noNegativeAbilities) {
+                // Respect noNegativeAbilities in both weighting modes
+                negativeAbilities.add(ability);
             }
-        } else {
-            abilityList = getEligibleSPAs(person, isVeterancyAward);
         }
 
-        // Alternative weighting will pre-determine whether the SPA is positive or negative.
+        final List<SpecialAbility> result;
         if (useAlternativeWeighting) {
-            if (negativeAbilities.isEmpty()) {
-                return positiveAbilities;
-            } else if (positiveAbilities.isEmpty()) {
-                return negativeAbilities;
-            } else {
-                int roll = Compute.randomInt(40);
-                if (roll == 0) {
-                    abilityList.addAll(negativeAbilities);
-                } else {
-                    abilityList.addAll(positiveAbilities);
-                }
-            }
+            result = pickBucketWithAlternativeWeighting(positiveAbilities, negativeAbilities);
         } else {
-            abilityList = SpecialAbility.getWeightedSpecialAbilities(abilityList);
+            final List<SpecialAbility> combined = new ArrayList<>(positiveAbilities);
+            combined.addAll(negativeAbilities);
+            result = SpecialAbility.getWeightedSpecialAbilities(combined);
         }
-        return abilityList;
+
+        if (noNegativeAbilities) {
+            result.removeIf(ability -> ability.getCost() < 0);
+        }
+
+        return result;
+    }
+
+    /**
+     * Returns every registered {@link SpecialAbility} that passes the veterancy-award filter and has no currently
+     * active invalid-ability conflict for the given person.
+     *
+     * <p>Extracted from {@link #getSpecialAbilities} to eliminate duplicated iteration logic and make the
+     * {@code ignoreEligibility} path independently testable.</p>
+     *
+     * @param person           the person whose active options are checked against invalid-ability lists
+     * @param isVeterancyAward if {@code true}, abilities flagged as origin-only are skipped
+     *
+     * @return a mutable list of abilities that cleared all filters; never {@code null}
+     */
+    private List<SpecialAbility> getValidAbilitiesIgnoringEligibility(Person person,
+          boolean isVeterancyAward) {
+
+        final PersonnelOptions options = person.getOptions();
+        final List<SpecialAbility> result = new ArrayList<>();
+
+        for (SpecialAbility ability : SpecialAbility.getSpecialAbilities().values()) {
+            if (isVeterancyAward && ability.getOriginOnly()) {
+                continue;
+            }
+            if (hasActiveInvalidAbility(options, ability.getInvalidAbilities())) {
+                continue;
+            }
+            result.add(ability);
+        }
+
+        return result;
+    }
+
+    /**
+     * Returns {@code true} if any of the supplied ability codes is currently active (i.e., its boolean option is
+     * {@code true}) for the given options set.
+     *
+     * @param options          the personnel options to query
+     * @param invalidAbilities the list of ability codes that would make an ability ineligible
+     *
+     * @return {@code true} if at least one invalid code is active; {@code false} otherwise
+     */
+    boolean hasActiveInvalidAbility(PersonnelOptions options,
+          Vector<String> invalidAbilities) {
+
+        for (String abilityCode : invalidAbilities) {
+            if (options.booleanOption(abilityCode)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Selects and returns one of the two ability buckets using alternative weighting: a 1-in-40 chance of returning the
+     * negative bucket; otherwise the positive bucket is returned.
+     *
+     * <p>If either bucket is empty, the other is returned unconditionally, preserving the original behavior while
+     * avoiding an unnecessary random roll.</p>
+     *
+     * @param positiveAbilities abilities with cost &ge; 0
+     * @param negativeAbilities abilities with cost &lt; 0
+     *
+     * @return the chosen bucket (can be empty if both inputs are empty)
+     */
+    List<SpecialAbility> pickBucketWithAlternativeWeighting(
+          List<SpecialAbility> positiveAbilities, List<SpecialAbility> negativeAbilities) {
+
+        if (negativeAbilities.isEmpty()) {
+            return positiveAbilities;
+        }
+        if (positiveAbilities.isEmpty()) {
+            return negativeAbilities;
+        }
+
+        final boolean pickNegative = (Compute.randomInt(40) == 0);
+        return pickNegative ? negativeAbilities : positiveAbilities;
     }
 
     private List<SpecialAbility> getEligibleSPAs(Person person, boolean isVeterancyAward) {
