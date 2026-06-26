@@ -222,9 +222,9 @@ public class MedicalController {
         ActionCheckResult actionCheckResult =
               doctor.checkSkill(S_SURGERY, isUseAgingEffects, isClanCampaign, today)
                     .withExternalModifiers(getAdditionalHealingModifiers(patient))
-                    .resolve(isUseEdge, getTextAt(RESOURCE_BUNDLE, "MedicalController.report.skillCheck"), false);
+                    .resolve(isUseEdge, getTextAt(RESOURCE_BUNDLE, "MedicalController.report.skillCheck"));
 
-        LOGGER.debug(actionCheckResult.resultsText());
+        LOGGER.debug(actionCheckResult.getReport(false));
 
         if (actionCheckResult.isSuccess()) {
             boolean inInfirmary = !(null == patient.getDoctorId());
