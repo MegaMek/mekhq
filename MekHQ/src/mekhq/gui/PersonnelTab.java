@@ -33,6 +33,8 @@
 package mekhq.gui;
 
 import static java.lang.Math.round;
+import static mekhq.gui.enums.PersonnelTableModelColumn.SURNAME;
+import static mekhq.gui.enums.PersonnelTableModelColumn.SURNAME_GROUPED_BY_UNIT;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
@@ -46,11 +48,14 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.swing.*;
 import javax.swing.RowSorter.SortKey;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
@@ -261,6 +266,7 @@ public final class PersonnelTab extends CampaignGuiTab {
         chkGroupByUnit.addActionListener(e -> {
             personModel.setGroupByUnit(chkGroupByUnit.isSelected());
             personModel.refreshData();
+            changePersonnelView();
         });
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 6;
@@ -452,20 +458,35 @@ public final class PersonnelTab extends CampaignGuiTab {
     }
 
     private void changePersonnelView() {
-        final PersonnelTabView view = (choicePersonView.getSelectedItem() == null) ?
-                                            PersonnelTabView.GENERAL :
-                                            choicePersonView.getSelectedItem();
-        final XTableColumnModel columnModel = (XTableColumnModel) getPersonnelTable().getColumnModel();
-        getPersonnelTable().setRowHeight(UIUtil.scaleForGUI(15));
+        PersonnelTabView view = (choicePersonView.getSelectedItem() == null) ?
+                                      PersonnelTabView.GENERAL :
+                                      choicePersonView.getSelectedItem();
 
-        // set the renderer
-        for (final PersonnelTableModelColumn column : PersonnelTableModel.PERSONNEL_COLUMNS) {
-            final TableColumn tableColumn = columnModel.getColumnByModelIndex(column.ordinal());
+        Set<PersonnelTableModelColumn> visibleColumns = view.getVisibleColumns(getCampaign().getCampaignOptions());
+        if (view == PersonnelTabView.FLUFF) {
+            visibleColumns = visibleColumns.stream().filter(column -> {
+                if (column == SURNAME) {
+                    return !getPersonModel().isGroupByUnit();
+                } else if (column == SURNAME_GROUPED_BY_UNIT) {
+                    return getPersonModel().isGroupByUnit();
+                }
+                return true;
+            }).collect(Collectors.toSet());
+        }
+
+        XTableColumnModel columnModel = (XTableColumnModel) getPersonnelTable().getColumnModel();
+        // replace the model with a dummy to suspend UI repaints
+        getPersonnelTable().setColumnModel(new DefaultTableColumnModel());
+
+        for (PersonnelTableModelColumn column : PersonnelTableModel.PERSONNEL_COLUMNS) {
+            TableColumn tableColumn = columnModel.getColumnByModelIndex(column.ordinal());
             tableColumn.setCellRenderer(getPersonModel().getRenderer(choicePersonView.getSelectedItem()));
             tableColumn.setPreferredWidth(column.getWidth());
-            columnModel.setColumnVisible(tableColumn, column.isVisible(getCampaign(), view, getPersonnelTable(),
-                  personModel.isLoadAssignmentFromMarket(), personModel.isGroupByUnit()));
+            columnModel.setColumnVisible(tableColumn, visibleColumns.contains(column));
         }
+
+        // reattach the updated model
+        personnelTable.setColumnModel(columnModel);
     }
 
     public void focusOnPerson(UUID id) {
