@@ -40,6 +40,7 @@ import java.util.Set;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.AbstractLocation;
+import mekhq.campaign.AbstractMobileLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.utilities.MHQXMLUtility;
@@ -133,7 +134,7 @@ public class LocationNode {
             ILocation locatable = child.getLocatable();
             if (locatable instanceof AcademyCampusLocation campus) {
                 campus.writeToXML(pw, indent);
-            } else if (locatable instanceof CurrentLocation travelNode) {
+            } else if (locatable instanceof AbstractMobileLocation travelNode) {
                 travelNode.writeToXML(pw, indent);
             }
         }
