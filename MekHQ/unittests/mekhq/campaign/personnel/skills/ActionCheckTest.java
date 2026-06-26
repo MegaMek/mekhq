@@ -145,9 +145,10 @@ class ActionCheckTest {
         assertTrue(result.isSuccess());
         assertFalse(result.hasUsedEdge());
         assertEquals(8, result.getRollResult());
-        assertEquals("<a href='PERSON:link'>F L</a> <span color=\"#7fcf43\"><b>Passed</b></span> his <b>Action</b> " +
+        assertEquals("<a href='PERSON:link'>F L</a> <span color=\"positive\"><b>Passed</b></span> his <b>Action</b> " +
                            "check with a roll of <b>8</b> vs. a target number of <b>7</b>.",
-              result.getReport(false).replace(person.getId().toString(), "link"));
+              result.getReport(false).replace(person.getId().toString(), "link")
+                    .replace(ReportingUtilities.getPositiveColor(), "positive"));
     }
 
     @Test
