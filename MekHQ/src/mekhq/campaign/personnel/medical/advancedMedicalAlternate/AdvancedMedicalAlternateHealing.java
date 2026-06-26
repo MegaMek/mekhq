@@ -343,7 +343,7 @@ public class AdvancedMedicalAlternateHealing {
               useEdge,
               isUnassistedHealing);
 
-        return actionCheckResult.marginOfSuccess();
+        return actionCheckResult.getMarginOfSuccess();
     }
 
     private static ActionCheckResult getActionCheckResult(Person doctor, Campaign campaign,
@@ -377,7 +377,7 @@ public class AdvancedMedicalAlternateHealing {
         actionCheckResult = attributeCheck.resolve(false, reportText);
 
         // Edge
-        if (actionCheckResult.marginOfSuccess() <= PERMANENT_INJURY_THRESHOLD &&
+        if (actionCheckResult.getMarginOfSuccess() <= PERMANENT_INJURY_THRESHOLD &&
                   useEdge &&
                   doctor.getCurrentEdge() > 0) {
             // manually update edge because if we pass useEdge == true, the doctor will get one free roll
@@ -407,7 +407,7 @@ public class AdvancedMedicalAlternateHealing {
         actionCheckResult = skillCheck.resolve(false, reportText);
 
         // Edge
-        if (actionCheckResult.marginOfSuccess() <= PERMANENT_INJURY_THRESHOLD &&
+        if (actionCheckResult.getMarginOfSuccess() <= PERMANENT_INJURY_THRESHOLD &&
                   useEdge &&
                   doctor.getCurrentEdge() > 0) {
             // manually update edge because if we pass useEdge == true, the doctor will get one free roll

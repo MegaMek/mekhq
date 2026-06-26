@@ -85,6 +85,7 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
+import mekhq.campaign.personnel.skills.ActionCheckRoll;
 import mekhq.campaign.personnel.skills.AttributeCheck;
 import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
@@ -197,9 +198,9 @@ class AdvancedMedicalAlternateHealingTest {
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         Person patient = mock(Person.class);
         Injury injury = mock(Injury.class);
-        SkillCheck skillCheck = mock(SkillCheck.class);
         AttributeCheck attributeCheck = mock(AttributeCheck.class);
-        ActionCheckResult result = new ActionCheckResult(8, 3, false, "success");
+        ActionCheckRoll actionCheckRoll = new ActionCheckRoll(8, List.of(6, 2));
+        ActionCheckResult result = new ActionCheckResult(actionCheckRoll, 3, false, "success");
         PersonnelOptions options = mock(PersonnelOptions.class);
 
         when(campaign.getLocalDate()).thenReturn(MONDAY);
@@ -285,7 +286,8 @@ class AdvancedMedicalAlternateHealingTest {
         Injury injury = mock(Injury.class);
         Injury permanentMod = mock(Injury.class);
         SkillCheck skillCheck = mock(SkillCheck.class);
-        ActionCheckResult result = new ActionCheckResult(10, 2, false, "success");
+        ActionCheckRoll actionCheckRoll = new ActionCheckRoll(10, List.of(6, 4));
+        ActionCheckResult result = new ActionCheckResult(actionCheckRoll, 2, false, "success");
         PersonnelOptions doctorOptions = mock(PersonnelOptions.class);
         PersonnelOptions patientOptions = mock(PersonnelOptions.class);
 
@@ -358,8 +360,10 @@ class AdvancedMedicalAlternateHealingTest {
         Campaign campaign = mock(Campaign.class);
         Person doctor = mock(Person.class);
         SkillCheck skillCheck = mock(SkillCheck.class);
-        ActionCheckResult first = new ActionCheckResult(2, -4, false, "first");
-        ActionCheckResult second = new ActionCheckResult(11, 1, true, "second");
+        ActionCheckRoll firstActionCheckRoll = new ActionCheckRoll(2, List.of(1, 1));
+        ActionCheckResult first = new ActionCheckResult(firstActionCheckRoll, -4, false, "first");
+        ActionCheckRoll secondActionCheckRoll = new ActionCheckRoll(11, List.of(6, 5));
+        ActionCheckResult second = new ActionCheckResult(secondActionCheckRoll, 1, true, "second");
 
         when(doctor.checkSkill(S_SURGERY, campaign)).thenReturn(skillCheck);
         when(skillCheck.withMiscModifier(6)).thenReturn(skillCheck);
