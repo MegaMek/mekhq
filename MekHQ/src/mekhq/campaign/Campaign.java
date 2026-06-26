@@ -3855,10 +3855,10 @@ public class Campaign implements ITechManager, IPlace {
                                 person != null && person.getOptions().booleanOption(useEdgeOption);
 
         ActionCheckResult skillCheckResult = skillCheck.resolve(useEdge, null);
-        if (skillCheckResult.usedEdge()) {
-            report += " and <b>fails!</b> but uses Edge to reroll...getting a " + skillCheckResult.roll() + ": ";
+        if (skillCheckResult.hasUsedEdge()) {
+            report += " and <b>fails!</b> but uses Edge to reroll...getting a " + skillCheckResult.getRollResult() + ": ";
         } else {
-            report += " and rolls " + skillCheckResult.roll() + ':';
+            report += " and rolls " + skillCheckResult.getRollResult() + ':';
         }
         int xpGained = 0;
         if (skillCheckResult.isSuccess()) {
@@ -3892,7 +3892,7 @@ public class Campaign implements ITechManager, IPlace {
             if (person != null) {
                 if (!skillCheck.getTargetNumber().isAutomaticSuccess()) {
                     person.setNTasks(person.getNTasks() + 1);
-                    if (skillCheckResult.roll() == 12) {
+                    if (skillCheckResult.getRollResult() == 12) {
                         xpGained += getCampaignOptions().getSuccessXP();
                     }
                 }
@@ -3903,7 +3903,8 @@ public class Campaign implements ITechManager, IPlace {
             }
         } else {
             report = report + acquisition.failToFind();
-            if (person != null && skillCheckResult.roll() == 2 && !skillCheck.getTargetNumber().isAutomaticFail()) {
+            if ((person != null) && (skillCheckResult.getRollResult() == 2) &&
+                      !skillCheck.getTargetNumber().isAutomaticFail()) {
                 xpGained += getCampaignOptions().getMistakeXP();
             }
         }

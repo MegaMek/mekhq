@@ -565,13 +565,13 @@ public class TrainingCombatTeams {
                     .resolve(isUseEdge, getTextAt(RESOURCE_BUNDLE, "trainingCombatTeam.skillCheck"));
         campaign.addReport(SKILL_CHECKS, actionCheckResult.getReport(true));
 
-        MarginOfSuccess marginOfSuccess = getMarginOfSuccessObject(actionCheckResult.marginOfSuccess());
+        MarginOfSuccess marginOfSuccess = getMarginOfSuccessObject(actionCheckResult.getMarginOfSuccess());
         String personnelReport = getFormattedTextAt(RESOURCE_BUNDLE, "learnedProgress.text",
               educator.getHyperlinkedFullTitle(), spanOpeningWithCustomColor(marginOfSuccess.getColor()),
               marginOfSuccess.getLabel(), CLOSING_SPAN_TAG);
         campaign.addReport(PERSONNEL, personnelReport);
 
-        return actionCheckResult.marginOfSuccess();
+        return actionCheckResult.getMarginOfSuccess();
     }
 
     /**

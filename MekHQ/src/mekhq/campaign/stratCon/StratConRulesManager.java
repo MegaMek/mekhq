@@ -2146,7 +2146,7 @@ public class StratConRulesManager {
         campaign.addReport(BATTLE, String.format(resources.getString("reinforcementEvasionUnsuccessful.text"),
               spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
               CLOSING_SPAN_TAG,
-              actionCheckResult.roll(),
+              actionCheckResult.getRollResult(),
               9));
 
         ScenarioTemplate scenarioTemplate = getInterceptionScenarioTemplate(formation, campaign.getAllHangar());

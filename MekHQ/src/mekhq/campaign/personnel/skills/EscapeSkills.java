@@ -105,7 +105,7 @@ public class EscapeSkills {
                     .resolve(useEdge, getTextAt(RESOURCE_BUNDLE, "EscapeArtist.skillCheck"));
 
         MarginOfSuccess marginOfSuccess =
-              MarginOfSuccess.getMarginOfSuccessObjectFromMarginValue(actionCheckResult.marginOfSuccess());
+              MarginOfSuccess.getMarginOfSuccessObjectFromMarginValue(actionCheckResult.getMarginOfSuccess());
 
         // Nothing happens for these cases, so we can just early exit
         List<MarginOfSuccess> noFurtherActionCases = List.of(MarginOfSuccess.IT_WILL_DO, MarginOfSuccess.BARELY_MADE_IT,

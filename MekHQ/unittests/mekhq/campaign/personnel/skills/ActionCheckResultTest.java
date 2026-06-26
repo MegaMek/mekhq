@@ -41,24 +41,26 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+import java.util.List;
+
 class ActionCheckResultTest {
 
     @Test
     void testGetReport_EdgeNotUsed() {
-        ActionCheckResult result = new ActionCheckResult(3, 1, false, "Success.");
-        assertEquals(3, result.roll());
-        assertEquals(1, result.marginOfSuccess());
-        assertFalse(result.usedEdge());
+        ActionCheckResult result = new ActionCheckResult(new ActionCheckRoll(3, List.of()), 1, false, "Success.");
+        assertEquals(3, result.getRollResult());
+        assertEquals(1, result.getMarginOfSuccess());
+        assertFalse(result.hasUsedEdge());
         assertEquals("Success.", result.getReport(false));
         assertEquals("Success. <span color='#7fcf43'><i>It'll do...</i></span>", result.getReport(true));
     }
 
     @Test
     void testGetReport_EdgeUsed() {
-        ActionCheckResult result = new ActionCheckResult(8, 2, true, "Success.");
-        assertEquals(8, result.roll());
-        assertEquals(2, result.marginOfSuccess());
-        assertTrue(result.usedEdge());
+        ActionCheckResult result = new ActionCheckResult(new ActionCheckRoll(8, List.of()), 2, true, "Success.");
+        assertEquals(8, result.getRollResult());
+        assertEquals(2, result.getMarginOfSuccess());
+        assertTrue(result.hasUsedEdge());
         assertEquals("Success. Used a point of <b>Edge</b>.", result.getReport(false));
         assertEquals("Success. Used a point of <b>Edge</b>. <span color='#7fcf43'><i>Good.</i></span>", result.getReport(true));
     }
@@ -66,7 +68,7 @@ class ActionCheckResultTest {
     @ParameterizedTest
     @CsvSource({ "-2, false", "-1, false", "0, true", "1, true", "12, true" })
     void testIsSuccess(int marginOfSuccess, boolean expectedResult) {
-        ActionCheckResult result = new ActionCheckResult(10, marginOfSuccess, false, "");
+        ActionCheckResult result = new ActionCheckResult(new ActionCheckRoll(10, List.of()), marginOfSuccess, false, "");
         assertEquals(expectedResult, result.isSuccess());
     }
 
