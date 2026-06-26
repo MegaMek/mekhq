@@ -1061,8 +1061,8 @@ public class CampaignNewDayManager {
      */
     private void embezzleFunds(Person person) {
         ActionCheckResult actionCheckResult =
-              person.checkSkill(S_ADMIN, campaign).resolve(false, getTextAt(RESOURCE_BUNDLE, "embezzle.roll"), true);
-        campaign.addReport(SKILL_CHECKS, actionCheckResult.resultsText());
+              person.checkSkill(S_ADMIN, campaign).resolve(false, getTextAt(RESOURCE_BUNDLE, "embezzle.roll"));
+        campaign.addReport(SKILL_CHECKS, actionCheckResult.getReport(true));
 
         if (actionCheckResult.isSuccess()) {
             Money currentCampaignFunds = finances.getBalance();
@@ -1804,8 +1804,8 @@ public class CampaignNewDayManager {
     private static boolean performPersonalityBreakCheck(Campaign campaign, Person person, int modifier) {
         ActionCheckResult attributeCheckResult =
               person.checkAttribute(SkillAttribute.WILLPOWER).withMiscModifier(modifier)
-                    .resolve(true, getTextAt(RESOURCE_BUNDLE, "mentalBreak.check"), true);
-        campaign.addReport(SKILL_CHECKS, attributeCheckResult.resultsText());
+                    .resolve(true, getTextAt(RESOURCE_BUNDLE, "mentalBreak.check"));
+        campaign.addReport(SKILL_CHECKS, attributeCheckResult.getReport(true));
 
         return !attributeCheckResult.isSuccess();
     }
@@ -1885,8 +1885,8 @@ public class CampaignNewDayManager {
 
         ActionCheckResult attributeCheckResult =
               person.checkAttribute(SkillAttribute.WILLPOWER).withMiscModifier(modifier)
-                    .resolve(true, getTextAt(RESOURCE_BUNDLE, "discontinuationSyndrome.check"), true);
-        campaign.addReport(SKILL_CHECKS, attributeCheckResult.resultsText());
+                    .resolve(true, getTextAt(RESOURCE_BUNDLE, "discontinuationSyndrome.check"));
+        campaign.addReport(SKILL_CHECKS, attributeCheckResult.getReport(true));
 
         boolean failedWillpowerCheck = attributeCheckResult.isSuccess();
         person.processDiscontinuationSyndrome(campaign,

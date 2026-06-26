@@ -34,6 +34,7 @@
 package mekhq.campaign.personnel.skills;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
@@ -43,12 +44,23 @@ import org.junit.jupiter.params.provider.CsvSource;
 class ActionCheckResultTest {
 
     @Test
-    void testRecord() {
-        ActionCheckResult result = new ActionCheckResult(8, 2, true, "Success");
+    void testGetReport_EdgeNotUsed() {
+        ActionCheckResult result = new ActionCheckResult(3, 1, false, "Success.");
+        assertEquals(3, result.roll());
+        assertEquals(1, result.marginOfSuccess());
+        assertFalse(result.usedEdge());
+        assertEquals("Success.", result.getReport(false));
+        assertEquals("Success. <span color='#7fcf43'><i>It'll do...</i></span>", result.getReport(true));
+    }
+
+    @Test
+    void testGetReport_EdgeUsed() {
+        ActionCheckResult result = new ActionCheckResult(8, 2, true, "Success.");
         assertEquals(8, result.roll());
         assertEquals(2, result.marginOfSuccess());
         assertTrue(result.usedEdge());
-        assertEquals("Success", result.resultsText());
+        assertEquals("Success. Used a point of <b>Edge</b>.", result.getReport(false));
+        assertEquals("Success. Used a point of <b>Edge</b>. <span color='#7fcf43'><i>Good.</i></span>", result.getReport(true));
     }
 
     @ParameterizedTest

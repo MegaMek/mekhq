@@ -102,7 +102,7 @@ public class EscapeSkills {
         useEdge = useEdge && person.getOptions().booleanOption(EDGE_ESCAPE_ATTEMPTS);
         ActionCheckResult actionCheckResult =
               person.checkSkill(skillToUse, false, false, today)
-                    .resolve(useEdge, getTextAt(RESOURCE_BUNDLE, "EscapeArtist.skillCheck"), false);
+                    .resolve(useEdge, getTextAt(RESOURCE_BUNDLE, "EscapeArtist.skillCheck"));
 
         MarginOfSuccess marginOfSuccess =
               MarginOfSuccess.getMarginOfSuccessObjectFromMarginValue(actionCheckResult.marginOfSuccess());

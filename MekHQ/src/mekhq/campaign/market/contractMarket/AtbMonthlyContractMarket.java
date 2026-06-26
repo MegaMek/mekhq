@@ -741,10 +741,8 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
         ActionCheckResult actionCheckResult =
               commander.checkSkill(S_NEGOTIATION, campaign)
-                    .resolve(isUseEdge,
-                          getTextAt(RESOURCE_BUNDLE, "AtbMonthlyContractMarket.contractSkillCheck"),
-                          true);
-        campaign.addReport(SKILL_CHECKS, actionCheckResult.resultsText());
+                    .resolve(isUseEdge, getTextAt(RESOURCE_BUNDLE, "AtbMonthlyContractMarket.contractSkillCheck"));
+        campaign.addReport(SKILL_CHECKS, actionCheckResult.getReport(true));
 
         return connections + Math.max(0, actionCheckResult.marginOfSuccess());
     }
