@@ -50,6 +50,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignLocationManager;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.FixedLocation;
 import mekhq.campaign.base.PlayerBase;
@@ -251,11 +252,14 @@ public class LocationNodeTest {
     class ReconnectChildren {
 
         Campaign mockCampaign;
+        CampaignLocationManager mockLocationManager;
         FixedLocation parentFixed;
 
         @BeforeEach
         void setUp() {
             mockCampaign = mock(Campaign.class);
+            mockLocationManager = mock(CampaignLocationManager.class);
+            when(mockCampaign.getCampaignLocationManager()).thenReturn(mockLocationManager);
             parentFixed = new FixedLocation(mock(PlanetarySystem.class));
         }
 
@@ -333,7 +337,7 @@ public class LocationNodeTest {
 
             LocationNode.reconnectChildren(parseXml(xml), parentFixed, mockCampaign);
 
-            verify(mockCampaign).addLocation(any(CurrentLocation.class));
+            verify(mockLocationManager).addLocation(any(CurrentLocation.class));
         }
 
         @Test

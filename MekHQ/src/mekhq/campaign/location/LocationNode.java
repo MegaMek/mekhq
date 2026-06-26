@@ -180,7 +180,7 @@ public class LocationNode {
                                 CurrentLocation travelNode = CurrentLocation.generateInstanceFromXML(campusChild, campaign);
                                 if (travelNode != null) {
                                     LocationManager.setLocation(travelNode, campus);
-                                    campaign.addLocation(travelNode);
+                                    campaign.getCampaignLocationManager().addLocation(travelNode);
                                 }
                             }
                         }
@@ -189,7 +189,7 @@ public class LocationNode {
                     CurrentLocation travelNode = CurrentLocation.generateInstanceFromXML(wn, campaign);
                     if (travelNode != null) {
                         LocationManager.setLocation(travelNode, parent);
-                        campaign.addLocation(travelNode);
+                        campaign.getCampaignLocationManager().addLocation(travelNode);
                     }
                 } else {
                     // Person, Unit, and Part reconnection will be added here

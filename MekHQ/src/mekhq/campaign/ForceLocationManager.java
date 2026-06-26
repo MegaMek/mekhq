@@ -33,6 +33,8 @@
 
 package mekhq.campaign;
 
+import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
+
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +47,6 @@ import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationDispatch;
 import mekhq.campaign.location.LocationNode;
-import mekhq.campaign.market.contractMarket.ContractAutomation;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 import mekhq.campaign.universe.PlanetarySystem;
 
@@ -82,35 +83,27 @@ public class ForceLocationManager {
         }
 
         @Override
-        @Nonnull
         public LocationNode getLocationNode() {
             return campaign.getLocationNode();
         }
 
         @Override
-        @Nonnull
         public Hangar getHangar() {
             return campaign.getHangar();
         }
 
         @Override
-        @Nonnull
         public Warehouse getWarehouse() {
             return campaign.getWarehouse();
         }
 
         @Override
-        @Nonnull
         public Personnel getPersonnel() {
             return campaign.getMainForcePersonnel();
         }
 
         List<UUID> getAutomatedMothballUnits() {
             return campaign.getAutomatedMothballUnits();
-        }
-
-        void performAutomatedActivation() {
-            ContractAutomation.performAutomatedActivation(campaign);
         }
     }
 
@@ -160,7 +153,8 @@ public class ForceLocationManager {
                   mainForce.getPersonnel(),
                   mainForce.getHangar(),
                   mainForce.getWarehouse(),
-                  campaign);
+                  campaign,
+                  campaign.getCampaignLocationManager());
         }
     }
 
@@ -184,7 +178,7 @@ public class ForceLocationManager {
         MekHQ.triggerEvent(new LocationChangedEvent(mainForce.getCurrentLocation(), false));
 
         if (mainForce.getAutomatedMothballUnits().isEmpty()) {
-            mainForce.performAutomatedActivation();
+            performAutomatedActivation(campaign);
         }
 
         if (campaign.getCampaignOptions().isUseRandomDiseases()

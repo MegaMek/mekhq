@@ -168,7 +168,6 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationType;
 import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.campaign.icons.UnitIcon;
-import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationNode;
@@ -1753,37 +1752,6 @@ public class Campaign implements ITechManager, IPlace {
         getForceLocationManager().setLocation(getCampaignLocationManager(), location);
     }
 
-    public void addLocation(AbstractLocation location) {
-        getCampaignLocationManager().addLocation(location);
-    }
-
-    public void removeLocation(AbstractLocation location) {
-        getCampaignLocationManager().removeLocation(location);
-    }
-
-    public void pruneEmptyLocations() {
-        getCampaignLocationManager().pruneEmptyLocations(this);
-    }
-
-    @Nonnull
-    public List<AbstractLocation> getLocations() {
-        return getCampaignLocationManager().getLocations();
-    }
-
-
-    public void addPlayerBase(@Nullable PlayerBase base) {
-        getCampaignLocationManager().addPlayerBase(base);
-    }
-
-    public void removePlayerBase(@Nullable PlayerBase base) {
-        getCampaignLocationManager().removePlayerBase(base);
-    }
-
-    @Nonnull
-    public Set<PlayerBase> getPlayerBases() {
-        return getCampaignLocationManager().getPlayerBases();
-    }
-
     @Nonnull
     public CampaignLocationManager getCampaignLocationManager() {
         return locationManager;
@@ -1796,24 +1764,6 @@ public class Campaign implements ITechManager, IPlace {
 
     public Personnel getMainForcePersonnel() {
         return mainForcePersonnel;
-    }
-
-    @Nullable
-    public AcademyCampusLocation getOrCreateCampusLocation(String academySet, String academyName,
-          String systemId) {
-        return getCampaignLocationManager().getOrCreateCampusLocation(this, academySet, academyName, systemId);
-    }
-
-    @Nonnull
-    public AcademyCampusLocation getOrCreateLocalCampusLocation(String academySet,
-          String academyName) {
-        return getCampaignLocationManager().getOrCreateLocalCampusLocation(this, academySet, academyName);
-    }
-
-    @Nonnull
-    public AcademyCampusLocation getOrCreateCampusUnderLocation(String academySet, String academyName,
-          ILocation parent) {
-        return getCampaignLocationManager().getOrCreateCampusUnderLocation(academySet, academyName, parent);
     }
 
     public void moveToPlanetarySystem(PlanetarySystem planetarySystem) {
@@ -2147,7 +2097,7 @@ public class Campaign implements ITechManager, IPlace {
      */
     public Collection<Unit> getAllUnits() {
         List<Unit> units = new ArrayList<>();
-        for (AbstractLocation location : getLocations()) {
+        for (AbstractLocation location : getCampaignLocationManager().getLocations()) {
             Set<Unit> found = location.fetchUnitsAtLocation();
             units.addAll(found);
         }
