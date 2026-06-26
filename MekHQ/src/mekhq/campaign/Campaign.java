@@ -1796,7 +1796,7 @@ public class Campaign implements ITechManager, IPlace {
                       !location.fetchUnitsAtLocation().isEmpty()) {
                 return false;
             }
-            if (location instanceof CurrentLocation) {
+            if (location instanceof AbstractMobileLocation) {
                 location.setParent(null);
             } else if (location instanceof FixedLocation) {
                 for (ILocation child : new ArrayList<>(location.getChildLocations())) {
@@ -1999,10 +1999,10 @@ public class Campaign implements ITechManager, IPlace {
             return;
         }
         for (ILocation child : new ArrayList<>(getChildLocations())) {
-            if (!(child instanceof CurrentLocation travelLocation)) {
+            if (!(child instanceof AbstractMobileLocation travelLocation)) {
                 continue;
             }
-            if (!travelLocation.isOnPlanet()) {
+            if (!travelLocation.hasArrived()) {
                 continue;
             }
             LocationDispatch.landFromTravelNode(
