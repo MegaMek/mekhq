@@ -66,7 +66,7 @@ import static mekhq.campaign.personnel.skills.SkillType.S_STRATEGY;
 import static mekhq.campaign.personnel.skills.SkillType.S_TECH_MECHANIC;
 import static mekhq.campaign.personnel.skills.SkillType.getType;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
-import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
+import static mekhq.campaign.randomEvents.other.GrayMonday.isGrayMonday;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.MINIMUM_TEMPORARY_CAPACITY;
 import static mekhq.campaign.unit.Unit.TECH_WORK_DAY;
@@ -234,8 +234,8 @@ import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
-import mekhq.campaign.randomEvents.RandomEventLibraries;
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
+import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
+import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventLibraries;
 import mekhq.campaign.storyArc.StoryArc;
 import mekhq.campaign.stratCon.StratConContractInitializer;
 import mekhq.campaign.stratCon.StratConRulesManager;
@@ -3242,6 +3242,10 @@ public class Campaign implements ITechManager, IPlace {
         return humanResources.getSeniorMedicalPerson(getCampaignOptions(), isClanCampaign(), getLocalDate());
     }
 
+    public @Nullable Person getSeniorTechPerson() {
+        return humanResources.getSeniorTechPerson(getCampaignOptions(), isClanCampaign(), getLocalDate());
+    }
+
     /**
      * Retrieves the current campaign commander.
      *
@@ -3586,7 +3590,7 @@ public class Campaign implements ITechManager, IPlace {
         // if it's already impossible, don't bother with the rest
         if (skillCheck.getTargetNumber().isImpossible()) {
             if (getCampaignOptions().isPlanetAcquisitionVerbose()) {
-                addReport(ACQUISITIONS, getFormattedTextAt(ACTION_CHECK_BUNDLE, "contractAcquisition.impossible",
+                addReport(ACQUISITIONS, getFormattedTextAt(ACTION_CHECK_BUNDLE, "acquisition.impossible",
                       ReportingUtilities.getNegativeColor(), person.getFullName(), acquisition.getAcquisitionName(),
                       system.getPrintableName(getLocalDate()), skillCheck.getTargetNumber().getDesc()));
             }
@@ -3594,7 +3598,7 @@ public class Campaign implements ITechManager, IPlace {
                          PartAcquisitionResult.PlanetSpecificFailure;
         }
 
-        ActionCheckResult result = skillCheck.resolve(false, null, false);
+        ActionCheckResult result = skillCheck.resolve(false, null);
         if (getCampaignOptions().isPlanetAcquisitionVerbose()) {
             SocioIndustrialData socioIndustrial = system.getPrimaryPlanet().getSocioIndustrial(getLocalDate());
             CampaignOptions options = getCampaignOptions();
@@ -3602,7 +3606,7 @@ public class Campaign implements ITechManager, IPlace {
             int industryBonus = options.getPlanetIndustryAcquisitionBonus(socioIndustrial.industry);
             int outputsBonus = options.getPlanetOutputAcquisitionBonus(socioIndustrial.output);
 
-            String reportType = result.isSuccess() ? "contractAcquisition.success" : "contractAcquisition.failure";
+            String reportType = result.isSuccess() ? "acquisition.success" : "acquisition.failure";
             String highlightColor = result.isSuccess() ? ReportingUtilities.getPositiveColor() :
                                  ReportingUtilities.getNegativeColor();
 
@@ -3697,11 +3701,11 @@ public class Campaign implements ITechManager, IPlace {
         boolean useEdge = getCampaignOptions().isUseEdge() &&
                                 person != null && person.getOptions().booleanOption(useEdgeOption);
 
-        ActionCheckResult skillCheckResult = skillCheck.resolve(useEdge, null, false);
-        if (skillCheckResult.usedEdge()) {
-            report += " and <b>fails!</b> but uses Edge to reroll...getting a " + skillCheckResult.roll() + ": ";
+        ActionCheckResult skillCheckResult = skillCheck.resolve(useEdge, null);
+        if (skillCheckResult.hasUsedEdge()) {
+            report += " and <b>fails!</b> but uses Edge to reroll...getting a " + skillCheckResult.getRollResult() + ": ";
         } else {
-            report += " and rolls " + skillCheckResult.roll() + ':';
+            report += " and rolls " + skillCheckResult.getRollResult() + ':';
         }
         int xpGained = 0;
         if (skillCheckResult.isSuccess()) {
@@ -3735,7 +3739,7 @@ public class Campaign implements ITechManager, IPlace {
             if (person != null) {
                 if (!skillCheck.getTargetNumber().isAutomaticSuccess()) {
                     person.setNTasks(person.getNTasks() + 1);
-                    if (skillCheckResult.roll() == 12) {
+                    if (skillCheckResult.getRollResult() == 12) {
                         xpGained += getCampaignOptions().getSuccessXP();
                     }
                 }
@@ -3746,7 +3750,8 @@ public class Campaign implements ITechManager, IPlace {
             }
         } else {
             report = report + acquisition.failToFind();
-            if (person != null && skillCheckResult.roll() == 2 && !skillCheck.getTargetNumber().isAutomaticFail()) {
+            if ((person != null) && (skillCheckResult.getRollResult() == 2) &&
+                      !skillCheck.getTargetNumber().isAutomaticFail()) {
                 xpGained += getCampaignOptions().getMistakeXP();
             }
         }
@@ -6817,28 +6822,32 @@ public class Campaign implements ITechManager, IPlace {
     public SkillCheck checkAcquisition(IAcquisitionWork acquisition, @Nullable Person person, boolean checkDaysToWait) {
         TargetRollModifier decisiveModifier = null;
         if (getCampaignOptions().getAcquisitionType() == AcquisitionsType.AUTOMATIC) {
-            decisiveModifier = new TargetRollModifier(TargetRoll.AUTOMATIC_SUCCESS, "Automatic Success");
-        } else if (person == null) {
-            decisiveModifier = new TargetRollModifier(TargetRoll.IMPOSSIBLE,
-                  "Your procurement personnel have used up all their acquisition attempts for this period");
-        } else if (null != getShoppingList().getShoppingItem(acquisition.getNewEquipment()) && checkDaysToWait) {
-            decisiveModifier = new TargetRollModifier(TargetRoll.AUTOMATIC_FAIL,
-                  "You must wait until the new cycle to check for this part. Further" +
-                        " attempts will be added to the shopping list.");
+            decisiveModifier = new TargetRollModifier(TargetRoll.AUTOMATIC_SUCCESS,
+                  getTextAt(ACTION_CHECK_BUNDLE, "acquisition.modifier.automaticSuccess"));
         } else if (acquisition.getTechBase() == TechBase.CLAN && !getCampaignOptions().isAllowClanPurchases()) {
-            decisiveModifier = new TargetRollModifier(TargetRoll.IMPOSSIBLE, "You cannot acquire clan parts");
+            decisiveModifier = new TargetRollModifier(TargetRoll.IMPOSSIBLE,
+                  getTextAt(ACTION_CHECK_BUNDLE, "acquisition.modifier.clanTech"));
         } else if (acquisition.getTechBase() == TechBase.IS && !getCampaignOptions().isAllowISPurchases()) {
-            decisiveModifier = new TargetRollModifier(TargetRoll.IMPOSSIBLE, "You cannot acquire inner sphere parts");
+            decisiveModifier = new TargetRollModifier(TargetRoll.IMPOSSIBLE,
+                  getTextAt(ACTION_CHECK_BUNDLE, "acquisition.modifier.ISTech"));
         } else if (getCampaignOptions().getTechLevel() < Utilities.getSimpleTechLevel(acquisition.getTechLevel())) {
             decisiveModifier = new TargetRollModifier(TargetRoll.IMPOSSIBLE,
-                  "You cannot acquire parts of this tech level");
+                  getTextAt(ACTION_CHECK_BUNDLE, "acquisition.modifier.techLevel"));
         } else if (getCampaignOptions().isLimitByYear() &&
                          !acquisition.isIntroducedBy(getGameYear(), useClanTechBase(), getTechFaction())) {
-            decisiveModifier = new TargetRollModifier(TargetRoll.IMPOSSIBLE, "It has not been invented yet!");
+            decisiveModifier = new TargetRollModifier(TargetRoll.IMPOSSIBLE,
+                  getTextAt(ACTION_CHECK_BUNDLE, "acquisition.modifier.notInvented"));
         } else if (getCampaignOptions().isDisallowExtinctStuff() &&
                          (acquisition.isExtinctIn(getGameYear(), useClanTechBase(), getTechFaction()) ||
                                 acquisition.getAvailability().equals(AvailabilityValue.X))) {
-            decisiveModifier = new TargetRollModifier(TargetRoll.IMPOSSIBLE, "It is extinct!");
+            decisiveModifier = new TargetRollModifier(TargetRoll.IMPOSSIBLE,
+                  getTextAt(ACTION_CHECK_BUNDLE, "acquisition.modifier.extinct"));
+        } else if (checkDaysToWait && (getShoppingList().getShoppingItem(acquisition.getNewEquipment()) != null)) {
+            decisiveModifier = new TargetRollModifier(TargetRoll.AUTOMATIC_FAIL,
+                  getTextAt(ACTION_CHECK_BUNDLE, "acquisition.modifier.waitForNewCycle"));
+        } else if (person == null) {
+            decisiveModifier = new TargetRollModifier(TargetRoll.AUTOMATIC_FAIL,
+                  getTextAt(ACTION_CHECK_BUNDLE, "acquisition.modifier.noPersonnel"));
         }
 
         if (person == null) {
@@ -6858,8 +6867,9 @@ public class Campaign implements ITechManager, IPlace {
                 yield (bestTechSkill == null) ? SkillType.getType(S_TECH_MECHANIC) : bestTechSkill.getType();
             }
         };
-        if (!person.hasSkill(skillType.getName()) && (decisiveModifier == null)) {
-            decisiveModifier = new TargetRollModifier(TargetRoll.AUTOMATIC_FAIL, "No skill");
+        if ((decisiveModifier == null) && !person.hasSkill(skillType.getName())) {
+            decisiveModifier = new TargetRollModifier(TargetRoll.AUTOMATIC_FAIL,
+                  getTextAt(ACTION_CHECK_BUNDLE, "acquisition.modifier.missingRequiredSkill"));
         }
 
         if (decisiveModifier != null) {
@@ -6870,11 +6880,12 @@ public class Campaign implements ITechManager, IPlace {
         if (getCampaignOptions().isUseStratCon() && getCampaignOptions().isRestrictPartsByMission()) {
             int contractAvailability = findAtBPartsAvailabilityLevel();
             if (contractAvailability != 0) {
-                modifiers.add(new TargetRollModifier(contractAvailability, "Contract"));
+                modifiers.add(new TargetRollModifier(contractAvailability,
+                      getTextAt(ACTION_CHECK_BUNDLE, "acquisition.modifier.contractPartAvailability")));
             }
         }
         if (isGrayMonday(currentDay, getCampaignOptions().isSimulateGrayMonday())) {
-            modifiers.add(new TargetRollModifier(4, "Gray Monday"));
+            modifiers.add(new TargetRollModifier(4, getTextAt(ACTION_CHECK_BUNDLE, "acquisition.modifier.grayMonday")));
         }
 
         return person.checkSkill(skillType.getName(), this).withExternalModifiers(modifiers);

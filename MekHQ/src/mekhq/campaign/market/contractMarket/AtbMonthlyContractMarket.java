@@ -48,7 +48,7 @@ import static mekhq.campaign.mission.ContractDifficulty.calculateContractDifficu
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_NETWORKER;
 import static mekhq.campaign.personnel.PersonnelOptions.EDGE_COMMANDER_NEGOTIATION;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
-import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
+import static mekhq.campaign.randomEvents.other.GrayMonday.isGrayMonday;
 import static mekhq.campaign.universe.Faction.COMSTAR_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.WORD_OF_BLAKE_FACTION_CODE;
@@ -741,12 +741,10 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
         ActionCheckResult actionCheckResult =
               commander.checkSkill(S_NEGOTIATION, campaign)
-                    .resolve(isUseEdge,
-                          getTextAt(RESOURCE_BUNDLE, "AtbMonthlyContractMarket.contractSkillCheck"),
-                          true);
-        campaign.addReport(SKILL_CHECKS, actionCheckResult.resultsText());
+                    .resolve(isUseEdge, getTextAt(RESOURCE_BUNDLE, "AtbMonthlyContractMarket.contractSkillCheck"));
+        campaign.addReport(SKILL_CHECKS, actionCheckResult.getReport(true));
 
-        return connections + Math.max(0, actionCheckResult.marginOfSuccess());
+        return connections + Math.max(0, actionCheckResult.getMarginOfSuccess());
     }
 
     /**

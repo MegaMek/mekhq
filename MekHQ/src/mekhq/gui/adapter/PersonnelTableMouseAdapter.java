@@ -161,7 +161,7 @@ import mekhq.campaign.personnel.skills.Skills;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
 import mekhq.campaign.randomEvents.personalities.PersonalityController;
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
+import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
@@ -2867,8 +2867,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                                 }
 
                                                 if (skillName.equalsIgnoreCase("xp")) {
-                                                    if (EducationLevel.parseToInt(person.getEduHighestEducation()) <
-                                                              educationLevel) {
+                                                    if (person.getEduHighestEducation().getLevel() < educationLevel) {
                                                         improvementPossible++;
                                                     }
                                                 } else {
@@ -3382,7 +3381,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             int attributeImprovementCost = (int) round(getCampaignOptions().getAttributeCost() * costMultiplier);
             int edgeCost = (int) round(getCampaignOptions().getEdgeCost() * costMultiplier);
             for (SkillAttribute attribute : SkillAttribute.values()) {
-                if (attribute.isNone()) {
+                if (attribute.isNoAttribute()) {
                     continue;
                 }
 
@@ -4374,7 +4373,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
             JMenu attributesMenu = new JMenu(resources.getString("spendOnAttributes.set"));
             for (SkillAttribute attribute : SkillAttribute.values()) {
-                if (attribute.isNone()) {
+                if (attribute.isNoAttribute()) {
                     continue;
                 }
                 menuItem = new JMenuItem(attribute.getLabel());

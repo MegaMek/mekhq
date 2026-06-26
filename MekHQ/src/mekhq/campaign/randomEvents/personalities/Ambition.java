@@ -30,19 +30,18 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.randomEvents.personalities.enums;
+package mekhq.campaign.randomEvents.personalities;
 
-import static mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType.SOCIAL;
+import static mekhq.campaign.randomEvents.personalities.PersonalityTraitType.AMBITION;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.PronounData;
-import mekhq.campaign.randomEvents.personalities.PersonalityTrait;
 
 /**
- * Represents various levels and traits of social skills in a personality.
+ * Represents various levels and traits of ambition in a personality.
  *
  * <p>This enumeration defines a wide range of traits that can be associated with a person's
  * personality. Traits are characterized as either "positive" or not and can optionally be "major" traits. The
@@ -51,40 +50,40 @@ import mekhq.campaign.randomEvents.personalities.PersonalityTrait;
  * <p>Some traits, referred to as "Major Traits," denote stronger personality attributes
  * and are to be handled distinctly. These traits are always listed at the end of the enumeration.</p>
  */
-public enum Social implements PersonalityTrait {
+public enum Ambition implements PersonalityTrait {
     // region Enum Declarations
     NONE(false, false),
-    APATHETIC(false, false),
-    AUTHENTIC(true, false),
-    BLUNT(false, false),
-    CALLOUS(false, false),
-    CONDESCENDING(false, false),
-    CONSIDERATE(true, false),
-    DISINGENUOUS(false, false),
-    DISMISSIVE(false, false),
-    ENCOURAGING(true, false),
-    ERRATIC(false, false),
-    EMPATHETIC(true, false),
-    FRIENDLY(true, false),
-    INSPIRING(true, false),
-    INDIFFERENT(false, false),
-    INTROVERTED(true, false),
-    IRRITABLE(false, false),
-    NEGLECTFUL(false, false),
-    PETTY(false, false),
-    PERSUASIVE(true, false),
-    RECEPTIVE(true, false),
-    SINCERE(true, false),
-    SUPPORTIVE(true, false),
-    TACTFUL(true, false),
-    UNTRUSTWORTHY(false, false),
+    AMBITIOUS(true, false),
+    ARROGANT(false, false),
+    ASPIRING(true, false),
+    CALCULATING(true, false),
+    CONNIVING(false, false),
+    CONTROLLING(false, false),
+    CUTTHROAT(false, false),
+    DILIGENT(true, false),
+    DRIVEN(true, false),
+    ENERGETIC(true, false),
+    EXCESSIVE(false, false),
+    FOCUSED(true, false),
+    GOAL_ORIENTED(true, false),
+    MOTIVATED(true, false),
+    OPPORTUNISTIC(true, false),
+    OVERCONFIDENT(false, false),
+    PERSISTENT(true, false),
+    PROACTIVE(true, false),
+    RESILIENT(true, false),
+    RUTHLESS(false, false),
+    SELFISH(false, false),
+    STRATEGIC(true, false),
+    UNAMBITIOUS(false, false),
+    UNSCRUPULOUS(false, false),
     // Major Traits should always be last
-    SCHEMING(false, true),
-    ALTRUISTIC(true, true),
-    COMPASSIONATE(true, true),
-    GREGARIOUS(true, true),
-    NARCISSISTIC(false, true),
-    POMPOUS(false, true);
+    DISHONEST(false, true),
+    INNOVATIVE(true, true),
+    MANIPULATIVE(false, true),
+    RESOURCEFUL(true, true),
+    TYRANNICAL(false, true),
+    VISIONARY(true, true);
     // endregion Enum Declarations
 
     // region Variable Declarations
@@ -94,8 +93,8 @@ public enum Social implements PersonalityTrait {
     // endregion Variable Declarations
 
     // region Constructors
-    Social(boolean isPositive, boolean isMajor) {
-        this.label = generateLabel();
+    Ambition(boolean isPositive, boolean isMajor) {
+        this.label = this.generateLabel();
         this.isPositive = isPositive;
         this.isMajor = isMajor;
     }
@@ -113,22 +112,20 @@ public enum Social implements PersonalityTrait {
      */
     public final static int MAJOR_TRAITS_START_INDEX = 25;
 
-    public String getLabel() {
-        return label;
-    }
+    // region Getters
 
     /**
-     * @return the {@link PersonalityTraitType} representing social aptitude
+     * @return the {@link PersonalityTraitType} representing ambition
      *
      * @author Illiani
      * @since 0.50.06
      */
     public PersonalityTraitType getPersonalityTraitType() {
-        return SOCIAL;
+        return AMBITION;
     }
 
     /**
-     * @return the label string for the social personality trait type
+     * @return the label string for the ambition personality trait type
      *
      * @author Illiani
      * @since 0.50.06
@@ -136,6 +133,10 @@ public enum Social implements PersonalityTrait {
     @Deprecated(since = "0.51.0", forRemoval = true)
     public String getPersonalityTraitTypeLabel() {
         return getPersonalityTraitType().getLabel();
+    }
+
+    public String getLabel() {
+        return label;
     }
 
     /**
@@ -146,7 +147,6 @@ public enum Social implements PersonalityTrait {
      *
      * @return the localized label string corresponding to the enumeration value.
      */
-    // region Getters
     private String generateLabel() {
         final String RESOURCE_KEY = name() + ".label";
 
@@ -161,21 +161,21 @@ public enum Social implements PersonalityTrait {
      * the individual's given name, and other localized text from the resource bundle.
      * </p>
      *
-     * @param socialDescriptionIndex an index representing the type/variation of the description. This value is clamped
-     *                               to ensure it falls within a valid range.
-     * @param gender                 the {@link Gender} of the individual, used to determine appropriate pronouns for
-     *                               the description.
-     * @param givenName              the given name of the person. This <b>MUST</b> use 'person.getGivenName()' and
-     *                               <b>NOT</b> 'person.getFirstName()'
+     * @param ambitionDescriptionIndex an index representing the type/variation of the description. This value is
+     *                                 clamped to ensure it falls within a valid range.
+     * @param gender                   the {@link Gender} of the individual, used to determine appropriate pronouns for
+     *                                 the description.
+     * @param givenName                the given name of the person. This <b>MUST</b> use 'person.getGivenName()' and
+     *                                 <b>NOT</b> 'person.getFirstName()'
      *
      * @return a formatted description string based on the enum, the individual's gender, name, and aggression
      *       description index.
      */
-    public String getDescription(int socialDescriptionIndex, final Gender gender,
+    public String getDescription(int ambitionDescriptionIndex, final Gender gender,
           final String givenName) {
-        socialDescriptionIndex = Math.clamp(socialDescriptionIndex, 0, MAXIMUM_VARIATIONS - 1);
+        ambitionDescriptionIndex = Math.clamp(ambitionDescriptionIndex, 0, MAXIMUM_VARIATIONS - 1);
 
-        final String RESOURCE_KEY = name() + ".description." + socialDescriptionIndex;
+        final String RESOURCE_KEY = name() + ".description." + ambitionDescriptionIndex;
         final PronounData pronounData = new PronounData(gender);
 
         // {0} = givenName
@@ -209,20 +209,20 @@ public enum Social implements PersonalityTrait {
     }
 
     /**
-     * Retrieves the formatted interviewer notes for a specific social description index.
+     * Retrieves the formatted interviewer notes for a specific ambition description index.
      *
      * <p>Constructs a resource key by combining the enum name, "interviewerNote", and the provided index,
      * then fetches the formatted text for that key from the resource bundle.</p>
      *
-     * @param socialDescriptionIndex the index of the social description to retrieve notes for
+     * @param ambitionDescriptionIndex the index of the ambition description to retrieve notes for
      *
      * @return the formatted interviewer notes text corresponding to the specified index.
      *
      * @author Illiani
      * @since 0.50.06
      */
-    public String getInterviewersNotes(int socialDescriptionIndex) {
-        final String RESOURCE_KEY = name() + ".interviewerNote." + socialDescriptionIndex;
+    public String getInterviewersNotes(int ambitionDescriptionIndex) {
+        final String RESOURCE_KEY = name() + ".interviewerNote." + ambitionDescriptionIndex;
 
         return getFormattedTextAt(RESOURCE_BUNDLE, RESOURCE_KEY);
     }
@@ -249,29 +249,29 @@ public enum Social implements PersonalityTrait {
     // endregion Boolean Comparison Methods
 
     /**
-     * Converts the given string into an instance of the {@code Social} enum. The method tries to interpret the string
-     * as both a name of an enumeration constant and as an ordinal index. If neither interpretation succeeds, it logs an
-     * error and returns {@code NONE}.
+     * Converts the specified string into its corresponding Ambition enum value. The method attempts to interpret the
+     * string as either the name of an enum constant or an ordinal value of the enum. If the conversion fails, the
+     * method logs an error and returns the default value {@code NONE}.
      *
-     * @param text the string representation of the social; can be either the name of an enumeration constant or the
-     *             ordinal string.
+     * @param text the string to be converted into an Ambition enum value. It can be the name of the enum constant or
+     *             its ordinal value as a string.
      *
-     * @return the corresponding {@code Social} enum instance if the string is a valid name or ordinal; otherwise,
-     *       returns {@code NONE}.
+     * @return the corresponding Ambition enum constant if the string matches a name or ordinal value, otherwise
+     *       {@code NONE}.
      */
     // region File I/O
-    public static Social fromString(String text) {
+    public static Ambition fromString(String text) {
         try {
-            return Social.valueOf(text.toUpperCase().replace(" ", "_"));
+            return Ambition.valueOf(text.toUpperCase().replace(" ", "_"));
         } catch (Exception ignored) {}
 
         try {
-            return Social.values()[Integer.parseInt(text)];
+            return Ambition.values()[Integer.parseInt(text)];
         } catch (Exception ignored) {}
 
 
-        MMLogger logger = MMLogger.create(Social.class);
-        logger.error("Unknown Social ordinal: {} - returning {}.", text, NONE);
+        MMLogger logger = MMLogger.create(Ambition.class);
+        logger.error("Unknown Ambition ordinal: {} - returning {}.", text, NONE);
 
         return NONE;
     }

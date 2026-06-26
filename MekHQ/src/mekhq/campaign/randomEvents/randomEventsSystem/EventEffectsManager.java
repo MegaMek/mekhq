@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.randomEvents.prisoners;
+package mekhq.campaign.randomEvents.randomEventsSystem;
 
 import static java.lang.Math.ceil;
 import static java.lang.Math.max;
@@ -72,12 +72,7 @@ import mekhq.campaign.personnel.medical.InjurySPAUtility;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
-import mekhq.campaign.randomEvents.prisoners.enums.EventResultEffect;
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerEvent;
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
-import mekhq.campaign.randomEvents.prisoners.records.EventResult;
-import mekhq.campaign.randomEvents.prisoners.records.PrisonerEventData;
-import mekhq.campaign.randomEvents.prisoners.records.PrisonerResponseEntry;
+import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;

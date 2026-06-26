@@ -1032,9 +1032,8 @@ public class AdvancedReplacementLimbDialog extends JDialog {
             ActionCheckResult actionCheckResult =
                   surgeon.checkSkill(S_SURGERY, campaign)
                         .withMiscModifier(spaModifier)
-                        .resolve(isUseEdge, getTextAt(RESOURCE_BUNDLE,
-                              "AdvancedReplacementLimbDialog.skillCheck"), false);
-            campaign.addReport(SKILL_CHECKS, actionCheckResult.resultsText());
+                        .resolve(isUseEdge, getTextAt(RESOURCE_BUNDLE, "AdvancedReplacementLimbDialog.skillCheck"));
+            campaign.addReport(SKILL_CHECKS, actionCheckResult.getReport(false));
             if (actionCheckResult.isSuccess()) {
                 successfulSurgeries.add(surgery);
                 MedicalLogger.successfulSurgery(patient, campaign.getLocalDate(), surgery.type.toString());

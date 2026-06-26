@@ -210,8 +210,8 @@ public class AdvancedMedicalAlternateImplants {
         ActionCheckResult attributeCheckResult =
               person.checkAttributes(SkillAttribute.BODY, SkillAttribute.WILLPOWER)
                     .withMiscModifier(resistanceModifier)
-                    .resolve(true, getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.skillCheck.degradation"), false);
-        campaign.addReport(SKILL_CHECKS, attributeCheckResult.resultsText());
+                    .resolve(true, getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.skillCheck.degradation"));
+        campaign.addReport(SKILL_CHECKS, attributeCheckResult.getReport(false));
 
         if (!attributeCheckResult.isSuccess() && useAbilities) {
             String flaw = getAndApplyEIDegradationFlaw(person);

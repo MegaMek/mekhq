@@ -30,20 +30,22 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.randomEvents.prisoners.records;
-
-import java.util.List;
-
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerEvent;
+package mekhq.campaign.randomEvents.randomEventsSystem;
 
 /**
- * Represents data relevant to a random prisoner event, including its type, severity, and response map structure.
+ * Represents the collection of possible events related to prisoners in MekHQ.
  *
- * @param prisonerEvent   The type of prisoner event as a {@link PrisonerEvent}. This represents the name of the event.
- * @param responseEntries A list of {@link PrisonerResponseEntry} defining the responses and their associated qualities
- *                        and effects.
+ * <p>The {@code PrisonerEvent} enumeration is used to define various prisoner-related random
+ * events that can occur during a campaign. These events include interactions and behaviors among prisoners, as well as
+ * outcomes that can affect morale, resources, and the overall state of the campaign. Each event describes a unique
+ * scenario or theme triggered under certain circumstances.</p>
  */
-public record PrisonerEventData(
-      PrisonerEvent prisonerEvent,
-      List<PrisonerResponseEntry> responseEntries
-) {}
+public enum PrisonerEvent {
+    ARGUMENT, WILD_STORIES, TAMPERING, CONVERSATIONS, RATIONS, TRADE, DRAINED, RESCUE, REPAIRS,
+    SICKNESS, VETERAN, GRAFFITI, PRAYER, BARTERING, OFFICER, DICE, LOVERS, SOBBING, PROPAGANDA,
+    SONGS, REFUSE_RATIONS, PLOTTING, EQUIPMENT, PLANNED_RESCUE, MISTAKE, LETTER, ILLNESS,
+    DO_ANDROIDS_DREAM_OF_ELECTRONIC_SHEEP, HEAVY_METAL, PARANOIA, TUNNEL, PET_RODENT, ESCAPE_ROPE,
+    UNDERCOVER, BRAND, SILENCE, SINGING, PAPER, HOLIDAY, WHISPERS, LEADER, ARGUMENTS, SENTIMENTAL_ITEM,
+    MALNUTRITION, INJURIES, TERROR, SCREAMING, PHOTO, GHOSTS, VOICES, BREAKOUT, RIOT, MURDER, FIRE,
+    POISON, HOSTAGE, BOMB, EXECUTION, ABANDONED_TO_DIE, UNITED
+}
