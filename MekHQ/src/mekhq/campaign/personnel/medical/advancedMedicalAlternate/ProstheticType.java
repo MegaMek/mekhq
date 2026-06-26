@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.personnel.medical.advancedMedicalAlternate;
 
+import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.common.options.OptionsConstants.*;
@@ -1605,7 +1606,7 @@ public enum ProstheticType {
 
         // 7) Estimated recovery time
         int recoveryTime = (int) round(injuryType.getBaseRecoveryTime() * healingTimeMultiplier);
-        recoveryTime = min(recoveryTime, 1);
+        recoveryTime = max(recoveryTime, 1);
         tooltipPortion.add(getFormattedTextAt(RESOURCE_BUNDLE, "ProstheticType.tooltip.recovery", recoveryTime));
 
         // 8) Misc
