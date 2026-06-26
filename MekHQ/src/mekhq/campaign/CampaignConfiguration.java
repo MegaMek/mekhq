@@ -59,7 +59,7 @@ import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
-import mekhq.campaign.randomEvents.RandomEventLibraries;
+import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventLibraries;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.factionStanding.FactionStandingUltimatumsLibrary;
@@ -496,10 +496,6 @@ public class CampaignConfiguration {
 
     public void setCampaignOptions(CampaignOptions campaignOptions) {
         this.campaignOptions = campaignOptions;
-    }
-
-    public void setPersonnelMarket(PersonnelMarket personnelMarket) {
-        this.personnelMarket = personnelMarket;
     }
 
     public void setContractMarket(AbstractContractMarket contractMarket) {

@@ -33,29 +33,43 @@
 package mekhq.gui.view;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.estimateCargoRequirements;
+import static mekhq.campaign.universe.Factions.getFactionLogo;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ResourceBundle;
+import java.time.LocalDate;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
+import javax.swing.SwingConstants;
 
 import megamek.client.ui.util.UIUtil;
 import mekhq.MekHQ;
+import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.location.ILocation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
+import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.JScrollablePanel;
-import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.utilities.BriefingStyle;
 import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.utilities.ReportingUtilities;
@@ -66,6 +80,8 @@ import mekhq.utilities.ReportingUtilities;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MissionViewPanel extends JScrollablePanel {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.ContractViewPanel";
+
     private final Mission mission;
     protected CampaignGUI gui;
 
@@ -73,7 +89,6 @@ public class MissionViewPanel extends JScrollablePanel {
     protected JTextPane txtDesc;
 
     /* Basic Mission Parameters */
-    private JLabel lblStatus;
     private JPanel lblBelligerents;
     private JLabel lblLocation;
     private JLabel txtLocation;
@@ -98,9 +113,6 @@ public class MissionViewPanel extends JScrollablePanel {
     private JLabel lblSalvageValueEmployer;
     private JLabel txtSalvageValueEmployer;
     private JLabel txtDeploymentCoverage;
-
-    private final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractViewPanel",
-          MekHQ.getMHQOptions().getLocale());
 
     public MissionViewPanel(Mission m, CampaignGUI gui) {
         super();
@@ -137,7 +149,8 @@ public class MissionViewPanel extends JScrollablePanel {
     private void initComponents() {
         GridBagConstraints gridBagConstraints;
 
-        JPanel statsSection = BriefingStyle.createSectionPanel(mission.getName());
+        // The mission status is shown in the section's title border ("<name> - <status>") rather than as a row.
+        JPanel statsSection = BriefingStyle.createSectionPanel(mission.getName() + " - " + mission.getStatus());
         pnlStats = new JPanel();
         txtDesc = new JTextPane();
 
@@ -170,7 +183,6 @@ public class MissionViewPanel extends JScrollablePanel {
     }
 
     private void fillStatsBasic() {
-        lblStatus = new JLabel();
         lblBelligerents = new JPanel();
         lblLocation = new JLabel();
         txtLocation = new JLabel();
@@ -179,23 +191,11 @@ public class MissionViewPanel extends JScrollablePanel {
 
         pnlStats.setLayout(new GridBagLayout());
 
-        lblStatus.setName("lblOwner");
-        lblStatus.setText("<html><b>" + mission.getStatus() + "</b></html>");
-        lblStatus.setToolTipText(mission.getStatus().getToolTipText());
-        GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.insets = new Insets(0, 0, 5, 0);
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(lblStatus, gridBagConstraints);
+        GridBagConstraints gridBagConstraints;
 
         if ((null != mission.getSystemName(null)) && !mission.getSystemName(null).isEmpty()) {
             lblLocation.setName("lblLocation");
-            lblLocation.setText(resourceMap.getString("lblLocation.text"));
+            lblLocation.setText(getTextAt(RESOURCE_BUNDLE, "lblLocation.text"));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = 1;
@@ -225,9 +225,9 @@ public class MissionViewPanel extends JScrollablePanel {
             pnlStats.add(txtLocation, gridBagConstraints);
         }
 
-        if ((null != mission.getType()) && !mission.getType().isEmpty()) {
+        if ((null != mission.getContractTypeName()) && !mission.getContractTypeName().isEmpty()) {
             lblType.setName("lblType");
-            lblType.setText(resourceMap.getString("lblType.text"));
+            lblType.setText(getTextAt(RESOURCE_BUNDLE, "lblType.text"));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = 2;
@@ -236,7 +236,7 @@ public class MissionViewPanel extends JScrollablePanel {
             pnlStats.add(lblType, gridBagConstraints);
 
             txtType.setName("txtType");
-            txtType.setText(mission.getType());
+            txtType.setText(mission.getContractTypeName());
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = 2;
@@ -253,7 +253,6 @@ public class MissionViewPanel extends JScrollablePanel {
     private void fillStatsContract() {
         Contract contract = (Contract) mission;
 
-        lblStatus = new JLabel();
         lblLocation = new JLabel();
         txtLocation = new JLabel();
         lblEmployer = new JLabel();
@@ -274,23 +273,9 @@ public class MissionViewPanel extends JScrollablePanel {
         GridBagConstraints gridBagConstraints;
         pnlStats.setLayout(new GridBagLayout());
 
-        lblStatus.setName("lblOwner");
-        lblStatus.setText("<html><b>" + contract.getStatus() + "</b></html>");
-        lblStatus.setToolTipText(contract.getStatus().getToolTipText());
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.insets = new Insets(0, 0, 5, 0);
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(lblStatus, gridBagConstraints);
-
         if ((null != contract.getSystemName(null)) && !contract.getSystemName(null).isEmpty()) {
             lblLocation.setName("lblLocation");
-            lblLocation.setText(resourceMap.getString("lblLocation.text"));
+            lblLocation.setText(getTextAt(RESOURCE_BUNDLE, "lblLocation.text"));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = 1;
@@ -320,9 +305,9 @@ public class MissionViewPanel extends JScrollablePanel {
             pnlStats.add(txtLocation, gridBagConstraints);
         }
 
-        if ((null != contract.getEmployer()) && !contract.getEmployer().isEmpty()) {
+        if ((null != contract.getEmployerName()) && !contract.getEmployerName().isEmpty()) {
             lblEmployer.setName("lblEmployer");
-            lblEmployer.setText(resourceMap.getString("lblEmployer.text"));
+            lblEmployer.setText(getTextAt(RESOURCE_BUNDLE, "lblEmployer.text"));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = 2;
@@ -331,7 +316,7 @@ public class MissionViewPanel extends JScrollablePanel {
             pnlStats.add(lblEmployer, gridBagConstraints);
 
             txtEmployer.setName("txtEmployer");
-            txtEmployer.setText(contract.getEmployer());
+            txtEmployer.setText(contract.getEmployerName());
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = 2;
@@ -342,9 +327,9 @@ public class MissionViewPanel extends JScrollablePanel {
             pnlStats.add(txtEmployer, gridBagConstraints);
         }
 
-        if ((null != contract.getType()) && !contract.getType().isEmpty()) {
+        if ((null != contract.getContractTypeName()) && !contract.getContractTypeName().isEmpty()) {
             lblType.setName("lblType");
-            lblType.setText(resourceMap.getString("lblType.text"));
+            lblType.setText(getTextAt(RESOURCE_BUNDLE, "lblType.text"));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = 3;
@@ -353,7 +338,7 @@ public class MissionViewPanel extends JScrollablePanel {
             pnlStats.add(lblType, gridBagConstraints);
 
             txtType.setName("txtType");
-            txtType.setText(contract.getType());
+            txtType.setText(contract.getContractTypeName());
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = 3;
@@ -365,7 +350,7 @@ public class MissionViewPanel extends JScrollablePanel {
         }
 
         lblStartDate.setName("lblStartDate");
-        lblStartDate.setText(resourceMap.getString("lblStartDate.text"));
+        lblStartDate.setText(getTextAt(RESOURCE_BUNDLE, "lblStartDate.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
@@ -385,7 +370,7 @@ public class MissionViewPanel extends JScrollablePanel {
         pnlStats.add(txtStartDate, gridBagConstraints);
 
         lblEndDate.setName("lblEndDate");
-        lblEndDate.setText(resourceMap.getString("lblEndDate.text"));
+        lblEndDate.setText(getTextAt(RESOURCE_BUNDLE, "lblEndDate.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 5;
@@ -405,7 +390,7 @@ public class MissionViewPanel extends JScrollablePanel {
         pnlStats.add(txtEndDate, gridBagConstraints);
 
         lblPayout.setName("lblPayout");
-        lblPayout.setText(resourceMap.getString("lblPayout.text"));
+        lblPayout.setText(getTextAt(RESOURCE_BUNDLE, "lblPayout.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 6;
@@ -425,7 +410,7 @@ public class MissionViewPanel extends JScrollablePanel {
         pnlStats.add(txtPayout, gridBagConstraints);
 
         lblCommand.setName("lblCommand");
-        lblCommand.setText(resourceMap.getString("lblCommand.text"));
+        lblCommand.setText(getTextAt(RESOURCE_BUNDLE, "lblCommand.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 7;
@@ -446,7 +431,7 @@ public class MissionViewPanel extends JScrollablePanel {
         pnlStats.add(txtCommand, gridBagConstraints);
 
         lblBLC.setName("lblBLC");
-        lblBLC.setText(resourceMap.getString("lblBLC.text"));
+        lblBLC.setText(getTextAt(RESOURCE_BUNDLE, "lblBLC.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 8;
@@ -455,7 +440,7 @@ public class MissionViewPanel extends JScrollablePanel {
         pnlStats.add(lblBLC, gridBagConstraints);
 
         txtBLC.setName("txtBLC");
-        txtBLC.setText(contract.getBattleLossComp() + "%");
+        txtBLC.setText(contract.getBattleLossCompensation() + "%");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 8;
@@ -466,7 +451,7 @@ public class MissionViewPanel extends JScrollablePanel {
         pnlStats.add(txtBLC, gridBagConstraints);
 
         int i = 9;
-        lblSalvageValueMerc = new JLabel(resourceMap.getString("lblSalvageValueMerc.text"));
+        lblSalvageValueMerc = new JLabel(getTextAt(RESOURCE_BUNDLE, "lblSalvageValueMerc.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = i;
@@ -484,7 +469,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtSalvageValueMerc, gridBagConstraints);
         i++;
-        lblSalvageValueEmployer = new JLabel(resourceMap.getString("lblSalvageValueEmployer.text"));
+        lblSalvageValueEmployer = new JLabel(getTextAt(RESOURCE_BUNDLE, "lblSalvageValueEmployer.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = i;
@@ -503,16 +488,16 @@ public class MissionViewPanel extends JScrollablePanel {
         pnlStats.add(txtSalvageValueEmployer, gridBagConstraints);
         i++;
 
-        JLabel lblSalvagePct1 = new JLabel(resourceMap.getString("lblSalvage.text"));
+        JLabel lblSalvagePct1 = new JLabel(getTextAt(RESOURCE_BUNDLE, "lblSalvage.text"));
         JLabel lblSalvagePct2 = new JLabel();
 
         if (contract.isSalvageExchange()) {
-            lblSalvagePct2.setText(resourceMap.getString("exchange") + " (" + contract.getSalvagePct() + "%)");
-        } else if (contract.getSalvagePct() == 0) {
-            lblSalvagePct2.setText(resourceMap.getString("none"));
+            lblSalvagePct2.setText(getTextAt(RESOURCE_BUNDLE, "exchange") + " (" + contract.getSalvagePercent() + "%)");
+        } else if (contract.getSalvagePercent() == 0) {
+            lblSalvagePct2.setText(getTextAt(RESOURCE_BUNDLE, "none"));
         } else {
-            lblSalvagePct1.setText(resourceMap.getString("lblSalvagePct.text"));
-            int maxSalvagePct = contract.getSalvagePct();
+            lblSalvagePct1.setText(getTextAt(RESOURCE_BUNDLE, "lblSalvagePct.text"));
+            int maxSalvagePct = contract.getSalvagePercent();
 
             int currentSalvagePct = contract.getCurrentSalvagePct();
 
@@ -552,20 +537,9 @@ public class MissionViewPanel extends JScrollablePanel {
 
         // TODO : Switch me to use IUnitRating
         String[] ratingNames = { "F", "D", "C", "B", "A" };
-        lblStatus = new JLabel();
         lblLocation = new JLabel();
         txtLocation = new JLabel();
-        lblEmployer = new JLabel();
-        txtEmployer = new JLabel();
         /* AtB Contract Parameters */
-        JLabel lblEnemy = new JLabel();
-        JLabel txtEnemy = new JLabel();
-        lblType = new JLabel();
-        txtType = new JLabel();
-        lblStartDate = new JLabel();
-        txtStartDate = new JLabel();
-        lblEndDate = new JLabel();
-        txtEndDate = new JLabel();
         lblPayout = new JLabel();
         txtPayout = new JLabel();
         lblCommand = new JLabel();
@@ -592,41 +566,20 @@ public class MissionViewPanel extends JScrollablePanel {
 
         int y = 0;
 
-        lblStatus.setName("lblOwner");
-        lblStatus.setText("<html><b>" + contract.getStatus() + "</b></html>");
-        lblStatus.setToolTipText(contract.getStatus().getToolTipText());
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.insets = new Insets(0, 0, 5, 0);
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(lblStatus, gridBagConstraints);
+        // === Header: belligerents (the status is shown in the section's title border). The employer and enemy
+        // faction names are shown as tooltips on their logos (employer left, enemy right) rather than as their own
+        // label rows, to save vertical space.
+        final String employerTooltip = getFormattedTextAt(RESOURCE_BUNDLE, "belligerents.employer.tooltip",
+              contract.getEmployerName(campaign.getGameYear()));
+        final String enemyTooltip = getFormattedTextAt(RESOURCE_BUNDLE, "belligerents.enemy.tooltip",
+              contract.getEnemyBotName());
+        lblBelligerents = getBelligerentsPanel(contract, gui.getCampaign().getGameYear(), employerTooltip,
+              enemyTooltip);
+        addHeaderRow(lblBelligerents, y++, GridBagConstraints.NORTH);
 
-        lblBelligerents = contract.getBelligerentsPanel(gui.getCampaign().getGameYear());
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy++;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.insets = new Insets(0, 0, 5, 0);
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTH;
-        pnlStats.add(lblBelligerents, gridBagConstraints);
-
+        // === Identity: the orienting facts (where, who) ===
         lblLocation.setName("lblLocation");
-        lblLocation.setText(resourceMap.getString("lblLocation.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(lblLocation, gridBagConstraints);
-
+        lblLocation.setText(getTextAt(RESOURCE_BUNDLE, "lblLocation.text"));
         txtLocation.setName("txtLocation");
         String systemName = contract.getSystemName(campaign.getLocalDate());
         txtLocation.setText(String.format("<html><a href='#'>%s</a></html>", systemName));
@@ -639,344 +592,148 @@ public class MissionViewPanel extends JScrollablePanel {
                 gui.setSelectedTab(gui.getNavigationTab());
             }
         });
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(txtLocation, gridBagConstraints);
+        addStatRow(lblLocation, txtLocation, y++);
 
-        lblEmployer.setName("lblEmployer");
-        lblEmployer.setText(resourceMap.getString("lblEmployer.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(lblEmployer, gridBagConstraints);
+        // === Dashboard: all gauges grouped together, most important first ===
+        // Enemy morale (always shown for AtB contracts).
+        final MoraleBar.MoraleDisplay moraleDisplay = MoraleBar.getMoraleDisplay(contract);
+        MoraleBar moraleBar = new MoraleBar(contract.getMoraleLevel(), moraleDisplay.label());
+        moraleBar.setToolTipText(wordWrap(moraleDisplay.tooltip()));
+        addGaugeRow(moraleBar, y++);
 
-        txtEmployer.setName("txtEmployer");
-        txtEmployer.setText(contract.getEmployerName(campaign.getGameYear()));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(txtEmployer, gridBagConstraints);
+        final boolean useStratCon = campaign.getCampaignOptions().isUseStratCon();
+        if (useStratCon) {
+            // Victory points gauge, or a text fallback when there is no positive target.
+            int currentScore = contract.getContractScore(campaign.getCampaignOptions().isUseStratConMaplessMode());
+            int neededScore = contract.getRequiredVictoryPoints();
+            if (neededScore > 0) {
+                final boolean canEndEarly = (contract.getStratConCampaignState() == null) ||
+                                                  contract.getStratConCampaignState().allowEarlyVictory();
+                addGaugeRow(ContractMeterBar.victoryPoints(currentScore, neededScore, canEndEarly), y++);
+            } else {
+                lblScore.setName("lblScore");
+                lblScore.setText(getTextAt(RESOURCE_BUNDLE, "lblScore.text"));
+                txtScore.setName("txtScore");
+                txtScore.setText(currentScore + " / " + neededScore);
+                addStatRow(lblScore, txtScore, y++);
+            }
 
-        lblEnemy.setName("lblEnemy");
-        lblEnemy.setText(resourceMap.getString("lblEnemy.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(lblEnemy, gridBagConstraints);
+            // Support points gauge, or a text fallback when there is no positive reserve.
+            int currentSupportPoints = contract.getCurrentSupportPoints();
+            int maximumSupportPoints = contract.getMaximumSupportPoints();
+            if (maximumSupportPoints > 0) {
+                addGaugeRow(ContractMeterBar.supportPoints(currentSupportPoints, maximumSupportPoints), y++);
+            } else {
+                lblSupportPoints.setName("lblSupportPoints");
+                lblSupportPoints.setText(getTextAt(RESOURCE_BUNDLE, "lblSupportPoints.text"));
+                txtSupport.setName("txtSupport");
+                txtSupport.setText(Integer.toString(currentSupportPoints));
+                addStatRow(lblSupportPoints, txtSupport, y++);
+            }
+        }
 
-        txtEnemy.setName("txtEnemy");
-        txtEnemy.setText(contract.getEnemyBotName());
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(txtEnemy, gridBagConstraints);
+        // Salvage gauge for a normal salvage percentage; the exchange / no-salvage cases are shown as text among the
+        // reference terms below.
+        final boolean salvageIsMeter = !contract.isSalvageExchange() && (contract.getSalvagePercent() > 0);
+        if (salvageIsMeter) {
+            addGaugeRow(ContractMeterBar.salvage(contract.getCurrentSalvagePct(), contract.getSalvagePercent()), y++);
+        }
 
-        lblType.setName("lblType");
-        lblType.setText(resourceMap.getString("lblType.text"));
-        lblType.setToolTipText(contract.getContractType().getToolTipText());
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(lblType, gridBagConstraints);
+        // Contract timeline: a neutral progress gauge from start to end with a marker for today, shown once the
+        // contract is active and the player has landed at the destination. Contracts that have not started yet, are
+        // still in transit, or have been completed keep the compact dates row instead.
+        final String startLabel = MekHQ.getMHQOptions().getDisplayFormattedDate(contract.getStartDate());
+        final String endLabel = MekHQ.getMHQOptions().getDisplayFormattedDate(contract.getEndingDate());
+        if (shouldShowContractTimeline(campaign, contract)) {
+            final String todayLabel = MekHQ.getMHQOptions().getDisplayFormattedDate(campaign.getLocalDate());
+            addGaugeRow(ContractMeterBar.timeline(contract.getStartDate(), contract.getEndingDate(),
+                  campaign.getLocalDate(), startLabel, endLabel, todayLabel), y++);
+        } else {
+            JLabel lblDates = new JLabel(getTextAt(RESOURCE_BUNDLE, "lblDates.text"));
+            JLabel txtDates = new JLabel(startLabel + " \u2013 " + endLabel);
+            final String timelineFallbackTooltip = contractTimelineFallbackTooltip(campaign, contract);
+            lblDates.setToolTipText(timelineFallbackTooltip);
+            txtDates.setToolTipText(timelineFallbackTooltip);
+            addStatRow(lblDates, txtDates, y++);
+        }
 
-        txtType.setName("txtType");
-        txtType.setText(contract.getType());
-        txtType.setToolTipText(contract.getContractType().getToolTipText());
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(txtType, gridBagConstraints);
-
+        // === Reference terms: the static contract details ===
         lblAllyRating.setName("lblAllyRating");
-        lblAllyRating.setText(resourceMap.getString("lblAllyRating.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(lblAllyRating, gridBagConstraints);
-
+        lblAllyRating.setText(getTextAt(RESOURCE_BUNDLE, "lblAllyRating.text"));
         txtAllyRating.setName("txtAllyRating");
         txtAllyRating.setText(contract.getAllySkill() + "/" + ratingNames[contract.getAllyQuality()]);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(txtAllyRating, gridBagConstraints);
+        addStatRow(lblAllyRating, txtAllyRating, y++);
 
         lblEnemyRating.setName("lblEnemyRating");
-        lblEnemyRating.setText(resourceMap.getString("lblEnemyRating.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(lblEnemyRating, gridBagConstraints);
-
+        lblEnemyRating.setText(getTextAt(RESOURCE_BUNDLE, "lblEnemyRating.text"));
         txtEnemyRating.setName("txtEnemyRating");
         txtEnemyRating.setText(contract.getEnemySkill() + "/" + ratingNames[contract.getEnemyQuality()]);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(txtEnemyRating, gridBagConstraints);
-
-        lblStartDate.setName("lblStartDate");
-        lblStartDate.setText(resourceMap.getString("lblStartDate.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(lblStartDate, gridBagConstraints);
-
-        txtStartDate.setName("txtStartDate");
-        txtStartDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(contract.getStartDate()));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(txtStartDate, gridBagConstraints);
-
-        lblEndDate.setName("lblEndDate");
-        lblEndDate.setText(resourceMap.getString("lblEndDate.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(lblEndDate, gridBagConstraints);
-
-        txtEndDate.setName("txtEndDate");
-        txtEndDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(contract.getEndingDate()));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(txtEndDate, gridBagConstraints);
+        addStatRow(lblEnemyRating, txtEnemyRating, y++);
 
         lblPayout.setName("lblPayout");
-        lblPayout.setText(resourceMap.getString("lblPayout.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(lblPayout, gridBagConstraints);
-
+        lblPayout.setText(getTextAt(RESOURCE_BUNDLE, "lblPayout.text"));
         txtPayout.setName("txtPayout");
         txtPayout.setText(contract.getMonthlyPayOut().toAmountAndSymbolString());
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(txtPayout, gridBagConstraints);
+        addStatRow(lblPayout, txtPayout, y++);
 
         lblCommand.setName("lblCommand");
-        lblCommand.setText(resourceMap.getString("lblCommand.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(lblCommand, gridBagConstraints);
-
+        lblCommand.setText(getTextAt(RESOURCE_BUNDLE, "lblCommand.text"));
         txtCommand.setName("txtCommand");
         txtCommand.setText(contract.getCommandRights().toString());
         txtCommand.setToolTipText(wordWrap(contract.getCommandRights().getToolTipText()));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(txtCommand, gridBagConstraints);
+        addStatRow(lblCommand, txtCommand, y++);
 
         lblBLC.setName("lblBLC");
-        lblBLC.setText(resourceMap.getString("lblBLC.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(lblBLC, gridBagConstraints);
-
+        lblBLC.setText(getTextAt(RESOURCE_BUNDLE, "lblBLC.text"));
         txtBLC.setName("txtBLC");
-        txtBLC.setText(contract.getBattleLossComp() + "%");
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(txtBLC, gridBagConstraints);
+        txtBLC.setText(contract.getBattleLossCompensation() + "%");
+        addStatRow(lblBLC, txtBLC, y++);
 
-        lblSalvageValueMerc = new JLabel(resourceMap.getString("lblSalvageValueMerc.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(lblSalvageValueMerc, gridBagConstraints);
-
+        lblSalvageValueMerc = new JLabel(getTextAt(RESOURCE_BUNDLE, "lblSalvageValueMerc.text"));
         txtSalvageValueMerc = new JLabel();
         txtSalvageValueMerc.setText(contract.getSalvagedByUnit().toAmountAndSymbolString());
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(txtSalvageValueMerc, gridBagConstraints);
+        addStatRow(lblSalvageValueMerc, txtSalvageValueMerc, y++);
 
-        lblSalvageValueEmployer = new JLabel(resourceMap.getString("lblSalvageValueEmployer.text"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(lblSalvageValueEmployer, gridBagConstraints);
-
+        lblSalvageValueEmployer = new JLabel(getTextAt(RESOURCE_BUNDLE, "lblSalvageValueEmployer.text"));
         txtSalvageValueEmployer = new JLabel();
         txtSalvageValueEmployer.setText(contract.getSalvagedByEmployer().toAmountAndSymbolString());
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(txtSalvageValueEmployer, gridBagConstraints);
+        addStatRow(lblSalvageValueEmployer, txtSalvageValueEmployer, y++);
 
-        JLabel lblSalvagePct = new JLabel(resourceMap.getString("lblSalvage.text"));
-        JLabel txtSalvagePct = new JLabel();
-        txtSalvagePct.setName("txtSalvagePct");
-
-        if (contract.isSalvageExchange()) {
-            txtSalvagePct.setText(resourceMap.getString("exchange") + " (" + contract.getSalvagePct() + "%)");
-        } else if (contract.getSalvagePct() == 0) {
-            txtSalvagePct.setText(resourceMap.getString("none"));
-        } else {
-            lblSalvagePct.setText(resourceMap.getString("lblSalvagePct.text"));
-            int maxSalvagePct = contract.getSalvagePct();
-
-            int currentSalvagePct = contract.getCurrentSalvagePct();
-
-            txtSalvagePct.setText(currentSalvagePct + "% (max " + maxSalvagePct + "%)");
+        // Salvage as text for the exchange / no-salvage cases (the normal case is the gauge in the dashboard above).
+        if (!salvageIsMeter) {
+            JLabel lblSalvagePct = new JLabel(getTextAt(RESOURCE_BUNDLE, "lblSalvage.text"));
+            JLabel txtSalvagePct = new JLabel();
+            txtSalvagePct.setName("txtSalvagePct");
+            if (contract.isSalvageExchange()) {
+                txtSalvagePct.setText(getTextAt(RESOURCE_BUNDLE, "exchange") + " (" + contract.getSalvagePercent() + "%)");
+            } else {
+                txtSalvagePct.setText(getTextAt(RESOURCE_BUNDLE, "none"));
+            }
+            addStatRow(lblSalvagePct, txtSalvagePct, y++);
         }
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(lblSalvagePct, gridBagConstraints);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(txtSalvagePct, gridBagConstraints);
 
         if (campaign.getCampaignOptions().isUseShareSystem()) {
             lblSharePct.setName("lblSharePct");
-            lblSharePct.setText(resourceMap.getString("lblSharePct.text"));
+            lblSharePct.setText(getTextAt(RESOURCE_BUNDLE, "lblSharePct.text"));
             lblSharePct.setToolTipText(wordWrap(contract.getMoraleLevel().getToolTipText()));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = y;
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlStats.add(lblSharePct, gridBagConstraints);
-
             txtSharePct.setName("txtSharePct");
             txtSharePct.setText(contract.getSharesPercent() + "%");
             txtSharePct.setToolTipText(wordWrap(contract.getMoraleLevel().getToolTipText()));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = y++;
-            gridBagConstraints.weightx = 0.5;
-            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlStats.add(txtSharePct, gridBagConstraints);
+            addStatRow(lblSharePct, txtSharePct, y++);
         }
 
-        if (campaign.getCampaignOptions().isUseStratCon()) {
+        if (useStratCon) {
             lblCargoRequirement.setName("lblCargoRequirement");
-            lblCargoRequirement.setText(resourceMap.getString("lblCargoRequirement.text"));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = y;
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlStats.add(lblCargoRequirement, gridBagConstraints);
-
+            lblCargoRequirement.setText(getTextAt(RESOURCE_BUNDLE, "lblCargoRequirement.text"));
             txtCargoRequirement.setName("txtCargoRequirement");
             txtCargoRequirement.setText("~" + estimateCargoRequirements(campaign, contract) + 't');
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = y++;
-            gridBagConstraints.weightx = 0.5;
-            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlStats.add(txtCargoRequirement, gridBagConstraints);
+            addStatRow(lblCargoRequirement, txtCargoRequirement, y++);
 
             if (contract.isActiveOn(campaign.getLocalDate())) {
-                String deploymentCoverageTooltip = wordWrap(resourceMap.getString("txtDeploymentCoverage.tooltip"));
+                String deploymentCoverageTooltip = wordWrap(getTextAt(RESOURCE_BUNDLE, "txtDeploymentCoverage.tooltip"));
                 lblDeploymentCoverage.setName("lblDeploymentCoverage");
-                lblDeploymentCoverage.setText(resourceMap.getString("lblDeploymentCoverage.text"));
+                lblDeploymentCoverage.setText(getTextAt(RESOURCE_BUNDLE, "lblDeploymentCoverage.text"));
                 lblDeploymentCoverage.setToolTipText(deploymentCoverageTooltip);
-                gridBagConstraints = new GridBagConstraints();
-                gridBagConstraints.gridx = 0;
-                gridBagConstraints.gridy = y;
-                gridBagConstraints.fill = GridBagConstraints.NONE;
-                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-                pnlStats.add(lblDeploymentCoverage, gridBagConstraints);
 
                 int assignedCombatElements = RequiredLancesTableModel.getAssignedCombatElementCount(campaign, contract);
                 int requiredCombatElements = contract.getRequiredCombatElements();
@@ -988,86 +745,176 @@ public class MissionViewPanel extends JScrollablePanel {
                 } else {
                     txtDeploymentCoverage.setForeground(MekHQ.getMHQOptions().getFontColorPositive());
                 }
-                gridBagConstraints = new GridBagConstraints();
-                gridBagConstraints.gridx = 1;
-                gridBagConstraints.gridy = y++;
-                gridBagConstraints.weightx = 0.5;
-                gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-                gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-                pnlStats.add(txtDeploymentCoverage, gridBagConstraints);
+                addStatRow(lblDeploymentCoverage, txtDeploymentCoverage, y++);
             }
-
-            lblScore.setName("lblScore");
-            lblScore.setText(resourceMap.getString("lblScore.text"));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = y;
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlStats.add(lblScore, gridBagConstraints);
-
-            txtScore.setName("txtScore");
-            int currentScore = contract.getContractScore(campaign.getCampaignOptions().isUseStratConMaplessMode());
-            int neededScore = contract.getRequiredVictoryPoints();
-            String earlyContractEnd = "";
-            if (contract.getStratconCampaignState() != null &&
-                      !contract.getStratconCampaignState().allowEarlyVictory()) {
-                earlyContractEnd = " " + resourceMap.getString("lblNoEarlyEnd.text");
-            }
-            txtScore.setText(currentScore + " / " + neededScore + earlyContractEnd);
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = y++;
-            gridBagConstraints.weightx = 0.5;
-            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlStats.add(txtScore, gridBagConstraints);
-
-            lblSupportPoints.setName("lblSupportPoints");
-            lblSupportPoints.setText(resourceMap.getString("lblSupportPoints.text"));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = y;
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlStats.add(lblSupportPoints, gridBagConstraints);
-
-            txtSupport.setName("txtSupport");
-            txtSupport.setText(Integer.toString(contract.getCurrentSupportPoints()));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = y++;
-            gridBagConstraints.weightx = 0.5;
-            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlStats.add(txtSupport, gridBagConstraints);
         }
 
         addDescriptionPane(contract.getDescription(), y++, 0.0);
 
-        // Enemy morale is shown as a labelled gauge at the very bottom of the panel, after the contract description.
-        // This (always-present) row carries the panel's vertical weight so the contract stats stay anchored to the top
-        // rather than centering; SOUTHWEST anchoring keeps the fixed-height gauge pinned to the bottom of that row, so
-        // any extra vertical space falls above the gauge instead of below it.
-        final MoraleBar.MoraleDisplay moraleDisplay = MoraleBar.getMoraleDisplay(contract);
-        final String moraleText = moraleDisplay.label();
-        final String moraleTooltip = moraleDisplay.tooltip();
-
-        MoraleBar moraleBar = new MoraleBar(contract.getMoraleLevel(), moraleText);
-        moraleBar.setToolTipText(wordWrap(moraleTooltip));
+        // A trailing vertical glue absorbs any extra height so every row stays anchored to the top of the panel,
+        // regardless of which optional rows (and the variable-height description) are present.
+        JPanel verticalGlue = new JPanel();
+        verticalGlue.setOpaque(false);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new Insets(UIUtil.scaleForGUI(6), 0, 2, 0);
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.SOUTHWEST;
-        pnlStats.add(moraleBar, gridBagConstraints);
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        pnlStats.add(verticalGlue, gridBagConstraints);
+    }
+
+    static boolean shouldShowContractTimeline(Campaign campaign, Contract contract) {
+        final AbstractLocation currentLocation = campaign.getCurrentLocation();
+        if (currentLocation == ILocation.NO_LOCATION) {
+            return false;
+        }
+
+        final PlanetarySystem currentSystem = currentLocation.getCurrentSystem();
+        final PlanetarySystem contractSystem = contract.getSystem();
+        return contract.isActiveOn(campaign.getLocalDate()) &&
+                     (currentLocation != null) && currentLocation.isOnPlanet() &&
+                     (currentSystem != null) && (contractSystem != null) &&
+                     currentSystem.getId().equals(contractSystem.getId());
+    }
+
+    static String contractTimelineFallbackTooltip(Campaign campaign, Contract contract) {
+        final String contractLocation = contract.getSystemName(campaign.getLocalDate());
+        final String currentLocation = currentLocationDescription(campaign);
+        return wordWrap(getFormattedTextAt(RESOURCE_BUNDLE, "contractTimelineBar.fallback.tooltip", contractLocation,
+              currentLocation));
+    }
+
+    static String currentLocationDescription(Campaign campaign) {
+        final AbstractLocation currentLocation = campaign.getCurrentLocation();
+        if (currentLocation == ILocation.NO_LOCATION) {
+            return getTextAt(RESOURCE_BUNDLE, "contractTimelineBar.location.unknown");
+        }
+
+        final PlanetarySystem currentSystem = currentLocation.getCurrentSystem();
+        final LocalDate currentDate = campaign.getLocalDate();
+        if (currentLocation.isOnPlanet()) {
+            final Planet currentPlanet = currentLocation.getPlanet();
+            final String planetName = (currentPlanet == null) ? currentSystem.getPrintableName(currentDate) :
+                                            currentPlanet.getPrintableName(currentDate);
+            return getFormattedTextAt(RESOURCE_BUNDLE, "contractTimelineBar.location.landed", planetName);
+        }
+
+        final String systemName = currentSystem.getPrintableName(currentDate);
+        final String locationKey = currentLocation.isAtJumpPoint() ? "contractTimelineBar.location.jumpPoint" :
+                                         "contractTimelineBar.location.inTransit";
+        return getFormattedTextAt(RESOURCE_BUNDLE, locationKey, systemName);
+    }
+
+    /**
+     * Creates and returns a {@link JPanel} containing the belligerent factions' logos for the specified game year.
+     *
+     * <p>This panel displays the employer and enemy faction logos side by side, separated by a styled divider.
+     * The logos are determined based on the provided game year and faction codes, scaled appropriately for the
+     * GUI.</p>
+     *
+     * @param gameYear        the year used to determine which faction logos to display
+     * @param employerTooltip the tooltip to show on the employer (left) logo, or {@code null} for none
+     * @param enemyTooltip    the tooltip to show on the enemy (right) logo, or {@code null} for none
+     *
+     * @return a {@link JPanel} with the employer and enemy faction logos, with a divider in between
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    private JPanel getBelligerentsPanel(AtBContract contract, int gameYear, String employerTooltip,
+          String enemyTooltip) {
+        final int SIZE = 64;
+
+        String employer = contract.getEmployerCode();
+        ImageIcon employerImage = getFactionLogo(gameYear, employer);
+        employerImage = scaleImageIcon(employerImage, SIZE, true);
+        JLabel employerLabel = new JLabel(employerImage);
+        employerLabel.setToolTipText(employerTooltip);
+
+        JLabel divider = new JLabel("/");
+        divider.setHorizontalAlignment(SwingConstants.CENTER);
+        int fontSize = scaleForGUI(SIZE); // scaleImageIcon already includes the necessary scaling
+        divider.setFont(new Font(Font.MONOSPACED, Font.PLAIN, fontSize));
+        divider.setForeground(new Color(0, 0, 0, 128));
+
+        String enemy = contract.getEnemyCode();
+        ImageIcon enemyImage = getFactionLogo(gameYear, enemy);
+        enemyImage = scaleImageIcon(enemyImage, SIZE, true);
+        JLabel enemyLabel = new JLabel(enemyImage);
+        enemyLabel.setToolTipText(enemyTooltip);
+
+        JPanel panel = new JPanel(new FlowLayout());
+        panel.add(employerLabel);
+        panel.add(divider);
+        panel.add(enemyLabel);
+
+        return panel;
+    }
+
+    /**
+     * Adds a standard two-column stat row: {@code label} in the left column and {@code value} in the right.
+     *
+     * @param label the label component (left column)
+     * @param value the value component (right column)
+     * @param gridY the grid row to place them on
+     */
+    private void addStatRow(JComponent label, JComponent value, int gridY) {
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = gridY;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        pnlStats.add(label, gbc);
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = gridY;
+        gbc.weightx = 0.5;
+        gbc.insets = new Insets(0, 10, 0, 0);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        pnlStats.add(value, gbc);
+    }
+
+    /**
+     * Adds a component that spans both stat columns and is not part of the label/value grid (currently the belligerents
+     * panel).
+     *
+     * @param component the component to add
+     * @param gridY     the grid row to place it on
+     * @param anchor    the {@link GridBagConstraints} anchor used to position the component within its row
+     */
+    private void addHeaderRow(JComponent component, int gridY, int anchor) {
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = gridY;
+        gbc.gridwidth = 2;
+        gbc.weightx = 1.0;
+        gbc.insets = new Insets(0, 0, 5, 0);
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = anchor;
+        pnlStats.add(component, gbc);
+    }
+
+    /**
+     * Adds a full-width gauge spanning both stat columns, with uniform spacing so the dashboard gauges read as a
+     * group.
+     *
+     * @param gauge the gauge component to add
+     * @param gridY the grid row to place it on
+     */
+    private void addGaugeRow(JComponent gauge, int gridY) {
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = gridY;
+        gbc.gridwidth = 2;
+        gbc.weightx = 1.0;
+        gbc.insets = new Insets(UIUtil.scaleForGUI(1), 0, UIUtil.scaleForGUI(1), 0);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        pnlStats.add(gauge, gbc);
     }
 
     private void addDescriptionPane(String description, int gridY, double weighty) {

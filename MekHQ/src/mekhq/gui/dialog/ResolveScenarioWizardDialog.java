@@ -90,7 +90,7 @@ import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.ScenarioObjectiveProcessor;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
+import mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle;
 import mekhq.campaign.stratCon.StratConRulesManager;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
@@ -220,7 +220,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         if (tracker.getMission() instanceof Contract contract) {
             salvageEmployer = contract.getSalvagedByEmployer();
             salvageUnit = contract.getSalvagedByUnit();
-            maxSalvagePct = contract.getSalvagePct();
+            maxSalvagePct = contract.getSalvagePercent();
 
             currentSalvagePct = Contract.calculateSalvagePercentage(salvageUnit, salvageEmployer);
         }
@@ -1962,7 +1962,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         }
         PersonViewPanel personViewPanel = new PersonViewPanel(person,
               tracker.getCampaign(),
-              tracker.getCampaign().getApp().getCampaigngui());
+              tracker.getCampaign().getGUI());
         final JDialog dialog = new JDialog(frame, isPrisoner ? "Prisoner View" : "Personnel View", true);
         dialog.getContentPane().setLayout(new GridBagLayout());
 

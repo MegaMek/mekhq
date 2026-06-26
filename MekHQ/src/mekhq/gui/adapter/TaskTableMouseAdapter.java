@@ -47,6 +47,7 @@ import javax.swing.JTable;
 
 import megamek.common.rolls.TargetRoll;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.events.AcquisitionEvent;
 import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.events.parts.PartModeChangedEvent;
@@ -54,6 +55,7 @@ import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.AmmoBin;
+import mekhq.campaign.parts.meks.MekLocation;
 import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -61,7 +63,9 @@ import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.WorkTime;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.dialog.QuickStripDialog;
 import mekhq.gui.model.TaskTableModel;
+import mekhq.service.mrms.MRMSService;
 
 public class TaskTableMouseAdapter extends JPopupMenuAdapter {
     //region Variable Declarations
@@ -99,22 +103,33 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
             parts[i] = taskModel.getTaskAt(taskTable.convertRowIndexToModel(rows[i]));
         }
 
+        Campaign campaign = gui.getCampaign();
         if (command.equalsIgnoreCase("SCRAP")) {
             for (IPartWork p : parts) {
-                if (!(p instanceof Part)) {
+                if (!(p instanceof Part part)) {
                     continue;
                 }
 
-                if (((Part) p).checkScrappable() != null) {
-                    JOptionPane.showMessageDialog(gui.getFrame(), ((Part) p).checkScrappable(), "Cannot scrap part",
+                if (part instanceof MekLocation && part.onBadHipOrShoulder() && !part.isSalvaging()) {
+                    boolean runMRMS = new QuickStripDialog(campaign).wasConfirmed();
+                    if (runMRMS) {
+                        MRMSService.performSingleLocationMRMS(campaign, part.getUnit(), part);
+                    }
+
+                    return;
+                }
+
+                if (part.checkScrappable() != null) {
+                    JOptionPane.showMessageDialog(gui.getFrame(), part.checkScrappable(),
+                          getTextAt(RESOURCE_BUNDLE, "TaskTableMouseAdapter.scrap"),
                           JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 Unit u = p.getUnit();
-                gui.getCampaign().addReport(TECHNICAL, ((Part) p).scrap());
-                ((Part) p).setSkillMin(SkillType.EXP_GREEN);
+                campaign.addReport(TECHNICAL, part.scrap());
+                part.setSkillMin(SkillType.EXP_GREEN);
                 if ((u != null) && !u.isRepairable() && !u.hasSalvageableParts()) {
-                    gui.getCampaign().removeUnit(u.getId());
+                    campaign.removeUnit(u.getId());
                 }
                 MekHQ.triggerEvent(new UnitChangedEvent(u));
             }

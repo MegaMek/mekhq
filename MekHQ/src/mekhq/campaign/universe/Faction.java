@@ -63,7 +63,9 @@ public class Faction {
     public static final String MERCENARY_FACTION_CODE = "MERC";
     public static final String PIRATE_FACTION_CODE = "PIR";
     public static final String COMSTAR_FACTION_CODE = "CS";
+    public static final String WORD_OF_BLAKE_FACTION_CODE = "WOB";
     public static final String TORTUGA_DOMINIONS_FACTION_CODE = "TD";
+    public static final String INDEPENDENT_FACTION_CODE = "IND";
 
     private Faction2 faction2;
 
@@ -463,11 +465,11 @@ public class Faction {
     }
 
     public boolean isComStar() {
-        return "CS".equals(getShortName());
+        return COMSTAR_FACTION_CODE.equals(getShortName());
     }
 
     public boolean isWoB() {
-        return "WOB".equals(getShortName());
+        return WORD_OF_BLAKE_FACTION_CODE.equals(getShortName());
     }
 
     public boolean isComStarOrWoB() {

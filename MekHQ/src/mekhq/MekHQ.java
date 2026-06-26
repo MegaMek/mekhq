@@ -49,6 +49,7 @@ import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import javax.swing.InputMap;
 import javax.swing.JOptionPane;
@@ -99,7 +100,6 @@ import megamek.common.planetaryConditions.PlanetaryConditions;
 import megamek.logging.MMLogger;
 import megamek.server.Server;
 import megamek.server.totalWarfare.TWGameManager;
-import megameklab.MMLConstants;
 import megameklab.MegaMekLab;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
@@ -167,6 +167,10 @@ public class MekHQ implements GameListener {
     // endregion Variable Declarations
     private static final SanityInputFilter sanityInputFilter = new SanityInputFilter();
     private static final String defaultTheme = "com.formdev.flatlaf.FlatDarculaLaf";
+
+    public static ResourceBundle getDefaultResourceBundle() {
+        return ResourceBundle.getBundle("mekhq.resources.GUI", MekHQ.getMHQOptions().getLocale());
+    }
 
     public static SuitePreferences getMHQPreferences() {
         return mhqPreferences;
@@ -264,12 +268,7 @@ public class MekHQ implements GameListener {
      * restart back to the splash screen
      */
     public void restart() {
-
-        // Actually close MHQ
-        if (campaignGUI != null) {
-            campaignGUI.getFrame().dispose();
-        }
-
+        deactivateCampaign();
         new StartupScreenPanel(this).getFrame().setVisible(true);
     }
 
@@ -352,8 +351,36 @@ public class MekHQ implements GameListener {
         System.exit(0);
     }
 
-    public void showNewView() {
+    /**
+     * Activates a campaign. Ensures that previously active campaign is disposed, then creates new
+     * {@link CampaignController} and {@link CampaignGUI} and initializes wiring between all of them.
+     *
+     * @param campaign the {@link Campaign} to be activated
+     */
+    public void activateCampaign(Campaign campaign) {
+        deactivateCampaign();
+        campaignController = new CampaignController(this, campaign);
+        campaignController.setHost(campaign.getId());
         campaignGUI = new CampaignGUI(this);
+        campaign.setGUI(campaignGUI);
+        campaignController.activate();
+    }
+
+    /**
+     * Disposes all CampaignGUI components and deactivates the current campaign. Since event bus registration is
+     * linked to UI lifecycle, it also unregisters them from the event bus. Manually unsubscribes non-UI components.
+     * Logs remaining event bus listeners for debug purposes.
+     */
+    private void deactivateCampaign() {
+        if (campaignGUI != null) {
+            campaignGUI.getFrame().dispose();
+            campaignGUI = null;
+        }
+        if (campaignController != null) {
+            campaignController.deactivate();
+            campaignController = null;
+        }
+        EVENT_BUS.logActiveSubscribers();
     }
 
     /**
@@ -423,10 +450,6 @@ public class MekHQ implements GameListener {
 
     public Campaign getCampaign() {
         return campaignController.getLocalCampaign();
-    }
-
-    public void setCampaign(Campaign c) {
-        campaignController = new CampaignController(c);
     }
 
     public CampaignController getCampaignController() {

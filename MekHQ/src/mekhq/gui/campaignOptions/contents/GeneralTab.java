@@ -73,7 +73,6 @@ import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
-import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
@@ -182,9 +181,9 @@ public class GeneralTab {
      *     <li>Buttons for choosing camouflage and unit icons</li>
      * </ul>
      *
-     * @return An {@link AbstractMHQScrollablePanel} containing the general tab content.
+     * @return An {@link DefaultMHQScrollablePanel} containing the general tab content.
      */
-    public AbstractMHQScrollablePanel createGeneralTab() {
+    public DefaultMHQScrollablePanel createGeneralTab() {
         // Header
         JPanel headerPanel = createGeneralHeader();
 
@@ -244,7 +243,7 @@ public class GeneralTab {
         btnIcon.setIcon(unitIcon.getImageIcon(UIUtil.scaleForGUI(75)));
 
         // Initialize the parent panel
-        AbstractMHQScrollablePanel generalPanel = new DefaultMHQScrollablePanel(frame,
+        DefaultMHQScrollablePanel generalPanel = new DefaultMHQScrollablePanel(frame,
               "generalPanel",
               new GridBagLayout());
 

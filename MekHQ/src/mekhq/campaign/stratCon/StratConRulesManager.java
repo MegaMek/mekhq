@@ -117,11 +117,11 @@ import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.mission.enums.ScenarioType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.skills.ActionCheckResult;
 import mekhq.campaign.personnel.skills.ScoutingSkills;
 import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillCheckUtility;
+import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.SkillModifierData;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.stratCon.StratConScenario.ScenarioState;
@@ -130,6 +130,7 @@ import mekhq.campaign.universe.Planet;
 import mekhq.gui.dialog.nagDialogs.CombatChallengeNagDialog;
 import mekhq.utilities.ReportingUtilities;
 import org.apache.commons.math3.util.Pair;
+import org.jspecify.annotations.NonNull;
 
 /**
  * This class contains "rules" logic for the AtB-StratCon state
@@ -631,7 +632,7 @@ public class StratConRulesManager {
      * @return The randomly chosen {@link StratConTrackState}, or {@code null} if no tracks are available.
      */
     public static @Nullable StratConTrackState getRandomTrack(AtBContract contract) {
-        List<StratConTrackState> tracks = contract.getStratconCampaignState().getTracks();
+        List<StratConTrackState> tracks = contract.getStratConCampaignState().getTracks();
         Random rand = new Random();
 
         if (!tracks.isEmpty()) {
@@ -910,25 +911,39 @@ public class StratConRulesManager {
             // Find potential units to substitute based on the explicitForceID
             Collection<Unit> potentialUnits = findPotentialUnits(campaign, explicitForceID);
 
-            // Iterate through the potential units and substitute up to `unitCount` units
-            for (Unit unit : potentialUnits) {
-                if (isValidUnitForScenario(unit,
-                      scenarioForceTemplate,
-                      campaign,
-                      scenario.getScenarioTemplate().mapParameters.getMapLocation())) {
-                    scenario.addUnit(unit, scenarioForceTemplate.getForceName(), false);
-                    AtBDynamicScenarioFactory.benchAllyUnit(unit.getId(),
-                          scenarioForceTemplate.getForceName(),
-                          scenario.getBackingScenario());
-                    unitCount--;
+            // Iterate through the potential units and vet based on scenario eligibility
+            List<Unit> vettedUnits = getVettedUnits(scenario, campaign, scenarioForceTemplate, potentialUnits);
 
+            while (unitCount > 0 && !(vettedUnits.isEmpty())) {
+                unitCount--;
 
-                    if (unitCount == 0) {
-                        break; // Stop once enough units have been substituted
-                    }
-                }
+                substituteUnit(scenario, scenarioForceTemplate, vettedUnits);
             }
         }
+    }
+
+    private static @NonNull List<Unit> getVettedUnits(StratConScenario scenario, Campaign campaign,
+          ScenarioForceTemplate scenarioForceTemplate, Collection<Unit> potentialUnits) {
+        List<Unit> vettedUnits = new ArrayList<>();
+        MapLocation scenarioLocation = scenario.getScenarioTemplate().mapParameters.getMapLocation();
+        for (Unit potentialUnit : potentialUnits) {
+            if (isValidUnitForScenario(potentialUnit, scenarioForceTemplate, campaign, scenarioLocation)) {
+                vettedUnits.add(potentialUnit);
+            }
+        }
+        return vettedUnits;
+    }
+
+    private static void substituteUnit(StratConScenario scenario, ScenarioForceTemplate scenarioForceTemplate,
+          List<Unit> vettedUnits) {
+        int selectedIndex = randomInt(vettedUnits.size());
+        Unit selectedUnit = vettedUnits.remove(selectedIndex);
+
+        scenario.addUnit(selectedUnit, scenarioForceTemplate.getForceName(), false);
+
+        AtBDynamicScenarioFactory.benchAllyUnit(selectedUnit.getId(),
+              scenarioForceTemplate.getForceName(),
+              scenario.getBackingScenario());
     }
 
     /**
@@ -1608,12 +1623,9 @@ public class StratConRulesManager {
         }
 
         // Build a map of scouts and their information
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        Formation formation = campaign.getFormation(forceID);
-        Hangar hangar = campaign.getAllHangar();
-        List<ScoutRecord> scouts = buildScoutMap(formation, hangar, campaignOptions,
-              campaign.isClanCampaign(), campaign.getLocalDate());
+        List<ScoutRecord> scouts = buildScoutMap(campaign.getFormation(forceID), campaign.getAllHangar(), campaign);
 
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
         boolean useAdvancedScouting = campaignOptions.isUseAdvancedScouting();
         // Each scout may scan up to scanMultiplier hexes
         // Each scout may scan up to a radius of individualScanRange hexes
@@ -1642,7 +1654,7 @@ public class StratConRulesManager {
                     continue;
                 }
 
-boolean isUseEdge = campaignOptions.isUseEdge() && scout.getOptions().booleanOption(EDGE_RECON_FAIL);
+                boolean isUseEdge = campaignOptions.isUseEdge() && scout.getOptions().booleanOption(EDGE_RECON_FAIL);
                 for (int direction = 0; direction < 6; direction++) {
                     StratConCoords checkCoords = currentCoords.translate(direction);
 
@@ -1673,21 +1685,11 @@ boolean isUseEdge = campaignOptions.isUseEdge() && scout.getOptions().booleanOpt
                         continue;
                     }
 
-                    SkillCheckUtility skillCheck = null;
+                    ActionCheckResult actionCheckResult = null;
                     if (useAdvancedScouting) {
-                        skillCheck = new SkillCheckUtility(
-                              getTextAt(RESOURCE_BUNDLE, "StratConRulesManager.scoutingSkillCheck"),
-                              scout,
-                              scoutData.bestScoutSkillName(),
-                              scoutData.getAllScoutRollModifiers(),
-                              0,
-                              isUseEdge,
-                              false,
-                              campaignOptions.isUseAgeEffects(),
-                              campaign.isClanCampaign(),
-                              campaign.getLocalDate()
-                        );
-                        campaign.addReport(SKILL_CHECKS, skillCheck.getResultsText());
+                        actionCheckResult = scoutData.skillCheck().resolve(
+                              isUseEdge, getTextAt(RESOURCE_BUNDLE, "StratConRulesManager.scoutingSkillCheck"), false);
+                        campaign.addReport(SKILL_CHECKS, actionCheckResult.resultsText());
                     }
 
                     remainingScans--;
@@ -1697,7 +1699,7 @@ boolean isUseEdge = campaignOptions.isUseEdge() && scout.getOptions().booleanOpt
                         hasFatigueIncreased = true;
                     }
 
-                    boolean wasScoutingSuccessful = !useAdvancedScouting || skillCheck.isSuccess();
+                    boolean wasScoutingSuccessful = actionCheckResult == null || actionCheckResult.isSuccess();
                     if (!wasScoutingSuccessful) {
                         // Failed check: hex remains unrevealed, but future scouts may still try it
                         continue;
@@ -1853,11 +1855,9 @@ boolean isUseEdge = campaignOptions.isUseEdge() && scout.getOptions().booleanOpt
      * <p>All such {@link ScoutRecord} entries are collected, sorted in descending order of scout skill level, and
      * returned as a list. Units with no crew are logged and skipped.</p>
      *
-     * @param formation       the {@link Formation} containing units to evaluate
-     * @param hangar          the {@link Hangar} used to help retrieve units from the force
-     * @param campaignOptions {@link CampaignOptions}, used to check useCommanderOnly options
-     * @param isClanCampaign  if {@code true}, applies rules specific to clan campaigns
-     * @param date            the current date, used for time-dependent logic
+     * @param formation the {@link Formation} containing units to evaluate
+     * @param hangar    the {@link Hangar} used to help retrieve units from the force
+     * @param campaign  the {@link Campaign} context
      *
      * @return a list of {@link ScoutRecord} objects, each representing the best scout and their skill details for a
      *       unit, sorted from the highest to lowest scout skill level
@@ -1865,8 +1865,7 @@ boolean isUseEdge = campaignOptions.isUseEdge() && scout.getOptions().booleanOpt
      * @author Illiani
      * @since 0.50.07
      */
-    static List<ScoutRecord> buildScoutMap(Formation formation, Hangar hangar, CampaignOptions campaignOptions,
-          boolean isClanCampaign, LocalDate date) {
+    static List<ScoutRecord> buildScoutMap(Formation formation, Hangar hangar, Campaign campaign) {
         if (formation == null) {
             return new ArrayList<>();
         }
@@ -1890,7 +1889,7 @@ boolean isUseEdge = campaignOptions.isUseEdge() && scout.getOptions().booleanOpt
                 unitSpeed = AtBDynamicScenarioFactory.calculateAtBSpeed(entity);
                 hasSensorEquipment = hasImprovedSensors(entity) || hasActiveProbe(entity);
 
-                if (unit.isOnlyCommandersMatter(campaignOptions)) {
+                if (unit.isOnlyCommandersMatter(campaign.getCampaignOptions())) {
                     Person commander = unit.getCommander();
                     if (commander == null) {
                         LOGGER.info("No commander for unit: {} {}", unit.getName(), unit.getId());
@@ -1902,23 +1901,20 @@ boolean isUseEdge = campaignOptions.isUseEdge() && scout.getOptions().booleanOpt
 
             // Find the best scout in this unit, if any
             ScoutRecord bestScout = null;
-            int bestScoutTargetNumber = Integer.MAX_VALUE;
             for (Person crewMember : unitCrew) {
                 boolean hasEagleEyes = crewMember.getOptions().booleanOption(OptionsConstants.MISC_EAGLE_EYES);
                 String scoutSkillName = ScoutingSkills.getBestScoutingSkill(crewMember);
                 if (scoutSkillName == null) {
-                    continue;
+                    // default to unskilled check
+                    scoutSkillName = ScoutingSkills.DEFAULT_UNSKILLED_CHECK;
                 }
 
-                TargetRoll targetNumber = SkillCheckUtility.determineTargetNumber(crewMember,
-                      SkillType.getType(scoutSkillName), 0, campaignOptions.isUseAgeEffects(), isClanCampaign, date);
-                getAllScoutRollModifiers(unitWeight, unitSpeed, hasEagleEyes, hasSensorEquipment)
-                      .forEach(targetNumber::addModifier);
+                List<TargetRollModifier> mods = getAllScoutRollModifiers(
+                      unitWeight, unitSpeed, hasEagleEyes, hasSensorEquipment);
+                SkillCheck skillCheck = crewMember.checkSkill(scoutSkillName, campaign).withExternalModifiers(mods);
 
-                if (bestScout == null || targetNumber.getValue() < bestScoutTargetNumber) {
-                    bestScout = new ScoutRecord(crewMember, targetNumber, scoutSkillName,
-                          hasEagleEyes, unitWeight, unitSpeed, hasSensorEquipment);
-                    bestScoutTargetNumber = targetNumber.getValue();
+                if (bestScout == null || skillCheck.isEasierThan(bestScout.skillCheck())) {
+                    bestScout = new ScoutRecord(crewMember, skillCheck, unitWeight);
                 }
             }
 
@@ -1927,13 +1923,13 @@ boolean isUseEdge = campaignOptions.isUseEdge() && scout.getOptions().booleanOpt
             }
 
             LOGGER.info("Unit {} (weight: {}t, speed: {}) has best scout: {} with skill {} at TN {}",
-                  unit.getId(), unitWeight, unitSpeed, bestScout.scout(), bestScout.bestScoutSkillName(),
-                  bestScout.targetNumber().getValue());
+                  unit.getId(), unitWeight, unitSpeed, bestScout.scout(),
+                  bestScout.skillCheck().getSkillType().getName(), bestScout.skillCheck().getTargetNumber().getValue());
             scouts.add(bestScout);
         }
 
         // Sort scouts by the target number of their best scout skill, the lowest first
-        scouts.sort(Comparator.comparingInt(a -> a.targetNumber().getValue()));
+        scouts.sort(Comparator.comparingInt(a -> a.skillCheck().getTargetNumber().getValue()));
         return scouts;
     }
 
@@ -2127,23 +2123,12 @@ boolean isUseEdge = campaignOptions.isUseEdge() && scout.getOptions().booleanOpt
 
         campaign.addReport(BATTLE, reportStatus.toString());
 
+        ActionCheckResult actionCheckResult =
+              commander.checkSkill(S_TACTICS, campaign)
+                    .resolve(true, getTextAt(RESOURCE_BUNDLE, "StratConRulesManager.tacticsSkillCheck"), false);
 
-        roll = d6(2);
-        int targetNumber = 9;
-        Skill tactics = commander.getSkill(S_TACTICS);
-
-        SkillCheckUtility skillCheckUtility = new SkillCheckUtility(
-              getTextAt(RESOURCE_BUNDLE, "StratConRulesManager.tacticsSkillCheck"),
-              commander,
-              S_TACTICS,
-              null,
-              0,
-              true,
-              false);
-        campaign.addReport(SKILL_CHECKS, skillCheckUtility.getResultsText());
-
-        if (skillCheckUtility.isSuccess()) {
-            String reportString = tactics != null ?
+        if (actionCheckResult.isSuccess()) {
+            String reportString = commander.getSkill(S_TACTICS) != null ?
                                         resources.getString("reinforcementEvasionSuccessful.text") :
                                         resources.getString("reinforcementEvasionSuccessful.noSkill");
             campaign.addReport(BATTLE, String.format(reportString,
@@ -2157,11 +2142,12 @@ boolean isUseEdge = campaignOptions.isUseEdge() && scout.getOptions().booleanOpt
             return DELAYED;
         }
 
+        // FIXME: roll and target number are not present in the template
         campaign.addReport(BATTLE, String.format(resources.getString("reinforcementEvasionUnsuccessful.text"),
               spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
               CLOSING_SPAN_TAG,
-              roll,
-              targetNumber));
+              actionCheckResult.roll(),
+              9));
 
         ScenarioTemplate scenarioTemplate = getInterceptionScenarioTemplate(formation, campaign.getAllHangar());
 
@@ -2592,7 +2578,7 @@ boolean isUseEdge = campaignOptions.isUseEdge() && scout.getOptions().booleanOpt
         }
 
         applyGlobalModifiers(scenario,
-              contract.getStratconCampaignState(),
+              contract.getStratConCampaignState(),
               restrictAlliedModifiers,
               restrictEnemyModifiers);
 
@@ -2811,10 +2797,8 @@ boolean isUseEdge = campaignOptions.isUseEdge() && scout.getOptions().booleanOpt
     /**
      * Applies the relevant modifiers from a facility to the provided scenario.
      *
-     * <p>Local modifiers are used when the scenario occurs directly at the facility. If the scenario occurs directly
-     * at the facility, and the facility has no local modifiers, its shared modifiers are applied.</p>
-     *
-     * <p>Otherwise, if the scenario does not occur at the facility, its shared modifiers are applied.</p>
+     * <p>Local modifiers are used when the scenario occurs directly at the facility. Otherwise, if the scenario does
+     * not occur at the facility, its shared modifiers are applied.</p>
      *
      * <p>Then, the facility is marked as unavailable.</p>
      *
@@ -2836,7 +2820,7 @@ boolean isUseEdge = campaignOptions.isUseEdge() && scout.getOptions().booleanOpt
         List<String> localModifiers = facility.getLocalModifiers();
         List<String> globalModifiers = facility.getSharedModifiers();
 
-        if (!localModifiers.isEmpty() && isLocal) {
+        if (isLocal) {
             relevantModifiers.addAll(localModifiers);
         } else {
             relevantModifiers.addAll(globalModifiers);
@@ -3110,7 +3094,7 @@ boolean isUseEdge = campaignOptions.isUseEdge() && scout.getOptions().booleanOpt
         // assemble a set of all force IDs that are currently assigned to tracks
         Set<Integer> forcesInTracks = new HashSet<>();
         for (AtBContract contract : campaign.getActiveAtBContracts()) {
-            StratConCampaignState state = contract.getStratconCampaignState();
+            StratConCampaignState state = contract.getStratConCampaignState();
             if (state == null) {
                 continue;
             }
@@ -3436,16 +3420,16 @@ boolean isUseEdge = campaignOptions.isUseEdge() && scout.getOptions().booleanOpt
         return unit.getCampaign()
                      .getActiveAtBContracts()
                      .stream()
-                     .anyMatch(contract -> (contract.getStratconCampaignState() != null) &&
-                                                 contract.getStratconCampaignState()
+                     .anyMatch(contract -> (contract.getStratConCampaignState() != null) &&
+                                                 contract.getStratConCampaignState()
                                                        .isForceDeployedHere(unit.getFormationId()));
     }
 
     public static boolean isForceDeployedToStratCon(List<AtBContract> activeAtBContracts, int forceId) {
         return activeAtBContracts
                      .stream()
-                     .anyMatch(contract -> (contract.getStratconCampaignState() != null) &&
-                                                 contract.getStratconCampaignState()
+                     .anyMatch(contract -> (contract.getStratConCampaignState() != null) &&
+                                                 contract.getStratConCampaignState()
                                                        .isForceDeployedHere(forceId));
     }
 
@@ -3491,7 +3475,7 @@ boolean isUseEdge = campaignOptions.isUseEdge() && scout.getOptions().booleanOpt
         // if the force is deployed elsewhere, it cannot be deployed as reinforcements
         if (campaign.getActiveAtBContracts()
                   .stream()
-                  .flatMap(contract -> contract.getStratconCampaignState().getTracks().stream())
+                  .flatMap(contract -> contract.getStratConCampaignState().getTracks().stream())
                   .anyMatch(track -> !Objects.equals(track, trackState) &&
                                            track.getAssignedForceCoords().containsKey(forceID))) {
             return ReinforcementEligibilityType.NONE;
@@ -3606,7 +3590,7 @@ boolean isUseEdge = campaignOptions.isUseEdge() && scout.getOptions().booleanOpt
      */
     public static void updateFacilityForScenario(AtBScenario scenario, AtBContract contract, boolean destroy,
           boolean capture) {
-        if (contract.getStratconCampaignState() == null) {
+        if (contract.getStratConCampaignState() == null) {
             return;
         }
 
@@ -3616,7 +3600,7 @@ boolean isUseEdge = campaignOptions.isUseEdge() && scout.getOptions().booleanOpt
         // basically, we're looping through all scenarios on all the contract's tracks
         // if we find one with the same ID as the one being resolved, that's our
         // facility: get rid of it.
-        for (StratConTrackState trackState : contract.getStratconCampaignState().getTracks()) {
+        for (StratConTrackState trackState : contract.getStratConCampaignState().getTracks()) {
             for (StratConCoords coords : trackState.getScenarios().keySet()) {
                 StratConScenario potentialScenario = trackState.getScenario(coords);
                 if (potentialScenario.getBackingScenarioID() == scenario.getId()) {
@@ -3651,7 +3635,7 @@ boolean isUseEdge = campaignOptions.isUseEdge() && scout.getOptions().booleanOpt
         Mission mission = tracker.getMission();
 
         if (mission instanceof AtBContract) {
-            StratConCampaignState campaignState = ((AtBContract) mission).getStratconCampaignState();
+            StratConCampaignState campaignState = ((AtBContract) mission).getStratConCampaignState();
             if (campaignState == null) {
                 return;
             }
@@ -3716,7 +3700,7 @@ boolean isUseEdge = campaignOptions.isUseEdge() && scout.getOptions().booleanOpt
 
         if (nextScenario instanceof AtBScenario nextAtBScenario) {
 
-            StratConCampaignState campaignState = nextAtBScenario.getContract(campaign).getStratconCampaignState();
+            StratConCampaignState campaignState = nextAtBScenario.getContract(campaign).getStratConCampaignState();
             if (campaignState == null) {
                 return;
             }
@@ -3961,7 +3945,7 @@ boolean isUseEdge = campaignOptions.isUseEdge() && scout.getOptions().booleanOpt
 
         // run scenario generation routine for every track attached to an active contract
         for (AtBContract contract : campaign.getActiveAtBContracts()) {
-            StratConCampaignState campaignState = contract.getStratconCampaignState();
+            StratConCampaignState campaignState = contract.getStratConCampaignState();
 
             if (campaignState != null) {
                 List<StratConTrackState> tracks = campaignState.getTracks();

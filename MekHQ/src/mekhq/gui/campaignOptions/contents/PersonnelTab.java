@@ -56,7 +56,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.AwardBonus;
 import mekhq.campaign.personnel.enums.EdgeRefreshPeriod;
 import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
+import mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsGridBagConstraints;
@@ -113,7 +113,6 @@ public class PersonnelTab {
     private JCheckBox chkOnlyCommandersMatterInfantry;
     private JCheckBox chkOnlyCommandersMatterBattleArmor;
     private JCheckBox chkUseEdge;
-    private JCheckBox chkUseSupportEdge;
     private JLabel lblEdgeRefreshPeriod;
     private MMComboBox<EdgeRefreshPeriod> comboEdgeRefreshPeriod;
     private JLabel lblEdgeRefreshCost;
@@ -400,7 +399,6 @@ public class PersonnelTab {
         chkOnlyCommandersMatterInfantry = new JCheckBox();
         chkOnlyCommandersMatterBattleArmor = new JCheckBox();
         chkUseEdge = new JCheckBox();
-        chkUseSupportEdge = new JCheckBox();
         lblEdgeRefreshPeriod = new JLabel();
         comboEdgeRefreshPeriod = new MMComboBox<>("comboEdgeRefreshPeriod", EdgeRefreshPeriod.values());
         lblEdgeRefreshCost = new JLabel();
@@ -520,8 +518,6 @@ public class PersonnelTab {
               "OnlyCommandersMatterBattleArmor"));
         chkUseEdge = new CampaignOptionsCheckBox("UseEdge");
         chkUseEdge.addMouseListener(createTipPanelUpdater(generalHeader, "UseEdge"));
-        chkUseSupportEdge = new CampaignOptionsCheckBox("UseSupportEdge");
-        chkUseSupportEdge.addMouseListener(createTipPanelUpdater(generalHeader, "UseSupportEdge"));
 
         lblEdgeRefreshPeriod = new CampaignOptionsLabel("EdgeRefreshPeriod", getMetadata(new Version(0, 51, 0)));
         lblEdgeRefreshPeriod.addMouseListener(createTipPanelUpdater(generalHeader, "EdgeRefreshPeriod"));
@@ -586,9 +582,6 @@ public class PersonnelTab {
 
         layout.gridy++;
         panel.add(chkUseEdge, layout);
-
-        layout.gridy++;
-        panel.add(chkUseSupportEdge, layout);
 
         layout.gridx = 0;
         layout.gridy++;
@@ -1522,7 +1515,6 @@ public class PersonnelTab {
         chkOnlyCommandersMatterInfantry.setSelected(options.isOnlyCommandersMatterInfantry());
         chkOnlyCommandersMatterBattleArmor.setSelected(options.isOnlyCommandersMatterBattleArmor());
         chkUseEdge.setSelected(options.isUseEdge());
-        chkUseSupportEdge.setSelected(options.isUseSupportEdge());
         comboEdgeRefreshPeriod.setSelectedItem(options.getEdgeRefreshPeriod());
         spnEdgeRefreshCost.setValue(options.getEdgeRefreshCost());
         chkUseImplants.setSelected(options.isUseImplants());
@@ -1635,7 +1627,6 @@ public class PersonnelTab {
         options.setOnlyCommandersMatterInfantry(chkOnlyCommandersMatterInfantry.isSelected());
         options.setOnlyCommandersMatterBattleArmor(chkOnlyCommandersMatterBattleArmor.isSelected());
         options.setUseEdge(chkUseEdge.isSelected());
-        options.setUseSupportEdge(chkUseSupportEdge.isSelected());
         options.setEdgeRefreshPeriod(comboEdgeRefreshPeriod.getSelectedItem());
         options.setEdgeRefreshCost((int) spnEdgeRefreshCost.getValue());
         options.setUseImplants(chkUseImplants.isSelected());

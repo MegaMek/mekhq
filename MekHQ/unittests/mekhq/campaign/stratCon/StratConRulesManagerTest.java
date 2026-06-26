@@ -47,6 +47,7 @@ import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -76,6 +77,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.ScoutingSkills;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.stratCon.StratConContractDefinition.StrategicObjectiveType;
@@ -725,8 +727,8 @@ class StratConRulesManagerTest {
 
         @Test
         void testBuildScoutMap_NullFormation() {
-            List<ScoutRecord> scouts = StratConRulesManager.buildScoutMap(null, mock(Hangar.class),
-                  mock(CampaignOptions.class), false, LocalDate.now());
+            List<ScoutRecord> scouts =
+                  StratConRulesManager.buildScoutMap(null, mock(Hangar.class), mock(Campaign.class));
             assertNotNull(scouts);
             assertTrue(scouts.isEmpty());
         }
@@ -735,14 +737,12 @@ class StratConRulesManagerTest {
         void testBuildScoutMap_SingleCrewMember() {
             Person person = mockPerson(4, true);
             ScoutRecord bestScout = getBestScoutForUnit(List.of(person), 45, 5, true, false);
+            SkillCheck skillCheck = bestScout.skillCheck();
 
             assertEquals(person, bestScout.scout());
-            assertEquals(S_SENSOR_OPERATIONS, bestScout.bestScoutSkillName());
-            assertEquals(3, bestScout.targetNumber().getValue());
+            assertEquals(S_SENSOR_OPERATIONS, skillCheck.getSkillType().getName());
+            assertEquals(3, skillCheck.getTargetNumber().getValue());
             assertEquals(45.0, bestScout.unitWeight());
-            assertEquals(5, bestScout.unitSpeed());
-            assertTrue(bestScout.scoutHasEagleEyes());
-            assertTrue(bestScout.unitHasSensorEquipment());
         }
 
         @ParameterizedTest
@@ -759,6 +759,15 @@ class StratConRulesManagerTest {
             Person person = mockPerson(4, true);
             getBestScoutForUnit(List.of(person), 45, 5, true, false, false, isClanCampaign);
             verify(person).getSkillModifierData(eq(false), eq(isClanCampaign), any(LocalDate.class));
+        }
+
+        @Test
+        void testBuildScoutMap_Unskilled() {
+            Person person = mockPerson(null, false);
+            ScoutRecord bestScout = getBestScoutForUnit(List.of(person), 45, 5, false, false);
+            assertEquals(person, bestScout.scout());
+            assertEquals(S_SENSOR_OPERATIONS, bestScout.skillCheck().getSkillType().getName());
+            assertEquals(12, bestScout.skillCheck().getTargetNumber().getValue());
         }
 
         @Test
@@ -795,43 +804,43 @@ class StratConRulesManagerTest {
         @Test
         void testBuildScoutMap_TN_NoEagleEyes() {
             ScoutRecord bestScout = getBestScoutForUnit(List.of(mockPerson(4, false)), 45, 5, false, false);
-            assertEquals(4, bestScout.targetNumber().getValue());
+            assertEquals(4, bestScout.skillCheck().getTargetNumber().getValue());
         }
 
         @Test
         void testBuildScoutMap_TN_EagleEyes() {
             ScoutRecord bestScout = getBestScoutForUnit(List.of(mockPerson(4, true)), 45, 5, false, false);
-            assertEquals(3, bestScout.targetNumber().getValue());
+            assertEquals(3, bestScout.skillCheck().getTargetNumber().getValue());
         }
 
         @Test
         void testBuildScoutMap_TN_EagleEyes_AP() {
             ScoutRecord bestScout = getBestScoutForUnit(List.of(mockPerson(4, true)), 45, 5, false, true);
-            assertEquals(3, bestScout.targetNumber().getValue());
+            assertEquals(3, bestScout.skillCheck().getTargetNumber().getValue());
         }
 
         @Test
         void testBuildScoutMap_TN_EagleEyes_IS() {
             ScoutRecord bestScout = getBestScoutForUnit(List.of(mockPerson(4, true)), 45, 5, true, false);
-            assertEquals(3, bestScout.targetNumber().getValue());
+            assertEquals(3, bestScout.skillCheck().getTargetNumber().getValue());
         }
 
         @Test
         void testBuildScoutMap_TN_EagleEyes_IS_AP() {
             ScoutRecord bestScout = getBestScoutForUnit(List.of(mockPerson(4, true)), 45, 5, true, true);
-            assertEquals(3, bestScout.targetNumber().getValue());
+            assertEquals(3, bestScout.skillCheck().getTargetNumber().getValue());
         }
 
         @Test
         void testBuildScoutMap_TN_UnitSpeed() {
             ScoutRecord bestScout = getBestScoutForUnit(List.of(mockPerson(4, false)), 45, 9, false, false);
-            assertEquals(3, bestScout.targetNumber().getValue());
+            assertEquals(3, bestScout.skillCheck().getTargetNumber().getValue());
         }
 
         @Test
         void testBuildScoutMap_TN_UnitWeight() {
             ScoutRecord bestScout = getBestScoutForUnit(List.of(mockPerson(4, false)), 95, 5, false, false);
-            assertEquals(8, bestScout.targetNumber().getValue());
+            assertEquals(8, bestScout.skillCheck().getTargetNumber().getValue());
         }
 
         @Test
@@ -843,30 +852,31 @@ class StratConRulesManagerTest {
             when(formation.getAllUnitsAsUnits(hangar, false)).thenReturn(Collections.singletonList(unit));
             when(unit.getCrew()).thenReturn(new ArrayList<>());
 
-            List<ScoutRecord> scouts = StratConRulesManager.buildScoutMap(formation, hangar,
-                  mock(CampaignOptions.class), false, LocalDate.now());
+            List<ScoutRecord> scouts = StratConRulesManager.buildScoutMap(formation, hangar, mock(Campaign.class));
             assertTrue(scouts.isEmpty());
         }
 
-        private Person mockPerson(int sensorOperationsSkill, boolean hasEagleEye) {
-            Person person = mock(Person.class);
+        private Person mockPerson(Integer sensorOperationsSkill, boolean hasEagleEye) {
+            Person person = new Person("GivenName", "Surname", null, "Faction");
+            if (sensorOperationsSkill != null) {
+                Skill skill = mock(Skill.class);
+                when(skill.getFinalSkillValue(any(SkillModifierData.class))).thenReturn(sensorOperationsSkill);
+                person.addSkill(S_SENSOR_OPERATIONS, skill);
+            }
             PersonnelOptions options = mock(PersonnelOptions.class);
-            Skill skill = mock(Skill.class);
-            SkillModifierData skillModData = mock(SkillModifierData.class);
-
-            when(person.hasSkill(S_SENSOR_OPERATIONS)).thenReturn(true);
-            when(person.getSkill(S_SENSOR_OPERATIONS)).thenReturn(skill);
-            when(person.getSkillModifierData()).thenReturn(skillModData);
-            when(person.getSkillModifierData(anyBoolean())).thenReturn(skillModData);
-            when(person.getSkillModifierData(
-                  anyBoolean(), anyBoolean(), any(LocalDate.class))).thenReturn(skillModData);
-            when(person.getSkillModifierData(
-                  anyBoolean(), anyBoolean(), any(LocalDate.class), anyBoolean())).thenReturn(skillModData);
-            when(skill.getFinalSkillValue(skillModData)).thenReturn(sensorOperationsSkill);
-            when(person.getOptions()).thenReturn(options);
             when(options.booleanOption(OptionsConstants.MISC_EAGLE_EYES)).thenReturn(hasEagleEye);
+            person.setOptions(options);
+            return spy(person);
+        }
 
-            return person;
+        private static Campaign mockCampaign(boolean useAgingEffects, boolean isClanCampaign) {
+            Campaign campaign = mock(Campaign.class);
+            when(campaign.isClanCampaign()).thenReturn(isClanCampaign);
+            when(campaign.getLocalDate()).thenReturn(LocalDate.now());
+            CampaignOptions campaignOptions = mock(CampaignOptions.class);
+            when(campaignOptions.isUseAgeEffects()).thenReturn(useAgingEffects);
+            when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
+            return campaign;
         }
 
         private ScoutRecord getBestScoutForUnit(List<Person> crew, double unitWeight, int unitSpeed,
@@ -890,22 +900,14 @@ class StratConRulesManagerTest {
             when(entity.getWeight()).thenReturn(unitWeight);
 
             try (MockedStatic<AtBDynamicScenarioFactory> scenarioFactory = mockStatic(AtBDynamicScenarioFactory.class);
-                  MockedStatic<EntityUtilities> entityUtils = mockStatic(EntityUtilities.class);
-                  MockedStatic<ScoutingSkills> scoutingSkills = mockStatic(ScoutingSkills.class)) {
+                  MockedStatic<EntityUtilities> entityUtils = mockStatic(EntityUtilities.class)) {
 
                 scenarioFactory.when(() -> AtBDynamicScenarioFactory.calculateAtBSpeed(entity)).thenReturn(unitSpeed);
                 entityUtils.when(() -> EntityUtilities.hasImprovedSensors(entity)).thenReturn(hasImprovedSensors);
                 entityUtils.when(() -> EntityUtilities.hasActiveProbe(entity)).thenReturn(hasActiveProbe);
-                crew.forEach(crewMember -> scoutingSkills.when(() ->
-                                                                     ScoutingSkills.getBestScoutingSkill(crewMember))
-                                                 .thenReturn(S_SENSOR_OPERATIONS));
 
-                CampaignOptions campaignOptions = mock(CampaignOptions.class);
-                if (useAgingEffects) {
-                    when(campaignOptions.isUseAgeEffects()).thenReturn(true);
-                }
-                List<ScoutRecord> scouts = StratConRulesManager.buildScoutMap(formation, hangar,
-                      campaignOptions, isClanCampaign, LocalDate.now());
+                Campaign campaign = mockCampaign(useAgingEffects, isClanCampaign);
+                List<ScoutRecord> scouts = StratConRulesManager.buildScoutMap(formation, hangar, campaign);
                 assertEquals(1, scouts.size());
 
                 return scouts.getFirst();
@@ -938,10 +940,9 @@ class StratConRulesManagerTest {
                 }).toList();
                 when(formation.getAllUnitsAsUnits(hangar, false)).thenReturn(units);
 
-                List<ScoutRecord> scouts = StratConRulesManager.buildScoutMap(formation, hangar,
-                      mock(CampaignOptions.class), false, LocalDate.now());
+                Campaign campaign = mockCampaign(false, false);
 
-                return scouts;
+                return StratConRulesManager.buildScoutMap(formation, hangar, campaign);
             }
         }
     }

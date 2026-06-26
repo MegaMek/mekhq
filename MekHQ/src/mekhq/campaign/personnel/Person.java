@@ -144,22 +144,24 @@ import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.personnel.skills.AttributeCheck;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.Skills;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
+import mekhq.campaign.randomEvents.personalities.Aggression;
+import mekhq.campaign.randomEvents.personalities.Ambition;
+import mekhq.campaign.randomEvents.personalities.Greed;
 import mekhq.campaign.randomEvents.personalities.PersonalityController;
-import mekhq.campaign.randomEvents.personalities.enums.Aggression;
-import mekhq.campaign.randomEvents.personalities.enums.Ambition;
-import mekhq.campaign.randomEvents.personalities.enums.Greed;
-import mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk;
-import mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType;
-import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
-import mekhq.campaign.randomEvents.personalities.enums.Social;
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
+import mekhq.campaign.randomEvents.personalities.PersonalityQuirk;
+import mekhq.campaign.randomEvents.personalities.PersonalityTraitType;
+import mekhq.campaign.randomEvents.personalities.Reasoning;
+import mekhq.campaign.randomEvents.personalities.Social;
+import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -2146,6 +2148,25 @@ public class Person implements ILocation {
                      .getDisplayFormattedOutput(getLastRankChangeDate(), today);
     }
 
+    public long getYearsSinceJoiningCampaign(final Campaign campaign) {
+        // Get time in service based on year
+        if (getJoinedCampaign() == null) {
+            return 0;
+        }
+
+        LocalDate today = campaign.getLocalDate();
+
+        // If the person is dead or has left the unit, we only care about how long they
+        // spent in service to the company
+        if (getRetirement() != null) {
+            today = getRetirement();
+        } else if (getDateOfDeath() != null) {
+            today = getDateOfDeath();
+        }
+
+        return ChronoUnit.YEARS.between(getJoinedCampaign(), today);
+    }
+
     public void setId(final UUID id) {
         this.id = id;
     }
@@ -2771,22 +2792,20 @@ public class Person implements ILocation {
      * Returns the ID of the planetary system where the person's academy campus is located.
      *
      * <p>The primary source is the location tree: this walks the person's parent chain to find
-     * the nearest {@link AcademyCampusLocation}, then returns the system ID from its parent
-     * {@link AbstractLocation} (typically a {@link mekhq.campaign.FixedLocation}).</p>
+     * the nearest {@link AcademyCampusLocation}, then returns the system ID from its parent {@link AbstractLocation}
+     * (typically a {@link mekhq.campaign.FixedLocation}).</p>
      *
      * <p>If no campus node is reachable in the tree — for example, during JOURNEY_FROM_CAMPUS,
-     * a local-academy transit before campus arrival, or when loading a pre-location-tree save
-     * file — this falls back to a transient value populated from the legacy {@code eduAcademySystem}
-     * XML tag.</p>
+     * a local-academy transit before campus arrival, or when loading a pre-location-tree save file — this falls back to
+     * a transient value populated from the legacy {@code eduAcademySystem} XML tag.</p>
      *
      * @return the campus system ID, or {@code null} if not derivable from either source
      */
     public @Nullable String getEduAcademySystem() {
-        LocationNode node = getLocationNode().getParent();
-        while (node != null) {
-            if (node.getLocatable() instanceof AcademyCampusLocation) {
-                LocationNode campusParent = node.getParent();
-                if (campusParent != null && campusParent.getLocatable() instanceof AbstractLocation location) {
+        for (ILocation cursor = getParentLocation(); cursor != null; cursor = cursor.getParentLocation()) {
+            if (cursor instanceof AcademyCampusLocation) {
+                ILocation campusParent = cursor.getParentLocation();
+                if (campusParent instanceof AbstractLocation location) {
                     PlanetarySystem system = location.getCurrentSystem();
                     if (system != null) {
                         return system.getId();
@@ -2794,7 +2813,6 @@ public class Person implements ILocation {
                 }
                 return legacyEduAcademySystem;
             }
-            node = node.getParent();
         }
         return legacyEduAcademySystem;
     }
@@ -5821,6 +5839,68 @@ public class Person implements ILocation {
     }
 
     /**
+     * Prepares a skill check based on individually passed options.
+     *
+     * <p>This method creates a {@code SkillCheck} instance which calculates the target number
+     * for the skill check, based on the person's skill, aging effects, clan campaign rules, and the current date.</p>
+     *
+     * @param skillName         the name of the skill being checked, corresponding to a {@link SkillType}
+     * @param isUseAgingEffects if {@code true}, considers aging effects during the check
+     * @param isClanCampaign    if {@code true}, applies rules specific to clan campaigns
+     * @param date              the current date, used for time-dependent logic
+     *
+     * @return prepared skill check
+     */
+    public SkillCheck checkSkill(String skillName, boolean isUseAgingEffects, boolean isClanCampaign, LocalDate date) {
+        return new SkillCheck(this, skillName, isUseAgingEffects, isClanCampaign, date);
+    }
+
+    /**
+     * Prepares a skill check based on the campaign's options.
+     *
+     * <p>Automatically extracts aging effect setting, clan campaign status, and the current date from
+     * the provided {@link Campaign} context to calculate the target number.</p>
+     *
+     * @param skillName the name of the skill being checked, corresponding to a {@link SkillType}
+     * @param campaign  the current {@link Campaign} context
+     *
+     * @return prepared skill check
+     */
+    public SkillCheck checkSkill(String skillName, Campaign campaign) {
+        return new SkillCheck(this, skillName, campaign.getCampaignOptions().isUseAgeEffects(),
+              campaign.isClanCampaign(), campaign.getLocalDate());
+    }
+
+    /**
+     * Prepares an attribute check.
+     *
+     * <p>This method creates an {@link AttributeCheck} instance which calculates the target number
+     * for the attribute check.</p>
+     *
+     * @param attribute the {@link SkillAttribute} to be checked
+     *
+     * @return prepared attribute check
+     */
+    public AttributeCheck checkAttribute(SkillAttribute attribute) {
+        return new AttributeCheck(this, attribute);
+    }
+
+    /**
+     * Prepares a double attribute check.
+     *
+     * <p>This method creates an {@link AttributeCheck} instance which calculates the target number
+     * for the attribute check.</p>
+     *
+     * @param firstAttribute  first {@link SkillAttribute} to be checked
+     * @param secondAttribute second {@link SkillAttribute} to be checked
+     *
+     * @return prepared attribute check
+     */
+    public AttributeCheck checkAttributes(SkillAttribute firstAttribute, SkillAttribute secondAttribute) {
+        return new AttributeCheck(this, firstAttribute, secondAttribute);
+    }
+
+    /**
      * Calculates the cost to improve a specific skill, at a specified skill level, with an optional reasoning
      * multiplier.
      *
@@ -6107,6 +6187,15 @@ public class Person implements ILocation {
 
     public void changeCurrentEdge(final int amount) {
         atowAttributes.changeCurrentEdge(amount);
+    }
+
+    public void spendEdge() {
+        if (getCurrentEdge() > 0) {
+            atowAttributes.changeCurrentEdge(-1);
+            MekHQ.triggerEvent(new PersonChangedEvent(this));
+        } else {
+            LOGGER.error("Trying to spend edge, but it is at {}", getCurrentEdge(), new IllegalArgumentException());
+        }
     }
 
     /**
@@ -7314,14 +7403,15 @@ public class Person implements ILocation {
      *
      * <p>The actual attribute score update is delegated to the underlying attribute handler.</p>
      *
-     * @param attribute The {@link SkillAttribute} to be updated. Must not be <code>null</code> or "NONE".
+     * @param attribute The {@link SkillAttribute} to be updated. Must not be {@code null} or
+     *                  {@link SkillAttribute#NO_ATTRIBUTE}.
      * @param newScore  The new score to assign to the specified skill attribute.
      *
      * @author Illiani
      * @since 0.50.05
      */
     public void setAttributeScore(final SkillAttribute attribute, final int newScore) {
-        if (attribute == null || attribute == SkillAttribute.NONE) {
+        if (attribute == null || attribute == SkillAttribute.NO_ATTRIBUTE) {
             LOGGER.warn("(setAttributeScore) SkillAttribute is null or NONE.");
             return;
         }
@@ -7349,14 +7439,14 @@ public class Person implements ILocation {
     /**
      * Retrieves the maximum allowed value (cap) for the specified {@link SkillAttribute}.
      *
-     * <p>If the attribute is {@code null} or marked as {@link SkillAttribute#NONE}, a default maximum attribute score
-     * is returned, and a warning is logged.</p>
+     * <p>If the attribute is {@code null} or marked as {@link SkillAttribute#NO_ATTRIBUTE}, a default maximum
+     * attribute score is returned, and a warning is logged.</p>
      *
      * <p>For valid attributes, this method delegates to
      * {@link Attributes#getAttributeCap(Phenotype, PersonnelOptions, SkillAttribute)}.</p>
      *
      * @param attribute The {@link SkillAttribute} for which the maximum value is being retrieved. Must not be
-     *                  {@code null} or {@link SkillAttribute#NONE}.
+     *                  {@code null} or {@link SkillAttribute#NO_ATTRIBUTE}.
      *
      * @return The maximum allowed value (cap) for the given attribute. Returns the default maximum value if the input
      *       attribute is invalid.
@@ -7365,7 +7455,7 @@ public class Person implements ILocation {
      * @since 0.50.05
      */
     public int getAttributeCap(final SkillAttribute attribute) {
-        if (attribute == null || attribute.isNone()) {
+        if (attribute == null || attribute.isNoAttribute()) {
             LOGGER.warn("(getAttributeCap) SkillAttribute is null or NONE.");
             return MAXIMUM_ATTRIBUTE_SCORE;
         }
@@ -7374,7 +7464,8 @@ public class Person implements ILocation {
     }
 
     /**
-     * Retrieves the modifier value for a specified skill attribute.
+     * Retrieves the modifier value for a specified skill attribute. Equivalent to
+     * <code>Skill.getIndividualAttributeModifier(person.getAttributeScore(attribute))</code>.
      *
      * @param attribute the skill attribute for which the modifier is to be calculated; if the attribute is null or
      *                  represents "none", a warning is logged and the method returns 0
@@ -7385,7 +7476,7 @@ public class Person implements ILocation {
      * @since 0.51.00
      */
     public int getAttributeModifier(final SkillAttribute attribute) {
-        if (attribute == null || attribute.isNone()) {
+        if (attribute == null || attribute.isNoAttribute()) {
             LOGGER.warn("(getAttributeModifier) SkillAttribute is null or NONE.");
             return 0;
         }
@@ -7415,8 +7506,8 @@ public class Person implements ILocation {
      * Modifies the score of a specified skill attribute by a given delta value.
      *
      * <p>This method adjusts the current score of the provided {@link SkillAttribute} by adding the specified delta
-     * to it. If the attribute is {@code null} or {@link SkillAttribute#NONE}, a warning is logged, and the method exits
-     * without making any changes.</p>
+     * to it. If the attribute is {@code null} or {@link SkillAttribute#NO_ATTRIBUTE}, a warning is logged, and the
+     * method exits without making any changes.</p>
      *
      * <p>The new score is computed as the sum of the current score and the delta, and it is passed
      * to {@link Attributes#setAttributeScore(Phenotype, PersonnelOptions, SkillAttribute, int)} to ensure it compiles
@@ -7429,7 +7520,7 @@ public class Person implements ILocation {
      * @since 0.50.05
      */
     public void changeAttributeScore(final SkillAttribute attribute, final int delta) {
-        if (attribute == null || attribute.isNone()) {
+        if (attribute == null || attribute.isNoAttribute()) {
             LOGGER.warn("(changeAttributeScore) SkillAttribute is null or NONE.");
             return;
         }
@@ -7598,6 +7689,15 @@ public class Person implements ILocation {
         return injuries.stream()
                      .filter(i -> !i.getSubType().isPermanentModification())
                      .collect(Collectors.toList());
+    }
+
+    public boolean hasProstheticInjuryNoImplant(BodyLocation location) {
+        for (Injury injury : getInjuriesByLocation(location)) {
+            if (injury.getSubType().isProsthetic()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public List<Injury> getNonPermanentInjuries() {
@@ -9357,8 +9457,7 @@ public class Person implements ILocation {
 
     @Override
     public boolean setParent(ILocation parent) {
-        LocationNode parentNode = getLocationNode().getParent();
-        ILocation oldParent = parentNode != null ? parentNode.getLocatable() : null;
+        ILocation oldParent = getParentLocation();
         if (ILocation.super.setParent(parent)) {
             if (oldParent instanceof Personnel personnel) {
                 personnel.remove(getId());

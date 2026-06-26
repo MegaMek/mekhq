@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -289,7 +289,6 @@ public class CampaignOptionsMarshaller {
               "edgeRefreshPeriod",
               campaignOptions.getEdgeRefreshPeriod().getLookupKey());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useEdge", campaignOptions.isUseEdge());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSupportEdge", campaignOptions.isUseSupportEdge());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useImplants", campaignOptions.isUseImplants());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
@@ -519,6 +518,10 @@ public class CampaignOptionsMarshaller {
               indent,
               "useRandomPersonalities",
               campaignOptions.isUseRandomPersonalities());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "usePersonalityLabelsOnly",
+              campaignOptions.isUsePersonalityLabelsOnly());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "useRandomPersonalityReputation",

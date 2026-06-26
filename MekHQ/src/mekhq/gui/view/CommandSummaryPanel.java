@@ -119,7 +119,18 @@ public class CommandSummaryPanel extends ScalingWidthConstrainedPanel {
         add(lblCombatStrengthValue, gridBagConstraints);
 
         refreshAll();
+    }
+
+    @Override
+    public void addNotify() {
+        super.addNotify();
         MekHQ.registerHandler(this);
+    }
+
+    @Override
+    public void removeNotify() {
+        MekHQ.unregisterHandler(this);
+        super.removeNotify();
     }
 
     /**

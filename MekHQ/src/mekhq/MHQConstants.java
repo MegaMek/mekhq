@@ -257,6 +257,12 @@ public final class MHQConstants extends SuiteConstants {
     public static final String NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT = "nagUnableToAffordLoanPayment";
     public static final String NAG_UNABLE_TO_AFFORD_JUMP = "nagUnableToAffordJump";
     public static final String NAG_UNABLE_TO_AFFORD_SHOPPING_LIST = "nagUnableToAffordShoppingList";
+    public static final String NAG_SOMEONE_RANDOMLY_DIED_COMBAT = "nagSomeoneRandomlyDiedCombat";
+    public static final String NAG_SOMEONE_RANDOMLY_DIED_TECH = "nagSomeoneRandomlyDiedTech";
+    public static final String NAG_SOMEONE_RANDOMLY_DIED_OTHER_SUPPORT = "nagSomeoneRandomlyDiedOtherSupport";
+    public static final String NAG_SOMEONE_RANDOMLY_DIED_CIVILIAN = "nagSomeoneRandomlyDiedCivilian";
+    public static final String NAG_SOMEONE_RANDOMLY_DIED_CAMP_FOLLOWER = "nagSomeoneRandomlyDiedCampFollower";
+    public static final String NAG_SOMEONE_RANDOMLY_DIED_RETIREE = "nagSomeoneRandomlyDiedRetired";
 
     public static final String CONFIRMATION_CONTRACT_RENTAL = "confirmationContractRental";
     public static final String CONFIRMATION_FACTION_STANDINGS_ULTIMATUM = "confirmationFactionStandingsUltimatum";

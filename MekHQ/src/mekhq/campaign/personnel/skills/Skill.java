@@ -61,7 +61,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
-import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
+import mekhq.campaign.randomEvents.personalities.Reasoning;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -552,7 +552,7 @@ public class Skill {
      *   <li>The {@link TargetRoll}, where the attribute modifier is applied as a negative value.</li>
      * </ul>
      *
-     * <p>Attributes that are set to {@link SkillAttribute#NONE} are ignored during this process.</p>
+     * <p>Attributes that are set to {@link SkillAttribute#NO_ATTRIBUTE} are ignored during this process.</p>
      *
      * <p>The calculated attribute modifiers are applied directly to the {@link TargetRoll} using
      * {@link TargetRoll#addModifier(int, String)}, where the negative modifier is associated with the
@@ -582,7 +582,7 @@ public class Skill {
 
         int totalModifier = 0;
         for (SkillAttribute attribute : linkedAttributes) {
-            if (attribute == SkillAttribute.NONE) {
+            if (attribute == SkillAttribute.NO_ATTRIBUTE) {
                 continue;
             }
 
@@ -922,7 +922,7 @@ public class Skill {
               (firstLinkedAttributeModifier > 0 ? additionSymbol : "") + firstLinkedAttributeModifier));
 
         SkillAttribute secondLinkedAttribute = type.getSecondAttribute();
-        if (secondLinkedAttribute != SkillAttribute.NONE) {
+        if (secondLinkedAttribute != SkillAttribute.NO_ATTRIBUTE) {
             int secondLinkedAttributeModifier = attributes.getAttributeModifier(secondLinkedAttribute,
                   activeInjuryEffects, options, skillModifierData.age());
             tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,

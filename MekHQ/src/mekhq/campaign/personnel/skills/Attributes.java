@@ -36,12 +36,14 @@ import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.personnel.skills.Skill.getIndividualAttributeModifier;
 import static mekhq.campaign.personnel.skills.SkillModifierData.IGNORE_AGE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.PrintWriter;
 import java.util.List;
 
 import megamek.codeUtilities.MathUtility;
 import megamek.logging.MMLogger;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
@@ -263,7 +265,7 @@ public class Attributes {
 
         int attributeScore = 0;
         return switch (attribute) {
-            case NONE, BODY, REFLEXES, DEXTERITY, WILLPOWER, EDGE -> 0;
+            case NO_ATTRIBUTE, BODY, REFLEXES, DEXTERITY, WILLPOWER, EDGE -> 0;
             case INTELLIGENCE -> {
                 if (hasAgeraniumsDisease) {
                     attributeScore -= 2;
@@ -315,7 +317,7 @@ public class Attributes {
      * @since 0.50.05
      */
     public int getBaseAttributeScore(SkillAttribute attribute) {
-        if (attribute == null || attribute.isNone()) {
+        if (attribute == null || attribute.isNoAttribute()) {
             LOGGER.warn("(getAttributeScore) attribute is null or NONE.");
             return DEFAULT_ATTRIBUTE_SCORE;
         }
@@ -366,7 +368,7 @@ public class Attributes {
                 case INTELLIGENCE -> effect.getIntelligenceModifier();
                 case WILLPOWER -> effect.getWillpowerModifier();
                 case CHARISMA -> effect.getCharismaModifier();
-                case NONE, EDGE -> 0; // There are no Edge modifying injury effects
+                case NO_ATTRIBUTE, EDGE -> 0; // There are no Edge modifying injury effects
             };
         }
 
@@ -420,17 +422,12 @@ public class Attributes {
      * @since 0.50.05
      */
     public void setAttributeScore(Phenotype phenotype, PersonnelOptions options, SkillAttribute attribute, int score) {
-        if (attribute == null || attribute.isNone()) {
+        if (attribute == null || attribute.isNoAttribute()) {
             LOGGER.warn("(setAttributeScore) attribute is null or NONE.");
             return;
         }
 
         int cap = getAttributeCap(phenotype, options, attribute);
-
-        // This ensures we never fall outside the hard boundaries, no matter how many SPAs or other weirdness the
-        // player piles on.
-        cap = Math.clamp(cap, MINIMUM_ATTRIBUTE_SCORE, MAXIMUM_ATTRIBUTE_SCORE);
-
         switch (attribute) {
             case STRENGTH -> strength = Math.clamp(score, MINIMUM_ATTRIBUTE_SCORE, cap);
             case BODY -> body = Math.clamp(score, MINIMUM_ATTRIBUTE_SCORE, cap);
@@ -472,32 +469,21 @@ public class Attributes {
         int cap = phenotype.getAttributeCap(attribute);
 
         // This is where you'd use options to verify if a character has SPAs that modify their maximum attribute score
-        boolean hasExceptionalStrength = options.booleanOption(EXCEPTIONAL_ATTRIBUTE_STRENGTH);
-        boolean hasFreakishStrength = options.booleanOption(MUTATION_FREAKISH_STRENGTH);
-        boolean hasExceptionalBody = options.booleanOption(EXCEPTIONAL_ATTRIBUTE_BODY);
-        boolean hasExceptionalReflexes = options.booleanOption(EXCEPTIONAL_ATTRIBUTE_REFLEXES);
-        boolean hasExceptionalDexterity = options.booleanOption(EXCEPTIONAL_ATTRIBUTE_DEXTERITY);
-        boolean hasExceptionalIntelligence = options.booleanOption(EXCEPTIONAL_ATTRIBUTE_INTELLIGENCE);
-        boolean hasExceptionalWillpower = options.booleanOption(EXCEPTIONAL_ATTRIBUTE_WILLPOWER);
-        boolean hasExceptionalCharisma = options.booleanOption(EXCEPTIONAL_ATTRIBUTE_CHARISMA);
-        boolean hasExceptionalEdge = options.booleanOption(EXCEPTIONAL_ATTRIBUTE_EDGE);
-        boolean hasBelovedPet = options.booleanOption(UNOFFICIAL_BELOVED_PET);
-
         cap += switch (attribute) {
             case STRENGTH -> {
-                int modifier = hasExceptionalStrength ? 1 : 0;
-                modifier += hasFreakishStrength ? 1 : 0;
+                int modifier = options.booleanOption(EXCEPTIONAL_ATTRIBUTE_STRENGTH) ? 1 : 0;
+                modifier += options.booleanOption(MUTATION_FREAKISH_STRENGTH) ? 1 : 0;
                 yield modifier;
             }
-            case BODY -> hasExceptionalBody ? 1 : 0;
-            case DEXTERITY -> hasExceptionalReflexes ? 1 : 0;
-            case REFLEXES -> hasExceptionalDexterity ? 1 : 0;
-            case INTELLIGENCE -> hasExceptionalIntelligence ? 1 : 0;
-            case WILLPOWER -> hasExceptionalWillpower ? 1 : 0;
-            case CHARISMA -> hasExceptionalCharisma ? 1 : 0;
+            case BODY -> options.booleanOption(EXCEPTIONAL_ATTRIBUTE_BODY) ? 1 : 0;
+            case DEXTERITY -> options.booleanOption(EXCEPTIONAL_ATTRIBUTE_REFLEXES) ? 1 : 0;
+            case REFLEXES -> options.booleanOption(EXCEPTIONAL_ATTRIBUTE_DEXTERITY) ? 1 : 0;
+            case INTELLIGENCE -> options.booleanOption(EXCEPTIONAL_ATTRIBUTE_INTELLIGENCE) ? 1 : 0;
+            case WILLPOWER -> options.booleanOption(EXCEPTIONAL_ATTRIBUTE_WILLPOWER) ? 1 : 0;
+            case CHARISMA -> options.booleanOption(EXCEPTIONAL_ATTRIBUTE_CHARISMA) ? 1 : 0;
             case EDGE -> {
-                int modifier = hasExceptionalEdge ? 1 : 0;
-                modifier += hasBelovedPet ? 1 : 0;
+                int modifier = options.booleanOption(EXCEPTIONAL_ATTRIBUTE_EDGE) ? 1 : 0;
+                modifier += options.booleanOption(UNOFFICIAL_BELOVED_PET) ? 1 : 0;
                 yield modifier;
             }
             default -> {
@@ -505,7 +491,11 @@ public class Attributes {
                 yield 0;
             }
         };
-        return cap;
+
+        // This ensures we never fall outside the hard boundaries, no matter how many SPAs or other weirdness the
+        // player piles on.
+        int minimumValue = attribute == SkillAttribute.EDGE ? MINIMUM_EDGE_SCORE : MINIMUM_ATTRIBUTE_SCORE;
+        return Math.clamp(cap, minimumValue, MAXIMUM_ATTRIBUTE_SCORE);
     }
 
     // Utility Methods
@@ -517,7 +507,8 @@ public class Attributes {
      * modifying their scores accordingly. Attribute values are clamped within valid bounds as defined by the
      * {@code changeAttribute} and {@code setAttributeScore} methods, ensuring no invalid scores are set.</p>
      *
-     * <p>Attributes marked as {@link SkillAttribute#NONE} are skipped during the iteration and are not modified.</p>
+     * <p>Attributes marked as {@link SkillAttribute#NO_ATTRIBUTE} are skipped during the iteration and are not
+     * modified.</p>
      *
      * @param phenotype The {@link Phenotype} used to determine the caps for all skill attributes.
      * @param options   The {@link PersonnelOptions} containing context-specific modifiers that may affect attribute
@@ -540,7 +531,7 @@ public class Attributes {
         }
 
         for (SkillAttribute attribute : SkillAttribute.values()) {
-            if (attribute.isNone()) {
+            if (attribute.isNoAttribute()) {
                 continue;
             }
 
@@ -578,7 +569,7 @@ public class Attributes {
             return;
         }
 
-        if (attribute == null || attribute.isNone()) {
+        if (attribute == null || attribute.isNoAttribute()) {
             LOGGER.warn("(changeAttribute) attribute is null or NONE.");
             return;
         }
@@ -648,6 +639,43 @@ public class Attributes {
         }
 
         return tooltip.toString();
+    }
+
+    /**
+     * Determines the attribute level description for the given person and skill attribute.
+     *
+     * <p><b>Note:</b> Currently MekHQ uses a 0+ scale for Edge which doesn't quite map to these values. These
+     * values are set up for ATOW Edge where 5 is average. Avoid using for Edge until we adopt an ATOW-style scaling for
+     * Edge.</p>
+     *
+     * @param person    the person whose attribute score is being evaluated
+     * @param attribute the skill attribute being assessed
+     *
+     * @return a string representing the descriptive level of the attribute
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static String getAttributeLevel(Person person, SkillAttribute attribute) {
+        int actualScore = 0;
+        if (person == null) {
+            LOGGER.warn("(getAttributeLevel) person is null.");
+        } else {
+            actualScore = person.getAttributeScore(attribute);
+        }
+
+        // corresponds to the attribute modifiers on ATOW pg 41 (6th printing)
+        String resourceKey = switch (actualScore) {
+            case 0 -> "incapacitated";
+            case 1 -> "terrible";
+            case 2, 3 -> "bad";
+            case 4, 5, 6 -> "average";
+            case 7, 8, 9 -> "great";
+            case 10 -> "amazing";
+            default -> "heroic";
+        };
+
+        return getTextAt(RESOURCE_BUNDLE, "attributeLevel." + resourceKey);
     }
 
     // Reading and Writing

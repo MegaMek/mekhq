@@ -475,7 +475,7 @@ public final class InjuryUtil {
                 }
                 final int critTimeReduction = injury.getTime() - (int) Math.floor(injury.getTime() * 0.9);
                 // Reroll fumbled treatment check with Edge if applicable
-                if (campaign.getCampaignOptions().isUseSupportEdge() &&
+                if (campaign.getCampaignOptions().isUseEdge() &&
                           (roll < fumbleLimit) &&
                           doctor.getOptions().booleanOption(PersonnelOptions.EDGE_MEDICAL) &&
                           (doctor.getCurrentEdge() > 0)) {
@@ -483,7 +483,7 @@ public final class InjuryUtil {
                           "%s made a mistake in the treatment of %s, but used Edge to reroll.",
                           doctor.getHyperlinkedFullTitle(),
                           person.getHyperlinkedName())));
-                    doctor.changeCurrentEdge(-1);
+                    doctor.spendEdge();
                     roll = Compute.randomInt(100);
                 }
 

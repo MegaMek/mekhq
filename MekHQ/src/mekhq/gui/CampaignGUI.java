@@ -211,12 +211,11 @@ public class CampaignGUI extends JPanel {
         this.app = app;
         reportHLL = new ReportHyperlinkListener(this);
         initComponents();
-        MekHQ.registerHandler(this);
         setUserPreferences();
 
         commandCenterTab = new CommandCenterTab(this, MHQTabType.COMMAND_CENTER.toString());
         toeTab = new TOETab(this, MHQTabType.TOE.toString());
-        briefingRoomTab = new BriefingTab(this, MHQTabType.BRIEFING_ROOM.toString());
+        briefingRoomTab = new BriefingTab(app, this, MHQTabType.BRIEFING_ROOM.toString());
         stratConTab = new StratConTab(this, MHQTabType.STRAT_CON.toString());
         navigationTab = new NavigationTab(this, MHQTabType.NAVIGATION.toString());
         personnelTab = new PersonnelTab(this, MHQTabType.PERSONNEL.toString());
@@ -243,6 +242,18 @@ public class CampaignGUI extends JPanel {
         activateTab(financesTab);
     }
     // endregion Constructors
+
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        MekHQ.registerHandler(this);
+    }
+
+    @Override
+    public void removeNotify() {
+        MekHQ.unregisterHandler(this);
+        super.removeNotify();
+    }
 
     // region Getters/Setters
     public JFrame getFrame() {
@@ -665,10 +676,7 @@ public class CampaignGUI extends JPanel {
                     .orElse(tabMain.getTabCount());
         tabMain.insertTab(tab.getTabName(), null, tab, null, index);
         tabMain.setMnemonicAt(index, tab.tabType().getMnemonic());
-        SwingUtilities.invokeLater(() -> {
-            tab.refreshAll();
-            tab.activateTab();
-        });
+        SwingUtilities.invokeLater(tab::refreshAll);
     }
 
     /**
@@ -677,7 +685,6 @@ public class CampaignGUI extends JPanel {
      * @param tab The tab to deactivate
      */
     private void deactivateTab(CampaignGuiTab tab) {
-        tab.deactivateTab();
         tabMain.remove(tab);
     }
 

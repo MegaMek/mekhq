@@ -42,7 +42,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.util.List;
-import java.util.stream.IntStream;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -388,18 +387,11 @@ public class ShoppingListPriorityDialog extends JDialog {
                 case COL_COST -> item.getBuyCost().toAmountAndSymbolString();
                 case COL_TOTAL_COST -> item.getTotalBuyCost().toAmountAndSymbolString();
                 case COL_TARGET -> {
-                    final TargetRoll target = campaign.getTargetForAcquisition(item, true);
-
+                    TargetRoll target = campaign.checkGenericAcquisition(item).getTargetNumber();
                     String value = target.getValueAsString();
-
-                    if (IntStream.of(
-                                TargetRoll.IMPOSSIBLE,
-                                TargetRoll.AUTOMATIC_SUCCESS,
-                                TargetRoll.AUTOMATIC_FAIL)
-                              .noneMatch(i -> target.getValue() == i)) {
+                    if (!target.cannotSucceed() && !target.isAutomaticSuccess()) {
                         value += "+";
                     }
-
                     yield value;
                 }
                 case COL_NEXT -> {
