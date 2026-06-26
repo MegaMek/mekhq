@@ -33,15 +33,12 @@
 
 package mekhq.campaign.personnel.skills;
 
-import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
-import mekhq.utilities.ReportingUtilities;
-
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.BARELY_MADE_IT;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginOfSuccessObjectFromMarginValue;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
-import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 
 import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * An immutable record representing the outcome of an action check.
@@ -86,18 +83,18 @@ public record ActionCheckResult(
      * @return {@code true} if the margin qualifies as a success, {@code false} otherwise
      */
     public static boolean isSuccess(int marginOfSuccess) {
-        return marginOfSuccess >= BARELY_MADE_IT.getMarginOfSuccessValue();
+        return marginOfSuccess >= BARELY_MADE_IT.getValue();
     }
 
     /**
      * Returns a skill check report. It takes resultsText generated during the skill check and extends it with
      * information about edge usage and, optionally, margin of success.
      *
-     * <p>See more in {@link AttributeCheck#generateResultsText}.</p>
+     * <p>See more in {@code ActionCheck#generateResultsText(int, int, String)}.</p>
      *
      * <p>If edge was used to reroll the skill check, the results will include an additional note with
-     * information about the reroll. If the caller requests it, margin of success details can also be
-     * appended to the results text.</p>
+     * information about the reroll. If the caller requests it, margin of success details can also be appended to the
+     * results text.</p>
      *
      * @param includeMarginsOfSuccessText whether to include detailed margins of success information in the results
      */

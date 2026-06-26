@@ -41,6 +41,7 @@ import static mekhq.campaign.personnel.enums.PersonnelStatus.MEDICAL_COMPLICATIO
 import static mekhq.campaign.personnel.medical.BodyLocation.GENERIC;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.HealingMarginOfSuccessEffects.getEffectFromHealingAttempt;
 import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
+import static mekhq.campaign.personnel.skills.enums.SkillAttribute.BODY;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.time.DayOfWeek;
@@ -61,7 +62,9 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
+import mekhq.campaign.personnel.skills.AttributeCheck;
 import mekhq.campaign.personnel.skills.SkillCheck;
+import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 
 
 /**
@@ -277,7 +280,8 @@ public class AdvancedMedicalAlternateHealing {
 
         // If we're performing unassisted healing, recovery time is substantially decreased sevenfold, as per ATOW
         // pg193 (6th printing). We represent this by only decreasing healing time on Mondays.
-        if (Objects.equals(doctor, patient)) {
+        boolean isUnassistedHealing = Objects.equals(doctor, patient);
+        if (isUnassistedHealing) {
             if (today.getDayOfWeek() != DayOfWeek.MONDAY) {
                 return;
             }
@@ -296,8 +300,12 @@ public class AdvancedMedicalAlternateHealing {
 
             boolean useEdge = campaign.getCampaignOptions().isUseEdge();
             useEdge = useEdge && healingSPAOptions.hasMedicalEdge();
-            int marginOfSuccess = getMarginOfSuccessForHealing(
-                  doctor, campaign, modifiers, miscPenalty, useEdge);
+            int marginOfSuccess = getMarginOfSuccessForHealing(doctor,
+                  campaign,
+                  modifiers,
+                  miscPenalty,
+                  useEdge,
+                  isUnassistedHealing);
 
             if (injury.getTime() <= 0) {
                 HealingMarginOfSuccessEffects outcome = processHealingEffects(campaign,
@@ -314,6 +322,11 @@ public class AdvancedMedicalAlternateHealing {
     /**
      * Performs the assisted healing roll for a doctor and returns its margin of success.
      *
+     *
+     * <p>The roll is an attribute check based on the patient's {@link SkillAttribute#BODY} attribute, modified by the
+     * provided target roll modifiers and miscellaneous penalties. If the initial result causes the injury to become
+     * permanent (margin of success &le; -6) and {@code useEdge} is {@code true}, a second roll is made and its result
+     * replaces the original.</p>
      * <p>The roll is a skill check using the doctor's {@code Surgery} skill, modified by the provided target roll
      * modifiers and miscellaneous penalties. If the initial result causes the injury to become permanent (margin of
      * success &le; {@link #PERMANENT_INJURY_THRESHOLD}) and {@code useEdge} is {@code true}, a second roll is made and
@@ -332,24 +345,71 @@ public class AdvancedMedicalAlternateHealing {
      * @since 0.50.10
      */
     private static int getMarginOfSuccessForHealing(Person doctor, Campaign campaign,
-          List<TargetRollModifier> modifiers, int miscPenalty, boolean useEdge) {
-        SkillCheck skillCheck = doctor.checkSkill(S_SURGERY, campaign)
-                                      .withMiscModifier(miscPenalty)
-                                      .withExternalModifiers(modifiers);
-        ActionCheckResult actionCheckResult = skillCheck.resolve(false, getTextAt(RESOURCE_BUNDLE,
-              "AdvancedMedicalAlternateHealing.assistedHealing.normal"));
+          List<TargetRollModifier> modifiers, int miscPenalty, boolean useEdge, boolean isUnassistedHealing) {
+        ActionCheckResult actionCheckResult = getActionCheckResult(doctor,
+              campaign,
+              modifiers,
+              miscPenalty,
+              useEdge,
+              isUnassistedHealing);
+
+        return actionCheckResult.marginOfSuccess();
+    }
+
+    private static ActionCheckResult getActionCheckResult(Person doctor, Campaign campaign,
+          List<TargetRollModifier> modifiers, int miscPenalty, boolean useEdge, boolean isUnassistedHealing) {
+        ActionCheckResult actionCheckResult;
+        if (isUnassistedHealing) {
+            actionCheckResult = performBodyAttributeCheck(doctor, modifiers, miscPenalty, useEdge);
+        } else {
+            actionCheckResult = performSurgerySkillCheck(doctor, campaign, modifiers, miscPenalty, useEdge);
+        }
+
+        return actionCheckResult;
+    }
+
+    private static ActionCheckResult performBodyAttributeCheck(Person doctor, List<TargetRollModifier> modifiers,
+          int miscPenalty, boolean useEdge) {
+        ActionCheckResult actionCheckResult;
+        AttributeCheck attributeCheck = doctor.checkAttribute(BODY)
+                                              .withMiscModifier(miscPenalty)
+                                              .withExternalModifiers(modifiers);
+        String resourceBundleKey = "AdvancedMedicalAlternateHealing.naturalHealing.normal";
+        String reportText = getTextAt(RESOURCE_BUNDLE, resourceBundleKey);
+        actionCheckResult = attributeCheck.resolve(false, reportText);
 
         // Edge
         if (actionCheckResult.marginOfSuccess() <= PERMANENT_INJURY_THRESHOLD &&
                   useEdge &&
-                  doctor.getCurrentEdge() > 0) { // Permanent injury
+                  doctor.getCurrentEdge() > 0) {
+            // manually update edge because if we pass useEdge == true, the doctor will get one free roll
+            doctor.spendEdge();
+            actionCheckResult = attributeCheck.resolve(false, getTextAt(RESOURCE_BUNDLE,
+                  "AdvancedMedicalAlternateHealing.naturalHealing.edge"));
+        }
+        return actionCheckResult;
+    }
+
+    private static ActionCheckResult performSurgerySkillCheck(Person doctor, Campaign campaign,
+          List<TargetRollModifier> modifiers, int miscPenalty, boolean useEdge) {
+        ActionCheckResult actionCheckResult;
+        SkillCheck skillCheck = doctor.checkSkill(S_SURGERY, campaign)
+                                      .withMiscModifier(miscPenalty)
+                                      .withExternalModifiers(modifiers);
+        String resourceBundleKey = "AdvancedMedicalAlternateHealing.assistedHealing.normal";
+        String reportText = getTextAt(RESOURCE_BUNDLE, resourceBundleKey);
+        actionCheckResult = skillCheck.resolve(false, reportText);
+
+        // Edge
+        if (actionCheckResult.marginOfSuccess() <= PERMANENT_INJURY_THRESHOLD &&
+                  useEdge &&
+                  doctor.getCurrentEdge() > 0) {
             // manually update edge because if we pass useEdge == true, the doctor will get one free roll
             doctor.spendEdge();
             actionCheckResult = skillCheck.resolve(false, getTextAt(RESOURCE_BUNDLE,
                   "AdvancedMedicalAlternateHealing.assistedHealing.edge"));
         }
-
-        return actionCheckResult.marginOfSuccess();
+        return actionCheckResult;
     }
 
     /**

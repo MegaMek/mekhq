@@ -208,28 +208,28 @@ class TrainingCombatTeamsTest {
     @Test
     void test_IsTrainingImpossible_NoSkills_CheckSuccessful() {
         boolean isTrainingImpossible = TrainingCombatTeams.isTrainingImpossible(List.of(),
-              BARELY_MADE_IT.getMarginOfSuccessValue());
+              BARELY_MADE_IT.getValue());
         assertTrue(isTrainingImpossible);
     }
 
     @Test
     void test_IsTrainingImpossible_YesSkills_CheckFailed() {
         boolean isTrainingImpossible = TrainingCombatTeams.isTrainingImpossible(List.of(gunneryMek),
-              ALMOST.getMarginOfSuccessValue());
+              ALMOST.getValue());
         assertTrue(isTrainingImpossible);
     }
 
     @Test
     void test_IsTrainingImpossible_NoSkills_CheckFailed() {
         boolean isTrainingImpossible = TrainingCombatTeams.isTrainingImpossible(List.of(),
-              ALMOST.getMarginOfSuccessValue());
+              ALMOST.getValue());
         assertTrue(isTrainingImpossible);
     }
 
     @Test
     void test_IsTrainingImpossible_YesSkills_CheckSuccessful() {
         boolean isTrainingImpossible = TrainingCombatTeams.isTrainingImpossible(List.of(gunneryMek),
-              BARELY_MADE_IT.getMarginOfSuccessValue());
+              BARELY_MADE_IT.getValue());
         assertFalse(isTrainingImpossible);
     }
 }

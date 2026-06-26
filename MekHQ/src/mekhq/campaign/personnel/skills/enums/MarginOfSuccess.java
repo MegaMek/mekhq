@@ -126,7 +126,7 @@ public enum MarginOfSuccess {
      * @author Illiani
      * @since 0.50.05
      */
-    public int getMarginOfSuccessValue() {
+    public int getValue() {
         return margin;
     }
 

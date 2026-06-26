@@ -219,7 +219,7 @@ class AdvancedMedicalAlternateHealingTest {
         when(patient.checkSkill(S_SURGERY, campaign)).thenReturn(skillCheck);
         when(skillCheck.withMiscModifier(anyInt())).thenReturn(skillCheck);
         when(skillCheck.withExternalModifiers(any())).thenReturn(skillCheck);
-        when(skillCheck.resolve(anyBoolean(), any(), anyBoolean())).thenReturn(result);
+        when(skillCheck.resolve(anyBoolean(), any())).thenReturn(result);
 
         AtomicBoolean removed = new AtomicBoolean(false);
         doAnswer(invocation -> {
@@ -313,7 +313,7 @@ class AdvancedMedicalAlternateHealingTest {
         when(doctor.checkSkill(S_SURGERY, campaign)).thenReturn(skillCheck);
         when(skillCheck.withMiscModifier(anyInt())).thenReturn(skillCheck);
         when(skillCheck.withExternalModifiers(any())).thenReturn(skillCheck);
-        when(skillCheck.resolve(anyBoolean(), any(), anyBoolean())).thenReturn(result);
+        when(skillCheck.resolve(anyBoolean(), any())).thenReturn(result);
         when(patient.getDoctorId()).thenReturn(null);
 
         AtomicBoolean removed = new AtomicBoolean(false);
@@ -361,7 +361,7 @@ class AdvancedMedicalAlternateHealingTest {
         when(doctor.checkSkill(S_SURGERY, campaign)).thenReturn(skillCheck);
         when(skillCheck.withMiscModifier(6)).thenReturn(skillCheck);
         when(skillCheck.withExternalModifiers(any())).thenReturn(skillCheck);
-        when(skillCheck.resolve(anyBoolean(), anyString(), anyBoolean())).thenReturn(first, second);
+        when(skillCheck.resolve(anyBoolean(), anyString())).thenReturn(first, second);
         when(doctor.getCurrentEdge()).thenReturn(1);
 
         try (MockedStatic<MHQInternationalization> i18n = mockStatic(MHQInternationalization.class)) {
@@ -375,7 +375,7 @@ class AdvancedMedicalAlternateHealingTest {
 
             assertEquals(1, margin);
             verify(doctor).spendEdge();
-            verify(skillCheck, times(2)).resolve(anyBoolean(), anyString(), anyBoolean());
+            verify(skillCheck, times(2)).resolve(anyBoolean(), anyString());
         }
     }
 

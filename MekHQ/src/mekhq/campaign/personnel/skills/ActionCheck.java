@@ -35,11 +35,8 @@ package mekhq.campaign.personnel.skills;
 
 import static mekhq.campaign.personnel.enums.GenderDescriptors.HIS_HER_THEIR;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.BARELY_MADE_IT;
-import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginOfSuccessObjectFromMarginValue;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
-import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
-import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.util.List;
 
@@ -55,8 +52,8 @@ import mekhq.utilities.ReportingUtilities;
  * Base abstract class for configuring character skill, attribute, and other action checks.
  *
  * <p>This class utilizes a builder pattern to allow the caller to attach external modifiers
- * and miscellaneous adjustments before resolving the check via {@link #resolve(boolean, String)}.
- * Subclasses must implement the abstract methods to define the specific mechanics of the action being checked.</p>
+ * and miscellaneous adjustments before resolving the check via {@link #resolve(boolean, String)}. Subclasses must
+ * implement the abstract methods to define the specific mechanics of the action being checked.</p>
  *
  * @param <T> the concrete subclass type, used to enable method chaining
  *
@@ -175,8 +172,8 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
      * <p><b>Usage:</b> This constructor offers detailed control over the skill check process.
      * </p>
      *
-     * @param useEdge                     whether the person should use edge to re-roll if the initial attempt fails
-     * @param reason                      the reason for the check; can be {@code null}
+     * @param useEdge whether the person should use edge to re-roll if the initial attempt fails
+     * @param reason  the reason for the check; can be {@code null}
      */
     public ActionCheckResult resolve(boolean useEdge, @Nullable String reason) {
 
@@ -237,7 +234,7 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
         String genderedReferenced = HIS_HER_THEIR.getDescriptor(person.getGender());
 
         String color;
-        int neutralMarginValue = BARELY_MADE_IT.getMarginOfSuccessValue();
+        int neutralMarginValue = BARELY_MADE_IT.getValue();
         if (marginOfSuccess == neutralMarginValue) {
             color = ReportingUtilities.getWarningColor();
         } else if (marginOfSuccess < neutralMarginValue) {
