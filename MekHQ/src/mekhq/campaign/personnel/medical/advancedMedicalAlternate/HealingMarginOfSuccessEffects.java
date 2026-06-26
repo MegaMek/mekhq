@@ -41,7 +41,7 @@ import static megamek.common.compute.Compute.d6;
  * <p>Each enum constant describes a combination of effects that can occur after resolving a healing roll: whether
  * the injury is recovered, whether fatigue is inflicted, whether recovery is delayed, and whether the injury becomes
  * permanent. The mapping from margin of success to these effects is handled by
- * {@link #getEffectFromHealingAttempt(int)}.</p>
+ * {@link #getEffectFromHealingAttempt(int, boolean)}.</p>
  *
  * @author Illiani
  * @since 0.50.10
