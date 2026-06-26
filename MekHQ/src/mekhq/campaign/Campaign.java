@@ -405,7 +405,7 @@ public class Campaign implements ITechManager, IPlace {
 
     private Systems systemsInstance;
     private final Map<String, PlanetarySystem> planetarySystemOverrides = new LinkedHashMap<>();
-    private final CampaignLocationManager locationManager = new CampaignLocationManager(this);
+    private final CampaignLocationManager locationManager = new CampaignLocationManager();
     private final ForceLocationManager forceLocationManager = new ForceLocationManager(this);
     private final Personnel mainForcePersonnel = new Personnel();
     private boolean isAvoidingEmptySystems;
@@ -1750,7 +1750,7 @@ public class Campaign implements ITechManager, IPlace {
     }
 
     public void setLocation(AbstractLocation location) {
-        getForceLocationManager().setLocation(location);
+        getForceLocationManager().setLocation(getCampaignLocationManager(), location);
     }
 
     public void addLocation(AbstractLocation location) {
@@ -1762,7 +1762,7 @@ public class Campaign implements ITechManager, IPlace {
     }
 
     public void pruneEmptyLocations() {
-        getCampaignLocationManager().pruneEmptyLocations();
+        getCampaignLocationManager().pruneEmptyLocations(this);
     }
 
     public List<AbstractLocation> getLocations() {
@@ -1771,25 +1771,23 @@ public class Campaign implements ITechManager, IPlace {
 
 
     public void addPlayerBase(@Nullable PlayerBase base) {
-        if (getCampaignLocationManager().addPlayerBase(base)) {
-            MekHQ.triggerEvent(new LocationAddedEvent(base));
-        }
+        getCampaignLocationManager().addPlayerBase(base);
     }
 
     public void removePlayerBase(@Nullable PlayerBase base) {
-        if (getCampaignLocationManager().removePlayerBase(base)) {
-            MekHQ.triggerEvent(new LocationRemovedEvent(base));
-        }
+        getCampaignLocationManager().removePlayerBase(base);
     }
 
     public Set<PlayerBase> getPlayerBases() {
         return getCampaignLocationManager().getPlayerBases();
     }
 
+    @Nonnull
     public CampaignLocationManager getCampaignLocationManager() {
         return locationManager;
     }
 
+    @Nonnull
     public ForceLocationManager getForceLocationManager() {
         return forceLocationManager;
     }
@@ -1800,12 +1798,12 @@ public class Campaign implements ITechManager, IPlace {
 
     public AcademyCampusLocation getOrCreateCampusLocation(String academySet, String academyName,
           String systemId) {
-        return getCampaignLocationManager().getOrCreateCampusLocation(academySet, academyName, systemId);
+        return getCampaignLocationManager().getOrCreateCampusLocation(this, academySet, academyName, systemId);
     }
 
     public AcademyCampusLocation getOrCreateLocalCampusLocation(String academySet,
           String academyName) {
-        return getCampaignLocationManager().getOrCreateLocalCampusLocation(academySet, academyName);
+        return getCampaignLocationManager().getOrCreateLocalCampusLocation(this, academySet, academyName);
     }
 
     public AcademyCampusLocation getOrCreateCampusUnderLocation(String academySet, String academyName,
@@ -1814,7 +1812,7 @@ public class Campaign implements ITechManager, IPlace {
     }
 
     public void moveToPlanetarySystem(PlanetarySystem planetarySystem) {
-        getForceLocationManager().moveToPlanetarySystem(planetarySystem);
+        getForceLocationManager().moveToPlanetarySystem(this, planetarySystem);
     }
 
     @Override
@@ -1856,7 +1854,7 @@ public class Campaign implements ITechManager, IPlace {
 
     @Override
     public void processArrivals(Campaign campaign) {
-        getForceLocationManager().processArrivals();
+        getForceLocationManager().processArrivals(campaign);
     }
 
     public boolean isOnContractAndPlanetside() {
@@ -5669,7 +5667,7 @@ public class Campaign implements ITechManager, IPlace {
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "formations");
         finances.writeToXML(writer, indent);
         forceLocationManager.writeToXML(writer, indent);
-        locationManager.writeToXML(writer, indent);
+        locationManager.writeToXML(this, writer, indent);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "isAvoidingEmptySystems", isAvoidingEmptySystems);
         MHQXMLUtility.writeSimpleXMLTag(writer,
               indent,

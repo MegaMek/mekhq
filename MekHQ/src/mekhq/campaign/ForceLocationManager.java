@@ -33,16 +33,18 @@
 
 package mekhq.campaign;
 
-import static mekhq.campaign.market.contractMarket.ContractAutomation.performAutomatedActivation;
-
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 import mekhq.MekHQ;
 import mekhq.campaign.events.LocationChangedEvent;
 import mekhq.campaign.location.ILocation;
+import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationDispatch;
 import mekhq.campaign.location.LocationNode;
+import mekhq.campaign.market.contractMarket.ContractAutomation;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 import mekhq.campaign.universe.PlanetarySystem;
 
@@ -55,16 +57,63 @@ import mekhq.campaign.universe.PlanetarySystem;
  */
 public class ForceLocationManager {
 
-    private final Campaign campaign;
     /**
-     * Splitting from {@code campaign} to seamlessly support future refactor of {@link Campaign} into two classes
+     * Temporary {@link IPlace} facade exposing only the force-level operations {@link ForceLocationManager} needs
+     * from the {@link Campaign} that currently doubles as the player's main force.
+     *
+     * <p><strong>Remove this class once {@link Campaign} is properly split into a standalone {@code Force} class.
+     * </strong> Right now {@code Force} is just a thin wrapper around {@link Campaign}: it has no {@link LocationNode}
+     * of its own and simply borrows the wrapped campaign's node and resources. Because of that,
+     * {@code getCurrentLocation()}, {@code setParent(...)} and {@code getChildLocations()} are inherited from the
+     * {@link IPlace}/{@link ILocation} defaults operating on that shared node, and only the node and the owned
+     * resources are overridden here.</p>
+     *
+     * <p>Anything at the whole-campaign level (campaign options, the universe, the shared location collection) is
+     * intentionally <em>not</em> exposed here and is passed in as a {@link Campaign} argument instead. Keeping the
+     * surface this small documents exactly which operations belong to the force and keeps the eventual split
+     * mechanical.</p>
      */
-    private final Campaign mainForce;
+    private static final class Force implements IPlace {
+        private final Campaign campaign;
+
+        Force(Campaign campaign) {
+            this.campaign = campaign;
+        }
+
+        @Override
+        public LocationNode getLocationNode() {
+            return campaign.getLocationNode();
+        }
+
+        @Override
+        public Hangar getHangar() {
+            return campaign.getHangar();
+        }
+
+        @Override
+        public Warehouse getWarehouse() {
+            return campaign.getWarehouse();
+        }
+
+        @Override
+        public Personnel getPersonnel() {
+            return campaign.getMainForcePersonnel();
+        }
+
+        List<UUID> getAutomatedMothballUnits() {
+            return campaign.getAutomatedMothballUnits();
+        }
+
+        void performAutomatedActivation() {
+            ContractAutomation.performAutomatedActivation(campaign);
+        }
+    }
+
+    private final Force mainForce;
     private final LocationNode locationNode;
 
     public ForceLocationManager(Campaign campaign) {
-        this.campaign = campaign;
-        this.mainForce = campaign;
+        this.mainForce = new Force(campaign);
         this.locationNode = new LocationNode(campaign);
     }
 
@@ -78,14 +127,14 @@ public class ForceLocationManager {
      * <p>If {@code location} is not yet tracked by the campaign's location collection, it is added. The previous
      * location is removed from the collection when it no longer has any children.</p>
      */
-    public void setLocation(AbstractLocation location) {
+    public void setLocation(CampaignLocationManager locationManager, AbstractLocation location) {
         AbstractLocation old = mainForce.getCurrentLocation();
-        if (location != null && !campaign.getCampaignLocationManager().getLocations().contains(location)) {
-            campaign.addLocation(location);
+        if (location != null && !locationManager.getLocations().contains(location)) {
+            locationManager.addLocation(location);
         }
         mainForce.setParent(location);
         if (old != null && old != location && old.getChildLocations().isEmpty()) {
-            campaign.removeLocation(old);
+            locationManager.removeLocation(old);
         }
     }
 
@@ -93,8 +142,8 @@ public class ForceLocationManager {
      * Processes {@link CurrentLocation} travel nodes that are parented directly to the campaign and have completed
      * their journey (i.e. are on-planet), landing their passengers into the campaign's main force resources.
      */
-    public void processArrivals() {
-        for (ILocation child : new ArrayList<>(campaign.getChildLocations())) {
+    public void processArrivals(Campaign campaign) {
+        for (ILocation child : new ArrayList<>(mainForce.getChildLocations())) {
             if (!(child instanceof CurrentLocation travelLocation)) {
                 continue;
             }
@@ -102,7 +151,7 @@ public class ForceLocationManager {
                 continue;
             }
             LocationDispatch.landFromTravelNode(travelLocation,
-                  mainForce.getMainForcePersonnel(),
+                  mainForce.getPersonnel(),
                   mainForce.getHangar(),
                   mainForce.getWarehouse(),
                   campaign);
@@ -124,12 +173,12 @@ public class ForceLocationManager {
      *
      * @param planetarySystem the destination {@link PlanetarySystem} to move the campaign to
      */
-    public void moveToPlanetarySystem(PlanetarySystem planetarySystem) {
-        setLocation(new CurrentLocation(planetarySystem, 0.0));
+    public void moveToPlanetarySystem(Campaign campaign, PlanetarySystem planetarySystem) {
+        setLocation(campaign.getCampaignLocationManager(), new CurrentLocation(planetarySystem, 0.0));
         MekHQ.triggerEvent(new LocationChangedEvent(mainForce.getCurrentLocation(), false));
 
         if (mainForce.getAutomatedMothballUnits().isEmpty()) {
-            performAutomatedActivation(mainForce);
+            mainForce.performAutomatedActivation();
         }
 
         if (campaign.getCampaignOptions().isUseRandomDiseases()

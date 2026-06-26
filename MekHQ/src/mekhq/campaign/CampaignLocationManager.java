@@ -41,7 +41,10 @@ import java.util.List;
 import java.util.Set;
 
 import megamek.common.annotations.Nullable;
+import mekhq.MekHQ;
 import mekhq.campaign.base.PlayerBase;
+import mekhq.campaign.events.LocationAddedEvent;
+import mekhq.campaign.events.LocationRemovedEvent;
 import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationNode;
@@ -56,13 +59,8 @@ import mekhq.utilities.MHQXMLUtility;
  */
 public class CampaignLocationManager {
 
-    private final Campaign campaign;
     private final List<AbstractLocation> locations = new ArrayList<>();
     private final Set<PlayerBase> playerBases = new LinkedHashSet<>();
-
-    public CampaignLocationManager(Campaign campaign) {
-        this.campaign = campaign;
-    }
 
     public void addLocation(AbstractLocation location) {
         if (location != null && !locations.contains(location)) {
@@ -79,31 +77,33 @@ public class CampaignLocationManager {
     }
 
     /**
-     * Adds {@code base} to the set of player bases and registers its parent location, if any.
-     *
-     * @return {@code true} if the set changed (i.e. the base was not already present)
+     * Adds {@code base} to the set of player bases, registers its parent location if any, and fires a
+     * {@link LocationAddedEvent} when the base was not already present.
      */
-    public boolean addPlayerBase(@Nullable PlayerBase base) {
+    public void addPlayerBase(@Nullable PlayerBase base) {
         if (base == null) {
-            return false;
+            return;
         }
         boolean added = playerBases.add(base);
         if (base.getParent() instanceof AbstractLocation parent) {
             addLocation(parent);
         }
-        return added;
+        if (added) {
+            MekHQ.triggerEvent(new LocationAddedEvent(base));
+        }
     }
 
     /**
-     * Removes {@code base} from the set of player bases.
-     *
-     * @return {@code true} if the set changed (i.e. the base was present)
+     * Removes {@code base} from the set of player bases, firing a {@link LocationRemovedEvent} when the base was
+     * present.
      */
-    public boolean removePlayerBase(@Nullable PlayerBase base) {
+    public void removePlayerBase(@Nullable PlayerBase base) {
         if (base == null) {
-            return false;
+            return;
         }
-        return playerBases.remove(base);
+        if (playerBases.remove(base)) {
+            MekHQ.triggerEvent(new LocationRemovedEvent(base));
+        }
     }
 
     public Set<PlayerBase> getPlayerBases() {
@@ -120,7 +120,7 @@ public class CampaignLocationManager {
      *
      * <p>Call this once per day after all personnel processing has completed.</p>
      */
-    public void pruneEmptyLocations() {
+    public void pruneEmptyLocations(Campaign campaign) {
         AbstractLocation mainLocation = campaign.getCurrentLocation();
         locations.removeIf(location -> {
             if (location == mainLocation) {
@@ -151,7 +151,7 @@ public class CampaignLocationManager {
      * @return the newly created campus location, or {@code null} if {@code systemId} could not be resolved
      */
     @Nullable
-    public AcademyCampusLocation addCampusLocation(String academySet, String academyName,
+    public AcademyCampusLocation addCampusLocation(Campaign campaign, String academySet, String academyName,
           String systemId) {
         PlanetarySystem system = campaign.getSystemById(systemId);
         if (system == null) {
@@ -168,7 +168,7 @@ public class CampaignLocationManager {
      * Returns the existing {@link AcademyCampusLocation} for the given campus at the given system, creating it on
      * demand if it does not yet exist.
      */
-    public AcademyCampusLocation getOrCreateCampusLocation(String academySet, String academyName,
+    public AcademyCampusLocation getOrCreateCampusLocation(Campaign campaign, String academySet, String academyName,
           String systemId) {
         for (AbstractLocation location : locations) {
             if (!(location instanceof FixedLocation fixedLocation)) {
@@ -185,7 +185,7 @@ public class CampaignLocationManager {
                 }
             }
         }
-        return addCampusLocation(academySet, academyName, systemId);
+        return addCampusLocation(campaign, academySet, academyName, systemId);
     }
 
     /**
@@ -195,7 +195,7 @@ public class CampaignLocationManager {
      * <p>Local campuses travel with the campaign and are not anchored to a {@link FixedLocation}.
      * Use {@link #getOrCreateCampusLocation} for academies at a fixed planetary system.</p>
      */
-    public AcademyCampusLocation getOrCreateLocalCampusLocation(String academySet,
+    public AcademyCampusLocation getOrCreateLocalCampusLocation(Campaign campaign, String academySet,
           String academyName) {
         for (ILocation child : campaign.getChildLocations()) {
             if (child instanceof AcademyCampusLocation campus
@@ -233,7 +233,7 @@ public class CampaignLocationManager {
     /**
      * Writes the {@code <locations>} and {@code <playerBases>} XML blocks.
      */
-    public void writeToXML(PrintWriter pw, int indent) {
+    public void writeToXML(Campaign campaign, PrintWriter pw, int indent) {
         AbstractLocation mainForceLocation = campaign.getCurrentLocation();
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "locations");
         for (AbstractLocation location : locations) {
