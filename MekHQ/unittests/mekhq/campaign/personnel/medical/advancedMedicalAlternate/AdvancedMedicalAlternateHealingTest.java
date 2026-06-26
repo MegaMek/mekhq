@@ -85,7 +85,9 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
+import mekhq.campaign.personnel.skills.AttributeCheck;
 import mekhq.campaign.personnel.skills.SkillCheck;
+import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.utilities.MHQInternationalization;
 import org.junit.jupiter.api.DisplayName;
@@ -196,6 +198,7 @@ class AdvancedMedicalAlternateHealingTest {
         Person patient = mock(Person.class);
         Injury injury = mock(Injury.class);
         SkillCheck skillCheck = mock(SkillCheck.class);
+        AttributeCheck attributeCheck = mock(AttributeCheck.class);
         ActionCheckResult result = new ActionCheckResult(8, 3, false, "success");
         PersonnelOptions options = mock(PersonnelOptions.class);
 
@@ -216,10 +219,10 @@ class AdvancedMedicalAlternateHealingTest {
         when(injury.getTime()).thenReturn(0); // Timer already elapsed; ready to resolve
         when(injury.getOriginalTime()).thenReturn(1);
         when(injury.getName()).thenReturn("Broken arm");
-        when(patient.checkSkill(S_SURGERY, campaign)).thenReturn(skillCheck);
-        when(skillCheck.withMiscModifier(anyInt())).thenReturn(skillCheck);
-        when(skillCheck.withExternalModifiers(any())).thenReturn(skillCheck);
-        when(skillCheck.resolve(anyBoolean(), any())).thenReturn(result);
+        when(patient.checkAttribute(SkillAttribute.BODY)).thenReturn(attributeCheck);
+        when(attributeCheck.withMiscModifier(anyInt())).thenReturn(attributeCheck);
+        when(attributeCheck.withExternalModifiers(any())).thenReturn(attributeCheck);
+        when(attributeCheck.resolve(anyBoolean(), any())).thenReturn(result);
 
         AtomicBoolean removed = new AtomicBoolean(false);
         doAnswer(invocation -> {
@@ -240,8 +243,8 @@ class AdvancedMedicalAlternateHealingTest {
             AdvancedMedicalAlternateHealing.processNewDay(campaign, patient, null);
 
             ArgumentCaptor<List<TargetRollModifier>> modifiersCaptor = ArgumentCaptor.forClass(List.class);
-            verify(skillCheck).withMiscModifier(0);
-            verify(skillCheck).withExternalModifiers(modifiersCaptor.capture());
+            verify(attributeCheck).withMiscModifier(0);
+            verify(attributeCheck).withExternalModifiers(modifiersCaptor.capture());
             assertEquals(List.of(new TargetRollModifier(-3, "Unassisted Healing")), modifiersCaptor.getValue());
             verify(patient).removeInjury(eq(injury), eq(MONDAY));
             verify(patient).setDoctorId(null, 1);
@@ -370,8 +373,20 @@ class AdvancedMedicalAlternateHealingTest {
                                                                                                                 1));
 
             int margin = invokePrivateStatic("getMarginOfSuccessForHealing",
-                  new Class<?>[] { Person.class, Campaign.class, List.class, int.class, boolean.class },
-                  doctor, campaign, List.of(), 6, true);
+                  new Class<?>[] {
+                        Person.class,
+                        Campaign.class,
+                        List.class,
+                        int.class,
+                        boolean.class,
+                        boolean.class
+                  },
+                  doctor,
+                  campaign,
+                  List.of(),
+                  6,
+                  true,
+                  false);
 
             assertEquals(1, margin);
             verify(doctor).spendEdge();
