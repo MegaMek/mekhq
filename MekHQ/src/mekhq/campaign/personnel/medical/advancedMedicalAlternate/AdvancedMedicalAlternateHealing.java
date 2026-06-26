@@ -320,17 +320,7 @@ public class AdvancedMedicalAlternateHealing {
     }
 
     /**
-     * Performs the assisted healing roll for a doctor and returns its margin of success.
-     *
-     *
-     * <p>The roll is an attribute check based on the patient's {@link SkillAttribute#BODY} attribute, modified by the
-     * provided target roll modifiers and miscellaneous penalties. If the initial result causes the injury to become
-     * permanent (margin of success &le; -6) and {@code useEdge} is {@code true}, a second roll is made and its result
-     * replaces the original.</p>
-     * <p>The roll is a skill check using the doctor's {@code Surgery} skill, modified by the provided target roll
-     * modifiers and miscellaneous penalties. If the initial result causes the injury to become permanent (margin of
-     * success &le; {@link #PERMANENT_INJURY_THRESHOLD}) and {@code useEdge} is {@code true}, a second roll is made and
-     * its result replaces the original.</p>
+     * Performs the healing roll for a doctor and returns its margin of success.
      *
      * @param doctor      the person performing the surgery check
      * @param campaign    the {@link Campaign} context
@@ -368,6 +358,14 @@ public class AdvancedMedicalAlternateHealing {
         return actionCheckResult;
     }
 
+    /**
+     * Performs a healing action check.
+     *
+     * <p>The roll is an attribute check based on the patient's {@link SkillAttribute#BODY} attribute, modified by the
+     * provided target roll modifiers and miscellaneous penalties. If the initial result causes the injury to become
+     * permanent (margin of success &le; -6) and {@code useEdge} is {@code true}, a second roll is made and its result
+     * replaces the original.</p>
+     */
     private static ActionCheckResult performBodyAttributeCheck(Person doctor, List<TargetRollModifier> modifiers,
           int miscPenalty, boolean useEdge) {
         ActionCheckResult actionCheckResult;
@@ -390,6 +388,14 @@ public class AdvancedMedicalAlternateHealing {
         return actionCheckResult;
     }
 
+    /**
+     * Performs a healing action check.
+     *
+     * <p>The roll is a skill check using the doctor's {@code Surgery} skill, modified by the provided target roll
+     * modifiers and miscellaneous penalties. If the initial result causes the injury to become permanent (margin of
+     * success &le; {@link #PERMANENT_INJURY_THRESHOLD}) and {@code useEdge} is {@code true}, a second roll is made and
+     * its result replaces the original.</p>
+     */
     private static ActionCheckResult performSurgerySkillCheck(Person doctor, Campaign campaign,
           List<TargetRollModifier> modifiers, int miscPenalty, boolean useEdge) {
         ActionCheckResult actionCheckResult;
