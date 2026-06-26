@@ -35,8 +35,11 @@ package mekhq.campaign.personnel.skills;
 
 import static mekhq.campaign.personnel.enums.GenderDescriptors.HIS_HER_THEIR;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.BARELY_MADE_IT;
+import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginOfSuccessObjectFromMarginValue;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.util.List;
 
@@ -52,8 +55,8 @@ import mekhq.utilities.ReportingUtilities;
  * Base abstract class for configuring character skill, attribute, and other action checks.
  *
  * <p>This class utilizes a builder pattern to allow the caller to attach external modifiers
- * and miscellaneous adjustments before resolving the check via {@link #resolve(boolean, String)}. Subclasses must
- * implement the abstract methods to define the specific mechanics of the action being checked.</p>
+ * and miscellaneous adjustments before resolving the check via {@link #resolve(boolean, String)}.
+ * Subclasses must implement the abstract methods to define the specific mechanics of the action being checked.</p>
  *
  * @param <T> the concrete subclass type, used to enable method chaining
  *
@@ -131,11 +134,10 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
      * Applies external modifiers to the action check's target number.
      *
      * <p>External modifiers can optionally influence the target number. Using edge allows the person to attempt a
-     * re-roll if the initial roll fails. Additionally, the constructor can include margins of success text as part of
-     * the results, if desired.</p>
+     * re-roll if the initial roll fails. Additionally, the constructor can include margins of success text as
+     * part of the results, if desired.</p>
      *
      * @param modifiers a list of {@link TargetRollModifier}s that affect the target number
-     *
      * @return updated action check
      */
     public T withExternalModifiers(List<TargetRollModifier> modifiers) {
@@ -148,10 +150,10 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
     /**
      * Applies a miscellaneous numerical modifier to the action check's target number.
      *
-     * @param miscModifier any special modifiers, as an {@link Integer}. These values are subtracted from the target
-     *                     number, if the associated skill is classified as 'count up', otherwise they are added to the
-     *                     target number. This means negative values are bonuses, positive values are penalties.
-     *
+     * @param miscModifier any special modifiers, as an {@link Integer}. These values are subtracted from the
+     *                     target number, if the associated skill is classified as 'count up', otherwise they are
+     *                     added to the target number. This means negative values are bonuses, positive values are
+     *                     penalties.
      * @return updated action check
      */
     public T withMiscModifier(int miscModifier) {
@@ -172,8 +174,8 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
      * <p><b>Usage:</b> This constructor offers detailed control over the skill check process.
      * </p>
      *
-     * @param useEdge whether the person should use edge to re-roll if the initial attempt fails
-     * @param reason  the reason for the check; can be {@code null}
+     * @param useEdge                     whether the person should use edge to re-roll if the initial attempt fails
+     * @param reason                      the reason for the check; can be {@code null}
      */
     public ActionCheckResult resolve(boolean useEdge, @Nullable String reason) {
 
