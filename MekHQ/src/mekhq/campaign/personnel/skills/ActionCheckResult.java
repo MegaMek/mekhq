@@ -33,34 +33,53 @@
 
 package mekhq.campaign.personnel.skills;
 
-import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
-import mekhq.utilities.ReportingUtilities;
-
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.BARELY_MADE_IT;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginOfSuccessObjectFromMarginValue;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
-import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+
+import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
+import mekhq.utilities.ReportingUtilities;
 
 /**
- * An immutable record representing the outcome of an action check.
- *
- * @param roll            Roll result for the action check
- * @param marginOfSuccess Calculated margin of success for this action check. Represents how much better (or worse)
- *                        the roll was compared to the target number
- * @param usedEdge        Indicates whether edge was used during the action check
- * @param resultsText     A string representing the outcome of the action check
+ * An immutable record of action check outcome.
  *
  * @author Hokk
  * @since 0.51.01
  */
-public record ActionCheckResult(
-      int roll,
-      int marginOfSuccess,
-      boolean usedEdge,
-      String resultsText
-) {
+public class ActionCheckResult {
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.ActionCheck";
+
+    private final ActionCheckRoll roll;
+    private final int marginOfSuccess;
+    private final boolean usedEdge;
+    private final String resultsText;
+
+    /**
+     * @param roll            Roll result for the action check
+     * @param marginOfSuccess Calculated margin of success for this action check. Represents how much better (or worse)
+     *                        the roll was compared to the target number
+     * @param usedEdge        Indicates whether edge was used during the action check
+     * @param resultsText     A string representing the outcome of the action check
+     */
+    public ActionCheckResult(ActionCheckRoll roll, int marginOfSuccess, boolean usedEdge, String resultsText) {
+        this.roll = roll;
+        this.marginOfSuccess = marginOfSuccess;
+        this.usedEdge = usedEdge;
+        this.resultsText = resultsText;
+    }
+
+    public int getRollResult() {
+        return roll.result();
+    }
+
+    public int getMarginOfSuccess() {
+        return marginOfSuccess;
+    }
+
+    public boolean hasUsedEdge() {
+        return usedEdge;
+    }
 
     /**
      * Determines whether the action check was successful.

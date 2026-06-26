@@ -36,15 +36,16 @@ package mekhq.campaign.personnel.skills;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
 
 import megamek.common.TargetRollModifier;
+import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
 import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.personnel.Person;
@@ -91,9 +92,9 @@ class ActionCheckTest {
     }
 
     private ActionCheckResult resolveWithFixedRoll(ActionCheck<?> check, boolean useEdge,
-          int firstRoll, int secondRoll) {
-        try (MockedStatic<SkillCheckUtility> utils = mockStatic(SkillCheckUtility.class)) {
-            utils.when(() -> SkillCheckUtility.getRoll(anyBoolean())).thenReturn(firstRoll, secondRoll);
+          Integer firstRoll, Integer... otherRolls) {
+        try (MockedStatic<Compute> utils = mockStatic(Compute.class)) {
+            utils.when(Compute::d6).thenReturn(firstRoll, otherRolls);
             return check.resolve(useEdge, null);
         }
     }
@@ -139,11 +140,11 @@ class ActionCheckTest {
         Person person = new Person("F", "L", null, "Faction");
         TargetRoll target = new TargetRoll(7, "");
         ConcreteActionCheck check = new ConcreteActionCheck(person, target, false, false, "Action");
-        ActionCheckResult result = resolveWithFixedRoll(check, true, 8, 0);
+        ActionCheckResult result = resolveWithFixedRoll(check, true, 2, 6);
 
         assertTrue(result.isSuccess());
-        assertFalse(result.usedEdge());
-        assertEquals(8, result.roll());
+        assertFalse(result.hasUsedEdge());
+        assertEquals(8, result.getRollResult());
         assertEquals("<a href='PERSON:link'>F L</a> <span color=\"#7fcf43\"><b>Passed</b></span> his <b>Action</b> " +
                            "check with a roll of <b>8</b> vs. a target number of <b>7</b>.",
               result.getReport(false).replace(person.getId().toString(), "link"));
@@ -154,11 +155,11 @@ class ActionCheckTest {
         Person person = new Person("F", "L", null, "Faction");
         TargetRoll target = new TargetRoll(7, "");
         ConcreteActionCheck check = new ConcreteActionCheck(person, target, false, false, "Action");
-        ActionCheckResult result = resolveWithFixedRoll(check, false, 5, 0);
+        ActionCheckResult result = resolveWithFixedRoll(check, false, 1, 4);
 
         assertFalse(result.isSuccess());
-        assertFalse(result.usedEdge());
-        assertEquals(5, result.roll());
+        assertFalse(result.hasUsedEdge());
+        assertEquals(5, result.getRollResult());
         assertEquals("<a href='PERSON:link'>F L</a> <span color=\"negative\"><b>Failed</b></span> his <b>Action</b> " +
                            "check with a roll of <b>5</b> vs. a target number of <b>7</b>.",
               result.getReport(false).replace(person.getId().toString(), "link")
@@ -171,10 +172,10 @@ class ActionCheckTest {
         person.setCurrentEdge(0);
         TargetRoll target = new TargetRoll(7, "");
         ConcreteActionCheck check = new ConcreteActionCheck(person, target, false, false, "Action");
-        ActionCheckResult result = resolveWithFixedRoll(check, true, 5, 12);
+        ActionCheckResult result = resolveWithFixedRoll(check, true, 3, 2, 6, 6);
 
         assertFalse(result.isSuccess());
-        assertFalse(result.usedEdge());
+        assertFalse(result.hasUsedEdge());
         assertEquals("<a href='PERSON:link'>F L</a> <span color=\"negative\"><b>Failed</b></span> his <b>Action</b> " +
                            "check with a roll of <b>5</b> vs. a target number of <b>7</b>.",
               result.getReport(false).replace(person.getId().toString(), "link")
@@ -186,10 +187,10 @@ class ActionCheckTest {
         Person person = new Person("F", "L", null, "Faction");
         TargetRoll target = new TargetRoll(13, "");
         ConcreteActionCheck check = new ConcreteActionCheck(person, target, false, false, "Action");
-        ActionCheckResult result = resolveWithFixedRoll(check, true, 12, 0);
+        ActionCheckResult result = resolveWithFixedRoll(check, true, 6, 6);
 
         assertFalse(result.isSuccess());
-        assertFalse(result.usedEdge());
+        assertFalse(result.hasUsedEdge());
     }
 
     @Test
@@ -200,11 +201,11 @@ class ActionCheckTest {
         when(person.getCurrentEdge()).thenReturn(1);
         TargetRoll target = new TargetRoll(7, "");
         ConcreteActionCheck check = new ConcreteActionCheck(person, target, false, false, "Action");
-        ActionCheckResult result = resolveWithFixedRoll(check, true, 5, 9);
+        ActionCheckResult result = resolveWithFixedRoll(check, true, 4, 1, 3, 6);
 
         assertTrue(result.isSuccess());
-        assertTrue(result.usedEdge());
-        assertEquals(9, result.roll());
+        assertTrue(result.hasUsedEdge());
+        assertEquals(9, result.getRollResult());
         verify(person).spendEdge();
         assertEquals("Person <span color=\"positive\"><b>Passed</b></span> her <b>Action</b> check with a roll of " +
                            "<b>9</b> vs. a target number of <b>7</b>. Used a point of <b>Edge</b>.",
@@ -220,11 +221,11 @@ class ActionCheckTest {
 
         TargetRoll target = new TargetRoll(7, "");
         ConcreteActionCheck check = new ConcreteActionCheck(person, target, false, false, "Action");
-        ActionCheckResult result = resolveWithFixedRoll(check, true, 5, 6);
+        ActionCheckResult result = resolveWithFixedRoll(check, true, 2, 3, 4, 2);
 
         assertFalse(result.isSuccess());
-        assertTrue(result.usedEdge());
-        assertEquals(6, result.roll());
+        assertTrue(result.hasUsedEdge());
+        assertEquals(6, result.getRollResult());
         verify(person).spendEdge();
         assertEquals("Person <span color=\"negative\"><b>Failed</b></span> his <b>Action</b> check with a roll of " +
                            "<b>6</b> vs. a target number of <b>7</b>. Used a point of <b>Edge</b>.",
@@ -238,10 +239,11 @@ class ActionCheckTest {
         TargetRoll target = new TargetRoll(7, "Base");
         ConcreteActionCheck check = new ConcreteActionCheck(person, target, false, naturalAptitude, "Action");
 
-        try (MockedStatic<SkillCheckUtility> utils = mockStatic(SkillCheckUtility.class)) {
-            utils.when(() -> SkillCheckUtility.getRoll(anyBoolean())).thenReturn(8);
-            check.resolve(false, null);
-            utils.verify(() -> SkillCheckUtility.getRoll(naturalAptitude));
+        try (MockedStatic<Compute> utils = mockStatic(Compute.class)) {
+            utils.when(Compute::d6).thenReturn(3, 5, 2);
+            ActionCheckResult result = check.resolve(false, null);
+            assertEquals(8, result.getRollResult());
+            utils.verify(Compute::d6, times(naturalAptitude ? 3 : 2));
         }
     }
 }
