@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import jakarta.annotation.Nonnull;
 import mekhq.MekHQ;
 import mekhq.campaign.events.LocationChangedEvent;
 import mekhq.campaign.location.ILocation;
@@ -81,21 +82,25 @@ public class ForceLocationManager {
         }
 
         @Override
+        @Nonnull
         public LocationNode getLocationNode() {
             return campaign.getLocationNode();
         }
 
         @Override
+        @Nonnull
         public Hangar getHangar() {
             return campaign.getHangar();
         }
 
         @Override
+        @Nonnull
         public Warehouse getWarehouse() {
             return campaign.getWarehouse();
         }
 
         @Override
+        @Nonnull
         public Personnel getPersonnel() {
             return campaign.getMainForcePersonnel();
         }
@@ -117,6 +122,7 @@ public class ForceLocationManager {
         this.locationNode = new LocationNode(campaign);
     }
 
+    @Nonnull
     public LocationNode getLocationNode() {
         return locationNode;
     }

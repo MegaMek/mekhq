@@ -40,6 +40,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import jakarta.annotation.Nonnull;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.base.PlayerBase;
@@ -72,6 +73,7 @@ public class CampaignLocationManager {
         locations.remove(location);
     }
 
+    @Nonnull
     public List<AbstractLocation> getLocations() {
         return Collections.unmodifiableList(locations);
     }
@@ -106,6 +108,7 @@ public class CampaignLocationManager {
         }
     }
 
+    @Nonnull
     public Set<PlayerBase> getPlayerBases() {
         return Collections.unmodifiableSet(playerBases);
     }
@@ -195,6 +198,7 @@ public class CampaignLocationManager {
      * <p>Local campuses travel with the campaign and are not anchored to a {@link FixedLocation}.
      * Use {@link #getOrCreateCampusLocation} for academies at a fixed planetary system.</p>
      */
+    @Nonnull
     public AcademyCampusLocation getOrCreateLocalCampusLocation(Campaign campaign, String academySet,
           String academyName) {
         for (ILocation child : campaign.getChildLocations()) {
@@ -216,6 +220,7 @@ public class CampaignLocationManager {
      * <p>Used for home-school campuses that travel with the campaign or a player base rather than being anchored to a
      * fixed planetary system.</p>
      */
+    @Nonnull
     public AcademyCampusLocation getOrCreateCampusUnderLocation(String academySet, String academyName,
           ILocation parent) {
         for (ILocation child : parent.getChildLocations()) {

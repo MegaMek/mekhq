@@ -1765,6 +1765,7 @@ public class Campaign implements ITechManager, IPlace {
         getCampaignLocationManager().pruneEmptyLocations(this);
     }
 
+    @Nonnull
     public List<AbstractLocation> getLocations() {
         return getCampaignLocationManager().getLocations();
     }
@@ -1778,6 +1779,7 @@ public class Campaign implements ITechManager, IPlace {
         getCampaignLocationManager().removePlayerBase(base);
     }
 
+    @Nonnull
     public Set<PlayerBase> getPlayerBases() {
         return getCampaignLocationManager().getPlayerBases();
     }
@@ -1801,11 +1803,13 @@ public class Campaign implements ITechManager, IPlace {
         return getCampaignLocationManager().getOrCreateCampusLocation(this, academySet, academyName, systemId);
     }
 
+    @Nonnull
     public AcademyCampusLocation getOrCreateLocalCampusLocation(String academySet,
           String academyName) {
         return getCampaignLocationManager().getOrCreateLocalCampusLocation(this, academySet, academyName);
     }
 
+    @Nonnull
     public AcademyCampusLocation getOrCreateCampusUnderLocation(String academySet, String academyName,
           ILocation parent) {
         return getCampaignLocationManager().getOrCreateCampusUnderLocation(academySet, academyName, parent);
@@ -1816,8 +1820,8 @@ public class Campaign implements ITechManager, IPlace {
     }
 
     @Override
-    @Nullable
-    public @Nonnull LocationNode getLocationNode() {
+    @Nonnull
+    public LocationNode getLocationNode() {
         return getForceLocationManager().getLocationNode();
     }
 
