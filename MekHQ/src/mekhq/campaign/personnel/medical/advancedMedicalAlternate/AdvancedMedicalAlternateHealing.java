@@ -34,8 +34,10 @@ package mekhq.campaign.personnel.medical.advancedMedicalAlternate;
 
 import static java.lang.Math.max;
 import static megamek.common.compute.Compute.randomInt;
+import static megamek.common.units.Crew.DEATH;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_FIT;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
+import static mekhq.campaign.personnel.enums.PersonnelStatus.MEDICAL_COMPLICATIONS;
 import static mekhq.campaign.personnel.medical.BodyLocation.GENERIC;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.HealingMarginOfSuccessEffects.getEffectFromHealingAttempt;
 import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
@@ -413,8 +415,9 @@ public class AdvancedMedicalAlternateHealing {
 
         // Some healing effects are mutually exclusive. These conditionals are constructed so we bypass illogical
         // values.
+        LocalDate today = campaign.getLocalDate();
         if (healingEffect.isHealed()) {
-            patient.removeInjury(injury, campaign.getLocalDate());
+            patient.removeInjury(injury, today);
 
             if (patient.getInjuries().isEmpty()) {
                 if (!(null == patient.getDoctorId()) && patient.getPrisonerStatus().isFreeOrBondsman()) {
@@ -440,6 +443,9 @@ public class AdvancedMedicalAlternateHealing {
 
         if (healingEffect.isHasComplication()) {
             patient.addInjury(createMedicalComplicationInjury(campaign, patient));
+            if (patient.getTotalInjurySeverity() >= DEATH) {
+                patient.changeStatus(campaign, today, MEDICAL_COMPLICATIONS);
+            }
         }
 
         return healingEffect;
