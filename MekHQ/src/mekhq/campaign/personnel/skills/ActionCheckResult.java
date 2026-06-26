@@ -33,16 +33,16 @@
 
 package mekhq.campaign.personnel.skills;
 
-import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
-
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.BARELY_MADE_IT;
+
+import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
 
 /**
  * An immutable record representing the outcome of an action check.
  *
  * @param roll            Roll result for the action check
- * @param marginOfSuccess Calculated margin of success for this action check. Represents how much better (or worse)
- *                        the roll was compared to the target number
+ * @param marginOfSuccess Calculated margin of success for this action check. Represents how much better (or worse) the
+ *                        roll was compared to the target number
  * @param usedEdge        Indicates whether edge was used during the action check
  * @param resultsText     A string representing the outcome of the action check
  *
@@ -74,9 +74,10 @@ public record ActionCheckResult(
      * <p>A margin is considered successful if it is equal or exceeds {@link MarginOfSuccess#BARELY_MADE_IT}.</p>
      *
      * @param marginOfSuccess the margin of success to evaluate
+     *
      * @return {@code true} if the margin qualifies as a success, {@code false} otherwise
      */
     public static boolean isSuccess(int marginOfSuccess) {
-        return marginOfSuccess >= BARELY_MADE_IT.getValue();
+        return marginOfSuccess >= BARELY_MADE_IT.getMarginOfSuccessValue();
     }
 }

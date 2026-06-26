@@ -549,7 +549,7 @@ public class TrainingCombatTeams {
      * @since 0.51.01
      */
     static boolean isTrainingImpossible(List<Skill> skillsBeingTrained, int marginOfSuccess) {
-        boolean isSkillCheckFailed = marginOfSuccess < BARELY_MADE_IT.getValue();
+        boolean isSkillCheckFailed = marginOfSuccess < BARELY_MADE_IT.getMarginOfSuccessValue();
         boolean isNothingBeingTrained = skillsBeingTrained.isEmpty();
 
         return isSkillCheckFailed || isNothingBeingTrained;
