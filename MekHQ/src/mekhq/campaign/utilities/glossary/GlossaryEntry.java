@@ -53,8 +53,8 @@ import mekhq.MHQConstants;
  */
 public enum GlossaryEntry {
     ADMIN_STRAIN("HR_STRAIN", new Version("0.50.06")),
-    ADVANCED_SCOUTING("ADVANCED_SCOUTING", new Version("0.50.11")),
     ADVANCED_MEDICAL("ADVANCED_MEDICAL", new Version("0.50.01")),
+    ADVANCED_SCOUTING("ADVANCED_SCOUTING", new Version("0.50.11")),
     AGGREGATE_COMBAT_VIEW("AGGREGATE_COMBAT_VIEW", new Version("0.51.0")),
     AGING("AGING", new Version("0.50.06")),
     ALT_ADVANCED_MEDICAL("ALT_ADVANCED_MEDICAL", new Version("0.50.10")),
@@ -75,7 +75,6 @@ public enum GlossaryEntry {
     CONNECTIONS("CONNECTIONS", new Version("0.50.10")),
     CONTRACTS_AND_MISSIONS("CONTRACTS_AND_MISSIONS", new Version("0.50.06")),
     CONTRACT_VICTORY_POINTS("CONTRACT_VICTORY_POINTS", new Version("0.50.06")),
-    CREW_REQUIREMENTS("CREW_REQUIREMENTS", new Version("0.50.06")),
     CRISIS_SCENARIO("CRISIS_SCENARIO", new Version("0.50.06")),
     DAMAGED_PARTS("DAMAGED_PARTS", new Version("0.50.06")),
     DELIVERY_TIMES("DELIVERY_TIMES", new Version("0.50.06")),
@@ -174,7 +173,7 @@ public enum GlossaryEntry {
     TURNING_POINTS("TURNING_POINTS", new Version("0.50.06")),
     TURNOVER("TURNOVER", new Version("0.50.06")),
     UNABLE_TO_START_SCENARIO("UNABLE_TO_START_SCENARIO", new Version("0.50.06")),
-    VEHICLE_CREWS("VEHICLE_CREWS", new Version("0.50.06")),
+    VEHICLE_CREWS("VEHICLE_CREWS", new Version("0.51.01")),
     VOCATIONAL_XP("VOCATIONAL_XP", new Version("0.50.06")),
     WINTER_HOLIDAY("WINTER_HOLIDAY", new Version("0.50.06"));
 
