@@ -206,7 +206,8 @@ public class PersonnelTab {
     private JCheckBox chkUseRandomHitsForVehicles;
     private JCheckBox chkUseTougherHealing;
     private JCheckBox chkUseAlternativeAdvancedMedical;
-    private JCheckBox chkUseKinderAlternativeAdvancedMedical;
+    private JLabel lblAlternativeAdvancedMedicalHealingTimeMultiplier;
+    private JSpinner spnAlternativeAdvancedMedicalHealingTimeMultiplier;
     private JCheckBox chkUseRandomDiseases;
     private JLabel lblMaximumPatients;
     private JSpinner spnMaximumPatients;
@@ -298,7 +299,8 @@ public class PersonnelTab {
         chkUseRandomHitsForVehicles = new JCheckBox();
         chkUseTougherHealing = new JCheckBox();
         chkUseAlternativeAdvancedMedical = new JCheckBox();
-        chkUseKinderAlternativeAdvancedMedical = new JCheckBox();
+        lblAlternativeAdvancedMedicalHealingTimeMultiplier = new JLabel();
+        spnAlternativeAdvancedMedicalHealingTimeMultiplier = new JSpinner();
         chkUseRandomDiseases = new JCheckBox();
 
         lblMaximumPatients = new JLabel();
@@ -964,7 +966,7 @@ public class PersonnelTab {
         //start Medical Tab
         CampaignOptionsHeaderPanel medicalHeader = new CampaignOptionsHeaderPanel("MedicalTab",
               getImageDirectory() + "logo_duchy_of_tamarind_abbey.png",
-              3);
+              4);
 
         // Contents
         chkUseAdvancedMedical = new CampaignOptionsCheckBox("UseAdvancedMedical",
@@ -1000,10 +1002,16 @@ public class PersonnelTab {
         chkUseAlternativeAdvancedMedical.addMouseListener(createTipPanelUpdater(medicalHeader,
               "UseAlternativeAdvancedMedical"));
 
-        chkUseKinderAlternativeAdvancedMedical = new CampaignOptionsCheckBox("UseKinderAlternativeAdvancedMedical",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.IMPORTANT));
-        chkUseKinderAlternativeAdvancedMedical.addMouseListener(createTipPanelUpdater(medicalHeader,
-              "UseKinderAlternativeAdvancedMedical"));
+        lblAlternativeAdvancedMedicalHealingTimeMultiplier = new CampaignOptionsLabel(
+              "AlternativeAdvancedMedicalHealingTimeMultiplier",
+              getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.IMPORTANT));
+        lblAlternativeAdvancedMedicalHealingTimeMultiplier.addMouseListener(createTipPanelUpdater(medicalHeader,
+              "AlternativeAdvancedMedicalHealingTimeMultiplier"));
+
+        spnAlternativeAdvancedMedicalHealingTimeMultiplier = new CampaignOptionsSpinner(
+              "AlternativeAdvancedMedicalHealingTimeMultiplier", 1.0, 0.01, 10.0, 0.01);
+        spnAlternativeAdvancedMedicalHealingTimeMultiplier.addMouseListener(createTipPanelUpdater(medicalHeader,
+              "AlternativeAdvancedMedicalHealingTimeMultiplier"));
 
         chkUseRandomDiseases = new CampaignOptionsCheckBox("UseRandomDiseases",
               getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.IMPORTANT));
@@ -1096,8 +1104,14 @@ public class PersonnelTab {
         panelRight.add(chkUseTougherHealing, layoutRight);
         layoutRight.gridy++;
         panelRight.add(chkUseAlternativeAdvancedMedical, layoutRight);
-        layoutRight.gridy++;
-        panelRight.add(chkUseKinderAlternativeAdvancedMedical, layoutRight);
+
+        layoutLeft.gridx = 0;
+        layoutLeft.gridy++;
+        panelLeft.add(lblAlternativeAdvancedMedicalHealingTimeMultiplier, layoutLeft);
+        layoutLeft.gridx++;
+        panelLeft.add(spnAlternativeAdvancedMedicalHealingTimeMultiplier, layoutLeft);
+
+        layoutLeft.gridx = 0;
         layoutRight.gridy++;
         panelRight.add(chkUseRandomDiseases, layoutRight);
 
@@ -1585,7 +1599,7 @@ public class PersonnelTab {
         chkUseRandomHitsForVehicles.setSelected(options.isUseRandomHitsForVehicles());
         chkUseTougherHealing.setSelected(options.isTougherHealing());
         chkUseAlternativeAdvancedMedical.setSelected(options.isUseAlternativeAdvancedMedical());
-        chkUseKinderAlternativeAdvancedMedical.setSelected(options.isUseKinderAlternativeAdvancedMedical());
+        spnAlternativeAdvancedMedicalHealingTimeMultiplier.setValue(options.getAlternativeAdvancedMedicalHealingTimeMultiplier());
         chkUseRandomDiseases.setSelected(options.isUseRandomDiseases());
         spnMaximumPatients.setValue(options.getMaximumPatients());
         chkDoctorsUseAdministration.setSelected(options.isDoctorsUseAdministration());
@@ -1697,7 +1711,7 @@ public class PersonnelTab {
         options.setUseRandomHitsForVehicles(chkUseRandomHitsForVehicles.isSelected());
         options.setTougherHealing(chkUseTougherHealing.isSelected());
         options.setUseAlternativeAdvancedMedical(chkUseAlternativeAdvancedMedical.isSelected());
-        options.setUseKinderAlternativeAdvancedMedical(chkUseKinderAlternativeAdvancedMedical.isSelected());
+        options.setAlternativeAdvancedMedicalHealingTimeMultiplier((double) spnAlternativeAdvancedMedicalHealingTimeMultiplier.getValue());
         options.setUseRandomDiseases(chkUseRandomDiseases.isSelected());
         options.setMaximumPatients((int) spnMaximumPatients.getValue());
         options.setDoctorsUseAdministration(chkDoctorsUseAdministration.isSelected());
