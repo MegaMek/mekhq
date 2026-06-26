@@ -516,7 +516,7 @@ class AdvancedMedicalAlternateHealingTest {
             invokePrivateStatic("processTaskAwardsAndPersonnelLogUpdates",
                   new Class<?>[] { LocalDate.class, Person.class, Person.class, Injury.class,
                                    HealingMarginOfSuccessEffects.class },
-                  today, patient, null, injury, HealingMarginOfSuccessEffects.getEffectFromHealingAttempt(-6));
+                  today, patient, null, injury, HealingMarginOfSuccessEffects.getEffectFromHealingAttempt(-6, false));
 
             verify(patient, never()).changeNTasks(anyInt());
             patientLogger.verifyNoInteractions();

@@ -185,31 +185,22 @@ public enum HealingMarginOfSuccessEffects {
     /**
      * Determines the healing outcome corresponding to a given margin of success.
      *
-     * <p>The provided margin of success is first clamped between {@link #MINIMUM_MARGIN_OF_SUCCESS} and
-     * {@link #MAXIMUM_MARGIN_OF_SUCCESS}. The resulting value is then mapped to one of the defined enum constants:</p>
-     *
-     * <ul>
-     *   <li>3: {@link #RECOVERY}</li>
-     *   <li>0, 1, 2: {@link #RECOVERY_WITH_FATIGUE}</li>
-     *   <li>-1, -2: {@link #RECOVERY_DELAYED}</li>
-     *   <li>-3, -4, -5: {@link #PERMANENT_INJURY}</li>
-     *   <li>-6: {@link #PERMANENT_INJURY_WITH_MEDICAL_COMPLICATIONS}</li>
-     * </ul>
-     *
-     * @param marginOfSuccess the raw margin of success from the healing roll
+     * @param marginOfSuccess  the raw margin of success from the healing roll
+     * @param useKinderHealing reduces the chance of getting a permanent injury
      *
      * @return the {@link HealingMarginOfSuccessEffects} corresponding to the given margin of success
      *
      * @author Illiani
      * @since 0.50.10
      */
-    public static HealingMarginOfSuccessEffects getEffectFromHealingAttempt(int marginOfSuccess) {
+    public static HealingMarginOfSuccessEffects getEffectFromHealingAttempt(int marginOfSuccess,
+          boolean useKinderHealing) {
         int clampedRoll = Math.clamp(marginOfSuccess, MINIMUM_MARGIN_OF_SUCCESS, MAXIMUM_MARGIN_OF_SUCCESS);
 
         return switch (clampedRoll) {
             case 3 -> RECOVERY;
             case -1, -2 -> RECOVERY_DELAYED;
-            case -3, -4, -5 -> PERMANENT_INJURY;
+            case -3, -4, -5 -> useKinderHealing ? RECOVERY_DELAYED : PERMANENT_INJURY;
             case -6 -> PERMANENT_INJURY_WITH_MEDICAL_COMPLICATIONS;
             default -> RECOVERY_WITH_FATIGUE; // 0, 1, 2
         };

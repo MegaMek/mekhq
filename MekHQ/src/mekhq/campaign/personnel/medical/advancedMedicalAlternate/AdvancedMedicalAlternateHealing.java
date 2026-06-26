@@ -411,7 +411,8 @@ public class AdvancedMedicalAlternateHealing {
      */
     private static HealingMarginOfSuccessEffects processHealingEffects(Campaign campaign, Person patient, Injury injury,
           int marginOfSuccess) {
-        HealingMarginOfSuccessEffects healingEffect = getEffectFromHealingAttempt(marginOfSuccess);
+        boolean isUseKinderHealing = campaign.getCampaignOptions().isUseAlternativeAdvancedMedicalKinderHealing();
+        HealingMarginOfSuccessEffects healingEffect = getEffectFromHealingAttempt(marginOfSuccess, isUseKinderHealing);
 
         // Some healing effects are mutually exclusive. These conditionals are constructed so we bypass illogical
         // values.
