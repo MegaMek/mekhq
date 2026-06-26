@@ -34,8 +34,12 @@
 package mekhq.campaign.personnel.skills;
 
 import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
+import mekhq.utilities.ReportingUtilities;
 
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.BARELY_MADE_IT;
+import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginOfSuccessObjectFromMarginValue;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 
 /**
  * An immutable record representing the outcome of an action check.
@@ -55,6 +59,8 @@ public record ActionCheckResult(
       boolean usedEdge,
       String resultsText
 ) {
+
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.ActionCheck";
 
     /**
      * Determines whether the action check was successful.
@@ -78,5 +84,40 @@ public record ActionCheckResult(
      */
     public static boolean isSuccess(int marginOfSuccess) {
         return marginOfSuccess >= BARELY_MADE_IT.getValue();
+    }
+
+    /**
+     * Returns a skill check report. It takes resultsText generated during the skill check and extends it with
+     * information about edge usage and, optionally, margin of success.
+     *
+     * <p>See more in {@link AttributeCheck#generateResultsText}.</p>
+     *
+     * <p>If edge was used to reroll the skill check, the results will include an additional note with
+     * information about the reroll. If the caller requests it, margin of success details can also be
+     * appended to the results text.</p>
+     *
+     * @param includeMarginsOfSuccessText whether to include detailed margins of success information in the results
+     */
+    public String getReport(boolean includeMarginsOfSuccessText) {
+        StringBuilder report = new StringBuilder(resultsText);
+        if (usedEdge) {
+            report.append(" ").append(getTextAt(RESOURCE_BUNDLE, "actionCheckResult.rerolled"));
+        }
+        if (includeMarginsOfSuccessText) {
+            String color;
+            int neutralMarginValue = BARELY_MADE_IT.getValue();
+            if (marginOfSuccess == neutralMarginValue) {
+                color = ReportingUtilities.getWarningColor();
+            } else if (marginOfSuccess < neutralMarginValue) {
+                color = ReportingUtilities.getNegativeColor();
+            } else {
+                color = ReportingUtilities.getPositiveColor();
+            }
+            MarginOfSuccess marginOfSuccessObject = getMarginOfSuccessObjectFromMarginValue(marginOfSuccess);
+            String marginOfSuccessText =
+                  ReportingUtilities.messageSurroundedBySpanWithColor(color, marginOfSuccessObject.getLabel());
+            report.append(" ").append(marginOfSuccessText);
+        }
+        return report.toString();
     }
 }

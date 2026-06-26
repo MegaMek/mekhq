@@ -80,7 +80,7 @@ public class Appraisal {
         }
         ActionCheckResult actionCheckResult =
               person.checkSkill(S_APPRAISAL, false, false, currentDay)
-                    .resolve(isUseEdge, getTextAt(RESOURCE_BUNDLE, "Appraisal.skillCheck"), false);
+                    .resolve(isUseEdge, getTextAt(RESOURCE_BUNDLE, "Appraisal.skillCheck"));
         return getAppraisalCostMultiplier(actionCheckResult.marginOfSuccess());
     }
 
