@@ -120,9 +120,8 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
 import mekhq.campaign.personnel.skills.ScoutingSkills;
 import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillCheckUtility;
+import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.SkillModifierData;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.stratCon.StratConScenario.ScenarioState;
@@ -131,6 +130,7 @@ import mekhq.campaign.universe.Planet;
 import mekhq.gui.dialog.nagDialogs.CombatChallengeNagDialog;
 import mekhq.utilities.ReportingUtilities;
 import org.apache.commons.math3.util.Pair;
+import org.jspecify.annotations.NonNull;
 
 /**
  * This class contains "rules" logic for the AtB-StratCon state
@@ -911,25 +911,39 @@ public class StratConRulesManager {
             // Find potential units to substitute based on the explicitForceID
             Collection<Unit> potentialUnits = findPotentialUnits(campaign, explicitForceID);
 
-            // Iterate through the potential units and substitute up to `unitCount` units
-            for (Unit unit : potentialUnits) {
-                if (isValidUnitForScenario(unit,
-                      scenarioForceTemplate,
-                      campaign,
-                      scenario.getScenarioTemplate().mapParameters.getMapLocation())) {
-                    scenario.addUnit(unit, scenarioForceTemplate.getForceName(), false);
-                    AtBDynamicScenarioFactory.benchAllyUnit(unit.getId(),
-                          scenarioForceTemplate.getForceName(),
-                          scenario.getBackingScenario());
-                    unitCount--;
+            // Iterate through the potential units and vet based on scenario eligibility
+            List<Unit> vettedUnits = getVettedUnits(scenario, campaign, scenarioForceTemplate, potentialUnits);
 
+            while (unitCount > 0 && !(vettedUnits.isEmpty())) {
+                unitCount--;
 
-                    if (unitCount == 0) {
-                        break; // Stop once enough units have been substituted
-                    }
-                }
+                substituteUnit(scenario, scenarioForceTemplate, vettedUnits);
             }
         }
+    }
+
+    private static @NonNull List<Unit> getVettedUnits(StratConScenario scenario, Campaign campaign,
+          ScenarioForceTemplate scenarioForceTemplate, Collection<Unit> potentialUnits) {
+        List<Unit> vettedUnits = new ArrayList<>();
+        MapLocation scenarioLocation = scenario.getScenarioTemplate().mapParameters.getMapLocation();
+        for (Unit potentialUnit : potentialUnits) {
+            if (isValidUnitForScenario(potentialUnit, scenarioForceTemplate, campaign, scenarioLocation)) {
+                vettedUnits.add(potentialUnit);
+            }
+        }
+        return vettedUnits;
+    }
+
+    private static void substituteUnit(StratConScenario scenario, ScenarioForceTemplate scenarioForceTemplate,
+          List<Unit> vettedUnits) {
+        int selectedIndex = randomInt(vettedUnits.size());
+        Unit selectedUnit = vettedUnits.remove(selectedIndex);
+
+        scenario.addUnit(selectedUnit, scenarioForceTemplate.getForceName(), false);
+
+        AtBDynamicScenarioFactory.benchAllyUnit(selectedUnit.getId(),
+              scenarioForceTemplate.getForceName(),
+              scenario.getBackingScenario());
     }
 
     /**
@@ -1609,12 +1623,9 @@ public class StratConRulesManager {
         }
 
         // Build a map of scouts and their information
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        Formation formation = campaign.getFormation(forceID);
-        Hangar hangar = campaign.getAllHangar();
-        List<ScoutRecord> scouts = buildScoutMap(formation, hangar, campaignOptions,
-              campaign.isClanCampaign(), campaign.getLocalDate());
+        List<ScoutRecord> scouts = buildScoutMap(campaign.getFormation(forceID), campaign.getAllHangar(), campaign);
 
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
         boolean useAdvancedScouting = campaignOptions.isUseAdvancedScouting();
         // Each scout may scan up to scanMultiplier hexes
         // Each scout may scan up to a radius of individualScanRange hexes
@@ -1676,11 +1687,8 @@ public class StratConRulesManager {
 
                     ActionCheckResult actionCheckResult = null;
                     if (useAdvancedScouting) {
-                        actionCheckResult =
-                              scout.checkSkill(scoutData.bestScoutSkillName(), false, false, campaign.getLocalDate())
-                                    .withExternalModifiers(scoutData.getAllScoutRollModifiers())
-                                    .resolve(isUseEdge, getTextAt(RESOURCE_BUNDLE,
-                                          "StratConRulesManager.scoutingSkillCheck"), false);
+                        actionCheckResult = scoutData.skillCheck().resolve(
+                              isUseEdge, getTextAt(RESOURCE_BUNDLE, "StratConRulesManager.scoutingSkillCheck"), false);
                         campaign.addReport(SKILL_CHECKS, actionCheckResult.resultsText());
                     }
 
@@ -1847,11 +1855,9 @@ public class StratConRulesManager {
      * <p>All such {@link ScoutRecord} entries are collected, sorted in descending order of scout skill level, and
      * returned as a list. Units with no crew are logged and skipped.</p>
      *
-     * @param formation       the {@link Formation} containing units to evaluate
-     * @param hangar          the {@link Hangar} used to help retrieve units from the force
-     * @param campaignOptions {@link CampaignOptions}, used to check useCommanderOnly options
-     * @param isClanCampaign  if {@code true}, applies rules specific to clan campaigns
-     * @param date            the current date, used for time-dependent logic
+     * @param formation the {@link Formation} containing units to evaluate
+     * @param hangar    the {@link Hangar} used to help retrieve units from the force
+     * @param campaign  the {@link Campaign} context
      *
      * @return a list of {@link ScoutRecord} objects, each representing the best scout and their skill details for a
      *       unit, sorted from the highest to lowest scout skill level
@@ -1859,8 +1865,7 @@ public class StratConRulesManager {
      * @author Illiani
      * @since 0.50.07
      */
-    static List<ScoutRecord> buildScoutMap(Formation formation, Hangar hangar, CampaignOptions campaignOptions,
-          boolean isClanCampaign, LocalDate date) {
+    static List<ScoutRecord> buildScoutMap(Formation formation, Hangar hangar, Campaign campaign) {
         if (formation == null) {
             return new ArrayList<>();
         }
@@ -1884,7 +1889,7 @@ public class StratConRulesManager {
                 unitSpeed = AtBDynamicScenarioFactory.calculateAtBSpeed(entity);
                 hasSensorEquipment = hasImprovedSensors(entity) || hasActiveProbe(entity);
 
-                if (unit.isOnlyCommandersMatter(campaignOptions)) {
+                if (unit.isOnlyCommandersMatter(campaign.getCampaignOptions())) {
                     Person commander = unit.getCommander();
                     if (commander == null) {
                         LOGGER.info("No commander for unit: {} {}", unit.getName(), unit.getId());
@@ -1896,7 +1901,6 @@ public class StratConRulesManager {
 
             // Find the best scout in this unit, if any
             ScoutRecord bestScout = null;
-            int bestScoutTargetNumber = Integer.MAX_VALUE;
             for (Person crewMember : unitCrew) {
                 boolean hasEagleEyes = crewMember.getOptions().booleanOption(OptionsConstants.MISC_EAGLE_EYES);
                 String scoutSkillName = ScoutingSkills.getBestScoutingSkill(crewMember);
@@ -1904,15 +1908,12 @@ public class StratConRulesManager {
                     continue;
                 }
 
-                TargetRoll targetNumber = SkillCheckUtility.determineTargetNumber(crewMember,
-                      SkillType.getType(scoutSkillName), campaignOptions.isUseAgeEffects(), isClanCampaign, date);
-                getAllScoutRollModifiers(unitWeight, unitSpeed, hasEagleEyes, hasSensorEquipment)
-                      .forEach(targetNumber::addModifier);
+                List<TargetRollModifier> mods = getAllScoutRollModifiers(
+                      unitWeight, unitSpeed, hasEagleEyes, hasSensorEquipment);
+                SkillCheck skillCheck = crewMember.checkSkill(scoutSkillName, campaign).withExternalModifiers(mods);
 
-                if (bestScout == null || targetNumber.getValue() < bestScoutTargetNumber) {
-                    bestScout = new ScoutRecord(crewMember, targetNumber, scoutSkillName,
-                          hasEagleEyes, unitWeight, unitSpeed, hasSensorEquipment);
-                    bestScoutTargetNumber = targetNumber.getValue();
+                if (bestScout == null || skillCheck.isEasierThan(bestScout.skillCheck())) {
+                    bestScout = new ScoutRecord(crewMember, skillCheck, unitWeight);
                 }
             }
 
@@ -1921,13 +1922,13 @@ public class StratConRulesManager {
             }
 
             LOGGER.info("Unit {} (weight: {}t, speed: {}) has best scout: {} with skill {} at TN {}",
-                  unit.getId(), unitWeight, unitSpeed, bestScout.scout(), bestScout.bestScoutSkillName(),
-                  bestScout.targetNumber().getValue());
+                  unit.getId(), unitWeight, unitSpeed, bestScout.scout(),
+                  bestScout.skillCheck().getSkillType().getName(), bestScout.skillCheck().getTargetNumber().getValue());
             scouts.add(bestScout);
         }
 
         // Sort scouts by the target number of their best scout skill, the lowest first
-        scouts.sort(Comparator.comparingInt(a -> a.targetNumber().getValue()));
+        scouts.sort(Comparator.comparingInt(a -> a.skillCheck().getTargetNumber().getValue()));
         return scouts;
     }
 

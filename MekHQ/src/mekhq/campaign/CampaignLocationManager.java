@@ -65,7 +65,7 @@ public class CampaignLocationManager {
     }
 
     public void addLocation(AbstractLocation location) {
-        if (location != null) {
+        if (location != null && !locations.contains(location)) {
             locations.add(location);
         }
     }
@@ -79,7 +79,7 @@ public class CampaignLocationManager {
     }
 
     /**
-     * Adds {@code base} to the set of player bases.
+     * Adds {@code base} to the set of player bases and registers its parent location, if any.
      *
      * @return {@code true} if the set changed (i.e. the base was not already present)
      */
@@ -87,7 +87,11 @@ public class CampaignLocationManager {
         if (base == null) {
             return false;
         }
-        return playerBases.add(base);
+        boolean added = playerBases.add(base);
+        if (base.getParent() instanceof AbstractLocation parent) {
+            addLocation(parent);
+        }
+        return added;
     }
 
     /**
@@ -202,6 +206,27 @@ public class CampaignLocationManager {
         }
         AcademyCampusLocation campus = new AcademyCampusLocation(academySet, academyName);
         LocationNode.LocationManager.setLocation(campus, campaign);
+        return campus;
+    }
+
+    /**
+     * Returns the existing {@link AcademyCampusLocation} parented under {@code parent}, creating it on demand if it
+     * does not yet exist.
+     *
+     * <p>Used for home-school campuses that travel with the campaign or a player base rather than being anchored to a
+     * fixed planetary system.</p>
+     */
+    public AcademyCampusLocation getOrCreateCampusUnderLocation(String academySet, String academyName,
+          ILocation parent) {
+        for (ILocation child : parent.getChildLocations()) {
+            if (child instanceof AcademyCampusLocation campus
+                      && academySet.equals(campus.getAcademySet())
+                      && academyName.equals(campus.getAcademyName())) {
+                return campus;
+            }
+        }
+        AcademyCampusLocation campus = new AcademyCampusLocation(academySet, academyName);
+        LocationNode.LocationManager.setLocation(campus, parent);
         return campus;
     }
 

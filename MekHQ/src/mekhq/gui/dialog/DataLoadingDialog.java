@@ -472,7 +472,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 // This needs to be the final stage in Progress 7 as otherwise the display of any confirmation
                 // dialogs will get 'stuck' behind other dialogs
                 if (campaignVersion.isLowerThan(MHQConstants.VERSION)) {
-                    handleCampaignUpgrading(campaign);
+                    handleCampaignUpgrading(application, campaign);
                 }
                 // endregion Progress 7
             }
@@ -498,13 +498,14 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
          * <p><b>Note:</b> This method should not be called from the Event Dispatch Thread (EDT), as it will block
          * the thread until the upgrade is finished.</p>
          *
+         * @param app      the application context
          * @param campaign the {@link Campaign} instance to be upgraded
          *
          * @author Illiani
          * @since 0.50.07
          */
-        private static void handleCampaignUpgrading(Campaign campaign) {
-            CampaignUpgradeDialog.campaignUpgradeDialog(campaign);
+        private static void handleCampaignUpgrading(MekHQ app, Campaign campaign) {
+            CampaignUpgradeDialog.campaignUpgradeDialog(app, campaign);
         }
 
         /**

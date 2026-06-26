@@ -47,8 +47,6 @@ import megamek.common.TargetRollModifier;
 import megamek.common.annotations.Nullable;
 import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
-import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
 import mekhq.utilities.ReportingUtilities;
@@ -68,7 +66,7 @@ import mekhq.utilities.ReportingUtilities;
 public abstract class ActionCheck<T extends ActionCheck<T>> {
 
     private static final MMLogger LOGGER = MMLogger.create(ActionCheck.class);
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.SkillCheckUtility";
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.ActionCheck";
 
     protected final Person person;
     protected final TargetRoll targetNumber;
@@ -160,7 +158,7 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
      */
     public T withMiscModifier(int miscModifier) {
         int finalModifier = isCountUp() ? -miscModifier : miscModifier;
-        targetNumber.addModifier(finalModifier, getFormattedTextAt(RESOURCE_BUNDLE, "skillCheck.miscModifier"));
+        targetNumber.addModifier(finalModifier, getFormattedTextAt(RESOURCE_BUNDLE, "actionCheck.miscModifier"));
         return getThis();
     }
 
@@ -195,8 +193,7 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
             roll = SkillCheckUtility.getRoll(hasNaturalAptitude());
             usedEdge = true;
 
-            person.changeCurrentEdge(-1);
-            MekHQ.triggerEvent(new PersonChangedEvent(person));
+            person.spendEdge();
         }
 
         int difference = targetNumber.getValue() - roll;
@@ -264,10 +261,10 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
         }
 
         String status = getTextAt(RESOURCE_BUNDLE,
-              ActionCheckResult.isSuccess(marginOfSuccess) ? "skillCheck.results.success" : "skillCheck.results.failure");
+              ActionCheckResult.isSuccess(marginOfSuccess) ? "actionCheckResult.success" : "actionCheckResult.failure");
 
         StringBuilder resultsText = new StringBuilder(getFormattedTextAt(RESOURCE_BUNDLE,
-              "skillCheck.results",
+              "actionCheckResult.report",
               reason == null ? "" : "<b>" + reason + ":</b> ",
               fullTitle,
               colorOpen,
@@ -279,11 +276,11 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
               targetNumber.getValue()));
 
         if (hasNaturalAptitude) {
-            resultsText.append(" ").append(getTextAt(RESOURCE_BUNDLE, "skillCheck.naturalAptitude"));
+            resultsText.append(" ").append(getTextAt(RESOURCE_BUNDLE, "actionCheckResult.naturalAptitude"));
         }
 
         if (usedEdge) {
-            resultsText.append(" ").append(getTextAt(RESOURCE_BUNDLE, "skillCheck.rerolled"));
+            resultsText.append(" ").append(getTextAt(RESOURCE_BUNDLE, "actionCheckResult.rerolled"));
         }
 
         if (includeMarginsOfSuccessText) {

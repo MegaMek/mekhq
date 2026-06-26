@@ -114,18 +114,19 @@ public class CampaignUpgradeDialog {
      * the chosen preset, optionally runs a completion callback, or allows further customization via a campaign options
      * dialog.</p>
      *
+     * @param app      The application context
      * @param campaign The campaign being upgraded; must not be {@code null}.
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public static void campaignUpgradeDialog(Campaign campaign) {
+    public static void campaignUpgradeDialog(MekHQ app, Campaign campaign) {
         JPanel supplementalPanel = createSupplementalPanel();
 
         // This will occur if there are no presets available. This should never occur under normal circumstances as
         // MekHQ always ships with a battery of presets.
         if (supplementalPanel == null) {
-            exitApp(campaign.getApp());
+            exitApp(app);
             return;
         }
 
@@ -145,13 +146,13 @@ public class CampaignUpgradeDialog {
         int comboChoiceIndex = upgradeDialog.getComboBoxChoiceIndex();
 
         switch (dialogChoiceIndex) {
-            case PRESET_SELECTION_CANCELLED -> exitApp(campaign.getApp());
+            case PRESET_SELECTION_CANCELLED -> exitApp(app);
             case PRESET_SELECTION_SELECT -> {
                 if (comboChoiceIndex < 0 || comboChoiceIndex >= presets.size()) {
                     LOGGER.errorDialog("Error",
                           "Invalid campaign preset index {}. Please report to the MekHQ team",
                           comboChoiceIndex);
-                    exitApp(campaign.getApp());
+                    exitApp(app);
                     // This is wholly unnecessary as the app will have already been closed.
                     // We include it because otherwise the IDE complains.
                     return;
@@ -222,7 +223,7 @@ public class CampaignUpgradeDialog {
                 CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(null, campaign);
                 optionsDialog.setVisible(true);
                 if (optionsDialog.wasCanceled()) {
-                    exitApp(campaign.getApp());
+                    exitApp(app);
                 }
             }
         }

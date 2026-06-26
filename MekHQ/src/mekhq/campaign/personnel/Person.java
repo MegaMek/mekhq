@@ -144,6 +144,7 @@ import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.personnel.skills.AttributeCheck;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillCheck;
@@ -2134,6 +2135,25 @@ public class Person implements ILocation {
                      .getDisplayFormattedOutput(getLastRankChangeDate(), today);
     }
 
+    public long getYearsSinceJoiningCampaign(final Campaign campaign) {
+        // Get time in service based on year
+        if (getJoinedCampaign() == null) {
+            return 0;
+        }
+
+        LocalDate today = campaign.getLocalDate();
+
+        // If the person is dead or has left the unit, we only care about how long they
+        // spent in service to the company
+        if (getRetirement() != null) {
+            today = getRetirement();
+        } else if (getDateOfDeath() != null) {
+            today = getDateOfDeath();
+        }
+
+        return ChronoUnit.YEARS.between(getJoinedCampaign(), today);
+    }
+
     public void setId(final UUID id) {
         this.id = id;
     }
@@ -2759,13 +2779,12 @@ public class Person implements ILocation {
      * Returns the ID of the planetary system where the person's academy campus is located.
      *
      * <p>The primary source is the location tree: this walks the person's parent chain to find
-     * the nearest {@link AcademyCampusLocation}, then returns the system ID from its parent
-     * {@link AbstractLocation} (typically a {@link mekhq.campaign.FixedLocation}).</p>
+     * the nearest {@link AcademyCampusLocation}, then returns the system ID from its parent {@link AbstractLocation}
+     * (typically a {@link mekhq.campaign.FixedLocation}).</p>
      *
      * <p>If no campus node is reachable in the tree — for example, during JOURNEY_FROM_CAMPUS,
-     * a local-academy transit before campus arrival, or when loading a pre-location-tree save
-     * file — this falls back to a transient value populated from the legacy {@code eduAcademySystem}
-     * XML tag.</p>
+     * a local-academy transit before campus arrival, or when loading a pre-location-tree save file — this falls back to
+     * a transient value populated from the legacy {@code eduAcademySystem} XML tag.</p>
      *
      * @return the campus system ID, or {@code null} if not derivable from either source
      */
@@ -5810,8 +5829,7 @@ public class Person implements ILocation {
      * Prepares a skill check based on individually passed options.
      *
      * <p>This method creates a {@code SkillCheck} instance which calculates the target number
-     * for the skill check, based on the person's skill, aging effects, clan campaign rules,
-     * and the current date.</p>
+     * for the skill check, based on the person's skill, aging effects, clan campaign rules, and the current date.</p>
      *
      * @param skillName         the name of the skill being checked, corresponding to a {@link SkillType}
      * @param isUseAgingEffects if {@code true}, considers aging effects during the check
@@ -5838,6 +5856,35 @@ public class Person implements ILocation {
     public SkillCheck checkSkill(String skillName, Campaign campaign) {
         return new SkillCheck(this, skillName, campaign.getCampaignOptions().isUseAgeEffects(),
               campaign.isClanCampaign(), campaign.getLocalDate());
+    }
+
+    /**
+     * Prepares an attribute check.
+     *
+     * <p>This method creates an {@link AttributeCheck} instance which calculates the target number
+     * for the attribute check.</p>
+     *
+     * @param attribute the {@link SkillAttribute} to be checked
+     *
+     * @return prepared attribute check
+     */
+    public AttributeCheck checkAttribute(SkillAttribute attribute) {
+        return new AttributeCheck(this, attribute);
+    }
+
+    /**
+     * Prepares a double attribute check.
+     *
+     * <p>This method creates an {@link AttributeCheck} instance which calculates the target number
+     * for the attribute check.</p>
+     *
+     * @param firstAttribute  first {@link SkillAttribute} to be checked
+     * @param secondAttribute second {@link SkillAttribute} to be checked
+     *
+     * @return prepared attribute check
+     */
+    public AttributeCheck checkAttributes(SkillAttribute firstAttribute, SkillAttribute secondAttribute) {
+        return new AttributeCheck(this, firstAttribute, secondAttribute);
     }
 
     /**
@@ -6127,6 +6174,15 @@ public class Person implements ILocation {
 
     public void changeCurrentEdge(final int amount) {
         atowAttributes.changeCurrentEdge(amount);
+    }
+
+    public void spendEdge() {
+        if (getCurrentEdge() > 0) {
+            atowAttributes.changeCurrentEdge(-1);
+            MekHQ.triggerEvent(new PersonChangedEvent(this));
+        } else {
+            LOGGER.error("Trying to spend edge, but it is at {}", getCurrentEdge(), new IllegalArgumentException());
+        }
     }
 
     /**
@@ -7618,6 +7674,15 @@ public class Person implements ILocation {
         return injuries.stream()
                      .filter(i -> !i.getSubType().isPermanentModification())
                      .collect(Collectors.toList());
+    }
+
+    public boolean hasProstheticInjuryNoImplant(BodyLocation location) {
+        for (Injury injury : getInjuriesByLocation(location)) {
+            if (injury.getSubType().isProsthetic()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public List<Injury> getNonPermanentInjuries() {

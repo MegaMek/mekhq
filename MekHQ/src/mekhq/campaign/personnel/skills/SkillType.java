@@ -86,14 +86,6 @@ public class SkillType {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.SkillType";
     private static final MMLogger LOGGER = MMLogger.create(SkillType.class);
 
-    /**
-     * A constant string value representing the suffix " (RP Only)".
-     *
-     * <p><b>Usage:</b> This is used to denote a skill that has no mechanical benefits. This tag should be
-     * progressively removed as mechanics are expanded to use these skills.</p>
-     */
-    public static final String RP_ONLY_TAG = " (RP Only)";
-
     // combat skills
     public static final String S_PILOT_MEK = "Piloting/Mek";
     public static final String S_PILOT_AERO = "Piloting/Aerospace";
@@ -149,65 +141,65 @@ public class SkillType {
     public static final String S_SLEIGHT_OF_HAND = "Sleight of Hand/Any";
 
     // roleplay skills
-    public static final String S_ACROBATICS = "Acrobatics" + RP_ONLY_TAG;
-    public static final String S_ANIMAL_HANDLING = "Animal Handling" + RP_ONLY_TAG;
-    public static final String S_ART_DANCING = "Art/Dancing" + RP_ONLY_TAG;
-    public static final String S_ART_DRAWING = "Art/Drawing" + RP_ONLY_TAG;
-    public static final String S_ART_PAINTING = "Art/Painting" + RP_ONLY_TAG;
-    public static final String S_ART_WRITING = "Art/Writing" + RP_ONLY_TAG;
-    public static final String S_ART_COOKING = "Art/Cooking" + RP_ONLY_TAG;
-    public static final String S_ART_POETRY = "Art/Poetry" + RP_ONLY_TAG;
-    public static final String S_ART_SCULPTURE = "Art/Sculpture" + RP_ONLY_TAG;
-    public static final String S_ART_INSTRUMENT = "Art/Instrument" + RP_ONLY_TAG;
-    public static final String S_ART_SINGING = "Art/Singing" + RP_ONLY_TAG;
-    public static final String S_ART_OTHER = "Art/Other" + RP_ONLY_TAG;
-    public static final String S_COMPUTERS = "Computers" + RP_ONLY_TAG;
-    public static final String S_CRYPTOGRAPHY = "Cryptography" + RP_ONLY_TAG;
-    public static final String S_INTEREST_HISTORY = "Interest/History" + RP_ONLY_TAG;
-    public static final String S_INTEREST_LITERATURE = "Interest/Literature" + RP_ONLY_TAG;
-    public static final String S_INTEREST_HOLO_GAMES = "Interest/Holo-Games" + RP_ONLY_TAG;
-    public static final String S_INTEREST_SPORTS = "Interest/Sports" + RP_ONLY_TAG;
-    public static final String S_INTEREST_FASHION = "Interest/Fashion" + RP_ONLY_TAG;
-    public static final String S_INTEREST_MUSIC = "Interest/Music" + RP_ONLY_TAG;
-    public static final String S_INTEREST_MILITARY = "Interest/Military" + RP_ONLY_TAG;
-    public static final String S_INTEREST_ANTIQUES = "Interest/Antiques" + RP_ONLY_TAG;
-    public static final String S_INTEREST_THEOLOGY = "Interest/Theology" + RP_ONLY_TAG;
-    public static final String S_INTEREST_GAMBLING = "Interest/Gambling" + RP_ONLY_TAG;
-    public static final String S_INTEREST_POLITICS = "Interest/Politics" + RP_ONLY_TAG;
-    public static final String S_INTEREST_PHILOSOPHY = "Interest/Philosophy" + RP_ONLY_TAG;
-    public static final String S_INTEREST_ECONOMICS = "Interest/Economics" + RP_ONLY_TAG;
-    public static final String S_INTEREST_POP_CULTURE = "Interest/Pop-Culture" + RP_ONLY_TAG;
-    public static final String S_INTEREST_ASTROLOGY = "Interest/Astrology" + RP_ONLY_TAG;
-    public static final String S_INTEREST_FISHING = "Interest/Fishing" + RP_ONLY_TAG;
-    public static final String S_INTEREST_MYTHOLOGY = "Interest/Mythology" + RP_ONLY_TAG;
-    public static final String S_INTEREST_CARTOGRAPHY = "Interest/Cartography" + RP_ONLY_TAG;
-    public static final String S_INTEREST_ARCHEOLOGY = "Interest/Archeology" + RP_ONLY_TAG;
-    public static final String S_INTEREST_HOLO_CINEMA = "Interest/Holo-Cinema" + RP_ONLY_TAG;
-    public static final String S_INTEREST_EXOTIC_ANIMALS = "Interest/Exotic Animals" + RP_ONLY_TAG;
-    public static final String S_INTEREST_LAW = "Interest/Law" + RP_ONLY_TAG;
-    public static final String S_INTEREST_OTHER = "Interest/Other" + RP_ONLY_TAG;
-    public static final String S_INTERROGATION = "Interrogation" + RP_ONLY_TAG;
-    public static final String S_INVESTIGATION = "Investigation" + RP_ONLY_TAG;
-    public static final String S_LANGUAGES = "Language/Any" + RP_ONLY_TAG;
-    public static final String S_PROTOCOLS = "Protocols/Any" + RP_ONLY_TAG;
-    public static final String S_SCIENCE_BIOLOGY = "Science/Biology" + RP_ONLY_TAG;
-    public static final String S_SCIENCE_CHEMISTRY = "Science/Chemistry" + RP_ONLY_TAG;
-    public static final String S_SCIENCE_MATHEMATICS = "Science/Mathematics" + RP_ONLY_TAG;
-    public static final String S_SCIENCE_PHYSICS = "Science/Physics" + RP_ONLY_TAG;
-    public static final String S_SCIENCE_MILITARY = "Science/Military" + RP_ONLY_TAG;
-    public static final String S_SCIENCE_GEOLOGY = "Science/Geology" + RP_ONLY_TAG;
-    public static final String S_SCIENCE_XENOBIOLOGY = "Science/Xenobiology" + RP_ONLY_TAG;
-    public static final String S_SCIENCE_PHARMACOLOGY = "Science/Pharmacology" + RP_ONLY_TAG;
-    public static final String S_SCIENCE_GENETICS = "Science/Genetics" + RP_ONLY_TAG;
-    public static final String S_SCIENCE_PSYCHOLOGY = "Science/Psychology" + RP_ONLY_TAG;
-    public static final String S_SCIENCE_OTHER = "Science/Other" + RP_ONLY_TAG;
-    public static final String S_SECURITY_SYSTEMS_ELECTRONIC = "Security Systems/Electronic" + RP_ONLY_TAG;
-    public static final String S_SECURITY_SYSTEMS_MECHANICAL = "Security Systems/Mechanical" + RP_ONLY_TAG;
-    public static final String S_STREETWISE = "Streetwise/Any" + RP_ONLY_TAG;
-    public static final String S_SURVIVAL = "Survival/Any" + RP_ONLY_TAG;
-    public static final String S_CAREER_ANY = "Career/Any" + RP_ONLY_TAG;
-    public static final String S_RUNNING = "Running" + RP_ONLY_TAG;
-    public static final String S_SWIMMING = "Swimming" + RP_ONLY_TAG;
+    public static final String S_ACROBATICS = "Acrobatics";
+    public static final String S_ANIMAL_HANDLING = "Animal Handling";
+    public static final String S_ART_DANCING = "Art/Dancing";
+    public static final String S_ART_DRAWING = "Art/Drawing";
+    public static final String S_ART_PAINTING = "Art/Painting";
+    public static final String S_ART_WRITING = "Art/Writing";
+    public static final String S_ART_COOKING = "Art/Cooking";
+    public static final String S_ART_POETRY = "Art/Poetry";
+    public static final String S_ART_SCULPTURE = "Art/Sculpture";
+    public static final String S_ART_INSTRUMENT = "Art/Instrument";
+    public static final String S_ART_SINGING = "Art/Singing";
+    public static final String S_ART_OTHER = "Art/Other";
+    public static final String S_COMPUTERS = "Computers";
+    public static final String S_CRYPTOGRAPHY = "Cryptography";
+    public static final String S_INTEREST_HISTORY = "Interest/History";
+    public static final String S_INTEREST_LITERATURE = "Interest/Literature";
+    public static final String S_INTEREST_HOLO_GAMES = "Interest/Holo-Games";
+    public static final String S_INTEREST_SPORTS = "Interest/Sports";
+    public static final String S_INTEREST_FASHION = "Interest/Fashion";
+    public static final String S_INTEREST_MUSIC = "Interest/Music";
+    public static final String S_INTEREST_MILITARY = "Interest/Military";
+    public static final String S_INTEREST_ANTIQUES = "Interest/Antiques";
+    public static final String S_INTEREST_THEOLOGY = "Interest/Theology";
+    public static final String S_INTEREST_GAMBLING = "Interest/Gambling";
+    public static final String S_INTEREST_POLITICS = "Interest/Politics";
+    public static final String S_INTEREST_PHILOSOPHY = "Interest/Philosophy";
+    public static final String S_INTEREST_ECONOMICS = "Interest/Economics";
+    public static final String S_INTEREST_POP_CULTURE = "Interest/Pop-Culture";
+    public static final String S_INTEREST_ASTROLOGY = "Interest/Astrology";
+    public static final String S_INTEREST_FISHING = "Interest/Fishing";
+    public static final String S_INTEREST_MYTHOLOGY = "Interest/Mythology";
+    public static final String S_INTEREST_CARTOGRAPHY = "Interest/Cartography";
+    public static final String S_INTEREST_ARCHEOLOGY = "Interest/Archeology";
+    public static final String S_INTEREST_HOLO_CINEMA = "Interest/Holo-Cinema";
+    public static final String S_INTEREST_EXOTIC_ANIMALS = "Interest/Exotic Animals";
+    public static final String S_INTEREST_LAW = "Interest/Law";
+    public static final String S_INTEREST_OTHER = "Interest/Other";
+    public static final String S_INTERROGATION = "Interrogation";
+    public static final String S_INVESTIGATION = "Investigation";
+    public static final String S_LANGUAGES = "Language/Any";
+    public static final String S_PROTOCOLS = "Protocols/Any";
+    public static final String S_SCIENCE_BIOLOGY = "Science/Biology";
+    public static final String S_SCIENCE_CHEMISTRY = "Science/Chemistry";
+    public static final String S_SCIENCE_MATHEMATICS = "Science/Mathematics";
+    public static final String S_SCIENCE_PHYSICS = "Science/Physics";
+    public static final String S_SCIENCE_MILITARY = "Science/Military";
+    public static final String S_SCIENCE_GEOLOGY = "Science/Geology";
+    public static final String S_SCIENCE_XENOBIOLOGY = "Science/Xenobiology";
+    public static final String S_SCIENCE_PHARMACOLOGY = "Science/Pharmacology";
+    public static final String S_SCIENCE_GENETICS = "Science/Genetics";
+    public static final String S_SCIENCE_PSYCHOLOGY = "Science/Psychology";
+    public static final String S_SCIENCE_OTHER = "Science/Other";
+    public static final String S_SECURITY_SYSTEMS_ELECTRONIC = "Security Systems/Electronic";
+    public static final String S_SECURITY_SYSTEMS_MECHANICAL = "Security Systems/Mechanical";
+    public static final String S_STREETWISE = "Streetwise/Any";
+    public static final String S_SURVIVAL = "Survival/Any";
+    public static final String S_CAREER_ANY = "Career/Any";
+    public static final String S_RUNNING = "Running";
+    public static final String S_SWIMMING = "Swimming";
 
 
     public static final int NUM_LEVELS = 11;
@@ -572,7 +564,6 @@ public class SkillType {
      */
     private String getResourceBundleKey() {
         String key = name;
-        key = key.replace(RP_ONLY_TAG, "");
         key = key.replace("/", "");
         key = key.replace("(", "");
         key = key.replace(")", "");
@@ -1078,8 +1069,14 @@ public class SkillType {
     }
 
     public static @Nullable SkillType getType(String skillName) {
-        skillName = updateSkillName(skillName);
-        return lookupHash.get(skillName);
+        SkillType result = lookupHash.get(skillName);
+        if (result == null) {
+            result = lookupHash.get(updateSkillName(skillName));
+        }
+        if (result == null) {
+            LOGGER.error("Failed to resolve a skill type '{}'", skillName);
+        }
+        return result;
     }
 
     /**
@@ -1105,39 +1102,69 @@ public class SkillType {
      * @since 0.50.07
      */
     private static String updateSkillName(String skillName) {
-        // When updating skill names do NOT use the static, it must be a hardcoded switch otherwise it won't work
-        String temporarySkillName = skillName.toLowerCase();
-        skillName = switch (temporarySkillName) {
-            // CHECKSTYLE IGNORE ForbiddenWords FOR 1 LINES
-            case "anti-mech" -> "Anti-Mek (Climbing)"; // <50.07
-            case "medtech" -> "MedTech/Any"; // <50.07
-            case "communications (rp only)", "communications/any (rp only)" -> "Communications/Any"; // <50.07
-            case "sleight of hand (rp only)" -> "Sleight of Hand/Any" + RP_ONLY_TAG; // <50.07
-            case "protocols (rp only)" -> "Protocols/Any" + RP_ONLY_TAG; // <50.07
-            case "survival" -> "Survival/Any" + RP_ONLY_TAG; // <50.07
-            case "languages (rp only)" -> "Language/Any" + RP_ONLY_TAG; // <50.07
-            case "hyperspace navigation" -> "Navigation/Any"; // <50.07
-            case "streetwise (rp only)" -> "Streetwise/Any" + RP_ONLY_TAG; // <50.07
-            case "doctor" -> "Surgery/Any"; // <50.07
-            case "tactics" -> "Tactics/Any"; // <50.07
-            case "tracking (rp only)" -> "Tracking/Any"; // <50.07
-            case "training (rp only)" -> "Training"; // <50.07
-            case "zero-g operations (rp only)" -> "Zero-G Operations"; // <50.07
-            case "escape artist (rp only)" -> "Escape Artist"; // <50.07
-            case "disguise (rp only)" -> "Disguise"; // <50.07
-            case "forgery (rp only)" -> "Forgery"; // <50.07
-            case "acting (rp only)" -> "Acting"; // <50.07
-            case "appraisal (rp only)" -> "Appraisal"; // <50.07
-            case "archery (rp only)" -> "Archery"; // <50.07
-            case "demolitions (rp only)" -> "Demolitions"; // <50.07
-            case "martial arts (rp only)" -> "Martial Arts"; // <50.07
-            case "melee weapons (rp only)" -> "Melee Weapons"; // <50.07
-            case "support weapons (rp only)" -> "Support Weapons"; // <50.07
-            case "thrown weapons (rp only)" -> "Thrown Weapons"; // <50.07
-            case "perception (rp only)" -> "Perception"; // <50.07
-            case "sensor operations (rp only)" -> "Sensor Operations"; // <50.07
-            case "stealth (rp only)" -> "Stealth"; // <50.07
-            case "sleight of hand/any (rp only)" -> "Sleight of Hand/Any"; // <50.07
+        final String RP_ONLY_TAG = " (RP Only)";
+
+        skillName = switch (skillName) {
+            // <51.01 compatibility handler
+            case "Acrobatics" + RP_ONLY_TAG -> "Acrobatics";
+            case "Animal Handling" + RP_ONLY_TAG -> "Animal Handling";
+            case "Art/Dancing" + RP_ONLY_TAG -> "Art/Dancing";
+            case "Art/Drawing" + RP_ONLY_TAG -> "Art/Drawing";
+            case "Art/Painting" + RP_ONLY_TAG -> "Art/Painting";
+            case "Art/Writing" + RP_ONLY_TAG -> "Art/Writing";
+            case "Art/Cooking" + RP_ONLY_TAG -> "Art/Cooking";
+            case "Art/Poetry" + RP_ONLY_TAG -> "Art/Poetry";
+            case "Art/Sculpture" + RP_ONLY_TAG -> "Art/Sculpture";
+            case "Art/Instrument" + RP_ONLY_TAG -> "Art/Instrument";
+            case "Art/Singing" + RP_ONLY_TAG -> "Art/Singing";
+            case "Art/Other" + RP_ONLY_TAG -> "Art/Other";
+            case "Computers" + RP_ONLY_TAG -> "Computers";
+            case "Cryptography" + RP_ONLY_TAG -> "Cryptography";
+            case "Interest/History" + RP_ONLY_TAG -> "Interest/History";
+            case "Interest/Literature" + RP_ONLY_TAG -> "Interest/Literature";
+            case "Interest/Holo-Games" + RP_ONLY_TAG -> "Interest/Holo-Games";
+            case "Interest/Sports" + RP_ONLY_TAG -> "Interest/Sports";
+            case "Interest/Fashion" + RP_ONLY_TAG -> "Interest/Fashion";
+            case "Interest/Music" + RP_ONLY_TAG -> "Interest/Music";
+            case "Interest/Military" + RP_ONLY_TAG -> "Interest/Military";
+            case "Interest/Antiques" + RP_ONLY_TAG -> "Interest/Antiques";
+            case "Interest/Theology" + RP_ONLY_TAG -> "Interest/Theology";
+            case "Interest/Gambling" + RP_ONLY_TAG -> "Interest/Gambling";
+            case "Interest/Politics" + RP_ONLY_TAG -> "Interest/Politics";
+            case "Interest/Philosophy" + RP_ONLY_TAG -> "Interest/Philosophy";
+            case "Interest/Economics" + RP_ONLY_TAG -> "Interest/Economics";
+            case "Interest/Pop-Culture" + RP_ONLY_TAG -> "Interest/Pop-Culture";
+            case "Interest/Astrology" + RP_ONLY_TAG -> "Interest/Astrology";
+            case "Interest/Fishing" + RP_ONLY_TAG -> "Interest/Fishing";
+            case "Interest/Mythology" + RP_ONLY_TAG -> "Interest/Mythology";
+            case "Interest/Cartography" + RP_ONLY_TAG -> "Interest/Cartography";
+            case "Interest/Archeology" + RP_ONLY_TAG -> "Interest/Archeology";
+            case "Interest/Holo-Cinema" + RP_ONLY_TAG -> "Interest/Holo-Cinema";
+            case "Interest/Exotic Animals" + RP_ONLY_TAG -> "Interest/Exotic Animals";
+            case "Interest/Law" + RP_ONLY_TAG -> "Interest/Law";
+            case "Interest/Other" + RP_ONLY_TAG -> "Interest/Other";
+            case "Interrogation" + RP_ONLY_TAG -> "Interrogation";
+            case "Investigation" + RP_ONLY_TAG -> "Investigation";
+            case "Language/Any" + RP_ONLY_TAG -> "Language/Any";
+            case "Protocols/Any" + RP_ONLY_TAG -> "Protocols/Any";
+            case "Science/Biology" + RP_ONLY_TAG -> "Science/Biology";
+            case "Science/Chemistry" + RP_ONLY_TAG -> "Science/Chemistry";
+            case "Science/Mathematics" + RP_ONLY_TAG -> "Science/Mathematics";
+            case "Science/Physics" + RP_ONLY_TAG -> "Science/Physics";
+            case "Science/Military" + RP_ONLY_TAG -> "Science/Military";
+            case "Science/Geology" + RP_ONLY_TAG -> "Science/Geology";
+            case "Science/Xenobiology" + RP_ONLY_TAG -> "Science/Xenobiology";
+            case "Science/Pharmacology" + RP_ONLY_TAG -> "Science/Pharmacology";
+            case "Science/Genetics" + RP_ONLY_TAG -> "Science/Genetics";
+            case "Science/Psychology" + RP_ONLY_TAG -> "Science/Psychology";
+            case "Science/Other" + RP_ONLY_TAG -> "Science/Other";
+            case "Security Systems/Electronic" + RP_ONLY_TAG -> "Security Systems/Electronic";
+            case "Security Systems/Mechanical" + RP_ONLY_TAG -> "Security Systems/Mechanical";
+            case "Streetwise/Any" + RP_ONLY_TAG -> "Streetwise/Any";
+            case "Survival/Any" + RP_ONLY_TAG -> "Survival/Any";
+            case "Career/Any" + RP_ONLY_TAG -> "Career/Any";
+            case "Running" + RP_ONLY_TAG -> "Running";
+            case "Swimming" + RP_ONLY_TAG -> "Swimming";
             default -> skillName;
         };
         return skillName;
@@ -1295,7 +1322,7 @@ public class SkillType {
                     // The above code can be uncommented once these handlers have been removed
                     String name = wn2.getTextContent().trim();
 
-                    //Start <50.07 compatibility handler.
+                    //Start <51.01 compatibility handler.
                     skillType.name = updateSkillName(name);
                 } else if (wn2.getNodeName().equalsIgnoreCase("target")) {
                     skillType.target = MathUtility.parseInt(wn2.getTextContent(), skillType.target);
@@ -1331,12 +1358,6 @@ public class SkillType {
                         skillType.costs[i] = MathUtility.parseInt(values[i], skillType.costs[i]);
                     }
                 }
-            }
-
-            // Skill settings from prior to this are incompatible and cannot be used, so we use the default values instead.
-            boolean preDatesLastSkillChanges = version.isLowerThan(new Version("0.50.11"));
-            if (preDatesLastSkillChanges) {
-                compatibilityHandler(skillType);
             }
 
             lookupHash.put(skillType.name, skillType);
@@ -1386,165 +1407,9 @@ public class SkillType {
                 }
             }
 
-            // Skill settings from prior to this are incompatible and cannot be used, so we use the default values instead.
-            boolean preDatesSkillChanges = version.isLowerThan(new Version("0.50.11"));
-            if (preDatesSkillChanges) {
-                compatibilityHandler(skillType);
-            }
-
             hash.put(skillType.name, skillType);
         } catch (Exception ex) {
             LOGGER.error("", ex);
-        }
-    }
-
-    /**
-     * Updates {@link SkillType} from <0.50.05 by setting its subtype and attributes based on the skill name.
-     *
-     * <p>The method creates a temporary {@link SkillType} with the correct configuration based on the input skill
-     * name, then copies the {@link SkillType#subType}, {@link SkillType#firstAttribute}, and
-     * {@link SkillType#secondAttribute} values to the provided {@link SkillType}.<p>
-     *
-     * <p>For each skill type, it logs the updates made to help with debugging and tracking compatibility changes.</p>
-     *
-     * @param skillType the {@link SkillType} to update with compatible configuration If {@code null}, the method logs
-     *                  an error and returns without making changes
-     */
-    private static void compatibilityHandler(SkillType skillType) {
-        if (skillType == null) {
-            LOGGER.info("SkillType is null, unable to update compatibility. " +
-                              "This suggests a deeper issue and should be reported.");
-            return;
-        }
-
-        SkillType temporarySkillType = switch (skillType.getName()) {
-            case S_PILOT_MEK -> createPilotingMek();
-            case S_GUN_MEK -> createGunneryMek();
-            case S_PILOT_AERO -> createPilotingAero();
-            case S_GUN_AERO -> createGunneryAero();
-            case S_PILOT_JET -> createPilotingJet();
-            case S_GUN_JET -> createGunneryJet();
-            case S_PILOT_SPACE -> createPilotingSpace();
-            case S_GUN_SPACE -> createGunnerySpace();
-            case S_PILOT_GVEE -> createPilotingGroundVee();
-            case S_PILOT_NVEE -> createPilotingNavalVee();
-            case S_PILOT_VTOL -> createPilotingVTOL();
-            case S_GUN_VEE -> createGunneryVehicle();
-            case S_ARTILLERY -> createArtillery();
-            case S_GUN_BA -> createGunneryBA();
-            case S_GUN_PROTO -> createGunneryProto();
-            case S_SMALL_ARMS -> createSmallArms();
-            case S_ANTI_MEK -> createAntiMek();
-            case S_TECH_MEK -> createTechMek();
-            case S_TECH_MECHANIC -> createTechMechanic();
-            case S_TECH_AERO -> createTechAero();
-            case S_TECH_BA -> createTechBA();
-            case S_TECH_VESSEL -> createTechVessel();
-            case S_ASTECH -> createAstech();
-            case S_SURGERY -> createSurgery();
-            case S_MEDTECH -> createMedTech();
-            case S_NAVIGATION -> createNavigation();
-            case S_ADMIN -> createAdmin();
-            case S_NEGOTIATION -> createNegotiation();
-            case S_LEADER -> createLeadership();
-            case S_STRATEGY -> createStrategy();
-            case S_TACTICS -> createTactics();
-            case S_ACROBATICS -> createAcrobatics();
-            case S_ACTING, "Acting (RP Only)" -> createActing();
-            case S_ANIMAL_HANDLING -> createAnimalHandling();
-            case S_APPRAISAL, "Appraisal (RP Only)" -> createAppraisal();
-            case S_ARCHERY, "Archery (RP Only)" -> createArchery();
-            case S_ART_DANCING -> createArtDancing();
-            case S_ART_DRAWING -> createArtDrawing();
-            case S_ART_PAINTING -> createArtPainting();
-            case S_ART_WRITING -> createArtWriting();
-            case S_ART_COOKING -> createArtCooking();
-            case S_ART_POETRY -> createArtPoetry();
-            case S_ART_SCULPTURE -> createArtSculpture();
-            case S_ART_INSTRUMENT -> createArtInstrument();
-            case S_ART_SINGING -> createArtSinging();
-            case S_ART_OTHER -> createArtOther();
-            case S_COMMUNICATIONS, "Communications/Any (RP Only)" -> createCommunications();
-            case S_COMPUTERS -> createComputers();
-            case S_CRYPTOGRAPHY -> createCryptography();
-            case S_DEMOLITIONS, "Demolitions (RP Only)" -> createDemolitions();
-            case S_DISGUISE, "Disguise (RP Only)" -> createDisguise();
-            case S_ESCAPE_ARTIST, "Escape Artist (RP Only)" -> createEscapeArtist();
-            case S_FORGERY, "Forgery (RP Only)" -> createForgery();
-            case S_INTEREST_HISTORY -> createInterestHistory();
-            case S_INTEREST_LITERATURE -> createInterestLiterature();
-            case S_INTEREST_HOLO_GAMES -> createInterestHoloGames();
-            case S_INTEREST_SPORTS -> createInterestSports();
-            case S_INTEREST_FASHION -> createInterestFashion();
-            case S_INTEREST_MUSIC -> createInterestMusic();
-            case S_INTEREST_MILITARY -> createInterestMilitary();
-            case S_INTEREST_ANTIQUES -> createInterestAntiques();
-            case S_INTEREST_THEOLOGY -> createInterestTheology();
-            case S_INTEREST_GAMBLING -> createInterestGambling();
-            case S_INTEREST_POLITICS -> createInterestPolitics();
-            case S_INTEREST_PHILOSOPHY -> createInterestPhilosophy();
-            case S_INTEREST_ECONOMICS -> createInterestEconomics();
-            case S_INTEREST_POP_CULTURE -> createInterestPopCulture();
-            case S_INTEREST_ASTROLOGY -> createInterestAstrology();
-            case S_INTEREST_FISHING -> createInterestFishing();
-            case S_INTEREST_MYTHOLOGY -> createInterestMythology();
-            case S_INTEREST_CARTOGRAPHY -> createInterestCartography();
-            case S_INTEREST_ARCHEOLOGY -> createInterestArcheology();
-            case S_INTEREST_HOLO_CINEMA -> createInterestHoloCinema();
-            case S_INTEREST_EXOTIC_ANIMALS -> createInterestExoticAnimals();
-            case S_INTEREST_LAW -> createInterestLaw();
-            case S_INTEREST_OTHER -> createInterestOther();
-            case S_INTERROGATION -> createInterrogation();
-            case S_INVESTIGATION -> createInvestigation();
-            case S_LANGUAGES -> createLanguage();
-            case S_MARTIAL_ARTS, "Martial Arts (RP Only)" -> createMartialArts();
-            case S_PERCEPTION, "Perception (RP Only)" -> createPerception();
-            case S_SLEIGHT_OF_HAND, "Sleight of Hand/Any (RP Only)" -> createSleightOfHand();
-            case S_PROTOCOLS -> createProtocols();
-            case S_SCIENCE_BIOLOGY -> createScienceBiology();
-            case S_SCIENCE_CHEMISTRY -> createScienceChemistry();
-            case S_SCIENCE_MATHEMATICS -> createScienceMathematics();
-            case S_SCIENCE_PHYSICS -> createSciencePhysics();
-            case S_SCIENCE_MILITARY -> createScienceMilitary();
-            case S_SCIENCE_GEOLOGY -> createScienceGeology();
-            case S_SCIENCE_XENOBIOLOGY -> createScienceXenobiology();
-            case S_SCIENCE_PHARMACOLOGY -> createSciencePharmacology();
-            case S_SCIENCE_GENETICS -> createScienceGenetics();
-            case S_SCIENCE_PSYCHOLOGY -> createSciencePsychology();
-            case S_SCIENCE_OTHER -> createScienceOther();
-            case S_SECURITY_SYSTEMS_ELECTRONIC -> createSecuritySystemsElectronic();
-            case S_SECURITY_SYSTEMS_MECHANICAL -> createSecuritySystemsMechanical();
-            case S_SENSOR_OPERATIONS, "Sensor Operations (RP Only)" -> createSensorOperations();
-            case S_STEALTH, "Stealth (RP Only)" -> createStealth();
-            case S_STREETWISE -> createStreetwise();
-            case S_SURVIVAL -> createSurvival();
-            case S_TRACKING, "Tracking/Any (RP Only)" -> createTracking();
-            case S_TRAINING, "Training (RP Only)" -> createTraining();
-            case S_CAREER_ANY -> createCareer();
-            case S_SWIMMING -> createSwimming();
-            case S_ZERO_G_OPERATIONS, "Zero-G Operations (RP Only)" -> createZeroGOperations();
-            case S_MELEE_WEAPONS, "Melee Weapons (RP Only)" -> createMeleeWeapons();
-            case S_THROWN_WEAPONS, "Thrown Weapons (RP Only)" -> createThrownWeapons();
-            case S_SUPPORT_WEAPONS, "Support Weapons (RP Only)" -> createSupportWeapons();
-            case S_RUNNING -> createRunning();
-            default -> {
-                LOGGER.warn("Unexpected value in compatibilityHandler: {}", skillType.getName());
-                yield null;
-            }
-        };
-
-        if (temporarySkillType == null) {
-            return;
-        }
-
-        // <50.07 compatibility handlers.
-        skillType.subType = temporarySkillType.getSubType();
-        skillType.firstAttribute = temporarySkillType.getFirstAttribute();
-        skillType.secondAttribute = temporarySkillType.getSecondAttribute();
-        skillType.countUp = temporarySkillType.isCountUp();
-
-        if (skillType.subType == UTILITY_COMMAND) {
-            skillType.target = temporarySkillType.getTarget();
         }
     }
 

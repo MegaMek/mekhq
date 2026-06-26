@@ -95,6 +95,7 @@ public class CampaignExportWizard extends JDialog {
     private JLabel lblStatus;
 
     private final Campaign sourceCampaign;
+    private final MekHQ app;
 
     private Optional<File> destinationCampaignFile;
     private final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignExportWizard",
@@ -110,7 +111,8 @@ public class CampaignExportWizard extends JDialog {
         DestinationFileSelection // this should always be last
     }
 
-    public CampaignExportWizard(Campaign c) {
+    public CampaignExportWizard(MekHQ app, Campaign c) {
+        this.app = app;
         chkExportState.setText(resourceMap.getString("chkExportSettings.text"));
         chkExportState.setToolTipText(resourceMap.getString("chkExportSettings.tooltip"));
         chkExportContractOffers.setText(resourceMap.getString("chkExportContractOffers.text"));
@@ -493,12 +495,11 @@ public class CampaignExportWizard extends JDialog {
         Campaign destinationCampaign;
         if (newCampaign) {
             destinationCampaign = CampaignFactory.createCampaign();
-            destinationCampaign.setApp(sourceCampaign.getApp());
             destinationCampaign.setCampaignOptions(sourceCampaign.getCampaignOptions());
             destinationCampaign.setGameOptions(sourceCampaign.getGameOptions());
         } else {
             try (FileInputStream fis = new FileInputStream(file)) {
-                destinationCampaign = CampaignFactory.newInstance(sourceCampaign.getApp()).createCampaign(fis);
+                destinationCampaign = CampaignFactory.newInstance(app).createCampaign(fis);
                 // Restores all transient attributes from serialized objects
                 destinationCampaign.restore();
                 destinationCampaign.cleanUp();

@@ -51,6 +51,7 @@ import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
 import static mekhq.campaign.universe.Faction.COMSTAR_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
+import static mekhq.campaign.universe.Faction.WORD_OF_BLAKE_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -380,25 +381,91 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
      * @param employerCode the faction code of the current employer
      */
     private static void checkForEmployerOverride(LocalDate today, AtBContract contract, String employerCode) {
-        // 1. ComStar co-opting check
-        Faction comStar = Factions.getInstance().getFaction(COMSTAR_FACTION_CODE);
-        if (comStar.validIn(today) && Compute.randomInt(COMSTAR_CO_OPT_CHANCE) == 0) {
-            contract.updateEmployer(COMSTAR_FACTION_CODE, today.getYear());
+        if (!Objects.equals(employerCode, COMSTAR_FACTION_CODE) && doesComStarCoOpt(today, contract)) {
             return;
         }
 
-        // 2. Word of Blake co-opting during Jihad period
-        Faction wordOfBlake = Factions.getInstance().getFaction("WOB");
+        if (!Objects.equals(employerCode, WORD_OF_BLAKE_FACTION_CODE) && doesWordOfBlakeCoOpt(today, contract)) {
+            return;
+        }
+
+        // Add any new co-opts here
+    }
+
+    /**
+     * Determines whether the Word of Blake co-opts the given contract under specific conditions.
+     *
+     * <p>This method checks if the current date falls within the Jihad era, if the Word of Blake faction is active,
+     * and if a randomized chance check succeeds.</p>
+     *
+     * <p>If all conditions are met and the enemy faction is not yet Word of Blake, the contract's employer is
+     * updated to Word of Blake.</p>
+     *
+     * @param today    the current date in the campaign
+     * @param contract the contract that may be co-opted
+     *
+     * @return {@code true} if Word of Blake successfully co-opts the contract; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static boolean doesWordOfBlakeCoOpt(LocalDate today, AtBContract contract) {
+        Faction wordOfBlake = Factions.getInstance().getFaction(WORD_OF_BLAKE_FACTION_CODE);
+
         boolean isDuringJihad = !today.isBefore(MHQConstants.JIHAD_START) &&
                                       !today.isAfter(MHQConstants.NOMINAL_JIHAD_END);
+        boolean wordOfBlakeActive = wordOfBlake.validIn(today);
+        boolean canCoOpt = !contract.getEnemy().isWoB();
 
-        if (isDuringJihad
-                  && wordOfBlake.validIn(today)
-                  && !Objects.equals("WOB", employerCode)
-                  && !Objects.equals("WOB", contract.getEnemyCode())
-                  && Compute.randomInt(WOB_CO_OPT_CHANCE) == 0) {
-            contract.updateEmployer("WOB", today.getYear());
+        boolean willCoOpt = isDuringJihad &&
+                                  wordOfBlakeActive &&
+                                  canCoOpt;
+
+        // micro-optimization that prevents us calling randomInt without need
+        willCoOpt = willCoOpt && Compute.randomInt(WOB_CO_OPT_CHANCE) == 0;
+
+        if (willCoOpt) {
+            contract.updateEmployer(WORD_OF_BLAKE_FACTION_CODE, today.getYear());
+            return true;
         }
+
+        return false;
+    }
+
+    /**
+     * Determines whether ComStar co-opts the given contract under certain conditions.
+     *
+     * <p>The method checks if ComStar is active on the provided date, whether a randomized chance roll passes, and
+     * if ComStar is not already an enemy on the given contract.</p>
+     *
+     * <p>If all conditions are satisfied, ComStar becomes the employer of the contract, and the method returns
+     * {@code true}. Otherwise, the employer remains unchanged, and the method returns {@code false}.</p>
+     *
+     * @param today    the current date used to evaluate ComStar's activity and potential co-option of the contract
+     * @param contract the contract being evaluated for potential co-option by ComStar
+     *
+     * @return {@code true} if ComStar successfully co-opts the contract, {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static boolean doesComStarCoOpt(LocalDate today, AtBContract contract) {
+        Faction comStar = Factions.getInstance().getFaction(COMSTAR_FACTION_CODE);
+
+        boolean comStarActive = comStar.validIn(today);
+        boolean canCoOpt = !contract.getEnemy().isComStar();
+
+        boolean willCoOpt = comStarActive && canCoOpt;
+
+        // micro-optimization that prevents us calling randomInt without need
+        willCoOpt = willCoOpt && Compute.randomInt(COMSTAR_CO_OPT_CHANCE) == 0;
+
+        if (willCoOpt) {
+            contract.updateEmployer(COMSTAR_FACTION_CODE, today.getYear());
+            return true;
+        }
+
+        return false;
     }
 
     private @Nullable AtBContract generateAtBContract(Campaign campaign, @Nullable String employer, int unitRatingMod) {
@@ -669,7 +736,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         }
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         int connections = commander.getAdjustedConnections(false);
-        boolean isUseEdge = campaignOptions.isUseEdge() || campaignOptions.isUseSupportEdge();
+        boolean isUseEdge = campaignOptions.isUseEdge();
         isUseEdge = isUseEdge && commander.getOptions().booleanOption(EDGE_COMMANDER_NEGOTIATION);
 
         ActionCheckResult actionCheckResult =

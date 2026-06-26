@@ -273,7 +273,7 @@ public class ContractSummaryPanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 // Display where it is on the interstellar map
-                CampaignGUI gui = campaign.getApp().getCampaigngui();
+                CampaignGUI gui = campaign.getGUI();
                 gui.getNavigationTab().showSystem(contract.getSystem());
                 gui.setSelectedTab(gui.getNavigationTab());
             }

@@ -36,15 +36,18 @@ package mekhq.campaign.location;
 import java.util.ArrayList;
 
 import megamek.common.annotations.Nullable;
+import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.Personnel;
 import mekhq.campaign.Warehouse;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 
 /**
  * A sub-interface of {@link ILocation} that marks a node in the {@link LocationNode} tree as a
@@ -136,6 +139,30 @@ public interface IPlace extends ILocation {
         }
         inventory.setCountModifier(countModifier);
         return inventory;
+    }
+
+    /**
+     * Called when this place has just completed in-system transit and is now on-planet.
+     *
+     * <p>The default implementation fires disease and inoculation checks, which apply to every
+     * arriving {@code IPlace}. Implementors such as {@link mekhq.campaign.Campaign} override this
+     * (calling {@code IPlace.super.onArrival} at the appropriate point) to add place-specific
+     * behaviors such as mothball activation, early-arrival contract checks, and personnel market
+     * refresh.</p>
+     *
+     * @param campaign           the root campaign context
+     * @param isSilentProcessing {@code true} when processing happens without user interaction (e.g.
+     *                           fast-forward), which suppresses dialog prompts
+     */
+    default void onArrival(Campaign campaign, boolean isSilentProcessing) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        if (campaignOptions.isUseRandomDiseases() && campaignOptions.isUseAlternativeAdvancedMedical()) {
+            if (!isSilentProcessing) {
+                Inoculations.triggerInoculationPrompt(campaign, false);
+            } else if (getParentLocation() instanceof AbstractLocation loc) {
+                Inoculations.autoInoculateAll(campaign, loc);
+            }
+        }
     }
 
     /**

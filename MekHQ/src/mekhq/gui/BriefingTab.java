@@ -164,6 +164,8 @@ public final class BriefingTab extends CampaignGuiTab {
     private static final int BRIEFING_SPLIT_DIVIDER_SIZE = 10;
     private static final int SCENARIO_TABLE_ROW_HEIGHT = 24;
 
+    private final MekHQ app;
+
     private LanceAssignmentView panLanceAssignment;
     private JTabbedPane scenarioWorkTabs;
     private JTable scenarioTable;
@@ -219,8 +221,9 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     // region Constructors
-    public BriefingTab(CampaignGUI gui, String tabName) {
+    public BriefingTab(MekHQ app, CampaignGUI gui, String tabName) {
         super(gui, tabName);
+        this.app = app;
         selectedScenario = -1;
     }
     // endregion Constructors
@@ -810,7 +813,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
         CampaignOptions campaignOptions = getCampaignOptions();
 
-        getCampaign().getApp().getAutosaveService().requestBeforeMissionEndAutosave(getCampaign());
+        app.getAutosaveService().requestBeforeMissionEndAutosave(getCampaign());
 
         final CompleteMissionDialog cmd = new CompleteMissionDialog(getFrame());
         if (!cmd.showDialog().isConfirmed()) {
@@ -1491,7 +1494,7 @@ public final class BriefingTab extends CampaignGuiTab {
         Campaign campaign = getCampaign();
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         boolean isClanCampaign = campaign.isClanCampaign();
-        boolean isUseEdge = campaignOptions.isUseEdge() && campaignOptions.isUseSupportEdge();
+        boolean isUseEdge = campaignOptions.isUseEdge();
         SalvageTechPicker techPicker = new SalvageTechPicker(techData, priorSelectedTechs,
               isClanCampaign, getBattlefieldControlType(scenario), isUseEdge);
         boolean wasConfirmed = techPicker.wasConfirmed();
@@ -1730,7 +1733,7 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
-        getCampaign().getApp().resolveScenario(scenario);
+        app.resolveScenario(scenario);
     }
 
     /**
@@ -1753,7 +1756,7 @@ public final class BriefingTab extends CampaignGuiTab {
         if (chosen.isEmpty()) {
             return;
         }
-        getCampaign().getApp().startAutoResolve(scenario, chosen);
+        app.startAutoResolve(scenario, chosen);
     }
 
     private void runPrincessAutoResolve() {

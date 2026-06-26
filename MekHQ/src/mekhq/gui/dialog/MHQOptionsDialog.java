@@ -55,6 +55,7 @@ import megamek.client.ui.buttons.ColourSelectorButton;
 import megamek.client.ui.clientGUI.GUIPreferences;
 import megamek.client.ui.comboBoxes.FontComboBox;
 import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.dialogs.buttonDialogs.AbstractButtonDialog;
 import megamek.client.ui.dialogs.buttonDialogs.CommonSettingsDialog;
 import megamek.client.ui.dialogs.helpDialogs.HelpDialog;
 import megamek.client.ui.displayWrappers.FontDisplay;
@@ -66,13 +67,12 @@ import mekhq.MHQOptions;
 import mekhq.MHQOptionsChangedEvent;
 import mekhq.MekHQ;
 import mekhq.campaign.universe.enums.CompanyGenerationMethod;
-import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 import mekhq.gui.enums.FormationIconOperationalStatusStyle;
 import mekhq.gui.enums.PersonnelFilterStyle;
 
 /**
  * MHQOptionsDialog is a dialog that allows the user to configure various options in MegaMekHQ. It extends the
- * {@link AbstractMHQButtonDialog} class and inherits its common dialog features. The dialog allows configuration of
+ * {@link AbstractButtonDialog} class and inherits its common dialog features. The dialog allows configuration of
  * options related to display, colors, fonts, autosave, startup behavior, notifications, and various other miscellaneous
  * options.
  * <p>
@@ -83,7 +83,7 @@ import mekhq.gui.enums.PersonnelFilterStyle;
  * <p>
  * This dialog uses the following Mnemonics: C, D, M, M, S, U, W, Y
  */
-public class MHQOptionsDialog extends AbstractMHQButtonDialog {
+public class MHQOptionsDialog extends AbstractButtonDialog {
     private static final MMLogger LOGGER = MMLogger.create(MHQOptionsDialog.class);
 
     // region Variable Declaration
@@ -248,6 +248,12 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     private JCheckBox optionUnableToAffordLoanPaymentNag;
     private JCheckBox optionUnableToAffordJumpNag;
     private JCheckBox optionUnableToAffordShoppingListNag;
+    private JCheckBox optionSomeoneRandomlyDiedCombatNag;
+    private JCheckBox optionSomeoneRandomlyDiedTechNag;
+    private JCheckBox optionSomeoneRandomlyDiedOtherSupportNag;
+    private JCheckBox optionSomeoneRandomlyDiedCivilianNag;
+    private JCheckBox optionSomeoneRandomlyDiedCampFollowerNag;
+    private JCheckBox optionSomeoneRandomlyDiedRetiredNag;
 
     private JCheckBox optionContractRentalConfirmation;
     private JCheckBox optionFactionStandingsUltimatumConfirmation;
@@ -273,7 +279,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
 
     // region Constructors
     public MHQOptionsDialog(final JFrame frame) {
-        super(frame, true, "MHQOptionsDialog", "MHQOptionsDialog.title");
+        super(frame, true, MekHQ.getDefaultResourceBundle(), "MHQOptionsDialog", "MHQOptionsDialog.title");
         initialize();
         setInitialState();
     }
@@ -1419,6 +1425,42 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
               "optionUnableToAffordShoppingListNag.toolTipText"));
         optionUnableToAffordShoppingListNag.setName("optionUnableToAffordShoppingListNag");
 
+        optionSomeoneRandomlyDiedCombatNag = new JCheckBox(resources.getString(
+              "optionSomeoneRandomlyDiedCombatNag.text"));
+        optionSomeoneRandomlyDiedCombatNag.setToolTipText(resources.getString(
+              "optionSomeoneRandomlyDiedCombatNag.toolTipText"));
+        optionSomeoneRandomlyDiedCombatNag.setName("optionSomeoneRandomlyDiedCombatNag");
+
+        optionSomeoneRandomlyDiedTechNag = new JCheckBox(resources.getString(
+              "optionSomeoneRandomlyDiedTechNag.text"));
+        optionSomeoneRandomlyDiedTechNag.setToolTipText(resources.getString(
+              "optionSomeoneRandomlyDiedTechNag.toolTipText"));
+        optionSomeoneRandomlyDiedTechNag.setName("optionSomeoneRandomlyDiedTechNag");
+
+        optionSomeoneRandomlyDiedOtherSupportNag = new JCheckBox(resources.getString(
+              "optionSomeoneRandomlyDiedOtherSupportNag.text"));
+        optionSomeoneRandomlyDiedOtherSupportNag.setToolTipText(resources.getString(
+              "optionSomeoneRandomlyDiedOtherSupportNag.toolTipText"));
+        optionSomeoneRandomlyDiedOtherSupportNag.setName("optionSomeoneRandomlyDiedOtherSupportNag");
+
+        optionSomeoneRandomlyDiedCivilianNag = new JCheckBox(resources.getString(
+              "optionSomeoneRandomlyDiedCivilianNag.text"));
+        optionSomeoneRandomlyDiedCivilianNag.setToolTipText(resources.getString(
+              "optionSomeoneRandomlyDiedCivilianNag.toolTipText"));
+        optionSomeoneRandomlyDiedCivilianNag.setName("optionSomeoneRandomlyDiedCivilianNag");
+
+        optionSomeoneRandomlyDiedCampFollowerNag = new JCheckBox(resources.getString(
+              "optionSomeoneRandomlyDiedCampFollowerNag.text"));
+        optionSomeoneRandomlyDiedCampFollowerNag.setToolTipText(resources.getString(
+              "optionSomeoneRandomlyDiedCampFollowerNag.toolTipText"));
+        optionSomeoneRandomlyDiedCampFollowerNag.setName("optionSomeoneRandomlyDiedCampFollowerNag");
+
+        optionSomeoneRandomlyDiedRetiredNag = new JCheckBox(resources.getString(
+              "optionSomeoneRandomlyDiedRetiredNag.text"));
+        optionSomeoneRandomlyDiedRetiredNag.setToolTipText(resources.getString(
+              "optionSomeoneRandomlyDiedRetiredNag.toolTipText"));
+        optionSomeoneRandomlyDiedRetiredNag.setName("optionSomeoneRandomlyDiedRetiredNag");
+
         optionContractRentalConfirmation = new JCheckBox(resources.getString(
               "optionContractRentalConfirmation.text"));
         optionContractRentalConfirmation.setToolTipText(resources.getString(
@@ -1498,6 +1540,12 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                       .addComponent(optionUnableToAffordLoanPaymentNag)
                                       .addComponent(optionUnableToAffordJumpNag)
                                       .addComponent(optionUnableToAffordShoppingListNag)
+                                      .addComponent(optionSomeoneRandomlyDiedCombatNag)
+                                      .addComponent(optionSomeoneRandomlyDiedTechNag)
+                                      .addComponent(optionSomeoneRandomlyDiedOtherSupportNag)
+                                      .addComponent(optionSomeoneRandomlyDiedCivilianNag)
+                                      .addComponent(optionSomeoneRandomlyDiedCampFollowerNag)
+                                      .addComponent(optionSomeoneRandomlyDiedRetiredNag)
                                       .addComponent(optionContractRentalConfirmation)
                                       .addComponent(optionFactionStandingsUltimatumConfirmation)
                                       .addComponent(optionBeginTransitConfirmation)
@@ -1529,6 +1577,12 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                         .addComponent(optionUnableToAffordLoanPaymentNag)
                                         .addComponent(optionUnableToAffordJumpNag)
                                         .addComponent(optionUnableToAffordShoppingListNag)
+                                        .addComponent(optionSomeoneRandomlyDiedCombatNag)
+                                        .addComponent(optionSomeoneRandomlyDiedTechNag)
+                                        .addComponent(optionSomeoneRandomlyDiedOtherSupportNag)
+                                        .addComponent(optionSomeoneRandomlyDiedCivilianNag)
+                                        .addComponent(optionSomeoneRandomlyDiedCampFollowerNag)
+                                        .addComponent(optionSomeoneRandomlyDiedRetiredNag)
                                         .addComponent(optionContractRentalConfirmation)
                                         .addComponent(optionFactionStandingsUltimatumConfirmation)
                                         .addComponent(optionBeginTransitConfirmation)
@@ -1899,6 +1953,24 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
               .setNagDialogIgnore(MHQConstants.NAG_UNABLE_TO_AFFORD_SHOPPING_LIST,
                     optionUnableToAffordShoppingListNag.isSelected());
         options
+              .setNagDialogIgnore(MHQConstants.NAG_SOMEONE_RANDOMLY_DIED_COMBAT,
+                    optionSomeoneRandomlyDiedCombatNag.isSelected());
+        options
+              .setNagDialogIgnore(MHQConstants.NAG_SOMEONE_RANDOMLY_DIED_TECH,
+                    optionSomeoneRandomlyDiedTechNag.isSelected());
+        options
+              .setNagDialogIgnore(MHQConstants.NAG_SOMEONE_RANDOMLY_DIED_OTHER_SUPPORT,
+                    optionSomeoneRandomlyDiedOtherSupportNag.isSelected());
+        options
+              .setNagDialogIgnore(MHQConstants.NAG_SOMEONE_RANDOMLY_DIED_CIVILIAN,
+                    optionSomeoneRandomlyDiedCivilianNag.isSelected());
+        options
+              .setNagDialogIgnore(MHQConstants.NAG_SOMEONE_RANDOMLY_DIED_CAMP_FOLLOWER,
+                    optionSomeoneRandomlyDiedCampFollowerNag.isSelected());
+        options
+              .setNagDialogIgnore(MHQConstants.NAG_SOMEONE_RANDOMLY_DIED_RETIREE,
+                    optionSomeoneRandomlyDiedRetiredNag.isSelected());
+        options
               .setNagDialogIgnore(MHQConstants.CONFIRMATION_CONTRACT_RENTAL,
                     optionContractRentalConfirmation.isSelected());
         options
@@ -2130,6 +2202,18 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                       .getNagDialogIgnore(MHQConstants.NAG_UNABLE_TO_AFFORD_JUMP));
         optionUnableToAffordShoppingListNag.setSelected(options
                                                               .getNagDialogIgnore(MHQConstants.NAG_UNABLE_TO_AFFORD_SHOPPING_LIST));
+        optionSomeoneRandomlyDiedCombatNag.setSelected(options
+                                                             .getNagDialogIgnore(MHQConstants.NAG_SOMEONE_RANDOMLY_DIED_COMBAT));
+        optionSomeoneRandomlyDiedTechNag.setSelected(options
+                                                           .getNagDialogIgnore(MHQConstants.NAG_SOMEONE_RANDOMLY_DIED_TECH));
+        optionSomeoneRandomlyDiedOtherSupportNag.setSelected(options
+                                                                   .getNagDialogIgnore(MHQConstants.NAG_SOMEONE_RANDOMLY_DIED_OTHER_SUPPORT));
+        optionSomeoneRandomlyDiedCivilianNag.setSelected(options
+                                                               .getNagDialogIgnore(MHQConstants.NAG_SOMEONE_RANDOMLY_DIED_CIVILIAN));
+        optionSomeoneRandomlyDiedCampFollowerNag.setSelected(options
+                                                                   .getNagDialogIgnore(MHQConstants.NAG_SOMEONE_RANDOMLY_DIED_CAMP_FOLLOWER));
+        optionSomeoneRandomlyDiedRetiredNag.setSelected(options
+                                                              .getNagDialogIgnore(MHQConstants.NAG_SOMEONE_RANDOMLY_DIED_RETIREE));
 
         optionContractRentalConfirmation.setSelected(options
                                                            .getNagDialogIgnore(MHQConstants.CONFIRMATION_CONTRACT_RENTAL));
@@ -2172,4 +2256,9 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         return true;
     }
     // endregion Data Validation
+
+    @Override
+    protected void setPreferences() throws Exception {
+        setPreferences(MekHQ.getMHQPreferences().forClass(getClass()));
+    }
 }

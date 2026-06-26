@@ -45,7 +45,6 @@ import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_TRAUMA_SURGEO
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.HealingMarginOfSuccessEffects.getEffectFromHealingAttempt;
 import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.BODY;
-import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NONE;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.time.LocalDate;
@@ -64,7 +63,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
-import mekhq.campaign.personnel.skills.AttributeCheckUtility;
+import mekhq.campaign.personnel.skills.AttributeCheck;
 import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 
@@ -211,7 +210,7 @@ public class AdvancedMedicalAlternateHealing {
                       hasProthesisTechnician);
                 miscPenalty += hasHypochondriac ? 1 : 0;
 
-                boolean useEdge = campaign.getCampaignOptions().isUseSupportEdge();
+                boolean useEdge = campaign.getCampaignOptions().isUseEdge();
                 useEdge = useEdge && patientOptions.booleanOption(EDGE_MEDICAL);
                 int marginOfSuccess = getMarginOfSuccessForUnassistedHealing(patient, modifiers, miscPenalty, useEdge);
 
@@ -298,31 +297,19 @@ public class AdvancedMedicalAlternateHealing {
      */
     private static int getMarginOfSuccessForUnassistedHealing(Person patient, List<TargetRollModifier> modifiers,
           int miscPenalty, boolean useEdge) {
-        AttributeCheckUtility naturalHealing = new AttributeCheckUtility(
-              getTextAt(RESOURCE_BUNDLE, "AdvancedMedicalAlternateHealing.naturalHealing.normal"),
-              patient,
-              BODY,
-              NONE,
-              modifiers,
-              miscPenalty,
-              false,
-              true);
-        int marginOfSuccess = naturalHealing.getMarginOfSuccess();
+        AttributeCheck naturalHealing =
+              patient.checkAttribute(BODY).withExternalModifiers(modifiers).withMiscModifier(miscPenalty);
+        ActionCheckResult result = naturalHealing.resolve(false, getTextAt(RESOURCE_BUNDLE,
+              "AdvancedMedicalAlternateHealing.naturalHealing.normal"), true);
 
-        // Edge
-        if (marginOfSuccess <= -6 && useEdge) { // Attempt to reroll a permanent injury
-            AttributeCheckUtility edgeReroll = new AttributeCheckUtility(
-                  getTextAt(RESOURCE_BUNDLE, "AdvancedMedicalAlternateHealing.naturalHealing.edge"),
-                  patient,
-                  BODY,
-                  NONE,
-                  modifiers,
-                  miscPenalty,
-                  false,
-                  true);
-            marginOfSuccess = edgeReroll.getMarginOfSuccess(); // Edge always replaces the original
+        // Attempt to reroll a permanent injury with edge
+        if ((result.marginOfSuccess() <= -6) && useEdge &&  (patient.getCurrentEdge() > 0)) {
+            // manually update edge because if we pass useEdge == true, the patient will get one free roll
+            patient.spendEdge();
+            result = naturalHealing.resolve(false, getTextAt(RESOURCE_BUNDLE,
+                  "AdvancedMedicalAlternateHealing.naturalHealing.edge"), true);
         }
-        return marginOfSuccess;
+        return result.marginOfSuccess();
     }
 
     /**
@@ -373,7 +360,7 @@ public class AdvancedMedicalAlternateHealing {
                           hasTraumaSurgeon, hasProthesisTechnician);
                     miscPenalty += hasHypochondriac ? 1 : 0;
 
-                    boolean useEdge = campaign.getCampaignOptions().isUseSupportEdge();
+                    boolean useEdge = campaign.getCampaignOptions().isUseEdge();
                     useEdge = useEdge && doctorOptions.booleanOption(EDGE_MEDICAL);
                     int marginOfSuccess = getMarginOfSuccessForAssistedHealing(
                           doctor, campaign, modifiers, miscPenalty, useEdge);
@@ -417,7 +404,7 @@ public class AdvancedMedicalAlternateHealing {
         // Edge
         if (actionCheckResult.marginOfSuccess() <= -6 && useEdge && doctor.getCurrentEdge() > 0) { // Permanent injury
             // manually update edge because if we pass useEdge == true, the doctor will get one free roll
-            doctor.changeCurrentEdge(-1);
+            doctor.spendEdge();
             actionCheckResult = skillCheck.resolve(false, getTextAt(RESOURCE_BUNDLE,
                   "AdvancedMedicalAlternateHealing.assistedHealing.edge"), true);
         }

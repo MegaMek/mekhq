@@ -373,7 +373,7 @@ public class CamOpsSalvageUtilities {
 
             Person victim = ObjectUtility.getRandomItem(techs);
 
-            if (campaignOptions.isUseEdge() && campaignOptions.isUseSupportEdge() && victim.getCurrentEdge() > 0) {
+            if (campaignOptions.isUseEdge() && victim.getCurrentEdge() > 0) {
                 if (performEdgeReroll(campaign, victim)) {
                     continue;
                 }
@@ -419,7 +419,7 @@ public class CamOpsSalvageUtilities {
             campaign.addReport(PERSONNEL,
                   getFormattedTextAt(RESOURCE_BUNDLE, "CamOpsSalvageUtilities.reroll",
                         victim.getHyperlinkedName()));
-            victim.changeCurrentEdge(-1);
+            victim.spendEdge();
 
             int roll = d6(2);
             return roll != 2;
