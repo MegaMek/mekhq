@@ -35,11 +35,8 @@ package mekhq.campaign.personnel.skills;
 
 import static mekhq.campaign.personnel.enums.GenderDescriptors.HIS_HER_THEIR;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.BARELY_MADE_IT;
-import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginOfSuccessObjectFromMarginValue;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
-import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
-import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.util.List;
 
@@ -48,6 +45,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.skills.ActionCheckRoll.RollType;
 import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
 import mekhq.utilities.ReportingUtilities;
 
@@ -178,25 +176,25 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
      * @param reason                      the reason for the check; can be {@code null}
      */
     public ActionCheckResult resolve(boolean useEdge, @Nullable String reason) {
+        RollType rollType = hasNaturalAptitude() ? RollType.ADVANTAGE : RollType.NORMAL;
 
-        int roll = SkillCheckUtility.getRoll(hasNaturalAptitude());
+        ActionCheckRoll roll = ActionCheckRoll.perform(rollType);
         boolean usedEdge = false;
-
-        boolean failed = roll < targetNumber.getValue();
+        boolean failed = roll.result() < targetNumber.getValue();
         boolean canSucceed = !targetNumber.cannotSucceed() && targetNumber.getValue() <= 12;
         boolean canSpendEdge = useEdge && person.getCurrentEdge() > 0;
 
         if (failed && canSucceed && canSpendEdge) {
             // reroll using edge
-            roll = SkillCheckUtility.getRoll(hasNaturalAptitude());
+            roll = ActionCheckRoll.perform(rollType);
             usedEdge = true;
 
             person.spendEdge();
         }
 
-        int difference = targetNumber.getValue() - roll;
+        int difference = targetNumber.getValue() - roll.result();
         int marginOfSuccess = MarginOfSuccess.getMarginOfSuccess(isCountUp() ? difference : -difference);
-        String resultsText = generateResultsText(roll, marginOfSuccess, reason);
+        String resultsText = generateResultsText(roll.result(), marginOfSuccess, reason);
 
         LOGGER.info(resultsText);
 
