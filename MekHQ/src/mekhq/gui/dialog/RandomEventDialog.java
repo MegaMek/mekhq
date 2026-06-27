@@ -347,4 +347,31 @@ public class RandomEventDialog {
             campaign.addReport(DailyReportType.SKILL_CHECKS, attributeCheckResultsText);
         }
     }
+
+
+    /**
+     * Displays a dialog to the player presenting the outcome of their response to a prisoner event.
+     *
+     * <p>
+     * Generates an in-character message based on whether the player's action was successful or a failure, using
+     * localized resources and the specific response choice. The dialog presents this message along with an optional
+     * event report to provide context or details about the event's resolution.
+     * </p>
+     *
+     * @param event       the {@link RandomEventData} associated with the dialog
+     * @param eventReport additional report or commentary to display in the dialog (maybe {@code null})
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
+    public void showResolutionDialog(RandomEventData event, String eventReport) {
+        String commanderAddress = campaign.getCommanderAddress();
+
+        String suffix = wasSuccessful ? ".success" : ".failure";
+
+        String resourceKey = "response." + choiceIndex + '.' + event.randomEventType().name() + suffix;
+        String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, resourceKey, commanderAddress);
+
+        new ImmersiveDialogSimple(campaign, eventParticipant, null, inCharacterMessage, null, eventReport, null, false);
+    }
 }
