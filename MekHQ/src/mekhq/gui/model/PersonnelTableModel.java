@@ -45,10 +45,10 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
 import megamek.common.annotations.Nullable;
-import megamek.common.units.Entity;
 import megamek.common.units.Jumpship;
 import megamek.common.units.SmallCraft;
 import megamek.common.units.UnitType;
+import mekhq.MHQOptions;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -60,6 +60,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
 import mekhq.gui.enums.PersonnelTabView;
 import mekhq.gui.enums.PersonnelTableModelColumn;
+import mekhq.gui.utilities.ComponentColors;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 /**
@@ -176,86 +177,62 @@ public class PersonnelTableModel extends DataTableModel<Person> {
 
             setText(personnelColumn.getText(value));
 
-            // Colouring - determine color and collect ALL applicable color reasons
-            boolean personIsDamaged;
-            final CampaignOptions campaignOptions = campaign.getCampaignOptions();
-            if (campaignOptions.isUseAdvancedMedical()) {
-                personIsDamaged = person.hasInjuries(true);
-            } else {
-                personIsDamaged = person.getHits() > 0;
-            }
-            boolean personIsFatigued = (campaignOptions.isUseFatigue()
-                                              &&
-                                              (getEffectiveFatigue(person.getAdjustedFatigue(),
-                                                    person.getPermanentFatigue(),
-                                                    person.isClanPersonnel(),
-                                                    person.getSkillLevel(campaign, false, true)) >= 5));
-            boolean personIsAwayFromMainForce = PersonnelStatus.computeIsAwayFromMainForce(campaign, person);
-
             // Collect all applicable color reasons for tooltip
-            List<String> colorReasonKeys = new ArrayList<>();
-
-            boolean isUseAlternateAdvancedMedical = campaignOptions.isUseAlternativeAdvancedMedical();
+            List<String> personalStateFlags = new ArrayList<>();
             if (!isSelected) {
-                // Set color based on priority (first match wins for display color)
-                // But collect ALL applicable reasons for tooltip
-                if (person.getStatus().isAbsent()) {
-                    setBackground(MekHQ.getMHQOptions().getAbsentBackground());
-                    setForeground(MekHQ.getMHQOptions().getAbsentForeground());
-                } else if (person.getStatus().isDepartedUnit()) {
-                    setBackground(MekHQ.getMHQOptions().getGoneBackground());
-                    setForeground(MekHQ.getMHQOptions().getGoneForeground());
-                } else if (person.isDeployed()) {
-                    setForeground(MekHQ.getMHQOptions().getDeployedForeground());
-                    setBackground(MekHQ.getMHQOptions().getDeployedBackground());
-                } else if (personIsAwayFromMainForce) {
-                    setForeground(MekHQ.getMHQOptions().getAwayFromMainForceForeground());
-                    setBackground(MekHQ.getMHQOptions().getAwayFromMainForceBackground());
-                } else if (personIsDamaged) {
-                    setForeground(MekHQ.getMHQOptions().getInjuredForeground());
-                    setBackground(MekHQ.getMHQOptions().getInjuredBackground());
-                } else if (person.isPregnant()) {
-                    setForeground(MekHQ.getMHQOptions().getPregnantForeground());
-                    setBackground(MekHQ.getMHQOptions().getPregnantBackground());
-                } else if (personIsFatigued) {
-                    setForeground(MekHQ.getMHQOptions().getFatiguedForeground());
-                    setBackground(MekHQ.getMHQOptions().getFatiguedBackground());
-                } else if (person.hasNonProstheticPermanentInjuries(isUseAlternateAdvancedMedical)) {
-                    setForeground(MekHQ.getMHQOptions().getHealedInjuriesForeground());
-                    setBackground(MekHQ.getMHQOptions().getHealedInjuriesBackground());
-                } else {
-                    setBackground(UIManager.getColor("Table.background"));
-                    setForeground(UIManager.getColor("Table.foreground"));
-                }
-
-                // Now collect ALL applicable reasons (not mutually exclusive)
-                if (person.getStatus().isAbsent()) {
-                    colorReasonKeys.add("colorReason.personnel.absent");
-                }
-                if (person.getStatus().isDepartedUnit()) {
-                    colorReasonKeys.add("colorReason.personnel.departed");
-                }
-                if (person.isDeployed()) {
-                    colorReasonKeys.add("colorReason.personnel.deployed");
-                }
-                if (personIsDamaged) {
-                    colorReasonKeys.add("colorReason.personnel.injured");
-                }
-                if (person.isPregnant()) {
-                    colorReasonKeys.add("colorReason.personnel.pregnant");
-                }
-                if (personIsFatigued) {
-                    colorReasonKeys.add("colorReason.personnel.fatigued");
-                }
-                if (person.hasNonProstheticPermanentInjuries(isUseAlternateAdvancedMedical)) {
-                    colorReasonKeys.add("colorReason.personnel.healedInjuries");
-                }
+                ComponentColors cellColors = populatePersonalStateFlags(person, personalStateFlags);
+                setForeground(cellColors.foreground());
+                setBackground(cellColors.background());
             }
-
             // Tool Tips - includes all applicable color reasons for name/rank/status columns
-            setToolTipText(personnelColumn.getToolTipText(person, colorReasonKeys));
+            setToolTipText(personnelColumn.getToolTipText(person, personalStateFlags));
 
             return this;
+        }
+
+        /**
+         * Populates a list with personal state flags. Selects a color for the most important state.
+         */
+        private ComponentColors populatePersonalStateFlags(Person person, List<String> colorReasonKeys) {
+            // Set color based on priority (first match wins for display color)
+            // But collect ALL applicable reasons for tooltip
+            MHQOptions mhqOptions = MekHQ.getMHQOptions();
+            CampaignOptions campaignOptions = campaign.getCampaignOptions();
+
+            ComponentColors cellColors = null;
+            if (person.getStatus().isAbsent()) {
+                colorReasonKeys.add("colorReason.personnel.absent");
+                cellColors = mhqOptions.getAbsentColors();
+            }
+            if (person.getStatus().isDepartedUnit()) {
+                colorReasonKeys.add("colorReason.personnel.departed");
+                cellColors = (cellColors == null) ? mhqOptions.getGoneColors() : cellColors;
+            }
+            if (person.isDeployed()) {
+                colorReasonKeys.add("colorReason.personnel.deployed");
+                cellColors = (cellColors == null) ? mhqOptions.getDeployedColors() : cellColors;
+            }
+            if (PersonnelStatus.computeIsAwayFromMainForce(campaign, person)) {
+                cellColors = (cellColors == null) ? mhqOptions.getAwayFromMainForceColors() : cellColors;
+            }
+            if (campaignOptions.isUseAdvancedMedical() ? person.hasInjuries(true) : (person.getHits() > 0)) {
+                colorReasonKeys.add("colorReason.personnel.injured");
+                cellColors = (cellColors == null) ? mhqOptions.getInjuredColors() : cellColors;
+            }
+            if (person.isPregnant()) {
+                colorReasonKeys.add("colorReason.personnel.pregnant");
+                cellColors = (cellColors == null) ? mhqOptions.getPregnantColors() : cellColors;
+            }
+            if (campaignOptions.isUseFatigue() && (getEffectiveFatigue(person, campaign) >= 5)) {
+                colorReasonKeys.add("colorReason.personnel.fatigued");
+                cellColors = (cellColors == null) ? mhqOptions.getFatiguedColors() : cellColors;
+            }
+            if (person.hasNonProstheticPermanentInjuries(campaignOptions.isUseAlternativeAdvancedMedical())) {
+                colorReasonKeys.add("colorReason.personnel.healedInjuries");
+                cellColors = (cellColors == null) ? mhqOptions.getHealedInjuriesColors() : cellColors;
+            }
+            return (cellColors == null) ? new ComponentColors(UIManager.getColor("Table.foreground"),
+                  UIManager.getColor("Table.background")) : cellColors;
         }
     }
 
@@ -271,19 +248,10 @@ public class PersonnelTableModel extends DataTableModel<Person> {
             final PersonnelTableModelColumn personnelColumn = PERSONNEL_COLUMNS[table.convertColumnIndexToModel(column)];
             final Person person = getPerson(modelRow);
 
-            setText(String.valueOf(getValueAt(person, personnelColumn)));
-
             switch (personnelColumn) {
-                case RANK:
-                    setHtmlText(person.getRankName());
-                    break;
                 case PERSON:
                     setText(person.getFullDesc(campaign));
                     setImage(person.getPortraitImageIconWithFallback(true, 54).getImage());
-                    break;
-                case MARKET_UNIT_ASSIGNMENT:
-                    Entity entity = campaign.getPersonnelMarket().getAttachedEntity(person);
-                    setText((entity != null) ? entity.getDisplayName() : "-");
                     break;
                 case UNIT_ASSIGNMENT:
                     Unit unit = person.getUnit();
