@@ -410,7 +410,7 @@ public class RetirementTableModel extends AbstractTableModel {
             setText(getValueAt(actualRow, actualCol).toString());
             if (actualCol == COL_PERSON) {
                 setText(p.getFullDesc(campaign));
-                setImage(p.getPortrait().getImage(40));
+                setImage(p.getPortraitImageIconWithFallback(true, 40).getImage());
             } else if (actualCol == COL_ASSIGN) {
                 Unit u = p.getUnit();
                 if (!p.getTechUnits().isEmpty()) {

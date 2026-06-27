@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.personnel.advancedCharacterBuilder;
 
-import static megamek.codeUtilities.MathUtility.clamp;
 import static mekhq.campaign.personnel.Person.*;
 import static mekhq.campaign.personnel.advancedCharacterBuilder.LifePathDataClassLookup.ATOW_TRAIT;
 import static mekhq.campaign.personnel.advancedCharacterBuilder.LifePathDataClassLookup.FACTION_CODE;
@@ -272,7 +271,7 @@ public record LifePathEntryData(
             return minimumScore;
         }
 
-        if (attribute == SkillAttribute.NONE) {
+        if (attribute == SkillAttribute.NO_ATTRIBUTE) {
             return 0;
         }
 

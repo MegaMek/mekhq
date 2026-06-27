@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,23 +33,24 @@
 package mekhq.campaign.events;
 
 import megamek.common.event.MMEvent;
-import mekhq.campaign.CurrentLocation;
+import mekhq.campaign.AbstractLocation;
+import mekhq.campaign.AbstractMobileLocation;
 
 /**
  * Triggered when a jump path is completed
  */
 public class TransitCompleteEvent extends MMEvent {
 
-    private final CurrentLocation location;
+    private final AbstractLocation location;
 
-    public TransitCompleteEvent(CurrentLocation location) {
+    public TransitCompleteEvent(AbstractMobileLocation location) {
         this.location = location;
     }
 
     /**
      * @return The campaign's location object.
      */
-    public CurrentLocation getLocation() {
+    public AbstractLocation getLocation() {
         return location;
     }
 }

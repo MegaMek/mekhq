@@ -46,12 +46,12 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
+import megamek.client.ui.dialogs.buttonDialogs.AbstractButtonDialog;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.PersonalLogEntry;
 import mekhq.campaign.personnel.Person;
-import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 
 /**
  * A dialog for adding or editing medical log entries for a person.
@@ -61,7 +61,7 @@ import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
  *
  * @author Taharqa
  */
-public class AddOrEditLogEntryDialog extends AbstractMHQButtonDialog {
+public class AddOrEditLogEntryDialog extends AbstractButtonDialog {
     private static final int ADD_OPERATION = 1;
     private static final int EDIT_OPERATION = 2;
 
@@ -105,8 +105,7 @@ public class AddOrEditLogEntryDialog extends AbstractMHQButtonDialog {
      */
     private AddOrEditLogEntryDialog(final JFrame parent, final int operationType, final @Nullable Person person,
           final LogEntry entry) {
-        super(parent,
-              "AddOrEditPersonnelEntryDialog",
+        super(parent, true, MekHQ.getDefaultResourceBundle(), "AddOrEditPersonnelEntryDialog",
               operationType == ADD_OPERATION ? "logController.btnAdd.text" : "logController.btnEdit.text");
 
         this.person = person;
@@ -182,5 +181,10 @@ public class AddOrEditLogEntryDialog extends AbstractMHQButtonDialog {
             date = dateChooser.getDate();
             btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
         }
+    }
+
+    @Override
+    protected void setPreferences() throws Exception {
+        setPreferences(MekHQ.getMHQPreferences().forClass(getClass()));
     }
 }

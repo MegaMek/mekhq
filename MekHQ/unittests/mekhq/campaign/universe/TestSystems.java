@@ -37,10 +37,35 @@ public class TestSystems extends Systems {
 
     private static TestSystems systems;
 
+    /**
+     * Provides a singleton instance of the TestSystems class.
+     *
+     * <p><b>Warning:</b> This method ensures that only one instance of TestSystems is created. This means any
+     * changes made to the instance will be retained elsewhere. This method should <b>NOT</b> be used in any test
+     * that modifies the instance.</p>
+     *
+     * @return the singleton instance of the TestSystems class
+     * @see #resetAndGetInstance()
+     */
     public static TestSystems getInstance() {
         if (systems == null) {
             systems = new TestSystems();
         }
+
+        return systems;
+    }
+
+    /**
+     * Resets the current instance of the {@code TestSystems} class and creates a new instance.
+     *
+     * <p><b>Usage:</b> This method is designed for use in tests where we're going to modify the system data in some
+     * way. It ensures that we're cleaning up after ourselves and creating a fresh instance for each test.</p>
+     *
+     * @return A new instance of {@code TestSystems}.
+     * @see #getInstance()
+     */
+    public static TestSystems resetAndGetInstance() {
+        systems = new TestSystems();
 
         return systems;
     }

@@ -39,7 +39,7 @@ import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.enums.Gender.RANDOMIZE;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.LEFT;
-import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.FREE;
+import static mekhq.campaign.randomEvents.prisoners.PrisonerStatus.FREE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.time.LocalDate;
@@ -151,8 +151,8 @@ public class RandomDependents {
     int prepareData() {
         int activeNonDependents = 0;
 
-        for (Person person : campaign.getActivePersonnel(false, false)) {
-            if (!person.isEmployed()) {
+        for (Person person : campaign.getActivePersonnel(false, true)) {
+            if (!person.isEmployed() && person.isCivilian()) {
                 activeDependents.add(person);
                 continue;
             }

@@ -72,6 +72,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.persons.PersonBattleFinishedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
@@ -656,31 +657,37 @@ public class ResolveScenarioTracker {
     }
 
     public void assignKills() {
-        for (Unit u : units) {
+        for (Unit unit : units) {
             for (String killed : killCredits.keySet()) {
                 if (killCredits.get(killed).equalsIgnoreCase("None")) {
                     continue;
                 }
 
-                if (u.getId().toString().equals(killCredits.get(killed))) {
-                    for (Person p : u.getActiveCrew()) {
-                        PersonStatus status = peopleStatus.get(p.getId());
+                if (unit.getId().toString().equals(killCredits.get(killed))) {
+                    int formationId = unit.getFormationId();
+                    if (formationId == Formation.FORMATION_NONE) {
+                        logger.error("Unit {} has no actual formation when trying to assign kills",
+                              unit.getId().toString());
+                        continue;
+                    }
+                    for (Person person : unit.getActiveCrew()) {
+                        PersonStatus status = peopleStatus.get(person.getId());
 
                         if (null == status) {
                             // this shouldn't happen so report
                             logger.error("A null person status was found for person id {} when trying to assign kills",
-                                  p.getId().toString());
+                                  person.getId().toString());
                             continue;
                         }
 
-                        status.addKill(new Kill(p.getId(),
+                        status.addKill(new Kill(person.getId(),
                               killed,
-                              u.getEntity().getShortNameRaw(),
+                              unit.getEntity().getShortNameRaw(),
                               campaign.getLocalDate(),
                               getMissionId(),
                               getScenarioId(),
-                              p.getUnit().getFormationId(),
-                              u.getEntity().getEntityType()));
+                              formationId,
+                              unit.getEntity().getEntityType()));
                     }
                 }
             }
@@ -1766,7 +1773,7 @@ public class ResolveScenarioTracker {
 
         final boolean isContract = mission instanceof Contract;
         if (isContract) {
-            blc = ((Contract) mission).getBattleLossComp() / 100.0;
+            blc = ((Contract) mission).getBattleLossCompensation() / 100.0;
         }
 
         // now lets update personnel
@@ -1972,17 +1979,26 @@ public class ResolveScenarioTracker {
         }
 
         if (campaignOptions.isUseCamOpsSalvage()) {
-            SalvagePostScenarioPicker picker = new SalvagePostScenarioPicker(campaign, mission, scenario,
-                  getActualSalvage(), getSoldSalvage());
+            boolean hasAssignedSalvageForce = !scenario.getSalvageFormations().isEmpty();
+            boolean hasAssignedSalvageTechs = !scenario.getSalvageTechs().isEmpty();
 
-            List<UUID> techUUIDs = scenario.getSalvageTechs();
-            if (campaignOptions.isUseRiskySalvage()) {
-                CamOpsSalvageUtilities.performRiskySalvageChecks(campaign,
-                      techUUIDs,
-                      picker.getCountOfSalvageUnits());
+            // There is no point presenting the dialog if there are no techs or teams assigned, or if the player
+            // doesn't control the field
+            boolean showSalvageDialog = control && hasAssignedSalvageForce && hasAssignedSalvageTechs;
+
+            if (showSalvageDialog) {
+                SalvagePostScenarioPicker picker = new SalvagePostScenarioPicker(campaign, mission, scenario,
+                      getActualSalvage(), getSoldSalvage());
+
+                List<UUID> techUUIDs = scenario.getSalvageTechs();
+                if (campaignOptions.isUseRiskySalvage()) {
+                    CamOpsSalvageUtilities.performRiskySalvageChecks(campaign,
+                          techUUIDs,
+                          picker.getCountOfSalvageUnits());
+                }
+
+                CamOpsSalvageUtilities.depleteTechMinutes(campaign, techUUIDs);
             }
-
-            CamOpsSalvageUtilities.depleteTechMinutes(campaign, techUUIDs);
         } else {
             CamOpsSalvageUtilities.resolveSalvage(campaign, mission, scenario, getActualSalvage(), getSoldSalvage(),
                   getLeftoverSalvage());

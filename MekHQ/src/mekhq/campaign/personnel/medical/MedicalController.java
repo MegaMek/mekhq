@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -50,11 +50,12 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.persons.PersonMedicalAssignmentEvent;
+import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternateHealing;
-import mekhq.campaign.personnel.skills.SkillCheckUtility;
+import mekhq.campaign.personnel.skills.ActionCheckResult;
 import mekhq.campaign.unit.Unit;
 
 /**
@@ -74,7 +75,7 @@ public class MedicalController {
     final private int maximumPatients;
     final private int healingWaitingPeriod;
     final private int naturalHealingWaitingPeriod;
-    final private boolean isUseSupportEdge;
+    final private boolean isUseEdge;
     final private boolean isUseAdvancedMedical;
     final private boolean isUseAltAdvancedMedical;
 
@@ -93,7 +94,7 @@ public class MedicalController {
         maximumPatients = campaignOptions.getMaximumPatients();
         healingWaitingPeriod = campaignOptions.getHealingWaitingPeriod();
         naturalHealingWaitingPeriod = campaignOptions.getNaturalHealingWaitingPeriod();
-        isUseSupportEdge = campaignOptions.isUseSupportEdge();
+        isUseEdge = campaignOptions.isUseEdge();
         isUseAdvancedMedical = campaignOptions.isUseAdvancedMedical();
         isUseAltAdvancedMedical = campaignOptions.isUseAlternativeAdvancedMedical();
     }
@@ -147,12 +148,13 @@ public class MedicalController {
             // Handle Advanced Medical
             if (isUseAdvancedMedical) {
                 if (isUseAltAdvancedMedical) {
-                    AdvancedMedicalAlternateHealing.processNewDay(campaign.getLocalDate(),
-                          campaign.getCampaignOptions().isUseFatigue(), campaign.getCampaignOptions().getFatigueRate(),
-                          patient, doctor);
+                    AdvancedMedicalAlternateHealing.processNewDay(campaign, patient, doctor);
                 } else {
                     InjuryUtil.resolveDailyHealing(campaign, patient);
                 }
+
+                patient.clearDoctorAssignmentForCharacterWithOnlyPermanentInjuries(isUseAdvancedMedical,
+                      naturalHealingWaitingPeriod);
             } else {
                 if (doctor != null && patient.getDaysToWaitForHealing() <= 0) {
                     healPerson(patient, doctor, isUseAgingEffects, isClanCampaign, today);
@@ -217,22 +219,19 @@ public class MedicalController {
         LOGGER.debug(getFormattedTextAt(RESOURCE_BUNDLE, "MedicalController.report.intro",
               doctor.getHyperlinkedFullTitle(), patient.getHyperlinkedFullTitle()));
 
-        SkillCheckUtility skillCheckUtility = new SkillCheckUtility(
-              getTextAt(RESOURCE_BUNDLE, "MedicalController.report.skillCheck"),
-              doctor,
-              S_SURGERY,
-              getAdditionalHealingModifiers(patient),
-              0,
-              isUseSupportEdge,
-              false,
-              isUseAgingEffects,
-              isClanCampaign,
-              today);
+        ActionCheckResult actionCheckResult =
+              doctor.checkSkill(S_SURGERY, isUseAgingEffects, isClanCampaign, today)
+                    .withExternalModifiers(getAdditionalHealingModifiers(patient))
+                    .resolve(isUseEdge, getTextAt(RESOURCE_BUNDLE, "MedicalController.report.skillCheck"));
 
-        LOGGER.debug(skillCheckUtility.getResultsText());
+        LOGGER.debug(actionCheckResult.getReport(false));
 
-        if (skillCheckUtility.isSuccess()) {
+        if (actionCheckResult.isSuccess()) {
+            boolean inInfirmary = !(null == patient.getDoctorId());
             patient.heal();
+            if (inInfirmary && !patient.needsFixing() && patient.getPrisonerStatus().isFreeOrBondsman()) {
+                MedicalLogger.dismissedFromInfirmary(patient, campaign);
+            }
             Unit unit = patient.getUnit();
             if (unit != null) {
                 unit.resetPilotAndEntity();

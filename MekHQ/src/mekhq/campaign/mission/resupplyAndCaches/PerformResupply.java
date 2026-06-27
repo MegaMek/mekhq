@@ -255,9 +255,9 @@ public class PerformResupply {
             } else if (part instanceof Armor) {
                 int quantity = (int) Math.ceil(((Armor) part).getArmorPointsPerTon() * RESUPPLY_ARMOR_TONNAGE);
                 ((Armor) part).setAmount(quantity);
-                campaign.getWarehouse().addPart(part, true);
+                campaign.getAllWarehouse().addPart(part, true);
             } else {
-                campaign.getWarehouse().addPart(part, true);
+                campaign.getAllWarehouse().addPart(part, true);
             }
         }
     }
@@ -360,8 +360,8 @@ public class PerformResupply {
      *
      * @param resupply       the {@link Resupply} instance defining the resupply operation.
      * @param convoyContents a list of {@link Part} objects representing the contents of the convoy.
-     * @param playerConvoy   the {@link Formation} object representing the player's convoy. If {@code null}, the convoy is
-     *                       an NPC-controlled unit.
+     * @param playerConvoy   the {@link Formation} object representing the player's convoy. If {@code null}, the convoy
+     *                       is an NPC-controlled unit.
      */
     public static void processConvoy(Resupply resupply, List<Part> convoyContents, @Nullable Formation playerConvoy) {
         final Campaign campaign = resupply.getCampaign();
@@ -390,7 +390,7 @@ public class PerformResupply {
             convoyWeight += npcConvoyWeight;
         } else {
             for (UUID unitId : playerConvoy.getAllUnits(false)) {
-                Entity entity = getEntityFromUnitId(campaign.getHangar(), unitId);
+                Entity entity = getEntityFromUnitId(campaign.getAllHangar(), unitId);
 
                 if (entity == null) {
                     continue;
@@ -445,8 +445,8 @@ public class PerformResupply {
             }
 
             // Non-ground convoys don't get roleplay events
-            if (convoy.formationContainsOnlyVTOLForces(campaign.getHangar(), false) ||
-                      convoy.formationContainsOnlyAerialForces(campaign.getHangar(), false, false)) {
+            if (convoy.formationContainsOnlyVTOLForces(campaign.getAllHangar(), false) ||
+                      convoy.formationContainsOnlyAerialForces(campaign.getAllHangar(), false, false)) {
                 completeSuccessfulDelivery(resupply, convoyContents);
                 return;
             }
@@ -513,7 +513,8 @@ public class PerformResupply {
      * </ul>
      *
      * @param resupply       the {@link Resupply} instance representing the resupply mission.
-     * @param targetConvoy   the {@link Formation} representing the player's convoy. Can be {@code null} for NPC convoys.
+     * @param targetConvoy   the {@link Formation} representing the player's convoy. Can be {@code null} for NPC
+     *                       convoys.
      * @param convoyContents a list of {@link Part} objects representing the resupply cargo.
      */
     private static void processConvoyInterception(Resupply resupply, @Nullable Formation targetConvoy,
@@ -534,9 +535,9 @@ public class PerformResupply {
         String templateAddress = GENERIC;
 
         if (targetConvoy != null) {
-            if (targetConvoy.formationContainsOnlyAerialForces(campaign.getHangar(), false, false)) {
+            if (targetConvoy.formationContainsOnlyAerialForces(campaign.getAllHangar(), false, false)) {
                 templateAddress = PLAYER_AEROSPACE_CONVOY;
-            } else if (targetConvoy.formationContainsMajorityVTOLForces(campaign.getHangar(), false)) {
+            } else if (targetConvoy.formationContainsMajorityVTOLForces(campaign.getAllHangar(), false)) {
                 templateAddress = PLAYER_VTOL_CONVOY;
             } else {
                 templateAddress = PLAYER_CONVOY;
@@ -567,7 +568,7 @@ public class PerformResupply {
         // we log an error and make the delivery, in the same manner as above.
         StratConTrackState track;
         try {
-            final StratConCampaignState campaignState = contract.getStratconCampaignState();
+            final StratConCampaignState campaignState = contract.getStratConCampaignState();
             List<StratConTrackState> tracks = campaignState.getTracks();
             track = ObjectUtility.getRandomItem(tracks);
         } catch (NullPointerException e) {
@@ -647,7 +648,7 @@ public class PerformResupply {
         if (targetConvoy != null) {
             speaker = campaign.getPerson(targetConvoy.getFormationCommanderID());
 
-            Hangar hangar = campaign.getHangar();
+            Hangar hangar = campaign.getAllHangar();
             if (targetConvoy.formationContainsOnlyVTOLForces(hangar, false) ||
                       targetConvoy.formationContainsOnlyAerialForces(hangar, false, false)) {
                 inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,

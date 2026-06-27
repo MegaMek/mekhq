@@ -548,7 +548,7 @@ public class StratConScenario implements IStratConDisplayable {
 
             AtBContract contract = backingScenario.getContract(campaign);
 
-            campaignState = contract.getStratconCampaignState();
+            campaignState = contract.getStratConCampaignState();
 
             if (campaignState == null) {
                 return null;
@@ -615,7 +615,7 @@ public class StratConScenario implements IStratConDisplayable {
             if (contract == null) {
                 return;
             }
-            StratConCampaignState campaignState = contract.getStratconCampaignState();
+            StratConCampaignState campaignState = contract.getStratConCampaignState();
 
             StratConTrackState track = getTrackForScenario(campaign, campaignState);
             for (Formation formation : campaign.getAllFormations()) {

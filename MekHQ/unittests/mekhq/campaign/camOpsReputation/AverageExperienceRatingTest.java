@@ -63,7 +63,7 @@ class AverageExperienceRatingTest {
     @Test
     void returnsNoCampaignExperience_whenNoCombatTeams() throws Exception {
         Campaign campaign = mock(Campaign.class);
-        when(campaign.getHangar()).thenReturn(mock(Hangar.class));
+        when(campaign.getAllHangar()).thenReturn(mock(Hangar.class));
         when(campaign.getCombatTeamsAsList()).thenReturn(new ArrayList<>());
 
         assertEquals(7, invokeCalculateAverageExperienceRating(campaign, false));
@@ -74,7 +74,7 @@ class AverageExperienceRatingTest {
     void returnsNoCampaignExperience_whenAllCombatTeamsReturnNullForce() throws Exception {
         Campaign campaign = mock(Campaign.class);
         Hangar hangar = mock(Hangar.class);
-        when(campaign.getHangar()).thenReturn(hangar);
+        when(campaign.getAllHangar()).thenReturn(hangar);
 
         CombatTeam team = mock(CombatTeam.class);
         when(team.getFormation(campaign)).thenReturn(null);
@@ -89,7 +89,7 @@ class AverageExperienceRatingTest {
     void returnsNoCampaignExperience_whenAllForcesAreTraining() throws Exception {
         Campaign campaign = mock(Campaign.class);
         Hangar hangar = mock(Hangar.class);
-        when(campaign.getHangar()).thenReturn(hangar);
+        when(campaign.getAllHangar()).thenReturn(hangar);
 
         Formation trainingFormation = mock(Formation.class, RETURNS_DEEP_STUBS);
         when(trainingFormation.getCombatRoleInMemory().isTraining()).thenReturn(true);
@@ -106,7 +106,7 @@ class AverageExperienceRatingTest {
     void returnsNoCampaignExperience_whenUnitsAreUncrewed() throws Exception {
         Campaign campaign = mock(Campaign.class);
         Hangar hangar = mock(Hangar.class);
-        when(campaign.getHangar()).thenReturn(hangar);
+        when(campaign.getAllHangar()).thenReturn(hangar);
 
         Entity entity = mock(Entity.class);
         Unit unit = mock(Unit.class);
@@ -129,7 +129,7 @@ class AverageExperienceRatingTest {
     void ignoresJumpships_entirely() throws Exception {
         Campaign campaign = mock(Campaign.class);
         Hangar hangar = mock(Hangar.class);
-        when(campaign.getHangar()).thenReturn(hangar);
+        when(campaign.getAllHangar()).thenReturn(hangar);
 
         Jumpship jumpship = mock(Jumpship.class); // instanceof Jumpship => must be skipped
         Unit unit = mock(Unit.class);
@@ -153,7 +153,7 @@ class AverageExperienceRatingTest {
         // unitCount=1 => divisor=2 => rawAverage=3.5 => fractional==0.5 => round DOWN => 3
         Campaign campaign = mock(Campaign.class);
         Hangar hangar = mock(Hangar.class);
-        when(campaign.getHangar()).thenReturn(hangar);
+        when(campaign.getAllHangar()).thenReturn(hangar);
 
         Entity entity = mock(Entity.class);
 
@@ -197,7 +197,7 @@ class AverageExperienceRatingTest {
         // totalExperience=15, units=2 => divisor=4 => rawAverage=3.75 => fractional>0.5 => ceil => 4
         Campaign campaign = mock(Campaign.class);
         Hangar hangar = mock(Hangar.class);
-        when(campaign.getHangar()).thenReturn(hangar);
+        when(campaign.getAllHangar()).thenReturn(hangar);
 
         Entity entityA = mock(Entity.class);
         Entity entityB = mock(Entity.class);
@@ -256,7 +256,7 @@ class AverageExperienceRatingTest {
         // Set target=5 => returns 6 for driving and 6 for gunnery => total=12 => divisor=2 => avg=6
         Campaign campaign = mock(Campaign.class);
         Hangar hangar = mock(Hangar.class);
-        when(campaign.getHangar()).thenReturn(hangar);
+        when(campaign.getAllHangar()).thenReturn(hangar);
 
         Entity entity = mock(Entity.class);
 
@@ -302,7 +302,7 @@ class AverageExperienceRatingTest {
         // totalExperience=8 => divisor=2 => avg=4
         Campaign campaign = mock(Campaign.class);
         Hangar hangar = mock(Hangar.class);
-        when(campaign.getHangar()).thenReturn(hangar);
+        when(campaign.getAllHangar()).thenReturn(hangar);
 
         SmallCraft smallCraft = mock(SmallCraft.class);
 
@@ -362,7 +362,7 @@ class AverageExperienceRatingTest {
         // So (1 driver, 1 gunner) leaves hasAtLeastOneCrew false and should return NO_CAMPAIGN_EXPERIENCE.
         Campaign campaign = mock(Campaign.class);
         Hangar hangar = mock(Hangar.class);
-        when(campaign.getHangar()).thenReturn(hangar);
+        when(campaign.getAllHangar()).thenReturn(hangar);
 
         SmallCraft smallCraft = mock(SmallCraft.class);
 
@@ -406,7 +406,7 @@ class AverageExperienceRatingTest {
     void logFlag_doesNotChangeComputedResult() throws Exception {
         Campaign campaign = mock(Campaign.class);
         Hangar hangar = mock(Hangar.class);
-        when(campaign.getHangar()).thenReturn(hangar);
+        when(campaign.getAllHangar()).thenReturn(hangar);
 
         Entity entity = mock(Entity.class);
 

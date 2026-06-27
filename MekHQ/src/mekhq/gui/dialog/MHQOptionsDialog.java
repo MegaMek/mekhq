@@ -33,6 +33,7 @@
 package mekhq.gui.dialog;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
+import static mekhq.utilities.MHQInternationalization.getText;
 
 import java.awt.Component;
 import java.awt.Container;
@@ -54,6 +55,7 @@ import megamek.client.ui.buttons.ColourSelectorButton;
 import megamek.client.ui.clientGUI.GUIPreferences;
 import megamek.client.ui.comboBoxes.FontComboBox;
 import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.dialogs.buttonDialogs.AbstractButtonDialog;
 import megamek.client.ui.dialogs.buttonDialogs.CommonSettingsDialog;
 import megamek.client.ui.dialogs.helpDialogs.HelpDialog;
 import megamek.client.ui.displayWrappers.FontDisplay;
@@ -65,13 +67,12 @@ import mekhq.MHQOptions;
 import mekhq.MHQOptionsChangedEvent;
 import mekhq.MekHQ;
 import mekhq.campaign.universe.enums.CompanyGenerationMethod;
-import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 import mekhq.gui.enums.FormationIconOperationalStatusStyle;
 import mekhq.gui.enums.PersonnelFilterStyle;
 
 /**
  * MHQOptionsDialog is a dialog that allows the user to configure various options in MegaMekHQ. It extends the
- * {@link AbstractMHQButtonDialog} class and inherits its common dialog features. The dialog allows configuration of
+ * {@link AbstractButtonDialog} class and inherits its common dialog features. The dialog allows configuration of
  * options related to display, colors, fonts, autosave, startup behavior, notifications, and various other miscellaneous
  * options.
  * <p>
@@ -82,7 +83,7 @@ import mekhq.gui.enums.PersonnelFilterStyle;
  * <p>
  * This dialog uses the following Mnemonics: C, D, M, M, S, U, W, Y
  */
-public class MHQOptionsDialog extends AbstractMHQButtonDialog {
+public class MHQOptionsDialog extends AbstractButtonDialog {
     private static final MMLogger LOGGER = MMLogger.create(MHQOptionsDialog.class);
 
     // region Variable Declaration
@@ -95,10 +96,6 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     private JCheckBox chkCompanyGeneratorStartup;
     private JCheckBox chkShowCompanyGenerator;
     private JCheckBox chkShowUnitPicturesOnTOE;
-
-    // region Command Center Tab
-    private JCheckBox optionCommandCenterMRMS;
-    // endregion Command Center Tab
 
     // region Interstellar Map Tab
     private JCheckBox chkInterstellarMapShowJumpRadius;
@@ -115,10 +112,12 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     private JComboBox<PersonnelFilterStyle> optionPersonnelFilterStyle;
     private JCheckBox optionPersonnelFilterOnPrimaryRole;
     private JCheckBox chkUnifiedDailyReport;
+    private JCheckBox chkEnableDailyReportAggregateTab;
     // endregion Personnel Tab
     // endregion Display
 
     // region Colours
+    private JTextArea txtDisclaimer;
     private ColourSelectorButton optionDeployedForeground;
     private ColourSelectorButton optionDeployedBackground;
     private ColourSelectorButton optionBelowContractMinimumForeground;
@@ -184,19 +183,37 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
 
     // region New Day
     private JCheckBox chkNewDayAsTechPoolFill;
+    private JCheckBox chkNewDayAsTechPoolNoRelease;
     private JCheckBox chkNewDayMedicPoolFill;
+    private JCheckBox chkNewDayMedicPoolNoRelease;
     private JCheckBox chkNewDaySoldierPoolFill;
+    private JCheckBox chkNewDaySoldierPoolNoRelease;
     private JCheckBox chkNewDayBattleArmorPoolFill;
+    private JCheckBox chkNewDayBattleArmorPoolNoRelease;
     private JCheckBox chkNewDayVehicleCrewGroundPoolFill;
+    private JCheckBox chkNewDayVehicleCrewGroundPoolNoRelease;
     private JCheckBox chkNewDayVehicleCrewVTOLPoolFill;
+    private JCheckBox chkNewDayVehicleCrewVTOLPoolNoRelease;
     private JCheckBox chkNewDayVehicleCrewNavalPoolFill;
+    private JCheckBox chkNewDayVehicleCrewNavalPoolNoRelease;
     private JCheckBox chkNewDayVesselPilotPoolFill;
+    private JCheckBox chkNewDayVesselPilotPoolNoRelease;
     private JCheckBox chkNewDayVesselGunnerPoolFill;
+    private JCheckBox chkNewDayVesselGunnerPoolNoRelease;
     private JCheckBox chkNewDayVesselCrewPoolFill;
+    private JCheckBox chkNewDayVesselCrewPoolNoRelease;
+    private JCheckBox chkNewDayAutoLogistics;
     private JCheckBox chkNewDayMRMS;
     private JCheckBox chkNewDayOptimizeMedicalAssignments;
     private JCheckBox chkNewDayAutomaticallyAssignUnmaintainedUnits;
     private JCheckBox chkNewMonthQuickTrain;
+    private JSpinner spnQuickTrainTarget;
+    private JCheckBox chkLevelArtillery;
+    private JCheckBox chkLevelEscapeSkills;
+    private JCheckBox chkLevelScoutingSkills;
+    private JCheckBox chkLevelLeadership;
+    private JCheckBox chkLevelTraining;
+    private JCheckBox chkLevelOtherCommandSkills;
     private JCheckBox chkSelfCorrectMaintenance;
     private JCheckBox chkNewDayFormationIconOperationalStatus;
     private MMComboBox<FormationIconOperationalStatusStyle> comboNewDayFormationIconOperationalStatusStyle;
@@ -231,13 +248,21 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     private JCheckBox optionUnableToAffordLoanPaymentNag;
     private JCheckBox optionUnableToAffordJumpNag;
     private JCheckBox optionUnableToAffordShoppingListNag;
+    private JCheckBox optionSomeoneRandomlyDiedCombatNag;
+    private JCheckBox optionSomeoneRandomlyDiedTechNag;
+    private JCheckBox optionSomeoneRandomlyDiedOtherSupportNag;
+    private JCheckBox optionSomeoneRandomlyDiedCivilianNag;
+    private JCheckBox optionSomeoneRandomlyDiedCampFollowerNag;
+    private JCheckBox optionSomeoneRandomlyDiedRetiredNag;
 
     private JCheckBox optionContractRentalConfirmation;
     private JCheckBox optionFactionStandingsUltimatumConfirmation;
     private JCheckBox optionBeginTransitConfirmation;
     private JCheckBox optionStratConBatchallBreachConfirmation;
     private JCheckBox optionStratConDeployConfirmation;
+    private JCheckBox optionResolveScenarioConfirmation;
     private JCheckBox optionAbandonUnitsConfirmation;
+    private JCheckBox optionAssignTechsConfirmation;
 
     // endregion Nag Tab
 
@@ -254,7 +279,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
 
     // region Constructors
     public MHQOptionsDialog(final JFrame frame) {
-        super(frame, true, "MHQOptionsDialog", "MHQOptionsDialog.title");
+        super(frame, true, MekHQ.getDefaultResourceBundle(), "MHQOptionsDialog", "MHQOptionsDialog.title");
         initialize();
         setInitialState();
     }
@@ -349,13 +374,6 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         chkShowUnitPicturesOnTOE = new JCheckBox(resources.getString("chkShowUnitPicturesOnTOE.text"));
         chkShowUnitPicturesOnTOE.setToolTipText(resources.getString("chkShowUnitPicturesOnTOE.toolTipText"));
         chkShowUnitPicturesOnTOE.setName("chkShowUnitPicturesOnTOE");
-
-        // region Command Center Tab
-        JLabel labelCommandCenterDisplay = new JLabel(resources.getString("labelCommandCenterDisplay.text"));
-
-        optionCommandCenterMRMS = new JCheckBox(resources.getString("optionCommandCenterMRMS.text"));
-        optionCommandCenterMRMS.setToolTipText(resources.getString("optionCommandCenterMRMS.toolTipText"));
-        // endregion Command Center Tab
 
         // region Interstellar Map Tab
         final JLabel lblInterstellarMapTab = new JLabel(resources.getString("lblInterstellarMapTab.text"));
@@ -462,6 +480,11 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         chkUnifiedDailyReport = new JCheckBox(resources.getString("chkUnifiedDailyReport.text"));
         chkUnifiedDailyReport.setToolTipText(resources.getString("chkUnifiedDailyReport.toolTipText"));
         chkUnifiedDailyReport.setName("chkUnifiedDailyReport");
+
+        chkEnableDailyReportAggregateTab = new JCheckBox(getText("chkEnableDailyReportAggregateTab.text"));
+        chkEnableDailyReportAggregateTab.setToolTipText(wordWrap(getText(
+              "chkEnableDailyReportAggregateTab.toolTipText")));
+        chkEnableDailyReportAggregateTab.setName("chkEnableDailyReportAggregateTab");
         // endregion Personnel Tab
 
         // Programmatically Assign Accessibility Labels
@@ -501,8 +524,6 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                       .addComponent(chkCompanyGeneratorStartup)
                                       .addComponent(chkShowCompanyGenerator)
                                       .addComponent(chkShowUnitPicturesOnTOE)
-                                      .addComponent(labelCommandCenterDisplay)
-                                      .addComponent(optionCommandCenterMRMS)
                                       .addComponent(lblInterstellarMapTab)
                                       .addComponent(chkInterstellarMapShowJumpRadius)
                                       .addGroup(layout.createParallelGroup(Alignment.BASELINE)
@@ -528,6 +549,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                             GroupLayout.DEFAULT_SIZE,
                                                             40))
                                       .addComponent(optionPersonnelFilterOnPrimaryRole)
+                                      .addComponent(chkEnableDailyReportAggregateTab)
                                       .addComponent(chkUnifiedDailyReport));
 
         layout.setHorizontalGroup(layout.createParallelGroup(Alignment.LEADING)
@@ -545,8 +567,6 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                         .addComponent(chkCompanyGeneratorStartup)
                                         .addComponent(chkShowCompanyGenerator)
                                         .addComponent(chkShowUnitPicturesOnTOE)
-                                        .addComponent(labelCommandCenterDisplay)
-                                        .addComponent(optionCommandCenterMRMS)
                                         .addComponent(lblInterstellarMapTab)
                                         .addComponent(chkInterstellarMapShowJumpRadius)
                                         .addGroup(layout.createSequentialGroup()
@@ -567,12 +587,15 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                         .addComponent(labelPersonnelFilterStyle)
                                                         .addComponent(optionPersonnelFilterStyle))
                                         .addComponent(optionPersonnelFilterOnPrimaryRole)
+                                        .addComponent(chkEnableDailyReportAggregateTab)
                                         .addComponent(chkUnifiedDailyReport));
 
         return body;
     }
 
     private JPanel createColoursTab() {
+        txtDisclaimer = new JTextArea(getText("coloursTab.disclaimer"));
+
         // region Create Graphical Components
         optionDeployedForeground = new ColourSelectorButton(resources.getString("optionDeployedForeground.text"));
 
@@ -689,6 +712,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         layout.setAutoCreateContainerGaps(true);
 
         layout.setVerticalGroup(layout.createSequentialGroup()
+                                      .addComponent(txtDisclaimer)
                                       .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                                       .addComponent(optionDeployedForeground)
                                                       .addComponent(optionDeployedBackground, Alignment.TRAILING))
@@ -764,6 +788,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                       .addComponent(optionFontColorSkillElite, Alignment.TRAILING)));
 
         layout.setHorizontalGroup(layout.createParallelGroup(Alignment.LEADING)
+                                        .addComponent(txtDisclaimer)
                                         .addGroup(layout.createSequentialGroup()
                                                         .addComponent(optionDeployedForeground)
                                                         .addComponent(optionDeployedBackground))
@@ -959,45 +984,129 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         chkNewDayAsTechPoolFill.setToolTipText(resources.getString("chkNewDayAstechPoolFill.toolTipText"));
         chkNewDayAsTechPoolFill.setName("chkNewDayAsTechPoolFill");
 
+        chkNewDayAsTechPoolNoRelease = new JCheckBox(resources.getString("chkNewDayAstechPoolNoRelease.text"));
+        chkNewDayAsTechPoolNoRelease.setToolTipText(resources.getString("chkNewDayAstechPoolNoRelease.toolTipText"));
+        chkNewDayAsTechPoolNoRelease.setName("chkNewDayAsTechPoolNoRelease");
+        chkNewDayAsTechPoolFill.addItemListener(e ->
+                                                      chkNewDayAsTechPoolNoRelease.setEnabled(chkNewDayAsTechPoolFill.isSelected()));
+
         chkNewDayMedicPoolFill = new JCheckBox(resources.getString("chkNewDayMedicPoolFill.text"));
         chkNewDayMedicPoolFill.setToolTipText(resources.getString("chkNewDayMedicPoolFill.toolTipText"));
         chkNewDayMedicPoolFill.setName("chkNewDayMedicPoolFill");
+
+        chkNewDayMedicPoolNoRelease = new JCheckBox(resources.getString("chkNewDayMedicPoolNoRelease.text"));
+        chkNewDayMedicPoolNoRelease.setToolTipText(resources.getString("chkNewDayMedicPoolNoRelease.toolTipText"));
+        chkNewDayMedicPoolNoRelease.setName("chkNewDayMedicPoolNoRelease");
+        chkNewDayMedicPoolFill.addItemListener(e ->
+                                                     chkNewDayMedicPoolNoRelease.setEnabled(chkNewDayMedicPoolFill.isSelected()));
 
         chkNewDaySoldierPoolFill = new JCheckBox(resources.getString("chkNewDaySoldierPoolFill.text"));
         chkNewDaySoldierPoolFill.setToolTipText(resources.getString("chkNewDaySoldierPoolFill.toolTipText"));
         chkNewDaySoldierPoolFill.setName("chkNewDaySoldierPoolFill");
 
+        chkNewDaySoldierPoolNoRelease = new JCheckBox(resources.getString("chkNewDaySoldierPoolNoRelease.text"));
+        chkNewDaySoldierPoolNoRelease.setToolTipText(resources.getString("chkNewDaySoldierPoolNoRelease.toolTipText"));
+        chkNewDaySoldierPoolNoRelease.setName("chkNewDaySoldierPoolNoRelease");
+        chkNewDaySoldierPoolFill.addItemListener(e ->
+                                                       chkNewDaySoldierPoolNoRelease.setEnabled(chkNewDaySoldierPoolFill.isSelected()));
+
         chkNewDayBattleArmorPoolFill = new JCheckBox(resources.getString("chkNewDayBattleArmorPoolFill.text"));
         chkNewDayBattleArmorPoolFill.setToolTipText(resources.getString("chkNewDayBattleArmorPoolFill.toolTipText"));
         chkNewDayBattleArmorPoolFill.setName("chkNewDayBattleArmorPoolFill");
 
+        chkNewDayBattleArmorPoolNoRelease = new JCheckBox(resources.getString("chkNewDayBattleArmorPoolNoRelease.text"));
+        chkNewDayBattleArmorPoolNoRelease.setToolTipText(resources.getString(
+              "chkNewDayBattleArmorPoolNoRelease.toolTipText"));
+        chkNewDayBattleArmorPoolNoRelease.setName("chkNewDayBattleArmorPoolNoRelease");
+        chkNewDayBattleArmorPoolFill.addItemListener(e ->
+                                                           chkNewDayBattleArmorPoolNoRelease.setEnabled(
+                                                                 chkNewDayBattleArmorPoolFill.isSelected()));
+
         chkNewDayVehicleCrewGroundPoolFill = new JCheckBox(resources.getString("chkNewDayVehicleCrewGroundPoolFill.text"));
-        chkNewDayVehicleCrewGroundPoolFill.setToolTipText(resources.getString("chkNewDayVehicleCrewGroundPoolFill.toolTipText"));
+        chkNewDayVehicleCrewGroundPoolFill.setToolTipText(resources.getString(
+              "chkNewDayVehicleCrewGroundPoolFill.toolTipText"));
         chkNewDayVehicleCrewGroundPoolFill.setName("chkNewDayVehicleCrewGroundPoolFill");
 
+        chkNewDayVehicleCrewGroundPoolNoRelease = new JCheckBox(resources.getString(
+              "chkNewDayVehicleCrewGroundPoolNoRelease.text"));
+        chkNewDayVehicleCrewGroundPoolNoRelease.setToolTipText(resources.getString(
+              "chkNewDayVehicleCrewGroundPoolNoRelease.toolTipText"));
+        chkNewDayVehicleCrewGroundPoolNoRelease.setName("chkNewDayVehicleCrewGroundPoolNoRelease");
+        chkNewDayVehicleCrewGroundPoolFill.addItemListener(e ->
+                                                                 chkNewDayVehicleCrewGroundPoolNoRelease.setEnabled(
+                                                                       chkNewDayVehicleCrewGroundPoolFill.isSelected()));
+
         chkNewDayVehicleCrewVTOLPoolFill = new JCheckBox(resources.getString("chkNewDayVehicleCrewVTOLPoolFill.text"));
-        chkNewDayVehicleCrewVTOLPoolFill.setToolTipText(resources.getString("chkNewDayVehicleCrewVTOLPoolFill.toolTipText"));
+        chkNewDayVehicleCrewVTOLPoolFill.setToolTipText(resources.getString(
+              "chkNewDayVehicleCrewVTOLPoolFill.toolTipText"));
         chkNewDayVehicleCrewVTOLPoolFill.setName("chkNewDayVehicleCrewVTOLPoolFill");
 
+        chkNewDayVehicleCrewVTOLPoolNoRelease = new JCheckBox(resources.getString(
+              "chkNewDayVehicleCrewVTOLPoolNoRelease.text"));
+        chkNewDayVehicleCrewVTOLPoolNoRelease.setToolTipText(resources.getString(
+              "chkNewDayVehicleCrewVTOLPoolNoRelease.toolTipText"));
+        chkNewDayVehicleCrewVTOLPoolNoRelease.setName("chkNewDayVehicleCrewVTOLPoolNoRelease");
+        chkNewDayVehicleCrewVTOLPoolFill.addItemListener(e ->
+                                                               chkNewDayVehicleCrewVTOLPoolNoRelease.setEnabled(
+                                                                     chkNewDayVehicleCrewVTOLPoolFill.isSelected()));
+
         chkNewDayVehicleCrewNavalPoolFill = new JCheckBox(resources.getString("chkNewDayVehicleCrewNavalPoolFill.text"));
-        chkNewDayVehicleCrewNavalPoolFill.setToolTipText(resources.getString("chkNewDayVehicleCrewNavalPoolFill.toolTipText"));
+        chkNewDayVehicleCrewNavalPoolFill.setToolTipText(resources.getString(
+              "chkNewDayVehicleCrewNavalPoolFill.toolTipText"));
         chkNewDayVehicleCrewNavalPoolFill.setName("chkNewDayVehicleCrewNavalPoolFill");
+
+        chkNewDayVehicleCrewNavalPoolNoRelease = new JCheckBox(resources.getString(
+              "chkNewDayVehicleCrewNavalPoolNoRelease.text"));
+        chkNewDayVehicleCrewNavalPoolNoRelease.setToolTipText(resources.getString(
+              "chkNewDayVehicleCrewNavalPoolNoRelease.toolTipText"));
+        chkNewDayVehicleCrewNavalPoolNoRelease.setName("chkNewDayVehicleCrewNavalPoolNoRelease");
+        chkNewDayVehicleCrewNavalPoolFill.addItemListener(e ->
+                                                                chkNewDayVehicleCrewNavalPoolNoRelease.setEnabled(
+                                                                      chkNewDayVehicleCrewNavalPoolFill.isSelected()));
 
         chkNewDayVesselPilotPoolFill = new JCheckBox(resources.getString("chkNewDayVesselPilotPoolFill.text"));
         chkNewDayVesselPilotPoolFill.setToolTipText(resources.getString("chkNewDayVesselPilotPoolFill.toolTipText"));
         chkNewDayVesselPilotPoolFill.setName("chkNewDayVesselPilotPoolFill");
 
+        chkNewDayVesselPilotPoolNoRelease = new JCheckBox(resources.getString("chkNewDayVesselPilotPoolNoRelease.text"));
+        chkNewDayVesselPilotPoolNoRelease.setToolTipText(resources.getString(
+              "chkNewDayVesselPilotPoolNoRelease.toolTipText"));
+        chkNewDayVesselPilotPoolNoRelease.setName("chkNewDayVesselPilotPoolNoRelease");
+        chkNewDayVesselPilotPoolFill.addItemListener(e ->
+                                                           chkNewDayVesselPilotPoolNoRelease.setEnabled(
+                                                                 chkNewDayVesselPilotPoolFill.isSelected()));
+
         chkNewDayVesselGunnerPoolFill = new JCheckBox(resources.getString("chkNewDayVesselGunnerPoolFill.text"));
         chkNewDayVesselGunnerPoolFill.setToolTipText(resources.getString("chkNewDayVesselGunnerPoolFill.toolTipText"));
         chkNewDayVesselGunnerPoolFill.setName("chkNewDayVesselGunnerPoolFill");
+
+        chkNewDayVesselGunnerPoolNoRelease = new JCheckBox(resources.getString("chkNewDayVesselGunnerPoolNoRelease.text"));
+        chkNewDayVesselGunnerPoolNoRelease.setToolTipText(resources.getString(
+              "chkNewDayVesselGunnerPoolNoRelease.toolTipText"));
+        chkNewDayVesselGunnerPoolNoRelease.setName("chkNewDayVesselGunnerPoolNoRelease");
+        chkNewDayVesselGunnerPoolFill.addItemListener(e ->
+                                                            chkNewDayVesselGunnerPoolNoRelease.setEnabled(
+                                                                  chkNewDayVesselGunnerPoolFill.isSelected()));
 
         chkNewDayVesselCrewPoolFill = new JCheckBox(resources.getString("chkNewDayVesselCrewPoolFill.text"));
         chkNewDayVesselCrewPoolFill.setToolTipText(resources.getString("chkNewDayVesselCrewPoolFill.toolTipText"));
         chkNewDayVesselCrewPoolFill.setName("chkNewDayVesselCrewPoolFill");
 
+        chkNewDayVesselCrewPoolNoRelease = new JCheckBox(resources.getString("chkNewDayVesselCrewPoolNoRelease.text"));
+        chkNewDayVesselCrewPoolNoRelease.setToolTipText(resources.getString(
+              "chkNewDayVesselCrewPoolNoRelease.toolTipText"));
+        chkNewDayVesselCrewPoolNoRelease.setName("chkNewDayVesselCrewPoolNoRelease");
+        chkNewDayVesselCrewPoolFill.addItemListener(e ->
+                                                          chkNewDayVesselCrewPoolNoRelease.setEnabled(
+                                                                chkNewDayVesselCrewPoolFill.isSelected()));
+
         chkNewDayMRMS = new JCheckBox(resources.getString("chkNewDayMRMS.text"));
         chkNewDayMRMS.setToolTipText(resources.getString("chkNewDayMRMS.toolTipText"));
         chkNewDayMRMS.setName("chkNewDayMRMS");
+
+        chkNewDayAutoLogistics = new JCheckBox(getText("chkNewDayAutoLogistics.text"));
+        chkNewDayAutoLogistics.setToolTipText(wordWrap(getText("chkNewDayAutoLogistics.toolTipText")));
+        chkNewDayAutoLogistics.setName("chkNewDayAutoLogistics");
 
         chkNewDayOptimizeMedicalAssignments = new JCheckBox(resources.getString(
               "chkNewDayOptimizeMedicalAssignments.text"));
@@ -1011,16 +1120,44 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
               "chkNewDayAutomaticallyAssignUnmaintainedUnits.toolTipText")));
         chkNewDayAutomaticallyAssignUnmaintainedUnits.setName("chkNewDayAutomaticallyAssignUnmaintainedUnits.text");
 
-        chkNewMonthQuickTrain = new JCheckBox(resources.getString(
-              "chkNewMonthQuickTrain.text"));
-        chkNewMonthQuickTrain.setToolTipText(resources.getString(
-              "chkNewMonthQuickTrain.toolTipText"));
+        chkNewMonthQuickTrain = new JCheckBox(getText("chkNewMonthQuickTrain.text"));
+        chkNewMonthQuickTrain.setToolTipText(getText("chkNewMonthQuickTrain.toolTipText"));
         chkNewMonthQuickTrain.setName("chkNewMonthQuickTrain.text");
 
-        chkSelfCorrectMaintenance = new JCheckBox(resources.getString(
-              "chkSelfCorrectMaintenance.text"));
-        chkSelfCorrectMaintenance.setToolTipText(resources.getString(
-              "chkSelfCorrectMaintenance.toolTipText"));
+        final JLabel lblQuickTrainTarget = new JLabel(getText("lblQuickTrainTarget.text"));
+        lblQuickTrainTarget.setToolTipText(wordWrap(getText("lblQuickTrainTarget.toolTipText")));
+        lblQuickTrainTarget.setName("lblQuickTrainTarget");
+
+        spnQuickTrainTarget = new JSpinner(new SpinnerNumberModel(5, 1, 10, 1));
+        spnQuickTrainTarget.setToolTipText(wordWrap(getText("lblQuickTrainTarget.toolTipText")));
+        spnQuickTrainTarget.setName("spnQuickTrainTarget");
+
+        chkLevelArtillery = new JCheckBox(getText("chkLevelArtillery.text"));
+        chkLevelArtillery.setToolTipText(wordWrap(getText("chkLevelArtillery.toolTipText")));
+        chkLevelArtillery.setName("chkLevelArtillery.text");
+
+        chkLevelScoutingSkills = new JCheckBox(getText("chkLevelScoutingSkills.text"));
+        chkLevelScoutingSkills.setToolTipText(wordWrap(getText("chkLevelScoutingSkills.toolTipText")));
+        chkLevelScoutingSkills.setName("chkLevelScoutingSkills.text");
+
+        chkLevelEscapeSkills = new JCheckBox(getText("chkLevelEscapeSkills.text"));
+        chkLevelEscapeSkills.setToolTipText(wordWrap(getText("chkLevelEscapeSkills.toolTipText")));
+        chkLevelEscapeSkills.setName("chkLevelEscapeSkills.text");
+
+        chkLevelLeadership = new JCheckBox(getText("chkLevelLeadership.text"));
+        chkLevelLeadership.setToolTipText(wordWrap(getText("chkLevelLeadership.toolTipText")));
+        chkLevelLeadership.setName("chkLevelLeadership.text");
+
+        chkLevelTraining = new JCheckBox(getText("chkLevelTraining.text"));
+        chkLevelTraining.setToolTipText(wordWrap(getText("chkLevelTraining.toolTipText")));
+        chkLevelTraining.setName("chkLevelTraining.text");
+
+        chkLevelOtherCommandSkills = new JCheckBox(getText("chkLevelOtherCommandSkills.text"));
+        chkLevelOtherCommandSkills.setToolTipText(wordWrap(getText("chkLevelOtherCommandSkills.toolTipText")));
+        chkLevelOtherCommandSkills.setName("chkLevelOtherCommandSkills.text");
+
+        chkSelfCorrectMaintenance = new JCheckBox(getText("chkSelfCorrectMaintenance.text"));
+        chkSelfCorrectMaintenance.setToolTipText(wordWrap(resources.getString("chkSelfCorrectMaintenance.toolTipText")));
         chkSelfCorrectMaintenance.setName("chkSelfCorrectMaintenance.text");
 
         chkNewDayFormationIconOperationalStatus = new JCheckBox(resources.getString(
@@ -1038,7 +1175,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
               "lblNewDayFormationIconOperationalStatusStyle.toolTipText"));
         lblNewDayFormationIconOperationalStatusStyle.setName("lblNewDayFormationIconOperationalStatusStyle");
 
-        comboNewDayFormationIconOperationalStatusStyle = new MMComboBox<>("comboNewDayFormationIconOperationalStatusStyle",
+        comboNewDayFormationIconOperationalStatusStyle = new MMComboBox<>(
+              "comboNewDayFormationIconOperationalStatusStyle",
               FormationIconOperationalStatusStyle.values());
         comboNewDayFormationIconOperationalStatusStyle.setToolTipText(resources.getString(
               "lblNewDayFormationIconOperationalStatusStyle.toolTipText"));
@@ -1072,19 +1210,39 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
 
         layout.setVerticalGroup(layout.createSequentialGroup()
                                       .addComponent(chkNewDayAsTechPoolFill)
+                                      .addComponent(chkNewDayAsTechPoolNoRelease)
                                       .addComponent(chkNewDayMedicPoolFill)
+                                      .addComponent(chkNewDayMedicPoolNoRelease)
                                       .addComponent(chkNewDaySoldierPoolFill)
+                                      .addComponent(chkNewDaySoldierPoolNoRelease)
                                       .addComponent(chkNewDayBattleArmorPoolFill)
+                                      .addComponent(chkNewDayBattleArmorPoolNoRelease)
                                       .addComponent(chkNewDayVehicleCrewGroundPoolFill)
+                                      .addComponent(chkNewDayVehicleCrewGroundPoolNoRelease)
                                       .addComponent(chkNewDayVehicleCrewVTOLPoolFill)
+                                      .addComponent(chkNewDayVehicleCrewVTOLPoolNoRelease)
                                       .addComponent(chkNewDayVehicleCrewNavalPoolFill)
+                                      .addComponent(chkNewDayVehicleCrewNavalPoolNoRelease)
                                       .addComponent(chkNewDayVesselPilotPoolFill)
+                                      .addComponent(chkNewDayVesselPilotPoolNoRelease)
                                       .addComponent(chkNewDayVesselGunnerPoolFill)
+                                      .addComponent(chkNewDayVesselGunnerPoolNoRelease)
                                       .addComponent(chkNewDayVesselCrewPoolFill)
+                                      .addComponent(chkNewDayVesselCrewPoolNoRelease)
+                                      .addComponent(chkNewDayAutoLogistics)
                                       .addComponent(chkNewDayMRMS)
                                       .addComponent(chkNewDayOptimizeMedicalAssignments)
                                       .addComponent(chkNewDayAutomaticallyAssignUnmaintainedUnits)
                                       .addComponent(chkNewMonthQuickTrain)
+                                      .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                                      .addComponent(lblQuickTrainTarget)
+                                                      .addComponent(spnQuickTrainTarget, Alignment.TRAILING))
+                                      .addComponent(chkLevelArtillery)
+                                      .addComponent(chkLevelScoutingSkills)
+                                      .addComponent(chkLevelEscapeSkills)
+                                      .addComponent(chkLevelLeadership)
+                                      .addComponent(chkLevelTraining)
+                                      .addComponent(chkLevelOtherCommandSkills)
                                       .addComponent(chkSelfCorrectMaintenance)
                                       .addComponent(chkNewDayFormationIconOperationalStatus)
                                       .addGroup(layout.createParallelGroup(Alignment.LEADING)
@@ -1096,19 +1254,39 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
 
         layout.setHorizontalGroup(layout.createParallelGroup(Alignment.LEADING)
                                         .addComponent(chkNewDayAsTechPoolFill)
+                                        .addComponent(chkNewDayAsTechPoolNoRelease)
                                         .addComponent(chkNewDayMedicPoolFill)
+                                        .addComponent(chkNewDayMedicPoolNoRelease)
                                         .addComponent(chkNewDaySoldierPoolFill)
+                                        .addComponent(chkNewDaySoldierPoolNoRelease)
                                         .addComponent(chkNewDayBattleArmorPoolFill)
+                                        .addComponent(chkNewDayBattleArmorPoolNoRelease)
                                         .addComponent(chkNewDayVehicleCrewGroundPoolFill)
+                                        .addComponent(chkNewDayVehicleCrewGroundPoolNoRelease)
                                         .addComponent(chkNewDayVehicleCrewVTOLPoolFill)
+                                        .addComponent(chkNewDayVehicleCrewVTOLPoolNoRelease)
                                         .addComponent(chkNewDayVehicleCrewNavalPoolFill)
+                                        .addComponent(chkNewDayVehicleCrewNavalPoolNoRelease)
                                         .addComponent(chkNewDayVesselPilotPoolFill)
+                                        .addComponent(chkNewDayVesselPilotPoolNoRelease)
                                         .addComponent(chkNewDayVesselGunnerPoolFill)
+                                        .addComponent(chkNewDayVesselGunnerPoolNoRelease)
                                         .addComponent(chkNewDayVesselCrewPoolFill)
+                                        .addComponent(chkNewDayVesselCrewPoolNoRelease)
+                                        .addComponent(chkNewDayAutoLogistics)
                                         .addComponent(chkNewDayMRMS)
                                         .addComponent(chkNewDayOptimizeMedicalAssignments)
                                         .addComponent(chkNewDayAutomaticallyAssignUnmaintainedUnits)
                                         .addComponent(chkNewMonthQuickTrain)
+                                        .addGroup(layout.createSequentialGroup()
+                                                        .addComponent(lblQuickTrainTarget)
+                                                        .addComponent(spnQuickTrainTarget))
+                                        .addComponent(chkLevelArtillery)
+                                        .addComponent(chkLevelScoutingSkills)
+                                        .addComponent(chkLevelEscapeSkills)
+                                        .addComponent(chkLevelLeadership)
+                                        .addComponent(chkLevelTraining)
+                                        .addComponent(chkLevelOtherCommandSkills)
                                         .addComponent(chkSelfCorrectMaintenance)
                                         .addComponent(chkNewDayFormationIconOperationalStatus)
                                         .addGroup(layout.createSequentialGroup()
@@ -1247,6 +1425,42 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
               "optionUnableToAffordShoppingListNag.toolTipText"));
         optionUnableToAffordShoppingListNag.setName("optionUnableToAffordShoppingListNag");
 
+        optionSomeoneRandomlyDiedCombatNag = new JCheckBox(resources.getString(
+              "optionSomeoneRandomlyDiedCombatNag.text"));
+        optionSomeoneRandomlyDiedCombatNag.setToolTipText(resources.getString(
+              "optionSomeoneRandomlyDiedCombatNag.toolTipText"));
+        optionSomeoneRandomlyDiedCombatNag.setName("optionSomeoneRandomlyDiedCombatNag");
+
+        optionSomeoneRandomlyDiedTechNag = new JCheckBox(resources.getString(
+              "optionSomeoneRandomlyDiedTechNag.text"));
+        optionSomeoneRandomlyDiedTechNag.setToolTipText(resources.getString(
+              "optionSomeoneRandomlyDiedTechNag.toolTipText"));
+        optionSomeoneRandomlyDiedTechNag.setName("optionSomeoneRandomlyDiedTechNag");
+
+        optionSomeoneRandomlyDiedOtherSupportNag = new JCheckBox(resources.getString(
+              "optionSomeoneRandomlyDiedOtherSupportNag.text"));
+        optionSomeoneRandomlyDiedOtherSupportNag.setToolTipText(resources.getString(
+              "optionSomeoneRandomlyDiedOtherSupportNag.toolTipText"));
+        optionSomeoneRandomlyDiedOtherSupportNag.setName("optionSomeoneRandomlyDiedOtherSupportNag");
+
+        optionSomeoneRandomlyDiedCivilianNag = new JCheckBox(resources.getString(
+              "optionSomeoneRandomlyDiedCivilianNag.text"));
+        optionSomeoneRandomlyDiedCivilianNag.setToolTipText(resources.getString(
+              "optionSomeoneRandomlyDiedCivilianNag.toolTipText"));
+        optionSomeoneRandomlyDiedCivilianNag.setName("optionSomeoneRandomlyDiedCivilianNag");
+
+        optionSomeoneRandomlyDiedCampFollowerNag = new JCheckBox(resources.getString(
+              "optionSomeoneRandomlyDiedCampFollowerNag.text"));
+        optionSomeoneRandomlyDiedCampFollowerNag.setToolTipText(resources.getString(
+              "optionSomeoneRandomlyDiedCampFollowerNag.toolTipText"));
+        optionSomeoneRandomlyDiedCampFollowerNag.setName("optionSomeoneRandomlyDiedCampFollowerNag");
+
+        optionSomeoneRandomlyDiedRetiredNag = new JCheckBox(resources.getString(
+              "optionSomeoneRandomlyDiedRetiredNag.text"));
+        optionSomeoneRandomlyDiedRetiredNag.setToolTipText(resources.getString(
+              "optionSomeoneRandomlyDiedRetiredNag.toolTipText"));
+        optionSomeoneRandomlyDiedRetiredNag.setName("optionSomeoneRandomlyDiedRetiredNag");
+
         optionContractRentalConfirmation = new JCheckBox(resources.getString(
               "optionContractRentalConfirmation.text"));
         optionContractRentalConfirmation.setToolTipText(resources.getString(
@@ -1277,11 +1491,23 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
               "optionStratConDeployConfirmation.toolTipText"));
         optionStratConDeployConfirmation.setName("optionStratConDeployConfirmation");
 
+        optionResolveScenarioConfirmation = new JCheckBox(resources.getString(
+              "optionResolveScenarioConfirmation.text"));
+        optionResolveScenarioConfirmation.setToolTipText(resources.getString(
+              "optionResolveScenarioConfirmation.toolTipText"));
+        optionResolveScenarioConfirmation.setName("optionResolveScenarioConfirmation");
+
         optionAbandonUnitsConfirmation = new JCheckBox(resources.getString(
               "optionAbandonUnitsConfirmation.text"));
         optionAbandonUnitsConfirmation.setToolTipText(resources.getString(
               "optionAbandonUnitsConfirmation.toolTipText"));
         optionAbandonUnitsConfirmation.setName("optionAbandonUnitsConfirmation");
+
+        optionAssignTechsConfirmation = new JCheckBox(resources.getString(
+              "optionAssignTechsConfirmation.text"));
+        optionAssignTechsConfirmation.setToolTipText(resources.getString(
+              "optionAssignTechsConfirmation.toolTipText"));
+        optionAssignTechsConfirmation.setName("optionAssignTechsConfirmation");
 
 
         // Layout the UI
@@ -1314,12 +1540,20 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                       .addComponent(optionUnableToAffordLoanPaymentNag)
                                       .addComponent(optionUnableToAffordJumpNag)
                                       .addComponent(optionUnableToAffordShoppingListNag)
+                                      .addComponent(optionSomeoneRandomlyDiedCombatNag)
+                                      .addComponent(optionSomeoneRandomlyDiedTechNag)
+                                      .addComponent(optionSomeoneRandomlyDiedOtherSupportNag)
+                                      .addComponent(optionSomeoneRandomlyDiedCivilianNag)
+                                      .addComponent(optionSomeoneRandomlyDiedCampFollowerNag)
+                                      .addComponent(optionSomeoneRandomlyDiedRetiredNag)
                                       .addComponent(optionContractRentalConfirmation)
                                       .addComponent(optionFactionStandingsUltimatumConfirmation)
                                       .addComponent(optionBeginTransitConfirmation)
                                       .addComponent(optionStratConBatchallBreachConfirmation)
                                       .addComponent(optionStratConDeployConfirmation)
-                                      .addComponent(optionAbandonUnitsConfirmation));
+                                      .addComponent(optionResolveScenarioConfirmation)
+                                      .addComponent(optionAbandonUnitsConfirmation)
+                                      .addComponent(optionAssignTechsConfirmation));
 
         layout.setHorizontalGroup(layout.createParallelGroup(Alignment.LEADING)
                                         .addComponent(optionUnmaintainedUnitsNag)
@@ -1343,12 +1577,20 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                         .addComponent(optionUnableToAffordLoanPaymentNag)
                                         .addComponent(optionUnableToAffordJumpNag)
                                         .addComponent(optionUnableToAffordShoppingListNag)
+                                        .addComponent(optionSomeoneRandomlyDiedCombatNag)
+                                        .addComponent(optionSomeoneRandomlyDiedTechNag)
+                                        .addComponent(optionSomeoneRandomlyDiedOtherSupportNag)
+                                        .addComponent(optionSomeoneRandomlyDiedCivilianNag)
+                                        .addComponent(optionSomeoneRandomlyDiedCampFollowerNag)
+                                        .addComponent(optionSomeoneRandomlyDiedRetiredNag)
                                         .addComponent(optionContractRentalConfirmation)
                                         .addComponent(optionFactionStandingsUltimatumConfirmation)
                                         .addComponent(optionBeginTransitConfirmation)
                                         .addComponent(optionStratConBatchallBreachConfirmation)
                                         .addComponent(optionStratConDeployConfirmation)
-                                        .addComponent(optionAbandonUnitsConfirmation));
+                                        .addComponent(optionResolveScenarioConfirmation)
+                                        .addComponent(optionAbandonUnitsConfirmation)
+                                        .addComponent(optionAssignTechsConfirmation));
 
         return panel;
     }
@@ -1540,9 +1782,6 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         options.setShowCompanyGenerator(chkShowCompanyGenerator.isSelected());
         options.setShowUnitPicturesOnTOE(chkShowUnitPicturesOnTOE.isSelected());
 
-        // Command Center Tab
-        options.setCommandCenterMRMS(optionCommandCenterMRMS.isSelected());
-
         // Interstellar Map Tab
         options.setInterstellarMapShowJumpRadius(chkInterstellarMapShowJumpRadius.isSelected());
         options
@@ -1564,6 +1803,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
               .setPersonnelFilterStyle((PersonnelFilterStyle) Objects.requireNonNull(optionPersonnelFilterStyle.getSelectedItem()));
         options.setPersonnelFilterOnPrimaryRole(optionPersonnelFilterOnPrimaryRole.isSelected());
         options.setUnifiedDailyReport(chkUnifiedDailyReport.isSelected());
+        options.setAggregateDailyReport(chkEnableDailyReportAggregateTab.isSelected());
 
         // Colours
         options.setDeployedForeground(optionDeployedForeground.getColour());
@@ -1626,20 +1866,38 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         options.setMaximumNumberOfAutoSavesValue((Integer) spinnerSavedGamesCount.getValue());
 
         options.setNewDayAsTechPoolFill(chkNewDayAsTechPoolFill.isSelected());
+        options.setNewDayAsTechPoolNoRelease(chkNewDayAsTechPoolNoRelease.isSelected());
         options.setNewDayMedicPoolFill(chkNewDayMedicPoolFill.isSelected());
+        options.setNewDayMedicPoolNoRelease(chkNewDayMedicPoolNoRelease.isSelected());
+        options.setNewDayAutoLogistics(chkNewDayAutoLogistics.isSelected());
         options.setNewDayMRMS(chkNewDayMRMS.isSelected());
         options.setNewDayOptimizeMedicalAssignments(chkNewDayOptimizeMedicalAssignments.isSelected());
         options.setNewDaySoldierPoolFill(chkNewDaySoldierPoolFill.isSelected());
+        options.setNewDaySoldierPoolNoRelease(chkNewDaySoldierPoolNoRelease.isSelected());
         options.setNewDayBattleArmorPoolFill(chkNewDayBattleArmorPoolFill.isSelected());
+        options.setNewDayBattleArmorPoolNoRelease(chkNewDayBattleArmorPoolNoRelease.isSelected());
         options.setNewDayVehicleCrewGroundPoolFill(chkNewDayVehicleCrewGroundPoolFill.isSelected());
+        options.setNewDayVehicleCrewGroundPoolNoRelease(chkNewDayVehicleCrewGroundPoolNoRelease.isSelected());
         options.setNewDayVehicleCrewVTOLPoolFill(chkNewDayVehicleCrewVTOLPoolFill.isSelected());
+        options.setNewDayVehicleCrewVTOLPoolNoRelease(chkNewDayVehicleCrewVTOLPoolNoRelease.isSelected());
         options.setNewDayVehicleCrewNavalPoolFill(chkNewDayVehicleCrewNavalPoolFill.isSelected());
+        options.setNewDayVehicleCrewNavalPoolNoRelease(chkNewDayVehicleCrewNavalPoolNoRelease.isSelected());
         options.setNewDayVesselPilotPoolFill(chkNewDayVesselPilotPoolFill.isSelected());
+        options.setNewDayVesselPilotPoolNoRelease(chkNewDayVesselPilotPoolNoRelease.isSelected());
         options.setNewDayVesselGunnerPoolFill(chkNewDayVesselGunnerPoolFill.isSelected());
+        options.setNewDayVesselGunnerPoolNoRelease(chkNewDayVesselGunnerPoolNoRelease.isSelected());
         options.setNewDayVesselCrewPoolFill(chkNewDayVesselCrewPoolFill.isSelected());
+        options.setNewDayVesselCrewPoolNoRelease(chkNewDayVesselCrewPoolNoRelease.isSelected());
         options
               .setNewDayAutomaticallyAssignUnmaintainedUnits(chkNewDayAutomaticallyAssignUnmaintainedUnits.isSelected());
         options.setNewMonthQuickTrain(chkNewMonthQuickTrain.isSelected());
+        options.setQuickTrainTarget((int) spnQuickTrainTarget.getValue());
+        options.setLevelArtillery(chkLevelArtillery.isSelected());
+        options.setLevelScouting(chkLevelScoutingSkills.isSelected());
+        options.setLevelEscape(chkLevelEscapeSkills.isSelected());
+        options.setLevelLeadership(chkLevelLeadership.isSelected());
+        options.setLevelTraining(chkLevelTraining.isSelected());
+        options.setLevelOtherCommand(chkLevelOtherCommandSkills.isSelected());
         options.setSelfCorrectMaintenance(chkSelfCorrectMaintenance.isSelected());
         options.setNewDayFormationIconOperationalStatus(chkNewDayFormationIconOperationalStatus.isSelected());
         options
@@ -1695,6 +1953,24 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
               .setNagDialogIgnore(MHQConstants.NAG_UNABLE_TO_AFFORD_SHOPPING_LIST,
                     optionUnableToAffordShoppingListNag.isSelected());
         options
+              .setNagDialogIgnore(MHQConstants.NAG_SOMEONE_RANDOMLY_DIED_COMBAT,
+                    optionSomeoneRandomlyDiedCombatNag.isSelected());
+        options
+              .setNagDialogIgnore(MHQConstants.NAG_SOMEONE_RANDOMLY_DIED_TECH,
+                    optionSomeoneRandomlyDiedTechNag.isSelected());
+        options
+              .setNagDialogIgnore(MHQConstants.NAG_SOMEONE_RANDOMLY_DIED_OTHER_SUPPORT,
+                    optionSomeoneRandomlyDiedOtherSupportNag.isSelected());
+        options
+              .setNagDialogIgnore(MHQConstants.NAG_SOMEONE_RANDOMLY_DIED_CIVILIAN,
+                    optionSomeoneRandomlyDiedCivilianNag.isSelected());
+        options
+              .setNagDialogIgnore(MHQConstants.NAG_SOMEONE_RANDOMLY_DIED_CAMP_FOLLOWER,
+                    optionSomeoneRandomlyDiedCampFollowerNag.isSelected());
+        options
+              .setNagDialogIgnore(MHQConstants.NAG_SOMEONE_RANDOMLY_DIED_RETIREE,
+                    optionSomeoneRandomlyDiedRetiredNag.isSelected());
+        options
               .setNagDialogIgnore(MHQConstants.CONFIRMATION_CONTRACT_RENTAL,
                     optionContractRentalConfirmation.isSelected());
         options
@@ -1710,8 +1986,14 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
               .setNagDialogIgnore(MHQConstants.CONFIRMATION_STRATCON_DEPLOY,
                     optionStratConDeployConfirmation.isSelected());
         options
+              .setNagDialogIgnore(MHQConstants.CONFIRMATION_RESOLVE_SCENARIO,
+                    optionResolveScenarioConfirmation.isSelected());
+        options
               .setNagDialogIgnore(MHQConstants.CONFIRMATION_ABANDON_UNITS,
                     optionAbandonUnitsConfirmation.isSelected());
+        options
+              .setNagDialogIgnore(MHQConstants.CONFIRMATION_ASSIGN_TECHS,
+                    optionAssignTechsConfirmation.isSelected());
 
         PreferenceManager.getClientPreferences().setUserDir(txtUserDir.getText());
         PreferenceManager.getInstance().save();
@@ -1737,9 +2019,6 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         chkCompanyGeneratorStartup.setSelected(options.getCompanyGeneratorStartup());
         chkShowCompanyGenerator.setSelected(options.getShowCompanyGenerator());
         chkShowUnitPicturesOnTOE.setSelected(options.getShowUnitPicturesOnTOE());
-
-        // Command Center Tab
-        optionCommandCenterMRMS.setSelected(options.getCommandCenterMRMS());
 
         // Interstellar Map Tab
         if (chkInterstellarMapShowJumpRadius.isSelected() != options.getInterstellarMapShowJumpRadius()) {
@@ -1767,6 +2046,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionPersonnelFilterStyle.setSelectedItem(options.getPersonnelFilterStyle());
         optionPersonnelFilterOnPrimaryRole.setSelected(options.getPersonnelFilterOnPrimaryRole());
         chkUnifiedDailyReport.setSelected(options.getUnifiedDailyReport());
+        chkEnableDailyReportAggregateTab.setSelected(options.isUseAggregateDailyReport());
 
         // Colours
         optionDeployedForeground.setColour(options.getDeployedForeground());
@@ -1829,27 +2109,58 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         spinnerSavedGamesCount.setValue(options.getMaximumNumberOfAutoSavesValue());
 
         chkNewDayAsTechPoolFill.setSelected(options.getNewDayAsTechPoolFill());
+        chkNewDayAsTechPoolNoRelease.setSelected(options.getNewDayAsTechPoolNoRelease());
+        chkNewDayAsTechPoolNoRelease.setEnabled(chkNewDayAsTechPoolFill.isSelected());
         chkNewDayMedicPoolFill.setSelected(options.getNewDayMedicPoolFill());
+        chkNewDayMedicPoolNoRelease.setSelected(options.getNewDayMedicPoolNoRelease());
+        chkNewDayMedicPoolNoRelease.setEnabled(chkNewDayMedicPoolFill.isSelected());
         chkNewDaySoldierPoolFill.setSelected(MekHQ.getMHQOptions().getNewDaySoldierPoolFill());
+        chkNewDaySoldierPoolNoRelease.setSelected(MekHQ.getMHQOptions().getNewDaySoldierPoolNoRelease());
+        chkNewDaySoldierPoolNoRelease.setEnabled(chkNewDaySoldierPoolFill.isSelected());
         chkNewDayBattleArmorPoolFill.setSelected(MekHQ.getMHQOptions().getNewDayBattleArmorPoolFill());
+        chkNewDayBattleArmorPoolNoRelease.setSelected(MekHQ.getMHQOptions().getNewDayBattleArmorPoolNoRelease());
+        chkNewDayBattleArmorPoolNoRelease.setEnabled(chkNewDayBattleArmorPoolFill.isSelected());
         chkNewDayVehicleCrewGroundPoolFill.setSelected(MekHQ.getMHQOptions().getNewDayVehicleCrewGroundPoolFill());
+        chkNewDayVehicleCrewGroundPoolNoRelease.setSelected(MekHQ.getMHQOptions()
+                                                                  .getNewDayVehicleCrewGroundPoolNoRelease());
+        chkNewDayVehicleCrewGroundPoolNoRelease.setEnabled(chkNewDayVehicleCrewGroundPoolFill.isSelected());
         chkNewDayVehicleCrewVTOLPoolFill.setSelected(MekHQ.getMHQOptions().getNewDayVehicleCrewVTOLPoolFill());
+        chkNewDayVehicleCrewVTOLPoolNoRelease.setSelected(MekHQ.getMHQOptions()
+                                                                .getNewDayVehicleCrewVTOLPoolNoRelease());
+        chkNewDayVehicleCrewVTOLPoolNoRelease.setEnabled(chkNewDayVehicleCrewVTOLPoolFill.isSelected());
         chkNewDayVehicleCrewNavalPoolFill.setSelected(MekHQ.getMHQOptions().getNewDayVehicleCrewNavalPoolFill());
+        chkNewDayVehicleCrewNavalPoolNoRelease.setSelected(MekHQ.getMHQOptions()
+                                                                 .getNewDayVehicleCrewNavalPoolNoRelease());
+        chkNewDayVehicleCrewNavalPoolNoRelease.setEnabled(chkNewDayVehicleCrewNavalPoolFill.isSelected());
         chkNewDayVesselPilotPoolFill.setSelected(MekHQ.getMHQOptions().getNewDayVesselPilotPoolFill());
+        chkNewDayVesselPilotPoolNoRelease.setSelected(MekHQ.getMHQOptions().getNewDayVesselPilotPoolNoRelease());
+        chkNewDayVesselPilotPoolNoRelease.setEnabled(chkNewDayVesselPilotPoolFill.isSelected());
         chkNewDayVesselGunnerPoolFill.setSelected(MekHQ.getMHQOptions().getNewDayVesselGunnerPoolFill());
+        chkNewDayVesselGunnerPoolNoRelease.setSelected(MekHQ.getMHQOptions().getNewDayVesselGunnerPoolNoRelease());
+        chkNewDayVesselGunnerPoolNoRelease.setEnabled(chkNewDayVesselGunnerPoolFill.isSelected());
         chkNewDayVesselCrewPoolFill.setSelected(MekHQ.getMHQOptions().getNewDayVesselCrewPoolFill());
+        chkNewDayVesselCrewPoolNoRelease.setSelected(MekHQ.getMHQOptions().getNewDayVesselCrewPoolNoRelease());
+        chkNewDayVesselCrewPoolNoRelease.setEnabled(chkNewDayVesselCrewPoolFill.isSelected());
+        chkNewDayAutoLogistics.setSelected(options.getNewDayAutoLogistics());
         chkNewDayMRMS.setSelected(options.getNewDayMRMS());
         chkNewDayOptimizeMedicalAssignments.setSelected(options.getNewDayOptimizeMedicalAssignments());
         chkNewDayAutomaticallyAssignUnmaintainedUnits.setSelected(options
                                                                         .getNewDayAutomaticallyAssignUnmaintainedUnits());
         chkNewMonthQuickTrain.setSelected(options.getNewMonthQuickTrain());
+        spnQuickTrainTarget.setValue(options.getQuickTrainTarget());
+        chkLevelArtillery.setSelected(options.getLevelArtillery());
+        chkLevelScoutingSkills.setSelected(options.getLevelScouting());
+        chkLevelEscapeSkills.setSelected(options.getLevelEscape());
+        chkLevelLeadership.setSelected(options.getLevelLeadership());
+        chkLevelTraining.setSelected(options.getLevelTraining());
+        chkLevelOtherCommandSkills.setSelected(options.getLevelOtherCommand());
         chkSelfCorrectMaintenance.setSelected(options.getSelfCorrectMaintenance());
         if (chkNewDayFormationIconOperationalStatus.isSelected() !=
                   options.getNewDayFormationIconOperationalStatus()) {
             chkNewDayFormationIconOperationalStatus.doClick();
         }
         comboNewDayFormationIconOperationalStatusStyle.setSelectedItem(options
-                                                                         .getNewDayFormationIconOperationalStatusStyle());
+                                                                             .getNewDayFormationIconOperationalStatusStyle());
 
         optionPreferGzippedOutput.setSelected(options.getPreferGzippedOutput());
         optionWriteCustomsToXML.setSelected(options.getWriteCustomsToXML());
@@ -1891,6 +2202,18 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                       .getNagDialogIgnore(MHQConstants.NAG_UNABLE_TO_AFFORD_JUMP));
         optionUnableToAffordShoppingListNag.setSelected(options
                                                               .getNagDialogIgnore(MHQConstants.NAG_UNABLE_TO_AFFORD_SHOPPING_LIST));
+        optionSomeoneRandomlyDiedCombatNag.setSelected(options
+                                                             .getNagDialogIgnore(MHQConstants.NAG_SOMEONE_RANDOMLY_DIED_COMBAT));
+        optionSomeoneRandomlyDiedTechNag.setSelected(options
+                                                           .getNagDialogIgnore(MHQConstants.NAG_SOMEONE_RANDOMLY_DIED_TECH));
+        optionSomeoneRandomlyDiedOtherSupportNag.setSelected(options
+                                                                   .getNagDialogIgnore(MHQConstants.NAG_SOMEONE_RANDOMLY_DIED_OTHER_SUPPORT));
+        optionSomeoneRandomlyDiedCivilianNag.setSelected(options
+                                                               .getNagDialogIgnore(MHQConstants.NAG_SOMEONE_RANDOMLY_DIED_CIVILIAN));
+        optionSomeoneRandomlyDiedCampFollowerNag.setSelected(options
+                                                                   .getNagDialogIgnore(MHQConstants.NAG_SOMEONE_RANDOMLY_DIED_CAMP_FOLLOWER));
+        optionSomeoneRandomlyDiedRetiredNag.setSelected(options
+                                                              .getNagDialogIgnore(MHQConstants.NAG_SOMEONE_RANDOMLY_DIED_RETIREE));
 
         optionContractRentalConfirmation.setSelected(options
                                                            .getNagDialogIgnore(MHQConstants.CONFIRMATION_CONTRACT_RENTAL));
@@ -1906,8 +2229,13 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
 
         optionStratConDeployConfirmation.setSelected(options
                                                            .getNagDialogIgnore(MHQConstants.CONFIRMATION_STRATCON_DEPLOY));
+
+        optionResolveScenarioConfirmation.setSelected(options
+                                                            .getNagDialogIgnore(MHQConstants.CONFIRMATION_RESOLVE_SCENARIO));
         optionAbandonUnitsConfirmation.setSelected(options
                                                          .getNagDialogIgnore(MHQConstants.CONFIRMATION_ABANDON_UNITS));
+        optionAssignTechsConfirmation.setSelected(options
+                                                        .getNagDialogIgnore(MHQConstants.CONFIRMATION_ASSIGN_TECHS));
         txtUserDir.setText(PreferenceManager.getClientPreferences().getUserDir());
         spnStartGameDelay.setValue(options.getStartGameDelay());
         spnStartGameClientDelay.setValue(options.getStartGameClientDelay());
@@ -1928,4 +2256,9 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         return true;
     }
     // endregion Data Validation
+
+    @Override
+    protected void setPreferences() throws Exception {
+        setPreferences(MekHQ.getMHQPreferences().forClass(getClass()));
+    }
 }

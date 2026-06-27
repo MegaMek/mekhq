@@ -40,6 +40,7 @@ import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.MiscType;
+import megamek.common.weapons.infantry.InfantryWeapon;
 import megamek.common.equipment.Mounted;
 import megamek.common.equipment.WeaponType;
 import megamek.common.units.Entity;
@@ -68,6 +69,13 @@ public class MissingEquipmentPart extends MissingPart {
 
     public EquipmentType getType() {
         return type;
+    }
+
+    @Override
+    public boolean isBulkAcquisition() {
+        // Infantry weapons (primary, secondary and disposable) are ordered one per trooper, so a platoon's order is
+        // filled by a single bulk acquisition roll rather than one roll per weapon.
+        return type instanceof InfantryWeapon;
     }
 
     public int getEquipmentNum() {

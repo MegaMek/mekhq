@@ -70,7 +70,6 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.gui.model.UnitTableModel;
@@ -295,7 +294,7 @@ public class MRMSDialog extends JDialog {
         final Container content = getContentPane();
         content.setLayout(new BorderLayout());
 
-        AbstractMHQScrollablePanel pnlMain = new DefaultMHQScrollablePanel(frame, "pnlMain", new GridBagLayout());
+        DefaultMHQScrollablePanel pnlMain = new DefaultMHQScrollablePanel(frame, "pnlMain", new GridBagLayout());
 
         if (getMode().isUnits()) {
             pnlMain.add(createUnitsPanel(), createBaseConstraints(0));

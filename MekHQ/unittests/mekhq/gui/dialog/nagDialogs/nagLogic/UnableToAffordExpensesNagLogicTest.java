@@ -82,8 +82,8 @@ class UnableToAffordExpensesNagLogicTest {
 
         // Stubs
         when(campaign.getFinances()).thenReturn(finances);
-        when(campaign.getHangar()).thenReturn(hangar);
-        when(campaign.getWarehouse()).thenReturn(warehouse);
+        when(campaign.getAllHangar()).thenReturn(hangar);
+        when(campaign.getAllWarehouse()).thenReturn(warehouse);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
     }
 

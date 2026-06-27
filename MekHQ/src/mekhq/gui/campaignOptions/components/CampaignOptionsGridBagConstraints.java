@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -38,7 +38,8 @@ import java.awt.Insets;
 import java.util.Objects;
 import javax.swing.JPanel;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 /**
  * A custom implementation of {@link GridBagConstraints} designed for use with panels in the campaign options dialog.
@@ -57,14 +58,14 @@ public class CampaignOptionsGridBagConstraints extends GridBagConstraints {
      * The {@code JPanel} will automatically be set to use a {@link GridBagLayout}. Default constraints include:
      * </p>
      * <ul>
-     *   <li> {@code anchor} set to {@link GridBagConstraints#NORTHWEST} </li>
-     *   <li> {@code fill} set to {@link GridBagConstraints#BOTH} </li>
-     *   <li> {@code insets} set to {@code new Insets(5, 5, 5, 5)} </li>
+     *   <li>{@code anchor} set to {@link GridBagConstraints#NORTHWEST}</li>
+     *   <li>{@code fill} set to {@link GridBagConstraints#HORIZONTAL}</li>
+     *   <li>{@code insets} set to {@code new Insets(5, 5, 5, 5)}</li>
      * </ul>
      *
      * @param panel the {@link JPanel} for which the {@link GridBagConstraints} is created
      */
-    public CampaignOptionsGridBagConstraints(JPanel panel) {
+    public CampaignOptionsGridBagConstraints(@Nonnull JPanel panel) {
         this(panel, null, null);
     }
 
@@ -78,7 +79,7 @@ public class CampaignOptionsGridBagConstraints extends GridBagConstraints {
      * values are used:
      * <ul>
      *   <li>Default {@code anchor}: {@link GridBagConstraints#NORTHWEST}</li>
-     *   <li>Default {@code fill}: {@link GridBagConstraints#BOTH}</li>
+     *   <li>Default {@code fill}: {@link GridBagConstraints#HORIZONTAL}</li>
      * </ul>
      * Default {@code insets} are set to {@code new Insets(5, 5, 5, 5)}.
      *
@@ -86,9 +87,9 @@ public class CampaignOptionsGridBagConstraints extends GridBagConstraints {
      * @param anchor the anchor setting for the {@link GridBagConstraints}, or {@code null} to use the default value
      *               {@link GridBagConstraints#NORTHWEST}
      * @param fill   the fill setting for the {@link GridBagConstraints}, or {@code null} to use the default value
-     *               {@link GridBagConstraints#BOTH}
+     *               {@link GridBagConstraints#HORIZONTAL}
      */
-    public CampaignOptionsGridBagConstraints(JPanel panel, @Nullable Integer anchor, @Nullable Integer fill) {
+    public CampaignOptionsGridBagConstraints(@Nonnull JPanel panel, @Nullable Integer anchor, @Nullable Integer fill) {
         super();
 
         // Set up GridBagLayout on the panel
@@ -96,7 +97,7 @@ public class CampaignOptionsGridBagConstraints extends GridBagConstraints {
 
         // Assign anchor and fill, using defaults if not provided
         this.anchor = Objects.requireNonNullElse(anchor, GridBagConstraints.NORTHWEST);
-        this.fill = Objects.requireNonNullElse(fill, GridBagConstraints.BOTH);
+        this.fill = Objects.requireNonNullElse(fill, GridBagConstraints.HORIZONTAL);
 
         // Set default insets
         this.insets = new Insets(5, 5, 5, 5);

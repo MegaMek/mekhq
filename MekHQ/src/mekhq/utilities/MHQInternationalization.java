@@ -124,7 +124,7 @@ public class MHQInternationalization {
      * @return the localized string
      */
     public static String getFormattedText(String key, Object... args) {
-        return MessageFormat.format(getFormattedTextAt(getInstance().defaultBundle, key), args);
+        return getFormattedTextAt(getInstance().defaultBundle, key, args);
     }
 
     /**

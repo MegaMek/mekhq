@@ -39,6 +39,9 @@ import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.campaign.personnel.Person;
 
 public class PersonRankSorter implements Comparator<Person> {
+
+    public static final PersonRankSorter INSTANCE = new PersonRankSorter(new NaturalOrderComparator());
+
     //region Variable Declarations
     private final PrisonerStatusSorter prisonerStatusSorter = new PrisonerStatusSorter();
     private final NaturalOrderComparator naturalOrderComparator;

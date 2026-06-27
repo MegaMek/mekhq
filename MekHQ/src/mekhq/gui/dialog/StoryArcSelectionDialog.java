@@ -40,14 +40,15 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
 
+import megamek.client.ui.dialogs.buttonDialogs.AbstractButtonDialog;
 import megamek.common.annotations.Nullable;
 import megamek.common.ui.FastJScrollPane;
+import mekhq.MekHQ;
 import mekhq.campaign.storyArc.StoryArcStub;
-import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 import mekhq.gui.panes.StoryArcSelectionPane;
 import mekhq.gui.utilities.MarkdownRenderer;
 
-public class StoryArcSelectionDialog extends AbstractMHQButtonDialog {
+public class StoryArcSelectionDialog extends AbstractButtonDialog {
     //region Variable Declarations
     private StoryArcSelectionPane selectionPanel;
     private JTextPane descriptionPane;
@@ -56,7 +57,8 @@ public class StoryArcSelectionDialog extends AbstractMHQButtonDialog {
 
     //region Constructors
     public StoryArcSelectionDialog(final JFrame parent, boolean startNew) {
-        super(parent, "StoryArcSelectionDialog", "StoryArcSelectionDialog.title");
+        super(parent, true, MekHQ.getDefaultResourceBundle(),
+              "StoryArcSelectionDialog", "StoryArcSelectionDialog.title");
         this.startNew = startNew;
         initialize();
         refreshDescription();
@@ -123,5 +125,10 @@ public class StoryArcSelectionDialog extends AbstractMHQButtonDialog {
             descriptionPane.setText(MarkdownRenderer.getRenderedHtml(getCurrentlySelectedStoryArc().getDescription()));
             descriptionPane.setCaretPosition(0);
         }
+    }
+
+    @Override
+    protected void setPreferences() throws Exception {
+        setPreferences(MekHQ.getMHQPreferences().forClass(getClass()));
     }
 }

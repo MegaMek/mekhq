@@ -119,14 +119,7 @@ public class ScenarioWizardLanceRenderer extends JLabel implements ListCellRende
                 }
 
                 for (Person person : unit.getCrew()) {
-                    int personFatigue = getEffectiveFatigue(person.getAdjustedFatigue(),
-                          person.getPermanentFatigue(),
-                          person.isClanPersonnel(),
-                          person.getSkillLevel(campaign, false, true));
-
-                    if (personFatigue > highestFatigue) {
-                        highestFatigue = personFatigue;
-                    }
+                    highestFatigue = Math.max(highestFatigue, getEffectiveFatigue(person, campaign));
                 }
             }
             fatigueReport = getFormattedTextAt(RESOURCE_BUNDLE, "fatigueReport.string", highestFatigue);

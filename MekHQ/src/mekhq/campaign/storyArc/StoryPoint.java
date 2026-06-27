@@ -163,7 +163,7 @@ public abstract class StoryPoint {
         processTriggers();
         proceedToNextStoryPoint();
         // refresh the GUI in case things have changed or been added
-        getCampaign().getApp().getCampaigngui().refreshAllTabs();
+        getCampaign().getGUI().refreshAllTabs();
 
     }
 

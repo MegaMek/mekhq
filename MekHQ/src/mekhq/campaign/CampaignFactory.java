@@ -71,7 +71,7 @@ import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
-import mekhq.campaign.randomEvents.RandomEventLibraries;
+import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventLibraries;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -160,9 +160,9 @@ public class CampaignFactory {
      * Creates a partially-configured CampaignConfiguration that is missing: 1. Systems (TestSystems for testing
      * purposes) 2. GameOptions (required for MegaMek, may be candidate for further test class development) 3. Player
      * instance 4. LocalDate for Campaign start day 5. CurrentLocation (created from a PlanetarySystem, which must be
-     * retrieved using Systems or TestSystems) 6. Logistical classes: parts store, new-type personnel market, random
-     * death generator, persistent campaign summary tracker. Useful for testing purposes, as the missing references can
-     * be replaced with mocks or lightweight test classes.
+     * retrieved using Systems or TestSystems) 6. Logistical classes: parts store, new-style recruitment, random death
+     * generator, persistent campaign summary tracker. Useful for testing purposes, as the missing references can be
+     * replaced with mocks or lightweight test classes.
      *
      * @param options CampaignOptions instance; used in Randomizer construction
      *
@@ -250,7 +250,7 @@ public class CampaignFactory {
         Game game = new Game();
         Player player = new Player(0, "self");
 
-        Systems systems = Systems.getInstance();
+        Systems systems = Systems.createCampaignSystems();
 
         // For simplicity, createPartialCampaignConfiguration needs a CampaignOptions instance.
         CampaignOptions campaignOptions = new CampaignOptions();
@@ -273,7 +273,7 @@ public class CampaignFactory {
         GameOptions gameOptions = new GameOptions();
         gameOptions.getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaignConfig.getDate().getYear());
 
-        // Instantiate default parts store, new-style personnel market, random death manager, and campaign summary
+        // Instantiate default parts store, new-style recruitment, random death manager, and campaign summary
         // object.
         // Note: Campaign is responsible for correctly initializing these objects now!
         PartsStore partsStore = new PartsStore();

@@ -95,7 +95,6 @@ public final class TOETab extends CampaignGuiTab {
     //region Constructors
     public TOETab(CampaignGUI gui, String name) {
         super(gui, name);
-        MekHQ.registerHandler(this);
     }
     //endregion Constructors
 
@@ -200,7 +199,7 @@ public final class TOETab extends CampaignGuiTab {
         // Check if this is a StratCon scenario
         boolean isStratConScenario = selectedScenario instanceof AtBDynamicScenario &&
                                            selectedMission instanceof AtBContract atbContract &&
-                                           atbContract.getStratconCampaignState() != null;
+                                           atbContract.getStratConCampaignState() != null;
 
         if (isStratConScenario) {
             deployToStratCon(selectedScenario);
@@ -221,9 +220,9 @@ public final class TOETab extends CampaignGuiTab {
      * @since 0.50.10
      */
     private void deployToStratCon(Scenario selectedScenario) {
-        if (getCampaignGui().getTab(MHQTabType.STRAT_CON) instanceof StratConTab stratConTab) {
-            MaplessStratCon.deployWithoutMap(stratConTab.getStratconPanel(), getCampaign(), selectedScenario);
-        }
+        getCampaignGui().getStratConTab().ifPresent(
+              tab -> MaplessStratCon.deployWithoutMap(tab.getStratconPanel(),
+                    getCampaign(), selectedScenario));
     }
 
     /**

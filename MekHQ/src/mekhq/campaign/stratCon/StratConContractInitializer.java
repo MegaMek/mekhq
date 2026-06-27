@@ -518,6 +518,12 @@ public class StratConContractInitializer {
             ScenarioTemplate template = StratConScenarioFactory.getSpecificScenario(objectiveScenarios.get(Compute.randomInt(
                   objectiveScenarios.size())));
 
+            if (template == null) {
+                LOGGER.error("Unable to place objective scenario on track {}, as no scenario template was available.",
+                      trackState.getDisplayableName());
+                continue;
+            }
+
             StratConCoords coords = getUnoccupiedCoords(trackState);
 
             if (coords == null) {
@@ -527,11 +533,13 @@ public class StratConContractInitializer {
             }
 
             // facility
+            boolean addedFacility = false;
             if (template.isFacilityScenario()) {
                 StratConFacility facility = template.isHostileFacility() ?
                                                   StratConFacilityFactory.getRandomHostileFacility() :
                                                   StratConFacilityFactory.getRandomAlliedFacility();
                 trackState.addFacility(coords, facility);
+                addedFacility = true;
             }
 
             // create scenario - don't assign a force yet
@@ -560,13 +568,15 @@ public class StratConContractInitializer {
                 }
 
                 trackState.addScenario(scenario);
-            }
 
-            StratConStrategicObjective sso = new StratConStrategicObjective();
-            sso.setObjectiveCoords(coords);
-            sso.setObjectiveType(StrategicObjectiveType.SpecificScenarioVictory);
-            sso.setDesiredObjectiveCount(1);
-            trackState.addStrategicObjective(sso);
+                StratConStrategicObjective sso = new StratConStrategicObjective();
+                sso.setObjectiveCoords(coords);
+                sso.setObjectiveType(StrategicObjectiveType.SpecificScenarioVictory);
+                sso.setDesiredObjectiveCount(1);
+                trackState.addStrategicObjective(sso);
+            } else if (addedFacility) {
+                trackState.removeFacility(coords);
+            }
         }
     }
 
@@ -672,8 +682,8 @@ public class StratConContractInitializer {
             // scenarios for this contract
             // and set their backing scenario pointers to the existing scenarios stored in
             // the campaign for this contract
-            if (atbContract.getStratconCampaignState() != null) {
-                for (StratConTrackState track : atbContract.getStratconCampaignState().getTracks()) {
+            if (atbContract.getStratConCampaignState() != null) {
+                for (StratConTrackState track : atbContract.getStratConCampaignState().getTracks()) {
                     for (StratConScenario scenario : track.getScenarios().values()) {
                         Scenario campaignScenario = campaign.getScenario(scenario.getBackingScenarioID());
 

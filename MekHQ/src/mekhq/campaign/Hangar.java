@@ -36,6 +36,7 @@ import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -43,16 +44,29 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import jakarta.annotation.Nonnull;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.location.ILocation;
+import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
 
 /**
  * Represents a hangar which contains zero or more units.
  */
-public class Hangar {
+public class Hangar implements ILocation {
     private final Map<UUID, Unit> units = new LinkedHashMap<>();
+    private final LocationNode locationNode = new LocationNode(this);
+
+    @Override
+    public @Nonnull LocationNode getLocationNode() {
+        return locationNode;
+    }
+
+    public Set<Unit> getUnitsAtLocation() {
+        return Set.copyOf(units.values());
+    }
 
     /**
      * Adds a unit to the hangar.
@@ -71,6 +85,7 @@ public class Hangar {
         }
 
         units.put(unit.getId(), unit);
+        unit.setParent(this);
     }
 
     /**
@@ -171,7 +186,11 @@ public class Hangar {
      * @return true if the unit was removed, otherwise false.
      */
     public boolean removeUnit(UUID id) {
-        return null != units.remove(id);
+        Unit unit = units.remove(id);
+        if (unit != null) {
+            unit.setParent(null);
+        }
+        return unit != null;
     }
 
     public void writeToXML(final PrintWriter pw, final int indent, final String tag) {

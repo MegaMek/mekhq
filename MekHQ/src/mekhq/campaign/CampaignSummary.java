@@ -150,18 +150,18 @@ public class CampaignSummary {
         aeroCount = 0;
         infantryCount = 0;
         int squadCount = 0;
-        for (Unit u : campaign.getHangar().getUnits()) {
-            Entity e = u.getEntity();
-            if (u.isUnmanned() ||
-                      u.isSalvage() ||
-                      u.isMothballed() ||
-                      u.isMothballing() ||
-                      !u.isPresent() ||
-                      (null == e)) {
+        for (Unit unit : campaign.getAllHangar().getUnits()) {
+            Entity entity = unit.getEntity();
+            if (unit.isUnmanned() ||
+                      unit.isSalvage() ||
+                      unit.isMothballed() ||
+                      unit.isMothballing() ||
+                      !unit.isPresent() ||
+                      (null == entity)) {
                 continue;
             }
-            countDamageStatus[u.getDamageState()]++;
-            switch (e.getUnitType()) {
+            countDamageStatus[unit.getDamageState()]++;
+            switch (entity.getUnitType()) {
                 case UnitType.MEK:
                 case UnitType.PROTOMEK:
                     mekCount++;
@@ -178,7 +178,7 @@ public class CampaignSummary {
                     infantryCount++;
                     break;
                 case UnitType.INFANTRY:
-                    Infantry i = (Infantry) e;
+                    Infantry i = (Infantry) entity;
                     squadCount += i.getSquadCount();
                     break;
             }
@@ -222,12 +222,16 @@ public class CampaignSummary {
         HangarStatistics hangarStats = campaign.getHangarStatistics();
         int noMek = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_MEK) -
                                    hangarStats.getOccupiedBays(Entity.ETYPE_MEK), 0);
+        int noSC = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT) -
+                                  hangarStats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
         int noASF = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_AEROSPACE_FIGHTER) -
                                    hangarStats.getOccupiedBays(Entity.ETYPE_AEROSPACE_FIGHTER), 0);
         int noLV = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true) -
                                   hangarStats.getOccupiedBays(Entity.ETYPE_TANK, true), 0);
         int noHV = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK) -
                                   hangarStats.getOccupiedBays(Entity.ETYPE_TANK), 0);
+        int noSH = Math.max(hangarStats.getNumberOfSuperHeavyVehicles() -
+                                  hangarStats.getOccupiedSuperHeavyVehicleBays(), 0);
         int noInf = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY) -
                                    hangarStats.getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
         int noBA = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR) -
@@ -236,22 +240,30 @@ public class CampaignSummary {
                                      hangarStats.getOccupiedBays(Entity.ETYPE_PROTOMEK), 0);
         int freeHV = Math.max(hangarStats.getTotalHeavyVehicleBays() - hangarStats.getOccupiedBays(Entity.ETYPE_TANK),
               0);
+        int freeSH = Math.max(hangarStats.getTotalSuperHeavyVehicleBays() -
+                                    hangarStats.getOccupiedSuperHeavyVehicleBays(), 0);
         int freeSC = Math.max(hangarStats.getTotalSmallCraftBays() -
                                     hangarStats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
 
         // check for free bays elsewhere
         noASF = Math.max(noASF - freeSC, 0);
         noLV = Math.max(noLV - freeHV, 0);
+        int heavyVehiclesInSuperHeavyBays = Math.min(noHV, freeSH);
+        noHV -= heavyVehiclesInSuperHeavyBays;
+        freeSH -= heavyVehiclesInSuperHeavyBays;
+        noLV = Math.max(noLV - freeSH, 0);
 
-        unitsOver = noMek + noASF + noLV + noHV + noInf + noBA + noProto;
-        unitsTransported = hangarStats.getOccupiedBays(Entity.ETYPE_MEK) +
-                                 hangarStats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT) +
-                                 hangarStats.getOccupiedBays(Entity.ETYPE_AEROSPACE_FIGHTER) +
-                                 hangarStats.getOccupiedBays(Entity.ETYPE_TANK, true) +
-                                 hangarStats.getOccupiedBays(Entity.ETYPE_TANK) +
-                                 hangarStats.getOccupiedBays(Entity.ETYPE_INFANTRY) +
-                                 hangarStats.getOccupiedBays(Entity.ETYPE_BATTLEARMOR) +
-                                 hangarStats.getOccupiedBays(Entity.ETYPE_PROTOMEK);
+        unitsOver = noMek + noSC + noASF + noLV + noHV + noSH + noInf + noBA + noProto;
+        int totalBayUnits = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_MEK) +
+                                  hangarStats.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT) +
+                                  hangarStats.getNumberOfUnitsByType(Entity.ETYPE_AEROSPACE_FIGHTER) +
+                                  hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true) +
+                                  hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK) +
+                                  hangarStats.getNumberOfSuperHeavyVehicles() +
+                                  hangarStats.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY) +
+                                  hangarStats.getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR) +
+                                  hangarStats.getNumberOfUnitsByType(Entity.ETYPE_PROTOMEK);
+        unitsTransported = Math.max(totalBayUnits - unitsOver, 0);
 
         nDS = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP);
     }
@@ -315,15 +327,21 @@ public class CampaignSummary {
     }
 
     /**
-     * Generates an HTML report about the current and maximum cargo capacity. The current cargo capacity (cargoTons) and
-     * maximum cargo capacity (cargoCapacity) are rounded to 1 decimal place. The comparison between the current and
-     * maximum cargo capacity determines the font's color in the report. - If the current cargo exceeds the maximum
-     * capacity, the color is set to MHQ's defined negative color. - If the current cargo equals the maximum capacity,
-     * the color is set to MHQ's defined warning color. - In other cases, the regular color is used.
+     * Generates a report string with the current and maximum cargo capacity. It is intended to be embedded into HTML
+     * documents.
+     * <p>The comparison between the current and maximum cargo capacity determines the font's color in the report.</p>
+     * <ul>
+     *     <li>If the current cargo exceeds the maximum capacity, the color is set to MHQ's defined negative color.</li>
+     *     <li>If the current cargo equals the maximum capacity, the color is set to MHQ's defined warning color.</li>
+     *     <li>In other cases, the regular color is used.</li>
+     * </ul>
+     * <p>The current cargo capacity (cargoTons) and maximum cargo capacity (cargoCapacity) are rounded to 1 decimal
+     * place.</p>
      *
-     * @return A {@link StringBuilder} object containing the HTML formatted report of cargo usage against capacity.
+     * @return A string containing the cargo capacity report; may contain HTML tags, but it's not wrapped into
+     *       &lt;html&gt;
      */
-    public StringBuilder getCargoCapacityReport() {
+    public String getCargoCapacityReport() {
         BigDecimal roundedCargo = new BigDecimal(Double.toString(cargoTons));
         roundedCargo = roundedCargo.setScale(1, RoundingMode.HALF_UP);
 
@@ -332,21 +350,17 @@ public class CampaignSummary {
 
         int comparison = roundedCargo.compareTo(roundedCapacity);
 
-        StringBuilder report = new StringBuilder("<html>");
+        StringBuilder report = new StringBuilder();
 
         if (comparison > 0) {
             report.append("<font color='").append(getWarningColor()).append("'>");
         }
-
         report.append(roundedCargo).append(" tons (").append(roundedCapacity).append(" tons capacity)");
-
-        if (!report.toString().equals(roundedCargo + " tons (" + roundedCapacity + " tons capacity)")) {
-            report.append("</font></html>");
-        } else {
-            report.append("</html>");
+        if (comparison > 0) {
+            report.append("</font>");
         }
 
-        return report;
+        return report.toString();
     }
 
     /**
@@ -429,14 +443,15 @@ public class CampaignSummary {
         StringBuilder report = new StringBuilder("<html>");
 
         // Field Kitchens
-        List<Unit> unitsInToe = campaign.getFormation(FORMATION_ORIGIN).getAllUnitsAsUnits(campaign.getHangar(), false);
+        List<Unit> unitsInToe = campaign.getFormation(FORMATION_ORIGIN)
+                                      .getAllUnitsAsUnits(campaign.getAllHangar(), false);
         if (campaignOptions.isUseFatigue()) {
             int fieldKitchenCapacity = checkFieldKitchenCapacity(unitsInToe, campaignOptions.getFieldKitchenCapacity());
             fieldKitchenCapacity += FacilityRentals.getCapacityIncreaseFromRentals(campaign.getActiveContracts(),
                   ContractRentalType.KITCHENS);
 
             int fieldKitchenUsage = checkFieldKitchenUsage(campaign.getActivePersonnel(false, true),
-                  campaignOptions.isUseFieldKitchenIgnoreNonCombatants());
+                  campaignOptions.isUseFieldKitchenIgnoreNonCombatants(), campaign);
 
             boolean isWithinCapacity = areFieldKitchensWithinCapacity(fieldKitchenCapacity, fieldKitchenUsage);
             color = isWithinCapacity ?

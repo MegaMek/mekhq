@@ -35,9 +35,8 @@ package mekhq.gui.enums;
 import java.awt.event.KeyEvent;
 import java.util.ResourceBundle;
 
-import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
-import mekhq.gui.*;
+import mekhq.gui.CampaignGUI;
 
 /**
  * Identifies the standard tabs and provides a creation method. The mnemonics used in this are included in the list at
@@ -49,7 +48,7 @@ import mekhq.gui.*;
 public enum MHQTabType {
     //region Enum Declaration
     COMMAND_CENTER("MHQTabType.COMMAND_CENTER.text", KeyEvent.VK_O),
-    INTERSTELLAR_MAP("MHQTabType.INTERSTELLAR_MAP.text", KeyEvent.VK_S),
+    NAVIGATION("MHQTabType.NAVIGATION.text", KeyEvent.VK_UNDEFINED),
     TOE("MHQTabType.TOE.text", KeyEvent.VK_T),
     BRIEFING_ROOM("MHQTabType.BRIEFING_ROOM.text", KeyEvent.VK_B),
     STRAT_CON("MHQTabType.STRAT_CON.text", KeyEvent.VK_C),
@@ -87,16 +86,16 @@ public enum MHQTabType {
         return this == COMMAND_CENTER;
     }
 
+    public boolean isNavigation() {
+        return this == NAVIGATION;
+    }
+
     public boolean isTOE() {
         return this == TOE;
     }
 
     public boolean isBriefingRoom() {
         return this == BRIEFING_ROOM;
-    }
-
-    public boolean isInterstellarMap() {
-        return this == INTERSTELLAR_MAP;
     }
 
     public boolean isPersonnel() {
@@ -131,23 +130,6 @@ public enum MHQTabType {
         return this == STRAT_CON;
     }
     //endregion Boolean Comparison Methods
-
-    public @Nullable CampaignGuiTab createTab(final CampaignGUI gui) {
-        return switch (this) {
-            case COMMAND_CENTER -> new CommandCenterTab(gui, toString());
-            case TOE -> new TOETab(gui, toString());
-            case BRIEFING_ROOM -> new BriefingTab(gui, toString());
-            case INTERSTELLAR_MAP -> new MapTab(gui, toString());
-            case PERSONNEL -> new PersonnelTab(gui, toString());
-            case HANGAR -> new HangarTab(gui, toString());
-            case WAREHOUSE -> new WarehouseTab(gui, toString());
-            case REPAIR_BAY -> new RepairTab(gui, toString());
-            case INFIRMARY -> new InfirmaryTab(gui, toString());
-            case FINANCES -> new FinancesTab(gui, toString());
-            case MEK_LAB -> new MekLabTab(gui, toString());
-            case STRAT_CON -> new StratConTab(gui, toString());
-        };
-    }
 
     @Override
     public String toString() {

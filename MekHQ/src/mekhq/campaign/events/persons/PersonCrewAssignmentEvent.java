@@ -37,6 +37,7 @@ import static mekhq.campaign.force.Formation.FORMATION_NONE;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 
 /**
@@ -74,6 +75,56 @@ public class PersonCrewAssignmentEvent extends PersonChangedEvent {
 
             if (formation != null) {
                 formation.updateCommander(campaign);
+            }
+        }
+
+        removeExcessTempCrew();
+    }
+
+    /**
+     * Removes any temporary crew from the unit that exceed its full crew requirement.
+     *
+     * <p>This can occur when a real {@link Person} fills a slot that was already covered by temp
+     * crew of a <em>different</em> role (e.g. a vessel gunner replaces a SOLDIER temp-crew slot), or when crew-add
+     * methods other than {@code addPilotOrSoldier} assign a person without first trimming temp crew.</p>
+     *
+     * <p>The person's primary role is preferred — temp crew of that role is removed first. Any
+     * residual excess (e.g. the roles don't match) is then drained from whichever other roles still have temp
+     * crew.</p>
+     */
+    private void removeExcessTempCrew() {
+        int excess = unit.getTotalCrewSize() - unit.getFullCrewSize();
+
+        if (excess <= 0) {
+            return;
+        }
+
+        // Prefer removing temp crew whose role matches the person being assigned,
+        // since that is the slot semantically being filled.
+        PersonnelRole primaryRole = getPerson().getPrimaryRole();
+        int matching = unit.getTempCrewByPersonnelRole(primaryRole);
+        if (matching > 0) {
+            int toRemove = Math.min(excess, matching);
+            unit.setTempCrew(primaryRole, matching - toRemove);
+            excess -= toRemove;
+        }
+
+        // Drain any remaining excess from other roles (order is arbitrary); Should only be needed to get existing
+        // saves fixed.
+        if (excess > 0) {
+            for (PersonnelRole role : unit.getTempCrewRoles()) {
+                if (role.equals(primaryRole)) {
+                    continue;
+                }
+
+                int current = unit.getTempCrewByPersonnelRole(role);
+                int toRemove = Math.min(excess, current);
+                unit.setTempCrew(role, current - toRemove);
+                excess -= toRemove;
+
+                if (excess <= 0) {
+                    break;
+                }
             }
         }
     }

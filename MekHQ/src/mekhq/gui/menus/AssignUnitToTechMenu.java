@@ -40,6 +40,7 @@ import javax.swing.JMenuItem;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.location.IPlace;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.unit.Unit;
@@ -100,8 +101,14 @@ public class AssignUnitToTechMenu extends JScrollableMenu {
                                                                        (unit.getTech() == null) :
                                                                        units[0].getTech().equals(unit.getTech()));
 
+            final IPlace unitPlace = units[0].getPlace();
+
             for (final Person tech : campaign.getTechs()) {
                 if (allShareTech && tech.equals(units[0].getTech())) {
+                    continue;
+                }
+
+                if (unitPlace != null && tech.getPlace() != unitPlace) {
                     continue;
                 }
 

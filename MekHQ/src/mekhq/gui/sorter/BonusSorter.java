@@ -42,6 +42,9 @@ import megamek.logging.MMLogger;
  * @author Jay Lawson
  */
 public class BonusSorter implements Comparator<String> {
+
+    public static final BonusSorter INSTANCE = new BonusSorter();
+
     private static final MMLogger LOGGER = MMLogger.create(BonusSorter.class);
 
     @Override

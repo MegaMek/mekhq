@@ -33,7 +33,7 @@
  */
 package mekhq.gui.dialog;
 
-import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
+import static mekhq.campaign.randomEvents.other.GrayMonday.isGrayMonday;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;

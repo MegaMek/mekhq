@@ -90,11 +90,11 @@ public class UnresolvedStratConContactsNagLogic {
         // check every track attached to an active contract for unresolved scenarios
         // to which the player can deploy forces
         for (AtBContract contract : activeContracts) {
-            if (contract.getStratconCampaignState() == null) {
+            if (contract.getStratConCampaignState() == null) {
                 continue; // Skip contracts without a Stratcon campaign state
             }
 
-            for (StratConTrackState track : contract.getStratconCampaignState().getTracks()) {
+            for (StratConTrackState track : contract.getStratConCampaignState().getTracks()) {
                 for (StratConScenario scenario : track.getScenarios().values()) {
                     // Check if the scenario is unresolved and the deployment date matches the local date
                     if (scenario.getCurrentState() == ScenarioState.UNRESOLVED &&

@@ -146,7 +146,7 @@ class AcademyTests {
         academy.setEducationLevelMax(EducationLevel.POST_GRADUATE);
         Person person = Mockito.mock(Person.class);
         when(person.getEduHighestEducation()).thenReturn(EducationLevel.COLLEGE);
-        assertEquals(3000, academy.getTuitionAdjusted(person));
+        assertEquals(2750, academy.getTuitionAdjusted(person));
     }
 
     @Test

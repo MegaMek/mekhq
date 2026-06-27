@@ -23,17 +23,17 @@ jobs:
 
     steps:
       - name: Checkout Data Repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: megamek/mm-data
           path: mm-data
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           path: mekhq
 
       - name: Checkout MegaMek
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: MegaMek/megamek
           path: megamek
@@ -45,7 +45,7 @@ jobs:
           echo "$calculatedSha" >> megamek/docs/mm-revision.txt
 
       - name: Checkout MegaMekLab
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: MegaMek/megameklab
           path: megameklab
@@ -101,7 +101,7 @@ jobs:
         run: ./gradlew build -x test -PextraVersion="nightly-$(date +'%Y-%m-%d')"
 
       - name: CodeCov.io Coverage Report
-        uses: codecov/codecov-action@v6
+        uses: codecov/codecov-action@v7
         with:
           directory: ./mekhq/MekHQ/build/reports/jacoco/test
           fail_ci_if_error: false

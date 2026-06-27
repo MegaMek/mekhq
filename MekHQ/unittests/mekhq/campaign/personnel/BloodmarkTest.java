@@ -73,8 +73,8 @@ class BloodmarkTest {
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
         when(campaign.getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
-        when(campaign.getHangar()).thenReturn(campaignHangar);
-        when(campaign.getWarehouse()).thenReturn(campaignWarehouse);
+        when(campaign.getAllHangar()).thenReturn(campaignHangar);
+        when(campaign.getAllWarehouse()).thenReturn(campaignWarehouse);
 
         target = new Person(campaign);
     }

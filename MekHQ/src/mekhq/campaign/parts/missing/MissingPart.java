@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -166,7 +166,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
     public void remove(boolean salvage) {
         final Unit unit = getUnit();
 
-        campaign.getWarehouse().removePart(this);
+        getWarehouse().removePart(this);
         if (unit != null) {
             unit.removePart(this);
         }
@@ -190,7 +190,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
         }
 
         // don't just return with the first part if it is damaged
-        return campaign.getWarehouse()
+        return getWarehouse()
                      .streamSpareParts()
                      .filter(MissingPart::isAvailableAsReplacement)
                      .filter(p -> !p.isUsedForRefitPlanning() || !refit)
@@ -232,7 +232,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
 
     @Override
     public String getDetails(boolean includeRepairDetails) {
-        PartInventory inventories = campaign.getPartInventory(getNewPart());
+        PartInventory inventories = getPartInventory(getNewPart());
         StringBuilder toReturn = new StringBuilder();
 
         String superDetails = super.getDetails(includeRepairDetails);
@@ -345,12 +345,12 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
 
         toReturn += ">";
         toReturn += "<b>" + getAcquisitionDisplayName() + "</b> " + getAcquisitionBonus() + "<br/>";
-        PartInventory inventories = campaign.getPartInventory(getNewPart());
+        PartInventory inventories = getPartInventory(getNewPart());
         toReturn += inventories.getTransitOrderedDetails();
         if (!isOmniPodded()) {
             Part newPart = getAcquisitionPart();
             newPart.setOmniPodded(true);
-            inventories = campaign.getPartInventory(newPart);
+            inventories = getPartInventory(newPart);
             if (inventories.getSupply() > 0) {
                 toReturn += ", " + inventories.supplyAsString() + " OmniPod";
             }
@@ -479,7 +479,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
             if (replacement.getQuantity() > 1) {
                 Part actualReplacement = replacement.clone();
                 actualReplacement.setReservedBy(getTech());
-                campaign.getQuartermaster().addPart(actualReplacement, 0, false);
+                replacement.getWarehouse().addPart(actualReplacement, true);
                 setReplacementPart(actualReplacement);
                 replacement.changeQuantity(-1);
             } else {
@@ -496,9 +496,8 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
             if (replacement != null) {
                 replacement.setReservedBy(null);
 
-                // Only return the replacement part to the campaign if we have one
                 if (replacement.getQuantity() > 0) {
-                    campaign.getQuartermaster().addPart(replacement, 0, false);
+                    replacement.getWarehouse().addPart(replacement, true);
                 }
             }
         }

@@ -35,6 +35,7 @@ package mekhq.campaign.randomEvents.prisoners.enums;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle;
 import org.junit.jupiter.api.Test;
 
 /**

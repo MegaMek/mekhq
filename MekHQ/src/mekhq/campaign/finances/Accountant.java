@@ -47,8 +47,8 @@ import java.util.UUID;
 import megamek.common.equipment.Engine;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
+import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.enums.TransactionType;
@@ -106,13 +106,8 @@ public record Accountant(Campaign campaign) {
             }
         }
 
-        // And pay our pool
-        salaries = salaries.plus(campaign().getCampaignOptions()
-                                       .getRoleBaseSalaries()[PersonnelRole.ASTECH.ordinal()].getAmount()
-                                       .doubleValue() * campaign().getTemporaryAsTechPool());
-        salaries = salaries.plus(campaign().getCampaignOptions()
-                                       .getRoleBaseSalaries()[PersonnelRole.MEDIC.ordinal()].getAmount().doubleValue() *
-                                       campaign().getTemporaryMedicPool());
+        // Add all temporary personnel (medics, astechs, temp crew)
+        salaries = salaries.plus(sumTempCrewPay(noInfantry));
 
         return salaries;
     }
@@ -162,7 +157,7 @@ public record Accountant(Campaign campaign) {
      */
     public Money getMonthlyFoodAndHousingExpenses() {
         boolean payForFood = getCampaignOptions().isPayForFood();
-        CurrentLocation location = campaign.getLocation();
+        AbstractLocation location = campaign.getCurrentLocation();
         boolean isOnPlanet = location.isOnPlanet();
         boolean payForHousing = getCampaignOptions().isPayForHousing() && isOnPlanet;
 
@@ -184,7 +179,7 @@ public record Accountant(Campaign campaign) {
         int officerFoodUsage = 0;
 
         // Determine housing and food requirements
-        List<Person> personnel = new ArrayList<>(campaign().getPersonnel());
+        List<Person> personnel = new ArrayList<>(campaign().getAllPersonnel());
         for (Person person : personnel) {
             if (person.getStatus().isDepartedUnit()) {
                 // No paying for dead people or folks who left the campaign unit
@@ -265,7 +260,7 @@ public record Accountant(Campaign campaign) {
      * @author Illiani
      * @since 0.50.07
      */
-    private double setFactionStandingBarrackCostMultiplier(CurrentLocation location) {
+    private double setFactionStandingBarrackCostMultiplier(AbstractLocation location) {
         FactionStandings factionStandings = campaign.getFactionStandings();
         PlanetarySystem currentSystem = location.getCurrentSystem();
 
@@ -575,7 +570,7 @@ public record Accountant(Campaign campaign) {
         if (getCampaignOptions().isUseAlternatePaymentMode()) {
             final Money forceValue = AlternatePaymentModelValues.getForceValue(campaign.getFaction(),
                   campaign.getAllFormations(),
-                  campaign.getHangar(),
+                  campaign.getAllHangar(),
                   useDiminishingContractPay,
                   excludeInfantry,
                   combatUnitContractPercent,
@@ -632,18 +627,24 @@ public record Accountant(Campaign campaign) {
     }
 
     private double sumTempCrewPay() {
+        return sumTempCrewPay(false);
+    }
+
+    private double sumTempCrewPay(boolean noInfantry) {
         double tempCrewPay = 0.0;
         tempCrewPay += getTempCrewPay(PersonnelRole.ASTECH, campaign().getTemporaryAsTechPool());
-        tempCrewPay += getTempCrewPay(PersonnelRole.MEDIC, campaign.getTemporaryMedicPool());
+        tempCrewPay += getTempCrewPay(PersonnelRole.MEDIC, campaign().getTemporaryMedicPool());
 
         for (PersonnelRole personnelRole : campaign().getTempCrewRoleKeys()) {
-            tempCrewPay += getTempCrewPay(personnelRole, campaign().getTempCrewPool(personnelRole));
+            if (!(noInfantry && personnelRole.isSoldier())) {
+                tempCrewPay += getTempCrewPay(personnelRole, campaign().getTempCrewPool(personnelRole));
+            }
         }
 
         return tempCrewPay;
     }
 
-     private double getTempCrewPay(PersonnelRole personnelRole, int tempPersonnelPool) {
+    private double getTempCrewPay(PersonnelRole personnelRole, int tempPersonnelPool) {
         return campaign().getCampaignOptions()
                      .getRoleBaseSalaries()[personnelRole.ordinal()].getAmount().doubleValue() *
                      tempPersonnelPool;

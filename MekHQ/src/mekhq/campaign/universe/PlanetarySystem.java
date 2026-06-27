@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2011-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2011-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,6 +33,7 @@
  */
 package mekhq.campaign.universe;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -44,9 +45,16 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.util.StdConverter;
 import megamek.codeUtilities.ObjectUtility;
@@ -170,6 +178,9 @@ public class PlanetarySystem {
     // Base data
     @JsonProperty("id")
     private String id;
+    @JsonProperty("sucsId")
+    @JsonDeserialize(using = SucsIdDeserializer.class)
+    private Integer sucsId;
     private String name;
 
     // Star data (to be factored out)
@@ -194,7 +205,6 @@ public class PlanetarySystem {
     private TreeMap<Integer, Planet> planets;
 
     // for reading in because lists are easier
-    @JsonProperty("planet")
     private List<Planet> planetList;
 
     // the location of the primary planet for this system
@@ -210,8 +220,7 @@ public class PlanetarySystem {
      */
     TreeMap<LocalDate, PlanetarySystemEvent> events;
 
-    // For export and import only (lists are easier than maps) */
-    @JsonProperty("event")
+    // For import only; lists are easier than maps in YAML.
     private List<PlanetarySystemEvent> eventList;
 
     public PlanetarySystem() {
@@ -224,6 +233,36 @@ public class PlanetarySystem {
 
     public String getId() {
         return id;
+    }
+
+    public Integer getSucsId() {
+        return sucsId;
+    }
+
+    public static class SucsIdDeserializer extends JsonDeserializer<Integer> {
+        @Override
+        public Integer deserialize(JsonParser parser, DeserializationContext context) throws IOException {
+            JsonToken token = parser.currentToken();
+            if (token == JsonToken.VALUE_NULL) {
+                return null;
+            }
+            if (token == JsonToken.VALUE_NUMBER_INT) {
+                return parser.getIntValue();
+            }
+            if (token == JsonToken.VALUE_STRING) {
+                String text = parser.getText().trim();
+                if (text.isEmpty() || ".na".equalsIgnoreCase(text)) {
+                    return null;
+                }
+                try {
+                    return Integer.valueOf(text);
+                } catch (NumberFormatException ex) {
+                    throw JsonMappingException.from(parser, "Cannot deserialize sucsId from '" + text
+                          + "'; expected integer or .na", ex);
+                }
+            }
+            return (Integer) context.handleUnexpectedToken(Integer.class, parser);
+        }
     }
 
     /**
@@ -600,6 +639,77 @@ public class PlanetarySystem {
             return null;
         }
         return new ArrayList<>(events.values());
+    }
+
+    @JsonGetter("planet")
+    private List<Planet> getPlanetListForSerialization() {
+        return ((planets == null) || planets.isEmpty()) ? null : new ArrayList<>(planets.values());
+    }
+
+    @JsonSetter("planet")
+    private void setPlanetList(List<Planet> planetList) {
+        this.planetList = planetList;
+    }
+
+    @JsonGetter("event")
+    private List<PlanetarySystemEvent> getEventListForSerialization() {
+        return ((events == null) || events.isEmpty()) ? null : new ArrayList<>(events.values());
+    }
+
+    @JsonSetter("event")
+    private void setEventList(List<PlanetarySystemEvent> eventList) {
+        this.eventList = eventList;
+    }
+
+    /**
+     * Insert or replace a system-level event keyed by date. GM-only planetary editor; gameplay code should not call
+     * this.
+     *
+     * @param event the event to insert; must have a non-null date
+     * @throws IllegalArgumentException if the event or its date is null
+     */
+    public void putEvent(PlanetarySystemEvent event) {
+        if ((event == null) || (event.date == null)) {
+            throw new IllegalArgumentException("Planetary system events must have a date");
+        }
+        if (events == null) {
+            events = new TreeMap<>();
+        }
+        events.put(event.date, event);
+    }
+
+    /**
+     * Remove the system-level event for the given date if present. GM-only planetary editor; gameplay code should not
+     * call this.
+     *
+     * @param when the date of the event to remove
+     * @return {@code true} if an event was removed
+     */
+    public boolean removeEvent(LocalDate when) {
+        if ((when == null) || (events == null)) {
+            return false;
+        }
+        return events.remove(when) != null;
+    }
+
+    /**
+     * Replace the system-level event timeline with the provided collection. GM-only planetary editor; gameplay code
+     * should not call this.
+     *
+     * @param updatedEvents events to install (may be null or empty to clear)
+     */
+    public void replaceEvents(Collection<PlanetarySystemEvent> updatedEvents) {
+        events = new TreeMap<>();
+        if (updatedEvents != null) {
+            for (PlanetarySystemEvent event : updatedEvents) {
+                if ((event != null) && (event.date != null)) {
+                    events.put(event.date, event);
+                }
+            }
+        }
+        if (events.isEmpty()) {
+            events = null;
+        }
     }
 
     protected interface EventGetter<T> {

@@ -141,7 +141,7 @@ public class ProtoMekArmor extends Armor {
 
     @Override
     public int getAmountAvailable() {
-        return campaign.getWarehouse()
+        return getWarehouse()
                      .streamSpareParts().filter(this::isSameProtoMekArmor)
                      .mapToInt(part -> ((ProtoMekArmor) part).getAmount())
                      .sum();
@@ -162,7 +162,7 @@ public class ProtoMekArmor extends Armor {
 
     @Override
     protected int changeAmountAvailableSingle(int amount) {
-        ProtoMekArmor armor = (ProtoMekArmor) campaign.getWarehouse()
+        ProtoMekArmor armor = (ProtoMekArmor) getWarehouse()
                                                     .findSparePart(part -> (part instanceof Armor) &&
                                                                      part.isPresent() &&
                                                                      Objects.equals(getRefitUnit(), part.getRefitUnit()) &&
@@ -172,7 +172,7 @@ public class ProtoMekArmor extends Armor {
             int amountRemaining = armor.getAmount() + amount;
             armor.setAmount(amountRemaining);
             if (armor.getAmount() <= 0) {
-                campaign.getWarehouse().removePart(armor);
+                getWarehouse().removePart(armor);
                 return Math.min(0, amountRemaining);
             }
         } else if (amount > 0) {

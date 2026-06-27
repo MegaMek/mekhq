@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 
 import megamek.codeUtilities.ObjectUtility;
+import megamek.common.annotations.Nullable;
 import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
@@ -146,8 +147,14 @@ public class StratConScenarioFactory {
     /**
      * Retrieves a specific scenario given the key (file name)
      */
-    public static ScenarioTemplate getSpecificScenario(String name) {
-        return dynamicScenarioNameMap.get(name).clone();
+    public static @Nullable ScenarioTemplate getSpecificScenario(String name) {
+        ScenarioTemplate template = dynamicScenarioNameMap.get(name);
+        if (template == null) {
+            logger.error("Scenario template {} not found.", name);
+            return null;
+        }
+
+        return template.clone();
     }
 
     /**
@@ -188,7 +195,7 @@ public class StratConScenarioFactory {
     /**
      * Get an allied or hostile facility scenario, depending on passed on parameter.
      */
-    public static ScenarioTemplate getFacilityScenario(boolean allied) {
+    public static @Nullable ScenarioTemplate getFacilityScenario(boolean allied) {
         if (allied) {
             return getSpecificScenario(MHQConstants.ALLIED_FACILITY_SCENARIO);
         } else {

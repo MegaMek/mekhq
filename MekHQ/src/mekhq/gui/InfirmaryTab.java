@@ -32,6 +32,9 @@
  */
 package mekhq.gui;
 
+import static mekhq.campaign.enums.DailyReportType.MEDICAL;
+import static mekhq.utilities.MHQInternationalization.getFormattedText;
+
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
@@ -98,7 +101,6 @@ public final class InfirmaryTab extends CampaignGuiTab {
     //region Constructors
     public InfirmaryTab(CampaignGUI gui, String name) {
         super(gui, name);
-        MekHQ.registerHandler(this);
     }
     //endregion Constructors
 
@@ -161,7 +163,14 @@ public final class InfirmaryTab extends CampaignGuiTab {
         btnAdvancedSurgery.setEnabled(false);
         btnAdvancedSurgery.addActionListener(ev -> {
             for (Person person : getAllSelectedPatients()) {
-                new AdvancedReplacementLimbDialog(getCampaign(), person, false);
+                if (person.getStatus().isDead()) {
+                    String report = getFormattedText(
+                          "performAdvancedSurgery.report.characterDead",
+                          person.getHyperlinkedFullTitle());
+                    getCampaign().addReport(MEDICAL, report);
+                } else {
+                    new AdvancedReplacementLimbDialog(getCampaign(), getCampaignGui().getIconPackage(), person, false);
+                }
             }
         });
 
@@ -198,8 +207,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
                         Person selectedPatient = listAssignedPatient.getSelectedValue();
                         if (selectedPatient != null) {
                             MedicalViewDialog medicalViewDialog = new MedicalViewDialog(null,
-                                  getCampaign(),
-                                  selectedPatient);
+                                  getCampaign(), selectedPatient, getCampaignGui().getIconPackage());
                             medicalViewDialog.setVisible(true);
                         }
                     }
@@ -248,8 +256,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
                         Person selectedPatient = listUnassignedPatient.getSelectedValue();
                         if (selectedPatient != null) {
                             MedicalViewDialog medicalViewDialog = new MedicalViewDialog(null,
-                                  getCampaign(),
-                                  selectedPatient);
+                                  getCampaign(), selectedPatient, getCampaignGui().getIconPackage());
                             medicalViewDialog.setVisible(true);
                         }
                     }
@@ -530,13 +537,14 @@ public final class InfirmaryTab extends CampaignGuiTab {
         Person doctor = getSelectedDoctor();
         ArrayList<Person> assigned = new ArrayList<>();
         ArrayList<Person> unassigned = new ArrayList<>();
-        for (Person patient : getCampaign().getPatients()) {
+        for (Person patient : getCampaign().getPatientsWithNonPermanentInjuries()) {
             // Knock out inactive doctors
             if ((patient.getDoctorId() != null) &&
                       (getCampaign().getPerson(patient.getDoctorId()) != null) &&
                       !getCampaign().getPerson(patient.getDoctorId()).getStatus().isActiveFlexible()) {
                 patient.setDoctorId(null, getCampaign().getCampaignOptions().getNaturalHealingWaitingPeriod());
             }
+
             if (patient.getDoctorId() == null) {
                 unassigned.add(patient);
             } else if ((doctor != null) && patient.getDoctorId().equals(doctor.getId())) {

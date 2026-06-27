@@ -49,6 +49,7 @@ import megamek.Version;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.TechConstants;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.Faction;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.Mounted;
 import megamek.common.equipment.WeaponType;
@@ -587,6 +588,7 @@ public class SpecialAbility {
                 addValidWeaponryToMap(equipmentType, person, techLevel, year, clusterOnly, weapons);
             }
         }
+
         return weapons.isEmpty() ? null : weapons.randomItem().getName();
     }
 
@@ -604,32 +606,40 @@ public class SpecialAbility {
     private static void addValidWeaponryToMap(final EquipmentType equipmentType, final Person person,
           final int techLevel, final int year, final boolean clusterOnly,
           final WeightedIntMap<EquipmentType> weapons) {
+        boolean isClanCharacter = person.isClanPersonnel();
+
+        mekhq.campaign.universe.Faction originFaction = person.getOriginFaction();
+        Faction fallbackFaction = originFaction.isClan() ? Faction.CLAN : Faction.IS;
+        Faction megamekFaction = Faction.fromMMAbbr(originFaction.getShortName());
+        megamekFaction = (megamekFaction == Faction.NONE) ? fallbackFaction : megamekFaction;
+
         // Ensure it is a weapon eligible for the SPA in question, and the tech level is
-        // IS for
-        // IS personnel and Clan for Clan personnel
+        // IS for IS personnel and
+        // CLAN for Clan personnel
         if (!isWeaponEligibleForSPA(equipmentType, person.getPrimaryRole(), clusterOnly) ||
                   (TechConstants.isClan(equipmentType.getTechLevel(year)) != person.isClanPersonnel())) {
             return;
         }
 
         // Ensure the weapon's tech level is valid (zero or above)
-        int weaponTechLevel = equipmentType.getTechLevel(year);
-        if (weaponTechLevel < 0) {
+        boolean isWeaponAvailable = equipmentType.isAvailableIn(year, isClanCharacter, megamekFaction);
+        if (!isWeaponAvailable) {
             return;
         }
+
         // Ensure that the weapon's tech level is lower than that of the specified tech
         // level
-        weaponTechLevel = Utilities.getSimpleTechLevel(weaponTechLevel);
-        if (techLevel < weaponTechLevel) {
+        int simpleTechLevel = equipmentType.getTechLevel(year, isClanCharacter);
+        if (techLevel < simpleTechLevel) {
             return;
         }
 
         // Determine the weight based on the tech level
-        final int weight = (weaponTechLevel < CampaignOptions.TECH_STANDARD) ?
+        final int weight = (simpleTechLevel < CampaignOptions.TECH_STANDARD) ?
                                  50 :
-                                 (weaponTechLevel < CampaignOptions.TECH_ADVANCED) ?
+                                 (simpleTechLevel < CampaignOptions.TECH_ADVANCED) ?
                                  25 :
-                                 (weaponTechLevel < CampaignOptions.TECH_EXPERIMENTAL) ? 5 : 1;
+                                 (simpleTechLevel < CampaignOptions.TECH_EXPERIMENTAL) ? 5 : 1;
         weapons.add(weight, equipmentType);
     }
 

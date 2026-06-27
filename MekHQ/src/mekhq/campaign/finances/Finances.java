@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,6 +35,7 @@ package mekhq.campaign.finances;
 
 import static mekhq.campaign.enums.DailyReportType.FINANCES;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
+import static mekhq.campaign.finances.WeeklyNetWorth.parseWeeklyNetWorthFromXML;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.messageSurroundedBySpanWithColor;
 
@@ -43,6 +44,7 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.temporal.ChronoUnit;
@@ -89,6 +91,8 @@ public class Finances {
     private int failedCollateral;
     private LocalDate wentIntoDebt;
 
+    private List<WeeklyNetWorth> netWorthOverTime;
+
     private Money balance;
     private int transactionSize = -1;
 
@@ -99,6 +103,7 @@ public class Finances {
         loanDefaults = 0;
         failedCollateral = 0;
         wentIntoDebt = null;
+        netWorthOverTime = new ArrayList<>();
     }
 
     public List<Transaction> getTransactions() {
@@ -149,6 +154,21 @@ public class Finances {
         this.wentIntoDebt = wentIntoDebt;
     }
 
+    public List<WeeklyNetWorth> getNetWorthOverTime() {
+        return netWorthOverTime;
+    }
+
+    public void setNetWorthOverTime(List<WeeklyNetWorth> netWorthOverTime) {
+        this.netWorthOverTime = netWorthOverTime;
+    }
+
+    public void addWeeklyNetWorth(LocalDate date, Money amount) {
+        if (netWorthOverTime.size() == (52 * 10)) { //keep about 10 years max TODO add option to select number of years
+            netWorthOverTime.removeFirst();
+        }
+        this.netWorthOverTime.add(new WeeklyNetWorth(date, amount));
+    }
+
     /**
      * Current campaign balance. Will calculate the current campaign balance based on the campaign's transactions.
      * Cached using the current transaction count.
@@ -192,7 +212,12 @@ public class Finances {
         return balance.plus(loans.stream().map(Loan::determineRemainingValue).collect(Collectors.toList()));
     }
 
-    public boolean isInDebt() {
+    /**
+     * Checks whether the company currently has any active loans.
+     *
+     * @return {@code true} if the loan balance is positive, {@code false} otherwise
+     */
+    public boolean hasActiveLoans() {
         return getLoanBalance().isPositive();
     }
 
@@ -232,7 +257,7 @@ public class Finances {
         }
         Transaction t = new Transaction(type, date, amount.multipliedBy(-1), reason);
         transactions.add(t);
-        if ((wentIntoDebt != null) && !isInDebt()) {
+        if ((wentIntoDebt != null) && !hasActiveLoans()) {
             wentIntoDebt = null;
         }
         MekHQ.triggerEvent(new TransactionDebitEvent(t));
@@ -279,7 +304,7 @@ public class Finances {
     public void credit(final TransactionType type, final LocalDate date, final Money amount, final String reason) {
         Transaction t = new Transaction(type, date, amount, reason);
         transactions.add(t);
-        if ((wentIntoDebt == null) && isInDebt()) {
+        if ((wentIntoDebt == null) && hasActiveLoans()) {
             wentIntoDebt = date;
         }
         MekHQ.triggerEvent(new TransactionCreditEvent(t));
@@ -327,6 +352,7 @@ public class Finances {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         boolean isNewYear = campaignOptions.getFinancialYearDuration().isEndOfFinancialYear(today);
         boolean isNewMonth = (today.getDayOfMonth() == 1);
+        boolean isMonday = today.getDayOfWeek() == DayOfWeek.MONDAY;
         Accountant accountant = campaign.getAccountant();
         // check for a new fiscal year
         if (isNewYear) {
@@ -433,7 +459,7 @@ public class Finances {
                     addReportInsufficientFunds(campaign, resourceMap.getString("Payroll.text"));
 
                     if (campaignOptions.isUseLoyaltyModifiers()) {
-                        for (Person person : campaign.getPersonnel()) {
+                        for (Person person : campaign.getAllPersonnel()) {
                             if (person.getStatus().isDepartedUnit()) {
                                 continue;
                             }
@@ -512,11 +538,21 @@ public class Finances {
             }
         }
 
-        if ((getWentIntoDebt() != null) && !isInDebt()) {
+        if ((getWentIntoDebt() != null) && !hasActiveLoans()) {
             setWentIntoDebt(null);
         }
 
         loans = newLoans;
+
+        //Create a starting datapoint when there are none so far, then add one each monday
+        if (netWorthOverTime.isEmpty() || isMonday) {
+            boolean alreadyRecordedToday = !netWorthOverTime.isEmpty() &&
+                                                 netWorthOverTime.getLast().getDate().equals(campaign.getLocalDate());
+            if (!alreadyRecordedToday) {
+                FinancialReport financialReport = FinancialReport.calculate(campaign);
+                addWeeklyNetWorth(campaign.getLocalDate(), financialReport.getNetWorth());
+            }
+        }
     }
 
     /**
@@ -630,7 +666,7 @@ public class Finances {
             }
         }
         loans = newLoans;
-        if ((wentIntoDebt != null) && !isInDebt()) {
+        if ((wentIntoDebt != null) && !hasActiveLoans()) {
             wentIntoDebt = null;
         }
         return overdueAmount;
@@ -638,7 +674,7 @@ public class Finances {
 
     public void removeLoan(Loan loan) {
         loans.remove(loan);
-        if ((wentIntoDebt != null) && !isInDebt()) {
+        if ((wentIntoDebt != null) && !hasActiveLoans()) {
             wentIntoDebt = null;
         }
     }
@@ -728,6 +764,13 @@ public class Finances {
         if (getWentIntoDebt() != null) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "wentIntoDebt", getWentIntoDebt());
         }
+        if (!getNetWorthOverTime().isEmpty()) {
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "netWorthOverTime");
+            for (final WeeklyNetWorth weeklyNetWorth : getNetWorthOverTime()) {
+                weeklyNetWorth.writeToXML(pw, indent);
+            }
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "netWorthOverTime");
+        }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "finances");
     }
 
@@ -755,6 +798,9 @@ public class Finances {
                         break;
                     case "wentIntoDebt":
                         retVal.setWentIntoDebt(MHQXMLUtility.parseDate(wn2.getTextContent().trim()));
+                        break;
+                    case "netWorthOverTime":
+                        retVal.setNetWorthOverTime(parseWeeklyNetWorthFromXML(wn2));
                         break;
                     default:
                         break;
@@ -805,6 +851,7 @@ public class Finances {
                      .map(Asset::generateInstanceFromXML)
                      .collect(Collectors.toList());
     }
+
     // endregion XML
     // endregion File I/O
 }

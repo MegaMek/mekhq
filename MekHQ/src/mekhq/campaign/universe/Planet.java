@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2011-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2011-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -36,11 +36,16 @@ package mekhq.campaign.universe;
 import java.time.LocalDate;
 import java.util.*;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.util.StdConverter;
 import megamek.codeUtilities.ObjectUtility;
+import megamek.common.TargetRollModifier;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.TechRating;
 import megamek.common.rolls.TargetRoll;
@@ -148,8 +153,7 @@ public class Planet {
      */
     CurrentEvents currentEvents;
 
-    // For export and import only (lists are easier than maps) */
-    @JsonProperty("event")
+    // For import only; lists are easier than maps in YAML.
     private List<Planet.PlanetaryEvent> eventList;
 
     public Planet() {
@@ -201,6 +205,14 @@ public class Planet {
         return null != satellites ? new ArrayList<>(satellites) : null;
     }
 
+    /**
+     * Replaces the satellite list. Pass {@code null} or an empty list to clear satellites entirely. Used by the
+     * GM-only planetary editor; gameplay code should not call this.
+     */
+    public void setSatellites(List<Satellite> satellites) {
+        this.satellites = (satellites == null || satellites.isEmpty()) ? null : new ArrayList<>(satellites);
+    }
+
     public Integer getSmallMoons() {
         return (null == getSourcedSmallMoons()) ? 0 : getSourcedSmallMoons().getValue();
     }
@@ -219,6 +231,14 @@ public class Planet {
 
     public List<LandMass> getLandMasses() {
         return null != landMasses ? new ArrayList<>(landMasses) : null;
+    }
+
+    /**
+     * Replaces the landmass list. Pass {@code null} or an empty list to clear landmasses entirely. Used by the
+     * GM-only planetary editor; gameplay code should not call this.
+     */
+    public void setLandMasses(List<LandMass> landMasses) {
+        this.landMasses = (landMasses == null || landMasses.isEmpty()) ? null : new ArrayList<>(landMasses);
     }
 
     public SourceableValue<Double> getSourcedDayLength(LocalDate when) {
@@ -280,6 +300,72 @@ public class Planet {
         return icon;
     }
 
+    // --- Setters for the planetary editor (sourceable static fields) ---
+
+    public void setSourcedName(SourceableValue<String> name) {
+        this.name = name;
+    }
+
+    public void setSourcedGravity(SourceableValue<Double> gravity) {
+        this.gravity = gravity;
+    }
+
+    public void setSourcedDiameter(SourceableValue<Double> diameter) {
+        this.diameter = diameter;
+    }
+
+    public void setSourcedDensity(SourceableValue<Double> density) {
+        this.density = density;
+    }
+
+    public void setSourcedDayLength(SourceableValue<Double> dayLength) {
+        this.dayLength = dayLength;
+    }
+
+    public void setSourcedYearLength(SourceableValue<Double> yearLength) {
+        this.yearLength = yearLength;
+    }
+
+    public void setSourcedTemperature(SourceableValue<Integer> temperature) {
+        this.temperature = temperature;
+    }
+
+    public void setSourcedPressure(SourceableValue<megamek.common.planetaryConditions.Atmosphere> pressure) {
+        this.pressure = pressure;
+    }
+
+    public void setSourcedAtmosphere(SourceableValue<Atmosphere> atmosphere) {
+        this.atmosphere = atmosphere;
+    }
+
+    public void setSourcedComposition(SourceableValue<String> composition) {
+        this.composition = composition;
+    }
+
+    public void setSourcedPercentWater(SourceableValue<Integer> percentWater) {
+        this.percentWater = percentWater;
+    }
+
+    public void setSourcedLifeForm(SourceableValue<LifeForm> lifeForm) {
+        this.lifeForm = lifeForm;
+    }
+
+    public void setSourcedPlanetType(SourceableValue<PlanetaryType> planetType) {
+        this.planetType = planetType;
+    }
+
+    public void setSourcedSmallMoons(SourceableValue<Integer> smallMoons) {
+        this.smallMoons = smallMoons;
+    }
+
+    public void setSourcedRing(SourceableValue<Boolean> ring) {
+        this.ring = ring;
+    }
+
+    public void setDescription(String desc) {
+        this.desc = desc;
+    }
+
     // Constant stellar data (to be moved out later)
 
     public Double getX() {
@@ -308,6 +394,56 @@ public class Planet {
             return null;
         }
         return new ArrayList<>(events.values());
+    }
+
+    @JsonGetter("event")
+    private List<PlanetaryEvent> getEventListForSerialization() {
+        return ((events == null) || events.isEmpty()) ? null : new ArrayList<>(events.values());
+    }
+
+    @JsonSetter("event")
+    private void setEventList(List<PlanetaryEvent> eventList) {
+        this.eventList = eventList;
+    }
+
+    public void putEvent(PlanetaryEvent event) {
+        if ((event == null) || (event.date == null)) {
+            throw new IllegalArgumentException("Planetary events must have a date");
+        }
+        if (events == null) {
+            events = new TreeMap<>();
+        }
+        events.put(event.date, event);
+        currentEvents = null;
+    }
+
+    public boolean removeEvent(LocalDate when) {
+        if ((when == null) || (events == null)) {
+            return false;
+        }
+        boolean removed = events.remove(when) != null;
+        if (removed) {
+            if (events.isEmpty()) {
+                events = null;
+            }
+            currentEvents = null;
+        }
+        return removed;
+    }
+
+    public void replaceEvents(Collection<PlanetaryEvent> updatedEvents) {
+        events = new TreeMap<>();
+        if (updatedEvents != null) {
+            for (PlanetaryEvent event : updatedEvents) {
+                if ((event != null) && (event.date != null)) {
+                    events.put(event.date, event);
+                }
+            }
+        }
+        if (events.isEmpty()) {
+            events = null;
+        }
+        currentEvents = null;
     }
 
     protected <T> T getEventData(LocalDate when, T defaultValue, EventGetter<T> getter) {
@@ -650,14 +786,14 @@ public class Planet {
      * A function to return any planetary related modifiers to a target roll for acquiring parts. Feeds in the campaign
      * options because this will include important information about these mods as well as faction information.
      *
-     * @param target  - current TargetRoll for acquisitions
      * @param when    - a LocalDate object for the campaign to retrieve information from the planet
      * @param options - the campaign options from which important values need to be determined
      *
      * @return an updated TargetRoll with planet specific mods
      */
-    public TargetRoll getAcquisitionMods(TargetRoll target, LocalDate when, CampaignOptions options, Faction faction,
-          boolean clanPart) {
+    public List<TargetRollModifier> getAcquisitionMods(LocalDate when, CampaignOptions options,
+          Faction faction, boolean clanPart) {
+        List<TargetRollModifier> result = new ArrayList<>();
         // check faction limitations
         Set<Faction> planetFactions = getFactionSet(when);
         if (null != planetFactions) {
@@ -693,23 +829,26 @@ public class Planet {
                           !neutrals &&
                           !allies &&
                           !options.getPlanetAcquisitionFactionLimit().generateOnEnemyPlanets()) {
-                    return new TargetRoll(TargetRoll.IMPOSSIBLE, "No supplies from enemy planets");
+                    return List.of(new TargetRollModifier(TargetRoll.IMPOSSIBLE, "No supplies from enemy planets"));
                 } else if (neutrals &&
                                  !allies &&
                                  !options.getPlanetAcquisitionFactionLimit().generateOnNeutralPlanets()) {
-                    return new TargetRoll(TargetRoll.IMPOSSIBLE, "No supplies from neutral planets");
+                    return List.of(new TargetRollModifier(TargetRoll.IMPOSSIBLE, "No supplies from neutral planets"));
                 } else if (allies && !options.getPlanetAcquisitionFactionLimit().generateOnAlliedPlanets()) {
-                    return new TargetRoll(TargetRoll.IMPOSSIBLE, "No supplies from allied planets");
+                    return List.of(new TargetRollModifier(TargetRoll.IMPOSSIBLE, "No supplies from allied planets"));
                 } else if (clanCrossover && options.isPlanetAcquisitionNoClanCrossover()) {
-                    return new TargetRoll(TargetRoll.IMPOSSIBLE, "The clans and inner sphere do not trade supplies");
+                    return List.of(new TargetRollModifier(TargetRoll.IMPOSSIBLE,
+                          "The clans and inner sphere do not trade supplies"));
                 }
             }
 
             if (noClansPresent && clanPart) {
                 if (options.isNoClanPartsFromIS()) {
-                    return new TargetRoll(TargetRoll.IMPOSSIBLE, "No clan parts from non-clan factions");
+                    return List.of(new TargetRollModifier(TargetRoll.IMPOSSIBLE,
+                          "No clan parts from non-clan factions"));
                 }
-                target.addModifier(options.getPenaltyClanPartsFromIS(), "clan parts from non-clan faction");
+                result.add(new TargetRollModifier(options.getPenaltyClanPartsFromIS(),
+                      "clan parts from non-clan faction"));
             }
         }
 
@@ -723,18 +862,17 @@ public class Planet {
         if ((socioIndustrial.tech == PlanetarySophistication.REGRESSED) ||
                   (socioIndustrial.industry == PlanetaryRating.F) ||
                   (socioIndustrial.output == PlanetaryRating.F)) {
-            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Regressed: Pre-industrial world");
+            return List.of(new TargetRollModifier(TargetRoll.IMPOSSIBLE, "Regressed: Pre-industrial world"));
         }
 
-        target.addModifier(options.getPlanetTechAcquisitionBonus(socioIndustrial.tech),
-              "planet tech: " + socioIndustrial.tech.getName());
-        target.addModifier(options.getPlanetIndustryAcquisitionBonus(socioIndustrial.industry),
-              "planet industry: " + socioIndustrial.industry.getName());
-        target.addModifier(options.getPlanetOutputAcquisitionBonus(socioIndustrial.output),
-              "planet output: " + socioIndustrial.output.getName());
+        result.add(new TargetRollModifier(options.getPlanetTechAcquisitionBonus(socioIndustrial.tech),
+              "planet tech: " + socioIndustrial.tech.getName()));
+        result.add(new TargetRollModifier(options.getPlanetIndustryAcquisitionBonus(socioIndustrial.industry),
+              "planet industry: " + socioIndustrial.industry.getName()));
+        result.add(new TargetRollModifier(options.getPlanetOutputAcquisitionBonus(socioIndustrial.output),
+              "planet output: " + socioIndustrial.output.getName()));
 
-        return target;
-
+        return result;
     }
 
     @Override
@@ -768,6 +906,7 @@ public class Planet {
 
         @JsonProperty("faction")
         public SourceableValue<List<String>> faction;
+        @JsonIgnore
         public Set<Faction> factions;
         @JsonProperty("lifeForm")
         public SourceableValue<LifeForm> lifeForm;
@@ -791,6 +930,7 @@ public class Planet {
         @JsonProperty("dayLength")
         public SourceableValue<Double> dayLength;
         // Events marked as "custom" are saved to scenario files and loaded from there
+        @JsonInclude(JsonInclude.Include.NON_DEFAULT)
         @JsonProperty("custom")
         public boolean custom = false;
 

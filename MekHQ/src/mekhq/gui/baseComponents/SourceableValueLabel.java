@@ -60,8 +60,20 @@ public class SourceableValueLabel extends JLabel {
 
     private void initialize() {
         setText(String.format(format, sourcedValue.getValue()));
-        setToolTipText("<html><b>Source:</b> " +
-                             (sourcedValue.isCanon() ? sourcedValue.getSource() : "noncanon") +
-                             "</html>");
+        setToolTipText(createTooltipText());
+    }
+
+    private String createTooltipText() {
+        StringBuilder tooltip = new StringBuilder("<html><b>Source:</b> ");
+        tooltip.append(sourcedValue.isCanon() ? escapeHtml(sourcedValue.getSource()) : "noncanon");
+        if ((sourcedValue.getVersion() != null) && !sourcedValue.getVersion().isBlank()) {
+            tooltip.append("<br><b>Version:</b> ").append(escapeHtml(sourcedValue.getVersion()));
+        }
+        tooltip.append("</html>");
+        return tooltip.toString();
+    }
+
+    private static String escapeHtml(String text) {
+        return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
     }
 }

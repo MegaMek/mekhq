@@ -86,7 +86,6 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.AbstractMHQDialogBasic;
-import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.displayWrappers.ClanDisplay;
 import mekhq.gui.displayWrappers.FactionDisplay;
@@ -812,7 +811,7 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
         final JPanel bloodnamePanel = createBloodnamePanel();
 
         // Layout the Panel
-        final AbstractMHQScrollablePanel namesPanel = new DefaultMHQScrollablePanel(getFrame(), "namesPanel");
+        final DefaultMHQScrollablePanel namesPanel = new DefaultMHQScrollablePanel(getFrame(), "namesPanel");
         final GroupLayout layout = new GroupLayout(namesPanel);
         namesPanel.setLayout(layout);
 

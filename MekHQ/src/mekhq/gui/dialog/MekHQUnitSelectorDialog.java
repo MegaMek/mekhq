@@ -274,7 +274,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
             // Here also, we need to update the Buy and AddGM buttons  when a unit is selected.
             if (addToCampaign) {
                 buttonBuy.setEnabled(true);
-                final TargetRoll target = campaign.getTargetForAcquisition(selectedUnit);
+                TargetRoll target = campaign.checkAcquisition(selectedUnit).getTargetNumber();
                 buttonBuy.setText(Messages.getString("MekSelectorDialog.Buy", target.getValueAsString()));
                 buttonBuy.setToolTipText(target.getDesc());
                 buttonAddGM.setEnabled(true);

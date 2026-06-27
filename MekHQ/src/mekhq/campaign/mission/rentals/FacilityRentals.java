@@ -328,7 +328,7 @@ public class FacilityRentals {
 
         List<Mission> activeMissions = campaign.getActiveMissions(false);
         Money totalAvailableFunds = finances.getBalance();
-        Collection<Unit> units = campaign.getHangar().getUnits();
+        Collection<Unit> units = campaign.getAllHangar().getUnits();
 
         Money totalCharge = Money.zero();
 
@@ -482,7 +482,7 @@ public class FacilityRentals {
             }
         }
 
-        if (!isBayRentalAllowed || !campaign.getLocation().isOnPlanet()) {
+        if (!isBayRentalAllowed || !campaign.getCurrentLocation().isOnPlanet()) {
             BayRentalDialog.showNoFacilitiesAvailableDialog(campaign);
             return false;
         }

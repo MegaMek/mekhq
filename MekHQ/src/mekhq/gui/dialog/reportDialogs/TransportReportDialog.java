@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,6 +35,9 @@ package mekhq.gui.dialog.reportDialogs;
 import java.awt.Font;
 import javax.swing.JFrame;
 import javax.swing.JTextPane;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 
 import mekhq.MHQConstants;
 import mekhq.campaign.report.TransportReport;
@@ -60,12 +63,27 @@ public class TransportReportDialog extends AbstractReportDialog {
     @Override
     protected JTextPane createTxtReport() {
         final JTextPane txtReport = new JTextPane();
-        txtReport.setText(getTransportReport().getTransportDetails());
+        String reportText = getTransportReport().getTransportDetails();
         txtReport.setName("txtReport");
         txtReport.setFont(new Font(MHQConstants.FONT_COURIER_NEW, Font.PLAIN, 12));
+        txtReport.setText(reportText);
+        applyHeaderStyle(txtReport, reportText);
         txtReport.setEditable(false);
         txtReport.setCaretPosition(0);
         return txtReport;
+    }
+
+    private static void applyHeaderStyle(final JTextPane txtReport, final String reportText) {
+        int headerEnd = reportText.indexOf('\n');
+        if (headerEnd < 0) {
+            return;
+        }
+
+        SimpleAttributeSet headerAttributes = new SimpleAttributeSet();
+        StyleConstants.setBold(headerAttributes, true);
+
+        StyledDocument document = txtReport.getStyledDocument();
+        document.setCharacterAttributes(0, headerEnd, headerAttributes, false);
     }
     //endregion Getters
 }

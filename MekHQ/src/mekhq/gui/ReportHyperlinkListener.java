@@ -106,7 +106,7 @@ public record ReportHyperlinkListener(CampaignGUI campaignGUI) implements Hyperl
                 }
             } else if (evt.getDescription().startsWith(PERSONNEL_MARKET)) { // Must come before PERSON since it starts
                 // with PERSON as well
-                campaignGUI.hirePersonMarket();
+                campaignGUI.openRecruitmentDialog();
             } else if (evt.getDescription().startsWith(NEWS)) {
                 try {
                     final int id = Integer.parseInt(evt.getDescription().split("\\|")[1]);

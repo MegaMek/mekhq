@@ -44,17 +44,16 @@ import mekhq.campaign.mission.AtBContract;
  */
 public class SingleDropSetUpNagLogic {
     /**
-     * Determines whether any of the given active contracts has an associated
-     * StratCon campaign state.
+     * Determines whether any of the given active contracts has an associated StratCon campaign state.
      *
-     * @param activeContracts the list of currently active AtB contracts to inspect;
-     *                        may be empty but not {@code null}
-     * @return {@code true} if at least one contract has a non-{@code null}
-     *         StratCon campaign state; otherwise {@code false}
+     * @param activeContracts the list of currently active AtB contracts to inspect; may be empty but not {@code null}
+     *
+     * @return {@code true} if at least one contract has a non-{@code null} StratCon campaign state; otherwise
+     *       {@code false}
      */
     public static boolean hasActiveStratConContract(List<AtBContract> activeContracts) {
         for (AtBContract atBContract : activeContracts) {
-            if (atBContract.getStratconCampaignState() != null) {
+            if (atBContract.getStratConCampaignState() != null) {
                 return true;
             }
         }

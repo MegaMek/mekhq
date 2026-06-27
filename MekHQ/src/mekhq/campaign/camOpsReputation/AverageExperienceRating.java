@@ -123,7 +123,7 @@ public class AverageExperienceRating {
         int unitCount = 0;
         double totalExperience = 0;
 
-        Hangar hangar = campaign.getHangar();
+        Hangar hangar = campaign.getAllHangar();
         ArrayList<CombatTeam> combatTeams = campaign.getCombatTeamsAsList();
 
         if (combatTeams.isEmpty()) {

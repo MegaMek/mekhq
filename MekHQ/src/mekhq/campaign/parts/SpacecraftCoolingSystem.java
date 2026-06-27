@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -167,7 +167,7 @@ public class SpacecraftCoolingSystem extends Part {
         if (unit != null && unit.getEntity() instanceof Aero) {
             // Spare part is usually 'this', but we're looking for spare heat sinks here...
             Part spareHeatSink = new AeroHeatSink(0, sinkType, false, campaign);
-            Part spare = campaign.getWarehouse().checkForExistingSparePart(spareHeatSink);
+            Part spare = getWarehouse().checkForExistingSparePart(spareHeatSink);
             if (null != spare) {
                 spare.setQuantity(spare.getQuantity() - Math.min(sinksNeeded, 50));
                 ((Aero) unit.getEntity())
@@ -208,7 +208,7 @@ public class SpacecraftCoolingSystem extends Part {
         if (unit != null && unit.getEntity() instanceof Aero) {
             // Spare part is usually 'this', but we're looking for spare heat sinks here...
             Part spareHeatSink = new AeroHeatSink(0, sinkType, false, campaign);
-            Part spare = campaign.getWarehouse().checkForExistingSparePart(spareHeatSink);
+            Part spare = getWarehouse().checkForExistingSparePart(spareHeatSink);
             // How many sinks are we trying to remove? It'll be between 0 and 50.
             int sinkBatch = Math.clamp(currentSinks - engineSinks, 0, 50);
             if (!salvage) {
@@ -241,7 +241,7 @@ public class SpacecraftCoolingSystem extends Part {
             return "All remaining heat sinks are built-in and cannot be salvaged.";
         }
         Part spareHeatSink = new AeroHeatSink(0, sinkType, false, campaign);
-        Part spare = campaign.getWarehouse().checkForExistingSparePart(spareHeatSink);
+        Part spare = getWarehouse().checkForExistingSparePart(spareHeatSink);
         if (!isSalvaging()) {
             if (spare == null) {
                 return "No compatible heat sinks in warehouse!";

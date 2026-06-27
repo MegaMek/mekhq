@@ -45,6 +45,7 @@ public final class MHQConstants extends SuiteConstants {
     // region General Constants
     public static final String PROJECT_NAME = "MekHQ";
     public static final int AS_TECH_TEAM_SIZE = 6;
+    public static final int MEDIC_TEAM_SIZE = 4;
     public static final int MAX_JUMP_RADIUS = 30; //
     public static final int PREGNANCY_STANDARD_DURATION = 280; // standard duration of a pregnancy in days (40 weeks)
     public static final String EGO_OBJECTIVE_NAME = "Player";
@@ -81,6 +82,7 @@ public final class MHQConstants extends SuiteConstants {
     // region Command Center Tab
     @Deprecated(since = "0.50.07", forRemoval = true)
     public static final String COMMAND_CENTER_USE_UNIT_MARKET = "commandCenterUseUnitMarket";
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public static final String COMMAND_CENTER_MRMS = "commandCenterMRMS";
     // endregion Command Center Tab
 
@@ -99,6 +101,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String PERSONNEL_FILTER_STYLE = "personnelFilterStyle";
     public static final String PERSONNEL_FILTER_ON_PRIMARY_ROLE = "personnelFilterOnPrimaryRole";
     public static final String USE_UNIFIED_DAILY_REPORT = "useUnifiedDailyReport";
+    public static final String USE_AGGREGATE_DAILY_REPORT = "useAggregateDailyReport";
     // endregion Personnel Tab
     // endregion Display
 
@@ -139,6 +142,8 @@ public final class MHQConstants extends SuiteConstants {
     public static final String ABSENT_BACKGROUND = "absentBackground";
     public static final String FATIGUED_FOREGROUND = "fatiguedForeground";
     public static final String FATIGUED_BACKGROUND = "fatiguedBackground";
+    public static final String AWAY_FROM_MAIN_FORCE_FOREGROUND = "awayFromMainForceForeground";
+    public static final String AWAY_FROM_MAIN_FORCE_BACKGROUND = "awayFromMainForceBackground";
     public static final String STRAT_CON_HEX_COORD_FOREGROUND = "stratconHexCoordForeground";
     public static final String FONT_COLOR_NEGATIVE = "fontColorNegative";
     public static final String FONT_COLOR_AMAZING = "fontColorAmazing";
@@ -181,10 +186,28 @@ public final class MHQConstants extends SuiteConstants {
     public static final String NEW_DAY_VESSEL_PILOT_POOL_FILL = "newDayVesselPilotPoolFill";
     public static final String NEW_DAY_VESSEL_GUNNER_POOL_FILL = "newDayVesselGunnerPoolFill";
     public static final String NEW_DAY_VESSEL_CREW_POOL_FILL = "newDayVesselCrewPoolFill";
+    public static final String NEW_DAY_AS_TECH_POOL_NO_RELEASE = "newDayAstechPoolNoRelease";
+    public static final String NEW_DAY_MEDIC_POOL_NO_RELEASE = "newDayMedicPoolNoRelease";
+    public static final String NEW_DAY_SOLDIER_POOL_NO_RELEASE = "newDaySoldierPoolNoRelease";
+    public static final String NEW_DAY_BATTLE_ARMOR_POOL_NO_RELEASE = "newDayBattleArmorPoolNoRelease";
+    public static final String NEW_DAY_VEHICLE_CREW_GROUND_POOL_NO_RELEASE = "newDayVehicleCrewGroundPoolNoRelease";
+    public static final String NEW_DAY_VEHICLE_CREW_VTOL_POOL_NO_RELEASE = "newDayVehicleCrewVTOLPoolNoRelease";
+    public static final String NEW_DAY_VEHICLE_CREW_NAVAL_POOL_NO_RELEASE = "newDayVehicleCrewNavalPoolNoRelease";
+    public static final String NEW_DAY_VESSEL_PILOT_POOL_NO_RELEASE = "newDayVesselPilotPoolNoRelease";
+    public static final String NEW_DAY_VESSEL_GUNNER_POOL_NO_RELEASE = "newDayVesselGunnerPoolNoRelease";
+    public static final String NEW_DAY_VESSEL_CREW_POOL_NO_RELEASE = "newDayVesselCrewPoolNoRelease";
+    public static final String NEW_DAY_AUTO_LOGISTICS = "newDayAutoLogistics";
     public static final String NEW_DAY_MRMS = "newDayMRMS";
     public static final String NEW_DAY_OPTIMIZE_MEDICAL_ASSIGNMENTS = "NewDayOptimizeMedicalAssignments";
     public static final String NEW_DAY_AUTOMATE_MAINTENANCE_ASSIGNMENTS = "NewDayAutomateMaintenanceAssignments";
     public static final String NEW_DAY_QUICK_TRAIN = "NewDayQuickTrain";
+    public static final String NEW_DAY_QUICK_TRAIN_TARGET = "QuickTrainTarget";
+    public static final String NEW_DAY_ARTILLERY = "NewDayArtillery";
+    public static final String NEW_DAY_SCOUTING = "NewDayScouting";
+    public static final String NEW_DAY_ESCAPE = "NewDayEscape";
+    public static final String NEW_DAY_LEADERSHIP = "NewDayLeadership";
+    public static final String NEW_DAY_TRAINING = "NewDayTraining";
+    public static final String NEW_DAY_OTHER_COMMAND = "NewDayOtherCommand";
     public static final String SELF_CORRECT_MAINTENANCE = "SelfCorrectMaintenance";
     public static final String NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS = "newDayFormationIconOperationalStatus";
     public static final String NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS_STYLE = "newDayFormationIconOperationalStatusStyle";
@@ -234,13 +257,21 @@ public final class MHQConstants extends SuiteConstants {
     public static final String NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT = "nagUnableToAffordLoanPayment";
     public static final String NAG_UNABLE_TO_AFFORD_JUMP = "nagUnableToAffordJump";
     public static final String NAG_UNABLE_TO_AFFORD_SHOPPING_LIST = "nagUnableToAffordShoppingList";
+    public static final String NAG_SOMEONE_RANDOMLY_DIED_COMBAT = "nagSomeoneRandomlyDiedCombat";
+    public static final String NAG_SOMEONE_RANDOMLY_DIED_TECH = "nagSomeoneRandomlyDiedTech";
+    public static final String NAG_SOMEONE_RANDOMLY_DIED_OTHER_SUPPORT = "nagSomeoneRandomlyDiedOtherSupport";
+    public static final String NAG_SOMEONE_RANDOMLY_DIED_CIVILIAN = "nagSomeoneRandomlyDiedCivilian";
+    public static final String NAG_SOMEONE_RANDOMLY_DIED_CAMP_FOLLOWER = "nagSomeoneRandomlyDiedCampFollower";
+    public static final String NAG_SOMEONE_RANDOMLY_DIED_RETIREE = "nagSomeoneRandomlyDiedRetired";
 
     public static final String CONFIRMATION_CONTRACT_RENTAL = "confirmationContractRental";
     public static final String CONFIRMATION_FACTION_STANDINGS_ULTIMATUM = "confirmationFactionStandingsUltimatum";
     public static final String CONFIRMATION_BEGIN_TRANSIT = "confirmationBeginTransit";
+    public static final String CONFIRMATION_RESOLVE_SCENARIO = "confirmationResolveScenario";
     public static final String CONFIRMATION_STRATCON_BATCHALL_BREACH = "confirmationStratConBatchallBreach";
     public static final String CONFIRMATION_STRATCON_DEPLOY = "confirmationStratConDeploy";
     public static final String CONFIRMATION_ABANDON_UNITS = "confirmationAbandonUnits";
+    public static final String CONFIRMATION_ASSIGN_TECHS = "confirmationAssignTechs";
     // endregion Nag Tab
 
     // region Miscellaneous Options

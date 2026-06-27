@@ -53,6 +53,7 @@ import megamek.common.units.Tank;
 import megamek.common.units.VTOL;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.location.IPlace;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
@@ -106,15 +107,27 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
         // units has
         // any crew or a tech
         if (Stream.of(units).anyMatch(unit -> (unit.getTech() != null) || !unit.getCrew().isEmpty())) {
-            final JMenuItem miUnassignCrew = new JMenuItem(resources.getString("miUnassignCrew.text"));
-            miUnassignCrew.setName("miUnassignCrew");
-            miUnassignCrew.addActionListener(evt -> {
-                for (final Unit unit : units) {
-                    unit.clearCrew();
-                }
-            });
-            add(miUnassignCrew);
+            String key = "miUnassignCrew";
+            boolean keepTechs = false;
+            removeCrew(units, key, keepTechs);
         }
+
+        if (Stream.of(units).anyMatch(unit -> !unit.getCrew().isEmpty())) {
+            String key = "miUnassignNonTechCrew";
+            boolean keepTechs = true;
+            removeCrew(units, key, keepTechs);
+        }
+    }
+
+    private void removeCrew(Unit[] units, String key, boolean keepTechs) {
+        final JMenuItem menuItem = new JMenuItem(resources.getString(key + ".text"));
+        menuItem.setName(key);
+        menuItem.addActionListener(evt -> {
+            for (final Unit unit : units) {
+                unit.clearCrew(keepTechs);
+            }
+        });
+        add(menuItem);
     }
 
     private void createPersonAssignmentMenus(final Campaign campaign, final Unit... units) {
@@ -156,13 +169,16 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
         // 1) Inactive
         // 2) Prisoner
         // 3) Already assigned to a unit
+        // 4) At a different IPlace than the unit
         // Then sorts the remainder based on their full title
-        List<Person> personnel = campaign.getPersonnel()
+        final IPlace unitPlace = units[0].getPlace();
+        List<Person> personnel = campaign.getPersonnel().values()
                                        .stream()
                                        .filter(person -> person.getStatus().isActive())
                                        .filter(person -> !person.getPrisonerStatus().isCurrentPrisoner())
                                        .filter(Person::isEmployed)
                                        .filter(person -> person.getUnit() == null)
+                                       .filter(person -> unitPlace == null || person.getPlace() == unitPlace)
                                        .sorted(new PersonTitleSorter().reversed())
                                        .collect(Collectors.toList());
 

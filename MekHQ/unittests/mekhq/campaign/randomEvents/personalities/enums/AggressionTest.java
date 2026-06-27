@@ -32,8 +32,8 @@
  */
 package mekhq.campaign.randomEvents.personalities.enums;
 
-import static mekhq.campaign.randomEvents.personalities.enums.Aggression.MAXIMUM_VARIATIONS;
-import static mekhq.campaign.randomEvents.personalities.enums.Aggression.NONE;
+import static mekhq.campaign.randomEvents.personalities.Aggression.MAXIMUM_VARIATIONS;
+import static mekhq.campaign.randomEvents.personalities.Aggression.NONE;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -43,6 +43,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import megamek.common.enums.Gender;
+import mekhq.campaign.randomEvents.personalities.Aggression;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;

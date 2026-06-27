@@ -79,6 +79,7 @@ import mekhq.campaign.unit.UnitTestUtilities;
 import mekhq.utilities.MHQXMLUtility;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -88,6 +89,7 @@ import org.mockito.quality.Strictness;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
+import testUtilities.MHQTestUtilities;
 
 @ExtendWith(value = MockitoExtension.class)
 public class RefitTest {
@@ -922,5 +924,57 @@ public class RefitTest {
 
         // We should have 0 points of standard armor on order
         assertNull(refit.getNewArmorSupplies());
+    }
+
+    @Nested
+    class InfantryRefitConstructorTest {
+        @Test
+        public void customTrueSaveFalse_nameUnchanged() {
+            Entity oldEntity = MHQTestUtilities.getEntityForUnitTesting(
+                  "Foot Platoon (DCMS) (Laser 2620+)", true);
+            assertNotNull(oldEntity);
+            Player mockPlayer = mock(Player.class);
+            when(mockPlayer.getName()).thenReturn("Test Player");
+            oldEntity.setOwner(mockPlayer);
+
+            Entity newEntity = MHQTestUtilities.getEntityForUnitTesting(
+                  "Foot Platoon (DCMS) (MG 2620+)", true);
+            assertNotNull(newEntity);
+
+            String originalChassis = newEntity.getChassis();
+            String originalModel = newEntity.getModel();
+
+            Unit oldUnit = new Unit(oldEntity, mockCampaign);
+            oldUnit.setId(UUID.randomUUID());
+            oldUnit.initializeParts(false);
+
+            Refit refit = new Refit(oldUnit, newEntity, true, false, false);
+
+            assertEquals(originalChassis, refit.getNewEntity().getChassis());
+            assertEquals(originalModel, refit.getNewEntity().getModel());
+        }
+
+        @Test
+        public void customTrueSaveTrue_nameReplacedWithAutoName() {
+            Entity oldEntity = MHQTestUtilities.getEntityForUnitTesting(
+                  "Foot Platoon (DCMS) (Laser 2620+)", true);
+            assertNotNull(oldEntity);
+            Player mockPlayer = mock(Player.class);
+            when(mockPlayer.getName()).thenReturn("Test Player");
+            oldEntity.setOwner(mockPlayer);
+
+            Entity newEntity = MHQTestUtilities.getEntityForUnitTesting(
+                  "Foot Platoon (DCMS) (MG 2620+)", true);
+            assertNotNull(newEntity);
+
+            Unit oldUnit = new Unit(oldEntity, mockCampaign);
+            oldUnit.setId(UUID.randomUUID());
+            oldUnit.initializeParts(false);
+
+            Refit refit = new Refit(oldUnit, newEntity, true, false, true);
+
+            assertEquals("Foot Platoon", refit.getNewEntity().getChassis());
+            assertEquals("(Machine Gun (Portable))", refit.getNewEntity().getModel());
+        }
     }
 }

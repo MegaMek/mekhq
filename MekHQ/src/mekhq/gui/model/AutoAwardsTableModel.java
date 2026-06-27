@@ -244,7 +244,7 @@ public class AutoAwardsTableModel extends AbstractTableModel {
             switch (actualColumn) {
                 case COL_PERSON:
                     setText(getPerson(actualRow).getFullDesc(campaign));
-                    setImage(getPerson(actualRow).getPortrait().getImage(50));
+                    setImage(getPerson(actualRow).getPortraitImageIconWithFallback(true, 50).getImage());
                     break;
                 case COL_NAME:
                     setText(getAwardName(actualRow));

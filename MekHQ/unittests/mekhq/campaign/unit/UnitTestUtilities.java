@@ -49,7 +49,7 @@ public final class UnitTestUtilities {
 
     public static Unit addAndGetUnit(Campaign campaign, Entity entity) {
         campaign.addNewUnit(entity, false, 0, PartQuality.QUALITY_D);
-        for (Unit unit : campaign.getHangar().getUnits()) {
+        for (Unit unit : campaign.getAllHangar().getUnits()) {
             return unit;
         }
 

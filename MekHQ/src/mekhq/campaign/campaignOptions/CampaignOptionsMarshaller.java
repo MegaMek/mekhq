@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -60,6 +60,8 @@ public class CampaignOptionsMarshaller {
               campaignOptions.getManualUnitRatingModifier());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clampReputationPayMultiplier",
               campaignOptions.isClampReputationPayMultiplier());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "requireSupportForceTransportation",
+              campaignOptions.isRequireSupportForceTransportation());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "reduceReputationPerformanceModifier",
@@ -134,6 +136,7 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "missionXpOutstandingSuccess",
               campaignOptions.getMissionXpOutstandingSuccess());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "edgeCost", campaignOptions.getEdgeCost());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "edgeRefreshCost", campaignOptions.getEdgeRefreshCost());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "attributeCost", campaignOptions.getAttributeCost());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "limitByYear", campaignOptions.isLimitByYear());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "disallowExtinctStuff", campaignOptions.isDisallowExtinctStuff());
@@ -253,12 +256,18 @@ public class CampaignOptionsMarshaller {
               campaignOptions.getAutoLogisticsJumpJets());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsEngines", campaignOptions.getAutoLogisticsEngines());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsWeapons", campaignOptions.getAutoLogisticsWeapons());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsGyros", campaignOptions.getAutoLogisticsGyros());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "autoLogisticsHeadComponents",
+              campaignOptions.getAutoLogisticsHeadComponents());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoLogisticsOther", campaignOptions.getAutoLogisticsOther());
 
         // region Personnel Tab
         // region General Personnel
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useTactics", campaignOptions.isUseTactics());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useInitiativeBonus", campaignOptions.isUseInitiativeBonus());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSensibleTactics", campaignOptions.isUseSensibleTactics());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useToughness", campaignOptions.isUseToughness());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomToughness", campaignOptions.isUseRandomToughness());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useArtillery", campaignOptions.isUseArtillery());
@@ -275,8 +284,11 @@ public class CampaignOptionsMarshaller {
               indent,
               "onlyCommandersMatterBattleArmor",
               campaignOptions.isOnlyCommandersMatterBattleArmor());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "edgeRefreshPeriod",
+              campaignOptions.getEdgeRefreshPeriod().getLookupKey());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useEdge", campaignOptions.isUseEdge());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSupportEdge", campaignOptions.isUseSupportEdge());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useImplants", campaignOptions.isUseImplants());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
@@ -311,6 +323,10 @@ public class CampaignOptionsMarshaller {
               indent,
               "awardVeterancySPAs",
               campaignOptions.isAwardVeterancySPAs());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "awardRelevantVeterancySPAs",
+              campaignOptions.isAwardRelevantVeterancySPAs());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "rewardComingOfAgeAbilities",
@@ -504,6 +520,10 @@ public class CampaignOptionsMarshaller {
               campaignOptions.isUseRandomPersonalities());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
+              "usePersonalityLabelsOnly",
+              campaignOptions.isUsePersonalityLabelsOnly());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
               "useRandomPersonalityReputation",
               campaignOptions.isUseRandomPersonalityReputation());
         MHQXMLUtility.writeSimpleXMLTag(pw,
@@ -548,6 +568,10 @@ public class CampaignOptionsMarshaller {
               indent,
               "payBonusDefaultThreshold",
               campaignOptions.getPayBonusDefaultThreshold());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "includeCivilians",
+              campaignOptions.isIncludeCivilians());
 
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
@@ -635,6 +659,14 @@ public class CampaignOptionsMarshaller {
               indent,
               "announceChildBirthdays",
               campaignOptions.isAnnounceChildBirthdays());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "announceRetireeDeath",
+              campaignOptions.isAnnounceRetireeDeath());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "announceRetireeDeathExpanded",
+              campaignOptions.isAnnounceRetireeDeathExpanded());
         // endregion Announcements
 
         // region Life Events
@@ -1055,6 +1087,10 @@ public class CampaignOptionsMarshaller {
               campaignOptions.getDropShipBonusPercentage());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
+              "pityContracts",
+              campaignOptions.getPityContracts());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
               "isUseTwoWayPay",
               campaignOptions.isUseTwoWayPay());
         MHQXMLUtility.writeSimpleXMLTag(pw,
@@ -1114,7 +1150,6 @@ public class CampaignOptionsMarshaller {
               "opForLanceTypeVehicles",
               campaignOptions.getOpForLanceTypeVehicles());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useDropShips", campaignOptions.isUseDropShips());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mercSizeLimited", campaignOptions.isMercSizeLimited());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "moraleVictoryEffect", campaignOptions.getMoraleVictoryEffect());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
@@ -1144,12 +1179,23 @@ public class CampaignOptionsMarshaller {
               campaignOptions.isAllowDuplicatePortraits());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useGenderedPortraitsOnly",
               campaignOptions.isUseGenderedPortraitsOnly());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "childPortraitsWhenComingOfAge",
+              campaignOptions.isChildPortraitsWhenComingOfAge());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "noRandomPortraitsForChildren",
+              campaignOptions.isNoRandomPortraitsForChildren());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fixedMapChance", campaignOptions.getFixedMapChance());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "useAdvancedBuildingGunEmplacements",
               campaignOptions.isUseAdvancedBuildingGunEmplacements());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "spaUpgradeIntensity", campaignOptions.getSpaUpgradeIntensity());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "reinforcementBaseTargetNumber",
+              campaignOptions.getReinforcementBaseTargetNumber());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clansObeyBiddingRules", campaignOptions.isClansObeyBiddingRules());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "alliedFacilityModifierDieSize",
+              campaignOptions.getAlliedFacilityModifierDieSize());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enemyFacilityModifierDieSize",
+              campaignOptions.getEnemyFacilityModifierDieSize());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioModMax", campaignOptions.getScenarioModMax());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioModChance", campaignOptions.getScenarioModChance());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioModBV", campaignOptions.getScenarioModBV());

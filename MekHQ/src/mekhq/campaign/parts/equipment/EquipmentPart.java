@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -50,6 +50,7 @@ import megamek.common.units.Entity;
 import megamek.common.weapons.bayWeapons.BayWeapon;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.Warehouse;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
@@ -258,16 +259,20 @@ public class EquipmentPart extends Part {
                 campaign.getQuartermaster().addPart(missing, 0, false);
             }
 
+            // Capture target warehouse before detaching from unit
+            Warehouse targetWarehouse = unit.getWarehouse() != null ? unit.getWarehouse() : campaign.getWarehouse();
+
             unit.removePart(this);
             setUnit(null);
             setEquipmentNum(-1);
 
             if (!salvage) {
-                campaign.getWarehouse().removePart(this);
+                getWarehouse().removePart(this);
             } else {
-                // Now that we're a spare part, add us back into the campaign
-                // to merge us with any other parts of the same type
-                campaign.getQuartermaster().addPart(this, 0, false);
+                // Return the stripped part to the warehouse at the unit's location
+                this.setDaysToArrival(0);
+                this.postProcessCampaignAddition();
+                targetWarehouse.addPart(this, true);
             }
 
             checkWeaponBay(unit, getType(), equipmentNum);

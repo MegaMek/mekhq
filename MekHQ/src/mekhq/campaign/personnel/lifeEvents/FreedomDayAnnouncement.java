@@ -159,7 +159,7 @@ public record FreedomDayAnnouncement(Campaign campaign) {
         List<Person> factionPool = new ArrayList<>();
         List<Person> activePool = new ArrayList<>();
 
-        for (Person person : campaign.getPersonnel()) {
+        for (Person person : campaign.getAllPersonnel()) {
             if (isIneligible(commander, person)) {
                 continue;
             }

@@ -41,7 +41,7 @@ import static mekhq.campaign.market.enums.UnitMarketRarity.UNCOMMON;
 import static mekhq.campaign.market.enums.UnitMarketRarity.VERY_COMMON;
 import static mekhq.campaign.market.enums.UnitMarketRarity.VERY_RARE;
 import static mekhq.campaign.market.enums.UnitMarketType.getPricePercentage;
-import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
+import static mekhq.campaign.randomEvents.other.GrayMonday.isGrayMonday;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getAmazingColor;
@@ -145,6 +145,7 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
             // Employer Market
             faction = contract.getEmployerFaction();
 
+            int totalModifier;
             int standingsModifier = 0;
             if (campaign.getCampaignOptions().isUseFactionStandingUnitMarketSafe()) {
                 FactionStandings factionStandings = campaign.getFactionStandings();
@@ -152,30 +153,34 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
                 standingsModifier = FactionStandingUtilities.getUnitMarketRarityModifier(regard);
             }
 
-            int totalModifier = rarityModifier + standingsModifier;
+            totalModifier = rarityModifier + standingsModifier;
 
-            addOffers(campaign, getMarketItemCount(campaign, RARE, totalModifier),
-                  UnitMarketType.EMPLOYER, UnitType.MEK, faction, DragoonRating.DRAGOON_D.getRating(), -1);
+            // ComStar and WoB won't sell their goodies out of faction
+            if (campaign.getFaction().isComStarOrWoB() || !faction.isComStarOrWoB()) {
 
-            addOffers(campaign,
-                  getMarketItemCount(campaign, RARE, totalModifier),
-                  UnitMarketType.EMPLOYER,
-                  UnitType.AEROSPACE_FIGHTER,
-                  faction,
-                  DragoonRating.DRAGOON_D.getRating(),
-                  -1);
+                addOffers(campaign, getMarketItemCount(campaign, RARE, totalModifier),
+                      UnitMarketType.EMPLOYER, UnitType.MEK, faction, DragoonRating.DRAGOON_D.getRating(), -1);
 
-            addOffers(campaign, getMarketItemCount(campaign, COMMON, totalModifier),
-                  UnitMarketType.EMPLOYER, UnitType.TANK, faction, DragoonRating.DRAGOON_D.getRating(), -1);
+                addOffers(campaign,
+                      getMarketItemCount(campaign, RARE, totalModifier),
+                      UnitMarketType.EMPLOYER,
+                      UnitType.AEROSPACE_FIGHTER,
+                      faction,
+                      DragoonRating.DRAGOON_D.getRating(),
+                      -1);
 
-            addOffers(campaign, getMarketItemCount(campaign, UNCOMMON, totalModifier),
-                  UnitMarketType.EMPLOYER, UnitType.CONV_FIGHTER, faction, DragoonRating.DRAGOON_D.getRating(), -1);
+                addOffers(campaign, getMarketItemCount(campaign, COMMON, totalModifier),
+                      UnitMarketType.EMPLOYER, UnitType.TANK, faction, DragoonRating.DRAGOON_D.getRating(), -1);
 
-            addOffers(campaign, getMarketItemCount(campaign, RARE, totalModifier),
-                  UnitMarketType.EMPLOYER, UnitType.BATTLE_ARMOR, faction, DragoonRating.DRAGOON_D.getRating(), -1);
+                addOffers(campaign, getMarketItemCount(campaign, UNCOMMON, totalModifier),
+                      UnitMarketType.EMPLOYER, UnitType.CONV_FIGHTER, faction, DragoonRating.DRAGOON_D.getRating(), -1);
 
-            addOffers(campaign, getMarketItemCount(campaign, UBIQUITOUS, totalModifier),
-                  UnitMarketType.EMPLOYER, UnitType.INFANTRY, faction, DragoonRating.DRAGOON_D.getRating(), -1);
+                addOffers(campaign, getMarketItemCount(campaign, RARE, totalModifier),
+                      UnitMarketType.EMPLOYER, UnitType.BATTLE_ARMOR, faction, DragoonRating.DRAGOON_D.getRating(), -1);
+
+                addOffers(campaign, getMarketItemCount(campaign, UBIQUITOUS, totalModifier),
+                      UnitMarketType.EMPLOYER, UnitType.INFANTRY, faction, DragoonRating.DRAGOON_D.getRating(), -1);
+            }
 
             // Unwanted Salvage Market
             faction = contract.getEnemy();

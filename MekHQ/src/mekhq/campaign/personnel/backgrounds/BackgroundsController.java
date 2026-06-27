@@ -100,7 +100,7 @@ public class BackgroundsController {
                 yield name + newWordSuggestion;
             }
             // Pre-Fab
-            case 3 -> name + getWeightedPreFab().randomItem();
+            case 3 -> getWeightedPreFab().randomItem();
             default -> throw new IllegalStateException(
                   "Unexpected value in mekhq/campaign/personnel/backgrounds/BackgroundsController.java/getNameBody: "
                         + roll

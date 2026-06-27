@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -262,7 +262,7 @@ public class OmniPod extends Part {
     @Override
     public void fix() {
         Part newPart = partType.clone();
-        Part oldPart = campaign.getWarehouse().checkForExistingSparePart(newPart.clone());
+        Part oldPart = getWarehouse().checkForExistingSparePart(newPart.clone());
         if (null != oldPart) {
             newPart.setOmniPodded(true);
             campaign.getQuartermaster().addPart(newPart, 0, false);

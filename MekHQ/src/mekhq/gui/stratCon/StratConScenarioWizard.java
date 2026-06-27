@@ -44,6 +44,7 @@ import static mekhq.campaign.stratCon.StratConRulesManager.ReinforcementResultsT
 import static mekhq.campaign.stratCon.StratConRulesManager.ReinforcementResultsType.FAILED;
 import static mekhq.campaign.stratCon.StratConRulesManager.ReinforcementResultsType.INSTANT;
 import static mekhq.campaign.stratCon.StratConRulesManager.calculateReinforcementTargetNumber;
+import static mekhq.campaign.stratCon.StratConRulesManager.commanderLanceHasDefensiveAssignment;
 import static mekhq.campaign.stratCon.StratConRulesManager.getEligibleLeadershipUnits;
 import static mekhq.campaign.stratCon.StratConRulesManager.getReinforcementType;
 import static mekhq.campaign.stratCon.StratConRulesManager.processReinforcementDeployment;
@@ -230,17 +231,21 @@ public class StratConScenarioWizard extends JDialog {
         if (isPrimaryForce) {
             gbc.gridy++;
             AtBDynamicScenario backingScenario = currentScenario.getBackingScenario();
-            int leadershipSkill = backingScenario.getLanceCommanderSkill(S_LEADER, campaign);
 
-            if (backingScenario.getStratConScenarioType().isOfficialChallenge()) {
-                leadershipSkill = 0; // No leadership units for combat challenges, that'd be cheating
+            if (commanderLanceHasDefensiveAssignment(backingScenario, campaign)) {
+                int leadershipSkill = backingScenario.getLanceCommanderSkill(S_LEADER, campaign);
+                if (backingScenario.getStratConScenarioType().isOfficialChallenge()) {
+                    leadershipSkill = 0; // No leadership units for combat challenges, that'd be cheating
+                }
+
+                eligibleLeadershipUnits = getEligibleLeadershipUnits(campaign, currentScenario, leadershipSkill);
+                eligibleLeadershipUnits.sort(Comparator.comparing(this::getForceNameReversed));
+
+                if (leadershipSkill > 0) {
+                    setLeadershipUI(gbc, eligibleLeadershipUnits, leadershipSkill);
+                    gbc.gridy++;
+                }
             }
-
-            eligibleLeadershipUnits = getEligibleLeadershipUnits(campaign, currentScenario, leadershipSkill);
-            eligibleLeadershipUnits.sort(Comparator.comparing(this::getForceNameReversed));
-
-            setLeadershipUI(gbc, eligibleLeadershipUnits, leadershipSkill);
-            gbc.gridy++;
 
             if (currentScenario.getNumDefensivePoints() > 0) {
                 setDefensiveUI(gbc);
@@ -502,7 +507,7 @@ public class StratConScenarioWizard extends JDialog {
      * Add an "available force list" to the given control
      */
     private JList<Formation> addAvailableForceList(JPanel parent, GridBagConstraints gbc,
-                                                   ScenarioForceTemplate forceTemplate) {
+          ScenarioForceTemplate forceTemplate) {
         JScrollPane forceListContainer = new FastJScrollPane();
 
         ScenarioWizardLanceModel lanceModel = new ScenarioWizardLanceModel(campaign,
@@ -731,11 +736,11 @@ public class StratConScenarioWizard extends JDialog {
         if (isPrimaryForce) {
             String instructions;
             Formation primaryFormation = currentScenario.getBackingScenario()
-                                       .getForces(campaign)
-                                       .getAllSubFormations()
-                                       .stream()
-                                       .findFirst()
-                                       .orElse(null);
+                                               .getForces(campaign)
+                                               .getAllSubFormations()
+                                               .stream()
+                                               .findFirst()
+                                               .orElse(null);
             if (primaryFormation != null) {
                 instructions = MHQInternationalization.getFormattedTextAt(resourcePath,
                       "lblLeadershipCommitForces.text",
@@ -846,8 +851,10 @@ public class StratConScenarioWizard extends JDialog {
         }
 
         Person commandLiaison = campaign.getSeniorAdminPerson(AdministratorSpecialization.COMMAND);
+        int baseTargetNumber = campaign.getCampaignOptions().getReinforcementBaseTargetNumber();
         TargetRoll targetNumber = calculateReinforcementTargetNumber(commandLiaison,
-              currentCampaignState.getContract());
+              currentCampaignState.getContract(),
+              baseTargetNumber);
         int availableSupportPoints = currentCampaignState.getSupportPoints();
 
         AtBContract contract = currentScenario.getBackingContract(campaign);
@@ -903,7 +910,7 @@ public class StratConScenarioWizard extends JDialog {
                                                  0
                                                  :
                                                  (dialog.getSupportPoints() * SUPPORT_POINTS_MODIFIER) /
-                                                       selectedForceCount;
+                                                 selectedForceCount;
                 int finalTargetNumber = targetNumber.getValue() + supportPointModifier;
 
                 btnCommitClicked(finalTargetNumber, false, true);

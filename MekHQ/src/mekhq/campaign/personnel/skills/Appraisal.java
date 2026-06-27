@@ -32,14 +32,15 @@
  */
 package mekhq.campaign.personnel.skills;
 
+import static mekhq.campaign.personnel.skills.SkillType.S_APPRAISAL;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.time.LocalDate;
-import java.util.List;
 
+import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
@@ -62,29 +63,25 @@ public class Appraisal {
      * Performs an appraisal skill check for a given person on the specified date and calculates the appraisal cost
      * multiplier based on the result.
      *
-     * @param person     the {@link Person} performing the appraisal skill check
+     * @param person     the {@link Person} performing the appraisal skill check; may be {@code null}, in which case no
+     *                   check is performed and the multiplier defaults to {@code 1.0}
      * @param currentDay the current date of the appraisal check
+     * @param isUseEdge  {@code true} if an Edge reroll should be used for a failed check
      *
      * @return the calculated appraisal cost multiplier as a {@code double}
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public static double performAppraisalMultiplierCheck(Person person, LocalDate currentDay) {
-        SkillCheckUtility skillCheckUtility = new SkillCheckUtility(
-              getTextAt(RESOURCE_BUNDLE, "Appraisal.skillCheck"),
-              person,
-              SkillType.S_APPRAISAL,
-              List.of(),
-              0,
-              false,
-              false,
-              false,
-              false,
-              currentDay);
-        int marginOfSuccessValue = skillCheckUtility.getMarginOfSuccess();
-
-        return getAppraisalCostMultiplier(marginOfSuccessValue);
+    public static double performAppraisalMultiplierCheck(@Nullable Person person, LocalDate currentDay,
+          boolean isUseEdge) {
+        if (person == null) {
+            return 1.0;
+        }
+        ActionCheckResult actionCheckResult =
+              person.checkSkill(S_APPRAISAL, false, false, currentDay)
+                    .resolve(isUseEdge, getTextAt(RESOURCE_BUNDLE, "Appraisal.skillCheck"));
+        return getAppraisalCostMultiplier(actionCheckResult.getMarginOfSuccess());
     }
 
     /**

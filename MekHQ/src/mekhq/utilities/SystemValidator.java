@@ -42,17 +42,12 @@ import java.util.zip.ZipFile;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import mekhq.MHQConstants;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Planet.PlanetaryEvent;
 import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.universe.SocioIndustrialData;
-import mekhq.campaign.universe.SourceableValue;
-import mekhq.campaign.universe.StarType;
+import mekhq.campaign.universe.PlanetarySystemYamlIO;
 import mekhq.campaign.universe.enums.PlanetaryType;
 import mekhq.utilities.ValidationMessage.Category;
 import mekhq.utilities.ValidationMessage.Severity;
@@ -81,15 +76,7 @@ public class SystemValidator {
      * Creates a new validator, initializing the YAML deserializer and loading known faction codes.
      */
     public SystemValidator() {
-        mapper = new ObjectMapper(new YAMLFactory());
-        SimpleModule module = new SimpleModule();
-        module.addDeserializer(SocioIndustrialData.class,
-              new SocioIndustrialData.SocioIndustrialDataDeserializer());
-        module.addDeserializer(StarType.class, new StarType.StarTypeDeserializer());
-        module.addDeserializer(SourceableValue.class, new SourceableValue.SourceableValueDeserializer());
-        mapper.registerModule(module);
-        mapper.registerModule(new JavaTimeModule());
-
+        mapper = PlanetarySystemYamlIO.createMapper();
         knownFactionCodes = loadFactionCodes();
     }
 
@@ -133,6 +120,18 @@ public class SystemValidator {
         }
 
         validateDirectory(dir, result, seenIds, seenSucsIds);
+        return result;
+    }
+
+    public ValidationResult validate(PlanetarySystem system, String sourceName) {
+        ValidationResult result = new ValidationResult();
+        if (system == null) {
+            result.addMessage(new ValidationMessage(Severity.ERROR, Category.YAML_PARSE_FAILURE,
+                  sourceName, "N/A", null, "No planetary system data was provided"));
+            return result;
+        }
+
+        validateSystem(system, sourceName, result, new HashMap<>());
         return result;
     }
 

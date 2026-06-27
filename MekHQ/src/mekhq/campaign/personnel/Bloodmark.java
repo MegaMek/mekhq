@@ -35,6 +35,7 @@ package mekhq.campaign.personnel;
 import static java.lang.Math.min;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
+import static megamek.common.units.Crew.DEATH;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.personnel.enums.BloodmarkLevel.BLOODMARK_ZERO;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -170,6 +171,10 @@ public class Bloodmark {
      */
     public static boolean checkForAssassinationAttempt(Person target, LocalDate today, boolean isCampaignPlanetside) {
         if (target.isChild(today, true)) { // Children are not eligible for bloodmark assassinations
+            return false;
+        }
+
+        if (target.getEduEducationTime() != 0) { // Student Bloodmarks are handled by the education system
             return false;
         }
 
@@ -367,7 +372,7 @@ public class Bloodmark {
             if (wounds > 0) {
                 InjuryUtil.resolveCombatDamage(campaign, person, wounds);
             }
-            if (person.getInjuries().size() >= 6) {
+            if (person.getTotalInjurySeverity() >= DEATH) {
                 person.changeStatus(campaign, today, PersonnelStatus.HOMICIDE);
             }
         } else {

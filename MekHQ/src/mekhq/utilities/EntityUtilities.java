@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -38,6 +38,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Mounted;
 import megamek.common.equipment.Sensor;
+import megamek.common.options.OptionsConstants;
 import megamek.common.units.Entity;
 import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
@@ -94,7 +95,8 @@ public class EntityUtilities {
      * <p>Improved Sensors are represented by the presence of a BAP (Beagle Active Probe) flag and an internal name
      * that matches either {@link Sensor#IS_IMPROVED} or {@link Sensor#CL_IMPROVED}.</p>
      *
-     * @param entity the {@link Entity} to check for improved sensors
+     * @param entity the {@link Entity} to check for improved sensors. They are also checked for
+     * the Improved Sensors quirk.
      *
      * @return {@code true} if the entity has Improved Sensors
      */
@@ -108,7 +110,7 @@ public class EntityUtilities {
                 }
             }
         }
-        return false;
+        return entity.hasQuirk(OptionsConstants.QUIRK_POS_IMPROVED_SENSORS);
     }
 
     /**

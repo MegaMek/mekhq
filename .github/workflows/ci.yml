@@ -26,13 +26,13 @@ jobs:
 
     steps:
       - name: Checkout Data Repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: megamek/mm-data
           path: mm-data
 
       - name: Checkout out MekHQ
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           path: mekhq
 
@@ -52,7 +52,7 @@ jobs:
           exit 0
 
       - name: Checkout MegaMek
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: ${{ steps.find_mm.outputs.mmRepo }}
           ref: ${{ steps.find_mm.outputs.mmBranch }}
@@ -80,7 +80,7 @@ jobs:
           exit 0
 
       - name: Checkout MegaMekLab
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: ${{ steps.find_mml.outputs.mmlRepo }}
           ref: ${{ steps.find_mml.outputs.mmlBranch }}
@@ -140,7 +140,7 @@ jobs:
         run: ./gradlew build -x test -PextraVersion="PR-${{ github.event.number }}-${{ env.COMMIT_SHORT_SHA }}"
 
       - name: CodeCov.io Coverage Report
-        uses: codecov/codecov-action@v6
+        uses: codecov/codecov-action@v7
         with:
           directory: ./mekhq/MekHQ/build/reports/jacoco/test
           fail_ci_if_error: false

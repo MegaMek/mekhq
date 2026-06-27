@@ -618,8 +618,7 @@ public class Academy implements Comparable<Academy> {
      * @return the adjusted tuition value as an Integer
      */
     public int getTuitionAdjusted(Person person) {
-        double educationLevel = Math.max(1,
-              getEducationLevel(person) - (EducationLevel.parseToInt(educationLevelMin) / 4));
+        double educationLevel = Math.max(1, getEducationLevel(person) - ((double) educationLevelMin.getLevel() / 4));
 
         return (int) (tuition * educationLevel);
     }
@@ -937,8 +936,7 @@ public class Academy implements Comparable<Academy> {
      *       required, false otherwise.
      */
     public boolean isQualified(Person person) {
-        return EducationLevel.parseToInt(person.getEduHighestEducation()) >=
-                     EducationLevel.parseToInt(educationLevelMin);
+        return person.getEduHighestEducation().getLevel() >= educationLevelMin.getLevel();
     }
 
     /**
@@ -961,9 +959,9 @@ public class Academy implements Comparable<Academy> {
      * @return The education level of the qualification.
      */
     public int getEducationLevel(Person person) {
-        int currentEducationLevel = EducationLevel.parseToInt(person.getEduHighestEducation());
-        int minimumEducationLevel = EducationLevel.parseToInt(educationLevelMin);
-        int maximumEducationLevel = EducationLevel.parseToInt(educationLevelMax);
+        int currentEducationLevel = person.getEduHighestEducation().getLevel();
+        int minimumEducationLevel = educationLevelMin.getLevel();
+        int maximumEducationLevel = educationLevelMax.getLevel();
 
         int educationLevel;
 
@@ -976,13 +974,7 @@ public class Academy implements Comparable<Academy> {
         }
 
         // this probably isn't necessary, but a little insurance goes a long way
-        if (educationLevel > EducationLevel.values().length - 1) {
-            educationLevel = EducationLevel.values().length - 1;
-        } else if (educationLevel < 0) {
-            educationLevel = 0;
-        }
-
-        return educationLevel;
+        return Math.clamp(educationLevel, EducationLevel.MIN_LEVEL, EducationLevel.MAX_LEVEL);
     }
 
     /**
@@ -1088,7 +1080,7 @@ public class Academy implements Comparable<Academy> {
                     if (skillName.equalsIgnoreCase("xp")) {
                         tooltip.append(skillName.toUpperCase()).append(" (");
 
-                        if (EducationLevel.parseToInt(person.getEduHighestEducation()) >= educationLevel) {
+                        if (person.getEduHighestEducation().getLevel() >= educationLevel) {
                             tooltip.append(resources.getString("nothingToLearn.text")).append(")<br>");
                         } else {
                             tooltip.append(educationLevel * campaign.getCampaignOptions().getCurriculumXpRate())
@@ -1159,6 +1151,9 @@ public class Academy implements Comparable<Academy> {
             // we need to do a little extra work to get travel time, to cover academies with
             // multiple campuses
             if (!isHomeSchool) {
+                if (destination == null) {
+                    destination = campaign.getCurrentSystem();
+                }
                 int distance = campaign.getSimplifiedTravelTime(destination);
 
                 tooltip.append("<b>").append(resources.getString("distance.text")).append("</b> ");
@@ -1198,7 +1193,7 @@ public class Academy implements Comparable<Academy> {
                 tooltip.append("<b>")
                       .append(resources.getString("educationLevel.text"))
                       .append("</b> ")
-                      .append(EducationLevel.fromString(String.valueOf(getEducationLevel(person))))
+                      .append(EducationLevel.fromLevel(getEducationLevel(person)))
                       .append("<br>");
             }
 

@@ -465,7 +465,7 @@ public class ForceViewPanel extends JScrollablePanel {
             lblUnit = new JLabel();
             if (null != p) {
                 lblPerson.setText(getForceSummary(p, unit));
-                lblPerson.setIcon(p.getPortrait().getImageIcon());
+                lblPerson.setIcon(p.getPortraitImageIconWithFallback(true, 54));
             } else {
                 lblPerson.getAccessibleContext().setAccessibleName("Unmanned Unit");
             }
@@ -535,8 +535,7 @@ public class ForceViewPanel extends JScrollablePanel {
             }
         }
 
-        int effectiveFatigue = getEffectiveFatigue(person.getAdjustedFatigue(), person.getPermanentFatigue(),
-              person.isClanPersonnel(), person.getSkillLevel(campaign, false, true));
+        int effectiveFatigue = getEffectiveFatigue(person, campaign);
         if (campaign.getCampaignOptions().isUseFatigue() && (effectiveFatigue > 0)) {
             isFatigued = true;
             if (isInjured) {

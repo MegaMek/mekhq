@@ -67,10 +67,10 @@ import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.rentals.ContractRentalType;
 import mekhq.campaign.mission.rentals.FacilityRentals;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerEvent;
-import mekhq.campaign.randomEvents.prisoners.enums.ResponseQuality;
-import mekhq.campaign.randomEvents.prisoners.records.PrisonerEventData;
+import mekhq.campaign.randomEvents.randomEventsSystem.EventEffectsManager;
+import mekhq.campaign.randomEvents.randomEventsSystem.PrisonerEvent;
+import mekhq.campaign.randomEvents.randomEventsSystem.PrisonerEventData;
+import mekhq.campaign.randomEvents.randomEventsSystem.ResponseQuality;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
@@ -274,7 +274,7 @@ public class PrisonerEventManager {
     List<Boolean> checkForPrisonerEvents(boolean isHeadless, int totalPrisoners, int prisonerCapacityUsage,
           int prisonerCapacity) {
         // Calculate overflow as the percentage over prisonerCapacity
-        double overflowPercentage = ((double) (prisonerCapacityUsage - prisonerCapacity) / prisonerCapacity) * 100;
+        double overflowPercentage = ((double) (prisonerCapacityUsage - prisonerCapacity) / prisonerCapacity);
 
         // If no overflow and total prisoners are below the minimum count, no risk of event
         if (overflowPercentage <= 0 && totalPrisoners < MINIMUM_PRISONER_COUNT) {
@@ -705,8 +705,8 @@ public class PrisonerEventManager {
                                           CLOSING_SPAN_TAG);
 
         // Add the report
-        campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, key), messageColor, CLOSING_SPAN_TAG,
-              crimeMessage);
+        campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, key, messageColor, CLOSING_SPAN_TAG,
+              crimeMessage));
     }
 
     /**
@@ -787,6 +787,11 @@ public class PrisonerEventManager {
                         }
                     }
 
+                    prisonerCapacity += unit.getTotalTempCrew() * (isMekHQCaptureStyle ?
+                                                                         PRISONER_CAPACITY_BATTLE_ARMOR :
+                                                                         PRISONER_CAPACITY_BATTLE_ARMOR *
+                                                                         PRISONER_CAPACITY_CAM_OPS_MULTIPLIER);
+
                     continue;
                 }
 
@@ -799,6 +804,12 @@ public class PrisonerEventManager {
                                                       PRISONER_CAPACITY_CAM_OPS_MULTIPLIER;
                         }
                     }
+
+                    prisonerCapacity += unit.getTotalTempCrew() * (isMekHQCaptureStyle ?
+                                                                         PRISONER_CAPACITY_CONVENTIONAL_INFANTRY :
+                                                                         PRISONER_CAPACITY_CONVENTIONAL_INFANTRY *
+                                                                         PRISONER_CAPACITY_CAM_OPS_MULTIPLIER);
+
                     continue;
                 }
 

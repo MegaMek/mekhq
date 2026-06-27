@@ -95,9 +95,9 @@ public class OtherModifiers {
         // or the campaign start date if there are no completed contracts
         LocalDate oldestMissionDate = contracts.isEmpty() ? campaign.getCampaignStartDate()
                                             : contracts.stream()
-                                              .map(AtBContract::getEndingDate)
-                                              .min(LocalDate::compareTo)
-                                              .orElse(today);
+                                                    .map(AtBContract::getEndingDate)
+                                                    .min(LocalDate::compareTo)
+                                                    .orElse(today);
 
         if (oldestMissionDate == null) {
             oldestMissionDate = today;
