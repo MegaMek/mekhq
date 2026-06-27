@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.randomEvents.randomEventsSystem;
+package mekhq.campaign.randomEvents.prisoners;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
@@ -65,8 +65,6 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle;
-import mekhq.campaign.randomEvents.prisoners.PrisonerEventManager;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.Nested;
@@ -80,7 +78,7 @@ import org.junit.jupiter.api.Test;
  * {@link PrisonerEventManager} class. The tests primarily focus on scenarios involving degradation of temporary
  * prisoner capacity and events triggered by prisoner or morale conditions.</p>
  */
-public class RandomEventTypeManagerTest {
+public class PrisonerEventManagerTest {
     @Test
     void testDegradeTemporaryCapacity_DegradeDownTowardsDefault() {
         final int INITIAL_TEMPORARY_CAPACITY = 150;
