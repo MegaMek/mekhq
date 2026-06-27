@@ -36,7 +36,6 @@ import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffective
 
 import java.awt.Component;
 import java.awt.Image;
-import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JTable;
@@ -45,9 +44,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
 import megamek.common.annotations.Nullable;
-import megamek.common.units.Jumpship;
-import megamek.common.units.SmallCraft;
-import megamek.common.units.UnitType;
 import mekhq.MHQOptions;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -248,85 +244,32 @@ public class PersonnelTableModel extends DataTableModel<Person> {
             final PersonnelTableModelColumn personnelColumn = PERSONNEL_COLUMNS[table.convertColumnIndexToModel(column)];
             final Person person = getPerson(modelRow);
 
-            switch (personnelColumn) {
-                case PERSON:
-                    setText(person.getFullDesc(campaign));
-                    setImage(person.getPortraitImageIconWithFallback(true, 54).getImage());
-                    break;
-                case UNIT_ASSIGNMENT:
-                    Unit unit = person.getUnit();
-                    if ((unit == null) && !person.getTechUnits().isEmpty()) {
-                        unit = person.getTechUnits().getFirst();
-                    }
-
-                    if (unit != null) {
-                        String description = "<b>" + unit.getName() + "</b><br>";
-                        description += unit.getEntity().getWeightClassName();
-                        if ((!(unit.getEntity() instanceof SmallCraft) || !(unit.getEntity() instanceof Jumpship))) {
-                            description += " " + UnitType.getTypeDisplayableName(unit.getEntity().getUnitType());
-                        }
-                        description += "<br>" + unit.getStatus();
-                        setText(description);
-                        Image mekImage = unit.getImage(this);
-                        if (mekImage != null) {
-                            setImage(mekImage);
-                        } else {
-                            clearImage();
-                        }
-                    } else {
-                        clearImage();
-                    }
-                    break;
-                case FORCE:
-                    Formation formation = campaign.getFormationFor(person);
-                    if (formation != null) {
-                        StringBuilder desc = new StringBuilder("<html><b>").append(formation.getName())
-                                                   .append("</b>");
-                        Formation parent = formation.getParentFormation();
-                        // cut off after three lines and don't include the top level
-                        int lines = 1;
-                        while ((parent != null) && (parent.getParentFormation() != null) && (lines < 4)) {
-                            desc.append("<br>").append(parent.getName());
-                            lines++;
-                            parent = parent.getParentFormation();
-                        }
-                        desc.append("</html>");
-                        setHtmlText(desc.toString());
-                        final Image forceImage = formation.getFormationIcon().getImage(54);
-                        if (forceImage != null) {
-                            setImage(forceImage);
-                        } else {
-                            clearImage();
-                        }
-                    } else {
-                        clearImage();
-                    }
-                    break;
-                case INJURIES:
-                    Image hitImage = getHitsImage(person.getHits());
-                    if (hitImage != null) {
-                        setImage(hitImage);
-                    } else {
-                        clearImage();
-                    }
-                    setHtmlText("");
-                    break;
-                default:
-                    break;
+            setText(personnelColumn.getText(value));
+            Image image = getImage(person, personnelColumn);
+            if (image != null) {
+                setImage(image);
+            } else {
+                clearImage();
             }
 
             MekHqTableCellRenderer.setupTableColors(this, table, isSelected, hasFocus, row);
             return this;
         }
 
-        private @Nullable Image getHitsImage(int hits) {
-            return switch (hits) {
-                case 1 -> Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/onehit.png");
-                case 2 -> Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/twohits.png");
-                case 3 -> Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/threehits.png");
-                case 4 -> Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/fourhits.png");
-                case 5 -> Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/fivehits.png");
-                case 6 -> Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/sixhits.png");
+        private Image getImage(Person person, PersonnelTableModelColumn personnelColumn) {
+            return switch (personnelColumn) {
+                case PERSON_GRAPHICAL -> person.getPortraitImageIconWithFallback(true, 54).getImage();
+                case UNIT_ASSIGNMENT_GRAPHICAL -> {
+                    Unit unit = person.getUnit();
+                    if ((unit == null) && !person.getTechUnits().isEmpty()) {
+                        unit = person.getTechUnits().getFirst();
+                    }
+                    yield (unit == null) ? null : unit.getImage(this);
+                }
+                case FORCE_GRAPHICAL -> {
+                    Formation formation = campaign.getFormationFor(person);
+                    yield  (formation == null) ? null : formation.getFormationIcon().getImage(54);
+                }
                 default -> null;
             };
         }
@@ -336,7 +279,4 @@ public class PersonnelTableModel extends DataTableModel<Person> {
         this.personnelMarket = personnelMarket;
     }
 
-    public boolean isLoadAssignmentFromMarket() {
-        return personnelMarket != null;
-    }
 }

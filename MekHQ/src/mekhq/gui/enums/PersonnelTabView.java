@@ -47,7 +47,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 
 public enum PersonnelTabView {
     GRAPHIC("PersonnelTabView.GRAPHIC.text", "PersonnelTabView.GRAPHIC.toolTipText",
-          Set.of(PERSON, FORCE, UNIT_ASSIGNMENT)),
+          Set.of(PERSON_GRAPHICAL, FORCE_GRAPHICAL, UNIT_ASSIGNMENT_GRAPHICAL)),
     GENERAL("PersonnelTabView.GENERAL.text", "PersonnelTabView.GENERAL.toolTipText",
           Set.of(RANK, FIRST_NAME, LAST_NAME, SKILL_LEVEL, PERSONNEL_ROLE, FORCE, DEPLOYED, INJURIES,
                 UNIT_ASSIGNMENT)),
