@@ -73,7 +73,7 @@ public class PersonnelTableModelColumnTest {
     public void testGetWidth() {
         for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
             switch (personnelTableModelColumn) {
-                case PERSON:
+                case PERSON_GRAPHICAL:
                 case MARKET_UNIT_ASSIGNMENT:
                 case UNIT_ASSIGNMENT:
                     assertEquals(125, personnelTableModelColumn.getWidth());
