@@ -103,7 +103,7 @@ public class AttributeCheck extends ActionCheck<AttributeCheck> {
     }
 
     @Override
-    public String getActionName() {
+    protected String getActionName() {
         String label = firstAttribute.getLabel();
         if (secondAttribute != null && secondAttribute != SkillAttribute.NO_ATTRIBUTE) {
             label = label + "-" + secondAttribute.getLabel();
