@@ -35,6 +35,7 @@ package mekhq.gui.enums;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
@@ -115,40 +116,31 @@ public class PersonnelTableModelColumnTest {
 
     @Test
     public void testGetAlignment() {
+        // check overrides and a few columns of different types
         for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
             switch (personnelTableModelColumn) {
-                case PERSON:
-                case RANK:
-                case FIRST_NAME:
-                case LAST_NAME:
-                case PRE_NOMINAL:
-                case GIVEN_NAME:
-                case SURNAME:
-                case SURNAME_GROUPED_BY_UNIT:
-                case BLOODNAME:
-                case POST_NOMINAL:
-                case CALLSIGN:
-                case GENDER:
-                case SKILL_LEVEL:
-                case PERSONNEL_ROLE:
-                case UNIT_ASSIGNMENT:
-                case MARKET_UNIT_ASSIGNMENT:
-                case FORCE:
-                case DEPLOYED:
-                case LOCATION_SYSTEM:
-                case LOCATION_PLANET:
-                case LOCATION_NAME:
-                case DESTINATION_SYSTEM:
-                case DESTINATION_PLANET:
-                case DESTINATION_NAME:
+                case RANK, SKILL_LEVEL ->
                     assertEquals(SwingConstants.LEFT, personnelTableModelColumn.getAlignment());
-                    break;
-                case SALARY:
+                case SALARY, TECH_MINUTES ->
                     assertEquals(SwingConstants.RIGHT, personnelTableModelColumn.getAlignment());
-                    break;
-                default:
+                case FIRST_NAME -> // String
+                    assertEquals(SwingConstants.LEFT, personnelTableModelColumn.getAlignment());
+                case AGE -> // Int
                     assertEquals(SwingConstants.CENTER, personnelTableModelColumn.getAlignment());
-                    break;
+                case VTOL -> // SkillPair
+                    assertEquals(SwingConstants.CENTER, personnelTableModelColumn.getAlignment());
+                case BIRTHDAY -> // Date
+                    assertEquals(SwingConstants.CENTER, personnelTableModelColumn.getAlignment());
+                case COMMANDER -> // Boolean
+                    assertEquals(SwingConstants.CENTER, personnelTableModelColumn.getAlignment());
+                case HIGHEST_EDUCATION -> // field
+                    assertEquals(SwingConstants.CENTER, personnelTableModelColumn.getAlignment());
+                case AGGRESSION -> // PersonalityTrait
+                    assertEquals(SwingConstants.CENTER, personnelTableModelColumn.getAlignment());
+                case REFLEXES -> // SkillAttribute
+                    assertEquals(SwingConstants.CENTER, personnelTableModelColumn.getAlignment());
+                default ->
+                    assertTrue(SwingConstants.RIGHT != personnelTableModelColumn.getAlignment());
             }
         }
     }
