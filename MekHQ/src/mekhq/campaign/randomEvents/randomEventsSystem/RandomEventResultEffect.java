@@ -37,6 +37,8 @@ package mekhq.campaign.randomEvents.randomEventsSystem;
  * such as improving a skill, causing injury, or even death.
  */
 public enum RandomEventResultEffect {
+    // NEVER EVER EVER EVER RENAME THESE ENUMS
+
     /**
      * The event produces no effect.
      */
