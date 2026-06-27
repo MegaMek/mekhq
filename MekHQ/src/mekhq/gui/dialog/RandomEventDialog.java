@@ -325,14 +325,14 @@ public class RandomEventDialog {
     }
 
     private void resolveAttributeCheck(boolean useEdge, AttributeCheck attributeCheck, String reason) {
-        ActionCheckResult result = attributeCheck.resolve(useEdge, reason, true);
-        attributeCheckResultsText = result.resultsText();
+        ActionCheckResult result = attributeCheck.resolve(useEdge, reason);
+        attributeCheckResultsText = result.getReport(true);
         wasSuccessful = result.isSuccess();
     }
 
     private void resolveSkillCheck(boolean useEdge, SkillCheck skillCheck, String reason) {
-        ActionCheckResult result = skillCheck.resolve(useEdge, reason, true);
-        skillCheckResultsText = result.resultsText();
+        ActionCheckResult result = skillCheck.resolve(useEdge, reason);
+        skillCheckResultsText = result.getReport(true);
         wasSuccessful = result.isSuccess();
     }
 
