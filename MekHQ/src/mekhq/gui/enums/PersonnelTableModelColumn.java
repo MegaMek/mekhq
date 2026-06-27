@@ -86,7 +86,7 @@ import org.jspecify.annotations.NonNull;
 public enum PersonnelTableModelColumn {
 
     PERSON_GRAPHICAL("Column.PERSON.title", Comparators.STRING_COMPARATOR,
-          Person::getFullDesc),
+          (person, campaign) -> "<html>" + person.getFullDesc(campaign) + "</html>"),
     RANK("Column.RANK.title", PersonRankSorter.INSTANCE,
           person -> person, Person::getRankName),
     FIRST_NAME("Column.FIRST_NAME.title", Comparators.STRING_COMPARATOR,
@@ -607,12 +607,12 @@ public enum PersonnelTableModelColumn {
         }
 
         if (unit != null) {
-            String description = "<b>" + unit.getName() + "</b><br>";
+            String description = "<html><b>" + unit.getName() + "</b><br>";
             description += unit.getEntity().getWeightClassName();
             if ((!(unit.getEntity() instanceof SmallCraft) || !(unit.getEntity() instanceof Jumpship))) {
                 description += " " + UnitType.getTypeDisplayableName(unit.getEntity().getUnitType());
             }
-            description += "<br>" + unit.getStatus();
+            description += "<br>" + unit.getStatus() + "</html>";
             return description;
         }
         return "-";

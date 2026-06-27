@@ -38,6 +38,7 @@ import java.awt.Component;
 import java.awt.Image;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.ImageIcon;
 import javax.swing.JTable;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -49,12 +50,9 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.BasicInfo;
-import mekhq.gui.enums.PersonnelTabView;
 import mekhq.gui.enums.PersonnelTableModelColumn;
 import mekhq.gui.utilities.ComponentColors;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
@@ -69,8 +67,8 @@ public class PersonnelTableModel extends DataTableModel<Person> {
     public static final PersonnelTableModelColumn[] PERSONNEL_COLUMNS = PersonnelTableModelColumn.values();
 
     private final Campaign campaign;
-    private PersonnelMarket personnelMarket;
     private boolean groupByUnit;
+    private final TableCellRenderer renderer = new Renderer();
 
     public PersonnelTableModel(Campaign c) {
         data = new ArrayList<>();
@@ -155,8 +153,8 @@ public class PersonnelTableModel extends DataTableModel<Person> {
         }
     }
 
-    public TableCellRenderer getRenderer(final @Nullable PersonnelTabView view) {
-        return ((view != null) && view.isGraphic()) ? new VisualRenderer() : new Renderer();
+    public TableCellRenderer getRenderer() {
+        return renderer;
     }
 
     public class Renderer extends DefaultTableCellRenderer {
@@ -183,6 +181,14 @@ public class PersonnelTableModel extends DataTableModel<Person> {
             // Tool Tips - includes all applicable color reasons for name/rank/status columns
             setToolTipText(personnelColumn.getToolTipText(person, personalStateFlags));
 
+            Image image = getImage(person, personnelColumn);
+            if (image != null) {
+                setIcon(new ImageIcon(image));
+            } else {
+                setIcon(null);
+            }
+
+            MekHqTableCellRenderer.setupTableColors(this, table, isSelected, hasFocus, row);
             return this;
         }
 
@@ -230,31 +236,6 @@ public class PersonnelTableModel extends DataTableModel<Person> {
             return (cellColors == null) ? new ComponentColors(UIManager.getColor("Table.foreground"),
                   UIManager.getColor("Table.background")) : cellColors;
         }
-    }
-
-    public class VisualRenderer extends BasicInfo implements TableCellRenderer {
-        public VisualRenderer() {
-            super();
-        }
-
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-              boolean hasFocus, int row, int column) {
-            final int modelRow = table.convertRowIndexToModel(row);
-            final PersonnelTableModelColumn personnelColumn = PERSONNEL_COLUMNS[table.convertColumnIndexToModel(column)];
-            final Person person = getPerson(modelRow);
-
-            setText(personnelColumn.getText(value));
-            Image image = getImage(person, personnelColumn);
-            if (image != null) {
-                setImage(image);
-            } else {
-                clearImage();
-            }
-
-            MekHqTableCellRenderer.setupTableColors(this, table, isSelected, hasFocus, row);
-            return this;
-        }
 
         private Image getImage(Person person, PersonnelTableModelColumn personnelColumn) {
             return switch (personnelColumn) {
@@ -273,10 +254,6 @@ public class PersonnelTableModel extends DataTableModel<Person> {
                 default -> null;
             };
         }
-    }
-
-    public void loadAssignmentFromMarket(PersonnelMarket personnelMarket) {
-        this.personnelMarket = personnelMarket;
     }
 
 }
