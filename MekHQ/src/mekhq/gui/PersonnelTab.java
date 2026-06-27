@@ -484,7 +484,7 @@ public final class PersonnelTab extends CampaignGuiTab {
             tableColumn.setPreferredWidth(column.getWidth());
             columnModel.setColumnVisible(tableColumn, visibleColumns.contains(column));
         }
-
+        personnelTable.setRowHeight(UIUtil.scaleForGUI((view == PersonnelTabView.GRAPHIC) ? 60 : 15));
         // reattach the updated model
         personnelTable.setColumnModel(columnModel);
     }

@@ -32,8 +32,6 @@
  */
 package mekhq.gui.enums;
 
-import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
-
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.function.BiFunction;
@@ -72,6 +70,7 @@ import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
+import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.randomEvents.personalities.PersonalityTrait;
 import mekhq.campaign.randomEvents.personalities.Reasoning;
 import mekhq.campaign.unit.Unit;
@@ -305,10 +304,7 @@ public enum PersonnelTableModelColumn {
     BLOODMARK("Column.BLOODMARK.title", Comparators.INT_COMPARATOR,
           Person::getBloodmark, Object::toString),
     FATIGUE("Column.FATIGUE.title", Comparators.INT_COMPARATOR,
-          (person, campaign) ->
-                getEffectiveFatigue(person.getAdjustedFatigue(),
-                      person.getPermanentFatigue(), person.isClanPersonnel(),
-                      person.getSkillLevel(campaign, false, true)), Object::toString),
+          Fatigue::getEffectiveFatigue, Object::toString),
     SPA_COUNT("Column.SPA_COUNT.title", Comparators.INT_COMPARATOR,
           person -> person.countOptions(PersonnelOptions.LVL3_ADVANTAGES), Object::toString),
     MODIFICATION_COUNT("Column.MODIFICATION_COUNT.title", Comparators.INT_COMPARATOR,
