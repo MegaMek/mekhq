@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -74,7 +74,7 @@ import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.enums.*;
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
+import mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle;
 import mekhq.campaign.stratCon.StratConPlayType;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
@@ -238,7 +238,6 @@ public class CampaignOptions {
     private boolean onlyCommandersMatterBattleArmor;
     private EdgeRefreshPeriod edgeRefreshPeriod;
     private boolean useEdge;
-    private boolean useSupportEdge;
     private boolean useImplants;
     private boolean alternativeQualityAveraging;
     private boolean useAgeEffects;
@@ -348,6 +347,7 @@ public class CampaignOptions {
     // Random Histories
     private RandomOriginOptions randomOriginOptions;
     private boolean useRandomPersonalities;
+    private boolean usePersonalityLabelsOnly;
     private boolean useRandomPersonalityReputation;
     private boolean useReasoningXpMultiplier;
     private boolean useSimulatedRelationships;
@@ -859,7 +859,6 @@ public class CampaignOptions {
         edgeRefreshPeriod = EdgeRefreshPeriod.WEEKLY;
         setOnlyCommandersMatterBattleArmor(false);
         setUseEdge(false);
-        setUseSupportEdge(false);
         setUseImplants(false);
         setAlternativeQualityAveraging(false);
         setUseAgeEffects(false);
@@ -1007,6 +1006,7 @@ public class CampaignOptions {
         // Random Histories
         setRandomOriginOptions(new RandomOriginOptions(true));
         setUseRandomPersonalities(false);
+        setUsePersonalityLabelsOnly(false);
         setUseRandomPersonalityReputation(true);
         setUseReasoningXpMultiplier(true);
         setUseSimulatedRelationships(false);
@@ -1736,14 +1736,6 @@ public class CampaignOptions {
         this.useEdge = useEdge;
     }
 
-    public boolean isUseSupportEdge() {
-        return useSupportEdge;
-    }
-
-    public void setUseSupportEdge(final boolean useSupportEdge) {
-        this.useSupportEdge = useSupportEdge;
-    }
-
     public boolean isUseImplants() {
         return useImplants;
     }
@@ -2327,6 +2319,14 @@ public class CampaignOptions {
 
     public void setUseRandomPersonalities(final boolean useRandomPersonalities) {
         this.useRandomPersonalities = useRandomPersonalities;
+    }
+
+    public boolean isUsePersonalityLabelsOnly() {
+        return usePersonalityLabelsOnly;
+    }
+
+    public void setUsePersonalityLabelsOnly(final boolean usePersonalityLabelsOnly) {
+        this.usePersonalityLabelsOnly = usePersonalityLabelsOnly;
     }
 
     public boolean isUseRandomPersonalityReputation() {

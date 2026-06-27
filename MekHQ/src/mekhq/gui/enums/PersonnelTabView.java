@@ -32,149 +32,157 @@
  */
 package mekhq.gui.enums;
 
-import java.util.ResourceBundle;
+import static mekhq.gui.enums.PersonnelTableModelColumn.*;
 
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 
 public enum PersonnelTabView {
-    //region Enum Declarations
-    GRAPHIC("PersonnelTabView.GRAPHIC.text", "PersonnelTabView.GRAPHIC.toolTipText"),
-    GENERAL("PersonnelTabView.GENERAL.text", "PersonnelTabView.GENERAL.toolTipText"),
-    COMBAT("PersonnelTabView.COMBAT.text", "PersonnelTabView.COMBAT.toolTipText"),
+    GRAPHIC("PersonnelTabView.GRAPHIC.text", "PersonnelTabView.GRAPHIC.toolTipText",
+          Set.of(PERSON, FORCE, UNIT_ASSIGNMENT)),
+    GENERAL("PersonnelTabView.GENERAL.text", "PersonnelTabView.GENERAL.toolTipText",
+          Set.of(RANK, FIRST_NAME, LAST_NAME, SKILL_LEVEL, PERSONNEL_ROLE, FORCE, DEPLOYED, INJURIES,
+                UNIT_ASSIGNMENT)),
+    COMBAT("PersonnelTabView.COMBAT.text", "PersonnelTabView.COMBAT.toolTipText",
+          Set.of(RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, AGGREGATE_COMBAT, ARTILLERY, SCOUTING, LEADERSHIP,
+                TACTICS, STRATEGY)),
     GUNNERY_PILOT_SKILLS("PersonnelTabView.GUNNERY_PILOT_SKILLS.text",
-          "PersonnelTabView.GUNNERY_PILOT_SKILLS.toolTipText"),
+          "PersonnelTabView.GUNNERY_PILOT_SKILLS.toolTipText",
+          Set.of(RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, MEK, GROUND_VEHICLE, NAVAL_VEHICLE, VTOL)),
     GUNNERY_PILOT_SKILLS_II("PersonnelTabView.GUNNERY_PILOT_SKILLS_II.text",
-          "PersonnelTabView.GUNNERY_PILOT_SKILLS_II.toolTipText"),
-    INFANTRY_SKILLS("PersonnelTabView.INFANTRY_SKILLS.text", "PersonnelTabView.INFANTRY_SKILLS.toolTipText"),
-    TACTICAL_SKILLS("PersonnelTabView.TACTICAL_SKILLS.text", "PersonnelTabView.TACTICAL_SKILLS.toolTipText"),
-    TECHNICAL_SKILLS("PersonnelTabView.TECHNICAL_SKILLS.text", "PersonnelTabView.TECHNICAL_SKILLS.toolTipText"),
-    MEDICAL_SKILLS("PersonnelTabView.MEDICAL_SKILLS.text", "PersonnelTabView.MEDICAL_SKILLS.toolTipText"),
+          "PersonnelTabView.GUNNERY_PILOT_SKILLS_II.toolTipText",
+          Set.of(RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, AEROSPACE, CONVENTIONAL_AIRCRAFT, VESSEL, ARTILLERY)),
+    INFANTRY_SKILLS("PersonnelTabView.INFANTRY_SKILLS.text", "PersonnelTabView.INFANTRY_SKILLS.toolTipText",
+          Set.of(RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, PROTOMEK, BATTLE_ARMOUR, SMALL_ARMS, ANTI_MEK)),
+    TACTICAL_SKILLS("PersonnelTabView.TACTICAL_SKILLS.text", "PersonnelTabView.TACTICAL_SKILLS.toolTipText",
+          Set.of(RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, TACTICS, STRATEGY, LEADERSHIP, NAVIGATION, SCOUTING)),
+    TECHNICAL_SKILLS("PersonnelTabView.TECHNICAL_SKILLS.text", "PersonnelTabView.TECHNICAL_SKILLS.toolTipText",
+          Set.of(RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, ASTECH, TECH_MEK, TECH_AERO, TECH_MECHANIC, TECH_BA,
+                TECH_VESSEL, ZERO_G, WORK_MINUTES, TECH_MINUTES)),
+    MEDICAL_SKILLS("PersonnelTabView.MEDICAL_SKILLS.text", "PersonnelTabView.MEDICAL_SKILLS.toolTipText",
+          Set.of(RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, MEDTECH, MEDICAL, MEDICAL_CAPACITY)),
     ADMINISTRATIVE_SKILLS("PersonnelTabView.ADMINISTRATIVE_SKILLS.text",
-          "PersonnelTabView.ADMINISTRATIVE_SKILLS.toolTipText"),
-    TRAITS("PersonnelTabView.TRAITS.text", "PersonnelTabView.TRAITS.toolTipText"),
-    ATTRIBUTES("PersonnelTabView.ATTRIBUTES.text", "PersonnelTabView.ATTRIBUTES.toolTipText"),
-    PERSONALITY("PersonnelTabView.PERSONALITY.text", "PersonnelTabView.PERSONALITY.toolTipText"),
-    BIOGRAPHICAL("PersonnelTabView.BIOGRAPHICAL.text", "PersonnelTabView.BIOGRAPHICAL.toolTipText"),
-    FLUFF("PersonnelTabView.FLUFF.text", "PersonnelTabView.FLUFF.toolTipText"),
-    DATES("PersonnelTabView.DATES.text", "PersonnelTabView.DATES.toolTipText"),
-    FLAGS_A("PersonnelTabView.FLAGS_A.text", "PersonnelTabView.FLAGS_A.toolTipText"),
-    FLAGS_B("PersonnelTabView.FLAGS_B.text", "PersonnelTabView.FLAGS_B.toolTipText"),
-    FLAGS_C("PersonnelTabView.FLAGS_C.text", "PersonnelTabView.FLAGS_C.toolTipText"),
-    TRANSPORT("PersonnelTabView.TRANSPORT.text", "PersonnelTabView.TRANSPORT.toolTipText"),
-    EDUCATION("PersonnelTabView.EDUCATION.text", "PersonnelTabView.EDUCATION.toolTipText"),
-    LOCATION("PersonnelTabView.LOCATION.text", "PersonnelTabView.LOCATION.toolTipText"),
-    OTHER("PersonnelTabView.OTHER.text", "PersonnelTabView.OTHER.toolTipText");
-    //endregion Enum Declarations
+          "PersonnelTabView.ADMINISTRATIVE_SKILLS.toolTipText",
+          Set.of(RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, ADMINISTRATION, NEGOTIATION, TRAINING, APPRAISAL)),
+    TRAITS("PersonnelTabView.TRAITS.text", "PersonnelTabView.TRAITS.toolTipText",
+          Set.of(RANK, FIRST_NAME, LAST_NAME, CONNECTIONS, WEALTH, EXTRA_INCOME, REPUTATION, UNLUCKY, BLOODMARK)),
+    ATTRIBUTES("PersonnelTabView.ATTRIBUTES.text", "PersonnelTabView.ATTRIBUTES.toolTipText",
+          Set.of(RANK, FIRST_NAME, LAST_NAME, STRENGTH, BODY, REFLEXES, DEXTERITY, INTELLIGENCE, WILLPOWER, CHARISMA,
+                EDGE),
+          Map.of(EDGE, CampaignOptions::isUseEdge)),
+    PERSONALITY("PersonnelTabView.PERSONALITY.text", "PersonnelTabView.PERSONALITY.toolTipText",
+          Set.of(RANK, FIRST_NAME, LAST_NAME, AGGRESSION, AMBITION, GREED, SOCIAL, REASONING),
+          Map.of(AGGRESSION, CampaignOptions::isUseRandomPersonalities,
+                AMBITION, CampaignOptions::isUseRandomPersonalities,
+                GREED, CampaignOptions::isUseRandomPersonalities,
+                SOCIAL, CampaignOptions::isUseRandomPersonalities,
+                REASONING, CampaignOptions::isUseRandomPersonalities)),
+    BIOGRAPHICAL("PersonnelTabView.BIOGRAPHICAL.text", "PersonnelTabView.BIOGRAPHICAL.toolTipText",
+          Set.of(RANK, FIRST_NAME, LAST_NAME, AGE, PERSONNEL_STATUS, PERSONNEL_ROLE, HIGHEST_EDUCATION, ORIGIN_FACTION,
+                ORIGIN_PLANET, SALARY),
+          Map.of(ORIGIN_FACTION, CampaignOptions::isShowOriginFaction,
+                ORIGIN_PLANET, CampaignOptions::isShowOriginFaction,
+                SALARY, CampaignOptions::isPayForSalaries)),
+    FLUFF("PersonnelTabView.FLUFF.text", "PersonnelTabView.FLUFF.toolTipText",
+          Set.of(RANK, PRE_NOMINAL, GIVEN_NAME, SURNAME, SURNAME_GROUPED_BY_UNIT, BLOODNAME, POST_NOMINAL, CALLSIGN,
+                GENDER, PERSONNEL_ROLE, KILLS)),
+    DATES("PersonnelTabView.DATES.text", "PersonnelTabView.DATES.toolTipText",
+          Set.of(RANK, FIRST_NAME, LAST_NAME, BIRTHDAY, DEATH_DATE, RECRUITMENT_DATE, RETIREMENT_DATE,
+                LAST_RANK_CHANGE_DATE, DUE_DATE),
+          Map.of(RECRUITMENT_DATE, CampaignOptions::isUseTimeInService,
+                LAST_RANK_CHANGE_DATE, CampaignOptions::isUseTimeInRank,
+                DUE_DATE, options -> options.isUseManualProcreation() || !options.getRandomProcreationMethod().isNone())),
+    FAMILY("PersonnelTabView.FAMILY.text", "PersonnelTabView.FAMILY.toolTipText",
+          Set.of(RANK, FIRST_NAME, LAST_NAME, IS_MARRIED, FORMER_SPOUSES, CHILDREN, SIBLINGS, PARENTS, GRANDCHILDREN,
+                GRANDPARENTS, AUNTS_OR_UNCLES, COUSINS)),
+    TRANSPORT("PersonnelTabView.TRANSPORT.text", "PersonnelTabView.TRANSPORT.toolTipText",
+          Set.of(RANK, FIRST_NAME, LAST_NAME, SKILL_LEVEL, PERSONNEL_ROLE, SHIP_TRANSPORT, TACTICAL_TRANSPORT,
+                UNIT_ASSIGNMENT)),
+    EDUCATION("PersonnelTabView.EDUCATION.text", "PersonnelTabView.EDUCATION.toolTipText",
+          Set.of(RANK, FIRST_NAME, LAST_NAME, HIGHEST_EDUCATION, CURRENT_EDUCATION, ACADEMY, COURSE,
+                ACADEMY_DURATION)),
+    LOCATION("PersonnelTabView.LOCATION.text", "PersonnelTabView.LOCATION.toolTipText",
+          Set.of(RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, LOCATION_SYSTEM, LOCATION_PLANET, LOCATION_NAME,
+                DESTINATION_SYSTEM, DESTINATION_PLANET, DESTINATION_NAME)),
+    // Max 7 flags
+    FLAGS_A("PersonnelTabView.FLAGS_A.text", "PersonnelTabView.FLAGS_A.toolTipText",
+          Set.of(RANK, FIRST_NAME, LAST_NAME, COMMANDER, SECOND_IN_COMMAND, FOUNDER, CLAN_PERSONNEL, UNDER_PROTECTION,
+                IMMORTAL)),
+    FLAGS_B("PersonnelTabView.FLAGS_B.text", "PersonnelTabView.FLAGS_B.toolTipText",
+          Set.of(RANK, FIRST_NAME, LAST_NAME, DIVORCEABLE, PREFERS_MEN, PREFERS_WOMEN, COVER_MEDICAL_EXPENSES,
+                WANTS_CHILDREN, BLOCK_MATERNITY_LEAVE)),
+    FLAGS_C("PersonnelTabView.FLAGS_C.text", "PersonnelTabView.FLAGS_C.toolTipText",
+          Set.of(RANK, FIRST_NAME, LAST_NAME, SALVAGE_SUPERVISOR, QUICK_TRAIN_IGNORE, NEVER_ASSIGN_AUTO_MAINTENANCE,
+                HIDE_PERSONALITY)),
+    OTHER("PersonnelTabView.OTHER.text", "PersonnelTabView.OTHER.toolTipText",
+          Set.of(RANK, FIRST_NAME, LAST_NAME, TOUGHNESS, FATIGUE, SPA_COUNT, IMPLANT_COUNT, MODIFICATION_COUNT,
+                LOYALTY),
+          Map.of(TOUGHNESS, CampaignOptions::isUseToughness,
+                FATIGUE, CampaignOptions::isUseFatigue,
+                SPA_COUNT, CampaignOptions::isUseAbilities,
+                IMPLANT_COUNT, CampaignOptions::isUseImplants,
+                MODIFICATION_COUNT, CampaignOptions::isUseAlternativeAdvancedMedical,
+                LOYALTY, options -> options.isUseLoyaltyModifiers() && !options.isUseHideLoyalty()));
 
-    //region Variable Declarations
     private final String name;
     private final String toolTipText;
-    //endregion Variable Declarations
+    private final Set<PersonnelTableModelColumn> columns;
+    private final EnumMap<PersonnelTableModelColumn, Function<CampaignOptions, Boolean>> optionalColumns;
 
-    //region Constructors
-    PersonnelTabView(final String name, final String toolTipText) {
+    /**
+     * Defines a personnel table view.
+     *
+     * @param name            View name
+     * @param toolTipText     View tooltip
+     * @param columns         Columns this view includes; must include all optional columns
+     * @param optionalColumns An override for column visibility based on {@link CampaignOptions}
+     */
+    PersonnelTabView(String name, String toolTipText, Set<PersonnelTableModelColumn> columns,
+          @Nullable Map<PersonnelTableModelColumn, Function<CampaignOptions, Boolean>> optionalColumns) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
               MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
+        this.columns = columns;
+        if (optionalColumns == null) {
+            this.optionalColumns = null;
+        } else {
+            this.optionalColumns = new EnumMap<>(optionalColumns);
+        }
     }
-    //endregion Constructors
 
-    //region Getters
+    PersonnelTabView(String name, String toolTipText, Set<PersonnelTableModelColumn> columns) {
+        this(name, toolTipText, columns, null);
+    }
+
     public String getToolTipText() {
         return toolTipText;
     }
-    //endregion Getters
 
-    //region Boolean Comparison Methods
     public boolean isGraphic() {
         return this == GRAPHIC;
     }
 
-    public boolean isGeneral() {
-        return this == GENERAL;
-    }
-
-    /**
-     * @deprecated use {@link #isGunneryPilotSkillsII()} instead.
-     */
-    @Deprecated(since = "{SEMVER}", forRemoval = true)
-    public boolean isPilotGunnerySkillsII() {
-        return this == GUNNERY_PILOT_SKILLS_II;
-    }
-
-    public boolean isGunneryPilotSkillsII() {
-        return this == GUNNERY_PILOT_SKILLS_II;
-    }
-
-    /**
-     * @deprecated use {@link #isGunneryPilotSkills()} instead.
-     */
-    @Deprecated(since = "{SEMVER}", forRemoval = true)
-    public boolean isPilotGunnerySkills() {
-        return this == GUNNERY_PILOT_SKILLS;
-    }
-
-    public boolean isGunneryPilotSkills() {
-        return this == GUNNERY_PILOT_SKILLS;
-    }
-
-    public boolean isInfantrySkills() {
-        return this == INFANTRY_SKILLS;
-    }
-
-    public boolean isTacticalSkills() {
-        return this == TACTICAL_SKILLS;
-    }
-
-    public boolean isTechnicalSkills() {
-        return this == TECHNICAL_SKILLS;
-    }
-
-    @Deprecated(since = "0.51.0", forRemoval = true)
-    public boolean isMedicalSkills() {
-        return this == MEDICAL_SKILLS;
-    }
-
-    public boolean isAdministrativeSkills() {
-        return this == ADMINISTRATIVE_SKILLS;
-    }
-
-    public boolean isBiographical() {
-        return this == BIOGRAPHICAL;
-    }
-
-    public boolean isFluff() {
-        return this == FLUFF;
-    }
-
-    public boolean isDates() {
-        return this == DATES;
-    }
-
-    public boolean isTransport() {
-        return this == TRANSPORT;
-    }
-
-    public boolean isPersonality() {
-        return this == PERSONALITY;
-    }
-
-    public boolean isTraits() {
-        return this == TRAITS;
-    }
-
-    public boolean isLocation() {
-        return this == LOCATION;
-    }
-
-    public boolean isOther() {
-        return this == OTHER;
-    }
-    //endregion Boolean Comparison Methods
-
     @Override
     public String toString() {
         return name;
+    }
+
+    public Set<PersonnelTableModelColumn> getVisibleColumns(CampaignOptions campaignOptions) {
+        if (optionalColumns == null) {
+            return columns;
+        }
+        return columns.stream().filter(column -> {
+            Function<CampaignOptions, Boolean> condition = optionalColumns.get(column);
+            return (condition == null) || condition.apply(campaignOptions);
+        }).collect(Collectors.toSet());
     }
 }

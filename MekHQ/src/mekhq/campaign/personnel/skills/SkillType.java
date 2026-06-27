@@ -36,7 +36,7 @@ package mekhq.campaign.personnel.skills;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.CHARISMA;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.DEXTERITY;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.INTELLIGENCE;
-import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NONE;
+import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NO_ATTRIBUTE;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.REFLEXES;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.STRENGTH;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.WILLPOWER;
@@ -494,7 +494,7 @@ public class SkillType {
      * @param firstAttribute  The primary {@link SkillAttribute} associated with the skill, influencing its calculation
      *                        or behavior. <b>Cannot</b> be {@code null}.
      * @param secondAttribute The secondary {@link SkillAttribute} associated with the skill. If {@code null}, the
-     *                        default value is {@link SkillAttribute#NONE}.
+     *                        default value is {@link SkillAttribute#NO_ATTRIBUTE}.
      * @param greenLvl        The value representing the skill's "Green" proficiency level. If {@code null}, the default
      *                        value is {@code 1}.
      * @param regLvl          The value representing the skill's "Regular" proficiency level. If {@code null}, the
@@ -521,7 +521,7 @@ public class SkillType {
         this.countUp = isCountUp != null && isCountUp;
         this.subType = subType;
         this.firstAttribute = firstAttribute;
-        this.secondAttribute = secondAttribute == null ? NONE : secondAttribute;
+        this.secondAttribute = secondAttribute == null ? NO_ATTRIBUTE : secondAttribute;
         this.greenLvl = greenLvl == null ? 1 : greenLvl;
         this.regLvl = regLvl == null ? 3 : regLvl;
         this.vetLvl = vetLvl == null ? 4 : vetLvl;
@@ -598,7 +598,7 @@ public class SkillType {
 
         String flavorText = htmlOpenTag + rawFlavorText + "<br>(" + firstAttribute.getLabel();
 
-        if (secondAttribute != NONE) {
+        if (secondAttribute != NO_ATTRIBUTE) {
             flavorText += ", " + secondAttribute.getLabel() + ')';
         } else {
             flavorText += ")";
@@ -779,8 +779,8 @@ public class SkillType {
      */
     public int getLinkedAttributeCount() {
         int count = 0;
-        count += (firstAttribute != null && firstAttribute != NONE) ? 1 : 0;
-        count += (secondAttribute != null && secondAttribute != NONE) ? 1 : 0;
+        count += (firstAttribute != null && firstAttribute != NO_ATTRIBUTE) ? 1 : 0;
+        count += (secondAttribute != null && secondAttribute != NO_ATTRIBUTE) ? 1 : 0;
         return count;
     }
 
@@ -860,7 +860,7 @@ public class SkillType {
      * @since 0.50.05
      */
     public void setFirstAttribute(@Nullable SkillAttribute firstAttribute) {
-        this.firstAttribute = firstAttribute == null ? NONE : firstAttribute;
+        this.firstAttribute = firstAttribute == null ? NO_ATTRIBUTE : firstAttribute;
     }
 
     /**
@@ -876,7 +876,7 @@ public class SkillType {
      * @since 0.50.05
      */
     public void setSecondAttribute(@Nullable SkillAttribute secondAttribute) {
-        this.secondAttribute = secondAttribute == null ? NONE : secondAttribute;
+        this.secondAttribute = secondAttribute == null ? NO_ATTRIBUTE : secondAttribute;
     }
 
     public int getCost(int lvl) {
@@ -1683,7 +1683,7 @@ public class SkillType {
               false,
               COMBAT_GUNNERY,
               DEXTERITY,
-              NONE,
+              NO_ATTRIBUTE,
               2,
               null,
               null,
@@ -1701,7 +1701,7 @@ public class SkillType {
               false,
               COMBAT_PILOTING,
               DEXTERITY,
-              NONE,
+              NO_ATTRIBUTE,
               2,
               null,
               null,
@@ -1814,7 +1814,7 @@ public class SkillType {
               false,
               SUPPORT_TECHNICIAN,
               INTELLIGENCE,
-              NONE,
+              NO_ATTRIBUTE,
               null,
               null,
               null,
@@ -1852,7 +1852,7 @@ public class SkillType {
               false,
               SUPPORT,
               INTELLIGENCE,
-              NONE,
+              NO_ATTRIBUTE,
               null,
               null,
               null,
@@ -1872,7 +1872,7 @@ public class SkillType {
               false,
               SUPPORT,
               INTELLIGENCE,
-              NONE,
+              NO_ATTRIBUTE,
               null,
               null,
               null,
@@ -1958,7 +1958,7 @@ public class SkillType {
               false,
               SUPPORT,
               CHARISMA,
-              NONE,
+              NO_ATTRIBUTE,
               null,
               null,
               null,
@@ -1975,7 +1975,7 @@ public class SkillType {
               false,
               ROLEPLAY_GENERAL,
               REFLEXES,
-              NONE,
+              NO_ATTRIBUTE,
               null,
               null,
               null,
@@ -1992,7 +1992,7 @@ public class SkillType {
               false,
               UTILITY,
               CHARISMA,
-              NONE,
+              NO_ATTRIBUTE,
               null,
               null,
               null,
@@ -2009,7 +2009,7 @@ public class SkillType {
               false,
               ROLEPLAY_GENERAL,
               WILLPOWER,
-              NONE,
+              NO_ATTRIBUTE,
               null,
               null,
               null,
@@ -2026,7 +2026,7 @@ public class SkillType {
               false,
               UTILITY,
               INTELLIGENCE,
-              NONE,
+              NO_ATTRIBUTE,
               null,
               null,
               null,
@@ -2043,7 +2043,7 @@ public class SkillType {
               false,
               COMBAT_GUNNERY,
               DEXTERITY,
-              NONE,
+              NO_ATTRIBUTE,
               null,
               null,
               null,
@@ -2232,7 +2232,7 @@ public class SkillType {
               false,
               UTILITY,
               INTELLIGENCE,
-              NONE,
+              NO_ATTRIBUTE,
               null,
               null,
               null,
@@ -2249,7 +2249,7 @@ public class SkillType {
               false,
               ROLEPLAY_GENERAL,
               INTELLIGENCE,
-              NONE,
+              NO_ATTRIBUTE,
               null,
               null,
               null,
@@ -2300,7 +2300,7 @@ public class SkillType {
               false,
               UTILITY,
               CHARISMA,
-              NONE,
+              NO_ATTRIBUTE,
               null,
               null,
               null,
@@ -2810,7 +2810,7 @@ public class SkillType {
               false,
               UTILITY,
               INTELLIGENCE,
-              NONE,
+              NO_ATTRIBUTE,
               null,
               null,
               null,
@@ -3118,7 +3118,7 @@ public class SkillType {
               false,
               ROLEPLAY_GENERAL,
               CHARISMA,
-              NONE,
+              NO_ATTRIBUTE,
               null,
               null,
               null,
@@ -3186,7 +3186,7 @@ public class SkillType {
               false,
               ROLEPLAY_GENERAL,
               INTELLIGENCE,
-              NONE,
+              NO_ATTRIBUTE,
               null,
               null,
               null,
@@ -3203,7 +3203,7 @@ public class SkillType {
               false,
               UTILITY,
               REFLEXES,
-              NONE,
+              NO_ATTRIBUTE,
               null,
               null,
               null,
@@ -3237,7 +3237,7 @@ public class SkillType {
               false,
               COMBAT_GUNNERY,
               DEXTERITY,
-              NONE,
+              NO_ATTRIBUTE,
               null,
               null,
               null,
@@ -3254,7 +3254,7 @@ public class SkillType {
               false,
               COMBAT_GUNNERY,
               DEXTERITY,
-              NONE,
+              NO_ATTRIBUTE,
               null,
               null,
               null,
@@ -3271,7 +3271,7 @@ public class SkillType {
               false,
               ROLEPLAY_GENERAL,
               STRENGTH,
-              NONE,
+              NO_ATTRIBUTE,
               null,
               null,
               null,

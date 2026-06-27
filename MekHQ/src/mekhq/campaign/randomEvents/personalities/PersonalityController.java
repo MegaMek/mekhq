@@ -33,7 +33,7 @@
 package mekhq.campaign.randomEvents.personalities;
 
 import static megamek.common.compute.Compute.randomInt;
-import static mekhq.campaign.randomEvents.personalities.enums.Reasoning.*;
+import static mekhq.campaign.randomEvents.personalities.Reasoning.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,13 +41,6 @@ import java.util.List;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.enums.Gender;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.randomEvents.personalities.enums.Aggression;
-import mekhq.campaign.randomEvents.personalities.enums.Ambition;
-import mekhq.campaign.randomEvents.personalities.enums.Greed;
-import mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk;
-import mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType;
-import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
-import mekhq.campaign.randomEvents.personalities.enums.Social;
 
 /**
  * This class is responsible for generating and managing personalities for characters. It assigns traits such as
@@ -244,6 +237,59 @@ public class PersonalityController {
         interviewersNotes.append("</html>");
 
         person.setPersonalityInterviewNotes(interviewersNotes.toString());
+    }
+
+    /**
+     * Generates a concatenated string of personality labels based on the attributes of the given person.
+     *
+     * <p>The method checks various personality traits and appends their respective labels to the result if they are
+     * not in their default or neutral state.</p>
+     *
+     * @param person The person whose personality traits are being analyzed and converted to labels.
+     *
+     * @return A string containing all applicable personality labels concatenated together. If no labels are applicable,
+     *       an empty string is returned.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static String getPersonalityLabels(Person person) {
+        StringBuilder personalityLabels = new StringBuilder();
+
+        Aggression aggression = person.getAggression();
+        if (!aggression.isNone()) {
+            appendLabel(personalityLabels, aggression.getLabel());
+        }
+
+        Ambition ambition = person.getAmbition();
+        if (!ambition.isNone()) {
+            appendLabel(personalityLabels, ambition.getLabel());
+        }
+
+        Greed greed = person.getGreed();
+        if (!greed.isNone()) {
+            appendLabel(personalityLabels, greed.getLabel());
+        }
+
+        Social social = person.getSocial();
+        if (!social.isNone()) {
+            appendLabel(personalityLabels, social.getLabel());
+        }
+
+        PersonalityQuirk personalityQuirk = person.getPersonalityQuirk();
+        if (!personalityQuirk.isNone()) {
+            appendLabel(personalityLabels, personalityQuirk.getLabel());
+        }
+
+        return personalityLabels.toString();
+    }
+
+    private static void appendLabel(StringBuilder personalityLabels, String label) {
+        if (!personalityLabels.isEmpty()) {
+            personalityLabels.append(", ");
+        }
+
+        personalityLabels.append(label);
     }
 
     /**

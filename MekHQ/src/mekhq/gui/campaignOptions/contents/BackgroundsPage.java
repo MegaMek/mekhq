@@ -51,6 +51,7 @@ import javax.swing.JSpinner;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import megamek.Version;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Faction;
@@ -88,6 +89,7 @@ class BackgroundsPage {
     private CampaignOptionsHeaderPanel backgroundHeader;
     private JPanel pnlRandomBackgrounds;
     private JCheckBox chkUseRandomPersonalities;
+    private JCheckBox chkUsePersonalityTagsOnly;
     private JCheckBox chkUseRandomPersonalityReputation;
     private JCheckBox chkUseReasoningXpMultiplier;
     private JCheckBox chkUseSimulatedRelationships;
@@ -169,6 +171,9 @@ class BackgroundsPage {
         chkUseRandomPersonalities = new CampaignOptionsCheckBox("UseRandomPersonalities",
                 getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.DOCUMENTED));
         chkUseRandomPersonalities.addMouseListener(createTipPanelUpdater("UseRandomPersonalities"));
+        chkUsePersonalityTagsOnly = new CampaignOptionsCheckBox("UsePersonalityTagsOnly",
+                getMetadata(new Version(0, 51, 1), CampaignOptionFlag.IMPORTANT));
+        chkUsePersonalityTagsOnly.addMouseListener(createTipPanelUpdater("UsePersonalityTagsOnly"));
         chkUseRandomPersonalityReputation = new CampaignOptionsCheckBox("UseRandomPersonalityReputation");
         chkUseRandomPersonalityReputation.addMouseListener(createTipPanelUpdater("UseRandomPersonalityReputation"));
         chkUseReasoningXpMultiplier = new CampaignOptionsCheckBox("UseReasoningXpMultiplier");
@@ -183,6 +188,7 @@ class BackgroundsPage {
             CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(2,
                 chkUseRandomPersonalities,
+                chkUsePersonalityTagsOnly,
                 chkUseRandomPersonalityReputation,
                 chkUseReasoningXpMultiplier,
                 chkUseSimulatedRelationships);
@@ -447,6 +453,7 @@ class BackgroundsPage {
         }
 
         chkUseRandomPersonalities.setSelected(model.useRandomPersonalities);
+        chkUsePersonalityTagsOnly.setSelected(model.usePersonalityLabelsOnly);
         chkUseRandomPersonalityReputation.setSelected(model.useRandomPersonalityReputation);
         chkUseReasoningXpMultiplier.setSelected(model.useReasoningXpMultiplier);
         chkUseSimulatedRelationships.setSelected(model.useSimulatedRelationships);
@@ -475,6 +482,7 @@ class BackgroundsPage {
         }
 
         model.useRandomPersonalities = chkUseRandomPersonalities.isSelected();
+        model.usePersonalityLabelsOnly = chkUsePersonalityTagsOnly.isSelected();
         model.useRandomPersonalityReputation = chkUseRandomPersonalityReputation.isSelected();
         model.useReasoningXpMultiplier = chkUseReasoningXpMultiplier.isSelected();
         model.useSimulatedRelationships = chkUseSimulatedRelationships.isSelected();

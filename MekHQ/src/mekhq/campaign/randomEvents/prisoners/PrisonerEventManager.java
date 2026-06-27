@@ -67,10 +67,10 @@ import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.rentals.ContractRentalType;
 import mekhq.campaign.mission.rentals.FacilityRentals;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerCaptureStyle;
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerEvent;
-import mekhq.campaign.randomEvents.prisoners.enums.ResponseQuality;
-import mekhq.campaign.randomEvents.prisoners.records.PrisonerEventData;
+import mekhq.campaign.randomEvents.randomEventsSystem.EventEffectsManager;
+import mekhq.campaign.randomEvents.randomEventsSystem.PrisonerEvent;
+import mekhq.campaign.randomEvents.randomEventsSystem.PrisonerEventData;
+import mekhq.campaign.randomEvents.randomEventsSystem.ResponseQuality;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
@@ -788,9 +788,9 @@ public class PrisonerEventManager {
                     }
 
                     prisonerCapacity += unit.getTotalTempCrew() * (isMekHQCaptureStyle ?
-                                              PRISONER_CAPACITY_BATTLE_ARMOR :
-                                              PRISONER_CAPACITY_BATTLE_ARMOR *
-                                              PRISONER_CAPACITY_CAM_OPS_MULTIPLIER);
+                                                                         PRISONER_CAPACITY_BATTLE_ARMOR :
+                                                                         PRISONER_CAPACITY_BATTLE_ARMOR *
+                                                                         PRISONER_CAPACITY_CAM_OPS_MULTIPLIER);
 
                     continue;
                 }
@@ -806,9 +806,9 @@ public class PrisonerEventManager {
                     }
 
                     prisonerCapacity += unit.getTotalTempCrew() * (isMekHQCaptureStyle ?
-                                              PRISONER_CAPACITY_CONVENTIONAL_INFANTRY :
-                                              PRISONER_CAPACITY_CONVENTIONAL_INFANTRY *
-                                              PRISONER_CAPACITY_CAM_OPS_MULTIPLIER);
+                                                                         PRISONER_CAPACITY_CONVENTIONAL_INFANTRY :
+                                                                         PRISONER_CAPACITY_CONVENTIONAL_INFANTRY *
+                                                                         PRISONER_CAPACITY_CAM_OPS_MULTIPLIER);
 
                     continue;
                 }

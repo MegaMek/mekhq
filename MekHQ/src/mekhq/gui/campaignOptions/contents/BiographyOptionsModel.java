@@ -67,6 +67,7 @@ class BiographyOptionsModel {
     boolean rewardComingOfAgeAbilities;
     boolean rewardComingOfAgeRPSkills;
     boolean useRandomPersonalities;
+    boolean usePersonalityLabelsOnly;
     boolean useRandomPersonalityReputation;
     boolean useReasoningXpMultiplier;
     boolean useSimulatedRelationships;
@@ -125,6 +126,7 @@ class BiographyOptionsModel {
         rewardComingOfAgeAbilities = options.isRewardComingOfAgeAbilities();
         rewardComingOfAgeRPSkills = options.isRewardComingOfAgeRPSkills();
         useRandomPersonalities = options.isUseRandomPersonalities();
+        usePersonalityLabelsOnly = options.isUsePersonalityLabelsOnly();
         useRandomPersonalityReputation = options.isUseRandomPersonalityReputation();
         useReasoningXpMultiplier = options.isUseReasoningXpMultiplier();
         useSimulatedRelationships = options.isUseSimulatedRelationships();
@@ -184,6 +186,7 @@ class BiographyOptionsModel {
         options.setRewardComingOfAgeAbilities(rewardComingOfAgeAbilities);
         options.setRewardComingOfAgeRPSkills(rewardComingOfAgeRPSkills);
         options.setUseRandomPersonalities(useRandomPersonalities);
+        options.setUsePersonalityLabelsOnly(usePersonalityLabelsOnly);
         options.setUseRandomPersonalityReputation(useRandomPersonalityReputation);
         options.setUseReasoningXpMultiplier(useReasoningXpMultiplier);
         options.setUseSimulatedRelationships(useSimulatedRelationships);

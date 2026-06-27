@@ -35,11 +35,8 @@ package mekhq.campaign.personnel.skills;
 
 import static mekhq.campaign.personnel.enums.GenderDescriptors.HIS_HER_THEIR;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.BARELY_MADE_IT;
-import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginOfSuccessObjectFromMarginValue;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
-import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
-import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.util.List;
 
@@ -47,9 +44,8 @@ import megamek.common.TargetRollModifier;
 import megamek.common.annotations.Nullable;
 import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
-import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.skills.ActionCheckRoll.RollType;
 import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
 import mekhq.utilities.ReportingUtilities;
 
@@ -57,7 +53,7 @@ import mekhq.utilities.ReportingUtilities;
  * Base abstract class for configuring character skill, attribute, and other action checks.
  *
  * <p>This class utilizes a builder pattern to allow the caller to attach external modifiers
- * and miscellaneous adjustments before resolving the check via {@link #resolve(boolean, String, boolean)}.
+ * and miscellaneous adjustments before resolving the check via {@link #resolve(boolean, String)}.
  * Subclasses must implement the abstract methods to define the specific mechanics of the action being checked.</p>
  *
  * @param <T> the concrete subclass type, used to enable method chaining
@@ -68,7 +64,7 @@ import mekhq.utilities.ReportingUtilities;
 public abstract class ActionCheck<T extends ActionCheck<T>> {
 
     private static final MMLogger LOGGER = MMLogger.create(ActionCheck.class);
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.SkillCheckUtility";
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.ActionCheck";
 
     protected final Person person;
     protected final TargetRoll targetNumber;
@@ -160,7 +156,7 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
      */
     public T withMiscModifier(int miscModifier) {
         int finalModifier = isCountUp() ? -miscModifier : miscModifier;
-        targetNumber.addModifier(finalModifier, getFormattedTextAt(RESOURCE_BUNDLE, "skillCheck.miscModifier"));
+        targetNumber.addModifier(finalModifier, getFormattedTextAt(RESOURCE_BUNDLE, "actionCheck.miscModifier"));
         return getThis();
     }
 
@@ -178,30 +174,27 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
      *
      * @param useEdge                     whether the person should use edge to re-roll if the initial attempt fails
      * @param reason                      the reason for the check; can be {@code null}
-     * @param includeMarginsOfSuccessText whether to include detailed margins of success information in the results
      */
-    public ActionCheckResult resolve(boolean useEdge, @Nullable String reason,
-          boolean includeMarginsOfSuccessText) {
+    public ActionCheckResult resolve(boolean useEdge, @Nullable String reason) {
+        RollType rollType = hasNaturalAptitude() ? RollType.ADVANTAGE : RollType.NORMAL;
 
-        int roll = SkillCheckUtility.getRoll(hasNaturalAptitude());
+        ActionCheckRoll roll = ActionCheckRoll.perform(rollType);
         boolean usedEdge = false;
-
-        boolean failed = roll < targetNumber.getValue();
+        boolean failed = roll.result() < targetNumber.getValue();
         boolean canSucceed = !targetNumber.cannotSucceed() && targetNumber.getValue() <= 12;
         boolean canSpendEdge = useEdge && person.getCurrentEdge() > 0;
 
         if (failed && canSucceed && canSpendEdge) {
             // reroll using edge
-            roll = SkillCheckUtility.getRoll(hasNaturalAptitude());
+            roll = ActionCheckRoll.perform(rollType);
             usedEdge = true;
 
             person.spendEdge();
         }
 
-        int difference = targetNumber.getValue() - roll;
+        int difference = targetNumber.getValue() - roll.result();
         int marginOfSuccess = MarginOfSuccess.getMarginOfSuccess(isCountUp() ? difference : -difference);
-        String resultsText = generateResultsText(roll, marginOfSuccess, usedEdge, person,
-              includeMarginsOfSuccessText, hasNaturalAptitude(), reason);
+        String resultsText = generateResultsText(roll.result(), marginOfSuccess, reason);
 
         LOGGER.info(resultsText);
 
@@ -217,7 +210,6 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
      *   <li>The name of the skill being checked</li>
      *   <li>The dice roll, target number, and margin of success or failure</li>
      *   <li>A status message indicating success or failure</li>
-     *   <li>Use of edge (if applicable)</li>
      * </ul>
      *
      * <p>The results text is color-coded using custom span tags based on the margin of success:
@@ -228,67 +220,44 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
      * </ul>
      * </p>
      *
-     * <p>If edge was used to reroll the skill check, the results will include an additional note with
-     * information about the reroll. If the caller requests it, margin of success details can also be
-     * appended to the results text.</p>
+     * @param roll            Roll result for the action check
+     * @param marginOfSuccess Calculated margin of success for this action check
+     * @param reason          A string describing the reason for the action check
      *
-     * <p>If the skill name is {@code null}, the method returns a localized error message indicating that the
-     * skill name could not be resolved and that an error occurred during the results generation process.</p>
-     *
-     * @param includeMarginsOfSuccessText whether to include detailed margin of success information in the results text
-     *
-     * @return a localized and formatted {@link String} representing the outcomes of the skill check:
-     *       <ul>
-     *         <li>If successful, the string provides details of the roll, skill, and margin of success.</li>
-     *         <li>If edge was used, additional information about the reroll is included.</li>
-     *         <li>If the skill name is {@code null}, an error message is returned instead.</li>
-     *       </ul>
+     * @return a localized HTML {@link String} representing the outcomes of the skill check
      *
      * @author Illiani
      * @since 0.50.05
      */
-    private String generateResultsText(int roll, int marginOfSuccess, boolean usedEdge,
-          Person person, boolean includeMarginsOfSuccessText, boolean hasNaturalAptitude, @Nullable String reason) {
+    private String generateResultsText(int roll, int marginOfSuccess, @Nullable String reason) {
         String fullTitle = person.getHyperlinkedFullTitle();
         String genderedReferenced = HIS_HER_THEIR.getDescriptor(person.getGender());
 
-        String colorOpen;
+        String color;
         int neutralMarginValue = BARELY_MADE_IT.getValue();
         if (marginOfSuccess == neutralMarginValue) {
-            colorOpen = spanOpeningWithCustomColor(ReportingUtilities.getWarningColor());
+            color = ReportingUtilities.getWarningColor();
         } else if (marginOfSuccess < neutralMarginValue) {
-            colorOpen = spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());
+            color = ReportingUtilities.getNegativeColor();
         } else {
-            colorOpen = spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor());
+            color = ReportingUtilities.getPositiveColor();
         }
 
-        String status = getTextAt(RESOURCE_BUNDLE,
-              ActionCheckResult.isSuccess(marginOfSuccess) ? "skillCheck.results.success" : "skillCheck.results.failure");
+        String reportKey =
+              ActionCheckResult.isSuccess(marginOfSuccess) ? "actionCheckResult.success" : "actionCheckResult.failure";
 
         StringBuilder resultsText = new StringBuilder(getFormattedTextAt(RESOURCE_BUNDLE,
-              "skillCheck.results",
+              reportKey,
               reason == null ? "" : "<b>" + reason + ":</b> ",
               fullTitle,
-              colorOpen,
-              status,
-              CLOSING_SPAN_TAG,
+              color,
               genderedReferenced,
               getActionName(),
               roll,
               targetNumber.getValue()));
 
-        if (hasNaturalAptitude) {
-            resultsText.append(" ").append(getTextAt(RESOURCE_BUNDLE, "skillCheck.naturalAptitude"));
-        }
-
-        if (usedEdge) {
-            resultsText.append(" ").append(getTextAt(RESOURCE_BUNDLE, "skillCheck.rerolled"));
-        }
-
-        if (includeMarginsOfSuccessText) {
-            MarginOfSuccess marginOfSuccessObject = getMarginOfSuccessObjectFromMarginValue(marginOfSuccess);
-            String marginOfSuccessText = colorOpen + marginOfSuccessObject.getLabel() + CLOSING_SPAN_TAG;
-            resultsText.append(" ").append(marginOfSuccessText);
+        if (hasNaturalAptitude()) {
+            resultsText.append(" ").append(getTextAt(RESOURCE_BUNDLE, "actionCheckResult.naturalAptitude"));
         }
 
         return resultsText.toString();

@@ -90,7 +90,7 @@ public class AttributeCheckUtility {
     static TargetRoll determineTargetNumber(Person person, SkillAttribute firstSkillAttribute,
           @Nullable SkillAttribute secondSkillAttribute, int miscModifier) {
 
-        if (firstSkillAttribute == null || firstSkillAttribute.isNone()) {
+        if (firstSkillAttribute == null || firstSkillAttribute.isNoAttribute()) {
             throw new IllegalArgumentException("First attribute for an attribute check is not present");
         }
 
@@ -98,7 +98,7 @@ public class AttributeCheckUtility {
 
         TargetRoll targetNumber = new TargetRoll();
 
-        getBaseTargetNumber(targetNumber, secondSkillAttribute != null && !secondSkillAttribute.isNone());
+        getBaseTargetNumber(targetNumber, secondSkillAttribute != null && !secondSkillAttribute.isNoAttribute());
         getAttributeModifiers(firstSkillAttribute, secondSkillAttribute, characterAttributes, targetNumber,
               person.getActiveInjuryEffects(), person.getOptions(), person.getAgeForAttributeModifiers());
 
@@ -127,7 +127,7 @@ public class AttributeCheckUtility {
               options, ageForAttributeModifiers);
         targetNumber.addModifier(firstAttributeModifier, firstSkillAttribute.getLabel());
 
-        if (secondSkillAttribute != null && !secondSkillAttribute.isNone()) {
+        if (secondSkillAttribute != null && !secondSkillAttribute.isNoAttribute()) {
             int secondAttributeModifier = -characterAttributes.getAdjustedAttributeScore(secondSkillAttribute,
                   injuryEffects, options, ageForAttributeModifiers);
             targetNumber.addModifier(secondAttributeModifier, secondSkillAttribute.getLabel());

@@ -55,7 +55,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternateHealing;
-import mekhq.campaign.personnel.skills.ActionCheck;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
 import mekhq.campaign.unit.Unit;
 
@@ -76,7 +75,7 @@ public class MedicalController {
     final private int maximumPatients;
     final private int healingWaitingPeriod;
     final private int naturalHealingWaitingPeriod;
-    final private boolean isUseSupportEdge;
+    final private boolean isUseEdge;
     final private boolean isUseAdvancedMedical;
     final private boolean isUseAltAdvancedMedical;
 
@@ -95,7 +94,7 @@ public class MedicalController {
         maximumPatients = campaignOptions.getMaximumPatients();
         healingWaitingPeriod = campaignOptions.getHealingWaitingPeriod();
         naturalHealingWaitingPeriod = campaignOptions.getNaturalHealingWaitingPeriod();
-        isUseSupportEdge = campaignOptions.isUseSupportEdge();
+        isUseEdge = campaignOptions.isUseEdge();
         isUseAdvancedMedical = campaignOptions.isUseAdvancedMedical();
         isUseAltAdvancedMedical = campaignOptions.isUseAlternativeAdvancedMedical();
     }
@@ -223,9 +222,9 @@ public class MedicalController {
         ActionCheckResult actionCheckResult =
               doctor.checkSkill(S_SURGERY, isUseAgingEffects, isClanCampaign, today)
                     .withExternalModifiers(getAdditionalHealingModifiers(patient))
-                    .resolve(isUseSupportEdge, getTextAt(RESOURCE_BUNDLE, "MedicalController.report.skillCheck"), false);
+                    .resolve(isUseEdge, getTextAt(RESOURCE_BUNDLE, "MedicalController.report.skillCheck"));
 
-        LOGGER.debug(actionCheckResult.resultsText());
+        LOGGER.debug(actionCheckResult.getReport(false));
 
         if (actionCheckResult.isSuccess()) {
             boolean inInfirmary = !(null == patient.getDoctorId());

@@ -88,7 +88,6 @@ class PersonnelGeneralPage {
     private JCheckBox chkOnlyCommandersMatterInfantry;
     private JCheckBox chkOnlyCommandersMatterBattleArmor;
     private JCheckBox chkUseEdge;
-    private JCheckBox chkUseSupportEdge;
     private JLabel lblEdgeRefreshPeriod;
     private MMComboBox<EdgeRefreshPeriod> comboEdgeRefreshPeriod;
     private JLabel lblEdgeRefreshCost;
@@ -195,8 +194,6 @@ class PersonnelGeneralPage {
         chkOnlyCommandersMatterBattleArmor.addMouseListener(createTipPanelUpdater("OnlyCommandersMatterBattleArmor"));
         chkUseEdge = new CampaignOptionsCheckBox("UseEdge");
         chkUseEdge.addMouseListener(createTipPanelUpdater("UseEdge"));
-        chkUseSupportEdge = new CampaignOptionsCheckBox("UseSupportEdge");
-        chkUseSupportEdge.addMouseListener(createTipPanelUpdater("UseSupportEdge"));
 
         lblEdgeRefreshPeriod = new CampaignOptionsLabel("EdgeRefreshPeriod", getMetadata(new Version(0, 51, 0)));
         lblEdgeRefreshPeriod.addMouseListener(createTipPanelUpdater("EdgeRefreshPeriod"));
@@ -239,7 +236,6 @@ class PersonnelGeneralPage {
                 chkOnlyCommandersMatterInfantry,
                 chkOnlyCommandersMatterBattleArmor,
                 chkUseEdge,
-                chkUseSupportEdge,
                 chkUseImplants,
                 chkUseAlternativeQualityAveraging);
         panel.addRow(lblEdgeRefreshCost, spnEdgeRefreshCost);
@@ -372,7 +368,6 @@ class PersonnelGeneralPage {
         chkOnlyCommandersMatterInfantry.setSelected(model.onlyCommandersMatterInfantry);
         chkOnlyCommandersMatterBattleArmor.setSelected(model.onlyCommandersMatterBattleArmor);
         chkUseEdge.setSelected(model.useEdge);
-        chkUseSupportEdge.setSelected(model.useSupportEdge);
         comboEdgeRefreshPeriod.setSelectedItem(model.edgeRefreshPeriod);
         spnEdgeRefreshCost.setValue(model.edgeRefreshCost);
         chkUseImplants.setSelected(model.useImplants);
@@ -414,7 +409,6 @@ class PersonnelGeneralPage {
         model.onlyCommandersMatterInfantry = chkOnlyCommandersMatterInfantry.isSelected();
         model.onlyCommandersMatterBattleArmor = chkOnlyCommandersMatterBattleArmor.isSelected();
         model.useEdge = chkUseEdge.isSelected();
-        model.useSupportEdge = chkUseSupportEdge.isSelected();
         model.edgeRefreshPeriod = comboEdgeRefreshPeriod.getSelectedItem();
         model.edgeRefreshCost = (int) spnEdgeRefreshCost.getValue();
         model.useImplants = chkUseImplants.isSelected();

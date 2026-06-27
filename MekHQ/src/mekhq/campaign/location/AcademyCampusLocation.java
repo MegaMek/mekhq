@@ -40,7 +40,7 @@ import java.util.UUID;
 import jakarta.annotation.Nonnull;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
-import mekhq.campaign.CurrentLocation;
+import mekhq.campaign.AbstractMobileLocation;
 import mekhq.campaign.Personnel;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.education.Academy;
@@ -99,8 +99,8 @@ public class AcademyCampusLocation implements IPlace {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "academySet", academySet);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "academyName", academyName);
         for (LocationNode child : locationNode.getChildren()) {
-            if (child.getLocatable() instanceof CurrentLocation currentLocation) {
-                currentLocation.writeToXML(pw, indent);
+            if (child.getLocatable() instanceof AbstractMobileLocation travelNode) {
+                travelNode.writeToXML(pw, indent);
             }
         }
         for (LocationNode child : personnel.getLocationNode().getChildren()) {
