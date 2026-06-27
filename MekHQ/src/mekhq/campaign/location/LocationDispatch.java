@@ -347,14 +347,15 @@ public final class LocationDispatch {
 
             if (destinationSystem == null || fromSystem.equals(destinationSystem)) {
                 PlanetarySystem system = destinationSystem != null ? destinationSystem : fromSystem;
-                land(group, destination, directLandingTarget, system, campaign, logMarker);
+                land(group, destination, directLandingTarget, system, campaign.getCampaignLocationManager(), logMarker);
                 continue;
             }
 
             Optional<CurrentLocation> maybeTravelLocation = buildTravelNode(
                   fromSystem, destinationSystem, destination, campaign, logMarker);
             if (maybeTravelLocation.isEmpty()) {
-                land(group, destination, directLandingTarget, destinationSystem, campaign, logMarker);
+                land(group, destination, directLandingTarget, destinationSystem,
+                      campaign.getCampaignLocationManager(), logMarker);
                 continue;
             }
             CurrentLocation travelLocation = maybeTravelLocation.get();
@@ -368,10 +369,9 @@ public final class LocationDispatch {
      * {@code directLandingTarget}.
      */
     private static void land(List<? extends ILocation> group, ILocation destination, ILocation directLandingTarget,
-          PlanetarySystem system, Campaign campaign, String logMarker) {
+          PlanetarySystem system, CampaignLocationManager locationManager, String logMarker) {
         if (destination instanceof AbstractBase) {
-            CurrentLocation arrivedLocation = buildArrivedNode(system, destination,
-                  campaign.getCampaignLocationManager(), logMarker);
+            CurrentLocation arrivedLocation = buildArrivedNode(system, destination, locationManager, logMarker);
             group.forEach(item -> reparent(item, arrivedLocation));
         } else {
             group.forEach(item -> reparent(item, directLandingTarget));

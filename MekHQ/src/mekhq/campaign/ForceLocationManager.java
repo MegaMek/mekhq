@@ -88,16 +88,19 @@ public class ForceLocationManager {
         }
 
         @Override
+        @Nonnull
         public Hangar getHangar() {
             return campaign.getHangar();
         }
 
         @Override
+        @Nonnull
         public Warehouse getWarehouse() {
             return campaign.getWarehouse();
         }
 
         @Override
+        @Nonnull
         public Personnel getPersonnel() {
             return campaign.getMainForcePersonnel();
         }
