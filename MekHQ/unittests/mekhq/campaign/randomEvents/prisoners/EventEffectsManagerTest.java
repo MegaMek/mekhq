@@ -213,7 +213,7 @@ class EventEffectsManagerTest {
         // Assert
         int injuredCharacters = 0;
         for (Person person : mockCampaign.getCurrentPrisoners()) {
-            if (person.needsFixing()) {
+            if (person.getTotalInjurySeverity() > 0) {
                 injuredCharacters++;
             }
         }
@@ -257,7 +257,7 @@ class EventEffectsManagerTest {
         // Assert
         int injuredCharacters = 0;
         for (Person person : mockCampaign.getCurrentPrisoners()) {
-            if (person.needsFixing()) {
+            if (person.getTotalInjurySeverity() > 0) {
                 injuredCharacters++;
             }
         }
