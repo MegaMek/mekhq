@@ -37,11 +37,11 @@ import java.util.List;
 /**
  * Represents data relevant to a random event, including its type, severity, and response map structure.
  *
- * @param randomEventType The type of random event as a {@link RandomEventType}. This represents the name of the event.
+ * @param randomEventType The type of random event as a {@link String}. This represents the name of the event.
  * @param responseEntries A list of {@link RandomEventResponseEntry} defining the responses and their associated
  *                        qualities and effects.
  */
 public record RandomEventData(
-      RandomEventType randomEventType,
+      String randomEventType,
       List<RandomEventResponseEntry> responseEntries
 ) {}

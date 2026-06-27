@@ -1035,19 +1035,19 @@ public class RandomEventEffectsManager {
      * @return A {@link String} summarizing the unique effect or an empty string for unsupported events.
      */
     private String eventEffectUnique(RandomEventData eventData, RandomEventResult result) {
-        final RandomEventType event = eventData.randomEventType();
+        final String event = eventData.randomEventType();
 
         return switch (event) {
             // The OpFor has their morale bumped by one level
-            case BARTERING -> eventEffectUniqueBartering();
+            case "BARTERING" -> eventEffectUniqueBartering();
             // Remove all combat skills from a random Prisoner
-            case MISTAKE -> eventEffectUniqueMistake(result);
+            case "MISTAKE" -> eventEffectUniqueMistake(result);
             // Change the origin faction of one prisoner to match employer
-            case UNDERCOVER -> eventEffectUniqueUndercover(result);
+            case "UNDERCOVER" -> eventEffectUniqueUndercover(result);
             // 'Poison' (xd6 Fatigue) 10% of personnel. x = magnitude
-            case POISON -> eventEffectUniquePoison(result);
+            case "POISON" -> eventEffectUniquePoison(result);
             // Generate 2d6 new prisoners & xd6 crime. x = magnitude
-            case ABANDONED_TO_DIE -> eventEffectUniqueAbandonedToDie(result);
+            case "ABANDONED_TO_DIE" -> eventEffectUniqueAbandonedToDie(result);
             default -> "";
         };
     }

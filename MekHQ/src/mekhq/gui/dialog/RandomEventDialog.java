@@ -139,7 +139,7 @@ public class RandomEventDialog {
 
     private void triggerDialog(Campaign campaign, Person eventParticipant, @Nullable Person otherEventParticipant,
           RandomEventData eventData, String externalResourceBundle) {
-        String eventName = eventData.randomEventType().name();
+        String eventName = eventData.randomEventType();
         String commanderAddress = getCommanderAddress();
 
         String inCharacterMessage = getInCharacterMessage(eventName, externalResourceBundle, commanderAddress);
@@ -369,7 +369,7 @@ public class RandomEventDialog {
 
         String suffix = wasSuccessful ? ".success" : ".failure";
 
-        String resourceKey = "response." + choiceIndex + '.' + event.randomEventType().name() + suffix;
+        String resourceKey = "response." + choiceIndex + '.' + event.randomEventType() + suffix;
         String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, resourceKey, commanderAddress);
 
         new ImmersiveDialogSimple(campaign, eventParticipant, null, inCharacterMessage, null, eventReport, null, false);

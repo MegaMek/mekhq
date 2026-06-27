@@ -19,7 +19,7 @@
 events:
   # This is the internal identification enum for the event.
   # Only acceptable values are in the RandomEventType enum.
-  - randomEventType: ARGUMENT
+  - randomEventType: "ARGUMENT"
     responseEntries:
       # Can only include values from the ResponseQuality enum. Must include three responses whose
       # index matches the response options presented to the player.
@@ -72,7 +72,7 @@ events:
               - SECURITY_GUARD
             magnitude: 3
 
-  - randomEventType: WILD_STORIES
+  - randomEventType: "WILD_STORIES"
     responseEntries:
       - quality: RESPONSE_POSITIVE
         effectsSuccess:
@@ -108,7 +108,7 @@ events:
             magnitude: 1
             affectedSkill: Leadership
 
-  - randomEventType: TAMPERING
+  - randomEventType: "TAMPERING"
     responseEntries:
       - quality: RESPONSE_NEGATIVE
         skillCheckSkill: Melee Weapons
@@ -140,7 +140,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: 10
 
-  - randomEventType: CONVERSATIONS
+  - randomEventType: "CONVERSATIONS"
     responseEntries:
       - quality: RESPONSE_NEUTRAL
         skillCheckSkill: Cryptography
@@ -171,7 +171,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: -5
 
-  - randomEventType: RATIONS
+  - randomEventType: "RATIONS"
     responseEntries:
       - quality: RESPONSE_POSITIVE
         abilityCheckType: CHARISMA
@@ -197,7 +197,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: -5
 
-  - randomEventType: TRADE
+  - randomEventType: "TRADE"
     responseEntries:
       - quality: RESPONSE_NEUTRAL
         skillCheckSkill: Investigation
@@ -230,7 +230,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: -10
 
-  - randomEventType: DRAINED
+  - randomEventType: "DRAINED"
     responseEntries:
       - quality: RESPONSE_POSITIVE
         skillCheckSkill: Administration
@@ -264,7 +264,7 @@ events:
               - SECURITY_GUARD
             magnitude: -2
 
-  - randomEventType: RESCUE
+  - randomEventType: "RESCUE"
     responseEntries:
       - quality: RESPONSE_NEUTRAL
         skillCheckSkill: Administration
@@ -315,7 +315,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: -10
 
-  - randomEventType: REPAIRS
+  - randomEventType: "REPAIRS"
     responseEntries:
       - quality: RESPONSE_NEUTRAL
         skillCheckSkill: Perception
@@ -360,7 +360,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: -5
 
-  - randomEventType: SICKNESS
+  - randomEventType: "SICKNESS"
     responseEntries:
       - quality: RESPONSE_POSITIVE
         skillCheckSkill: MedTech/Any
@@ -394,7 +394,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: -15
 
-  - randomEventType: VETERAN
+  - randomEventType: "VETERAN"
     responseEntries:
       - quality: RESPONSE_NEGATIVE
         effectsSuccess:
@@ -425,7 +425,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: -5
 
-  - randomEventType: GRAFFITI
+  - randomEventType: "GRAFFITI"
     responseEntries:
       - quality: RESPONSE_NEGATIVE
         skillCheckSkill: Small Arms
@@ -456,7 +456,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: -5
 
-  - randomEventType: PRAYER
+  - randomEventType: "PRAYER"
     responseEntries:
       - quality: RESPONSE_NEUTRAL
         effectsSuccess:
@@ -479,7 +479,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: -10
 
-  - randomEventType: BARTERING
+  - randomEventType: "BARTERING"
     responseEntries:
       - quality: RESPONSE_NEUTRAL
         skillCheckSkill: Investigation
@@ -503,7 +503,7 @@ events:
           # The OpFor has their morale bumped by one level
           - effect: UNIQUE
 
-  - randomEventType: OFFICER
+  - randomEventType: "OFFICER"
     responseEntries:
       - quality: RESPONSE_NEUTRAL
         effectsSuccess:
@@ -559,7 +559,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: -5
 
-  - randomEventType: DICE
+  - randomEventType: "DICE"
     responseEntries:
       - quality: RESPONSE_NEUTRAL
         skillCheckSkill: Melee Weapons
@@ -589,7 +589,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: -5
 
-  - randomEventType: LOVERS
+  - randomEventType: "LOVERS"
     responseEntries:
       - quality: RESPONSE_NEUTRAL
         skillCheckSkill: Leadership
@@ -615,7 +615,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: -5
 
-  - randomEventType: SOBBING
+  - randomEventType: "SOBBING"
     responseEntries:
       - quality: RESPONSE_NEUTRAL
         effectsSuccess:
@@ -645,7 +645,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: -5
 
-  - randomEventType: PROPAGANDA
+  - randomEventType: "PROPAGANDA"
     responseEntries:
       - quality: RESPONSE_NEUTRAL
         skillCheckSkill: Investigation
@@ -671,7 +671,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: -10
 
-  - randomEventType: SONGS
+  - randomEventType: "SONGS"
     responseEntries:
       - quality: RESPONSE_NEGATIVE
         skillCheckSkill: Small Arms
@@ -697,7 +697,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: -5
 
-  - randomEventType: REFUSE_RATIONS
+  - randomEventType: "REFUSE_RATIONS"
     responseEntries:
       - quality: RESPONSE_NEUTRAL
         effectsSuccess:
@@ -733,7 +733,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: -15
 
-  - randomEventType: PLOTTING
+  - randomEventType: "PLOTTING"
     responseEntries:
       - quality: RESPONSE_NEUTRAL
         skillCheckSkill: Administration
@@ -769,7 +769,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: -15
 
-  - randomEventType: EQUIPMENT
+  - randomEventType: "EQUIPMENT"
     responseEntries:
       - quality: RESPONSE_POSITIVE
         skillCheckSkill: Investigation
@@ -795,7 +795,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: -10
 
-  - randomEventType: PLANNED_RESCUE
+  - randomEventType: "PLANNED_RESCUE"
     responseEntries:
       - quality: RESPONSE_NEUTRAL
         skillCheckSkill: Negotiation
@@ -830,7 +830,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: -10
 
-  - randomEventType: MISTAKE
+  - randomEventType: "MISTAKE"
     responseEntries:
       - quality: RESPONSE_NEUTRAL
         effectsSuccess:
@@ -859,7 +859,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: -5
 
-  - randomEventType: LETTER
+  - randomEventType: "LETTER"
     responseEntries:
       - quality: RESPONSE_POSITIVE
         skillCheckSkill: Cryptography
@@ -884,7 +884,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: -5
 
-  - randomEventType: ILLNESS
+  - randomEventType: "ILLNESS"
     responseEntries:
       - quality: RESPONSE_NEUTRAL
         skillCheckSkill: Administration
@@ -924,7 +924,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: -10
 
-  - randomEventType: DO_ANDROIDS_DREAM_OF_ELECTRONIC_SHEEP
+  - randomEventType: "DO_ANDROIDS_DREAM_OF_ELECTRONIC_SHEEP"
     responseEntries:
       - quality: RESPONSE_NEUTRAL
         effectsSuccess:
@@ -948,7 +948,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: -5
 
-  - randomEventType: HEAVY_METAL
+  - randomEventType: "HEAVY_METAL"
     responseEntries:
       - quality: RESPONSE_POSITIVE
         skillCheckSkill: Investigation
@@ -973,7 +973,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: -5
 
-  - randomEventType: PARANOIA
+  - randomEventType: "PARANOIA"
     responseEntries:
       - quality: RESPONSE_NEUTRAL
         skillCheckSkill: Administration
@@ -996,7 +996,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: -10
 
-  - randomEventType: TUNNEL
+  - randomEventType: "TUNNEL"
     responseEntries:
       - quality: RESPONSE_POSITIVE
         skillCheckSkill: Administration
@@ -1046,7 +1046,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: -15
 
-  - randomEventType: PET_RODENT
+  - randomEventType: "PET_RODENT"
     responseEntries:
       - quality: RESPONSE_NEUTRAL
         effectsSuccess:
@@ -1070,7 +1070,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: -5
 
-  - randomEventType: ESCAPE_ROPE
+  - randomEventType: "ESCAPE_ROPE"
     responseEntries:
       - quality: RESPONSE_NEUTRAL
         skillCheckSkill: Melee Weapons
@@ -1120,7 +1120,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: -10
 
-  - randomEventType: UNDERCOVER
+  - randomEventType: "UNDERCOVER"
     responseEntries:
       - quality: RESPONSE_POSITIVE
         skillCheckSkill: Administration
@@ -1155,7 +1155,7 @@ events:
           - effect: SUPPORT_POINT
             magnitude: -1
 
-  - randomEventType: BRAND
+  - randomEventType: "BRAND"
     responseEntries:
       - quality: RESPONSE_NEUTRAL
         skillCheckSkill: Investigation
@@ -1203,7 +1203,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: -10
 
-  - randomEventType: SILENCE
+  - randomEventType: "SILENCE"
     responseEntries:
       - quality: RESPONSE_NEUTRAL
         skillCheckSkill: Investigation
@@ -1228,7 +1228,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: -5
 
-  - randomEventType: SINGING
+  - randomEventType: "SINGING"
     responseEntries:
       - quality: RESPONSE_NEUTRAL
         abilityCheckType: CHARISMA
@@ -1255,7 +1255,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: -5
 
-  - randomEventType: PAPER
+  - randomEventType: "PAPER"
     responseEntries:
       - quality: RESPONSE_NEUTRAL
         skillCheckSkill: Cryptography
@@ -1280,7 +1280,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: -10
 
-  - randomEventType: HOLIDAY
+  - randomEventType: "HOLIDAY"
     responseEntries:
       - quality: RESPONSE_NEGATIVE
         skillCheckSkill: Small Arms
@@ -1305,7 +1305,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: -5
 
-  - randomEventType: WHISPERS
+  - randomEventType: "WHISPERS"
     responseEntries:
       - quality: RESPONSE_NEUTRAL
         skillCheckSkill: Administration
@@ -1329,7 +1329,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: -10
 
-  - randomEventType: LEADER
+  - randomEventType: "LEADER"
     responseEntries:
       - quality: RESPONSE_NEUTRAL
         skillCheckSkill: Interrogation
@@ -1381,7 +1381,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: -10
 
-  - randomEventType: ARGUMENTS
+  - randomEventType: "ARGUMENTS"
     responseEntries:
       - quality: RESPONSE_POSITIVE
         skillCheckSkill: Negotiation
@@ -1405,7 +1405,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: -10
 
-  - randomEventType: SENTIMENTAL_ITEM
+  - randomEventType: "SENTIMENTAL_ITEM"
     responseEntries:
       - quality: RESPONSE_POSITIVE
         effectsSuccess:
@@ -1429,7 +1429,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: -10
 
-  - randomEventType: MALNUTRITION
+  - randomEventType: "MALNUTRITION"
     responseEntries:
       - quality: RESPONSE_POSITIVE
         skillCheckSkill: Melee Weapons
@@ -1462,7 +1462,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: -5
 
-  - randomEventType: INJURIES
+  - randomEventType: "INJURIES"
     responseEntries:
       - quality: RESPONSE_POSITIVE
         skillCheckSkill: Investigation
@@ -1518,7 +1518,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: -5
 
-  - randomEventType: TERROR
+  - randomEventType: "TERROR"
     responseEntries:
       - quality: RESPONSE_NEGATIVE
         effectsSuccess:
@@ -1545,7 +1545,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: -15
 
-  - randomEventType: SCREAMING
+  - randomEventType: "SCREAMING"
     responseEntries:
       - quality: RESPONSE_NEUTRAL
         skillCheckSkill: MedTech/Any
@@ -1570,7 +1570,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: -5
 
-  - randomEventType: PHOTO
+  - randomEventType: "PHOTO"
     responseEntries:
       - quality: RESPONSE_POSITIVE
         skillCheckSkill: Negotiation
@@ -1597,7 +1597,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: -15
 
-  - randomEventType: GHOSTS
+  - randomEventType: "GHOSTS"
     responseEntries:
       - quality: RESPONSE_POSITIVE
         skillCheckSkill: MedTech/Any
@@ -1622,7 +1622,7 @@ events:
           - effect: PRISONER_CAPACITY
             magnitude: -5
 
-  - randomEventType: VOICES
+  - randomEventType: "VOICES"
     responseEntries:
       - quality: RESPONSE_POSITIVE
         skillCheckSkill: Administration

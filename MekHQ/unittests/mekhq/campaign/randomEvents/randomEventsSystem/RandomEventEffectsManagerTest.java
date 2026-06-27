@@ -47,11 +47,6 @@ import static mekhq.campaign.randomEvents.randomEventsSystem.RandomEventEffected
 import static mekhq.campaign.randomEvents.randomEventsSystem.RandomEventEffectedPersonnelType.PRISONERS;
 import static mekhq.campaign.randomEvents.randomEventsSystem.RandomEventResponseQuality.RESPONSE_NEUTRAL;
 import static mekhq.campaign.randomEvents.randomEventsSystem.RandomEventResultEffect.*;
-import static mekhq.campaign.randomEvents.randomEventsSystem.RandomEventType.BARTERING;
-import static mekhq.campaign.randomEvents.randomEventsSystem.RandomEventType.BREAKOUT;
-import static mekhq.campaign.randomEvents.randomEventsSystem.RandomEventType.MISTAKE;
-import static mekhq.campaign.randomEvents.randomEventsSystem.RandomEventType.POISON;
-import static mekhq.campaign.randomEvents.randomEventsSystem.RandomEventType.UNDERCOVER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -101,10 +96,10 @@ class RandomEventEffectsManagerTest {
     }
 
     private static RandomEventData buildEventData(RandomEventResult result) {
-        return buildEventData(BREAKOUT, result);
+        return buildEventData("BREAKOUT", result);
     }
 
-    private static RandomEventData buildEventData(RandomEventType type, RandomEventResult result) {
+    private static RandomEventData buildEventData(String type, RandomEventResult result) {
         RandomEventResponseEntry entry = new RandomEventResponseEntry(
               RESPONSE_NEUTRAL, "", NO_ATTRIBUTE, List.of(result), List.of(result));
         return new RandomEventData(type, List.of(entry));
@@ -127,7 +122,7 @@ class RandomEventEffectsManagerTest {
         return runEffect(effect, targets, magnitude, "");
     }
 
-    private RandomEventEffectsManager runEffectForType(RandomEventType type,
+    private RandomEventEffectsManager runEffectForType(String type,
           List<RandomEventEffectedPersonnelType> targets, int magnitude) {
         RandomEventResult result = new RandomEventResult(RandomEventResultEffect.UNIQUE, targets, magnitude, "");
         return runEffect(buildEventData(type, result));
@@ -633,7 +628,7 @@ class RandomEventEffectsManagerTest {
         contract.setMoraleLevel(STALEMATE);
         when(mockCampaign.getActiveAtBContracts()).thenReturn(List.of(contract));
 
-        runEffectForType(BARTERING, List.of(PRISONERS), 1);
+        runEffectForType("BARTERING", List.of(PRISONERS), 1);
 
         assertEquals(STALEMATE.ordinal() + 1, contract.getMoraleLevel().ordinal(),
               "Morale should advance by one level");
@@ -645,7 +640,7 @@ class RandomEventEffectsManagerTest {
         contract.setMoraleLevel(OVERWHELMING);
         when(mockCampaign.getActiveAtBContracts()).thenReturn(List.of(contract));
 
-        RandomEventEffectsManager manager = runEffectForType(BARTERING, List.of(PRISONERS), 1);
+        RandomEventEffectsManager manager = runEffectForType("BARTERING", List.of(PRISONERS), 1);
 
         assertEquals(OVERWHELMING, contract.getMoraleLevel(), "Morale must not exceed OVERWHELMING");
         assertTrue(manager.getMechanicalEffectsReport().isBlank(),
@@ -656,7 +651,7 @@ class RandomEventEffectsManagerTest {
     void testEffectUniqueBartering_noContracts_emptyReport() {
         when(mockCampaign.getActiveAtBContracts()).thenReturn(List.of());
 
-        assertTrue(runEffectForType(BARTERING, List.of(PRISONERS), 1)
+        assertTrue(runEffectForType("BARTERING", List.of(PRISONERS), 1)
                          .getMechanicalEffectsReport().isBlank());
     }
 
@@ -676,7 +671,7 @@ class RandomEventEffectsManagerTest {
         prisoner.setSecondaryRole(ADMINISTRATOR_LOGISTICS);
         stubAllPersonnel(prisoner);
 
-        runEffectForType(MISTAKE, List.of(PRISONERS), 1);
+        runEffectForType("MISTAKE", List.of(PRISONERS), 1);
 
         assertNull(prisoner.getSkill(S_ADMIN), "Admin skill should be removed");
         assertNull(prisoner.getSkill(S_SMALL_ARMS), "Small Arms skill should be removed");
@@ -690,7 +685,7 @@ class RandomEventEffectsManagerTest {
         SkillType.initializeTypes();
         stubAllPersonnel();
 
-        assertTrue(runEffectForType(MISTAKE, List.of(PRISONERS), 1)
+        assertTrue(runEffectForType("MISTAKE", List.of(PRISONERS), 1)
                          .getMechanicalEffectsReport().isBlank());
     }
 
@@ -710,7 +705,7 @@ class RandomEventEffectsManagerTest {
         prisoner.setOriginFaction(originalFaction);
         stubAllPersonnel(prisoner);
 
-        runEffectForType(UNDERCOVER, List.of(PRISONERS), 1);
+        runEffectForType("UNDERCOVER", List.of(PRISONERS), 1);
 
         assertNotEquals(originalFaction, prisoner.getOriginFaction(), "The prisoner's faction should have changed");
         assertEquals(employerFaction, prisoner.getOriginFaction(),
@@ -726,7 +721,7 @@ class RandomEventEffectsManagerTest {
         prisoner.setOriginFaction(originalFaction);
         stubAllPersonnel(prisoner);
 
-        runEffectForType(UNDERCOVER, List.of(PRISONERS), 1);
+        runEffectForType("UNDERCOVER", List.of(PRISONERS), 1);
 
         assertEquals(originalFaction, prisoner.getOriginFaction(),
               "Faction should be unchanged when no contract is available");
@@ -748,7 +743,7 @@ class RandomEventEffectsManagerTest {
         soldier2.setPrimaryRoleDirect(SOLDIER);
         stubAllPersonnel(soldier0, soldier1, soldier2);
 
-        runEffectForType(POISON, List.of(COMBAT_PERSONNEL), 5);
+        runEffectForType("POISON", List.of(COMBAT_PERSONNEL), 5);
 
         long fatigued = Stream.of(soldier0, soldier1, soldier2)
                               .filter(p -> p.getFatigueDirect() > 0)
@@ -770,7 +765,7 @@ class RandomEventEffectsManagerTest {
 
         int resistantFatigueBefore = soldier0.getFatigueDirect();
 
-        runEffectForType(POISON, List.of(COMBAT_PERSONNEL), 5);
+        runEffectForType("POISON", List.of(COMBAT_PERSONNEL), 5);
 
         assertEquals(resistantFatigueBefore, soldier0.getFatigueDirect(),
               "A person with ATOW_POISON_RESISTANCE must not receive any fatigue from the poison effect");
@@ -785,7 +780,7 @@ class RandomEventEffectsManagerTest {
         Person soldier = new Person(mockCampaign);
         stubAllPersonnel(soldier);
 
-        assertTrue(runEffectForType(POISON, List.of(COMBAT_PERSONNEL), 5)
+        assertTrue(runEffectForType("POISON", List.of(COMBAT_PERSONNEL), 5)
                          .getMechanicalEffectsReport().isBlank());
     }
 
@@ -806,7 +801,7 @@ class RandomEventEffectsManagerTest {
 
         RandomEventResponseEntry entry = new RandomEventResponseEntry(
               RESPONSE_NEUTRAL, "", NO_ATTRIBUTE, List.of(successResult), List.of(failureResult));
-        RandomEventData eventData = new RandomEventData(BREAKOUT, List.of(entry));
+        RandomEventData eventData = new RandomEventData("BREAKOUTON", List.of(entry));
 
         new RandomEventEffectsManager(mockCampaign, eventData, 0, false);
 
