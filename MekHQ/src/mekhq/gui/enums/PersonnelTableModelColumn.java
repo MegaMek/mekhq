@@ -714,18 +714,18 @@ public enum PersonnelTableModelColumn {
     /**
      * Returns the tooltip text for this column, optionally including color reason explanations.
      *
-     * @param person          the person for this row
-     * @param colorReasonKeys list of i18n keys for color reasons, or null/empty if no special coloring
+     * @param person             the person for this row
+     * @param personalStateFlags list of i18n keys for color reasons, or null/empty if no special coloring
      *
      * @return the tooltip text, or null if no tooltip
      */
-    public @Nullable String getToolTipText(Person person, @Nullable java.util.List<String> colorReasonKeys) {
+    public @Nullable String getToolTipText(Person person, java.util.List<String> personalStateFlags) {
         String baseTooltip = getBaseToolTipText(person);
 
         // For name, rank, and status columns, append color reasons if present
-        if (colorReasonKeys != null && !colorReasonKeys.isEmpty() && isNameRankOrStatusColumn()) {
+        if (!personalStateFlags.isEmpty() && isNameRankOrStatusColumn()) {
             StringBuilder colorReasons = new StringBuilder();
-            for (String key : colorReasonKeys) {
+            for (String key : personalStateFlags) {
                 if (!colorReasons.isEmpty()) {
                     colorReasons.append("<br>");
                 }
