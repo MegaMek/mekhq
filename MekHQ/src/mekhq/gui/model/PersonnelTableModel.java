@@ -35,7 +35,6 @@ package mekhq.gui.model;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
 
 import java.awt.Component;
-import java.awt.Image;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.ImageIcon;
@@ -160,35 +159,39 @@ public class PersonnelTableModel extends DataTableModel<Person> {
     public class Renderer extends DefaultTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-              boolean hasFocus, int row, int column) {
-            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            final int modelRow = table.convertRowIndexToModel(row);
-            final PersonnelTableModelColumn personnelColumn = PERSONNEL_COLUMNS[table.convertColumnIndexToModel(column)];
-            final Person person = getPerson(modelRow);
+              boolean hasFocus, int rowIndex, int columnIndex) {
+            if (table == null) {
+                return this;
+            }
 
-            setOpaque(true);
-            setHorizontalAlignment(personnelColumn.getAlignment());
+            int modelRow = table.convertRowIndexToModel(rowIndex);
+            PersonnelTableModelColumn column = PERSONNEL_COLUMNS[table.convertColumnIndexToModel(columnIndex)];
+            Person person = getPerson(modelRow);
 
-            setText(personnelColumn.getText(value));
+            setFont(table.getFont());
+            setText(column.getText(value));
+            setHorizontalAlignment(column.getAlignment());
+
+            setIcon(getImage(person, column));
 
             // Collect all applicable color reasons for tooltip
             List<String> personalStateFlags = new ArrayList<>();
-            if (!isSelected) {
-                ComponentColors cellColors = populatePersonalStateFlags(person, personalStateFlags);
-                setForeground(cellColors.foreground());
-                setBackground(cellColors.background());
-            }
-            // Tool Tips - includes all applicable color reasons for name/rank/status columns
-            setToolTipText(personnelColumn.getToolTipText(person, personalStateFlags));
-
-            Image image = getImage(person, personnelColumn);
-            if (image != null) {
-                setIcon(new ImageIcon(image));
+            if (isSelected) {
+                setForeground(table.getSelectionForeground());
+                setBackground(table.getSelectionBackground());
             } else {
-                setIcon(null);
+                if (column == PersonnelTableModelColumn.PERSON_GRAPHICAL ||
+                          column == PersonnelTableModelColumn.FORCE_GRAPHICAL ||
+                          column == PersonnelTableModelColumn.UNIT_ASSIGNMENT_GRAPHICAL) {
+                    MekHqTableCellRenderer.setupTigerStripes(this, table, rowIndex);
+                } else {
+                    ComponentColors cellColors = populatePersonalStateFlags(person, personalStateFlags);
+                    setForeground(cellColors.foreground());
+                    setBackground(cellColors.background());
+                }
             }
+            setToolTipText(column.getToolTipText(person, personalStateFlags));
 
-            MekHqTableCellRenderer.setupTableColors(this, table, isSelected, hasFocus, row);
             return this;
         }
 
@@ -237,19 +240,19 @@ public class PersonnelTableModel extends DataTableModel<Person> {
                   UIManager.getColor("Table.background")) : cellColors;
         }
 
-        private Image getImage(Person person, PersonnelTableModelColumn personnelColumn) {
+        private ImageIcon getImage(Person person, PersonnelTableModelColumn personnelColumn) {
             return switch (personnelColumn) {
-                case PERSON_GRAPHICAL -> person.getPortraitImageIconWithFallback(true, 54).getImage();
+                case PERSON_GRAPHICAL -> person.getPortraitImageIconWithFallback(true, 54);
                 case UNIT_ASSIGNMENT_GRAPHICAL -> {
                     Unit unit = person.getUnit();
                     if ((unit == null) && !person.getTechUnits().isEmpty()) {
                         unit = person.getTechUnits().getFirst();
                     }
-                    yield (unit == null) ? null : unit.getImage(this);
+                    yield (unit == null) ? null : new ImageIcon(unit.getImage(this));
                 }
                 case FORCE_GRAPHICAL -> {
                     Formation formation = campaign.getFormationFor(person);
-                    yield  (formation == null) ? null : formation.getFormationIcon().getImage(54);
+                    yield  (formation == null) ? null : new ImageIcon(formation.getFormationIcon().getImage(54));
                 }
                 default -> null;
             };

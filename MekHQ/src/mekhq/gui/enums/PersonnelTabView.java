@@ -167,10 +167,6 @@ public enum PersonnelTabView {
         return toolTipText;
     }
 
-    public boolean isGraphic() {
-        return this == GRAPHIC;
-    }
-
     @Override
     public String toString() {
         return name;
