@@ -30,35 +30,19 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.randomEvents.prisoners.enums;
+package mekhq.campaign.randomEvents.personalities;
 
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
-/**
- * A test class for validating the functionality of the {@code PrisonerCaptureStyle} enumeration.
- *
- * <p>This class contains unit tests to ensure that each {@code PrisonerCaptureStyle} has valid
- * resource keys for its labels and tooltips. The tests verify that no invalid labels or tooltips are present, as
- * determined by the {@code isResourceKeyValid} method.</p>
- */
-public class PrisonerCaptureStyleTest {
-    @Test
-    public void testGetLabel_notInvalid() {
-        for (PrisonerCaptureStyle status : PrisonerCaptureStyle.values()) {
-            String label = status.getLabel();
-            assertTrue(isResourceKeyValid(label));
-        }
-    }
-
-    @Test
-    public void testGetTitleExtension_notInvalid() {
-        for (PrisonerCaptureStyle status : PrisonerCaptureStyle.values()) {
-            String titleExtension = status.getTooltip();
-            assertTrue(isResourceKeyValid(titleExtension));
-        }
+class PersonalityTraitTypeTest {
+    @ParameterizedTest
+    @EnumSource(value = PersonalityTraitType.class)
+    void testGetLabel_notInvalid(PersonalityTraitType status) {
+        String label = status.getLabel();
+        assertTrue(isResourceKeyValid(label));
     }
 }

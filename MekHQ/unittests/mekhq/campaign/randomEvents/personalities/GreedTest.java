@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.randomEvents.personalities.enums;
+package mekhq.campaign.randomEvents.personalities;
 
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -41,47 +41,46 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import megamek.common.enums.Gender;
-import mekhq.campaign.randomEvents.personalities.Ambition;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
-public class AmbitionTest {
+public class GreedTest {
     @ParameterizedTest
-    @CsvSource(value = { "AMBITIOUS,AMBITIOUS", "INVALID_STATUS,NONE", "'',NONE", "'null',NONE", "1,AMBITIOUS" })
-    void testFromStringVariousInputs(String input, Ambition expected) {
+    @CsvSource(value = { "ASTUTE,ASTUTE", "INVALID_STATUS,NONE", "'',NONE", "'null',NONE", "1,ASTUTE" })
+    void testFromStringVariousInputs(String input, Greed expected) {
         if ("null".equals(input)) {
             input = null;
         }
-        Ambition result = Ambition.fromString(input);
+        Greed result = Greed.fromString(input);
         assertEquals(expected, result);
     }
 
     @ParameterizedTest
-    @EnumSource(value = Ambition.class)
-    void testFromString_Ordinal_All(Ambition value) {
-        Ambition result = Ambition.fromString(String.valueOf(value.ordinal()));
+    @EnumSource(value = Greed.class)
+    void testFromString_Ordinal_All(Greed value) {
+        Greed result = Greed.fromString(String.valueOf(value.ordinal()));
         assertEquals(value, result);
     }
 
     @ParameterizedTest
-    @EnumSource(value = Ambition.class)
-    void testGetLabel_notInvalid(Ambition status) {
+    @EnumSource(value = Greed.class)
+    void testGetLabel_notInvalid(Greed status) {
         String label = status.getLabel();
         assertTrue(isResourceKeyValid(label));
     }
 
-    static Stream<Arguments> provideAmbitionsAndIndices() {
-        return Arrays.stream(Ambition.values())
-                     .flatMap(trait -> IntStream.range(0, Ambition.MAXIMUM_VARIATIONS)
+    static Stream<Arguments> provideGreedsAndIndices() {
+        return Arrays.stream(Greed.values())
+                     .flatMap(trait -> IntStream.range(0, Greed.MAXIMUM_VARIATIONS)
                                              .mapToObj(i -> Arguments.of(trait, i)));
     }
 
     @ParameterizedTest
-    @MethodSource(value = "provideAmbitionsAndIndices")
-    void testGetDescription_notInvalid(Ambition trait, int i) {
+    @MethodSource(value = "provideGreedsAndIndices")
+    void testGetDescription_notInvalid(Greed trait, int i) {
         String description = trait.getDescription(i, Gender.MALE, "Barry");
         assertTrue(isResourceKeyValid(description));
     }
@@ -89,13 +88,13 @@ public class AmbitionTest {
     @ParameterizedTest
     @CsvSource(value = { "99", "1000", "-1" })
     void testGetDescription_InvalidDescriptionIndex(int invalidIndex) {
-        String description = Ambition.NONE.getDescription(invalidIndex, Gender.MALE, "Barry");
+        String description = Greed.NONE.getDescription(invalidIndex, Gender.MALE, "Barry");
         assertTrue(isResourceKeyValid(description));
     }
 
     @ParameterizedTest
-    @EnumSource(value = Ambition.class)
-    void testGetRoninMessage_notInvalid(Ambition trait) {
+    @EnumSource(value = Greed.class)
+    void testGetRoninMessage_notInvalid(Greed trait) {
         String description = trait.getRoninMessage("Commander");
         assertTrue(isResourceKeyValid(description));
     }

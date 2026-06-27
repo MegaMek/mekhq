@@ -30,10 +30,8 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.randomEvents.personalities.enums;
+package mekhq.campaign.randomEvents.personalities;
 
-import static mekhq.campaign.randomEvents.personalities.Aggression.MAXIMUM_VARIATIONS;
-import static mekhq.campaign.randomEvents.personalities.Aggression.NONE;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -43,46 +41,46 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import megamek.common.enums.Gender;
-import mekhq.campaign.randomEvents.personalities.Aggression;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
-public class AggressionTest {
+public class SocialTest {
     @ParameterizedTest
-    @CsvSource(value = { "AGGRESSIVE,AGGRESSIVE", "INVALID_STATUS,NONE", "'',NONE", "'null',NONE", "1,AGGRESSIVE" })
-    void testFromStringVariousInputs(String input, Aggression expected) {
+    @CsvSource(value = { "APATHETIC,APATHETIC", "INVALID_STATUS,NONE", "'',NONE", "'null',NONE", "1,APATHETIC" })
+    void testFromStringVariousInputs(String input, Social expected) {
         if ("null".equals(input)) {
             input = null;
         }
-        Aggression result = Aggression.fromString(input);
+        Social result = Social.fromString(input);
         assertEquals(expected, result);
     }
 
     @ParameterizedTest
-    @EnumSource(value = Aggression.class)
-    void testFromString_Ordinal_All(Aggression value) {
-        Aggression result = Aggression.fromString(String.valueOf(value.ordinal()));
+    @EnumSource(value = Social.class)
+    void testFromString_Ordinal_All(Social value) {
+        Social result = Social.fromString(String.valueOf(value.ordinal()));
         assertEquals(value, result);
     }
 
     @ParameterizedTest
-    @EnumSource(value = Aggression.class)
-    void testGetLabel_notInvalid(Aggression status) {
+    @EnumSource(value = Social.class)
+    void testGetLabel_notInvalid(Social status) {
         String label = status.getLabel();
         assertTrue(isResourceKeyValid(label));
     }
 
-    static Stream<Arguments> provideAggressionsAndIndices() {
-        return Arrays.stream(Aggression.values())
-                     .flatMap(trait -> IntStream.range(0, MAXIMUM_VARIATIONS).mapToObj(i -> Arguments.of(trait, i)));
+    static Stream<Arguments> provideSocialsAndIndices() {
+        return Arrays.stream(Social.values())
+                     .flatMap(trait -> IntStream.range(0, Social.MAXIMUM_VARIATIONS)
+                                             .mapToObj(i -> Arguments.of(trait, i)));
     }
 
     @ParameterizedTest
-    @MethodSource(value = "provideAggressionsAndIndices")
-    void testGetDescription_notInvalid(Aggression trait, int i) {
+    @MethodSource(value = "provideSocialsAndIndices")
+    void testGetDescription_notInvalid(Social trait, int i) {
         String description = trait.getDescription(i, Gender.MALE, "Barry");
         assertTrue(isResourceKeyValid(description));
     }
@@ -90,13 +88,13 @@ public class AggressionTest {
     @ParameterizedTest
     @CsvSource(value = { "99", "1000", "-1" })
     void testGetDescription_InvalidDescriptionIndex(int invalidIndex) {
-        String description = NONE.getDescription(invalidIndex, Gender.MALE, "Barry");
+        String description = Social.NONE.getDescription(invalidIndex, Gender.MALE, "Barry");
         assertTrue(isResourceKeyValid(description));
     }
 
     @ParameterizedTest
-    @EnumSource(value = Aggression.class)
-    void testGetRoninMessage_notInvalid(Aggression trait) {
+    @EnumSource(value = Social.class)
+    void testGetRoninMessage_notInvalid(Social trait) {
         String description = trait.getRoninMessage("Commander");
         assertTrue(isResourceKeyValid(description));
     }

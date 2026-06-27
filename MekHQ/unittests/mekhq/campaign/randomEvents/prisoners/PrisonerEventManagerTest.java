@@ -78,7 +78,7 @@ import org.junit.jupiter.api.Test;
  * {@link PrisonerEventManager} class. The tests primarily focus on scenarios involving degradation of temporary
  * prisoner capacity and events triggered by prisoner or morale conditions.</p>
  */
-public class RandomEventTypeManagerTest {
+public class PrisonerEventManagerTest {
     @Test
     void testDegradeTemporaryCapacity_DegradeDownTowardsDefault() {
         final int INITIAL_TEMPORARY_CAPACITY = 150;
