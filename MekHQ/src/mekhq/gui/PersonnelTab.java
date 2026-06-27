@@ -330,6 +330,9 @@ public final class PersonnelTab extends CampaignGuiTab {
         personnelSorter = new TableRowSorter<>(personModel);
         final ArrayList<SortKey> sortKeys = new ArrayList<>();
         for (final PersonnelTableModelColumn column : PersonnelTableModel.PERSONNEL_COLUMNS) {
+            TableColumn tableColumn = personColumnModel.getColumnByModelIndex(column.ordinal());
+            tableColumn.setCellRenderer(personModel.getRenderer());
+
             final Comparator<?> comparator = column.getComparator();
             personnelSorter.setComparator(column.ordinal(), comparator);
             final SortOrder sortOrder = column.getDefaultSortOrder();
@@ -480,11 +483,10 @@ public final class PersonnelTab extends CampaignGuiTab {
 
         for (PersonnelTableModelColumn column : PersonnelTableModel.PERSONNEL_COLUMNS) {
             TableColumn tableColumn = columnModel.getColumnByModelIndex(column.ordinal());
-            tableColumn.setCellRenderer(getPersonModel().getRenderer(choicePersonView.getSelectedItem()));
             tableColumn.setPreferredWidth(column.getWidth());
             columnModel.setColumnVisible(tableColumn, visibleColumns.contains(column));
         }
-
+        personnelTable.setRowHeight(UIUtil.scaleForGUI((view == PersonnelTabView.GRAPHIC) ? 60 : 15));
         // reattach the updated model
         personnelTable.setColumnModel(columnModel);
     }

@@ -133,7 +133,6 @@ public class PersonnelMarketDialog extends JDialog {
         personnelMarket = campaign.getPersonnelMarket();
         personnelModel = new PersonnelTableModel(campaign);
         personnelModel.setData(personnelMarket.getPersonnel());
-        personnelModel.loadAssignmentFromMarket(personnelMarket);
         initComponents();
         filterPersonnel();
         setLocationRelativeTo(frame);

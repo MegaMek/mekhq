@@ -32,8 +32,6 @@
  */
 package mekhq.gui.enums;
 
-import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
-
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.function.BiFunction;
@@ -49,6 +47,7 @@ import megamek.common.units.Jumpship;
 import megamek.common.units.Mek;
 import megamek.common.units.SmallCraft;
 import megamek.common.units.Tank;
+import megamek.common.units.UnitType;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -72,6 +71,7 @@ import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
+import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.randomEvents.personalities.PersonalityTrait;
 import mekhq.campaign.randomEvents.personalities.Reasoning;
 import mekhq.campaign.unit.Unit;
@@ -85,8 +85,8 @@ import org.jspecify.annotations.NonNull;
 
 public enum PersonnelTableModelColumn {
 
-    PERSON("Column.PERSON.title", Comparators.STRING_COMPARATOR,
-          person -> ""),
+    PERSON_GRAPHICAL("Column.PERSON.title", Comparators.STRING_COMPARATOR,
+          (person, campaign) -> "<html>" + person.getFullDesc(campaign) + "</html>"),
     RANK("Column.RANK.title", PersonRankSorter.INSTANCE,
           person -> person, Person::getRankName),
     FIRST_NAME("Column.FIRST_NAME.title", Comparators.STRING_COMPARATOR,
@@ -120,6 +120,8 @@ public enum PersonnelTableModelColumn {
           (person, campaign) -> person.getFormatedRoleDescriptions(campaign.getLocalDate())),
     UNIT_ASSIGNMENT("Column.UNIT_ASSIGNMENT.title", Comparators.STRING_COMPARATOR,
           PersonnelTableModelColumn::getUnitAssignment),
+    UNIT_ASSIGNMENT_GRAPHICAL("Column.UNIT_ASSIGNMENT.title", Comparators.STRING_COMPARATOR,
+          PersonnelTableModelColumn::getUnitAssignmentGraphical),
     MARKET_UNIT_ASSIGNMENT("Column.UNIT_ASSIGNMENT.title", Comparators.STRING_COMPARATOR,
           (person, campaign) -> {
               PersonnelMarket market = campaign.getPersonnelMarket();
@@ -131,6 +133,8 @@ public enum PersonnelTableModelColumn {
               Formation formation = campaign.getFormationFor(person);
               return (formation == null) ? "-" : formation.getName();
           }),
+    FORCE_GRAPHICAL("Column.FORCE.title", Comparators.STRING_COMPARATOR,
+          PersonnelTableModelColumn::getForceTextGraphical),
     DEPLOYED("Column.DEPLOYED.title", Comparators.STRING_COMPARATOR,
           PersonnelTableModelColumn::getDeployedScenarioName),
     MEK("Column.MEK.title", SkillPair.COMPARATOR,
@@ -305,10 +309,7 @@ public enum PersonnelTableModelColumn {
     BLOODMARK("Column.BLOODMARK.title", Comparators.INT_COMPARATOR,
           Person::getBloodmark, Object::toString),
     FATIGUE("Column.FATIGUE.title", Comparators.INT_COMPARATOR,
-          (person, campaign) ->
-                getEffectiveFatigue(person.getAdjustedFatigue(),
-                      person.getPermanentFatigue(), person.isClanPersonnel(),
-                      person.getSkillLevel(campaign, false, true)), Object::toString),
+          Fatigue::getEffectiveFatigue, Object::toString),
     SPA_COUNT("Column.SPA_COUNT.title", Comparators.INT_COMPARATOR,
           person -> person.countOptions(PersonnelOptions.LVL3_ADVANTAGES), Object::toString),
     MODIFICATION_COUNT("Column.MODIFICATION_COUNT.title", Comparators.INT_COMPARATOR,
@@ -514,6 +515,24 @@ public enum PersonnelTableModelColumn {
         }
     }
 
+    private static String getForceTextGraphical(Person person, Campaign campaign) {
+        Formation formation = campaign.getFormationFor(person);
+        if (formation != null) {
+            StringBuilder desc = new StringBuilder("<html><b>").append(formation.getName()).append("</b>");
+            Formation parent = formation.getParentFormation();
+            // cut off after three lines and don't include the top level
+            int lines = 1;
+            while ((parent != null) && (parent.getParentFormation() != null) && (lines < 4)) {
+                desc.append("<br>").append(parent.getName());
+                lines++;
+                parent = parent.getParentFormation();
+            }
+            desc.append("</html>");
+            return desc.toString();
+        }
+        return "-";
+    }
+
     private static String getDeployedScenarioName(Person person, Campaign campaign) {
         Unit unit = person.getUnit();
         if (unit == null || !unit.isDeployed()) {
@@ -580,6 +599,25 @@ public enum PersonnelTableModelColumn {
             default -> "-/-";
         };
     }
+
+    private static String getUnitAssignmentGraphical(Person person) {
+        Unit unit = person.getUnit();
+        if ((unit == null) && !person.getTechUnits().isEmpty()) {
+            unit = person.getTechUnits().getFirst();
+        }
+
+        if (unit != null) {
+            String description = "<html><b>" + unit.getName() + "</b><br>";
+            description += unit.getEntity().getWeightClassName();
+            if ((!(unit.getEntity() instanceof SmallCraft) || !(unit.getEntity() instanceof Jumpship))) {
+                description += " " + UnitType.getTypeDisplayableName(unit.getEntity().getUnitType());
+            }
+            description += "<br>" + unit.getStatus() + "</html>";
+            return description;
+        }
+        return "-";
+    }
+
 
     private static String getUnitAssignment(Person person) {
         Unit unit = person.getUnit();
@@ -744,7 +782,7 @@ public enum PersonnelTableModelColumn {
      * status column.
      */
     private boolean isNameRankOrStatusColumn() {
-        return (this == PERSON) ||
+        return (this == PERSON_GRAPHICAL) ||
                      (this == FIRST_NAME) ||
                      (this == LAST_NAME) ||
                      (this == GIVEN_NAME) ||
@@ -757,7 +795,7 @@ public enum PersonnelTableModelColumn {
 
     public int getWidth() {
         return switch (this) {
-            case PERSON, UNIT_ASSIGNMENT, MARKET_UNIT_ASSIGNMENT -> 125;
+            case PERSON_GRAPHICAL, UNIT_ASSIGNMENT, MARKET_UNIT_ASSIGNMENT -> 125;
             case RANK, FIRST_NAME, GIVEN_NAME, DEPLOYED -> 70;
             case LAST_NAME, SURNAME, SURNAME_GROUPED_BY_UNIT, BLOODNAME, CALLSIGN, SKILL_LEVEL, SALARY -> 50;
             case PERSONNEL_ROLE -> 150;

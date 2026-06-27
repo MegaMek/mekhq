@@ -252,7 +252,7 @@ public final class LocationDisplay {
 
     /** Returns the player base anchored at {@code system}, or {@code null} if there is none. */
     private static @Nullable PlayerBase findBaseAtSystem(Campaign campaign, PlanetarySystem system) {
-        for (PlayerBase base : campaign.getPlayerBases()) {
+        for (PlayerBase base : campaign.getCampaignLocationManager().getPlayerBases()) {
             if (system.equals(base.getCurrentSystem())) {
                 return base;
             }

@@ -246,7 +246,7 @@ public final class LocationNewDayUtil {
      * location).
      */
     public static void processAllLocationUnits(Campaign campaign) {
-        for (AbstractLocation location : campaign.getLocations()) {
+        for (AbstractLocation location : campaign.getCampaignLocationManager().getLocations()) {
             for (ILocation child : location.getChildLocations()) {
                 if (child instanceof IPlace place) {
                     processNewDayUnits(place, campaign);
