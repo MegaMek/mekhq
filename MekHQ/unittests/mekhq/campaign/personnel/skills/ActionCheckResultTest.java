@@ -37,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import mekhq.utilities.ReportingUtilities;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -52,7 +53,8 @@ class ActionCheckResultTest {
         assertEquals(1, result.getMarginOfSuccess());
         assertFalse(result.hasUsedEdge());
         assertEquals("Success.", result.getReport(false));
-        assertEquals("Success. <span color='#7fcf43'><i>It'll do...</i></span>", result.getReport(true));
+        assertEquals("Success. <span color='positive'><i>It'll do...</i></span>",
+              result.getReport(true).replace(ReportingUtilities.getPositiveColor(), "positive"));
     }
 
     @Test
@@ -62,7 +64,8 @@ class ActionCheckResultTest {
         assertEquals(2, result.getMarginOfSuccess());
         assertTrue(result.hasUsedEdge());
         assertEquals("Success. Used a point of <b>Edge</b>.", result.getReport(false));
-        assertEquals("Success. Used a point of <b>Edge</b>. <span color='#7fcf43'><i>Good.</i></span>", result.getReport(true));
+        assertEquals("Success. Used a point of <b>Edge</b>. <span color='positive'><i>Good.</i></span>",
+              result.getReport(true).replace(ReportingUtilities.getPositiveColor(), "positive"));
     }
 
     @ParameterizedTest
