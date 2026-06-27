@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.randomEvents.prisoners;
+package mekhq.campaign.randomEvents.randomEventsSystem;
 
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.OVERWHELMING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
@@ -73,13 +73,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventData;
-import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventEffectedPersonnelType;
-import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventEffectsManager;
-import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventResponseEntry;
-import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventResult;
-import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventResultEffect;
-import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventType;
+import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.BeforeEach;

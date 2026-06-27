@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.randomEvents.prisoners;
+package mekhq.campaign.randomEvents.randomEventsSystem;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
@@ -65,6 +65,8 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle;
+import mekhq.campaign.randomEvents.prisoners.PrisonerEventManager;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.Nested;

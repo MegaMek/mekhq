@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.randomEvents.personalities.enums;
+package mekhq.campaign.randomEvents.personalities;
 
 import static mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR;
 import static mekhq.campaign.randomEvents.personalities.PersonalityQuirk.NONE;
@@ -44,7 +44,6 @@ import java.util.stream.Stream;
 
 import megamek.common.enums.Gender;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.randomEvents.personalities.PersonalityQuirk;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import org.junit.jupiter.params.ParameterizedTest;
