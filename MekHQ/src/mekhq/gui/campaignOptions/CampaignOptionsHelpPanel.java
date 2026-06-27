@@ -58,7 +58,6 @@ import megamek.common.ui.FastJScrollPane;
  */
 class CampaignOptionsHelpPanel extends JPanel {
     private static final int HELP_PANEL_HEIGHT = 120;
-    private static final int SCROLL_SPEED = 12;
 
     private final JEditorPane helpTextPane;
 
@@ -90,7 +89,6 @@ class CampaignOptionsHelpPanel extends JPanel {
         helpScrollPane.setBorder(null);
         helpScrollPane.setOpaque(false);
         helpScrollPane.getViewport().setOpaque(false);
-        helpScrollPane.getVerticalScrollBar().setUnitIncrement(SCROLL_SPEED);
 
         add(helpScrollPane, BorderLayout.CENTER);
         clearHelpText();

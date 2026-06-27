@@ -32,26 +32,24 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import static mekhq.campaign.personnel.SkillPrerequisite.DISPLAY_GROUP_CLOSE;
+import static mekhq.campaign.personnel.SkillPrerequisite.DISPLAY_GROUP_OPEN;
+import static mekhq.campaign.personnel.SkillPrerequisite.DISPLAY_OR_SEPARATOR;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.CAMPAIGN_OPTIONS_PAGE_CONTENT_WIDTH;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static mekhq.utilities.spaUtilities.SpaUtilities.getSpaCategory;
-import static mekhq.utilities.spaUtilities.enums.AbilityCategory.CHARACTER_CREATION_ONLY;
-import static mekhq.utilities.spaUtilities.enums.AbilityCategory.CHARACTER_FLAW;
-import static mekhq.utilities.spaUtilities.enums.AbilityCategory.COMBAT_ABILITY;
-import static mekhq.utilities.spaUtilities.enums.AbilityCategory.MANEUVERING_ABILITY;
-import static mekhq.utilities.spaUtilities.enums.AbilityCategory.UTILITY_ABILITY;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumMap;
@@ -270,14 +268,25 @@ public class AbilitiesPages {
               .showDetailsPanel(false)
               .component(createAbilityButtonBar(abilityCategory));
 
-        // Every special ability is selectable as a prerequisite/incompatible/removed entry, so build the lookup map
-        // once and share it with each ability control's selector popups.
-        Map<String, SpecialAbility> allSPAs = new HashMap<>();
-        for (CampaignOptionsAbilityInfo info : allAbilityInfo.values()) {
-            allSPAs.put(info.getAbility().getName(), info.getAbility());
-        }
+        // Build the shared special-ability lookup once and hand it to every ability control below.
+        Map<String, SpecialAbility> allSPAs = buildSpaLookup(allAbilityInfo.values());
 
-        // One collapsible section per ability, alphabetical, titled by the ability's display name.
+        addAbilitySections(builder, abilityCategory, allSPAs);
+
+        return builder.build();
+    }
+
+    /**
+     * Adds one collapsible section per ability in the given category to the page builder. Abilities are listed
+     * alphabetically by internal name and titled by their display name; each section wraps an
+     * {@link AbilityOptionPanel} backed by the shared special-ability lookup.
+     *
+     * @param builder         the page builder to append the ability sections to
+     * @param abilityCategory the category whose abilities should be listed
+     * @param allSPAs         the shared special-ability lookup handed to each ability control
+     */
+    private void addAbilitySections(CampaignOptionsPagePanel.Builder builder, AbilityCategory abilityCategory,
+          Map<String, SpecialAbility> allSPAs) {
         ArrayList<String> sortedAbilityNames = new ArrayList<>(allAbilityInfo.keySet());
         Collections.sort(sortedAbilityNames);
 
@@ -291,8 +300,22 @@ public class AbilitiesPages {
                       abilityPanel);
             }
         }
+    }
 
-        return builder.build();
+    /**
+     * Builds a lookup of every special ability keyed by its internal name. Each ability is selectable as a
+     * prerequisite/incompatible/removed entry, so this shared map backs each ability control's selector popups.
+     *
+     * @param abilityInfos the ability info entries to index
+     *
+     * @return a map of ability name to its {@link SpecialAbility}
+     */
+    private static Map<String, SpecialAbility> buildSpaLookup(Collection<CampaignOptionsAbilityInfo> abilityInfos) {
+        Map<String, SpecialAbility> allSPAs = new HashMap<>();
+        for (CampaignOptionsAbilityInfo info : abilityInfos) {
+            allSPAs.put(info.getAbility().getName(), info.getAbility());
+        }
+        return allSPAs;
     }
 
     /**
@@ -631,9 +654,10 @@ public class AbilitiesPages {
         }
 
         /**
-         * Formats a single skill prerequisite (an OR-group) for display: drops the raw {@code {}} delimiters from
-         * {@link SkillPrerequisite#toString()} and renders the {@code OR} separators as a muted "or" so the entry reads
-         * as a plain "any one of these skills" list.
+         * Formats a single skill prerequisite (an OR-group) for display: drops the {@link SkillPrerequisite} group
+         * delimiters and renders its {@code OR} separators as a muted "or", so the entry reads as a plain "any one of
+         * these skills" list. The tokens are the {@code DISPLAY_*} constants on {@link SkillPrerequisite} - if
+         * {@link SkillPrerequisite#toString()} ever changes format, update this parser to match.
          *
          * @param skillPrerequisite the prerequisite to format
          *
@@ -641,10 +665,10 @@ public class AbilitiesPages {
          */
         private static String formatSkillPrerequisite(SkillPrerequisite skillPrerequisite) {
             String body = skillPrerequisite.toString();
-            if (body.startsWith("{") && body.endsWith("}")) {
-                body = body.substring(1, body.length() - 1);
+            if (body.startsWith(DISPLAY_GROUP_OPEN) && body.endsWith(DISPLAY_GROUP_CLOSE)) {
+                body = body.substring(DISPLAY_GROUP_OPEN.length(), body.length() - DISPLAY_GROUP_CLOSE.length());
             }
-            body = body.replace("<br>OR ", "<br><span style='color:gray;'>or </span>");
+            body = body.replace(DISPLAY_OR_SEPARATOR, "<br><span style='color:gray;'>or </span>");
             return "<html><div style='width: " +
                          UIUtil.scaleForGUI(ABILITY_COLUMN_TEXT_WIDTH) +
                          "px;'>" +
@@ -669,32 +693,56 @@ public class AbilitiesPages {
             JLabel title = new JLabel("<html>" + getTextAt(getCampaignOptionsResourceBundle(), titleKey) + "</html>");
 
             JButton btnAdd = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "abilityAdd.text"));
-            btnAdd.addActionListener(e -> {
-                AbilitySelectorDialog dialog = new AbilitySelectorDialog(SwingUtilities.getWindowAncestor(this),
-                      getTextAt(getCampaignOptionsResourceBundle(), titleKey).replaceAll("<[^>]*>", "").trim(),
-                      current,
-                      allSPAs);
-                dialog.setVisible(true);
-                if (!dialog.wasCancelled()) {
-                    setter.accept(dialog.getSelected());
-                    rebuild.run();
-                }
-            });
+            btnAdd.addActionListener(e -> promptToAddAbilities(titleKey, current, setter, rebuild));
             column.add(makeColumnHeader(title, btnAdd));
 
             List<String> sorted = new ArrayList<>(current);
             sorted.sort(Comparator.comparing(SpecialAbility::getDisplayName, String.CASE_INSENSITIVE_ORDER));
             for (String abilityName : sorted) {
-                column.add(makeChipRow(abilityName, () -> {
-                    Vector<String> updated = new Vector<>(current);
-                    updated.remove(abilityName);
-                    setter.accept(updated);
-                    rebuild.run();
-                }));
+                column.add(makeChipRow(abilityName, () -> removeAbility(abilityName, current, setter, rebuild)));
             }
 
             column.revalidate();
             column.repaint();
+        }
+
+        /**
+         * Opens the searchable ability selector seeded with the column's current selection and, if the user confirms,
+         * writes the chosen abilities back and rebuilds the column.
+         *
+         * @param titleKey the resource key for the selector's heading
+         * @param current  the column's current selection, used to seed the selector
+         * @param setter   writes the chosen selection back to the ability
+         * @param rebuild  re-runs this column's population after the change
+         */
+        private void promptToAddAbilities(String titleKey, Vector<String> current,
+              Consumer<Vector<String>> setter, Runnable rebuild) {
+            AbilitySelectorDialog dialog = new AbilitySelectorDialog(SwingUtilities.getWindowAncestor(this),
+                  getTextAt(getCampaignOptionsResourceBundle(), titleKey).replaceAll("<[^>]*>", "").trim(),
+                  current,
+                  allSPAs);
+            dialog.setVisible(true);
+            if (!dialog.wasCancelled()) {
+                setter.accept(dialog.getSelected());
+                rebuild.run();
+            }
+        }
+
+        /**
+         * Removes the given ability from the column's selection and rebuilds the column. The current selection is
+         * copied before editing, so the vector backing the column is left untouched.
+         *
+         * @param abilityName the ability to remove from the selection
+         * @param current     the column's current selection
+         * @param setter      writes the updated selection back to the ability
+         * @param rebuild     re-runs this column's population after the change
+         */
+        private static void removeAbility(String abilityName, Vector<String> current,
+              Consumer<Vector<String>> setter, Runnable rebuild) {
+            Vector<String> updated = new Vector<>(current);
+            updated.remove(abilityName);
+            setter.accept(updated);
+            rebuild.run();
         }
 
         /**

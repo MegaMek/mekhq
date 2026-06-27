@@ -174,7 +174,7 @@ class DeathPage {
         for (final AgeGroup ageGroup : AgeGroup.values()) {
             JCheckBox ageGroupCheckBox = chkEnabledRandomDeathAgeGroups.get(ageGroup);
             if (ageGroupCheckBox != null) {
-                ageGroupCheckBox.setSelected(Boolean.TRUE.equals(model.enabledRandomDeathAgeGroups.get(ageGroup)));
+                ageGroupCheckBox.setSelected(model.enabledRandomDeathAgeGroups.getOrDefault(ageGroup, false));
             }
         }
     }

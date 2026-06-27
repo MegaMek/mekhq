@@ -202,7 +202,7 @@ class BiographyOptionsModel {
         options.setRandomDeathMultiplier(randomDeathMultiplier);
         for (final AgeGroup ageGroup : AgeGroup.values()) {
             options.getEnabledRandomDeathAgeGroups().put(ageGroup,
-                  Boolean.TRUE.equals(enabledRandomDeathAgeGroups.get(ageGroup)));
+                  enabledRandomDeathAgeGroups.getOrDefault(ageGroup, false));
         }
         options.setUseEducationModule(useEducationModule);
         options.setCurriculumXpRate(curriculumXpRate);

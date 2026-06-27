@@ -310,24 +310,27 @@ class NameAndPortraitGenerationPage {
         chkNoRandomPortraitsForChildren.setSelected(model.noRandomPortraitsForChildren);
         chkChildPortraitsWhenComingOfAge.setSelected(model.childPortraitsWhenComingOfAge);
 
-        for (int i = 0; i < Math.min(chkUsePortrait.length, model.usePortraitForRole.length); i++) {
-            if (chkUsePortrait[i] == null) {
-                continue;
+        int portraitCount = Math.min(chkUsePortrait.length, model.usePortraitForRole.length);
+        int civilianIndex = chkUsePortrait.length - 1;
+
+        // Role-specific portraits are index-aligned with their role ordinal.
+        for (int i = 0; i < portraitCount; i++) {
+            if (chkUsePortrait[i] != null && i != civilianIndex) {
+                chkUsePortrait[i].setSelected(model.usePortraitForRole[i]);
             }
-            if (i == chkUsePortrait.length - 1) {
-                // The last checkbox is the shared "Civilian" toggle; writeToModel spreads it across every civilian
-                // role, so read it back from a civilian role's slot to keep the two sides symmetric.
-                boolean civilianSelected = false;
-                for (PersonnelRole role : PersonnelRole.getCivilianRoles()) {
-                    if (role.ordinal() < model.usePortraitForRole.length) {
-                        civilianSelected = model.usePortraitForRole[role.ordinal()];
-                        break;
-                    }
+        }
+
+        // The last checkbox is the shared "Civilian" toggle; writeToModel spreads it across every civilian role,
+        // so read it back from the first civilian role's slot to keep the two sides symmetric.
+        if (civilianIndex < portraitCount && chkUsePortrait[civilianIndex] != null) {
+            boolean civilianSelected = false;
+            for (PersonnelRole role : PersonnelRole.getCivilianRoles()) {
+                if (role.ordinal() < model.usePortraitForRole.length) {
+                    civilianSelected = model.usePortraitForRole[role.ordinal()];
+                    break;
                 }
-                chkUsePortrait[i].setSelected(civilianSelected);
-                continue;
             }
-            chkUsePortrait[i].setSelected(model.usePortraitForRole[i]);
+            chkUsePortrait[civilianIndex].setSelected(civilianSelected);
         }
     }
 
@@ -350,19 +353,24 @@ class NameAndPortraitGenerationPage {
         model.noRandomPortraitsForChildren = chkNoRandomPortraitsForChildren.isSelected();
         model.childPortraitsWhenComingOfAge = chkChildPortraitsWhenComingOfAge.isSelected();
 
-        for (int i = 0; i < Math.min(chkUsePortrait.length, model.usePortraitForRole.length); i++) {
-            if (chkUsePortrait[i] == null) {
-                continue;
+        int portraitCount = Math.min(chkUsePortrait.length, model.usePortraitForRole.length);
+        int civilianIndex = chkUsePortrait.length - 1;
+
+        // Role-specific portraits are index-aligned with their role ordinal.
+        for (int i = 0; i < portraitCount; i++) {
+            if (chkUsePortrait[i] != null && i != civilianIndex) {
+                model.usePortraitForRole[i] = chkUsePortrait[i].isSelected();
             }
-            if (i == chkUsePortrait.length - 1) {
-                for (PersonnelRole role : PersonnelRole.getCivilianRoles()) {
-                    if (role.ordinal() < model.usePortraitForRole.length) {
-                        model.usePortraitForRole[role.ordinal()] = chkUsePortrait[i].isSelected();
-                    }
+        }
+
+        // The shared "Civilian" toggle spreads across every civilian role slot.
+        if (civilianIndex < portraitCount && chkUsePortrait[civilianIndex] != null) {
+            boolean civilianSelected = chkUsePortrait[civilianIndex].isSelected();
+            for (PersonnelRole role : PersonnelRole.getCivilianRoles()) {
+                if (role.ordinal() < model.usePortraitForRole.length) {
+                    model.usePortraitForRole[role.ordinal()] = civilianSelected;
                 }
-                continue;
             }
-            model.usePortraitForRole[i] = chkUsePortrait[i].isSelected();
         }
     }
 }

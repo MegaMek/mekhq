@@ -69,7 +69,6 @@ import megamek.common.ui.FastJScrollPane;
  */
 class CampaignOptionsNavigationPanel extends JPanel {
     static final int NAVIGATION_WIDTH = 240;
-    private static final int SCROLL_SPEED = 16;
 
     private final List<CampaignOptionsRoute> routes;
     private final Consumer<CampaignOptionsRoute> routeSelectionListener;
@@ -95,7 +94,10 @@ class CampaignOptionsNavigationPanel extends JPanel {
             frameBorder = BorderFactory.createLineBorder(UIManager.getColor("Component.borderColor"));
         }
         setBorder(BorderFactory.createCompoundBorder(frameBorder,
-              BorderFactory.createEmptyBorder(6, 6, 6, 6)));
+              BorderFactory.createEmptyBorder(UIUtil.scaleForGUI(6),
+                    UIUtil.scaleForGUI(6),
+                    UIUtil.scaleForGUI(6),
+                    UIUtil.scaleForGUI(6))));
         setPreferredSize(new Dimension(UIUtil.scaleForGUI(NAVIGATION_WIDTH), 1));
 
         filterField = new JTextField();
@@ -142,14 +144,13 @@ class CampaignOptionsNavigationPanel extends JPanel {
               ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
               ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         navigationScrollPane.setName("campaignOptionsNavigationScrollPane");
-        navigationScrollPane.getVerticalScrollBar().setUnitIncrement(SCROLL_SPEED);
 
-        JPanel filterRow = new JPanel(new BorderLayout(4, 0));
+        JPanel filterRow = new JPanel(new BorderLayout(UIUtil.scaleForGUI(4), 0));
         filterRow.setName("campaignOptionsFilterRow");
         filterRow.add(filterField, BorderLayout.CENTER);
         filterRow.add(legendButton, BorderLayout.EAST);
 
-        JPanel filterPanel = new JPanel(new BorderLayout(0, 4));
+        JPanel filterPanel = new JPanel(new BorderLayout(0, UIUtil.scaleForGUI(4)));
         filterPanel.setName("campaignOptionsFilterPanel");
         filterPanel.add(filterRow, BorderLayout.NORTH);
         filterPanel.add(filterStatusLabel, BorderLayout.SOUTH);
@@ -164,7 +165,10 @@ class CampaignOptionsNavigationPanel extends JPanel {
         JLabel legend = new JLabel("<html><body>"
               + getTextAt(getCampaignOptionsResourceBundle(), "lblGeneralIconLegend.text")
               + "</body></html>");
-        legend.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
+        legend.setBorder(BorderFactory.createEmptyBorder(UIUtil.scaleForGUI(8),
+              UIUtil.scaleForGUI(8),
+              UIUtil.scaleForGUI(8),
+              UIUtil.scaleForGUI(8)));
 
         JPopupMenu legendPopup = new JPopupMenu();
         legendPopup.setName("campaignOptionsLegendPopup");

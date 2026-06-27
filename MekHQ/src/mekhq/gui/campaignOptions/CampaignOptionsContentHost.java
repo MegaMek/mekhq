@@ -47,6 +47,7 @@ import javax.swing.SwingConstants;
 
 import jakarta.annotation.Nullable;
 import javax.swing.SwingUtilities;
+import megamek.client.ui.util.UIUtil;
 import megamek.common.ui.FastJScrollPane;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
@@ -84,7 +85,6 @@ class CampaignOptionsContentHost extends JPanel {
               ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
               ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         contentScrollPane.setName("campaignOptionsContentScrollPane");
-        contentScrollPane.getVerticalScrollBar().setUnitIncrement(SCROLL_SPEED);
 
         add(contentScrollPane, BorderLayout.CENTER);
         add(helpPanel, BorderLayout.SOUTH);
@@ -129,12 +129,14 @@ class CampaignOptionsContentHost extends JPanel {
      * @param component the content subtree to process
      */
     private static void clearRedundantOptionToolTips(Component component) {
-        if (component instanceof JComponent jComponent
-                  && (component instanceof CampaignOptionsCheckBox
-                  || component instanceof CampaignOptionsSpinner
-                  || component instanceof CampaignOptionsLabel
-                  || component instanceof CampaignOptionsTextField)) {
-            jComponent.setToolTipText(null);
+        boolean isJComponent = component instanceof JComponent;
+        boolean isOptionInputControl = component instanceof CampaignOptionsCheckBox
+                || component instanceof CampaignOptionsSpinner
+                || component instanceof CampaignOptionsLabel
+                || component instanceof CampaignOptionsTextField;
+        boolean shouldClearToolTip = isJComponent && isOptionInputControl;
+        if (shouldClearToolTip) {
+            ((JComponent) component).setToolTipText(null);
         }
 
         if (component instanceof Container container) {
@@ -208,7 +210,7 @@ class CampaignOptionsContentHost extends JPanel {
 
         @Override
         public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
-            return SCROLL_SPEED;
+            return UIUtil.scaleForGUI(SCROLL_SPEED);
         }
 
         @Override

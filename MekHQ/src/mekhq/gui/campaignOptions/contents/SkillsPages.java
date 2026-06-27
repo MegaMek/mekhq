@@ -37,6 +37,7 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.CAMPAIGN_OPTION
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.Component;
@@ -250,8 +251,8 @@ public class SkillsPages {
 
         installCopyPasteBindings(table, tableModel);
 
-        JLabel hintLabel = new JLabel(String.format(
-              getTextAt(getCampaignOptionsResourceBundle(), "lblSkillTableHint.text"), shortcutModifierLabel()));
+        JLabel hintLabel = new JLabel(getFormattedTextAt(getCampaignOptionsResourceBundle(),
+              "lblSkillTableHint.text", shortcutModifierLabel()));
 
         layout.gridy = 0;
 
@@ -622,7 +623,7 @@ public class SkillsPages {
      * @return a compact milestone summary string
      */
     private static String buildProgressionSummary(SkillConfiguration configuration) {
-        return String.format("G %d  \u00B7  R %d  \u00B7  V %d  \u00B7  E %d  \u00B7  H %d  \u00B7  L %d",
+        return getFormattedTextAt(getCampaignOptionsResourceBundle(), "lblSkillTableProgressionSummary.text",
               configuration.greenLevel,
               configuration.regularLevel,
               configuration.veteranLevel,
