@@ -1048,7 +1048,10 @@ public class RandomEventEffectsManager {
             case "POISON" -> eventEffectUniquePoison(result);
             // Generate 2d6 new prisoners & xd6 crime. x = magnitude
             case "ABANDONED_TO_DIE" -> eventEffectUniqueAbandonedToDie(result);
-            default -> "";
+            default -> {
+                LOGGER.warn("Unsupported unique event type: {}", event);
+                yield "";
+            }
         };
     }
 
