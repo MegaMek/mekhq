@@ -204,10 +204,10 @@ public class AttributeCheckDialog {
         boolean useEdge = choiceIndex == DIALOG_USE_EDGE_INDEX;
         ActionCheckResult attributeCheckResult =
               character.checkAttributes(firstAttribute, secondAttribute).withMiscModifier(selectedModifier)
-                    .resolve(useEdge, null, true);
+                    .resolve(useEdge, null);
         isSuccess = attributeCheckResult.isSuccess();
 
-        return attributeCheckResult.resultsText();
+        return attributeCheckResult.getReport(true);
     }
 
 

@@ -43,6 +43,7 @@ import java.util.stream.Collectors;
 
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
+import mekhq.campaign.AbstractMobileLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.Hangar;
@@ -111,7 +112,7 @@ public final class LocationDispatch {
      * @param travelNode the node to remove, or {@code null}
      * @param campaign   the active campaign; must not be {@code null}
      */
-    public static void removeTravelNode(@Nullable CurrentLocation travelNode, Campaign campaign) {
+    public static void removeTravelNode(@Nullable AbstractMobileLocation travelNode, Campaign campaign) {
         if (travelNode == null) {
             return;
         }
@@ -137,7 +138,7 @@ public final class LocationDispatch {
      *                          {@code campaign} with a warning
      * @param campaign          the active campaign; must not be {@code null}
      */
-    public static void landFromTravelNode(CurrentLocation travelNode,
+    public static void landFromTravelNode(AbstractMobileLocation travelNode,
           @Nullable ILocation personDestination,
           @Nullable ILocation unitDestination,
           @Nullable ILocation partDestination,
@@ -158,7 +159,7 @@ public final class LocationDispatch {
               campaign);
     }
 
-    private static void landFromTravelNodeImpl(CurrentLocation travelNode,
+    private static void landFromTravelNodeImpl(AbstractMobileLocation travelNode,
           ILocation personDestination,
           ILocation unitDestination,
           ILocation partDestination,
