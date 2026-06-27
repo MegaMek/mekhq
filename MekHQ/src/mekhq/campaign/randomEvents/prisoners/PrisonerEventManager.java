@@ -549,7 +549,6 @@ public class PrisonerEventManager {
      */
     private RandomEventData pickEvent(boolean isMajor) {
         List<RandomEventData> allMajorEvents = campaign.getRandomEventLibraries().getPrisonerEvents(isMajor);
-        Collections.shuffle(allMajorEvents);
         return ObjectUtility.getRandomItem(allMajorEvents);
     }
 
