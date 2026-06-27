@@ -99,7 +99,7 @@ import org.jspecify.annotations.NonNull;
  */
 public class RandomEventEffectsManager {
     private static final MMLogger LOGGER = MMLogger.create(RandomEventEffectsManager.class);
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.RandomEventEffectsManager";
 
     private static final String SINGULAR_CHARACTER_RESOURCE_KEY = "context.character.singular";
     private static final String PLURAL_CHARACTER_RESOURCE_KEY = "context.character.plural";
