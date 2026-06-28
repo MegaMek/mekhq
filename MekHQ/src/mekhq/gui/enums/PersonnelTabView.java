@@ -50,7 +50,7 @@ public enum PersonnelTabView {
           Set.of(PERSON_GRAPHICAL, FORCE_GRAPHICAL, UNIT_ASSIGNMENT_GRAPHICAL)),
     GENERAL("PersonnelTabView.GENERAL.text", "PersonnelTabView.GENERAL.toolTipText",
           Set.of(RANK, FIRST_NAME, LAST_NAME, SKILL_LEVEL, PERSONNEL_ROLE, FORCE, DEPLOYED, INJURIES,
-                UNIT_ASSIGNMENT)),
+                UNIT_ASSIGNMENT, XP)),
     COMBAT("PersonnelTabView.COMBAT.text", "PersonnelTabView.COMBAT.toolTipText",
           Set.of(RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, AGGREGATE_COMBAT, ARTILLERY, SCOUTING, LEADERSHIP,
                 TACTICS, STRATEGY)),
