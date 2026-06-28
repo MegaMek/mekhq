@@ -125,16 +125,6 @@ public class CampaignOptionsPresetPicker extends JDialog {
     }
 
     /**
-     * Indicates if the user selected the 'customize' option.
-     *
-     * @return {@code true} if 'customize' was selected, {@code false} otherwise
-     */
-    @Deprecated(since = "0.51.0", forRemoval = true)
-    public boolean wasCustomized() {
-        return returnState == PresetSelection.CUSTOMIZE.getValue();
-    }
-
-    /**
      * Gets the selected campaign preset.
      *
      * @return the selected {@link CampaignPreset}, or {@code null} if none selected

@@ -344,7 +344,6 @@ public final class PersonnelTab extends CampaignGuiTab {
         personnelTable.setRowSorter(personnelSorter);
         personnelTable.setIntercellSpacing(new Dimension(0, 0));
         personnelTable.setShowGrid(false);
-        changePersonnelView();
         personnelTable.getSelectionModel().addListSelectionListener(ev -> refreshPersonnelView());
 
         scrollPersonnelView = new FastJScrollPane();
@@ -377,7 +376,8 @@ public final class PersonnelTab extends CampaignGuiTab {
 
         PersonnelTableMouseAdapter.connect(getCampaignGui(), personnelTable, personModel, splitPersonnel);
 
-        filterPersonnel();
+        changePersonnelView();
+        refreshPersonnelList();
     }
 
     private DefaultComboBoxModel<PersonnelFilter> createPersonGroupModel() {
@@ -578,7 +578,6 @@ public final class PersonnelTab extends CampaignGuiTab {
     @Subscribe
     public void handle(OptionsChangedEvent ev) {
         changePersonnelView();
-        personnelListScheduler.schedule();
     }
 
     @Subscribe
