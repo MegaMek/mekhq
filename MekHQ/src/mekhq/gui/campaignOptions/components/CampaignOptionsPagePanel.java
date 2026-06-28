@@ -201,6 +201,17 @@ public class CampaignOptionsPagePanel extends JPanel {
         return true;
     }
 
+    /**
+     * Expands every collapsible section on this page. Used as a fallback when a page is opened from a navigation search
+     * whose term matched the page as a whole (such as an internal page name) rather than any single section heading, so
+     * the page is revealed instead of opening fully collapsed.
+     */
+    public void expandAllSections() {
+        for (SearchableSection section : searchableSections) {
+            section.panel().setExpanded(true);
+        }
+    }
+
     /** Pairs a collapsible section with its resolved title and summary text for search-driven expansion. */
     private record SearchableSection(MHQCollapsiblePanel panel, String searchText) {
     }

@@ -416,8 +416,9 @@ public class CampaignOptionsPane extends JPanel {
 
     /**
      * When a page is opened while a navigation search is active, expands the section(s) whose title or summary match
-     * the search so the result the user clicked is revealed, instead of the page opening fully collapsed. Pages with no
-     * matching section (e.g. the search matched only the page title) are left in their default state.
+     * the search so the result the user clicked is revealed, instead of the page opening fully collapsed. When the
+     * search matched the page as a whole (its title or an internal name such as "stratcon" for the renamed "Digital
+     * GMs" page) rather than any single section, every section is expanded so the page is still revealed.
      *
      * @param directPage the page component just shown
      */
@@ -437,7 +438,11 @@ public class CampaignOptionsPane extends JPanel {
         }
 
         String[] tokens = activeFilter.split("\\s+");
-        pagePanel.expandSectionsMatching(sectionText -> sectionMatchesAllTokens(sectionText, tokens));
+        boolean expandedMatchingSection = pagePanel.expandSectionsMatching(
+              sectionText -> sectionMatchesAllTokens(sectionText, tokens));
+        if (!expandedMatchingSection) {
+            pagePanel.expandAllSections();
+        }
     }
 
     private static boolean sectionMatchesAllTokens(String rawSectionText, String[] normalizedTokens) {
