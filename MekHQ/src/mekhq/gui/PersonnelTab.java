@@ -32,7 +32,6 @@
  */
 package mekhq.gui;
 
-import static java.lang.Math.round;
 import static mekhq.gui.enums.PersonnelTableModelColumn.SURNAME;
 import static mekhq.gui.enums.PersonnelTableModelColumn.SURNAME_GROUPED_BY_UNIT;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -85,7 +84,6 @@ import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
 import mekhq.campaign.events.units.UnitRemovedEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.QuickTrain;
-import mekhq.gui.adapter.PersonnelTableMouseAdapter;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.BatchXPDialog;
@@ -106,7 +104,8 @@ public final class PersonnelTab extends CampaignGuiTab {
     private static final MMLogger LOGGER = MMLogger.create(PersonnelTab.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignGUI";
 
-    public static final int PERSONNEL_VIEW_WIDTH = UIUtil.scaleForGUI(700);
+    public static final int PERSON_VIEW_MIN_WIDTH = 450;
+    public static final int PERSON_VIEW_PREFERRED_WIDTH = 650;
 
     private JSplitPane splitPersonnel;
     private JTable personnelTable;
@@ -323,7 +322,6 @@ public final class PersonnelTab extends CampaignGuiTab {
         personModel = new PersonnelTableModel(getCampaign());
         personnelTable = new JTable(personModel);
         personnelTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        personnelTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         XTableColumnModel personColumnModel = new XTableColumnModel();
         personnelTable.setColumnModel(personColumnModel);
         personnelTable.createDefaultColumnsFromModel();
@@ -348,8 +346,6 @@ public final class PersonnelTab extends CampaignGuiTab {
 
         scrollPersonnelView = new FastJScrollPane();
         scrollPersonnelView.setBorder(RoundedLineBorder.createRoundedLineBorder());
-        scrollPersonnelView.setMinimumSize(new Dimension((int) round(PERSONNEL_VIEW_WIDTH * 0.9), 600));
-        scrollPersonnelView.setPreferredSize(new Dimension(PERSONNEL_VIEW_WIDTH, 600));
         scrollPersonnelView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPersonnelView.setViewportView(null);
 
@@ -364,6 +360,7 @@ public final class PersonnelTab extends CampaignGuiTab {
 
         splitPersonnel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, tableAndInfoPanel, scrollPersonnelView);
         splitPersonnel.setOneTouchExpandable(true);
+        splitPersonnel.setDividerSize(15);
         splitPersonnel.setResizeWeight(1.0);
         splitPersonnel.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, ev -> refreshPersonnelView());
         gridBagConstraints.gridx = 0;
@@ -374,10 +371,8 @@ public final class PersonnelTab extends CampaignGuiTab {
         gridBagConstraints.weighty = 1.0;
         add(splitPersonnel, gridBagConstraints);
 
-        PersonnelTableMouseAdapter.connect(getCampaignGui(), personnelTable, personModel, splitPersonnel);
-
-        changePersonnelView();
-        refreshPersonnelList();
+        refreshAll();
+        updateUIScaling();
     }
 
     private DefaultComboBoxModel<PersonnelFilter> createPersonGroupModel() {
@@ -483,7 +478,10 @@ public final class PersonnelTab extends CampaignGuiTab {
 
         for (PersonnelTableModelColumn column : PersonnelTableModel.PERSONNEL_COLUMNS) {
             TableColumn tableColumn = columnModel.getColumnByModelIndex(column.ordinal());
-            tableColumn.setPreferredWidth(column.getWidth());
+            Integer width = column.getPreferredWidth();
+            if (width != null) {
+                tableColumn.setPreferredWidth(width);
+            }
             columnModel.setColumnVisible(tableColumn, visibleColumns.contains(column));
         }
         personnelTable.setRowHeight(UIUtil.scaleForGUI((view == PersonnelTabView.GRAPHIC) ? 60 : 15));
@@ -492,7 +490,6 @@ public final class PersonnelTab extends CampaignGuiTab {
     }
 
     public void focusOnPerson(UUID id) {
-        splitPersonnel.resetToPreferredSizes();
         int row = -1;
         for (int i = 0; i < personnelTable.getRowCount(); i++) {
             if (personModel.getPerson(personnelTable.convertRowIndexToModel(i)).getId().equals(id)) {
@@ -515,6 +512,11 @@ public final class PersonnelTab extends CampaignGuiTab {
             personnelTable.setRowSelectionInterval(row, row);
             personnelTable.scrollRectToVisible(personnelTable.getCellRect(row, 0, true));
         }
+    }
+
+    private void updateUIScaling() {
+        scrollPersonnelView.setMinimumSize(new Dimension(UIUtil.scaleForGUI(PERSON_VIEW_MIN_WIDTH, 0)));
+        scrollPersonnelView.setPreferredSize(new Dimension(UIUtil.scaleForGUI(PERSON_VIEW_PREFERRED_WIDTH), 0));
     }
 
     /**
@@ -583,7 +585,8 @@ public final class PersonnelTab extends CampaignGuiTab {
     @Subscribe
     public void handle(MHQOptionsChangedEvent evt) {
         choicePerson.setModel(createPersonGroupModel());
-        personnelListScheduler.schedule();
+        refreshAll();
+        updateUIScaling();
     }
 
     @Subscribe

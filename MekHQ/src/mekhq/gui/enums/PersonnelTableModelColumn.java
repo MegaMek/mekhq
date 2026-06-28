@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
 import javax.swing.SortOrder;
 import javax.swing.SwingConstants;
 
+import megamek.client.ui.util.UIUtil;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.units.Entity;
@@ -793,17 +794,23 @@ public enum PersonnelTableModelColumn {
                      (this == PERSONNEL_STATUS);
     }
 
-    public int getWidth() {
-        return switch (this) {
-            case PERSON_GRAPHICAL, UNIT_ASSIGNMENT, MARKET_UNIT_ASSIGNMENT -> 125;
-            case RANK, FIRST_NAME, GIVEN_NAME, DEPLOYED -> 70;
-            case LAST_NAME, SURNAME, SURNAME_GROUPED_BY_UNIT, BLOODNAME, CALLSIGN, SKILL_LEVEL, SALARY -> 50;
-            case PERSONNEL_ROLE -> 150;
-            case FORCE -> 100;
-            case LOCATION_SYSTEM, LOCATION_PLANET, DESTINATION_SYSTEM, DESTINATION_PLANET -> 100;
-            case LOCATION_NAME, DESTINATION_NAME -> 150;
-            default -> 20;
+    /**
+     * Returns optional preferred size.
+     * @return null if the column has no size preference, a preferred width otherwise.
+     */
+    @Nullable
+    public Integer getPreferredWidth() {
+        Integer preferredWidth = switch (this) {
+            case RANK -> 60;
+            case FIRST_NAME -> 50;
+            case LAST_NAME -> 70;
+            case SKILL_LEVEL -> 45;
+            case PERSONNEL_ROLE -> 120;
+            case UNIT_ASSIGNMENT -> 140;
+            case LOCATION_NAME -> 140;
+            default -> null;
         };
+        return (preferredWidth == null) ? null : UIUtil.scaleForGUI(preferredWidth);
     }
 
     public int getAlignment() {
