@@ -182,7 +182,9 @@ public class CampaignOptionsPane extends JPanel {
         splitPane.setName("campaignOptionsSplitPane");
         splitPane.setResizeWeight(0.0);
         splitPane.setDividerLocation(UIUtil.scaleForGUI(CampaignOptionsNavigationPanel.NAVIGATION_WIDTH));
-        setBorder(BorderFactory.createEmptyBorder(CONTENT_MARGIN, CONTENT_MARGIN, CONTENT_MARGIN, CONTENT_MARGIN));
+        // Bottom margin is 0: the footer's button panel already adds top padding, so a bottom margin here would
+        // stack with it and make the gap above the footer buttons look larger than the gap below them.
+        setBorder(BorderFactory.createEmptyBorder(CONTENT_MARGIN, CONTENT_MARGIN, 0, CONTENT_MARGIN));
         add(splitPane, BorderLayout.CENTER);
         navigationPanel.selectRoute(navigationTargets.get(0));
     }
@@ -369,6 +371,43 @@ public class CampaignOptionsPane extends JPanel {
         }
 
         activeContentHost.setContent(directPage, getQuoteResourceName(route), route.shouldShowHelpPanel());
+        expandSectionsForActiveFilter(directPage);
+        return true;
+    }
+
+    /**
+     * When a page is opened while a navigation search is active, expands the section(s) whose title or summary match
+     * the search so the result the user clicked is revealed, instead of the page opening fully collapsed. Pages with no
+     * matching section (e.g. the search matched only the page title) are left in their default state.
+     *
+     * @param directPage the page component just shown
+     */
+    private void expandSectionsForActiveFilter(Component directPage) {
+        if (navigationPanel == null) {
+            return;
+        }
+
+        String activeFilter = navigationPanel.getActiveFilter();
+        if (activeFilter.isBlank()) {
+            return;
+        }
+
+        CampaignOptionsPagePanel pagePanel = CampaignOptionsContentHost.findPagePanel(directPage);
+        if (pagePanel == null) {
+            return;
+        }
+
+        String[] tokens = activeFilter.split("\\s+");
+        pagePanel.expandSectionsMatching(sectionText -> sectionMatchesAllTokens(sectionText, tokens));
+    }
+
+    private static boolean sectionMatchesAllTokens(String rawSectionText, String[] normalizedTokens) {
+        String normalizedSectionText = CampaignOptionsRoute.normalizeSearchText(rawSectionText);
+        for (String token : normalizedTokens) {
+            if (!token.isBlank() && !normalizedSectionText.contains(token)) {
+                return false;
+            }
+        }
         return true;
     }
 
