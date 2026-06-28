@@ -265,6 +265,15 @@ class CampaignOptionsNavigationPanel extends JPanel {
         return CampaignOptionsRoute.normalizeSearchText(filterField.getText());
     }
 
+    /**
+     * Moves keyboard focus to the navigation filter field and selects any existing text, so a fresh query replaces
+     * it. Backs the dialog's Ctrl/Cmd+F shortcut.
+     */
+    void focusSearchField() {
+        filterField.requestFocusInWindow();
+        filterField.selectAll();
+    }
+
     private void buildNavigationTree(String filterText) {
         String normalizedFilter = filterText == null ? "" : CampaignOptionsRoute.normalizeSearchText(filterText);
         List<CampaignOptionsRoute> matchingRoutes = getMatchingRoutes(normalizedFilter);

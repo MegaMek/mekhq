@@ -52,6 +52,9 @@ import static mekhq.utilities.spaUtilities.enums.AbilityCategory.UTILITY_ABILITY
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -59,10 +62,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JSplitPane;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
 import jakarta.annotation.Nonnull;
@@ -176,17 +182,43 @@ public class CampaignOptionsPane extends JPanel {
         registerRoutes(generalPage);
         CampaignOptionsRoute initialRoute = navigationTargets.get(0);
 
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-                createNavigationPanel(),
-                createContentHost(generalPage, initialRoute));
-        splitPane.setName("campaignOptionsSplitPane");
-        splitPane.setResizeWeight(0.0);
-        splitPane.setDividerLocation(UIUtil.scaleForGUI(CampaignOptionsNavigationPanel.NAVIGATION_WIDTH));
         // Bottom margin is 0: the footer's button panel already adds top padding, so a bottom margin here would
         // stack with it and make the gap above the footer buttons look larger than the gap below them.
         setBorder(BorderFactory.createEmptyBorder(CONTENT_MARGIN, CONTENT_MARGIN, 0, CONTENT_MARGIN));
+        CampaignOptionsContentHost contentHost = createContentHost(generalPage, initialRoute);
+
+        // Abridged startup (preset "Apply") shows only the General page, so skip the navigation tree and its search
+        // entirely and let the content fill the dialog.
+        if (mode == STARTUP_ABRIDGED) {
+            add(contentHost, BorderLayout.CENTER);
+            return;
+        }
+
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+                createNavigationPanel(),
+                contentHost);
+        splitPane.setName("campaignOptionsSplitPane");
+        splitPane.setResizeWeight(0.0);
+        splitPane.setDividerLocation(UIUtil.scaleForGUI(CampaignOptionsNavigationPanel.NAVIGATION_WIDTH));
         add(splitPane, BorderLayout.CENTER);
         navigationPanel.selectRoute(navigationTargets.get(0));
+        registerSearchShortcut();
+    }
+
+    /**
+     * Registers a window-level Ctrl/Cmd+F shortcut that moves focus to the navigation search field, regardless of
+     * which control inside the dialog currently has focus.
+     */
+    private void registerSearchShortcut() {
+        KeyStroke findKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_F,
+                Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx());
+        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(findKeyStroke, "focusCampaignOptionsSearch");
+        getActionMap().put("focusCampaignOptionsSearch", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                navigationPanel.focusSearchField();
+            }
+        });
     }
 
     private CampaignOptionsNavigationPanel createNavigationPanel() {
@@ -204,6 +236,13 @@ public class CampaignOptionsPane extends JPanel {
 
     private void registerRoutes(JPanel generalPage) {
         registerDirectRoute("general", () -> generalPage, "generalPanel");
+
+        // Abridged startup (preset "Apply") shows only the General landing page, so users who just want a preset
+        // aren't faced with the full options tree. The preset's other options are still applied in full via
+        // ensureAllSectionsLoaded() when the dialog is accepted.
+        if (mode == STARTUP_ABRIDGED) {
+            return;
+        }
 
         registerParentRoute("human-resources", "humanResourcesCategory");
         registerParentRoute("human-resources.personnel", "humanResourcesCategory", "personnelCategory");
