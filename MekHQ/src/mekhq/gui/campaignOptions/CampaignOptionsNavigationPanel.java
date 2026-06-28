@@ -162,9 +162,7 @@ class CampaignOptionsNavigationPanel extends JPanel {
     }
 
     private void showLegend(JComponent anchor) {
-        JLabel legend = new JLabel("<html><body>"
-              + getTextAt(getCampaignOptionsResourceBundle(), "lblGeneralIconLegend.text")
-              + "</body></html>");
+        CampaignOptionsIconLegend legend = new CampaignOptionsIconLegend();
         legend.setBorder(BorderFactory.createEmptyBorder(UIUtil.scaleForGUI(8),
               UIUtil.scaleForGUI(8),
               UIUtil.scaleForGUI(8),

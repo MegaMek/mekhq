@@ -178,8 +178,13 @@ public class CampaignOptionsDialog extends AbstractButtonDialog {
     protected @Nonnull JPanel createButtonPanel() {
         final JPanel pnlButtons = new JPanel(new FlowLayout(FlowLayout.CENTER, BUTTON_GAP, BUTTON_GAP));
 
-        // Apply Settings
-        pnlButtons.add(createDialogButton("ApplySettings", this::processApplyAction));
+        // Apply Settings: emphasized as the primary action using FlatLaf's accent/default-button colors. This is a
+        // visual cue only (not the root-pane default button), so Enter cannot accidentally close this field-heavy
+        // dialog while editing.
+        JButton applyButton = createDialogButton("ApplySettings", this::processApplyAction);
+        applyButton.putClientProperty("FlatLaf.style",
+              "background: $Button.default.background; foreground: $Button.default.foreground");
+        pnlButtons.add(applyButton);
 
         // Save Preset
         if (mode != CampaignOptionsDialogMode.CAMPAIGN_UPGRADE && mode != CampaignOptionsDialogMode.STARTUP_ABRIDGED) {

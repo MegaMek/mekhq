@@ -36,6 +36,7 @@ import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.CAMPAIGN_OPTIONS_PANEL_WIDTH;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.formatBadges;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMaterialSymbolIcon;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.setSmallSizeVariant;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -216,7 +217,7 @@ public class CampaignOptionsPagePanel extends JPanel {
         layout.anchor = GridBagConstraints.CENTER;
         panel.add(header, layout);
 
-        if (builder.introTextKey != null) {
+        if (builder.introComponent != null || builder.introTextKey != null) {
             layout.gridy++;
             int introWidth = sectionStackWidth > 0 ? sectionStackWidth : header.getPreferredSize().width;
             panel.add(createIntroPanel(builder, introWidth), layout);
@@ -280,9 +281,17 @@ public class CampaignOptionsPagePanel extends JPanel {
 
     private JPanel createIntroPanel(Builder builder, int textWidth) {
         int introHorizontalPadding = getIntroHorizontalPadding(textWidth);
-        JPanel introPanel = new CampaignOptionsIntroPanel(builder.name + "Intro",
-            getTextAt(getCampaignOptionsResourceBundle(), builder.introTextKey),
-            textWidth - (introHorizontalPadding * 2));
+        JPanel introPanel;
+        if (builder.introComponent != null) {
+            introPanel = new JPanel(new BorderLayout());
+            introPanel.setName(builder.name + "Intro");
+            introPanel.setOpaque(false);
+            introPanel.add(builder.introComponent, BorderLayout.CENTER);
+        } else {
+            introPanel = new CampaignOptionsIntroPanel(builder.name + "Intro",
+                getTextAt(getCampaignOptionsResourceBundle(), builder.introTextKey),
+                textWidth - (introHorizontalPadding * 2));
+        }
         introPanel.setBorder(BorderFactory.createEmptyBorder(0,
             introHorizontalPadding,
             0,
@@ -357,9 +366,10 @@ public class CampaignOptionsPagePanel extends JPanel {
     }
 
     private JPanel createSectionControls(List<MHQCollapsiblePanel> sections) {
-        JButton expandAllButton = createSectionActionButton("btnExpandAll.text");
+        // Material Symbols code points (https://fonts.google.com/icons): unfold_more / unfold_less.
+        JButton expandAllButton = createSectionActionButton("btnExpandAll.text", 0xE5D7);
         expandAllButton.addActionListener(event -> setExpanded(true, sections));
-        JButton collapseAllButton = createSectionActionButton("btnCollapseAll.text");
+        JButton collapseAllButton = createSectionActionButton("btnCollapseAll.text", 0xE5D6);
         collapseAllButton.addActionListener(event -> setExpanded(false, sections));
 
         JPanel controls = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
@@ -370,9 +380,10 @@ public class CampaignOptionsPagePanel extends JPanel {
         return controls;
     }
 
-    private JButton createSectionActionButton(String resourceKey) {
+    private JButton createSectionActionButton(String resourceKey, int iconCodePoint) {
         JButton button = new JButton(getTextAt(getCampaignOptionsResourceBundle(), resourceKey));
         setSmallSizeVariant(button);
+        button.setIcon(getMaterialSymbolIcon(iconCodePoint, button.getFont().getSize(), button.getForeground()));
         return button;
     }
 
@@ -443,6 +454,7 @@ public class CampaignOptionsPagePanel extends JPanel {
         private CampaignOptionsHeaderPanel headerPanel;
         private String quoteResourceName;
         private String introTextKey;
+        private JComponent introComponent;
         private boolean includeHeaderBodyText;
         private int headerImageSize = DEFAULT_HEADER_IMAGE_SIZE;
         private boolean tintHeaderImage = true;
@@ -477,6 +489,15 @@ public class CampaignOptionsPagePanel extends JPanel {
 
         public Builder intro(String introTextKey) {
             this.introTextKey = introTextKey;
+            return this;
+        }
+
+        /**
+         * Places the given component in the centered intro area below the header, used instead of {@link
+         * #intro(String)} when the intro needs real Swing controls (such as an icon legend) rather than HTML text.
+         */
+        public Builder introComponent(JComponent introComponent) {
+            this.introComponent = introComponent;
             return this;
         }
 
