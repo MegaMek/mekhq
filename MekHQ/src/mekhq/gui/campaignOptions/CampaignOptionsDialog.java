@@ -204,9 +204,16 @@ public class CampaignOptionsDialog extends AbstractButtonDialog {
         JPanel legendPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, BUTTON_GAP, BUTTON_GAP));
         legendPanel.add(legendButton);
 
+        // Mirror the legend's width on the right so the action buttons are centered on the whole footer; a plain
+        // WEST + CENTER layout would center them only in the space to the right of the legend.
+        JPanel rightSpacer = new JPanel();
+        rightSpacer.setOpaque(false);
+        rightSpacer.setPreferredSize(new Dimension(legendPanel.getPreferredSize().width, 0));
+
         final JPanel pnlButtons = new JPanel(new BorderLayout());
         pnlButtons.add(legendPanel, BorderLayout.WEST);
         pnlButtons.add(actionButtons, BorderLayout.CENTER);
+        pnlButtons.add(rightSpacer, BorderLayout.EAST);
 
         return pnlButtons;
     }

@@ -408,7 +408,9 @@ class CampaignOptionsNavigationPanel extends JPanel {
             Font baseFont = tree.getFont();
             if (baseFont != null) {
                 boolean topLevel = value instanceof DefaultMutableTreeNode node && node.getLevel() == 1;
-                setFont(baseFont.deriveFont(topLevel ? Font.BOLD : Font.PLAIN));
+                // Toggle only the BOLD bit so other style bits the Look&Feel may set (e.g. italics) are preserved.
+                int style = topLevel ? (baseFont.getStyle() | Font.BOLD) : (baseFont.getStyle() & ~Font.BOLD);
+                setFont(baseFont.deriveFont(style));
             }
             return this;
         }
