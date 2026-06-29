@@ -33,7 +33,6 @@
 package mekhq.campaign.mission.mission;
 
 import static megamek.common.compute.Compute.d6;
-import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 
 import jakarta.annotation.Nullable;
 import megamek.common.util.weightedMaps.AbstractWeightedMap;
@@ -41,7 +40,6 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.personnel.enums.ConnectionsLevel;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 
@@ -84,8 +82,10 @@ public class ContractEmployerDetermination {
             // looking at all potential employers in the contract search radius. Our generation method is based on
             // the table found in the above-cited page but is not an exact match due to legacy reasons.
             case MERCENARY -> getEmployerUsingMercenaryMethod();
-            // Pirate factions always have themselves as the employer
-            case PIRATE -> Factions.getInstance().getFaction(PIRATE_FACTION_CODE);
+            // Pirate factions are actually picking their victim at this stage. Victim is then used to generate
+            // the contract type and then later overwritten by the pirate faction
+            // TODO makes sure you did the above
+            case PIRATE -> getEmployerUsingMercenaryMethod();
             // Government factions always have themselves as the employer. Government factions as any campaign
             // faction that is not pirate or mercenary.
             case GOVERNMENT -> campaignFaction;
