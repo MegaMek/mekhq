@@ -250,8 +250,8 @@ public enum PersonnelTableModelColumn {
           Person::getDateOfDeath, date -> MekHQ.getMHQOptions().getDisplayFormattedDate(date)),
     CLAN_PERSONNEL("Column.CLAN_PERSONNEL.title", Comparators.YES_NO_NA_COMPARATOR,
           Person::isClanPersonnel, PersonnelTableModelColumn::convertBooleanToYesNoNA),
-    COMMANDER("Column.COMMANDER.title", Comparators.YES_NO_NA_COMPARATOR,
-          Person::isCommander, PersonnelTableModelColumn::convertBooleanToYesNoNA),
+    COMMAND_STATUS("Column.COMMAND_STATUS.title", Comparators.COMMAND_STATUS_COMPARATOR,
+          person -> person, PersonnelTableModelColumn::getCommandStatus),
     FOUNDER("Column.FOUNDER.title", Comparators.YES_NO_NA_COMPARATOR,
           Person::isFounder, PersonnelTableModelColumn::convertBooleanToYesNoNA),
     HIDE_PERSONALITY("Column.HIDE_PERSONALITY.title", Comparators.YES_NO_NA_COMPARATOR,
@@ -268,8 +268,6 @@ public enum PersonnelTableModelColumn {
           Person::isQuickTrainIgnore, PersonnelTableModelColumn::convertBooleanToYesNoNA),
     SALVAGE_SUPERVISOR("Column.SALVAGE_SUPERVISOR.title", Comparators.YES_NO_NA_COMPARATOR,
           Person::isSalvageSupervisor, PersonnelTableModelColumn::convertBooleanToYesNoNA),
-    SECOND_IN_COMMAND("Column.SECOND_IN_COMMAND.title", Comparators.YES_NO_NA_COMPARATOR,
-          Person::isSecondInCommand, PersonnelTableModelColumn::convertBooleanToYesNoNA),
     WANTS_CHILDREN("Column.WANTS_CHILDREN.title", Comparators.WANTS_CHILDREN_COMPARATOR,
           (person, campaign) -> person.isChild(campaign.getLocalDate()) ? null : person,
           PersonnelTableModelColumn::getProcreationStatus),
@@ -540,6 +538,16 @@ public enum PersonnelTableModelColumn {
             return new SkillPair(skillValue.apply(gunnerySkill), gunnerySkill,
                   skillValue.apply(pilotingSkill), pilotingSkill);
         };
+    }
+
+    private static String getCommandStatus(Person person) {
+        if (person.isCommander()) {
+            return getTextAt("Cell.COMMAND_STATUS.text.commander");
+        }
+        if (person.isSecondInCommand()) {
+            return getTextAt("Cell.COMMAND_STATUS.text.secondInCommand");
+        }
+        return "";
     }
 
     private static int getImmediateFamilySize(Person person) {
@@ -879,6 +887,9 @@ public enum PersonnelTableModelColumn {
                           .thenComparing(Person::isWantsChildren));
         private static final Comparator<Person> PREFERENCE_COMPARATOR =
               Comparator.nullsLast(Comparator.comparing(Person::isPrefersMen).thenComparing(Person::isPrefersWomen));
+        private static final Comparator<Person> COMMAND_STATUS_COMPARATOR =
+              Comparator.nullsLast(Comparator.comparing(Person::isCommander)
+                                         .thenComparing(Person::isSecondInCommand));
     }
 
     /**
