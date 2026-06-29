@@ -33,10 +33,10 @@
 package mekhq.gui.campaignOptions.components;
 
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
+import static megamek.client.ui.util.FontHandler.symbolIcon;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.CAMPAIGN_OPTIONS_PANEL_WIDTH;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.formatBadges;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMaterialSymbolIcon;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.setSmallSizeVariant;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -442,7 +442,7 @@ public class CampaignOptionsPagePanel extends JPanel {
     private JButton createSectionActionButton(String resourceKey, int iconCodePoint, int iconSizeBoost) {
         JButton button = new JButton(getTextAt(getCampaignOptionsResourceBundle(), resourceKey));
         setSmallSizeVariant(button);
-        button.setIcon(getMaterialSymbolIcon(iconCodePoint, button.getFont().getSize() + iconSizeBoost,
+        button.setIcon(symbolIcon(iconCodePoint, button.getFont().getSize() + iconSizeBoost,
               button.getForeground()));
         return button;
     }

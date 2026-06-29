@@ -32,8 +32,8 @@
  */
 package mekhq.gui.campaignOptions;
 
+import static megamek.client.ui.util.FontHandler.symbolIcon;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMaterialSymbolIcon;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.setSmallSizeVariant;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -183,7 +183,7 @@ class CampaignOptionsNavigationPanel extends JPanel {
         // Icon-only toolbar buttons on the search row; the section "Expand All"/"Collapse All" buttons teach the same
         // unfold icons, and the tooltip covers first-time discovery. Collapse is sized a touch larger so its tighter
         // glyph reads the same as the expand glyph.
-        button.setIcon(getMaterialSymbolIcon(iconCodePoint, iconSize, button.getForeground()));
+        button.setIcon(symbolIcon(iconCodePoint, iconSize, button.getForeground()));
         button.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(), tooltipKey));
         button.putClientProperty("JButton.buttonType", "toolBarButton");
         setSmallSizeVariant(button);

@@ -32,8 +32,8 @@
  */
 package mekhq.gui.campaignOptions;
 
+import static megamek.client.ui.util.FontHandler.symbolIcon;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMaterialSymbolIcon;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -206,7 +206,7 @@ public class CampaignOptionsDialog extends AbstractButtonDialog {
         JButton legendButton = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "lblIconsLegend.text"));
         legendButton.setName("btnIconsLegend");
         legendButton.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(), "lblIconsLegend.tooltip"));
-        legendButton.setIcon(getMaterialSymbolIcon(0xE88E, legendButton.getFont().getSize(), legendButton.getForeground()));
+        legendButton.setIcon(symbolIcon(0xE88E, legendButton.getFont().getSize(), legendButton.getForeground()));
         legendButton.addActionListener(evt -> showIconLegend(legendButton));
         JPanel legendPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, BUTTON_GAP, BUTTON_GAP));
         legendPanel.add(legendButton);

@@ -36,7 +36,6 @@ import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -53,7 +52,6 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
-import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -61,7 +59,6 @@ import javax.swing.JPanel;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.Version;
-import megamek.client.ui.util.FontHandler;
 import mekhq.gui.baseComponents.MHQCollapsiblePanel;
 
 /**
@@ -165,22 +162,6 @@ public class CampaignOptionsUtilities {
      */
     public static void setSmallSizeVariant(@Nonnull JComponent component) {
         component.putClientProperty("JComponent.sizeVariant", "small");
-    }
-
-    /**
-     * Creates an {@link Icon} that paints a Google Material Symbol glyph so it can sit on a component beside
-     * normal-font text. The symbols font ships in {@code data/fonts/} and is resolved through MegaMek's
-     * {@link FontHandler}; each icon's code point is listed at
-     * <a href="https://fonts.google.com/icons">fonts.google.com/icons</a>.
-     *
-     * @param codePoint the Material Symbols code point, for example {@code 0xE5D7} for {@code unfold_more}
-     * @param size      the glyph height in (already scaled) pixels
-     * @param color     the color to paint the glyph
-     *
-     * @return an {@link Icon} that draws the glyph, or {@code null} if the symbols font cannot display it
-     */
-    public static @Nullable Icon getMaterialSymbolIcon(int codePoint, int size, @Nonnull Color color) {
-        return FontHandler.symbolIcon(codePoint, size, color);
     }
 
     static void setTipTextConsumer(@Nullable Consumer<String> tipTextConsumer) {

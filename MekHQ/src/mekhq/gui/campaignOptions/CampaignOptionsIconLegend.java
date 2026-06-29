@@ -32,8 +32,8 @@
  */
 package mekhq.gui.campaignOptions;
 
+import static megamek.client.ui.util.FontHandler.symbolIcon;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMaterialSymbolIcon;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.Color;
@@ -52,7 +52,7 @@ import megamek.client.ui.util.UIUtil;
  * important, recommended, and the "added since" version badges).
  *
  * <p>The markers are drawn as real Swing icon-and-text rows rather than an HTML glyph table, so the Google Material
- * Symbol icons render through the proven {@link CampaignOptionsUtilities#getMaterialSymbolIcon} path and stay crisp on
+ * Symbol icons render through the proven {@link megamek.client.ui.util.FontHandler#symbolIcon} path and stay crisp on
  * HiDPI displays. The glyph code points, colors, and descriptions are read from the same resource keys the inline
  * badges use, so the legend always matches the badges shown on the options.</p>
  */
@@ -76,7 +76,7 @@ public class CampaignOptionsIconLegend extends JPanel {
         Color iconColor = (color != null) ? color : UIManager.getColor("Label.foreground");
 
         JLabel label = new JLabel("<html>" + getTextAt(getCampaignOptionsResourceBundle(), descriptionKey) + "</html>");
-        label.setIcon(getMaterialSymbolIcon(codePoint, ICON_SIZE, iconColor));
+        label.setIcon(symbolIcon(codePoint, ICON_SIZE, iconColor));
         label.setIconTextGap(UIUtil.scaleForGUI(6));
 
         GridBagConstraints constraints = new GridBagConstraints();
