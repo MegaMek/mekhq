@@ -424,10 +424,11 @@ public class CampaignOptionsPagePanel extends JPanel {
     }
 
     private JPanel createSectionControls(List<MHQCollapsiblePanel> sections) {
-        // Material Symbols code points (https://fonts.google.com/icons): unfold_more / unfold_less.
-        JButton expandAllButton = createSectionActionButton("btnExpandAll.text", 0xE5D7);
+        // Material Symbols code points (https://fonts.google.com/icons): unfold_more / unfold_less. Collapse is sized
+        // a touch larger so its tighter glyph reads the same as the expand glyph.
+        JButton expandAllButton = createSectionActionButton("btnExpandAll.text", 0xE5D7, 0);
         expandAllButton.addActionListener(event -> setExpanded(true, sections));
-        JButton collapseAllButton = createSectionActionButton("btnCollapseAll.text", 0xE5D6);
+        JButton collapseAllButton = createSectionActionButton("btnCollapseAll.text", 0xE5D6, UIUtil.scaleForGUI(2));
         collapseAllButton.addActionListener(event -> setExpanded(false, sections));
 
         JPanel controls = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
@@ -438,10 +439,11 @@ public class CampaignOptionsPagePanel extends JPanel {
         return controls;
     }
 
-    private JButton createSectionActionButton(String resourceKey, int iconCodePoint) {
+    private JButton createSectionActionButton(String resourceKey, int iconCodePoint, int iconSizeBoost) {
         JButton button = new JButton(getTextAt(getCampaignOptionsResourceBundle(), resourceKey));
         setSmallSizeVariant(button);
-        button.setIcon(getMaterialSymbolIcon(iconCodePoint, button.getFont().getSize(), button.getForeground()));
+        button.setIcon(getMaterialSymbolIcon(iconCodePoint, button.getFont().getSize() + iconSizeBoost,
+              button.getForeground()));
         return button;
     }
 

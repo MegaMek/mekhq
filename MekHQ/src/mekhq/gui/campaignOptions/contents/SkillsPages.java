@@ -46,11 +46,9 @@ import java.awt.FontMetrics;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.Toolkit;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -60,13 +58,12 @@ import java.util.Map;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
-import javax.swing.ButtonModel;
 import javax.swing.DefaultCellEditor;
 import javax.swing.InputMap;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
@@ -277,7 +274,7 @@ public class SkillsPages {
     private JTable createSkillsTable(SkillsTableModel tableModel) {
         JTable table = new JTable(tableModel);
         table.setName("tblSkills");
-        table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         table.setShowVerticalLines(false);
         table.setRowHeight(Math.max(table.getRowHeight(), UIUtil.scaleForGUI(24)));
         table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
@@ -285,15 +282,17 @@ public class SkillsPages {
         table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
         table.getColumnModel().getColumn(SkillsTableModel.SKILL_COLUMN)
-              .setPreferredWidth(UIUtil.scaleForGUI(180));
+              .setPreferredWidth(UIUtil.scaleForGUI(170));
         table.getColumnModel().getColumn(SkillsTableModel.TARGET_COLUMN)
-              .setPreferredWidth(UIUtil.scaleForGUI(50));
-        table.getColumnModel().getColumn(SkillsTableModel.PROGRESSION_COLUMN)
-              .setPreferredWidth(UIUtil.scaleForGUI(230));
-        table.getColumnModel().getColumn(SkillsTableModel.COST_COLUMN)
-              .setPreferredWidth(UIUtil.scaleForGUI(330));
-        table.getColumnModel().getColumn(SkillsTableModel.EDIT_COLUMN)
-              .setPreferredWidth(UIUtil.scaleForGUI(70));
+              .setPreferredWidth(UIUtil.scaleForGUI(30));
+        for (int column = SkillsTableModel.MILESTONE_FIRST_COLUMN; column < SkillsTableModel.COST_FIRST_COLUMN; column++) {
+            table.getColumnModel().getColumn(column).setPreferredWidth(UIUtil.scaleForGUI(32));
+        }
+        for (int column = SkillsTableModel.COST_FIRST_COLUMN; column < SkillsTableModel.COLUMN_COUNT; column++) {
+            // The final column carries the two-digit level 10, so give it one extra digit of width.
+            int width = (column == SkillsTableModel.COLUMN_COUNT - 1) ? 60 : 50;
+            table.getColumnModel().getColumn(column).setPreferredWidth(UIUtil.scaleForGUI(width));
+        }
 
         // Left-align the target number so it reads as a value rather than a right-aligned figure.
         DefaultTableCellRenderer leftAlignedRenderer = new DefaultTableCellRenderer();
@@ -326,6 +325,13 @@ public class SkillsPages {
         };
         targetEditor.setClickCountToStart(1);
         table.getColumnModel().getColumn(SkillsTableModel.TARGET_COLUMN).setCellEditor(targetEditor);
+        // Milestone and XP cells store a raw number but render with their label/level prefix (e.g. "G 2", "7 · 70");
+        // editing exposes just the number. They reuse the same digit-only editor as the TN column.
+        SkillValueRenderer skillValueRenderer = new SkillValueRenderer();
+        for (int column = SkillsTableModel.MILESTONE_FIRST_COLUMN; column < SkillsTableModel.COLUMN_COUNT; column++) {
+            table.getColumnModel().getColumn(column).setCellRenderer(skillValueRenderer);
+            table.getColumnModel().getColumn(column).setCellEditor(targetEditor);
+        }
         // Mirror the row copy/paste shortcuts onto the TN editor field so Ctrl+C/Ctrl+V still copy the whole row even
         // when a TN cell is in edit mode (the field would otherwise consume them as a plain text copy/paste).
         registerRowCopyPasteShortcuts(targetEditorField, JComponent.WHEN_FOCUSED, table, tableModel);
@@ -334,62 +340,21 @@ public class SkillsPages {
         table.getColumnModel().getColumn(SkillsTableModel.SKILL_COLUMN)
               .setCellRenderer(new TruncationTooltipRenderer());
 
-        String editText = getTextAt(getCampaignOptionsResourceBundle(), "btnSkillAdvanced.text");
-        // The Edit column is renderer-only (never an editable cell): a live cell-editor button would visibly shift its
-        // label between the static renderer and the focused/pressed editor instance. To still give button-like feedback,
-        // the renderer tracks the hovered/pressed row and a single listener drives hover, press, and the click that
-        // opens the advanced editor.
-        ButtonRenderer editRenderer = new ButtonRenderer(editText);
-        table.getColumnModel().getColumn(SkillsTableModel.EDIT_COLUMN).setCellRenderer(editRenderer);
-
-        MouseAdapter editColumnMouse = new MouseAdapter() {
-            @Override
-            public void mouseMoved(MouseEvent mouseEvent) {
-                repaintIfChanged(editRenderer.setHoverRow(editColumnRow(mouseEvent)));
-            }
-
-            @Override
-            public void mousePressed(MouseEvent mouseEvent) {
-                repaintIfChanged(editRenderer.setPressedRow(editColumnRow(mouseEvent)));
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent mouseEvent) {
-                repaintIfChanged(editRenderer.setPressedRow(-1));
-            }
-
-            @Override
-            public void mouseExited(MouseEvent mouseEvent) {
-                boolean changed = editRenderer.setHoverRow(-1);
-                changed = editRenderer.setPressedRow(-1) || changed;
-                repaintIfChanged(changed);
-            }
-
-            @Override
-            public void mouseClicked(MouseEvent mouseEvent) {
-                int viewRow = editColumnRow(mouseEvent);
-                if (viewRow >= 0) {
-                    openAdvancedEditor(table, tableModel, table.convertRowIndexToModel(viewRow));
-                }
-            }
-
-            // Returns the view row under the event when it is over the Edit column, otherwise -1.
-            private int editColumnRow(MouseEvent mouseEvent) {
-                int viewColumn = table.columnAtPoint(mouseEvent.getPoint());
-                if (viewColumn < 0 || table.convertColumnIndexToModel(viewColumn) != SkillsTableModel.EDIT_COLUMN) {
-                    return -1;
-                }
-                return table.rowAtPoint(mouseEvent.getPoint());
-            }
-
-            private void repaintIfChanged(boolean changed) {
-                if (changed) {
-                    table.repaint();
-                }
-            }
-        };
-        table.addMouseListener(editColumnMouse);
-        table.addMouseMotionListener(editColumnMouse);
+        // Group the 6 milestone and 11 XP columns under spanning header captions while keeping per-value sub-columns.
+        GroupableTableHeader header = new GroupableTableHeader(table.getColumnModel());
+        GroupableTableHeader.ColumnGroup milestones = new GroupableTableHeader.ColumnGroup(
+              getTextAt(getCampaignOptionsResourceBundle(), "lblSkillTableProgressionColumn.text"));
+        for (int column = SkillsTableModel.MILESTONE_FIRST_COLUMN; column < SkillsTableModel.COST_FIRST_COLUMN; column++) {
+            milestones.add(table.getColumnModel().getColumn(column));
+        }
+        header.addColumnGroup(milestones);
+        GroupableTableHeader.ColumnGroup costs = new GroupableTableHeader.ColumnGroup(
+              getTextAt(getCampaignOptionsResourceBundle(), "lblSkillTableCostColumn.text"));
+        for (int column = SkillsTableModel.COST_FIRST_COLUMN; column < SkillsTableModel.COLUMN_COUNT; column++) {
+            costs.add(table.getColumnModel().getColumn(column));
+        }
+        header.addColumnGroup(costs);
+        table.setTableHeader(header);
 
         return table;
     }
@@ -399,11 +364,21 @@ public class SkillsPages {
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        // The table shows all rows with no scrollbars; forward the mouse wheel to the enclosing page scroll pane so
+        // hovering the table still scrolls the page.
+        scrollPane.setWheelScrollingEnabled(false);
+        scrollPane.addMouseWheelListener(event -> {
+            JScrollPane pageScroll = (JScrollPane) SwingUtilities.getAncestorOfClass(JScrollPane.class, scrollPane);
+            if (pageScroll != null) {
+                JScrollBar bar = pageScroll.getVerticalScrollBar();
+                bar.setValue(bar.getValue() + event.getUnitsToScroll() * bar.getUnitIncrement());
+            }
+        });
 
         int rowCount = Math.max(1, table.getRowCount());
         int bodyHeight = table.getRowHeight() * rowCount;
         int headerHeight = table.getTableHeader().getPreferredSize().height;
-        int width = CAMPAIGN_OPTIONS_PAGE_CONTENT_WIDTH;
+        int width = Math.max(CAMPAIGN_OPTIONS_PAGE_CONTENT_WIDTH, table.getPreferredSize().width);
         Dimension viewportSize = new Dimension(width, bodyHeight);
         Dimension scrollPaneSize = new Dimension(width, bodyHeight + headerHeight + UIUtil.scaleForGUI(4));
 
@@ -538,22 +513,6 @@ public class SkillsPages {
         }
     }
 
-    private void openAdvancedEditor(JTable table, SkillsTableModel tableModel, int modelRow) {
-        SkillConfiguration configuration = tableModel.getConfiguration(modelRow);
-        if (configuration == null) {
-            return;
-        }
-
-        Window parent = SwingUtilities.getWindowAncestor(table);
-        SkillAdvancedEditorDialog dialog = new SkillAdvancedEditorDialog(parent,
-              tableModel.getSkillName(modelRow), configuration);
-        dialog.setVisible(true);
-
-        if (dialog.wasChanged()) {
-            tableModel.fireTableRowsUpdated(modelRow, modelRow);
-        }
-    }
-
     /**
      * Loads skill values from the current campaign options using default skill values.
      */
@@ -615,55 +574,18 @@ public class SkillsPages {
     }
 
     /**
-     * Builds a short, human-readable summary of a skill's experience milestones (the level at which a character is
-     * considered Green, Regular, Veteran, Elite, Heroic, and Legendary).
-     *
-     * @param configuration the configuration to summarize
-     *
-     * @return a compact milestone summary string
-     */
-    private static String buildProgressionSummary(SkillConfiguration configuration) {
-        return getFormattedTextAt(getCampaignOptionsResourceBundle(), "lblSkillTableProgressionSummary.text",
-              configuration.greenLevel,
-              configuration.regularLevel,
-              configuration.veteranLevel,
-              configuration.eliteLevel,
-              configuration.heroicLevel,
-              configuration.legendaryLevel);
-    }
-
-    /**
-     * Builds a compact summary of a skill's per-level XP costs (levels 0 through 10). A cost of {@code -1} marks an
-     * unreachable level and is shown as an em dash.
-     *
-     * @param configuration the configuration to summarize
-     *
-     * @return a compact XP cost summary string
-     */
-    private static String buildCostSummary(SkillConfiguration configuration) {
-        StringBuilder summary = new StringBuilder();
-        for (int i = 0; i < configuration.costs.length; i++) {
-            if (i > 0) {
-                summary.append(" \u00B7 ");
-            }
-            Integer cost = configuration.costs[i];
-            summary.append((cost == null || cost < 0) ? "\u2014" : cost);
-        }
-        return summary.toString();
-    }
-
-    /**
      * Table model backing a single skill sub-type's table. It reads and writes the live {@link SkillConfiguration}
      * instances held by the {@link SkillsOptionsModel}, so edits made through the table (and the advanced editor) are
      * reflected immediately in the model.
      */
     private static final class SkillsTableModel extends AbstractTableModel {
+        private static final String[] MILESTONE_LABELS = { "G", "R", "V", "E", "H", "L" };
         private static final int SKILL_COLUMN = 0;
         private static final int TARGET_COLUMN = 1;
-        private static final int PROGRESSION_COLUMN = 2;
-        private static final int COST_COLUMN = 3;
-        private static final int EDIT_COLUMN = 4;
-        private static final int COLUMN_COUNT = 5;
+        private static final int MILESTONE_FIRST_COLUMN = 2;
+        private static final int COST_FIRST_COLUMN = 8;
+        private static final int COST_COLUMN_COUNT = 11;
+        private static final int COLUMN_COUNT = 19;
 
         private final List<String> skillNames;
         private SkillsOptionsModel optionsModel;
@@ -701,14 +623,14 @@ public class SkillsPages {
 
         @Override
         public String getColumnName(int column) {
+            if (column >= MILESTONE_FIRST_COLUMN && column < COLUMN_COUNT) {
+                // Each cell already carries its label ("G 2", "7 · 70"), so the per-value sub-headers are blank; only
+                // the spanning group captions are shown.
+                return "";
+            }
             return switch (column) {
                 case SKILL_COLUMN -> getTextAt(getCampaignOptionsResourceBundle(), "lblSkillTableSkillColumn.text");
                 case TARGET_COLUMN -> getTextAt(getCampaignOptionsResourceBundle(), "lblSkillTableTargetColumn.text");
-                case PROGRESSION_COLUMN ->
-                      getTextAt(getCampaignOptionsResourceBundle(), "lblSkillTableProgressionColumn.text");
-                case COST_COLUMN -> getTextAt(getCampaignOptionsResourceBundle(), "lblSkillTableCostColumn.text");
-                case EDIT_COLUMN ->
-                      getTextAt(getCampaignOptionsResourceBundle(), "lblSkillTableAdvancedColumn.text");
                 default -> throw new IllegalArgumentException("Unknown skill table column: " + column);
             };
         }
@@ -716,45 +638,84 @@ public class SkillsPages {
         @Override
         public Class<?> getColumnClass(int column) {
             return switch (column) {
-                case TARGET_COLUMN -> Integer.class;
-                default -> String.class;
+                case SKILL_COLUMN -> String.class;
+                default -> Integer.class;
             };
         }
 
         @Override
         public boolean isCellEditable(int rowIndex, int columnIndex) {
-            return columnIndex == TARGET_COLUMN;
+            return columnIndex == TARGET_COLUMN
+                         || (columnIndex >= MILESTONE_FIRST_COLUMN && columnIndex < COLUMN_COUNT);
         }
 
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
             SkillConfiguration configuration = getConfiguration(rowIndex);
-            return switch (columnIndex) {
-                case SKILL_COLUMN -> skillNames.get(rowIndex);
-                case TARGET_COLUMN -> configuration == null ? 0 : configuration.targetNumber;
-                case PROGRESSION_COLUMN -> configuration == null ? "" : buildProgressionSummary(configuration);
-                case COST_COLUMN -> configuration == null ? "" : buildCostSummary(configuration);
-                case EDIT_COLUMN -> "";
-                default -> throw new IllegalArgumentException("Unknown skill table column: " + columnIndex);
+            if (columnIndex == SKILL_COLUMN) {
+                return skillNames.get(rowIndex);
+            }
+            if (columnIndex == TARGET_COLUMN) {
+                return configuration == null ? 0 : configuration.targetNumber;
+            }
+            if (configuration == null) {
+                return "";
+            }
+            if (columnIndex >= MILESTONE_FIRST_COLUMN && columnIndex < COST_FIRST_COLUMN) {
+                return milestoneLevel(configuration, columnIndex - MILESTONE_FIRST_COLUMN);
+            }
+            if (columnIndex >= COST_FIRST_COLUMN && columnIndex < COLUMN_COUNT) {
+                return configuration.costs[columnIndex - COST_FIRST_COLUMN];
+            }
+            throw new IllegalArgumentException("Unknown skill table column: " + columnIndex);
+        }
+
+        private static int milestoneLevel(SkillConfiguration configuration, int index) {
+            return switch (index) {
+                case 0 -> configuration.greenLevel;
+                case 1 -> configuration.regularLevel;
+                case 2 -> configuration.veteranLevel;
+                case 3 -> configuration.eliteLevel;
+                case 4 -> configuration.heroicLevel;
+                default -> configuration.legendaryLevel;
             };
         }
 
         @Override
         public void setValueAt(Object value, int rowIndex, int columnIndex) {
-            if (columnIndex != TARGET_COLUMN) {
-                return;
-            }
-
             SkillConfiguration configuration = getConfiguration(rowIndex);
             if (configuration == null) {
                 return;
             }
 
-            configuration.targetNumber = clampTargetNumber(value);
-            fireTableCellUpdated(rowIndex, columnIndex);
+            if (columnIndex == TARGET_COLUMN) {
+                configuration.targetNumber = clamp(value, 0, 12);
+                fireTableCellUpdated(rowIndex, columnIndex);
+                return;
+            }
+            if (columnIndex >= MILESTONE_FIRST_COLUMN && columnIndex < COST_FIRST_COLUMN) {
+                setMilestoneLevel(configuration, columnIndex - MILESTONE_FIRST_COLUMN, clamp(value, 0, 10));
+                fireTableCellUpdated(rowIndex, columnIndex);
+                return;
+            }
+            if (columnIndex >= COST_FIRST_COLUMN && columnIndex < COLUMN_COUNT) {
+                configuration.costs[columnIndex - COST_FIRST_COLUMN] = clamp(value, 0, 99999);
+                fireTableCellUpdated(rowIndex, columnIndex);
+            }
         }
 
-        private int clampTargetNumber(Object value) {
+        private static void setMilestoneLevel(SkillConfiguration configuration, int index, int level) {
+            switch (index) {
+                case 0 -> configuration.greenLevel = level;
+                case 1 -> configuration.regularLevel = level;
+                case 2 -> configuration.veteranLevel = level;
+                case 3 -> configuration.eliteLevel = level;
+                case 4 -> configuration.heroicLevel = level;
+                default -> configuration.legendaryLevel = level;
+            }
+        }
+
+        private int clamp(Object value, int minimum, int maximum) {
             int parsed;
             if (value instanceof Number number) {
                 parsed = number.intValue();
@@ -767,7 +728,7 @@ public class SkillsPages {
                     parsed = 0;
                 }
             }
-            return Math.max(0, Math.min(12, parsed));
+            return Math.max(minimum, Math.min(maximum, parsed));
         }
     }
 
@@ -825,66 +786,26 @@ public class SkillsPages {
     }
 
     /**
-     * Styles the "Advanced" column's renderer button so the painted cell reads as a centered button.
-     *
-     * @param button the renderer button to style
+     * Renders a milestone or XP cell: the cell value is the raw number, but it is shown with its label (e.g. "G 2")
+     * or level prefix (e.g. "7 · 70"), with an em dash for unreachable XP levels.
      */
-    private static void styleAdvancedButton(JButton button) {
-        button.setOpaque(true);
-        button.setHorizontalAlignment(SwingConstants.CENTER);
-    }
-
-    /**
-     * A table cell renderer that paints a button. Used to give every skill row an "Advanced" affordance.
-     */
-    private static final class ButtonRenderer extends JButton implements TableCellRenderer {
-        private int hoverRow = -1;
-        private int pressedRow = -1;
-
-        private ButtonRenderer(String text) {
-            super(text);
-            styleAdvancedButton(this);
-            setRolloverEnabled(true);
-        }
-
-        /**
-         * Records the row the mouse is hovering so that row's button paints its rollover (hover) background.
-         *
-         * @param row the hovered view row, or {@code -1} for none
-         *
-         * @return {@code true} if the hovered row changed (so the column should be repainted)
-         */
-        private boolean setHoverRow(int row) {
-            if (hoverRow == row) {
-                return false;
-            }
-            hoverRow = row;
-            return true;
-        }
-
-        /**
-         * Records the row whose button is currently pressed so it paints its pressed background.
-         *
-         * @param row the pressed view row, or {@code -1} for none
-         *
-         * @return {@code true} if the pressed row changed (so the column should be repainted)
-         */
-        private boolean setPressedRow(int row) {
-            if (pressedRow == row) {
-                return false;
-            }
-            pressedRow = row;
-            return true;
-        }
-
+    private static final class SkillValueRenderer extends DefaultTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
               boolean hasFocus, int row, int column) {
-            boolean pressed = row == pressedRow;
-            ButtonModel model = getModel();
-            model.setRollover(row == hoverRow);
-            model.setArmed(pressed);
-            model.setPressed(pressed);
+            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            setHorizontalAlignment(SwingConstants.LEFT);
+            int modelColumn = table.convertColumnIndexToModel(column);
+            Integer number = (value instanceof Integer integer) ? integer : null;
+            if (modelColumn >= SkillsTableModel.MILESTONE_FIRST_COLUMN
+                      && modelColumn < SkillsTableModel.COST_FIRST_COLUMN) {
+                String label = SkillsTableModel.MILESTONE_LABELS[modelColumn - SkillsTableModel.MILESTONE_FIRST_COLUMN];
+                setText(label + ' ' + (number == null ? "" : number));
+            } else {
+                int level = modelColumn - SkillsTableModel.COST_FIRST_COLUMN;
+                String cost = (number == null || number < 0) ? "\u2014" : number.toString();
+                setText(level + " \u00B7 " + cost);
+            }
             return this;
         }
     }
