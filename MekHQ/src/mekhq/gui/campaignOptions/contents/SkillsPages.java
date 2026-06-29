@@ -248,8 +248,9 @@ public class SkillsPages {
 
         installCopyPasteBindings(table, tableModel);
 
-        JLabel hintLabel = new JLabel(getFormattedTextAt(getCampaignOptionsResourceBundle(),
-              "lblSkillTableHint.text", shortcutModifierLabel()));
+        String hintText = getFormattedTextAt(getCampaignOptionsResourceBundle(), "lblSkillTableHint.text",
+              shortcutModifierLabel());
+        JLabel hintLabel = new JLabel("<html>" + hintText + "</html>");
 
         layout.gridy = 0;
 
@@ -304,6 +305,11 @@ public class SkillsPages {
         targetEditorField.setHorizontalAlignment(SwingConstants.LEFT);
         ((AbstractDocument) targetEditorField.getDocument()).setDocumentFilter(new DigitOnlyDocumentFilter());
         DefaultCellEditor targetEditor = new DefaultCellEditor(targetEditorField) {
+            // True when the current edit began by typing a character (rather than a mouse click, F2, or a programmatic
+            // start). A typed character should replace the cell's value like a spreadsheet, so the field is cleared
+            // before the character arrives; otherwise the value is kept and selected so typing still replaces it.
+            private boolean replaceOnEdit;
+
             @Override
             public boolean isCellEditable(EventObject anEvent) {
                 // Let menu-shortcut/Shift clicks extend the row selection instead of starting an edit, so multiple
@@ -312,14 +318,28 @@ public class SkillsPages {
                           && (((mouseEvent.getModifiersEx() & shortcutMask()) != 0) || mouseEvent.isShiftDown())) {
                     return false;
                 }
-                return super.isCellEditable(anEvent);
+                boolean editable = super.isCellEditable(anEvent);
+                if (editable) {
+                    // JTable passes the triggering KeyEvent when a keystroke auto-starts the edit; F2, mouse, and
+                    // programmatic starts pass a non-key event (or null).
+                    replaceOnEdit = anEvent instanceof KeyEvent;
+                }
+                return editable;
             }
 
             @Override
             public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row,
                   int column) {
                 Component editor = super.getTableCellEditorComponent(table, value, isSelected, row, column);
-                SwingUtilities.invokeLater(targetEditorField::selectAll);
+                if (replaceOnEdit) {
+                    // Clear now so the triggering character (delivered right after this returns) becomes the whole
+                    // value instead of being appended to it.
+                    targetEditorField.setText("");
+                } else {
+                    // Select the existing value so a click-then-type still replaces it (deferred until the field has
+                    // focus, otherwise the caret reset on focus gain would drop the selection).
+                    SwingUtilities.invokeLater(targetEditorField::selectAll);
+                }
                 return editor;
             }
         };
@@ -371,7 +391,10 @@ public class SkillsPages {
             JScrollPane pageScroll = (JScrollPane) SwingUtilities.getAncestorOfClass(JScrollPane.class, scrollPane);
             if (pageScroll != null) {
                 JScrollBar bar = pageScroll.getVerticalScrollBar();
-                bar.setValue(bar.getValue() + event.getUnitsToScroll() * bar.getUnitIncrement());
+                // Use the directional unit increment so the step matches the page's scrollable view (a per-line
+                // amount) rather than the raw 1px property the no-argument overload returns.
+                int direction = event.getUnitsToScroll() < 0 ? -1 : 1;
+                bar.setValue(bar.getValue() + event.getUnitsToScroll() * bar.getUnitIncrement(direction));
             }
         });
 
@@ -659,7 +682,9 @@ public class SkillsPages {
                 return configuration == null ? 0 : configuration.targetNumber;
             }
             if (configuration == null) {
-                return "";
+                // These are Integer.class columns (see getColumnClass); return null rather than a String so the
+                // value matches the declared column type. The renderer draws a blank/em-dash cell for null.
+                return null;
             }
             if (columnIndex >= MILESTONE_FIRST_COLUMN && columnIndex < COST_FIRST_COLUMN) {
                 return milestoneLevel(configuration, columnIndex - MILESTONE_FIRST_COLUMN);
@@ -694,12 +719,15 @@ public class SkillsPages {
                 return;
             }
             if (columnIndex >= MILESTONE_FIRST_COLUMN && columnIndex < COST_FIRST_COLUMN) {
-                setMilestoneLevel(configuration, columnIndex - MILESTONE_FIRST_COLUMN, clamp(value, 0, 10));
-                fireTableCellUpdated(rowIndex, columnIndex);
+                int milestoneIndex = columnIndex - MILESTONE_FIRST_COLUMN;
+                setMilestoneLevel(configuration, milestoneIndex, clamp(value, 0, 10));
+                // Restoring the ascending invariant can change neighbouring milestone cells, so refresh the row.
+                enforceMilestoneOrder(configuration, milestoneIndex);
+                fireTableRowsUpdated(rowIndex, rowIndex);
                 return;
             }
             if (columnIndex >= COST_FIRST_COLUMN && columnIndex < COLUMN_COUNT) {
-                configuration.costs[columnIndex - COST_FIRST_COLUMN] = clamp(value, 0, 99999);
+                configuration.costs[columnIndex - COST_FIRST_COLUMN] = parseCost(value);
                 fireTableCellUpdated(rowIndex, columnIndex);
             }
         }
@@ -712,6 +740,28 @@ public class SkillsPages {
                 case 3 -> configuration.eliteLevel = level;
                 case 4 -> configuration.heroicLevel = level;
                 default -> configuration.legendaryLevel = level;
+            }
+        }
+
+        /**
+         * Restores the non-decreasing milestone invariant (Green &le; Regular &le; Veteran &le; Elite &le; Heroic
+         * &le; Legendary) after the milestone at {@code editedIndex} changed, preserving that edited value: later
+         * milestones are raised up to it and earlier milestones are lowered down to it as needed.
+         * {@link SkillType#getExperienceLevel} tests these thresholds from highest to lowest, so an out-of-order
+         * value would misclassify a skill's experience level.
+         */
+        private static void enforceMilestoneOrder(SkillConfiguration configuration, int editedIndex) {
+            for (int index = editedIndex + 1; index < MILESTONE_LABELS.length; index++) {
+                int previous = milestoneLevel(configuration, index - 1);
+                if (milestoneLevel(configuration, index) < previous) {
+                    setMilestoneLevel(configuration, index, previous);
+                }
+            }
+            for (int index = editedIndex - 1; index >= 0; index--) {
+                int next = milestoneLevel(configuration, index + 1);
+                if (milestoneLevel(configuration, index) > next) {
+                    setMilestoneLevel(configuration, index, next);
+                }
             }
         }
 
@@ -729,6 +779,16 @@ public class SkillsPages {
                 }
             }
             return Math.max(minimum, Math.min(maximum, parsed));
+        }
+
+        /**
+         * Parses an edited XP cost. A blank edit clears the level back to {@link SkillType#DISABLED_SKILL_LEVEL}
+         * (shown as an em dash); any entered value is clamped to a non-negative cost. A blank edit is the only way to
+         * disable a level inline, since the digit-only editor cannot accept the -1 sentinel directly.
+         */
+        private int parseCost(Object value) {
+            boolean blank = (value == null) || value.toString().trim().isEmpty();
+            return blank ? SkillType.DISABLED_SKILL_LEVEL : clamp(value, 0, 99999);
         }
     }
 
