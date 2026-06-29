@@ -34,30 +34,108 @@ package mekhq.campaign.mission.mission;
 
 import static megamek.common.compute.Compute.d6;
 
+import jakarta.annotation.Nullable;
+import megamek.common.util.weightedMaps.AbstractWeightedMap;
+import megamek.logging.MMLogger;
+import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.personnel.enums.ConnectionsLevel;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 
 public class ContractEmployerDetermination {
+    private static final MMLogger LOGGER = MMLogger.create(ContractEmployerDetermination.class);
+
     private final CampaignTypeForContractDetermination campaignType;
     private final HiringHallLevel hiringHallLevel;
     private final int forceReputationModifier;
     private final ConnectionsLevel connectionsLevel;
+    private final AbstractLocation currentLocation;
 
     public ContractEmployerDetermination(CampaignTypeForContractDetermination campaignType,
-          HiringHallLevel hiringHallLevel, int forceReputationModifier, ConnectionsLevel connectionsLevel) {
+          HiringHallLevel hiringHallLevel, int forceReputationModifier, ConnectionsLevel connectionsLevel,
+          AbstractLocation currentLocation) {
         this.campaignType = campaignType;
         this.hiringHallLevel = hiringHallLevel;
         this.forceReputationModifier = forceReputationModifier;
         this.connectionsLevel = connectionsLevel;
+        this.currentLocation = currentLocation;
     }
 
-    public GlobalEmployerTableValue getContractEmployer() {
-
+    /**
+     * Determines and returns the faction that will serve as the employer for a contract.
+     *
+     * <p>We start by determining the {@link GlobalEmployerTableValue}, we also generate an
+     * {@link IndependentEmployerTableValue} in case we need it. If {@code globalEmployerType} is
+     * {@link GlobalEmployerTableValue#INDEPENDENT} then we generate a second {@link GlobalEmployerTableValue}. This
+     * second value is then used to help us pick a faction the 'independent' employer is acting on behalf of.</p>
+     *
+     * <p>For contract pay, terms, and other clauses, either {@code globalEmployerType} or
+     * {@code independentEmployerType} should be used. {@code employerSearchFactionType} only exists to assist
+     * searching.</p>
+     *
+     * @return the faction representing the contract employer
+     */
+    public Faction getContractEmployer() {
         // CamOps pg 39 rev 5th printing states that a player can pick any employer at or below their roll. This
         // creates a UX issue for MekHQ. To avoid spamming the player, we instead use the exact employer matching the
         // roll
         GlobalEmployerTableValue globalEmployerType = getGlobalEmployer();
         IndependentEmployerTableValue independentEmployerType = getIndependentEmployer();
+        GlobalEmployerTableValue employerSearchFactionType = getFinalGlobalFactionTableValue(globalEmployerType,
+              independentEmployerType);
+
+        return getEmployer(employerSearchFactionType);
+    }
+
+    private GlobalEmployerTableValue getFinalGlobalFactionTableValue(GlobalEmployerTableValue globalEmployerType,
+          IndependentEmployerTableValue independentEmployerType) {
+        if (globalEmployerType == GlobalEmployerTableValue.INDEPENDENT) {
+            GlobalEmployerTableValue newGlobalEmployerFaction = getSecondaryGlobalEmployerType(independentEmployerType);
+            return newGlobalEmployerFaction != null ? newGlobalEmployerFaction : globalEmployerType;
+        }
+
+        return globalEmployerType;
+    }
+
+    private @Nullable GlobalEmployerTableValue getSecondaryGlobalEmployerType(
+          IndependentEmployerTableValue independentEmployerType) {
+        boolean isIndependentOverride = isIsIndependentOverride(independentEmployerType);
+
+        GlobalEmployerTableValue secondaryGlobalEmployerType = null;
+        if (isIndependentOverride) {
+            secondaryGlobalEmployerType = getGlobalEmployer();
+        }
+
+        return secondaryGlobalEmployerType;
+    }
+
+    private static boolean isIsIndependentOverride(IndependentEmployerTableValue independentEmployerType) {
+        return switch (independentEmployerType) {
+            case NOBLE, PLANETARY_GOVERNMENT, MERCENARY, CORPORATION -> true;
+            // These are terms used by CamOps. In MekHQ we treat them as truly Independent employers, so not acting
+            // on behalf of a parent nation
+            case MAJOR_PERIPHERY, MINOR_PERIPHERY -> false;
+        };
+    }
+
+    private static @Nullable Faction getEmployer(@Nullable GlobalEmployerTableValue globalEmployerType) {
+        while (globalEmployerType != null) {
+            // TODO once we have the tech to have multiple combat forces scattered about the galaxy we should update
+            //  this to no longer use campaign location - Illiani, 29/Jun/26
+            AbstractWeightedMap<Integer, Faction> employerMap = RandomFactionGenerator.getInstance().getEmployerMap(
+                  globalEmployerType);
+
+            if (!employerMap.isEmpty()) {
+                return employerMap.randomItem();
+            }
+
+            globalEmployerType = globalEmployerType.getNextLowestEmployerType();
+        }
+
+        LOGGER.warn("Failed to generate employer of type {}", globalEmployerType);
+
+        return null;
     }
 
     private IndependentEmployerTableValue getIndependentEmployer() {

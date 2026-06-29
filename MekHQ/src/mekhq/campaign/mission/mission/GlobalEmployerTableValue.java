@@ -34,6 +34,7 @@ package mekhq.campaign.mission.mission;
 
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+import jakarta.annotation.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.randomEvents.personalities.Aggression;
 import org.jspecify.annotations.NonNull;
@@ -98,6 +99,15 @@ public enum GlobalEmployerTableValue {
         LOGGER.warn("Roll {} is outside of any employer range. Returning MAJOR_POWER", roll);
 
         return MAJOR_POWER;
+    }
+
+    public @Nullable GlobalEmployerTableValue getNextLowestEmployerType() {
+        return switch (this) {
+            case INDEPENDENT -> null;
+            case MINOR_POWER -> INDEPENDENT;
+            case MAJOR_POWER -> MINOR_POWER;
+            case SUPER_POWER -> MAJOR_POWER;
+        };
     }
 
     public static GlobalEmployerTableValue fromString(String text) {
