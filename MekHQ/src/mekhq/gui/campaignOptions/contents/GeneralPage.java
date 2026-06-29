@@ -72,6 +72,7 @@ import mekhq.campaign.personnel.backgrounds.BackgroundsController;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
+import mekhq.gui.campaignOptions.CampaignOptionsIconLegend;
 import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
 import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
@@ -254,7 +255,7 @@ public class GeneralPage {
               .showDetailsPanel(false)
               .sectionsExpandedByDefault(true)
               .quote("generalPanel")
-              .intro("lblGeneralIconLegend.text")
+              .introComponent(new CampaignOptionsIconLegend())
               .section("lblGeneralCampaignBasicsPanel.text",
                     "lblGeneralCampaignBasicsPanel.summary",
                     createCampaignBasicsPanel())
