@@ -56,7 +56,7 @@ import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.mission.GlobalEmployerTableValue;
+import mekhq.campaign.mission.mission.contractGeneration.GlobalEmployerTableValue;
 import mekhq.campaign.universe.factionHints.FactionHints;
 
 /**
@@ -64,8 +64,8 @@ import mekhq.campaign.universe.factionHints.FactionHints;
  *       <p>
  *       Uses Factions and Planets to weighted lists of potential employers and enemies for contract generation. Also
  *       finds a suitable planet for the action.
- *                                                                                           TODO : Account for the de facto alliance of the invading Clans and the
- *                                                                                           TODO : Fortress Republic in a way that doesn't involve hard-coding them here.
+ *                                                                                                 TODO : Account for the de facto alliance of the invading Clans and the
+ *                                                                                                 TODO : Fortress Republic in a way that doesn't involve hard-coding them here.
  */
 public class RandomFactionGenerator {
     private static final MMLogger LOGGER = MMLogger.create(RandomFactionGenerator.class);
@@ -287,8 +287,8 @@ public class RandomFactionGenerator {
     }
 
     /**
-     * Selects a Faction from those with a presence in the region weighted by the number of systems controlled.
-     * Factions are filtered based on the employer type.
+     * Selects a Faction from those with a presence in the region weighted by the number of systems controlled. Factions
+     * are filtered based on the employer type.
      *
      * @param employerType the type of employer to return
      *
