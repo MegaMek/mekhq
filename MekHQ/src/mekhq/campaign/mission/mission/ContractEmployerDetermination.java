@@ -33,6 +33,7 @@
 package mekhq.campaign.mission.mission;
 
 import static megamek.common.compute.Compute.d6;
+import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 
 import jakarta.annotation.Nullable;
 import megamek.common.util.weightedMaps.AbstractWeightedMap;
@@ -40,30 +41,59 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.personnel.enums.ConnectionsLevel;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 
 public class ContractEmployerDetermination {
     private static final MMLogger LOGGER = MMLogger.create(ContractEmployerDetermination.class);
 
+    private final Faction campaignFaction;
     private final CampaignTypeForContractDetermination campaignType;
     private final HiringHallLevel hiringHallLevel;
     private final int forceReputationModifier;
     private final ConnectionsLevel connectionsLevel;
-    private final AbstractLocation currentLocation;
+    private final AbstractLocation currentLocation; // TODO added for use once we support multi-locational contracts
 
-    public ContractEmployerDetermination(CampaignTypeForContractDetermination campaignType,
-          HiringHallLevel hiringHallLevel, int forceReputationModifier, ConnectionsLevel connectionsLevel,
+    public ContractEmployerDetermination(Faction campaignFaction, HiringHallLevel hiringHallLevel,
+          int forceReputationModifier, ConnectionsLevel connectionsLevel,
           AbstractLocation currentLocation) {
-        this.campaignType = campaignType;
+        this.campaignFaction = campaignFaction;
+        this.campaignType = getCampaignTypeFromFaction();
         this.hiringHallLevel = hiringHallLevel;
         this.forceReputationModifier = forceReputationModifier;
         this.connectionsLevel = connectionsLevel;
         this.currentLocation = currentLocation;
     }
 
+    private CampaignTypeForContractDetermination getCampaignTypeFromFaction() {
+        if (campaignFaction.isPirate()) {
+            return CampaignTypeForContractDetermination.PIRATE;
+        }
+
+        if (campaignFaction.isMercenary()) {
+            return CampaignTypeForContractDetermination.MERCENARY;
+        }
+
+        return CampaignTypeForContractDetermination.GOVERNMENT;
+    }
+
+    public Faction getContractEmployer() {
+        return switch (campaignType) {
+            // CampOps pg 39 rev 5th printing states that mercenaries get a semi-random employer. We generate this by
+            // looking at all potential employers in the contract search radius. Our generation method is based on
+            // the table found in the above-cited page but is not an exact match due to legacy reasons.
+            case MERCENARY -> getEmployerUsingMercenaryMethod();
+            // Pirate factions always have themselves as the employer
+            case PIRATE -> Factions.getInstance().getFaction(PIRATE_FACTION_CODE);
+            // Government factions always have themselves as the employer. Government factions as any campaign
+            // faction that is not pirate or mercenary.
+            case GOVERNMENT -> campaignFaction;
+        };
+    }
+
     /**
-     * Determines and returns the faction that will serve as the employer for a contract.
+     * Determines and returns the faction that will serve as the mercenary employer for a contract.
      *
      * <p>We start by determining the {@link GlobalEmployerTableValue}, we also generate an
      * {@link IndependentEmployerTableValue} in case we need it. If {@code globalEmployerType} is
@@ -76,7 +106,7 @@ public class ContractEmployerDetermination {
      *
      * @return the faction representing the contract employer
      */
-    public Faction getContractEmployer() {
+    private @Nullable Faction getEmployerUsingMercenaryMethod() {
         // CamOps pg 39 rev 5th printing states that a player can pick any employer at or below their roll. This
         // creates a UX issue for MekHQ. To avoid spamming the player, we instead use the exact employer matching the
         // roll
