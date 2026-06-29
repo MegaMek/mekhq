@@ -211,6 +211,13 @@ public class PersonUtility {
      * @since 0.51.0
      */
     public static void setVeterancyAwardEligibility(Campaign campaign, Person person) {
+        // We don't want a veteran civilian to be barred from later getting one from a non-civilian profession.
+        // The exception is if the player directly improves the civilian to a Veteranc status, in which case the
+        // normal process takes over.
+        if (person.isCivilian()) {
+            return;
+        }
+
         boolean useSecondaryProfession = false;
         boolean excludeInjuryEffects = true;
         int experienceLevel = person.getExperienceLevel(campaign, useSecondaryProfession, excludeInjuryEffects);
