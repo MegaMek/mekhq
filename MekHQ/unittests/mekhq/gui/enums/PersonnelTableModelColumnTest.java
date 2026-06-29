@@ -34,6 +34,7 @@ package mekhq.gui.enums;
 
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -73,42 +74,19 @@ public class PersonnelTableModelColumnTest {
     public void testGetWidth() {
         for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
             switch (personnelTableModelColumn) {
-                case PERSON_GRAPHICAL:
-                case MARKET_UNIT_ASSIGNMENT:
-                case UNIT_ASSIGNMENT:
-                    assertEquals(125, personnelTableModelColumn.getWidth());
-                    break;
                 case RANK:
                 case FIRST_NAME:
-                case GIVEN_NAME:
-                case DEPLOYED:
-                    assertEquals(70, personnelTableModelColumn.getWidth());
-                    break;
                 case LAST_NAME:
-                case SURNAME:
-                case SURNAME_GROUPED_BY_UNIT:
-                case BLOODNAME:
-                case CALLSIGN:
-                case SKILL_LEVEL:
-                case SALARY:
-                    assertEquals(50, personnelTableModelColumn.getWidth());
-                    break;
-                case PERSONNEL_ROLE:
-                    assertEquals(150, personnelTableModelColumn.getWidth());
+                    // fixed size for the most important columns
+                    assertNotNull(personnelTableModelColumn.getPreferredWidth());
                     break;
                 case FORCE:
-                case LOCATION_SYSTEM:
-                case LOCATION_PLANET:
-                case DESTINATION_SYSTEM:
-                case DESTINATION_PLANET:
-                    assertEquals(100, personnelTableModelColumn.getWidth());
-                    break;
-                case LOCATION_NAME:
-                case DESTINATION_NAME:
-                    assertEquals(150, personnelTableModelColumn.getWidth());
-                    break;
-                default:
-                    assertEquals(20, personnelTableModelColumn.getWidth());
+                case BODY:
+                case AGGRESSION:
+                case XP:
+                case KILLS:
+                case MEDTECH:
+                    assertNull(personnelTableModelColumn.getPreferredWidth());
                     break;
             }
         }
