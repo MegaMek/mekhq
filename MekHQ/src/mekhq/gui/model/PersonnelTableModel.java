@@ -46,7 +46,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JTable;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableCellRenderer;
 
 import io.sentry.util.Objects;
 import megamek.client.ui.tileset.EntityImage;
@@ -64,6 +63,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.gui.enums.PersonnelTableModelColumn;
 import mekhq.gui.utilities.ComponentColors;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * A table Model for displaying information about personnel
@@ -76,7 +76,7 @@ public class PersonnelTableModel extends DataTableModel<Person> {
 
     private final Campaign campaign;
     private boolean groupByUnit;
-    private final TableCellRenderer renderer = new Renderer();
+    private final Renderer renderer = new Renderer();
 
     public PersonnelTableModel(Campaign c) {
         data = new ArrayList<>();
@@ -161,7 +161,7 @@ public class PersonnelTableModel extends DataTableModel<Person> {
         }
     }
 
-    public TableCellRenderer getRenderer() {
+    public Renderer getRenderer() {
         return renderer;
     }
 
@@ -174,6 +174,12 @@ public class PersonnelTableModel extends DataTableModel<Person> {
         private final Map<Portrait, ImageIcon> portraitCache = new WeakHashMap<>();
         private final Map<Long, ImageIcon> entityImageCache = new WeakHashMap<>();
         private final Map<StandardFormationIcon, ImageIcon> formationIconCache = new WeakHashMap<>();
+
+        private String highlight = "";
+
+        public void setHighlight(String highlight) {
+            this.highlight = highlight;
+        }
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
@@ -189,7 +195,8 @@ public class PersonnelTableModel extends DataTableModel<Person> {
             if (getFont() != table.getFont()) {
                 setFont(table.getFont());
             }
-            setText(column.getText(value));
+            String text = applyHighlighting(column.getText(value));
+            setText(text);
             setHorizontalAlignment(column.getAlignment());
 
             setIcon(getImage(person, column));
@@ -212,6 +219,19 @@ public class PersonnelTableModel extends DataTableModel<Person> {
             setToolTipText(column.getToolTipText(person, personalStateFlags));
 
             return this;
+        }
+
+        private String applyHighlighting(String text) {
+            if (highlight.isEmpty()) {
+                return text;
+            }
+            String highlightedText =
+                  ReportingUtilities.messageSurroundedBySpanWithColor(ReportingUtilities.getPositiveColor(), "$1");
+            text = text.replaceAll("(?i)(" + java.util.regex.Pattern.quote(highlight) + ")(?![^<>]*>)", highlightedText);
+            if (text.startsWith("<html>")) {
+                return text;
+            }
+            return "<html>" + text + "</html>";
         }
 
         /**

@@ -47,6 +47,7 @@ import java.awt.GridBagLayout;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.function.Predicate;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -99,6 +100,7 @@ public class CampaignOptionsPagePanel extends JPanel {
     private final JPanel pageBody;
     private final boolean showDetailsPanel;
     private final String sectionSearchText;
+    private final List<SearchableSection> searchableSections;
 
     private CampaignOptionsPagePanel(Builder builder) {
         super(null);
@@ -113,17 +115,26 @@ public class CampaignOptionsPagePanel extends JPanel {
         // can place arbitrary components above, between, or below the collapsible sections.
         List<Object> renderItems = new ArrayList<>();
         List<MHQCollapsiblePanel> sections = new ArrayList<>();
+        List<SearchableSection> searchableSectionList = new ArrayList<>();
         StringBuilder searchTextBuilder = new StringBuilder();
         for (Object bodyItem : builder.bodyItems) {
             if (bodyItem instanceof Section section) {
                 MHQCollapsiblePanel sectionPanel = createSection(section, builder.sectionsExpandedByDefault);
                 sections.add(sectionPanel);
                 renderItems.add(sectionPanel);
-                appendSectionSearchText(searchTextBuilder, section);
+
+                StringBuilder sectionTextBuilder = new StringBuilder();
+                appendSectionSearchText(sectionTextBuilder, section);
+                String sectionText = sectionTextBuilder.toString().trim();
+                searchableSectionList.add(new SearchableSection(sectionPanel, sectionText));
+                if (!sectionText.isEmpty()) {
+                    searchTextBuilder.append(' ').append(sectionText);
+                }
             } else if (bodyItem instanceof JComponent component) {
                 renderItems.add(component);
             }
         }
+        searchableSections = List.copyOf(searchableSectionList);
         sectionSearchText = searchTextBuilder.toString().trim();
         JPanel sectionControls = createSectionControls(sections);
         int sectionStackWidth = getPreferredSectionStackWidth(sections, sectionControls);
@@ -156,6 +167,53 @@ public class CampaignOptionsPagePanel extends JPanel {
      */
     public @Nonnull String getSectionSearchText() {
         return sectionSearchText;
+    }
+
+    /**
+     * Expands every collapsible section whose title or summary text satisfies the given matcher and collapses the
+     * rest, so a page opened from a navigation search result reveals the matching section instead of opening fully
+     * collapsed. If no section matches (for example, when only the page title matched the search), the page is left
+     * untouched.
+     *
+     * @param sectionTextMatcher tests a section's raw (un-normalized) title and summary text
+     *
+     * @return {@code true} if at least one section matched and the section states were updated
+     */
+    public boolean expandSectionsMatching(@Nonnull Predicate<String> sectionTextMatcher) {
+        if (searchableSections.isEmpty()) {
+            return false;
+        }
+
+        boolean[] matches = new boolean[searchableSections.size()];
+        boolean anyMatch = false;
+        for (int index = 0; index < searchableSections.size(); index++) {
+            matches[index] = sectionTextMatcher.test(searchableSections.get(index).searchText());
+            anyMatch |= matches[index];
+        }
+
+        if (!anyMatch) {
+            return false;
+        }
+
+        for (int index = 0; index < searchableSections.size(); index++) {
+            searchableSections.get(index).panel().setExpanded(matches[index]);
+        }
+        return true;
+    }
+
+    /**
+     * Expands every collapsible section on this page. Used as a fallback when a page is opened from a navigation search
+     * whose term matched the page as a whole (such as an internal page name) rather than any single section heading, so
+     * the page is revealed instead of opening fully collapsed.
+     */
+    public void expandAllSections() {
+        for (SearchableSection section : searchableSections) {
+            section.panel().setExpanded(true);
+        }
+    }
+
+    /** Pairs a collapsible section with its resolved title and summary text for search-driven expansion. */
+    private record SearchableSection(MHQCollapsiblePanel panel, String searchText) {
     }
 
     private static void appendSectionSearchText(StringBuilder builder, Section section) {
