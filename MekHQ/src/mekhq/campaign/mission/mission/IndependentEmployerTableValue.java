@@ -57,17 +57,17 @@ public enum IndependentEmployerTableValue {
     // region Constructors
     IndependentEmployerTableValue(final String lookupName, final int lowerBand, final int upperBand) {
         this.lookupName = lookupName;
-        this.label = getName(lookupName);
-        this.tooltip = getTooltip(lookupName);
+        this.label = generateName(lookupName);
+        this.tooltip = generateTooltip(lookupName);
         this.lowerBand = lowerBand;
         this.upperBand = upperBand;
     }
 
-    private @NonNull String getTooltip(String lookupName) {
+    private @NonNull String generateTooltip(String lookupName) {
         return getTextAt(RESOURCE_BUNDLE, "IndependentEmployerTableValue." + lookupName + ".tooltip");
     }
 
-    private @NonNull String getName(String lookupName) {
+    private @NonNull String generateName(String lookupName) {
         return getTextAt(RESOURCE_BUNDLE, "IndependentEmployerTableValue." + lookupName + ".name");
     }
 
