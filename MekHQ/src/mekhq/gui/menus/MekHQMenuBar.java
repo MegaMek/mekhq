@@ -34,6 +34,7 @@
 
 package mekhq.gui.menus;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -238,7 +239,10 @@ public class MekHQMenuBar extends JMenuBar {
         menuFile.add(initExportMenu());
         menuFile.add(initRefreshMenu());
 
-        menuFile.add(createMenuItem("menuOptions.text", KeyEvent.VK_C, this::menuOptionsActionPerformed));
+        JMenuItem menuOptions = createMenuItem("menuOptions.text", KeyEvent.VK_C, this::menuOptionsActionPerformed);
+        menuOptions.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O,
+              Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx() | InputEvent.SHIFT_DOWN_MASK));
+        menuFile.add(menuOptions);
 
         JMenuItem miMHQOptions = createMenuItem("miMHQOptions.text", KeyEvent.VK_H,
               evt -> new MHQOptionsDialog(getFrame()).setVisible(true));
