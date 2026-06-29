@@ -40,17 +40,10 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -187,64 +180,7 @@ public class CampaignOptionsUtilities {
      * @return an {@link Icon} that draws the glyph, or {@code null} if the symbols font cannot display it
      */
     public static @Nullable Icon getMaterialSymbolIcon(int codePoint, int size, @Nonnull Color color) {
-        Font font = FontHandler.symbolFont().deriveFont((float) size);
-        if (!font.canDisplay(codePoint)) {
-            // The symbols font could not be registered, or the code point is wrong; fall back to a text-only button.
-            return null;
-        }
-        return new MaterialSymbolIcon(font, new String(Character.toChars(codePoint)), color);
-    }
-
-    /**
-     * An {@link Icon} that paints a single glyph live through the host component's graphics. Painting on each repaint
-     * (instead of baking it into a fixed-resolution bitmap) keeps it crisp on HiDPI displays, where a raster icon
-     * would be scaled up and look pixelated.
-     */
-    private static final class MaterialSymbolIcon implements Icon {
-        private final Font font;
-        private final String glyph;
-        private final Color color;
-        private final int width;
-        private final int height;
-        private final int drawX;
-
-        private MaterialSymbolIcon(@Nonnull Font font, @Nonnull String glyph, @Nonnull Color color) {
-            this.font = font;
-            this.glyph = glyph;
-            this.color = color;
-
-            BufferedImage scratch = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
-            Graphics2D graphics = scratch.createGraphics();
-            FontMetrics metrics = graphics.getFontMetrics(font);
-            height = Math.max(1, metrics.getHeight());
-            // Size and offset to the glyph's actual ink box rather than its advance width, which on these icon glyphs
-            // carries wide side bearings and otherwise shows up as uneven empty space to the left of the icon.
-            Rectangle2D inkBounds = font.createGlyphVector(graphics.getFontRenderContext(), glyph).getVisualBounds();
-            width = Math.max(1, (int) Math.ceil(inkBounds.getWidth()));
-            drawX = (int) Math.round(-inkBounds.getX());
-            graphics.dispose();
-        }
-
-        @Override
-        public void paintIcon(Component component, Graphics g, int x, int y) {
-            Graphics2D graphics = (Graphics2D) g.create();
-            graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-            graphics.setFont(font);
-            graphics.setColor(color);
-            graphics.drawString(glyph, x + drawX, y + graphics.getFontMetrics().getAscent());
-            graphics.dispose();
-        }
-
-        @Override
-        public int getIconWidth() {
-            return width;
-        }
-
-        @Override
-        public int getIconHeight() {
-            return height;
-        }
+        return FontHandler.symbolIcon(codePoint, size, color);
     }
 
     static void setTipTextConsumer(@Nullable Consumer<String> tipTextConsumer) {
