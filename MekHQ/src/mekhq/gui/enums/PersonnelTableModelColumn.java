@@ -66,6 +66,7 @@ import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
+import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.personnel.skills.InfantryGunnerySkills;
 import mekhq.campaign.personnel.skills.ScoutingSkills;
 import mekhq.campaign.personnel.skills.Skill;
@@ -251,20 +252,12 @@ public enum PersonnelTableModelColumn {
           Person::isClanPersonnel, PersonnelTableModelColumn::convertBooleanToYesNoNA),
     COMMANDER("Column.COMMANDER.title", Comparators.YES_NO_NA_COMPARATOR,
           Person::isCommander, PersonnelTableModelColumn::convertBooleanToYesNoNA),
-    DIVORCEABLE("Column.DIVORCEABLE.title", Comparators.YES_NO_NA_COMPARATOR,
-          person -> person.getGenealogy().hasSpouse() ? person.isDivorceable() : null,
-          PersonnelTableModelColumn::convertBooleanToYesNoNA),
-    EMPLOYED("Column.EMPLOYED.title", Comparators.YES_NO_NA_COMPARATOR,
-          Person::isEmployed, PersonnelTableModelColumn::convertBooleanToYesNoNA),
     FOUNDER("Column.FOUNDER.title", Comparators.YES_NO_NA_COMPARATOR,
           Person::isFounder, PersonnelTableModelColumn::convertBooleanToYesNoNA),
     HIDE_PERSONALITY("Column.HIDE_PERSONALITY.title", Comparators.YES_NO_NA_COMPARATOR,
           Person::isHidePersonality, PersonnelTableModelColumn::convertBooleanToYesNoNA),
     IMMORTAL("Column.IMMORTAL.title", Comparators.YES_NO_NA_COMPARATOR,
           person -> person.getStatus().isDead() ? null : person.isImmortal(),
-          PersonnelTableModelColumn::convertBooleanToYesNoNA),
-    MARRIAGEABLE("Column.MARRIAGEABLE.title", Comparators.YES_NO_NA_COMPARATOR,
-          person -> person.getGenealogy().hasSpouse() ? null : person.isMarriageable(),
           PersonnelTableModelColumn::convertBooleanToYesNoNA),
     NEVER_ASSIGN_AUTO_MAINTENANCE("Column.NEVER_ASSIGN_AUTO_MAINTENANCE.title", Comparators.YES_NO_NA_COMPARATOR,
           Person::isNeverAssignMaintenanceAutomatically, PersonnelTableModelColumn::convertBooleanToYesNoNA),
@@ -280,9 +273,9 @@ public enum PersonnelTableModelColumn {
           Person::isSalvageSupervisor, PersonnelTableModelColumn::convertBooleanToYesNoNA),
     SECOND_IN_COMMAND("Column.SECOND_IN_COMMAND.title", Comparators.YES_NO_NA_COMPARATOR,
           Person::isSecondInCommand, PersonnelTableModelColumn::convertBooleanToYesNoNA),
-    WANTS_CHILDREN("Column.WANTS_CHILDREN.title", Comparators.YES_NO_NA_COMPARATOR,
-          (person, campaign) -> person.isChild(campaign.getLocalDate()) ? null : person.isWantsChildren(),
-          PersonnelTableModelColumn::convertBooleanToYesNoNA),
+    WANTS_CHILDREN("Column.WANTS_CHILDREN.title", Comparators.WANTS_CHILDREN_COMPARATOR,
+          (person, campaign) -> person.isChild(campaign.getLocalDate()) ? null : person,
+          PersonnelTableModelColumn::getProcreationStatus),
     UNDER_PROTECTION("Column.UNDER_PROTECTION.title", Comparators.YES_NO_NA_COMPARATOR,
           Person::isUnderProtection, PersonnelTableModelColumn::convertBooleanToYesNoNA),
     COVER_MEDICAL_EXPENSES("Column.COVER_MEDICAL_EXPENSES.title", Comparators.YES_NO_NA_COMPARATOR,
@@ -403,20 +396,12 @@ public enum PersonnelTableModelColumn {
           person -> person.getGenealogy().hasSpouse(), PersonnelTableModelColumn::convertBooleanToYesNoNA),
     FORMER_SPOUSES("Column.FORMER_SPOUSES.title", Comparators.INT_COMPARATOR,
           person -> person.getGenealogy().getFormerSpouses().size(), Object::toString),
-    CHILDREN("Column.CHILDREN.title", Comparators.INT_COMPARATOR,
+    IMMEDIATE_FAMILY("Column.IMMEDIATE_FAMILY.title", Comparators.INT_COMPARATOR,
+          PersonnelTableModelColumn::getImmediateFamilySize, Object::toString),
+    EXTENDED_FAMILY("Column.EXTENDED_FAMILY.title", Comparators.INT_COMPARATOR,
           person -> person.getGenealogy().getChildren().size(), Object::toString),
-    SIBLINGS("Column.SIBLINGS.title", Comparators.INT_COMPARATOR,
-          person -> person.getGenealogy().getSiblingCount(), Object::toString),
-    PARENTS("Column.PARENTS.title", Comparators.INT_COMPARATOR,
-          person -> person.getGenealogy().getParentsCount(), Object::toString),
-    GRANDCHILDREN("Column.GRANDCHILDREN.title", Comparators.INT_COMPARATOR,
-          person -> person.getGenealogy().getGrandchildrenCount(), Object::toString),
-    GRANDPARENTS("Column.GRANDPARENTS.title", Comparators.INT_COMPARATOR,
-          person -> person.getGenealogy().getGrandparentsCount(), Object::toString),
-    AUNTS_OR_UNCLES("Column.AUNTS_OR_UNCLES.title", Comparators.INT_COMPARATOR,
-          person -> person.getGenealogy().getAuntsAndUnclesCount(), Object::toString),
-    COUSINS("Column.COUSINS.title", Comparators.INT_COMPARATOR,
-          person -> person.getGenealogy().getCousinsCount(), Object::toString);
+    TOTAL_RELATIVES("Column.TOTAL_RELATIVES.title", Comparators.INT_COMPARATOR,
+          person -> getImmediateFamilySize(person) + getExtendedFamilySize(person), Object::toString);
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PersonnelTable";
 
@@ -554,6 +539,27 @@ public enum PersonnelTableModelColumn {
             return new SkillPair(skillValue.apply(gunnerySkill), gunnerySkill,
                   skillValue.apply(pilotingSkill), pilotingSkill);
         };
+    }
+
+    private static int getImmediateFamilySize(Person person) {
+        Genealogy genealogy = person.getGenealogy();
+        return genealogy.getChildren().size() + genealogy.getSiblingCount() + genealogy.getParentsCount();
+    }
+
+    private static int getExtendedFamilySize(Person person) {
+        Genealogy genealogy = person.getGenealogy();
+        return genealogy.getGrandchildrenCount() + genealogy.getGrandparentsCount() +
+                     genealogy.getAuntsAndUnclesCount() + genealogy.getCousinsCount();
+    }
+
+    private static String getProcreationStatus(Person person) {
+        if (person == null) {
+            return MHQInternationalization.getText("NA.text");
+        } else if (person.getDueDate() != null) {
+            String formattedDate = MekHQ.getMHQOptions().getDisplayFormattedDate(person.getDueDate());
+            return getFormattedTextAt("Cell.WANTS_CHILDREN.dueText", formattedDate);
+        }
+        return convertBooleanToYesNoNA(person.isWantsChildren());
     }
 
     private static String getAggregateSkillValue(Person person, Campaign campaign) {
@@ -853,6 +859,10 @@ public enum PersonnelTableModelColumn {
         private static final Comparator<String> STRING_COMPARATOR = Comparator.nullsLast(Comparator.naturalOrder());
         private static final Comparator<LocalDate> DATE_COMPARATOR = Comparator.nullsLast(Comparator.naturalOrder());
         private static final Comparator<Boolean> YES_NO_NA_COMPARATOR = Comparator.nullsLast(Comparator.naturalOrder());
+        private static final Comparator<Person> WANTS_CHILDREN_COMPARATOR =
+              Comparator.nullsLast(
+                    Comparator.comparing(Person::getDueDate, Comparator.nullsFirst(Comparator.naturalOrder()))
+                          .thenComparing(Person::isWantsChildren));
     }
 
     /**
