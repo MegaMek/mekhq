@@ -109,8 +109,6 @@ public class PersonnelTableModelColumnTest {
                     assertEquals(SwingConstants.CENTER, personnelTableModelColumn.getAlignment());
                 case BIRTHDAY -> // Date
                     assertEquals(SwingConstants.CENTER, personnelTableModelColumn.getAlignment());
-                case COMMANDER -> // Boolean
-                    assertEquals(SwingConstants.CENTER, personnelTableModelColumn.getAlignment());
                 case HIGHEST_EDUCATION -> // field
                     assertEquals(SwingConstants.CENTER, personnelTableModelColumn.getAlignment());
                 case AGGRESSION -> // PersonalityTrait
