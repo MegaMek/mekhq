@@ -54,13 +54,12 @@ public class ContractEmployerDetermination {
     private final AbstractLocation currentLocation; // TODO added for use once we support multi-locational contracts
 
     public ContractEmployerDetermination(Faction campaignFaction, HiringHallLevel hiringHallLevel,
-          int forceReputationModifier, ConnectionsLevel connectionsLevel,
-          AbstractLocation currentLocation) {
+          int forceReputationModifier, int adjustedConnectionsLevel, AbstractLocation currentLocation) {
         this.campaignFaction = campaignFaction;
         this.campaignType = getCampaignTypeFromFaction();
         this.hiringHallLevel = hiringHallLevel;
         this.forceReputationModifier = forceReputationModifier;
-        this.connectionsLevel = connectionsLevel;
+        this.connectionsLevel = ConnectionsLevel.parseConnectionsLevelFromInt(adjustedConnectionsLevel);
         this.currentLocation = currentLocation;
     }
 
