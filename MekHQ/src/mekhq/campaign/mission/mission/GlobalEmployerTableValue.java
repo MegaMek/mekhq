@@ -55,17 +55,17 @@ public enum GlobalEmployerTableValue {
     // region Constructors
     GlobalEmployerTableValue(final String lookupName, final int lowerBand, final int upperBand) {
         this.lookupName = lookupName;
-        this.label = getName(lookupName);
-        this.tooltip = getTooltip(lookupName);
+        this.label = generateLabel(lookupName);
+        this.tooltip = generateTooltip(lookupName);
         this.lowerBand = lowerBand;
         this.upperBand = upperBand;
     }
 
-    private @NonNull String getTooltip(String lookupName) {
+    private @NonNull String generateTooltip(String lookupName) {
         return getTextAt(RESOURCE_BUNDLE, "GlobalEmployerTableValue." + lookupName + ".tooltip");
     }
 
-    private @NonNull String getName(String lookupName) {
+    private @NonNull String generateLabel(String lookupName) {
         return getTextAt(RESOURCE_BUNDLE, "GlobalEmployerTableValue." + lookupName + ".name");
     }
 
