@@ -37,6 +37,7 @@ import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.mission.enums.AtBContractType.*;
 import static mekhq.campaign.personnel.PersonnelOptions.EDGE_TRAINING;
+import static mekhq.campaign.personnel.skills.SkillType.S_INVESTIGATION;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -66,6 +67,7 @@ public class MissionObjectiveTypeDetermination {
           "MissionObjectiveTypeDetermination.skillCheck.reason");
 
     private final Campaign campaign;
+    private final boolean isPirateCampaign;
     private final HiringHallLevel hiringHallLevel;
     private final Person negotiator;
     private final ConnectionsLevel connectionsLevel;
@@ -78,6 +80,7 @@ public class MissionObjectiveTypeDetermination {
           Faction employerFaction, GlobalEmployerTableValue employerTableValue,
           IndependentEmployerTableValue independentEmployerTableValue) {
         this.campaign = campaign;
+        this.isPirateCampaign = campaign.isPirateCampaign();
         this.negotiator = negotiator;
         this.hiringHallLevel = hiringHallLevel;
         this.employerFaction = employerFaction;
@@ -91,7 +94,7 @@ public class MissionObjectiveTypeDetermination {
     public List<AtBContractType> getObjectiveType() {
         int roll = getMissionRollAdjustedByFaction();
 
-        if (campaign.isPirateCampaign()) {
+        if (isPirateCampaign) {
             return getPirateObjectiveType(roll);
         }
 
@@ -245,7 +248,7 @@ public class MissionObjectiveTypeDetermination {
     }
 
     private int getMissionRoll() {
-        int negotiationModifier = getNegotiationModifier(campaign);
+        int negotiationModifier = getSkillModifier();
         int connectionsModifier = connectionsLevel.getEquipLevel();
 
         // CamOps pg 40 rev 5th printing states that the player can apply their negotiations and connections
@@ -262,12 +265,14 @@ public class MissionObjectiveTypeDetermination {
         return clamp(roll + negotiationModifier + connectionsModifier, 2, 12);
     }
 
-    private int getNegotiationModifier(Campaign campaign) {
-        SkillCheck skillCheck = negotiator.checkSkill(S_NEGOTIATION, campaign);
+    private int getSkillModifier() {
+        String skill = isPirateCampaign ? S_INVESTIGATION : S_NEGOTIATION;
+        SkillCheck skillCheck = negotiator.checkSkill(skill, campaign);
+
         // TODO replace with actual edge option, current is just a placeholder
         boolean isUseEdge = negotiator.getOptions().booleanOption(EDGE_TRAINING);
-        String reason = getTextAt(RESOURCE_BUNDLE, skillCheckReason);
 
+        String reason = getTextAt(RESOURCE_BUNDLE, skillCheckReason);
         ActionCheckResult result = skillCheck.resolve(isUseEdge, reason);
 
         campaign.addReport(DailyReportType.SKILL_CHECKS, result.getReport(true));
