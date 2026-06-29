@@ -1859,28 +1859,28 @@ public class AtBDynamicScenarioFactory {
         } else {
             StratConBiomeManifest biomeManifest = StratConBiomeManifest.getInstance();
             int kelvinTemp = scenario.getTemperature() + StratConContractInitializer.ZERO_CELSIUS_IN_KELVIN;
-            var facilityTempMap = biomeManifest.getTempMap(StratConBiomeManifest.TERRAN_FACILITY_BIOME);
-            var facilityBiomeEntry = facilityTempMap.floorEntry(kelvinTemp);
-            if (facilityBiomeEntry == null) {
-                facilityBiomeEntry = facilityTempMap.firstEntry();
-            }
-            List<String> allowedFacility = facilityBiomeEntry.getValue().allowedTerrainTypes;
+
             var terrainTempMap = biomeManifest.getTempMap(StratConBiomeManifest.TERRAN_BIOME);
             var terrainBiomeEntry = terrainTempMap.floorEntry(kelvinTemp);
             if (terrainBiomeEntry == null) {
                 terrainBiomeEntry = terrainTempMap.firstEntry();
             }
-            List<String> allowedTerrain = terrainBiomeEntry.getValue().allowedTerrainTypes;
-            List<String> allowedTemplate = scenario.getTemplate().mapParameters.allowedTerrainTypes;
-            // try to filter on temp
-            allowedTerrain.addAll(allowedFacility);
-            allowedTemplate.retainAll(allowedTerrain);
-            allowedTemplate = !allowedTemplate.isEmpty() ?
-                                    allowedTemplate :
-                                    scenario.getTemplate().mapParameters.allowedTerrainTypes;
+
+            List<String> allowedTemplate = new ArrayList<>(scenario.getTemplate().mapParameters.allowedTerrainTypes);
+            allowedTemplate.retainAll(terrainBiomeEntry.getValue().allowedTerrainTypes);
+
+            if (allowedTemplate.isEmpty()) {
+                allowedTemplate = scenario.getTemplate().mapParameters.allowedTerrainTypes;
+            }
+
+            if (allowedTemplate.isEmpty()) {
+                LOGGER.warn("No allowed terrain types found for scenario template '{}'; skipping terrain assignment.",
+                      scenario.getTemplate().name);
+                return;
+            }
 
             int terrainIndex = randomInt(allowedTemplate.size());
-            scenario.setTerrainType(scenario.getTemplate().mapParameters.allowedTerrainTypes.get(terrainIndex));
+            scenario.setTerrainType(allowedTemplate.get(terrainIndex));
             scenario.setMapFile();
         }
     }
