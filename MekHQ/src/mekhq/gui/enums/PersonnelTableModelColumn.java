@@ -261,12 +261,9 @@ public enum PersonnelTableModelColumn {
           PersonnelTableModelColumn::convertBooleanToYesNoNA),
     NEVER_ASSIGN_AUTO_MAINTENANCE("Column.NEVER_ASSIGN_AUTO_MAINTENANCE.title", Comparators.YES_NO_NA_COMPARATOR,
           Person::isNeverAssignMaintenanceAutomatically, PersonnelTableModelColumn::convertBooleanToYesNoNA),
-    PREFERS_MEN("Column.PREFERS_MEN.title", Comparators.YES_NO_NA_COMPARATOR,
-          (person, campaign) -> person.isChild(campaign.getLocalDate()) ? null : person.isPrefersMen(),
-          PersonnelTableModelColumn::convertBooleanToYesNoNA),
-    PREFERS_WOMEN("Column.PREFERS_WOMEN.title", Comparators.YES_NO_NA_COMPARATOR,
-          (person, campaign) -> person.isChild(campaign.getLocalDate()) ? null : person.isPrefersWomen(),
-          PersonnelTableModelColumn::convertBooleanToYesNoNA),
+    PREFERENCE("Column.PREFERENCE.title", Comparators.PREFERENCE_COMPARATOR,
+          (person, campaign) -> person.isChild(campaign.getLocalDate()) ? null : person,
+          PersonnelTableModelColumn::getPreference),
     QUICK_TRAIN_IGNORE("Column.QUICK_TRAIN_IGNORE.title", Comparators.YES_NO_NA_COMPARATOR,
           Person::isQuickTrainIgnore, PersonnelTableModelColumn::convertBooleanToYesNoNA),
     SALVAGE_SUPERVISOR("Column.SALVAGE_SUPERVISOR.title", Comparators.YES_NO_NA_COMPARATOR,
@@ -479,6 +476,10 @@ public enum PersonnelTableModelColumn {
         return MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, key, args);
     }
 
+    private static String getTextAt(String key) {
+        return MHQInternationalization.getTextAt(RESOURCE_BUNDLE, key);
+    }
+
     public String getText(Object model) {
         return modelToText.apply(model);
     }
@@ -560,6 +561,19 @@ public enum PersonnelTableModelColumn {
             return getFormattedTextAt("Cell.WANTS_CHILDREN.dueText", formattedDate);
         }
         return convertBooleanToYesNoNA(person.isWantsChildren());
+    }
+
+    private static String getPreference(Person person) {
+        if (person == null) {
+            return MHQInternationalization.getText("NA.text");
+        } else if (person.isPrefersMen() && person.isPrefersWomen()) {
+            return getTextAt("Cell.PREFERS.text.any");
+        } else if (person.isPrefersWomen()) {
+            return getTextAt("Cell.PREFERS.text.women");
+        } else if (person.isPrefersMen()) {
+            return getTextAt("Cell.PREFERS.text.men");
+        }
+        return getTextAt("Cell.PREFERS.text.none");
     }
 
     private static String getAggregateSkillValue(Person person, Campaign campaign) {
@@ -863,6 +877,8 @@ public enum PersonnelTableModelColumn {
               Comparator.nullsLast(
                     Comparator.comparing(Person::getDueDate, Comparator.nullsFirst(Comparator.naturalOrder()))
                           .thenComparing(Person::isWantsChildren));
+        private static final Comparator<Person> PREFERENCE_COMPARATOR =
+              Comparator.nullsLast(Comparator.comparing(Person::isPrefersMen).thenComparing(Person::isPrefersWomen));
     }
 
     /**
