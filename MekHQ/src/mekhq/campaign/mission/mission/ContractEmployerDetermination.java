@@ -32,8 +32,49 @@
  */
 package mekhq.campaign.mission.mission;
 
-public class ContractEmployerDetermination {
-    int commanderConnections;
-    int contractEmployerRoll;
+import static megamek.common.compute.Compute.d6;
 
+import mekhq.campaign.personnel.enums.ConnectionsLevel;
+import mekhq.campaign.universe.enums.HiringHallLevel;
+
+public class ContractEmployerDetermination {
+    private final CampaignTypeForContractDetermination campaignType;
+    private final HiringHallLevel hiringHallLevel;
+    private final int forceReputationModifier;
+    private final ConnectionsLevel connectionsLevel;
+
+    public ContractEmployerDetermination(CampaignTypeForContractDetermination campaignType,
+          HiringHallLevel hiringHallLevel, int forceReputationModifier, ConnectionsLevel connectionsLevel) {
+        this.campaignType = campaignType;
+        this.hiringHallLevel = hiringHallLevel;
+        this.forceReputationModifier = forceReputationModifier;
+        this.connectionsLevel = connectionsLevel;
+    }
+
+    public GlobalEmployerTableValue getContractEmployer() {
+
+        // CamOps pg 39 rev 5th printing states that a player can pick any employer at or below their roll. This
+        // creates a UX issue for MekHQ. To avoid spamming the player, we instead use the exact employer matching the
+        // roll
+        GlobalEmployerTableValue globalEmployerType = getGlobalEmployer();
+        IndependentEmployerTableValue independentEmployerType = getIndependentEmployer();
+    }
+
+    private IndependentEmployerTableValue getIndependentEmployer() {
+        int roll = getEmployerRoll();
+        return IndependentEmployerTableValue.getEmployerForRoll(roll);
+    }
+
+    private GlobalEmployerTableValue getGlobalEmployer() {
+        int roll = getEmployerRoll();
+        return GlobalEmployerTableValue.getEmployerForRoll(roll);
+    }
+
+    private int getEmployerRoll() {
+        int roll = d6(2);
+        int hiringHallModifier = hiringHallLevel.getEmployerModifier();
+        int connectionsModifier = connectionsLevel.getEquipLevel();
+
+        return roll + hiringHallModifier + connectionsModifier + forceReputationModifier;
+    }
 }

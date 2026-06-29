@@ -52,9 +52,9 @@ public enum IndependentEmployerTableValue {
     private final int lowerBand;
     private final int upperBand;
 
+    private final static MMLogger LOGGER = MMLogger.create(IndependentEmployerTableValue.class);
     private final String RESOURCE_BUNDLE = "mekhq.resources.IndependentEmployerTableValue";
 
-    // region Constructors
     IndependentEmployerTableValue(final String lookupName, final int lowerBand, final int upperBand) {
         this.lookupName = lookupName;
         this.label = generateName(lookupName);
@@ -91,8 +91,15 @@ public enum IndependentEmployerTableValue {
         return value >= lowerBand && value <= upperBand;
     }
 
-    public boolean isIncludedForRoll(int value) {
-        return value <= upperBand;
+    public static IndependentEmployerTableValue getEmployerForRoll(int roll) {
+        for (IndependentEmployerTableValue employer : values()) {
+            if (employer.isWithinRange(roll)) {
+                return employer;
+            }
+        }
+        LOGGER.warn("Roll {} is outside of any employer range. Returning PLANETARY_GOVERNMENT", roll);
+
+        return PLANETARY_GOVERNMENT;
     }
 
     public static IndependentEmployerTableValue fromString(String text) {

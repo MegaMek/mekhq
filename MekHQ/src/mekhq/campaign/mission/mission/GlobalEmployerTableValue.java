@@ -51,8 +51,8 @@ public enum GlobalEmployerTableValue {
     private final int upperBand;
 
     private final String RESOURCE_BUNDLE = "mekhq.resources.GlobalEmployerTableValue";
+    private final static MMLogger LOGGER = MMLogger.create(GlobalEmployerTableValue.class);
 
-    // region Constructors
     GlobalEmployerTableValue(final String lookupName, final int lowerBand, final int upperBand) {
         this.lookupName = lookupName;
         this.label = generateLabel(lookupName);
@@ -89,8 +89,15 @@ public enum GlobalEmployerTableValue {
         return value >= lowerBand && value <= upperBand;
     }
 
-    public boolean isIncludedForRoll(int value) {
-        return value <= upperBand;
+    public static GlobalEmployerTableValue getEmployerForRoll(int roll) {
+        for (GlobalEmployerTableValue employer : values()) {
+            if (employer.isWithinRange(roll)) {
+                return employer;
+            }
+        }
+        LOGGER.warn("Roll {} is outside of any employer range. Returning MAJOR_POWER", roll);
+
+        return MAJOR_POWER;
     }
 
     public static GlobalEmployerTableValue fromString(String text) {
