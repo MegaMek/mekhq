@@ -99,7 +99,7 @@ public class PersonnelTableModelColumnTest {
             switch (personnelTableModelColumn) {
                 case RANK, SKILL_LEVEL ->
                     assertEquals(SwingConstants.LEFT, personnelTableModelColumn.getAlignment());
-                case SALARY, TECH_MINUTES ->
+                case SALARY, MAX_TECH_MINUTES ->
                     assertEquals(SwingConstants.RIGHT, personnelTableModelColumn.getAlignment());
                 case FIRST_NAME -> // String
                     assertEquals(SwingConstants.LEFT, personnelTableModelColumn.getAlignment());
