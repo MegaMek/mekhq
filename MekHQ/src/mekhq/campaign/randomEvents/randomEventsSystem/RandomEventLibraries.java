@@ -41,6 +41,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import jakarta.annotation.Nullable;
 
 /**
  * A utility class that manages the loading and retrieval of random event data from YAML files. Organizes the events
@@ -91,6 +92,28 @@ public class RandomEventLibraries {
         } else {
             return prisonerEventsMinor;
         }
+    }
+
+    /**
+     * Retrieves a prisoner event of the specified type from the appropriate event library based on severity.
+     *
+     * @param eventType the type of the prisoner event to retrieve, represented as a {@link String}
+     * @param isMajor   {@code true} to search for the event in the major events library, {@code false} to search in the
+     *                  minor events library
+     *
+     * @return the {@link RandomEventData} object representing the prisoner event that matches the specified type, or
+     *       {@code null} if no matching event is found
+     */
+    public @Nullable RandomEventData getPrisonerEvent(String eventType, boolean isMajor) {
+        // Once we have more categories of events, we should replace this with a enum
+        List<RandomEventData> library = isMajor ? prisonerEventsMajor : prisonerEventsMinor;
+        for (RandomEventData event : library) {
+            if (event.randomEventType().equals(eventType)) {
+                return event;
+            }
+        }
+
+        return null;
     }
 
     /**

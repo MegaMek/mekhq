@@ -101,7 +101,7 @@ class RandomEventEffectsManagerTest {
 
     private static RandomEventData buildEventData(String type, RandomEventResult result) {
         RandomEventResponseEntry entry = new RandomEventResponseEntry(
-              RESPONSE_NEUTRAL, "", 0, "", NO_ATTRIBUTE, List.of(result), List.of(result));
+              RESPONSE_NEUTRAL, "", "", NO_ATTRIBUTE, List.of(result), List.of(result));
         return new RandomEventData(type, List.of(entry));
     }
 
@@ -800,7 +800,7 @@ class RandomEventEffectsManagerTest {
         RandomEventResult failureResult = new RandomEventResult(LOYALTY_ONE, List.of(PRISONERS), -7, "");
 
         RandomEventResponseEntry entry = new RandomEventResponseEntry(
-              RESPONSE_NEUTRAL, "", 0, "", NO_ATTRIBUTE, List.of(successResult), List.of(failureResult));
+              RESPONSE_NEUTRAL, "", "", NO_ATTRIBUTE, List.of(successResult), List.of(failureResult));
         RandomEventData eventData = new RandomEventData("BREAKOUTON", List.of(entry));
 
         new RandomEventEffectsManager(mockCampaign, eventData, 0, false);

@@ -37,7 +37,6 @@ import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NO_ATTRIBUTE;
 import java.util.ArrayList;
 import java.util.List;
 
-import megamek.codeUtilities.StringUtility;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 
@@ -58,7 +57,6 @@ import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 public record RandomEventResponseEntry(
       RandomEventResponseQuality quality,
       String followOnEvent,
-      int followOnEventDelay,
       String skillCheckSkill,
       SkillAttribute abilityCheckType,
       List<RandomEventResult> effectsSuccess,
@@ -74,14 +72,5 @@ public record RandomEventResponseEntry(
         abilityCheckType = (abilityCheckType != null) ? abilityCheckType : NO_ATTRIBUTE;
         effectsSuccess = (effectsSuccess != null) ? effectsSuccess : new ArrayList<>();
         effectsFailure = (effectsFailure != null) ? effectsFailure : new ArrayList<>();
-
-        // Validate event delays
-        if (StringUtility.isNullOrBlank(followOnEvent) && followOnEventDelay > 0) {
-            LOGGER.warn("Follow-on event delay specified without a follow-on event");
-        }
-
-        if (followOnEventDelay < 0) {
-            LOGGER.warn("Follow-on event delay specified as negative");
-        }
     }
 }
