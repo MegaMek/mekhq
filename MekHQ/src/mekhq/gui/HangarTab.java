@@ -314,7 +314,7 @@ public final class HangarTab extends CampaignGuiTab {
         scrollUnitTable.setFocusable(false);
         scrollUnitTable.setBorder(RoundedLineBorder.createRoundedLineBorder());
 
-        JPanel pnlTutorial = new TutorialHyperlinkPanel("hangarTab");
+        JPanel pnlTutorial = new TutorialHyperlinkPanel("hangarTab.keyText");
 
         JPanel tableAndInfoPanel = new JPanel(new BorderLayout());
         tableAndInfoPanel.add(scrollUnitTable, BorderLayout.CENTER);

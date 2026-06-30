@@ -149,7 +149,7 @@ public class StratConTab extends CampaignGuiTab {
 
         // TODO: lance role assignment UI here?
 
-        JPanel pnlTutorial = new TutorialHyperlinkPanel("stratConTab");
+        JPanel pnlTutorial = new TutorialHyperlinkPanel("stratConTab.keyText");
 
         JPanel centerPanel = new JPanel();
         centerPanel.setLayout(new BorderLayout());
