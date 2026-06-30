@@ -331,7 +331,7 @@ public class PrisonerEventManager {
      * @param majorEvent {@code true} if the event is a major event, {@code false} otherwise.
      */
     private void processRandomEvent(RandomEventData eventData, boolean majorEvent) {
-        RandomEventDialog dialog = new RandomEventDialog(campaign, speaker, null, eventData, RESOURCE_BUNDLE);
+        RandomEventDialog dialog = new RandomEventDialog(campaign, speaker, null, eventData);
         int choiceIndex = dialog.getDialogChoice();
         boolean isSuccessful = dialog.wasSuccessful();
 

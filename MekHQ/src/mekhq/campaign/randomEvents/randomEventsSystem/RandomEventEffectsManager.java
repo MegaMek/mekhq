@@ -262,9 +262,11 @@ public class RandomEventEffectsManager {
 
             if (includeSecurityGuards) {
                 Unit unit = person.getUnit();
-                Formation formation = unit.getCampaign().getFormationFor(unit);
-                if (formation != null && formation.isFormationType(SECURITY)) {
-                    potentialTargets.add(person);
+                if (unit != null) {
+                    Formation formation = unit.getCampaign().getFormationFor(unit);
+                    if (formation != null && formation.isFormationType(SECURITY)) {
+                        potentialTargets.add(person);
+                    }
                 }
             }
         }

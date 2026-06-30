@@ -67,7 +67,8 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import org.jspecify.annotations.NonNull;
 
 public class RandomEventDialog {
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.RandomEventDialog";
+    private static final String RESOURCES_RANDOM_EVENT_DIALOG = "mekhq.resources.RandomEventDialog";
+    private static final String RESOURCES_RANDOM_EVENT_EFFECTS = "mekhq.resources.RandomEventEffectsManager";
 
     private final static String CHECK_REASON_KEY = "RandomEventDialog.check.reason";
 
@@ -111,7 +112,7 @@ public class RandomEventDialog {
     }
 
     public RandomEventDialog(Campaign campaign, Person eventParticipant, @Nullable Person otherEventParticipant,
-          RandomEventData eventData, String externalResourceBundle) {
+          RandomEventData eventData) {
         this.campaign = campaign;
         this.eventParticipant = eventParticipant;
 
@@ -129,13 +130,12 @@ public class RandomEventDialog {
         resolveDialog(campaign,
               eventParticipant,
               otherEventParticipant,
-              eventData,
-              externalResourceBundle);
+              eventData);
     }
 
     private void resolveDialog(Campaign campaign, Person eventParticipant, @Nullable Person otherEventParticipant,
-          RandomEventData eventData, String externalResourceBundle) {
-        triggerDialog(campaign, eventParticipant, otherEventParticipant, eventData, externalResourceBundle);
+          RandomEventData eventData) {
+        triggerDialog(campaign, eventParticipant, otherEventParticipant, eventData);
 
         resolveEvent(useEdge);
         reportSkillCheckResults();
@@ -143,13 +143,13 @@ public class RandomEventDialog {
     }
 
     private void triggerDialog(Campaign campaign, Person eventParticipant, @Nullable Person otherEventParticipant,
-          RandomEventData eventData, String externalResourceBundle) {
+          RandomEventData eventData) {
         String eventName = eventData.randomEventType();
         String commanderAddress = getCommanderAddress();
 
-        String inCharacterMessage = getInCharacterMessage(eventName, externalResourceBundle, commanderAddress);
-        String outOfCharacterMessage = getOutOfCharacterMessage(externalResourceBundle);
-        List<String> options = getOptions(eventData, eventName, externalResourceBundle);
+        String inCharacterMessage = getInCharacterMessage(eventName, commanderAddress);
+        String outOfCharacterMessage = getOutOfCharacterMessage();
+        List<String> options = getOptions(eventData, eventName);
 
         ImmersiveDialogSimple eventDialog = new ImmersiveDialogSimple(campaign,
               eventParticipant,
@@ -237,29 +237,29 @@ public class RandomEventDialog {
     }
 
     private static void addModifier(String resourceKey, List<TargetRollModifier> modifierArray, int modifier) {
-        String modifierLabel = getTextAt(RESOURCE_BUNDLE, resourceKey);
+        String modifierLabel = getTextAt(RESOURCES_RANDOM_EVENT_DIALOG, resourceKey);
         modifierArray.add(new TargetRollModifier(modifier, modifierLabel));
     }
 
-    private static @NonNull String getOutOfCharacterMessage(String externalResourceBundle) {
-        return getFormattedTextAt(externalResourceBundle, RESULT_OOC);
+    private static @NonNull String getOutOfCharacterMessage() {
+        return getFormattedTextAt(RESOURCES_RANDOM_EVENT_EFFECTS, RESULT_OOC);
     }
 
-    private List<String> getOptions(RandomEventData event, String eventName, String externalResourceBundle) {
+    private List<String> getOptions(RandomEventData event, String eventName) {
         List<String> options = new ArrayList<>();
 
         List<RandomEventResponseEntry> responseEntries = event.responseEntries();
         for (int responseIndex = 0; responseIndex < responseEntries.size(); responseIndex++) {
-            String optionText = getOptionText(eventName, externalResourceBundle, responseIndex);
+            String optionText = getOptionText(eventName, responseIndex);
             options.add(optionText);
         }
 
         return options;
     }
 
-    private @NonNull String getOptionText(String eventName, String externalResourceBundle, int responseIndex) {
+    private @NonNull String getOptionText(String eventName, int responseIndex) {
         String resourceKey = RESPONSE_PREFIX + "." + responseIndex + "." + eventName + BUTTON_SUFFIX;
-        String optionText = getFormattedTextAt(externalResourceBundle, resourceKey);
+        String optionText = getFormattedTextAt(RESOURCES_RANDOM_EVENT_EFFECTS, resourceKey);
 
         SkillCheck skillCheck = skillCheckMap.get(responseIndex);
         AttributeCheck attributeCheck = attributeCheckMap.get(responseIndex);
@@ -287,7 +287,7 @@ public class RandomEventDialog {
         String skillName = skillType.getName();
 
         Skill skill = eventParticipant.getSkill(skillName);
-        String skillLevelLabel = getTextAt(RESOURCE_BUNDLE, "RandomEventDialog.skill.unskilled");
+        String skillLevelLabel = getTextAt(RESOURCES_RANDOM_EVENT_DIALOG, "RandomEventDialog.skill.unskilled");
         if (skill != null) {
             SkillModifierData skillModifierData = eventParticipant.getSkillModifierData(isUseAgingEffects,
                   isClanCampaign,
@@ -300,10 +300,9 @@ public class RandomEventDialog {
         return optionText;
     }
 
-    private static @NonNull String getInCharacterMessage(String eventName, String externalResourceBundle,
-          String commanderAddress) {
+    private static @NonNull String getInCharacterMessage(String eventName, String commanderAddress) {
         String resourceKey = EVENT_PREFIX + eventName + MESSAGE_SUFFIX;
-        return getFormattedTextAt(externalResourceBundle, resourceKey, commanderAddress);
+        return getFormattedTextAt(RESOURCES_RANDOM_EVENT_EFFECTS, resourceKey, commanderAddress);
     }
 
     private String getCommanderAddress() {
@@ -314,7 +313,7 @@ public class RandomEventDialog {
         SkillCheck skillCheck = skillCheckMap.get(choiceIndex);
         AttributeCheck attributeCheck = attributeCheckMap.get(choiceIndex);
 
-        String reason = getTextAt(RESOURCE_BUNDLE, CHECK_REASON_KEY);
+        String reason = getTextAt(RESOURCES_RANDOM_EVENT_DIALOG, CHECK_REASON_KEY);
 
         // Skill checks take precedence over attribute checks
         if (skillCheck != null) {
@@ -380,9 +379,8 @@ public class RandomEventDialog {
         String commanderAddress = campaign.getCommanderAddress();
 
         String suffix = wasSuccessful ? ".success" : ".failure";
-
-        String resourceKey = "response." + choiceIndex + '.' + event.randomEventType() + suffix;
-        String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, resourceKey, commanderAddress);
+        String resourceKey = RESPONSE_PREFIX + '.' + choiceIndex + '.' + event.randomEventType() + suffix;
+        String inCharacterMessage = getFormattedTextAt(RESOURCES_RANDOM_EVENT_EFFECTS, resourceKey, commanderAddress);
 
         new ImmersiveDialogSimple(campaign, eventParticipant, null, inCharacterMessage, null, eventReport, null, false);
     }
