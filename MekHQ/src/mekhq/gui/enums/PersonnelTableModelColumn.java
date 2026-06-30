@@ -34,6 +34,7 @@ package mekhq.gui.enums;
 
 import java.time.LocalDate;
 import java.util.Comparator;
+import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -124,6 +125,8 @@ public enum PersonnelTableModelColumn {
           PersonnelTableModelColumn::getUnitAssignment),
     UNIT_ASSIGNMENT_GRAPHICAL("Column.UNIT_ASSIGNMENT.title", Comparators.STRING_COMPARATOR,
           PersonnelTableModelColumn::getUnitAssignmentGraphical),
+    TECH_UNIT_ASSIGNMENT("Column.TECH_UNIT_ASSIGNMENT.title", Comparators.STRING_COMPARATOR,
+          PersonnelTableModelColumn::getTechUnitAssignment),
     MARKET_UNIT_ASSIGNMENT("Column.UNIT_ASSIGNMENT.title", Comparators.STRING_COMPARATOR,
           (person, campaign) -> {
               PersonnelMarket market = campaign.getPersonnelMarket();
@@ -158,7 +161,9 @@ public enum PersonnelTableModelColumn {
     BATTLE_ARMOUR("Column.BATTLE_ARMOUR.title", Comparators.SKILL_COMPARATOR,
           skillModelExtractor(SkillType.S_GUN_BA), PersonnelTableModelColumn::skillToText),
     AGGREGATE_COMBAT("Column.AGGREGATE_COMBAT.title", NaturalOrderComparator.INSTANCE,
-          PersonnelTableModelColumn::getAggregateSkillValue),
+          PersonnelTableModelColumn::getAggregateCombatSkillValue),
+    AGGREGATE_TECH("Column.AGGREGATE_TECH.title", SkillPair.COMPARATOR,
+          PersonnelTableModelColumn::getAggregateTechSkillValue, SkillPair::toString),
     SMALL_ARMS("Column.SMALL_ARMS.title", Comparators.SKILL_COMPARATOR,
           (person, campaign) -> getSkillValue(person, campaign).apply(InfantryGunnerySkills.getBestInfantryGunnerySkill(
                 person,
@@ -204,9 +209,11 @@ public enum PersonnelTableModelColumn {
           skillModelExtractor(SkillType.S_ADMIN), PersonnelTableModelColumn::skillToText),
     NEGOTIATION("Column.NEGOTIATION.title", Comparators.SKILL_COMPARATOR,
           skillModelExtractor(SkillType.S_NEGOTIATION), PersonnelTableModelColumn::skillToText),
-    WORK_MINUTES("Column.WORK_MINUTES.title", Comparators.INT_COMPARATOR,
+    REMAINING_TECH_MINUTES("Column.REMAINING_TECH_MINUTES.title", Comparators.INT_COMPARATOR,
           person -> person.isTechExpanded() ? person.getMinutesLeft() : 0, Object::toString),
-    TECH_MINUTES("Column.TECH_MINUTES.title", Comparators.INT_COMPARATOR,
+    MAINTENANCE_TECH_MINUTES("Column.MAINTENANCE_TECH_MINUTES.title", Comparators.INT_COMPARATOR,
+          person -> person.isTechExpanded() ? person.getMaintenanceTimeUsing() : 0, Object::toString),
+    MAX_TECH_MINUTES("Column.MAX_TECH_MINUTES.title", Comparators.INT_COMPARATOR,
           (person, campaign) -> {
               boolean isUseTechAdmin = campaign.getCampaignOptions().isTechsUseAdministration();
               return person.isTechExpanded() ? person.getDailyAvailableTechTime(isUseTechAdmin) : 0;
@@ -603,7 +610,7 @@ public enum PersonnelTableModelColumn {
         return locationSystem + " - " + locationPlanet;
     }
 
-    private static String getAggregateSkillValue(Person person, Campaign campaign) {
+    private static String getAggregateCombatSkillValue(Person person, Campaign campaign) {
         Function<String, String> skillValue = getStringSkillValue(person, campaign);
         Unit unit = person.getUnit();
         if (unit != null && unit.getEntity() != null) {
@@ -645,6 +652,32 @@ public enum PersonnelTableModelColumn {
             }
             case PersonnelRole.PROTOMEK_PILOT -> skillValue.apply(SkillType.S_GUN_PROTO);
             default -> "-/-";
+        };
+    }
+
+    private static SkillPair getAggregateTechSkillValue(Person person, Campaign campaign) {
+        Function<String, Integer> skillValue = getSkillValue(person, campaign);
+        PersonnelRole primaryProfession = person.getPrimaryRole();
+        PersonnelRole secondaryProfession = person.getSecondaryRole();
+        PersonnelRole profession = primaryProfession.isTech() ? primaryProfession : secondaryProfession;
+        return switch (profession) {
+            case PersonnelRole.MEK_TECH ->
+                  new SkillPair(skillValue.apply(SkillType.S_TECH_MEK), SkillType.S_TECH_MEK,
+                        skillValue.apply(SkillType.S_ZERO_G_OPERATIONS), SkillType.S_ZERO_G_OPERATIONS);
+            case PersonnelRole.BA_TECH ->
+                  new SkillPair(skillValue.apply(SkillType.S_TECH_BA), SkillType.S_TECH_BA,
+                        skillValue.apply(SkillType.S_ZERO_G_OPERATIONS), SkillType.S_ZERO_G_OPERATIONS);
+            case PersonnelRole.MECHANIC ->
+                  new SkillPair(skillValue.apply(SkillType.S_TECH_MECHANIC), SkillType.S_TECH_MECHANIC,
+                        skillValue.apply(SkillType.S_ZERO_G_OPERATIONS), SkillType.S_ZERO_G_OPERATIONS);
+            case PersonnelRole.AERO_TEK ->
+                  new SkillPair(skillValue.apply(SkillType.S_TECH_AERO), SkillType.S_TECH_AERO,
+                        skillValue.apply(SkillType.S_ZERO_G_OPERATIONS), SkillType.S_ZERO_G_OPERATIONS);
+            case PersonnelRole.VESSEL_CREW ->
+                  new SkillPair(skillValue.apply(SkillType.S_TECH_VESSEL), SkillType.S_TECH_VESSEL,
+                        skillValue.apply(SkillType.S_ZERO_G_OPERATIONS), SkillType.S_ZERO_G_OPERATIONS);
+            default ->
+                  new SkillPair(null, SkillType.S_TECH_MEK, null, SkillType.S_ZERO_G_OPERATIONS);
         };
     }
 
@@ -728,6 +761,18 @@ public enum PersonnelTableModelColumn {
         }
         // Final fallback return of nothing
         return "-";
+    }
+
+    private static String getTechUnitAssignment(Person person) {
+        int maintainedUnitCount = person.getTechUnits().size();
+        if (maintainedUnitCount > 0) {
+            List<String> assignments = person.getTechUnits().stream().map(unit ->
+                unit.getName() + ((unit.isRefitting() && unit.getRefit().getTech() == person) ?
+                                        getTextAt("Cell.TECH_UNIT_ASSIGNMENT.text.refit") : "")
+            ).toList();
+            return "<html>" + String.join(", ", assignments) + "</html>";
+        }
+        return "";
     }
 
     private static @NonNull Function<String, Integer> getSkillValue(Person person, Campaign campaign) {
@@ -855,6 +900,7 @@ public enum PersonnelTableModelColumn {
             case PERSONNEL_ROLE -> 120;
             case UNIT_ASSIGNMENT -> 140;
             case ORIGIN -> 160;
+            case TECH_UNIT_ASSIGNMENT -> 280;
             default -> null;
         };
         return (preferredWidth == null) ? null : UIUtil.scaleForGUI(preferredWidth);
@@ -863,7 +909,7 @@ public enum PersonnelTableModelColumn {
     public int getAlignment() {
         return switch (this) {
             case RANK, SKILL_LEVEL -> SwingConstants.LEFT;
-            case SALARY, TECH_MINUTES -> SwingConstants.RIGHT;
+            case SALARY, MAX_TECH_MINUTES -> SwingConstants.RIGHT;
             default -> {
                 if (modelComparator.equals(Comparators.STRING_COMPARATOR)) {
                     yield SwingConstants.LEFT;
