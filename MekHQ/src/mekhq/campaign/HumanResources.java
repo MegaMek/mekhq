@@ -148,7 +148,7 @@ public class HumanResources {
      * Map of PersonnelRole to temp crew pool size. Tracks TOTAL pool (not available). Use
      * {@link #getAvailableTempCrewPool(Campaign, PersonnelRole)} for available count.
      */
-    private Map<PersonnelRole, Integer> tempPersonnelRoleMap = new HashMap<>();
+    private final Map<PersonnelRole, Integer> tempPersonnelRoleMap = new HashMap<>();
 
     private List<Person> personnelWhoAdvancedInXP = new ArrayList<>();
     private RetirementDefectionTracker retirementDefectionTracker;
@@ -686,6 +686,15 @@ public class HumanResources {
 
     public Set<PersonnelRole> getTempCrewRoleKeys() {
         return tempPersonnelRoleMap.keySet();
+    }
+
+    /**
+     * Returns an unmodifiable copy of the temporary personnel role map.
+     *
+     * @return an unmodifiable {@link Map} containing the temporary personnel roles and counts
+     */
+    public Map<PersonnelRole, Integer> getTempPersonnelRoleMap() {
+        return Map.copyOf(tempPersonnelRoleMap);
     }
 
     /**

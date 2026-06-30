@@ -40,888 +40,280 @@ import static mekhq.campaign.finances.Accountant.HOUSING_OFFICER;
 import static mekhq.campaign.finances.Accountant.HOUSING_PRISONER_OR_DEPENDENT;
 import static mekhq.campaign.personnel.enums.PersonnelRole.DEPENDENT;
 import static mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR;
-import static mekhq.campaign.personnel.enums.PersonnelRole.VESSEL_GUNNER;
 import static mekhq.campaign.personnel.ranks.Rank.RWO_MIN;
-import static mekhq.campaign.randomEvents.prisoners.PrisonerStatus.PRISONER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import megamek.common.units.Entity;
+import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.force.Formation;
+import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
 
 public class AccountantTest {
 
+    private Campaign mockCampaign;
+    private CampaignOptions mockCampaignOptions;
+    private AbstractLocation mockLocation;
+    private List<Unit> emptyUnits;
+    private List<Formation> emptyFormations;
+    private List<Part> emptyParts;
+    private Map<PersonnelRole, Integer> emptyRoleMap;
+
+    @BeforeEach
+    void setUp() {
+        mockCampaign = mock(Campaign.class);
+        mockCampaignOptions = mock(CampaignOptions.class);
+        mockLocation = mock(AbstractLocation.class);
+
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        when(mockCampaign.getCurrentLocation()).thenReturn(mockLocation);
+
+        emptyUnits = Collections.emptyList();
+        emptyFormations = Collections.emptyList();
+        emptyParts = Collections.emptyList();
+        emptyRoleMap = new HashMap<>();
+    }
+
+    private Accountant createAccountant(List<Person> personnel) {
+        return new Accountant(
+              mockCampaign,
+              emptyUnits,
+              personnel,
+              emptyFormations,
+              emptyParts,
+              0,
+              0,
+              emptyRoleMap
+        );
+    }
+
+    private Person createMockPrisoner() {
+        Person prisoner = mock(Person.class);
+        UUID uniqueId = UUID.randomUUID();
+        when(prisoner.getId()).thenReturn(uniqueId);
+        when(prisoner.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
+
+        PrisonerStatus prisonerStatus = mock(PrisonerStatus.class);
+        when(prisonerStatus.isCurrentPrisoner()).thenReturn(true);
+        when(prisoner.getPrisonerStatus()).thenReturn(prisonerStatus);
+        return prisoner;
+    }
+
+    private Person createMockDependent() {
+        Person dependent = mock(Person.class);
+        UUID uniqueId = UUID.randomUUID();
+        when(dependent.getId()).thenReturn(uniqueId);
+        when(dependent.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
+
+        PrisonerStatus prisonerStatus = mock(PrisonerStatus.class);
+        when(prisonerStatus.isCurrentPrisoner()).thenReturn(false);
+        when(dependent.getPrisonerStatus()).thenReturn(prisonerStatus);
+        when(dependent.getPrimaryRole()).thenReturn(DEPENDENT);
+        return dependent;
+    }
+
+    private Person createMockEnlisted() {
+        Person enlisted = mock(Person.class);
+        UUID uniqueId = UUID.randomUUID();
+        when(enlisted.getId()).thenReturn(uniqueId);
+        when(enlisted.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
+
+        PrisonerStatus prisonerStatus = mock(PrisonerStatus.class);
+        when(prisonerStatus.isCurrentPrisoner()).thenReturn(false);
+        when(enlisted.getPrisonerStatus()).thenReturn(prisonerStatus);
+        when(enlisted.getPrimaryRole()).thenReturn(MEKWARRIOR);
+        when(enlisted.getRankNumeric()).thenReturn(RWO_MIN - 1);
+        return enlisted;
+    }
+
+    private Person createMockOfficer() {
+        Person officer = mock(Person.class);
+        UUID uniqueId = UUID.randomUUID();
+        when(officer.getId()).thenReturn(uniqueId);
+        when(officer.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
+
+        PrisonerStatus prisonerStatus = mock(PrisonerStatus.class);
+        when(prisonerStatus.isCurrentPrisoner()).thenReturn(false);
+        when(officer.getPrisonerStatus()).thenReturn(prisonerStatus);
+        when(officer.getPrimaryRole()).thenReturn(MEKWARRIOR);
+        when(officer.getRankNumeric()).thenReturn(RWO_MIN + 1);
+        return officer;
+    }
+
     @Test
     void testGetMonthlyFoodAndHousingExpenses_WhenFoodAndHousingDisabled() {
-        // Setup
-        Campaign mockCampaign = mock(Campaign.class);
-
-        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
         when(mockCampaignOptions.isPayForFood()).thenReturn(false);
         when(mockCampaignOptions.isPayForHousing()).thenReturn(false);
+        when(mockLocation.isOnPlanet()).thenReturn(true);
 
-        Accountant accountant = new Accountant(mockCampaign);
+        Accountant accountant = createAccountant(Collections.emptyList());
 
-        CurrentLocation location = new CurrentLocation();
-        when(mockCampaign.getCurrentLocation()).thenReturn(location);
-
-        // Act
-        Money expected = Money.zero();
-        Money actual = accountant.getMonthlyFoodAndHousingExpenses();
-
-        // Assert
-        assertEquals(expected, actual);
+        assertEquals(Money.zero(), accountant.getMonthlyFoodAndHousingExpenses());
     }
 
     @Test
     void testGetMonthlyFoodAndHousingExpenses_WhenNoPersonnel() {
-        // Setup
-        Campaign mockCampaign = mock(Campaign.class);
+        when(mockCampaignOptions.isPayForFood()).thenReturn(true);
+        when(mockCampaignOptions.isPayForHousing()).thenReturn(true);
+        when(mockLocation.isOnPlanet()).thenReturn(true);
 
-        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.isPayForFood()).thenReturn(false);
-        when(mockCampaignOptions.isPayForHousing()).thenReturn(false);
+        Accountant accountant = createAccountant(Collections.emptyList());
 
-        Accountant accountant = new Accountant(mockCampaign);
-
-        CurrentLocation location = new CurrentLocation();
-        when(mockCampaign.getCurrentLocation()).thenReturn(location);
-
-        // Act
-        Money expected = Money.zero();
-        Money actual = accountant.getMonthlyFoodAndHousingExpenses();
-
-        // Assert
-        assertEquals(expected, actual);
+        assertEquals(Money.zero(), accountant.getMonthlyFoodAndHousingExpenses());
     }
 
     @Test
     void testGetMonthlyFoodAndHousingExpenses_WhenOnlyPrisoners() {
-        // Setup
-        Campaign mockCampaign = mock(Campaign.class);
-
-        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
         when(mockCampaignOptions.isPayForFood()).thenReturn(true);
         when(mockCampaignOptions.isPayForHousing()).thenReturn(true);
+        when(mockLocation.isOnPlanet()).thenReturn(true);
 
-        Accountant accountant = new Accountant(mockCampaign);
+        List<Person> prisoners = List.of(createMockPrisoner(), createMockPrisoner(), createMockPrisoner());
+        Accountant accountant = createAccountant(prisoners);
 
-        CurrentLocation location = new CurrentLocation();
-        when(mockCampaign.getCurrentLocation()).thenReturn(location);
-
-        Faction faction = new Faction();
-        when(mockCampaign.getFaction()).thenReturn(faction);
-
-        Person prisoner = new Person(mockCampaign);
-        prisoner.setPrisonerStatus(mockCampaign, PRISONER, false);
-        List<Person> prisoners = List.of(prisoner, prisoner, prisoner);
-        when(mockCampaign.getAllPersonnel()).thenReturn(prisoners);
-
-        // Act
         int expensesFood = FOOD_PRISONER_OR_DEPENDENT * prisoners.size();
         int expensesHousing = HOUSING_PRISONER_OR_DEPENDENT * prisoners.size();
         Money expected = Money.of(expensesFood + expensesHousing);
-        Money actual = accountant.getMonthlyFoodAndHousingExpenses();
 
-        // Assert
-        assertEquals(expected, actual);
+        assertEquals(expected, accountant.getMonthlyFoodAndHousingExpenses());
     }
 
     @Test
     void testGetMonthlyHousingExpenses_WhenOnlyPrisoners() {
-        // Setup
-        Campaign mockCampaign = mock(Campaign.class);
-
-        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
         when(mockCampaignOptions.isPayForFood()).thenReturn(false);
         when(mockCampaignOptions.isPayForHousing()).thenReturn(true);
+        when(mockLocation.isOnPlanet()).thenReturn(true);
 
-        Accountant accountant = new Accountant(mockCampaign);
+        List<Person> prisoners = List.of(createMockPrisoner(), createMockPrisoner(), createMockPrisoner());
+        Accountant accountant = createAccountant(prisoners);
 
-        CurrentLocation location = new CurrentLocation();
-        when(mockCampaign.getCurrentLocation()).thenReturn(location);
-
-        Faction faction = new Faction();
-        when(mockCampaign.getFaction()).thenReturn(faction);
-
-        Person prisoner = new Person(mockCampaign);
-        prisoner.setPrisonerStatus(mockCampaign, PRISONER, false);
-        List<Person> prisoners = List.of(prisoner, prisoner, prisoner);
-        when(mockCampaign.getAllPersonnel()).thenReturn(prisoners);
-
-        // Act
         int expensesHousing = HOUSING_PRISONER_OR_DEPENDENT * prisoners.size();
         Money expected = Money.of(expensesHousing);
-        Money actual = accountant.getMonthlyFoodAndHousingExpenses();
 
-        // Assert
-        assertEquals(expected, actual);
+        assertEquals(expected, accountant.getMonthlyFoodAndHousingExpenses());
     }
 
     @Test
     void testGetMonthlyFoodExpenses_WhenOnlyPrisoners() {
-        // Setup
-        Campaign mockCampaign = mock(Campaign.class);
-
-        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
         when(mockCampaignOptions.isPayForFood()).thenReturn(true);
         when(mockCampaignOptions.isPayForHousing()).thenReturn(false);
+        when(mockLocation.isOnPlanet()).thenReturn(true);
 
-        Accountant accountant = new Accountant(mockCampaign);
+        List<Person> prisoners = List.of(createMockPrisoner(), createMockPrisoner(), createMockPrisoner());
+        Accountant accountant = createAccountant(prisoners);
 
-        CurrentLocation location = new CurrentLocation();
-        when(mockCampaign.getCurrentLocation()).thenReturn(location);
-
-        Faction faction = new Faction();
-        when(mockCampaign.getFaction()).thenReturn(faction);
-
-        Person prisoner = new Person(mockCampaign);
-        prisoner.setPrisonerStatus(mockCampaign, PRISONER, false);
-        List<Person> prisoners = List.of(prisoner, prisoner, prisoner);
-        when(mockCampaign.getAllPersonnel()).thenReturn(prisoners);
-
-        // Act
         int expensesFood = FOOD_PRISONER_OR_DEPENDENT * prisoners.size();
         Money expected = Money.of(expensesFood);
-        Money actual = accountant.getMonthlyFoodAndHousingExpenses();
 
-        // Assert
-        assertEquals(expected, actual);
+        assertEquals(expected, accountant.getMonthlyFoodAndHousingExpenses());
     }
 
     @Test
     void testGetMonthlyFoodAndHousingExpenses_WhenOnlyDependents() {
-        // Setup
-        Campaign mockCampaign = mock(Campaign.class);
-
-        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
         when(mockCampaignOptions.isPayForFood()).thenReturn(true);
         when(mockCampaignOptions.isPayForHousing()).thenReturn(true);
+        when(mockLocation.isOnPlanet()).thenReturn(true);
 
-        Accountant accountant = new Accountant(mockCampaign);
+        List<Person> dependents = List.of(createMockDependent(), createMockDependent(), createMockDependent());
+        Accountant accountant = createAccountant(dependents);
 
-        CurrentLocation location = new CurrentLocation();
-        when(mockCampaign.getCurrentLocation()).thenReturn(location);
-
-        Faction faction = new Faction();
-        when(mockCampaign.getFaction()).thenReturn(faction);
-
-        Person dependent = new Person(mockCampaign);
-        dependent.setPrimaryRole(mockCampaign, DEPENDENT);
-        List<Person> dependents = List.of(dependent, dependent, dependent);
-        when(mockCampaign.getAllPersonnel()).thenReturn(dependents);
-
-        // Act
         int expensesFood = FOOD_PRISONER_OR_DEPENDENT * dependents.size();
         int expensesHousing = HOUSING_PRISONER_OR_DEPENDENT * dependents.size();
         Money expected = Money.of(expensesFood + expensesHousing);
-        Money actual = accountant.getMonthlyFoodAndHousingExpenses();
 
-        // Assert
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void testGetMonthlyHousingExpenses_WhenOnlyDependents() {
-        // Setup
-        Campaign mockCampaign = mock(Campaign.class);
-
-        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.isPayForFood()).thenReturn(false);
-        when(mockCampaignOptions.isPayForHousing()).thenReturn(true);
-
-        Accountant accountant = new Accountant(mockCampaign);
-
-        CurrentLocation location = new CurrentLocation();
-        when(mockCampaign.getCurrentLocation()).thenReturn(location);
-
-        Faction faction = new Faction();
-        when(mockCampaign.getFaction()).thenReturn(faction);
-
-        Person dependent = new Person(mockCampaign);
-        dependent.setPrimaryRole(mockCampaign, DEPENDENT);
-        List<Person> dependents = List.of(dependent, dependent, dependent);
-        when(mockCampaign.getAllPersonnel()).thenReturn(dependents);
-
-        // Act
-        int expensesHousing = HOUSING_PRISONER_OR_DEPENDENT * dependents.size();
-        Money expected = Money.of(expensesHousing);
-        Money actual = accountant.getMonthlyFoodAndHousingExpenses();
-
-        // Assert
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void testGetMonthlyFoodExpenses_WhenOnlyDependents() {
-        // Setup
-        Campaign mockCampaign = mock(Campaign.class);
-
-        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.isPayForFood()).thenReturn(true);
-        when(mockCampaignOptions.isPayForHousing()).thenReturn(false);
-
-        Accountant accountant = new Accountant(mockCampaign);
-
-        CurrentLocation location = new CurrentLocation();
-        when(mockCampaign.getCurrentLocation()).thenReturn(location);
-
-        Faction faction = new Faction();
-        when(mockCampaign.getFaction()).thenReturn(faction);
-
-        Person dependent = new Person(mockCampaign);
-        dependent.setPrimaryRole(mockCampaign, DEPENDENT);
-        List<Person> dependents = List.of(dependent, dependent, dependent);
-        when(mockCampaign.getAllPersonnel()).thenReturn(dependents);
-
-        // Act
-        int expensesFood = FOOD_PRISONER_OR_DEPENDENT * dependents.size();
-        Money expected = Money.of(expensesFood);
-        Money actual = accountant.getMonthlyFoodAndHousingExpenses();
-
-        // Assert
-        assertEquals(expected, actual);
+        assertEquals(expected, accountant.getMonthlyFoodAndHousingExpenses());
     }
 
     @Test
     void testGetMonthlyFoodAndHousingExpenses_WhenOnlyEnlisted() {
-        // Setup
-        Campaign mockCampaign = mock(Campaign.class);
-
-        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
         when(mockCampaignOptions.isPayForFood()).thenReturn(true);
         when(mockCampaignOptions.isPayForHousing()).thenReturn(true);
+        when(mockLocation.isOnPlanet()).thenReturn(true);
 
-        Accountant accountant = new Accountant(mockCampaign);
+        List<Person> enlistedPersonnel = List.of(createMockEnlisted(), createMockEnlisted(), createMockEnlisted());
+        Accountant accountant = createAccountant(enlistedPersonnel);
 
-        CurrentLocation location = new CurrentLocation();
-        when(mockCampaign.getCurrentLocation()).thenReturn(location);
-
-        Faction faction = new Faction();
-        when(mockCampaign.getFaction()).thenReturn(faction);
-
-        Person enlisted = new Person(mockCampaign);
-        enlisted.setPrimaryRole(mockCampaign, MEKWARRIOR);
-        enlisted.setRank(RWO_MIN - 1);
-        List<Person> enlistedPersonnel = List.of(enlisted, enlisted, enlisted);
-        when(mockCampaign.getAllPersonnel()).thenReturn(enlistedPersonnel);
-
-        // Act
         int expensesFood = FOOD_ENLISTED * enlistedPersonnel.size();
         int expensesHousing = HOUSING_ENLISTED * enlistedPersonnel.size();
         Money expected = Money.of(expensesFood + expensesHousing);
-        Money actual = accountant.getMonthlyFoodAndHousingExpenses();
 
-        // Assert
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void testGetMonthlyHousingExpenses_WhenOnlyEnlisted() {
-        // Setup
-        Campaign mockCampaign = mock(Campaign.class);
-
-        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.isPayForFood()).thenReturn(false);
-        when(mockCampaignOptions.isPayForHousing()).thenReturn(true);
-
-        Accountant accountant = new Accountant(mockCampaign);
-
-        CurrentLocation location = new CurrentLocation();
-        when(mockCampaign.getCurrentLocation()).thenReturn(location);
-
-        Faction faction = new Faction();
-        when(mockCampaign.getFaction()).thenReturn(faction);
-
-        Person enlisted = new Person(mockCampaign);
-        enlisted.setPrimaryRole(mockCampaign, MEKWARRIOR);
-        enlisted.setRank(RWO_MIN - 1);
-        List<Person> enlistedPersonnel = List.of(enlisted, enlisted, enlisted);
-        when(mockCampaign.getAllPersonnel()).thenReturn(enlistedPersonnel);
-
-        // Act
-        int expensesHousing = HOUSING_ENLISTED * enlistedPersonnel.size();
-        Money expected = Money.of(expensesHousing);
-        Money actual = accountant.getMonthlyFoodAndHousingExpenses();
-
-        // Assert
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void testGetMonthlyFoodExpenses_WhenOnlyEnlisted() {
-        // Setup
-        Campaign mockCampaign = mock(Campaign.class);
-
-        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.isPayForFood()).thenReturn(true);
-        when(mockCampaignOptions.isPayForHousing()).thenReturn(false);
-
-        Accountant accountant = new Accountant(mockCampaign);
-
-        CurrentLocation location = new CurrentLocation();
-        when(mockCampaign.getCurrentLocation()).thenReturn(location);
-
-        Faction faction = new Faction();
-        when(mockCampaign.getFaction()).thenReturn(faction);
-
-        Person enlisted = new Person(mockCampaign);
-        enlisted.setPrimaryRole(mockCampaign, MEKWARRIOR);
-        enlisted.setRank(RWO_MIN - 1);
-        List<Person> enlistedPersonnel = List.of(enlisted, enlisted, enlisted);
-        when(mockCampaign.getAllPersonnel()).thenReturn(enlistedPersonnel);
-
-        // Act
-        int expensesFood = FOOD_ENLISTED * enlistedPersonnel.size();
-        Money expected = Money.of(expensesFood);
-        Money actual = accountant.getMonthlyFoodAndHousingExpenses();
-
-        // Assert
-        assertEquals(expected, actual);
+        assertEquals(expected, accountant.getMonthlyFoodAndHousingExpenses());
     }
 
     @Test
     void testGetMonthlyFoodAndHousingExpenses_WhenOnlyOfficers() {
-        // Setup
-        Campaign mockCampaign = mock(Campaign.class);
-
-        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
         when(mockCampaignOptions.isPayForFood()).thenReturn(true);
         when(mockCampaignOptions.isPayForHousing()).thenReturn(true);
+        when(mockLocation.isOnPlanet()).thenReturn(true);
 
-        Accountant accountant = new Accountant(mockCampaign);
+        List<Person> officerPersonnel = List.of(createMockOfficer(), createMockOfficer(), createMockOfficer());
+        Accountant accountant = createAccountant(officerPersonnel);
 
-        CurrentLocation location = new CurrentLocation();
-        when(mockCampaign.getCurrentLocation()).thenReturn(location);
-
-        Faction faction = new Faction();
-        when(mockCampaign.getFaction()).thenReturn(faction);
-
-        Person officer = new Person(mockCampaign);
-        officer.setPrimaryRole(mockCampaign, MEKWARRIOR);
-        officer.setRank(RWO_MIN + 1);
-        List<Person> officerPersonnel = List.of(officer, officer, officer);
-        when(mockCampaign.getAllPersonnel()).thenReturn(officerPersonnel);
-
-        // Act
         int expensesFood = FOOD_OFFICER * officerPersonnel.size();
         int expensesHousing = HOUSING_OFFICER * officerPersonnel.size();
         Money expected = Money.of(expensesFood + expensesHousing);
-        Money actual = accountant.getMonthlyFoodAndHousingExpenses();
 
-        // Assert
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void testGetMonthlyHousingExpenses_WhenOnlyOfficers() {
-        // Setup
-        Campaign mockCampaign = mock(Campaign.class);
-
-        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.isPayForFood()).thenReturn(false);
-        when(mockCampaignOptions.isPayForHousing()).thenReturn(true);
-
-        Accountant accountant = new Accountant(mockCampaign);
-
-        CurrentLocation location = new CurrentLocation();
-        when(mockCampaign.getCurrentLocation()).thenReturn(location);
-
-        Faction faction = new Faction();
-        when(mockCampaign.getFaction()).thenReturn(faction);
-
-        Person officer = new Person(mockCampaign);
-        officer.setPrimaryRole(mockCampaign, MEKWARRIOR);
-        officer.setRank(RWO_MIN + 1);
-        List<Person> officerPersonnel = List.of(officer, officer, officer);
-        when(mockCampaign.getAllPersonnel()).thenReturn(officerPersonnel);
-
-        // Act
-        int expensesHousing = HOUSING_OFFICER * officerPersonnel.size();
-        Money expected = Money.of(expensesHousing);
-        Money actual = accountant.getMonthlyFoodAndHousingExpenses();
-
-        // Assert
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void testGetMonthlyFoodExpenses_WhenOnlyOfficers() {
-        // Setup
-        Campaign mockCampaign = mock(Campaign.class);
-
-        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.isPayForFood()).thenReturn(true);
-        when(mockCampaignOptions.isPayForHousing()).thenReturn(false);
-
-        Accountant accountant = new Accountant(mockCampaign);
-
-        CurrentLocation location = new CurrentLocation();
-        when(mockCampaign.getCurrentLocation()).thenReturn(location);
-
-        Faction faction = new Faction();
-        when(mockCampaign.getFaction()).thenReturn(faction);
-
-        Person officer = new Person(mockCampaign);
-        officer.setPrimaryRole(mockCampaign, MEKWARRIOR);
-        officer.setRank(RWO_MIN + 1);
-        List<Person> officerPersonnel = List.of(officer, officer, officer);
-        when(mockCampaign.getAllPersonnel()).thenReturn(officerPersonnel);
-
-        // Act
-        int expensesFood = FOOD_OFFICER * officerPersonnel.size();
-        Money expected = Money.of(expensesFood);
-        Money actual = accountant.getMonthlyFoodAndHousingExpenses();
-
-        // Assert
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void testGetMonthlyFoodAndHousingExpenses_Mixed() {
-        // Setup
-        Campaign mockCampaign = mock(Campaign.class);
-
-        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.isPayForFood()).thenReturn(true);
-        when(mockCampaignOptions.isPayForHousing()).thenReturn(true);
-
-        Accountant accountant = new Accountant(mockCampaign);
-
-        CurrentLocation location = new CurrentLocation();
-        when(mockCampaign.getCurrentLocation()).thenReturn(location);
-
-        Faction faction = new Faction();
-        when(mockCampaign.getFaction()).thenReturn(faction);
-
-        Person prisoner = new Person(mockCampaign);
-        prisoner.setPrisonerStatus(mockCampaign, PRISONER, false);
-        List<Person> prisoners = List.of(prisoner, prisoner, prisoner);
-
-        Person dependent = new Person(mockCampaign);
-        dependent.setPrimaryRole(mockCampaign, DEPENDENT);
-        List<Person> dependents = List.of(dependent, dependent, dependent);
-
-        Person enlisted = new Person(mockCampaign);
-        enlisted.setPrimaryRole(mockCampaign, MEKWARRIOR);
-        enlisted.setRank(RWO_MIN - 1);
-        List<Person> enlistedPersonnel = List.of(enlisted, enlisted, enlisted);
-
-        Person officer = new Person(mockCampaign);
-        officer.setPrimaryRole(mockCampaign, MEKWARRIOR);
-        officer.setRank(RWO_MIN + 1);
-        List<Person> officerPersonnel = List.of(officer, officer, officer);
-
-        List<Person> allPersonnel = new ArrayList<>();
-        allPersonnel.addAll(prisoners);
-        allPersonnel.addAll(dependents);
-        allPersonnel.addAll(enlistedPersonnel);
-        allPersonnel.addAll(officerPersonnel);
-        when(mockCampaign.getAllPersonnel()).thenReturn(allPersonnel);
-
-        // Act
-        int expensesFood = FOOD_PRISONER_OR_DEPENDENT * (prisoners.size() + dependents.size());
-        expensesFood += FOOD_ENLISTED * enlistedPersonnel.size();
-        expensesFood += FOOD_OFFICER * officerPersonnel.size();
-
-        int expensesHousing = HOUSING_PRISONER_OR_DEPENDENT * (prisoners.size() + dependents.size());
-        expensesHousing += HOUSING_ENLISTED * enlistedPersonnel.size();
-        expensesHousing += HOUSING_OFFICER * officerPersonnel.size();
-
-        Money expected = Money.of(expensesFood + expensesHousing);
-        Money actual = accountant.getMonthlyFoodAndHousingExpenses();
-
-        // Assert
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void testGetMonthlyHousingExpenses_Mixed() {
-        // Setup
-        Campaign mockCampaign = mock(Campaign.class);
-
-        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.isPayForFood()).thenReturn(false);
-        when(mockCampaignOptions.isPayForHousing()).thenReturn(true);
-
-        Accountant accountant = new Accountant(mockCampaign);
-
-        CurrentLocation location = new CurrentLocation();
-        when(mockCampaign.getCurrentLocation()).thenReturn(location);
-
-        Faction faction = new Faction();
-        when(mockCampaign.getFaction()).thenReturn(faction);
-
-        Person prisoner = new Person(mockCampaign);
-        prisoner.setPrisonerStatus(mockCampaign, PRISONER, false);
-        List<Person> prisoners = List.of(prisoner, prisoner, prisoner);
-
-        Person dependent = new Person(mockCampaign);
-        dependent.setPrimaryRole(mockCampaign, DEPENDENT);
-        List<Person> dependents = List.of(dependent, dependent, dependent);
-
-        Person enlisted = new Person(mockCampaign);
-        enlisted.setPrimaryRole(mockCampaign, MEKWARRIOR);
-        enlisted.setRank(RWO_MIN - 1);
-        List<Person> enlistedPersonnel = List.of(enlisted, enlisted, enlisted);
-
-        Person officer = new Person(mockCampaign);
-        officer.setPrimaryRole(mockCampaign, MEKWARRIOR);
-        officer.setRank(RWO_MIN + 1);
-        List<Person> officerPersonnel = List.of(officer, officer, officer);
-
-        List<Person> allPersonnel = new ArrayList<>();
-        allPersonnel.addAll(prisoners);
-        allPersonnel.addAll(dependents);
-        allPersonnel.addAll(enlistedPersonnel);
-        allPersonnel.addAll(officerPersonnel);
-        when(mockCampaign.getAllPersonnel()).thenReturn(allPersonnel);
-
-        // Act
-        int expensesHousing = HOUSING_PRISONER_OR_DEPENDENT * (prisoners.size() + dependents.size());
-        expensesHousing += HOUSING_ENLISTED * enlistedPersonnel.size();
-        expensesHousing += HOUSING_OFFICER * officerPersonnel.size();
-
-        Money expected = Money.of(expensesHousing);
-        Money actual = accountant.getMonthlyFoodAndHousingExpenses();
-
-        // Assert
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void testGetMonthlyFoodExpenses_Mixed() {
-        // Setup
-        Campaign mockCampaign = mock(Campaign.class);
-
-        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        when(mockCampaignOptions.isPayForFood()).thenReturn(true);
-        when(mockCampaignOptions.isPayForHousing()).thenReturn(false);
-
-        Accountant accountant = new Accountant(mockCampaign);
-
-        CurrentLocation location = new CurrentLocation();
-        when(mockCampaign.getCurrentLocation()).thenReturn(location);
-
-        Faction faction = new Faction();
-        when(mockCampaign.getFaction()).thenReturn(faction);
-
-        Person prisoner = new Person(mockCampaign);
-        prisoner.setPrisonerStatus(mockCampaign, PRISONER, false);
-        List<Person> prisoners = List.of(prisoner, prisoner, prisoner);
-
-        Person dependent = new Person(mockCampaign);
-        dependent.setPrimaryRole(mockCampaign, DEPENDENT);
-        List<Person> dependents = List.of(dependent, dependent, dependent);
-
-        Person enlisted = new Person(mockCampaign);
-        enlisted.setPrimaryRole(mockCampaign, MEKWARRIOR);
-        enlisted.setRank(RWO_MIN - 1);
-        List<Person> enlistedPersonnel = List.of(enlisted, enlisted, enlisted);
-
-        Person officer = new Person(mockCampaign);
-        officer.setPrimaryRole(mockCampaign, MEKWARRIOR);
-        officer.setRank(RWO_MIN + 1);
-        List<Person> officerPersonnel = List.of(officer, officer, officer);
-
-        List<Person> allPersonnel = new ArrayList<>();
-        allPersonnel.addAll(prisoners);
-        allPersonnel.addAll(dependents);
-        allPersonnel.addAll(enlistedPersonnel);
-        allPersonnel.addAll(officerPersonnel);
-        when(mockCampaign.getAllPersonnel()).thenReturn(allPersonnel);
-
-        // Act
-        int expensesFood = FOOD_PRISONER_OR_DEPENDENT * (prisoners.size() + dependents.size());
-        expensesFood += FOOD_ENLISTED * enlistedPersonnel.size();
-        expensesFood += FOOD_OFFICER * officerPersonnel.size();
-
-        Money expected = Money.of(expensesFood);
-        Money actual = accountant.getMonthlyFoodAndHousingExpenses();
-
-        // Assert
-        assertEquals(expected, actual);
+        assertEquals(expected, accountant.getMonthlyFoodAndHousingExpenses());
     }
 
     @Test
     void testGetMonthlyFoodAndHousingExpenses_Mixed_InTransit() {
-        // Setup
-        Campaign mockCampaign = mock(Campaign.class);
-
-        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
         when(mockCampaignOptions.isPayForFood()).thenReturn(true);
         when(mockCampaignOptions.isPayForHousing()).thenReturn(true);
+        when(mockLocation.isOnPlanet()).thenReturn(false);
 
-        Accountant accountant = new Accountant(mockCampaign);
+        List<Person> personnel = List.of(createMockEnlisted(), createMockEnlisted());
+        Accountant accountant = createAccountant(personnel);
 
-        CurrentLocation location = new CurrentLocation();
-        location.setTransitTime(1);
-        when(mockCampaign.getCurrentLocation()).thenReturn(location);
+        int expensesFood = FOOD_ENLISTED * personnel.size();
+        Money expected = Money.of(expensesFood);
 
-        Faction faction = new Faction();
-        when(mockCampaign.getFaction()).thenReturn(faction);
-
-        Person prisoner = new Person(mockCampaign);
-        prisoner.setPrisonerStatus(mockCampaign, PRISONER, false);
-        List<Person> prisoners = List.of(prisoner, prisoner, prisoner);
-
-        Person dependent = new Person(mockCampaign);
-        dependent.setPrimaryRole(mockCampaign, DEPENDENT);
-        List<Person> dependents = List.of(dependent, dependent, dependent);
-
-        Person enlisted = new Person(mockCampaign);
-        enlisted.setPrimaryRole(mockCampaign, MEKWARRIOR);
-        enlisted.setRank(RWO_MIN - 1);
-        List<Person> enlistedPersonnel = List.of(enlisted, enlisted, enlisted);
-
-        Person officer = new Person(mockCampaign);
-        officer.setPrimaryRole(mockCampaign, MEKWARRIOR);
-        officer.setRank(RWO_MIN + 1);
-        List<Person> officerPersonnel = List.of(officer, officer, officer);
-
-        List<Person> allPersonnel = new ArrayList<>();
-        allPersonnel.addAll(prisoners);
-        allPersonnel.addAll(dependents);
-        allPersonnel.addAll(enlistedPersonnel);
-        allPersonnel.addAll(officerPersonnel);
-        when(mockCampaign.getAllPersonnel()).thenReturn(allPersonnel);
-
-        // Act
-        int expensesFood = FOOD_PRISONER_OR_DEPENDENT * (prisoners.size() + dependents.size());
-        expensesFood += FOOD_ENLISTED * enlistedPersonnel.size();
-        expensesFood += FOOD_OFFICER * officerPersonnel.size();
-
-        int expensesHousing = 0;
-
-        Money expected = Money.of(expensesFood + expensesHousing);
-        Money actual = accountant.getMonthlyFoodAndHousingExpenses();
-
-        // Assert
-        assertEquals(expected, actual);
+        assertEquals(expected, accountant.getMonthlyFoodAndHousingExpenses());
     }
 
     @Test
     void testGetMonthlyFoodAndHousingExpenses_Mixed_ExcludingWarShipCrew() {
-        // Setup
-        Campaign mockCampaign = mock(Campaign.class);
-
-        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
         when(mockCampaignOptions.isPayForFood()).thenReturn(true);
         when(mockCampaignOptions.isPayForHousing()).thenReturn(true);
+        when(mockLocation.isOnPlanet()).thenReturn(true);
 
-        Accountant accountant = new Accountant(mockCampaign);
-
-        CurrentLocation location = new CurrentLocation();
-        when(mockCampaign.getCurrentLocation()).thenReturn(location);
-
-        Faction faction = new Faction();
-        when(mockCampaign.getFaction()).thenReturn(faction);
-
-        Person prisoner = new Person(mockCampaign);
-        prisoner.setPrisonerStatus(mockCampaign, PRISONER, false);
-        List<Person> prisoners = List.of(prisoner, prisoner, prisoner);
-
-        Person dependent = new Person(mockCampaign);
-        dependent.setPrimaryRole(mockCampaign, DEPENDENT);
-        List<Person> dependents = List.of(dependent, dependent, dependent);
-
-        Person enlisted = new Person(mockCampaign);
-        enlisted.setPrimaryRole(mockCampaign, MEKWARRIOR);
-        enlisted.setRank(RWO_MIN - 1);
-        List<Person> enlistedPersonnel = List.of(enlisted, enlisted, enlisted);
-
-        Person officer = new Person(mockCampaign);
-        officer.setPrimaryRole(mockCampaign, MEKWARRIOR);
-        officer.setRank(RWO_MIN + 1);
-        List<Person> officerPersonnel = List.of(officer, officer, officer);
-
-        Unit warShip = new Unit();
+        Unit warShip = mock(Unit.class);
         Entity mockEntity = mock(Entity.class);
         when(mockEntity.isLargeCraft()).thenReturn(true);
         when(mockEntity.isDropShip()).thenReturn(false);
-        warShip.setEntity(mockEntity);
+        when(warShip.getEntity()).thenReturn(mockEntity);
 
-        Person warShipCrew = new Person(mockCampaign);
-        warShipCrew.setPrimaryRole(mockCampaign, VESSEL_GUNNER);
-        warShipCrew.setRank(RWO_MIN - 1);
-        warShipCrew.setUnit(warShip);
-        List<Person> warShipPersonnel = List.of(warShipCrew, warShipCrew, warShipCrew);
+        Person crew = mock(Person.class);
+        when(crew.getId()).thenReturn(UUID.randomUUID());
+        when(crew.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
+        PrisonerStatus prisonerStatus = mock(PrisonerStatus.class);
+        when(crew.getPrisonerStatus()).thenReturn(prisonerStatus);
+        when(crew.getPrimaryRole()).thenReturn(PersonnelRole.VESSEL_GUNNER);
+        when(crew.getRankNumeric()).thenReturn(RWO_MIN - 1);
+        when(crew.getUnit()).thenReturn(warShip);
 
-        List<Person> allPersonnel = new ArrayList<>();
-        allPersonnel.addAll(prisoners);
-        allPersonnel.addAll(dependents);
-        allPersonnel.addAll(enlistedPersonnel);
-        allPersonnel.addAll(officerPersonnel);
-        allPersonnel.addAll(warShipPersonnel);
-        when(mockCampaign.getAllPersonnel()).thenReturn(allPersonnel);
+        List<Person> personnel = List.of(crew);
+        Accountant accountant = createAccountant(personnel);
 
-        // Act
-        int expensesFood = FOOD_PRISONER_OR_DEPENDENT * (prisoners.size() + dependents.size());
-        expensesFood += FOOD_ENLISTED * enlistedPersonnel.size();
-        expensesFood += FOOD_OFFICER * officerPersonnel.size();
-        expensesFood += FOOD_ENLISTED * warShipPersonnel.size();
+        int expensesFood = FOOD_ENLISTED * personnel.size();
+        Money expected = Money.of(expensesFood);
 
-        int expensesHousing = HOUSING_PRISONER_OR_DEPENDENT * (prisoners.size() + dependents.size());
-        expensesHousing += HOUSING_ENLISTED * enlistedPersonnel.size();
-        expensesHousing += HOUSING_OFFICER * officerPersonnel.size();
-
-        Money expected = Money.of(expensesFood + expensesHousing);
-        Money actual = accountant.getMonthlyFoodAndHousingExpenses();
-
-        // Assert
-        assertEquals(expected, actual);
-    }
-
-    /**
-     * tests {@link Accountant#getPayRollSummary()}
-     */
-    @Nested
-    class TestGetPayrollSummary {
-        Campaign mockCampaign;
-        CampaignOptions campaignOptions;
-        Accountant accountant;
-        final int EXPECTEDPAY = 100;
-        final int CREWCOUNT = 5;
-
-        @BeforeEach
-        void beforeEach() {
-            mockCampaign = mock(Campaign.class);
-            campaignOptions = new CampaignOptions();
-            accountant = new Accountant(mockCampaign);
-        }
-
-
-        @Test
-        void testGetPayrollSummary_emptyCampaign() {
-            // Arrange
-            when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
-
-            // Act
-            Map<Person, Money> expectedMap = accountant.getPayRollSummary();
-
-            // Assert
-            assertEquals(1, expectedMap.size());
-            assertTrue(expectedMap.containsKey(null));
-            assertEquals(Money.zero(), expectedMap.get(null));
-        }
-
-        @Test
-        void testGetPayrollSummary_onePerson() {
-            // Arrange
-            Person mockPerson = getMockPerson(EXPECTEDPAY);
-
-            when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
-            when(mockCampaign.getSalaryEligiblePersonnel()).thenReturn(List.of(mockPerson));
-
-            // Act
-            Map<Person, Money> expectedMap = accountant.getPayRollSummary();
-
-            // Assert
-            assertEquals(2, expectedMap.size());
-            assertTrue(expectedMap.containsKey(null));
-            assertEquals(Money.zero(), expectedMap.get(null));
-            assertTrue(expectedMap.containsKey(mockPerson));
-            assertEquals(Money.of(EXPECTEDPAY), expectedMap.get(mockPerson));
-        }
-
-        @Test
-        void testGetAstechPoolPay() {
-            // Arrange
-            when(mockCampaign.getTemporaryAsTechPool()).thenReturn(5);
-            when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
-
-            // Act
-
-            Map<Person, Money> expectedMap = accountant.getPayRollSummary();
-
-            // Assert
-            assertEquals(1, expectedMap.size());
-            assertTrue(expectedMap.containsKey(null));
-            assertEquals(Money.of(2000), expectedMap.get(null));
-        }
-
-        @Test
-        void testGetMedicPoolPay() {
-            // Arrange
-            when(mockCampaign.getTemporaryMedicPool()).thenReturn(5);
-            when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
-
-            // Act
-
-            Map<Person, Money> expectedMap = accountant.getPayRollSummary();
-
-            // Assert
-            assertEquals(1, expectedMap.size());
-            assertTrue(expectedMap.containsKey(null));
-            assertEquals(Money.of(2000), expectedMap.get(null));
-        }
-
-        @ParameterizedTest
-        @EnumSource(names = { "SOLDIER", "BATTLE_ARMOUR", "VEHICLE_CREW_GROUND", "VEHICLE_CREW_VTOL",
-                              "VEHICLE_CREW_NAVAL", "VESSEL_PILOT", "VESSEL_GUNNER", "VESSEL_CREW" })
-        void testGetAllTempCrewPay(PersonnelRole role) {
-            // Arrange
-            when(mockCampaign.getTempCrewRoleKeys())
-                  .thenReturn(new HashSet<>(Collections.singleton(role)));
-            when(mockCampaign.getTempCrewPool(any())).thenReturn(CREWCOUNT);
-            when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
-
-            // Act
-            Map<Person, Money> expectedMap = accountant.getPayRollSummary();
-
-            // Assert
-            assertEquals(1, expectedMap.size());
-            assertTrue(expectedMap.containsKey(null));
-            assertEquals(Money.of(CREWCOUNT *
-                                        campaignOptions.getRoleBaseSalaries()[role.ordinal()].getAmount()
-                                              .doubleValue()),
-                  expectedMap.get(null));
-        }
-
-        Person getMockPerson(int pay) {
-            Person mockPerson = mock(Person.class);
-
-            when(mockPerson.getSalary(mockCampaign)).thenReturn(Money.of(pay));
-            return mockPerson;
-        }
+        assertEquals(expected, accountant.getMonthlyFoodAndHousingExpenses());
     }
 }
