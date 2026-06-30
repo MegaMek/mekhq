@@ -139,6 +139,11 @@ public class CampaignOptionsPagePanel extends JPanel {
         sectionSearchText = searchTextBuilder.toString().trim();
         JPanel sectionControls = createSectionControls(sections);
         int sectionStackWidth = getPreferredSectionStackWidth(sections, sectionControls);
+        if (sectionStackWidth == 0 && builder.standardContentWidth) {
+            // A section-less page (such as a category landing page) would otherwise collapse its intro and quote to
+            // the header width; floor it to the shared page width so it matches the dialog's sectioned pages.
+            sectionStackWidth = UNIFORM_SECTION_STACK_WIDTH;
+        }
 
         JPanel contentPanel = createContentPanel(builder, renderItems, sections, sectionControls, sectionStackWidth);
         pageBody.add(contentPanel, BorderLayout.CENTER);
@@ -520,6 +525,7 @@ public class CampaignOptionsPagePanel extends JPanel {
         private boolean tintHeaderImage = true;
         private boolean sectionsExpandedByDefault;
         private boolean showDetailsPanel = true;
+        private boolean standardContentWidth;
 
         private Builder(String name, String headerResourceName, String imageAddress) {
             this.name = name;
@@ -568,6 +574,16 @@ public class CampaignOptionsPagePanel extends JPanel {
 
         public Builder showDetailsPanel(boolean showDetailsPanel) {
             this.showDetailsPanel = showDetailsPanel;
+            return this;
+        }
+
+        /**
+         * Floors a section-less page (such as a category landing page) to the standard page content width, so its
+         * intro and quote render at the same width as the dialog's sectioned pages instead of collapsing to the
+         * header width.
+         */
+        public Builder standardContentWidth() {
+            this.standardContentWidth = true;
             return this;
         }
 
