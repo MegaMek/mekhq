@@ -227,17 +227,8 @@ public enum PersonnelTableModelColumn {
           Person::getSalary, Money::toAmountAndSymbolString),
     XP("Column.XP.title", Comparators.INT_COMPARATOR,
           Person::getXP, Object::toString),
-    ORIGIN_FACTION("Column.ORIGIN_FACTION.title", Comparators.STRING_COMPARATOR,
-          (person, campaign) ->
-                person.getOriginFaction() == null ? "-" :
-                      person.getOriginFaction().getFullName(campaign.getGameYear())),
-    ORIGIN_PLANET("Column.ORIGIN_PLANET.title", Comparators.STRING_COMPARATOR,
-          (person, campaign) -> {
-              Planet originPlanet = person.getOriginPlanet();
-              return (originPlanet == null) ? "" : originPlanet.getName(campaign.getLocalDate());
-          }),
-    BIRTHDAY("Column.BIRTHDAY.title", Comparators.DATE_COMPARATOR,
-          Person::getDateOfBirth, date -> MekHQ.getMHQOptions().getDisplayFormattedDate(date)),
+    ORIGIN("Column.ORIGIN.title", Comparators.STRING_COMPARATOR,
+          PersonnelTableModelColumn::getOrigin),
     RECRUITMENT_DATE("Column.RECRUITMENT_DATE.title", Comparators.DATE_COMPARATOR,
           Person::getRecruitment, date -> MekHQ.getMHQOptions().getDisplayFormattedDate(date)),
     LAST_RANK_CHANGE_DATE("Column.LAST_RANK_CHANGE_DATE.title", Comparators.DATE_COMPARATOR,
@@ -375,16 +366,12 @@ public enum PersonnelTableModelColumn {
               }
               return person.getUnit().getTacticalTransportAssignment().getTransport().getName();
           }),
-    LOCATION_SYSTEM("Column.LOCATION_SYSTEM.title", Comparators.STRING_COMPARATOR,
-          (person, campaign) -> LocationDisplay.getLocationSystem(person, campaign.getLocalDate(), campaign)),
-    LOCATION_PLANET("Column.LOCATION_PLANET.title", Comparators.STRING_COMPARATOR,
-          (person, campaign) -> LocationDisplay.getLocationPlanet(person, campaign.getLocalDate(), campaign)),
+    LOCATION_SYSTEM_AND_PLANET("Column.LOCATION_SYSTEM_AND_PLANET.title", Comparators.STRING_COMPARATOR,
+          PersonnelTableModelColumn::getLocationSystemAndPlanet),
     LOCATION_NAME("Column.LOCATION_NAME.title", Comparators.STRING_COMPARATOR,
           (person, campaign) -> LocationDisplay.getLocationName(person, campaign, campaign.getLocalDate())),
-    DESTINATION_SYSTEM("Column.DESTINATION_SYSTEM.title", Comparators.STRING_COMPARATOR,
-          (person, campaign) -> LocationDisplay.getDestinationSystem(person, campaign.getLocalDate())),
-    DESTINATION_PLANET("Column.DESTINATION_PLANET.title", Comparators.STRING_COMPARATOR,
-          (person, campaign) -> LocationDisplay.getDestinationPlanet(person, campaign.getLocalDate())),
+    DESTINATION_SYSTEM_AND_PLANET("Column.DESTINATION_SYSTEM_AND_PLANET.title", Comparators.STRING_COMPARATOR,
+          PersonnelTableModelColumn::getDestinationSystemAndPlanet),
     DESTINATION_NAME("Column.DESTINATION_NAME.title", Comparators.STRING_COMPARATOR,
           (person, campaign) -> LocationDisplay.getDestinationName(person, campaign, campaign.getLocalDate())),
     IS_MARRIED("Column.IS_MARRIED.title", Comparators.YES_NO_NA_COMPARATOR,
@@ -582,6 +569,38 @@ public enum PersonnelTableModelColumn {
             return getTextAt("Cell.PREFERS.text.men");
         }
         return getTextAt("Cell.PREFERS.text.none");
+    }
+
+    private static String getOrigin(Person person, Campaign campaign) {
+        StringBuilder result = new StringBuilder();
+        if (person.getOriginFaction() == null) {
+            result.append("-");
+        } else {
+            result.append(person.getOriginFaction().getFullName(campaign.getGameYear()));
+        }
+        Planet originPlanet = person.getOriginPlanet();
+        if (originPlanet != null) {
+            result.append(" (").append(originPlanet.getName(campaign.getLocalDate())).append(")");
+        }
+        return result.toString();
+    }
+
+    private static String getLocationSystemAndPlanet(Person person, Campaign campaign) {
+        String locationPlanet = LocationDisplay.getLocationPlanet(person, campaign.getLocalDate(), campaign);
+        String locationSystem = LocationDisplay.getLocationSystem(person, campaign.getLocalDate(), campaign);
+        if (locationSystem.equals(locationPlanet)) {
+            return locationPlanet;
+        }
+        return locationSystem + " - " + locationPlanet;
+    }
+
+    private static String getDestinationSystemAndPlanet(Person person, Campaign campaign) {
+        String locationPlanet = LocationDisplay.getDestinationPlanet(person, campaign.getLocalDate());
+        String locationSystem = LocationDisplay.getDestinationSystem(person, campaign.getLocalDate());
+        if (locationSystem.equals(locationPlanet)) {
+            return locationPlanet;
+        }
+        return locationSystem + " - " + locationPlanet;
     }
 
     private static String getAggregateSkillValue(Person person, Campaign campaign) {
@@ -835,7 +854,7 @@ public enum PersonnelTableModelColumn {
             case SKILL_LEVEL -> 45;
             case PERSONNEL_ROLE -> 120;
             case UNIT_ASSIGNMENT -> 140;
-            case LOCATION_NAME -> 140;
+            case ORIGIN -> 160;
             default -> null;
         };
         return (preferredWidth == null) ? null : UIUtil.scaleForGUI(preferredWidth);
