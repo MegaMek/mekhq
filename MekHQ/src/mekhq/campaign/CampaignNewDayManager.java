@@ -464,7 +464,7 @@ public class CampaignNewDayManager {
 
         campaign.readNews();
 
-        for (AbstractLocation location : new ArrayList<>(campaign.getLocations())) {
+        for (AbstractLocation location : new ArrayList<>(campaign.getCampaignLocationManager().getLocations())) {
             location.newDay(campaign, location != updatedLocation);
         }
         updatedLocation = campaign.getCurrentLocation();
@@ -476,7 +476,7 @@ public class CampaignNewDayManager {
 
         processAllArrivals();
 
-        campaign.pruneEmptyLocations();
+        campaign.getCampaignLocationManager().pruneEmptyLocations(campaign);
 
         if (campaignOptions.isUseRandomDiseases() && campaignOptions.isUseAlternativeAdvancedMedical()) {
             PlanetarySystem currentSystem = updatedLocation.getCurrentSystem();
@@ -697,10 +697,10 @@ public class CampaignNewDayManager {
      */
 
     private void processAllArrivals() {
-        for (AbstractLocation location : new ArrayList<>(campaign.getLocations())) {
+        for (AbstractLocation location : new ArrayList<>(campaign.getCampaignLocationManager().getLocations())) {
             location.processArrivals(campaign);
         }
-        for (PlayerBase base : campaign.getPlayerBases()) {
+        for (PlayerBase base : campaign.getCampaignLocationManager().getPlayerBases()) {
             base.processArrivals(campaign);
         }
         campaign.processArrivals(campaign);

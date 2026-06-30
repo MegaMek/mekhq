@@ -47,6 +47,7 @@ import java.util.Collections;
 import java.util.List;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignLocationManager;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.JumpPath;
@@ -111,6 +112,8 @@ class EducationControllerTest {
         when(currentSystem.getId()).thenReturn("CurrentSystem");
         when(campaign.getCurrentSystem()).thenReturn(currentSystem);
 
+        when(campaign.getCampaignLocationManager()).thenReturn(mock(CampaignLocationManager.class));
+
         return campaign;
     }
 
@@ -135,10 +138,11 @@ class EducationControllerTest {
             person.setEduAcademySystem("TestSystem");
             person.setEduEducationStage(EducationStage.JOURNEY_TO_CAMPUS);
             campaign = mock(Campaign.class);
+            when(campaign.getCampaignLocationManager()).thenReturn(mock(CampaignLocationManager.class));
             PlanetarySystem destSystem = mock(PlanetarySystem.class);
             when(campaign.getSystemById("TestSystem")).thenReturn(destSystem);
             when(campaign.getSimplifiedTravelTime(destSystem)).thenReturn(2);
-            when(campaign.getOrCreateCampusLocation(any(), any(), any()))
+            when(campaign.getCampaignLocationManager().getOrCreateCampusLocation(any(), any(), any(), any()))
                   .thenReturn(new AcademyCampusLocation(ACADEMY_SET, ACADEMY_NAME));
         }
 
@@ -230,9 +234,10 @@ class EducationControllerTest {
 
             destSystem = mock(PlanetarySystem.class);
             campaign = mock(Campaign.class);
+            when(campaign.getCampaignLocationManager()).thenReturn(mock(CampaignLocationManager.class));
             when(campaign.getSystemById("TestSystem")).thenReturn(destSystem);
             when(campaign.getSimplifiedTravelTime(destSystem)).thenReturn(5);
-            when(campaign.getOrCreateCampusLocation(any(), any(), any()))
+            when(campaign.getCampaignLocationManager().getOrCreateCampusLocation(any(), any(), any(), any()))
                   .thenReturn(new AcademyCampusLocation(ACADEMY_SET, ACADEMY_NAME));
 
             PlanetarySystem currentSystem = mock(PlanetarySystem.class);
@@ -315,11 +320,11 @@ class EducationControllerTest {
         @BeforeEach
         void setUp() {
             campaign = buildMinimalCampaignMock();
-            when(campaign.getOrCreateCampusLocation(any(), any(), any()))
+            when(campaign.getCampaignLocationManager().getOrCreateCampusLocation(any(), any(), any(), any()))
                   .thenReturn(new AcademyCampusLocation(ACADEMY_SET, ACADEMY_NAME));
-            when(campaign.getOrCreateLocalCampusLocation(any(), any()))
+            when(campaign.getCampaignLocationManager().getOrCreateLocalCampusLocation(any(), any(), any()))
                   .thenReturn(new AcademyCampusLocation(ACADEMY_SET, ACADEMY_NAME));
-            when(campaign.getOrCreateCampusUnderLocation(any(), any(), any()))
+            when(campaign.getCampaignLocationManager().getOrCreateCampusUnderLocation(any(), any(), any()))
                   .thenReturn(new AcademyCampusLocation(ACADEMY_SET, ACADEMY_NAME));
         }
 

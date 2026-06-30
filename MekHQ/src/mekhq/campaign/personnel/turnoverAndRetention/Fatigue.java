@@ -184,8 +184,7 @@ public class Fatigue {
      * @param person   the person whose fatigue actions are being processed.
      */
     public static void processFatigueActions(Campaign campaign, Person person) {
-        int effectiveFatigue = getEffectiveFatigue(person.getAdjustedFatigue(), person.getPermanentFatigue(),
-              person.isClanPersonnel(), person.getSkillLevel(campaign, false, true));
+        int effectiveFatigue = getEffectiveFatigue(person, campaign);
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         if (!campaignOptions.isUseFatigue()) {
@@ -288,13 +287,7 @@ public class Fatigue {
                 }
 
                 for (Person person : unit.getCrew()) {
-                    int fatigue = person.getAdjustedFatigue();
-                    int permanentFatigue = person.getPermanentFatigue();
-                    boolean isClan = person.isClanPersonnel();
-                    SkillLevel experienceLevel = person.getSkillLevel(campaign, false, true);
-                    int effectiveFatigue = getEffectiveFatigue(fatigue, permanentFatigue, isClan, experienceLevel);
-
-                    if (effectiveFatigue >= leaveThreshold) {
+                    if (getEffectiveFatigue(person, campaign) >= leaveThreshold) {
                         fatiguedUnits++;
                         break;
                     }
@@ -318,7 +311,7 @@ public class Fatigue {
     }
 
     /**
-     * Calculates the effective fatigue level for a given person based on various modifiers.
+     * Calculates the effective fatigue level based on various modifiers.
      *
      * <p>The base fatigue level is adjusted by factors such as:</p>
      * <ul>
@@ -335,7 +328,7 @@ public class Fatigue {
      *
      * @return the calculated effective fatigue value.
      */
-    public static int getEffectiveFatigue(int fatigue, int permanentFatigueLoss, boolean isClan,
+    private static int getEffectiveFatigue(int fatigue, int permanentFatigueLoss, boolean isClan,
           SkillLevel skillLevel) {
         int effectiveFatigue = fatigue + permanentFatigueLoss;
 
@@ -350,6 +343,26 @@ public class Fatigue {
         }
 
         return effectiveFatigue;
+    }
+
+    /**
+     * Calculates the effective fatigue level for a given person based on various modifiers.
+     *
+     * <p>The base fatigue level is adjusted by factors such as:</p>
+     * <ul>
+     *     <li>Whether the person is classified as Clan personnel.</li>
+     *     <li>The person's skill level, with higher-skilled personnel suffering less fatigue.</li>
+     *     <li>Whether field kitchens are operating within their required capacity.</li>
+     * </ul>
+     *
+     * @param person   the {@link Person} to get the fatigue level for
+     * @param campaign the {@link Campaign} context
+     *
+     * @return the calculated effective fatigue value.
+     */
+    public static int getEffectiveFatigue(Person person, Campaign campaign) {
+        return getEffectiveFatigue(person.getAdjustedFatigue(), person.getPermanentFatigue(),
+              person.isClanPersonnel(), person.getSkillLevel(campaign, false, true));
     }
 
     @Deprecated(since = "0.50.07", forRemoval = true)

@@ -66,6 +66,7 @@ import megamek.common.units.Entity;
 import megamek.common.units.EntityWeightClass;
 import mekhq.EventSpy;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignLocationManager;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.FixedLocation;
 import mekhq.campaign.Hangar;
@@ -1564,6 +1565,7 @@ public class PersonTest {
             @BeforeEach
             void setUp() {
                 campaign = mock(Campaign.class);
+                when(campaign.getCampaignLocationManager()).thenReturn(mock(CampaignLocationManager.class));
                 when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 1));
 
                 CampaignOptions options = mock(CampaignOptions.class);
@@ -1582,11 +1584,11 @@ public class PersonTest {
                 PlanetarySystem currentSystem = mock(PlanetarySystem.class);
                 when(currentSystem.getId()).thenReturn("CurrentSystem");
                 when(campaign.getCurrentSystem()).thenReturn(currentSystem);
-                when(campaign.getOrCreateCampusLocation(any(), any(), any()))
+                when(campaign.getCampaignLocationManager().getOrCreateCampusLocation(any(), any(), any(), any()))
                       .thenReturn(new AcademyCampusLocation(ACADEMY_SET, ACADEMY_NAME));
-                when(campaign.getOrCreateLocalCampusLocation(any(), any()))
+                when(campaign.getCampaignLocationManager().getOrCreateLocalCampusLocation(any(), any(), any()))
                       .thenReturn(new AcademyCampusLocation(ACADEMY_SET, ACADEMY_NAME));
-                when(campaign.getOrCreateCampusUnderLocation(any(), any(), any()))
+                when(campaign.getCampaignLocationManager().getOrCreateCampusUnderLocation(any(), any(), any()))
                       .thenReturn(new AcademyCampusLocation(ACADEMY_SET, ACADEMY_NAME));
             }
 
@@ -1644,6 +1646,7 @@ public class PersonTest {
             @BeforeEach
             void setUp() {
                 campaign = mock(Campaign.class);
+                when(campaign.getCampaignLocationManager()).thenReturn(mock(CampaignLocationManager.class));
                 when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 1));
 
                 CampaignOptions options = mock(CampaignOptions.class);

@@ -133,7 +133,6 @@ public class PersonnelMarketDialog extends JDialog {
         personnelMarket = campaign.getPersonnelMarket();
         personnelModel = new PersonnelTableModel(campaign);
         personnelModel.setData(personnelMarket.getPersonnel());
-        personnelModel.loadAssignmentFromMarket(personnelMarket);
         initComponents();
         filterPersonnel();
         setLocationRelativeTo(frame);
@@ -274,7 +273,10 @@ public class PersonnelMarketDialog extends JDialog {
                 continue;
             }
 
-            tableColumn.setPreferredWidth(column.getWidth());
+            Integer width = column.getPreferredWidth();
+            if (width != null) {
+                tableColumn.setPreferredWidth(width);
+            }
             tableColumn.setCellRenderer(getRenderer());
             columnModel.setColumnVisible(tableColumn, true);
 

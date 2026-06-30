@@ -187,7 +187,7 @@ public class PlayerBase extends AbstractBase {
                     CurrentLocation travelLocation = CurrentLocation.generateInstanceFromXML(wn2, campaign);
                     if (travelLocation != null) {
                         travelLocation.setParent(base);
-                        campaign.addLocation(travelLocation);
+                        campaign.getCampaignLocationManager().addLocation(travelLocation);
                     }
                 } else if (nodeName.equalsIgnoreCase("academyCampus")) {
                     AcademyCampusLocation campus = AcademyCampusLocation.generateInstanceFromXML(wn2);
@@ -203,7 +203,7 @@ public class PlayerBase extends AbstractBase {
                                 CurrentLocation travelNode = CurrentLocation.generateInstanceFromXML(campusChild, campaign);
                                 if (travelNode != null) {
                                     travelNode.setParent(campus);
-                                    campaign.addLocation(travelNode);
+                                    campaign.getCampaignLocationManager().addLocation(travelNode);
                                 }
                             }
                         }

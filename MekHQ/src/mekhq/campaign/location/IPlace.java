@@ -188,7 +188,8 @@ public interface IPlace extends ILocation {
             if (!travelNode.hasArrived()) {
                 continue;
             }
-            LocationDispatch.landFromTravelNode(travelNode, personnel, hangar, warehouse, campaign);
+            LocationDispatch.landFromTravelNode(travelNode, personnel, hangar, warehouse, campaign,
+                  campaign.getCampaignLocationManager());
         }
     }
 }

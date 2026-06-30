@@ -42,6 +42,7 @@ import megamek.common.annotations.Nullable;
 import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 import mekhq.gui.enums.FormationIconOperationalStatusStyle;
 import mekhq.gui.enums.PersonnelFilterStyle;
+import mekhq.gui.utilities.ComponentColors;
 
 public final class MHQOptions extends SuiteOptions {
     // region Display Tab
@@ -258,6 +259,11 @@ public final class MHQOptions extends SuiteOptions {
     // endregion Display Tab
 
     // region Colours
+
+    public ComponentColors getDeployedColors() {
+        return new ComponentColors(getDeployedForeground(), getDeployedBackground());
+    }
+
     public Color getDeployedForeground() {
         return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
                                .getInt(MHQConstants.DEPLOYED_FOREGROUND, Color.BLACK.getRGB()));
@@ -479,6 +485,10 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.LOAN_OVERDUE_BACKGROUND, value.getRGB());
     }
 
+    public ComponentColors getInjuredColors() {
+        return new ComponentColors(getInjuredForeground(), getInjuredBackground());
+    }
+
     public Color getInjuredForeground() {
         return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
                                .getInt(MHQConstants.INJURED_FOREGROUND, Color.BLACK.getRGB()));
@@ -495,6 +505,10 @@ public final class MHQOptions extends SuiteOptions {
 
     public void setInjuredBackground(Color value) {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.INJURED_BACKGROUND, value.getRGB());
+    }
+
+    public ComponentColors getHealedInjuriesColors() {
+        return new ComponentColors(getHealedInjuriesForeground(), getHealedInjuriesBackground());
     }
 
     public Color getHealedInjuriesForeground() {
@@ -515,6 +529,10 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.HEALED_INJURIES_BACKGROUND, value.getRGB());
     }
 
+    public ComponentColors getPregnantColors() {
+        return new ComponentColors(getPregnantForeground(), getPregnantBackground());
+    }
+
     public Color getPregnantForeground() {
         return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
                                .getInt(MHQConstants.PREGNANT_FOREGROUND, Color.BLACK.getRGB()));
@@ -531,6 +549,10 @@ public final class MHQOptions extends SuiteOptions {
 
     public void setPregnantBackground(Color value) {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.PREGNANT_BACKGROUND, value.getRGB());
+    }
+
+    public ComponentColors getGoneColors() {
+        return new ComponentColors(getGoneForeground(), getGoneBackground());
     }
 
     public Color getGoneForeground() {
@@ -551,6 +573,10 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.GONE_BACKGROUND, value.getRGB());
     }
 
+    public ComponentColors getAbsentColors() {
+        return new ComponentColors(getAbsentForeground(), getAbsentBackground());
+    }
+
     public Color getAbsentForeground() {
         return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
                                .getInt(MHQConstants.ABSENT_FOREGROUND, 0x000000));
@@ -569,6 +595,10 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.ABSENT_BACKGROUND, value.getRGB());
     }
 
+    public ComponentColors getFatiguedColors() {
+        return new ComponentColors(getFatiguedForeground(), getFatiguedBackground());
+    }
+
     public Color getFatiguedForeground() {
         return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
                                .getInt(MHQConstants.FATIGUED_FOREGROUND, 0x000000));
@@ -585,6 +615,10 @@ public final class MHQOptions extends SuiteOptions {
 
     public void setFatiguedBackground(Color value) {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.FATIGUED_BACKGROUND, value.getRGB());
+    }
+
+    public ComponentColors getAwayFromMainForceColors() {
+        return new ComponentColors(getAwayFromMainForceForeground(), getAwayFromMainForceBackground());
     }
 
     public Color getAwayFromMainForceForeground() {
