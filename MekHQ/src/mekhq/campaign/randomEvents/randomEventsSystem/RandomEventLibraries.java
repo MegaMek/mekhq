@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -41,6 +41,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import jakarta.annotation.Nullable;
 
 /**
  * A utility class that manages the loading and retrieval of random event data from YAML files. Organizes the events
@@ -57,20 +58,25 @@ public class RandomEventLibraries {
      * File extension for the YAML files.
      */
     private final String EXTENSION = ".yml";
+    private final String TEST_RESOURCE_PREFIX = "testresources" + separator;
 
     private final String PRISONER_EVENTS_MAJOR = DIRECTORY + "PrisonerMajorEventData" + EXTENSION;
     private final String PRISONER_EVENTS_MINOR = DIRECTORY + "PrisonerMinorEventData" + EXTENSION;
 
     // lists
-    private final List<PrisonerEventData> prisonerEventsMajor = new ArrayList<>();
-    private final List<PrisonerEventData> prisonerEventsMinor = new ArrayList<>();
+    private final List<RandomEventData> prisonerEventsMajor = new ArrayList<>();
+    private final List<RandomEventData> prisonerEventsMinor = new ArrayList<>();
 
     /**
      * Constructs a {@code RandomEventLibraries} object and initializes the event data by loading it from the YAML
      * files.
      */
     public RandomEventLibraries() {
-        buildPrisonerEventData();
+        buildPrisonerEventData(false);
+    }
+
+    public RandomEventLibraries(boolean isUseTestResources) {
+        buildPrisonerEventData(isUseTestResources);
     }
 
     /**
@@ -78,14 +84,36 @@ public class RandomEventLibraries {
      *
      * @param isMajor {@code true} to retrieve major prisoner events, {@code false} to retrieve minor prisoner events.
      *
-     * @return a {@link List} of {@link PrisonerEventData} corresponding to the specified event severity.
+     * @return a {@link List} of {@link RandomEventData} corresponding to the specified event severity.
      */
-    public List<PrisonerEventData> getPrisonerEvents(boolean isMajor) {
+    public List<RandomEventData> getPrisonerEvents(boolean isMajor) {
         if (isMajor) {
             return prisonerEventsMajor;
         } else {
             return prisonerEventsMinor;
         }
+    }
+
+    /**
+     * Retrieves a prisoner event of the specified type from the appropriate event library based on severity.
+     *
+     * @param eventType the type of the prisoner event to retrieve, represented as a {@link String}
+     * @param isMajor   {@code true} to search for the event in the major events library, {@code false} to search in the
+     *                  minor events library
+     *
+     * @return the {@link RandomEventData} object representing the prisoner event that matches the specified type, or
+     *       {@code null} if no matching event is found
+     */
+    public @Nullable RandomEventData getPrisonerEvent(String eventType, boolean isMajor) {
+        // Once we have more categories of events, we should replace this with a enum
+        List<RandomEventData> library = isMajor ? prisonerEventsMajor : prisonerEventsMinor;
+        for (RandomEventData event : library) {
+            if (event.randomEventType().equals(eventType)) {
+                return event;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -95,24 +123,28 @@ public class RandomEventLibraries {
      * Uses Jackson for YAML deserialization via the {@link ObjectMapper}.
      * </p>
      */
-    private void buildPrisonerEventData() {
+    private void buildPrisonerEventData(boolean isUseTestResources) {
         ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
 
         // List of file paths for major and minor events
-        List<String> eventFiles = List.of(PRISONER_EVENTS_MAJOR, PRISONER_EVENTS_MINOR);
+        List<String> eventFiles = new ArrayList<>(List.of(PRISONER_EVENTS_MAJOR, PRISONER_EVENTS_MINOR));
+
+        if (isUseTestResources) {
+            eventFiles.replaceAll(s -> TEST_RESOURCE_PREFIX + s);
+        }
 
         for (String eventFile : eventFiles) {
             try {
                 // Deserialize YAML into PrisonerEventDataWrapper
-                PrisonerEventDataWrapper wrapper = objectMapper.readValue(
+                RandomEventDataWrapper wrapper = objectMapper.readValue(
                       new File(eventFile),
-                      PrisonerEventDataWrapper.class
+                      RandomEventDataWrapper.class
                 );
 
                 // Access and sort individual events
-                List<PrisonerEventData> events = wrapper.getEvents();
+                List<RandomEventData> events = wrapper.getEvents();
 
-                for (PrisonerEventData event : events) {
+                for (RandomEventData event : events) {
                     if (eventFiles.indexOf(eventFile) == 0) {
                         prisonerEventsMajor.add(event);
                     } else {

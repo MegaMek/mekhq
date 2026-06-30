@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -30,67 +30,57 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.randomEvents.personalities.enums;
+package mekhq.campaign.randomEvents.prisoners;
 
-import static mekhq.campaign.randomEvents.personalities.Reasoning.AVERAGE;
-import static mekhq.campaign.randomEvents.personalities.Reasoning.OBTUSE;
-import static mekhq.campaign.randomEvents.personalities.Reasoning.UNDER_PERFORMING;
+import static mekhq.campaign.randomEvents.prisoners.PrisonerStatus.FREE;
+import static mekhq.campaign.randomEvents.prisoners.PrisonerStatus.PRISONER;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import mekhq.campaign.randomEvents.personalities.Reasoning;
 import org.junit.jupiter.api.Test;
 
-public class ReasoningTest {
+public class PrisonerStatusTest {
     @Test
-    public void testFromString_ValidStatus() {
-        Reasoning status = Reasoning.fromString(OBTUSE.name());
-        assertEquals(OBTUSE, status);
+    public void testParseFromString_ValidStatus() {
+        PrisonerStatus status = PrisonerStatus.parseFromString("PRISONER");
+        assertEquals(PRISONER, status);
     }
 
     @Test
-    public void testFromString_InvalidStatus() {
-        Reasoning status = Reasoning.fromString("INVALID_STATUS");
+    public void testParseFromString_InvalidStatus() {
+        PrisonerStatus status = PrisonerStatus.parseFromString("INVALID_STATUS");
 
-        assertEquals(AVERAGE, status);
+        assertEquals(FREE, status);
     }
 
     @Test
-    public void testFromString_NullStatus() {
-        Reasoning status = Reasoning.fromString(null);
+    public void testParseFromString_NullStatus() {
+        PrisonerStatus status = PrisonerStatus.parseFromString(null);
 
-        assertEquals(AVERAGE, status);
+        assertEquals(FREE, status);
     }
 
     @Test
-    public void testFromString_EmptyString() {
-        Reasoning status = Reasoning.fromString("");
+    public void testParseFromString_EmptyString() {
+        PrisonerStatus status = PrisonerStatus.parseFromString("");
 
-        assertEquals(AVERAGE, status);
-    }
-
-    @Test
-    public void testFromString_FromOrdinal() {
-        Reasoning status = Reasoning.fromString(UNDER_PERFORMING.ordinal() + "");
-
-        assertEquals(UNDER_PERFORMING, status);
+        assertEquals(FREE, status);
     }
 
     @Test
     public void testGetLabel_notInvalid() {
-        for (Reasoning status : Reasoning.values()) {
+        for (PrisonerStatus status : PrisonerStatus.values()) {
             String label = status.getLabel();
             assertTrue(isResourceKeyValid(label));
         }
     }
 
     @Test
-    public void testGetExamResultsWithSpecificScore() {
-        int testScore = 55;
-        String result = Reasoning.AVERAGE.getExamResults(testScore);
-        assertNotNull(result);
-        assertTrue(result.contains("55"));
+    public void testGetTitleExtension_notInvalid() {
+        for (PrisonerStatus status : PrisonerStatus.values()) {
+            String titleExtension = status.getTitleExtension();
+            assertTrue(isResourceKeyValid(titleExtension));
+        }
     }
 }

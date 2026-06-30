@@ -30,12 +30,11 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.randomEvents.prisoners.enums;
+package mekhq.campaign.randomEvents.prisoners;
 
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle;
 import org.junit.jupiter.api.Test;
 
 /**

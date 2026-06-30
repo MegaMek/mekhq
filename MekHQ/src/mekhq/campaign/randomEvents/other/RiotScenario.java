@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,10 +35,10 @@ package mekhq.campaign.randomEvents.other;
 import static java.io.File.separator;
 import static megamek.common.compute.Compute.d6;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.createEntityWithCrew;
-import static mekhq.campaign.randomEvents.prisoners.MobType.HUGE;
-import static mekhq.campaign.randomEvents.prisoners.MobType.LARGE;
-import static mekhq.campaign.randomEvents.prisoners.MobType.MEDIUM;
-import static mekhq.campaign.randomEvents.prisoners.MobType.SMALL;
+import static mekhq.campaign.randomEvents.prisoners.prisonerEvents.MobType.HUGE;
+import static mekhq.campaign.randomEvents.prisoners.prisonerEvents.MobType.LARGE;
+import static mekhq.campaign.randomEvents.prisoners.prisonerEvents.MobType.MEDIUM;
+import static mekhq.campaign.randomEvents.prisoners.prisonerEvents.MobType.SMALL;
 import static mekhq.campaign.stratCon.StratConContractInitializer.getUnoccupiedCoords;
 import static mekhq.campaign.stratCon.StratConRulesManager.generateExternalScenario;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;

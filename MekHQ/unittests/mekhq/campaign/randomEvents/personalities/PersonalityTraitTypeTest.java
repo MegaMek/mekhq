@@ -30,30 +30,19 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.randomEvents.randomEventsSystem;
+package mekhq.campaign.randomEvents.personalities;
 
-import static mekhq.campaign.randomEvents.randomEventsSystem.EventResultEffect.NONE;
+import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
-/**
- * Represents the result of an event response, including the effect type, the guard flag, the magnitude, and an optional
- * skill type.
- *
- * @param effect    The type of effect this result describes
- * @param isGuard   Whether this result applies to a guard
- * @param magnitude The intensity or magnitude of the effect
- * @param skillType An optional skill type associated with the effect
- */
-public record EventResult(
-      @JsonProperty(value = "effect") EventResultEffect effect,
-      @JsonProperty(value = "isGuard") boolean isGuard,
-      @JsonProperty(value = "magnitude") int magnitude,
-      @JsonProperty(value = "skillType") String skillType
-) {
-    // Additional logic to provide defaults for missing properties
-    public EventResult {
-        effect = (effect != null) ? effect : NONE;
-        skillType = (skillType != null) ? skillType : "";
+class PersonalityTraitTypeTest {
+    @ParameterizedTest
+    @EnumSource(value = PersonalityTraitType.class)
+    void testGetLabel_notInvalid(PersonalityTraitType status) {
+        String label = status.getLabel();
+        assertTrue(isResourceKeyValid(label));
     }
 }

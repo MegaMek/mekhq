@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -30,20 +30,18 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.randomEvents.personalities.enums;
+package mekhq.campaign.randomEvents.randomEventsSystem;
 
-import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.List;
 
-import mekhq.campaign.randomEvents.personalities.PersonalityTraitType;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
-
-class PersonalityTraitTypeTest {
-    @ParameterizedTest
-    @EnumSource(value = PersonalityTraitType.class)
-    void testGetLabel_notInvalid(PersonalityTraitType status) {
-        String label = status.getLabel();
-        assertTrue(isResourceKeyValid(label));
-    }
-}
+/**
+ * Represents data relevant to a random event, including its type, severity, and response map structure.
+ *
+ * @param randomEventType The type of random event as a {@link String}. This represents the name of the event.
+ * @param responseEntries A list of {@link RandomEventResponseEntry} defining the responses and their associated
+ *                        qualities and effects.
+ */
+public record RandomEventData(
+      String randomEventType,
+      List<RandomEventResponseEntry> responseEntries
+) {}

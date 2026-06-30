@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.randomEvents.personalities.enums;
+package mekhq.campaign.randomEvents.personalities;
 
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -41,47 +41,46 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import megamek.common.enums.Gender;
-import mekhq.campaign.randomEvents.personalities.Social;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
-public class SocialTest {
+public class AmbitionTest {
     @ParameterizedTest
-    @CsvSource(value = { "APATHETIC,APATHETIC", "INVALID_STATUS,NONE", "'',NONE", "'null',NONE", "1,APATHETIC" })
-    void testFromStringVariousInputs(String input, Social expected) {
+    @CsvSource(value = { "AMBITIOUS,AMBITIOUS", "INVALID_STATUS,NONE", "'',NONE", "'null',NONE", "1,AMBITIOUS" })
+    void testFromStringVariousInputs(String input, Ambition expected) {
         if ("null".equals(input)) {
             input = null;
         }
-        Social result = Social.fromString(input);
+        Ambition result = Ambition.fromString(input);
         assertEquals(expected, result);
     }
 
     @ParameterizedTest
-    @EnumSource(value = Social.class)
-    void testFromString_Ordinal_All(Social value) {
-        Social result = Social.fromString(String.valueOf(value.ordinal()));
+    @EnumSource(value = Ambition.class)
+    void testFromString_Ordinal_All(Ambition value) {
+        Ambition result = Ambition.fromString(String.valueOf(value.ordinal()));
         assertEquals(value, result);
     }
 
     @ParameterizedTest
-    @EnumSource(value = Social.class)
-    void testGetLabel_notInvalid(Social status) {
+    @EnumSource(value = Ambition.class)
+    void testGetLabel_notInvalid(Ambition status) {
         String label = status.getLabel();
         assertTrue(isResourceKeyValid(label));
     }
 
-    static Stream<Arguments> provideSocialsAndIndices() {
-        return Arrays.stream(Social.values())
-                     .flatMap(trait -> IntStream.range(0, Social.MAXIMUM_VARIATIONS)
+    static Stream<Arguments> provideAmbitionsAndIndices() {
+        return Arrays.stream(Ambition.values())
+                     .flatMap(trait -> IntStream.range(0, Ambition.MAXIMUM_VARIATIONS)
                                              .mapToObj(i -> Arguments.of(trait, i)));
     }
 
     @ParameterizedTest
-    @MethodSource(value = "provideSocialsAndIndices")
-    void testGetDescription_notInvalid(Social trait, int i) {
+    @MethodSource(value = "provideAmbitionsAndIndices")
+    void testGetDescription_notInvalid(Ambition trait, int i) {
         String description = trait.getDescription(i, Gender.MALE, "Barry");
         assertTrue(isResourceKeyValid(description));
     }
@@ -89,13 +88,13 @@ public class SocialTest {
     @ParameterizedTest
     @CsvSource(value = { "99", "1000", "-1" })
     void testGetDescription_InvalidDescriptionIndex(int invalidIndex) {
-        String description = Social.NONE.getDescription(invalidIndex, Gender.MALE, "Barry");
+        String description = Ambition.NONE.getDescription(invalidIndex, Gender.MALE, "Barry");
         assertTrue(isResourceKeyValid(description));
     }
 
     @ParameterizedTest
-    @EnumSource(value = Social.class)
-    void testGetRoninMessage_notInvalid(Social trait) {
+    @EnumSource(value = Ambition.class)
+    void testGetRoninMessage_notInvalid(Ambition trait) {
         String description = trait.getRoninMessage("Commander");
         assertTrue(isResourceKeyValid(description));
     }

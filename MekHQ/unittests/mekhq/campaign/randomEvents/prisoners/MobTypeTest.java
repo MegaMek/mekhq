@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -30,30 +30,33 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.randomEvents.randomEventsSystem;
+package mekhq.campaign.randomEvents.prisoners;
 
-import java.util.List;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import mekhq.campaign.randomEvents.prisoners.prisonerEvents.MobType;
+import org.junit.jupiter.api.Test;
 
 /**
- * A wrapper class for managing a list of {@link PrisonerEventData}. This class provides getter and setter methods to
- * access and modify the list of prisoner events.
+ * A test class for validating the behavior and properties of the {@code MobType} enumeration.
+ *
+ * <p>This class contains unit tests to ensure that the ranges defined by each {@code MobType}
+ * are consistent and correctly implemented. It checks whether the minimum value of each subsequent {@code MobType} is
+ * one greater than the maximum value of the previous {@code MobType}.</p>
+ *
+ * <p>These tests aim to validate that the {@code MobType} enumerations are properly sequential and
+ * follow the expected logical configuration.</p>
  */
-public class PrisonerEventDataWrapper {
-    private List<PrisonerEventData> events;
+class MobTypeTest {
+    @Test
+    void testToStringSmall() {
+        int maximum = 0;
+        for (MobType mobType : MobType.values()) {
+            int minimum = mobType.getMinimum();
 
-    /**
-     * @return a {@link List} of {@link PrisonerEventData} objects representing the prisoner events.
-     */
-    public List<PrisonerEventData> getEvents() {
-        return events;
-    }
+            assertEquals(maximum + 1, minimum);
 
-    /**
-     * Sets the list of {@link PrisonerEventData} for this wrapper.
-     *
-     * @param events a {@link List} of {@link PrisonerEventData} objects to be associated with this wrapper.
-     */
-    public void setEvents(List<PrisonerEventData> events) {
-        this.events = events;
+            maximum = mobType.getMaximum();
+        }
     }
 }

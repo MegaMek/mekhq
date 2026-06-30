@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,16 +32,30 @@
  */
 package mekhq.campaign.randomEvents.randomEventsSystem;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
- * Represents data relevant to a random prisoner event, including its type, severity, and response map structure.
+ * Represents the result of an event response, including the effect type, the guard flag, the magnitude, and an optional
+ * skill type.
  *
- * @param prisonerEvent   The type of prisoner event as a {@link PrisonerEvent}. This represents the name of the event.
- * @param responseEntries A list of {@link PrisonerResponseEntry} defining the responses and their associated qualities
- *                        and effects.
+ * @param effect                 The type of effect this result describes
+ * @param affectedPersonnelTypes Whether this result applies to a guard
+ * @param magnitude              The intensity or magnitude of the effect
+ * @param affectedSkill          An optional skill type associated with the effect
  */
-public record PrisonerEventData(
-      PrisonerEvent prisonerEvent,
-      List<PrisonerResponseEntry> responseEntries
-) {}
+public record RandomEventResult(
+      @JsonProperty(value = "effect") RandomEventResultEffect effect,
+      @JsonProperty(value = "affectedPersonnelTypes") List<RandomEventEffectedPersonnelType> affectedPersonnelTypes,
+      @JsonProperty(value = "magnitude") int magnitude,
+      @JsonProperty(value = "affectedSkill") String affectedSkill
+) {
+    // Additional logic to provide defaults for missing properties
+    public RandomEventResult {
+        effect = (effect != null) ? effect : RandomEventResultEffect.NONE;
+        affectedPersonnelTypes = (affectedPersonnelTypes != null) ? affectedPersonnelTypes : new ArrayList<>();
+        affectedSkill = (affectedSkill != null) ? affectedSkill : "";
+    }
+}

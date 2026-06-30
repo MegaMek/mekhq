@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,35 +32,28 @@
  */
 package mekhq.campaign.randomEvents.randomEventsSystem;
 
+import java.util.List;
+
 /**
- * Represents the quality of a response in prisoner-related random events.
- *
- * <p>This enumeration defines three levels of response quality, which influence how various
- * prisoner events and interactions are processed in the campaign. It is used to categorize reactions or results in
- * situations involving prisoners.</p>
+ * A wrapper class for managing a list of {@link RandomEventData}. This class provides getter and setter methods to
+ * access and modify the list of prisoner events.
  */
-public enum ResponseQuality {
-    /**
-     * Represents a neutral response quality.
-     *
-     * <p>Indicates that the response neither has a positive nor a negative influence, but
-     * reflects a balanced or indifferent outcome from the associated prisoner interaction.</p>
-     */
-    RESPONSE_NEUTRAL,
+public class RandomEventDataWrapper {
+    private List<RandomEventData> events;
 
     /**
-     * Represents a positive response quality.
-     *
-     * <p>Indicates a favorable interaction or result, often leading to improved outcomes
-     * during prisoner-related events, such as successful negotiations or rescues.</p>
+     * @return a {@link List} of {@link RandomEventData} objects representing the prisoner events.
      */
-    RESPONSE_POSITIVE,
+    public List<RandomEventData> getEvents() {
+        return events;
+    }
 
     /**
-     * Represents a negative response quality.
+     * Sets the list of {@link RandomEventData} for this wrapper.
      *
-     * <p>Indicates an unfavorable interaction or result, often leading to deteriorated
-     * outcomes during prisoner-related events, such as failed negotiations or missed rescues.</p>
+     * @param events a {@link List} of {@link RandomEventData} objects to be associated with this wrapper.
      */
-    RESPONSE_NEGATIVE
+    public void setEvents(List<RandomEventData> events) {
+        this.events = events;
+    }
 }
