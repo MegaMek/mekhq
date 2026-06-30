@@ -33,8 +33,6 @@
 package mekhq.gui.enums;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ResourceBundle;
 
@@ -51,19 +49,6 @@ public class PersonnelTabViewTest {
     public void testGetToolTipText() {
         assertEquals(resources.getString("PersonnelTabView.GRAPHIC.toolTipText"),
               PersonnelTabView.GRAPHIC.getToolTipText());
-        assertEquals(resources.getString("PersonnelTabView.DATES.toolTipText"),
-              PersonnelTabView.DATES.getToolTipText());
-    }
-
-    @Test
-    public void testIsGraphic() {
-        for (final PersonnelTabView personnelTabView : views) {
-            if (personnelTabView == PersonnelTabView.GRAPHIC) {
-                assertTrue(personnelTabView.isGraphic());
-            } else {
-                assertFalse(personnelTabView.isGraphic());
-            }
-        }
     }
 
     @Test

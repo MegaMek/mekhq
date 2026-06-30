@@ -1137,15 +1137,15 @@ public class CampaignTest {
 
                 campaign.setLocation(newLocation);
 
-                assertEquals(1, campaign.getLocations().size());
-                assertSame(newLocation, campaign.getLocations().get(0));
+                assertEquals(1, campaign.getCampaignLocationManager().getLocations().size());
+                assertSame(newLocation, campaign.getCampaignLocationManager().getLocations().get(0));
             }
 
             @Test
             void setLocation_null_clearsLocations() {
                 campaign.setLocation(null);
 
-                assertTrue(campaign.getLocations().isEmpty());
+                assertTrue(campaign.getCampaignLocationManager().getLocations().isEmpty());
             }
 
             @Test
@@ -1178,7 +1178,7 @@ public class CampaignTest {
                 CurrentLocation newLocation = new CurrentLocation(newSystem, 0.0);
                 campaign.setLocation(newLocation);
 
-                assertTrue(campaign.getLocations().contains(old));
+                assertTrue(campaign.getCampaignLocationManager().getLocations().contains(old));
             }
         }
 
@@ -1188,13 +1188,13 @@ public class CampaignTest {
 
             @Test
             void addLocation_appendsToExistingList() {
-                int sizeBefore = campaign.getLocations().size();
+                int sizeBefore = campaign.getCampaignLocationManager().getLocations().size();
                 PlanetarySystem system = mock(PlanetarySystem.class);
                 CurrentLocation extra = new CurrentLocation(system, 0.0);
 
-                campaign.addLocation(extra);
+                campaign.getCampaignLocationManager().addLocation(extra);
 
-                assertEquals(sizeBefore + 1, campaign.getLocations().size());
+                assertEquals(sizeBefore + 1, campaign.getCampaignLocationManager().getLocations().size());
             }
 
             @Test
@@ -1202,28 +1202,28 @@ public class CampaignTest {
                 PlanetarySystem system = mock(PlanetarySystem.class);
                 CurrentLocation extra = new CurrentLocation(system, 0.0);
 
-                campaign.addLocation(extra);
+                campaign.getCampaignLocationManager().addLocation(extra);
 
-                assertTrue(campaign.getLocations().contains(extra));
+                assertTrue(campaign.getCampaignLocationManager().getLocations().contains(extra));
             }
 
             @Test
             void addLocation_null_doesNotChangeList() {
-                int sizeBefore = campaign.getLocations().size();
+                int sizeBefore = campaign.getCampaignLocationManager().getLocations().size();
 
-                campaign.addLocation(null);
+                campaign.getCampaignLocationManager().addLocation(null);
 
-                assertEquals(sizeBefore, campaign.getLocations().size());
+                assertEquals(sizeBefore, campaign.getCampaignLocationManager().getLocations().size());
             }
 
             @Test
             void addLocation_doesNotClearPrimaryLocation() {
-                AbstractLocation primary = campaign.getLocations().get(0);
+                AbstractLocation primary = campaign.getCampaignLocationManager().getLocations().get(0);
                 PlanetarySystem system = mock(PlanetarySystem.class);
 
-                campaign.addLocation(new CurrentLocation(system, 0.0));
+                campaign.getCampaignLocationManager().addLocation(new CurrentLocation(system, 0.0));
 
-                assertSame(primary, campaign.getLocations().get(0));
+                assertSame(primary, campaign.getCampaignLocationManager().getLocations().get(0));
             }
         }
 
@@ -1237,22 +1237,22 @@ public class CampaignTest {
                 CurrentLocation extra = new CurrentLocation(system, 0.0);
 
                 assertThrows(UnsupportedOperationException.class,
-                      () -> campaign.getLocations().add(extra));
+                      () -> campaign.getCampaignLocationManager().getLocations().add(extra));
             }
 
             @Test
             void getLocations_initiallyContainsOneLocation() {
-                assertEquals(1, campaign.getLocations().size());
+                assertEquals(1, campaign.getCampaignLocationManager().getLocations().size());
             }
 
             @Test
             void getLocations_multipleCallsReflectCurrentState() {
-                int before = campaign.getLocations().size();
+                int before = campaign.getCampaignLocationManager().getLocations().size();
 
                 PlanetarySystem system = mock(PlanetarySystem.class);
-                campaign.addLocation(new CurrentLocation(system, 0.0));
+                campaign.getCampaignLocationManager().addLocation(new CurrentLocation(system, 0.0));
 
-                assertEquals(before + 1, campaign.getLocations().size());
+                assertEquals(before + 1, campaign.getCampaignLocationManager().getLocations().size());
             }
         }
     }

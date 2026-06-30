@@ -76,6 +76,20 @@ public class SkillPrerequisite {
     private static final MMLogger logger = MMLogger.create(SkillPrerequisite.class);
     private final Hashtable<String, Integer> skillSet = new Hashtable<>();
 
+    /**
+     * Opening delimiter wrapping an OR-group in {@link #toString()}.
+     *
+     * <p>{@code toString()} renders a prerequisite as {@code DISPLAY_GROUP_OPEN}, the skill entries joined by
+     * {@link #DISPLAY_OR_SEPARATOR}, then {@link #DISPLAY_GROUP_CLOSE}. The campaign options abilities UI parses this
+     * format back apart in {@code AbilitiesPages.formatSkillPrerequisite}; if you change any of these tokens (or the
+     * {@code toString()} layout), update that parser to match.</p>
+     */
+    public static final String DISPLAY_GROUP_OPEN = "{";
+    /** Closing delimiter for an OR-group in {@link #toString()}; see {@link #DISPLAY_GROUP_OPEN}. */
+    public static final String DISPLAY_GROUP_CLOSE = "}";
+    /** Separator placed between OR-group entries in {@link #toString()}; see {@link #DISPLAY_GROUP_OPEN}. */
+    public static final String DISPLAY_OR_SEPARATOR = "<br>OR ";
+
     public SkillPrerequisite() {
     }
 
@@ -189,10 +203,10 @@ public class SkillPrerequisite {
                 toReturn.append(skillLvl).append(SkillType.getType(key).getName());
             }
             if (enumKeys.hasMoreElements()) {
-                toReturn.append("<br>OR ");
+                toReturn.append(DISPLAY_OR_SEPARATOR);
             }
         }
-        return '{' + toReturn.toString() + '}';
+        return DISPLAY_GROUP_OPEN + toReturn.toString() + DISPLAY_GROUP_CLOSE;
     }
 
     public void writeToXML(final PrintWriter pw, int indent) {

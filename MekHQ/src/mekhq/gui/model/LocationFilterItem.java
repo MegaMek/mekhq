@@ -109,7 +109,7 @@ public final class LocationFilterItem {
     public List<Unit> selectUnits(Campaign campaign) {
         if (isAll()) {
             List<Unit> units = new ArrayList<>(campaign.getHangar().getUnits());
-            for (PlayerBase playerBase : campaign.getPlayerBases()) {
+            for (PlayerBase playerBase : campaign.getCampaignLocationManager().getPlayerBases()) {
                 units.addAll(playerBase.getBaseHangar().getUnits());
             }
             return units;
@@ -141,7 +141,7 @@ public final class LocationFilterItem {
     public List<Part> selectSpareParts(Campaign campaign) {
         if (isAll()) {
             List<Part> parts = new ArrayList<>(campaign.getWarehouse().getSpareParts());
-            for (PlayerBase playerBase : campaign.getPlayerBases()) {
+            for (PlayerBase playerBase : campaign.getCampaignLocationManager().getPlayerBases()) {
                 parts.addAll(playerBase.getBaseWarehouse().getSpareParts());
             }
             return parts;
