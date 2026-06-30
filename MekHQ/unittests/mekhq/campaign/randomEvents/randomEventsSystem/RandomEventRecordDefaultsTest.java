@@ -75,24 +75,38 @@ class RandomEventRecordDefaultsTest {
 
     @Test
     void responseEntryNullQualityDefaultsToNeutral() {
-        RandomEventResponseEntry entry = new RandomEventResponseEntry(null, "", null, null, null);
+        RandomEventResponseEntry entry = new RandomEventResponseEntry(null, "", 0, "", null, null, null);
 
         assertSame(RESPONSE_NEUTRAL, entry.quality(), "A null response quality must default to RESPONSE_NEUTRAL.");
     }
 
     @Test
     void responseEntryNullAbilityCheckDefaultsToNoAttribute() {
-        RandomEventResponseEntry entry = new RandomEventResponseEntry(RESPONSE_NEUTRAL, "", null, null, null);
+        RandomEventResponseEntry entry = new RandomEventResponseEntry(RESPONSE_NEUTRAL, "", 0, "", null, null, null);
 
         assertSame(NO_ATTRIBUTE, entry.abilityCheckType(), "A null abilityCheckType must default to NO_ATTRIBUTE.");
     }
 
     @Test
     void responseEntryNullEffectListsDefaultToEmpty() {
-        RandomEventResponseEntry entry = new RandomEventResponseEntry(RESPONSE_NEUTRAL, "", NO_ATTRIBUTE, null, null);
+        RandomEventResponseEntry entry = new RandomEventResponseEntry(RESPONSE_NEUTRAL,
+              "",
+              0,
+              "",
+              NO_ATTRIBUTE,
+              null,
+              null);
 
         assertTrue(entry.effectsSuccess().isEmpty(), "A null success-effects list must default to empty.");
         assertTrue(entry.effectsFailure().isEmpty(), "A null failure-effects list must default to empty.");
+    }
+
+    @Test
+    void responseEntryNullFollowOnEventDefaultToEmpty() {
+        RandomEventResponseEntry entry = new RandomEventResponseEntry(RESPONSE_NEUTRAL, null, 0, "", NO_ATTRIBUTE, null,
+              null);
+
+        assertTrue(entry.followOnEvent().isEmpty(), "A null follow on entry must default to empty.");
     }
 
     @Test
