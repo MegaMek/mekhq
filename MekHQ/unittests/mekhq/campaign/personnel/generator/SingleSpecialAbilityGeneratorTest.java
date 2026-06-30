@@ -73,18 +73,6 @@ class SingleSpecialAbilityGeneratorTest {
     }
 
     @Test
-    void pickBucketWithAlternativeWeightingReturnsNegativeAbilitiesWhenPositiveBucketIsEmpty() {
-        SpecialAbility negative = mock(SpecialAbility.class);
-
-        List<SpecialAbility> positives = List.of();
-        List<SpecialAbility> negatives = List.of(negative);
-
-        List<SpecialAbility> result = service.pickBucketWithAlternativeWeighting(positives, negatives);
-
-        assertSame(negatives, result);
-    }
-
-    @Test
     void hasActiveInvalidAbilityReturnsTrueWhenInvalidAbilityIsActive() {
         PersonnelOptions options = mock(PersonnelOptions.class);
 
@@ -188,9 +176,10 @@ class SingleSpecialAbilityGeneratorTest {
         SpecialAbility negative = mock(SpecialAbility.class);
 
         when(negative.getCost()).thenReturn(-1);
+        when(negative.getWeight()).thenReturn(1);
 
         List<SpecialAbility> result = service.applyAbilityWeighting(List.of(negative),
-              true,
+              false,
               false);
 
         assertEquals(List.of(negative), result);

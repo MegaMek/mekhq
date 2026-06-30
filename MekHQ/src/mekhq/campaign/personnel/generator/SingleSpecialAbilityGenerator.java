@@ -283,11 +283,7 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
             combined.addAll(negativeAbilities);
             result = SpecialAbility.getWeightedSpecialAbilities(combined);
         }
-
-        if (noNegativeAbilities) {
-            result.removeIf(ability -> ability.getCost() < 0);
-        }
-
+        
         return result;
     }
 
