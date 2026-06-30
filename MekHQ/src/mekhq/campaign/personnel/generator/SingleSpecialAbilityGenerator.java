@@ -354,14 +354,10 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
      *
      * @return the chosen bucket (can be empty if both inputs are empty)
      */
-    List<SpecialAbility> pickBucketWithAlternativeWeighting(
-          List<SpecialAbility> positiveAbilities, List<SpecialAbility> negativeAbilities) {
-
+    List<SpecialAbility> pickBucketWithAlternativeWeighting(List<SpecialAbility> positiveAbilities,
+          List<SpecialAbility> negativeAbilities) {
         if (negativeAbilities.isEmpty()) {
             return positiveAbilities;
-        }
-        if (positiveAbilities.isEmpty()) {
-            return negativeAbilities;
         }
 
         final boolean pickNegative = (Compute.randomInt(40) == 0);
