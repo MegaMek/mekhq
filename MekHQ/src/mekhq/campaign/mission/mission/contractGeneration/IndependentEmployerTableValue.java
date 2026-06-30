@@ -35,7 +35,6 @@ package mekhq.campaign.mission.mission.contractGeneration;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import megamek.logging.MMLogger;
-import mekhq.campaign.randomEvents.personalities.Aggression;
 import org.jspecify.annotations.NonNull;
 
 public enum IndependentEmployerTableValue {
@@ -117,8 +116,7 @@ public enum IndependentEmployerTableValue {
             return IndependentEmployerTableValue.values()[Integer.parseInt(text)];
         } catch (Exception ignored) {}
 
-        MMLogger logger = MMLogger.create(Aggression.class);
-        logger.error("Unknown IndependentEmployerTableValue ordinal: {} - returning {}.",
+        LOGGER.error("Unknown IndependentEmployerTableValue ordinal: {} - returning {}.",
               text,
               PLANETARY_GOVERNMENT.lookupName);
 

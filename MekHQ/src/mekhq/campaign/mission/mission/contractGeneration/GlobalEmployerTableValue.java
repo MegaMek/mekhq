@@ -36,7 +36,6 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import jakarta.annotation.Nullable;
 import megamek.logging.MMLogger;
-import mekhq.campaign.randomEvents.personalities.Aggression;
 import org.jspecify.annotations.NonNull;
 
 public enum GlobalEmployerTableValue {
@@ -125,8 +124,7 @@ public enum GlobalEmployerTableValue {
             return GlobalEmployerTableValue.values()[Integer.parseInt(text)];
         } catch (Exception ignored) {}
 
-        MMLogger logger = MMLogger.create(Aggression.class);
-        logger.error("Unknown GlobalEmployerTableValue ordinal: {} - returning {}.", text, MAJOR_POWER.lookupName);
+        LOGGER.error("Unknown GlobalEmployerTableValue ordinal: {} - returning {}.", text, MAJOR_POWER.lookupName);
 
         return MAJOR_POWER;
     }
