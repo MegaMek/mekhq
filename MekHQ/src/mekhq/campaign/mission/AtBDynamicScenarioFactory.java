@@ -1874,7 +1874,9 @@ public class AtBDynamicScenarioFactory {
             }
 
             if (allowedTemplate.isEmpty()) {
-                LOGGER.warn("No allowed terrain types found for scenario template '{}'; skipping terrain assignment.",
+                // This should never happen. If it does, it means that both allowedTemplate and allowedTerrainTypes
+                // were empty, which likely points to a malformed scenario template.
+                LOGGER.error("No allowed terrain types found for scenario template '{}'; skipping terrain assignment.",
                       scenario.getTemplate().name);
                 return;
             }
