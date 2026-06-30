@@ -768,7 +768,7 @@ public enum PersonnelRole {
             case HOLO_STAR -> List.of(SkillType.S_ACTING, SkillType.S_INTEREST_HOLO_CINEMA);
             case INDUSTRIAL_MEK_PILOT -> List.of(SkillType.S_PILOT_MEK, SkillType.S_TECH_MEK);
             case INFORMATION_BROKER -> List.of(SkillType.S_STREETWISE, SkillType.S_INVESTIGATION);
-            case MILITARY_LIAISON -> List.of(SkillType.S_INVESTIGATION, SkillType.S_COMMUNICATIONS);
+            case MILITARY_LIAISON -> List.of(SkillType.S_NEGOTIATION, SkillType.S_COMMUNICATIONS);
             case JANITOR -> List.of(SkillType.S_ASTECH, SkillType.S_CAREER_ANY);
             case JUMPSHIP_CHEF -> List.of(SkillType.S_ART_COOKING, SkillType.S_ZERO_G_OPERATIONS);
             case EXOSKELETON_LABORER -> List.of(SkillType.S_ASTECH, SkillType.S_TECH_BA);
