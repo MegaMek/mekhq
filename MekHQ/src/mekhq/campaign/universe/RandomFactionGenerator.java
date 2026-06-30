@@ -64,8 +64,8 @@ import mekhq.campaign.universe.factionHints.FactionHints;
  *       <p>
  *       Uses Factions and Planets to weighted lists of potential employers and enemies for contract generation. Also
  *       finds a suitable planet for the action.
- *                                                                                                 TODO : Account for the de facto alliance of the invading Clans and the
- *                                                                                                 TODO : Fortress Republic in a way that doesn't involve hard-coding them here.
+ *                                                                                                       TODO : Account for the de facto alliance of the invading Clans and the
+ *                                                                                                       TODO : Fortress Republic in a way that doesn't involve hard-coding them here.
  */
 public class RandomFactionGenerator {
     private static final MMLogger LOGGER = MMLogger.create(RandomFactionGenerator.class);
@@ -180,7 +180,7 @@ public class RandomFactionGenerator {
      *
      * @return Map used to select employer
      */
-    protected WeightedIntMap<Faction> buildEmployerMap(GlobalEmployerTableValue employerType) {
+    protected WeightedIntMap<Faction> buildEmployerMap(@Nullable GlobalEmployerTableValue employerType) {
         LocalDate currentDate = getCurrentDate();
         int currentYear = currentDate.getYear();
 
@@ -223,7 +223,7 @@ public class RandomFactionGenerator {
     }
 
     private static boolean checkForEarlyExit(@Nullable Faction faction, LocalDate currentDate, int currentYear,
-          GlobalEmployerTableValue employerType) {
+          @Nullable GlobalEmployerTableValue employerType) {
         if (faction == null) {
             return true;
         }
@@ -259,7 +259,11 @@ public class RandomFactionGenerator {
         return isDuringFortressRepublic(factionShortName, currentDate);
     }
 
-    private static boolean applyFactionFilter(Faction faction, GlobalEmployerTableValue employerType) {
+    private static boolean applyFactionFilter(Faction faction, @Nullable GlobalEmployerTableValue employerType) {
+        if (employerType == null) {
+            return false;
+        }
+
         boolean include = switch (employerType) {
             case INDEPENDENT -> !faction.isMinorPower() && !faction.isMajorOrSuperPower();
             case MINOR_POWER -> faction.isMinorPower();
@@ -294,7 +298,7 @@ public class RandomFactionGenerator {
      *
      * @return A Faction to use as the employer for a contract.
      */
-    public @Nullable Faction getEmployerFaction(GlobalEmployerTableValue employerType) {
+    public @Nullable Faction getEmployerFaction(@Nullable GlobalEmployerTableValue employerType) {
         return buildEmployerMap(employerType).randomItem();
     }
 
