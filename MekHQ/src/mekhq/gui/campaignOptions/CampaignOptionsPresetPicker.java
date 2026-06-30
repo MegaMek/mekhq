@@ -354,6 +354,9 @@ public class CampaignOptionsPresetPicker extends JDialog {
 
         txtDescription.setText(String.format("<body><div style='width:%spx;'><center>%s</center></div></body>",
               DIALOG_WIDTH, description));
+
+        // Reset the scroll position to the top so a newly selected description always starts at its beginning.
+        txtDescription.setCaretPosition(0);
     }
 
     /**
