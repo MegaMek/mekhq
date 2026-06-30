@@ -79,7 +79,9 @@ class MedicalPage {
     private JCheckBox chkUseRandomHitsForVehicles;
     private JCheckBox chkUseTougherHealing;
     private JCheckBox chkUseAlternativeAdvancedMedical;
-    private JCheckBox chkUseKinderAlternativeAdvancedMedical;
+    private JCheckBox chkUseAlternativeAdvancedMedicalFewerPermanentInjuries;
+    private JLabel lblAlternativeAdvancedMedicalHealingTimeMultiplier;
+    private JSpinner spnAlternativeAdvancedMedicalHealingTimeMultiplier;
     private JCheckBox chkUseRandomDiseases;
     private JLabel lblMaximumPatients;
     private JSpinner spnMaximumPatients;
@@ -98,15 +100,16 @@ class MedicalPage {
      *
      * @return a {@link JPanel} representing the Medical Page
      */
-    @Nonnull JPanel createPanel(@Nullable PersonnelOptionsModel model) {
+    @Nonnull
+    JPanel createPanel(@Nullable PersonnelOptionsModel model) {
         // Header
         String imageAddress = getImageDirectory() + "logo_duchy_of_tamarind_abbey.png";
         medicalHeader = new CampaignOptionsHeaderPanel("MedicalPage", imageAddress);
 
         // Contents
         chkUseAdvancedMedical = new CampaignOptionsCheckBox("UseAdvancedMedical",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM,
-                        CampaignOptionFlag.DOCUMENTED));
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM,
+                    CampaignOptionFlag.DOCUMENTED));
         chkUseAdvancedMedical.addMouseListener(createTipPanelUpdater("UseAdvancedMedical"));
 
         lblHealWaitingPeriod = new CampaignOptionsLabel("HealWaitingPeriod");
@@ -116,10 +119,10 @@ class MedicalPage {
 
         lblNaturalHealWaitingPeriod = new CampaignOptionsLabel("NaturalHealWaitingPeriod");
         lblNaturalHealWaitingPeriod
-                .addMouseListener(createTipPanelUpdater("NaturalHealWaitingPeriod"));
+              .addMouseListener(createTipPanelUpdater("NaturalHealWaitingPeriod"));
         spnNaturalHealWaitingPeriod = new CampaignOptionsSpinner("NaturalHealWaitingPeriod", 1, 1, 365, 1);
         spnNaturalHealWaitingPeriod
-                .addMouseListener(createTipPanelUpdater("NaturalHealWaitingPeriod"));
+              .addMouseListener(createTipPanelUpdater("NaturalHealWaitingPeriod"));
 
         lblMinimumHitsForVehicles = new CampaignOptionsLabel("MinimumHitsForVehicles");
         lblMinimumHitsForVehicles.addMouseListener(createTipPanelUpdater("MinimumHitsForVehicles"));
@@ -128,25 +131,40 @@ class MedicalPage {
 
         chkUseRandomHitsForVehicles = new CampaignOptionsCheckBox("UseRandomHitsForVehicles");
         chkUseRandomHitsForVehicles
-                .addMouseListener(createTipPanelUpdater("UseRandomHitsForVehicles"));
+              .addMouseListener(createTipPanelUpdater("UseRandomHitsForVehicles"));
 
         chkUseTougherHealing = new CampaignOptionsCheckBox("UseTougherHealing",
-                getMetadata(null, CampaignOptionFlag.CUSTOM_SYSTEM));
+              getMetadata(null, CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseTougherHealing.addMouseListener(createTipPanelUpdater("UseTougherHealing"));
 
         chkUseAlternativeAdvancedMedical = new CampaignOptionsCheckBox("UseAlternativeAdvancedMedical",
-                getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM,
-                        CampaignOptionFlag.IMPORTANT));
+              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM,
+                    CampaignOptionFlag.IMPORTANT));
         chkUseAlternativeAdvancedMedical.addMouseListener(createTipPanelUpdater("UseAlternativeAdvancedMedical"));
 
-        chkUseKinderAlternativeAdvancedMedical = new CampaignOptionsCheckBox("UseKinderAlternativeAdvancedMedical",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM,
-                        CampaignOptionFlag.IMPORTANT));
-        chkUseKinderAlternativeAdvancedMedical.addMouseListener(createTipPanelUpdater("UseKinderAlternativeAdvancedMedical"));
+        chkUseAlternativeAdvancedMedicalFewerPermanentInjuries = new CampaignOptionsCheckBox(
+              "UseAlternativeAdvancedMedicalFewerPermanentInjuries",
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM,
+                    CampaignOptionFlag.IMPORTANT));
+        chkUseAlternativeAdvancedMedicalFewerPermanentInjuries.addMouseListener(createTipPanelUpdater(
+              "UseAlternativeAdvancedMedicalFewerPermanentInjuries"));
+
+        lblAlternativeAdvancedMedicalHealingTimeMultiplier = new CampaignOptionsLabel(
+              "AlternativeAdvancedMedicalHealingTimeMultiplier");
+        lblAlternativeAdvancedMedicalHealingTimeMultiplier.addMouseListener(createTipPanelUpdater(
+              "AlternativeAdvancedMedicalHealingTimeMultiplier"));
+        spnAlternativeAdvancedMedicalHealingTimeMultiplier = new CampaignOptionsSpinner(
+              "AlternativeAdvancedMedicalHealingTimeMultiplier",
+              1.0,
+              0.01,
+              10,
+              0.01);
+        spnAlternativeAdvancedMedicalHealingTimeMultiplier.addMouseListener(createTipPanelUpdater(
+              "AlternativeAdvancedMedicalHealingTimeMultiplier"));
 
         chkUseRandomDiseases = new CampaignOptionsCheckBox("UseRandomDiseases",
-                getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM,
-                        CampaignOptionFlag.IMPORTANT));
+              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM,
+                    CampaignOptionFlag.IMPORTANT));
         chkUseRandomDiseases.addMouseListener(createTipPanelUpdater("UseRandomDiseases"));
 
         lblMaximumPatients = new CampaignOptionsLabel("MaximumPatients");
@@ -155,62 +173,66 @@ class MedicalPage {
         spnMaximumPatients.addMouseListener(createTipPanelUpdater("MaximumPatients"));
 
         chkDoctorsUseAdministration = new CampaignOptionsCheckBox("DoctorsUseAdministration",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         chkDoctorsUseAdministration
-                .addMouseListener(createTipPanelUpdater("DoctorsUseAdministration"));
+              .addMouseListener(createTipPanelUpdater("DoctorsUseAdministration"));
 
         chkUseUsefulMedics = new CampaignOptionsCheckBox("UseUsefulMedics",
-                getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseUsefulMedics.addMouseListener(createTipPanelUpdater("UseUsefulMedics"));
 
         chkUseMASHTheatres = new CampaignOptionsCheckBox("UseMASHTheatres",
-                getMetadata(MILESTONE_BEFORE_METADATA));
+              getMetadata(MILESTONE_BEFORE_METADATA));
         chkUseMASHTheatres.addMouseListener(createTipPanelUpdater("UseMASHTheatres"));
 
         lblMASHTheatreCapacity = new CampaignOptionsLabel("MASHTheatreCapacity",
-                getMetadata(MILESTONE_BEFORE_METADATA));
+              getMetadata(MILESTONE_BEFORE_METADATA));
         lblMASHTheatreCapacity.addMouseListener(createTipPanelUpdater("MASHTheatreCapacity"));
         spnMASHTheatreCapacity = new CampaignOptionsSpinner("MASHTheatreCapacity", 25, 1, 100, 1);
         spnMASHTheatreCapacity.addMouseListener(createTipPanelUpdater("MASHTheatreCapacity"));
 
         // Layout the Panels
         final CampaignOptionsFormPanel medicalCapacityPanel = new CampaignOptionsFormPanel("MedicalCapacityPanel",
-                LABEL_COLUMN_WIDTH,
-                CONTROL_COLUMN_WIDTH);
+              LABEL_COLUMN_WIDTH,
+              CONTROL_COLUMN_WIDTH);
         medicalCapacityPanel.addRow(lblMaximumPatients, spnMaximumPatients);
         medicalCapacityPanel.addCheckBoxGrid(2,
-                chkDoctorsUseAdministration,
-                chkUseUsefulMedics,
-                chkUseMASHTheatres);
+              chkDoctorsUseAdministration,
+              chkUseUsefulMedics,
+              chkUseMASHTheatres);
         medicalCapacityPanel.addRow(lblMASHTheatreCapacity, spnMASHTheatreCapacity);
 
         final CampaignOptionsFormPanel healingChecksPanel = new CampaignOptionsFormPanel("HealingChecksPanel",
-                LABEL_COLUMN_WIDTH,
-                CONTROL_COLUMN_WIDTH);
+              LABEL_COLUMN_WIDTH,
+              CONTROL_COLUMN_WIDTH);
         healingChecksPanel.addRow(lblHealWaitingPeriod, spnHealWaitingPeriod);
         healingChecksPanel.addRow(lblNaturalHealWaitingPeriod, spnNaturalHealWaitingPeriod);
         healingChecksPanel.addCheckBox(chkUseRandomHitsForVehicles);
         healingChecksPanel.addRow(lblMinimumHitsForVehicles, spnMinimumHitsForVehicles);
 
         final CampaignOptionsFormPanel advancedMedicalRulesPanel = new CampaignOptionsFormPanel(
-                "AdvancedMedicalRulesPanel",
-                LABEL_COLUMN_WIDTH,
-                CONTROL_COLUMN_WIDTH);
+              "AdvancedMedicalRulesPanel",
+              LABEL_COLUMN_WIDTH,
+              CONTROL_COLUMN_WIDTH);
         advancedMedicalRulesPanel.addCheckBoxGrid(2,
-                chkUseAdvancedMedical,
-                chkUseTougherHealing,
-                chkUseAlternativeAdvancedMedical,
-                chkUseKinderAlternativeAdvancedMedical,
-                chkUseRandomDiseases);
+              chkUseAdvancedMedical,
+              chkUseTougherHealing,
+              chkUseAlternativeAdvancedMedical,
+              chkUseAlternativeAdvancedMedicalFewerPermanentInjuries,
+              chkUseRandomDiseases);
+        advancedMedicalRulesPanel.addRow(lblAlternativeAdvancedMedicalHealingTimeMultiplier,
+              spnAlternativeAdvancedMedicalHealingTimeMultiplier);
         JPanel panel = CampaignOptionsPagePanel.builder("MedicalPage", "MedicalPage", imageAddress)
-                .header(medicalHeader)
-                .quote("medicalPage")
-                .section("lblMedicalCapacityPanel.text", "lblMedicalCapacityPanel.summary", medicalCapacityPanel)
-                .section("lblHealingChecksPanel.text", "lblHealingChecksPanel.summary", healingChecksPanel)
-                .section("lblAdvancedMedicalRulesPanel.text",
-                        "lblAdvancedMedicalRulesPanel.summary",
-                        advancedMedicalRulesPanel)
-                .build();
+                             .header(medicalHeader)
+                             .quote("medicalPage")
+                             .section("lblMedicalCapacityPanel.text",
+                                   "lblMedicalCapacityPanel.summary",
+                                   medicalCapacityPanel)
+                             .section("lblHealingChecksPanel.text", "lblHealingChecksPanel.summary", healingChecksPanel)
+                             .section("lblAdvancedMedicalRulesPanel.text",
+                                   "lblAdvancedMedicalRulesPanel.summary",
+                                   advancedMedicalRulesPanel)
+                             .build();
 
         created = true;
         readFromModel(model);
@@ -236,7 +258,8 @@ class MedicalPage {
         chkUseRandomHitsForVehicles.setSelected(model.useRandomHitsForVehicles);
         chkUseTougherHealing.setSelected(model.tougherHealing);
         chkUseAlternativeAdvancedMedical.setSelected(model.useAlternativeAdvancedMedical);
-        chkUseKinderAlternativeAdvancedMedical.setSelected(model.useKinderAlternativeAdvancedMedical);
+        chkUseAlternativeAdvancedMedicalFewerPermanentInjuries.setSelected(model.useAlternativeAdvancedMedicalFewerPermanentInjuries);
+        spnAlternativeAdvancedMedicalHealingTimeMultiplier.setValue(model.alternativeAdvancedMedicalHealingTimeMultiplier);
         chkUseRandomDiseases.setSelected(model.useRandomDiseases);
         spnMaximumPatients.setValue(model.maximumPatients);
         chkDoctorsUseAdministration.setSelected(model.doctorsUseAdministration);
@@ -263,7 +286,8 @@ class MedicalPage {
         model.useRandomHitsForVehicles = chkUseRandomHitsForVehicles.isSelected();
         model.tougherHealing = chkUseTougherHealing.isSelected();
         model.useAlternativeAdvancedMedical = chkUseAlternativeAdvancedMedical.isSelected();
-        model.useKinderAlternativeAdvancedMedical = chkUseKinderAlternativeAdvancedMedical.isSelected();
+        model.useAlternativeAdvancedMedicalFewerPermanentInjuries = chkUseAlternativeAdvancedMedicalFewerPermanentInjuries.isSelected();
+        model.alternativeAdvancedMedicalHealingTimeMultiplier = (double) spnAlternativeAdvancedMedicalHealingTimeMultiplier.getValue();
         model.useRandomDiseases = chkUseRandomDiseases.isSelected();
         model.maximumPatients = (int) spnMaximumPatients.getValue();
         model.doctorsUseAdministration = chkDoctorsUseAdministration.isSelected();

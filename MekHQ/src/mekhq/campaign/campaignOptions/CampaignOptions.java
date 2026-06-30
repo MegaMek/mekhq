@@ -277,7 +277,7 @@ public class CampaignOptions {
     private boolean useRandomHitsForVehicles;
     private boolean tougherHealing;
     private boolean useAlternativeAdvancedMedical;
-    private boolean useAlternativeAdvancedMedicalKinderHealing;
+    private boolean useAlternativeAdvancedMedicalFewerPermanentInjuries;
     private double alternativeAdvancedMedicalHealingTimeMultiplier;
     private boolean useRandomDiseases;
     private int maximumPatients;
@@ -897,7 +897,7 @@ public class CampaignOptions {
         setUseRandomHitsForVehicles(false);
         setTougherHealing(false);
         useAlternativeAdvancedMedical = false;
-        useAlternativeAdvancedMedicalKinderHealing = false;
+        useAlternativeAdvancedMedicalFewerPermanentInjuries = false;
         alternativeAdvancedMedicalHealingTimeMultiplier = 1.0;
         useRandomDiseases = false;
         setMaximumPatients(25);
@@ -2148,13 +2148,13 @@ public class CampaignOptions {
         this.useAlternativeAdvancedMedical = useAlternativeAdvancedMedical;
     }
 
-    public boolean isUseAlternativeAdvancedMedicalKinderHealing() {
-        return useAlternativeAdvancedMedicalKinderHealing;
+    public boolean isUseAlternativeAdvancedMedicalFewerPermanentInjuries() {
+        return useAlternativeAdvancedMedicalFewerPermanentInjuries;
     }
 
-    public void setUseAlternativeAdvancedMedicalKinderHealing(
-          final boolean useAlternativeAdvancedMedicalKinderHealing) {
-        this.useAlternativeAdvancedMedicalKinderHealing = useAlternativeAdvancedMedicalKinderHealing;
+    public void setUseAlternativeAdvancedMedicalFewerPermanentInjuries(
+          final boolean useAlternativeAdvancedMedicalFewerPermanentInjuries) {
+        this.useAlternativeAdvancedMedicalFewerPermanentInjuries = useAlternativeAdvancedMedicalFewerPermanentInjuries;
     }
 
     public double getAlternativeAdvancedMedicalHealingTimeMultiplier() {

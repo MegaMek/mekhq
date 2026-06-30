@@ -116,7 +116,8 @@ class PersonnelOptionsModel {
     boolean useRandomHitsForVehicles;
     boolean tougherHealing;
     boolean useAlternativeAdvancedMedical;
-    boolean useKinderAlternativeAdvancedMedical;
+    boolean useAlternativeAdvancedMedicalFewerPermanentInjuries;
+    double alternativeAdvancedMedicalHealingTimeMultiplier;
     boolean useRandomDiseases;
     int maximumPatients;
     boolean doctorsUseAdministration;
@@ -205,7 +206,8 @@ class PersonnelOptionsModel {
         useRandomHitsForVehicles = options.isUseRandomHitsForVehicles();
         tougherHealing = options.isTougherHealing();
         useAlternativeAdvancedMedical = options.isUseAlternativeAdvancedMedical();
-        useKinderAlternativeAdvancedMedical = options.isUseKinderAlternativeAdvancedMedical();
+        useAlternativeAdvancedMedicalFewerPermanentInjuries = options.isUseAlternativeAdvancedMedicalFewerPermanentInjuries();
+        alternativeAdvancedMedicalHealingTimeMultiplier = options.getAlternativeAdvancedMedicalHealingTimeMultiplier();
         useRandomDiseases = options.isUseRandomDiseases();
         maximumPatients = options.getMaximumPatients();
         doctorsUseAdministration = options.isDoctorsUseAdministration();
@@ -295,7 +297,9 @@ class PersonnelOptionsModel {
         options.setUseRandomHitsForVehicles(useRandomHitsForVehicles);
         options.setTougherHealing(tougherHealing);
         options.setUseAlternativeAdvancedMedical(useAlternativeAdvancedMedical);
-        options.setUseKinderAlternativeAdvancedMedical(useKinderAlternativeAdvancedMedical);
+        options.setUseAlternativeAdvancedMedicalFewerPermanentInjuries(
+              useAlternativeAdvancedMedicalFewerPermanentInjuries);
+        options.setAlternativeAdvancedMedicalHealingTimeMultiplier(alternativeAdvancedMedicalHealingTimeMultiplier);
         options.setUseRandomDiseases(useRandomDiseases);
         options.setMaximumPatients(maximumPatients);
         options.setDoctorsUseAdministration(doctorsUseAdministration);

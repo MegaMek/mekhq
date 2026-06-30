@@ -393,8 +393,8 @@ public class CampaignOptionsUnmarshaller {
             case "tougherHealing" -> campaignOptions.setTougherHealing(parseBoolean(nodeContents));
             case "useAlternativeAdvancedMedical" ->
                   campaignOptions.setUseAlternativeAdvancedMedical(parseBoolean(nodeContents));
-            case "isUseAlternativeAdvancedMedicalKinderHealing" ->
-                  campaignOptions.setUseAlternativeAdvancedMedicalKinderHealing(parseBoolean(nodeContents));
+            case "useAlternativeAdvancedMedicalFewerPermanentInjuries" ->
+                  campaignOptions.setUseAlternativeAdvancedMedicalFewerPermanentInjuries(parseBoolean(nodeContents));
             case "alternativeAdvancedMedicalHealingTimeMultiplier" ->
                   campaignOptions.setAlternativeAdvancedMedicalHealingTimeMultiplier(parseDouble(nodeContents, 1.0));
             case "useRandomDiseases" -> campaignOptions.setUseRandomDiseases(parseBoolean(nodeContents));
