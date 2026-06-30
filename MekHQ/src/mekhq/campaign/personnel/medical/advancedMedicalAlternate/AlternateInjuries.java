@@ -77,7 +77,9 @@ public class AlternateInjuries {
     private static final int ORGAN_TRAUMA_HEALING_DAYS = 21; // Internet says 6-8 weeks
     private static final int DISEMBOWELED_HEALING_DAYS = 21; // Internet says 6-8 weeks
     private static final int BONE_BRUISE_HEALING_DAYS = 21; // Internet says 6 weeks
-    private static final int BLOOD_LOSS_HEALING_DAYS = 14; // Internet says 4-6 weeks
+    private static final int BLOOD_LOSS_HEALING_DAYS = 14; // Internet says 4-6 week
+    // Copied from Blood Loss as ATOW has this always be blood loss
+    private static final int MEDICAL_COMPLICATION_HEALING_DAYS = 14;
     private static final int SEVER_HEALING_DAYS = 180; // We need to have something here for Advanced Medical
     private static final int CLONED_LIMB_HEALING_DAYS = 21; // ATOW pg 316
     private static final int REPLACEMENT_LIMB_HEALING_DAYS = 42; // ATOW pg 316
@@ -154,6 +156,7 @@ public class AlternateInjuries {
     public static final InjuryType CATATONIA = new ChronicDisassociation();
     public static final InjuryType TERRIBLE_BRUISES = new TerribleBruises();
     public static final InjuryType OLD_WOUND = new OldWound();
+    public static final InjuryType MEDICAL_COMPLICATION = new MedicalComplication();
     // Diseases
     public static final InjuryType GROWTHS_DISCOMFORT = new GrowthsDiscomfort();
     public static final InjuryType GROWTHS_SLIGHT = new GrowthsSlight();
@@ -2928,6 +2931,17 @@ public class AlternateInjuries {
                   NONE,
                   Set.of(GENERIC));
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.OLD_WOUND.simpleName");
+        }
+    }
+
+    public static final class MedicalComplication extends BaseInjury {
+        // In ATOW the medical complications result from healing checks is always flavored as 'blood loss'. We've
+        // given it the more generic title of 'medical complication'.
+        MedicalComplication() {
+            super(MEDICAL_COMPLICATION_HEALING_DAYS, false, MINOR,
+                  NONE, Set.of(GENERIC));
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.MEDICAL_COMPLICATION.simpleName");
+            this.fluffText = simpleName;
         }
     }
 }

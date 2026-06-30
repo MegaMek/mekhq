@@ -64,7 +64,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.ranks.AutoAssignRankForCompanyGenerator;
-import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
@@ -224,7 +223,10 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
     private void processBonusUnitsBasedOnCampaignOptions(List<CompanyGenerationPersonTracker> trackers,
           CompanyGenerationOptions options) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        if (campaignOptions.isUseAlternativeAdvancedMedical()) {
+        boolean isUseAltAdvancedMedical = campaignOptions.isUseAlternativeAdvancedMedical();
+        double altAdvancedMedicalHealingTimeMultiplier = campaignOptions.getAlternativeAdvancedMedicalHealingTimeMultiplier();
+        boolean isUseHardAltAdvancedMedical = altAdvancedMedicalHealingTimeMultiplier >= 2.0;
+        if (isUseAltAdvancedMedical && isUseHardAltAdvancedMedical) {
             int combatants = 0;
             for (CompanyGenerationPersonTracker tracker : trackers) {
                 if (tracker.getPersonType().isCombat()) {

@@ -33,6 +33,8 @@
 package mekhq.campaign.personnel.medical.advancedMedical;
 
 import static java.lang.Math.ceil;
+import static java.lang.Math.max;
+import static java.lang.Math.round;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -124,8 +126,13 @@ public final class InjuryUtil {
      */
     public static void resolveCombatDamage(Campaign campaign, Person person, int hits) {
         if (campaign.getCampaignOptions().isUseAlternativeAdvancedMedical()) {
-            resolveCombatDamageUsingAlternateModel(campaign, person, hits,
-                  campaign.getCampaignOptions().isUseKinderAlternativeAdvancedMedical(), campaign.getLocalDate());
+            double healingTimeMultiplier = campaign.getCampaignOptions()
+                                                 .getAlternativeAdvancedMedicalHealingTimeMultiplier();
+            resolveCombatDamageUsingAlternateModel(campaign,
+                  person,
+                  hits,
+                  healingTimeMultiplier,
+                  campaign.getLocalDate());
         } else {
             resolveCombatDamageUsingStandardModel(campaign, person, hits);
         }
@@ -162,21 +169,23 @@ public final class InjuryUtil {
      * <p>Injuries may be automatically removed during processing if the body location they affect has been severed
      * by another injury.</p>
      *
-     * @param campaign        the current campaign
-     * @param person          the person who suffered combat damage
-     * @param hits            the number of TW-scale Hits taken
-     * @param isUseKinderMode {@code true} to halve all recovery times
+     * @param campaign              the current campaign
+     * @param person                the person who suffered combat damage
+     * @param hits                  the number of TW-scale Hits taken
+     * @param healingTimeMultiplier A multiplier applied to all healing times
      *
      * @author Illiani
      * @since 0.50.10
      */
     private static void resolveCombatDamageUsingAlternateModel(Campaign campaign, Person person, int hits,
-          boolean isUseKinderMode, LocalDate today) {
+          double healingTimeMultiplier, LocalDate today) {
+        boolean hasRelevantHealingTimeMultiplier = healingTimeMultiplier != 1.0;
         Collection<Injury> newInjuries = AdvancedMedicalAlternate.generateInjuriesFromHits(campaign, person, hits);
         for (Injury injury : newInjuries) {
-            if (isUseKinderMode) {
+            if (hasRelevantHealingTimeMultiplier) {
                 int originalRecoveryTime = injury.getOriginalTime();
-                int newRecoveryTime = (int) ceil(originalRecoveryTime / 2.0);
+                int newRecoveryTime = (int) round(originalRecoveryTime * healingTimeMultiplier);
+                newRecoveryTime = max(newRecoveryTime, 1);
                 injury.setOriginalTime(newRecoveryTime);
                 injury.setTime(newRecoveryTime);
             }
@@ -194,9 +203,10 @@ public final class InjuryUtil {
         // Prepare an amputation recovery injury in case we need it later
         Injury amputationRecovery = AlternateInjuries.AMPUTATION_RECOVERY.newInjury(campaign, person,
               BodyLocation.RIGHT_HAND, 1);
-        if (isUseKinderMode) {
+        if (healingTimeMultiplier != 1.0) {
             int originalRecoveryTime = amputationRecovery.getOriginalTime();
-            int newRecoveryTime = (int) ceil(originalRecoveryTime / 2.0);
+            int newRecoveryTime = (int) round(originalRecoveryTime * healingTimeMultiplier);
+            newRecoveryTime = max(newRecoveryTime, 1);
             amputationRecovery.setOriginalTime(newRecoveryTime);
             amputationRecovery.setTime(newRecoveryTime);
         }
@@ -441,9 +451,9 @@ public final class InjuryUtil {
         int variationPercent = 80 + Compute.randomInt(41); // 80 to 120
 
         // Apply both random variation and person's ability modifier
-        int time = (int) Math.round((baseTime * variationPercent * person.getAbilityTimeModifier(campaign)) / 10000.0);
+        int time = (int) round((baseTime * variationPercent * person.getAbilityTimeModifier(campaign)) / 10000.0);
 
-        return Math.max(1, time);
+        return max(1, time);
     }
 
     /** Generate the effects of a doctor dealing with injuries (frequency depends on campaign settings) */
@@ -466,10 +476,10 @@ public final class InjuryUtil {
             if (!injury.isWorkedOn()) {
                 int roll = Compute.randomInt(100);
                 // Determine XP, if any
-                if (roll < Math.max(1, fumbleLimit / 10)) {
+                if (roll < max(1, fumbleLimit / 10)) {
                     mistakeXP += campaign.getCampaignOptions().getMistakeXP();
                     xpGained += mistakeXP;
-                } else if (roll > Math.min(98, 99 - (int) Math.round((99 - critLimit) / 10.0))) {
+                } else if (roll > Math.min(98, 99 - (int) round((99 - critLimit) / 10.0))) {
                     successXP += campaign.getCampaignOptions().getSuccessXP();
                     xpGained += successXP;
                 }
@@ -495,7 +505,7 @@ public final class InjuryUtil {
                           GenderDescriptors.HIS_HER_THEIR.getDescriptor(person.getGender()),
                           injury.getName()), rnd -> {
                         int time = injury.getTime();
-                        injury.setTime((int) Math.max(ceil(time * 1.2), time + 5));
+                        injury.setTime((int) max(ceil(time * 1.2), time + 5));
                         MedicalLogger.docMadeAMistake(doctor, person, injury, campaign.getLocalDate());
 
                         // TODO: Add in special handling of the critical
@@ -520,7 +530,7 @@ public final class InjuryUtil {
                               critTimeReduction);
                     }));
                 } else {
-                    final int xpChance = (int) Math.round(100.0 / campaign.getCampaignOptions().getNTasksXP());
+                    final int xpChance = (int) round(100.0 / campaign.getCampaignOptions().getNTasksXP());
                     result.add(new GameEffect(String.format("%s successfully treated %s [%d%% chance of gaining %d XP]",
                           doctor.getHyperlinkedFullTitle(),
                           person.getHyperlinkedName(),
@@ -627,7 +637,7 @@ public final class InjuryUtil {
                 }
             } else if (injury.getTime() > 1) {
                 result.add(new GameEffect(String.format("%s continues healing", injury.getName()),
-                      rnd -> injury.setTime(Math.max(injury.getTime() - 1, 0))));
+                      rnd -> injury.setTime(max(injury.getTime() - 1, 0))));
             } else if ((injury.getTime() == 1) && injury.isPermanent()) {
                 result.add(new GameEffect(String.format("%s becomes permanent", injury.getName()), rnd -> {
                     injury.setTime(0);

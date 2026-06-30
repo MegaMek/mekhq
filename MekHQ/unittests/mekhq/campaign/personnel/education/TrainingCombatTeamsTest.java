@@ -207,7 +207,8 @@ class TrainingCombatTeamsTest {
 
     @Test
     void test_IsTrainingImpossible_NoSkills_CheckSuccessful() {
-        boolean isTrainingImpossible = TrainingCombatTeams.isTrainingImpossible(List.of(), BARELY_MADE_IT.getValue());
+        boolean isTrainingImpossible = TrainingCombatTeams.isTrainingImpossible(List.of(),
+              BARELY_MADE_IT.getValue());
         assertTrue(isTrainingImpossible);
     }
 
@@ -220,7 +221,8 @@ class TrainingCombatTeamsTest {
 
     @Test
     void test_IsTrainingImpossible_NoSkills_CheckFailed() {
-        boolean isTrainingImpossible = TrainingCombatTeams.isTrainingImpossible(List.of(), ALMOST.getValue());
+        boolean isTrainingImpossible = TrainingCombatTeams.isTrainingImpossible(List.of(),
+              ALMOST.getValue());
         assertTrue(isTrainingImpossible);
     }
 

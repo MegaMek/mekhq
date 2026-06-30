@@ -41,7 +41,7 @@ import static megamek.common.compute.Compute.d6;
  * <p>Each enum constant describes a combination of effects that can occur after resolving a healing roll: whether
  * the injury is recovered, whether fatigue is inflicted, whether recovery is delayed, and whether the injury becomes
  * permanent. The mapping from margin of success to these effects is handled by
- * {@link #getEffectFromHealingAttempt(int)}.</p>
+ * {@link #getEffectFromHealingAttempt(int, boolean)}.</p>
  *
  * @author Illiani
  * @since 0.50.10
@@ -50,23 +50,23 @@ public enum HealingMarginOfSuccessEffects {
     /**
      * The injury fully recovers with no fatigue or delay.
      */
-    RECOVERY(true, false, false, false),
+    RECOVERY(true, false, false, false, false),
     /**
      * The injury fully recovers but inflicts a point of fatigue.
      */
-    RECOVERY_WITH_FATIGUE(true, true, false, false),
+    RECOVERY_WITH_FATIGUE(true, true, false, false, false),
     /**
      * The injury will eventually recover, but its healing is delayed.
      */
-    RECOVERY_DELAYED(false, false, true, false),
-    /**
-     * The injury will eventually recover, but healing is delayed and inflicts a point of fatigue.
-     */
-    RECOVERY_DELAYED_WITH_FATIGUE(false, true, true, false),
+    RECOVERY_DELAYED(false, true, true, false, false),
     /**
      * The injury fails to heal and becomes permanent.
      */
-    PERMANENT_INJURY(false, false, false, true);
+    PERMANENT_INJURY(false, true, false, true, false),
+    /**
+     * The injury fails to heal and becomes permanent with the addition of a new injury.
+     */
+    PERMANENT_INJURY_WITH_MEDICAL_COMPLICATIONS(false, true, false, true, true);
 
     private final static int MINIMUM_MARGIN_OF_SUCCESS = -6;
     private final static int MAXIMUM_MARGIN_OF_SUCCESS = 3;
@@ -75,6 +75,7 @@ public enum HealingMarginOfSuccessEffects {
     private final boolean inflictsFatigue;
     private final boolean isDelayed;
     private final boolean isPermanent;
+    private final boolean hasComplication;
 
 
     /**
@@ -87,15 +88,18 @@ public enum HealingMarginOfSuccessEffects {
      * @param isDelayed       {@code true} if this outcome delays the healing time of the injury; {@code false}
      *                        otherwise
      * @param isPermanent     {@code true} if this outcome makes the injury permanent; {@code false} otherwise
+     * @param hasComplication {@code true} if this outcome also results in a new injury; {@code false} otherwise
      *
      * @author Illiani
      * @since 0.50.10
      */
-    HealingMarginOfSuccessEffects(boolean isRecovery, boolean inflictsFatigue, boolean isDelayed, boolean isPermanent) {
+    HealingMarginOfSuccessEffects(boolean isRecovery, boolean inflictsFatigue, boolean isDelayed, boolean isPermanent,
+          boolean hasComplication) {
         this.isRecovery = isRecovery;
         this.inflictsFatigue = inflictsFatigue;
         this.isDelayed = isDelayed;
         this.isPermanent = isPermanent;
+        this.hasComplication = hasComplication;
     }
 
     /**
@@ -111,9 +115,21 @@ public enum HealingMarginOfSuccessEffects {
     }
 
     /**
+     * Returns whether this outcome results in the injury's healing being delayed.
+     *
+     * @return {@code true} if the injury eventually hasn't recovered yet; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    public boolean isDelayed() {
+        return isDelayed;
+    }
+
+    /**
      * Gets the amount of fatigue damage inflicted by this outcome.
      *
-     * <p>Currently this is either {@code 1} if fatigue is inflicted or {@code 0} if it is not.</p>
+     * <p>Currently this is either {@code d6} if fatigue is inflicted or {@code 0} if it is not.</p>
      *
      * @return the fatigue damage to apply to the patient
      *
@@ -121,7 +137,7 @@ public enum HealingMarginOfSuccessEffects {
      * @since 0.50.10
      */
     public int getFatigueDamage() {
-        return inflictsFatigue ? 1 : 0;
+        return inflictsFatigue ? d6(1) : 0;
     }
 
 
@@ -154,36 +170,38 @@ public enum HealingMarginOfSuccessEffects {
         return isPermanent;
     }
 
+    /**
+     * Returns whether this outcome also adds a new injury.
+     *
+     * @return {@code true} if the outcome adds a new injury; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isHasComplication() {
+        return hasComplication;
+    }
 
     /**
      * Determines the healing outcome corresponding to a given margin of success.
      *
-     * <p>The provided margin of success is first clamped between {@link #MINIMUM_MARGIN_OF_SUCCESS} and
-     * {@link #MAXIMUM_MARGIN_OF_SUCCESS}. The resulting value is then mapped to one of the defined enum constants:</p>
-     *
-     * <ul>
-     *   <li>3: {@link #RECOVERY}</li>
-     *   <li>0, 1, 2: {@link #RECOVERY_WITH_FATIGUE}</li>
-     *   <li>-1, -2: {@link #RECOVERY_DELAYED}</li>
-     *   <li>-3, -4, -5: {@link #RECOVERY_DELAYED_WITH_FATIGUE}</li>
-     *   <li>-6: {@link #PERMANENT_INJURY}</li>
-     * </ul>
-     *
-     * @param marginOfSuccess the raw margin of success from the healing roll
+     * @param marginOfSuccess  the raw margin of success from the healing roll
+     * @param useKinderHealing reduces the chance of getting a permanent injury
      *
      * @return the {@link HealingMarginOfSuccessEffects} corresponding to the given margin of success
      *
      * @author Illiani
      * @since 0.50.10
      */
-    public static HealingMarginOfSuccessEffects getEffectFromHealingAttempt(int marginOfSuccess) {
+    public static HealingMarginOfSuccessEffects getEffectFromHealingAttempt(int marginOfSuccess,
+          boolean useKinderHealing) {
         int clampedRoll = Math.clamp(marginOfSuccess, MINIMUM_MARGIN_OF_SUCCESS, MAXIMUM_MARGIN_OF_SUCCESS);
 
         return switch (clampedRoll) {
             case 3 -> RECOVERY;
             case -1, -2 -> RECOVERY_DELAYED;
-            case -3, -4, -5 -> RECOVERY_DELAYED_WITH_FATIGUE;
-            case -6 -> PERMANENT_INJURY;
+            case -3, -4, -5 -> useKinderHealing ? RECOVERY_DELAYED : PERMANENT_INJURY;
+            case -6 -> PERMANENT_INJURY_WITH_MEDICAL_COMPLICATIONS;
             default -> RECOVERY_WITH_FATIGUE; // 0, 1, 2
         };
     }
