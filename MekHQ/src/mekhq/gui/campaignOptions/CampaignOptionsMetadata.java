@@ -160,7 +160,7 @@ public record CampaignOptionsMetadata(
         if (badge == null) {
             return "";
         }
-        return String.format(" <span style=\"color:%s;\">%s</span>",
+        return String.format(" <font face=\"Material Symbols Rounded\" color=\"%s\">%s</font>",
               badge.getColor(), badge.getSymbol());
     }
 }

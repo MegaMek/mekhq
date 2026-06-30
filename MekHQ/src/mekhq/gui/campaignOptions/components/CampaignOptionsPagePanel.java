@@ -33,6 +33,7 @@
 package mekhq.gui.campaignOptions.components;
 
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
+import static megamek.client.ui.util.FontHandler.symbolIcon;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.CAMPAIGN_OPTIONS_PANEL_WIDTH;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.formatBadges;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
@@ -47,6 +48,7 @@ import java.awt.GridBagLayout;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.function.Predicate;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -99,6 +101,7 @@ public class CampaignOptionsPagePanel extends JPanel {
     private final JPanel pageBody;
     private final boolean showDetailsPanel;
     private final String sectionSearchText;
+    private final List<SearchableSection> searchableSections;
 
     private CampaignOptionsPagePanel(Builder builder) {
         super(null);
@@ -113,17 +116,26 @@ public class CampaignOptionsPagePanel extends JPanel {
         // can place arbitrary components above, between, or below the collapsible sections.
         List<Object> renderItems = new ArrayList<>();
         List<MHQCollapsiblePanel> sections = new ArrayList<>();
+        List<SearchableSection> searchableSectionList = new ArrayList<>();
         StringBuilder searchTextBuilder = new StringBuilder();
         for (Object bodyItem : builder.bodyItems) {
             if (bodyItem instanceof Section section) {
                 MHQCollapsiblePanel sectionPanel = createSection(section, builder.sectionsExpandedByDefault);
                 sections.add(sectionPanel);
                 renderItems.add(sectionPanel);
-                appendSectionSearchText(searchTextBuilder, section);
+
+                StringBuilder sectionTextBuilder = new StringBuilder();
+                appendSectionSearchText(sectionTextBuilder, section);
+                String sectionText = sectionTextBuilder.toString().trim();
+                searchableSectionList.add(new SearchableSection(sectionPanel, sectionText));
+                if (!sectionText.isEmpty()) {
+                    searchTextBuilder.append(' ').append(sectionText);
+                }
             } else if (bodyItem instanceof JComponent component) {
                 renderItems.add(component);
             }
         }
+        searchableSections = List.copyOf(searchableSectionList);
         sectionSearchText = searchTextBuilder.toString().trim();
         JPanel sectionControls = createSectionControls(sections);
         int sectionStackWidth = getPreferredSectionStackWidth(sections, sectionControls);
@@ -156,6 +168,53 @@ public class CampaignOptionsPagePanel extends JPanel {
      */
     public @Nonnull String getSectionSearchText() {
         return sectionSearchText;
+    }
+
+    /**
+     * Expands every collapsible section whose title or summary text satisfies the given matcher and collapses the
+     * rest, so a page opened from a navigation search result reveals the matching section instead of opening fully
+     * collapsed. If no section matches (for example, when only the page title matched the search), the page is left
+     * untouched.
+     *
+     * @param sectionTextMatcher tests a section's raw (un-normalized) title and summary text
+     *
+     * @return {@code true} if at least one section matched and the section states were updated
+     */
+    public boolean expandSectionsMatching(@Nonnull Predicate<String> sectionTextMatcher) {
+        if (searchableSections.isEmpty()) {
+            return false;
+        }
+
+        boolean[] matches = new boolean[searchableSections.size()];
+        boolean anyMatch = false;
+        for (int index = 0; index < searchableSections.size(); index++) {
+            matches[index] = sectionTextMatcher.test(searchableSections.get(index).searchText());
+            anyMatch |= matches[index];
+        }
+
+        if (!anyMatch) {
+            return false;
+        }
+
+        for (int index = 0; index < searchableSections.size(); index++) {
+            searchableSections.get(index).panel().setExpanded(matches[index]);
+        }
+        return true;
+    }
+
+    /**
+     * Expands every collapsible section on this page. Used as a fallback when a page is opened from a navigation search
+     * whose term matched the page as a whole (such as an internal page name) rather than any single section heading, so
+     * the page is revealed instead of opening fully collapsed.
+     */
+    public void expandAllSections() {
+        for (SearchableSection section : searchableSections) {
+            section.panel().setExpanded(true);
+        }
+    }
+
+    /** Pairs a collapsible section with its resolved title and summary text for search-driven expansion. */
+    private record SearchableSection(MHQCollapsiblePanel panel, String searchText) {
     }
 
     private static void appendSectionSearchText(StringBuilder builder, Section section) {
@@ -216,7 +275,7 @@ public class CampaignOptionsPagePanel extends JPanel {
         layout.anchor = GridBagConstraints.CENTER;
         panel.add(header, layout);
 
-        if (builder.introTextKey != null) {
+        if (builder.introComponent != null || builder.introTextKey != null) {
             layout.gridy++;
             int introWidth = sectionStackWidth > 0 ? sectionStackWidth : header.getPreferredSize().width;
             panel.add(createIntroPanel(builder, introWidth), layout);
@@ -280,9 +339,17 @@ public class CampaignOptionsPagePanel extends JPanel {
 
     private JPanel createIntroPanel(Builder builder, int textWidth) {
         int introHorizontalPadding = getIntroHorizontalPadding(textWidth);
-        JPanel introPanel = new CampaignOptionsIntroPanel(builder.name + "Intro",
-            getTextAt(getCampaignOptionsResourceBundle(), builder.introTextKey),
-            textWidth - (introHorizontalPadding * 2));
+        JPanel introPanel;
+        if (builder.introComponent != null) {
+            introPanel = new JPanel(new BorderLayout());
+            introPanel.setName(builder.name + "Intro");
+            introPanel.setOpaque(false);
+            introPanel.add(builder.introComponent, BorderLayout.CENTER);
+        } else {
+            introPanel = new CampaignOptionsIntroPanel(builder.name + "Intro",
+                getTextAt(getCampaignOptionsResourceBundle(), builder.introTextKey),
+                textWidth - (introHorizontalPadding * 2));
+        }
         introPanel.setBorder(BorderFactory.createEmptyBorder(0,
             introHorizontalPadding,
             0,
@@ -357,9 +424,11 @@ public class CampaignOptionsPagePanel extends JPanel {
     }
 
     private JPanel createSectionControls(List<MHQCollapsiblePanel> sections) {
-        JButton expandAllButton = createSectionActionButton("btnExpandAll.text");
+        // Material Symbols code points (https://fonts.google.com/icons): unfold_more / unfold_less. Collapse is sized
+        // a touch larger so its tighter glyph reads the same as the expand glyph.
+        JButton expandAllButton = createSectionActionButton("btnExpandAll.text", 0xE5D7, 0);
         expandAllButton.addActionListener(event -> setExpanded(true, sections));
-        JButton collapseAllButton = createSectionActionButton("btnCollapseAll.text");
+        JButton collapseAllButton = createSectionActionButton("btnCollapseAll.text", 0xE5D6, UIUtil.scaleForGUI(2));
         collapseAllButton.addActionListener(event -> setExpanded(false, sections));
 
         JPanel controls = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
@@ -370,9 +439,11 @@ public class CampaignOptionsPagePanel extends JPanel {
         return controls;
     }
 
-    private JButton createSectionActionButton(String resourceKey) {
+    private JButton createSectionActionButton(String resourceKey, int iconCodePoint, int iconSizeBoost) {
         JButton button = new JButton(getTextAt(getCampaignOptionsResourceBundle(), resourceKey));
         setSmallSizeVariant(button);
+        button.setIcon(symbolIcon(iconCodePoint, button.getFont().getSize() + iconSizeBoost,
+              button.getForeground()));
         return button;
     }
 
@@ -443,6 +514,7 @@ public class CampaignOptionsPagePanel extends JPanel {
         private CampaignOptionsHeaderPanel headerPanel;
         private String quoteResourceName;
         private String introTextKey;
+        private JComponent introComponent;
         private boolean includeHeaderBodyText;
         private int headerImageSize = DEFAULT_HEADER_IMAGE_SIZE;
         private boolean tintHeaderImage = true;
@@ -477,6 +549,15 @@ public class CampaignOptionsPagePanel extends JPanel {
 
         public Builder intro(String introTextKey) {
             this.introTextKey = introTextKey;
+            return this;
+        }
+
+        /**
+         * Places the given component in the centered intro area below the header, used instead of {@link
+         * #intro(String)} when the intro needs real Swing controls (such as an icon legend) rather than HTML text.
+         */
+        public Builder introComponent(JComponent introComponent) {
+            this.introComponent = introComponent;
             return this;
         }
 
