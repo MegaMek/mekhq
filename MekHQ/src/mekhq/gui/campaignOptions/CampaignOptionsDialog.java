@@ -32,6 +32,7 @@
  */
 package mekhq.gui.campaignOptions;
 
+import static megamek.client.ui.util.FontHandler.symbolIcon;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -181,8 +182,13 @@ public class CampaignOptionsDialog extends AbstractButtonDialog {
     protected @Nonnull JPanel createButtonPanel() {
         final JPanel actionButtons = new JPanel(new FlowLayout(FlowLayout.CENTER, BUTTON_GAP, BUTTON_GAP));
 
-        // Apply Settings
-        actionButtons.add(createDialogButton("ApplySettings", this::processApplyAction));
+        // Apply Settings: emphasized as the primary action using FlatLaf's accent/default-button colors. This is a
+        // visual cue only (not the root-pane default button), so Enter cannot accidentally close this field-heavy
+        // dialog while editing.
+        JButton applyButton = createDialogButton("ApplySettings", this::processApplyAction);
+        applyButton.putClientProperty("FlatLaf.style",
+              "background: $Button.default.background; foreground: $Button.default.foreground");
+        actionButtons.add(applyButton);
 
         // Save Preset
         if (mode != CampaignOptionsDialogMode.CAMPAIGN_UPGRADE && mode != CampaignOptionsDialogMode.STARTUP_ABRIDGED) {
@@ -200,6 +206,7 @@ public class CampaignOptionsDialog extends AbstractButtonDialog {
         JButton legendButton = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "lblIconsLegend.text"));
         legendButton.setName("btnIconsLegend");
         legendButton.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(), "lblIconsLegend.tooltip"));
+        legendButton.setIcon(symbolIcon(0xE88E, legendButton.getFont().getSize(), legendButton.getForeground()));
         legendButton.addActionListener(evt -> showIconLegend(legendButton));
         JPanel legendPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, BUTTON_GAP, BUTTON_GAP));
         legendPanel.add(legendButton);
@@ -226,9 +233,7 @@ public class CampaignOptionsDialog extends AbstractButtonDialog {
      * @param anchor the footer button the popup opens above
      */
     private void showIconLegend(JButton anchor) {
-        JLabel legend = new JLabel("<html><body>"
-              + getTextAt(getCampaignOptionsResourceBundle(), "lblGeneralIconLegend.text")
-              + "</body></html>");
+        CampaignOptionsIconLegend legend = new CampaignOptionsIconLegend();
         legend.setBorder(BorderFactory.createEmptyBorder(UIUtil.scaleForGUI(8),
               UIUtil.scaleForGUI(8),
               UIUtil.scaleForGUI(8),

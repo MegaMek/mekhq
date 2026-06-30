@@ -83,6 +83,7 @@ import static mekhq.utilities.spaUtilities.SpaUtilities.getSpaCategory;
 import java.awt.Color;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -95,6 +96,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JSplitPane;
 import javax.swing.JTable;
 
 import megamek.client.generator.RandomCallsignGenerator;
@@ -165,6 +167,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.PersonnelTab;
 import mekhq.gui.baseComponents.JScrollableMenu;
 import mekhq.gui.control.EditLogControl.LogType;
 import mekhq.gui.dialog.*;
@@ -344,6 +347,27 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
     private String makeCommand(String... parts) {
         return Utilities.combineString(Arrays.asList(parts), SEPARATOR);
+    }
+
+    public static void connect(CampaignGUI gui, JTable personnelTable, PersonnelTableModel personnelModel,
+          JSplitPane splitPersonnel) {
+        new PersonnelTableMouseAdapter(gui, personnelTable, personnelModel) {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if ((e.getButton() == MouseEvent.BUTTON1) && (e.getClickCount() == 2)) {
+                    int width = splitPersonnel.getSize().width;
+                    int location = splitPersonnel.getDividerLocation();
+                    int size = splitPersonnel.getDividerSize();
+                    if ((width - location + size) < PersonnelTab.PERSON_VIEW_MIN_WIDTH) {
+                        // expand
+                        splitPersonnel.resetToPreferredSizes();
+                    } else {
+                        // collapse
+                        splitPersonnel.setDividerLocation(1.0);
+                    }
+                }
+            }
+        }.connect(personnelTable);
     }
 
     @Override

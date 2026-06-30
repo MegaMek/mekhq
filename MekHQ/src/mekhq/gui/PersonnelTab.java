@@ -36,7 +36,6 @@ import static mekhq.gui.enums.PersonnelTableModelColumn.SURNAME;
 import static mekhq.gui.enums.PersonnelTableModelColumn.SURNAME_GROUPED_BY_UNIT;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -88,6 +87,7 @@ import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
 import mekhq.campaign.events.units.UnitRemovedEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.QuickTrain;
+import mekhq.gui.adapter.PersonnelTableMouseAdapter;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.BatchXPDialog;
@@ -355,13 +355,7 @@ public final class PersonnelTab extends CampaignGuiTab {
         JScrollPane scrollPersonnelTable = new FastJScrollPane(personnelTable);
         scrollPersonnelTable.setBorder(RoundedLineBorder.createRoundedLineBorder());
 
-        JPanel tableAndInfoPanel = new JPanel(new BorderLayout());
-        tableAndInfoPanel.add(scrollPersonnelTable, BorderLayout.CENTER);
-
-        JPanel pnlTutorial = new TutorialHyperlinkPanel("personnelTab");
-        tableAndInfoPanel.add(pnlTutorial, BorderLayout.SOUTH);
-
-        JSplitPane splitPersonnel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, tableAndInfoPanel, scrollPersonnelView);
+        JSplitPane splitPersonnel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollPersonnelTable, scrollPersonnelView);
         splitPersonnel.setOneTouchExpandable(true);
         splitPersonnel.setDividerSize(15);
         splitPersonnel.setResizeWeight(1.0);
@@ -374,7 +368,18 @@ public final class PersonnelTab extends CampaignGuiTab {
         gridBagConstraints.weighty = 1.0;
         add(splitPersonnel, gridBagConstraints);
 
+        JPanel pnlTutorial = new TutorialHyperlinkPanel("personnelTab.keyText");
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 9;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0;
+        add(pnlTutorial, gridBagConstraints);
+
         registerSearchShortcut();
+
+        PersonnelTableMouseAdapter.connect(getCampaignGui(), personnelTable, personnelTableModel, splitPersonnel);
 
         refreshAll();
         updateUIScaling();
