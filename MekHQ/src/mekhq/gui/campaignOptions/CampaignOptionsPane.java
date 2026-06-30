@@ -650,7 +650,7 @@ public class CampaignOptionsPane extends JPanel {
         String logoFile = CATEGORY_LANDING_LOGOS.getOrDefault(categoryKey, DEFAULT_CATEGORY_LANDING_LOGO);
         String logoPath = CampaignOptionsUtilities.getImageDirectory() + logoFile;
         return CampaignOptionsPagePanel.builder(categoryKey + "Landing", categoryKey, logoPath)
-                .intro(categoryKey + ".intro")
+                .intro(categoryKey)
                 .quote(categoryKey)
                 .showDetailsPanel(false)
                 .standardContentWidth()

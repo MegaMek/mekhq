@@ -280,7 +280,7 @@ public class CampaignOptionsPagePanel extends JPanel {
         layout.anchor = GridBagConstraints.CENTER;
         panel.add(header, layout);
 
-        if (builder.introComponent != null || builder.introTextKey != null) {
+        if (builder.introComponent != null || builder.introResourceName != null) {
             layout.gridy++;
             int introWidth = sectionStackWidth > 0 ? sectionStackWidth : header.getPreferredSize().width;
             panel.add(createIntroPanel(builder, introWidth), layout);
@@ -352,7 +352,7 @@ public class CampaignOptionsPagePanel extends JPanel {
             introPanel.add(builder.introComponent, BorderLayout.CENTER);
         } else {
             introPanel = new CampaignOptionsIntroPanel(builder.name + "Intro",
-                getTextAt(getCampaignOptionsResourceBundle(), builder.introTextKey),
+                getTextAt(getCampaignOptionsResourceBundle(), builder.introResourceName + ".intro"),
                 textWidth - (introHorizontalPadding * 2));
         }
         introPanel.setBorder(BorderFactory.createEmptyBorder(0,
@@ -518,7 +518,7 @@ public class CampaignOptionsPagePanel extends JPanel {
         private final List<Object> bodyItems = new ArrayList<>();
         private CampaignOptionsHeaderPanel headerPanel;
         private String quoteResourceName;
-        private String introTextKey;
+        private String introResourceName;
         private JComponent introComponent;
         private boolean includeHeaderBodyText;
         private int headerImageSize = DEFAULT_HEADER_IMAGE_SIZE;
@@ -553,8 +553,12 @@ public class CampaignOptionsPagePanel extends JPanel {
             return this;
         }
 
-        public Builder intro(String introTextKey) {
-            this.introTextKey = introTextKey;
+        /**
+         * Sets the explainer paragraph shown under the header, resolved from the {@code <name>.intro} resource key.
+         * Mirrors {@link #quote(String)}, which resolves {@code <name>.border}.
+         */
+        public Builder intro(String introResourceName) {
+            this.introResourceName = introResourceName;
             return this;
         }
 
@@ -567,6 +571,10 @@ public class CampaignOptionsPagePanel extends JPanel {
             return this;
         }
 
+        /**
+         * Sets the centered quote shown at the foot of the page, resolved from the {@code <name>.border} resource key.
+         * Mirrors {@link #intro(String)}, which resolves {@code <name>.intro}.
+         */
         public Builder quote(String quoteResourceName) {
             this.quoteResourceName = quoteResourceName;
             return this;
