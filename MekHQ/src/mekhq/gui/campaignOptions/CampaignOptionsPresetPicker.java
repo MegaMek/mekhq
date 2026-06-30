@@ -51,7 +51,6 @@ import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.CampaignPreset;
-import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
 /**
@@ -229,40 +228,35 @@ public class CampaignOptionsPresetPicker extends JDialog {
         contentPanel.add(centerPanel, BorderLayout.CENTER);
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, INSERT_SIZE, 0));
+        Dimension buttonSize = new Dimension(BUTTON_WIDTH, SINGLE_LINE_HEIGHT);
 
-        JButton btnCancel = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "CampaignOptionsPresetPicker.button.cancel"));
+        JButton btnApply = new JButton(getTextAt(RESOURCE_BUNDLE, "CampaignOptionsPresetPicker.button.apply"));
+        btnApply.setPreferredSize(buttonSize);
+        btnApply.addActionListener(e -> commitSelection(cboPresets, PresetSelection.APPLY));
+        buttonPanel.add(btnApply);
+
+        // The customize option is only offered in some contexts; when it is not available we omit the button entirely
+        // rather than showing it disabled.
+        if (includeCustomizePresetOption) {
+            JButton btnCustomize = new JButton(getTextAt(RESOURCE_BUNDLE,
+                  "CampaignOptionsPresetPicker.button.customize"));
+            btnCustomize.setPreferredSize(buttonSize);
+            btnCustomize.addActionListener(e -> commitSelection(cboPresets, PresetSelection.CUSTOMIZE));
+            buttonPanel.add(btnCustomize);
+        }
+
+        JButton btnCancel = new JButton(getTextAt(RESOURCE_BUNDLE, "CampaignOptionsPresetPicker.button.cancel"));
+        btnCancel.setPreferredSize(buttonSize);
         btnCancel.addActionListener(e -> {
             returnState = PresetSelection.CANCELLED.getValue();
             dispose();
         });
         buttonPanel.add(btnCancel);
 
-        JButton btnApply = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "CampaignOptionsPresetPicker.button.apply"));
-        btnApply.addActionListener(e -> {
-            selectedPreset = loadFullPreset((CampaignPreset) cboPresets.getSelectedItem());
-            returnState = PresetSelection.APPLY.getValue();
-            dispose();
-        });
-        buttonPanel.add(btnApply);
-
-        JButton btnCustomize = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
-              "CampaignOptionsPresetPicker.button.customize"));
-        btnCustomize.setEnabled(includeCustomizePresetOption);
-        btnCustomize.addActionListener(e -> {
-            selectedPreset = loadFullPreset((CampaignPreset) cboPresets.getSelectedItem());
-            returnState = PresetSelection.CUSTOMIZE.getValue();
-            dispose();
-        });
-        buttonPanel.add(btnCustomize);
-
-        Dimension buttonSize = new Dimension(BUTTON_WIDTH, SINGLE_LINE_HEIGHT);
-        btnCancel.setPreferredSize(buttonSize);
-        btnApply.setPreferredSize(buttonSize);
-        btnCustomize.setPreferredSize(buttonSize);
-
         contentPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         setContentPane(contentPanel);
+        getRootPane().setDefaultButton(btnApply);
         pack();
         fitToScreen(parentFrame);
         setVisible(true);
@@ -305,6 +299,29 @@ public class CampaignOptionsPresetPicker extends JDialog {
         final int minY = screenBounds.y + screenInsets.top;
         final int clampedY = Math.max(minY, Math.min(getY(), minY + usableHeight - getHeight()));
         setLocation(getX(), clampedY);
+    }
+
+    /**
+     * Loads the preset currently selected in the combo box and, if it loads successfully, records the chosen outcome
+     * and closes the dialog. If the preset cannot be loaded the dialog is left open and an error is shown, so the
+     * action never silently completes with no selection.
+     *
+     * @param cboPresets the combo box holding the selectable presets
+     * @param selection  the outcome to record when the selected preset loads successfully
+     */
+    private void commitSelection(JComboBox<CampaignPreset> cboPresets, PresetSelection selection) {
+        final CampaignPreset preset = loadFullPreset((CampaignPreset) cboPresets.getSelectedItem());
+        if (preset == null) {
+            JOptionPane.showMessageDialog(this,
+                  getTextAt(RESOURCE_BUNDLE, "CampaignOptionsPresetPicker.loadFailed.message"),
+                  getTextAt(RESOURCE_BUNDLE, "CampaignOptionsPresetPicker.loadFailed.title"),
+                  JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        selectedPreset = preset;
+        returnState = selection.getValue();
+        dispose();
     }
 
     /**

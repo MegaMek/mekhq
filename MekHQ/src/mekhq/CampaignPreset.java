@@ -552,7 +552,7 @@ public class CampaignPreset {
      * @return a metadata-only {@link CampaignPreset}, or {@code null} if the file could not be read or has no title
      */
     private static @Nullable CampaignPreset parseMetadataFromFile(final @Nullable File file) {
-        if ((file == null) || !file.isFile() || !file.getName().toLowerCase().endsWith(".xml")) {
+        if ((file == null) || !file.isFile() || !file.getName().toLowerCase(java.util.Locale.ROOT).endsWith(".xml")) {
             return null;
         }
 
