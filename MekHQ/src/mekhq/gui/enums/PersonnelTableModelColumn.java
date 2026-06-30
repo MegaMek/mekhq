@@ -38,7 +38,6 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.swing.SortOrder;
 import javax.swing.SwingConstants;
 
 import megamek.client.ui.util.UIUtil;
@@ -79,6 +78,7 @@ import mekhq.campaign.randomEvents.personalities.PersonalityTrait;
 import mekhq.campaign.randomEvents.personalities.Reasoning;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
+import mekhq.gui.baseComponents.tables.MHQTableColumn;
 import mekhq.gui.model.LocationDisplay;
 import mekhq.gui.sorter.PersonRankSorter;
 import mekhq.gui.sorter.PersonalityTraitSorter;
@@ -86,7 +86,7 @@ import mekhq.utilities.MHQInternationalization;
 import mekhq.utilities.ReportingUtilities;
 import org.jspecify.annotations.NonNull;
 
-public enum PersonnelTableModelColumn {
+public enum PersonnelTableModelColumn implements MHQTableColumn {
 
     PERSON_GRAPHICAL("Column.PERSON.title", Comparators.STRING_COMPARATOR,
           (person, campaign) -> "<html>" + person.getFullDesc(campaign) + "</html>"),
@@ -449,8 +449,14 @@ public enum PersonnelTableModelColumn {
         this(name, modelComparator, (person, campaign) -> modelExtractor.apply(person), string -> string);
     }
 
+    @Override
     public Comparator<?> getComparator() {
         return modelComparator;
+    }
+
+    @Override
+    public int getIndex() {
+        return ordinal();
     }
 
     private static String convertBooleanToYesNoNA(Boolean yesNoValue) {
@@ -472,6 +478,7 @@ public enum PersonnelTableModelColumn {
         return MHQInternationalization.getTextAt(RESOURCE_BUNDLE, key);
     }
 
+    @Override
     public String getText(Object model) {
         return modelToText.apply(model);
     }
@@ -890,6 +897,7 @@ public enum PersonnelTableModelColumn {
      * Returns optional preferred size.
      * @return null if the column has no size preference, a preferred width otherwise.
      */
+    @Override
     @Nullable
     public Integer getPreferredWidth() {
         Integer preferredWidth = switch (this) {
@@ -906,6 +914,7 @@ public enum PersonnelTableModelColumn {
         return (preferredWidth == null) ? null : UIUtil.scaleForGUI(preferredWidth);
     }
 
+    @Override
     public int getAlignment() {
         return switch (this) {
             case RANK, SKILL_LEVEL -> SwingConstants.LEFT;
@@ -916,13 +925,6 @@ public enum PersonnelTableModelColumn {
                 }
                 yield SwingConstants.CENTER;
             }
-        };
-    }
-
-    public @Nullable SortOrder getDefaultSortOrder() {
-        return switch (this) {
-            case RANK, FIRST_NAME, LAST_NAME, SKILL_LEVEL -> SortOrder.DESCENDING;
-            default -> null;
         };
     }
 
