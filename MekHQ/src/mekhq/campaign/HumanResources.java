@@ -1996,7 +1996,8 @@ public class HumanResources {
             if (campaign.getCampaignOptions().isPayForRecruitment() && !gmAdd) {
                 if (!finances.debit(TransactionType.RECRUITMENT,
                       currentDay,
-                      person.getSalary(campaign).multipliedBy(2),
+                      person.getSalary(campaign.getCampaignOptions(), currentDay, campaign.isClanCampaign())
+                            .multipliedBy(2),
                       String.format(resources.getString("personnelRecruitmentFinancesReason.text"),
                             person.getFullName()))) {
                     campaign.addReport(DailyReportType.FINANCES,

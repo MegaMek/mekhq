@@ -1688,7 +1688,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_EDIT_SALARY: {
-                int originalSalary = selectedPerson.getSalary(getCampaign()).getAmount().intValue();
+                int originalSalary = selectedPerson.getSalary(getCampaignOptions(),
+                      getCampaign().getLocalDate(),
+                      getCampaign().isClanCampaign()).getAmount().intValue();
 
                 PopupValueChoiceDialog salaryDialog = new PopupValueChoiceDialog(getFrame(),
                       true,

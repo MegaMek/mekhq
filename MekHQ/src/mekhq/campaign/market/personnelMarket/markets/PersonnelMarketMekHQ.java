@@ -445,7 +445,9 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
         // 12 months' salary, we double the multiplier from 12 to 24. And a normal hiring cost is one month's salary
         // we increase 1 to 2.
         int hiringCostMultiplier = isWasOfferingGoldenHello() ? 24 : 2;
-        Money salary = applicant.getSalary(getCampaign());
+        Money salary = applicant.getSalary(getCampaign().getCampaignOptions(),
+              getToday(),
+              getCampaign().isClanCampaign());
         return salary.multipliedBy(hiringCostMultiplier);
     }
 }

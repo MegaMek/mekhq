@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2009-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -382,7 +382,8 @@ public class PersonnelMarketDialog extends JDialog {
         if (null != selectedPerson) {
             if (campaign.getFunds()
                       .isLessThan((campaign.getCampaignOptions().isPayForRecruitment() ?
-                                         selectedPerson.getSalary(campaign).multipliedBy(2) :
+                                         selectedPerson.getSalary(campaign.getCampaignOptions(),
+                                               campaign.getLocalDate(), campaign.isClanCampaign()).multipliedBy(2) :
                                          Money.zero()).plus(unitCost))) {
                 campaign.addReport(FINANCES, "<font color='" +
                                                    ReportingUtilities.getNegativeColor() +

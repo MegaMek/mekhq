@@ -1744,7 +1744,9 @@ public abstract class AbstractCompanyGenerator {
 
         Money hiringCosts = Money.zero();
         for (final CompanyGenerationPersonTracker tracker : trackers) {
-            hiringCosts = hiringCosts.plus(tracker.getPerson().getSalary(campaign).multipliedBy(2));
+            hiringCosts =
+                  hiringCosts.plus(tracker.getPerson().getSalary(campaign.getCampaignOptions(),
+                        campaign.getLocalDate(), campaign.isClanCampaign()).multipliedBy(2));
         }
         return hiringCosts;
     }

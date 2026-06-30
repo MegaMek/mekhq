@@ -1030,18 +1030,20 @@ public class RetirementDefectionTracker {
      * @return The amount in C-bills required to get a bonus to the Employee Turnover roll
      */
     public static Money getPayoutOrBonusValue(final Campaign campaign, Person person) {
-        double bonusMultiplier = campaign.getCampaignOptions().getPayoutRateEnlisted();
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        double bonusMultiplier = campaignOptions.getPayoutRateEnlisted();
 
         if (person.getRank().isOfficer()) {
-            bonusMultiplier = campaign.getCampaignOptions().getPayoutRateOfficer();
+            bonusMultiplier = campaignOptions.getPayoutRateOfficer();
         }
 
-        if (campaign.getCampaignOptions().isUsePayoutServiceBonus()) {
+        if (campaignOptions.isUsePayoutServiceBonus()) {
             bonusMultiplier += person.getYearsInService(campaign) *
-                                     ((double) campaign.getCampaignOptions().getPayoutServiceBonusRate() / 100);
+                                     ((double) campaignOptions.getPayoutServiceBonusRate() / 100);
         }
 
-        return person.getSalary(campaign).multipliedBy(bonusMultiplier);
+        return person.getSalary(campaignOptions, campaign.getLocalDate(), campaign.isClanCampaign())
+                     .multipliedBy(bonusMultiplier);
     }
 
     /**

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -41,6 +41,7 @@ import java.util.ResourceBundle;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -70,6 +71,10 @@ public class PersonnelReport extends AbstractReport {
         int countRetired = 0;
         Money salary = Money.zero();
 
+        CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
+        LocalDate today = getCampaign().getLocalDate();
+        boolean isClanCampaign = getCampaign().isClanCampaign();
+        boolean isAdvancedMedical = campaignOptions.isUseAdvancedMedical();
         for (Person person : getCampaign().getPersonnel().values()) {
             if ((!person.getPrimaryRole().isCombat()) || (!person.getPrisonerStatus().isFreeOrBondsman())) {
                 continue;
@@ -79,12 +84,13 @@ public class PersonnelReport extends AbstractReport {
             if (person.getStatus().isActive()) {
                 countPersonByType[person.getPrimaryRole().ordinal()]++;
                 countTotal++;
-                if (getCampaign().getCampaignOptions().isUseAdvancedMedical() && !person.getInjuries().isEmpty()) {
+                if (isAdvancedMedical && !person.getInjuries().isEmpty()) {
                     countInjured++;
                 } else if (person.getHits() > 0) {
                     countInjured++;
                 }
-                salary = salary.plus(person.getSalary(getCampaign()));
+                salary = salary.plus(person.getSalary(campaignOptions,
+                      today, isClanCampaign));
             } else if ((person.getPrisonerStatus().isBondsman()) && (person.getStatus().isActive())) {
                 if (!person.getInjuries().isEmpty() || (person.getHits() > 0)) {
                     countInjured++;
@@ -129,8 +135,8 @@ public class PersonnelReport extends AbstractReport {
                 if (poolSize > 0) {
                     String labelKey = "combat.temp." + role.name().toLowerCase() + ".text";
                     String label = resources.containsKey(labelKey) ?
-                        resources.getString(labelKey) :
-                        "Temp " + role.getLabel(getCampaign().getFaction().isClan());
+                                         resources.getString(labelKey) :
+                                         "Temp " + role.getLabel(getCampaign().getFaction().isClan());
                     sb.append(String.format("    %-30s    %4s\n", label, poolSize));
                 }
             }
@@ -171,6 +177,8 @@ public class PersonnelReport extends AbstractReport {
         int childrenStudents = 0;
         Money civilianSalaries = Money.zero();
         LocalDate today = getCampaign().getLocalDate();
+        CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
+        boolean isClanCampaign = getCampaign().isClanCampaign();
 
         for (Person person : getCampaign().getPersonnel().values()) {
             if (person.getStatus().isCampFollower() && !person.getPrisonerStatus().isCurrentPrisoner()) {
@@ -187,7 +195,7 @@ public class PersonnelReport extends AbstractReport {
                 if (!person.getInjuries().isEmpty() || (person.getHits() > 0)) {
                     countInjured++;
                 }
-                salary = salary.plus(person.getSalary(getCampaign()));
+                salary = salary.plus(person.getSalary(campaignOptions, today, isClanCampaign));
             } else if (person.getPrisonerStatus().isCurrentPrisoner() && person.getStatus().isActive()) {
                 prisoners++;
             } else if (person.getPrisonerStatus().isBondsman() && person.getStatus().isActive()) {
@@ -223,7 +231,7 @@ public class PersonnelReport extends AbstractReport {
                 }
 
                 if (person.getStatus().isSalaryEligible()) {
-                    civilianSalaries = civilianSalaries.plus(person.getSalary(getCampaign()));
+                    civilianSalaries = civilianSalaries.plus(person.getSalary(campaignOptions, today, isClanCampaign));
                 }
             }
         }
@@ -268,7 +276,7 @@ public class PersonnelReport extends AbstractReport {
                             "\n" + getFormattedTextAt("mekhq.resources.PersonnelReport", "support.dependant.text"
                                   , dependents, dependentStudents) :
                             "\n" + getFormattedTextAt("mekhq.resources"
-                                                            + ".PersonnelReport",
+                                                      + ".PersonnelReport",
                                   "support.dependants.text",
                                   dependents,
                                   dependentStudents))
@@ -276,22 +284,22 @@ public class PersonnelReport extends AbstractReport {
                             "\n" + getFormattedTextAt("mekhq.resources.PersonnelReport", "support.child.text"
                                   , children, childrenStudents) :
                             "\n" + getFormattedTextAt("mekhq.resources"
-                                                            + ".PersonnelReport",
+                                                      + ".PersonnelReport",
                                   "support.children.text",
                                   children,
                                   childrenStudents))
               .append("\n").append(resources.getString("dependant.salary.text")).append(": ")
               .append(civilianSalaries.toAmountAndSymbolString())
               .append("\n").append((prisoners == 1) ? getFormattedTextAt("mekhq.resources"
-                                                                               + ".PersonnelReport",
+                                                                         + ".PersonnelReport",
                     "prisoner.text",
                     prisoners) : getFormattedTextAt("mekhq.resources"
-                                                          + ".PersonnelReport", "prisoners.text", prisoners)).append(": ")
+                                                    + ".PersonnelReport", "prisoners.text", prisoners)).append(": ")
               .append("\n").append((bondsmen == 1) ? getFormattedTextAt("mekhq.resources"
-                                                                              + ".PersonnelReport",
+                                                                        + ".PersonnelReport",
                     "bondsman.text",
                     bondsmen) : getFormattedTextAt("mekhq.resources"
-                                                         + ".PersonnelReport", "bondsmen.text", bondsmen)).append(": ");
+                                                   + ".PersonnelReport", "bondsmen.text", bondsmen)).append(": ");
 
         return getFormattedTextAt("mekhq.resources.PersonnelReport", "secondary.support", sb.toString());
     }

@@ -58,6 +58,7 @@ import java.util.Map;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
+import mekhq.campaign.HumanResources;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -83,6 +84,9 @@ public class AccountantTest {
 
         Accountant accountant = new Accountant(mockCampaign);
 
+        HumanResources mockHumanResources = mock(HumanResources.class);
+        when(mockCampaign.getHumanResources()).thenReturn(mockHumanResources);
+
         CurrentLocation location = new CurrentLocation();
         when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
@@ -105,6 +109,9 @@ public class AccountantTest {
         when(mockCampaignOptions.isPayForHousing()).thenReturn(false);
 
         Accountant accountant = new Accountant(mockCampaign);
+
+        HumanResources mockHumanResources = mock(HumanResources.class);
+        when(mockCampaign.getHumanResources()).thenReturn(mockHumanResources);
 
         CurrentLocation location = new CurrentLocation();
         when(mockCampaign.getCurrentLocation()).thenReturn(location);
@@ -129,6 +136,9 @@ public class AccountantTest {
 
         Accountant accountant = new Accountant(mockCampaign);
 
+        HumanResources mockHumanResources = mock(HumanResources.class);
+        when(mockCampaign.getHumanResources()).thenReturn(mockHumanResources);
+
         CurrentLocation location = new CurrentLocation();
         when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
@@ -138,7 +148,7 @@ public class AccountantTest {
         Person prisoner = new Person(mockCampaign);
         prisoner.setPrisonerStatus(mockCampaign, PRISONER, false);
         List<Person> prisoners = List.of(prisoner, prisoner, prisoner);
-        when(mockCampaign.getAllPersonnel()).thenReturn(prisoners);
+        when(mockHumanResources.getPersonnel()).thenReturn(prisoners);
 
         // Act
         int expensesFood = FOOD_PRISONER_OR_DEPENDENT * prisoners.size();
@@ -162,6 +172,9 @@ public class AccountantTest {
 
         Accountant accountant = new Accountant(mockCampaign);
 
+        HumanResources mockHumanResources = mock(HumanResources.class);
+        when(mockCampaign.getHumanResources()).thenReturn(mockHumanResources);
+
         CurrentLocation location = new CurrentLocation();
         when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
@@ -171,7 +184,7 @@ public class AccountantTest {
         Person prisoner = new Person(mockCampaign);
         prisoner.setPrisonerStatus(mockCampaign, PRISONER, false);
         List<Person> prisoners = List.of(prisoner, prisoner, prisoner);
-        when(mockCampaign.getAllPersonnel()).thenReturn(prisoners);
+        when(mockHumanResources.getPersonnel()).thenReturn(prisoners);
 
         // Act
         int expensesHousing = HOUSING_PRISONER_OR_DEPENDENT * prisoners.size();
@@ -194,6 +207,9 @@ public class AccountantTest {
 
         Accountant accountant = new Accountant(mockCampaign);
 
+        HumanResources mockHumanResources = mock(HumanResources.class);
+        when(mockCampaign.getHumanResources()).thenReturn(mockHumanResources);
+
         CurrentLocation location = new CurrentLocation();
         when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
@@ -203,7 +219,7 @@ public class AccountantTest {
         Person prisoner = new Person(mockCampaign);
         prisoner.setPrisonerStatus(mockCampaign, PRISONER, false);
         List<Person> prisoners = List.of(prisoner, prisoner, prisoner);
-        when(mockCampaign.getAllPersonnel()).thenReturn(prisoners);
+        when(mockHumanResources.getPersonnel()).thenReturn(prisoners);
 
         // Act
         int expensesFood = FOOD_PRISONER_OR_DEPENDENT * prisoners.size();
@@ -226,6 +242,9 @@ public class AccountantTest {
 
         Accountant accountant = new Accountant(mockCampaign);
 
+        HumanResources mockHumanResources = mock(HumanResources.class);
+        when(mockCampaign.getHumanResources()).thenReturn(mockHumanResources);
+
         CurrentLocation location = new CurrentLocation();
         when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
@@ -233,9 +252,9 @@ public class AccountantTest {
         when(mockCampaign.getFaction()).thenReturn(faction);
 
         Person dependent = new Person(mockCampaign);
-        dependent.setPrimaryRole(mockCampaign, DEPENDENT);
+        dependent.setPrimaryRoleDirect(DEPENDENT);
         List<Person> dependents = List.of(dependent, dependent, dependent);
-        when(mockCampaign.getAllPersonnel()).thenReturn(dependents);
+        when(mockHumanResources.getPersonnel()).thenReturn(dependents);
 
         // Act
         int expensesFood = FOOD_PRISONER_OR_DEPENDENT * dependents.size();
@@ -259,6 +278,9 @@ public class AccountantTest {
 
         Accountant accountant = new Accountant(mockCampaign);
 
+        HumanResources mockHumanResources = mock(HumanResources.class);
+        when(mockCampaign.getHumanResources()).thenReturn(mockHumanResources);
+
         CurrentLocation location = new CurrentLocation();
         when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
@@ -266,9 +288,9 @@ public class AccountantTest {
         when(mockCampaign.getFaction()).thenReturn(faction);
 
         Person dependent = new Person(mockCampaign);
-        dependent.setPrimaryRole(mockCampaign, DEPENDENT);
+        dependent.setPrimaryRoleDirect(DEPENDENT);
         List<Person> dependents = List.of(dependent, dependent, dependent);
-        when(mockCampaign.getAllPersonnel()).thenReturn(dependents);
+        when(mockHumanResources.getPersonnel()).thenReturn(dependents);
 
         // Act
         int expensesHousing = HOUSING_PRISONER_OR_DEPENDENT * dependents.size();
@@ -291,6 +313,9 @@ public class AccountantTest {
 
         Accountant accountant = new Accountant(mockCampaign);
 
+        HumanResources mockHumanResources = mock(HumanResources.class);
+        when(mockCampaign.getHumanResources()).thenReturn(mockHumanResources);
+
         CurrentLocation location = new CurrentLocation();
         when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
@@ -298,9 +323,9 @@ public class AccountantTest {
         when(mockCampaign.getFaction()).thenReturn(faction);
 
         Person dependent = new Person(mockCampaign);
-        dependent.setPrimaryRole(mockCampaign, DEPENDENT);
+        dependent.setPrimaryRoleDirect(DEPENDENT);
         List<Person> dependents = List.of(dependent, dependent, dependent);
-        when(mockCampaign.getAllPersonnel()).thenReturn(dependents);
+        when(mockHumanResources.getPersonnel()).thenReturn(dependents);
 
         // Act
         int expensesFood = FOOD_PRISONER_OR_DEPENDENT * dependents.size();
@@ -323,6 +348,9 @@ public class AccountantTest {
 
         Accountant accountant = new Accountant(mockCampaign);
 
+        HumanResources mockHumanResources = mock(HumanResources.class);
+        when(mockCampaign.getHumanResources()).thenReturn(mockHumanResources);
+
         CurrentLocation location = new CurrentLocation();
         when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
@@ -330,10 +358,10 @@ public class AccountantTest {
         when(mockCampaign.getFaction()).thenReturn(faction);
 
         Person enlisted = new Person(mockCampaign);
-        enlisted.setPrimaryRole(mockCampaign, MEKWARRIOR);
+        enlisted.setPrimaryRoleDirect(MEKWARRIOR);
         enlisted.setRank(RWO_MIN - 1);
         List<Person> enlistedPersonnel = List.of(enlisted, enlisted, enlisted);
-        when(mockCampaign.getAllPersonnel()).thenReturn(enlistedPersonnel);
+        when(mockHumanResources.getPersonnel()).thenReturn(enlistedPersonnel);
 
         // Act
         int expensesFood = FOOD_ENLISTED * enlistedPersonnel.size();
@@ -357,6 +385,9 @@ public class AccountantTest {
 
         Accountant accountant = new Accountant(mockCampaign);
 
+        HumanResources mockHumanResources = mock(HumanResources.class);
+        when(mockCampaign.getHumanResources()).thenReturn(mockHumanResources);
+
         CurrentLocation location = new CurrentLocation();
         when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
@@ -364,10 +395,10 @@ public class AccountantTest {
         when(mockCampaign.getFaction()).thenReturn(faction);
 
         Person enlisted = new Person(mockCampaign);
-        enlisted.setPrimaryRole(mockCampaign, MEKWARRIOR);
+        enlisted.setPrimaryRoleDirect(MEKWARRIOR);
         enlisted.setRank(RWO_MIN - 1);
         List<Person> enlistedPersonnel = List.of(enlisted, enlisted, enlisted);
-        when(mockCampaign.getAllPersonnel()).thenReturn(enlistedPersonnel);
+        when(mockHumanResources.getPersonnel()).thenReturn(enlistedPersonnel);
 
         // Act
         int expensesHousing = HOUSING_ENLISTED * enlistedPersonnel.size();
@@ -390,6 +421,9 @@ public class AccountantTest {
 
         Accountant accountant = new Accountant(mockCampaign);
 
+        HumanResources mockHumanResources = mock(HumanResources.class);
+        when(mockCampaign.getHumanResources()).thenReturn(mockHumanResources);
+
         CurrentLocation location = new CurrentLocation();
         when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
@@ -397,10 +431,10 @@ public class AccountantTest {
         when(mockCampaign.getFaction()).thenReturn(faction);
 
         Person enlisted = new Person(mockCampaign);
-        enlisted.setPrimaryRole(mockCampaign, MEKWARRIOR);
+        enlisted.setPrimaryRoleDirect(MEKWARRIOR);
         enlisted.setRank(RWO_MIN - 1);
         List<Person> enlistedPersonnel = List.of(enlisted, enlisted, enlisted);
-        when(mockCampaign.getAllPersonnel()).thenReturn(enlistedPersonnel);
+        when(mockHumanResources.getPersonnel()).thenReturn(enlistedPersonnel);
 
         // Act
         int expensesFood = FOOD_ENLISTED * enlistedPersonnel.size();
@@ -423,6 +457,9 @@ public class AccountantTest {
 
         Accountant accountant = new Accountant(mockCampaign);
 
+        HumanResources mockHumanResources = mock(HumanResources.class);
+        when(mockCampaign.getHumanResources()).thenReturn(mockHumanResources);
+
         CurrentLocation location = new CurrentLocation();
         when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
@@ -430,10 +467,10 @@ public class AccountantTest {
         when(mockCampaign.getFaction()).thenReturn(faction);
 
         Person officer = new Person(mockCampaign);
-        officer.setPrimaryRole(mockCampaign, MEKWARRIOR);
+        officer.setPrimaryRoleDirect(MEKWARRIOR);
         officer.setRank(RWO_MIN + 1);
         List<Person> officerPersonnel = List.of(officer, officer, officer);
-        when(mockCampaign.getAllPersonnel()).thenReturn(officerPersonnel);
+        when(mockHumanResources.getPersonnel()).thenReturn(officerPersonnel);
 
         // Act
         int expensesFood = FOOD_OFFICER * officerPersonnel.size();
@@ -457,6 +494,9 @@ public class AccountantTest {
 
         Accountant accountant = new Accountant(mockCampaign);
 
+        HumanResources mockHumanResources = mock(HumanResources.class);
+        when(mockCampaign.getHumanResources()).thenReturn(mockHumanResources);
+
         CurrentLocation location = new CurrentLocation();
         when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
@@ -464,10 +504,10 @@ public class AccountantTest {
         when(mockCampaign.getFaction()).thenReturn(faction);
 
         Person officer = new Person(mockCampaign);
-        officer.setPrimaryRole(mockCampaign, MEKWARRIOR);
+        officer.setPrimaryRoleDirect(MEKWARRIOR);
         officer.setRank(RWO_MIN + 1);
         List<Person> officerPersonnel = List.of(officer, officer, officer);
-        when(mockCampaign.getAllPersonnel()).thenReturn(officerPersonnel);
+        when(mockHumanResources.getPersonnel()).thenReturn(officerPersonnel);
 
         // Act
         int expensesHousing = HOUSING_OFFICER * officerPersonnel.size();
@@ -490,6 +530,9 @@ public class AccountantTest {
 
         Accountant accountant = new Accountant(mockCampaign);
 
+        HumanResources mockHumanResources = mock(HumanResources.class);
+        when(mockCampaign.getHumanResources()).thenReturn(mockHumanResources);
+
         CurrentLocation location = new CurrentLocation();
         when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
@@ -497,10 +540,10 @@ public class AccountantTest {
         when(mockCampaign.getFaction()).thenReturn(faction);
 
         Person officer = new Person(mockCampaign);
-        officer.setPrimaryRole(mockCampaign, MEKWARRIOR);
+        officer.setPrimaryRoleDirect(MEKWARRIOR);
         officer.setRank(RWO_MIN + 1);
         List<Person> officerPersonnel = List.of(officer, officer, officer);
-        when(mockCampaign.getAllPersonnel()).thenReturn(officerPersonnel);
+        when(mockHumanResources.getPersonnel()).thenReturn(officerPersonnel);
 
         // Act
         int expensesFood = FOOD_OFFICER * officerPersonnel.size();
@@ -523,6 +566,9 @@ public class AccountantTest {
 
         Accountant accountant = new Accountant(mockCampaign);
 
+        HumanResources mockHumanResources = mock(HumanResources.class);
+        when(mockCampaign.getHumanResources()).thenReturn(mockHumanResources);
+
         CurrentLocation location = new CurrentLocation();
         when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
@@ -534,16 +580,16 @@ public class AccountantTest {
         List<Person> prisoners = List.of(prisoner, prisoner, prisoner);
 
         Person dependent = new Person(mockCampaign);
-        dependent.setPrimaryRole(mockCampaign, DEPENDENT);
+        dependent.setPrimaryRoleDirect(DEPENDENT);
         List<Person> dependents = List.of(dependent, dependent, dependent);
 
         Person enlisted = new Person(mockCampaign);
-        enlisted.setPrimaryRole(mockCampaign, MEKWARRIOR);
+        enlisted.setPrimaryRoleDirect(MEKWARRIOR);
         enlisted.setRank(RWO_MIN - 1);
         List<Person> enlistedPersonnel = List.of(enlisted, enlisted, enlisted);
 
         Person officer = new Person(mockCampaign);
-        officer.setPrimaryRole(mockCampaign, MEKWARRIOR);
+        officer.setPrimaryRoleDirect(MEKWARRIOR);
         officer.setRank(RWO_MIN + 1);
         List<Person> officerPersonnel = List.of(officer, officer, officer);
 
@@ -552,7 +598,7 @@ public class AccountantTest {
         allPersonnel.addAll(dependents);
         allPersonnel.addAll(enlistedPersonnel);
         allPersonnel.addAll(officerPersonnel);
-        when(mockCampaign.getAllPersonnel()).thenReturn(allPersonnel);
+        when(mockHumanResources.getPersonnel()).thenReturn(allPersonnel);
 
         // Act
         int expensesFood = FOOD_PRISONER_OR_DEPENDENT * (prisoners.size() + dependents.size());
@@ -582,6 +628,9 @@ public class AccountantTest {
 
         Accountant accountant = new Accountant(mockCampaign);
 
+        HumanResources mockHumanResources = mock(HumanResources.class);
+        when(mockCampaign.getHumanResources()).thenReturn(mockHumanResources);
+
         CurrentLocation location = new CurrentLocation();
         when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
@@ -593,16 +642,16 @@ public class AccountantTest {
         List<Person> prisoners = List.of(prisoner, prisoner, prisoner);
 
         Person dependent = new Person(mockCampaign);
-        dependent.setPrimaryRole(mockCampaign, DEPENDENT);
+        dependent.setPrimaryRoleDirect(DEPENDENT);
         List<Person> dependents = List.of(dependent, dependent, dependent);
 
         Person enlisted = new Person(mockCampaign);
-        enlisted.setPrimaryRole(mockCampaign, MEKWARRIOR);
+        enlisted.setPrimaryRoleDirect(MEKWARRIOR);
         enlisted.setRank(RWO_MIN - 1);
         List<Person> enlistedPersonnel = List.of(enlisted, enlisted, enlisted);
 
         Person officer = new Person(mockCampaign);
-        officer.setPrimaryRole(mockCampaign, MEKWARRIOR);
+        officer.setPrimaryRoleDirect(MEKWARRIOR);
         officer.setRank(RWO_MIN + 1);
         List<Person> officerPersonnel = List.of(officer, officer, officer);
 
@@ -611,7 +660,7 @@ public class AccountantTest {
         allPersonnel.addAll(dependents);
         allPersonnel.addAll(enlistedPersonnel);
         allPersonnel.addAll(officerPersonnel);
-        when(mockCampaign.getAllPersonnel()).thenReturn(allPersonnel);
+        when(mockHumanResources.getPersonnel()).thenReturn(allPersonnel);
 
         // Act
         int expensesHousing = HOUSING_PRISONER_OR_DEPENDENT * (prisoners.size() + dependents.size());
@@ -637,6 +686,9 @@ public class AccountantTest {
 
         Accountant accountant = new Accountant(mockCampaign);
 
+        HumanResources mockHumanResources = mock(HumanResources.class);
+        when(mockCampaign.getHumanResources()).thenReturn(mockHumanResources);
+
         CurrentLocation location = new CurrentLocation();
         when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
@@ -648,16 +700,16 @@ public class AccountantTest {
         List<Person> prisoners = List.of(prisoner, prisoner, prisoner);
 
         Person dependent = new Person(mockCampaign);
-        dependent.setPrimaryRole(mockCampaign, DEPENDENT);
+        dependent.setPrimaryRoleDirect(DEPENDENT);
         List<Person> dependents = List.of(dependent, dependent, dependent);
 
         Person enlisted = new Person(mockCampaign);
-        enlisted.setPrimaryRole(mockCampaign, MEKWARRIOR);
+        enlisted.setPrimaryRoleDirect(MEKWARRIOR);
         enlisted.setRank(RWO_MIN - 1);
         List<Person> enlistedPersonnel = List.of(enlisted, enlisted, enlisted);
 
         Person officer = new Person(mockCampaign);
-        officer.setPrimaryRole(mockCampaign, MEKWARRIOR);
+        officer.setPrimaryRoleDirect(MEKWARRIOR);
         officer.setRank(RWO_MIN + 1);
         List<Person> officerPersonnel = List.of(officer, officer, officer);
 
@@ -666,7 +718,7 @@ public class AccountantTest {
         allPersonnel.addAll(dependents);
         allPersonnel.addAll(enlistedPersonnel);
         allPersonnel.addAll(officerPersonnel);
-        when(mockCampaign.getAllPersonnel()).thenReturn(allPersonnel);
+        when(mockHumanResources.getPersonnel()).thenReturn(allPersonnel);
 
         // Act
         int expensesFood = FOOD_PRISONER_OR_DEPENDENT * (prisoners.size() + dependents.size());
@@ -692,6 +744,9 @@ public class AccountantTest {
 
         Accountant accountant = new Accountant(mockCampaign);
 
+        HumanResources mockHumanResources = mock(HumanResources.class);
+        when(mockCampaign.getHumanResources()).thenReturn(mockHumanResources);
+
         CurrentLocation location = new CurrentLocation();
         location.setTransitTime(1);
         when(mockCampaign.getCurrentLocation()).thenReturn(location);
@@ -704,16 +759,16 @@ public class AccountantTest {
         List<Person> prisoners = List.of(prisoner, prisoner, prisoner);
 
         Person dependent = new Person(mockCampaign);
-        dependent.setPrimaryRole(mockCampaign, DEPENDENT);
+        dependent.setPrimaryRoleDirect(DEPENDENT);
         List<Person> dependents = List.of(dependent, dependent, dependent);
 
         Person enlisted = new Person(mockCampaign);
-        enlisted.setPrimaryRole(mockCampaign, MEKWARRIOR);
+        enlisted.setPrimaryRoleDirect(MEKWARRIOR);
         enlisted.setRank(RWO_MIN - 1);
         List<Person> enlistedPersonnel = List.of(enlisted, enlisted, enlisted);
 
         Person officer = new Person(mockCampaign);
-        officer.setPrimaryRole(mockCampaign, MEKWARRIOR);
+        officer.setPrimaryRoleDirect(MEKWARRIOR);
         officer.setRank(RWO_MIN + 1);
         List<Person> officerPersonnel = List.of(officer, officer, officer);
 
@@ -722,7 +777,7 @@ public class AccountantTest {
         allPersonnel.addAll(dependents);
         allPersonnel.addAll(enlistedPersonnel);
         allPersonnel.addAll(officerPersonnel);
-        when(mockCampaign.getAllPersonnel()).thenReturn(allPersonnel);
+        when(mockHumanResources.getPersonnel()).thenReturn(allPersonnel);
 
         // Act
         int expensesFood = FOOD_PRISONER_OR_DEPENDENT * (prisoners.size() + dependents.size());
@@ -750,6 +805,9 @@ public class AccountantTest {
 
         Accountant accountant = new Accountant(mockCampaign);
 
+        HumanResources mockHumanResources = mock(HumanResources.class);
+        when(mockCampaign.getHumanResources()).thenReturn(mockHumanResources);
+
         CurrentLocation location = new CurrentLocation();
         when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
@@ -761,16 +819,16 @@ public class AccountantTest {
         List<Person> prisoners = List.of(prisoner, prisoner, prisoner);
 
         Person dependent = new Person(mockCampaign);
-        dependent.setPrimaryRole(mockCampaign, DEPENDENT);
+        dependent.setPrimaryRoleDirect(DEPENDENT);
         List<Person> dependents = List.of(dependent, dependent, dependent);
 
         Person enlisted = new Person(mockCampaign);
-        enlisted.setPrimaryRole(mockCampaign, MEKWARRIOR);
+        enlisted.setPrimaryRoleDirect(MEKWARRIOR);
         enlisted.setRank(RWO_MIN - 1);
         List<Person> enlistedPersonnel = List.of(enlisted, enlisted, enlisted);
 
         Person officer = new Person(mockCampaign);
-        officer.setPrimaryRole(mockCampaign, MEKWARRIOR);
+        officer.setPrimaryRoleDirect(MEKWARRIOR);
         officer.setRank(RWO_MIN + 1);
         List<Person> officerPersonnel = List.of(officer, officer, officer);
 
@@ -781,7 +839,7 @@ public class AccountantTest {
         warShip.setEntity(mockEntity);
 
         Person warShipCrew = new Person(mockCampaign);
-        warShipCrew.setPrimaryRole(mockCampaign, VESSEL_GUNNER);
+        warShipCrew.setPrimaryRoleDirect(VESSEL_GUNNER);
         warShipCrew.setRank(RWO_MIN - 1);
         warShipCrew.setUnit(warShip);
         List<Person> warShipPersonnel = List.of(warShipCrew, warShipCrew, warShipCrew);
@@ -792,7 +850,7 @@ public class AccountantTest {
         allPersonnel.addAll(enlistedPersonnel);
         allPersonnel.addAll(officerPersonnel);
         allPersonnel.addAll(warShipPersonnel);
-        when(mockCampaign.getAllPersonnel()).thenReturn(allPersonnel);
+        when(mockHumanResources.getPersonnel()).thenReturn(allPersonnel);
 
         // Act
         int expensesFood = FOOD_PRISONER_OR_DEPENDENT * (prisoners.size() + dependents.size());
@@ -817,6 +875,7 @@ public class AccountantTest {
     @Nested
     class TestGetPayrollSummary {
         Campaign mockCampaign;
+        HumanResources mockHumanResources;
         CampaignOptions campaignOptions;
         Accountant accountant;
         final int EXPECTEDPAY = 100;
@@ -825,6 +884,8 @@ public class AccountantTest {
         @BeforeEach
         void beforeEach() {
             mockCampaign = mock(Campaign.class);
+            mockHumanResources = mock(HumanResources.class);
+            when(mockCampaign.getHumanResources()).thenReturn(mockHumanResources);
             campaignOptions = new CampaignOptions();
             accountant = new Accountant(mockCampaign);
         }
@@ -850,7 +911,7 @@ public class AccountantTest {
             Person mockPerson = getMockPerson(EXPECTEDPAY);
 
             when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
-            when(mockCampaign.getSalaryEligiblePersonnel()).thenReturn(List.of(mockPerson));
+            when(mockHumanResources.getSalaryEligiblePersonnel()).thenReturn(List.of(mockPerson));
 
             // Act
             Map<Person, Money> expectedMap = accountant.getPayRollSummary();
@@ -866,7 +927,7 @@ public class AccountantTest {
         @Test
         void testGetAstechPoolPay() {
             // Arrange
-            when(mockCampaign.getTemporaryAsTechPool()).thenReturn(5);
+            when(mockHumanResources.getTemporaryAsTechPool()).thenReturn(5);
             when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
 
             // Act
@@ -882,7 +943,7 @@ public class AccountantTest {
         @Test
         void testGetMedicPoolPay() {
             // Arrange
-            when(mockCampaign.getTemporaryMedicPool()).thenReturn(5);
+            when(mockHumanResources.getTemporaryMedicPool()).thenReturn(5);
             when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
 
             // Act
@@ -900,9 +961,9 @@ public class AccountantTest {
                               "VEHICLE_CREW_NAVAL", "VESSEL_PILOT", "VESSEL_GUNNER", "VESSEL_CREW" })
         void testGetAllTempCrewPay(PersonnelRole role) {
             // Arrange
-            when(mockCampaign.getTempCrewRoleKeys())
+            when(mockHumanResources.getTempCrewRoleKeys())
                   .thenReturn(new HashSet<>(Collections.singleton(role)));
-            when(mockCampaign.getTempCrewPool(any())).thenReturn(CREWCOUNT);
+            when(mockHumanResources.getTempCrewPool(any())).thenReturn(CREWCOUNT);
             when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
 
             // Act
@@ -920,7 +981,7 @@ public class AccountantTest {
         Person getMockPerson(int pay) {
             Person mockPerson = mock(Person.class);
 
-            when(mockPerson.getSalary(mockCampaign)).thenReturn(Money.of(pay));
+            when(mockPerson.getSalary(campaignOptions, null, false)).thenReturn(Money.of(pay));
             return mockPerson;
         }
     }
