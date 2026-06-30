@@ -815,16 +815,16 @@ public class AtBDynamicScenarioFactory {
                         }
                     } else {
                         generatedLance = generateLance(factionCode, skill, quality, unitTypes, requiredRoles, campaign);
+                    }
 
-                        // If extreme temperatures are present and XCT infantry is not being generated,
-                        // swap out standard armor for snowsuits or heat suits as appropriate
-                        if (actualUnitType == INFANTRY) {
-                            for (Entity curPlatoon : generatedLance) {
-                                changeInfantryKit((ConvInfantry) curPlatoon,
-                                      isLowPressure,
-                                      isTainted,
-                                      scenario.getTemperature());
-                            }
+                    // If extreme temperatures are present and XCT infantry is not being generated,
+                    // swap out standard armor for snowsuits or heat suits as appropriate
+                    if (actualUnitType == INFANTRY) {
+                        for (Entity currentPlatoon : generatedLance) {
+                            changeInfantryKit((ConvInfantry) currentPlatoon,
+                                  isLowPressure,
+                                  isTainted,
+                                  scenario.getTemperature());
                         }
                     }
                 }

@@ -88,6 +88,7 @@ import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
 import mekhq.campaign.events.units.UnitRemovedEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.QuickTrain;
+import mekhq.gui.adapter.PersonnelTableMouseAdapter;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.BatchXPDialog;
@@ -375,6 +376,8 @@ public final class PersonnelTab extends CampaignGuiTab {
         add(splitPersonnel, gridBagConstraints);
 
         registerSearchShortcut();
+
+        PersonnelTableMouseAdapter.connect(getCampaignGui(), personnelTable, personnelTableModel, splitPersonnel);
 
         refreshAll();
         updateUIScaling();

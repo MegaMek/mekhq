@@ -32,6 +32,7 @@
  */
 package mekhq.gui.campaignOptions;
 
+import static megamek.client.ui.util.FontHandler.symbolIcon;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.setSmallSizeVariant;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -143,29 +144,31 @@ class CampaignOptionsNavigationPanel extends JPanel {
               ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         navigationScrollPane.setName("campaignOptionsNavigationScrollPane");
 
+        JPanel searchRow = new JPanel(new BorderLayout(CONTROL_GAP, 0));
+        searchRow.setName("campaignOptionsSearchRow");
+        searchRow.add(filterField, BorderLayout.CENTER);
+        searchRow.add(createTreeControls(), BorderLayout.EAST);
+
         JPanel filterPanel = new JPanel(new BorderLayout(0, CONTROL_GAP));
         filterPanel.setName("campaignOptionsFilterPanel");
-        filterPanel.add(filterField, BorderLayout.NORTH);
+        filterPanel.add(searchRow, BorderLayout.NORTH);
         filterPanel.add(filterStatusLabel, BorderLayout.SOUTH);
 
-        JPanel topPanel = new JPanel(new BorderLayout(0, CONTROL_GAP));
-        topPanel.setName("campaignOptionsNavigationTopPanel");
-        topPanel.add(filterPanel, BorderLayout.NORTH);
-        topPanel.add(createTreeControls(), BorderLayout.CENTER);
-
-        add(topPanel, BorderLayout.NORTH);
+        add(filterPanel, BorderLayout.NORTH);
         add(navigationScrollPane, BorderLayout.CENTER);
 
         buildNavigationTree("");
     }
 
     private JPanel createTreeControls() {
-        JButton expandAllButton = createTreeControlButton("btnExpandAll.text", "btnCampaignOptionsExpandAll");
+        JButton expandAllButton = createTreeControlButton("btnExpandAll.text", "btnCampaignOptionsExpandAll", 0xE5D7,
+              UIUtil.scaleForGUI(18));
         expandAllButton.addActionListener(evt -> setAllNodesExpanded(true));
-        JButton collapseAllButton = createTreeControlButton("btnCollapseAll.text", "btnCampaignOptionsCollapseAll");
+        JButton collapseAllButton = createTreeControlButton("btnCollapseAll.text", "btnCampaignOptionsCollapseAll",
+              0xE5D6, UIUtil.scaleForGUI(20));
         collapseAllButton.addActionListener(evt -> setAllNodesExpanded(false));
 
-        JPanel controls = new JPanel(new FlowLayout(FlowLayout.CENTER, UIUtil.scaleForGUI(4), 0));
+        JPanel controls = new JPanel(new FlowLayout(FlowLayout.CENTER, UIUtil.scaleForGUI(2), 0));
         controls.setName("campaignOptionsNavigationControls");
         controls.setOpaque(false);
         controls.add(expandAllButton);
@@ -173,11 +176,19 @@ class CampaignOptionsNavigationPanel extends JPanel {
         return controls;
     }
 
-    private JButton createTreeControlButton(String resourceKey, String name) {
-        JButton button = new JButton(getTextAt(getCampaignOptionsResourceBundle(), resourceKey));
+    private JButton createTreeControlButton(String tooltipKey, String name, int iconCodePoint, int iconSize) {
+        JButton button = new JButton();
         button.setName(name);
         button.setFocusable(false);
+        // Icon-only toolbar buttons on the search row; the section "Expand All"/"Collapse All" buttons teach the same
+        // unfold icons, and the tooltip covers first-time discovery. Collapse is sized a touch larger so its tighter
+        // glyph reads the same as the expand glyph.
+        button.setIcon(symbolIcon(iconCodePoint, iconSize, button.getForeground()));
+        button.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(), tooltipKey));
+        button.putClientProperty("JButton.buttonType", "toolBarButton");
         setSmallSizeVariant(button);
+        int buttonSide = UIUtil.scaleForGUI(28);
+        button.setPreferredSize(new Dimension(buttonSide, buttonSide));
         return button;
     }
 
