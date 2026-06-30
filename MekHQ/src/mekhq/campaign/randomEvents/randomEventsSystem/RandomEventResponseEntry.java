@@ -44,15 +44,14 @@ import mekhq.campaign.personnel.skills.enums.SkillAttribute;
  * Represents an individual response entry for a random event. Each response entry defines a response quality and its
  * associated effects.
  *
- * @param quality            the quality of the response, as defined by the {@link RandomEventResponseQuality} enum
- * @param followOnEvent      the internal {@code randomEventType} reference to the follow-on event
- * @param followOnEventDelay how many days to wait for the follow-on event
- * @param skillCheckSkill    the skill used in skill checks related to this response
- * @param abilityCheckType   the ability used in ability checks related to this response
- * @param effectsSuccess     a list of effects resulting from successful resolution of the event, as defined by the
- *                           {@link RandomEventResult} record
- * @param effectsFailure     a list of effects resulting from failing to resolve the event, as defined by the
- *                           {@link RandomEventResult} record
+ * @param quality          the quality of the response, as defined by the {@link RandomEventResponseQuality} enum
+ * @param followOnEvent    the internal {@code randomEventType} reference to the follow-on event
+ * @param skillCheckSkill  the skill used in skill checks related to this response
+ * @param abilityCheckType the ability used in ability checks related to this response
+ * @param effectsSuccess   a list of effects resulting from successful resolution of the event, as defined by the
+ *                         {@link RandomEventResult} record
+ * @param effectsFailure   a list of effects resulting from failing to resolve the event, as defined by the
+ *                         {@link RandomEventResult} record
  */
 public record RandomEventResponseEntry(
       RandomEventResponseQuality quality,

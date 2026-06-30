@@ -59,6 +59,7 @@ import megamek.codeUtilities.ObjectUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 import megamek.common.units.Entity;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
@@ -89,6 +90,7 @@ import mekhq.utilities.ReportingUtilities;
  * interactions with the player via dialogs, providing options to resolve prisoner-related issues.</p>
  */
 public class PrisonerEventManager {
+    private static final MMLogger LOGGER = MMLogger.create(PrisonerEventManager.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PrisonerEvents";
 
     private final Campaign campaign;
@@ -312,7 +314,8 @@ public class PrisonerEventManager {
 
         // Random Event
         if (!isHeadless) {
-            processRandomEvent(majorEvent);
+            RandomEventData eventData = pickEvent(majorEvent);
+            processRandomEvent(eventData, majorEvent);
         }
         return List.of(true, majorEvent);
     }
@@ -324,11 +327,10 @@ public class PrisonerEventManager {
      * allowing them to decide how to respond. Based on the outcome, the event's effects are applied, which may include
      * generating escapee scenarios or other consequences.</p>
      *
-     * @param majorEvent {@code true} if the event is classified as a major event, {@code false} for a minor event.
+     * @param eventData  the event to process
+     * @param majorEvent {@code true} if the event is a major event, {@code false} otherwise.
      */
-    private void processRandomEvent(boolean majorEvent) {
-        RandomEventData eventData = pickEvent(majorEvent);
-
+    private void processRandomEvent(RandomEventData eventData, boolean majorEvent) {
         RandomEventDialog dialog = new RandomEventDialog(campaign, speaker, null, eventData, RESOURCE_BUNDLE);
         int choiceIndex = dialog.getDialogChoice();
         boolean isSuccessful = dialog.wasSuccessful();
@@ -349,6 +351,21 @@ public class PrisonerEventManager {
                 Collections.shuffle(contracts);
 
                 new PrisonEscapeScenario(campaign, contracts.getFirst(), escapees);
+            }
+        }
+
+        processFollowOnEvent(majorEvent, dialog, choiceIndex);
+    }
+
+    private void processFollowOnEvent(boolean majorEvent, RandomEventDialog dialog, int choiceIndex) {
+        String followOnEvent = dialog.getFollowOnEvent(choiceIndex);
+        if (followOnEvent != null) {
+            RandomEventData followOnEventData = campaign.getRandomEventLibraries().getPrisonerEvent(followOnEvent,
+                  majorEvent);
+            if (followOnEventData != null) {
+                processRandomEvent(followOnEventData, majorEvent);
+            } else {
+                LOGGER.warn("Could not find follow-on event: {}. Skipping", followOnEvent);
             }
         }
     }

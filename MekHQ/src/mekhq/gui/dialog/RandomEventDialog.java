@@ -88,6 +88,7 @@ public class RandomEventDialog {
     private final boolean useEdge;
     private final int personalityModifier;
 
+    private final Map<Integer, String> followOnEventMap = new HashMap<>();
     private final Map<Integer, SkillCheck> skillCheckMap = new HashMap<>();
     private final Map<Integer, AttributeCheck> attributeCheckMap = new HashMap<>();
     private final Map<Integer, Integer> difficultyMap = new HashMap<>();
@@ -103,6 +104,10 @@ public class RandomEventDialog {
 
     public boolean wasSuccessful() {
         return wasSuccessful;
+    }
+
+    public @Nullable String getFollowOnEvent(int responseIndex) {
+        return followOnEventMap.get(responseIndex);
     }
 
     public RandomEventDialog(Campaign campaign, Person eventParticipant, @Nullable Person otherEventParticipant,
@@ -175,8 +180,15 @@ public class RandomEventDialog {
             List<TargetRollModifier> externalModifiers = applyExternalModifiers(personalityModifier,
                   response, responseIndex);
 
+            addFollowOnEvent(response.followOnEvent(), responseIndex);
             addSkillCheck(response.skillCheckSkill(), externalModifiers, responseIndex);
             addAttributeCheck(response.abilityCheckType(), externalModifiers, responseIndex);
+        }
+    }
+
+    private void addFollowOnEvent(String eventTypeKey, int responseIndex) {
+        if (!StringUtility.isNullOrBlank(eventTypeKey)) {
+            followOnEventMap.put(responseIndex, eventTypeKey);
         }
     }
 
