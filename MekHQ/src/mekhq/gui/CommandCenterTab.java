@@ -281,7 +281,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.weighty = 0.0;
         panCommand.add(panFaction, gridBagConstraints);
 
-        JPanel pnlTutorial = new TutorialHyperlinkPanel("commandCenterTab");
+        JPanel pnlTutorial = new TutorialHyperlinkPanel("commandCenterTab.keyText");
 
         setLayout(new BorderLayout());
         add(panCommand, BorderLayout.CENTER);

@@ -35,6 +35,7 @@ package mekhq.gui.panels;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
+import java.awt.Insets;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
@@ -76,9 +77,9 @@ public class TutorialHyperlinkPanel extends JPanel {
 
         JEditorPane paneTutorial = new JEditorPane();
         paneTutorial.setContentType("text/html");
-        paneTutorial.setText("<html><div style='text-align:center'>" +
-                                   getTextAt(RESOURCE_BUNDLE, key + ".keyText") +
-                                   "</div></html>");
+        String text = getTextAt(RESOURCE_BUNDLE, key);
+        paneTutorial.setText("<html><div style='text-align:center'>" + text + "</div></html>");
+        paneTutorial.setMargin(new Insets(0, 20, 0, 20));
         paneTutorial.setEditable(false);
         paneTutorial.setBorder(null);
         paneTutorial.setOpaque(false);
