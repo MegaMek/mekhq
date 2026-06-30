@@ -32,20 +32,23 @@
  */
 package mekhq.gui.campaignOptions;
 
+import static megamek.client.ui.util.FontHandler.symbolIcon;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.setSmallSizeVariant;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTree;
@@ -56,6 +59,7 @@ import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
@@ -69,6 +73,10 @@ import megamek.common.ui.FastJScrollPane;
  */
 class CampaignOptionsNavigationPanel extends JPanel {
     static final int NAVIGATION_WIDTH = 240;
+    // Padding between the navigation frame border and its content.
+    private static final int CONTENT_GAP = UIUtil.scaleForGUI(6);
+    // Tighter vertical gap stacking the search box, tree controls, and tree, so the controls read as one cluster.
+    private static final int CONTROL_GAP = UIUtil.scaleForGUI(4);
 
     private final List<CampaignOptionsRoute> routes;
     private final Consumer<CampaignOptionsRoute> routeSelectionListener;
@@ -81,7 +89,7 @@ class CampaignOptionsNavigationPanel extends JPanel {
 
     CampaignOptionsNavigationPanel(@Nonnull List<CampaignOptionsRoute> routes,
           @Nonnull Consumer<CampaignOptionsRoute> routeSelectionListener) {
-        super(new BorderLayout());
+        super(new BorderLayout(0, CONTROL_GAP));
         this.routes = routes;
         this.routeSelectionListener = routeSelectionListener;
 
@@ -94,10 +102,7 @@ class CampaignOptionsNavigationPanel extends JPanel {
             frameBorder = BorderFactory.createLineBorder(UIManager.getColor("Component.borderColor"));
         }
         setBorder(BorderFactory.createCompoundBorder(frameBorder,
-              BorderFactory.createEmptyBorder(UIUtil.scaleForGUI(6),
-                    UIUtil.scaleForGUI(6),
-                    UIUtil.scaleForGUI(6),
-                    UIUtil.scaleForGUI(6))));
+              BorderFactory.createEmptyBorder(CONTENT_GAP, CONTENT_GAP, CONTENT_GAP, CONTENT_GAP)));
         setPreferredSize(new Dimension(UIUtil.scaleForGUI(NAVIGATION_WIDTH), 1));
 
         filterField = new JTextField();
@@ -127,32 +132,26 @@ class CampaignOptionsNavigationPanel extends JPanel {
         filterStatusLabel.setHorizontalAlignment(SwingConstants.LEADING);
         filterStatusLabel.setVisible(false);
 
-        JButton legendButton = new JButton("\u24D8");
-        legendButton.setName("btnCampaignOptionsLegend");
-        legendButton.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(), "campaignOptionsLegend.tooltip"));
-        legendButton.putClientProperty("JButton.buttonType", "toolBarButton");
-        legendButton.setFocusable(false);
-        legendButton.addActionListener(evt -> showLegend(legendButton));
-
         navigationTree = new JTree();
         navigationTree.setName("campaignOptionsNavigationTree");
         navigationTree.setRootVisible(false);
         navigationTree.setShowsRootHandles(true);
         navigationTree.addTreeSelectionListener(evt -> notifySelectedRoute());
+        navigationTree.setCellRenderer(new NavigationTreeCellRenderer());
 
         JScrollPane navigationScrollPane = new FastJScrollPane(navigationTree,
               ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
               ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         navigationScrollPane.setName("campaignOptionsNavigationScrollPane");
 
-        JPanel filterRow = new JPanel(new BorderLayout(UIUtil.scaleForGUI(4), 0));
-        filterRow.setName("campaignOptionsFilterRow");
-        filterRow.add(filterField, BorderLayout.CENTER);
-        filterRow.add(legendButton, BorderLayout.EAST);
+        JPanel searchRow = new JPanel(new BorderLayout(CONTROL_GAP, 0));
+        searchRow.setName("campaignOptionsSearchRow");
+        searchRow.add(filterField, BorderLayout.CENTER);
+        searchRow.add(createTreeControls(), BorderLayout.EAST);
 
-        JPanel filterPanel = new JPanel(new BorderLayout(0, UIUtil.scaleForGUI(4)));
+        JPanel filterPanel = new JPanel(new BorderLayout(0, CONTROL_GAP));
         filterPanel.setName("campaignOptionsFilterPanel");
-        filterPanel.add(filterRow, BorderLayout.NORTH);
+        filterPanel.add(searchRow, BorderLayout.NORTH);
         filterPanel.add(filterStatusLabel, BorderLayout.SOUTH);
 
         add(filterPanel, BorderLayout.NORTH);
@@ -161,24 +160,54 @@ class CampaignOptionsNavigationPanel extends JPanel {
         buildNavigationTree("");
     }
 
-    private void showLegend(JComponent anchor) {
-        JLabel legend = new JLabel("<html><body>"
-              + getTextAt(getCampaignOptionsResourceBundle(), "lblGeneralIconLegend.text")
-              + "</body></html>");
-        legend.setBorder(BorderFactory.createEmptyBorder(UIUtil.scaleForGUI(8),
-              UIUtil.scaleForGUI(8),
-              UIUtil.scaleForGUI(8),
-              UIUtil.scaleForGUI(8)));
+    private JPanel createTreeControls() {
+        JButton expandAllButton = createTreeControlButton("btnExpandAll.text", "btnCampaignOptionsExpandAll", 0xE5D7,
+              UIUtil.scaleForGUI(18));
+        expandAllButton.addActionListener(evt -> setAllNodesExpanded(true));
+        JButton collapseAllButton = createTreeControlButton("btnCollapseAll.text", "btnCampaignOptionsCollapseAll",
+              0xE5D6, UIUtil.scaleForGUI(20));
+        collapseAllButton.addActionListener(evt -> setAllNodesExpanded(false));
 
-        JPopupMenu legendPopup = new JPopupMenu();
-        legendPopup.setName("campaignOptionsLegendPopup");
-        legendPopup.setLayout(new BorderLayout());
-        legendPopup.add(legend, BorderLayout.CENTER);
+        JPanel controls = new JPanel(new FlowLayout(FlowLayout.CENTER, UIUtil.scaleForGUI(2), 0));
+        controls.setName("campaignOptionsNavigationControls");
+        controls.setOpaque(false);
+        controls.add(expandAllButton);
+        controls.add(collapseAllButton);
+        return controls;
+    }
 
-        Dimension popupSize = legendPopup.getPreferredSize();
-        // Anchor the popup so its right edge lines up with the button, opening downward beneath the icon.
-        int x = anchor.getWidth() - popupSize.width;
-        legendPopup.show(anchor, x, anchor.getHeight());
+    private JButton createTreeControlButton(String tooltipKey, String name, int iconCodePoint, int iconSize) {
+        JButton button = new JButton();
+        button.setName(name);
+        button.setFocusable(false);
+        // Icon-only toolbar buttons on the search row; the section "Expand All"/"Collapse All" buttons teach the same
+        // unfold icons, and the tooltip covers first-time discovery. Collapse is sized a touch larger so its tighter
+        // glyph reads the same as the expand glyph.
+        button.setIcon(symbolIcon(iconCodePoint, iconSize, button.getForeground()));
+        button.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(), tooltipKey));
+        button.putClientProperty("JButton.buttonType", "toolBarButton");
+        setSmallSizeVariant(button);
+        int buttonSide = UIUtil.scaleForGUI(28);
+        button.setPreferredSize(new Dimension(buttonSide, buttonSide));
+        return button;
+    }
+
+    /**
+     * Expands or collapses every node in the navigation tree. Collapsing leaves only the top-level category rows
+     * visible; expanding reveals every page.
+     *
+     * @param expanded {@code true} to expand all rows, {@code false} to collapse them
+     */
+    private void setAllNodesExpanded(boolean expanded) {
+        if (expanded) {
+            for (int row = 0; row < navigationTree.getRowCount(); row++) {
+                navigationTree.expandRow(row);
+            }
+        } else {
+            for (int row = navigationTree.getRowCount() - 1; row >= 0; row--) {
+                navigationTree.collapseRow(row);
+            }
+        }
     }
 
     void selectRoute(CampaignOptionsRoute route) {
@@ -235,6 +264,25 @@ class CampaignOptionsNavigationPanel extends JPanel {
      */
     void refreshFilter() {
         buildNavigationTree(filterField.getText());
+    }
+
+    /**
+     * Returns the current filter text, normalized the same way the navigation search matches routes, so callers can
+     * decide which section a page should open expanded to. Backs the "expand the matched section" navigation behavior.
+     *
+     * @return the normalized active filter, or an empty string when the filter is blank
+     */
+    String getActiveFilter() {
+        return CampaignOptionsRoute.normalizeSearchText(filterField.getText());
+    }
+
+    /**
+     * Moves keyboard focus to the navigation filter field and selects any existing text, so a fresh query replaces
+     * it. Backs the dialog's Ctrl/Cmd+F shortcut.
+     */
+    void focusSearchField() {
+        filterField.requestFocusInWindow();
+        filterField.selectAll();
     }
 
     private void buildNavigationTree(String filterText) {
@@ -356,6 +404,27 @@ class CampaignOptionsNavigationPanel extends JPanel {
         }
 
         return null;
+    }
+
+    /**
+     * Renders the navigation tree, drawing the top-level category nodes in bold so the major sections stand out from
+     * their sub-pages. The hidden root sits at level 0, so the visible top-level rows are the level-1 nodes.
+     */
+    private static class NavigationTreeCellRenderer extends DefaultTreeCellRenderer {
+        @Override
+        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded,
+              boolean leaf, int row, boolean hasFocus) {
+            super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
+
+            Font baseFont = tree.getFont();
+            if (baseFont != null) {
+                boolean topLevel = value instanceof DefaultMutableTreeNode node && node.getLevel() == 1;
+                // Toggle only the BOLD bit so other style bits the Look&Feel may set (e.g. italics) are preserved.
+                int style = topLevel ? (baseFont.getStyle() | Font.BOLD) : (baseFont.getStyle() & ~Font.BOLD);
+                setFont(baseFont.deriveFont(style));
+            }
+            return this;
+        }
     }
 
     private static class NavigationTreeNode {

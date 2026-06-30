@@ -142,7 +142,10 @@ public final class BatchXPDialog extends JDialog {
                 continue;
             }
 
-            tableColumn.setPreferredWidth(column.getWidth());
+            Integer width = column.getPreferredWidth();
+            if (width != null) {
+                tableColumn.setPreferredWidth(width);
+            }
             tableColumn.setCellRenderer(getRenderer());
             columnModel.setColumnVisible(tableColumn, true);
 
