@@ -42,6 +42,7 @@ import javax.swing.SwingConstants;
 
 import megamek.client.ui.util.UIUtil;
 import megamek.codeUtilities.StringUtility;
+import megamek.common.TargetRollModifier;
 import megamek.common.annotations.Nullable;
 import megamek.common.units.Entity;
 import megamek.common.units.Jumpship;
@@ -74,6 +75,7 @@ import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
+import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.randomEvents.personalities.PersonalityTrait;
 import mekhq.campaign.randomEvents.personalities.Reasoning;
 import mekhq.campaign.unit.Unit;
@@ -228,6 +230,8 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
           (person, campaign) ->
                 campaign.getCampaignOptions().isUseAdvancedMedical() ? person.getInjuries().size() : person.getHits(),
           Object::toString),
+    MODIFICATION_COUNT("Column.MODIFICATION_COUNT.title", Comparators.INT_COMPARATOR,
+          person -> person.getProstheticInjuries().size(), Object::toString),
     KILLS("Column.KILLS.title", Comparators.INT_COMPARATOR,
           (person, campaign) -> campaign.getKillsFor(person.getId()).size(), Object::toString),
     SALARY("Column.SALARY.title", fieldBasedSorter(Money::getAmount),
@@ -299,10 +303,16 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
           Fatigue::getEffectiveFatigue, Object::toString),
     SPA_COUNT("Column.SPA_COUNT.title", Comparators.INT_COMPARATOR,
           person -> person.countOptions(PersonnelOptions.LVL3_ADVANTAGES), Object::toString),
-    MODIFICATION_COUNT("Column.MODIFICATION_COUNT.title", Comparators.INT_COMPARATOR,
-          person -> person.getProstheticInjuries().size(), Object::toString),
     IMPLANT_COUNT("Column.IMPLANT_COUNT.title", Comparators.INT_COMPARATOR,
           person -> person.countOptions(PersonnelOptions.MD_ADVANTAGES), Object::toString),
+    MANAGEMENT_MODIFIER("Column.MANAGEMENT_MODIFIER.title", Comparators.INT_COMPARATOR,
+          (person, campaign) -> campaign.getRetirementDefectionTracker().getManagementSkillPenalty(person, campaign),
+          Object::toString),
+    FACTION_MODIFIER("Column.FACTION_MODIFIER.title", Comparators.INT_COMPARATOR,
+          (person, campaign) ->
+                RetirementDefectionTracker.getFactionModifiers(person, campaign)
+                      .stream().mapToInt(TargetRollModifier::value).sum(),
+          Object::toString),
     LOYALTY("Column.LOYALTY.title", Comparators.INT_COMPARATOR,
           (person, campaign) -> person.getAdjustedLoyalty(campaign.getFaction(),
                 campaign.getCampaignOptions().isUseAlternativeAdvancedMedical()), Object::toString),
