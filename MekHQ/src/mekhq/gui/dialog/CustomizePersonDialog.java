@@ -38,7 +38,7 @@ import static mekhq.campaign.personnel.Person.*;
 import static mekhq.campaign.personnel.skills.Skill.getCountUpMaxValue;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeInterviewersNotes;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
-import static mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk.personalityQuirksSortedAlphabetically;
+import static mekhq.campaign.randomEvents.personalities.PersonalityQuirk.personalityQuirksSortedAlphabetically;
 
 import java.awt.Component;
 import java.awt.GridBagConstraints;
@@ -47,16 +47,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.ResourceBundle;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import javax.swing.*;
 
 import megamek.client.generator.RandomCallsignGenerator;
@@ -69,6 +60,7 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.TechConstants;
+import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.options.IOption;
@@ -90,18 +82,17 @@ import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.randomEvents.personalities.enums.Aggression;
-import mekhq.campaign.randomEvents.personalities.enums.Ambition;
-import mekhq.campaign.randomEvents.personalities.enums.Greed;
-import mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk;
-import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
-import mekhq.campaign.randomEvents.personalities.enums.Social;
+import mekhq.campaign.randomEvents.personalities.Aggression;
+import mekhq.campaign.randomEvents.personalities.Ambition;
+import mekhq.campaign.randomEvents.personalities.Greed;
+import mekhq.campaign.randomEvents.personalities.PersonalityQuirk;
+import mekhq.campaign.randomEvents.personalities.Reasoning;
+import mekhq.campaign.randomEvents.personalities.Social;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.control.EditKillLogControl;
 import mekhq.gui.control.EditLogControl;
@@ -138,8 +129,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     private JButton btnRetirementDate;
     private JComboBox<Gender> choiceGender;
     private JLabel lblAge;
-    private AbstractMHQScrollablePanel skillsPanel;
-    private AbstractMHQScrollablePanel optionsPanel;
+    private DefaultMHQScrollablePanel skillsPanel;
+    private DefaultMHQScrollablePanel optionsPanel;
     private JTextField textToughness;
     private JTextField textConnections;
     private JTextField textWealth;
@@ -520,18 +511,18 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         allSystems = getPlanetarySystemsComboBoxModel();
         Faction originFaction = person.getOriginFaction();
         DefaultComboBoxModel<PlanetarySystem> initialSystems = (originFaction != null)
-              ? getPlanetarySystemsComboBoxModel(originFaction)
-              : allSystems;
+                                                                     ? getPlanetarySystemsComboBoxModel(originFaction)
+                                                                     : allSystems;
         // If the person already has an origin planet that the faction-filtered view excludes (e.g.,
         // a Tharkad-origin character whose faction is now FedSuns), fall back to the all-worlds view
         // so we don't silently drop their existing assignment when they click OK. Tracked back to the
         // checkbox state below via showAllWorldsInitial. (Copilot review on PR #8935.)
         PlanetarySystem existingOriginSystem = (person.getOriginPlanet() != null)
-              ? person.getOriginPlanet().getParentSystem()
-              : null;
+                                                     ? person.getOriginPlanet().getParentSystem()
+                                                     : null;
         boolean showAllWorldsInitial = false;
         if (existingOriginSystem != null && initialSystems != allSystems
-              && initialSystems.getIndexOf(existingOriginSystem) < 0) {
+                  && initialSystems.getIndexOf(existingOriginSystem) < 0) {
             initialSystems = allSystems;
             showAllWorldsInitial = true;
         }
@@ -1421,11 +1412,11 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     }
 
     /**
-     * Rebuilds {@code choiceFaction}'s model after a "Show All Factions" toggle, preserving the
-     * current selection across the swap. If there was no current selection (or the previously
-     * selected faction has been filtered out by the new model), the index is explicitly set to
-     * {@code -1} — otherwise Swing's combobox auto-selects the first item on a model swap, which
-     * would silently assign an unintended origin when OK is clicked. (Copilot review on PR #8937.)
+     * Rebuilds {@code choiceFaction}'s model after a "Show All Factions" toggle, preserving the current selection
+     * across the swap. If there was no current selection (or the previously selected faction has been filtered out by
+     * the new model), the index is explicitly set to {@code -1} — otherwise Swing's combobox auto-selects the first
+     * item on a model swap, which would silently assign an unintended origin when OK is clicked. (Copilot review on PR
+     * #8937.)
      */
     private void rebuildFactionsModelPreservingSelection() {
         Faction current = (Faction) choiceFaction.getSelectedItem();
@@ -1526,7 +1517,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
                                                      .filter(a -> !a.isConnector())
                                                      .filter(a -> {
                                                          Set<Faction> owners = cachedOwnersAt(a);
-                                                         return isInhabitedAt(owners) && isFactionMatch(owners, faction);
+                                                         return isInhabitedAt(owners) &&
+                                                                      isFactionMatch(owners, faction);
                                                      })
                                                      .sorted(Comparator.comparing(a -> a.getName(birthDate)))
                                                      .toList();
@@ -1538,10 +1530,9 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     }
 
     /**
-     * Returns {@link #ownersAt(PlanetarySystem, LocalDate)} cached per system for the dialog's
-     * current {@code birthdate}. The cache is invalidated when {@code birthdate} changes, so a
-     * single filter pass resolves each system at most once even when both the inhabited and
-     * faction filters apply.
+     * Returns {@link #ownersAt(PlanetarySystem, LocalDate)} cached per system for the dialog's current
+     * {@code birthdate}. The cache is invalidated when {@code birthdate} changes, so a single filter pass resolves each
+     * system at most once even when both the inhabited and faction filters apply.
      */
     private Set<Faction> cachedOwnersAt(PlanetarySystem system) {
         if (!java.util.Objects.equals(birthdate, ownersCacheBirthdate)) {
@@ -1552,13 +1543,12 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     }
 
     /**
-     * Renders the dropdown label as e.g. {@code "New Avalon [FS]"} — the date-aware system name
-     * with the resolved owner faction code(s) appended in brackets. Owner is computed by
-     * {@link #ownersAt(PlanetarySystem, LocalDate)} which applies to-the-victor citizenship rules,
-     * so a 3047-born character sees New Avalon as {@code [FS]} rather than the transitional
-     * {@code [FC]}. Multiple owners come out comma-separated, e.g. {@code "World [FACTA, FACTB]"}.
-     * Visible in both filtered and "Show All Worlds" modes — useful both for player context and
-     * for spotting data-side anomalies at a glance.
+     * Renders the dropdown label as e.g. {@code "New Avalon [FS]"} — the date-aware system name with the resolved owner
+     * faction code(s) appended in brackets. Owner is computed by {@link #ownersAt(PlanetarySystem, LocalDate)} which
+     * applies to-the-victor citizenship rules, so a 3047-born character sees New Avalon as {@code [FS]} rather than the
+     * transitional {@code [FC]}. Multiple owners come out comma-separated, e.g. {@code "World [FACTA, FACTB]"}. Visible
+     * in both filtered and "Show All Worlds" modes — useful both for player context and for spotting data-side
+     * anomalies at a glance.
      */
     private String formatSystemForBirthdate(PlanetarySystem system) {
         String name = system.getName(birthdate);
@@ -1583,38 +1573,43 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
      * Cache-bypassing point-in-time owner lookup with to-the-victor citizenship semantics.
      *
      * <p>{@link Planet#getFactionSet(LocalDate)} routes through {@code Planet.CurrentEvents}, a
-     * stateful per-planet event-stream cache that can return stale-forward state when warmed at a
-     * later date and queried at an earlier one (observed during #8934 testing — New Avalon at
-     * 3047-09-25 returning 3067-12-31's {@code DIS} marker because the cache had already advanced
-     * for a campaign-date render). We walk {@link Planet#getEvents()} directly (TreeMap-ordered,
-     * deterministic) instead.</p>
+     * stateful per-planet event-stream cache that can return stale-forward state when warmed at a later date and
+     * queried at an earlier one (observed during #8934 testing — New Avalon at 3047-09-25 returning 3067-12-31's
+     * {@code DIS} marker because the cache had already advanced for a campaign-date render). We walk
+     * {@link Planet#getEvents()} directly (TreeMap-ordered, deterministic) instead.</p>
      *
      * <p>BattleTech canon treats world-citizenship as defined by whoever ends up holding the world
-     * long-term, not by transient umbrella states or active disputes. We substitute the snapshot
-     * with the world's eventual stable owner when:</p>
+     * long-term, not by transient umbrella states or active disputes. We substitute the snapshot with the world's
+     * eventual stable owner when:</p>
      *
      * <ul>
      *   <li>The snapshot is a {@code DIS} (Disputed) marker — to the victor goes the spoils.</li>
-     *   <li>The snapshot owner is a faction with a defined dissolution year that falls within
-     *   100 years of {@code when}. This catches FedCom-era births (FC ends 3067, well within a
-     *   3047 character's lifespan) without retroactively rewriting deep-history births where the
-     *   dissolution is centuries off (a 2470 Star League birth keeps SL — the player chose that
-     *   era deliberately).</li>
+     *   <li>The snapshot owner is a faction with a defined dissolution year within 100 years of {@code when}
+     *   <b>and</b> the eventual owner already held this world at or before {@code when}. The second condition
+     *   restricts substitution to a transient umbrella/overlay state the world reverts out of, and excludes a
+     *   continuous polity that merely renames into a brand-new successor (see below). This catches FedCom-era
+     *   births (FC ends 3067, well within a 3047 character's lifespan) without retroactively rewriting
+     *   deep-history births where the dissolution is centuries off (a 2470 Star League birth keeps SL — the
+     *   player chose that era deliberately).</li>
      * </ul>
      *
      * <p>"Eventual stable owner" is the most-recent non-{@code DIS} faction event in the planet's
      * own future timeline. If the world has no future faction events (data ends at the snapshot),
      * or if the eventual owner is the same as the snapshot, the snapshot is used as-is. The
-     * {@code ABN} (Abandoned) marker is dropped only when other real owners are present.</p>
+     * {@code ABN} (Abandoned) marker is dropped only when other real owners are present. The owner decision
+     * itself lives in {@link #chooseDisplayedOwner}.</p>
      *
      * <p>Concrete cases:</p>
      *
      * <ul>
-     *   <li>New Avalon at 3047, snapshot {@code FC} (ends 3067, within 100y), eventual {@code FS}:
-     *   substitutes — a 3047-born NA citizen is FedSuns-stock regardless of the FedCom overlay.</li>
-     *   <li>Tharkad at 3047, snapshot {@code FC}, eventual {@code LA}: substitutes to {@code LA},
-     *   putting the world on the Lyran side as it ends up.</li>
+     *   <li>New Avalon at 3047, snapshot {@code FC} (ends 3067, within 100y), eventual {@code FS} (held it
+     *   before the FedCom overlay): substitutes — a 3047-born NA citizen is FedSuns-stock.</li>
+     *   <li>Tharkad at 3047, snapshot {@code FC}, eventual {@code LA} (held it before): substitutes to
+     *   {@code LA}, putting the world on the Lyran side as it ends up.</li>
      *   <li>New Avalon at 3070, snapshot {@code DIS}, eventual {@code FS}: substitutes.</li>
+     *   <li>Mishkadrill at 3025, snapshot {@code OA} (Outworlds Alliance, ends 3082, within 100y), eventual
+     *   {@code RA} (Raven Alliance — the rename, never owned the world before 3083): kept as {@code OA}. A
+     *   pre-3083 character is Outworlds-stock, and the OA origin filter still finds the world.</li>
      *   <li>Terra at 2470, snapshot {@code SL} (ends ~2786, 316y off), eventual modern owner: kept
      *   as {@code SL} — the era is intentional.</li>
      *   <li>Hesperus II at 3047, snapshot {@code LA} (no end year), eventual {@code LA}: kept.</li>
@@ -1632,37 +1627,94 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             if (events == null) {
                 continue;
             }
-            java.util.List<String> snapshot = null;
-            java.util.List<String> eventualOwner = null;
+            List<String> snapshot = null;
+            List<String> eventualOwner = null;
+            // Every faction code that owned this world at or before `when`. Lets us tell a transient
+            // overlay the world reverts out of (the eventual owner also held it earlier — e.g. FedCom
+            // over Davion/Lyran worlds) from a continuous polity that simply renames into a brand-new
+            // successor (the eventual owner is new — e.g. Outworlds Alliance -> Raven Alliance). Only
+            // the former is substituted; see chooseDisplayedOwner.
+            Set<String> priorOwnerCodes = new HashSet<>();
             for (Planet.PlanetaryEvent event : events) {
                 if (event.date == null || event.faction == null || event.faction.getValue() == null) {
                     continue;
                 }
-                java.util.List<String> codes = event.faction.getValue();
+                List<String> codes = event.faction.getValue();
                 if (event.date.isAfter(when)) {
                     if (!isDisputedOnly(codes)) {
                         eventualOwner = codes;
                     }
                 } else {
                     snapshot = codes;
+                    priorOwnerCodes.addAll(codes);
                 }
             }
             // No snapshot means the world wasn't owned at `when` — uncolonized. Don't substitute a
             // future colonization event, or we'd incorrectly mark pre-colonial dates as inhabited
             // and pollute the picker (Copilot review on PR #8935).
-            java.util.List<String> displayed;
-            if (snapshot != null && eventualOwner != null && !sameCodes(snapshot, eventualOwner)
-                  && (isDisputedOnly(snapshot) || anyDissolvesNear(snapshot, when))) {
-                displayed = eventualOwner;
-            } else {
-                displayed = snapshot;
-            }
+            List<String> displayed = chooseDisplayedOwner(snapshot, eventualOwner, priorOwnerCodes,
+                  anyDissolvesNear(snapshot, when));
             addCodes(result, displayed);
         }
         if (result.size() > 1) {
             result.remove(Factions.getInstance().getFaction("ABN"));
         }
         return result;
+    }
+
+    /**
+     * Decides which owner code list to credit a world to: the era-correct {@code snapshot} owner, or its
+     * {@code eventualOwner} when the snapshot is merely a transient state the world ends up leaving.
+     *
+     * <p>The snapshot is replaced by the eventual owner only when it is genuinely transient:</p>
+     * <ul>
+     *   <li>The snapshot is a {@code DIS} (Disputed) marker — to the victor goes the spoils; always substitute.</li>
+     *   <li>The snapshot faction dissolves within {@link #DISSOLUTION_PROXIMITY_YEARS} of {@code when}
+     *   ({@code snapshotDissolvesNear}) <b>and</b> the eventual owner already held this world at or before
+     *   {@code when} (its codes intersect {@code priorOwnerCodes}).</li>
+     * </ul>
+     *
+     * <p>The second clause is the key distinction. A temporary umbrella/overlay state that the world reverts out
+     * of has the eventual owner present earlier in the timeline (FedCom over Davion/Lyran worlds reverts to
+     * {@code FS}/{@code LA}), so it substitutes. A continuous polity that merely renames into a brand-new successor
+     * (Outworlds Alliance -> Raven Alliance, Clan Wolf -> Wolf Empire) has a successor that never owned the world
+     * before the rename, so it is <b>not</b> substituted and the era-correct owner is kept. Substituting it would
+     * credit a pre-rename character to a state that does not yet exist and, worse, make the origin-faction world
+     * filter return no worlds for the still-extant pre-rename faction.</p>
+     *
+     * @param snapshot              the owner code(s) at {@code when}, or {@code null} if the world was uncolonized
+     * @param eventualOwner         the world's latest future non-disputed owner code(s), or {@code null} if none
+     * @param priorOwnerCodes       every faction code that owned the world at or before {@code when}
+     * @param snapshotDissolvesNear whether a snapshot faction dissolves within the proximity window of {@code when}
+     *
+     * @return the owner code list to credit: {@code eventualOwner} when substituting, otherwise {@code snapshot}
+     */
+    @Nullable
+    static List<String> chooseDisplayedOwner(@Nullable List<String> snapshot, @Nullable List<String> eventualOwner,
+          Set<String> priorOwnerCodes, boolean snapshotDissolvesNear) {
+        boolean canSubstitute = (snapshot != null) && (eventualOwner != null) && !sameCodes(snapshot, eventualOwner);
+        if (!canSubstitute) {
+            return snapshot;
+        }
+        boolean eventualOwnerHeldWorldBefore = intersects(eventualOwner, priorOwnerCodes);
+        boolean snapshotIsTransient = isDisputedOnly(snapshot)
+                                            || (snapshotDissolvesNear && eventualOwnerHeldWorldBefore);
+        return snapshotIsTransient ? eventualOwner : snapshot;
+    }
+
+    /**
+     * @return {@code true} if any code in {@code codes} is present in {@code priorOwnerCodes}
+     */
+    private static boolean intersects(@Nullable List<String> codes, Set<String> priorOwnerCodes) {
+        if (codes == null) {
+            return false;
+        }
+        for (String code : codes) {
+            if (priorOwnerCodes.contains(code)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static boolean anyDissolvesNear(java.util.List<String> codes, LocalDate when) {
@@ -1711,10 +1763,10 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     }
 
     /**
-     * @return {@code true} if {@code chosen} directly controls the world at the queried date OR is
-     *       lineage-compatible (predecessor/successor) with one of the actual owners. Excludes meta
-     *       umbrella codes ({@code IS}, {@code CLAN.IS}, {@code Periphery.*}, {@code CLAN.*}) so two
-     *       unrelated Inner Sphere factions don't match via the abstract IS umbrella.
+     * @return {@code true} if {@code chosen} directly controls the world at the queried date OR is lineage-compatible
+     *       (predecessor/successor) with one of the actual owners. Excludes meta umbrella codes ({@code IS},
+     *       {@code CLAN.IS}, {@code Periphery.*}, {@code CLAN.*}) so two unrelated Inner Sphere factions don't match
+     *       via the abstract IS umbrella.
      */
     private static boolean isFactionMatch(Set<Faction> owners, Faction chosen) {
         if (owners == null || owners.isEmpty()) {
@@ -1731,7 +1783,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             }
             String ownerCode = owner.getShortName();
             if (containsRealCode(owner.getAlternativeFactionCodes(), chosenCode)
-                  || containsRealCode(chosenAlts, ownerCode)) {
+                      || containsRealCode(chosenAlts, ownerCode)) {
                 return true;
             }
         }
@@ -1755,14 +1807,13 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
     private static boolean isMetaFactionCode(String code) {
         return "IS".equals(code) || "CLAN.IS".equals(code)
-              || code.startsWith("Periphery.") || code.startsWith("CLAN.");
+                     || code.startsWith("Periphery.") || code.startsWith("CLAN.");
     }
 
     /**
      * @return {@code true} if the resolved owner set has at least one real (non-abandoned) faction.
-     *       {@code ownersAt(...)} already drops the {@code ABN} marker when other factions are present;
-     *       a system whose ONLY faction is {@code ABN} would still come back non-empty here, so we
-     *       reject that case explicitly.
+     *       {@code ownersAt(...)} already drops the {@code ABN} marker when other factions are present; a system whose
+     *       ONLY faction is {@code ABN} would still come back non-empty here, so we reject that case explicitly.
      */
     private static boolean isInhabitedAt(Set<Faction> owners) {
         if (owners.isEmpty()) {
@@ -2145,7 +2196,12 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             addGroup(group, gridBag, c);
 
             for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements(); ) {
-                addOption(j.nextElement(), gridBag, c);
+                IOption option = j.nextElement();
+                // Edge isn't processed here. MegaMek treats edge as a type of SPA, whereas in MekHQ Edge is an
+                // Attribute score (as per ATOW).
+                if (!option.getName().equals("edge")) {
+                    addOption(option, gridBag, c);
+                }
             }
         }
     }

@@ -1,0 +1,81 @@
+/*
+ * Copyright (C) 2026 The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
+ */
+
+package mekhq.gui.baseComponents;
+
+import java.awt.Dimension;
+import javax.swing.JPanel;
+
+import megamek.client.ui.clientGUI.GUIPreferences;
+import megamek.client.ui.util.UIUtil;
+
+/**
+ * A custom {@link JPanel} that enforces minimum and maximum width constraints and respects the GUI scale setting.
+ * <p>
+ * This component is useful in flexible UI layouts (such as {@code BoxLayout}) where a panel's horizontal growth and
+ * shrinkage must be explicitly limited. It overrides the standard sizing methods to ensure the width always respects
+ * the specified {@code minWidth} and {@code maxWidth}. These constraints are automatically multiplied by the
+ * {@link GUIPreferences#GUI_SCALE}, while allowing the height to scale dynamically based on the layout manager's
+ * calculations.
+ * </p>
+ */
+public class ScalingWidthConstrainedPanel extends JPanel {
+
+    /** Minimum panel width allowed, before GUI scaling */
+    private final int minWidth;
+    /** Maximum width allowed, before GUI scaling */
+    private final int maxWidth;
+
+    public ScalingWidthConstrainedPanel(int minWidth, int maxWidth) {
+        if (minWidth > maxWidth) {
+            throw new IllegalArgumentException("minWidth cannot be greater than maxWidth");
+        }
+        this.minWidth = minWidth;
+        this.maxWidth = maxWidth;
+    }
+
+    @Override
+    public Dimension getMinimumSize() {
+        return new Dimension(UIUtil.scaleForGUI(minWidth), super.getMinimumSize().height);
+    }
+
+    @Override
+    public Dimension getMaximumSize() {
+        return new Dimension(UIUtil.scaleForGUI(maxWidth), Integer.MAX_VALUE);
+    }
+
+    @Override
+    public Dimension getPreferredSize() {
+        return new Dimension(UIUtil.scaleForGUI(maxWidth), super.getPreferredSize().height);
+    }
+}

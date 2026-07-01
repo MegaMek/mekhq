@@ -32,16 +32,7 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -51,41 +42,11 @@ import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
+import java.util.*;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import javax.swing.AbstractAction;
-import javax.swing.ActionMap;
-import javax.swing.BorderFactory;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.DefaultListModel;
-import javax.swing.InputMap;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.AbstractTableModel;
@@ -366,7 +327,9 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
         tabbedPane.setName("tabPlanetarySystemEditor");
         tabbedPane.addTab(resources.getString("PlanetarySystemEditorDialog.details"),
               new FastJScrollPane(txtSystemDetails));
-        propertiesPanel = new PlanetarySystemPropertiesPanel(resources, campaign::getLocalDate, this::defaultEditorSource,
+        propertiesPanel = new PlanetarySystemPropertiesPanel(resources,
+              campaign::getLocalDate,
+              this::defaultEditorSource,
               this::onPropertiesChanged);
         tabbedPane.addTab(resources.getString("PlanetarySystemEditorDialog.systemEvents"),
               createSystemEventsPane());
@@ -399,9 +362,9 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
     }
 
     private Component createSystemEventsPane() {
-          systemEventsPanel = new PlanetarySystemSystemEventsPanel(this, resources, campaign::getLocalDate,
+        systemEventsPanel = new PlanetarySystemSystemEventsPanel(this, resources, campaign::getLocalDate,
               this::getSelectedSystem, campaign::isGM, this::onPropertiesChanged);
-          return systemEventsPanel;
+        return systemEventsPanel;
     }
 
     private Component createPlanetListPane() {
@@ -1309,7 +1272,7 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
     }
 
     private SocioIndustrialData parseSocioIndustrialData() {
-          String text = blankToNull(PlanetarySystemEditorInputFormatter.formatSocioIndustrialInput(
+        String text = blankToNull(PlanetarySystemEditorInputFormatter.formatSocioIndustrialInput(
               txtEventSocioIndustrial.getText()));
         if (text == null) {
             return null;
@@ -1422,9 +1385,9 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
               JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (choice == JOptionPane.OK_OPTION) {
             List<String> selectedCodes = factionList.getSelectedValuesList()
-                                             .stream()
-                                             .map(FactionChoice::code)
-                                             .toList();
+                                               .stream()
+                                               .map(FactionChoice::code)
+                                               .toList();
             if (!selectedCodes.isEmpty()) {
                 targetField.setText(formatFactionCodes(selectedCodes));
             }
@@ -1677,11 +1640,11 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
         JPanel panel = new JPanel(new BorderLayout(0, PADDING));
         String heading = systemsToReview.size() == 1
                                ? MessageFormat.format(resources.getString(
-                                     "PlanetarySystemEditorDialog.reviewChanges.heading"),
-                                     systemDisplayName(systemsToReview.get(0)))
+                    "PlanetarySystemEditorDialog.reviewChanges.heading"),
+              systemDisplayName(systemsToReview.get(0)))
                                : MessageFormat.format(resources.getString(
-                                     "PlanetarySystemEditorDialog.reviewChanges.allHeading"),
-                                     systemsToReview.size());
+                    "PlanetarySystemEditorDialog.reviewChanges.allHeading"),
+              systemsToReview.size());
         panel.add(new JLabel(heading), BorderLayout.NORTH);
 
         JTextArea txtChanges = createReadOnlyTextArea("txtPlanetarySystemChangeReview");
@@ -1785,7 +1748,7 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
             }
             if (result.hasErrors()) {
                 validationErrors.add(MessageFormat.format(resources.getString(
-                      "PlanetarySystemEditorDialog.saveBlocked.system"), systemDisplayName(system),
+                            "PlanetarySystemEditorDialog.saveBlocked.system"), systemDisplayName(system),
                       result.getErrorCount()));
                 result.getErrors().forEach(error -> validationErrors.add("  - " + error));
             }
@@ -1796,7 +1759,7 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
     private Component createSaveValidationErrorPane(List<String> validationErrors) {
         JPanel panel = new JPanel(new BorderLayout(0, PADDING));
         panel.add(new JLabel(MessageFormat.format(resources.getString(
-              "PlanetarySystemEditorDialog.saveBlocked"), countValidationErrors(validationErrors))),
+                    "PlanetarySystemEditorDialog.saveBlocked"), countValidationErrors(validationErrors))),
               BorderLayout.NORTH);
 
         JTextArea txtErrors = createReadOnlyTextArea("txtPlanetarySystemSaveValidationErrors");
@@ -1877,7 +1840,7 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
         }
 
         int choice = JOptionPane.showConfirmDialog(this, MessageFormat.format(resources.getString(
-                    "PlanetarySystemEditorDialog.revertPlanetConfirm"),
+                          "PlanetarySystemEditorDialog.revertPlanetConfirm"),
                     safeValue(() -> selectedPlanet.getPrintableName(campaign.getLocalDate()))),
               resources.getString("PlanetarySystemEditorDialog.revertPlanetConfirm.title"), JOptionPane.YES_NO_OPTION,
               JOptionPane.WARNING_MESSAGE);
@@ -2048,8 +2011,8 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
                      .filter(Objects::nonNull)
                      .filter(faction -> blankToNull(faction.getShortName()) != null)
                      .filter(faction -> !faction.isAggregate())
-                   .map(faction -> new FactionChoice(faction.getShortName(), factionDisplayName(faction, year),
-                       faction.getStartYear(), faction.getEndYear()))
+                     .map(faction -> new FactionChoice(faction.getShortName(), factionDisplayName(faction, year),
+                           faction.getStartYear(), faction.getEndYear()))
                      .sorted(Comparator.comparing(choice -> choice.displayName().toLowerCase(Locale.ROOT)))
                      .toList();
     }
@@ -2423,13 +2386,13 @@ public class PlanetarySystemEditorDialog extends AbstractMHQDialogBasic {
             return switch (this) {
                 case NAME -> Comparator.comparing(system -> dialog.systemDisplayName(system).toLowerCase(Locale.ROOT));
                 case X -> Comparator.comparingDouble((PlanetarySystem system) ->
-                                                            system.getX() == null ? Double.MAX_VALUE : system.getX())
-                                                          .thenComparing(system -> dialog.systemDisplayName(system)
-                                                                                       .toLowerCase(Locale.ROOT));
+                                                           system.getX() == null ? Double.MAX_VALUE : system.getX())
+                                .thenComparing(system -> dialog.systemDisplayName(system)
+                                                               .toLowerCase(Locale.ROOT));
                 case Y -> Comparator.comparingDouble((PlanetarySystem system) ->
-                                                            system.getY() == null ? Double.MAX_VALUE : system.getY())
-                                                          .thenComparing(system -> dialog.systemDisplayName(system)
-                                                                                       .toLowerCase(Locale.ROOT));
+                                                           system.getY() == null ? Double.MAX_VALUE : system.getY())
+                                .thenComparing(system -> dialog.systemDisplayName(system)
+                                                               .toLowerCase(Locale.ROOT));
             };
         }
     }

@@ -36,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -50,6 +51,8 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import megamek.Version;
 import megamek.common.enums.SkillLevel;
@@ -63,7 +66,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
+import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
 import mekhq.utilities.MHQXMLUtility;
@@ -511,7 +514,8 @@ public class HumanResourcesTest {
 
     /**
      * Tests for
-     * {@link HumanResources#getSeniorAdminPerson(Collection, AdministratorSpecialization, CampaignOptions, boolean, LocalDate)}
+     * {@link HumanResources#getSeniorAdminPerson(Collection, AdministratorSpecialization, CampaignOptions, boolean,
+     * LocalDate)}
      */
     @Nested
     class GetSeniorAdminPerson {
@@ -601,11 +605,10 @@ public class HumanResourcesTest {
     }
 
     /**
-     * Tests for
-     * {@link HumanResources#getSeniorMedicalPerson(Collection, CampaignOptions, boolean, LocalDate)}
+     * Tests for {@link HumanResources#getSeniorPerson(Collection, CampaignOptions, boolean, LocalDate)}
      */
     @Nested
-    class GetSeniorMedicalPerson {
+    class GetSeniorPerson {
 
         @Test
         void emptyInputReturnsNull() {
@@ -613,7 +616,7 @@ public class HumanResourcesTest {
             List<Person> people = List.of();
 
             // Act
-            Person result = HumanResources.getSeniorMedicalPerson(people, campaignOptions, false, today);
+            Person result = HumanResources.getSeniorPerson(people, campaignOptions, false, today);
 
             // Assert
             assertNull(result);
@@ -625,7 +628,7 @@ public class HumanResourcesTest {
             Person doctor = mock(Person.class);
 
             // Act
-            Person result = HumanResources.getSeniorMedicalPerson(List.of(doctor), campaignOptions, false, today);
+            Person result = HumanResources.getSeniorPerson(List.of(doctor), campaignOptions, false, today);
 
             // Assert
             assertEquals(doctor, result);
@@ -641,7 +644,7 @@ public class HumanResourcesTest {
             when(senior.outRanksUsingSkillTiebreaker(any(), anyBoolean(), any(), any())).thenReturn(true);
 
             // Act
-            Person result = HumanResources.getSeniorMedicalPerson(List.of(junior, senior),
+            Person result = HumanResources.getSeniorPerson(List.of(junior, senior),
                   campaignOptions, false, today);
 
             // Assert
@@ -729,8 +732,7 @@ public class HumanResourcesTest {
     }
 
     /**
-     * Tests for
-     * {@link HumanResources#findBestAtSkill(Collection, String, CampaignOptions, boolean, LocalDate)}
+     * Tests for {@link HumanResources#findBestAtSkill(Collection, String, CampaignOptions, boolean, LocalDate)}
      */
     @Nested
     class FindBestAtSkill {
@@ -814,7 +816,8 @@ public class HumanResourcesTest {
 
     /**
      * Tests for
-     * {@link HumanResources#findBestInRole(Collection, PersonnelRole, String, String, CampaignOptions, boolean, LocalDate)}
+     * {@link HumanResources#findBestInRole(Collection, PersonnelRole, String, String, CampaignOptions, boolean,
+     * LocalDate)}
      */
     @Nested
     class FindBestInRole {
@@ -932,8 +935,7 @@ public class HumanResourcesTest {
     }
 
     /**
-     * Tests for
-     * {@link HumanResources#getLogisticsPerson(Collection, CampaignOptions, boolean, LocalDate)}
+     * Tests for {@link HumanResources#getLogisticsPerson(Collection, CampaignOptions, boolean, LocalDate)}
      */
     @Nested
     class GetLogisticsPerson {
@@ -1084,7 +1086,7 @@ public class HumanResourcesTest {
 
             Campaign fresh = MHQTestUtilities.getTestCampaign();
             Document doc = MHQXMLUtility.newSafeDocumentBuilder()
-                  .parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
+                                 .parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
             Node hrNode = doc.getDocumentElement();
 
             // Act
@@ -1109,7 +1111,7 @@ public class HumanResourcesTest {
 
             Campaign fresh = MHQTestUtilities.getTestCampaign();
             Document doc = MHQXMLUtility.newSafeDocumentBuilder()
-                  .parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
+                                 .parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
             Node hrNode = doc.getDocumentElement();
 
             // Act
@@ -1139,7 +1141,7 @@ public class HumanResourcesTest {
 
             Campaign fresh = MHQTestUtilities.getTestCampaign();
             Document doc = MHQXMLUtility.newSafeDocumentBuilder()
-                  .parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
+                                 .parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
             Node hrNode = doc.getDocumentElement();
 
             // Act
@@ -1152,9 +1154,9 @@ public class HumanResourcesTest {
     }
 
     /**
-     * Tests for the backward-compatibility path in {@link HumanResources#loadFromXML(Node, Campaign, Version)}
-     * that handles the pre-{@code <humanResources>} save format where pool values and personnel
-     * appeared at the campaign level.
+     * Tests for the backward-compatibility path in {@link HumanResources#loadFromXML(Node, Campaign, Version)} that
+     * handles the pre-{@code <humanResources>} save format where pool values and personnel appeared at the campaign
+     * level.
      */
     @Nested
     class BackwardCompatibility {
@@ -1163,17 +1165,17 @@ public class HumanResourcesTest {
         void legacyAsTechPoolNodeIsRead() throws Exception {
             // Arrange
             String legacyXml = "<humanResources>"
-                  + "<asTechPool>7</asTechPool>"
-                  + "<asTechPoolMinutes>3360</asTechPoolMinutes>"
-                  + "<asTechPoolOvertime>1680</asTechPoolOvertime>"
-                  + "<medicPool>0</medicPool>"
-                  + "<personnelWhoAdvancedInXP/>"
-                  + "<personnel/>"
-                  + "</humanResources>";
+                                     + "<asTechPool>7</asTechPool>"
+                                     + "<asTechPoolMinutes>3360</asTechPoolMinutes>"
+                                     + "<asTechPoolOvertime>1680</asTechPoolOvertime>"
+                                     + "<medicPool>0</medicPool>"
+                                     + "<personnelWhoAdvancedInXP/>"
+                                     + "<personnel/>"
+                                     + "</humanResources>";
 
             Campaign fresh = MHQTestUtilities.getTestCampaign();
             Document doc = MHQXMLUtility.newSafeDocumentBuilder()
-                  .parse(new ByteArrayInputStream(legacyXml.getBytes(StandardCharsets.UTF_8)));
+                                 .parse(new ByteArrayInputStream(legacyXml.getBytes(StandardCharsets.UTF_8)));
             Node hrNode = doc.getDocumentElement();
 
             // Act
@@ -1191,18 +1193,18 @@ public class HumanResourcesTest {
         void unknownChildNodeDoesNotThrow() throws Exception {
             // Arrange
             String xmlWithUnknown = "<humanResources>"
-                  + "<asTechPool>0</asTechPool>"
-                  + "<asTechPoolMinutes>0</asTechPoolMinutes>"
-                  + "<asTechPoolOvertime>0</asTechPoolOvertime>"
-                  + "<medicPool>0</medicPool>"
-                  + "<unknownFutureElement>someValue</unknownFutureElement>"
-                  + "<personnelWhoAdvancedInXP/>"
-                  + "<personnel/>"
-                  + "</humanResources>";
+                                          + "<asTechPool>0</asTechPool>"
+                                          + "<asTechPoolMinutes>0</asTechPoolMinutes>"
+                                          + "<asTechPoolOvertime>0</asTechPoolOvertime>"
+                                          + "<medicPool>0</medicPool>"
+                                          + "<unknownFutureElement>someValue</unknownFutureElement>"
+                                          + "<personnelWhoAdvancedInXP/>"
+                                          + "<personnel/>"
+                                          + "</humanResources>";
 
             Campaign fresh = MHQTestUtilities.getTestCampaign();
             Document doc = MHQXMLUtility.newSafeDocumentBuilder()
-                  .parse(new ByteArrayInputStream(xmlWithUnknown.getBytes(StandardCharsets.UTF_8)));
+                                 .parse(new ByteArrayInputStream(xmlWithUnknown.getBytes(StandardCharsets.UTF_8)));
             Node hrNode = doc.getDocumentElement();
 
             // Act — must not throw
@@ -1216,17 +1218,17 @@ public class HumanResourcesTest {
         void emptyPersonnelNodeProducesEmptyRoster() throws Exception {
             // Arrange
             String xml = "<humanResources>"
-                  + "<asTechPool>0</asTechPool>"
-                  + "<asTechPoolMinutes>0</asTechPoolMinutes>"
-                  + "<asTechPoolOvertime>0</asTechPoolOvertime>"
-                  + "<medicPool>0</medicPool>"
-                  + "<personnelWhoAdvancedInXP/>"
-                  + "<personnel/>"
-                  + "</humanResources>";
+                               + "<asTechPool>0</asTechPool>"
+                               + "<asTechPoolMinutes>0</asTechPoolMinutes>"
+                               + "<asTechPoolOvertime>0</asTechPoolOvertime>"
+                               + "<medicPool>0</medicPool>"
+                               + "<personnelWhoAdvancedInXP/>"
+                               + "<personnel/>"
+                               + "</humanResources>";
 
             Campaign fresh = MHQTestUtilities.getTestCampaign();
             Document doc = MHQXMLUtility.newSafeDocumentBuilder()
-                  .parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
+                                 .parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
             Node hrNode = doc.getDocumentElement();
 
             // Act
@@ -1235,6 +1237,21 @@ public class HumanResourcesTest {
             // Assert
             assertTrue(fresh.getHumanResources().getPersonnel().isEmpty(),
                   "Empty <personnel/> node must produce an empty roster");
+        }
+
+        @Test
+        void usesExistingHRFromCampaign() throws Exception {
+            Campaign mockCampaign = mock(Campaign.class);
+            HumanResources existingHr = new HumanResources();
+            when(mockCampaign.getHumanResources()).thenReturn(existingHr);
+
+            String xml = "<humanResources></humanResources>";
+            DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            Node node = db.parse(new ByteArrayInputStream(xml.getBytes())).getDocumentElement();
+
+            HumanResources result = HumanResources.loadFromXML(node, mockCampaign, new Version("0.50.00"));
+
+            assertSame(existingHr, result);
         }
     }
 

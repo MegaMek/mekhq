@@ -61,7 +61,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
-import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
+import mekhq.campaign.randomEvents.personalities.Reasoning;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -468,14 +468,14 @@ public class Skill {
             }
         }
 
-        // Ranger
+        // Tracking
         if (Objects.equals(S_TRACKING, name)) {
             if (characterOptions.booleanOption(UNOFFICIAL_RANGER)) {
                 modifier += 1;
             }
         }
 
-        // Ranger
+        // Stealth
         if (Objects.equals(S_STEALTH, name)) {
             if (characterOptions.booleanOption(UNOFFICIAL_GHOST)) {
                 modifier += 1;
@@ -483,6 +483,54 @@ public class Skill {
 
             if (characterOptions.booleanOption(UNOFFICIAL_LOUD_MOUTH)) {
                 modifier -= 1;
+            }
+        }
+
+        // Appraisal
+        if (Objects.equals(S_APPRAISAL, name)) {
+            if (characterOptions.booleanOption(UNOFFICIAL_BARGAIN_HUNTER)) {
+                modifier += 2;
+            }
+        }
+
+        // Surgery/Any
+        if (Objects.equals(S_SURGERY, name)) {
+            if (characterOptions.booleanOption(UNOFFICIAL_SHAKEY_SCALPEL)) {
+                modifier -= 2;
+            }
+            if (characterOptions.booleanOption(UNOFFICIAL_PAPER_SURGEON)) {
+                modifier -= 2;
+            }
+        }
+
+        // Training
+        if (Objects.equals(S_TRAINING, name)) {
+            if (characterOptions.booleanOption(UNOFFICIAL_PATIENT_EDUCATOR)) {
+                modifier += 2;
+            }
+        }
+
+        // Communications/Any
+        if (Objects.equals(S_COMMUNICATIONS, name)) {
+            if (characterOptions.booleanOption(UNOFFICIAL_RADIO_HOBBYIST)) {
+                modifier += 2;
+            }
+        }
+
+        // Administration
+        if (Objects.equals(S_ADMIN, name)) {
+            if (characterOptions.booleanOption(UNOFFICIAL_LOSES_PAPERWORK)) {
+                modifier -= 2;
+            }
+        }
+
+        // Art/Cooking
+        if (Objects.equals(S_ART_COOKING, name)) {
+            if (characterOptions.booleanOption(UNOFFICIAL_SPICE_IS_RIGHT)) {
+                modifier += 2;
+            }
+            if (characterOptions.booleanOption(UNOFFICIAL_KITCHEN_MENACE)) {
+                modifier -= 2;
             }
         }
 
@@ -504,7 +552,7 @@ public class Skill {
      *   <li>The {@link TargetRoll}, where the attribute modifier is applied as a negative value.</li>
      * </ul>
      *
-     * <p>Attributes that are set to {@link SkillAttribute#NONE} are ignored during this process.</p>
+     * <p>Attributes that are set to {@link SkillAttribute#NO_ATTRIBUTE} are ignored during this process.</p>
      *
      * <p>The calculated attribute modifiers are applied directly to the {@link TargetRoll} using
      * {@link TargetRoll#addModifier(int, String)}, where the negative modifier is associated with the
@@ -534,7 +582,7 @@ public class Skill {
 
         int totalModifier = 0;
         for (SkillAttribute attribute : linkedAttributes) {
-            if (attribute == SkillAttribute.NONE) {
+            if (attribute == SkillAttribute.NO_ATTRIBUTE) {
                 continue;
             }
 
@@ -839,6 +887,12 @@ public class Skill {
             tooltip.append(flavorText).append("<br><br>");
         }
 
+        if (bonus != 0) {
+            tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "tooltip.format.bonus",
+                  (bonus > 0 ? "+" : "") + bonus));
+        }
+
         int spaModifier = getSPAModifiers(skillModifierData.characterOptions(), skillModifierData.adjustedReputation());
         if (spaModifier != 0) {
             tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
@@ -868,7 +922,7 @@ public class Skill {
               (firstLinkedAttributeModifier > 0 ? additionSymbol : "") + firstLinkedAttributeModifier));
 
         SkillAttribute secondLinkedAttribute = type.getSecondAttribute();
-        if (secondLinkedAttribute != SkillAttribute.NONE) {
+        if (secondLinkedAttribute != SkillAttribute.NO_ATTRIBUTE) {
             int secondLinkedAttributeModifier = attributes.getAttributeModifier(secondLinkedAttribute,
                   activeInjuryEffects, options, skillModifierData.age());
             tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,

@@ -62,7 +62,6 @@ import mekhq.campaign.universe.enums.BattleMekQualityGenerationMethod;
 import mekhq.campaign.universe.enums.BattleMekWeightClassGenerationMethod;
 import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 import mekhq.campaign.universe.enums.ForceNamingMethod;
-import mekhq.campaign.universe.enums.MysteryBoxType;
 import mekhq.campaign.universe.enums.PartGenerationMethod;
 import mekhq.campaign.universe.enums.TechAssignmentSortFactor;
 import mekhq.utilities.MHQXMLUtility;
@@ -185,7 +184,6 @@ public class CompanyGenerationOptions {
     private boolean randomizeStartingCash;
     private int randomStartingCashDiceCount;
     private int minimumStartingFloat;
-    private boolean includeInitialContractPayment;
     private boolean startingLoan;
     private boolean payForSetup;
     private boolean payForPersonnel;
@@ -193,11 +191,6 @@ public class CompanyGenerationOptions {
     private boolean payForParts;
     private boolean payForArmour;
     private boolean payForAmmunition;
-
-    // Surprises
-    private boolean generateSurprises;
-    private boolean generateMysteryBoxes;
-    private Map<MysteryBoxType, Boolean> generateMysteryBoxTypes;
     // endregion Variable Declarations
 
     /**
@@ -370,7 +363,6 @@ public class CompanyGenerationOptions {
         setRandomizeStartingCash(method.isWindchild());
         setRandomStartingCashDiceCount(18);
         setMinimumStartingFloat(method.isWindchild() ? 3500000 : 0);
-        setIncludeInitialContractPayment(method.isWindchild());
         setStartingLoan(!method.isWindchild());
         setPayForSetup(true);
         setPayForPersonnel(true);
@@ -378,12 +370,6 @@ public class CompanyGenerationOptions {
         setPayForParts(true);
         setPayForArmour(true);
         setPayForAmmunition(true);
-
-        // Surprises
-        setGenerateSurprises(true);
-        setGenerateMysteryBoxes(true);
-        setGenerateMysteryBoxTypes(new HashMap<>());
-        getGenerateMysteryBoxTypes().put(MysteryBoxType.STAR_LEAGUE_REGULAR, true);
     }
     // endregion Constructors
 
@@ -872,7 +858,8 @@ public class CompanyGenerationOptions {
         return useSpecifiedFactionToGenerateFormationIcons;
     }
 
-    public void setUseSpecifiedFactionToGenerateFormationIcons(final boolean useSpecifiedFactionToGenerateFormationIcons) {
+    public void setUseSpecifiedFactionToGenerateFormationIcons(
+          final boolean useSpecifiedFactionToGenerateFormationIcons) {
         this.useSpecifiedFactionToGenerateFormationIcons = useSpecifiedFactionToGenerateFormationIcons;
     }
 
@@ -1018,14 +1005,6 @@ public class CompanyGenerationOptions {
         this.minimumStartingFloat = minimumStartingFloat;
     }
 
-    public boolean isIncludeInitialContractPayment() {
-        return includeInitialContractPayment;
-    }
-
-    public void setIncludeInitialContractPayment(final boolean includeInitialContractPayment) {
-        this.includeInitialContractPayment = includeInitialContractPayment;
-    }
-
     public boolean isStartingLoan() {
         return startingLoan;
     }
@@ -1082,32 +1061,6 @@ public class CompanyGenerationOptions {
         this.payForAmmunition = payForAmmunition;
     }
     // endregion Finances
-
-    // region Surprises
-    public boolean isGenerateSurprises() {
-        return generateSurprises;
-    }
-
-    public void setGenerateSurprises(final boolean generateSurprises) {
-        this.generateSurprises = generateSurprises;
-    }
-
-    public boolean isGenerateMysteryBoxes() {
-        return generateMysteryBoxes;
-    }
-
-    public void setGenerateMysteryBoxes(final boolean generateMysteryBoxes) {
-        this.generateMysteryBoxes = generateMysteryBoxes;
-    }
-
-    public Map<MysteryBoxType, Boolean> getGenerateMysteryBoxTypes() {
-        return generateMysteryBoxTypes;
-    }
-
-    public void setGenerateMysteryBoxTypes(final Map<MysteryBoxType, Boolean> generateMysteryBoxTypes) {
-        this.generateMysteryBoxTypes = generateMysteryBoxTypes;
-    }
-    // endregion Surprises
     // endregion Getters/Setters
 
     // region File IO
@@ -1256,8 +1209,14 @@ public class CompanyGenerationOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "generateFormationIcons", isGenerateFormationIcons());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSpecifiedFactionToGenerateFormationIcons",
               isUseSpecifiedFactionToGenerateFormationIcons());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "generateOriginNodeFormationIcon", isGenerateOriginNodeFormationIcon());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useOriginNodeFormationIconLogo", isUseOriginNodeFormationIconLogo());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "generateOriginNodeFormationIcon",
+              isGenerateOriginNodeFormationIcon());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "useOriginNodeFormationIconLogo",
+              isUseOriginNodeFormationIconLogo());
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "forceWeightLimits");
         for (final Entry<Integer, Integer> entry : getForceWeightLimits().entrySet()) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "WeightClass:" + entry.getValue(), entry.getKey().toString());
@@ -1284,7 +1243,6 @@ public class CompanyGenerationOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomizeStartingCash", isRandomizeStartingCash());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomStartingCashDiceCount", getRandomStartingCashDiceCount());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "minimumStartingFloat", getMinimumStartingFloat());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "includeInitialContractPayment", isIncludeInitialContractPayment());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "startingLoan", isStartingLoan());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForSetup", isPayForSetup());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForPersonnel", isPayForPersonnel());
@@ -1292,15 +1250,6 @@ public class CompanyGenerationOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForParts", isPayForParts());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForArmour", isPayForArmour());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForAmmunition", isPayForAmmunition());
-
-        // Surprises
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "generateSurprises", isGenerateSurprises());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "generateMysteryBoxes", isGenerateMysteryBoxes());
-        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "generateMysteryBoxTypes");
-        for (final Entry<MysteryBoxType, Boolean> entry : getGenerateMysteryBoxTypes().entrySet()) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, entry.getKey().name(), entry.getValue());
-        }
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "generateMysteryBoxTypes");
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "companyGenerationOptions");
     }
 
@@ -1690,9 +1639,6 @@ public class CompanyGenerationOptions {
                     case "minimumStartingFloat":
                         options.setMinimumStartingFloat(Integer.parseInt(wn.getTextContent().trim()));
                         break;
-                    case "includeInitialContractPayment":
-                        options.setIncludeInitialContractPayment(Boolean.parseBoolean(wn.getTextContent().trim()));
-                        break;
                     case "startingLoan":
                         options.setStartingLoan(Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
@@ -1715,31 +1661,6 @@ public class CompanyGenerationOptions {
                         options.setPayForAmmunition(Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
                     // endregion Finances
-
-                    // region Surprises
-                    case "generateSurprises":
-                        options.setGenerateSurprises(Boolean.parseBoolean(wn.getTextContent().trim()));
-                        break;
-                    case "generateMysteryBoxes":
-                        options.setGenerateMysteryBoxes(Boolean.parseBoolean(wn.getTextContent().trim()));
-                        break;
-                    case "generateMysteryBoxTypes": {
-                        options.setGenerateMysteryBoxTypes(new HashMap<>());
-                        final NodeList nl2 = wn.getChildNodes();
-                        for (int y = 0; y < nl2.getLength(); y++) {
-                            final Node wn2 = nl2.item(y);
-                            try {
-                                options.getGenerateMysteryBoxTypes().put(
-                                      MysteryBoxType.valueOf(wn2.getNodeName().trim()),
-                                      Boolean.parseBoolean(wn2.getTextContent().trim()));
-                            } catch (Exception ignored) {
-
-                            }
-                        }
-                        break;
-                    }
-                    // endregion Surprises
-
                     default:
                         break;
                 }

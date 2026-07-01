@@ -170,7 +170,7 @@ public class ContractPaymentBreakdown {
         mainPanel.add(lblTransportAmount2, gridBagConstraintsText);
 
         JLabel lblFeeAmount1;
-        if (contract.payMRBCFee()) {
+        if (contract.isPaidMRBCFee()) {
             lblFeeAmount1 = new JLabel(indentation + resourceMap.getString("lblFeeAmount1.text")
                                              + " (-" + contract.getMRBCFeePercentage() + "% "
                                              + resourceMap.getString("lblOfGrossIncome.text") + ")");
@@ -349,7 +349,7 @@ public class ContractPaymentBreakdown {
     }
 
     private void setLblAdvanceNetIncome1() {
-        lblAdvanceNetIncome1.setText(indentation + contract.getAdvancePct() + "% "
+        lblAdvanceNetIncome1.setText(indentation + contract.getAdvancePercent() + "% "
                                            + resourceMap.getString("lblOfNetIncome.text") + ":");
     }
 
@@ -362,12 +362,12 @@ public class ContractPaymentBreakdown {
     }
 
     private void setLblMonthlyNetIncome1() {
-        lblMonthlyNetIncome1.setText(indentation + (100 - contract.getAdvancePct()) + "% "
+        lblMonthlyNetIncome1.setText(indentation + (100 - contract.getAdvancePercent()) + "% "
                                            + resourceMap.getString("lblOfNetIncome.text") + ":");
     }
 
     private void setLblMonthlyNetIncome2() {
-        lblMonthlyNetIncome2.setText(generateMonthlyHeader(contract.getLength())
+        lblMonthlyNetIncome2.setText(generateMonthlyHeader(contract.getLengthInMonths())
                                            + contract.getMonthlyPayOut().toAmountAndSymbolString());
     }
 

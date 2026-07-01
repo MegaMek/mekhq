@@ -55,6 +55,7 @@ import java.util.UUID;
 import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
+import megamek.common.icons.Portrait;
 import megamek.common.options.IOption;
 import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
@@ -77,7 +78,7 @@ import mekhq.campaign.personnel.lifeEvents.BirthAnnouncement;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries;
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
+import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 
@@ -233,12 +234,12 @@ public abstract class AbstractProcreation {
      * @return null if they can, otherwise the reason why they cannot
      */
     public @Nullable String canProcreate(final LocalDate today, final Person person, final boolean randomProcreation) {
-        if (person.getGender().isMale()) {
-            return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.Gender.text");
-        }
-
-        if (!person.isTryingToConceive()) {
-            return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.NotTryingForABaby.text");
+        if (!person.isWantsChildren()) {
+            if (person.getGender().isMale()) {
+                return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.DoesNotWantChildren.text");
+            } else {
+                return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.NotTryingForABaby.text");
+            }
         }
 
         if (person.isPregnant()) {
@@ -288,7 +289,7 @@ public abstract class AbstractProcreation {
                     return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.FemaleSpouse.text");
                 }
 
-                if (!person.getGenealogy().getSpouse().isTryingToConceive()) {
+                if (!person.getGenealogy().getSpouse().isWantsChildren()) {
                     return getFormattedTextAt(RESOURCE_BUNDLE, "cannotProcreate.SpouseNotTryingForABaby.text");
                 }
 
@@ -432,7 +433,7 @@ public abstract class AbstractProcreation {
             // Create a baby
             final Person baby = campaign.newDependent(Gender.RANDOMIZE,
                   mother.getOriginFaction(),
-                  campaign.getLocation().getPlanet());
+                  campaign.getCurrentLocation().getPlanet());
             baby.setSurname(campaignOptions.getBabySurnameStyle()
                                   .generateBabySurname(mother, father, baby.getGender()));
 
@@ -444,6 +445,11 @@ public abstract class AbstractProcreation {
             baby.setOptions(new PersonnelOptions()); // Stop babies being born with SPAs
             baby.setPreNominal(""); // Stop babies being born with doctorates
             baby.setPostNominal(""); // Stop babies being born with post-nominal titles
+
+            if (campaign.getCampaignOptions().isNoRandomPortraitsForChildren() &&
+                      baby.isChild(campaign.getLocalDate(), false)) {
+                baby.setPortrait(new Portrait());
+            }
 
             baby.setBloodGroup(getInheritedBloodGroup(mother.getBloodGroup(),
                   father == null ? getRandomBloodGroup() : father.getBloodGroup()));
@@ -527,7 +533,7 @@ public abstract class AbstractProcreation {
 
         // check desire for children
         if (Compute.d6(1) <= 2) {
-            mother.setTryingToConceive(false);
+            mother.setWantsChildren(false);
         }
 
         // Cleanup Data
@@ -606,6 +612,11 @@ public abstract class AbstractProcreation {
             baby.removeAllSkills(); // Limit skills by age for children and adolescents
             baby.setPrimaryRole(campaign, PersonnelRole.DEPENDENT); // Babies can't have jobs
 
+            if (campaign.getCampaignOptions().isNoRandomPortraitsForChildren() &&
+                      baby.isChild(campaign.getLocalDate(), false)) {
+                baby.setPortrait(new Portrait());
+            }
+
             // re-roll SPAs to include in any age and skill adjustments
             Enumeration<IOption> options = new PersonnelOptions().getOptions(PersonnelOptions.LVL3_ADVANTAGES);
 
@@ -626,7 +637,7 @@ public abstract class AbstractProcreation {
         }
 
         if (Compute.d6(1) <= 2) {
-            mother.setTryingToConceive(false);
+            mother.setWantsChildren(false);
         }
 
         // Cleanup Data
@@ -713,6 +724,7 @@ public abstract class AbstractProcreation {
 
             if (campaign.getCampaignOptions().isUseMaternityLeave() && !person.isBlockMaternityLeave()) {
                 if (!person.isBusy()
+                          && !person.getStatus().isCampFollower()
                           && person.getNonPermanentInjurySeverity() == 0
                           && (person.getDueDate().minusWeeks(20).isBefore(today))) {
                     person.changeStatus(campaign, today, PersonnelStatus.ON_MATERNITY_LEAVE);

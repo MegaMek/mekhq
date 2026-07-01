@@ -152,11 +152,11 @@ class CampaignOptionsMetadataTest {
 
         String result = metadata.getAddedSinceBadgeHtml();
 
-        // Should contain HTML span with color formatting
+        // Should contain a colored Material Symbols font badge
         if (!result.isEmpty()) {
-            assertTrue(result.contains("<span"));
-            assertTrue(result.contains("color:"));
-            assertTrue(result.contains("</span>"));
+            assertTrue(result.contains("<font"));
+            assertTrue(result.contains("color="));
+            assertTrue(result.contains("</font>"));
         }
     }
 
@@ -176,11 +176,11 @@ class CampaignOptionsMetadataTest {
 
         String result = metadata.getAddedSinceBadgeHtml();
 
-        // Should contain HTML span with color formatting
+        // Should contain a colored Material Symbols font badge
         if (!result.isEmpty()) {
-            assertTrue(result.contains("<span"));
-            assertTrue(result.contains("color:"));
-            assertTrue(result.contains("</span>"));
+            assertTrue(result.contains("<font"));
+            assertTrue(result.contains("color="));
+            assertTrue(result.contains("</font>"));
         }
     }
 

@@ -535,8 +535,7 @@ public class ForceViewPanel extends JScrollablePanel {
             }
         }
 
-        int effectiveFatigue = getEffectiveFatigue(person.getAdjustedFatigue(), person.getPermanentFatigue(),
-              person.isClanPersonnel(), person.getSkillLevel(campaign, false, true));
+        int effectiveFatigue = getEffectiveFatigue(person, campaign);
         if (campaign.getCampaignOptions().isUseFatigue() && (effectiveFatigue > 0)) {
             isFatigued = true;
             if (isInjured) {

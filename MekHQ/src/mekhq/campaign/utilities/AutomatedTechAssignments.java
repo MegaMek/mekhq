@@ -480,17 +480,19 @@ public class AutomatedTechAssignments {
      * produced, an additional informational message explaining how to disable the feature is added first, followed by
      * each report line.</p>
      *
-     * @param campaign the campaign whose technicians and units are evaluated and to which any resulting reports are
-     *                 added; must not be {@code null}
+     * @param campaign   the campaign whose technicians and units are evaluated and to which any resulting reports are
+     *                   added; must not be {@code null}
+     * @param skipReport if {@code true}, no report is added to the campaign; otherwise, a report is added if any
+     *                   assignments are performed
      *
      * @author Illiani
      * @since 0.50.11
      */
-    public static void handleTheAutomaticAssignmentOfUnmaintainedUnits(Campaign campaign) {
+    public static void handleTheAutomaticAssignmentOfUnmaintainedUnits(Campaign campaign, boolean skipReport) {
         AutomatedTechAssignments automatedAssignments = new AutomatedTechAssignments(campaign.getTechs(),
               campaign.getUnits());
         List<String> reports = automatedAssignments.getReports();
-        if (!reports.isEmpty()) {
+        if (!reports.isEmpty() && !skipReport) {
             String message = getTextAt("mekhq.resources.AutomatedTechAssignments",
                   "AutomatedTechAssignments.howToDisable");
             campaign.addReport(TECHNICAL, message);

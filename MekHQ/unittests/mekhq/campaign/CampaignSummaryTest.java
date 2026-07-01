@@ -64,7 +64,7 @@ class CampaignSummaryTest {
         CargoStatistics cargoStatistics = mock(CargoStatistics.class);
 
         when(campaign.getActivePersonnel(false, false)).thenReturn(List.of());
-        when(campaign.getHangar()).thenReturn(hangar);
+        when(campaign.getAllHangar()).thenReturn(hangar);
         when(hangar.getUnits()).thenReturn(List.of());
         when(campaign.getMissions()).thenReturn(List.of());
         when(campaign.getCargoStatistics()).thenReturn(cargoStatistics);

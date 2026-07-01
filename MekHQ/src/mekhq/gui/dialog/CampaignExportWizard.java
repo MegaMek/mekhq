@@ -40,16 +40,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.text.NumberFormat;
 import java.text.ParsePosition;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import javax.swing.*;
 
@@ -104,6 +95,7 @@ public class CampaignExportWizard extends JDialog {
     private JLabel lblStatus;
 
     private final Campaign sourceCampaign;
+    private final MekHQ app;
 
     private Optional<File> destinationCampaignFile;
     private final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignExportWizard",
@@ -119,7 +111,8 @@ public class CampaignExportWizard extends JDialog {
         DestinationFileSelection // this should always be last
     }
 
-    public CampaignExportWizard(Campaign c) {
+    public CampaignExportWizard(MekHQ app, Campaign c) {
+        this.app = app;
         chkExportState.setText(resourceMap.getString("chkExportSettings.text"));
         chkExportState.setToolTipText(resourceMap.getString("chkExportSettings.tooltip"));
         chkExportContractOffers.setText(resourceMap.getString("chkExportContractOffers.text"));
@@ -502,12 +495,11 @@ public class CampaignExportWizard extends JDialog {
         Campaign destinationCampaign;
         if (newCampaign) {
             destinationCampaign = CampaignFactory.createCampaign();
-            destinationCampaign.setApp(sourceCampaign.getApp());
             destinationCampaign.setCampaignOptions(sourceCampaign.getCampaignOptions());
             destinationCampaign.setGameOptions(sourceCampaign.getGameOptions());
         } else {
             try (FileInputStream fis = new FileInputStream(file)) {
-                destinationCampaign = CampaignFactory.newInstance(sourceCampaign.getApp()).createCampaign(fis);
+                destinationCampaign = CampaignFactory.newInstance(app).createCampaign(fis);
                 // Restores all transient attributes from serialized objects
                 destinationCampaign.restore();
                 destinationCampaign.cleanUp();
@@ -534,7 +526,7 @@ public class CampaignExportWizard extends JDialog {
             destinationCampaign.setFaction(sourceCampaign.getFaction());
             destinationCampaign.setCamouflage(sourceCampaign.getCamouflage().clone());
             destinationCampaign.setLocalDate(sourceCampaign.getLocalDate());
-            destinationCampaign.setLocation(sourceCampaign.getLocation());
+            destinationCampaign.setLocation(sourceCampaign.getCurrentLocation());
         }
 
         if (chkExportContractOffers.isSelected()) {

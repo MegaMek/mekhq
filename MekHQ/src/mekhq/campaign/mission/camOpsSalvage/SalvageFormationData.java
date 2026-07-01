@@ -56,8 +56,9 @@ import mekhq.campaign.unit.ITransportAssignment;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.enums.TransporterType;
 
-public record SalvageFormationData(Formation formation, FormationType formationType, @Nullable Person tech, double maximumCargoCapacity,
-                                   double maximumTowCapacity, int salvageCapableUnits, boolean hasTug) {
+public record SalvageFormationData(Formation formation, FormationType formationType, @Nullable Person tech,
+      double maximumCargoCapacity,
+      double maximumTowCapacity, int salvageCapableUnits, boolean hasTug) {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.SalvageFormationData";
 
     public static SalvageFormationData buildData(Campaign campaign, Formation formation, boolean isSpaceScenario) {
@@ -73,7 +74,7 @@ public record SalvageFormationData(Formation formation, FormationType formationT
         int salvageCapableUnits = 0;
         boolean hasTug = false;
 
-        Hangar hangar = campaign.getHangar();
+        Hangar hangar = campaign.getAllHangar();
         for (Unit unit : formation.getAllUnitsAsUnits(hangar, false)) {
             if (!unit.isFullyCrewed()) {
                 continue;
@@ -153,7 +154,7 @@ public record SalvageFormationData(Formation formation, FormationType formationT
             int injuries;
             if (campaign.getCampaignOptions().isUseAdvancedMedical()) {
                 injuryLabelKey = "SalvageFormationData.injuries";
-                injuries = tech.getInjuries().size();
+                injuries = tech.getTotalInjurySeverity();
             } else {
                 injuryLabelKey = "SalvageFormationData.hits";
                 injuries = tech.getHits();
@@ -166,7 +167,7 @@ public record SalvageFormationData(Formation formation, FormationType formationT
     }
 
     public String getAllCrewTechTooltip(Campaign campaign, Formation formation) {
-        Hangar hangar = campaign.getHangar();
+        Hangar hangar = campaign.getAllHangar();
 
         StringBuilder tooltip = new StringBuilder();
         for (Unit unit : formation.getAllUnitsAsUnits(hangar, false)) {

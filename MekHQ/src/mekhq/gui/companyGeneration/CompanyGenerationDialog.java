@@ -63,7 +63,6 @@ import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
 import mekhq.campaign.universe.companyGeneration.ratgen.CompanyGenerator;
@@ -451,39 +450,54 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
             }
         }
 
+        final Faction rankAssignmentFaction = options.isUseSpecifiedFactionToAssignRanks()
+                                                     ? options.getSpecifiedFaction()
+                                                     : campaign.getFaction();
+        final boolean isAutomaticallyAssignRanks = options.isAutomaticallyAssignRanks();
+
         if (campaignOptions.isUseFatigue()) {
             new ImmersiveDialogNotification(campaign,
                   resources.getString("CompanyGenerationDialog.campaignOptions.fatigue"),
                   true);
-            FatigueTrackingCampaignOptionsChangedConfirmationDialog.processFreeUnit(campaign);
+            FatigueTrackingCampaignOptionsChangedConfirmationDialog.processFreeUnit(campaign,
+                  rankAssignmentFaction,
+                  isAutomaticallyAssignRanks);
         }
 
         if (campaignOptions.isUseMASHTheatres()) {
             new ImmersiveDialogNotification(campaign,
                   resources.getString("CompanyGenerationDialog.campaignOptions.mash"),
                   true);
-            MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog.processFreeUnit(campaign);
+            MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog.processFreeUnit(campaign,
+                  rankAssignmentFaction,
+                  isAutomaticallyAssignRanks);
         }
 
         if (!campaignOptions.getPrisonerCaptureStyle().isNone()) {
             new ImmersiveDialogNotification(campaign,
                   resources.getString("CompanyGenerationDialog.campaignOptions.security"),
                   true);
-            PrisonerTrackingCampaignOptionsChangedConfirmationDialog.processFreeUnit(campaign);
+            PrisonerTrackingCampaignOptionsChangedConfirmationDialog.processFreeUnit(campaign,
+                  rankAssignmentFaction,
+                  isAutomaticallyAssignRanks);
         }
 
         if (campaignOptions.isUseCamOpsSalvage()) {
             new ImmersiveDialogNotification(campaign,
                   resources.getString("CompanyGenerationDialog.campaignOptions.salvage"),
                   true);
-            SalvageCampaignOptionsChangedConfirmationDialog.processFreeUnits(campaign);
+            SalvageCampaignOptionsChangedConfirmationDialog.processFreeUnits(campaign,
+                  rankAssignmentFaction,
+                  isAutomaticallyAssignRanks);
         }
 
         if (campaignOptions.isUseStratCon()) {
             new ImmersiveDialogNotification(campaign,
                   resources.getString("CompanyGenerationDialog.campaignOptions.stratCon"),
                   true);
-            StratConConvoyCampaignOptionsChangedConfirmationDialog.processFreeUnits(campaign);
+            StratConConvoyCampaignOptionsChangedConfirmationDialog.processFreeUnits(campaign,
+                  rankAssignmentFaction,
+                  isAutomaticallyAssignRanks);
         }
 
         if (campaignOptions.isUseAdvancedScouting() && campaignOptions.isUseStratCon()) {
@@ -494,18 +508,7 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
     private void generateSparePersonnel(CompanyGenerationOptions options) {
         Person person = campaign.newPerson(PersonnelRole.MEKWARRIOR);
 
-        RandomSkillPreferences randomSkillPreferences = campaign.getRandomSkillPreferences();
-        boolean useExtraRandomness = randomSkillPreferences.randomizeSkill();
-
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        overrideSkills(campaignOptions.isAdminsHaveNegotiation(),
-              campaignOptions.isDoctorsUseAdministration(),
-              campaignOptions.isTechsUseAdministration(),
-              campaignOptions.isUseArtillery(),
-              useExtraRandomness,
-              person,
-              PersonnelRole.MEKWARRIOR,
-              SkillLevel.GREEN);
+        overrideSkills(campaign, person, PersonnelRole.MEKWARRIOR, SkillLevel.GREEN, true);
 
         SkillLevel actualSkillLevel = person.getSkillLevel(campaign, false);
         reRollLoyalty(person, actualSkillLevel);

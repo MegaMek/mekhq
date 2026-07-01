@@ -40,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -48,9 +49,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.TEST_CANON_SYSTEMS_DIR;
 
@@ -71,7 +70,6 @@ import megamek.common.units.Crew;
 import megamek.common.units.Dropship;
 import megamek.common.units.EntityMovementMode;
 import megamek.common.units.UnitType;
-import mekhq.campaign.HumanResources;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.personnel.Person;
@@ -79,6 +77,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.AbstractTransportedUnitsSummary;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.TestSystems;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -570,6 +569,23 @@ public class CampaignTest {
             when(unit.getActiveCrew()).thenReturn(activeCrew);
             when(unit.getFullCrewSize()).thenReturn(crewSize);
 
+            // Mock vessel-specific role methods for getRoleSpecificNeeds
+            switch (role) {
+                case VESSEL_PILOT -> {
+                    doReturn(activeCrew).when(unit).getDrivers();
+                    doReturn(crewSize).when(unit).getTotalDriverNeeds();
+                }
+                case VESSEL_GUNNER -> {
+                    doReturn(new HashSet<>(activeCrew)).when(unit).getGunners();
+                    doReturn(crewSize).when(unit).getTotalGunnerNeeds();
+                }
+                case VESSEL_CREW -> {
+                    doReturn(activeCrew).when(unit).getVesselCrew();
+                    doReturn(crewSize).when(unit).getTotalCrewNeeds();
+                }
+                default -> { /* non-vessel: getActiveCrew() + getFullCrewSize() covers default case */ }
+            }
+
             // Mock role methods so unitCanUseTempCrewRole returns true
             switch (role) {
                 case SOLDIER, BATTLE_ARMOUR, VEHICLE_CREW_GROUND,
@@ -938,6 +954,307 @@ public class CampaignTest {
             assertEquals(0, testCampaign.getTempCrewPool(PersonnelRole.SOLDIER));
             assertEquals(8, testCampaign.getTempCrewPool(PersonnelRole.BATTLE_ARMOUR));
         }
+
+        /**
+         * Tests {@link Campaign#releaseSurplusBlobCrewForRole(PersonnelRole)}: when a unit has more temp crew than
+         * needed to fill the gap left by real crew, the excess is trimmed.
+         *
+         * <p>SOLDIER units have fullCrewSize=5 and 1 real crew member, so they need 4 temp crew.
+         * Setting 6 temp crew gives an excess of 2, which should be removed.</p>
+         */
+        @Test
+        void testReleaseSurplusTrimsExcessTempCrewFromUnit() {
+            // Arrange
+            PersonnelRole role = PersonnelRole.SOLDIER;
+            enableBlobCrewForRole(role);
+            Unit unit = createMockUnitForRole(role, true); // 1 real crew, fullSize=5
+            unit.setTempCrew(role, 6); // 1 real + 6 temp = 7 total; need 5, excess = 2
+            testCampaign.importUnit(unit);
+
+            // Act
+            testCampaign.releaseSurplusBlobCrewForRole(role);
+
+            // Assert
+            assertEquals(4, unit.getTempCrewByPersonnelRole(role),
+                  "Excess temp crew should be trimmed so real + temp equals fullCrewSize");
+        }
+
+        /**
+         * Tests {@link Campaign#releaseSurplusBlobCrewForRole(PersonnelRole)}: when temp crew exactly covers the gap
+         * between real crew and full crew size, nothing is changed.
+         */
+        @Test
+        void testReleaseSurplusDoesNotRemoveTempCrewWhenExactFit() {
+            // Arrange
+            PersonnelRole role = PersonnelRole.SOLDIER;
+            enableBlobCrewForRole(role);
+            Unit unit = createMockUnitForRole(role, true); // 1 real crew, fullSize=5
+            unit.setTempCrew(role, 4); // 1 real + 4 temp = 5 = fullSize; no excess
+            testCampaign.importUnit(unit);
+
+            // Act
+            testCampaign.releaseSurplusBlobCrewForRole(role);
+
+            // Assert
+            assertEquals(4, unit.getTempCrewByPersonnelRole(role),
+                  "Temp crew should be unchanged when it exactly fills the crew gap");
+        }
+
+        /**
+         * Tests {@link Campaign#releaseSurplusBlobCrewForRole(PersonnelRole)}: when real crew already meets or exceeds
+         * fullCrewSize, all temp crew are removed from the unit.
+         *
+         * <p>VESSEL_PILOT units have fullCrewSize=2. By providing 2 real crew members the unit is fully staffed,
+         * so any temp crew assigned is pure surplus.</p>
+         */
+        @Test
+        void testReleaseSurplusRemovesAllTempWhenRealCrewFull() {
+            // Arrange
+            PersonnelRole role = PersonnelRole.VESSEL_PILOT;
+            enableBlobCrewForRole(role);
+            Unit unit = createMockUnitForRole(role, false); // fullSize=2
+            List<Person> fullPilotCrew = List.of(mock(Person.class), mock(Person.class));
+            doReturn(fullPilotCrew).when(unit).getActiveCrew();
+            doReturn(fullPilotCrew).when(unit).getDrivers();
+            unit.setTempCrew(role, 1); // 2 real + 1 temp = 3 total; need 2, excess = 1
+            testCampaign.importUnit(unit);
+
+            // Act
+            testCampaign.releaseSurplusBlobCrewForRole(role);
+
+            // Assert
+            assertEquals(0, unit.getTempCrewByPersonnelRole(role),
+                  "All temp crew should be removed when real crew already fills the unit");
+        }
+
+        /**
+         * Tests {@link Campaign#releaseSurplusBlobCrewForRole(PersonnelRole)}: any temp crew sitting in the unassigned
+         * pool (not yet distributed to units) is also cleared.
+         */
+        @Test
+        void testReleaseSurplusClearsUnassignedPool() {
+            // Arrange
+            PersonnelRole role = PersonnelRole.SOLDIER;
+            enableBlobCrewForRole(role);
+            Unit unit = createMockUnitForRole(role, true); // 1 real crew, fullSize=5
+            unit.setTempCrew(role, 4); // unit exactly staffed: 1 + 4 = 5
+            testCampaign.importUnit(unit);
+            testCampaign.setTempCrewPool(role, 10); // 4 in-use, 6 unassigned in pool
+
+            // Act
+            testCampaign.releaseSurplusBlobCrewForRole(role);
+
+            // Assert — pool reduced to just the in-use count
+            assertEquals(4, testCampaign.getTempCrewPool(role),
+                  "Unassigned pool should be cleared; only assigned (in-use) temp crew remain");
+        }
+
+        /**
+         * Tests {@link Campaign#releaseSurplusAsTechPool()}: in a campaign with no tech personnel all pooled AsTechs
+         * are surplus and should be released.
+         */
+        @Test
+        void testReleaseSurplusAsTechPoolReleasesAllWhenNoTechs() {
+            // Arrange — no techs in campaign, so entire pool is surplus
+            testCampaign.getHumanResources().setAsTechPool(5);
+
+            // Act
+            testCampaign.releaseSurplusAsTechPool();
+
+            // Assert
+            assertEquals(0, testCampaign.getTemporaryAsTechPool(),
+                  "All AsTechs should be released when there are no tech teams requiring support");
+        }
+
+        /**
+         * Tests {@link Campaign#releaseSurplusAsTechPool()}: when the pool is already empty, nothing changes.
+         */
+        @Test
+        void testReleaseSurplusAsTechPoolDoesNothingWhenEmpty() {
+            // Arrange — pool already at 0
+            assertEquals(0, testCampaign.getTemporaryAsTechPool());
+
+            // Act
+            testCampaign.releaseSurplusAsTechPool();
+
+            // Assert
+            assertEquals(0, testCampaign.getTemporaryAsTechPool());
+        }
+
+        /**
+         * Tests {@link Campaign#releaseSurplusMedicPool()}: in a campaign with no doctors all pooled Medics are surplus
+         * and should be released.
+         */
+        @Test
+        void testReleaseSurplusMedicPoolReleasesAllWhenNoDoctors() {
+            // Arrange — no doctors in campaign, so entire pool is surplus
+            testCampaign.getHumanResources().setMedicPool(3);
+
+            // Act
+            testCampaign.releaseSurplusMedicPool();
+
+            // Assert
+            assertEquals(0, testCampaign.getTemporaryMedicPool(),
+                  "All Medics should be released when there are no doctors requiring support");
+        }
+
+        /**
+         * Tests {@link Campaign#releaseSurplusMedicPool()}: when the pool is already empty, nothing changes.
+         */
+        @Test
+        void testReleaseSurplusMedicPoolDoesNothingWhenEmpty() {
+            // Arrange — pool already at 0
+            assertEquals(0, testCampaign.getTemporaryMedicPool());
+
+            // Act
+            testCampaign.releaseSurplusMedicPool();
+
+            // Assert
+            assertEquals(0, testCampaign.getTemporaryMedicPool());
+        }
     }
     // endregion Nested Test Classes for Temp Crew
+
+    // region Nested Test Classes for Location
+    @Nested
+    class Location {
+
+        Campaign campaign;
+
+        @BeforeEach
+        void setUp() {
+            campaign = MHQTestUtilities.getTestCampaign();
+        }
+
+        /** Tests for {@link Campaign#setLocation(AbstractLocation)}. */
+        @Nested
+        class SetLocation {
+
+            @Test
+            void setLocation_replacesExistingLocation() {
+                PlanetarySystem newSystem = mock(PlanetarySystem.class);
+                CurrentLocation newLocation = new CurrentLocation(newSystem, 0.0);
+
+                campaign.setLocation(newLocation);
+
+                assertEquals(1, campaign.getCampaignLocationManager().getLocations().size());
+                assertSame(newLocation, campaign.getCampaignLocationManager().getLocations().get(0));
+            }
+
+            @Test
+            void setLocation_null_clearsLocations() {
+                campaign.setLocation(null);
+
+                assertTrue(campaign.getCampaignLocationManager().getLocations().isEmpty());
+            }
+
+            @Test
+            void setLocation_null_currentLocationBecomesNull() {
+                campaign.setLocation(null);
+
+                assertNull(campaign.getCurrentLocation());
+            }
+
+            @Test
+            void setLocation_updatesCurrentLocation() {
+                PlanetarySystem newSystem = mock(PlanetarySystem.class);
+                CurrentLocation newLocation = new CurrentLocation(newSystem, 0.0);
+
+                campaign.setLocation(newLocation);
+
+                assertSame(newLocation, campaign.getCurrentLocation());
+            }
+
+            @Test
+            void setLocation_keepsOldLocationWhenItHasChildren() {
+                // The old CurrentLocation has a child (simulating a person in transit).
+                // setLocation must NOT remove it — only the daily prune may do so.
+                AbstractLocation old = campaign.getCurrentLocation();
+                PlanetarySystem childSystem = mock(PlanetarySystem.class);
+                CurrentLocation child = new CurrentLocation(childSystem, 0.0);
+                child.setParent(old);
+
+                PlanetarySystem newSystem = mock(PlanetarySystem.class);
+                CurrentLocation newLocation = new CurrentLocation(newSystem, 0.0);
+                campaign.setLocation(newLocation);
+
+                assertTrue(campaign.getCampaignLocationManager().getLocations().contains(old));
+            }
+        }
+
+        /** Tests for {@link Campaign#addLocation(AbstractLocation)}. */
+        @Nested
+        class AddLocation {
+
+            @Test
+            void addLocation_appendsToExistingList() {
+                int sizeBefore = campaign.getCampaignLocationManager().getLocations().size();
+                PlanetarySystem system = mock(PlanetarySystem.class);
+                CurrentLocation extra = new CurrentLocation(system, 0.0);
+
+                campaign.getCampaignLocationManager().addLocation(extra);
+
+                assertEquals(sizeBefore + 1, campaign.getCampaignLocationManager().getLocations().size());
+            }
+
+            @Test
+            void addLocation_newLocationAppearsInList() {
+                PlanetarySystem system = mock(PlanetarySystem.class);
+                CurrentLocation extra = new CurrentLocation(system, 0.0);
+
+                campaign.getCampaignLocationManager().addLocation(extra);
+
+                assertTrue(campaign.getCampaignLocationManager().getLocations().contains(extra));
+            }
+
+            @Test
+            void addLocation_null_doesNotChangeList() {
+                int sizeBefore = campaign.getCampaignLocationManager().getLocations().size();
+
+                campaign.getCampaignLocationManager().addLocation(null);
+
+                assertEquals(sizeBefore, campaign.getCampaignLocationManager().getLocations().size());
+            }
+
+            @Test
+            void addLocation_doesNotClearPrimaryLocation() {
+                AbstractLocation primary = campaign.getCampaignLocationManager().getLocations().get(0);
+                PlanetarySystem system = mock(PlanetarySystem.class);
+
+                campaign.getCampaignLocationManager().addLocation(new CurrentLocation(system, 0.0));
+
+                assertSame(primary, campaign.getCampaignLocationManager().getLocations().get(0));
+            }
+        }
+
+        /** Tests for {@link Campaign#getLocations()}. */
+        @Nested
+        class GetLocations {
+
+            @Test
+            void getLocations_returnsUnmodifiableList() {
+                PlanetarySystem system = mock(PlanetarySystem.class);
+                CurrentLocation extra = new CurrentLocation(system, 0.0);
+
+                assertThrows(UnsupportedOperationException.class,
+                      () -> campaign.getCampaignLocationManager().getLocations().add(extra));
+            }
+
+            @Test
+            void getLocations_initiallyContainsOneLocation() {
+                assertEquals(1, campaign.getCampaignLocationManager().getLocations().size());
+            }
+
+            @Test
+            void getLocations_multipleCallsReflectCurrentState() {
+                int before = campaign.getCampaignLocationManager().getLocations().size();
+
+                PlanetarySystem system = mock(PlanetarySystem.class);
+                campaign.getCampaignLocationManager().addLocation(new CurrentLocation(system, 0.0));
+
+                assertEquals(before + 1, campaign.getCampaignLocationManager().getLocations().size());
+            }
+        }
+    }
+    // endregion Nested Test Classes for Location
 }

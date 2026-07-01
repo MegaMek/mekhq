@@ -276,7 +276,7 @@ public class AutoAwardsController {
         LocalDate lastMissionEndDate = getLastMissionEndDate();
 
         // Fetch all personnel in the campaign.
-        Collection<Person> rawPersonnel = campaign.getPersonnel();
+        Collection<Person> rawPersonnel = campaign.getAllPersonnel();
         // Create a list to store Ids of qualifying personnel.
         List<UUID> personnel = new ArrayList<>();
 

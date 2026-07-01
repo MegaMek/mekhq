@@ -57,7 +57,6 @@ import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import megamek.codeUtilities.ObjectUtility;
@@ -68,7 +67,7 @@ import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
-import mekhq.campaign.personnel.skills.AttributeCheckUtility;
+import mekhq.campaign.personnel.skills.ActionCheckResult;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 
 public class AdvancedMedicalAlternateImplants {
@@ -208,18 +207,13 @@ public class AdvancedMedicalAlternateImplants {
         }
 
         int resistanceModifier = person.getOptions().booleanOption(UNOFFICIAL_IMPLANT_RESISTANCE) ? -2 : 0;
-        AttributeCheckUtility attributeCheckUtility = new AttributeCheckUtility(
-              getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.skillCheck.degradation"),
-              person,
-              SkillAttribute.BODY,
-              SkillAttribute.WILLPOWER,
-              new ArrayList<>(),
-              resistanceModifier,
-              true,
-              false);
-        campaign.addReport(SKILL_CHECKS, attributeCheckUtility.getResultsText());
+        ActionCheckResult attributeCheckResult =
+              person.checkAttributes(SkillAttribute.BODY, SkillAttribute.WILLPOWER)
+                    .withMiscModifier(resistanceModifier)
+                    .resolve(true, getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.skillCheck.degradation"));
+        campaign.addReport(SKILL_CHECKS, attributeCheckResult.getReport(false));
 
-        if (!attributeCheckUtility.isSuccess() && useAbilities) {
+        if (!attributeCheckResult.isSuccess() && useAbilities) {
             String flaw = getAndApplyEIDegradationFlaw(person);
             if (!flaw.isBlank()) {
                 String key = "AlternateInjuries.report." +
@@ -256,7 +250,7 @@ public class AdvancedMedicalAlternateImplants {
         int prostheticThreshold = 3;
         int eligibleProstheticsCount = 0;
 
-        for (Injury injury : person.getInjuries()) {
+        for (Injury injury : person.getProstheticInjuries()) {
             ProstheticType prostheticType = getProstheticTypeFromInjuryType(injury.getType());
 
             if (prostheticType != null) {
@@ -360,7 +354,7 @@ public class AdvancedMedicalAlternateImplants {
     }
 
     public static void checkForDermalEligibility(Person person) {
-        List<Injury> injuries = person.getInjuries();
+        List<Injury> injuries = person.getProstheticInjuries();
 
         int dermalArmorCount = 0;
         int dermalCamoCount = 0;

@@ -71,7 +71,7 @@ public class PersonIdReferenceTest {
         final List<Person> personnel = IntStream.range(0, 100)
                                              .mapToObj(i -> new Person(mockCampaign, "MERC"))
                                              .collect(Collectors.toList());
-        when(mockCampaign.getPersonnel()).thenReturn(personnel);
+        when(mockCampaign.getAllPersonnel()).thenReturn(personnel);
         PersonIdReference.fixPersonIdReferences(mockCampaign);
     }
 

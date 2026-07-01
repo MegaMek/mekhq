@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -34,7 +34,9 @@ package mekhq.campaign.personnel.skills;
 
 import static java.lang.Math.floor;
 import static megamek.common.compute.Compute.d6;
+import static megamek.common.units.Crew.DEATH;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
+import static mekhq.campaign.personnel.PersonnelOptions.EDGE_ESCAPE_ATTEMPTS;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -95,19 +97,15 @@ public class EscapeSkills {
         }
 
         LocalDate today = campaign.getLocalDate();
-        SkillCheckUtility skillCheckUtility = new SkillCheckUtility(
-              getTextAt(RESOURCE_BUNDLE, "EscapeArtist.skillCheck"),
-              person,
-              skillToUse,
-              List.of(),
-              0,
-              true,
-              false,
-              false,
-              false,
-              today);
-        int marginOfSuccessValue = skillCheckUtility.getMarginOfSuccess();
-        MarginOfSuccess marginOfSuccess = MarginOfSuccess.getMarginOfSuccessObjectFromMarginValue(marginOfSuccessValue);
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean useEdge = campaignOptions.isUseEdge();
+        useEdge = useEdge && person.getOptions().booleanOption(EDGE_ESCAPE_ATTEMPTS);
+        ActionCheckResult actionCheckResult =
+              person.checkSkill(skillToUse, false, false, today)
+                    .resolve(useEdge, getTextAt(RESOURCE_BUNDLE, "EscapeArtist.skillCheck"));
+
+        MarginOfSuccess marginOfSuccess =
+              MarginOfSuccess.getMarginOfSuccessObjectFromMarginValue(actionCheckResult.getMarginOfSuccess());
 
         // Nothing happens for these cases, so we can just early exit
         List<MarginOfSuccess> noFurtherActionCases = List.of(MarginOfSuccess.IT_WILL_DO, MarginOfSuccess.BARELY_MADE_IT,
@@ -210,7 +208,7 @@ public class EscapeSkills {
         boolean useAdvancedMedical = campaignOptions.isUseAdvancedMedical();
         if (useAdvancedMedical) {
             InjuryUtil.resolveCombatDamage(campaign, prisoner, injuries);
-            if (prisoner.getInjuries().size() > 5) {
+            if (prisoner.getTotalInjurySeverity() >= DEATH) {
                 prisoner.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.HOMICIDE);
             }
         } else {

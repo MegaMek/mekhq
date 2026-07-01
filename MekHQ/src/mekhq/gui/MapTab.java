@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -78,6 +78,7 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.utilities.JumpBlockers;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.dialog.JumpCostsSummary;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.utilities.JSuggestField;
@@ -87,6 +88,7 @@ import mekhq.gui.view.PlanetViewPanel;
 /**
  * Displays interstellar map and contains transit controls.
  */
+// FIXME: this class should not inherit from CampaignGuiTab because it is managed by NavigationTab now
 public final class MapTab extends CampaignGuiTab implements ActionListener {
     private static final int PADDING = UIUtil.scaleForGUI(10);
 
@@ -100,13 +102,12 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
     //region Constructors
     public MapTab(CampaignGUI gui, String tabName) {
         super(gui, tabName);
-        MekHQ.registerHandler(this);
     }
     //endregion Constructors
 
     @Override
     public MHQTabType tabType() {
-        return MHQTabType.INTERSTELLAR_MAP;
+        return null;
     }
 
     /*
@@ -215,15 +216,31 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         gridBagConstraints.weighty = 0.0;
         panTopButtons.add(chkUseCommandCircuits, gridBagConstraints);
 
+        RoundedJButton btnJumpFees = new RoundedJButton(resourceMap.getString("btnJumpFees.text"));
+        btnJumpFees.addActionListener(evt -> {
+            TransportCostCalculations transportCostCalculations =
+                  getCampaign().getTransportCostCalculation(EXP_REGULAR);
+            transportCostCalculations.calculateJumpCostForEachDay();
+            new JumpCostsSummary(getCampaignGui().getFrame(), transportCostCalculations);
+        });
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 6;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.weighty = 0.0;
+        panTopButtons.add(btnJumpFees, gridBagConstraints);
+
         panMapView.add(panTopButtons, BorderLayout.PAGE_START);
 
         //the actual map
         panMap = new InterstellarMapPanel(getCampaign(), getCampaignGui());
         // let's go ahead and zoom in on the current location
-        panMap.setSelectedSystem(getCampaign().getLocation().getCurrentSystem());
+        panMap.setSelectedSystem(getCampaign().getCurrentLocation().getCurrentSystem());
         panMapView.add(panMap, BorderLayout.CENTER);
 
-        JPanel pnlTutorial = new TutorialHyperlinkPanel("mapTab");
+        JPanel pnlTutorial = new TutorialHyperlinkPanel("mapTab.keyText");
         panMapView.add(pnlTutorial, BorderLayout.SOUTH);
 
         mapView = new JViewport();
@@ -295,7 +312,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
 
         boolean isUseCommandCircuits = getCampaign().isUseCommandCircuit();
         int duration = (int) ceil(jumpPath.getTotalTime(getCampaign().getLocalDate(),
-              getCampaign().getLocation().getTransitTime(), isUseCommandCircuits));
+              getCampaign().getCurrentLocation().getTransitTime(), isUseCommandCircuits));
 
         TransportCostCalculations transportCostCalculations = getCampaign().getTransportCostCalculation(EXP_REGULAR);
         Money journeyCost = transportCostCalculations.calculateJumpCostForEntireJourney(duration, jumpPath.getJumps());
@@ -307,10 +324,8 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
             getCampaign().addReport(GENERAL, jumpReport);
         }
 
-        getCampaign().getLocation().setJumpPath(panMap.getJumpPath());
-
+        getCampaign().getCurrentLocation().setJumpPath(panMap.getJumpPath());
         refreshPlanetView();
-        getCampaignGui().refreshLocation();
 
         panMap.setJumpPath(new JumpPath());
         panMap.repaint();

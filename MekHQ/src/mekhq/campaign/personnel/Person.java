@@ -34,6 +34,7 @@
 package mekhq.campaign.personnel;
 
 import static java.lang.Math.abs;
+import static java.lang.Math.clamp;
 import static java.lang.Math.floor;
 import static java.lang.Math.max;
 import static java.lang.Math.round;
@@ -81,6 +82,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javax.swing.ImageIcon;
 
+import jakarta.annotation.Nonnull;
 import megamek.Version;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.codeUtilities.MathUtility;
@@ -102,8 +104,10 @@ import megamek.common.units.*;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
+import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ExtraData;
+import mekhq.campaign.Personnel;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.events.persons.PersonStatusChangedEvent;
@@ -111,6 +115,9 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.location.AcademyCampusLocation;
+import mekhq.campaign.location.ILocation;
+import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.LogEntryFactory;
 import mekhq.campaign.log.LogEntryType;
@@ -137,22 +144,24 @@ import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.personnel.skills.AttributeCheck;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.Skills;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
+import mekhq.campaign.randomEvents.personalities.Aggression;
+import mekhq.campaign.randomEvents.personalities.Ambition;
+import mekhq.campaign.randomEvents.personalities.Greed;
 import mekhq.campaign.randomEvents.personalities.PersonalityController;
-import mekhq.campaign.randomEvents.personalities.enums.Aggression;
-import mekhq.campaign.randomEvents.personalities.enums.Ambition;
-import mekhq.campaign.randomEvents.personalities.enums.Greed;
-import mekhq.campaign.randomEvents.personalities.enums.PersonalityQuirk;
-import mekhq.campaign.randomEvents.personalities.enums.PersonalityTraitType;
-import mekhq.campaign.randomEvents.personalities.enums.Reasoning;
-import mekhq.campaign.randomEvents.personalities.enums.Social;
-import mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus;
+import mekhq.campaign.randomEvents.personalities.PersonalityQuirk;
+import mekhq.campaign.randomEvents.personalities.PersonalityTraitType;
+import mekhq.campaign.randomEvents.personalities.Reasoning;
+import mekhq.campaign.randomEvents.personalities.Social;
+import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -167,7 +176,7 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  * @author Justin "Windchild" Bowen
  */
-public class Person {
+public class Person implements ILocation {
     // region Variable Declarations
     public static final Map<Integer, Money> MEKWARRIOR_AERO_RANSOM_VALUES;
     public static final Map<Integer, Money> OTHER_RANSOM_VALUES;
@@ -203,8 +212,22 @@ public class Person {
 
     private static final String DELIMITER = "::";
 
+    /**
+     * Campaign Operations doesn't have a cap on Fatigue, but does stop tracking Fatigue at 17 points. With this in
+     * mind, we have opted to set a cap on fatigue of 30. This is to ensure the player isn't placed in a situation where
+     * a character could conceivably accumulate hundreds of Fatigue. At a certain point you can't get more tired
+     */
+    private static final int FATIGUE_CAP = 30;
+    /**
+     * Some modifiers can reduce Fatigue below 0, but fatigue cannot directly be reduced to below zero. We use this
+     * constant to ensure this is the case.
+     */
+    private static final int FATIGUE_MINIMUM = 0;
+
 
     private PersonAwardController awardController;
+
+    private LocationNode locationNode = new LocationNode(this);
 
     // region Family Variables
     // Lineage
@@ -345,12 +368,12 @@ public class Person {
     private String eduAcademySet;
     private String eduAcademyNameInSet;
     private String eduAcademyFaction;
-    private String eduAcademySystem;
     private int eduCourseIndex;
     private EducationStage eduEducationStage;
     private int eduJourneyTime;
     private int eduEducationTime;
     private int eduDaysOfTravel;
+    private transient String legacyEduAcademySystem;
     private List<UUID> eduTagAlongs;
     private List<String> eduFailedApplications;
     private double trainingForceEducationTime;
@@ -415,7 +438,7 @@ public class Person {
     private boolean prefersWomen;
     // this is a flag used in random procreation to determine whether to attempt to
     // procreate
-    private boolean tryingToConceive;
+    private boolean wantsChildren;
     private boolean hidePersonality;
     // endregion Flags
 
@@ -584,7 +607,6 @@ public class Person {
         acquisitions = 0;
         eduHighestEducation = EducationLevel.EARLY_CHILDHOOD;
         eduAcademyName = null;
-        eduAcademySystem = null;
         eduCourseIndex = 0;
         eduEducationStage = EducationStage.NONE;
         eduJourneyTime = 0;
@@ -653,7 +675,7 @@ public class Person {
         setQuickTrainIgnore(false);
         setPrefersMen(false);
         setPrefersWomen(false);
-        setTryingToConceive(true);
+        setWantsChildren(true);
         // endregion Flags
 
         extraData = new ExtraData();
@@ -1705,8 +1727,8 @@ public class Person {
         this.setEduAcademySystem(null);
         this.setEduCourseIndex(0);
         this.setEduEducationStage(EducationStage.NONE);
-        this.setEduEducationTime(0);
         this.setEduJourneyTime(0);
+        this.setEduEducationTime(0);
         this.setEduDaysOfTravel(0);
 
         for (UUID tagAlongId : eduTagAlongs) {
@@ -1727,7 +1749,7 @@ public class Person {
      * @param campaign The current campaign
      */
     private void leadershipMassChangeLoyalty(Campaign campaign) {
-        for (Person person : campaign.getPersonnel()) {
+        for (Person person : campaign.getAllPersonnel()) {
             if (person.getStatus().isDepartedUnit()) {
                 continue;
             }
@@ -1836,7 +1858,7 @@ public class Person {
      */
     public static void performMassForcedDirectionLoyaltyChange(Campaign campaign, boolean isPositive,
           boolean isMajor) {
-        for (Person person : campaign.getPersonnel()) {
+        for (Person person : campaign.getAllPersonnel()) {
             if (person.getStatus().isDepartedUnit()) {
                 continue;
             }
@@ -2113,6 +2135,25 @@ public class Person {
                      .getDisplayFormattedOutput(getLastRankChangeDate(), today);
     }
 
+    public long getYearsSinceJoiningCampaign(final Campaign campaign) {
+        // Get time in service based on year
+        if (getJoinedCampaign() == null) {
+            return 0;
+        }
+
+        LocalDate today = campaign.getLocalDate();
+
+        // If the person is dead or has left the unit, we only care about how long they
+        // spent in service to the company
+        if (getRetirement() != null) {
+            today = getRetirement();
+        } else if (getDateOfDeath() != null) {
+            today = getDateOfDeath();
+        }
+
+        return ChronoUnit.YEARS.between(getJoinedCampaign(), today);
+    }
+
     public void setId(final UUID id) {
         this.id = id;
     }
@@ -2360,7 +2401,8 @@ public class Person {
             modifier += 2;
         }
 
-        return getFatigueDirect() + modifier;
+        int adjustedFatigue = fatigue + modifier;
+        return clamp(adjustedFatigue, FATIGUE_MINIMUM, FATIGUE_CAP);
     }
 
     public void setFatigue(final int fatigue) {
@@ -2392,7 +2434,9 @@ public class Person {
             delta = (int) floor(delta * getFatigueMultiplier());
         }
 
-        this.fatigue = this.fatigue + MathUtility.roundAwayFromZero(delta);
+        fatigue += MathUtility.roundAwayFromZero(delta);
+
+        fatigue = clamp(fatigue, FATIGUE_MINIMUM, FATIGUE_CAP);
     }
 
     public boolean getIsRecoveringFromFatigue() {
@@ -2690,6 +2734,14 @@ public class Person {
         this.eduHighestEducation = eduHighestEducation;
     }
 
+    /**
+     * Returns an estimated journey time in days to or from the academy.
+     *
+     * <p>This value is a snapshot recorded at enrollment or journey-start and may not reflect the
+     * actual remaining travel time. The person's {@link AbstractLocation} (accessible via
+     * {@link #getCurrentLocation()}) holds the authoritative travel state including the live
+     * {@link mekhq.campaign.JumpPath}.</p>
+     */
     public int getEduJourneyTime() {
         return eduJourneyTime;
     }
@@ -2698,12 +2750,66 @@ public class Person {
         this.eduJourneyTime = eduJourneyTime;
     }
 
+    /**
+     * Returns an estimated count of days elapsed since the person began their current journey.
+     *
+     * <p>This counter is incremented each day during JOURNEY_TO_CAMPUS and JOURNEY_FROM_CAMPUS
+     * stages as a rough progress indicator. The person's {@link AbstractLocation} (accessible via
+     * {@link #getCurrentLocation()}) holds the authoritative travel state including the live
+     * {@link mekhq.campaign.JumpPath}.</p>
+     */
     public int getEduDaysOfTravel() {
         return eduDaysOfTravel;
     }
 
     public void setEduDaysOfTravel(final int eduDaysOfTravel) {
         this.eduDaysOfTravel = eduDaysOfTravel;
+    }
+
+    /**
+     * Increments the number of educational travel days by 1.
+     *
+     * <p>See {@link #getEduDaysOfTravel()} for caveats about accuracy.</p>
+     */
+    public void incrementEduDaysOfTravel() {
+        this.eduDaysOfTravel++;
+    }
+
+    /**
+     * Returns the ID of the planetary system where the person's academy campus is located.
+     *
+     * <p>The primary source is the location tree: this walks the person's parent chain to find
+     * the nearest {@link AcademyCampusLocation}, then returns the system ID from its parent {@link AbstractLocation}
+     * (typically a {@link mekhq.campaign.FixedLocation}).</p>
+     *
+     * <p>If no campus node is reachable in the tree — for example, during JOURNEY_FROM_CAMPUS,
+     * a local-academy transit before campus arrival, or when loading a pre-location-tree save file — this falls back to
+     * a transient value populated from the legacy {@code eduAcademySystem} XML tag.</p>
+     *
+     * @return the campus system ID, or {@code null} if not derivable from either source
+     */
+    public @Nullable String getEduAcademySystem() {
+        for (ILocation cursor = getParentLocation(); cursor != null; cursor = cursor.getParentLocation()) {
+            if (cursor instanceof AcademyCampusLocation) {
+                ILocation campusParent = cursor.getParentLocation();
+                if (campusParent instanceof AbstractLocation location) {
+                    PlanetarySystem system = location.getCurrentSystem();
+                    if (system != null) {
+                        return system.getId();
+                    }
+                }
+                return legacyEduAcademySystem;
+            }
+        }
+        return legacyEduAcademySystem;
+    }
+
+    public void setEduAcademySystem(final String academySystem) {
+        // The authoritative source is the location tree (see getEduAcademySystem()).
+        // This value is stored transiently as a fallback for callers that set the system
+        // before a travel CurrentLocation is established (e.g. test setup, enrollment).
+        // It is not persisted to XML.
+        this.legacyEduAcademySystem = academySystem;
     }
 
     public List<UUID> getEduTagAlongs() {
@@ -2726,27 +2832,12 @@ public class Person {
         eduFailedApplications.add(failedApplication);
     }
 
-    /**
-     * Increments the number educational travel days by 1.
-     */
-    public void incrementEduDaysOfTravel() {
-        this.eduDaysOfTravel++;
-    }
-
     public int getEduEducationTime() {
         return eduEducationTime;
     }
 
     public void setEduEducationTime(final int eduEducationTime) {
         this.eduEducationTime = eduEducationTime;
-    }
-
-    public String getEduAcademySystem() {
-        return eduAcademySystem;
-    }
-
-    public void setEduAcademySystem(final String eduAcademySystem) {
-        this.eduAcademySystem = eduAcademySystem;
     }
 
     public String getEduAcademyNameInSet() {
@@ -2828,7 +2919,7 @@ public class Person {
      *                                   ensure it remains within the valid range.
      */
     public void setAggressionDescriptionIndex(final int aggressionDescriptionIndex) {
-        this.aggressionDescriptionIndex = Math.clamp(aggressionDescriptionIndex, 0, Aggression.MAXIMUM_VARIATIONS - 1);
+        this.aggressionDescriptionIndex = clamp(aggressionDescriptionIndex, 0, Aggression.MAXIMUM_VARIATIONS - 1);
     }
 
     Aggression getStoredAggression() {
@@ -2866,7 +2957,7 @@ public class Person {
      *                                 it remains within the valid range.
      */
     public void setAmbitionDescriptionIndex(final int ambitionDescriptionIndex) {
-        this.ambitionDescriptionIndex = Math.clamp(ambitionDescriptionIndex, 0, Ambition.MAXIMUM_VARIATIONS - 1);
+        this.ambitionDescriptionIndex = clamp(ambitionDescriptionIndex, 0, Ambition.MAXIMUM_VARIATIONS - 1);
     }
 
     Ambition getStoredAmbition() {
@@ -2904,7 +2995,7 @@ public class Person {
      *                              remains within the valid range.
      */
     public void setGreedDescriptionIndex(final int greedDescriptionIndex) {
-        this.greedDescriptionIndex = Math.clamp(greedDescriptionIndex, 0, Greed.MAXIMUM_VARIATIONS - 1);
+        this.greedDescriptionIndex = clamp(greedDescriptionIndex, 0, Greed.MAXIMUM_VARIATIONS - 1);
     }
 
     Greed getStoredGreed() {
@@ -2942,7 +3033,7 @@ public class Person {
      *                               remains within the valid range.
      */
     public void setSocialDescriptionIndex(final int socialDescriptionIndex) {
-        this.socialDescriptionIndex = Math.clamp(socialDescriptionIndex, 0, Social.MAXIMUM_VARIATIONS - 1);
+        this.socialDescriptionIndex = clamp(socialDescriptionIndex, 0, Social.MAXIMUM_VARIATIONS - 1);
     }
 
     Social getStoredSocial() {
@@ -2980,7 +3071,7 @@ public class Person {
      *                                         ensure it remains within the valid range.
      */
     public void setPersonalityQuirkDescriptionIndex(final int personalityQuirkDescriptionIndex) {
-        this.personalityQuirkDescriptionIndex = Math.clamp(personalityQuirkDescriptionIndex,
+        this.personalityQuirkDescriptionIndex = clamp(personalityQuirkDescriptionIndex,
               0,
               PersonalityQuirk.MAXIMUM_VARIATIONS - 1);
     }
@@ -3224,13 +3315,9 @@ public class Person {
         this.prefersWomen = prefersWomen;
     }
 
-    public boolean isTryingToConceive() {
-        return tryingToConceive;
-    }
+    public boolean isWantsChildren() {return wantsChildren;}
 
-    public void setTryingToConceive(final boolean tryingToConceive) {
-        this.tryingToConceive = tryingToConceive;
-    }
+    public void setWantsChildren(final boolean wantsChildren) {this.wantsChildren = wantsChildren;}
 
     public boolean isHidePersonality() {
         return hidePersonality;
@@ -3613,10 +3700,6 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "eduFailedApplications");
             }
 
-            if (eduAcademySystem != null) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduAcademySystem", eduAcademySystem);
-            }
-
             if (eduAcademyNameInSet != null) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduAcademyNameInSet", eduAcademyNameInSet);
             }
@@ -3811,7 +3894,7 @@ public class Person {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "marriageable", marriageable);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prefersMen", prefersMen);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prefersWomen", prefersWomen);
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "tryingToConceive", tryingToConceive);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "wantsChildren", wantsChildren);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hidePersonality", hidePersonality);
             // endregion Flags
 
@@ -4285,6 +4368,10 @@ public class Person {
                     person.eduJourneyTime = MathUtility.parseInt(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("eduDaysOfTravel")) {
                     person.eduDaysOfTravel = MathUtility.parseInt(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("eduAcademySystem")) {
+                    // Legacy tag — academy system is now derived from the location tree.
+                    // Stored transiently so mid-journey persons on old saves can still function.
+                    person.legacyEduAcademySystem = wn2.getTextContent().trim();
                 } else if (nodeName.equalsIgnoreCase("eduTagAlongs")) {
                     if (nodeName.equalsIgnoreCase("eduTagAlongs")) {
                         NodeList uuidNodes = wn2.getChildNodes();
@@ -4313,8 +4400,6 @@ public class Person {
                             }
                         }
                     }
-                } else if (nodeName.equalsIgnoreCase("eduAcademySystem")) {
-                    person.eduAcademySystem = String.valueOf(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("eduAcademyName")) {
                     person.eduAcademyName = String.valueOf(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("eduAcademySet")) {
@@ -4451,8 +4536,10 @@ public class Person {
                     person.setPrefersMen(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("prefersWomen")) {
                     person.setPrefersWomen(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (nodeName.equalsIgnoreCase("tryingToConceive")) {
-                    person.setTryingToConceive(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("tryingToConceive")) { // <51.0 compatibility handler
+                    person.setWantsChildren(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (nodeName.equalsIgnoreCase("wantsChildren")) {
+                    person.setWantsChildren(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("hidePersonality")) {
                     person.setHidePersonality(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("extraData")) {
@@ -4518,7 +4605,46 @@ public class Person {
             person = null;
         }
 
+        if (person != null) {
+            // < 0.51.00 compatibility handler
+            if (!campaign.getVersion().isHigherThan(new Version("0.51.0"))) {
+                CampaignOptions campaignOptions = campaign.getCampaignOptions();
+                int healingPeriod = campaignOptions.getNaturalHealingWaitingPeriod();
+                boolean isUseAdvancedMedical = campaignOptions.isUseAdvancedMedical();
+
+                if (isUseAdvancedMedical) {
+                    person.clearDoctorAssignmentForCharacterWithOnlyPermanentInjuries(isUseAdvancedMedical,
+                          healingPeriod);
+                }
+            }
+        }
+
         return person;
+    }
+
+    /**
+     * In 0.51.0 we introduced a change that removed characters who only have permanent injuries from the assignments.
+     * This method exists to avoid 'ghost patients', patients that take up doctor patient assignments but aren't visible
+     * in the Infirmary UI.
+     *
+     * @param isUseAdvancedMedical        whether Advanced Medical (or Alternate Advanced Medical) are enabled. Used to
+     *                                    facilitate an early exit to avoid unassigning doctors in campaigns that only
+     *                                    use TW-scale 'Hits'.
+     * @param naturalHealingWaitingPeriod the waiting period (in days) between healing checks
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
+    public void clearDoctorAssignmentForCharacterWithOnlyPermanentInjuries(boolean isUseAdvancedMedical,
+          int naturalHealingWaitingPeriod) {
+        if (!isUseAdvancedMedical) {
+            return;
+        }
+
+        List<Injury> nonPermanentInjuries = getNonPermanentInjuries();
+        if (nonPermanentInjuries.isEmpty()) {
+            setDoctorId(null, naturalHealingWaitingPeriod);
+        }
     }
 
     /**
@@ -5174,7 +5300,11 @@ public class Person {
      */
     public SkillLevel getSkillLevel(final CampaignOptions campaignOptions, final boolean isClanCampaign,
           final LocalDate today, final boolean secondary, final boolean excludeInjuryEffects) {
-        return Skills.SKILL_LEVELS[getExperienceLevel(campaignOptions, isClanCampaign, today, secondary, excludeInjuryEffects) + 1];
+        return Skills.SKILL_LEVELS[getExperienceLevel(campaignOptions,
+              isClanCampaign,
+              today,
+              secondary,
+              excludeInjuryEffects) + 1];
     }
 
     public int getExperienceLevel(final Campaign campaign, final boolean secondary) {
@@ -5611,7 +5741,7 @@ public class Person {
      * Returns the experience level for the specified skill using pre-built modifier data, or {@code -1} if the skill is
      * not present.
      *
-     * @param skillName        the name of the skill to query
+     * @param skillName         the name of the skill to query
      * @param skillModifierData pre-computed modifier data to apply to the skill level
      *
      * @return the experience level of the skill, or {@code -1} if the skill is not found
@@ -5696,6 +5826,91 @@ public class Person {
     }
 
     /**
+     * Prepares a skill check based on individually passed options.
+     *
+     * <p>This method creates a {@code SkillCheck} instance which calculates the target number
+     * for the skill check, based on the person's skill, aging effects, clan campaign rules, and the current date.</p>
+     *
+     * @param skillName         the name of the skill being checked, corresponding to a {@link SkillType}
+     * @param isUseAgingEffects if {@code true}, considers aging effects during the check
+     * @param isClanCampaign    if {@code true}, applies rules specific to clan campaigns
+     * @param date              the current date, used for time-dependent logic
+     *
+     * @return prepared skill check
+     */
+    public SkillCheck checkSkill(String skillName, boolean isUseAgingEffects, boolean isClanCampaign, LocalDate date) {
+        return new SkillCheck(this, skillName, isUseAgingEffects, isClanCampaign, date);
+    }
+
+    /**
+     * Prepares a skill check based on the campaign's options.
+     *
+     * <p>Automatically extracts aging effect setting, clan campaign status, and the current date from
+     * the provided {@link Campaign} context to calculate the target number.</p>
+     *
+     * @param skillName the name of the skill being checked, corresponding to a {@link SkillType}
+     * @param campaign  the current {@link Campaign} context
+     *
+     * @return prepared skill check
+     */
+    public SkillCheck checkSkill(String skillName, Campaign campaign) {
+        return new SkillCheck(this, skillName, campaign.getCampaignOptions().isUseAgeEffects(),
+              campaign.isClanCampaign(), campaign.getLocalDate());
+    }
+
+    /**
+     * Prepares an attribute check.
+     *
+     * <p>This method creates an {@link AttributeCheck} instance which calculates the target number
+     * for the attribute check.</p>
+     *
+     * @param attribute the {@link SkillAttribute} to be checked
+     *
+     * @return prepared attribute check
+     */
+    public AttributeCheck checkAttribute(SkillAttribute attribute) {
+        return new AttributeCheck(this, attribute);
+    }
+
+    /**
+     * Prepares a double attribute check.
+     *
+     * <p>This method creates an {@link AttributeCheck} instance which calculates the target number
+     * for the attribute check.</p>
+     *
+     * @param firstAttribute  first {@link SkillAttribute} to be checked
+     * @param secondAttribute second {@link SkillAttribute} to be checked
+     *
+     * @return prepared attribute check
+     */
+    public AttributeCheck checkAttributes(SkillAttribute firstAttribute, SkillAttribute secondAttribute) {
+        return new AttributeCheck(this, firstAttribute, secondAttribute);
+    }
+
+    /**
+     * Calculates the cost to improve a specific skill, at a specified skill level, with an optional reasoning
+     * multiplier.
+     *
+     * @param skillName        the name of the skill for which to calculate the improvement cost.
+     * @param useReasoning     a boolean indicating whether to apply {@link Reasoning} cost multipliers.
+     * @param targetSkillLevel The target skill level
+     *
+     * @return the cost to improve the skill, adjusted by the reasoning multiplier if applicable, or the cost for level
+     *       0 if the specified skill does not currently exist.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public int getCostToImprove(final String skillName, final boolean useReasoning, final int targetSkillLevel) {
+        final SkillType skillType = getType(skillName);
+        int cost = skillType.getCost(targetSkillLevel);
+
+        double multiplier = getTalentBasedXpCostMultiplier(useReasoning, skillType);
+
+        return (int) round(cost * multiplier);
+    }
+
+    /**
      * Calculates the cost to improve a specific skill, with an optional reasoning multiplier.
      *
      * <p>If the skill exists, the cost is based on its current level's improvement cost.</p>
@@ -5714,6 +5929,12 @@ public class Person {
         final SkillType skillType = getType(skillName);
         int cost = hasSkill(skillName) ? skill.getCostToImprove() : skillType.getCost(0);
 
+        double multiplier = getTalentBasedXpCostMultiplier(useReasoning, skillType);
+
+        return (int) round(cost * multiplier);
+    }
+
+    public double getTalentBasedXpCostMultiplier(boolean useReasoning, @Nullable SkillType skillType) {
         double multiplier = getReasoningXpCostMultiplier(useReasoning);
 
         if (options.booleanOption(FLAW_SLOW_LEARNER)) {
@@ -5724,7 +5945,7 @@ public class Person {
             multiplier -= 0.2;
         }
 
-        if (skillType.isAffectedByGremlinsOrTechEmpathy()) {
+        if (skillType != null && skillType.isAffectedByGremlinsOrTechEmpathy()) {
             if (options.booleanOption(FLAW_GREMLINS)) {
                 multiplier += 0.1;
             }
@@ -5734,7 +5955,7 @@ public class Person {
             }
         }
 
-        return (int) round(cost * multiplier);
+        return multiplier;
     }
     // endregion skill
 
@@ -5955,6 +6176,15 @@ public class Person {
         atowAttributes.changeCurrentEdge(amount);
     }
 
+    public void spendEdge() {
+        if (getCurrentEdge() > 0) {
+            atowAttributes.changeCurrentEdge(-1);
+            MekHQ.triggerEvent(new PersonChangedEvent(this));
+        } else {
+            LOGGER.error("Trying to spend edge, but it is at {}", getCurrentEdge(), new IllegalArgumentException());
+        }
+    }
+
     /**
      * @return this person's currently available edge points. Used for weekly refresh.
      */
@@ -5962,12 +6192,19 @@ public class Person {
         return atowAttributes.getCurrentEdge();
     }
 
-    public void setEdgeUsed(final int edgeUsedThisRound) {
+    public void setEdgeUsedThisRound(final int edgeUsedThisRound) {
         this.edgeUsedThisRound = edgeUsedThisRound;
     }
 
-    public int getEdgeUsed() {
+    public int getEdgeUsedThisRound() {
         return edgeUsedThisRound;
+    }
+
+    public int getUsedEdge() {
+        int currentEdge = getCurrentEdge();
+        int maximumEdge = getAdjustedEdge();
+
+        return maximumEdge - currentEdge;
     }
 
     /**
@@ -6297,7 +6534,7 @@ public class Person {
     }
 
     public void removeAllTechJobs(final Campaign campaign) {
-        campaign.getHangar().forEachUnit(u -> {
+        campaign.getAllHangar().forEachUnit(u -> {
             if (equals(u.getTech())) {
                 u.remove(this, true);
             }
@@ -6307,7 +6544,7 @@ public class Person {
             }
         });
 
-        for (final Part part : campaign.getWarehouse().getParts()) {
+        for (final Part part : campaign.getAllWarehouse().getParts()) {
             if (equals(part.getTech())) {
                 part.cancelAssignment(true);
             }
@@ -6912,11 +7149,11 @@ public class Person {
 
         modifiers += getDarkSecretModifier(false);
 
-        return Math.clamp(connections + modifiers, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
+        return clamp(connections + modifiers, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
     }
 
     public void setConnections(final int connections) {
-        this.connections = Math.clamp(connections, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
+        this.connections = clamp(connections, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
     }
 
     /**
@@ -6929,7 +7166,7 @@ public class Person {
      */
     public void changeConnections(final int delta) {
         int newValue = connections + delta;
-        connections = Math.clamp(newValue, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
+        connections = clamp(newValue, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
     }
 
     public int getWealth() {
@@ -6937,7 +7174,7 @@ public class Person {
     }
 
     public void setWealth(final int wealth) {
-        this.wealth = Math.clamp(wealth, MINIMUM_WEALTH, MAXIMUM_WEALTH);
+        this.wealth = clamp(wealth, MINIMUM_WEALTH, MAXIMUM_WEALTH);
     }
 
     /**
@@ -6950,7 +7187,7 @@ public class Person {
      */
     public void changeWealth(final int delta) {
         int newValue = wealth + delta;
-        wealth = Math.clamp(newValue, MINIMUM_WEALTH, MAXIMUM_WEALTH);
+        wealth = clamp(newValue, MINIMUM_WEALTH, MAXIMUM_WEALTH);
     }
 
     public boolean isHasPerformedExtremeExpenditure() {
@@ -6997,7 +7234,7 @@ public class Person {
      * @since 0.50.10
      */
     public void setExtraIncomeFromTraitLevel(final int traitLevel) {
-        int newExtraIncomeTraitLevel = Math.clamp(traitLevel, MINIMUM_EXTRA_INCOME, MAXIMUM_EXTRA_INCOME);
+        int newExtraIncomeTraitLevel = clamp(traitLevel, MINIMUM_EXTRA_INCOME, MAXIMUM_EXTRA_INCOME);
         extraIncome = ExtraIncome.extraIncomeParseFromInteger(newExtraIncomeTraitLevel);
     }
 
@@ -7069,11 +7306,11 @@ public class Person {
 
         modifiers += getDarkSecretModifier(true);
 
-        return Math.clamp(reputation + modifiers, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
+        return clamp(reputation + modifiers, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
     }
 
     public void setReputation(final int reputation) {
-        this.reputation = Math.clamp(reputation, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
+        this.reputation = clamp(reputation, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
     }
 
     /**
@@ -7086,7 +7323,7 @@ public class Person {
      */
     public void changeReputation(final int delta) {
         int newValue = reputation + delta;
-        reputation = Math.clamp(newValue, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
+        reputation = clamp(newValue, MINIMUM_REPUTATION, MAXIMUM_REPUTATION);
     }
 
     public int getUnlucky() {
@@ -7094,12 +7331,12 @@ public class Person {
     }
 
     public void setUnlucky(final int unlucky) {
-        this.unlucky = Math.clamp(unlucky, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY);
+        this.unlucky = clamp(unlucky, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY);
     }
 
     public void changeUnlucky(final int delta) {
         int newValue = unlucky + delta;
-        unlucky = Math.clamp(newValue, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY);
+        unlucky = clamp(newValue, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY);
     }
 
     public int getBloodmark() {
@@ -7111,12 +7348,12 @@ public class Person {
     }
 
     public void setBloodmark(final int unlucky) {
-        this.bloodmark = Math.clamp(unlucky, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK);
+        this.bloodmark = clamp(unlucky, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK);
     }
 
     public void changeBloodmark(final int delta) {
         int newValue = bloodmark + delta;
-        bloodmark = Math.clamp(newValue, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK);
+        bloodmark = clamp(newValue, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK);
     }
 
     public List<LocalDate> getBloodhuntSchedule() {
@@ -7153,14 +7390,15 @@ public class Person {
      *
      * <p>The actual attribute score update is delegated to the underlying attribute handler.</p>
      *
-     * @param attribute The {@link SkillAttribute} to be updated. Must not be <code>null</code> or "NONE".
+     * @param attribute The {@link SkillAttribute} to be updated. Must not be {@code null} or
+     *                  {@link SkillAttribute#NO_ATTRIBUTE}.
      * @param newScore  The new score to assign to the specified skill attribute.
      *
      * @author Illiani
      * @since 0.50.05
      */
     public void setAttributeScore(final SkillAttribute attribute, final int newScore) {
-        if (attribute == null || attribute == SkillAttribute.NONE) {
+        if (attribute == null || attribute == SkillAttribute.NO_ATTRIBUTE) {
             LOGGER.warn("(setAttributeScore) SkillAttribute is null or NONE.");
             return;
         }
@@ -7188,14 +7426,14 @@ public class Person {
     /**
      * Retrieves the maximum allowed value (cap) for the specified {@link SkillAttribute}.
      *
-     * <p>If the attribute is {@code null} or marked as {@link SkillAttribute#NONE}, a default maximum attribute score
-     * is returned, and a warning is logged.</p>
+     * <p>If the attribute is {@code null} or marked as {@link SkillAttribute#NO_ATTRIBUTE}, a default maximum
+     * attribute score is returned, and a warning is logged.</p>
      *
      * <p>For valid attributes, this method delegates to
      * {@link Attributes#getAttributeCap(Phenotype, PersonnelOptions, SkillAttribute)}.</p>
      *
      * @param attribute The {@link SkillAttribute} for which the maximum value is being retrieved. Must not be
-     *                  {@code null} or {@link SkillAttribute#NONE}.
+     *                  {@code null} or {@link SkillAttribute#NO_ATTRIBUTE}.
      *
      * @return The maximum allowed value (cap) for the given attribute. Returns the default maximum value if the input
      *       attribute is invalid.
@@ -7204,7 +7442,7 @@ public class Person {
      * @since 0.50.05
      */
     public int getAttributeCap(final SkillAttribute attribute) {
-        if (attribute == null || attribute.isNone()) {
+        if (attribute == null || attribute.isNoAttribute()) {
             LOGGER.warn("(getAttributeCap) SkillAttribute is null or NONE.");
             return MAXIMUM_ATTRIBUTE_SCORE;
         }
@@ -7213,7 +7451,8 @@ public class Person {
     }
 
     /**
-     * Retrieves the modifier value for a specified skill attribute.
+     * Retrieves the modifier value for a specified skill attribute. Equivalent to
+     * <code>Skill.getIndividualAttributeModifier(person.getAttributeScore(attribute))</code>.
      *
      * @param attribute the skill attribute for which the modifier is to be calculated; if the attribute is null or
      *                  represents "none", a warning is logged and the method returns 0
@@ -7224,7 +7463,7 @@ public class Person {
      * @since 0.51.00
      */
     public int getAttributeModifier(final SkillAttribute attribute) {
-        if (attribute == null || attribute.isNone()) {
+        if (attribute == null || attribute.isNoAttribute()) {
             LOGGER.warn("(getAttributeModifier) SkillAttribute is null or NONE.");
             return 0;
         }
@@ -7254,8 +7493,8 @@ public class Person {
      * Modifies the score of a specified skill attribute by a given delta value.
      *
      * <p>This method adjusts the current score of the provided {@link SkillAttribute} by adding the specified delta
-     * to it. If the attribute is {@code null} or {@link SkillAttribute#NONE}, a warning is logged, and the method exits
-     * without making any changes.</p>
+     * to it. If the attribute is {@code null} or {@link SkillAttribute#NO_ATTRIBUTE}, a warning is logged, and the
+     * method exits without making any changes.</p>
      *
      * <p>The new score is computed as the sum of the current score and the delta, and it is passed
      * to {@link Attributes#setAttributeScore(Phenotype, PersonnelOptions, SkillAttribute, int)} to ensure it compiles
@@ -7268,7 +7507,7 @@ public class Person {
      * @since 0.50.05
      */
     public void changeAttributeScore(final SkillAttribute attribute, final int delta) {
-        if (attribute == null || attribute.isNone()) {
+        if (attribute == null || attribute.isNoAttribute()) {
             LOGGER.warn("(changeAttributeScore) SkillAttribute is null or NONE.");
             return;
         }
@@ -7439,6 +7678,21 @@ public class Person {
                      .collect(Collectors.toList());
     }
 
+    public boolean hasProstheticInjuryNoImplant(BodyLocation location) {
+        for (Injury injury : getInjuriesByLocation(location)) {
+            if (injury.getSubType().isProsthetic()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public List<Injury> getNonPermanentInjuries() {
+        return injuries.stream()
+                     .filter(i -> !i.isPermanent())
+                     .collect(Collectors.toList());
+    }
+
     /**
      * Removes all non-prosthetic injuries from this person.
      *
@@ -7561,8 +7815,14 @@ public class Person {
         return getInjuryByLocation(location) != null;
     }
 
+    /**
+     * Determines whether this entity has any non-permanent injuries that require medical attention.
+     *
+     * @return {@code true} if there is at least one non-permanent injury present; {@code false} otherwise
+     */
     public boolean needsAMFixing() {
-        return !injuries.isEmpty();
+        boolean ignorePermanentInjuries = true;
+        return hasInjuries(ignorePermanentInjuries);
     }
 
     /**
@@ -7677,7 +7937,30 @@ public class Person {
         return false;
     }
 
-    public boolean hasOnlyHealedPermanentInjuries() {
+    /**
+     * Determines whether the character has any permanent, non-prosthetic injuries.
+     *
+     * <p>If {@code isUseAlternateAdvancedMedical} is {@code true} we check whether the character has
+     * non-prosthetic permanent injuries. Otherwise we use legacy testing that just checks for permanent injuries.</p>
+     *
+     * @return Returns {@code true} if the character has no non-permanent injuries, has at least one permanent injury,
+     *       and that injury is not a permanent modification, such as an implant.
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
+    public boolean hasNonProstheticPermanentInjuries(boolean isUseAlternateAdvancedMedical) {
+        if (isUseAlternateAdvancedMedical) {
+            if (getNonPermanentInjurySeverity() > 0) {
+                return false;
+            }
+
+            ArrayList<Injury> relevantInjuries = new ArrayList<>(injuries);
+            relevantInjuries.removeAll(getProstheticInjuries());
+
+            return !relevantInjuries.isEmpty();
+        }
+
         return !injuries.isEmpty() &&
                      injuries.stream().noneMatch(injury -> !injury.isPermanent() || (injury.getTime() > 0));
     }
@@ -7810,6 +8093,31 @@ public class Person {
         return (getPrimaryRole().isMekWarriorGrouping() || getPrimaryRole().isAerospacePilot() ?
                       MEKWARRIOR_AERO_RANSOM_VALUES :
                       OTHER_RANSOM_VALUES).get(getExperienceLevel(campaign, false, true));
+    }
+
+    @Override
+    public @Nonnull LocationNode getLocationNode() {
+        return locationNode;
+    }
+
+    @Override
+    public java.util.Set<Person> fetchPersonnelAtLocation() {
+        return java.util.Set.of(this);
+    }
+
+    public List<Skill> getInProgressSkills() {
+        Collection<Skill> allTrainedSkills = skills.getSkills();
+        List<Skill> inProgressSkills = new ArrayList<>();
+
+        for (Skill skill : allTrainedSkills) {
+            if (skill.getXpProgress() > 0) {
+                inProgressSkills.add(skill);
+            }
+        }
+
+        inProgressSkills.sort(Comparator.comparing(s -> s.getType().getName()));
+
+        return inProgressSkills;
     }
 
     public static class PersonUnitRef extends Unit {
@@ -9132,5 +9440,20 @@ public class Person {
 
     public void setAdvancedAsTechContribution(int contribution) {
         advancedAsTechContribution = contribution;
+    }
+
+    @Override
+    public boolean setParent(ILocation parent) {
+        ILocation oldParent = getParentLocation();
+        if (ILocation.super.setParent(parent)) {
+            if (oldParent instanceof Personnel personnel) {
+                personnel.remove(getId());
+            }
+            if (parent instanceof Personnel personnel) {
+                personnel.put(getId(), this);
+            }
+            return true;
+        }
+        return false;
     }
 }

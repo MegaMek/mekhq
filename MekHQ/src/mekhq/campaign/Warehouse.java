@@ -43,12 +43,15 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import jakarta.annotation.Nonnull;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.events.parts.PartNewEvent;
 import mekhq.campaign.events.parts.PartRemovedEvent;
+import mekhq.campaign.location.ILocation;
+import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
@@ -57,9 +60,10 @@ import mekhq.utilities.MHQXMLUtility;
 /**
  * Stores parts for a Campaign.
  */
-public class Warehouse {
+public class Warehouse implements ILocation {
     private static final MMLogger LOGGER = MMLogger.create(Warehouse.class);
 
+    private final LocationNode locationNode = new LocationNode(this);
     // ConcurrentSkipListMap rather than TreeMap so the value iterators are weakly consistent and
     // never throw ConcurrentModificationException. The earlier snapshot helpers (forEachPart,
     // streamSpareParts, etc.) call `new ArrayList<>(parts.values())` whose ArrayList(Collection)
@@ -70,6 +74,11 @@ public class Warehouse {
     // race is reachable in normal play. Same NavigableMap API; the snapshot helpers stay in
     // place for deterministic per-call views but no longer trip during construction.
     private final ConcurrentSkipListMap<Integer, Part> parts = new ConcurrentSkipListMap<>();
+
+    @Override
+    public @Nonnull LocationNode getLocationNode() {
+        return locationNode;
+    }
 
     /**
      * Adds a part to the warehouse.
@@ -124,6 +133,7 @@ public class Warehouse {
         boolean isNewPart = !parts.containsKey(part.getId());
 
         parts.put(part.getId(), part);
+        part.setParent(this);
 
         if (isNewPart) {
             MekHQ.triggerEvent(new PartNewEvent(part));
@@ -182,6 +192,7 @@ public class Warehouse {
         boolean didRemove = (parts.remove(part.getId()) != null);
 
         if (didRemove) {
+            part.setParent(null);
             MekHQ.triggerEvent(new PartRemovedEvent(part));
         }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2009-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -196,7 +196,8 @@ public class JumpPathViewPanel extends JScrollablePanel {
 
         txtTimeStart.setName("lblTimeStart2");
         txtTimeStart.setText("<html>" +
-                                   Math.round(path.getStartTime(campaign.getLocation().getTransitTime()) * 100.0) /
+                                   Math.round(path.getStartTime(campaign.getCurrentLocation().getTransitTime()) *
+                                                    100.0) /
                                          100.0 +
                                    " days from " +
                                    startName +
@@ -274,7 +275,9 @@ public class JumpPathViewPanel extends JScrollablePanel {
 
         txtTotalTime.setName("lblTotalTime2");
         txtTotalTime.setText("<html>" + Math.round(path.getTotalTime(currentDate,
-              campaign.getLocation().getTransitTime(), isUseCommandCircuit) * 100.0) / 100.0 + " days" + "</html>");
+              campaign.getCurrentLocation().getTransitTime(), isUseCommandCircuit) * 100.0) / 100.0 +
+                                   " days" +
+                                   "</html>");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 5;
@@ -295,7 +298,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
             pnlStats.add(lblCost, gridBagConstraints);
 
             TransportCostCalculations transportCostCalculations = campaign.getTransportCostCalculation(EXP_REGULAR);
-            int duration = (int) ceil(path.getTotalTime(currentDate, campaign.getLocation().getTransitTime(),
+            int duration = (int) ceil(path.getTotalTime(currentDate, campaign.getCurrentLocation().getTransitTime(),
                   isUseCommandCircuit));
             Money journeyCost = transportCostCalculations.calculateJumpCostForEntireJourney(duration, path.getJumps());
 

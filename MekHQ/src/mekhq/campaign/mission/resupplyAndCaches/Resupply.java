@@ -420,7 +420,7 @@ public class Resupply {
             }
 
             for (UUID unitId : force.getAllUnits(true)) {
-                Entity entity = getEntityFromUnitId(campaign.getHangar(), unitId);
+                Entity entity = getEntityFromUnitId(campaign.getAllHangar(), unitId);
 
                 if (entity == null) {
                     continue;

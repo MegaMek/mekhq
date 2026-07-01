@@ -57,29 +57,27 @@ public class ContractTypePicker {
      * Major Power, Corporation, or Independent) and rolls on that table with modifiers from connections and negotiation
      * success.</p>
      *
-     * @param employer                   the faction offering the contract
-     * @param connections                the unit's connection rating with the employer
-     * @param negotiationMarginOfSuccess the margin by which the negotiation roll succeeded or failed
+     * @param employer          the faction offering the contract
+     * @param commanderModifier Modifiers applied based on the commander's connections and negotiation success
      *
      * @return the selected contract type
      *
      * @author Illiani
      * @since 0.50.10
      */
-    public static AtBContractType findMissionType(Faction employer, int connections, int negotiationMarginOfSuccess) {
-        int modifier = connections + negotiationMarginOfSuccess;
+    public static AtBContractType findMissionType(Faction employer, int commanderModifier) {
         // I took some liberties here with what faction rolls on what table, as the options were fairly limited. The
         // below gives a much better variance among the factions.
         if (employer.isClan()) {
-            return clanTable(modifier);
+            return clanTable(commanderModifier);
         } else if (employer.isPirate()) {
-            return pirateTable(modifier);
+            return pirateTable(commanderModifier);
         } else if (employer.isMajorPower()) {
-            return innerSphereTable(modifier);
+            return innerSphereTable(commanderModifier);
         } else if (employer.isCorporation() || employer.isRebel() || employer.isComStarOrWoB()) {
-            return corporationTable(modifier);
+            return corporationTable(commanderModifier);
         } else {
-            return independentTable(modifier);
+            return independentTable(commanderModifier);
         }
     }
 

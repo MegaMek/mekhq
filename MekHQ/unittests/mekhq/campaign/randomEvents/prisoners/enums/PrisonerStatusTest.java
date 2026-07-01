@@ -32,12 +32,13 @@
  */
 package mekhq.campaign.randomEvents.prisoners.enums;
 
-import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.FREE;
-import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.PRISONER;
+import static mekhq.campaign.randomEvents.prisoners.PrisonerStatus.FREE;
+import static mekhq.campaign.randomEvents.prisoners.PrisonerStatus.PRISONER;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import org.junit.jupiter.api.Test;
 
 public class PrisonerStatusTest {

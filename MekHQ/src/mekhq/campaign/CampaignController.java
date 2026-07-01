@@ -33,22 +33,63 @@
 package mekhq.campaign;
 
 import java.util.UUID;
+import javax.swing.SwingUtilities;
+
+import megamek.common.event.Subscribe;
+import mekhq.MekHQ;
+import mekhq.campaign.events.StoryFinishedEvent;
+import mekhq.campaign.market.PersonnelMarket;
 
 /**
  * Manages the timeline of a {@link Campaign}.
  */
 public class CampaignController {
+    private final MekHQ app;
     private final Campaign localCampaign;
     private boolean isHost;
     private UUID host;
+    private final CampaignEventProcessor campaignEventProcessor;
 
     /**
      * Creates a new {@code CampaignController} for the given {@link Campaign}
      *
-     * @param c The {@link Campaign} being used locally.
+     * @param campaign The {@link Campaign} being used locally.
      */
-    public CampaignController(Campaign c) {
-        localCampaign = c;
+    public CampaignController(MekHQ app, Campaign campaign) {
+        this.app = app;
+        localCampaign = campaign;
+        campaignEventProcessor = new CampaignEventProcessor(campaign);
+    }
+
+    /**
+     * Manually registers campaign-related event bus listeners.
+     */
+    public void activate() {
+        PersonnelMarket personnelMarket = localCampaign.getHumanResources().getPersonnelMarket();
+        if (personnelMarket != null) {
+            MekHQ.registerHandler(personnelMarket);
+        }
+        MekHQ.registerHandler(campaignEventProcessor);
+        MekHQ.registerHandler(this);
+    }
+
+    /**
+     * Manually unregister campaign-related event bus listeners.
+     */
+    public void deactivate() {
+        if (localCampaign.getStoryArc() != null) {
+            MekHQ.unregisterHandler(localCampaign.getStoryArc());
+        }
+        PersonnelMarket personnelMarket = localCampaign.getHumanResources().getPersonnelMarket();
+        if (personnelMarket != null) {
+            MekHQ.unregisterHandler(personnelMarket);
+        }
+        MekHQ.unregisterHandler(campaignEventProcessor);
+        MekHQ.unregisterHandler(this);
+        CampaignNewDayManager newDayManager = localCampaign.getNewDayManager();
+        if (newDayManager != null) {
+            MekHQ.unregisterHandler(newDayManager);
+        }
     }
 
     /**
@@ -94,4 +135,12 @@ public class CampaignController {
     public void advanceDay() {
         getLocalCampaign().newDay();
     }
+
+    @Subscribe
+    public void handle(StoryFinishedEvent event) {
+        // do on a different thread, because restart will trigger event bus registrations which can
+        // lead to ConcurrentModificationException if done on the event bus trigger thread
+        SwingUtilities.invokeLater(app::restart);
+    }
+
 }

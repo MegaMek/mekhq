@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -58,8 +58,8 @@ import java.util.Set;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
+import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
@@ -118,7 +118,7 @@ public class Inoculations {
      * @since 0.50.10
      */
     public static void triggerInoculationPrompt(Campaign campaign, boolean isAdHoc) {
-        CurrentLocation location = campaign.getLocation();
+        AbstractLocation location = campaign.getCurrentLocation();
         if (!location.isOnPlanet()) {
             new ImmersiveDialogNotification(campaign, getTextAt(RESOURCE_BUNDLE, "Inoculations.inTransit"), true);
             return;
@@ -216,6 +216,32 @@ public class Inoculations {
               allCivilianPersonnel,
               militaryInoculationCost,
               civilianInoculationCost);
+    }
+
+    /**
+     * Silently inoculates eligible personnel at the given location's planet without displaying a dialog.
+     *
+     * <p>Only personnel nested under {@code location}'s node are vaccinated — personnel at other
+     * locations are not affected. Vaccine dodgers are still excluded. No cost is charged.</p>
+     *
+     * @param campaign the current campaign
+     * @param location the location whose personnel should be inoculated
+     */
+    public static void autoInoculateAll(Campaign campaign, mekhq.campaign.AbstractLocation location) {
+        if (!location.isOnPlanet()) {
+            return;
+        }
+        Planet currentPlanet = location.getPlanet();
+        LocalDate today = campaign.getLocalDate();
+
+        Set<Person> personnel = new HashSet<>();
+        for (Person person : location.fetchPersonnelAtLocation()) {
+            if (!person.getOptions().booleanOption(FLAW_VACCINE_DODGER)) {
+                personnel.add(person);
+            }
+        }
+
+        inoculatePersonnel(today, personnel, currentPlanet);
     }
 
     private static void gatherPersonnelInNeedOfCanonInoculations(Set<InjuryType> availableCures,
@@ -491,7 +517,7 @@ public class Inoculations {
      * @since 0.50.10
      */
     public static void performDiseaseChecks(Campaign campaign) {
-        CurrentLocation location = campaign.getLocation();
+        AbstractLocation location = campaign.getCurrentLocation();
         LocalDate today = campaign.getLocalDate();
 
         String planetCode = location.isOnPlanet() ? location.getPlanet().getId() : null;
@@ -828,8 +854,8 @@ public class Inoculations {
 
     public static void triggerBioweaponSpreadMessages(Campaign campaign, boolean isInTransit, boolean hasCure,
           Set<String> diseases) {
-        String alertColor = spanOpeningWithCustomColor(isInTransit ? getNegativeColor() : getWarningColor());
-        alertColor = hasCure ? alertColor : getNegativeColor();
+        String alertColor = isInTransit ? getNegativeColor() : getWarningColor();
+        alertColor = spanOpeningWithCustomColor(hasCure ? alertColor : getNegativeColor());
 
         String reportKey;
         if (!hasCure) {

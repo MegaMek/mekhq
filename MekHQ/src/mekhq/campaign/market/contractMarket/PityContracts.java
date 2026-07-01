@@ -32,16 +32,20 @@
  */
 package mekhq.campaign.market.contractMarket;
 
-import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.AtBContractType;
-
 import static java.lang.Math.max;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.enums.SkillLevel.GREEN;
 import static megamek.common.enums.SkillLevel.VETERAN;
 import static mekhq.campaign.mission.Contract.OH_NONE;
+import static mekhq.campaign.mission.ContractDifficulty.calculateContractDifficulty;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
+
+import java.util.List;
+
+import megamek.common.units.Entity;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.enums.AtBContractType;
 
 /**
  * Utility class for generating pity contracts when a campaign does not have enough successful completed contracts.
@@ -60,8 +64,8 @@ public class PityContracts {
      * Generates pity contracts for the supplied campaign.
      *
      * <p>The number of generated contracts is based on the number of successful completed contracts already present
-     * in the campaign. If the campaign already has at least a number of successful completed contracts in excess of
-     * the pity contract count, no pity contracts are generated.</p>
+     * in the campaign. If the campaign already has at least a number of successful completed contracts in excess of the
+     * pity contract count, no pity contracts are generated.</p>
      *
      * @param campaign the campaign for which pity contracts are generated
      *
@@ -126,11 +130,20 @@ public class PityContracts {
 
         updateEnemyFaction(campaign, contract);
 
+        // We need to rebuild the difficulty estimate as otherwise it will still be reporting for the contract's
+        // original enemy
+        boolean isUseGenericBattleValue = campaign.getCampaignOptions().isUseGenericBattleValue();
+        List<Entity> combatUnits = campaign.getAllCombatEntities();
+        int difficulty = calculateContractDifficulty(contract, campaign.getGameYear(),
+              isUseGenericBattleValue,
+              combatUnits);
+        contract.setContractDifficulty(difficulty);
+
         if (!campaign.isPirateCampaign()) { // Pirate campaigns have fixed contractual terms
             overrideContractTermsForPityContracts(contract);
         }
 
-        contract.setName(AtbMonthlyContractMarket.generateDefaultName(contract.getEmployer(), contract));
+        contract.setName(AtbMonthlyContractMarket.generateDefaultName(contract.getEmployerName(), contract));
     }
 
     /**
@@ -164,19 +177,19 @@ public class PityContracts {
      * @since 0.51.0
      */
     private static void overrideContractTermsForPityContracts(AtBContract contract) {
-        contract.setContractType(AtBContractType.PIRATE_HUNTING);
+        contract.setContractTypeAndName(AtBContractType.PIRATE_HUNTING);
 
         int salvageRoll = d6(1) * 10;
-        contract.setSalvagePct(salvageRoll);
+        contract.setSalvagePercent(salvageRoll);
 
         int supportRoll = d6(1) * 10;
         contract.setStraightSupport(supportRoll);
-        contract.setOverheadComp(OH_NONE);
+        contract.setOverheadCompensation(OH_NONE);
 
         int battleLossRoll = d6(1) * 10;
-        contract.setBattleLossComp(battleLossRoll);
+        contract.setBattleLossCompensation(battleLossRoll);
 
         int transportRoll = (4 + d6(1)) * 10;
-        contract.setTransportComp(transportRoll);
+        contract.setTransportCompensation(transportRoll);
     }
 }

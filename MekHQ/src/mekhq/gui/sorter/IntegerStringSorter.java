@@ -37,6 +37,8 @@ import java.util.Objects;
 
 public class IntegerStringSorter implements Comparator<String> {
 
+    public static final IntegerStringSorter INSTANCE = new IntegerStringSorter();
+
     @Override
     public int compare(String o1, String o2) {
         if (Objects.equals(o1, o2)) {

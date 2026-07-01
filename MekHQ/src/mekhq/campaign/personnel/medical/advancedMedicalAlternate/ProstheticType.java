@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -61,7 +61,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.enums.AvailabilityValue;
 import megamek.common.options.IOption;
 import mekhq.MHQConstants;
-import mekhq.campaign.CurrentLocation;
+import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.ATOWLegalityRating;
 import mekhq.campaign.personnel.InjuryType;
@@ -1306,7 +1306,7 @@ public enum ProstheticType {
      * @author Illiani
      * @since 0.50.10
      */
-    public boolean isAvailableInCurrentLocation(CurrentLocation currentLocation, LocalDate today) {
+    public boolean isAvailableInCurrentLocation(AbstractLocation currentLocation, LocalDate today) {
         PlanetarySystem.PlanetarySophistication minimumSophistication = PlanetarySystem.PlanetarySophistication.F;
 
         // In transit: availability limited to rating F or lower

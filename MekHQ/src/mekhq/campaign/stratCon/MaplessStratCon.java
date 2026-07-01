@@ -126,7 +126,7 @@ public class MaplessStratCon {
             return null;
         }
 
-        StratConCampaignState campaignState = atbContract.getStratconCampaignState();
+        StratConCampaignState campaignState = atbContract.getStratConCampaignState();
         if (campaignState == null) {
             LOGGER.warn("CampaignState is null for contract: {}", atbContract);
             return null;

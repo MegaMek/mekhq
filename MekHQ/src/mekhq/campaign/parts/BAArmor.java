@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -153,7 +153,7 @@ public class BAArmor extends Armor {
 
     @Override
     public int getAmountAvailable() {
-        return campaign.getWarehouse()
+        return getWarehouse()
                      .streamSpareParts()
                      .filter(this::isSameBAArmorPart)
                      .mapToInt(part -> ((BAArmor) part).getAmount())
@@ -162,14 +162,14 @@ public class BAArmor extends Armor {
 
     @Override
     protected int changeAmountAvailableSingle(int amount) {
-        BAArmor armor = (BAArmor) campaign.getWarehouse()
+        BAArmor armor = (BAArmor) getWarehouse()
                                         .findSparePart(part -> isSamePartType(part) && part.isPresent());
 
         if (null != armor) {
             int amountRemaining = armor.getAmount() + amount;
             armor.setAmount(amountRemaining);
             if (armor.getAmount() <= 0) {
-                campaign.getWarehouse().removePart(armor);
+                getWarehouse().removePart(armor);
                 return Math.min(0, amountRemaining);
             }
         } else if (amount > 0) {

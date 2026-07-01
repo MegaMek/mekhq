@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,6 +32,9 @@
  */
 package mekhq.gui;
 
+import static mekhq.MHQConstants.CONFIRMATION_ASSIGN_TECHS;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -39,10 +42,13 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.UUID;
 import javax.swing.*;
 import javax.swing.RowSorter.SortKey;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
@@ -63,6 +69,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.events.AcquisitionEvent;
 import mekhq.campaign.events.DeploymentChangedEvent;
+import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.events.OvertimeModeEvent;
 import mekhq.campaign.events.RepairStatusChangedEvent;
 import mekhq.campaign.events.parts.PartEvent;
@@ -80,6 +87,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.enums.MHQTabType;
+import mekhq.gui.model.LocationFilterItem;
 import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.sorter.FormattedNumberSorter;
@@ -89,13 +97,12 @@ import mekhq.gui.sorter.UnitTypeSorter;
 import mekhq.gui.sorter.WeightClassSorter;
 import mekhq.gui.view.UnitViewPanel;
 
-import static mekhq.MHQConstants.CONFIRMATION_ASSIGN_TECHS;
-
 /**
  * Displays a table of all units in the force.
  */
 public final class HangarTab extends CampaignGuiTab {
     private static final MMLogger LOGGER = MMLogger.create(HangarTab.class);
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignGUI";
 
     public static final int UNIT_VIEW_WIDTH = 600;
 
@@ -105,13 +112,15 @@ public final class HangarTab extends CampaignGuiTab {
     private static final int UV_DETAILS = 2;
     private static final int UV_STATUS = 3;
     private static final int UV_TRANSPORT = 4;
-    private static final int UV_NUM = 5;
+    private static final int UV_LOCATION = 5;
+    private static final int UV_NUM = 6;
 
 
     private JSplitPane splitUnit;
     private JTable unitTable;
     private JComboBox<String> choiceUnit;
     private JComboBox<String> choiceUnitView;
+    private JTextField txtUnitSearch;
     private JCheckBox chkHideMothballed;
     private JButton btnAssignTechs;
     private JScrollPane scrollUnitView;
@@ -127,11 +136,21 @@ public final class HangarTab extends CampaignGuiTab {
     // region Constructors
     public HangarTab(CampaignGUI gui, String name) {
         super(gui, name);
-        MekHQ.registerHandler(this);
         setUserPreferences();
-        GUIPreferences.getInstance().addPreferenceChangeListener(scalingChangeListener);
     }
     // endregion Constructors
+
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        GUIPreferences.getInstance().addPreferenceChangeListener(scalingChangeListener);
+    }
+
+    @Override
+    public void removeNotify() {
+        GUIPreferences.getInstance().removePreferenceChangeListener(scalingChangeListener);
+        super.removeNotify();
+    }
 
     @Override
     public MHQTabType tabType() {
@@ -205,16 +224,52 @@ public final class HangarTab extends CampaignGuiTab {
         gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weightx = 0.0;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         add(choiceUnitView, gridBagConstraints);
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 10, 0, 0);
+        add(new JLabel(getTextAt(RESOURCE_BUNDLE, "lblUnitSearch.text")), gridBagConstraints);
+
+        txtUnitSearch = new JTextField(15);
+        txtUnitSearch.setToolTipText(getTextAt(RESOURCE_BUNDLE, "lblUnitSearch.tooltip"));
+        txtUnitSearch.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent event) {
+                filterUnits();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent event) {
+                filterUnits();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent event) {
+                filterUnits();
+            }
+        });
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 6;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 5);
+        add(txtUnitSearch, gridBagConstraints);
 
         btnAssignTechs = new RoundedJButton(resourceMap.getString("btnAssignTechs.text"));
         btnAssignTechs.setToolTipText(resourceMap.getString("btnAssignTechs.toolTipText"));
         btnAssignTechs.addActionListener(ev -> quickAssignTechs());
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridx = 7;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.weightx = 1.0;
@@ -259,7 +314,7 @@ public final class HangarTab extends CampaignGuiTab {
         scrollUnitTable.setFocusable(false);
         scrollUnitTable.setBorder(RoundedLineBorder.createRoundedLineBorder());
 
-        JPanel pnlTutorial = new TutorialHyperlinkPanel("hangarTab");
+        JPanel pnlTutorial = new TutorialHyperlinkPanel("hangarTab.keyText");
 
         JPanel tableAndInfoPanel = new JPanel(new BorderLayout());
         tableAndInfoPanel.add(scrollUnitTable, BorderLayout.CENTER);
@@ -278,13 +333,15 @@ public final class HangarTab extends CampaignGuiTab {
         splitUnit.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, pce -> refreshUnitView());
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 6;
+        gridBagConstraints.gridwidth = 8;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         add(splitUnit, gridBagConstraints);
 
         UnitTableMouseAdapter.connect(getCampaignGui(), unitTable, unitModel, splitUnit);
+
+        refreshUnitList();
     }
 
     private void quickAssignTechs() {
@@ -299,7 +356,8 @@ public final class HangarTab extends CampaignGuiTab {
         }
 
         if (wasConfirmedOverall) {
-            AutomatedTechAssignments.handleTheAutomaticAssignmentOfUnmaintainedUnits(getCampaign());
+            boolean skipReports = true;
+            AutomatedTechAssignments.handleTheAutomaticAssignmentOfUnmaintainedUnits(getCampaign(), skipReports);
         }
     }
 
@@ -344,11 +402,22 @@ public final class HangarTab extends CampaignGuiTab {
     public void filterUnits() {
         final int nGroup = choiceUnit.getSelectedIndex() - 1;
         final boolean hideMothballed = chkHideMothballed.isSelected();
+        final String searchText = txtUnitSearch.getText().trim().toLowerCase(Locale.ROOT);
+
         RowFilter<UnitTableModel, Integer> unitTypeFilter = new RowFilter<>() {
             @Override
             public boolean include(Entry<? extends UnitTableModel, ? extends Integer> entry) {
                 UnitTableModel unitModel = entry.getModel();
                 Unit unit = unitModel.getUnit(entry.getIdentifier());
+
+                // Search filter
+                String unitName = unit.getName();
+                unitName = unitName + unit.getTypeDisplayableNameWithOmni();
+                unitName = unitName.toLowerCase(Locale.ROOT);
+
+                if (!searchText.isEmpty() && !unitName.contains(searchText)) {
+                    return false;
+                }
 
                 // Apply "Hide Mothballed" checkbox filter first
                 if (hideMothballed && unit.isMothballed()) {
@@ -392,6 +461,7 @@ public final class HangarTab extends CampaignGuiTab {
             case UV_DETAILS -> "Details";
             case UV_STATUS -> "Status";
             case UV_TRANSPORT -> "Transport";
+            case UV_LOCATION -> "Location";
             default -> "?";
         };
     }
@@ -443,6 +513,14 @@ public final class HangarTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_MODE), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_SHIP_TRANSPORT), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TAC_TRANSPORT), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_LOCATION_NAME), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_LOCATION_SYSTEM), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_LOCATION_PLANET), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DESTINATION_NAME), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DESTINATION_SYSTEM),
+                  false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DESTINATION_PLANET),
+                  false);
         } else if (view == UV_GENERAL) {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_NAME), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TYPE), true);
@@ -468,6 +546,14 @@ public final class HangarTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_MODE), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_SHIP_TRANSPORT), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TAC_TRANSPORT), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_LOCATION_NAME), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_LOCATION_SYSTEM), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_LOCATION_PLANET), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DESTINATION_NAME), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DESTINATION_SYSTEM),
+                  false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DESTINATION_PLANET),
+                  false);
         } else if (view == UV_DETAILS) {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_NAME), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TYPE), true);
@@ -494,6 +580,14 @@ public final class HangarTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_MODE), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_SHIP_TRANSPORT), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TAC_TRANSPORT), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_LOCATION_NAME), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_LOCATION_SYSTEM), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_LOCATION_PLANET), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DESTINATION_NAME), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DESTINATION_SYSTEM),
+                  false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DESTINATION_PLANET),
+                  false);
         } else if (view == UV_STATUS) {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_NAME), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TYPE), true);
@@ -521,6 +615,14 @@ public final class HangarTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_MODE), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_SHIP_TRANSPORT), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TAC_TRANSPORT), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_LOCATION_NAME), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_LOCATION_SYSTEM), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_LOCATION_PLANET), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DESTINATION_NAME), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DESTINATION_SYSTEM),
+                  false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DESTINATION_PLANET),
+                  false);
         } else if (view == UV_TRANSPORT) {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_NAME), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TYPE), true);
@@ -546,13 +648,48 @@ public final class HangarTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_MODE), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_SHIP_TRANSPORT), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TAC_TRANSPORT), true);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_LOCATION_NAME), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_LOCATION_SYSTEM), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_LOCATION_PLANET), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DESTINATION_NAME), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DESTINATION_SYSTEM),
+                  false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DESTINATION_PLANET),
+                  false);
+        } else if (view == UV_LOCATION) {
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_NAME), true);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TYPE), true);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_WEIGHT_CLASS), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TECH), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_WEIGHT), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_COST), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_STATUS), true);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_CONDITION), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_CREW_STATE), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUALITY), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PILOT), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_FORCE), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_CREW), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TECH_CRW), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_MAINTAIN), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_MAINTAIN_CYCLE), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_BV), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_REPAIR), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PARTS), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_SITE), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUIRKS), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_MODE), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_SHIP_TRANSPORT), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TAC_TRANSPORT), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_LOCATION_NAME), true);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_LOCATION_SYSTEM), true);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_LOCATION_PLANET), true);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DESTINATION_NAME), true);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DESTINATION_SYSTEM),
+                  true);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DESTINATION_PLANET),
+                  true);
         }
-    }
-
-    @Override
-    public void disposeTab() {
-        super.disposeTab();
-        GUIPreferences.getInstance().removePreferenceChangeListener(scalingChangeListener);
     }
 
     public void focusOnUnit(UUID id) {
@@ -604,8 +741,12 @@ public final class HangarTab extends CampaignGuiTab {
                 selectedUUID = u.getId();
             }
         }
-        unitModel.setData(new ArrayList<>(getCampaign().getHangar().getUnits()));
-        // try to put the focus back on same person if they are still available
+
+        LocationFilterItem locationFilter = getCampaignGui().getActiveLocation();
+
+        List<Unit> units = locationFilter.selectUnits(getCampaign());
+        unitModel.setData(units);
+
         for (int row = 0; row < unitTable.getRowCount(); row++) {
             Unit u = unitModel.getUnit(unitTable.convertRowIndexToModel(row));
             if (u.getId().equals(selectedUUID)) {
@@ -657,6 +798,11 @@ public final class HangarTab extends CampaignGuiTab {
     @Subscribe
     public void handle(RepairStatusChangedEvent ev) {
         filterUnitScheduler.schedule();
+    }
+
+    @Subscribe
+    public void handle(OrganizationChangedEvent ev) {
+        unitListScheduler.schedule();
     }
 
     @Subscribe

@@ -39,7 +39,7 @@ import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.enums.Gender.RANDOMIZE;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.LEFT;
-import static mekhq.campaign.randomEvents.prisoners.enums.PrisonerStatus.FREE;
+import static mekhq.campaign.randomEvents.prisoners.PrisonerStatus.FREE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.time.LocalDate;

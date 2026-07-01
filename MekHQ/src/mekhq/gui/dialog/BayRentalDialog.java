@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -94,7 +94,7 @@ public class BayRentalDialog extends ImmersiveDialogSimple {
     }
 
     public static void showNoFacilitiesAvailableDialog(Campaign campaign) {
-        boolean isInSpace = !campaign.getLocation().isOnPlanet();
+        boolean isInSpace = !campaign.getCurrentLocation().isOnPlanet();
 
         String message;
         if (isInSpace) {

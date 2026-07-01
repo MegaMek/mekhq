@@ -35,12 +35,13 @@ package mekhq.gui.panels;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
+import java.awt.Insets;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.event.HyperlinkEvent;
 
-import mekhq.gui.dialog.glossary.NewGlossaryDialog;
+import mekhq.gui.dialog.glossary.GlossaryDialog;
 
 /**
  * {@code TutorialHyperlinkPanel} is a GUI component for displaying text (typically instructional or tutorial content)
@@ -64,7 +65,7 @@ public class TutorialHyperlinkPanel extends JPanel {
      * Creates a {@code TutorialHyperlinkPanel} displaying text associated with the specified resource key.
      *
      * <p>Displays HTML-formatted, centered text with hyperlinks on a transparent background. Hyperlinks are handled by
-     * {@link NewGlossaryDialog#handleGlossaryHyperlinkClick(JDialog, HyperlinkEvent)}.</p>
+     * {@link GlossaryDialog#handleGlossaryHyperlinkClick(JDialog, HyperlinkEvent)}.</p>
      *
      * @param key The resource key used to look up the tutorial/instructional text for display.
      *
@@ -76,15 +77,15 @@ public class TutorialHyperlinkPanel extends JPanel {
 
         JEditorPane paneTutorial = new JEditorPane();
         paneTutorial.setContentType("text/html");
-        paneTutorial.setText("<html><div style='text-align:center'>" +
-                                   getTextAt(RESOURCE_BUNDLE, key + ".keyText") +
-                                   "</div></html>");
+        String text = getTextAt(RESOURCE_BUNDLE, key);
+        paneTutorial.setText("<html><div style='text-align:center'>" + text + "</div></html>");
+        paneTutorial.setMargin(new Insets(0, 20, 0, 20));
         paneTutorial.setEditable(false);
         paneTutorial.setBorder(null);
         paneTutorial.setOpaque(false);
         paneTutorial.addHyperlinkListener(evt -> {
             if (evt.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                NewGlossaryDialog.handleGlossaryHyperlinkClick(null, evt);
+                GlossaryDialog.handleGlossaryHyperlinkClick(null, evt);
             }
         });
 

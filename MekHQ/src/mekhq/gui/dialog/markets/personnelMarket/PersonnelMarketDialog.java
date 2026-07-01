@@ -81,7 +81,7 @@ import mekhq.campaign.utilities.glossary.DocumentationEntry;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.AdvanceDaysDialog;
-import mekhq.gui.dialog.glossary.NewDocumentationEntryDialog;
+import mekhq.gui.dialog.glossary.GlossaryDocumentationEntryDialog;
 import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.view.PersonViewPanel;
 
@@ -153,7 +153,7 @@ public class PersonnelMarketDialog extends JDialog {
         this.market = market;
         this.campaign = market.getCampaign();
         this.campaignOptions = campaign.getCampaignOptions();
-        this.parent = campaign.getApp().getCampaigngui().getFrame();
+        this.parent = campaign.getGUI().getFrame();
         this.currentApplicants = market.getCurrentApplicants();
 
         initializeComponents();
@@ -228,7 +228,7 @@ public class PersonnelMarketDialog extends JDialog {
         DocumentationEntry documentationEntry = DocumentationEntry.RECRUITMENT;
 
         try {
-            new NewDocumentationEntryDialog(this, documentationEntry);
+            new GlossaryDocumentationEntryDialog(this, documentationEntry);
         } catch (Exception ex) {
             LOGGER.error("Failed to open PDF", ex);
         }
@@ -381,7 +381,7 @@ public class PersonnelMarketDialog extends JDialog {
               "button.personnelMarket.advanceDays"));
         btnAdvanceMultipleDays.addActionListener(e -> {
             closeAction(); // Close old instance
-            AdvanceDaysDialog advanceDaysDialog = new AdvanceDaysDialog(parent, campaign.getApp().getCampaigngui());
+            AdvanceDaysDialog advanceDaysDialog = new AdvanceDaysDialog(parent, campaign.getGUI());
             advanceDaysDialog.setVisible(true);
             advanceDaysDialog.addWindowListener(new WindowAdapter() {
                 @Override
@@ -510,7 +510,7 @@ public class PersonnelMarketDialog extends JDialog {
      * @since 0.50.06
      */
     private JSplitPane initializePersonView(AtomicReference<Person> selectedPerson, JPanel mainPanel) {
-        personViewPanel = new PersonViewPanel(selectedPerson.get(), campaign, campaign.getApp().getCampaigngui());
+        personViewPanel = new PersonViewPanel(selectedPerson.get(), campaign, campaign.getGUI());
         JScrollPane viewScrollPane = new JScrollPane(personViewPanel);
         viewScrollPane.setMinimumSize(PERSON_VIEW_MINIMUM_SIZE);
         viewScrollPane.setBorder(null);

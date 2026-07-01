@@ -38,7 +38,9 @@ import static megamek.common.options.OptionsConstants.BASE_REAL_BLIND_DROP;
 import static megamek.common.units.Entity.getEntityMajorTypeName;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -82,6 +84,7 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.gui.baseComponents.JScrollablePanel;
+import mekhq.gui.utilities.BriefingStyle;
 
 /**
  * @author Neoancient
@@ -175,46 +178,56 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
     private void initComponents() {
         GridBagConstraints gridBagConstraints;
 
+        JPanel statsSection = BriefingStyle.createSectionPanel(scenario.getName());
         panStats = new JPanel();
         txtDesc = new JTextArea();
-        JTextArea txtReport = new JTextArea();
-        playerForceTree = new JTree();
+        playerForceTree = new JTree() {
+            @Override
+            public Dimension getMinimumSize() {
+                return super.getPreferredSize();
+            }
+        };
 
         setLayout(new GridBagLayout());
 
-        setTracksViewportWidth(false);
+        setTracksViewportWidth(true);
 
         int y = 0;
 
         panStats.setName("pnlStats");
-        panStats.setBorder(BorderFactory.createTitledBorder(scenario.getName()));
         fillStats();
+        statsSection.add(panStats, BorderLayout.CENTER);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y++;
         gridBagConstraints.gridheight = 1;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        add(panStats, gridBagConstraints);
-
-        txtReport.setName("txtReport");
-        txtReport.setText(scenario.getReport());
-        txtReport.setEditable(false);
-        txtReport.setLineWrap(true);
-        txtReport.setWrapStyleWord(true);
-        txtReport.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("After-Action Report"),
-              BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 1;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        add(txtReport, gridBagConstraints);
+        add(statsSection, gridBagConstraints);
+
+        if ((scenario.getReport() != null) && !scenario.getReport().isBlank()) {
+            JPanel reportSection = BriefingStyle.createSectionPanel("After-Action Report");
+            JTextArea txtReport = new JTextArea();
+            txtReport.setName("txtReport");
+            txtReport.setText(scenario.getReport());
+            txtReport.setEditable(false);
+            txtReport.setLineWrap(true);
+            txtReport.setWrapStyleWord(true);
+            txtReport.setBorder(BorderFactory.createEmptyBorder());
+            reportSection.add(txtReport, BorderLayout.CENTER);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.gridwidth = 1;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 1.0;
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            add(reportSection, gridBagConstraints);
+        }
     }
 
     private void fillStats() {
@@ -243,97 +256,6 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y++;
         panStats.add(lblStatusDesc, gridBagConstraints);
-
-        playerForceTree.setModel(playerForceModel);
-        playerForceTree.setCellRenderer(new ForceStubRenderer());
-        playerForceTree.setRowHeight(50);
-        playerForceTree.setRootVisible(false);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.gridheight = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        panStats.add(playerForceTree, gridBagConstraints);
-
-        if (!attachedAllyStub.isEmpty()) {
-            DefaultMutableTreeNode top = new DefaultMutableTreeNode("Attached Allies");
-            for (String en : attachedAllyStub) {
-                top.add(new DefaultMutableTreeNode(en));
-            }
-            JTree tree = new JTree(top);
-            tree.collapsePath(new TreePath(top));
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = y++;
-            gridBagConstraints.gridwidth = 3;
-            gridBagConstraints.gridheight = 1;
-            gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.weighty = 1.0;
-            gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-            gridBagConstraints.fill = GridBagConstraints.BOTH;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            panStats.add(tree, gridBagConstraints);
-        }
-
-        boolean isBlindDrop = campaign.getGameOptions().getOption(BASE_BLIND_DROP).booleanValue();
-        boolean isTrueBlindDrop = campaign.getGameOptions().getOption(BASE_REAL_BLIND_DROP).booleanValue();
-        boolean isCurrent = scenario.getStatus().isCurrent();
-        for (int i = 0; i < botStubs.size(); i++) {
-            BotForceStub botStub = botStubs.get(i);
-            if (botStub == null) {
-                continue;
-            }
-
-            int team = botStub.team();
-            List<String> allEntries = botStub.entityList();
-            DefaultMutableTreeNode top = new DefaultMutableTreeNode(botStubs.get(i).name());
-
-            if (!(isTrueBlindDrop && (team != 1))) {
-                boolean hideInformation = isCurrent && isBlindDrop && (team != 1);
-                for (String entityString : allEntries) {
-                    if (hideInformation) {
-                        int unitIndex = allEntries.indexOf(entityString);
-                        Entity entity = scenario.getBotForce(i).getFullEntityList(campaign).get(unitIndex);
-
-                        if (entity == null) {
-                            String label = "???";
-                            top.add(new DefaultMutableTreeNode(label));
-                            continue;
-                        }
-
-                        String weightClass = entity.getWeightClassName();
-                        long entityType = entity.getEntityType();
-                        String unitType = getEntityMajorTypeName(entityType);
-
-                        String label = weightClass + ' ' + unitType;
-                        top.add(new DefaultMutableTreeNode(label));
-                    } else {
-                        top.add(new DefaultMutableTreeNode(entityString));
-                    }
-                }
-            }
-
-            JTree tree = new JTree(top);
-            tree.collapsePath(new TreePath(top));
-            tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = y++;
-            gridBagConstraints.gridwidth = 3;
-            gridBagConstraints.gridheight = 1;
-            gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.weighty = 1.0;
-            gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-            gridBagConstraints.fill = GridBagConstraints.BOTH;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            panStats.add(tree, gridBagConstraints);
-            if (scenario.getStatus().isCurrent()) {
-                tree.addMouseListener(new TreeMouseAdapter(tree, i));
-            }
-        }
 
         gridBagConstraints = new GridBagConstraints();
         lblType.setText(resourceMap.getString("lblType.text"));
@@ -436,7 +358,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         gridBagConstraints.gridy = y++;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.weighty = 0.0;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
@@ -504,11 +426,13 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         gridBagConstraints.gridy = y++;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.weighty = 0.0;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panStats.add(txtDetails, gridBagConstraints);
+
+        y = addForceTrees(y);
 
         if (!scenario.getLoot().isEmpty()) {
             gridBagConstraints.gridx = 0;
@@ -533,6 +457,109 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
                 panStats.add(new JLabel(loot.getShortDescription()), gridBagConstraints);
             }
         }
+    }
+
+    private int addForceTrees(int row) {
+        playerForceTree.setModel(playerForceModel);
+        playerForceTree.setCellRenderer(new ForceStubRenderer());
+        playerForceTree.setRowHeight(50);
+        playerForceTree.setRootVisible(false);
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = row++;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridheight = 1;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panStats.add(playerForceTree, gridBagConstraints);
+
+        if (!attachedAllyStub.isEmpty()) {
+            DefaultMutableTreeNode top = new DefaultMutableTreeNode("Attached Allies");
+            for (String entityName : attachedAllyStub) {
+                top.add(new DefaultMutableTreeNode(entityName));
+            }
+            JTree tree = new JTree(top) {
+                @Override
+                public Dimension getMinimumSize() {
+                    return super.getPreferredSize();
+                }
+            };
+            tree.collapsePath(new TreePath(top));
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = row++;
+            gridBagConstraints.gridwidth = 3;
+            gridBagConstraints.gridheight = 1;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 0.0;
+            gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            panStats.add(tree, gridBagConstraints);
+        }
+
+        boolean isBlindDrop = campaign.getGameOptions().getOption(BASE_BLIND_DROP).booleanValue();
+        boolean isTrueBlindDrop = campaign.getGameOptions().getOption(BASE_REAL_BLIND_DROP).booleanValue();
+        boolean isCurrent = scenario.getStatus().isCurrent();
+        for (int botIndex = 0; botIndex < botStubs.size(); botIndex++) {
+            BotForceStub botStub = botStubs.get(botIndex);
+            if (botStub == null) {
+                continue;
+            }
+
+            int team = botStub.team();
+            List<String> allEntries = botStub.entityList();
+            DefaultMutableTreeNode top = new DefaultMutableTreeNode(botStubs.get(botIndex).name());
+
+            if (!(isTrueBlindDrop && (team != 1))) {
+                boolean hideInformation = isCurrent && isBlindDrop && (team != 1);
+                for (int unitIndex = 0; unitIndex < allEntries.size(); unitIndex++) {
+                    String entityString = allEntries.get(unitIndex);
+                    if (hideInformation) {
+                        Entity entity = scenario.getBotForce(botIndex).getFullEntityList(campaign).get(unitIndex);
+
+                        if (entity == null) {
+                            top.add(new DefaultMutableTreeNode("???"));
+                            continue;
+                        }
+
+                        String weightClass = entity.getWeightClassName();
+                        long entityType = entity.getEntityType();
+                        String unitType = getEntityMajorTypeName(entityType);
+
+                        top.add(new DefaultMutableTreeNode(weightClass + ' ' + unitType));
+                    } else {
+                        top.add(new DefaultMutableTreeNode(entityString));
+                    }
+                }
+            }
+
+            JTree tree = new JTree(top) {
+                @Override
+                public Dimension getMinimumSize() {
+                    return super.getPreferredSize();
+                }
+            };
+            tree.collapsePath(new TreePath(top));
+            tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = row++;
+            gridBagConstraints.gridwidth = 3;
+            gridBagConstraints.gridheight = 1;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 0.0;
+            gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            panStats.add(tree, gridBagConstraints);
+            if (scenario.getStatus().isCurrent()) {
+                tree.addMouseListener(new TreeMouseAdapter(tree, botIndex));
+            }
+        }
+
+        return row;
     }
 
     /**

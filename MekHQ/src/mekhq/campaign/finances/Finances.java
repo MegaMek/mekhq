@@ -212,7 +212,12 @@ public class Finances {
         return balance.plus(loans.stream().map(Loan::determineRemainingValue).collect(Collectors.toList()));
     }
 
-    public boolean isInDebt() {
+    /**
+     * Checks whether the company currently has any active loans.
+     *
+     * @return {@code true} if the loan balance is positive, {@code false} otherwise
+     */
+    public boolean hasActiveLoans() {
         return getLoanBalance().isPositive();
     }
 
@@ -252,7 +257,7 @@ public class Finances {
         }
         Transaction t = new Transaction(type, date, amount.multipliedBy(-1), reason);
         transactions.add(t);
-        if ((wentIntoDebt != null) && !isInDebt()) {
+        if ((wentIntoDebt != null) && !hasActiveLoans()) {
             wentIntoDebt = null;
         }
         MekHQ.triggerEvent(new TransactionDebitEvent(t));
@@ -299,7 +304,7 @@ public class Finances {
     public void credit(final TransactionType type, final LocalDate date, final Money amount, final String reason) {
         Transaction t = new Transaction(type, date, amount, reason);
         transactions.add(t);
-        if ((wentIntoDebt == null) && isInDebt()) {
+        if ((wentIntoDebt == null) && hasActiveLoans()) {
             wentIntoDebt = date;
         }
         MekHQ.triggerEvent(new TransactionCreditEvent(t));
@@ -454,7 +459,7 @@ public class Finances {
                     addReportInsufficientFunds(campaign, resourceMap.getString("Payroll.text"));
 
                     if (campaignOptions.isUseLoyaltyModifiers()) {
-                        for (Person person : campaign.getPersonnel()) {
+                        for (Person person : campaign.getAllPersonnel()) {
                             if (person.getStatus().isDepartedUnit()) {
                                 continue;
                             }
@@ -533,7 +538,7 @@ public class Finances {
             }
         }
 
-        if ((getWentIntoDebt() != null) && !isInDebt()) {
+        if ((getWentIntoDebt() != null) && !hasActiveLoans()) {
             setWentIntoDebt(null);
         }
 
@@ -661,7 +666,7 @@ public class Finances {
             }
         }
         loans = newLoans;
-        if ((wentIntoDebt != null) && !isInDebt()) {
+        if ((wentIntoDebt != null) && !hasActiveLoans()) {
             wentIntoDebt = null;
         }
         return overdueAmount;
@@ -669,7 +674,7 @@ public class Finances {
 
     public void removeLoan(Loan loan) {
         loans.remove(loan);
-        if ((wentIntoDebt != null) && !isInDebt()) {
+        if ((wentIntoDebt != null) && !hasActiveLoans()) {
             wentIntoDebt = null;
         }
     }

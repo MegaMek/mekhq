@@ -168,4 +168,10 @@ public class InfantryAmmoStorage extends AmmoStorage {
         return new InfantryAmmoStorage(1, getType(), getWeaponType().getShots(),
               getWeaponType(), campaign);
     }
+
+    @Override
+    public boolean isBulkAcquisition() {
+        // Infantry ammo is bought for the whole platoon at once, so a single acquisition roll fills the order.
+        return true;
+    }
 }

@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
+import static megamek.common.universe.Factions2.FACTIONS2_TEST_DIRECTORY;
 import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_3;
 import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_4;
 import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_5;
@@ -53,11 +54,13 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Stream;
 
+import megamek.common.universe.Factions2;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.TestSystems;
+import mekhq.campaign.universe.factionHints.FactionHints;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -72,7 +75,9 @@ class FactionStandingsTest {
         TestSystems.resetAndGetInstance();
 
         assertDoesNotThrow(() -> {
+            Factions2.setInstance(new Factions2(FACTIONS2_TEST_DIRECTORY));
             Factions.setInstance(Factions.loadDefault(true));
+            FactionHints.initializeTestInstance();
             factions = Factions.getInstance();
         });
 
@@ -101,7 +106,7 @@ class FactionStandingsTest {
         LocalDate today = LocalDate.of(3028, 8, 20); // Start of the 4th Succession War
 
         FactionStandings factionStandings = new FactionStandings();
-        factionStandings.updateClimateRegard(campaignFaction, today, 1.0, true, true);
+        factionStandings.updateClimateRegard(campaignFaction, today, 1.0, false);
 
         // Act
         double actualRegard = factionStandings.getRegardForFaction(targetFaction, true);

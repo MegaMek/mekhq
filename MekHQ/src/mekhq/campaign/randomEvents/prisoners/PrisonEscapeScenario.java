@@ -37,10 +37,10 @@ import static megamek.common.board.Board.START_SW;
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.personnel.enums.PersonnelRole.SOLDIER;
 import static mekhq.campaign.personnel.skills.SkillType.S_SMALL_ARMS;
-import static mekhq.campaign.randomEvents.prisoners.enums.MobType.HUGE;
-import static mekhq.campaign.randomEvents.prisoners.enums.MobType.LARGE;
-import static mekhq.campaign.randomEvents.prisoners.enums.MobType.MEDIUM;
-import static mekhq.campaign.randomEvents.prisoners.enums.MobType.SMALL;
+import static mekhq.campaign.randomEvents.prisoners.MobType.HUGE;
+import static mekhq.campaign.randomEvents.prisoners.MobType.LARGE;
+import static mekhq.campaign.randomEvents.prisoners.MobType.MEDIUM;
+import static mekhq.campaign.randomEvents.prisoners.MobType.SMALL;
 import static mekhq.campaign.stratCon.StratConContractInitializer.getUnoccupiedCoords;
 import static mekhq.campaign.stratCon.StratConRulesManager.generateExternalScenario;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -251,7 +251,7 @@ public class PrisonEscapeScenario {
         // we log an error and make the delivery, in the same manner as above.
         StratConTrackState track;
         try {
-            final StratConCampaignState campaignState = contract.getStratconCampaignState();
+            final StratConCampaignState campaignState = contract.getStratConCampaignState();
             List<StratConTrackState> tracks = campaignState.getTracks();
             track = ObjectUtility.getRandomItem(tracks);
         } catch (NullPointerException e) {

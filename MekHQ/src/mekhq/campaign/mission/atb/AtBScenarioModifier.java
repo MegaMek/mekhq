@@ -501,7 +501,6 @@ public class AtBScenarioModifier implements Cloneable {
         this.additionalBriefingText = additionalBriefingText;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public Boolean getBenefitsPlayer() {
         return benefitsPlayer;
     }

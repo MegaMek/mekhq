@@ -61,7 +61,11 @@ import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.HeatSink;
 import mekhq.campaign.parts.equipment.JumpJet;
 import mekhq.campaign.parts.meks.MekActuator;
+import mekhq.campaign.parts.meks.MekCockpit;
+import mekhq.campaign.parts.meks.MekGyro;
+import mekhq.campaign.parts.meks.MekLifeSupport;
 import mekhq.campaign.parts.meks.MekLocation;
+import mekhq.campaign.parts.meks.MekSensor;
 import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
@@ -158,6 +162,13 @@ public class PartsInUseManager {
      * <p>This method uses the type of the provided {@link Part} to decide which default stock percentage to return.
      * The values for each part type are retrieved from the campaign options.</p>
      *
+     * <p>If the provided {@link Part} is a {@link MissingPart} we use {@link MissingPart#getNewPart()} to fetch the
+     * right part. We do this here to avoid an issue with inheritance. Chiefly, missing parts can be a type of part, but
+     * most parts aren't missing parts.</p>
+     *
+     * <p>We could filter earlier in the pipeline, but that would rely on all future developers knowing about
+     * this risk and accounting for it. By self-correcting here, we avoid that issue entirely.</p>
+     *
      * @param part The {@link Part} for which the default stock percentage is to be determined. The part must not be
      *             {@code null}.
      *
@@ -165,6 +176,10 @@ public class PartsInUseManager {
      *       campaign options.
      */
     private int getDefaultStockPercent(Part part) {
+        if (part instanceof MissingPart missingPart) {
+            part = missingPart.getNewPart();
+        }
+
         if (part instanceof HeatSink) {
             return campaignOptions.getAutoLogisticsHeatSink();
         } else if (part instanceof MekLocation) {
@@ -189,6 +204,10 @@ public class PartsInUseManager {
             return campaignOptions.getAutoLogisticsJumpJets();
         } else if (part instanceof EnginePart) {
             return campaignOptions.getAutoLogisticsEngines();
+        } else if (part instanceof MekGyro) {
+            return campaignOptions.getAutoLogisticsGyros();
+        } else if (part instanceof MekCockpit || part instanceof MekSensor || part instanceof MekLifeSupport) {
+            return campaignOptions.getAutoLogisticsHeadComponents();
         } else if (part instanceof EquipmentPart equipmentPart) {
             if (equipmentPart.getType() instanceof WeaponType) {
                 return campaignOptions.getAutoLogisticsWeapons();
@@ -454,21 +473,26 @@ public class PartsInUseManager {
      * <ul>
      *     <li>Current inventory: parts in storage, in transfer, and planned acquisitions</li>
      *     <li>Required stock: the requested stock percentage applied to the part's usage count</li>
+     *     <li>Ammo storage adjustment: for ammo the amount in the inventory is the number of shots, so this needs to
+     *     be converted to its tonnage to determine the amount to buy.</li>
      *     <li>Bundle adjustment: for bundled items (e.g., armor sold in 5-ton blocks), the quantity is adjusted
      *         based on tonnage per item</li>
      * </ul>
      *
-     * @param PartInUse the {@link PartInUse} instance to calculate stock requirements for
+     * @param partInUse the {@link PartInUse} instance to calculate stock requirements for
      *
      * @return the number of units to purchase, or {@code 0} if no additional stock is needed
      */
-    private int findStockUpAmount(PartInUse PartInUse) {
-        int inventory = PartInUse.getStoreCount() + PartInUse.getTransferCount() + PartInUse.getPlannedCount();
-        int needed = (int) Math.ceil(PartInUse.getRequestedStock() / 100.0 * PartInUse.getUseCount());
+    private int findStockUpAmount(PartInUse partInUse) {
+        int inventory = partInUse.getStoreCount() + partInUse.getTransferCount() + partInUse.getPlannedCount();
+        if (partInUse.getPartToBuy() instanceof AmmoStorage) {
+            inventory = (int) Math.ceil((float) inventory * partInUse.getTonnagePerItem());
+        }
+        int needed = (int) Math.ceil(partInUse.getRequestedStock() / 100.0 * partInUse.getUseCount());
         int toBuy = needed - inventory;
 
-        if (PartInUse.getIsBundle()) {
-            toBuy = (int) Math.ceil((float) toBuy * PartInUse.getTonnagePerItem() / 5);
+        if (partInUse.getIsBundle()) {
+            toBuy = (int) Math.ceil((float) toBuy * partInUse.getTonnagePerItem() / 5);
             // special case for armor only, as it's bought in 5 ton blocks. Armor is the
             // only kind of item that's assigned isBundle()
         }

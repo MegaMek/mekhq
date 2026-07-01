@@ -53,6 +53,7 @@ import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.stratCon.StratConRulesManager;
 import mekhq.campaign.stratCon.StratConTrackState;
@@ -118,8 +119,15 @@ public class Fatigue {
      * @return the total number of personnel requiring field kitchen support.
      */
     public static int checkFieldKitchenUsage(List<Person> activePersonnel,
-          boolean isUseFieldKitchenIgnoreNonCombatants) {
+          boolean isUseFieldKitchenIgnoreNonCombatants, Campaign campaign) {
         int fieldKitchenUsage = 0;
+
+        for (PersonnelRole personnelRole : campaign.getTempCrewRoleKeys()) {
+            if (!personnelRole.isCombat() && isUseFieldKitchenIgnoreNonCombatants) {
+                continue;
+            }
+            fieldKitchenUsage += campaign.getTempCrewPool(personnelRole);
+        }
 
         for (Person person : activePersonnel) {
             if (!person.isCombat() && isUseFieldKitchenIgnoreNonCombatants) {
@@ -176,10 +184,10 @@ public class Fatigue {
      * @param person   the person whose fatigue actions are being processed.
      */
     public static void processFatigueActions(Campaign campaign, Person person) {
-        int effectiveFatigue = getEffectiveFatigue(person.getAdjustedFatigue(), person.getPermanentFatigue(),
-              person.isClanPersonnel(), person.getSkillLevel(campaign, false, true));
+        int effectiveFatigue = getEffectiveFatigue(person, campaign);
 
-        if (!campaign.getCampaignOptions().isUseFatigue()) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        if (!campaignOptions.isUseFatigue()) {
             return;
         }
 
@@ -213,8 +221,22 @@ public class Fatigue {
             person.setIsRecoveringFromFatigue(true);
         }
 
-        if ((campaign.getCampaignOptions().getFatigueLeaveThreshold() != 0)
-                  && (effectiveFatigue >= campaign.getCampaignOptions().getFatigueLeaveThreshold())) {
+        int fatigueThreshold = campaignOptions.getFatigueLeaveThreshold();
+        boolean hasThreshold = fatigueThreshold != 0;
+
+        boolean isFatigued = effectiveFatigue >= fatigueThreshold;
+        boolean isCampFollower = person.getStatus().isCampFollower();
+        boolean isFree = !person.isBusy();
+
+        int nonPermanentInjuryCount = person.getNonPermanentInjuries().size();
+        int hits = person.getHits();
+        boolean isInjured = nonPermanentInjuryCount > 0 || hits > 0;
+
+        if (hasThreshold &&
+                  isFatigued &&
+                  isFree &&
+                  !isInjured &&
+                  !isCampFollower) {
             person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ON_LEAVE);
         }
     }
@@ -265,13 +287,7 @@ public class Fatigue {
                 }
 
                 for (Person person : unit.getCrew()) {
-                    int fatigue = person.getAdjustedFatigue();
-                    int permanentFatigue = person.getPermanentFatigue();
-                    boolean isClan = person.isClanPersonnel();
-                    SkillLevel experienceLevel = person.getSkillLevel(campaign, false, true);
-                    int effectiveFatigue = getEffectiveFatigue(fatigue, permanentFatigue, isClan, experienceLevel);
-
-                    if (effectiveFatigue >= leaveThreshold) {
+                    if (getEffectiveFatigue(person, campaign) >= leaveThreshold) {
                         fatiguedUnits++;
                         break;
                     }
@@ -280,8 +296,8 @@ public class Fatigue {
 
             if (fatiguedUnits >= (unitsInForce.size() + 1) / 2) {
                 for (AtBContract contract : campaign.getActiveAtBContracts()) {
-                    if (contract.getStratconCampaignState() != null) {
-                        for (StratConTrackState track : contract.getStratconCampaignState().getTracks()) {
+                    if (contract.getStratConCampaignState() != null) {
+                        for (StratConTrackState track : contract.getStratConCampaignState().getTracks()) {
                             track.unassignFormation(formation.getId());
                         }
                     }
@@ -295,7 +311,7 @@ public class Fatigue {
     }
 
     /**
-     * Calculates the effective fatigue level for a given person based on various modifiers.
+     * Calculates the effective fatigue level based on various modifiers.
      *
      * <p>The base fatigue level is adjusted by factors such as:</p>
      * <ul>
@@ -312,7 +328,7 @@ public class Fatigue {
      *
      * @return the calculated effective fatigue value.
      */
-    public static int getEffectiveFatigue(int fatigue, int permanentFatigueLoss, boolean isClan,
+    private static int getEffectiveFatigue(int fatigue, int permanentFatigueLoss, boolean isClan,
           SkillLevel skillLevel) {
         int effectiveFatigue = fatigue + permanentFatigueLoss;
 
@@ -327,6 +343,26 @@ public class Fatigue {
         }
 
         return effectiveFatigue;
+    }
+
+    /**
+     * Calculates the effective fatigue level for a given person based on various modifiers.
+     *
+     * <p>The base fatigue level is adjusted by factors such as:</p>
+     * <ul>
+     *     <li>Whether the person is classified as Clan personnel.</li>
+     *     <li>The person's skill level, with higher-skilled personnel suffering less fatigue.</li>
+     *     <li>Whether field kitchens are operating within their required capacity.</li>
+     * </ul>
+     *
+     * @param person   the {@link Person} to get the fatigue level for
+     * @param campaign the {@link Campaign} context
+     *
+     * @return the calculated effective fatigue value.
+     */
+    public static int getEffectiveFatigue(Person person, Campaign campaign) {
+        return getEffectiveFatigue(person.getAdjustedFatigue(), person.getPermanentFatigue(),
+              person.isClanPersonnel(), person.getSkillLevel(campaign, false, true));
     }
 
     @Deprecated(since = "0.50.07", forRemoval = true)
@@ -360,10 +396,6 @@ public class Fatigue {
             }
 
             person.changeFatigue(-fatigueAdjustment);
-
-            if (person.getFatigueDirect() < 0) {
-                person.setFatigue(0);
-            }
         }
 
         if (campaign.getCampaignOptions().isUseFatigue()) {

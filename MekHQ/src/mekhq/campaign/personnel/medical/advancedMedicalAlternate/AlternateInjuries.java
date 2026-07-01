@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -91,6 +91,7 @@ public class AlternateInjuries {
     private static final int TRANSIT_DISORIENTATION_SYNDROME_HEALING_DAYS = 1;
     private static final int CHILDUS_FEVER_RECOVERY_TIME = 365;
     private static final int OLD_WOUND_HEALING_DAYS = 7;
+    private static final int AMPUTATION_RECOVERY_HEALING_DAYS = 10; // 3-4 weeks for initial healing
 
     private static final InjuryLevel SEVER_INJURY_LEVEL = CHRONIC;
     private static final InjuryLevel FRACTURE_INJURY_LEVEL = MAJOR;
@@ -295,6 +296,7 @@ public class AlternateInjuries {
     public static final InjuryType REPLACEMENT_ORGAN_RECOVERY = new ReplacementOrganRecovery();
     public static final InjuryType COSMETIC_SURGERY_RECOVERY = new CosmeticSurgeryRecovery();
     public static final InjuryType FAILED_SURGERY_RECOVERY = new FailedSurgeryRecovery();
+    public static final InjuryType AMPUTATION_RECOVERY = new AmputationRecovery();
     public static final InjuryType ELECTIVE_MYOMER_ARM = new ElectiveMyomerArm();
     public static final InjuryType ELECTIVE_MYOMER_HAND = new ElectiveMyomerHand();
     public static final InjuryType ELECTIVE_MYOMER_LEG = new ElectiveMyomerLeg();
@@ -2814,6 +2816,18 @@ public class AlternateInjuries {
                   NONE,
                   Set.of(GENERIC));
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.PAIN_SHUNT_RECOVERY.simpleName");
+        }
+    }
+
+    public static final class AmputationRecovery extends BaseInjury {
+        AmputationRecovery() {
+            super(AMPUTATION_RECOVERY_HEALING_DAYS,
+                  false,
+                  MINOR,
+                  InjuryEffect.BLOOD_LOSS,
+                  Set.of(LEFT_HAND, RIGHT_HAND, LEFT_ARM, RIGHT_ARM, LEFT_FOOT, RIGHT_FOOT, LEFT_LEG, RIGHT_LEG));
+            this.simpleName = getTextAt(RESOURCE_BUNDLE,
+                  "AlternateInjuries.AMPUTATION_RECOVERY.simpleName");
         }
     }
 

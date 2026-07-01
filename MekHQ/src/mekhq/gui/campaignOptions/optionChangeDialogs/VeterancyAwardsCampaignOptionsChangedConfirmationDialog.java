@@ -187,7 +187,7 @@ public class VeterancyAwardsCampaignOptionsChangedConfirmationDialog extends JDi
     }
 
     private void processAwards() {
-        Collection<Person> personnel = campaign.getPersonnel();
+        Collection<Person> personnel = campaign.getAllPersonnel();
         for (Person person : personnel) {
             if (person.getStatus().isDepartedUnit()) {
                 continue;

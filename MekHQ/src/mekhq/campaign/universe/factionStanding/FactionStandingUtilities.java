@@ -573,7 +573,7 @@ public class FactionStandingUtilities {
         }
 
         LocalDate today = campaign.getLocalDate();
-        for (Person person : campaign.getPersonnel()) {
+        for (Person person : campaign.getAllPersonnel()) {
             if (isExempt(person, today)) {
                 continue;
             }

@@ -704,7 +704,7 @@ public abstract class AbstractCompanyGenerator {
 
                 for (final CompanyGenerationPersonTracker tracker : trackers) {
                     if (getOptions().isSimulateRandomMarriages()) {
-                        campaign.getMarriage().processNewWeek(campaign, date, tracker.getPerson(), true);
+                        campaign.getMarriage().processNewWeek(campaign, date, tracker.getPerson());
                     }
 
                     if (getOptions().isSimulateRandomProcreation()) {
@@ -1615,7 +1615,7 @@ public abstract class AbstractCompanyGenerator {
         }
 
         if (getOptions().isStartCourseToContractPlanet()) {
-            campaign.getLocation().setJumpPath(contract.getJumpPath(campaign));
+            campaign.getCurrentLocation().setJumpPath(contract.getJumpPath(campaign));
         }
     }
     // endregion Contract
@@ -1647,11 +1647,6 @@ public abstract class AbstractCompanyGenerator {
         Money startingCash = generateStartingCash();
         Money minimumStartingFloat = Money.of(getOptions().getMinimumStartingFloat());
         Money loan = Money.zero();
-
-        // Process Initial Contract Payment
-        if (getOptions().isIncludeInitialContractPayment() && (contract != null)) {
-            startingCash = startingCash.plus(contract.getTotalAdvanceAmount());
-        }
 
         if (getOptions().isPayForSetup()) {
             // Calculate the total costs of setup
@@ -1731,7 +1726,7 @@ public abstract class AbstractCompanyGenerator {
     private Money rollRandomStartingCash() {
         return getOptions().isRandomizeStartingCash()
                      ? Money.of(Math.pow(10, 6))
-                       .multipliedBy(Utilities.dice(getOptions().getRandomStartingCashDiceCount(), 6))
+                             .multipliedBy(Utilities.dice(getOptions().getRandomStartingCashDiceCount(), 6))
                      : Money.zero();
     }
 

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013 Dylan Myers <dylan at dylanspcs.com>. All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -99,13 +99,11 @@ public class PersonnelMarket {
 
     public PersonnelMarket() {
         method = new PersonnelMarketDisabled();
-        MekHQ.registerHandler(this);
     }
 
     public PersonnelMarket(Campaign c) {
         generatePersonnelForDay(c);
         setType(c.getCampaignOptions().getPersonnelMarketName());
-        MekHQ.registerHandler(this);
     }
 
     /**
@@ -145,11 +143,11 @@ public class PersonnelMarket {
      *                 current planetary system, date, settings, factions, and more.
      */
     public void generatePersonnelForDay(Campaign campaign) {
-        PlanetarySystem location = campaign.getLocation().getCurrentSystem();
+        PlanetarySystem location = campaign.getCurrentLocation().getCurrentSystem();
         LocalDate today = campaign.getLocalDate();
 
         // Determine conditions
-        boolean isOnPlanet = campaign.getLocation().isOnPlanet();
+        boolean isOnPlanet = campaign.getCurrentLocation().isOnPlanet();
         boolean useCapitalsHiringHallsOnly = campaign.getCampaignOptions().isUsePersonnelHireHiringHallOnly();
         boolean isHiringHall = location.isHiringHall(today);
         boolean isCapital = location.getFactionSet(today)

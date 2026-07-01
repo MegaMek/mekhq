@@ -35,19 +35,16 @@ package mekhq.gui.companyGeneration.contents;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
-import mekhq.campaign.universe.enums.MysteryBoxType;
 import mekhq.gui.companyGeneration.components.CompanyGenerationCheckBox;
 import mekhq.gui.companyGeneration.components.CompanyGenerationLabel;
 import mekhq.gui.companyGeneration.components.CompanyGenerationStandardPanel;
@@ -61,8 +58,6 @@ import mekhq.gui.companyGeneration.components.CompanyGenerationStandardPanel;
  *       minimum-float / initial contract payment / starting-loan / six "Pay For" toggles</li>
  *   <li><b>Starting Simulation</b> — Run Starting Simulation toggle plus duration spinner and the
  *       two random-event toggles (marriages, procreation)</li>
- *   <li><b>Surprises</b> — Generate Surprises master toggle, Mystery Boxes toggle, and a checkbox
- *       per {@link MysteryBoxType}</li>
  * </ol>
  *
  * <p>Legacy "Unit Extras" (mothballed counts, AtB/Windchild-only roll customizations) are
@@ -84,7 +79,6 @@ public class OtherTab {
     private CompanyGenerationCheckBox chkRandomizeStartingCash;
     private JSpinner spnRandomStartingCashDiceCount;
     private JSpinner spnMinimumStartingFloat;
-    private CompanyGenerationCheckBox chkIncludeInitialContractPayment;
     private CompanyGenerationCheckBox chkStartingLoan;
     private final Map<String, CompanyGenerationCheckBox> payForToggles = new LinkedHashMap<>();
 
@@ -93,11 +87,6 @@ public class OtherTab {
     private JSpinner spnSimulationDuration;
     private CompanyGenerationCheckBox chkSimulateRandomMarriages;
     private CompanyGenerationCheckBox chkSimulateRandomProcreation;
-
-    // Surprises
-    private CompanyGenerationCheckBox chkGenerateSurprises;
-    private CompanyGenerationCheckBox chkGenerateMysteryBoxes;
-    private final Map<MysteryBoxType, JCheckBox> chkMysteryBoxTypes = new EnumMap<>(MysteryBoxType.class);
 
     public OtherTab(Campaign campaign, CompanyGenerationOptions options) {
         this.campaign = campaign;
@@ -114,8 +103,6 @@ public class OtherTab {
         panel.add(buildFinancesSection());
         panel.add(Box.createVerticalStrut(6));
         panel.add(buildStartingSimulationSection());
-        panel.add(Box.createVerticalStrut(6));
-        panel.add(buildSurprisesSection());
 
         return panel;
     }
@@ -153,7 +140,6 @@ public class OtherTab {
         spnRandomStartingCashDiceCount.setName("spnRandomStartingCashDiceCount");
         spnMinimumStartingFloat = new JSpinner(new SpinnerNumberModel(0, 0, 100_000_000, 100_000));
         spnMinimumStartingFloat.setName("spnMinimumStartingFloat");
-        chkIncludeInitialContractPayment = new CompanyGenerationCheckBox("IncludeInitialContractPayment");
         chkStartingLoan = new CompanyGenerationCheckBox("StartingLoan");
 
         chkRandomizeStartingCash.addActionListener(evt -> {
@@ -198,9 +184,6 @@ public class OtherTab {
         gbc.gridy = row++;
         gbc.gridx = 0;
         gbc.gridwidth = 2;
-        section.add(chkIncludeInitialContractPayment, gbc);
-
-        gbc.gridy = row++;
         section.add(chkStartingLoan, gbc);
 
         // Pay For sub-section
@@ -261,51 +244,6 @@ public class OtherTab {
         return section;
     }
 
-    private JPanel buildSurprisesSection() {
-        CompanyGenerationStandardPanel section = new CompanyGenerationStandardPanel(
-              "Surprises", true, "Surprises");
-        section.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = sectionConstraints();
-        gbc.gridwidth = 2;
-
-        chkGenerateSurprises = new CompanyGenerationCheckBox("GenerateSurprises");
-        chkGenerateMysteryBoxes = new CompanyGenerationCheckBox("GenerateMysteryBoxes");
-
-        chkGenerateSurprises.addActionListener(evt -> {
-            boolean surprises = chkGenerateSurprises.isSelected();
-            chkGenerateMysteryBoxes.setEnabled(surprises);
-            for (JCheckBox chk : chkMysteryBoxTypes.values()) {
-                chk.setEnabled(surprises && chkGenerateMysteryBoxes.isSelected());
-            }
-        });
-        chkGenerateMysteryBoxes.addActionListener(evt -> {
-            for (JCheckBox chk : chkMysteryBoxTypes.values()) {
-                chk.setEnabled(chkGenerateSurprises.isSelected() && chkGenerateMysteryBoxes.isSelected());
-            }
-        });
-
-        int row = 0;
-        gbc.gridy = row++;
-        section.add(chkGenerateSurprises, gbc);
-        gbc.gridy = row++;
-        section.add(chkGenerateMysteryBoxes, gbc);
-
-        // Per-type checkboxes. The MysteryBoxType enum already has its own resource bundle entries,
-        // so we use them directly via the enum's getLabel() rather than adding duplicate keys to the
-        // Company Generation bundle.
-        for (MysteryBoxType type : MysteryBoxType.values()) {
-            JCheckBox chk = new JCheckBox(type.toString());
-            chk.setName("chkMysteryBox_" + type.name());
-            chk.setToolTipText(type.getToolTipText());
-            chkMysteryBoxTypes.put(type, chk);
-
-            gbc.gridy = row++;
-            section.add(chk, gbc);
-        }
-
-        return section;
-    }
-
     private static GridBagConstraints sectionConstraints() {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -334,7 +272,6 @@ public class OtherTab {
         spnStartingCash.setEnabled(!chkRandomizeStartingCash.isSelected());
         spnRandomStartingCashDiceCount.setEnabled(chkRandomizeStartingCash.isSelected());
         spnMinimumStartingFloat.setValue(sourceOptions.getMinimumStartingFloat());
-        chkIncludeInitialContractPayment.setSelected(sourceOptions.isIncludeInitialContractPayment());
         chkStartingLoan.setSelected(sourceOptions.isStartingLoan());
         payForToggles.get("PayForSetup").setSelected(sourceOptions.isPayForSetup());
         payForToggles.get("PayForPersonnel").setSelected(sourceOptions.isPayForPersonnel());
@@ -351,19 +288,6 @@ public class OtherTab {
         spnSimulationDuration.setEnabled(sim);
         chkSimulateRandomMarriages.setEnabled(sim);
         chkSimulateRandomProcreation.setEnabled(sim);
-
-        chkGenerateSurprises.setSelected(sourceOptions.isGenerateSurprises());
-        chkGenerateMysteryBoxes.setSelected(sourceOptions.isGenerateMysteryBoxes());
-        Map<MysteryBoxType, Boolean> types = sourceOptions.getGenerateMysteryBoxTypes();
-        for (Map.Entry<MysteryBoxType, JCheckBox> entry : chkMysteryBoxTypes.entrySet()) {
-            Boolean v = types.get(entry.getKey());
-            entry.getValue().setSelected(Boolean.TRUE.equals(v));
-        }
-        boolean surprises = chkGenerateSurprises.isSelected();
-        chkGenerateMysteryBoxes.setEnabled(surprises);
-        for (JCheckBox chk : chkMysteryBoxTypes.values()) {
-            chk.setEnabled(surprises && chkGenerateMysteryBoxes.isSelected());
-        }
     }
 
     public void writeValuesToOptions(CompanyGenerationOptions targetOptions) {
@@ -379,7 +303,6 @@ public class OtherTab {
         targetOptions.setRandomizeStartingCash(chkRandomizeStartingCash.isSelected());
         targetOptions.setRandomStartingCashDiceCount((Integer) spnRandomStartingCashDiceCount.getValue());
         targetOptions.setMinimumStartingFloat((Integer) spnMinimumStartingFloat.getValue());
-        targetOptions.setIncludeInitialContractPayment(chkIncludeInitialContractPayment.isSelected());
         targetOptions.setStartingLoan(chkStartingLoan.isSelected());
         targetOptions.setPayForSetup(payForToggles.get("PayForSetup").isSelected());
         targetOptions.setPayForPersonnel(payForToggles.get("PayForPersonnel").isSelected());
@@ -392,13 +315,6 @@ public class OtherTab {
         targetOptions.setSimulationDuration((Integer) spnSimulationDuration.getValue());
         targetOptions.setSimulateRandomMarriages(chkSimulateRandomMarriages.isSelected());
         targetOptions.setSimulateRandomProcreation(chkSimulateRandomProcreation.isSelected());
-
-        targetOptions.setGenerateSurprises(chkGenerateSurprises.isSelected());
-        targetOptions.setGenerateMysteryBoxes(chkGenerateMysteryBoxes.isSelected());
-        Map<MysteryBoxType, Boolean> types = targetOptions.getGenerateMysteryBoxTypes();
-        for (Map.Entry<MysteryBoxType, JCheckBox> entry : chkMysteryBoxTypes.entrySet()) {
-            types.put(entry.getKey(), entry.getValue().isSelected());
-        }
     }
 
     public Campaign getCampaign() {

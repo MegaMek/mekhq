@@ -43,17 +43,18 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 
 import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.dialogs.buttonDialogs.AbstractButtonDialog;
+import mekhq.MekHQ;
 import mekhq.campaign.mission.enums.MissionStatus;
-import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 
-public class CompleteMissionDialog extends AbstractMHQButtonDialog {
+public class CompleteMissionDialog extends AbstractButtonDialog {
     //region Variable Declarations
     private MMComboBox<MissionStatus> comboOutcomeStatus;
     //endregion Variable Declarations
 
     //region Constructors
     public CompleteMissionDialog(final JFrame frame) {
-        super(frame, "CompleteMissionDialog", "CompleteMissionDialog.title");
+        super(frame, true, MekHQ.getDefaultResourceBundle(), "CompleteMissionDialog", "CompleteMissionDialog.title");
         initialize();
     }
     //endregion Constructors
@@ -121,4 +122,9 @@ public class CompleteMissionDialog extends AbstractMHQButtonDialog {
         return panel;
     }
     //endregion Initialization
+
+    @Override
+    protected void setPreferences() throws Exception {
+        setPreferences(MekHQ.getMHQPreferences().forClass(getClass()));
+    }
 }

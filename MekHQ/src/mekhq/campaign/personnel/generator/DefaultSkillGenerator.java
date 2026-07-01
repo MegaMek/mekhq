@@ -156,6 +156,14 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
             List<String> possibleSkills = new ArrayList<>();
             for (String skillType : SkillType.skillList) {
                 SkillType type = SkillType.getType(skillType);
+
+                // We're removing protomek from the pool as only actual protomek pilots should have access to this
+                // skill. Adding it randomly creates some lore inconsistencies. ProtoMek pilots will already have the
+                // skill at this stage
+                if (skillType.equalsIgnoreCase(SkillType.S_GUN_PROTO)) {
+                    continue;
+                }
+
                 if (!person.getSkills().hasSkill(skillType)
                           && !DEPRECATED_SKILLS.contains(type)
                           // The next lines are to prevent double-dipping
@@ -220,7 +228,7 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
 
         // Reset Attribute Scores to default
         for (SkillAttribute attribute : SkillAttribute.values()) {
-            if (attribute.isNone()) {
+            if (attribute.isNoAttribute()) {
                 continue;
             }
 
@@ -241,7 +249,7 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
         PersonnelRole profession = person.getPrimaryRole();
         Phenotype phenotype = person.getPhenotype();
         for (SkillAttribute attribute : SkillAttribute.values()) {
-            if (attribute.isNone()) {
+            if (attribute.isNoAttribute()) {
                 continue;
             }
 

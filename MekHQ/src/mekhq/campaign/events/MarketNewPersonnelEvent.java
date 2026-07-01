@@ -40,7 +40,7 @@ import megamek.common.event.MMEvent;
 import mekhq.campaign.personnel.Person;
 
 /**
- * Triggered when new potential recruits are available on the personnel market
+ * Triggered when new applicants are available for hiring
  *
  * @author Neoancient
  */

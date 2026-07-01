@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -132,7 +132,7 @@ public record WinterHolidayAnnouncement(Campaign campaign) {
         String commanderAddress = campaign.getCommanderAddress();
 
         // Determine the location context
-        String location = campaign.getLocation().isOnPlanet() ? "planetside" : "transit";
+        String location = campaign.getCurrentLocation().isOnPlanet() ? "planetside" : "transit";
 
         // Generate each paragraph and concatenate the full message
         StringBuilder messageBuilder = new StringBuilder();

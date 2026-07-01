@@ -33,13 +33,18 @@
 package mekhq.campaign.personnel.medical.advancedMedicalAlternate;
 
 import static java.lang.Math.max;
+import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_FIT;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
 import static mekhq.campaign.personnel.PersonnelOptions.EDGE_MEDICAL;
+import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_HOLISTIC_CARE;
+import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_HYPOCHONDRIAC;
+import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_PATHOLOGIC_INSIGHT;
+import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_PROTHESIS_TECHNICIAN;
+import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_TRAUMA_SURGEON;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.HealingMarginOfSuccessEffects.getEffectFromHealingAttempt;
 import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.BODY;
-import static mekhq.campaign.personnel.skills.enums.SkillAttribute.NONE;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.time.LocalDate;
@@ -57,8 +62,9 @@ import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.medical.BodyLocation;
-import mekhq.campaign.personnel.skills.AttributeCheckUtility;
-import mekhq.campaign.personnel.skills.SkillCheckUtility;
+import mekhq.campaign.personnel.skills.ActionCheckResult;
+import mekhq.campaign.personnel.skills.AttributeCheck;
+import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 
 
@@ -76,12 +82,6 @@ public class AdvancedMedicalAlternateHealing {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.AdvancedMedicalAlternateHealing";
     private static final int PROSTHETIC_PENALTY = 4; // Interstellar Operations page 70
 
-    private static Campaign campaign;
-
-    public static void setCampaign(Campaign campaign) {
-        AdvancedMedicalAlternateHealing.campaign = campaign;
-    }
-
     /**
      * Processes the start-of-day healing for a given patient.
      *
@@ -89,16 +89,14 @@ public class AdvancedMedicalAlternateHealing {
      * unassisted based on the presence of a doctor, and then performs the appropriate healing checks. It also handles
      * optional fatigue changes and the use of medical Edge.</p>
      *
-     * @param today        the current in-game date
-     * @param isUseFatigue {@code true} if fatigue effects from healing should be applied; {@code false} otherwise
-     * @param fatigueRate  the user-defined rate fatigue is gained
-     * @param patient      the person undergoing healing
-     * @param doctor       the doctor providing treatment, or {@code null} if the patient is healing naturally
+     * @param campaign the {@link Campaign} context
+     * @param patient  the person undergoing healing
+     * @param doctor   the doctor providing treatment, or {@code null} if the patient is healing naturally
      *
      * @author Illiani
      * @since 0.50.10
      */
-    public static void processNewDay(LocalDate today, boolean isUseFatigue, int fatigueRate, Person patient,
+    public static void processNewDay(Campaign campaign, Person patient,
           @Nullable Person doctor) {
         // Modifiers
         List<TargetRollModifier> modifiers = getSPAModifiers(patient);
@@ -106,13 +104,9 @@ public class AdvancedMedicalAlternateHealing {
 
         // Healing
         if (doctor == null) {
-            boolean patientUsesEdge = patient.getOptions().booleanOption(EDGE_MEDICAL);
-            performUnassistedHealingCheck(today, isUseFatigue, fatigueRate, patient, modifiers, prostheticPenalties,
-                  patientUsesEdge);
+            performUnassistedHealingCheck(campaign, patient, modifiers, prostheticPenalties);
         } else {
-            boolean doctorUsesEdge = doctor.getOptions().booleanOption(EDGE_MEDICAL);
-            performAssistedHealingCheck(today, isUseFatigue, fatigueRate, patient, doctor, modifiers,
-                  prostheticPenalties, doctorUsesEdge);
+            performAssistedHealingCheck(campaign, patient, doctor, modifiers, prostheticPenalties);
         }
     }
 
@@ -183,33 +177,46 @@ public class AdvancedMedicalAlternateHealing {
      * <p>A defensive copy of the injury list is used because successful healing may remove injuries from the
      * underlying collection.</p>
      *
-     * @param today               the current in-game date
-     * @param isUseFatigue        {@code true} if fatigue effects from healing should be applied; {@code false}
-     *                            otherwise
-     * @param fatigueRate         the user-defined rate fatigue is gained
+     * @param campaign            the {@link Campaign} context
      * @param patient             the person attempting to heal naturally
      * @param modifiers           the list of SPA-based and other modifiers applied to the natural healing roll
      * @param prostheticPenalties the set of body locations that should incur a prosthetic penalty
-     * @param useEdge             {@code true} if the patient is allowed to use medical Edge for rerolls; {@code false}
-     *                            otherwise
      *
      * @author Illiani
      * @since 0.50.10
      */
-    public static void performUnassistedHealingCheck(LocalDate today, boolean isUseFatigue, int fatigueRate,
-          Person patient, List<TargetRollModifier> modifiers, Set<BodyLocation> prostheticPenalties, boolean useEdge) {
+    private static void performUnassistedHealingCheck(Campaign campaign, Person patient,
+          List<TargetRollModifier> modifiers, Set<BodyLocation> prostheticPenalties) {
+
+        PersonnelOptions patientOptions = patient.getOptions();
+        boolean hasTraumaSurgeon = patientOptions.booleanOption(UNOFFICIAL_TRAUMA_SURGEON);
+        boolean hasProthesisTechnician = patientOptions.booleanOption(UNOFFICIAL_PROTHESIS_TECHNICIAN);
+        boolean hasPathologicInsight = patientOptions.booleanOption(UNOFFICIAL_PATHOLOGIC_INSIGHT);
+        boolean hasHypochondriac = patientOptions.booleanOption(UNOFFICIAL_HYPOCHONDRIAC);
+
         // We need a defensive copy of the list as we're going to be removing injuries from it when successfully healing
         for (Injury injury : new ArrayList<>(patient.getInjuries())) {
+            addPathologicInsightModifier(modifiers, injury, hasPathologicInsight);
+
             if (!injury.isPermanent()) {
                 // This needs to be refetched each cycle as the number of concurrent injuries might have changed
                 int injuryPenalty = max(0, patient.getTotalInjurySeverity() - patient.getAdjustedToughness());
 
                 injury.changeTime(-1);
-                int miscPenalty = getMiscPenalty(injuryPenalty, prostheticPenalties, injury.getLocation());
+                int miscPenalty = getMiscPenalty(injuryPenalty,
+                      prostheticPenalties,
+                      injury.getLocation(),
+                      hasTraumaSurgeon,
+                      hasProthesisTechnician);
+                miscPenalty += hasHypochondriac ? 1 : 0;
+
+                boolean useEdge = campaign.getCampaignOptions().isUseEdge();
+                useEdge = useEdge && patientOptions.booleanOption(EDGE_MEDICAL);
                 int marginOfSuccess = getMarginOfSuccessForUnassistedHealing(patient, modifiers, miscPenalty, useEdge);
 
+                LocalDate today = campaign.getLocalDate();
                 if (injury.getTime() <= 0) { // Time to try and fully heal the injury
-                    processHealingEffects(isUseFatigue, fatigueRate, patient, injury, marginOfSuccess, today);
+                    processHealingEffects(campaign, patient, injury, marginOfSuccess);
                     processTaskAwardsAndPersonnelLogUpdates(today, patient, null, injury, marginOfSuccess);
                 } else if (marginOfSuccess <= -6) { // The injury became permanent
                     injury.setPermanent(true);
@@ -221,6 +228,13 @@ public class AdvancedMedicalAlternateHealing {
         }
     }
 
+    private static void addPathologicInsightModifier(List<TargetRollModifier> modifiers, Injury injury,
+          boolean hasPathologicInsight) {
+        if (hasPathologicInsight && injury.isDisease()) {
+            modifiers.add(new TargetRollModifier(-2, "Pathologic Insight"));
+        }
+    }
+
 
     /**
      * Calculates the combined penalty applied to a healing roll for a specific injury.
@@ -229,21 +243,34 @@ public class AdvancedMedicalAlternateHealing {
      * represented by a prosthetic and that location is present in {@code prostheticPenalties}, the prosthetic penalty
      * is added.</p>
      *
-     * @param injuryPenalty       the total injury severity for the patient
-     * @param prostheticPenalties the set of body locations that incur prosthetic penalties
-     * @param location            the body location of the injury being healed
+     * @param injuryPenalty          the total injury severity for the patient
+     * @param prostheticPenalties    the set of body locations that incur prosthetic penalties
+     * @param location               the body location of the injury being healed
+     * @param hasTraumaSurgeon       {@code true} if the patient has the trauma surgeon SPA (reduces injury penalty)
+     * @param hasProthesisTechnician {@code true} if the patient has the prothesis technician SPA (reduces prosthetic
+     *                               penalty)
      *
      * @return the sum of the base injury penalty and any applicable prosthetic penalty
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private static int getMiscPenalty(int injuryPenalty, Set<BodyLocation> prostheticPenalties, BodyLocation location) {
+    private static int getMiscPenalty(int injuryPenalty, Set<BodyLocation> prostheticPenalties, BodyLocation location,
+          boolean hasTraumaSurgeon, boolean hasProthesisTechnician) {
         int miscPenalty = injuryPenalty;
+        int traumaSurgeonModifier = hasTraumaSurgeon ? -1 : 0;
+        miscPenalty = max(0, miscPenalty + traumaSurgeonModifier);
 
+        boolean hasProstheticPenalty = false;
         BodyLocation primaryLocation = location.getPrimaryLocation();
         if (prostheticPenalties.contains(primaryLocation)) {
             miscPenalty += PROSTHETIC_PENALTY;
+            hasProstheticPenalty = true;
+        }
+
+        if (hasProstheticPenalty) {
+            int technicianModifier = hasProthesisTechnician ? -1 : 0;
+            miscPenalty = max(0, miscPenalty + technicianModifier);
         }
 
         return miscPenalty;
@@ -270,31 +297,19 @@ public class AdvancedMedicalAlternateHealing {
      */
     private static int getMarginOfSuccessForUnassistedHealing(Person patient, List<TargetRollModifier> modifiers,
           int miscPenalty, boolean useEdge) {
-        AttributeCheckUtility naturalHealing = new AttributeCheckUtility(
-              getTextAt(RESOURCE_BUNDLE, "AdvancedMedicalAlternateHealing.naturalHealing.normal"),
-              patient,
-              BODY,
-              NONE,
-              modifiers,
-              miscPenalty,
-              false,
-              true);
-        int marginOfSuccess = naturalHealing.getMarginOfSuccess();
+        AttributeCheck naturalHealing =
+              patient.checkAttribute(BODY).withExternalModifiers(modifiers).withMiscModifier(miscPenalty);
+        ActionCheckResult result = naturalHealing.resolve(false, getTextAt(RESOURCE_BUNDLE,
+              "AdvancedMedicalAlternateHealing.naturalHealing.normal"));
 
-        // Edge
-        if (marginOfSuccess <= -6 && useEdge) { // Attempt to reroll a permanent injury
-            AttributeCheckUtility edgeReroll = new AttributeCheckUtility(
-                  getTextAt(RESOURCE_BUNDLE, "AdvancedMedicalAlternateHealing.naturalHealing.edge"),
-                  patient,
-                  BODY,
-                  NONE,
-                  modifiers,
-                  miscPenalty,
-                  false,
-                  true);
-            marginOfSuccess = edgeReroll.getMarginOfSuccess(); // Edge always replaces the original
+        // Attempt to reroll a permanent injury with edge
+        if ((result.getMarginOfSuccess() <= -6) && useEdge &&  (patient.getCurrentEdge() > 0)) {
+            // manually update edge because if we pass useEdge == true, the patient will get one free roll
+            patient.spendEdge();
+            result = naturalHealing.resolve(false, getTextAt(RESOURCE_BUNDLE,
+                  "AdvancedMedicalAlternateHealing.naturalHealing.edge"));
         }
-        return marginOfSuccess;
+        return result.getMarginOfSuccess();
     }
 
     /**
@@ -308,36 +323,50 @@ public class AdvancedMedicalAlternateHealing {
      * <p>A defensive copy of the injury list is used because successful healing may remove injuries from the
      * underlying collection.</p>
      *
-     * @param today               the current in-game date
-     * @param isUseFatigue        {@code true} if fatigue effects from healing should be applied; {@code false}
-     *                            otherwise
-     * @param fatigueRate         the user-defined rate fatigue is gained
+     * @param campaign            the {@link Campaign} context
      * @param patient             the person being treated
      * @param doctor              the doctor performing the assisted healing
      * @param modifiers           the list of modifiers applied to the surgery check
      * @param prostheticPenalties the set of body locations that should incur a prosthetic penalty
-     * @param useEdge             {@code true} if the doctor is allowed to use medical Edge for rerolls; {@code false}
-     *                            otherwise
      *
      * @author Illiani
      * @since 0.50.10
      */
-    public static void performAssistedHealingCheck(LocalDate today, boolean isUseFatigue, int fatigueRate,
-          Person patient, Person doctor, List<TargetRollModifier> modifiers, Set<BodyLocation> prostheticPenalties,
-          boolean useEdge) {
+    private static void performAssistedHealingCheck(Campaign campaign, Person patient, Person doctor,
+          List<TargetRollModifier> modifiers, Set<BodyLocation> prostheticPenalties) {
+
+        PersonnelOptions doctorOptions = doctor.getOptions();
+        boolean hasHolisticCareSPA = doctorOptions.booleanOption(UNOFFICIAL_HOLISTIC_CARE);
+        boolean hasTraumaSurgeon = doctorOptions.booleanOption(UNOFFICIAL_TRAUMA_SURGEON);
+        boolean hasProthesisTechnician = doctorOptions.booleanOption(UNOFFICIAL_PROTHESIS_TECHNICIAN);
+        boolean hasPathologicInsight = doctorOptions.booleanOption(UNOFFICIAL_PATHOLOGIC_INSIGHT);
+
+        PersonnelOptions patientOptions = patient.getOptions();
+        boolean hasHypochondriac = patientOptions.booleanOption(UNOFFICIAL_HYPOCHONDRIAC);
+
         // We need a defensive copy of the list as we're going to be removing injuries from it when successfully healing
         for (Injury injury : new ArrayList<>(patient.getInjuries())) {
+            addPathologicInsightModifier(modifiers, injury, hasPathologicInsight);
+
             if (!injury.isPermanent()) {
                 // This needs to be refetched each cycle as the number of concurrent injuries might have changed
                 int injuryPenalty = max(0, patient.getTotalInjurySeverity() - patient.getAdjustedToughness());
 
-                injury.changeTime(-1);
+                int healingDelta = hasHolisticCareSPA && randomInt(20) == 0 ? -2 : -1;
+                injury.changeTime(healingDelta);
 
                 if (injury.getTime() <= 0) {
-                    int miscPenalty = getMiscPenalty(injuryPenalty, prostheticPenalties, injury.getLocation());
-                    int marginOfSuccess = getMarginOfSuccessForAssistedHealing(doctor, modifiers, miscPenalty, useEdge);
+                    int miscPenalty = getMiscPenalty(injuryPenalty, prostheticPenalties, injury.getLocation(),
+                          hasTraumaSurgeon, hasProthesisTechnician);
+                    miscPenalty += hasHypochondriac ? 1 : 0;
 
-                    processHealingEffects(isUseFatigue, fatigueRate, patient, injury, marginOfSuccess, today);
+                    boolean useEdge = campaign.getCampaignOptions().isUseEdge();
+                    useEdge = useEdge && doctorOptions.booleanOption(EDGE_MEDICAL);
+                    int marginOfSuccess = getMarginOfSuccessForAssistedHealing(
+                          doctor, campaign, modifiers, miscPenalty, useEdge);
+
+                    LocalDate today = campaign.getLocalDate();
+                    processHealingEffects(campaign, patient, injury, marginOfSuccess);
                     processTaskAwardsAndPersonnelLogUpdates(today, patient, doctor, injury, marginOfSuccess);
                 }
             }
@@ -353,6 +382,7 @@ public class AdvancedMedicalAlternateHealing {
      * original.</p>
      *
      * @param doctor      the person performing the surgery check
+     * @param campaign    the {@link Campaign} context
      * @param modifiers   the list of modifiers applied to the surgery roll
      * @param miscPenalty the combined penalty for this healing attempt
      * @param useEdge     {@code true} if medical Edge may be used to reroll a potentially permanent injury;
@@ -363,31 +393,22 @@ public class AdvancedMedicalAlternateHealing {
      * @author Illiani
      * @since 0.50.10
      */
-    private static int getMarginOfSuccessForAssistedHealing(Person doctor, List<TargetRollModifier> modifiers,
-          int miscPenalty, boolean useEdge) {
-        SkillCheckUtility surgery = new SkillCheckUtility(
-              getTextAt(RESOURCE_BUNDLE, "AdvancedMedicalAlternateHealing.assistedHealing.normal"),
-              doctor,
-              S_SURGERY,
-              modifiers,
-              miscPenalty,
-              false,
-              true);
-        int marginOfSuccess = surgery.getMarginOfSuccess();
+    private static int getMarginOfSuccessForAssistedHealing(Person doctor, Campaign campaign,
+          List<TargetRollModifier> modifiers, int miscPenalty, boolean useEdge) {
+        SkillCheck skillCheck = doctor.checkSkill(S_SURGERY, campaign)
+                                      .withMiscModifier(miscPenalty)
+                                      .withExternalModifiers(modifiers);
+        ActionCheckResult actionCheckResult = skillCheck.resolve(false, getTextAt(RESOURCE_BUNDLE,
+              "AdvancedMedicalAlternateHealing.assistedHealing.normal"));
 
         // Edge
-        if (marginOfSuccess <= -6 && useEdge) { // Permanent injury
-            SkillCheckUtility edgeReroll = new SkillCheckUtility(
-                  getTextAt(RESOURCE_BUNDLE, "AdvancedMedicalAlternateHealing.assistedHealing.edge"),
-                  doctor,
-                  S_SURGERY,
-                  modifiers,
-                  miscPenalty,
-                  false,
-                  true);
-            marginOfSuccess = edgeReroll.getMarginOfSuccess(); // Edge always replaces the original
+        if (actionCheckResult.getMarginOfSuccess() <= -6 && useEdge && doctor.getCurrentEdge() > 0) { // Permanent injury
+            // manually update edge because if we pass useEdge == true, the doctor will get one free roll
+            doctor.spendEdge();
+            actionCheckResult = skillCheck.resolve(false, getTextAt(RESOURCE_BUNDLE,
+                  "AdvancedMedicalAlternateHealing.assistedHealing.edge"));
         }
-        return marginOfSuccess;
+        return actionCheckResult.getMarginOfSuccess();
     }
 
     /**
@@ -438,8 +459,7 @@ public class AdvancedMedicalAlternateHealing {
      * fatigue is changed. If the effect indicates recovery, the injury is removed. If the effect indicates permanence,
      * the injury is marked permanent. Otherwise, the configured delay adjusts the injury's remaining healing time.</p>
      *
-     * @param isUseFatigue    {@code true} if fatigue effects from healing should be applied; {@code false} otherwise
-     * @param fatigueRate     the user-defined rate fatigue is gained
+     * @param campaign        the {@link Campaign} context
      * @param patient         the person undergoing healing
      * @param injury          the injury being updated
      * @param marginOfSuccess the final margin of success for the healing attempt
@@ -447,15 +467,15 @@ public class AdvancedMedicalAlternateHealing {
      * @author Illiani
      * @since 0.50.10
      */
-    private static void processHealingEffects(boolean isUseFatigue, int fatigueRate, Person patient, Injury injury,
-          int marginOfSuccess, LocalDate today) {
+    private static void processHealingEffects(Campaign campaign, Person patient, Injury injury, int marginOfSuccess) {
         HealingMarginOfSuccessEffects healingEffect = getEffectFromHealingAttempt(marginOfSuccess);
-        if (isUseFatigue) {
+        if (campaign.getCampaignOptions().isUseFatigue()) {
+            int fatigueRate = campaign.getCampaignOptions().getFatigueRate();
             patient.changeFatigue(healingEffect.getFatigueDamage() * fatigueRate);
         }
 
         if (healingEffect.isHealed()) {
-            patient.removeInjury(injury, today);
+            patient.removeInjury(injury, campaign.getLocalDate());
 
             if (patient.getInjuries().isEmpty()) {
                 if (!(null == patient.getDoctorId()) && patient.getPrisonerStatus().isFreeOrBondsman()) {

@@ -34,6 +34,7 @@
 package mekhq.gui.view;
 
 import java.util.ArrayList;
+import javax.swing.SwingConstants;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.CombatTeam;
@@ -73,6 +74,10 @@ class LanceAssignmentTableModel extends DataTableModel<CombatTeam> {
             case COL_WEIGHT_CLASS -> 5;
             default -> 50;
         };
+    }
+
+    public int getAlignment(int col) {
+        return (col == COL_WEIGHT_CLASS) ? SwingConstants.CENTER : SwingConstants.LEFT;
     }
 
     @Override

@@ -251,7 +251,7 @@ public class CombatTeam {
         }
 
         for (UUID unitId : formation.getAllUnits(true)) {
-            Entity entity = EntityUtilities.getEntityFromUnitId(campaign.getHangar(), unitId);
+            Entity entity = EntityUtilities.getEntityFromUnitId(campaign.getAllHangar(), unitId);
 
             if (entity == null) {
                 continue;
@@ -471,7 +471,7 @@ public class CombatTeam {
 
         // if we are using StratCon, don't *also* generate legacy scenarios
         if (campaign.getCampaignOptions().isUseStratCon() &&
-                  (getContract(campaign).getStratconCampaignState() != null)) {
+                  (getContract(campaign).getStratConCampaignState() != null)) {
             return null;
         }
 

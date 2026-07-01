@@ -35,16 +35,7 @@ package mekhq.utilities;
 import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.function.Function;
 
 import mekhq.campaign.universe.LandMass;
@@ -414,8 +405,8 @@ public final class PlanetarySystemChangeSummary {
     private static String formatList(Object value) {
         if (value instanceof Collection<?> values) {
             return values.isEmpty() ? "none" : String.join(", ", values.stream()
-                                                                   .map(String::valueOf)
-                                                                   .toList());
+                                                                       .map(String::valueOf)
+                                                                       .toList());
         }
         return formatObject(value);
     }

@@ -63,7 +63,7 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
-import mekhq.gui.dialog.glossary.NewGlossaryDialog;
+import mekhq.gui.dialog.glossary.GlossaryDialog;
 
 /**
  * Dialog window to simulate missions and adjust faction standings based on employer, enemy, and mission status
@@ -583,7 +583,7 @@ public class SimulateMissionDialog extends JDialog {
      */
     protected void hyperlinkEventListenerActions(HyperlinkEvent evt) {
         if (evt.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-            NewGlossaryDialog.handleGlossaryHyperlinkClick(this, evt);
+            GlossaryDialog.handleGlossaryHyperlinkClick(this, evt);
         }
     }
 
@@ -605,7 +605,7 @@ public class SimulateMissionDialog extends JDialog {
      *
      * @param campaignFaction  the current campaign faction
      * @param employer         the employer faction, or {@code null} if not specified
-     * @param enemy            the enemy faction, or {@code null} if not specified
+     * @param enemyFaction     the enemy faction, or {@code null} if not specified
      * @param status           the mission status applied to the simulation
      * @param today            the current date of the simulation
      * @param factionStandings the {@link FactionStandings} object holding all faction Regard data
@@ -618,12 +618,12 @@ public class SimulateMissionDialog extends JDialog {
      * @since 0.50.07
      */
     public static List<String> handleFactionRegardUpdates(@Nullable Faction campaignFaction,
-          @Nullable final Faction employer, @Nullable final Faction enemy, final MissionStatus status,
+          @Nullable final Faction employer, @Nullable final Faction enemyFaction, final MissionStatus status,
           final LocalDate today, final FactionStandings factionStandings, final double regardMultiplier,
           final int contractDuration) {
         List<String> reports = new ArrayList<>();
-        if (enemy != null) { // Null means the faction isn't tracked
-            String report = factionStandings.processContractAccept(campaignFaction.getShortName(), enemy, today,
+        if (enemyFaction != null) { // Null means the faction isn't tracked
+            String report = factionStandings.processContractAccept(campaignFaction.getShortName(), enemyFaction, today,
                   regardMultiplier, contractDuration);
             if (report != null) {
                 reports.add(report);

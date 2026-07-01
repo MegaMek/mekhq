@@ -41,6 +41,9 @@ import javax.swing.JMenuItem;
 
 import megamek.common.units.*;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.Hangar;
+import mekhq.campaign.base.AbstractBase;
+import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Profession;
@@ -183,8 +186,15 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
             int unitType = -1;
             int weightClass = -1;
 
+            // Use the hangar at the persons' effective location: base hangar when at a base,
+            // campaign hangar when in the main force. All selected persons must be co-located
+            // (enforced above via the in-transit check and the unit co-location filter below).
+            AbstractBase effectiveBase = LocationUtils.findEffectiveBase(people[0]);
+            Hangar sourceHangar = (effectiveBase != null)
+                  ? effectiveBase.getBaseHangar()
+                  : campaign.getHangar();
             final List<Unit> units = HangarSorter.defaultSorting()
-                                           .sort(campaign.getHangar().getUnitsStream().filter(Unit::isAvailable))
+                                           .sort(sourceHangar.getUnitsStream().filter(Unit::isAvailable))
                                            .toList();
             for (final Unit unit : units) {
                 Entity entity = unit.getEntity();

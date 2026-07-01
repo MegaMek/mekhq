@@ -371,7 +371,7 @@ public class ChooseRefitDialog extends JDialog {
             } else if (col == COL_COST) {
                 return r.getCost().toAmountAndSymbolString();
             } else if (col == COL_TARGET) {
-                return campaign.getTargetForAcquisition(r).getValueAsString();
+                return campaign.checkAcquisition(r).getTargetNumber().getValueAsString();
             } else {
                 return "?";
             }
@@ -411,7 +411,7 @@ public class ChooseRefitDialog extends JDialog {
             }
 
             if (col == COL_TARGET) {
-                return campaign.getTargetForAcquisition(r).getDesc();
+                return campaign.checkAcquisition(r).getTargetNumber().getDesc();
             }
 
             return null;

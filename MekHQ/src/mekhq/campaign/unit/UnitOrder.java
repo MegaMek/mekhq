@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -46,6 +46,7 @@ import megamek.common.rolls.TargetRoll;
 import megamek.common.units.*;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.Warehouse;
 import mekhq.campaign.parts.Availability;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
@@ -182,6 +183,11 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
     @Override
     public Unit getUnit() {
         return this;
+    }
+
+    @Override
+    public Warehouse getWarehouse() {
+        return getCampaign().getWarehouse();
     }
 
     @Override

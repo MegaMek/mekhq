@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -61,6 +61,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
@@ -109,6 +110,12 @@ public class Maintenance {
 
         if (unit.getDaysSinceMaintenance() >= (campaignOptions.getMaintenanceCycleDays() * ruggedMultiplier)) {
             Person tech = unit.getTech();
+            if (tech != null && !LocationUtils.areSameEffectiveLocation(unit, tech)) {
+                // Tech is at a different location; maintenance cannot be performed this cycle.
+                campaign.addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE,
+                      "Maintenance.techAtDifferentLocation", unit.getName()));
+                tech = null;
+            }
             if (tech != null) {
                 int availableMinutes = tech.getMinutesLeft();
                 maintained = (availableMinutes >= minutesUsed);
@@ -425,8 +432,8 @@ public class Maintenance {
         }
 
         if (partWork.getUnit().getSite() < SITE_FACILITY_BASIC) {
-            if (campaign.getLocation().isOnPlanet() && campaignOptions.isUsePlanetaryModifiers()) {
-                Planet planet = campaign.getLocation().getPlanet();
+            if (campaign.getCurrentLocation().isOnPlanet() && campaignOptions.isUsePlanetaryModifiers()) {
+                Planet planet = campaign.getCurrentLocation().getPlanet();
                 Atmosphere atmosphere = planet.getAtmosphere(campaign.getLocalDate());
                 megamek.common.planetaryConditions.Atmosphere planetaryConditions = planet.getPressure(campaign.getLocalDate());
                 int temperature = planet.getTemperature(campaign.getLocalDate());

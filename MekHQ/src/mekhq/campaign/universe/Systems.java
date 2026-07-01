@@ -378,15 +378,19 @@ public class Systems {
             File[] zipFiles = dir.listFiles((dir1, name) -> name.toLowerCase(Locale.ROOT).endsWith(".zip"));
             if (zipFiles != null) {
                 for (File zipFile : zipFiles) {
+                    // The connector subtree ships as a zip (connector_systems.zip) whose entries are flat
+                    // filenames (e.g. HWY-Spinward-040.yml) with no connector_systems/ path. So derive
+                    // connector-ness from the zip's own name; the per-entry check below still catches the
+                    // case where a connector entry lives inside a zip that sits elsewhere.
+                    boolean zipIsConnector = isConnectorDir
+                          || isConnectorPath(zipFile.getName().replaceFirst("(?i)\\.zip$", ""));
                     try (ZipFile zip = new ZipFile(zipFile.getPath())) {
                         Enumeration<? extends ZipEntry> entries = zip.entries();
                         while (entries.hasMoreElements()) {
                             ZipEntry entry = entries.nextElement();
                             // Check if entry is a directory
                             if (!entry.isDirectory() && entry.getName().toLowerCase(Locale.ROOT).endsWith(".yml")) {
-                                // Zip entries carry their internal path; use it to detect connector entries
-                                // even when the zip itself sits in the canon tree.
-                                boolean entryIsConnector = isConnectorDir || isConnectorPath(entry.getName());
+                                boolean entryIsConnector = zipIsConnector || isConnectorPath(entry.getName());
                                 try (InputStream inputStream = zip.getInputStream(entry)) {
                                     loadPlanetarySystem(inputStream, mapper, entryIsConnector);
                                 } catch (Exception ex) {
@@ -436,17 +440,22 @@ public class Systems {
     }
 
     /**
-     * @return {@code true} if the path identifies a {@code connector_systems/} subtree entry.
-     *       Both {@code /} and {@code \} separators are normalized; the segment must be bounded by
-     *       directory separators on both sides (or sit at the path root) so a stray substring match
-     *       in a filename or unrelated directory doesn't get flagged. See issue #8934.
+     * @return {@code true} if the path identifies the {@code connector_systems} subtree - either the
+     *       directory itself (as passed to {@link #parsePlanetarySystemFiles} when recursing into it)
+     *       or an entry within it (e.g. a zip entry). {@code connector_systems} must be a full path
+     *       segment, bounded by directory separators or the path ends, so a stray substring match in a
+     *       filename or unrelated directory (e.g. {@code my_connector_systems_notes.yml}) is not flagged.
+     *       Both {@code /} and {@code \} separators are normalized. See issue #8934.
      */
     private static boolean isConnectorPath(String path) {
         if (path == null) {
             return false;
         }
         String normalized = path.replace('\\', '/');
-        return normalized.contains("/connector_systems/") || normalized.startsWith("connector_systems/");
+        return normalized.contains("/connector_systems/")    // an entry inside the subtree
+              || normalized.startsWith("connector_systems/")  // ... at the path root
+              || normalized.endsWith("/connector_systems")    // the directory itself (no trailing slash)
+              || normalized.equals("connector_systems");      // ... at the path root
     }
 
     private void cleanupSystems() {
@@ -482,11 +491,21 @@ public class Systems {
     }
 
     private void logVeryCloseSystems() {
-        // Planetary sanity check time!
+        // Planetary sanity check: this catches genuine canon coordinate data errors (two real
+        // systems at nearly the same spot). Connector systems are synthetic jump-path waypoints
+        // (see PlanetarySystem#isConnector / issue #8934) that are intentionally placed dense
+        // along routes, so they trip this check en masse with no data-error meaning. Skip them on
+        // both sides to keep the warning useful instead of flooding the log every startup.
         for (PlanetarySystem system : systemList.values()) {
+            if (system.isConnector()) {
+                continue;
+            }
             List<PlanetarySystem> veryCloseSystems = getNearbySystems(system, 1);
             if (veryCloseSystems.size() > 1) {
                 for (PlanetarySystem closeSystem : veryCloseSystems) {
+                    if (closeSystem.isConnector()) {
+                        continue;
+                    }
                     if (!system.getId().equals(closeSystem.getId())) {
                         logger.warn(String.format(Locale.ROOT,
                               "Extremely close systems detected. Data error? %s <-> %s: %.3f ly",

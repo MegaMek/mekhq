@@ -46,13 +46,12 @@ import static mekhq.campaign.personnel.skills.enums.SkillAttribute.STRENGTH;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.WILLPOWER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.List;
+
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import org.junit.jupiter.api.Test;
-
-import javax.swing.text.AttributeSet;
-import java.util.List;
 
 public class AttributesTest {
     @Test
@@ -220,7 +219,7 @@ public class AttributesTest {
         attributes.changeAllAttributes(phenotype, options, -999);
 
         for (SkillAttribute attribute : SkillAttribute.values()) {
-            if (attribute.isNone()) {
+            if (attribute.isNoAttribute()) {
                 continue;
             }
 
@@ -241,7 +240,7 @@ public class AttributesTest {
         attributes.changeAllAttributes(phenotype, options, 999);
 
         for (SkillAttribute attribute : SkillAttribute.values()) {
-            if (attribute.isNone()) {
+            if (attribute.isNoAttribute()) {
                 continue;
             }
 
@@ -261,7 +260,7 @@ public class AttributesTest {
             attributes.changeAllAttributes(phenotype, options, i);
 
             for (SkillAttribute attribute : SkillAttribute.values()) {
-                if (attribute.isNone()) {
+                if (attribute.isNoAttribute()) {
                     continue;
                 }
 

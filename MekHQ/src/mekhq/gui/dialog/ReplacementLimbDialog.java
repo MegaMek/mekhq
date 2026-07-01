@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -72,7 +72,7 @@ public class ReplacementLimbDialog {
     public ReplacementLimbDialog(Campaign campaign, List<Person> suitableDoctors, Person patient, Money cost) {
         this.campaign = campaign;
 
-        final boolean isPlanetside = campaign.getLocation().isOnPlanet();
+        final boolean isPlanetside = campaign.getCurrentLocation().isOnPlanet();
         final boolean hasQualifiedDoctors = !suitableDoctors.isEmpty();
         final boolean hasSufficientFunds = campaign.getFunds().isGreaterOrEqualThan(cost);
 

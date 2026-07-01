@@ -33,7 +33,7 @@
  */
 package mekhq.campaign.finances;
 
-import static mekhq.campaign.randomEvents.GrayMonday.isGrayMonday;
+import static mekhq.campaign.randomEvents.other.GrayMonday.isGrayMonday;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;

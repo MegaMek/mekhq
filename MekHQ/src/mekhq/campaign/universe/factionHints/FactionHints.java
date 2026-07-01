@@ -89,8 +89,8 @@ public class FactionHints {
      * For test purposes only. Loads the singleton using test directory instead of main data. Call this ONLY in tests,
      * never in production code.
      */
-    public static FactionHints initializeTestInstance() {
-        return getOrInitializeInstance(true);
+    public static void initializeTestInstance() {
+        getOrInitializeInstance(true, true);
     }
 
     /**
@@ -104,15 +104,29 @@ public class FactionHints {
      * @return the singleton {@link FactionHints} instance, loaded from the specified data source
      */
     private static FactionHints getOrInitializeInstance(boolean useTestDirectory) {
-        if (instance == null) {
+        return getOrInitializeInstance(useTestDirectory, false);
+    }
+
+    /**
+     * Returns the singleton instance of {@link FactionHints}, initializing it if necessary.
+     *
+     * <p>This method ensures that the instance is fully constructed and loaded with data before being published to
+     * other threads.</p>
+     *
+     * @param useTestDirectory whether to load data from the test directory (for testing only)
+     * @param loadFreshData    whether to always load fresh data from the data source, even if it's already loaded
+     *
+     * @return the singleton {@link FactionHints} instance, loaded from the specified data source
+     */
+    private static FactionHints getOrInitializeInstance(boolean useTestDirectory, boolean loadFreshData) {
+        boolean isLoadNewInstance = instance == null || loadFreshData;
+        if (isLoadNewInstance) {
             synchronized (FactionHints.class) {
-                if (instance == null) {
-                    // The use of tempHints here ensures that the instance is never seen by any other thread until it's
-                    // fully constructed and initialized, eliminating any risk of a race condition.
-                    FactionHints tempHints = new FactionHints();
-                    tempHints.loadData(useTestDirectory);
-                    instance = tempHints;
-                }
+                // The use of tempHints here ensures that the instance is never seen by any other thread until it's
+                // fully constructed and initialized, eliminating any risk of a race condition.
+                FactionHints tempHints = new FactionHints();
+                tempHints.loadData(useTestDirectory);
+                instance = tempHints;
             }
         }
         return instance;

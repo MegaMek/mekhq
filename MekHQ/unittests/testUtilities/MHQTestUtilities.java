@@ -38,6 +38,7 @@ import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.Base64;
 
+import megamek.Version;
 import megamek.common.Player;
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.EquipmentType;
@@ -73,18 +74,14 @@ public final class MHQTestUtilities {
     private static boolean rankSystemsInitialized = false;
 
     /**
-     * Create a Campaign Configuration partially configured from the campaign options
-     * Most dependencies are configured here with default values; for more information see
-     * {@link CampaignFactory#createPartialCampaignConfiguration}
-     *
-     * Then set the heavyweight dependencies here:
-     * 1. Systems (TestSystems for testing purposes)
-     * 2. GameOptions (required for MegaMek, may be candidate for further test class development)
-     * 3. Player instance
-     * 4. LocalDate for Campaign start day
-     * 5. CurrentLocation (created from a PlanetarySystem, which must be retrieved using Systems or TestSystems)
-     * 6. Logistical classes: parts store, new-type personnel market, random death generator, persistent campaign
-     *    summary tracker.
+     * Create a Campaign Configuration partially configured from the campaign options Most dependencies are configured
+     * here with default values; for more information see {@link CampaignFactory#createPartialCampaignConfiguration}
+     * <p>
+     * Then set the heavyweight dependencies here: 1. Systems (TestSystems for testing purposes) 2. GameOptions
+     * (required for MegaMek, may be candidate for further test class development) 3. Player instance 4. LocalDate for
+     * Campaign start day 5. CurrentLocation (created from a PlanetarySystem, which must be retrieved using Systems or
+     * TestSystems) 6. Logistical classes: parts store, new-type personnel market, random death generator, persistent
+     * campaign summary tracker.
      */
     public static CampaignConfiguration buildTestConfigWithSystems(Systems systems) {
         CampaignOptions options = new CampaignOptions();
@@ -134,7 +131,14 @@ public final class MHQTestUtilities {
             Ranks.initializeRankSystems();
             rankSystemsInitialized = true;
         }
-        return new Campaign(buildTestConfigWithSystems(TestSystems.resetAndGetInstance()));
+        Campaign campaign = new Campaign(buildTestConfigWithSystems(TestSystems.resetAndGetInstance()));
+
+        // I picked version 999.00.00 as we're never reaching it. This can be changed locally in tests that require
+        // version-gated testing. Without this line any test that passes through version-gated code (such as
+        // compatibility handlers) will break.
+        campaign.setVersion(new Version(999, 0, 0));
+
+        return campaign;
     }
 
     public static InputStream ParseBase64XmlFile(String base64) {
