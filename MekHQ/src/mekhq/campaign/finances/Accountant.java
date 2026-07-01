@@ -39,6 +39,7 @@ import static mekhq.campaign.personnel.ranks.Rank.RWO_MIN;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -99,15 +100,30 @@ public record Accountant(Campaign campaign) {
     }
 
     private Money getTheoreticalPayroll(boolean noInfantry) {
-        Money salaries = Money.zero();
-        for (Person person : campaign().getSalaryEligiblePersonnel()) {
-            if (!(noInfantry && person.getPrimaryRole().isSoldier())) {
-                salaries = salaries.plus(person.getSalary(campaign()));
-            }
-        }
+        Money salaries = getSalaryTotal(campaign().getSalaryEligiblePersonnel(), campaign(), noInfantry);
 
         // Add all temporary personnel (medics, astechs, temp crew)
         salaries = salaries.plus(sumTempCrewPay(noInfantry));
+
+        return salaries;
+    }
+
+    /**
+     * Calculates the total salary owed to the given personnel.
+     *
+     * @param personnel  the personnel to total salaries for
+     * @param campaign   the campaign, used to resolve each person's salary
+     * @param noInfantry if {@code true}, personnel whose primary role is soldier are excluded
+     *
+     * @return the total {@link Money} owed in salaries
+     */
+    public static Money getSalaryTotal(Collection<Person> personnel, Campaign campaign, boolean noInfantry) {
+        Money salaries = Money.zero();
+        for (Person person : personnel) {
+            if (!(noInfantry && person.getPrimaryRole().isSoldier())) {
+                salaries = salaries.plus(person.getSalary(campaign));
+            }
+        }
 
         return salaries;
     }
@@ -333,25 +349,132 @@ public record Accountant(Campaign campaign) {
      * @return The peacetime costs of the campaign, optionally including salaries.
      */
     public Money getPeacetimeCost(boolean includeSalaries) {
-        Money peaceTimeCosts = Money.zero().plus(getMonthlySpareParts()).plus(getMonthlyFuel()).plus(getMonthlyAmmo());
-        if (includeSalaries) {
-            peaceTimeCosts = peaceTimeCosts.plus(getPayRoll(getCampaignOptions().isInfantryDontCount()));
+        return getPeacetimeOperatingCosts(campaign().getFormations().getSubFormations(), campaign(), includeSalaries);
+    }
+
+    /**
+     * Calculates the peacetime operating costs (spare parts, fuel, ammo and, optionally, salaries) of the given
+     * formations.
+     *
+     * <p>Units and personnel are resolved by walking the given formations and all of their sub-formations, so
+     * callers only need to supply the formations they care about. This lets the method double as both a
+     * whole-campaign total (by passing every top-level formation) and, in future, a total scoped to some smaller
+     * grouping of formations without any change to this method.</p>
+     *
+     * <p>Salaries, when included, cover both the crews of the resolved units and the campaign's temporary
+     * personnel pools (astechs, medics, and other temporary crew), since those pools are not tied to any
+     * particular formation.</p>
+     *
+     * @param formations      the formations (and, recursively, their sub-formations) to total operating costs for
+     * @param campaign        the campaign, used to resolve units and, if requested, salaries
+     * @param includeSalaries whether salaries should be included in the total
+     *
+     * @return the total {@link Money} peacetime operating cost of the given formations
+     */
+    public static Money getPeacetimeOperatingCosts(Collection<Formation> formations, Campaign campaign,
+          boolean includeSalaries) {
+        Collection<Unit> units = getUnitsInFormations(formations, campaign.getHangar());
+
+        Money peacetimeCosts = getSparePartsTotal(units).plus(getFuelTotal(units)).plus(getAmmoTotal(units));
+
+        if (includeSalaries && campaign.getCampaignOptions().isPayForSalaries()) {
+            Collection<Person> personnel = getCrewsOfUnits(units);
+            boolean noInfantry = campaign.getCampaignOptions().isInfantryDontCount();
+            peacetimeCosts = peacetimeCosts.plus(getSalaryTotal(personnel, campaign, noInfantry));
+            peacetimeCosts = peacetimeCosts.plus(Money.of(sumTempCrewPay(campaign, noInfantry)));
         }
 
-        return peaceTimeCosts;
+        return peacetimeCosts;
+    }
+
+    /**
+     * Resolves every unit assigned to the given formations, recursing into their sub-formations.
+     *
+     * @param formations the formations to resolve units for
+     * @param hangar     the hangar used to resolve unit ids into {@link Unit} instances
+     *
+     * @return every unit assigned to the given formations and their sub-formations
+     */
+    private static List<Unit> getUnitsInFormations(Collection<Formation> formations, Hangar hangar) {
+        List<Unit> units = new ArrayList<>();
+        for (Formation formation : formations) {
+            for (UUID unitId : formation.getUnits()) {
+                Unit unit = hangar.getUnit(unitId);
+                if (unit != null) {
+                    units.add(unit);
+                }
+            }
+
+            units.addAll(getUnitsInFormations(formation.getSubFormations(), hangar));
+        }
+
+        return units;
+    }
+
+    /**
+     * Collects the crews of the given units.
+     *
+     * @param units the units to collect crews from
+     *
+     * @return every person crewing the given units
+     */
+    private static List<Person> getCrewsOfUnits(Collection<Unit> units) {
+        List<Person> personnel = new ArrayList<>();
+        for (Unit unit : units) {
+            personnel.addAll(unit.getCrew());
+        }
+
+        return personnel;
     }
 
     public Money getMonthlySpareParts() {
-        return getHangar().getUnitCosts(u -> !u.isMothballed(), Unit::getSparePartsCost);
+        return getSparePartsTotal(getHangar().getUnits());
     }
 
     public Money getMonthlyFuel() {
+        return getFuelTotal(getHangar().getUnits());
+    }
+
+    public Money getMonthlyAmmo() {
+        return getAmmoTotal(getHangar().getUnits());
+    }
+
+    /**
+     * Calculates the total monthly spare parts cost for the given units.
+     *
+     * @param units the units to total spare parts costs for
+     *
+     * @return the total {@link Money} cost of spare parts
+     */
+    public static Money getSparePartsTotal(Collection<Unit> units) {
+        Money total = Money.zero();
+        for (Unit unit : units) {
+            if (!unit.isMothballed()) {
+                total = total.plus(unit.getSparePartsCost());
+            }
+        }
+
+        return total;
+    }
+
+    /**
+     * Calculates the total monthly fuel cost for the given units.
+     *
+     * <p>Every non-mothballed unit with a fusion engine contributes to the pool of hydrogen produced each month;
+     * that pooled production is then used to determine the fuel cost of every unit that is in the TO&E (and by
+     * extension in use).</p>
+     *
+     * @param units the units to total fuel costs for
+     *
+     * @return the total {@link Money} cost of fuel
+     */
+    public static Money getFuelTotal(Collection<Unit> units) {
         int daysInMonth = 28; // we use a 28-day month so we don't need to bring in and process the exact date
         int dailyHydrogenProduction = 10;
         int monthlyHydrogenProduction = daysInMonth * dailyHydrogenProduction;
 
         int totalFusionEngines = 0;
-        for (Unit unit : getHangar().getUnits()) {
+        for (Unit unit : units) {
             if (unit.isMothballed()) {
                 continue;
             }
@@ -359,7 +482,7 @@ public record Accountant(Campaign campaign) {
             Entity entity = unit.getEntity();
 
             if (entity == null) {
-                LOGGER.info("(getMonthlyFuel) entity is null for {}", unit);
+                LOGGER.info("(getFuelTotal) entity is null for {}", unit);
                 continue;
             }
 
@@ -368,7 +491,7 @@ public record Accountant(Campaign campaign) {
             Engine engine = entity.getEngine();
 
             if (engine == null) {
-                LOGGER.debug("(getMonthlyFuel) engine is null for {}", unit);
+                LOGGER.debug("(getFuelTotal) engine is null for {}", unit);
                 continue;
             }
 
@@ -380,13 +503,33 @@ public record Accountant(Campaign campaign) {
         // Calculate total hydrogen production based on the number of fusion engines
         int hydrogenProduction = totalFusionEngines * monthlyHydrogenProduction;
 
-        return getHangar().getUnitCosts(
-              // Is it in the TO&E and by extension in use?
-              unit -> unit.getFormationId() != FORMATION_NONE, unit -> unit.getFuelCost(hydrogenProduction));
+        Money total = Money.zero();
+        for (Unit unit : units) {
+            // Is it in the TO&E and by extension in use?
+            if (unit.getFormationId() != FORMATION_NONE) {
+                total = total.plus(unit.getFuelCost(hydrogenProduction));
+            }
+        }
+
+        return total;
     }
 
-    public Money getMonthlyAmmo() {
-        return getHangar().getUnitCosts(u -> !u.isMothballed(), Unit::getAmmoCost);
+    /**
+     * Calculates the total monthly ammo cost for the given units.
+     *
+     * @param units the units to total ammo costs for
+     *
+     * @return the total {@link Money} cost of ammo
+     */
+    public static Money getAmmoTotal(Collection<Unit> units) {
+        Money total = Money.zero();
+        for (Unit unit : units) {
+            if (!unit.isMothballed()) {
+                total = total.plus(unit.getAmmoCost());
+            }
+        }
+
+        return total;
     }
 
     /**
@@ -627,25 +770,38 @@ public record Accountant(Campaign campaign) {
     }
 
     private double sumTempCrewPay() {
-        return sumTempCrewPay(false);
+        return sumTempCrewPay(campaign(), false);
     }
 
     private double sumTempCrewPay(boolean noInfantry) {
-        double tempCrewPay = 0.0;
-        tempCrewPay += getTempCrewPay(PersonnelRole.ASTECH, campaign().getTemporaryAsTechPool());
-        tempCrewPay += getTempCrewPay(PersonnelRole.MEDIC, campaign().getTemporaryMedicPool());
+        return sumTempCrewPay(campaign(), noInfantry);
+    }
 
-        for (PersonnelRole personnelRole : campaign().getTempCrewRoleKeys()) {
+    /**
+     * Calculates the total pay owed to the campaign's temporary personnel pools (astechs, medics, and any other
+     * temporary crew roles).
+     *
+     * @param campaign   the campaign whose temporary personnel pools should be totaled
+     * @param noInfantry if {@code true}, temporary personnel in soldier roles are excluded
+     *
+     * @return the total pay owed to temporary personnel
+     */
+    private static double sumTempCrewPay(Campaign campaign, boolean noInfantry) {
+        double tempCrewPay = 0.0;
+        tempCrewPay += getTempCrewPay(campaign, PersonnelRole.ASTECH, campaign.getTemporaryAsTechPool());
+        tempCrewPay += getTempCrewPay(campaign, PersonnelRole.MEDIC, campaign.getTemporaryMedicPool());
+
+        for (PersonnelRole personnelRole : campaign.getTempCrewRoleKeys()) {
             if (!(noInfantry && personnelRole.isSoldier())) {
-                tempCrewPay += getTempCrewPay(personnelRole, campaign().getTempCrewPool(personnelRole));
+                tempCrewPay += getTempCrewPay(campaign, personnelRole, campaign.getTempCrewPool(personnelRole));
             }
         }
 
         return tempCrewPay;
     }
 
-    private double getTempCrewPay(PersonnelRole personnelRole, int tempPersonnelPool) {
-        return campaign().getCampaignOptions()
+    private static double getTempCrewPay(Campaign campaign, PersonnelRole personnelRole, int tempPersonnelPool) {
+        return campaign.getCampaignOptions()
                      .getRoleBaseSalaries()[personnelRole.ordinal()].getAmount().doubleValue() *
                      tempPersonnelPool;
     }
