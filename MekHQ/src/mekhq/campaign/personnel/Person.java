@@ -4826,6 +4826,12 @@ public class Person implements ILocation {
         this.salary = salary;
     }
 
+    /** Use {@link #getSalary(CampaignOptions, boolean, LocalDate)} instead */
+    @Deprecated(since = "0.51.01")
+    public Money getSalary(final Campaign campaign) {
+        return getSalary(campaign.getCampaignOptions(), campaign.isClanCampaign(), campaign.getLocalDate());
+    }
+
     /**
      * Calculates and returns the salary for this person based on campaign rules and status.
      *
@@ -4848,12 +4854,14 @@ public class Person implements ILocation {
      *
      * <p>The method does not currently account for era modifiers or crew type (e.g., DropShip, JumpShip, WarShip).</p>
      *
-     * @param campaign The current {@link Campaign} used to determine relevant options and settings.
+     * @param campaignOptions The current {@link CampaignOptions} used to determine relevant options and settings.
+     * @param isClanCampaign  {@code true} if the campaign belongs to a Clan faction
+     * @param today           The current in-game date
      *
      * @return A {@link Money} object representing the person's salary according to current campaign rules and their
      *       status.
      */
-    public Money getSalary(final Campaign campaign) {
+    public Money getSalary(final CampaignOptions campaignOptions, final boolean isClanCampaign, final LocalDate today) {
         if (!getPrisonerStatus().isFree()) {
             return Money.zero();
         }
@@ -4867,7 +4875,7 @@ public class Person implements ILocation {
         }
 
         // If the salary is negative, then use the standard amounts
-        Money primaryBase = campaign.getCampaignOptions().getRoleBaseSalaries()[getPrimaryRole().ordinal()];
+        Money primaryBase = campaignOptions.getRoleBaseSalaries()[getPrimaryRole().ordinal()];
 
         // SpecInf is a special case, this needs to be applied first to bring base
         // salary up to RAW.
@@ -4875,20 +4883,21 @@ public class Person implements ILocation {
             if ((getUnit() != null) &&
                       getUnit().isConventionalInfantry() &&
                       ((ConvInfantry) getUnit().getEntity()).hasSpecialization()) {
-                primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions()
+                primaryBase = primaryBase.multipliedBy(campaignOptions
                                                              .getSalarySpecialistInfantryMultiplier());
             }
         }
 
         // Experience multiplier
-        primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions()
+        primaryBase = primaryBase.multipliedBy(campaignOptions
                                                      .getSalaryXPMultipliers()
-                                                     .get(getSkillLevel(campaign, false, true)));
+                                                     .get(getSkillLevel(campaignOptions, isClanCampaign, today, false,
+                                                           true)));
 
         // Specialization multiplier
         if (getPrimaryRole().isSoldierOrBattleArmour()) {
             if (hasSkill(S_ANTI_MEK)) {
-                primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
+                primaryBase = primaryBase.multipliedBy(campaignOptions.getSalaryAntiMekMultiplier());
             }
         }
 
@@ -4896,29 +4905,32 @@ public class Person implements ILocation {
         // secondary role.
         Money secondaryBase = Money.zero();
 
-        if (!campaign.getCampaignOptions().isDisableSecondaryRoleSalary()) {
-            secondaryBase = campaign.getCampaignOptions().getRoleBaseSalaries()[getSecondaryRole().ordinal()].dividedBy(
+        if (!campaignOptions.isDisableSecondaryRoleSalary()) {
+            secondaryBase = campaignOptions.getRoleBaseSalaries()[getSecondaryRole().ordinal()].dividedBy(
                   2);
 
             // SpecInf is a special case, this needs to be applied first to bring base
             // salary up to RAW.
             if (getSecondaryRole().isSoldierOrBattleArmour()) {
                 if (hasSkill(S_ANTI_MEK)) {
-                    secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions()
+                    secondaryBase = secondaryBase.multipliedBy(campaignOptions
                                                                      .getSalaryAntiMekMultiplier());
                 }
             }
 
             // Experience modifier
-            secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions()
+            secondaryBase = secondaryBase.multipliedBy(campaignOptions
                                                              .getSalaryXPMultipliers()
-                                                             .get(getSkillLevel(campaign, true, true)));
+                                                             .get(getSkillLevel(campaignOptions,
+                                                                   isClanCampaign,
+                                                                   today,
+                                                                   true,
+                                                                   true)));
 
             // Specialization
             if (getSecondaryRole().isSoldierOrBattleArmour()) {
                 if (hasSkill(S_ANTI_MEK)) {
-                    secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions()
-                                                                     .getSalaryAntiMekMultiplier());
+                    secondaryBase = secondaryBase.multipliedBy(campaignOptions.getSalaryAntiMekMultiplier());
                 }
             }
         }
