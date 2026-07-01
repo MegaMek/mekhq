@@ -43,14 +43,12 @@ import static mekhq.campaign.randomEvents.prisoners.PrisonerStatus.PRISONER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -773,18 +771,20 @@ public class AccountantTest {
         Accountant accountant;
         final int EXPECTEDPAY = 100;
         final int CREWCOUNT = 5;
+        final LocalDate TODAY = LocalDate.of(3025, 1, 1);
 
         @BeforeEach
         void beforeEach() {
             mockCampaign = mock(Campaign.class);
             campaignOptions = new CampaignOptions();
             accountant = new Accountant(mockCampaign);
+            when(mockCampaign.isClanCampaign()).thenReturn(false);
+            when(mockCampaign.getLocalDate()).thenReturn(TODAY);
         }
 
 
         @Test
         void testGetPayrollSummary_emptyCampaign() {
-            // Arrange
             when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
 
             Map<Person, Money> expectedMap = accountant.getPayRollSummary();
@@ -796,7 +796,6 @@ public class AccountantTest {
 
         @Test
         void testGetPayrollSummary_onePerson() {
-            // Arrange
             Person mockPerson = getMockPerson();
 
             when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
@@ -813,7 +812,6 @@ public class AccountantTest {
 
         @Test
         void testGetAstechPoolPay() {
-            // Arrange
             when(mockCampaign.getTemporaryAsTechPool()).thenReturn(5);
             when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
 
@@ -827,7 +825,6 @@ public class AccountantTest {
 
         @Test
         void testGetMedicPoolPay() {
-            // Arrange
             when(mockCampaign.getTemporaryMedicPool()).thenReturn(5);
             when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
 
@@ -843,10 +840,7 @@ public class AccountantTest {
         @EnumSource(names = { "SOLDIER", "BATTLE_ARMOUR", "VEHICLE_CREW_GROUND", "VEHICLE_CREW_VTOL",
                               "VEHICLE_CREW_NAVAL", "VESSEL_PILOT", "VESSEL_GUNNER", "VESSEL_CREW" })
         void testGetAllTempCrewPay(PersonnelRole role) {
-            // Arrange
-            when(mockCampaign.getTempCrewRoleKeys())
-                  .thenReturn(new HashSet<>(Collections.singleton(role)));
-            when(mockCampaign.getTempCrewPool(any())).thenReturn(CREWCOUNT);
+            when(mockCampaign.getTempCrewMap()).thenReturn(Map.of(role, CREWCOUNT));
             when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
 
             Map<Person, Money> expectedMap = accountant.getPayRollSummary();
@@ -862,34 +856,35 @@ public class AccountantTest {
         Person getMockPerson() {
             Person mockPerson = mock(Person.class);
 
-            when(mockPerson.getSalary(mockCampaign)).thenReturn(Money.of(100));
+            when(mockPerson.getSalary(campaignOptions, false, TODAY)).thenReturn(Money.of(EXPECTEDPAY));
             return mockPerson;
         }
     }
 
     /**
-     * tests {@link Accountant#getSalaryTotal(java.util.Collection, Campaign, boolean)}
+     * tests {@link Accountant#getSalaryTotal(java.util.Collection, CampaignOptions, boolean, LocalDate, boolean)}
      */
     @Nested
     class TestGetSalaryTotal {
-        Campaign mockCampaign;
+        CampaignOptions campaignOptions;
+        final LocalDate TODAY = LocalDate.of(3025, 1, 1);
 
         @BeforeEach
         void beforeEach() {
-            mockCampaign = mock(Campaign.class);
+            campaignOptions = new CampaignOptions();
         }
 
         @Test
         void testGetSalaryTotal_sumsAllPersonnel() {
             Person personA = mock(Person.class);
             when(personA.getPrimaryRole()).thenReturn(MEKWARRIOR);
-            when(personA.getSalary(mockCampaign)).thenReturn(Money.of(100));
+            when(personA.getSalary(campaignOptions, false, TODAY)).thenReturn(Money.of(100));
 
             Person personB = mock(Person.class);
             when(personB.getPrimaryRole()).thenReturn(MEKWARRIOR);
-            when(personB.getSalary(mockCampaign)).thenReturn(Money.of(250));
+            when(personB.getSalary(campaignOptions, false, TODAY)).thenReturn(Money.of(250));
 
-            Money actual = getSalaryTotal(List.of(personA, personB), mockCampaign, false);
+            Money actual = getSalaryTotal(List.of(personA, personB), campaignOptions, false, TODAY, false);
 
             assertEquals(Money.of(350), actual);
         }
@@ -898,20 +893,20 @@ public class AccountantTest {
         void testGetSalaryTotal_noInfantryExcludesSoldiers() {
             Person soldier = mock(Person.class);
             when(soldier.getPrimaryRole()).thenReturn(SOLDIER);
-            when(soldier.getSalary(mockCampaign)).thenReturn(Money.of(100));
+            when(soldier.getSalary(campaignOptions, false, TODAY)).thenReturn(Money.of(100));
 
             Person mekWarrior = mock(Person.class);
             when(mekWarrior.getPrimaryRole()).thenReturn(MEKWARRIOR);
-            when(mekWarrior.getSalary(mockCampaign)).thenReturn(Money.of(250));
+            when(mekWarrior.getSalary(campaignOptions, false, TODAY)).thenReturn(Money.of(250));
 
-            Money actual = getSalaryTotal(List.of(soldier, mekWarrior), mockCampaign, true);
+            Money actual = getSalaryTotal(List.of(soldier, mekWarrior), campaignOptions, false, TODAY, true);
 
             assertEquals(Money.of(250), actual);
         }
 
         @Test
         void testGetSalaryTotal_emptyCollectionIsZero() {
-            Money actual = getSalaryTotal(List.of(), mockCampaign, false);
+            Money actual = getSalaryTotal(List.of(), campaignOptions, false, TODAY, false);
 
             assertEquals(Money.zero(), actual);
         }
@@ -1053,25 +1048,22 @@ public class AccountantTest {
     }
 
     /**
-     * tests {@link Accountant#getPeacetimeOperatingCosts(java.util.Collection, Campaign, boolean)}
+     * tests {@link Accountant#getPeacetimeOperatingCosts(java.util.Collection, Hangar, CampaignOptions, boolean,
+     * LocalDate, int, int, java.util.Map, boolean)}
      */
     @Nested
     class TestGetPeacetimeOperatingCosts {
-        Campaign mockCampaign;
-        CampaignOptions mockCampaignOptions;
+        CampaignOptions campaignOptions;
         Hangar mockHangar;
+        final LocalDate TODAY = LocalDate.of(3025, 1, 1);
 
         @BeforeEach
         void beforeEach() {
-            mockCampaign = mock(Campaign.class);
             // A real CampaignOptions is used (rather than a mock) so that unrelated lookups such as
-            // getRoleBaseSalaries()// consulted internally while totaling temporary crew pay - resolve to
+            // getRoleBaseSalaries() - consulted internally while totaling temporary crew pay - resolve to
             // real, non-null values instead of requiring exhaustive stubbing.
-            mockCampaignOptions = new CampaignOptions();
+            campaignOptions = new CampaignOptions();
             mockHangar = mock(Hangar.class);
-
-            when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-            when(mockCampaign.getHangar()).thenReturn(mockHangar);
         }
 
         @Test
@@ -1095,7 +1087,8 @@ public class AccountantTest {
             when(topLevelFormation.getUnits()).thenReturn(new Vector<>());
             when(topLevelFormation.getSubFormations()).thenReturn(new Vector<>(List.of(childFormation)));
 
-            Money actual = getPeacetimeOperatingCosts(List.of(topLevelFormation), mockCampaign, false);
+            Money actual = getPeacetimeOperatingCosts(List.of(topLevelFormation), mockHangar, campaignOptions, false,
+                  TODAY, 0, 0, Map.of(), false);
 
             assertEquals(Money.of(100), actual);
         }
@@ -1120,7 +1113,8 @@ public class AccountantTest {
             when(formation.getUnits()).thenReturn(new Vector<>(List.of(includedId)));
             when(formation.getSubFormations()).thenReturn(new Vector<>());
 
-            Money actual = getPeacetimeOperatingCosts(List.of(formation), mockCampaign, false);
+            Money actual = getPeacetimeOperatingCosts(List.of(formation), mockHangar, campaignOptions, false, TODAY,
+                  0, 0, Map.of(), false);
 
             assertEquals(Money.of(100), actual);
         }
@@ -1133,16 +1127,17 @@ public class AccountantTest {
 
             Person crewMember = mock(Person.class);
             when(crewMember.getPrimaryRole()).thenReturn(MEKWARRIOR);
-            when(crewMember.getSalary(mockCampaign)).thenReturn(Money.of(1000));
+            when(crewMember.getSalary(campaignOptions, false, TODAY)).thenReturn(Money.of(1000));
             when(unit.getCrew()).thenReturn(List.of(crewMember));
 
             Formation formation = mock(Formation.class);
             when(formation.getUnits()).thenReturn(new Vector<>(List.of(unitId)));
             when(formation.getSubFormations()).thenReturn(new Vector<>());
 
-            mockCampaignOptions.setPayForSalaries(true);
+            campaignOptions.setPayForSalaries(true);
 
-            Money actual = getPeacetimeOperatingCosts(List.of(formation), mockCampaign, false);
+            Money actual = getPeacetimeOperatingCosts(List.of(formation), mockHangar, campaignOptions, false, TODAY,
+                  0, 0, Map.of(), false);
 
             assertEquals(Money.zero(), actual);
         }
@@ -1155,16 +1150,17 @@ public class AccountantTest {
 
             Person crewMember = mock(Person.class);
             when(crewMember.getPrimaryRole()).thenReturn(MEKWARRIOR);
-            when(crewMember.getSalary(mockCampaign)).thenReturn(Money.of(1000));
+            when(crewMember.getSalary(campaignOptions, false, TODAY)).thenReturn(Money.of(1000));
             when(unit.getCrew()).thenReturn(List.of(crewMember));
 
             Formation formation = mock(Formation.class);
             when(formation.getUnits()).thenReturn(new Vector<>(List.of(unitId)));
             when(formation.getSubFormations()).thenReturn(new Vector<>());
 
-            mockCampaignOptions.setPayForSalaries(false);
+            campaignOptions.setPayForSalaries(false);
 
-            Money actual = getPeacetimeOperatingCosts(List.of(formation), mockCampaign, true);
+            Money actual = getPeacetimeOperatingCosts(List.of(formation), mockHangar, campaignOptions, false, TODAY,
+                  0, 0, Map.of(), true);
 
             assertEquals(Money.zero(), actual);
         }
@@ -1177,24 +1173,26 @@ public class AccountantTest {
 
             Person crewMember = mock(Person.class);
             when(crewMember.getPrimaryRole()).thenReturn(MEKWARRIOR);
-            when(crewMember.getSalary(mockCampaign)).thenReturn(Money.of(1000));
+            when(crewMember.getSalary(campaignOptions, false, TODAY)).thenReturn(Money.of(1000));
             when(unit.getCrew()).thenReturn(List.of(crewMember));
 
             Formation formation = mock(Formation.class);
             when(formation.getUnits()).thenReturn(new Vector<>(List.of(unitId)));
             when(formation.getSubFormations()).thenReturn(new Vector<>());
 
-            mockCampaignOptions.setPayForSalaries(true);
-            mockCampaignOptions.setUseInfantryDontCount(false);
+            campaignOptions.setPayForSalaries(true);
+            campaignOptions.setUseInfantryDontCount(false);
 
-            Money actual = getPeacetimeOperatingCosts(List.of(formation), mockCampaign, true);
+            Money actual = getPeacetimeOperatingCosts(List.of(formation), mockHangar, campaignOptions, false, TODAY,
+                  0, 0, Map.of(), true);
 
             assertEquals(Money.of(1000), actual);
         }
 
         @Test
         void testGetPeacetimeOperatingCosts_emptyFormationsIsZero() {
-            Money actual = getPeacetimeOperatingCosts(List.of(), mockCampaign, true);
+            Money actual = getPeacetimeOperatingCosts(List.of(), mockHangar, campaignOptions, false, TODAY, 0, 0,
+                  Map.of(), true);
 
             assertEquals(Money.zero(), actual);
         }
@@ -1204,8 +1202,9 @@ public class AccountantTest {
      * These tests confirm that, for a campaign where every hangar unit is assigned somewhere in the TO&E and every
      * salary-eligible person crews one of those units (i.e. the common case today), routing
      * {@link Accountant#getPeacetimeCost(boolean)} through the new formation-based
-     * {@link Accountant#getPeacetimeOperatingCosts(java.util.Collection, Campaign, boolean)} produces the exact same
-     * total that the old whole-campaign calculation used to produce.
+     * {@link Accountant#getPeacetimeOperatingCosts(java.util.Collection, Hangar, CampaignOptions, boolean,
+     * LocalDate, int, int, java.util.Map, boolean)} produces the exact same total that the old whole-campaign
+     * calculation used to produce.
      */
     @Nested
     class TestPeacetimeCostMatchesLegacyBehavior {
@@ -1213,6 +1212,7 @@ public class AccountantTest {
         CampaignOptions mockCampaignOptions;
         Hangar mockHangar;
         Accountant accountant;
+        final LocalDate TODAY = LocalDate.of(3025, 1, 1);
 
         Unit unit1;
         Unit unit2;
@@ -1231,6 +1231,8 @@ public class AccountantTest {
 
             when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
             when(mockCampaign.getHangar()).thenReturn(mockHangar);
+            when(mockCampaign.isClanCampaign()).thenReturn(false);
+            when(mockCampaign.getLocalDate()).thenReturn(TODAY);
             mockCampaignOptions.setPayForSalaries(true);
             mockCampaignOptions.setUseInfantryDontCount(false);
 
@@ -1255,12 +1257,12 @@ public class AccountantTest {
             // unassigned, so the formation-derived roster matches the whole-campaign roster.
             person1 = mock(Person.class);
             when(person1.getPrimaryRole()).thenReturn(MEKWARRIOR);
-            when(person1.getSalary(mockCampaign)).thenReturn(Money.of(1000));
+            when(person1.getSalary(mockCampaignOptions, false, TODAY)).thenReturn(Money.of(1000));
             when(unit1.getCrew()).thenReturn(List.of(person1));
 
             person2 = mock(Person.class);
             when(person2.getPrimaryRole()).thenReturn(MEKWARRIOR);
-            when(person2.getSalary(mockCampaign)).thenReturn(Money.of(1500));
+            when(person2.getSalary(mockCampaignOptions, false, TODAY)).thenReturn(Money.of(1500));
             when(unit2.getCrew()).thenReturn(List.of(person2));
 
             when(mockCampaign.getSalaryEligiblePersonnel()).thenReturn(List.of(person1, person2));
@@ -1288,7 +1290,9 @@ public class AccountantTest {
                                       .plus(getFuelTotal(mockHangar.getUnits()))
                                       .plus(getAmmoTotal(mockHangar.getUnits()))
                                       .plus(getSalaryTotal(mockCampaign.getSalaryEligiblePersonnel(),
-                                            mockCampaign,
+                                            mockCampaignOptions,
+                                            false,
+                                            TODAY,
                                             false));
 
             Money actual = accountant.getPeacetimeCost(true);
@@ -1343,7 +1347,8 @@ public class AccountantTest {
         void testGetPayRoll_stillMatchesWholeCampaignSalaryTotal() {
             Money actual = accountant.getPayRoll();
 
-            assertEquals(getSalaryTotal(mockCampaign.getSalaryEligiblePersonnel(), mockCampaign, false), actual);
+            assertEquals(getSalaryTotal(mockCampaign.getSalaryEligiblePersonnel(), mockCampaignOptions, false, TODAY,
+                  false), actual);
         }
 
         Unit newFusionUnit(int formationId) {
@@ -1363,25 +1368,27 @@ public class AccountantTest {
     }
 
     /**
-     * tests {@link Accountant#getPayRollTotal(java.util.Collection, Campaign, boolean, boolean)}
+     * tests {@link Accountant#getPayRollTotal(java.util.Collection, CampaignOptions, boolean, LocalDate, int, int,
+     * java.util.Map, boolean, boolean)}
      */
     @Nested
     class TestGetPayRollTotal {
-        Campaign mockCampaign;
+        CampaignOptions campaignOptions;
+        final LocalDate TODAY = LocalDate.of(3025, 1, 1);
 
         @BeforeEach
         void beforeEach() {
-            mockCampaign = mock(Campaign.class);
-            when(mockCampaign.getCampaignOptions()).thenReturn(new CampaignOptions());
+            campaignOptions = new CampaignOptions();
         }
 
         @Test
         void testGetPayRollTotal_payForSalariesFalseIsZero() {
             Person person = mock(Person.class);
             when(person.getPrimaryRole()).thenReturn(MEKWARRIOR);
-            when(person.getSalary(mockCampaign)).thenReturn(Money.of(500));
+            when(person.getSalary(campaignOptions, false, TODAY)).thenReturn(Money.of(500));
 
-            Money actual = getPayRollTotal(List.of(person), mockCampaign, false, false);
+            Money actual = getPayRollTotal(List.of(person), campaignOptions, false, TODAY, 0, 0, Map.of(), false,
+                  false);
 
             assertEquals(Money.zero(), actual);
         }
@@ -1390,9 +1397,10 @@ public class AccountantTest {
         void testGetPayRollTotal_sumsSalariesWhenPayForSalariesTrue() {
             Person person = mock(Person.class);
             when(person.getPrimaryRole()).thenReturn(MEKWARRIOR);
-            when(person.getSalary(mockCampaign)).thenReturn(Money.of(500));
+            when(person.getSalary(campaignOptions, false, TODAY)).thenReturn(Money.of(500));
 
-            Money actual = getPayRollTotal(List.of(person), mockCampaign, true, false);
+            Money actual = getPayRollTotal(List.of(person), campaignOptions, false, TODAY, 0, 0, Map.of(), false,
+                  true);
 
             assertEquals(Money.of(500), actual);
         }
@@ -1401,9 +1409,10 @@ public class AccountantTest {
         void testGetPayRollTotal_noInfantryExcludesSoldiers() {
             Person soldier = mock(Person.class);
             when(soldier.getPrimaryRole()).thenReturn(SOLDIER);
-            when(soldier.getSalary(mockCampaign)).thenReturn(Money.of(500));
+            when(soldier.getSalary(campaignOptions, false, TODAY)).thenReturn(Money.of(500));
 
-            Money actual = getPayRollTotal(List.of(soldier), mockCampaign, true, true);
+            Money actual = getPayRollTotal(List.of(soldier), campaignOptions, false, TODAY, 0, 0, Map.of(), true,
+                  true);
 
             assertEquals(Money.zero(), actual);
         }
@@ -1483,25 +1492,26 @@ public class AccountantTest {
     }
 
     /**
-     * tests {@link Accountant#getOverheadTotal(java.util.Collection, Campaign, boolean)}
+     * tests {@link Accountant#getOverheadTotal(java.util.Collection, CampaignOptions, boolean, LocalDate, int, int,
+     * java.util.Map, boolean)}
      */
     @Nested
     class TestGetOverheadTotal {
-        Campaign mockCampaign;
+        CampaignOptions campaignOptions;
+        final LocalDate TODAY = LocalDate.of(3025, 1, 1);
 
         @BeforeEach
         void beforeEach() {
-            mockCampaign = mock(Campaign.class);
-            when(mockCampaign.getCampaignOptions()).thenReturn(new CampaignOptions());
+            campaignOptions = new CampaignOptions();
         }
 
         @Test
         void testGetOverheadTotal_payForOverheadFalseIsZero() {
             Person person = mock(Person.class);
             when(person.getPrimaryRole()).thenReturn(MEKWARRIOR);
-            when(person.getSalary(mockCampaign)).thenReturn(Money.of(1000));
+            when(person.getSalary(campaignOptions, false, TODAY)).thenReturn(Money.of(1000));
 
-            Money actual = getOverheadTotal(List.of(person), mockCampaign, false);
+            Money actual = getOverheadTotal(List.of(person), campaignOptions, false, TODAY, 0, 0, Map.of(), false);
 
             assertEquals(Money.zero(), actual);
         }
@@ -1510,9 +1520,9 @@ public class AccountantTest {
         void testGetOverheadTotal_fivePercentOfTheoreticalPayroll() {
             Person person = mock(Person.class);
             when(person.getPrimaryRole()).thenReturn(MEKWARRIOR);
-            when(person.getSalary(mockCampaign)).thenReturn(Money.of(1000));
+            when(person.getSalary(campaignOptions, false, TODAY)).thenReturn(Money.of(1000));
 
-            Money actual = getOverheadTotal(List.of(person), mockCampaign, true);
+            Money actual = getOverheadTotal(List.of(person), campaignOptions, false, TODAY, 0, 0, Map.of(), true);
 
             assertEquals(Money.of(50), actual);
         }
@@ -1781,28 +1791,31 @@ public class AccountantTest {
     }
 
     /**
-     * tests {@link Accountant#getContractBase(Campaign)}
+     * tests {@link Accountant#getContractBase(CampaignOptions, Faction, LocalDate, Hangar, java.util.List, int, int,
+     * java.util.Map, java.util.List)}
      */
     @Nested
     class TestGetContractBaseStatic {
-        Campaign mockCampaign;
         CampaignOptions campaignOptions;
+        Faction faction;
+        final LocalDate TODAY = LocalDate.of(3025, 1, 1);
 
         @BeforeEach
         void beforeEach() {
-            mockCampaign = mock(Campaign.class);
             campaignOptions = new CampaignOptions();
-            when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
+            faction = new Faction();
         }
 
         @Test
         void testGetContractBase_defaultFallsBackToTheoreticalPayroll() {
             Person person = mock(Person.class);
             when(person.getPrimaryRole()).thenReturn(MEKWARRIOR);
-            when(person.getSalary(mockCampaign)).thenReturn(Money.of(1000));
-            when(mockCampaign.getSalaryEligiblePersonnel()).thenReturn(List.of(person));
+            when(person.getSalary(campaignOptions, false, TODAY)).thenReturn(Money.of(1000));
 
-            Money actual = getContractBase(mockCampaign);
+            Hangar mockHangar = mock(Hangar.class);
+
+            Money actual = getContractBase(campaignOptions, faction, TODAY, mockHangar, List.of(person), 0, 0,
+                  Map.of(), List.of());
 
             assertEquals(Money.of(1000), actual);
         }
@@ -1823,42 +1836,40 @@ public class AccountantTest {
 
             Hangar mockHangar = mock(Hangar.class);
             when(mockHangar.getUnit(unitId)).thenReturn(unit);
-            when(mockCampaign.getHangar()).thenReturn(mockHangar);
 
             Formation formation = mock(Formation.class);
             when(formation.getFormationType()).thenReturn(FormationType.STANDARD);
             when(formation.getCombatRoleInMemory()).thenReturn(CombatRole.MANEUVER);
             when(formation.getUnits()).thenReturn(new Vector<>(List.of(unitId)));
-            when(mockCampaign.getAllFormations()).thenReturn(List.of(formation));
 
-            Faction faction = new Faction();
-            when(mockCampaign.getFaction()).thenReturn(faction);
-
-            Money actual = getContractBase(mockCampaign);
+            Money actual = getContractBase(campaignOptions, faction, TODAY, mockHangar, List.of(), 0, 0, Map.of(),
+                  List.of(formation));
 
             assertEquals(Money.of(100), actual);
         }
     }
 
     /**
-     * tests {@link Accountant#getPayRollSummary(java.util.Collection, Campaign)}
+     * tests {@link Accountant#getPayRollSummary(java.util.Collection, CampaignOptions, boolean, LocalDate, int, int,
+     * java.util.Map)}
      */
     @Nested
     class TestGetPayRollSummaryStatic {
-        Campaign mockCampaign;
+        CampaignOptions campaignOptions;
+        final LocalDate TODAY = LocalDate.of(3025, 1, 1);
 
         @BeforeEach
         void beforeEach() {
-            mockCampaign = mock(Campaign.class);
-            when(mockCampaign.getCampaignOptions()).thenReturn(new CampaignOptions());
+            campaignOptions = new CampaignOptions();
         }
 
         @Test
         void testGetPayRollSummary_mapsEachPersonToTheirSalary() {
             Person person = mock(Person.class);
-            when(person.getSalary(mockCampaign)).thenReturn(Money.of(300));
+            when(person.getSalary(campaignOptions, false, TODAY)).thenReturn(Money.of(300));
 
-            Map<Person, Money> actual = getPayRollSummary(List.of(person), mockCampaign);
+            Map<Person, Money> actual = getPayRollSummary(List.of(person), campaignOptions, false, TODAY, 0, 0,
+                  Map.of());
 
             assertEquals(2, actual.size());
             assertTrue(actual.containsKey(person));
@@ -1869,7 +1880,7 @@ public class AccountantTest {
 
         @Test
         void testGetPayRollSummary_emptyPersonnelStillHasPoolKey() {
-            Map<Person, Money> actual = getPayRollSummary(List.of(), mockCampaign);
+            Map<Person, Money> actual = getPayRollSummary(List.of(), campaignOptions, false, TODAY, 0, 0, Map.of());
 
             assertEquals(1, actual.size());
             assertTrue(actual.containsKey(null));
