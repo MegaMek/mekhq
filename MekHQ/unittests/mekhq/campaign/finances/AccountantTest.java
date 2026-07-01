@@ -51,6 +51,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.Vector;
 import java.util.stream.Stream;
@@ -64,12 +65,17 @@ import mekhq.campaign.Warehouse;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationType;
+import mekhq.campaign.market.contractMarket.AlternatePaymentModelValues;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -761,6 +767,97 @@ public class AccountantTest {
         assertEquals(expected, actual);
     }
 
+    @Test
+    void testGetMonthlyFoodAndHousingExpenses_UsesContractBasedFactionStandingBarrackMultiplier() {
+        Campaign mockCampaign = mock(Campaign.class);
+
+        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        when(mockCampaignOptions.isPayForFood()).thenReturn(false);
+        when(mockCampaignOptions.isPayForHousing()).thenReturn(true);
+        when(mockCampaignOptions.isUseFactionStandingBarracksCostsSafe()).thenReturn(true);
+
+        Accountant accountant = new Accountant(mockCampaign);
+
+        PlanetarySystem mockSystem = mock(PlanetarySystem.class);
+        CurrentLocation location = new CurrentLocation(mockSystem, 0);
+        when(mockCampaign.getCurrentLocation()).thenReturn(location);
+
+        Faction faction = new Faction();
+        when(mockCampaign.getFaction()).thenReturn(faction);
+
+        LocalDate today = LocalDate.of(3025, 1, 1);
+        when(mockCampaign.getLocalDate()).thenReturn(today);
+
+        // A contract active in the current system takes precedence over local factions when
+        // determining whose regard sets the barrack cost multiplier.
+        AtBContract contract = mock(AtBContract.class);
+        when(contract.getSystem()).thenReturn(mockSystem);
+        when(contract.getEmployerCode()).thenReturn("EMPLOYER");
+        when(mockCampaign.getActiveAtBContracts()).thenReturn(List.of(contract));
+
+        FactionStandings factionStandings = mock(FactionStandings.class);
+        when(factionStandings.getRegardForFaction("EMPLOYER", true)).thenReturn(20.0);
+        when(mockCampaign.getFactionStandings()).thenReturn(factionStandings);
+
+        Person officer = new Person(mockCampaign);
+        officer.setPrimaryRole(mockCampaign, MEKWARRIOR);
+        officer.setRank(RWO_MIN + 1);
+        when(mockCampaign.getAllPersonnel()).thenReturn(List.of(officer));
+
+        double expectedMultiplier = FactionStandingUtilities.getBarrackCostsMultiplier(20.0);
+        Money expected = Money.of(HOUSING_OFFICER).multipliedBy(expectedMultiplier);
+        Money actual = accountant.getMonthlyFoodAndHousingExpenses();
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void testGetMonthlyFoodAndHousingExpenses_FallsBackToLocalFactionsWhenNoMatchingContract() {
+        Campaign mockCampaign = mock(Campaign.class);
+
+        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        when(mockCampaignOptions.isPayForFood()).thenReturn(false);
+        when(mockCampaignOptions.isPayForHousing()).thenReturn(true);
+        when(mockCampaignOptions.isUseFactionStandingBarracksCostsSafe()).thenReturn(true);
+
+        Accountant accountant = new Accountant(mockCampaign);
+
+        PlanetarySystem mockSystem = mock(PlanetarySystem.class);
+        CurrentLocation location = new CurrentLocation(mockSystem, 0);
+        when(mockCampaign.getCurrentLocation()).thenReturn(location);
+
+        Faction faction = new Faction();
+        when(mockCampaign.getFaction()).thenReturn(faction);
+
+        LocalDate today = LocalDate.of(3025, 1, 1);
+        when(mockCampaign.getLocalDate()).thenReturn(today);
+
+        // No active contracts in the current system, so the barrack multiplier falls back to the
+        // highest regard among the system's local factions.
+        when(mockCampaign.getActiveAtBContracts()).thenReturn(List.of());
+
+        Faction localFaction = mock(Faction.class);
+        when(localFaction.getShortName()).thenReturn("LOCAL");
+        when(mockSystem.getFactionSet(today)).thenReturn(Set.of(localFaction));
+
+        FactionStandings factionStandings = mock(FactionStandings.class);
+        when(factionStandings.getRegardForFaction("LOCAL", true)).thenReturn(15.0);
+        when(mockCampaign.getFactionStandings()).thenReturn(factionStandings);
+
+        Person officer = new Person(mockCampaign);
+        officer.setPrimaryRole(mockCampaign, MEKWARRIOR);
+        officer.setRank(RWO_MIN + 1);
+        when(mockCampaign.getAllPersonnel()).thenReturn(List.of(officer));
+
+        double expectedMultiplier = FactionStandingUtilities.getBarrackCostsMultiplier(15.0);
+        Money expected = Money.of(HOUSING_OFFICER).multipliedBy(expectedMultiplier);
+        Money actual = accountant.getMonthlyFoodAndHousingExpenses();
+
+        assertEquals(expected, actual);
+    }
+
     /**
      * tests {@link Accountant#getPayRollSummary()}
      */
@@ -1193,6 +1290,38 @@ public class AccountantTest {
         void testGetPeacetimeOperatingCosts_emptyFormationsIsZero() {
             Money actual = getPeacetimeOperatingCosts(List.of(), mockHangar, campaignOptions, false, TODAY, 0, 0,
                   Map.of(), true);
+
+            assertEquals(Money.zero(), actual);
+        }
+
+        @Test
+        void testGetPeacetimeOperatingCosts_includesTemporaryCrewPay() {
+            // With no formations there are no units or crews at all, so any nonzero total here can only
+            // have come from the astech pool - isolating the temporary-crew-pay contribution.
+            campaignOptions.setPayForSalaries(true);
+
+            double expectedTempCrewPay = campaignOptions.getRoleBaseSalaries()[PersonnelRole.ASTECH.ordinal()]
+                                                .getAmount()
+                                                .doubleValue() * 5;
+
+            Money actual = getPeacetimeOperatingCosts(List.of(), mockHangar, campaignOptions, false, TODAY, 5, 0,
+                  Map.of(), true);
+
+            assertEquals(Money.of(expectedTempCrewPay), actual);
+        }
+
+        @Test
+        void testGetPeacetimeOperatingCosts_skipsUnitIdsMissingFromHangar() {
+            UUID missingUnitId = UUID.randomUUID();
+            // mockHangar.getUnit(missingUnitId) is left unstubbed, so it returns null - simulating a unit
+            // that was removed from the hangar but is still referenced by a formation.
+
+            Formation formation = mock(Formation.class);
+            when(formation.getUnits()).thenReturn(new Vector<>(List.of(missingUnitId)));
+            when(formation.getSubFormations()).thenReturn(new Vector<>());
+
+            Money actual = getPeacetimeOperatingCosts(List.of(formation), mockHangar, campaignOptions, false, TODAY,
+                  0, 0, Map.of(), false);
 
             assertEquals(Money.zero(), actual);
         }
@@ -1697,6 +1826,130 @@ public class AccountantTest {
 
             assertEquals(Money.zero(), actual);
         }
+
+        @Test
+        void testGetForceValue_excludesNonCombatRoleFormations() {
+            Formation formation = mock(Formation.class);
+            when(formation.getFormationType()).thenReturn(FormationType.STANDARD);
+            when(formation.getCombatRoleInMemory()).thenReturn(CombatRole.RESERVE);
+
+            Money actual = getForceValue(List.of(formation), mockHangar, faction, campaignOptions, false, false, 10,
+                  10, 10, false);
+
+            assertEquals(Money.zero(), actual);
+        }
+
+        @Test
+        void testGetForceValue_warShipIncludedWhenPercentNonZero() {
+            UUID unitId = UUID.randomUUID();
+            Unit unit = mock(Unit.class);
+            Entity entity = mock(Entity.class);
+            when(entity.isWarShip()).thenReturn(true);
+            when(unit.getEntity()).thenReturn(entity);
+            when(unit.getBuyCost()).thenReturn(Money.of(1000));
+            when(mockHangar.getUnit(unitId)).thenReturn(unit);
+
+            Formation formation = mock(Formation.class);
+            when(formation.getFormationType()).thenReturn(FormationType.STANDARD);
+            when(formation.getCombatRoleInMemory()).thenReturn(CombatRole.MANEUVER);
+            when(formation.getUnits()).thenReturn(new Vector<>(List.of(unitId)));
+
+            Money actual = getForceValue(List.of(formation), mockHangar, faction, campaignOptions, false, false, 10,
+                  30, 10, false);
+
+            assertEquals(Money.of(1000), actual);
+        }
+
+        @Test
+        void testGetForceValue_warShipExcludedWhenPercentZero() {
+            UUID unitId = UUID.randomUUID();
+            Unit unit = mock(Unit.class);
+            Entity entity = mock(Entity.class);
+            when(entity.isWarShip()).thenReturn(true);
+            when(unit.getEntity()).thenReturn(entity);
+            when(unit.getBuyCost()).thenReturn(Money.of(1000));
+            when(mockHangar.getUnit(unitId)).thenReturn(unit);
+
+            Formation formation = mock(Formation.class);
+            when(formation.getFormationType()).thenReturn(FormationType.STANDARD);
+            when(formation.getCombatRoleInMemory()).thenReturn(CombatRole.MANEUVER);
+            when(formation.getUnits()).thenReturn(new Vector<>(List.of(unitId)));
+
+            Money actual = getForceValue(List.of(formation), mockHangar, faction, campaignOptions, false, false, 10,
+                  0, 10, false);
+
+            assertEquals(Money.zero(), actual);
+        }
+
+        @Test
+        void testGetForceValue_jumpShipIncludedWhenPercentNonZero() {
+            UUID unitId = UUID.randomUUID();
+            Unit unit = mock(Unit.class);
+            Entity entity = mock(Entity.class);
+            when(entity.isJumpShip()).thenReturn(true);
+            when(unit.getEntity()).thenReturn(entity);
+            when(unit.getBuyCost()).thenReturn(Money.of(1000));
+            when(mockHangar.getUnit(unitId)).thenReturn(unit);
+
+            Formation formation = mock(Formation.class);
+            when(formation.getFormationType()).thenReturn(FormationType.STANDARD);
+            when(formation.getCombatRoleInMemory()).thenReturn(CombatRole.MANEUVER);
+            when(formation.getUnits()).thenReturn(new Vector<>(List.of(unitId)));
+
+            Money actual = getForceValue(List.of(formation), mockHangar, faction, campaignOptions, false, false, 10,
+                  10, 40, false);
+
+            assertEquals(Money.of(1000), actual);
+        }
+
+        @Test
+        void testGetForceValue_jumpShipExcludedWhenPercentZero() {
+            UUID unitId = UUID.randomUUID();
+            Unit unit = mock(Unit.class);
+            Entity entity = mock(Entity.class);
+            when(entity.isJumpShip()).thenReturn(true);
+            when(unit.getEntity()).thenReturn(entity);
+            when(unit.getBuyCost()).thenReturn(Money.of(1000));
+            when(mockHangar.getUnit(unitId)).thenReturn(unit);
+
+            Formation formation = mock(Formation.class);
+            when(formation.getFormationType()).thenReturn(FormationType.STANDARD);
+            when(formation.getCombatRoleInMemory()).thenReturn(CombatRole.MANEUVER);
+            when(formation.getUnits()).thenReturn(new Vector<>(List.of(unitId)));
+
+            Money actual = getForceValue(List.of(formation), mockHangar, faction, campaignOptions, false, false, 10,
+                  10, 0, false);
+
+            assertEquals(Money.zero(), actual);
+        }
+
+        @Test
+        void testGetForceValue_appliesDiminishingReturnsWhenThresholdExceeded() {
+            Formation formation = mock(Formation.class);
+            when(formation.getFormationType()).thenReturn(FormationType.STANDARD);
+            when(formation.getCombatRoleInMemory()).thenReturn(CombatRole.MANEUVER);
+
+            Vector<UUID> unitIds = new Vector<>();
+            for (int i = 0; i < 100; i++) {
+                UUID unitId = UUID.randomUUID();
+                Unit unit = mock(Unit.class);
+                Entity entity = mock(Entity.class);
+                when(unit.getEntity()).thenReturn(entity);
+                when(unit.getBuyCost()).thenReturn(Money.of(1000));
+                when(mockHangar.getUnit(unitId)).thenReturn(unit);
+                unitIds.add(unitId);
+            }
+            when(formation.getUnits()).thenReturn(unitIds);
+
+            Money straightSum = getForceValue(List.of(formation), mockHangar, faction, campaignOptions, false, false,
+                  10, 10, 10, false);
+            Money withDiminishingReturns = getForceValue(List.of(formation), mockHangar, faction, campaignOptions,
+                  true, false, 10, 10, 10, false);
+
+            // 100 units comfortably exceeds any faction's diminishing-returns threshold, so the
+            // discounted total must come out strictly lower than the undiscounted straight sum.
+            assertTrue(withDiminishingReturns.isLessThan(straightSum));
+        }
     }
 
     /**
@@ -1788,6 +2041,51 @@ public class AccountantTest {
 
             assertEquals(Money.of(750), actual);
         }
+
+        @Test
+        void testGetEquipmentContractValue_warShipUsesWarShipContractPercent() {
+            when(campaignOptions.getWarShipContractPercent()).thenReturn(30.0);
+
+            Unit unit = mock(Unit.class);
+            Entity entity = mock(Entity.class);
+            when(entity.hasETypeFlag(Entity.ETYPE_WARSHIP)).thenReturn(true);
+            when(unit.getEntity()).thenReturn(entity);
+            when(unit.getBuyCost()).thenReturn(Money.of(1000));
+
+            Money actual = getEquipmentContractValue(campaignOptions, unit, false);
+
+            assertEquals(Money.of(300), actual);
+        }
+
+        @Test
+        void testGetEquipmentContractValue_jumpShipUsesJumpShipContractPercent() {
+            when(campaignOptions.getJumpShipContractPercent()).thenReturn(40.0);
+
+            Unit unit = mock(Unit.class);
+            Entity entity = mock(Entity.class);
+            when(entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP)).thenReturn(true);
+            when(unit.getEntity()).thenReturn(entity);
+            when(unit.getBuyCost()).thenReturn(Money.of(1000));
+
+            Money actual = getEquipmentContractValue(campaignOptions, unit, false);
+
+            assertEquals(Money.of(400), actual);
+        }
+
+        @Test
+        void testGetEquipmentContractValue_spaceStationUsesJumpShipContractPercent() {
+            when(campaignOptions.getJumpShipContractPercent()).thenReturn(40.0);
+
+            Unit unit = mock(Unit.class);
+            Entity entity = mock(Entity.class);
+            when(entity.hasETypeFlag(Entity.ETYPE_SPACE_STATION)).thenReturn(true);
+            when(unit.getEntity()).thenReturn(entity);
+            when(unit.getBuyCost()).thenReturn(Money.of(1000));
+
+            Money actual = getEquipmentContractValue(campaignOptions, unit, false);
+
+            assertEquals(Money.of(400), actual);
+        }
     }
 
     /**
@@ -1847,6 +2145,114 @@ public class AccountantTest {
 
             assertEquals(Money.of(100), actual);
         }
+
+        @Test
+        void testGetContractBase_alternatePaymentModeSkipsTheoreticalPayrollFallback() {
+            campaignOptions.setUseAlternatePaymentMode(true);
+
+            Person person = mock(Person.class);
+            when(person.getPrimaryRole()).thenReturn(MEKWARRIOR);
+            when(person.getSalary(campaignOptions, false, TODAY)).thenReturn(Money.of(1000));
+
+            Hangar mockHangar = mock(Hangar.class);
+
+            Money actual = getContractBase(campaignOptions, faction, TODAY, mockHangar, List.of(person), 0, 0,
+                  Map.of(), List.of());
+
+            // Alternate payment mode short-circuits before ever falling through to the theoretical-payroll
+            // branch, so the salary stubbed above must not show up in the result.
+            assertEquals(Money.zero(), actual);
+        }
+
+        @Test
+        void testGetContractBase_alternatePaymentModeUsesAlternatePaymentModelValues() {
+            campaignOptions.setUseAlternatePaymentMode(true);
+
+            UUID unitId = UUID.randomUUID();
+            // isProtoMek() is the simplest single-condition branch in
+            // AlternatePaymentModelValues#getUnitContractValue, making it an easy way to get a
+            // predictable, nonzero force value out of the real production logic.
+            Entity entity = mock(Entity.class);
+            when(entity.isProtoMek()).thenReturn(true);
+
+            Unit unit = mock(Unit.class);
+            when(unit.getEntity()).thenReturn(entity);
+
+            Hangar mockHangar = mock(Hangar.class);
+            when(mockHangar.getUnit(unitId)).thenReturn(unit);
+
+            Formation formation = mock(Formation.class);
+            when(formation.getFormationType()).thenReturn(FormationType.STANDARD);
+            when(formation.getCombatRoleInMemory()).thenReturn(CombatRole.MANEUVER);
+            when(formation.getUnitsAsUnits(mockHangar)).thenReturn(List.of(unit));
+
+            Money actual = getContractBase(campaignOptions, faction, TODAY, mockHangar, List.of(), 0, 0, Map.of(),
+                  List.of(formation));
+
+            // Real default equipmentContractPercent (5%) applied to the PROTOMEK base value.
+            Money expected = AlternatePaymentModelValues.PROTOMEK.getValue().multipliedBy(0.05);
+            assertEquals(expected, actual);
+        }
+
+        @Test
+        void testGetContractBase_alternatePaymentModeHalvesResultWhenUsingSaleValue() {
+            campaignOptions.setUseAlternatePaymentMode(true);
+            campaignOptions.setEquipmentContractSaleValue(true);
+
+            UUID unitId = UUID.randomUUID();
+            Entity entity = mock(Entity.class);
+            when(entity.isProtoMek()).thenReturn(true);
+
+            Unit unit = mock(Unit.class);
+            when(unit.getEntity()).thenReturn(entity);
+
+            Hangar mockHangar = mock(Hangar.class);
+            when(mockHangar.getUnit(unitId)).thenReturn(unit);
+
+            Formation formation = mock(Formation.class);
+            when(formation.getFormationType()).thenReturn(FormationType.STANDARD);
+            when(formation.getCombatRoleInMemory()).thenReturn(CombatRole.MANEUVER);
+            when(formation.getUnitsAsUnits(mockHangar)).thenReturn(List.of(unit));
+
+            Money actual = getContractBase(campaignOptions, faction, TODAY, mockHangar, List.of(), 0, 0, Map.of(),
+                  List.of(formation));
+
+            Money expected = AlternatePaymentModelValues.PROTOMEK.getValue().multipliedBy(0.05).multipliedBy(0.5);
+            assertEquals(expected, actual);
+        }
+
+        @Test
+        void testGetContractBase_usePeacetimeCostCombinesForceValueAndPeacetimeCost() {
+            campaignOptions.setUsePeacetimeCost(true);
+
+            UUID unitId = UUID.randomUUID();
+            Unit unit = mock(Unit.class);
+            Entity entity = mock(Entity.class);
+            when(unit.getEntity()).thenReturn(entity);
+            when(unit.getBuyCost()).thenReturn(Money.of(1000));
+            when(unit.getSparePartsCost()).thenReturn(Money.of(10));
+            when(unit.getAmmoCost()).thenReturn(Money.of(5));
+            when(unit.getFuelCost(anyInt())).thenReturn(Money.zero());
+
+            Hangar mockHangar = mock(Hangar.class);
+            when(mockHangar.getUnit(unitId)).thenReturn(unit);
+
+            Formation formation = mock(Formation.class);
+            when(formation.getFormationType()).thenReturn(FormationType.STANDARD);
+            when(formation.getCombatRoleInMemory()).thenReturn(CombatRole.MANEUVER);
+            when(formation.getUnits()).thenReturn(new Vector<>(List.of(unitId)));
+            when(formation.getSubFormations()).thenReturn(new Vector<>());
+
+            Money expectedPeacetimeCost = getSparePartsTotal(List.of(unit)).plus(getFuelTotal(List.of(unit)))
+                                                 .plus(getAmmoTotal(List.of(unit)));
+            Money expectedForceValue = getEquipmentContractValue(campaignOptions, unit, false);
+            Money expected = expectedPeacetimeCost.multipliedBy(0.75).plus(expectedForceValue);
+
+            Money actual = getContractBase(campaignOptions, faction, TODAY, mockHangar, List.of(), 0, 0, Map.of(),
+                  List.of(formation));
+
+            assertEquals(expected, actual);
+        }
     }
 
     /**
@@ -1885,6 +2291,170 @@ public class AccountantTest {
             assertEquals(1, actual.size());
             assertTrue(actual.containsKey(null));
             assertEquals(Money.zero(), actual.get(null));
+        }
+    }
+
+    /**
+     * These tests confirm that the thin instance-method wrappers correctly extract values from the wrapped
+     * {@link Campaign} (formations, hangar, campaign options, salary-eligible personnel, etc.) and forward them to
+     * their static counterparts, since those counterparts are otherwise only ever exercised directly with
+     * hand-built inputs.
+     */
+    @Nested
+    class TestInstanceMethodDelegation {
+        Campaign mockCampaign;
+        CampaignOptions campaignOptions;
+        Hangar mockHangar;
+        Accountant accountant;
+        final LocalDate TODAY = LocalDate.of(3025, 1, 1);
+
+        @BeforeEach
+        void beforeEach() {
+            mockCampaign = mock(Campaign.class);
+            campaignOptions = new CampaignOptions();
+            mockHangar = mock(Hangar.class);
+            accountant = new Accountant(mockCampaign);
+
+            when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
+            when(mockCampaign.getHangar()).thenReturn(mockHangar);
+            when(mockCampaign.isClanCampaign()).thenReturn(false);
+            when(mockCampaign.getLocalDate()).thenReturn(TODAY);
+        }
+
+        @Test
+        void testGetMaintenanceCosts_delegatesToStaticTotal() {
+            campaignOptions.setPayForMaintain(true);
+
+            Unit unit = mock(Unit.class);
+            when(unit.requiresMaintenance()).thenReturn(true);
+            when(unit.getTech()).thenReturn(mock(Person.class));
+            when(unit.getMaintenanceCost()).thenReturn(Money.of(100));
+            when(mockHangar.getUnits()).thenReturn(List.of(unit));
+
+            Money actual = accountant.getMaintenanceCosts();
+
+            assertEquals(Money.of(100), actual);
+        }
+
+        @Test
+        void testGetMaintenanceCosts_payForMaintainFalseIsZero() {
+            campaignOptions.setPayForMaintain(false);
+
+            Unit unit = mock(Unit.class);
+            when(unit.requiresMaintenance()).thenReturn(true);
+            when(unit.getTech()).thenReturn(mock(Person.class));
+            when(unit.getMaintenanceCost()).thenReturn(Money.of(100));
+            when(mockHangar.getUnits()).thenReturn(List.of(unit));
+
+            Money actual = accountant.getMaintenanceCosts();
+
+            assertEquals(Money.zero(), actual);
+        }
+
+        @Test
+        void testGetWeeklyMaintenanceCosts_delegatesToStaticTotal() {
+            Unit unit = mock(Unit.class);
+            when(unit.getWeeklyMaintenanceCost()).thenReturn(Money.of(20));
+            when(mockHangar.getUnits()).thenReturn(List.of(unit));
+
+            Money actual = accountant.getWeeklyMaintenanceCosts();
+
+            assertEquals(Money.of(20), actual);
+        }
+
+        @Test
+        void testGetOverheadExpenses_delegatesToStaticTotal() {
+            campaignOptions.setPayForOverhead(true);
+
+            Person person = mock(Person.class);
+            when(person.getPrimaryRole()).thenReturn(MEKWARRIOR);
+            when(person.getSalary(campaignOptions, false, TODAY)).thenReturn(Money.of(1000));
+            when(mockCampaign.getSalaryEligiblePersonnel()).thenReturn(List.of(person));
+
+            Money actual = accountant.getOverheadExpenses();
+
+            assertEquals(Money.of(50), actual);
+        }
+
+        @Test
+        void testGetOverheadExpenses_payForOverheadFalseIsZero() {
+            campaignOptions.setPayForOverhead(false);
+
+            Person person = mock(Person.class);
+            when(person.getPrimaryRole()).thenReturn(MEKWARRIOR);
+            when(person.getSalary(campaignOptions, false, TODAY)).thenReturn(Money.of(1000));
+            when(mockCampaign.getSalaryEligiblePersonnel()).thenReturn(List.of(person));
+
+            Money actual = accountant.getOverheadExpenses();
+
+            assertEquals(Money.zero(), actual);
+        }
+
+        @Test
+        void testGetForceValue_instanceDelegatesWithCampaignFormationsAndHangar() {
+            UUID unitId = UUID.randomUUID();
+            Unit unit = mock(Unit.class);
+            Entity entity = mock(Entity.class);
+            when(unit.getEntity()).thenReturn(entity);
+            when(unit.getBuyCost()).thenReturn(Money.of(1000));
+            when(unit.isConventionalInfantry()).thenReturn(false);
+            when(mockHangar.getUnit(unitId)).thenReturn(unit);
+
+            Formation formation = mock(Formation.class);
+            when(formation.getFormationType()).thenReturn(FormationType.STANDARD);
+            when(formation.getCombatRoleInMemory()).thenReturn(CombatRole.MANEUVER);
+            when(formation.getUnits()).thenReturn(new Vector<>(List.of(unitId)));
+            when(mockCampaign.getAllFormations()).thenReturn(List.of(formation));
+
+            Faction faction = new Faction();
+            when(mockCampaign.getFaction()).thenReturn(faction);
+
+            Money actual = accountant.getForceValue(false, false, 10, 10, 10, false);
+
+            // Real default equipmentContractPercent (5%) applied to the unit's buy cost.
+            assertEquals(Money.of(1000).multipliedBy(0.05), actual);
+        }
+
+        @Test
+        void testGetTotalEquipmentValue_delegatesToStaticTotal() {
+            Unit unit = mock(Unit.class);
+            when(unit.getSellValue()).thenReturn(Money.of(1000));
+            when(mockHangar.getUnits()).thenReturn(List.of(unit));
+
+            Warehouse warehouse = mock(Warehouse.class);
+            when(warehouse.streamSpareParts()).thenReturn(Stream.empty());
+            when(mockCampaign.getWarehouse()).thenReturn(warehouse);
+
+            Money actual = accountant.getTotalEquipmentValue();
+
+            assertEquals(Money.of(1000), actual);
+        }
+
+        @Test
+        void testGetEquipmentContractValue_instanceDelegatesWithCampaignOptions() {
+            Unit unit = mock(Unit.class);
+            Entity entity = mock(Entity.class);
+            when(unit.getEntity()).thenReturn(entity);
+            when(unit.getBuyCost()).thenReturn(Money.of(1000));
+
+            Money actual = accountant.getEquipmentContractValue(unit, false);
+
+            // Real default equipmentContractPercent (5%).
+            assertEquals(Money.of(1000).multipliedBy(0.05), actual);
+        }
+
+        @Test
+        void testGetContractBase_instanceDelegatesWithCampaign() {
+            when(mockCampaign.getFaction()).thenReturn(new Faction());
+
+            Person person = mock(Person.class);
+            when(person.getPrimaryRole()).thenReturn(MEKWARRIOR);
+            when(person.getSalary(campaignOptions, false, TODAY)).thenReturn(Money.of(1000));
+            when(mockCampaign.getSalaryEligiblePersonnel()).thenReturn(List.of(person));
+
+            Money actual = accountant.getContractBase();
+
+            assertEquals(Money.of(1000), actual);
         }
     }
 }
