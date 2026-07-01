@@ -673,7 +673,7 @@ public class HumanResources {
     }
 
     public Map<PersonnelRole, Integer> getTempPersonnelRoleMap() {
-        return tempPersonnelRoleMap;
+        return Map.copyOf(tempPersonnelRoleMap);
     }
 
 
