@@ -672,6 +672,10 @@ public class HumanResources {
         }
     }
 
+    public Map<PersonnelRole, Integer> getTempPersonnelRoleMap() {
+        return tempPersonnelRoleMap;
+    }
+
 
     /**
      * Gets the total temp crew pool size for a specific personnel role.

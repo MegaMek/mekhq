@@ -41,6 +41,7 @@ import static mekhq.campaign.personnel.enums.PersonnelRole.VESSEL_GUNNER;
 import static mekhq.campaign.personnel.ranks.Rank.RWO_MIN;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerStatus.PRISONER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -54,14 +55,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.Vector;
+import java.util.stream.Stream;
 
 import megamek.common.equipment.Engine;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.Hangar;
+import mekhq.campaign.Warehouse;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.force.FormationType;
+import mekhq.campaign.mission.enums.CombatRole;
+import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
@@ -1353,6 +1359,521 @@ public class AccountantTest {
             when(mockUnit.getFormationId()).thenReturn(formationId);
 
             return mockUnit;
+        }
+    }
+
+    /**
+     * tests {@link Accountant#getPayRollTotal(java.util.Collection, Campaign, boolean, boolean)}
+     */
+    @Nested
+    class TestGetPayRollTotal {
+        Campaign mockCampaign;
+
+        @BeforeEach
+        void beforeEach() {
+            mockCampaign = mock(Campaign.class);
+            when(mockCampaign.getCampaignOptions()).thenReturn(new CampaignOptions());
+        }
+
+        @Test
+        void testGetPayRollTotal_payForSalariesFalseIsZero() {
+            Person person = mock(Person.class);
+            when(person.getPrimaryRole()).thenReturn(MEKWARRIOR);
+            when(person.getSalary(mockCampaign)).thenReturn(Money.of(500));
+
+            Money actual = getPayRollTotal(List.of(person), mockCampaign, false, false);
+
+            assertEquals(Money.zero(), actual);
+        }
+
+        @Test
+        void testGetPayRollTotal_sumsSalariesWhenPayForSalariesTrue() {
+            Person person = mock(Person.class);
+            when(person.getPrimaryRole()).thenReturn(MEKWARRIOR);
+            when(person.getSalary(mockCampaign)).thenReturn(Money.of(500));
+
+            Money actual = getPayRollTotal(List.of(person), mockCampaign, true, false);
+
+            assertEquals(Money.of(500), actual);
+        }
+
+        @Test
+        void testGetPayRollTotal_noInfantryExcludesSoldiers() {
+            Person soldier = mock(Person.class);
+            when(soldier.getPrimaryRole()).thenReturn(SOLDIER);
+            when(soldier.getSalary(mockCampaign)).thenReturn(Money.of(500));
+
+            Money actual = getPayRollTotal(List.of(soldier), mockCampaign, true, true);
+
+            assertEquals(Money.zero(), actual);
+        }
+    }
+
+    /**
+     * tests {@link Accountant#getMaintenanceTotal(java.util.Collection, boolean)}
+     */
+    @Nested
+    class TestGetMaintenanceTotal {
+        @Test
+        void testGetMaintenanceTotal_payForMaintainFalseIsZero() {
+            Unit unit = mock(Unit.class);
+            when(unit.requiresMaintenance()).thenReturn(true);
+            when(unit.getTech()).thenReturn(mock(Person.class));
+            when(unit.getMaintenanceCost()).thenReturn(Money.of(100));
+
+            Money actual = getMaintenanceTotal(List.of(unit), false);
+
+            assertEquals(Money.zero(), actual);
+        }
+
+        @Test
+        void testGetMaintenanceTotal_excludesUnitsWithoutTech() {
+            Unit unitWithTech = mock(Unit.class);
+            when(unitWithTech.requiresMaintenance()).thenReturn(true);
+            when(unitWithTech.getTech()).thenReturn(mock(Person.class));
+            when(unitWithTech.getMaintenanceCost()).thenReturn(Money.of(100));
+
+            Unit unitWithoutTech = mock(Unit.class);
+            when(unitWithoutTech.requiresMaintenance()).thenReturn(true);
+            when(unitWithoutTech.getTech()).thenReturn(null);
+            when(unitWithoutTech.getMaintenanceCost()).thenReturn(Money.of(500));
+
+            Money actual = getMaintenanceTotal(List.of(unitWithTech, unitWithoutTech), true);
+
+            assertEquals(Money.of(100), actual);
+        }
+
+        @Test
+        void testGetMaintenanceTotal_excludesUnitsThatDontRequireMaintenance() {
+            Unit unit = mock(Unit.class);
+            when(unit.requiresMaintenance()).thenReturn(false);
+            when(unit.getTech()).thenReturn(mock(Person.class));
+            when(unit.getMaintenanceCost()).thenReturn(Money.of(100));
+
+            Money actual = getMaintenanceTotal(List.of(unit), true);
+
+            assertEquals(Money.zero(), actual);
+        }
+    }
+
+    /**
+     * tests {@link Accountant#getWeeklyMaintenanceTotal(java.util.Collection)}
+     */
+    @Nested
+    class TestGetWeeklyMaintenanceTotal {
+        @Test
+        void testGetWeeklyMaintenanceTotal_sumsAllUnitsRegardlessOfMaintenanceSettings() {
+            Unit unitA = mock(Unit.class);
+            when(unitA.getWeeklyMaintenanceCost()).thenReturn(Money.of(10));
+
+            Unit unitB = mock(Unit.class);
+            when(unitB.getWeeklyMaintenanceCost()).thenReturn(Money.of(20));
+
+            Money actual = getWeeklyMaintenanceTotal(List.of(unitA, unitB));
+
+            assertEquals(Money.of(30), actual);
+        }
+
+        @Test
+        void testGetWeeklyMaintenanceTotal_emptyCollectionIsZero() {
+            Money actual = getWeeklyMaintenanceTotal(List.of());
+
+            assertEquals(Money.zero(), actual);
+        }
+    }
+
+    /**
+     * tests {@link Accountant#getOverheadTotal(java.util.Collection, Campaign, boolean)}
+     */
+    @Nested
+    class TestGetOverheadTotal {
+        Campaign mockCampaign;
+
+        @BeforeEach
+        void beforeEach() {
+            mockCampaign = mock(Campaign.class);
+            when(mockCampaign.getCampaignOptions()).thenReturn(new CampaignOptions());
+        }
+
+        @Test
+        void testGetOverheadTotal_payForOverheadFalseIsZero() {
+            Person person = mock(Person.class);
+            when(person.getPrimaryRole()).thenReturn(MEKWARRIOR);
+            when(person.getSalary(mockCampaign)).thenReturn(Money.of(1000));
+
+            Money actual = getOverheadTotal(List.of(person), mockCampaign, false);
+
+            assertEquals(Money.zero(), actual);
+        }
+
+        @Test
+        void testGetOverheadTotal_fivePercentOfTheoreticalPayroll() {
+            Person person = mock(Person.class);
+            when(person.getPrimaryRole()).thenReturn(MEKWARRIOR);
+            when(person.getSalary(mockCampaign)).thenReturn(Money.of(1000));
+
+            Money actual = getOverheadTotal(List.of(person), mockCampaign, true);
+
+            assertEquals(Money.of(50), actual);
+        }
+    }
+
+    /**
+     * tests {@link Accountant#getFoodAndHousingTotal(java.util.Collection, boolean, boolean, double)}
+     */
+    @Nested
+    class TestGetFoodAndHousingTotal {
+        Campaign mockCampaign;
+
+        @BeforeEach
+        void beforeEach() {
+            mockCampaign = mock(Campaign.class);
+            when(mockCampaign.getFaction()).thenReturn(new Faction());
+        }
+
+        @Test
+        void testGetFoodAndHousingTotal_bothDisabledIsZero() {
+            Money actual = getFoodAndHousingTotal(List.of(), false, false, 1.0);
+
+            assertEquals(Money.zero(), actual);
+        }
+
+        @Test
+        void testGetFoodAndHousingTotal_officerFoodAndHousing() {
+            Person officer = new Person(mockCampaign);
+            officer.setPrimaryRoleDirect(MEKWARRIOR);
+            officer.setRank(RWO_MIN + 1);
+
+            Money actual = getFoodAndHousingTotal(List.of(officer, officer, officer), true, true, 1.0);
+
+            int expected = (FOOD_OFFICER + HOUSING_OFFICER) * 3;
+            assertEquals(Money.of(expected), actual);
+        }
+
+        @Test
+        void testGetFoodAndHousingTotal_appliesBarrackCostMultiplier() {
+            Person officer = new Person(mockCampaign);
+            officer.setPrimaryRoleDirect(MEKWARRIOR);
+            officer.setRank(RWO_MIN + 1);
+
+            Money actual = getFoodAndHousingTotal(List.of(officer), true, true, 2.0);
+
+            int expected = (FOOD_OFFICER + HOUSING_OFFICER) * 2;
+            assertEquals(Money.of(expected), actual);
+        }
+    }
+
+    /**
+     * tests {@link Accountant#isNonDropShipLargeVessel(Unit)}
+     */
+    @Nested
+    class TestIsNonDropShipLargeVessel {
+        @Test
+        void testIsNonDropShipLargeVessel_nullUnitIsFalse() {
+            assertFalse(Accountant.isNonDropShipLargeVessel(null));
+        }
+
+        @Test
+        void testIsNonDropShipLargeVessel_largeCraftNonDropShipIsTrue() {
+            Unit unit = new Unit();
+            Entity mockEntity = mock(Entity.class);
+            when(mockEntity.isLargeCraft()).thenReturn(true);
+            when(mockEntity.isDropShip()).thenReturn(false);
+            unit.setEntity(mockEntity);
+
+            assertTrue(Accountant.isNonDropShipLargeVessel(unit));
+        }
+
+        @Test
+        void testIsNonDropShipLargeVessel_dropShipIsFalse() {
+            Unit unit = new Unit();
+            Entity mockEntity = mock(Entity.class);
+            when(mockEntity.isLargeCraft()).thenReturn(true);
+            when(mockEntity.isDropShip()).thenReturn(true);
+            unit.setEntity(mockEntity);
+
+            assertFalse(Accountant.isNonDropShipLargeVessel(unit));
+        }
+
+        @Test
+        void testIsNonDropShipLargeVessel_notLargeCraftIsFalse() {
+            Unit unit = new Unit();
+            Entity mockEntity = mock(Entity.class);
+            when(mockEntity.isLargeCraft()).thenReturn(false);
+            unit.setEntity(mockEntity);
+
+            assertFalse(Accountant.isNonDropShipLargeVessel(unit));
+        }
+    }
+
+    /**
+     * tests
+     * {@link Accountant#getForceValue(java.util.Collection, Hangar, Faction, CampaignOptions, boolean, boolean, double,
+     * double, double, boolean)}
+     */
+    @Nested
+    class TestGetForceValueStatic {
+        Hangar mockHangar;
+        CampaignOptions campaignOptions;
+        Faction faction;
+
+        @BeforeEach
+        void beforeEach() {
+            mockHangar = mock(Hangar.class);
+            // A mock is used (rather than a real CampaignOptions) because the real setters clamp contract
+            // percentages to small real-game maximums (e.g. 5% for combat equipment), which would get in the
+            // way of asserting simple round-number totals here.
+            campaignOptions = mock(CampaignOptions.class);
+            when(campaignOptions.getEquipmentContractPercent()).thenReturn(100.0);
+            faction = new Faction();
+        }
+
+        @Test
+        void testGetForceValue_sumsRegularUnitAtEquipmentContractPercent() {
+            UUID unitId = UUID.randomUUID();
+            Unit unit = mock(Unit.class);
+            Entity entity = mock(Entity.class);
+            when(unit.getEntity()).thenReturn(entity);
+            when(unit.getBuyCost()).thenReturn(Money.of(1000));
+            when(unit.isConventionalInfantry()).thenReturn(false);
+            when(mockHangar.getUnit(unitId)).thenReturn(unit);
+
+            Formation formation = mock(Formation.class);
+            when(formation.getFormationType()).thenReturn(FormationType.STANDARD);
+            when(formation.getCombatRoleInMemory()).thenReturn(CombatRole.MANEUVER);
+            when(formation.getUnits()).thenReturn(new Vector<>(List.of(unitId)));
+
+            Money actual = getForceValue(List.of(formation), mockHangar, faction, campaignOptions, false, false, 10,
+                  10, 10, false);
+
+            assertEquals(Money.of(1000), actual);
+        }
+
+        @Test
+        void testGetForceValue_excludesNonStandardFormations() {
+            Formation formation = mock(Formation.class);
+            when(formation.getFormationType()).thenReturn(FormationType.SUPPORT);
+
+            Money actual = getForceValue(List.of(formation), mockHangar, faction, campaignOptions, false, false, 10,
+                  10, 10, false);
+
+            assertEquals(Money.zero(), actual);
+        }
+
+        @Test
+        void testGetForceValue_excludesInfantryWhenRequested() {
+            UUID unitId = UUID.randomUUID();
+            Unit unit = mock(Unit.class);
+            Entity entity = mock(Entity.class);
+            when(unit.getEntity()).thenReturn(entity);
+            when(unit.isConventionalInfantry()).thenReturn(true);
+            when(mockHangar.getUnit(unitId)).thenReturn(unit);
+
+            Formation formation = mock(Formation.class);
+            when(formation.getFormationType()).thenReturn(FormationType.STANDARD);
+            when(formation.getCombatRoleInMemory()).thenReturn(CombatRole.MANEUVER);
+            when(formation.getUnits()).thenReturn(new Vector<>(List.of(unitId)));
+
+            Money actual = getForceValue(List.of(formation), mockHangar, faction, campaignOptions, false, true, 10,
+                  10, 10, false);
+
+            assertEquals(Money.zero(), actual);
+        }
+
+        @Test
+        void testGetForceValue_emptyFormationsIsZero() {
+            Money actual = getForceValue(List.of(), mockHangar, faction, campaignOptions, false, false, 10, 10, 10,
+                  false);
+
+            assertEquals(Money.zero(), actual);
+        }
+    }
+
+    /**
+     * tests {@link Accountant#getTotalEquipmentValue(java.util.Collection, Warehouse)}
+     */
+    @Nested
+    class TestGetTotalEquipmentValueStatic {
+        @Test
+        void testGetTotalEquipmentValue_sumsUnitSellValueAndSpareParts() {
+            Unit unit = mock(Unit.class);
+            when(unit.getSellValue()).thenReturn(Money.of(1000));
+
+            Part part = mock(Part.class);
+            when(part.getActualValue()).thenReturn(Money.of(200));
+
+            Warehouse warehouse = mock(Warehouse.class);
+            when(warehouse.streamSpareParts()).thenReturn(Stream.of(part));
+
+            Money actual = getTotalEquipmentValue(List.of(unit), warehouse);
+
+            assertEquals(Money.of(1200), actual);
+        }
+
+        @Test
+        void testGetTotalEquipmentValue_noUnitsOrPartsIsZero() {
+            Warehouse warehouse = mock(Warehouse.class);
+            when(warehouse.streamSpareParts()).thenReturn(Stream.empty());
+
+            Money actual = getTotalEquipmentValue(List.of(), warehouse);
+
+            assertEquals(Money.zero(), actual);
+        }
+    }
+
+    /**
+     * tests {@link Accountant#getEquipmentContractValue(CampaignOptions, Unit, boolean)}
+     */
+    @Nested
+    class TestGetEquipmentContractValueStatic {
+        CampaignOptions campaignOptions;
+
+        @BeforeEach
+        void beforeEach() {
+            // A mock is used (rather than a real CampaignOptions) because the real setters clamp contract
+            // percentages to small real-game maximums (e.g. 5% for combat equipment, 1% for DropShips), which
+            // would get in the way of asserting simple round-number totals here.
+            campaignOptions = mock(CampaignOptions.class);
+        }
+
+        @Test
+        void testGetEquipmentContractValue_regularUnitUsesEquipmentContractPercent() {
+            when(campaignOptions.getEquipmentContractPercent()).thenReturn(50.0);
+
+            Unit unit = mock(Unit.class);
+            Entity entity = mock(Entity.class);
+            when(unit.getEntity()).thenReturn(entity);
+            when(unit.getBuyCost()).thenReturn(Money.of(1000));
+
+            Money actual = getEquipmentContractValue(campaignOptions, unit, false);
+
+            assertEquals(Money.of(500), actual);
+        }
+
+        @Test
+        void testGetEquipmentContractValue_dropShipUsesDropShipContractPercent() {
+            when(campaignOptions.getDropShipContractPercent()).thenReturn(20.0);
+
+            Unit unit = mock(Unit.class);
+            Entity entity = mock(Entity.class);
+            when(entity.hasETypeFlag(Entity.ETYPE_DROPSHIP)).thenReturn(true);
+            when(unit.getEntity()).thenReturn(entity);
+            when(unit.getBuyCost()).thenReturn(Money.of(1000));
+
+            Money actual = getEquipmentContractValue(campaignOptions, unit, false);
+
+            assertEquals(Money.of(200), actual);
+        }
+
+        @Test
+        void testGetEquipmentContractValue_useSaleValueUsesSellValue() {
+            when(campaignOptions.getEquipmentContractPercent()).thenReturn(100.0);
+
+            Unit unit = mock(Unit.class);
+            Entity entity = mock(Entity.class);
+            when(unit.getEntity()).thenReturn(entity);
+            when(unit.getSellValue()).thenReturn(Money.of(750));
+
+            Money actual = getEquipmentContractValue(campaignOptions, unit, true);
+
+            assertEquals(Money.of(750), actual);
+        }
+    }
+
+    /**
+     * tests {@link Accountant#getContractBase(Campaign)}
+     */
+    @Nested
+    class TestGetContractBaseStatic {
+        Campaign mockCampaign;
+        CampaignOptions campaignOptions;
+
+        @BeforeEach
+        void beforeEach() {
+            mockCampaign = mock(Campaign.class);
+            campaignOptions = new CampaignOptions();
+            when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
+        }
+
+        @Test
+        void testGetContractBase_defaultFallsBackToTheoreticalPayroll() {
+            Person person = mock(Person.class);
+            when(person.getPrimaryRole()).thenReturn(MEKWARRIOR);
+            when(person.getSalary(mockCampaign)).thenReturn(Money.of(1000));
+            when(mockCampaign.getSalaryEligiblePersonnel()).thenReturn(List.of(person));
+
+            Money actual = getContractBase(mockCampaign);
+
+            assertEquals(Money.of(1000), actual);
+        }
+
+        @Test
+        void testGetContractBase_equipmentContractBaseUsesForceValue() {
+            campaignOptions.setEquipmentContractBase(true);
+            // Left at its real default (5%) rather than set explicitly - CampaignOptions clamps
+            // setEquipmentContractPercent() to MAXIMUM_COMBAT_EQUIPMENT_PERCENT (5.0), so the expected total below
+            // is computed against that real-game cap rather than an artificial round number.
+
+            UUID unitId = UUID.randomUUID();
+            Unit unit = mock(Unit.class);
+            Entity entity = mock(Entity.class);
+            when(unit.getEntity()).thenReturn(entity);
+            when(unit.getBuyCost()).thenReturn(Money.of(2000));
+            when(unit.isConventionalInfantry()).thenReturn(false);
+
+            Hangar mockHangar = mock(Hangar.class);
+            when(mockHangar.getUnit(unitId)).thenReturn(unit);
+            when(mockCampaign.getHangar()).thenReturn(mockHangar);
+
+            Formation formation = mock(Formation.class);
+            when(formation.getFormationType()).thenReturn(FormationType.STANDARD);
+            when(formation.getCombatRoleInMemory()).thenReturn(CombatRole.MANEUVER);
+            when(formation.getUnits()).thenReturn(new Vector<>(List.of(unitId)));
+            when(mockCampaign.getAllFormations()).thenReturn(List.of(formation));
+
+            Faction faction = new Faction();
+            when(mockCampaign.getFaction()).thenReturn(faction);
+
+            Money actual = getContractBase(mockCampaign);
+
+            assertEquals(Money.of(100), actual);
+        }
+    }
+
+    /**
+     * tests {@link Accountant#getPayRollSummary(java.util.Collection, Campaign)}
+     */
+    @Nested
+    class TestGetPayRollSummaryStatic {
+        Campaign mockCampaign;
+
+        @BeforeEach
+        void beforeEach() {
+            mockCampaign = mock(Campaign.class);
+            when(mockCampaign.getCampaignOptions()).thenReturn(new CampaignOptions());
+        }
+
+        @Test
+        void testGetPayRollSummary_mapsEachPersonToTheirSalary() {
+            Person person = mock(Person.class);
+            when(person.getSalary(mockCampaign)).thenReturn(Money.of(300));
+
+            Map<Person, Money> actual = getPayRollSummary(List.of(person), mockCampaign);
+
+            assertEquals(2, actual.size());
+            assertTrue(actual.containsKey(person));
+            assertEquals(Money.of(300), actual.get(person));
+            assertTrue(actual.containsKey(null));
+            assertEquals(Money.zero(), actual.get(null));
+        }
+
+        @Test
+        void testGetPayRollSummary_emptyPersonnelStillHasPoolKey() {
+            Map<Person, Money> actual = getPayRollSummary(List.of(), mockCampaign);
+
+            assertEquals(1, actual.size());
+            assertTrue(actual.containsKey(null));
+            assertEquals(Money.zero(), actual.get(null));
         }
     }
 }

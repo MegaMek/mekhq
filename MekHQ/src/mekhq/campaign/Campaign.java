@@ -2068,7 +2068,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all hangars across all locations associated with this campaign.
-     *                                           TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     *                                                 TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
      */
     public Hangar getAllHangar() {
         return units;
@@ -2716,7 +2716,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all warehouses across all locations associated with this campaign.
-     *                                           TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
+     *                                                 TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
      */
     public Warehouse getAllWarehouse() {
         return parts;
@@ -3529,8 +3529,8 @@ public class Campaign implements ITechManager, IPlace {
      *
      * @param acquisition The <code> IAcquisitionWork</code> being acquired.
      * @param person      The <code>Person</code> object attempting to do the acquiring
-     * @param system      The <code>PlanetarySystem</code> object where the acquisition is being attempted. This may
-     *                    be null if the user is not using planetary acquisition.
+     * @param system      The <code>PlanetarySystem</code> object where the acquisition is being attempted. This may be
+     *                    null if the user is not using planetary acquisition.
      *
      * @return The result of the rolls.
      */
@@ -3563,12 +3563,12 @@ public class Campaign implements ITechManager, IPlace {
 
             String reportType = result.isSuccess() ? "acquisition.success" : "acquisition.failure";
             String highlightColor = result.isSuccess() ? ReportingUtilities.getPositiveColor() :
-                                 ReportingUtilities.getNegativeColor();
+                                          ReportingUtilities.getNegativeColor();
 
             addReport(ACQUISITIONS, getFormattedTextAt(ACTION_CHECK_BUNDLE, reportType,
                   highlightColor, person.getFullName(), acquisition.getAcquisitionName(),
                   system.getPrintableName(getLocalDate()), skillCheck.getTargetNumber().getValue(),
-                  techBonus,  industryBonus, outputsBonus));
+                  techBonus, industryBonus, outputsBonus));
         }
         return result.isSuccess() ? PartAcquisitionResult.Success : PartAcquisitionResult.PlanetSpecificFailure;
     }
@@ -3658,7 +3658,9 @@ public class Campaign implements ITechManager, IPlace {
 
         ActionCheckResult skillCheckResult = skillCheck.resolve(useEdge, null);
         if (skillCheckResult.hasUsedEdge()) {
-            report += " and <b>fails!</b> but uses Edge to reroll...getting a " + skillCheckResult.getRollResult() + ": ";
+            report += " and <b>fails!</b> but uses Edge to reroll...getting a " +
+                            skillCheckResult.getRollResult() +
+                            ": ";
         } else {
             report += " and rolls " + skillCheckResult.getRollResult() + ':';
         }
@@ -6913,6 +6915,10 @@ public class Campaign implements ITechManager, IPlace {
 
     public int getTemporaryMedicPool() {
         return humanResources.getTemporaryMedicPool();
+    }
+
+    public Map<PersonnelRole, Integer> getTempCrewMap() {
+        return humanResources.getTempPersonnelRoleMap();
     }
 
     /**
