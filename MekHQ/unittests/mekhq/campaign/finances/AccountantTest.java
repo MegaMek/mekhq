@@ -801,7 +801,7 @@ public class AccountantTest {
         when(mockCampaign.getFactionStandings()).thenReturn(factionStandings);
 
         Person officer = new Person(mockCampaign);
-        officer.setPrimaryRole(mockCampaign, MEKWARRIOR);
+        officer.setPrimaryRoleDirect(MEKWARRIOR);
         officer.setRank(RWO_MIN + 1);
         when(mockCampaign.getAllPersonnel()).thenReturn(List.of(officer));
 
@@ -847,7 +847,7 @@ public class AccountantTest {
         when(mockCampaign.getFactionStandings()).thenReturn(factionStandings);
 
         Person officer = new Person(mockCampaign);
-        officer.setPrimaryRole(mockCampaign, MEKWARRIOR);
+        officer.setPrimaryRoleDirect(MEKWARRIOR);
         officer.setRank(RWO_MIN + 1);
         when(mockCampaign.getAllPersonnel()).thenReturn(List.of(officer));
 
@@ -1145,8 +1145,9 @@ public class AccountantTest {
     }
 
     /**
-     * tests {@link Accountant#getPeacetimeOperatingCosts(java.util.Collection, Hangar, CampaignOptions, boolean,
-     * LocalDate, int, int, java.util.Map, boolean)}
+     * tests
+     * {@link Accountant#getPeacetimeOperatingCosts(java.util.Collection, Hangar, CampaignOptions, boolean, LocalDate,
+     * int, int, java.util.Map, boolean)}
      */
     @Nested
     class TestGetPeacetimeOperatingCosts {
@@ -1301,8 +1302,8 @@ public class AccountantTest {
             campaignOptions.setPayForSalaries(true);
 
             double expectedTempCrewPay = campaignOptions.getRoleBaseSalaries()[PersonnelRole.ASTECH.ordinal()]
-                                                .getAmount()
-                                                .doubleValue() * 5;
+                                               .getAmount()
+                                               .doubleValue() * 5;
 
             Money actual = getPeacetimeOperatingCosts(List.of(), mockHangar, campaignOptions, false, TODAY, 5, 0,
                   Map.of(), true);
@@ -1331,9 +1332,9 @@ public class AccountantTest {
      * These tests confirm that, for a campaign where every hangar unit is assigned somewhere in the TO&E and every
      * salary-eligible person crews one of those units (i.e. the common case today), routing
      * {@link Accountant#getPeacetimeCost(boolean)} through the new formation-based
-     * {@link Accountant#getPeacetimeOperatingCosts(java.util.Collection, Hangar, CampaignOptions, boolean,
-     * LocalDate, int, int, java.util.Map, boolean)} produces the exact same total that the old whole-campaign
-     * calculation used to produce.
+     * {@link Accountant#getPeacetimeOperatingCosts(java.util.Collection, Hangar, CampaignOptions, boolean, LocalDate,
+     * int, int, java.util.Map, boolean)} produces the exact same total that the old whole-campaign calculation used to
+     * produce.
      */
     @Nested
     class TestPeacetimeCostMatchesLegacyBehavior {
@@ -1497,7 +1498,8 @@ public class AccountantTest {
     }
 
     /**
-     * tests {@link Accountant#getPayRollTotal(java.util.Collection, CampaignOptions, boolean, LocalDate, int, int,
+     * tests
+     * {@link Accountant#getPayRollTotal(java.util.Collection, CampaignOptions, boolean, LocalDate, int, int,
      * java.util.Map, boolean, boolean)}
      */
     @Nested
@@ -1621,7 +1623,8 @@ public class AccountantTest {
     }
 
     /**
-     * tests {@link Accountant#getOverheadTotal(java.util.Collection, CampaignOptions, boolean, LocalDate, int, int,
+     * tests
+     * {@link Accountant#getOverheadTotal(java.util.Collection, CampaignOptions, boolean, LocalDate, int, int,
      * java.util.Map, boolean)}
      */
     @Nested
@@ -2089,7 +2092,8 @@ public class AccountantTest {
     }
 
     /**
-     * tests {@link Accountant#getContractBase(CampaignOptions, Faction, LocalDate, Hangar, java.util.List, int, int,
+     * tests
+     * {@link Accountant#getContractBase(CampaignOptions, Faction, LocalDate, Hangar, java.util.List, int, int,
      * java.util.Map, java.util.List)}
      */
     @Nested
@@ -2244,7 +2248,7 @@ public class AccountantTest {
             when(formation.getSubFormations()).thenReturn(new Vector<>());
 
             Money expectedPeacetimeCost = getSparePartsTotal(List.of(unit)).plus(getFuelTotal(List.of(unit)))
-                                                 .plus(getAmmoTotal(List.of(unit)));
+                                                .plus(getAmmoTotal(List.of(unit)));
             Money expectedForceValue = getEquipmentContractValue(campaignOptions, unit, false);
             Money expected = expectedPeacetimeCost.multipliedBy(0.75).plus(expectedForceValue);
 
@@ -2256,7 +2260,8 @@ public class AccountantTest {
     }
 
     /**
-     * tests {@link Accountant#getPayRollSummary(java.util.Collection, CampaignOptions, boolean, LocalDate, int, int,
+     * tests
+     * {@link Accountant#getPayRollSummary(java.util.Collection, CampaignOptions, boolean, LocalDate, int, int,
      * java.util.Map)}
      */
     @Nested
@@ -2297,8 +2302,8 @@ public class AccountantTest {
     /**
      * These tests confirm that the thin instance-method wrappers correctly extract values from the wrapped
      * {@link Campaign} (formations, hangar, campaign options, salary-eligible personnel, etc.) and forward them to
-     * their static counterparts, since those counterparts are otherwise only ever exercised directly with
-     * hand-built inputs.
+     * their static counterparts, since those counterparts are otherwise only ever exercised directly with hand-built
+     * inputs.
      */
     @Nested
     class TestInstanceMethodDelegation {

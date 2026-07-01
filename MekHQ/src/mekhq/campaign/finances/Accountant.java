@@ -128,9 +128,15 @@ public record Accountant(Campaign campaign) {
     /**
      * Static version of {@link #getPayRoll(boolean)}.
      *
-     * @param personnel      the personnel to total salaries for
-     * @param payForSalaries if {@code false}, this method returns zero regardless of the other parameters
-     * @param noInfantry     if {@code true}, personnel whose primary role is soldier are excluded
+     * @param personnel               the personnel to total salaries for
+     * @param campaignOptions         the campaign options used to resolve salaries and temporary crew pay
+     * @param isClanCampaign          whether the campaign is a Clan campaign, used to resolve each person's salary
+     * @param today                   the current campaign date, used to resolve each person's salary
+     * @param temporaryAsTechPoolSize the size of the campaign's temporary astech pool
+     * @param temporaryMedicPool      the size of the campaign's temporary medic pool
+     * @param tempCrewMap             the campaign's other temporary crew roles, mapped to their pool sizes
+     * @param noInfantry              if {@code true}, personnel whose primary role is soldier are excluded
+     * @param payForSalaries          if {@code false}, this method returns zero regardless of the other parameters
      *
      * @return the total {@link Money} value of the payroll, or zero if salaries are not paid
      */
@@ -154,8 +160,11 @@ public record Accountant(Campaign campaign) {
     /**
      * Calculates the total salary owed to the given personnel.
      *
-     * @param personnel  the personnel to total salaries for
-     * @param noInfantry if {@code true}, personnel whose primary role is soldier are excluded
+     * @param personnel       the personnel to total salaries for
+     * @param campaignOptions the campaign options used to resolve each person's salary
+     * @param isClanCampaign  whether the campaign is a Clan campaign, used to resolve each person's salary
+     * @param today           the current campaign date, used to resolve each person's salary
+     * @param noInfantry      if {@code true}, personnel whose primary role is soldier are excluded
      *
      * @return the total {@link Money} owed in salaries
      */
@@ -175,8 +184,14 @@ public record Accountant(Campaign campaign) {
      * Calculates the sum of all given personnel's salaries plus temporary crew pay, regardless of whether the campaign
      * is configured to actually pay salaries.
      *
-     * @param personnel  the personnel to total salaries for
-     * @param noInfantry if {@code true}, personnel whose primary role is soldier are excluded
+     * @param personnel               the personnel to total salaries for
+     * @param campaignOptions         the campaign options used to resolve salaries and temporary crew pay
+     * @param isClanCampaign          whether the campaign is a Clan campaign, used to resolve each person's salary
+     * @param today                   the current campaign date, used to resolve each person's salary
+     * @param temporaryAsTechPoolSize the size of the campaign's temporary astech pool
+     * @param temporaryMedicPool      the size of the campaign's temporary medic pool
+     * @param tempCrewMap             the campaign's other temporary crew roles, mapped to their pool sizes
+     * @param noInfantry              if {@code true}, personnel whose primary role is soldier are excluded
      *
      * @return the total {@link Money} value of salaries and temporary crew pay
      */
@@ -257,8 +272,14 @@ public record Accountant(Campaign campaign) {
     /**
      * Static version of {@link #getOverheadExpenses()}.
      *
-     * @param personnel      the personnel to base the theoretical payroll on
-     * @param payForOverhead if {@code false}, this method returns zero regardless of the other parameters
+     * @param personnel               the personnel to base the theoretical payroll on
+     * @param campaignOptions         the campaign options used to resolve salaries and temporary crew pay
+     * @param isClanCampaign          whether the campaign is a Clan campaign, used to resolve each person's salary
+     * @param today                   the current campaign date, used to resolve each person's salary
+     * @param temporaryAsTechPoolSize the size of the campaign's temporary astech pool
+     * @param temporaryMedicPool      the size of the campaign's temporary medic pool
+     * @param tempCrewMap             the campaign's other temporary crew roles, mapped to their pool sizes
+     * @param payForOverhead          if {@code false}, this method returns zero regardless of the other parameters
      *
      * @return the total {@link Money} value of overhead expenses, or zero if overhead is not paid for
      */
@@ -306,6 +327,18 @@ public record Accountant(Campaign campaign) {
         return getMonthlyFoodAndHousingExpenses(campaign, allPersonnel, location);
     }
 
+    /**
+     * Static version of {@link #getMonthlyFoodAndHousingExpenses()}, additionally resolving the faction-standing
+     * barrack cost multiplier (if enabled) from the given campaign rather than {@code this.campaign()}.
+     *
+     * @param campaign  the campaign, used to resolve the barrack cost multiplier (faction standings, active AtB
+     *                  contracts, and the current date)
+     * @param personnel the personnel to evaluate
+     * @param location  the location to evaluate; determines whether housing is charged at all and, together with
+     *                  the campaign, whether a faction-standing barrack cost multiplier applies
+     *
+     * @return a {@link Money} object representing the total monthly food and housing expenses
+     */
     public static Money getMonthlyFoodAndHousingExpenses(Campaign campaign, List<Person> personnel,
           AbstractLocation location) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
@@ -530,8 +563,16 @@ public record Accountant(Campaign campaign) {
      * personnel pools (astechs, medics, and other temporary crew), since those pools are not tied to any particular
      * formation.</p>
      *
-     * @param formations      the formations (and, recursively, their sub-formations) to total operating costs for
-     * @param includeSalaries whether salaries should be included in the total
+     * @param formations              the formations (and, recursively, their sub-formations) to total operating
+     *                                costs for
+     * @param hangar                  the hangar used to resolve unit ids into units
+     * @param campaignOptions         the campaign options used to resolve salaries and temporary crew pay
+     * @param isClanCampaign          whether the campaign is a Clan campaign, used to resolve each person's salary
+     * @param today                   the current campaign date, used to resolve each person's salary
+     * @param temporaryAsTechPoolSize the size of the campaign's temporary astech pool
+     * @param temporaryMedicPool      the size of the campaign's temporary medic pool
+     * @param tempCrewMap             the campaign's other temporary crew roles, mapped to their pool sizes
+     * @param includeSalaries         whether salaries should be included in the total
      *
      * @return the total {@link Money} peacetime operating cost of the given formations
      */
@@ -944,6 +985,17 @@ public record Accountant(Campaign campaign) {
     /**
      * Static version of {@link #getContractBase()}.
      *
+     * @param campaignOptions         the campaign options used to control how the base contract value is computed
+     * @param campaignFaction         the campaign's faction, used for diminishing-returns and clan-campaign
+     *                                calculations
+     * @param today                   the current campaign date, used to resolve salaries
+     * @param hangar                  the hangar used to resolve unit ids to units
+     * @param salaryEligiblePersonnel the personnel used for the theoretical-payroll fallback branch
+     * @param temporaryAsTechPoolSize the size of the campaign's temporary astech pool
+     * @param temporaryMedicPool      the size of the campaign's temporary medic pool
+     * @param tempCrewMap             the campaign's other temporary crew roles, mapped to their pool sizes
+     * @param formations              the campaign's formations, used for force-value and peacetime-cost calculations
+     *
      * @return a {@link Money} object representing the calculated base contract value, adjusted according to the
      *       campaign's configuration
      */
@@ -1047,7 +1099,13 @@ public record Accountant(Campaign campaign) {
     /**
      * Static version of {@link #getPayRollSummary()}.
      *
-     * @param personnel the personnel to total salaries for
+     * @param personnel               the personnel to total salaries for
+     * @param campaignOptions         the campaign options used to resolve salaries and temporary crew pay
+     * @param isClanCampaign          whether the campaign is a Clan campaign, used to resolve each person's salary
+     * @param today                   the current campaign date, used to resolve each person's salary
+     * @param temporaryAsTechPoolSize the size of the campaign's temporary astech pool
+     * @param temporaryMedicPool      the size of the campaign's temporary medic pool
+     * @param tempCrewMap             the campaign's other temporary crew roles, mapped to their pool sizes
      *
      * @return map of personnel to their pay, including pool as a null key
      */
@@ -1073,7 +1131,11 @@ public record Accountant(Campaign campaign) {
      * Calculates the total pay owed to the campaign's temporary personnel pools (astechs, medics, and any other
      * temporary crew roles).
      *
-     * @param noInfantry if {@code true}, temporary personnel in soldier roles are excluded
+     * @param campaignOptions         the campaign options used to look up each role's base salary
+     * @param temporaryAsTechPoolSize the size of the campaign's temporary astech pool
+     * @param temporaryMedicPool      the size of the campaign's temporary medic pool
+     * @param tempCrewMap             the campaign's other temporary crew roles, mapped to their pool sizes
+     * @param noInfantry              if {@code true}, temporary personnel in soldier roles are excluded
      *
      * @return the total pay owed to temporary personnel
      */
@@ -1092,6 +1154,15 @@ public record Accountant(Campaign campaign) {
         return tempCrewPay;
     }
 
+    /**
+     * Calculates the total pay for a single temporary-crew role, based on its base salary and pool size.
+     *
+     * @param campaignOptions   the campaign options used to look up the role's base salary
+     * @param personnelRole     the role to calculate pay for
+     * @param tempPersonnelPool the number of temporary personnel filling this role
+     *
+     * @return the total pay for the role's temporary pool
+     */
     private static double getTempCrewPay(CampaignOptions campaignOptions, PersonnelRole personnelRole,
           int tempPersonnelPool) {
         return campaignOptions
