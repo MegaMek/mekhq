@@ -937,7 +937,7 @@ public class AccountantTest {
         @EnumSource(names = { "SOLDIER", "BATTLE_ARMOUR", "VEHICLE_CREW_GROUND", "VEHICLE_CREW_VTOL",
                               "VEHICLE_CREW_NAVAL", "VESSEL_PILOT", "VESSEL_GUNNER", "VESSEL_CREW" })
         void testGetAllTempCrewPay(PersonnelRole role) {
-            when(mockCampaign.getTempCrewMap()).thenReturn(Map.of(role, CREWCOUNT));
+            when(mockCampaign.getTempCrewMapCopy()).thenReturn(Map.of(role, CREWCOUNT));
             when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
 
             Map<Person, Money> expectedMap = accountant.getPayRollSummary();

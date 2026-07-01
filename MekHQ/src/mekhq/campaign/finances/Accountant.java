@@ -105,7 +105,7 @@ public record Accountant(Campaign campaign) {
     }
 
     private Map<PersonnelRole, Integer> getTempCrewMap() {
-        return campaign().getTempCrewMap();
+        return campaign().getTempCrewMapCopy();
     }
 
 
@@ -334,8 +334,8 @@ public record Accountant(Campaign campaign) {
      * @param campaign  the campaign, used to resolve the barrack cost multiplier (faction standings, active AtB
      *                  contracts, and the current date)
      * @param personnel the personnel to evaluate
-     * @param location  the location to evaluate; determines whether housing is charged at all and, together with
-     *                  the campaign, whether a faction-standing barrack cost multiplier applies
+     * @param location  the location to evaluate; determines whether housing is charged at all and, together with the
+     *                  campaign, whether a faction-standing barrack cost multiplier applies
      *
      * @return a {@link Money} object representing the total monthly food and housing expenses
      */
@@ -563,8 +563,8 @@ public record Accountant(Campaign campaign) {
      * personnel pools (astechs, medics, and other temporary crew), since those pools are not tied to any particular
      * formation.</p>
      *
-     * @param formations              the formations (and, recursively, their sub-formations) to total operating
-     *                                costs for
+     * @param formations              the formations (and, recursively, their sub-formations) to total operating costs
+     *                                for
      * @param hangar                  the hangar used to resolve unit ids into units
      * @param campaignOptions         the campaign options used to resolve salaries and temporary crew pay
      * @param isClanCampaign          whether the campaign is a Clan campaign, used to resolve each person's salary
