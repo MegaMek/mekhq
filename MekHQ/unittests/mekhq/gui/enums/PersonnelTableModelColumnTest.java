@@ -58,10 +58,10 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationNode;
-import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.gui.model.PersonnelTableModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -121,16 +121,19 @@ public class PersonnelTableModelColumnTest {
 
     @Test
     public void testGetDefaultSortOrder() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
+        PersonnelTableModel personnelTableModel = new PersonnelTableModel(null);
+        for (PersonnelTableModelColumn personnelTableModelColumn : columns) {
             switch (personnelTableModelColumn) {
                 case RANK:
                 case FIRST_NAME:
                 case LAST_NAME:
                 case SKILL_LEVEL:
-                    assertEquals(SortOrder.DESCENDING, personnelTableModelColumn.getDefaultSortOrder());
+                    assertEquals(SortOrder.DESCENDING,
+                          personnelTableModel.getDefaultSortOrder().get(personnelTableModelColumn));
                     break;
                 default:
-                    assertNull(personnelTableModelColumn.getDefaultSortOrder());
+                    assertNull(
+                          personnelTableModel.getDefaultSortOrder().get(personnelTableModelColumn));
                     break;
             }
         }
@@ -157,12 +160,10 @@ public class PersonnelTableModelColumnTest {
         private static final LocalDate TODAY = LocalDate.of(3025, 1, 1);
         private static final String CAMPAIGN_NAME = "Test Mercs";
 
-        private PersonnelMarket market;
         private Personnel mainForce;
 
         @BeforeEach
         void setUp() {
-            market = mock(PersonnelMarket.class);
             mainForce = new Personnel();
         }
 
