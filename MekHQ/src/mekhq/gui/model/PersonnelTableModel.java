@@ -33,26 +33,39 @@
 package mekhq.gui.model;
 
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
+import static mekhq.gui.enums.PersonnelTableModelColumn.FIRST_NAME;
+import static mekhq.gui.enums.PersonnelTableModelColumn.FORCE_GRAPHICAL;
+import static mekhq.gui.enums.PersonnelTableModelColumn.LAST_NAME;
+import static mekhq.gui.enums.PersonnelTableModelColumn.PERSON_GRAPHICAL;
+import static mekhq.gui.enums.PersonnelTableModelColumn.RANK;
+import static mekhq.gui.enums.PersonnelTableModelColumn.SKILL_LEVEL;
+import static mekhq.gui.enums.PersonnelTableModelColumn.UNIT_ASSIGNMENT_GRAPHICAL;
 
 import java.awt.Component;
-import java.awt.Image;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 import javax.swing.ImageIcon;
 import javax.swing.JTable;
+import javax.swing.SortOrder;
 import javax.swing.UIManager;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableCellRenderer;
 
+import io.sentry.util.Objects;
+import megamek.client.ui.tileset.EntityImage;
 import megamek.common.annotations.Nullable;
+import megamek.common.icons.Portrait;
 import mekhq.MHQOptions;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
+import mekhq.gui.baseComponents.tables.MHQTableModel;
 import mekhq.gui.enums.PersonnelTableModelColumn;
 import mekhq.gui.utilities.ComponentColors;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
@@ -62,17 +75,24 @@ import mekhq.gui.utilities.MekHqTableCellRenderer;
  *
  * @author Jay lawson
  */
-public class PersonnelTableModel extends DataTableModel<Person> {
+public class PersonnelTableModel extends MHQTableModel<Person, PersonnelTableModelColumn> {
 
-    public static final PersonnelTableModelColumn[] PERSONNEL_COLUMNS = PersonnelTableModelColumn.values();
+    private final static Map<PersonnelTableModelColumn, SortOrder> DEFAULT_SORT_ORDER = Map.of(
+          RANK, SortOrder.DESCENDING,
+          FIRST_NAME, SortOrder.DESCENDING,
+          LAST_NAME, SortOrder.DESCENDING,
+          SKILL_LEVEL, SortOrder.DESCENDING
+    );
 
     private final Campaign campaign;
     private boolean groupByUnit;
-    private final TableCellRenderer renderer = new Renderer();
+    private final PersonnelRenderer renderer = new PersonnelRenderer();
 
     public PersonnelTableModel(Campaign c) {
+        super(Arrays.stream(PersonnelTableModelColumn.values()).toList());
         data = new ArrayList<>();
         campaign = c;
+        setDefaultSortOrder(DEFAULT_SORT_ORDER);
     }
 
     /**
@@ -94,41 +114,8 @@ public class PersonnelTableModel extends DataTableModel<Person> {
         this.groupByUnit = groupByUnit;
     }
 
-    @Override
-    public int getColumnCount() {
-        return PERSONNEL_COLUMNS.length;
-    }
-
-    @Override
-    public String getColumnName(final int column) {
-        return PERSONNEL_COLUMNS[column].toString();
-    }
-
-    @Override
-    public Class<?> getColumnClass(int column) {
-        if (PERSONNEL_COLUMNS[column] == PersonnelTableModelColumn.RANK) {
-            return Person.class;
-        }
-        return String.class;
-    }
-
     public @Nullable Person getPerson(final int row) {
-        return (row < getRowCount()) ? (Person) getData().get(row) : null;
-    }
-
-    @Override
-    public Object getValueAt(final int row, final int column) {
-        return getValueAt(getPerson(row), PERSONNEL_COLUMNS[column]);
-    }
-
-    public Object getValueAt(@Nullable Person person, PersonnelTableModelColumn column) {
-        if (getData().isEmpty()) {
-            return "";
-        } else if (person == null) {
-            return "?";
-        } else {
-            return column.getCellValue(campaign, person);
-        }
+        return getRow(row);
     }
 
     public void refreshData() {
@@ -153,42 +140,62 @@ public class PersonnelTableModel extends DataTableModel<Person> {
         }
     }
 
-    public TableCellRenderer getRenderer() {
+    @Override
+    protected Object getCellValue(Person person, PersonnelTableModelColumn column) {
+        return column.getCellValue(campaign, person);
+    }
+
+    @Override
+    protected PersonnelRenderer getRenderer() {
         return renderer;
     }
 
-    public class Renderer extends DefaultTableCellRenderer {
+    public void setHighlight(String searchText) {
+        renderer.setHighlight(searchText);
+    }
+
+    public class PersonnelRenderer extends MHQTableModel.Renderer {
+
+        private static final ComponentColors DEFAULT_COLORS =
+              new ComponentColors(UIManager.getColor("Table.foreground"), UIManager.getColor("Table.background"));
+
+        private final List<String> personalStateFlags = new ArrayList<>();
+        private final Map<Portrait, ImageIcon> portraitCache = new WeakHashMap<>();
+        private final Map<Long, ImageIcon> entityImageCache = new WeakHashMap<>();
+        private final Map<StandardFormationIcon, ImageIcon> formationIconCache = new WeakHashMap<>();
+
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-              boolean hasFocus, int row, int column) {
-            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            final int modelRow = table.convertRowIndexToModel(row);
-            final PersonnelTableModelColumn personnelColumn = PERSONNEL_COLUMNS[table.convertColumnIndexToModel(column)];
-            final Person person = getPerson(modelRow);
-
-            setOpaque(true);
-            setHorizontalAlignment(personnelColumn.getAlignment());
-
-            setText(personnelColumn.getText(value));
-
-            // Collect all applicable color reasons for tooltip
-            List<String> personalStateFlags = new ArrayList<>();
-            if (!isSelected) {
-                ComponentColors cellColors = populatePersonalStateFlags(person, personalStateFlags);
-                setForeground(cellColors.foreground());
-                setBackground(cellColors.background());
+              boolean hasFocus, int rowIndex, int columnIndex) {
+            if (table == null) {
+                return this;
             }
-            // Tool Tips - includes all applicable color reasons for name/rank/status columns
-            setToolTipText(personnelColumn.getToolTipText(person, personalStateFlags));
+            
+            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, rowIndex, columnIndex);
 
-            Image image = getImage(person, personnelColumn);
-            if (image != null) {
-                setIcon(new ImageIcon(image));
+            int modelRow = table.convertRowIndexToModel(rowIndex);
+            PersonnelTableModelColumn column = getAllColumns().get(table.convertColumnIndexToModel(columnIndex));
+            Person person = getRow(modelRow);
+
+            setIcon(getImage(person, column));
+
+            personalStateFlags.clear(); // reuse to avoid memory allocations
+            if (isSelected) {
+                setForeground(table.getSelectionForeground());
+                setBackground(table.getSelectionBackground());
             } else {
-                setIcon(null);
+                if (column == PERSON_GRAPHICAL ||
+                          column == FORCE_GRAPHICAL ||
+                          column == UNIT_ASSIGNMENT_GRAPHICAL) {
+                    MekHqTableCellRenderer.setupTigerStripes(this, table, rowIndex);
+                } else {
+                    ComponentColors cellColors = populatePersonalStateFlags(person, personalStateFlags);
+                    setForeground(cellColors.foreground());
+                    setBackground(cellColors.background());
+                }
             }
+            setToolTipText(column.getToolTipText(person, personalStateFlags));
 
-            MekHqTableCellRenderer.setupTableColors(this, table, isSelected, hasFocus, row);
             return this;
         }
 
@@ -233,26 +240,36 @@ public class PersonnelTableModel extends DataTableModel<Person> {
                 colorReasonKeys.add("colorReason.personnel.healedInjuries");
                 cellColors = (cellColors == null) ? mhqOptions.getHealedInjuriesColors() : cellColors;
             }
-            return (cellColors == null) ? new ComponentColors(UIManager.getColor("Table.foreground"),
-                  UIManager.getColor("Table.background")) : cellColors;
+            return (cellColors == null) ? DEFAULT_COLORS : cellColors;
         }
 
-        private Image getImage(Person person, PersonnelTableModelColumn personnelColumn) {
-            return switch (personnelColumn) {
-                case PERSON_GRAPHICAL -> person.getPortraitImageIconWithFallback(true, 54).getImage();
-                case UNIT_ASSIGNMENT_GRAPHICAL -> {
-                    Unit unit = person.getUnit();
-                    if ((unit == null) && !person.getTechUnits().isEmpty()) {
-                        unit = person.getTechUnits().getFirst();
-                    }
-                    yield (unit == null) ? null : unit.getImage(this);
+        private ImageIcon getImage(Person person, PersonnelTableModelColumn personnelColumn) {
+            if (personnelColumn == PERSON_GRAPHICAL) {
+                return portraitCache.computeIfAbsent(person.getPortrait(),
+                      portrait -> person.getPortraitImageIconWithFallback(true, 54));
+            } else if (personnelColumn == UNIT_ASSIGNMENT_GRAPHICAL) {
+                Unit unit = person.getUnit();
+                if ((unit == null) && !person.getTechUnits().isEmpty()) {
+                    unit = person.getTechUnits().getFirst();
                 }
-                case FORCE_GRAPHICAL -> {
-                    Formation formation = campaign.getFormationFor(person);
-                    yield  (formation == null) ? null : formation.getFormationIcon().getImage(54);
+                if (unit == null) {
+                    return null;
                 }
-                default -> null;
-            };
+                EntityImage entityImage = unit.getEntityImage();
+                long cacheKey = Objects.hash(entityImage.getBase(), entityImage.getCamouflage());
+                // key by base image and camouflage because EntityImage doesn't have an identity function
+                // since we use WeakHashMap underneath, memory leaks won't be a problem
+                return entityImageCache.computeIfAbsent(cacheKey,
+                      key -> new ImageIcon(entityImage.loadPreviewImage(true)));
+            } else if (personnelColumn == FORCE_GRAPHICAL) {
+                Formation formation = campaign.getFormationFor(person);
+                if (formation == null) {
+                    return null;
+                }
+                return formationIconCache.computeIfAbsent(formation.getFormationIcon(),
+                      formationIcon -> new ImageIcon(formationIcon.getImage(54)));
+            }
+            return null;
         }
     }
 

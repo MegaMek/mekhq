@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,29 +32,42 @@
  */
 package mekhq.gui.campaignOptions;
 
+import static megamek.client.ui.util.FontHandler.symbolIcon;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.Desktop;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
+import java.io.File;
 import java.util.ResourceBundle;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JTextField;
+import javax.swing.UIManager;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.client.ui.dialogs.buttonDialogs.AbstractButtonDialog;
-import megamek.common.annotations.Nullable;
+import megamek.client.ui.util.UIUtil;
+import megamek.logging.MMLogger;
 import mekhq.CampaignPreset;
+import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.gui.FileDialogs;
-import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
 
 /**
  * The {@code CampaignOptionsDialog} class represents a dialog window for presenting and modifying the campaign options
@@ -75,6 +88,10 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
  * </ul>
  */
 public class CampaignOptionsDialog extends AbstractButtonDialog {
+    private static final MMLogger LOGGER = MMLogger.create(CampaignOptionsDialog.class);
+
+    private static final int BUTTON_GAP = UIUtil.scaleForGUI(8);
+
     private final Campaign campaign;
     private final CampaignOptionsPane campaignOptionsPane;
     private final CampaignOptionsDialogMode mode;
@@ -92,7 +109,7 @@ public class CampaignOptionsDialog extends AbstractButtonDialog {
      * @param frame    the parent {@link JFrame} for this dialog
      * @param campaign the {@link Campaign} instance representing the current campaign
      */
-    public CampaignOptionsDialog(final JFrame frame, final Campaign campaign) {
+    public CampaignOptionsDialog(final JFrame frame, @Nonnull final Campaign campaign) {
         super(frame,
               true,
               ResourceBundle.getBundle(getCampaignOptionsResourceBundle()),
@@ -116,7 +133,7 @@ public class CampaignOptionsDialog extends AbstractButtonDialog {
      * @param preset   an optional {@link CampaignPreset} to initialize the campaign (can be null)
      * @param mode     the {@link CampaignOptionsDialogMode} defining the behavior of the dialog
      */
-    public CampaignOptionsDialog(final JFrame frame, final Campaign campaign, @Nullable CampaignPreset preset,
+    public CampaignOptionsDialog(final JFrame frame, @Nonnull final Campaign campaign, @Nullable CampaignPreset preset,
           CampaignOptionsDialogMode mode) {
         super(frame,
               true,
@@ -137,36 +154,6 @@ public class CampaignOptionsDialog extends AbstractButtonDialog {
     }
 
     /**
-     * Constructs a {@code CampaignOptionsDialog} for the specified campaign and applies the given preset if provided.
-     *
-     * <p>This constructor initializes the dialog using the {@code NORMAL} mode, providing a user interface for
-     * viewing and modifying campaign options. If a {@link CampaignPreset} is supplied (i.e., {@code preset} is not
-     * {@code null}), the options from the preset are automatically applied to the dialog upon creation. </p>
-     *
-     * @param campaign the {@link Campaign} instance whose options will be displayed and edited
-     * @param preset   an optional {@link CampaignPreset} to apply initial settings (maybe {@code null})
-     */
-    @Deprecated(since = "0.51.0", forRemoval = true)
-    public CampaignOptionsDialog(final Campaign campaign, @Nullable CampaignPreset preset) {
-        super(null,
-              false,
-              ResourceBundle.getBundle(getCampaignOptionsResourceBundle()),
-              "CampaignOptionsDialog",
-              "campaignOptions.title");
-        this.campaign = campaign;
-        this.campaignOptionsPane = new CampaignOptionsPane(null, campaign, CampaignOptionsDialogMode.NORMAL);
-        this.mode = CampaignOptionsDialogMode.NORMAL;
-        initialize();
-
-        if (preset != null) {
-            applyPreset(preset, false);
-        }
-
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-    }
-
-    /**
      * Indicates whether the dialog was canceled by the user.
      *
      * @return {@code true} if the user canceled the dialog, {@code false} otherwise
@@ -181,7 +168,7 @@ public class CampaignOptionsDialog extends AbstractButtonDialog {
      * @return a {@link Container} representing the center pane of the dialog
      */
     @Override
-    protected Container createCenterPane() {
+    protected @Nonnull Container createCenterPane() {
         return campaignOptionsPane;
     }
 
@@ -192,32 +179,96 @@ public class CampaignOptionsDialog extends AbstractButtonDialog {
      * @return a {@link JPanel} representing the button panel
      */
     @Override
-    protected JPanel createButtonPanel() {
-        final JPanel pnlButtons = new JPanel(new GridLayout(1, 0));
+    protected @Nonnull JPanel createButtonPanel() {
+        final JPanel actionButtons = new JPanel(new FlowLayout(FlowLayout.CENTER, BUTTON_GAP, BUTTON_GAP));
 
-        // Apply Settings
-        JButton btnApplySettings = new CampaignOptionsButton("ApplySettings");
-        btnApplySettings.addActionListener(evt -> processApplyAction());
-        pnlButtons.add(btnApplySettings);
+        // Apply Settings: emphasized as the primary action using FlatLaf's accent/default-button colors. This is a
+        // visual cue only (not the root-pane default button), so Enter cannot accidentally close this field-heavy
+        // dialog while editing.
+        JButton applyButton = createDialogButton("ApplySettings", this::processApplyAction);
+        applyButton.putClientProperty("FlatLaf.style",
+              "background: $Button.default.background; foreground: $Button.default.foreground");
+        actionButtons.add(applyButton);
 
         // Save Preset
         if (mode != CampaignOptionsDialogMode.CAMPAIGN_UPGRADE && mode != CampaignOptionsDialogMode.STARTUP_ABRIDGED) {
-            JButton btnSavePreset = new CampaignOptionsButton("SavePreset");
-            btnSavePreset.addActionListener(evt -> btnSaveActionPerformed());
-            pnlButtons.add(btnSavePreset);
+            actionButtons.add(createDialogButton("SavePreset", this::btnSaveActionPerformed));
         }
 
         // Load Preset
-        JButton btnLoadPreset = new CampaignOptionsButton("LoadPreset");
-        btnLoadPreset.addActionListener(evt -> btnLoadActionPerformed());
-        pnlButtons.add(btnLoadPreset);
+        actionButtons.add(createDialogButton("LoadPreset", this::btnLoadActionPerformed));
 
         // Cancel
-        JButton btnCancel = new CampaignOptionsButton("Cancel");
-        btnCancel.addActionListener(evt -> dispose());
-        pnlButtons.add(btnCancel);
+        actionButtons.add(createDialogButton("Cancel", this::dispose));
+
+        // Icons legend: kept apart on the left so it reads as a reference aid rather than a dialog action. Its popup
+        // opens upward over the help/content area instead of past the bottom of the dialog.
+        JButton legendButton = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "lblIconsLegend.text"));
+        legendButton.setName("btnIconsLegend");
+        legendButton.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(), "lblIconsLegend.tooltip"));
+        legendButton.setIcon(symbolIcon(0xE88E, legendButton.getFont().getSize(), legendButton.getForeground()));
+        legendButton.addActionListener(evt -> showIconLegend(legendButton));
+        JPanel legendPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, BUTTON_GAP, BUTTON_GAP));
+        legendPanel.add(legendButton);
+
+        // Mirror the legend's width on the right so the action buttons are centered on the whole footer; a plain
+        // WEST + CENTER layout would center them only in the space to the right of the legend.
+        JPanel rightSpacer = new JPanel();
+        rightSpacer.setOpaque(false);
+        rightSpacer.setPreferredSize(new Dimension(legendPanel.getPreferredSize().width, 0));
+
+        final JPanel pnlButtons = new JPanel(new BorderLayout());
+        pnlButtons.add(legendPanel, BorderLayout.WEST);
+        pnlButtons.add(actionButtons, BorderLayout.CENTER);
+        pnlButtons.add(rightSpacer, BorderLayout.EAST);
 
         return pnlButtons;
+    }
+
+    /**
+     * Shows the icon legend popup anchored above the given button, overlaying the content/help area. The legend
+     * explains the badge glyphs (custom-system, important, recommended, documented, and recently-added markers) used
+     * on option labels and section titles throughout the dialog.
+     *
+     * @param anchor the footer button the popup opens above
+     */
+    private void showIconLegend(JButton anchor) {
+        CampaignOptionsIconLegend legend = new CampaignOptionsIconLegend();
+        legend.setBorder(BorderFactory.createEmptyBorder(UIUtil.scaleForGUI(8),
+              UIUtil.scaleForGUI(8),
+              UIUtil.scaleForGUI(8),
+              UIUtil.scaleForGUI(8)));
+
+        JPopupMenu legendPopup = new JPopupMenu();
+        legendPopup.setName("campaignOptionsLegendPopup");
+        legendPopup.setLayout(new BorderLayout());
+        legendPopup.add(legend, BorderLayout.CENTER);
+
+        Dimension popupSize = legendPopup.getPreferredSize();
+        // The button is in the footer, so open the popup above it (negative y) to overlay the content above.
+        legendPopup.show(anchor, 0, -popupSize.height);
+    }
+
+    /**
+     * Creates a standard FlatLaf-styled dialog button whose text and tooltip are sourced from the campaign options
+     * resource bundle (keys {@code "lbl" + name + ".text"} and {@code "lbl" + name + ".tooltip"}).
+     *
+     * @param name   the resource name used to look up the button's text, tooltip, and internal name
+     * @param action the action to run when the button is pressed
+     *
+     * @return the configured button
+     */
+    private static JButton createDialogButton(String name, Runnable action) {
+        JButton button = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".text"));
+        button.setName("btn" + name);
+
+        String tooltipText = getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + ".tooltip");
+        if (!tooltipText.isEmpty()) {
+            button.setToolTipText(tooltipText);
+        }
+
+        button.addActionListener(evt -> action.run());
+        return button;
     }
 
     /**
@@ -248,24 +299,129 @@ public class CampaignOptionsDialog extends AbstractButtonDialog {
     }
 
     /**
-     * Handles the "Save Preset" button action. Opens a dialog to create a new preset and save the campaign
-     * configuration to a file if confirmed.
+     * Handles the "Save Preset" button action. Opens the preset builder dialog and, when confirmed, saves the preset
+     * to the user campaign-preset directory.
+     *
+     * <p>If saving would overwrite an existing preset and the user declines, the builder is re-opened seeded with the
+     * just-entered selections so the user can adjust the name (or anything else) without recreating the preset from
+     * scratch.</p>
      */
     private void btnSaveActionPerformed() {
-        final CreateCampaignPreset createCampaignPresetDialog = new CreateCampaignPreset(null, campaign, null);
+        CampaignPreset preset = null;
 
-        if (!createCampaignPresetDialog.showDialog().isConfirmed()) {
+        while (true) {
+            final CreateCampaignPreset createCampaignPresetDialog = new CreateCampaignPreset(null, campaign, preset);
+
+            if (!createCampaignPresetDialog.showDialog().isConfirmed()) {
+                return;
+            }
+
+            preset = createCampaignPresetDialog.getPreset();
+            if (preset == null) {
+                return;
+            }
+
+            final File presetFile = resolveUserPresetFile(preset);
+            if (presetFile.exists() && !confirmPresetOverwrite(preset)) {
+                // The user declined to overwrite: loop to re-open the builder seeded with their selections.
+                continue;
+            }
+
+            campaignOptionsPane.applyCampaignOptionsToCampaign(preset, mode, true);
+            preset.writeToFile(getFrame(), presetFile);
+            showSavePresetSuccessDialog(preset, presetFile.getParentFile(), presetFile);
             return;
         }
+    }
 
-        final CampaignPreset preset = createCampaignPresetDialog.getPreset();
-        if (preset == null) {
-            return;
+    /**
+     * Resolves the destination file for the given preset within the user campaign-preset directory (the folder the
+     * "Load Preset" picker scans), creating the directory if it does not yet exist. The preset title is sanitized into
+     * a valid file name.
+     *
+     * @param preset the preset to resolve a file for
+     *
+     * @return the file the preset should be written to
+     */
+    private File resolveUserPresetFile(final CampaignPreset preset) {
+        final File presetDirectory = new File(MHQConstants.USER_CAMPAIGN_PRESET_DIRECTORY);
+        if (!presetDirectory.exists() && !presetDirectory.mkdirs()) {
+            LOGGER.error("Failed to create campaign preset directory: {}", presetDirectory);
         }
 
-        campaignOptionsPane.applyCampaignOptionsToCampaign(preset, mode, true);
+        String fileName = preset.toString().replaceAll("[^A-Za-z0-9 ._-]", "_").trim();
+        if (fileName.isBlank()) {
+            fileName = "Campaign Preset";
+        }
+        return new File(presetDirectory, fileName + " Preset.xml");
+    }
 
-        preset.writeToFile(null, FileDialogs.saveCampaignPreset(null, preset).orElse(null));
+    /**
+     * Asks the user to confirm overwriting an existing preset file of the same name.
+     *
+     * @param preset the preset being saved
+     *
+     * @return {@code true} if the user chose to overwrite the existing file
+     */
+    private boolean confirmPresetOverwrite(final CampaignPreset preset) {
+        final int choice = JOptionPane.showConfirmDialog(getFrame(),
+              getFormattedTextAt(getCampaignOptionsResourceBundle(), "savePresetOverwrite.text", preset.toString()),
+              getTextAt(getCampaignOptionsResourceBundle(), "savePresetOverwrite.title"),
+              JOptionPane.YES_NO_OPTION,
+              JOptionPane.WARNING_MESSAGE);
+        return choice == JOptionPane.YES_OPTION;
+    }
+
+    /**
+     * Shows a confirmation that the preset was saved, including a selectable field with the full file path so the user
+     * can copy it. When desktop integration supports it, an inline folder button beside the path opens the preset
+     * directory in the system file manager without closing this dialog.
+     *
+     * @param preset          the preset that was saved
+     * @param presetDirectory the directory the preset was saved into
+     * @param presetFile      the file the preset was saved to
+     */
+    private void showSavePresetSuccessDialog(final CampaignPreset preset, final File presetDirectory,
+          final File presetFile) {
+        final String bundle = getCampaignOptionsResourceBundle();
+
+        final JTextField pathField = new JTextField(presetFile.getAbsolutePath());
+        pathField.setEditable(false);
+        pathField.setCaretPosition(0);
+        pathField.setColumns(Math.min(pathField.getText().length() + 1, 50));
+
+        final JPanel pathPanel = new JPanel(new BorderLayout(BUTTON_GAP, 0));
+        pathPanel.add(pathField, BorderLayout.CENTER);
+
+        if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.OPEN)) {
+            final JButton openFolderButton = new JButton();
+            final Icon folderIcon = UIManager.getIcon("FileView.directoryIcon");
+            if (folderIcon != null) {
+                openFolderButton.setIcon(folderIcon);
+            } else {
+                openFolderButton.setText(getTextAt(bundle, "savePresetSuccess.openFolder"));
+            }
+            openFolderButton.setToolTipText(getTextAt(bundle, "savePresetSuccess.openFolder"));
+            openFolderButton.addActionListener(evt -> {
+                try {
+                    Desktop.getDesktop().open(presetDirectory);
+                } catch (Exception ex) {
+                    LOGGER.error(ex, "Failed to open campaign preset folder: {}", presetDirectory);
+                }
+            });
+            pathPanel.add(openFolderButton, BorderLayout.LINE_END);
+        }
+
+        final Object[] message = {
+              getFormattedTextAt(bundle, "savePresetSuccess.text", preset.toString()),
+              " ",
+              getTextAt(bundle, "savePresetSuccess.location"),
+              pathPanel };
+
+        JOptionPane.showMessageDialog(getFrame(),
+              message,
+              getTextAt(bundle, "savePresetSuccess.title"),
+              JOptionPane.INFORMATION_MESSAGE);
     }
 
     /**
@@ -281,17 +437,6 @@ public class CampaignOptionsDialog extends AbstractButtonDialog {
     }
 
     /**
-     * Applies a preset to the campaign options pane. This allows the user to quickly configure the campaign settings
-     * based on predefined presets.
-     *
-     * @param preset the {@link CampaignPreset} instance to apply
-     */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    public void applyPreset(CampaignPreset preset) {
-        campaignOptionsPane.applyPreset(preset, true);
-    }
-
-    /**
      * Applies the specified campaign preset to the options pane, optionally indicating if the dialog is being used
      * during campaign startup.
      *
@@ -302,7 +447,7 @@ public class CampaignOptionsDialog extends AbstractButtonDialog {
      * @param preset    the {@link CampaignPreset} whose settings will be applied to the options pane
      * @param isStartup {@code true} if the dialog is being used during the startup of a new campaign
      */
-    public void applyPreset(CampaignPreset preset, boolean isStartup) {
+    public void applyPreset(@Nullable CampaignPreset preset, boolean isStartup) {
         campaignOptionsPane.applyPreset(preset, isStartup);
     }
 

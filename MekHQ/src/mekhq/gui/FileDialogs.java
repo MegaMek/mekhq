@@ -37,7 +37,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import javax.swing.JFrame;
 
-import mekhq.CampaignPreset;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -161,16 +160,6 @@ public class FileDialogs {
               "layeredFormationIcon.png");
         value.ifPresent(x -> MekHQ.getMHQOptions().setLayeredFormationIconPath(x.getParent()));
         return value;
-    }
-
-    /**
-     * Displays a dialog window from which the user can select a <code>.mul</code> file to save to.
-     *
-     * @return the file selected, if any
-     */
-    public static Optional<File> saveCampaignPreset(final JFrame frame, final CampaignPreset preset) {
-        return GUI.fileDialogSave(frame, "Save Campaign Preset", FileType.XML,
-              MHQConstants.USER_CAMPAIGN_PRESET_DIRECTORY, preset + " Preset.xml");
     }
 
     /**

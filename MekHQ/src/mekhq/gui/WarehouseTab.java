@@ -471,7 +471,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         splitWarehouse.setOneTouchExpandable(true);
         splitWarehouse.setResizeWeight(1.0);
 
-        JPanel pnlTutorial = new TutorialHyperlinkPanel("warehouseTab");
+        JPanel pnlTutorial = new TutorialHyperlinkPanel("warehouseTab.keyText");
 
         setLayout(new BorderLayout());
         add(splitWarehouse, BorderLayout.CENTER);
