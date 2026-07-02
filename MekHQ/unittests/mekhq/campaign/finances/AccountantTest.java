@@ -54,14 +54,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.Vector;
-import java.util.stream.Stream;
 
 import megamek.common.equipment.Engine;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.Hangar;
-import mekhq.campaign.Warehouse;
+import mekhq.campaign.HumanResources;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationType;
@@ -86,6 +85,7 @@ public class AccountantTest {
 
     @Test
     void testGetMonthlyFoodAndHousingExpenses_WhenFoodAndHousingDisabled() {
+        // Setup
         Campaign mockCampaign = mock(Campaign.class);
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
@@ -98,14 +98,17 @@ public class AccountantTest {
         CurrentLocation location = new CurrentLocation();
         when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
+        // Act
         Money expected = Money.zero();
         Money actual = accountant.getMonthlyFoodAndHousingExpenses();
 
+        // Assert
         assertEquals(expected, actual);
     }
 
     @Test
     void testGetMonthlyFoodAndHousingExpenses_WhenNoPersonnel() {
+        // Setup
         Campaign mockCampaign = mock(Campaign.class);
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
@@ -118,14 +121,17 @@ public class AccountantTest {
         CurrentLocation location = new CurrentLocation();
         when(mockCampaign.getCurrentLocation()).thenReturn(location);
 
+        // Act
         Money expected = Money.zero();
         Money actual = accountant.getMonthlyFoodAndHousingExpenses();
 
+        // Assert
         assertEquals(expected, actual);
     }
 
     @Test
     void testGetMonthlyFoodAndHousingExpenses_WhenOnlyPrisoners() {
+        // Setup
         Campaign mockCampaign = mock(Campaign.class);
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
@@ -146,16 +152,19 @@ public class AccountantTest {
         List<Person> prisoners = List.of(prisoner, prisoner, prisoner);
         when(mockCampaign.getAllPersonnel()).thenReturn(prisoners);
 
+        // Act
         int expensesFood = FOOD_PRISONER_OR_DEPENDENT * prisoners.size();
         int expensesHousing = HOUSING_PRISONER_OR_DEPENDENT * prisoners.size();
         Money expected = Money.of(expensesFood + expensesHousing);
         Money actual = accountant.getMonthlyFoodAndHousingExpenses();
 
+        // Assert
         assertEquals(expected, actual);
     }
 
     @Test
     void testGetMonthlyHousingExpenses_WhenOnlyPrisoners() {
+        // Setup
         Campaign mockCampaign = mock(Campaign.class);
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
@@ -176,15 +185,18 @@ public class AccountantTest {
         List<Person> prisoners = List.of(prisoner, prisoner, prisoner);
         when(mockCampaign.getAllPersonnel()).thenReturn(prisoners);
 
+        // Act
         int expensesHousing = HOUSING_PRISONER_OR_DEPENDENT * prisoners.size();
         Money expected = Money.of(expensesHousing);
         Money actual = accountant.getMonthlyFoodAndHousingExpenses();
 
+        // Assert
         assertEquals(expected, actual);
     }
 
     @Test
     void testGetMonthlyFoodExpenses_WhenOnlyPrisoners() {
+        // Setup
         Campaign mockCampaign = mock(Campaign.class);
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
@@ -205,15 +217,18 @@ public class AccountantTest {
         List<Person> prisoners = List.of(prisoner, prisoner, prisoner);
         when(mockCampaign.getAllPersonnel()).thenReturn(prisoners);
 
+        // Act
         int expensesFood = FOOD_PRISONER_OR_DEPENDENT * prisoners.size();
         Money expected = Money.of(expensesFood);
         Money actual = accountant.getMonthlyFoodAndHousingExpenses();
 
+        // Assert
         assertEquals(expected, actual);
     }
 
     @Test
     void testGetMonthlyFoodAndHousingExpenses_WhenOnlyDependents() {
+        // Setup
         Campaign mockCampaign = mock(Campaign.class);
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
@@ -234,16 +249,19 @@ public class AccountantTest {
         List<Person> dependents = List.of(dependent, dependent, dependent);
         when(mockCampaign.getAllPersonnel()).thenReturn(dependents);
 
+        // Act
         int expensesFood = FOOD_PRISONER_OR_DEPENDENT * dependents.size();
         int expensesHousing = HOUSING_PRISONER_OR_DEPENDENT * dependents.size();
         Money expected = Money.of(expensesFood + expensesHousing);
         Money actual = accountant.getMonthlyFoodAndHousingExpenses();
 
+        // Assert
         assertEquals(expected, actual);
     }
 
     @Test
     void testGetMonthlyHousingExpenses_WhenOnlyDependents() {
+        // Setup
         Campaign mockCampaign = mock(Campaign.class);
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
@@ -264,15 +282,18 @@ public class AccountantTest {
         List<Person> dependents = List.of(dependent, dependent, dependent);
         when(mockCampaign.getAllPersonnel()).thenReturn(dependents);
 
+        // Act
         int expensesHousing = HOUSING_PRISONER_OR_DEPENDENT * dependents.size();
         Money expected = Money.of(expensesHousing);
         Money actual = accountant.getMonthlyFoodAndHousingExpenses();
 
+        // Assert
         assertEquals(expected, actual);
     }
 
     @Test
     void testGetMonthlyFoodExpenses_WhenOnlyDependents() {
+        // Setup
         Campaign mockCampaign = mock(Campaign.class);
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
@@ -293,15 +314,18 @@ public class AccountantTest {
         List<Person> dependents = List.of(dependent, dependent, dependent);
         when(mockCampaign.getAllPersonnel()).thenReturn(dependents);
 
+        // Act
         int expensesFood = FOOD_PRISONER_OR_DEPENDENT * dependents.size();
         Money expected = Money.of(expensesFood);
         Money actual = accountant.getMonthlyFoodAndHousingExpenses();
 
+        // Assert
         assertEquals(expected, actual);
     }
 
     @Test
     void testGetMonthlyFoodAndHousingExpenses_WhenOnlyEnlisted() {
+        // Setup
         Campaign mockCampaign = mock(Campaign.class);
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
@@ -323,16 +347,19 @@ public class AccountantTest {
         List<Person> enlistedPersonnel = List.of(enlisted, enlisted, enlisted);
         when(mockCampaign.getAllPersonnel()).thenReturn(enlistedPersonnel);
 
+        // Act
         int expensesFood = FOOD_ENLISTED * enlistedPersonnel.size();
         int expensesHousing = HOUSING_ENLISTED * enlistedPersonnel.size();
         Money expected = Money.of(expensesFood + expensesHousing);
         Money actual = accountant.getMonthlyFoodAndHousingExpenses();
 
+        // Assert
         assertEquals(expected, actual);
     }
 
     @Test
     void testGetMonthlyHousingExpenses_WhenOnlyEnlisted() {
+        // Setup
         Campaign mockCampaign = mock(Campaign.class);
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
@@ -354,15 +381,18 @@ public class AccountantTest {
         List<Person> enlistedPersonnel = List.of(enlisted, enlisted, enlisted);
         when(mockCampaign.getAllPersonnel()).thenReturn(enlistedPersonnel);
 
+        // Act
         int expensesHousing = HOUSING_ENLISTED * enlistedPersonnel.size();
         Money expected = Money.of(expensesHousing);
         Money actual = accountant.getMonthlyFoodAndHousingExpenses();
 
+        // Assert
         assertEquals(expected, actual);
     }
 
     @Test
     void testGetMonthlyFoodExpenses_WhenOnlyEnlisted() {
+        // Setup
         Campaign mockCampaign = mock(Campaign.class);
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
@@ -384,15 +414,18 @@ public class AccountantTest {
         List<Person> enlistedPersonnel = List.of(enlisted, enlisted, enlisted);
         when(mockCampaign.getAllPersonnel()).thenReturn(enlistedPersonnel);
 
+        // Act
         int expensesFood = FOOD_ENLISTED * enlistedPersonnel.size();
         Money expected = Money.of(expensesFood);
         Money actual = accountant.getMonthlyFoodAndHousingExpenses();
 
+        // Assert
         assertEquals(expected, actual);
     }
 
     @Test
     void testGetMonthlyFoodAndHousingExpenses_WhenOnlyOfficers() {
+        // Setup
         Campaign mockCampaign = mock(Campaign.class);
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
@@ -414,16 +447,19 @@ public class AccountantTest {
         List<Person> officerPersonnel = List.of(officer, officer, officer);
         when(mockCampaign.getAllPersonnel()).thenReturn(officerPersonnel);
 
+        // Act
         int expensesFood = FOOD_OFFICER * officerPersonnel.size();
         int expensesHousing = HOUSING_OFFICER * officerPersonnel.size();
         Money expected = Money.of(expensesFood + expensesHousing);
         Money actual = accountant.getMonthlyFoodAndHousingExpenses();
 
+        // Assert
         assertEquals(expected, actual);
     }
 
     @Test
     void testGetMonthlyHousingExpenses_WhenOnlyOfficers() {
+        // Setup
         Campaign mockCampaign = mock(Campaign.class);
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
@@ -445,15 +481,18 @@ public class AccountantTest {
         List<Person> officerPersonnel = List.of(officer, officer, officer);
         when(mockCampaign.getAllPersonnel()).thenReturn(officerPersonnel);
 
+        // Act
         int expensesHousing = HOUSING_OFFICER * officerPersonnel.size();
         Money expected = Money.of(expensesHousing);
         Money actual = accountant.getMonthlyFoodAndHousingExpenses();
 
+        // Assert
         assertEquals(expected, actual);
     }
 
     @Test
     void testGetMonthlyFoodExpenses_WhenOnlyOfficers() {
+        // Setup
         Campaign mockCampaign = mock(Campaign.class);
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
@@ -475,15 +514,18 @@ public class AccountantTest {
         List<Person> officerPersonnel = List.of(officer, officer, officer);
         when(mockCampaign.getAllPersonnel()).thenReturn(officerPersonnel);
 
+        // Act
         int expensesFood = FOOD_OFFICER * officerPersonnel.size();
         Money expected = Money.of(expensesFood);
         Money actual = accountant.getMonthlyFoodAndHousingExpenses();
 
+        // Assert
         assertEquals(expected, actual);
     }
 
     @Test
     void testGetMonthlyFoodAndHousingExpenses_Mixed() {
+        // Setup
         Campaign mockCampaign = mock(Campaign.class);
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
@@ -524,6 +566,7 @@ public class AccountantTest {
         allPersonnel.addAll(officerPersonnel);
         when(mockCampaign.getAllPersonnel()).thenReturn(allPersonnel);
 
+        // Act
         int expensesFood = FOOD_PRISONER_OR_DEPENDENT * (prisoners.size() + dependents.size());
         expensesFood += FOOD_ENLISTED * enlistedPersonnel.size();
         expensesFood += FOOD_OFFICER * officerPersonnel.size();
@@ -535,11 +578,13 @@ public class AccountantTest {
         Money expected = Money.of(expensesFood + expensesHousing);
         Money actual = accountant.getMonthlyFoodAndHousingExpenses();
 
+        // Assert
         assertEquals(expected, actual);
     }
 
     @Test
     void testGetMonthlyHousingExpenses_Mixed() {
+        // Setup
         Campaign mockCampaign = mock(Campaign.class);
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
@@ -580,6 +625,7 @@ public class AccountantTest {
         allPersonnel.addAll(officerPersonnel);
         when(mockCampaign.getAllPersonnel()).thenReturn(allPersonnel);
 
+        // Act
         int expensesHousing = HOUSING_PRISONER_OR_DEPENDENT * (prisoners.size() + dependents.size());
         expensesHousing += HOUSING_ENLISTED * enlistedPersonnel.size();
         expensesHousing += HOUSING_OFFICER * officerPersonnel.size();
@@ -587,11 +633,13 @@ public class AccountantTest {
         Money expected = Money.of(expensesHousing);
         Money actual = accountant.getMonthlyFoodAndHousingExpenses();
 
+        // Assert
         assertEquals(expected, actual);
     }
 
     @Test
     void testGetMonthlyFoodExpenses_Mixed() {
+        // Setup
         Campaign mockCampaign = mock(Campaign.class);
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
@@ -632,6 +680,7 @@ public class AccountantTest {
         allPersonnel.addAll(officerPersonnel);
         when(mockCampaign.getAllPersonnel()).thenReturn(allPersonnel);
 
+        // Act
         int expensesFood = FOOD_PRISONER_OR_DEPENDENT * (prisoners.size() + dependents.size());
         expensesFood += FOOD_ENLISTED * enlistedPersonnel.size();
         expensesFood += FOOD_OFFICER * officerPersonnel.size();
@@ -639,11 +688,13 @@ public class AccountantTest {
         Money expected = Money.of(expensesFood);
         Money actual = accountant.getMonthlyFoodAndHousingExpenses();
 
+        // Assert
         assertEquals(expected, actual);
     }
 
     @Test
     void testGetMonthlyFoodAndHousingExpenses_Mixed_InTransit() {
+        // Setup
         Campaign mockCampaign = mock(Campaign.class);
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
@@ -685,6 +736,7 @@ public class AccountantTest {
         allPersonnel.addAll(officerPersonnel);
         when(mockCampaign.getAllPersonnel()).thenReturn(allPersonnel);
 
+        // Act
         int expensesFood = FOOD_PRISONER_OR_DEPENDENT * (prisoners.size() + dependents.size());
         expensesFood += FOOD_ENLISTED * enlistedPersonnel.size();
         expensesFood += FOOD_OFFICER * officerPersonnel.size();
@@ -694,11 +746,13 @@ public class AccountantTest {
         Money expected = Money.of(expensesFood + expensesHousing);
         Money actual = accountant.getMonthlyFoodAndHousingExpenses();
 
+        // Assert
         assertEquals(expected, actual);
     }
 
     @Test
     void testGetMonthlyFoodAndHousingExpenses_Mixed_ExcludingWarShipCrew() {
+        // Setup
         Campaign mockCampaign = mock(Campaign.class);
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
@@ -752,6 +806,7 @@ public class AccountantTest {
         allPersonnel.addAll(warShipPersonnel);
         when(mockCampaign.getAllPersonnel()).thenReturn(allPersonnel);
 
+        // Act
         int expensesFood = FOOD_PRISONER_OR_DEPENDENT * (prisoners.size() + dependents.size());
         expensesFood += FOOD_ENLISTED * enlistedPersonnel.size();
         expensesFood += FOOD_OFFICER * officerPersonnel.size();
@@ -764,6 +819,7 @@ public class AccountantTest {
         Money expected = Money.of(expensesFood + expensesHousing);
         Money actual = accountant.getMonthlyFoodAndHousingExpenses();
 
+        // Assert
         assertEquals(expected, actual);
     }
 
@@ -864,6 +920,7 @@ public class AccountantTest {
     @Nested
     class TestGetPayrollSummary {
         Campaign mockCampaign;
+        HumanResources mockHumanResources;
         CampaignOptions campaignOptions;
         Accountant accountant;
         final int EXPECTEDPAY = 100;
@@ -873,19 +930,24 @@ public class AccountantTest {
         @BeforeEach
         void beforeEach() {
             mockCampaign = mock(Campaign.class);
+            mockHumanResources = mock(HumanResources.class);
             campaignOptions = new CampaignOptions();
             accountant = new Accountant(mockCampaign);
             when(mockCampaign.isClanCampaign()).thenReturn(false);
             when(mockCampaign.getLocalDate()).thenReturn(TODAY);
+            when(mockCampaign.getHumanResources()).thenReturn(mockHumanResources);
         }
 
 
         @Test
         void testGetPayrollSummary_emptyCampaign() {
+            // Arrange
             when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
 
+            // Act
             Map<Person, Money> expectedMap = accountant.getPayRollSummary();
 
+            // Assert
             assertEquals(1, expectedMap.size());
             assertTrue(expectedMap.containsKey(null));
             assertEquals(Money.zero(), expectedMap.get(null));
@@ -893,13 +955,16 @@ public class AccountantTest {
 
         @Test
         void testGetPayrollSummary_onePerson() {
+            // Arrange
             Person mockPerson = getMockPerson();
 
             when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
             when(mockCampaign.getSalaryEligiblePersonnel()).thenReturn(List.of(mockPerson));
 
+            // Act
             Map<Person, Money> expectedMap = accountant.getPayRollSummary();
 
+            // Assert
             assertEquals(2, expectedMap.size());
             assertTrue(expectedMap.containsKey(null));
             assertEquals(Money.zero(), expectedMap.get(null));
@@ -909,12 +974,15 @@ public class AccountantTest {
 
         @Test
         void testGetAstechPoolPay() {
+            // Arrange
             when(mockCampaign.getTemporaryAsTechPool()).thenReturn(5);
             when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
 
+            // Act
 
             Map<Person, Money> expectedMap = accountant.getPayRollSummary();
 
+            // Assert
             assertEquals(1, expectedMap.size());
             assertTrue(expectedMap.containsKey(null));
             assertEquals(Money.of(2000), expectedMap.get(null));
@@ -922,12 +990,15 @@ public class AccountantTest {
 
         @Test
         void testGetMedicPoolPay() {
+            // Arrange
             when(mockCampaign.getTemporaryMedicPool()).thenReturn(5);
             when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
 
+            // Act
 
             Map<Person, Money> expectedMap = accountant.getPayRollSummary();
 
+            // Assert
             assertEquals(1, expectedMap.size());
             assertTrue(expectedMap.containsKey(null));
             assertEquals(Money.of(2000), expectedMap.get(null));
@@ -937,11 +1008,14 @@ public class AccountantTest {
         @EnumSource(names = { "SOLDIER", "BATTLE_ARMOUR", "VEHICLE_CREW_GROUND", "VEHICLE_CREW_VTOL",
                               "VEHICLE_CREW_NAVAL", "VESSEL_PILOT", "VESSEL_GUNNER", "VESSEL_CREW" })
         void testGetAllTempCrewPay(PersonnelRole role) {
-            when(mockCampaign.getTempCrewMapCopy()).thenReturn(Map.of(role, CREWCOUNT));
+            // Arrange
+            when(mockHumanResources.getTempPersonnelRoleMap()).thenReturn(Map.of(role, CREWCOUNT));
             when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
 
+            // Act
             Map<Person, Money> expectedMap = accountant.getPayRollSummary();
 
+            // Assert
             assertEquals(1, expectedMap.size());
             assertTrue(expectedMap.containsKey(null));
             assertEquals(Money.of(CREWCOUNT *
@@ -1360,9 +1434,10 @@ public class AccountantTest {
             accountant = new Accountant(mockCampaign);
 
             when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-            when(mockCampaign.getHangar()).thenReturn(mockHangar);
+            when(mockCampaign.getAllHangar()).thenReturn(mockHangar);
             when(mockCampaign.isClanCampaign()).thenReturn(false);
             when(mockCampaign.getLocalDate()).thenReturn(TODAY);
+            when(mockCampaign.getHumanResources()).thenReturn(mock(HumanResources.class));
             mockCampaignOptions.setPayForSalaries(true);
             mockCampaignOptions.setUseInfantryDontCount(false);
 
@@ -1381,7 +1456,7 @@ public class AccountantTest {
 
             when(mockHangar.getUnit(unitId1)).thenReturn(unit1);
             when(mockHangar.getUnit(unitId2)).thenReturn(unit2);
-            when(mockHangar.getUnits()).thenReturn(List.of(unit1, unit2));
+            when(mockCampaign.getAllUnits()).thenReturn(List.of(unit1, unit2));
 
             // Each unit's crew is exactly the campaign's salary-eligible personnel - nobody is
             // unassigned, so the formation-derived roster matches the whole-campaign roster.
@@ -1414,11 +1489,11 @@ public class AccountantTest {
 
         @Test
         void testGetPeacetimeCost_includingSalaries_matchesLegacyTotal() {
-            // The "legacy" total: spare parts/fuel/ammo summed over every hangar unit, salaries
+            // The "legacy" total: spare parts/fuel/ammo summed over every campaign unit, salaries
             // summed over every salary-eligible person - exactly what the old implementation did.
-            Money legacyTotal = getSparePartsTotal(mockHangar.getUnits())
-                                      .plus(getFuelTotal(mockHangar.getUnits()))
-                                      .plus(getAmmoTotal(mockHangar.getUnits()))
+            Money legacyTotal = getSparePartsTotal(mockCampaign.getAllUnits())
+                                      .plus(getFuelTotal(mockCampaign.getAllUnits()))
+                                      .plus(getAmmoTotal(mockCampaign.getAllUnits()))
                                       .plus(getSalaryTotal(mockCampaign.getSalaryEligiblePersonnel(),
                                             mockCampaignOptions,
                                             false,
@@ -1442,9 +1517,9 @@ public class AccountantTest {
         @Test
         void testGetPeacetimeCost_excludingSalaries_matchesLegacyTotal() {
             // The "legacy" total without salaries: just spare parts, fuel, and ammo.
-            Money legacyTotal = getSparePartsTotal(mockHangar.getUnits())
-                                      .plus(getFuelTotal(mockHangar.getUnits()))
-                                      .plus(getAmmoTotal(mockHangar.getUnits()));
+            Money legacyTotal = getSparePartsTotal(mockCampaign.getAllUnits())
+                                      .plus(getFuelTotal(mockCampaign.getAllUnits()))
+                                      .plus(getAmmoTotal(mockCampaign.getAllUnits()));
 
             Money actual = accountant.getPeacetimeCost(false);
 
@@ -1453,24 +1528,24 @@ public class AccountantTest {
         }
 
         @Test
-        void testGetMonthlySpareParts_stillMatchesWholeHangarTotal() {
+        void testGetMonthlySpareParts_stillMatchesWholeCampaignTotal() {
             Money actual = accountant.getMonthlySpareParts();
 
-            assertEquals(getSparePartsTotal(mockHangar.getUnits()), actual);
+            assertEquals(getSparePartsTotal(mockCampaign.getAllUnits()), actual);
         }
 
         @Test
-        void testGetMonthlyFuel_stillMatchesWholeHangarTotal() {
+        void testGetMonthlyFuel_stillMatchesWholeCampaignTotal() {
             Money actual = accountant.getMonthlyFuel();
 
-            assertEquals(getFuelTotal(mockHangar.getUnits()), actual);
+            assertEquals(getFuelTotal(mockCampaign.getAllUnits()), actual);
         }
 
         @Test
-        void testGetMonthlyAmmo_stillMatchesWholeHangarTotal() {
+        void testGetMonthlyAmmo_stillMatchesWholeCampaignTotal() {
             Money actual = accountant.getMonthlyAmmo();
 
-            assertEquals(getAmmoTotal(mockHangar.getUnits()), actual);
+            assertEquals(getAmmoTotal(mockCampaign.getAllUnits()), actual);
         }
 
         @Test
@@ -1956,7 +2031,7 @@ public class AccountantTest {
     }
 
     /**
-     * tests {@link Accountant#getTotalEquipmentValue(java.util.Collection, Warehouse)}
+     * tests {@link Accountant#getTotalEquipmentValue(java.util.Collection, java.util.Collection)}
      */
     @Nested
     class TestGetTotalEquipmentValueStatic {
@@ -1965,23 +2040,29 @@ public class AccountantTest {
             Unit unit = mock(Unit.class);
             when(unit.getSellValue()).thenReturn(Money.of(1000));
 
-            Part part = mock(Part.class);
-            when(part.getActualValue()).thenReturn(Money.of(200));
+            Part sparePart = mock(Part.class);
+            when(sparePart.isSpare()).thenReturn(true);
+            when(sparePart.getActualValue()).thenReturn(Money.of(200));
 
-            Warehouse warehouse = mock(Warehouse.class);
-            when(warehouse.streamSpareParts()).thenReturn(Stream.of(part));
-
-            Money actual = getTotalEquipmentValue(List.of(unit), warehouse);
+            Money actual = getTotalEquipmentValue(List.of(unit), List.of(sparePart));
 
             assertEquals(Money.of(1200), actual);
         }
 
         @Test
-        void testGetTotalEquipmentValue_noUnitsOrPartsIsZero() {
-            Warehouse warehouse = mock(Warehouse.class);
-            when(warehouse.streamSpareParts()).thenReturn(Stream.empty());
+        void testGetTotalEquipmentValue_excludesNonSpareParts() {
+            Part installedPart = mock(Part.class);
+            when(installedPart.isSpare()).thenReturn(false);
+            when(installedPart.getActualValue()).thenReturn(Money.of(500));
 
-            Money actual = getTotalEquipmentValue(List.of(), warehouse);
+            Money actual = getTotalEquipmentValue(List.of(), List.of(installedPart));
+
+            assertEquals(Money.zero(), actual);
+        }
+
+        @Test
+        void testGetTotalEquipmentValue_noUnitsOrPartsIsZero() {
+            Money actual = getTotalEquipmentValue(List.of(), List.of());
 
             assertEquals(Money.zero(), actual);
         }
@@ -2321,9 +2402,10 @@ public class AccountantTest {
             accountant = new Accountant(mockCampaign);
 
             when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
-            when(mockCampaign.getHangar()).thenReturn(mockHangar);
+            when(mockCampaign.getAllHangar()).thenReturn(mockHangar);
             when(mockCampaign.isClanCampaign()).thenReturn(false);
             when(mockCampaign.getLocalDate()).thenReturn(TODAY);
+            when(mockCampaign.getHumanResources()).thenReturn(mock(HumanResources.class));
         }
 
         @Test
@@ -2334,7 +2416,7 @@ public class AccountantTest {
             when(unit.requiresMaintenance()).thenReturn(true);
             when(unit.getTech()).thenReturn(mock(Person.class));
             when(unit.getMaintenanceCost()).thenReturn(Money.of(100));
-            when(mockHangar.getUnits()).thenReturn(List.of(unit));
+            when(mockCampaign.getAllUnits()).thenReturn(List.of(unit));
 
             Money actual = accountant.getMaintenanceCosts();
 
@@ -2349,7 +2431,7 @@ public class AccountantTest {
             when(unit.requiresMaintenance()).thenReturn(true);
             when(unit.getTech()).thenReturn(mock(Person.class));
             when(unit.getMaintenanceCost()).thenReturn(Money.of(100));
-            when(mockHangar.getUnits()).thenReturn(List.of(unit));
+            when(mockCampaign.getAllUnits()).thenReturn(List.of(unit));
 
             Money actual = accountant.getMaintenanceCosts();
 
@@ -2360,7 +2442,7 @@ public class AccountantTest {
         void testGetWeeklyMaintenanceCosts_delegatesToStaticTotal() {
             Unit unit = mock(Unit.class);
             when(unit.getWeeklyMaintenanceCost()).thenReturn(Money.of(20));
-            when(mockHangar.getUnits()).thenReturn(List.of(unit));
+            when(mockCampaign.getAllUnits()).thenReturn(List.of(unit));
 
             Money actual = accountant.getWeeklyMaintenanceCosts();
 
@@ -2424,11 +2506,8 @@ public class AccountantTest {
         void testGetTotalEquipmentValue_delegatesToStaticTotal() {
             Unit unit = mock(Unit.class);
             when(unit.getSellValue()).thenReturn(Money.of(1000));
-            when(mockHangar.getUnits()).thenReturn(List.of(unit));
-
-            Warehouse warehouse = mock(Warehouse.class);
-            when(warehouse.streamSpareParts()).thenReturn(Stream.empty());
-            when(mockCampaign.getWarehouse()).thenReturn(warehouse);
+            when(mockCampaign.getAllUnits()).thenReturn(List.of(unit));
+            when(mockCampaign.getAllParts()).thenReturn(List.of());
 
             Money actual = accountant.getTotalEquipmentValue();
 

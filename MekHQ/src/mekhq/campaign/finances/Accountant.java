@@ -51,7 +51,6 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
-import mekhq.campaign.Warehouse;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
@@ -85,7 +84,11 @@ public record Accountant(Campaign campaign) {
     }
 
     private Hangar getHangar() {
-        return campaign().getHangar();
+        return campaign().getAllHangar();
+    }
+
+    private Collection<Unit> getAllUnits() {
+        return campaign().getAllUnits();
     }
 
     private boolean isClanCampaign() {
@@ -105,7 +108,7 @@ public record Accountant(Campaign campaign) {
     }
 
     private Map<PersonnelRole, Integer> getTempCrewMap() {
-        return campaign().getTempCrewMapCopy();
+        return campaign().getHumanResources().getTempPersonnelRoleMap();
     }
 
 
@@ -212,7 +215,7 @@ public record Accountant(Campaign campaign) {
     }
 
     public Money getMaintenanceCosts() {
-        return getMaintenanceTotal(getHangar().getUnits(), getCampaignOptions().isPayForMaintain());
+        return getMaintenanceTotal(getAllUnits(), getCampaignOptions().isPayForMaintain());
     }
 
     /**
@@ -239,7 +242,7 @@ public record Accountant(Campaign campaign) {
     }
 
     public Money getWeeklyMaintenanceCosts() {
-        return getWeeklyMaintenanceTotal(getHangar().getUnits());
+        return getWeeklyMaintenanceTotal(getAllUnits());
     }
 
     /**
@@ -642,15 +645,15 @@ public record Accountant(Campaign campaign) {
     }
 
     public Money getMonthlySpareParts() {
-        return getSparePartsTotal(getHangar().getUnits());
+        return getSparePartsTotal(getAllUnits());
     }
 
     public Money getMonthlyFuel() {
-        return getFuelTotal(getHangar().getUnits());
+        return getFuelTotal(getAllUnits());
     }
 
     public Money getMonthlyAmmo() {
-        return getAmmoTotal(getHangar().getUnits());
+        return getAmmoTotal(getAllUnits());
     }
 
     /**
@@ -899,24 +902,24 @@ public record Accountant(Campaign campaign) {
     }
 
     public Money getTotalEquipmentValue() {
-        return getTotalEquipmentValue(getHangar().getUnits(), campaign().getWarehouse());
+        return getTotalEquipmentValue(getAllUnits(), campaign().getAllParts());
     }
 
     /**
      * Static version of {@link #getTotalEquipmentValue()}.
      *
-     * @param units     the units to total sell value for
-     * @param warehouse the warehouse containing the spare parts to evaluate
+     * @param units the units to total sell value for
+     * @param parts the parts to evaluate
      *
      * @return the total {@link Money} value of all equipment
      */
-    public static Money getTotalEquipmentValue(Collection<Unit> units, Warehouse warehouse) {
+    public static Money getTotalEquipmentValue(Collection<Unit> units, Collection<Part> parts) {
         Money total = Money.zero();
         for (Unit unit : units) {
             total = total.plus(unit.getSellValue());
         }
 
-        return warehouse.streamSpareParts().map(Part::getActualValue).reduce(total, Money::plus);
+        return parts.stream().filter(Part::isSpare).map(Part::getActualValue).reduce(total, Money::plus);
     }
 
     public Money getEquipmentContractValue(Unit unit, boolean useSaleValue) {
