@@ -214,8 +214,8 @@ public class CampaignSummary {
 
         cargoCapacity = cargoCapacity * tetrisMasterMultiplier;
 
-        cargoTons = cargoStats.getCargoTonnage(false);
-        double mothballedTonnage = cargoStats.getCargoTonnage(false, true);
+        cargoTons = cargoStats.getCargoTonnage(campaign, false);
+        double mothballedTonnage = cargoStats.getCargoTonnage(campaign, false, true);
         cargoTons = (cargoTons + mothballedTonnage);
 
         // transport capacity

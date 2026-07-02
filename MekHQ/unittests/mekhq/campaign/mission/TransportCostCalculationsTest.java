@@ -44,7 +44,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyCollection;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -70,45 +73,43 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.CargoStatistics;
-import mekhq.campaign.unit.HangarStatistics;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.PlanetarySystem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.MockedStatic;
 
 public class TransportCostCalculationsTest {
 
     private static final LocalDate today = LocalDate.of(3151, 1, 1);
-    private static final CargoStatistics mockCargoStatistics = mock(CargoStatistics.class);
-    private static final HangarStatistics mockHangarStatistics = mock(HangarStatistics.class);
 
     private TransportCostCalculations transportCostCalculations;
 
-    private Hangar mockHangar;
-
     @BeforeEach
     public void setup() {
-        mockHangar = mock(Hangar.class);
-        when(mockHangarStatistics.getHangar()).thenReturn(mockHangar);
-
-        // Getters now use getUnits() (Collection), not getUnitsStream()
-        setHangarUnits(List.of());
-
-        transportCostCalculations = new TransportCostCalculations(new ArrayList<>(),
-              new ArrayList<>(),
-              mockCargoStatistics,
-              mockHangarStatistics,
-              EXP_REGULAR);
+        transportCostCalculations = calculationsWithUnits(List.of());
         transportCostCalculations.setTotalCost(Money.zero());
     }
 
     // Helpers
 
-    private void setHangarUnits(List<Unit> units) {
-        // IMPORTANT: return a Collection<Unit> because production code iterates getUnits()
-        when(mockHangar.getUnits()).thenReturn(units);
+    private Hangar hangarWithUnits(Collection<Unit> units) {
+        // IMPORTANT: production code captures hangar.getUnits() once at construction time, so the hangar
+        // must be stubbed with its final unit list BEFORE the TransportCostCalculations is constructed.
+        Hangar hangar = mock(Hangar.class);
+        when(hangar.getUnits()).thenReturn(units);
+        return hangar;
+    }
+
+    private TransportCostCalculations calculationsWithUnits(Collection<Unit> units) {
+        TransportCostCalculations calculations = new TransportCostCalculations(hangarWithUnits(units),
+              new ArrayList<>(), new ArrayList<>(), EXP_REGULAR);
+        // totalCost is only initialized by calculateJumpCostForEachDay(); tests exercising individual
+        // calculation steps directly need it pre-seeded to avoid NPEs on totalCost.plus(...).
+        calculations.setTotalCost(Money.zero());
+        return calculations;
     }
 
     private Unit unitWithEntity(Entity entity) {
@@ -204,19 +205,19 @@ public class TransportCostCalculationsTest {
     @ParameterizedTest
     @ValueSource(ints = { 0, 3, 5, 10 })
     public void testCalculateAdditionalJumpCollarsRequirements_notEnoughCollars(int additionalDropShips) {
-        setHangarUnits(List.of());
+        TransportCostCalculations local = calculationsWithUnits(List.of());
 
-        transportCostCalculations.setDropShipCount(0);
-        transportCostCalculations.setAdditionalDropShipsRequired(additionalDropShips);
+        local.setDropShipCount(0);
+        local.setAdditionalDropShipsRequired(additionalDropShips);
 
-        transportCostCalculations.calculateAdditionalJumpCollarsRequirements();
+        local.calculateAdditionalJumpCollarsRequirements();
 
-        int actualCollarNeeds = transportCostCalculations.getAdditionalCollarsRequired();
+        int actualCollarNeeds = local.getAdditionalCollarsRequired();
         assertEquals(additionalDropShips, actualCollarNeeds,
               "Expected " + additionalDropShips + " additional collars required but was " + actualCollarNeeds);
 
         double predictedDockingCollarCost = round(additionalDropShips * JUMP_SHIP_COLLAR_COST);
-        double actualDockingCollarCost = transportCostCalculations.getDockingCollarCost();
+        double actualDockingCollarCost = local.getDockingCollarCost();
 
         assertEquals(predictedDockingCollarCost, actualDockingCollarCost,
               "Expected docking collar cost of " + predictedDockingCollarCost + " but was " + actualDockingCollarCost);
@@ -225,21 +226,22 @@ public class TransportCostCalculationsTest {
     @ParameterizedTest
     @ValueSource(ints = { 0, 3, 5, 10 })
     public void testCalculateAdditionalJumpCollarsRequirements_enoughCollars(int additionalDropShips) {
-        setHangarUnits(List.of(unitThatIsJumpShipWithDocks(additionalDropShips)));
+        TransportCostCalculations local = calculationsWithUnits(List.of(
+              unitThatIsJumpShipWithDocks(additionalDropShips)));
 
-        transportCostCalculations.setDropShipCount(0);
-        transportCostCalculations.setAdditionalDropShipsRequired(0);
+        local.setDropShipCount(0);
+        local.setAdditionalDropShipsRequired(0);
 
-        transportCostCalculations.calculateAdditionalJumpCollarsRequirements();
+        local.calculateAdditionalJumpCollarsRequirements();
 
         int predictedCollarNeeds = 0;
-        int actualCollarNeeds = transportCostCalculations.getAdditionalCollarsRequired();
+        int actualCollarNeeds = local.getAdditionalCollarsRequired();
 
         assertEquals(predictedCollarNeeds, actualCollarNeeds,
               "Expected " + predictedCollarNeeds + " additional collars required but was " + actualCollarNeeds);
 
         double predictedDockingCollarCost = 0;
-        double actualDockingCollarCost = transportCostCalculations.getDockingCollarCost();
+        double actualDockingCollarCost = local.getDockingCollarCost();
 
         assertEquals(predictedDockingCollarCost, actualDockingCollarCost,
               "Expected docking collar cost of " + predictedDockingCollarCost + " but was " + actualDockingCollarCost);
@@ -248,13 +250,18 @@ public class TransportCostCalculationsTest {
     @ParameterizedTest
     @ValueSource(ints = { 0, 3000, 5000, 10000 })
     public void testCalculateCargoRequirements_mothballedCargo_insufficientCapacity(double cargoSize) {
-        when(mockCargoStatistics.getTotalCargoCapacity()).thenReturn(0.0);
-
-        when(mockCargoStatistics.getCargoTonnage(false, false)).thenReturn(cargoSize);
-        when(mockCargoStatistics.getCargoTonnage(false, true)).thenReturn(cargoSize);
         double totalCargoSize = cargoSize * 2;
 
-        transportCostCalculations.calculateCargoRequirements();
+        try (MockedStatic<CargoStatistics> mockedCargo = mockStatic(CargoStatistics.class)) {
+            mockedCargo.when(() -> CargoStatistics.getTotalCargoCapacity(any(Hangar.class))).thenReturn(0.0);
+            mockedCargo.when(() -> CargoStatistics.getCargoTonnage(anyCollection(), anyCollection(), eq(false),
+                  eq(false))).thenReturn(cargoSize);
+            mockedCargo.when(() -> CargoStatistics.getCargoTonnage(anyCollection(), anyCollection(), eq(false),
+                  eq(true))).thenReturn(cargoSize);
+
+            transportCostCalculations.calculateCargoRequirements();
+        }
+
         int additionalDropShipsRequired = transportCostCalculations.getAdditionalDropShipsRequired();
         int predictedAdditionalDropShipsRequired = (int) ceil(totalCargoSize / CARGO_PER_DROPSHIP);
         assertEquals(predictedAdditionalDropShipsRequired, additionalDropShipsRequired,
@@ -272,12 +279,17 @@ public class TransportCostCalculationsTest {
     @ParameterizedTest
     @ValueSource(ints = { 0, 3000, 5000, 10000 })
     public void testCalculateCargoRequirements_mothballedCargo_sufficientCapacity(double cargoSize) {
-        when(mockCargoStatistics.getTotalCargoCapacity()).thenReturn(cargoSize * 3);
+        try (MockedStatic<CargoStatistics> mockedCargo = mockStatic(CargoStatistics.class)) {
+            mockedCargo.when(() -> CargoStatistics.getTotalCargoCapacity(any(Hangar.class)))
+                  .thenReturn(cargoSize * 3);
+            mockedCargo.when(() -> CargoStatistics.getCargoTonnage(anyCollection(), anyCollection(), eq(false),
+                  eq(false))).thenReturn(cargoSize);
+            mockedCargo.when(() -> CargoStatistics.getCargoTonnage(anyCollection(), anyCollection(), eq(false),
+                  eq(true))).thenReturn(cargoSize);
 
-        when(mockCargoStatistics.getCargoTonnage(false, false)).thenReturn(cargoSize);
-        when(mockCargoStatistics.getCargoTonnage(false, true)).thenReturn(cargoSize);
+            transportCostCalculations.calculateCargoRequirements();
+        }
 
-        transportCostCalculations.calculateCargoRequirements();
         int additionalDropShipsRequired = transportCostCalculations.getAdditionalDropShipsRequired();
         int predictedAdditionalDropShipsRequired = 0;
         assertEquals(predictedAdditionalDropShipsRequired, additionalDropShipsRequired,
@@ -295,12 +307,16 @@ public class TransportCostCalculationsTest {
     @ParameterizedTest
     @ValueSource(ints = { 0, 3000, 5000, 10000 })
     public void testCalculateCargoRequirements_noMothballedCargo_insufficientCapacity(double cargoSize) {
-        when(mockCargoStatistics.getTotalCargoCapacity()).thenReturn(0.0);
+        try (MockedStatic<CargoStatistics> mockedCargo = mockStatic(CargoStatistics.class)) {
+            mockedCargo.when(() -> CargoStatistics.getTotalCargoCapacity(any(Hangar.class))).thenReturn(0.0);
+            mockedCargo.when(() -> CargoStatistics.getCargoTonnage(anyCollection(), anyCollection(), eq(false),
+                  eq(false))).thenReturn(cargoSize);
+            mockedCargo.when(() -> CargoStatistics.getCargoTonnage(anyCollection(), anyCollection(), eq(false),
+                  eq(true))).thenReturn(0.0);
 
-        when(mockCargoStatistics.getCargoTonnage(false, false)).thenReturn(cargoSize);
-        when(mockCargoStatistics.getCargoTonnage(false, true)).thenReturn(0.0);
+            transportCostCalculations.calculateCargoRequirements();
+        }
 
-        transportCostCalculations.calculateCargoRequirements();
         int additionalDropShipsRequired = transportCostCalculations.getAdditionalDropShipsRequired();
         int predictedAdditionalDropShipsRequired = (int) ceil(cargoSize / CARGO_PER_DROPSHIP);
         assertEquals(predictedAdditionalDropShipsRequired, additionalDropShipsRequired,
@@ -318,12 +334,17 @@ public class TransportCostCalculationsTest {
     @ParameterizedTest
     @ValueSource(ints = { 0, 3000, 5000, 10000 })
     public void testCalculateCargoRequirements_noMothballedCargo_sufficientCapacity(double cargoSize) {
-        when(mockCargoStatistics.getTotalCargoCapacity()).thenReturn(cargoSize * 3);
+        try (MockedStatic<CargoStatistics> mockedCargo = mockStatic(CargoStatistics.class)) {
+            mockedCargo.when(() -> CargoStatistics.getTotalCargoCapacity(any(Hangar.class)))
+                  .thenReturn(cargoSize * 3);
+            mockedCargo.when(() -> CargoStatistics.getCargoTonnage(anyCollection(), anyCollection(), eq(false),
+                  eq(false))).thenReturn(cargoSize);
+            mockedCargo.when(() -> CargoStatistics.getCargoTonnage(anyCollection(), anyCollection(), eq(false),
+                  eq(true))).thenReturn(0.0);
 
-        when(mockCargoStatistics.getCargoTonnage(false, false)).thenReturn(cargoSize);
-        when(mockCargoStatistics.getCargoTonnage(false, true)).thenReturn(0.0);
+            transportCostCalculations.calculateCargoRequirements();
+        }
 
-        transportCostCalculations.calculateCargoRequirements();
         int additionalDropShipsRequired = transportCostCalculations.getAdditionalDropShipsRequired();
         int predictedAdditionalDropShipsRequired = 0;
         assertEquals(predictedAdditionalDropShipsRequired, additionalDropShipsRequired,
@@ -341,12 +362,16 @@ public class TransportCostCalculationsTest {
     @ParameterizedTest
     @ValueSource(ints = { 0, 3000, 5000, 10000 })
     public void testCalculateCargoRequirements_onlyMothballedCargo_insufficientCapacity(double cargoSize) {
-        when(mockCargoStatistics.getTotalCargoCapacity()).thenReturn(0.0);
+        try (MockedStatic<CargoStatistics> mockedCargo = mockStatic(CargoStatistics.class)) {
+            mockedCargo.when(() -> CargoStatistics.getTotalCargoCapacity(any(Hangar.class))).thenReturn(0.0);
+            mockedCargo.when(() -> CargoStatistics.getCargoTonnage(anyCollection(), anyCollection(), eq(false),
+                  eq(false))).thenReturn(0.0);
+            mockedCargo.when(() -> CargoStatistics.getCargoTonnage(anyCollection(), anyCollection(), eq(false),
+                  eq(true))).thenReturn(cargoSize);
 
-        when(mockCargoStatistics.getCargoTonnage(false, false)).thenReturn(0.0);
-        when(mockCargoStatistics.getCargoTonnage(false, true)).thenReturn(cargoSize);
+            transportCostCalculations.calculateCargoRequirements();
+        }
 
-        transportCostCalculations.calculateCargoRequirements();
         int additionalDropShipsRequired = transportCostCalculations.getAdditionalDropShipsRequired();
         int predictedAdditionalDropShipsRequired = (int) ceil(cargoSize / CARGO_PER_DROPSHIP);
         assertEquals(predictedAdditionalDropShipsRequired, additionalDropShipsRequired,
@@ -364,12 +389,17 @@ public class TransportCostCalculationsTest {
     @ParameterizedTest
     @ValueSource(ints = { 0, 3000, 5000, 10000 })
     public void testCalculateCargoRequirements_onlyMothballedCargo_sufficientCapacity(double cargoSize) {
-        when(mockCargoStatistics.getTotalCargoCapacity()).thenReturn(cargoSize * 3);
+        try (MockedStatic<CargoStatistics> mockedCargo = mockStatic(CargoStatistics.class)) {
+            mockedCargo.when(() -> CargoStatistics.getTotalCargoCapacity(any(Hangar.class)))
+                  .thenReturn(cargoSize * 3);
+            mockedCargo.when(() -> CargoStatistics.getCargoTonnage(anyCollection(), anyCollection(), eq(false),
+                  eq(false))).thenReturn(0.0);
+            mockedCargo.when(() -> CargoStatistics.getCargoTonnage(anyCollection(), anyCollection(), eq(false),
+                  eq(true))).thenReturn(cargoSize);
 
-        when(mockCargoStatistics.getCargoTonnage(false, false)).thenReturn(0.0);
-        when(mockCargoStatistics.getCargoTonnage(false, true)).thenReturn(cargoSize);
+            transportCostCalculations.calculateCargoRequirements();
+        }
 
-        transportCostCalculations.calculateCargoRequirements();
         int additionalDropShipsRequired = transportCostCalculations.getAdditionalDropShipsRequired();
         int predictedAdditionalDropShipsRequired = 0;
         assertEquals(predictedAdditionalDropShipsRequired, additionalDropShipsRequired,
@@ -388,17 +418,17 @@ public class TransportCostCalculationsTest {
     @ValueSource(ints = { 0, 3, 5, 10 })
     public void calculateAdditionalBayRequirementsFromUnits_smallCraft_noSpareBays(int bayRequirementCount) {
         // 0 existing bays
-        setHangarUnits(List.of());
+        TransportCostCalculations local = calculationsWithUnits(List.of());
 
-        transportCostCalculations.setSmallCraftCount(bayRequirementCount);
-        transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
+        local.setSmallCraftCount(bayRequirementCount);
+        local.calculateAdditionalBayRequirementsFromUnits();
 
-        int additionalBaysRequired = transportCostCalculations.getAdditionalSmallCraftBaysRequired();
+        int additionalBaysRequired = local.getAdditionalSmallCraftBaysRequired();
         assertEquals(bayRequirementCount, additionalBaysRequired,
               "Expected " + bayRequirementCount + " additional bays required but was " + additionalBaysRequired);
 
         double expectedCost = round(bayRequirementCount * SMALL_CRAFT_COST);
-        double actualCost = transportCostCalculations.getAdditionalSmallCraftBaysCost();
+        double actualCost = local.getAdditionalSmallCraftBaysCost();
         assertEquals(expectedCost, actualCost,
               "Expected " + expectedCost + " additional bays cost but was " + actualCost);
     }
@@ -407,18 +437,19 @@ public class TransportCostCalculationsTest {
     @ValueSource(ints = { 3, 5, 10 })
     public void calculateAdditionalBayRequirementsFromUnits_smallCraft_tooFewExistingBays(int bayRequirementCount) {
         // existing = bayRequirementCount - 1
-        setHangarUnits(List.of(unitWithSmallCraftCapacity(bayRequirementCount - 1)));
+        TransportCostCalculations local = calculationsWithUnits(List.of(
+              unitWithSmallCraftCapacity(bayRequirementCount - 1)));
 
-        transportCostCalculations.setSmallCraftCount(bayRequirementCount);
-        transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
+        local.setSmallCraftCount(bayRequirementCount);
+        local.calculateAdditionalBayRequirementsFromUnits();
 
-        int additionalBaysRequired = transportCostCalculations.getAdditionalSmallCraftBaysRequired();
+        int additionalBaysRequired = local.getAdditionalSmallCraftBaysRequired();
         int expectedBaysRequired = 1;
         assertEquals(expectedBaysRequired, additionalBaysRequired,
               "Expected " + expectedBaysRequired + " additional bays required but was " + additionalBaysRequired);
 
         double expectedCost = round(expectedBaysRequired * SMALL_CRAFT_COST);
-        double actualCost = transportCostCalculations.getAdditionalSmallCraftBaysCost();
+        double actualCost = local.getAdditionalSmallCraftBaysCost();
         assertEquals(expectedCost, actualCost,
               "Expected " + expectedCost + " additional bays cost but was " + actualCost);
     }
@@ -427,18 +458,19 @@ public class TransportCostCalculationsTest {
     @ValueSource(ints = { 3, 5, 10 })
     public void calculateAdditionalBayRequirementsFromUnits_smallCraft_tooManyExistingBays(int bayRequirementCount) {
         // existing = bayRequirementCount + 1
-        setHangarUnits(List.of(unitWithSmallCraftCapacity(bayRequirementCount + 1)));
+        TransportCostCalculations local = calculationsWithUnits(List.of(
+              unitWithSmallCraftCapacity(bayRequirementCount + 1)));
 
-        transportCostCalculations.setSmallCraftCount(bayRequirementCount);
-        transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
+        local.setSmallCraftCount(bayRequirementCount);
+        local.calculateAdditionalBayRequirementsFromUnits();
 
-        int additionalBaysRequired = transportCostCalculations.getAdditionalSmallCraftBaysRequired();
+        int additionalBaysRequired = local.getAdditionalSmallCraftBaysRequired();
         int expectedBaysRequired = 0;
         assertEquals(expectedBaysRequired, additionalBaysRequired,
               "Expected " + expectedBaysRequired + " additional bays required but was " + additionalBaysRequired);
 
         double expectedCost = round(expectedBaysRequired * SMALL_CRAFT_COST);
-        double actualCost = transportCostCalculations.getAdditionalSmallCraftBaysCost();
+        double actualCost = local.getAdditionalSmallCraftBaysCost();
         assertEquals(expectedCost, actualCost,
               "Expected " + expectedCost + " additional bays cost but was " + actualCost);
     }
@@ -448,18 +480,18 @@ public class TransportCostCalculationsTest {
     public void calculateAdditionalBayRequirementsFromUnits_aerospaceOrConventionalFighter_noSpareBays(
           int bayRequirementCount) {
         // totalSmallCraftBays=0, totalASFBays=0
-        setHangarUnits(List.of());
+        TransportCostCalculations local = calculationsWithUnits(List.of());
 
-        transportCostCalculations.setSmallCraftCount(0);
-        transportCostCalculations.setASFCount(bayRequirementCount);
-        transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
+        local.setSmallCraftCount(0);
+        local.setASFCount(bayRequirementCount);
+        local.calculateAdditionalBayRequirementsFromUnits();
 
-        int additionalBaysRequired = transportCostCalculations.getAdditionalASFBaysRequired();
+        int additionalBaysRequired = local.getAdditionalASFBaysRequired();
         assertEquals(bayRequirementCount, additionalBaysRequired,
               "Expected " + bayRequirementCount + " additional bays required but was " + additionalBaysRequired);
 
         double expectedCost = round(bayRequirementCount * ASF_COST);
-        double actualCost = transportCostCalculations.getAdditionalASFBaysCost();
+        double actualCost = local.getAdditionalASFBaysCost();
         assertEquals(expectedCost, actualCost,
               "Expected " + expectedCost + " additional bays cost but was " + actualCost);
     }
@@ -469,19 +501,20 @@ public class TransportCostCalculationsTest {
     public void calculateAdditionalBayRequirementsFromUnits_aerospaceOrConventionalFighter_tooFewExistingBays(
           int bayRequirementCount) {
         // totalASFBays = bayRequirementCount - 1
-        setHangarUnits(List.of(unitWithASFCapacity(bayRequirementCount - 1)));
+        TransportCostCalculations local = calculationsWithUnits(List.of(
+              unitWithASFCapacity(bayRequirementCount - 1)));
 
-        transportCostCalculations.setSmallCraftCount(0);
-        transportCostCalculations.setASFCount(bayRequirementCount);
-        transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
+        local.setSmallCraftCount(0);
+        local.setASFCount(bayRequirementCount);
+        local.calculateAdditionalBayRequirementsFromUnits();
 
-        int additionalBaysRequired = transportCostCalculations.getAdditionalASFBaysRequired();
+        int additionalBaysRequired = local.getAdditionalASFBaysRequired();
         int expectedBaysRequired = 1;
         assertEquals(expectedBaysRequired, additionalBaysRequired,
               "Expected " + expectedBaysRequired + " additional bays required but was " + additionalBaysRequired);
 
         double expectedCost = round(expectedBaysRequired * ASF_COST);
-        double actualCost = transportCostCalculations.getAdditionalASFBaysCost();
+        double actualCost = local.getAdditionalASFBaysCost();
         assertEquals(expectedCost, actualCost,
               "Expected " + expectedCost + " additional bays cost but was " + actualCost);
     }
@@ -491,19 +524,20 @@ public class TransportCostCalculationsTest {
     public void calculateAdditionalBayRequirementsFromUnits_aerospaceOrConventionalFighter_tooManyExistingBays(
           int bayRequirementCount) {
         // totalASFBays = bayRequirementCount + 1
-        setHangarUnits(List.of(unitWithASFCapacity(bayRequirementCount + 1)));
+        TransportCostCalculations local = calculationsWithUnits(List.of(
+              unitWithASFCapacity(bayRequirementCount + 1)));
 
-        transportCostCalculations.setSmallCraftCount(0);
-        transportCostCalculations.setASFCount(bayRequirementCount);
-        transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
+        local.setSmallCraftCount(0);
+        local.setASFCount(bayRequirementCount);
+        local.calculateAdditionalBayRequirementsFromUnits();
 
-        int additionalBaysRequired = transportCostCalculations.getAdditionalASFBaysRequired();
+        int additionalBaysRequired = local.getAdditionalASFBaysRequired();
         int expectedBaysRequired = 0;
         assertEquals(expectedBaysRequired, additionalBaysRequired,
               "Expected " + expectedBaysRequired + " additional bays required but was " + additionalBaysRequired);
 
         double expectedCost = round(expectedBaysRequired * ASF_COST);
-        double actualCost = transportCostCalculations.getAdditionalASFBaysCost();
+        double actualCost = local.getAdditionalASFBaysCost();
         assertEquals(expectedCost, actualCost,
               "Expected " + expectedCost + " additional bays cost but was " + actualCost);
     }
@@ -513,19 +547,19 @@ public class TransportCostCalculationsTest {
     public void calculateAdditionalBayRequirementsFromUnits_aerospaceOrConventionalFighter_surplusCompatibleBays(
           int bayRequirementCount) {
         // totalSmallCraftBays=3, totalASFBays=0
-        setHangarUnits(List.of(unitWithSmallCraftCapacity(3)));
+        TransportCostCalculations local = calculationsWithUnits(List.of(unitWithSmallCraftCapacity(3)));
 
-        transportCostCalculations.setSmallCraftCount(0);
-        transportCostCalculations.setASFCount(bayRequirementCount);
-        transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
+        local.setSmallCraftCount(0);
+        local.setASFCount(bayRequirementCount);
+        local.calculateAdditionalBayRequirementsFromUnits();
 
-        int additionalBaysRequired = transportCostCalculations.getAdditionalASFBaysRequired();
+        int additionalBaysRequired = local.getAdditionalASFBaysRequired();
         int expectedBaysRequired = max(0, bayRequirementCount - 3);
         assertEquals(expectedBaysRequired, additionalBaysRequired,
               "Expected " + expectedBaysRequired + " additional bays required but was " + additionalBaysRequired);
 
         double expectedCost = round(expectedBaysRequired * ASF_COST);
-        double actualCost = transportCostCalculations.getAdditionalASFBaysCost();
+        double actualCost = local.getAdditionalASFBaysCost();
         assertEquals(expectedCost, actualCost,
               "Expected " + expectedCost + " additional bays cost but was " + actualCost);
     }
@@ -533,17 +567,17 @@ public class TransportCostCalculationsTest {
     @ParameterizedTest
     @ValueSource(ints = { 0, 3, 5, 10 })
     public void calculateAdditionalBayRequirementsFromUnits_mek_noSpareBays(int bayRequirementCount) {
-        setHangarUnits(List.of());
+        TransportCostCalculations local = calculationsWithUnits(List.of());
 
-        transportCostCalculations.setMekCount(bayRequirementCount);
-        transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
+        local.setMekCount(bayRequirementCount);
+        local.calculateAdditionalBayRequirementsFromUnits();
 
-        int additionalBaysRequired = transportCostCalculations.getAdditionalMekBaysRequired();
+        int additionalBaysRequired = local.getAdditionalMekBaysRequired();
         assertEquals(bayRequirementCount, additionalBaysRequired,
               "Expected " + bayRequirementCount + " additional bays required but was " + additionalBaysRequired);
 
         double expectedCost = round(bayRequirementCount * MEK_COST);
-        double actualCost = transportCostCalculations.getAdditionalMekBaysCost();
+        double actualCost = local.getAdditionalMekBaysCost();
         assertEquals(expectedCost, actualCost,
               "Expected " + expectedCost + " additional bays cost but was " + actualCost);
     }
@@ -551,18 +585,19 @@ public class TransportCostCalculationsTest {
     @ParameterizedTest
     @ValueSource(ints = { 3, 5, 10 })
     public void calculateAdditionalBayRequirementsFromUnits_mek_tooFewExistingBays(int bayRequirementCount) {
-        setHangarUnits(List.of(unitWithMekCapacity(bayRequirementCount - 1)));
+        TransportCostCalculations local = calculationsWithUnits(List.of(
+              unitWithMekCapacity(bayRequirementCount - 1)));
 
-        transportCostCalculations.setMekCount(bayRequirementCount);
-        transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
+        local.setMekCount(bayRequirementCount);
+        local.calculateAdditionalBayRequirementsFromUnits();
 
-        int additionalBaysRequired = transportCostCalculations.getAdditionalMekBaysRequired();
+        int additionalBaysRequired = local.getAdditionalMekBaysRequired();
         int expectedBaysRequired = 1;
         assertEquals(expectedBaysRequired, additionalBaysRequired,
               "Expected " + expectedBaysRequired + " additional bays required but was " + additionalBaysRequired);
 
         double expectedCost = round(expectedBaysRequired * MEK_COST);
-        double actualCost = transportCostCalculations.getAdditionalMekBaysCost();
+        double actualCost = local.getAdditionalMekBaysCost();
         assertEquals(expectedCost, actualCost,
               "Expected " + expectedCost + " additional bays cost but was " + actualCost);
     }
@@ -570,18 +605,19 @@ public class TransportCostCalculationsTest {
     @ParameterizedTest
     @ValueSource(ints = { 3, 5, 10 })
     public void calculateAdditionalBayRequirementsFromUnits_mek_tooManyExistingBays(int bayRequirementCount) {
-        setHangarUnits(List.of(unitWithMekCapacity(bayRequirementCount + 1)));
+        TransportCostCalculations local = calculationsWithUnits(List.of(
+              unitWithMekCapacity(bayRequirementCount + 1)));
 
-        transportCostCalculations.setMekCount(bayRequirementCount);
-        transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
+        local.setMekCount(bayRequirementCount);
+        local.calculateAdditionalBayRequirementsFromUnits();
 
-        int additionalBaysRequired = transportCostCalculations.getAdditionalMekBaysRequired();
+        int additionalBaysRequired = local.getAdditionalMekBaysRequired();
         int expectedBaysRequired = 0;
         assertEquals(expectedBaysRequired, additionalBaysRequired,
               "Expected " + expectedBaysRequired + " additional bays required but was " + additionalBaysRequired);
 
         double expectedCost = round(expectedBaysRequired * MEK_COST);
-        double actualCost = transportCostCalculations.getAdditionalMekBaysCost();
+        double actualCost = local.getAdditionalMekBaysCost();
         assertEquals(expectedCost, actualCost,
               "Expected " + expectedCost + " additional bays cost but was " + actualCost);
     }
@@ -589,17 +625,17 @@ public class TransportCostCalculationsTest {
     @ParameterizedTest
     @ValueSource(ints = { 0, 3, 5, 10 })
     public void calculateAdditionalBayRequirementsFromUnits_superHeavyVehicle_noSpareBays(int bayRequirementCount) {
-        setHangarUnits(List.of());
+        TransportCostCalculations local = calculationsWithUnits(List.of());
 
-        transportCostCalculations.setSuperHeavyVehicleCount(bayRequirementCount);
-        transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
+        local.setSuperHeavyVehicleCount(bayRequirementCount);
+        local.calculateAdditionalBayRequirementsFromUnits();
 
-        int additionalBaysRequired = transportCostCalculations.getAdditionalSuperHeavyVehicleBaysRequired();
+        int additionalBaysRequired = local.getAdditionalSuperHeavyVehicleBaysRequired();
         assertEquals(bayRequirementCount, additionalBaysRequired,
               "Expected " + bayRequirementCount + " additional bays required but was " + additionalBaysRequired);
 
         double expectedCost = round(bayRequirementCount * SUPER_HEAVY_VEHICLE_COST);
-        double actualCost = transportCostCalculations.getAdditionalSuperHeavyVehicleBaysCost();
+        double actualCost = local.getAdditionalSuperHeavyVehicleBaysCost();
         assertEquals(expectedCost, actualCost,
               "Expected " + expectedCost + " additional bays cost but was " + actualCost);
     }
@@ -608,18 +644,19 @@ public class TransportCostCalculationsTest {
     @ValueSource(ints = { 3, 5, 10 })
     public void calculateAdditionalBayRequirementsFromUnits_superHeavyVehicle_tooFewExistingBays(
           int bayRequirementCount) {
-        setHangarUnits(List.of(unitWithSuperHeavyVehicleCapacity(bayRequirementCount - 1)));
+        TransportCostCalculations local = calculationsWithUnits(List.of(
+              unitWithSuperHeavyVehicleCapacity(bayRequirementCount - 1)));
 
-        transportCostCalculations.setSuperHeavyVehicleCount(bayRequirementCount);
-        transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
+        local.setSuperHeavyVehicleCount(bayRequirementCount);
+        local.calculateAdditionalBayRequirementsFromUnits();
 
-        int additionalBaysRequired = transportCostCalculations.getAdditionalSuperHeavyVehicleBaysRequired();
+        int additionalBaysRequired = local.getAdditionalSuperHeavyVehicleBaysRequired();
         int expectedBaysRequired = 1;
         assertEquals(expectedBaysRequired, additionalBaysRequired,
               "Expected " + expectedBaysRequired + " additional bays required but was " + additionalBaysRequired);
 
         double expectedCost = round(expectedBaysRequired * SUPER_HEAVY_VEHICLE_COST);
-        double actualCost = transportCostCalculations.getAdditionalSuperHeavyVehicleBaysCost();
+        double actualCost = local.getAdditionalSuperHeavyVehicleBaysCost();
         assertEquals(expectedCost, actualCost,
               "Expected " + expectedCost + " additional bays cost but was " + actualCost);
     }
@@ -628,18 +665,19 @@ public class TransportCostCalculationsTest {
     @ValueSource(ints = { 3, 5, 10 })
     public void calculateAdditionalBayRequirementsFromUnits_superHeavyVehicle_tooManyExistingBays(
           int bayRequirementCount) {
-        setHangarUnits(List.of(unitWithSuperHeavyVehicleCapacity(bayRequirementCount + 1)));
+        TransportCostCalculations local = calculationsWithUnits(List.of(
+              unitWithSuperHeavyVehicleCapacity(bayRequirementCount + 1)));
 
-        transportCostCalculations.setSuperHeavyVehicleCount(bayRequirementCount);
-        transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
+        local.setSuperHeavyVehicleCount(bayRequirementCount);
+        local.calculateAdditionalBayRequirementsFromUnits();
 
-        int additionalBaysRequired = transportCostCalculations.getAdditionalSuperHeavyVehicleBaysRequired();
+        int additionalBaysRequired = local.getAdditionalSuperHeavyVehicleBaysRequired();
         int expectedBaysRequired = 0;
         assertEquals(expectedBaysRequired, additionalBaysRequired,
               "Expected " + expectedBaysRequired + " additional bays required but was " + additionalBaysRequired);
 
         double expectedCost = round(expectedBaysRequired * SUPER_HEAVY_VEHICLE_COST);
-        double actualCost = transportCostCalculations.getAdditionalSuperHeavyVehicleBaysCost();
+        double actualCost = local.getAdditionalSuperHeavyVehicleBaysCost();
         assertEquals(expectedCost, actualCost,
               "Expected " + expectedCost + " additional bays cost but was " + actualCost);
     }
@@ -648,18 +686,18 @@ public class TransportCostCalculationsTest {
     @ValueSource(ints = { 0, 3, 5, 10 })
     public void calculateAdditionalBayRequirementsFromUnits_heavyVehicle_noSpareBays(int bayRequirementCount) {
         // Ensure no compatible surplus in super-heavy bays
-        setHangarUnits(List.of());
+        TransportCostCalculations local = calculationsWithUnits(List.of());
 
-        transportCostCalculations.setSuperHeavyVehicleCount(0);
-        transportCostCalculations.setHeavyVehicleCount(bayRequirementCount);
-        transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
+        local.setSuperHeavyVehicleCount(0);
+        local.setHeavyVehicleCount(bayRequirementCount);
+        local.calculateAdditionalBayRequirementsFromUnits();
 
-        int additionalBaysRequired = transportCostCalculations.getAdditionalHeavyVehicleBaysRequired();
+        int additionalBaysRequired = local.getAdditionalHeavyVehicleBaysRequired();
         assertEquals(bayRequirementCount, additionalBaysRequired,
               "Expected " + bayRequirementCount + " additional bays required but was " + additionalBaysRequired);
 
         double expectedCost = round(bayRequirementCount * HEAVY_VEHICLE_COST);
-        double actualCost = transportCostCalculations.getAdditionalHeavyVehicleBaysCost();
+        double actualCost = local.getAdditionalHeavyVehicleBaysCost();
         assertEquals(expectedCost, actualCost,
               "Expected " + expectedCost + " additional bays cost but was " + actualCost);
     }
@@ -667,19 +705,20 @@ public class TransportCostCalculationsTest {
     @ParameterizedTest
     @ValueSource(ints = { 3, 5, 10 })
     public void calculateAdditionalBayRequirementsFromUnits_heavyVehicle_tooFewExistingBays(int bayRequirementCount) {
-        setHangarUnits(List.of(unitWithHeavyVehicleCapacity(bayRequirementCount - 1)));
+        TransportCostCalculations local = calculationsWithUnits(List.of(
+              unitWithHeavyVehicleCapacity(bayRequirementCount - 1)));
 
-        transportCostCalculations.setSuperHeavyVehicleCount(0);
-        transportCostCalculations.setHeavyVehicleCount(bayRequirementCount);
-        transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
+        local.setSuperHeavyVehicleCount(0);
+        local.setHeavyVehicleCount(bayRequirementCount);
+        local.calculateAdditionalBayRequirementsFromUnits();
 
-        int additionalBaysRequired = transportCostCalculations.getAdditionalHeavyVehicleBaysRequired();
+        int additionalBaysRequired = local.getAdditionalHeavyVehicleBaysRequired();
         int expectedBaysRequired = 1;
         assertEquals(expectedBaysRequired, additionalBaysRequired,
               "Expected " + expectedBaysRequired + " additional bays required but was " + additionalBaysRequired);
 
         double expectedCost = round(expectedBaysRequired * HEAVY_VEHICLE_COST);
-        double actualCost = transportCostCalculations.getAdditionalHeavyVehicleBaysCost();
+        double actualCost = local.getAdditionalHeavyVehicleBaysCost();
         assertEquals(expectedCost, actualCost,
               "Expected " + expectedCost + " additional bays cost but was " + actualCost);
     }
@@ -687,19 +726,20 @@ public class TransportCostCalculationsTest {
     @ParameterizedTest
     @ValueSource(ints = { 3, 5, 10 })
     public void calculateAdditionalBayRequirementsFromUnits_heavyVehicle_tooManyExistingBays(int bayRequirementCount) {
-        setHangarUnits(List.of(unitWithHeavyVehicleCapacity(bayRequirementCount + 1)));
+        TransportCostCalculations local = calculationsWithUnits(List.of(
+              unitWithHeavyVehicleCapacity(bayRequirementCount + 1)));
 
-        transportCostCalculations.setSuperHeavyVehicleCount(0);
-        transportCostCalculations.setHeavyVehicleCount(bayRequirementCount);
-        transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
+        local.setSuperHeavyVehicleCount(0);
+        local.setHeavyVehicleCount(bayRequirementCount);
+        local.calculateAdditionalBayRequirementsFromUnits();
 
-        int additionalBaysRequired = transportCostCalculations.getAdditionalHeavyVehicleBaysRequired();
+        int additionalBaysRequired = local.getAdditionalHeavyVehicleBaysRequired();
         int expectedBaysRequired = 0;
         assertEquals(expectedBaysRequired, additionalBaysRequired,
               "Expected " + expectedBaysRequired + " additional bays required but was " + additionalBaysRequired);
 
         double expectedCost = round(expectedBaysRequired * HEAVY_VEHICLE_COST);
-        double actualCost = transportCostCalculations.getAdditionalHeavyVehicleBaysCost();
+        double actualCost = local.getAdditionalHeavyVehicleBaysCost();
         assertEquals(expectedCost, actualCost,
               "Expected " + expectedCost + " additional bays cost but was " + actualCost);
     }
@@ -709,19 +749,19 @@ public class TransportCostCalculationsTest {
     public void calculateAdditionalBayRequirementsFromUnits_heavyVehicle_surplusCompatibleBays(
           int bayRequirementCount) {
         // totalSuperHeavyVehicleBays = 3 can cover heavy vehicles
-        setHangarUnits(List.of(unitWithSuperHeavyVehicleCapacity(3)));
+        TransportCostCalculations local = calculationsWithUnits(List.of(unitWithSuperHeavyVehicleCapacity(3)));
 
-        transportCostCalculations.setSuperHeavyVehicleCount(0);
-        transportCostCalculations.setHeavyVehicleCount(bayRequirementCount);
-        transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
+        local.setSuperHeavyVehicleCount(0);
+        local.setHeavyVehicleCount(bayRequirementCount);
+        local.calculateAdditionalBayRequirementsFromUnits();
 
-        int additionalBaysRequired = transportCostCalculations.getAdditionalHeavyVehicleBaysRequired();
+        int additionalBaysRequired = local.getAdditionalHeavyVehicleBaysRequired();
         int expectedBaysRequired = max(0, bayRequirementCount - 3);
         assertEquals(expectedBaysRequired, additionalBaysRequired,
               "Expected " + expectedBaysRequired + " additional bays required but was " + additionalBaysRequired);
 
         double expectedCost = round(expectedBaysRequired * HEAVY_VEHICLE_COST);
-        double actualCost = transportCostCalculations.getAdditionalHeavyVehicleBaysCost();
+        double actualCost = local.getAdditionalHeavyVehicleBaysCost();
         assertEquals(expectedCost, actualCost,
               "Expected " + expectedCost + " additional bays cost but was " + actualCost);
     }
@@ -729,19 +769,19 @@ public class TransportCostCalculationsTest {
     @ParameterizedTest
     @ValueSource(ints = { 0, 3, 5, 10 })
     public void calculateAdditionalBayRequirementsFromUnits_lightVehicle_noSpareBays(int bayRequirementCount) {
-        setHangarUnits(List.of());
+        TransportCostCalculations local = calculationsWithUnits(List.of());
 
-        transportCostCalculations.setSuperHeavyVehicleCount(0);
-        transportCostCalculations.setHeavyVehicleCount(0);
-        transportCostCalculations.setLightVehicleCount(bayRequirementCount);
-        transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
+        local.setSuperHeavyVehicleCount(0);
+        local.setHeavyVehicleCount(0);
+        local.setLightVehicleCount(bayRequirementCount);
+        local.calculateAdditionalBayRequirementsFromUnits();
 
-        int additionalBaysRequired = transportCostCalculations.getAdditionalLightVehicleBaysRequired();
+        int additionalBaysRequired = local.getAdditionalLightVehicleBaysRequired();
         assertEquals(bayRequirementCount, additionalBaysRequired,
               "Expected " + bayRequirementCount + " additional bays required but was " + additionalBaysRequired);
 
         double expectedCost = round(bayRequirementCount * LIGHT_VEHICLE_COST);
-        double actualCost = transportCostCalculations.getAdditionalLightVehicleBaysCost();
+        double actualCost = local.getAdditionalLightVehicleBaysCost();
         assertEquals(expectedCost, actualCost,
               "Expected " + expectedCost + " additional bays cost but was " + actualCost);
     }
@@ -749,20 +789,21 @@ public class TransportCostCalculationsTest {
     @ParameterizedTest
     @ValueSource(ints = { 3, 5, 10 })
     public void calculateAdditionalBayRequirementsFromUnits_lightVehicle_tooFewExistingBays(int bayRequirementCount) {
-        setHangarUnits(List.of(unitWithLightVehicleCapacity(bayRequirementCount - 1)));
+        TransportCostCalculations local = calculationsWithUnits(List.of(
+              unitWithLightVehicleCapacity(bayRequirementCount - 1)));
 
-        transportCostCalculations.setSuperHeavyVehicleCount(0);
-        transportCostCalculations.setHeavyVehicleCount(0);
-        transportCostCalculations.setLightVehicleCount(bayRequirementCount);
-        transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
+        local.setSuperHeavyVehicleCount(0);
+        local.setHeavyVehicleCount(0);
+        local.setLightVehicleCount(bayRequirementCount);
+        local.calculateAdditionalBayRequirementsFromUnits();
 
-        int additionalBaysRequired = transportCostCalculations.getAdditionalLightVehicleBaysRequired();
+        int additionalBaysRequired = local.getAdditionalLightVehicleBaysRequired();
         int expectedBaysRequired = 1;
         assertEquals(expectedBaysRequired, additionalBaysRequired,
               "Expected " + expectedBaysRequired + " additional bays required but was " + additionalBaysRequired);
 
         double expectedCost = round(expectedBaysRequired * LIGHT_VEHICLE_COST);
-        double actualCost = transportCostCalculations.getAdditionalLightVehicleBaysCost();
+        double actualCost = local.getAdditionalLightVehicleBaysCost();
         assertEquals(expectedCost, actualCost,
               "Expected " + expectedCost + " additional bays cost but was " + actualCost);
     }
@@ -770,20 +811,21 @@ public class TransportCostCalculationsTest {
     @ParameterizedTest
     @ValueSource(ints = { 3, 5, 10 })
     public void calculateAdditionalBayRequirementsFromUnits_lightVehicle_tooManyExistingBays(int bayRequirementCount) {
-        setHangarUnits(List.of(unitWithLightVehicleCapacity(bayRequirementCount + 1)));
+        TransportCostCalculations local = calculationsWithUnits(List.of(
+              unitWithLightVehicleCapacity(bayRequirementCount + 1)));
 
-        transportCostCalculations.setSuperHeavyVehicleCount(0);
-        transportCostCalculations.setHeavyVehicleCount(0);
-        transportCostCalculations.setLightVehicleCount(bayRequirementCount);
-        transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
+        local.setSuperHeavyVehicleCount(0);
+        local.setHeavyVehicleCount(0);
+        local.setLightVehicleCount(bayRequirementCount);
+        local.calculateAdditionalBayRequirementsFromUnits();
 
-        int additionalBaysRequired = transportCostCalculations.getAdditionalLightVehicleBaysRequired();
+        int additionalBaysRequired = local.getAdditionalLightVehicleBaysRequired();
         int expectedBaysRequired = 0;
         assertEquals(expectedBaysRequired, additionalBaysRequired,
               "Expected " + expectedBaysRequired + " additional bays required but was " + additionalBaysRequired);
 
         double expectedCost = round(expectedBaysRequired * LIGHT_VEHICLE_COST);
-        double actualCost = transportCostCalculations.getAdditionalLightVehicleBaysCost();
+        double actualCost = local.getAdditionalLightVehicleBaysCost();
         assertEquals(expectedCost, actualCost,
               "Expected " + expectedCost + " additional bays cost but was " + actualCost);
     }
@@ -792,20 +834,20 @@ public class TransportCostCalculationsTest {
     @ValueSource(ints = { 0, 3, 5, 10 })
     public void calculateAdditionalBayRequirementsFromUnits_lightVehicle_surplusCompatibleBays_superHeavy(
           int bayRequirementCount) {
-        setHangarUnits(List.of(unitWithSuperHeavyVehicleCapacity(3)));
+        TransportCostCalculations local = calculationsWithUnits(List.of(unitWithSuperHeavyVehicleCapacity(3)));
 
-        transportCostCalculations.setSuperHeavyVehicleCount(0);
-        transportCostCalculations.setHeavyVehicleCount(0);
-        transportCostCalculations.setLightVehicleCount(bayRequirementCount);
-        transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
+        local.setSuperHeavyVehicleCount(0);
+        local.setHeavyVehicleCount(0);
+        local.setLightVehicleCount(bayRequirementCount);
+        local.calculateAdditionalBayRequirementsFromUnits();
 
-        int additionalBaysRequired = transportCostCalculations.getAdditionalLightVehicleBaysRequired();
+        int additionalBaysRequired = local.getAdditionalLightVehicleBaysRequired();
         int expectedBaysRequired = max(0, bayRequirementCount - 3);
         assertEquals(expectedBaysRequired, additionalBaysRequired,
               "Expected " + expectedBaysRequired + " additional bays required but was " + additionalBaysRequired);
 
         double expectedCost = round(expectedBaysRequired * LIGHT_VEHICLE_COST);
-        double actualCost = transportCostCalculations.getAdditionalLightVehicleBaysCost();
+        double actualCost = local.getAdditionalLightVehicleBaysCost();
         assertEquals(expectedCost, actualCost,
               "Expected " + expectedCost + " additional bays cost but was " + actualCost);
     }
@@ -814,20 +856,20 @@ public class TransportCostCalculationsTest {
     @ValueSource(ints = { 0, 3, 5, 10 })
     public void calculateAdditionalBayRequirementsFromUnits_lightVehicle_surplusCompatibleBays_heavy(
           int bayRequirementCount) {
-        setHangarUnits(List.of(unitWithHeavyVehicleCapacity(3)));
+        TransportCostCalculations local = calculationsWithUnits(List.of(unitWithHeavyVehicleCapacity(3)));
 
-        transportCostCalculations.setSuperHeavyVehicleCount(0);
-        transportCostCalculations.setHeavyVehicleCount(0);
-        transportCostCalculations.setLightVehicleCount(bayRequirementCount);
-        transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
+        local.setSuperHeavyVehicleCount(0);
+        local.setHeavyVehicleCount(0);
+        local.setLightVehicleCount(bayRequirementCount);
+        local.calculateAdditionalBayRequirementsFromUnits();
 
-        int additionalBaysRequired = transportCostCalculations.getAdditionalLightVehicleBaysRequired();
+        int additionalBaysRequired = local.getAdditionalLightVehicleBaysRequired();
         int expectedBaysRequired = max(0, bayRequirementCount - 3);
         assertEquals(expectedBaysRequired, additionalBaysRequired,
               "Expected " + expectedBaysRequired + " additional bays required but was " + additionalBaysRequired);
 
         double expectedCost = round(expectedBaysRequired * LIGHT_VEHICLE_COST);
-        double actualCost = transportCostCalculations.getAdditionalLightVehicleBaysCost();
+        double actualCost = local.getAdditionalLightVehicleBaysCost();
         assertEquals(expectedCost, actualCost,
               "Expected " + expectedCost + " additional bays cost but was " + actualCost);
     }
@@ -836,20 +878,21 @@ public class TransportCostCalculationsTest {
     @ValueSource(ints = { 0, 3, 5, 10 })
     public void calculateAdditionalBayRequirementsFromUnits_lightVehicle_surplusCompatibleBays_superHeavyAndHeavy(
           int bayRequirementCount) {
-        setHangarUnits(List.of(unitWithSuperHeavyVehicleCapacity(2), unitWithHeavyVehicleCapacity(1)));
+        TransportCostCalculations local = calculationsWithUnits(List.of(unitWithSuperHeavyVehicleCapacity(2),
+              unitWithHeavyVehicleCapacity(1)));
 
-        transportCostCalculations.setSuperHeavyVehicleCount(0);
-        transportCostCalculations.setHeavyVehicleCount(0);
-        transportCostCalculations.setLightVehicleCount(bayRequirementCount);
-        transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
+        local.setSuperHeavyVehicleCount(0);
+        local.setHeavyVehicleCount(0);
+        local.setLightVehicleCount(bayRequirementCount);
+        local.calculateAdditionalBayRequirementsFromUnits();
 
-        int additionalBaysRequired = transportCostCalculations.getAdditionalLightVehicleBaysRequired();
+        int additionalBaysRequired = local.getAdditionalLightVehicleBaysRequired();
         int expectedBaysRequired = max(0, bayRequirementCount - 3);
         assertEquals(expectedBaysRequired, additionalBaysRequired,
               "Expected " + expectedBaysRequired + " additional bays required but was " + additionalBaysRequired);
 
         double expectedCost = round(expectedBaysRequired * LIGHT_VEHICLE_COST);
-        double actualCost = transportCostCalculations.getAdditionalLightVehicleBaysCost();
+        double actualCost = local.getAdditionalLightVehicleBaysCost();
         assertEquals(expectedCost, actualCost,
               "Expected " + expectedCost + " additional bays cost but was " + actualCost);
     }
@@ -860,18 +903,18 @@ public class TransportCostCalculationsTest {
         double protoMekBayUsage = (double) bayRequirementCount / PROTOMEKS_PER_BAY;
         int expectedBaysRequired = max(0, MathUtility.roundAwayFromZero(protoMekBayUsage));
 
-        setHangarUnits(List.of());
+        TransportCostCalculations local = calculationsWithUnits(List.of());
 
-        transportCostCalculations.setProtoMekCount(bayRequirementCount);
-        transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
+        local.setProtoMekCount(bayRequirementCount);
+        local.calculateAdditionalBayRequirementsFromUnits();
 
-        int additionalBaysRequired = transportCostCalculations.getAdditionalProtoMekBaysRequired();
+        int additionalBaysRequired = local.getAdditionalProtoMekBaysRequired();
 
         assertEquals(expectedBaysRequired, additionalBaysRequired,
               "Expected " + expectedBaysRequired + " additional bays required but was " + additionalBaysRequired);
 
         double expectedCost = round(expectedBaysRequired * PROTOMEK_COST);
-        double actualCost = transportCostCalculations.getAdditionalProtoMekBaysCost();
+        double actualCost = local.getAdditionalProtoMekBaysCost();
         assertEquals(expectedCost, actualCost,
               "Expected " + expectedCost + " additional bays cost but was " + actualCost);
     }
@@ -880,17 +923,17 @@ public class TransportCostCalculationsTest {
     @ValueSource(ints = { 0, 3, 5, 10 })
     public void calculateAdditionalBayRequirementsFromUnits_protoMek_tooFewSpareBays(int bayRequirementCount) {
         // totalProtoMekBays = 1
-        setHangarUnits(List.of(unitWithProtoMekCapacity(1)));
+        TransportCostCalculations local = calculationsWithUnits(List.of(unitWithProtoMekCapacity(1)));
 
         double protoMekBayUsage = 1 - bayRequirementCount;
         protoMekBayUsage = protoMekBayUsage / PROTOMEKS_PER_BAY;
         int adjustedProtoMekBayUsage = MathUtility.roundAwayFromZero(protoMekBayUsage);
         int expectedProtoMekBaysRequired = -min(0, adjustedProtoMekBayUsage);
 
-        transportCostCalculations.setProtoMekCount(bayRequirementCount);
-        transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
+        local.setProtoMekCount(bayRequirementCount);
+        local.calculateAdditionalBayRequirementsFromUnits();
 
-        int additionalBaysRequired = transportCostCalculations.getAdditionalProtoMekBaysRequired();
+        int additionalBaysRequired = local.getAdditionalProtoMekBaysRequired();
 
         assertEquals(expectedProtoMekBaysRequired, additionalBaysRequired,
               "Expected " +
@@ -899,7 +942,7 @@ public class TransportCostCalculationsTest {
                     additionalBaysRequired);
 
         double expectedCost = round(expectedProtoMekBaysRequired * PROTOMEK_COST);
-        double actualCost = transportCostCalculations.getAdditionalProtoMekBaysCost();
+        double actualCost = local.getAdditionalProtoMekBaysCost();
         assertEquals(expectedCost, actualCost,
               "Expected " + expectedCost + " additional bays cost but was " + actualCost);
     }
@@ -908,12 +951,13 @@ public class TransportCostCalculationsTest {
     @ValueSource(ints = { 0, 3, 5, 10 })
     public void calculateAdditionalBayRequirementsFromUnits_protoMek_tooManySpareBays(int bayRequirementCount) {
         // totalProtoMekBays = bayRequirementCount
-        setHangarUnits(List.of(unitWithProtoMekCapacity(bayRequirementCount)));
+        TransportCostCalculations local = calculationsWithUnits(List.of(
+              unitWithProtoMekCapacity(bayRequirementCount)));
 
-        transportCostCalculations.setProtoMekCount(bayRequirementCount);
-        transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
+        local.setProtoMekCount(bayRequirementCount);
+        local.calculateAdditionalBayRequirementsFromUnits();
 
-        int additionalBaysRequired = transportCostCalculations.getAdditionalProtoMekBaysRequired();
+        int additionalBaysRequired = local.getAdditionalProtoMekBaysRequired();
 
         assertEquals(0, additionalBaysRequired,
               "Expected " +
@@ -922,7 +966,7 @@ public class TransportCostCalculationsTest {
                     additionalBaysRequired);
 
         double expectedCost = 0;
-        double actualCost = transportCostCalculations.getAdditionalProtoMekBaysCost();
+        double actualCost = local.getAdditionalProtoMekBaysCost();
         assertEquals(expectedCost, actualCost,
               "Expected " + expectedCost + " additional bays cost but was " + actualCost);
     }
@@ -933,18 +977,18 @@ public class TransportCostCalculationsTest {
         double battleArmorBayUsage = (double) bayRequirementCount / BATTLE_ARMOR_SQUADS_PER_BAY;
         int expectedBaysRequired = max(0, MathUtility.roundAwayFromZero(battleArmorBayUsage));
 
-        setHangarUnits(List.of());
+        TransportCostCalculations local = calculationsWithUnits(List.of());
 
-        transportCostCalculations.setBattleArmorCount(bayRequirementCount);
-        transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
+        local.setBattleArmorCount(bayRequirementCount);
+        local.calculateAdditionalBayRequirementsFromUnits();
 
-        int additionalBaysRequired = transportCostCalculations.getAdditionalBattleArmorBaysRequired();
+        int additionalBaysRequired = local.getAdditionalBattleArmorBaysRequired();
 
         assertEquals(expectedBaysRequired, additionalBaysRequired,
               "Expected " + expectedBaysRequired + " additional bays required but was " + additionalBaysRequired);
 
         double expectedCost = round(expectedBaysRequired * BATTLE_ARMOR_COST);
-        double actualCost = transportCostCalculations.getAdditionalBattleArmorBaysCost();
+        double actualCost = local.getAdditionalBattleArmorBaysCost();
         assertEquals(expectedCost, actualCost,
               "Expected " + expectedCost + " additional bays cost but was " + actualCost);
     }
@@ -953,17 +997,17 @@ public class TransportCostCalculationsTest {
     @ValueSource(ints = { 6, 8, 11, 24 })
     public void calculateAdditionalBayRequirementsFromUnits_battleArmor_tooFewSpareBays(int bayRequirementCount) {
         // totalBattleArmorBays = 1
-        setHangarUnits(List.of(unitWithBattleArmorCapacity(1)));
+        TransportCostCalculations local = calculationsWithUnits(List.of(unitWithBattleArmorCapacity(1)));
 
         double battleArmorBayUsage = 1 - bayRequirementCount;
         battleArmorBayUsage = battleArmorBayUsage / BATTLE_ARMOR_SQUADS_PER_BAY;
         int adjustedBattleArmorBayUsage = MathUtility.roundAwayFromZero(battleArmorBayUsage);
         int expectedBattleArmorBaysRequired = -min(0, adjustedBattleArmorBayUsage);
 
-        transportCostCalculations.setBattleArmorCount(bayRequirementCount);
-        transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
+        local.setBattleArmorCount(bayRequirementCount);
+        local.calculateAdditionalBayRequirementsFromUnits();
 
-        int additionalBaysRequired = transportCostCalculations.getAdditionalBattleArmorBaysRequired();
+        int additionalBaysRequired = local.getAdditionalBattleArmorBaysRequired();
         assertEquals(expectedBattleArmorBaysRequired, additionalBaysRequired,
               "Expected " +
                     expectedBattleArmorBaysRequired +
@@ -971,7 +1015,7 @@ public class TransportCostCalculationsTest {
                     additionalBaysRequired);
 
         double expectedCost = round(expectedBattleArmorBaysRequired * BATTLE_ARMOR_COST);
-        double actualCost = transportCostCalculations.getAdditionalBattleArmorBaysCost();
+        double actualCost = local.getAdditionalBattleArmorBaysCost();
         assertEquals(expectedCost, actualCost,
               "Expected " + expectedCost + " additional bays cost but was " + actualCost);
     }
@@ -979,17 +1023,18 @@ public class TransportCostCalculationsTest {
     @ParameterizedTest
     @ValueSource(ints = { 6, 8, 11, 24 })
     public void calculateAdditionalBayRequirementsFromUnits_battleArmor_tooManySpareBays(int bayRequirementCount) {
-        setHangarUnits(List.of(unitWithBattleArmorCapacity(bayRequirementCount)));
+        TransportCostCalculations local = calculationsWithUnits(List.of(
+              unitWithBattleArmorCapacity(bayRequirementCount)));
 
-        transportCostCalculations.setBattleArmorCount(bayRequirementCount);
-        transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
+        local.setBattleArmorCount(bayRequirementCount);
+        local.calculateAdditionalBayRequirementsFromUnits();
 
-        int additionalBaysRequired = transportCostCalculations.getAdditionalBattleArmorBaysRequired();
+        int additionalBaysRequired = local.getAdditionalBattleArmorBaysRequired();
         assertEquals(0, additionalBaysRequired,
               "Expected " + 0 + " additional bays required but was " + additionalBaysRequired);
 
         double expectedCost = 0;
-        double actualCost = transportCostCalculations.getAdditionalBattleArmorBaysCost();
+        double actualCost = local.getAdditionalBattleArmorBaysCost();
         assertEquals(expectedCost, actualCost,
               "Expected " + expectedCost + " additional bays cost but was " + actualCost);
     }
@@ -1000,18 +1045,18 @@ public class TransportCostCalculationsTest {
         double infantryBayUsage = (double) bayRequirementCount / PLATOONS_PER_BAY;
         int expectedBaysRequired = max(0, MathUtility.roundAwayFromZero(infantryBayUsage));
 
-        setHangarUnits(List.of());
+        TransportCostCalculations local = calculationsWithUnits(List.of());
 
-        transportCostCalculations.setInfantryCount(bayRequirementCount);
-        transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
+        local.setInfantryCount(bayRequirementCount);
+        local.calculateAdditionalBayRequirementsFromUnits();
 
-        int additionalBaysRequired = transportCostCalculations.getAdditionalInfantryBaysRequired();
+        int additionalBaysRequired = local.getAdditionalInfantryBaysRequired();
 
         assertEquals(expectedBaysRequired, additionalBaysRequired,
               "Expected " + expectedBaysRequired + " additional bays required but was " + additionalBaysRequired);
 
         double expectedCost = round(expectedBaysRequired * INFANTRY_COST);
-        double actualCost = transportCostCalculations.getAdditionalInfantryBaysCost();
+        double actualCost = local.getAdditionalInfantryBaysCost();
         assertEquals(expectedCost, actualCost,
               "Expected " + expectedCost + " additional bays cost but was " + actualCost);
     }
@@ -1020,17 +1065,17 @@ public class TransportCostCalculationsTest {
     @ValueSource(ints = { 6, 8, 11, 24 })
     public void calculateAdditionalBayRequirementsFromUnits_infantry_tooFewSpareBays(int bayRequirementCount) {
         // totalInfantryBays = 1
-        setHangarUnits(List.of(unitWithInfantryCapacity(1)));
+        TransportCostCalculations local = calculationsWithUnits(List.of(unitWithInfantryCapacity(1)));
 
         double infantryBayUsage = 1 - bayRequirementCount;
         infantryBayUsage = infantryBayUsage / PLATOONS_PER_BAY;
         int adjustedInfantryBayUsage = MathUtility.roundAwayFromZero(infantryBayUsage);
         int expectedInfantryBaysRequired = -min(0, adjustedInfantryBayUsage);
 
-        transportCostCalculations.setInfantryCount(bayRequirementCount);
-        transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
+        local.setInfantryCount(bayRequirementCount);
+        local.calculateAdditionalBayRequirementsFromUnits();
 
-        int additionalBaysRequired = transportCostCalculations.getAdditionalInfantryBaysRequired();
+        int additionalBaysRequired = local.getAdditionalInfantryBaysRequired();
         assertEquals(expectedInfantryBaysRequired, additionalBaysRequired,
               "Expected " +
                     expectedInfantryBaysRequired +
@@ -1038,7 +1083,7 @@ public class TransportCostCalculationsTest {
                     additionalBaysRequired);
 
         double expectedCost = round(expectedInfantryBaysRequired * INFANTRY_COST);
-        double actualCost = transportCostCalculations.getAdditionalInfantryBaysCost();
+        double actualCost = local.getAdditionalInfantryBaysCost();
         assertEquals(expectedCost, actualCost,
               "Expected " + expectedCost + " additional bays cost but was " + actualCost);
     }
@@ -1046,17 +1091,18 @@ public class TransportCostCalculationsTest {
     @ParameterizedTest
     @ValueSource(ints = { 6, 8, 11, 24 })
     public void calculateAdditionalBayRequirementsFromUnits_infantry_tooManySpareBays(int bayRequirementCount) {
-        setHangarUnits(List.of(unitWithInfantryCapacity(bayRequirementCount)));
+        TransportCostCalculations local = calculationsWithUnits(List.of(
+              unitWithInfantryCapacity(bayRequirementCount)));
 
-        transportCostCalculations.setInfantryCount(bayRequirementCount);
-        transportCostCalculations.calculateAdditionalBayRequirementsFromUnits();
+        local.setInfantryCount(bayRequirementCount);
+        local.calculateAdditionalBayRequirementsFromUnits();
 
-        int additionalBaysRequired = transportCostCalculations.getAdditionalInfantryBaysRequired();
+        int additionalBaysRequired = local.getAdditionalInfantryBaysRequired();
         assertEquals(0, additionalBaysRequired,
               "Expected " + 0 + " additional bays required but was " + additionalBaysRequired);
 
         double expectedCost = 0;
-        double actualCost = transportCostCalculations.getAdditionalInfantryBaysCost();
+        double actualCost = local.getAdditionalInfantryBaysCost();
         assertEquals(expectedCost, actualCost,
               "Expected " + expectedCost + " additional bays cost but was " + actualCost);
     }
@@ -1092,8 +1138,8 @@ public class TransportCostCalculationsTest {
             units.add(mockUnit);
         }
 
-        TransportCostCalculations local = new TransportCostCalculations(units, new ArrayList<>(),
-              mockCargoStatistics, mockHangarStatistics, EXP_REGULAR);
+        TransportCostCalculations local = new TransportCostCalculations(hangarWithUnits(units), new ArrayList<>(),
+              new ArrayList<>(), EXP_REGULAR);
         local.countUnitsByType();
 
         int countedUnits = local.getDropShipCount();
@@ -1115,8 +1161,8 @@ public class TransportCostCalculationsTest {
             units.add(mockUnit);
         }
 
-        TransportCostCalculations local = new TransportCostCalculations(units, new ArrayList<>(),
-              mockCargoStatistics, mockHangarStatistics, EXP_REGULAR);
+        TransportCostCalculations local = new TransportCostCalculations(hangarWithUnits(units), new ArrayList<>(),
+              new ArrayList<>(), EXP_REGULAR);
         local.countUnitsByType();
 
         int countedUnits = local.getSmallCraftCount();
@@ -1139,8 +1185,8 @@ public class TransportCostCalculationsTest {
             units.add(mockUnit);
         }
 
-        TransportCostCalculations local = new TransportCostCalculations(units, new ArrayList<>(),
-              mockCargoStatistics, mockHangarStatistics, EXP_REGULAR);
+        TransportCostCalculations local = new TransportCostCalculations(hangarWithUnits(units), new ArrayList<>(),
+              new ArrayList<>(), EXP_REGULAR);
         local.countUnitsByType();
 
         int countedUnits = local.getMekCount();
@@ -1164,8 +1210,8 @@ public class TransportCostCalculationsTest {
             units.add(mockUnit);
         }
 
-        TransportCostCalculations local = new TransportCostCalculations(units, new ArrayList<>(),
-              mockCargoStatistics, mockHangarStatistics, EXP_REGULAR);
+        TransportCostCalculations local = new TransportCostCalculations(hangarWithUnits(units), new ArrayList<>(),
+              new ArrayList<>(), EXP_REGULAR);
         local.countUnitsByType();
 
         int countedUnits = local.getAsfCount();
@@ -1189,8 +1235,8 @@ public class TransportCostCalculationsTest {
             units.add(mockUnit);
         }
 
-        TransportCostCalculations local = new TransportCostCalculations(units, new ArrayList<>(),
-              mockCargoStatistics, mockHangarStatistics, EXP_REGULAR);
+        TransportCostCalculations local = new TransportCostCalculations(hangarWithUnits(units), new ArrayList<>(),
+              new ArrayList<>(), EXP_REGULAR);
         local.countUnitsByType();
 
         int countedUnits = local.getAsfCount();
@@ -1215,8 +1261,8 @@ public class TransportCostCalculationsTest {
             units.add(mockUnit);
         }
 
-        TransportCostCalculations local = new TransportCostCalculations(units, new ArrayList<>(),
-              mockCargoStatistics, mockHangarStatistics, EXP_REGULAR);
+        TransportCostCalculations local = new TransportCostCalculations(hangarWithUnits(units), new ArrayList<>(),
+              new ArrayList<>(), EXP_REGULAR);
         local.countUnitsByType();
 
         int countedUnits = local.getProtoMekCount();
@@ -1242,8 +1288,8 @@ public class TransportCostCalculationsTest {
             units.add(mockUnit);
         }
 
-        TransportCostCalculations local = new TransportCostCalculations(units, new ArrayList<>(),
-              mockCargoStatistics, mockHangarStatistics, EXP_REGULAR);
+        TransportCostCalculations local = new TransportCostCalculations(hangarWithUnits(units), new ArrayList<>(),
+              new ArrayList<>(), EXP_REGULAR);
         local.countUnitsByType();
 
         int countedUnits = local.getBattleArmorCount();
@@ -1270,8 +1316,8 @@ public class TransportCostCalculationsTest {
             units.add(mockUnit);
         }
 
-        TransportCostCalculations local = new TransportCostCalculations(units, new ArrayList<>(),
-              mockCargoStatistics, mockHangarStatistics, EXP_REGULAR);
+        TransportCostCalculations local = new TransportCostCalculations(hangarWithUnits(units), new ArrayList<>(),
+              new ArrayList<>(), EXP_REGULAR);
         local.countUnitsByType();
 
         int countedUnits = local.getInfantryCount();
@@ -1298,8 +1344,8 @@ public class TransportCostCalculationsTest {
             units.add(mockUnit);
         }
 
-        TransportCostCalculations local = new TransportCostCalculations(units, new ArrayList<>(),
-              mockCargoStatistics, mockHangarStatistics, EXP_REGULAR);
+        TransportCostCalculations local = new TransportCostCalculations(hangarWithUnits(units), new ArrayList<>(),
+              new ArrayList<>(), EXP_REGULAR);
         local.countUnitsByType();
 
         int countedUnits = local.getOtherUnitCount();
@@ -1320,8 +1366,8 @@ public class TransportCostCalculationsTest {
             units.add(mockUnit);
         }
 
-        TransportCostCalculations local = new TransportCostCalculations(units, new ArrayList<>(),
-              mockCargoStatistics, mockHangarStatistics, EXP_REGULAR);
+        TransportCostCalculations local = new TransportCostCalculations(hangarWithUnits(units), new ArrayList<>(),
+              new ArrayList<>(), EXP_REGULAR);
         local.countUnitsByType();
 
         int countedSuperHeavyVehicles = local.getSuperHeavyVehicleCount();
@@ -1351,8 +1397,8 @@ public class TransportCostCalculationsTest {
             units.add(mockUnit);
         }
 
-        TransportCostCalculations local = new TransportCostCalculations(units, new ArrayList<>(),
-              mockCargoStatistics, mockHangarStatistics, EXP_REGULAR);
+        TransportCostCalculations local = new TransportCostCalculations(hangarWithUnits(units), new ArrayList<>(),
+              new ArrayList<>(), EXP_REGULAR);
         local.countUnitsByType();
 
         int countedSuperHeavyVehicles = local.getSuperHeavyVehicleCount();
@@ -1382,8 +1428,8 @@ public class TransportCostCalculationsTest {
             units.add(mockUnit);
         }
 
-        TransportCostCalculations local = new TransportCostCalculations(units, new ArrayList<>(),
-              mockCargoStatistics, mockHangarStatistics, EXP_REGULAR);
+        TransportCostCalculations local = new TransportCostCalculations(hangarWithUnits(units), new ArrayList<>(),
+              new ArrayList<>(), EXP_REGULAR);
         local.countUnitsByType();
 
         int countedSuperHeavyVehicles = local.getSuperHeavyVehicleCount();
@@ -1410,27 +1456,24 @@ public class TransportCostCalculationsTest {
             passengers.add(person);
         }
 
-        TransportCostCalculations local = new TransportCostCalculations(new ArrayList<>(),
-              passengers,
-              mockCargoStatistics,
-              mockHangarStatistics,
-              EXP_REGULAR);
+        TransportCostCalculations local = new TransportCostCalculations(hangarWithUnits(List.of()),
+              new ArrayList<>(), passengers, EXP_REGULAR);
+        local.setTotalCost(Money.zero());
 
-        double additionalPassengerBaysCost = local.getAdditionalPassengerBaysCost();
-        double expectedCost = round(additionalPassengerBaysCost * PASSENGERS_COST);
-        assertEquals(additionalPassengerBaysCost, expectedCost,
-              "Expected additional passenger bays cost to be " +
-                    expectedCost +
-                    " but was " +
-                    additionalPassengerBaysCost);
+        local.calculateAdditionalBayRequirementsFromPassengers(0);
 
-        double totalAdditionalBaysRequired = local.getAdditionalPassengerBaysRequired();
-        int expectedAdditionalBays = (int) ceil(totalAdditionalBaysRequired / BAYS_PER_DROPSHIP);
-        assertEquals(expectedAdditionalBays, totalAdditionalBaysRequired,
-              "Expected total additional bays required to be " +
-                    expectedAdditionalBays +
-                    " but was " +
-                    totalAdditionalBaysRequired);
+        int expectedBaysRequired = (int) ceil(passengerCount / PASSENGERS_PER_BAY);
+        int actualBaysRequired = local.getAdditionalPassengerBaysRequired();
+        assertEquals(expectedBaysRequired, actualBaysRequired,
+              "Expected " +
+                    expectedBaysRequired +
+                    " additional passenger bays required but was " +
+                    actualBaysRequired);
+
+        double expectedCost = round(expectedBaysRequired * PASSENGERS_COST);
+        double actualCost = local.getAdditionalPassengerBaysCost();
+        assertEquals(expectedCost, actualCost,
+              "Expected " + expectedCost + " additional passenger bays cost but was " + actualCost);
     }
 
     @Test
@@ -1480,13 +1523,7 @@ public class TransportCostCalculationsTest {
 
     @Test
     public void testGetTotalCost_whenTotalCostIsSet() {
-        TransportCostCalculations local = new TransportCostCalculations(
-              new ArrayList<>(),
-              new ArrayList<>(),
-              mockCargoStatistics,
-              mockHangarStatistics,
-              EXP_REGULAR
-        );
+        TransportCostCalculations local = calculationsWithUnits(List.of());
         Money expectedCost = Money.of(1000);
         local.setTotalCost(expectedCost);
 
@@ -1496,13 +1533,9 @@ public class TransportCostCalculationsTest {
 
     @Test
     public void testGetTotalCost_whenTotalCostIsNull() {
-        TransportCostCalculations local = new TransportCostCalculations(
-              new ArrayList<>(),
-              new ArrayList<>(),
-              mockCargoStatistics,
-              mockHangarStatistics,
-              EXP_REGULAR
-        );
+        // Deliberately bypasses calculationsWithUnits(), which pre-seeds totalCost for the other tests
+        TransportCostCalculations local = new TransportCostCalculations(hangarWithUnits(List.of()),
+              new ArrayList<>(), new ArrayList<>(), EXP_REGULAR);
 
         Money actualCost = local.getTotalCost();
         assertNull(actualCost, "Expected total cost to be null but was " + actualCost);

@@ -58,8 +58,8 @@ public class CargoReport extends AbstractReport {
         final double lcc = cargoStats.getTotalLiquidCargoCapacity();
         final double scc = cargoStats.getTotalLivestockCargoCapacity();
         final double rcc = cargoStats.getTotalRefrigeratedCargoCapacity();
-        final double tonnage = cargoStats.getCargoTonnage(false);
-        final double mothballedTonnage = cargoStats.getCargoTonnage(false, true);
+        final double tonnage = cargoStats.getCargoTonnage(getCampaign(), false);
+        final double mothballedTonnage = cargoStats.getCargoTonnage(getCampaign(), false, true);
         final int mothballedUnits = hangarStats.getNumberOfUnitsByType(Unit.ETYPE_MOTHBALLED);
         final double combined = tonnage + mothballedTonnage;
         final double transported = Math.min(combined, ccc);
