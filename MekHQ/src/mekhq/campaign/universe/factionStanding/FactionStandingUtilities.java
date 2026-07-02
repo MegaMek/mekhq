@@ -383,6 +383,41 @@ public class FactionStandingUtilities {
     }
 
     /**
+     * Determines whether command circuit access should be granted based on campaign settings, GM mode, current faction
+     * standings, and contract employer.
+     *
+     * <p>Access is immediately granted if both command circuit requirements are overridden and GM mode is
+     * active. If not, and if faction standing is used as a criterion, the method evaluates the player's highest faction
+     * regard across all active contracts, granting access if this level meets the threshold.</p>
+     *
+     * <p>If there are no active contracts, access is denied.</p>
+     *
+     * <p><b>Note:</b> this overload is intented for when evaluating a contract without the contract being
+     * initialized yet.</p>
+     *
+     * @param overridingCommandCircuitRequirements {@code true} if command circuit requirements are overridden
+     * @param isGM                                 {@code true} if GM mode is enabled
+     * @param factionStandings                     player faction standing data
+     *
+     * @return {@code true} if command circuit access should be used; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public static boolean isUseCommandCircuit(boolean overridingCommandCircuitRequirements, boolean isGM,
+          FactionStandings factionStandings, String employerCode) {
+        boolean useCommandCircuit = overridingCommandCircuitRequirements && isGM;
+
+        if (useCommandCircuit) {
+            return true;
+        }
+
+        double currentRegard = factionStandings.getRegardForFaction(employerCode, true);
+        useCommandCircuit = hasCommandCircuitAccess(currentRegard);
+        return useCommandCircuit;
+    }
+
+    /**
      * Determines whether a campaign force is allowed to enter the specified target planetary system, based on
      * population, ownership, outlaw status, contract relationships, and state of war.
      *

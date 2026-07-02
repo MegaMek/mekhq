@@ -22,10 +22,7 @@ public class ContractObjectiveBasePay {
     private final Money totalCostOfCombatUnits;
     private final Money basePay;
 
-    // TODO Base Pay
-    // TODO Transport Payment
-    // TODO Support Payment0
-    private ContractObjectiveBasePay(CampaignOptions campaignOptions, Faction campaignFaction, LocalDate today,
+    ContractObjectiveBasePay(CampaignOptions campaignOptions, Faction campaignFaction, LocalDate today,
           Hangar hangar, int temporaryAsTechPoolSize, int temporaryMedicPool, Map<PersonnelRole, Integer> tempCrewMap,
           List<Formation> formations, BasePaymentMultiplier basePaymentMultiplier) {
         peacetimeOperatingCosts = calculatePeacetimeOperatingCosts(formations,
