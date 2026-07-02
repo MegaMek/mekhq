@@ -99,7 +99,7 @@ class RankPage {
         return CampaignOptionsPagePanel.builder("RankPage", "RankPage", imageAddress)
             .header(headerPanel)
             .showDetailsPanel(false)
-            .intro("lblRankPageBody.text")
+            .intro("rankPage")
             .quote("rankPage")
             .section("lblRankPage.text", "lblRankPage.summary", rankSystemsPanel)
             .build();
