@@ -43,7 +43,9 @@ import java.util.stream.Collectors;
 
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
+import mekhq.campaign.AbstractMobileLocation;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignLocationManager;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.JumpPath;
@@ -108,15 +110,15 @@ public final class LocationDispatch {
      *
      * <p>Safe to call with a {@code null} argument (no-op).</p>
      *
-     * @param travelNode the node to remove, or {@code null}
-     * @param campaign   the active campaign; must not be {@code null}
+     * @param travelNode      the node to remove, or {@code null}
+     * @param locationManager the campaign's location registry; must not be {@code null}
      */
-    public static void removeTravelNode(@Nullable CurrentLocation travelNode, Campaign campaign) {
+    public static void removeTravelNode(@Nullable AbstractMobileLocation travelNode, CampaignLocationManager locationManager) {
         if (travelNode == null) {
             return;
         }
         travelNode.setParent(null);
-        campaign.removeLocation(travelNode);
+        locationManager.removeLocation(travelNode);
     }
 
     /**
@@ -130,39 +132,43 @@ public final class LocationDispatch {
      *
      * @param travelNode        the completed travel node; must not be {@code null}
      * @param personDestination destination container for persons; if {@code null}, persons fall back to
-     *                          {@code campaign} with a warning
+     *                          {@code fallbackLocation} with a warning
      * @param unitDestination   destination container for units; if {@code null}, units fall back to
-     *                          {@code campaign} with a warning
+     *                          {@code fallbackLocation} with a warning
      * @param partDestination   destination container for parts; if {@code null}, parts fall back to
-     *                          {@code campaign} with a warning
-     * @param campaign          the active campaign; must not be {@code null}
+     *                          {@code fallbackLocation} with a warning
+     * @param fallbackLocation  the location to land items at when their destination is {@code null} (currently the
+     *                          campaign root); must not be {@code null}
+     * @param locationManager   the campaign's location registry, used to de-register the spent node; must not be
+     *                          {@code null}
      */
-    public static void landFromTravelNode(CurrentLocation travelNode,
+    public static void landFromTravelNode(AbstractMobileLocation travelNode,
           @Nullable ILocation personDestination,
           @Nullable ILocation unitDestination,
           @Nullable ILocation partDestination,
-          Campaign campaign) {
+          ILocation fallbackLocation,
+          CampaignLocationManager locationManager) {
         if (personDestination == null) {
-            LOGGER.warn("landFromTravelNode: null personDestination; landing persons at Campaign root");
+            LOGGER.warn("landFromTravelNode: null personDestination; landing persons at fallback location");
         }
         if (unitDestination == null) {
-            LOGGER.warn("landFromTravelNode: null unitDestination; landing units at Campaign root");
+            LOGGER.warn("landFromTravelNode: null unitDestination; landing units at fallback location");
         }
         if (partDestination == null) {
-            LOGGER.warn("landFromTravelNode: null partDestination; landing parts at Campaign root");
+            LOGGER.warn("landFromTravelNode: null partDestination; landing parts at fallback location");
         }
         landFromTravelNodeImpl(travelNode,
-              personDestination != null ? personDestination : campaign,
-              unitDestination != null ? unitDestination : campaign,
-              partDestination != null ? partDestination : campaign,
-              campaign);
+              personDestination != null ? personDestination : fallbackLocation,
+              unitDestination != null ? unitDestination : fallbackLocation,
+              partDestination != null ? partDestination : fallbackLocation,
+              locationManager);
     }
 
-    private static void landFromTravelNodeImpl(CurrentLocation travelNode,
+    private static void landFromTravelNodeImpl(AbstractMobileLocation travelNode,
           ILocation personDestination,
           ILocation unitDestination,
           ILocation partDestination,
-          Campaign campaign) {
+          CampaignLocationManager locationManager) {
         for (Person person : new ArrayList<>(travelNode.fetchPersonnelAtLocation())) {
             person.setParent(personDestination);
         }
@@ -172,7 +178,7 @@ public final class LocationDispatch {
         for (Part part : new ArrayList<>(travelNode.fetchPartsAtLocation())) {
             LocationNode.LocationManager.setLocation(part, partDestination);
         }
-        removeTravelNode(travelNode, campaign);
+        removeTravelNode(travelNode, locationManager);
     }
 
     /**
@@ -181,14 +187,14 @@ public final class LocationDispatch {
      * immediately {@code true} and {@link IPlace#processArrivals} will land all carried items on
      * its next call.
      */
-    private static CurrentLocation buildArrivedNode(PlanetarySystem system, ILocation destination, Campaign campaign,
-          String logContext) {
+    private static CurrentLocation buildArrivedNode(PlanetarySystem system, ILocation destination,
+          CampaignLocationManager locationManager, String logContext) {
         CurrentLocation arrivedLocation = new CurrentLocation(system, 0.0);
         if (!arrivedLocation.setParent(destination)) {
             LOGGER.warn("{}: setParent failed for arrivedLocation → {}",
                   logContext, destination.getClass().getSimpleName());
         }
-        campaign.addLocation(arrivedLocation);
+        locationManager.addLocation(arrivedLocation);
         return arrivedLocation;
     }
 
@@ -213,7 +219,7 @@ public final class LocationDispatch {
                   + "items may display as Main Force after save/load",
                   logContext, destination.getClass().getSimpleName());
         }
-        campaign.addLocation(travelNode);
+        campaign.getCampaignLocationManager().addLocation(travelNode);
         return Optional.of(travelNode);
     }
 
@@ -341,14 +347,15 @@ public final class LocationDispatch {
 
             if (destinationSystem == null || fromSystem.equals(destinationSystem)) {
                 PlanetarySystem system = destinationSystem != null ? destinationSystem : fromSystem;
-                land(group, destination, directLandingTarget, system, campaign, logMarker);
+                land(group, destination, directLandingTarget, system, campaign.getCampaignLocationManager(), logMarker);
                 continue;
             }
 
             Optional<CurrentLocation> maybeTravelLocation = buildTravelNode(
                   fromSystem, destinationSystem, destination, campaign, logMarker);
             if (maybeTravelLocation.isEmpty()) {
-                land(group, destination, directLandingTarget, destinationSystem, campaign, logMarker);
+                land(group, destination, directLandingTarget, destinationSystem,
+                      campaign.getCampaignLocationManager(), logMarker);
                 continue;
             }
             CurrentLocation travelLocation = maybeTravelLocation.get();
@@ -362,9 +369,9 @@ public final class LocationDispatch {
      * {@code directLandingTarget}.
      */
     private static void land(List<? extends ILocation> group, ILocation destination, ILocation directLandingTarget,
-          PlanetarySystem system, Campaign campaign, String logMarker) {
+          PlanetarySystem system, CampaignLocationManager locationManager, String logMarker) {
         if (destination instanceof AbstractBase) {
-            CurrentLocation arrivedLocation = buildArrivedNode(system, destination, campaign, logMarker);
+            CurrentLocation arrivedLocation = buildArrivedNode(system, destination, locationManager, logMarker);
             group.forEach(item -> reparent(item, arrivedLocation));
         } else {
             group.forEach(item -> reparent(item, directLandingTarget));

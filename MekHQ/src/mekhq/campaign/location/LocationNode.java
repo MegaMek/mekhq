@@ -40,6 +40,7 @@ import java.util.Set;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.AbstractLocation;
+import mekhq.campaign.AbstractMobileLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.utilities.MHQXMLUtility;
@@ -133,7 +134,7 @@ public class LocationNode {
             ILocation locatable = child.getLocatable();
             if (locatable instanceof AcademyCampusLocation campus) {
                 campus.writeToXML(pw, indent);
-            } else if (locatable instanceof CurrentLocation travelNode) {
+            } else if (locatable instanceof AbstractMobileLocation travelNode) {
                 travelNode.writeToXML(pw, indent);
             }
         }
@@ -179,7 +180,7 @@ public class LocationNode {
                                 CurrentLocation travelNode = CurrentLocation.generateInstanceFromXML(campusChild, campaign);
                                 if (travelNode != null) {
                                     LocationManager.setLocation(travelNode, campus);
-                                    campaign.addLocation(travelNode);
+                                    campaign.getCampaignLocationManager().addLocation(travelNode);
                                 }
                             }
                         }
@@ -188,7 +189,7 @@ public class LocationNode {
                     CurrentLocation travelNode = CurrentLocation.generateInstanceFromXML(wn, campaign);
                     if (travelNode != null) {
                         LocationManager.setLocation(travelNode, parent);
-                        campaign.addLocation(travelNode);
+                        campaign.getCampaignLocationManager().addLocation(travelNode);
                     }
                 } else {
                     // Person, Unit, and Part reconnection will be added here

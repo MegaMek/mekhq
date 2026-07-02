@@ -41,8 +41,13 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingUtilities;
 
-import megamek.common.annotations.Nullable;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
 
 /**
@@ -57,23 +62,19 @@ public class CampaignOptionsSpinner extends JSpinner {
      * Creates a {@link CampaignOptionsSpinner} with fully configurable numeric values and tooltip settings.
      * <p>
      * The spinner uses a {@link SpinnerNumberModel} that supports both integer and double values. The tooltip is
-     * fetched from a resource bundle using the key {@code "lbl" + name + ".tooltip"} and can be wrapped to a specified
-     * line length using {@code customWrapSize}. If {@code noTooltip} is set to {@code true}, the spinner will not have
-     * a tooltip.
+     * fetched from a resource bundle using the key {@code "lbl" + name + ".tooltip"} and is word-wrapped. If
+     * {@code noTooltip} is set to {@code true}, the spinner will not have a tooltip.
      *
-     * @param name           the name of the spinner, used to construct its resource bundle keys and internal name
-     * @param customWrapSize the maximum number of characters per line for the tooltip (or 100 by default if
-     *                       {@code null})
-     * @param defaultValue   the default value of the spinner (integer or double)
-     * @param minimum        the minimum value for the spinner (integer or double)
-     * @param maximum        the maximum value for the spinner (integer or double)
-     * @param stepSize       the step value for incrementing or decrementing the spinner (integer or double)
-     * @param noTooltip      if {@code true}, the spinner will not have a tooltip
-     * @param metadata       version and flag metadata for displaying badges in tooltip, or {@code null} for no badges
+     * @param name         the name of the spinner, used to construct its resource bundle keys and internal name
+     * @param defaultValue the default value of the spinner (integer or double)
+     * @param minimum      the minimum value for the spinner (integer or double)
+     * @param maximum      the maximum value for the spinner (integer or double)
+     * @param stepSize     the step value for incrementing or decrementing the spinner (integer or double)
+     * @param noTooltip    if {@code true}, the spinner will not have a tooltip
+     * @param metadata     version and flag metadata for displaying badges in tooltip, or {@code null} for no badges
      */
-    public CampaignOptionsSpinner(String name, @Nullable Integer customWrapSize,
-          Number defaultValue, Number minimum, Number maximum, Number stepSize, boolean noTooltip,
-          @Nullable CampaignOptionsMetadata metadata) {
+    public CampaignOptionsSpinner(@Nonnull String name, Number defaultValue, Number minimum, Number maximum,
+          Number stepSize, boolean noTooltip, @Nullable CampaignOptionsMetadata metadata) {
         super(createSpinnerModel(defaultValue, minimum, maximum, stepSize));
 
         if (!noTooltip) {
@@ -97,9 +98,9 @@ public class CampaignOptionsSpinner extends JSpinner {
      * @param maximum      the maximum value for the spinner (integer)
      * @param stepSize     the step value for incrementing or decrementing the spinner (integer)
      */
-    public CampaignOptionsSpinner(String name, int defaultValue, int minimum,
+    public CampaignOptionsSpinner(@Nonnull String name, int defaultValue, int minimum,
           int maximum, int stepSize) {
-        this(name, null, defaultValue, minimum, maximum, stepSize, false, null);
+        this(name, defaultValue, minimum, maximum, stepSize, false, null);
     }
 
     /**
@@ -114,9 +115,9 @@ public class CampaignOptionsSpinner extends JSpinner {
      * @param maximum      the maximum value for the spinner (double)
      * @param stepSize     the step value for incrementing or decrementing the spinner (double)
      */
-    public CampaignOptionsSpinner(String name, double defaultValue, double minimum,
+    public CampaignOptionsSpinner(@Nonnull String name, double defaultValue, double minimum,
           double maximum, double stepSize) {
-        this(name, null, defaultValue, minimum, maximum, stepSize, false, null);
+        this(name, defaultValue, minimum, maximum, stepSize, false, null);
     }
 
     /**
@@ -129,9 +130,9 @@ public class CampaignOptionsSpinner extends JSpinner {
      * @param stepSize     the step value for incrementing or decrementing the spinner (integer)
      * @param metadata     version and flag metadata for displaying badges in tooltip, or {@code null} for no badges
      */
-    public CampaignOptionsSpinner(String name, int defaultValue, int minimum,
+    public CampaignOptionsSpinner(@Nonnull String name, int defaultValue, int minimum,
           int maximum, int stepSize, @Nullable CampaignOptionsMetadata metadata) {
-        this(name, null, defaultValue, minimum, maximum, stepSize, false, metadata);
+        this(name, defaultValue, minimum, maximum, stepSize, false, metadata);
     }
 
     /**
@@ -144,43 +145,24 @@ public class CampaignOptionsSpinner extends JSpinner {
      * @param stepSize     the step value for incrementing or decrementing the spinner (double)
      * @param metadata     version and flag metadata for displaying badges in tooltip, or {@code null} for no badges
      */
-    public CampaignOptionsSpinner(String name, double defaultValue, double minimum,
+    public CampaignOptionsSpinner(@Nonnull String name, double defaultValue, double minimum,
           double maximum, double stepSize, @Nullable CampaignOptionsMetadata metadata) {
-        this(name, null, defaultValue, minimum, maximum, stepSize, false, metadata);
+        this(name, defaultValue, minimum, maximum, stepSize, false, metadata);
     }
 
     /**
-     * Creates a {@link CampaignOptionsSpinner} for integer values with custom wrap size and optional tooltip.
+     * Creates a {@link CampaignOptionsSpinner} for double values with an optional tooltip.
      *
-     * @param name           the name of the spinner, used to construct its resource bundle keys and internal name
-     * @param customWrapSize the maximum number of characters per line for the tooltip (or 100 by default if
-     *                       {@code null})
-     * @param defaultValue   the default value of the spinner (integer)
-     * @param minimum        the minimum value for the spinner (integer)
-     * @param maximum        the maximum value for the spinner (integer)
-     * @param stepSize       the step value for incrementing or decrementing the spinner (integer)
-     * @param noTooltip      if {@code true}, the spinner will not have a tooltip
+     * @param name         the name of the spinner, used to construct its resource bundle keys and internal name
+     * @param defaultValue the default value of the spinner (double)
+     * @param minimum      the minimum value for the spinner (double)
+     * @param maximum      the maximum value for the spinner (double)
+     * @param stepSize     the step value for incrementing or decrementing the spinner (double)
+     * @param noTooltip    if {@code true}, the spinner will not have a tooltip
      */
-    public CampaignOptionsSpinner(String name, @Nullable Integer customWrapSize, int defaultValue, int minimum,
-          int maximum, int stepSize, boolean noTooltip) {
-        this(name, customWrapSize, defaultValue, minimum, maximum, stepSize, noTooltip, null);
-    }
-
-    /**
-     * Creates a {@link CampaignOptionsSpinner} for double values with custom wrap size and optional tooltip.
-     *
-     * @param name           the name of the spinner, used to construct its resource bundle keys and internal name
-     * @param customWrapSize the maximum number of characters per line for the tooltip (or 100 by default if
-     *                       {@code null})
-     * @param defaultValue   the default value of the spinner (double)
-     * @param minimum        the minimum value for the spinner (double)
-     * @param maximum        the maximum value for the spinner (double)
-     * @param stepSize       the step value for incrementing or decrementing the spinner (double)
-     * @param noTooltip      if {@code true}, the spinner will not have a tooltip
-     */
-    public CampaignOptionsSpinner(String name, @Nullable Integer customWrapSize, double defaultValue, double minimum,
-          double maximum, double stepSize, boolean noTooltip) {
-        this(name, customWrapSize, defaultValue, minimum, maximum, stepSize, noTooltip, null);
+    public CampaignOptionsSpinner(@Nonnull String name, double defaultValue, double minimum, double maximum,
+          double stepSize, boolean noTooltip) {
+        this(name, defaultValue, minimum, maximum, stepSize, noTooltip, null);
     }
 
     /**
@@ -222,5 +204,37 @@ public class CampaignOptionsSpinner extends JSpinner {
         // Align text in the spinner editor to the left
         DefaultEditor editor = (DefaultEditor) this.getEditor();
         editor.getTextField().setHorizontalAlignment(JTextField.LEFT);
+
+        installSelectAllOnFocus(this);
+    }
+
+    /**
+     * Makes a spinner select its whole value when its editor gains focus, so a user
+     * can click and immediately type a
+     * replacement instead of clearing the field first. Use this on raw
+     * {@link JSpinner}s in the campaign options
+     * dialogs that are not {@link CampaignOptionsSpinner} instances;
+     * {@code CampaignOptionsSpinner} applies it
+     * automatically.
+     *
+     * <p>
+     * The select-all is deferred to the end of the event queue because a mouse
+     * click positions the caret (clearing
+     * any selection) after {@code focusGained} fires; running afterwards keeps the
+     * value selected.
+     * </p>
+     *
+     * @param spinner the spinner whose editor should auto-select its value on focus
+     */
+    public static void installSelectAllOnFocus(@Nonnull JSpinner spinner) {
+        if (spinner.getEditor() instanceof DefaultEditor editor) {
+            JTextField textField = editor.getTextField();
+            textField.addFocusListener(new FocusAdapter() {
+                @Override
+                public void focusGained(FocusEvent event) {
+                    SwingUtilities.invokeLater(textField::selectAll);
+                }
+            });
+        }
     }
 }

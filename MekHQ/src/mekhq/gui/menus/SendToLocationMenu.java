@@ -122,7 +122,7 @@ public class SendToLocationMenu extends JScrollableMenu {
 
         // One entry per player base, nested by display type
         Map<String, JMenu> pathToMenu = new HashMap<>();
-        for (PlayerBase base : campaign.getPlayerBases()) {
+        for (PlayerBase base : campaign.getCampaignLocationManager().getPlayerBases()) {
             // Use == (identity) — equals() on Personnel compares map contents, not object identity
             if (sharedCurrent == base
                   || sharedCurrent == base.getBasePersonnel()

@@ -37,8 +37,8 @@ import java.util.ArrayList;
 
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.AbstractLocation;
+import mekhq.campaign.AbstractMobileLocation;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.Personnel;
 import mekhq.campaign.Warehouse;
@@ -182,13 +182,14 @@ public interface IPlace extends ILocation {
         Hangar hangar = getHangar() != null ? getHangar() : campaign.getHangar();
         Warehouse warehouse = getWarehouse() != null ? getWarehouse() : campaign.getWarehouse();
         for (LocationNode child : new ArrayList<>(getLocationNode().getChildren())) {
-            if (!(child.getLocatable() instanceof CurrentLocation travelNode)) {
+            if (!(child.getLocatable() instanceof AbstractMobileLocation travelNode)) {
                 continue;
             }
-            if (!travelNode.isOnPlanet()) {
+            if (!travelNode.hasArrived()) {
                 continue;
             }
-            LocationDispatch.landFromTravelNode(travelNode, personnel, hangar, warehouse, campaign);
+            LocationDispatch.landFromTravelNode(travelNode, personnel, hangar, warehouse, campaign,
+                  campaign.getCampaignLocationManager());
         }
     }
 }

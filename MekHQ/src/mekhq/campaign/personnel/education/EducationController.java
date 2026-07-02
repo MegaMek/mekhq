@@ -323,7 +323,7 @@ public class EducationController {
             // if the student is being homeschooled, we skip the journey to the 'academy'
             person.setEduEducationStage(EducationStage.EDUCATION);
             IPlace homeSchoolLocation = findHomeLocation(person, campaign);
-            AcademyCampusLocation campusLocation = campaign.getOrCreateCampusUnderLocation(
+            AcademyCampusLocation campusLocation = campaign.getCampaignLocationManager().getOrCreateCampusUnderLocation(
                   academy.getSet(), academy.getName(), homeSchoolLocation);
             person.setParent(campusLocation.getPersonnel());
         } else if (academy.isLocal()) {
@@ -347,7 +347,7 @@ public class EducationController {
         if (!academy.isHomeSchool() && !academy.isLocal()) {
             PlanetarySystem originSystem = person.getCurrentSystem();
             person.setEduAcademySystem(campus);
-            AcademyCampusLocation campusLocation = campaign.getOrCreateCampusLocation(academy.getSet(),
+            AcademyCampusLocation campusLocation = campaign.getCampaignLocationManager().getOrCreateCampusLocation(campaign, academy.getSet(),
                   academy.getName(), academy.getLocationSystems().getFirst());
             LocationDispatch.dispatchToLocation(List.of(person), campusLocation, campaign);
             double startTransit = originSystem != null && originSystem.equals(campaign.getCurrentSystem())
@@ -427,7 +427,7 @@ public class EducationController {
         if (academy.isHomeSchool()) {
             person.setEduEducationStage(EducationStage.EDUCATION);
             IPlace homeBase = findHomeLocation(person, campaign);
-            AcademyCampusLocation campusLocation = campaign.getOrCreateCampusUnderLocation(
+            AcademyCampusLocation campusLocation = campaign.getCampaignLocationManager().getOrCreateCampusUnderLocation(
                   academy.getSet(), academy.getName(), homeBase);
             person.setParent(campusLocation.getPersonnel());
         } else if (academy.isLocal()) {
@@ -662,13 +662,13 @@ public class EducationController {
         campaign.addReport(PERSONNEL,
               getFormattedTextAt(BUNDLE_NAME, "arrived.text", person.getHyperlinkedFullTitle()));
 
-        AcademyCampusLocation campusLocation = campaign.getOrCreateCampusLocation(
+        AcademyCampusLocation campusLocation = campaign.getCampaignLocationManager().getOrCreateCampusLocation(campaign, 
               person.getEduAcademySet(), person.getEduAcademyNameInSet(), person.getEduAcademySystem());
         if (campusLocation == null) {
             throw new IllegalStateException("Campus location must exist for system " + person.getEduAcademySystem());
         }
         person.setParent(campusLocation.getPersonnel());
-        LocationDispatch.removeTravelNode(travelLocation, campaign);
+        LocationDispatch.removeTravelNode(travelLocation, campaign.getCampaignLocationManager());
         person.setEduEducationStage(EducationStage.EDUCATION);
     }
 
@@ -919,12 +919,12 @@ public class EducationController {
             }
         }
 
-        LocationDispatch.removeTravelNode(returnLocation, campaign);
+        LocationDispatch.removeTravelNode(returnLocation, campaign.getCampaignLocationManager());
     }
 
     private static Personnel findPersonnelWhenReturningFromLocal(Campaign campaign, @Nullable String systemId) {
         if (systemId != null) {
-            for (PlayerBase base : campaign.getPlayerBases()) {
+            for (PlayerBase base : campaign.getCampaignLocationManager().getPlayerBases()) {
                 PlanetarySystem system = base.getCurrentSystem();
                 if (system != null && systemId.equals(system.getId())) {
                     return base.getPersonnel();

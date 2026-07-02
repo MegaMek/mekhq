@@ -168,10 +168,8 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationType;
 import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.campaign.icons.UnitIcon;
-import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.IPlace;
-import mekhq.campaign.location.LocationDispatch;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.log.HistoricalLogEntry;
@@ -224,7 +222,6 @@ import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.medical.MASHCapacity;
-import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.ranks.AutoAssignRankForCompanyGenerator;
 import mekhq.campaign.personnel.ranks.RankSystem;
@@ -409,9 +406,8 @@ public class Campaign implements ITechManager, IPlace {
 
     private Systems systemsInstance;
     private final Map<String, PlanetarySystem> planetarySystemOverrides = new LinkedHashMap<>();
-    private LocationNode locationNode;
-    private List<AbstractLocation> locations = new ArrayList<>();
-    private final Set<PlayerBase> playerBases = new LinkedHashSet<>();
+    private final CampaignLocationManager locationManager = new CampaignLocationManager();
+    private final ForceLocationManager forceLocationManager = new ForceLocationManager(this);
     private final Personnel mainForcePersonnel = new Personnel();
     private boolean isAvoidingEmptySystems;
     private boolean isOverridingCommandCircuitRequirements;
@@ -568,7 +564,6 @@ public class Campaign implements ITechManager, IPlace {
         game.setOptions(gameOptions);
         this.techFaction = techFaction;
         this.systemsInstance = systemsInstance;
-        this.locationNode = new LocationNode(this);
         setLocation(startLocation);
         this.setParent(startLocation);
         if (startLocation != null) {
@@ -1768,212 +1763,31 @@ public class Campaign implements ITechManager, IPlace {
     }
 
     public void setLocation(AbstractLocation location) {
-        AbstractLocation old = getCurrentLocation();
-        if (location != null && !locations.contains(location)) {
-            addLocation(location);
-        }
-        setParent(location);
-        // After reparenting, old has one fewer child. Remove it only if nothing else remains under it.
-        if (old != null && old != location && old.getChildLocations().isEmpty()) {
-            locations.remove(old);
-        }
+        getForceLocationManager().setLocation(getCampaignLocationManager(), location);
     }
 
-    public void addLocation(AbstractLocation location) {
-        if (location != null && !locations.contains(location)) {
-            locations.add(location);
-        }
+    @Nonnull
+    public CampaignLocationManager getCampaignLocationManager() {
+        return locationManager;
     }
 
-    public void removeLocation(AbstractLocation location) {
-        locations.remove(location);
-    }
-
-    /**
-     * Removes any {@link AbstractLocation} entries in {@link #locations} that have no personnel at any depth in their
-     * subtree, excluding the campaign's own current location.
-     *
-     * <p>This handles two leak paths: {@link CurrentLocation} travel nodes whose passengers all
-     * died or were removed before arriving, and {@link FixedLocation}/{@link AcademyCampusLocation} pairs that were
-     * never cleaned up after the last student graduated.</p>
-     *
-     * <p>Call this once per day after all personnel processing has completed.</p>
-     */
-    public void pruneEmptyLocations() {
-        AbstractLocation mainLocation = getCurrentLocation();
-        locations.removeIf(location -> {
-            if (location == mainLocation) {
-                return false;
-            }
-            if (!location.fetchPersonnelAtLocation().isEmpty() ||
-                      !location.fetchPartsAtLocation().isEmpty() ||
-                      !location.fetchUnitsAtLocation().isEmpty()) {
-                return false;
-            }
-            if (location instanceof CurrentLocation) {
-                location.setParent(null);
-            } else if (location instanceof FixedLocation) {
-                for (ILocation child : new ArrayList<>(location.getChildLocations())) {
-                    if (child instanceof AcademyCampusLocation campus) {
-                        campus.setParent(null);
-                    }
-                }
-            }
-            return true;
-        });
-    }
-
-    public List<AbstractLocation> getLocations() {
-        return Collections.unmodifiableList(locations);
-    }
-
-
-    public void addPlayerBase(@Nullable PlayerBase base) {
-        if (base == null) {
-            return;
-        }
-        playerBases.add(base);
-        ILocation parent = base.getParent();
-        if (parent instanceof AbstractLocation abstractLocation) {
-            addLocation(abstractLocation);
-        }
-        MekHQ.triggerEvent(new LocationAddedEvent(base));
-    }
-
-    public void removePlayerBase(@Nullable PlayerBase base) {
-        if (base == null) {
-            return;
-        }
-        playerBases.remove(base);
-        MekHQ.triggerEvent(new LocationRemovedEvent(base));
-    }
-
-    public Set<PlayerBase> getPlayerBases() {
-        return Collections.unmodifiableSet(playerBases);
+    @Nonnull
+    public ForceLocationManager getForceLocationManager() {
+        return forceLocationManager;
     }
 
     public Personnel getMainForcePersonnel() {
         return mainForcePersonnel;
     }
 
-
-    /**
-     * Creates a {@link FixedLocation} with an {@link AcademyCampusLocation} child and registers it in
-     * {@link #locations}.
-     *
-     * @return the newly created campus location node
-     */
-    public AcademyCampusLocation addCampusLocation(String academySet, String academyName,
-          String systemId) {
-        PlanetarySystem system = getSystemById(systemId);
-        if (system == null) {
-            return null;
-        }
-        FixedLocation fixedLocation = new FixedLocation(system);
-        AcademyCampusLocation campus =
-              new AcademyCampusLocation(academySet, academyName);
-        LocationNode.LocationManager.setLocation(campus, fixedLocation);
-        locations.add(fixedLocation);
-        return campus;
-    }
-
-    /**
-     * Returns the existing {@link AcademyCampusLocation} for the given campus, creating it on demand if it does not yet
-     * exist.
-     */
-    public AcademyCampusLocation getOrCreateCampusLocation(String academySet,
-          String academyName, String systemId) {
-        for (AbstractLocation location : locations) {
-            if (!(location instanceof FixedLocation fixedLocation)) {
-                continue;
-            }
-            if (!fixedLocation.getCurrentSystem().getId().equals(systemId)) {
-                continue;
-            }
-            for (ILocation child : fixedLocation.getChildLocations()) {
-                if (child instanceof AcademyCampusLocation campus
-                          && academySet.equals(campus.getAcademySet())
-                          && academyName.equals(campus.getAcademyName())) {
-                    return campus;
-                }
-            }
-        }
-        return addCampusLocation(academySet, academyName, systemId);
-    }
-
-    /**
-     * Returns the existing {@link AcademyCampusLocation} parented under {@code parent}, creating it on demand if it
-     * does not yet exist.
-     *
-     * <p>Used for home-school campuses that travel with the campaign or a player base rather than being anchored to a
-     * fixed planetary system.</p>
-     */
-    public AcademyCampusLocation getOrCreateCampusUnderLocation(String academySet, String academyName,
-          ILocation parent) {
-        for (ILocation child : parent.getChildLocations()) {
-            if (child instanceof AcademyCampusLocation campus
-                      && academySet.equals(campus.getAcademySet())
-                      && academyName.equals(campus.getAcademyName())) {
-                return campus;
-            }
-        }
-        AcademyCampusLocation campus = new AcademyCampusLocation(academySet, academyName);
-        LocationNode.LocationManager.setLocation(campus, parent);
-        return campus;
-    }
-
-    /**
-     * Returns the existing local {@link AcademyCampusLocation} (home-school or unit-education) for the given campus
-     * parented directly under this campaign, creating it on demand if it does not yet exist.
-     *
-     * <p>Local campuses travel with the campaign and are not anchored to a {@link FixedLocation}.
-     * Use {@link #getOrCreateCampusLocation} for academies at a fixed planetary system.</p>
-     */
-    public AcademyCampusLocation getOrCreateLocalCampusLocation(String academySet, String academyName) {
-        for (ILocation child : getChildLocations()) {
-            if (child instanceof AcademyCampusLocation campus
-                      && academySet.equals(campus.getAcademySet())
-                      && academyName.equals(campus.getAcademyName())) {
-                return campus;
-            }
-        }
-        AcademyCampusLocation campus = new AcademyCampusLocation(academySet, academyName);
-        LocationNode.LocationManager.setLocation(campus, this);
-        return campus;
-    }
-
-    /**
-     * Relocates the campaign immediately to the specified {@link PlanetarySystem}, updating the current location and
-     * firing any associated events or automated behaviors.
-     *
-     * <p>This method performs the following actions:</p>
-     * <ul>
-     *     <li>Updates the campaign's {@link CurrentLocation} to the given planetary system.</li>
-     *     <li>Triggers a {@link LocationChangedEvent} to notify listeners of the move.</li>
-     *     <li>If there are no units in automated mothball mode, performs automated activation.</li>
-     *     <li>If enabled by campaign options, checks for possible inoculation prompts related to the Random Diseases
-     *     and Alternative Advanced Medical systems.</li>
-     * </ul>
-     *
-     * @param planetarySystem the destination {@link PlanetarySystem} to move the campaign to
-     */
     public void moveToPlanetarySystem(PlanetarySystem planetarySystem) {
-        setLocation(new CurrentLocation(planetarySystem, 0.0));
-        MekHQ.triggerEvent(new LocationChangedEvent(getCurrentLocation(), false));
-
-        if (getAutomatedMothballUnits().isEmpty()) {
-            performAutomatedActivation(this);
-        }
-
-        if (campaignOptions.isUseRandomDiseases() && campaignOptions.isUseAlternativeAdvancedMedical()) {
-            Inoculations.triggerInoculationPrompt(this, false);
-        }
+        getForceLocationManager().moveToPlanetarySystem(this, planetarySystem);
     }
 
     @Override
-    @Nullable
-    public @Nonnull LocationNode getLocationNode() {
-        return locationNode;
+    @Nonnull
+    public LocationNode getLocationNode() {
+        return getForceLocationManager().getLocationNode();
     }
 
     @Override
@@ -2009,19 +1823,7 @@ public class Campaign implements ITechManager, IPlace {
 
     @Override
     public void processArrivals(Campaign campaign) {
-        if (locationNode == null) {
-            return;
-        }
-        for (ILocation child : new ArrayList<>(getChildLocations())) {
-            if (!(child instanceof CurrentLocation travelLocation)) {
-                continue;
-            }
-            if (!travelLocation.isOnPlanet()) {
-                continue;
-            }
-            LocationDispatch.landFromTravelNode(
-                  travelLocation, mainForcePersonnel, units, parts, campaign);
-        }
+        getForceLocationManager().processArrivals(campaign);
     }
 
     public boolean isOnContractAndPlanetside() {
@@ -2280,7 +2082,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all hangars across all locations associated with this campaign.
-     *                                           TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     *                                                                                           TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
      */
     public Hangar getAllHangar() {
         return units;
@@ -2309,7 +2111,7 @@ public class Campaign implements ITechManager, IPlace {
      */
     public Collection<Unit> getAllUnits() {
         List<Unit> units = new ArrayList<>();
-        for (AbstractLocation location : getLocations()) {
+        for (AbstractLocation location : getCampaignLocationManager().getLocations()) {
             Set<Unit> found = location.fetchUnitsAtLocation();
             units.addAll(found);
         }
@@ -2334,7 +2136,7 @@ public class Campaign implements ITechManager, IPlace {
         if (unit != null) {
             return unit;
         }
-        for (PlayerBase base : playerBases) {
+        for (PlayerBase base : getCampaignLocationManager().getPlayerBases()) {
             unit = base.getBaseHangar().getUnit(id);
             if (unit != null) {
                 return unit;
@@ -2928,7 +2730,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all warehouses across all locations associated with this campaign.
-     *                                           TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
+     *                                                                                           TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
      */
     public Warehouse getAllWarehouse() {
         return parts;
@@ -2956,6 +2758,18 @@ public class Campaign implements ITechManager, IPlace {
 
     public Part getPart(int id) {
         return parts.getPart(id);
+    }
+
+    /**
+     * @return All player's parts in {@code campaign}, not just the ones located with the main force.
+     */
+    public Collection<Part> getAllParts() {
+        List<Part> parts = new ArrayList<>();
+        for (AbstractLocation location : getCampaignLocationManager().getLocations()) {
+            Set<Part> found = location.fetchPartsAtLocation();
+            parts.addAll(found);
+        }
+        return parts;
     }
 
     @Nullable
@@ -3741,8 +3555,8 @@ public class Campaign implements ITechManager, IPlace {
      *
      * @param acquisition The <code> IAcquisitionWork</code> being acquired.
      * @param person      The <code>Person</code> object attempting to do the acquiring
-     * @param system      The <code>PlanetarySystem</code> object where the acquisition is being attempted. This may
-     *                    be null if the user is not using planetary acquisition.
+     * @param system      The <code>PlanetarySystem</code> object where the acquisition is being attempted. This may be
+     *                    null if the user is not using planetary acquisition.
      *
      * @return The result of the rolls.
      */
@@ -3765,7 +3579,7 @@ public class Campaign implements ITechManager, IPlace {
                          PartAcquisitionResult.PlanetSpecificFailure;
         }
 
-        ActionCheckResult result = skillCheck.resolve(false, null, false);
+        ActionCheckResult result = skillCheck.resolve(false, null);
         if (getCampaignOptions().isPlanetAcquisitionVerbose()) {
             SocioIndustrialData socioIndustrial = system.getPrimaryPlanet().getSocioIndustrial(getLocalDate());
             CampaignOptions options = getCampaignOptions();
@@ -3775,12 +3589,12 @@ public class Campaign implements ITechManager, IPlace {
 
             String reportType = result.isSuccess() ? "acquisition.success" : "acquisition.failure";
             String highlightColor = result.isSuccess() ? ReportingUtilities.getPositiveColor() :
-                                 ReportingUtilities.getNegativeColor();
+                                          ReportingUtilities.getNegativeColor();
 
             addReport(ACQUISITIONS, getFormattedTextAt(ACTION_CHECK_BUNDLE, reportType,
                   highlightColor, person.getFullName(), acquisition.getAcquisitionName(),
                   system.getPrintableName(getLocalDate()), skillCheck.getTargetNumber().getValue(),
-                  techBonus,  industryBonus, outputsBonus));
+                  techBonus, industryBonus, outputsBonus));
         }
         return result.isSuccess() ? PartAcquisitionResult.Success : PartAcquisitionResult.PlanetSpecificFailure;
     }
@@ -3868,11 +3682,13 @@ public class Campaign implements ITechManager, IPlace {
         boolean useEdge = getCampaignOptions().isUseEdge() &&
                                 person != null && person.getOptions().booleanOption(useEdgeOption);
 
-        ActionCheckResult skillCheckResult = skillCheck.resolve(useEdge, null, false);
-        if (skillCheckResult.usedEdge()) {
-            report += " and <b>fails!</b> but uses Edge to reroll...getting a " + skillCheckResult.roll() + ": ";
+        ActionCheckResult skillCheckResult = skillCheck.resolve(useEdge, null);
+        if (skillCheckResult.hasUsedEdge()) {
+            report += " and <b>fails!</b> but uses Edge to reroll...getting a " +
+                            skillCheckResult.getRollResult() +
+                            ": ";
         } else {
-            report += " and rolls " + skillCheckResult.roll() + ':';
+            report += " and rolls " + skillCheckResult.getRollResult() + ':';
         }
         int xpGained = 0;
         if (skillCheckResult.isSuccess()) {
@@ -3906,7 +3722,7 @@ public class Campaign implements ITechManager, IPlace {
             if (person != null) {
                 if (!skillCheck.getTargetNumber().isAutomaticSuccess()) {
                     person.setNTasks(person.getNTasks() + 1);
-                    if (skillCheckResult.roll() == 12) {
+                    if (skillCheckResult.getRollResult() == 12) {
                         xpGained += getCampaignOptions().getSuccessXP();
                     }
                 }
@@ -3917,7 +3733,8 @@ public class Campaign implements ITechManager, IPlace {
             }
         } else {
             report = report + acquisition.failToFind();
-            if (person != null && skillCheckResult.roll() == 2 && !skillCheck.getTargetNumber().isAutomaticFail()) {
+            if ((person != null) && (skillCheckResult.getRollResult() == 2) &&
+                      !skillCheck.getTargetNumber().isAutomaticFail()) {
                 xpGained += getCampaignOptions().getMistakeXP();
             }
         }
@@ -5849,29 +5666,8 @@ public class Campaign implements ITechManager, IPlace {
         formations.writeToXML(writer, indent);
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "formations");
         finances.writeToXML(writer, indent);
-        // Write the campaign's own location separately so load order in <locations> doesn't matter.
-        AbstractLocation currentLoc = getCurrentLocation();
-        if (currentLoc != null) {
-            currentLoc.writeToXML(writer, indent);
-        }
-        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "locations");
-        for (AbstractLocation location : locations) {
-            if (location == currentLoc) {
-                continue;
-            }
-            // Skip locations parented to another node — they are serialized inside their parent's XML.
-            if (location.isParented()) {
-                continue;
-            }
-            location.writeToXML(writer, indent);
-        }
-        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "locations");
-        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "playerBases");
-        for (PlayerBase base : playerBases) {
-            base.writeToXML(writer, indent);
-        }
-        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "playerBases");
-        locationNode.writeToXML(writer, indent);
+        forceLocationManager.writeToXML(writer, indent);
+        locationManager.writeToXML(this, writer, indent);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "isAvoidingEmptySystems", isAvoidingEmptySystems);
         MHQXMLUtility.writeSimpleXMLTag(writer,
               indent,

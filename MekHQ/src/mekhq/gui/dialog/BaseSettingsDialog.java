@@ -472,7 +472,7 @@ public class BaseSettingsDialog extends JDialog {
         base.setPlanetId(selectedPlanet != null ? selectedPlanet.getId() : null);
 
         if (existingBase == null) {
-            campaign.addPlayerBase(base);
+            campaign.getCampaignLocationManager().addPlayerBase(base);
         }
 
         result = base;

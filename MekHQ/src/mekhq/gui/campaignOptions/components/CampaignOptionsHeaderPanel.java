@@ -36,19 +36,19 @@ import static java.awt.Color.BLACK;
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static megamek.utilities.ImageUtilities.addTintToImageIcon;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.CAMPAIGN_OPTIONS_PANEL_WIDTH;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 
+import jakarta.annotation.Nonnull;
 import megamek.client.ui.util.UIUtil;
 
 /**
@@ -59,22 +59,12 @@ import megamek.client.ui.util.UIUtil;
  * layout, and font scaling is applied to the labels to ensure consistent appearance.
  */
 public class CampaignOptionsHeaderPanel extends JPanel {
-    private static final String TIP_PANEL_NAME = "TipPanel";
+    private static final int DEFAULT_IMAGE_SIZE = 80;
+    private static final int DEFAULT_BODY_TEXT_WIDTH = 750;
 
-    private final int tipPanelHeight;
-
-    public int getTipPanelHeight() {
-        return tipPanelHeight;
-    }
-
-    public static String getTipPanelName() {
-        return TIP_PANEL_NAME;
-    }
-
-    @Deprecated(since = "0.50.06", forRemoval = true)
-    public CampaignOptionsHeaderPanel(String name, String imageAddress, boolean includeBodyText) {
-        this(name, imageAddress, includeBodyText, false, 0);
-    }
+    // Header images are reused across every page build; cache the loaded/scaled/tinted icon by (address, size, tint)
+    // so we don't reload from disk and re-tint each time. Accessed only on the EDT, so a plain HashMap is safe.
+    private static final Map<String, ImageIcon> HEADER_IMAGE_CACHE = new HashMap<>();
 
     /**
      * Constructs a {@code CampaignOptionsHeaderPanel} that displays a header label and an image.
@@ -86,47 +76,39 @@ public class CampaignOptionsHeaderPanel extends JPanel {
      * @param name         a unique identifier used to fetch resource bundle entries and to form the panel's name
      * @param imageAddress the path to the image file displayed in the panel
      */
-    public CampaignOptionsHeaderPanel(String name, String imageAddress) {
-        this(name, imageAddress, false, false, 0);
+    public CampaignOptionsHeaderPanel(@Nonnull String name, @Nonnull String imageAddress) {
+        this(name, imageAddress, false, DEFAULT_IMAGE_SIZE, true);
     }
 
     /**
-     * Constructs a {@code CampaignOptionsHeaderPanel} that displays a header label and an image.
-     *
-     * <p>The panel is named {@code "pnl" + name + "HeaderPanel"}. The header label's text is fetched from a resource
-     * bundle using {@code "lbl" + name + ".text"}. The image is loaded from the specified file path and scaled
-     * appropriately.</p>
-     *
-     * @param name           a unique identifier used to fetch resource bundle entries and to form the panel's name
-     * @param imageAddress   the path to the image file displayed in the panel
-     * @param tipPanelHeight the number of empty line breaks to reserve vertical space for the tip panel area
-     */
-    public CampaignOptionsHeaderPanel(String name, String imageAddress, int tipPanelHeight) {
-        this(name, imageAddress, false, true, tipPanelHeight);
-    }
-
-    /**
-     * Constructs a {@code CampaignOptionsHeaderPanel} that displays a header label, an image, and optionally includes
-     * additional descriptive body text and/or a tip panel.
-     *
-     * <p>The panel is named {@code "pnl" + name + "HeaderPanel"}. The header label's text is fetched from a resource
-     * bundle using {@code "lbl" + name + ".text"}. The image is loaded from the specified file path and scaled
-     * appropriately.</p>
+     * Constructs a {@code CampaignOptionsHeaderPanel} with a custom image size.
      *
      * @param name            a unique identifier used for resource bundle lookups and to form the panel's name
      * @param imageAddress    the path to the image file to display at the top of the panel
      * @param includeBodyText if true, includes a body label beneath the image with descriptive text
-     * @param includeTipPanel if true, displays a tip panel beneath the body text (or image if body text is excluded)
-     * @param tipPanelHeight  the number of empty line breaks to reserve vertical space for the tip panel area
+     * @param imageSize       the target width or height for the header image
      */
-    public CampaignOptionsHeaderPanel(String name, String imageAddress, boolean includeBodyText,
-          boolean includeTipPanel, int tipPanelHeight) {
-        this.tipPanelHeight = tipPanelHeight;
+    public CampaignOptionsHeaderPanel(@Nonnull String name, @Nonnull String imageAddress, boolean includeBodyText, int imageSize) {
+        this(name, imageAddress, includeBodyText, imageSize, true);
+    }
 
-        // Load and scale the image using the provided file path
-        ImageIcon imageIcon = new ImageIcon(imageAddress);
-        imageIcon = scaleImageIcon(imageIcon, 100, true);
-        imageIcon = addTintToImageIcon(imageIcon.getImage(), BLACK);
+    /**
+     * Constructs a {@code CampaignOptionsHeaderPanel} with custom image sizing and tint behavior.
+     *
+     * @param name            a unique identifier used for resource bundle lookups and to form the panel's name
+     * @param imageAddress    the path to the image file to display at the top of the panel
+     * @param includeBodyText if true, includes a body label beneath the image with descriptive text
+     * @param imageSize       the target width or height for the header image
+     * @param tintImage       if true, tints the image black to match the standard options header style
+     */
+    public CampaignOptionsHeaderPanel(@Nonnull String name, @Nonnull String imageAddress, boolean includeBodyText, int imageSize,
+          boolean tintImage) {
+        // Build the header image once per (address, size, tint) and reuse it; see HEADER_IMAGE_CACHE.
+        ImageIcon imageIcon = HEADER_IMAGE_CACHE.computeIfAbsent(imageAddress + '|' + imageSize + '|' + tintImage,
+              key -> {
+                  ImageIcon icon = scaleImageIcon(new ImageIcon(imageAddress), imageSize, true);
+                  return tintImage ? addTintToImageIcon(icon.getImage(), BLACK) : icon;
+              });
 
         // Create a JLabel to display the image in the panel
         JLabel lblImage = new JLabel(imageIcon);
@@ -144,16 +126,15 @@ public class CampaignOptionsHeaderPanel extends JPanel {
         JLabel lblBody = new JLabel();
         if (includeBodyText) {
             lblBody = new JLabel(String.format("<html><div style='width: %s'>%s</div></html>",
-                  UIUtil.scaleForGUI(750), getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + "Body.text")),
+                  UIUtil.scaleForGUI(DEFAULT_BODY_TEXT_WIDTH),
+                  getTextAt(getCampaignOptionsResourceBundle(), "lbl" + name + "Body.text")),
                   SwingConstants.CENTER);
             lblBody.setName("lbl" + name + "Body");
             setFontScaling(lblBody, false, 1);
         }
 
-        JLabel lblTip = getTooltipJLabel(name, includeTipPanel, tipPanelHeight);
-
         // Initialize the panel's layout using a GridBagLayout
-        new CampaignOptionsStandardPanel("pnl" + name + "HeaderPanel");
+        setName("pnl" + name + "HeaderPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(this);
 
         // Configure and add components to the panel
@@ -170,43 +151,5 @@ public class CampaignOptionsHeaderPanel extends JPanel {
             layout.gridwidth = 1;
             this.add(lblBody, layout);
         }
-
-        if (includeTipPanel) {
-            layout.gridy++;
-            layout.gridwidth = 5;
-            this.add(new JSeparator(SwingConstants.HORIZONTAL), layout);
-            layout.gridy++;
-            this.add(lblTip, layout);
-            layout.gridy++;
-            this.add(new JSeparator(SwingConstants.HORIZONTAL), layout);
-        }
-    }
-
-    private JLabel getTooltipJLabel(String name, boolean includeTipPanel, int tipPanelHeight) {
-        JLabel lblTip = new JLabel() {
-            @Override
-            public Dimension getPreferredSize() {
-                Dimension standardSize = super.getPreferredSize();
-                // CAMPAIGN_OPTIONS_PANEL_WIDTH and standardSize are already in screen pixels — do not scale again
-                return new Dimension(Math.max(standardSize.width, CAMPAIGN_OPTIONS_PANEL_WIDTH), standardSize.height);
-            }
-
-            @Override
-            public Dimension getMinimumSize() {
-                Dimension standardSize = super.getPreferredSize();
-                // CAMPAIGN_OPTIONS_PANEL_WIDTH and standardSize are already in screen pixels — do not scale again
-                return new Dimension(Math.max(standardSize.width, CAMPAIGN_OPTIONS_PANEL_WIDTH), standardSize.height);
-            }
-        };
-
-        if (includeTipPanel) {
-            // This stops the tip panel from bouncing around too much as new options are selected
-            String lineBreaks = "<br>".repeat(Math.max(0, tipPanelHeight));
-
-            lblTip.setName("lbl" + name + TIP_PANEL_NAME);
-            lblTip.setText("<html>" + lineBreaks + "</html>");
-            lblTip.setHorizontalAlignment(SwingConstants.CENTER);
-        }
-        return lblTip;
     }
 }

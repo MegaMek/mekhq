@@ -57,8 +57,15 @@ import java.io.PrintWriter;
 import java.io.Serial;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import java.util.UUID;
 import java.util.stream.IntStream;
 import java.util.zip.GZIPOutputStream;
 import javax.swing.*;
@@ -1195,10 +1202,10 @@ public class CampaignGUI extends JPanel {
             logger.warn("Cannot export person if no one is selected! Ignoring.");
             return;
         }
-        Person selectedPerson = pt.getPersonModel().getPerson(pt.getPersonnelTable().convertRowIndexToModel(row));
+        Person selectedPerson = pt.getPersonnelTableModel().getPerson(pt.getPersonnelTable().convertRowIndexToModel(row));
         int[] rows = pt.getPersonnelTable().getSelectedRows();
         Person[] people = Arrays.stream(rows)
-                                .mapToObj(j -> pt.getPersonModel()
+                                .mapToObj(j -> pt.getPersonnelTableModel()
                                                      .getPerson(pt.getPersonnelTable().convertRowIndexToModel(j)))
                                 .toArray(Person[]::new);
 
@@ -1486,7 +1493,7 @@ public class CampaignGUI extends JPanel {
         DefaultComboBoxModel<LocationFilterItem> model = new DefaultComboBoxModel<>();
         model.addElement(LocationFilterItem.ALL);
         model.addElement(LocationFilterItem.MAIN_FORCE);
-        for (PlayerBase base : getCampaign().getPlayerBases()) {
+        for (PlayerBase base : getCampaign().getCampaignLocationManager().getPlayerBases()) {
             model.addElement(LocationFilterItem.forBase(base));
         }
         return model;
@@ -1638,7 +1645,7 @@ public class CampaignGUI extends JPanel {
 
     private void refreshCampaignControlButtons() {
         boolean emptyHangar = getCampaign().getUnits().isEmpty() &&
-                                    getCampaign().getPlayerBases()
+                                    getCampaign().getCampaignLocationManager().getPlayerBases()
                                           .stream()
                                           .allMatch(base -> base.getBaseHangar().getUnits().isEmpty());
         boolean noPersonnel = getCampaign().getAllPersonnel().isEmpty();
