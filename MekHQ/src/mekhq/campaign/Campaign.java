@@ -1823,7 +1823,12 @@ public class Campaign implements ITechManager, IPlace {
     }
 
     public TransportCostCalculations getTransportCostCalculation(int crewExperienceLevel) {
-        return new TransportCostCalculations(getHangar().getUnits(),
+        // Units queued for travel elsewhere (e.g. left behind at a base via the jump-blocker prompt) still sit in
+        // the hangar until the queue is dispatched next day, but must not be billed as traveling with the campaign.
+        List<Unit> travelingUnits = getHangar().getUnits().stream()
+              .filter(unit -> !getCampaignLocationManager().isQueuedForTravel(unit))
+              .toList();
+        return new TransportCostCalculations(travelingUnits,
               getPersonnelFilteringOutDepartedAndAbsent(),
               getCargoStatistics(),
               getHangarStatistics(),
@@ -8805,6 +8810,12 @@ public class Campaign implements ITechManager, IPlace {
      */
     public void wipePartsInUseMap() {
         this.partsInUseRequestedStockMap.clear();
+    }
+
+    @Override
+    public boolean writePendingTravelDestinationToXML(PrintWriter pw, int indent) {
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "destinationType", "campaign");
+        return true;
     }
 
     /**

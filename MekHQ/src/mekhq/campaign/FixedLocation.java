@@ -75,6 +75,13 @@ public class FixedLocation extends AbstractLocation {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "fixedLocation");
     }
 
+    @Override
+    public boolean writePendingTravelDestinationToXML(PrintWriter pw, int indent) {
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "destinationType", "fixed");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "destinationSystemId", currentSystem.getId());
+        return true;
+    }
+
     public static FixedLocation generateInstanceFromXML(Node wn, Campaign campaign) {
         FixedLocation returnValue = null;
         try {

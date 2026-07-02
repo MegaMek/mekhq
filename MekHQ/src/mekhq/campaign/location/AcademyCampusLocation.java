@@ -41,6 +41,7 @@ import jakarta.annotation.Nonnull;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.AbstractMobileLocation;
+import mekhq.campaign.FixedLocation;
 import mekhq.campaign.Personnel;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.education.Academy;
@@ -109,6 +110,24 @@ public class AcademyCampusLocation implements IPlace {
             }
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "academyCampus");
+    }
+
+    @Override
+    public boolean writePendingTravelDestinationToXML(PrintWriter pw, int indent) {
+        if (getParentLocation() instanceof FixedLocation fixedLocation) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "destinationType", "campus");
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "destinationCampusSet", academySet);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "destinationCampusName", academyName);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "destinationCampusSystemId",
+                  fixedLocation.getCurrentSystem().getId());
+            return true;
+        }
+        // A local (home-school or unit-education) campus travels with its parent rather than being anchored to a
+        // fixed system; it is resolved on load by academy set and name under the campaign.
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "destinationType", "localCampus");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "destinationCampusSet", academySet);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "destinationCampusName", academyName);
+        return true;
     }
 
     // Populated during XML load; drained by CampaignXmlParser to reconnect persons after load.

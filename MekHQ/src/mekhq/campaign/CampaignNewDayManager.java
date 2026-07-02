@@ -464,6 +464,10 @@ public class CampaignNewDayManager {
 
         campaign.readNews();
 
+        // Dispatch travel queued during the previous day before transit advances, so departures resolve from where
+        // the travelers actually were when the travel was queued.
+        campaign.getCampaignLocationManager().dispatchPendingTravel(campaign);
+
         for (AbstractLocation location : new ArrayList<>(campaign.getCampaignLocationManager().getLocations())) {
             location.newDay(campaign, location != updatedLocation);
         }

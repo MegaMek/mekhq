@@ -43,14 +43,22 @@ import megamek.common.units.Entity;
 import megamek.common.units.Jumpship;
 import megamek.common.units.SpaceStation;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignLocationManager;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.Test;
 
 class JumpBlockersTest {
 
+    /** A mocked campaign with a real (empty) location manager, so the queued-for-travel check sees no queue. */
+    private static Campaign mockCampaign() {
+        Campaign campaign = mock(Campaign.class);
+        when(campaign.getCampaignLocationManager()).thenReturn(new CampaignLocationManager());
+        return campaign;
+    }
+
     @Test
     void areAllUnitsJumpCapable_returnsTrue_whenNoJumpShipsPresent() {
-        Campaign campaign = mock(Campaign.class);
+        Campaign campaign = mockCampaign();
         Unit nonJumpUnit = mock(Unit.class);
         when(nonJumpUnit.getEntity()).thenReturn(mock(Entity.class));
         when(campaign.getUnits()).thenReturn(List.of(nonJumpUnit));
@@ -60,7 +68,7 @@ class JumpBlockersTest {
 
     @Test
     void areAllUnitsJumpCapable_returnsTrue_whenAllJumpShipsAreCapable() {
-        Campaign campaign = mock(Campaign.class);
+        Campaign campaign = mockCampaign();
 
         Unit okJumpShipUnit = mock(Unit.class);
         Jumpship okJumpShip = mock(Jumpship.class);
@@ -75,7 +83,7 @@ class JumpBlockersTest {
 
     @Test
     void areAllUnitsJumpCapable_doesNotTreatSpaceStationsWithKfAdapterAsBlockers() {
-        Campaign campaign = mock(Campaign.class);
+        Campaign campaign = mockCampaign();
 
         Unit stationUnit = mock(Unit.class);
         SpaceStation station = mock(SpaceStation.class);
@@ -93,7 +101,7 @@ class JumpBlockersTest {
 
     @Test
     void areAllUnitsJumpCapable_doesNotTreatModularSpaceStationsAsBlockers() {
-        Campaign campaign = mock(Campaign.class);
+        Campaign campaign = mockCampaign();
 
         Unit stationUnit = mock(Unit.class);
         SpaceStation station = mock(SpaceStation.class);
