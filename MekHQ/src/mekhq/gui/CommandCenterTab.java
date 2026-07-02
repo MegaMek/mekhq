@@ -266,12 +266,12 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.weighty = 0.1;
         panCommand.add(panObjectives, gridBagConstraints);
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
         panCommand.add(panInfo, gridBagConstraints);
         gridBagConstraints.gridx = 1;
@@ -326,6 +326,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         lblRating.setHyperlinkMode(true);
         lblRatingHead.setLabelFor(lblRating);
         gridBagConstraints.gridx = 1;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         panInfo.add(lblRating, gridBagConstraints);
 
@@ -340,6 +341,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         lblExperience = new JLabel();
         lblExperienceHead.setLabelFor(lblExperience);
         gridBagConstraints.gridx = 1;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         panInfo.add(lblExperience, gridBagConstraints);
 
@@ -354,6 +356,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         lblMissionSuccess = new JLabel();
         lblMissionSuccessHead.setLabelFor(lblMissionSuccess);
         gridBagConstraints.gridx = 1;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         panInfo.add(lblMissionSuccess, gridBagConstraints);
 
@@ -371,6 +374,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         lblPersonnel.setHyperlinkMode(true);
         lblPersonnelHead.setLabelFor(lblPersonnel);
         gridBagConstraints.gridx = 1;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         panInfo.add(lblPersonnel, gridBagConstraints);
 
@@ -387,6 +391,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
             lblHRCapacity = new JLabel();
             lblHRCapacityHead.setLabelFor(lblHRCapacity);
             gridBagConstraints.gridx = 1;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.weightx = 1.0;
             panInfo.add(lblHRCapacity, gridBagConstraints);
         }
@@ -405,6 +410,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         lblComposition.setHyperlinkMode(true);
         lblCompositionHead.setLabelFor(lblComposition);
         gridBagConstraints.gridx = 1;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         panInfo.add(lblComposition, gridBagConstraints);
 
@@ -419,6 +425,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         lblRepairStatus = new JLabel();
         lblRepairStatusHead.setLabelFor(lblRepairStatus);
         gridBagConstraints.gridx = 1;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         panInfo.add(lblRepairStatus, gridBagConstraints);
 
@@ -436,6 +443,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         lblTransportCapacity.setHyperlinkMode(true);
         lblTransportCapacityHead.setLabelFor(lblTransportCapacity);
         gridBagConstraints.gridx = 1;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         panInfo.add(lblTransportCapacity, gridBagConstraints);
 
@@ -453,6 +461,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         lblCargoSummary.setHyperlinkMode(true);
         lblCargoSummaryHead.setLabelFor(lblCargoSummary);
         gridBagConstraints.gridx = 1;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         panInfo.add(lblCargoSummary, gridBagConstraints);
 
@@ -470,6 +479,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
             lblFacilityCapacities = new JLabel();
             lblFacilityCapacitiesHead.setLabelFor(lblFacilityCapacities);
             gridBagConstraints.gridx = 1;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.weightx = 1.0;
             panInfo.add(lblFacilityCapacities, gridBagConstraints);
         }
