@@ -58,10 +58,10 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationNode;
-import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.gui.model.PersonnelTableModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -99,17 +99,13 @@ public class PersonnelTableModelColumnTest {
             switch (personnelTableModelColumn) {
                 case RANK, SKILL_LEVEL ->
                     assertEquals(SwingConstants.LEFT, personnelTableModelColumn.getAlignment());
-                case SALARY, TECH_MINUTES ->
+                case SALARY, MAX_TECH_MINUTES ->
                     assertEquals(SwingConstants.RIGHT, personnelTableModelColumn.getAlignment());
                 case FIRST_NAME -> // String
                     assertEquals(SwingConstants.LEFT, personnelTableModelColumn.getAlignment());
                 case AGE -> // Int
                     assertEquals(SwingConstants.CENTER, personnelTableModelColumn.getAlignment());
                 case VTOL -> // SkillPair
-                    assertEquals(SwingConstants.CENTER, personnelTableModelColumn.getAlignment());
-                case BIRTHDAY -> // Date
-                    assertEquals(SwingConstants.CENTER, personnelTableModelColumn.getAlignment());
-                case COMMANDER -> // Boolean
                     assertEquals(SwingConstants.CENTER, personnelTableModelColumn.getAlignment());
                 case HIGHEST_EDUCATION -> // field
                     assertEquals(SwingConstants.CENTER, personnelTableModelColumn.getAlignment());
@@ -125,16 +121,19 @@ public class PersonnelTableModelColumnTest {
 
     @Test
     public void testGetDefaultSortOrder() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
+        PersonnelTableModel personnelTableModel = new PersonnelTableModel(null);
+        for (PersonnelTableModelColumn personnelTableModelColumn : columns) {
             switch (personnelTableModelColumn) {
                 case RANK:
                 case FIRST_NAME:
                 case LAST_NAME:
                 case SKILL_LEVEL:
-                    assertEquals(SortOrder.DESCENDING, personnelTableModelColumn.getDefaultSortOrder());
+                    assertEquals(SortOrder.DESCENDING,
+                          personnelTableModel.getDefaultSortOrder().get(personnelTableModelColumn));
                     break;
                 default:
-                    assertNull(personnelTableModelColumn.getDefaultSortOrder());
+                    assertNull(
+                          personnelTableModel.getDefaultSortOrder().get(personnelTableModelColumn));
                     break;
             }
         }
@@ -161,12 +160,10 @@ public class PersonnelTableModelColumnTest {
         private static final LocalDate TODAY = LocalDate.of(3025, 1, 1);
         private static final String CAMPAIGN_NAME = "Test Mercs";
 
-        private PersonnelMarket market;
         private Personnel mainForce;
 
         @BeforeEach
         void setUp() {
-            market = mock(PersonnelMarket.class);
             mainForce = new Personnel();
         }
 
@@ -205,13 +202,10 @@ public class PersonnelTableModelColumnTest {
         void noParent_allColumnsReturnDash() {
             Person person = mockPerson();
             Campaign campaign = mockCampaign();
-            assertEquals("-", PersonnelTableModelColumn.LOCATION_SYSTEM.getCellValue(campaign, person));
-            assertEquals("-", PersonnelTableModelColumn.LOCATION_PLANET.getCellValue(campaign, person));
+            assertEquals("-", PersonnelTableModelColumn.LOCATION_SYSTEM_AND_PLANET.getCellValue(campaign, person));
             assertEquals(CAMPAIGN_NAME, PersonnelTableModelColumn.LOCATION_NAME.getCellValue(campaign, person));
             assertEquals("-",
-                  PersonnelTableModelColumn.DESTINATION_SYSTEM.getCellValue(campaign, person));
-            assertEquals("-",
-                  PersonnelTableModelColumn.DESTINATION_PLANET.getCellValue(campaign, person));
+                  PersonnelTableModelColumn.DESTINATION_SYSTEM_AND_PLANET.getCellValue(campaign, person));
             assertEquals("-",
                   PersonnelTableModelColumn.DESTINATION_NAME.getCellValue(campaign, person));
         }
@@ -237,13 +231,7 @@ public class PersonnelTableModelColumnTest {
             @Test
             void locationSystem_returnsCampaignSystem() {
                 assertEquals("Galatea",
-                      PersonnelTableModelColumn.LOCATION_SYSTEM.getCellValue(campaign, person));
-            }
-
-            @Test
-            void locationPlanet_returnsCampaignPlanet() {
-                assertEquals("Galatea",
-                      PersonnelTableModelColumn.LOCATION_PLANET.getCellValue(campaign, person));
+                      PersonnelTableModelColumn.LOCATION_SYSTEM_AND_PLANET.getCellValue(campaign, person));
             }
 
             @Test
@@ -264,8 +252,7 @@ public class PersonnelTableModelColumnTest {
 
             @Test
             void destination_allDashWhenNotTraveling() {
-                assertEquals("-", PersonnelTableModelColumn.DESTINATION_SYSTEM.getCellValue(campaign, person));
-                assertEquals("-", PersonnelTableModelColumn.DESTINATION_PLANET.getCellValue(campaign, person));
+                assertEquals("-", PersonnelTableModelColumn.DESTINATION_SYSTEM_AND_PLANET.getCellValue(campaign, person));
                 assertEquals("-", PersonnelTableModelColumn.DESTINATION_NAME.getCellValue(campaign, person));
             }
         }
@@ -293,13 +280,7 @@ public class PersonnelTableModelColumnTest {
             @Test
             void locationSystem_returnsAcademySystem() {
                 assertEquals("New Avalon",
-                      PersonnelTableModelColumn.LOCATION_SYSTEM.getCellValue(campaign, person));
-            }
-
-            @Test
-            void locationPlanet_returnsAcademyPlanet() {
-                assertEquals("New Avalon",
-                      PersonnelTableModelColumn.LOCATION_PLANET.getCellValue(campaign, person));
+                      PersonnelTableModelColumn.LOCATION_SYSTEM_AND_PLANET.getCellValue(campaign, person));
             }
 
             @Test
@@ -310,8 +291,7 @@ public class PersonnelTableModelColumnTest {
 
             @Test
             void destination_allDashWhenNotTraveling() {
-                assertEquals("-", PersonnelTableModelColumn.DESTINATION_SYSTEM.getCellValue(campaign, person));
-                assertEquals("-", PersonnelTableModelColumn.DESTINATION_PLANET.getCellValue(campaign, person));
+                assertEquals("-", PersonnelTableModelColumn.DESTINATION_SYSTEM_AND_PLANET.getCellValue(campaign, person));
                 assertEquals("-", PersonnelTableModelColumn.DESTINATION_NAME.getCellValue(campaign, person));
             }
         }
@@ -349,7 +329,8 @@ public class PersonnelTableModelColumnTest {
                 cl.setJumpPath(new JumpPath(new ArrayList<>(List.of(originSys, academySys))));
                 Person person = buildTravelingPerson(cl);
 
-                assertEquals("New Avalon", PersonnelTableModelColumn.DESTINATION_SYSTEM.getCellValue(campaign, person));
+                assertEquals("New Avalon", PersonnelTableModelColumn.DESTINATION_SYSTEM_AND_PLANET.getCellValue(campaign,
+                      person));
             }
 
             @Test
@@ -359,7 +340,8 @@ public class PersonnelTableModelColumnTest {
                 cl.setJumpPath(new JumpPath(new ArrayList<>(List.of(originSys, academySys))));
                 Person person = buildTravelingPerson(cl);
 
-                assertEquals("New Avalon", PersonnelTableModelColumn.DESTINATION_PLANET.getCellValue(campaign, person));
+                assertEquals("New Avalon", PersonnelTableModelColumn.DESTINATION_SYSTEM_AND_PLANET.getCellValue(campaign,
+                      person));
             }
 
             @Test
@@ -414,19 +396,12 @@ public class PersonnelTableModelColumnTest {
             @Test
             void locationSystem_returnsBaseSystem() {
                 assertEquals("Outreach",
-                      PersonnelTableModelColumn.LOCATION_SYSTEM.getCellValue(campaign, person));
-            }
-
-            @Test
-            void locationPlanet_returnsBasePlanet() {
-                assertEquals("Outreach",
-                      PersonnelTableModelColumn.LOCATION_PLANET.getCellValue(campaign, person));
+                      PersonnelTableModelColumn.LOCATION_SYSTEM_AND_PLANET.getCellValue(campaign, person));
             }
 
             @Test
             void destination_allDashWhenNotTraveling() {
-                assertEquals("-", PersonnelTableModelColumn.DESTINATION_SYSTEM.getCellValue(campaign, person));
-                assertEquals("-", PersonnelTableModelColumn.DESTINATION_PLANET.getCellValue(campaign, person));
+                assertEquals("-", PersonnelTableModelColumn.DESTINATION_SYSTEM_AND_PLANET.getCellValue(campaign, person));
                 assertEquals("-", PersonnelTableModelColumn.DESTINATION_NAME.getCellValue(campaign, person));
             }
         }

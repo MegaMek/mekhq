@@ -121,7 +121,7 @@ public final class TOETab extends CampaignGuiTab {
         orgTree.setBorder(RoundedLineBorder.createRoundedLineBorder());
         orgTree.setFocusable(false);
 
-        JPanel pnlTutorial = new TutorialHyperlinkPanel("toeTab");
+        JPanel pnlTutorial = new TutorialHyperlinkPanel("toeTab.keyText");
 
         JPanel leftPanel = new JPanel(new BorderLayout());
         leftPanel.setBorder(null);

@@ -240,7 +240,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         panMap.setSelectedSystem(getCampaign().getCurrentLocation().getCurrentSystem());
         panMapView.add(panMap, BorderLayout.CENTER);
 
-        JPanel pnlTutorial = new TutorialHyperlinkPanel("mapTab");
+        JPanel pnlTutorial = new TutorialHyperlinkPanel("mapTab.keyText");
         panMapView.add(pnlTutorial, BorderLayout.SOUTH);
 
         mapView = new JViewport();

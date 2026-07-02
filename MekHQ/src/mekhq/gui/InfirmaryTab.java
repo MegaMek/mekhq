@@ -308,7 +308,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
         gridBagConstraints.weighty = 1.0;
         add(scrollUnassignedPatient, gridBagConstraints);
 
-        JPanel pnlTutorial = new TutorialHyperlinkPanel("infirmary");
+        JPanel pnlTutorial = new TutorialHyperlinkPanel("infirmary.keyText");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
