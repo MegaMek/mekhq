@@ -38,15 +38,14 @@ import megamek.logging.MMLogger;
 import org.jspecify.annotations.NonNull;
 
 public enum BasePaymentMultiplier {
-    NORMAL("NORMAL", 0.05),
-    SPENDTHRIFT("SPENDTHRIFT", 0.025),
-    MISERLY("MISERLY", 0.01);
+    NORMAL("NORMAL", 1.0),
+    SPENDTHRIFT("SPENDTHRIFT", 0.5),
+    MISERLY("MISERLY", 0.2);
 
     private final String lookupName;
     private final String label;
     private final double multiplier;
 
-    private final String RESOURCE_BUNDLE = "mekhq.resources.BasePaymentMultiplier";
     private final static MMLogger LOGGER = MMLogger.create(BasePaymentMultiplier.class);
 
     BasePaymentMultiplier(final String lookupName, final double multiplier) {
@@ -56,6 +55,8 @@ public enum BasePaymentMultiplier {
     }
 
     private @NonNull String generateLabel(String lookupName) {
+        String RESOURCE_BUNDLE = "mekhq.resources.BasePaymentMultiplier";
+
         return getTextAt(RESOURCE_BUNDLE, "BasePaymentMultiplier." + lookupName + ".name");
     }
 

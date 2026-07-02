@@ -1002,6 +1002,7 @@ public record Accountant(Campaign campaign) {
      * @return a {@link Money} object representing the calculated base contract value, adjusted according to the
      *       campaign's configuration
      */
+    @Deprecated(since = "0.51.01", forRemoval = false)
     public static Money getContractBase(CampaignOptions campaignOptions, Faction campaignFaction, LocalDate today,
           Hangar hangar, List<Person> salaryEligiblePersonnel, int temporaryAsTechPoolSize, int temporaryMedicPool,
           Map<PersonnelRole, Integer> tempCrewMap, List<Formation> formations) {
