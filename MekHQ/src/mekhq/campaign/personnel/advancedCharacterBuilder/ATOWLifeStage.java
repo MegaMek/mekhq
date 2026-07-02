@@ -32,6 +32,12 @@
  */
 package mekhq.campaign.personnel.advancedCharacterBuilder;
 
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+
 import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
@@ -50,10 +56,15 @@ import megamek.logging.MMLogger;
  */
 public enum ATOWLifeStage {
     AFFILIATION(0, "AFFILIATION"),
-    EARLY_CHILDHOOD(1, "EARLY_CHILDHOOD"),
-    LATE_CHILDHOOD(2, "LATE_CHILDHOOD"),
-    HIGHER_EDUCATION(3, "HIGHER_EDUCATION"),
-    REAL_LIFE(4, "REAL_LIFE");
+    SUB_AFFILIATION(1, "SUB_AFFILIATION"),
+    CLAN_CASTE(2, "CLAN_CASTE"),
+    SUPPLEMENTAL(3, "SUPPLEMENTAL"),
+    EARLY_CHILDHOOD(4, "EARLY_CHILDHOOD"),
+    LATE_CHILDHOOD(5, "LATE_CHILDHOOD"),
+    HIGHER_EDUCATION(6, "HIGHER_EDUCATION"),
+    REAL_LIFE(7, "REAL_LIFE");
+
+    final static String RESOURCE_BUNDLE = "mekhq.resources.ATOWLifeStage";
 
     private static final MMLogger LOGGER = MMLogger.create(ATOWLifeStage.class);
 
@@ -96,6 +107,47 @@ public enum ATOWLifeStage {
      */
     public String getLookupName() {
         return lookupName;
+    }
+
+    /**
+     * Returns the display name for this object by looking up the ".label" key in the resource bundle associated with
+     * this class.
+     *
+     * @return the localized display name for this object
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String getDisplayName() {
+        return getTextAt(RESOURCE_BUNDLE, lookupName + ".label");
+    }
+
+    /**
+     * Returns the description for this object by looking up the ".description" key in the resource bundle associated
+     * with this class.
+     *
+     * @return the localized description for this object
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public String getDescription() {
+        return getTextAt(RESOURCE_BUNDLE, lookupName + ".description");
+    }
+
+    /**
+     * Returns a list of all {@link ATOWLifeStage} values, sorted by their ascending order.
+     *
+     * @return a sorted list of {@link ATOWLifeStage} values by order
+     *
+     * @author Illiani
+     * @since 0.50.07
+     */
+    public static List<ATOWLifeStage> getOrderedLifeStages() {
+        List<ATOWLifeStage> stages = Arrays.asList(values());
+        stages.sort(Comparator.comparingInt(ATOWLifeStage::getOrder));
+
+        return stages;
     }
 
     /**
@@ -174,5 +226,10 @@ public enum ATOWLifeStage {
 
         LOGGER.warn("Unknown ATOWLifeStage: {}", text);
         return null;
+    }
+
+    @Override
+    public String toString() {
+        return getLookupName();
     }
 }
