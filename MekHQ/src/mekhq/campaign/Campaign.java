@@ -2068,7 +2068,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all hangars across all locations associated with this campaign.
-     *                                                                                           TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
+     *                                                                                                 TODO: This won't work once we support multiple hangars. Method separated from getHangar() for future refactor
      */
     public Hangar getAllHangar() {
         return units;
@@ -2716,7 +2716,7 @@ public class Campaign implements ITechManager, IPlace {
 
     /**
      * @return all warehouses across all locations associated with this campaign.
-     *                                                                                           TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
+     *                                                                                                 TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
      */
     public Warehouse getAllWarehouse() {
         return parts;
@@ -6235,7 +6235,8 @@ public class Campaign implements ITechManager, IPlace {
         double nCargo = cargoStats.getTotalCargoCapacity(); // ignoring refrigerated/insulated/etc.
 
         // get cargo tonnage including parts in transit, then get mothballed unit tonnage
-        double carriedCargo = cargoStats.getCargoTonnage(true, false) + cargoStats.getCargoTonnage(false, true);
+        double carriedCargo = cargoStats.getCargoTonnage(this, true, false) + cargoStats.getCargoTonnage(this, false,
+              true);
 
         // calculate the number of units left not transported
         int noMek = max(nMek - stats.getOccupiedBays(Entity.ETYPE_MEK), 0);

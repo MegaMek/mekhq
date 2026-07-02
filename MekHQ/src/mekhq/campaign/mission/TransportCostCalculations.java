@@ -62,11 +62,11 @@ import mekhq.campaign.JumpPath;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.CargoStatistics;
-import mekhq.campaign.unit.HangarStatistics;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.PlanetarySystem;
 
@@ -153,8 +153,8 @@ public class TransportCostCalculations {
 
     private final Collection<Unit> hangarContents;
     private final Collection<Person> allPersonnel;
-    private final CargoStatistics cargoStatistics;
-    private final HangarStatistics hangarStatistics;
+    private final Hangar hangar;
+    private final Collection<Part> spareParts;
     private final int crewExperienceLevel;
 
     private double additionalCargoSpaceRequired;
@@ -433,21 +433,17 @@ public class TransportCostCalculations {
     /**
      * Constructs a new TransportCostCalculations class for evaluating jump and transport costs.
      *
-     * @param hangarContents      The contents of the campaign's {@link Hangar}
      * @param allPersonnel        The {@link Person} list representing personnel to be transported.
-     * @param cargoStatistics     The {@link CargoStatistics} describing cargo loads.
-     * @param hangarStatistics    The {@link HangarStatistics} listing all available bay capacities.
      * @param crewExperienceLevel The experience level to use for crew-related cost multipliers.
      *
      * @author Illiani
      * @since 50.10
      */
-    public TransportCostCalculations(final Collection<Unit> hangarContents, final Collection<Person> allPersonnel,
-          final CargoStatistics cargoStatistics, final HangarStatistics hangarStatistics,
-          final int crewExperienceLevel) {
-        this.hangarContents = hangarContents;
-        this.cargoStatistics = cargoStatistics;
-        this.hangarStatistics = hangarStatistics;
+    public TransportCostCalculations(final Hangar hangar, final Collection<Part> spareParts,
+          final Collection<Person> allPersonnel, final int crewExperienceLevel) {
+        this.hangar = hangar;
+        this.hangarContents = hangar.getUnits();
+        this.spareParts = spareParts;
         this.crewExperienceLevel = crewExperienceLevel;
         this.allPersonnel = allPersonnel;
 
@@ -608,8 +604,9 @@ public class TransportCostCalculations {
     void calculateCargoRequirements() {
         double totalCargoCapacity = getTotalCargoCapacity();
 
-        double totalCargoUsage = cargoStatistics.getCargoTonnage(false, false);
-        totalCargoUsage += cargoStatistics.getCargoTonnage(false, true);
+        Collection<Unit> units = hangar.getUnits();
+        double totalCargoUsage = CargoStatistics.getCargoTonnage(units, spareParts, false, false);
+        totalCargoUsage += CargoStatistics.getCargoTonnage(units, spareParts, false, true);
 
         additionalCargoSpaceRequired = -min(0, totalCargoCapacity - totalCargoUsage);
         cargoBayCost = round(additionalCargoSpaceRequired * CARGO_PER_TON_COST);
@@ -622,7 +619,7 @@ public class TransportCostCalculations {
     }
 
     private double getTotalCargoCapacity() {
-        double totalCargoCapacity = cargoStatistics.getTotalCargoCapacity();
+        double totalCargoCapacity = CargoStatistics.getTotalCargoCapacity(hangar);
         totalCargoCapacity *= tetrisMasterMultiplier;
         return totalCargoCapacity;
     }
@@ -918,7 +915,7 @@ public class TransportCostCalculations {
     int getTotalSmallCraftBays() {
         double total = 0.0;
 
-        for (Unit unit : hangarStatistics.getHangar().getUnits()) {
+        for (Unit unit : hangarContents) {
             total += unit.getSmallCraftCapacity();
         }
 
@@ -928,7 +925,7 @@ public class TransportCostCalculations {
     int getTotalASFBays() {
         double total = 0.0;
 
-        for (Unit unit : hangarStatistics.getHangar().getUnits()) {
+        for (Unit unit : hangarContents) {
             total += unit.getASFCapacity();
         }
 
@@ -938,7 +935,7 @@ public class TransportCostCalculations {
     int getTotalMekBays() {
         double total = 0.0;
 
-        for (Unit unit : hangarStatistics.getHangar().getUnits()) {
+        for (Unit unit : hangarContents) {
             total += unit.getMekCapacity();
         }
 
@@ -948,7 +945,7 @@ public class TransportCostCalculations {
     int getTotalSuperHeavyVehicleBays() {
         double total = 0.0;
 
-        for (Unit unit : hangarStatistics.getHangar().getUnits()) {
+        for (Unit unit : hangarContents) {
             total += unit.getSuperHeavyVehicleCapacity();
         }
 
@@ -958,7 +955,7 @@ public class TransportCostCalculations {
     int getTotalHeavyVehicleBays() {
         double total = 0.0;
 
-        for (Unit unit : hangarStatistics.getHangar().getUnits()) {
+        for (Unit unit : hangarContents) {
             total += unit.getHeavyVehicleCapacity();
         }
 
@@ -968,7 +965,7 @@ public class TransportCostCalculations {
     int getTotalLightVehicleBays() {
         double total = 0.0;
 
-        for (Unit unit : hangarStatistics.getHangar().getUnits()) {
+        for (Unit unit : hangarContents) {
             total += unit.getLightVehicleCapacity();
         }
 
@@ -978,7 +975,7 @@ public class TransportCostCalculations {
     int getTotalProtoMekBays() {
         double total = 0.0;
 
-        for (Unit unit : hangarStatistics.getHangar().getUnits()) {
+        for (Unit unit : hangarContents) {
             total += unit.getProtoMekCapacity();
         }
 
@@ -988,7 +985,7 @@ public class TransportCostCalculations {
     int getTotalBattleArmorBays() {
         double total = 0.0;
 
-        for (Unit unit : hangarStatistics.getHangar().getUnits()) {
+        for (Unit unit : hangarContents) {
             total += unit.getBattleArmorCapacity();
         }
 
@@ -998,7 +995,7 @@ public class TransportCostCalculations {
     int getTotalInfantryBays() {
         double total = 0.0;
 
-        for (Unit unit : hangarStatistics.getHangar().getUnits()) {
+        for (Unit unit : hangarContents) {
             total += unit.getInfantryCapacity();
         }
 
@@ -1008,7 +1005,7 @@ public class TransportCostCalculations {
     public int getTotalDockingCollars() {
         int total = 0;
 
-        for (Unit unit : hangarStatistics.getHangar().getUnits()) {
+        for (Unit unit : hangarContents) {
             Entity entity = unit.getEntity();
             if (!(entity instanceof Jumpship)) {
                 continue;
@@ -1022,7 +1019,7 @@ public class TransportCostCalculations {
     public int getTotalLargeCraftPassengerCapacity() {
         int total = 0;
 
-        for (Unit unit : hangarStatistics.getHangar().getUnits()) {
+        for (Unit unit : hangarContents) {
             Entity entity = unit.getEntity();
 
             if (!entity.isLargeCraft() && !entity.isSmallCraft() && !entity.isSpaceStation()) {

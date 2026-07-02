@@ -346,7 +346,11 @@ public class Warehouse implements ILocation {
      * @return A list of spare parts in the warehouse.
      */
     public List<Part> getSpareParts() {
-        return getParts().stream()
+        return getSpareParts(getParts());
+    }
+
+    public static List<Part> getSpareParts(Collection<Part> parts) {
+        return parts.stream()
                      .filter(Part::isSpare)
                      .collect(Collectors.toList());
     }
