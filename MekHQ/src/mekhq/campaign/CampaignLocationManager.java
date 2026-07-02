@@ -35,20 +35,28 @@ package mekhq.campaign;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import jakarta.annotation.Nonnull;
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.events.LocationAddedEvent;
 import mekhq.campaign.events.LocationRemovedEvent;
 import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.location.ILocation;
+import mekhq.campaign.location.LocationDispatch;
 import mekhq.campaign.location.LocationNode;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.utilities.MHQXMLUtility;
 
@@ -59,9 +67,16 @@ import mekhq.utilities.MHQXMLUtility;
  * Campaign holds a single instance of this manager and exposes facade methods that delegate here.</p>
  */
 public class CampaignLocationManager {
+    private static final MMLogger LOGGER = MMLogger.create(CampaignLocationManager.class);
 
     private final List<AbstractLocation> locations = new ArrayList<>();
     private final Set<PlayerBase> playerBases = new LinkedHashSet<>();
+    /**
+     * Travel queued during the day, keyed by origin and destination. It is dispatched at the start of the next new day
+     * by {@link #dispatchPendingTravel(Campaign)} rather than immediately. Travel still queued at save time is persisted
+     * via {@link #writePendingTravelToXML} and restored during campaign load.
+     */
+    private final Map<TravelRoute, List<ILocation>> pendingTravel = new LinkedHashMap<>();
 
     public void addLocation(AbstractLocation location) {
         if (location != null && !locations.contains(location)) {
@@ -111,6 +126,72 @@ public class CampaignLocationManager {
     @Nonnull
     public Set<PlayerBase> getPlayerBases() {
         return Collections.unmodifiableSet(playerBases);
+    }
+
+    /**
+     * Queues {@code travelers} to be relocated to {@code destination} when the day next advances, rather than
+     * dispatching them immediately. Each traveler is bucketed by its own current (origin) location, so a single call
+     * may produce several entries when the travelers start from different places. Queued travel is dispatched by
+     * {@link #dispatchPendingTravel(Campaign)}.
+     *
+     * @param travelers  the persons, units, or parts to relocate; must not be {@code null}
+     * @param destination the target {@link ILocation}; must not be {@code null}
+     */
+    public void queueTravel(Collection<? extends ILocation> travelers, ILocation destination) {
+        for (ILocation traveler : travelers) {
+            TravelRoute route = new TravelRoute(traveler.getCurrentLocation(), destination);
+            pendingTravel.computeIfAbsent(route, key -> new ArrayList<>()).add(traveler);
+        }
+    }
+
+    /**
+     * Returns {@code true} if {@code traveler} is currently queued for travel that has not yet been dispatched by
+     * {@link #dispatchPendingTravel(Campaign)}. A queued traveler still sits at its origin location; it has not been
+     * moved toward its destination.
+     */
+    public boolean isQueuedForTravel(ILocation traveler) {
+        for (List<ILocation> travelers : pendingTravel.values()) {
+            if (travelers.contains(traveler)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Dispatches all travel queued via {@link #queueTravel}.
+     *
+     * <p>Queued routes are first grouped by their root locations into unique
+     * {@link TravelRootRoute origin-root → destination-root} pairs; this collapses routes that differ only in their
+     * sub-location, since inter-system travel is computed root-to-root. Each original route is then dispatched to its
+     * own destination via {@link LocationDispatch}, so arrival behavior is unchanged.</p>
+     *
+     * <p>Must run at the start of a new day, before location transit is advanced, so that the departure system resolved
+     * at dispatch time matches where the travelers were when the travel was queued.</p>
+     *
+     * @param campaign the active campaign; must not be {@code null}
+     */
+    public void dispatchPendingTravel(Campaign campaign) {
+        if (pendingTravel.isEmpty()) {
+            return;
+        }
+
+        Map<TravelRootRoute, List<TravelRoute>> byRoot = new LinkedHashMap<>();
+        for (TravelRoute route : pendingTravel.keySet()) {
+            TravelRootRoute rootRoute = new TravelRootRoute(rootOf(route.origin()), rootOf(route.destination()));
+            byRoot.computeIfAbsent(rootRoute, key -> new ArrayList<>()).add(route);
+        }
+
+        for (List<TravelRoute> routes : byRoot.values()) {
+            for (TravelRoute route : routes) {
+                LocationDispatch.dispatchTravelers(pendingTravel.get(route), route.destination(), campaign);
+            }
+        }
+        pendingTravel.clear();
+    }
+
+    private static @Nullable AbstractLocation rootOf(@Nullable ILocation location) {
+        return location != null ? location.getCurrentLocation() : null;
     }
 
     /**
@@ -258,5 +339,47 @@ public class CampaignLocationManager {
             base.writeToXML(pw, indent);
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "playerBases");
+        writePendingTravelToXML(pw, indent);
     }
+
+    /**
+     * Serializes queued-but-undrained travel. Only the destination and the travelers are written; the origin is
+     * recomputed from each traveler's location when the saved travel is re-queued on load (see
+     * {@code CampaignXmlParser}). Destinations are limited to the campaign itself, a {@link PlayerBase}, or an
+     * {@link AcademyCampusLocation}; any other destination type is logged and skipped.
+     */
+    private void writePendingTravelToXML(PrintWriter pw, int indent) {
+        if (pendingTravel.isEmpty()) {
+            return;
+        }
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "pendingTravel");
+        for (Map.Entry<TravelRoute, List<ILocation>> entry : pendingTravel.entrySet()) {
+            ILocation destination = entry.getKey().destination();
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "route");
+            if (destination != null && destination.writePendingTravelDestinationToXML(pw, indent)) {
+                for (ILocation traveler : entry.getValue()) {
+                    switch (traveler) {
+                        case Person person ->
+                              MHQXMLUtility.writeSimpleXMLTag(pw, indent, "person", person.getId().toString());
+                        case Unit unit -> MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unit", unit.getId().toString());
+                        case Part part -> MHQXMLUtility.writeSimpleXMLTag(pw, indent, "part", part.getId());
+                        default -> LOGGER.error(
+                              "writePendingTravel: cannot serialize queued traveler of type {} bound for {} — skipping",
+                              traveler.getClass().getSimpleName(), destination.getClass().getSimpleName());
+                    }
+                }
+            } else {
+                LOGGER.warn("writePendingTravel: unsupported destination type {} — skipping route travelers",
+                      destination == null ? "null" : destination.getClass().getSimpleName());
+            }
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "route");
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "pendingTravel");
+    }
+
+    /** Queue key: an item's origin location paired with its travel destination. */
+    private record TravelRoute(@Nullable ILocation origin, ILocation destination) {}
+
+    /** Root-collapsed travel key: the origin and destination resolved to their root {@link AbstractLocation}. */
+    private record TravelRootRoute(@Nullable AbstractLocation originRoot, @Nullable AbstractLocation destinationRoot) {}
 }

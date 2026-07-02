@@ -82,6 +82,7 @@ import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationDispatch;
+import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.log.PerformanceLogger;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.personnel.Person;
@@ -349,14 +350,15 @@ public class EducationController {
             person.setEduAcademySystem(campus);
             AcademyCampusLocation campusLocation = campaign.getCampaignLocationManager().getOrCreateCampusLocation(campaign, academy.getSet(),
                   academy.getName(), academy.getLocationSystems().getFirst());
-            LocationDispatch.dispatchToLocation(List.of(person), campusLocation, campaign);
+            campaign.getCampaignLocationManager().queueTravel(List.of(person), campusLocation);
             double startTransit = originSystem != null && originSystem.equals(campaign.getCurrentSystem())
-                                        ? LocationDispatch.computeStartTransit(originSystem, campaign)
+                                        ? LocationUtils.computeStartTransit(originSystem, campaign)
                                         : 0.0;
-            JumpPath jumpPath = person.getJumpPath();
+            // Travel is queued, not yet dispatched, so plan the route directly to set the journey time.
+            JumpPath jumpPath = LocationUtils.planJumpPath(originSystem, campusLocation.getCurrentSystem(), campaign);
             person.setEduJourneyTime(jumpPath != null
                                            ?
-                                           LocationDispatch.computeJourneyDays(jumpPath,
+                                           LocationUtils.computeJourneyDays(jumpPath,
                                                  campaign.getLocalDate(),
                                                  startTransit)
                                            :
@@ -782,9 +784,8 @@ public class EducationController {
             return;
         }
 
-        // Capture the academy system before dispatch — dispatchToLocation moves the person out of
-        // the campus node, after which getEduAcademySystem() can no longer walk up to the campus
-        // and returns null, causing a NPE in getSimplifiedTravelTime.
+        // Resolve the academy system from the stored id; travel is queued (not dispatched) below, so the person
+        // stays in the campus node until the next new day.
         String academySystemId = person.getEduAcademySystem();
         PlanetarySystem academySystem = null;
         if (academySystemId != null) {
@@ -805,12 +806,12 @@ public class EducationController {
             }
         }
 
-        LocationDispatch.dispatchToLocation(List.of(person), campaign, campaign);
+        campaign.getCampaignLocationManager().queueTravel(List.of(person), campaign);
 
-        JumpPath returnPath = person.getJumpPath();
+        JumpPath returnPath = LocationUtils.planJumpPath(academySystem, campaign.getCurrentSystem(), campaign);
         int travelDays = returnPath != null
-                               ? LocationDispatch.computeJourneyDays(returnPath, campaign.getLocalDate(),
-              LocationDispatch.computeStartTransit(academySystem, campaign))
+                               ? LocationUtils.computeJourneyDays(returnPath, campaign.getLocalDate(),
+              LocationUtils.computeStartTransit(academySystem, campaign))
                                : max(2, campaign.getSimplifiedTravelTime(academySystem));
         person.setEduJourneyTime(travelDays);
         person.setEduDaysOfTravel(0);
@@ -891,7 +892,7 @@ public class EducationController {
             JumpPath newPath = campaign.calculateJumpPath(currentLocation.getCurrentSystem(), targetSystem);
             if (newPath != null && !newPath.isEmpty()) {
                 currentLocation.setJumpPath(newPath);
-                person.setEduJourneyTime(LocationDispatch.computeJourneyDays(
+                person.setEduJourneyTime(LocationUtils.computeJourneyDays(
                       newPath, campaign.getLocalDate(), currentLocation.getTransitTime()));
             }
             return;

@@ -8793,6 +8793,12 @@ public class Campaign implements ITechManager, IPlace {
         this.partsInUseRequestedStockMap.clear();
     }
 
+    @Override
+    public boolean writePendingTravelDestinationToXML(PrintWriter pw, int indent) {
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "destinationType", "campaign");
+        return true;
+    }
+
     /**
      * Retrieves the campaign faction icon for the specified {@link Campaign}. If a custom icon is defined in the
      * campaign's unit icon configuration, that icon is used. Otherwise, a default faction logo is fetched based on the

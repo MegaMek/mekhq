@@ -32,19 +32,33 @@
  */
 package mekhq.campaign.location;
 
+import java.time.LocalDate;
 import java.util.Objects;
 
 import megamek.common.annotations.Nullable;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
+import mekhq.campaign.JumpPath;
 import mekhq.campaign.base.AbstractBase;
+import mekhq.campaign.universe.PlanetarySystem;
 
 /**
- * Static utilities for reasoning about "same effective location" across the {@link ILocation} tree.
+ * A collection of stateless static utility methods for reasoning about locations and travel. These methods only read
+ * and compute from their inputs — they never mutate the {@link ILocation} tree or dispatch travelers (see
+ * {@link LocationDispatch} for state-changing dispatch operations).
+ *
+ * <p>The utilities fall into two groups:</p>
+ * <ul>
+ *   <li><b>Co-location reasoning</b> over the {@link ILocation} tree
+ *       ({@link #areSameEffectiveLocation}, {@link #findEffectiveBase}, {@link #isInTransit}).</li>
+ *   <li><b>Travel computations</b> for planning a journey's route and duration
+ *       ({@link #computeStartTransit}, {@link #planJumpPath}, {@link #computeJourneyDays}).</li>
+ * </ul>
  *
  * <p>Co-location definition</p>
  * Two {@link ILocation} items are <em>co-located</em> when:
  * <ol>
- *   <li>Neither is currently in transit (no active {@link mekhq.campaign.JumpPath} anywhere in
+ *   <li>Neither is currently in transit (no active {@link JumpPath} anywhere in
  *       their ancestor chain).</li>
  *   <li>They share the same {@link AbstractBase} ancestor in the {@link LocationNode} tree —
  *       or neither has an {@link AbstractBase} ancestor (both are in the main force).</li>
@@ -134,5 +148,58 @@ public final class LocationUtils {
             node = node.getParent();
         }
         return false;
+    }
+
+    /**
+     * Returns the transit time from {@code fromSystem} that should be used as the start-transit
+     * parameter when calculating a new journey's duration.
+     *
+     * <p>When already in-system, we inherit its current transit progress.
+     * When there is no location, we assume the
+     * traveler starts at the outer jump point of their system.</p>
+     *
+     * @param fromSystem the departure system; must not be {@code null}
+     * @param campaign   the active campaign; must not be {@code null}
+     * @return transit time in days
+     */
+    public static double computeStartTransit(PlanetarySystem fromSystem, Campaign campaign) {
+        return campaign.getCurrentLocation() != null
+              ? campaign.getCurrentLocation().getTransitTime()
+              : fromSystem.getTimeToJumpPoint(1.0);
+    }
+
+    /**
+     * Returns the {@link JumpPath} a dispatch would assign for travel from {@code fromSystem} to
+     * {@code destinationSystem}, or {@code null} when the trip needs no inter-system jump and would land immediately
+     * (same system, a missing system, or no calculable path).
+     *
+     * <p>This mirrors the path selection performed by {@link LocationDispatch} when dispatching, letting callers learn
+     * the planned route (e.g. to compute a journey time) without actually dispatching the travelers.</p>
+     *
+     * @param fromSystem        the departure system, or {@code null}
+     * @param destinationSystem the arrival system, or {@code null}
+     * @param campaign          the active campaign; must not be {@code null}
+     * @return the planned {@link JumpPath}, or {@code null} if travel would land immediately
+     */
+    public static @Nullable JumpPath planJumpPath(@Nullable PlanetarySystem fromSystem,
+          @Nullable PlanetarySystem destinationSystem, Campaign campaign) {
+        if (fromSystem == null || destinationSystem == null || fromSystem.equals(destinationSystem)) {
+            return null;
+        }
+        JumpPath path = campaign.calculateJumpPath(fromSystem, destinationSystem);
+        return (path == null || path.isEmpty()) ? null : path;
+    }
+
+    /**
+     * Computes the total journey duration in days from a {@link JumpPath}, applying a minimum of
+     * 2 days.
+     *
+     * @param path         the route to calculate; must not be {@code null}
+     * @param date         the in-game date (used for pirate-point availability); must not be {@code null}
+     * @param startTransit the already-elapsed transit time at the origin, in days
+     * @return journey length in whole days, always at least 2
+     */
+    public static int computeJourneyDays(JumpPath path, LocalDate date, double startTransit) {
+        return Math.max(2, (int) Math.ceil(path.getTotalTime(date, startTransit, false)));
     }
 }

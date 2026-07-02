@@ -94,6 +94,7 @@ import mekhq.Utilities;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignFactory;
+import mekhq.campaign.CampaignLocationManager;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.FixedLocation;
 import mekhq.campaign.Kill;
@@ -308,6 +309,9 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         // Saves made in 0.51.00 do not have a <location> but will have a <locations> with a single item.
         boolean foundMainForceLocation = false;
 
+        // Pending travel references persons, units, parts, and bases, so it is resolved after those are all loaded.
+        Node pendingTravelNode = null;
+
         // Okay, lets iterate through the children, eh?
         for (int x = 0; x < nl.getLength(); x++) {
             Node workingNode = nl.item(x);
@@ -355,6 +359,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     processLocations(campaign, workingNode);
                 } else if (nodeName.equalsIgnoreCase("playerBases")) {
                     processPlayerBaseNodes(campaign, workingNode, version);
+                } else if (nodeName.equalsIgnoreCase("pendingTravel")) {
+                    pendingTravelNode = workingNode;
                 } else if (nodeName.equalsIgnoreCase("location")) {
                     // Campaign's current location — written as a top-level tag in new saves;
                     // same tag was used as the only location entry in pre-<locations>-list saves.
@@ -808,9 +814,12 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                   .ifPresent(campaign::setLocation);
         }
 
+        if (pendingTravelNode != null) {
+            processPendingTravel(campaign, pendingTravelNode);
+        }
+
         migrateLegacyEducationTravel(campaign);
         reconnectPersonsToTravelLocations(campaign);
-
         LOGGER.info("Load of campaign file complete!");
 
         return campaign;
@@ -1862,6 +1871,140 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
     }
 
     /**
+     * Re-queues travel that was queued but not yet drained when the campaign was saved. Each {@code <route>} names a
+     * destination and its travelers; resolved travelers are re-queued via {@link CampaignLocationManager#queueTravel},
+     * which recomputes their origin from their current location. Routes whose destination or travelers cannot be
+     * resolved are skipped with a warning.
+     */
+    private static void processPendingTravel(Campaign campaign, Node pendingTravelNode) {
+        NodeList routes = pendingTravelNode.getChildNodes();
+        for (int i = 0; i < routes.getLength(); i++) {
+            Node routeNode = routes.item(i);
+            if (routeNode.getNodeType() != Node.ELEMENT_NODE || !routeNode.getNodeName().equalsIgnoreCase("route")) {
+                continue;
+            }
+            ILocation destination = resolvePendingDestination(campaign, routeNode);
+            if (destination == null) {
+                LOGGER.warn("processPendingTravel: could not resolve destination for a queued route — skipping");
+                continue;
+            }
+            List<ILocation> travelers = resolvePendingTravelers(campaign, routeNode);
+            if (!travelers.isEmpty()) {
+                campaign.getCampaignLocationManager().queueTravel(travelers, destination);
+            }
+        }
+    }
+
+    private static @Nullable ILocation resolvePendingDestination(Campaign campaign, Node routeNode) {
+        String type = getChildText(routeNode, "destinationType");
+        if (type == null) {
+            return null;
+        }
+        return switch (type) {
+            case "campaign" -> campaign;
+            case "base" -> {
+                String baseId = getChildText(routeNode, "destinationBaseId");
+                yield baseId == null ? null : findPlayerBaseById(campaign, baseId);
+            }
+            case "campus" -> {
+                String set = getChildText(routeNode, "destinationCampusSet");
+                String name = getChildText(routeNode, "destinationCampusName");
+                String systemId = getChildText(routeNode, "destinationCampusSystemId");
+                yield (set == null || name == null || systemId == null)
+                            ? null
+                            : campaign.getCampaignLocationManager().getOrCreateCampusLocation(campaign, set, name,
+                      systemId);
+            }
+            default -> {
+                LOGGER.error("processPendingTravel: unrecognized destination type '{}' in a queued route — skipping",
+                      type);
+                yield null;
+            }
+        };
+    }
+
+    private static @Nullable PlayerBase findPlayerBaseById(Campaign campaign, String baseId) {
+        UUID id;
+        try {
+            id = UUID.fromString(baseId);
+        } catch (IllegalArgumentException ex) {
+            return null;
+        }
+        for (PlayerBase base : campaign.getCampaignLocationManager().getPlayerBases()) {
+            if (id.equals(base.getId())) {
+                return base;
+            }
+        }
+        return null;
+    }
+
+    private static List<ILocation> resolvePendingTravelers(Campaign campaign, Node routeNode) {
+        List<ILocation> travelers = new ArrayList<>();
+        NodeList children = routeNode.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            Node child = children.item(i);
+            if (child.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+            String text = child.getTextContent().trim();
+            switch (child.getNodeName()) {
+                case "person" -> {
+                    Person person = campaign.getPerson(parseUuidOrNull(text));
+                    addIfNotNull(travelers, person, "person", text);
+                }
+                case "unit" -> {
+                    Unit unit = campaign.getUnit(parseUuidOrNull(text));
+                    addIfNotNull(travelers, unit, "unit", text);
+                }
+                case "part" -> {
+                    Integer partId = parsePartId(text);
+                    Part part = partId == null ? null : findPartAnywhere(campaign, partId);
+                    addIfNotNull(travelers, part, "part", text);
+                }
+                default -> { /* destination tags and whitespace */ }
+            }
+        }
+        return travelers;
+    }
+
+    private static void addIfNotNull(List<ILocation> travelers, @Nullable ILocation traveler, String type,
+          String id) {
+        if (traveler != null) {
+            travelers.add(traveler);
+        } else {
+            LOGGER.warn("processPendingTravel: queued {} {} not found — skipping", type, id);
+        }
+    }
+
+    private static @Nullable UUID parseUuidOrNull(String text) {
+        try {
+            return UUID.fromString(text);
+        } catch (IllegalArgumentException ex) {
+            return null;
+        }
+    }
+
+    private static @Nullable Integer parsePartId(String text) {
+        try {
+            return Integer.parseInt(text);
+        } catch (NumberFormatException ex) {
+            return null;
+        }
+    }
+
+    /** Returns the trimmed text of the first direct child element named {@code childName}, or {@code null}. */
+    private static @Nullable String getChildText(Node parent, String childName) {
+        NodeList children = parent.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            Node child = children.item(i);
+            if (child.getNodeType() == Node.ELEMENT_NODE && child.getNodeName().equalsIgnoreCase(childName)) {
+                return child.getTextContent().trim();
+            }
+        }
+        return null;
+    }
+
+    /**
      * Migrates persons mid-journey on legacy saves (pre-location-tree) into real {@link CurrentLocation} nodes so they
      * are handled by the location-aware travel code.
      *
@@ -1881,6 +2024,14 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                       && stage != EducationStage.EDUCATION
                       && stage != EducationStage.GRADUATING
                       && stage != EducationStage.DROPPING_OUT) {
+                continue;
+            }
+
+            // Skip persons already queued for (but not yet dispatched) travel — processPendingTravel re-queued them
+            // and they still sit at their origin. Migrating would wrongly move them into a travel node/campus.
+            if (campaign.getCampaignLocationManager().isQueuedForTravel(person)) {
+                LOGGER.debug("migrateLegacyEducationTravel: skipping {} — queued in pendingTravel (stage={})",
+                      person.getFullTitle(), stage);
                 continue;
             }
 

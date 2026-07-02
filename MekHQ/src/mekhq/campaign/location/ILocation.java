@@ -33,6 +33,7 @@
 
 package mekhq.campaign.location;
 
+import java.io.PrintWriter;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -466,4 +467,16 @@ public interface ILocation {
      * @param campaign the active campaign
      */
     default void processArrivals(Campaign campaign) {}
+
+    /**
+     * Writes this destination's {@code destinationType} discriminator plus any identity tags needed to resolve it on
+     * load, and returns {@code true} if it did.
+     *
+     * <p>The default writes nothing and returns {@code false}, marking this location as not a valid
+     * pending-travel destination. Destination types override this to serialize themselves; the read side is mirrored by
+     * {@code CampaignXmlParser.resolvePendingDestination}.</p>
+     */
+    default boolean writePendingTravelDestinationToXML(PrintWriter pw, int indent) {
+        return false;
+    }
 }

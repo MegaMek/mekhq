@@ -45,6 +45,7 @@ import mekhq.campaign.Personnel;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.AcademyFactory;
+import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -109,6 +110,18 @@ public class AcademyCampusLocation implements IPlace {
             }
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "academyCampus");
+    }
+
+    @Override
+    public boolean writePendingTravelDestinationToXML(PrintWriter pw, int indent) {
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "destinationType", "campus");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "destinationCampusSet", academySet);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "destinationCampusName", academyName);
+        PlanetarySystem system = getCurrentSystem();
+        if (system != null) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "destinationCampusSystemId", system.getId());
+        }
+        return true;
     }
 
     // Populated during XML load; drained by CampaignXmlParser to reconnect persons after load.

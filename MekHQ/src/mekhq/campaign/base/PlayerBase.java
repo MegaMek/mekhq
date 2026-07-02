@@ -137,6 +137,13 @@ public class PlayerBase extends AbstractBase {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "playerBase");
     }
 
+    @Override
+    public boolean writePendingTravelDestinationToXML(PrintWriter pw, int indent) {
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "destinationType", "base");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "destinationBaseId", getId().toString());
+        return true;
+    }
+
     public static @Nullable PlayerBase generateInstanceFromXML(Node wn, Campaign campaign,
           Version version) {
         try {
