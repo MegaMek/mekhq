@@ -92,6 +92,7 @@ import mekhq.campaign.universe.Planet;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsHighlighter;
 import mekhq.gui.campaignOptions.contents.*;
 import mekhq.gui.campaignOptions.optionChangeDialogs.*;
 
@@ -131,6 +132,7 @@ public class CampaignOptionsPane extends JPanel {
     private final Map<String, Supplier<Component>> directPageFactories = new HashMap<>();
     private final Map<String, Component> directPageCache = new HashMap<>();
     private boolean searchIndexInitialized = false;
+    private String searchTerm;
 
     private CampaignOptionsContentHost activeContentHost;
     private CampaignOptionsNavigationPanel navigationPanel;
@@ -222,9 +224,17 @@ public class CampaignOptionsPane extends JPanel {
     }
 
     private CampaignOptionsNavigationPanel createNavigationPanel() {
-        navigationPanel = new CampaignOptionsNavigationPanel(navigationTargets, this::selectedNavigationTarget);
+        navigationPanel = new CampaignOptionsNavigationPanel(navigationTargets, this::selectedNavigationTarget,
+            this::updateSearchTerm);
         navigationPanel.setSearchIndexInitializer(this::ensureSearchIndexBuilt);
         return navigationPanel;
+    }
+
+    private void updateSearchTerm(String searchTerm) {
+        if (activeContentHost != null) {
+            CampaignOptionsHighlighter.highlightSearchTerm(activeContentHost, searchTerm);
+        }
+        this.searchTerm = searchTerm;
     }
 
     private CampaignOptionsContentHost createContentHost(Component initialContent, CampaignOptionsRoute initialRoute) {
@@ -411,6 +421,7 @@ public class CampaignOptionsPane extends JPanel {
 
         activeContentHost.setContent(directPage, getQuoteResourceName(route), route.shouldShowHelpPanel());
         expandSectionsForActiveFilter(directPage);
+        CampaignOptionsHighlighter.highlightSearchTerm(activeContentHost, searchTerm);
         return true;
     }
 
@@ -491,7 +502,8 @@ public class CampaignOptionsPane extends JPanel {
             return;
         }
 
-        String sectionSearchText = pagePanel.getSectionSearchText();
+        List<String> strings = CampaignOptionsHighlighter.extractAllText(pagePanel);
+        String sectionSearchText = String.join(" ", strings);
         if (sectionSearchText.isBlank()) {
             return;
         }
