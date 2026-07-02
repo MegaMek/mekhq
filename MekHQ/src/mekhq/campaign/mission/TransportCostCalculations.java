@@ -433,6 +433,8 @@ public class TransportCostCalculations {
     /**
      * Constructs a new TransportCostCalculations class for evaluating jump and transport costs.
      *
+     * @param hangar              The {@link Hangar} whose units are being evaluated for transport.
+     * @param spareParts          The {@link Part} collection representing spare parts to be transported as cargo.
      * @param allPersonnel        The {@link Person} list representing personnel to be transported.
      * @param crewExperienceLevel The experience level to use for crew-related cost multipliers.
      *
@@ -856,6 +858,9 @@ public class TransportCostCalculations {
      * </ul>
      *
      * @return The total count of passengers based on the conditions specified.
+     *
+     * @author Illiani
+     * @since 50.10
      */
     private int getPassengerCount() {
         int passengerCount = 0;
