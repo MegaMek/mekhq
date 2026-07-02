@@ -33,12 +33,15 @@
 package mekhq.campaign.personnel.education;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Answers.CALLS_REAL_METHODS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
@@ -408,6 +411,19 @@ class EducationControllerTest {
             }
 
             assertEquals(10, person.getEduJourneyTime());
+        }
+
+        @Test
+        void nonHomeSchoolRemote_unresolvableCampus_abortsEnrollment() {
+            Academy academy = buildAcademy(false, false);
+            when(campaign.getCampaignLocationManager().getOrCreateCampusLocation(any(), any(), any(), any()))
+                  .thenReturn(null);
+
+            Person person = buildStudentPerson();
+            EducationController.enrollPerson(campaign, person, academy, "Galatea", "MERC", 0);
+
+            assertNotEquals(EducationStage.JOURNEY_TO_CAMPUS, person.getEduEducationStage());
+            verify(campaign.getCampaignLocationManager(), never()).queueTravel(any(), any());
         }
 
         @Test

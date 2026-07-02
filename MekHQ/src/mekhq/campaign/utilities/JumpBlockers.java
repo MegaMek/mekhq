@@ -113,6 +113,12 @@ public class JumpBlockers {
         Set<Unit> nonJumpCapableUnits = new HashSet<>();
 
         for (Unit unit : campaign.getUnits()) {
+            // Units already queued to travel to a base have been handled by an earlier blocker prompt this day;
+            // they only leave the hangar when the queue is dispatched on the next new day.
+            if (campaign.getCampaignLocationManager().isQueuedForTravel(unit)) {
+                continue;
+            }
+
             Entity entity = unit.getEntity();
             // Buildings are, by their nature, not able to leave the planet they're on.
             if (entity instanceof BuildingEntity) {

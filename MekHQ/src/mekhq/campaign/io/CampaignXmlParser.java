@@ -1771,7 +1771,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                         }
                     }
                     for (int partId : currentLocation.drainPendingPartIds()) {
-                        Part part = findPartAnywhere(campaign, partId);
+                        Part part = campaign.getCampaignLocationManager().findPartAnywhere(campaign, partId);
                         if (part != null && !part.isParented()) {
                             LocationNode.LocationManager.setLocation(part, campaign.getWarehouse());
                             LOGGER.warn("reconnectPersonsToTravelLocations: part {} had no parent "
@@ -1801,7 +1801,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
                 // Parts in transit — in base warehouse data structure, but LocationNode under CurrentLocation
                 for (int partId : currentLocation.drainPendingPartIds()) {
-                    Part part = findPartAnywhere(campaign, partId);
+                    Part part = campaign.getCampaignLocationManager().findPartAnywhere(campaign, partId);
                     if (part != null) {
                         LocationNode.LocationManager.setLocation(part, currentLocation);
                     }
@@ -1855,21 +1855,6 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         return null;
     }
 
-    /** Searches campaign warehouse then all base warehouses for a part by ID. */
-    private static @Nullable Part findPartAnywhere(Campaign campaign, int partId) {
-        Part part = campaign.getWarehouse().getPart(partId);
-        if (part != null) {
-            return part;
-        }
-        for (PlayerBase base : campaign.getCampaignLocationManager().getPlayerBases()) {
-            part = base.getBaseWarehouse().getPart(partId);
-            if (part != null) {
-                return part;
-            }
-        }
-        return null;
-    }
-
     /**
      * Re-queues travel that was queued but not yet drained when the campaign was saved. Each {@code <route>} names a
      * destination and its travelers; resolved travelers are re-queued via {@link CampaignLocationManager#queueTravel},
@@ -1915,6 +1900,19 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                             : campaign.getCampaignLocationManager().getOrCreateCampusLocation(campaign, set, name,
                       systemId);
             }
+            case "localCampus" -> {
+                String set = getChildText(routeNode, "destinationCampusSet");
+                String name = getChildText(routeNode, "destinationCampusName");
+                yield (set == null || name == null)
+                            ? null
+                            : campaign.getCampaignLocationManager().getOrCreateLocalCampusLocation(campaign, set, name);
+            }
+            case "fixed" -> {
+                String systemId = getChildText(routeNode, "destinationSystemId");
+                yield systemId == null
+                            ? null
+                            : campaign.getCampaignLocationManager().getOrCreateFixedLocation(campaign, systemId);
+            }
             default -> {
                 LOGGER.error("processPendingTravel: unrecognized destination type '{}' in a queued route — skipping",
                       type);
@@ -1924,10 +1922,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
     }
 
     private static @Nullable PlayerBase findPlayerBaseById(Campaign campaign, String baseId) {
-        UUID id;
-        try {
-            id = UUID.fromString(baseId);
-        } catch (IllegalArgumentException ex) {
+        UUID id = parseUuidOrNull(baseId);
+        if (id == null) {
             return null;
         }
         for (PlayerBase base : campaign.getCampaignLocationManager().getPlayerBases()) {
@@ -1948,17 +1944,19 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             }
             String text = child.getTextContent().trim();
             switch (child.getNodeName()) {
-                case "person" -> {
+                case "personId" -> {
                     Person person = campaign.getPerson(parseUuidOrNull(text));
                     addIfNotNull(travelers, person, "person", text);
                 }
-                case "unit" -> {
+                case "unitId" -> {
                     Unit unit = campaign.getUnit(parseUuidOrNull(text));
                     addIfNotNull(travelers, unit, "unit", text);
                 }
-                case "part" -> {
+                case "partId" -> {
                     Integer partId = parsePartId(text);
-                    Part part = partId == null ? null : findPartAnywhere(campaign, partId);
+                    Part part = partId == null
+                                      ? null
+                                      : campaign.getCampaignLocationManager().findPartAnywhere(campaign, partId);
                     addIfNotNull(travelers, part, "part", text);
                 }
                 default -> { /* destination tags and whitespace */ }

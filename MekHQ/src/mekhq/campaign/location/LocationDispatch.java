@@ -175,8 +175,8 @@ public final class LocationDispatch {
      */
     private static Optional<CurrentLocation> buildTravelNode(PlanetarySystem fromSystem,
           PlanetarySystem destinationSystem, ILocation destination, Campaign campaign, String logContext) {
-        JumpPath path = campaign.calculateJumpPath(fromSystem, destinationSystem);
-        if (path == null || path.isEmpty()) {
+        JumpPath path = LocationUtils.planJumpPath(fromSystem, destinationSystem, campaign);
+        if (path == null) {
             return Optional.empty();
         }
         double startTransit = LocationUtils.computeStartTransit(fromSystem, campaign);

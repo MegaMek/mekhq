@@ -316,6 +316,19 @@ public class EducationController {
      */
     public static void enrollPerson(Campaign campaign, Person person, Academy academy, String campus, String faction,
           Integer courseIndex) {
+        // Resolve the campus before mutating any person state, so an unresolvable academy system aborts the
+        // enrollment cleanly instead of queueing travel to a null destination.
+        AcademyCampusLocation campusLocation = null;
+        if (!academy.isHomeSchool() && !academy.isLocal()) {
+            campusLocation = campaign.getCampaignLocationManager().getOrCreateCampusLocation(campaign, academy.getSet(),
+                  academy.getName(), academy.getLocationSystems().getFirst());
+            if (campusLocation == null) {
+                LOGGER.error("enrollPerson: could not resolve campus system {} for academy {} — aborting enrollment",
+                      academy.getLocationSystems().getFirst(), academy.getName());
+                return;
+            }
+        }
+
         // change status will wipe the academic information, so must always precede the
         // setters
         person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.STUDENT);
@@ -324,9 +337,9 @@ public class EducationController {
             // if the student is being homeschooled, we skip the journey to the 'academy'
             person.setEduEducationStage(EducationStage.EDUCATION);
             IPlace homeSchoolLocation = findHomeLocation(person, campaign);
-            AcademyCampusLocation campusLocation = campaign.getCampaignLocationManager().getOrCreateCampusUnderLocation(
+            AcademyCampusLocation homeSchoolCampus = campaign.getCampaignLocationManager().getOrCreateCampusUnderLocation(
                   academy.getSet(), academy.getName(), homeSchoolLocation);
-            person.setParent(campusLocation.getPersonnel());
+            person.setParent(homeSchoolCampus.getPersonnel());
         } else if (academy.isLocal()) {
             person.setEduEducationStage(EducationStage.JOURNEY_TO_CAMPUS);
             PlanetarySystem personSystem = person.getCurrentSystem();
@@ -348,8 +361,6 @@ public class EducationController {
         if (!academy.isHomeSchool() && !academy.isLocal()) {
             PlanetarySystem originSystem = person.getCurrentSystem();
             person.setEduAcademySystem(campus);
-            AcademyCampusLocation campusLocation = campaign.getCampaignLocationManager().getOrCreateCampusLocation(campaign, academy.getSet(),
-                  academy.getName(), academy.getLocationSystems().getFirst());
             campaign.getCampaignLocationManager().queueTravel(List.of(person), campusLocation);
             double startTransit = originSystem != null && originSystem.equals(campaign.getCurrentSystem())
                                         ? LocationUtils.computeStartTransit(originSystem, campaign)
@@ -889,8 +900,8 @@ public class EducationController {
         }
 
         if (!currentLocation.getCurrentSystem().equals(targetSystem)) {
-            JumpPath newPath = campaign.calculateJumpPath(currentLocation.getCurrentSystem(), targetSystem);
-            if (newPath != null && !newPath.isEmpty()) {
+            JumpPath newPath = LocationUtils.planJumpPath(currentLocation.getCurrentSystem(), targetSystem, campaign);
+            if (newPath != null) {
                 currentLocation.setJumpPath(newPath);
                 person.setEduJourneyTime(LocationUtils.computeJourneyDays(
                       newPath, campaign.getLocalDate(), currentLocation.getTransitTime()));

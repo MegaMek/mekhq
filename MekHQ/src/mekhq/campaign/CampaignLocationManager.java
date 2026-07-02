@@ -135,9 +135,14 @@ public class CampaignLocationManager {
      * {@link #dispatchPendingTravel(Campaign)}.
      *
      * @param travelers  the persons, units, or parts to relocate; must not be {@code null}
-     * @param destination the target {@link ILocation}; must not be {@code null}
+     * @param destination the target {@link ILocation}; a {@code null} destination is refused with an error log, since
+     *                    a queued null destination would fail dispatch on every subsequent new day
      */
-    public void queueTravel(Collection<? extends ILocation> travelers, ILocation destination) {
+    public void queueTravel(Collection<? extends ILocation> travelers, @Nullable ILocation destination) {
+        if (destination == null) {
+            LOGGER.error("queueTravel: null destination — refusing to queue {} traveler(s)", travelers.size());
+            return;
+        }
         for (ILocation traveler : travelers) {
             TravelRoute route = new TravelRoute(traveler.getCurrentLocation(), destination);
             pendingTravel.computeIfAbsent(route, key -> new ArrayList<>()).add(traveler);
@@ -159,12 +164,9 @@ public class CampaignLocationManager {
     }
 
     /**
-     * Dispatches all travel queued via {@link #queueTravel}.
-     *
-     * <p>Queued routes are first grouped by their root locations into unique
-     * {@link TravelRootRoute origin-root → destination-root} pairs; this collapses routes that differ only in their
-     * sub-location, since inter-system travel is computed root-to-root. Each original route is then dispatched to its
-     * own destination via {@link LocationDispatch}, so arrival behavior is unchanged.</p>
+     * Dispatches all travel queued via {@link #queueTravel}, one {@link LocationDispatch} call per queued route.
+     * Travelers that have left the campaign since they were queued (a removed person, a sold unit, a sold or consumed
+     * part) are skipped with a warning — dispatching them would re-add them to the destination's hangar or warehouse.
      *
      * <p>Must run at the start of a new day, before location transit is advanced, so that the departure system resolved
      * at dispatch time matches where the travelers were when the travel was queued.</p>
@@ -172,26 +174,50 @@ public class CampaignLocationManager {
      * @param campaign the active campaign; must not be {@code null}
      */
     public void dispatchPendingTravel(Campaign campaign) {
-        if (pendingTravel.isEmpty()) {
-            return;
-        }
-
-        Map<TravelRootRoute, List<TravelRoute>> byRoot = new LinkedHashMap<>();
-        for (TravelRoute route : pendingTravel.keySet()) {
-            TravelRootRoute rootRoute = new TravelRootRoute(rootOf(route.origin()), rootOf(route.destination()));
-            byRoot.computeIfAbsent(rootRoute, key -> new ArrayList<>()).add(route);
-        }
-
-        for (List<TravelRoute> routes : byRoot.values()) {
-            for (TravelRoute route : routes) {
-                LocationDispatch.dispatchTravelers(pendingTravel.get(route), route.destination(), campaign);
+        for (Map.Entry<TravelRoute, List<ILocation>> entry : pendingTravel.entrySet()) {
+            List<ILocation> travelers = filterTravelersStillInCampaign(entry.getValue(), campaign);
+            if (!travelers.isEmpty()) {
+                LocationDispatch.dispatchTravelers(travelers, entry.getKey().destination(), campaign);
             }
         }
         pendingTravel.clear();
     }
 
-    private static @Nullable AbstractLocation rootOf(@Nullable ILocation location) {
-        return location != null ? location.getCurrentLocation() : null;
+    private List<ILocation> filterTravelersStillInCampaign(List<ILocation> travelers, Campaign campaign) {
+        List<ILocation> stillPresent = new ArrayList<>();
+        for (ILocation traveler : travelers) {
+            if (isStillInCampaign(traveler, campaign)) {
+                stillPresent.add(traveler);
+            } else {
+                LOGGER.warn("dispatchPendingTravel: queued {} left the campaign before dispatch — skipping",
+                      traveler.getClass().getSimpleName());
+            }
+        }
+        return stillPresent;
+    }
+
+    private boolean isStillInCampaign(ILocation traveler, Campaign campaign) {
+        return switch (traveler) {
+            case Person person -> campaign.getPerson(person.getId()) != null;
+            case Unit unit -> campaign.getUnit(unit.getId()) != null;
+            case Part part -> findPartAnywhere(campaign, part.getId()) != null;
+            default -> true;
+        };
+    }
+
+    /** Searches the campaign warehouse then all base warehouses for a part by ID. */
+    public @Nullable Part findPartAnywhere(Campaign campaign, int partId) {
+        Part part = campaign.getWarehouse().getPart(partId);
+        if (part != null) {
+            return part;
+        }
+        for (PlayerBase base : playerBases) {
+            Part basePart = base.getBaseWarehouse().getPart(partId);
+            if (basePart != null) {
+                return basePart;
+            }
+        }
+        return null;
     }
 
     /**
@@ -229,22 +255,42 @@ public class CampaignLocationManager {
     }
 
     /**
-     * Creates a {@link FixedLocation} with an {@link AcademyCampusLocation} child at the given system and registers it
-     * in the locations list.
+     * Returns the existing {@link FixedLocation} at the given system, creating and registering one on demand.
+     *
+     * @return the existing or newly created location, or {@code null} if {@code systemId} could not be resolved
+     */
+    @Nullable
+    public FixedLocation getOrCreateFixedLocation(Campaign campaign, String systemId) {
+        for (AbstractLocation location : locations) {
+            if (location instanceof FixedLocation fixedLocation
+                      && fixedLocation.getCurrentSystem().getId().equals(systemId)) {
+                return fixedLocation;
+            }
+        }
+        PlanetarySystem system = campaign.getSystemById(systemId);
+        if (system == null) {
+            return null;
+        }
+        FixedLocation fixedLocation = new FixedLocation(system);
+        locations.add(fixedLocation);
+        return fixedLocation;
+    }
+
+    /**
+     * Creates an {@link AcademyCampusLocation} under the {@link FixedLocation} at the given system (created on demand)
+     * and registers it in the locations list.
      *
      * @return the newly created campus location, or {@code null} if {@code systemId} could not be resolved
      */
     @Nullable
     public AcademyCampusLocation addCampusLocation(Campaign campaign, String academySet, String academyName,
           String systemId) {
-        PlanetarySystem system = campaign.getSystemById(systemId);
-        if (system == null) {
+        FixedLocation fixedLocation = getOrCreateFixedLocation(campaign, systemId);
+        if (fixedLocation == null) {
             return null;
         }
-        FixedLocation fixedLocation = new FixedLocation(system);
         AcademyCampusLocation campus = new AcademyCampusLocation(academySet, academyName);
         LocationNode.LocationManager.setLocation(campus, fixedLocation);
-        locations.add(fixedLocation);
         return campus;
     }
 
@@ -345,8 +391,9 @@ public class CampaignLocationManager {
     /**
      * Serializes queued-but-undrained travel. Only the destination and the travelers are written; the origin is
      * recomputed from each traveler's location when the saved travel is re-queued on load (see
-     * {@code CampaignXmlParser}). Destinations are limited to the campaign itself, a {@link PlayerBase}, or an
-     * {@link AcademyCampusLocation}; any other destination type is logged and skipped.
+     * {@code CampaignXmlParser}). Each destination serializes itself via
+     * {@link ILocation#writePendingTravelDestinationToXML}; a destination type without serialization support is logged
+     * and skipped.
      */
     private void writePendingTravelToXML(PrintWriter pw, int indent) {
         if (pendingTravel.isEmpty()) {
@@ -360,9 +407,10 @@ public class CampaignLocationManager {
                 for (ILocation traveler : entry.getValue()) {
                     switch (traveler) {
                         case Person person ->
-                              MHQXMLUtility.writeSimpleXMLTag(pw, indent, "person", person.getId().toString());
-                        case Unit unit -> MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unit", unit.getId().toString());
-                        case Part part -> MHQXMLUtility.writeSimpleXMLTag(pw, indent, "part", part.getId());
+                              MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personId", person.getId().toString());
+                        case Unit unit ->
+                              MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitId", unit.getId().toString());
+                        case Part part -> MHQXMLUtility.writeSimpleXMLTag(pw, indent, "partId", part.getId());
                         default -> LOGGER.error(
                               "writePendingTravel: cannot serialize queued traveler of type {} bound for {} — skipping",
                               traveler.getClass().getSimpleName(), destination.getClass().getSimpleName());
@@ -379,7 +427,4 @@ public class CampaignLocationManager {
 
     /** Queue key: an item's origin location paired with its travel destination. */
     private record TravelRoute(@Nullable ILocation origin, ILocation destination) {}
-
-    /** Root-collapsed travel key: the origin and destination resolved to their root {@link AbstractLocation}. */
-    private record TravelRootRoute(@Nullable AbstractLocation originRoot, @Nullable AbstractLocation destinationRoot) {}
 }
