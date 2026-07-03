@@ -151,11 +151,10 @@ public class TransportCostCalculations {
     // Hiring a Princess for dependents proved to be insanely expensive. So we're instead assuming
     static final double PASSENGERS_COST = INFANTRY_COST;
 
-    private final Collection<Unit> hangarContents;
-    private final Collection<Person> allPersonnel;
-    private final Hangar hangar;
-    private final Collection<Part> spareParts;
-    private final int crewExperienceLevel;
+    private final Collection<Unit> travelingUnits;
+    private final Collection<Person> travelingPersonnel;
+    private final Collection<Part> travelingSpareParts;
+    private final int jumpShipCrewExperienceLevel;
 
     private double additionalCargoSpaceRequired;
     private double cargoBayCost;
@@ -433,21 +432,21 @@ public class TransportCostCalculations {
     /**
      * Constructs a new TransportCostCalculations class for evaluating jump and transport costs.
      *
-     * @param hangar              The {@link Hangar} whose units are being evaluated for transport.
-     * @param spareParts          The {@link Part} collection representing spare parts to be transported as cargo.
-     * @param allPersonnel        The {@link Person} list representing personnel to be transported.
-     * @param crewExperienceLevel The experience level to use for crew-related cost multipliers.
+     * @param travelingUnits              The {@link Hangar} whose units are being evaluated for transport.
+     * @param travelingSpareParts         The {@link Part} collection representing spare parts to be transported as
+     *                                    cargo.
+     * @param travelingPersonnel          The {@link Person} list representing personnel to be transported.
+     * @param jumpShipCrewExperienceLevel The experience level to use for crew-related cost multipliers.
      *
      * @author Illiani
      * @since 50.10
      */
-    public TransportCostCalculations(final Hangar hangar, final Collection<Part> spareParts,
-          final Collection<Person> allPersonnel, final int crewExperienceLevel) {
-        this.hangar = hangar;
-        this.hangarContents = hangar.getUnits();
-        this.spareParts = spareParts;
-        this.crewExperienceLevel = crewExperienceLevel;
-        this.allPersonnel = allPersonnel;
+    public TransportCostCalculations(final Collection<Unit> travelingUnits, final Collection<Part> travelingSpareParts,
+          final Collection<Person> travelingPersonnel, final int jumpShipCrewExperienceLevel) {
+        this.travelingUnits = travelingUnits;
+        this.travelingSpareParts = travelingSpareParts;
+        this.jumpShipCrewExperienceLevel = jumpShipCrewExperienceLevel;
+        this.travelingPersonnel = travelingPersonnel;
 
         setSPAValues();
     }
@@ -463,7 +462,7 @@ public class TransportCostCalculations {
      * @since 0.50.10
      */
     private void setSPAValues() {
-        Collection<Person> activePersonnel = allPersonnel.stream()
+        Collection<Person> activePersonnel = travelingPersonnel.stream()
                                                    .filter(p -> p.getStatus().isActive())
                                                    .toList();
         for (Person person : activePersonnel) {
@@ -544,7 +543,7 @@ public class TransportCostCalculations {
     /**
      * Adjusts the total transport cost by applying a multiplier determined by the crew's experience level.
      *
-     * <p>The method selects a specific multiplier based on {@link #crewExperienceLevel}:</p>
+     * <p>The method selects a specific multiplier based on {@link #jumpShipCrewExperienceLevel}:</p>
      *
      * <ul>
      *   <li>{@code EXP_LEGENDARY}: uses {@code LEGENDARY_CREW_MULTIPLIER}</li>
@@ -561,7 +560,7 @@ public class TransportCostCalculations {
      * @since 50.10
      */
     private void adjustForCrewExperienceLevel() {
-        double crewExperienceLevelMultiplier = switch (crewExperienceLevel) {
+        double crewExperienceLevelMultiplier = switch (jumpShipCrewExperienceLevel) {
             case EXP_LEGENDARY -> LEGENDARY_CREW_MULTIPLIER;
             case EXP_HEROIC -> HEROIC_CREW_MULTIPLIER;
             case EXP_ELITE -> ELITE_CREW_MULTIPLIER;
@@ -606,9 +605,8 @@ public class TransportCostCalculations {
     void calculateCargoRequirements() {
         double totalCargoCapacity = getTotalCargoCapacity();
 
-        Collection<Unit> units = hangar.getUnits();
-        double totalCargoUsage = CargoStatistics.getCargoTonnage(units, spareParts, false, false);
-        totalCargoUsage += CargoStatistics.getCargoTonnage(units, spareParts, false, true);
+        double totalCargoUsage = CargoStatistics.getCargoTonnage(travelingUnits, travelingSpareParts, false, false);
+        totalCargoUsage += CargoStatistics.getCargoTonnage(travelingUnits, travelingSpareParts, false, true);
 
         additionalCargoSpaceRequired = -min(0, totalCargoCapacity - totalCargoUsage);
         cargoBayCost = round(additionalCargoSpaceRequired * CARGO_PER_TON_COST);
@@ -621,7 +619,7 @@ public class TransportCostCalculations {
     }
 
     private double getTotalCargoCapacity() {
-        double totalCargoCapacity = CargoStatistics.getTotalCargoCapacity(hangar);
+        double totalCargoCapacity = CargoStatistics.getTotalCargoCapacity(travelingUnits);
         totalCargoCapacity *= tetrisMasterMultiplier;
         return totalCargoCapacity;
     }
@@ -742,7 +740,7 @@ public class TransportCostCalculations {
      * @since 50.10
      */
     void countUnitsByType() {
-        List<Unit> relevantUnits = hangarContents.stream().filter(unit -> !unit.isMothballed()).toList();
+        List<Unit> relevantUnits = travelingUnits.stream().filter(unit -> !unit.isMothballed()).toList();
         for (Unit unit : relevantUnits) {
             Entity entity = unit.getEntity();
             if (entity == null) {
@@ -864,7 +862,7 @@ public class TransportCostCalculations {
      */
     private int getPassengerCount() {
         int passengerCount = 0;
-        for (Person person : allPersonnel) {
+        for (Person person : travelingPersonnel) {
             Unit unit = person.getUnit();
             if (unit == null) {
                 passengerCount++;
@@ -920,7 +918,7 @@ public class TransportCostCalculations {
     int getTotalSmallCraftBays() {
         double total = 0.0;
 
-        for (Unit unit : hangarContents) {
+        for (Unit unit : travelingUnits) {
             total += unit.getSmallCraftCapacity();
         }
 
@@ -930,7 +928,7 @@ public class TransportCostCalculations {
     int getTotalASFBays() {
         double total = 0.0;
 
-        for (Unit unit : hangarContents) {
+        for (Unit unit : travelingUnits) {
             total += unit.getASFCapacity();
         }
 
@@ -940,7 +938,7 @@ public class TransportCostCalculations {
     int getTotalMekBays() {
         double total = 0.0;
 
-        for (Unit unit : hangarContents) {
+        for (Unit unit : travelingUnits) {
             total += unit.getMekCapacity();
         }
 
@@ -950,7 +948,7 @@ public class TransportCostCalculations {
     int getTotalSuperHeavyVehicleBays() {
         double total = 0.0;
 
-        for (Unit unit : hangarContents) {
+        for (Unit unit : travelingUnits) {
             total += unit.getSuperHeavyVehicleCapacity();
         }
 
@@ -960,7 +958,7 @@ public class TransportCostCalculations {
     int getTotalHeavyVehicleBays() {
         double total = 0.0;
 
-        for (Unit unit : hangarContents) {
+        for (Unit unit : travelingUnits) {
             total += unit.getHeavyVehicleCapacity();
         }
 
@@ -970,7 +968,7 @@ public class TransportCostCalculations {
     int getTotalLightVehicleBays() {
         double total = 0.0;
 
-        for (Unit unit : hangarContents) {
+        for (Unit unit : travelingUnits) {
             total += unit.getLightVehicleCapacity();
         }
 
@@ -980,7 +978,7 @@ public class TransportCostCalculations {
     int getTotalProtoMekBays() {
         double total = 0.0;
 
-        for (Unit unit : hangarContents) {
+        for (Unit unit : travelingUnits) {
             total += unit.getProtoMekCapacity();
         }
 
@@ -990,7 +988,7 @@ public class TransportCostCalculations {
     int getTotalBattleArmorBays() {
         double total = 0.0;
 
-        for (Unit unit : hangarContents) {
+        for (Unit unit : travelingUnits) {
             total += unit.getBattleArmorCapacity();
         }
 
@@ -1000,7 +998,7 @@ public class TransportCostCalculations {
     int getTotalInfantryBays() {
         double total = 0.0;
 
-        for (Unit unit : hangarContents) {
+        for (Unit unit : travelingUnits) {
             total += unit.getInfantryCapacity();
         }
 
@@ -1010,7 +1008,7 @@ public class TransportCostCalculations {
     public int getTotalDockingCollars() {
         int total = 0;
 
-        for (Unit unit : hangarContents) {
+        for (Unit unit : travelingUnits) {
             Entity entity = unit.getEntity();
             if (!(entity instanceof Jumpship)) {
                 continue;
@@ -1024,7 +1022,7 @@ public class TransportCostCalculations {
     public int getTotalLargeCraftPassengerCapacity() {
         int total = 0;
 
-        for (Unit unit : hangarContents) {
+        for (Unit unit : travelingUnits) {
             Entity entity = unit.getEntity();
 
             if (!entity.isLargeCraft() && !entity.isSmallCraft() && !entity.isSpaceStation()) {

@@ -64,7 +64,6 @@ import megamek.codeUtilities.MathUtility;
 import megamek.common.units.Entity;
 import megamek.common.units.Jumpship;
 import megamek.common.units.SpaceStation;
-import mekhq.campaign.Hangar;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
@@ -79,6 +78,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentMatchers;
 import org.mockito.MockedStatic;
 
 public class TransportCostCalculationsTest {
@@ -95,16 +95,8 @@ public class TransportCostCalculationsTest {
 
     // Helpers
 
-    private Hangar hangarWithUnits(Collection<Unit> units) {
-        // IMPORTANT: production code captures hangar.getUnits() once at construction time, so the hangar
-        // must be stubbed with its final unit list BEFORE the TransportCostCalculations is constructed.
-        Hangar hangar = mock(Hangar.class);
-        when(hangar.getUnits()).thenReturn(units);
-        return hangar;
-    }
-
     private TransportCostCalculations calculationsWithUnits(Collection<Unit> units) {
-        TransportCostCalculations calculations = new TransportCostCalculations(hangarWithUnits(units),
+        TransportCostCalculations calculations = new TransportCostCalculations(units,
               new ArrayList<>(), new ArrayList<>(), EXP_REGULAR);
         // totalCost is only initialized by calculateJumpCostForEachDay(); tests exercising individual
         // calculation steps directly need it pre-seeded to avoid NPEs on totalCost.plus(...).
@@ -253,7 +245,7 @@ public class TransportCostCalculationsTest {
         double totalCargoSize = cargoSize * 2;
 
         try (MockedStatic<CargoStatistics> mockedCargo = mockStatic(CargoStatistics.class)) {
-            mockedCargo.when(() -> CargoStatistics.getTotalCargoCapacity(any(Hangar.class))).thenReturn(0.0);
+            mockedCargo.when(() -> CargoStatistics.getTotalCargoCapacity(ArgumentMatchers.any())).thenReturn(0.0);
             mockedCargo.when(() -> CargoStatistics.getCargoTonnage(anyCollection(), anyCollection(), eq(false),
                   eq(false))).thenReturn(cargoSize);
             mockedCargo.when(() -> CargoStatistics.getCargoTonnage(anyCollection(), anyCollection(), eq(false),
@@ -280,7 +272,7 @@ public class TransportCostCalculationsTest {
     @ValueSource(ints = { 0, 3000, 5000, 10000 })
     public void testCalculateCargoRequirements_mothballedCargo_sufficientCapacity(double cargoSize) {
         try (MockedStatic<CargoStatistics> mockedCargo = mockStatic(CargoStatistics.class)) {
-            mockedCargo.when(() -> CargoStatistics.getTotalCargoCapacity(any(Hangar.class)))
+            mockedCargo.when(() -> CargoStatistics.getTotalCargoCapacity(ArgumentMatchers.any()))
                   .thenReturn(cargoSize * 3);
             mockedCargo.when(() -> CargoStatistics.getCargoTonnage(anyCollection(), anyCollection(), eq(false),
                   eq(false))).thenReturn(cargoSize);
@@ -308,7 +300,7 @@ public class TransportCostCalculationsTest {
     @ValueSource(ints = { 0, 3000, 5000, 10000 })
     public void testCalculateCargoRequirements_noMothballedCargo_insufficientCapacity(double cargoSize) {
         try (MockedStatic<CargoStatistics> mockedCargo = mockStatic(CargoStatistics.class)) {
-            mockedCargo.when(() -> CargoStatistics.getTotalCargoCapacity(any(Hangar.class))).thenReturn(0.0);
+            mockedCargo.when(() -> CargoStatistics.getTotalCargoCapacity(ArgumentMatchers.any())).thenReturn(0.0);
             mockedCargo.when(() -> CargoStatistics.getCargoTonnage(anyCollection(), anyCollection(), eq(false),
                   eq(false))).thenReturn(cargoSize);
             mockedCargo.when(() -> CargoStatistics.getCargoTonnage(anyCollection(), anyCollection(), eq(false),
@@ -335,7 +327,7 @@ public class TransportCostCalculationsTest {
     @ValueSource(ints = { 0, 3000, 5000, 10000 })
     public void testCalculateCargoRequirements_noMothballedCargo_sufficientCapacity(double cargoSize) {
         try (MockedStatic<CargoStatistics> mockedCargo = mockStatic(CargoStatistics.class)) {
-            mockedCargo.when(() -> CargoStatistics.getTotalCargoCapacity(any(Hangar.class)))
+            mockedCargo.when(() -> CargoStatistics.getTotalCargoCapacity(ArgumentMatchers.any()))
                   .thenReturn(cargoSize * 3);
             mockedCargo.when(() -> CargoStatistics.getCargoTonnage(anyCollection(), anyCollection(), eq(false),
                   eq(false))).thenReturn(cargoSize);
@@ -363,7 +355,7 @@ public class TransportCostCalculationsTest {
     @ValueSource(ints = { 0, 3000, 5000, 10000 })
     public void testCalculateCargoRequirements_onlyMothballedCargo_insufficientCapacity(double cargoSize) {
         try (MockedStatic<CargoStatistics> mockedCargo = mockStatic(CargoStatistics.class)) {
-            mockedCargo.when(() -> CargoStatistics.getTotalCargoCapacity(any(Hangar.class))).thenReturn(0.0);
+            mockedCargo.when(() -> CargoStatistics.getTotalCargoCapacity(ArgumentMatchers.any())).thenReturn(0.0);
             mockedCargo.when(() -> CargoStatistics.getCargoTonnage(anyCollection(), anyCollection(), eq(false),
                   eq(false))).thenReturn(0.0);
             mockedCargo.when(() -> CargoStatistics.getCargoTonnage(anyCollection(), anyCollection(), eq(false),
@@ -390,7 +382,7 @@ public class TransportCostCalculationsTest {
     @ValueSource(ints = { 0, 3000, 5000, 10000 })
     public void testCalculateCargoRequirements_onlyMothballedCargo_sufficientCapacity(double cargoSize) {
         try (MockedStatic<CargoStatistics> mockedCargo = mockStatic(CargoStatistics.class)) {
-            mockedCargo.when(() -> CargoStatistics.getTotalCargoCapacity(any(Hangar.class)))
+            mockedCargo.when(() -> CargoStatistics.getTotalCargoCapacity(ArgumentMatchers.any()))
                   .thenReturn(cargoSize * 3);
             mockedCargo.when(() -> CargoStatistics.getCargoTonnage(anyCollection(), anyCollection(), eq(false),
                   eq(false))).thenReturn(0.0);
@@ -1138,7 +1130,7 @@ public class TransportCostCalculationsTest {
             units.add(mockUnit);
         }
 
-        TransportCostCalculations local = new TransportCostCalculations(hangarWithUnits(units), new ArrayList<>(),
+        TransportCostCalculations local = new TransportCostCalculations(units, new ArrayList<>(),
               new ArrayList<>(), EXP_REGULAR);
         local.countUnitsByType();
 
@@ -1161,7 +1153,7 @@ public class TransportCostCalculationsTest {
             units.add(mockUnit);
         }
 
-        TransportCostCalculations local = new TransportCostCalculations(hangarWithUnits(units), new ArrayList<>(),
+        TransportCostCalculations local = new TransportCostCalculations(units, new ArrayList<>(),
               new ArrayList<>(), EXP_REGULAR);
         local.countUnitsByType();
 
@@ -1185,7 +1177,7 @@ public class TransportCostCalculationsTest {
             units.add(mockUnit);
         }
 
-        TransportCostCalculations local = new TransportCostCalculations(hangarWithUnits(units), new ArrayList<>(),
+        TransportCostCalculations local = new TransportCostCalculations(units, new ArrayList<>(),
               new ArrayList<>(), EXP_REGULAR);
         local.countUnitsByType();
 
@@ -1210,7 +1202,7 @@ public class TransportCostCalculationsTest {
             units.add(mockUnit);
         }
 
-        TransportCostCalculations local = new TransportCostCalculations(hangarWithUnits(units), new ArrayList<>(),
+        TransportCostCalculations local = new TransportCostCalculations(units, new ArrayList<>(),
               new ArrayList<>(), EXP_REGULAR);
         local.countUnitsByType();
 
@@ -1235,7 +1227,7 @@ public class TransportCostCalculationsTest {
             units.add(mockUnit);
         }
 
-        TransportCostCalculations local = new TransportCostCalculations(hangarWithUnits(units), new ArrayList<>(),
+        TransportCostCalculations local = new TransportCostCalculations(units, new ArrayList<>(),
               new ArrayList<>(), EXP_REGULAR);
         local.countUnitsByType();
 
@@ -1261,7 +1253,7 @@ public class TransportCostCalculationsTest {
             units.add(mockUnit);
         }
 
-        TransportCostCalculations local = new TransportCostCalculations(hangarWithUnits(units), new ArrayList<>(),
+        TransportCostCalculations local = new TransportCostCalculations(units, new ArrayList<>(),
               new ArrayList<>(), EXP_REGULAR);
         local.countUnitsByType();
 
@@ -1288,7 +1280,7 @@ public class TransportCostCalculationsTest {
             units.add(mockUnit);
         }
 
-        TransportCostCalculations local = new TransportCostCalculations(hangarWithUnits(units), new ArrayList<>(),
+        TransportCostCalculations local = new TransportCostCalculations(units, new ArrayList<>(),
               new ArrayList<>(), EXP_REGULAR);
         local.countUnitsByType();
 
@@ -1316,7 +1308,7 @@ public class TransportCostCalculationsTest {
             units.add(mockUnit);
         }
 
-        TransportCostCalculations local = new TransportCostCalculations(hangarWithUnits(units), new ArrayList<>(),
+        TransportCostCalculations local = new TransportCostCalculations(units, new ArrayList<>(),
               new ArrayList<>(), EXP_REGULAR);
         local.countUnitsByType();
 
@@ -1344,7 +1336,7 @@ public class TransportCostCalculationsTest {
             units.add(mockUnit);
         }
 
-        TransportCostCalculations local = new TransportCostCalculations(hangarWithUnits(units), new ArrayList<>(),
+        TransportCostCalculations local = new TransportCostCalculations(units, new ArrayList<>(),
               new ArrayList<>(), EXP_REGULAR);
         local.countUnitsByType();
 
@@ -1366,7 +1358,7 @@ public class TransportCostCalculationsTest {
             units.add(mockUnit);
         }
 
-        TransportCostCalculations local = new TransportCostCalculations(hangarWithUnits(units), new ArrayList<>(),
+        TransportCostCalculations local = new TransportCostCalculations(units, new ArrayList<>(),
               new ArrayList<>(), EXP_REGULAR);
         local.countUnitsByType();
 
@@ -1397,7 +1389,7 @@ public class TransportCostCalculationsTest {
             units.add(mockUnit);
         }
 
-        TransportCostCalculations local = new TransportCostCalculations(hangarWithUnits(units), new ArrayList<>(),
+        TransportCostCalculations local = new TransportCostCalculations(units, new ArrayList<>(),
               new ArrayList<>(), EXP_REGULAR);
         local.countUnitsByType();
 
@@ -1428,7 +1420,7 @@ public class TransportCostCalculationsTest {
             units.add(mockUnit);
         }
 
-        TransportCostCalculations local = new TransportCostCalculations(hangarWithUnits(units), new ArrayList<>(),
+        TransportCostCalculations local = new TransportCostCalculations(units, new ArrayList<>(),
               new ArrayList<>(), EXP_REGULAR);
         local.countUnitsByType();
 
@@ -1456,7 +1448,7 @@ public class TransportCostCalculationsTest {
             passengers.add(person);
         }
 
-        TransportCostCalculations local = new TransportCostCalculations(hangarWithUnits(List.of()),
+        TransportCostCalculations local = new TransportCostCalculations(List.of(),
               new ArrayList<>(), passengers, EXP_REGULAR);
         local.setTotalCost(Money.zero());
 
@@ -1534,7 +1526,7 @@ public class TransportCostCalculationsTest {
     @Test
     public void testGetTotalCost_whenTotalCostIsNull() {
         // Deliberately bypasses calculationsWithUnits(), which pre-seeds totalCost for the other tests
-        TransportCostCalculations local = new TransportCostCalculations(hangarWithUnits(List.of()),
+        TransportCostCalculations local = new TransportCostCalculations(List.of(),
               new ArrayList<>(), new ArrayList<>(), EXP_REGULAR);
 
         Money actualCost = local.getTotalCost();
@@ -1872,7 +1864,7 @@ public class TransportCostCalculationsTest {
     }
 
     private void setAllPersonnel(List<Person> people) throws Exception {
-        Field allPersonnel = transportCostCalculations.getClass().getDeclaredField("allPersonnel");
+        Field allPersonnel = transportCostCalculations.getClass().getDeclaredField("travelingPersonnel");
         allPersonnel.setAccessible(true);
         allPersonnel.set(transportCostCalculations, people);
     }

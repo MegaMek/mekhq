@@ -50,7 +50,6 @@ import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.events.parts.PartModeChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.location.LocationDispatch;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
@@ -533,8 +532,7 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
                                   .collect(Collectors.toList());
         JMenuHelpers.addMenuIfNonEmpty(popup, new SendToLocationMenu(
               gui.getCampaign(), gui.getFrame(), spares,
-              destination -> LocationDispatch.dispatchPartsToLocation(
-                    spares, destination, gui.getCampaign())));
+              destination -> gui.getCampaign().getCampaignLocationManager().queueTravel(spares, destination)));
 
         return Optional.of(popup);
     }
