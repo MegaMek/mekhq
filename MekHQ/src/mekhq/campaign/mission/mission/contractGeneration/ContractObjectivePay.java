@@ -67,8 +67,8 @@ public class ContractObjectivePay {
     private final Faction campaignFaction;
     private final LocalDate today;
     private final Hangar hangar;
-    private final final Collection<Part> spareParts;
-    private final final Collection<Person> allPersonnel;
+    private final Collection<Part> spareParts;
+    private final Collection<Person> allPersonnel;
     private final int temporaryAsTechPoolSize;
     private final int temporaryMedicPool;
     private final Map<PersonnelRole, Integer> tempCrewMap;
