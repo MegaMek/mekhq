@@ -34,8 +34,9 @@ package mekhq.campaign.mission.mission.contractGeneration;
 
 import static megamek.common.compute.Compute.d6;
 
+import java.time.LocalDate;
+
 import jakarta.annotation.Nullable;
-import megamek.common.util.weightedMaps.AbstractWeightedMap;
 import megamek.logging.MMLogger;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.personnel.enums.ConnectionsLevel;
@@ -46,15 +47,18 @@ import mekhq.campaign.universe.enums.HiringHallLevel;
 public class ContractEmployerDetermination {
     private static final MMLogger LOGGER = MMLogger.create(ContractEmployerDetermination.class);
 
+    private final LocalDate currentDate;
     private final Faction campaignFaction;
     private final CampaignTypeForContractDetermination campaignType;
     private final HiringHallLevel hiringHallLevel;
     private final int forceReputationModifier;
     private final ConnectionsLevel connectionsLevel;
-    private final AbstractLocation currentLocation; // TODO added for use once we support multi-locational contracts
+    private final AbstractLocation currentLocation;
 
-    public ContractEmployerDetermination(Faction campaignFaction, HiringHallLevel hiringHallLevel,
-          int forceReputationModifier, int adjustedConnectionsLevel, AbstractLocation currentLocation) {
+    public ContractEmployerDetermination(LocalDate currentDate, Faction campaignFaction,
+          HiringHallLevel hiringHallLevel, int forceReputationModifier, int adjustedConnectionsLevel,
+          AbstractLocation currentLocation) {
+        this.currentDate = currentDate;
         this.campaignFaction = campaignFaction;
         this.campaignType = getCampaignTypeFromFaction();
         this.hiringHallLevel = hiringHallLevel;
@@ -148,21 +152,19 @@ public class ContractEmployerDetermination {
         };
     }
 
-    private static @Nullable Faction getEmployer(@Nullable GlobalEmployerTableValue globalEmployerType) {
+    private @Nullable Faction getEmployer(@Nullable GlobalEmployerTableValue globalEmployerType) {
         while (globalEmployerType != null) {
-            // TODO once we have the tech to have multiple combat forces scattered about the galaxy we should update
-            //  this to no longer use campaign location - Illiani, 29/Jun/26
-            AbstractWeightedMap<Integer, Faction> employerMap = RandomFactionGenerator.getInstance().getEmployerMap(
-                  globalEmployerType);
+            Faction employerFaction = RandomFactionGenerator.getInstance()
+                                            .getRandomEmployerFaction(currentLocation, currentDate, globalEmployerType);
 
-            if (!employerMap.isEmpty()) {
-                return employerMap.randomItem();
+            if (employerFaction != null) {
+                return employerFaction;
             }
 
             globalEmployerType = globalEmployerType.getNextLowestEmployerType();
         }
 
-        LOGGER.warn("Failed to generate employer of type {}", globalEmployerType);
+        LOGGER.warn("Failed to generate employer. Returning null.");
 
         return null;
     }
