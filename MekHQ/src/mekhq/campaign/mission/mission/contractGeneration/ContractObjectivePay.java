@@ -33,6 +33,7 @@
 package mekhq.campaign.mission.mission.contractGeneration;
 
 import static java.lang.Math.ceil;
+import static java.lang.Math.round;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 
 import java.time.LocalDate;
@@ -54,6 +55,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 
@@ -61,10 +63,31 @@ public class ContractObjectivePay {
     /** CampOps pg 41 5th printing */
     private final static double PEACETIME_OPERATING_COSTS_PERCENTAGE = 0.75;
 
+    private final CampaignOptions campaignOptions;
+    private final Faction campaignFaction;
+    private final LocalDate today;
+    private final Hangar hangar;
+    private final final Collection<Part> spareParts;
+    private final final Collection<Person> allPersonnel;
+    private final int temporaryAsTechPoolSize;
+    private final int temporaryMedicPool;
+    private final Map<PersonnelRole, Integer> tempCrewMap;
+    private final List<Formation> formations;
+    private final BasePaymentMultiplier basePaymentMultiplier;
+    private final ILocation currentLocation;
+    private final JumpPath jumpPath;
+    private final boolean isOverridingCommandCircuitRequirements;
+    private final boolean isGM;
+    private final FactionStandings factionStandings;
+    private final String employerCode;
+
     // Base Pay
     private Money peacetimeOperatingCosts;
     private Money totalCostOfCombatUnits;
     private Money basePay;
+
+    // Transit
+    private int transitMonths;
 
     // Transport
     private Money transportPayment;
@@ -75,60 +98,40 @@ public class ContractObjectivePay {
           List<Formation> formations, BasePaymentMultiplier basePaymentMultiplier, ILocation currentLocation,
           JumpPath jumpPath, boolean isOverridingCommandCircuitRequirements, boolean isGM,
           FactionStandings factionStandings, String employerCode) {
-        calculateBasePay(campaignOptions,
-              campaignFaction,
-              today,
-              hangar,
-              temporaryAsTechPoolSize,
-              temporaryMedicPool,
-              tempCrewMap,
-              formations,
-              basePaymentMultiplier);
-
-        calculateObjectiveTransportPay(today,
-              hangar.getUnits(),
-              spareParts,
-              allPersonnel,
-              currentLocation,
-              jumpPath,
-              isOverridingCommandCircuitRequirements,
-              isGM,
-              factionStandings,
-              employerCode);
+        this.campaignOptions = campaignOptions;
+        this.campaignFaction = campaignFaction;
+        this.today = today;
+        this.hangar = hangar;
+        this.spareParts = spareParts;
+        this.allPersonnel = allPersonnel;
+        this.temporaryAsTechPoolSize = temporaryAsTechPoolSize;
+        this.temporaryMedicPool = temporaryMedicPool;
+        this.tempCrewMap = tempCrewMap;
+        this.formations = formations;
+        this.basePaymentMultiplier = basePaymentMultiplier;
+        this.currentLocation = currentLocation;
+        this.jumpPath = jumpPath;
+        this.isOverridingCommandCircuitRequirements = isOverridingCommandCircuitRequirements;
+        this.isGM = isGM;
+        this.factionStandings = factionStandings;
+        this.employerCode = employerCode;
     }
 
-    public void calculateBasePay(CampaignOptions campaignOptions, Faction campaignFaction, LocalDate today,
-          Hangar hangar, int temporaryAsTechPoolSize, int temporaryMedicPool, Map<PersonnelRole, Integer> tempCrewMap,
-          List<Formation> formations, BasePaymentMultiplier basePaymentMultiplier) {
-        peacetimeOperatingCosts = calculatePeacetimeOperatingCosts(formations,
-              hangar,
-              campaignOptions,
-              campaignFaction.isClan(),
-              today,
-              temporaryAsTechPoolSize,
-              temporaryMedicPool,
-              tempCrewMap);
-
-        totalCostOfCombatUnits = calculateTotalCostOfCombatUnits(campaignOptions,
-              campaignFaction,
-              hangar,
-              formations,
-              basePaymentMultiplier);
+    public void calculateBasePay() {
+        peacetimeOperatingCosts = calculatePeacetimeOperatingCosts(campaignFaction.isClan());
+        totalCostOfCombatUnits = calculateTotalCostOfCombatUnits();
 
         basePay = peacetimeOperatingCosts.plus(totalCostOfCombatUnits);
     }
 
-    private Money calculatePeacetimeOperatingCosts(Collection<Formation> formations, Hangar hangar,
-          CampaignOptions campaignOptions, boolean isClanCampaign, LocalDate today, int temporaryAsTechPoolSize,
-          int temporaryMedicPool, Map<PersonnelRole, Integer> tempCrewMap) {
+    private Money calculatePeacetimeOperatingCosts(boolean isClanCampaign) {
         Money peacetimeOperatingCosts = Accountant.getPeacetimeOperatingCosts(formations, hangar, campaignOptions,
               isClanCampaign, today, temporaryAsTechPoolSize, temporaryMedicPool, tempCrewMap, true);
 
         return peacetimeOperatingCosts.multipliedBy(PEACETIME_OPERATING_COSTS_PERCENTAGE);
     }
 
-    private Money calculateTotalCostOfCombatUnits(CampaignOptions campaignOptions, Faction campaignFaction,
-          Hangar hangar, List<Formation> formations, BasePaymentMultiplier basePaymentMultiplier) {
+    private Money calculateTotalCostOfCombatUnits() {
         final boolean excludeInfantry = campaignOptions.isInfantryDontCount();
         final double combatUnitContractPercent = campaignOptions.getEquipmentContractPercent();
         final double dropShipContractPercent = campaignOptions.getDropShipContractPercent();
@@ -165,10 +168,25 @@ public class ContractObjectivePay {
         return forceValue.multipliedBy(basePaymentMultiplierValue);
     }
 
-    public void calculateObjectiveTransportPay(LocalDate today, Collection<Unit> units,
-          final Collection<Part> spareParts, final Collection<Person> allPersonnel, ILocation currentLocation,
-          JumpPath jumpPath, boolean isOverridingCommandCircuitRequirements, boolean isGM,
-          FactionStandings factionStandings, String employerCode) {
+    public void calculateLengthOfMission() {
+        // The calculation in this method is taken from CamOps pg 41 rev 5th printing
+        PlanetarySystem startSystem = jumpPath.getFirstSystem();
+        PlanetarySystem endSystem = jumpPath.getLastSystem();
+
+        boolean isInSameSystem = startSystem.equals(endSystem);
+        if (isInSameSystem) {
+            transitMonths = 0;
+            return;
+        }
+
+        int baseWeeks = 2;
+        double additionalWeeks = 1.1 * jumpPath.getJumps();
+        int multiplier = 2;
+
+        transitMonths = (int) round((baseWeeks + additionalWeeks) * multiplier);
+    }
+
+    public void calculateObjectiveTransportPay(Collection<Unit> units) {
         boolean isUseCommandCircuit = FactionStandingUtilities.isUseCommandCircuit(
               isOverridingCommandCircuitRequirements,
               isGM,
