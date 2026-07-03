@@ -34,8 +34,63 @@ package mekhq.campaign.mission.mission;
 
 import java.util.UUID;
 
+import jakarta.annotation.Nullable;
+import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
+
 public abstract class AbstractContractObjective {
     String name;
     UUID objectiveId;
     AbstractContractManager parentContract;
+    AtBContractType objectiveType;
+    String enemyFactionCode;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public UUID getObjectiveId() {
+        return objectiveId;
+    }
+
+    public void setObjectiveId(UUID objectiveId) {
+        this.objectiveId = objectiveId;
+    }
+
+    public AbstractContractManager getParentContract() {
+        return parentContract;
+    }
+
+    public void setParentContract(AbstractContractManager parentContract) {
+        this.parentContract = parentContract;
+    }
+
+    public AtBContractType getObjectiveType() {
+        return objectiveType;
+    }
+
+    public void setObjectiveType(AtBContractType objectiveType) {
+        this.objectiveType = objectiveType;
+    }
+
+    public String getEnemyFactionCode() {
+        return enemyFactionCode;
+    }
+
+    public @Nullable Faction getEnemyFaction() {
+        return Factions.getInstance().getFaction(enemyFactionCode);
+    }
+
+    public void setEnemyFactionCode(String enemyFactionCode) {
+        this.enemyFactionCode = enemyFactionCode;
+    }
+
+    public void setEnemyFactionCode(Faction enemyFaction) {
+        enemyFactionCode = enemyFaction.getShortName();
+    }
 }

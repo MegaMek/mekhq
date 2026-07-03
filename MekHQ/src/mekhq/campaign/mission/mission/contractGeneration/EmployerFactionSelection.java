@@ -1,7 +1,12 @@
 package mekhq.campaign.mission.mission.contractGeneration;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import mekhq.campaign.universe.Faction;
 
-public record EmployerFactionSelection(Faction employerFaction, GlobalEmployerTableValue globalEmployerTableValue,
-      IndependentEmployerTableValue independentEmployerTableValue) {
+public record EmployerFactionSelection(
+      @Nonnull Faction employerFaction,
+      @Nonnull GlobalEmployerTableValue globalEmployerTableValue,
+      @Nullable IndependentEmployerTableValue independentEmployerTableValue
+) {
 }

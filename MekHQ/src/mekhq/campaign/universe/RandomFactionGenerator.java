@@ -68,14 +68,11 @@ import mekhq.campaign.universe.factionHints.FactionHints;
  *       <p>
  *       Uses Factions and Planets to weighted lists of potential employers and enemies for contract generation. Also
  *       finds a suitable planet for the action.
- *                                                                                                                   TODO : Account for the de facto alliance of the invading Clans and the
- *                                                                                                                   TODO : Fortress Republic in a way that doesn't involve hard-coding them here.
+ *                                                                                                                               TODO : Account for the de facto alliance of the invading Clans and the
+ *                                                                                                                               TODO : Fortress Republic in a way that doesn't involve hard-coding them here.
  */
 public class RandomFactionGenerator {
     private static final MMLogger LOGGER = MMLogger.create(RandomFactionGenerator.class);
-
-    private static final int CLAN_SEA_FOX_START_USING_MERCENARIES = 3133;
-    private static final int CLAN_WOLF_START_USING_MERCENARIES = 3051;
 
     private static RandomFactionGenerator randomFactionGenerator = null;
 
@@ -231,15 +228,16 @@ public class RandomFactionGenerator {
      * faction itself, Clans (aside from the CW/CSF mercenary-use exceptions), and ROS once Fortress Republic begins are
      * all excluded.
      *
-     * @param faction      the candidate faction to check
-     * @param currentDate  the date to check faction eligibility against
-     * @param currentYear  the year of {@code currentDate}
-     * @param employerType the type of employer to return, or {@code null} for no power-tier filtering
+     * @param faction             the candidate faction to check
+     * @param currentDate         the date to check faction eligibility against
+     * @param currentYear         the year of {@code currentDate}
+     * @param employerType        the type of employer to return, or {@code null} for no power-tier filtering
+     * @param isMercenaryCampaign if the player campaign is considered part of the 'mercenary' faction
      *
      * @return {@code true} if the faction should be excluded from employer selection
      */
     private static boolean checkForEarlyExit(@Nullable Faction faction, LocalDate currentDate, int currentYear,
-          @Nullable GlobalEmployerTableValue employerType) {
+          @Nullable GlobalEmployerTableValue employerType, boolean isMercenaryCampaign) {
         if (faction == null) {
             return true;
         }
@@ -258,18 +256,14 @@ public class RandomFactionGenerator {
             return true;
         }
 
-        String factionShortName = faction.getShortName();
-
-        // We don't add mercenary employers here, they're handled explicitly elsewhere
-        if (factionShortName.equals(MERCENARY_FACTION_CODE)) {
+        if (isMercenaryCampaign && !faction.isUsesMercenaries(currentYear)) {
             return true;
         }
 
-        if (faction.isClan()) {
-            if (!isClanSeaFoxUsesMercenaries(factionShortName, currentYear) &&
-                      !isClanWolfUsesMercenaries(factionShortName, currentYear)) {
-                return true;
-            }
+        // We don't add mercenary employers here, they're handled explicitly elsewhere
+        String factionShortName = faction.getShortName();
+        if (factionShortName.equals(MERCENARY_FACTION_CODE)) {
+            return true;
         }
 
         return isDuringFortressRepublic(factionShortName, currentDate);
@@ -302,31 +296,10 @@ public class RandomFactionGenerator {
     }
 
     /**
-     * @param factionShortName the faction's short name
-     * @param currentYear      the current year
-     *
-     * @return {@code true} if the faction is Clan Wolf and the year is 3051 or later, when it begins using mercenaries
-     */
-    private static boolean isClanWolfUsesMercenaries(String factionShortName, int currentYear) {
-        return currentYear >= CLAN_WOLF_START_USING_MERCENARIES && factionShortName.equals("CW");
-    }
-
-    /**
-     * @param factionShortName the faction's short name
-     * @param currentYear      the current year
-     *
-     * @return {@code true} if the faction is Clan Sea Fox and the year is 3133 or later, when it begins using
-     *       mercenaries
-     */
-    private static boolean isClanSeaFoxUsesMercenaries(String factionShortName, int currentYear) {
-        return currentYear >= CLAN_SEA_FOX_START_USING_MERCENARIES && factionShortName.equals("CSF");
-    }
-
-    /**
      * Selects a random employer faction from those controlling (or hosted by a controller of) systems within the search
      * area around the given location, with no employer-type filtering. Equivalent to calling
-     * {@link #getRandomEmployerFaction(ILocation, LocalDate, GlobalEmployerTableValue)} with a {@code null} employer
-     * type.
+     * {@link #getRandomEmployerFaction(ILocation, LocalDate, GlobalEmployerTableValue, boolean)} with a {@code null}
+     * employer type.
      *
      * @param location the location to check
      * @param date     the date to check faction control and eligibility against
@@ -335,7 +308,7 @@ public class RandomFactionGenerator {
      *       eligible faction currently controls anything in the area
      */
     public @Nullable Faction getEmployerFaction(ILocation location, LocalDate date) {
-        return getRandomEmployerFaction(location, date, null);
+        return getRandomEmployerFaction(location, date, null, true);
     }
 
     /**
@@ -352,15 +325,16 @@ public class RandomFactionGenerator {
      * inheriting their hosting faction's weight; if a faction is hosted by more than one eligible controlling faction,
      * its weights from each are summed.
      *
-     * @param location     the location whose surrounding area should be searched
-     * @param date         the date to check faction control and eligibility against
-     * @param employerType the type of employer to return, or {@code null} for no power-tier filtering
+     * @param location            the location whose surrounding area should be searched
+     * @param date                the date to check faction control and eligibility against
+     * @param employerType        the type of employer to return, or {@code null} for no power-tier filtering
+     * @param isMercenaryCampaign if the player campaign is considered part of the 'mercenary' faction
      *
      * @return a random eligible employer faction for the area, weighted by regional presence, or {@code null} if the
      *       location has no system, or no eligible faction currently controls anything in the area
      */
     public @Nullable Faction getRandomEmployerFaction(ILocation location, LocalDate date,
-          @Nullable GlobalEmployerTableValue employerType) {
+          @Nullable GlobalEmployerTableValue employerType, boolean isMercenaryCampaign) {
         PlanetarySystem system = location.getCurrentSystem();
         if (system == null) {
             return null;
@@ -382,14 +356,14 @@ public class RandomFactionGenerator {
             Faction faction = entry.getKey();
             int weight = entry.getValue();
 
-            if (checkForEarlyExit(faction, date, currentYear, employerType)) {
+            if (checkForEarlyExit(faction, date, currentYear, employerType, isMercenaryCampaign)) {
                 continue;
             }
 
             finalWeights.merge(faction, weight, Integer::sum);
 
             for (Faction containedFaction : factionHints.getContainedFactions(faction, date)) {
-                if (!checkForEarlyExit(containedFaction, date, currentYear, employerType)) {
+                if (!checkForEarlyExit(containedFaction, date, currentYear, employerType, isMercenaryCampaign)) {
                     finalWeights.merge(containedFaction, weight, Integer::sum);
                 }
             }

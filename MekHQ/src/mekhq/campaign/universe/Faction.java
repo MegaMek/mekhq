@@ -61,7 +61,9 @@ public class Faction {
     // region Variable Declarations
     public static final String DEFAULT_CODE = "???";
     public static final String MERCENARY_FACTION_CODE = "MERC";
+    public static final String REBEL_FACTION_CODE = "REB";
     public static final String PIRATE_FACTION_CODE = "PIR";
+    public static final String BANDIT_CASTE_FACTION_CODE = "BAN";
     public static final String COMSTAR_FACTION_CODE = "CS";
     public static final String WORD_OF_BLAKE_FACTION_CODE = "WOB";
     public static final String TORTUGA_DOMINIONS_FACTION_CODE = "TD";
@@ -743,5 +745,9 @@ public class Faction {
         }
 
         return false;
+    }
+
+    public boolean isUsesMercenaries(int year) {
+        return faction2 != null ? faction2.isUsesMercenaries(year) : true;
     }
 }

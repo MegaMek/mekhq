@@ -35,8 +35,7 @@ package mekhq.campaign.mission.mission.contractGeneration;
 import static java.lang.Math.floor;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
-import static mekhq.campaign.mission.mission.contractGeneration.GlobalEmployerTableValue.MAJOR_POWER;
-import static mekhq.campaign.mission.mission.contractGeneration.IndependentEmployerTableValue.MERCENARY;
+import static mekhq.campaign.mission.mission.contractGeneration.GlobalEmployerTableValue.INDEPENDENT;
 import static mekhq.campaign.universe.Faction.COMSTAR_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.WORD_OF_BLAKE_FACTION_CODE;
 
@@ -101,7 +100,10 @@ public class ContractEmployerDetermination {
             case PIRATE -> getEmployerUsingMercenaryMethod();
             // Government factions always have themselves as the employer. Government factions as any campaign
             // faction that is not pirate or mercenary.
-            case GOVERNMENT -> campaignFaction;
+            case GOVERNMENT -> {
+                GlobalEmployerTableValue globalType = GlobalEmployerTableValue.getFactionTableType(campaignFaction);
+                yield new EmployerFactionSelection(campaignFaction, globalType, null);
+            }
         };
     }
 
@@ -124,16 +126,18 @@ public class ContractEmployerDetermination {
 
         Faction specialEmployer = checkForSpecialEmployer(currentYear);
         if (specialEmployer != null) {
-            // the mercenary value here is going to be ignored
-            return new EmployerFactionSelection(specialEmployer, MAJOR_POWER, MERCENARY);
+            GlobalEmployerTableValue globalType = GlobalEmployerTableValue.getFactionTableType(specialEmployer);
+            return new EmployerFactionSelection(specialEmployer, globalType, null);
         }
 
         // CamOps pg 39 rev 5th printing states that a player can pick any employer at or below their roll. This
         // creates a UX issue for MekHQ. To avoid spamming the player, we instead use the exact employer matching the
         // roll
         GlobalEmployerTableValue globalEmployerType = getGlobalEmployer();
-        // This is ignored if globalEmployerType isn't INDEPENDENT
-        IndependentEmployerTableValue independentEmployerType = getIndependentEmployer();
+        IndependentEmployerTableValue independentEmployerType = globalEmployerType == INDEPENDENT ?
+                                                                      getIndependentEmployer() :
+                                                                      null;
+
         GlobalEmployerTableValue employerSearchFactionType = getFinalGlobalFactionTableValue(globalEmployerType,
               independentEmployerType);
 
@@ -209,9 +213,12 @@ public class ContractEmployerDetermination {
     }
 
     private @Nullable Faction getEmployer(@Nullable GlobalEmployerTableValue globalEmployerType) {
+        RandomFactionGenerator generator = RandomFactionGenerator.getInstance();
         while (globalEmployerType != null) {
-            Faction employerFaction = RandomFactionGenerator.getInstance()
-                                            .getRandomEmployerFaction(currentLocation, currentDate, globalEmployerType);
+            Faction employerFaction = generator.getRandomEmployerFaction(currentLocation,
+                  currentDate,
+                  globalEmployerType,
+                  campaignFaction.isMercenary());
 
             if (employerFaction != null) {
                 return employerFaction;
