@@ -122,7 +122,6 @@ import mekhq.campaign.events.persons.PersonLogEvent;
 import mekhq.campaign.events.persons.PersonStatusChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.location.LocationDispatch;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.PerformanceLogger;
 import mekhq.campaign.personnel.Award;
@@ -2531,7 +2530,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         List<mekhq.campaign.personnel.Person> selectedPeople = Arrays.asList(selected);
         JMenuHelpers.addMenuIfNonEmpty(popup, new SendToLocationMenu(getCampaign(), getFrame(),
               selectedPeople,
-              destination -> LocationDispatch.dispatchToLocation(selectedPeople, destination, getCampaign())));
+              destination -> getCampaign().getCampaignLocationManager().queueTravel(selectedPeople, destination)));
 
         if (oneSelected && person.getStatus().isActiveFlexible()) {
             if (getCampaignOptions().isUseManualMarriages() &&

@@ -33,22 +33,30 @@
 
 package mekhq.campaign.location;
 
+import java.io.PrintWriter;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import jakarta.annotation.Nonnull;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.FixedLocation;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.Personnel;
 import mekhq.campaign.Warehouse;
+import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Interface for classes that have a location.
@@ -466,4 +474,95 @@ public interface ILocation {
      * @param campaign the active campaign
      */
     default void processArrivals(Campaign campaign) {}
+
+    /** XML tag holding the discriminator written by {@link #writeReferenceToXML} and read by {@link #resolveReferenceFromXML}. */
+    String LOCATION_REFERENCE_TYPE_TAG = "locationReferenceType";
+
+    /**
+     * The discriminator identifying this location's kind within a serialized reference, or {@code null} if this type
+     * cannot be referenced. Concrete referable types return their own {@code LOCATION_REFERENCE_TYPE} constant.
+     */
+    default @Nullable String locationReferenceType() {
+        return null;
+    }
+
+    /**
+     * Writes the identity tags (ids/names) that {@link #resolveReferenceFromXML} needs to resolve a reference of this
+     * kind. The default writes nothing; referable types with identity beyond their discriminator override this.
+     */
+    default void writeReferenceIdentity(PrintWriter pw, int indent) {}
+
+    /**
+     * Writes a resolvable reference to this location — its {@code locationReferenceType} discriminator plus any identity
+     * tags — and returns {@code true} if it did.
+     *
+     * <p>The default writes nothing and returns {@code false}, marking this location as not referable. This is the
+     * generic counterpart to {@link #resolveReferenceFromXML}; reuse the pair wherever a reference to an
+     * {@code ILocation} must survive an XML save/load round-trip.</p>
+     */
+    default boolean writeReferenceToXML(PrintWriter pw, int indent) {
+        String type = locationReferenceType();
+        if (type == null) {
+            return false;
+        }
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, LOCATION_REFERENCE_TYPE_TAG, type);
+        writeReferenceIdentity(pw, indent);
+        return true;
+    }
+
+    /** Reconstructs a live location from a serialized reference's identity tags, or {@code null} if unresolvable. */
+    @FunctionalInterface
+    interface ReferenceResolver {
+        @Nullable ILocation resolve(Campaign campaign, Node node);
+    }
+
+    /**
+     * Maps each {@code locationReferenceType} discriminator to the resolver that rebuilds that kind of location. Each
+     * value points at that type's own static resolver, co-located with its {@link #writeReferenceToXML} override, so a
+     * new referable type is wired in by adding one entry here plus its resolver and {@code LOCATION_REFERENCE_TYPE}
+     * constant.
+     */
+    Map<String, ReferenceResolver> REFERENCE_RESOLVERS = Map.of(
+          Campaign.LOCATION_REFERENCE_TYPE, (campaign, node) -> campaign,
+          PlayerBase.LOCATION_REFERENCE_TYPE, PlayerBase::resolveReference,
+          FixedLocation.LOCATION_REFERENCE_TYPE, FixedLocation::resolveReference,
+          AcademyCampusLocation.CAMPUS_REFERENCE_TYPE, AcademyCampusLocation::resolveCampusReference,
+          AcademyCampusLocation.LOCAL_CAMPUS_REFERENCE_TYPE, AcademyCampusLocation::resolveLocalCampusReference);
+
+    /**
+     * Resolves a reference previously written by {@link #writeReferenceToXML} back to the live location, or
+     * {@code null} if the discriminator is missing/unknown or its identity cannot be resolved. Malformed data simply
+     * yields {@code null}; validating hand-edited saves is not a goal.
+     */
+    static @Nullable ILocation resolveReferenceFromXML(Campaign campaign, Node node) {
+        ReferenceResolver resolver = REFERENCE_RESOLVERS.get(referenceChildText(node, LOCATION_REFERENCE_TYPE_TAG));
+        return resolver == null ? null : resolver.resolve(campaign, node);
+    }
+
+    /**
+     * Returns the trimmed text of the first direct child element named {@code childName}, or {@code null}. Exposed so
+     * each type's {@link ReferenceResolver} can read its own identity tags.
+     */
+    static @Nullable String referenceChildText(Node parent, String childName) {
+        NodeList children = parent.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            Node child = children.item(i);
+            if (child.getNodeType() == Node.ELEMENT_NODE && child.getNodeName().equalsIgnoreCase(childName)) {
+                return child.getTextContent().trim();
+            }
+        }
+        return null;
+    }
+
+    /** Parses {@code text} as a {@link UUID}, or returns {@code null} if it is {@code null} or malformed. */
+    static @Nullable UUID parseReferenceUuid(@Nullable String text) {
+        if (text == null) {
+            return null;
+        }
+        try {
+            return UUID.fromString(text);
+        } catch (IllegalArgumentException ex) {
+            return null;
+        }
+    }
 }

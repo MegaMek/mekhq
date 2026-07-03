@@ -137,6 +137,27 @@ public class PlayerBase extends AbstractBase {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "playerBase");
     }
 
+    /** Discriminator identifying a player base as a serialized {@link ILocation} reference. */
+    public static final String LOCATION_REFERENCE_TYPE = "base";
+
+    private static final String TAG_BASE_ID = "referenceBaseId";
+
+    @Override
+    public String locationReferenceType() {
+        return LOCATION_REFERENCE_TYPE;
+    }
+
+    @Override
+    public void writeReferenceIdentity(PrintWriter pw, int indent) {
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, TAG_BASE_ID, getId().toString());
+    }
+
+    /** Resolves a {@code "base"} reference back to the matching player base, or {@code null} if none matches. */
+    public static @Nullable ILocation resolveReference(Campaign campaign, Node node) {
+        UUID id = ILocation.parseReferenceUuid(ILocation.referenceChildText(node, TAG_BASE_ID));
+        return id == null ? null : campaign.getCampaignLocationManager().getPlayerBaseById(id);
+    }
+
     public static @Nullable PlayerBase generateInstanceFromXML(Node wn, Campaign campaign,
           Version version) {
         try {
