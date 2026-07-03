@@ -86,8 +86,6 @@ public class ContractObjectivePay {
     private final double reputationFactor;
 
     // Base Pay
-    private Money peacetimeOperatingCosts;
-    private Money totalCostOfCombatUnits;
     private Money basePay;
 
     // Length
@@ -146,8 +144,8 @@ public class ContractObjectivePay {
     }
 
     public void calculateBasePay() {
-        peacetimeOperatingCosts = calculatePeacetimeOperatingCosts(campaignFaction.isClan());
-        totalCostOfCombatUnits = calculateTotalCostOfCombatUnits();
+        Money peacetimeOperatingCosts = calculatePeacetimeOperatingCosts(campaignFaction.isClan());
+        Money totalCostOfCombatUnits = calculateTotalCostOfCombatUnits();
 
         basePay = peacetimeOperatingCosts.plus(totalCostOfCombatUnits);
     }
