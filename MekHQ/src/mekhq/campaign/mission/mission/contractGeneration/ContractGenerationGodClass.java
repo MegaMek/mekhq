@@ -9,11 +9,15 @@ import java.util.List;
 import megamek.logging.MMLogger;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.JumpPath;
+import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.mission.NormalContractObjective;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 
 public class ContractGenerationGodClass {
@@ -50,18 +54,26 @@ public class ContractGenerationGodClass {
 
     public void generateContract(Person negotiator) {
         EmployerFactionSelection employerFactionSelection = contractEmployerDetermination.getContractEmployer();
-        List<AtBContractType> objectiveType = getObjectives(negotiator, employerFactionSelection);
+        List<AtBContractType> objectiveTypes = getObjectives(negotiator, employerFactionSelection);
 
         Faction employerFaction = employerFactionSelection.employerFaction();
+        AtBContractType firstObjective = objectiveTypes.getFirst();
+        Faction enemyFaction = getEnemyFaction(campaignType, firstObjective, employerFaction, currentDate);
 
-        for (AtBContractType objective : objectiveType) {
+        String targetSystemId = DetermineContractLocation.generateContractLocation(employerFaction, enemyFaction);
+        PlanetarySystem targetPlanetarySystem = Systems.getInstance().getSystemById(targetSystemId);
+
+        // TODO Cache in contract object. We'll need to check if current location changed at any point
+        JumpPath jumpPath = LocationUtils.planJumpPath(currentLocation.getCurrentSystem(), targetPlanetarySystem,
+              campaign);
+
+        for (AtBContractType objective : objectiveTypes) {
             NormalContractObjective contractObjective = new NormalContractObjective();
-            Faction enemyFaction = getEnemyFaction(campaignType, objective, employerFaction, currentDate);
         }
 
+        // Under CamOps pirates don't generate employers they generate targets, so employer is always pirates, CamOps
+        // pg 39 rev 5th edition
         if (campaignType == CampaignTypeForContractDetermination.PIRATE) {
-            // Under CamOps pirates don't generate employers they generate targets, so employer is always pirates,
-            // CamOps pg 39 rev 5th edition
             employerFaction = Factions.getInstance().getFaction(PIRATE_FACTION_CODE);
         }
     }
