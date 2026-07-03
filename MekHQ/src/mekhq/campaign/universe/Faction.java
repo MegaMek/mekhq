@@ -66,6 +66,7 @@ public class Faction {
     public static final String WORD_OF_BLAKE_FACTION_CODE = "WOB";
     public static final String TORTUGA_DOMINIONS_FACTION_CODE = "TD";
     public static final String INDEPENDENT_FACTION_CODE = "IND";
+    public static final String CLAN_FACTION_CODE = "CLAN";
 
     private Faction2 faction2;
 

@@ -34,6 +34,7 @@
 package mekhq.campaign.universe;
 
 import static mekhq.MHQConstants.FORTRESS_REPUBLIC;
+import static mekhq.campaign.universe.Faction.CLAN_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.COMSTAR_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
@@ -41,8 +42,11 @@ import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -56,6 +60,8 @@ import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.location.ILocation;
+import mekhq.campaign.mission.mission.contractGeneration.GlobalEmployerTableValue;
 import mekhq.campaign.mission.mission.contractGeneration.GlobalEmployerTableValue;
 import mekhq.campaign.universe.factionHints.FactionHints;
 
@@ -70,15 +76,28 @@ import mekhq.campaign.universe.factionHints.FactionHints;
 public class RandomFactionGenerator {
     private static final MMLogger LOGGER = MMLogger.create(RandomFactionGenerator.class);
 
-    private static RandomFactionGenerator rfg = null;
+    private static final int CLAN_SEA_FOX_START_USING_MERCENARIES = 3133;
+    private static final int CLAN_WOLF_START_USING_MERCENARIES = 3051;
+
+    private static RandomFactionGenerator randomFactionGenerator = null;
 
     private FactionBorderTracker borderTracker;
     private FactionHints factionHints;
 
+    /**
+     * Constructs a generator with a default {@link FactionBorderTracker} and the shared {@link FactionHints} instance.
+     */
     public RandomFactionGenerator() {
         this(null, null);
     }
 
+    /**
+     * Constructs a generator with the given border tracker and faction hints, falling back to a default border tracker
+     * and the shared {@link FactionHints} instance when either argument is {@code null}.
+     *
+     * @param borderTracker the border tracker to use, or {@code null} to create a default one
+     * @param factionHints  the faction hints to use, or {@code null} to use {@link FactionHints#getInstance()}
+     */
     public RandomFactionGenerator(FactionBorderTracker borderTracker,
           FactionHints factionHints) {
         this.borderTracker = borderTracker;
@@ -91,6 +110,10 @@ public class RandomFactionGenerator {
         }
     }
 
+    /**
+     * Builds the default {@link FactionBorderTracker} used when no tracker is supplied, configured with this
+     * generator's standard day/distance thresholds and border sizes.
+     */
     private void initDefaultBorderTracker() {
         borderTracker = new FactionBorderTracker();
         borderTracker.setDayThreshold(30);
@@ -100,22 +123,37 @@ public class RandomFactionGenerator {
               MHQConstants.FACTION_GENERATOR_BORDER_RANGE_CLAN);
     }
 
+    /**
+     * @return the shared {@link RandomFactionGenerator} instance, creating a default one on first access
+     */
     public static RandomFactionGenerator getInstance() {
-        if (rfg == null) {
-            rfg = new RandomFactionGenerator();
+        if (randomFactionGenerator == null) {
+            randomFactionGenerator = new RandomFactionGenerator();
         }
-        return rfg;
+        return randomFactionGenerator;
     }
 
+    /**
+     * Replaces the shared {@link RandomFactionGenerator} instance, e.g. for testing.
+     *
+     * @param instance the instance to use as the new shared instance
+     */
     public static void setInstance(RandomFactionGenerator instance) {
-        rfg = instance;
+        randomFactionGenerator = instance;
     }
 
-    public void startup(Campaign c) {
-        borderTracker.setDate(c.getLocalDate());
-        final PlanetarySystem location = c.getCurrentLocation().getCurrentSystem();
+    /**
+     * Initializes the border tracker for the given campaign: sets its date to the campaign's current date, centers its
+     * search region on the campaign's current system with a radius from the campaign options, registers it as an event
+     * handler, and widens the border size for deep periphery factions.
+     *
+     * @param campaign the campaign to initialize the border tracker for
+     */
+    public void startup(Campaign campaign) {
+        borderTracker.setDate(campaign.getLocalDate());
+        final PlanetarySystem location = campaign.getCurrentLocation().getCurrentSystem();
         borderTracker.setRegionCenter(location.getX(), location.getY());
-        borderTracker.setRegionRadius(c.getCampaignOptions().getContractSearchRadius());
+        borderTracker.setRegionRadius(campaign.getCampaignOptions().getContractSearchRadius());
         MekHQ.registerHandler(borderTracker);
         for (final Faction faction : Factions.getInstance().getFactions()) {
             if (faction.isDeepPeriphery()) {
@@ -124,18 +162,32 @@ public class RandomFactionGenerator {
         }
     }
 
+    /**
+     * Updates the border tracker's current date.
+     *
+     * @param date the new current date
+     */
     public void setDate(LocalDate date) {
         borderTracker.setDate(date);
     }
 
+    /**
+     * @return the {@link FactionHints} used by this generator
+     */
     public FactionHints getFactionHints() {
         return factionHints;
     }
 
+    /**
+     * Unregisters the border tracker as an event handler.
+     */
     public void dispose() {
         MekHQ.unregisterHandler(borderTracker);
     }
 
+    /**
+     * @return the border tracker's current date
+     */
     private LocalDate getCurrentDate() {
         return borderTracker.getLastUpdated();
     }
@@ -146,24 +198,24 @@ public class RandomFactionGenerator {
     public Set<String> getCurrentFactions() {
         Set<String> retVal = new TreeSet<>();
         LocalDate currentDate = getCurrentDate();
-        for (Faction f : borderTracker.getFactionsInRegion()) {
-
-            if (FactionHints.isEmptyFaction(f) ||
-                      f.getShortName().equals("CLAN")) {
+        for (Faction faction : borderTracker.getFactionsInRegion()) {
+            if (FactionHints.isEmptyFaction(faction) ||
+                      faction.getShortName().equals(CLAN_FACTION_CODE)) {
                 continue;
             }
-            if (f.getShortName().equals("ROS") && currentDate.isAfter(MHQConstants.FORTRESS_REPUBLIC)) {
+
+            if (faction.getShortName().equals("ROS") && currentDate.isAfter(MHQConstants.FORTRESS_REPUBLIC)) {
                 continue;
             }
             // Skip factions whose stated active years don't include the current date.
             // Stale planet ownership data can otherwise leak extinct factions (e.g. ARC after 3028) into the pool.
-            if (!f.validIn(currentDate)) {
+            if (!faction.validIn(currentDate)) {
                 continue;
             }
 
-            retVal.add(f.getShortName());
+            retVal.add(faction.getShortName());
             /* Add factions which do not control any planets to the employer list */
-            for (Faction containedFaction : factionHints.getContainedFactions(f, currentDate)) {
+            for (Faction containedFaction : factionHints.getContainedFactions(faction, currentDate)) {
                 if (containedFaction != null && containedFaction.validIn(currentDate)) {
                     retVal.add(containedFaction.getShortName());
                 }
@@ -176,52 +228,18 @@ public class RandomFactionGenerator {
     }
 
     /**
-     * Builds map of potential employers weighted by number of systems controlled within the search area
+     * Determines whether the given faction should be excluded from employer selection: {@code null} or empty factions,
+     * factions not valid on the given date, factions filtered out by the employer-type power tier, the mercenary
+     * faction itself, Clans (aside from the CW/CSF mercenary-use exceptions), and ROS once Fortress Republic begins are
+     * all excluded.
      *
-     * @return Map used to select employer
+     * @param faction      the candidate faction to check
+     * @param currentDate  the date to check faction eligibility against
+     * @param currentYear  the year of {@code currentDate}
+     * @param employerType the type of employer to return, or {@code null} for no power-tier filtering
+     *
+     * @return {@code true} if the faction should be excluded from employer selection
      */
-    protected WeightedIntMap<Faction> buildEmployerMap(@Nullable GlobalEmployerTableValue employerType) {
-        LocalDate currentDate = getCurrentDate();
-        int currentYear = currentDate.getYear();
-
-        WeightedIntMap<Faction> employerMap = new WeightedIntMap<>();
-        for (Faction faction : borderTracker.getFactionsInRegion()) {
-            if (checkForEarlyExit(faction, currentDate, currentYear, employerType)) {
-                continue;
-            }
-
-            addPotentialEmployer(faction, employerMap);
-            addAnyContainedFactions(faction, currentDate, employerMap, employerType);
-        }
-
-        return employerMap;
-    }
-
-    private void addPotentialEmployer(Faction faction, WeightedIntMap<Faction> employerMap) {
-        int weight = borderTracker.getBorders(faction).getSystems().size();
-        employerMap.add(weight, faction);
-    }
-
-    private void addAnyContainedFactions(Faction faction, LocalDate currentDate, WeightedIntMap<Faction> employerMap,
-          GlobalEmployerTableValue employerType) {
-        int currentYear = currentDate.getYear();
-
-        for (Faction containedFaction : factionHints.getContainedFactions(faction, currentDate)) {
-            if (checkForEarlyExit(faction, currentDate, currentYear, employerType)) {
-                continue;
-            }
-
-            int calculatedWeight = getWeightForContainedFaction(faction, currentDate, containedFaction);
-            employerMap.add(calculatedWeight, containedFaction);
-        }
-    }
-
-    private int getWeightForContainedFaction(Faction faction, LocalDate currentDate, Faction containedFaction) {
-        int numberOfBorderSystems = borderTracker.getBorders(containedFaction).getSystems().size();
-        double altLocationFraction = factionHints.getAltLocationFraction(faction, containedFaction, currentDate);
-        return (int) Math.floor(numberOfBorderSystems * altLocationFraction + 0.5);
-    }
-
     private static boolean checkForEarlyExit(@Nullable Faction faction, LocalDate currentDate, int currentYear,
           @Nullable GlobalEmployerTableValue employerType) {
         if (faction == null) {
@@ -259,12 +277,21 @@ public class RandomFactionGenerator {
         return isDuringFortressRepublic(factionShortName, currentDate);
     }
 
+    /**
+     * Checks whether the given faction should be filtered out based on the requested employer power tier.
+     *
+     * @param faction      the candidate faction to check
+     * @param employerType the type of employer to return, or {@code null} for no power-tier filtering
+     *
+     * @return {@code true} if the faction does not match the requested employer type and should be filtered out
+     */
     private static boolean applyFactionFilter(Faction faction, @Nullable GlobalEmployerTableValue employerType) {
         if (employerType == null) {
             return false;
         }
 
         boolean include = switch (employerType) {
+            // We're using INDEPENDENT as a catch-all so nobody is missed
             case INDEPENDENT -> !faction.isMinorPower() && !faction.isMajorOrSuperPower();
             case MINOR_POWER -> faction.isMinorPower();
             case MAJOR_POWER -> faction.isMajorPower();
@@ -274,32 +301,125 @@ public class RandomFactionGenerator {
         return !include;
     }
 
+    /**
+     * @param factionShortName the faction's short name
+     * @param currentDate      the date to check
+     *
+     * @return {@code true} if the faction is ROS and the date is after Fortress Republic begins
+     */
     private static boolean isDuringFortressRepublic(String factionShortName, LocalDate currentDate) {
         return factionShortName.equals("ROS") && currentDate.isAfter(FORTRESS_REPUBLIC);
     }
 
+    /**
+     * @param factionShortName the faction's short name
+     * @param currentYear      the current year
+     *
+     * @return {@code true} if the faction is Clan Wolf and the year is 3051 or later, when it begins using mercenaries
+     */
     private static boolean isClanWolfUsesMercenaries(String factionShortName, int currentYear) {
-        return currentYear >= 3051 && factionShortName.equals("CW");
-    }
-
-    private static boolean isClanSeaFoxUsesMercenaries(String factionShortName, int currentYear) {
-        return currentYear >= 3133 && factionShortName.equals("CSF");
-    }
-
-    public AbstractWeightedMap<Integer, Faction> getEmployerMap(GlobalEmployerTableValue employerType) {
-        return buildEmployerMap(employerType);
+        return currentYear >= CLAN_WOLF_START_USING_MERCENARIES && factionShortName.equals("CW");
     }
 
     /**
-     * Selects a Faction from those with a presence in the region weighted by the number of systems controlled. Factions
-     * are filtered based on the employer type.
+     * @param factionShortName the faction's short name
+     * @param currentYear      the current year
      *
-     * @param employerType the type of employer to return
-     *
-     * @return A Faction to use as the employer for a contract.
+     * @return {@code true} if the faction is Clan Sea Fox and the year is 3133 or later, when it begins using
+     *       mercenaries
      */
-    public @Nullable Faction getEmployerFaction(@Nullable GlobalEmployerTableValue employerType) {
-        return buildEmployerMap(employerType).randomItem();
+    private static boolean isClanSeaFoxUsesMercenaries(String factionShortName, int currentYear) {
+        return currentYear >= CLAN_SEA_FOX_START_USING_MERCENARIES && factionShortName.equals("CSF");
+    }
+
+    /**
+     * Selects a random employer faction from those controlling (or hosted by a controller of) systems within the search
+     * area around the given location, with no employer-type filtering. Equivalent to calling
+     * {@link #getRandomEmployerFaction(ILocation, LocalDate, GlobalEmployerTableValue)} with a {@code null} employer
+     * type.
+     *
+     * @param location the location to check
+     * @param date     the date to check faction control and eligibility against
+     *
+     * @return a random eligible employer faction for the area, or {@code null} if the location has no system, or no
+     *       eligible faction currently controls anything in the area
+     */
+    public @Nullable Faction getEmployerFaction(ILocation location, LocalDate date) {
+        return getRandomEmployerFaction(location, date, null);
+    }
+
+    /**
+     * Selects a random employer faction from those controlling (or hosted by a controller of) systems within the search
+     * area around the given location, the same way {@link #getCurrentFactions()} surveys the area around the border
+     * tracker's configured region: every system within {@link FactionBorderTracker#getRadius()} of the location's
+     * system (a negative radius means the entire map) is checked, and the controlling factions of all of them are
+     * pooled together as candidates, each weighted by the number of nearby systems it controls (a faction controlling
+     * five systems is five times as likely to be selected as one controlling a single system). Candidates are filtered
+     * using the same eligibility rules as {@link #getEmployerFaction(ILocation, LocalDate)}: the mercenary faction
+     * itself is excluded, Clans are excluded (aside from the CW/CSF mercenary-use exceptions), ROS is excluded once
+     * Fortress Republic begins, and factions not valid on the given date are excluded. Factions hosted by an eligible
+     * controlling faction (per {@link FactionHints#getContainedFactions}) are added as additional candidates,
+     * inheriting their hosting faction's weight; if a faction is hosted by more than one eligible controlling faction,
+     * its weights from each are summed.
+     *
+     * @param location     the location whose surrounding area should be searched
+     * @param date         the date to check faction control and eligibility against
+     * @param employerType the type of employer to return, or {@code null} for no power-tier filtering
+     *
+     * @return a random eligible employer faction for the area, weighted by regional presence, or {@code null} if the
+     *       location has no system, or no eligible faction currently controls anything in the area
+     */
+    public @Nullable Faction getRandomEmployerFaction(ILocation location, LocalDate date,
+          @Nullable GlobalEmployerTableValue employerType) {
+        PlanetarySystem system = location.getCurrentSystem();
+        if (system == null) {
+            return null;
+        }
+
+        double radius = borderTracker.getRadius();
+        Map<Faction, Integer> counts = new HashMap<>();
+        for (PlanetarySystem nearbySystem : borderTracker.getSystemList()) {
+            if ((radius < 0) || (nearbySystem.getDistanceTo(system) <= radius)) {
+                for (Faction faction : nearbySystem.getFactionSet(date)) {
+                    counts.merge(faction, 1, Integer::sum);
+                }
+            }
+        }
+
+        int currentYear = date.getYear();
+        Map<Faction, Integer> finalWeights = new LinkedHashMap<>();
+        for (Map.Entry<Faction, Integer> entry : counts.entrySet()) {
+            Faction faction = entry.getKey();
+            int weight = entry.getValue();
+
+            if (checkForEarlyExit(faction, date, currentYear, employerType)) {
+                continue;
+            }
+
+            finalWeights.merge(faction, weight, Integer::sum);
+
+            for (Faction containedFaction : factionHints.getContainedFactions(faction, date)) {
+                if (!checkForEarlyExit(containedFaction, date, currentYear, employerType)) {
+                    finalWeights.merge(containedFaction, weight, Integer::sum);
+                }
+            }
+        }
+
+        if (finalWeights.isEmpty()) {
+            return null;
+        }
+
+        int totalWeight = finalWeights.values().stream().mapToInt(Integer::intValue).sum();
+        int roll = Compute.randomInt(totalWeight);
+        int cumulative = 0;
+        for (Map.Entry<Faction, Integer> entry : finalWeights.entrySet()) {
+            cumulative += entry.getValue();
+            if (roll < cumulative) {
+                return entry.getKey();
+            }
+        }
+
+        return null; // unreachable in practice, safety fallback
     }
 
     /**
@@ -324,6 +444,11 @@ public class RandomFactionGenerator {
 
     /**
      * Pick an enemy faction, possibly rebels or mercenaries, given an employer.
+     *
+     * @param employer  The faction offering the contract
+     * @param useRebels Whether to include rebels as a possible opponent
+     *
+     * @return The shortName of the faction to use as the op for.
      */
     public String getEnemy(Faction employer, boolean useRebels) {
         return getEnemy(employer, useRebels, false);
@@ -477,12 +602,12 @@ public class RandomFactionGenerator {
         WeightedIntMap<Faction> enemyMap = new WeightedIntMap<>();
         LocalDate currentDate = getCurrentDate();
 
-        // If the employer is a pirate, or comstar return all border factions as "enemies"
+        // If the employer is a pirate, or ComStar return all border factions as "enemies"
         String employerShortName = employer.getShortName();
         if (employerShortName.equals(PIRATE_FACTION_CODE) || employerShortName.equals(COMSTAR_FACTION_CODE)) {
             for (Faction enemy : borderTracker.getFactionsInRegion()) {
                 if (FactionHints.isEmptyFaction(enemy) ||
-                          enemy.getShortName().equals("CLAN")) {
+                          enemy.getShortName().equals(CLAN_FACTION_CODE)) {
                     continue;
                 }
                 if (!enemy.validIn(currentDate)) {
@@ -495,7 +620,7 @@ public class RandomFactionGenerator {
 
         for (Faction enemy : borderTracker.getFactionsInRegion()) {
             if (FactionHints.isEmptyFaction(enemy) ||
-                      enemy.getShortName().equals("CLAN")) {
+                      enemy.getShortName().equals(CLAN_FACTION_CODE)) {
                 continue;
             }
 
@@ -511,30 +636,30 @@ public class RandomFactionGenerator {
             int totalCount = borderTracker.getBorderSystems(employer, enemy).size();
             double count = totalCount;
             // Split the border between main controlling faction and any contained factions.
-            for (Faction cFaction : factionHints.getContainedFactions(employer, currentDate)) {
-                if ((null == cFaction) ||
-                          !factionHints.isContainedFactionOpponent(enemy, cFaction, employer, currentDate)) {
+            for (Faction containedFaction : factionHints.getContainedFactions(employer, currentDate)) {
+                if ((null == containedFaction) ||
+                          !factionHints.isContainedFactionOpponent(enemy, containedFaction, employer, currentDate)) {
                     continue;
                 }
 
-                if (isDuringFortressRepublic(cFaction.getShortName(), currentDate)) {
+                if (isDuringFortressRepublic(containedFaction.getShortName(), currentDate)) {
                     continue;
                 }
-                if (!cFaction.validIn(currentDate)) {
+                if (!containedFaction.validIn(currentDate)) {
                     continue;
                 }
 
-                if (factionHints.isNeutral(cFaction, enemy, currentDate) ||
-                          factionHints.isNeutral(enemy, cFaction, currentDate)) {
+                if (factionHints.isNeutral(containedFaction, enemy, currentDate) ||
+                          factionHints.isNeutral(enemy, containedFaction, currentDate)) {
                     continue;
                 }
                 double cfCount = totalCount;
-                if (factionHints.getAltLocationFraction(employer, cFaction, currentDate) > 0.0) {
-                    cfCount = totalCount * factionHints.getAltLocationFraction(employer, cFaction, currentDate);
+                if (factionHints.getAltLocationFraction(employer, containedFaction, currentDate) > 0.0) {
+                    cfCount = totalCount * factionHints.getAltLocationFraction(employer, containedFaction, currentDate);
                     count -= cfCount;
                 }
                 cfCount = adjustBorderWeight(cfCount, employer, enemy, currentDate);
-                enemyMap.add((int) Math.floor(cfCount + 0.5), cFaction);
+                enemyMap.add((int) Math.floor(cfCount + 0.5), containedFaction);
             }
             count = adjustBorderWeight(count, employer, enemy, currentDate);
             enemyMap.add((int) Math.floor(count + 0.5), enemy);
@@ -549,22 +674,22 @@ public class RandomFactionGenerator {
     public Set<String> getEmployerSet() {
         Set<String> set = new HashSet<>();
         LocalDate currentDate = getCurrentDate();
-        for (Faction f : borderTracker.getFactionsInRegion()) {
+        for (Faction faction : borderTracker.getFactionsInRegion()) {
             // Skip factions whose stated active years don't include the current date.
             // Stale planet ownership data can otherwise leak extinct factions (e.g. ARC after 3028) into the pool.
-            if (!f.validIn(currentDate)) {
+            if (!faction.validIn(currentDate)) {
                 continue;
             }
-            if (isDuringFortressRepublic(f.getShortName(), currentDate)) {
+            if (isDuringFortressRepublic(faction.getShortName(), currentDate)) {
                 continue;
             }
-            if (!f.isClan() && !FactionHints.isEmptyFaction(f)) {
-                set.add(f.getShortName());
+            if (!faction.isClan() && !FactionHints.isEmptyFaction(faction)) {
+                set.add(faction.getShortName());
             }
             /* Add factions which do not control any planets to the employer list */
-            for (Faction cfaction : factionHints.getContainedFactions(f, currentDate)) {
-                if (!cfaction.isClan() && cfaction.validIn(currentDate)) {
-                    set.add(cfaction.getShortName());
+            for (Faction containedFaction : factionHints.getContainedFactions(faction, currentDate)) {
+                if (!containedFaction.isClan() && containedFaction.validIn(currentDate)) {
+                    set.add(containedFaction.getShortName());
                 }
             }
         }
@@ -626,10 +751,10 @@ public class RandomFactionGenerator {
 
             if (!borderTracker.getBorderSystems(useBorder, enemy).isEmpty()) {
                 list.add(enemy);
-                for (Faction cf : factionHints.getContainedFactions(enemy, currentDate)) {
-                    if ((null != cf) && cf.validIn(currentDate) &&
-                              factionHints.isContainedFactionOpponent(enemy, cf, employer, currentDate)) {
-                        list.add(cf);
+                for (Faction containedFaction : factionHints.getContainedFactions(enemy, currentDate)) {
+                    if ((null != containedFaction) && containedFaction.validIn(currentDate) &&
+                              factionHints.isContainedFactionOpponent(enemy, containedFaction, employer, currentDate)) {
+                        list.add(containedFaction);
                     }
                 }
             }
@@ -707,17 +832,17 @@ public class RandomFactionGenerator {
      */
     @Nullable
     public String getMissionTarget(String attacker, String defender) {
-        Faction f1 = Factions.getInstance().getFaction(attacker);
-        Faction f2 = Factions.getInstance().getFaction(defender);
-        if (null == f1) {
+        Faction faction0 = Factions.getInstance().getFaction(attacker);
+        Faction faction1 = Factions.getInstance().getFaction(defender);
+        if (null == faction0) {
             LOGGER.error("Non-existent faction key: {}", attacker);
             return null;
         }
-        if (null == f2) {
+        if (null == faction1) {
             LOGGER.error("Non-existent faction key: {}", attacker);
             return null;
         }
-        List<PlanetarySystem> planetList = getMissionTargetList(f1, f2);
+        List<PlanetarySystem> planetList = getMissionTargetList(faction0, faction1);
         if (!planetList.isEmpty()) {
             return ObjectUtility.getRandomItem(planetList).getId();
         }
