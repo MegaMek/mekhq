@@ -58,6 +58,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
+import org.jspecify.annotations.NonNull;
 
 public class ContractObjectivePay {
     /** CampOps pg 41 5th printing */
@@ -80,14 +81,19 @@ public class ContractObjectivePay {
     private final boolean isGM;
     private final FactionStandings factionStandings;
     private final String employerCode;
+    private final double tempoMultiplier;
+    private final double employmentMultiplier;
+    private final double reputationFactor;
 
     // Base Pay
     private Money peacetimeOperatingCosts;
     private Money totalCostOfCombatUnits;
     private Money basePay;
 
-    // Transit
-    private int transitMonths;
+    // Length
+    private final int lengthOfObjective;
+    private int transportPeriod;
+    private int totalLength;
 
     // Transport
     private Money transportPayment;
@@ -97,7 +103,8 @@ public class ContractObjectivePay {
           int temporaryAsTechPoolSize, int temporaryMedicPool, Map<PersonnelRole, Integer> tempCrewMap,
           List<Formation> formations, BasePaymentMultiplier basePaymentMultiplier, ILocation currentLocation,
           JumpPath jumpPath, boolean isOverridingCommandCircuitRequirements, boolean isGM,
-          FactionStandings factionStandings, String employerCode) {
+          FactionStandings factionStandings, String employerCode, int lengthOfObjective, double tempoMultiplier,
+          double employmentMultiplier, double reputationFactor) {
         this.campaignOptions = campaignOptions;
         this.campaignFaction = campaignFaction;
         this.today = today;
@@ -115,6 +122,27 @@ public class ContractObjectivePay {
         this.isGM = isGM;
         this.factionStandings = factionStandings;
         this.employerCode = employerCode;
+        this.lengthOfObjective = lengthOfObjective;
+        this.tempoMultiplier = tempoMultiplier;
+        this.employmentMultiplier = employmentMultiplier;
+        this.reputationFactor = reputationFactor;
+    }
+
+    private @NonNull Money getObjectivePay() {
+        return Money.zero()
+                     .plus(basePay)
+                     .multipliedBy(totalLength)
+                     .multipliedBy(tempoMultiplier)
+                     .multipliedBy(employmentMultiplier)
+                     .multipliedBy(reputationFactor);
+    }
+
+    private @NonNull Money travelPay() {
+        return Money.zero().plus(basePay)
+                     .multipliedBy(transportPeriod)
+                     .multipliedBy(employmentMultiplier)
+                     .multipliedBy(reputationFactor)
+                     .plus(transportPayment);
     }
 
     public void calculateBasePay() {
@@ -175,7 +203,7 @@ public class ContractObjectivePay {
 
         boolean isInSameSystem = startSystem.equals(endSystem);
         if (isInSameSystem) {
-            transitMonths = 0;
+            transportPeriod = 0;
             return;
         }
 
@@ -183,7 +211,9 @@ public class ContractObjectivePay {
         double additionalWeeks = 1.1 * jumpPath.getJumps();
         int multiplier = 2;
 
-        transitMonths = (int) round((baseWeeks + additionalWeeks) * multiplier);
+        transportPeriod = (int) round((baseWeeks + additionalWeeks) * multiplier);
+
+        totalLength = transportPeriod + lengthOfObjective;
     }
 
     public void calculateObjectiveTransportPay(Collection<Unit> units) {
