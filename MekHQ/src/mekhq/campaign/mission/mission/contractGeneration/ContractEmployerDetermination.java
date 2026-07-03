@@ -32,8 +32,11 @@
  */
 package mekhq.campaign.mission.mission.contractGeneration;
 
+import static java.lang.Math.floor;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
+import static mekhq.campaign.mission.mission.contractGeneration.GlobalEmployerTableValue.MAJOR_POWER;
+import static mekhq.campaign.mission.mission.contractGeneration.IndependentEmployerTableValue.MERCENARY;
 import static mekhq.campaign.universe.Faction.COMSTAR_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.WORD_OF_BLAKE_FACTION_CODE;
 
@@ -58,18 +61,18 @@ public class ContractEmployerDetermination {
     private final Faction campaignFaction;
     private final CampaignTypeForContractDetermination campaignType;
     private final HiringHallLevel hiringHallLevel;
-    private final int forceReputationModifier;
+    private final double forceReputationFactor;
     private final ConnectionsLevel connectionsLevel;
     private final AbstractLocation currentLocation;
 
     public ContractEmployerDetermination(LocalDate currentDate, Faction campaignFaction,
-          HiringHallLevel hiringHallLevel, int forceReputationModifier, int adjustedConnectionsLevel,
+          HiringHallLevel hiringHallLevel, double forceReputationFactor, int adjustedConnectionsLevel,
           AbstractLocation currentLocation) {
         this.currentDate = currentDate;
         this.campaignFaction = campaignFaction;
         this.campaignType = getCampaignTypeFromFaction();
         this.hiringHallLevel = hiringHallLevel;
-        this.forceReputationModifier = forceReputationModifier;
+        this.forceReputationFactor = forceReputationFactor;
         this.connectionsLevel = ConnectionsLevel.parseConnectionsLevelFromInt(adjustedConnectionsLevel);
         this.currentLocation = currentLocation;
     }
@@ -86,7 +89,7 @@ public class ContractEmployerDetermination {
         return CampaignTypeForContractDetermination.GOVERNMENT;
     }
 
-    public Faction getContractEmployer() {
+    public EmployerFactionSelection getContractEmployer() {
         return switch (campaignType) {
             // CampOps pg 39 rev 5th printing states that mercenaries get a semi-random employer. We generate this by
             // looking at all potential employers in the contract search radius. Our generation method is based on
@@ -116,23 +119,28 @@ public class ContractEmployerDetermination {
      *
      * @return the faction representing the contract employer
      */
-    private @Nullable Faction getEmployerUsingMercenaryMethod() {
+    private @Nullable EmployerFactionSelection getEmployerUsingMercenaryMethod() {
         int currentYear = currentDate.getYear();
 
         Faction specialEmployer = checkForSpecialEmployer(currentYear);
         if (specialEmployer != null) {
-            return specialEmployer;
+            // the mercenary value here is going to be ignored
+            return new EmployerFactionSelection(specialEmployer, MAJOR_POWER, MERCENARY);
         }
 
         // CamOps pg 39 rev 5th printing states that a player can pick any employer at or below their roll. This
         // creates a UX issue for MekHQ. To avoid spamming the player, we instead use the exact employer matching the
         // roll
         GlobalEmployerTableValue globalEmployerType = getGlobalEmployer();
+        // This is ignored if globalEmployerType isn't INDEPENDENT
         IndependentEmployerTableValue independentEmployerType = getIndependentEmployer();
         GlobalEmployerTableValue employerSearchFactionType = getFinalGlobalFactionTableValue(globalEmployerType,
               independentEmployerType);
 
-        return getEmployer(employerSearchFactionType);
+        Faction employerFaction = getEmployer(employerSearchFactionType);
+        return employerFaction == null ?
+                     null :
+                     new EmployerFactionSelection(employerFaction, globalEmployerType, independentEmployerType);
     }
 
     private static @Nullable Faction checkForSpecialEmployer(int currentYear) {
@@ -232,6 +240,6 @@ public class ContractEmployerDetermination {
         int hiringHallModifier = hiringHallLevel.getEmployerModifier();
         int connectionsModifier = connectionsLevel.getEquipLevel();
 
-        return roll + hiringHallModifier + connectionsModifier + forceReputationModifier;
+        return roll + hiringHallModifier + connectionsModifier + (int) floor(forceReputationFactor);
     }
 }

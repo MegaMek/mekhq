@@ -52,6 +52,7 @@ import mekhq.campaign.mission.TransportCostCalculations;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
@@ -85,7 +86,7 @@ public class ContractObjectivePay {
               basePaymentMultiplier);
 
         calculateObjectiveTransportPay(today,
-              hangar,
+              hangar.getUnits(),
               spareParts,
               allPersonnel,
               currentLocation,
@@ -111,7 +112,8 @@ public class ContractObjectivePay {
         totalCostOfCombatUnits = calculateTotalCostOfCombatUnits(campaignOptions,
               campaignFaction,
               hangar,
-              formations, basePaymentMultiplier);
+              formations,
+              basePaymentMultiplier);
 
         basePay = peacetimeOperatingCosts.plus(totalCostOfCombatUnits);
     }
@@ -163,7 +165,7 @@ public class ContractObjectivePay {
         return forceValue.multipliedBy(basePaymentMultiplierValue);
     }
 
-    public void calculateObjectiveTransportPay(LocalDate today, Hangar hangar,
+    public void calculateObjectiveTransportPay(LocalDate today, Collection<Unit> units,
           final Collection<Part> spareParts, final Collection<Person> allPersonnel, ILocation currentLocation,
           JumpPath jumpPath, boolean isOverridingCommandCircuitRequirements, boolean isGM,
           FactionStandings factionStandings, String employerCode) {
@@ -176,7 +178,7 @@ public class ContractObjectivePay {
         int duration = (int) ceil(jumpPath.getTotalTime(today, currentLocation.getTransitTime(),
               isUseCommandCircuit));
 
-        TransportCostCalculations costCalculation = new TransportCostCalculations(hangar,
+        TransportCostCalculations costCalculation = new TransportCostCalculations(units,
               spareParts,
               allPersonnel,
               EXP_REGULAR);

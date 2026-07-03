@@ -36,6 +36,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import jakarta.annotation.Nullable;
 import megamek.logging.MMLogger;
+import mekhq.campaign.universe.Faction;
 import org.jspecify.annotations.NonNull;
 
 public enum GlobalEmployerTableValue {
@@ -107,6 +108,18 @@ public enum GlobalEmployerTableValue {
             case MAJOR_POWER -> MINOR_POWER;
             case SUPER_POWER -> MAJOR_POWER;
         };
+    }
+
+    public static GlobalEmployerTableValue getFactionTableType(Faction faction) {
+        if (faction.isMinorPower()) {
+            return MINOR_POWER;
+        } else if (faction.isMajorPower()) {
+            return MAJOR_POWER;
+        } else if (faction.isSuperPower()) {
+            return SUPER_POWER;
+        } else {
+            return INDEPENDENT;
+        }
     }
 
     public static GlobalEmployerTableValue fromString(String text) {

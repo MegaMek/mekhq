@@ -54,14 +54,12 @@ import java.util.stream.Collectors;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
-import megamek.common.util.weightedMaps.AbstractWeightedMap;
 import megamek.common.util.weightedMaps.WeightedIntMap;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.location.ILocation;
-import mekhq.campaign.mission.mission.contractGeneration.GlobalEmployerTableValue;
 import mekhq.campaign.mission.mission.contractGeneration.GlobalEmployerTableValue;
 import mekhq.campaign.universe.factionHints.FactionHints;
 
@@ -70,8 +68,8 @@ import mekhq.campaign.universe.factionHints.FactionHints;
  *       <p>
  *       Uses Factions and Planets to weighted lists of potential employers and enemies for contract generation. Also
  *       finds a suitable planet for the action.
- *                                                                                                       TODO : Account for the de facto alliance of the invading Clans and the
- *                                                                                                       TODO : Fortress Republic in a way that doesn't involve hard-coding them here.
+ *                                                                                                                   TODO : Account for the de facto alliance of the invading Clans and the
+ *                                                                                                                   TODO : Fortress Republic in a way that doesn't involve hard-coding them here.
  */
 public class RandomFactionGenerator {
     private static final MMLogger LOGGER = MMLogger.create(RandomFactionGenerator.class);
@@ -290,15 +288,7 @@ public class RandomFactionGenerator {
             return false;
         }
 
-        boolean include = switch (employerType) {
-            // We're using INDEPENDENT as a catch-all so nobody is missed
-            case INDEPENDENT -> !faction.isMinorPower() && !faction.isMajorOrSuperPower();
-            case MINOR_POWER -> faction.isMinorPower();
-            case MAJOR_POWER -> faction.isMajorPower();
-            case SUPER_POWER -> faction.isMajorOrSuperPower();
-        };
-
-        return !include;
+        return !GlobalEmployerTableValue.getFactionTableType(faction).equals(employerType);
     }
 
     /**
