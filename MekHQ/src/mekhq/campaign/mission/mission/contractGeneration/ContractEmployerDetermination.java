@@ -33,6 +33,9 @@
 package mekhq.campaign.mission.mission.contractGeneration;
 
 import static megamek.common.compute.Compute.d6;
+import static megamek.common.compute.Compute.randomInt;
+import static mekhq.campaign.universe.Faction.COMSTAR_FACTION_CODE;
+import static mekhq.campaign.universe.Faction.WORD_OF_BLAKE_FACTION_CODE;
 
 import java.time.LocalDate;
 
@@ -41,11 +44,15 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.personnel.enums.ConnectionsLevel;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 
 public class ContractEmployerDetermination {
     private static final MMLogger LOGGER = MMLogger.create(ContractEmployerDetermination.class);
+
+    private static final int COMSTAR_EMPLOYER_CHANCE = 100;
+    private static final int WORD_OF_BLAKE_EMPLOYER_CHANCE = 40;
 
     private final LocalDate currentDate;
     private final Faction campaignFaction;
@@ -110,6 +117,13 @@ public class ContractEmployerDetermination {
      * @return the faction representing the contract employer
      */
     private @Nullable Faction getEmployerUsingMercenaryMethod() {
+        int currentYear = currentDate.getYear();
+
+        Faction specialEmployer = checkForSpecialEmployer(currentYear);
+        if (specialEmployer != null) {
+            return specialEmployer;
+        }
+
         // CamOps pg 39 rev 5th printing states that a player can pick any employer at or below their roll. This
         // creates a UX issue for MekHQ. To avoid spamming the player, we instead use the exact employer matching the
         // roll
@@ -119,6 +133,40 @@ public class ContractEmployerDetermination {
               independentEmployerType);
 
         return getEmployer(employerSearchFactionType);
+    }
+
+    private static @Nullable Faction checkForSpecialEmployer(int currentYear) {
+        Faction specialEmployer = checkForEmployerOverride(currentYear,
+              COMSTAR_FACTION_CODE,
+              COMSTAR_EMPLOYER_CHANCE,
+              true);
+        if (specialEmployer != null) {
+            return specialEmployer;
+        }
+
+        specialEmployer = checkForEmployerOverride(currentYear, WORD_OF_BLAKE_FACTION_CODE,
+              WORD_OF_BLAKE_EMPLOYER_CHANCE, false);
+        return specialEmployer;
+    }
+
+    private static @Nullable Faction checkForEmployerOverride(int currentYear,
+          String factionCode, int chance, boolean useSpecialComStarStartYear) {
+        Faction faction = Factions.getInstance().getFaction(factionCode);
+        int startYear = useSpecialComStarStartYear ? 2788 : faction.getStartYear();
+        int endYear = faction.getEndYear();
+
+        if (isFactionOperating(currentYear, startYear, endYear)) {
+            int roll = randomInt(chance);
+
+            if (roll == 0) {
+                return faction;
+            }
+        }
+        return null;
+    }
+
+    private static boolean isFactionOperating(int currentYear, int startYearComStar, int endingYearComStar) {
+        return currentYear >= startYearComStar && currentYear <= endingYearComStar;
     }
 
     private GlobalEmployerTableValue getFinalGlobalFactionTableValue(GlobalEmployerTableValue globalEmployerType,
