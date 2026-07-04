@@ -33,28 +33,29 @@
 package mekhq.campaign.personnel.education;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Answers.CALLS_REAL_METHODS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignLocationManager;
-import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.location.AcademyCampusLocation;
-import mekhq.campaign.location.LocationDispatch;
+import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
@@ -361,21 +362,8 @@ class EducationControllerTest {
 
             Person person = buildStudentPerson();
 
-            try (MockedStatic<LocationDispatch> mockDispatch = mockStatic(LocationDispatch.class, CALLS_REAL_METHODS)) {
-                JumpPath mockPath = mock(JumpPath.class);
-                when(mockPath.getTotalTime(any(), anyDouble(), anyBoolean())).thenReturn(10.0);
-                CurrentLocation travelLoc = new CurrentLocation(mock(PlanetarySystem.class), 0.5);
-                travelLoc.setJumpPath(mockPath);
-
-                mockDispatch.when(() -> LocationDispatch.dispatchToLocation(any(), any(), any()))
-                      .thenAnswer(inv -> {
-                          Collection<Person> people = inv.getArgument(0);
-                          people.forEach(p -> p.setParent(travelLoc));
-                          return null;
-                      });
-
-                EducationController.enrollPerson(campaign, person, academy, "Galatea", "MERC", 0);
-            }
+            // Travel is now queued rather than dispatched; the stage is set regardless of the planned route.
+            EducationController.enrollPerson(campaign, person, academy, "Galatea", "MERC", 0);
 
             assertEquals(EducationStage.JOURNEY_TO_CAMPUS, person.getEduEducationStage());
         }
@@ -413,23 +401,29 @@ class EducationControllerTest {
 
             Person person = buildStudentPerson();
 
-            try (MockedStatic<LocationDispatch> mockDispatch = mockStatic(LocationDispatch.class, CALLS_REAL_METHODS)) {
+            try (MockedStatic<LocationUtils> mockUtils = mockStatic(LocationUtils.class, CALLS_REAL_METHODS)) {
                 JumpPath mockPath = mock(JumpPath.class);
                 when(mockPath.getTotalTime(any(), anyDouble(), anyBoolean())).thenReturn(10.0);
-                CurrentLocation travelLoc = new CurrentLocation(mock(PlanetarySystem.class), 0.5);
-                travelLoc.setJumpPath(mockPath);
-
-                mockDispatch.when(() -> LocationDispatch.dispatchToLocation(any(), any(), any()))
-                      .thenAnswer(inv -> {
-                          Collection<Person> people = inv.getArgument(0);
-                          people.forEach(p -> p.setParent(travelLoc));
-                          return null;
-                      });
+                mockUtils.when(() -> LocationUtils.planJumpPath(any(), any(), any()))
+                      .thenReturn(mockPath);
 
                 EducationController.enrollPerson(campaign, person, academy, "Galatea", "MERC", 0);
             }
 
             assertEquals(10, person.getEduJourneyTime());
+        }
+
+        @Test
+        void nonHomeSchoolRemote_unresolvableCampus_abortsEnrollment() {
+            Academy academy = buildAcademy(false, false);
+            when(campaign.getCampaignLocationManager().getOrCreateCampusLocation(any(), any(), any(), any()))
+                  .thenReturn(null);
+
+            Person person = buildStudentPerson();
+            EducationController.enrollPerson(campaign, person, academy, "Galatea", "MERC", 0);
+
+            assertNotEquals(EducationStage.JOURNEY_TO_CAMPUS, person.getEduEducationStage());
+            verify(campaign.getCampaignLocationManager(), never()).queueTravel(any(), any());
         }
 
         @Test

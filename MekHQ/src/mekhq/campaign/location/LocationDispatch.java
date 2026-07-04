@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.location;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -72,37 +71,6 @@ public final class LocationDispatch {
     private static final String LOG_DISPATCH_PARTS = "dispatchPartsToLocation";
 
     private LocationDispatch() {}
-
-    /**
-     * Returns the transit time from {@code fromSystem} that should be used as the start-transit
-     * parameter when calculating a new journey's duration.
-     *
-     * <p>When already in-system, we inherit its current transit progress.
-     * When there is no location, we assume the
-     * traveler starts at the outer jump point of their system.</p>
-     *
-     * @param fromSystem the departure system; must not be {@code null}
-     * @param campaign   the active campaign; must not be {@code null}
-     * @return transit time in days
-     */
-    public static double computeStartTransit(PlanetarySystem fromSystem, Campaign campaign) {
-        return campaign.getCurrentLocation() != null
-              ? campaign.getCurrentLocation().getTransitTime()
-              : fromSystem.getTimeToJumpPoint(1.0);
-    }
-
-    /**
-     * Computes the total journey duration in days from a {@link JumpPath}, applying a minimum of
-     * 2 days.
-     *
-     * @param path         the route to calculate; must not be {@code null}
-     * @param date         the in-game date (used for pirate-point availability); must not be {@code null}
-     * @param startTransit the already-elapsed transit time at the origin, in days
-     * @return journey length in whole days, always at least 2
-     */
-    public static int computeJourneyDays(JumpPath path, LocalDate date, double startTransit) {
-        return Math.max(2, (int) Math.ceil(path.getTotalTime(date, startTransit, false)));
-    }
 
     /**
      * Removes a completed travel node from the campaign: detaches it from the location tree and
@@ -207,11 +175,11 @@ public final class LocationDispatch {
      */
     private static Optional<CurrentLocation> buildTravelNode(PlanetarySystem fromSystem,
           PlanetarySystem destinationSystem, ILocation destination, Campaign campaign, String logContext) {
-        JumpPath path = campaign.calculateJumpPath(fromSystem, destinationSystem);
-        if (path == null || path.isEmpty()) {
+        JumpPath path = LocationUtils.planJumpPath(fromSystem, destinationSystem, campaign);
+        if (path == null) {
             return Optional.empty();
         }
-        double startTransit = computeStartTransit(fromSystem, campaign);
+        double startTransit = LocationUtils.computeStartTransit(fromSystem, campaign);
         CurrentLocation travelNode = new CurrentLocation(fromSystem, startTransit);
         travelNode.setJumpPath(path);
         if (!travelNode.setParent(destination)) {
@@ -231,7 +199,7 @@ public final class LocationDispatch {
      * @param destination the target {@link ILocation}; must not be {@code null}
      * @param campaign    the active campaign; must not be {@code null}
      */
-    public static void dispatchToLocation(Collection<Person> people, ILocation destination, Campaign campaign) {
+    private static void dispatchToLocation(Collection<Person> people, ILocation destination, Campaign campaign) {
         dispatch(people, destination, campaign, LOG_DISPATCH_PERSONS, destination, null);
     }
 
@@ -250,7 +218,7 @@ public final class LocationDispatch {
      * @param destination the target {@link ILocation}; must not be {@code null}
      * @param campaign    the active campaign; must not be {@code null}
      */
-    public static void dispatchUnitsToLocation(Collection<Unit> units,
+    private static void dispatchUnitsToLocation(Collection<Unit> units,
           ILocation destination,
           Campaign campaign) {
 
@@ -293,7 +261,7 @@ public final class LocationDispatch {
      * @param destination the target {@link ILocation}; must not be {@code null}
      * @param campaign    the active campaign; must not be {@code null}
      */
-    public static void dispatchPartsToLocation(Collection<Part> parts, ILocation destination, Campaign campaign) {
+    private static void dispatchPartsToLocation(Collection<Part> parts, ILocation destination, Campaign campaign) {
 
         Warehouse arrivalWarehouse = (destination instanceof AbstractBase base)
               ? base.getBaseWarehouse()
@@ -307,6 +275,42 @@ public final class LocationDispatch {
                 arrivalWarehouse.addPart(part);
             }
         });
+    }
+
+    /**
+     * Dispatches a heterogeneous group of {@code travelers} to {@code destination}, splitting them by type so each
+     * reaches {@code destination} through the appropriate type-specific entry point
+     * ({@link #dispatchToLocation}, {@link #dispatchUnitsToLocation}, {@link #dispatchPartsToLocation}), which maintains
+     * the relevant hangar and warehouse data structures. Travelers that are not a {@link Person}, {@link Unit}, or
+     * {@link Part} are logged and skipped.
+     *
+     * @param travelers  the persons, units, and/or parts to dispatch; must not be {@code null}
+     * @param destination the target {@link ILocation}; must not be {@code null}
+     * @param campaign    the active campaign; must not be {@code null}
+     */
+    public static void dispatchTravelers(Collection<? extends ILocation> travelers, ILocation destination,
+          Campaign campaign) {
+        List<Person> people = new ArrayList<>();
+        List<Unit> units = new ArrayList<>();
+        List<Part> parts = new ArrayList<>();
+        for (ILocation traveler : travelers) {
+            switch (traveler) {
+                case Person person -> people.add(person);
+                case Unit unit -> units.add(unit);
+                case Part part -> parts.add(part);
+                default -> LOGGER.warn("dispatchTravelers: unsupported traveler type {} — skipping",
+                      traveler.getClass().getSimpleName());
+            }
+        }
+        if (!people.isEmpty()) {
+            dispatchToLocation(people, destination, campaign);
+        }
+        if (!units.isEmpty()) {
+            dispatchUnitsToLocation(units, destination, campaign);
+        }
+        if (!parts.isEmpty()) {
+            dispatchPartsToLocation(parts, destination, campaign);
+        }
     }
 
     /**
