@@ -34,9 +34,12 @@ package mekhq.gui.view;
 
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
 
+import java.awt.Cursor;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -44,6 +47,7 @@ import java.util.UUID;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.JTextPane;
 
 import megamek.client.ui.Messages;
@@ -69,16 +73,44 @@ import mekhq.utilities.ReportingUtilities;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class ForceViewPanel extends JScrollablePanel {
+    public enum UnitSelectionType {
+        CREW,
+        UNIT
+    }
+
+    @FunctionalInterface
+    public interface UnitSelectionListener {
+        void unitSelected(Unit unit, UnitSelectionType selectionType);
+    }
+
+    @FunctionalInterface
+    public interface FormationSelectionListener {
+        void formationSelected(Formation formation);
+    }
+
     private final Formation formation;
     private final Campaign campaign;
+    private final UnitSelectionListener unitSelectionListener;
+    private final FormationSelectionListener formationSelectionListener;
 
     private JPanel pnlStats;
     private JPanel pnlSubUnits;
 
     public ForceViewPanel(Formation f, Campaign c) {
+        this(f, c, null, null);
+    }
+
+    public ForceViewPanel(Formation f, Campaign c, UnitSelectionListener unitSelectionListener) {
+        this(f, c, unitSelectionListener, null);
+    }
+
+    public ForceViewPanel(Formation f, Campaign c, UnitSelectionListener unitSelectionListener,
+          FormationSelectionListener formationSelectionListener) {
         super();
         this.formation = f;
         this.campaign = c;
+        this.unitSelectionListener = unitSelectionListener;
+        this.formationSelectionListener = formationSelectionListener;
         this.setBorder(null);
         initComponents();
     }
@@ -427,6 +459,7 @@ public class ForceViewPanel extends JScrollablePanel {
             lblForce = new JLabel();
             lblForce.setText(getForceSummary(subFormation));
             lblForce.setIcon(subFormation.getFormationIcon().getImageIcon(72));
+            addFormationSelectionListener(lblForce, subFormation);
             nextY++;
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -466,6 +499,7 @@ public class ForceViewPanel extends JScrollablePanel {
             if (null != p) {
                 lblPerson.setText(getForceSummary(p, unit));
                 lblPerson.setIcon(p.getPortraitImageIconWithFallback(true, 54));
+                addUnitSelectionListener(lblPerson, unit, UnitSelectionType.CREW);
             } else {
                 lblPerson.getAccessibleContext().setAccessibleName("Unmanned Unit");
             }
@@ -480,6 +514,7 @@ public class ForceViewPanel extends JScrollablePanel {
             pnlSubUnits.add(lblPerson, gridBagConstraints);
             lblUnit.setText(getForceSummary(unit));
             lblUnit.setIcon(new ImageIcon(unit.getImage(lblUnit)));
+            addUnitSelectionListener(lblUnit, unit, UnitSelectionType.UNIT);
             lblPerson.setLabelFor(lblUnit);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
@@ -491,6 +526,34 @@ public class ForceViewPanel extends JScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlSubUnits.add(lblUnit, gridBagConstraints);
         }
+    }
+
+    private void addUnitSelectionListener(JLabel label, Unit unit, UnitSelectionType selectionType) {
+        if (unitSelectionListener == null) {
+            return;
+        }
+
+        addSelectionListener(label, () -> unitSelectionListener.unitSelected(unit, selectionType));
+    }
+
+    private void addFormationSelectionListener(JLabel label, Formation formation) {
+        if (formationSelectionListener == null) {
+            return;
+        }
+
+        addSelectionListener(label, () -> formationSelectionListener.formationSelected(formation));
+    }
+
+    private void addSelectionListener(JLabel label, Runnable selectionAction) {
+        label.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        label.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent evt) {
+                if (SwingUtilities.isLeftMouseButton(evt)) {
+                    selectionAction.run();
+                }
+            }
+        });
     }
 
     public String getForceSummary(Person person, Unit unit) {

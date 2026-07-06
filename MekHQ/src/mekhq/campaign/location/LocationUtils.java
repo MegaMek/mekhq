@@ -38,6 +38,7 @@ import java.util.Objects;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
+import mekhq.campaign.GroundTransitLocation;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.base.AbstractBase;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -123,13 +124,15 @@ public final class LocationUtils {
     }
 
     /**
-     * Returns {@code true} if the item — or any of its ancestors in the {@link LocationNode} tree — is a
-     * {@link CurrentLocation} with an active {@link mekhq.campaign.JumpPath} (i.e. the item is currently traveling).
+     * Returns {@code true} if the item — or any of its ancestors in the {@link LocationNode} tree — is
+     * currently traveling: a {@link CurrentLocation} with an active {@link mekhq.campaign.JumpPath}, or a
+     * {@link GroundTransitLocation} still counting down its overland transit time.
      *
-     * <p>This intentionally checks for a non-empty {@link mekhq.campaign.JumpPath} rather than
-     * {@link ILocation#isInTransit()}, which only returns {@code true} once the ship has actually
+     * <p>For interplanetary travel this intentionally checks for a non-empty {@link mekhq.campaign.JumpPath}
+     * rather than {@link ILocation#isInTransit()}, which only returns {@code true} once the ship has actually
      * started moving (transit time &gt; 0). An item with an assigned but not-yet-started journey
-     * must also be treated as in transit for co-location and assignment purposes.</p>
+     * must also be treated as in transit for co-location and assignment purposes. A ground convoy has no
+     * jump path, so it is judged by its own {@link GroundTransitLocation#isInTransit()}.</p>
      *
      * @param location the location item to inspect
      *
@@ -141,8 +144,14 @@ public final class LocationUtils {
         }
         LocationNode node = location.getLocationNode();
         while (node != null) {
-            if (node.getLocatable() instanceof CurrentLocation currentLocation
+            ILocation locatable = node.getLocatable();
+            if (locatable instanceof CurrentLocation currentLocation
                       && currentLocation.getJumpPath() != null && !currentLocation.getJumpPath().isEmpty()) {
+                return true;
+            }
+            // A GroundTransitLocation has no jump path; it is in transit while its overland
+            // transit time is still counting down.
+            if (locatable instanceof GroundTransitLocation groundTransit && groundTransit.isInTransit()) {
                 return true;
             }
             node = node.getParent();

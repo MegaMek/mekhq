@@ -39,8 +39,9 @@ import java.util.UUID;
 
 import megamek.Version;
 import megamek.common.annotations.Nullable;
+import mekhq.campaign.AbstractLocation;
+import mekhq.campaign.AbstractMobileLocation;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.FixedLocation;
 import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.location.ILocation;
@@ -122,10 +123,10 @@ public class PlayerBase extends AbstractBase {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personId", person.getId().toString());
             }
         }
-        // Travel nodes (CurrentLocation) and homeSchool campuses sit directly under the base.
+        // Travel nodes (CurrentLocation / GroundTransitLocation) and homeSchool campuses sit directly under the base.
         for (ILocation child : getChildLocations()) {
-            if (child instanceof CurrentLocation currentLocation) {
-                currentLocation.writeToXML(pw, indent);
+            if (child instanceof AbstractMobileLocation travelNode) {
+                travelNode.writeToXML(pw, indent);
             } else if (child instanceof AcademyCampusLocation campus) {
                 campus.writeToXML(pw, indent);
             }
@@ -203,12 +204,12 @@ public class PlayerBase extends AbstractBase {
                     // Already handled in pre-scan above.
                 } else if (nodeName.equalsIgnoreCase("personId")) {
                     base.pendingPersonIds.add(UUID.fromString(wn2.getTextContent().trim()));
-                } else if (nodeName.equalsIgnoreCase("location")) {
+                } else if (AbstractLocation.isTravelNodeTag(nodeName)) {
                     // Travel nodes sit directly under the base (not under basePersonnel).
-                    CurrentLocation travelLocation = CurrentLocation.generateInstanceFromXML(wn2, campaign);
-                    if (travelLocation != null) {
-                        travelLocation.setParent(base);
-                        campaign.getCampaignLocationManager().addLocation(travelLocation);
+                    if (AbstractLocation.generateInstanceFromXML(wn2, campaign)
+                              instanceof AbstractMobileLocation travelNode) {
+                        travelNode.setParent(base);
+                        campaign.getCampaignLocationManager().addLocation(travelNode);
                     }
                 } else if (nodeName.equalsIgnoreCase("academyCampus")) {
                     AcademyCampusLocation campus = AcademyCampusLocation.generateInstanceFromXML(wn2);
@@ -220,12 +221,11 @@ public class PlayerBase extends AbstractBase {
                             if (campusChild.getNodeType() != Node.ELEMENT_NODE) {
                                 continue;
                             }
-                            if (campusChild.getNodeName().equalsIgnoreCase("location")) {
-                                CurrentLocation travelNode = CurrentLocation.generateInstanceFromXML(campusChild, campaign);
-                                if (travelNode != null) {
-                                    travelNode.setParent(campus);
-                                    campaign.getCampaignLocationManager().addLocation(travelNode);
-                                }
+                            if (AbstractLocation.isTravelNodeTag(campusChild.getNodeName())
+                                      && AbstractLocation.generateInstanceFromXML(campusChild, campaign)
+                                                 instanceof AbstractMobileLocation travelNode) {
+                                travelNode.setParent(campus);
+                                campaign.getCampaignLocationManager().addLocation(travelNode);
                             }
                         }
                     }

@@ -316,11 +316,22 @@ public abstract class AbstractLocation implements IPlace {
         return switch (wn.getNodeName().toLowerCase()) {
             case "location" -> CurrentLocation.generateInstanceFromXML(wn, campaign);
             case "fixedlocation" -> FixedLocation.generateInstanceFromXML(wn, campaign);
+            case "groundtransitlocation" -> GroundTransitLocation.generateInstanceFromXML(wn, campaign);
             default -> {
                 logger.warn("Unrecognized location node '{}' — skipping", wn.getNodeName());
                 yield null;
             }
         };
+    }
+
+    /**
+     * Returns {@code true} if {@code nodeName} is the XML element name of a serialized travel node — an
+     * interplanetary {@code <location>} ({@link CurrentLocation}) or an on-planet {@code <groundTransitLocation>}
+     * ({@link GroundTransitLocation}). Both deserialize via {@link #generateInstanceFromXML} to an
+     * {@link AbstractMobileLocation}.
+     */
+    public static boolean isTravelNodeTag(String nodeName) {
+        return nodeName.equalsIgnoreCase("location") || nodeName.equalsIgnoreCase("groundTransitLocation");
     }
 
     static class PlanetarySystemAdapter extends XmlAdapter<String, PlanetarySystem> {

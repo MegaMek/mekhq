@@ -42,7 +42,6 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.AbstractMobileLocation;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CurrentLocation;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -176,21 +175,13 @@ public class LocationNode {
                             if (campusChild.getNodeType() != Node.ELEMENT_NODE) {
                                 continue;
                             }
-                            if (campusChild.getNodeName().equalsIgnoreCase("location")) {
-                                CurrentLocation travelNode = CurrentLocation.generateInstanceFromXML(campusChild, campaign);
-                                if (travelNode != null) {
-                                    LocationManager.setLocation(travelNode, campus);
-                                    campaign.getCampaignLocationManager().addLocation(travelNode);
-                                }
+                            if (AbstractLocation.isTravelNodeTag(campusChild.getNodeName())) {
+                                readAndRegisterTravelNode(campusChild, campus, campaign);
                             }
                         }
                     }
-                } else if (wn.getNodeName().equalsIgnoreCase("location")) {
-                    CurrentLocation travelNode = CurrentLocation.generateInstanceFromXML(wn, campaign);
-                    if (travelNode != null) {
-                        LocationManager.setLocation(travelNode, parent);
-                        campaign.getCampaignLocationManager().addLocation(travelNode);
-                    }
+                } else if (AbstractLocation.isTravelNodeTag(wn.getNodeName())) {
+                    readAndRegisterTravelNode(wn, parent, campaign);
                 } else {
                     // Person, Unit, and Part reconnection will be added here
                     logger.warn("Unrecognized locationNodeChildren element '{}' — skipping", wn.getNodeName());
@@ -198,6 +189,19 @@ public class LocationNode {
             } catch (Exception ex) {
                 logger.error("", ex);
             }
+        }
+    }
+
+    /**
+     * Reads a serialized travel node (a {@link mekhq.campaign.CurrentLocation} or a
+     * {@link mekhq.campaign.GroundTransitLocation}), parents it under {@code parent}, and registers it with the
+     * campaign. Node-internal helper; external callers deserialize via
+     * {@link AbstractLocation#generateInstanceFromXML} and attach with {@link ILocation#setParent}.
+     */
+    private static void readAndRegisterTravelNode(Node wn, ILocation parent, Campaign campaign) {
+        if (AbstractLocation.generateInstanceFromXML(wn, campaign) instanceof AbstractMobileLocation travelNode) {
+            LocationManager.setLocation(travelNode, parent);
+            campaign.getCampaignLocationManager().addLocation(travelNode);
         }
     }
 
