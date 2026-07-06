@@ -55,7 +55,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 
 public class MissionObjectiveTypeDetermination {
-    private final MMLogger LOGGER = MMLogger.create(MissionObjectiveTypeDetermination.class);
+    private static final MMLogger LOGGER = MMLogger.create(MissionObjectiveTypeDetermination.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.MissionObjectiveTypeDetermination";
 
     /**
@@ -63,72 +63,71 @@ public class MissionObjectiveTypeDetermination {
      */
     private static final List<Integer> PROHIBITED_CLAN_ROLLS = List.of(2, 3, 12);
 
-    private final String skillCheckReason = getTextAt(RESOURCE_BUNDLE,
+    private final static String skillCheckReason = getTextAt(RESOURCE_BUNDLE,
           "MissionObjectiveTypeDetermination.skillCheck.reason");
 
-    private final Campaign campaign;
-    private final boolean isPirateCampaign;
-    private final HiringHallLevel hiringHallLevel;
-    private final Person negotiator;
-    private final ConnectionsLevel connectionsLevel;
-    private final Faction employerFaction;
-    private final GlobalEmployerTableValue employerTableValue;
-    private final IndependentEmployerTableValue independentEmployerTableValue;
-
-    // TODO player must be able to pick negotiator
-    public MissionObjectiveTypeDetermination(Campaign campaign, HiringHallLevel hiringHallLevel, Person negotiator,
-          Faction employerFaction, GlobalEmployerTableValue employerTableValue,
-          IndependentEmployerTableValue independentEmployerTableValue) {
-        this.campaign = campaign;
-        this.isPirateCampaign = campaign.isPirateCampaign();
-        this.negotiator = negotiator;
-        this.hiringHallLevel = hiringHallLevel;
-        this.employerFaction = employerFaction;
-        this.employerTableValue = employerTableValue;
-        this.independentEmployerTableValue = independentEmployerTableValue;
-
-        int adjustedConnections = negotiator.getAdjustedConnections(false);
-        connectionsLevel = ConnectionsLevel.parseConnectionsLevelFromInt(adjustedConnections);
+    public MissionObjectiveTypeDetermination() {
     }
 
-    public List<AtBContractType> getObjectiveType() {
-        int roll = getMissionRollAdjustedByFaction();
+    // TODO player must be able to pick negotiator
+    public static List<AtBContractType> getObjectiveType(Campaign campaign, HiringHallLevel hiringHallLevel,
+          Person negotiator,
+          Faction employerFaction, GlobalEmployerTableValue employerTableValue,
+          IndependentEmployerTableValue independentEmployerTableValue) {
+        boolean isPirateCampaign = campaign.isPirateCampaign();
+        boolean isClanCampaign = employerFaction.isClan();
+        int adjustedConnections = negotiator.getAdjustedConnections(false);
+        ConnectionsLevel connectionsLevel = ConnectionsLevel.parseConnectionsLevelFromInt(adjustedConnections);
+        int connectionsEquipLevel = connectionsLevel.getEquipLevel();
+
+
+        int roll = getMissionRollAdjustedByFaction(isClanCampaign,
+              connectionsEquipLevel,
+              hiringHallLevel,
+              campaign,
+              negotiator);
 
         if (isPirateCampaign) {
             return getPirateObjectiveType(roll);
         }
 
         return switch (employerTableValue) {
-            case INDEPENDENT -> getIndependentObjectiveType(roll);
-            case MINOR_POWER, SUPER_POWER, MAJOR_POWER -> getObjectiveTypeForInnerSphereOrClan(roll);
+            case INDEPENDENT -> getIndependentObjectiveType(roll, independentEmployerTableValue,
+                  connectionsEquipLevel, hiringHallLevel, campaign, negotiator);
+            case MINOR_POWER, SUPER_POWER, MAJOR_POWER -> getObjectiveTypeForInnerSphereOrClan(roll,
+                  connectionsEquipLevel, hiringHallLevel, campaign, negotiator);
         };
     }
 
-    private List<AtBContractType> getIndependentObjectiveType(int roll) {
+    private static List<AtBContractType> getIndependentObjectiveType(int roll,
+          IndependentEmployerTableValue independentEmployerTableValue, int connectionsEquipLevel,
+          HiringHallLevel hiringHallLevel, Campaign campaign, Person negotiator) {
         return switch (independentEmployerTableValue) {
             case NOBLE, PLANETARY_GOVERNMENT, MERCENARY, MAJOR_PERIPHERY, MINOR_PERIPHERY ->
-                  getObjectiveTypeForIndependent(roll);
-            case CORPORATION -> getObjectiveTypeForCorporation(roll);
+                  getObjectiveTypeForIndependent(roll, connectionsEquipLevel, hiringHallLevel, campaign, negotiator);
+            case CORPORATION ->
+                  getObjectiveTypeForCorporation(roll, connectionsEquipLevel, hiringHallLevel, campaign, negotiator);
         };
     }
 
-    private int getMissionRollAdjustedByFaction() {
+    private static int getMissionRollAdjustedByFaction(boolean isEmployerClan, int connectionsEquipLevel,
+          HiringHallLevel hiringHallLevel, Campaign campaign, Person negotiator) {
         boolean shouldReroll = true;
-        boolean isClan = employerFaction.isClan();
 
         int roll = 7;
         while (shouldReroll) {
-            roll = getMissionRoll();
-            shouldReroll = isClan && PROHIBITED_CLAN_ROLLS.contains(roll);
+            roll = getMissionRoll(connectionsEquipLevel, hiringHallLevel, campaign, negotiator);
+            shouldReroll = isEmployerClan && PROHIBITED_CLAN_ROLLS.contains(roll);
         }
 
         return roll;
     }
 
-    private List<AtBContractType> getObjectiveTypeForInnerSphereOrClan(int roll) {
+    private static List<AtBContractType> getObjectiveTypeForInnerSphereOrClan(int roll, int connectionsEquipLevel,
+          HiringHallLevel hiringHallLevel, Campaign campaign, Person negotiator) {
         return switch (roll) {
-            case 2 -> getConvertObjectiveType();
-            case 3, 12 -> getSpecialObjectiveType();
+            case 2 -> getConvertObjectiveType(connectionsEquipLevel, hiringHallLevel, campaign, negotiator);
+            case 3, 12 -> getSpecialObjectiveType(connectionsEquipLevel, hiringHallLevel, campaign, negotiator);
             case 4 -> List.of(PIRATE_HUNTING);
             case 5 -> List.of(PLANETARY_ASSAULT);
             case 6, 7 -> List.of(OBJECTIVE_RAID);
@@ -143,10 +142,11 @@ public class MissionObjectiveTypeDetermination {
         };
     }
 
-    private List<AtBContractType> getObjectiveTypeForIndependent(int roll) {
+    private static List<AtBContractType> getObjectiveTypeForIndependent(int roll, int connectionsEquipLevel,
+          HiringHallLevel hiringHallLevel, Campaign campaign, Person negotiator) {
         return switch (roll) {
-            case 2 -> getConvertObjectiveType();
-            case 3, 12 -> getSpecialObjectiveType();
+            case 2 -> getConvertObjectiveType(connectionsEquipLevel, hiringHallLevel, campaign, negotiator);
+            case 3, 12 -> getSpecialObjectiveType(connectionsEquipLevel, hiringHallLevel, campaign, negotiator);
             case 4 -> List.of(PLANETARY_ASSAULT);
             case 5, 9 -> List.of(OBJECTIVE_RAID);
             case 6 -> List.of(EXTRACTION_RAID);
@@ -161,15 +161,19 @@ public class MissionObjectiveTypeDetermination {
         };
     }
 
-    private List<AtBContractType> getSpecialObjectiveType() {
-        int newRoll = getMissionRoll();
-        return getSpecialObjectiveType(newRoll);
+    private static List<AtBContractType> getSpecialObjectiveType(int connectionsEquipLevel,
+          HiringHallLevel hiringHallLevel,
+          Campaign campaign,
+          Person negotiator) {
+        int newRoll = getMissionRoll(connectionsEquipLevel, hiringHallLevel, campaign, negotiator);
+        return getSpecialObjectiveType(newRoll, connectionsEquipLevel, hiringHallLevel, campaign, negotiator);
     }
 
-    private List<AtBContractType> getObjectiveTypeForCorporation(int roll) {
+    private static List<AtBContractType> getObjectiveTypeForCorporation(int roll, int connectionsEquipLevel,
+          HiringHallLevel hiringHallLevel, Campaign campaign, Person negotiator) {
         return switch (roll) {
-            case 2, 3 -> getConvertObjectiveType();
-            case 4, 12 -> getSpecialObjectiveType();
+            case 2, 3 -> getConvertObjectiveType(connectionsEquipLevel, hiringHallLevel, campaign, negotiator);
+            case 4, 12 -> getSpecialObjectiveType(connectionsEquipLevel, hiringHallLevel, campaign, negotiator);
             case 5, 8 -> List.of(OBJECTIVE_RAID);
             case 6 -> List.of(EXTRACTION_RAID);
             case 7 -> List.of(RECON_RAID);
@@ -183,8 +187,11 @@ public class MissionObjectiveTypeDetermination {
         };
     }
 
-    private List<AtBContractType> getConvertObjectiveType() {
-        int newRoll = getMissionRoll();
+    private static List<AtBContractType> getConvertObjectiveType(int connectionsEquipLevel,
+          HiringHallLevel hiringHallLevel,
+          Campaign campaign,
+          Person negotiator) {
+        int newRoll = getMissionRoll(connectionsEquipLevel, hiringHallLevel, campaign, negotiator);
         return getCovertObjectiveType(newRoll);
     }
 
@@ -197,9 +204,10 @@ public class MissionObjectiveTypeDetermination {
         }
     }
 
-    private List<AtBContractType> getSpecialObjectiveType(int roll) {
+    private static List<AtBContractType> getSpecialObjectiveType(int roll, int connectionsEquipLevel,
+          HiringHallLevel hiringHallLevel, Campaign campaign, Person negotiator) {
         return switch (roll) {
-            case 2 -> getConvertObjectiveType();
+            case 2 -> getConvertObjectiveType(connectionsEquipLevel, hiringHallLevel, campaign, negotiator);
             case 3 -> List.of(GUERRILLA_WARFARE, PLANETARY_ASSAULT);
             case 4 -> List.of(GUERRILLA_WARFARE);
             case 5 -> List.of(RECON_RAID, PLANETARY_ASSAULT);
@@ -217,7 +225,7 @@ public class MissionObjectiveTypeDetermination {
         };
     }
 
-    private List<AtBContractType> getCovertObjectiveType(int roll) {
+    private static List<AtBContractType> getCovertObjectiveType(int roll) {
         return switch (roll) {
             case 2 -> List.of(TERRORISM);
             case 3, 4 -> List.of(ASSASSINATION);
@@ -236,7 +244,7 @@ public class MissionObjectiveTypeDetermination {
         };
     }
 
-    private List<AtBContractType> getPirateObjectiveType(int roll) {
+    private static List<AtBContractType> getPirateObjectiveType(int roll) {
         return switch (roll) {
             case 2, 3, 4, 5 -> List.of(RECON_RAID);
             case 6, 7, 8, 9, 10, 11, 12 -> List.of(OBJECTIVE_RAID);
@@ -247,9 +255,9 @@ public class MissionObjectiveTypeDetermination {
         };
     }
 
-    private int getMissionRoll() {
-        int negotiationModifier = getSkillModifier();
-        int connectionsModifier = connectionsLevel.getEquipLevel();
+    private static int getMissionRoll(int connectionsEquipLevel, HiringHallLevel hiringHallLevel, Campaign campaign,
+          Person negotiator) {
+        int negotiationModifier = getSkillModifier(campaign, negotiator);
 
         // CamOps pg 40 rev 5th printing states that the player can apply their negotiations and connections
         // modifiers negatively to produce more covert results. As we cannot spam the player with requests, we're
@@ -258,14 +266,16 @@ public class MissionObjectiveTypeDetermination {
 
         if (hiringHallLevel == HiringHallLevel.QUESTIONABLE) {
             negotiationModifier = -negotiationModifier;
-            connectionsModifier = -connectionsModifier;
+            connectionsEquipLevel = -connectionsEquipLevel;
         }
 
         int roll = d6(2);
-        return clamp(roll + negotiationModifier + connectionsModifier, 2, 12);
+        return clamp(roll + negotiationModifier + connectionsEquipLevel, 2, 12);
     }
 
-    private int getSkillModifier() {
+    private static int getSkillModifier(Campaign campaign, Person negotiator) {
+        boolean isPirateCampaign = campaign.isPirateCampaign();
+
         String skill = isPirateCampaign ? S_INVESTIGATION : S_NEGOTIATION;
         SkillCheck skillCheck = negotiator.checkSkill(skill, campaign);
 

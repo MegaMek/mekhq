@@ -1,91 +1,64 @@
 package mekhq.campaign.mission.newContract.contractGeneration;
 
-import static mekhq.campaign.mission.newContract.contractGeneration.ObjectiveEnemyDetermination.getEnemyFaction;
-import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
-
 import java.time.LocalDate;
 import java.util.List;
 
 import megamek.logging.MMLogger;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.JumpPath;
-import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.mission.enums.AtBContractType;
-import mekhq.campaign.mission.newContract.NormalContractObjective;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 
 public class ContractGenerationGodClass {
     private static final MMLogger LOGGER = MMLogger.create(ContractGenerationGodClass.class);
 
-    private final Campaign campaign;
-    private final CampaignTypeForContractDetermination campaignType;
-    private final LocalDate currentDate;
-    private final Faction campaignFaction;
-    private final HiringHallLevel hiringHallLevel;
-    private final ContractEmployerDetermination contractEmployerDetermination;
-    private final double forceReputationFactor;
-    private final AbstractLocation currentLocation;
+    public ContractGenerationGodClass() {
+    }
 
-    public ContractGenerationGodClass(Campaign campaign, CampaignTypeForContractDetermination campaignType,
-          HiringHallLevel hiringHallLevel,
-          int adjustedConnectionsLevel,
-          AbstractLocation currentLocation) {
-        this.campaign = campaign;
-        this.campaignType = campaignType;
-        this.currentDate = campaign.getLocalDate();
-        this.campaignFaction = campaign.getFaction();
-        this.forceReputationFactor = campaign.getReputation().getReputationFactor();
-        this.currentLocation = currentLocation;
-        this.hiringHallLevel = hiringHallLevel;
+    public void generateContract(Campaign campaign, double forceReputationFactor, AbstractLocation currentLocation,
+          Person negotiator) {
+        LocalDate currentDate = campaign.getLocalDate();
+        Faction campaignFaction = campaign.getFaction();
 
-        contractEmployerDetermination = new ContractEmployerDetermination(currentDate,
-              campaignFaction,
+        PlanetarySystem currentSystem = currentLocation.getCurrentSystem();
+        HiringHallLevel hiringHallLevel = currentSystem == null ?
+                                                HiringHallLevel.NONE :
+                                                currentSystem.getHiringHallLevel(currentDate);
+
+        int adjustedConnectionsLevel = negotiator.getAdjustedConnections(false);
+
+        // Pick employer
+        EmployerFactionSelection employerFactionSelectionData =
+              ContractEmployerDetermination.getEmployerFactionSelectionData(currentLocation,
+                    adjustedConnectionsLevel,
+                    campaignFaction,
+                    currentDate,
+                    hiringHallLevel,
+                    forceReputationFactor);
+        Faction employerFaction = employerFactionSelectionData.employerFaction();
+        if (employerFaction == null) {
+            LOGGER.error("Could not find employer for contract generation. No contract generated.");
+            return;
+        }
+
+        // Pick contract type
+        List<AtBContractType> objectives = MissionObjectiveTypeDetermination.getObjectiveType(campaign,
               hiringHallLevel,
-              forceReputationFactor,
-              adjustedConnectionsLevel,
-              currentLocation);
-    }
+              negotiator,
+              employerFaction,
+              employerFactionSelectionData.globalEmployerTableValue(),
+              employerFactionSelectionData.independentEmployerTableValue());
+        AtBContractType firstObjective = objectives.getFirst();
 
-    public void generateContract(Person negotiator) {
-        EmployerFactionSelection employerFactionSelection = contractEmployerDetermination.getContractEmployer();
+        // Pick enemy
+        Faction enemyFaction = ObjectiveEnemyDetermination.generateEnemyFactionForObjective(currentLocation,
+              currentDate, employerFaction, firstObjective);
 
 
-        List<AtBContractType> objectiveTypes = getObjectives(negotiator, employerFactionSelection);
+        // Pick location
 
-        Faction employerFaction = employerFactionSelection.employerFaction();
-        AtBContractType firstObjective = objectiveTypes.getFirst();
-        Faction enemyFaction = getEnemyFaction(campaignType, firstObjective, employerFaction, currentDate);
-
-        String targetSystemId = DetermineContractLocation.generateContractLocation(employerFaction, enemyFaction);
-        PlanetarySystem targetPlanetarySystem = Systems.getInstance().getSystemById(targetSystemId);
-
-        // TODO Cache in contract object. We'll need to check if current location changed at any point
-        JumpPath jumpPath = LocationUtils.planJumpPath(currentLocation.getCurrentSystem(), targetPlanetarySystem,
-              campaign);
-
-        for (AtBContractType objective : objectiveTypes) {
-            NormalContractObjective contractObjective = new NormalContractObjective();
-        }
-
-        // Under CamOps pirates don't generate employers they generate targets, so employer is always pirates, CamOps
-        // pg 39 rev 5th edition
-        if (campaignType == CampaignTypeForContractDetermination.PIRATE) {
-            employerFaction = Factions.getInstance().getFaction(PIRATE_FACTION_CODE);
-        }
-    }
-
-    private List<AtBContractType> getObjectives(Person negotiator, EmployerFactionSelection employerFactionSelection) {
-        MissionObjectiveTypeDetermination objectiveTypeDetermination = new MissionObjectiveTypeDetermination(campaign,
-              hiringHallLevel, negotiator, employerFactionSelection.employerFaction(),
-              employerFactionSelection.globalEmployerTableValue(),
-              employerFactionSelection.independentEmployerTableValue());
-
-        return objectiveTypeDetermination.getObjectiveType();
     }
 }

@@ -43,7 +43,7 @@ import java.time.LocalDate;
 
 import jakarta.annotation.Nullable;
 import megamek.logging.MMLogger;
-import mekhq.campaign.AbstractLocation;
+import mekhq.campaign.location.ILocation;
 import mekhq.campaign.personnel.enums.ConnectionsLevel;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -56,27 +56,41 @@ public class ContractEmployerDetermination {
     private static final int COMSTAR_EMPLOYER_CHANCE = 100;
     private static final int WORD_OF_BLAKE_EMPLOYER_CHANCE = 40;
 
-    private final LocalDate currentDate;
-    private final Faction campaignFaction;
-    private final CampaignTypeForContractDetermination campaignType;
-    private final HiringHallLevel hiringHallLevel;
-    private final double forceReputationFactor;
-    private final ConnectionsLevel connectionsLevel;
-    private final AbstractLocation currentLocation;
+    public ContractEmployerDetermination() {}
 
-    public ContractEmployerDetermination(LocalDate currentDate, Faction campaignFaction,
-          HiringHallLevel hiringHallLevel, double forceReputationFactor, int adjustedConnectionsLevel,
-          AbstractLocation currentLocation) {
-        this.currentDate = currentDate;
-        this.campaignFaction = campaignFaction;
-        this.campaignType = getCampaignTypeFromFaction();
-        this.hiringHallLevel = hiringHallLevel;
-        this.forceReputationFactor = forceReputationFactor;
-        this.connectionsLevel = ConnectionsLevel.parseConnectionsLevelFromInt(adjustedConnectionsLevel);
-        this.currentLocation = currentLocation;
+    public static EmployerFactionSelection getEmployerFactionSelectionData(ILocation currentLocation,
+          int adjustedConnectionsLevel, Faction campaignFaction, LocalDate currentDate, HiringHallLevel hiringHallLevel,
+          double forceReputationFactor) {
+        CampaignTypeForContractDetermination campaignType = getCampaignTypeFromFaction(campaignFaction);
+        ConnectionsLevel connectionsLevel = ConnectionsLevel.parseConnectionsLevelFromInt(adjustedConnectionsLevel);
+        int connectionsEquipLevel = connectionsLevel.getEquipLevel();
+
+        return switch (campaignType) {
+            // CampOps pg 39 rev 5th printing states that mercenaries get a semi-random employer. We generate this by
+            // looking at all potential employers in the contract search radius. Our generation method is based on
+            // the table found in the above-cited page but is not an exact match due to legacy reasons.
+            case MERCENARY -> getEmployerUsingMercenaryMethod(currentLocation, currentDate, hiringHallLevel,
+                  connectionsEquipLevel,
+                  forceReputationFactor, true);
+            // Pirate factions are actually picking their victim at this stage. Victim is then used to generate
+            // the contract type and then later overwritten by the pirate faction
+            // TODO makes sure you did the above
+            case PIRATE -> getEmployerUsingMercenaryMethod(currentLocation,
+                  currentDate,
+                  hiringHallLevel,
+                  connectionsEquipLevel,
+                  forceReputationFactor,
+                  false);
+            // Government factions always have themselves as the employer. Government factions as any campaign
+            // faction that is not pirate or mercenary.
+            case GOVERNMENT -> {
+                GlobalEmployerTableValue globalType = GlobalEmployerTableValue.getFactionTableType(campaignFaction);
+                yield new EmployerFactionSelection(campaignFaction, globalType, null);
+            }
+        };
     }
 
-    private CampaignTypeForContractDetermination getCampaignTypeFromFaction() {
+    private static CampaignTypeForContractDetermination getCampaignTypeFromFaction(Faction campaignFaction) {
         if (campaignFaction.isPirate()) {
             return CampaignTypeForContractDetermination.PIRATE;
         }
@@ -86,25 +100,6 @@ public class ContractEmployerDetermination {
         }
 
         return CampaignTypeForContractDetermination.GOVERNMENT;
-    }
-
-    public EmployerFactionSelection getContractEmployer() {
-        return switch (campaignType) {
-            // CampOps pg 39 rev 5th printing states that mercenaries get a semi-random employer. We generate this by
-            // looking at all potential employers in the contract search radius. Our generation method is based on
-            // the table found in the above-cited page but is not an exact match due to legacy reasons.
-            case MERCENARY -> getEmployerUsingMercenaryMethod();
-            // Pirate factions are actually picking their victim at this stage. Victim is then used to generate
-            // the contract type and then later overwritten by the pirate faction
-            // TODO makes sure you did the above
-            case PIRATE -> getEmployerUsingMercenaryMethod();
-            // Government factions always have themselves as the employer. Government factions as any campaign
-            // faction that is not pirate or mercenary.
-            case GOVERNMENT -> {
-                GlobalEmployerTableValue globalType = GlobalEmployerTableValue.getFactionTableType(campaignFaction);
-                yield new EmployerFactionSelection(campaignFaction, globalType, null);
-            }
-        };
     }
 
     /**
@@ -121,7 +116,10 @@ public class ContractEmployerDetermination {
      *
      * @return the faction representing the contract employer
      */
-    private @Nullable EmployerFactionSelection getEmployerUsingMercenaryMethod() {
+    private static EmployerFactionSelection getEmployerUsingMercenaryMethod(ILocation currentLocation,
+          LocalDate currentDate,
+          HiringHallLevel hiringHallLevel, int connectionsEquipLevel, double forceReputationFactor,
+          boolean isMercenaryCampaignType) {
         int currentYear = currentDate.getYear();
 
         Faction specialEmployer = checkForSpecialEmployer(currentYear);
@@ -133,18 +131,23 @@ public class ContractEmployerDetermination {
         // CamOps pg 39 rev 5th printing states that a player can pick any employer at or below their roll. This
         // creates a UX issue for MekHQ. To avoid spamming the player, we instead use the exact employer matching the
         // roll
-        GlobalEmployerTableValue globalEmployerType = getGlobalEmployer();
+        GlobalEmployerTableValue globalEmployerType = getGlobalEmployer(hiringHallLevel,
+              connectionsEquipLevel,
+              forceReputationFactor);
         IndependentEmployerTableValue independentEmployerType = globalEmployerType == INDEPENDENT ?
-                                                                      getIndependentEmployer() :
+                                                                      getIndependentEmployer(hiringHallLevel,
+                                                                            connectionsEquipLevel,
+                                                                            forceReputationFactor) :
                                                                       null;
 
         GlobalEmployerTableValue employerSearchFactionType = getFinalGlobalFactionTableValue(globalEmployerType,
-              independentEmployerType);
+              independentEmployerType, hiringHallLevel, connectionsEquipLevel, forceReputationFactor);
 
-        Faction employerFaction = getEmployer(employerSearchFactionType);
-        return employerFaction == null ?
-                     null :
-                     new EmployerFactionSelection(employerFaction, globalEmployerType, independentEmployerType);
+        Faction employerFaction = getEmployer(employerSearchFactionType,
+              currentDate,
+              currentLocation,
+              isMercenaryCampaignType);
+        return new EmployerFactionSelection(employerFaction, globalEmployerType, independentEmployerType);
     }
 
     private static @Nullable Faction checkForSpecialEmployer(int currentYear) {
@@ -181,23 +184,30 @@ public class ContractEmployerDetermination {
         return currentYear >= startYearComStar && currentYear <= endingYearComStar;
     }
 
-    private GlobalEmployerTableValue getFinalGlobalFactionTableValue(GlobalEmployerTableValue globalEmployerType,
-          IndependentEmployerTableValue independentEmployerType) {
+    private static GlobalEmployerTableValue getFinalGlobalFactionTableValue(GlobalEmployerTableValue globalEmployerType,
+          IndependentEmployerTableValue independentEmployerType, HiringHallLevel hiringHallLevel,
+          int connectionsEquipLevel, double forceReputationFactor) {
         if (globalEmployerType == GlobalEmployerTableValue.INDEPENDENT) {
-            GlobalEmployerTableValue newGlobalEmployerFaction = getSecondaryGlobalEmployerType(independentEmployerType);
+            GlobalEmployerTableValue newGlobalEmployerFaction = getSecondaryGlobalEmployerType(independentEmployerType,
+                  hiringHallLevel,
+                  connectionsEquipLevel,
+                  forceReputationFactor);
             return newGlobalEmployerFaction != null ? newGlobalEmployerFaction : globalEmployerType;
         }
 
         return globalEmployerType;
     }
 
-    private @Nullable GlobalEmployerTableValue getSecondaryGlobalEmployerType(
-          IndependentEmployerTableValue independentEmployerType) {
+    private static @Nullable GlobalEmployerTableValue getSecondaryGlobalEmployerType(
+          IndependentEmployerTableValue independentEmployerType, HiringHallLevel hiringHallLevel,
+          int connectionsEquipLevel, double forceReputationFactor) {
         boolean isIndependentOverride = isIsIndependentOverride(independentEmployerType);
 
         GlobalEmployerTableValue secondaryGlobalEmployerType = null;
         if (isIndependentOverride) {
-            secondaryGlobalEmployerType = getGlobalEmployer();
+            secondaryGlobalEmployerType = getGlobalEmployer(hiringHallLevel,
+                  connectionsEquipLevel,
+                  forceReputationFactor);
         }
 
         return secondaryGlobalEmployerType;
@@ -212,13 +222,15 @@ public class ContractEmployerDetermination {
         };
     }
 
-    private @Nullable Faction getEmployer(@Nullable GlobalEmployerTableValue globalEmployerType) {
+    private static @Nullable Faction getEmployer(@Nullable GlobalEmployerTableValue globalEmployerType,
+          LocalDate currentDate,
+          ILocation currentLocation, boolean isMercenaryFactionType) {
         RandomFactionGenerator generator = RandomFactionGenerator.getInstance();
         while (globalEmployerType != null) {
             Faction employerFaction = generator.getRandomEmployerFaction(currentLocation,
                   currentDate,
                   globalEmployerType,
-                  campaignFaction.isMercenary());
+                  isMercenaryFactionType);
 
             if (employerFaction != null) {
                 return employerFaction;
@@ -232,21 +244,24 @@ public class ContractEmployerDetermination {
         return null;
     }
 
-    private IndependentEmployerTableValue getIndependentEmployer() {
-        int roll = getEmployerRoll();
+    private static IndependentEmployerTableValue getIndependentEmployer(HiringHallLevel hiringHallLevel,
+          int connectionsEquipLevel, double forceReputationFactor) {
+        int roll = getEmployerRoll(hiringHallLevel, connectionsEquipLevel, forceReputationFactor);
         return IndependentEmployerTableValue.getEmployerForRoll(roll);
     }
 
-    private GlobalEmployerTableValue getGlobalEmployer() {
-        int roll = getEmployerRoll();
+    private static GlobalEmployerTableValue getGlobalEmployer(HiringHallLevel hiringHallLevel,
+          int connectionsEquipLevel,
+          double forceReputationFactor) {
+        int roll = getEmployerRoll(hiringHallLevel, connectionsEquipLevel, forceReputationFactor);
         return GlobalEmployerTableValue.getEmployerForRoll(roll);
     }
 
-    private int getEmployerRoll() {
+    private static int getEmployerRoll(HiringHallLevel hiringHallLevel, int connectionsEquipLevel,
+          double forceReputationFactor) {
         int roll = d6(2);
         int hiringHallModifier = hiringHallLevel.getEmployerModifier();
-        int connectionsModifier = connectionsLevel.getEquipLevel();
 
-        return roll + hiringHallModifier + connectionsModifier + (int) floor(forceReputationFactor);
+        return roll + hiringHallModifier + connectionsEquipLevel + (int) floor(forceReputationFactor);
     }
 }
