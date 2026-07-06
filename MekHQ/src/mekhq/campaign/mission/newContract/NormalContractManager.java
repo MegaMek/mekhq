@@ -32,8 +32,8 @@
  */
 package mekhq.campaign.mission.newContract;
 
-public class NormalContractObjective extends AbstractContractObjective {
-    public NormalContractObjective() {
+public class NormalContractManager extends AbstractContractManager {
+    public NormalContractManager() {
         super();
     }
 }

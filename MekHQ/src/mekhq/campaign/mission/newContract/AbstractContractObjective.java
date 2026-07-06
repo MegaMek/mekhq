@@ -32,42 +32,22 @@
  */
 package mekhq.campaign.mission.newContract;
 
-import java.util.UUID;
-
-import jakarta.annotation.Nullable;
 import mekhq.campaign.mission.enums.AtBContractType;
-import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Factions;
 
 public abstract class AbstractContractObjective {
-    String name;
-    UUID objectiveId;
-    AbstractContractManager parentContract;
-    AtBContractType objectiveType;
-    String enemyFactionCode;
+    private transient AbstractContractManager parentContractManager;
+    private AtBContractType objectiveType;
+    private String enemyFactionCode;
 
-    public String getName() {
-        return name;
+    public AbstractContractObjective() {
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public AbstractContractManager getParentContractManager() {
+        return parentContractManager;
     }
 
-    public UUID getObjectiveId() {
-        return objectiveId;
-    }
-
-    public void setObjectiveId(UUID objectiveId) {
-        this.objectiveId = objectiveId;
-    }
-
-    public AbstractContractManager getParentContract() {
-        return parentContract;
-    }
-
-    public void setParentContract(AbstractContractManager parentContract) {
-        this.parentContract = parentContract;
+    public void setParentContractManager(AbstractContractManager parentContractManager) {
+        this.parentContractManager = parentContractManager;
     }
 
     public AtBContractType getObjectiveType() {
@@ -82,15 +62,7 @@ public abstract class AbstractContractObjective {
         return enemyFactionCode;
     }
 
-    public @Nullable Faction getEnemyFaction() {
-        return Factions.getInstance().getFaction(enemyFactionCode);
-    }
-
     public void setEnemyFactionCode(String enemyFactionCode) {
         this.enemyFactionCode = enemyFactionCode;
-    }
-
-    public void setEnemyFactionCode(Faction enemyFaction) {
-        enemyFactionCode = enemyFaction.getShortName();
     }
 }

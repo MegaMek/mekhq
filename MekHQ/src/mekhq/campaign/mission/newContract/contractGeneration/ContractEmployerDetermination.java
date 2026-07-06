@@ -44,7 +44,6 @@ import java.time.LocalDate;
 import jakarta.annotation.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.location.ILocation;
-import mekhq.campaign.personnel.enums.ConnectionsLevel;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RandomFactionGenerator;
@@ -59,11 +58,9 @@ public class ContractEmployerDetermination {
     public ContractEmployerDetermination() {}
 
     public static EmployerFactionSelection getEmployerFactionSelectionData(ILocation currentLocation,
-          int adjustedConnectionsLevel, Faction campaignFaction, LocalDate currentDate, HiringHallLevel hiringHallLevel,
+          int connectionsEquipLevel, Faction campaignFaction, LocalDate currentDate, HiringHallLevel hiringHallLevel,
           double forceReputationFactor) {
         CampaignTypeForContractDetermination campaignType = getCampaignTypeFromFaction(campaignFaction);
-        ConnectionsLevel connectionsLevel = ConnectionsLevel.parseConnectionsLevelFromInt(adjustedConnectionsLevel);
-        int connectionsEquipLevel = connectionsLevel.getEquipLevel();
 
         return switch (campaignType) {
             // CampOps pg 39 rev 5th printing states that mercenaries get a semi-random employer. We generate this by

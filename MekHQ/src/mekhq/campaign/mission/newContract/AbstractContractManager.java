@@ -32,11 +32,65 @@
  */
 package mekhq.campaign.mission.newContract;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+
+import jakarta.annotation.Nullable;
+import megamek.logging.MMLogger;
 
 public abstract class AbstractContractManager {
-    String name;
-    UUID contractId;
-    List<AbstractContractObjective> contractObjectives;
+    private final static MMLogger LOGGER = MMLogger.create(AbstractContractManager.class);
+
+    private String employerFactionCode;
+    private String targetSystemId;
+    private List<AbstractContractObjective> contractObjectives;
+
+    public AbstractContractManager() {
+    }
+
+    public String getTargetSystemId() {
+        return targetSystemId;
+    }
+
+    public void setTargetSystemId(String targetSystemId) {
+        this.targetSystemId = targetSystemId;
+    }
+
+    public String getEmployerFactionCode() {
+        return employerFactionCode;
+    }
+
+    public void setEmployerFactionCode(String employerFactionCode) {
+        this.employerFactionCode = employerFactionCode;
+    }
+
+    public List<AbstractContractObjective> getContractAllObjectivesDirect() {
+        return contractObjectives;
+    }
+
+    public List<AbstractContractObjective> getContractAllObjectivesCopy() {
+        return new ArrayList<>(contractObjectives);
+    }
+
+    public @Nullable AbstractContractObjective getContractObjective(int index) {
+        try {
+            return contractObjectives.get(index);
+        } catch (IndexOutOfBoundsException e) {
+            LOGGER.error("Index out of bounds: {}", index);
+            return null;
+        }
+    }
+
+    public void setContractObjectives(List<AbstractContractObjective> contractObjectives) {
+        this.contractObjectives = contractObjectives;
+    }
+
+    public void addContractObjective(AbstractContractObjective contractObjective) {
+        contractObjective.setParentContractManager(this);
+        contractObjectives.add(contractObjective);
+    }
+
+    public void removeContractObjective(AbstractContractObjective contractObjective) {
+        contractObjectives.remove(contractObjective);
+    }
 }
