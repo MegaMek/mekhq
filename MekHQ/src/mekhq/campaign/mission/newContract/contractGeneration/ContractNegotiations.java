@@ -30,10 +30,22 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.mission.mission.contractGeneration;
+package mekhq.campaign.mission.newContract.contractGeneration;
 
-public enum CampaignTypeForContractDetermination {
-    MERCENARY,
-    PIRATE,
-    GOVERNMENT
+public class ContractNegotiations {
+    // Length
+
+    // Contract-level
+    // Employer Factor
+    // Reputation Factor
+    // Final Payment
+    // Command Rights
+    // Salvage Rights
+    // Support Rights
+    // Transport Terms
+
+    // Objective-level
+    // Base payment
+    // Transport Costs
+    // Tempo
 }

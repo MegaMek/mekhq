@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.mission.mission.contractGeneration;
+package mekhq.campaign.mission.newContract.contractGeneration;
 
 import static java.lang.Math.clamp;
 import static megamek.common.compute.Compute.d6;

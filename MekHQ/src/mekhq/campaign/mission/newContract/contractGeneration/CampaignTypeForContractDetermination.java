@@ -30,13 +30,10 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.mission.mission.contractGeneration;
+package mekhq.campaign.mission.newContract.contractGeneration;
 
-public enum NegotiationsModifierType {
-    TEMPO_MULTIPLIER,
-    EMPLOYMENT_MULTIPLIER,
-    COMMAND_MODIFIER,
-    SALVAGE_MODIFIER,
-    SUPPORT_MODIFIER,
-    TRANSPORT_MODIFIER;
+public enum CampaignTypeForContractDetermination {
+    MERCENARY,
+    PIRATE,
+    GOVERNMENT
 }

@@ -30,12 +30,12 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.mission.mission.contractGeneration;
+package mekhq.campaign.mission.newContract.contractGeneration;
 
 import static java.lang.Math.floor;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
-import static mekhq.campaign.mission.mission.contractGeneration.GlobalEmployerTableValue.INDEPENDENT;
+import static mekhq.campaign.mission.newContract.contractGeneration.GlobalEmployerTableValue.INDEPENDENT;
 import static mekhq.campaign.universe.Faction.COMSTAR_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.WORD_OF_BLAKE_FACTION_CODE;
 

@@ -1,4 +1,4 @@
-package mekhq.campaign.mission.mission.contractGeneration;
+package mekhq.campaign.mission.newContract.contractGeneration;
 
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.universe.Faction.BANDIT_CASTE_FACTION_CODE;

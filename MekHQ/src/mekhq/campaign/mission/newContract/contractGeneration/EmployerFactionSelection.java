@@ -1,4 +1,4 @@
-package mekhq.campaign.mission.mission.contractGeneration;
+package mekhq.campaign.mission.newContract.contractGeneration;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;

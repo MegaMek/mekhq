@@ -1,6 +1,6 @@
-package mekhq.campaign.mission.mission.contractGeneration;
+package mekhq.campaign.mission.newContract.contractGeneration;
 
-import static mekhq.campaign.mission.mission.contractGeneration.ObjectiveEnemyDetermination.getEnemyFaction;
+import static mekhq.campaign.mission.newContract.contractGeneration.ObjectiveEnemyDetermination.getEnemyFaction;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 
 import java.time.LocalDate;
@@ -12,7 +12,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.mission.enums.AtBContractType;
-import mekhq.campaign.mission.mission.NormalContractObjective;
+import mekhq.campaign.mission.newContract.NormalContractObjective;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -54,6 +54,8 @@ public class ContractGenerationGodClass {
 
     public void generateContract(Person negotiator) {
         EmployerFactionSelection employerFactionSelection = contractEmployerDetermination.getContractEmployer();
+
+
         List<AtBContractType> objectiveTypes = getObjectives(negotiator, employerFactionSelection);
 
         Faction employerFaction = employerFactionSelection.employerFaction();

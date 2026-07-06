@@ -53,8 +53,8 @@ import java.util.List;
 import java.util.Set;
 
 import mekhq.campaign.location.ILocation;
-import mekhq.campaign.mission.mission.contractGeneration.GlobalEmployerTableValue;
 import mekhq.campaign.mission.newContract.EnemySelectionProfile;
+import mekhq.campaign.mission.newContract.contractGeneration.GlobalEmployerTableValue;
 import mekhq.campaign.universe.enums.HPGRating;
 import mekhq.campaign.universe.factionHints.FactionHints;
 import org.junit.jupiter.api.AfterEach;
