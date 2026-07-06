@@ -57,8 +57,13 @@ public class ContractGenerationGodClass {
         Faction enemyFaction = ObjectiveEnemyDetermination.generateEnemyFactionForObjective(currentLocation,
               currentDate, employerFaction, firstObjective);
 
-
         // Pick location
-
+        // TODO change from short name to faction object
+        String targetSystemId = ContractLocationDetermination.determineContractLocation(firstObjective, true,
+              employerFaction.getShortName(), enemyFaction.getShortName(), currentLocation);
+        if (targetSystemId == null) {
+            LOGGER.error("Could not find target system for contract generation. No contract generated.");
+            return;
+        }
     }
 }
