@@ -50,7 +50,6 @@ import static mekhq.campaign.personnel.PersonnelOptions.EDGE_COMMANDER_NEGOTIATI
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.campaign.randomEvents.other.GrayMonday.isGrayMonday;
 import static mekhq.campaign.universe.Faction.COMSTAR_FACTION_CODE;
-import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.WORD_OF_BLAKE_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -76,6 +75,7 @@ import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.ContractCommandRights;
+import mekhq.campaign.mission.newContract.EnemySelectionProfile;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -258,27 +258,6 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                 numContracts++;
             }
 
-            /*
-             * If located on a faction's capital (interpreted as the starting planet for that faction),
-             * generate one contract offer for that faction.
-             */
-            if (!campaign.isPirateCampaign()) {
-                for (Faction f : campaign.getCurrentSystem().getFactionSet(campaign.getLocalDate())) {
-                    try {
-                        if (f.getStartingPlanet(campaign.getLocalDate()).equals(campaign.getCurrentSystem().getId()) &&
-                                  RandomFactionGenerator.getInstance().getEmployerSet().contains(f.getShortName())) {
-                            AtBContract c = generateAtBContract(campaign, f.getShortName(), unitRatingMod);
-                            if (c != null) {
-                                contracts.add(c);
-                                break;
-                            }
-                        }
-                    } catch (ArrayIndexOutOfBoundsException e) {
-                        // no starting planet in current era; continue to next faction
-                    }
-                }
-            }
-
             if (newCampaign) {
                 numContracts = max(numContracts, 2);
             }
@@ -320,13 +299,14 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
     private @Nullable AtBContract generateAtBContract(Campaign campaign, int unitRatingMod) {
         AtBContract contract = null;
 
+        boolean isMercenaryCampaign = campaign.isMercenaryCampaign();
         if (campaign.getFaction().isMercenary()) {
             if (null == campaign.getRetainerEmployerCode()) {
                 int retries = MAXIMUM_GENERATION_RETRIES;
                 while ((retries > 0) && (contract == null)) {
                     Faction employer =
-                          RandomFactionGenerator.getInstance().getEmployerFaction(campaign.getCurrentLocation(),
-                                campaign.getLocalDate());
+                          RandomFactionGenerator.getInstance().getRandomEmployerFaction(campaign.getCurrentLocation(),
+                                campaign.getLocalDate(), null, isMercenaryCampaign);
                     if (employer == null) {
                         retries--;
                         continue;
@@ -492,8 +472,12 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         if (Factions.getInstance().getFaction(employer).isMercenary()) {
             contract.setMercSubcontract(true);
             for (int attempts = 0; attempts < MAXIMUM_ATTEMPTS_TO_FIND_NON_MERC_EMPLOYER; ++attempts) {
-                employer = RandomFactionGenerator.getInstance().getEmployerFaction(campaign.getCurrentLocation(),
-                      campaign.getLocalDate()).getShortName();
+                Faction rerolledEmployer = RandomFactionGenerator.getInstance()
+                                                 .getRandomEmployerFaction(campaign.getCurrentLocation(),
+                                                       campaign.getLocalDate(),
+                                                       null,
+                                                       true);
+                employer = rerolledEmployer == null ? null : rerolledEmployer.getShortName();
                 if ((employer != null) && !Factions.getInstance().getFaction(employer).isMercenary()) {
                     break;
                 }
@@ -508,7 +492,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
         getContractType(contract);
 
-        setEnemyCode(contract);
+        setEnemyCode(contract, campaign);
 
         /*
          * Addition to AtB rules: factions which are generally neutral
@@ -531,7 +515,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         }
         setAttacker(contract);
         try {
-            setSystemId(contract);
+            setSystemId(contract, campaign);
         } catch (NoContractLocationFoundException ex) {
             return generateAtBContract(campaign, employer, unitRatingMod, retries - 1);
         }
@@ -562,6 +546,14 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                   campaign.getCurrentSystem().getName(campaign.getLocalDate()));
             return generateAtBContract(campaign, employer, unitRatingMod, retries - 1);
         }
+
+        if (violatesHomeworldsExclusion(contract, campaign)) {
+            logger.warn(
+                  "Contract location {} is within the Clan Homeworlds exclusion zone outside Operation Bulldog; "
+                        + "retrying.", contract.getSystem().getName(campaign.getLocalDate()));
+            return generateAtBContract(campaign, employer, unitRatingMod, retries - 1);
+        }
+
         final ReputationController reputation = campaign.getReputation();
         final SkillLevel campaignSkillLevel = reputation == null ? REGULAR : reputation.getAverageSkillLevel();
         final boolean useDynamicDifficulty = campaign.getCampaignOptions().isUseDynamicDifficulty();
@@ -597,19 +589,25 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         contract.initContractDetails(campaign);
         contract.calculateContract(campaign);
 
-        contract.setName(generateDefaultName(employer, contract));
+        contract.setName(generateDefaultName(employer, contract, campaign));
 
         contract.clanTechSalvageOverride();
 
         return contract;
     }
 
-    static @org.jspecify.annotations.NonNull String generateDefaultName(String employer, AtBContract contract) {
+    static @org.jspecify.annotations.NonNull String generateDefaultName(String employer, AtBContract contract,
+          Campaign campaign) {
         return String.format("%s - %s - %s %s",
               contract.getStartDate()
                     .format(DateTimeFormatter.ofPattern("yyyy").withLocale(MekHQ.getMHQOptions().getDateLocale())),
               employer,
-              contract.getSystem().getName(contract.getStartDate()),
+              // Uses the campaign's current date rather than the contract's (possibly much later) start date: some
+              // targets are only reachable via a distant war partner with no local presence, and their start date can
+              // land past a scripted historical ownership change for that system. Planet's event cache is a single
+              // forward-advancing cursor shared by every accessor, so querying it with a future date here would
+              // permanently corrupt getFactionSet() and everything else for that system for the rest of the session.
+              contract.getSystem().getName(campaign.getLocalDate()),
               contract.getContractType());
     }
 
@@ -618,16 +616,13 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         contract.updateEmployer(parent.getEmployerCode(), campaign.getGameYear());
         getContractType(contract);
 
-        if (contract.getContractType().isPirateHunting()) {
-            Faction employer = contract.getEmployerFaction();
-            contract.setEnemyCode(employer.isClan() ? "BAN" : PIRATE_FACTION_CODE);
-        } else if (contract.getContractType().isRiotDuty()) {
-            contract.setEnemyCode("REB");
-        } else {
-            contract.setEnemyCode(RandomFactionGenerator.getInstance()
-                                        .getEnemy(contract.getEmployerCode(),
-                                              contract.getContractType().isGarrisonType()));
-        }
+        // Same type-derived enemy preference as setEnemyCode, minus the mercenary-opposition substitution, which
+        // subcontracts have never rolled for.
+        Faction enemyFaction = RandomFactionGenerator.getInstance()
+                                     .getRandomEnemy(campaign.getCurrentLocation(), campaign.getLocalDate(),
+                                           contract.getEmployerFaction(),
+                                           EnemySelectionProfile.fromContractType(contract.getContractType()));
+        contract.setEnemyCode(enemyFaction.getShortName());
         if (contract.getContractType().isGarrisonDuty() && contract.getEnemy().isRebel()) {
             contract.setContractTypeAndName(AtBContractType.RIOT_DUTY);
         }

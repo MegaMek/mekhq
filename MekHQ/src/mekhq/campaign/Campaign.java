@@ -3682,13 +3682,15 @@ public class Campaign implements ITechManager, IPlace {
         }
         int xpGained = 0;
         if (skillCheckResult.isSuccess()) {
-            boolean useFunctionalAppraisal = campaignOptions.isUseFunctionalAppraisal();
-            boolean isUseEdge = person != null &&
-                                      campaignOptions.isUseEdge() &&
-                                      person.getOptions().booleanOption(EDGE_ADMIN_APPRAISAL_FAIL);
-            double valueChange = useFunctionalAppraisal ? Appraisal.performAppraisalMultiplierCheck(person,
-                  currentDay, isUseEdge) : 1.0;
-            String appraisalReport = useFunctionalAppraisal ? Appraisal.getAppraisalReport(valueChange) : "";
+            double valueChange = 1.0;
+            String appraisalReport = "";
+            if (campaignOptions.isUseFunctionalAppraisal() && person != null) {
+                boolean isUseEdge = campaignOptions.isUseEdge() &&
+                                          person.getOptions().booleanOption(EDGE_ADMIN_APPRAISAL_FAIL);
+                ActionCheckResult appraisalResult = Appraisal.performAppraisalCheck(person, currentDay, isUseEdge);
+                valueChange = Appraisal.getAppraisalCostMultiplier(appraisalResult.getMarginOfSuccess());
+                appraisalReport = Appraisal.getAppraisalReport(valueChange, appraisalResult.getReportMargin());
+            }
 
             if (transitDays < 0) {
                 transitDays = calculatePartTransitTime(acquisition.getAvailability());

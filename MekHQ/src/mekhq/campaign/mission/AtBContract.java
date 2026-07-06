@@ -81,6 +81,7 @@ import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.ContractCommandRights;
+import mekhq.campaign.mission.newContract.EnemySelectionProfile;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
@@ -283,7 +284,12 @@ public class AtBContract extends Contract {
     public void updateEnemy(Campaign campaign, LocalDate today, @Nullable String enemyCode) {
         if (enemyCode == null) {
             Faction employer = getEmployerFaction();
-            enemyCode = RandomFactionGenerator.getInstance().getEnemy(employer, false, true);
+            // Re-rolled with the same contract-type enemy preference the market uses, so e.g. a riot duty that
+            // "mixes it up" still ends up against rebels rather than a random neighboring power.
+            enemyCode = RandomFactionGenerator.getInstance()
+                              .getRandomEnemy(campaign.getCurrentLocation(), today, employer,
+                                    EnemySelectionProfile.fromContractType(getContractType()))
+                              .getShortName();
         }
         setEnemyCode(enemyCode);
 

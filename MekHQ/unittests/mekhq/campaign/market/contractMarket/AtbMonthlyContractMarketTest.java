@@ -39,6 +39,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -63,6 +64,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.mission.newContract.EnemySelectionProfile;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -210,8 +212,9 @@ class AtbMonthlyContractMarketTest {
 
             RandomFactionGenerator randomFactionGenerator = mock(RandomFactionGenerator.class);
             when(randomFactionGenerator.getFactionHints()).thenReturn(factionHints);
-            when(randomFactionGenerator.getEnemy(EMPLOYER_CODE, true)).thenReturn(ENEMY_CODE);
-            when(randomFactionGenerator.getMissionTarget(anyString(), anyString()))
+            when(randomFactionGenerator.getRandomEnemy(any(), any(), eq(employerFaction),
+                  any(EnemySelectionProfile.class))).thenReturn(enemyFaction);
+            when(randomFactionGenerator.getMissionTarget(anyString(), anyString(), any(), any()))
                   .thenReturn(UNREACHABLE_TARGET_ID)
                   .thenReturn(REACHABLE_TARGET_ID);
             RandomFactionGenerator.setInstance(randomFactionGenerator);

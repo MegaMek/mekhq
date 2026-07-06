@@ -45,8 +45,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 
+import megamek.codeUtilities.ObjectUtility;
+import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 import megamek.common.enums.SkillLevel;
 import megamek.common.universe.FactionTag;
@@ -257,6 +258,10 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         contractIds.put(lastId, contract);
         // Step 1: Determine Employer
         Faction employer = determineEmployer(campaign, reputation.getReputationModifier(), hiringHallModifiers);
+        if (employer == null) {
+            // No active faction matches the rolled employer column (e.g. no corporation factions in this era).
+            return Optional.empty();
+        }
         contract.updateEmployer(employer.getShortName(), campaign.getGameYear());
         if (employer.isMercenary()) {
             contract.setMercSubcontract(true);
@@ -264,12 +269,15 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         // Step 2: Determine the mission type
         contract.setContractTypeAndName(determineMission(campaign, employer, reputation.getReputationModifier()));
         ContractTerms contractTerms = getContractTerms(campaign, contract);
-        setEnemyCode(contract);
+        setEnemyCode(contract, campaign);
         setAttacker(contract);
         // Step 3: Set the system location
         try {
-            setSystemId(contract);
+            setSystemId(contract, campaign);
         } catch (NoContractLocationFoundException ex) {
+            return Optional.empty();
+        }
+        if (violatesHomeworldsExclusion(contract, campaign)) {
             return Optional.empty();
         }
         // Step 4: Populate some information about enemies and allies
@@ -330,7 +338,8 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         }
     }
 
-    private Faction determineEmployer(Campaign campaign, int ratingMod, HiringHallModifiers hiringHallModifiers) {
+    private @Nullable Faction determineEmployer(Campaign campaign, int ratingMod,
+          HiringHallModifiers hiringHallModifiers) {
         Collection<FactionTag> employerTags;
         int roll = Compute.d6(2) + ratingMod + hiringHallModifiers.employersMod;
         if (roll < 6) {
@@ -343,7 +352,15 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         return getRandomEmployer(campaign, employerTags);
     }
 
-    private Faction getRandomEmployer(Campaign campaign, Collection<FactionTag> employerTags) {
+    /**
+     * Picks a random active faction matching every tag of the rolled employer column (see {@link #getEmployerTags}).
+     *
+     * @param campaign     the active campaign; Clan factions other than the campaign's own are never valid employers
+     * @param employerTags the tags a faction must all carry to sit in the rolled employer column
+     *
+     * @return a random qualifying employer faction, or {@code null} if no active faction qualifies
+     */
+    private @Nullable Faction getRandomEmployer(Campaign campaign, Collection<FactionTag> employerTags) {
         Collection<Faction> factions = Factions.getInstance().getActiveFactions(campaign.getLocalDate());
         List<Faction> filtered = new ArrayList<>();
         for (Faction faction : factions) {
@@ -351,20 +368,29 @@ public class CamOpsContractMarket extends AbstractContractMarket {
             if (faction.isClan() && !faction.equals(campaign.getFaction())) {
                 continue;
             }
-            for (FactionTag employerTag : employerTags) {
-                if (!faction.is(employerTag)) {
-                    // The SMALL tag has to be converted to independent for now, since for some reason
-                    // independent is coded as a string.
-                    if (employerTag == FactionTag.SMALL && faction.isIndependent()) {
-                        continue;
-                    }
-                    break;
-                }
+            if (matchesAllEmployerTags(faction, employerTags)) {
                 filtered.add(faction);
             }
         }
-        Random rand = new Random();
-        return filtered.get(rand.nextInt(filtered.size()));
+        return filtered.isEmpty() ? null : ObjectUtility.getRandomItem(filtered);
+    }
+
+    /**
+     * @param faction      the candidate employer faction
+     * @param employerTags the tags of the rolled employer column
+     *
+     * @return {@code true} if the faction carries every one of the given tags; the SMALL tag is also satisfied by an
+     *       independent faction, since independence is coded as a string rather than a tag
+     */
+    static boolean matchesAllEmployerTags(Faction faction, Collection<FactionTag> employerTags) {
+        for (FactionTag employerTag : employerTags) {
+            boolean matches = faction.is(employerTag) ||
+                                    ((employerTag == FactionTag.SMALL) && faction.isIndependent());
+            if (!matches) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private Collection<FactionTag> getEmployerTags(Campaign campaign, int roll, boolean independent) {

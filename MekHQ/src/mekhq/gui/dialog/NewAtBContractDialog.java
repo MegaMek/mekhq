@@ -499,19 +499,22 @@ public class NewAtBContractDialog extends NewContractDialog {
             return;
         }
         AtBContract contract = (AtBContract) this.contract;
+        boolean isGarrisonType = contract.getContractType().isGarrisonType();
         HashSet<String> systems = new HashSet<>();
-        if (!contract.getContractType().isGarrisonType() ||
+        if (!isGarrisonType ||
                   Factions.getInstance().getFaction(getCurrentEnemyCode()).isRebelOrPirate()) {
             for (PlanetarySystem p : RandomFactionGenerator.getInstance()
-                                           .getMissionTargetList(getCurrentEmployerCode(), getCurrentEnemyCode())) {
+                                           .getMissionTargetList(getCurrentEmployerCode(), getCurrentEnemyCode(),
+                                                 campaign.getCurrentLocation())) {
                 systems.add(p.getName(campaign.getLocalDate()));
             }
         }
 
-        if ((contract.getContractType().isGarrisonType() || contract.getContractType().isReliefDuty()) &&
+        if ((isGarrisonType || contract.getContractType().isReliefDuty()) &&
                   !contract.getEnemy().isRebel()) {
             for (PlanetarySystem p : RandomFactionGenerator.getInstance()
-                                           .getMissionTargetList(getCurrentEnemyCode(), getCurrentEmployerCode())) {
+                                           .getMissionTargetList(getCurrentEnemyCode(), getCurrentEmployerCode(),
+                                                 campaign.getCurrentLocation())) {
                 systems.add(p.getName(campaign.getLocalDate()));
             }
         }

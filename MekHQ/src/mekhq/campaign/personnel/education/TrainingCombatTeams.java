@@ -42,8 +42,6 @@ import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
 import static mekhq.campaign.personnel.PersonnelOptions.EDGE_TRAINING;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_GLASS_JAW;
 import static mekhq.campaign.personnel.skills.SkillType.S_TRAINING;
-import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.BARELY_MADE_IT;
-import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginOfSuccessObject;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -96,8 +94,7 @@ import org.jspecify.annotations.NonNull;
  * <ol>
  *   <li>The combat team's commander makes a {@link SkillType#S_TRAINING}
  *       skill check. The raw margin of success drives the amount of XP awarded this session.</li>
- *   <li>A margin at or below {@link MarginOfSuccess#BARELY_MADE_IT}
- *       produces no XP for any trainee.</li>
+ *   <li>A failed skill check produces no XP for any trainee.</li>
  *   <li>Above that threshold, each trainee's target skill receives {@code max(1, marginOfSuccess)} XP.
  *       Accumulated XP persists across sessions until the improvement cost is met.</li>
  *   <li>When accumulated XP meets or exceeds the cost to improve (adjusted by
@@ -119,6 +116,7 @@ public class TrainingCombatTeams {
 
     private static final int EXPERIENCE_LEVEL_REDUCTION = -1;
     static final int XP_RATE_BASE_LINE = 1;
+    static final int XP_GAIN_MAX = 6;
 
     /**
      * Processes all training combat teams in the campaign.
@@ -208,9 +206,9 @@ public class TrainingCombatTeams {
         // Then build a set of their skills
         Map<String, Integer> educatorSkills = createSkillsList(campaign, educators);
 
-        int marginOfSuccess = performTrainingSkillCheck(campaign, commander);
+        ActionCheckResult actionCheckResult = performTrainingSkillCheck(campaign, commander);
 
-        performTraining(campaign, formation, commander, educatorSkills, marginOfSuccess);
+        performTraining(campaign, formation, commander, educatorSkills, actionCheckResult);
     }
 
     /**
@@ -229,16 +227,15 @@ public class TrainingCombatTeams {
      * {@code processEducationTime} helper method, using the result of the training check's {@code marginOfSuccess} to
      * determine training time awarded and progress.</p>
      *
-     * @param campaign        the current {@link Campaign} in which training is occurring
-     * @param formation       the {@link Formation} containing the units and trainees to train
-     * @param commander       the {@link Person} acting as the educator/commander providing the training
-     * @param educatorSkills  a map containing all skills and their experience levels available for teaching by the
-     *                        educator(s)
-     * @param marginOfSuccess the margin of success for the training check, as an integer (affects training
-     *                        speed/progress)
+     * @param campaign          the current {@link Campaign} in which training is occurring
+     * @param formation         the {@link Formation} containing the units and trainees to train
+     * @param commander         the {@link Person} acting as the educator/commander providing the training
+     * @param educatorSkills    a map containing all skills and their experience levels available for teaching by the
+     *                          educator(s)
+     * @param actionCheckResult the result of the training check
      */
     private static void performTraining(Campaign campaign, Formation formation, Person commander,
-          Map<String, Integer> educatorSkills, int marginOfSuccess) {
+          Map<String, Integer> educatorSkills, ActionCheckResult actionCheckResult) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         boolean useReasoningXPChanges = campaignOptions.isUseReasoningXpMultiplier();
         boolean isUseFatigue = campaignOptions.isUseFatigue();
@@ -293,7 +290,7 @@ public class TrainingCombatTeams {
                     continue;
                 }
 
-                String report = processTrainingTime(campaign, commander, trainee, skillsBeingTrained, marginOfSuccess,
+                String report = processTrainingTime(campaign, commander, trainee, skillsBeingTrained, actionCheckResult,
                       xpCostMultiplier, useReasoningXPChanges, campaign.getCampaignOptions().isPersonnelLogSkillGain(),
                       campaign.getLocalDate());
 
@@ -328,8 +325,7 @@ public class TrainingCombatTeams {
      *
      * <p>The method follows this sequence:</p>
      * <ol>
-     *   <li>Returns early with an empty string if training is impossible (skill check not cleared above {@link
-     *   MarginOfSuccess#BARELY_MADE_IT}, or no skills queued).</li>
+     *   <li>Returns early with an empty string if training is impossible (skill check failed, or no skills queued).</li>
      *   <li>Sorts {@code skillsBeingTrained} ascending by level and targets the lowest-level skill for improvement.</li>
      *   <li>Calculates the base XP cost to reach the next level of the target skill, applying
      *       {@code xpCostMultiplier} and optional reasoning-based adjustments.</li>
@@ -353,9 +349,8 @@ public class TrainingCombatTeams {
      *                              improvement occurs
      * @param skillsBeingTrained    the list of {@link Skill}s queued for training; sorted ascending by level in-place;
      *                              must not be {@code null}
-     * @param marginOfSuccess       the margin by which the skill check was passed; values at or below
-     *                              {@link MarginOfSuccess#BARELY_MADE_IT} immediately abort training with no XP
-     *                              applied; higher values yield proportionally more XP progress
+     * @param actionCheckResult     the result of the training check; failed skill checks immediately abort training
+     *                              with no XP applied; higher values yield proportionally more XP progress
      * @param xpCostMultiplier      a multiplier applied to the raw XP improvement cost before comparing against
      *                              progress; values below {@code 1.0} reduce the cost, values above {@code 1.0}
      *                              increase it
@@ -373,9 +368,9 @@ public class TrainingCombatTeams {
      * @since 0.51.01
      */
     private static String processTrainingTime(Campaign campaign, Person educator, Person trainee,
-          List<Skill> skillsBeingTrained, int marginOfSuccess, double xpCostMultiplier, boolean useReasoningXPChanges,
-          boolean isLogSkillChange, LocalDate today) {
-        if (isTrainingImpossible(skillsBeingTrained, marginOfSuccess)) {
+          List<Skill> skillsBeingTrained, ActionCheckResult actionCheckResult, double xpCostMultiplier,
+          boolean useReasoningXPChanges, boolean isLogSkillChange, LocalDate today) {
+        if (isTrainingImpossible(skillsBeingTrained, actionCheckResult)) {
             return "";
         }
 
@@ -388,7 +383,7 @@ public class TrainingCombatTeams {
         int baseCostToImprove = getBaseCostToImprove(trainee, xpCostMultiplier, useReasoningXPChanges,
               skillName, targetSkillLevel);
 
-        int finalXPProgress = getFinalXPProgress(marginOfSuccess, targetSkill);
+        int finalXPProgress = getFinalXPProgress(actionCheckResult, targetSkill);
 
         boolean wasTrainingCompleted = isWasTrainingCompleted(baseCostToImprove, finalXPProgress);
 
@@ -483,16 +478,17 @@ public class TrainingCombatTeams {
      * <p>Progress is at minimum 1 XP, scaled by the margin of success. Returns the skill's total accumulated XP
      * progress after applying this session's gain.</p>
      *
-     * @param marginOfSuccess the margin by which the skill check was passed, used to scale XP gain
-     * @param targetSkill     the {@link Skill} receiving the XP progress; its progress is mutated in-place
+     * @param actionCheckResult the training skill check result, used to scale XP gain
+     * @param targetSkill       the {@link Skill} receiving the XP progress; its progress is mutated in-place
      *
      * @return the skill's total accumulated XP progress after this session's contribution is applied
      *
      * @author Illiani
      * @since 0.51.01
      */
-    static int getFinalXPProgress(int marginOfSuccess, Skill targetSkill) {
-        int actualXPProgress = max(XP_RATE_BASE_LINE, (XP_RATE_BASE_LINE * marginOfSuccess));
+    public static int getFinalXPProgress(ActionCheckResult actionCheckResult, Skill targetSkill) {
+        int actualXPProgress = Math.clamp(XP_RATE_BASE_LINE * actionCheckResult.getMarginOfSuccess(),
+              XP_RATE_BASE_LINE, XP_GAIN_MAX);
         targetSkill.changeXpProgress(actualXPProgress);
 
         return targetSkill.getXpProgress();
@@ -540,22 +536,19 @@ public class TrainingCombatTeams {
      * queued for training.</p>
      *
      * @param skillsBeingTrained the list of {@link Skill}s queued for training
-     * @param marginOfSuccess    the margin by which the skill check was passed; must equal or exceed
-     *                           {@link MarginOfSuccess#BARELY_MADE_IT} for training to be possible
+     * @param actionCheckResult  the result of the training skill check; must succeed for training to be possible
      *
      * @return {@code true} if training cannot proceed; {@code false} if it can
      *
      * @author Illiani
      * @since 0.51.01
      */
-    static boolean isTrainingImpossible(List<Skill> skillsBeingTrained, int marginOfSuccess) {
-        boolean isSkillCheckFailed = marginOfSuccess < BARELY_MADE_IT.getValue();
+    static boolean isTrainingImpossible(List<Skill> skillsBeingTrained, ActionCheckResult actionCheckResult) {
         boolean isNothingBeingTrained = skillsBeingTrained.isEmpty();
-
-        return isSkillCheckFailed || isNothingBeingTrained;
+        return !actionCheckResult.isSuccess() || isNothingBeingTrained;
     }
 
-    private static int performTrainingSkillCheck(Campaign campaign, Person educator) {
+    private static ActionCheckResult performTrainingSkillCheck(Campaign campaign, Person educator) {
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
         boolean isUseEdge = campaignOptions.isUseEdge();
         isUseEdge = isUseEdge && educator.getOptions().booleanOption(EDGE_TRAINING);
@@ -565,13 +558,13 @@ public class TrainingCombatTeams {
                     .resolve(isUseEdge, getTextAt(RESOURCE_BUNDLE, "trainingCombatTeam.skillCheck"));
         campaign.addReport(SKILL_CHECKS, actionCheckResult.getReport(true));
 
-        MarginOfSuccess marginOfSuccess = getMarginOfSuccessObject(actionCheckResult.getMarginOfSuccess());
+        MarginOfSuccess reportMargin = actionCheckResult.getReportMargin();
         String personnelReport = getFormattedTextAt(RESOURCE_BUNDLE, "learnedProgress.text",
-              educator.getHyperlinkedFullTitle(), spanOpeningWithCustomColor(marginOfSuccess.getColor()),
-              marginOfSuccess.getLabel(), CLOSING_SPAN_TAG);
+              educator.getHyperlinkedFullTitle(), spanOpeningWithCustomColor(reportMargin.getColor()),
+              reportMargin.getLabel(), CLOSING_SPAN_TAG);
         campaign.addReport(PERSONNEL, personnelReport);
 
-        return actionCheckResult.getMarginOfSuccess();
+        return actionCheckResult;
     }
 
     /**

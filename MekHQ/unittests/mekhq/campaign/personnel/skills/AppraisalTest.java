@@ -35,6 +35,7 @@ package mekhq.campaign.personnel.skills;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
+import mekhq.utilities.ReportingUtilities;
 import org.junit.jupiter.api.Test;
 
 class AppraisalTest {
@@ -57,20 +58,31 @@ class AppraisalTest {
     }
 
     @Test
-    void testGetMarginOfSuccess_withPositiveMultiplier() {
-        MarginOfSuccess marginOfSuccess = Appraisal.getMarginOfSuccess(0.9);
-        assertEquals(MarginOfSuccess.SPECTACULAR, marginOfSuccess);
+    void testGetAppraisalCostMultiplier_withAutomaticSuccess() {
+        double multiplier = Appraisal.getAppraisalCostMultiplier(100);
+        assertEquals(0.85, multiplier);
     }
 
     @Test
-    void testGetMarginOfSuccess_withNegativeMultiplier() {
-        MarginOfSuccess marginOfSuccess = Appraisal.getMarginOfSuccess(1.05);
-        assertEquals(MarginOfSuccess.BAD, marginOfSuccess);
+    void testGetAppraisalCostMultiplier_withAutomaticFailure() {
+        double multiplier = Appraisal.getAppraisalCostMultiplier(-100);
+        assertEquals(1.15, multiplier);
     }
 
     @Test
-    void testGetMarginOfSuccess_withZeroMultiplier() {
-        MarginOfSuccess marginOfSuccess = Appraisal.getMarginOfSuccess(1.0);
-        assertEquals(MarginOfSuccess.BARELY_MADE_IT, marginOfSuccess);
+    void testGetAppraisalReport_Almost() {
+        assertEquals("They got a <span color='warning'><b>Below Average</b></span> deal. " +
+                           "Margin of Failure 1, price increased to <b>105%</b>.",
+              Appraisal.getAppraisalReport(1.05, MarginOfSuccess.ALMOST)
+                    .replace(ReportingUtilities.getWarningColor(), "warning"));
     }
+
+    @Test
+    void testGetAppraisalReport_Extraordinary() {
+        assertEquals("They got an <span color='positive'><b>Extraordinary</b></span> deal! " +
+                           "Margin of Success 3, price reduced to <b>80%</b>.",
+              Appraisal.getAppraisalReport(0.8, MarginOfSuccess.EXTRAORDINARY)
+                    .replace(ReportingUtilities.getPositiveColor(), "positive"));
+    }
+
 }

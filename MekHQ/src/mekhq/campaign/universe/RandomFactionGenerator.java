@@ -33,11 +33,16 @@
  */
 package mekhq.campaign.universe;
 
-import static mekhq.MHQConstants.FORTRESS_REPUBLIC;
+import static java.lang.Math.max;
+import static mekhq.MHQConstants.FORTRESS_REPUBLIC_END;
+import static mekhq.MHQConstants.FORTRESS_REPUBLIC_START;
+import static mekhq.campaign.universe.Faction.BANDIT_CASTE_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.CLAN_FACTION_CODE;
-import static mekhq.campaign.universe.Faction.COMSTAR_FACTION_CODE;
+import static mekhq.campaign.universe.Faction.INDEPENDENT_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
+import static mekhq.campaign.universe.Faction.REBEL_FACTION_CODE;
+import static mekhq.campaign.universe.Faction.REPUBLIC_OF_THE_SPHERE_FACTION_CODE;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -61,6 +66,10 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.mission.mission.contractGeneration.GlobalEmployerTableValue;
+import mekhq.campaign.mission.newContract.EnemySelectionProfile;
+import mekhq.campaign.mission.newContract.MissionLocationProfile;
+import mekhq.campaign.mission.newContract.MissionTargetFinder;
+import mekhq.campaign.universe.enums.HPGRating;
 import mekhq.campaign.universe.factionHints.FactionHints;
 
 /**
@@ -68,8 +77,8 @@ import mekhq.campaign.universe.factionHints.FactionHints;
  *       <p>
  *       Uses Factions and Planets to weighted lists of potential employers and enemies for contract generation. Also
  *       finds a suitable planet for the action.
- *                                                                                                                               TODO : Account for the de facto alliance of the invading Clans and the
- *                                                                                                                               TODO : Fortress Republic in a way that doesn't involve hard-coding them here.
+ *                                                                                                                                                                                                                                                                                                 TODO : Account for the de facto alliance of the invading Clans and the
+ *                                                                                                                                                                                                                                                                                                 TODO : Fortress Republic in a way that doesn't involve hard-coding them here.
  */
 public class RandomFactionGenerator {
     private static final MMLogger LOGGER = MMLogger.create(RandomFactionGenerator.class);
@@ -78,6 +87,7 @@ public class RandomFactionGenerator {
 
     private FactionBorderTracker borderTracker;
     private FactionHints factionHints;
+    private final MissionTargetFinder missionTargetFinder;
 
     /**
      * Constructs a generator with a default {@link FactionBorderTracker} and the shared {@link FactionHints} instance.
@@ -93,8 +103,7 @@ public class RandomFactionGenerator {
      * @param borderTracker the border tracker to use, or {@code null} to create a default one
      * @param factionHints  the faction hints to use, or {@code null} to use {@link FactionHints#getInstance()}
      */
-    public RandomFactionGenerator(FactionBorderTracker borderTracker,
-          FactionHints factionHints) {
+    public RandomFactionGenerator(FactionBorderTracker borderTracker, FactionHints factionHints) {
         this.borderTracker = borderTracker;
         this.factionHints = factionHints;
         if (null == borderTracker) {
@@ -103,6 +112,7 @@ public class RandomFactionGenerator {
         if (null == factionHints) {
             this.factionHints = FactionHints.getInstance();
         }
+        missionTargetFinder = new MissionTargetFinder(this.borderTracker, this.factionHints);
     }
 
     /**
@@ -190,6 +200,7 @@ public class RandomFactionGenerator {
     /**
      * @return A set of faction keys for all factions that have a presence within the search area.
      */
+    @Deprecated(since = "0.51.01")
     public Set<String> getCurrentFactions() {
         Set<String> retVal = new TreeSet<>();
         LocalDate currentDate = getCurrentDate();
@@ -199,7 +210,8 @@ public class RandomFactionGenerator {
                 continue;
             }
 
-            if (faction.getShortName().equals("ROS") && currentDate.isAfter(MHQConstants.FORTRESS_REPUBLIC)) {
+            if (faction.getShortName().equals(REPUBLIC_OF_THE_SPHERE_FACTION_CODE) &&
+                      currentDate.isAfter(MHQConstants.FORTRESS_REPUBLIC_START)) {
                 continue;
             }
             // Skip factions whose stated active years don't include the current date.
@@ -217,7 +229,7 @@ public class RandomFactionGenerator {
             }
         }
         // Add rebels and pirates
-        retVal.add("REB");
+        retVal.add(REBEL_FACTION_CODE);
         retVal.add(PIRATE_FACTION_CODE);
         return retVal;
     }
@@ -289,10 +301,12 @@ public class RandomFactionGenerator {
      * @param factionShortName the faction's short name
      * @param currentDate      the date to check
      *
-     * @return {@code true} if the faction is ROS and the date is after Fortress Republic begins
+     * @return {@code true} if the faction is ROS, and the date is after Fortress Republic begins, but before it ends
      */
     private static boolean isDuringFortressRepublic(String factionShortName, LocalDate currentDate) {
-        return factionShortName.equals("ROS") && currentDate.isAfter(FORTRESS_REPUBLIC);
+        return factionShortName.equals(REPUBLIC_OF_THE_SPHERE_FACTION_CODE) &&
+                     currentDate.isBefore(FORTRESS_REPUBLIC_END) &&
+                     currentDate.isAfter(FORTRESS_REPUBLIC_START);
     }
 
     /**
@@ -307,31 +321,28 @@ public class RandomFactionGenerator {
      * @return a random eligible employer faction for the area, or {@code null} if the location has no system, or no
      *       eligible faction currently controls anything in the area
      */
+    @Deprecated(since = "0.51.01", forRemoval = true)
     public @Nullable Faction getEmployerFaction(ILocation location, LocalDate date) {
         return getRandomEmployerFaction(location, date, null, true);
     }
 
     /**
-     * Selects a random employer faction from those controlling (or hosted by a controller of) systems within the search
-     * area around the given location, the same way {@link #getCurrentFactions()} surveys the area around the border
-     * tracker's configured region: every system within {@link FactionBorderTracker#getRadius()} of the location's
-     * system (a negative radius means the entire map) is checked, and the controlling factions of all of them are
-     * pooled together as candidates, each weighted by the number of nearby systems it controls (a faction controlling
-     * five systems is five times as likely to be selected as one controlling a single system). Candidates are filtered
-     * using the same eligibility rules as {@link #getEmployerFaction(ILocation, LocalDate)}: the mercenary faction
-     * itself is excluded, Clans are excluded (aside from the CW/CSF mercenary-use exceptions), ROS is excluded once
-     * Fortress Republic begins, and factions not valid on the given date are excluded. Factions hosted by an eligible
-     * controlling faction (per {@link FactionHints#getContainedFactions}) are added as additional candidates,
-     * inheriting their hosting faction's weight; if a faction is hosted by more than one eligible controlling faction,
-     * its weights from each are summed.
+     * Returns a randomly selected faction that can act as an employer based on the provided location, date, employer
+     * type, and campaign type.
      *
-     * @param location            the location whose surrounding area should be searched
-     * @param date                the date to check faction control and eligibility against
-     * @param employerType        the type of employer to return, or {@code null} for no power-tier filtering
-     * @param isMercenaryCampaign if the player campaign is considered part of the 'mercenary' faction
+     * <p>The method calculates potential employer factions by considering nearby planetary systems and
+     * filtering them based on the given criteria. It then assigns weights to the factions and performs a weighted
+     * random selection.</p>
      *
-     * @return a random eligible employer faction for the area, weighted by regional presence, or {@code null} if the
-     *       location has no system, or no eligible faction currently controls anything in the area
+     * @param location            The current location used to determine the system context for employer selection.
+     * @param date                The date to use for filtering factions by temporal availability.
+     * @param employerType        The type of employer being considered, which may further filter faction selection. Can
+     *                            be null if no specific type is required.
+     * @param isMercenaryCampaign A flag indicating if the selection is being made in the context of a mercenary
+     *                            campaign. May alter filtering and weighting logic.
+     *
+     * @return A randomly selected {@code Faction} that can act as an employer under the provided criteria, or
+     *       {@code null} if the location has no current system or no eligible faction controls anything in range.
      */
     public @Nullable Faction getRandomEmployerFaction(ILocation location, LocalDate date,
           @Nullable GlobalEmployerTableValue employerType, boolean isMercenaryCampaign) {
@@ -340,15 +351,7 @@ public class RandomFactionGenerator {
             return null;
         }
 
-        double radius = borderTracker.getRadius();
-        Map<Faction, Integer> counts = new HashMap<>();
-        for (PlanetarySystem nearbySystem : borderTracker.getSystemList()) {
-            if ((radius < 0) || (nearbySystem.getDistanceTo(system) <= radius)) {
-                for (Faction faction : nearbySystem.getFactionSet(date)) {
-                    counts.merge(faction, 1, Integer::sum);
-                }
-            }
-        }
+        Map<Faction, Integer> counts = countRegionalPresence(system, date);
 
         int currentYear = date.getYear();
         Map<Faction, Integer> finalWeights = new LinkedHashMap<>();
@@ -369,272 +372,352 @@ public class RandomFactionGenerator {
             }
         }
 
-        if (finalWeights.isEmpty()) {
-            return null;
-        }
-
-        int totalWeight = finalWeights.values().stream().mapToInt(Integer::intValue).sum();
-        int roll = Compute.randomInt(totalWeight);
-        int cumulative = 0;
+        WeightedIntMap<Faction> weightedEmployers = new WeightedIntMap<>();
         for (Map.Entry<Faction, Integer> entry : finalWeights.entrySet()) {
-            cumulative += entry.getValue();
-            if (roll < cumulative) {
-                return entry.getKey();
-            }
+            weightedEmployers.add(entry.getValue(), entry.getKey());
         }
-
-        return null; // unreachable in practice, safety fallback
+        return weightedEmployers.randomItem();
     }
 
     /**
-     * Selects an enemy faction for the given employer, weighted by length of shared border and diplomatic relations.
-     * Factions at war or designated as rivals are twice as likely (cumulative) to be chosen as opponents. Allied
-     * factions are ignored except for Clans, which halves the weight for that option.
+     * Counts how many systems within this generator's search radius of {@code origin} each faction controls, the shared
+     * base weighting for both employer selection and the enemy-candidate pool.
      *
-     * @param employer  The shortName of the faction offering the contract
-     * @param useRebels Whether to include rebels as a possible opponent
+     * @param origin the system to center the search on
+     * @param date   the date to check faction control against
      *
-     * @return The shortName of the faction to use as the op for.
+     * @return a map of each faction present in range to the number of systems it controls there
      */
-    public String getEnemy(String employer, boolean useRebels) {
-        Faction employerFaction = Factions.getInstance().getFaction(employer);
-        if (null == employerFaction) {
-            LOGGER.error("Could not find enemy for employer: {}", employer);
-            return PIRATE_FACTION_CODE;
-        } else {
-            return getEnemy(employerFaction, useRebels);
+    private Map<Faction, Integer> countRegionalPresence(PlanetarySystem origin, LocalDate date) {
+        double radius = borderTracker.getRadius();
+        Map<Faction, Integer> counts = new HashMap<>();
+        for (PlanetarySystem nearbySystem : borderTracker.getSystemList()) {
+            if ((radius < 0) || (nearbySystem.getDistanceTo(origin) <= radius)) {
+                for (Faction faction : nearbySystem.getFactionSet(date)) {
+                    counts.merge(faction, 1, Integer::sum);
+                }
+            }
         }
+        return counts;
     }
 
     /**
-     * Pick an enemy faction, possibly rebels or mercenaries, given an employer.
+     * Selects a random enemy faction for {@code employer} within the area around {@code location}, weighted by regional
+     * presence and diplomatic stance (see {@link #buildEnemyMap}).
      *
-     * @param employer  The faction offering the contract
-     * @param useRebels Whether to include rebels as a possible opponent
+     * @param isCovert whether this is a covert operation, where allies become rare, low-chance targets instead of
+     *                 always being excluded
+     * @param location the location to center the search on
+     * @param date     the date to check faction control and diplomatic relations against
+     * @param employer the employer faction, or {@code null} to skip straight to the INDEPENDENT fallback
      *
-     * @return The shortName of the faction to use as the op for.
+     * @return a randomly selected enemy faction, or the INDEPENDENT faction if none could be found
      */
-    public String getEnemy(Faction employer, boolean useRebels) {
-        return getEnemy(employer, useRebels, false);
-    }
-
-    /**
-     * Selects an enemy faction for the given employer, weighted by length of shared border and diplomatic relations.
-     * Factions at war or designated as rivals are twice as likely (cumulative) to be chosen as opponents. Allied
-     * factions are ignored except for Clans, which halves the weight for that option.
-     *
-     * @param employer  The faction offering the contract
-     * @param useRebels Whether to include rebels as a possible opponent
-     * @param useMercs  Whether to include MERC as a possible opponent. Note, don't do this when first generating
-     *                  contract, as contract generation relies on the op for having planets
-     *
-     * @return The faction to use as the op for.
-     */
-    public String getEnemy(Faction employer, boolean useRebels, boolean useMercs) {
-        String employerName = employer != null ?
-                                    employer.getShortName() :
-                                    "no employer supplied or faction does not exist";
-
-        /* Rebels occur on a 1-4 (d20) on nearly every enemy chart */
-        if (useRebels && (Compute.randomInt(5) == 0)) {
-            return "REB";
+    public Faction getRandomEnemy(boolean isCovert, ILocation location, LocalDate date, @Nullable Faction employer) {
+        if (employer == null) {
+            return independentFallback("No employer supplied or faction does not exist. Returning INDEPENDENT");
         }
 
-        Faction enemy = null;
-        Faction originalEmployer = employer;
-        if (!borderTracker.getFactionsInRegion().contains(employer)) {
-            // First, try the contained faction host (from factionhints.xml)
-            employer = factionHints.getContainedFactionHost(employer, getCurrentDate());
-
-            // If that fails, look for a "super-state" faction that has this faction as a fallback
-            // This handles cases like FS during the Federated Commonwealth era (3028-3067)
-            if (employer == null) {
-                employer = findSuperStateFaction(originalEmployer);
-            }
-        }
-        if (null != employer) {
-            employerName = employer.getShortName();
-            WeightedIntMap<Faction> enemyMap = buildEnemyMap(employer);
-
-            if (useMercs) {
-                appendMercsToEnemyMap(enemyMap);
-            }
-
-            enemy = enemyMap.randomItem();
-        }
+        WeightedIntMap<Faction> enemyMap = buildEnemyMap(isCovert, location, date, employer);
+        Faction enemy = enemyMap.randomItem();
         if (null != enemy) {
-            return enemy.getShortName();
+            return enemy;
         }
 
-        LOGGER.error("Could not find enemy for employerName {}", employerName);
-
-        // Fallback; there are always pirates.
-        return PIRATE_FACTION_CODE;
+        return independentFallback("Could not find enemy for employerName {}. Returning INDEPENDENT",
+              employer.getShortName());
     }
 
     /**
-     * Finds a "super-state" faction that controls planets in the current region and has the given faction listed as one
-     * of its fallback factions.
+     * Selects an enemy faction for {@code employer} using the given contract-type enemy-selection profile: synthetic
+     * enemies (pirates, rebels, raiders) resolve directly, war-based profiles prefer the employer's actual belligerents
+     * before falling back to the standard pool, and covert profiles run the standard pool under covert rules (see
+     * {@link #getRandomEnemy(boolean, ILocation, LocalDate, Faction)}).
      *
-     * <p>This handles cases where a faction exists but doesn't directly control planets during a
-     * certain era because a larger state controls them. For example, during the Federated Commonwealth era (3028-3067),
-     * the Federated Suns (FS) and Lyran Commonwealth (LA) don't directly control planets - the Federated Commonwealth
-     * (FC) does. FC lists both FS and LA as its fallback factions, so this method will return FC when given FS or LA
-     * during that era.</p>
+     * @param location the location to center any pool-based search on
+     * @param date     the date to check faction control and diplomatic relations against
+     * @param employer the employer faction, or {@code null} to skip straight to the INDEPENDENT fallback
+     * @param profile  the enemy-selection profile for the contract's type
      *
-     * @param faction The faction to find a super-state for
-     *
-     * @return The super-state faction if found, or {@code null} if no matching faction exists
+     * @return the selected enemy faction, or the INDEPENDENT faction if none could be found
      */
-    private @Nullable Faction findSuperStateFaction(Faction faction) {
-        if (faction == null) {
-            return null;
+    public Faction getRandomEnemy(ILocation location, LocalDate date, @Nullable Faction employer,
+          EnemySelectionProfile profile) {
+        if (employer == null) {
+            return independentFallback("No employer supplied or faction does not exist. Returning INDEPENDENT");
         }
 
-        String factionKey = faction.getShortName();
-        LocalDate currentDate = getCurrentDate();
-        int currentYear = currentDate.getYear();
+        return switch (profile) {
+            case PIRATES -> pirateFactionFor(employer);
+            case REBELS -> Factions.getInstance().getFaction(REBEL_FACTION_CODE);
+            case RAIDERS -> raiderEnemy(employer);
+            case AT_WAR -> atWarEnemy(location, date, employer);
+            case OCCUPYING_POWER -> occupyingPowerEnemy(location, date, employer);
+            case COVERT -> getRandomEnemy(true, location, date, employer);
+            case DEFAULT -> getRandomEnemy(false, location, date, employer);
+        };
+    }
 
-        for (Faction candidate : borderTracker.getFactionsInRegion()) {
-            // Skip if candidate isn't valid for the current date
-            if (!candidate.validIn(currentYear)) {
+    /**
+     * @param employer the employer faction
+     *
+     * @return the pirate faction appropriate to the employer: the Bandit Caste for a Clan employer, otherwise the
+     *       regular pirate faction
+     */
+    private static Faction pirateFactionFor(Faction employer) {
+        return Factions.getInstance()
+                     .getFaction(employer.isClan() ? BANDIT_CASTE_FACTION_CODE : PIRATE_FACTION_CODE);
+    }
+
+    /**
+     * Picks an irregular rear-area harasser: pirates or rebels, even odds. A pirate employer always gets rebels, so the
+     * pirate faction never ends up as its own enemy.
+     *
+     * @param employer the employer faction
+     *
+     * @return the raider enemy faction
+     */
+    private Faction raiderEnemy(Faction employer) {
+        Faction pirates = pirateFactionFor(employer);
+        if (employer.equals(pirates) || (Compute.randomInt(2) == 0)) {
+            return Factions.getInstance().getFaction(REBEL_FACTION_CODE);
+        }
+        return pirates;
+    }
+
+    /**
+     * Picks a faction the employer is at war with, falling back to the standard pool when the employer isn't at war
+     * with anyone.
+     *
+     * @param location the location to center the fallback pool search on
+     * @param date     the date to check diplomatic relations against
+     * @param employer the employer faction
+     *
+     * @return the selected enemy faction
+     */
+    private Faction atWarEnemy(ILocation location, LocalDate date, Faction employer) {
+        List<Faction> belligerents = findEnemiesAtWarWith(employer, date);
+        if (!belligerents.isEmpty()) {
+            return ObjectUtility.getRandomItem(belligerents);
+        }
+        return getRandomEnemy(false, location, date, employer);
+    }
+
+    /**
+     * Picks a faction at war with the employer that occupies a world recently taken from it (within the search area,
+     * using the same lookback window as {@link MissionLocationProfile#OCCUPIED_TERRITORY}'s location tier), then any
+     * war partner, then the standard pool.
+     *
+     * @param location the location to center the search on
+     * @param date     the date to check faction control and diplomatic relations against
+     * @param employer the employer faction
+     *
+     * @return the selected enemy faction
+     */
+    private Faction occupyingPowerEnemy(ILocation location, LocalDate date, Faction employer) {
+        List<Faction> belligerents = findEnemiesAtWarWith(employer, date);
+        if (belligerents.isEmpty()) {
+            return getRandomEnemy(false, location, date, employer);
+        }
+
+        List<Faction> occupiers = new ArrayList<>();
+        for (Faction belligerent : belligerents) {
+            // A civil-war employer can be its own belligerent, but its long-held worlds are not "conquests from
+            // itself" - self only qualifies via the plain belligerents tier below.
+            if (!belligerent.equals(employer) && holdsRecentConquestFrom(belligerent, employer, location, date)) {
+                occupiers.add(belligerent);
+            }
+        }
+        if (!occupiers.isEmpty()) {
+            return ObjectUtility.getRandomItem(occupiers);
+        }
+        return ObjectUtility.getRandomItem(belligerents);
+    }
+
+    /**
+     * Finds every faction the employer is at war with on the given date that also controls at least one known system,
+     * applying the same basic eligibility rules as the standard pool (real, currently valid, not
+     * Fortress-Republic-locked). The employer itself qualifies when factionHints records it at war with itself, which
+     * is how a civil war is represented. Serves both the {@link EnemySelectionProfile#AT_WAR}-family preferences and
+     * {@link #buildEnemyMap}'s guarantee that a war partner is a valid target regardless of local presence. War
+     * relationships are sparse, so the war check runs first (cheap, over the whole faction roster) before the territory
+     * scan (only for the handful of actual war partners).
+     *
+     * @param employer the employer faction
+     * @param date     the date to check diplomatic relations and faction control against
+     *
+     * @return the employer's territorial war partners, possibly empty
+     */
+    private List<Faction> findEnemiesAtWarWith(Faction employer, LocalDate date) {
+        List<Faction> belligerents = new ArrayList<>();
+        for (Faction faction : Factions.getInstance().getFactions()) {
+            if (FactionHints.isEmptyFaction(faction) || !faction.validIn(date)) {
                 continue;
             }
+            if (isDuringFortressRepublic(faction.getShortName(), date)) {
+                continue;
+            }
+            if (factionHints.isAtWarWith(employer, faction, date) &&
+                      borderTracker.controlsAnySystem(faction, date)) {
+                belligerents.add(faction);
+            }
+        }
+        return belligerents;
+    }
 
-            String[] fallbacks = candidate.getAlternativeFactionCodes();
-            boolean matchesFallback = false;
-            if (fallbacks != null) {
-                for (String fallback : fallbacks) {
-                    if (factionKey.equals(fallback)) {
-                        matchesFallback = true;
-                        break;
-                    }
+    /**
+     * Checks whether {@code occupier} currently holds a system within the search radius that {@code formerOwner} held
+     * {@value MissionLocationProfile#OCCUPIED_TERRITORY_LOOKBACK_YEARS} years ago, stopping at the first match.
+     *
+     * @param occupier    the faction suspected of occupying the former owner's territory
+     * @param formerOwner the faction whose lost worlds are being looked for
+     * @param location    the location to center the search on
+     * @param date        the current date; the "before" ownership check uses the shared lookback window
+     *
+     * @return {@code true} if at least one such occupied system exists in range
+     */
+    private boolean holdsRecentConquestFrom(Faction occupier, Faction formerOwner, ILocation location,
+          LocalDate date) {
+        PlanetarySystem origin = location.getCurrentSystem();
+        if (origin == null) {
+            return false;
+        }
+
+        double radius = borderTracker.getRadius();
+        LocalDate beforeConquest = date.minusYears(MissionLocationProfile.OCCUPIED_TERRITORY_LOOKBACK_YEARS);
+        for (PlanetarySystem system : borderTracker.getSystemList()) {
+            if ((radius < 0) || (system.getDistanceTo(origin) <= radius)) {
+                if (system.getFactionSet(date).contains(occupier) &&
+                          system.getFactionSet(beforeConquest).contains(formerOwner)) {
+                    return true;
                 }
             }
-            if (matchesFallback) {
-                LOGGER.info("Found super-state faction {} for {} during {}",
-                      candidate.getShortName(), factionKey, currentYear);
-                return candidate;
-            }
         }
-
-        return null;
+        return false;
     }
 
     /**
-     * Appends the mercenary faction to the given enemy map with an approximate weight equal to 10% of the total enemy
-     * weight, but only if the enemy map contains at least one non-Clan faction.
+     * Logs the given warning and returns the INDEPENDENT faction, used as {@link #getRandomEnemy}'s fallback when no
+     * employer is supplied or no valid enemy candidate could be found.
      *
-     * <p>The method first checks if any faction in the enemy map returns {@code false} from {@link Faction#isClan()}.
-     * If all factions are Clan, no action is taken. Otherwise, the mercenary faction is added to the enemy map with a
-     * weight based on the sum of existing weights (at least 1).</p>
+     * @param message the warning message (may contain {@code {}} placeholders)
+     * @param args    arguments for the message's placeholders
      *
-     * <p>The check for non-Clan factions is to help avoid a situation where we have mercenary companies popping up
-     * in Clan-space.</p>
-     *
-     * @param enemyMap the {@link WeightedIntMap} of {@link Faction} to which the mercenary faction may be appended
+     * @return the INDEPENDENT faction
      */
-    protected void appendMercsToEnemyMap(WeightedIntMap<Faction> enemyMap) {
-        boolean hasNonClan = false;
-        for (Faction faction : enemyMap.values()) {
-            if (!faction.isClan()) {
-                hasNonClan = true;
-                break;
-            }
-        }
-
-        if (!hasNonClan) {
-            return;
-        }
-
-        int mercWeight = 0;
-        for (int key : enemyMap.keySet()) {
-            mercWeight += key;
-        }
-
-        enemyMap.add(Math.max(1, (mercWeight / 10)), Factions.getInstance().getFaction(MERCENARY_FACTION_CODE));
+    private Faction independentFallback(String message, Object... args) {
+        LOGGER.warn(message, args);
+        return Factions.getInstance().getFaction(INDEPENDENT_FACTION_CODE);
     }
 
     /**
-     * Builds a map of potential enemies keyed to cumulative weight
+     * Builds a weighted pool of enemy candidates for {@code employer} within the search area around {@code location}.
+     * Each faction's weight starts at the number of systems it controls in range; factions at war with the employer are
+     * added regardless of area presence, as long as they control territory anywhere; allies (direct or through a shared
+     * ally, see {@link #performIsAllyCheck}) are excluded; and remaining weights are adjusted for diplomatic stance
+     * (see {@link #adjustEnemyWeight}). A pirate employer bypasses all diplomatic checks. The employer itself is a
+     * valid candidate only when factionHints records it at war with itself &mdash; a civil war.
      *
-     * @param employer The employer faction
+     * @param isCovert whether allies should be rare, low-chance targets instead of always excluded
+     * @param location the location to center the search on
+     * @param date     the date to check faction control and diplomatic relations against
+     * @param employer the employer faction
      *
-     * @return The weight map of potential enemies
+     * @return a weighted map of enemy candidates, empty if {@code location} has no current system
      */
-    protected WeightedIntMap<Faction> buildEnemyMap(Faction employer) {
+    protected WeightedIntMap<Faction> buildEnemyMap(boolean isCovert, ILocation location, LocalDate date,
+          Faction employer) {
         WeightedIntMap<Faction> enemyMap = new WeightedIntMap<>();
-        LocalDate currentDate = getCurrentDate();
-
-        // If the employer is a pirate, or ComStar return all border factions as "enemies"
-        String employerShortName = employer.getShortName();
-        if (employerShortName.equals(PIRATE_FACTION_CODE) || employerShortName.equals(COMSTAR_FACTION_CODE)) {
-            for (Faction enemy : borderTracker.getFactionsInRegion()) {
-                if (FactionHints.isEmptyFaction(enemy) ||
-                          enemy.getShortName().equals(CLAN_FACTION_CODE)) {
-                    continue;
-                }
-                if (!enemy.validIn(currentDate)) {
-                    continue;
-                }
-                enemyMap.add(1, enemy); // weight (1) can be adjusted as needed
-            }
+        PlanetarySystem system = location.getCurrentSystem();
+        if (system == null) {
             return enemyMap;
         }
 
-        for (Faction enemy : borderTracker.getFactionsInRegion()) {
-            if (FactionHints.isEmptyFaction(enemy) ||
-                      enemy.getShortName().equals(CLAN_FACTION_CODE)) {
+        Map<Faction, Integer> counts = countRegionalPresence(system, date);
+
+        String employerShortName = employer.getShortName();
+        boolean isPirateEmployer = employerShortName.equals(PIRATE_FACTION_CODE) ||
+                                         employerShortName.equals(BANDIT_CASTE_FACTION_CODE);
+
+        // A faction at war with the employer is always a valid target, even one with no systems in the search
+        // area, as long as it controls territory somewhere on the map.
+        Set<Faction> candidates = new HashSet<>(counts.keySet());
+        if (!isPirateEmployer) {
+            candidates.addAll(findEnemiesAtWarWith(employer, date));
+        }
+
+        // This only depends on the date, not on any individual candidate, so compute them once per call rather
+        // than once per candidate in adjustEnemyWeight.
+        boolean isDuringJihad = date.isAfter(MHQConstants.JIHAD_START) && date.isBefore(MHQConstants.NOMINAL_JIHAD_END);
+
+        for (Faction enemy : candidates) {
+            if (FactionHints.isEmptyFaction(enemy)) {
                 continue;
             }
 
-            if (isDuringFortressRepublic(enemy.getShortName(), currentDate)) {
+            if (isDuringFortressRepublic(enemy.getShortName(), date) || !enemy.validIn(date)) {
                 continue;
             }
 
-            // Skip extinct factions; stale planet ownership data can otherwise leak them into the enemy pool.
-            if (!enemy.validIn(currentDate)) {
+            if (isPirateEmployer) {
+                enemyMap.add(1, enemy);
                 continue;
             }
 
-            int totalCount = borderTracker.getBorderSystems(employer, enemy).size();
-            double count = totalCount;
-            // Split the border between main controlling faction and any contained factions.
-            for (Faction containedFaction : factionHints.getContainedFactions(employer, currentDate)) {
-                if ((null == containedFaction) ||
-                          !factionHints.isContainedFactionOpponent(enemy, containedFaction, employer, currentDate)) {
-                    continue;
-                }
-
-                if (isDuringFortressRepublic(containedFaction.getShortName(), currentDate)) {
-                    continue;
-                }
-                if (!containedFaction.validIn(currentDate)) {
-                    continue;
-                }
-
-                if (factionHints.isNeutral(containedFaction, enemy, currentDate) ||
-                          factionHints.isNeutral(enemy, containedFaction, currentDate)) {
-                    continue;
-                }
-                double cfCount = totalCount;
-                if (factionHints.getAltLocationFraction(employer, containedFaction, currentDate) > 0.0) {
-                    cfCount = totalCount * factionHints.getAltLocationFraction(employer, containedFaction, currentDate);
-                    count -= cfCount;
-                }
-                cfCount = adjustBorderWeight(cfCount, employer, enemy, currentDate);
-                enemyMap.add((int) Math.floor(cfCount + 0.5), containedFaction);
+            // A faction is never its own enemy - unless factionHints explicitly records it at war with itself,
+            // which is how a civil war is represented (e.g. the FedCom Civil War).
+            if (enemy.equals(employer) && !factionHints.isAtWarWith(employer, employer, date)) {
+                continue;
             }
-            count = adjustBorderWeight(count, employer, enemy, currentDate);
-            enemyMap.add((int) Math.floor(count + 0.5), enemy);
+
+            // Factions that don't have a direct alliance record but share a common ally (e.g. two member states of
+            // the same superpower, each individually allied with it but not with each other) should still be treated
+            // as allies, unless factionHints directly contradicts that by recording them as at war with each other.
+            boolean isAlly = performIsAllyCheck(date, employer, enemy);
+
+            // During covert operations, allies may sometimes attack each other. However, this is a very low chance
+            if (isCovert && isAlly) {
+                enemyMap.add(1, enemy);
+                continue;
+            }
+
+            if (isAlly) {
+                continue;
+            }
+
+            double weight = adjustEnemyWeight(counts.getOrDefault(enemy, 0),
+                  employer,
+                  enemy,
+                  date,
+                  isDuringJihad);
+            if (weight > 0) {
+                enemyMap.add((int) Math.round(weight), enemy);
+            }
         }
 
         return enemyMap;
     }
 
     /**
+     * Checks whether two factions should be treated as allies: directly, or through a shared ally (e.g. two member
+     * states of the same superpower), unless a direct war record between them says otherwise.
+     *
+     * @param date     the date to check diplomatic relations against
+     * @param employer one faction
+     * @param enemy    the other faction
+     *
+     * @return {@code true} if the two factions should be treated as allied
+     */
+    private boolean performIsAllyCheck(LocalDate date, Faction employer, Faction enemy) {
+        return factionHints.isAlliedWith(employer, enemy, date) ||
+                     (!factionHints.isAtWarWith(employer, enemy, date) &&
+                            factionHints.isAlliedThroughSharedAlly(employer, enemy, date));
+    }
+
+    /**
      * @return A set of keys for all current factions in the space that are potential employers.
      */
+    @Deprecated(since = "0.51.01")
     public Set<String> getEmployerSet() {
         Set<String> set = new HashSet<>();
         LocalDate currentDate = getCurrentDate();
@@ -667,6 +750,7 @@ public class RandomFactionGenerator {
      *
      * @return A list of faction that share a border
      */
+    @Deprecated(since = "0.51.01")
     public List<String> getEnemyList(String employerName) {
         Faction employer = Factions.getInstance().getFaction(employerName);
         if (null == employer) {
@@ -683,6 +767,7 @@ public class RandomFactionGenerator {
      *
      * @return A list of faction that share a border
      */
+    @Deprecated(since = "0.51.01")
     public List<String> getEnemyList(Faction employer) {
         Set<Faction> list = new HashSet<>();
         LocalDate currentDate = getCurrentDate();
@@ -691,6 +776,13 @@ public class RandomFactionGenerator {
             if (FactionHints.isEmptyFaction(enemy)) {
                 continue;
             }
+
+            if (enemy.isAggregate()) {
+                if (!enemy.isMercenary() && !enemy.isPirate()) {
+                    continue;
+                }
+            }
+
             // Skip extinct factions; stale planet ownership data can otherwise leak them into the enemy list.
             if (!enemy.validIn(currentDate)) {
                 continue;
@@ -727,90 +819,154 @@ public class RandomFactionGenerator {
     }
 
     /**
-     * Applies modifiers to the border size (measured by number of planets within a certain proximity to one or more of
-     * the attacker's planets) based on diplomatic stance (e.g. war, rivalry, alliance).
+     * Applies diplomatic-stance multipliers to an enemy candidate's base area-presence weight (see
+     * {@link #buildEnemyMap(boolean, ILocation, LocalDate, Faction)}). Factions at war with the employer are floored to
+     * a weight of at least 10 before quadrupling, so a belligerent with no systems in the search area is still a valid,
+     * heavily-weighted, pickable target (e.g. distant warring factions during the early Clan Invasion or the
+     * Reunification Wars).
      *
-     * @param count    The number of planets
-     * @param employer The attacking faction
-     * @param enemy    The defending faction
-     * @param date     The current campaign date
+     * @param count         The candidate's base weight (number of systems it controls in the search area)
+     * @param employer      The attacking faction
+     * @param enemy         The defending faction
+     * @param date          The date to check diplomatic relations against
+     * @param isDuringJihad Whether {@code date} falls within the Jihad
      *
-     * @return An adjusted weight
+     * @return The adjusted weight
      */
-    protected double adjustBorderWeight(double count, Faction employer, Faction enemy, LocalDate date) {
-        boolean isBeforeTukayyid = date.isBefore(MHQConstants.BATTLE_OF_TUKAYYID);
-        boolean isAfterFirstWaveBegins = date.isAfter(MHQConstants.CLAN_INVASION_FIRST_WAVE_BEGINS);
-        boolean isDuringClanInvasionHeight = isBeforeTukayyid && isAfterFirstWaveBegins;
-        List<String> innerSphereClanWarCombatants = List.of("FC", "FRR", "DC");
+    protected double adjustEnemyWeight(int count, Faction employer, Faction enemy, LocalDate date,
+          boolean isDuringJihad) {
+        double weight = count;
+        if (factionHints.isAtWarWith(employer, enemy, date)) {
+            // minimum 'count' enforced for warring factions. This allows us to better ensure fighting between warring
+            // factions that are not near each other. For example, the early years of the Clan Invasion, or the
+            // Reunification Wars.
+            weight = max(10.0, weight);
 
-        boolean isAfterJihadBegins = date.isAfter(MHQConstants.JIHAD_START);
-        boolean isBeforeJihadEnds = date.isBefore(MHQConstants.NOMINAL_JIHAD_END);
-        boolean isDuringJihad = isAfterJihadBegins && isBeforeJihadEnds;
+            weight *= 4.0;
+        }
 
-        if (factionHints.isNeutral(employer, enemy, getCurrentDate()) ||
-                  factionHints.isNeutral(enemy, employer, getCurrentDate())) {
-            return 0;
-        }
-        if (!employer.isClan() && factionHints.isAlliedWith(employer, enemy, date)) {
-            return 0;
-        }
-        if (employer.isClan() &&
-                  enemy.isClan() &&
-                  (factionHints.isAlliedWith(employer, enemy, date) ||
-                         (isDuringClanInvasionHeight && (borderTracker.getCenterY() < 600)))) {
-            /* Treat invading Clans as allies in the Inner Sphere */
-            count /= 4.0;
-        }
-        if (factionHints.isAtWarWith(employer, enemy, date) && !employer.equals(enemy)) {
-            count *= 2.0;
-        }
         if (factionHints.isRivalOf(employer, enemy, date)) {
-            count *= 2.0;
+            weight *= 2.0;
         }
-        if (innerSphereClanWarCombatants.contains(employer.getShortName()) &&
-                  enemy.isClan() &&
-                  isDuringClanInvasionHeight) {
-            count *= 2.0;
-        }
+
         if (isDuringJihad && enemy.isWoB()) {
-            count *= 2.0;
+            weight *= 2.0;
         }
+
         /*
          * This is pretty hacky, but ComStar does not have many targets
          * and tends to fight the Clans too much between Tukayyid and
          * the Jihad.
          */
         if (employer.getShortName().equals("CS") && enemy.isClan()) {
-            count /= 12.0;
+            weight /= 12.0;
         }
-        return count;
+
+        return weight;
     }
 
     /**
-     * Selects a random planet from a list of potential targets based on the attacking and defending factions.
+     * Selects a random planet from a list of potential targets based on the attacking and defending factions, with no
+     * contract-type location preference. Equivalent to calling
+     * {@link #getMissionTarget(String, String, ILocation, MissionLocationProfile)} with
+     * {@link MissionLocationProfile#DEFAULT}.
      *
      * @param attacker The faction key of the attacker
      * @param defender The faction key of the defender
+     * @param location the location to center the search on, scoped by this generator's configured search radius (see
+     *                 {@link #getMissionTargetList(Faction, Faction, ILocation)})
      *
      * @return The planetId of the chosen planet, or null if there are no target candidates
      */
     @Nullable
-    public String getMissionTarget(String attacker, String defender) {
-        Faction faction0 = Factions.getInstance().getFaction(attacker);
-        Faction faction1 = Factions.getInstance().getFaction(defender);
-        if (null == faction0) {
+    public String getMissionTarget(String attacker, String defender, ILocation location) {
+        return getMissionTarget(attacker, defender, location, MissionLocationProfile.DEFAULT);
+    }
+
+    /**
+     * Selects a random planet from a list of potential targets based on the attacking and defending factions, applying
+     * the given contract-type location profile to both the candidate search (see
+     * {@link MissionTargetFinder#find(Faction, Faction, ILocation, LocalDate, MissionLocationProfile)}) and the final
+     * pick: for {@linkplain MissionLocationProfile#isPopulationWeighted() population-weighted} profiles the pick is
+     * weighted toward populous, well-connected worlds instead of being uniformly random.
+     *
+     * @param attacker The faction key of the attacker
+     * @param defender The faction key of the defender
+     * @param location the location to center the search on, scoped by this generator's configured search radius (see
+     *                 {@link #getMissionTargetList(Faction, Faction, ILocation)})
+     * @param profile  the location profile for the contract's type
+     *
+     * @return The planetId of the chosen planet, or null if there are no target candidates
+     */
+    @Nullable
+    public String getMissionTarget(String attacker, String defender, ILocation location,
+          MissionLocationProfile profile) {
+        Faction attackerFaction = Factions.getInstance().getFaction(attacker);
+        Faction defenderFaction = Factions.getInstance().getFaction(defender);
+        if (null == attackerFaction) {
             LOGGER.error("Non-existent faction key: {}", attacker);
             return null;
         }
-        if (null == faction1) {
-            LOGGER.error("Non-existent faction key: {}", attacker);
+        if (null == defenderFaction) {
+            LOGGER.error("Non-existent faction key: {}", defender);
             return null;
         }
-        List<PlanetarySystem> planetList = getMissionTargetList(faction0, faction1);
-        if (!planetList.isEmpty()) {
-            return ObjectUtility.getRandomItem(planetList).getId();
+        List<PlanetarySystem> planetList = getMissionTargetList(attackerFaction, defenderFaction, location, profile);
+        if (planetList.isEmpty()) {
+            return null;
         }
-        return null;
+        if (profile.isPopulationWeighted()) {
+            return pickPopulationWeighted(planetList).getId();
+        }
+        return ObjectUtility.getRandomItem(planetList).getId();
+    }
+
+    /**
+     * Weight bonus for a system with a major (A- or B-rated) HPG station in the population-weighted pick: a hub world
+     * matters beyond its raw head count.
+     */
+    private static final int MAJOR_HPG_WEIGHT_BONUS = 3;
+
+    /**
+     * Picks a candidate weighted by {@link #populationWeight}, so populous, well-connected worlds are favored without
+     * making them the only possible outcome.
+     *
+     * @param candidates the candidate systems; must not be empty
+     *
+     * @return the chosen system
+     */
+    private PlanetarySystem pickPopulationWeighted(List<PlanetarySystem> candidates) {
+        LocalDate now = getCurrentDate();
+        WeightedIntMap<PlanetarySystem> weightedCandidates = new WeightedIntMap<>();
+        for (PlanetarySystem system : candidates) {
+            weightedCandidates.add(populationWeight(system, now), system);
+        }
+        PlanetarySystem chosen = weightedCandidates.randomItem();
+        return (chosen != null) ? chosen : ObjectUtility.getRandomItem(candidates);
+    }
+
+    /**
+     * Scores a system's value as a high-profile mission target. Population is scored on a log10 scale (a
+     * billion-population world weighs ~10, a thousand-person outpost ~4) so major worlds are favored without drowning
+     * out everything else, plus {@value #MAJOR_HPG_WEIGHT_BONUS} for an A/B-rated HPG. A system with no data at all
+     * still gets a weight of 1, so it remains pickable.
+     *
+     * @param system the system to score
+     * @param when   the date to check population and HPG rating against
+     *
+     * @return the system's weight, at least 1
+     */
+    static int populationWeight(PlanetarySystem system, LocalDate when) {
+        int weight = 1;
+        long population = system.getPopulation(when);
+        if (population > 0) {
+            weight += (int) Math.log10(population);
+        }
+        HPGRating hpg = system.getHPG(when);
+        if ((hpg != null) && (hpg.compareTo(HPGRating.B) >= 0)) {
+            weight += MAJOR_HPG_WEIGHT_BONUS;
+        }
+        return weight;
     }
 
     /**
@@ -818,10 +974,12 @@ public class RandomFactionGenerator {
      *
      * @param attackerKey The attacking faction's shortName
      * @param defenderKey The defending faction's shortName
+     * @param location    the location to center the search on, scoped by this generator's configured search radius (see
+     *                    {@link #getMissionTargetList(Faction, Faction, ILocation)})
      *
      * @return A list of potential mission targets
      */
-    public List<PlanetarySystem> getMissionTargetList(String attackerKey, String defenderKey) {
+    public List<PlanetarySystem> getMissionTargetList(String attackerKey, String defenderKey, ILocation location) {
         Faction attacker = Factions.getInstance().getFaction(attackerKey);
         Faction defender = Factions.getInstance().getFaction(defenderKey);
         if (null == attacker) {
@@ -831,85 +989,42 @@ public class RandomFactionGenerator {
             LOGGER.error("Non-existent faction key (defender): {}", defenderKey);
         }
         if ((null != attacker) && (null != defender)) {
-            return getMissionTargetList(attacker, defender);
+            return getMissionTargetList(attacker, defender, location);
         } else {
             return Collections.emptyList();
         }
     }
 
     /**
-     * Builds a list of planets controlled by the defender that are near one or more of the attacker's planets.
+     * Builds a list of potential mission-target planets near {@code location}, generally on the shared border between
+     * attacker and defender, with dedicated tiers for factions whose territory doesn't work like a normal nation's
+     * (pirates, ComStar, rebels). Outside of those special cases, only planets the defender actually owns are ever
+     * valid targets. See {@link MissionTargetFinder} for the full selection logic.
      *
-     * @param attacker The attacking faction
-     * @param defender The defending faction
+     * @param attacker the attacking faction
+     * @param defender the defending faction
+     * @param location the location to center the search on
      *
-     * @return A list of potential mission targets
+     * @return a list of potential mission targets
      */
-    public List<PlanetarySystem> getMissionTargetList(Faction attacker, Faction defender) {
-        boolean attackerIsPirate = attacker.isPirate();
-        boolean attackerIsMerc = attacker.isMercenary();
-        boolean attackerIsComStar = attacker.isComStarOrWoB();
-        boolean attackerHasNoPlanets = !borderTracker.getFactionsInRegion().contains(attacker);
+    public List<PlanetarySystem> getMissionTargetList(Faction attacker, Faction defender, ILocation location) {
+        return getMissionTargetList(attacker, defender, location, MissionLocationProfile.DEFAULT);
+    }
 
-        boolean defenderIsPirate = defender.isPirate();
-        boolean defenderIsMerc = defender.isMercenary();
-        boolean defenderIsComStar = defender.isComStarOrWoB();
-        boolean defenderHasNoPlanets = !borderTracker.getFactionsInRegion().contains(defender);
-
-        // Faction host logic
-        if (attackerHasNoPlanets && !attackerIsPirate && !attackerIsMerc && !attackerIsComStar) {
-            attacker = factionHints.getContainedFactionHost(attacker, getCurrentDate());
-        }
-        if (defenderHasNoPlanets && !defender.isRebelOrPirate() && !defender.isMercenary() && !defenderIsComStar) {
-            defender = factionHints.getContainedFactionHost(defender, getCurrentDate());
-        }
-
-        if (attacker == null || defender == null) {
-            return Collections.emptyList();
-        }
-
-        // Special cases for pirates, mercenaries, and ComStar
-        if (attackerIsPirate || attackerIsMerc || attackerIsComStar) {
-            FactionBorders defenderBorders = borderTracker.getBorders(defender);
-            return (defenderBorders == null) ? Collections.emptyList() : new ArrayList<>(defenderBorders.getSystems());
-        }
-        if (defender.isRebel()) {
-            FactionBorders attackerBorders = borderTracker.getBorders(attacker);
-            return (attackerBorders == null) ? Collections.emptyList() : new ArrayList<>(attackerBorders.getSystems());
-        }
-
-        // Main border calculation
-        Set<PlanetarySystem> planetSet = new HashSet<>(borderTracker.getBorderSystems(attacker, defender));
-        // For mercenaries, we don't care if they own planets, as generally they're a proxy force. For pirates and
-        // ComStar if they own any planets, we want to target those planets.
-        if (defenderIsMerc || ((defenderIsPirate || defenderIsComStar) && defenderHasNoPlanets)) {
-            for (Faction regionalFaction : borderTracker.getFactionsInRegion()) {
-                planetSet.addAll(borderTracker.getBorderSystems(regionalFaction, attacker));
-                planetSet.addAll(borderTracker.getBorderSystems(attacker, regionalFaction));
-            }
-        }
-
-        // Check contained factions if nothing found
-        if (planetSet.isEmpty()) {
-            for (Faction regionalFaction : borderTracker.getFactionsInRegion()) {
-                for (Faction hintFaction : factionHints.getContainedFactions(regionalFaction, getCurrentDate())) {
-                    if (hintFaction.equals(attacker) &&
-                              factionHints.isContainedFactionOpponent(regionalFaction,
-                                    hintFaction,
-                                    defender,
-                                    getCurrentDate())) {
-                        planetSet.addAll(borderTracker.getBorderSystems(regionalFaction, defender));
-                    } else if (hintFaction.equals(defender) &&
-                                     factionHints.isContainedFactionOpponent(regionalFaction,
-                                           hintFaction,
-                                           attacker,
-                                           getCurrentDate())) {
-                        planetSet.addAll(borderTracker.getBorderSystems(attacker, regionalFaction));
-                    }
-                }
-            }
-        }
-
-        return new ArrayList<>(planetSet);
+    /**
+     * As {@link #getMissionTargetList(Faction, Faction, ILocation)}, but applying the given contract-type location
+     * profile's preferred tier before the default border-based search (see
+     * {@link MissionTargetFinder#find(Faction, Faction, ILocation, LocalDate, MissionLocationProfile)}).
+     *
+     * @param attacker the attacking faction
+     * @param defender the defending faction
+     * @param location the location to center the search on
+     * @param profile  the location profile for the contract's type
+     *
+     * @return a list of potential mission targets
+     */
+    public List<PlanetarySystem> getMissionTargetList(Faction attacker, Faction defender, ILocation location,
+          MissionLocationProfile profile) {
+        return missionTargetFinder.find(attacker, defender, location, getCurrentDate(), profile);
     }
 }

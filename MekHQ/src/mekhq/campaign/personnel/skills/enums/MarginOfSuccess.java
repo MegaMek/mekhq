@@ -59,15 +59,15 @@ import mekhq.utilities.ReportingUtilities;
  * @since 0.50.05
  */
 public enum MarginOfSuccess {
-    SPECTACULAR("SPECTACULAR", 7, Integer.MAX_VALUE, 4, ReportingUtilities.getAmazingColor()),
-    EXTRAORDINARY("EXTRAORDINARY", 5, 6, 3, ReportingUtilities.getPositiveColor()),
-    GOOD("GOOD", 3, 4, 2, ReportingUtilities.getPositiveColor()),
-    IT_WILL_DO("IT_WILL_DO", 1, 2, 1, ReportingUtilities.getWarningColor()),
-    BARELY_MADE_IT("BARELY_MADE_IT", 0, 0, 0, ReportingUtilities.getWarningColor()),
-    ALMOST("ALMOST", -2, -1, -1, ReportingUtilities.getWarningColor()),
-    BAD("BAD", -4, -3, -2, ReportingUtilities.getNegativeColor()),
-    TERRIBLE("TERRIBLE", -6, -5, -3, ReportingUtilities.getNegativeColor()),
-    DISASTROUS("DISASTROUS", Integer.MIN_VALUE, -7, -4, ReportingUtilities.getNegativeColor());
+    SPECTACULAR("SPECTACULAR", 7, Integer.MAX_VALUE, ReportingUtilities.getAmazingColor()),
+    EXTRAORDINARY("EXTRAORDINARY", 5, 6, ReportingUtilities.getPositiveColor()),
+    GOOD("GOOD", 3, 4, ReportingUtilities.getPositiveColor()),
+    IT_WILL_DO("IT_WILL_DO", 1, 2, ReportingUtilities.getWarningColor()),
+    BARELY_MADE_IT("BARELY_MADE_IT", 0, 0, ReportingUtilities.getWarningColor()),
+    ALMOST("ALMOST", -2, -1, ReportingUtilities.getWarningColor()),
+    BAD("BAD", -4, -3, ReportingUtilities.getNegativeColor()),
+    TERRIBLE("TERRIBLE", -6, -5, ReportingUtilities.getNegativeColor()),
+    DISASTROUS("DISASTROUS", Integer.MIN_VALUE, -7, ReportingUtilities.getNegativeColor());
 
     private static final MMLogger LOGGER = MMLogger.create(MarginOfSuccess.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.MarginOfSuccess";
@@ -76,27 +76,24 @@ public enum MarginOfSuccess {
     private final String label;
     private final int lowerBound;
     private final int upperBound;
-    private final int margin;
     private final String color;
 
     /**
-     * Constructs a {@link MarginOfSuccess} enum constant with the specified bounds and margin value.
+     * Constructs a {@link MarginOfSuccess} enum constant with the specified bounds.
      *
      * @param lookupName the key used to retrieve resource bundle entries
      * @param lowerBound the lower inclusive bound for this margin of success
      * @param upperBound the upper inclusive bound for this margin of success
-     * @param margin     the margin value associated with this range
      * @param color      the color of reporting text
      *
      * @author Illiani
      * @since 0.50.05
      */
-    MarginOfSuccess(String lookupName, int lowerBound, int upperBound, int margin, String color) {
+    MarginOfSuccess(String lookupName, int lowerBound, int upperBound, String color) {
         this.lookupName = lookupName;
         this.label = generateMarginOfSuccessString();
         this.lowerBound = lowerBound;
         this.upperBound = upperBound;
-        this.margin = margin;
         this.color = color;
     }
 
@@ -116,21 +113,6 @@ public enum MarginOfSuccess {
     }
 
     /**
-     * Retrieves the margin value associated with the specified {@link MarginOfSuccess}.
-     *
-     * <p>The margin value represents the numerical value tied to a specific margin of success, typically used to
-     * measure the degree of success or failure of a skill check.</p>
-     *
-     * @return the margin value associated with the given {@link MarginOfSuccess}
-     *
-     * @author Illiani
-     * @since 0.50.05
-     */
-    public int getValue() {
-        return margin;
-    }
-
-    /**
      * Returns the color associated with the specified {@link MarginOfSuccess} value.
      *
      * <p>This method allows retrieval of a string representing a display color associated with a given margin of
@@ -145,22 +127,16 @@ public enum MarginOfSuccess {
         return color;
     }
 
-    /**
-     * Determines the margin of success as an integer based on the difference between the roll and the target.
-     *
-     * <p>This method calculates the margin of success using the given difference and returns the associated
-     * margin as an integer. Internally, it utilizes {@link #getMarginOfSuccessObject(int)} to determine the relevant
-     * margin category.</p>
-     *
-     * @param differenceBetweenRollAndTarget The difference between the roll result and the target value.
-     *
-     * @return The margin of success as an integer.
-     *
-     * @author Illiani
-     * @since 0.50.05
-     */
-    public static int getMarginOfSuccess(int differenceBetweenRollAndTarget) {
-        return getMarginOfSuccessObject(differenceBetweenRollAndTarget).margin;
+    public int getLowerBound() {
+        return lowerBound;
+    }
+
+    public int getUpperBound() {
+        return upperBound;
+    }
+
+    public String getLookupName() {
+        return lookupName;
     }
 
     /**
@@ -189,34 +165,6 @@ public enum MarginOfSuccess {
         }
         LOGGER.error("No valid MarginOfSuccess found for roll: {}. Returning DISASTROUS",
               differenceBetweenRollAndTarget);
-        return DISASTROUS;
-    }
-
-    /**
-     * Retrieves the {@link MarginOfSuccess} object corresponding to the specified margin value.
-     *
-     * <p>This method iterates through all possible {@link MarginOfSuccess} values and returns the one
-     * whose associated margin matches the provided {@code marginValue}.</p>
-     *
-     * <p>If no matching {@link MarginOfSuccess} is found, an error is logged, and the method
-     * defaults to returning {@link MarginOfSuccess#DISASTROUS}.</p>
-     *
-     * @param marginValue The integer margin value to look up.
-     *
-     * @return The {@link MarginOfSuccess} object corresponding to the given margin value, or
-     *       {@link MarginOfSuccess#DISASTROUS} if no match is found.
-     *
-     * @author Illiani
-     * @since 0.50.05
-     */
-    public static MarginOfSuccess getMarginOfSuccessObjectFromMarginValue(int marginValue) {
-        for (MarginOfSuccess marginOfSuccess : MarginOfSuccess.values()) {
-            if (marginOfSuccess.margin == marginValue) {
-                return marginOfSuccess;
-            }
-        }
-
-        LOGGER.error("No valid MarginOfSuccess found for marginValue: {}. Returning DISASTROUS", marginValue);
         return DISASTROUS;
     }
 

@@ -69,6 +69,7 @@ public class Faction {
     public static final String TORTUGA_DOMINIONS_FACTION_CODE = "TD";
     public static final String INDEPENDENT_FACTION_CODE = "IND";
     public static final String CLAN_FACTION_CODE = "CLAN";
+    public static final String REPUBLIC_OF_THE_SPHERE_FACTION_CODE = "ROS";
 
     private Faction2 faction2;
 

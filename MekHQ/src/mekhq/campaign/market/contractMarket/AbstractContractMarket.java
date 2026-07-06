@@ -46,33 +46,37 @@ import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 
 import java.io.PrintWriter;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 import megamek.Version;
-import megamek.codeUtilities.ObjectUtility;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.market.enums.ContractMarketMethod;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.mission.enums.ContractCommandRights;
+import mekhq.campaign.mission.newContract.EnemySelectionProfile;
+import mekhq.campaign.mission.newContract.MissionLocationProfile;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
+import mekhq.campaign.universe.Systems;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -534,32 +538,30 @@ public abstract class AbstractContractMarket {
         }
     }
 
-    protected void setEnemyCode(AtBContract contract) {
-        if (contract.getContractType().isPirateHunting()) {
-            Faction employer = contract.getEmployerFaction();
-            contract.setEnemyCode(employer.isClan() ? "BAN" : PIRATE_FACTION_CODE);
-        } else if (contract.getContractType().isRiotDuty()) {
-            contract.setEnemyCode("REB");
-        } else if (contract.getEmployerCode().equals(PIRATE_FACTION_CODE)) {
-            RandomFactionGenerator factionGenerator = RandomFactionGenerator.getInstance();
-            Set<String> localFactions = new HashSet<>(factionGenerator.getCurrentFactions());
-            String enemyCode = ObjectUtility.getRandomItem(localFactions);
-            contract.setEnemyCode(enemyCode);
-        } else {
-            String enemyFactionCode = RandomFactionGenerator.getInstance()
-                                            .getEnemy(contract.getEmployerCode(),
-                                                  contract.getContractType().isGarrisonType());
-            Faction enemyFaction = Factions.getInstance().getFaction(enemyFactionCode);
+    /**
+     * Selects and sets the contract's enemy faction, using an enemy-selection preference derived from the contract's
+     * type (see {@link EnemySelectionProfile}): pirate hunting and riot duty resolve to their baked-in enemies as
+     * before, while the other profiles shape which factions the weighted pool prefers.
+     *
+     * @param contract the contract to select an enemy for; its type and employer must already be set
+     * @param campaign the active campaign
+     */
+    protected void setEnemyCode(AtBContract contract, Campaign campaign) {
+        EnemySelectionProfile profile = EnemySelectionProfile.fromContractType(contract.getContractType());
+        Faction enemyFaction = RandomFactionGenerator.getInstance()
+                                     .getRandomEnemy(campaign.getCurrentLocation(), campaign.getLocalDate(),
+                                           contract.getEmployerFaction(), profile);
 
-            // If the OpFor isn't Clan, there is a 1-in-5 chance they've hired mercenaries to do their dirty work. So
-            // the original enemy faction is set as the mercenary's employer, while the enemy faction is set to
-            // Mercenaries.
-            if (!enemyFaction.isClan() && !enemyFaction.isAggregate() && randomInt(5) == 0) {
-                contract.setEnemyMercenaryEmployerCode(enemyFactionCode);
-                contract.setEnemyCode(MERCENARY_FACTION_CODE);
-            } else {
-                contract.setEnemyCode(enemyFactionCode);
-            }
+        // If the OpFor isn't Clan (or an aggregate like pirates and rebels), there is a 1-in-5 chance they've hired
+        // mercenaries to do their dirty work. So the original enemy faction is set as the mercenary's employer,
+        // while the enemy faction is set to Mercenaries. A pirate employer's grudges are its own, so its enemies are
+        // never substituted.
+        boolean isPirateEmployer = contract.getEmployerCode().equals(PIRATE_FACTION_CODE);
+        if (!isPirateEmployer && !enemyFaction.isClan() && !enemyFaction.isAggregate() && randomInt(5) == 0) {
+            contract.setEnemyMercenaryEmployerCode(enemyFaction.getShortName());
+            contract.setEnemyCode(MERCENARY_FACTION_CODE);
+        } else {
+            contract.setEnemyCode(enemyFaction.getShortName());
         }
     }
 
@@ -570,13 +572,27 @@ public abstract class AbstractContractMarket {
         contract.setPlayerAttacker(isAttacker);
     }
 
-    protected void setSystemId(AtBContract contract) throws NoContractLocationFoundException {
+    /**
+     * Resolves and sets the contract's target system, searching the defender's side of the conflict with a location
+     * preference derived from the contract's type (see {@link MissionLocationProfile}). Must be called after any enemy
+     * or contract-type overrides (e.g. pity contracts), since both the attacker/defender roles and the profile are read
+     * from the contract's current state.
+     *
+     * @param contract the contract to resolve a target system for
+     * @param campaign the active campaign
+     *
+     * @throws NoContractLocationFoundException if no valid target system could be found
+     */
+    protected void setSystemId(AtBContract contract, Campaign campaign) throws NoContractLocationFoundException {
+        MissionLocationProfile profile = MissionLocationProfile.fromContractType(contract.getContractType());
         if (contract.isPlayerAttacker()) {
             contract.setSystemId(RandomFactionGenerator.getInstance()
-                                       .getMissionTarget(contract.getEmployerCode(), contract.getEnemyCode()));
+                                       .getMissionTarget(contract.getEmployerCode(), contract.getEnemyCode(),
+                                             campaign.getCurrentLocation(), profile));
         } else {
             contract.setSystemId(RandomFactionGenerator.getInstance()
-                                       .getMissionTarget(contract.getEnemyCode(), contract.getEmployerCode()));
+                                       .getMissionTarget(contract.getEnemyCode(), contract.getEmployerCode(),
+                                             campaign.getCurrentLocation(), profile));
         }
         if (contract.getSystem() == null) {
             String errorMsg = "Could not find contract location for " +
@@ -586,6 +602,42 @@ public abstract class AbstractContractMarket {
             logger.warn(errorMsg);
             throw new NoContractLocationFoundException(errorMsg);
         }
+    }
+
+    /**
+     * Radius, in light years, of the Clan Homeworlds exclusion zone centered on Strana Mechty.
+     */
+    private static final double HOMEWORLDS_EXCLUSION_RADIUS = 450;
+
+    private static final String STRANA_MECHTY_SYSTEM_ID = "Strana Mechty";
+
+    /**
+     * Outside of Operation Bulldog ({@link MHQConstants#OPERATION_BULLDOG_START} to
+     * {@link MHQConstants#OPERATION_BULLDOG_END}), no non-Clan faction has the reach to strike within
+     * {@value #HOMEWORLDS_EXCLUSION_RADIUS} light years of Strana Mechty: that one historical invasion is the only time
+     * Inner Sphere/mercenary forces ever operated that deep in the Clan Homeworlds.
+     *
+     * @param contract the contract whose target system to check
+     * @param campaign the active campaign, used to compute the arrival date (current date plus travel time)
+     *
+     * @return {@code true} if the contract's attacking faction is non-Clan, its target is within the exclusion radius,
+     *       and the attacker would arrive there outside the Operation Bulldog window
+     */
+    protected boolean violatesHomeworldsExclusion(AbstractMissionTransition contract, Campaign campaign) {
+        Faction attacker = contract.isPlayerAttacker() ? contract.getEmployerFaction() : contract.getEnemy();
+        if (attacker.isClan()) {
+            return false;
+        }
+
+        PlanetarySystem stranaMechty = Systems.getInstance().getSystemById(STRANA_MECHTY_SYSTEM_ID);
+        if ((stranaMechty == null) ||
+                  (contract.getSystem().getDistanceTo(stranaMechty) > HOMEWORLDS_EXCLUSION_RADIUS)) {
+            return false;
+        }
+
+        LocalDate arrivalDate = campaign.getLocalDate().plusDays(contract.getTravelDays(campaign));
+        return !(arrivalDate.isAfter(MHQConstants.OPERATION_BULLDOG_START) &&
+                       arrivalDate.isBefore(MHQConstants.OPERATION_BULLDOG_END));
     }
 
     /**

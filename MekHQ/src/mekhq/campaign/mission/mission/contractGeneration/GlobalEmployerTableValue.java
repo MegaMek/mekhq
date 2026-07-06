@@ -118,6 +118,7 @@ public enum GlobalEmployerTableValue {
         } else if (faction.isSuperPower()) {
             return SUPER_POWER;
         } else {
+            // We use independent here as a catch net so nothing slips through
             return INDEPENDENT;
         }
     }

@@ -175,8 +175,8 @@ public class ContractMarketAtBGenerationTests {
         RandomFactionGenerator rfg = mock(RandomFactionGenerator.class);
         RandomFactionGenerator.setInstance(rfg);
         when(rfg.getEmployerFaction(any(), any())).thenReturn(employerFaction);
-        doReturn(enemy).when(rfg).getEnemy(eq(employer), anyBoolean());
-        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
+        doReturn(enemyFaction).when(rfg).getRandomEnemy(anyBoolean(), any(), any(), eq(employerFaction));
+        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString(), any(), any());
 
         FactionHints hints = mock(FactionHints.class);
         when(employerFaction.isISMajorOrSuperPower()).thenReturn(true);
@@ -279,8 +279,8 @@ public class ContractMarketAtBGenerationTests {
         RandomFactionGenerator rfg = mock(RandomFactionGenerator.class);
         RandomFactionGenerator.setInstance(rfg);
         when(rfg.getEmployerFaction(any(), any())).thenReturn(employerFaction);
-        doReturn(enemy).when(rfg).getEnemy(eq(employer), anyBoolean());
-        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
+        doReturn(enemyFaction).when(rfg).getRandomEnemy(anyBoolean(), any(), any(), eq(employerFaction));
+        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString(), any(), any());
 
         FactionHints hints = mock(FactionHints.class);
         when(employerFaction.isISMajorOrSuperPower()).thenReturn(false);
@@ -386,8 +386,8 @@ public class ContractMarketAtBGenerationTests {
         RandomFactionGenerator rfg = mock(RandomFactionGenerator.class);
         RandomFactionGenerator.setInstance(rfg);
         when(rfg.getEmployerFaction(any(), any())).thenReturn(employerFaction);
-        doReturn(enemy).when(rfg).getEnemy(eq(employer), anyBoolean());
-        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
+        doReturn(enemyFaction).when(rfg).getRandomEnemy(anyBoolean(), any(), any(), eq(employerFaction));
+        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString(), any(), any());
 
         FactionHints hints = mock(FactionHints.class);
         when(employerFaction.isISMajorOrSuperPower()).thenReturn(true);
@@ -493,8 +493,8 @@ public class ContractMarketAtBGenerationTests {
         RandomFactionGenerator rfg = mock(RandomFactionGenerator.class);
         RandomFactionGenerator.setInstance(rfg);
         when(rfg.getEmployerFaction(any(), any())).thenReturn(employerFaction);
-        doReturn(enemy).when(rfg).getEnemy(eq(employer), anyBoolean());
-        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
+        doReturn(enemyFaction).when(rfg).getRandomEnemy(anyBoolean(), any(), any(), eq(employerFaction));
+        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString(), any(), any());
 
         FactionHints hints = mock(FactionHints.class);
         when(employerFaction.isISMajorOrSuperPower()).thenReturn(true);
@@ -612,8 +612,8 @@ public class ContractMarketAtBGenerationTests {
 
         RandomFactionGenerator rfg = mock(RandomFactionGenerator.class);
         RandomFactionGenerator.setInstance(rfg);
-        doReturn(enemy).when(rfg).getEnemy(eq(employer), anyBoolean());
-        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
+        doReturn(enemyFaction).when(rfg).getRandomEnemy(anyBoolean(), any(), any(), eq(employerFaction));
+        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString(), any(), any());
 
         FactionHints hints = mock(FactionHints.class);
         when(employerFaction.isISMajorOrSuperPower()).thenReturn(true);
@@ -757,9 +757,9 @@ public class ContractMarketAtBGenerationTests {
         RandomFactionGenerator rfg = mock(RandomFactionGenerator.class);
         RandomFactionGenerator.setInstance(rfg);
         when(rfg.getEmployerFaction(any(), any())).thenReturn(employerFaction);
-        doReturn(enemy).when(rfg).getEnemy(eq(employer), anyBoolean());
+        doReturn(enemyFaction).when(rfg).getRandomEnemy(anyBoolean(), any(), any(), eq(employerFaction));
         // Don't find the mission target and force a retry
-        doReturn(null).doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
+        doReturn(null).doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString(), any(), any());
 
         FactionHints hints = mock(FactionHints.class);
         when(employerFaction.isISMajorOrSuperPower()).thenReturn(true);
@@ -864,9 +864,9 @@ public class ContractMarketAtBGenerationTests {
         RandomFactionGenerator rfg = mock(RandomFactionGenerator.class);
         RandomFactionGenerator.setInstance(rfg);
         when(rfg.getEmployerFaction(any(), any())).thenReturn(employerFaction);
-        doReturn(enemy).when(rfg).getEnemy(eq(employer), anyBoolean());
+        doReturn(enemyFaction).when(rfg).getRandomEnemy(anyBoolean(), any(), any(), eq(employerFaction));
         // Don't ever find the mission target and force a retry failure
-        doReturn(null).when(rfg).getMissionTarget(anyString(), anyString());
+        doReturn(null).when(rfg).getMissionTarget(anyString(), anyString(), any(), any());
 
         FactionHints hints = mock(FactionHints.class);
         when(employerFaction.isISMajorOrSuperPower()).thenReturn(true);
@@ -963,8 +963,8 @@ public class ContractMarketAtBGenerationTests {
         RandomFactionGenerator rfg = mock(RandomFactionGenerator.class);
         RandomFactionGenerator.setInstance(rfg);
         when(rfg.getEmployerFaction(any(), any())).thenReturn(employerFaction);
-        doReturn(enemy).when(rfg).getEnemy(eq(employer), anyBoolean());
-        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
+        doReturn(enemyFaction).when(rfg).getRandomEnemy(anyBoolean(), any(), any(), eq(employerFaction));
+        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString(), any(), any());
 
         FactionHints hints = mock(FactionHints.class);
         when(employerFaction.isISMajorOrSuperPower()).thenReturn(true);
@@ -1070,8 +1070,8 @@ public class ContractMarketAtBGenerationTests {
         RandomFactionGenerator rfg = mock(RandomFactionGenerator.class);
         RandomFactionGenerator.setInstance(rfg);
         when(rfg.getEmployerFaction(any(), any())).thenReturn(employerFaction);
-        doReturn(enemy).when(rfg).getEnemy(eq(employer), anyBoolean());
-        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
+        doReturn(enemyFaction).when(rfg).getRandomEnemy(anyBoolean(), any(), any(), eq(employerFaction));
+        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString(), any(), any());
 
         FactionHints hints = mock(FactionHints.class);
         when(employerFaction.isISMajorOrSuperPower()).thenReturn(true);
@@ -1172,8 +1172,8 @@ public class ContractMarketAtBGenerationTests {
         RandomFactionGenerator rfg = mock(RandomFactionGenerator.class);
         RandomFactionGenerator.setInstance(rfg);
         when(rfg.getEmployerFaction(any(), any())).thenReturn(employerFaction);
-        doReturn(enemy).when(rfg).getEnemy(eq(employer), anyBoolean());
-        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
+        doReturn(enemyFaction).when(rfg).getRandomEnemy(anyBoolean(), any(), any(), eq(employerFaction));
+        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString(), any(), any());
 
         FactionHints hints = mock(FactionHints.class);
         when(employerFaction.isISMajorOrSuperPower()).thenReturn(true);
@@ -1279,8 +1279,8 @@ public class ContractMarketAtBGenerationTests {
         RandomFactionGenerator rfg = mock(RandomFactionGenerator.class);
         RandomFactionGenerator.setInstance(rfg);
         when(rfg.getEmployerFaction(any(), any())).thenReturn(employerFaction);
-        doReturn(enemy).when(rfg).getEnemy(eq(employer), anyBoolean());
-        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
+        doReturn(enemyFaction).when(rfg).getRandomEnemy(anyBoolean(), any(), any(), eq(employerFaction));
+        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString(), any(), any());
 
         FactionHints hints = mock(FactionHints.class);
         when(employerFaction.isISMajorOrSuperPower()).thenReturn(false);
@@ -1386,8 +1386,8 @@ public class ContractMarketAtBGenerationTests {
         RandomFactionGenerator rfg = mock(RandomFactionGenerator.class);
         RandomFactionGenerator.setInstance(rfg);
         when(rfg.getEmployerFaction(any(), any())).thenReturn(employerFaction);
-        doReturn(enemy).when(rfg).getEnemy(eq(employer), anyBoolean());
-        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
+        doReturn(enemyFaction).when(rfg).getRandomEnemy(anyBoolean(), any(), any(), eq(employerFaction));
+        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString(), any(), any());
 
         FactionHints hints = mock(FactionHints.class);
         when(employerFaction.isISMajorOrSuperPower()).thenReturn(true);
@@ -1492,8 +1492,8 @@ public class ContractMarketAtBGenerationTests {
 
         RandomFactionGenerator rfg = mock(RandomFactionGenerator.class);
         RandomFactionGenerator.setInstance(rfg);
-        doReturn(enemy).when(rfg).getEnemy(eq(employer), anyBoolean());
-        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
+        doReturn(enemyFaction).when(rfg).getRandomEnemy(anyBoolean(), any(), any(), eq(employerFaction));
+        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString(), any(), any());
 
         FactionHints hints = mock(FactionHints.class);
         when(employerFaction.isISMajorOrSuperPower()).thenReturn(true);
@@ -1600,8 +1600,8 @@ public class ContractMarketAtBGenerationTests {
         RandomFactionGenerator rfg = mock(RandomFactionGenerator.class);
         RandomFactionGenerator.setInstance(rfg);
         when(rfg.getEmployerFaction(any(), any())).thenReturn(employerFaction);
-        doReturn(enemy).when(rfg).getEnemy(eq(employer), anyBoolean());
-        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
+        doReturn(enemyFaction).when(rfg).getRandomEnemy(anyBoolean(), any(), any(), eq(employerFaction));
+        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString(), any(), any());
 
         FactionHints hints = mock(FactionHints.class);
         when(employerFaction.isISMajorOrSuperPower()).thenReturn(true);
@@ -1708,8 +1708,8 @@ public class ContractMarketAtBGenerationTests {
         RandomFactionGenerator rfg = mock(RandomFactionGenerator.class);
         RandomFactionGenerator.setInstance(rfg);
         when(rfg.getEmployerFaction(any(), any())).thenReturn(employerFaction);
-        doReturn(enemy).when(rfg).getEnemy(eq(employer), anyBoolean());
-        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
+        doReturn(enemyFaction).when(rfg).getRandomEnemy(anyBoolean(), any(), any(), eq(employerFaction));
+        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString(), any(), any());
 
         FactionHints hints = mock(FactionHints.class);
         when(employerFaction.isISMajorOrSuperPower()).thenReturn(false);
@@ -1815,8 +1815,8 @@ public class ContractMarketAtBGenerationTests {
         RandomFactionGenerator rfg = mock(RandomFactionGenerator.class);
         RandomFactionGenerator.setInstance(rfg);
         when(rfg.getEmployerFaction(any(), any())).thenReturn(employerFaction);
-        doReturn(enemy).when(rfg).getEnemy(eq(employer), anyBoolean());
-        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
+        doReturn(enemyFaction).when(rfg).getRandomEnemy(anyBoolean(), any(), any(), eq(employerFaction));
+        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString(), any(), any());
 
         FactionHints hints = mock(FactionHints.class);
         when(employerFaction.isISMajorOrSuperPower()).thenReturn(true);
@@ -1922,8 +1922,8 @@ public class ContractMarketAtBGenerationTests {
 
         RandomFactionGenerator rfg = mock(RandomFactionGenerator.class);
         RandomFactionGenerator.setInstance(rfg);
-        doReturn(enemy).when(rfg).getEnemy(eq(employer), anyBoolean());
-        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
+        doReturn(enemyFaction).when(rfg).getRandomEnemy(anyBoolean(), any(), any(), eq(employerFaction));
+        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString(), any(), any());
 
         FactionHints hints = mock(FactionHints.class);
         when(employerFaction.isISMajorOrSuperPower()).thenReturn(true);
