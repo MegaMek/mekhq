@@ -41,23 +41,41 @@ public record ContractPayData(
       ContractBasePayData basePayData,
       TransitPayData transitPayData,
       Map<UUID, ObjectivePayData> objectivePayDataMap,
-      Money totalObjectivePay
+      Money totalObjectivePay,
+      double straightSupportMultiplier,
+      Money straightSupportEstimate,
+      double transportPaymentMultiplier,
+      Money transportPayment
 ) {
-    public ContractPayData rebuildIncludingStraightSupport() {
+    public ContractPayData(ContractBasePayData basePayData, TransitPayData transitPayData,
+          Map<UUID, ObjectivePayData> objectivePayDataMap, Money totalObjectivePay) {
+        this(basePayData, transitPayData, objectivePayDataMap, totalObjectivePay, 0.0, Money.zero(), 0.0, Money.zero());
+    }
+
+    public ContractPayData rebuildIncludingTransportPay(double straightSupportMultiplier,
+          Money straightSupportEstimate) {
         return new ContractPayData(
               basePayData,
               transitPayData,
               objectivePayDataMap,
-              totalObjectivePay
+              totalObjectivePay,
+              straightSupportMultiplier,
+              straightSupportEstimate,
+              transportPaymentMultiplier,
+              transportPayment
         );
     }
 
-    public ContractPayData rebuildIncludingTransportPayment() {
+    public ContractPayData rebuildIncludingStraightSupport(double transportPaymentMultiplier, Money transportPayment) {
         return new ContractPayData(
               basePayData,
               transitPayData,
               objectivePayDataMap,
-              totalObjectivePay
+              totalObjectivePay,
+              straightSupportMultiplier,
+              straightSupportEstimate,
+              transportPaymentMultiplier,
+              transportPayment
         );
     }
 }

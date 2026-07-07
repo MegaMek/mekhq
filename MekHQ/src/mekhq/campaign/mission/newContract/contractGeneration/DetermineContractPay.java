@@ -34,7 +34,6 @@ package mekhq.campaign.mission.newContract.contractGeneration;
 
 import static java.lang.Math.ceil;
 import static java.lang.Math.round;
-import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -126,7 +125,7 @@ public class DetermineContractPay {
         // TODO replace with campaign option
         BasePaymentMultiplier basePaymentMultiplier = BasePaymentMultiplier.NORMAL;
 
-        Money peacetimeOperatingCosts = calculatePeacetimeOperatingCosts(isClanCampaign,
+        Money peacetimeOperatingCosts = calculatePeacetimeOperatingCostsIncludingMultiplier(isClanCampaign,
               formations,
               hangar,
               campaignOptions,
@@ -146,7 +145,8 @@ public class DetermineContractPay {
         return new ContractBasePayData(peacetimeOperatingCosts, totalCostOfCombatUnits, calculatedBasePay);
     }
 
-    private static Money calculatePeacetimeOperatingCosts(boolean isClanCampaign, List<Formation> formations,
+    private static Money calculatePeacetimeOperatingCostsIncludingMultiplier(boolean isClanCampaign,
+          List<Formation> formations,
           Hangar hangar, CampaignOptions campaignOptions, LocalDate currentDate, int temporaryAsTechPoolSize,
           int temporaryMedicPool, Map<PersonnelRole, Integer> temporaryCrewMap) {
         Money peacetimeOperatingCosts = Accountant.getPeacetimeOperatingCosts(formations,
@@ -230,26 +230,6 @@ public class DetermineContractPay {
         return (int) round((baseWeeks + additionalWeeks) * multiplier);
     }
 
-    public static Money calculateObjectiveTransportPay(Collection<Unit> travelingUnits,
-          boolean isOverridingCommandCircuitRequirements, boolean isGM, FactionStandings factionStandings,
-          String employerId, JumpPath cachedJumpPath, LocalDate currentDate, ILocation currentLocation,
-          Collection<Part> travelingParts, Collection<Person> travelingPersonnel) {
-        boolean isUseCommandCircuit = FactionStandingUtilities.isUseCommandCircuit(
-              isOverridingCommandCircuitRequirements,
-              isGM,
-              factionStandings,
-              employerId);
-
-        int duration = (int) ceil(cachedJumpPath.getTotalTime(currentDate, currentLocation.getTransitTime(),
-              isUseCommandCircuit));
-
-        TransportCostCalculations costCalculation = new TransportCostCalculations(travelingUnits,
-              travelingParts,
-              travelingPersonnel,
-              EXP_REGULAR);
-        return costCalculation.calculateJumpCostForEntireJourney(duration, cachedJumpPath.getJumps());
-    }
-
     private static @NonNull Map<UUID, ObjectivePayData> calculateObjectivePay(
           List<AbstractContractObjective> objectives, Money calculatedBasePay,
           double employmentMultiplier, double reputationFactor) {
@@ -277,5 +257,42 @@ public class DetermineContractPay {
         }
 
         return objectivePayMap;
+    }
+
+    public Money determineTransportPayment(boolean isOverridingCommandCircuitRequirements, boolean isGM,
+          FactionStandings factionStandings, String employerCode, JumpPath jumpPath, LocalDate currentDate,
+          ILocation currentLocation, Collection<Unit> travelingUnits, Collection<Part> travelingParts,
+          Collection<Person> travelingPersonnel, int jumpShipCrewExperienceLevel) {
+        boolean isUseCommandCircuit = FactionStandingUtilities.isUseCommandCircuit(
+              isOverridingCommandCircuitRequirements,
+              isGM,
+              factionStandings,
+              employerCode);
+
+        int duration = (int) ceil(jumpPath.getTotalTime(currentDate, currentLocation.getTransitTime(),
+              isUseCommandCircuit));
+
+        TransportCostCalculations costCalculation = new TransportCostCalculations(travelingUnits,
+              travelingParts,
+              travelingPersonnel,
+              jumpShipCrewExperienceLevel);
+
+        return costCalculation.calculateJumpCostForEntireJourney(duration, jumpPath.getJumps());
+    }
+
+    public static Money determineStraightSupport(boolean isClanCampaign, List<Formation> formations,
+          Hangar hangar, CampaignOptions campaignOptions, LocalDate currentDate, int temporaryAsTechPoolSize,
+          int temporaryMedicPool, Map<PersonnelRole, Integer> temporaryCrewMap, double straightSupportMultiplier) {
+        Money peacetimeOperatingCosts = Accountant.getPeacetimeOperatingCosts(formations,
+              hangar,
+              campaignOptions,
+              isClanCampaign,
+              currentDate,
+              temporaryAsTechPoolSize,
+              temporaryMedicPool,
+              temporaryCrewMap,
+              true);
+
+        return peacetimeOperatingCosts.multipliedBy(straightSupportMultiplier);
     }
 }
