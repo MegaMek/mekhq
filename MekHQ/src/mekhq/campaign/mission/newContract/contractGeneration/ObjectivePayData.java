@@ -32,34 +32,5 @@
  */
 package mekhq.campaign.mission.newContract.contractGeneration;
 
-import java.time.LocalDate;
-
-import megamek.logging.MMLogger;
-import mekhq.campaign.AbstractLocation;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.newContract.AbstractContractManager;
-import mekhq.campaign.mission.newContract.NormalContractManager;
-import mekhq.campaign.personnel.Person;
-
-public class ContractGenerationGodClass {
-    private static final MMLogger LOGGER = MMLogger.create(ContractGenerationGodClass.class);
-
-    public ContractGenerationGodClass() {
-    }
-
-    public void generateContract(Campaign campaign, double forceReputationFactor, AbstractLocation currentLocation,
-          Person negotiator) {
-        AbstractContractManager parentContractManager = new NormalContractManager();
-
-        LocalDate currentDate = campaign.getLocalDate();
-
-        ContractGenerationStage1.generateEmployerContractTypeEnemyAndLocation(campaign,
-              forceReputationFactor,
-              currentLocation,
-              negotiator,
-              currentDate,
-              parentContractManager);
-
-
-    }
+public record ObjectivePayData() {
 }

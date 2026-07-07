@@ -38,6 +38,7 @@ import megamek.logging.MMLogger;
 import org.jspecify.annotations.NonNull;
 
 public enum BasePaymentMultiplier {
+    GENEROUS("GENEROUS", 1.5),
     NORMAL("NORMAL", 1.0),
     SPENDTHRIFT("SPENDTHRIFT", 0.5),
     MISERLY("MISERLY", 0.2);

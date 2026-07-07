@@ -42,122 +42,87 @@ import java.util.List;
 import java.util.Map;
 
 import mekhq.campaign.Hangar;
-import mekhq.campaign.JumpPath;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.location.ILocation;
 import mekhq.campaign.market.contractMarket.AlternatePaymentModelValues;
 import mekhq.campaign.mission.TransportCostCalculations;
-import mekhq.campaign.parts.Part;
-import mekhq.campaign.personnel.Person;
+import mekhq.campaign.mission.newContract.AbstractContractManager;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
-import mekhq.campaign.universe.factionStanding.FactionStandings;
 import org.jspecify.annotations.NonNull;
 
-public class ContractObjectivePay {
+public class DetermineContractPay {
     /** CampOps pg 41 5th printing */
     private final static double PEACETIME_OPERATING_COSTS_PERCENTAGE = 0.75;
 
-    private final CampaignOptions campaignOptions;
-    private final Faction campaignFaction;
-    private final LocalDate today;
-    private final Hangar hangar;
-    private final Collection<Part> spareParts;
-    private final Collection<Person> allPersonnel;
-    private final int temporaryAsTechPoolSize;
-    private final int temporaryMedicPool;
-    private final Map<PersonnelRole, Integer> tempCrewMap;
-    private final List<Formation> formations;
-    private final BasePaymentMultiplier basePaymentMultiplier;
-    private final ILocation currentLocation;
-    private final JumpPath jumpPath;
-    private final boolean isOverridingCommandCircuitRequirements;
-    private final boolean isGM;
-    private final FactionStandings factionStandings;
-    private final String employerCode;
-    private final double tempoMultiplier;
-    private final double employmentMultiplier;
-    private final double reputationFactor;
+    public DetermineContractPay() {}
 
-    // Base Pay
-    private Money basePay;
+    public static ContractPayData generateContractPay(AbstractContractManager contractManager, boolean isClanCampaign,
+          List<Formation> formations, Hangar hangar, CampaignOptions campaignOptions, LocalDate currentDate,
+          int temporaryAsTechPoolSize, int temporaryMedicPool, Map<PersonnelRole, Integer> temporaryCrewMap,
+          Faction campaignFaction) {
+        ContractBasePayData basePayData = calculateBasePay(isClanCampaign,
+              formations,
+              hangar,
+              campaignOptions,
+              currentDate,
+              temporaryAsTechPoolSize,
+              temporaryMedicPool,
+              temporaryCrewMap,
+              campaignFaction);
 
-    // Length
-    private final int lengthOfObjective;
-    private int transportPeriod;
-    private int totalLength;
-
-    // Transport
-    private Money transportPayment;
-
-    public ContractObjectivePay(CampaignOptions campaignOptions, Faction campaignFaction, LocalDate today,
-          Hangar hangar, final Collection<Part> spareParts, final Collection<Person> allPersonnel,
-          int temporaryAsTechPoolSize, int temporaryMedicPool, Map<PersonnelRole, Integer> tempCrewMap,
-          List<Formation> formations, BasePaymentMultiplier basePaymentMultiplier, ILocation currentLocation,
-          JumpPath jumpPath, boolean isOverridingCommandCircuitRequirements, boolean isGM,
-          FactionStandings factionStandings, String employerCode, int lengthOfObjective, double tempoMultiplier,
-          double employmentMultiplier, double reputationFactor) {
-        this.campaignOptions = campaignOptions;
-        this.campaignFaction = campaignFaction;
-        this.today = today;
-        this.hangar = hangar;
-        this.spareParts = spareParts;
-        this.allPersonnel = allPersonnel;
-        this.temporaryAsTechPoolSize = temporaryAsTechPoolSize;
-        this.temporaryMedicPool = temporaryMedicPool;
-        this.tempCrewMap = tempCrewMap;
-        this.formations = formations;
-        this.basePaymentMultiplier = basePaymentMultiplier;
-        this.currentLocation = currentLocation;
-        this.jumpPath = jumpPath;
-        this.isOverridingCommandCircuitRequirements = isOverridingCommandCircuitRequirements;
-        this.isGM = isGM;
-        this.factionStandings = factionStandings;
-        this.employerCode = employerCode;
-        this.lengthOfObjective = lengthOfObjective;
-        this.tempoMultiplier = tempoMultiplier;
-        this.employmentMultiplier = employmentMultiplier;
-        this.reputationFactor = reputationFactor;
+        Money travelPay = travelPay();
     }
 
-    private @NonNull Money getObjectivePay() {
-        return Money.zero()
-                     .plus(basePay)
-                     .multipliedBy(totalLength)
-                     .multipliedBy(tempoMultiplier)
-                     .multipliedBy(employmentMultiplier)
-                     .multipliedBy(reputationFactor);
+    public static ContractBasePayData calculateBasePay(boolean isClanCampaign, List<Formation> formations,
+          Hangar hangar, CampaignOptions campaignOptions, LocalDate currentDate, int temporaryAsTechPoolSize,
+          int temporaryMedicPool, Map<PersonnelRole, Integer> temporaryCrewMap, Faction campaignFaction) {
+        // TODO replace with campaign option
+        BasePaymentMultiplier basePaymentMultiplier = BasePaymentMultiplier.NORMAL;
+
+        Money peacetimeOperatingCosts = calculatePeacetimeOperatingCosts(isClanCampaign,
+              formations,
+              hangar,
+              campaignOptions,
+              currentDate,
+              temporaryAsTechPoolSize,
+              temporaryMedicPool,
+              temporaryCrewMap);
+
+        Money totalCostOfCombatUnits = calculateTotalCostOfCombatUnits(campaignOptions,
+              campaignFaction,
+              formations,
+              hangar);
+
+        Money calculatedBasePay = peacetimeOperatingCosts.plus(totalCostOfCombatUnits);
+        calculatedBasePay = calculatedBasePay.multipliedBy(basePaymentMultiplier.getMultiplier());
+
+        return new ContractBasePayData(peacetimeOperatingCosts, totalCostOfCombatUnits, calculatedBasePay);
     }
 
-    private @NonNull Money travelPay() {
-        return Money.zero().plus(basePay)
-                     .multipliedBy(transportPeriod)
-                     .multipliedBy(employmentMultiplier)
-                     .multipliedBy(reputationFactor)
-                     .plus(transportPayment);
-    }
-
-    public void calculateBasePay() {
-        Money peacetimeOperatingCosts = calculatePeacetimeOperatingCosts(campaignFaction.isClan());
-        Money totalCostOfCombatUnits = calculateTotalCostOfCombatUnits();
-
-        basePay = peacetimeOperatingCosts.plus(totalCostOfCombatUnits);
-    }
-
-    private Money calculatePeacetimeOperatingCosts(boolean isClanCampaign) {
-        Money peacetimeOperatingCosts = Accountant.getPeacetimeOperatingCosts(formations, hangar, campaignOptions,
-              isClanCampaign, today, temporaryAsTechPoolSize, temporaryMedicPool, tempCrewMap, true);
+    private static Money calculatePeacetimeOperatingCosts(boolean isClanCampaign, List<Formation> formations,
+          Hangar hangar, CampaignOptions campaignOptions, LocalDate currentDate, int temporaryAsTechPoolSize,
+          int temporaryMedicPool, Map<PersonnelRole, Integer> temporaryCrewMap) {
+        Money peacetimeOperatingCosts = Accountant.getPeacetimeOperatingCosts(formations,
+              hangar,
+              campaignOptions,
+              isClanCampaign,
+              currentDate,
+              temporaryAsTechPoolSize,
+              temporaryMedicPool,
+              temporaryCrewMap,
+              true);
 
         return peacetimeOperatingCosts.multipliedBy(PEACETIME_OPERATING_COSTS_PERCENTAGE);
     }
 
-    private Money calculateTotalCostOfCombatUnits() {
+    private static Money calculateTotalCostOfCombatUnits(CampaignOptions campaignOptions, Faction campaignFaction,
+          List<Formation> formations, Hangar hangar) {
         final boolean excludeInfantry = campaignOptions.isInfantryDontCount();
         final double combatUnitContractPercent = campaignOptions.getEquipmentContractPercent();
         final double dropShipContractPercent = campaignOptions.getDropShipContractPercent();
@@ -192,6 +157,23 @@ public class ContractObjectivePay {
 
         double basePaymentMultiplierValue = basePaymentMultiplier.getMultiplier();
         return forceValue.multipliedBy(basePaymentMultiplierValue);
+    }
+
+    private @NonNull Money getObjectivePay() {
+        return Money.zero()
+                     .plus(basePay)
+                     .multipliedBy(totalLength)
+                     .multipliedBy(tempoMultiplier)
+                     .multipliedBy(employmentMultiplier)
+                     .multipliedBy(reputationFactor);
+    }
+
+    private static @NonNull Money travelPay() {
+        return Money.zero().plus(basePay)
+                     .multipliedBy(transportPeriod)
+                     .multipliedBy(employmentMultiplier)
+                     .multipliedBy(reputationFactor)
+                     .plus(transportPayment);
     }
 
     public void calculateLengthOfMission() {
