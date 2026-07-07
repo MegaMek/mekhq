@@ -81,18 +81,35 @@ public class SendToLocationMenu extends JScrollableMenu {
     public SendToLocationMenu(Campaign campaign, JFrame frame,
           List<? extends ILocation> items,
           Consumer<ILocation> dispatcher) {
+        this(campaign, frame, items, dispatcher, "menu.sendTo.text");
+    }
+
+    /**
+     * @param campaign    the active campaign
+     * @param frame       parent frame for any dialogs
+     * @param items       the {@link ILocation} objects to dispatch (persons, units, or parts)
+     * @param dispatcher  callback invoked with the chosen destination when the user clicks an entry
+     * @param menuTextKey resource-bundle key for this menu's label (e.g. "menu.sendTo.text" or
+     *                    "menu.teleportTo.text"), letting the same destination picker be reused under
+     *                    different top-level labels
+     */
+    public SendToLocationMenu(Campaign campaign, JFrame frame,
+          List<? extends ILocation> items,
+          Consumer<ILocation> dispatcher,
+          String menuTextKey) {
         super("SendToLocationMenu");
-        initialize(campaign, frame, items, dispatcher);
+        initialize(campaign, frame, items, dispatcher, menuTextKey);
     }
 
     private void initialize(Campaign campaign, JFrame frame,
           List<? extends ILocation> items,
-          Consumer<ILocation> dispatcher) {
+          Consumer<ILocation> dispatcher,
+          String menuTextKey) {
         if (items.isEmpty()) {
             return;
         }
 
-        setText(getTextAt(RESOURCE_BUNDLE, "menu.sendTo.text"));
+        setText(getTextAt(RESOURCE_BUNDLE, menuTextKey));
 
         // Determine the ILocation parent all selected items share (if any), to exclude it.
         // ILocation subtypes like Personnel extend LinkedHashMap, so Objects.equals() would

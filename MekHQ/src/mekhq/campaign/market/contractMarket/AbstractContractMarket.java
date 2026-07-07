@@ -42,11 +42,11 @@ import static megamek.common.enums.SkillLevel.HEROIC;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.enums.SkillLevel.VETERAN;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
+import static mekhq.campaign.mission.newContract.LandlessEmployerExclusion.shouldRejectDefensiveObjectives;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 
 import java.io.PrintWriter;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -56,13 +56,11 @@ import java.util.Objects;
 import megamek.Version;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
-import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.market.enums.ContractMarketMethod;
-import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
@@ -74,9 +72,7 @@ import mekhq.campaign.mission.newContract.MissionLocationProfile;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
-import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
-import mekhq.campaign.universe.Systems;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -581,9 +577,16 @@ public abstract class AbstractContractMarket {
      * @param contract the contract to resolve a target system for
      * @param campaign the active campaign
      *
-     * @throws NoContractLocationFoundException if no valid target system could be found
+     * @throws NoContractLocationFoundException if no valid target system could be found, or the player would be
+     *                                          defending for an employer that controls no planets to defend
      */
     protected void setSystemId(AtBContract contract, Campaign campaign) throws NoContractLocationFoundException {
+        if (shouldRejectDefensiveObjectives(contract.getEmployerFaction(),
+              contract.isPlayerAttacker(),
+              campaign.getLocalDate())) {
+            throw new NoContractLocationFoundException("Defensive contract for landless employer");
+        }
+
         MissionLocationProfile profile = MissionLocationProfile.fromContractType(contract.getContractType());
         if (contract.isPlayerAttacker()) {
             contract.setSystemId(RandomFactionGenerator.getInstance()
@@ -595,49 +598,13 @@ public abstract class AbstractContractMarket {
                                              campaign.getCurrentLocation(), profile));
         }
         if (contract.getSystem() == null) {
-            String errorMsg = "Could not find contract location for " +
-                                    contract.getEmployerCode() +
-                                    " vs. " +
-                                    contract.getEnemyCode();
-            logger.warn(errorMsg);
-            throw new NoContractLocationFoundException(errorMsg);
+            String errorMessage = "Could not find contract location for " +
+                                        contract.getEmployerCode() +
+                                        " vs. " +
+                                        contract.getEnemyCode();
+            logger.warn(errorMessage);
+            throw new NoContractLocationFoundException(errorMessage);
         }
-    }
-
-    /**
-     * Radius, in light years, of the Clan Homeworlds exclusion zone centered on Strana Mechty.
-     */
-    private static final double HOMEWORLDS_EXCLUSION_RADIUS = 450;
-
-    private static final String STRANA_MECHTY_SYSTEM_ID = "Strana Mechty";
-
-    /**
-     * Outside of Operation Bulldog ({@link MHQConstants#OPERATION_BULLDOG_START} to
-     * {@link MHQConstants#OPERATION_BULLDOG_END}), no non-Clan faction has the reach to strike within
-     * {@value #HOMEWORLDS_EXCLUSION_RADIUS} light years of Strana Mechty: that one historical invasion is the only time
-     * Inner Sphere/mercenary forces ever operated that deep in the Clan Homeworlds.
-     *
-     * @param contract the contract whose target system to check
-     * @param campaign the active campaign, used to compute the arrival date (current date plus travel time)
-     *
-     * @return {@code true} if the contract's attacking faction is non-Clan, its target is within the exclusion radius,
-     *       and the attacker would arrive there outside the Operation Bulldog window
-     */
-    protected boolean violatesHomeworldsExclusion(AbstractMissionTransition contract, Campaign campaign) {
-        Faction attacker = contract.isPlayerAttacker() ? contract.getEmployerFaction() : contract.getEnemy();
-        if (attacker.isClan()) {
-            return false;
-        }
-
-        PlanetarySystem stranaMechty = Systems.getInstance().getSystemById(STRANA_MECHTY_SYSTEM_ID);
-        if ((stranaMechty == null) ||
-                  (contract.getSystem().getDistanceTo(stranaMechty) > HOMEWORLDS_EXCLUSION_RADIUS)) {
-            return false;
-        }
-
-        LocalDate arrivalDate = campaign.getLocalDate().plusDays(contract.getTravelDays(campaign));
-        return !(arrivalDate.isAfter(MHQConstants.OPERATION_BULLDOG_START) &&
-                       arrivalDate.isBefore(MHQConstants.OPERATION_BULLDOG_END));
     }
 
     /**

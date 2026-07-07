@@ -32,16 +32,22 @@
  */
 package mekhq.campaign;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
+import mekhq.MekHQ;
+import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationDispatch;
 import mekhq.campaign.unit.Unit;
@@ -127,5 +133,111 @@ class CampaignLocationManagerTest {
             dispatch.verify(() -> LocationDispatch.dispatchTravelers(List.of(unit), firstDestination, campaign),
                   never());
         }
+    }
+
+    @Test
+    void gmTeleport_dispatchesThenProcessesArrivals() {
+        CampaignLocationManager manager = new CampaignLocationManager();
+        Campaign campaign = mock(Campaign.class);
+        Unit unit = mock(Unit.class);
+
+        try (MockedStatic<LocationDispatch> dispatch = mockStatic(LocationDispatch.class)) {
+            manager.gmTeleport(campaign, List.of(unit), campaign);
+            dispatch.verify(() -> LocationDispatch.dispatchTravelers(List.of(unit), campaign, campaign));
+        }
+        verify(campaign).processArrivals(campaign);
+    }
+
+    @Test
+    void gmCompleteTravel_startsQueuedItemToItsDestination() {
+        CampaignLocationManager manager = new CampaignLocationManager();
+        Campaign campaign = mock(Campaign.class);
+        Unit unit = mock(Unit.class);
+
+        // Queue the unit to travel to the campaign (used here as the destination ILocation).
+        manager.queueTravel(List.of(unit), campaign);
+
+        try (MockedStatic<LocationDispatch> dispatch = mockStatic(LocationDispatch.class)) {
+            manager.gmCompleteTravel(campaign, List.of(unit));
+            dispatch.verify(() -> LocationDispatch.dispatchTravelers(List.of(unit), campaign, campaign));
+        }
+        assertFalse(manager.isQueuedForTravel(unit));
+        verify(campaign).processArrivals(campaign);
+    }
+
+    @Test
+    void gmCompleteTravel_noopWhenNothingTravelingOrQueued() {
+        CampaignLocationManager manager = new CampaignLocationManager();
+        Campaign campaign = mock(Campaign.class);
+        Unit unit = mock(Unit.class);
+
+        try (MockedStatic<LocationDispatch> dispatch = mockStatic(LocationDispatch.class)) {
+            manager.gmCompleteTravel(campaign, List.of(unit));
+            dispatch.verifyNoInteractions();
+        }
+        verify(campaign).processArrivals(campaign);
+    }
+
+    @Test
+    void gmCompleteTravel_forcesInTransitNodeToArrive() {
+        CampaignLocationManager manager = new CampaignLocationManager();
+        Campaign campaign = mock(Campaign.class);
+        Unit unit = mock(Unit.class);
+        CurrentLocation travelNode = mock(CurrentLocation.class);
+        when(unit.getCurrentLocation()).thenReturn(travelNode);
+        when(travelNode.hasArrived()).thenReturn(false);
+
+        try (MockedStatic<MekHQ> ignored = mockStatic(MekHQ.class)) {
+            manager.gmCompleteTravel(campaign, List.of(unit));
+        }
+
+        verify(travelNode).setTransitTime(0);
+        verify(travelNode).setJumpPath(null);
+        verify(campaign).processArrivals(campaign);
+    }
+
+    @Test
+    void gmCompleteTravel_refreshesUnselectedCoTravelers() {
+        CampaignLocationManager manager = new CampaignLocationManager();
+        Campaign campaign = mock(Campaign.class);
+        Unit selectedUnit = mock(Unit.class);
+        Unit coTraveler = mock(Unit.class);
+        CurrentLocation travelNode = mock(CurrentLocation.class);
+        when(selectedUnit.getCurrentLocation()).thenReturn(travelNode);
+        when(travelNode.hasArrived()).thenReturn(false);
+        when(travelNode.fetchPersonnelAtLocation()).thenReturn(Set.of());
+        when(travelNode.fetchUnitsAtLocation()).thenReturn(Set.of(selectedUnit, coTraveler));
+        when(travelNode.fetchPartsAtLocation()).thenReturn(Set.of());
+
+        try (MockedStatic<MekHQ> mekhq = mockStatic(MekHQ.class)) {
+            manager.gmCompleteTravel(campaign, List.of(selectedUnit));
+
+            // The co-traveler, though not selected, arrives with the node and must get a refresh event too.
+            mekhq.verify(() -> MekHQ.triggerEvent(argThat(
+                  event -> event instanceof UnitChangedEvent changed && changed.getUnit() == coTraveler)));
+        }
+    }
+
+    @Test
+    void countUnselectedCoTravelers_countsOnlyItemsNotInSelection() {
+        CampaignLocationManager manager = new CampaignLocationManager();
+        Unit selectedUnit = mock(Unit.class);
+        Unit coTraveler = mock(Unit.class);
+        CurrentLocation travelNode = mock(CurrentLocation.class);
+        when(selectedUnit.getCurrentLocation()).thenReturn(travelNode);
+        when(travelNode.hasArrived()).thenReturn(false);
+        when(travelNode.fetchPersonnelAtLocation()).thenReturn(Set.of());
+        when(travelNode.fetchUnitsAtLocation()).thenReturn(Set.of(selectedUnit, coTraveler));
+        when(travelNode.fetchPartsAtLocation()).thenReturn(Set.of());
+
+        assertEquals(1, manager.countUnselectedCoTravelers(List.of(selectedUnit)));
+    }
+
+    @Test
+    void countUnselectedCoTravelers_zeroWhenNotTraveling() {
+        CampaignLocationManager manager = new CampaignLocationManager();
+        Unit unit = mock(Unit.class);
+
+        assertEquals(0, manager.countUnselectedCoTravelers(List.of(unit)));
     }
 }

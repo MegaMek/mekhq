@@ -43,16 +43,20 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.processWrapSize
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.time.LocalDate;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -71,10 +75,13 @@ import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.StartingLocationChoice;
+import mekhq.campaign.universe.enums.StartingLocationMode;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.campaignOptions.CampaignOptionsIconLegend;
 import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
+import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsIntroPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
@@ -131,6 +138,17 @@ public class GeneralPage {
     private JLabel lblIcon;
     private JButton btnIcon;
     private StandardFormationIcon unitIcon;
+
+    private JLabel lblStartingLocation;
+    private MMComboBox<StartingLocationMode> comboStartingLocation;
+    private JLabel lblStartingLocationFaction;
+    private MMComboBox<FactionDisplay> comboStartingLocationFaction;
+    private JComponent startingLocationControl;
+    private JComponent startingLocationFactionControl;
+    private JLabel lblStartingWorld;
+    private MMComboBox<String> comboStartingWorld;
+    private JComponent startingWorldControl;
+    private JCheckBox chkIncludeDeepPeriphery;
 
     /**
      * Constructs a new instance of the {@code GeneralPage} using the provided {@link Campaign} and {@link JFrame}.
@@ -237,6 +255,29 @@ public class GeneralPage {
             btnRandomDate.setEnabled(false);
         }
 
+        // Starting location
+        lblStartingLocation = new CampaignOptionsLabel("StartingLocation");
+        lblStartingLocationFaction = new CampaignOptionsLabel("StartingLocationFaction");
+        lblStartingWorld = new CampaignOptionsLabel("StartingWorld");
+        comboStartingLocation.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                  boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof StartingLocationMode locationMode) {
+                    setText(getStartingLocationModeLabel(locationMode));
+                }
+                return this;
+            }
+        });
+        startingLocationControl = createInlineControls(createFixedWidthControl(comboStartingLocation));
+        startingLocationFactionControl = createInlineControls(createFixedWidthControl(comboStartingLocationFaction));
+        startingWorldControl = createInlineControls(createFixedWidthControl(comboStartingWorld));
+
+        // Keep the starting-location controls in sync with the selected faction and mode
+        comboFaction.addActionListener(evt -> updateStartingLocationVisibility());
+        comboStartingLocation.addActionListener(evt -> updateStartingLocationVisibility());
+
         // Camouflage
         lblCamo = new CampaignOptionsLabel("Camo");
         btnCamo.setName("btnCamo");
@@ -248,6 +289,8 @@ public class GeneralPage {
         btnIcon.setName("btnIcon");
         btnIcon.addActionListener(this::btnIconActionPerformed);
         btnIcon.setIcon(unitIcon.getImageIcon(UIUtil.scaleForGUI(75)));
+
+        updateStartingLocationVisibility();
 
         return CampaignOptionsPagePanel.builder("GeneralPage", "General", "data/images/misc/MekHQ.png")
               .headerImageSize(GENERAL_HEADER_IMAGE_SIZE)
@@ -275,6 +318,10 @@ public class GeneralPage {
         panel.addRow(lblDate, createInlineControls(btnDate, btnRandomDate));
         panel.addRow(lblName, createInlineControls(createFixedWidthControl(txtName), btnNameGenerator));
         panel.addRow(lblFaction, createInlineControls(createFixedWidthControl(comboFaction), btnRandomFaction));
+        panel.addRow(lblStartingLocation, startingLocationControl);
+        panel.addRow(lblStartingLocationFaction, startingLocationFactionControl);
+        panel.addRow(lblStartingWorld, startingWorldControl);
+        panel.addFullWidthComponent(chkIncludeDeepPeriphery);
         return panel;
     }
 
@@ -368,6 +415,23 @@ public class GeneralPage {
                 return UIUtil.scaleForGUI(100, 100);
             }
         };
+
+        lblStartingLocation = new JLabel();
+        comboStartingLocation = new MMComboBox<>("comboStartingLocation",
+              new StartingLocationMode[] { StartingLocationMode.RANDOM,
+                                           StartingLocationMode.RANDOM_GREAT_HOUSE,
+                                           StartingLocationMode.RANDOM_PERIPHERY,
+                                           StartingLocationMode.MERCENARY_CAPITAL,
+                                           StartingLocationMode.SPECIFIC_FACTION });
+        lblStartingLocationFaction = new JLabel();
+        comboStartingLocationFaction = new MMComboBox<>("comboStartingLocationFaction",
+              buildStartingLocationFactionModel(date));
+        lblStartingWorld = new JLabel();
+        // Faction Capital first (the default), then Random Hiring Hall
+        comboStartingWorld = new MMComboBox<>("comboStartingWorld",
+              new String[] { getTextAt(getCampaignOptionsResourceBundle(), "startingWorld.factionCapital"),
+                             getTextAt(getCampaignOptionsResourceBundle(), "startingWorld.randomHiringHall") });
+        chkIncludeDeepPeriphery = new CampaignOptionsCheckBox("IncludeDeepPeriphery");
     }
 
     /**
@@ -442,6 +506,15 @@ public class GeneralPage {
             Factions.getInstance().getChoosableFactions(), date);
         factionModel.addAll(validFactions);
         comboFaction.setSelectedItem(factionDisplay);
+
+        if (comboStartingLocationFaction != null) {
+            final FactionDisplay startingFactionDisplay = comboStartingLocationFaction.getSelectedItem();
+            comboStartingLocationFaction.removeAllItems();
+            DefaultComboBoxModel<FactionDisplay> startingFactionModel =
+                  (DefaultComboBoxModel<FactionDisplay>) comboStartingLocationFaction.getModel();
+            startingFactionModel.addAll(buildStartingLocationFactionDisplays(date));
+            comboStartingLocationFaction.setSelectedItem(startingFactionDisplay);
+        }
     }
 
     /**
@@ -572,6 +645,113 @@ public class GeneralPage {
 
             campaign.setCamouflage(camouflage);
             campaign.setUnitIcon(unitIcon);
+
+            if (isStartUp) {
+                // Resolve and set the starting system from the starting-location controls
+                campaign.setStartingSystem(campaign.getNewCampaignStartingPlanet(buildStartingLocationChoice()));
+            }
         }
+    }
+
+    /**
+     * Returns the localized label for a starting-location mode. The mercenary-capital option is relabelled as the
+     * pirate haven for pirate campaigns.
+     *
+     * @param locationMode the mode to label
+     *
+     * @return the localized label
+     */
+    private String getStartingLocationModeLabel(StartingLocationMode locationMode) {
+        if ((locationMode == StartingLocationMode.MERCENARY_CAPITAL) && getFaction().isPirate()) {
+            return getTextAt(getCampaignOptionsResourceBundle(),
+                  "lblStartingLocationMode.MERCENARY_CAPITAL.pirate.text");
+        }
+        return getTextAt(getCampaignOptionsResourceBundle(),
+                "lblStartingLocationMode." + locationMode.name() + ".text");
+    }
+
+    /**
+     * @return the {@link StartingLocationMode} currently selected in the starting-location combo
+     */
+    private StartingLocationMode getSelectedStartingLocationMode() {
+        StartingLocationMode selectedMode = comboStartingLocation.getSelectedItem();
+        return (selectedMode != null) ? selectedMode : StartingLocationMode.RANDOM;
+    }
+
+    /**
+     * Builds the list of factions offered for a specific-faction start, excluding mercenary and pirate factions (which
+     * hold no territory of their own).
+     *
+     * @param date the date used to filter valid factions
+     *
+     * @return the sorted list of selectable faction displays
+     */
+    private static List<FactionDisplay> buildStartingLocationFactionDisplays(LocalDate date) {
+        List<Faction> factions = Factions.getInstance()
+                                       .getChoosableFactions()
+                                       .stream()
+                                       .filter(faction -> !faction.isMercenary() && !faction.isPirate())
+                                       .toList();
+        return FactionDisplay.getSortedValidFactionDisplays(factions, date);
+    }
+
+    private static DefaultComboBoxModel<FactionDisplay> buildStartingLocationFactionModel(LocalDate date) {
+        DefaultComboBoxModel<FactionDisplay> model = new DefaultComboBoxModel<>();
+        model.addAll(buildStartingLocationFactionDisplays(date));
+        return model;
+    }
+
+    /**
+     * Shows the starting-location controls relevant to the current mode and faction, and hides the rest. Everything is
+     * hidden unless the dialog is in a startup mode, mirroring how the campaign start date is only editable at startup.
+     */
+    private void updateStartingLocationVisibility() {
+        boolean isStartUp = (mode == CampaignOptionsDialogMode.STARTUP)
+                                  || (mode == CampaignOptionsDialogMode.STARTUP_ABRIDGED);
+        Faction selectedFaction = getFaction();
+        boolean isMercenaryOrPirate = selectedFaction.isMercenary() || selectedFaction.isPirate();
+
+        // The capital-vs-hiring-hall choice applies to every campaign
+        lblStartingWorld.setVisible(isStartUp);
+        startingWorldControl.setVisible(isStartUp);
+
+        // The mode, specific faction, and Deep Periphery controls only apply to mercenary and pirate campaigns
+        boolean modeVisible = isStartUp && isMercenaryOrPirate;
+        lblStartingLocation.setVisible(modeVisible);
+        startingLocationControl.setVisible(modeVisible);
+
+        StartingLocationMode selectedMode = getSelectedStartingLocationMode();
+
+        boolean specificFactionVisible = modeVisible && selectedMode.isSpecificFaction();
+        lblStartingLocationFaction.setVisible(specificFactionVisible);
+        startingLocationFactionControl.setVisible(specificFactionVisible);
+
+        chkIncludeDeepPeriphery.setVisible(modeVisible && selectedMode.isRandomPeriphery());
+
+        // Refresh the mercenary-capital / pirate-haven label for the current faction
+        comboStartingLocation.repaint();
+
+        // Re-layout the form so hidden rows collapse instead of leaving gaps
+        if (lblStartingWorld.getParent() != null) {
+            lblStartingWorld.getParent().revalidate();
+            lblStartingWorld.getParent().repaint();
+        }
+    }
+
+    /**
+     * @return a {@link StartingLocationChoice} built from the current starting-location controls
+     */
+    private StartingLocationChoice buildStartingLocationChoice() {
+        Faction specificFaction = null;
+        FactionDisplay selectedDisplay = comboStartingLocationFaction.getSelectedItem();
+        if (selectedDisplay != null) {
+            specificFaction = selectedDisplay.getFaction();
+        }
+        // Starting-world combo: index 0 is Faction Capital, index 1 is Random Hiring Hall
+        boolean useFactionCapital = comboStartingWorld.getSelectedIndex() == 0;
+        return new StartingLocationChoice(getSelectedStartingLocationMode(),
+              specificFaction,
+              useFactionCapital,
+              chkIncludeDeepPeriphery.isSelected());
     }
 }

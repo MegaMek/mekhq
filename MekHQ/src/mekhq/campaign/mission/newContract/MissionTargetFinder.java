@@ -36,6 +36,7 @@ import static mekhq.MHQConstants.FORTRESS_REPUBLIC_END;
 import static mekhq.MHQConstants.FORTRESS_REPUBLIC_START;
 import static mekhq.MHQConstants.FORTRESS_REPUBLIC_TERRA_ONLY_END;
 import static mekhq.campaign.universe.Faction.BANDIT_CASTE_FACTION_CODE;
+import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.REPUBLIC_OF_THE_SPHERE_FACTION_CODE;
 
@@ -114,8 +115,8 @@ public class MissionTargetFinder {
     public List<PlanetarySystem> find(Faction attacker, Faction defender, ILocation location, LocalDate currentDate,
           MissionLocationProfile profile) {
         double radius = borderTracker.getRadius();
-        attacker = resolveTerritorialHost(attacker, currentDate);
-        defender = resolveTerritorialHost(defender, currentDate);
+        attacker = resolveTerritorialHost(attacker, currentDate, false);
+        defender = resolveTerritorialHost(defender, currentDate, true);
         if (attacker == null || defender == null) {
             return Collections.emptyList();
         }
@@ -153,23 +154,17 @@ public class MissionTargetFinder {
             return systemsOf(borders, currentDate);
         }
 
-        // A rebel uprising happens somewhere within the attacking government's own territory, not on a border.
+        // A rebel uprising happens somewhere within the attacking government's own territory, not on a border. The
+        // rebel faction itself owns no systems, so this must search the attacker's side, not the defender's -
+        // findProfileTargets' INTERIOR_POPULATED tier searches the defender and would always come up empty here.
         if (defender.isRebel()) {
-            MissionLocationProfile rebelProfile = MissionLocationProfile.INTERIOR_POPULATED;
-            List<PlanetarySystem> profileTargets = findProfileTargets(rebelProfile,
-                  defender,
-                  attacker,
-                  location,
-                  radius,
-                  currentDate);
-            if (!profileTargets.isEmpty()) {
-                return profileTargets;
-            }
+            FactionBorders borders = borderTracker.getBorders(attacker, location, radius);
+            return systemsOf(borders, currentDate);
         }
 
         // The contract type's preferred geography, when it has one (rear areas for training, deep strikes for
         // raids, occupied territory for guerrillas...). A preference only: an empty result falls through to the
-        // default chain below rather than failing generation.
+        // default chain below rather than failing contract generation.
         List<PlanetarySystem> profileTargets = findProfileTargets(profile, attacker, defender, location, radius,
               currentDate);
         if (!profileTargets.isEmpty()) {
@@ -181,12 +176,12 @@ public class MissionTargetFinder {
         // deep-placement fallback for it - no shared border means no viable invasion target at all.
         if (profile == MissionLocationProfile.INVASION) {
             return Collections.emptyList();
-        }
-
-        List<PlanetarySystem> borderTargets = findSharedBorderTargets(attacker, defender, location, radius,
-              currentDate);
-        if (!borderTargets.isEmpty()) {
-            return borderTargets;
+        } else {
+            List<PlanetarySystem> borderTargets = findSharedBorderTargets(attacker, defender, location, radius,
+                  currentDate);
+            if (!borderTargets.isEmpty()) {
+                return borderTargets;
+            }
         }
 
         // Last resort: neither a direct border nor a contained-faction proxy border exists. Target whichever of
@@ -365,31 +360,107 @@ public class MissionTargetFinder {
     }
 
     /**
-     * Resolves a faction with no directly-controlled systems anywhere to its contained-faction host, if one is
-     * configured, so mission targeting has something with real territory to work with. Inherently landless factions
-     * (pirates, mercenaries, ComStar/WoB) and rebels are never contained by anyone, so this is a no-op for them;
-     * {@link #find} handles their lack of territory separately.
-     * <p>A faction with territory only outside the local search area (e.g. a war partner guaranteed valid by
-     * {@code RandomFactionGenerator#buildEnemyMap} regardless of local presence) is still returned unchanged, not
-     * redirected to a host: it has real territory to work with, just not nearby. The cached, region-limited
-     * {@link FactionBorderTracker#getFactionsInRegion()} is checked first as a cheap common-case shortcut; the full,
-     * uncached {@link FactionBorderTracker#controlsAnySystem} scan only runs for the rare faction with no local
-     * presence.</p>
+     * Resolves a faction with no directly-controlled systems in the search region to its contained-faction host, if one
+     * is configured, so mission targeting has something with real territory to work with. Pirates, ComStar/WoB, and
+     * rebels are never contained by anyone, so this is a no-op for them regardless of role; {@link #find} handles their
+     * lack of territory separately. Mercenaries are landless the same way when resolved as the
+     * <em>attacker</em> (so the "can strike anywhere the defender holds" routing in {@link #find} still recognizes
+     * them), but as the <em>defender</em> they're instead treated as contained within every faction that hires
+     * mercenaries (see {@link #findTerritorialHost}) &mdash; otherwise every mercenary-defender contract would converge
+     * on the handful of systems the data happens to tag as directly MERC-controlled.
+     * <p>The host redirect takes precedence over the faction's own <em>remote</em> holdings: a contained faction can
+     * hold a few titular worlds far from the campaign (e.g. the Star League's far-periphery administrative systems)
+     * that would otherwise pass a controls-anything check and leave it with no usable territory anywhere near the
+     * search area. Only a faction with no host at all falls back on its remote territory, which the whole-map
+     * closest-system fallback in {@link #find} can still reach (e.g. a distant war partner guaranteed valid by
+     * {@code RandomFactionGenerator#buildEnemyMap} regardless of local presence).</p>
      *
-     * @param faction the faction to resolve
-     * @param date    the date to check faction control and the contained-faction relationship against
+     * @param faction    the faction to resolve
+     * @param date       the date to check faction control and the contained-faction relationship against
+     * @param isDefender {@code true} if {@code faction} is being resolved as the defender, {@code false} for the
+     *                   attacker
      *
-     * @return the resolved faction (its host if one was found and needed, otherwise the faction unchanged), or
-     *       {@code null} if the faction has no systems anywhere and no host could be found
+     * @return the resolved faction (a host with territory if one was found and needed, otherwise the faction
+     *       unchanged), or {@code null} if the faction has no systems anywhere and no territorial host
      */
-    private @Nullable Faction resolveTerritorialHost(Faction faction, LocalDate date) {
+    private @Nullable Faction resolveTerritorialHost(Faction faction, LocalDate date, boolean isDefender) {
+        boolean isLandlessWithNoHostNeeded = isSpecialAttacker(faction) &&
+                                                   !(isDefender && isMercenaryFaction(faction));
         if (borderTracker.getFactionsInRegion().contains(faction) ||
-                  isSpecialAttacker(faction) ||
-                  faction.isRebel() ||
-                  borderTracker.controlsAnySystem(faction, date)) {
+                  isLandlessWithNoHostNeeded ||
+                  faction.isRebel()) {
             return faction;
         }
-        return factionHints.getContainedFactionHost(faction, date);
+
+        Faction territorialHost = findTerritorialHost(faction, date);
+        if (territorialHost != null) {
+            return territorialHost;
+        }
+
+        return borderTracker.controlsAnySystem(faction, date) ? faction : null;
+    }
+
+    /**
+     * @param faction the faction to check
+     *
+     * @return {@code true} if the faction is the mercenary faction specifically (not merely
+     *       {@link Faction#isMercenary()}, which also covers non-combatant bodies like the Mercenary Review Board)
+     */
+    private static boolean isMercenaryFaction(Faction faction) {
+        return faction.getShortName().equals(MERCENARY_FACTION_CODE);
+    }
+
+    /**
+     * Picks the host whose territory should stand in for the given faction's: a host with systems in the search region
+     * first, then any host with systems at all. A host can itself be landless at the time (the occupied Terran Hegemony
+     * during the Amaris Civil War, while still nominally hosting the Star League), so hosting alone is not enough
+     * &mdash; the chosen host must actually hold territory.
+     * <p>For the mercenary faction, "host" means any faction that hires mercenaries on the given date (see
+     * {@link Faction#isUsesMercenaries(int)}) rather than a {@code factionHints}-defined contained-faction
+     * relationship: mercenaries don't have one fixed employer the way the Star League has one set of member states,
+     * they work for whoever's hiring nearby.</p>
+     *
+     * @param faction the faction to find a host for
+     * @param date    the date to check faction control and the contained-faction/mercenary-usage relationship against
+     *
+     * @return the best territorial host, or {@code null} if the faction has no host with any territory
+     */
+    private @Nullable Faction findTerritorialHost(Faction faction, LocalDate date) {
+        List<Faction> hosts = isMercenaryFaction(faction) ?
+                                    factionsUsingMercenaries(faction, date) :
+                                    factionHints.getContainedFactionHosts(faction, date);
+        for (Faction host : hosts) {
+            if (borderTracker.getFactionsInRegion().contains(host)) {
+                return host;
+            }
+        }
+        for (Faction host : hosts) {
+            if (borderTracker.controlsAnySystem(host, date)) {
+                return host;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param mercenaryFaction the mercenary faction itself, excluded from its own host list
+     * @param date             the date to check faction eligibility and mercenary usage against
+     *
+     * @return every real, currently valid faction (other than {@code mercenaryFaction}) that hires mercenaries on the
+     *       given date
+     */
+    private static List<Faction> factionsUsingMercenaries(Faction mercenaryFaction, LocalDate date) {
+        int year = date.getYear();
+        List<Faction> hosts = new ArrayList<>();
+        for (Faction candidate : Factions.getInstance().getFactions()) {
+            if (!candidate.equals(mercenaryFaction) &&
+                      !FactionHints.isEmptyFaction(candidate) &&
+                      candidate.validIn(date) &&
+                      candidate.isUsesMercenaries(year)) {
+                hosts.add(candidate);
+            }
+        }
+        return hosts;
     }
 
     /**

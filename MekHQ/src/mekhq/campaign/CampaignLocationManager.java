@@ -43,6 +43,10 @@ import mekhq.MekHQ;
 import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.events.LocationAddedEvent;
 import mekhq.campaign.events.LocationRemovedEvent;
+import mekhq.campaign.events.TransitCompleteEvent;
+import mekhq.campaign.events.parts.PartChangedEvent;
+import mekhq.campaign.events.persons.PersonChangedEvent;
+import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationDispatch;
@@ -181,7 +185,158 @@ public class CampaignLocationManager {
      */
     public boolean isQueuedForTravel(ILocation traveler) {
         for (List<ILocation> travelers : pendingTravel.values()) {
-            if (travelers.contains(traveler)) {
+            if (containsByIdentity(travelers, traveler)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * GM override: dispatches {@code items} to {@code destination} and lands them immediately, with zero transit time.
+     *
+     * <p>This composes the ordinary {@link LocationDispatch#dispatchTravelers} (which starts the journey and updates
+     * hangar/warehouse bookkeeping) with {@link #gmCompleteTravel}, which collapses the freshly-created travel node to
+     * arrived and runs the shared arrival pass. Intended to be reachable only from a GM-gated menu path.</p>
+     */
+    public void gmTeleport(Campaign campaign, Collection<? extends ILocation> items, ILocation destination) {
+        LocationDispatch.dispatchTravelers(items, destination, campaign);
+        gmCompleteTravel(campaign, items);
+    }
+
+    /**
+     * GM override: force-completes travel for {@code items} that are queued or already in transit, landing them at
+     * their destination now.
+     *
+     * <p>Selected items still sitting in the pending-travel queue are started immediately so they gain a travel node.
+     * Every selected item's in-transit node is then collapsed to arrived — mirroring the finalize in
+     * {@link CurrentLocation#newDay} — and the shared {@link #processAllArrivals} pass lands all arrived nodes through
+     * the same path the daily cycle uses. Because a travel node is shared by everyone who departed together, completing
+     * travel for one item arrives all of its co-travelers. Items that are neither queued nor traveling are left
+     * untouched. Intended to be reachable only from a GM-gated menu path.</p>
+     */
+    public void gmCompleteTravel(Campaign campaign, Collection<? extends ILocation> items) {
+        // Start any selected items still queued, so they gain a travel node to collapse below.
+        for (ILocation item : items) {
+            ILocation queuedDestination = removeFromPendingTravel(item);
+            if (queuedDestination != null) {
+                LocationDispatch.dispatchTravelers(List.of(item), queuedDestination, campaign);
+            }
+        }
+
+        // Collapse each distinct in-transit node to arrived, mirroring CurrentLocation.newDay's finalize. Capture every
+        // traveler carried by those nodes first — collapsing a shared node arrives co-travelers that were not selected,
+        // and they must be gathered before processAllArrivals empties the node.
+        Set<ILocation> toRefresh = Collections.newSetFromMap(new IdentityHashMap<>());
+        toRefresh.addAll(items);
+        for (AbstractMobileLocation node : collectInTransitNodes(items)) {
+            toRefresh.addAll(node.fetchPersonnelAtLocation());
+            toRefresh.addAll(node.fetchUnitsAtLocation());
+            toRefresh.addAll(node.fetchPartsAtLocation());
+            node.setTransitTime(0);
+            if (node instanceof CurrentLocation currentLocation) {
+                currentLocation.setJumpPath(null);
+            }
+            MekHQ.triggerEvent(new TransitCompleteEvent(node));
+        }
+
+        // Land every arrived node through the shared new-day arrival pass.
+        processAllArrivals(campaign);
+
+        // Refresh the tables' location columns now — the daily cycle relies on a later full GUI refresh, but a GM
+        // override lands mid-session, so fire the per-item changed event each table listens for. Includes co-travelers
+        // swept along by a shared node, not just the selected items.
+        for (ILocation item : toRefresh) {
+            fireLocationChanged(item);
+        }
+    }
+
+    /**
+     * Counts the travelers a GM {@link #gmCompleteTravel} on {@code items} would also arrive but that are not themselves
+     * in {@code items} — co-travelers sharing an in-transit node with a selected item. Collapsing a shared travel node
+     * arrives everyone it carries, so this lets the menu warn the GM with a "(+ n others)" hint. Queued (not-yet-departed)
+     * items contribute nothing, since completing one queued traveler dispatches only that traveler.
+     */
+    public int countUnselectedCoTravelers(Collection<? extends ILocation> items) {
+        Set<ILocation> selected = Collections.newSetFromMap(new IdentityHashMap<>());
+        selected.addAll(items);
+
+        Set<ILocation> affected = Collections.newSetFromMap(new IdentityHashMap<>());
+        for (AbstractMobileLocation node : collectInTransitNodes(items)) {
+            affected.addAll(node.fetchPersonnelAtLocation());
+            affected.addAll(node.fetchUnitsAtLocation());
+            affected.addAll(node.fetchPartsAtLocation());
+        }
+        affected.removeAll(selected);
+        return affected.size();
+    }
+
+    /**
+     * Returns the distinct in-transit travel nodes carrying {@code items}, keyed by object identity. An item that has
+     * arrived or is not on a mobile node contributes nothing.
+     */
+    private static Set<AbstractMobileLocation> collectInTransitNodes(Collection<? extends ILocation> items) {
+        Set<AbstractMobileLocation> nodes = Collections.newSetFromMap(new IdentityHashMap<>());
+        for (ILocation item : items) {
+            if (item.getCurrentLocation() instanceof AbstractMobileLocation node && !node.hasArrived()) {
+                nodes.add(node);
+            }
+        }
+        return nodes;
+    }
+
+    /**
+     * Fires the type-specific "changed" event for {@code item} so the personnel, hangar, and warehouse tables refresh
+     * their location columns immediately after a GM travel override. Items that are not a {@link Person}, {@link Unit},
+     * or {@link Part} have no such table and are ignored.
+     */
+    private static void fireLocationChanged(ILocation item) {
+        switch (item) {
+            case Person person -> MekHQ.triggerEvent(new PersonChangedEvent(person));
+            case Unit unit -> MekHQ.triggerEvent(new UnitChangedEvent(unit));
+            case Part part -> MekHQ.triggerEvent(new PartChangedEvent(part));
+            default -> {}
+        }
+    }
+
+    /**
+     * Removes {@code traveler} from the pending-travel queue by object identity, pruning any route left empty.
+     *
+     * @return the destination the traveler was queued for, or {@code null} if it was not queued
+     */
+    private @Nullable ILocation removeFromPendingTravel(ILocation traveler) {
+        for (Iterator<Map.Entry<TravelRoute, List<ILocation>>> it = pendingTravel.entrySet().iterator();
+                it.hasNext(); ) {
+            Map.Entry<TravelRoute, List<ILocation>> entry = it.next();
+            List<ILocation> travelers = entry.getValue();
+            if (removeByIdentity(travelers, traveler)) {
+                if (travelers.isEmpty()) {
+                    it.remove();
+                }
+                return entry.getKey().destination();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Identity ({@code ==}) membership test. {@link ILocation} subtypes such as {@code Personnel} extend
+     * {@code LinkedHashMap}, so {@link List#contains} would compare map contents rather than object identity.
+     */
+    private static boolean containsByIdentity(List<ILocation> list, ILocation target) {
+        for (ILocation candidate : list) {
+            if (candidate == target) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Identity ({@code ==}) removal of the first matching element; see {@link #containsByIdentity}. */
+    private static boolean removeByIdentity(List<ILocation> list, ILocation target) {
+        for (Iterator<ILocation> it = list.iterator(); it.hasNext(); ) {
+            if (it.next() == target) {
+                it.remove();
                 return true;
             }
         }
@@ -228,6 +383,25 @@ public class CampaignLocationManager {
             case Part part -> findPartAnywhere(campaign, part.getId()) != null;
             default -> true;
         };
+    }
+
+    /**
+     * Lands every arrived traveler: each registered {@link AbstractLocation}, then each {@link PlayerBase}, then the
+     * campaign itself has {@link ILocation#processArrivals} run, draining any travel node that has reached its
+     * destination into that destination's personnel/hangar/warehouse.
+     *
+     * <p>This is the common arrival pass shared by the daily new-day cycle and the GM travel overrides
+     * ({@link #gmTeleport}, {@link #gmCompleteTravel}); only nodes that report {@code hasArrived()} land, so it is safe
+     * to call at any time.</p>
+     */
+    public void processAllArrivals(Campaign campaign) {
+        for (AbstractLocation location : new ArrayList<>(locations)) {
+            location.processArrivals(campaign);
+        }
+        for (PlayerBase base : playerBases) {
+            base.processArrivals(campaign);
+        }
+        campaign.processArrivals(campaign);
     }
 
     /** Searches the campaign warehouse then all base warehouses for a part by ID. */

@@ -372,22 +372,40 @@ public class FactionHints {
      * @param date      The campaign date.
      *
      * @return The faction that controls the planets where the contained faction is positioned, or {@code null} if the
-     *       faction is not contained within another at the time.
+     *       faction is not contained within another at the time. When the faction has several hosts (e.g. the Star
+     *       League within each of its member states), an arbitrary one is returned; use
+     *       {@link #getContainedFactionHosts(Faction, LocalDate)} to choose among them.
      */
     @Nullable
     public Faction getContainedFactionHost(Faction contained,
           LocalDate date) {
+        List<Faction> hosts = getContainedFactionHosts(contained, date);
+        return hosts.isEmpty() ? null : hosts.get(0);
+    }
+
+    /**
+     * @param contained A faction that is potentially hosted within the borders of others, with no planets directly
+     *                  controlled.
+     * @param date      The campaign date.
+     *
+     * @return every faction hosting the contained faction on the given date, in no particular order &mdash; e.g. the
+     *       Star League is hosted by the Terran Hegemony and each member state. Empty if the faction is not contained
+     *       within another at the time.
+     */
+    public List<Faction> getContainedFactionHosts(Faction contained, LocalDate date) {
+        List<Faction> hosts = new ArrayList<>();
         for (Faction f : containedFactions.keySet()) {
             List<AltLocation> locs = containedFactions.get(f).get(contained);
             if (null != locs) {
                 for (AltLocation loc : locs) {
                     if (loc.isInDateRange(date)) {
-                        return f;
+                        hosts.add(f);
+                        break;
                     }
                 }
             }
         }
-        return null;
+        return hosts;
     }
 
     /**

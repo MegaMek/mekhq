@@ -37,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -842,5 +843,135 @@ public class MissionTargetFinderTest {
         assertTrue(invasionTargets.isEmpty(),
               "An invasion with no shared border has no viable target: the attacker could never hold a world so far "
                     + "from its own territory");
+    }
+
+    /**
+     * Regression test: a contained faction whose only direct holdings are far outside the search region (e.g. the Star
+     * League's far-periphery administrative worlds during the Amaris Civil War) must resolve to its contained-faction
+     * host's territory, not be left stranded on its remote worlds by a controls-anything-anywhere check.
+     */
+    @Test
+    public void testFindRedirectsContainedFactionWithOnlyRemoteHoldingsToItsHost() {
+        Faction attackerFaction = createTestFaction("ATTACKER", false, false);
+        Faction leagueFaction = createTestFaction("LEAGUE", false, false);
+        Faction hostFaction = createTestFaction("HOST", false, false);
+
+        PlanetarySystem attackerSystem = createTestSystem(0, 0, attackerFaction);
+        PlanetarySystem hostSystem = createTestSystem(2, 0, hostFaction);
+        // The contained faction's only direct holding, far outside the 5 ly search region below.
+        PlanetarySystem remoteSystem = createTestSystem(1000, 1000, leagueFaction);
+        stubDistances(attackerSystem, hostSystem, remoteSystem);
+
+        FactionBorderTracker tracker = buildTestTracker(List.of(attackerSystem, hostSystem, remoteSystem), 5);
+        FactionHints hints = new FactionHints();
+        hints.addContainedFaction(hostFaction, leagueFaction, null, null, 0.5);
+        MissionTargetFinder finder = new MissionTargetFinder(tracker, hints);
+        ILocation location = createTestLocation(attackerFaction);
+
+        List<PlanetarySystem> targets = finder.find(attackerFaction, leagueFaction, location, TEST_DATE);
+
+        assertEquals(List.of(hostSystem), targets,
+              "A contained faction with only remote holdings should fight on its host's territory, not be stranded "
+                    + "on a titular world on the far side of the map");
+    }
+
+    /**
+     * Regression test: a contained faction's host can itself be landless at the time (the occupied Terran Hegemony
+     * during the Amaris Civil War, still nominally hosting the Star League), so host resolution must skip past it to a
+     * host that actually holds territory.
+     */
+    @Test
+    public void testFindSkipsLandlessHostWhenResolvingContainedFaction() {
+        Faction attackerFaction = createTestFaction("ATTACKER", false, false);
+        Faction leagueFaction = createTestFaction("LEAGUE", false, false);
+        Faction occupiedHostFaction = createTestFaction("OCCUPIED_HOST", false, false);
+        Faction intactHostFaction = createTestFaction("INTACT_HOST", false, false);
+
+        PlanetarySystem attackerSystem = createTestSystem(0, 0, attackerFaction);
+        PlanetarySystem intactHostSystem = createTestSystem(2, 0, intactHostFaction);
+        stubDistances(attackerSystem, intactHostSystem);
+
+        FactionBorderTracker tracker = buildTestTracker(List.of(attackerSystem, intactHostSystem), 5);
+        FactionHints hints = new FactionHints();
+        hints.addContainedFaction(occupiedHostFaction, leagueFaction, null, null, 0.5);
+        hints.addContainedFaction(intactHostFaction, leagueFaction, null, null, 0.5);
+        MissionTargetFinder finder = new MissionTargetFinder(tracker, hints);
+        ILocation location = createTestLocation(attackerFaction);
+
+        List<PlanetarySystem> targets = finder.find(attackerFaction, leagueFaction, location, TEST_DATE);
+
+        assertEquals(List.of(intactHostSystem), targets,
+              "Host resolution should skip a host that holds no territory and use one that does");
+    }
+
+    /**
+     * Regression test: the mercenary faction has no fixed territory of its own beyond whatever handful of systems the
+     * data happens to tag it as directly controlling. As the defender, it must be treated as contained within any
+     * faction that hires mercenaries, not left stranded on that tiny footprint - otherwise every mercenary-defender
+     * contract converges on the same one or two systems.
+     */
+    @Test
+    public void testFindRedirectsMercenaryDefenderToAFactionThatHiresMercenaries() {
+        Faction attackerFaction = createTestFaction("ATTACKER", false, false);
+        Faction mercFaction = createTestFaction(Faction.MERCENARY_FACTION_CODE, false, false);
+        when(mercFaction.isMercenary()).thenReturn(true);
+        Faction hostFaction = createTestFaction("HOST_MERC_USER", false, false);
+        when(hostFaction.validIn(any())).thenReturn(true);
+        when(hostFaction.isUsesMercenaries(anyInt())).thenReturn(true);
+        allFactions.add(mercFaction);
+        allFactions.add(hostFaction);
+
+        PlanetarySystem attackerSystem = createTestSystem(0, 0, attackerFaction);
+        PlanetarySystem hostSystem = createTestSystem(2, 0, hostFaction);
+        // The mercenary faction's only direct holding, far outside the 5 ly search region below.
+        PlanetarySystem distantMercSystem = createTestSystem(1000, 1000, mercFaction);
+        stubDistances(attackerSystem, hostSystem, distantMercSystem);
+
+        FactionBorderTracker tracker = buildTestTracker(List.of(attackerSystem, hostSystem, distantMercSystem), 5);
+        MissionTargetFinder finder = new MissionTargetFinder(tracker, new FactionHints());
+        ILocation location = createTestLocation(attackerFaction);
+
+        List<PlanetarySystem> targets = finder.find(attackerFaction, mercFaction, location, TEST_DATE);
+
+        assertEquals(List.of(hostSystem), targets,
+              "A mercenary defender should fight on the territory of a nearby faction that hires mercenaries, not "
+                    + "be stranded on its own distant, sparsely-held systems");
+    }
+
+    /**
+     * Regression test: the mercenary-host redirect only applies to the mercenary faction as <em>defender</em>. As the
+     * attacker, mercenaries must remain landless in the usual sense (able to strike anywhere the defender holds, per
+     * {@code isSpecialAttacker}), even when a mercenary-hiring host is available nearby - redirecting the attacker too
+     * would narrow its reach down to just that host's border with the defender.
+     */
+    @Test
+    public void testFindMercenaryAttackerStrikesAnywhereDespiteAnAvailableMercenaryHost() {
+        Faction mercFaction = createTestFaction(Faction.MERCENARY_FACTION_CODE, false, false);
+        when(mercFaction.isMercenary()).thenReturn(true);
+        Faction hostFaction = createTestFaction("HOST_MERC_USER", false, false);
+        when(hostFaction.validIn(any())).thenReturn(true);
+        when(hostFaction.isUsesMercenaries(anyInt())).thenReturn(true);
+        Faction defenderFaction = createTestFaction("DEFENDER", false, false);
+        allFactions.add(mercFaction);
+        allFactions.add(hostFaction);
+        allFactions.add(defenderFaction);
+
+        PlanetarySystem hostSystem = createTestSystem(2, 0, hostFaction);
+        // Borders hostSystem (within the default 2.5 ly border size).
+        PlanetarySystem borderingDefenderSystem = createTestSystem(2.2, 0, defenderFaction);
+        // Within the attacker's 5 ly search radius, but far enough from hostSystem to not border it.
+        PlanetarySystem distantDefenderSystem = createTestSystem(4.9, 0, defenderFaction);
+        stubDistances(hostSystem, borderingDefenderSystem, distantDefenderSystem);
+
+        FactionBorderTracker tracker = buildTestTracker(List.of(hostSystem, borderingDefenderSystem,
+              distantDefenderSystem), 5);
+        MissionTargetFinder finder = new MissionTargetFinder(tracker, new FactionHints());
+        ILocation location = createTestLocation(mercFaction);
+
+        List<PlanetarySystem> targets = finder.find(mercFaction, defenderFaction, location, TEST_DATE);
+
+        assertEquals(Set.of(borderingDefenderSystem, distantDefenderSystem), new HashSet<>(targets),
+              "A mercenary attacker should still be able to strike any defender system in its search radius, not "
+                    + "just ones bordering the mercenary-hiring host");
     }
 }

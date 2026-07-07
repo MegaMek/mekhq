@@ -128,4 +128,19 @@ class MissionLocationProfileTest {
             }
         }
     }
+
+    /**
+     * Only HIGH_VALUE and INVASION target worlds worth conquering or sabotaging for their industry; INTERIOR_POPULATED
+     * cares only about the population (a riot doesn't care whether the crowd is at a factory or a farm).
+     */
+    @Test
+    void onlyHighValueAndInvasionAreIndustriallyWeighted() {
+        for (MissionLocationProfile profile : MissionLocationProfile.values()) {
+            if ((profile == MissionLocationProfile.HIGH_VALUE) || (profile == MissionLocationProfile.INVASION)) {
+                assertTrue(profile.isIndustriallyWeighted(), profile + " should be industrially weighted");
+            } else {
+                assertFalse(profile.isIndustriallyWeighted(), profile + " should not be industrially weighted");
+            }
+        }
+    }
 }

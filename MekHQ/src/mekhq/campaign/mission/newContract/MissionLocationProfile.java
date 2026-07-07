@@ -127,4 +127,15 @@ public enum MissionLocationProfile {
     public boolean isPopulationWeighted() {
         return (this == HIGH_VALUE) || (this == INTERIOR_POPULATED) || (this == INVASION);
     }
+
+    /**
+     * @return {@code true} if the weighted pick should also factor in a world's industrial capacity (see
+     *       {@link mekhq.campaign.universe.SocioIndustrialData}) on top of population and HPG presence.
+     *       {@link #HIGH_VALUE} and {@link #INVASION} target worlds worth sabotaging or conquering for their industry,
+     *       not just their head count; {@link #INTERIOR_POPULATED} cares only about people (riots and internal security
+     *       happen wherever the crowds are, factory or farm alike).
+     */
+    public boolean isIndustriallyWeighted() {
+        return (this == HIGH_VALUE) || (this == INVASION);
+    }
 }

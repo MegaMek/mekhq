@@ -30,8 +30,9 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.market.contractMarket;
+package mekhq.campaign.mission.newContract;
 
+import static mekhq.campaign.mission.newContract.ClanHomeworldsExclusion.violatesHomeworldsExclusion;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -42,18 +43,16 @@ import java.time.LocalDate;
 
 import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.market.contractMarket.AbstractContractMarket;
+import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
+import mekhq.campaign.mission.AbstractMissionTransition;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * Tests {@link AbstractContractMarket#violatesHomeworldsExclusion}: outside Operation Bulldog, no non-Clan faction
- * should be able to target a system within 450 light years of Strana Mechty.
- */
-class AbstractContractMarketHomeworldsExclusionTest {
+class ClanHomeworldsExclusionTest {
 
     private static final LocalDate OUTSIDE_BULLDOG = LocalDate.of(3049, 12, 1);
     private static final LocalDate INSIDE_BULLDOG = LocalDate.of(3059, 6, 1);
@@ -79,9 +78,9 @@ class AbstractContractMarketHomeworldsExclusionTest {
         return faction;
     }
 
-    private static AtBContract mockContract(Faction attackerFaction, double distanceToStranaMechty,
+    private static AbstractMissionTransition mockContract(Faction attackerFaction, double distanceToStranaMechty,
           PlanetarySystem stranaMechty, int travelDays) {
-        AtBContract contract = mock(AtBContract.class);
+        AbstractMissionTransition contract = mock(AbstractMissionTransition.class);
         when(contract.isPlayerAttacker()).thenReturn(true);
         when(contract.getEmployerFaction()).thenReturn(attackerFaction);
         PlanetarySystem targetSystem = mock(PlanetarySystem.class);
@@ -101,9 +100,9 @@ class AbstractContractMarketHomeworldsExclusionTest {
     void nonClanAttackerWithinRadiusOutsideBulldogViolates() {
         PlanetarySystem stranaMechty = mockStranaMechty();
         Campaign campaign = mockCampaign(OUTSIDE_BULLDOG);
-        AtBContract contract = mockContract(mockFaction(false), 200, stranaMechty, 0);
+        AbstractMissionTransition contract = mockContract(mockFaction(false), 200, stranaMechty, 0);
 
-        assertTrue(contractMarket.violatesHomeworldsExclusion(contract, campaign),
+        assertTrue(violatesHomeworldsExclusion(contract, campaign),
               "A non-Clan faction striking within the exclusion radius outside Operation Bulldog should violate "
                     + "the restriction");
     }
@@ -112,9 +111,9 @@ class AbstractContractMarketHomeworldsExclusionTest {
     void nonClanAttackerWithinRadiusDuringBulldogIsAllowed() {
         PlanetarySystem stranaMechty = mockStranaMechty();
         Campaign campaign = mockCampaign(INSIDE_BULLDOG);
-        AtBContract contract = mockContract(mockFaction(false), 200, stranaMechty, 0);
+        AbstractMissionTransition contract = mockContract(mockFaction(false), 200, stranaMechty, 0);
 
-        assertFalse(contractMarket.violatesHomeworldsExclusion(contract, campaign),
+        assertFalse(violatesHomeworldsExclusion(contract, campaign),
               "Operation Bulldog is the one historical window where non-Clan forces legitimately operated within "
                     + "the exclusion radius");
     }
@@ -123,9 +122,9 @@ class AbstractContractMarketHomeworldsExclusionTest {
     void clanAttackerWithinRadiusOutsideBulldogIsAllowed() {
         PlanetarySystem stranaMechty = mockStranaMechty();
         Campaign campaign = mockCampaign(OUTSIDE_BULLDOG);
-        AtBContract contract = mockContract(mockFaction(true), 200, stranaMechty, 0);
+        AbstractMissionTransition contract = mockContract(mockFaction(true), 200, stranaMechty, 0);
 
-        assertFalse(contractMarket.violatesHomeworldsExclusion(contract, campaign),
+        assertFalse(violatesHomeworldsExclusion(contract, campaign),
               "Clan factions are native to the Homeworlds and are never restricted by this rule");
     }
 
@@ -133,9 +132,9 @@ class AbstractContractMarketHomeworldsExclusionTest {
     void nonClanAttackerOutsideRadiusOutsideBulldogIsAllowed() {
         PlanetarySystem stranaMechty = mockStranaMechty();
         Campaign campaign = mockCampaign(OUTSIDE_BULLDOG);
-        AtBContract contract = mockContract(mockFaction(false), 451, stranaMechty, 0);
+        AbstractMissionTransition contract = mockContract(mockFaction(false), 451, stranaMechty, 0);
 
-        assertFalse(contractMarket.violatesHomeworldsExclusion(contract, campaign),
+        assertFalse(violatesHomeworldsExclusion(contract, campaign),
               "A target outside the exclusion radius is never restricted by this rule");
     }
 
@@ -145,9 +144,9 @@ class AbstractContractMarketHomeworldsExclusionTest {
         // The current date is before Operation Bulldog starts, but travel time pushes the actual arrival date into
         // the window - the rule is keyed on arrival date, not the date the contract was generated.
         Campaign campaign = mockCampaign(MHQConstants.OPERATION_BULLDOG_START.minusDays(10));
-        AtBContract contract = mockContract(mockFaction(false), 200, stranaMechty, 15);
+        AbstractMissionTransition contract = mockContract(mockFaction(false), 200, stranaMechty, 15);
 
-        assertFalse(contractMarket.violatesHomeworldsExclusion(contract, campaign),
+        assertFalse(violatesHomeworldsExclusion(contract, campaign),
               "The restriction is keyed on the arrival date (current date plus travel time), not the date the "
                     + "contract was generated");
     }
