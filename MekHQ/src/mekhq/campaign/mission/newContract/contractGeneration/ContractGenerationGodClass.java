@@ -64,8 +64,9 @@ public class ContractGenerationGodClass {
     }
 
     public void generateContract(Campaign campaign, double forceReputationFactor, AbstractLocation currentLocation,
-          Person negotiator, List<Formation> formations, Hangar hangar, int temporaryAsTechPoolSize,
-          int temporaryMedicPool, Map<PersonnelRole, Integer> temporaryCrewMap) {
+          Person playerNegotiator, List<Formation> formations, Hangar hangar, int temporaryAsTechPoolSize,
+          int temporaryMedicPool, Map<PersonnelRole, Integer> temporaryCrewMap,
+          CampaignTypeForContractDetermination campaignType) {
         AbstractContractManager contractManager = new NormalContractManager();
 
         // Generate Employer, Contract Type, Enemy, & Location
@@ -78,7 +79,7 @@ public class ContractGenerationGodClass {
         generateEmployerContractTypeEnemyAndLocation(campaign,
               forceReputationFactor,
               currentLocation,
-              negotiator,
+              playerNegotiator,
               currentDate,
               contractManager,
               hiringHallLevel);
@@ -118,13 +119,18 @@ public class ContractGenerationGodClass {
         contractManager.setContractPayData(contractPayData);
 
         // Initial Negotiations
+        Person employerNegotiator = EmployerNegotiator.generateNegotiator(campaign,
+              campaignType,
+              employerFaction,
+              hiringHallLevel);
+        NegotiationsData negotiationsData = ContractDeterminationNegotiations.determineInitialNegotiationTerms(
+              employerModifierData,
+              campaign,
+              playerNegotiator,
+              employerNegotiator);
+        contractManager.setNegotiationsData(negotiationsData);
 
-
-        // TODO Command Rights
-        // TODO Salvage Rights
-        // TODO Support Rights
-        // TODO Transport Terms
-
+        // Ad Hoc Renegotiations
         // TODO follow-on Negotiations
     }
 

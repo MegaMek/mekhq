@@ -41,6 +41,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.mission.newContract.contractGeneration.ContractPayData;
 import mekhq.campaign.mission.newContract.contractGeneration.EmployerModifierData;
+import mekhq.campaign.mission.newContract.contractGeneration.NegotiationsData;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -58,6 +59,7 @@ public abstract class AbstractContractManager {
     private JumpPath cachedJumpPath = new JumpPath();
     private boolean isHighRisk;
     private boolean isCovert;
+    private NegotiationsData negotiationsData;
 
     public AbstractContractManager() {
     }
@@ -171,5 +173,13 @@ public abstract class AbstractContractManager {
 
     public void setCovert(boolean isCovert) {
         this.isCovert = isCovert;
+    }
+
+    public NegotiationsData getNegotiationsData() {
+        return negotiationsData;
+    }
+
+    public void setNegotiationsData(NegotiationsData negotiationsData) {
+        this.negotiationsData = negotiationsData;
     }
 }

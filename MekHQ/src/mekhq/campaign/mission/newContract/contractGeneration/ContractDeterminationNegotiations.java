@@ -41,11 +41,10 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.DailyReportType;
+import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
 import mekhq.campaign.personnel.skills.SkillCheck;
-import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.enums.HiringHallLevel;
 
 public class ContractDeterminationNegotiations {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.ContractDeterminationNegotiations";
@@ -55,6 +54,14 @@ public class ContractDeterminationNegotiations {
 
     /** CamOps pg 41 rev 5th printing */
     private final static double MARGIN_OF_SUCCESS_DIVIDER = 2.0;
+    /** CamOps pg 41 rev 5th printing */
+    private final static double PIRATE_SALVAGE_TERMS = 1.0;
+    /** CamOps pg 41 rev 5th printing */
+    private final static ContractCommandRights PIRATE_COMMAND_RIGHTS = ContractCommandRights.INDEPENDENT;
+    /** CamOps pg 41 rev 5th printing */
+    private final static double PIRATE_TRANSPORT_RIGHTS = 0.0;
+    /** CamOps pg 41 rev 5th printing */
+    private final static double PIRATE_SUPPORT_RIGHTS = 0.0;
 
     public ContractDeterminationNegotiations() {
         // TODO - roll 2d6 per term
@@ -65,17 +72,61 @@ public class ContractDeterminationNegotiations {
         // TODO pirates get special rules
     }
 
-    public static void negotiateInitialContractTerms(Person playerNegotiator, Campaign campaign,
-          CampaignTypeForContractDetermination campaignType, Faction employerFaction, HiringHallLevel hiringHallLevel) {
-        Person employerNegotiator = EmployerNegotiator.generateNegotiator(campaign,
-              campaignType,
-              employerFaction,
-              hiringHallLevel);
+    public static NegotiationsData negotiateInitialContractTerms(Person playerNegotiator, Person employerNegotiator,
+          Campaign campaign, CampaignTypeForContractDetermination campaignType) {
+        boolean isPirateCampaignType = campaignType == CampaignTypeForContractDetermination.PIRATE;
+        if (isPirateCampaignType) {
+            return determinePirateNegotiationTerms();
+        }
 
-        // TODO Command Rights
-        // TODO Salvage Rights
-        // TODO Support Rights
-        // TODO Transport Rights
+        EmployerModifierData employerModifierData = new EmployerModifierData();
+        return determineInitialNegotiationTerms(employerModifierData,
+              campaign,
+              playerNegotiator,
+              employerNegotiator);
+    }
+
+    private static NegotiationsData determinePirateNegotiationTerms() {
+        return new NegotiationsData(PIRATE_COMMAND_RIGHTS,
+              PIRATE_SALVAGE_TERMS,
+              PIRATE_SUPPORT_RIGHTS,
+              PIRATE_TRANSPORT_RIGHTS);
+    }
+
+    public static NegotiationsData determineInitialNegotiationTerms(EmployerModifierData employerModifierData,
+          Campaign campaign, Person playerNegotiator, Person employerNegotiator) {
+        boolean isPirateCampaignType = false;
+
+        int commandRightsNegotiationModifier = makeOpposedNegotiationSkillCheck(campaign,
+              playerNegotiator,
+              employerNegotiator,
+              isPirateCampaignType);
+        ContractCommandRights commandRights = NegotiationTermsTables.rollOnCommandRightsTable(
+              commandRightsNegotiationModifier,
+              employerModifierData.getCommandModifier());
+
+        int commandSalvageNegotiationModifier = makeOpposedNegotiationSkillCheck(campaign,
+              playerNegotiator,
+              employerNegotiator,
+              isPirateCampaignType);
+        double salvageRights = NegotiationTermsTables.rollOnSalvageRightsTable(commandSalvageNegotiationModifier,
+              employerModifierData.getSalvageModifier());
+
+        int commandSupportNegotiationModifier = makeOpposedNegotiationSkillCheck(campaign,
+              playerNegotiator,
+              employerNegotiator,
+              isPirateCampaignType);
+        double supportRights = NegotiationTermsTables.rollOnSupportRightsTable(commandSupportNegotiationModifier,
+              employerModifierData.getSupportModifier());
+
+        int commandTransportNegotiationModifier = makeOpposedNegotiationSkillCheck(campaign,
+              playerNegotiator,
+              employerNegotiator,
+              isPirateCampaignType);
+        double transportRights = NegotiationTermsTables.rollOnTransportRightsTable(commandTransportNegotiationModifier,
+              employerModifierData.getTransportModifier());
+
+        return new NegotiationsData(commandRights, salvageRights, supportRights, transportRights);
     }
 
     private static int makeOpposedNegotiationSkillCheck(Campaign campaign, Person playerNegotiator,
@@ -115,6 +166,4 @@ public class ContractDeterminationNegotiations {
 
         return totalMarginOfSuccess;
     }
-
-
 }
