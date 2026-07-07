@@ -32,5 +32,14 @@
  */
 package mekhq.campaign.mission.newContract.contractGeneration;
 
-public record ObjectivePayData() {
+import mekhq.campaign.finances.Money;
+
+public record ObjectivePayData(
+      Money calculatedBasePay,
+      int objectiveLength,
+      double tempoMultiplier,
+      double employmentMultiplier,
+      double reputationFactor,
+      Money calculatedObjectivePay
+) {
 }

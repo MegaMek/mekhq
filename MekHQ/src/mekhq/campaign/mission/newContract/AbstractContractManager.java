@@ -39,6 +39,7 @@ import jakarta.annotation.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
+import mekhq.campaign.mission.newContract.contractGeneration.ContractPayData;
 import mekhq.campaign.mission.newContract.contractGeneration.EmployerModifierData;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -49,11 +50,14 @@ public abstract class AbstractContractManager {
     private final static MMLogger LOGGER = MMLogger.create(AbstractContractManager.class);
 
     private String employerFactionCode;
-    EmployerModifierData employerModifierData;
+    private EmployerModifierData employerModifierData;
     private List<AbstractContractObjective> contractObjectives;
+    private ContractPayData contractPayData;
 
     private String targetSystemId;
     private JumpPath cachedJumpPath = new JumpPath();
+    private boolean isHighRisk;
+    private boolean isCovert;
 
     public AbstractContractManager() {
     }
@@ -143,5 +147,29 @@ public abstract class AbstractContractManager {
 
     public void setEmployerModifierData(EmployerModifierData employerModifierData) {
         this.employerModifierData = employerModifierData;
+    }
+
+    public ContractPayData getContractPayData() {
+        return contractPayData;
+    }
+
+    public void setContractPayData(ContractPayData contractPayData) {
+        this.contractPayData = contractPayData;
+    }
+
+    public boolean isHighRisk() {
+        return isHighRisk;
+    }
+
+    public void setHighRisk(boolean isHighRisk) {
+        this.isHighRisk = isHighRisk;
+    }
+
+    public boolean isCovert() {
+        return isCovert;
+    }
+
+    public void setCovert(boolean isCovert) {
+        this.isCovert = isCovert;
     }
 }

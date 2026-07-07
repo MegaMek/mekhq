@@ -71,16 +71,11 @@ public enum SpecialNegotiationsModifier {
         return transportModifier;
     }
 
-    public static void getNegotiationsModifier(boolean isHighRisk, boolean isCovert,
-          EmployerModifierData modifierData) {
-        if (isHighRisk) {
-            applyNegotiationModifiers(OBJECTIVE_HIGH_RISK, modifierData);
-        }
-
-        if (isCovert) {
-            applyNegotiationModifiers(OBJECTIVE_COVERT, modifierData);
-        }
+    public static void applyHighRisk(EmployerModifierData modifierData) {
+        applyNegotiationModifiers(OBJECTIVE_HIGH_RISK, modifierData);
     }
+
+    public static void applyCovert(EmployerModifierData modifierData) {}
 
     private static void applyNegotiationModifiers(SpecialNegotiationsModifier modifierEntry,
           EmployerModifierData modifierData) {

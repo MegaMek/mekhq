@@ -32,7 +32,32 @@
  */
 package mekhq.campaign.mission.newContract.contractGeneration;
 
-import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
-public record ContractPayData(List<ObjectivePayData> objectivePayData) {
+import mekhq.campaign.finances.Money;
+
+public record ContractPayData(
+      ContractBasePayData basePayData,
+      TransitPayData transitPayData,
+      Map<UUID, ObjectivePayData> objectivePayDataMap,
+      Money totalObjectivePay
+) {
+    public ContractPayData rebuildIncludingStraightSupport() {
+        return new ContractPayData(
+              basePayData,
+              transitPayData,
+              objectivePayDataMap,
+              totalObjectivePay
+        );
+    }
+
+    public ContractPayData rebuildIncludingTransportPayment() {
+        return new ContractPayData(
+              basePayData,
+              transitPayData,
+              objectivePayDataMap,
+              totalObjectivePay
+        );
+    }
 }

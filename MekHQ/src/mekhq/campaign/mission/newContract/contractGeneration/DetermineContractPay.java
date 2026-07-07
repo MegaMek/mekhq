@@ -38,9 +38,11 @@ import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 import mekhq.campaign.Hangar;
 import mekhq.campaign.JumpPath;
@@ -52,6 +54,7 @@ import mekhq.campaign.location.ILocation;
 import mekhq.campaign.market.contractMarket.AlternatePaymentModelValues;
 import mekhq.campaign.mission.TransportCostCalculations;
 import mekhq.campaign.mission.newContract.AbstractContractManager;
+import mekhq.campaign.mission.newContract.AbstractContractObjective;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -68,10 +71,12 @@ public class DetermineContractPay {
 
     public DetermineContractPay() {}
 
-    public static ContractPayData generateContractPay(AbstractContractManager contractManager, boolean isClanCampaign,
+    public static ContractPayData generateContractPay(AbstractContractManager contractManager,
           List<Formation> formations, Hangar hangar, CampaignOptions campaignOptions, LocalDate currentDate,
           int temporaryAsTechPoolSize, int temporaryMedicPool, Map<PersonnelRole, Integer> temporaryCrewMap,
           Faction campaignFaction, double reputationFactor) {
+        boolean isClanCampaign = campaignFaction.isClan();
+
         ContractBasePayData basePayData = calculateBasePay(isClanCampaign,
               formations,
               hangar,
@@ -87,13 +92,32 @@ public class DetermineContractPay {
         boolean isUseTwoWayPay = campaignOptions.isUseTwoWayPay();
         EmployerModifierData employerModifierData = contractManager.getEmployerModifierData();
         double employmentMultiplier = employerModifierData.getEmploymentMultiplier();
-        String employerId = contractManager.getEmployerFactionCode();
 
         TransitPayData transitPayData = calculateTransitPay(calculatedBasePay,
               reputationFactor,
               cachedJumpPath,
               isUseTwoWayPay,
               employmentMultiplier);
+
+        List<AbstractContractObjective> objectives = contractManager.getContractAllObjectivesCopy();
+        Map<UUID, ObjectivePayData> objectivePayDataMap = calculateObjectivePay(objectives,
+              calculatedBasePay,
+              employmentMultiplier,
+              reputationFactor);
+
+        Money totalObjectivePay = getTotalObjectivePay(objectivePayDataMap);
+
+        return new ContractPayData(basePayData, transitPayData, objectivePayDataMap, totalObjectivePay);
+    }
+
+    private static Money getTotalObjectivePay(Map<UUID, ObjectivePayData> objectivePayDataMap) {
+        Money totalObjectivePay = Money.zero();
+        for (ObjectivePayData objectivePayData : objectivePayDataMap.values()) {
+            Money calculatedObjectivePay = objectivePayData.calculatedObjectivePay();
+            totalObjectivePay = totalObjectivePay.plus(calculatedObjectivePay);
+        }
+
+        return totalObjectivePay;
     }
 
     public static ContractBasePayData calculateBasePay(boolean isClanCampaign, List<Formation> formations,
@@ -175,15 +199,6 @@ public class DetermineContractPay {
         return forceValue;
     }
 
-    private @NonNull Money getObjectivePay() {
-        return Money.zero()
-                     .plus(basePay)
-                     .multipliedBy(totalLength)
-                     .multipliedBy(tempoMultiplier)
-                     .multipliedBy(employmentMultiplier)
-                     .multipliedBy(reputationFactor);
-    }
-
     private static @NonNull TransitPayData calculateTransitPay(Money calculatedBasePay, double reputationFactor,
           JumpPath cachedJumpPath, boolean isUseTwoWayPay, double employmentMultiplier) {
         int transportPeriod = calculateTransportPeriod(cachedJumpPath, isUseTwoWayPay);
@@ -194,7 +209,8 @@ public class DetermineContractPay {
                                            .multipliedBy(employmentMultiplier)
                                            .multipliedBy(reputationFactor);
 
-        return new TransitPayData(transportPeriod, employmentMultiplier, reputationFactor, calculatedTransitPay);
+        return new TransitPayData(calculatedBasePay, transportPeriod, employmentMultiplier, reputationFactor,
+              calculatedTransitPay);
     }
 
     public static int calculateTransportPeriod(JumpPath cachedJumpPath, boolean isUseTwoWayPay) {
@@ -232,5 +248,34 @@ public class DetermineContractPay {
               travelingPersonnel,
               EXP_REGULAR);
         return costCalculation.calculateJumpCostForEntireJourney(duration, cachedJumpPath.getJumps());
+    }
+
+    private static @NonNull Map<UUID, ObjectivePayData> calculateObjectivePay(
+          List<AbstractContractObjective> objectives, Money calculatedBasePay,
+          double employmentMultiplier, double reputationFactor) {
+        Map<UUID, ObjectivePayData> objectivePayMap = new HashMap<>();
+
+        for (AbstractContractObjective objective : objectives) {
+            int objectiveLength = objective.getLengthInMonths();
+            double tempoMultiplier = objective.getObjectiveType().getOperationsTempoMultiplier();
+
+            Money calculatedObjectivePay = Money.zero()
+                                                 .plus(calculatedBasePay)
+                                                 .multipliedBy(objectiveLength)
+                                                 .multipliedBy(tempoMultiplier)
+                                                 .multipliedBy(employmentMultiplier)
+                                                 .multipliedBy(reputationFactor);
+
+            ObjectivePayData objectivePayData = new ObjectivePayData(calculatedBasePay,
+                  objectiveLength,
+                  tempoMultiplier,
+                  employmentMultiplier,
+                  reputationFactor,
+                  calculatedObjectivePay);
+
+            objectivePayMap.put(objective.getId(), objectivePayData);
+        }
+
+        return objectivePayMap;
     }
 }

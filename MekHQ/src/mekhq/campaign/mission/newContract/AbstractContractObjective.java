@@ -32,13 +32,24 @@
  */
 package mekhq.campaign.mission.newContract;
 
+import java.util.UUID;
+
 import mekhq.campaign.mission.enums.AtBContractType;
 
 public abstract class AbstractContractObjective {
+    private UUID uuid;
     private transient AbstractContractManager parentContractManager;
     private AtBContractType objectiveType;
     private String enemyFactionCode;
     private int lengthInMonths;
+
+    public UUID getId() {
+        return uuid;
+    }
+
+    public void setId(UUID uuid) {
+        this.uuid = uuid;
+    }
 
     public AbstractContractObjective() {
     }

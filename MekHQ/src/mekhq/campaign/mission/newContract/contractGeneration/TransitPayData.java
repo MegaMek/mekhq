@@ -35,6 +35,7 @@ package mekhq.campaign.mission.newContract.contractGeneration;
 import mekhq.campaign.finances.Money;
 
 public record TransitPayData(
+      Money calculatedBasePay,
       int transportPeriod,
       double employmentMultiplier,
       double reputationFactor,
