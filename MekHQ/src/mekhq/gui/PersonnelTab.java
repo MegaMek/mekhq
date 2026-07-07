@@ -113,6 +113,12 @@ public final class PersonnelTab extends CampaignGuiTab {
     private JScrollPane scrollPersonnelView;
     private JCheckBox chkGroupByUnit;
 
+    /**
+     * A person shown in the detail panel while not present in the grid, e.g. when a link targets someone outside the
+     * active location scope. Kept so table refreshes that clear the grid selection do not blank the detail panel.
+     */
+    private Person pinnedPerson;
+
     private final IPreferenceChangeListener scalingChangeListener = e -> changePersonnelView();
 
     // region Constructors
@@ -502,6 +508,15 @@ public final class PersonnelTab extends CampaignGuiTab {
         if (row != -1) {
             personnelTable.setRowSelectionInterval(row, row);
             personnelTable.scrollRectToVisible(personnelTable.getCellRect(row, 0, true));
+            return;
+        }
+        // The person is outside the active location scope, so the grid does not contain them. Pin them to the detail
+        // panel so it shows them without forcing them onto the grid, surviving later table refreshes.
+        Person person = getCampaign().getPerson(id);
+        if (person != null) {
+            pinnedPerson = person;
+            personnelTable.clearSelection();
+            refreshPersonnelView();
         }
     }
 
@@ -542,9 +557,15 @@ public final class PersonnelTab extends CampaignGuiTab {
     public void refreshPersonnelView() {
         int row = personnelTable.getSelectedRow();
         if (row < 0) {
-            scrollPersonnelView.setViewportView(null);
+            if (pinnedPerson != null) {
+                scrollPersonnelView.setViewportView(new PersonViewPanel(pinnedPerson, getCampaign(), getCampaignGui()));
+                SwingUtilities.invokeLater(() -> scrollPersonnelView.getVerticalScrollBar().setValue(0));
+            } else {
+                scrollPersonnelView.setViewportView(null);
+            }
             return;
         }
+        pinnedPerson = null;
         Person selectedPerson = getPersonnelTableModel().getRow(personnelTable.convertRowIndexToModel(row));
         scrollPersonnelView.setViewportView(new PersonViewPanel(selectedPerson, getCampaign(), getCampaignGui()));
         // This odd code is to make sure that the scrollbar stays at the top
