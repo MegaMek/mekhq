@@ -56,7 +56,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import org.jspecify.annotations.NonNull;
 
-public class Negotiator {
+public class NPCNegotiator {
     /**
      * This level is taken from CamOps rev 5th printing, pg 41. CamOps states that Negotiators have a Charisma modifier
      * of 1. 7 Charisma is the minimum score necessary to reach that modifier.

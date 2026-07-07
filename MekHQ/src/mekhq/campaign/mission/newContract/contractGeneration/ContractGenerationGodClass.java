@@ -116,6 +116,14 @@ public class ContractGenerationGodClass {
               campaignFaction,
               forceReputationFactor);
         contractManager.setContractPayData(contractPayData);
+
+        // Initial Negotiations
+        // TODO Command Rights
+        // TODO Salvage Rights
+        // TODO Support Rights
+        // TODO Transport Terms
+
+        // TODO follow-on Negotiations
     }
 
     private static void generateEmployerContractTypeEnemyAndLocation(Campaign campaign, double forceReputationFactor,
@@ -176,7 +184,7 @@ public class ContractGenerationGodClass {
         }
 
         // TODO change from short name to faction object
-        String targetSystemId = ContractLocationDetermination.determineContractLocation(firstObjective,
+        String targetSystemId = ContractDeterminationLocation.determineContractLocation(firstObjective,
               true,
               employerFaction.getShortName(),
               enemyFaction.getShortName(),
@@ -196,7 +204,7 @@ public class ContractGenerationGodClass {
           AbstractContractManager parentContractManager) {
         // Only the first objective is used to determine the initial enemy, as this is used to influence contract
         // location.
-        Faction enemyFaction = ObjectiveEnemyDetermination.generateEnemyFactionForObjective(currentLocation,
+        Faction enemyFaction = ContractDeterminationObjectiveEnemy.generateEnemyFactionForObjective(currentLocation,
               currentDate, employerFactionSelectionData.employerFaction(), firstObjective);
         String enemyFactionCode = enemyFaction.getShortName();
         for (AbstractContractObjective contractObjective : parentContractManager.getContractAllObjectivesCopy()) {
@@ -215,7 +223,7 @@ public class ContractGenerationGodClass {
             return List.of();
         }
 
-        MissionObjectiveTypeDetermination missionObjectiveTypeDetermination = new MissionObjectiveTypeDetermination(
+        ContractDeterminationObjectiveType contractDeterminationObjectiveType = new ContractDeterminationObjectiveType(
               campaign,
               hiringHallLevel,
               negotiator,
@@ -223,14 +231,14 @@ public class ContractGenerationGodClass {
               employerFactionSelectionData.globalEmployerTableValue(),
               employerFactionSelectionData.independentEmployerTableValue());
 
-        List<AtBContractType> objectives = missionObjectiveTypeDetermination.getObjectiveTypes();
+        List<AtBContractType> objectives = contractDeterminationObjectiveType.getObjectiveTypes();
         for (AtBContractType objective : objectives) {
             AbstractContractObjective contractObjective = new NormalContractObjective();
             contractObjective.setObjectiveType(objective);
             contractManager.addContractObjective(contractObjective);
         }
 
-        boolean isCovert = missionObjectiveTypeDetermination.isCovert();
+        boolean isCovert = contractDeterminationObjectiveType.isCovert();
         contractManager.setCovert(isCovert);
 
         return objectives;
@@ -245,7 +253,7 @@ public class ContractGenerationGodClass {
         int connectionsEquipLevel = connectionsLevel.getEquipLevel();
 
         EmployerFactionSelection employerFactionSelectionData =
-              ContractEmployerDetermination.getEmployerFactionSelectionData(currentLocation,
+              ContractDeterminationEmployer.getEmployerFactionSelectionData(currentLocation,
                     connectionsEquipLevel,
                     campaignFaction,
                     currentDate,

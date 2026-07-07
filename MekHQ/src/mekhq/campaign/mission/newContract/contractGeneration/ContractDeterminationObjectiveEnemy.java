@@ -47,8 +47,8 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RandomFactionGenerator;
 
-public class ObjectiveEnemyDetermination {
-    private static final MMLogger LOGGER = MMLogger.create(ObjectiveEnemyDetermination.class);
+public class ContractDeterminationObjectiveEnemy {
+    private static final MMLogger LOGGER = MMLogger.create(ContractDeterminationObjectiveEnemy.class);
 
     private static final int MERCENARY_ENEMY_CHANCE = 20;
 

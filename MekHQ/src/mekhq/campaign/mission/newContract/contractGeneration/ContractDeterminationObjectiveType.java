@@ -55,8 +55,8 @@ import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 
-public class MissionObjectiveTypeDetermination {
-    private static final MMLogger LOGGER = MMLogger.create(MissionObjectiveTypeDetermination.class);
+public class ContractDeterminationObjectiveType {
+    private static final MMLogger LOGGER = MMLogger.create(ContractDeterminationObjectiveType.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.MissionObjectiveTypeDetermination";
 
     private final static String SKILL_CHECK_REASON = getTextAt(RESOURCE_BUNDLE,
@@ -78,7 +78,7 @@ public class MissionObjectiveTypeDetermination {
     private List<AtBContractType> objectiveTypes;
 
     // TODO player must be able to pick negotiator
-    public MissionObjectiveTypeDetermination(Campaign campaign, HiringHallLevel hiringHallLevel,
+    public ContractDeterminationObjectiveType(Campaign campaign, HiringHallLevel hiringHallLevel,
           Person negotiator, Faction employerFaction, GlobalEmployerTableValue employerTableValue,
           IndependentEmployerTableValue independentEmployerTableValue) {
         this.campaign = campaign;

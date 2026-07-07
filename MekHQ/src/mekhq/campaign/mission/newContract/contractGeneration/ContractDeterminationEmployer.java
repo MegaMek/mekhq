@@ -49,13 +49,13 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 
-public class ContractEmployerDetermination {
-    private static final MMLogger LOGGER = MMLogger.create(ContractEmployerDetermination.class);
+public class ContractDeterminationEmployer {
+    private static final MMLogger LOGGER = MMLogger.create(ContractDeterminationEmployer.class);
 
     private static final int COMSTAR_EMPLOYER_CHANCE = 100;
     private static final int WORD_OF_BLAKE_EMPLOYER_CHANCE = 40;
 
-    public ContractEmployerDetermination() {}
+    public ContractDeterminationEmployer() {}
 
     public static EmployerFactionSelection getEmployerFactionSelectionData(ILocation currentLocation,
           int connectionsEquipLevel, Faction campaignFaction, LocalDate currentDate, HiringHallLevel hiringHallLevel,
