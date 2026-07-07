@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.location;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -43,10 +42,12 @@ import java.util.stream.Collectors;
 
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
+import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.AbstractMobileLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignLocationManager;
 import mekhq.campaign.CurrentLocation;
+import mekhq.campaign.GroundTransitLocation;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.Warehouse;
@@ -71,38 +72,10 @@ public final class LocationDispatch {
     private static final String LOG_DISPATCH_UNITS = "dispatchUnitsToLocation";
     private static final String LOG_DISPATCH_PARTS = "dispatchPartsToLocation";
 
+    /** Overland transit time, in days, for a same-planet move to a different root location. */
+    private static final double GROUND_TRANSIT_DAYS = 2.0;
+
     private LocationDispatch() {}
-
-    /**
-     * Returns the transit time from {@code fromSystem} that should be used as the start-transit
-     * parameter when calculating a new journey's duration.
-     *
-     * <p>When already in-system, we inherit its current transit progress.
-     * When there is no location, we assume the
-     * traveler starts at the outer jump point of their system.</p>
-     *
-     * @param fromSystem the departure system; must not be {@code null}
-     * @param campaign   the active campaign; must not be {@code null}
-     * @return transit time in days
-     */
-    public static double computeStartTransit(PlanetarySystem fromSystem, Campaign campaign) {
-        return campaign.getCurrentLocation() != null
-              ? campaign.getCurrentLocation().getTransitTime()
-              : fromSystem.getTimeToJumpPoint(1.0);
-    }
-
-    /**
-     * Computes the total journey duration in days from a {@link JumpPath}, applying a minimum of
-     * 2 days.
-     *
-     * @param path         the route to calculate; must not be {@code null}
-     * @param date         the in-game date (used for pirate-point availability); must not be {@code null}
-     * @param startTransit the already-elapsed transit time at the origin, in days
-     * @return journey length in whole days, always at least 2
-     */
-    public static int computeJourneyDays(JumpPath path, LocalDate date, double startTransit) {
-        return Math.max(2, (int) Math.ceil(path.getTotalTime(date, startTransit, false)));
-    }
 
     /**
      * Removes a completed travel node from the campaign: detaches it from the location tree and
@@ -207,11 +180,11 @@ public final class LocationDispatch {
      */
     private static Optional<CurrentLocation> buildTravelNode(PlanetarySystem fromSystem,
           PlanetarySystem destinationSystem, ILocation destination, Campaign campaign, String logContext) {
-        JumpPath path = campaign.calculateJumpPath(fromSystem, destinationSystem);
-        if (path == null || path.isEmpty()) {
+        JumpPath path = LocationUtils.planJumpPath(fromSystem, destinationSystem, campaign);
+        if (path == null) {
             return Optional.empty();
         }
-        double startTransit = computeStartTransit(fromSystem, campaign);
+        double startTransit = LocationUtils.computeStartTransit(fromSystem, campaign);
         CurrentLocation travelNode = new CurrentLocation(fromSystem, startTransit);
         travelNode.setJumpPath(path);
         if (!travelNode.setParent(destination)) {
@@ -224,6 +197,39 @@ public final class LocationDispatch {
     }
 
     /**
+     * Builds an on-planet overland travel node at {@code system} (a fixed {@link #GROUND_TRANSIT_DAYS}
+     * day journey, no jump path), parented under {@code destination}, and registers it with the
+     * campaign. Used for same-planet moves to a different root location.
+     */
+    private static GroundTransitLocation buildGroundTransitNode(PlanetarySystem system, ILocation destination,
+          Campaign campaign, String logContext) {
+        GroundTransitLocation groundNode = new GroundTransitLocation(system, GROUND_TRANSIT_DAYS);
+        if (!groundNode.setParent(destination)) {
+            LOGGER.warn("{}: setParent failed for groundTransitNode → {}; "
+                  + "items may display as Main Force after save/load",
+                  logContext, destination.getClass().getSimpleName());
+        }
+        campaign.getCampaignLocationManager().addLocation(groundNode);
+        return groundNode;
+    }
+
+    /**
+     * Returns {@code true} if {@code item} and {@code destination} hang under the same root
+     * {@link AbstractLocation} — i.e. they are already at the same location and no travel node is
+     * needed. Each base, campus, and the main force is its own root {@code AbstractLocation}, so
+     * identity comparison distinguishes them. When either root can't be resolved, returns
+     * {@code true} so callers fall back to direct landing (preserving legacy behavior).
+     */
+    private static boolean sharesRootLocation(ILocation item, ILocation destination) {
+        AbstractLocation itemRoot = item.getCurrentLocation();
+        AbstractLocation destinationRoot = destination.getCurrentLocation();
+        if (itemRoot == null || destinationRoot == null) {
+            return true;
+        }
+        return itemRoot == destinationRoot;
+    }
+
+    /**
      * Dispatches {@code people} to {@code destination}, grouping by departure system so that
      * everyone leaving from the same system shares one {@link CurrentLocation} for the journey.
      *
@@ -231,7 +237,7 @@ public final class LocationDispatch {
      * @param destination the target {@link ILocation}; must not be {@code null}
      * @param campaign    the active campaign; must not be {@code null}
      */
-    public static void dispatchToLocation(Collection<Person> people, ILocation destination, Campaign campaign) {
+    private static void dispatchToLocation(Collection<Person> people, ILocation destination, Campaign campaign) {
         dispatch(people, destination, campaign, LOG_DISPATCH_PERSONS, destination, null);
     }
 
@@ -250,7 +256,7 @@ public final class LocationDispatch {
      * @param destination the target {@link ILocation}; must not be {@code null}
      * @param campaign    the active campaign; must not be {@code null}
      */
-    public static void dispatchUnitsToLocation(Collection<Unit> units,
+    private static void dispatchUnitsToLocation(Collection<Unit> units,
           ILocation destination,
           Campaign campaign) {
 
@@ -293,7 +299,7 @@ public final class LocationDispatch {
      * @param destination the target {@link ILocation}; must not be {@code null}
      * @param campaign    the active campaign; must not be {@code null}
      */
-    public static void dispatchPartsToLocation(Collection<Part> parts, ILocation destination, Campaign campaign) {
+    private static void dispatchPartsToLocation(Collection<Part> parts, ILocation destination, Campaign campaign) {
 
         Warehouse arrivalWarehouse = (destination instanceof AbstractBase base)
               ? base.getBaseWarehouse()
@@ -307,6 +313,42 @@ public final class LocationDispatch {
                 arrivalWarehouse.addPart(part);
             }
         });
+    }
+
+    /**
+     * Dispatches a heterogeneous group of {@code travelers} to {@code destination}, splitting them by type so each
+     * reaches {@code destination} through the appropriate type-specific entry point
+     * ({@link #dispatchToLocation}, {@link #dispatchUnitsToLocation}, {@link #dispatchPartsToLocation}), which maintains
+     * the relevant hangar and warehouse data structures. Travelers that are not a {@link Person}, {@link Unit}, or
+     * {@link Part} are logged and skipped.
+     *
+     * @param travelers  the persons, units, and/or parts to dispatch; must not be {@code null}
+     * @param destination the target {@link ILocation}; must not be {@code null}
+     * @param campaign    the active campaign; must not be {@code null}
+     */
+    public static void dispatchTravelers(Collection<? extends ILocation> travelers, ILocation destination,
+          Campaign campaign) {
+        List<Person> people = new ArrayList<>();
+        List<Unit> units = new ArrayList<>();
+        List<Part> parts = new ArrayList<>();
+        for (ILocation traveler : travelers) {
+            switch (traveler) {
+                case Person person -> people.add(person);
+                case Unit unit -> units.add(unit);
+                case Part part -> parts.add(part);
+                default -> LOGGER.warn("dispatchTravelers: unsupported traveler type {} — skipping",
+                      traveler.getClass().getSimpleName());
+            }
+        }
+        if (!people.isEmpty()) {
+            dispatchToLocation(people, destination, campaign);
+        }
+        if (!units.isEmpty()) {
+            dispatchUnitsToLocation(units, destination, campaign);
+        }
+        if (!parts.isEmpty()) {
+            dispatchPartsToLocation(parts, destination, campaign);
+        }
     }
 
     /**
@@ -347,7 +389,21 @@ public final class LocationDispatch {
 
             if (destinationSystem == null || fromSystem.equals(destinationSystem)) {
                 PlanetarySystem system = destinationSystem != null ? destinationSystem : fromSystem;
-                land(group, destination, directLandingTarget, system, campaign.getCampaignLocationManager(), logMarker);
+                // Same planet: items already at the destination's root location land immediately;
+                // items at a different root on the same planet take a GroundTransitLocation overland trip.
+                List<T> alreadyThere = new ArrayList<>();
+                List<T> needGroundTransit = new ArrayList<>();
+                for (T item : group) {
+                    (sharesRootLocation(item, destination) ? alreadyThere : needGroundTransit).add(item);
+                }
+                if (!alreadyThere.isEmpty()) {
+                    land(alreadyThere, destination, directLandingTarget, system,
+                          campaign.getCampaignLocationManager(), logMarker);
+                }
+                if (!needGroundTransit.isEmpty()) {
+                    GroundTransitLocation groundNode = buildGroundTransitNode(system, destination, campaign, logMarker);
+                    needGroundTransit.forEach(item -> reparent(item, groundNode));
+                }
                 continue;
             }
 

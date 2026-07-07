@@ -4748,6 +4748,14 @@ public class Unit implements ITechnology, ILocation {
         return new EntityImage(base, camouflage, component, getEntity()).loadPreviewImage(showDamage);
     }
 
+    public @Nullable EntityImage getEntityImage() {
+        if (MHQStaticDirectoryManager.getMekTileset() == null) {
+            return null;
+        }
+        final Image base = MHQStaticDirectoryManager.getMekTileset().imageFor(getEntity());
+        return new EntityImage(base, getUtilizedCamouflage(getCampaign()), null, getEntity());
+    }
+
     public Color determineForegroundColor(String type) {
         if (isDeployed()) {
             return MekHQ.getMHQOptions().getDeployedForeground();

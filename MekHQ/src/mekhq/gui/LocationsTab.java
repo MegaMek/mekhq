@@ -50,8 +50,8 @@ import megamek.codeUtilities.MathUtility;
 import megamek.common.event.Subscribe;
 import megamek.common.ui.FastJScrollPane;
 import megamek.common.units.UnitType;
+import mekhq.campaign.AbstractMobileLocation;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.base.AbstractBase;
 import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.events.LocationEvent;
@@ -309,7 +309,7 @@ public class LocationsTab extends CampaignGuiTab {
 
         @FunctionalInterface
         private interface TransitCounter {
-            int count(CurrentLocation node);
+            int count(AbstractMobileLocation node);
         }
 
         private static int countInTransit(IPlace place, TransitCounter counter) {
@@ -318,7 +318,9 @@ public class LocationsTab extends CampaignGuiTab {
             }
             int total = 0;
             for (ILocation child : place.getChildLocations()) {
-                if (child instanceof CurrentLocation travel && !travel.isOnPlanet()) {
+                // getTransitTime() > 0 covers both an interplanetary jump ship (equivalent to its former
+                // !isOnPlanet() check, including while recharging at a jump point) and an on-planet convoy.
+                if (child instanceof AbstractMobileLocation travel && travel.getTransitTime() > 0) {
                     total += counter.count(travel);
                 }
             }

@@ -40,8 +40,8 @@ import java.util.Objects;
 
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.AbstractLocation;
+import mekhq.campaign.AbstractMobileLocation;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.base.AbstractBase;
 import mekhq.campaign.base.PlayerBase;
@@ -101,9 +101,9 @@ public final class LocationDisplay {
         if (isUnderMainForce(item, campaign)) {
             return campaign.getName();
         }
-        if (item.getCurrentLocation() instanceof CurrentLocation currentLocation
-                  && currentLocation.getJumpPath() != null && !currentLocation.getJumpPath().isEmpty()) {
-            return getTravelStatus(currentLocation, campaign, today);
+        if (item.getCurrentLocation() instanceof AbstractMobileLocation mobileLocation
+                  && mobileLocation.getTransitTime() > 0) {
+            return getTravelStatus(mobileLocation, campaign, today);
         }
 
         AbstractBase base = LocationUtils.findEffectiveBase(item);
@@ -118,17 +118,29 @@ public final class LocationDisplay {
     }
 
     /**
-     * The "In Transit (…)" status line for an actively traveling node: recharging or ready to
-     * jump at a jump point, days to the destination planet on the final leg, or days to the
-     * origin jump point otherwise.
+     * The "In Transit (…)" status line for a traveling node: the jump-travel status for an interplanetary jump
+     * ship with a jump path, or the remaining overland days for an on-planet convoy.
      */
-    private static String getTravelStatus(CurrentLocation currentLocation, Campaign campaign, LocalDate today) {
-        JumpPath path = currentLocation.getJumpPath();
-        PlanetarySystem system = currentLocation.getCurrentSystem();
+    private static String getTravelStatus(AbstractMobileLocation mobileLocation, Campaign campaign, LocalDate today) {
+        JumpPath path = mobileLocation.getJumpPath();
+        if (path != null && !path.isEmpty()) {
+            return getJumpTravelStatus(mobileLocation, path, campaign, today);
+        }
+        int days = (int) Math.ceil(mobileLocation.getTransitTime());
+        return getFormattedTextAt(RESOURCE_BUNDLE, "LocationDisplay.inTransit.overland.text", days);
+    }
 
-        if (path.size() > 1 && currentLocation.isAtJumpPoint()) {
-            double neededHours = system.getRechargeTime(today, currentLocation.computeIsUseCommandCircuit(campaign));
-            double remainingHours = neededHours - currentLocation.getRechargeTime();
+    /**
+     * The jump-travel status line: recharging or ready to jump at a jump point, days to the destination planet on
+     * the final leg, or days to the origin jump point otherwise.
+     */
+    private static String getJumpTravelStatus(AbstractMobileLocation mobileLocation, JumpPath path, Campaign campaign,
+          LocalDate today) {
+        PlanetarySystem system = mobileLocation.getCurrentSystem();
+
+        if (path.size() > 1 && mobileLocation.isAtJumpPoint()) {
+            double neededHours = system.getRechargeTime(today, mobileLocation.computeIsUseCommandCircuit(campaign));
+            double remainingHours = neededHours - mobileLocation.getRechargeTime();
             if (remainingHours > 0) {
                 int days = (int) Math.ceil(remainingHours / HOURS_PER_DAY);
                 return getFormattedTextAt(RESOURCE_BUNDLE, "LocationDisplay.inTransit.recharging.text", days);
@@ -136,10 +148,10 @@ public final class LocationDisplay {
             return getTextAt(RESOURCE_BUNDLE, "LocationDisplay.inTransit.readyToJump.text");
         }
         if (path.size() == 1) {
-            int days = (int) Math.ceil(currentLocation.getTransitTime());
+            int days = (int) Math.ceil(mobileLocation.getTransitTime());
             return getFormattedTextAt(RESOURCE_BUNDLE, "LocationDisplay.inTransit.toPlanet.text", days);
         }
-        double daysToJP = system.getTimeToJumpPoint(1.0) - currentLocation.getTransitTime();
+        double daysToJP = system.getTimeToJumpPoint(1.0) - mobileLocation.getTransitTime();
         int days = (int) Math.ceil(daysToJP);
         return getFormattedTextAt(RESOURCE_BUNDLE, "LocationDisplay.inTransit.toJumpPoint.text", days);
     }
@@ -197,21 +209,18 @@ public final class LocationDisplay {
     /**
      * A human-readable label for the item's <em>destination</em> when in transit.
      *
-     * <p>Walks the {@link CurrentLocation}'s parent chain for an {@link AbstractBase}; if found
-     * returns the base's display name, otherwise the last system in the {@link JumpPath}.
-     * Returns {@code "-"} when the item is not traveling.</p>
+     * <p>Walks the travel node's parent chain for an {@link AbstractBase}; if found returns the base's display name,
+     * otherwise the transit destination system (the last {@link JumpPath} system for a jump ship, or the current
+     * system for an on-planet convoy). Returns {@code "-"} when the item is not traveling.</p>
      */
     public static String getDestinationName(ILocation item, Campaign campaign, LocalDate today) {
-        if (!(getNearestAbstractLocation(item) instanceof CurrentLocation currentLocation)) {
+        if (!(getNearestAbstractLocation(item) instanceof AbstractMobileLocation mobileLocation)
+                  || mobileLocation.getTransitTime() <= 0) {
             return "-";
         }
-        JumpPath path = currentLocation.getJumpPath();
-        if (path == null || path.isEmpty()) {
-            return "-";
-        }
-        PlanetarySystem destination = path.getLastSystem();
+        PlanetarySystem destination = getTransitDestination(item);
 
-        String ancestorName = getDestinationNameFromAncestors(currentLocation, destination, campaign);
+        String ancestorName = getDestinationNameFromAncestors(mobileLocation, destination, campaign);
         if (ancestorName != null) {
             return ancestorName;
         }
@@ -230,9 +239,9 @@ public final class LocationDisplay {
      *
      * @return the destination label, or {@code null} when no ancestor decides it
      */
-    private static @Nullable String getDestinationNameFromAncestors(CurrentLocation currentLocation,
+    private static @Nullable String getDestinationNameFromAncestors(AbstractMobileLocation mobileLocation,
           @Nullable PlanetarySystem destination, Campaign campaign) {
-        for (ILocation cursor = currentLocation.getParentLocation(); cursor != null; cursor = cursor.getParentLocation()) {
+        for (ILocation cursor = mobileLocation.getParentLocation(); cursor != null; cursor = cursor.getParentLocation()) {
             if (cursor instanceof AbstractBase base) {
                 return formatBaseName(base);
             }
@@ -264,7 +273,7 @@ public final class LocationDisplay {
      * The printable name of the destination system when in transit, or {@code "-"} otherwise.
      */
     public static String getDestinationSystem(ILocation item, LocalDate today) {
-        PlanetarySystem destination = getJumpDestination(item);
+        PlanetarySystem destination = getTransitDestination(item);
         return destination != null ? destination.getPrintableName(today) : "-";
     }
 
@@ -273,7 +282,7 @@ public final class LocationDisplay {
      * or {@code "-"} otherwise.
      */
     public static String getDestinationPlanet(ILocation item, LocalDate today) {
-        PlanetarySystem destination = getJumpDestination(item);
+        PlanetarySystem destination = getTransitDestination(item);
         if (destination != null) {
             Planet planet = destination.getPrimaryPlanet();
             return planet != null ? planet.getPrintableName(today) : "-";
@@ -282,19 +291,20 @@ public final class LocationDisplay {
     }
 
     /**
-     * Returns the last system in {@code item}'s active {@link JumpPath}, or {@code null} if the item has no active
-     * travel node or the path is empty/null.
+     * Returns the system {@code item} is traveling toward, or {@code null} if it has no active travel node. For a
+     * jump ship this is the last system in its {@link JumpPath}; for an on-planet convoy it is the current (same)
+     * system, since overland transit never leaves the planet.
      */
-    private static @Nullable PlanetarySystem getJumpDestination(ILocation item) {
-        AbstractLocation location = getNearestAbstractLocation(item);
-        if (!(location instanceof CurrentLocation currentLocation)) {
+    private static @Nullable PlanetarySystem getTransitDestination(ILocation item) {
+        if (!(getNearestAbstractLocation(item) instanceof AbstractMobileLocation mobileLocation)
+                  || mobileLocation.getTransitTime() <= 0) {
             return null;
         }
-        JumpPath path = currentLocation.getJumpPath();
-        if (path == null || path.isEmpty()) {
-            return null;
+        JumpPath path = mobileLocation.getJumpPath();
+        if (path != null && !path.isEmpty()) {
+            return path.getLastSystem();
         }
-        return path.getLastSystem();
+        return mobileLocation.getCurrentSystem();
     }
 
     private static AbstractLocation getNearestAbstractLocation(ILocation item) {

@@ -166,7 +166,7 @@ class CampaignOptionsContentHost extends JPanel {
      *
      * @return the page panel, or {@code null} if none is present
      */
-    private static @Nullable CampaignOptionsPagePanel findPagePanel(Component content) {
+    static @Nullable CampaignOptionsPagePanel findPagePanel(Component content) {
         if (content instanceof CampaignOptionsPagePanel pagePanel) {
             return pagePanel;
         }

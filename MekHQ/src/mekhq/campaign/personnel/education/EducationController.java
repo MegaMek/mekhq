@@ -69,6 +69,7 @@ import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.AbstractLocation;
+import mekhq.campaign.AbstractMobileLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.JumpPath;
@@ -82,6 +83,7 @@ import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationDispatch;
+import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.log.PerformanceLogger;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.personnel.Person;
@@ -315,6 +317,22 @@ public class EducationController {
      */
     public static void enrollPerson(Campaign campaign, Person person, Academy academy, String campus, String faction,
           Integer courseIndex) {
+        // Resolve the campus before mutating any person state, so an unresolvable academy system aborts the
+        // enrollment cleanly instead of queueing travel to a null destination.
+        AcademyCampusLocation campusLocation = null;
+        if (!academy.isHomeSchool()) {
+            String campusSystemId = academy.isLocal()
+                                          ? localCampusSystemId(person, campaign)
+                                          : academy.getLocationSystems().getFirst();
+            campusLocation = campaign.getCampaignLocationManager().getOrCreateCampusLocation(campaign, academy.getSet(),
+                  academy.getName(), campusSystemId);
+            if (campusLocation == null) {
+                LOGGER.error("enrollPerson: could not resolve campus system {} for academy {} — aborting enrollment",
+                      campusSystemId, academy.getName());
+                return;
+            }
+        }
+
         // change status will wipe the academic information, so must always precede the
         // setters
         person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.STUDENT);
@@ -323,17 +341,17 @@ public class EducationController {
             // if the student is being homeschooled, we skip the journey to the 'academy'
             person.setEduEducationStage(EducationStage.EDUCATION);
             IPlace homeSchoolLocation = findHomeLocation(person, campaign);
-            AcademyCampusLocation campusLocation = campaign.getCampaignLocationManager().getOrCreateCampusUnderLocation(
+            AcademyCampusLocation homeSchoolCampus = campaign.getCampaignLocationManager().getOrCreateCampusUnderLocation(
                   academy.getSet(), academy.getName(), homeSchoolLocation);
-            person.setParent(campusLocation.getPersonnel());
+            person.setParent(homeSchoolCampus.getPersonnel());
         } else if (academy.isLocal()) {
             person.setEduEducationStage(EducationStage.JOURNEY_TO_CAMPUS);
-            PlanetarySystem personSystem = person.getCurrentSystem();
-            String systemId = personSystem != null
-                                    ? personSystem.getId()
-                                    : campaign.getCurrentSystem().getId();
-            person.setEduAcademySystem(systemId);
+            person.setEduAcademySystem(localCampusSystemId(person, campaign));
+            // Overland transit to the local campus (a different root location on the same planet) is
+            // dispatched as a GroundTransitLocation next new day. The journey time is retained only for
+            // the travel-progress display; arrival is driven by the travel node, not this counter.
             person.setEduJourneyTime(2);
+            campaign.getCampaignLocationManager().queueTravel(List.of(person), campusLocation);
         } else {
             person.setEduEducationStage(EducationStage.JOURNEY_TO_CAMPUS);
         }
@@ -347,16 +365,15 @@ public class EducationController {
         if (!academy.isHomeSchool() && !academy.isLocal()) {
             PlanetarySystem originSystem = person.getCurrentSystem();
             person.setEduAcademySystem(campus);
-            AcademyCampusLocation campusLocation = campaign.getCampaignLocationManager().getOrCreateCampusLocation(campaign, academy.getSet(),
-                  academy.getName(), academy.getLocationSystems().getFirst());
-            LocationDispatch.dispatchToLocation(List.of(person), campusLocation, campaign);
+            campaign.getCampaignLocationManager().queueTravel(List.of(person), campusLocation);
             double startTransit = originSystem != null && originSystem.equals(campaign.getCurrentSystem())
-                                        ? LocationDispatch.computeStartTransit(originSystem, campaign)
+                                        ? LocationUtils.computeStartTransit(originSystem, campaign)
                                         : 0.0;
-            JumpPath jumpPath = person.getJumpPath();
+            // Travel is queued, not yet dispatched, so plan the route directly to set the journey time.
+            JumpPath jumpPath = LocationUtils.planJumpPath(originSystem, campusLocation.getCurrentSystem(), campaign);
             person.setEduJourneyTime(jumpPath != null
                                            ?
-                                           LocationDispatch.computeJourneyDays(jumpPath,
+                                           LocationUtils.computeJourneyDays(jumpPath,
                                                  campaign.getLocalDate(),
                                                  startTransit)
                                            :
@@ -411,6 +428,12 @@ public class EducationController {
               campaign.getLocalDate(),
               person.getEduAcademyName(),
               academy.getQualifications().get(person.getEduCourseIndex()));
+    }
+
+    /** The planetary-system id a local academy's campus sits at: the student's current system, or the campaign's. */
+    private static String localCampusSystemId(Person person, Campaign campaign) {
+        PlanetarySystem personSystem = person.getCurrentSystem();
+        return personSystem != null ? personSystem.getId() : campaign.getCurrentSystem().getId();
     }
 
     /**
@@ -658,7 +681,7 @@ public class EducationController {
     }
 
     private static void landAtCampus(Campaign campaign, Person person,
-          @Nullable CurrentLocation travelLocation) {
+          @Nullable AbstractMobileLocation travelLocation) {
         campaign.addReport(PERSONNEL,
               getFormattedTextAt(BUNDLE_NAME, "arrived.text", person.getHyperlinkedFullTitle()));
 
@@ -771,20 +794,21 @@ public class EducationController {
         }
 
         if (academy.isLocal()) {
-            // Local academy: the campus is on the person's own system. The return is a 2-day
-            // local transit — no inter-system dispatch needed, and the person stays in their
-            // current base location rather than being moved to main force.
+            // Local academy: the campus is a different root location, usually on the same planet as the
+            // campaign. Queue the return trip so it dispatches as a GroundTransitLocation next new day (or
+            // a jump, if the campaign has since moved off-system). The journey time is retained only for
+            // the travel-progress display; arrival is driven by the travel node.
             person.setEduJourneyTime(2);
             person.setEduDaysOfTravel(0);
+            campaign.getCampaignLocationManager().queueTravel(List.of(person), campaign);
             campaign.addReport(PERSONNEL, String.format(resources.getString("returningFromSchool.text"),
                   person.getHyperlinkedFullTitle(), 2));
             person.setEduEducationStage(EducationStage.JOURNEY_FROM_CAMPUS);
             return;
         }
 
-        // Capture the academy system before dispatch — dispatchToLocation moves the person out of
-        // the campus node, after which getEduAcademySystem() can no longer walk up to the campus
-        // and returns null, causing a NPE in getSimplifiedTravelTime.
+        // Resolve the academy system from the stored id; travel is queued (not dispatched) below, so the person
+        // stays in the campus node until the next new day.
         String academySystemId = person.getEduAcademySystem();
         PlanetarySystem academySystem = null;
         if (academySystemId != null) {
@@ -805,12 +829,12 @@ public class EducationController {
             }
         }
 
-        LocationDispatch.dispatchToLocation(List.of(person), campaign, campaign);
+        campaign.getCampaignLocationManager().queueTravel(List.of(person), campaign);
 
-        JumpPath returnPath = person.getJumpPath();
+        JumpPath returnPath = LocationUtils.planJumpPath(academySystem, campaign.getCurrentSystem(), campaign);
         int travelDays = returnPath != null
-                               ? LocationDispatch.computeJourneyDays(returnPath, campaign.getLocalDate(),
-              LocationDispatch.computeStartTransit(academySystem, campaign))
+                               ? LocationUtils.computeJourneyDays(returnPath, campaign.getLocalDate(),
+              LocationUtils.computeStartTransit(academySystem, campaign))
                                : max(2, campaign.getSimplifiedTravelTime(academySystem));
         person.setEduJourneyTime(travelDays);
         person.setEduDaysOfTravel(0);
@@ -855,14 +879,16 @@ public class EducationController {
     private static void processJourney(Campaign campaign, Person person,
           @Nullable PlanetarySystem targetSystem,
           Runnable onDayCounterArrival,
-          Consumer<CurrentLocation> onTravelArrival) {
+          Consumer<AbstractMobileLocation> onTravelArrival) {
         person.incrementEduDaysOfTravel();
 
-        AbstractLocation travelLocation = person.getCurrentLocation();
+        AbstractLocation location = person.getCurrentLocation();
 
-        if (!(travelLocation instanceof CurrentLocation currentLocation)) {
-            // Local academies are same-system 2-day transits; their travel time must not be
-            // recalculated from the campaign's current position (which may be on a different planet).
+        if (!(location instanceof AbstractMobileLocation travelNode)) {
+            // No travel node: dispatch either landed the student directly (already at the campus root) or
+            // this is a legacy save. Fall back to the day counter.
+            // Local academies are same-system transits; their travel time must not be recalculated from
+            // the campaign's current position (which may be on a different planet).
             Academy fallbackAcademy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
             if (fallbackAcademy == null || !fallbackAcademy.isLocal()) {
                 int travelTime = max(2,
@@ -877,31 +903,39 @@ public class EducationController {
             return;
         }
 
-        if (!currentLocation.isOnPlanet()) {
-            return;
-        }
-
-        if (targetSystem == null) {
-            LOGGER.warn("Null target system for person {} during education travel; skipping path correction",
-                  person.getFullName());
-            return;
-        }
-
-        if (!currentLocation.getCurrentSystem().equals(targetSystem)) {
-            JumpPath newPath = campaign.calculateJumpPath(currentLocation.getCurrentSystem(), targetSystem);
-            if (newPath != null && !newPath.isEmpty()) {
-                currentLocation.setJumpPath(newPath);
-                person.setEduJourneyTime(LocationDispatch.computeJourneyDays(
-                      newPath, campaign.getLocalDate(), currentLocation.getTransitTime()));
+        // Interplanetary travel: wait for the JumpShip to reach a planet, correcting the jump path when
+        // the campaign has drifted off-course (e.g. it moved while the student was away).
+        if (travelNode instanceof CurrentLocation currentLocation) {
+            if (!currentLocation.isOnPlanet()) {
+                return;
             }
+            if (targetSystem == null) {
+                LOGGER.warn("Null target system for person {} during education travel; skipping path correction",
+                      person.getFullName());
+                return;
+            }
+            if (!currentLocation.getCurrentSystem().equals(targetSystem)) {
+                JumpPath newPath = LocationUtils.planJumpPath(currentLocation.getCurrentSystem(), targetSystem, campaign);
+                if (newPath != null) {
+                    currentLocation.setJumpPath(newPath);
+                    person.setEduJourneyTime(LocationUtils.computeJourneyDays(
+                          newPath, campaign.getLocalDate(), currentLocation.getTransitTime()));
+                }
+                return;
+            }
+            onTravelArrival.accept(currentLocation);
             return;
         }
 
-        onTravelArrival.accept(currentLocation);
+        // On-planet overland travel (GroundTransitLocation): no jump path — just wait for arrival.
+        if (!travelNode.hasArrived()) {
+            return;
+        }
+        onTravelArrival.accept(travelNode);
     }
 
     private static void arriveHome(Campaign campaign, Person person,
-          @Nullable CurrentLocation returnLocation) {
+          @Nullable AbstractMobileLocation returnLocation) {
         Academy returningFromAcademy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
         boolean isLocal = returningFromAcademy != null && returningFromAcademy.isLocal();
         Personnel arrivingAtPersonnel = isLocal ?

@@ -32,6 +32,7 @@
  */
 package mekhq.gui.campaignOptions;
 
+import static megamek.client.ui.util.FontHandler.symbolIcon;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -39,10 +40,12 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Desktop;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagLayout;
 import java.io.File;
 import java.util.ResourceBundle;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -51,6 +54,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 
@@ -176,23 +180,73 @@ public class CampaignOptionsDialog extends AbstractButtonDialog {
      */
     @Override
     protected @Nonnull JPanel createButtonPanel() {
-        final JPanel pnlButtons = new JPanel(new FlowLayout(FlowLayout.CENTER, BUTTON_GAP, BUTTON_GAP));
+        final JPanel actionButtons = new JPanel(new FlowLayout(FlowLayout.CENTER, BUTTON_GAP, BUTTON_GAP));
 
-        // Apply Settings
-        pnlButtons.add(createDialogButton("ApplySettings", this::processApplyAction));
+        // Apply Settings: emphasized as the primary action using FlatLaf's accent/default-button colors. This is a
+        // visual cue only (not the root-pane default button), so Enter cannot accidentally close this field-heavy
+        // dialog while editing.
+        JButton applyButton = createDialogButton("ApplySettings", this::processApplyAction);
+        applyButton.putClientProperty("FlatLaf.style",
+              "background: $Button.default.background; foreground: $Button.default.foreground");
+        actionButtons.add(applyButton);
 
         // Save Preset
         if (mode != CampaignOptionsDialogMode.CAMPAIGN_UPGRADE && mode != CampaignOptionsDialogMode.STARTUP_ABRIDGED) {
-            pnlButtons.add(createDialogButton("SavePreset", this::btnSaveActionPerformed));
+            actionButtons.add(createDialogButton("SavePreset", this::btnSaveActionPerformed));
         }
 
         // Load Preset
-        pnlButtons.add(createDialogButton("LoadPreset", this::btnLoadActionPerformed));
+        actionButtons.add(createDialogButton("LoadPreset", this::btnLoadActionPerformed));
 
         // Cancel
-        pnlButtons.add(createDialogButton("Cancel", this::dispose));
+        actionButtons.add(createDialogButton("Cancel", this::dispose));
+
+        // Icons legend: kept apart on the left so it reads as a reference aid rather than a dialog action. Its popup
+        // opens upward over the help/content area instead of past the bottom of the dialog.
+        JButton legendButton = new JButton(getTextAt(getCampaignOptionsResourceBundle(), "lblIconsLegend.text"));
+        legendButton.setName("btnIconsLegend");
+        legendButton.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(), "lblIconsLegend.tooltip"));
+        legendButton.setIcon(symbolIcon(0xE88E, legendButton.getFont().getSize(), legendButton.getForeground()));
+        legendButton.addActionListener(evt -> showIconLegend(legendButton));
+        JPanel legendPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, BUTTON_GAP, BUTTON_GAP));
+        legendPanel.add(legendButton);
+
+        // Mirror the legend's width on the right so the action buttons are centered on the whole footer; a plain
+        // WEST + CENTER layout would center them only in the space to the right of the legend.
+        JPanel rightSpacer = new JPanel();
+        rightSpacer.setOpaque(false);
+        rightSpacer.setPreferredSize(new Dimension(legendPanel.getPreferredSize().width, 0));
+
+        final JPanel pnlButtons = new JPanel(new BorderLayout());
+        pnlButtons.add(legendPanel, BorderLayout.WEST);
+        pnlButtons.add(actionButtons, BorderLayout.CENTER);
+        pnlButtons.add(rightSpacer, BorderLayout.EAST);
 
         return pnlButtons;
+    }
+
+    /**
+     * Shows the icon legend popup anchored above the given button, overlaying the content/help area. The legend
+     * explains the badge glyphs (custom-system, important, recommended, documented, and recently-added markers) used
+     * on option labels and section titles throughout the dialog.
+     *
+     * @param anchor the footer button the popup opens above
+     */
+    private void showIconLegend(JButton anchor) {
+        CampaignOptionsIconLegend legend = new CampaignOptionsIconLegend();
+        legend.setBorder(BorderFactory.createEmptyBorder(UIUtil.scaleForGUI(8),
+              UIUtil.scaleForGUI(8),
+              UIUtil.scaleForGUI(8),
+              UIUtil.scaleForGUI(8)));
+
+        JPopupMenu legendPopup = new JPopupMenu();
+        legendPopup.setName("campaignOptionsLegendPopup");
+        legendPopup.setLayout(new BorderLayout());
+        legendPopup.add(legend, BorderLayout.CENTER);
+
+        Dimension popupSize = legendPopup.getPreferredSize();
+        // The button is in the footer, so open the popup above it (negative y) to overlay the content above.
+        legendPopup.show(anchor, 0, -popupSize.height);
     }
 
     /**

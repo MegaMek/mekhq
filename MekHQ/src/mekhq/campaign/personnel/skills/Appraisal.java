@@ -40,7 +40,6 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.time.LocalDate;
 
-import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
@@ -58,30 +57,25 @@ public class Appraisal {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Appraisal";
 
     private final static double MULTIPLIER_PER_MARGIN_OF_SUCCESS = 0.025;
+    private final static int MARGIN_OF_SUCCESS_MIN = -6;
+    private final static int MARGIN_OF_SUCCESS_MAX = 6;
 
     /**
-     * Performs an appraisal skill check for a given person on the specified date and calculates the appraisal cost
-     * multiplier based on the result.
+     * Performs an appraisal skill check for a given person on the specified date.
      *
-     * @param person     the {@link Person} performing the appraisal skill check; may be {@code null}, in which case no
-     *                   check is performed and the multiplier defaults to {@code 1.0}
+     * @param person     the {@link Person} performing the appraisal skill check
      * @param currentDay the current date of the appraisal check
      * @param isUseEdge  {@code true} if an Edge reroll should be used for a failed check
      *
-     * @return the calculated appraisal cost multiplier as a {@code double}
+     * @return the appraisal skill check result
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public static double performAppraisalMultiplierCheck(@Nullable Person person, LocalDate currentDay,
+    public static ActionCheckResult performAppraisalCheck(Person person, LocalDate currentDay,
           boolean isUseEdge) {
-        if (person == null) {
-            return 1.0;
-        }
-        ActionCheckResult actionCheckResult =
-              person.checkSkill(S_APPRAISAL, false, false, currentDay)
+        return person.checkSkill(S_APPRAISAL, false, false, currentDay)
                     .resolve(isUseEdge, getTextAt(RESOURCE_BUNDLE, "Appraisal.skillCheck"));
-        return getAppraisalCostMultiplier(actionCheckResult.getMarginOfSuccess());
     }
 
     /**
@@ -90,15 +84,16 @@ public class Appraisal {
      * <p>The multiplier increases or decreases based on the negative margin of success from an appraisal skill
      * check.</p>
      *
-     * @param marginOfSuccessValue The return value of {@link MarginOfSuccess#getMarginValue(MarginOfSuccess)}
+     * @param marginOfSuccessValue The skill check's margin of success
      *
      * @return The appraisal cost multiplier as a {@code double}.
      *
      * @author Illiani
      * @since 0.50.07
      */
-    static double getAppraisalCostMultiplier(int marginOfSuccessValue) {
-        return 1 - (marginOfSuccessValue * MULTIPLIER_PER_MARGIN_OF_SUCCESS);
+    public static double getAppraisalCostMultiplier(int marginOfSuccessValue) {
+        int marginOfSuccessCapped = Math.clamp(marginOfSuccessValue, MARGIN_OF_SUCCESS_MIN, MARGIN_OF_SUCCESS_MAX);
+        return 1 - (marginOfSuccessCapped * MULTIPLIER_PER_MARGIN_OF_SUCCESS);
     }
 
     /**
@@ -108,16 +103,16 @@ public class Appraisal {
      * corresponding margin of success.</p>
      *
      * @param appraisalCostMultiplier The calculated appraisal cost multiplier.
+     * @param reportMargin            The {@link MarginOfSuccess} for report text generation.
      *
      * @return An HTML-formatted String describing the appraisal result.
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public static String getAppraisalReport(double appraisalCostMultiplier) {
-        MarginOfSuccess marginOfSuccess = getMarginOfSuccess(appraisalCostMultiplier);
-        String reportColor = marginOfSuccess.getColor();
-        String reportKey = "Appraisal.report." + marginOfSuccess.name();
+    public static String getAppraisalReport(double appraisalCostMultiplier, MarginOfSuccess reportMargin) {
+        String reportColor = reportMargin.getColor();
+        String reportKey = "Appraisal.report." + reportMargin.name();
 
         return getFormattedTextAt(RESOURCE_BUNDLE,
               reportKey,
@@ -126,23 +121,4 @@ public class Appraisal {
               appraisalCostMultiplier * 100);
     }
 
-    /**
-     * Determines the {@link MarginOfSuccess} corresponding to the provided appraisal cost multiplier.
-     *
-     * <p>This converts the multiplier back to a margin value and looks up the appropriate result category.</p>
-     *
-     * @param appraisalCostMultiplier the appraisal cost multiplier to evaluate
-     *
-     * @return the {@link MarginOfSuccess} category for the given multiplier
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    static MarginOfSuccess getMarginOfSuccess(double appraisalCostMultiplier) {
-        LOGGER.debug("Appraisal report requested with multiplier: {}", appraisalCostMultiplier);
-        int normalizedMarginValue = (int) Math.round(-(appraisalCostMultiplier - 1) / MULTIPLIER_PER_MARGIN_OF_SUCCESS);
-        LOGGER.debug("Margin value: {}", normalizedMarginValue);
-
-        return MarginOfSuccess.getMarginOfSuccessObjectFromMarginValue(normalizedMarginValue);
-    }
 }

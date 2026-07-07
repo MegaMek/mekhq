@@ -32,7 +32,6 @@
  */
 package mekhq.gui.campaignOptions;
 
-import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -382,10 +381,10 @@ public class CampaignOptionsUtilities {
     }
 
     /**
-     * Sends the given raw text to the shared Campaign Options "Option Details" help surface, applying the same word
-     * wrapping and HTML wrapping used by {@link #createTipPanelUpdater}. Use this to drive the details panel from
-     * interactions that the static {@code createTipPanelUpdater} adapters cannot express, such as showing the
-     * description of whichever table row the mouse is currently over.
+     * Sends raw text to the shared Campaign Options "Option Details" help surface, wrapping it as HTML so the panel
+     * soft-wraps it to its own width. Use this to drive the details panel from interactions that the static
+     * {@code createTipPanelUpdater} adapters cannot express, such as showing the description of whichever table row the
+     * mouse is currently over.
      *
      * <p>Blank or {@code null} text is ignored so the previously shown details are left in place.</p>
      *
@@ -396,10 +395,10 @@ public class CampaignOptionsUtilities {
             return;
         }
 
-        String tipText = wordWrap(rawText, 120);
-        if (!tipText.endsWith("</html>")) {
-            tipText += "</html>";
-        }
+        // Wrap as HTML and let the help pane soft-wrap to its own width. We deliberately avoid inserting hard line
+        // breaks here (this previously hard-wrapped at a fixed character count, producing ragged breaks that did not
+        // match the panel width); any <br> already in the text is an intentional break and is preserved.
+        String tipText = rawText.startsWith("<html>") ? rawText : "<html>" + rawText + "</html>";
 
         if (tipTextConsumer != null) {
             tipTextConsumer.accept(tipText);
@@ -435,7 +434,9 @@ public class CampaignOptionsUtilities {
         // Add flag symbols first
         if (metadata.flags() != null && !metadata.flags().isEmpty()) {
             for (CampaignOptionFlag flag : metadata.flags()) {
-                badges.append(" ").append(flag.getSymbol());
+                badges.append(" <font face=\"Material Symbols Rounded\">")
+                      .append(flag.getSymbol())
+                      .append("</font>");
             }
         }
 

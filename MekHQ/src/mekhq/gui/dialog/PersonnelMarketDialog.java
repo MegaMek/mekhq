@@ -47,6 +47,7 @@ import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.UUID;
 import javax.swing.*;
@@ -266,20 +267,24 @@ public class PersonnelMarketDialog extends JDialog {
 
         final XTableColumnModel columnModel = (XTableColumnModel) tablePersonnel.getColumnModel();
         final ArrayList<SortKey> sortKeys = new ArrayList<>();
-        for (final PersonnelTableModelColumn column : PersonnelTableModel.PERSONNEL_COLUMNS) {
+        Map<PersonnelTableModelColumn, SortOrder> defaultSortOrder = personnelModel.getDefaultSortOrder();
+        for (PersonnelTableModelColumn column : personnelModel.getAllColumns()) {
             final TableColumn tableColumn = columnModel.getColumnByModelIndex(column.ordinal());
             if (!personnelMarketColumns.contains(column)) {
                 columnModel.setColumnVisible(tableColumn, false);
                 continue;
             }
 
-            tableColumn.setPreferredWidth(column.getWidth());
+            Integer width = column.getPreferredWidth();
+            if (width != null) {
+                tableColumn.setPreferredWidth(width);
+            }
             tableColumn.setCellRenderer(getRenderer());
             columnModel.setColumnVisible(tableColumn, true);
 
             final Comparator<?> comparator = column.getComparator();
             sorter.setComparator(column.ordinal(), comparator);
-            final SortOrder sortOrder = column.getDefaultSortOrder();
+            SortOrder sortOrder = defaultSortOrder.get(column);
             if (sortOrder != null) {
                 sortKeys.add(new SortKey(column.ordinal(), sortOrder));
             }
@@ -494,7 +499,7 @@ public class PersonnelMarketDialog extends JDialog {
         sorter.setRowFilter(new RowFilter<>() {
             @Override
             public boolean include(Entry<? extends PersonnelTableModel, ? extends Integer> entry) {
-                return nGroup.getFilteredInformation(entry.getModel().getPerson(entry.getIdentifier()),
+                return nGroup.getFilteredInformation(entry.getModel().getRow(entry.getIdentifier()),
                       hqView.getCampaign().getLocalDate());
             }
         });
@@ -508,7 +513,7 @@ public class PersonnelMarketDialog extends JDialog {
             refreshPersonView();
             return;
         }
-        selectedPerson = personnelModel.getPerson(tablePersonnel.convertRowIndexToModel(view));
+        selectedPerson = personnelModel.getRow(tablePersonnel.convertRowIndexToModel(view));
         Entity en = personnelMarket.getAttachedEntity(selectedPerson);
         if (null == en) {
             unitCost = Money.zero();
@@ -582,6 +587,6 @@ public class PersonnelMarketDialog extends JDialog {
     }
 
     public TableCellRenderer getRenderer() {
-        return personnelModel.new Renderer();
+        return personnelModel.new PersonnelRenderer();
     }
 }

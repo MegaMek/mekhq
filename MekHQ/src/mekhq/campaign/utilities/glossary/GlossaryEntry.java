@@ -56,6 +56,7 @@ public enum GlossaryEntry {
     ADVANCED_MEDICAL("ADVANCED_MEDICAL", new Version("0.50.01")),
     ADVANCED_SCOUTING("ADVANCED_SCOUTING", new Version("0.50.11")),
     AGGREGATE_COMBAT_VIEW("AGGREGATE_COMBAT_VIEW", new Version("0.51.0")),
+    AGGREGATE_TECH_VIEW("AGGREGATE_TECH_VIEW", new Version("0.51.01")),
     AGING("AGING", new Version("0.50.06")),
     ALT_ADVANCED_MEDICAL("ALT_ADVANCED_MEDICAL", new Version("0.50.10")),
     AREA_OF_OPERATIONS("AREA_OF_OPERATIONS", new Version("0.50.06")),

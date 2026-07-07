@@ -34,21 +34,26 @@
 package mekhq.campaign;
 
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import jakarta.annotation.Nonnull;
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.events.LocationAddedEvent;
 import mekhq.campaign.events.LocationRemovedEvent;
+import mekhq.campaign.events.TransitCompleteEvent;
+import mekhq.campaign.events.parts.PartChangedEvent;
+import mekhq.campaign.events.persons.PersonChangedEvent;
+import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.location.ILocation;
+import mekhq.campaign.location.LocationDispatch;
 import mekhq.campaign.location.LocationNode;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.utilities.MHQXMLUtility;
 
@@ -59,9 +64,16 @@ import mekhq.utilities.MHQXMLUtility;
  * Campaign holds a single instance of this manager and exposes facade methods that delegate here.</p>
  */
 public class CampaignLocationManager {
+    private static final MMLogger LOGGER = MMLogger.create(CampaignLocationManager.class);
 
     private final List<AbstractLocation> locations = new ArrayList<>();
     private final Set<PlayerBase> playerBases = new LinkedHashSet<>();
+    /**
+     * Travel queued during the day, keyed by origin and destination. It is dispatched at the start of the next new day
+     * by {@link #dispatchPendingTravel(Campaign)} rather than immediately. Travel still queued at save time is persisted
+     * via {@link #writePendingTravelToXML} and restored during campaign load.
+     */
+    private final Map<TravelRoute, List<ILocation>> pendingTravel = new LinkedHashMap<>();
 
     public void addLocation(AbstractLocation location) {
         if (location != null && !locations.contains(location)) {
@@ -113,6 +125,300 @@ public class CampaignLocationManager {
         return Collections.unmodifiableSet(playerBases);
     }
 
+    /** Returns the player base with the given id, or {@code null} if none matches. */
+    public @Nullable PlayerBase getPlayerBaseById(UUID id) {
+        for (PlayerBase base : playerBases) {
+            if (id.equals(base.getId())) {
+                return base;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Queues {@code travelers} to be relocated to {@code destination} when the day next advances, rather than
+     * dispatching them immediately. Each traveler is bucketed by its own current (origin) location, so a single call
+     * may produce several entries when the travelers start from different places. Queued travel is dispatched by
+     * {@link #dispatchPendingTravel(Campaign)}.
+     *
+     * @param travelers  the persons, units, or parts to relocate; must not be {@code null}
+     * @param destination the target {@link ILocation}; a {@code null} destination is refused with an error log, since
+     *                    a queued null destination would fail dispatch on every subsequent new day
+     */
+    public void queueTravel(Collection<? extends ILocation> travelers, @Nullable ILocation destination) {
+        if (destination == null) {
+            LOGGER.error("queueTravel: null destination — refusing to queue {} traveler(s)", travelers.size());
+            return;
+        }
+        for (ILocation traveler : travelers) {
+            removeExistingPendingTravel(traveler);
+            TravelRoute route = new TravelRoute(traveler.getCurrentLocation(), destination);
+            pendingTravel.computeIfAbsent(route, key -> new ArrayList<>()).add(traveler);
+        }
+    }
+
+    /**
+     * Removes {@code traveler} from any route it is already queued on, logging at debug level when it is found. Called
+     * before re-queuing so a later {@link #queueTravel} supersedes an earlier one rather than leaving the traveler
+     * bound to two destinations (which would dispatch it twice). A route left empty by the removal is dropped so it
+     * does not linger in {@link #pendingTravel}.
+     */
+    private void removeExistingPendingTravel(ILocation traveler) {
+        Iterator<Map.Entry<TravelRoute, List<ILocation>>> iterator = pendingTravel.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<TravelRoute, List<ILocation>> entry = iterator.next();
+            if (entry.getValue().remove(traveler)) {
+                LOGGER.debug("queueTravel: {} was already queued for travel to {} — removing prior pending travel",
+                      traveler.getClass().getSimpleName(), entry.getKey().destination());
+                if (entry.getValue().isEmpty()) {
+                    iterator.remove();
+                }
+                return;
+            }
+        }
+    }
+
+    /**
+     * Returns {@code true} if {@code traveler} is currently queued for travel that has not yet been dispatched by
+     * {@link #dispatchPendingTravel(Campaign)}. A queued traveler still sits at its origin location; it has not been
+     * moved toward its destination.
+     */
+    public boolean isQueuedForTravel(ILocation traveler) {
+        for (List<ILocation> travelers : pendingTravel.values()) {
+            if (containsByIdentity(travelers, traveler)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * GM override: dispatches {@code items} to {@code destination} and lands them immediately, with zero transit time.
+     *
+     * <p>This composes the ordinary {@link LocationDispatch#dispatchTravelers} (which starts the journey and updates
+     * hangar/warehouse bookkeeping) with {@link #gmCompleteTravel}, which collapses the freshly-created travel node to
+     * arrived and runs the shared arrival pass. Intended to be reachable only from a GM-gated menu path.</p>
+     */
+    public void gmTeleport(Campaign campaign, Collection<? extends ILocation> items, ILocation destination) {
+        LocationDispatch.dispatchTravelers(items, destination, campaign);
+        gmCompleteTravel(campaign, items);
+    }
+
+    /**
+     * GM override: force-completes travel for {@code items} that are queued or already in transit, landing them at
+     * their destination now.
+     *
+     * <p>Selected items still sitting in the pending-travel queue are started immediately so they gain a travel node.
+     * Every selected item's in-transit node is then collapsed to arrived — mirroring the finalize in
+     * {@link CurrentLocation#newDay} — and the shared {@link #processAllArrivals} pass lands all arrived nodes through
+     * the same path the daily cycle uses. Because a travel node is shared by everyone who departed together, completing
+     * travel for one item arrives all of its co-travelers. Items that are neither queued nor traveling are left
+     * untouched. Intended to be reachable only from a GM-gated menu path.</p>
+     */
+    public void gmCompleteTravel(Campaign campaign, Collection<? extends ILocation> items) {
+        // Start any selected items still queued, so they gain a travel node to collapse below.
+        for (ILocation item : items) {
+            ILocation queuedDestination = removeFromPendingTravel(item);
+            if (queuedDestination != null) {
+                LocationDispatch.dispatchTravelers(List.of(item), queuedDestination, campaign);
+            }
+        }
+
+        // Collapse each distinct in-transit node to arrived, mirroring CurrentLocation.newDay's finalize. Capture every
+        // traveler carried by those nodes first — collapsing a shared node arrives co-travelers that were not selected,
+        // and they must be gathered before processAllArrivals empties the node.
+        Set<ILocation> toRefresh = Collections.newSetFromMap(new IdentityHashMap<>());
+        toRefresh.addAll(items);
+        for (AbstractMobileLocation node : collectInTransitNodes(items)) {
+            toRefresh.addAll(node.fetchPersonnelAtLocation());
+            toRefresh.addAll(node.fetchUnitsAtLocation());
+            toRefresh.addAll(node.fetchPartsAtLocation());
+            node.setTransitTime(0);
+            if (node instanceof CurrentLocation currentLocation) {
+                currentLocation.setJumpPath(null);
+            }
+            MekHQ.triggerEvent(new TransitCompleteEvent(node));
+        }
+
+        // Land every arrived node through the shared new-day arrival pass.
+        processAllArrivals(campaign);
+
+        // Refresh the tables' location columns now — the daily cycle relies on a later full GUI refresh, but a GM
+        // override lands mid-session, so fire the per-item changed event each table listens for. Includes co-travelers
+        // swept along by a shared node, not just the selected items.
+        for (ILocation item : toRefresh) {
+            fireLocationChanged(item);
+        }
+    }
+
+    /**
+     * Counts the travelers a GM {@link #gmCompleteTravel} on {@code items} would also arrive but that are not themselves
+     * in {@code items} — co-travelers sharing an in-transit node with a selected item. Collapsing a shared travel node
+     * arrives everyone it carries, so this lets the menu warn the GM with a "(+ n others)" hint. Queued (not-yet-departed)
+     * items contribute nothing, since completing one queued traveler dispatches only that traveler.
+     */
+    public int countUnselectedCoTravelers(Collection<? extends ILocation> items) {
+        Set<ILocation> selected = Collections.newSetFromMap(new IdentityHashMap<>());
+        selected.addAll(items);
+
+        Set<ILocation> affected = Collections.newSetFromMap(new IdentityHashMap<>());
+        for (AbstractMobileLocation node : collectInTransitNodes(items)) {
+            affected.addAll(node.fetchPersonnelAtLocation());
+            affected.addAll(node.fetchUnitsAtLocation());
+            affected.addAll(node.fetchPartsAtLocation());
+        }
+        affected.removeAll(selected);
+        return affected.size();
+    }
+
+    /**
+     * Returns the distinct in-transit travel nodes carrying {@code items}, keyed by object identity. An item that has
+     * arrived or is not on a mobile node contributes nothing.
+     */
+    private static Set<AbstractMobileLocation> collectInTransitNodes(Collection<? extends ILocation> items) {
+        Set<AbstractMobileLocation> nodes = Collections.newSetFromMap(new IdentityHashMap<>());
+        for (ILocation item : items) {
+            if (item.getCurrentLocation() instanceof AbstractMobileLocation node && !node.hasArrived()) {
+                nodes.add(node);
+            }
+        }
+        return nodes;
+    }
+
+    /**
+     * Fires the type-specific "changed" event for {@code item} so the personnel, hangar, and warehouse tables refresh
+     * their location columns immediately after a GM travel override. Items that are not a {@link Person}, {@link Unit},
+     * or {@link Part} have no such table and are ignored.
+     */
+    private static void fireLocationChanged(ILocation item) {
+        switch (item) {
+            case Person person -> MekHQ.triggerEvent(new PersonChangedEvent(person));
+            case Unit unit -> MekHQ.triggerEvent(new UnitChangedEvent(unit));
+            case Part part -> MekHQ.triggerEvent(new PartChangedEvent(part));
+            default -> {}
+        }
+    }
+
+    /**
+     * Removes {@code traveler} from the pending-travel queue by object identity, pruning any route left empty.
+     *
+     * @return the destination the traveler was queued for, or {@code null} if it was not queued
+     */
+    private @Nullable ILocation removeFromPendingTravel(ILocation traveler) {
+        for (Iterator<Map.Entry<TravelRoute, List<ILocation>>> it = pendingTravel.entrySet().iterator();
+                it.hasNext(); ) {
+            Map.Entry<TravelRoute, List<ILocation>> entry = it.next();
+            List<ILocation> travelers = entry.getValue();
+            if (removeByIdentity(travelers, traveler)) {
+                if (travelers.isEmpty()) {
+                    it.remove();
+                }
+                return entry.getKey().destination();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Identity ({@code ==}) membership test. {@link ILocation} subtypes such as {@code Personnel} extend
+     * {@code LinkedHashMap}, so {@link List#contains} would compare map contents rather than object identity.
+     */
+    private static boolean containsByIdentity(List<ILocation> list, ILocation target) {
+        for (ILocation candidate : list) {
+            if (candidate == target) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Identity ({@code ==}) removal of the first matching element; see {@link #containsByIdentity}. */
+    private static boolean removeByIdentity(List<ILocation> list, ILocation target) {
+        for (Iterator<ILocation> it = list.iterator(); it.hasNext(); ) {
+            if (it.next() == target) {
+                it.remove();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Dispatches all travel queued via {@link #queueTravel}, one {@link LocationDispatch} call per queued route.
+     * Travelers that have left the campaign since they were queued (a removed person, a sold unit, a sold or consumed
+     * part) are skipped with a warning — dispatching them would re-add them to the destination's hangar or warehouse.
+     *
+     * <p>Must run at the start of a new day, before location transit is advanced, so that the departure system resolved
+     * at dispatch time matches where the travelers were when the travel was queued.</p>
+     *
+     * @param campaign the active campaign; must not be {@code null}
+     */
+    public void dispatchPendingTravel(Campaign campaign) {
+        for (Map.Entry<TravelRoute, List<ILocation>> entry : pendingTravel.entrySet()) {
+            List<ILocation> travelers = filterTravelersStillInCampaign(entry.getValue(), campaign);
+            if (!travelers.isEmpty()) {
+                LocationDispatch.dispatchTravelers(travelers, entry.getKey().destination(), campaign);
+            }
+        }
+        pendingTravel.clear();
+    }
+
+    private List<ILocation> filterTravelersStillInCampaign(List<ILocation> travelers, Campaign campaign) {
+        List<ILocation> stillPresent = new ArrayList<>();
+        for (ILocation traveler : travelers) {
+            if (isStillInCampaign(traveler, campaign)) {
+                stillPresent.add(traveler);
+            } else {
+                LOGGER.warn("dispatchPendingTravel: queued {} left the campaign before dispatch — skipping",
+                      traveler.getClass().getSimpleName());
+            }
+        }
+        return stillPresent;
+    }
+
+    private boolean isStillInCampaign(ILocation traveler, Campaign campaign) {
+        return switch (traveler) {
+            case Person person -> campaign.getPerson(person.getId()) != null;
+            case Unit unit -> campaign.getUnit(unit.getId()) != null;
+            case Part part -> findPartAnywhere(campaign, part.getId()) != null;
+            default -> true;
+        };
+    }
+
+    /**
+     * Lands every arrived traveler: each registered {@link AbstractLocation}, then each {@link PlayerBase}, then the
+     * campaign itself has {@link ILocation#processArrivals} run, draining any travel node that has reached its
+     * destination into that destination's personnel/hangar/warehouse.
+     *
+     * <p>This is the common arrival pass shared by the daily new-day cycle and the GM travel overrides
+     * ({@link #gmTeleport}, {@link #gmCompleteTravel}); only nodes that report {@code hasArrived()} land, so it is safe
+     * to call at any time.</p>
+     */
+    public void processAllArrivals(Campaign campaign) {
+        for (AbstractLocation location : new ArrayList<>(locations)) {
+            location.processArrivals(campaign);
+        }
+        for (PlayerBase base : playerBases) {
+            base.processArrivals(campaign);
+        }
+        campaign.processArrivals(campaign);
+    }
+
+    /** Searches the campaign warehouse then all base warehouses for a part by ID. */
+    public @Nullable Part findPartAnywhere(Campaign campaign, int partId) {
+        Part part = campaign.getWarehouse().getPart(partId);
+        if (part != null) {
+            return part;
+        }
+        for (PlayerBase base : playerBases) {
+            Part basePart = base.getBaseWarehouse().getPart(partId);
+            if (basePart != null) {
+                return basePart;
+            }
+        }
+        return null;
+    }
+
     /**
      * Removes any {@link AbstractLocation} entries that have no personnel, parts, or units at any depth in their
      * subtree, excluding the campaign's own current location.
@@ -134,7 +440,7 @@ public class CampaignLocationManager {
                       || !location.fetchUnitsAtLocation().isEmpty()) {
                 return false;
             }
-            if (location instanceof CurrentLocation) {
+            if (location instanceof AbstractMobileLocation) {
                 location.setParent(null);
             } else if (location instanceof FixedLocation) {
                 for (ILocation child : new ArrayList<>(location.getChildLocations())) {
@@ -148,22 +454,42 @@ public class CampaignLocationManager {
     }
 
     /**
-     * Creates a {@link FixedLocation} with an {@link AcademyCampusLocation} child at the given system and registers it
-     * in the locations list.
+     * Returns the existing {@link FixedLocation} at the given system, creating and registering one on demand.
+     *
+     * @return the existing or newly created location, or {@code null} if {@code systemId} could not be resolved
+     */
+    @Nullable
+    public FixedLocation getOrCreateFixedLocation(Campaign campaign, String systemId) {
+        for (AbstractLocation location : locations) {
+            if (location instanceof FixedLocation fixedLocation
+                      && fixedLocation.getCurrentSystem().getId().equals(systemId)) {
+                return fixedLocation;
+            }
+        }
+        PlanetarySystem system = campaign.getSystemById(systemId);
+        if (system == null) {
+            return null;
+        }
+        FixedLocation fixedLocation = new FixedLocation(system);
+        locations.add(fixedLocation);
+        return fixedLocation;
+    }
+
+    /**
+     * Creates an {@link AcademyCampusLocation} under the {@link FixedLocation} at the given system (created on demand)
+     * and registers it in the locations list.
      *
      * @return the newly created campus location, or {@code null} if {@code systemId} could not be resolved
      */
     @Nullable
     public AcademyCampusLocation addCampusLocation(Campaign campaign, String academySet, String academyName,
           String systemId) {
-        PlanetarySystem system = campaign.getSystemById(systemId);
-        if (system == null) {
+        FixedLocation fixedLocation = getOrCreateFixedLocation(campaign, systemId);
+        if (fixedLocation == null) {
             return null;
         }
-        FixedLocation fixedLocation = new FixedLocation(system);
         AcademyCampusLocation campus = new AcademyCampusLocation(academySet, academyName);
         LocationNode.LocationManager.setLocation(campus, fixedLocation);
-        locations.add(fixedLocation);
         return campus;
     }
 
@@ -258,5 +584,45 @@ public class CampaignLocationManager {
             base.writeToXML(pw, indent);
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "playerBases");
+        writePendingTravelToXML(pw, indent);
     }
+
+    /**
+     * Serializes queued-but-undrained travel. Only the destination and the travelers are written; the origin is
+     * recomputed from each traveler's location when the saved travel is re-queued on load (see
+     * {@code CampaignXmlParser}). Each destination serializes itself via
+     * {@link ILocation#writeReferenceToXML}; a destination type that is not referable is logged and skipped.
+     */
+    private void writePendingTravelToXML(PrintWriter pw, int indent) {
+        if (pendingTravel.isEmpty()) {
+            return;
+        }
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "pendingTravel");
+        for (Map.Entry<TravelRoute, List<ILocation>> entry : pendingTravel.entrySet()) {
+            ILocation destination = entry.getKey().destination();
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "route");
+            if (destination != null && destination.writeReferenceToXML(pw, indent)) {
+                for (ILocation traveler : entry.getValue()) {
+                    switch (traveler) {
+                        case Person person ->
+                              MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personId", person.getId().toString());
+                        case Unit unit ->
+                              MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitId", unit.getId().toString());
+                        case Part part -> MHQXMLUtility.writeSimpleXMLTag(pw, indent, "partId", part.getId());
+                        default -> LOGGER.error(
+                              "writePendingTravel: cannot serialize queued traveler of type {} bound for {} — skipping",
+                              traveler.getClass().getSimpleName(), destination.getClass().getSimpleName());
+                    }
+                }
+            } else {
+                LOGGER.warn("writePendingTravel: unsupported destination type {} — skipping route travelers",
+                      destination == null ? "null" : destination.getClass().getSimpleName());
+            }
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "route");
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "pendingTravel");
+    }
+
+    /** Queue key: an item's origin location paired with its travel destination. */
+    private record TravelRoute(@Nullable ILocation origin, ILocation destination) {}
 }

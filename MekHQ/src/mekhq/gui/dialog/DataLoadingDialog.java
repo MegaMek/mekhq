@@ -92,7 +92,6 @@ import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Factions;
-import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.eras.Eras;
 import mekhq.campaign.universe.factionHints.WarAndPeaceProcessor;
@@ -371,13 +370,11 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                     setVisible(true); // restore loader visibility
                 }
 
-                // Starting planet
-                Planet startingPlanet = (preset == null) ? null : preset.getPlanet();
-                // If the player hasn't set a starting planet in the preset, use the default for their chosen faction
-                if (startingPlanet == null) {
-                    startingPlanet = campaign.getNewCampaignStartingPlanet();
+                // Starting planet: the campaign options General page resolves and sets the starting system during
+                // apply. A preset with a pinned planet overrides that choice.
+                if ((preset != null) && (preset.getPlanet() != null)) {
+                    campaign.setStartingSystem(preset.getPlanet());
                 }
-                campaign.setStartingSystem(startingPlanet);
 
                 // initialize reputation
                 ReputationController reputationController = new ReputationController();

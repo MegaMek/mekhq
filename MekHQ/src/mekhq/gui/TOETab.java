@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 import javax.swing.*;
+import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import megamek.common.event.Subscribe;
@@ -86,6 +87,9 @@ import mekhq.gui.view.UnitViewPanel;
  * Display organization tree (TO&amp;E) and force/unit summary
  */
 public final class TOETab extends CampaignGuiTab {
+    private static final int UNIT_CREW_TAB_INDEX = 0;
+    private static final int UNIT_STATS_TAB_INDEX_WITH_CREW = 1;
+
     private JTree orgTree;
     private JPanel panForceView;
     private JTabbedPane tabUnit;
@@ -121,7 +125,7 @@ public final class TOETab extends CampaignGuiTab {
         orgTree.setBorder(RoundedLineBorder.createRoundedLineBorder());
         orgTree.setFocusable(false);
 
-        JPanel pnlTutorial = new TutorialHyperlinkPanel("toeTab");
+        JPanel pnlTutorial = new TutorialHyperlinkPanel("toeTab.keyText");
 
         JPanel leftPanel = new JPanel(new BorderLayout());
         leftPanel.setBorder(null);
@@ -335,13 +339,66 @@ public final class TOETab extends CampaignGuiTab {
             // We can ignore here because if the selected index is out of bounds, we're just going
             // to not select the unit in the TO&E.
         } else if (node instanceof Formation) {
-            final JScrollPane scrollForce = new FastJScrollPane(new ForceViewPanel((Formation) node, getCampaign()));
+            final JScrollPane scrollForce = new FastJScrollPane(new ForceViewPanel((Formation) node, getCampaign(),
+                this::selectUnitFromForceView, this::selectFormationFromForceView));
             scrollForce.setBorder(null);
             panForceView.add(scrollForce, BorderLayout.CENTER);
             panForceView.setBorder(null);
             SwingUtilities.invokeLater(() -> scrollForce.getVerticalScrollBar().setValue(0));
         }
         panForceView.updateUI();
+    }
+
+    private void selectUnitFromForceView(Unit unit, ForceViewPanel.UnitSelectionType selectionType) {
+        tabUnitLastSelectedIndex = switch (selectionType) {
+            case CREW -> UNIT_CREW_TAB_INDEX;
+            case UNIT -> unit.getCrew().isEmpty() ? UNIT_CREW_TAB_INDEX : UNIT_STATS_TAB_INDEX_WITH_CREW;
+        };
+
+        selectTreePath(getTreePathForUnit(unit));
+    }
+
+    private void selectFormationFromForceView(Formation formation) {
+        selectTreePath(getTreePathForFormation(formation));
+    }
+
+    private void selectTreePath(TreePath path) {
+        if (path != null) {
+            orgTree.setSelectionPath(path);
+            orgTree.scrollPathToVisible(path);
+        }
+    }
+
+    private TreePath getTreePathForUnit(Unit unit) {
+        Formation formation = getCampaign().getFormation(unit.getFormationId());
+        TreePath formationPath = formation == null ? null : getTreePathForFormation(formation);
+        return formationPath == null ? null : formationPath.pathByAddingChild(unit);
+    }
+
+    private TreePath getTreePathForFormation(Formation formation) {
+        Object root = orgTree.getModel().getRoot();
+        if (!(root instanceof Formation rootFormation)) {
+            return null;
+        }
+
+        if (formation == rootFormation || formation.equals(rootFormation)) {
+            return new TreePath(root);
+        }
+
+        List<Formation> parents = formation.getAllParents();
+        int rootIndex = parents.indexOf(rootFormation);
+        if (rootIndex < 0) {
+            return null;
+        }
+
+        List<Object> pathComponents = new ArrayList<>();
+        pathComponents.add(root);
+        for (int parentIndex = rootIndex - 1; parentIndex >= 0; parentIndex--) {
+            pathComponents.add(parents.get(parentIndex));
+        }
+        pathComponents.add(formation);
+
+        return new TreePath(pathComponents.toArray());
     }
 
     private JList<Person> getCrewList(CrewListModel model, JScrollPane scrollPerson) {

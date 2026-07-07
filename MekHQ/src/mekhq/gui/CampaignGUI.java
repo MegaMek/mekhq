@@ -1200,10 +1200,10 @@ public class CampaignGUI extends JPanel {
             logger.warn("Cannot export person if no one is selected! Ignoring.");
             return;
         }
-        Person selectedPerson = pt.getPersonModel().getPerson(pt.getPersonnelTable().convertRowIndexToModel(row));
+        Person selectedPerson = pt.getPersonnelTableModel().getPerson(pt.getPersonnelTable().convertRowIndexToModel(row));
         int[] rows = pt.getPersonnelTable().getSelectedRows();
         Person[] people = Arrays.stream(rows)
-                                .mapToObj(j -> pt.getPersonModel()
+                                .mapToObj(j -> pt.getPersonnelTableModel()
                                                      .getPerson(pt.getPersonnelTable().convertRowIndexToModel(j)))
                                 .toArray(Person[]::new);
 
