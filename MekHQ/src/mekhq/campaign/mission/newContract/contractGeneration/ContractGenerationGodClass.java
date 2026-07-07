@@ -40,6 +40,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.newContract.AbstractContractManager;
 import mekhq.campaign.mission.newContract.NormalContractManager;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.universe.Faction;
 
 public class ContractGenerationGodClass {
     private static final MMLogger LOGGER = MMLogger.create(ContractGenerationGodClass.class);
@@ -59,6 +60,13 @@ public class ContractGenerationGodClass {
               negotiator,
               currentDate,
               parentContractManager);
+
+        Faction employerFaction = parentContractManager.getEmployerFaction();
+        EmployerModifierData employerModifierData = new EmployerModifierData();
+        int currentYear = currentDate.getYear();
+        int reputationRating = campaign.getReputation().getReputationRating();
+        EmployerNegotiationsModifier.getNegotiationsModifier(employerFaction, currentYear, employerModifierData);
+        UnitReputationNegotiationsModifier.getNegotiationsModifier(reputationRating, employerModifierData);
 
 
     }

@@ -37,23 +37,25 @@ import java.util.List;
 
 import jakarta.annotation.Nullable;
 import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.JumpPath;
+import mekhq.campaign.mission.newContract.contractGeneration.EmployerModifierData;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.Systems;
 
 public abstract class AbstractContractManager {
     private final static MMLogger LOGGER = MMLogger.create(AbstractContractManager.class);
 
     private String employerFactionCode;
-    private String targetSystemId;
+    EmployerModifierData employerModifierData;
     private List<AbstractContractObjective> contractObjectives;
 
+    private String targetSystemId;
+    private JumpPath cachedJumpPath = new JumpPath();
+
     public AbstractContractManager() {
-    }
-
-    public String getTargetSystemId() {
-        return targetSystemId;
-    }
-
-    public void setTargetSystemId(String targetSystemId) {
-        this.targetSystemId = targetSystemId;
     }
 
     public String getEmployerFactionCode() {
@@ -62,6 +64,10 @@ public abstract class AbstractContractManager {
 
     public void setEmployerFactionCode(String employerFactionCode) {
         this.employerFactionCode = employerFactionCode;
+    }
+
+    public Faction getEmployerFaction() {
+        return Factions.getInstance().getFaction(employerFactionCode);
     }
 
     public List<AbstractContractObjective> getContractAllObjectivesDirect() {
@@ -92,5 +98,50 @@ public abstract class AbstractContractManager {
 
     public void removeContractObjective(AbstractContractObjective contractObjective) {
         contractObjectives.remove(contractObjective);
+    }
+
+    public String getTargetSystemId() {
+        return targetSystemId;
+    }
+
+    public void setTargetSystemId(String targetSystemId) {
+        this.targetSystemId = targetSystemId;
+    }
+
+    public PlanetarySystem getTargetSystem() {
+        return Systems.getInstance().getSystemById(targetSystemId);
+    }
+
+    public JumpPath getCachedJumpPathDirect() {
+        return cachedJumpPath;
+    }
+
+    public JumpPath getCachedJumpPathWithUpdate(PlanetarySystem currentSystem, Campaign campaign) {
+        PlanetarySystem firstSystem = cachedJumpPath.getFirstSystem();
+        if (firstSystem == null) {
+            return cachedJumpPath;
+        }
+
+        String firstSystemId = firstSystem.getId();
+        String currentSystemId = currentSystem.getId();
+        boolean shouldUpdateCache = !firstSystemId.equals(currentSystemId);
+
+        if (shouldUpdateCache) {
+            cachedJumpPath = campaign.calculateJumpPath(currentSystem, getTargetSystem());
+        }
+
+        return cachedJumpPath;
+    }
+
+    public void setCachedJumpPath(JumpPath cachedJumpPath) {
+        this.cachedJumpPath = cachedJumpPath;
+    }
+
+    public EmployerModifierData getEmployerModifierData() {
+        return employerModifierData;
+    }
+
+    public void setEmployerModifierData(EmployerModifierData employerModifierData) {
+        this.employerModifierData = employerModifierData;
     }
 }

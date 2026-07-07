@@ -72,7 +72,7 @@ public enum SpecialNegotiationsModifier {
     }
 
     public static void getNegotiationsModifier(boolean isHighRisk, boolean isCovert,
-          NegotiationsModifierData modifierData) {
+          EmployerModifierData modifierData) {
         if (isHighRisk) {
             applyNegotiationModifiers(OBJECTIVE_HIGH_RISK, modifierData);
         }
@@ -83,7 +83,7 @@ public enum SpecialNegotiationsModifier {
     }
 
     private static void applyNegotiationModifiers(SpecialNegotiationsModifier modifierEntry,
-          NegotiationsModifierData modifierData) {
+          EmployerModifierData modifierData) {
         modifierData.modifyTempoMultiplier(modifierEntry.getTempoMultiplier());
         modifierData.modifyCommandModifier(modifierEntry.getCommandModifier());
         modifierData.modifySalvageModifier(modifierEntry.getSalvageModifier());

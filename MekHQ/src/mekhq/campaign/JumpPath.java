@@ -38,6 +38,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.annotation.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.utilities.MHQXMLUtility;
@@ -72,7 +73,7 @@ public class JumpPath {
         return path.isEmpty();
     }
 
-    public PlanetarySystem getFirstSystem() {
+    public @Nullable PlanetarySystem getFirstSystem() {
         if (path.isEmpty()) {
             return null;
         } else {
@@ -80,7 +81,7 @@ public class JumpPath {
         }
     }
 
-    public PlanetarySystem getLastSystem() {
+    public @Nullable PlanetarySystem getLastSystem() {
         if (path.isEmpty()) {
             return null;
         } else {

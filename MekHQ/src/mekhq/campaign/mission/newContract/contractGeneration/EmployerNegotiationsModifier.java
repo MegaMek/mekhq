@@ -83,14 +83,14 @@ public enum EmployerNegotiationsModifier {
         return transportModifier;
     }
 
-    public static void getNegotiationsModifier(Faction employer, int year, NegotiationsModifierData modifierData) {
+    public static void getNegotiationsModifier(Faction employer, int year, EmployerModifierData modifierData) {
         getFactionModifiers(employer, modifierData);
         getGenerosityModifiers(employer, modifierData);
         getOversightModifiers(employer, modifierData);
         getEraModifiers(year, modifierData);
     }
 
-    private static void getFactionModifiers(Faction employer, NegotiationsModifierData modifierData) {
+    private static void getFactionModifiers(Faction employer, EmployerModifierData modifierData) {
         if (employer.isSuperPower()) {
             applyNegotiationModifiers(EMPLOYER_SUPER_POWER, modifierData);
         } else if (employer.isMajorPower()) {
@@ -106,7 +106,7 @@ public enum EmployerNegotiationsModifier {
         }
     }
 
-    private static void getGenerosityModifiers(Faction employer, NegotiationsModifierData modifierData) {
+    private static void getGenerosityModifiers(Faction employer, EmployerModifierData modifierData) {
         if (employer.isGenerous()) {
             applyNegotiationModifiers(EMPLOYER_GENEROSITY_GENEROUS, modifierData);
         } else if (employer.isStingy()) {
@@ -114,7 +114,7 @@ public enum EmployerNegotiationsModifier {
         }
     }
 
-    private static void getOversightModifiers(Faction employer, NegotiationsModifierData modifierData) {
+    private static void getOversightModifiers(Faction employer, EmployerModifierData modifierData) {
         if (employer.isControlling()) {
             applyNegotiationModifiers(EMPLOYER_OVERSIGHT_CONTROLLING, modifierData);
         } else if (employer.isLenient()) {
@@ -122,7 +122,7 @@ public enum EmployerNegotiationsModifier {
         }
     }
 
-    private static void getEraModifiers(int year, NegotiationsModifierData modifierData) {
+    private static void getEraModifiers(int year, EmployerModifierData modifierData) {
         if (year <= 2780) {
             applyNegotiationModifiers(ERA_PRE_SUCCESSION_WARS, modifierData);
         } else if (year > 3061) {
@@ -131,7 +131,7 @@ public enum EmployerNegotiationsModifier {
     }
 
     private static void applyNegotiationModifiers(EmployerNegotiationsModifier modifierEntry,
-          NegotiationsModifierData modifierData) {
+          EmployerModifierData modifierData) {
         modifierData.modifyTempoMultiplier(modifierEntry.getEmploymentMultiplier());
         modifierData.modifyCommandModifier(modifierEntry.getCommandModifier());
         modifierData.modifySalvageModifier(modifierEntry.getSalvageModifier());

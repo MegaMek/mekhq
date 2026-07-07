@@ -80,7 +80,7 @@ public enum UnitReputationNegotiationsModifier {
         return transportModifier;
     }
 
-    public static void getNegotiationsModifier(int reputationRating, NegotiationsModifierData modifierData) {
+    public static void getNegotiationsModifier(int reputationRating, EmployerModifierData modifierData) {
         int clampedRating = clamp(reputationRating, 0, 10);
 
         UnitReputationNegotiationsModifier modifierEntry = switch (clampedRating) {
@@ -107,7 +107,7 @@ public enum UnitReputationNegotiationsModifier {
     }
 
     private static void applyNegotiationModifiers(UnitReputationNegotiationsModifier modifierEntry,
-          NegotiationsModifierData modifierData) {
+          EmployerModifierData modifierData) {
         modifierData.modifyCommandModifier(modifierEntry.getCommandModifier());
         modifierData.modifySalvageModifier(modifierEntry.getSalvageModifier());
         modifierData.modifySupportModifier(modifierEntry.getSupportModifier());

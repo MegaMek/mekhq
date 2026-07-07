@@ -30,48 +30,15 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.mission.newContract;
+package mekhq.campaign.mission.newContract.contractGeneration;
 
-import mekhq.campaign.mission.enums.AtBContractType;
+import mekhq.campaign.finances.Money;
 
-public abstract class AbstractContractObjective {
-    private transient AbstractContractManager parentContractManager;
-    private AtBContractType objectiveType;
-    private String enemyFactionCode;
-    private int lengthInMonths;
-
-    public AbstractContractObjective() {
-    }
-
-    public AbstractContractManager getParentContractManager() {
-        return parentContractManager;
-    }
-
-    public void setParentContractManager(AbstractContractManager parentContractManager) {
-        this.parentContractManager = parentContractManager;
-    }
-
-    public AtBContractType getObjectiveType() {
-        return objectiveType;
-    }
-
-    public void setObjectiveType(AtBContractType objectiveType) {
-        this.objectiveType = objectiveType;
-    }
-
-    public String getEnemyFactionCode() {
-        return enemyFactionCode;
-    }
-
-    public void setEnemyFactionCode(String enemyFactionCode) {
-        this.enemyFactionCode = enemyFactionCode;
-    }
-
-    public int getLengthInMonths() {
-        return lengthInMonths;
-    }
-
-    public void setLengthInMonths(int lengthInMonths) {
-        this.lengthInMonths = lengthInMonths;
-    }
+public record TravelPayData(
+      int transportPeriod,
+      Money transportPay,
+      double employmentMultiplier,
+      double reputationFactor,
+      Money calculatedTravelPay
+) {
 }

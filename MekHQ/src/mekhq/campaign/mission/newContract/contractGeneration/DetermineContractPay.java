@@ -40,20 +40,26 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import mekhq.campaign.Hangar;
+import mekhq.campaign.JumpPath;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.location.ILocation;
 import mekhq.campaign.market.contractMarket.AlternatePaymentModelValues;
 import mekhq.campaign.mission.TransportCostCalculations;
 import mekhq.campaign.mission.newContract.AbstractContractManager;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
 import org.jspecify.annotations.NonNull;
 
 public class DetermineContractPay {
@@ -65,7 +71,9 @@ public class DetermineContractPay {
     public static ContractPayData generateContractPay(AbstractContractManager contractManager, boolean isClanCampaign,
           List<Formation> formations, Hangar hangar, CampaignOptions campaignOptions, LocalDate currentDate,
           int temporaryAsTechPoolSize, int temporaryMedicPool, Map<PersonnelRole, Integer> temporaryCrewMap,
-          Faction campaignFaction) {
+          Faction campaignFaction, double reputationFactor, Collection<Unit> travelingUnits,
+          boolean isOverridingCommandCircuitRequirements, boolean isGM, FactionStandings factionStandings,
+          ILocation currentLocation, Collection<Part> travelingParts, Collection<Person> travelingPersonnel) {
         ContractBasePayData basePayData = calculateBasePay(isClanCampaign,
               formations,
               hangar,
@@ -76,7 +84,27 @@ public class DetermineContractPay {
               temporaryCrewMap,
               campaignFaction);
 
-        Money travelPay = travelPay();
+        Money calculatedBasePay = basePayData.calculatedBasePay();
+        JumpPath cachedJumpPath = contractManager.getCachedJumpPathDirect();
+        boolean isUseTwoWayPay = campaignOptions.isUseTwoWayPay();
+        EmployerModifierData employerModifierData = contractManager.getEmployerModifierData();
+        double employmentMultiplier = employerModifierData.getEmploymentMultiplier();
+        String employerId = contractManager.getEmployerFactionCode();
+
+        TravelPayData travelPay = calculateTravelPay(calculatedBasePay,
+              reputationFactor,
+              cachedJumpPath,
+              isUseTwoWayPay,
+              employmentMultiplier,
+              travelingUnits,
+              isOverridingCommandCircuitRequirements,
+              isGM,
+              factionStandings,
+              employerId,
+              currentDate,
+              currentLocation,
+              travelingParts,
+              travelingPersonnel);
     }
 
     public static ContractBasePayData calculateBasePay(boolean isClanCampaign, List<Formation> formations,
@@ -168,48 +196,69 @@ public class DetermineContractPay {
                      .multipliedBy(reputationFactor);
     }
 
-    private static @NonNull Money travelPay() {
-        return Money.zero().plus(basePay)
-                     .multipliedBy(transportPeriod)
-                     .multipliedBy(employmentMultiplier)
-                     .multipliedBy(reputationFactor)
-                     .plus(transportPayment);
+    private static @NonNull TravelPayData calculateTravelPay(Money calculatedBasePay, double reputationFactor,
+          JumpPath cachedJumpPath, boolean isUseTwoWayPay, double employmentMultiplier, Collection<Unit> travelingUnits,
+          boolean isOverridingCommandCircuitRequirements, boolean isGM, FactionStandings factionStandings,
+          String employerId, LocalDate currentDate, ILocation currentLocation, Collection<Part> travelingParts,
+          Collection<Person> travelingPersonnel) {
+        int transportPeriod = calculateTransportPeriod(cachedJumpPath, isUseTwoWayPay);
+
+        Money transportPayment = calculateObjectiveTransportPay(travelingUnits,
+              isOverridingCommandCircuitRequirements,
+              isGM,
+              factionStandings,
+              employerId,
+              cachedJumpPath,
+              currentDate,
+              currentLocation,
+              travelingParts,
+              travelingPersonnel);
+
+        Money calculatedTravelPay = Money.zero()
+                                          .plus(calculatedBasePay)
+                                          .multipliedBy(transportPeriod)
+                                          .multipliedBy(employmentMultiplier)
+                                          .multipliedBy(reputationFactor)
+                                          .plus(transportPayment);
+
+        return new TravelPayData(transportPeriod, transportPayment, employmentMultiplier, reputationFactor,
+              calculatedTravelPay);
     }
 
-    public void calculateLengthOfMission() {
+    public static int calculateTransportPeriod(JumpPath cachedJumpPath, boolean isUseTwoWayPay) {
         // The calculation in this method is taken from CamOps pg 41 rev 5th printing
-        PlanetarySystem startSystem = jumpPath.getFirstSystem();
-        PlanetarySystem endSystem = jumpPath.getLastSystem();
+        PlanetarySystem startSystem = cachedJumpPath.getFirstSystem();
+        PlanetarySystem endSystem = cachedJumpPath.getLastSystem();
 
-        boolean isInSameSystem = startSystem.equals(endSystem);
+        boolean isInSameSystem = Objects.equals(startSystem, endSystem);
         if (isInSameSystem) {
-            transportPeriod = 0;
-            return;
+            return 0;
         }
 
         int baseWeeks = 2;
-        double additionalWeeks = 1.1 * jumpPath.getJumps();
-        int multiplier = 2;
+        double additionalWeeks = 1.1 * cachedJumpPath.getJumps();
+        int multiplier = isUseTwoWayPay ? 2 : 1;
 
-        transportPeriod = (int) round((baseWeeks + additionalWeeks) * multiplier);
-
-        totalLength = transportPeriod + lengthOfObjective;
+        return (int) round((baseWeeks + additionalWeeks) * multiplier);
     }
 
-    public void calculateObjectiveTransportPay(Collection<Unit> units) {
+    public static Money calculateObjectiveTransportPay(Collection<Unit> travelingUnits,
+          boolean isOverridingCommandCircuitRequirements, boolean isGM, FactionStandings factionStandings,
+          String employerId, JumpPath cachedJumpPath, LocalDate currentDate, ILocation currentLocation,
+          Collection<Part> travelingParts, Collection<Person> travelingPersonnel) {
         boolean isUseCommandCircuit = FactionStandingUtilities.isUseCommandCircuit(
               isOverridingCommandCircuitRequirements,
               isGM,
               factionStandings,
-              employerCode);
+              employerId);
 
-        int duration = (int) ceil(jumpPath.getTotalTime(today, currentLocation.getTransitTime(),
+        int duration = (int) ceil(cachedJumpPath.getTotalTime(currentDate, currentLocation.getTransitTime(),
               isUseCommandCircuit));
 
-        TransportCostCalculations costCalculation = new TransportCostCalculations(units,
-              spareParts,
-              allPersonnel,
+        TransportCostCalculations costCalculation = new TransportCostCalculations(travelingUnits,
+              travelingParts,
+              travelingPersonnel,
               EXP_REGULAR);
-        transportPayment = costCalculation.calculateJumpCostForEntireJourney(duration, jumpPath.getJumps());
+        return costCalculation.calculateJumpCostForEntireJourney(duration, cachedJumpPath.getJumps());
     }
 }

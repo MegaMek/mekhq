@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.mission.newContract.contractGeneration;
 
-public class NegotiationsModifierData {
+public class EmployerModifierData {
     private double employmentMultiplier = 0.0;
     private double tempoMultiplier = 0.0;
     private int commandModifier = 0;
@@ -40,7 +40,7 @@ public class NegotiationsModifierData {
     private int supportModifier = 0;
     private int transportModifier = 0;
 
-    public NegotiationsModifierData() {}
+    public EmployerModifierData() {}
 
     public double getEmploymentMultiplier() {
         return employmentMultiplier;
