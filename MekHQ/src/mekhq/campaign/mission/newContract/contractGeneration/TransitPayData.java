@@ -34,11 +34,10 @@ package mekhq.campaign.mission.newContract.contractGeneration;
 
 import mekhq.campaign.finances.Money;
 
-public record TravelPayData(
+public record TransitPayData(
       int transportPeriod,
-      Money transportPay,
       double employmentMultiplier,
       double reputationFactor,
-      Money calculatedTravelPay
+      Money calculatedTransitPay
 ) {
 }

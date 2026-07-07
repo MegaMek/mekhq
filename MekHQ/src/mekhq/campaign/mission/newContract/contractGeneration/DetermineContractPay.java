@@ -71,9 +71,7 @@ public class DetermineContractPay {
     public static ContractPayData generateContractPay(AbstractContractManager contractManager, boolean isClanCampaign,
           List<Formation> formations, Hangar hangar, CampaignOptions campaignOptions, LocalDate currentDate,
           int temporaryAsTechPoolSize, int temporaryMedicPool, Map<PersonnelRole, Integer> temporaryCrewMap,
-          Faction campaignFaction, double reputationFactor, Collection<Unit> travelingUnits,
-          boolean isOverridingCommandCircuitRequirements, boolean isGM, FactionStandings factionStandings,
-          ILocation currentLocation, Collection<Part> travelingParts, Collection<Person> travelingPersonnel) {
+          Faction campaignFaction, double reputationFactor) {
         ContractBasePayData basePayData = calculateBasePay(isClanCampaign,
               formations,
               hangar,
@@ -91,20 +89,11 @@ public class DetermineContractPay {
         double employmentMultiplier = employerModifierData.getEmploymentMultiplier();
         String employerId = contractManager.getEmployerFactionCode();
 
-        TravelPayData travelPay = calculateTravelPay(calculatedBasePay,
+        TransitPayData transitPayData = calculateTransitPay(calculatedBasePay,
               reputationFactor,
               cachedJumpPath,
               isUseTwoWayPay,
-              employmentMultiplier,
-              travelingUnits,
-              isOverridingCommandCircuitRequirements,
-              isGM,
-              factionStandings,
-              employerId,
-              currentDate,
-              currentLocation,
-              travelingParts,
-              travelingPersonnel);
+              employmentMultiplier);
     }
 
     public static ContractBasePayData calculateBasePay(boolean isClanCampaign, List<Formation> formations,
@@ -183,8 +172,7 @@ public class DetermineContractPay {
                   useEquipmentSellValue);
         }
 
-        double basePaymentMultiplierValue = basePaymentMultiplier.getMultiplier();
-        return forceValue.multipliedBy(basePaymentMultiplierValue);
+        return forceValue;
     }
 
     private @NonNull Money getObjectivePay() {
@@ -196,33 +184,17 @@ public class DetermineContractPay {
                      .multipliedBy(reputationFactor);
     }
 
-    private static @NonNull TravelPayData calculateTravelPay(Money calculatedBasePay, double reputationFactor,
-          JumpPath cachedJumpPath, boolean isUseTwoWayPay, double employmentMultiplier, Collection<Unit> travelingUnits,
-          boolean isOverridingCommandCircuitRequirements, boolean isGM, FactionStandings factionStandings,
-          String employerId, LocalDate currentDate, ILocation currentLocation, Collection<Part> travelingParts,
-          Collection<Person> travelingPersonnel) {
+    private static @NonNull TransitPayData calculateTransitPay(Money calculatedBasePay, double reputationFactor,
+          JumpPath cachedJumpPath, boolean isUseTwoWayPay, double employmentMultiplier) {
         int transportPeriod = calculateTransportPeriod(cachedJumpPath, isUseTwoWayPay);
 
-        Money transportPayment = calculateObjectiveTransportPay(travelingUnits,
-              isOverridingCommandCircuitRequirements,
-              isGM,
-              factionStandings,
-              employerId,
-              cachedJumpPath,
-              currentDate,
-              currentLocation,
-              travelingParts,
-              travelingPersonnel);
+        Money calculatedTransitPay = Money.zero()
+                                           .plus(calculatedBasePay)
+                                           .multipliedBy(transportPeriod)
+                                           .multipliedBy(employmentMultiplier)
+                                           .multipliedBy(reputationFactor);
 
-        Money calculatedTravelPay = Money.zero()
-                                          .plus(calculatedBasePay)
-                                          .multipliedBy(transportPeriod)
-                                          .multipliedBy(employmentMultiplier)
-                                          .multipliedBy(reputationFactor)
-                                          .plus(transportPayment);
-
-        return new TravelPayData(transportPeriod, transportPayment, employmentMultiplier, reputationFactor,
-              calculatedTravelPay);
+        return new TransitPayData(transportPeriod, employmentMultiplier, reputationFactor, calculatedTransitPay);
     }
 
     public static int calculateTransportPeriod(JumpPath cachedJumpPath, boolean isUseTwoWayPay) {
