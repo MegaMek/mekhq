@@ -118,6 +118,8 @@ public class ContractGenerationGodClass {
         contractManager.setContractPayData(contractPayData);
 
         // Initial Negotiations
+
+
         // TODO Command Rights
         // TODO Salvage Rights
         // TODO Support Rights

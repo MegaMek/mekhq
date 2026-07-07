@@ -56,7 +56,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import org.jspecify.annotations.NonNull;
 
-public class NPCNegotiator {
+public class EmployerNegotiator {
     /**
      * This level is taken from CamOps rev 5th printing, pg 41. CamOps states that Negotiators have a Charisma modifier
      * of 1. 7 Charisma is the minimum score necessary to reach that modifier.
@@ -81,7 +81,7 @@ public class NPCNegotiator {
           MERCENARY_NEGOTIATOR_CLAN);
 
     // TODO have a way for the player to get intel on the opposing negotiator
-    private static Person generateNegotiator(Campaign campaign, CampaignTypeForContractDetermination campaignType,
+    public static Person generateNegotiator(Campaign campaign, CampaignTypeForContractDetermination campaignType,
           Faction employerFaction, HiringHallLevel hiringHallLevel) {
         PersonnelRole role = getNegotiatorRole(hiringHallLevel, campaignType, employerFaction);
 
@@ -127,14 +127,14 @@ public class NPCNegotiator {
         }
     }
 
-    public static void adjustCharisma(Person negotiator) {
+    private static void adjustCharisma(Person negotiator) {
         int charisma = negotiator.getAttributeScore(SkillAttribute.CHARISMA);
         if (charisma < MINIMUM_CHARISMA) {
             negotiator.setAttributeScore(SkillAttribute.CHARISMA, MINIMUM_CHARISMA);
         }
     }
 
-    public static void adjustNegotiation(Person negotiator) {
+    private static void adjustNegotiation(Person negotiator) {
         Skill negotiationSkill = negotiator.getSkill(S_NEGOTIATION);
 
         if (negotiationSkill == null) { // Unskilled
