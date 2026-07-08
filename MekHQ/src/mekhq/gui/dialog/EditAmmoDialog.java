@@ -41,6 +41,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -48,29 +49,57 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
 
 import megamek.client.ui.util.UIUtil;
 import megamek.common.equipment.AmmoMounted;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
+import mekhq.MekHQ;
 
 /**
  * Dialog for editing ammo consumption of units during manual scenario resolution.
  * Allows users to adjust the remaining shots for each ammo bin on a unit.
  */
 public class EditAmmoDialog extends JDialog {
-    private static final MMLogger logger = MMLogger.create(EditAmmoDialog.class);
+    private static final MMLogger LOGGER = MMLogger.create(EditAmmoDialog.class);
+
+    private static final int DIALOG_MIN_WIDTH = 600;
+    private static final int DIALOG_MIN_HEIGHT = 200;
+    private static final int DIALOG_ROW_HEIGHT = 30;
+    private static final int DIALOG_BUTTON_ROW_HEIGHT = 100;
+    private static final Insets SPACING_INSETS = new Insets(5, 5, 5, 5);
+
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle(
+        "mekhq.resources.EditAmmoDialog", MekHQ.getMHQOptions().getLocale());
 
     private final Entity entity;
-    private final List<JSpinner> ammoSpinners = new ArrayList<>();
-    private final List<AmmoMounted> ammoMounteds = new ArrayList<>();
-    private final List<Integer> correctedOriginalShots = new ArrayList<>();
+    private final List<AmmoBinding> ammoBindings = new ArrayList<>();
     private boolean confirmed = false;
 
+    /**
+     * Wrapper class to eliminate parallel list anti-pattern.
+     * Groups ammo data with its UI component and validation data.
+     */
+    private static class AmmoBinding {
+        final AmmoMounted ammo;
+        final JSpinner spinner;
+        final int maxShots;
+        
+        AmmoBinding(AmmoMounted ammo, JSpinner spinner, int maxShots) {
+            this.ammo = ammo;
+            this.spinner = spinner;
+            this.maxShots = maxShots;
+        }
+    }
+
     public EditAmmoDialog(Frame parent, Entity entity) {
-        super(parent, "Edit Ammo Consumption", true);
+        super(parent, true);
         this.entity = entity;
+        
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle(resourceMap.getString("dialog.title"));
         
         initComponents();
         setLocationRelativeTo(parent);
@@ -81,213 +110,247 @@ public class EditAmmoDialog extends JDialog {
         setLayout(new BorderLayout());
         
         // Main panel with ammo controls
+        JPanel mainPanel = createAmmoPanel();
+        add(mainPanel, BorderLayout.CENTER);
+        
+        // Button panel
+        add(buildButtonPanel(), BorderLayout.SOUTH);
+        
+        // Set preferred size
+        int calculatedHeight = Math.max(DIALOG_MIN_HEIGHT, ammoBindings.size() * DIALOG_ROW_HEIGHT + DIALOG_BUTTON_ROW_HEIGHT);
+        setPreferredSize(UIUtil.scaleForGUI(DIALOG_MIN_WIDTH, calculatedHeight));
+    }
+
+    /**
+     * Creates the main panel containing ammo bin controls.
+     * @return configured JPanel with ammo bindings
+     */
+    private JPanel createAmmoPanel() {
         JPanel mainPanel = new JPanel(new GridBagLayout());
-        mainPanel.setBorder(new TitledBorder("Ammo Bins - " + entity.getDisplayName()));
+        mainPanel.setBorder(new TitledBorder(
+            String.format(resourceMap.getString("panel.title"), entity.getDisplayName())));
         
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = SPACING_INSETS;
         gbc.anchor = GridBagConstraints.WEST;
         
         // Header row
-        gbc.gridx = 0; gbc.gridy = 0;
-        mainPanel.add(new JLabel("Weapon/Location:"), gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        mainPanel.add(new JLabel(resourceMap.getString("label.weaponLocation")), gbc);
         gbc.gridx = 1;
-        mainPanel.add(new JLabel("Ammo Type:"), gbc);
+        mainPanel.add(new JLabel(resourceMap.getString("label.ammoType")), gbc);
         gbc.gridx = 2;
-        mainPanel.add(new JLabel("Shots Remaining:"), gbc);
+        mainPanel.add(new JLabel(resourceMap.getString("label.shotsRemaining")), gbc);
         
         // Add ammo bins
         int row = 1;
         for (AmmoMounted ammo : entity.getAmmo()) {
-            if (ammo != null && ammo.getType() != null) {
-                // Weapon name and location
-                gbc.gridx = 0; gbc.gridy = row;
-                String weaponName;
-                String location = entity.getLocationName(ammo.getLocation());
-                
-                // Try to find the linked weapon
-                if (ammo.getLinked() != null) {
-                    weaponName = ammo.getLinked().getName();
-                } else if (ammo.getLinkedBy() != null) {
-                    weaponName = ammo.getLinkedBy().getName();
-                } else {
-                    // Use ammo type name as fallback
-                    weaponName = ammo.getType().getName();
-                }
-                
-                String displayText = weaponName + " (" + location + ")";
-                mainPanel.add(new JLabel(displayText), gbc);
-                
-                // Ammo type
-                gbc.gridx = 1;
-                String ammoName = ammo.getType().getName();
-                if (ammo.isHotLoaded()) {
-                    ammoName += " (Hot-Loaded)";
-                }
-                mainPanel.add(new JLabel(ammoName), gbc);
-                
-                // Shots remaining spinner
-                gbc.gridx = 2;
-                try {
-                    int currentShots = ammo.getBaseShotsLeft();
-                    int originalShots = ammo.getOriginalShots();
-                    
-                    // Debug logging to understand the values
-                    logger.info("Ammo {}: type={}, current={}, original={}, location={}", 
-                        weaponName, ammo.getType().getName(), currentShots, originalShots, 
-                        entity.getLocationName(ammo.getLocation()));
-                    
-                    // Handle case where original shots is 0 (possible data issue)
-                    if (originalShots == 0) {
-                        // Try to get capacity from ammo type as fallback
-                        int ammoCapacity = ammo.getType().getShots();
-                        if (ammoCapacity > 0) {
-                            logger.warn("Original shots is 0, using ammo type capacity ({}) as fallback", 
-                                ammoCapacity);
-                            originalShots = ammoCapacity;
-                        } else {
-                            // Last resort: use a reasonable default based on ammo type
-                            originalShots = Math.max(currentShots, 1);
-                            logger.warn("Both original and capacity are 0, using default ({})", 
-                                originalShots);
-                        }
-                    }
-                    
-                    // Ensure we have valid values and handle inconsistent state
-                    currentShots = Math.max(0, currentShots);
-                    // If current shots exceed original, cap at original
-                    if (currentShots > originalShots) {
-                        logger.warn("Ammo {} has more shots ({}) than original ({}), capping at original", 
-                            ammo.getType().getName(), currentShots, originalShots);
-                        currentShots = originalShots;
-                    }
-                    // Original shots should always be the maximum, regardless of current shots
-                    logger.debug("Creating spinner for {}: current={}, original={}, max={}", 
-                        ammo.getType().getName(), currentShots, originalShots, originalShots);
-                    SpinnerNumberModel spinnerModel = new SpinnerNumberModel(
-                        currentShots, 0, originalShots, 1);
-                    JSpinner spinner = new JSpinner(spinnerModel);
-                    spinner.setToolTipText("Adjust remaining shots (0-" + originalShots + ")");
-                    
-                    // Add spinner and update lists only if everything succeeds
-                    ammoMounteds.add(ammo);
-                    ammoSpinners.add(spinner);
-                    // Store corrected original shots for validation
-                    correctedOriginalShots.add(originalShots);
-                    mainPanel.add(spinner, gbc);
-                } catch (Exception e) {
-                    logger.error("Error creating spinner for ammo: " + ammo.getType().getName(), e);
-                    // Create error display in place of spinner
-                    mainPanel.add(new JLabel("Error: " + e.getMessage()), gbc);
-                }
-                
+            if ((ammo != null) && (ammo.getType() != null)) {
+                createAmmoRow(mainPanel, ammo, row);
                 row++;
             }
         }
         
-        // Check if we have any ammo at all (not just successful spinners)
-        boolean hasAnyAmmo = false;
-        for (AmmoMounted ammo : entity.getAmmo()) {
-            if (ammo != null && ammo.getType() != null) {
-                hasAnyAmmo = true;
-                break;
+        // Check if we have any ammo at all
+        if (ammoBindings.isEmpty()) {
+            gbc.gridx = 0;
+            gbc.gridy = 1;
+            gbc.gridwidth = 3;
+            gbc.anchor = GridBagConstraints.CENTER;
+            mainPanel.add(new JLabel(resourceMap.getString("label.noAmmo")), gbc);
+        }
+        
+        return mainPanel;
+    }
+
+    /**
+     * Creates a single ammo row with spinner control.
+     * @param mainPanel panel to add row to
+     * @param ammo the ammo mounted item
+     * @param row the row index
+     */
+    private void createAmmoRow(JPanel mainPanel, AmmoMounted ammo, int row) {
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = SPACING_INSETS;
+        
+        try {
+            // Weapon name and location
+            gbc.gridx = 0;
+            gbc.gridy = row;
+            gbc.anchor = GridBagConstraints.WEST;
+            String weaponName = getAmmoWeaponName(ammo);
+            String location = entity.getLocationName(ammo.getLocation());
+            String displayText = String.format("%s (%s)", weaponName, location);
+            mainPanel.add(new JLabel(displayText), gbc);
+            
+            // Ammo type
+            gbc.gridx = 1;
+            String ammoName = ammo.getType().getName();
+            if (ammo.isHotLoaded()) {
+                ammoName = String.format("%s %s", ammoName, resourceMap.getString("label.hotLoaded"));
+            }
+            mainPanel.add(new JLabel(ammoName), gbc);
+            
+            // Shots remaining spinner
+            gbc.gridx = 2;
+            int currentShots = ammo.getBaseShotsLeft();
+            int maxShots = calculateMaxShots(ammo, weaponName, currentShots);
+            
+            SpinnerNumberModel spinnerModel = new SpinnerNumberModel(currentShots, 0, maxShots, 1);
+            JSpinner spinner = new JSpinner(spinnerModel);
+            spinner.setName(String.format("ammoSpinner_%d", row));
+            spinner.setToolTipText(String.format(
+                resourceMap.getString("spinner.shotsTooltip"), maxShots));
+            
+            AmmoBinding binding = new AmmoBinding(ammo, spinner, maxShots);
+            ammoBindings.add(binding);
+            
+            mainPanel.add(spinner, gbc);
+            LOGGER.debug("Created ammo row {} for {}: current={}, max={}", 
+                row, ammo.getType().getName(), currentShots, maxShots);
+            
+        } catch (Exception e) {
+            LOGGER.error("Error creating spinner for ammo: {}", ammo.getType().getName(), e);
+            gbc.gridx = 0;
+            gbc.gridy = row;
+            gbc.gridwidth = 3;
+            mainPanel.add(new JLabel(String.format(
+                resourceMap.getString("label.error"), e.getMessage())), gbc);
+        }
+    }
+
+    /**
+     * Gets the weapon name for ammo display.
+     * @param ammo the ammo mounted item
+     * @return weapon name or fallback
+     */
+    private String getAmmoWeaponName(AmmoMounted ammo) {
+        if (ammo.getLinked() != null) {
+            return ammo.getLinked().getName();
+        } else if (ammo.getLinkedBy() != null) {
+            return ammo.getLinkedBy().getName();
+        } else {
+            return ammo.getType().getName();
+        }
+    }
+
+    /**
+     * Calculates the maximum shots for an ammo bin with fallback logic.
+     * @param ammo the ammo mounted item
+     * @param weaponName name of weapon (for logging)
+     * @param currentShots current shots
+     * @return calculated max shots
+     */
+    private int calculateMaxShots(AmmoMounted ammo, String weaponName, int currentShots) {
+        int originalShots = ammo.getOriginalShots();
+        
+        // Handle case where original shots is 0 (data issue)
+        if (originalShots == 0) {
+            int ammoCapacity = ammo.getType().getShots();
+            if (ammoCapacity > 0) {
+                LOGGER.warn("Original shots is 0 for {}, using ammo type capacity ({})", 
+                    weaponName, ammoCapacity);
+                originalShots = ammoCapacity;
+            } else {
+                originalShots = Math.max(currentShots, 1);
+                LOGGER.warn("Both original and capacity are 0 for {}, using default ({})", 
+                    weaponName, originalShots);
             }
         }
         
-        // If no ammo found
-        if (!hasAnyAmmo) {
-            gbc.gridx = 0; gbc.gridy = 1;
-            gbc.gridwidth = 3;
-            gbc.anchor = GridBagConstraints.CENTER;
-            mainPanel.add(new JLabel("No ammo bins found on this unit"), gbc);
+        // Ensure valid values
+        currentShots = Math.max(0, currentShots);
+        if (currentShots > originalShots) {
+            LOGGER.warn("Ammo {} has more shots ({}) than original ({}), capping at original", 
+                ammo.getType().getName(), currentShots, originalShots);
         }
         
-        add(mainPanel, BorderLayout.CENTER);
-        
-        // Button panel
+        return originalShots;
+    }
+
+    /**
+     * Builds the button panel with standard buttons.
+     * @return configured button panel
+     */
+    private JPanel buildButtonPanel() {
         JPanel buttonPanel = new JPanel(new FlowLayout());
         
-        JButton btnZero = new JButton("Set All to Zero");
-        btnZero.addActionListener(e -> setAllToZero());
-        buttonPanel.add(btnZero);
+        JButton setAllZeroButton = new JButton(resourceMap.getString("btn.setAllZero.text"));
+        setAllZeroButton.setName("setAllZeroButton");
+        setAllZeroButton.addActionListener(e -> setAllToZero());
+        buttonPanel.add(setAllZeroButton);
         
-        JButton btnFull = new JButton("Set All to Full");
-        btnFull.addActionListener(e -> setAllToFull());
-        buttonPanel.add(btnFull);
+        JButton setAllFullButton = new JButton(resourceMap.getString("btn.setAllFull.text"));
+        setAllFullButton.setName("setAllFullButton");
+        setAllFullButton.addActionListener(e -> setAllToFull());
+        buttonPanel.add(setAllFullButton);
         
-        JButton btnCancel = new JButton("Cancel");
-        btnCancel.addActionListener(e -> dispose());
-        buttonPanel.add(btnCancel);
+        JButton cancelButton = new JButton(resourceMap.getString("btn.cancel.text"));
+        cancelButton.setName("cancelButton");
+        cancelButton.addActionListener(e -> dispose());
+        buttonPanel.add(cancelButton);
         
-        JButton btnOK = new JButton("OK");
-        btnOK.addActionListener(e -> confirmChanges());
-        getRootPane().setDefaultButton(btnOK);
-        buttonPanel.add(btnOK);
+        JButton okayButton = new JButton(resourceMap.getString("btn.okay.text"));
+        okayButton.setName("okayButton");
+        okayButton.addActionListener(e -> confirmChanges());
+        getRootPane().setDefaultButton(okayButton);
+        buttonPanel.add(okayButton);
         
-        add(buttonPanel, BorderLayout.SOUTH);
-        
-        // Set preferred size
-        setPreferredSize(UIUtil.scaleForGUI(600, Math.max(200, row * 30 + 100)));
+        return buttonPanel;
     }
 
     private void setAllToZero() {
-        for (JSpinner spinner : ammoSpinners) {
-            spinner.setValue(0);
+        for (AmmoBinding binding : ammoBindings) {
+            binding.spinner.setValue(0);
         }
     }
 
     private void setAllToFull() {
-        for (int i = 0; i < ammoSpinners.size(); i++) {
-            if (i < correctedOriginalShots.size()) {
-                ammoSpinners.get(i).setValue(correctedOriginalShots.get(i));
-            }
+        for (AmmoBinding binding : ammoBindings) {
+            binding.spinner.setValue(binding.maxShots);
         }
     }
 
+    /**
+     * Validates and applies ammo changes to the entity.
+     */
     private void confirmChanges() {
         try {
-            // Apply the changes to the entity
-            for (int i = 0; i < ammoSpinners.size(); i++) {
-                if (i >= ammoMounteds.size()) {
-                    break; // Safety check
-                }
-                
-                Integer spinnerValue = (Integer) ammoSpinners.get(i).getValue();
+            for (AmmoBinding binding : ammoBindings) {
+                Integer spinnerValue = (Integer) binding.spinner.getValue();
                 if (spinnerValue == null) {
-                    continue; // Skip null values
+                    continue;
                 }
                 
                 int newShots = spinnerValue;
-                AmmoMounted ammo = ammoMounteds.get(i);
                 
-                if (ammo == null) {
-                    continue; // Skip null ammo
-                }
+                // Validate the new value
+                LOGGER.debug("Validating ammo {}: newShots={}, maxShots={}", 
+                    binding.ammo.getType().getName(), newShots, binding.maxShots);
                 
-                // Validate the new value using corrected original shots
-                int correctedOriginal = correctedOriginalShots.get(i);
-                logger.debug("Validating ammo {}: newShots={}, correctedOriginal={}", 
-                    ammo.getType().getName(), newShots, correctedOriginal);
-                
-                if (newShots < 0 || newShots > correctedOriginal) {
-                    logger.warn("Invalid shot count for {}: newShots={}, correctedOriginal={}", 
-                        ammo.getType().getName(), newShots, correctedOriginal);
+                if ((newShots < 0) || (newShots > binding.maxShots)) {
+                    LOGGER.warn("Invalid shot count for {}: newShots={}, maxShots={}", 
+                        binding.ammo.getType().getName(), newShots, binding.maxShots);
                     JOptionPane.showMessageDialog(this,
-                        "Invalid shot count for " + ammo.getType().getName() + 
-                        ". Must be between 0 and " + correctedOriginal,
-                        "Invalid Input", JOptionPane.ERROR_MESSAGE);
+                        String.format(resourceMap.getString("error.invalidShotCount"),
+                            binding.ammo.getType().getName(), binding.maxShots),
+                        resourceMap.getString("error.invalidInput"), 
+                        JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 
-                ammo.setShotsLeft(newShots);
+                binding.ammo.setShotsLeft(newShots);
+                LOGGER.info("Set ammo {} shots to {}", binding.ammo.getType().getName(), newShots);
             }
             
             confirmed = true;
         } catch (Exception e) {
-            logger.error("Error confirming ammo changes", e);
+            LOGGER.error("Error confirming ammo changes", e);
             JOptionPane.showMessageDialog(this,
-                "An error occurred while saving ammo changes: " + e.getMessage(),
-                "Error", JOptionPane.ERROR_MESSAGE);
+                String.format(resourceMap.getString("error.savingChanges"), e.getMessage()),
+                resourceMap.getString("error.title"), 
+                JOptionPane.ERROR_MESSAGE);
         }
         
         dispose();
