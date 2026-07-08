@@ -59,6 +59,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.location.IPlace;
 import mekhq.campaign.market.PartsInUseManager;
 import mekhq.campaign.market.procurement.Procurement;
 import mekhq.campaign.mission.AtBContract;
@@ -553,8 +554,7 @@ public class Resupply {
      */
 
     private Map<Part, PartDetails> collectParts() {
-        PartsInUseManager partsInUseManager = new PartsInUseManager(campaign);
-        Set<PartInUse> partsInUse = partsInUseManager.getPartsInUse(true, true, PartQuality.QUALITY_A);
+        Set<PartInUse> partsInUse = collectPartsInUseAcrossLocations();
 
         Faction campaignFaction = campaign.getFaction();
         LocalDate today = campaign.getLocalDate();
@@ -576,6 +576,41 @@ public class Resupply {
         partsInUse.removeAll(partsToRemove);
 
         return applyWarehouseWeightModifiers(partsInUse);
+    }
+
+    /**
+     * Gathers the parts in use from the main force and every base into a single set, accumulating the per-location
+     * counts for parts that appear in more than one location.
+     */
+    private Set<PartInUse> collectPartsInUseAcrossLocations() {
+        List<IPlace> places = new ArrayList<>();
+        places.add(campaign);
+        places.addAll(campaign.getCampaignLocationManager().getPlayerBases());
+
+        Map<PartInUse, PartInUse> merged = new HashMap<>();
+        for (IPlace place : places) {
+            PartsInUseManager partsInUseManager = new PartsInUseManager(campaign, place);
+            for (PartInUse partInUse : partsInUseManager.getPartsInUse(true, true, PartQuality.QUALITY_A)) {
+                mergePartInUse(merged, partInUse);
+            }
+        }
+        return new HashSet<>(merged.values());
+    }
+
+    /**
+     * Adds {@code incoming} to {@code merged}, or accumulates its per-location counts onto the existing entry for the
+     * same part. Planned count comes from the campaign-wide shopping list and is identical for every location, so it is
+     * not summed.
+     */
+    private static void mergePartInUse(Map<PartInUse, PartInUse> merged, PartInUse incoming) {
+        PartInUse existing = merged.get(incoming);
+        if (existing == null) {
+            merged.put(incoming, incoming);
+            return;
+        }
+        existing.setUseCount(existing.getUseCount() + incoming.getUseCount());
+        existing.setStoreCount(existing.getStoreCount() + incoming.getStoreCount());
+        existing.setTransferCount(existing.getTransferCount() + incoming.getTransferCount());
     }
 
     /**

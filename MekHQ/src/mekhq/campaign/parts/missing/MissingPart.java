@@ -393,8 +393,9 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
         Part newPart = getNewPart();
         newPart.setBrandNew(true);
         newPart.setDaysToArrival(transitDays);
+        // Deliver to this order's own warehouse (a base warehouse for a base order, else the campaign warehouse).
         StringBuilder toReturn = new StringBuilder();
-        if (campaign.getQuartermaster().buyPart(newPart, valueMultiplier, transitDays)) {
+        if (campaign.getQuartermaster().buyPart(newPart, valueMultiplier, transitDays, getWarehouse())) {
             toReturn.append(messageSurroundedBySpanWithColor(
                         ReportingUtilities.getPositiveColor(), "<b> part found</b>"))
                   .append(". It will be delivered in ")

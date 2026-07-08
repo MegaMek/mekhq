@@ -121,6 +121,15 @@ public record Quartermaster(Campaign campaign) {
     }
 
     /**
+     * Returns the warehouse a part physically lives in — its own (a base warehouse for a base spare, resolved through
+     * the location tree), falling back to the campaign warehouse.
+     */
+    private Warehouse warehouseFor(Part part) {
+        Warehouse partWarehouse = part.getWarehouse();
+        return (partWarehouse != null) ? partWarehouse : getWarehouse();
+    }
+
+    /**
      * Adds a part to the campaign's warehouse, specifying the number of transit days for its arrival and whether the
      * part is considered brand new. The method validates the input and decides whether to skip the addition based on
      * specific conditions, such as test units, spare ammo bins, or missing parts without associated units.
@@ -137,6 +146,22 @@ public record Quartermaster(Campaign campaign) {
      * @throws NullPointerException If {@code part} is {@code null}.
      */
     public void addPart(Part part, int transitDays, boolean isBrandNew) {
+        addPart(part, transitDays, isBrandNew, null);
+    }
+
+    /**
+     * Adds a part to a warehouse, specifying the number of transit days for its arrival and whether the part is
+     * considered brand new. Behaves like {@link #addPart(Part, int, boolean)} but allows the caller to direct the part
+     * to a specific {@code target} warehouse (e.g. a base's warehouse for a location-scoped purchase or GM add).
+     *
+     * @param part        The part to add. Cannot be {@code null}.
+     * @param transitDays The number of days until the part arrives; negative values are treated as zero.
+     * @param isBrandNew  {@code true} if the part is brand new.
+     * @param target      The warehouse to add the part to, or {@code null} to use the warehouse the part resolves to
+     *                    through its own location (a base warehouse for a base spare), falling back to the campaign
+     *                    warehouse.
+     */
+    public void addPart(Part part, int transitDays, boolean isBrandNew, @Nullable Warehouse target) {
         Objects.requireNonNull(part);
 
         // Refit kits are special, if this is for a refit kit use that method
@@ -167,12 +192,9 @@ public record Quartermaster(Campaign campaign) {
         // be careful in using this next line
         part.postProcessCampaignAddition();
 
-        // Add the part to the warehouse local to its unit (e.g. a base warehouse for a unit
-        // stationed at a base) and merge it with any existing part if possible
-        Unit unit = part.getUnit();
-        Warehouse warehouse = ((unit != null) && (unit.getWarehouse() != null))
-              ? unit.getWarehouse()
-              : getWarehouse();
+        // Add the part to the requested target warehouse, or the warehouse local to the part (e.g. a base warehouse for
+        // a unit or spare at a base), and merge it with any existing part if possible
+        Warehouse warehouse = (target != null) ? target : warehouseFor(part);
         warehouse.addPart(part, true);
     }
 
@@ -735,7 +757,7 @@ public record Quartermaster(Campaign campaign) {
         campaign().getFinances().credit(TransactionType.EQUIPMENT_SALE, campaign().getLocalDate(),
               cost, "Sale of " + quantity + " " + part.getName() + plural);
 
-        getWarehouse().removePart(part, quantity);
+        warehouseFor(part).removePart(part, quantity);
     }
 
     /**
@@ -776,7 +798,7 @@ public record Quartermaster(Campaign campaign) {
         campaign().getFinances().credit(TransactionType.EQUIPMENT_SALE, campaign().getLocalDate(),
               cost, "Sale of " + shots + " " + ammo.getName());
 
-        getWarehouse().removeAmmo(ammo, shots);
+        warehouseFor(ammo).removeAmmo(ammo, shots);
     }
 
     /**
@@ -817,7 +839,7 @@ public record Quartermaster(Campaign campaign) {
         campaign().getFinances().credit(TransactionType.EQUIPMENT_SALE, campaign().getLocalDate(),
               cost, "Sale of " + points + " " + armor.getName());
 
-        getWarehouse().removeArmor(armor, points);
+        warehouseFor(armor).removeArmor(armor, points);
     }
 
     /**
@@ -915,19 +937,34 @@ public record Quartermaster(Campaign campaign) {
      * @return True if the part was purchased, otherwise false.
      */
     public boolean buyPart(Part part, double costMultiplier, int transitDays) {
+        return buyPart(part, costMultiplier, transitDays, null);
+    }
+
+    /**
+     * Tries to buy a part with a cost multiplier, arriving in a given number of days, delivered to a specific
+     * warehouse.
+     *
+     * @param part           The part to buy.
+     * @param costMultiplier The cost multiplier for the purchase.
+     * @param transitDays    The number of days until the new part arrives.
+     * @param target         The warehouse to deliver to, or {@code null} to use the part's own location.
+     *
+     * @return True if the part was purchased, otherwise false.
+     */
+    public boolean buyPart(Part part, double costMultiplier, int transitDays, @Nullable Warehouse target) {
         Objects.requireNonNull(part);
 
         if (getCampaignOptions().isPayForParts()) {
             Money cost = part.getActualValue().multipliedBy(costMultiplier);
             if (campaign().getFinances().debit(TransactionType.EQUIPMENT_PURCHASE,
                   campaign().getLocalDate(), cost, "Purchase of " + part.getName())) {
-                addPart(part, transitDays, true);
+                addPart(part, transitDays, true, target);
                 return true;
             } else {
                 return false;
             }
         } else {
-            addPart(part, transitDays, true);
+            addPart(part, transitDays, true, target);
             return true;
         }
     }

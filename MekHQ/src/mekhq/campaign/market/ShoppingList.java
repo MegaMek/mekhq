@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -47,6 +47,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.events.ProcurementEvent;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.location.IPlace;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
@@ -161,11 +162,37 @@ public class ShoppingList {
     }
 
     public void addShoppingItem(IAcquisitionWork newWork, int quantity, Campaign campaign) {
-        // check to see if this is already on the shopping list. If so, then add
+        addShoppingItem(newWork, quantity, campaign, null);
+    }
+
+    /** The place an existing order resolves to (a base for a base order), or {@code null} for the main force. */
+    private static @Nullable IPlace orderPlace(IAcquisitionWork shoppingItem) {
+        return (shoppingItem instanceof Part part) ? part.getPlace() : null;
+    }
+
+    /**
+     * Adds an item to the shopping list, destined for a specific {@link IPlace}.
+     *
+     * <p>A non-main-force {@code place} anchors the order's location node to that place, so it (and the part
+     * eventually delivered from it) resolves to that base's warehouse. Orders bound for different places are kept as
+     * separate line items even when they are the same equipment.</p>
+     *
+     * @param place the destination; {@code null} or the campaign itself means the main force
+     */
+    public void addShoppingItem(IAcquisitionWork newWork, int quantity, Campaign campaign, @Nullable IPlace place) {
+        // The main force leaves orders unanchored (their part resolves to the campaign warehouse); a base anchors the
+        // order at that base so it resolves to the base warehouse.
+        IPlace destination = (place instanceof Campaign) ? null : place;
+        if (destination != null) {
+            newWork.setParent(destination);
+        }
+
+        // check to see if this is already on the shopping list for the same destination. If so, then add
         // quantity to the list
         // and return
         for (IAcquisitionWork shoppingItem : getShoppingList()) {
-            if (isSameEquipment(shoppingItem.getNewEquipment(), newWork.getNewEquipment())) {
+            if (isSameEquipment(shoppingItem.getNewEquipment(), newWork.getNewEquipment())
+                      && orderPlace(shoppingItem) == destination) {
                 campaign.addReport(ACQUISITIONS, newWork.getShoppingListReport(quantity));
                 while (quantity > 0) {
                     shoppingItem.incrementQuantity();
