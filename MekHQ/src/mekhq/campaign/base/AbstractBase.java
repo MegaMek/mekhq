@@ -46,6 +46,7 @@ import mekhq.campaign.Warehouse;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationNode;
+import mekhq.campaign.market.RequestedStockLevels;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 
@@ -67,6 +68,7 @@ public abstract class AbstractBase implements IPlace {
     private final Personnel basePersonnel = new Personnel();
     private final Warehouse baseWarehouse = new Warehouse();
     private final Hangar baseHangar = new Hangar();
+    private final RequestedStockLevels baseRequestedStockLevels = new RequestedStockLevels();
 
     /**
      * Creates a new base anchored under {@code parentLocation}.
@@ -130,6 +132,11 @@ public abstract class AbstractBase implements IPlace {
         return basePersonnel;
     }
 
+    @Override
+    public RequestedStockLevels getRequestedStockLevels() {
+        return baseRequestedStockLevels;
+    }
+
     public UUID getId() {
         return id;
     }
@@ -178,6 +185,9 @@ public abstract class AbstractBase implements IPlace {
         if (planetId != null) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetId", planetId);
         }
+        if (!baseRequestedStockLevels.isEmpty()) {
+            baseRequestedStockLevels.writeToXML(pw, indent);
+        }
     }
 
     /**
@@ -207,6 +217,11 @@ public abstract class AbstractBase implements IPlace {
             }
             case "planetid" -> {
                 base.planetId = wn2.getTextContent().trim();
+                return true;
+            }
+            case "partinusemap" -> {
+                base.baseRequestedStockLevels.getStockMap()
+                      .putAll(RequestedStockLevels.generateInstanceFromXML(wn2).getStockMap());
                 return true;
             }
             default -> {

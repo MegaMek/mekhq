@@ -116,7 +116,7 @@ import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationType;
-import mekhq.campaign.location.ILocation;
+import mekhq.campaign.location.ILocatable;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.log.AssignmentLogger;
@@ -169,7 +169,7 @@ import org.w3c.dom.NodeList;
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
-public class Unit implements ITechnology, ILocation {
+public class Unit implements ITechnology, ILocatable {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Unit";
     private static final MMLogger LOGGER = MMLogger.create(Unit.class);
 
@@ -1203,6 +1203,12 @@ public class Unit implements ITechnology, ILocation {
 
     public boolean isDeployed() {
         return scenarioId != -1;
+    }
+
+    @Override
+    public boolean canBeManuallyDispatched() {
+        // A deployed unit is committed to a scenario, and a unit still in transit from a purchase hasn't arrived yet.
+        return isPresent() && !isDeployed();
     }
 
     public void undeploy() {
@@ -4761,6 +4767,8 @@ public class Unit implements ITechnology, ILocation {
             return MekHQ.getMHQOptions().getDeployedForeground();
         } else if (!isPresent()) {
             return MekHQ.getMHQOptions().getInTransitForeground();
+        } else if (isQueuedForTravel(getCampaign().getCampaignLocationManager())) {
+            return MekHQ.getMHQOptions().getQueuedForTravelForeground();
         } else if (isRefitting()) {
             return MekHQ.getMHQOptions().getRefittingForeground();
         } else if (isMothballing()) {
@@ -4787,6 +4795,8 @@ public class Unit implements ITechnology, ILocation {
             return MekHQ.getMHQOptions().getDeployedBackground();
         } else if (!isPresent()) {
             return MekHQ.getMHQOptions().getInTransitBackground();
+        } else if (isQueuedForTravel(getCampaign().getCampaignLocationManager())) {
+            return MekHQ.getMHQOptions().getQueuedForTravelBackground();
         } else if (isRefitting()) {
             return MekHQ.getMHQOptions().getRefittingBackground();
         } else if (isMothballing()) {
@@ -4822,6 +4832,9 @@ public class Unit implements ITechnology, ILocation {
         }
         if (!isPresent()) {
             reasons.add("colorReason.unit.inTransit");
+        }
+        if (isQueuedForTravel(getCampaign().getCampaignLocationManager())) {
+            reasons.add("colorReason.unit.queuedForTravel");
         }
         if (isRefitting()) {
             reasons.add("colorReason.unit.refitting");

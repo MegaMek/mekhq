@@ -43,6 +43,7 @@ import mekhq.campaign.Hangar;
 import mekhq.campaign.Personnel;
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.market.RequestedStockLevels;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
@@ -99,6 +100,17 @@ public interface IPlace extends ILocation {
     @Nullable
     default Personnel getPersonnel() {
         return null;
+    }
+
+    /**
+     * Returns the per-part "requested stock percent" targets this place maintains for its warehouse.
+     *
+     * <p>Only {@link mekhq.campaign.Campaign} (main force) and {@link mekhq.campaign.base.AbstractBase} own real stock
+     * levels; every other place inherits the empty {@link RequestedStockLevels#NO_RESTOCK}, so its parts fall through to
+     * default stock percentages.</p>
+     */
+    default RequestedStockLevels getRequestedStockLevels() {
+        return RequestedStockLevels.NO_RESTOCK;
     }
 
     /**

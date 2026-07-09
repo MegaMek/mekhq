@@ -1,0 +1,11 @@
+# MegaMek Data (C) 2025 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# Test fixture: civil war - the same faction listed twice makes it its own enemy.
+
+wars:
+  - name: Test Civil War
+    start: 3060-01-01
+    end: 3060-12-31
+    parties:
+      - factions: [CC, CC]

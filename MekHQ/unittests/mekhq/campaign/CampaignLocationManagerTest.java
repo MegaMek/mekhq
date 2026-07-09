@@ -34,6 +34,7 @@ package mekhq.campaign;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
@@ -47,9 +48,13 @@ import java.util.Set;
 import java.util.UUID;
 
 import mekhq.MekHQ;
+import mekhq.campaign.events.parts.PartChangedEvent;
+import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationDispatch;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -133,6 +138,39 @@ class CampaignLocationManagerTest {
             dispatch.verify(() -> LocationDispatch.dispatchTravelers(List.of(unit), firstDestination, campaign),
                   never());
         }
+    }
+
+    @Test
+    void queueTravel_firesChangedEventPerTravelerType() {
+        CampaignLocationManager manager = new CampaignLocationManager();
+        ILocation destination = mock(ILocation.class);
+        Unit unit = mock(Unit.class);
+        Person person = mock(Person.class);
+        Part part = mock(Part.class);
+
+        try (MockedStatic<MekHQ> mekhq = mockStatic(MekHQ.class)) {
+            manager.queueTravel(List.of(unit, person, part), destination);
+
+            mekhq.verify(() -> MekHQ.triggerEvent(argThat(
+                  event -> event instanceof UnitChangedEvent changed && changed.getUnit() == unit)));
+            mekhq.verify(() -> MekHQ.triggerEvent(argThat(
+                  event -> event instanceof PersonChangedEvent changed && changed.getPerson() == person)));
+            mekhq.verify(() -> MekHQ.triggerEvent(argThat(
+                  event -> event instanceof PartChangedEvent changed && changed.getPart() == part)));
+        }
+    }
+
+    @Test
+    void getQueuedDestination_returnsDestinationWhenQueuedElseNull() {
+        CampaignLocationManager manager = new CampaignLocationManager();
+        ILocation destination = mock(ILocation.class);
+        Unit queuedUnit = mock(Unit.class);
+        Unit unqueuedUnit = mock(Unit.class);
+
+        manager.queueTravel(List.of(queuedUnit), destination);
+
+        assertEquals(destination, manager.getQueuedDestination(queuedUnit));
+        assertNull(manager.getQueuedDestination(unqueuedUnit));
     }
 
     @Test

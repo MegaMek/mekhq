@@ -294,7 +294,8 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     public String find(int transitDays, double valueMultiplier) {
         AmmoStorage newPart = getNewPart();
         newPart.setBrandNew(true);
-        if (campaign.getQuartermaster().buyPart(newPart, valueMultiplier, transitDays)) {
+        // Deliver to this order's own warehouse (a base warehouse for a base order, else the campaign warehouse).
+        if (campaign.getQuartermaster().buyPart(newPart, valueMultiplier, transitDays, getWarehouse())) {
             return "<font color='" + ReportingUtilities.getPositiveColor()
                          + "'><b> part found</b>.</font> It will be delivered in " + transitDays + " days.";
         } else {

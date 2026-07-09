@@ -177,6 +177,7 @@ import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.market.PartsStore;
 import mekhq.campaign.market.PersonnelMarket;
+import mekhq.campaign.market.RequestedStockLevels;
 import mekhq.campaign.market.ShoppingList;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
@@ -307,10 +308,9 @@ public class Campaign implements ITechManager, IPlace {
     private final TreeMap<Integer, Scenario> scenarios = new TreeMap<>();
     private final Map<UUID, List<Kill>> kills = new HashMap<>();
 
-    // This maps PartInUse ToString() results to doubles, representing a mapping
-    // of parts in use to their requested stock percentages to make these values
-    // persistent
-    private Map<String, Double> partsInUseRequestedStockMap = new LinkedHashMap<>();
+    // The main force's per-part requested stock percentages. Each player base owns its own instance; see
+    // IPlace.getRequestedStockLevels().
+    private final RequestedStockLevels requestedStockLevels = new RequestedStockLevels();
 
     private transient final UnitNameTracker unitNameTracker = new UnitNameTracker();
 
@@ -8757,13 +8757,20 @@ public class Campaign implements ITechManager, IPlace {
         this.processProcurement = processProcurement;
     }
 
+    @Override
+    public RequestedStockLevels getRequestedStockLevels() {
+        return requestedStockLevels;
+    }
+
     // Simple getters and setters for our stock map
     public Map<String, Double> getPartsInUseRequestedStockMap() {
-        return partsInUseRequestedStockMap;
+        return requestedStockLevels.getStockMap();
     }
 
     public void setPartsInUseRequestedStockMap(Map<String, Double> partsInUseRequestedStockMap) {
-        this.partsInUseRequestedStockMap = partsInUseRequestedStockMap;
+        Map<String, Double> stockMap = requestedStockLevels.getStockMap();
+        stockMap.clear();
+        stockMap.putAll(partsInUseRequestedStockMap);
     }
 
     public boolean getIgnoreMothballed() {
@@ -8794,25 +8801,14 @@ public class Campaign implements ITechManager, IPlace {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ignoreMothBalled", ignoreMothballed);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "topUpWeekly", topUpWeekly);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ignoreSparesUnderQuality", ignoreSparesUnderQuality.name());
-        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "partInUseMap");
-        writePartInUseMapToXML(pw, indent);
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "partInUseMap");
-    }
-
-    public void writePartInUseMapToXML(final PrintWriter pw, int indent) {
-        for (String key : partsInUseRequestedStockMap.keySet()) {
-            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "partInUseMapEntry");
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "partInUseMapKey", key);
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "partInUseMapVal", partsInUseRequestedStockMap.get(key));
-            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "partInUseMapEntry");
-        }
+        requestedStockLevels.writeToXML(pw, indent);
     }
 
     /**
      * Wipes the Parts in use map for the purpose of resetting all values to their default
      */
     public void wipePartsInUseMap() {
-        this.partsInUseRequestedStockMap.clear();
+        this.requestedStockLevels.clear();
     }
 
     /** Discriminator identifying the main campaign as a serialized {@link ILocation} reference. */

@@ -37,6 +37,7 @@ import static mekhq.campaign.mission.resupplyAndCaches.Resupply.isProhibitedUnit
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import megamek.common.equipment.EquipmentType;
@@ -47,7 +48,9 @@ import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Quartermaster;
 import mekhq.campaign.Warehouse;
+import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.location.IPlace;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.EnginePart;
@@ -93,6 +96,7 @@ import mekhq.campaign.work.IAcquisitionWork;
  */
 public class PartsInUseManager {
     private final Campaign campaign;
+    private final IPlace place;
     private final CampaignOptions campaignOptions;
     private final Warehouse warehouse;
     private final ShoppingList shoppingList;
@@ -100,17 +104,58 @@ public class PartsInUseManager {
     private final Map<String, Double> partsInUseRequestedStockMap;
 
     /**
-     * Creates a new {@link PartsInUseManager} manager for the specified campaign.
+     * Creates a new {@link PartsInUseManager} for the campaign's main force.
      *
      * @param campaign the {@link Campaign} to manage parts for
      */
     public PartsInUseManager(Campaign campaign) {
+        this(campaign, campaign);
+    }
+
+    /**
+     * Creates a new {@link PartsInUseManager} scoped to a specific location.
+     *
+     * <p>The parts, spares, and requested stock levels are all drawn from {@code place}: the campaign for the main
+     * force, or a base for that base's warehouse. The shopping list and quartermaster remain campaign-level.</p>
+     *
+     * @param campaign the owning {@link Campaign}
+     * @param place    the {@link IPlace} whose warehouse and stock levels this manager operates on
+     */
+    public PartsInUseManager(Campaign campaign, IPlace place) {
         this.campaign = campaign;
+        this.place = place;
         this.campaignOptions = campaign.getCampaignOptions();
-        this.warehouse = campaign.getWarehouse();
+        Warehouse placeWarehouse = place.getWarehouse();
+        this.warehouse = (placeWarehouse != null) ? placeWarehouse : campaign.getWarehouse();
         this.shoppingList = campaign.getShoppingList();
         this.quartermaster = campaign.getQuartermaster();
-        this.partsInUseRequestedStockMap = campaign.getPartsInUseRequestedStockMap();
+        this.partsInUseRequestedStockMap = place.getRequestedStockLevels().getStockMap();
+    }
+
+    /** The place a part is located at — its unit's location for installed parts, its warehouse for spares. */
+    private IPlace placeOf(Part part) {
+        IPlace partPlace = part.getPlace();
+        return (partPlace != null) ? partPlace : campaign;
+    }
+
+    /**
+     * Applies {@code consumer} to every part, across the main-force and all base warehouses, whose location resolves to
+     * this manager's {@code place}. Attributing each part by {@link Part#getPlace()} scopes the report to the selected
+     * location regardless of which warehouse map physically holds the part (installed parts follow their unit's base).
+     */
+    private void forEachPartAtPlace(Consumer<Part> consumer) {
+        campaign.getWarehouse().forEachPart(part -> {
+            if (placeOf(part) == place) {
+                consumer.accept(part);
+            }
+        });
+        for (PlayerBase base : campaign.getCampaignLocationManager().getPlayerBases()) {
+            base.getBaseWarehouse().forEachPart(part -> {
+                if (placeOf(part) == place) {
+                    consumer.accept(part);
+                }
+            });
+        }
     }
 
     /**
@@ -296,13 +341,16 @@ public class PartsInUseManager {
         partInUse.setStoreCount(0);
         partInUse.setTransferCount(0);
         partInUse.setPlannedCount(0);
-        warehouse.forEachPart(incomingPart -> {
+        forEachPartAtPlace(incomingPart -> {
             PartInUse newPartInUse = getPartInUse(incomingPart);
             if (partInUse.equals(newPartInUse)) {
                 updatePartInUseData(partInUse, incomingPart, ignoreMothballedUnits, ignoreSparesUnderQuality);
             }
         });
         for (IAcquisitionWork maybePart : shoppingList.getPartList()) {
+            if (placeOf((Part) maybePart) != place) {
+                continue;
+            }
             PartInUse newPartInUse = getPartInUse((Part) maybePart);
             if (partInUse.equals(newPartInUse)) {
                 Part newPart = (maybePart instanceof MissingPart)
@@ -347,7 +395,7 @@ public class PartsInUseManager {
         // java.util.Set doesn't supply a get(Object) method, so we have to use a
         // java.util.Map
         Map<PartInUse, PartInUse> inUse = new HashMap<>();
-        warehouse.forEachPart(incomingPart -> {
+        forEachPartAtPlace(incomingPart -> {
             if (isResupply) {
                 Unit unit = incomingPart.getUnit();
 
@@ -385,6 +433,9 @@ public class PartsInUseManager {
 
         for (IAcquisitionWork maybePart : shoppingList.getPartList()) {
             if (!(maybePart instanceof Part)) {
+                continue;
+            }
+            if (placeOf((Part) maybePart) != place) {
                 continue;
             }
             PartInUse partInUse = getPartInUse((Part) maybePart);
@@ -436,7 +487,7 @@ public class PartsInUseManager {
             int toBuy = findStockUpAmount(partInUse);
             if (toBuy > 0) {
                 IAcquisitionWork partToBuy = partInUse.getPartToBuy();
-                shoppingList.addShoppingItem(partToBuy, toBuy, campaign);
+                shoppingList.addShoppingItem(partToBuy, toBuy, campaign, place);
                 bought += 1;
             }
         }
@@ -459,7 +510,7 @@ public class PartsInUseManager {
             int toBuy = findStockUpAmount(partInUse);
             while (toBuy > 0) {
                 IAcquisitionWork partToBuy = partInUse.getPartToBuy();
-                quartermaster.addPart((Part) partToBuy.getNewEquipment(), 0, true);
+                quartermaster.addPart((Part) partToBuy.getNewEquipment(), 0, true, warehouse);
                 --toBuy;
             }
         }

@@ -32,6 +32,7 @@
  */
 package mekhq.gui.dialog.camOpsSalvage;
 
+import static java.lang.Math.round;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -119,6 +120,8 @@ public class SalvagePostScenarioPicker {
 
     private final static int PADDING = scaleForGUI(10);
     private final static Dimension DEFAULT_SIZE = scaleForGUI(1200, 600);
+
+    private final static int UNKNOWN_UNIT_WEIGHT = -1;
 
     private final boolean isInSpace;
     private int maximumSalvageTime = 0;
@@ -608,9 +611,13 @@ public class SalvagePostScenarioPicker {
             rowPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
             rowPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, scaleForGUI(60)));
 
+            int unitWeight = getUnitWeight(unit);
+            String unitWeightString = unitWeight == UNKNOWN_UNIT_WEIGHT ? "?" : String.valueOf(unitWeight);
+            int plural = unitWeight == 0 ? 0 : 1;
+
             JLabel unitLabel = new JLabel();
             unitLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.unitLabel.unit",
-                  unitName, sellValue.toAmountString()));
+                  unitName, sellValue.toAmountString(), unitWeightString, plural));
 
             RecoveryTimeData data = recoveryTimeData.get(unit.getId());
             if (data != null) {
@@ -720,6 +727,16 @@ public class SalvagePostScenarioPicker {
         dialog.setVisible(true);
 
         return confirmed[0] ? resultHolder.groups : null;
+    }
+
+    private static int getUnitWeight(TestUnit unit) {
+        Entity entity = unit.getEntity();
+        int unitWeight = UNKNOWN_UNIT_WEIGHT;
+        if (entity != null) {
+            unitWeight = (int) round(entity.getWeight());
+        }
+
+        return unitWeight;
     }
 
     private static void confirmationAction(Campaign campaign, JDialog dialog, boolean[] confirmed,

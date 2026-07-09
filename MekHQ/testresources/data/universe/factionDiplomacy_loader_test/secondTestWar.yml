@@ -1,0 +1,12 @@
+# MegaMek Data (C) 2025 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# Test fixture: a second FS-CC war in a different file and date range than the one in
+# conflicts.yml, proving entries for the same faction pair merge across files.
+
+wars:
+  - name: Later Test War
+    start: 3090-01-01
+    end: 3091-12-31
+    parties:
+      - factions: [FS, CC]

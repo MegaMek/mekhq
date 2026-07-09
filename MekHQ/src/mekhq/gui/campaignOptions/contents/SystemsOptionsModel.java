@@ -34,7 +34,6 @@ package mekhq.gui.campaignOptions.contents;
 
 import jakarta.annotation.Nonnull;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 
 class SystemsOptionsModel {
     int manualUnitRatingModifier;
@@ -56,17 +55,8 @@ class SystemsOptionsModel {
     boolean useFactionStandingUnitMarket;
     boolean useFactionStandingContractPay;
     boolean useFactionStandingSupportPoints;
-    boolean useAttributes;
-    boolean randomizeAttributes;
-    boolean displayAllAttributes;
-    boolean useAgeEffects;
-    boolean randomizeTraits;
-    boolean allowMonthlyReinvestment;
-    boolean allowMonthlyConnections;
-    boolean useBetterExtraIncome;
-    boolean useSmallArmsOnly;
 
-    SystemsOptionsModel(@Nonnull CampaignOptions options, @Nonnull RandomSkillPreferences skillPreferences) {
+    SystemsOptionsModel(@Nonnull CampaignOptions options) {
         manualUnitRatingModifier = options.getManualUnitRatingModifier();
         resetCriminalRecord = false;
         requireSupportForceTransportation = options.isRequireSupportForceTransportation();
@@ -86,18 +76,9 @@ class SystemsOptionsModel {
         useFactionStandingUnitMarket = options.isUseFactionStandingUnitMarket();
         useFactionStandingContractPay = options.isUseFactionStandingContractPay();
         useFactionStandingSupportPoints = options.isUseFactionStandingSupportPoints();
-        useAttributes = skillPreferences.isUseAttributes();
-        randomizeAttributes = skillPreferences.isRandomizeAttributes();
-        displayAllAttributes = options.isDisplayAllAttributes();
-        useAgeEffects = options.isUseAgeEffects();
-        randomizeTraits = skillPreferences.isRandomizeTraits();
-        allowMonthlyReinvestment = options.isAllowMonthlyReinvestment();
-        allowMonthlyConnections = options.isAllowMonthlyConnections();
-        useBetterExtraIncome = options.isUseBetterExtraIncome();
-        useSmallArmsOnly = options.isUseSmallArmsOnly();
     }
 
-    void applyTo(@Nonnull CampaignOptions options, @Nonnull RandomSkillPreferences skillPreferences) {
+    void applyTo(@Nonnull CampaignOptions options) {
         options.setManualUnitRatingModifier(manualUnitRatingModifier);
         options.setRequireSupportForceTransportation(requireSupportForceTransportation);
         options.setClampReputationPayMultiplier(clampReputationPayMultiplier);
@@ -116,14 +97,5 @@ class SystemsOptionsModel {
         options.setUseFactionStandingUnitMarket(useFactionStandingUnitMarket);
         options.setUseFactionStandingContractPay(useFactionStandingContractPay);
         options.setUseFactionStandingSupportPoints(useFactionStandingSupportPoints);
-        skillPreferences.setUseAttributes(useAttributes);
-        skillPreferences.setRandomizeAttributes(randomizeAttributes);
-        options.setDisplayAllAttributes(displayAllAttributes);
-        options.setUseAgeEffects(useAgeEffects);
-        skillPreferences.setRandomizeTraits(randomizeTraits);
-        options.setAllowMonthlyReinvestment(allowMonthlyReinvestment);
-        options.setAllowMonthlyConnections(allowMonthlyConnections);
-        options.setUseBetterExtraIncome(useBetterExtraIncome);
-        options.setUseSmallArmsOnly(useSmallArmsOnly);
     }
 }

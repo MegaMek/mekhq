@@ -116,6 +116,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.location.AcademyCampusLocation;
+import mekhq.campaign.location.ILocatable;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.log.LogEntry;
@@ -176,7 +177,7 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  * @author Justin "Windchild" Bowen
  */
-public class Person implements ILocation {
+public class Person implements ILocatable {
     // region Variable Declarations
     public static final Map<Integer, Money> MEKWARRIOR_AERO_RANSOM_VALUES;
     public static final Map<Integer, Money> OTHER_RANSOM_VALUES;
@@ -2612,7 +2613,8 @@ public class Person implements ILocation {
 
         boolean isIgnoreSPAEligibility = !campaignOptions.isAwardRelevantVeterancySPAs();
         SingleSpecialAbilityGenerator singleSpecialAbilityGenerator = new SingleSpecialAbilityGenerator();
-        String spaGained = singleSpecialAbilityGenerator.rollSPA(campaign, this, true, isIgnoreSPAEligibility, true);
+        String spaGained = singleSpecialAbilityGenerator.rollSPA(campaign, this, true, isIgnoreSPAEligibility, true,
+              false);
         if (spaGained == null) {
             return;
         } else {
@@ -2716,6 +2718,12 @@ public class Person implements ILocation {
 
     public boolean isDeployed() {
         return (getUnit() != null) && (getUnit().getScenarioId() != -1);
+    }
+
+    @Override
+    public boolean canBeManuallyDispatched() {
+        // A deployed person is committed to a scenario, and a student is tied to their academy campus.
+        return !isDeployed() && !getStatus().isStudent();
     }
 
     public String getBiography() {
@@ -9457,7 +9465,7 @@ public class Person implements ILocation {
     @Override
     public boolean setParent(ILocation parent) {
         ILocation oldParent = getParentLocation();
-        if (ILocation.super.setParent(parent)) {
+        if (ILocatable.super.setParent(parent)) {
             if (oldParent instanceof Personnel personnel) {
                 personnel.remove(getId());
             }

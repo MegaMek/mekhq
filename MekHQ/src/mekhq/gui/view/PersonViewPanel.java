@@ -196,7 +196,18 @@ public class PersonViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(pnlInfo, gridBagConstraints);
 
-        int gridY = 1;
+        LocationSummaryPanel pnlLocation = new LocationSummaryPanel(person, campaign);
+        GridBagConstraints locationConstraints = new GridBagConstraints();
+        locationConstraints.gridx = 0;
+        locationConstraints.gridy = 1;
+        locationConstraints.gridwidth = 2;
+        locationConstraints.weightx = 1.0;
+        locationConstraints.insets = new Insets(0, 5, 10, 10);
+        locationConstraints.fill = GridBagConstraints.HORIZONTAL;
+        locationConstraints.anchor = GridBagConstraints.NORTHWEST;
+        add(pnlLocation, locationConstraints);
+
+        int gridY = 2;
 
         EnhancedTabbedPane tabbedPane = new EnhancedTabbedPane();
         GridBagConstraints tabbedPaneConstraints = new GridBagConstraints();

@@ -1,0 +1,11 @@
+# MegaMek Data (C) 2025 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# Test fixture: the ZZZ code does not exist; the remaining valid pair must still load.
+
+wars:
+  - name: Invalid Code War
+    start: 3050-01-01
+    end: 3052-12-31
+    parties:
+      - factions: [CSJ, ZZZ, CGB]

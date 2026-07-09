@@ -40,6 +40,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.location.ILocatable;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationUtils;
 import mekhq.gui.baseComponents.JScrollableMenu;
@@ -65,33 +66,49 @@ public class LocationMenu extends JScrollableMenu {
     /**
      * @param campaign the active campaign
      * @param frame    parent frame for any dialogs
-     * @param items    the {@link ILocation} objects to act on (persons, units, or parts)
+     * @param items    the {@link ILocatable} objects to act on (persons, units, or parts)
      */
-    public LocationMenu(Campaign campaign, JFrame frame, List<? extends ILocation> items) {
+    public LocationMenu(Campaign campaign, JFrame frame, List<? extends ILocatable> items) {
         super("LocationMenu");
         initialize(campaign, frame, items);
     }
 
-    private void initialize(Campaign campaign, JFrame frame, List<? extends ILocation> items) {
+    private void initialize(Campaign campaign, JFrame frame, List<? extends ILocatable> items) {
         if (items.isEmpty()) {
             return;
         }
 
         setText(getTextAt(RESOURCE_BUNDLE, "menu.location.text"));
 
-        add(new SendToLocationMenu(campaign, frame, items,
-              destination -> campaign.getCampaignLocationManager().queueTravel(items, destination)));
+        // Disable dispatch unless every selected item is free to move — a deployed unit/person, a student,
+        // a reserved part, or an item still in transit from a purchase cannot be manually dispatched.
+        boolean canDispatch = items.stream().allMatch(ILocatable::canBeManuallyDispatched);
+
+        SendToLocationMenu sendTo = new SendToLocationMenu(campaign, frame, items,
+              destination -> campaign.getCampaignLocationManager().queueTravel(items, destination));
+        sendTo.setEnabled(canDispatch);
+        add(sendTo);
+
+        // Track whether any child entry is actionable; if none are, the whole Location menu is disabled below.
+        boolean anyEnabled = canDispatch;
 
         if (campaign.isGM()) {
-            add(new SendToLocationMenu(campaign, frame, items,
+            SendToLocationMenu teleportTo = new SendToLocationMenu(campaign, frame, items,
                   destination -> campaign.getCampaignLocationManager().gmTeleport(campaign, items, destination),
-                  "menu.teleportTo.text"));
+                  "menu.teleportTo.text");
+            teleportTo.setEnabled(canDispatch);
+            add(teleportTo);
 
+            boolean canCompleteTravel = anyTravelingOrQueued(campaign, items);
             JMenuItem completeTravel = new JMenuItem(completeTravelLabel(campaign, items));
-            completeTravel.setEnabled(anyTravelingOrQueued(campaign, items));
+            completeTravel.setEnabled(canCompleteTravel);
             completeTravel.addActionListener(e -> campaign.getCampaignLocationManager().gmCompleteTravel(campaign, items));
             add(completeTravel);
+
+            anyEnabled |= canCompleteTravel;
         }
+
+        setEnabled(anyEnabled);
     }
 
     /**

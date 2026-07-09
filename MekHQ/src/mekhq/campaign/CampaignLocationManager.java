@@ -154,6 +154,7 @@ public class CampaignLocationManager {
             removeExistingPendingTravel(traveler);
             TravelRoute route = new TravelRoute(traveler.getCurrentLocation(), destination);
             pendingTravel.computeIfAbsent(route, key -> new ArrayList<>()).add(traveler);
+            fireLocationChanged(traveler);
         }
     }
 
@@ -190,6 +191,20 @@ public class CampaignLocationManager {
             }
         }
         return false;
+    }
+
+    /**
+     * Returns the destination {@code traveler} is queued to depart for, or {@code null} if it is not queued. Unlike
+     * {@link #removeFromPendingTravel}, this leaves the queue untouched. A queued traveler still sits at its origin; it
+     * has not begun moving toward this destination.
+     */
+    public @Nullable ILocation getQueuedDestination(ILocation traveler) {
+        for (Map.Entry<TravelRoute, List<ILocation>> entry : pendingTravel.entrySet()) {
+            if (containsByIdentity(entry.getValue(), traveler)) {
+                return entry.getKey().destination();
+            }
+        }
+        return null;
     }
 
     /**
@@ -286,9 +301,10 @@ public class CampaignLocationManager {
     }
 
     /**
-     * Fires the type-specific "changed" event for {@code item} so the personnel, hangar, and warehouse tables refresh
-     * their location columns immediately after a GM travel override. Items that are not a {@link Person}, {@link Unit},
-     * or {@link Part} have no such table and are ignored.
+     * Fires the type-specific "changed" event for {@code item} so the personnel, hangar, and warehouse tables and detail
+     * panels refresh their location display immediately after its travel state changes (queued for travel, or a GM
+     * travel override). Items that are not a {@link Person}, {@link Unit}, or {@link Part} have no such view and are
+     * ignored.
      */
     private static void fireLocationChanged(ILocation item) {
         switch (item) {

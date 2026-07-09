@@ -43,6 +43,9 @@ import javax.swing.JPanel;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
@@ -50,72 +53,86 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
 
 /**
- * The {@code ATimeOfWarPage} class builds and manages the A Time of War leaf page of the Campaign Options dialog. It
- * owns the widgets for ATOW configuration - the attribute, trait, age-effect, and related campaign-mechanic toggles -
- * and synchronises them with a shared {@link SystemsOptionsModel}.
+ * The {@code AttributesAndTraitsPage} class builds and manages the Attributes &amp; Traits leaf page of the Campaign
+ * Options dialog, found under Advancement &rarr; Skills. It owns the widgets for the <i>A Time of War</i>
+ * character-generation and skill rules - the attribute, trait, age-effect, and infantry-skill toggles - and
+ * synchronises them with an {@link AttributesAndTraitsOptionsModel}.
  *
- * <p>This view is a sub-component of {@link SystemsPages}: the model snapshot and the overall load/apply lifecycle still
- * live on {@code SystemsPages}, while this class is responsible only for constructing the A Time of War panel and
- * copying ATOW values to and from the model. The page is built lazily; until {@link #createPanel(SystemsOptionsModel)}
- * is called, {@link #readFromModel(SystemsOptionsModel)} and {@link #writeToModel(SystemsOptionsModel)} are no-ops.</p>
+ * <p>These options previously lived on the Operations &rarr; Systems &rarr; A Time of War page. They were relocated here
+ * (issue #9560) so that the personnel- and skill-oriented settings sit beside their peers instead of under Operations.
+ * The trait-driven income toggles that used to share that page moved to Operations &rarr; Finances instead.</p>
+ *
+ * <p>Unlike the leaf pages that are driven by a shared coordinator, this page is self-contained: it owns its model and
+ * exposes the load/apply lifecycle directly to {@code CampaignOptionsPane}. The page is built lazily; until
+ * {@link #createPage()} is called, {@code readFromModel} and {@code writeToModel} are no-ops.</p>
  */
-class ATimeOfWarPage {
+public class AttributesAndTraitsPage {
     private static final int FORM_LABEL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_LABEL_WIDTH;
     private static final int FORM_CONTROL_COLUMN_WIDTH = CampaignOptionsFormPanel.DEFAULT_CONTROL_WIDTH;
     private static final int CHECKBOX_GRID_COLUMNS = 2;
 
-    private CampaignOptionsHeaderPanel atowHeader;
+    private final CampaignOptions campaignOptions;
+    private final RandomSkillPreferences randomSkillPreferences;
+    private AttributesAndTraitsOptionsModel model;
+
+    private CampaignOptionsHeaderPanel header;
 
     private JCheckBox chkUseAttributes;
     private JCheckBox chkRandomizeAttributes;
     private JCheckBox chkDisplayAllAttributes;
     private JCheckBox chkUseAgeEffects;
     private JCheckBox chkRandomizeTraits;
-    private JCheckBox chkAllowMonthlyReinvestment;
-    private JCheckBox chkAllowMonthlyConnections;
-    private JCheckBox chkUseBetterExtraIncome;
     private JCheckBox chkUseSmallArmsOnly;
 
     private boolean created;
 
     /**
-     * Creates the ATOW page panel, containing grouped UI elements for configuring ATOW-related options and its header.
+     * Constructs a new {@code AttributesAndTraitsPage} for the specified campaign.
      *
-     * @param model the shared systems options model to populate the freshly built controls from
-     *
-     * @return a {@link JPanel} component representing the entire ATOW page UI
+     * @param campaign the campaign whose options and random skill preferences back this page
      */
-    @Nonnull JPanel createPanel(@Nullable SystemsOptionsModel model) {
+    public AttributesAndTraitsPage(@Nonnull Campaign campaign) {
+        this.campaignOptions = campaign.getCampaignOptions();
+        this.randomSkillPreferences = campaign.getRandomSkillPreferences();
+        loadValuesFromCampaignOptions();
+    }
+
+    /**
+     * Creates the Attributes &amp; Traits page panel, containing the grouped attribute, trait, age-effect, and
+     * infantry-skill toggles and its header.
+     *
+     * @return a {@link JPanel} component representing the entire Attributes &amp; Traits page UI
+     */
+    public @Nonnull JPanel createPage() {
         // Header
         String imageAddress = getImageDirectory() + "logo_elysian_fields.png";
-        atowHeader = new CampaignOptionsHeaderPanel("ATimeOfWarPage", imageAddress);
+        header = new CampaignOptionsHeaderPanel("AttributesAndTraitsPage", imageAddress);
 
         // Contents
-        JPanel pnlATOWAttributes = createATOWAttributesPanel();
+        JPanel pnlAttributesAndTraits = createAttributesAndTraitsPanel();
 
         // Layout the Panel
-        final JPanel panel = CampaignOptionsPagePanel.builder("ATimeOfWarPage", "ATimeOfWarPage", imageAddress)
-                .header(atowHeader)
-                .quote("atowPage")
-                .section("lblATOWAttributesPanel.text",
-                        "lblATOWAttributesPanel.summary",
-                        pnlATOWAttributes)
+        final JPanel panel = CampaignOptionsPagePanel.builder("AttributesAndTraitsPage", "AttributesAndTraitsPage",
+                        imageAddress)
+                .header(header)
+                .quote("attributesAndTraitsPage")
+                .section("lblAttributesAndTraitsSection.text",
+                        "lblAttributesAndTraitsSection.summary",
+                        pnlAttributesAndTraits)
                 .build();
 
         created = true;
-        readFromModel(model);
+        readFromModel();
 
         return panel;
     }
 
     /**
-     * Creates and returns the ATOW panel, which allows users to configure settings for attribute and traits
-     * probabilities.
+     * Creates and returns the panel holding the attribute, trait, age-effect, and infantry-skill toggles.
      *
-     * @return A {@code JPanel} containing configuration options for phenotype probabilities.
+     * @return a {@link JPanel} containing the configuration options
      */
-    private @Nonnull JPanel createATOWAttributesPanel() {
-        // Contents
+    private @Nonnull JPanel createAttributesAndTraitsPanel() {
         chkUseAttributes = new CampaignOptionsCheckBox("UseAttributes",
                 getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         chkUseAttributes.addMouseListener(createTipPanelUpdater("UseAttributes"));
@@ -130,19 +147,11 @@ class ATimeOfWarPage {
         chkUseAgeEffects.addMouseListener(createTipPanelUpdater("UseAgeEffects"));
         chkRandomizeTraits = new CampaignOptionsCheckBox("RandomizeTraits");
         chkRandomizeTraits.addMouseListener(createTipPanelUpdater("RandomizeTraits"));
-        chkAllowMonthlyReinvestment = new CampaignOptionsCheckBox("AllowMonthlyReinvestment");
-        chkAllowMonthlyReinvestment.addMouseListener(createTipPanelUpdater("AllowMonthlyReinvestment"));
-        chkAllowMonthlyConnections = new CampaignOptionsCheckBox("AllowMonthlyConnections",
-                getMetadata(MILESTONE_BEFORE_METADATA));
-        chkAllowMonthlyConnections.addMouseListener(createTipPanelUpdater("AllowMonthlyConnections"));
-        chkUseBetterExtraIncome = new CampaignOptionsCheckBox("UseBetterExtraIncome",
-                getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
-        chkUseBetterExtraIncome.addMouseListener(createTipPanelUpdater("UseBetterExtraIncome"));
         chkUseSmallArmsOnly = new CampaignOptionsCheckBox("UseSmallArmsOnly",
                 getMetadata(MILESTONE_BEFORE_METADATA));
         chkUseSmallArmsOnly.addMouseListener(createTipPanelUpdater("UseSmallArmsOnly"));
 
-        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("ATOWAttributesPanel",
+        final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("AttributesAndTraitsPanel",
                 FORM_LABEL_COLUMN_WIDTH,
                 FORM_CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
@@ -151,20 +160,59 @@ class ATimeOfWarPage {
                 chkDisplayAllAttributes,
                 chkUseAgeEffects,
                 chkRandomizeTraits,
-                chkAllowMonthlyReinvestment,
-                chkAllowMonthlyConnections,
-                chkUseBetterExtraIncome,
                 chkUseSmallArmsOnly);
 
         return panel;
     }
 
     /**
-     * Copies ATOW values from the shared model into this page's controls. This is a no-op until the page has been built.
-     *
-     * @param model the shared systems options model to read values from
+     * Loads values from the current campaign options and random skill preferences into this page's controls.
      */
-    void readFromModel(@Nullable SystemsOptionsModel model) {
+    public void loadValuesFromCampaignOptions() {
+        loadValuesFromCampaignOptions(null, null);
+    }
+
+    /**
+     * Loads values from the specified preset sources, or the current campaign's sources if {@code null}, into this
+     * page's controls.
+     *
+     * @param presetCampaignOptions        an alternative {@link CampaignOptions}, or {@code null} to use the current
+     *                                     campaign's options
+     * @param presetRandomSkillPreferences an alternative {@link RandomSkillPreferences}, or {@code null} to use the
+     *                                     current campaign's preferences
+     */
+    public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions,
+            @Nullable RandomSkillPreferences presetRandomSkillPreferences) {
+        CampaignOptions options = presetCampaignOptions != null ? presetCampaignOptions : this.campaignOptions;
+        RandomSkillPreferences skillPreferences = presetRandomSkillPreferences != null
+                ? presetRandomSkillPreferences
+                : this.randomSkillPreferences;
+
+        model = new AttributesAndTraitsOptionsModel(options, skillPreferences);
+        readFromModel();
+    }
+
+    /**
+     * Applies the currently selected values in this page's controls to the given campaign options and random skill
+     * preferences, or the current campaign's sources if {@code null}.
+     *
+     * @param presetCampaignOptions        an alternative {@link CampaignOptions} to update, or {@code null} to update
+     *                                     the campaign's own options
+     * @param presetRandomSkillPreferences an alternative {@link RandomSkillPreferences} to update, or {@code null} to
+     *                                     update the campaign's own preferences
+     */
+    public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions,
+            @Nullable RandomSkillPreferences presetRandomSkillPreferences) {
+        CampaignOptions options = presetCampaignOptions != null ? presetCampaignOptions : this.campaignOptions;
+        RandomSkillPreferences skillPreferences = presetRandomSkillPreferences != null
+                ? presetRandomSkillPreferences
+                : this.randomSkillPreferences;
+
+        writeToModel();
+        model.applyTo(options, skillPreferences);
+    }
+
+    private void readFromModel() {
         if (!created || model == null) {
             return;
         }
@@ -174,18 +222,10 @@ class ATimeOfWarPage {
         chkDisplayAllAttributes.setSelected(model.displayAllAttributes);
         chkUseAgeEffects.setSelected(model.useAgeEffects);
         chkRandomizeTraits.setSelected(model.randomizeTraits);
-        chkAllowMonthlyReinvestment.setSelected(model.allowMonthlyReinvestment);
-        chkAllowMonthlyConnections.setSelected(model.allowMonthlyConnections);
-        chkUseBetterExtraIncome.setSelected(model.useBetterExtraIncome);
         chkUseSmallArmsOnly.setSelected(model.useSmallArmsOnly);
     }
 
-    /**
-     * Copies ATOW values from this page's controls into the shared model. This is a no-op until the page has been built.
-     *
-     * @param model the shared systems options model to write values into
-     */
-    void writeToModel(@Nullable SystemsOptionsModel model) {
+    private void writeToModel() {
         if (!created || model == null) {
             return;
         }
@@ -195,9 +235,6 @@ class ATimeOfWarPage {
         model.displayAllAttributes = chkDisplayAllAttributes.isSelected();
         model.useAgeEffects = chkUseAgeEffects.isSelected();
         model.randomizeTraits = chkRandomizeTraits.isSelected();
-        model.allowMonthlyReinvestment = chkAllowMonthlyReinvestment.isSelected();
-        model.allowMonthlyConnections = chkAllowMonthlyConnections.isSelected();
-        model.useBetterExtraIncome = chkUseBetterExtraIncome.isSelected();
         model.useSmallArmsOnly = chkUseSmallArmsOnly.isSelected();
     }
 }

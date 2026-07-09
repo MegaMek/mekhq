@@ -58,7 +58,6 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -106,6 +105,7 @@ import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.market.PersonnelMarket;
+import mekhq.campaign.market.RequestedStockLevels;
 import mekhq.campaign.market.ShoppingList;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
@@ -2880,59 +2880,12 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 retVal.setIgnoreSparesUnderQuality(ignoreQuality);
             } else if (wn2.getNodeName().equalsIgnoreCase("partInUseMap")) {
                 if (version.isHigherThan(new Version("0.50.07"))) { // <50.10 compatibility handler
-                    processPartsInUseRequestedStockMap(retVal, wn2);
+                    retVal.setPartsInUseRequestedStockMap(
+                          RequestedStockLevels.generateInstanceFromXML(wn2).getStockMap());
                 }
             } else {
                 LOGGER.error("Unknown node type not loaded in PartInUse nodes: {}", wn2.getNodeName());
             }
-        }
-    }
-
-    private static void processPartsInUseRequestedStockMap(Campaign retVal, Node wn) {
-        NodeList wList = wn.getChildNodes();
-
-        Map<String, Double> partInUseStockMap = new LinkedHashMap<>();
-
-        for (int i = 0; i < wList.getLength(); i++) {
-            Node wn2 = wList.item(i);
-
-            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-
-            if (!wn2.getNodeName().equalsIgnoreCase("partInUseMapEntry")) {
-                LOGGER.error("Unknown node type not loaded in PartInUseStockMap nodes: {}", wn2.getNodeName());
-            }
-
-            processPartsInUseRequestedStockMapVal(retVal, wn2, partInUseStockMap);
-
-        }
-
-        retVal.setPartsInUseRequestedStockMap(partInUseStockMap);
-    }
-
-    private static void processPartsInUseRequestedStockMapVal(Campaign retVal, Node wn,
-          Map<String, Double> partsInUseRequestedStockMap) {
-        NodeList wList = wn.getChildNodes();
-
-        String key = null;
-        double val = 0;
-
-        for (int i = 0; i < wList.getLength(); i++) {
-            Node wn2 = wList.item(i);
-
-            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-
-            if (wn2.getNodeName().equalsIgnoreCase("partInUseMapKey")) {
-                key = wn2.getTextContent();
-            } else if (wn2.getNodeName().equalsIgnoreCase("partInUseMapVal")) {
-                val = Double.parseDouble(wn2.getTextContent());
-            }
-        }
-        if (key != null) {
-            partsInUseRequestedStockMap.put(key, val);
         }
     }
 

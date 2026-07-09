@@ -59,6 +59,9 @@ class FinancesOptionsModel {
     boolean payForHousing;
     boolean sellUnits;
     boolean sellParts;
+    boolean allowMonthlyReinvestment;
+    boolean allowMonthlyConnections;
+    boolean useBetterExtraIncome;
     boolean useTaxes;
     int taxesPercentage;
     boolean useShareSystem;
@@ -99,6 +102,9 @@ class FinancesOptionsModel {
         payForHousing = options.isPayForHousing();
         sellUnits = options.isSellUnits();
         sellParts = options.isSellParts();
+        allowMonthlyReinvestment = options.isAllowMonthlyReinvestment();
+        allowMonthlyConnections = options.isAllowMonthlyConnections();
+        useBetterExtraIncome = options.isUseBetterExtraIncome();
         useTaxes = options.isUseTaxes();
         taxesPercentage = options.getTaxesPercentage();
         useShareSystem = options.isUseShareSystem();
@@ -141,6 +147,9 @@ class FinancesOptionsModel {
         options.setPayForHousing(payForHousing);
         options.setSellUnits(sellUnits);
         options.setSellParts(sellParts);
+        options.setAllowMonthlyReinvestment(allowMonthlyReinvestment);
+        options.setAllowMonthlyConnections(allowMonthlyConnections);
+        options.setUseBetterExtraIncome(useBetterExtraIncome);
         options.setUseTaxes(useTaxes);
         options.setTaxesPercentage(taxesPercentage);
         options.setUseShareSystem(useShareSystem);
