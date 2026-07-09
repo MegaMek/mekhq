@@ -60,8 +60,7 @@ import org.jspecify.annotations.Nullable;
 public class ContractGenerationGodClass {
     private static final MMLogger LOGGER = MMLogger.create(ContractGenerationGodClass.class);
 
-    public ContractGenerationGodClass() {
-    }
+    private ContractGenerationGodClass() {}
 
     public void generateContract(Campaign campaign, double forceReputationFactor, AbstractLocation currentLocation,
           Person playerNegotiator, List<Formation> formations, Hangar hangar, int temporaryAsTechPoolSize,
@@ -106,7 +105,7 @@ public class ContractGenerationGodClass {
         // Contract Pay Data
         Faction campaignFaction = campaign.getFaction();
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        ContractPayData contractPayData = DetermineContractPay.generateContractPay(contractManager,
+        ContractPayData contractPayData = ContractDeterminationPay.generateContractPay(contractManager,
               formations,
               hangar,
               campaignOptions,

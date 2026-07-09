@@ -55,7 +55,7 @@ public class ContractDeterminationEmployer {
     private static final int COMSTAR_EMPLOYER_CHANCE = 100;
     private static final int WORD_OF_BLAKE_EMPLOYER_CHANCE = 40;
 
-    public ContractDeterminationEmployer() {}
+    private ContractDeterminationEmployer() {}
 
     public static EmployerFactionSelection getEmployerFactionSelectionData(ILocation currentLocation,
           int connectionsEquipLevel, Faction campaignFaction, LocalDate currentDate, HiringHallLevel hiringHallLevel,

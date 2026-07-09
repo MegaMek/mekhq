@@ -53,6 +53,7 @@ import mekhq.campaign.universe.enums.HPGRating;
 class ComStarMissionTargetFinder {
     private final FactionBorderTracker borderTracker;
 
+    // TODO make static
     ComStarMissionTargetFinder(FactionBorderTracker borderTracker) {
         this.borderTracker = borderTracker;
     }

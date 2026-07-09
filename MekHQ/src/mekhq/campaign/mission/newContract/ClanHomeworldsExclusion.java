@@ -49,6 +49,8 @@ public class ClanHomeworldsExclusion {
 
     private static final String STRANA_MECHTY_SYSTEM_ID = "Strana Mechty";
 
+    private ClanHomeworldsExclusion() {}
+
     /**
      * Outside of Operation Bulldog ({@link MHQConstants#OPERATION_BULLDOG_START} to
      * {@link MHQConstants#OPERATION_BULLDOG_END}), no non-Clan faction has the reach to strike within

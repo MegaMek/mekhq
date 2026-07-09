@@ -80,6 +80,8 @@ public class EmployerNegotiator {
           MERCENARY_NEGOTIATOR_NORMAL,
           MERCENARY_NEGOTIATOR_CLAN);
 
+    private EmployerNegotiator() {}
+
     // TODO have a way for the player to get intel on the opposing negotiator
     public static Person generateNegotiator(Campaign campaign, CampaignTypeForContractDetermination campaignType,
           Faction employerFaction, HiringHallLevel hiringHallLevel) {

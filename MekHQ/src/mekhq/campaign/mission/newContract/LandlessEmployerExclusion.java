@@ -41,6 +41,8 @@ import mekhq.campaign.universe.RandomFactionGenerator;
 public class LandlessEmployerExclusion {
     private static final MMLogger LOGGER = MMLogger.create(LandlessEmployerExclusion.class);
 
+    private LandlessEmployerExclusion() {}
+
     /**
      * A contract where the player defends is a defense of the employer's territory, so an employer with no planets
      * anywhere - neither its own nor a contained-faction host's worlds to stand on - has nothing to defend, and the

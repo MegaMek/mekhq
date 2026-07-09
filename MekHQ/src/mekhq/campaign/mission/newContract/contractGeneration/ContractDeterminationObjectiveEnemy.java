@@ -52,6 +52,8 @@ public class ContractDeterminationObjectiveEnemy {
 
     private static final int MERCENARY_ENEMY_CHANCE = 20;
 
+    private ContractDeterminationObjectiveEnemy() {}
+
     static Faction generateEnemyFactionForObjective(AbstractLocation currentLocation, LocalDate currentDate,
           Faction employerFaction, AtBContractType objectiveType) {
         RandomFactionGenerator randomFactionGenerator = RandomFactionGenerator.getInstance();

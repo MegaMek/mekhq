@@ -39,7 +39,7 @@ import mekhq.campaign.mission.newContract.MissionLocationProfile;
 import mekhq.campaign.universe.RandomFactionGenerator;
 
 public class ContractDeterminationLocation {
-    public ContractDeterminationLocation() {}
+    private ContractDeterminationLocation() {}
 
     public static @Nullable String determineContractLocation(AtBContractType objectiveType, boolean isPlayerAttacker,
           String employerFactionCode, String enemyFactionCode, ILocation currentLocation) {

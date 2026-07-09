@@ -64,11 +64,11 @@ import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import org.jspecify.annotations.NonNull;
 
-public class DetermineContractPay {
+public class ContractDeterminationPay {
     /** CampOps pg 41 5th printing */
     private final static double PEACETIME_OPERATING_COSTS_PERCENTAGE = 0.75;
 
-    public DetermineContractPay() {}
+    private ContractDeterminationPay() {}
 
     public static ContractPayData generateContractPay(AbstractContractManager contractManager,
           List<Formation> formations, Hangar hangar, CampaignOptions campaignOptions, LocalDate currentDate,

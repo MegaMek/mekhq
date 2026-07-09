@@ -63,14 +63,7 @@ public class ContractDeterminationNegotiations {
     /** CamOps pg 41 rev 5th printing */
     private final static double PIRATE_SUPPORT_RIGHTS = 0.0;
 
-    public ContractDeterminationNegotiations() {
-        // TODO - roll 2d6 per term
-        // TODO player negotiator makes Negotiation skill check
-        // TODO NPC negotiator makes skill check
-        // TODO Modify roll one step per 2 MoS (improve if player wins, decrease if NPC wins)
-
-        // TODO pirates get special rules
-    }
+    private ContractDeterminationNegotiations() {}
 
     public static NegotiationsData negotiateInitialContractTerms(Person playerNegotiator, Person employerNegotiator,
           Campaign campaign, CampaignTypeForContractDetermination campaignType) {
