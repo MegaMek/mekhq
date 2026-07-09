@@ -57,10 +57,10 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import org.jspecify.annotations.Nullable;
 
-public class ContractGenerationGodClass {
-    private static final MMLogger LOGGER = MMLogger.create(ContractGenerationGodClass.class);
+public class ContractGenerationManager {
+    private static final MMLogger LOGGER = MMLogger.create(ContractGenerationManager.class);
 
-    private ContractGenerationGodClass() {}
+    private ContractGenerationManager() {}
 
     public void generateContract(Campaign campaign, double forceReputationFactor, AbstractLocation currentLocation,
           Person playerNegotiator, List<Formation> formations, Hangar hangar, int temporaryAsTechPoolSize,
@@ -128,9 +128,6 @@ public class ContractGenerationGodClass {
               playerNegotiator,
               employerNegotiator);
         contractManager.setNegotiationsData(negotiationsData);
-
-        // Ad Hoc Renegotiations
-        // TODO follow-on Negotiations
     }
 
     private static void generateEmployerContractTypeEnemyAndLocation(Campaign campaign, double forceReputationFactor,

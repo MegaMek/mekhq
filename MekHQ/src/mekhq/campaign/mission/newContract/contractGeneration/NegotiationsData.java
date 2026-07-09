@@ -48,4 +48,30 @@ public record NegotiationsData(
     public boolean isBattleCompensation() {
         return supportRights < 0;
     }
+
+    public NegotiationsData updateClause(ContractNegotiationClause clause, Object newValue) {
+        try {
+            switch (clause) {
+                case COMMAND_RIGHTS -> {
+                    return new NegotiationsData((ContractCommandRights) newValue,
+                          salvageRights,
+                          supportRights,
+                          transportRights);
+                }
+                case SALVAGE_RIGHTS -> {
+                    return new NegotiationsData(commandRights, (double) newValue, supportRights, transportRights);
+                }
+                case SUPPORT_RIGHTS -> {
+                    return new NegotiationsData(commandRights, salvageRights, (double) newValue, transportRights);
+                }
+                case TRANSPORT_RIGHTS -> {
+                    return new NegotiationsData(commandRights, salvageRights, supportRights, (double) newValue);
+                }
+            }
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException("Invalid value type for clause " + clause, e);
+        }
+
+        return this;
+    }
 }

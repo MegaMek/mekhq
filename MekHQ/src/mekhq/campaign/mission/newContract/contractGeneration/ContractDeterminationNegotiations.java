@@ -34,7 +34,6 @@ package mekhq.campaign.mission.newContract.contractGeneration;
 
 import static java.lang.Math.floor;
 import static mekhq.campaign.personnel.PersonnelOptions.EDGE_COMMANDER_NEGOTIATION;
-import static mekhq.campaign.personnel.skills.SkillType.S_INVESTIGATION;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -66,17 +65,33 @@ public class ContractDeterminationNegotiations {
     private ContractDeterminationNegotiations() {}
 
     public static NegotiationsData negotiateInitialContractTerms(Person playerNegotiator, Person employerNegotiator,
-          Campaign campaign, CampaignTypeForContractDetermination campaignType) {
+          Campaign campaign, CampaignTypeForContractDetermination campaignType,
+          EmployerModifierData employerModifierData) {
         boolean isPirateCampaignType = campaignType == CampaignTypeForContractDetermination.PIRATE;
         if (isPirateCampaignType) {
             return determinePirateNegotiationTerms();
         }
 
-        EmployerModifierData employerModifierData = new EmployerModifierData();
         return determineInitialNegotiationTerms(employerModifierData,
               campaign,
               playerNegotiator,
               employerNegotiator);
+    }
+
+    public static NegotiationsData renegotiateContractTerm(EmployerModifierData employerModifierData,
+          Person playerNegotiator, Person employerNegotiator, Campaign campaign, NegotiationsData negotiationsData,
+          ContractNegotiationClause clause) {
+        if (clause == ContractNegotiationClause.COMMAND_RIGHTS) {
+            ContractCommandRights commandRights = negotiateCommandRightsClause(employerModifierData,
+                  campaign,
+                  playerNegotiator,
+                  employerNegotiator);
+            return negotiationsData.updateClause(clause, commandRights);
+        }
+
+        double newValue = negotiateContractClause(employerModifierData, campaign,
+              playerNegotiator, employerNegotiator, clause);
+        return negotiationsData.updateClause(clause, newValue);
     }
 
     private static NegotiationsData determinePirateNegotiationTerms() {
@@ -88,43 +103,61 @@ public class ContractDeterminationNegotiations {
 
     public static NegotiationsData determineInitialNegotiationTerms(EmployerModifierData employerModifierData,
           Campaign campaign, Person playerNegotiator, Person employerNegotiator) {
-        boolean isPirateCampaignType = false;
+        ContractCommandRights commandRights = ContractCommandRights.HOUSE;
+        double salvageRights = 0.0;
+        double supportRights = 0.0;
+        double transportRights = 0.0;
 
-        int commandRightsNegotiationModifier = makeOpposedNegotiationSkillCheck(campaign,
-              playerNegotiator,
-              employerNegotiator,
-              isPirateCampaignType);
-        ContractCommandRights commandRights = NegotiationTermsTables.rollOnCommandRightsTable(
-              commandRightsNegotiationModifier,
-              employerModifierData.getCommandModifier());
-
-        int commandSalvageNegotiationModifier = makeOpposedNegotiationSkillCheck(campaign,
-              playerNegotiator,
-              employerNegotiator,
-              isPirateCampaignType);
-        double salvageRights = NegotiationTermsTables.rollOnSalvageRightsTable(commandSalvageNegotiationModifier,
-              employerModifierData.getSalvageModifier());
-
-        int commandSupportNegotiationModifier = makeOpposedNegotiationSkillCheck(campaign,
-              playerNegotiator,
-              employerNegotiator,
-              isPirateCampaignType);
-        double supportRights = NegotiationTermsTables.rollOnSupportRightsTable(commandSupportNegotiationModifier,
-              employerModifierData.getSupportModifier());
-
-        int commandTransportNegotiationModifier = makeOpposedNegotiationSkillCheck(campaign,
-              playerNegotiator,
-              employerNegotiator,
-              isPirateCampaignType);
-        double transportRights = NegotiationTermsTables.rollOnTransportRightsTable(commandTransportNegotiationModifier,
-              employerModifierData.getTransportModifier());
+        for (ContractNegotiationClause clause : ContractNegotiationClause.values()) {
+            switch (clause) {
+                case COMMAND_RIGHTS -> commandRights = negotiateCommandRightsClause(employerModifierData,
+                      campaign,
+                      playerNegotiator,
+                      employerNegotiator);
+                case SALVAGE_RIGHTS -> salvageRights = negotiateContractClause(employerModifierData, campaign,
+                      playerNegotiator, employerNegotiator, clause);
+                case SUPPORT_RIGHTS -> supportRights = negotiateContractClause(employerModifierData, campaign,
+                      playerNegotiator, employerNegotiator, clause);
+                case TRANSPORT_RIGHTS -> transportRights = negotiateContractClause(employerModifierData, campaign,
+                      playerNegotiator, employerNegotiator, clause);
+            }
+            ;
+        }
 
         return new NegotiationsData(commandRights, salvageRights, supportRights, transportRights);
     }
 
+    private static double negotiateContractClause(EmployerModifierData employerModifierData, Campaign campaign,
+          Person playerNegotiator, Person employerNegotiator, ContractNegotiationClause clause) {
+        int commandTransportNegotiationModifier = makeOpposedNegotiationSkillCheck(campaign,
+              playerNegotiator,
+              employerNegotiator);
+
+        return switch (clause) {
+            case SALVAGE_RIGHTS -> NegotiationTermsTables.rollOnSalvageRightsTable(commandTransportNegotiationModifier,
+                  employerModifierData.getSalvageModifier());
+            case SUPPORT_RIGHTS -> NegotiationTermsTables.rollOnSupportRightsTable(commandTransportNegotiationModifier,
+                  employerModifierData.getSupportModifier());
+            case TRANSPORT_RIGHTS -> NegotiationTermsTables.rollOnTransportRightsTable(
+                  commandTransportNegotiationModifier,
+                  employerModifierData.getTransportModifier());
+            default -> throw new IllegalStateException("Unexpected value: " + clause);
+        };
+    }
+
+    private static ContractCommandRights negotiateCommandRightsClause(EmployerModifierData employerModifierData,
+          Campaign campaign, Person playerNegotiator, Person employerNegotiator) {
+        int commandTransportNegotiationModifier = makeOpposedNegotiationSkillCheck(campaign,
+              playerNegotiator,
+              employerNegotiator);
+
+        return NegotiationTermsTables.rollOnCommandRightsTable(commandTransportNegotiationModifier,
+              employerModifierData.getCommandModifier());
+    }
+
     private static int makeOpposedNegotiationSkillCheck(Campaign campaign, Person playerNegotiator,
-          Person employerNegotiator, boolean isPirateCampaignType) {
-        String skillName = isPirateCampaignType ? S_INVESTIGATION : S_NEGOTIATION;
+          Person employerNegotiator) {
+        String skillName = S_NEGOTIATION;
 
         int playerMarginOfSuccess = performNegotiationCheck(campaign, playerNegotiator, skillName, false);
         int employerMarginOfSuccess = performNegotiationCheck(campaign, employerNegotiator, skillName, true);
