@@ -51,8 +51,8 @@ public enum GlobalEmployerTableValue {
     private final int lowerBand;
     private final int upperBand;
 
-    private final String RESOURCE_BUNDLE = "mekhq.resources.GlobalEmployerTableValue";
-    private final static MMLogger LOGGER = MMLogger.create(GlobalEmployerTableValue.class);
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.GlobalEmployerTableValue";
+    private static final MMLogger LOGGER = MMLogger.create(GlobalEmployerTableValue.class);
 
     GlobalEmployerTableValue(final String lookupName, final int lowerBand, final int upperBand) {
         this.lookupName = lookupName;

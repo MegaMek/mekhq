@@ -416,7 +416,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final LocalDate COMSTAR_SCHISM = LocalDate.of(3052, 9, 21);
     public static final LocalDate OPERATION_SCOUR_ENDS = LocalDate.of(3078, 1, 1);
     public static final LocalDate FORTRESS_REPUBLIC_START = LocalDate.of(3135, Month.NOVEMBER, 1);
-    public static final LocalDate FORTRESS_REPUBLIC_END = LocalDate.of(3049, Month.JANUARY, 1);
+    public static final LocalDate FORTRESS_REPUBLIC_END = LocalDate.of(3149, Month.JANUARY, 1);
     public static final LocalDate FORTRESS_REPUBLIC_TERRA_ONLY_END = LocalDate.of(3151, Month.JANUARY, 1);
     public static final LocalDate OPERATION_BULLDOG_START = LocalDate.of(3059, Month.MAY, 20);
     public static final LocalDate OPERATION_BULLDOG_END = LocalDate.of(3059, Month.AUGUST, 13);

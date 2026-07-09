@@ -74,7 +74,7 @@ public class ClanHomeworldsExclusion {
         }
 
         LocalDate arrivalDate = campaign.getLocalDate().plusDays(contract.getTravelDays(campaign));
-        return !(arrivalDate.isAfter(MHQConstants.OPERATION_BULLDOG_START) &&
-                       arrivalDate.isBefore(MHQConstants.OPERATION_BULLDOG_END));
+        return arrivalDate.isBefore(MHQConstants.OPERATION_BULLDOG_START) ||
+                     arrivalDate.isAfter(MHQConstants.OPERATION_BULLDOG_END);
     }
 }
