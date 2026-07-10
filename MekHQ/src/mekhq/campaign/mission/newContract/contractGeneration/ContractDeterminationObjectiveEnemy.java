@@ -57,7 +57,7 @@ public class ContractDeterminationObjectiveEnemy {
     static Faction generateEnemyFactionForObjective(AbstractLocation currentLocation, LocalDate currentDate,
           Faction employerFaction, AtBContractType objectiveType) {
         RandomFactionGenerator randomFactionGenerator = RandomFactionGenerator.getInstance();
-        EnemySelectionProfile enemySelectionProfile = EnemySelectionProfile.fromContractType(objectiveType);
+        EnemySelectionProfile enemySelectionProfile = objectiveType.getEnemySelectionProfile();
         Faction enemyFaction = randomFactionGenerator.getRandomEnemy(currentLocation, currentDate, employerFaction,
               enemySelectionProfile);
 

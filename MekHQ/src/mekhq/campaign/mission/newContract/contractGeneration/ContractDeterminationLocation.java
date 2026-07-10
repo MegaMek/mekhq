@@ -43,7 +43,7 @@ public class ContractDeterminationLocation {
 
     public static @Nullable String determineContractLocation(AtBContractType objectiveType, boolean isPlayerAttacker,
           String employerFactionCode, String enemyFactionCode, ILocation currentLocation) {
-        MissionLocationProfile missionLocationProfile = MissionLocationProfile.fromContractType(objectiveType);
+        MissionLocationProfile missionLocationProfile = objectiveType.getMissionLocationProfile();
 
         RandomFactionGenerator randomFactionGenerator = RandomFactionGenerator.getInstance();
         String attackerFactionCode = isPlayerAttacker ? employerFactionCode : enemyFactionCode;
