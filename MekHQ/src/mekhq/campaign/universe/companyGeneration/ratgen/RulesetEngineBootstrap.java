@@ -37,6 +37,7 @@ import megamek.client.ratgenerator.RATGenerator;
 import megamek.client.ratgenerator.Ruleset;
 import megamek.common.loaders.MekSummaryCache;
 import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
 
 /**
  * Idempotent initialization of the MegaMek Force Generator engine for use from the MekHQ side.
@@ -81,7 +82,14 @@ public final class RulesetEngineBootstrap {
 
         // Ruleset.loadData is idempotent (guards on its initialized flag).
         if (!Ruleset.isInitialized()) {
-            LOGGER.info("[CompanyGen]   Loading Force Generator rulesets from data/forcegenerator/faction_rules/ ...");
+            // Must precede loadData(): addRulesetDirectory only affects the next load. A ruleset in the
+            // user directory overrides the built-in one for the same faction; a missing directory is
+            // skipped by MegaMek with a warning, so no existence check is needed here.
+            Ruleset.addRulesetDirectory(MHQConstants.USER_FORCE_GENERATOR_RULES_DIRECTORY);
+            LOGGER.info("[CompanyGen]   Registered user ruleset directory {}",
+                  MHQConstants.USER_FORCE_GENERATOR_RULES_DIRECTORY);
+
+            LOGGER.info("[CompanyGen]   Loading Force Generator rulesets ...");
             t0 = System.currentTimeMillis();
             Ruleset.loadData();
             LOGGER.info("[CompanyGen]   Ruleset.loadData() -> {}ms", System.currentTimeMillis() - t0);
