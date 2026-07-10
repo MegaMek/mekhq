@@ -71,12 +71,12 @@ public enum AtBContractType {
           EnemySelectionProfile.DEFAULT,
           MissionLocationProfile.DEFAULT),
     CADRE_DUTY("AtBContractType.CADRE_DUTY.text", "AtBContractType.CADRE_DUTY.toolTipText",
-                     12,
-                     0.8,
-                     0,
-                     0,
-                     1,
-                     0,
+          12,
+          0.8,
+          0,
+          0,
+          1,
+          0,
           RAIDERS,
           REAR_AREA),
     SECURITY_DUTY("AtBContractType.SECURITY_DUTY.text", "AtBContractType.SECURITY_DUTY.toolTipText",
@@ -257,7 +257,10 @@ public enum AtBContractType {
     // endregion Variable Declarations
 
     // region Constructors
-    AtBContractType(final String name, final String toolTipText, final int constantLength, final double operationsTempoMultiplier, final int commandTermsModifier, final int salvageTermsModifier, final int supportTermsModifier, final int transportTermsModifier, final double operationsTempoMultiplier, final EnemySelectionProfile enemySelectionProfile, final MissionLocationProfile missionLocationProfile) {
+    AtBContractType(final String name, final String toolTipText, final int constantLength,
+          final double operationsTempoMultiplier, final int commandTermsModifier, final int salvageTermsModifier,
+          final int supportTermsModifier, final int transportTermsModifier,
+          final EnemySelectionProfile enemySelectionProfile, final MissionLocationProfile missionLocationProfile) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Mission",
               MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
