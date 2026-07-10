@@ -56,6 +56,7 @@ public abstract class AbstractContractManager {
     private final static MMLogger LOGGER = MMLogger.create(AbstractContractManager.class);
 
     private String employerFactionCode;
+    private String mercenaryEmployerFactionCode;
     private EmployerModifierData employerModifierData;
     private List<AbstractContractObjective> contractObjectives;
     private ContractPayData contractPayData;
@@ -278,5 +279,23 @@ public abstract class AbstractContractManager {
      */
     public void setNegotiationsData(NegotiationsData negotiationsData) {
         this.negotiationsData = negotiationsData;
+    }
+
+    /**
+     * Retrieves the mercenary employer faction's short code.
+     *
+     * @return the mercenary employer faction's short code
+     */
+    public String getMercenaryEmployerFactionCode() {
+        return mercenaryEmployerFactionCode;
+    }
+
+    /**
+     * Sets the mercenary employer faction's short code.
+     *
+     * @param mercenaryEmployerFactionCode the mercenary employer faction's short code
+     */
+    public void setMercenaryEmployerFactionCode(String mercenaryEmployerFactionCode) {
+        this.mercenaryEmployerFactionCode = mercenaryEmployerFactionCode;
     }
 }
