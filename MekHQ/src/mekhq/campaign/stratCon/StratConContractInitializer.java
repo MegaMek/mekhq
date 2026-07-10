@@ -649,6 +649,11 @@ public class StratConContractInitializer {
         for (int y = 0; y < trackHeight; y++) {
             for (int x = 0; x < trackWidth; x++) {
                 StratConCoords coords = new StratConCoords(x, y);
+                // Ocean hexes never host scenarios or facilities.
+                if (StratConBiomeManifest.isOceanTerrain(trackState.getTerrainTile(coords))) {
+                    continue;
+                }
+
                 if (trackState.getScenario(coords) != null) {
                     continue;
                 }

@@ -495,7 +495,7 @@ public class StratConTab extends CampaignGuiTab {
                       .append(OBJECTIVE_FAILED);
             }
 
-            sb.append(" Maintain Campaign Victory Point count above <b>")
+            sb.append(" Maintain Campaign Victory Point count at or above <b>")
                   .append(contract.getRequiredVictoryPoints())
                   .append("</b> by completing Turning Point scenarios")
                   .append("</span><br/>");

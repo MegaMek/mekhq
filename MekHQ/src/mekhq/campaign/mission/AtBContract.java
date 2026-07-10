@@ -56,6 +56,7 @@ import static mekhq.campaign.mission.enums.AtBMoraleLevel.OVERWHELMING;
 import static mekhq.campaign.mission.enums.AtBMoraleLevel.STALEMATE;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerStatus.FREE;
 import static mekhq.campaign.stratCon.StratConContractDefinition.getContractDefinition;
+import static mekhq.campaign.stratCon.StratConRulesManager.INDEPENDENT_COMMAND_RIGHTS_REQUIRED_VICTORY_POINTS;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -1102,18 +1103,9 @@ public class AtBContract extends Contract {
      * Calculates the number of required Victory Points (VP) needed to achieve overall success for this StratCon
      * contract.
      *
-     * <p>The calculation is based on several averaged campaign parameters:
-     * <ul>
-     *     <li><b>Base requirement</b> — Required number of combat teams multiplied by the contract length.</li>
-     *     <li><b>Scenario odds</b> — The mean scenario-odds percentage across all StratCon tracks, converted to a
-     *     probability.</li>
-     *     <li><b>Turning point chance</b> — A scaling factor based on command rights: {@code INTEGRATED} contracts
-     *     assume a 100% chance, while all others use a one-third chance.</li>
-     * </ul>
-     *
      * <p>The final result estimates the expected number of Turning Points the player must win for overall contract
-     * success. If the player loses a handful of Turning Points, they should still be able to win the contract by
-     * being proactive in the Area of Operations.</p>
+     * success. If the player loses a handful of Turning Points, they should still be able to win the contract by being
+     * proactive in the Area of Operations.</p>
      *
      * @return the required number of Victory Points, rounded up to the nearest integer
      *
@@ -1123,6 +1115,10 @@ public class AtBContract extends Contract {
     public int getRequiredVictoryPoints() {
         if (getStratConCampaignState() == null) {
             return 0;
+        }
+
+        if (getCommandRights().isIndependent()) {
+            return INDEPENDENT_COMMAND_RIGHTS_REQUIRED_VICTORY_POINTS;
         }
 
         double baseRequirement = getRequiredCombatTeams();

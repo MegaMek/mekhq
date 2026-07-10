@@ -32,6 +32,9 @@
  */
 package mekhq.campaign.stratCon;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import megamek.common.board.Coords;
 import megamek.common.compute.Compute;
 
@@ -62,11 +65,23 @@ public class StratConTerrainPlacer {
         }
         StratConBiome biome = biomeEntry.getValue();
 
-        int baseTerrainIndex = Compute.randomInt(biome.allowedTerrainTypes.size());
+        // Base terrain is always dry land; ocean is only ever added as "stripes" and is capped below,
+        // so a sector is never dominated by water.
+        List<String> baseCandidates = new ArrayList<>();
+        for (String terrainType : biome.allowedTerrainTypes) {
+            if (!StratConBiomeManifest.isOceanTerrain(terrainType)) {
+                baseCandidates.add(terrainType);
+            }
+        }
+        // Fallback for the (data-error) case where a biome offers only water.
+        if (baseCandidates.isEmpty()) {
+            baseCandidates = biome.allowedTerrainTypes;
+        }
+        String baseTerrain = baseCandidates.get(Compute.randomInt(baseCandidates.size()));
 
         for (int x = 0; x < track.getWidth(); x++) {
             for (int y = 0; y < track.getHeight(); y++) {
-                track.setTerrainTile(new StratConCoords(x, y), biome.allowedTerrainTypes.get(baseTerrainIndex));
+                track.setTerrainTile(new StratConCoords(x, y), baseTerrain);
             }
         }
 
@@ -92,9 +107,60 @@ public class StratConTerrainPlacer {
          * }
          */
 
-        for (int x = 0; x < biome.allowedTerrainTypes.size(); x++) {
-            if (x != baseTerrainIndex) {
-                DrawStripe(track, biome.allowedTerrainTypes.get(x));
+        for (String terrainType : biome.allowedTerrainTypes) {
+            if (!terrainType.equals(baseTerrain)) {
+                DrawStripe(track, terrainType);
+            }
+        }
+
+        // A sector must be at least 25% dry land; convert any excess ocean back to the base terrain.
+        enforceLandMinimum(track, baseTerrain);
+
+        // Ocean hexes are always revealed - open water holds no fog of war.
+        revealOceanHexes(track);
+    }
+
+    /**
+     * Ensures at least 25% of the given track is non-ocean by converting randomly selected excess ocean hexes into the
+     * supplied dry-land base terrain.
+     *
+     * @param track       the track to adjust
+     * @param baseTerrain the dry-land terrain type to convert excess ocean hexes into
+     */
+    private static void enforceLandMinimum(StratConTrackState track, String baseTerrain) {
+        int totalHexes = track.getWidth() * track.getHeight();
+        int minimumLand = (int) Math.ceil(totalHexes * 0.25);
+
+        List<StratConCoords> oceanCoords = new ArrayList<>();
+        for (int x = 0; x < track.getWidth(); x++) {
+            for (int y = 0; y < track.getHeight(); y++) {
+                StratConCoords coords = new StratConCoords(x, y);
+                if (StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(coords))) {
+                    oceanCoords.add(coords);
+                }
+            }
+        }
+
+        int landHexes = totalHexes - oceanCoords.size();
+        while ((landHexes < minimumLand) && !oceanCoords.isEmpty()) {
+            StratConCoords coords = oceanCoords.remove(Compute.randomInt(oceanCoords.size()));
+            track.setTerrainTile(coords, baseTerrain);
+            landHexes++;
+        }
+    }
+
+    /**
+     * Adds every ocean hex on the given track to its revealed-coordinates set, so open water is always visible.
+     *
+     * @param track the track whose ocean hexes should be revealed
+     */
+    private static void revealOceanHexes(StratConTrackState track) {
+        for (int x = 0; x < track.getWidth(); x++) {
+            for (int y = 0; y < track.getHeight(); y++) {
+                StratConCoords coords = new StratConCoords(x, y);
+                if (StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(coords))) {
+                    track.getRevealedCoords().add(coords);
+                }
             }
         }
     }

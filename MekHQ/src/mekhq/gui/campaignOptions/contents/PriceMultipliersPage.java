@@ -131,7 +131,7 @@ class PriceMultipliersPage {
 
         JPanel panel = CampaignOptionsPagePanel.builder("PriceMultipliersPage", "PriceMultipliersPage", imageAddress)
                 .header(priceMultipliersHeader)
-                .intro("lblPriceMultipliersPageBody.text")
+                .intro("priceMultipliersPage")
                 .quote("priceMultipliersPage")
                 .section("lblGeneralMultipliersPanel.text",
                         "lblGeneralMultipliersPanel.summary",

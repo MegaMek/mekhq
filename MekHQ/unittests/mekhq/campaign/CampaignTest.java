@@ -385,6 +385,25 @@ public class CampaignTest {
         assertArrayEquals(new Person[] { only, null }, result);
     }
 
+    @Test
+    void getTechAvailabilityYearsRespectsLimitByYear() {
+        CampaignOptions options = mock(CampaignOptions.class);
+        Campaign campaign = mock(Campaign.class);
+        when(campaign.getCampaignOptions()).thenReturn(options);
+        when(campaign.getGameYear()).thenReturn(3025);
+        when(campaign.getTechIntroYear()).thenCallRealMethod();
+        when(campaign.getTechAvailabilityYears()).thenCallRealMethod();
+
+        // Limit enabled: technology availability is capped at the current game year.
+        when(options.isLimitByYear()).thenReturn(true);
+        assertEquals(List.of(3025), campaign.getTechAvailabilityYears());
+
+        // Limit disabled: availability is unbounded, so designs introduced after the current campaign year - and
+        // their era-based tech level - are still treated as available.
+        when(options.isLimitByYear()).thenReturn(false);
+        assertEquals(List.of(Integer.MAX_VALUE), campaign.getTechAvailabilityYears());
+    }
+
     // region Nested Test Classes for Temp Crew
 
     /**

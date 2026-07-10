@@ -202,7 +202,7 @@ public class StratConPanel extends JPanel implements ActionListener {
 
         // display "Manage Force Assignment" if there is not a force already on the hex
         // except if there is already a non-cloaked scenario here.
-        if (StratConRulesManager.canManuallyDeployAnyForce(coords, currentTrack, campaignState.getContract())) {
+        if (StratConRulesManager.canManuallyDeployAnyForce(coords, currentTrack)) {
             JMenuItem menuItemManageForceAssignments = new JMenuItem();
             menuItemManageForceAssignments.setText("Manage Deployment");
             menuItemManageForceAssignments.setActionCommand(RIGHT_CLICK_COMMAND_MANAGE_FORCES);

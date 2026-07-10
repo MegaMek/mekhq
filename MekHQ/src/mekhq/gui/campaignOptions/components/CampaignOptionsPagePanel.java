@@ -139,6 +139,11 @@ public class CampaignOptionsPagePanel extends JPanel {
         sectionSearchText = searchTextBuilder.toString().trim();
         JPanel sectionControls = createSectionControls(sections);
         int sectionStackWidth = getPreferredSectionStackWidth(sections, sectionControls);
+        if (sectionStackWidth == 0 && builder.standardContentWidth) {
+            // A section-less page (such as a category landing page) would otherwise collapse its intro and quote to
+            // the header width; floor it to the shared page width so it matches the dialog's sectioned pages.
+            sectionStackWidth = UNIFORM_SECTION_STACK_WIDTH;
+        }
 
         JPanel contentPanel = createContentPanel(builder, renderItems, sections, sectionControls, sectionStackWidth);
         pageBody.add(contentPanel, BorderLayout.CENTER);
@@ -275,7 +280,7 @@ public class CampaignOptionsPagePanel extends JPanel {
         layout.anchor = GridBagConstraints.CENTER;
         panel.add(header, layout);
 
-        if (builder.introComponent != null || builder.introTextKey != null) {
+        if (builder.introComponent != null || builder.introResourceName != null) {
             layout.gridy++;
             int introWidth = sectionStackWidth > 0 ? sectionStackWidth : header.getPreferredSize().width;
             panel.add(createIntroPanel(builder, introWidth), layout);
@@ -347,7 +352,7 @@ public class CampaignOptionsPagePanel extends JPanel {
             introPanel.add(builder.introComponent, BorderLayout.CENTER);
         } else {
             introPanel = new CampaignOptionsIntroPanel(builder.name + "Intro",
-                getTextAt(getCampaignOptionsResourceBundle(), builder.introTextKey),
+                getTextAt(getCampaignOptionsResourceBundle(), builder.introResourceName + ".intro"),
                 textWidth - (introHorizontalPadding * 2));
         }
         introPanel.setBorder(BorderFactory.createEmptyBorder(0,
@@ -513,13 +518,14 @@ public class CampaignOptionsPagePanel extends JPanel {
         private final List<Object> bodyItems = new ArrayList<>();
         private CampaignOptionsHeaderPanel headerPanel;
         private String quoteResourceName;
-        private String introTextKey;
+        private String introResourceName;
         private JComponent introComponent;
         private boolean includeHeaderBodyText;
         private int headerImageSize = DEFAULT_HEADER_IMAGE_SIZE;
         private boolean tintHeaderImage = true;
         private boolean sectionsExpandedByDefault;
         private boolean showDetailsPanel = true;
+        private boolean standardContentWidth;
 
         private Builder(String name, String headerResourceName, String imageAddress) {
             this.name = name;
@@ -547,8 +553,12 @@ public class CampaignOptionsPagePanel extends JPanel {
             return this;
         }
 
-        public Builder intro(String introTextKey) {
-            this.introTextKey = introTextKey;
+        /**
+         * Sets the explainer paragraph shown under the header, resolved from the {@code <name>.intro} resource key.
+         * Mirrors {@link #quote(String)}, which resolves {@code <name>.border}.
+         */
+        public Builder intro(String introResourceName) {
+            this.introResourceName = introResourceName;
             return this;
         }
 
@@ -561,6 +571,10 @@ public class CampaignOptionsPagePanel extends JPanel {
             return this;
         }
 
+        /**
+         * Sets the centered quote shown at the foot of the page, resolved from the {@code <name>.border} resource key.
+         * Mirrors {@link #intro(String)}, which resolves {@code <name>.intro}.
+         */
         public Builder quote(String quoteResourceName) {
             this.quoteResourceName = quoteResourceName;
             return this;
@@ -568,6 +582,16 @@ public class CampaignOptionsPagePanel extends JPanel {
 
         public Builder showDetailsPanel(boolean showDetailsPanel) {
             this.showDetailsPanel = showDetailsPanel;
+            return this;
+        }
+
+        /**
+         * Floors a section-less page (such as a category landing page) to the standard page content width, so its
+         * intro and quote render at the same width as the dialog's sectioned pages instead of collapsing to the
+         * header width.
+         */
+        public Builder standardContentWidth() {
+            this.standardContentWidth = true;
             return this;
         }
 

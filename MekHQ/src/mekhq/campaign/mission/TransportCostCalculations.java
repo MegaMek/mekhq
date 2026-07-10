@@ -432,7 +432,7 @@ public class TransportCostCalculations {
     /**
      * Constructs a new TransportCostCalculations class for evaluating jump and transport costs.
      *
-     * @param travelingUnits              The {@link Hangar} whose units are being evaluated for transport.
+     * @param travelingUnits              The collection of {@link Unit}s being evaluated for transport.
      * @param travelingSpareParts         The {@link Part} collection representing spare parts to be transported as
      *                                    cargo.
      * @param travelingPersonnel          The {@link Person} list representing personnel to be transported.

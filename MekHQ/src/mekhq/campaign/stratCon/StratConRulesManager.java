@@ -145,6 +145,7 @@ public class StratConRulesManager {
 
     private static final int NO_FACILITY_MODIFIER = 0;
     private static final int AUTOMATIC_FACILITY_MODIFIER = 1;
+    public static final int INDEPENDENT_COMMAND_RIGHTS_REQUIRED_VICTORY_POINTS = 1;
 
     /**
      * What makes a particular lance eligible to be reinforcements for a scenario
@@ -735,19 +736,7 @@ public class StratConRulesManager {
      * should be flagged as a "turning point." Turning Point scenarios can cause CVP to be increased or decreased.
      * </p>
      *
-     * <p>
-     * The logic follows these rules:
-     * <ul>
-     *     <li>If the scenario template or its type is not related to resupply operations, the
-     *     method evaluates the contract's command rights.</li>
-     *     <li>For <strong>INTEGRATED</strong> or <strong>HOUSE</strong> command rights:
-     *     non-resupply scenarios are always marked as required.</li>
-     *     <li>For <strong>LIAISON</strong> or <strong>INDEPENDENT</strong> command rights:
-     *     non-resupply scenarios have a 25% chance (1 in 4) to be marked as required. An attached
-     *     units modifier is also set if the scenario becomes required.</li>
-     * </ul>
-     *  @param contract The {@link AtBContract} representing the current contract.
-     *
+     * @param contract          The {@link AtBContract} representing the current contract.
      * @param scenario          The {@link StratConScenario} being evaluated to determine if it is a Turning Point.
      * @param isCombatChallenge {@code true} if attached units should be skipped, and if the scenario is barred from
      *                          being a Turning Point
@@ -776,7 +765,8 @@ public class StratConRulesManager {
                 }
             }
             case INDEPENDENT -> {
-                if (randomInt(3) == 0) {
+                if (contract.getStratConCampaignState().getVictoryPoints() <
+                          INDEPENDENT_COMMAND_RIGHTS_REQUIRED_VICTORY_POINTS) {
                     scenario.setTurningPoint(true);
                 }
             }
@@ -1191,6 +1181,11 @@ public class StratConRulesManager {
      */
     public static void deployForceToCoords(StratConCoords coords, int forceID, Campaign campaign, AtBContract contract,
           StratConTrackState track, boolean sticky) {
+        // Ocean hexes are barred entirely - a force cannot deploy there, so no scenario can spawn there.
+        if (StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(coords))) {
+            return;
+        }
+
         CombatTeam combatTeam = campaign.getCombatTeamsAsMap().get(forceID);
 
         // This shouldn't be possible, but never hurts to have a little insurance
@@ -1358,6 +1353,11 @@ public class StratConRulesManager {
         List<StratConCoords> suitableCoords = new ArrayList<>();
         for (int direction : ALL_DIRECTIONS) {
             StratConCoords newCoords = originCoords.translate(direction);
+
+            // Ocean hexes never host scenarios.
+            if (StratConBiomeManifest.isOceanTerrain(trackState.getTerrainTile(newCoords))) {
+                continue;
+            }
 
             if (trackState.getScenario(newCoords) != null) {
                 continue;
@@ -2898,37 +2898,25 @@ public class StratConRulesManager {
         }
     }
 
+
     /**
-     * Set the 'attached' units modifier for the current scenario (integrated, house, liaison), and make sure we're not
-     * deploying ground units to an air scenario
+     * Sets the attached units modifier for the specified scenario based on the contract's type and map location of the
+     * backing scenario.
      *
-     * @param contract The scenario's contract
+     * @param scenario The strategic scenario to which the modifier will be applied. This scenario includes details
+     *                 about the current operation.
+     * @param contract The AtB (Against the Bot) contract which defines the command rights and governs how the scenario
+     *                 should be modified.
      */
     public static void setAttachedUnitsModifier(StratConScenario scenario, AtBContract contract) {
         AtBDynamicScenario backingScenario = scenario.getBackingScenario();
         boolean airBattle = (backingScenario.getTemplate().mapParameters.getMapLocation() == LowAtmosphere) ||
                                   (backingScenario.getTemplate().mapParameters.getMapLocation() == Space);
-        // if we're under non-independent command rights, a supervisor may come along
-        switch (contract.getCommandRights()) {
-            case INTEGRATED:
-                backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(airBattle ?
-                                                                                                  MHQConstants.SCENARIO_MODIFIER_INTEGRATED_UNITS_AIR :
-                                                                                                  MHQConstants.SCENARIO_MODIFIER_INTEGRATED_UNITS_GROUND));
-                break;
-            case HOUSE:
-                backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(airBattle ?
-                                                                                                  MHQConstants.SCENARIO_MODIFIER_HOUSE_CO_AIR :
-                                                                                                  MHQConstants.SCENARIO_MODIFIER_HOUSE_CO_GROUND));
-                break;
-            case LIAISON:
-                if (scenario.isTurningPoint()) {
-                    backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(airBattle ?
-                                                                                                      MHQConstants.SCENARIO_MODIFIER_LIAISON_AIR :
-                                                                                                      MHQConstants.SCENARIO_MODIFIER_LIAISON_GROUND));
-                }
-                break;
-            default:
-                break;
+
+        if (contract.getCommandRights().isHouse()) {
+            backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(airBattle ?
+                                                                                              MHQConstants.SCENARIO_MODIFIER_HOUSE_CO_AIR :
+                                                                                              MHQConstants.SCENARIO_MODIFIER_HOUSE_CO_GROUND));
         }
     }
 
@@ -3508,8 +3496,13 @@ public class StratConRulesManager {
     /**
      * Can any force be manually deployed to the given coordinates on the given track for the given contract?
      */
-    public static boolean canManuallyDeployAnyForce(StratConCoords coords, StratConTrackState track,
-          AtBContract contract) {
+    public static boolean canManuallyDeployAnyForce(StratConCoords coords, StratConTrackState track) {
+        // Ocean hexes are barred entirely - forces can never be deployed onto open water.
+        // TODO if we ever add ocean battles to the scenario generator we should consider retiring this conditional
+        if (StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(coords))) {
+            return false;
+        }
+
         // Rules: can't manually deploy if there's already a force deployed there
         // exception: on allied facilities
         // can't manually deploy if there's a non-cloaked scenario

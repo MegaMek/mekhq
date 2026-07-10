@@ -94,13 +94,13 @@ public record CargoStatistics(Campaign campaign) {
                      + getTotalInsulatedCargoCapacity() + getTotalRefrigeratedCargoCapacity();
     }
 
-    public double getCargoTonnage(Campaign campaign, boolean inTransit) {
+    public double getCargoTonnage(boolean inTransit) {
         Collection<Part> parts = campaign.getAllParts();
         Collection<Part> spareParts = Warehouse.getSpareParts(parts);
         return getCargoTonnage(campaign.getAllUnits(), spareParts, inTransit, false);
     }
 
-    public double getCargoTonnage(Campaign campaign, final boolean inTransit,
+    public double getCargoTonnage(final boolean inTransit,
           final boolean mothballed) {
         Collection<Part> parts = campaign.getAllParts();
         Collection<Part> spareParts = Warehouse.getSpareParts(parts);

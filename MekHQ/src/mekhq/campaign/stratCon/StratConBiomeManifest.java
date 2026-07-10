@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import javax.xml.transform.Source;
 
@@ -62,6 +63,21 @@ public class StratConBiomeManifest {
     public static final String FACILITY_ALLIED = "FacilityAllied";
     public static final String FORCE_FRIENDLY = "ForceFriendly";
     public static final String FORCE_HOSTILE = "ForceHostile";
+
+    /**
+     * The terrain types that represent open water. Ocean hexes are always revealed, are barred from hosting scenarios
+     * or facilities, and are capped so that a sector is always at least partly dry land.
+     */
+    public static final Set<String> OCEAN_TERRAIN_TYPES = Set.of("Sea", "ColdSea", "HotSea", "FrozenSea");
+
+    /**
+     * @param terrainType a StratCon terrain type name (as returned by {@link StratConTrackState#getTerrainTile})
+     *
+     * @return {@code true} if the given terrain type is open water (ocean)
+     */
+    public static boolean isOceanTerrain(String terrainType) {
+        return terrainType != null && OCEAN_TERRAIN_TYPES.contains(terrainType);
+    }
 
     // these constants will eventually be driven by planetary or track data
     /**
