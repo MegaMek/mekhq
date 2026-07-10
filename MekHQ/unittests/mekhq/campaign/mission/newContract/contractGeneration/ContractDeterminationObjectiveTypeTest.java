@@ -227,6 +227,16 @@ class ContractDeterminationObjectiveTypeTest {
         assertEquals(List.of(AtBContractType.OBJECTIVE_RAID), result.getObjectiveTypes());
     }
 
+    @Test
+    public void testPirateCampaign_ClanEmployer_DoesNotReroll() {
+        // The pirate table has no Covert/Special results, so the Clan reroll must not apply: a first roll of 2 (which
+        // the Clan reroll would otherwise reject) is used directly, yielding RECON_RAID rather than rerolling to 6.
+        ContractDeterminationObjectiveType result = build(GlobalEmployerTableValue.MAJOR_POWER, null, true, true,
+              HiringHallLevel.STANDARD, 2, 6);
+
+        assertEquals(List.of(AtBContractType.RECON_RAID), result.getObjectiveTypes());
+    }
+
     // ---- Accessor ---------------------------------------------------------------------------
 
     @Test

@@ -53,6 +53,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.ConnectionsLevel;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import org.jspecify.annotations.Nullable;
@@ -100,7 +101,8 @@ public class ContractGenerationManager {
               playerNegotiator,
               currentDate,
               contractManager,
-              hiringHallLevel);
+              hiringHallLevel,
+              campaignType);
 
         // Employer Modifier Data
         Faction employerFaction = contractManager.getEmployerFaction();
@@ -151,7 +153,8 @@ public class ContractGenerationManager {
 
     private static void generateEmployerContractTypeEnemyAndLocation(Campaign campaign, double forceReputationFactor,
           AbstractLocation currentLocation, Person negotiator, LocalDate currentDate,
-          AbstractContractManager parentContractManager, HiringHallLevel hiringHallLevel) {
+          AbstractContractManager parentContractManager, HiringHallLevel hiringHallLevel,
+          CampaignTypeForContractDetermination campaignType) {
         // Pick employer
         EmployerFactionSelection employerFactionSelectionData = generateEmployerFaction(campaign,
               forceReputationFactor,
@@ -161,8 +164,10 @@ public class ContractGenerationManager {
               hiringHallLevel,
               parentContractManager);
 
-        Faction employerFaction = employerFactionSelectionData.employerFaction();
-        if (employerFaction == null) {
+        // For pirate campaigns the faction selected above is really the victim, not the true employer; it is still
+        // used below to determine the contract's objectives.
+        Faction selectedFaction = employerFactionSelectionData.employerFaction();
+        if (selectedFaction == null) {
             return;
         }
 
@@ -178,17 +183,29 @@ public class ContractGenerationManager {
         }
         AtBContractType firstObjective = objectives.getFirst();
 
-        // Pick enemy
-        Faction enemyFaction = generateEnemyFactionForContractObjectives(currentLocation,
-              currentDate,
-              employerFactionSelectionData,
-              firstObjective,
-              parentContractManager);
+        // CamOps pg 39 rev 5th printing: pirate factions pick target, not employer. So the random employer we've
+        // chosen becomes the contract's enemy, pirate (Bandit Caste for a Clan campaign) becomes the 'employer.'
+        Faction employerFaction;
+        Faction enemyFaction;
+        if (campaignType == CampaignTypeForContractDetermination.PIRATE) {
+            employerFaction = getPirateEmployerFaction(campaign);
+            enemyFaction = selectedFaction;
+            parentContractManager.setEmployerFactionCode(employerFaction.getShortName());
+            assignEnemyFactionToObjectives(parentContractManager, enemyFaction);
+        } else {
+            employerFaction = selectedFaction;
+            enemyFaction = generateEnemyFactionForContractObjectives(currentLocation,
+                  currentDate,
+                  employerFactionSelectionData,
+                  firstObjective,
+                  parentContractManager);
+        }
 
-        // Pick location
+        // Pick location. The employer is the attacker and the enemy the defender; for pirates this means a landless
+        // pirate attacker striking into the victim's (defender's) territory, which MissionTargetFinder handles.
         String targetSystemId = generateContractLocation(currentLocation,
               firstObjective,
-              employerFactionSelectionData,
+              employerFaction,
               enemyFaction,
               parentContractManager);
         if (targetSystemId == null) {
@@ -197,10 +214,20 @@ public class ContractGenerationManager {
         }
     }
 
+    /**
+     * Resolves the pirate faction that acts as the employer for a pirate campaign's contract: the Bandit Caste for a
+     * Clan campaign, or the generic pirate faction otherwise.
+     */
+    private static Faction getPirateEmployerFaction(Campaign campaign) {
+        String pirateFactionCode = campaign.isClanCampaign() ?
+                                         Faction.BANDIT_CASTE_FACTION_CODE :
+                                         Faction.PIRATE_FACTION_CODE;
+        return Factions.getInstance().getFaction(pirateFactionCode);
+    }
+
     private static @Nullable String generateContractLocation(AbstractLocation currentLocation,
-          AtBContractType firstObjective, EmployerFactionSelection employerFactionSelectionData, Faction enemyFaction,
+          AtBContractType firstObjective, Faction employerFaction, Faction enemyFaction,
           AbstractContractManager parentContractManager) {
-        Faction employerFaction = employerFactionSelectionData.employerFaction();
         if (employerFaction == null) {
             LOGGER.error("Null employer passed into generateContractLocation. This should have been vetted already");
             return null;
@@ -229,12 +256,20 @@ public class ContractGenerationManager {
         // location.
         Faction enemyFaction = ContractDeterminationObjectiveEnemy.generateEnemyFactionForObjective(currentLocation,
               currentDate, employerFactionSelectionData.employerFaction(), firstObjective);
+        assignEnemyFactionToObjectives(parentContractManager, enemyFaction);
+
+        return enemyFaction;
+    }
+
+    /**
+     * Stamps the given enemy faction's code onto every objective already registered with the contract manager.
+     */
+    private static void assignEnemyFactionToObjectives(AbstractContractManager parentContractManager,
+          Faction enemyFaction) {
         String enemyFactionCode = enemyFaction.getShortName();
         for (AbstractContractObjective contractObjective : parentContractManager.getContractAllObjectivesCopy()) {
             contractObjective.setEnemyFactionCode(enemyFactionCode);
         }
-
-        return enemyFaction;
     }
 
     private static List<AtBContractType> generateContractObjectives(Campaign campaign, Person negotiator,

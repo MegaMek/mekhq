@@ -130,16 +130,19 @@ public class ContractDeterminationObjectiveType {
     private void getObjectiveType(Faction employerFaction, GlobalEmployerTableValue employerTableValue,
           IndependentEmployerTableValue independentEmployerTableValue) {
         boolean isPirateCampaign = campaign.isPirateCampaign();
-        boolean isClanCampaign = employerFaction.isClan();
         int adjustedConnections = negotiator.getAdjustedConnections(false);
         ConnectionsLevel connectionsLevel = ConnectionsLevel.parseConnectionsLevelFromInt(adjustedConnections);
         int connectionsEquipLevel = connectionsLevel.getEquipLevel();
 
-        int roll = getMissionRollAdjustedByFaction(isClanCampaign, connectionsEquipLevel);
-
         if (isPirateCampaign) {
+            // Pirate campaigns roll on the pirate table, which never yields Covert or Special missions. The Clan
+            // reroll only exists to suppress those results, so it does not apply here and the employer's Clan status
+            // is irrelevant.
+            int roll = getMissionRoll(connectionsEquipLevel);
             objectiveTypes = getPirateObjectiveType(roll);
         } else {
+            boolean isClanCampaign = employerFaction.isClan();
+            int roll = getMissionRollAdjustedByFaction(isClanCampaign, connectionsEquipLevel);
             objectiveTypes = switch (employerTableValue) {
                 case INDEPENDENT ->
                       getIndependentObjectiveType(roll, independentEmployerTableValue, connectionsEquipLevel);
