@@ -38,9 +38,25 @@ import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.newContract.MissionLocationProfile;
 import mekhq.campaign.universe.RandomFactionGenerator;
 
+/**
+ * Determines the target star system for a generated contract by delegating to the random faction generator with the
+ * attacker and defender resolved from the player's role. This is a static utility class and is not instantiable.
+ */
 public class ContractDeterminationLocation {
     private ContractDeterminationLocation() {}
 
+    /**
+     * Determines the contract's target system. The employer and enemy are assigned to attacker/defender roles based on
+     * whether the player is attacking, then a mission target is drawn using the objective type's location profile.
+     *
+     * @param objectiveType       the contract's objective type, whose location profile guides target selection
+     * @param isPlayerAttacker    whether the player's employer is the attacker (otherwise the defender)
+     * @param employerFactionCode the employer faction's short code
+     * @param enemyFactionCode    the enemy faction's short code
+     * @param currentLocation     the campaign's current location
+     *
+     * @return the target system id, or {@code null} if no valid target could be found
+     */
     public static @Nullable String determineContractLocation(AtBContractType objectiveType, boolean isPlayerAttacker,
           String employerFactionCode, String enemyFactionCode, ILocation currentLocation) {
         MissionLocationProfile missionLocationProfile = objectiveType.getMissionLocationProfile();

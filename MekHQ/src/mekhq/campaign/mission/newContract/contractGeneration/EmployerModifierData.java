@@ -32,6 +32,11 @@
  */
 package mekhq.campaign.mission.newContract.contractGeneration;
 
+/**
+ * A mutable accumulator of the negotiation modifiers an employer contributes during contract generation. Multiple
+ * sources (faction, generosity, oversight, era, unit reputation, special objectives) each add their deltas via the
+ * {@code modify*} methods, and the running totals are read back with the getters.
+ */
 public class EmployerModifierData {
     private double employmentMultiplier = 0.0;
     private double tempoMultiplier = 0.0;
@@ -40,52 +45,103 @@ public class EmployerModifierData {
     private int supportModifier = 0;
     private int transportModifier = 0;
 
+    /**
+     * Creates an accumulator with all modifiers initialized to zero.
+     */
     public EmployerModifierData() {}
 
+    /**
+     * @return the accumulated employment multiplier
+     */
     public double getEmploymentMultiplier() {
         return employmentMultiplier;
     }
 
+    /**
+     * Adds the given delta to the accumulated employment multiplier.
+     *
+     * @param delta the amount to add
+     */
     public void modifyEmploymentMultiplier(double delta) {
         employmentMultiplier += delta;
     }
 
+    /**
+     * @return the accumulated operations-tempo multiplier
+     */
     public double getTempoMultiplier() {
         return tempoMultiplier;
     }
 
+    /**
+     * Adds the given delta to the accumulated operations-tempo multiplier.
+     *
+     * @param delta the amount to add
+     */
     public void modifyTempoMultiplier(double delta) {
         tempoMultiplier += delta;
     }
 
+    /**
+     * @return the accumulated command-rights modifier
+     */
     public int getCommandModifier() {
         return commandModifier;
     }
 
+    /**
+     * Adds the given delta to the accumulated command-rights modifier.
+     *
+     * @param delta the amount to add
+     */
     public void modifyCommandModifier(int delta) {
         commandModifier += delta;
     }
 
+    /**
+     * @return the accumulated salvage-rights modifier
+     */
     public int getSalvageModifier() {
         return salvageModifier;
     }
 
+    /**
+     * Adds the given delta to the accumulated salvage-rights modifier.
+     *
+     * @param delta the amount to add
+     */
     public void modifySalvageModifier(int delta) {
         salvageModifier += delta;
     }
 
+    /**
+     * @return the accumulated support-rights modifier
+     */
     public int getSupportModifier() {
         return supportModifier;
     }
 
+    /**
+     * Adds the given delta to the accumulated support-rights modifier.
+     *
+     * @param delta the amount to add
+     */
     public void modifySupportModifier(int delta) {
         supportModifier += delta;
     }
 
+    /**
+     * @return the accumulated transport-rights modifier
+     */
     public int getTransportModifier() {
         return transportModifier;
     }
 
+    /**
+     * Adds the given delta to the accumulated transport-rights modifier.
+     *
+     * @param delta the amount to add
+     */
     public void modifyTransportModifier(int delta) {
         transportModifier += delta;
     }

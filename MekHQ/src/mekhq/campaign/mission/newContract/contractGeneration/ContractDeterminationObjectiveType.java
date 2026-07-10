@@ -55,6 +55,12 @@ import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 
+/**
+ * Determines a contract's objective type(s) by rolling on the appropriate CamOps mission tables for the campaign and
+ * employer. Construction performs the full determination; the results are then read back via
+ * {@link #getObjectiveTypes()}, {@link #isHighRisk()}, and {@link #isCovert()}. The roll is modified by the
+ * negotiator's skill and connections, and Clan campaigns reroll results that would produce covert or special missions.
+ */
 public class ContractDeterminationObjectiveType {
     private static final MMLogger LOGGER = MMLogger.create(ContractDeterminationObjectiveType.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.MissionObjectiveTypeDetermination";
@@ -78,6 +84,18 @@ public class ContractDeterminationObjectiveType {
     private List<AtBContractType> objectiveTypes;
 
     // TODO player must be able to pick negotiator
+
+    /**
+     * Determines the contract's objective type(s) on construction. The outcome is read back afterwards via the
+     * accessors.
+     *
+     * @param campaign                      the current campaign
+     * @param hiringHallLevel               the local hiring hall level, which biases the roll polarity
+     * @param negotiator                    the negotiator whose skill and connections modify the roll
+     * @param employerFaction               the employer faction (its Clan status affects rerolls)
+     * @param employerTableValue            the employer's global tier, selecting which objective table to use
+     * @param independentEmployerTableValue the independent-employer sub-type, used when the employer is independent
+     */
     public ContractDeterminationObjectiveType(Campaign campaign, HiringHallLevel hiringHallLevel,
           Person negotiator, Faction employerFaction, GlobalEmployerTableValue employerTableValue,
           IndependentEmployerTableValue independentEmployerTableValue) {
@@ -88,14 +106,23 @@ public class ContractDeterminationObjectiveType {
         getObjectiveType(employerFaction, employerTableValue, independentEmployerTableValue);
     }
 
+    /**
+     * @return {@code true} if the determined objectives make the contract high-risk (two or more objective types)
+     */
     public boolean isHighRisk() {
         return isHighRisk;
     }
 
+    /**
+     * @return {@code true} if the determined objectives are covert
+     */
     public boolean isCovert() {
         return isCovert;
     }
 
+    /**
+     * @return the determined objective types, or an empty list if determination produced none
+     */
     public List<AtBContractType> getObjectiveTypes() {
         return objectiveTypes == null ? new ArrayList<>() : objectiveTypes;
     }

@@ -36,6 +36,10 @@ import java.util.UUID;
 
 import mekhq.campaign.mission.enums.AtBContractType;
 
+/**
+ * Base class for a single objective within a generated contract: its identity, parent contract, objective type, enemy
+ * faction, and length. Subclasses supply the concrete objective flavor.
+ */
 public abstract class AbstractContractObjective {
     private UUID uuid;
     private transient AbstractContractManager parentContractManager;
@@ -43,45 +47,78 @@ public abstract class AbstractContractObjective {
     private String enemyFactionCode;
     private int lengthInMonths;
 
+    /**
+     * @return this objective's unique id
+     */
     public UUID getId() {
         return uuid;
     }
 
+    /**
+     * @param uuid this objective's unique id
+     */
     public void setId(UUID uuid) {
         this.uuid = uuid;
     }
 
+    /**
+     * Creates an empty contract objective.
+     */
     public AbstractContractObjective() {
     }
 
+    /**
+     * @return the contract manager this objective belongs to
+     */
     public AbstractContractManager getParentContractManager() {
         return parentContractManager;
     }
 
+    /**
+     * @param parentContractManager the contract manager this objective belongs to
+     */
     public void setParentContractManager(AbstractContractManager parentContractManager) {
         this.parentContractManager = parentContractManager;
     }
 
+    /**
+     * @return the objective's contract type
+     */
     public AtBContractType getObjectiveType() {
         return objectiveType;
     }
 
+    /**
+     * @param objectiveType the objective's contract type
+     */
     public void setObjectiveType(AtBContractType objectiveType) {
         this.objectiveType = objectiveType;
     }
 
+    /**
+     * @return the enemy faction's short code for this objective
+     */
     public String getEnemyFactionCode() {
         return enemyFactionCode;
     }
 
+    /**
+     * @param enemyFactionCode the enemy faction's short code for this objective
+     */
     public void setEnemyFactionCode(String enemyFactionCode) {
         this.enemyFactionCode = enemyFactionCode;
     }
 
+    /**
+     * @return the objective's length in months
+     */
     public int getLengthInMonths() {
         return lengthInMonths;
     }
 
+    /**
+     * @param lengthInMonths the objective's length in months
+     */
     public void setLengthInMonths(int lengthInMonths) {
         this.lengthInMonths = lengthInMonths;
     }

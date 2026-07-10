@@ -47,6 +47,11 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 
+/**
+ * Base class for the in-progress state of a contract as it is generated: the employer, objectives, target system,
+ * cached jump path, negotiation modifiers, negotiated terms, pay, and the high-risk/covert flags. Subclasses supply the
+ * concrete contract flavor.
+ */
 public abstract class AbstractContractManager {
     private final static MMLogger LOGGER = MMLogger.create(AbstractContractManager.class);
 
@@ -61,29 +66,54 @@ public abstract class AbstractContractManager {
     private boolean isCovert;
     private NegotiationsData negotiationsData;
 
+    /**
+     * Creates an empty contract manager.
+     */
     public AbstractContractManager() {
     }
 
+    /**
+     * @return the employer faction's short code
+     */
     public String getEmployerFactionCode() {
         return employerFactionCode;
     }
 
+    /**
+     * @param employerFactionCode the employer faction's short code
+     */
     public void setEmployerFactionCode(String employerFactionCode) {
         this.employerFactionCode = employerFactionCode;
     }
 
+    /**
+     * @return the employer faction resolved from the stored faction code
+     */
     public Faction getEmployerFaction() {
         return Factions.getInstance().getFaction(employerFactionCode);
     }
 
+    /**
+     * @return the live list of contract objectives (not a copy)
+     */
     public List<AbstractContractObjective> getContractAllObjectivesDirect() {
         return contractObjectives;
     }
 
+    /**
+     * @return a defensive copy of the contract objectives
+     */
     public List<AbstractContractObjective> getContractAllObjectivesCopy() {
         return new ArrayList<>(contractObjectives);
     }
 
+    /**
+     * Returns the objective at the given index.
+     *
+     * @param index the objective index
+     *
+     * @return the objective, or {@code null} if the index is out of bounds
+     */
     public @Nullable AbstractContractObjective getContractObjective(int index) {
         try {
             return contractObjectives.get(index);
@@ -93,35 +123,69 @@ public abstract class AbstractContractManager {
         }
     }
 
+    /**
+     * @param contractObjectives the contract objectives to set
+     */
     public void setContractObjectives(List<AbstractContractObjective> contractObjectives) {
         this.contractObjectives = contractObjectives;
     }
 
+    /**
+     * Adds an objective, setting this manager as its parent.
+     *
+     * @param contractObjective the objective to add
+     */
     public void addContractObjective(AbstractContractObjective contractObjective) {
         contractObjective.setParentContractManager(this);
         contractObjectives.add(contractObjective);
     }
 
+    /**
+     * Removes an objective.
+     *
+     * @param contractObjective the objective to remove
+     */
     public void removeContractObjective(AbstractContractObjective contractObjective) {
         contractObjectives.remove(contractObjective);
     }
 
+    /**
+     * @return the target system's id
+     */
     public String getTargetSystemId() {
         return targetSystemId;
     }
 
+    /**
+     * @param targetSystemId the target system's id
+     */
     public void setTargetSystemId(String targetSystemId) {
         this.targetSystemId = targetSystemId;
     }
 
+    /**
+     * @return the target planetary system resolved from the stored system id
+     */
     public PlanetarySystem getTargetSystem() {
         return Systems.getInstance().getSystemById(targetSystemId);
     }
 
+    /**
+     * @return the cached jump path without recalculating it
+     */
     public JumpPath getCachedJumpPathDirect() {
         return cachedJumpPath;
     }
 
+    /**
+     * Returns the cached jump path, recalculating it from the given current system to the target if the cache no longer
+     * starts at the current system.
+     *
+     * @param currentSystem the campaign's current system
+     * @param campaign      the campaign, used to calculate the jump path
+     *
+     * @return the (possibly refreshed) cached jump path
+     */
     public JumpPath getCachedJumpPathWithUpdate(PlanetarySystem currentSystem, Campaign campaign) {
         PlanetarySystem firstSystem = cachedJumpPath.getFirstSystem();
         if (firstSystem == null) {
@@ -139,46 +203,79 @@ public abstract class AbstractContractManager {
         return cachedJumpPath;
     }
 
+    /**
+     * @param cachedJumpPath the jump path to cache
+     */
     public void setCachedJumpPath(JumpPath cachedJumpPath) {
         this.cachedJumpPath = cachedJumpPath;
     }
 
+    /**
+     * @return the accumulated employer negotiation modifiers
+     */
     public EmployerModifierData getEmployerModifierData() {
         return employerModifierData;
     }
 
+    /**
+     * @param employerModifierData the accumulated employer negotiation modifiers
+     */
     public void setEmployerModifierData(EmployerModifierData employerModifierData) {
         this.employerModifierData = employerModifierData;
     }
 
+    /**
+     * @return the contract's payment breakdown
+     */
     public ContractPayData getContractPayData() {
         return contractPayData;
     }
 
+    /**
+     * @param contractPayData the contract's payment breakdown
+     */
     public void setContractPayData(ContractPayData contractPayData) {
         this.contractPayData = contractPayData;
     }
 
+    /**
+     * @return {@code true} if the contract is high-risk
+     */
     public boolean isHighRisk() {
         return isHighRisk;
     }
 
+    /**
+     * @param isHighRisk whether the contract is high-risk
+     */
     public void setHighRisk(boolean isHighRisk) {
         this.isHighRisk = isHighRisk;
     }
 
+    /**
+     * @return {@code true} if the contract is covert
+     */
     public boolean isCovert() {
         return isCovert;
     }
 
+    /**
+     * @param isCovert whether the contract is covert
+     */
     public void setCovert(boolean isCovert) {
         this.isCovert = isCovert;
     }
 
+    /**
+     * @return the negotiated contract terms
+     */
     public NegotiationsData getNegotiationsData() {
         return negotiationsData;
     }
 
+    /**
+     * @param negotiationsData the negotiated contract terms
+     */
     public void setNegotiationsData(NegotiationsData negotiationsData) {
         this.negotiationsData = negotiationsData;
     }

@@ -32,11 +32,21 @@
  */
 package mekhq.campaign.mission.newContract.contractGeneration;
 
+/**
+ * Identifies the individual negotiation modifier fields tracked by {@link EmployerModifierData}, one constant per
+ * accumulated value.
+ */
 public enum NegotiationsModifierType {
+    /** The operations-tempo multiplier. */
     TEMPO_MULTIPLIER,
+    /** The employment multiplier. */
     EMPLOYMENT_MULTIPLIER,
+    /** The command-rights modifier. */
     COMMAND_MODIFIER,
+    /** The salvage-rights modifier. */
     SALVAGE_MODIFIER,
+    /** The support-rights modifier. */
     SUPPORT_MODIFIER,
+    /** The transport-rights modifier. */
     TRANSPORT_MODIFIER;
 }

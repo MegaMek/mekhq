@@ -34,6 +34,16 @@ package mekhq.campaign.mission.newContract.contractGeneration;
 
 import mekhq.campaign.finances.Money;
 
+/**
+ * The transit-pay breakdown for a generated contract, capturing the inputs to the transit-pay calculation alongside the
+ * result.
+ *
+ * @param calculatedBasePay    the base pay the transit pay is derived from
+ * @param transportPeriod      the transport period in weeks
+ * @param employmentMultiplier the employer's employment multiplier
+ * @param reputationFactor     the force's reputation factor
+ * @param calculatedTransitPay the resulting transit pay
+ */
 public record TransitPayData(
       Money calculatedBasePay,
       int transportPeriod,

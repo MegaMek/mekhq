@@ -49,6 +49,11 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 
+/**
+ * Determines the employer faction for a generated contract. Government campaigns employ themselves; mercenary and
+ * pirate campaigns roll a semi-random employer (CamOps pg 39, rev 5th printing), with a chance of a special ComStar or
+ * Word of Blake override. This is a static utility class and is not instantiable.
+ */
 public class ContractDeterminationEmployer {
     private static final MMLogger LOGGER = MMLogger.create(ContractDeterminationEmployer.class);
 
@@ -57,6 +62,20 @@ public class ContractDeterminationEmployer {
 
     private ContractDeterminationEmployer() {}
 
+    /**
+     * Selects the employer faction for a contract based on the campaign faction's type. Government campaigns employ
+     * themselves; mercenary and pirate campaigns roll a semi-random employer and may resolve an independent employer's
+     * backing faction.
+     *
+     * @param currentLocation       the campaign's current location, used to bound the employer search
+     * @param connectionsEquipLevel the negotiator's connections/equipment level modifier to the employer roll
+     * @param campaignFaction       the player's campaign faction, which determines the campaign type
+     * @param currentDate           the current campaign date
+     * @param hiringHallLevel       the local hiring hall level, which modifies the employer roll
+     * @param forceReputationFactor the force's reputation factor, which modifies the employer roll
+     *
+     * @return the selected employer faction together with its roll-table classifications
+     */
     public static EmployerFactionSelection getEmployerFactionSelectionData(ILocation currentLocation,
           int connectionsEquipLevel, Faction campaignFaction, LocalDate currentDate, HiringHallLevel hiringHallLevel,
           double forceReputationFactor) {

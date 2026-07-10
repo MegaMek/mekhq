@@ -66,6 +66,13 @@ public class MissionTargetFinder {
     private final PirateMissionTargetFinder pirateFinder;
     private final ComStarMissionTargetFinder comStarFinder;
 
+    /**
+     * Creates a mission-target finder backed by the given border tracker and faction hints, wiring up the specialized
+     * pirate and ComStar finders.
+     *
+     * @param borderTracker the tracker providing faction border regions
+     * @param factionHints  the faction relationship hints used to evaluate diplomatic stance
+     */
     public MissionTargetFinder(FactionBorderTracker borderTracker, FactionHints factionHints) {
         this.borderTracker = borderTracker;
         this.factionHints = factionHints;

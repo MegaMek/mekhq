@@ -34,6 +34,17 @@ package mekhq.campaign.mission.newContract.contractGeneration;
 
 import mekhq.campaign.finances.Money;
 
+/**
+ * The payment breakdown for a single contract objective, capturing the inputs to the objective-pay calculation
+ * alongside the result.
+ *
+ * @param calculatedBasePay      the base pay the objective pay is derived from
+ * @param objectiveLength        the objective's length in months
+ * @param tempoMultiplier        the operations-tempo multiplier for the objective's contract type
+ * @param employmentMultiplier   the employer's employment multiplier
+ * @param reputationFactor       the force's reputation factor
+ * @param calculatedObjectivePay the resulting pay for this objective
+ */
 public record ObjectivePayData(
       Money calculatedBasePay,
       int objectiveLength,

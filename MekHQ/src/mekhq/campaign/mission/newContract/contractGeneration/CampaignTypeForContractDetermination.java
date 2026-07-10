@@ -32,8 +32,15 @@
  */
 package mekhq.campaign.mission.newContract.contractGeneration;
 
+/**
+ * The kind of campaign a contract is being generated for, which drives how employers, objectives, negotiators, and pay
+ * are determined. Every campaign faction resolves to exactly one of these categories.
+ */
 public enum CampaignTypeForContractDetermination {
+    /** A mercenary command, which receives a semi-random employer drawn from the contract search radius. */
     MERCENARY,
+    /** A pirate band, which selects a victim faction rather than a conventional employer. */
     PIRATE,
+    /** A government faction (any campaign faction that is neither mercenary nor pirate). */
     GOVERNMENT
 }

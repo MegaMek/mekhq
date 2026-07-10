@@ -36,6 +36,16 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import mekhq.campaign.universe.Faction;
 
+/**
+ * The outcome of employer selection: the chosen employer faction together with the roll-table classifications used to
+ * derive it. The global tier applies to every employer; the independent type is only present when the global tier is
+ * {@link GlobalEmployerTableValue#INDEPENDENT}.
+ *
+ * @param employerFaction               the selected employer faction, or {@code null} if none could be generated
+ * @param globalEmployerTableValue      the employer's global tier classification
+ * @param independentEmployerTableValue the independent-employer sub-type, or {@code null} if not an independent
+ *                                      employer
+ */
 public record EmployerFactionSelection(
       @Nullable Faction employerFaction,
       @Nonnull GlobalEmployerTableValue globalEmployerTableValue,

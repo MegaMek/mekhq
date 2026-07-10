@@ -38,6 +38,11 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.RandomFactionGenerator;
 
+/**
+ * Excludes defensive contracts offered by an employer that holds no territory. A contract where the player defends is a
+ * defense of the employer's worlds, so an employer with nowhere to stand has nothing to defend. This is a static
+ * utility class and is not instantiable.
+ */
 public class LandlessEmployerExclusion {
     private static final MMLogger LOGGER = MMLogger.create(LandlessEmployerExclusion.class);
 
@@ -47,6 +52,10 @@ public class LandlessEmployerExclusion {
      * A contract where the player defends is a defense of the employer's territory, so an employer with no planets
      * anywhere - neither its own nor a contained-faction host's worlds to stand on - has nothing to defend, and the
      * contract fails outright. Contracts where the player attacks stay valid for a landless employer.
+     *
+     * @param employerFaction  the employer faction to test for territory
+     * @param isPlayerAttacker whether the player is the attacker (defensive contracts are those where they are not)
+     * @param currentDate      the current campaign date, used to evaluate the employer's territory
      *
      * @return {@code true} if the contract should be rejected, {@code false} otherwise
      */

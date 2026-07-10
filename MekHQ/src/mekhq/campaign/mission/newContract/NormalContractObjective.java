@@ -32,7 +32,13 @@
  */
 package mekhq.campaign.mission.newContract;
 
+/**
+ * The standard {@link AbstractContractObjective} implementation used for conventional contract generation.
+ */
 public class NormalContractObjective extends AbstractContractObjective {
+    /**
+     * Creates an empty normal contract objective.
+     */
     public NormalContractObjective() {
         super();
     }

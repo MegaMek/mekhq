@@ -32,8 +32,16 @@
  */
 package mekhq.campaign.mission.newContract.contractGeneration;
 
+/**
+ * The negotiation modifiers contributed by special contract objective characteristics &mdash; high-risk and covert
+ * operations. Each constant bundles a tempo multiplier with command, salvage, support, and transport modifiers, applied
+ * to an {@link EmployerModifierData} accumulator via {@link #applyHighRisk(EmployerModifierData)} and
+ * {@link #applyCovert(EmployerModifierData)}.
+ */
 public enum SpecialNegotiationsModifier {
+    /** Modifiers applied when the contract's objectives make it high-risk. */
     OBJECTIVE_HIGH_RISK(0.5, -1, -2, 1, 0),
+    /** Modifiers applied when the contract's objectives are covert. */
     OBJECTIVE_COVERT(0.3, 1, 1, -1, -1);
 
     private final double tempoMultiplier;
@@ -51,30 +59,55 @@ public enum SpecialNegotiationsModifier {
         this.transportModifier = transportModifier;
     }
 
+    /**
+     * @return the operations-tempo multiplier contributed by this modifier
+     */
     public double getTempoMultiplier() {
         return tempoMultiplier;
     }
 
+    /**
+     * @return the command-rights modifier contributed by this modifier
+     */
     public int getCommandModifier() {
         return commandModifier;
     }
 
+    /**
+     * @return the salvage-rights modifier contributed by this modifier
+     */
     public int getSalvageModifier() {
         return salvageModifier;
     }
 
+    /**
+     * @return the support-rights modifier contributed by this modifier
+     */
     public int getSupportModifier() {
         return supportModifier;
     }
 
+    /**
+     * @return the transport-rights modifier contributed by this modifier
+     */
     public int getTransportModifier() {
         return transportModifier;
     }
 
+    /**
+     * Applies the high-risk objective modifiers to the given accumulator.
+     *
+     * @param modifierData the accumulator to apply the modifiers to
+     */
     public static void applyHighRisk(EmployerModifierData modifierData) {
         applyNegotiationModifiers(OBJECTIVE_HIGH_RISK, modifierData);
     }
 
+    /**
+     * Applies the covert objective modifiers to the given accumulator.
+     *
+     * @param modifierData the accumulator to apply the modifiers to
+     */
     public static void applyCovert(EmployerModifierData modifierData) {
         applyNegotiationModifiers(OBJECTIVE_COVERT, modifierData);
     }

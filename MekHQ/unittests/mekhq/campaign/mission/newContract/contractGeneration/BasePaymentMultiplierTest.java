@@ -133,7 +133,16 @@ class BasePaymentMultiplierTest {
         String label = value.getLabel();
 
         assertNotNull(label);
-        assertTrue(isResourceKeyValid(label), "Missing resource for " + value.name());
+        assertTrue(isResourceKeyValid(label), "Missing label resource for " + value.name());
+    }
+
+    @ParameterizedTest
+    @EnumSource(BasePaymentMultiplier.class)
+    public void testGetTooltip_notInvalid(BasePaymentMultiplier value) {
+        String label = value.getTooltip();
+
+        assertNotNull(label);
+        assertTrue(isResourceKeyValid(label), "Missing tooltip resource for " + value.name());
     }
 
     @ParameterizedTest

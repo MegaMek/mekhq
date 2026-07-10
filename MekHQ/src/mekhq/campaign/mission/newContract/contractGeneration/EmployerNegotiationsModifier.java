@@ -34,6 +34,12 @@ package mekhq.campaign.mission.newContract.contractGeneration;
 
 import mekhq.campaign.universe.Faction;
 
+/**
+ * The negotiation modifiers contributed by the employer's characteristics &mdash; their power tier, generosity,
+ * oversight style, and the campaign era. Each constant bundles an employment multiplier with command, salvage, support,
+ * and transport modifiers, and {@link #getNegotiationsModifier(Faction, int, EmployerModifierData)} applies the
+ * appropriate combination to an {@link EmployerModifierData} accumulator.
+ */
 public enum EmployerNegotiationsModifier {
     EMPLOYER_SUPER_POWER(1.3, 0, 0, 1, 2),
     EMPLOYER_MAJOR_POWER(1.2, 0, -1, 0, 1),
@@ -63,26 +69,49 @@ public enum EmployerNegotiationsModifier {
         this.transportModifier = transportModifier;
     }
 
+    /**
+     * @return the employment multiplier contributed by this modifier
+     */
     public double getEmploymentMultiplier() {
         return employmentMultiplier;
     }
 
+    /**
+     * @return the command-rights modifier contributed by this modifier
+     */
     public int getCommandModifier() {
         return commandModifier;
     }
 
+    /**
+     * @return the salvage-rights modifier contributed by this modifier
+     */
     public int getSalvageModifier() {
         return salvageModifier;
     }
 
+    /**
+     * @return the support-rights modifier contributed by this modifier
+     */
     public int getSupportModifier() {
         return supportModifier;
     }
 
+    /**
+     * @return the transport-rights modifier contributed by this modifier
+     */
     public int getTransportModifier() {
         return transportModifier;
     }
 
+    /**
+     * Applies every employer-derived negotiation modifier &mdash; faction power, generosity, oversight, and era &mdash;
+     * for the given employer and year to the supplied accumulator.
+     *
+     * @param employer     the employer faction
+     * @param year         the campaign year, used to apply era modifiers
+     * @param modifierData the accumulator to apply the modifiers to
+     */
     public static void getNegotiationsModifier(Faction employer, int year, EmployerModifierData modifierData) {
         getFactionModifiers(employer, modifierData);
         getGenerosityModifiers(employer, modifierData);

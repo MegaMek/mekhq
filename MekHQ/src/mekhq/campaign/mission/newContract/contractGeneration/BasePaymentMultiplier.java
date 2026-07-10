@@ -37,6 +37,11 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import megamek.logging.MMLogger;
 import org.jspecify.annotations.NonNull;
 
+/**
+ * The employer's generosity when setting a contract's base payment, expressed as a multiplier applied to the calculated
+ * base pay. Ranges from {@link #GENEROUS} (150%) down to {@link #MISERLY} (20%), with {@link #NORMAL} leaving the base
+ * pay unchanged.
+ */
 public enum BasePaymentMultiplier {
     GENEROUS("GENEROUS", 1.5),
     NORMAL("NORMAL", 1.0),
@@ -44,6 +49,7 @@ public enum BasePaymentMultiplier {
     MISERLY("MISERLY", 0.2);
 
     private final String lookupName;
+    private final String tooltip;
     private final String label;
     private final double multiplier;
 
@@ -52,6 +58,7 @@ public enum BasePaymentMultiplier {
     BasePaymentMultiplier(final String lookupName, final double multiplier) {
         this.lookupName = lookupName;
         this.label = generateLabel(lookupName);
+        this.tooltip = generateTooltip(lookupName);
         this.multiplier = multiplier;
     }
 
@@ -61,14 +68,41 @@ public enum BasePaymentMultiplier {
         return getTextAt(RESOURCE_BUNDLE, "BasePaymentMultiplier." + lookupName + ".name");
     }
 
+    private @NonNull String generateTooltip(String lookupName) {
+        String RESOURCE_BUNDLE = "mekhq.resources.BasePaymentMultiplier";
+
+        return getTextAt(RESOURCE_BUNDLE, "BasePaymentMultiplier." + lookupName + ".tooltip");
+    }
+
+    /**
+     * @return the localized, human-readable display label for this multiplier
+     */
     public String getLabel() {
         return label;
     }
 
+    /**
+     * @return the localized, human-readable description for this multiplier
+     */
+    public String getTooltip() {
+        return tooltip;
+    }
+
+    /**
+     * @return the factor applied to a contract's calculated base pay
+     */
     public double getMultiplier() {
         return multiplier;
     }
 
+    /**
+     * Resolves a {@link BasePaymentMultiplier} from a string. The text is matched, in order, against the enum name
+     * (case-insensitive, spaces treated as underscores), the internal lookup name, and finally the ordinal index.
+     *
+     * @param text the text to parse
+     *
+     * @return the matching multiplier, or {@link #NORMAL} if none matches
+     */
     public static BasePaymentMultiplier fromString(String text) {
         try {
             return BasePaymentMultiplier.valueOf(text.toUpperCase().replace(" ", "_"));
@@ -89,6 +123,9 @@ public enum BasePaymentMultiplier {
         return NORMAL;
     }
 
+    /**
+     * @return the localized display label, so the enum renders sensibly in UI components
+     */
     @Override
     public String toString() {
         return getLabel();

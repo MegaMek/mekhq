@@ -57,6 +57,12 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import org.jspecify.annotations.NonNull;
 
+/**
+ * Generates the employer's negotiator for a contract. The negotiator's role is chosen from the campaign type, employer
+ * faction, and hiring hall level, and the generated person is then brought up to the CamOps negotiator baseline
+ * (veteran experience, minimum charisma, and minimum negotiation skill) before being assigned a special ability and,
+ * for ranked roles, a military rank. This is a static utility class and is not instantiable.
+ */
 public class EmployerNegotiator {
     /**
      * This level is taken from CamOps rev 5th printing, pg 41. CamOps states that Negotiators have a Charisma modifier
@@ -84,6 +90,18 @@ public class EmployerNegotiator {
     private EmployerNegotiator() {}
 
     // TODO have a way for the player to get intel on the opposing negotiator
+
+    /**
+     * Generates the employer's negotiator, choosing an appropriate role and raising the person to the CamOps negotiator
+     * baseline.
+     *
+     * @param campaign        the current campaign, used to create and adjust the person
+     * @param campaignType    the campaign type, which drives the negotiator's role
+     * @param employerFaction the employer faction (its Clan status affects the role and rank system)
+     * @param hiringHallLevel the local hiring hall level, which can affect the mercenary negotiator's role
+     *
+     * @return the generated negotiator
+     */
     public static Person generateNegotiator(Campaign campaign, CampaignTypeForContractDetermination campaignType,
           Faction employerFaction, HiringHallLevel hiringHallLevel) {
         PersonnelRole role = getNegotiatorRole(hiringHallLevel, campaignType, employerFaction);

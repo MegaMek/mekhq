@@ -32,9 +32,17 @@
  */
 package mekhq.campaign.mission.newContract.contractGeneration;
 
+/**
+ * The individually negotiable clauses of a contract, each of which can be negotiated or renegotiated on its own.
+ * Mirrors the fields of {@link NegotiationsData}.
+ */
 public enum ContractNegotiationClause {
+    /** The command-rights arrangement (integrated, house, liaison, or independent). */
     COMMAND_RIGHTS,
+    /** The share of salvage the employer grants. */
     SALVAGE_RIGHTS,
+    /** The share of support costs the employer covers. */
     SUPPORT_RIGHTS,
+    /** The share of transport costs the employer covers. */
     TRANSPORT_RIGHTS;
 }

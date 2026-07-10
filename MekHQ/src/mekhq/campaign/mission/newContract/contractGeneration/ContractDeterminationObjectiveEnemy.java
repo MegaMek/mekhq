@@ -47,6 +47,11 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RandomFactionGenerator;
 
+/**
+ * Determines the enemy faction for a generated contract objective, drawing a random enemy appropriate to the objective
+ * type and falling back to the Rebels faction when none can be found. This is a static utility class and is not
+ * instantiable.
+ */
 public class ContractDeterminationObjectiveEnemy {
     private static final MMLogger LOGGER = MMLogger.create(ContractDeterminationObjectiveEnemy.class);
 

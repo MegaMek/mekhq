@@ -34,6 +34,13 @@ package mekhq.campaign.mission.newContract.contractGeneration;
 
 import mekhq.campaign.finances.Money;
 
+/**
+ * The base-pay breakdown for a generated contract: the two inputs that make it up and the resulting base pay.
+ *
+ * @param peacetimeOperatingCosts the (scaled) peacetime operating costs of the force
+ * @param totalCostOfCombatUnits  the assessed value of the force's combat units
+ * @param calculatedBasePay       the resulting base pay after applying the base-payment multiplier
+ */
 public record ContractBasePayData(
       Money peacetimeOperatingCosts,
       Money totalCostOfCombatUnits,

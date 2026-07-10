@@ -45,6 +45,11 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
 import mekhq.campaign.personnel.skills.SkillCheck;
 
+/**
+ * Negotiates a contract's terms (command rights and salvage/support/transport shares) through opposed negotiation skill
+ * checks between the player's and employer's negotiators, rolling on the CamOps terms tables. Pirate contracts use
+ * fixed terms and skip negotiation. This is a static utility class and is not instantiable.
+ */
 public class ContractDeterminationNegotiations {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.ContractDeterminationNegotiations";
 
@@ -64,6 +69,18 @@ public class ContractDeterminationNegotiations {
 
     private ContractDeterminationNegotiations() {}
 
+    /**
+     * Negotiates the initial terms of a contract. Pirate campaigns receive fixed terms; all others negotiate every
+     * clause via opposed skill checks.
+     *
+     * @param playerNegotiator     the player's negotiator
+     * @param employerNegotiator   the employer's negotiator
+     * @param campaign             the current campaign
+     * @param campaignType         the campaign type, which selects the pirate or standard negotiation path
+     * @param employerModifierData the accumulated employer negotiation modifiers
+     *
+     * @return the negotiated contract terms
+     */
     public static NegotiationsData negotiateInitialContractTerms(Person playerNegotiator, Person employerNegotiator,
           Campaign campaign, CampaignTypeForContractDetermination campaignType,
           EmployerModifierData employerModifierData) {
@@ -78,6 +95,19 @@ public class ContractDeterminationNegotiations {
               employerNegotiator);
     }
 
+    /**
+     * Renegotiates a single clause of an existing contract, rolling that clause's table afresh and returning updated
+     * terms.
+     *
+     * @param employerModifierData the accumulated employer negotiation modifiers
+     * @param playerNegotiator     the player's negotiator
+     * @param employerNegotiator   the employer's negotiator
+     * @param campaign             the current campaign
+     * @param negotiationsData     the existing contract terms
+     * @param clause               the clause to renegotiate
+     *
+     * @return the contract terms with the renegotiated clause updated
+     */
     public static NegotiationsData renegotiateContractTerm(EmployerModifierData employerModifierData,
           Person playerNegotiator, Person employerNegotiator, Campaign campaign, NegotiationsData negotiationsData,
           ContractNegotiationClause clause) {
@@ -101,6 +131,17 @@ public class ContractDeterminationNegotiations {
               PIRATE_TRANSPORT_RIGHTS);
     }
 
+    /**
+     * Negotiates every contract clause in turn, rolling each clause's table, and assembles the results into a full set
+     * of terms. Used for the non-pirate negotiation path.
+     *
+     * @param employerModifierData the accumulated employer negotiation modifiers
+     * @param campaign             the current campaign
+     * @param playerNegotiator     the player's negotiator
+     * @param employerNegotiator   the employer's negotiator
+     *
+     * @return the fully negotiated contract terms
+     */
     public static NegotiationsData determineInitialNegotiationTerms(EmployerModifierData employerModifierData,
           Campaign campaign, Person playerNegotiator, Person employerNegotiator) {
         ContractCommandRights commandRights = ContractCommandRights.HOUSE;

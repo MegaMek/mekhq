@@ -41,6 +41,11 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 
+/**
+ * Excludes contracts that would send non-Clan forces deep into the Clan Homeworlds. Outside the Operation Bulldog
+ * window, no Inner Sphere or mercenary force has the reach to strike within the exclusion radius of Strana Mechty, so
+ * such contracts are rejected during generation. This is a static utility class and is not instantiable.
+ */
 public class ClanHomeworldsExclusion {
     /**
      * Radius, in light years, of the Clan Homeworlds exclusion zone centered on Strana Mechty.

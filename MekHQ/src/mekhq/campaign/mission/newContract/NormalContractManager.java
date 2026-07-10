@@ -32,7 +32,13 @@
  */
 package mekhq.campaign.mission.newContract;
 
+/**
+ * The standard {@link AbstractContractManager} implementation used for conventional contract generation.
+ */
 public class NormalContractManager extends AbstractContractManager {
+    /**
+     * Creates an empty normal contract manager.
+     */
     public NormalContractManager() {
         super();
     }

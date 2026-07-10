@@ -39,10 +39,20 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.universe.Faction;
 import org.jspecify.annotations.NonNull;
 
+/**
+ * The top-level classification of a contract employer by political scale, from {@link #INDEPENDENT} minor players up to
+ * galactic {@link #SUPER_POWER}s. Each entry owns a contiguous band of the employer-determination roll (the bands tile
+ * the entire integer range), and the tiers form an ordered ladder used to step down to a lesser employer when one
+ * cannot be found.
+ */
 public enum GlobalEmployerTableValue {
+    /** Independent states or factions with minimal influence on galactic affairs. */
     INDEPENDENT("INDEPENDENT", Integer.MIN_VALUE, 5),
+    /** Periphery states or minor players on the galactic stage. */
     MINOR_POWER("MINOR_POWER", 6, 7),
+    /** The great houses or factions with significant spheres of influence. */
     MAJOR_POWER("MAJOR_POWER", 8, 10),
+    /** The Star League, FedCom Alliance, or similar superpowers. */
     SUPER_POWER("SUPER_POWER", 11, Integer.MAX_VALUE);
 
     private final String lookupName;
@@ -70,26 +80,53 @@ public enum GlobalEmployerTableValue {
         return getTextAt(RESOURCE_BUNDLE, "GlobalEmployerTableValue." + lookupName + ".name");
     }
 
+    /**
+     * @return the localized tooltip describing this employer tier
+     */
     public String getTooltip() {
         return tooltip;
     }
 
+    /**
+     * @return the localized, human-readable display label for this employer tier
+     */
     public String getLabel() {
         return label;
     }
 
+    /**
+     * @return the inclusive lower bound of this tier's roll band
+     */
     public int getLowerBand() {
         return lowerBand;
     }
 
+    /**
+     * @return the inclusive upper bound of this tier's roll band
+     */
     public int getUpperBand() {
         return upperBand;
     }
 
+    /**
+     * Determines whether the given roll falls within this tier's band.
+     *
+     * @param value the roll to test
+     *
+     * @return {@code true} if the roll is within this tier's inclusive band
+     */
     public boolean isWithinRange(int value) {
         return value >= lowerBand && value <= upperBand;
     }
 
+    /**
+     * Maps a roll to the employer tier whose band contains it. Because the tier bands tile the entire integer range,
+     * every roll resolves to a tier; {@link #MAJOR_POWER} is returned as a defensive fallback.
+     *
+     * @param roll the employer-determination roll
+     *
+     * @return the matching employer tier
+     */
     public static GlobalEmployerTableValue getEmployerForRoll(int roll) {
         for (GlobalEmployerTableValue employer : values()) {
             if (employer.isWithinRange(roll)) {
@@ -101,6 +138,12 @@ public enum GlobalEmployerTableValue {
         return MAJOR_POWER;
     }
 
+    /**
+     * Steps one rung down the employer ladder, used to retry employer generation with a lesser power when no faction
+     * can be found at the current tier.
+     *
+     * @return the next-lowest employer tier, or {@code null} if this is already {@link #INDEPENDENT}
+     */
     public @Nullable GlobalEmployerTableValue getNextLowestEmployerType() {
         return switch (this) {
             case INDEPENDENT -> null;
@@ -110,6 +153,14 @@ public enum GlobalEmployerTableValue {
         };
     }
 
+    /**
+     * Classifies a faction into its employer tier based on its political power. Factions that match no power tier are
+     * treated as {@link #INDEPENDENT} so nothing slips through.
+     *
+     * @param faction the faction to classify
+     *
+     * @return the employer tier corresponding to the faction's power
+     */
     public static GlobalEmployerTableValue getFactionTableType(Faction faction) {
         if (faction.isMinorPower()) {
             return MINOR_POWER;
@@ -123,6 +174,14 @@ public enum GlobalEmployerTableValue {
         }
     }
 
+    /**
+     * Resolves a {@link GlobalEmployerTableValue} from a string. The text is matched, in order, against the enum name
+     * (case-insensitive, spaces treated as underscores), the internal lookup name, and finally the ordinal index.
+     *
+     * @param text the text to parse
+     *
+     * @return the matching employer tier, or {@link #MAJOR_POWER} if none matches
+     */
     public static GlobalEmployerTableValue fromString(String text) {
         try {
             return GlobalEmployerTableValue.valueOf(text.toUpperCase().replace(" ", "_"));
@@ -143,6 +202,9 @@ public enum GlobalEmployerTableValue {
         return MAJOR_POWER;
     }
 
+    /**
+     * @return the localized display label, so the enum renders sensibly in UI components
+     */
     @Override
     public String toString() {
         return getLabel();

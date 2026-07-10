@@ -64,12 +64,33 @@ import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import org.jspecify.annotations.NonNull;
 
+/**
+ * Calculates the payment terms of a generated contract &mdash; base pay, transit pay, per-objective pay, straight
+ * support, and transport payment &mdash; following CamOps pg 41 (rev 5th printing). This is a static utility class and
+ * is not instantiable.
+ */
 public class ContractDeterminationPay {
     /** CampOps pg 41 5th printing */
     private final static double PEACETIME_OPERATING_COSTS_PERCENTAGE = 0.75;
 
     private ContractDeterminationPay() {}
 
+    /**
+     * Generates the full payment breakdown for a contract, combining base pay, transit pay, and per-objective pay.
+     *
+     * @param contractManager         the contract manager, providing the jump path, employer modifiers, and objectives
+     * @param formations              the campaign's formations
+     * @param hangar                  the campaign's hangar
+     * @param campaignOptions         the campaign options governing pay calculations
+     * @param currentDate             the current campaign date
+     * @param temporaryAsTechPoolSize the temporary astech pool size, factored into operating costs
+     * @param temporaryMedicPool      the temporary medic pool size, factored into operating costs
+     * @param temporaryCrewMap        temporary crew counts by role, factored into operating costs
+     * @param campaignFaction         the campaign faction (its Clan status affects operating costs)
+     * @param reputationFactor        the force's reputation factor
+     *
+     * @return the assembled contract payment data
+     */
     public static ContractPayData generateContractPay(AbstractContractManager contractManager,
           List<Formation> formations, Hangar hangar, CampaignOptions campaignOptions, LocalDate currentDate,
           int temporaryAsTechPoolSize, int temporaryMedicPool, Map<PersonnelRole, Integer> temporaryCrewMap,
@@ -119,6 +140,22 @@ public class ContractDeterminationPay {
         return totalObjectivePay;
     }
 
+    /**
+     * Calculates a contract's base pay: scaled peacetime operating costs plus the assessed combat-unit value, times the
+     * base-payment multiplier.
+     *
+     * @param isClanCampaign          whether the campaign is a Clan campaign
+     * @param formations              the campaign's formations
+     * @param hangar                  the campaign's hangar
+     * @param campaignOptions         the campaign options governing pay calculations
+     * @param currentDate             the current campaign date
+     * @param temporaryAsTechPoolSize the temporary astech pool size, factored into operating costs
+     * @param temporaryMedicPool      the temporary medic pool size, factored into operating costs
+     * @param temporaryCrewMap        temporary crew counts by role, factored into operating costs
+     * @param campaignFaction         the campaign faction
+     *
+     * @return the base-pay breakdown
+     */
     public static ContractBasePayData calculateBasePay(boolean isClanCampaign, List<Formation> formations,
           Hangar hangar, CampaignOptions campaignOptions, LocalDate currentDate, int temporaryAsTechPoolSize,
           int temporaryMedicPool, Map<PersonnelRole, Integer> temporaryCrewMap, Faction campaignFaction) {
@@ -213,6 +250,15 @@ public class ContractDeterminationPay {
               calculatedTransitPay);
     }
 
+    /**
+     * Calculates the transport period, in weeks, for a contract's jump path (CamOps pg 41, rev 5th printing). A journey
+     * that begins and ends in the same system has a period of zero.
+     *
+     * @param cachedJumpPath the jump path from the current location to the contract's target
+     * @param isUseTwoWayPay whether transport pay covers the return journey, doubling the period
+     *
+     * @return the transport period in weeks
+     */
     public static int calculateTransportPeriod(JumpPath cachedJumpPath, boolean isUseTwoWayPay) {
         // The calculation in this method is taken from CamOps pg 41 rev 5th printing
         PlanetarySystem startSystem = cachedJumpPath.getFirstSystem();
@@ -259,6 +305,25 @@ public class ContractDeterminationPay {
         return objectivePayMap;
     }
 
+    /**
+     * Calculates the actual transport payment for moving a force along a jump path, accounting for command-circuit use
+     * and the cost of the traveling units, parts, and personnel.
+     *
+     * @param isOverridingCommandCircuitRequirements whether command-circuit requirements are being overridden
+     * @param isGM                                   whether the action is being taken by a GM
+     * @param factionStandings                       the campaign's faction standings, consulted for command-circuit
+     *                                               eligibility
+     * @param employerCode                           the employer faction's short code
+     * @param jumpPath                               the jump path to be traveled
+     * @param currentDate                            the current campaign date
+     * @param currentLocation                        the campaign's current location, providing transit time
+     * @param travelingUnits                         the units being transported
+     * @param travelingParts                         the spare parts being transported
+     * @param travelingPersonnel                     the personnel being transported
+     * @param jumpShipCrewExperienceLevel            the experience level of the jump-ship crew
+     *
+     * @return the total transport payment for the journey
+     */
     public static Money determineTransportPayment(boolean isOverridingCommandCircuitRequirements, boolean isGM,
           FactionStandings factionStandings, String employerCode, JumpPath jumpPath, LocalDate currentDate,
           ILocation currentLocation, Collection<Unit> travelingUnits, Collection<Part> travelingParts,
@@ -280,6 +345,22 @@ public class ContractDeterminationPay {
         return costCalculation.calculateJumpCostForEntireJourney(duration, jumpPath.getJumps());
     }
 
+    /**
+     * Calculates the straight-support payment: the force's peacetime operating costs scaled by the negotiated
+     * straight-support multiplier.
+     *
+     * @param isClanCampaign            whether the campaign is a Clan campaign
+     * @param formations                the campaign's formations
+     * @param hangar                    the campaign's hangar
+     * @param campaignOptions           the campaign options governing operating-cost calculations
+     * @param currentDate               the current campaign date
+     * @param temporaryAsTechPoolSize   the temporary astech pool size, factored into operating costs
+     * @param temporaryMedicPool        the temporary medic pool size, factored into operating costs
+     * @param temporaryCrewMap          temporary crew counts by role, factored into operating costs
+     * @param straightSupportMultiplier the negotiated straight-support multiplier
+     *
+     * @return the straight-support payment
+     */
     public static Money determineStraightSupport(boolean isClanCampaign, List<Formation> formations,
           Hangar hangar, CampaignOptions campaignOptions, LocalDate currentDate, int temporaryAsTechPoolSize,
           int temporaryMedicPool, Map<PersonnelRole, Integer> temporaryCrewMap, double straightSupportMultiplier) {

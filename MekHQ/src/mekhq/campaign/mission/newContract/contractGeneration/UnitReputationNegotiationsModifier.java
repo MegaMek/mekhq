@@ -36,6 +36,11 @@ import static java.lang.Math.clamp;
 
 import megamek.logging.MMLogger;
 
+/**
+ * The negotiation modifiers contributed by the unit's reputation rating (0 through 10+). Each constant bundles command,
+ * salvage, support, and transport modifiers, and {@link #getNegotiationsModifier(int, EmployerModifierData)} applies
+ * the entry matching a (clamped) reputation rating to an {@link EmployerModifierData} accumulator.
+ */
 public enum UnitReputationNegotiationsModifier {
     UNIT_REPUTATION_RATING_0(-2, -1, -1, -3),
     UNIT_REPUTATION_RATING_1(-1, -1, -1, -2),
@@ -64,22 +69,41 @@ public enum UnitReputationNegotiationsModifier {
         this.transportModifier = transportModifier;
     }
 
+    /**
+     * @return the command-rights modifier contributed by this reputation rating
+     */
     public int getCommandModifier() {
         return commandModifier;
     }
 
+    /**
+     * @return the salvage-rights modifier contributed by this reputation rating
+     */
     public int getSalvageModifier() {
         return salvageModifier;
     }
 
+    /**
+     * @return the support-rights modifier contributed by this reputation rating
+     */
     public int getSupportModifier() {
         return supportModifier;
     }
 
+    /**
+     * @return the transport-rights modifier contributed by this reputation rating
+     */
     public int getTransportModifier() {
         return transportModifier;
     }
 
+    /**
+     * Applies the modifiers for the given unit reputation rating to the supplied accumulator. The rating is clamped to
+     * the range 0&ndash;10 before lookup.
+     *
+     * @param reputationRating the unit's reputation rating
+     * @param modifierData     the accumulator to apply the modifiers to
+     */
     public static void getNegotiationsModifier(int reputationRating, EmployerModifierData modifierData) {
         int clampedRating = clamp(reputationRating, 0, 10);
 

@@ -57,14 +57,33 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import org.jspecify.annotations.Nullable;
 
+/**
+ * Orchestrates end-to-end generation of a new contract, tying together the individual determination stages: employer,
+ * objective type, enemy, location, negotiators, negotiated terms, and pay.
+ */
 public class ContractGenerationManager {
     private static final MMLogger LOGGER = MMLogger.create(ContractGenerationManager.class);
 
     private ContractGenerationManager() {}
 
-    public void generateContract(Campaign campaign, double forceReputationFactor, AbstractLocation currentLocation,
-          Person playerNegotiator, List<Formation> formations, Hangar hangar, int temporaryAsTechPoolSize,
-          int temporaryMedicPool, Map<PersonnelRole, Integer> temporaryCrewMap,
+    /**
+     * Generates a new contract for the campaign, running each determination stage in turn (employer, objective type,
+     * enemy, location, negotiators, terms, and pay).
+     *
+     * @param campaign                the current campaign
+     * @param forceReputationFactor   the force's reputation factor, applied to employer selection and pay
+     * @param currentLocation         the campaign's current location
+     * @param playerNegotiator        the player's negotiator
+     * @param formations              the campaign's formations
+     * @param hangar                  the campaign's hangar
+     * @param temporaryAsTechPoolSize the temporary astech pool size, factored into pay
+     * @param temporaryMedicPool      the temporary medic pool size, factored into pay
+     * @param temporaryCrewMap        temporary crew counts by role, factored into pay
+     * @param campaignType            the campaign type, which drives employer, objective, and negotiator determination
+     */
+    public static void generateContract(Campaign campaign, double forceReputationFactor,
+          AbstractLocation currentLocation, Person playerNegotiator, List<Formation> formations, Hangar hangar,
+          int temporaryAsTechPoolSize, int temporaryMedicPool, Map<PersonnelRole, Integer> temporaryCrewMap,
           CampaignTypeForContractDetermination campaignType) {
         AbstractContractManager contractManager = new NormalContractManager();
 
