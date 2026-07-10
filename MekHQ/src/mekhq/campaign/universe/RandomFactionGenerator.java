@@ -66,8 +66,8 @@ import mekhq.campaign.location.ILocation;
 import mekhq.campaign.mission.newContract.EnemySelectionProfile;
 import mekhq.campaign.mission.newContract.MissionLocationProfile;
 import mekhq.campaign.mission.newContract.MissionTargetFinder;
-import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.mission.newContract.contractGeneration.GlobalEmployerTableValue;
+import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.enums.HPGRating;
 import mekhq.campaign.universe.factionHints.FactionHints;
 
@@ -580,7 +580,7 @@ public class RandomFactionGenerator {
 
     /**
      * Checks whether {@code occupier} currently holds a system within the search radius that {@code formerOwner} held
-     * {@value MissionLocationProfile#OCCUPIED_TERRITORY_LOOKBACK_YEARS} years ago, stopping at the first match.
+     * {@value MissionLocationProfile#OCCUPIED_TERRITORY_LOOK_BACK_YEARS} years ago, stopping at the first match.
      *
      * @param occupier    the faction suspected of occupying the former owner's territory
      * @param formerOwner the faction whose lost worlds are being looked for
@@ -596,7 +596,7 @@ public class RandomFactionGenerator {
             return false;
         }
 
-        LocalDate beforeConquest = date.minusYears(MissionLocationProfile.OCCUPIED_TERRITORY_LOOKBACK_YEARS);
+        LocalDate beforeConquest = date.minusYears(MissionLocationProfile.OCCUPIED_TERRITORY_LOOK_BACK_YEARS);
         for (PlanetarySystem system : borderTracker.systemsNear(origin, borderTracker.getRadius())) {
             if (system.getFactionSet(date).contains(occupier) &&
                       system.getFactionSet(beforeConquest).contains(formerOwner)) {

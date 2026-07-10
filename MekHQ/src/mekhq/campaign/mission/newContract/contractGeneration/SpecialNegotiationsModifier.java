@@ -75,7 +75,9 @@ public enum SpecialNegotiationsModifier {
         applyNegotiationModifiers(OBJECTIVE_HIGH_RISK, modifierData);
     }
 
-    public static void applyCovert(EmployerModifierData modifierData) {}
+    public static void applyCovert(EmployerModifierData modifierData) {
+        applyNegotiationModifiers(OBJECTIVE_COVERT, modifierData);
+    }
 
     private static void applyNegotiationModifiers(SpecialNegotiationsModifier modifierEntry,
           EmployerModifierData modifierData) {
