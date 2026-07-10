@@ -52,7 +52,7 @@ public record ContractPayData(
         this(basePayData, transitPayData, objectivePayDataMap, totalObjectivePay, 0.0, Money.zero(), 0.0, Money.zero());
     }
 
-    public ContractPayData rebuildIncludingTransportPay(double straightSupportMultiplier,
+    public ContractPayData rebuildIncludingStraightSupport(double straightSupportMultiplier,
           Money straightSupportEstimate) {
         return new ContractPayData(
               basePayData,
@@ -66,7 +66,7 @@ public record ContractPayData(
         );
     }
 
-    public ContractPayData rebuildIncludingStraightSupport(double transportPaymentMultiplier, Money transportPayment) {
+    public ContractPayData rebuildIncludingTransportPay(double transportPaymentMultiplier, Money transportPayment) {
         return new ContractPayData(
               basePayData,
               transitPayData,
