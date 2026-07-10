@@ -157,8 +157,8 @@ public class FactionBorderTrackerTest {
 
     /**
      * Regression test: {@link FactionBorderTracker#getBorders(Faction, ILocation, double)} computes a fresh result
-     * around an arbitrary location, entirely independent of the tracker's persistently cached region &mdash; even
-     * when that cached region is centered somewhere else (or empty) at the time of the call.
+     * around an arbitrary location, entirely independent of the tracker's persistently cached region &mdash; even when
+     * that cached region is centered somewhere else (or empty) at the time of the call.
      */
     @Test
     public void testGetBordersByLocationIgnoresCachedRegion() {
@@ -168,7 +168,8 @@ public class FactionBorderTrackerTest {
         tracker.setRegionRadius(1);
         tracker.setRegionCenter(50, 0);
         assertNull(tracker.getBorders(factionUs), "Sanity check: cached region should have no presence for factionUs");
-        assertNull(tracker.getBorders(factionThem), "Sanity check: cached region should have no presence for factionThem");
+        assertNull(tracker.getBorders(factionThem),
+              "Sanity check: cached region should have no presence for factionThem");
 
         ILocation location = createLocationAt(0, 0);
 
@@ -281,6 +282,35 @@ public class FactionBorderTrackerTest {
         tracker.setBorderSize(is, 30);
 
         assertEquals(30, tracker.getBorderSize(is), RegionPerimeter.EPSILON);
+    }
+
+    /**
+     * Regression test: {@link FactionBorderTracker#systemsNear(PlanetarySystem, double)} caches only the single most
+     * recent (origin, radius) query. A change in either the origin or the radius must recompute rather than serve a
+     * stale result left over from a prior call.
+     */
+    @Test
+    public void testSystemsNearRecomputesWhenOriginOrRadiusChanges() {
+        FactionBorderTracker tracker = buildTestTracker();
+        PlanetarySystem origin = createSystem(0, 0, factionUs);
+        PlanetarySystem farOrigin = createSystem(50, 0, factionUs);
+
+        assertEquals(3,
+              tracker.systemsNear(origin, 1).size(),
+              "Sanity check: radius 1 around the origin should include factionUs and the two adjacent factionThem systems");
+
+        // Same origin, narrower radius: must not reuse the radius-1 cache entry.
+        assertEquals(1, tracker.systemsNear(origin, 0.5).size(),
+              "A narrower radius on the same origin should recompute rather than reuse the wider cached result");
+
+        // Same radius as the first call, but a different origin far from every system: must not reuse the
+        // origin-(0,0) cache entry.
+        assertEquals(0, tracker.systemsNear(farOrigin, 1).size(),
+              "A different origin should recompute rather than reuse the previous origin's cached result");
+
+        // Back to the original (origin, radius) pair: should still produce the correct, non-stale result.
+        assertEquals(3, tracker.systemsNear(origin, 1).size(),
+              "Returning to a previously-queried (origin, radius) pair should still compute the correct result");
     }
 
     @Test

@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.mission.newContract;
 
+import static mekhq.MHQConstants.FORTRESS_REPUBLIC_END;
 import static mekhq.MHQConstants.FORTRESS_REPUBLIC_START;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -550,7 +551,7 @@ public class MissionTargetFinderTest {
     }
 
     @Test
-    public void testFindFortressRepublicFiltersNonTerraRepublicSystems() {
+    public void testFindFortressRepublicExcludesAllRepublicSystemsDuringCoreWindow() {
         Faction rosFaction = createTestFaction(Faction.REPUBLIC_OF_THE_SPHERE_FACTION_CODE, false, false);
         allFactions.add(rosFaction);
         Faction mercAttacker = createTestFaction("MERC", false, false);
@@ -575,9 +576,44 @@ public class MissionTargetFinderTest {
 
         List<PlanetarySystem> targets = finder.find(mercAttacker, rosFaction, location, fortressRepublicDate);
 
-        assertEquals(List.of(terraSystem), targets,
-              "During the Fortress Republic era, only Terra should remain a valid target among Republic-owned "
-                    + "systems");
+        assertTrue(targets.isEmpty(),
+              "During the core Fortress Republic window, every Republic-owned system - Terra included - is "
+                    + "off-limits as a target (see Faction#isDuringFortressRepublic)");
+    }
+
+    /**
+     * Once the core Fortress Republic window ends, {@link Faction#isDuringFortressRepublic} keeps excluding Terra alone
+     * through the wider Terra-only window, while every other Republic system becomes a valid target again.
+     */
+    @Test
+    public void testFindFortressRepublicTerraOnlyExcludesOnlyTerra() {
+        Faction rosFaction = createTestFaction(Faction.REPUBLIC_OF_THE_SPHERE_FACTION_CODE, false, false);
+        allFactions.add(rosFaction);
+        Faction mercAttacker = createTestFaction("MERC", false, false);
+        when(mercAttacker.isMercenary()).thenReturn(true);
+
+        PlanetarySystem terraSystem = createTestSystem(0, 0, rosFaction);
+        when(terraSystem.getId()).thenReturn("Terra");
+        PlanetarySystem otherRepublicSystem = createTestSystem(1, 0, rosFaction);
+        when(otherRepublicSystem.getId()).thenReturn("Addicks");
+
+        List<PlanetarySystem> systems = List.of(terraSystem, otherRepublicSystem);
+        FactionBorderTracker tracker = buildTestTracker(systems);
+
+        LocalDate terraOnlyDate = FORTRESS_REPUBLIC_END.plusMonths(6);
+        tracker.setDate(terraOnlyDate);
+        // Blocks until the background recalculation triggered by setDate() has finished, so the tracker's cached
+        // state (consulted by resolveTerritorialHost) is guaranteed to reflect terraOnlyDate.
+        tracker.getFactionsInRegion();
+
+        MissionTargetFinder finder = new MissionTargetFinder(tracker, new FactionHints());
+        ILocation location = createTestLocation(rosFaction);
+
+        List<PlanetarySystem> targets = finder.find(mercAttacker, rosFaction, location, terraOnlyDate);
+
+        assertEquals(List.of(otherRepublicSystem), targets,
+              "After the core Fortress Republic window ends, only Terra should remain off-limits as a target "
+                    + "among Republic-owned systems");
     }
 
     /**

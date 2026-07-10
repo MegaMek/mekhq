@@ -543,7 +543,7 @@ public abstract class AbstractContractMarket {
      * @param campaign the active campaign
      */
     protected void setEnemyCode(AtBContract contract, Campaign campaign) {
-        EnemySelectionProfile profile = EnemySelectionProfile.fromContractType(contract.getContractType());
+        EnemySelectionProfile profile = contract.getContractType().getEnemySelectionProfile();
         Faction enemyFaction = RandomFactionGenerator.getInstance()
                                      .getRandomEnemy(campaign.getCurrentLocation(), campaign.getLocalDate(),
                                            contract.getEmployerFaction(), profile);
@@ -587,7 +587,7 @@ public abstract class AbstractContractMarket {
             throw new NoContractLocationFoundException("Defensive contract for landless employer");
         }
 
-        MissionLocationProfile profile = MissionLocationProfile.fromContractType(contract.getContractType());
+        MissionLocationProfile profile = contract.getContractType().getMissionLocationProfile();
         if (contract.isPlayerAttacker()) {
             contract.setSystemId(RandomFactionGenerator.getInstance()
                                        .getMissionTarget(contract.getEmployerCode(), contract.getEnemyCode(),

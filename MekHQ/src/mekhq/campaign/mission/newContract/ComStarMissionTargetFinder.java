@@ -77,14 +77,12 @@ class ComStarMissionTargetFinder {
         }
 
         List<PlanetarySystem> validSystems = new ArrayList<>();
-        for (PlanetarySystem system : borderTracker.getSystemList()) {
-            if ((radius < 0) || (system.getDistanceTo(origin) <= radius)) {
-                boolean ownedByComStar = system.getFactionSet(date).contains(comStar);
-                HPGRating hpg = system.getHPG(date);
-                boolean highRatedHPG = (hpg != null) && (hpg.compareTo(HPGRating.B) >= 0);
-                if (ownedByComStar || highRatedHPG) {
-                    validSystems.add(system);
-                }
+        for (PlanetarySystem system : borderTracker.systemsNear(origin, radius)) {
+            boolean ownedByComStar = system.getFactionSet(date).contains(comStar);
+            HPGRating hpg = system.getHPG(date);
+            boolean highRatedHPG = (hpg != null) && (hpg.compareTo(HPGRating.B) >= 0);
+            if (ownedByComStar || highRatedHPG) {
+                validSystems.add(system);
             }
         }
         return validSystems;

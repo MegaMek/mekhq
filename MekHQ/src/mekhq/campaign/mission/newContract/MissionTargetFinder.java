@@ -32,9 +32,6 @@
  */
 package mekhq.campaign.mission.newContract;
 
-import static mekhq.MHQConstants.FORTRESS_REPUBLIC_END;
-import static mekhq.MHQConstants.FORTRESS_REPUBLIC_START;
-import static mekhq.MHQConstants.FORTRESS_REPUBLIC_TERRA_ONLY_END;
 import static mekhq.campaign.universe.Faction.BANDIT_CASTE_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
@@ -475,10 +472,11 @@ public class MissionTargetFinder {
                                               new ArrayList<>(borders.getSystems());
 
         Faction republicOfTheSphere = Factions.getInstance().getFaction(REPUBLIC_OF_THE_SPHERE_FACTION_CODE);
-        boolean isDuringFortressRepublic = isDuringFortressRepublic(REPUBLIC_OF_THE_SPHERE_FACTION_CODE, currentDate);
-        boolean isDuringFortressRepublicTerraOnly = isDuringFortressRepublicTerraOnly(currentDate);
 
-        if (!isDuringFortressRepublic && !isDuringFortressRepublicTerraOnly) {
+        // Terra's own Fortress Republic window (start to TERRA_ONLY_END) fully contains the narrower "core" window
+        // every other Republic system uses (start to END), so it alone determines whether this filtering applies
+        // at all - see Faction#isDuringFortressRepublic.
+        if (!Faction.isDuringFortressRepublic(REPUBLIC_OF_THE_SPHERE_FACTION_CODE, currentDate, "Terra")) {
             return systems;
         }
 
@@ -493,38 +491,12 @@ public class MissionTargetFinder {
                 continue;
             }
 
-            boolean isTerra = system.getId().equalsIgnoreCase("Terra");
-            if (isDuringFortressRepublic && !isDuringFortressRepublicTerraOnly) {
-                continue;
-            }
-
-            if (isTerra) {
+            if (!Faction.isDuringFortressRepublic(REPUBLIC_OF_THE_SPHERE_FACTION_CODE, currentDate,
+                  system.getId())) {
                 filteredSystems.add(system);
             }
         }
 
         return filteredSystems;
-    }
-
-    /**
-     * @param factionShortName the faction's short name
-     * @param currentDate      the date to check
-     *
-     * @return {@code true} if the faction is ROS, and the date is after Fortress Republic begins, but before it ends
-     */
-    private static boolean isDuringFortressRepublic(String factionShortName, LocalDate currentDate) {
-        return factionShortName.equals(REPUBLIC_OF_THE_SPHERE_FACTION_CODE) &&
-                     currentDate.isBefore(FORTRESS_REPUBLIC_END) &&
-                     currentDate.isAfter(FORTRESS_REPUBLIC_START);
-    }
-
-    /**
-     * @param currentDate the date to check
-     *
-     * @return {@code true} if the date is after Fortress Republic (Terra only) begins, but before it ends
-     */
-    private static boolean isDuringFortressRepublicTerraOnly(LocalDate currentDate) {
-        return currentDate.isBefore(FORTRESS_REPUBLIC_TERRA_ONLY_END) &&
-                     currentDate.isAfter(FORTRESS_REPUBLIC_START);
     }
 }

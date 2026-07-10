@@ -33,16 +33,14 @@
  */
 package mekhq.campaign.universe;
 
+import static java.lang.Math.ceil;
 import static java.lang.Math.max;
-import static mekhq.MHQConstants.FORTRESS_REPUBLIC_END;
-import static mekhq.MHQConstants.FORTRESS_REPUBLIC_START;
 import static mekhq.campaign.universe.Faction.BANDIT_CASTE_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.CLAN_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.COMSTAR_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.REBEL_FACTION_CODE;
-import static mekhq.campaign.universe.Faction.REPUBLIC_OF_THE_SPHERE_FACTION_CODE;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -228,18 +226,7 @@ public class RandomFactionGenerator {
         Set<String> retVal = new TreeSet<>();
         LocalDate currentDate = getCurrentDate();
         for (Faction faction : borderTracker.getFactionsInRegion()) {
-            if (FactionHints.isEmptyFaction(faction) ||
-                      faction.getShortName().equals(CLAN_FACTION_CODE)) {
-                continue;
-            }
-
-            if (faction.getShortName().equals(REPUBLIC_OF_THE_SPHERE_FACTION_CODE) &&
-                      currentDate.isAfter(MHQConstants.FORTRESS_REPUBLIC_START)) {
-                continue;
-            }
-            // Skip factions whose stated active years don't include the current date.
-            // Stale planet ownership data can otherwise leak extinct factions (e.g. ARC after 3028) into the pool.
-            if (!faction.validIn(currentDate)) {
+            if (!isEligibleFaction(faction, currentDate) || faction.getShortName().equals(CLAN_FACTION_CODE)) {
                 continue;
             }
 
@@ -258,10 +245,9 @@ public class RandomFactionGenerator {
     }
 
     /**
-     * Determines whether the given faction should be excluded from employer selection: {@code null} or empty factions,
-     * factions not valid on the given date, factions filtered out by the employer-type power tier, the mercenary
-     * faction itself, Clans (aside from the CW/CSF mercenary-use exceptions), and ROS once Fortress Republic begins are
-     * all excluded.
+     * Determines whether the given faction should be excluded from employer selection: {@code null} or ineligible
+     * factions (see {@link #isEligibleFaction}), factions filtered out by the employer-type power tier, the mercenary
+     * faction itself, and Clans (aside from the CW/CSF mercenary-use exceptions) are all excluded.
      *
      * @param faction             the candidate faction to check
      * @param currentDate         the date to check faction eligibility against
@@ -273,17 +259,7 @@ public class RandomFactionGenerator {
      */
     private static boolean checkForEarlyExit(@Nullable Faction faction, LocalDate currentDate, int currentYear,
           @Nullable GlobalEmployerTableValue employerType, boolean isMercenaryCampaign) {
-        if (faction == null) {
-            return true;
-        }
-
-        if (FactionHints.isEmptyFaction(faction)) {
-            return true;
-        }
-
-        // Skip factions whose stated active years don't include the current date. Stale planet ownership data
-        // can otherwise leak extinct factions (e.g. ARC after 3028) into the pool.
-        if (!faction.validIn(currentDate)) {
+        if ((faction == null) || !isEligibleFaction(faction, currentDate)) {
             return true;
         }
 
@@ -296,12 +272,7 @@ public class RandomFactionGenerator {
         }
 
         // We don't add mercenary employers here, they're handled explicitly elsewhere
-        String factionShortName = faction.getShortName();
-        if (factionShortName.equals(MERCENARY_FACTION_CODE)) {
-            return true;
-        }
-
-        return isDuringFortressRepublic(factionShortName, currentDate);
+        return faction.getShortName().equals(MERCENARY_FACTION_CODE);
     }
 
     /**
@@ -321,15 +292,22 @@ public class RandomFactionGenerator {
     }
 
     /**
-     * @param factionShortName the faction's short name
-     * @param currentDate      the date to check
+     * Checks the baseline eligibility criteria shared across faction-candidate filtering: whether the faction is a
+     * placeholder ("empty") faction, whether it's valid (not extinct or not yet formed) on the given date, and whether
+     * it's the Republic of the Sphere during the Fortress Republic period. Callers layer their own additional,
+     * context-specific exclusions (employer power tier, mercenary usage, alliances, neutrality, etc.) on top of this.
      *
-     * @return {@code true} if the faction is ROS, and the date is after Fortress Republic begins, but before it ends
+     * @param faction the candidate faction to check
+     * @param date    the date to check eligibility against
+     *
+     * @return {@code true} if the faction passes these baseline criteria
      */
-    private static boolean isDuringFortressRepublic(String factionShortName, LocalDate currentDate) {
-        return factionShortName.equals(REPUBLIC_OF_THE_SPHERE_FACTION_CODE) &&
-                     currentDate.isBefore(FORTRESS_REPUBLIC_END) &&
-                     currentDate.isAfter(FORTRESS_REPUBLIC_START);
+    private static boolean isEligibleFaction(Faction faction, LocalDate date) {
+        // Skip factions whose stated active years don't include the current date. Stale planet ownership data can
+        // otherwise leak extinct factions (e.g. ARC after 3028) into the pool.
+        return !FactionHints.isEmptyFaction(faction) &&
+                     faction.validIn(date) &&
+                     !Faction.isDuringFortressRepublic(faction.getShortName(), date, null);
     }
 
     /**
@@ -390,7 +368,9 @@ public class RandomFactionGenerator {
 
             for (Faction containedFaction : factionHints.getContainedFactions(faction, date)) {
                 if (!checkForEarlyExit(containedFaction, date, currentYear, employerType, isMercenaryCampaign)) {
-                    finalWeights.merge(containedFaction, weight, Integer::sum);
+                    double fractionalPresence = factionHints.getAltLocationFraction(faction, containedFaction, date);
+                    int adjustedWeight = (int) ceil(weight * fractionalPresence);
+                    finalWeights.merge(containedFaction, adjustedWeight, Integer::sum);
                 }
             }
         }
@@ -412,13 +392,10 @@ public class RandomFactionGenerator {
      * @return a map of each faction present in range to the number of systems it controls there
      */
     private Map<Faction, Integer> countRegionalPresence(PlanetarySystem origin, LocalDate date) {
-        double radius = borderTracker.getRadius();
         Map<Faction, Integer> counts = new HashMap<>();
-        for (PlanetarySystem nearbySystem : borderTracker.getSystemList()) {
-            if ((radius < 0) || (nearbySystem.getDistanceTo(origin) <= radius)) {
-                for (Faction faction : nearbySystem.getFactionSet(date)) {
-                    counts.merge(faction, 1, Integer::sum);
-                }
+        for (PlanetarySystem nearbySystem : borderTracker.systemsNear(origin, borderTracker.getRadius())) {
+            for (Faction faction : nearbySystem.getFactionSet(date)) {
+                counts.merge(faction, 1, Integer::sum);
             }
         }
         return counts;
@@ -501,11 +478,7 @@ public class RandomFactionGenerator {
      *       doesn't need a {@code factionHints} war record: it's true of the faction unconditionally.
      */
     private static boolean isSelfConflictingFaction(Faction faction) {
-        String code = faction.getShortName();
-        return code.equals(PIRATE_FACTION_CODE) ||
-                     code.equals(BANDIT_CASTE_FACTION_CODE) ||
-                     code.equals(REBEL_FACTION_CODE) ||
-                     code.equals(MERCENARY_FACTION_CODE);
+        return faction.isAggregate() && (faction.isPirate() || faction.isRebel() || faction.isMercenary());
     }
 
     /**
@@ -591,10 +564,7 @@ public class RandomFactionGenerator {
     private List<Faction> findEnemiesAtWarWith(Faction employer, LocalDate date) {
         List<Faction> belligerents = new ArrayList<>();
         for (Faction faction : Factions.getInstance().getFactions()) {
-            if (FactionHints.isEmptyFaction(faction) || !faction.validIn(date)) {
-                continue;
-            }
-            if (isDuringFortressRepublic(faction.getShortName(), date)) {
+            if (!isEligibleFaction(faction, date)) {
                 continue;
             }
             boolean atWar = faction.equals(employer) ?
@@ -626,14 +596,11 @@ public class RandomFactionGenerator {
             return false;
         }
 
-        double radius = borderTracker.getRadius();
         LocalDate beforeConquest = date.minusYears(MissionLocationProfile.OCCUPIED_TERRITORY_LOOKBACK_YEARS);
-        for (PlanetarySystem system : borderTracker.getSystemList()) {
-            if ((radius < 0) || (system.getDistanceTo(origin) <= radius)) {
-                if (system.getFactionSet(date).contains(occupier) &&
-                          system.getFactionSet(beforeConquest).contains(formerOwner)) {
-                    return true;
-                }
+        for (PlanetarySystem system : borderTracker.systemsNear(origin, borderTracker.getRadius())) {
+            if (system.getFactionSet(date).contains(occupier) &&
+                      system.getFactionSet(beforeConquest).contains(formerOwner)) {
+                return true;
             }
         }
         return false;
@@ -694,11 +661,14 @@ public class RandomFactionGenerator {
         boolean isDuringJihad = date.isAfter(MHQConstants.JIHAD_START) && date.isBefore(MHQConstants.NOMINAL_JIHAD_END);
 
         for (Faction enemy : candidates) {
-            if (FactionHints.isEmptyFaction(enemy)) {
+            if (!isEligibleFaction(enemy, date)) {
                 continue;
             }
 
-            if (isDuringFortressRepublic(enemy.getShortName(), date) || !enemy.validIn(date)) {
+            // A neutral faction is one that is never normally considered a valid target under any circumstances and
+            // therefore is entirely skipped.
+            boolean isNeutral = factionHints.isNeutral(employer, enemy, date);
+            if (isNeutral) {
                 continue;
             }
 
@@ -778,7 +748,7 @@ public class RandomFactionGenerator {
             if (!faction.validIn(currentDate)) {
                 continue;
             }
-            if (isDuringFortressRepublic(faction.getShortName(), currentDate)) {
+            if (Faction.isDuringFortressRepublic(faction.getShortName(), currentDate, null)) {
                 continue;
             }
             if (!faction.isClan() && !FactionHints.isEmptyFaction(faction)) {

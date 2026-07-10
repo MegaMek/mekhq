@@ -146,6 +146,16 @@ public class RandomFactionGeneratorTest {
         // Non-Clan factions use mercenaries by default (Faction#isUsesMercenaries' real default); Clans generally
         // don't, mirroring the historical CW/CSF-only exceptions. Individual tests can override this.
         when(f.isUsesMercenaries(anyInt())).thenReturn(!clan);
+        // Mirror the real data's AGGREGATE + PIRATE/REBEL/MERC tagging for the "self-conflicting" test factions, so
+        // RandomFactionGenerator#isSelfConflictingFaction (isAggregate() && (isPirate() || isRebel() ||
+        // isMercenary())) behaves the same against these mocks as it does against the real, YAML-loaded factions.
+        boolean isPirateLike = id.equals(Faction.PIRATE_FACTION_CODE) || id.equals(Faction.BANDIT_CASTE_FACTION_CODE);
+        boolean isRebelLike = id.equals(Faction.REBEL_FACTION_CODE);
+        boolean isMercLike = id.equals(Faction.MERCENARY_FACTION_CODE);
+        when(f.isPirate()).thenReturn(isPirateLike);
+        when(f.isRebel()).thenReturn(isRebelLike);
+        when(f.isMercenary()).thenReturn(isMercLike);
+        when(f.isAggregate()).thenReturn(isPirateLike || isRebelLike || isMercLike);
         return f;
     }
 
@@ -1010,8 +1020,9 @@ public class RandomFactionGeneratorTest {
 
     /**
      * AT_WAR (and by extension OCCUPYING_POWER, which shares the same belligerent search): an aggregate-faction
-     * employer can be matched against itself with no war record, since {@link #findEnemiesAtWarWith} carries the same
-     * self-conflict exception as {@link #buildEnemyMap}.
+     * employer can be matched against itself with no war record, since
+     * {@code RandomFactionGenerator#findEnemiesAtWarWith(Faction, LocalDate)} carries the
+     * same self-conflict exception as {@link RandomFactionGenerator#buildEnemyMap}.
      */
     @Test
     public void testGetRandomEnemyProfileAtWarAllowsMercenaryEmployerToFightItselfWithoutAWarRecord() {

@@ -76,7 +76,6 @@ import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.ContractCommandRights;
-import mekhq.campaign.mission.newContract.EnemySelectionProfile;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -622,7 +621,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         Faction enemyFaction = RandomFactionGenerator.getInstance()
                                      .getRandomEnemy(campaign.getCurrentLocation(), campaign.getLocalDate(),
                                            contract.getEmployerFaction(),
-                                           EnemySelectionProfile.fromContractType(contract.getContractType()));
+                                           contract.getContractType().getEnemySelectionProfile());
         contract.setEnemyCode(enemyFaction.getShortName());
         if (contract.getContractType().isGarrisonDuty() && contract.getEnemy().isRebel()) {
             contract.setContractTypeAndName(AtBContractType.RIOT_DUTY);

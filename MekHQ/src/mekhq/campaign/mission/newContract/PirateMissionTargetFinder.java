@@ -42,6 +42,7 @@ import java.util.Set;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.FactionBorderTracker;
+import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.enums.PlanetaryType;
@@ -136,16 +137,20 @@ class PirateMissionTargetFinder {
         }
 
         List<PlanetarySystem> emptySystems = new ArrayList<>();
-        for (PlanetarySystem system : borderTracker.getSystemList()) {
-            if ((radius < 0) || (system.getDistanceTo(origin) <= radius)) {
-                if (system.isConnector() && system.getPrimaryPlanet().getPlanetType() != PlanetaryType.TERRESTRIAL) {
-                    continue;
-                }
-                Set<Faction> factions = system.getFactionSet(date);
-                if (factions.isEmpty() ||
-                          (factions.size() == 1 && FactionHints.isEmptyFaction(factions.iterator().next()))) {
-                    emptySystems.add(system);
-                }
+        for (PlanetarySystem system : borderTracker.systemsNear(origin, radius)) {
+            boolean isConnector = system.isConnector();
+            Planet primaryPlanet = system.getPrimaryPlanet();
+
+            boolean isTerrestrial = primaryPlanet != null &&
+                                          primaryPlanet.getPlanetType() == PlanetaryType.TERRESTRIAL;
+            if (isConnector && !isTerrestrial) {
+                continue;
+            }
+
+            Set<Faction> factions = system.getFactionSet(date);
+            if (factions.isEmpty() ||
+                      (factions.size() == 1 && FactionHints.isEmptyFaction(factions.iterator().next()))) {
+                emptySystems.add(system);
             }
         }
         return emptySystems;

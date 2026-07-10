@@ -47,68 +47,68 @@ class EnemySelectionProfileTest {
     @Test
     void pirateHuntingMapsToPirates() {
         assertEquals(EnemySelectionProfile.PIRATES,
-              EnemySelectionProfile.fromContractType(AtBContractType.PIRATE_HUNTING));
+              AtBContractType.PIRATE_HUNTING.getEnemySelectionProfile());
     }
 
     @Test
     void riotDutyMapsToRebels() {
         assertEquals(EnemySelectionProfile.REBELS,
-              EnemySelectionProfile.fromContractType(AtBContractType.RIOT_DUTY));
+              AtBContractType.RIOT_DUTY.getEnemySelectionProfile());
     }
 
     @Test
     void cadreDutyMapsToRaiders() {
         assertEquals(EnemySelectionProfile.RAIDERS,
-              EnemySelectionProfile.fromContractType(AtBContractType.CADRE_DUTY));
+              AtBContractType.CADRE_DUTY.getEnemySelectionProfile());
     }
 
     @Test
     void openWarfareTypesMapToAtWar() {
         assertEquals(EnemySelectionProfile.AT_WAR,
-              EnemySelectionProfile.fromContractType(AtBContractType.PLANETARY_ASSAULT));
+              AtBContractType.PLANETARY_ASSAULT.getEnemySelectionProfile());
         assertEquals(EnemySelectionProfile.AT_WAR,
-              EnemySelectionProfile.fromContractType(AtBContractType.RELIEF_DUTY));
+              AtBContractType.RELIEF_DUTY.getEnemySelectionProfile());
     }
 
     @Test
     void guerrillaWarfareMapsToOccupyingPower() {
         assertEquals(EnemySelectionProfile.OCCUPYING_POWER,
-              EnemySelectionProfile.fromContractType(AtBContractType.GUERRILLA_WARFARE));
+              AtBContractType.GUERRILLA_WARFARE.getEnemySelectionProfile());
     }
 
     @Test
     void covertTypesMapToCovert() {
         assertEquals(EnemySelectionProfile.COVERT,
-              EnemySelectionProfile.fromContractType(AtBContractType.ESPIONAGE));
+              AtBContractType.ESPIONAGE.getEnemySelectionProfile());
         assertEquals(EnemySelectionProfile.COVERT,
-              EnemySelectionProfile.fromContractType(AtBContractType.SABOTAGE));
+              AtBContractType.SABOTAGE.getEnemySelectionProfile());
         assertEquals(EnemySelectionProfile.COVERT,
-              EnemySelectionProfile.fromContractType(AtBContractType.TERRORISM));
+              AtBContractType.TERRORISM.getEnemySelectionProfile());
         assertEquals(EnemySelectionProfile.COVERT,
-              EnemySelectionProfile.fromContractType(AtBContractType.ASSASSINATION));
+              AtBContractType.ASSASSINATION.getEnemySelectionProfile());
     }
 
     @Test
     void remainingTypesMapToDefault() {
         assertEquals(EnemySelectionProfile.DEFAULT,
-              EnemySelectionProfile.fromContractType(AtBContractType.GARRISON_DUTY));
+              AtBContractType.GARRISON_DUTY.getEnemySelectionProfile());
         assertEquals(EnemySelectionProfile.DEFAULT,
-              EnemySelectionProfile.fromContractType(AtBContractType.SECURITY_DUTY));
+              AtBContractType.SECURITY_DUTY.getEnemySelectionProfile());
         assertEquals(EnemySelectionProfile.DEFAULT,
-              EnemySelectionProfile.fromContractType(AtBContractType.RETAINER));
+              AtBContractType.RETAINER.getEnemySelectionProfile());
         assertEquals(EnemySelectionProfile.DEFAULT,
-              EnemySelectionProfile.fromContractType(AtBContractType.DIVERSIONARY_RAID));
+              AtBContractType.DIVERSIONARY_RAID.getEnemySelectionProfile());
         assertEquals(EnemySelectionProfile.DEFAULT,
-              EnemySelectionProfile.fromContractType(AtBContractType.OBJECTIVE_RAID));
+              AtBContractType.OBJECTIVE_RAID.getEnemySelectionProfile());
         assertEquals(EnemySelectionProfile.DEFAULT,
-              EnemySelectionProfile.fromContractType(AtBContractType.RECON_RAID));
+              AtBContractType.RECON_RAID.getEnemySelectionProfile());
         assertEquals(EnemySelectionProfile.DEFAULT,
-              EnemySelectionProfile.fromContractType(AtBContractType.EXTRACTION_RAID));
+              AtBContractType.EXTRACTION_RAID.getEnemySelectionProfile());
         assertEquals(EnemySelectionProfile.DEFAULT,
-              EnemySelectionProfile.fromContractType(AtBContractType.OBSERVATION_RAID));
+              AtBContractType.OBSERVATION_RAID.getEnemySelectionProfile());
         assertEquals(EnemySelectionProfile.DEFAULT,
-              EnemySelectionProfile.fromContractType(AtBContractType.MOLE_HUNTING));
+              AtBContractType.MOLE_HUNTING.getEnemySelectionProfile());
         assertEquals(EnemySelectionProfile.DEFAULT,
-              EnemySelectionProfile.fromContractType(AtBContractType.UNDEFINED));
+              AtBContractType.UNDEFINED.getEnemySelectionProfile());
     }
 }

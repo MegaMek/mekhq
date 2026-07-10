@@ -34,6 +34,8 @@
 package mekhq.campaign.universe;
 
 import static megamek.common.compute.Compute.randomInt;
+import static mekhq.MHQConstants.FORTRESS_REPUBLIC_START;
+import static mekhq.MHQConstants.FORTRESS_REPUBLIC_TERRA_ONLY_END;
 
 import java.awt.Color;
 import java.nio.file.Path;
@@ -48,6 +50,7 @@ import megamek.common.universe.Faction2;
 import megamek.common.universe.FactionLeaderData;
 import megamek.common.universe.FactionTag;
 import megamek.common.universe.HonorRating;
+import mekhq.MHQConstants;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.ranks.RankSystem;
@@ -461,6 +464,41 @@ public class Faction {
 
     public boolean isRebelOrPirate() {
         return isRebel() || isPirate();
+    }
+
+    /**
+     * Determines whether the given faction/date/location falls within the Fortress Republic period.
+     *
+     * <p>If {@code factionShortName} is non-{@code null}, only the Republic of the Sphere qualifies. A
+     * {@code null} faction short name is treated as faction-agnostic, and only the date/location rules are
+     * applied.</p>
+     *
+     * <p>Terra remains affected during the Terra-only Fortress Republic window. All other locations are affected
+     * until the general Fortress Republic end date.</p>
+     *
+     * @param factionShortName the faction short name to check, or {@code null} to ignore faction
+     * @param currentDate      the date to check
+     * @param planetName       the planet name to check, or {@code null} if no planet is specified
+     *
+     * @return {@code true} if the supplied values are during the applicable Fortress Republic period; {@code false}
+     *       otherwise
+     */
+    public static boolean isDuringFortressRepublic(@Nullable String factionShortName, LocalDate currentDate,
+          @Nullable String planetName) {
+        if (factionShortName != null && !factionShortName.equals(REPUBLIC_OF_THE_SPHERE_FACTION_CODE)) {
+            return false;
+        }
+
+        if (currentDate.isBefore(FORTRESS_REPUBLIC_START)) {
+            return false;
+        }
+
+        boolean isTerra = planetName != null && planetName.equals("Terra");
+        if (isTerra && currentDate.isBefore(FORTRESS_REPUBLIC_TERRA_ONLY_END)) {
+            return true;
+        }
+
+        return currentDate.isBefore(MHQConstants.FORTRESS_REPUBLIC_END);
     }
 
     public boolean isGovernment() {

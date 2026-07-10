@@ -89,6 +89,10 @@ public class FactionBorderTracker {
     private volatile boolean invalid = true;
     private volatile boolean cancelTask = false;
 
+    private PlanetarySystem lastSystemsNearOrigin;
+    private double lastSystemsNearRadius;
+    private List<PlanetarySystem> lastSystemsNearResult;
+
     /**
      * Constructs a FactionBorderTracker with the default region of a 1000 ly radius around Terra.
      */
@@ -437,14 +441,29 @@ public class FactionBorderTracker {
     /**
      * @return the systems from {@link #getSystemList()} within {@code radius} light years of {@code origin}; a negative
      *       radius returns every system
+     *       <p>Callers routinely repeat the exact same (origin, radius) query several times in quick succession
+     *       (e.g. several
+     *       {@link #getBorders(Faction, ILocation, double)}/{@link #getBorderSystems(Faction, Faction, ILocation,
+     *       double)} calls within one {@code MissionTargetFinder.find()}, or {@code RandomFactionGenerator} selecting
+     *       an employer then an enemy for the same location) &mdash; since the result depends only on the (stable,
+     *       session-lifetime) system list's geometry and never on campaign date, the single most recent call is cached
+     *       to skip re-scanning the whole system list each time.</p>
      */
-    private List<PlanetarySystem> systemsNear(PlanetarySystem origin, double radius) {
+    public synchronized List<PlanetarySystem> systemsNear(PlanetarySystem origin, double radius) {
+        if (origin.equals(lastSystemsNearOrigin) && (radius == lastSystemsNearRadius)) {
+            return lastSystemsNearResult;
+        }
+
         List<PlanetarySystem> nearby = new ArrayList<>();
         for (PlanetarySystem system : getSystemList()) {
             if ((radius < 0) || (system.getDistanceTo(origin) <= radius)) {
                 nearby.add(system);
             }
         }
+
+        lastSystemsNearOrigin = origin;
+        lastSystemsNearRadius = radius;
+        lastSystemsNearResult = nearby;
         return nearby;
     }
 

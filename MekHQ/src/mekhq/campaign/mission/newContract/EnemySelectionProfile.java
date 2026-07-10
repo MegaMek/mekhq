@@ -32,8 +32,6 @@
  */
 package mekhq.campaign.mission.newContract;
 
-import mekhq.campaign.mission.enums.AtBContractType;
-
 /**
  * Describes how a contract's enemy faction should be selected, based on what kind of operation the contract represents.
  * The default weighted pool (regional presence adjusted for diplomatic stance) fits a conventional front-line contract,
@@ -78,30 +76,5 @@ public enum EnemySelectionProfile {
      * The enemy is drawn from the standard pool under covert rules, where even allies become rare, low-chance targets:
      * espionage and sabotage don't respect alliances the way open warfare does.
      */
-    COVERT;
-
-    /**
-     * Maps a contract type to its enemy-selection profile. Deliberately exhaustive with no {@code default} branch so
-     * that adding a new contract type forces a conscious decision about who its missions are fought against.
-     *
-     * <p>{@link #PIRATES} and {@link #REBELS} absorb what were previously inline special cases in
-     * {@code AbstractContractMarket#setEnemyCode} and {@code AtbMonthlyContractMarket#generateAtBSubcontract}, so
-     * pirate-hunting and riot-duty behavior is unchanged &mdash; it just lives in the same policy as the rest.</p>
-     *
-     * @param contractType the contract's type
-     *
-     * @return the enemy-selection profile to use when choosing the contract's enemy faction
-     */
-    public static EnemySelectionProfile fromContractType(AtBContractType contractType) {
-        return switch (contractType) {
-            case PIRATE_HUNTING -> PIRATES;
-            case RIOT_DUTY -> REBELS;
-            case CADRE_DUTY -> RAIDERS;
-            case PLANETARY_ASSAULT, RELIEF_DUTY -> AT_WAR;
-            case GUERRILLA_WARFARE -> OCCUPYING_POWER;
-            case ESPIONAGE, SABOTAGE, TERRORISM, ASSASSINATION -> COVERT;
-            case GARRISON_DUTY, SECURITY_DUTY, RETAINER, DIVERSIONARY_RAID, OBJECTIVE_RAID, RECON_RAID,
-                 EXTRACTION_RAID, OBSERVATION_RAID, MOLE_HUNTING, UNDEFINED -> DEFAULT;
-        };
-    }
+    COVERT
 }

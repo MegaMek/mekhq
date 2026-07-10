@@ -49,71 +49,71 @@ class MissionLocationProfileTest {
     @Test
     void rearAreaTypesMapToRearArea() {
         assertEquals(MissionLocationProfile.REAR_AREA,
-              MissionLocationProfile.fromContractType(AtBContractType.CADRE_DUTY));
+              AtBContractType.CADRE_DUTY.getMissionLocationProfile());
         assertEquals(MissionLocationProfile.REAR_AREA,
-              MissionLocationProfile.fromContractType(AtBContractType.RETAINER));
+              AtBContractType.RETAINER.getMissionLocationProfile());
     }
 
     @Test
     void internalSecurityTypesMapToInteriorPopulated() {
         assertEquals(MissionLocationProfile.INTERIOR_POPULATED,
-              MissionLocationProfile.fromContractType(AtBContractType.RIOT_DUTY));
+              AtBContractType.RIOT_DUTY.getMissionLocationProfile());
         assertEquals(MissionLocationProfile.INTERIOR_POPULATED,
-              MissionLocationProfile.fromContractType(AtBContractType.SECURITY_DUTY));
+              AtBContractType.SECURITY_DUTY.getMissionLocationProfile());
     }
 
     @Test
     void raidTypesMapToDeepRaid() {
         assertEquals(MissionLocationProfile.DEEP_RAID,
-              MissionLocationProfile.fromContractType(AtBContractType.DIVERSIONARY_RAID));
+              AtBContractType.DIVERSIONARY_RAID.getMissionLocationProfile());
         assertEquals(MissionLocationProfile.DEEP_RAID,
-              MissionLocationProfile.fromContractType(AtBContractType.OBJECTIVE_RAID));
+              AtBContractType.OBJECTIVE_RAID.getMissionLocationProfile());
         assertEquals(MissionLocationProfile.DEEP_RAID,
-              MissionLocationProfile.fromContractType(AtBContractType.RECON_RAID));
+              AtBContractType.RECON_RAID.getMissionLocationProfile());
         assertEquals(MissionLocationProfile.DEEP_RAID,
-              MissionLocationProfile.fromContractType(AtBContractType.EXTRACTION_RAID));
+              AtBContractType.EXTRACTION_RAID.getMissionLocationProfile());
         assertEquals(MissionLocationProfile.DEEP_RAID,
-              MissionLocationProfile.fromContractType(AtBContractType.OBSERVATION_RAID));
+              AtBContractType.OBSERVATION_RAID.getMissionLocationProfile());
         assertEquals(MissionLocationProfile.DEEP_RAID,
-              MissionLocationProfile.fromContractType(AtBContractType.ASSASSINATION));
+              AtBContractType.ASSASSINATION.getMissionLocationProfile());
     }
 
     @Test
     void guerrillaWarfareMapsToOccupiedTerritory() {
         assertEquals(MissionLocationProfile.OCCUPIED_TERRITORY,
-              MissionLocationProfile.fromContractType(AtBContractType.GUERRILLA_WARFARE));
+              AtBContractType.GUERRILLA_WARFARE.getMissionLocationProfile());
     }
 
     @Test
     void covertHighValueTypesMapToHighValue() {
         assertEquals(MissionLocationProfile.HIGH_VALUE,
-              MissionLocationProfile.fromContractType(AtBContractType.ESPIONAGE));
+              AtBContractType.ESPIONAGE.getMissionLocationProfile());
         assertEquals(MissionLocationProfile.HIGH_VALUE,
-              MissionLocationProfile.fromContractType(AtBContractType.SABOTAGE));
+              AtBContractType.SABOTAGE.getMissionLocationProfile());
         assertEquals(MissionLocationProfile.HIGH_VALUE,
-              MissionLocationProfile.fromContractType(AtBContractType.TERRORISM));
+              AtBContractType.TERRORISM.getMissionLocationProfile());
     }
 
     @Test
     void planetaryAssaultMapsToInvasion() {
         assertEquals(MissionLocationProfile.INVASION,
-              MissionLocationProfile.fromContractType(AtBContractType.PLANETARY_ASSAULT));
+              AtBContractType.PLANETARY_ASSAULT.getMissionLocationProfile());
     }
 
     @Test
     void frontLineAndSpeciallyRoutedTypesMapToDefault() {
         assertEquals(MissionLocationProfile.DEFAULT,
-              MissionLocationProfile.fromContractType(AtBContractType.GARRISON_DUTY));
+              AtBContractType.GARRISON_DUTY.getMissionLocationProfile());
         assertEquals(MissionLocationProfile.DEFAULT,
-              MissionLocationProfile.fromContractType(AtBContractType.RELIEF_DUTY));
+              AtBContractType.RELIEF_DUTY.getMissionLocationProfile());
         // Pirate hunting is routed by the enemy faction (PIR/BAN) instead, see PirateMissionTargetFinder.
         assertEquals(MissionLocationProfile.DEFAULT,
-              MissionLocationProfile.fromContractType(AtBContractType.PIRATE_HUNTING));
+              AtBContractType.PIRATE_HUNTING.getMissionLocationProfile());
         // Deprecated for removal, and its location roles are inverted; see fromContractType's javadoc.
         assertEquals(MissionLocationProfile.DEFAULT,
-              MissionLocationProfile.fromContractType(AtBContractType.MOLE_HUNTING));
+              AtBContractType.MOLE_HUNTING.getMissionLocationProfile());
         assertEquals(MissionLocationProfile.DEFAULT,
-              MissionLocationProfile.fromContractType(AtBContractType.UNDEFINED));
+              AtBContractType.UNDEFINED.getMissionLocationProfile());
     }
 
     @Test

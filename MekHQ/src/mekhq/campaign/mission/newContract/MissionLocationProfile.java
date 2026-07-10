@@ -32,8 +32,6 @@
  */
 package mekhq.campaign.mission.newContract;
 
-import mekhq.campaign.mission.enums.AtBContractType;
-
 /**
  * Describes how a contract's mission location should be selected, based on what kind of operation the contract
  * represents. The default border-based search in {@link MissionTargetFinder} fits a conventional front-line campaign,
@@ -92,33 +90,6 @@ public enum MissionLocationProfile {
      * contracts pick an occupying enemy, the location tier's flipped-world search agrees on what "recent" means.
      */
     public static final int OCCUPIED_TERRITORY_LOOKBACK_YEARS = 10;
-
-    /**
-     * Maps a contract type to its location profile. Deliberately exhaustive with no {@code default} branch so that
-     * adding a new contract type forces a conscious decision about where its missions should happen.
-     *
-     * <p>{@code MOLE_HUNTING} maps to {@link #DEFAULT} rather than {@link #REAR_AREA} despite its
-     * counterintelligence fiction: it is the one type whose location roles are inverted (the employer is the attacker),
-     * so a rear-area preference would land it in the <em>enemy's</em> interior.</p>
-     *
-     * @param contractType the contract's (final, post-override) type
-     *
-     * @return the location profile to use when selecting the contract's target system
-     */
-    public static MissionLocationProfile fromContractType(AtBContractType contractType) {
-        // TODO move this to the AtBContractType enum (not doing that here as it will conflict awfully with the larger
-        //  contract overhaul project)
-        return switch (contractType) {
-            case CADRE_DUTY, RETAINER -> REAR_AREA;
-            case RIOT_DUTY, SECURITY_DUTY -> INTERIOR_POPULATED;
-            case DIVERSIONARY_RAID, OBJECTIVE_RAID, RECON_RAID, EXTRACTION_RAID, OBSERVATION_RAID, ASSASSINATION ->
-                  DEEP_RAID;
-            case GUERRILLA_WARFARE -> OCCUPIED_TERRITORY;
-            case PLANETARY_ASSAULT -> INVASION;
-            case ESPIONAGE, SABOTAGE, TERRORISM -> HIGH_VALUE;
-            case GARRISON_DUTY, RELIEF_DUTY, PIRATE_HUNTING, MOLE_HUNTING, UNDEFINED -> DEFAULT;
-        };
-    }
 
     /**
      * @return {@code true} if the final pick from this profile's candidate list should be weighted by how valuable
