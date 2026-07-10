@@ -259,7 +259,7 @@ public class ContractDeterminationPay {
         return objectivePayMap;
     }
 
-    public Money determineTransportPayment(boolean isOverridingCommandCircuitRequirements, boolean isGM,
+    public static Money determineTransportPayment(boolean isOverridingCommandCircuitRequirements, boolean isGM,
           FactionStandings factionStandings, String employerCode, JumpPath jumpPath, LocalDate currentDate,
           ILocation currentLocation, Collection<Unit> travelingUnits, Collection<Part> travelingParts,
           Collection<Person> travelingPersonnel, int jumpShipCrewExperienceLevel) {

@@ -49,6 +49,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonUtility;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.personnel.ranks.AutoAssignRankForCompanyGenerator;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
@@ -92,10 +93,16 @@ public class EmployerNegotiator {
         adjustExperienceLevel(campaign, negotiator, role);
         adjustCharisma(negotiator);
         adjustNegotiation(negotiator);
+        giveSPA(campaign, negotiator);
 
         assignRank(negotiator);
 
         return negotiator;
+    }
+
+    private static void giveSPA(Campaign campaign, Person negotiator) {
+        SingleSpecialAbilityGenerator singleSpecialAbilityGenerator = new SingleSpecialAbilityGenerator();
+        singleSpecialAbilityGenerator.rollSPA(campaign, negotiator);
     }
 
     private static PersonnelRole getNegotiatorRole(HiringHallLevel hiringHallLevel,

@@ -112,13 +112,14 @@ public class ContractDeterminationObjectiveType {
 
         if (isPirateCampaign) {
             objectiveTypes = getPirateObjectiveType(roll);
+        } else {
+            objectiveTypes = switch (employerTableValue) {
+                case INDEPENDENT ->
+                      getIndependentObjectiveType(roll, independentEmployerTableValue, connectionsEquipLevel);
+                case MINOR_POWER, SUPER_POWER, MAJOR_POWER ->
+                      getObjectiveTypeForInnerSphereOrClan(roll, connectionsEquipLevel);
+            };
         }
-
-        objectiveTypes = switch (employerTableValue) {
-            case INDEPENDENT -> getIndependentObjectiveType(roll, independentEmployerTableValue, connectionsEquipLevel);
-            case MINOR_POWER, SUPER_POWER, MAJOR_POWER ->
-                  getObjectiveTypeForInnerSphereOrClan(roll, connectionsEquipLevel);
-        };
 
         determineIfContractIsHighRisk();
     }

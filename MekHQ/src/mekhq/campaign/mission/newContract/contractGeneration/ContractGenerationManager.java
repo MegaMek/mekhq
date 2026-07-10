@@ -242,8 +242,16 @@ public class ContractGenerationManager {
             contractManager.addContractObjective(contractObjective);
         }
 
+        // isCovert and isHighRisk are set here and apply to the whole contract even if only true for one objective
         boolean isCovert = contractDeterminationObjectiveType.isCovert();
-        contractManager.setCovert(isCovert);
+        if (isCovert) {
+            contractManager.setCovert(true);
+        }
+
+        boolean isHighRisk = contractDeterminationObjectiveType.isHighRisk();
+        if (isHighRisk) {
+            contractManager.setHighRisk(true);
+        }
 
         return objectives;
     }
