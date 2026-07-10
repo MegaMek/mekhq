@@ -148,6 +148,7 @@ public class AlternateInjuries {
     public static final InjuryType BLOOD_LOSS = new BloodLoss();
     public static final InjuryType DISCONTINUATION_SYNDROME = new DiscontinuationSyndrome();
     public static final InjuryType POSTPARTUM_RECOVERY = new PostpartumRecovery();
+    @Deprecated(since = "0.51.01", forRemoval = true)
     public static final InjuryType TRANSIT_DISORIENTATION_SYNDROME = new TransitDisorientationSyndrome();
     public static final InjuryType CRIPPLING_FLASHBACKS = new CripplingFlashbacks();
     public static final InjuryType CHILDLIKE_REGRESSION = new ChildlikeRegression();
@@ -2855,7 +2856,9 @@ public class AlternateInjuries {
         }
     }
 
+    @Deprecated(since = "0.51.01", forRemoval = true)
     public static final class TransitDisorientationSyndrome extends BaseInjury {
+        @Deprecated(since = "0.51.01", forRemoval = true)
         TransitDisorientationSyndrome() {
             super(TRANSIT_DISORIENTATION_SYNDROME_HEALING_DAYS,
                   false,

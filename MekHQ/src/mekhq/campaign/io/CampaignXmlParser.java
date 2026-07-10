@@ -58,7 +58,6 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -91,14 +90,7 @@ import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
 import mekhq.Utilities;
-import mekhq.campaign.AbstractLocation;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignFactory;
-import mekhq.campaign.CurrentLocation;
-import mekhq.campaign.FixedLocation;
-import mekhq.campaign.Kill;
-import mekhq.campaign.Personnel;
-import mekhq.campaign.Warehouse;
+import mekhq.campaign.*;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.camOpsReputation.ReputationController;
@@ -113,6 +105,7 @@ import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.market.PersonnelMarket;
+import mekhq.campaign.market.RequestedStockLevels;
 import mekhq.campaign.market.ShoppingList;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
@@ -308,6 +301,9 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         // Saves made in 0.51.00 do not have a <location> but will have a <locations> with a single item.
         boolean foundMainForceLocation = false;
 
+        // Pending travel references persons, units, parts, and bases, so it is resolved after those are all loaded.
+        Node pendingTravelNode = null;
+
         // Okay, lets iterate through the children, eh?
         for (int x = 0; x < nl.getLength(); x++) {
             Node workingNode = nl.item(x);
@@ -355,6 +351,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     processLocations(campaign, workingNode);
                 } else if (nodeName.equalsIgnoreCase("playerBases")) {
                     processPlayerBaseNodes(campaign, workingNode, version);
+                } else if (nodeName.equalsIgnoreCase("pendingTravel")) {
+                    pendingTravelNode = workingNode;
                 } else if (nodeName.equalsIgnoreCase("location")) {
                     // Campaign's current location — written as a top-level tag in new saves;
                     // same tag was used as the only location entry in pre-<locations>-list saves.
@@ -808,9 +806,12 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                   .ifPresent(campaign::setLocation);
         }
 
+        if (pendingTravelNode != null) {
+            processPendingTravel(campaign, pendingTravelNode);
+        }
+
         migrateLegacyEducationTravel(campaign);
         reconnectPersonsToTravelLocations(campaign);
-
         LOGGER.info("Load of campaign file complete!");
 
         return campaign;
@@ -1731,21 +1732,20 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
      */
     private static void reconnectPersonsToTravelLocations(Campaign campaign) {
         for (AbstractLocation location : campaign.getCampaignLocationManager().getLocations()) {
-            if (location instanceof CurrentLocation currentLocation) {
-                // Orphaned, non-transiting CurrentLocations are stale transit records.
+            if (location instanceof AbstractMobileLocation travelLocation) {
+                // Orphaned, non-transiting travel nodes are stale transit records.
                 // They appear in <locations> (rather than inside a <playerBase>) because
                 // setParent() failed at dispatch time, leaving their locationNode unparented.
                 // Items that arrived (processPlayerBaseNodes already re-homed them) must NOT
                 // be re-parented here, as that would detach them from their base. Items whose
                 // save pre-dates the arrival-tracking fix fall back to main force so they
                 // remain visible rather than becoming invisible.
-                boolean isOrphaned = !currentLocation.isParented();
-                boolean isActivelyInTransit = currentLocation.getJumpPath() != null
-                                                    && !currentLocation.getJumpPath().isEmpty();
+                boolean isOrphaned = !travelLocation.isParented();
+                boolean isActivelyInTransit = isActivelyInTransit(travelLocation);
                 if (isOrphaned && !isActivelyInTransit) {
                     // Drain pending IDs so the loop below is skipped. Any person not already
                     // re-homed by processPlayerBaseNodes falls back to main force.
-                    for (UUID personId : currentLocation.drainPendingPersonIds()) {
+                    for (UUID personId : travelLocation.drainPendingPersonIds()) {
                         Person person = campaign.getPerson(personId);
                         if (person != null && !person.isParented()) {
                             person.setParent(campaign.getMainForcePersonnel());
@@ -1753,7 +1753,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                                   + "(orphaned arrived node); re-homed to main force", personId);
                         }
                     }
-                    for (UUID unitId : currentLocation.drainPendingUnitIds()) {
+                    for (UUID unitId : travelLocation.drainPendingUnitIds()) {
                         Unit unit = findUnitAnywhere(campaign, unitId);
                         if (unit != null && !unit.isParented()) {
                             LocationNode.LocationManager.setLocation(unit, campaign.getHangar());
@@ -1761,8 +1761,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                                   + "(orphaned arrived node); re-homed to main hangar", unitId);
                         }
                     }
-                    for (int partId : currentLocation.drainPendingPartIds()) {
-                        Part part = findPartAnywhere(campaign, partId);
+                    for (int partId : travelLocation.drainPendingPartIds()) {
+                        Part part = campaign.getCampaignLocationManager().findPartAnywhere(campaign, partId);
                         if (part != null && !part.isParented()) {
                             LocationNode.LocationManager.setLocation(part, campaign.getWarehouse());
                             LOGGER.warn("reconnectPersonsToTravelLocations: part {} had no parent "
@@ -1772,29 +1772,29 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     continue;
                 }
 
-                // Persons traveling — parented under a CurrentLocation
-                for (UUID personId : currentLocation.drainPendingPersonIds()) {
+                // Persons traveling — parented under the travel node
+                for (UUID personId : travelLocation.drainPendingPersonIds()) {
                     Person person = campaign.getPerson(personId);
                     if (person != null) {
-                        person.setParent(currentLocation);
+                        person.setParent(travelLocation);
                     } else {
                         LOGGER.warn("reconnectPersonsToTravelLocations: person {} not found in campaign", personId);
                     }
                 }
 
-                // Units in transit — in base hangar data structure, but LocationNode under CurrentLocation
-                for (UUID unitId : currentLocation.drainPendingUnitIds()) {
+                // Units in transit — in base hangar data structure, but LocationNode under the travel node
+                for (UUID unitId : travelLocation.drainPendingUnitIds()) {
                     Unit unit = findUnitAnywhere(campaign, unitId);
                     if (unit != null) {
-                        LocationNode.LocationManager.setLocation(unit, currentLocation);
+                        LocationNode.LocationManager.setLocation(unit, travelLocation);
                     }
                 }
 
-                // Parts in transit — in base warehouse data structure, but LocationNode under CurrentLocation
-                for (int partId : currentLocation.drainPendingPartIds()) {
-                    Part part = findPartAnywhere(campaign, partId);
+                // Parts in transit — in base warehouse data structure, but LocationNode under the travel node
+                for (int partId : travelLocation.drainPendingPartIds()) {
+                    Part part = campaign.getCampaignLocationManager().findPartAnywhere(campaign, partId);
                     if (part != null) {
-                        LocationNode.LocationManager.setLocation(part, currentLocation);
+                        LocationNode.LocationManager.setLocation(part, travelLocation);
                     }
                 }
 
@@ -1831,6 +1831,18 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         }
     }
 
+    /**
+     * A travel node is actively in transit when it still has a live journey: an interplanetary {@link CurrentLocation}
+     * with a non-empty jump path, or a {@link mekhq.campaign.GroundTransitLocation} still counting down its overland
+     * transit time. Arrived-but-not-yet-drained nodes are not.
+     */
+    private static boolean isActivelyInTransit(AbstractMobileLocation travelLocation) {
+        if (travelLocation instanceof CurrentLocation currentLocation) {
+            return currentLocation.getJumpPath() != null && !currentLocation.getJumpPath().isEmpty();
+        }
+        return travelLocation.isInTransit();
+    }
+
     /** Searches campaign hangar then all base hangars for a unit by UUID. */
     private static @Nullable Unit findUnitAnywhere(Campaign campaign, UUID unitId) {
         Unit unit = campaign.getHangar().getUnit(unitId);
@@ -1846,19 +1858,85 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         return null;
     }
 
-    /** Searches campaign warehouse then all base warehouses for a part by ID. */
-    private static @Nullable Part findPartAnywhere(Campaign campaign, int partId) {
-        Part part = campaign.getWarehouse().getPart(partId);
-        if (part != null) {
-            return part;
-        }
-        for (PlayerBase base : campaign.getCampaignLocationManager().getPlayerBases()) {
-            part = base.getBaseWarehouse().getPart(partId);
-            if (part != null) {
-                return part;
+    /**
+     * Re-queues travel that was queued but not yet drained when the campaign was saved. Each {@code <route>} names a
+     * destination and its travelers; resolved travelers are re-queued via {@link CampaignLocationManager#queueTravel},
+     * which recomputes their origin from their current location. Routes whose destination or travelers cannot be
+     * resolved are skipped with a warning.
+     */
+    private static void processPendingTravel(Campaign campaign, Node pendingTravelNode) {
+        NodeList routes = pendingTravelNode.getChildNodes();
+        for (int i = 0; i < routes.getLength(); i++) {
+            Node routeNode = routes.item(i);
+            if (routeNode.getNodeType() != Node.ELEMENT_NODE || !routeNode.getNodeName().equalsIgnoreCase("route")) {
+                continue;
+            }
+            ILocation destination = ILocation.resolveReferenceFromXML(campaign, routeNode);
+            if (destination == null) {
+                LOGGER.warn("processPendingTravel: could not resolve destination for a queued route — skipping");
+                continue;
+            }
+            List<ILocation> travelers = resolvePendingTravelers(campaign, routeNode);
+            if (!travelers.isEmpty()) {
+                campaign.getCampaignLocationManager().queueTravel(travelers, destination);
             }
         }
-        return null;
+    }
+
+    private static List<ILocation> resolvePendingTravelers(Campaign campaign, Node routeNode) {
+        List<ILocation> travelers = new ArrayList<>();
+        NodeList children = routeNode.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            Node child = children.item(i);
+            if (child.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+            String text = child.getTextContent().trim();
+            switch (child.getNodeName()) {
+                case "personId" -> {
+                    Person person = campaign.getPerson(parseUuidOrNull(text));
+                    addIfNotNull(travelers, person, "person", text);
+                }
+                case "unitId" -> {
+                    Unit unit = campaign.getUnit(parseUuidOrNull(text));
+                    addIfNotNull(travelers, unit, "unit", text);
+                }
+                case "partId" -> {
+                    Integer partId = parsePartId(text);
+                    Part part = partId == null
+                                      ? null
+                                      : campaign.getCampaignLocationManager().findPartAnywhere(campaign, partId);
+                    addIfNotNull(travelers, part, "part", text);
+                }
+                default -> { /* destination tags and whitespace */ }
+            }
+        }
+        return travelers;
+    }
+
+    private static void addIfNotNull(List<ILocation> travelers, @Nullable ILocation traveler, String type,
+          String id) {
+        if (traveler != null) {
+            travelers.add(traveler);
+        } else {
+            LOGGER.warn("processPendingTravel: queued {} {} not found — skipping", type, id);
+        }
+    }
+
+    private static @Nullable UUID parseUuidOrNull(String text) {
+        try {
+            return UUID.fromString(text);
+        } catch (IllegalArgumentException ex) {
+            return null;
+        }
+    }
+
+    private static @Nullable Integer parsePartId(String text) {
+        try {
+            return Integer.parseInt(text);
+        } catch (NumberFormatException ex) {
+            return null;
+        }
     }
 
     /**
@@ -1881,6 +1959,14 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                       && stage != EducationStage.EDUCATION
                       && stage != EducationStage.GRADUATING
                       && stage != EducationStage.DROPPING_OUT) {
+                continue;
+            }
+
+            // Skip persons already queued for (but not yet dispatched) travel — processPendingTravel re-queued them
+            // and they still sit at their origin. Migrating would wrongly move them into a travel node/campus.
+            if (campaign.getCampaignLocationManager().isQueuedForTravel(person)) {
+                LOGGER.debug("migrateLegacyEducationTravel: skipping {} — queued in pendingTravel (stage={})",
+                      person.getFullTitle(), stage);
                 continue;
             }
 
@@ -2794,59 +2880,12 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 retVal.setIgnoreSparesUnderQuality(ignoreQuality);
             } else if (wn2.getNodeName().equalsIgnoreCase("partInUseMap")) {
                 if (version.isHigherThan(new Version("0.50.07"))) { // <50.10 compatibility handler
-                    processPartsInUseRequestedStockMap(retVal, wn2);
+                    retVal.setPartsInUseRequestedStockMap(
+                          RequestedStockLevels.generateInstanceFromXML(wn2).getStockMap());
                 }
             } else {
                 LOGGER.error("Unknown node type not loaded in PartInUse nodes: {}", wn2.getNodeName());
             }
-        }
-    }
-
-    private static void processPartsInUseRequestedStockMap(Campaign retVal, Node wn) {
-        NodeList wList = wn.getChildNodes();
-
-        Map<String, Double> partInUseStockMap = new LinkedHashMap<>();
-
-        for (int i = 0; i < wList.getLength(); i++) {
-            Node wn2 = wList.item(i);
-
-            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-
-            if (!wn2.getNodeName().equalsIgnoreCase("partInUseMapEntry")) {
-                LOGGER.error("Unknown node type not loaded in PartInUseStockMap nodes: {}", wn2.getNodeName());
-            }
-
-            processPartsInUseRequestedStockMapVal(retVal, wn2, partInUseStockMap);
-
-        }
-
-        retVal.setPartsInUseRequestedStockMap(partInUseStockMap);
-    }
-
-    private static void processPartsInUseRequestedStockMapVal(Campaign retVal, Node wn,
-          Map<String, Double> partsInUseRequestedStockMap) {
-        NodeList wList = wn.getChildNodes();
-
-        String key = null;
-        double val = 0;
-
-        for (int i = 0; i < wList.getLength(); i++) {
-            Node wn2 = wList.item(i);
-
-            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-
-            if (wn2.getNodeName().equalsIgnoreCase("partInUseMapKey")) {
-                key = wn2.getTextContent();
-            } else if (wn2.getNodeName().equalsIgnoreCase("partInUseMapVal")) {
-                val = Double.parseDouble(wn2.getTextContent());
-            }
-        }
-        if (key != null) {
-            partsInUseRequestedStockMap.put(key, val);
         }
     }
 

@@ -69,6 +69,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.location.ILocatable;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationNode;
@@ -111,7 +112,7 @@ import org.w3c.dom.NodeList;
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
-public abstract class Part implements IPartWork, ITechnology, ILocation {
+public abstract class Part implements IPartWork, ITechnology, ILocatable {
     private static final MMLogger LOGGER = MMLogger.create(Part.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Parts";
 
@@ -1445,6 +1446,12 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
      */
     public boolean isPresent() {
         return daysToArrival == 0;
+    }
+
+    @Override
+    public boolean canBeManuallyDispatched() {
+        // A part still in transit from a purchase hasn't arrived yet, and a reserved part is committed to work.
+        return isPresent() && !isReservedForRefit() && !isReservedForReplacement();
     }
 
     @Override

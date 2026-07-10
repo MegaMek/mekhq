@@ -34,7 +34,7 @@
 package mekhq.campaign.personnel.skills;
 
 import static mekhq.campaign.personnel.enums.GenderDescriptors.HIS_HER_THEIR;
-import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.BARELY_MADE_IT;
+import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginOfSuccessObject;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -46,8 +46,6 @@ import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.ActionCheckRoll.RollType;
-import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
-import mekhq.utilities.ReportingUtilities;
 
 /**
  * Base abstract class for configuring character skill, attribute, and other action checks.
@@ -65,6 +63,8 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
 
     private static final MMLogger LOGGER = MMLogger.create(ActionCheck.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.ActionCheck";
+    private static final int MARGIN_OF_SUCCESS_MAX = 10;
+    private static final int MARGIN_OF_SUCCESS_MIN = -10;
 
     protected final Person person;
     protected final TargetRoll targetNumber;
@@ -164,16 +164,12 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
     /**
      * Executes action check for the specified person.
      *
-     * <p>External modifiers can optionally influence the target number, while miscellaneous modifiers
-     * alter the target based on whether the skill is classified as 'count up' or not. Using edge allows the person to
-     * attempt a re-roll if the initial roll fails. Additionally, the constructor can include margins of success text as
-     * part of the results, if desired.</p>
+     * <p>Performs a roll and determines margin of success as <code>Roll - TN</code> if <code>isCountUp ==
+     * false</code>, or <code>TN - Roll</code> otherwise. Margin of success is clamped to [-10; 10] range
+     * (inclusively). Using edge allows the person to attempt a re-roll if the initial roll fails.</p>
      *
-     * <p><b>Usage:</b> This constructor offers detailed control over the skill check process.
-     * </p>
-     *
-     * @param useEdge                     whether the person should use edge to re-roll if the initial attempt fails
-     * @param reason                      the reason for the check; can be {@code null}
+     * @param useEdge whether the person should use edge to re-roll if the initial attempt fails
+     * @param reason  the reason for the check; can be {@code null}
      */
     public ActionCheckResult resolve(boolean useEdge, @Nullable String reason) {
         RollType rollType = hasNaturalAptitude() ? RollType.ADVANTAGE : RollType.NORMAL;
@@ -192,8 +188,9 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
             person.spendEdge();
         }
 
-        int difference = targetNumber.getValue() - roll.result();
-        int marginOfSuccess = MarginOfSuccess.getMarginOfSuccess(isCountUp() ? difference : -difference);
+        long difference = (long) targetNumber.getValue() - roll.result();
+        int marginOfSuccess = Math.clamp(isCountUp() ? difference : -difference,
+              MARGIN_OF_SUCCESS_MIN, MARGIN_OF_SUCCESS_MAX);
         String resultsText = generateResultsText(roll.result(), marginOfSuccess, reason);
 
         LOGGER.info(resultsText);
@@ -233,16 +230,6 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
         String fullTitle = person.getHyperlinkedFullTitle();
         String genderedReferenced = HIS_HER_THEIR.getDescriptor(person.getGender());
 
-        String color;
-        int neutralMarginValue = BARELY_MADE_IT.getValue();
-        if (marginOfSuccess == neutralMarginValue) {
-            color = ReportingUtilities.getWarningColor();
-        } else if (marginOfSuccess < neutralMarginValue) {
-            color = ReportingUtilities.getNegativeColor();
-        } else {
-            color = ReportingUtilities.getPositiveColor();
-        }
-
         String reportKey =
               ActionCheckResult.isSuccess(marginOfSuccess) ? "actionCheckResult.success" : "actionCheckResult.failure";
 
@@ -250,7 +237,7 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
               reportKey,
               reason == null ? "" : "<b>" + reason + ":</b> ",
               fullTitle,
-              color,
+              getMarginOfSuccessObject(marginOfSuccess).getColor(),
               genderedReferenced,
               getActionName(),
               roll,

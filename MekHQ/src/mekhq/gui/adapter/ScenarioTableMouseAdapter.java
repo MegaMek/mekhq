@@ -77,16 +77,20 @@ public class ScenarioTableMouseAdapter extends JPopupMenuAdapter {
         }
 
         Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
-        if ((scenario == null) || !scenario.getStatus().isCurrent()) {
+        if (scenario == null) {
             return Optional.empty();
         }
+
+        // Resolved scenarios can still be edited (e.g. to add an After-Action Report), but actions that only make
+        // sense for an active scenario, such as deploying to it, are only offered while the scenario is current.
+        final boolean isCurrent = scenario.getStatus().isCurrent();
 
         JPopupMenu popup = new JPopupMenu();
         JMenuItem menuItem;
         JMenu menu;
 
         // let's fill the pop-up menu
-        if (gui.getStratConTab().isPresent() && scenario instanceof AtBDynamicScenario) {
+        if (isCurrent && gui.getStratConTab().isPresent() && scenario instanceof AtBDynamicScenario) {
             menuItem = new JMenuItem("Deploy...");
             menuItem.addActionListener(
                   event -> gui.getStratConTab().ifPresent(

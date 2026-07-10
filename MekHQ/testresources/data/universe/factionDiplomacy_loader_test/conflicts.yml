@@ -1,0 +1,34 @@
+# MegaMek Data (C) 2025 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# Test fixture: exercises every section of the faction diplomacy schema, including
+# party-level date overrides, multi-faction party lists, neutral exceptions, and
+# contained factions with restricted opponents.
+
+wars:
+  - name: Test War
+    start: 3026-01-01
+    end: 3030-12-31
+    parties:
+      - factions: [FS, CC]
+      - factions: [LA, CC]
+        start: 3027-06-01
+alliances:
+  - start: 3020-01-01
+    end: 3057-12-31
+    parties:
+      - factions: [FS, LA, CS]
+rivalries:
+  - factions: [CJF, CGB]
+    start: 3050-01-01
+neutralFactions:
+  - faction: MERC
+    exceptions:
+      - factions: [MH]
+        start: 3040-01-01
+containedFactions:
+  - host: FS
+    contained: CS
+    start: 3030-01-01
+    fraction: 0.25
+    opponents: [CC]

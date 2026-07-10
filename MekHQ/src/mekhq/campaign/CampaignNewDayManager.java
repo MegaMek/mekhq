@@ -110,7 +110,6 @@ import megamek.logging.MMLogger;
 import mekhq.MHQOptions;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign.AdministratorSpecialization;
-import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.DayEndingEvent;
@@ -122,6 +121,7 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationNewDayUtil;
 import mekhq.campaign.market.PartsInUseManager;
 import mekhq.campaign.mission.AtBContract;
@@ -464,6 +464,10 @@ public class CampaignNewDayManager {
 
         campaign.readNews();
 
+        // Dispatch travel queued during the previous day before transit advances, so departures resolve from where
+        // the travelers actually were when the travel was queued.
+        campaign.getCampaignLocationManager().dispatchPendingTravel(campaign);
+
         for (AbstractLocation location : new ArrayList<>(campaign.getCampaignLocationManager().getLocations())) {
             location.newDay(campaign, location != updatedLocation);
         }
@@ -574,11 +578,19 @@ public class CampaignNewDayManager {
         }
 
         if (campaign.getTopUpWeekly() && isMonday) {
-            PartsInUseManager partsInUseManager = new PartsInUseManager(campaign);
-            Set<PartInUse> actualPartsInUse = partsInUseManager.getPartsInUse(campaign.getIgnoreMothballed(),
-                  false,
-                  campaign.getIgnoreSparesUnderQuality());
-            int bought = partsInUseManager.stockUpPartsInUse(actualPartsInUse);
+            // Each location keeps its own stock levels, so top up the main force and every base independently.
+            List<IPlace> places = new ArrayList<>();
+            places.add(campaign);
+            places.addAll(campaign.getCampaignLocationManager().getPlayerBases());
+
+            int bought = 0;
+            for (IPlace place : places) {
+                PartsInUseManager partsInUseManager = new PartsInUseManager(campaign, place);
+                Set<PartInUse> actualPartsInUse = partsInUseManager.getPartsInUse(campaign.getIgnoreMothballed(),
+                      false,
+                      campaign.getIgnoreSparesUnderQuality());
+                bought += partsInUseManager.stockUpPartsInUse(actualPartsInUse);
+            }
             campaign.addReport(ACQUISITIONS, String.format(resources.getString("weeklyStockCheck.text"), bought));
         }
 
@@ -695,20 +707,13 @@ public class CampaignNewDayManager {
      * @author Illiani
      * @since 0.50.10
      */
-
-    private void processAllArrivals() {
-        for (AbstractLocation location : new ArrayList<>(campaign.getCampaignLocationManager().getLocations())) {
-            location.processArrivals(campaign);
-        }
-        for (PlayerBase base : campaign.getCampaignLocationManager().getPlayerBases()) {
-            base.processArrivals(campaign);
-        }
-        campaign.processArrivals(campaign);
-    }
-
     private void updateFacilities() {
         updateFieldKitchenCapacity();
         updateMASHTheatreCapacity();
+    }
+
+    private void processAllArrivals() {
+        campaign.getCampaignLocationManager().processAllArrivals(campaign);
     }
 
     /**
@@ -1569,7 +1574,7 @@ public class CampaignNewDayManager {
         if (isBirthday && (person.getAge(today) == 16)) {
             if (campaignOptions.isRewardComingOfAgeAbilities()) {
                 SingleSpecialAbilityGenerator singleSpecialAbilityGenerator = new SingleSpecialAbilityGenerator();
-                singleSpecialAbilityGenerator.rollSPA(campaign, person, true, true, false);
+                singleSpecialAbilityGenerator.rollSPA(campaign, person, true, true, false, false);
             }
 
             if (campaignOptions.isRewardComingOfAgeRPSkills()) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -50,7 +50,6 @@ import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.events.parts.PartModeChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.location.LocationDispatch;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
@@ -59,7 +58,7 @@ import mekhq.campaign.work.WorkTime;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.MRMSDialog;
 import mekhq.gui.dialog.PopupValueChoiceDialog;
-import mekhq.gui.menus.SendToLocationMenu;
+import mekhq.gui.menus.LocationMenu;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.service.enums.MRMSMode;
@@ -531,10 +530,7 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
         List<Part> spares = Arrays.stream(parts)
                                   .filter(Part::isSpare)
                                   .collect(Collectors.toList());
-        JMenuHelpers.addMenuIfNonEmpty(popup, new SendToLocationMenu(
-              gui.getCampaign(), gui.getFrame(), spares,
-              destination -> LocationDispatch.dispatchPartsToLocation(
-                    spares, destination, gui.getCampaign())));
+        JMenuHelpers.addMenuIfNonEmpty(popup, new LocationMenu(gui.getCampaign(), gui.getFrame(), spares));
 
         return Optional.of(popup);
     }

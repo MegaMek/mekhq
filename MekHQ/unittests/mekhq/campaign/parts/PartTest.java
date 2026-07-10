@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -313,6 +313,48 @@ public class PartTest {
 
         assertEquals(0, part.getDaysToArrival());
         assertTrue(part.isPresent());
+    }
+
+    @Test
+    public void canBeManuallyDispatchedWhenPresentAndUnreserved() {
+        Part part = new MekSensor();
+        part.setDaysToArrival(0);
+
+        assertTrue(part.canBeManuallyDispatched());
+    }
+
+    @Test
+    public void cannotBeManuallyDispatchedWhenNotPresent() {
+        Part part = new MekSensor();
+        part.setDaysToArrival(5);
+
+        assertFalse(part.canBeManuallyDispatched());
+    }
+
+    @Test
+    public void cannotBeManuallyDispatchedWhenReservedForRefit() {
+        Unit mockUnit = mock(Unit.class);
+        when(mockUnit.getId()).thenReturn(UUID.randomUUID());
+
+        Part part = new MekSensor();
+        part.setDaysToArrival(0);
+        part.setRefitUnit(mockUnit);
+
+        assertTrue(part.isReservedForRefit());
+        assertFalse(part.canBeManuallyDispatched());
+    }
+
+    @Test
+    public void cannotBeManuallyDispatchedWhenReservedForReplacement() {
+        Person mockTech = mock(Person.class);
+        when(mockTech.getId()).thenReturn(UUID.randomUUID());
+
+        Part part = new MekSensor();
+        part.setDaysToArrival(0);
+        part.setReservedBy(mockTech);
+
+        assertTrue(part.isReservedForReplacement());
+        assertFalse(part.canBeManuallyDispatched());
     }
 
     @Test

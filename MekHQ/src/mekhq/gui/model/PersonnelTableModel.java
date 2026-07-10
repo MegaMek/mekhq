@@ -221,6 +221,10 @@ public class PersonnelTableModel extends MHQTableModel<Person, PersonnelTableMod
                 colorReasonKeys.add("colorReason.personnel.deployed");
                 cellColors = (cellColors == null) ? mhqOptions.getDeployedColors() : cellColors;
             }
+            if (person.isQueuedForTravel(campaign.getCampaignLocationManager())) {
+                colorReasonKeys.add("colorReason.personnel.queuedForTravel");
+                cellColors = (cellColors == null) ? mhqOptions.getQueuedForTravelColors() : cellColors;
+            }
             if (PersonnelStatus.computeIsAwayFromMainForce(campaign, person)) {
                 cellColors = (cellColors == null) ? mhqOptions.getAwayFromMainForceColors() : cellColors;
             }

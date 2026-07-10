@@ -124,6 +124,8 @@ public class MHQOptionsDialog extends AbstractButtonDialog {
     private ColourSelectorButton optionBelowContractMinimumBackground;
     private ColourSelectorButton optionInTransitForeground;
     private ColourSelectorButton optionInTransitBackground;
+    private ColourSelectorButton optionQueuedForTravelForeground;
+    private ColourSelectorButton optionQueuedForTravelBackground;
     private ColourSelectorButton optionRefittingForeground;
     private ColourSelectorButton optionRefittingBackground;
     private ColourSelectorButton optionMothballingForeground;
@@ -611,6 +613,12 @@ public class MHQOptionsDialog extends AbstractButtonDialog {
 
         optionInTransitBackground = new ColourSelectorButton(resources.getString("optionInTransitBackground.text"));
 
+        optionQueuedForTravelForeground = new ColourSelectorButton(resources.getString(
+              "optionQueuedForTravelForeground.text"));
+
+        optionQueuedForTravelBackground = new ColourSelectorButton(resources.getString(
+              "optionQueuedForTravelBackground.text"));
+
         optionRefittingForeground = new ColourSelectorButton(resources.getString("optionRefittingForeground.text"));
 
         optionRefittingBackground = new ColourSelectorButton(resources.getString("optionRefittingBackground.text"));
@@ -724,6 +732,10 @@ public class MHQOptionsDialog extends AbstractButtonDialog {
                                                       .addComponent(optionInTransitForeground)
                                                       .addComponent(optionInTransitBackground, Alignment.TRAILING))
                                       .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                                      .addComponent(optionQueuedForTravelForeground)
+                                                      .addComponent(optionQueuedForTravelBackground,
+                                                            Alignment.TRAILING))
+                                      .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                                       .addComponent(optionRefittingForeground)
                                                       .addComponent(optionRefittingBackground, Alignment.TRAILING))
                                       .addGroup(layout.createParallelGroup(Alignment.BASELINE)
@@ -798,6 +810,9 @@ public class MHQOptionsDialog extends AbstractButtonDialog {
                                         .addGroup(layout.createSequentialGroup()
                                                         .addComponent(optionInTransitForeground)
                                                         .addComponent(optionInTransitBackground))
+                                        .addGroup(layout.createSequentialGroup()
+                                                        .addComponent(optionQueuedForTravelForeground)
+                                                        .addComponent(optionQueuedForTravelBackground))
                                         .addGroup(layout.createSequentialGroup()
                                                         .addComponent(optionRefittingForeground)
                                                         .addComponent(optionRefittingBackground))
@@ -1812,6 +1827,8 @@ public class MHQOptionsDialog extends AbstractButtonDialog {
         options.setBelowContractMinimumBackground(optionBelowContractMinimumBackground.getColour());
         options.setInTransitForeground(optionInTransitForeground.getColour());
         options.setInTransitBackground(optionInTransitBackground.getColour());
+        options.setQueuedForTravelForeground(optionQueuedForTravelForeground.getColour());
+        options.setQueuedForTravelBackground(optionQueuedForTravelBackground.getColour());
         options.setRefittingForeground(optionRefittingForeground.getColour());
         options.setRefittingBackground(optionRefittingBackground.getColour());
         options.setMothballingForeground(optionMothballingForeground.getColour());
@@ -2055,6 +2072,8 @@ public class MHQOptionsDialog extends AbstractButtonDialog {
         optionBelowContractMinimumBackground.setColour(options.getBelowContractMinimumBackground());
         optionInTransitForeground.setColour(options.getInTransitForeground());
         optionInTransitBackground.setColour(options.getInTransitBackground());
+        optionQueuedForTravelForeground.setColour(options.getQueuedForTravelForeground());
+        optionQueuedForTravelBackground.setColour(options.getQueuedForTravelBackground());
         optionRefittingForeground.setColour(options.getRefittingForeground());
         optionRefittingBackground.setColour(options.getRefittingBackground());
         optionMothballingForeground.setColour(options.getMothballingForeground());

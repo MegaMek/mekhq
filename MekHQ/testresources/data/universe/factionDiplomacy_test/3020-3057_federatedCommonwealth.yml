@@ -1,0 +1,10 @@
+# MegaMek Data (C) 2025 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# Test fixture: mirrors the alliance in factionhints_test.xml.
+
+alliances:
+  - start: 3020-01-01
+    end: 3057-12-31
+    parties:
+      - factions: [FS, LA, FC]

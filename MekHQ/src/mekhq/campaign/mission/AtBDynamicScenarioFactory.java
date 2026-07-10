@@ -1655,7 +1655,7 @@ public class AtBDynamicScenarioFactory {
                              templateObjective.getAssociatedForceNames()
                                    .contains(ScenarioObjective.FORCE_SHORTCUT_ALL_ENEMY_FORCES))) {
                 objectiveForceNames.add(botForce.getName());
-                calculatedDestinationZone = OffBoardDirection.translateBoardStart(getOppositeEdge(forceTemplate.getActualDeploymentZone()));
+                calculatedDestinationZone = OffBoardDirection.translateStartPosition(getOppositeEdge(forceTemplate.getActualDeploymentZone()));
             }
         }
 
@@ -1666,7 +1666,7 @@ public class AtBDynamicScenarioFactory {
                       templateObjective.getAssociatedForceNames()
                             .contains(ScenarioObjective.FORCE_SHORTCUT_ALL_PRIMARY_PLAYER_FORCES)) {
                 objectiveForceNames.add(campaign.getFormation(forceID).getName());
-                calculatedDestinationZone = OffBoardDirection.translateBoardStart(getOppositeEdge(playerForceTemplate.getActualDeploymentZone()));
+                calculatedDestinationZone = OffBoardDirection.translateStartPosition(getOppositeEdge(playerForceTemplate.getActualDeploymentZone()));
             }
         }
 
@@ -1677,7 +1677,7 @@ public class AtBDynamicScenarioFactory {
                       templateObjective.getAssociatedForceNames()
                             .contains(ScenarioObjective.FORCE_SHORTCUT_ALL_PRIMARY_PLAYER_FORCES)) {
                 objectiveUnitIDs.add(unitID.toString());
-                calculatedDestinationZone = OffBoardDirection.translateBoardStart(getOppositeEdge(playerForceTemplate.getActualDeploymentZone()));
+                calculatedDestinationZone = OffBoardDirection.translateStartPosition(getOppositeEdge(playerForceTemplate.getActualDeploymentZone()));
             }
         }
 
@@ -1687,7 +1687,7 @@ public class AtBDynamicScenarioFactory {
 
             if (templateObjective.isApplicableToForceTemplate(botForceTemplate, scenario)) {
                 objectiveUnitIDs.add(unitID.toString());
-                calculatedDestinationZone = OffBoardDirection.translateBoardStart(getOppositeEdge(botForceTemplate.getActualDeploymentZone()));
+                calculatedDestinationZone = OffBoardDirection.translateStartPosition(getOppositeEdge(botForceTemplate.getActualDeploymentZone()));
             }
         }
 
@@ -1701,11 +1701,23 @@ public class AtBDynamicScenarioFactory {
 
         // if the objective specifies that it's to reach or prevent reaching a map edge
         // and has been set to "force destination edge", set that here
-        if (actualObjective.getDestinationEdge() == OffBoardDirection.NONE &&
+        boolean destinationEdgeIsNone = actualObjective.getDestinationEdge() == OffBoardDirection.NONE;
+        boolean objectiveIsReachMapEdge = actualObjective.getObjectiveCriterion() == ObjectiveCriterion.ReachMapEdge;
+        boolean objectiveIsPreventReachMapEdge = actualObjective.getObjectiveCriterion() ==
+                                                       ObjectiveCriterion.PreventReachMapEdge;
+        boolean objectiveIsMapEdgeRelevant = objectiveIsReachMapEdge || objectiveIsPreventReachMapEdge;
+        if (destinationEdgeIsNone &&
                   calculatedDestinationZone != OffBoardDirection.NONE &&
-                  (actualObjective.getObjectiveCriterion() == ObjectiveCriterion.ReachMapEdge ||
-                         actualObjective.getObjectiveCriterion() == ObjectiveCriterion.PreventReachMapEdge)) {
+                  objectiveIsMapEdgeRelevant) {
             actualObjective.setDestinationEdge(calculatedDestinationZone);
+        } else if (destinationEdgeIsNone &&
+                         objectiveIsMapEdgeRelevant) {
+            // The edge could not be auto-derived (e.g. the associated force deploys from the map center, so there is
+            // no "opposite" edge to flee toward). Such an objective can never validate, so warn instead of failing
+            // silently; the template should set an explicit <destinationEdge> in this case.
+            LOGGER.warn("Reach/prevent-edge objective '{}' could not auto-resolve a destination edge; " +
+                              "it will never complete unless the scenario template sets an explicit <destinationEdge>.",
+                  actualObjective.getDescription());
         }
 
         return actualObjective;
@@ -1859,28 +1871,30 @@ public class AtBDynamicScenarioFactory {
         } else {
             StratConBiomeManifest biomeManifest = StratConBiomeManifest.getInstance();
             int kelvinTemp = scenario.getTemperature() + StratConContractInitializer.ZERO_CELSIUS_IN_KELVIN;
-            var facilityTempMap = biomeManifest.getTempMap(StratConBiomeManifest.TERRAN_FACILITY_BIOME);
-            var facilityBiomeEntry = facilityTempMap.floorEntry(kelvinTemp);
-            if (facilityBiomeEntry == null) {
-                facilityBiomeEntry = facilityTempMap.firstEntry();
-            }
-            List<String> allowedFacility = facilityBiomeEntry.getValue().allowedTerrainTypes;
+
             var terrainTempMap = biomeManifest.getTempMap(StratConBiomeManifest.TERRAN_BIOME);
             var terrainBiomeEntry = terrainTempMap.floorEntry(kelvinTemp);
             if (terrainBiomeEntry == null) {
                 terrainBiomeEntry = terrainTempMap.firstEntry();
             }
-            List<String> allowedTerrain = terrainBiomeEntry.getValue().allowedTerrainTypes;
-            List<String> allowedTemplate = scenario.getTemplate().mapParameters.allowedTerrainTypes;
-            // try to filter on temp
-            allowedTerrain.addAll(allowedFacility);
-            allowedTemplate.retainAll(allowedTerrain);
-            allowedTemplate = !allowedTemplate.isEmpty() ?
-                                    allowedTemplate :
-                                    scenario.getTemplate().mapParameters.allowedTerrainTypes;
+
+            List<String> allowedTemplate = new ArrayList<>(scenario.getTemplate().mapParameters.allowedTerrainTypes);
+            allowedTemplate.retainAll(terrainBiomeEntry.getValue().allowedTerrainTypes);
+
+            if (allowedTemplate.isEmpty()) {
+                allowedTemplate = scenario.getTemplate().mapParameters.allowedTerrainTypes;
+            }
+
+            if (allowedTemplate.isEmpty()) {
+                // This should never happen. If it does, it means that both allowedTemplate and allowedTerrainTypes
+                // were empty, which likely points to a malformed scenario template.
+                LOGGER.error("No allowed terrain types found for scenario template '{}'; skipping terrain assignment.",
+                      scenario.getTemplate().name);
+                return;
+            }
 
             int terrainIndex = randomInt(allowedTemplate.size());
-            scenario.setTerrainType(scenario.getTemplate().mapParameters.allowedTerrainTypes.get(terrainIndex));
+            scenario.setTerrainType(allowedTemplate.get(terrainIndex));
             scenario.setMapFile();
         }
     }

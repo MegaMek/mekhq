@@ -141,15 +141,16 @@ public class ForceLocationManager {
     }
 
     /**
-     * Processes {@link CurrentLocation} travel nodes that are parented directly to the campaign and have completed
-     * their journey (i.e. are on-planet), landing their passengers into the campaign's main force resources.
+     * Processes {@link AbstractMobileLocation} travel nodes (interplanetary {@link CurrentLocation} or on-planet
+     * {@link GroundTransitLocation}) that are parented directly to the campaign and have completed their journey,
+     * landing their passengers into the campaign's main force resources.
      */
     public void processArrivals(Campaign campaign) {
         for (ILocation child : new ArrayList<>(mainForce.getChildLocations())) {
-            if (!(child instanceof CurrentLocation travelLocation)) {
+            if (!(child instanceof AbstractMobileLocation travelLocation)) {
                 continue;
             }
-            if (!travelLocation.isOnPlanet()) {
+            if (!travelLocation.hasArrived()) {
                 continue;
             }
             LocationDispatch.landFromTravelNode(travelLocation,

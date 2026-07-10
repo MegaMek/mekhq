@@ -507,29 +507,35 @@ public final class BriefingTab extends CampaignGuiTab {
 
     private void styleSecondaryButton(AbstractButton button) {
         styleBriefingButton(button);
-        button.setBackground(null);
+        button.setBackground(UIManager.getColor("Button.background"));
         button.setForeground(null);
         button.setFont(button.getFont().deriveFont(Font.PLAIN));
     }
 
     private void stylePrimaryButton(AbstractButton button) {
-        styleBriefingButton(button);
-        button.setFont(button.getFont().deriveFont(Font.BOLD));
-
-        Color background = getUIColor("Button.default.background", "Actions.Blue");
-        if (background != null) {
-            button.setBackground(background);
-        }
-
-        Color foreground = getUIColor("Button.default.foreground", "Button.foreground");
-        if (foreground != null) {
-            button.setForeground(foreground);
-        }
+        styleFilledButton(button,
+              getUIColor("Button.default.background", "Actions.Blue"),
+              getUIColor("Button.default.foreground", "Button.foreground"));
     }
 
     private void styleDangerButton(AbstractButton button) {
+        // Actions.Red is the muted sibling of the Actions.Blue used for primary buttons; a filled red communicates a
+        // destructive action more strongly than red text alone.
+        styleFilledButton(button,
+              getUIColor("Actions.Red"),
+              getUIColor("Button.default.foreground", "Button.foreground"));
+    }
+
+    // Shared emphasized (filled) treatment for primary and danger buttons; they differ only in the colors supplied.
+    private void styleFilledButton(AbstractButton button, Color background, Color foreground) {
         styleBriefingButton(button);
-        button.setForeground(MekHQ.getMHQOptions().getBelowContractMinimumForeground());
+        button.setFont(button.getFont().deriveFont(Font.BOLD));
+        if (background != null) {
+            button.setBackground(background);
+        }
+        if (foreground != null) {
+            button.setForeground(foreground);
+        }
     }
 
     private void styleBriefingButton(AbstractButton button) {
@@ -2495,24 +2501,28 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
-        final boolean canStartGame = ((!getCampaign().checkLinkedScenario(scenario.getId())) &&
-                                            (scenario.canStartScenario(getCampaign())));
+        final boolean linkedScenario = getCampaign().checkLinkedScenario(scenario.getId());
+        final boolean canStartGame = !linkedScenario && scenario.canStartScenario(getCampaign());
+        // Preparation actions (adjusting the deployment, exporting or printing the assigned force) do not require the
+        // scenario's date to have arrived - they only need the scenario to be current with a valid deployed force - so
+        // they are gated on the date-free readiness check instead.
+        final boolean canPrepare = !linkedScenario && scenario.canPrepareScenario(getCampaign());
 
         btnStartGame.setEnabled(canStartGame);
         btnJoinGame.setEnabled(canStartGame);
         btnLoadGame.setEnabled(canStartGame);
-        btnGetMul.setEnabled(canStartGame);
+        btnGetMul.setEnabled(canPrepare);
 
         final boolean hasTrack = scenario.getHasTrack();
         if (hasTrack) {
-            btnClearAssignedUnits.setEnabled(canStartGame && getCampaign().isGM());
+            btnClearAssignedUnits.setEnabled(canPrepare && getCampaign().isGM());
         } else {
-            btnClearAssignedUnits.setEnabled(canStartGame);
+            btnClearAssignedUnits.setEnabled(canPrepare);
         }
 
         btnResolveScenario.setEnabled(canStartGame);
         btnAutoResolveScenario.setEnabled(canStartGame);
-        btnPrintRS.setEnabled(canStartGame);
+        btnPrintRS.setEnabled(canPrepare);
         refreshScenarioActionButtonEmphasis();
     }
 

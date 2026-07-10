@@ -53,8 +53,8 @@ class ActionCheckResultTest {
         assertEquals(1, result.getMarginOfSuccess());
         assertFalse(result.hasUsedEdge());
         assertEquals("Success.", result.getReport(false));
-        assertEquals("Success. <span color='positive'><i>It'll do...</i></span>",
-              result.getReport(true).replace(ReportingUtilities.getPositiveColor(), "positive"));
+        assertEquals("Success. <span color='warning'><i>It'll do...</i></span>",
+              result.getReport(true).replace(ReportingUtilities.getWarningColor(), "warning"));
     }
 
     @Test
@@ -64,8 +64,8 @@ class ActionCheckResultTest {
         assertEquals(2, result.getMarginOfSuccess());
         assertTrue(result.hasUsedEdge());
         assertEquals("Success. Used a point of <b>Edge</b>.", result.getReport(false));
-        assertEquals("Success. Used a point of <b>Edge</b>. <span color='positive'><i>Good.</i></span>",
-              result.getReport(true).replace(ReportingUtilities.getPositiveColor(), "positive"));
+        assertEquals("Success. Used a point of <b>Edge</b>. <span color='warning'><i>It'll do...</i></span>",
+              result.getReport(true).replace(ReportingUtilities.getWarningColor(), "warning"));
     }
 
     @ParameterizedTest

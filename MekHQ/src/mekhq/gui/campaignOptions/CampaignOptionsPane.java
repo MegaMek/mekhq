@@ -144,6 +144,7 @@ public class CampaignOptionsPane extends JPanel {
     private TurnoverAndRetentionPages turnoverAndRetentionPages;
     private AwardsAndRandomizationPages awardsAndRandomizationPages;
     private SkillsPages skillsPages;
+    private AttributesAndTraitsPage attributesAndTraitsPage;
     private AbilitiesPages abilitiesPages;
     private RepairAndMaintenancePages repairAndMaintenancePages;
     private EquipmentAndSuppliesPages equipmentAndSuppliesPages;
@@ -307,6 +308,9 @@ public class CampaignOptionsPane extends JPanel {
                 CampaignOptionsRouteOptions.withoutHelpPanel(),
                 "advancementCategory", "awardsAndRandomizationCategory", "2recruitmentBonusesPage");
         registerParentRoute("advancement.skills", "advancementCategory", "skillsCategory");
+        registerDirectRoute("advancement.skills.attributes-and-traits",
+                this::createAdvancementAttributesAndTraitsPage,
+                "advancementCategory", "skillsCategory", "attributesAndTraitsPage");
         registerDirectRoute("advancement.skills.gunnery", this::createAdvancementGunnerySkillsPage,
                 "advancementCategory", "skillsCategory", "0gunnerySkillsPage");
         registerDirectRoute("advancement.skills.piloting", this::createAdvancementPilotingSkillsPage,
@@ -366,8 +370,6 @@ public class CampaignOptionsPane extends JPanel {
                 "strategicOperationsCategory", "systemsCategory", "reputationPage");
         registerDirectRoute("operations.systems.faction-standing", this::createOperationsFactionStandingPage,
                 "strategicOperationsCategory", "systemsCategory", "factionStandingPage");
-        registerDirectRoute("operations.systems.a-time-of-war", this::createOperationsATimeOfWarPage,
-                "strategicOperationsCategory", "systemsCategory", "atowPage");
         registerParentRoute("operations.rulesets", "strategicOperationsCategory", "rulesetsCategory");
         registerDirectRoute("operations.rulesets.stratcon", this::createOperationsStratConPage,
                 "strategicOperationsCategory", "rulesetsCategory", "stratConGeneralPage");
@@ -591,6 +593,7 @@ public class CampaignOptionsPane extends JPanel {
     private void initializeAdvancementSection() {
         awardsAndRandomizationPages = new AwardsAndRandomizationPages(campaign);
         skillsPages = new SkillsPages(campaignOptions);
+        attributesAndTraitsPage = new AttributesAndTraitsPage(campaign);
         abilitiesPages = new AbilitiesPages();
     }
 
@@ -825,6 +828,11 @@ public class CampaignOptionsPane extends JPanel {
         return awardsAndRandomizationPages.recruitmentBonusesPage();
     }
 
+    private JPanel createAdvancementAttributesAndTraitsPage() {
+        ensureCategoryLoaded("advancementCategory");
+        return attributesAndTraitsPage.createPage();
+    }
+
     private JPanel createAdvancementGunnerySkillsPage() {
         ensureCategoryLoaded("advancementCategory");
         return skillsPages.createSkillsPage(COMBAT_GUNNERY);
@@ -935,11 +943,6 @@ public class CampaignOptionsPane extends JPanel {
         return systemsPages.createFactionStandingPage();
     }
 
-    private JPanel createOperationsATimeOfWarPage() {
-        ensureCategoryLoaded("strategicOperationsCategory");
-        return systemsPages.createATOWPage();
-    }
-
     private JPanel createOperationsStratConPage() {
         ensureCategoryLoaded("strategicOperationsCategory");
         return rulesetsPages.createStratConPage();
@@ -993,6 +996,7 @@ public class CampaignOptionsPane extends JPanel {
         // Advancement
         if (awardsAndRandomizationPages != null) {
             awardsAndRandomizationPages.applyCampaignOptionsToCampaign(options, presetRandomSkillPreferences);
+            attributesAndTraitsPage.applyCampaignOptionsToCampaign(options, presetRandomSkillPreferences);
             skillsPages.applyCampaignOptionsToCampaign(options, presetSkills);
             abilitiesPages.applyCampaignOptionsToCampaign(preset);
         }
@@ -1008,7 +1012,7 @@ public class CampaignOptionsPane extends JPanel {
             financesPages.applyCampaignOptionsToCampaign(options);
             marketsPages.applyCampaignOptionsToCampaign(options);
             rulesetsPages.applyCampaignOptionsToCampaign(options);
-            systemsPages.applyCampaignOptionsToCampaign(options, presetRandomSkillPreferences);
+            systemsPages.applyCampaignOptionsToCampaign(options);
         }
 
         // Tidy up
@@ -1281,6 +1285,8 @@ public class CampaignOptionsPane extends JPanel {
         // Advancement
         awardsAndRandomizationPages.loadValuesFromCampaignOptions(presetCampaignOptions,
                 campaignPreset.getRandomSkillPreferences());
+        attributesAndTraitsPage.loadValuesFromCampaignOptions(presetCampaignOptions,
+                campaignPreset.getRandomSkillPreferences());
         skillsPages.loadValuesFromCampaignOptions(presetCampaignOptions, campaignPreset.getSkills());
         // The ability page is a special case, so handled differently to other pages
         abilitiesPages.buildAllAbilityInfo(campaignPreset.getSpecialAbilities());
@@ -1293,6 +1299,6 @@ public class CampaignOptionsPane extends JPanel {
         financesPages.loadValuesFromCampaignOptions(presetCampaignOptions);
         marketsPages.loadValuesFromCampaignOptions(presetCampaignOptions);
         rulesetsPages.loadValuesFromCampaignOptions(presetCampaignOptions);
-        systemsPages.loadValuesFromCampaignOptions(presetCampaignOptions, campaignPreset.getRandomSkillPreferences());
+        systemsPages.loadValuesFromCampaignOptions(presetCampaignOptions);
     }
 }

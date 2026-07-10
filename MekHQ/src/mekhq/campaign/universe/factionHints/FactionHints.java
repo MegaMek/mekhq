@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,18 +32,26 @@
  */
 package mekhq.campaign.universe.factionHints;
 
+import static mekhq.MHQConstants.FACTION_DIPLOMACY_DIRECTORY_PATH;
 import static mekhq.MHQConstants.FACTION_HINTS_FILE;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+import java.awt.GraphicsEnvironment;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.xml.parsers.DocumentBuilder;
 
 import megamek.common.annotations.Nullable;
@@ -58,15 +66,39 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
+ * Holds the faction diplomacy data (wars, alliances, rivalries, neutral factions, and contained factions) used to
+ * compute the probabilities of conflicts between factions.
+ *
+ * <p>Data is loaded from the per-conflict YAML files in {@code data/universe/factionDiplomacy/} when that directory
+ * exists, falling back to the legacy {@code data/universe/factionhints.xml} otherwise. The format is documented in
+ * {@code docs/Faction Diplomacy Readme.md}.</p>
+ *
  * @author Neoancient
  */
 public class FactionHints {
     private static final MMLogger LOGGER = MMLogger.create(FactionHints.class);
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.FactionHints";
 
     private static final String TEST_DIR = "testresources/" + FACTION_HINTS_FILE.replace("factionhints",
           "factionhints_test");
+    private static final String TEST_DIPLOMACY_DIR = "testresources/"
+          + FACTION_DIPLOMACY_DIRECTORY_PATH.replace("factionDiplomacy", "factionDiplomacy_test");
+
+    /**
+     * Field separator and entry-type labels used by {@link #diplomaticSignatures()} to build the normalized text
+     * signatures that {@link #hasSameDiplomaticData(FactionHints)} compares.
+     */
+    private static final String SIGNATURE_SEPARATOR = "|";
+    private static final String SIGNATURE_TYPE_WAR = "war";
+    private static final String SIGNATURE_TYPE_ALLIANCE = "alliance";
+    private static final String SIGNATURE_TYPE_RIVALRY = "rivalry";
+    private static final String SIGNATURE_TYPE_NEUTRAL_EXCEPTION = "neutralException";
+    private static final String SIGNATURE_TYPE_NEUTRAL = "neutral";
+    private static final String SIGNATURE_TYPE_CONTAINED = "contained";
 
     private static volatile FactionHints instance;
+
+    private boolean customLegacyDataDetected;
 
     private final Set<Faction> neutralFactions;
 
@@ -180,7 +212,21 @@ public class FactionHints {
 
     private void loadData(boolean useTestDirectory) {
         try {
-            loadFactionHints(useTestDirectory);
+            File diplomacyDirectory = new File(useTestDirectory ? TEST_DIPLOMACY_DIR
+                                                     : FACTION_DIPLOMACY_DIRECTORY_PATH);
+            boolean yamlDataLoaded = false;
+            if (diplomacyDirectory.isDirectory()) {
+                LOGGER.info("[FactionDiplomacy] Loading faction diplomacy data from {}",
+                      diplomacyDirectory.getPath());
+                yamlDataLoaded = FactionDiplomacyLoader.load(this, diplomacyDirectory);
+            }
+            if (yamlDataLoaded) {
+                checkForCustomLegacyXml(new File(useTestDirectory ? TEST_DIR : FACTION_HINTS_FILE));
+            } else {
+                LOGGER.warn("[FactionDiplomacy] No faction diplomacy YAML data in {} - falling back to legacy XML {}",
+                      diplomacyDirectory.getPath(), FACTION_HINTS_FILE);
+                loadFactionHints(useTestDirectory);
+            }
         } catch (DOMException e) {
             LOGGER.error("", e);
         }
@@ -259,8 +305,9 @@ public class FactionHints {
     }
 
     /**
-     * Indicates a faction is neutral (e.g. ComStar) or non-combatant and should not be chosen as an employer or enemy
-     * unless at war at the time.
+     * Indicates a faction is neutral (e.g. ComStar) or non-combatant and should not be chosen as an enemy unless at
+     * war at the time. Neutral factions can still act as employers, but their offensive contract types are downgraded
+     * to defensive ones against enemies they are not at war with.
      *
      * @param faction Any faction
      *
@@ -364,7 +411,9 @@ public class FactionHints {
      * @param contained The contained faction
      * @param date      The campaign date
      *
-     * @return The ratio of space taken up by the contained faction to that of the host.
+     * @return The ratio of space taken up by the contained faction to that of the host. A value of {@code 0.0} is the
+     *       "no split" sentinel (used when the data omits the fraction): consumers then apportion the full border to
+     *       both factions instead of splitting it.
      */
     public double getAltLocationFraction(Faction host,
           Faction contained, LocalDate date) {
@@ -532,12 +581,148 @@ public class FactionHints {
         }
     }
 
+    /**
+     * @return {@code true} if a legacy {@code factionhints.xml} whose contents differ from the loaded faction
+     *       diplomacy data was found. This usually means a player carried a customized XML file into a release that
+     *       ships the {@code factionDiplomacy} YAML directory, so their customizations are not in effect.
+     */
+    public boolean isCustomLegacyDataDetected() {
+        return customLegacyDataDetected;
+    }
+
+    /**
+     * Detects a customized legacy {@code factionhints.xml} that is being ignored in favor of the YAML directory, and
+     * politely tells the player how to migrate their custom wars. Does nothing when the legacy file is absent or when
+     * its contents match the loaded YAML data (the stock file shipped alongside the directory).
+     *
+     * @param legacyXmlFile the legacy XML file location to check
+     */
+    private void checkForCustomLegacyXml(File legacyXmlFile) {
+        if (!legacyXmlFile.isFile() || !legacyXmlDiffers(legacyXmlFile)) {
+            return;
+        }
+        customLegacyDataDetected = true;
+        LOGGER.warn("""
+                    [FactionDiplomacy] {} differs from the shipped faction diplomacy data. \
+                    That XML file is NO LONGER LOADED when the {} directory is present, so any custom wars or \
+                    alliances in it are not in effect. To keep them, recreate them as a YAML file in the \
+                    factionDiplomacy directory (the format is documented in docs/Faction Diplomacy Readme.md). \
+                    If the XML file was not customized, it can simply be deleted.""",
+              legacyXmlFile.getPath(), FACTION_DIPLOMACY_DIRECTORY_PATH);
+        showCustomLegacyDataWarning(legacyXmlFile);
+    }
+
+    /**
+     * Loads the given legacy XML into a scratch instance and compares its diplomatic content against this instance.
+     *
+     * @param legacyXmlFile the legacy {@code factionhints.xml} to compare
+     *
+     * @return {@code true} if the XML contains different diplomatic data than this instance
+     */
+    boolean legacyXmlDiffers(File legacyXmlFile) {
+        FactionHints legacyHints = new FactionHints();
+        try {
+            legacyHints.loadFactionHintsFromXmlFile(legacyXmlFile);
+        } catch (RuntimeException exception) {
+            LOGGER.error(exception,
+                  "[FactionDiplomacy] Could not parse " + legacyXmlFile.getPath() + " for comparison");
+            return true;
+        }
+        return !hasSameDiplomaticData(legacyHints);
+    }
+
+    /**
+     * @param other another instance to compare with
+     *
+     * @return {@code true} if both instances hold exactly the same wars, alliances, rivalries, neutral factions, and
+     *       contained factions
+     */
+    boolean hasSameDiplomaticData(FactionHints other) {
+        return diplomaticSignatures().equals(other.diplomaticSignatures());
+    }
+
+    /**
+     * @return a sorted, normalized text signature of every diplomatic entry held by this instance, used to compare
+     *       two data sources for semantic equality independent of file format or entry order
+     */
+    private List<String> diplomaticSignatures() {
+        List<String> signatures = new ArrayList<>();
+        appendHintSignatures(signatures, SIGNATURE_TYPE_WAR, wars);
+        appendHintSignatures(signatures, SIGNATURE_TYPE_ALLIANCE, alliances);
+        appendHintSignatures(signatures, SIGNATURE_TYPE_RIVALRY, rivals);
+        appendHintSignatures(signatures, SIGNATURE_TYPE_NEUTRAL_EXCEPTION, neutralExceptions);
+        for (Faction faction : neutralFactions) {
+            signatures.add(SIGNATURE_TYPE_NEUTRAL + SIGNATURE_SEPARATOR + faction.getShortName());
+        }
+        for (Faction host : containedFactions.keySet()) {
+            for (Faction contained : containedFactions.get(host).keySet()) {
+                for (AltLocation location : containedFactions.get(host).get(contained)) {
+                    List<String> opponentCodes = location.getOpponents().stream()
+                                                       .map(Faction::getShortName)
+                                                       .sorted()
+                                                       .toList();
+                    signatures.add(String.join(SIGNATURE_SEPARATOR, SIGNATURE_TYPE_CONTAINED,
+                          host.getShortName(), contained.getShortName(),
+                          String.valueOf(location.getStart()), String.valueOf(location.getEnd()),
+                          String.valueOf(location.getFraction()), opponentCodes.toString()));
+                }
+            }
+        }
+        Collections.sort(signatures);
+        return signatures;
+    }
+
+    private static void appendHintSignatures(List<String> signatures, String type,
+          Map<Faction, Map<Faction, List<FactionHint>>> hints) {
+        for (Faction firstFaction : hints.keySet()) {
+            for (Faction secondFaction : hints.get(firstFaction).keySet()) {
+                String firstCode = firstFaction.getShortName();
+                String secondCode = secondFaction.getShortName();
+                String pair = (firstCode.compareTo(secondCode) <= 0)
+                                    ? firstCode + "," + secondCode
+                                    : secondCode + "," + firstCode;
+                for (FactionHint hint : hints.get(firstFaction).get(secondFaction)) {
+                    signatures.add(String.join(SIGNATURE_SEPARATOR, type, pair, hint.getName(),
+                          String.valueOf(hint.getStart()), String.valueOf(hint.getEnd())));
+                }
+            }
+        }
+    }
+
+    /**
+     * Shows the custom-data warning dialog unless running headless (tests, dedicated servers).
+     *
+     * @param legacyXmlFile the customized legacy XML file
+     */
+    private void showCustomLegacyDataWarning(File legacyXmlFile) {
+        if (GraphicsEnvironment.isHeadless()) {
+            return;
+        }
+        String title = getTextAt(RESOURCE_BUNDLE, "FactionHints.customLegacyXml.title");
+        String message = getFormattedTextAt(RESOURCE_BUNDLE, "FactionHints.customLegacyXml.message",
+              legacyXmlFile.getPath(), FACTION_DIPLOMACY_DIRECTORY_PATH);
+        SwingUtilities.invokeLater(() ->
+              JOptionPane.showMessageDialog(null, message, title, JOptionPane.WARNING_MESSAGE));
+    }
+
+    /**
+     * Legacy loader for the monolithic {@code factionhints.xml}. Only used when the {@code factionDiplomacy} YAML
+     * directory is not present; see {@link FactionDiplomacyLoader} for the current format.
+     */
     private void loadFactionHints(boolean useTestDirectory) throws DOMException {
+        loadFactionHintsFromXmlFile(new File(useTestDirectory ? TEST_DIR : FACTION_HINTS_FILE));
+    }
+
+    /**
+     * Parses the given legacy faction hints XML file into this instance.
+     *
+     * @param xmlFile the XML file to parse
+     */
+    private void loadFactionHintsFromXmlFile(File xmlFile) throws DOMException {
         LOGGER.info("Starting load of faction hint data from XML...");
         Document xmlDoc;
 
-        String directory = useTestDirectory ? TEST_DIR : FACTION_HINTS_FILE;
-        try (InputStream is = new FileInputStream(directory)) {
+        try (InputStream is = new FileInputStream(xmlFile)) {
             DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
 
             xmlDoc = db.parse(is);

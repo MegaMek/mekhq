@@ -38,14 +38,13 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 
 /**
  * The {@code SystemsPages} class coordinates the Systems section of the MekHQ Campaign Options dialog. It owns the
  * shared {@link SystemsOptionsModel} snapshot and delegates the construction and value synchronisation of each leaf page
- * to a dedicated view class: {@link ReputationPage}, {@link FactionStandingPage}, and {@link ATimeOfWarPage}.
+ * to a dedicated view class: {@link ReputationPage} and {@link FactionStandingPage}.
  *
- * <p>On load it builds the model from a {@link CampaignOptions} source (and a {@link RandomSkillPreferences} source) and
+ * <p>On load it builds the model from a {@link CampaignOptions} source and
  * pushes it into any pages that have already been built; on apply it gathers the page values back into the model, runs
  * any criminal-record reset requested on the Reputation page, and writes the model to the target options. Each leaf page
  * is built lazily the first time its {@code create...Page()} method is called.</p>
@@ -56,11 +55,9 @@ import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 public class SystemsPages {
     private final Campaign campaign;
     private final CampaignOptions campaignOptions;
-    private final RandomSkillPreferences randomSkillPreferences;
     private SystemsOptionsModel model;
     private final ReputationPage reputationPage = new ReputationPage();
     private final FactionStandingPage factionStandingPage = new FactionStandingPage();
-    private final ATimeOfWarPage aTimeOfWarPage = new ATimeOfWarPage();
 
     /**
      * Constructs a new {@code SystemsPages} for the specified campaign.
@@ -73,7 +70,6 @@ public class SystemsPages {
     public SystemsPages(@Nonnull Campaign campaign) {
         this.campaign = campaign;
         this.campaignOptions = campaign.getCampaignOptions();
-        this.randomSkillPreferences = campaign.getRandomSkillPreferences();
         loadValuesFromCampaignOptions();
     }
 
@@ -103,18 +99,6 @@ public class SystemsPages {
     }
 
     /**
-     * Creates the ATOW page panel, containing grouped UI elements for configuring ATOW-related options and its header.
-     *
-     * @return a {@link JPanel} component representing the entire ATOW page UI
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    public @Nonnull JPanel createATOWPage() {
-        return aTimeOfWarPage.createPanel(model);
-    }
-
-    /**
      * Loads values from the current campaign or an optional preset campaign options into the UI components, updating
      * their states to match the data.
      *
@@ -122,34 +106,26 @@ public class SystemsPages {
      * @since 0.50.07
      */
     public void loadValuesFromCampaignOptions() {
-        loadValuesFromCampaignOptions(null, null);
+        loadValuesFromCampaignOptions(null);
     }
 
     /**
      * Loads values from the specified {@code presetCampaignOptions}, or the current campaign's options if {@code null},
      * into the UI form fields and controls.
      *
-     * @param presetCampaignOptions        an alternative {@link CampaignOptions}, or {@code null} to use the current
-     *                                     campaign's options
-     * @param presetRandomSkillPreferences Optional {@code RandomSkillPreferences} object to load values from; if
-     *                                     {@code null}, values are loaded from the current skill preferences.
+     * @param presetCampaignOptions an alternative {@link CampaignOptions}, or {@code null} to use the current campaign's
+     *                              options
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions,
-            @Nullable RandomSkillPreferences presetRandomSkillPreferences) {
+    public void loadValuesFromCampaignOptions(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;
         }
 
-        RandomSkillPreferences skillPreferences = presetRandomSkillPreferences;
-        if (skillPreferences == null) {
-            skillPreferences = this.randomSkillPreferences;
-        }
-
-        model = new SystemsOptionsModel(options, skillPreferences);
+        model = new SystemsOptionsModel(options);
         updateCreatedControlsFromModel();
     }
 
@@ -157,24 +133,16 @@ public class SystemsPages {
      * Applies the currently selected values in the UI controls to modify the campaign's options. If a preset is
      * provided, that preset is updated instead of the campaign's default options.
      *
-     * @param presetCampaignOptions        an alternative {@link CampaignOptions} object to update, or {@code null} to
-     *                                     update the campaign's own options
-     * @param presetRandomSkillPreferences Optional {@code RandomSkillPreferences} object to set values to; if
-     *                                     {@code null}, values are applied to the current skill preferences.
+     * @param presetCampaignOptions an alternative {@link CampaignOptions} object to update, or {@code null} to update
+     *                              the campaign's own options
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions,
-            @Nullable RandomSkillPreferences presetRandomSkillPreferences) {
+    public void applyCampaignOptionsToCampaign(@Nullable CampaignOptions presetCampaignOptions) {
         CampaignOptions options = presetCampaignOptions;
         if (presetCampaignOptions == null) {
             options = this.campaignOptions;
-        }
-
-        RandomSkillPreferences skillPreferences = presetRandomSkillPreferences;
-        if (skillPreferences == null) {
-            skillPreferences = this.randomSkillPreferences;
         }
 
         updateModelFromCreatedControls();
@@ -186,19 +154,17 @@ public class SystemsPages {
             model.resetCriminalRecord = false;
         }
 
-        model.applyTo(options, skillPreferences);
+        model.applyTo(options);
         reputationPage.updateResetCriminalRecordButtonFromModel();
     }
 
     private void updateCreatedControlsFromModel() {
         reputationPage.readFromModel(model);
         factionStandingPage.readFromModel(model);
-        aTimeOfWarPage.readFromModel(model);
     }
 
     private void updateModelFromCreatedControls() {
         reputationPage.writeToModel(model);
         factionStandingPage.writeToModel(model);
-        aTimeOfWarPage.writeToModel(model);
     }
 }

@@ -219,7 +219,9 @@ public class CurrentLocation extends AbstractMobileLocation {
             if (isAtJumpPoint() && (rechargeTime >= neededRechargeTime)) {
                 // jump
                 if (campaignOptions.isUseAbilities()) {
-                    checkForTransitDisorientationSyndrome(campaign, campaignOptions);
+                    checkForTransitDisorientationSyndrome(campaign,
+                          campaignOptions.isUseFatigue(),
+                          campaignOptions.getFatigueRate());
                 }
                 if (!isSilentProcessing) {
                     campaign.addReport(GENERAL, "Jumping to " + jumpPath.get(1).getPrintableName(today));

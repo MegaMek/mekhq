@@ -105,7 +105,6 @@ import mekhq.campaign.events.RepairStatusChangedEvent;
 import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.location.LocationDispatch;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.rentals.FacilityRentals;
 import mekhq.campaign.parts.Part;
@@ -138,11 +137,10 @@ import mekhq.gui.dialog.SmallSVAmmoSwapDialog;
 import mekhq.gui.dialog.reportDialogs.MaintenanceReportDialog;
 import mekhq.gui.dialog.reportDialogs.MonthlyUnitCostReportDialog;
 import mekhq.gui.dialog.reportDialogs.PartQualityReportDialog;
-import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.menus.AssignUnitToForceMenu;
 import mekhq.gui.menus.AssignUnitToPersonMenu;
 import mekhq.gui.menus.ExportUnitSpriteMenu;
-import mekhq.gui.menus.SendToLocationMenu;
+import mekhq.gui.menus.LocationMenu;
 import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.StaticChecks;
@@ -1060,10 +1058,8 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             JMenuHelpers.addMenuIfNonEmpty(popup, new AssignUnitToForceMenu(gui.getCampaign(), units));
 
             List<mekhq.campaign.unit.Unit> unitList = List.of(units);
-            JMenuHelpers.addMenuIfNonEmpty(popup, new SendToLocationMenu(
-                  gui.getCampaign(), gui.getFrame(), unitList,
-                  destination -> LocationDispatch.dispatchUnitsToLocation(
-                        unitList, destination, gui.getCampaign())));
+            JMenuHelpers.addMenuIfNonEmpty(popup,
+                  new LocationMenu(gui.getCampaign(), gui.getFrame(), unitList));
 
             // if we're using maintenance and have selected something that requires
             // maintenance and

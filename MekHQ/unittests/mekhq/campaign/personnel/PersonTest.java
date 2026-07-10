@@ -312,6 +312,38 @@ public class PersonTest {
     }
 
     @Test
+    public void canBeManuallyDispatchedWhenNotDeployedAndNotStudent() {
+        initPerson();
+
+        assertFalse(mockPerson.isDeployed());
+        assertFalse(mockPerson.getStatus().isStudent());
+        assertTrue(mockPerson.canBeManuallyDispatched());
+    }
+
+    @Test
+    public void cannotBeManuallyDispatchedWhenDeployed() {
+        initPerson();
+
+        Unit unit0 = mock(Unit.class);
+        when(unit0.getId()).thenReturn(UUID.randomUUID());
+        when(unit0.getScenarioId()).thenReturn(1);
+        mockPerson.setUnit(unit0);
+
+        assertTrue(mockPerson.isDeployed());
+        assertFalse(mockPerson.canBeManuallyDispatched());
+    }
+
+    @Test
+    public void cannotBeManuallyDispatchedWhenStudent() {
+        initPerson();
+        mockPerson.setStatus(PersonnelStatus.STUDENT);
+
+        assertFalse(mockPerson.isDeployed());
+        assertTrue(mockPerson.getStatus().isStudent());
+        assertFalse(mockPerson.canBeManuallyDispatched());
+    }
+
+    @Test
     public void testAddInjuriesResetsUnitStatus() {
         initPerson();
 

@@ -192,7 +192,7 @@ public abstract class AbstractLocation implements IPlace {
         if (usedRechargeTime > 0) {
             if (!isSilentProcessing) {
                 campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, "getReport.recharge.hours",
-                                                  Math.round(100.0 * usedRechargeTime) / 100.0));
+                      Math.round(100.0 * usedRechargeTime) / 100.0));
             }
             setRechargeTime(getRechargeTime() + usedRechargeTime);
             if (getRechargeTime() >= neededRechargeTime && !isSilentProcessing) {
@@ -269,29 +269,20 @@ public abstract class AbstractLocation implements IPlace {
     }
 
     /**
-     * Applies Transit Disorientation Syndrome effects to all personnel who have the corresponding flaw.
+     * Checks all personnel in the given campaign for the "Transit Disorientation Syndrome" flaw and applies fatigue
+     * adjustments if specified. Personnel without the flaw are ignored.
      *
-     * @param campaign        the current campaign
-     * @param campaignOptions the campaign's ruleset and configuration
+     * @param campaign     The campaign instance containing the personnel to check.
+     * @param isUseFatigue If true, applies fatigue adjustments to affected personnel.
+     * @param fatigueRate  The rate at which fatigue is applied to the affected personnel.
      */
-    static void checkForTransitDisorientationSyndrome(Campaign campaign, CampaignOptions campaignOptions) {
-        final boolean useAdvancedMedical = campaignOptions.isUseAdvancedMedical();
-        final boolean useAltAdvancedMedical = campaignOptions.isUseAlternativeAdvancedMedical();
-        final boolean useFatigue = campaignOptions.isUseFatigue();
-        final int fatigueRate = campaignOptions.getFatigueRate();
+    static void checkForTransitDisorientationSyndrome(Campaign campaign, boolean isUseFatigue, int fatigueRate) {
+        if (isUseFatigue) {
+            for (Person person : campaign.getPersonnelFilteringOutDepartedAndAbsent()) {
+                if (!person.getOptions().booleanOption(FLAW_TRANSIT_DISORIENTATION_SYNDROME)) {
+                    continue;
+                }
 
-        for (Person person : campaign.getPersonnelFilteringOutDepartedAndAbsent()) {
-            if (!person.getOptions().booleanOption(FLAW_TRANSIT_DISORIENTATION_SYNDROME)) {
-                continue;
-            }
-
-            if (useAdvancedMedical) {
-                person.addInjury(createTransitDisorientationInjury(campaign, person, useAltAdvancedMedical));
-            } else {
-                person.setHits(person.getHits() + 1);
-            }
-
-            if (useFatigue) {
                 person.changeFatigue(fatigueRate);
             }
         }
@@ -316,11 +307,22 @@ public abstract class AbstractLocation implements IPlace {
         return switch (wn.getNodeName().toLowerCase()) {
             case "location" -> CurrentLocation.generateInstanceFromXML(wn, campaign);
             case "fixedlocation" -> FixedLocation.generateInstanceFromXML(wn, campaign);
+            case "groundtransitlocation" -> GroundTransitLocation.generateInstanceFromXML(wn, campaign);
             default -> {
                 logger.warn("Unrecognized location node '{}' — skipping", wn.getNodeName());
                 yield null;
             }
         };
+    }
+
+    /**
+     * Returns {@code true} if {@code nodeName} is the XML element name of a serialized travel node — an interplanetary
+     * {@code <location>} ({@link CurrentLocation}) or an on-planet {@code <groundTransitLocation>}
+     * ({@link GroundTransitLocation}). Both deserialize via {@link #generateInstanceFromXML} to an
+     * {@link AbstractMobileLocation}.
+     */
+    public static boolean isTravelNodeTag(String nodeName) {
+        return nodeName.equalsIgnoreCase("location") || nodeName.equalsIgnoreCase("groundTransitLocation");
     }
 
     static class PlanetarySystemAdapter extends XmlAdapter<String, PlanetarySystem> {

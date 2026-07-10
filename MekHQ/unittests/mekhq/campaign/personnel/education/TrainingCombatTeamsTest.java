@@ -38,17 +38,22 @@ import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.BARELY_MADE_
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.skills.ActionCheckResult;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import testUtilities.MHQTestUtilities;
 
 class TrainingCombatTeamsTest {
@@ -155,7 +160,7 @@ class TrainingCombatTeamsTest {
     @Test
     void test_GetFinalXPProgress_ZeroMarginOfSuccess() {
         int marginOfSuccess = 0;
-        TrainingCombatTeams.getFinalXPProgress(marginOfSuccess, gunneryMek);
+        TrainingCombatTeams.getFinalXPProgress(new ActionCheckResult(null, marginOfSuccess, false, ""), gunneryMek);
 
         int expectedProgress = XP_RATE_BASE_LINE;
         int actualXPProgress = gunneryMek.getXpProgress();
@@ -166,7 +171,7 @@ class TrainingCombatTeamsTest {
     @Test
     void test_GetFinalXPProgress_NonZeroMarginOfSuccess() {
         int marginOfSuccess = 2;
-        TrainingCombatTeams.getFinalXPProgress(marginOfSuccess, gunneryMek);
+        TrainingCombatTeams.getFinalXPProgress(new ActionCheckResult(null, marginOfSuccess, false, ""), gunneryMek);
 
         int expectedProgress = XP_RATE_BASE_LINE * marginOfSuccess;
         int actualXPProgress = gunneryMek.getXpProgress();
@@ -207,27 +212,37 @@ class TrainingCombatTeamsTest {
 
     @Test
     void test_IsTrainingImpossible_NoSkills_CheckSuccessful() {
-        boolean isTrainingImpossible = TrainingCombatTeams.isTrainingImpossible(List.of(), BARELY_MADE_IT.getValue());
+        boolean isTrainingImpossible = TrainingCombatTeams.isTrainingImpossible(List.of(),
+              new ActionCheckResult(null, BARELY_MADE_IT.getLowerBound(), false, ""));
         assertTrue(isTrainingImpossible);
     }
 
     @Test
     void test_IsTrainingImpossible_YesSkills_CheckFailed() {
         boolean isTrainingImpossible = TrainingCombatTeams.isTrainingImpossible(List.of(gunneryMek),
-              ALMOST.getValue());
+              new ActionCheckResult(null, ALMOST.getLowerBound(), false, ""));
         assertTrue(isTrainingImpossible);
     }
 
     @Test
     void test_IsTrainingImpossible_NoSkills_CheckFailed() {
-        boolean isTrainingImpossible = TrainingCombatTeams.isTrainingImpossible(List.of(), ALMOST.getValue());
+        boolean isTrainingImpossible = TrainingCombatTeams.isTrainingImpossible(List.of(),
+              new ActionCheckResult(null, ALMOST.getLowerBound(), false, ""));
         assertTrue(isTrainingImpossible);
     }
 
     @Test
     void test_IsTrainingImpossible_YesSkills_CheckSuccessful() {
         boolean isTrainingImpossible = TrainingCombatTeams.isTrainingImpossible(List.of(gunneryMek),
-              BARELY_MADE_IT.getValue());
+              new ActionCheckResult(null, BARELY_MADE_IT.getLowerBound(), false, ""));
         assertFalse(isTrainingImpossible);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"0, 1", "2, 2", "4, 4", "-2, 1", "-8, 1", "100000, 6"})
+    void test_GetFinalXPProgress_(int marginOfSuccess, int xp) {
+        Skill skill = mock(Skill.class);
+        TrainingCombatTeams.getFinalXPProgress(new ActionCheckResult(null, marginOfSuccess, false, ""), skill);
+        verify(skill).changeXpProgress(xp);
     }
 }
