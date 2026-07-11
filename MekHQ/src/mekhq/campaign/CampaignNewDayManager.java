@@ -121,6 +121,7 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationNewDayUtil;
 import mekhq.campaign.market.PartsInUseManager;
 import mekhq.campaign.mission.AtBContract;
@@ -577,11 +578,19 @@ public class CampaignNewDayManager {
         }
 
         if (campaign.getTopUpWeekly() && isMonday) {
-            PartsInUseManager partsInUseManager = new PartsInUseManager(campaign);
-            Set<PartInUse> actualPartsInUse = partsInUseManager.getPartsInUse(campaign.getIgnoreMothballed(),
-                  false,
-                  campaign.getIgnoreSparesUnderQuality());
-            int bought = partsInUseManager.stockUpPartsInUse(actualPartsInUse);
+            // Each location keeps its own stock levels, so top up the main force and every base independently.
+            List<IPlace> places = new ArrayList<>();
+            places.add(campaign);
+            places.addAll(campaign.getCampaignLocationManager().getPlayerBases());
+
+            int bought = 0;
+            for (IPlace place : places) {
+                PartsInUseManager partsInUseManager = new PartsInUseManager(campaign, place);
+                Set<PartInUse> actualPartsInUse = partsInUseManager.getPartsInUse(campaign.getIgnoreMothballed(),
+                      false,
+                      campaign.getIgnoreSparesUnderQuality());
+                bought += partsInUseManager.stockUpPartsInUse(actualPartsInUse);
+            }
             campaign.addReport(ACQUISITIONS, String.format(resources.getString("weeklyStockCheck.text"), bought));
         }
 

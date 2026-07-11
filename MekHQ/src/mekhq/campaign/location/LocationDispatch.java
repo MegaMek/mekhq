@@ -271,13 +271,19 @@ public final class LocationDispatch {
         dispatch(units, destination, campaign, LOG_DISPATCH_UNITS, arrivalHangar, group -> {
             for (Unit unit : group) {
                 Hangar sourceHangar = unit.getHangar();
+                // Capture the unit's current warehouse BEFORE moving it: Hangar.addUnit reparents the unit's node, after
+                // which each installed part's getWarehouse() (resolved through the unit) would already read the arrival
+                // warehouse and the move below would be skipped.
+                Warehouse sourceWarehouse = unit.getWarehouse();
+                if (sourceWarehouse == null) {
+                    sourceWarehouse = campaign.getWarehouse();
+                }
                 (sourceHangar != null ? sourceHangar : campaign.getHangar()).removeUnit(unit.getId());
                 arrivalHangar.addUnit(unit);
                 // Installed parts live in the warehouse local to their unit; move them along.
-                for (Part part : unit.getParts()) {
-                    Warehouse sourceWarehouse = part.getWarehouse();
-                    if (sourceWarehouse != arrivalWarehouse) {
-                        (sourceWarehouse != null ? sourceWarehouse : campaign.getWarehouse()).removePart(part);
+                if (sourceWarehouse != arrivalWarehouse) {
+                    for (Part part : unit.getParts()) {
+                        sourceWarehouse.removePart(part);
                         arrivalWarehouse.addPart(part);
                     }
                 }
