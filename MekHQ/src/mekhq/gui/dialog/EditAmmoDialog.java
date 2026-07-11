@@ -47,8 +47,10 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
 
@@ -67,6 +69,7 @@ public class EditAmmoDialog extends JDialog {
 
     private static final int DIALOG_MIN_WIDTH = 600;
     private static final int DIALOG_MIN_HEIGHT = 200;
+    private static final int DIALOG_MAX_HEIGHT = 500;
     private static final int DIALOG_ROW_HEIGHT = 30;
     private static final int DIALOG_BUTTON_ROW_HEIGHT = 100;
     private static final Insets SPACING_INSETS = new Insets(5, 5, 5, 5);
@@ -110,14 +113,20 @@ public class EditAmmoDialog extends JDialog {
         setLayout(new BorderLayout());
         
         // Main panel with ammo controls
-        JPanel mainPanel = createAmmoPanel();
-        add(mainPanel, BorderLayout.CENTER);
+        JPanel ammoPanel = createAmmoPanel();
         
-        // Button panel
+        // Wrap in scrollpane for overflow handling
+        JScrollPane scrollPane = new JScrollPane(ammoPanel);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        add(scrollPane, BorderLayout.CENTER);
+        
+        // Button panel (always visible, not scrolled)
         add(buildButtonPanel(), BorderLayout.SOUTH);
         
-        // Set preferred size
-        int calculatedHeight = Math.max(DIALOG_MIN_HEIGHT, ammoBindings.size() * DIALOG_ROW_HEIGHT + DIALOG_BUTTON_ROW_HEIGHT);
+        // Calculate preferred size with scrollbar limit
+        int calculatedHeight = Math.max(DIALOG_MIN_HEIGHT, 
+            Math.min(DIALOG_MAX_HEIGHT, ammoBindings.size() * DIALOG_ROW_HEIGHT + DIALOG_BUTTON_ROW_HEIGHT));
         setPreferredSize(UIUtil.scaleForGUI(DIALOG_MIN_WIDTH, calculatedHeight));
     }
 
