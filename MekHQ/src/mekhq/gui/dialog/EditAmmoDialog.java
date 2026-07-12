@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -41,7 +41,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
+import mekhq.utilities.MHQInternationalization;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -74,9 +74,6 @@ public class EditAmmoDialog extends JDialog {
     private static final int DIALOG_BUTTON_ROW_HEIGHT = 100;
     private static final Insets SPACING_INSETS = new Insets(5, 5, 5, 5);
 
-    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle(
-        "mekhq.resources.EditAmmoDialog", MekHQ.getMHQOptions().getLocale());
-
     private final Entity entity;
     private final List<AmmoBinding> ammoBindings = new ArrayList<>();
     private boolean confirmed = false;
@@ -102,7 +99,7 @@ public class EditAmmoDialog extends JDialog {
         this.entity = entity;
         
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle(resourceMap.getString("dialog.title"));
+        setTitle(MHQInternationalization.getTextAt("mekhq.resources.EditAmmoDialog", "dialog.title"));
         
         initComponents();
         setLocationRelativeTo(parent);
@@ -124,10 +121,12 @@ public class EditAmmoDialog extends JDialog {
         // Button panel (always visible, not scrolled)
         add(buildButtonPanel(), BorderLayout.SOUTH);
         
-        // Calculate preferred size with scrollbar limit
-        int calculatedHeight = Math.max(DIALOG_MIN_HEIGHT, 
-            Math.min(DIALOG_MAX_HEIGHT, ammoBindings.size() * DIALOG_ROW_HEIGHT + DIALOG_BUTTON_ROW_HEIGHT));
-        setPreferredSize(UIUtil.scaleForGUI(DIALOG_MIN_WIDTH, calculatedHeight));
+        // Calculate raw dimensions
+        int rawHeight = ammoBindings.size() * DIALOG_ROW_HEIGHT + DIALOG_BUTTON_ROW_HEIGHT;
+        int boundedHeight = Math.max(DIALOG_MIN_HEIGHT, Math.min(DIALOG_MAX_HEIGHT, rawHeight));
+        
+        // Scale for GUI and set preferred size
+        setPreferredSize(UIUtil.scaleForGUI(DIALOG_MIN_WIDTH, boundedHeight));
     }
 
     /**
@@ -137,7 +136,7 @@ public class EditAmmoDialog extends JDialog {
     private JPanel createAmmoPanel() {
         JPanel mainPanel = new JPanel(new GridBagLayout());
         mainPanel.setBorder(new TitledBorder(
-            String.format(resourceMap.getString("panel.title"), entity.getDisplayName())));
+            MHQInternationalization.getFormattedTextAt("mekhq.resources.EditAmmoDialog", "panel.title", entity.getDisplayName())));
         
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = SPACING_INSETS;
@@ -146,11 +145,11 @@ public class EditAmmoDialog extends JDialog {
         // Header row
         gbc.gridx = 0;
         gbc.gridy = 0;
-        mainPanel.add(new JLabel(resourceMap.getString("label.weaponLocation")), gbc);
+        mainPanel.add(new JLabel(MHQInternationalization.getTextAt("mekhq.resources.EditAmmoDialog", "label.weaponLocation")), gbc);
         gbc.gridx = 1;
-        mainPanel.add(new JLabel(resourceMap.getString("label.ammoType")), gbc);
+        mainPanel.add(new JLabel(MHQInternationalization.getTextAt("mekhq.resources.EditAmmoDialog", "label.ammoType")), gbc);
         gbc.gridx = 2;
-        mainPanel.add(new JLabel(resourceMap.getString("label.shotsRemaining")), gbc);
+        mainPanel.add(new JLabel(MHQInternationalization.getTextAt("mekhq.resources.EditAmmoDialog", "label.shotsRemaining")), gbc);
         
         // Add ammo bins
         int row = 1;
@@ -167,7 +166,7 @@ public class EditAmmoDialog extends JDialog {
             gbc.gridy = 1;
             gbc.gridwidth = 3;
             gbc.anchor = GridBagConstraints.CENTER;
-            mainPanel.add(new JLabel(resourceMap.getString("label.noAmmo")), gbc);
+            mainPanel.add(new JLabel(MHQInternationalization.getTextAt("mekhq.resources.EditAmmoDialog", "label.noAmmo")), gbc);
         }
         
         return mainPanel;
@@ -197,7 +196,7 @@ public class EditAmmoDialog extends JDialog {
             gbc.gridx = 1;
             String ammoName = ammo.getType().getName();
             if (ammo.isHotLoaded()) {
-                ammoName = String.format("%s %s", ammoName, resourceMap.getString("label.hotLoaded"));
+                ammoName = MHQInternationalization.getFormattedTextAt("mekhq.resources.EditAmmoDialog", "label.hotLoaded", ammoName);
             }
             mainPanel.add(new JLabel(ammoName), gbc);
             
@@ -209,8 +208,7 @@ public class EditAmmoDialog extends JDialog {
             SpinnerNumberModel spinnerModel = new SpinnerNumberModel(currentShots, 0, maxShots, 1);
             JSpinner spinner = new JSpinner(spinnerModel);
             spinner.setName(String.format("ammoSpinner_%d", row));
-            spinner.setToolTipText(String.format(
-                resourceMap.getString("spinner.shotsTooltip"), maxShots));
+            spinner.setToolTipText(MHQInternationalization.getFormattedTextAt("mekhq.resources.EditAmmoDialog", "spinner.shotsTooltip", maxShots));
             
             AmmoBinding binding = new AmmoBinding(ammo, spinner, maxShots);
             ammoBindings.add(binding);
@@ -224,8 +222,7 @@ public class EditAmmoDialog extends JDialog {
             gbc.gridx = 0;
             gbc.gridy = row;
             gbc.gridwidth = 3;
-            mainPanel.add(new JLabel(String.format(
-                resourceMap.getString("label.error"), e.getMessage())), gbc);
+            mainPanel.add(new JLabel(MHQInternationalization.getFormattedTextAt("mekhq.resources.EditAmmoDialog", "label.error", e.getMessage())), gbc);
         }
     }
 
@@ -285,22 +282,22 @@ public class EditAmmoDialog extends JDialog {
     private JPanel buildButtonPanel() {
         JPanel buttonPanel = new JPanel(new FlowLayout());
         
-        JButton setAllZeroButton = new JButton(resourceMap.getString("btn.setAllZero.text"));
+        JButton setAllZeroButton = new JButton(MHQInternationalization.getTextAt("mekhq.resources.EditAmmoDialog", "btn.setAllZero.text"));
         setAllZeroButton.setName("setAllZeroButton");
         setAllZeroButton.addActionListener(e -> setAllToZero());
         buttonPanel.add(setAllZeroButton);
         
-        JButton setAllFullButton = new JButton(resourceMap.getString("btn.setAllFull.text"));
+        JButton setAllFullButton = new JButton(MHQInternationalization.getTextAt("mekhq.resources.EditAmmoDialog", "btn.setAllFull.text"));
         setAllFullButton.setName("setAllFullButton");
         setAllFullButton.addActionListener(e -> setAllToFull());
         buttonPanel.add(setAllFullButton);
         
-        JButton cancelButton = new JButton(resourceMap.getString("btn.cancel.text"));
+        JButton cancelButton = new JButton(MHQInternationalization.getTextAt("mekhq.resources.EditAmmoDialog", "btn.cancel.text"));
         cancelButton.setName("cancelButton");
         cancelButton.addActionListener(e -> dispose());
         buttonPanel.add(cancelButton);
         
-        JButton okayButton = new JButton(resourceMap.getString("btn.okay.text"));
+        JButton okayButton = new JButton(MHQInternationalization.getTextAt("mekhq.resources.EditAmmoDialog", "btn.okay.text"));
         okayButton.setName("okayButton");
         okayButton.addActionListener(e -> confirmChanges());
         getRootPane().setDefaultButton(okayButton);
@@ -342,9 +339,9 @@ public class EditAmmoDialog extends JDialog {
                     LOGGER.warn("Invalid shot count for {}: newShots={}, maxShots={}", 
                         binding.ammo.getType().getName(), newShots, binding.maxShots);
                     JOptionPane.showMessageDialog(this,
-                        String.format(resourceMap.getString("error.invalidShotCount"),
+                        MHQInternationalization.getFormattedTextAt("mekhq.resources.EditAmmoDialog", "error.invalidShotCount",
                             binding.ammo.getType().getName(), binding.maxShots),
-                        resourceMap.getString("error.invalidInput"), 
+                        MHQInternationalization.getTextAt("mekhq.resources.EditAmmoDialog", "error.invalidInput"), 
                         JOptionPane.ERROR_MESSAGE);
                     return;
                 }
@@ -357,8 +354,8 @@ public class EditAmmoDialog extends JDialog {
         } catch (Exception e) {
             LOGGER.error("Error confirming ammo changes", e);
             JOptionPane.showMessageDialog(this,
-                String.format(resourceMap.getString("error.savingChanges"), e.getMessage()),
-                resourceMap.getString("error.title"), 
+                MHQInternationalization.getFormattedTextAt("mekhq.resources.EditAmmoDialog", "error.savingChanges", e.getMessage()),
+                MHQInternationalization.getTextAt("mekhq.resources.EditAmmoDialog", "error.title"), 
                 JOptionPane.ERROR_MESSAGE);
         }
         

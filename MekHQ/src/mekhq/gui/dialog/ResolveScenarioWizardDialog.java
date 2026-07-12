@@ -60,7 +60,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.UUID;
 import javax.swing.*;
@@ -100,6 +99,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 import mekhq.gui.view.PersonViewPanel;
 import mekhq.utilities.ReportingUtilities;
+import mekhq.utilities.MHQInternationalization;
 
 /**
  * @author Taharqa
@@ -204,10 +204,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private final boolean isUseCamOpsSalvage;
 
     private static final MMLogger logger = MMLogger.create(ResolveScenarioWizardDialog.class);
-
-    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle(
-          "mekhq.resources.ResolveScenarioWizardDialog",
-          MekHQ.getMHQOptions().getLocale());
     // endregion Variable Declarations
 
     public ResolveScenarioWizardDialog(Campaign campaign, JFrame parent, boolean modal, ResolveScenarioTracker t) {
@@ -248,7 +244,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
         getContentPane().setLayout(new GridBagLayout());
 
-        setTitle(resourceMap.getString("title"));
+        setTitle(MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "title"));
 
         tabMain = new JTabbedPane();
 
@@ -256,51 +252,51 @@ public class ResolveScenarioWizardDialog extends JDialog {
         JPanel pnlUnitStatus = makeUnitStatusPanel();
         tabMain.add(wrapWithInstructions(pnlUnitStatus,
               null,
-              resourceMap.getString("txtInstructions.text.missingunits")), UNITS_PANEL);
+              MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "txtInstructions.text.missingunits")), UNITS_PANEL);
 
         JPanel pnlPilotStatus = makePilotStatusPanel();
-        tabMain.add(wrapWithInstructions(pnlPilotStatus, null, resourceMap.getString("txtInstructions.text.personnel")),
+        tabMain.add(wrapWithInstructions(pnlPilotStatus, null, MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "txtInstructions.text.personnel")),
               PILOT_PANEL);
 
         JPanel pnlSalvage = makeSalvagePanel();
 
-        String report = resourceMap.getString("txtInstructions.text.salvage");
+        String report = MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "txtInstructions.text.salvage");
         if (tracker.isEmployerEvokingSpecialClause()) {
             String colorOpenWarning = spanOpeningWithCustomColor(ReportingUtilities.getWarningColor());
             String colorOpenNegative = spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());
-            campaign.addReport(GENERAL, String.format(resourceMap.getString("txtInstructions.text.salvage.special"),
+            campaign.addReport(GENERAL, MHQInternationalization.getFormattedTextAt("mekhq.resources.ResolveScenarioWizardDialog", "txtInstructions.text.salvage.special",
                   colorOpenWarning,
                   CLOSING_SPAN_TAG,
                   colorOpenNegative,
                   CLOSING_SPAN_TAG));
 
-            report = resourceMap.getString("txtInstructions.text.salvage.special.unformatted");
+            report = MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "txtInstructions.text.salvage.special.unformatted");
         }
         tabMain.add(wrapWithInstructions(pnlSalvage, null, report), SALVAGE_PANEL);
 
         JPanel pnlPrisonerStatus = makePrisonerStatusPanel();
         tabMain.add(wrapWithInstructions(pnlPrisonerStatus,
               null,
-              resourceMap.getString("txtInstructions.text.prisoners")), PRISONER_PANEL);
+              MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "txtInstructions.text.prisoners")), PRISONER_PANEL);
 
         JPanel pnlKills = makeKillsPanel();
-        tabMain.add(wrapWithInstructions(pnlKills, null, resourceMap.getString("txtInstructions.text.kills")),
+        tabMain.add(wrapWithInstructions(pnlKills, null, MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "txtInstructions.text.kills")),
               KILLS_PANEL);
 
         JPanel pnlRewards = makeRewardsPanel();
-        tabMain.add(wrapWithInstructions(pnlRewards, null, resourceMap.getString("txtInstructions.text.reward")),
+        tabMain.add(wrapWithInstructions(pnlRewards, null, MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "txtInstructions.text.reward")),
               REWARD_PANEL);
 
         JPanel pnlObjectiveStatus = makeObjectiveStatusPanel();
         tabMain.add(wrapWithInstructions(pnlObjectiveStatus,
               null,
-              resourceMap.getString("txtInstructions.text.objectives")), OBJECTIVE_PANEL);
+              MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "txtInstructions.text.objectives")), OBJECTIVE_PANEL);
 
         JPanel pnlPreview = makePreviewPanel();
         scrPreviewPanel = new FastJScrollPane();
         tabMain.add(wrapWithInstructions(pnlPreview,
               scrPreviewPanel,
-              resourceMap.getString("txtInstructions.text.preview")), PREVIEW_PANEL);
+              MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "txtInstructions.text.preview")), PREVIEW_PANEL);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -316,7 +312,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         panButtons.setName("panButtons");
         panButtons.setLayout(new GridBagLayout());
 
-        JButton btnCancel = new JButton(resourceMap.getString("btnCancel.text"));
+        JButton btnCancel = new JButton(MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "btnCancel.text"));
         btnCancel.setName("btnClose");
         btnCancel.setMnemonic(KeyEvent.VK_C);
         btnCancel.addActionListener(evt -> cancel());
@@ -329,7 +325,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.insets = new Insets(5, 0, 5, 5);
         panButtons.add(btnCancel, gridBagConstraints);
 
-        btnBack = new JButton(resourceMap.getString("btnBack.text"));
+        btnBack = new JButton(MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "btnBack.text"));
         btnBack.setName("btnBack");
         btnBack.setMnemonic(KeyEvent.VK_B);
         btnBack.addActionListener(evt -> back());
@@ -337,14 +333,14 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.weightx = 0.0;
         panButtons.add(btnBack, gridBagConstraints);
 
-        btnNext = new JButton(resourceMap.getString("btnNext.text"));
+        btnNext = new JButton(MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "btnNext.text"));
         btnNext.setName("btnNext");
         btnNext.setMnemonic(KeyEvent.VK_N);
         btnNext.addActionListener(evt -> next());
         gridBagConstraints.gridx = 2;
         panButtons.add(btnNext, gridBagConstraints);
 
-        btnFinish = new JButton(resourceMap.getString("btnFinish.text"));
+        btnFinish = new JButton(MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "btnFinish.text"));
         btnFinish.setName("btnFinish");
         btnFinish.setMnemonic(KeyEvent.VK_F);
         btnFinish.addActionListener(evt -> {
@@ -402,16 +398,16 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = GridBagConstraints.CENTER;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        pnlUnitStatus.add(new JLabel(resourceMap.getString("totaled")), gridBagConstraints);
+        pnlUnitStatus.add(new JLabel(MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "totaled")), gridBagConstraints);
 
         gridBagConstraints.gridx = 2;
-        pnlUnitStatus.add(new JLabel("View Unit"), gridBagConstraints);
+        pnlUnitStatus.add(new JLabel(MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "viewUnit")), gridBagConstraints);
         
         gridBagConstraints.gridx = 3;
-        pnlUnitStatus.add(new JLabel("Edit Unit"), gridBagConstraints);
+        pnlUnitStatus.add(new JLabel(MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "editUnit")), gridBagConstraints);
         
         gridBagConstraints.gridx = 4;
-        pnlUnitStatus.add(new JLabel("Edit Ammo"), gridBagConstraints);
+        pnlUnitStatus.add(new JLabel(MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "editAmmo")), gridBagConstraints);
 
         boolean possibleReinforcement = (tracker.getScenario().getLinkedScenario() != 0);
         if (possibleReinforcement) {
@@ -452,25 +448,25 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
             chkTotaled = new JCheckBox("");
             chkTotaled.setName("chkTotaled");
-            chkTotaled.getAccessibleContext().setAccessibleName(resourceMap.getString("totaled"));
+            chkTotaled.getAccessibleContext().setAccessibleName(MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "totaled"));
             chkTotaled.setSelected(status.isTotalLoss());
             chkTotaled.setName(Integer.toString(unitIndex));
             chkTotaled.setActionCommand(unit.getId().toString());
             chkTotaled.addItemListener(new CheckTotalListener());
             checkboxesTotaled.add(chkTotaled);
 
-            btnViewUnit = new JButton("View Unit");
+            btnViewUnit = new JButton(MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "viewUnit"));
             btnViewUnit.setActionCommand(unit.getId().toString());
             btnViewUnit.addActionListener(new ViewUnitListener(false));
 
-            btnEditUnit = new JButton("Edit Unit");
+            btnEditUnit = new JButton(MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "editUnit"));
             btnEditUnit.setEnabled(!status.isTotalLoss());
             btnEditUnit.setActionCommand(unit.getId().toString());
             btnEditUnit.setName(Integer.toString(unitIndex));
             btnEditUnit.addActionListener(new EditUnitListener());
             buttonsEditUnit.add(btnEditUnit);
 
-            btnEditAmmo = new JButton("Edit Ammo");
+            btnEditAmmo = new JButton(MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "editAmmo"));
             btnEditAmmo.setEnabled(!status.isTotalLoss() && !status.getEntity().getAmmo().isEmpty());
             btnEditAmmo.setActionCommand(unit.getId().toString());
             btnEditAmmo.setName(Integer.toString(unitIndex));
@@ -530,14 +526,14 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = GridBagConstraints.CENTER;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        pnlPilotStatus.add(new JLabel(resourceMap.getString("hits")), gridBagConstraints);
+        pnlPilotStatus.add(new JLabel(MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "hits")), gridBagConstraints);
 
         gridBagConstraints.gridx = 2;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
-        pnlPilotStatus.add(new JLabel(resourceMap.getString("mia")), gridBagConstraints);
+        pnlPilotStatus.add(new JLabel(MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "mia")), gridBagConstraints);
 
         gridBagConstraints.gridx = 3;
-        pnlPilotStatus.add(new JLabel(resourceMap.getString("kia")), gridBagConstraints);
+        pnlPilotStatus.add(new JLabel(MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "kia")), gridBagConstraints);
 
         Hashtable<Integer, JLabel> labelTable = new Hashtable<>();
         labelTable.put(0, new JLabel("0"));
@@ -586,7 +582,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
             JCheckBox miaCheck = new JCheckBox("");
             miaCheck.setName("miaCheck");
-            miaCheck.getAccessibleContext().setAccessibleName(resourceMap.getString("mia"));
+            miaCheck.getAccessibleContext().setAccessibleName(MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "mia"));
             miaCheck.setSelected(status.isMissing());
             miaButtons.add(miaCheck);
             gridBagConstraints.gridx = gridx++;
@@ -594,7 +590,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
             JCheckBox kiaCheck = new JCheckBox("");
             kiaCheck.setName("kiaCheck");
-            kiaCheck.getAccessibleContext().setAccessibleName(resourceMap.getString("kia"));
+            kiaCheck.getAccessibleContext().setAccessibleName(MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "kia"));
             kiaCheck.addItemListener(new CheckBoxKIAListener(hitSlider, miaCheck));
             kiaCheck.setSelected(status.isDead());
             kiaButtons.add(kiaCheck);
@@ -633,7 +629,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.insets = new Insets(5, 5, 0, 0);
 
-            JLabel lblSalvageValueUnit1 = new JLabel(resourceMap.getString("lblSalvageValueUnit1.text"));
+            JLabel lblSalvageValueUnit1 = new JLabel(MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "lblSalvageValueUnit1.text"));
             lblSalvageValueUnit1.setVisible(!isUseCamOpsSalvage); // We're using setVisible to avoid null objects
             gridBagConstraints.gridx = gridx++;
             gridBagConstraints.gridy = gridY++;
@@ -644,7 +640,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints.gridx = gridx--;
             pnlSalvageValue.add(lblSalvageValueUnit2, gridBagConstraints);
 
-            JLabel lblSalvageValueEmployer1 = new JLabel(resourceMap.getString("lblSalvageValueEmployer1.text"));
+            JLabel lblSalvageValueEmployer1 = new JLabel(MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "lblSalvageValueEmployer1.text"));
             lblSalvageValueEmployer1.setVisible(!isUseCamOpsSalvage);
             gridBagConstraints.gridx = gridx++;
             gridBagConstraints.gridy = gridY++;
@@ -655,7 +651,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints.gridx = gridx--;
             pnlSalvageValue.add(lblSalvageValueEmployer2, gridBagConstraints);
 
-            JLabel lblSalvagePct1 = new JLabel(resourceMap.getString("lblSalvagePct1.text"));
+            JLabel lblSalvagePct1 = new JLabel(MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "lblSalvagePct1.text"));
             lblSalvagePct1.setVisible(!isUseCamOpsSalvage);
             gridBagConstraints.gridx = gridx++;
             gridBagConstraints.gridy = gridY++;
@@ -702,14 +698,14 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
         gridBagConstraints.gridx = gridx++;
 
-        pnlSalvage.add(new JLabel(resourceMap.getString(isUseCamOpsSalvage ? "lblWreck.text" : "lblSalvage.text")),
+        pnlSalvage.add(new JLabel(MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", isUseCamOpsSalvage ? "lblWreck.text" : "lblSalvage.text")),
               gridBagConstraints);
 
         gridBagConstraints.gridx = gridx++;
-        pnlSalvage.add(new JLabel(isUseCamOpsSalvage ? "" : resourceMap.getString("lblSell.text")), gridBagConstraints);
+        pnlSalvage.add(new JLabel(isUseCamOpsSalvage ? "" : MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "lblSell.text")), gridBagConstraints);
 
         gridBagConstraints.gridx = gridx;
-        pnlSalvage.add(new JLabel(resourceMap.getString("lblEscaped.text")), gridBagConstraints);
+        pnlSalvage.add(new JLabel(MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "lblEscaped.text")), gridBagConstraints);
 
         // Initialize the tracking ArrayLists
         salvageUnitLabel = new ArrayList<>();
@@ -746,7 +742,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
             JCheckBox salvaged = new JCheckBox("");
             salvaged.setName("salvaged");
-            salvaged.getAccessibleContext().setAccessibleName(resourceMap.getString("lblSalvage.text"));
+            salvaged.getAccessibleContext().setAccessibleName(MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "lblSalvage.text"));
             salvaged.setEnabled(!tracker.usesSalvageExchange() || isUseCamOpsSalvage);
             salvaged.setSelected(automaticallySelectSalvage);
             salvaged.addItemListener(evt -> checkSalvageRights());
@@ -757,7 +753,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
             JCheckBox sold = new JCheckBox("");
             sold.setName("sold");
-            sold.getAccessibleContext().setAccessibleName(resourceMap.getString("lblSell.text"));
+            sold.getAccessibleContext().setAccessibleName(MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "lblSell.text"));
             sold.setEnabled(!tracker.usesSalvageExchange() && tracker.getCampaign().getCampaignOptions().isSellUnits());
             sold.addItemListener(evt -> checkSalvageRights());
             sold.setVisible(!isUseCamOpsSalvage);
@@ -767,7 +763,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
             JCheckBox escaped = new JCheckBox("");
             escaped.setName("escaped");
-            escaped.getAccessibleContext().setAccessibleName(resourceMap.getString("lblEscaped.text"));
+            escaped.getAccessibleContext().setAccessibleName(MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "lblEscaped.text"));
             escaped.setEnabled(!(unit.getEntity().isDestroyed() || unit.getEntity().isDoomed()));
             escaped.setSelected(!status.isLikelyCaptured());
             escaped.addItemListener(evt -> checkSalvageRights());
@@ -814,13 +810,13 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = GridBagConstraints.CENTER;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        pnlPrisonerStatus.add(new JLabel(resourceMap.getString("hits")), gridBagConstraints);
+        pnlPrisonerStatus.add(new JLabel(MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "hits")), gridBagConstraints);
 
         gridBagConstraints.gridx = gridx++;
-        pnlPrisonerStatus.add(new JLabel(resourceMap.getString("prisoner")), gridBagConstraints);
+        pnlPrisonerStatus.add(new JLabel(MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "prisoner")), gridBagConstraints);
 
         gridBagConstraints.gridx = gridx;
-        pnlPrisonerStatus.add(new JLabel(resourceMap.getString("kia")), gridBagConstraints);
+        pnlPrisonerStatus.add(new JLabel(MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "kia")), gridBagConstraints);
 
         int prisonerIndex = 0;
         int gridY = 2;
@@ -870,7 +866,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
             JCheckBox prisonerCapturedCheck = new JCheckBox("");
             prisonerCapturedCheck.setName("prisonerCapturedCheck");
-            prisonerCapturedCheck.getAccessibleContext().setAccessibleName(resourceMap.getString("prisoner"));
+            prisonerCapturedCheck.getAccessibleContext().setAccessibleName(MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "prisoner"));
             prisonerCapturedCheck.setSelected(status.isCaptured());
             prisonerCapturedCheck.addItemListener(evt -> checkPrisonerStatus());
             prisonerCapturedCheckboxes.add(prisonerCapturedCheck);
@@ -879,7 +875,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
             JCheckBox kiaCheck = new JCheckBox("");
             kiaCheck.setName("kiaCheck");
-            kiaCheck.getAccessibleContext().setAccessibleName(resourceMap.getString("kia"));
+            kiaCheck.getAccessibleContext().setAccessibleName(MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "kia"));
             kiaCheck.addItemListener(evt -> checkPrisonerStatus());
             prisonerKiaCheckboxes.add(kiaCheck);
             gridBagConstraints.gridx = gridx++;
@@ -937,7 +933,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        pnlKills.add(new JLabel(resourceMap.getString("kill")), gridBagConstraints);
+        pnlKills.add(new JLabel(MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "kill")), gridBagConstraints);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -945,7 +941,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         gridBagConstraints.weightx = 1.0;
-        pnlKills.add(new JLabel(resourceMap.getString("claim")), gridBagConstraints);
+        pnlKills.add(new JLabel(MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "claim")), gridBagConstraints);
 
         JComboBox<String> comboAssign;
         DefaultComboBoxModel<String> assignModel;
@@ -954,7 +950,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         for (String killName : tracker.getKillCredits().keySet()) {
             JLabel nameLbl = new JLabel(killName);
             assignModel = new DefaultComboBoxModel<>();
-            assignModel.addElement(resourceMap.getString("none"));
+            assignModel.addElement(MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "none"));
             int index = 0;
             int selected = 0;
             if (null == tracker.getKillCredits().get(killName)) {
@@ -1143,7 +1139,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
         JPanel pnlStatus = new JPanel();
 
-        lblStatus.setText(resourceMap.getString("lblStatus.text"));
+        lblStatus.setText(MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "lblStatus.text"));
         DefaultComboBoxModel<ScenarioStatus> scenarioStatusModel = new DefaultComboBoxModel<>(ScenarioStatus.values());
         scenarioStatusModel.removeElement(ScenarioStatus.CURRENT);
         choiceStatus.setModel(scenarioStatusModel);
@@ -1169,11 +1165,11 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         pnlPreview.add(pnlStatus, gridBagConstraints);
 
-        txtRewards.setText(resourceMap.getString("none"));
+        txtRewards.setText(MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "none"));
         txtRewards.setContentType("text/html");
         txtRewards.setEditable(false);
-        txtRewards.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(resourceMap.getString(
-              "txtRewards.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+        txtRewards.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(MHQInternationalization.getTextAt(
+              "mekhq.resources.ResolveScenarioWizardDialog", "txtRewards.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -1200,12 +1196,12 @@ public class ResolveScenarioWizardDialog extends JDialog {
         pnlPreview.add(txtReport, gridBagConstraints);
 
         txtRecoveredUnits.setName("txtRecoveredUnits");
-        txtRecoveredUnits.setText(resourceMap.getString("none"));
+        txtRecoveredUnits.setText(MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "none"));
         txtRecoveredUnits.setEditable(false);
         txtRecoveredUnits.setLineWrap(true);
         txtRecoveredUnits.setWrapStyleWord(true);
-        txtRecoveredUnits.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(resourceMap.getString(
-              "txtRecoveredUnits.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+        txtRecoveredUnits.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(MHQInternationalization.getTextAt(
+              "mekhq.resources.ResolveScenarioWizardDialog", "txtRecoveredUnits.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
@@ -1218,12 +1214,12 @@ public class ResolveScenarioWizardDialog extends JDialog {
         pnlPreview.add(txtRecoveredUnits, gridBagConstraints);
 
         txtRecoveredPilots.setName("txtRecoveredPilots");
-        txtRecoveredPilots.setText(resourceMap.getString("none"));
+        txtRecoveredPilots.setText(MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "none"));
         txtRecoveredPilots.setEditable(false);
         txtRecoveredPilots.setLineWrap(true);
         txtRecoveredPilots.setWrapStyleWord(true);
-        txtRecoveredPilots.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(resourceMap.getString(
-              "txtRecoveredPilots.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+        txtRecoveredPilots.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(MHQInternationalization.getTextAt(
+              "mekhq.resources.ResolveScenarioWizardDialog", "txtRecoveredPilots.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
@@ -1236,12 +1232,12 @@ public class ResolveScenarioWizardDialog extends JDialog {
         pnlPreview.add(txtRecoveredPilots, gridBagConstraints);
 
         txtMissingUnits.setName("txtMissingUnits");
-        txtMissingUnits.setText(resourceMap.getString("none"));
+        txtMissingUnits.setText(MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "none"));
         txtMissingUnits.setEditable(false);
         txtMissingUnits.setLineWrap(true);
         txtMissingUnits.setWrapStyleWord(true);
-        txtMissingUnits.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(resourceMap.getString(
-              "txtMissingUnits.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+        txtMissingUnits.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(MHQInternationalization.getTextAt(
+              "mekhq.resources.ResolveScenarioWizardDialog", "txtMissingUnits.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
@@ -1254,12 +1250,12 @@ public class ResolveScenarioWizardDialog extends JDialog {
         pnlPreview.add(txtMissingUnits, gridBagConstraints);
 
         txtMissingPilots.setName("txtMissingPilots");
-        txtMissingPilots.setText(resourceMap.getString("none"));
+        txtMissingPilots.setText(MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "none"));
         txtMissingPilots.setEditable(false);
         txtMissingPilots.setLineWrap(true);
         txtMissingPilots.setWrapStyleWord(true);
-        txtMissingPilots.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(resourceMap.getString(
-              "txtMissingPilots.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+        txtMissingPilots.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(MHQInternationalization.getTextAt(
+              "mekhq.resources.ResolveScenarioWizardDialog", "txtMissingPilots.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
@@ -1276,8 +1272,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
         txtSalvage.setEditable(false);
         txtSalvage.setLineWrap(true);
         txtSalvage.setWrapStyleWord(true);
-        txtSalvage.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(resourceMap.getString(
-              "txtSalvagedUnits.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+        txtSalvage.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(MHQInternationalization.getTextAt(
+              "mekhq.resources.ResolveScenarioWizardDialog", "txtSalvagedUnits.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 3;
@@ -1290,12 +1286,12 @@ public class ResolveScenarioWizardDialog extends JDialog {
         pnlPreview.add(txtSalvage, gridBagConstraints);
 
         txtDeadPilots.setName("txtDeadPilots");
-        txtDeadPilots.setText(resourceMap.getString("none"));
+        txtDeadPilots.setText(MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "none"));
         txtDeadPilots.setEditable(false);
         txtDeadPilots.setLineWrap(true);
         txtDeadPilots.setWrapStyleWord(true);
-        txtDeadPilots.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(resourceMap.getString(
-              "txtDeadPilots.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+        txtDeadPilots.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(MHQInternationalization.getTextAt(
+              "mekhq.resources.ResolveScenarioWizardDialog", "txtDeadPilots.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 4;
@@ -1338,8 +1334,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
         instructions.setEditable(false);
         instructions.setLineWrap(true);
         instructions.setWrapStyleWord(true);
-        instructions.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(resourceMap.getString(
-              "txtInstructions.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+        instructions.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(MHQInternationalization.getTextAt(
+              "mekhq.resources.ResolveScenarioWizardDialog", "txtInstructions.title")), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
         JPanel container = new JPanel(new GridBagLayout());
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -1635,9 +1631,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
                   .credit(TransactionType.MISCELLANEOUS,
                         tracker.getCampaign().getLocalDate(),
                         tracker.getDropShipBonus(),
-                        resourceMap.getString("dropShipBonus.text"));
+                        MHQInternationalization.getTextAt("mekhq.resources.ResolveScenarioWizardDialog", "dropShipBonus.text"));
 
-            campaign.addReport(FINANCES, String.format(resourceMap.getString("dropShipBonus.report"),
+            campaign.addReport(FINANCES, MHQInternationalization.getFormattedTextAt("mekhq.resources.ResolveScenarioWizardDialog", "dropShipBonus.report",
                   tracker.getDropShipBonus().toAmountString()));
         }
 
