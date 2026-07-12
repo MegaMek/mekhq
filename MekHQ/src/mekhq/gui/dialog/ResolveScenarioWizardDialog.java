@@ -65,6 +65,7 @@ import java.util.UUID;
 import javax.swing.*;
 
 import megamek.client.ui.Messages;
+import megamek.client.ui.dialogs.EditAmmoDialog;
 import megamek.client.ui.dialogs.UnitEditorDialog;
 import megamek.client.ui.dialogs.unitSelectorDialogs.EntityReadoutDialog;
 import megamek.client.ui.preferences.JWindowPreference;
