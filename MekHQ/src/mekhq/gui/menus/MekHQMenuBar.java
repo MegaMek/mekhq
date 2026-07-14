@@ -34,6 +34,7 @@
 
 package mekhq.gui.menus;
 
+import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -49,12 +50,16 @@ import java.util.Optional;
 import java.util.UUID;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.UIManager;
 import javax.xml.parsers.DocumentBuilder;
 
@@ -111,6 +116,10 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Systems;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.FileDialogs;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.ButtonLabelTooltipPair;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
+import mekhq.gui.baseComponents.immersiveDialogs.TransmissionSignalQuality;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog;
 import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.reportDialogs.CargoReportDialog;
@@ -579,8 +588,209 @@ public class MekHQMenuBar extends JMenuBar {
 
         menuManage.add(miAutoResolveBehaviorEditor);
 
+        menuManage.addSeparator();
+        JMenu immersiveDialogPreview = new JMenu(getTextAt("miImmersiveDialogPreview.text"));
+        immersiveDialogPreview.setMnemonic(KeyEvent.VK_I);
+
+        JMenu contractPreview = new JMenu(getTextAt("miImmersiveDialogPreview.contract.text"));
+        contractPreview.setMnemonic(KeyEvent.VK_C);
+        contractPreview.add(createMenuItem("miImmersiveDialogPreview.clear.text", KeyEvent.VK_C,
+              evt -> showImmersiveDialogPreview(ImmersiveDialogPreviewType.CONTRACT,
+                    TransmissionSignalQuality.CLEAR)));
+        contractPreview.add(createMenuItem("miImmersiveDialogPreview.remote.text", KeyEvent.VK_R,
+              evt -> showImmersiveDialogPreview(ImmersiveDialogPreviewType.CONTRACT,
+                    TransmissionSignalQuality.REMOTE)));
+        contractPreview.add(createMenuItem("miImmersiveDialogPreview.degraded.text", KeyEvent.VK_D,
+              evt -> showImmersiveDialogPreview(ImmersiveDialogPreviewType.CONTRACT,
+                    TransmissionSignalQuality.DEGRADED)));
+        immersiveDialogPreview.add(contractPreview);
+
+        immersiveDialogPreview.addSeparator();
+        immersiveDialogPreview.add(createMenuItem("miImmersiveDialogPreview.longBriefing.text", KeyEvent.VK_L,
+              evt -> showImmersiveDialogPreview(ImmersiveDialogPreviewType.LONG_BRIEFING,
+                    TransmissionSignalQuality.REMOTE)));
+        immersiveDialogPreview.add(createMenuItem("miImmersiveDialogPreview.compactNotification.text",
+              KeyEvent.VK_N,
+              evt -> showImmersiveDialogPreview(ImmersiveDialogPreviewType.COMPACT_NOTIFICATION,
+                    TransmissionSignalQuality.CLEAR)));
+        immersiveDialogPreview.add(createMenuItem("miImmersiveDialogPreview.horizontalResponses.text",
+              KeyEvent.VK_H,
+              evt -> showImmersiveDialogPreview(ImmersiveDialogPreviewType.HORIZONTAL_RESPONSES,
+                    TransmissionSignalQuality.REMOTE)));
+        immersiveDialogPreview.add(createMenuItem("miImmersiveDialogPreview.supplementalControls.text",
+              KeyEvent.VK_U,
+              evt -> showImmersiveDialogPreview(ImmersiveDialogPreviewType.SUPPLEMENTAL_CONTROLS,
+                    TransmissionSignalQuality.CLEAR)));
+        immersiveDialogPreview.add(createMenuItem("miImmersiveDialogPreview.systemAlert.text", KeyEvent.VK_S,
+              evt -> showImmersiveDialogPreview(ImmersiveDialogPreviewType.SYSTEM_ALERT,
+                    TransmissionSignalQuality.DEGRADED)));
+        menuManage.add(immersiveDialogPreview);
+
         return menuManage;
     }
+
+    private void showImmersiveDialogPreview(ImmersiveDialogPreviewType previewType,
+          TransmissionSignalQuality signalQuality) {
+        Campaign campaign = getCampaign();
+        var humanResources = campaign.getPlayerForce().getHumanResources();
+        Person commander = humanResources.getCommander(campaign.getCampaignOptions(),
+              campaign.isClanCampaign(),
+              campaign.getLocalDate());
+        Person contact = humanResources.getSeniorAdminPerson(Campaign.AdministratorSpecialization.LOGISTICS,
+              campaign.getCampaignOptions(),
+              campaign.isClanCampaign(),
+              campaign.getLocalDate());
+
+        if (contact == null) {
+            contact = humanResources.getPersonnel().stream()
+                            .filter(person -> !person.equals(commander))
+                            .findFirst()
+                            .orElse(commander);
+        }
+
+        Person localSpeaker = (commander == null || commander.equals(contact)) ? null : commander;
+
+        switch (previewType) {
+            case CONTRACT -> showContractPreview(campaign, contact, localSpeaker, signalQuality);
+            case LONG_BRIEFING -> showLongBriefingPreview(campaign, contact, signalQuality);
+            case COMPACT_NOTIFICATION -> showCompactNotificationPreview(campaign, signalQuality);
+            case HORIZONTAL_RESPONSES -> showHorizontalResponsesPreview(campaign,
+                  contact,
+                  localSpeaker,
+                  signalQuality);
+            case SUPPLEMENTAL_CONTROLS -> showSupplementalControlsPreview(campaign, contact, signalQuality);
+            case SYSTEM_ALERT -> showSystemAlertPreview(campaign, signalQuality);
+        }
+    }
+
+    private void showContractPreview(Campaign campaign, Person contact, Person localSpeaker,
+          TransmissionSignalQuality signalQuality) {
+        List<ButtonLabelTooltipPair> buttons = List.of(
+              new ButtonLabelTooltipPair(getTextAt("immersiveDialogPreview.accept.text"),
+                    getTextAt("immersiveDialogPreview.accept.toolTipText")),
+              new ButtonLabelTooltipPair(getTextAt("immersiveDialogPreview.details.text"),
+                    getTextAt("immersiveDialogPreview.details.toolTipText")),
+              new ButtonLabelTooltipPair(getTextAt("immersiveDialogPreview.decline.text"),
+                    getTextAt("immersiveDialogPreview.decline.toolTipText")));
+
+        new ImmersiveDialogCore(campaign,
+              contact,
+              localSpeaker,
+              getTextAt("immersiveDialogPreview.message"),
+              buttons,
+              getTextAt("immersiveDialogPreview.information"),
+              ImmersiveDialogWidth.MEDIUM.getWidth(),
+              true,
+              null,
+              null,
+              signalQuality,
+              true);
+    }
+
+    private void showLongBriefingPreview(Campaign campaign, Person contact,
+          TransmissionSignalQuality signalQuality) {
+        new ImmersiveDialogCore(campaign,
+              contact,
+              null,
+              getTextAt("immersiveDialogPreview.longBriefing.message"),
+              List.of(new ButtonLabelTooltipPair(
+                    getTextAt("immersiveDialogPreview.acknowledge.text"), null)),
+              getTextAt("immersiveDialogPreview.longBriefing.information"),
+              ImmersiveDialogWidth.LARGE.getWidth(),
+              false,
+              null,
+              null,
+              signalQuality,
+              true);
+    }
+
+    private void showCompactNotificationPreview(Campaign campaign, TransmissionSignalQuality signalQuality) {
+        new ImmersiveDialogCore(campaign,
+              null,
+              null,
+              getTextAt("immersiveDialogPreview.compactNotification.message"),
+              List.of(new ButtonLabelTooltipPair(
+                    getTextAt("immersiveDialogPreview.dismiss.text"), null)),
+              null,
+              ImmersiveDialogWidth.SMALL.getWidth(),
+              false,
+              null,
+              null,
+              signalQuality,
+              true);
+    }
+
+    private void showHorizontalResponsesPreview(Campaign campaign, Person contact, Person localSpeaker,
+          TransmissionSignalQuality signalQuality) {
+        List<ButtonLabelTooltipPair> buttons = List.of(
+              new ButtonLabelTooltipPair(getTextAt("immersiveDialogPreview.horizontal.advance.text"), null),
+              new ButtonLabelTooltipPair(getTextAt("immersiveDialogPreview.horizontal.hold.text"), null),
+              new ButtonLabelTooltipPair(getTextAt("immersiveDialogPreview.horizontal.withdraw.text"), null),
+              new ButtonLabelTooltipPair(getTextAt("immersiveDialogPreview.horizontal.support.text"), null),
+              new ButtonLabelTooltipPair(getTextAt("immersiveDialogPreview.horizontal.abort.text"), null));
+
+        new ImmersiveDialogCore(campaign,
+              contact,
+              localSpeaker,
+              getTextAt("immersiveDialogPreview.horizontal.message"),
+              buttons,
+              null,
+              ImmersiveDialogWidth.MEDIUM.getWidth(),
+              false,
+              null,
+              null,
+              signalQuality,
+              true);
+    }
+
+    private void showSupplementalControlsPreview(Campaign campaign, Person contact,
+          TransmissionSignalQuality signalQuality) {
+        JPanel supplementalPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        supplementalPanel.add(new JLabel(getTextAt("immersiveDialogPreview.supplemental.label")));
+        supplementalPanel.add(new JSpinner(new SpinnerNumberModel(2, 1, 12, 1)));
+
+        List<ButtonLabelTooltipPair> buttons = List.of(
+              new ButtonLabelTooltipPair(getTextAt("immersiveDialogPreview.supplemental.confirm.text"), null),
+              new ButtonLabelTooltipPair(getTextAt("immersiveDialogPreview.supplemental.cancel.text"), null));
+
+        new ImmersiveDialogCore(campaign,
+              contact,
+              null,
+              getTextAt("immersiveDialogPreview.supplemental.message"),
+              buttons,
+              getTextAt("immersiveDialogPreview.supplemental.information"),
+              ImmersiveDialogWidth.SMALL.getWidth(),
+              false,
+              supplementalPanel,
+              null,
+              signalQuality,
+              true);
+    }
+
+    private void showSystemAlertPreview(Campaign campaign, TransmissionSignalQuality signalQuality) {
+        new ImmersiveDialogCore(campaign,
+              null,
+              null,
+              getTextAt("immersiveDialogPreview.systemAlert.message"),
+              List.of(new ButtonLabelTooltipPair(
+                    getTextAt("immersiveDialogPreview.systemAlert.button.text"), null)),
+              getTextAt("immersiveDialogPreview.systemAlert.information"),
+              ImmersiveDialogWidth.SMALL.getWidth(),
+              false,
+              null,
+              campaign.getCampaignFactionIcon(),
+              signalQuality,
+              true);
+        }
+
+        private enum ImmersiveDialogPreviewType {
+                CONTRACT,
+                LONG_BRIEFING,
+                COMPACT_NOTIFICATION,
+                HORIZONTAL_RESPONSES,
+                SUPPLEMENTAL_CONTROLS,
+                SYSTEM_ALERT
+        }
 
     /**
      * The Help menu uses the following Mnemonic keys as of 19-March-2020:
