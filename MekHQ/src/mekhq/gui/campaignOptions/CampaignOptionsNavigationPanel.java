@@ -80,6 +80,7 @@ class CampaignOptionsNavigationPanel extends JPanel {
 
     private final List<CampaignOptionsRoute> routes;
     private final Consumer<CampaignOptionsRoute> routeSelectionListener;
+    private final Consumer<String> searchTermUpdateListener;
     private final JTextField filterField;
     private final JLabel filterStatusLabel;
     private final JTree navigationTree;
@@ -88,10 +89,12 @@ class CampaignOptionsNavigationPanel extends JPanel {
     private @Nullable Runnable searchIndexInitializer;
 
     CampaignOptionsNavigationPanel(@Nonnull List<CampaignOptionsRoute> routes,
-          @Nonnull Consumer<CampaignOptionsRoute> routeSelectionListener) {
+          @Nonnull Consumer<CampaignOptionsRoute> routeSelectionListener,
+          Consumer<String> searchTermUpdateListener) {
         super(new BorderLayout(0, CONTROL_GAP));
         this.routes = routes;
         this.routeSelectionListener = routeSelectionListener;
+        this.searchTermUpdateListener = searchTermUpdateListener;
 
         setName("campaignOptionsNavigationPanel");
         // Match the content panel's scroll-pane border instead of a TitledBorder. A TitledBorder reserves vertical
@@ -314,6 +317,7 @@ class CampaignOptionsNavigationPanel extends JPanel {
         if (currentRoute != null && findNavigationNode(root, currentRoute) == null) {
             navigationTree.clearSelection();
         }
+        searchTermUpdateListener.accept(normalizedFilter);
     }
 
     private List<CampaignOptionsRoute> getMatchingRoutes(String normalizedFilter) {

@@ -50,12 +50,7 @@ class CampaignOptionsRoute {
     private final List<String> path;
     private final List<String> titleResourceNames;
     private final boolean showHelpPanel;
-    private final String searchableText;
     private String sectionSearchText = "";
-
-    CampaignOptionsRoute(@Nonnull String id, @Nonnull List<String> path, @Nonnull List<String> titleResourceNames) {
-        this(id, path, titleResourceNames, true);
-    }
 
     CampaignOptionsRoute(@Nonnull String id, @Nonnull List<String> path, @Nonnull List<String> titleResourceNames,
           boolean showHelpPanel) {
@@ -63,8 +58,6 @@ class CampaignOptionsRoute {
         this.path = List.copyOf(path);
         this.titleResourceNames = List.copyOf(titleResourceNames);
         this.showHelpPanel = showHelpPanel;
-        this.searchableText = normalizeSearchText(String.join(" ", path) + " " + id + " "
-                                                         + String.join(" ", titleResourceNames));
     }
 
     @Nonnull String getId() {
@@ -107,7 +100,7 @@ class CampaignOptionsRoute {
         }
 
         for (String token : normalizedFilter.split("\\s+")) {
-            if (!token.isBlank() && !searchableText.contains(token) && !sectionSearchText.contains(token)) {
+            if (!token.isBlank() && !sectionSearchText.contains(token)) {
                 return false;
             }
         }
