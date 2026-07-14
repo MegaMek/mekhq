@@ -50,6 +50,7 @@ import javax.swing.ImageIcon;
 import megamek.client.ratgenerator.FactionRecord;
 import megamek.client.ratgenerator.RATGenerator;
 import megamek.common.annotations.Nullable;
+import megamek.common.universe.Faction2;
 import megamek.common.universe.Factions2;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -61,6 +62,9 @@ public class Factions {
     private static Factions instance;
 
     private final Map<String, Faction> factions = new HashMap<>();
+
+    /** Maps a retired/aliased faction code to the surviving canonical faction key. See {@link Faction2#getAliases()}. */
+    private final Map<String, String> aliasToCanonical = new HashMap<>();
 
     private RATGenerator ratGenerator;
     // endregion Variable Declarations
@@ -149,8 +153,14 @@ public class Factions {
     }
 
     public Faction getFaction(String name) {
-        Faction defaultFaction = new Faction();
-        return factions.getOrDefault(name, defaultFaction);
+        Faction faction = factions.get(name);
+        if (faction == null) {
+            String canonicalKey = aliasToCanonical.get(name);
+            if (canonicalKey != null) {
+                faction = factions.get(canonicalKey);
+            }
+        }
+        return (faction != null) ? faction : new Faction();
     }
 
     public @Nullable Faction getFactionFromFullNameAndYear(final String factionName, final int year) {
@@ -211,10 +221,41 @@ public class Factions {
     public static Factions load(boolean isForTesting) {
         // Factions are populated from the new unified factions list instead of loading them directly
         Factions factionsObject = new Factions();
-        Factions2.getInstance(isForTesting).getFactions().stream()
+        Collection<Faction2> yamlFactions = Factions2.getInstance(isForTesting).getFactions();
+        yamlFactions.stream()
               .map(Faction::new)
               .forEach(f -> factionsObject.factions.put(f.getShortName(), f));
+        factionsObject.registerAliases(yamlFactions);
         return factionsObject;
+    }
+
+    /**
+     * Registers each faction's historical code aliases (see {@link Faction2#getAliases()}) so that a lookup by a
+     * retired faction code resolves to the surviving faction - keeping old campaign saves, planetary ownership and
+     * contracts that still reference the old code working after a faction consolidation. Runs after all real factions
+     * are indexed, so a real faction always wins over an alias claiming the same code.
+     *
+     * @param yamlFactions the source {@link Faction2} definitions the alias data is read from
+     */
+    private void registerAliases(Collection<Faction2> yamlFactions) {
+        for (Faction2 faction2 : yamlFactions) {
+            for (String aliasCode : faction2.getAliases().values()) {
+                if (factions.containsKey(aliasCode)) {
+                    if (!faction2.getKey().equals(factions.get(aliasCode).getShortName())) {
+                        LOGGER.warn("[FactionAlias] Alias {} for faction {} collides with an existing faction; " +
+                                    "keeping the existing faction.", aliasCode, faction2.getKey());
+                    }
+                    continue;
+                }
+                String previousKey = aliasToCanonical.putIfAbsent(aliasCode, faction2.getKey());
+                if (previousKey != null && !previousKey.equals(faction2.getKey())) {
+                    LOGGER.warn("[FactionAlias] Alias {} is claimed by both {} and {}; keeping {}.",
+                          aliasCode, previousKey, faction2.getKey(), previousKey);
+                } else if (previousKey == null) {
+                    LOGGER.debug("[FactionAlias] Registered alias {} -> {}", aliasCode, faction2.getKey());
+                }
+            }
+        }
     }
 
     /**
@@ -319,7 +360,15 @@ public class Factions {
                     yield "logo_clan_ghost_bear";
                 }
             }
-            case "CGS", "SE" -> "logo_clan_goliath_scorpion";
+            case "CGS", "CEI", "SE" -> {
+                // The Clan Goliath Scorpion lineage is consolidated under the CGS key: it becomes the Escorpion
+                // Imperio in 3080 and the Scorpion Empire in 3141. CEI/SE are kept for old saves that still use them.
+                if (gameYear >= 3080) {
+                    yield "logo_escorpion_imperio";
+                } else {
+                    yield "logo_clan_goliath_scorpion";
+                }
+            }
             case "CHH" -> "logo_clan_hells_horses";
             case "CIH" -> "logo_clan_ice_hellion";
             case "CJF" -> "logo_clan_jade_falcon";
@@ -344,7 +393,6 @@ public class Factions {
             case "DC" -> "logo_draconis_combine";
             case "DA" -> "logo_duchy_of_andurien";
             case "DTA" -> "logo_duchy_of_tamarind_abbey";
-            case "CEI" -> "logo_escorpion_imperio";
             case "FC" -> "logo_federated_commonwealth";
             case "FS" -> "logo_federated_suns";
             case "FOR" -> "logo_fiefdom_of_randis";

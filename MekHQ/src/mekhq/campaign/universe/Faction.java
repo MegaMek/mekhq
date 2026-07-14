@@ -369,6 +369,75 @@ public class Faction {
         this.layeredFormationIconLogoFilename = layeredFormationIconLogoFilename;
     }
 
+    /**
+     * Returns the layered formation icon logo category (image subfolder) resolved for the given year, honoring any
+     * era-based {@link Faction2#getLogoChanges() logo changes}. Falls back to the base category when no era logo
+     * applies, or when this faction has no underlying {@link Faction2} (for example the default faction).
+     *
+     * @param year the game year to resolve the logo for
+     *
+     * @return the era-appropriate logo category
+     */
+    public String getLayeredFormationIconLogoCategory(int year) {
+        return pathParentOrDefault(eraLogo(year), layeredFormationIconLogoCategory);
+    }
+
+    /**
+     * Returns the layered formation icon logo filename resolved for the given year (see
+     * {@link #getLayeredFormationIconLogoCategory(int)}).
+     *
+     * @param year the game year to resolve the logo for
+     *
+     * @return the era-appropriate logo filename, or the base filename when no era logo applies
+     */
+    public @Nullable String getLayeredFormationIconLogoFilename(int year) {
+        return pathFileNameOrDefault(eraLogo(year), layeredFormationIconLogoFilename);
+    }
+
+    /**
+     * Returns the layered formation icon background category resolved for the given year, honoring any era-based
+     * {@link Faction2#getBackgroundChanges() background changes}.
+     *
+     * @param year the game year to resolve the background for
+     *
+     * @return the era-appropriate background category
+     */
+    public String getLayeredFormationIconBackgroundCategory(int year) {
+        return pathParentOrDefault(eraBackground(year), layeredFormationIconBackgroundCategory);
+    }
+
+    /**
+     * Returns the layered formation icon background filename resolved for the given year (see
+     * {@link #getLayeredFormationIconBackgroundCategory(int)}).
+     *
+     * @param year the game year to resolve the background for
+     *
+     * @return the era-appropriate background filename, or the base filename when no era background applies
+     */
+    public @Nullable String getLayeredFormationIconBackgroundFilename(int year) {
+        return pathFileNameOrDefault(eraBackground(year), layeredFormationIconBackgroundFilename);
+    }
+
+    private @Nullable String eraLogo(int year) {
+        return (faction2 != null) ? faction2.getLogo(year) : null;
+    }
+
+    private @Nullable String eraBackground(int year) {
+        return (faction2 != null) ? faction2.getBackground(year) : null;
+    }
+
+    private static String pathParentOrDefault(@Nullable String path, String defaultCategory) {
+        if (path == null) {
+            return defaultCategory;
+        }
+        Path parent = Path.of(path).getParent();
+        return (parent != null) ? parent.toString() : defaultCategory;
+    }
+
+    private static @Nullable String pathFileNameOrDefault(@Nullable String path, @Nullable String defaultFilename) {
+        return (path != null) ? Path.of(path).getFileName().toString() : defaultFilename;
+    }
+
     // region Checks
     public boolean isPlayable() {
         return is(FactionTag.PLAYABLE);

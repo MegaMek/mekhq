@@ -1198,10 +1198,12 @@ public abstract class AbstractCompanyGenerator {
         FormationPieceIcon background = null;
 
         if (getOptions().isGenerateFormationIcons()) {
-            if (formationIconFaction.getLayeredFormationIconBackgroundFilename() != null) {
+            // Resolve era-correct faction art for the campaign year (see Faction2#getLogo(int)).
+            final int formationIconYear = campaign.getGameYear();
+            if (formationIconFaction.getLayeredFormationIconBackgroundFilename(formationIconYear) != null) {
                 background = new FormationPieceIcon(LayeredFormationIconLayer.BACKGROUND,
-                      formationIconFaction.getLayeredFormationIconBackgroundCategory(),
-                      formationIconFaction.getLayeredFormationIconBackgroundFilename());
+                      formationIconFaction.getLayeredFormationIconBackgroundCategory(formationIconYear),
+                      formationIconFaction.getLayeredFormationIconBackgroundFilename(formationIconYear));
 
                 // If the faction doesn't have a proper setup, use the default background
                 // instead
@@ -1216,10 +1218,10 @@ public abstract class AbstractCompanyGenerator {
 
                 // Logo / Type
                 if (getOptions().isUseOriginNodeFormationIconLogo()
-                          && (formationIconFaction.getLayeredFormationIconLogoFilename() != null)) {
+                          && (formationIconFaction.getLayeredFormationIconLogoFilename(formationIconYear) != null)) {
                     final FormationPieceIcon logoIcon = new FormationPieceIcon(LayeredFormationIconLayer.LOGO,
-                          formationIconFaction.getLayeredFormationIconLogoCategory(),
-                          formationIconFaction.getLayeredFormationIconLogoFilename());
+                          formationIconFaction.getLayeredFormationIconLogoCategory(formationIconYear),
+                          formationIconFaction.getLayeredFormationIconLogoFilename(formationIconYear));
                     if (logoIcon.getBaseImage() != null) {
                         layeredFormationIcon.getPieces().putIfAbsent(LayeredFormationIconLayer.LOGO, new ArrayList<>());
                         layeredFormationIcon.getPieces().get(LayeredFormationIconLayer.LOGO).add(logoIcon);
