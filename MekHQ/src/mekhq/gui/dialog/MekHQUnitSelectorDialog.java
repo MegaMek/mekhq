@@ -304,14 +304,12 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
      * @param weightClassSelectorIndex The current weight class selection
      * @param tech                     The current tech selection
      * @param techLevelMatch           whether the current tech selection matches
-     * @param checkSupportVee          Whether the special 'Support Vehicle' unit type was selected
-     * @param unitTypeSelectorIndex    Which unit type is currently selected (Depends on the combo box order!)
+     * @param unitTypeSelectorIndex    the selected unit-type code
      *
      * @return true if the unit passes all filters and allowed, false otherwise
      */
     private boolean isAllowedUnit(MekSummary unitSummary, int weightClassSelectorIndex, ITechnology tech,
-          boolean techLevelMatch,
-          boolean checkSupportVee, int unitTypeSelectorIndex) {
+          boolean techLevelMatch, int unitTypeSelectorIndex) {
         if (enableYearLimits && (unitSummary.getYear() > allowedYear)) {
             return false;
         }
@@ -335,14 +333,8 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
             return false;
         }
 
-        // Filter by unit type and support vehicles (if applicable)
-        if (unitTypeSelectorIndex != -1) {
-            String unitTypeName = checkSupportVee ? "Support Vehicle" : UnitType.getTypeName(unitTypeSelectorIndex);
-            boolean isCorrectType = unitSummary.getUnitType().equals(unitTypeName);
-            boolean isSupport = unitSummary.isSupport();
-            if ((!checkSupportVee && !isCorrectType) || (checkSupportVee && !isSupport)) {
-                return false;
-            }
+        if (!matchesUnitTypeSelection(unitSummary, unitTypeSelectorIndex)) {
+            return false;
         }
 
         // if we have an advanced filter set, does it match that filter?
@@ -370,9 +362,9 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
         techLevels.toArray(nTypes);
 
         final int weightClassSelectorIndex = comboWeight.getSelectedIndex();
-        final int unitTypeSelectorIndex = comboUnitType.getSelectedIndex() - 1;
-        final boolean checkSupportVee = Messages.getString("MekSelectorDialog.SupportVee")
-                                              .equals(comboUnitType.getSelectedItem());
+        // Use the base class's gap-robust mapping (the shared combo omits AERO, so a positional
+        // selectedIndex - 1 would mismap types that follow it).
+        final int unitTypeSelectorIndex = unitTypeCodeForComboIndex(comboUnitType.getSelectedIndex());
         // If the current expression doesn't parse, don't update.
         try {
             unitTypeFilter = new RowFilter<>() {
@@ -393,7 +385,6 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
                           weightClassSelectorIndex,
                           tech,
                           techLevelMatch,
-                          checkSupportVee,
                           unitTypeSelectorIndex);
                 }
             };
