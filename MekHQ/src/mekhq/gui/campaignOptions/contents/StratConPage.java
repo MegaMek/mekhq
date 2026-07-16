@@ -169,6 +169,11 @@ class StratConPage {
     private JCheckBox chkNoSeedForces;
     private JCheckBox chkUseGenericBattleValue;
     private JCheckBox chkUseVerboseBidding;
+    private JCheckBox chkUseStratConAlternateSectorCount;
+    private JCheckBox chkUseStratConCondenseSectors;
+    private JCheckBox chkUseStratConAlternateSectorTerrain;
+    private JLabel lblStratConSectorSizeMultiplier;
+    private JSpinner spnStratConSectorSizeMultiplier;
     // end StratCon
 
     private boolean created;
@@ -294,6 +299,19 @@ class StratConPage {
         chkUseGenericBattleValue.addMouseListener(createTipPanelUpdater("UseGenericBattleValue"));
         chkUseVerboseBidding = new CampaignOptionsCheckBox("UseVerboseBidding");
         chkUseVerboseBidding.addMouseListener(createTipPanelUpdater("UseVerboseBidding"));
+        chkUseStratConAlternateSectorCount = new CampaignOptionsCheckBox("UseStratConAlternateSectorCount",
+              getMetadata(new Version(0, 51, 1)));
+        chkUseStratConAlternateSectorCount.addMouseListener(createTipPanelUpdater("UseStratConAlternateSectorCount"));
+        chkUseStratConCondenseSectors = new CampaignOptionsCheckBox("UseStratConCondenseSectors",
+              getMetadata(new Version(0, 51, 1)));
+        chkUseStratConCondenseSectors.addMouseListener(createTipPanelUpdater("UseStratConCondenseSectors"));
+        chkUseStratConAlternateSectorTerrain = new CampaignOptionsCheckBox("UseStratConAlternateSectorTerrain",
+              getMetadata(new Version(0, 51, 1)));
+        chkUseStratConAlternateSectorTerrain.addMouseListener(createTipPanelUpdater("UseStratConAlternateSectorTerrain"));
+        lblStratConSectorSizeMultiplier = new CampaignOptionsLabel("StratConSectorSizeMultiplier",
+              getMetadata(new Version(0, 51, 1)));
+        spnStratConSectorSizeMultiplier = new CampaignOptionsSpinner("StratConSectorSizeMultiplier", 1.0, 0.25, 2.0,
+              0.1);
 
         JPanel generalOptionsPanel = createStratConGeneralOptionsPanel();
         JPanel scenarioGenerationPanel = createStratConScenarioGenerationPanel();
@@ -471,7 +489,11 @@ class StratConPage {
               chkUseAdvancedScouting,
               chkNoSeedForces,
               chkUseGenericBattleValue,
-              chkUseVerboseBidding);
+              chkUseVerboseBidding,
+              chkUseStratConAlternateSectorCount,
+              chkUseStratConCondenseSectors,
+              chkUseStratConAlternateSectorTerrain);
+        panel.addRow(lblStratConSectorSizeMultiplier, spnStratConSectorSizeMultiplier);
 
         return panel;
     }
@@ -614,6 +636,10 @@ class StratConPage {
         chkNoSeedForces.setSelected(model.noSeedForces);
         chkUseGenericBattleValue.setSelected(model.useGenericBattleValue);
         chkUseVerboseBidding.setSelected(model.useVerboseBidding);
+        chkUseStratConAlternateSectorCount.setSelected(model.useStratConAlternateSectorCount);
+        chkUseStratConCondenseSectors.setSelected(model.useStratConCondenseSectors);
+        chkUseStratConAlternateSectorTerrain.setSelected(model.useStratConAlternateSectorTerrain);
+        spnStratConSectorSizeMultiplier.setValue(model.stratConSectorSizeMultiplier);
     }
 
     /**
@@ -668,5 +694,9 @@ class StratConPage {
         model.noSeedForces = chkNoSeedForces.isSelected();
         model.useGenericBattleValue = chkUseGenericBattleValue.isSelected();
         model.useVerboseBidding = chkUseVerboseBidding.isSelected();
+        model.useStratConAlternateSectorCount = chkUseStratConAlternateSectorCount.isSelected();
+        model.useStratConCondenseSectors = chkUseStratConCondenseSectors.isSelected();
+        model.useStratConAlternateSectorTerrain = chkUseStratConAlternateSectorTerrain.isSelected();
+        model.stratConSectorSizeMultiplier = (double) spnStratConSectorSizeMultiplier.getValue();
     }
 }

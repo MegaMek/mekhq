@@ -81,6 +81,10 @@ class RulesetsOptionsModel {
     boolean noSeedForces;
     boolean useGenericBattleValue;
     boolean useVerboseBidding;
+    boolean useStratConAlternateSectorCount;
+    boolean useStratConCondenseSectors;
+    boolean useStratConAlternateSectorTerrain;
+    double stratConSectorSizeMultiplier;
 
     RulesetsOptionsModel(@Nonnull CampaignOptions options) {
         skillLevel = options.getSkillLevel();
@@ -124,6 +128,11 @@ class RulesetsOptionsModel {
         noSeedForces = options.isNoSeedForces();
         useGenericBattleValue = options.isUseGenericBattleValue();
         useVerboseBidding = options.isUseVerboseBidding();
+        useStratConAlternateSectorCount = options.isUseStratConAlternateSectorCount();
+        useStratConCondenseSectors = options.isUseStratConAlternateSectorCount();
+        useStratConCondenseSectors = options.isUseStratConCondenseSectors();
+        useStratConAlternateSectorTerrain = options.isUseStratConAlternateSectorTerrain();
+        stratConSectorSizeMultiplier = options.getStratConSectorSizeMultiplier();
     }
 
     void applyTo(@Nonnull CampaignOptions options) {
@@ -168,5 +177,9 @@ class RulesetsOptionsModel {
         options.setNoSeedForces(noSeedForces);
         options.setUseGenericBattleValue(useGenericBattleValue);
         options.setUseVerboseBidding(useVerboseBidding);
+        options.setUseStratConAlternateSectorCount(useStratConAlternateSectorCount);
+        options.setUseStratConCondenseSectors(useStratConCondenseSectors);
+        options.setUseStratConAlternateSectorTerrain(useStratConAlternateSectorTerrain);
+        options.setStratConSectorSizeMultiplier(stratConSectorSizeMultiplier);
     }
 }

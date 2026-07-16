@@ -656,6 +656,10 @@ public class CampaignOptions {
     private boolean hadAtBEnabledMarker;
     private StratConPlayType stratConPlayType;
     private boolean useAdvancedScouting;
+    private boolean useStratConAlternateSectorCount;
+    private boolean useStratConCondenseSectors;
+    private boolean useStratConAlternateSectorTerrain;
+    private double stratConSectorSizeMultiplier;
     private boolean noSeedForces;
     private SkillLevel skillLevel;
     private BoardScalingType boardScalingType;
@@ -1341,6 +1345,10 @@ public class CampaignOptions {
         // region Against the Bot Tab
         stratConPlayType = StratConPlayType.DISABLED;
         useAdvancedScouting = false;
+        useStratConAlternateSectorCount = true;
+        useStratConCondenseSectors = true;
+        useStratConAlternateSectorTerrain = true;
+        stratConSectorSizeMultiplier = 1.0;
         noSeedForces = false;
         setSkillLevel(SkillLevel.REGULAR);
         boardScalingType = BoardScalingType.NORMAL;
@@ -5040,6 +5048,57 @@ public class CampaignOptions {
 
     public void setUseAdvancedScouting(final boolean useAdvancedScouting) {
         this.useAdvancedScouting = useAdvancedScouting;
+    }
+
+    /**
+     * @return {@code true} if StratCon uses the alternate sector-count rule (roughly one sector per nine combat teams),
+     *       rather than the legacy fixed three-lances-per-track count. Only meaningful when StratCon is enabled.
+     */
+    public boolean isUseStratConAlternateSectorCount() {
+        return useStratConAlternateSectorCount;
+    }
+
+    public void setUseStratConAlternateSectorCount(final boolean useStratConAlternateSectorCount) {
+        this.useStratConAlternateSectorCount = useStratConAlternateSectorCount;
+    }
+
+    /**
+     * @return {@code true} if StratCon condenses sector generation past a hard cap of ten sectors by enlarging existing
+     *       sectors instead of adding new ones, so a force that would generate more than ten sectors instead receives
+     *       ten proportionally larger ones. Only meaningful when StratCon is enabled.
+     */
+    public boolean isUseStratConCondenseSectors() {
+        return useStratConCondenseSectors;
+    }
+
+    public void setUseStratConCondenseSectors(final boolean useStratConCondenseSectors) {
+        this.useStratConCondenseSectors = useStratConCondenseSectors;
+    }
+
+    /**
+     * @return {@code true} if StratCon sectors use the alternate terrain-generation pipeline (latitude, hydrology,
+     *       mountains, weighted fill, cities, and roads), rather than the legacy stripe-based terrain placement. Only
+     *       meaningful when StratCon is enabled.
+     */
+    public boolean isUseStratConAlternateSectorTerrain() {
+        return useStratConAlternateSectorTerrain;
+    }
+
+    public void setUseStratConAlternateSectorTerrain(final boolean useStratConAlternateSectorTerrain) {
+        this.useStratConAlternateSectorTerrain = useStratConAlternateSectorTerrain;
+    }
+
+    /**
+     * @return the multiplier applied to each StratCon sector's base size before planetary-size and hydrology
+     *       adjustments. A value of {@code 1.0} leaves the base size unchanged. Only meaningful when StratCon is
+     *       enabled.
+     */
+    public double getStratConSectorSizeMultiplier() {
+        return stratConSectorSizeMultiplier;
+    }
+
+    public void setStratConSectorSizeMultiplier(final double stratConSectorSizeMultiplier) {
+        this.stratConSectorSizeMultiplier = stratConSectorSizeMultiplier;
     }
 
     public boolean isNoSeedForces() {

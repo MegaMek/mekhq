@@ -1140,6 +1140,22 @@ public class CampaignOptionsMarshaller {
               "stratConPlayType",
               campaignOptions.getStratConPlayType().getLookupName());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAdvancedScouting", campaignOptions.isUseAdvancedScouting());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "useStratConAlternateSectorCount",
+              campaignOptions.isUseStratConAlternateSectorCount());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "useStratConCondenseSectors",
+              campaignOptions.isUseStratConCondenseSectors());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "useStratConAlternateSectorTerrain",
+              campaignOptions.isUseStratConAlternateSectorTerrain());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "stratConSectorSizeMultiplier",
+              campaignOptions.getStratConSectorSizeMultiplier());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "noSeedForces", campaignOptions.isNoSeedForces());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useGenericBattleValue", campaignOptions.isUseGenericBattleValue());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useVerboseBidding", campaignOptions.isUseVerboseBidding());

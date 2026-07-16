@@ -895,6 +895,14 @@ public class CampaignOptionsUnmarshaller {
                 }
             }
             case "useAdvancedScouting" -> campaignOptions.setUseAdvancedScouting(parseBoolean(nodeContents));
+            case "useStratConAlternateSectorCount" ->
+                  campaignOptions.setUseStratConAlternateSectorCount(parseBoolean(nodeContents));
+            case "useStratConCondenseSectors" ->
+                  campaignOptions.setUseStratConCondenseSectors(parseBoolean(nodeContents));
+            case "useStratConAlternateSectorTerrain" ->
+                  campaignOptions.setUseStratConAlternateSectorTerrain(parseBoolean(nodeContents));
+            case "stratConSectorSizeMultiplier" ->
+                  campaignOptions.setStratConSectorSizeMultiplier(parseDouble(nodeContents));
             case "noSeedForces" -> campaignOptions.setNoSeedForces(parseBoolean(nodeContents));
             case "useGenericBattleValue" -> campaignOptions.setUseGenericBattleValue(parseBoolean(nodeContents));
             case "useVerboseBidding" -> campaignOptions.setUseVerboseBidding(parseBoolean(nodeContents));
