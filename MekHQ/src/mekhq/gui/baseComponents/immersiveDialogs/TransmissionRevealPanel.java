@@ -87,6 +87,11 @@ final class TransmissionRevealPanel extends JPanel {
     }
 
     @Override
+    protected boolean isPaintingOrigin() {
+        return revealProgress < 1.0;
+    }
+
+    @Override
     protected void paintChildren(Graphics graphics) {
         if (revealProgress >= 1.0) {
             super.paintChildren(graphics);

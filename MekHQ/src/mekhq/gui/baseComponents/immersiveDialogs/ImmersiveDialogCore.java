@@ -49,12 +49,18 @@ import static mekhq.utilities.MHQInternationalization.getText;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.KeyboardFocusManager;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.image.ImageObserver;
 import java.util.ArrayList;
 import java.util.List;
@@ -81,7 +87,6 @@ import mekhq.campaign.utilities.glossary.DocumentationEntry;
 import mekhq.campaign.utilities.glossary.GlossaryEntry;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.JScrollablePanel;
-import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.dialog.glossary.GlossaryDocumentationEntryDialog;
 import mekhq.gui.dialog.glossary.GlossaryEntryDialog;
 
@@ -122,6 +127,7 @@ public class ImmersiveDialogCore extends JDialog {
     private int spinnerValue;
     private MMComboBox<?> comboBox; // can be null
     private int comboBoxChoiceIndex;
+    private FastJScrollPane messageScrollPane;
 
     private int dialogChoice = 0;
 
@@ -343,16 +349,14 @@ public class ImmersiveDialogCore extends JDialog {
         add(transmissionPanel, BorderLayout.CENTER);
 
         // Dialog settings
+        Window locationReference = KeyboardFocusManager.getCurrentKeyboardFocusManager().getActiveWindow();
         pack();
-        // The reason for this unusual size setup is to account for the Windows taskbar
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        int screenHeight = screenSize.height;
-        int screenWidth = screenSize.width;
-        setSize(min(screenWidth, getWidth()), (int) min(getHeight(), screenHeight * 0.8));
+        applyDynamicDialogSize(locationReference);
+        messageScrollPane.getViewport().setViewPosition(new Point(0, 0));
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setModal(isModal);
-        setLocationRelativeTo(null); // Needs to be after pack
+        setLocationRelativeTo(locationReference); // Needs to be after pack
         setVisible(true);
     }
 
@@ -435,11 +439,11 @@ public class ImmersiveDialogCore extends JDialog {
         }
 
         FastJScrollPane scrollPane = new FastJScrollPane();
+        messageScrollPane = scrollPane;
         scrollPane.setViewportView(viewport);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         scrollPane.setOpaque(false);
         scrollPane.getViewport().setOpaque(false);
-        SwingUtilities.invokeLater(() -> scrollPane.getViewport().setViewPosition(new Point(0, 0)));
 
         // Create a container with a border for the padding
         JPanel scrollPaneContainer = new JPanel(new BorderLayout());
@@ -492,11 +496,50 @@ public class ImmersiveDialogCore extends JDialog {
         sectionConstraints.weighty = 0;
         centerPanel.add(responsePanel, sectionConstraints);
 
-        Dimension preferredSize = centerPanel.getPreferredSize();
-        preferredSize.height = max(preferredSize.height, scaleForGUI(360));
-        centerPanel.setPreferredSize(preferredSize);
-
         return centerPanel;
+    }
+
+    private void applyDynamicDialogSize(@Nullable Window locationReference) {
+        if (messageScrollPane == null) {
+            return;
+        }
+
+        Rectangle usableScreenBounds = getUsableScreenBounds(locationReference);
+        Dimension naturalDialogSize = getPreferredSize();
+        Dimension naturalViewportSize = messageScrollPane.getPreferredSize();
+        ImmersiveDialogSizing.SizingResult sizing = ImmersiveDialogSizing.calculate(
+              naturalDialogSize.height,
+              naturalViewportSize.height,
+              scaleForGUI(120),
+              usableScreenBounds.height);
+
+        messageScrollPane.setVerticalScrollBarPolicy(sizing.requiresScrolling()
+                                                           ? ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED
+                                                           : ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+        messageScrollPane.setPreferredSize(new Dimension(naturalViewportSize.width, sizing.viewportHeight()));
+
+        pack();
+        setSize(min(usableScreenBounds.width, getWidth()), min(sizing.dialogHeight(), getHeight()));
+    }
+
+    private Rectangle getUsableScreenBounds(@Nullable Window locationReference) {
+        GraphicsConfiguration configuration = locationReference == null
+                                                    ? null
+                                                    : locationReference.getGraphicsConfiguration();
+        if (configuration == null) {
+            configuration = getGraphicsConfiguration();
+        }
+        if (configuration == null) {
+            GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+            configuration = device.getDefaultConfiguration();
+        }
+
+        Rectangle bounds = configuration.getBounds();
+        Insets insets = Toolkit.getDefaultToolkit().getScreenInsets(configuration);
+        return new Rectangle(bounds.x + insets.left,
+              bounds.y + insets.top,
+              bounds.width - insets.left - insets.right,
+              bounds.height - insets.top - insets.bottom);
     }
 
     private JEditorPane getJEditorPane(String centerMessage, JPanel buttonPanel) {
@@ -689,12 +732,12 @@ public class ImmersiveDialogCore extends JDialog {
         gbc.fill = isVerticalLayout ? GridBagConstraints.HORIZONTAL : GridBagConstraints.NONE;
         gbc.weightx = isVerticalLayout ? 1 : 0;
 
-        List<RoundedJButton> buttonList = new ArrayList<>();
+        List<JButton> buttonList = new ArrayList<>();
         Dimension largestSize = scaleForGUI(0, 0);
 
         // First pass: Create buttons and determine the largest size
         for (ButtonLabelTooltipPair buttonStrings : buttons) {
-            RoundedJButton button = null;
+            JButton button = null;
 
             if (isVerticalLayout) {
                 StringBuilder buttonLabel = new StringBuilder("<html>");
@@ -713,19 +756,19 @@ public class ImmersiveDialogCore extends JDialog {
                     buttonLabel.append(label);
                 }
 
-                button = new RoundedJButton(buttonLabel.toString());
+                button = new JButton(buttonLabel.toString());
             } else {
                 String label = buttonStrings.btnLabel();
                 String tooltip = buttonStrings.btnTooltip();
                 if (label != null) {
                     String text = String.format("<html><div style='text-align:center;'>%s</div></html>", label);
-                    button = new RoundedJButton(text);
+                    button = new JButton(text);
 
                     if (tooltip != null) {
                         button.setToolTipText(wordWrap(tooltip));
                     }
                 } else if (tooltip != null) {
-                    button = new RoundedJButton(tooltip);
+                    button = new JButton(tooltip);
                 }
             }
 
@@ -767,12 +810,12 @@ public class ImmersiveDialogCore extends JDialog {
         }
 
         // Second pass: Set all buttons to the largest size
-        for (RoundedJButton button : buttonList) {
+        for (JButton button : buttonList) {
             button.setPreferredSize(largestSize);
         }
 
         // Final pass: Add buttons to the panel
-        for (RoundedJButton button : buttonList) {
+        for (JButton button : buttonList) {
             buttonPanel.add(button, gbc);
 
             // This ensures we don't have a button selected by default

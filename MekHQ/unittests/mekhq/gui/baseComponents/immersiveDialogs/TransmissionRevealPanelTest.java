@@ -59,11 +59,13 @@ class TransmissionRevealPanelTest {
             assertNotEquals(Color.RED.getRGB(), initialFrame.getRGB(10, 10));
             assertTrue(new Color(initialFrame.getRGB(WIDTH / 2, HEIGHT / 2), true).getAlpha() > 0);
             assertFalse(revealPanel.contains(WIDTH / 2, HEIGHT / 2));
+            assertTrue(revealPanel.isPaintingOrigin());
 
             revealPanel.completeReveal();
             BufferedImage completedFrame = render(revealPanel);
             assertEquals(Color.RED.getRGB(), completedFrame.getRGB(10, 10));
             assertTrue(revealPanel.contains(WIDTH / 2, HEIGHT / 2));
+            assertFalse(revealPanel.isPaintingOrigin());
         });
     }
 
