@@ -49,8 +49,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
-import mekhq.campaign.Hangar;
 import mekhq.campaign.JumpPath;
+import mekhq.campaign.LocalHangar;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.Money;
@@ -136,7 +136,7 @@ class ContractDeterminationPayTest {
                   anyDouble(), anyDouble(), anyDouble(), anyBoolean())).thenReturn(Money.of(500));
 
             ContractBasePayData data = ContractDeterminationPay.calculateBasePay(false, List.of(),
-                  mock(Hangar.class), options, DATE, 0, 0, Map.of(), mock(Faction.class));
+                  mock(LocalHangar.class), options, DATE, 0, 0, Map.of(), mock(Faction.class));
 
             // Peacetime is scaled by 0.75; base pay = (peacetime + combat) * NORMAL multiplier (1.0).
             assertEquals(Money.of(750), data.peacetimeOperatingCosts());
@@ -158,7 +158,7 @@ class ContractDeterminationPayTest {
                   anyBoolean(), anyDouble(), anyDouble(), anyDouble(), anyDouble())).thenReturn(Money.of(800));
 
             ContractBasePayData data = ContractDeterminationPay.calculateBasePay(false, List.of(),
-                  mock(Hangar.class), options, DATE, 0, 0, Map.of(), mock(Faction.class));
+                  mock(LocalHangar.class), options, DATE, 0, 0, Map.of(), mock(Faction.class));
 
             assertEquals(Money.of(750), data.peacetimeOperatingCosts());
             assertEquals(Money.of(800), data.totalCostOfCombatUnits());
@@ -174,7 +174,7 @@ class ContractDeterminationPayTest {
             accountant.when(() -> Accountant.getPeacetimeOperatingCosts(any(), any(), any(), anyBoolean(), any(),
                   anyInt(), anyInt(), any(), anyBoolean())).thenReturn(Money.of(2000));
 
-            Money result = ContractDeterminationPay.determineStraightSupport(false, List.of(), mock(Hangar.class),
+            Money result = ContractDeterminationPay.determineStraightSupport(false, List.of(), mock(LocalHangar.class),
                   mock(CampaignOptions.class), DATE, 0, 0, Map.of(), 0.5);
 
             assertEquals(Money.of(1000), result);
@@ -243,7 +243,7 @@ class ContractDeterminationPayTest {
                   anyDouble(), anyDouble(), anyDouble(), anyBoolean())).thenReturn(Money.of(200));
 
             ContractPayData data = ContractDeterminationPay.generateContractPay(contractManager, List.of(),
-                  mock(Hangar.class), options, DATE, 0, 0, Map.of(), campaignFaction, 1.0);
+                  mock(LocalHangar.class), options, DATE, 0, 0, Map.of(), campaignFaction, 1.0);
 
             // Base pay = (1000 * 0.75) + 200 = 950.
             assertEquals(Money.of(950), data.basePayData().calculatedBasePay());

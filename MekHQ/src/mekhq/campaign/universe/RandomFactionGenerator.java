@@ -64,6 +64,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.mission.newContract.EnemySelectionProfile;
 import mekhq.campaign.mission.newContract.MissionLocationProfile;
+import mekhq.campaign.mission.newContract.contractGeneration.GlobalEmployerTableValue;
 import mekhq.campaign.mission.newContract.targetFinder.MissionTargetFinder;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.enums.HPGRating;

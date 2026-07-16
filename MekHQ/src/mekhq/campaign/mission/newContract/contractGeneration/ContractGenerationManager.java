@@ -40,8 +40,8 @@ import jakarta.annotation.Nonnull;
 import megamek.logging.MMLogger;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Hangar;
-import mekhq.campaign.camOpsReputation.ReputationController;
+import mekhq.campaign.LocalHangar;
+import mekhq.campaign.camOpsReputation.ForceReputationController;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.enums.AtBContractType;
@@ -76,14 +76,15 @@ public class ContractGenerationManager {
      * @param currentLocation         the campaign's current location
      * @param playerNegotiator        the player's negotiator
      * @param formations              the campaign's formations
-     * @param hangar                  the campaign's hangar
+     * @param localHangar             the campaign's localHangar
      * @param temporaryAsTechPoolSize the temporary astech pool size, factored into pay
      * @param temporaryMedicPool      the temporary medic pool size, factored into pay
      * @param temporaryCrewMap        temporary crew counts by role, factored into pay
      * @param campaignType            the campaign type, which drives employer, objective, and negotiator determination
      */
     public static void generateContract(Campaign campaign, double forceReputationFactor,
-          AbstractLocation currentLocation, Person playerNegotiator, List<Formation> formations, Hangar hangar,
+          AbstractLocation currentLocation, Person playerNegotiator, List<Formation> formations,
+          LocalHangar localHangar,
           int temporaryAsTechPoolSize, int temporaryMedicPool, Map<PersonnelRole, Integer> temporaryCrewMap,
           CampaignTypeForContractDetermination campaignType) {
         AbstractContractManager contractManager = new NormalContractManager();
@@ -108,7 +109,7 @@ public class ContractGenerationManager {
         Faction employerFaction = contractManager.getEmployerFaction();
         EmployerModifierData employerModifierData = new EmployerModifierData();
         int currentYear = currentDate.getYear();
-        ReputationController reputation = campaign.getReputation();
+        ForceReputationController reputation = campaign.getReputation();
         int reputationRating = reputation.getReputationRating();
         EmployerNegotiationsModifier.getNegotiationsModifier(employerFaction, currentYear, employerModifierData);
         UnitReputationNegotiationsModifier.getNegotiationsModifier(reputationRating, employerModifierData);
@@ -128,7 +129,7 @@ public class ContractGenerationManager {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         ContractPayData contractPayData = ContractDeterminationPay.generateContractPay(contractManager,
               formations,
-              hangar,
+              localHangar,
               campaignOptions,
               currentDate,
               temporaryAsTechPoolSize,

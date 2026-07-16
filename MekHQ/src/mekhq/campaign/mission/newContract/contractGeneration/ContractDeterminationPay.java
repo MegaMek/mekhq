@@ -43,8 +43,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-import mekhq.campaign.Hangar;
 import mekhq.campaign.JumpPath;
+import mekhq.campaign.LocalHangar;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.Money;
@@ -80,7 +80,7 @@ public class ContractDeterminationPay {
      *
      * @param contractManager         the contract manager, providing the jump path, employer modifiers, and objectives
      * @param formations              the campaign's formations
-     * @param hangar                  the campaign's hangar
+     * @param localHangar             the campaign's localHangar
      * @param campaignOptions         the campaign options governing pay calculations
      * @param currentDate             the current campaign date
      * @param temporaryAsTechPoolSize the temporary astech pool size, factored into operating costs
@@ -92,14 +92,14 @@ public class ContractDeterminationPay {
      * @return the assembled contract payment data
      */
     public static ContractPayData generateContractPay(AbstractContractManager contractManager,
-          List<Formation> formations, Hangar hangar, CampaignOptions campaignOptions, LocalDate currentDate,
+          List<Formation> formations, LocalHangar localHangar, CampaignOptions campaignOptions, LocalDate currentDate,
           int temporaryAsTechPoolSize, int temporaryMedicPool, Map<PersonnelRole, Integer> temporaryCrewMap,
           Faction campaignFaction, double reputationFactor) {
         boolean isClanCampaign = campaignFaction.isClan();
 
         ContractBasePayData basePayData = calculateBasePay(isClanCampaign,
               formations,
-              hangar,
+              localHangar,
               campaignOptions,
               currentDate,
               temporaryAsTechPoolSize,
@@ -146,7 +146,7 @@ public class ContractDeterminationPay {
      *
      * @param isClanCampaign          whether the campaign is a Clan campaign
      * @param formations              the campaign's formations
-     * @param hangar                  the campaign's hangar
+     * @param localHangar             the campaign's localHangar
      * @param campaignOptions         the campaign options governing pay calculations
      * @param currentDate             the current campaign date
      * @param temporaryAsTechPoolSize the temporary astech pool size, factored into operating costs
@@ -157,14 +157,14 @@ public class ContractDeterminationPay {
      * @return the base-pay breakdown
      */
     public static ContractBasePayData calculateBasePay(boolean isClanCampaign, List<Formation> formations,
-          Hangar hangar, CampaignOptions campaignOptions, LocalDate currentDate, int temporaryAsTechPoolSize,
+          LocalHangar localHangar, CampaignOptions campaignOptions, LocalDate currentDate, int temporaryAsTechPoolSize,
           int temporaryMedicPool, Map<PersonnelRole, Integer> temporaryCrewMap, Faction campaignFaction) {
         // TODO replace with campaign option
         BasePaymentMultiplier basePaymentMultiplier = BasePaymentMultiplier.NORMAL;
 
         Money peacetimeOperatingCosts = calculatePeacetimeOperatingCostsIncludingMultiplier(isClanCampaign,
               formations,
-              hangar,
+              localHangar,
               campaignOptions,
               currentDate,
               temporaryAsTechPoolSize,
@@ -174,7 +174,7 @@ public class ContractDeterminationPay {
         Money totalCostOfCombatUnits = calculateTotalCostOfCombatUnits(campaignOptions,
               campaignFaction,
               formations,
-              hangar);
+              localHangar);
 
         Money calculatedBasePay = peacetimeOperatingCosts.plus(totalCostOfCombatUnits);
         calculatedBasePay = calculatedBasePay.multipliedBy(basePaymentMultiplier.getMultiplier());
@@ -184,10 +184,10 @@ public class ContractDeterminationPay {
 
     private static Money calculatePeacetimeOperatingCostsIncludingMultiplier(boolean isClanCampaign,
           List<Formation> formations,
-          Hangar hangar, CampaignOptions campaignOptions, LocalDate currentDate, int temporaryAsTechPoolSize,
+          LocalHangar localHangar, CampaignOptions campaignOptions, LocalDate currentDate, int temporaryAsTechPoolSize,
           int temporaryMedicPool, Map<PersonnelRole, Integer> temporaryCrewMap) {
         Money peacetimeOperatingCosts = Accountant.getPeacetimeOperatingCosts(formations,
-              hangar,
+              localHangar,
               campaignOptions,
               isClanCampaign,
               currentDate,
@@ -200,7 +200,7 @@ public class ContractDeterminationPay {
     }
 
     private static Money calculateTotalCostOfCombatUnits(CampaignOptions campaignOptions, Faction campaignFaction,
-          List<Formation> formations, Hangar hangar) {
+          List<Formation> formations, LocalHangar localHangar) {
         final boolean excludeInfantry = campaignOptions.isInfantryDontCount();
         final double combatUnitContractPercent = campaignOptions.getEquipmentContractPercent();
         final double dropShipContractPercent = campaignOptions.getDropShipContractPercent();
@@ -213,7 +213,7 @@ public class ContractDeterminationPay {
         if (campaignOptions.isUseAlternatePaymentMode()) {
             forceValue = AlternatePaymentModelValues.getForceValue(campaignFaction,
                   formations,
-                  hangar,
+                  localHangar,
                   useDiminishingContractPay,
                   excludeInfantry,
                   combatUnitContractPercent,
@@ -222,7 +222,7 @@ public class ContractDeterminationPay {
                   jumpShipContractPercent);
         } else {
             forceValue = Accountant.getForceValue(formations,
-                  hangar,
+                  localHangar,
                   campaignFaction,
                   campaignOptions,
                   useDiminishingContractPay,
@@ -351,7 +351,7 @@ public class ContractDeterminationPay {
      *
      * @param isClanCampaign            whether the campaign is a Clan campaign
      * @param formations                the campaign's formations
-     * @param hangar                    the campaign's hangar
+     * @param localHangar               the campaign's localHangar
      * @param campaignOptions           the campaign options governing operating-cost calculations
      * @param currentDate               the current campaign date
      * @param temporaryAsTechPoolSize   the temporary astech pool size, factored into operating costs
@@ -362,10 +362,10 @@ public class ContractDeterminationPay {
      * @return the straight-support payment
      */
     public static Money determineStraightSupport(boolean isClanCampaign, List<Formation> formations,
-          Hangar hangar, CampaignOptions campaignOptions, LocalDate currentDate, int temporaryAsTechPoolSize,
+          LocalHangar localHangar, CampaignOptions campaignOptions, LocalDate currentDate, int temporaryAsTechPoolSize,
           int temporaryMedicPool, Map<PersonnelRole, Integer> temporaryCrewMap, double straightSupportMultiplier) {
         Money peacetimeOperatingCosts = Accountant.getPeacetimeOperatingCosts(formations,
-              hangar,
+              localHangar,
               campaignOptions,
               isClanCampaign,
               currentDate,
