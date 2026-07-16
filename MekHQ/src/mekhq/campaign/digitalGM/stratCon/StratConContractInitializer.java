@@ -68,7 +68,7 @@ import mekhq.campaign.universe.PlanetarySystem;
 public class StratConContractInitializer {
     private static final MMLogger LOGGER = MMLogger.create(StratConContractInitializer.class);
 
-    public static final int NUM_LANCES_PER_TRACK = 3;
+    public static final int NUM_FORMATIONS_PER_TRACK = 3;
     public static final int ZERO_CELSIUS_IN_KELVIN = 273;
 
     /**
@@ -97,7 +97,7 @@ public class StratConContractInitializer {
         // scenarios
         // when objective is allied/hostile facility, place those facilities
 
-        int maximumTrackIndex = max(0, contract.getRequiredCombatTeams() / NUM_LANCES_PER_TRACK);
+        int maximumTrackIndex = max(0, contract.getRequiredCombatTeams() / NUM_FORMATIONS_PER_TRACK);
         // Use the contract's destination planet, not the campaign's current location
         int planetaryTemperature = getContractPlanetTemperature(contract, campaign);
 
@@ -107,7 +107,7 @@ public class StratConContractInitializer {
             int scenarioOdds = getScenarioOdds(contractDefinition);
             int deploymentTime = isUseMaplessMode ? 0 : getDeploymentTime(contractDefinition);
 
-            StratConTrackState track = initializeTrackState(NUM_LANCES_PER_TRACK,
+            StratConTrackState track = initializeTrackState(NUM_FORMATIONS_PER_TRACK,
                   scenarioOdds,
                   deploymentTime,
                   planetaryTemperature);
@@ -118,7 +118,7 @@ public class StratConContractInitializer {
         // a campaign will have X tracks going at a time, where
         // X = # required lances / 3, rounded up. The last track will have fewer
         // required lances.
-        int oddLanceCount = contract.getRequiredCombatTeams() % NUM_LANCES_PER_TRACK;
+        int oddLanceCount = contract.getRequiredCombatTeams() % NUM_FORMATIONS_PER_TRACK;
         if (oddLanceCount > 0) {
             int scenarioOdds = getScenarioOdds(contractDefinition);
             int deploymentTime = isUseMaplessMode ? 0 : getDeploymentTime(contractDefinition);
