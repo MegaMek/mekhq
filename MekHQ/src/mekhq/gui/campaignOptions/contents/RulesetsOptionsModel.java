@@ -129,7 +129,6 @@ class RulesetsOptionsModel {
         useGenericBattleValue = options.isUseGenericBattleValue();
         useVerboseBidding = options.isUseVerboseBidding();
         useStratConAlternateSectorCount = options.isUseStratConAlternateSectorCount();
-        useStratConCondenseSectors = options.isUseStratConAlternateSectorCount();
         useStratConCondenseSectors = options.isUseStratConCondenseSectors();
         useStratConAlternateSectorTerrain = options.isUseStratConAlternateSectorTerrain();
         stratConSectorSizeMultiplier = options.getStratConSectorSizeMultiplier();
