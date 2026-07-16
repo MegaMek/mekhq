@@ -46,12 +46,13 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignLocationManager;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.Test;
+import testUtilities.MHQTestUtilities;
 
 class JumpBlockersTest {
 
     /** A mocked campaign with a real (empty) location manager, so the queued-for-travel check sees no queue. */
     private static Campaign mockCampaign() {
-        Campaign campaign = mock(Campaign.class);
+        Campaign campaign = MHQTestUtilities.mockCampaign();
         when(campaign.getCampaignLocationManager()).thenReturn(new CampaignLocationManager());
         return campaign;
     }

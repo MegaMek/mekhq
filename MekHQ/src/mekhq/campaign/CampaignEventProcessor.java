@@ -62,7 +62,7 @@ public record CampaignEventProcessor(Campaign campaign) {
      */
     @Subscribe
     public void handlePersonUpdate(PersonEvent personEvent) {
-        campaign().invalidateActivePersonnelCache();
+        this.campaign().getPlayerForce().getHumanResources().invalidateActivePersonnelCache();
         Person person = personEvent.getPerson();
         person.invalidateAdvancedAsTechContribution();
     }

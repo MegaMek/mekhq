@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -136,7 +136,7 @@ public class PostScenarioDialogHandler {
 
     private static void postCombatRetirementCheck(CampaignGUI campaignGUI, Campaign campaign,
           Scenario currentScenario) {
-        if (!campaign.getRetirementDefectionTracker().getRetirees().isEmpty()) {
+        if (!campaign.getPlayerForce().getHumanResources().getRetirementDefectionTracker().getRetirees().isEmpty()) {
             RetirementDefectionDialog rdd = new RetirementDefectionDialog(campaignGUI,
                   campaign.getMission(currentScenario.getMissionId()), false);
 

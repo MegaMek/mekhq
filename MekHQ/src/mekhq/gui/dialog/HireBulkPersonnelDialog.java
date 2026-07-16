@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2010-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -352,7 +352,7 @@ public class HireBulkPersonnelDialog extends JDialog {
 
         while (number > 0) {
             PersonnelRole selectedRole = selectedItem.getRole();
-            Person person = campaign.newPerson(selectedRole);
+            Person person = campaign.getPlayerForce().getHumanResources().newPerson(campaign, selectedRole);
 
             // Dependents & 'None' don't have skills
             CampaignOptions campaignOptions = campaign.getCampaignOptions();
@@ -398,7 +398,7 @@ public class HireBulkPersonnelDialog extends JDialog {
             // might have occurred via GM Mode or age restrictions.
             setVeterancyAwardEligibility(campaign, person);
 
-            if (!campaign.recruitPerson(person, isGmHire, true)) {
+            if (!campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, person, isGmHire, true)) {
                 number = 0;
             } else {
                 number--;
@@ -412,7 +412,7 @@ public class HireBulkPersonnelDialog extends JDialog {
 
         // Determine correct profession to pass into the loop
         final PersonnelRole role = ((PersonTypeItem) Objects.requireNonNull(choiceType.getSelectedItem())).getRole();
-        rankModel.addAll(RankDisplay.getRankDisplaysForSystem(campaign.getRankSystem(),
+        rankModel.addAll(RankDisplay.getRankDisplaysForSystem(campaign.getPlayerForce().getRankSystem(),
               Profession.getProfessionFromPersonnelRole(role)));
 
         choiceRanks.setModel(rankModel);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -124,7 +124,7 @@ public class PersonTableModel extends AbstractTableModel {
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         Person person = people.get(rowIndex);
-        NewPersonnelMarket market = campaign.getNewPersonnelMarket();
+        NewPersonnelMarket market = campaign.getPlayerForce().getHumanResources().getNewPersonnelMarket();
         Set<UUID> rarePersonnel = market.getRarePersonnel();
 
         int positiveSPAs = 0;

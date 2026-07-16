@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,7 +35,6 @@ package mekhq.campaign.universe.generators.partGenerators;
 import java.util.List;
 
 import megamek.common.units.Mek;
-import mekhq.campaign.Warehouse;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.HeatSink;
@@ -70,8 +69,8 @@ public class MishraPartGenerator extends MultiplePartGenerator {
     }
 
     @Override
-    public Warehouse generateWarehouse(final List<Part> inputParts) {
-        final Warehouse warehouse = super.generateWarehouse(inputParts);
+    public mekhq.campaign.LocalWarehouse generateWarehouse(final List<Part> inputParts) {
+        final mekhq.campaign.LocalWarehouse warehouse = super.generateWarehouse(inputParts);
         warehouse.getParts().removeIf(part -> part instanceof EnginePart);
         warehouse.forEachPart(part -> {
             if (part instanceof HeatSink) {

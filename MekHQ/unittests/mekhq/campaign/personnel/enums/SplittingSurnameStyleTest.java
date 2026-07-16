@@ -55,6 +55,7 @@ import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -63,7 +64,7 @@ public class SplittingSurnameStyleTest {
     //region Variable Declarations
     private static final SplittingSurnameStyle[] styles = SplittingSurnameStyle.values();
 
-    @Mock
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private Campaign mockCampaign;
 
     @Mock
@@ -156,7 +157,7 @@ public class SplittingSurnameStyleTest {
     @Test
     public void testApplyOriginChangesSurname() {
         Faction campaignFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         final Person person = new Person(mockCampaign);
@@ -172,7 +173,7 @@ public class SplittingSurnameStyleTest {
     @Test
     public void testApplySpouseChangesSurname() {
         Faction campaignFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         final Person person = new Person(mockCampaign);
@@ -188,7 +189,7 @@ public class SplittingSurnameStyleTest {
     @Test
     public void testApplyBothChangeSurname() {
         Faction campaignFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         final Person origin = new Person(mockCampaign);
@@ -208,7 +209,7 @@ public class SplittingSurnameStyleTest {
     @Test
     public void testApplyBothKeepSurname() {
         Faction campaignFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
         final Person origin = new Person(mockCampaign);
         origin.setMaidenName("origin");
@@ -224,7 +225,7 @@ public class SplittingSurnameStyleTest {
     @Test
     public void testApplyWeighted() {
         Faction campaignFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
         final WeightedIntMap<SplittingSurnameStyle> weightMap = new WeightedIntMap<>();
         weightMap.add(1, SplittingSurnameStyle.WEIGHTED);

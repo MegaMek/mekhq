@@ -50,6 +50,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.time.LocalDate;
 import java.util.Map;
@@ -109,7 +110,7 @@ public class RandomDeathTest {
               BABY, true
         );
 
-        mockedCampaign = mock(Campaign.class);
+        mockedCampaign = mockCampaign();
         mockedCampaignOptions = mock(CampaignOptions.class);
         mockedToday = LocalDate.of(3025, 1, 1);
         mockedPerson = mock(Person.class);

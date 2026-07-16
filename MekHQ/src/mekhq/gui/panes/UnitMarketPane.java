@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -480,7 +480,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
             }
 
             final Money price = offer.getPrice();
-            if (getCampaign().getFunds().isLessThan(price)) {
+            if (getCampaign().getPlayerForce().getFunds().isLessThan(price)) {
                 getCampaign().addReport(FINANCES, String.format("<font color='" +
                                                                       ReportingUtilities.getNegativeColor() +
                                                                       "'>" +
@@ -493,7 +493,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
 
             final int roll = Compute.d6();
             if (offer.getMarketType().isBlackMarket() && (roll < 3)) {
-                getCampaign().getFinances()
+                getCampaign().getPlayerForce().getFinances()
                       .debit(TransactionType.UNIT_PURCHASE,
                             getCampaign().getLocalDate(),
                             price.dividedBy(roll),
@@ -510,7 +510,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
                 continue;
             }
 
-            getCampaign().getFinances()
+            getCampaign().getPlayerForce().getFinances()
                   .debit(TransactionType.UNIT_PURCHASE,
                         getCampaign().getLocalDate(),
                         price,

@@ -66,8 +66,8 @@ import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JSplitPane;
 import javax.swing.JPanel;
+import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
@@ -1142,7 +1142,7 @@ public class CampaignOptionsPane extends JPanel {
                     campaign.getCampaignFactionIcon(),
                     campaign.getFaction(),
                     campaign.getLocalDate(),
-                    campaign.getFactionStandings(),
+                  campaign.getPlayerForce().getFactionStandings(),
                     campaign.getMissions(),
                     newIsTrackFactionStandings,
                     campaign.getCampaignOptions().getRegardMultiplier());
@@ -1238,7 +1238,7 @@ public class CampaignOptionsPane extends JPanel {
      * @since 0.50.10
      */
     private static void inoculateAllCharacters(Campaign campaign) {
-        final AbstractLocation location = campaign.getCurrentLocation();
+        final AbstractLocation location = campaign.getPlayerForce().getForceDetachment().getCurrentLocation();
         final LocalDate currentDay = campaign.getLocalDate();
 
         final Map<String, Set<InjuryType>> curesBySystem = new HashMap<>();
@@ -1247,7 +1247,7 @@ public class CampaignOptionsPane extends JPanel {
         final String planetId = (planet != null) ? planet.getId() : null;
         final String systemId = (planet != null) ? planet.getParentSystem().getId() : null;
 
-        for (Person person : campaign.getAllPersonnel()) {
+        for (Person person : campaign.getPlayerForce().getHumanResources().getPersonnel()) {
             // Inoculate for current location, if applicable
             if (planet != null) {
                 inoculate(person, planet, planetId, systemId, currentDay, curesBySystem);

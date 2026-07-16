@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,8 +35,6 @@ package mekhq.campaign.randomEvents.prisoners;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static megamek.common.compute.Compute.randomInt;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.finances.enums.TransactionType.RANSOM;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.ACTIVE;
@@ -110,7 +108,11 @@ public class PrisonerMissionEndEvent {
 
         String outOfCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "prisonerDefectors.ooc");
         ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
-              campaign.getSeniorAdminPerson(HR),
+              campaign.getPlayerForce().getHumanResources()
+                    .getSeniorAdminPerson(Campaign.AdministratorSpecialization.HR,
+                          campaign.getCampaignOptions(),
+                          campaign.isClanCampaign(),
+                          campaign.getLocalDate()),
               null,
               inCharacterMessage,
               dialogOptions,
@@ -136,7 +138,10 @@ public class PrisonerMissionEndEvent {
         this.isAllied = isAllied;
         this.isSuccess = isSuccess;
 
-        List<Person> prisoners = isAllied ? campaign.getFriendlyPrisoners() : campaign.getCurrentPrisoners();
+        List<Person> prisoners;
+        prisoners = isAllied ?
+                          campaign.getPlayerForce().getHumanResources().getFriendlyPrisoners() :
+                          campaign.getPlayerForce().getHumanResources().getCurrentPrisoners();
         Money ransom = getRansom(prisoners);
 
         int goodEventChance = determineGoodEventChance(isAllied);
@@ -160,7 +165,11 @@ public class PrisonerMissionEndEvent {
         }
 
         ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
-              campaign.getSeniorAdminPerson(COMMAND),
+              campaign.getPlayerForce().getHumanResources()
+                    .getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND,
+                          campaign.getCampaignOptions(),
+                          campaign.isClanCampaign(),
+                          campaign.getLocalDate()),
               null,
               inCharacterMessage,
               getEndOfContractDialogButtons(isAllied, isSuccess, isGoodEvent),
@@ -228,13 +237,13 @@ public class PrisonerMissionEndEvent {
      */
     int determineGoodEventChance(boolean isAllied) {
         if (isAllied) {
-            LocalDate lastCrime = campaign.getDateOfLastCrime();
+            LocalDate lastCrime = campaign.getPlayerForce().getDateOfLastCrime();
             LocalDate startDate = getContractOrMissionStartDate();
 
             if ((startDate != null) && (lastCrime != null)) {
                 if (lastCrime.isAfter(startDate)) {
                     // Adjust the chance of a good event based on crime rating
-                    return max(1, GOOD_EVENT_CHANCE - campaign.getAdjustedCrimeRating());
+                    return max(1, GOOD_EVENT_CHANCE - campaign.getPlayerForce().getAdjustedCrimeRating());
                 }
             }
         }
@@ -401,15 +410,15 @@ public class PrisonerMissionEndEvent {
      * @param ransom   The ransom amount being transacted.
      * @param today    The current campaign date for the transaction record.
      */
-    private void performRansom(boolean isCredit, Money ransom, LocalDate today) {
+    void performRansom(boolean isCredit, Money ransom, LocalDate today) {
         if (isCredit) {
-            campaign.getFinances()
+            campaign.getPlayerForce().getFinances()
                   .credit(RANSOM, today, ransom, getFormattedTextAt(RESOURCE_BUNDLE, "transaction.ransom"));
         } else {
             // That this can take a player into negative is a deliberate decision. As this dialog
             // is only presented after the point of no return, we don't want the player left in a
             // situation where 1 C-Bill locks them out of ransoming back their people.
-            campaign.getFinances()
+            campaign.getPlayerForce().getFinances()
                   .debit(RANSOM, today, ransom, getFormattedTextAt(RESOURCE_BUNDLE, "transaction.ransom"));
         }
     }
@@ -419,9 +428,9 @@ public class PrisonerMissionEndEvent {
      *
      * @param prisoners The list of prisoners to be removed.
      */
-    private void removeAllPrisoners(List<Person> prisoners) {
+    void removeAllPrisoners(List<Person> prisoners) {
         for (Person prisoner : prisoners) {
-            campaign.removePerson(prisoner);
+            campaign.getPlayerForce().getHumanResources().removePerson(campaign, prisoner);
         }
     }
 
@@ -433,15 +442,17 @@ public class PrisonerMissionEndEvent {
      *
      * @param prisoners The list of prisoners to be executed.
      */
-    private void executePrisoners(List<Person> prisoners) {
+    void executePrisoners(List<Person> prisoners) {
         // Was the crime noticed?
         int crimeNoticeRoll = randomInt(100);
         boolean crimeNoticed = crimeNoticeRoll < prisoners.size();
 
         int penalty = min(MAX_CRIME_PENALTY, prisoners.size() * 2);
         if (crimeNoticed) {
-            campaign.changeCrimeRating(-penalty);
-            campaign.setDateOfLastCrime(campaign.getLocalDate());
+            int change = -penalty;
+            campaign.getPlayerForce().changeCrimeRating(change);
+            LocalDate dateOfLastCrime = campaign.getLocalDate();
+            campaign.getPlayerForce().setDateOfLastCrime(dateOfLastCrime);
         }
 
         // Build the report

@@ -60,7 +60,6 @@ import megamek.common.equipment.WeaponType;
 import megamek.common.ui.FastJScrollPane;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Quartermaster;
 import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.location.IPlace;
 import mekhq.campaign.market.PartsInUseManager;
@@ -130,8 +129,8 @@ public class PartsReportDialog extends JDialog {
         super(gui.getFrame(), modal);
         this.gui = gui;
         this.campaign = gui.getCampaign();
-        this.activePlace = campaign;
-        this.partsInUseManager = new PartsInUseManager(campaign, campaign);
+        this.activePlace = campaign.getPlayerForce().getForceDetachment();
+        this.partsInUseManager = new PartsInUseManager(campaign, campaign.getPlayerForce().getForceDetachment());
         initComponents();
         // initComponents() selects the dropdown to match the main GUI's active location; sync the scoped manager to it.
         activePlace = getSelectedPlace();
@@ -204,7 +203,7 @@ public class PartsReportDialog extends JDialog {
                 int row = Integer.parseInt(e.getActionCommand());
                 PartInUse partInUse = overviewPartsModel.getPartInUse(row);
                 IAcquisitionWork partToBuy = partInUse.getPartToBuy();
-                campaign.getShoppingList().addShoppingItem(partToBuy, 1, campaign, getSelectedPlace());
+                campaign.getPlayerForce().getShoppingList().addShoppingItem(partToBuy, 1, campaign, getSelectedPlace());
                 refreshOverviewSpecificPart(row, partInUse, partToBuy);
             }
         };
@@ -224,7 +223,9 @@ public class PartsReportDialog extends JDialog {
                     return;
                 }
                 IAcquisitionWork partToBuy = partInUse.getPartToBuy();
-                campaign.getShoppingList().addShoppingItem(partToBuy, quantity, campaign, getSelectedPlace());
+                campaign.getPlayerForce()
+                      .getShoppingList()
+                      .addShoppingItem(partToBuy, quantity, campaign, getSelectedPlace());
                 refreshOverviewSpecificPart(row, partInUse, partToBuy);
             }
         };
@@ -265,7 +266,7 @@ public class PartsReportDialog extends JDialog {
                 if (sellQty > spareQty) {
                     sellQty = spareQty;
                 }
-                Quartermaster quartermaster = campaign.getQuartermaster();
+                mekhq.campaign.ForceQuartermaster quartermaster = campaign.getQuartermaster();
                 int i = 0;
                 while (sellQty > 0 && i < spares.size()) {
                     Part spare = spares.get(i);
@@ -379,11 +380,11 @@ public class PartsReportDialog extends JDialog {
 
         ignoreMothballedCheck = new JCheckBox(resourceMap.getString("chkIgnoreMothballed.text"));
         ignoreMothballedCheck.addActionListener(evt -> refreshOverviewPartsInUse());
-        ignoreMothballedCheck.setSelected(campaign.getIgnoreMothballed());
+        ignoreMothballedCheck.setSelected(campaign.getPlayerForce().getIgnoreMothballed());
 
         topUpWeeklyCheck = new JCheckBox(resourceMap.getString("chkTopUpWeekly.text"));
         topUpWeeklyCheck.addActionListener(evt -> refreshOverviewPartsInUse());
-        topUpWeeklyCheck.setSelected(campaign.getTopUpWeekly());
+        topUpWeeklyCheck.setSelected(campaign.getPlayerForce().getTopUpWeekly());
 
         RoundedJButton topUpButton = new RoundedJButton();
         topUpButton.setText(resourceMap.getString("topUpBtn.text"));
@@ -417,8 +418,8 @@ public class PartsReportDialog extends JDialog {
         ignoreSparesUnderQualityCB.setMaximumSize(ignoreSparesUnderQualityCB.getPreferredSize());
         ignoreSparesUnderQualityCB.addActionListener(evt -> refreshOverviewPartsInUse());
         JLabel ignorePartsUnderLabel = new JLabel(resourceMap.getString("lblIgnoreSparesUnderQuality.text"));
-        if (campaign.getIgnoreSparesUnderQuality() != null) {
-            ignoreSparesUnderQualityCB.setSelectedItem(campaign.getIgnoreSparesUnderQuality());
+        if (campaign.getPlayerForce().getIgnoreSparesUnderQuality() != null) {
+            ignoreSparesUnderQualityCB.setSelectedItem(campaign.getPlayerForce().getIgnoreSparesUnderQuality());
         } else {
             ignoreSparesUnderQualityCB.setSelectedItem(" ");
         }
@@ -655,7 +656,7 @@ public class PartsReportDialog extends JDialog {
     private IPlace getSelectedPlace() {
         LocationFilterItem item = (LocationFilterItem) choiceLocation.getSelectedItem();
         if (item == null || item.isMainForce()) {
-            return campaign;
+            return campaign.getPlayerForce().getForceDetachment();
         }
         return item.getBase();
     }
@@ -673,14 +674,16 @@ public class PartsReportDialog extends JDialog {
             overviewPartsInUseTable.getCellEditor().stopCellEditing();
         }
 
-        campaign.setIgnoreMothballed(ignoreMothballedCheck.isSelected());
-        campaign.setTopUpWeekly(topUpWeeklyCheck.isSelected());
+        campaign.getPlayerForce().setIgnoreMothballed(ignoreMothballedCheck.isSelected());
+        campaign.getPlayerForce().setTopUpWeekly(topUpWeeklyCheck.isSelected());
         if (ignoreSparesUnderQualityCB == null) {
-            campaign.setIgnoreSparesUnderQuality(getMinimumQuality(" "));
+            PartQuality ignoreSparesUnderQuality = getMinimumQuality(" ");
+            campaign.getPlayerForce().setIgnoreSparesUnderQuality(ignoreSparesUnderQuality);
         } else {
             Object object = ignoreSparesUnderQualityCB.getSelectedItem();
             if (object instanceof String string) {
-                campaign.setIgnoreSparesUnderQuality(getMinimumQuality(string));
+                PartQuality ignoreSparesUnderQuality = getMinimumQuality(string);
+                campaign.getPlayerForce().setIgnoreSparesUnderQuality(ignoreSparesUnderQuality);
             }
         }
 

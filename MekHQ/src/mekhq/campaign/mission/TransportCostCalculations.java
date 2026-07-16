@@ -57,7 +57,6 @@ import megamek.common.units.Jumpship;
 import megamek.common.units.LandAirMek;
 import megamek.common.units.SpaceStation;
 import megamek.logging.MMLogger;
-import mekhq.campaign.Hangar;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;

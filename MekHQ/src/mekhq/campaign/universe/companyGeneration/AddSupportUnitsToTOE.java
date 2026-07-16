@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2026 The MekHQ Team. All Rights Reserved.
+ * Copyright (C) 2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.universe.companyGeneration;
 
-import static mekhq.campaign.force.Formation.FORMATION_ORIGIN;
 import static mekhq.campaign.universe.companyGeneration.SupportTOEFormationTypes.HQ_FORMATION;
 
 import java.util.List;
@@ -107,13 +106,14 @@ public class AddSupportUnitsToTOE {
     private static void createSubFormation(Campaign campaign, String label, FormationType type,
           List<Unit> units, Formation hqFormation) {
         Formation subFormation = new Formation(label);
-        campaign.addFormation(subFormation, hqFormation); // needs to be before we add units
+        // needs to be before we add units
+        campaign.getPlayerForce().addFormation(subFormation, hqFormation, campaign);
 
         subFormation.setFormationType(type, true); //subtype propagation is largely irrelevant
 
         int subFormationId = subFormation.getId();
         for (Unit unit : units) {
-            campaign.addUnitToFormation(unit, subFormationId);
+            campaign.getPlayerForce().addUnitToFormation(unit, subFormationId, campaign);
         }
     }
 
@@ -132,12 +132,12 @@ public class AddSupportUnitsToTOE {
      * @since 0.51.0
      */
     private static @NonNull Formation getHqFormation(Campaign campaign) {
-        final Formation ORIGIN_FORMATION = campaign.getFormation(FORMATION_ORIGIN);
+        final Formation ORIGIN_FORMATION = campaign.getPlayerForce().getFormation(Formation.FORMATION_ORIGIN);
 
         // I would prefer to not use string comparison here, but we don't have a more reliable option
         final String HQ_FORMATION_NAME = HQ_FORMATION.getLabel();
 
-        List<Formation> formations = campaign.getAllFormations();
+        List<Formation> formations = campaign.getPlayerForce().getAllFormations();
         for (Formation formation : formations) {
             if (formation.getName().equalsIgnoreCase(HQ_FORMATION.getLabel())) {
                 return formation;
@@ -145,7 +145,7 @@ public class AddSupportUnitsToTOE {
         }
 
         Formation newFormation = new Formation(HQ_FORMATION_NAME);
-        campaign.addFormation(newFormation, ORIGIN_FORMATION);
+        campaign.getPlayerForce().addFormation(newFormation, ORIGIN_FORMATION, campaign);
 
         return newFormation;
     }

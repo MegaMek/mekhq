@@ -52,7 +52,7 @@ import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
-import mekhq.campaign.camOpsReputation.ReputationController;
+import mekhq.campaign.camOpsReputation.ForceReputationController;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.Finances;
@@ -177,7 +177,7 @@ public class CampaignFactory {
 
         megamek.common.enums.Faction techFaction = megamek.common.enums.Faction.MERC;
         CurrencyManager currencyManager = CurrencyManager.getInstance();
-        ReputationController reputationController = new ReputationController();
+        ForceReputationController reputationController = new ForceReputationController();
 
         FactionStandings factionStandings = new FactionStandings();
         RankSystem rankSystem = Ranks.getRankSystemFromCode(Ranks.DEFAULT_SYSTEM_CODE);

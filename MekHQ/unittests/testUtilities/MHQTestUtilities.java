@@ -32,6 +32,10 @@
  */
 package testUtilities;
 
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
@@ -53,6 +57,7 @@ import mekhq.campaign.CampaignFactory;
 import mekhq.campaign.CampaignSummary;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.market.PartsStore;
 import mekhq.campaign.market.TestPartsStore;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
@@ -138,6 +143,19 @@ public final class MHQTestUtilities {
         // compatibility handlers) will break.
         campaign.setVersion(new Version(999, 0, 0));
 
+        return campaign;
+    }
+
+    /**
+     * Returns a mocked {@link Campaign} whose {@link Campaign#getPlayerForce()} is stubbed with a deep-stub
+     * {@link PlayerForce}. This prevents {@link NullPointerException}s in production code that routes through
+     * {@code getPlayerForce().getX()}, while still allowing callers to layer additional stubbing on the returned mock.
+     *
+     * @return a {@link Campaign} mock with a non-null, deep-stubbed {@link PlayerForce}
+     */
+    public static Campaign mockCampaign() {
+        Campaign campaign = mock(Campaign.class);
+        when(campaign.getPlayerForce()).thenReturn(mock(PlayerForce.class, RETURNS_DEEP_STUBS));
         return campaign;
     }
 

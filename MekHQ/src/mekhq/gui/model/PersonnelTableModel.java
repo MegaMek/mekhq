@@ -120,10 +120,10 @@ public class PersonnelTableModel extends MHQTableModel<Person, PersonnelTableMod
 
     public void refreshData() {
         if (!isGroupByUnit()) {
-            setData(new ArrayList<>(campaign.getAllPersonnel()));
+            setData(new ArrayList<>(campaign.getPlayerForce().getHumanResources().getPersonnel()));
         } else {
             List<Person> commanders = new ArrayList<>();
-            for (Person person : campaign.getAllPersonnel()) {
+            for (Person person : campaign.getPlayerForce().getHumanResources().getPersonnel()) {
                 if ((person.getUnit() != null) && !person.equals(person.getUnit().getCommander())) {
                     // this person is NOT the commander of their unit,
                     // skip them.
@@ -266,7 +266,7 @@ public class PersonnelTableModel extends MHQTableModel<Person, PersonnelTableMod
                 return entityImageCache.computeIfAbsent(cacheKey,
                       key -> new ImageIcon(entityImage.loadPreviewImage(true)));
             } else if (personnelColumn == FORCE_GRAPHICAL) {
-                Formation formation = campaign.getFormationFor(person);
+                Formation formation = campaign.getPlayerForce().getFormationFor(person);
                 if (formation == null) {
                     return null;
                 }

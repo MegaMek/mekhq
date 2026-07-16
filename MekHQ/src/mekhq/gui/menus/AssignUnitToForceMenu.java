@@ -32,7 +32,6 @@
  */
 package mekhq.gui.menus;
 
-import static mekhq.campaign.force.Formation.FORMATION_ORIGIN;
 import static mekhq.utilities.EntityUtilities.isUnsupportedEntity;
 
 import java.util.Arrays;
@@ -113,42 +112,23 @@ public class AssignUnitToForceMenu extends JScrollableMenu {
 
 
     /**
-     * Creates the top-level force assignment structure, including:
+     * Assigns all provided units to the specified force.
      *
-     * <ul>
-     *     <li>A "clear assignment" option that removes units from all forces</li>
-     *     <li>A recursive force hierarchy beginning with {@link Formation#FORMATION_ORIGIN}</li>
-     * </ul>
+     * <p>This method wraps a call to {@link Campaign#addUnitToFormation(Unit, int)}, ensuring that each unit is moved to
+     * the provided force ID.</p>
      *
-     * @param campaign the campaign whose forces are available
-     * @param units    the units being reassigned
+     * @param campaign    the campaign receiving the assignment update
+     * @param units       the units to move
+     * @param originFormation the force to assign units to
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private void createForceAssignmentMenus(final Campaign campaign,
-          final Unit... units) {
-
-        JMenuItem clearAssignment = new JMenuItem(MHQInternationalization.getText("AssignUnitToForceMenu.clear"));
-        clearAssignment.addActionListener(ev -> {
-            for (Unit unit : units) {
-                Formation parentFormation = campaign.getFormationFor(unit);
-                if (null != parentFormation) {
-                    campaign.removeUnitFromFormation(unit);
-                    if (null != parentFormation.getTechID()) {
-                        unit.removeTech();
-                    }
-                }
-                // Clear any transport assignments of units in the deleted force
-                TOEMouseAdapter.clearTransportAssignment(campaign, unit);
-
-                MekHQ.triggerEvent(new OrganizationChangedEvent(campaign, parentFormation, unit));
-            }
-        });
-        add(clearAssignment);
-
-        Formation originFormation = campaign.getFormation(FORMATION_ORIGIN); // All other forces descend from this force
-        addForceMenu(this, campaign, units, originFormation);
+    private static void addToForce(Campaign campaign, Unit[] units, Formation originFormation) {
+        for (Unit unit : units) {
+            int id = originFormation.getId();
+            campaign.getPlayerForce().addUnitToFormation(unit, id, campaign);
+        }
     }
 
     /**
@@ -190,21 +170,42 @@ public class AssignUnitToForceMenu extends JScrollableMenu {
     }
 
     /**
-     * Assigns all provided units to the specified force.
+     * Creates the top-level force assignment structure, including:
      *
-     * <p>This method wraps a call to {@link Campaign#addUnitToFormation(Unit, int)}, ensuring that each unit is moved to
-     * the provided force ID.</p>
+     * <ul>
+     *     <li>A "clear assignment" option that removes units from all forces</li>
+     *     <li>A recursive force hierarchy beginning with {@link Formation#FORMATION_ORIGIN}</li>
+     * </ul>
      *
-     * @param campaign    the campaign receiving the assignment update
-     * @param units       the units to move
-     * @param originFormation the force to assign units to
+     * @param campaign the campaign whose forces are available
+     * @param units    the units being reassigned
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private static void addToForce(Campaign campaign, Unit[] units, Formation originFormation) {
-        for (Unit unit : units) {
-            campaign.addUnitToFormation(unit, originFormation.getId());
-        }
+    private void createForceAssignmentMenus(final Campaign campaign,
+          final Unit... units) {
+
+        JMenuItem clearAssignment = new JMenuItem(MHQInternationalization.getText("AssignUnitToForceMenu.clear"));
+        clearAssignment.addActionListener(ev -> {
+            for (Unit unit : units) {
+                Formation parentFormation = campaign.getPlayerForce().getFormationFor(unit);
+                if (null != parentFormation) {
+                    campaign.getPlayerForce().removeUnitFromFormation(unit, campaign);
+                    if (null != parentFormation.getTechID()) {
+                        unit.removeTech();
+                    }
+                }
+                // Clear any transport assignments of units in the deleted force
+                TOEMouseAdapter.clearTransportAssignment(campaign, unit);
+
+                MekHQ.triggerEvent(new OrganizationChangedEvent(campaign, parentFormation, unit));
+            }
+        });
+        add(clearAssignment);
+
+        Formation originFormation = campaign.getPlayerForce()
+                                          .getFormation(Formation.FORMATION_ORIGIN); // All other forces descend from this force
+        addForceMenu(this, campaign, units, originFormation);
     }
 }

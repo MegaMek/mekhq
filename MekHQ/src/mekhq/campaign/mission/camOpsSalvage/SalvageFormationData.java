@@ -47,7 +47,6 @@ import megamek.common.units.Entity;
 import megamek.common.units.Mek;
 import megamek.common.units.Tank;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Hangar;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationType;
@@ -64,7 +63,8 @@ public record SalvageFormationData(Formation formation, FormationType formationT
     public static SalvageFormationData buildData(Campaign campaign, Formation formation, boolean isSpaceScenario) {
         FormationType formationType = formation.getFormationType();
         UUID techId = formation.getTechID();
-        Person tech = techId == null || !formationType.isSalvage() ? null : campaign.getPerson(techId);
+        Person tech;
+        if (techId == null || !formationType.isSalvage()) {tech = null;} else {tech = campaign.getPerson(techId);}
         if (tech != null && tech.isEngineer()) { // Engineers cannot salvage
             tech = null;
         }
@@ -74,7 +74,7 @@ public record SalvageFormationData(Formation formation, FormationType formationT
         int salvageCapableUnits = 0;
         boolean hasTug = false;
 
-        Hangar hangar = campaign.getAllHangar();
+        mekhq.campaign.LocalHangar hangar = campaign.getPlayerForce().getHangar();
         for (Unit unit : formation.getAllUnitsAsUnits(hangar, false)) {
             if (!unit.isFullyCrewed()) {
                 continue;
@@ -167,7 +167,7 @@ public record SalvageFormationData(Formation formation, FormationType formationT
     }
 
     public String getAllCrewTechTooltip(Campaign campaign, Formation formation) {
-        Hangar hangar = campaign.getAllHangar();
+        mekhq.campaign.LocalHangar hangar = campaign.getPlayerForce().getHangar();
 
         StringBuilder tooltip = new StringBuilder();
         for (Unit unit : formation.getAllUnitsAsUnits(hangar, false)) {
@@ -181,24 +181,24 @@ public record SalvageFormationData(Formation formation, FormationType formationT
         return tooltip.toString();
     }
 
-    public String getCargoCapacityTooltip(Hangar hangar) {
+    public String getCargoCapacityTooltip(mekhq.campaign.LocalHangar hangar) {
         LinkedHashMap<String, Double> capacityMap = getMap(hangar, false);
         StringBuilder tooltip = getTooltip(capacityMap);
         return tooltip.toString();
     }
 
-    public String getTowCapacityTooltip(Hangar hangar) {
+    public String getTowCapacityTooltip(mekhq.campaign.LocalHangar hangar) {
         LinkedHashMap<String, Double> capacityMap = getMap(hangar, true);
         StringBuilder tooltip = getTooltip(capacityMap);
         return tooltip.toString();
     }
 
-    private LinkedHashMap<String, Double> getMap(Hangar hangar, boolean isTow) {
+    private LinkedHashMap<String, Double> getMap(mekhq.campaign.LocalHangar hangar, boolean isTow) {
         Map<String, Double> unsortedMap = getUnsortedMap(hangar, isTow);
         return getSortedMap(unsortedMap);
     }
 
-    private Map<String, Double> getUnsortedMap(Hangar hangar, boolean isTow) {
+    private Map<String, Double> getUnsortedMap(mekhq.campaign.LocalHangar hangar, boolean isTow) {
         Map<String, Double> capacityMap = new HashMap<>();
         for (Unit unit : formation.getAllUnitsAsUnits(hangar, false)) {
             Entity entity = unit.getEntity();
@@ -236,7 +236,7 @@ public record SalvageFormationData(Formation formation, FormationType formationT
         return tooltip;
     }
 
-    public String getTugTooltip(Hangar hangar) {
+    public String getTugTooltip(mekhq.campaign.LocalHangar hangar) {
         Map<String, Boolean> capacityMap = new HashMap<>();
         for (Unit unit : formation.getAllUnitsAsUnits(hangar, false)) {
             Entity entity = unit.getEntity();

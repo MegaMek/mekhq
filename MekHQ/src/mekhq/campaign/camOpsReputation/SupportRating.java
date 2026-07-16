@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -112,7 +112,7 @@ public class SupportRating {
         LocalDate today = campaign.getLocalDate();
 
         int administratorCount = 0;
-        for (Person person : campaign.getActivePersonnel(false, false)) {
+        for (Person person : campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false)) {
             boolean isAdult = !person.isChild(today);
 
             if (isAdult &&
@@ -297,7 +297,7 @@ public class SupportRating {
         techCounts.put("techAeroCount", 0);
         techCounts.put("techBattleArmorCount", 0);
 
-        for (Person person : campaign.getActivePersonnel(false, false)) {
+        for (Person person : campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false)) {
             updateCount(person::isTechMek, "techMekCount", techCounts);
             updateCount(person::isTechMechanic, "techMechanicCount", techCounts);
             updateCount(person::isTechAero, "techAeroCount", techCounts);

@@ -46,6 +46,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -54,9 +55,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Hangar;
 import mekhq.campaign.JumpPath;
-import mekhq.campaign.camOpsReputation.ReputationController;
+import mekhq.campaign.LocalHangar;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.finances.Accountant;
@@ -125,7 +125,7 @@ class AtbMonthlyContractMarketTest {
         private static final String REACHABLE_TARGET_ID = "REACHABLE_TARGET";
         private static final String INTERMEDIATE_SYSTEM_ID = "INTERMEDIATE";
 
-        private final Campaign campaign = mock(Campaign.class);
+        private final Campaign campaign = mockCampaign();
         private final Faction employerFaction = mockFaction(EMPLOYER_CODE, "Contract Employer");
         private final Faction enemyFaction = mockFaction(ENEMY_CODE, "Contract Enemy");
         private final PlanetarySystem currentSystem = mockSystem(CURRENT_SYSTEM_ID);
@@ -148,7 +148,7 @@ class AtbMonthlyContractMarketTest {
             CampaignOptions campaignOptions = mock(CampaignOptions.class);
             when(campaignOptions.getContractMaxSalvagePercentage()).thenReturn(100);
 
-            ReputationController reputation = mock(ReputationController.class);
+            mekhq.campaign.camOpsReputation.ForceReputationController reputation = mock(mekhq.campaign.camOpsReputation.ForceReputationController.class);
             when(reputation.getReputationFactor()).thenReturn(1.0);
             when(reputation.getAverageSkillLevel()).thenReturn(REGULAR);
 
@@ -157,7 +157,7 @@ class AtbMonthlyContractMarketTest {
             when(accountant.getOverheadExpenses()).thenReturn(Money.of(1));
             when(accountant.getPeacetimeCost()).thenReturn(Money.of(1));
 
-            Hangar hangar = mock(Hangar.class);
+            LocalHangar hangar = mock(LocalHangar.class);
             doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
 
             when(campaign.getFaction()).thenReturn(employerFaction);
@@ -165,9 +165,9 @@ class AtbMonthlyContractMarketTest {
             when(campaign.getLocalDate()).thenReturn(TODAY);
             when(campaign.getGameYear()).thenReturn(GAME_YEAR);
             when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
-            when(campaign.getReputation()).thenReturn(reputation);
+            when(campaign.getPlayerForce().getReputation()).thenReturn(reputation);
             when(campaign.getAccountant()).thenReturn(accountant);
-            when(campaign.getAllHangar()).thenReturn(hangar);
+            when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
             when(campaign.getCurrentSystem()).thenReturn(currentSystem);
             when(campaign.getFutureAtBContracts()).thenReturn(List.of());
         }

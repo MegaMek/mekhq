@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,7 +32,6 @@
  */
 package mekhq.gui.dialog;
 
-import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.List;
@@ -64,7 +63,11 @@ public class VocationalExperienceAwardDialog extends ImmersiveDialogSimple {
      * @param campaign the {@link Campaign} to which this dialog is tied
      */
     public VocationalExperienceAwardDialog(Campaign campaign) {
-        super(campaign, campaign.getSeniorAdminPerson(HR),
+        super(campaign, campaign.getPlayerForce().getHumanResources()
+                              .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.HR,
+                                    campaign.getCampaignOptions(),
+                                    campaign.isClanCampaign(),
+                                    campaign.getLocalDate()),
               null,
               createInCharacterMessage(campaign), null,
               createOutOfCharacterMessage(campaign),
@@ -86,7 +89,7 @@ public class VocationalExperienceAwardDialog extends ImmersiveDialogSimple {
      * @return a string representing the in-character message in HTML format
      */
     private static String createInCharacterMessage(Campaign campaign) {
-        List<Person> personnelWhoAdvanced = campaign.getPersonnelWhoAdvancedInXP();
+        List<Person> personnelWhoAdvanced = campaign.getPlayerForce().getHumanResources().getPersonnelWhoAdvancedInXP();
 
         String commanderAddress = campaign.getCommanderAddress();
 

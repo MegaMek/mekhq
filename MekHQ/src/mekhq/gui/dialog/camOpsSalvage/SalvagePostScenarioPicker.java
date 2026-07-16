@@ -72,7 +72,6 @@ import megamek.common.units.Tank;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Hangar;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Formation;
@@ -331,7 +330,10 @@ public class SalvagePostScenarioPicker {
             }
 
             RecoveryTimeData data = RecoveryTimeCalculations.calculateRecoveryTimeForEntity(entity.getDisplayName(),
-                  entity.getRecoveryTime(), scenario, campaign.getCurrentLocation().getPlanet());
+                  entity.getRecoveryTime(), scenario, campaign.getPlayerForce()
+                                                            .getForceDetachment()
+                                                            .getCurrentLocation()
+                                                            .getPlanet());
             recoveryTimeData.put(unit.getId(), data);
         }
     }
@@ -353,11 +355,11 @@ public class SalvagePostScenarioPicker {
     private List<Integer> setSalvageUnits(Campaign campaign, Scenario scenario) {
         List<Integer> salvageFormations = new ArrayList<>();
         salvageUnits = new ArrayList<>();
-        Hangar hangar = campaign.getHangar();
+        mekhq.campaign.LocalHangar hangar = campaign.getPlayerForce().getHangar();
         for (Integer forceId : scenario.getSalvageFormations()) {
             salvageFormations.add(forceId);
 
-            Formation formation = campaign.getFormation(forceId);
+            Formation formation = campaign.getPlayerForce().getFormation(forceId);
             if (formation == null) {
                 LOGGER.error("Force {} not found in campaign", forceId);
                 continue;

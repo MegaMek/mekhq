@@ -33,8 +33,6 @@
 package mekhq.gui.dialog.nagDialogs;
 
 import static mekhq.MHQConstants.NAG_PRISONERS;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 import static mekhq.campaign.force.FormationType.SECURITY;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.PrisonersNagLogic.hasPrisoners;
 
@@ -71,7 +69,7 @@ public class PrisonersNagDialog extends ImmersiveDialogNag {
      */
     @Override
     protected @Nullable Person getSpeaker(Campaign campaign, @Nullable AdministratorSpecialization specialization) {
-        List<Formation> formations = campaign.getAllFormations();
+        List<Formation> formations = campaign.getPlayerForce().getAllFormations();
 
 
         Person speaker = null;
@@ -113,10 +111,18 @@ public class PrisonersNagDialog extends ImmersiveDialogNag {
      *       is available.
      */
     private @Nullable Person getFallbackSpeaker(Campaign campaign) {
-        Person speaker = campaign.getSeniorAdminPerson(TRANSPORT);
+        Person speaker = campaign.getPlayerForce().getHumanResources()
+                               .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT,
+                                     campaign.getCampaignOptions(),
+                                     campaign.isClanCampaign(),
+                                     campaign.getLocalDate());
 
         if (speaker == null) {
-            speaker = campaign.getSeniorAdminPerson(COMMAND);
+            speaker = campaign.getPlayerForce().getHumanResources()
+                            .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND,
+                                  campaign.getCampaignOptions(),
+                                  campaign.isClanCampaign(),
+                                  campaign.getLocalDate());
         } else {
             return speaker;
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -37,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -66,14 +67,14 @@ class UnableToAffordLoanPaymentNagLogicTest {
     void init() {
         // Initialize the mock objects
         //  for the tests
-        Campaign campaign = mock(Campaign.class);
+        Campaign campaign = mockCampaign();
         today = LocalDate.now();
         finances = mock(Finances.class);
         firstLoan = mock(Loan.class);
         secondLoan = mock(Loan.class);
 
         // Stubs
-        when(campaign.getFinances()).thenReturn(finances);
+        when(campaign.getPlayerForce().getFinances()).thenReturn(finances);
         when(campaign.getLocalDate()).thenReturn(today);
 
         when(firstLoan.getPaymentAmount()).thenReturn(Money.of(5));

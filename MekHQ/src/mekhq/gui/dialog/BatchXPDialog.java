@@ -166,7 +166,7 @@ public final class BatchXPDialog extends JDialog {
         DefaultComboBoxModel<PersonTypeItem> personRankModel = new DefaultComboBoxModel<>();
         personRankModel.addElement(new PersonTypeItem(resourceMap.getString("rank.choice.text"), null));
 
-        final List<Rank> ranks = campaign.getRankSystem().getRanks();
+        final List<Rank> ranks = campaign.getPlayerForce().getRankSystem().getRanks();
         for (int i = 0; i < ranks.size(); i++) {
             personRankModel.addElement(new PersonTypeItem(ranks.get(i).getRankNamesAsString(", "), i));
         }
@@ -361,7 +361,7 @@ public final class BatchXPDialog extends JDialog {
                       campaign.getLocalDate(),
                       skillName,
                       skill.getLevel());
-                campaign.personUpdated(person);
+                campaign.getPlayerForce().getHumanResources().personUpdated(campaign, person);
             }
 
             // Refresh the filter and continue if we still have anyone available

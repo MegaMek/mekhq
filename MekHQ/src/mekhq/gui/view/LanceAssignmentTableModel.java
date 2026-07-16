@@ -107,7 +107,10 @@ class LanceAssignmentTableModel extends DataTableModel<CombatTeam> {
             return "";
         }
         return switch (column) {
-            case COL_FORCE -> campaign.getFormation(data.get(row).getFormationId());
+            case COL_FORCE -> {
+                int id = data.get(row).getFormationId();
+                yield campaign.getPlayerForce().getFormation(id);
+            }
             case COL_WEIGHT_CLASS -> WEIGHT_CODES[data.get(row).getWeightClass(campaign)];
             case COL_CONTRACT -> campaign.getMission(data.get(row).getMissionId());
             case COL_ROLE -> data.get(row).getRole();

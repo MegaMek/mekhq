@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -544,7 +544,8 @@ public class StoryArc {
         }
 
         // get commander information
-        Person commander = c.getCommander();
+        Person commander = c.getPlayerForce().getHumanResources()
+                                 .getCommander(c.getCampaignOptions(), c.isClanCampaign(), c.getLocalDate());
         if (null == commander) {
             // shouldn't happen unless there are no personnel, but just in case
             replacementTokens.put("\\{commanderCallsign\\}", "callsign(?)");

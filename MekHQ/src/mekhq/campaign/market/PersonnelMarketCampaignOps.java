@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -60,25 +60,43 @@ public class PersonnelMarketCampaignOps implements PersonnelMarketMethod {
         Person p = null;
         int roll = Compute.d6(2);
         if (roll == 2) { // Medical
-            p = c.newPerson(PersonnelRole.DOCTOR);
+            p = c.getPlayerForce()
+                      .getHumanResources()
+                      .newPerson(c, mekhq.campaign.personnel.enums.PersonnelRole.DOCTOR);
         } else if (roll == 3) { // ASF or Proto Pilot
             if (c.getFaction().isClan() && c.getLocalDate().isAfter(LocalDate.of(3059, 1, 1))
                       && Compute.d6(2) < 6) {
-                p = c.newPerson(PersonnelRole.PROTOMEK_PILOT);
+                p = c.getPlayerForce()
+                          .getHumanResources()
+                          .newPerson(c, mekhq.campaign.personnel.enums.PersonnelRole.PROTOMEK_PILOT);
             } else {
-                p = c.newPerson(PersonnelRole.AEROSPACE_PILOT);
+                p = c.getPlayerForce()
+                          .getHumanResources()
+                          .newPerson(c, mekhq.campaign.personnel.enums.PersonnelRole.AEROSPACE_PILOT);
             }
         } else if (roll == 4 || roll == 10) { // MW
-            p = c.newPerson(PersonnelRole.MEKWARRIOR);
+            p = c.getPlayerForce()
+                      .getHumanResources()
+                      .newPerson(c, mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR);
         } else if (roll == 5 || roll == 9) { // Vehicle Crews
-            p = c.newPerson(PersonnelRole.VEHICLE_CREW_GROUND);
+            p = c.getPlayerForce()
+                      .getHumanResources()
+                      .newPerson(c, mekhq.campaign.personnel.enums.PersonnelRole.VEHICLE_CREW_GROUND);
         } else if (roll == 6 || roll == 8) { // Infantry
-            p = c.newPerson((c.getFaction().isClan() && Compute.d6(2) > 3)
-                                  ? PersonnelRole.BATTLE_ARMOUR : PersonnelRole.SOLDIER);
+            final mekhq.campaign.personnel.enums.PersonnelRole role = (c.getFaction().isClan() &&
+                                                                             megamek.common.compute.Compute.d6(2) > 3)
+                                                                            ?
+                                                                            mekhq.campaign.personnel.enums.PersonnelRole.BATTLE_ARMOUR :
+                                                                            mekhq.campaign.personnel.enums.PersonnelRole.SOLDIER;
+            p = c.getPlayerForce().getHumanResources().newPerson(c, role);
         } else if (roll == 11) { // Tech
-            p = c.newPerson(techRoles.get(Compute.randomInt(techRoles.size())));
+            final mekhq.campaign.personnel.enums.PersonnelRole role = techRoles.get(megamek.common.compute.Compute.randomInt(
+                  techRoles.size()));
+            p = c.getPlayerForce().getHumanResources().newPerson(c, role);
         } else if (roll == 12) { // Vessel Crew
-            p = c.newPerson(vesselRoles.get(Compute.randomInt(vesselRoles.size())));
+            final mekhq.campaign.personnel.enums.PersonnelRole role = vesselRoles.get(megamek.common.compute.Compute.randomInt(
+                  vesselRoles.size()));
+            p = c.getPlayerForce().getHumanResources().newPerson(c, role);
         }
         if (p != null) {
             return Collections.singletonList(p);

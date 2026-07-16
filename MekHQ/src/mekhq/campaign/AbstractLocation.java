@@ -34,7 +34,6 @@
 package mekhq.campaign;
 
 import static megamek.common.compute.Compute.randomInt;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.personnel.PersonnelOptions.FLAW_TRANSIT_DISORIENTATION_SYNDROME;
 import static mekhq.campaign.personnel.medical.BodyLocation.GENERIC;
@@ -165,13 +164,26 @@ public abstract class AbstractLocation implements IPlace {
         return computeIsUseCommandCircuit(campaign, campaign.getCampaignOptions());
     }
 
-    protected boolean computeIsUseCommandCircuit(Campaign campaign, CampaignOptions campaignOptions) {
-        return FactionStandingUtilities.isUseCommandCircuit(
-              campaign.isOverridingCommandCircuitRequirements(),
-              campaign.isGM(),
-              campaignOptions.isUseFactionStandingCommandCircuitSafe(),
-              campaign.getFactionStandings(),
-              campaign.getFutureAtBContracts());
+    /**
+     * Checks all personnel in the given campaign for the "Transit Disorientation Syndrome" flaw and applies fatigue
+     * adjustments if specified. Personnel without the flaw are ignored.
+     *
+     * @param campaign     The campaign instance containing the personnel to check.
+     * @param isUseFatigue If true, applies fatigue adjustments to affected personnel.
+     * @param fatigueRate  The rate at which fatigue is applied to the affected personnel.
+     */
+    static void checkForTransitDisorientationSyndrome(Campaign campaign, boolean isUseFatigue, int fatigueRate) {
+        if (isUseFatigue) {
+            for (Person person : campaign.getPlayerForce()
+                                       .getHumanResources()
+                                       .getPersonnelFilteringOutDepartedAndAbsent()) {
+                if (!person.getOptions().booleanOption(FLAW_TRANSIT_DISORIENTATION_SYNDROME)) {
+                    continue;
+                }
+
+                person.changeFatigue(fatigueRate);
+            }
+        }
     }
 
     public double getRechargeTime() {
@@ -210,7 +222,16 @@ public abstract class AbstractLocation implements IPlace {
               isSilentProcessing);
     }
 
-    void checkForDiseaseOrBioweaponOutbreaks(Campaign campaign, LocalDate today) {
+    protected boolean computeIsUseCommandCircuit(Campaign campaign, CampaignOptions campaignOptions) {
+        return FactionStandingUtilities.isUseCommandCircuit(
+              campaign.getPlayerForce().isOverridingCommandCircuitRequirements(),
+              campaign.isGM(),
+              campaignOptions.isUseFactionStandingCommandCircuitSafe(),
+              campaign.getPlayerForce().getFactionStandings(),
+              campaign.getFutureAtBContracts());
+    }
+
+    public void checkForDiseaseOrBioweaponOutbreaks(Campaign campaign, LocalDate today) {
         Set<InjuryType> availableCures = getAllSystemSpecificDiseasesWithCures(currentSystem.getId(), today, true);
 
         Set<InjuryType> activeBioweapons = getAllActiveBioweapons(currentSystem.getId(), today, true);
@@ -223,7 +244,10 @@ public abstract class AbstractLocation implements IPlace {
                                    ? getTextAt(RESOURCE_BUNDLE, "disease.outOfCharacter.vaccineStatus.available")
                                    : getTextAt(RESOURCE_BUNDLE, "disease.outOfCharacter.vaccineStatus.none");
 
-            new ImmersiveDialogSimple(campaign, campaign.getSeniorMedicalPerson(), null,
+            new ImmersiveDialogSimple(campaign, campaign.getPlayerForce().getHumanResources()
+                                                      .getSeniorMedicalPerson(campaign.getCampaignOptions(),
+                                                            campaign.isClanCampaign(),
+                                                            campaign.getLocalDate()), null,
                   centerMessage, null, bottomMessage, null, false, ImmersiveDialogWidth.LARGE);
         }
 
@@ -237,7 +261,10 @@ public abstract class AbstractLocation implements IPlace {
                                    ? getTextAt(RESOURCE_BUNDLE, "disease.outOfCharacter.vaccineStatus.available")
                                    : getTextAt(RESOURCE_BUNDLE, "disease.outOfCharacter.vaccineStatus.none");
 
-            new ImmersiveDialogSimple(campaign, campaign.getSeniorMedicalPerson(), null,
+            new ImmersiveDialogSimple(campaign, campaign.getPlayerForce().getHumanResources()
+                                                      .getSeniorMedicalPerson(campaign.getCampaignOptions(),
+                                                            campaign.isClanCampaign(),
+                                                            campaign.getLocalDate()), null,
                   centerMessage, null, bottomMessage, null, false, ImmersiveDialogWidth.LARGE);
         }
     }
@@ -249,7 +276,7 @@ public abstract class AbstractLocation implements IPlace {
      *
      * @param campaign The {@link Campaign} instance.
      */
-    void testForEarlyArrival(Campaign campaign) {
+    public void testForEarlyArrival(Campaign campaign) {
         for (Contract contract : campaign.getFutureContracts()) {
             if (Objects.equals(currentSystem, contract.getSystem())) {
                 int daysTillStart = campaign.getLocalDate().until(contract.getStartDate()).getDays();
@@ -259,31 +286,15 @@ public abstract class AbstractLocation implements IPlace {
                       campaign.getCommanderAddress(),
                       daysTillStart);
 
-                new ImmersiveDialogSimple(campaign, campaign.getSeniorAdminPerson(TRANSPORT), null,
+                new ImmersiveDialogSimple(campaign, campaign.getPlayerForce().getHumanResources()
+                                                          .getSeniorAdminPerson(Campaign.AdministratorSpecialization.TRANSPORT,
+                                                                campaign.getCampaignOptions(),
+                                                                campaign.isClanCampaign(),
+                                                                campaign.getLocalDate()), null,
                       inCharacterMessage, null,
                       getFormattedTextAt(RESOURCE_BUNDLE, "contract.arrivedEarly.ooc"),
                       null, false);
                 break;
-            }
-        }
-    }
-
-    /**
-     * Checks all personnel in the given campaign for the "Transit Disorientation Syndrome" flaw and applies fatigue
-     * adjustments if specified. Personnel without the flaw are ignored.
-     *
-     * @param campaign     The campaign instance containing the personnel to check.
-     * @param isUseFatigue If true, applies fatigue adjustments to affected personnel.
-     * @param fatigueRate  The rate at which fatigue is applied to the affected personnel.
-     */
-    static void checkForTransitDisorientationSyndrome(Campaign campaign, boolean isUseFatigue, int fatigueRate) {
-        if (isUseFatigue) {
-            for (Person person : campaign.getPersonnelFilteringOutDepartedAndAbsent()) {
-                if (!person.getOptions().booleanOption(FLAW_TRANSIT_DISORIENTATION_SYNDROME)) {
-                    continue;
-                }
-
-                person.changeFatigue(fatigueRate);
             }
         }
     }

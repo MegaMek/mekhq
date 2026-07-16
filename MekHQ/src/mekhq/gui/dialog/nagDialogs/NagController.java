@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -98,16 +98,19 @@ public class NagController {
             }
         }
 
-        final List<Person> activePersonnel = campaign.getActivePersonnel(false, false);
+        final List<Person> activePersonnel = campaign.getPlayerForce()
+                                                   .getHumanResources()
+                                                   .getActivePersonnel(false, false);
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
         final int doctorCapacity = campaignOptions.getMaximumPatients();
         final boolean isDoctorsUseAdministration = campaignOptions.isDoctorsUseAdministration();
 
         // Untreated personnel
         boolean isUseMASHTheatres = campaignOptions.isUseMASHTheatres();
-        int mashTheatreCapacity = isUseMASHTheatres && campaign.isOnContractAndPlanetside() ?
-                                        campaign.calculateMASHTheaterCapacity() :
-                                        Integer.MAX_VALUE;
+        int mashTheatreCapacity;
+        mashTheatreCapacity = isUseMASHTheatres && campaign.isOnContractAndPlanetside() ?
+                                    campaign.getPlayerForce().calculateMASHTheaterCapacity(campaign) :
+                                    Integer.MAX_VALUE;
         if (UntreatedPersonnelNagDialog.checkNag(activePersonnel,
               doctorCapacity,
               isDoctorsUseAdministration,
@@ -137,7 +140,7 @@ public class NagController {
         }
 
         // Unable to afford next loan payment
-        final Finances finances = campaign.getFinances();
+        final Finances finances = campaign.getPlayerForce().getFinances();
 
         if (UnableToAffordLoanPaymentNagDialog.checkNag(finances.getLoans(), today, finances.getBalance())) {
             UnableToAffordLoanPaymentNagDialog unableToAffordLoanPaymentNagDialog = new UnableToAffordLoanPaymentNagDialog(
@@ -148,8 +151,8 @@ public class NagController {
         }
 
         // Unable to afford all items on shopping list
-        final Money totalBuyCost = campaign.getShoppingList().getTotalBuyCost();
-        final Money currentFunds = campaign.getFunds();
+        final Money totalBuyCost = campaign.getPlayerForce().getShoppingList().getTotalBuyCost();
+        final Money currentFunds = campaign.getPlayerForce().getFunds();
         if (UnableToAffordShoppingListNagDialog.checkNag(totalBuyCost, currentFunds)) {
             UnableToAffordShoppingListNagDialog unableToAffordShoppingListNagDialog = new UnableToAffordShoppingListNagDialog(
                   campaign);
@@ -170,7 +173,7 @@ public class NagController {
         }
 
         // Insufficient Medics
-        if (InsufficientMedicsNagDialog.checkNag(campaign.getMedicsNeed())) {
+        if (InsufficientMedicsNagDialog.checkNag(campaign.getPlayerForce().getHumanResources().getMedicsNeed())) {
             InsufficientMedicsNagDialog insufficientMedicsNagDialog = new InsufficientMedicsNagDialog(campaign);
             if (insufficientMedicsNagDialog.shouldCancelAdvanceDay()) {
                 return true;
@@ -178,7 +181,9 @@ public class NagController {
         }
 
         // Insufficient AsTechs
-        if (InsufficientAsTechsNagDialog.checkNag(campaign.getAsTechNeed())) {
+        if (InsufficientAsTechsNagDialog.checkNag(campaign.getPlayerForce()
+                                                        .getHumanResources()
+                                                        .getAsTechNeed(campaign.getCampaignOptions()))) {
             InsufficientAsTechsNagDialog insufficientAstechsNagDialog = new InsufficientAsTechsNagDialog(campaign);
             if (insufficientAstechsNagDialog.shouldCancelAdvanceDay()) {
                 return true;
@@ -186,9 +191,13 @@ public class NagController {
         }
 
         // Insufficient AsTech Time
-        final int possibleAsTechPoolMinutes = campaign.getPossibleAsTechPoolMinutes();
+        final int possibleAsTechPoolMinutes = campaign.getPlayerForce()
+                                                    .getHumanResources()
+                                                    .getPossibleAsTechPoolMinutes(campaign.getCampaignOptions());
         final boolean isOvertimeAllowed = campaign.isOvertimeAllowed();
-        final int possibleAsTechPoolOvertime = campaign.getPossibleAsTechPoolOvertime();
+        final int possibleAsTechPoolOvertime = campaign.getPlayerForce()
+                                                     .getHumanResources()
+                                                     .getPossibleAsTechPoolOvertime(campaign.getCampaignOptions());
 
         if (InsufficientAstechTimeNagDialog.checkNag(units,
               possibleAsTechPoolMinutes,
@@ -233,7 +242,7 @@ public class NagController {
 
         // Prisoners of War
         final boolean hasActiveContract = campaign.hasActiveContract();
-        final boolean hasPrisoners = !campaign.getCurrentPrisoners().isEmpty();
+        final boolean hasPrisoners = !campaign.getPlayerForce().getHumanResources().getCurrentPrisoners().isEmpty();
 
         if (PrisonersNagDialog.checkNag(hasActiveContract, hasPrisoners)) {
             PrisonersNagDialog prisonersNagDialog = new PrisonersNagDialog(campaign);

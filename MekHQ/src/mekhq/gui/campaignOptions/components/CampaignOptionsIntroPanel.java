@@ -33,7 +33,7 @@
 package mekhq.gui.campaignOptions.components;
 
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.CAMPAIGN_OPTIONS_PANEL_WIDTH;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.campaignOptionsPanelWidth;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -77,7 +77,7 @@ public class CampaignOptionsIntroPanel extends JPanel {
     }
 
     private static int getTextWidth(int textWidth) {
-        return Math.max(1, Math.min(textWidth, CAMPAIGN_OPTIONS_PANEL_WIDTH));
+        return Math.max(1, Math.min(textWidth, campaignOptionsPanelWidth()));
     }
 
     private static Dimension getWrappedTextSize(JEditorPane textPane, int textWidth) {

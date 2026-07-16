@@ -41,6 +41,7 @@ import java.util.function.Consumer;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JViewport;
 import javax.swing.Scrollable;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
@@ -83,7 +84,7 @@ class CampaignOptionsContentHost extends JPanel {
 
         contentScrollPane = new FastJScrollPane(contentPanel,
               ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-              ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+              ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         contentScrollPane.setName("campaignOptionsContentScrollPane");
 
         add(contentScrollPane, BorderLayout.CENTER);
@@ -220,6 +221,12 @@ class CampaignOptionsContentHost extends JPanel {
 
         @Override
         public boolean getScrollableTracksViewportWidth() {
+            // When the scaled content is wider than the viewport (high GUI scale), report false so the scroll pane
+            // shows a horizontal scrollbar instead of clipping the right edge (section controls, wide fields).
+            Container parent = getParent();
+            if (parent instanceof JViewport viewport) {
+                return viewport.getWidth() >= getPreferredSize().width;
+            }
             return true;
         }
 

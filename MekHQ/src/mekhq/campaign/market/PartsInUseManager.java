@@ -46,8 +46,7 @@ import megamek.common.equipment.WeaponType;
 import megamek.common.units.Entity;
 import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Quartermaster;
-import mekhq.campaign.Warehouse;
+import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.location.IPlace;
@@ -98,9 +97,9 @@ public class PartsInUseManager {
     private final Campaign campaign;
     private final IPlace place;
     private final CampaignOptions campaignOptions;
-    private final Warehouse warehouse;
-    private final ShoppingList shoppingList;
-    private final Quartermaster quartermaster;
+    private final LocalWarehouse warehouse;
+    private final ForceShoppingList shoppingList;
+    private final mekhq.campaign.ForceQuartermaster quartermaster;
     private final Map<String, Double> partsInUseRequestedStockMap;
 
     /**
@@ -109,7 +108,7 @@ public class PartsInUseManager {
      * @param campaign the {@link Campaign} to manage parts for
      */
     public PartsInUseManager(Campaign campaign) {
-        this(campaign, campaign);
+        this(campaign, campaign.getPlayerForce().getForceDetachment());
     }
 
     /**
@@ -125,9 +124,9 @@ public class PartsInUseManager {
         this.campaign = campaign;
         this.place = place;
         this.campaignOptions = campaign.getCampaignOptions();
-        Warehouse placeWarehouse = place.getWarehouse();
-        this.warehouse = (placeWarehouse != null) ? placeWarehouse : campaign.getWarehouse();
-        this.shoppingList = campaign.getShoppingList();
+        LocalWarehouse placeWarehouse = place.getWarehouse();
+        this.warehouse = placeWarehouse != null ? placeWarehouse : campaign.getPlayerForce().getWarehouse();
+        this.shoppingList = campaign.getPlayerForce().getShoppingList();
         this.quartermaster = campaign.getQuartermaster();
         this.partsInUseRequestedStockMap = place.getRequestedStockLevels().getStockMap();
     }
@@ -135,7 +134,7 @@ public class PartsInUseManager {
     /** The place a part is located at — its unit's location for installed parts, its warehouse for spares. */
     private IPlace placeOf(Part part) {
         IPlace partPlace = part.getPlace();
-        return (partPlace != null) ? partPlace : campaign;
+        return (partPlace != null) ? partPlace : campaign.getPlayerForce().getForceDetachment();
     }
 
     /**
@@ -144,7 +143,7 @@ public class PartsInUseManager {
      * location regardless of which warehouse map physically holds the part (installed parts follow their unit's base).
      */
     private void forEachPartAtPlace(Consumer<Part> consumer) {
-        campaign.getWarehouse().forEachPart(part -> {
+        campaign.getPlayerForce().getWarehouse().forEachPart(part -> {
             if (placeOf(part) == place) {
                 consumer.accept(part);
             }

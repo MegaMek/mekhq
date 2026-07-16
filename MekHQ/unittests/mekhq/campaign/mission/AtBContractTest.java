@@ -44,6 +44,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -55,7 +56,6 @@ import megamek.common.equipment.EquipmentType;
 import megamek.common.units.Entity;
 import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Hangar;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
@@ -101,7 +101,7 @@ public class AtBContractTest {
 
     @BeforeEach
     void setup() {
-        campaign = mock(Campaign.class);
+        campaign = mockCampaign();
         options = mock(CampaignOptions.class);
         when(campaign.getCampaignOptions()).thenReturn(options);
         contract = new AtBContract();
@@ -109,7 +109,7 @@ public class AtBContractTest {
 
     @Test
     public void atbContractRestoreDoesNothingWithoutParent() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         int childId = 2;
         AtBContract child = new AtBContract();
@@ -127,7 +127,7 @@ public class AtBContractTest {
 
     @Test
     public void atbContractRestoresRefs() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         int parentId = 1;
         AtBContract parent = mock(AtBContract.class);
@@ -154,7 +154,7 @@ public class AtBContractTest {
 
     @Test
     public void atbContractRestoreClearsParentIfMissing() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         int parentId = 1;
         doReturn(null).when(mockCampaign).getMission(eq(parentId));
@@ -179,7 +179,7 @@ public class AtBContractTest {
 
     @Test
     public void atbContractRestoreClearsParentIfWrongType() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         int parentId = 1;
         Contract parent = mock(Contract.class);
@@ -271,7 +271,7 @@ public class AtBContractTest {
         Faction mockFaction;
         Campaign mockCampaign;
 
-        Hangar hangar;
+        mekhq.campaign.LocalHangar hangar;
 
         public static Stream<Arguments> getFormationSizesForTests() {
             return Stream.of(
@@ -285,13 +285,13 @@ public class AtBContractTest {
         @BeforeEach
         void beforeEach() {
             nextForceId = 0;
-            hangar = new Hangar();
+            hangar = new mekhq.campaign.LocalHangar();
 
             mockFaction = mock(Faction.class);
-            mockCampaign = mock(Campaign.class);
+            mockCampaign = mockCampaign();
 
             when(mockCampaign.getFaction()).thenReturn(mockFaction);
-            when(mockCampaign.getHangar()).thenReturn(hangar);
+            when(mockCampaign.getPlayerForce().getHangar()).thenReturn(hangar);
         }
 
         @ParameterizedTest
@@ -300,7 +300,7 @@ public class AtBContractTest {
             // Arrange
             ArrayList<CombatTeam> mockedCombatTeams = new ArrayList<>();
 
-            when(mockCampaign.getCombatTeamsAsList()).thenReturn(mockedCombatTeams);
+            when(mockCampaign.getPlayerForce().getCombatTeamsAsList(mockCampaign)).thenReturn(mockedCombatTeams);
 
             // Act
             int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false, true, 1.0);
@@ -317,7 +317,7 @@ public class AtBContractTest {
             ArrayList<CombatTeam> mockedCombatTeams = new ArrayList<>();
             mockedCombatTeams.add(getMockLanceCombatTeam(formationSize));
 
-            when(mockCampaign.getCombatTeamsAsList()).thenReturn(mockedCombatTeams);
+            when(mockCampaign.getPlayerForce().getCombatTeamsAsList(mockCampaign)).thenReturn(mockedCombatTeams);
 
             // Act
             int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false, true, 1.0);
@@ -336,7 +336,7 @@ public class AtBContractTest {
                 mockedCombatTeams.add(getMockLanceCombatTeam(formationSize));
             }
 
-            when(mockCampaign.getCombatTeamsAsList()).thenReturn(mockedCombatTeams);
+            when(mockCampaign.getPlayerForce().getCombatTeamsAsList(mockCampaign)).thenReturn(mockedCombatTeams);
 
             // Act
             int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false, true, 1.0);
@@ -355,7 +355,7 @@ public class AtBContractTest {
                 mockedCombatTeams.add(getMockLanceCombatTeam(formationSize));
             }
 
-            when(mockCampaign.getCombatTeamsAsList()).thenReturn(mockedCombatTeams);
+            when(mockCampaign.getPlayerForce().getCombatTeamsAsList(mockCampaign)).thenReturn(mockedCombatTeams);
 
             // Act
             int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false, true, 1.0);
@@ -372,7 +372,7 @@ public class AtBContractTest {
             ArrayList<CombatTeam> mockedCombatTeams = new ArrayList<>();
             mockedCombatTeams.add(getMockCompanyCombatTeam(formationSize));
 
-            when(mockCampaign.getCombatTeamsAsList()).thenReturn(mockedCombatTeams);
+            when(mockCampaign.getPlayerForce().getCombatTeamsAsList(mockCampaign)).thenReturn(mockedCombatTeams);
 
             // Act
             int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false, true, 1.0);
@@ -391,7 +391,7 @@ public class AtBContractTest {
                 mockedCombatTeams.add(getMockCompanyCombatTeam(formationSize));
             }
 
-            when(mockCampaign.getCombatTeamsAsList()).thenReturn(mockedCombatTeams);
+            when(mockCampaign.getPlayerForce().getCombatTeamsAsList(mockCampaign)).thenReturn(mockedCombatTeams);
 
             // Act
             int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false, true, 1.0);
@@ -410,7 +410,7 @@ public class AtBContractTest {
                 mockedCombatTeams.add(getMockCompanyCombatTeam(formationSize));
             }
 
-            when(mockCampaign.getCombatTeamsAsList()).thenReturn(mockedCombatTeams);
+            when(mockCampaign.getPlayerForce().getCombatTeamsAsList(mockCampaign)).thenReturn(mockedCombatTeams);
 
             // Act
             int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false, true, 1.0);
@@ -428,7 +428,7 @@ public class AtBContractTest {
             mockedCombatTeams.add(getMockLanceCombatTeam(formationSize));
             mockedCombatTeams.add(getMockCompanyCombatTeam(formationSize));
 
-            when(mockCampaign.getCombatTeamsAsList()).thenReturn(mockedCombatTeams);
+            when(mockCampaign.getPlayerForce().getCombatTeamsAsList(mockCampaign)).thenReturn(mockedCombatTeams);
 
             // Act
             int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false, true, 1.0);
@@ -448,7 +448,7 @@ public class AtBContractTest {
             }
             mockedCombatTeams.add(getMockCompanyCombatTeam(formationSize));
 
-            when(mockCampaign.getCombatTeamsAsList()).thenReturn(mockedCombatTeams);
+            when(mockCampaign.getPlayerForce().getCombatTeamsAsList(mockCampaign)).thenReturn(mockedCombatTeams);
 
             // Act
             int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false, true, 1.0);
@@ -526,7 +526,7 @@ public class AtBContractTest {
             ArrayList<CombatTeam> mockedCombatTeams = new ArrayList<>();
             mockedCombatTeams.add(mockLanceCombatTeam);
 
-            when(mockCampaign.getCombatTeamsAsList()).thenReturn(mockedCombatTeams);
+            when(mockCampaign.getPlayerForce().getCombatTeamsAsList(mockCampaign)).thenReturn(mockedCombatTeams);
 
             // Act
             int teams = ContractUtilities.calculateBaseNumberOfRequiredLances(mockCampaign, false, true, 1.0);

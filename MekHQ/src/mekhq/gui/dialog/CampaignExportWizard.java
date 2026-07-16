@@ -45,6 +45,7 @@ import java.util.stream.Collectors;
 import javax.swing.*;
 
 import megamek.common.equipment.AmmoType;
+import megamek.common.icons.Camouflage;
 import megamek.common.ui.FastJScrollPane;
 import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
@@ -66,6 +67,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Faction;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.FileDialogs;
 
@@ -272,7 +274,7 @@ public class CampaignExportWizard extends JDialog {
     private void setupForceList() {
         forceList = new JList<>();
         DefaultListModel<Formation> forceListModel = new DefaultListModel<>();
-        for (Formation formation : sourceCampaign.getAllFormations()) {
+        for (Formation formation : sourceCampaign.getPlayerForce().getAllFormations()) {
             forceListModel.addElement(formation);
         }
         forceList.setModel(forceListModel);
@@ -282,7 +284,7 @@ public class CampaignExportWizard extends JDialog {
     private void setupPersonList() {
         personList = new JList<>();
         DefaultListModel<Person> personListModel = new DefaultListModel<>();
-        List<Person> people = sourceCampaign.getActivePersonnel(true, true);
+        List<Person> people = sourceCampaign.getPlayerForce().getHumanResources().getActivePersonnel(true, true);
         people.sort(Comparator.comparing(Person::getPrimaryRole));
         for (Person person : people) {
             personListModel.addElement(person);
@@ -298,7 +300,7 @@ public class CampaignExportWizard extends JDialog {
     private void setupUnitList() {
         unitList = new JList<>();
         DefaultListModel<Unit> unitListModel = new DefaultListModel<>();
-        sourceCampaign.getHangar().forEachUnit(unitListModel::addElement);
+        sourceCampaign.getPlayerForce().getHangar().forEachUnit(unitListModel::addElement);
         unitList.setModel(unitListModel);
         unitList.addListSelectionListener(e -> {
             lblStatus.setText(getUnitSelectionStatus());
@@ -310,7 +312,7 @@ public class CampaignExportWizard extends JDialog {
     private void setupPartList() {
         partList = new JList<>();
         DefaultListModel<Part> partListModel = new DefaultListModel<>();
-        List<Part> parts = sourceCampaign.getWarehouse().getSpareParts();
+        List<Part> parts = sourceCampaign.getPlayerForce().getWarehouse().getSpareParts();
         parts.sort(Comparator.comparing(Part::getName));
 
         for (Part part : parts) {
@@ -523,10 +525,12 @@ public class CampaignExportWizard extends JDialog {
         }
 
         if (chkExportState.isSelected()) {
-            destinationCampaign.setFaction(sourceCampaign.getFaction());
-            destinationCampaign.setCamouflage(sourceCampaign.getCamouflage().clone());
+            final Faction faction = sourceCampaign.getFaction();
+            destinationCampaign.getPlayerForce().setFaction(faction);
+            final Camouflage camouflage = sourceCampaign.getCamouflage().clone();
+            destinationCampaign.getPlayerForce().setCamouflage(camouflage);
             destinationCampaign.setLocalDate(sourceCampaign.getLocalDate());
-            destinationCampaign.setLocation(sourceCampaign.getCurrentLocation());
+            destinationCampaign.setLocation(sourceCampaign.getPlayerForce().getForceDetachment().getCurrentLocation());
         }
 
         if (chkExportContractOffers.isSelected()) {
@@ -594,12 +598,14 @@ public class CampaignExportWizard extends JDialog {
 
         // overwrite any people with the same ID.
         for (Person person : personList.getSelectedValuesList()) {
-            if (destinationCampaign.getPerson(person.getId()) != null) {
-                destinationCampaign.removePerson(person);
+            final UUID id1 = person.getId();
+            if (destinationCampaign.getPlayerForce().getHumanResources().getPerson(id1) != null) {
+                destinationCampaign.getPlayerForce().getHumanResources().removePerson(destinationCampaign, person);
             }
 
             destinationCampaign.importPerson(person);
-            destinationCampaign.getPerson(person.getId())
+            final UUID id = person.getId();
+            destinationCampaign.getPlayerForce().getHumanResources().getPerson(id)
                   .resetMinutesLeft(destinationCampaign.getCampaignOptions().isTechsUseAdministration());
 
             for (Kill kill : sourceCampaign.getKillsFor(person.getId())) {
@@ -611,7 +617,7 @@ public class CampaignExportWizard extends JDialog {
             }
         }
 
-        destinationCampaign.getHangar().forEachUnit(Unit::resetEngineer);
+        destinationCampaign.getPlayerForce().getHangar().forEachUnit(Unit::resetEngineer);
 
         // there's just no way to overwrite parts
         // so we simply add them to the destination
@@ -634,7 +640,9 @@ public class CampaignExportWizard extends JDialog {
                 // ID,
                 // which is likely to happen when exporting to a brand-new campaign
                 newPart.setId(-1);
-                Part existingPart = destinationCampaign.getWarehouse().checkForExistingSparePart(newPart);
+                Part existingPart = destinationCampaign.getPlayerForce()
+                                          .getWarehouse()
+                                          .checkForExistingSparePart(newPart);
                 if (existingPart == null) {
                     // add part doesn't allow adding multiple parts, so we update it afterward
                     destinationCampaign.getQuartermaster().addPart(newPart, 0, false);
@@ -657,7 +665,7 @@ public class CampaignExportWizard extends JDialog {
             }
 
             for (Person person : personList.getSelectedValuesList()) {
-                sourceCampaign.removePerson(person, true);
+                sourceCampaign.getPlayerForce().getHumanResources().removePerson(sourceCampaign, person, true);
             }
 
             if (money > 0) {
@@ -676,19 +684,19 @@ public class CampaignExportWizard extends JDialog {
                     sourceAmmo.changeShots(-partCount.count);
 
                     if (sourceAmmo.getShots() <= 0) {
-                        sourceCampaign.getWarehouse().removePart(partCount.part);
+                        sourceCampaign.getPlayerForce().getWarehouse().removePart(partCount.part);
                     }
                 } else if (partCount.part instanceof Armor sourceArmor) {
                     sourceArmor.setAmount(sourceArmor.getAmount() - partCount.count);
 
                     if (sourceArmor.getAmount() <= 0) {
-                        sourceCampaign.getWarehouse().removePart(partCount.part);
+                        sourceCampaign.getPlayerForce().getWarehouse().removePart(partCount.part);
                     }
                 } else {
                     partCount.part.setQuantity(partCount.part.getQuantity() - partCount.count);
 
                     if (partCount.part.getQuantity() <= 0) {
-                        sourceCampaign.getWarehouse().removePart(partCount.part);
+                        sourceCampaign.getPlayerForce().getWarehouse().removePart(partCount.part);
                     }
                 }
             }
@@ -705,14 +713,14 @@ public class CampaignExportWizard extends JDialog {
 
     private void attemptToAssignToForce(Unit unit, int sourceForceID, Campaign sourceCampaign,
           Campaign destinationCampaign) {
-        Formation sourceFormation = sourceCampaign.getFormation(sourceForceID);
+        Formation sourceFormation = sourceCampaign.getPlayerForce().getFormation(sourceForceID);
         if (sourceFormation == null) {
             return;
         }
 
         // this indicates a unit assigned to the root-level force
         if (sourceFormation.getParentFormation() == null) {
-            destinationCampaign.getFormations().addUnit(unit.getId());
+            destinationCampaign.getPlayerForce().getFormations().addUnit(unit.getId());
         }
 
         // first thing we will try is to identify a force with the same name and tree
@@ -724,12 +732,12 @@ public class CampaignExportWizard extends JDialog {
         // name with the destination root force name
         String sourceForceFullName = getDestinationFullName(sourceFormation, sourceCampaign, destinationCampaign);
 
-        Formation destFormation = findForce(sourceForceFullName, destinationCampaign.getFormations());
+        Formation destFormation = findForce(sourceForceFullName, destinationCampaign.getPlayerForce().getFormations());
         if (destFormation != null) {
             destFormation.addUnit(unit.getId());
         } else {
             List<Formation> parentFormations = getForceAndParents(sourceFormation);
-            Formation currentDestinationFormation = destinationCampaign.getFormations();
+            Formation currentDestinationFormation = destinationCampaign.getPlayerForce().getFormations();
 
             for (int x = parentFormations.size() - 1; x >= 0; x--) {
                 Formation nextSourceFormation = parentFormations.get(x);
@@ -741,7 +749,9 @@ public class CampaignExportWizard extends JDialog {
                 // if this level doesn't exist yet, add it to where we currently are
                 if (nextDestinationFormation == null) {
                     Formation formationCopy = new Formation(nextSourceFormation.getName());
-                    destinationCampaign.addFormation(formationCopy, currentDestinationFormation);
+                    destinationCampaign.getPlayerForce().addFormation(formationCopy,
+                          currentDestinationFormation,
+                          destinationCampaign);
                     currentDestinationFormation = formationCopy;
                     // otherwise, update current location and move to next level
                 } else {
@@ -760,7 +770,9 @@ public class CampaignExportWizard extends JDialog {
     private String getDestinationFullName(Formation sourceFormation, Campaign sourceCampaign,
           Campaign destinationCampaign) {
         return sourceFormation.getFullName()
-                     .replace(sourceCampaign.getFormations().getName(), destinationCampaign.getFormations().getName());
+                     .replace(sourceCampaign.getPlayerForce()
+                                    .getFormations()
+                                    .getName(), destinationCampaign.getPlayerForce().getFormations().getName());
     }
 
     /**

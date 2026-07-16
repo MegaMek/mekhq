@@ -49,7 +49,6 @@ import javax.swing.table.TableCellRenderer;
 
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.rolls.TargetRoll;
-import megamek.common.units.EntityWeightClass;
 import megamek.common.units.Jumpship;
 import megamek.common.units.SmallCraft;
 import megamek.common.units.Tank;
@@ -227,7 +226,7 @@ public class RetirementTableModel extends AbstractTableModel {
                 }
                 return "-";
             case COL_FORCE:
-                Formation formation = campaign.getFormationFor(person);
+                Formation formation = campaign.getPlayerForce().getFormationFor(person);
                 if (null != formation) {
                     return formation.getName();
                 } else {
@@ -259,19 +258,31 @@ public class RetirementTableModel extends AbstractTableModel {
             case COL_SHARES:
                 return person.getNumShares(campaign, campaign.getCampaignOptions().isSharesForAll());
             case COL_PAYOUT:
-                if (null == campaign.getRetirementDefectionTracker().getPayout(person.getId())) {
+                if (null ==
+                          campaign.getPlayerForce()
+                                .getHumanResources()
+                                .getRetirementDefectionTracker()
+                                .getPayout(person.getId())) {
                     return "";
                 }
                 if (altPayout.containsKey(person.getId())) {
                     return altPayout.get(person.getId()).toAmountAndSymbolString();
                 }
-                Money payout = campaign.getRetirementDefectionTracker().getPayout(person.getId()).getPayoutAmount();
+                Money payout = campaign.getPlayerForce()
+                                     .getHumanResources()
+                                     .getRetirementDefectionTracker()
+                                     .getPayout(person.getId())
+                                     .getPayoutAmount();
                 /*
                  * If no unit is required as part of the payout, the unit is part or all of the
                  * final payout. If using the share system and tracking the original unit,
                  * the payout is also reduced by the value of the unit.
                  */
-                if ((campaign.getRetirementDefectionTracker().getPayout(person.getId()).getWeightClass() == 0 &&
+                if ((campaign.getPlayerForce()
+                           .getHumanResources()
+                           .getRetirementDefectionTracker()
+                           .getPayout(person.getId())
+                           .getWeightClass() == 0 &&
                            null != unitAssignments.get(person.getId())) ||
                           (campaign.getCampaignOptions().isUseShareSystem() &&
                                  campaign.getCampaignOptions().isTrackOriginalUnit() &&
@@ -285,7 +296,9 @@ public class RetirementTableModel extends AbstractTableModel {
                       campaign.getCampaignOptions().getServiceContractDuration())) {
                     // if the person requires a unit, check to ensure there isn't a shortfall
                     if (null != unitAssignments.get(person.getId())) {
-                        payout = payout.plus(RetirementDefectionDialog.getShortfallAdjustment(campaign.getRetirementDefectionTracker()
+                        payout = payout.plus(RetirementDefectionDialog.getShortfallAdjustment(campaign.getPlayerForce()
+                                                                                                    .getHumanResources()
+                                                                                                    .getRetirementDefectionTracker()
                                                                                                     .getPayout(person.getId())
                                                                                                     .getWeightClass(),
                               RetirementDefectionDialog.weightClassIndex(campaign.getUnit(unitAssignments.get(person.getId())))));
@@ -293,11 +306,18 @@ public class RetirementTableModel extends AbstractTableModel {
 
                     // if the person requires a unit, but doesn't have one...
                     if ((unitAssignments.get(person.getId()) == null) &&
-                              (campaign.getRetirementDefectionTracker().getPayout(person.getId()).getWeightClass() >
-                                     0)) {
-                        payout = payout.plus(RetirementDefectionDialog.getShortfallAdjustment(campaign.getRetirementDefectionTracker()
-                                                                                                    .getPayout(person.getId())
-                                                                                                    .getWeightClass(),
+                              campaign.getPlayerForce()
+                                    .getHumanResources()
+                                    .getRetirementDefectionTracker()
+                                    .getPayout(person.getId())
+                                    .getWeightClass() >
+                                    0) {
+                        payout = payout.plus(mekhq.gui.dialog.RetirementDefectionDialog.getShortfallAdjustment(campaign.getPlayerForce()
+                                                                                                                     .getHumanResources()
+                                                                                                                     .getRetirementDefectionTracker()
+                                                                                                                     .getPayout(
+                                                                                                                           person.getId())
+                                                                                                                     .getWeightClass(),
                               0));
                     }
                 }
@@ -308,17 +328,28 @@ public class RetirementTableModel extends AbstractTableModel {
                 }
                 return payout.toAmountAndSymbolString();
             case COL_UNIT:
-                if (null == campaign.getRetirementDefectionTracker().getPayout(person.getId())) {
+                if (null ==
+                          campaign.getPlayerForce()
+                                .getHumanResources()
+                                .getRetirementDefectionTracker()
+                                .getPayout(person.getId())) {
                     return "";
                 }
                 if (null != unitAssignments.get(person.getId())) {
                     return campaign.getUnit(unitAssignments.get(person.getId())).getName();
-                } else if (campaign.getRetirementDefectionTracker().getPayout(person.getId())
-                                 .getWeightClass() < EntityWeightClass.WEIGHT_LIGHT) {
+                } else if (campaign.getPlayerForce()
+                                 .getHumanResources()
+                                 .getRetirementDefectionTracker()
+                                 .getPayout(person.getId())
+                                 .getWeightClass() < megamek.common.units.EntityWeightClass.WEIGHT_LIGHT) {
                     return "";
                 } else {
                     return "Class " +
-                                 campaign.getRetirementDefectionTracker().getPayout(person.getId()).getWeightClass();
+                                 campaign.getPlayerForce()
+                                       .getHumanResources()
+                                       .getRetirementDefectionTracker()
+                                       .getPayout(person.getId())
+                                       .getWeightClass();
                 }
             default:
                 return "?";
@@ -435,7 +466,7 @@ public class RetirementTableModel extends AbstractTableModel {
                     clearImage();
                 }
             } else if (actualCol == COL_FORCE) {
-                Formation formation = campaign.getFormationFor(p);
+                Formation formation = campaign.getPlayerForce().getFormationFor(p);
                 if (null != formation) {
                     StringBuilder desc = new StringBuilder("<html><b>" + formation.getName() + "</b>");
                     Formation parent = formation.getParentFormation();

@@ -134,7 +134,7 @@ public class CombatTeam {
     public CombatTeam(int formationId, Campaign campaign) {
         this.formationId = formationId;
 
-        Formation formation = campaign.getFormation(formationId);
+        Formation formation = campaign.getPlayerForce().getFormation(formationId);
         role = formation != null ? formation.getCombatRoleInMemory() : CombatRole.FRONTLINE;
 
         missionId = -1;
@@ -192,6 +192,141 @@ public class CombatTeam {
         commanderId = findCommander(formationId, campaign);
     }
 
+    /* Code to find unit commander from ForceViewPanel */
+    public static @Nullable UUID findCommander(int formationId, Campaign campaign) {
+        return campaign.getPlayerForce().getFormation(formationId).getFormationCommanderID();
+    }
+
+    /**
+     * Worker function that calculates the total weight of a formation with the given ID
+     *
+     * @param campaign    Campaign in which the formation resides
+     * @param formationId Formation for which to calculate weight
+     *
+     * @return Total formation weight
+     */
+    public static double calculateTotalWeight(Campaign campaign, int formationId) {
+        double weight = 0.0;
+
+        for (UUID id : campaign.getPlayerForce().getFormation(formationId).getUnits()) {
+            try {
+                Unit unit = campaign.getUnit(id);
+                Entity entity = unit.getEntity();
+                long entityType = entity.getEntityType();
+
+                boolean isClan = campaign.isClanCampaign();
+
+                CampaignOptions campaignOptions = campaign.getCampaignOptions();
+                if (!campaignOptions.isUseStratCon()) {
+                    if (entityType == ETYPE_TANK) {
+                        if (isClan) {
+                            weight += entity.getWeight() * 0.5;
+                        } else {
+                            weight += entity.getWeight();
+                        }
+                    } else if (entityType == ETYPE_AEROSPACE_FIGHTER) {
+                        if (isClan) {
+                            weight += entity.getWeight() * 0.5;
+                        } else {
+                            weight += entity.getWeight();
+                        }
+                    }
+                } else {
+                    weight += entity.getWeight();
+                }
+            } catch (Exception exception) {
+                LOGGER.error("Failed to parse unit ID {}: {}", formationId, exception);
+            }
+        }
+
+        return weight;
+    }
+
+    /**
+     * This static method updates the combat teams across the campaign. It starts at the top level formation, and
+     * calculates the combat teams for each sub-formation. It keeps only the eligible combat teams and imports them into
+     * the campaign. After every formation is processed, an 'OrganizationChangedEvent' is triggered by that formation.
+     *
+     * @param campaign the current campaign.
+     */
+    public static void recalculateCombatTeams(Campaign campaign) {
+        Hashtable<Integer, CombatTeam> combatTeamsTable = campaign.getPlayerForce().getCombatTeamsAsMap(campaign);
+        CombatTeam combatTeam = combatTeamsTable.get(0); // This is the origin node
+        Formation formation = campaign.getPlayerForce().getFormation(0);
+
+        // Does the formation already exist in our hashtable? If so, update it accordingly
+        if (combatTeam != null) {
+            boolean isEligible = combatTeam.isEligible(campaign);
+
+            if (!isEligible) {
+                campaign.getPlayerForce().removeCombatTeam(0);
+            }
+
+            formation.setCombatTeamStatus(isEligible);
+            // Otherwise, create a new formation and then add it to the table, if appropriate
+        } else {
+            combatTeam = new CombatTeam(0, campaign);
+            boolean isEligible = combatTeam.isEligible(campaign);
+
+            if (isEligible) {
+                campaign.getPlayerForce().addCombatTeam(combatTeam);
+            }
+
+            formation.setCombatTeamStatus(isEligible);
+        }
+
+        // Update the TO&E and then begin recursively walking it
+        MekHQ.triggerEvent(new OrganizationChangedEvent(formation));
+        recalculateSubFormationStrategicStatus(campaign,
+              campaign.getPlayerForce().getCombatTeamsAsMap(campaign), formation);
+    }
+
+    /**
+     * This method is used to update the combat teams for the campaign working downwards from a specified node, through
+     * all of its sub-formations. It creates a new {@link CombatTeam} for each sub-formation and checks its eligibility.
+     * Eligible formations are imported into the campaign, and the combat team status of the respective formation is set
+     * to {@code true}. After every formation is processed, an 'OrganizationChangedEvent' is triggered. This function
+     * runs recursively on each sub-formation, effectively traversing the complete TO&E.
+     *
+     * @param campaign    the current {@link Campaign}.
+     * @param workingNode the {@link Formation} node from which the method starts working down through all its
+     *                    sub-formations.
+     */
+    private static void recalculateSubFormationStrategicStatus(Campaign campaign,
+          Hashtable<Integer, CombatTeam> combatTeamsTable, Formation workingNode) {
+
+        for (Formation formation : workingNode.getSubFormations()) {
+            int formationId = formation.getId();
+            CombatTeam combatTeam = combatTeamsTable.get(formationId);
+
+            // Does the formation already exist in our hashtable? If so, update it accordingly
+            if (combatTeam != null) {
+                boolean isEligible = combatTeam.isEligible(campaign);
+
+                if (!isEligible) {
+                    campaign.getPlayerForce().removeCombatTeam(formationId);
+                }
+
+                formation.setCombatTeamStatus(isEligible);
+                // Otherwise, create a new formation and then add it to the table, if appropriate
+            } else {
+                combatTeam = new CombatTeam(formationId, campaign);
+                boolean isEligible = combatTeam.isEligible(campaign);
+
+                if (isEligible) {
+                    campaign.getPlayerForce().addCombatTeam(combatTeam);
+                }
+
+                formation.setCombatTeamStatus(isEligible);
+            }
+
+            // Update the TO&E and then continue recursively walking it
+            MekHQ.triggerEvent(new OrganizationChangedEvent(formation));
+            recalculateSubFormationStrategicStatus(campaign,
+                  campaign.getPlayerForce().getCombatTeamsAsMap(campaign), formation);
+        }
+    }
+
     /**
      * Effective size used when determining for many units this combat team is. Sometimes a unit may count as less than
      * a unit, like a vehicle point in a Clan star (two vehicles would return a size of 1).
@@ -213,7 +348,7 @@ public class CombatTeam {
         if (campaign.getFaction().isClan()) {
             return (int) Math.ceil(getEffectivePoints(campaign));
         }
-        if (campaign.getFormation(formationId) != null) {
+        if (campaign.getPlayerForce().getFormation(formationId) != null) {
             return (int) Math.ceil(getEffectiveLanceSize(campaign));
         } else {
             return 0;
@@ -251,7 +386,7 @@ public class CombatTeam {
         }
 
         for (UUID unitId : formation.getAllUnits(true)) {
-            Entity entity = EntityUtilities.getEntityFromUnitId(campaign.getAllHangar(), unitId);
+            Entity entity = EntityUtilities.getEntityFromUnitId(campaign.getPlayerForce().getHangar(), unitId);
 
             if (entity == null) {
                 continue;
@@ -276,185 +411,6 @@ public class CombatTeam {
             return (int) Math.floor(numInfantry);
         }
         return (int) Math.floor(numUnits);
-    }
-
-    private double getEffectivePoints(Campaign campaign) {
-        /*
-         * Used to check against formation size limits; for this purpose we
-         * consider a 'Mek and a Point of BA to be a single Point so that
-         * a Nova that has 10 actual Points is calculated as 5 effective
-         * Points. We also count Points of vehicles with 'Meks and
-         * conventional infantry with BA to account for CHH vehicle Novas.
-         */
-        double armor = 0.0;
-        double infantry = 0.0;
-        double other = 0.0;
-        for (UUID id : campaign.getFormation(formationId).getAllUnits(true)) {
-            Unit unit = campaign.getUnit(id);
-            if (null != unit) {
-                Entity entity = unit.getEntity();
-                if (null != entity) {
-                    if ((entity.getEntityType() & ETYPE_MEK) != 0) {
-                        armor += 1;
-                    } else if ((entity.getEntityType() & ETYPE_AEROSPACE_FIGHTER) != 0) {
-                        other += 0.5;
-                    } else if ((entity.getEntityType() & ETYPE_TANK) != 0) {
-                        armor += 0.5;
-                    } else if ((entity.getEntityType() & ETYPE_PROTOMEK) != 0) {
-                        other += 0.2;
-                    } else if ((entity.getEntityType() & Entity.ETYPE_INFANTRY) != 0) {
-                        infantry += ((Infantry) entity).isSquad() ? 0.2 : 1;
-                    }
-                }
-            }
-        }
-        return Math.max(armor, infantry) + other;
-    }
-
-    public int getWeightClass(Campaign campaign) {
-        /*
-         * Clan units only count half the weight of ASF and vehicles
-         * (2/Point). IS units only count half the weight of vehicles
-         * if the option is enabled, possibly dropping the lance to a lower
-         * weight class and decreasing the enemy formation against vehicle/combined
-         * lances.
-         */
-        double weight = calculateTotalWeight(campaign, formationId);
-
-        Formation originFormation = campaign.getFormation(formationId);
-
-        if (originFormation == null) {
-            return WEIGHT_ULTRA_LIGHT;
-        }
-
-        List<Formation> subFormations = originFormation.getSubFormations();
-        int subFormationsCount = subFormations.size();
-
-        for (Formation childFormation : subFormations) {
-            double childFormationWeight = calculateTotalWeight(campaign, childFormation.getId());
-
-            if (childFormationWeight > 0) {
-                weight += childFormationWeight;
-            } else {
-                subFormationsCount--;
-            }
-        }
-
-        if (subFormationsCount > 0) {
-            weight = weight / subFormationsCount;
-        }
-
-        int standardFormationSize = getStandardFormationSize(campaign.getFaction());
-
-        weight = weight / standardFormationSize;
-
-        final int CATEGORY_ULTRA_LIGHT = 20;
-        final int CATEGORY_LIGHT = 35;
-        final int CATEGORY_MEDIUM = 55;
-        final int CATEGORY_HEAVY = 75;
-        final int CATEGORY_ASSAULT = 100;
-
-        if (weight < CATEGORY_ULTRA_LIGHT) {
-            return WEIGHT_ULTRA_LIGHT;
-        }
-        if (weight <= CATEGORY_LIGHT) {
-            return EntityWeightClass.WEIGHT_LIGHT;
-        }
-        if (weight <= CATEGORY_MEDIUM) {
-            return EntityWeightClass.WEIGHT_MEDIUM;
-        }
-        if (weight <= CATEGORY_HEAVY) {
-            return EntityWeightClass.WEIGHT_HEAVY;
-        }
-        if (weight <= CATEGORY_ASSAULT) {
-            return EntityWeightClass.WEIGHT_ASSAULT;
-        }
-        return EntityWeightClass.WEIGHT_SUPER_HEAVY;
-    }
-
-    public boolean isEligible(Campaign campaign) {
-        // ensure the lance is marked as a combat formation
-        final Formation formation = campaign.getFormation(formationId);
-
-        if (formation == null) {
-            return false;
-        }
-
-        if (!formation.isFormationType(STANDARD)) {
-            formation.setCombatTeamStatus(false);
-            return false;
-        }
-
-        /*
-         * Check that the number of units and weight are within the limits.
-         */
-        if (campaign.getCampaignOptions().isLimitLanceNumUnits()) {
-            int size = getSize(campaign);
-            if (size < getStandardFormationSize(campaign.getFaction()) - 1 ||
-                      size > getStandardFormationSize(campaign.getFaction()) + 2) {
-                formation.setCombatTeamStatus(false);
-                return false;
-            }
-        }
-
-        if (campaign.getCampaignOptions().isLimitLanceWeight() &&
-                  getWeightClass(campaign) > EntityWeightClass.WEIGHT_ASSAULT) {
-            formation.setCombatTeamStatus(false);
-            return false;
-        }
-
-        int isOverridden = formation.getOverrideCombatTeam();
-        if (isOverridden != COMBAT_TEAM_OVERRIDE_NONE) {
-            boolean overrideState = isOverridden == COMBAT_TEAM_OVERRIDE_TRUE;
-            formation.setCombatTeamStatus(overrideState);
-
-            List<Formation> associatedFormations = formation.getAllParents();
-            associatedFormations.addAll(formation.getAllSubFormations());
-
-            for (Formation associatedFormation : associatedFormations) {
-                associatedFormation.setCombatTeamStatus(false);
-            }
-
-            return overrideState;
-        }
-
-        // This should never be getAllUnits() as otherwise parent nodes will be assessed as being
-        // automatically eligible to be Combat Teams preventing child nodes from being Combat Teams
-        if (formation.getUnits().isEmpty()) {
-            formation.setCombatTeamStatus(false);
-            return false;
-        }
-
-        List<Formation> childFormations = formation.getAllSubFormations();
-
-        for (Formation childFormation : childFormations) {
-            if (childFormation.isCombatTeam()) {
-                formation.setCombatTeamStatus(false);
-                return false;
-            }
-        }
-
-        List<Formation> parentFormations = formation.getAllParents();
-
-        for (Formation parentFormation : parentFormations) {
-            if (parentFormation.isCombatTeam()) {
-                formation.setCombatTeamStatus(false);
-                return false;
-            }
-
-            if (!parentFormation.isFormationType(STANDARD)) {
-                formation.setCombatTeamStatus(false);
-                return false;
-            }
-        }
-
-        formation.setCombatTeamStatus(true);
-        return true;
-    }
-
-    /* Code to find unit commander from ForceViewPanel */
-    public static @Nullable UUID findCommander(int formationId, Campaign campaign) {
-        return campaign.getFormation(formationId).getFormationCommanderID();
     }
 
     public static LocalDate getBattleDate(LocalDate today) {
@@ -747,132 +703,178 @@ public class CombatTeam {
         return retVal;
     }
 
-    /**
-     * Worker function that calculates the total weight of a formation with the given ID
-     *
-     * @param campaign    Campaign in which the formation resides
-     * @param formationId Formation for which to calculate weight
-     *
-     * @return Total formation weight
-     */
-    public static double calculateTotalWeight(Campaign campaign, int formationId) {
-        double weight = 0.0;
-
-        for (UUID id : campaign.getFormation(formationId).getUnits()) {
-            try {
-                Unit unit = campaign.getUnit(id);
+    private double getEffectivePoints(Campaign campaign) {
+        /*
+         * Used to check against formation size limits; for this purpose we
+         * consider a 'Mek and a Point of BA to be a single Point so that
+         * a Nova that has 10 actual Points is calculated as 5 effective
+         * Points. We also count Points of vehicles with 'Meks and
+         * conventional infantry with BA to account for CHH vehicle Novas.
+         */
+        double armor = 0.0;
+        double infantry = 0.0;
+        double other = 0.0;
+        for (UUID id : campaign.getPlayerForce().getFormation(formationId).getAllUnits(true)) {
+            Unit unit = campaign.getUnit(id);
+            if (null != unit) {
                 Entity entity = unit.getEntity();
-                long entityType = entity.getEntityType();
-
-                boolean isClan = campaign.isClanCampaign();
-
-                CampaignOptions campaignOptions = campaign.getCampaignOptions();
-                if (!campaignOptions.isUseStratCon()) {
-                    if (entityType == ETYPE_TANK) {
-                        if (isClan) {
-                            weight += entity.getWeight() * 0.5;
-                        } else {
-                            weight += entity.getWeight();
-                        }
-                    } else if (entityType == ETYPE_AEROSPACE_FIGHTER) {
-                        if (isClan) {
-                            weight += entity.getWeight() * 0.5;
-                        } else {
-                            weight += entity.getWeight();
-                        }
+                if (null != entity) {
+                    if ((entity.getEntityType() & ETYPE_MEK) != 0) {
+                        armor += 1;
+                    } else if ((entity.getEntityType() & ETYPE_AEROSPACE_FIGHTER) != 0) {
+                        other += 0.5;
+                    } else if ((entity.getEntityType() & ETYPE_TANK) != 0) {
+                        armor += 0.5;
+                    } else if ((entity.getEntityType() & ETYPE_PROTOMEK) != 0) {
+                        other += 0.2;
+                    } else if ((entity.getEntityType() & Entity.ETYPE_INFANTRY) != 0) {
+                        infantry += ((Infantry) entity).isSquad() ? 0.2 : 1;
                     }
-                } else {
-                    weight += entity.getWeight();
                 }
-            } catch (Exception exception) {
-                LOGGER.error("Failed to parse unit ID {}: {}", formationId, exception);
             }
         }
-
-        return weight;
+        return Math.max(armor, infantry) + other;
     }
 
-    /**
-     * This static method updates the combat teams across the campaign. It starts at the top level formation, and
-     * calculates the combat teams for each sub-formation. It keeps only the eligible combat teams and imports them into
-     * the campaign. After every formation is processed, an 'OrganizationChangedEvent' is triggered by that formation.
-     *
-     * @param campaign the current campaign.
-     */
-    public static void recalculateCombatTeams(Campaign campaign) {
-        Hashtable<Integer, CombatTeam> combatTeamsTable = campaign.getCombatTeamsAsMap();
-        CombatTeam combatTeam = combatTeamsTable.get(0); // This is the origin node
-        Formation formation = campaign.getFormation(0);
+    public int getWeightClass(Campaign campaign) {
+        /*
+         * Clan units only count half the weight of ASF and vehicles
+         * (2/Point). IS units only count half the weight of vehicles
+         * if the option is enabled, possibly dropping the lance to a lower
+         * weight class and decreasing the enemy formation against vehicle/combined
+         * lances.
+         */
+        double weight = calculateTotalWeight(campaign, formationId);
 
-        // Does the formation already exist in our hashtable? If so, update it accordingly
-        if (combatTeam != null) {
-            boolean isEligible = combatTeam.isEligible(campaign);
+        Formation originFormation = campaign.getPlayerForce().getFormation(formationId);
 
-            if (!isEligible) {
-                campaign.removeCombatTeam(0);
-            }
-
-            formation.setCombatTeamStatus(isEligible);
-            // Otherwise, create a new formation and then add it to the table, if appropriate
-        } else {
-            combatTeam = new CombatTeam(0, campaign);
-            boolean isEligible = combatTeam.isEligible(campaign);
-
-            if (isEligible) {
-                campaign.addCombatTeam(combatTeam);
-            }
-
-            formation.setCombatTeamStatus(isEligible);
+        if (originFormation == null) {
+            return WEIGHT_ULTRA_LIGHT;
         }
 
-        // Update the TO&E and then begin recursively walking it
-        MekHQ.triggerEvent(new OrganizationChangedEvent(formation));
-        recalculateSubFormationStrategicStatus(campaign, campaign.getCombatTeamsAsMap(), formation);
-    }
+        List<Formation> subFormations = originFormation.getSubFormations();
+        int subFormationsCount = subFormations.size();
 
-    /**
-     * This method is used to update the combat teams for the campaign working downwards from a specified node, through
-     * all of its sub-formations. It creates a new {@link CombatTeam} for each sub-formation and checks its eligibility.
-     * Eligible formations are imported into the campaign, and the combat team status of the respective formation is set
-     * to {@code true}. After every formation is processed, an 'OrganizationChangedEvent' is triggered. This function
-     * runs recursively on each sub-formation, effectively traversing the complete TO&E.
-     *
-     * @param campaign    the current {@link Campaign}.
-     * @param workingNode the {@link Formation} node from which the method starts working down through all its
-     *                    sub-formations.
-     */
-    private static void recalculateSubFormationStrategicStatus(Campaign campaign,
-          Hashtable<Integer, CombatTeam> combatTeamsTable, Formation workingNode) {
+        for (Formation childFormation : subFormations) {
+            double childFormationWeight = calculateTotalWeight(campaign, childFormation.getId());
 
-        for (Formation formation : workingNode.getSubFormations()) {
-            int formationId = formation.getId();
-            CombatTeam combatTeam = combatTeamsTable.get(formationId);
-
-            // Does the formation already exist in our hashtable? If so, update it accordingly
-            if (combatTeam != null) {
-                boolean isEligible = combatTeam.isEligible(campaign);
-
-                if (!isEligible) {
-                    campaign.removeCombatTeam(formationId);
-                }
-
-                formation.setCombatTeamStatus(isEligible);
-                // Otherwise, create a new formation and then add it to the table, if appropriate
+            if (childFormationWeight > 0) {
+                weight += childFormationWeight;
             } else {
-                combatTeam = new CombatTeam(formationId, campaign);
-                boolean isEligible = combatTeam.isEligible(campaign);
+                subFormationsCount--;
+            }
+        }
 
-                if (isEligible) {
-                    campaign.addCombatTeam(combatTeam);
-                }
+        if (subFormationsCount > 0) {
+            weight = weight / subFormationsCount;
+        }
 
-                formation.setCombatTeamStatus(isEligible);
+        int standardFormationSize = getStandardFormationSize(campaign.getFaction());
+
+        weight = weight / standardFormationSize;
+
+        final int CATEGORY_ULTRA_LIGHT = 20;
+        final int CATEGORY_LIGHT = 35;
+        final int CATEGORY_MEDIUM = 55;
+        final int CATEGORY_HEAVY = 75;
+        final int CATEGORY_ASSAULT = 100;
+
+        if (weight < CATEGORY_ULTRA_LIGHT) {
+            return WEIGHT_ULTRA_LIGHT;
+        }
+        if (weight <= CATEGORY_LIGHT) {
+            return EntityWeightClass.WEIGHT_LIGHT;
+        }
+        if (weight <= CATEGORY_MEDIUM) {
+            return EntityWeightClass.WEIGHT_MEDIUM;
+        }
+        if (weight <= CATEGORY_HEAVY) {
+            return EntityWeightClass.WEIGHT_HEAVY;
+        }
+        if (weight <= CATEGORY_ASSAULT) {
+            return EntityWeightClass.WEIGHT_ASSAULT;
+        }
+        return EntityWeightClass.WEIGHT_SUPER_HEAVY;
+    }
+
+    public boolean isEligible(Campaign campaign) {
+        // ensure the lance is marked as a combat formation
+        final Formation formation = campaign.getPlayerForce().getFormation(formationId);
+
+        if (formation == null) {
+            return false;
+        }
+
+        if (!formation.isFormationType(STANDARD)) {
+            formation.setCombatTeamStatus(false);
+            return false;
+        }
+
+        /*
+         * Check that the number of units and weight are within the limits.
+         */
+        if (campaign.getCampaignOptions().isLimitLanceNumUnits()) {
+            int size = getSize(campaign);
+            if (size < getStandardFormationSize(campaign.getFaction()) - 1 ||
+                      size > getStandardFormationSize(campaign.getFaction()) + 2) {
+                formation.setCombatTeamStatus(false);
+                return false;
+            }
+        }
+
+        if (campaign.getCampaignOptions().isLimitLanceWeight() &&
+                  getWeightClass(campaign) > EntityWeightClass.WEIGHT_ASSAULT) {
+            formation.setCombatTeamStatus(false);
+            return false;
+        }
+
+        int isOverridden = formation.getOverrideCombatTeam();
+        if (isOverridden != COMBAT_TEAM_OVERRIDE_NONE) {
+            boolean overrideState = isOverridden == COMBAT_TEAM_OVERRIDE_TRUE;
+            formation.setCombatTeamStatus(overrideState);
+
+            List<Formation> associatedFormations = formation.getAllParents();
+            associatedFormations.addAll(formation.getAllSubFormations());
+
+            for (Formation associatedFormation : associatedFormations) {
+                associatedFormation.setCombatTeamStatus(false);
             }
 
-            // Update the TO&E and then continue recursively walking it
-            MekHQ.triggerEvent(new OrganizationChangedEvent(formation));
-            recalculateSubFormationStrategicStatus(campaign, campaign.getCombatTeamsAsMap(), formation);
+            return overrideState;
         }
+
+        // This should never be getAllUnits() as otherwise parent nodes will be assessed as being
+        // automatically eligible to be Combat Teams preventing child nodes from being Combat Teams
+        if (formation.getUnits().isEmpty()) {
+            formation.setCombatTeamStatus(false);
+            return false;
+        }
+
+        List<Formation> childFormations = formation.getAllSubFormations();
+
+        for (Formation childFormation : childFormations) {
+            if (childFormation.isCombatTeam()) {
+                formation.setCombatTeamStatus(false);
+                return false;
+            }
+        }
+
+        List<Formation> parentFormations = formation.getAllParents();
+
+        for (Formation parentFormation : parentFormations) {
+            if (parentFormation.isCombatTeam()) {
+                formation.setCombatTeamStatus(false);
+                return false;
+            }
+
+            if (!parentFormation.isFormationType(STANDARD)) {
+                formation.setCombatTeamStatus(false);
+                return false;
+            }
+        }
+
+        formation.setCombatTeamStatus(true);
+        return true;
     }
 
     /**
@@ -888,6 +890,6 @@ public class CombatTeam {
      * @return the {@link Formation} object associated with the {@code formationId}, or {@code null} if not found
      */
     public @Nullable Formation getFormation(Campaign campaign) {
-        return campaign.getFormation(formationId);
+        return campaign.getPlayerForce().getFormation(formationId);
     }
 }

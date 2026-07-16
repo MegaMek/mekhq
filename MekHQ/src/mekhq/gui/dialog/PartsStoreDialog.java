@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -499,7 +499,7 @@ public class PartsStoreDialog extends JDialog {
      */
     private void addPart(boolean purchase, Part part, int quantity) {
         if (purchase) {
-            campaign.getShoppingList().addShoppingItem(part.getAcquisitionWork(), quantity, campaign);
+            campaign.getPlayerForce().getShoppingList().addShoppingItem(part.getAcquisitionWork(), quantity, campaign);
         } else {
             while (quantity > 0) {
                 campaign.getQuartermaster().addPart(part.clone(), 0, true);

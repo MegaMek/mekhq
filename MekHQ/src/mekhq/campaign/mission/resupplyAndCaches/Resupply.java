@@ -53,6 +53,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import megamek.common.equipment.MiscType;
 import megamek.common.units.Entity;
 import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
@@ -409,8 +410,9 @@ public class Resupply {
         // First, calculate the total tonnage across all combat units in the campaign.
         // We define a 'combat unit' as any unit not flagged as non-combat who is both in a Combat
         // Team and not in a Force flagged as non-combat
-        for (CombatTeam formation : campaign.getCombatTeamsAsMap().values()) {
-            Formation force = campaign.getFormation(formation.getFormationId());
+        for (CombatTeam formation : campaign.getPlayerForce().getCombatTeamsAsMap(campaign).values()) {
+            int id = formation.getFormationId();
+            Formation force = campaign.getPlayerForce().getFormation(id);
 
             if (force == null) {
                 continue;
@@ -421,7 +423,7 @@ public class Resupply {
             }
 
             for (UUID unitId : force.getAllUnits(true)) {
-                Entity entity = getEntityFromUnitId(campaign.getAllHangar(), unitId);
+                Entity entity = getEntityFromUnitId(campaign.getPlayerForce().getHangar(), unitId);
 
                 if (entity == null) {
                     continue;
@@ -439,7 +441,7 @@ public class Resupply {
         double dropSize = getDropSize(contract, unitTonnage);
 
         if (campaign.getCampaignOptions().isUseFactionStandingResupplySafe()) {
-            FactionStandings standings = campaign.getFactionStandings();
+            FactionStandings standings = campaign.getPlayerForce().getFactionStandings();
             double regard = standings.getRegardForFaction(contract.getEmployerCode(), true);
             double resupplyMultiplier = FactionStandingUtilities.getResupplyWeightModifier(regard);
             dropSize *= resupplyMultiplier;
@@ -587,7 +589,7 @@ public class Resupply {
      */
     private Set<PartInUse> collectPartsInUseAcrossLocations() {
         List<IPlace> places = new ArrayList<>();
-        places.add(campaign);
+        places.add(campaign.getPlayerForce().getForceDetachment());
         places.addAll(campaign.getCampaignLocationManager().getPlayerBases());
 
         Map<PartInUse, PartInUse> merged = new HashMap<>();
@@ -641,8 +643,11 @@ public class Resupply {
      * @return {@code true} if the part is in the exclusion list, {@code false} otherwise.
      */
     private boolean checkExclusionList(Part part) {
-        if (part instanceof EquipmentPart equipmentPart) {
-            return equipmentPart.getType().hasFlag(F_SPONSON_TURRET);
+        // F_SPONSON_TURRET is a MiscType flag, so only check it when the underlying type is actually a
+        // MiscType. This correctly excludes EquipmentParts backed by other types (AmmoType, WeaponType, etc.).
+        if (part instanceof EquipmentPart equipmentPart &&
+                  equipmentPart.getType() instanceof MiscType miscType) {
+            return miscType.hasFlag(F_SPONSON_TURRET);
         }
         return false;
     }
@@ -831,11 +836,14 @@ public class Resupply {
         negotiatorSkill = NONE.ordinal();
 
         if (contract.getContractType().isGuerrillaType() || PIRATE_FACTION_CODE.equals(contract.getEmployerCode())) {
-            negotiator = campaign.getCommander();
+            negotiator = campaign.getPlayerForce().getHumanResources()
+                               .getCommander(campaign.getCampaignOptions(),
+                                     campaign.isClanCampaign(),
+                                     campaign.getLocalDate());
         } else {
             negotiator = null;
 
-            for (Person admin : campaign.getAdmins()) {
+            for (Person admin : campaign.getPlayerForce().getHumanResources().getAdmins()) {
                 if (admin.getPrimaryRole().isAdministratorLogistics() ||
                           admin.getSecondaryRole().isAdministratorLogistics()) {
                     if (negotiator == null || (admin.outRanksUsingSkillTiebreaker(campaign, negotiator))) {
@@ -866,7 +874,7 @@ public class Resupply {
         playerConvoys = new HashMap<>();
         totalPlayerCargoCapacity = 0;
 
-        for (Formation formation : campaign.getAllFormations()) {
+        for (Formation formation : campaign.getPlayerForce().getAllFormations()) {
             if (!formation.isFormationType(CONVOY)) {
                 continue;
             }

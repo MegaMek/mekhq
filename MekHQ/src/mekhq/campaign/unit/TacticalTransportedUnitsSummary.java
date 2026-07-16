@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -190,7 +190,7 @@ public class TacticalTransportedUnitsSummary extends AbstractTransportedUnitsSum
         clearTransportedUnits();
 
         // And now reset the Transported values for all the units we just booted
-        campaign.getHangar().forEachUnit(u -> {
+        campaign.getPlayerForce().getHangar().forEachUnit(u -> {
             if (u.hasTacticalTransportAssignment()
                       && Objects.equals(transport, u.getTacticalTransportAssignment().getTransport())) {
                 u.setTacticalTransportAssignment(null);
@@ -209,7 +209,7 @@ public class TacticalTransportedUnitsSummary extends AbstractTransportedUnitsSum
         clearTransportedUnits();
         for (Unit tacticalTransportedUnit : oldTransportedUnits) {
             if (tacticalTransportedUnit instanceof Unit.UnitRef) {
-                Unit realUnit = campaign.getHangar().getUnit(tacticalTransportedUnit.getId());
+                Unit realUnit = campaign.getPlayerForce().getHangar().getUnit(tacticalTransportedUnit.getId());
                 if (realUnit != null) {
                     if (realUnit.hasTacticalTransportAssignment()) {
                         loadTransport(realUnit.getTacticalTransportAssignment().getTransporterType(),

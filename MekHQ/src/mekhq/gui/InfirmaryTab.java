@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -53,6 +53,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.UUID;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -63,6 +64,7 @@ import megamek.client.ui.util.UIUtil;
 import megamek.common.event.Subscribe;
 import megamek.common.ui.FastJScrollPane;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.OptimizeInfirmaryAssignments;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.MedicPoolChangedEvent;
@@ -459,13 +461,15 @@ public final class InfirmaryTab extends CampaignGuiTab {
         final boolean isDoctorsUseAdministration = campaignOptions.isDoctorsUseAdministration();
 
         final int doctorCapacity = doctor.getDoctorMedicalCapacity(isDoctorsUseAdministration, baseBedCount);
-        final int patientsForDoctor = getCampaign().getPatientsFor(doctor);
+        Campaign campaign1 = getCampaign();
+        final int patientsForDoctor = campaign1.getPlayerForce().getHumanResources().getPatientsFor(doctor);
         final boolean isWithinDoctorCapacity = doctorCapacity > patientsForDoctor;
 
         boolean useMASHTheatres = campaignOptions.isUseMASHTheatres();
         boolean isWithinTheatreCapacity = !useMASHTheatres;
         if (useMASHTheatres) {
-            isWithinTheatreCapacity = getCampaign().getMashTheatresWithinCapacity();
+            mekhq.campaign.Campaign campaign = getCampaign();
+            isWithinTheatreCapacity = campaign.getPlayerForce().getMashTheatresWithinCapacity(campaign);
         }
 
         return isWithinDoctorCapacity && isWithinTheatreCapacity;
@@ -525,7 +529,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
 
     public void refreshDoctorsList() {
         final int selected = docTable.getSelectedRow();
-        final List<Person> doctors = getCampaign().getDoctors();
+        final List<Person> doctors = getCampaign().getPlayerForce().getHumanResources().getDoctors();
         doctors.sort(new PersonTitleSorter().reversed());
         doctorsModel.setData(doctors);
         if ((selected > -1) && (selected < doctors.size())) {
@@ -537,12 +541,17 @@ public final class InfirmaryTab extends CampaignGuiTab {
         Person doctor = getSelectedDoctor();
         ArrayList<Person> assigned = new ArrayList<>();
         ArrayList<Person> unassigned = new ArrayList<>();
-        for (Person patient : getCampaign().getPatientsWithNonPermanentInjuries()) {
+        for (Person patient : getCampaign().getPlayerForce()
+                                    .getHumanResources()
+                                    .getPatientsWithNonPermanentInjuries()) {
             // Knock out inactive doctors
             if ((patient.getDoctorId() != null) &&
-                      (getCampaign().getPerson(patient.getDoctorId()) != null) &&
-                      !getCampaign().getPerson(patient.getDoctorId()).getStatus().isActiveFlexible()) {
-                patient.setDoctorId(null, getCampaign().getCampaignOptions().getNaturalHealingWaitingPeriod());
+                      (getCampaign().getPerson(patient.getDoctorId()) != null)) {
+                Campaign campaign = getCampaign();
+                final UUID id = patient.getDoctorId();
+                if (!campaign.getPlayerForce().getHumanResources().getPerson(id).getStatus().isActiveFlexible()) {
+                    patient.setDoctorId(null, getCampaign().getCampaignOptions().getNaturalHealingWaitingPeriod());
+                }
             }
 
             if (patient.getDoctorId() == null) {

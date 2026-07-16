@@ -119,7 +119,7 @@ public class Contract extends Mission {
                                    .multipliedBy(getStraightSupport())
                                    .dividedBy(100));
         } else {
-            Money maintCosts = campaign.getAllHangar().getUnitCosts(u -> !u.isConventionalInfantry(),
+            Money maintCosts = campaign.getPlayerForce().getHangar().getUnitCosts(u -> !u.isConventionalInfantry(),
                   Unit::getWeeklyMaintenanceCost);
             maintCosts = maintCosts.multipliedBy(4);
             setSupportAmount(maintCosts
@@ -184,13 +184,15 @@ public class Contract extends Mission {
 
         if (adjustStartDate && (campaign.getSystemByName(getSystemId()) != null)) {
             boolean isUseCommandCircuit =
-                  FactionStandingUtilities.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(),
+                  FactionStandingUtilities.isUseCommandCircuit(campaign.getPlayerForce()
+                                                                     .isOverridingCommandCircuitRequirements(),
                         campaign.isGM(),
                         campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
-                        campaign.getFactionStandings(), campaign.getFutureAtBContracts());
+                        campaign.getPlayerForce().getFactionStandings(), campaign.getFutureAtBContracts());
 
             int days = (int) ceil(getJumpPath(campaign).getTotalTime(campaign.getLocalDate(),
-                  campaign.getCurrentLocation().getTransitTime(), isUseCommandCircuit));
+                  campaign.getPlayerForce().getForceDetachment().getCurrentLocation().getTransitTime(),
+                  isUseCommandCircuit));
             startDate = startDate.plusDays(days);
         }
 

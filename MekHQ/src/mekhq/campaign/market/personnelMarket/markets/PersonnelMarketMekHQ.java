@@ -54,7 +54,7 @@ import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
 import mekhq.MekHQ;
 import mekhq.campaign.AbstractLocation;
-import mekhq.campaign.camOpsReputation.ReputationController;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.personnelMarket.records.PersonnelMarketEntry;
@@ -129,7 +129,8 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
         ArrayList<Faction> interestedFactions = new ArrayList<>();
 
         boolean filterOutLegalFactions = false;
-        if (getCampaign().getReputation().getReputationRating() < getUnitReputationRecruitmentCutoff()) {
+        if (getCampaign().getPlayerForce().getReputation().getReputationRating() <
+                  getUnitReputationRecruitmentCutoff()) {
             getLogger().debug(
                   "Only pirates & mercenaries will be considered for applicants, as the campaign's unit " +
                         "rating is below the cutoff.");
@@ -147,7 +148,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
         Factions factions = Factions.getInstance();
         Faction mercenaryFaction = factions.getFaction(MERCENARY_FACTION_CODE);
         Faction pirateFaction = factions.getFaction(PIRATE_FACTION_CODE);
-        FactionStandings factionStandings = getCampaign().getFactionStandings();
+        FactionStandings factionStandings = getCampaign().getPlayerForce().getFactionStandings();
 
         for (Faction faction : systemFactions) {
             if (filterOutLegalFactions) {
@@ -199,7 +200,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
      */
     @Override
     public String getAvailabilityMessage() {
-        AbstractLocation location = getCampaign().getCurrentLocation();
+        AbstractLocation location = getCampaign().getPlayerForce().getForceDetachment().getCurrentLocation();
         String color;
         String closingBrace = CLOSING_SPAN_TAG;
 
@@ -245,7 +246,8 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
      */
     @Override
     public void generateApplicants() {
-        ReputationController reputation = getCampaign().getReputation();
+        mekhq.campaign.camOpsReputation.ForceReputationController reputation = getCampaign().getPlayerForce()
+                                                                                     .getReputation();
         int averageSkillLevel = reputation.getAverageSkillLevel().getExperienceLevel();
 
         calculateNumberOfRecruitmentRolls();
@@ -297,8 +299,10 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
 
         for (int roll = 0; roll < dependentsCount; roll++) {
             Faction applicantOriginFaction = getRandomItem(getApplicantOriginFactions());
-            Person applicant = getCampaign().newDependent(Gender.RANDOMIZE, applicantOriginFaction,
-                  null);
+            Campaign campaign = getCampaign();
+            Person applicant = campaign.getPlayerForce()
+                                     .getHumanResources()
+                                     .newDependent(campaign, Gender.RANDOMIZE, applicantOriginFaction, null);
             if (applicant == null) {
                 continue;
             }
@@ -371,9 +375,9 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
      * @since 0.50.07
      */
     private double getFactionStandingsRecruitmentModifier() {
-        FactionStandings factionStandings = getCampaign().getFactionStandings();
+        FactionStandings factionStandings = getCampaign().getPlayerForce().getFactionStandings();
 
-        AbstractLocation location = getCampaign().getCurrentLocation();
+        AbstractLocation location = getCampaign().getPlayerForce().getForceDetachment().getCurrentLocation();
         PlanetarySystem currentSystem = location.getCurrentSystem();
         double multiplier = 0;
 
@@ -399,7 +403,7 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
      * @since 0.50.06
      */
     public int getSystemStatusRecruitmentMultiplier() {
-        AbstractLocation location = getCampaign().getCurrentLocation();
+        AbstractLocation location = getCampaign().getPlayerForce().getForceDetachment().getCurrentLocation();
         PlanetarySystem currentSystem = location.getCurrentSystem();
 
         LocalDate today = getCampaign().getLocalDate();

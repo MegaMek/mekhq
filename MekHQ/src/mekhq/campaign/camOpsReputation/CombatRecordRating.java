@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -122,8 +122,8 @@ public class CombatRecordRating {
                                        - (contractBreaches * breachMultiplier);
 
         // if the campaign has a retainer, check retainer duration
-        if (campaign.getRetainerStartDate() != null) {
-            int retainerDuration = (int) ChronoUnit.YEARS.between(campaign.getRetainerStartDate(),
+        if (campaign.getPlayerForce().getRetainerStartDate() != null) {
+            int retainerDuration = (int) ChronoUnit.YEARS.between(campaign.getPlayerForce().getRetainerStartDate(),
                   campaign.getLocalDate());
             combatRecord.put("retainerDuration", retainerDuration);
             combatRecordRating += retainerDuration * 5;

@@ -32,7 +32,7 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
-import static org.mockito.Mockito.mock;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -47,7 +47,7 @@ import org.junit.jupiter.api.Test;
 class PersonnelOptionsModelTest {
     @Test
     void applyToRoundTripsEveryField() {
-        Campaign campaign = mock(Campaign.class);
+        Campaign campaign = mockCampaign();
         PersonnelOptionsModel model = new PersonnelOptionsModel(new CampaignOptions());
         OptionsModelTestSupport.mutateScalarFields(model, "resetTemporaryPrisonerCapacity");
         model.awardSetFilterList = "Alpha,Beta";

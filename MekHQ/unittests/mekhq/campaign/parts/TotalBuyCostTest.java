@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -38,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.math.BigDecimal;
 
@@ -46,20 +47,20 @@ import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.market.ShoppingList;
 import mekhq.campaign.parts.meks.MekCockpit;
 import mekhq.campaign.parts.meks.MekSensor;
 import mekhq.campaign.work.IAcquisitionWork;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
 import org.mockito.Mock;
 
 
 public class TotalBuyCostTest {
 
 
-    @Mock
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private Campaign mockCampaign;
 
     @Mock
@@ -72,7 +73,7 @@ public class TotalBuyCostTest {
 
     @BeforeEach
     public void beforeEach() {
-        mockCampaign = mock(Campaign.class);
+        mockCampaign = mockCampaign();
         mockCampaignOptions = mock(CampaignOptions.class);
         lenient().when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
         lenient().when(mockCampaignOptions.getCommonPartPriceMultiplier()).thenReturn(1d);
@@ -85,7 +86,7 @@ public class TotalBuyCostTest {
 
     @Test
     public void emptyShoppingList() {
-        ShoppingList testShoppingList = new ShoppingList();
+        mekhq.campaign.market.ForceShoppingList testShoppingList = new mekhq.campaign.market.ForceShoppingList();
         Money totalBuyValue = testShoppingList.getTotalBuyCost();
         assertTrue(testShoppingList.getPartList().isEmpty());
         assertTrue(totalBuyValue.isZero());
@@ -93,8 +94,8 @@ public class TotalBuyCostTest {
 
     @Test
     public void onePartInShoppingList() {
-        ShoppingList testShoppingList = new ShoppingList();
-        mockCampaign.setShoppingList(testShoppingList);
+        mekhq.campaign.market.ForceShoppingList testShoppingList = new mekhq.campaign.market.ForceShoppingList();
+        mockCampaign.getPlayerForce().setShoppingList(testShoppingList);
         Part part = new MekSensor(1, mockCampaign);
         IAcquisitionWork shoppingListItem = part.getAcquisitionWork();
         Money partValue = shoppingListItem.getBuyCost();
@@ -105,8 +106,8 @@ public class TotalBuyCostTest {
 
     @Test
     public void incrementPartInShoppingList() {
-        ShoppingList testShoppingList = new ShoppingList();
-        mockCampaign.setShoppingList(testShoppingList);
+        mekhq.campaign.market.ForceShoppingList testShoppingList = new mekhq.campaign.market.ForceShoppingList();
+        mockCampaign.getPlayerForce().setShoppingList(testShoppingList);
         Part part = new MekSensor(1, mockCampaign);
         IAcquisitionWork shoppingListItem = part.getAcquisitionWork();
         Money partValue = shoppingListItem.getBuyCost();
@@ -122,8 +123,8 @@ public class TotalBuyCostTest {
 
     @Test
     public void decrementPartInShoppingList() {
-        ShoppingList testShoppingList = new ShoppingList();
-        mockCampaign.setShoppingList(testShoppingList);
+        mekhq.campaign.market.ForceShoppingList testShoppingList = new mekhq.campaign.market.ForceShoppingList();
+        mockCampaign.getPlayerForce().setShoppingList(testShoppingList);
         Part part = new MekSensor(1, mockCampaign);
         IAcquisitionWork shoppingListItem = part.getAcquisitionWork();
         shoppingListItem.incrementQuantity();
@@ -144,8 +145,8 @@ public class TotalBuyCostTest {
 
     @Test
     public void addDifferentPartsInShoppingList() {
-        ShoppingList testShoppingList = new ShoppingList();
-        mockCampaign.setShoppingList(testShoppingList);
+        mekhq.campaign.market.ForceShoppingList testShoppingList = new mekhq.campaign.market.ForceShoppingList();
+        mockCampaign.getPlayerForce().setShoppingList(testShoppingList);
         Part partA = new MekSensor(1, mockCampaign);
         Part partB = new MekCockpit(2, Mek.COCKPIT_SMALL, false, mockCampaign);
         IAcquisitionWork shoppingListItemA = partA.getAcquisitionWork();

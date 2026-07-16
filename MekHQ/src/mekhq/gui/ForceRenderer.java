@@ -160,7 +160,9 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
 
             String text = name + ", " + unitName + c3network + transport + tacticalTransport + towTransport;
 
-            Formation formation = unit.getCampaign().getFormation(unit.getFormationId());
+            mekhq.campaign.Campaign campaign = unit.getCampaign();
+            int id = unit.getFormationId();
+            Formation formation = campaign.getPlayerForce().getFormation(id);
             if ((null != person) &&
                       (null != formation) &&
                       (person.getId().equals(formation.getFormationCommanderID()))) {

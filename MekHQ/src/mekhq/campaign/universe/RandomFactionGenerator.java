@@ -56,7 +56,6 @@ import java.util.stream.Collectors;
 
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.annotations.Nullable;
-import megamek.common.compute.Compute;
 import megamek.common.util.weightedMaps.WeightedIntMap;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
@@ -65,8 +64,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.mission.newContract.EnemySelectionProfile;
 import mekhq.campaign.mission.newContract.MissionLocationProfile;
-import mekhq.campaign.mission.newContract.MissionTargetFinder;
-import mekhq.campaign.mission.newContract.contractGeneration.GlobalEmployerTableValue;
+import mekhq.campaign.mission.newContract.targetFinder.MissionTargetFinder;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.enums.HPGRating;
 import mekhq.campaign.universe.factionHints.FactionHints;
@@ -429,7 +427,8 @@ public class RandomFactionGenerator {
     }
 
     /**
-     * Selects an enemy faction for {@code employer} using the given contract-type enemy-selection profile: synthetic
+     * Selects an enemy faction for {@code employer} by delegating to the given contract-type enemy-selection profile
+     * (see {@link EnemySelectionProfile#selectEnemy(RandomFactionGenerator, ILocation, LocalDate, Faction)}): synthetic
      * enemies (pirates, rebels, raiders) resolve directly, war-based profiles prefer the employer's actual belligerents
      * before falling back to the standard pool, and covert profiles run the standard pool under covert rules (see
      * {@link #getRandomEnemy(boolean, ILocation, LocalDate, Faction)}).
@@ -447,26 +446,7 @@ public class RandomFactionGenerator {
             return rebelFallback("No employer supplied or faction does not exist. Returning REBEL");
         }
 
-        return switch (profile) {
-            case PIRATES -> pirateFactionFor(employer);
-            case REBELS -> Factions.getInstance().getFaction(REBEL_FACTION_CODE);
-            case RAIDERS -> raiderEnemy(employer);
-            case AT_WAR -> atWarEnemy(location, date, employer);
-            case OCCUPYING_POWER -> occupyingPowerEnemy(location, date, employer);
-            case COVERT -> getRandomEnemy(true, location, date, employer);
-            case DEFAULT -> getRandomEnemy(false, location, date, employer);
-        };
-    }
-
-    /**
-     * @param employer the employer faction
-     *
-     * @return the pirate faction appropriate to the employer: the Bandit Caste for a Clan employer, otherwise the
-     *       regular pirate faction
-     */
-    private static Faction pirateFactionFor(Faction employer) {
-        return Factions.getInstance()
-                     .getFaction(employer.isClan() ? BANDIT_CASTE_FACTION_CODE : PIRATE_FACTION_CODE);
+        return profile.selectEnemy(this, location, date, employer);
     }
 
     /**
@@ -482,22 +462,6 @@ public class RandomFactionGenerator {
     }
 
     /**
-     * Picks an irregular rear-area harasser: pirates or rebels, even odds. Either can end up as its own enemy (rival
-     * pirate bands, rival rebel cells - see {@link #isSelfConflictingFaction}), so no special-casing is needed when the
-     * employer itself is one of the two.
-     *
-     * @param employer the employer faction
-     *
-     * @return the raider enemy faction
-     */
-    private Faction raiderEnemy(Faction employer) {
-        if (Compute.randomInt(2) == 0) {
-            return Factions.getInstance().getFaction(REBEL_FACTION_CODE);
-        }
-        return pirateFactionFor(employer);
-    }
-
-    /**
      * Picks a faction the employer is at war with, falling back to the standard pool when the employer isn't at war
      * with anyone.
      *
@@ -507,7 +471,7 @@ public class RandomFactionGenerator {
      *
      * @return the selected enemy faction
      */
-    private Faction atWarEnemy(ILocation location, LocalDate date, Faction employer) {
+    public Faction atWarEnemy(ILocation location, LocalDate date, Faction employer) {
         List<Faction> belligerents = findEnemiesAtWarWith(employer, date);
         if (!belligerents.isEmpty()) {
             return ObjectUtility.getRandomItem(belligerents);
@@ -526,7 +490,7 @@ public class RandomFactionGenerator {
      *
      * @return the selected enemy faction
      */
-    private Faction occupyingPowerEnemy(ILocation location, LocalDate date, Faction employer) {
+    public Faction occupyingPowerEnemy(ILocation location, LocalDate date, Faction employer) {
         List<Faction> belligerents = findEnemiesAtWarWith(employer, date);
         if (belligerents.isEmpty()) {
             return getRandomEnemy(false, location, date, employer);

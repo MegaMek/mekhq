@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -114,9 +114,12 @@ public record NewYearsDayAnnouncement(Campaign campaign) {
      * @return the selected {@link Person}, or {@code null} if no suitable speaker is found
      */
     private @Nullable Person getSpeaker() {
-        List<Person> activePersonnel = campaign.getActivePersonnel(false, false);
+        List<Person> activePersonnel = campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false);
 
-        Person commander = campaign.getCommander();
+        Person commander = campaign.getPlayerForce().getHumanResources()
+                                 .getCommander(campaign.getCampaignOptions(),
+                                       campaign.isClanCampaign(),
+                                       campaign.getLocalDate());
         if (commander != null) {
             activePersonnel.remove(commander);
         }

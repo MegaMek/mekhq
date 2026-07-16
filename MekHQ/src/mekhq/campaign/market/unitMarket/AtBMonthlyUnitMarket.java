@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -148,7 +148,7 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
             int totalModifier;
             int standingsModifier = 0;
             if (campaign.getCampaignOptions().isUseFactionStandingUnitMarketSafe()) {
-                FactionStandings factionStandings = campaign.getFactionStandings();
+                FactionStandings factionStandings = campaign.getPlayerForce().getFactionStandings();
                 double regard = factionStandings.getRegardForFaction(contract.getEmployerCode(), true);
                 standingsModifier = FactionStandingUtilities.getUnitMarketRarityModifier(regard);
             }

@@ -4733,10 +4733,11 @@ public class Unit implements ITechnology, ILocatable {
 
     public Camouflage getUtilizedCamouflage(final Campaign campaign) {
         if (getCamouflage().hasDefaultCategory()) {
-            final Formation formation = campaign.getFormation(getFormationId());
-            return (formation != null) ?
-                         formation.getCamouflageOrElse(campaign.getCamouflage()) :
-                         campaign.getCamouflage();
+            int id1 = getFormationId();
+            final Formation formation = campaign.getPlayerForce().getFormation(id1);
+            if ((formation != null)) {return formation.getCamouflageOrElse(campaign.getCamouflage());} else {
+                return campaign.getPlayerForce().getCamouflage();
+            }
         } else {
             return getCamouflage();
         }
@@ -5458,8 +5459,13 @@ public class Unit implements ITechnology, ILocatable {
 
             // Get available temp crew for this vehicle type
             int availableTempCrew = 0;
-            if (driverRole != null && getCampaign().isBlobCrewEnabled(driverRole)) {
-                availableTempCrew = getTempCrewByPersonnelRole(driverRole);
+            if (driverRole != null) {
+                Campaign campaign1 = getCampaign();
+                if (campaign1.getPlayerForce()
+                          .getHumanResources()
+                          .isBlobCrewEnabled(driverRole, campaign1.getCampaignOptions())) {
+                    availableTempCrew = getTempCrewByPersonnelRole(driverRole);
+                }
             }
 
             // Calculate how many drivers and gunners we need
@@ -6080,7 +6086,9 @@ public class Unit implements ITechnology, ILocatable {
 
     private void ensurePersonIsRegistered(final Person person) {
         Objects.requireNonNull(person);
-        if (getCampaign().getPerson(person.getId()) == null) {
+        Campaign campaign1 = getCampaign();
+        final UUID id1 = person.getId();
+        if (campaign1.getPlayerForce().getHumanResources().getPerson(id1) == null) {
             getCampaign().recruitPerson(person, person.getPrisonerStatus(), true, false, true);
             LOGGER.debug("The person {} added this unit {}, was not in the campaign.", person.getFullName(), getName());
         }
@@ -6120,17 +6128,20 @@ public class Unit implements ITechnology, ILocatable {
 
         if (useTransfers) {
             AssignmentLogger.reassignedTo(person, getCampaign().getLocalDate(), getName());
+            Campaign campaign1 = getCampaign();
+            Campaign campaign2 = getCampaign();
             AssignmentLogger.reassignedTOEFormation(getCampaign(),
                   person,
                   getCampaign().getLocalDate(),
-                  getCampaign().getFormationFor(oldUnit),
-                  getCampaign().getFormationFor(this));
+                  campaign2.getPlayerForce().getFormationFor(oldUnit),
+                  campaign1.getPlayerForce().getFormationFor(this));
         } else {
             AssignmentLogger.assignedTo(person, getCampaign().getLocalDate(), getName());
+            Campaign campaign1 = getCampaign();
             AssignmentLogger.addedToTOEFormation(getCampaign(),
                   person,
                   getCampaign().getLocalDate(),
-                  getCampaign().getFormationFor(this));
+                  campaign1.getPlayerForce().getFormationFor(this));
         }
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(campaign, person, this));
     }
@@ -6180,10 +6191,11 @@ public class Unit implements ITechnology, ILocatable {
 
         if (log) {
             AssignmentLogger.removedFrom(person, getCampaign().getLocalDate(), getName());
+            Campaign campaign1 = getCampaign();
             AssignmentLogger.removedFromTOEFormation(getCampaign(),
                   person,
                   getCampaign().getLocalDate(),
-                  getCampaign().getFormationFor(this));
+                  campaign1.getPlayerForce().getFormationFor(this));
         }
     }
 
@@ -6415,7 +6427,8 @@ public class Unit implements ITechnology, ILocatable {
 
         // don't remove personnel yet, because self crewed units need their crews to
         // mothball
-        getCampaign().removeUnitFromFormation(this);
+        Campaign campaign1 = getCampaign();
+        campaign1.getPlayerForce().removeUnitFromFormation(this, campaign1);
 
         // clear any assigned tasks
         for (Part p : getParts()) {
@@ -6444,7 +6457,7 @@ public class Unit implements ITechnology, ILocatable {
             // if it is self crewed AND is mothballed and has a mothball info, get the tech
             if (isSelfCrewed() && isMothballed() && (this.mothballInfo != null)) {
                 UUID previousTechId = this.mothballInfo.getTechId();
-                var previousTech = campaign.getPerson(previousTechId);
+                var previousTech = campaign.getPlayerForce().getHumanResources().getPerson(previousTechId);
                 var previousTechExists = previousTech != null;
                 var previousTechIsActive = previousTechExists && previousTech.getStatus().isActive();
                 if (previousTechIsActive) {
@@ -7379,10 +7392,13 @@ public class Unit implements ITechnology, ILocatable {
             Engine engine = entity.getEngine();
             int currentYear = getCampaign().getGameYear();
             TechRating rating = getTechRating();
-            if (((currentYear > 2859) && (currentYear < 3040)) &&
-                      (!getCampaign().getFaction().isClan() && !getCampaign().getFaction().isComStar())) {
-                if (rating.isBetterThan(TechRating.D)) {
-                    partsCost = partsCost.multipliedBy(5.0);
+            if (((currentYear > 2859) && (currentYear < 3040))) {
+                if (!getCampaign().getFaction().isClan()) {
+                    if (!getCampaign().getPlayerForce().getFaction().isComStar()) {
+                        if (rating.isBetterThan(TechRating.D)) {
+                            partsCost = partsCost.multipliedBy(5.0);
+                        }
+                    }
                 }
             }
 
@@ -7806,7 +7822,7 @@ public class Unit implements ITechnology, ILocatable {
     public void fixReferences(Campaign campaign) {
         if (tech instanceof UnitPersonRef) {
             UUID id = tech.getId();
-            tech = campaign.getPerson(id);
+            tech = campaign.getPlayerForce().getHumanResources().getPerson(id);
             if (tech == null) {
                 LOGGER.error("Unit {} ('{}') references missing tech {}", getId(), getName(), id);
             }
@@ -7814,7 +7830,8 @@ public class Unit implements ITechnology, ILocatable {
         for (int ii = drivers.size() - 1; ii >= 0; --ii) {
             Person driver = drivers.get(ii);
             if (driver instanceof UnitPersonRef) {
-                drivers.set(ii, campaign.getPerson(driver.getId()));
+                final UUID id1 = driver.getId();
+                drivers.set(ii, campaign.getPlayerForce().getHumanResources().getPerson(id1));
                 if (drivers.get(ii) == null) {
                     LOGGER.error("Unit {} ('{}') references missing driver {}", getId(), getName(), driver.getId());
                     drivers.remove(ii);
@@ -7823,7 +7840,8 @@ public class Unit implements ITechnology, ILocatable {
         }
         for (Person gunner : new HashSet<>(gunners)) {
             if (gunner instanceof UnitPersonRef) {
-                Person updatedGunner = campaign.getPerson(gunner.getId());
+                final UUID id1 = gunner.getId();
+                Person updatedGunner = campaign.getPlayerForce().getHumanResources().getPerson(id1);
                 if (updatedGunner != null) {
                     if (!gunners.remove(gunner)) { // Remove gunner person ref & log if it fails
                         LOGGER.warn("Unit {} ('{}') could not remove person ref {}",
@@ -7847,7 +7865,8 @@ public class Unit implements ITechnology, ILocatable {
         for (int ii = vesselCrew.size() - 1; ii >= 0; --ii) {
             Person crew = vesselCrew.get(ii);
             if (crew instanceof UnitPersonRef) {
-                vesselCrew.set(ii, campaign.getPerson(crew.getId()));
+                final UUID id1 = crew.getId();
+                vesselCrew.set(ii, campaign.getPlayerForce().getHumanResources().getPerson(id1));
                 if (vesselCrew.get(ii) == null) {
                     LOGGER.error("Unit {} ('{}') references missing vessel crew {}", getId(), getName(), crew.getId());
                     vesselCrew.remove(ii);
@@ -7857,7 +7876,7 @@ public class Unit implements ITechnology, ILocatable {
 
         if (engineer instanceof UnitPersonRef) {
             UUID id = engineer.getId();
-            engineer = campaign.getPerson(id);
+            engineer = campaign.getPlayerForce().getHumanResources().getPerson(id);
             if (engineer == null) {
                 LOGGER.error("Unit {} ('{}') references missing engineer {}", getId(), getName(), id);
             }
@@ -7865,7 +7884,7 @@ public class Unit implements ITechnology, ILocatable {
 
         if (navigator instanceof UnitPersonRef) {
             UUID id = navigator.getId();
-            navigator = campaign.getPerson(id);
+            navigator = campaign.getPlayerForce().getHumanResources().getPerson(id);
             if (navigator == null) {
                 LOGGER.error("Unit {} ('{}') references missing navigator {}", getId(), getName(), id);
             }
@@ -7873,7 +7892,7 @@ public class Unit implements ITechnology, ILocatable {
 
         if (getTechOfficer() instanceof UnitPersonRef) {
             final UUID id = getTechOfficer().getId();
-            techOfficer = campaign.getPerson(id);
+            techOfficer = campaign.getPlayerForce().getHumanResources().getPerson(id);
             if (getTechOfficer() == null) {
                 LOGGER.error("Unit {} ('{}') references missing tech officer {}", getId(), getName(), id);
             }

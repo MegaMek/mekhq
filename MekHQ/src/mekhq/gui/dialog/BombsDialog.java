@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -126,7 +126,7 @@ public class BombsDialog extends JDialog implements ActionListener {
         bombCatalog.clear();
         availableBombs.clear();
 
-        campaign.getWarehouse().forEachSparePart(spare -> {
+        campaign.getPlayerForce().getWarehouse().forEachSparePart(spare -> {
             if (isBombAmmoStorage(spare)) {
                 AmmoStorage ammoStorage = (AmmoStorage) spare;
                 BombTypeEnum bombType = BombTypeEnum.fromInternalName(
@@ -290,12 +290,12 @@ public class BombsDialog extends JDialog implements ActionListener {
      * Updates an existing warehouse entry.
      */
     private void updateExistingWarehouseEntry(int partId, int deltaCount) {
-        AmmoStorage storedBombs = (AmmoStorage) campaign.getWarehouse().getPart(partId);
+        AmmoStorage storedBombs = (AmmoStorage) campaign.getPlayerForce().getWarehouse().getPart(partId);
         if (storedBombs != null) {
             storedBombs.changeShots(deltaCount);
 
             if (storedBombs.getShots() <= 0) {
-                campaign.getWarehouse().removePart(storedBombs);
+                campaign.getPlayerForce().getWarehouse().removePart(storedBombs);
             }
         }
     }

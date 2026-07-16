@@ -32,6 +32,15 @@
  */
 package mekhq.campaign.mission.newContract;
 
+import java.time.LocalDate;
+import java.util.Collections;
+import java.util.List;
+
+import mekhq.campaign.location.ILocation;
+import mekhq.campaign.mission.newContract.targetFinder.MissionTargetFinder;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.PlanetarySystem;
+
 /**
  * Describes how a contract's mission location should be selected, based on what kind of operation the contract
  * represents. The default border-based search in {@link MissionTargetFinder} fits a conventional front-line campaign,
@@ -49,40 +58,106 @@ package mekhq.campaign.mission.newContract;
  */
 public enum MissionLocationProfile {
     /** The standard shared-border search, unmodified. */
-    DEFAULT,
+    DEFAULT {
+        @Override
+        public List<PlanetarySystem> findTargets(MissionTargetFinder finder, Faction attacker, Faction defender,
+              ILocation location, double radius, LocalDate date) {
+            return Collections.emptyList();
+        }
+    },
     /**
      * The mission happens in the defender's interior, away from the front: training cadres and standing retainers are
      * stationed where it's safe, not on a contested border world.
      */
-    REAR_AREA,
+    REAR_AREA {
+        @Override
+        public List<PlanetarySystem> findTargets(MissionTargetFinder finder, Faction attacker, Faction defender,
+              ILocation location, double radius, LocalDate date) {
+            return finder.findRearAreaTargets(attacker, defender, location, radius, date);
+        }
+    },
     /**
      * The mission can happen anywhere in the defender's territory, preferring heavily populated worlds: riots and
      * internal-security work need people, not proximity to the enemy.
      */
-    INTERIOR_POPULATED,
+    INTERIOR_POPULATED {
+        @Override
+        public List<PlanetarySystem> findTargets(MissionTargetFinder finder, Faction attacker, Faction defender,
+              ILocation location, double radius, LocalDate date) {
+            return finder.findAllDefenderTargets(defender, location, radius, date);
+        }
+    },
     /**
      * The mission is a hit-and-run strike that can reach past the immediate border into the defender's near interior,
      * roughly twice as deep as a conventional front line extends.
      */
-    DEEP_RAID,
+    DEEP_RAID {
+        @Override
+        public List<PlanetarySystem> findTargets(MissionTargetFinder finder, Faction attacker, Faction defender,
+              ILocation location, double radius, LocalDate date) {
+            return finder.findDeepRaidTargets(attacker, defender, location, radius);
+        }
+    },
     /**
      * The mission happens behind enemy lines, preferring worlds the attacker recently lost to the defender (occupied
      * territory with a sympathetic population), then any defender world away from the shared border.
      */
-    OCCUPIED_TERRITORY,
+    OCCUPIED_TERRITORY {
+        @Override
+        public List<PlanetarySystem> findTargets(MissionTargetFinder finder, Faction attacker, Faction defender,
+              ILocation location, double radius, LocalDate date) {
+            return finder.findOccupiedTerritoryTargets(attacker, defender, location, radius, date);
+        }
+    },
     /**
      * The mission uses the standard candidate pool, but the final pick is weighted toward high-value worlds
      * (population, major HPG presence) instead of being uniformly random: a sabotage or espionage campaign aims at a
-     * factory world, not an uninhabited iceball.
+     * factory world, not an uninhabited iceball. Uses the default candidate pool unchanged (no preferred tier here),
+     * differing only in how the final pick is weighted (see {@link #isPopulationWeighted()}).
      */
-    HIGH_VALUE,
+    HIGH_VALUE {
+        @Override
+        public List<PlanetarySystem> findTargets(MissionTargetFinder finder, Faction attacker, Faction defender,
+              ILocation location, double radius, LocalDate date) {
+            return Collections.emptyList();
+        }
+    },
     /**
      * The mission is a full planetary invasion, viable only on the shared border between the two factions: the attacker
      * can take, supply, and hold a world only from adjacent friendly territory. The pick among border worlds is
      * weighted like {@link #HIGH_VALUE}, but unlike every other profile there is no deep-placement fallback &mdash; no
      * shared border means no viable invasion target at all.
      */
-    INVASION;
+    INVASION {
+        @Override
+        public List<PlanetarySystem> findTargets(MissionTargetFinder finder, Faction attacker, Faction defender,
+              ILocation location, double radius, LocalDate date) {
+            return finder.findSharedBorderTargets(attacker, defender, location, radius, date);
+        }
+    };
+
+    /**
+     * Finds this profile's preferred-tier target systems, or an empty list to fall through to the finder's default
+     * shared-border chain. The finder owns the actual geography searches (they depend on its border tracker and faction
+     * hints); this method routes to the right one.
+     *
+     * <p>{@link #DEFAULT} and {@link #HIGH_VALUE} intentionally return nothing: DEFAULT has no preference, and
+     * HIGH_VALUE uses the default candidate pool unchanged, differing only in how the final pick is weighted (see
+     * {@link #isPopulationWeighted()}). An empty result from {@link #INVASION} does NOT fall through &mdash;
+     * {@link MissionTargetFinder#find} blocks it from reaching the deep fallbacks, since an invasion with no shared
+     * border has no viable target.</p>
+     *
+     * @param finder   the finder supplying the geography searches and regional context
+     * @param attacker the attacking faction
+     * @param defender the defending faction
+     * @param location the location to center the search on
+     * @param radius   the search radius in light years from {@code location}'s current system
+     * @param date     the date to check faction control and diplomatic relations against
+     *
+     * @return the profile's preferred candidate systems, or an empty list to fall through to the default chain
+     */
+    public abstract List<PlanetarySystem> findTargets(MissionTargetFinder finder, Faction attacker, Faction defender,
+          ILocation location, double radius, LocalDate date);
 
     /**
      * How many years back a "recently conquered" ownership check looks. Shared between the {@link #OCCUPIED_TERRITORY}

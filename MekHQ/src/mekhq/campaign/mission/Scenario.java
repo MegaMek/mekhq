@@ -634,7 +634,7 @@ public class Scenario implements IPlayerSettings {
     public Formation getForces(Campaign campaign) {
         Formation formation = new Formation("Assigned Forces");
         for (int subid : subForceIds) {
-            Formation sub = campaign.getFormation(subid);
+            Formation sub = campaign.getPlayerForce().getFormation(subid);
             if (null != sub) {
                 formation.addSubFormation(sub, false);
             }
@@ -725,7 +725,7 @@ public class Scenario implements IPlayerSettings {
 
     public void clearAllFormationsAndPersonnel(Campaign campaign) {
         for (int fid : subForceIds) {
-            Formation f = campaign.getFormation(fid);
+            Formation f = campaign.getPlayerForce().getFormation(fid);
             if (null != f) {
                 f.clearScenarioIds(campaign);
                 MekHQ.triggerEvent(new DeploymentChangedEvent(f, this));

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -91,7 +91,7 @@ public class DocTableModel extends DataTableModel<Person> {
 
         toReturn.append(String.format(" (%d XP)", doctor.getXP()));
 
-        if (campaign.requiresAdditionalMedics()) {
+        if (campaign.getPlayerForce().getHumanResources().requiresAdditionalMedics()) {
             toReturn.append("</font><font color='")
                   .append(ReportingUtilities.getNegativeColor()).append("'>, ")
                   .append(campaign.getMedicsPerDoctor())
@@ -100,7 +100,8 @@ public class DocTableModel extends DataTableModel<Person> {
             toReturn.append(String.format(", %d medics<br />", campaign.getMedicsPerDoctor()));
         }
 
-        toReturn.append(String.format("%d patient(s)</font></html>", campaign.getPatientsFor(doctor)));
+        toReturn.append(String.format("%d patient(s)</font></html>",
+              campaign.getPlayerForce().getHumanResources().getPatientsFor(doctor)));
 
         return toReturn.toString();
     }

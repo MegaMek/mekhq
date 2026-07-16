@@ -36,9 +36,9 @@ import static java.awt.Color.BLACK;
 import static java.awt.Color.BLUE;
 import static java.awt.Font.BOLD;
 import static megamek.utilities.ImageUtilities.addTintToBufferedImage;
+import static mekhq.campaign.digitalGM.stratCon.StratConScenario.ScenarioState.PRIMARY_FORCES_COMMITTED;
+import static mekhq.campaign.digitalGM.stratCon.StratConScenario.ScenarioState.UNRESOLVED;
 import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Allied;
-import static mekhq.campaign.stratCon.StratConScenario.ScenarioState.PRIMARY_FORCES_COMMITTED;
-import static mekhq.campaign.stratCon.StratConScenario.ScenarioState.UNRESOLVED;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -66,18 +66,18 @@ import megamek.common.util.ImageUtil;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.digitalGM.stratCon.StratConBiomeManifest;
+import mekhq.campaign.digitalGM.stratCon.StratConBiomeManifest.ImageType;
+import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
+import mekhq.campaign.digitalGM.stratCon.StratConCoords;
+import mekhq.campaign.digitalGM.stratCon.StratConFacility;
+import mekhq.campaign.digitalGM.stratCon.StratConFacilityFactory;
+import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
+import mekhq.campaign.digitalGM.stratCon.StratConScenario;
+import mekhq.campaign.digitalGM.stratCon.StratConScenario.ScenarioState;
+import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.stratCon.StratConBiomeManifest;
-import mekhq.campaign.stratCon.StratConBiomeManifest.ImageType;
-import mekhq.campaign.stratCon.StratConCampaignState;
-import mekhq.campaign.stratCon.StratConCoords;
-import mekhq.campaign.stratCon.StratConFacility;
-import mekhq.campaign.stratCon.StratConFacilityFactory;
-import mekhq.campaign.stratCon.StratConRulesManager;
-import mekhq.campaign.stratCon.StratConScenario;
-import mekhq.campaign.stratCon.StratConScenario.ScenarioState;
-import mekhq.campaign.stratCon.StratConTrackState;
 import mekhq.gui.stratCon.StratConScenarioWizard;
 import mekhq.gui.stratCon.TrackForceAssignmentUI;
 import mekhq.utilities.ReportingUtilities;
@@ -232,7 +232,7 @@ public class StratConPanel extends JPanel implements ActionListener {
 
         if ((currentTrack != null) && currentTrack.getAssignedCoordForces().containsKey(coords)) {
             for (int forceID : currentTrack.getAssignedCoordForces().get(coords)) {
-                String forceName = campaign.getFormation(forceID).getName();
+                String forceName = campaign.getPlayerForce().getFormation(forceID).getName();
 
                 JCheckBoxMenuItem stickyForceItem = new JCheckBoxMenuItem();
                 stickyForceItem.setText(String.format("%s - remain deployed", forceName));
@@ -702,7 +702,7 @@ public class StratConPanel extends JPanel implements ActionListener {
                     for (int forceID : currentTrack.getAssignedCoordForces().get(currentCoords)) {
                         String forceName;
                         try {
-                            Formation formation = campaign.getFormation(forceID);
+                            Formation formation = campaign.getPlayerForce().getFormation(forceID);
                             forceName = formation.getName();
                         } catch (Exception e) {
                             // If we can't successfully fetch the Force, there is no point trying
@@ -931,7 +931,7 @@ public class StratConPanel extends JPanel implements ActionListener {
 
         if (currentTrack.getAssignedCoordForces().containsKey(boardState.getSelectedCoords())) {
             for (int forceID : currentTrack.getAssignedCoordForces().get(boardState.getSelectedCoords())) {
-                Formation formation = this.campaign.getFormation(forceID);
+                Formation formation = this.campaign.getPlayerForce().getFormation(forceID);
                 infoBuilder.append(formation.getName()).append(" assigned");
 
                 if (currentTrack.getStickyForces().contains(forceID)) {

@@ -42,6 +42,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.util.function.Predicate;
 
@@ -58,7 +59,7 @@ import org.junit.jupiter.api.Test;
 public class MissingMekLocationTest {
     @Test
     public void missingLAMTorsoRepairableOnlyWithMissingAvionicsAndLandingGear() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         Unit unit = mock(Unit.class);
         LandAirMek entity = mock(LandAirMek.class);
         when(unit.getEntity()).thenReturn(entity);
@@ -133,7 +134,7 @@ public class MissingMekLocationTest {
 
     @Test
     public void missingLAMHeadRepairableOnlyWithMissingAvionics() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         Unit unit = mock(Unit.class);
         LandAirMek entity = mock(LandAirMek.class);
         when(unit.getEntity()).thenReturn(entity);

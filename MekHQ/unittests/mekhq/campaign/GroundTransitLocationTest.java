@@ -47,6 +47,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -132,7 +133,7 @@ public class GroundTransitLocationTest {
 
         @BeforeEach
         void setUp() {
-            campaign = mock(Campaign.class);
+            campaign = mockCampaign();
         }
 
         @Test
@@ -201,7 +202,7 @@ public class GroundTransitLocationTest {
                                + "<totalTransitTime>4.0</totalTransitTime></groundTransitLocation>";
             Node node = parseXml(xml);
 
-            Campaign mockCampaign = mock(Campaign.class);
+            Campaign mockCampaign = mockCampaign();
             when(mockCampaign.getSystemById("Outreach")).thenReturn(system);
 
             GroundTransitLocation loc = GroundTransitLocation.generateInstanceFromXML(node, mockCampaign);
@@ -221,7 +222,7 @@ public class GroundTransitLocationTest {
                                + "<personId>" + personId + "</personId></groundTransitLocation>";
             Node node = parseXml(xml);
 
-            Campaign mockCampaign = mock(Campaign.class);
+            Campaign mockCampaign = mockCampaign();
             when(mockCampaign.getSystemById("Outreach")).thenReturn(system);
 
             GroundTransitLocation loc = GroundTransitLocation.generateInstanceFromXML(node, mockCampaign);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -80,6 +80,6 @@ public class DefaultFactionSelector extends AbstractFactionSelector {
 
     @Override
     public @Nullable Faction selectFaction(final Campaign campaign) {
-        return (getFaction() == null) ? campaign.getFaction() : getFaction();
+        if ((getFaction() == null)) {return campaign.getFaction();} else {return getFaction();}
     }
 }

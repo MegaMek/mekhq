@@ -63,6 +63,7 @@ import megamek.common.rolls.TargetRoll;
 import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.events.AcquisitionEvent;
 import mekhq.campaign.events.AsTechPoolChangedEvent;
 import mekhq.campaign.events.OvertimeModeEvent;
@@ -713,7 +714,14 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     private void refreshTechsList() {
         // The next gets all techs who have more than 0 minutes free, and sorted by
         // skill descending (elites at bottom)
-        techsModel.setData(getCampaign().getTechs(true));
+        Campaign campaign = getCampaign();
+        techsModel.setData(campaign.getPlayerForce()
+                                 .getHumanResources()
+                                 .getTechs(campaign.getPlayerForce().getHangar().getUnits(),
+                                       campaign.getCampaignOptions(),
+                                       campaign.isClanCampaign(),
+                                       campaign.getLocalDate(),
+                                       true));
         refreshAsTechPool();
 
         // If requested, switch to top entry
@@ -736,9 +744,12 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
      * Updates the AsTech pool statistics (minutes, overtime availability, and AsTech count) in the UI label.
      */
     public void refreshAsTechPool() {
-        String astechString = "<html><b>AsTech Pool Minutes:</b> " + getCampaign().getAsTechPoolMinutes();
+        String astechString = "<html><b>AsTech Pool Minutes:</b> " +
+                                    getCampaign().getPlayerForce().getHumanResources().getAsTechPoolMinutes();
         if (getCampaign().isOvertimeAllowed()) {
-            astechString += " [" + getCampaign().getAsTechPoolOvertime() + " overtime]";
+            astechString += " [" +
+                                  getCampaign().getPlayerForce().getHumanResources().getAsTechPoolOvertime() +
+                                  " overtime]";
         }
         astechString += " (" + getCampaign().getNumberAsTechs() + " AsTechs)</html>";
         asTechPoolLabel.setText(astechString);
@@ -756,7 +767,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
 
         List<Part> parts = locationFilter.selectSpareParts(getCampaign());
         partsModel.setData(parts);
-        getCampaign().getShoppingList().removeZeroQuantityFromList(); // To
+        getCampaign().getPlayerForce().getShoppingList().removeZeroQuantityFromList(); // To
         // prevent
         // zero
         // quantity

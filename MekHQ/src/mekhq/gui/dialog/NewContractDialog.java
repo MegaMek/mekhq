@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -340,7 +340,7 @@ public class NewContractDialog extends JDialog {
 
         cboNegotiator.setName("cboNegotiator");
         // Add negotiators
-        for (Person p : campaign.getActivePersonnel(false, false)) {
+        for (Person p : campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false)) {
             if (p.hasSkill(SkillType.S_NEGOTIATION)) {
                 cboNegotiator.addItem(p);
             }
@@ -705,12 +705,12 @@ public class NewContractDialog extends JDialog {
         contract.setContractTypeName(txtType.getText());
         contract.setDescription(txtDesc.getText());
         contract.setCommandRights(choiceCommand.getSelectedItem());
-        campaign.getFinances()
+        campaign.getPlayerForce().getFinances()
               .credit(TransactionType.CONTRACT_PAYMENT,
                     campaign.getLocalDate(),
                     contract.getTotalAdvanceAmount(),
                     "Advance funds for " + contract.getName());
-        campaign.getFinances()
+        campaign.getPlayerForce().getFinances()
               .credit(TransactionType.CONTRACT_PAYMENT,
                     campaign.getLocalDate(),
                     contract.getTransportAmount(),

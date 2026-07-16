@@ -285,9 +285,9 @@ public class FactionBorderTrackerTest {
     }
 
     /**
-     * Regression test: {@link FactionBorderTracker#systemsNear(PlanetarySystem, double)} caches only the single most
-     * recent (origin, radius) query. A change in either the origin or the radius must recompute rather than serve a
-     * stale result left over from a prior call.
+     * Regression test: {@link FactionBorderTracker#systemsNear(PlanetarySystem, double)} caches each distinct
+     * (origin, radius) query on its own. A change in either the origin or the radius must yield that query's own
+     * correct result rather than serving a stale result keyed on a prior call's origin or radius.
      */
     @Test
     public void testSystemsNearRecomputesWhenOriginOrRadiusChanges() {
@@ -299,18 +299,18 @@ public class FactionBorderTrackerTest {
               tracker.systemsNear(origin, 1).size(),
               "Sanity check: radius 1 around the origin should include factionUs and the two adjacent factionThem systems");
 
-        // Same origin, narrower radius: must not reuse the radius-1 cache entry.
+        // Same origin, narrower radius: must key on its own radius, not reuse the radius-1 cache entry.
         assertEquals(1, tracker.systemsNear(origin, 0.5).size(),
-              "A narrower radius on the same origin should recompute rather than reuse the wider cached result");
+              "A narrower radius on the same origin should produce its own result, not reuse the wider cached result");
 
-        // Same radius as the first call, but a different origin far from every system: must not reuse the
-        // origin-(0,0) cache entry.
+        // Same radius as the first call, but a different origin far from every system: must key on its own origin,
+        // not reuse the origin-(0,0) cache entry.
         assertEquals(0, tracker.systemsNear(farOrigin, 1).size(),
-              "A different origin should recompute rather than reuse the previous origin's cached result");
+              "A different origin should produce its own result, not reuse the previous origin's cached result");
 
         // Back to the original (origin, radius) pair: should still produce the correct, non-stale result.
         assertEquals(3, tracker.systemsNear(origin, 1).size(),
-              "Returning to a previously-queried (origin, radius) pair should still compute the correct result");
+              "Returning to a previously-queried (origin, radius) pair should still produce the correct result");
     }
 
     @Test

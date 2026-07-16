@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -37,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -44,12 +45,12 @@ import java.util.Map;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
+import mekhq.campaign.digitalGM.stratCon.StratConCoords;
+import mekhq.campaign.digitalGM.stratCon.StratConScenario;
+import mekhq.campaign.digitalGM.stratCon.StratConScenario.ScenarioState;
+import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.stratCon.StratConCampaignState;
-import mekhq.campaign.stratCon.StratConCoords;
-import mekhq.campaign.stratCon.StratConScenario;
-import mekhq.campaign.stratCon.StratConScenario.ScenarioState;
-import mekhq.campaign.stratCon.StratConTrackState;
 import mekhq.gui.dialog.nagDialogs.UnresolvedStratConContactsNagDialog;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -69,7 +70,7 @@ public class UnresolvedStratConContactsNagLogicTest {
      */
     @BeforeEach
     void init() {
-        Campaign campaign = mock(Campaign.class);
+        Campaign campaign = mockCampaign();
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         today = LocalDate.of(3025, 1, 1);
         contract = mock(AtBContract.class);

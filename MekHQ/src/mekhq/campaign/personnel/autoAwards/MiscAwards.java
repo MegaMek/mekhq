@@ -122,8 +122,10 @@ public class MiscAwards {
                     }
                 }
                 case "civilianhelp" -> {
-                    if ((isCivilianHelp) && (award.canBeAwarded(campaign.getPerson(person)))) {
-                        eligibleAwards.add(award);
+                    if ((isCivilianHelp)) {
+                        if (award.canBeAwarded(campaign.getPerson(person))) {
+                            eligibleAwards.add(award);
+                        }
                     }
                 }
                 case "supportpersonoftheyear" -> {
@@ -296,7 +298,7 @@ public class MiscAwards {
      */
     private static boolean drillInstructor(Campaign campaign, Award award, UUID person) {
         if (award.canBeAwarded(campaign.getPerson(person)) && campaign.hasActiveAtBContract()) {
-            return campaign.getCombatTeamsAsList().stream()
+            return campaign.getPlayerForce().getCombatTeamsAsList(campaign).stream()
                          .anyMatch(lance -> (lance.getRole().isTraining() || lance.getRole().isCadre()) &&
                                                   (lance.getCommanderId().equals(person)));
         }

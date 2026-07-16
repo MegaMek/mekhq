@@ -39,6 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.util.List;
 
@@ -78,7 +79,7 @@ class UntreatedPersonnelNagLogicTest {
      */
     @BeforeEach
     public void init() {
-        campaign = mock(Campaign.class);
+        campaign = mockCampaign();
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);

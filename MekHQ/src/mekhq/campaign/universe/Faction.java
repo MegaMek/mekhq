@@ -263,6 +263,15 @@ public class Faction {
         return Optional.ofNullable(faction2 != null ? faction2.getCamosFolder(year) : null);
     }
 
+    /**
+     * @param year the year to check
+     *
+     * @return {@code true} if this faction observed the Ares Conventions in the given year; {@code false} by default
+     */
+public boolean isAresConventionsSignatory(int year) {
+    return faction2 != null && faction2.isAresConventionsSignatory(year);
+}
+
     public int getEraMod(int year) {
         if (eraMods == null) {
             return 0;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -125,24 +125,32 @@ public class FactionCensureEvent {
             return;
         }
 
-        commander = campaign.getCommander(); // Can be null if the campaign is effectively empty
+        commander = campaign.getPlayerForce().getHumanResources()
+                          .getCommander(campaign.getCampaignOptions(),
+                                campaign.isClanCampaign(),
+                                campaign.getLocalDate()); // Can be null if the campaign is effectively empty
         if (commander == null) {
             // If there isn't a commander in the campaign, we're going to invent someone. This avoids us needing to
             // add null protection throughout this class (and the dialogs it spawns). This clause should only trigger
             // in the event the campaign is effectively empty. So it shouldn't come up during normal play.
-            commander = campaign.newPerson(PersonnelRole.MEKWARRIOR,
-                  campaign.getFaction().getShortName(),
-                  Gender.RANDOMIZE);
+            final String factionCode = campaign.getFaction().getShortName();
+            commander = campaign.getPlayerForce()
+                              .getHumanResources()
+                              .newPerson(campaign, PersonnelRole.MEKWARRIOR, factionCode, Gender.RANDOMIZE);
             LOGGER.warn("Commander was null in FactionCensureEvent. Using a fallback commander: {}.",
                   commander.getFullName());
         }
 
-        secondInCommand = campaign.getSecondInCommand(); // Can be null if the campaign is effectively empty
+        secondInCommand = campaign.getPlayerForce().getHumanResources()
+                                .getSecondInCommand(campaign.getCampaignOptions(),
+                                      campaign.isClanCampaign(),
+                                      campaign.getLocalDate()); // Can be null if the campaign is effectively empty
         if (secondInCommand == null) {
             // See comments for the 'commander == null' clause
-            secondInCommand = campaign.newPerson(PersonnelRole.MEKWARRIOR,
-                  campaign.getFaction().getShortName(),
-                  Gender.RANDOMIZE);
+            final String factionCode = campaign.getFaction().getShortName();
+            secondInCommand = campaign.getPlayerForce()
+                                    .getHumanResources()
+                                    .newPerson(campaign, PersonnelRole.MEKWARRIOR, factionCode, Gender.RANDOMIZE);
             LOGGER.warn("Second in command was null in FactionCensureEvent. Using a fallback secondInCommand: {}.",
                   secondInCommand.getFullName());
         }
@@ -166,7 +174,10 @@ public class FactionCensureEvent {
                     PersonnelRole role = censuringFaction.isClan()
                                                ? PersonnelRole.MEKWARRIOR
                                                : PersonnelRole.MILITARY_LIAISON;
-                    Person speaker = campaign.newPerson(role, censuringFaction.getShortName(), Gender.RANDOMIZE);
+                    final String factionCode = censuringFaction.getShortName();
+                    Person speaker = campaign.getPlayerForce()
+                                           .getHumanResources()
+                                           .newPerson(campaign, role, factionCode, Gender.RANDOMIZE);
                     AutoAssignRankForCompanyGenerator.assignRankSystemFromFaction(speaker, RO_MIN);
 
                     ImmersiveDialogWidth dialogWidth;
@@ -310,7 +321,7 @@ public class FactionCensureEvent {
             case DISBAND -> new FactionJudgmentSceneDialog(campaign, commander, null,
                   FactionJudgmentSceneType.DISBAND, censuringFaction);
             case FINE, BRIBE_OFFICIALS -> {
-                Finances finances = campaign.getFinances();
+                Finances finances = campaign.getPlayerForce().getFinances();
 
                 Money fine = finances.getBalance().multipliedBy(0.1);
                 String fineMessage;
@@ -366,7 +377,7 @@ public class FactionCensureEvent {
 
         if (isSuccessful) {
             if (secondInCommand.getRecruitment() == null) {
-                campaign.recruitPerson(secondInCommand, true, true);
+                campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, secondInCommand, true, true);
             }
 
             secondInCommand.setCommander(true);
@@ -385,7 +396,7 @@ public class FactionCensureEvent {
         double delta = isMajor ? REGARD_DELTA_CONTRACT_SUCCESS_EMPLOYER : REGARD_DELTA_CONTRACT_PARTIAL_EMPLOYER;
         Faction faction = campaign.getFaction();
         String factionCode = faction.getShortName();
-        FactionStandings factionStandings = campaign.getFactionStandings();
+        FactionStandings factionStandings = campaign.getPlayerForce().getFactionStandings();
         String report = factionStandings.changeRegardForFaction(campaign.getFaction().getShortName(), factionCode,
               delta, campaign.getGameYear(), campaign.getCampaignOptions().getRegardMultiplier());
 
@@ -407,7 +418,7 @@ public class FactionCensureEvent {
             if (!isImprisoned) {
                 Person replacement = getReplacementCharacter(seniorPerson);
                 replacement.changeRank(campaign, rank, level, false);
-                campaign.recruitPerson(replacement, true, true);
+                campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, replacement, true, true);
             }
         }
     }
@@ -423,7 +434,7 @@ public class FactionCensureEvent {
             seniorPersonnel.add(secondInCommand);
         }
 
-        for (Person officer : campaign.getAllPersonnel()) {
+        for (Person officer : campaign.getPlayerForce().getHumanResources().getPersonnel()) {
             if (isExempt(officer, today)) {
                 continue;
             }
@@ -454,7 +465,9 @@ public class FactionCensureEvent {
 
         PersonnelRole primaryRole = seniorPerson.getPrimaryRole();
         PersonnelRole politicalRole = getPoliticalRole();
-        Person replacement = campaign.newPerson(primaryRole, politicalRole);
+        Person replacement = campaign.getPlayerForce()
+                                   .getHumanResources()
+                                   .newPerson(campaign, primaryRole, politicalRole);
 
         boolean checkVeterancyEligibility = true;
         overrideSkills(campaign, replacement, primaryRole, VETERAN, checkVeterancyEligibility);

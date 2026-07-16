@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -220,7 +220,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
         if (isBadSelection()) {
             return;
         }
-        campaign.getShoppingList().addShoppingItem(selectedUnit, 1, campaign);
+        campaign.getPlayerForce().getShoppingList().addShoppingItem(selectedUnit, 1, campaign);
     }
 
     /**

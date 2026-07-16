@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -164,7 +164,10 @@ public class PartsAcquisitionService {
     public static void generateSummaryCounts(Campaign campaign) {
         partCountInfoMap = new HashMap<>();
 
-        Person admin = campaign.getLogisticsPerson();
+        Person admin = campaign.getPlayerForce().getHumanResources()
+                             .getLogisticsPerson(campaign.getCampaignOptions(),
+                                   campaign.isClanCampaign(),
+                                   campaign.getLocalDate());
 
         for (List<IAcquisitionWork> awList : acquisitionMap.values()) {
             IAcquisitionWork awFirst = awList.getFirst();

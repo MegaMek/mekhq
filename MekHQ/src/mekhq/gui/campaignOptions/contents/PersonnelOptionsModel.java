@@ -305,7 +305,7 @@ class PersonnelOptionsModel {
         options.setPrisonerCaptureStyle(prisonerCaptureStyle);
         options.setUseFunctionalEscapeArtist(useFunctionalEscapeArtist);
         if (resetTemporaryPrisonerCapacity) {
-            campaign.setTemporaryPrisonerCapacity(DEFAULT_TEMPORARY_CAPACITY);
+            campaign.getPlayerForce().setTemporaryPrisonerCapacity(DEFAULT_TEMPORARY_CAPACITY);
         }
         options.setUseRandomDependentAddition(useRandomDependentAddition);
         options.setUseRandomDependentRemoval(useRandomDependentRemoval);

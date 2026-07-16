@@ -126,6 +126,260 @@ public class RetirementDefectionTracker {
     }
 
     /**
+     * Calculates the administrative strain for a given campaign.
+     *
+     * @param campaign the campaign for which to calculate the administrative strain
+     *
+     * @return the total administrative strain of the campaign
+     */
+    public static int getHRStrain(Campaign campaign) {
+        double personnel = 0;
+
+        for (Person person : campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false)) {
+            PersonnelRole primaryRole = person.getPrimaryRole();
+
+            if (primaryRole.isCivilian()) {
+                personnel += 0.1;
+            } else if (!(primaryRole.isAssistant() && person.getSecondaryRole().isNone())) {
+                personnel++;
+            }
+        }
+
+        return (int) round(personnel);
+    }
+
+    /**
+     * Determines whether the campaign is in the middle of a contract in hostile territory. If AtB is disabled, this
+     * method only checks whether there is an active contract.
+     *
+     * @param campaign the campaign to check for hostile territory modifier
+     *
+     * @return true if the campaign is in hostile territory modifier or (if AtB is disabled) whether the campaign is in
+     *       an active contract, false otherwise
+     */
+    private boolean isHostileTerritory(Campaign campaign) {
+        List<AtBContractType> defensiveContracts = Arrays.asList(AtBContractType.GARRISON_DUTY,
+              AtBContractType.CADRE_DUTY,
+              AtBContractType.SECURITY_DUTY,
+              AtBContractType.RIOT_DUTY);
+
+        List<Contract> activeContracts = campaign.getActiveContracts();
+
+        if (!activeContracts.isEmpty()) {
+            if (campaign.getCampaignOptions().isUseStratCon()) {
+                Optional<Contract> defensiveContract = activeContracts.stream()
+                                                             .filter(contract -> contract instanceof AtBContract)
+                                                             .filter(atBContract -> !defensiveContracts.contains(((AtBContract) atBContract).getContractType()))
+                                                             .findFirst();
+
+                return defensiveContract.isPresent();
+            } else {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static List<TargetRollModifier> getFactionModifiers(Person person, Campaign campaign) {
+        ArrayList<TargetRollModifier> result = new ArrayList<>();
+        Faction campaignFaction = campaign.getFaction();
+
+        // campaign faction modifiers
+        if (campaignFaction.isPirate()) {
+            result.add(new TargetRollModifier(1, getTextAt(RESOURCE_BUNDLE, "factionPirateCompany.text")));
+        } else if (campaignFaction.isComStarOrWoB()) {
+            if (person.getOriginFaction().isComStarOrWoB()) {
+                result.add(new TargetRollModifier(-2, getTextAt(RESOURCE_BUNDLE, "factionComStarOrWob.text")));
+            }
+        } else if ((!campaignFaction.isClan()) && (!campaignFaction.isMercenary())) {
+            if (campaignFaction.equals(person.getOriginFaction())) {
+                result.add(new TargetRollModifier(-1, getTextAt(RESOURCE_BUNDLE, "factionLoyalty.text")));
+            }
+        }
+
+        // origin faction modifiers
+        if ((!campaignFaction.isPirate()) && (person.getOriginFaction().isPirate())) {
+            result.add(new TargetRollModifier(1, getTextAt(RESOURCE_BUNDLE, "factionPirate.text")));
+        }
+
+        if (person.getOriginFaction().isMercenary()) {
+            result.add(new TargetRollModifier(1, getTextAt(RESOURCE_BUNDLE, "factionMercenary.text")));
+        }
+
+        if (person.getOriginFaction().isClan()) {
+            result.add(new TargetRollModifier(-2, getTextAt(RESOURCE_BUNDLE, "factionClan.text")));
+        }
+
+        // wartime modifier
+        if (FactionHints.getInstance()
+                  .isAtWarWith(campaign.getFaction(), person.getOriginFaction(), campaign.getLocalDate())) {
+            result.add(new TargetRollModifier(4, getTextAt(RESOURCE_BUNDLE, "factionEnemy.text")));
+        }
+        return result;
+    }
+
+    /**
+     * Calculates the combined skill values of active Admin/HR personnel.
+     *
+     * @param campaign the campaign for which to calculate the combined skill values
+     *
+     * @return the combined skill values of active Admin/HR personnel in the campaign
+     */
+    public static int getCombinedSkillValues(Campaign campaign, String skillType) {
+        int combinedSkillValues = 0;
+
+        for (Person person : campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false)) {
+            boolean isAdmin = person.getPrimaryRole().isAdministratorHR() ||
+                                    person.getSecondaryRole().isAdministratorHR();
+            if (!isAdmin) {
+                continue;
+            }
+
+            PersonnelOptions options = person.getOptions();
+            int mediatorModifier = options.booleanOption(ADMIN_MEDIATOR) ? 1 : 0;
+
+            Skill skill = person.getSkill(skillType);
+            if (skill == null) {
+                continue;
+            }
+
+            SkillModifierData skillModifierData = person.getSkillModifierData();
+            int skillLevel = skill.getTotalSkillLevel(skillModifierData);
+
+            combinedSkillValues += skillLevel + mediatorModifier;
+        }
+
+        return combinedSkillValues;
+    }
+
+    /**
+     * Calculates the management skill modifier for a person
+     *
+     * @param person the individual we're fetching the modifier for
+     *
+     * @return the management skill modifier
+     */
+    private static int getManagementSkillModifier(Person person) {
+        if ((person.getPrimaryRole().isCivilian()) || (!person.getPrisonerStatus().isFree())) {
+            return 0;
+        }
+
+        if (person.getSecondaryRole() == PersonnelRole.NONE) {
+            return getCommanderManagementSkill(person.getPrimaryRole());
+        } else {
+            return ((getCommanderManagementSkill(person.getPrimaryRole()) +
+                           getCommanderManagementSkill(person.getSecondaryRole())) / 2);
+        }
+    }
+
+    /**
+     * Returns the management skill modifier for a commander based on the given personnel role.
+     *
+     * @param role the personnel role of the person we're fetching the modifier for
+     *
+     * @return the management skill modifier for the commander
+     */
+    private static int getCommanderManagementSkill(PersonnelRole role) {
+        return switch (Profession.getProfessionFromPersonnelRole(role)) {
+            case AEROSPACE -> asfCommanderModifier;
+            case VEHICLE -> vehicleCrewCommanderModifier;
+            case INFANTRY -> infantryCommanderModifier;
+            case NAVAL -> navalCommanderModifier;
+            case TECH -> techCommanderModifier;
+            case MEDICAL -> medicalCommanderModifier;
+            case ADMINISTRATOR, CIVILIAN -> administrationCommanderModifier;
+            case MEKWARRIOR -> mekWarriorCommanderModifier;
+        };
+    }
+
+    /**
+     * @param campaign the campaign to get share values for
+     *
+     * @return The value of each share in C-bills
+     */
+    public static Money getShareValue(Campaign campaign) {
+        if (!campaign.getCampaignOptions().isUseShareSystem()) {
+            return Money.zero();
+        }
+
+        Money profits = campaign.getPlayerForce().getFinances().getProfits();
+
+        int totalShares = campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, true)
+                                .stream()
+                                .mapToInt(p -> p.getNumShares(campaign, campaign.getCampaignOptions().isSharesForAll()))
+                                .sum();
+
+        if (totalShares <= 0) {
+            return Money.zero();
+        }
+
+        return profits.dividedBy(totalShares);
+    }
+
+    /**
+     * Calculates the individual commander Leadership skill based on the provided commander.
+     *
+     * @param commander the commander for which the skill is being calculated
+     *
+     * @return the Leadership skill
+     */
+    private static int getIndividualCommanderLeadership(Person commander) {
+        if (commander.hasSkill(SkillType.S_LEADER)) {
+            SkillModifierData skillModifierData = commander.getSkillModifierData();
+
+            return commander.getSkill(SkillType.S_LEADER).getTotalSkillLevel(skillModifierData);
+        } else {
+            return 0;
+        }
+    }
+
+    /**
+     * use {@link #getHRStrainModifier(Campaign)} instead
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
+    public static int getAdministrativeStrainModifier(Campaign campaign) {
+        return getHRStrainModifier(campaign);
+    }
+
+    /**
+     * This method calculates the combatant strain modifier based on the active personnel assigned to units.
+     *
+     * @param campaign the campaign for which to calculate the strain modifier
+     *
+     * @return the strain modifier
+     */
+    public static int getHRStrainModifier(Campaign campaign) {
+        int personnel = getHRStrain(campaign);
+
+        int maximumStrain = campaign.getCampaignOptions().getHRCapacity() *
+                                  getCombinedSkillValues(campaign, SkillType.S_ADMIN);
+
+        // divide by zero protection - uses HR_DEFAULT_NOADMIN_PENALTY
+        if (maximumStrain != 0) {
+            double personnelPct = (double) personnel / maximumStrain;
+
+            // return modifier of 1 per 100% over hr capacity limit
+            if (personnelPct >= 1) {
+                return (int) Math.floor(personnelPct);
+            } else {
+                return 0; // personnel is within capacity, no modifier
+            }
+        } else {
+            // return penalty here on no Admin/HR staff, based on constant
+            return HR_DEFAULT_NOADMIN_PENALTY;
+        }
+    }
+
+    /**
+     * use {@link #getHRStrain(Campaign)} instead
+     */
+    @Deprecated(since = "0.50.07", forRemoval = true)
+    public static int getAdministrativeStrain(Campaign campaign) {
+        return getHRStrain(campaign);
+    }
+
+    /**
      * Computes the target for retirement rolls for all eligible personnel; this includes all active personnel who
      * aren’t dependents, prisoners, or bondsmen.
      *
@@ -148,7 +402,7 @@ public class RetirementDefectionTracker {
         }
 
         boolean includeCivilians = campaignOptions.isIncludeCivilians();
-        for (Person person : campaign.getActivePersonnel(false, false)) {
+        for (Person person : campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false)) {
             if (!includeCivilians && person.isCivilian()) {
                 continue;
             }
@@ -397,77 +651,6 @@ public class RetirementDefectionTracker {
         return targets;
     }
 
-    /**
-     * Determines whether the campaign is in the middle of a contract in hostile territory. If AtB is disabled, this
-     * method only checks whether there is an active contract.
-     *
-     * @param campaign the campaign to check for hostile territory modifier
-     *
-     * @return true if the campaign is in hostile territory modifier or (if AtB is disabled) whether the campaign is in
-     *       an active contract, false otherwise
-     */
-    private boolean isHostileTerritory(Campaign campaign) {
-        List<AtBContractType> defensiveContracts = Arrays.asList(AtBContractType.GARRISON_DUTY,
-              AtBContractType.CADRE_DUTY,
-              AtBContractType.SECURITY_DUTY,
-              AtBContractType.RIOT_DUTY);
-
-        List<Contract> activeContracts = campaign.getActiveContracts();
-
-        if (!activeContracts.isEmpty()) {
-            if (campaign.getCampaignOptions().isUseStratCon()) {
-                Optional<Contract> defensiveContract = activeContracts.stream()
-                                                             .filter(contract -> contract instanceof AtBContract)
-                                                             .filter(atBContract -> !defensiveContracts.contains(((AtBContract) atBContract).getContractType()))
-                                                             .findFirst();
-
-                return defensiveContract.isPresent();
-            } else {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public static List<TargetRollModifier> getFactionModifiers(Person person, Campaign campaign) {
-        ArrayList<TargetRollModifier> result = new ArrayList<>();
-        Faction campaignFaction = campaign.getFaction();
-
-        // campaign faction modifiers
-        if (campaignFaction.isPirate()) {
-            result.add(new TargetRollModifier(1, getTextAt(RESOURCE_BUNDLE, "factionPirateCompany.text")));
-        } else if (campaignFaction.isComStarOrWoB()) {
-            if (person.getOriginFaction().isComStarOrWoB()) {
-                result.add(new TargetRollModifier(-2, getTextAt(RESOURCE_BUNDLE, "factionComStarOrWob.text")));
-            }
-        } else if ((!campaignFaction.isClan()) && (!campaignFaction.isMercenary())) {
-            if (campaignFaction.equals(person.getOriginFaction())) {
-                result.add(new TargetRollModifier(-1, getTextAt(RESOURCE_BUNDLE, "factionLoyalty.text")));
-            }
-        }
-
-        // origin faction modifiers
-        if ((!campaignFaction.isPirate()) && (person.getOriginFaction().isPirate())) {
-            result.add(new TargetRollModifier(1, getTextAt(RESOURCE_BUNDLE, "factionPirate.text")));
-        }
-
-        if (person.getOriginFaction().isMercenary()) {
-            result.add(new TargetRollModifier(1, getTextAt(RESOURCE_BUNDLE, "factionMercenary.text")));
-        }
-
-        if (person.getOriginFaction().isClan()) {
-            result.add(new TargetRollModifier(-2, getTextAt(RESOURCE_BUNDLE, "factionClan.text")));
-        }
-
-        // wartime modifier
-        if (FactionHints.getInstance()
-                  .isAtWarWith(campaign.getFaction(), person.getOriginFaction(), campaign.getLocalDate())) {
-            result.add(new TargetRollModifier(4, getTextAt(RESOURCE_BUNDLE, "factionEnemy.text")));
-        }
-        return result;
-    }
-
     public int getManagementSkillPenalty(Person person, Campaign campaign) {
         if (asfCommanderModifier == null) {
             // calculate the modifiers if they're not populated yet
@@ -476,7 +659,10 @@ public class RetirementDefectionTracker {
         int modifier = campaign.getCampaignOptions().getManagementSkillPenalty();
 
         if (campaign.getCampaignOptions().isUseCommanderLeadershipOnly()) {
-            Person commander = campaign.getCommander();
+            Person commander = campaign.getPlayerForce().getHumanResources()
+                                     .getCommander(campaign.getCampaignOptions(),
+                                           campaign.isClanCampaign(),
+                                           campaign.getLocalDate());
             if (commander != null && commander.hasSkill((SkillType.S_LEADER))) {
                 SkillModifierData skillModifierData = commander.getSkillModifierData(true);
 
@@ -490,43 +676,48 @@ public class RetirementDefectionTracker {
     }
 
     /**
-     * Calculates the management skill modifier for a person
+     * This method calculates the base target number.
      *
-     * @param person the individual we're fetching the modifier for
+     * @param campaign the campaign for which the base target number is calculated
      *
-     * @return the management skill modifier
+     * @return the base target number
      */
-    private static int getManagementSkillModifier(Person person) {
-        if ((person.getPrimaryRole().isCivilian()) || (!person.getPrisonerStatus().isFree())) {
-            return 0;
-        }
+    private int getBaseTargetNumber(Campaign campaign, Person person) {
+        if ((campaign.getCampaignOptions().isUseLoyaltyModifiers()) &&
+                  (campaign.getCampaignOptions().isUseHideLoyalty())) {
+            int loyaltyScore = person.getAdjustedLoyalty(campaign.getFaction(),
+                  campaign.getCampaignOptions().isUseAlternativeAdvancedMedical());
 
-        if (person.getSecondaryRole() == PersonnelRole.NONE) {
-            return getCommanderManagementSkill(person.getPrimaryRole());
+            if (person.isCommander()) {
+                loyaltyScore += 2;
+            }
+
+            int loyaltyModifier = person.getLoyaltyModifier(loyaltyScore);
+
+            return campaign.getCampaignOptions().getTurnoverFixedTargetNumber() + loyaltyModifier;
         } else {
-            return ((getCommanderManagementSkill(person.getPrimaryRole()) +
-                           getCommanderManagementSkill(person.getSecondaryRole())) / 2);
+            return campaign.getCampaignOptions().getTurnoverFixedTargetNumber();
         }
     }
 
     /**
-     * Returns the management skill modifier for a commander based on the given personnel role.
+     * Returns the unit rating modifier for the campaign.
      *
-     * @param role the personnel role of the person we're fetching the modifier for
+     * @param campaign the campaign from which to derive the unit rating modifier
      *
-     * @return the management skill modifier for the commander
+     * @return the unit rating modifier
      */
-    private static int getCommanderManagementSkill(PersonnelRole role) {
-        return switch (Profession.getProfessionFromPersonnelRole(role)) {
-            case AEROSPACE -> asfCommanderModifier;
-            case VEHICLE -> vehicleCrewCommanderModifier;
-            case INFANTRY -> infantryCommanderModifier;
-            case NAVAL -> navalCommanderModifier;
-            case TECH -> techCommanderModifier;
-            case MEDICAL -> medicalCommanderModifier;
-            case ADMINISTRATOR, CIVILIAN -> administrationCommanderModifier;
-            case MEKWARRIOR -> mekWarriorCommanderModifier;
-        };
+    private static int getUnitRatingModifier(Campaign campaign) {
+        int unitRating = 0;
+
+        if (campaign.getAtBUnitRatingMod() < 1) {
+            unitRating = 2;
+        } else if (campaign.getAtBUnitRatingMod() == 1) {
+            unitRating = 1;
+        } else if (campaign.getAtBUnitRatingMod() > 3) {
+            unitRating = -1;
+        }
+        return unitRating;
     }
 
     /**
@@ -539,7 +730,7 @@ public class RetirementDefectionTracker {
      * @param campaign The Campaign object for which to calculate the management skill values.
      */
     private void refreshManagementSkillValues(Campaign campaign) {
-        for (Person person : campaign.getActivePersonnel(false, false)) {
+        for (Person person : campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false)) {
             if (person.getPrimaryRole().isCivilian()) {
                 continue;
             }
@@ -643,194 +834,6 @@ public class RetirementDefectionTracker {
     }
 
     /**
-     * Calculates the individual commander Leadership skill based on the provided commander.
-     *
-     * @param commander the commander for which the skill is being calculated
-     *
-     * @return the Leadership skill
-     */
-    private static int getIndividualCommanderLeadership(Person commander) {
-        if (commander.hasSkill(SkillType.S_LEADER)) {
-            SkillModifierData skillModifierData = commander.getSkillModifierData();
-
-            return commander.getSkill(SkillType.S_LEADER).getTotalSkillLevel(skillModifierData);
-        } else {
-            return 0;
-        }
-    }
-
-    /**
-     * use {@link #getHRStrainModifier(Campaign)} instead
-     */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    public static int getAdministrativeStrainModifier(Campaign campaign) {
-        return getHRStrainModifier(campaign);
-    }
-
-    /**
-     * This method calculates the combatant strain modifier based on the active personnel assigned to units.
-     *
-     * @param campaign the campaign for which to calculate the strain modifier
-     *
-     * @return the strain modifier
-     */
-    public static int getHRStrainModifier(Campaign campaign) {
-        int personnel = getHRStrain(campaign);
-
-        int maximumStrain = campaign.getCampaignOptions().getHRCapacity() *
-                                  getCombinedSkillValues(campaign, SkillType.S_ADMIN);
-
-        // divide by zero protection - uses HR_DEFAULT_NOADMIN_PENALTY
-        if (maximumStrain != 0) {
-            double personnelPct = (double) personnel / maximumStrain;
-
-            // return modifier of 1 per 100% over hr capacity limit
-            if (personnelPct >= 1) {
-                return (int) Math.floor(personnelPct);
-            } else {
-                return 0; // personnel is within capacity, no modifier
-            }
-        } else {
-            // return penalty here on no Admin/HR staff, based on constant
-            return HR_DEFAULT_NOADMIN_PENALTY;
-        }
-    }
-
-    /**
-     * use {@link #getHRStrain(Campaign)} instead
-     */
-    @Deprecated(since = "0.50.07", forRemoval = true)
-    public static int getAdministrativeStrain(Campaign campaign) {
-        return getHRStrain(campaign);
-    }
-
-    /**
-     * Calculates the administrative strain for a given campaign.
-     *
-     * @param campaign the campaign for which to calculate the administrative strain
-     *
-     * @return the total administrative strain of the campaign
-     */
-    public static int getHRStrain(Campaign campaign) {
-        double personnel = 0;
-
-        for (Person person : campaign.getActivePersonnel(false, false)) {
-            PersonnelRole primaryRole = person.getPrimaryRole();
-
-            if (primaryRole.isCivilian()) {
-                personnel += 0.1;
-            } else if (!(primaryRole.isAssistant() && person.getSecondaryRole().isNone())) {
-                personnel++;
-            }
-        }
-
-        return (int) round(personnel);
-    }
-
-    /**
-     * Calculates the combined skill values of active Admin/HR personnel.
-     *
-     * @param campaign the campaign for which to calculate the combined skill values
-     *
-     * @return the combined skill values of active Admin/HR personnel in the campaign
-     */
-    public static int getCombinedSkillValues(Campaign campaign, String skillType) {
-        int combinedSkillValues = 0;
-
-        for (Person person : campaign.getActivePersonnel(false, false)) {
-            boolean isAdmin = person.getPrimaryRole().isAdministratorHR() ||
-                                    person.getSecondaryRole().isAdministratorHR();
-            if (!isAdmin) {
-                continue;
-            }
-
-            PersonnelOptions options = person.getOptions();
-            int mediatorModifier = options.booleanOption(ADMIN_MEDIATOR) ? 1 : 0;
-
-            Skill skill = person.getSkill(skillType);
-            if (skill == null) {
-                continue;
-            }
-
-            SkillModifierData skillModifierData = person.getSkillModifierData();
-            int skillLevel = skill.getTotalSkillLevel(skillModifierData);
-
-            combinedSkillValues += skillLevel + mediatorModifier;
-        }
-
-        return combinedSkillValues;
-    }
-
-    /**
-     * This method calculates the base target number.
-     *
-     * @param campaign the campaign for which the base target number is calculated
-     *
-     * @return the base target number
-     */
-    private int getBaseTargetNumber(Campaign campaign, Person person) {
-        if ((campaign.getCampaignOptions().isUseLoyaltyModifiers()) &&
-                  (campaign.getCampaignOptions().isUseHideLoyalty())) {
-            int loyaltyScore = person.getAdjustedLoyalty(campaign.getFaction(),
-                  campaign.getCampaignOptions().isUseAlternativeAdvancedMedical());
-
-            if (person.isCommander()) {
-                loyaltyScore += 2;
-            }
-
-            int loyaltyModifier = person.getLoyaltyModifier(loyaltyScore);
-
-            return campaign.getCampaignOptions().getTurnoverFixedTargetNumber() + loyaltyModifier;
-        } else {
-            return campaign.getCampaignOptions().getTurnoverFixedTargetNumber();
-        }
-    }
-
-    /**
-     * Returns the unit rating modifier for the campaign.
-     *
-     * @param campaign the campaign from which to derive the unit rating modifier
-     *
-     * @return the unit rating modifier
-     */
-    private static int getUnitRatingModifier(Campaign campaign) {
-        int unitRating = 0;
-
-        if (campaign.getAtBUnitRatingMod() < 1) {
-            unitRating = 2;
-        } else if (campaign.getAtBUnitRatingMod() == 1) {
-            unitRating = 1;
-        } else if (campaign.getAtBUnitRatingMod() > 3) {
-            unitRating = -1;
-        }
-        return unitRating;
-    }
-
-    /**
-     * @param campaign the campaign to get share values for
-     *
-     * @return The value of each share in C-bills
-     */
-    public static Money getShareValue(Campaign campaign) {
-        if (!campaign.getCampaignOptions().isUseShareSystem()) {
-            return Money.zero();
-        }
-
-        Money profits = campaign.getFinances().getProfits();
-
-        int totalShares = campaign.getActivePersonnel(false, true)
-                                .stream()
-                                .mapToInt(p -> p.getNumShares(campaign, campaign.getCampaignOptions().isSharesForAll()))
-                                .sum();
-
-        if (totalShares <= 0) {
-            return Money.zero();
-        }
-
-        return profits.dividedBy(totalShares);
-    }
-
-    /**
      * @param age the age of the employee
      *
      * @return the age-based modifier
@@ -885,7 +888,7 @@ public class RetirementDefectionTracker {
                     unresolvedPersonnel.get(mission.getId()).add(id);
                 }
 
-                Person person = campaign.getPerson(id);
+                Person person = campaign.getPlayerForce().getHumanResources().getPerson(id);
 
                 // if the retiree is the commander of an infantry platoon, all non-founders in
                 // the platoon follow them into retirement
@@ -898,9 +901,10 @@ public class RetirementDefectionTracker {
                                       (campaign.getCampaignOptions().isUseRandomFounderTurnover())) {
                                 // this shouldn't be an issue, but we include it here as insurance
                                 if (!payouts.containsKey(id)) {
+                                    final java.util.UUID id1 = soldier.getId();
                                     payouts.put(soldier.getId(),
                                           new Payout(campaign,
-                                                campaign.getPerson(soldier.getId()),
+                                                campaign.getPlayerForce().getHumanResources().getPerson(id1),
                                                 shareValue,
                                                 false,
                                                 false,
@@ -915,7 +919,7 @@ public class RetirementDefectionTracker {
 
                 payouts.put(id,
                       new Payout(campaign,
-                            campaign.getPerson(id),
+                            campaign.getPlayerForce().getHumanResources().getPerson(id),
                             shareValue,
                             false,
                             false,
@@ -992,10 +996,14 @@ public class RetirementDefectionTracker {
      * Worker function that clears out any orphan Employee Turnover records
      */
     public void cleanupOrphans(Campaign campaign) {
-        payouts.keySet().removeIf(personID -> campaign.getPerson(personID) == null);
+        payouts.keySet().removeIf(personID -> {
+            return campaign.getPlayerForce().getHumanResources().getPerson(personID) == null;
+        });
 
         for (int contractID : unresolvedPersonnel.keySet()) {
-            unresolvedPersonnel.get(contractID).removeIf(personID -> campaign.getPerson(personID) == null);
+            unresolvedPersonnel.get(contractID).removeIf(personID -> {
+                return campaign.getPlayerForce().getHumanResources().getPerson(personID) == null;
+            });
         }
     }
 

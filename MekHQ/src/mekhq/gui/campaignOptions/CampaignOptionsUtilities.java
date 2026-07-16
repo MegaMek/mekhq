@@ -84,13 +84,25 @@ import mekhq.gui.baseComponents.MHQCollapsiblePanel;
 public class CampaignOptionsUtilities {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignOptionsDialog";
     final static String IMAGE_DIRECTORY = "data/images/universe/factions/";
-    public final static int CAMPAIGN_OPTIONS_PANEL_WIDTH = scaleForGUI(950);
+
     /**
-     * Fixed content width for page-shell section bodies (tables, ability panels). Kept narrower than
-     * {@link #CAMPAIGN_OPTIONS_PANEL_WIDTH} so that, once the collapsible section's padding and insets are added, the
-     * content never reports a preferred width wider than the page can display (which would break the section layout).
+     * Shared page-width cap for the Campaign Options dialog, at the current GUI scale. Resolved on each call (rather
+     * than cached in a {@code static final}) so the dialog reflows when the GUI scale changes at runtime instead of
+     * staying frozen at the scale in effect when the class first loaded.
      */
-    public final static int CAMPAIGN_OPTIONS_PAGE_CONTENT_WIDTH = scaleForGUI(860);
+    public static int campaignOptionsPanelWidth() {
+        return scaleForGUI(950);
+    }
+
+    /**
+     * Content width for page-shell section bodies (tables, ability panels), at the current GUI scale. Kept narrower
+     * than {@link #campaignOptionsPanelWidth()} so that, once the collapsible section's padding and insets are added,
+     * the content never reports a preferred width wider than the page can display (which would break the section
+     * layout). Resolved on each call so it tracks a runtime GUI-scale change.
+     */
+    public static int campaignOptionsPageContentWidth() {
+        return scaleForGUI(860);
+    }
     private static final int QUOTE_TOP_PADDING = scaleForGUI(12);
     private static final int QUOTE_BOTTOM_PADDING = scaleForGUI(8);
     // Ambient sink for contextual help text. Campaign Options is a single-instance modal dialog, and this sink is
@@ -229,7 +241,7 @@ public class CampaignOptionsUtilities {
             return content;
         }
 
-        int quoteWidth = Math.max(1, Math.min(getQuoteReferenceWidth(content), CAMPAIGN_OPTIONS_PANEL_WIDTH));
+        int quoteWidth = Math.max(1, Math.min(getQuoteReferenceWidth(content), campaignOptionsPanelWidth()));
 
         JPanel quotePanel = new JPanel(new GridBagLayout());
         quotePanel.setBorder(BorderFactory.createEmptyBorder(QUOTE_TOP_PADDING, 0, QUOTE_BOTTOM_PADDING, 0));
@@ -297,7 +309,7 @@ public class CampaignOptionsUtilities {
         @Override
         public Dimension getPreferredSize() {
             Dimension preferredSize = content.getPreferredSize();
-            return new Dimension(Math.min(preferredSize.width, CAMPAIGN_OPTIONS_PANEL_WIDTH), preferredSize.height);
+            return new Dimension(Math.min(preferredSize.width, campaignOptionsPanelWidth()), preferredSize.height);
         }
 
         @Override
@@ -308,7 +320,7 @@ public class CampaignOptionsUtilities {
         @Override
         public void doLayout() {
             Dimension preferredSize = content.getPreferredSize();
-            int contentWidth = Math.min(preferredSize.width, CAMPAIGN_OPTIONS_PANEL_WIDTH);
+            int contentWidth = Math.min(preferredSize.width, campaignOptionsPanelWidth());
             contentWidth = Math.min(contentWidth, getWidth());
             int x = Math.max(0, (getWidth() - contentWidth) / 2);
             content.setBounds(x, 0, contentWidth, preferredSize.height);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -40,7 +40,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import megamek.common.util.sorter.NaturalOrderComparator;
-import mekhq.campaign.Hangar;
 
 /**
  * Creates sorted views of a hangar.
@@ -86,7 +85,7 @@ public class HangarSorter {
      *
      * @return A sorted list of units.
      */
-    public List<Unit> getUnits(Hangar hangar) {
+    public List<Unit> getUnits(mekhq.campaign.LocalHangar hangar) {
         return sort(hangar.getUnitsStream()).collect(Collectors.toList());
     }
 
@@ -96,7 +95,7 @@ public class HangarSorter {
      * @param hangar   The hangar to retrieve units from in sorted order.
      * @param consumer A function to apply to each unit.
      */
-    public void forEachUnit(Hangar hangar, Consumer<Unit> consumer) {
+    public void forEachUnit(mekhq.campaign.LocalHangar hangar, Consumer<Unit> consumer) {
         sort(hangar.getUnitsStream()).forEach(consumer);
     }
 

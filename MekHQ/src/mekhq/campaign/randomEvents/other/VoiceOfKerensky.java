@@ -189,6 +189,10 @@ public class VoiceOfKerensky {
      * @return the senior command administrator, or {@code null} if none exists
      */
     private static @Nullable Person getSpeaker(Campaign campaign) {
-        return campaign.getSeniorAdminPerson(COMMAND);
+        return campaign.getPlayerForce().getHumanResources()
+                     .getSeniorAdminPerson(COMMAND,
+                           campaign.getCampaignOptions(),
+                           campaign.isClanCampaign(),
+                           campaign.getLocalDate());
     }
 }

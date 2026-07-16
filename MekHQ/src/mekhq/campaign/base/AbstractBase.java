@@ -40,9 +40,9 @@ import jakarta.annotation.Nonnull;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Hangar;
-import mekhq.campaign.Personnel;
-import mekhq.campaign.Warehouse;
+import mekhq.campaign.LocalHangar;
+import mekhq.campaign.LocalPersonnel;
+import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationNode;
@@ -65,9 +65,9 @@ public abstract class AbstractBase implements IPlace {
     private String displayType;
     private String planetId;
     private final LocationNode locationNode;
-    private final Personnel basePersonnel = new Personnel();
-    private final Warehouse baseWarehouse = new Warehouse();
-    private final Hangar baseHangar = new Hangar();
+    private final LocalPersonnel basePersonnel = new LocalPersonnel();
+    private final LocalWarehouse baseWarehouse = new LocalWarehouse();
+    private final LocalHangar baseHangar = new LocalHangar();
     private final RequestedStockLevels baseRequestedStockLevels = new RequestedStockLevels();
 
     /**
@@ -102,33 +102,39 @@ public abstract class AbstractBase implements IPlace {
         return locationNode;
     }
 
-    /** Returns the {@link Personnel} node that holds persons who have arrived at this base. */
-    public Personnel getBasePersonnel() {
+    /** A base is always in use, so any location node with a base below it must never be pruned. */
+    @Override
+    public boolean isInUse() {
+        return true;
+    }
+
+    /** Returns the {@link LocalPersonnel} node that holds persons who have arrived at this base. */
+    public LocalPersonnel getBasePersonnel() {
         return basePersonnel;
     }
 
-    /** Returns the {@link Warehouse} that holds spare parts stored at this base. */
-    public Warehouse getBaseWarehouse() {
+    /** Returns the {@link LocalWarehouse} that holds spare parts stored at this base. */
+    public LocalWarehouse getBaseWarehouse() {
         return baseWarehouse;
     }
 
-    /** Returns the {@link Hangar} that holds units stationed at this base. */
-    public Hangar getBaseHangar() {
+    /** Returns the {@link LocalHangar} that holds units stationed at this base. */
+    public LocalHangar getBaseHangar() {
         return baseHangar;
     }
     
     @Override
-    public Warehouse getWarehouse() {
+    public LocalWarehouse getWarehouse() {
         return baseWarehouse;
     }
 
     @Override
-    public Hangar getHangar() {
+    public LocalHangar getHangar() {
         return baseHangar;
     }
 
     @Override
-    public Personnel getPersonnel() {
+    public LocalPersonnel getPersonnel() {
         return basePersonnel;
     }
 

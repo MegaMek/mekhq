@@ -34,7 +34,7 @@ package mekhq.gui.campaignOptions.components;
 
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static megamek.client.ui.util.FontHandler.symbolIcon;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.CAMPAIGN_OPTIONS_PANEL_WIDTH;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.campaignOptionsPanelWidth;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.formatBadges;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.setSmallSizeVariant;
@@ -72,7 +72,7 @@ import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
  * expand/collapse-all controls), and an optional
  * quote footer. Arbitrary components can also be interleaved with the sections.
  * Every sectioned page is floored to a
- * shared width ({@link #UNIFORM_SECTION_STACK_WIDTH}) so the dialog's pages
+ * shared width ({@link #uniformSectionStackWidth()}) so the dialog's pages
  * render at a consistent width, while pages
  * whose content is naturally wider keep their size up to the page-width cap.
  * </p>
@@ -89,14 +89,14 @@ public class CampaignOptionsPagePanel extends JPanel {
     private static final int QUOTE_BOTTOM_PADDING = UIUtil.scaleForGUI(8);
     private static final int QUOTE_HORIZONTAL_PADDING = UIUtil.scaleForGUI(24);
     private static final int DEFAULT_HEADER_IMAGE_SIZE = 80;
-    // Shared minimum width every sectioned page is floored to, so form pages render
-    // at a consistent width across the
-    // dialog instead of each page shrinking to its own widest section. Comfortably
-    // covers a two-column form section
-    // (label column plus a long right-column control or checkbox) and stays well
-    // under the page width cap, so wider
-    // table pages and the 950 cap are unaffected.
-    private static final int UNIFORM_SECTION_STACK_WIDTH = UIUtil.scaleForGUI(640);
+    private static int uniformSectionStackWidth() {
+        // Shared minimum width every sectioned page is floored to, so form pages render at a consistent width across
+        // the dialog instead of each page shrinking to its own widest section. Comfortably covers a two-column form
+        // section (label column plus a long right-column control or checkbox) and stays well under the page width cap,
+        // so wider table pages and the 950 cap are unaffected. Resolved on each call (not cached in a static final) so
+        // the pages reflow when the GUI scale changes at runtime.
+        return UIUtil.scaleForGUI(640);
+    }
 
     private final JPanel pageBody;
     private final boolean showDetailsPanel;
@@ -142,7 +142,7 @@ public class CampaignOptionsPagePanel extends JPanel {
         if (sectionStackWidth == 0 && builder.standardContentWidth) {
             // A section-less page (such as a category landing page) would otherwise collapse its intro and quote to
             // the header width; floor it to the shared page width so it matches the dialog's sectioned pages.
-            sectionStackWidth = UNIFORM_SECTION_STACK_WIDTH;
+            sectionStackWidth = uniformSectionStackWidth();
         }
 
         JPanel contentPanel = createContentPanel(builder, renderItems, sections, sectionControls, sectionStackWidth);
@@ -240,7 +240,7 @@ public class CampaignOptionsPagePanel extends JPanel {
     @Override
     public @Nonnull Dimension getPreferredSize() {
         Dimension preferredSize = pageBody.getPreferredSize();
-        return new Dimension(Math.min(preferredSize.width, CAMPAIGN_OPTIONS_PANEL_WIDTH), preferredSize.height);
+        return new Dimension(Math.min(preferredSize.width, campaignOptionsPanelWidth()), preferredSize.height);
     }
 
     @Override
@@ -424,8 +424,8 @@ public class CampaignOptionsPagePanel extends JPanel {
         // is naturally wider than the
         // floor (e.g. table-based pages) keep their larger width; this only grows
         // narrower pages up to the floor, so it
-        // never clips. Tune UNIFORM_SECTION_STACK_WIDTH to adjust the shared width.
-        return Math.max(contentWidth, UNIFORM_SECTION_STACK_WIDTH);
+        // never clips. Tune uniformSectionStackWidth() to adjust the shared width.
+        return Math.max(contentWidth, uniformSectionStackWidth());
     }
 
     private JPanel createSectionControls(List<MHQCollapsiblePanel> sections) {
@@ -464,7 +464,7 @@ public class CampaignOptionsPagePanel extends JPanel {
             return null;
         }
 
-        int quotePanelWidth = Math.max(1, Math.min(contentWidth, CAMPAIGN_OPTIONS_PANEL_WIDTH));
+        int quotePanelWidth = Math.max(1, Math.min(contentWidth, campaignOptionsPanelWidth()));
         int quoteHorizontalPadding = getQuoteHorizontalPadding(quotePanelWidth);
         int quoteTextWidth = quotePanelWidth - (quoteHorizontalPadding * 2);
         JPanel quotePanel = new JPanel(new GridBagLayout());

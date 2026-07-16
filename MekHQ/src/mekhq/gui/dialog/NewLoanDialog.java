@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -116,7 +116,7 @@ public class NewLoanDialog extends JDialog implements ActionListener, ChangeList
         loan = Loan.getBaseLoan(rating,
               this.campaign.getCampaignOptions().isSimulateGrayMonday(),
               this.campaign.getLocalDate());
-        maxCollateralValue = this.campaign.getFinances().getMaxCollateral(this.campaign);
+        maxCollateralValue = this.campaign.getPlayerForce().getFinances().getMaxCollateral(this.campaign);
         initComponents();
         setLocationRelativeTo(frame);
         setUserPreferences();

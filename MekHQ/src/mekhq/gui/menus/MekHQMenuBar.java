@@ -101,6 +101,7 @@ import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.procreation.RandomProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.report.CargoReport;
 import mekhq.campaign.report.HangarReport;
 import mekhq.campaign.report.PersonnelReport;
@@ -286,8 +287,12 @@ public class MekHQMenuBar extends JMenuBar {
         menuImport.add(createMenuItem("miImportPerson.text", KeyEvent.VK_P, evt -> loadPersonFile()));
 
         JMenuItem miImportIndividualRankSystem = createMenuItem("miImportIndividualRankSystem.text", KeyEvent.VK_I,
-              evt -> getCampaign().setRankSystem(RankSystem.generateIndividualInstanceFromXML(
-                    FileDialogs.openIndividualRankSystem(getFrame()).orElse(null))));
+              evt -> {
+                  Campaign campaign = getCampaign();
+                  final RankSystem rankSystem = RankSystem.generateIndividualInstanceFromXML(
+                        FileDialogs.openIndividualRankSystem(getFrame()).orElse(null));
+                  campaign.getPlayerForce().setRankSystem(rankSystem);
+              });
         miImportIndividualRankSystem.setToolTipText(getTextAt("miImportIndividualRankSystem.toolTipText"));
         menuImport.add(miImportIndividualRankSystem);
 
@@ -325,11 +330,14 @@ public class MekHQMenuBar extends JMenuBar {
         miExportXMLFile.setMnemonic(KeyEvent.VK_X);
 
         miExportXMLFile.add(createMenuItem("miExportRankSystems.text", KeyEvent.VK_R,
-              evt -> Ranks.exportRankSystemsToFile(FileDialogs.saveRankSystems(getFrame()).orElse(null),
-                    getCampaign().getRankSystem())));
+              evt -> mekhq.campaign.personnel.ranks.Ranks.exportRankSystemsToFile(mekhq.gui.FileDialogs.saveRankSystems(
+                          getFrame()).orElse(null),
+                    getCampaign().getPlayerForce().getRankSystem())));
 
         miExportXMLFile.add(createMenuItem("miExportIndividualRankSystem.text", KeyEvent.VK_I,
-              evt -> getCampaign().getRankSystem().writeToFile(FileDialogs.saveIndividualRankSystem(getFrame()).orElse(null))));
+              evt -> getCampaign().getPlayerForce()
+                           .getRankSystem()
+                           .writeToFile(mekhq.gui.FileDialogs.saveIndividualRankSystem(getFrame()).orElse(null))));
 
         JMenuItem miExportPlanetsXML = createMenuItem("miExportPlanets.text", KeyEvent.VK_P, evt -> {
             try {
@@ -547,8 +555,9 @@ public class MekHQMenuBar extends JMenuBar {
         menuManage.add(miPlanetarySystemEditor);
 
         JMenuItem miBloodnames = createMenuItem("miRandomBloodnames.text", KeyEvent.VK_B, evt -> {
-            for (final Person person : getCampaign().getAllPersonnel()) {
-                getCampaign().checkBloodnameAdd(person, false);
+            for (final Person person : getCampaign().getPlayerForce().getHumanResources().getPersonnel()) {
+                Campaign campaign = getCampaign();
+                campaign.getPlayerForce().getHumanResources().checkBloodnameAdd(campaign, person, false);
             }
         });
         menuManage.add(miBloodnames);
@@ -662,7 +671,7 @@ public class MekHQMenuBar extends JMenuBar {
      * Exports Finances to a CSV file.
      */
     private void exportFinances() {
-        Finances finances = getCampaign().getFinances();
+        Finances finances = getCampaign().getPlayerForce().getFinances();
         if (finances.getTransactions().isEmpty()) {
             JOptionPane.showMessageDialog(getFrame(), getTextAt("dlgNoFinances.text"));
             return;
@@ -737,16 +746,25 @@ public class MekHQMenuBar extends JMenuBar {
                 }
 
                 Person person = Person.generateInstanceFromXML(wn2, getCampaign(), version);
-                if ((person != null) && (getCampaign().getPerson(person.getId()) != null)) {
-                    logger.error("ERROR: Cannot load person who exists, ignoring. (Name: {}, Id {})",
-                          person.getFullName(),
-                          person.getId());
-                    person = null;
+                if ((person != null)) {
+                    Campaign campaign = getCampaign();
+                    final UUID id = person.getId();
+                    if (campaign.getPlayerForce().getHumanResources().getPerson(id) != null) {
+                        logger.error("ERROR: Cannot load person who exists, ignoring. (Name: {}, Id {})",
+                              person.getFullName(),
+                              person.getId());
+                        person = null;
+                    }
                 }
 
                 if (person != null) {
-                    getCampaign().recruitPerson(person, person.getPrisonerStatus(), true, false, person.isEmployed(),
-                          true);
+                    Campaign campaign = getCampaign();
+                    PrisonerStatus prisonerStatus = person.getPrisonerStatus();
+                    boolean employ = person.isEmployed();
+                    campaign.getPlayerForce()
+                          .getHumanResources()
+                          .recruitPerson(campaign, person, prisonerStatus, true, false, employ,
+                                true);
 
                     // Clear some values we no longer should have set in case this
                     // has transferred campaigns or things in the campaign have
@@ -759,10 +777,14 @@ public class MekHQMenuBar extends JMenuBar {
             // Fix Spouse Id Information - This is required to fix spouse NPEs where one doesn't export both members
             // of the couple
             // TODO : make it so that exports will automatically include both spouses
-            for (Person p : getCampaign().getActivePersonnel(true, true)) {
+            Campaign campaign2 = getCampaign();
+            for (Person p : campaign2.getPlayerForce().getHumanResources().getActivePersonnel(true, true)) {
                 Person spouse = p.getGenealogy().getSpouse();
+                Campaign campaign1 = getCampaign();
+                final UUID id = spouse.getId();
                 if (p.getGenealogy().hasSpouse() &&
-                          ((spouse == null) || (getCampaign().getPerson(spouse.getId()) == null))) {
+                          ((spouse == null) ||
+                                 (campaign1.getPlayerForce().getHumanResources().getPerson(id) == null))) {
                     // If this happens, we need to clear the spouse
                     if (p.getMaidenName() != null) {
                         p.setSurname(p.getMaidenName());
@@ -774,8 +796,11 @@ public class MekHQMenuBar extends JMenuBar {
                 if (p.isPregnant()) {
                     String fatherIdString = p.getExtraData().get(AbstractProcreation.PREGNANCY_FATHER_DATA);
                     UUID fatherId = (fatherIdString != null) ? UUID.fromString(fatherIdString) : null;
-                    if ((fatherId != null) && (getCampaign().getPerson(fatherId) == null)) {
-                        p.getExtraData().set(AbstractProcreation.PREGNANCY_FATHER_DATA, null);
+                    if ((fatherId != null)) {
+                        Campaign campaign = getCampaign();
+                        if (campaign.getPlayerForce().getHumanResources().getPerson(fatherId) == null) {
+                            p.getExtraData().set(AbstractProcreation.PREGNANCY_FATHER_DATA, null);
+                        }
                     }
                 }
             }
@@ -843,12 +868,15 @@ public class MekHQMenuBar extends JMenuBar {
         person.setOriginPlanet(Systems.getInstance().getSystemById("Terra").getPrimaryPlanet());
         person.setPrimaryRoleDirect(PersonnelRole.DEPENDENT);
 
-        getCampaign().recruitPerson(person, true, true);
+        Campaign campaign = getCampaign();
+        campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, person, true, true);
     }
 
     private void hirePerson(final ActionEvent evt) {
+        Campaign campaign = getCampaign();
+        final PersonnelRole role = PersonnelRole.valueOf(evt.getActionCommand());
         NewRecruitDialog npd = new NewRecruitDialog(getGui(), true,
-              getCampaign().newPerson(PersonnelRole.valueOf(evt.getActionCommand())));
+              campaign.getPlayerForce().getHumanResources().newPerson(campaign, role));
         npd.setVisible(true);
     }
 
@@ -894,9 +922,11 @@ public class MekHQMenuBar extends JMenuBar {
         final CampaignOptions newOptions = getCampaign().getCampaignOptions();
 
         if (randomDivorceMethod != newOptions.getRandomDivorceMethod()) {
-            getCampaign().setDivorce(newOptions.getRandomDivorceMethod().getMethod(newOptions));
+            Campaign campaign = getCampaign();
+            final AbstractDivorce divorce = newOptions.getRandomDivorceMethod().getMethod(newOptions);
+            campaign.getPlayerForce().getHumanResources().setDivorce(divorce);
         } else {
-            AbstractDivorce divorce = getCampaign().getDivorce();
+            AbstractDivorce divorce = getCampaign().getPlayerForce().getHumanResources().getDivorce();
             divorce.setUseClanPersonnelDivorce(newOptions.isUseClanPersonnelDivorce());
             divorce.setUsePrisonerDivorce(newOptions.isUsePrisonerDivorce());
             divorce.setUseRandomOppositeSexDivorce(newOptions.isUseRandomOppositeSexDivorce());
@@ -909,9 +939,11 @@ public class MekHQMenuBar extends JMenuBar {
         }
 
         if (randomMarriageMethod != newOptions.getRandomMarriageMethod()) {
-            getCampaign().setMarriage(newOptions.getRandomMarriageMethod().getMethod(newOptions));
+            Campaign campaign = getCampaign();
+            final AbstractMarriage marriage = newOptions.getRandomMarriageMethod().getMethod(newOptions);
+            campaign.getPlayerForce().getHumanResources().setMarriage(marriage);
         } else {
-            AbstractMarriage marriage = getCampaign().getMarriage();
+            AbstractMarriage marriage = getCampaign().getPlayerForce().getHumanResources().getMarriage();
             marriage.setUseClanPersonnelMarriages(newOptions.isUseClanPersonnelMarriages());
             marriage.setUsePrisonerMarriages(newOptions.isUsePrisonerMarriages());
             marriage.setUseRandomClanPersonnelMarriages(newOptions.isUseRandomClanPersonnelMarriages());
@@ -922,9 +954,11 @@ public class MekHQMenuBar extends JMenuBar {
         }
 
         if (randomProcreationMethod != newOptions.getRandomProcreationMethod()) {
-            getCampaign().setProcreation(newOptions.getRandomProcreationMethod().getMethod(newOptions));
+            Campaign campaign = getCampaign();
+            final AbstractProcreation procreation = newOptions.getRandomProcreationMethod().getMethod(newOptions);
+            campaign.getPlayerForce().getHumanResources().setProcreation(procreation);
         } else {
-            AbstractProcreation procreation = getCampaign().getProcreation();
+            AbstractProcreation procreation = getCampaign().getPlayerForce().getHumanResources().getProcreation();
             procreation.setUseClanPersonnelProcreation(newOptions.isUseClanPersonnelProcreation());
             procreation.setUsePrisonerProcreation(newOptions.isUsePrisonerProcreation());
             procreation.setUseRelationshiplessProcreation(newOptions.isUseRelationshiplessRandomProcreation());
@@ -940,10 +974,13 @@ public class MekHQMenuBar extends JMenuBar {
 
         // Clear Procreation Data if Disabled
         if (!newOptions.isUseManualProcreation() && newOptions.getRandomProcreationMethod().isNone()) {
-            getCampaign().getAllPersonnel()
+            getCampaign().getPlayerForce().getHumanResources().getPersonnel()
                   .parallelStream()
                   .filter(Person::isPregnant)
-                  .forEach(person -> getCampaign().getProcreation().removePregnancy(person));
+                  .forEach(person -> getCampaign().getPlayerForce()
+                                           .getHumanResources()
+                                           .getProcreation()
+                                           .removePregnancy(person));
         }
 
         final AbstractUnitMarket unitMarket = getCampaign().getUnitMarket();
@@ -961,7 +998,8 @@ public class MekHQMenuBar extends JMenuBar {
             if (newOptions.isUseStratCon()) {
                 getCampaign().initAtB(false);
                 // refresh lance assignment table
-                MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign(), getCampaign().getFormations()));
+                MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign(),
+                      getCampaign().getPlayerForce().getFormations()));
             }
             if (newOptions.isUseStratCon()) {
                 int loops = 0;

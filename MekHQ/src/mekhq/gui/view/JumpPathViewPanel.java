@@ -116,10 +116,11 @@ public class JumpPathViewPanel extends JScrollablePanel {
         LocalDate currentDate = campaign.getLocalDate();
 
         boolean isUseCommandCircuit =
-              FactionStandingUtilities.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(),
+              FactionStandingUtilities.isUseCommandCircuit(campaign.getPlayerForce()
+                                                                 .isOverridingCommandCircuitRequirements(),
                     campaign.isGM(),
                     campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
-                    campaign.getFactionStandings(), campaign.getFutureAtBContracts());
+                    campaign.getPlayerForce().getFactionStandings(), campaign.getFutureAtBContracts());
 
         for (PlanetarySystem system : path.getSystems()) {
             lblPlanet =
@@ -196,7 +197,10 @@ public class JumpPathViewPanel extends JScrollablePanel {
 
         txtTimeStart.setName("lblTimeStart2");
         txtTimeStart.setText("<html>" +
-                                   Math.round(path.getStartTime(campaign.getCurrentLocation().getTransitTime()) *
+                                   Math.round(path.getStartTime(campaign.getPlayerForce()
+                                                                      .getForceDetachment()
+                                                                      .getCurrentLocation()
+                                                                      .getTransitTime()) *
                                                     100.0) /
                                          100.0 +
                                    " days from " +
@@ -245,9 +249,10 @@ public class JumpPathViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblRechargeTime, gridBagConstraints);
 
-        boolean isUseCommandCircuit = FactionStandingUtilities.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(),
+        boolean isUseCommandCircuit = FactionStandingUtilities.isUseCommandCircuit(campaign.getPlayerForce()
+                                                                                         .isOverridingCommandCircuitRequirements(),
               campaign.isGM(), campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
-              campaign.getFactionStandings(), campaign.getFutureAtBContracts());
+              campaign.getPlayerForce().getFactionStandings(), campaign.getFutureAtBContracts());
 
         txtRechargeTime.setName("lblRechargeTime2");
         txtRechargeTime.setText("<html>" +
@@ -275,7 +280,8 @@ public class JumpPathViewPanel extends JScrollablePanel {
 
         txtTotalTime.setName("lblTotalTime2");
         txtTotalTime.setText("<html>" + Math.round(path.getTotalTime(currentDate,
-              campaign.getCurrentLocation().getTransitTime(), isUseCommandCircuit) * 100.0) / 100.0 +
+              campaign.getPlayerForce().getForceDetachment().getCurrentLocation().getTransitTime(),
+              isUseCommandCircuit) * 100.0) / 100.0 +
                                    " days" +
                                    "</html>");
         gridBagConstraints = new GridBagConstraints();
@@ -298,7 +304,10 @@ public class JumpPathViewPanel extends JScrollablePanel {
             pnlStats.add(lblCost, gridBagConstraints);
 
             TransportCostCalculations transportCostCalculations = campaign.getTransportCostCalculation(EXP_REGULAR);
-            int duration = (int) ceil(path.getTotalTime(currentDate, campaign.getCurrentLocation().getTransitTime(),
+            int duration = (int) ceil(path.getTotalTime(currentDate, campaign.getPlayerForce()
+                                                                           .getForceDetachment()
+                                                                           .getCurrentLocation()
+                                                                           .getTransitTime(),
                   isUseCommandCircuit));
             Money journeyCost = transportCostCalculations.calculateJumpCostForEntireJourney(duration, path.getJumps());
 

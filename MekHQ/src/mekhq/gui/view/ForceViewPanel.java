@@ -47,8 +47,8 @@ import java.util.UUID;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import javax.swing.JTextPane;
+import javax.swing.SwingUtilities;
 
 import megamek.client.ui.Messages;
 import megamek.common.units.Entity;
@@ -214,7 +214,10 @@ public class ForceViewPanel extends JScrollablePanel {
         Person commanderPerson = campaign.getPerson(formation.getFormationCommanderID());
 
         if (formation.getId() == 0) {
-            commanderPerson = campaign.getCommander();
+            commanderPerson = campaign.getPlayerForce().getHumanResources()
+                                    .getCommander(campaign.getCampaignOptions(),
+                                          campaign.isClanCampaign(),
+                                          campaign.getLocalDate());
         }
         String commanderName = commanderPerson != null ? commanderPerson.getFullTitle() : "";
 
@@ -730,7 +733,8 @@ public class ForceViewPanel extends JScrollablePanel {
         }
 
         if (formation.getFormationCommanderID() != null) {
-            Person forceCommander = campaign.getPerson(formation.getFormationCommanderID());
+            final java.util.UUID id = formation.getFormationCommanderID();
+            Person forceCommander = campaign.getPlayerForce().getHumanResources().getPerson(id);
 
             if (forceCommander != null) {
                 commander = forceCommander.getFullTitle();

@@ -1248,11 +1248,15 @@ public class Refit extends Part implements IAcquisitionWork {
 
                     // Check if we need more ammo
                     if (ammoBin.needsFixing()) {
-                        getCampaign().getShoppingList().addShoppingItem(ammoBin.getNewPart(), 1, getCampaign());
+                        getCampaign().getPlayerForce()
+                              .getShoppingList()
+                              .addShoppingItem(ammoBin.getNewPart(), 1, getCampaign());
                     }
 
                 } else if (part instanceof IAcquisitionWork) {
-                    getCampaign().getShoppingList().addShoppingItem(((IAcquisitionWork) part), 1, getCampaign());
+                    getCampaign().getPlayerForce()
+                          .getShoppingList()
+                          .addShoppingItem(((IAcquisitionWork) part), 1, getCampaign());
                     newShoppingList.add(part);
                 }
             }
@@ -1268,7 +1272,7 @@ public class Refit extends Part implements IAcquisitionWork {
                 while (armorSupplied < armorNeeded) {
                     Armor armorPart = (Armor) (newArmorSupplies.getNewPart());
                     armorSupplied += armorPart.getAmount();
-                    getCampaign().getShoppingList().addShoppingItem(armorPart, 1, getCampaign());
+                    getCampaign().getPlayerForce().getShoppingList().addShoppingItem(armorPart, 1, getCampaign());
                 }
             }
         } else {
@@ -1280,7 +1284,7 @@ public class Refit extends Part implements IAcquisitionWork {
             if (shoppingList.isEmpty() && (null == newArmorSupplies || newArmorSupplies.getAmountNeeded() == 0)) {
                 kitFound = true;
             } else {
-                getCampaign().getShoppingList().addShoppingItem(this, 1, getCampaign());
+                getCampaign().getPlayerForce().getShoppingList().addShoppingItem(this, 1, getCampaign());
             }
         }
 
@@ -1490,14 +1494,14 @@ public class Refit extends Part implements IAcquisitionWork {
         List<IAcquisitionWork> toRemove = new ArrayList<>();
         toRemove.add(this);
         if (getRefitUnit() != null) {
-            for (IAcquisitionWork part : campaign.getShoppingList().getPartList()) {
+            for (IAcquisitionWork part : campaign.getPlayerForce().getShoppingList().getPartList()) {
                 if ((part instanceof Part) && Objects.equals(getRefitUnit(), ((Part) part).getRefitUnit())) {
                     toRemove.add(part);
                 }
             }
         }
         for (IAcquisitionWork work : toRemove) {
-            campaign.getShoppingList().removeItem(work);
+            campaign.getPlayerForce().getShoppingList().removeItem(work);
         }
         MekHQ.triggerEvent(new UnitRefitEvent(oldUnit));
     }
@@ -3206,7 +3210,7 @@ public class Refit extends Part implements IAcquisitionWork {
 
         if (assignedTech instanceof RefitPersonRef) {
             UUID id = assignedTech.getId();
-            assignedTech = campaign.getPerson(id);
+            assignedTech = campaign.getPlayerForce().getHumanResources().getPerson(id);
             if (assignedTech == null) {
                 LOGGER.error("Refit on Unit {} references missing tech {}", getUnit().getId(), id);
             }

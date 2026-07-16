@@ -167,8 +167,8 @@ public class AtBGameThread extends GameThread {
                 LOGGER.info("Thread in lounge");
 
                 client.getLocalPlayer().setCamouflage(app.getCampaign().getCamouflage().clone());
-                client.getLocalPlayer().setColour(app.getCampaign().getColour());
-                client.getLocalPlayer().setConstantInitBonus(campaign.getInitiativeBonus());
+                client.getLocalPlayer().setColour(app.getCampaign().getPlayerForce().getColour());
+                client.getLocalPlayer().setConstantInitBonus(campaign.getPlayerForce().getInitiativeBonus());
 
                 if (started) {
                     client.getGame().getOptions().loadOptions();
@@ -258,7 +258,7 @@ public class AtBGameThread extends GameThread {
                         }
                     }
                     entity.setDeployRound(deploymentRound);
-                    Formation formation = campaign.getFormationFor(unit);
+                    Formation formation = campaign.getPlayerForce().getFormationFor(unit);
                     if (formation != null) {
                         entity.setForceString(formation.getFullMMName());
                     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -139,12 +139,59 @@ public class RetirementDefectionDialog extends JDialog {
     private final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.RetirementDefectionDialog",
           MekHQ.getMHQOptions().getLocale());
 
+    final private ActionListener buttonListener = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent ev) {
+            if (ev.getSource().equals(btnRoll)) {
+                for (UUID id : targetRolls.keySet()) {
+                    if (payBonus(id)) {
+                        targetRolls.get(id).addModifier(-2, "Bonus");
+                    }
+
+                    if (miscModifier(id) != 0) {
+                        targetRolls.get(id).addModifier(miscModifier(id), "Custom");
+                    }
+                }
+                rdTracker.rollRetirement(contract,
+                      targetRolls,
+                      RetirementDefectionTracker.getShareValue(hqView.getCampaign()),
+                      hqView.getCampaign());
+                initResults();
+
+                btnEdit.setVisible(true);
+                btnRoll.setVisible(false);
+                btnDone.setVisible(true);
+                btnDone.setEnabled(unitAssignmentsComplete());
+
+                currentPanel = PAN_RESULTS;
+                cardLayout.show(panMain, currentPanel);
+                txtInstructions.setText(resourceMap.getString("txtInstructions.Results.text"));
+
+                hqView.getCampaign().getPlayerForce().getFinances()
+                      .debit(TransactionType.SALARIES,
+                            hqView.getCampaign().getLocalDate(),
+                            getTotalBonus(),
+                            "Bonus Payments");
+            } else if (ev.getSource().equals(btnDone)) {
+                for (UUID pid : ((RetirementTableModel) retireeTable.getModel()).getAltPayout().keySet()) {
+                    rdTracker.getPayout(pid)
+                          .setPayoutAmount(((RetirementTableModel) retireeTable.getModel()).getAltPayout().get(pid));
+                }
+                aborted = false;
+                setVisible(false);
+            } else if (ev.getSource().equals(btnCancel)) {
+                aborted = true;
+                setVisible(false);
+            }
+        }
+    };
+
     public RetirementDefectionDialog(CampaignGUI gui, Mission mission, boolean doRetirement) {
         super(gui.getFrame(), true);
         hqView = gui;
         unitAssignments = new HashMap<>();
         this.contract = mission;
-        rdTracker = hqView.getCampaign().getRetirementDefectionTracker();
+        rdTracker = hqView.getCampaign().getPlayerForce().getHumanResources().getRetirementDefectionTracker();
         if (doRetirement) {
             targetRolls = rdTracker.getTargetNumbers(mission, hqView.getCampaign());
 
@@ -299,7 +346,10 @@ public class RetirementDefectionDialog extends JDialog {
             model.addTableModelListener(ev -> {
                 setBonusAndShareTotals(getTotalBonus());
 
-                btnRoll.setEnabled(!getTotalBonus().isGreaterThan(hqView.getCampaign().getFinances().getBalance()));
+                btnRoll.setEnabled(!getTotalBonus().isGreaterThan(hqView.getCampaign()
+                                                                        .getPlayerForce()
+                                                                        .getFinances()
+                                                                        .getBalance()));
             });
             setBonusAndShareTotals(getTotalBonus());
 
@@ -463,27 +513,6 @@ public class RetirementDefectionDialog extends JDialog {
         add(btnPanel, BorderLayout.PAGE_END);
     }
 
-    private void setBonusAndShareTotals(Money totalBonuses) {
-        if (totalBonuses.isGreaterThan(hqView.getCampaign().getFinances().getBalance())) {
-            lblTotal.setText("<html>" +
-                                   resourceMap.getString("lblTotalBonus.text") +
-                                   ' ' +
-                                   "<font color='" +
-                                   ReportingUtilities.getNegativeColor() +
-                                   "'>" +
-                                   getTotalBonus().toAmountAndSymbolString() +
-                                   "</font></html>");
-        } else {
-            lblTotal.setText(resourceMap.getString("lblTotalBonus.text") +
-                                   ' ' +
-                                   getTotalBonus().toAmountAndSymbolString());
-        }
-
-        if (hqView.getCampaign().getCampaignOptions().isUseShareSystem()) {
-            lblTotalShares.setText(Integer.toString(getTotalShares()));
-        }
-    }
-
     /**
      * These need to be migrated to the Suite Constants / Suite Options Setup
      */
@@ -506,59 +535,32 @@ public class RetirementDefectionDialog extends JDialog {
         }
     }
 
-    final private ActionListener buttonListener = new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent ev) {
-            if (ev.getSource().equals(btnRoll)) {
-                for (UUID id : targetRolls.keySet()) {
-                    if (payBonus(id)) {
-                        targetRolls.get(id).addModifier(-2, "Bonus");
-                    }
-
-                    if (miscModifier(id) != 0) {
-                        targetRolls.get(id).addModifier(miscModifier(id), "Custom");
-                    }
-                }
-                rdTracker.rollRetirement(contract,
-                      targetRolls,
-                      RetirementDefectionTracker.getShareValue(hqView.getCampaign()),
-                      hqView.getCampaign());
-                initResults();
-
-                btnEdit.setVisible(true);
-                btnRoll.setVisible(false);
-                btnDone.setVisible(true);
-                btnDone.setEnabled(unitAssignmentsComplete());
-
-                currentPanel = PAN_RESULTS;
-                cardLayout.show(panMain, currentPanel);
-                txtInstructions.setText(resourceMap.getString("txtInstructions.Results.text"));
-
-                hqView.getCampaign()
-                      .getFinances()
-                      .debit(TransactionType.SALARIES,
-                            hqView.getCampaign().getLocalDate(),
-                            getTotalBonus(),
-                            "Bonus Payments");
-            } else if (ev.getSource().equals(btnDone)) {
-                for (UUID pid : ((RetirementTableModel) retireeTable.getModel()).getAltPayout().keySet()) {
-                    rdTracker.getPayout(pid)
-                          .setPayoutAmount(((RetirementTableModel) retireeTable.getModel()).getAltPayout().get(pid));
-                }
-                aborted = false;
-                setVisible(false);
-            } else if (ev.getSource().equals(btnCancel)) {
-                aborted = true;
-                setVisible(false);
-            }
+    private void setBonusAndShareTotals(Money totalBonuses) {
+        if (totalBonuses.isGreaterThan(hqView.getCampaign().getPlayerForce().getFinances().getBalance())) {
+            lblTotal.setText("<html>" +
+                                   resourceMap.getString("lblTotalBonus.text") +
+                                   ' ' +
+                                   "<font color='" +
+                                   ReportingUtilities.getNegativeColor() +
+                                   "'>" +
+                                   getTotalBonus().toAmountAndSymbolString() +
+                                   "</font></html>");
+        } else {
+            lblTotal.setText(resourceMap.getString("lblTotalBonus.text") +
+                                   ' ' +
+                                   getTotalBonus().toAmountAndSymbolString());
         }
-    };
+
+        if (hqView.getCampaign().getCampaignOptions().isUseShareSystem()) {
+            lblTotalShares.setText(Integer.toString(getTotalShares()));
+        }
+    }
 
     private void initResults() {
         // This and the below code is not referenced outside of this method and neither variables are used outside
         //  adding units to the list.
         ArrayList<UUID> availableUnits = new ArrayList<>();
-        hqView.getCampaign().getHangar().forEachUnit(u -> {
+        hqView.getCampaign().getPlayerForce().getHangar().forEachUnit(u -> {
             if (!u.isAvailable() && !u.isMothballing() && !u.isMothballed()) {
                 return;
             }
@@ -566,7 +568,8 @@ public class RetirementDefectionDialog extends JDialog {
         });
 
         for (UUID id : rdTracker.getRetirees(contract)) {
-            Person person = hqView.getCampaign().getPerson(id);
+            Campaign campaign = hqView.getCampaign();
+            Person person = campaign.getPlayerForce().getHumanResources().getPerson(id);
             /*
              * Retirees who brought a unit will take the same unit when
              * they go if it is still around
@@ -705,7 +708,8 @@ public class RetirementDefectionDialog extends JDialog {
             }
 
             // If the person is still under contract, we don't care that they're owed a unit
-            if (!isBreakingContract(hqView.getCampaign().getPerson(id),
+            Campaign campaign = hqView.getCampaign();
+            if (!isBreakingContract(campaign.getPlayerForce().getHumanResources().getPerson(id),
                   hqView.getCampaign().getLocalDate(),
                   hqView.getCampaign().getCampaignOptions().getServiceContractDuration())) {
                 // If the unit given in payment is of lower quality than required, pay an
@@ -745,10 +749,12 @@ public class RetirementDefectionDialog extends JDialog {
     private int getTotalShares() {
         return targetRolls.keySet()
                      .stream()
-                     .mapToInt(id -> hqView.getCampaign()
-                                           .getPerson(id)
-                                           .getNumShares(hqView.getCampaign(),
-                                                 hqView.getCampaign().getCampaignOptions().isSharesForAll()))
+                     .mapToInt(id -> {
+                         Campaign campaign = hqView.getCampaign();
+                         return campaign.getPlayerForce().getHumanResources().getPerson(id)
+                                      .getNumShares(hqView.getCampaign(),
+                                            hqView.getCampaign().getCampaignOptions().isSharesForAll());
+                     })
                      .sum();
     }
 
@@ -757,8 +763,9 @@ public class RetirementDefectionDialog extends JDialog {
 
         for (UUID id : targetRolls.keySet()) {
             if (((RetirementTableModel) personnelTable.getModel()).getPayBonus(id)) {
+                Campaign campaign = hqView.getCampaign();
                 retVal = retVal.plus(RetirementDefectionTracker.getPayoutOrBonusValue(hqView.getCampaign(),
-                      hqView.getCampaign().getPerson(id)));
+                      campaign.getPlayerForce().getHumanResources().getPerson(id)));
             }
         }
 
@@ -820,7 +827,8 @@ public class RetirementDefectionDialog extends JDialog {
         CampaignOptions campaignOptions = hqView.getCampaign().getCampaignOptions();
         int serviceContractDuration = campaignOptions.getServiceContractDuration();
         for (UUID personId : rdTracker.getRetirees()) {
-            Person retiree = hqView.getCampaign().getPerson(personId);
+            Campaign campaign = hqView.getCampaign();
+            Person retiree = campaign.getPlayerForce().getHumanResources().getPerson(personId);
             UUID originalUnitId = retiree.getOriginalUnitId();
 
             if (isBreakingContract(retiree, today, serviceContractDuration)) {
@@ -831,7 +839,7 @@ public class RetirementDefectionDialog extends JDialog {
             }
         }
 
-        return ((assignmentComplete) && (totalPayout.isLessThan(hqView.getCampaign().getFunds())));
+        return assignmentComplete && (totalPayout.isLessThan(hqView.getCampaign().getPlayerForce().getFunds()));
     }
 
     private void enableAddRemoveButtons() {
@@ -841,30 +849,43 @@ public class RetirementDefectionDialog extends JDialog {
         } else {
             int retireeRow = retireeTable.convertRowIndexToModel(retireeTable.getSelectedRow());
             UUID pid = ((RetirementTableModel) (retireeTable.getModel())).getPerson(retireeRow).getId();
+            Campaign campaign2 = hqView.getCampaign();
             if (null == rdTracker.getPayout(pid) &&
-                      isBreakingContract(hqView.getCampaign().getPerson(pid),
+                      isBreakingContract(campaign2.getPlayerForce().getHumanResources().getPerson(pid),
                             hqView.getCampaign().getLocalDate(),
                             hqView.getCampaign().getCampaignOptions().getServiceContractDuration())) {
                 btnAddUnit.setEnabled(false);
                 btnRemoveUnit.setEnabled(false);
-            } else if (hqView.getCampaign().getPerson(pid).getPrimaryRole().isSoldierOrBattleArmour()) {
-                btnAddUnit.setEnabled(false);
-                btnRemoveUnit.setEnabled(false);
-            } else if (null != rdTracker.getPayout(pid) && rdTracker.getPayout(pid).getWeightClass() > 0) {
-                if (unitAssignmentTable.getSelectedRow() < 0) {
-                    btnAddUnit.setEnabled(false);
-                } else if (btnEdit.isSelected()) {
-                    btnAddUnit.setEnabled(true);
-                } else {
-                    Unit unit = ((UnitAssignmentTableModel) unitAssignmentTable.getModel()).getUnit(unitAssignmentTable.convertRowIndexToModel(
-                          unitAssignmentTable.getSelectedRow()));
-                    // We bypass the Alt AM & Implant use check here
-                    btnAddUnit.setEnabled(hqView.getCampaign().getPerson(pid).canDrive(unit.getEntity(), false, false));
-                }
-                btnRemoveUnit.setEnabled(false);
             } else {
-                btnAddUnit.setEnabled(unitAssignmentTable.getSelectedRow() >= 0);
-                btnRemoveUnit.setEnabled(false);
+                Campaign campaign1 = hqView.getCampaign();
+                if (campaign1.getPlayerForce()
+                          .getHumanResources()
+                          .getPerson(pid)
+                          .getPrimaryRole()
+                          .isSoldierOrBattleArmour()) {
+                    btnAddUnit.setEnabled(false);
+                    btnRemoveUnit.setEnabled(false);
+                } else if (null != rdTracker.getPayout(pid) && rdTracker.getPayout(pid).getWeightClass() > 0) {
+                    if (unitAssignmentTable.getSelectedRow() < 0) {
+                        btnAddUnit.setEnabled(false);
+                    } else if (btnEdit.isSelected()) {
+                        btnAddUnit.setEnabled(true);
+                    } else {
+                        Unit unit = ((UnitAssignmentTableModel) unitAssignmentTable.getModel()).getUnit(
+                              unitAssignmentTable.convertRowIndexToModel(
+                                    unitAssignmentTable.getSelectedRow()));
+                        // We bypass the Alt AM & Implant use check here
+                        Campaign campaign = hqView.getCampaign();
+                        btnAddUnit.setEnabled(campaign.getPlayerForce()
+                                                    .getHumanResources()
+                                                    .getPerson(pid)
+                                                    .canDrive(unit.getEntity(), false, false));
+                    }
+                    btnRemoveUnit.setEnabled(false);
+                } else {
+                    btnAddUnit.setEnabled(unitAssignmentTable.getSelectedRow() >= 0);
+                    btnRemoveUnit.setEnabled(false);
+                }
             }
         }
     }

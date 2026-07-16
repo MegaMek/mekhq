@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -37,8 +37,7 @@ import java.util.Collection;
 
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Hangar;
-import mekhq.campaign.Warehouse;
+import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.parts.Part;
 
 /**
@@ -46,8 +45,8 @@ import mekhq.campaign.parts.Part;
  */
 public record CargoStatistics(Campaign campaign) {
 
-    public Hangar getHangar() {
-        return campaign().getHangar();
+    public mekhq.campaign.LocalHangar getHangar() {
+        return this.campaign().getPlayerForce().getHangar();
     }
 
     public double getTotalInsulatedCargoCapacity() {
@@ -96,14 +95,14 @@ public record CargoStatistics(Campaign campaign) {
 
     public double getCargoTonnage(boolean inTransit) {
         Collection<Part> parts = campaign.getAllParts();
-        Collection<Part> spareParts = Warehouse.getSpareParts(parts);
+        Collection<Part> spareParts = LocalWarehouse.getSpareParts(parts);
         return getCargoTonnage(campaign.getAllUnits(), spareParts, inTransit, false);
     }
 
     public double getCargoTonnage(final boolean inTransit,
           final boolean mothballed) {
         Collection<Part> parts = campaign.getAllParts();
-        Collection<Part> spareParts = Warehouse.getSpareParts(parts);
+        Collection<Part> spareParts = LocalWarehouse.getSpareParts(parts);
         return getCargoTonnage(campaign.getAllUnits(), spareParts, inTransit, mothballed);
     }
 

@@ -37,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -69,7 +70,7 @@ class OutstandingScenariosNagLogicTest {
      */
     @BeforeEach
     void init() {
-        campaign = mock(Campaign.class);
+        campaign = mockCampaign();
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         AtBContract contract = mock(AtBContract.class);
         scenario1 = mock(AtBScenario.class);

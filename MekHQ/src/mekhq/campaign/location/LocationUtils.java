@@ -172,9 +172,11 @@ public final class LocationUtils {
      * @return transit time in days
      */
     public static double computeStartTransit(PlanetarySystem fromSystem, Campaign campaign) {
-        return campaign.getCurrentLocation() != null
-              ? campaign.getCurrentLocation().getTransitTime()
-              : fromSystem.getTimeToJumpPoint(1.0);
+        if (campaign.getCurrentLocation() != null) {
+            return campaign.getPlayerForce().getForceDetachment().getCurrentLocation().getTransitTime();
+        } else {
+            return fromSystem.getTimeToJumpPoint(1.0);
+        }
     }
 
     /**

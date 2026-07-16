@@ -49,16 +49,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.time.LocalDate;
 import java.util.List;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JFrame;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.*;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
@@ -78,9 +69,9 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.StartingLocationChoice;
 import mekhq.campaign.universe.enums.StartingLocationMode;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
+import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
 import mekhq.gui.campaignOptions.CampaignOptionsIconLegend;
 import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
-import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsIntroPanel;
@@ -164,7 +155,7 @@ public class GeneralPage {
         this.campaign = campaign;
         this.date = campaign.getLocalDate();
         this.camouflage = campaign.getCamouflage();
-        this.unitIcon = campaign.getUnitIcon();
+        this.unitIcon = campaign.getPlayerForce().getUnitIcon();
         this.mode = mode;
 
         initialize();
@@ -217,7 +208,12 @@ public class GeneralPage {
         // Generate new random campaign name
         btnNameGenerator = createButton("NameGenerator");
         btnNameGenerator.addActionListener(event -> {
-            String generatedName = BackgroundsController.randomMercenaryCompanyNameGenerator(campaign.getCommander());
+            String generatedName = BackgroundsController.randomMercenaryCompanyNameGenerator(campaign.getPlayerForce()
+                                                                                                   .getHumanResources()
+                                                                                                   .getCommander(
+                                                                                                         campaign.getCampaignOptions(),
+                                                                                                         campaign.isClanCampaign(),
+                                                                                                         campaign.getLocalDate()));
             txtName.setText(generatedName);
         });
 
@@ -610,7 +606,7 @@ public class GeneralPage {
         }
 
         camouflage = campaign.getCamouflage();
-        unitIcon = campaign.getUnitIcon();
+        unitIcon = campaign.getPlayerForce().getUnitIcon();
     }
 
     /**
@@ -623,10 +619,11 @@ public class GeneralPage {
     public void applyCampaignOptionsToCampaign(boolean isStartUp, boolean isSaveAction) {
         // First, we apply any updates to the campaign
         if (!isSaveAction) {
-            campaign.setName(txtName.getText());
+            String s = txtName.getText();
+            campaign.getPlayerForce().setName(s);
 
             if (isStartUp) {
-                campaign.getFormations().setName(campaign.getName());
+                campaign.getPlayerForce().getFormations().setName(campaign.getName());
                 campaign.setLocalDate(date);
             }
 
@@ -640,11 +637,12 @@ public class GeneralPage {
             // Null state handled during validation
             FactionDisplay newFaction = comboFaction.getSelectedItem();
             if (newFaction != null) {
-                campaign.setFaction(newFaction.getFaction());
+                final Faction faction = newFaction.getFaction();
+                campaign.getPlayerForce().setFaction(faction);
             }
 
-            campaign.setCamouflage(camouflage);
-            campaign.setUnitIcon(unitIcon);
+            campaign.getPlayerForce().setCamouflage(camouflage);
+            campaign.getPlayerForce().setUnitIcon(unitIcon);
 
             if (isStartUp) {
                 // Resolve and set the starting system from the starting-location controls

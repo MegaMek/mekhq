@@ -366,7 +366,8 @@ public class UnitTableModel extends DataTableModel<Unit> {
                 if (unitCampaign == null) {
                     yield "-";
                 }
-                Formation formation = unitCampaign.getFormation(unit.getFormationId());
+                int id = unit.getFormationId();
+                Formation formation = unitCampaign.getPlayerForce().getFormation(id);
                 yield (formation != null) ? formation.getFullName() : "-";
             }
             case COL_CREW -> {
@@ -518,7 +519,8 @@ public class UnitTableModel extends DataTableModel<Unit> {
                     break;
                 }
                 case COL_FORCE: {
-                    Formation formation = getCampaign().getFormationFor(u);
+                    Campaign campaign1 = getCampaign();
+                    Formation formation = campaign1.getPlayerForce().getFormationFor(u);
                     if (formation != null) {
                         StringBuilder desc = new StringBuilder("<html><b>").append(formation.getName()).append("</b>");
                         Formation parent = formation.getParentFormation();

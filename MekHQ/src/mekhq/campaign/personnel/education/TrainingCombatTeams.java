@@ -63,6 +63,7 @@ import megamek.codeUtilities.StringUtility;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.log.PerformanceLogger;
@@ -77,7 +78,6 @@ import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
-import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.ReportingUtilities;
 import org.jspecify.annotations.NonNull;
@@ -130,7 +130,7 @@ public class TrainingCombatTeams {
      */
     public static void processTrainingCombatTeams(final Campaign campaign) {
         final LocalDate today = campaign.getLocalDate();
-        final List<CombatTeam> combatTeams = campaign.getCombatTeamsAsList();
+        final List<CombatTeam> combatTeams = campaign.getPlayerForce().getCombatTeamsAsList(campaign);
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         boolean isUsingStratCon = campaignOptions.isUseStratCon();
@@ -294,7 +294,7 @@ public class TrainingCombatTeams {
                       xpCostMultiplier, useReasoningXPChanges, campaign.getCampaignOptions().isPersonnelLogSkillGain(),
                       campaign.getLocalDate());
 
-                campaign.personUpdated(trainee);
+                campaign.getPlayerForce().getHumanResources().personUpdated(campaign, trainee);
 
                 if (!StringUtility.isNullOrBlank(report)) {
                     campaign.addReport(PERSONNEL, report);

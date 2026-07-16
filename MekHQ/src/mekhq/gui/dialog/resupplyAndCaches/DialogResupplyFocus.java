@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -56,7 +56,6 @@ import javax.swing.SwingConstants;
 
 import megamek.client.ui.util.UIUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
@@ -126,7 +125,11 @@ public class DialogResupplyFocus extends JDialog {
         leftBox.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // Get speaker details
-        Person speaker = campaign.getSeniorAdminPerson(AdministratorSpecialization.LOGISTICS);
+        Person speaker = campaign.getPlayerForce().getHumanResources()
+                               .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS,
+                                     campaign.getCampaignOptions(),
+                                     campaign.isClanCampaign(),
+                                     campaign.getLocalDate());
 
         String speakerName;
         if (speaker != null) {

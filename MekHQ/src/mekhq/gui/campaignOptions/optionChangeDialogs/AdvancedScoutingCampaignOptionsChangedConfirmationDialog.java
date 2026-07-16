@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -197,7 +197,7 @@ public class AdvancedScoutingCampaignOptionsChangedConfirmationDialog extends JD
     }
 
     public static void processFreeSkills(Campaign campaign, boolean isSilent) {
-        List<Person> personnel = campaign.getPersonnelFilteringOutDeparted();
+        List<Person> personnel = campaign.getPlayerForce().getHumanResources().getPersonnelFilteringOutDeparted();
         boolean logSkillGain = campaign.getCampaignOptions().isPersonnelLogSkillGain();
         LocalDate today = campaign.getLocalDate();
         for (Person person : personnel) {
@@ -227,7 +227,7 @@ public class AdvancedScoutingCampaignOptionsChangedConfirmationDialog extends JD
                       person.getHyperlinkedName(),
                       SkillType.getType(skillName).getName()));
             }
-            campaign.personUpdated(person);
+            campaign.getPlayerForce().getHumanResources().personUpdated(campaign, person);
         }
     }
 }

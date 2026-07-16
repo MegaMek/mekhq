@@ -142,7 +142,10 @@ public class FactionAccoladeEvent {
                                      accoladeLevel.is(CASH_BONUS_3) ||
                                      accoladeLevel.is(CASH_BONUS_4);
 
-        Person commander = campaign.getCommander();
+        Person commander = campaign.getPlayerForce().getHumanResources()
+                                 .getCommander(campaign.getCampaignOptions(),
+                                       campaign.isClanCampaign(),
+                                       campaign.getLocalDate());
         String factionName = getFactionName(accoladingFaction, campaign.getGameYear());
 
         boolean accoladeWasRefused;
@@ -213,7 +216,10 @@ public class FactionAccoladeEvent {
             }
 
             if (!isSameFaction) {
-                GoingRogue.processGoingRogue(campaign, accoladingFaction, campaign.getCommander(), null,
+                GoingRogue.processGoingRogue(campaign, accoladingFaction, campaign.getPlayerForce().getHumanResources()
+                                                                                .getCommander(campaign.getCampaignOptions(),
+                                                                                      campaign.isClanCampaign(),
+                                                                                      campaign.getLocalDate()), null,
                       campaign.getCampaignOptions().isTrackFactionStanding(), false);
             }
 
@@ -225,7 +231,7 @@ public class FactionAccoladeEvent {
         }
 
         if (isCashReward) {
-            campaign.getFinances().credit(TransactionType.MISCELLANEOUS, campaign.getLocalDate(),
+            campaign.getPlayerForce().getFinances().credit(TransactionType.MISCELLANEOUS, campaign.getLocalDate(),
                   Money.of(accoladeLevel.getRecognition() * C_BILL_MULTIPLIER),
                   getTextAt(RESOURCE_BUNDLE, "FactionAccoladeDialog.credit"));
         }
@@ -261,7 +267,11 @@ public class FactionAccoladeEvent {
         if (accoladeLevel.is(TAKING_NOTICE_0) || accoladeLevel.is(TAKING_NOTICE_1)) {
             return null;
         } else if (accoladeLevel.is(APPEARING_IN_SEARCHES)) {
-            speaker = campaign.getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND);
+            speaker = campaign.getPlayerForce().getHumanResources()
+                            .getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND,
+                                  campaign.getCampaignOptions(),
+                                  campaign.isClanCampaign(),
+                                  campaign.getLocalDate());
         } else {
             boolean isLetterFromHeadOfState = accoladeLevel.is(LETTER_FROM_HEAD_OF_STATE);
             boolean isMagistracySpecialCase = accoladingFaction.getShortName().equals("MOC")
@@ -282,7 +292,10 @@ public class FactionAccoladeEvent {
                 personnelRole = PersonnelRole.MILITARY_HOLO_FILMER;
             }
 
-            speaker = campaign.newPerson(personnelRole, accoladingFaction.getShortName(), Gender.RANDOMIZE);
+            final String factionCode1 = accoladingFaction.getShortName();
+            speaker = campaign.getPlayerForce()
+                            .getHumanResources()
+                            .newPerson(campaign, personnelRole, factionCode1, megamek.common.enums.Gender.RANDOMIZE);
             if (isMagistracySpecialCase) {
                 speaker.setGender(Gender.FEMALE);
                 speaker.setGivenName(MAGISTRACY_HOLO_STAR_GIVEN_NAME);

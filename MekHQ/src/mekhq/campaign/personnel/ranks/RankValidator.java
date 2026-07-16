@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -206,13 +206,20 @@ public class RankValidator {
         // First, we need to ensure the campaign's rank system was refreshed. This can
         // be done by
         // checking if the system is a campaign custom
-        if (!campaign.getRankSystem().getType().isCampaign()) {
+        if (!campaign.getPlayerForce().getRankSystem().getType().isCampaign()) {
             // This ensures it properly changes, with fallback properly handled
-            campaign.setRankSystemDirect(Ranks.getRankSystemFromCode(campaign.getRankSystem().getCode()));
+            final RankSystem rankSystem = Ranks.getRankSystemFromCode(campaign.getPlayerForce()
+                                                                            .getRankSystem()
+                                                                            .getCode());
+            campaign.getPlayerForce().setRankSystemDirect(rankSystem);
         }
 
         // Then, we need to fix any old rank system assignments for personnel
-        campaign.getAllPersonnel().stream().filter(person -> !person.getRankSystem().getType().isCampaign())
+        campaign.getPlayerForce()
+              .getHumanResources()
+              .getPersonnel()
+              .stream()
+              .filter(person -> !person.getRankSystem().getType().isCampaign())
               .forEach(person -> person.setRankSystem(this,
                     Ranks.getRankSystemFromCode(person.getRankSystem().getCode())));
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -118,7 +118,7 @@ public class GMTools extends JDialog {
         this.campaignFaction = campaign.getFaction();
         this.today = campaign.getLocalDate();
         this.gameYear = today.getYear();
-        this.factionStandings = campaign.getFactionStandings();
+        this.factionStandings = campaign.getPlayerForce().getFactionStandings();
         this.missions = new ArrayList<>(campaign.getMissions());
         this.regardMultiplier = campaign.getCampaignOptions().getRegardMultiplier();
 

@@ -38,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.awt.event.KeyEvent;
 import java.time.LocalDate;
@@ -55,7 +56,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.Mockito;
 
 class PersonnelRoleTest {
     private static final PersonnelRole[] roles = PersonnelRole.values();
@@ -685,7 +685,7 @@ class PersonnelRoleTest {
     @EnumSource(value = PersonnelRole.class, names = "NONE", mode = EnumSource.Mode.EXCLUDE)
     void testRoleEligibility(PersonnelRole role) {
         // Setup
-        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         when(mockCampaign.getFaction()).thenReturn(Factions.getInstance().getFaction("MERC"));
 
         Person person = new Person(mockCampaign);
@@ -745,7 +745,7 @@ class PersonnelRoleTest {
     @ParameterizedTest
     @MethodSource(value = "seventeenToEighteenYearsOld")
     void testAdultEntertain_ageLimit(int daysOld) {
-        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         when(mockCampaign.getFaction()).thenReturn(Factions.getInstance().getFaction("MERC"));
 
         LocalDate today = LocalDate.of(3000, 1, 1);
@@ -782,7 +782,7 @@ class PersonnelRoleTest {
 
     @Test
     void testAdultEntertainer_atAgeLimit() {
-        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         when(mockCampaign.getFaction()).thenReturn(Factions.getInstance().getFaction("MERC"));
 
         LocalDate today = LocalDate.of(3030, 1, 1);
@@ -813,7 +813,7 @@ class PersonnelRoleTest {
     @ParameterizedTest
     @MethodSource(value = "seventeenToEighteenYearsOld")
     void testLuxuryCompanion_ageLimit(int daysOld) {
-        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         when(mockCampaign.getFaction()).thenReturn(Factions.getInstance().getFaction("MERC"));
 
         LocalDate today = LocalDate.of(3000, 1, 1);
@@ -835,7 +835,7 @@ class PersonnelRoleTest {
 
     @Test
     void testLuxuryCompanion_atAgeLimit() {
-        Campaign mockCampaign = Mockito.mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         when(mockCampaign.getFaction()).thenReturn(Factions.getInstance().getFaction("MERC"));
 
         LocalDate today = LocalDate.of(3030, 1, 1);

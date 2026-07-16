@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014 - Carl Spain. All rights reserved.
- * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -57,13 +57,13 @@ import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition;
+import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.utilities.ContractUtilities;
-import mekhq.campaign.stratCon.StratConContractDefinition;
-import mekhq.campaign.stratCon.StratConContractInitializer;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
@@ -445,9 +445,11 @@ public class NewAtBContractDialog extends NewContractDialog {
     }
 
     private String getCurrentEmployerCode() {
-        return campaign.getFaction().isMercenary() ?
-                     cbEmployer.getSelectedItemKey() :
-                     campaign.getFaction().getShortName();
+        if (campaign.getFaction().isMercenary()) {
+            return cbEmployer.getSelectedItemKey();
+        } else {
+            return campaign.getFaction().getShortName();
+        }
     }
 
     private String getCurrentEnemyCode() {
@@ -614,12 +616,12 @@ public class NewAtBContractDialog extends NewContractDialog {
             contract.createClanOpponent(campaign);
         }
 
-        campaign.getFinances()
+        campaign.getPlayerForce().getFinances()
               .credit(TransactionType.CONTRACT_PAYMENT,
                     campaign.getLocalDate(),
                     contract.getTotalAdvanceAmount(),
                     "Advance funds for " + contract.getName());
-        campaign.getFinances()
+        campaign.getPlayerForce().getFinances()
               .credit(TransactionType.CONTRACT_PAYMENT,
                     campaign.getLocalDate(),
                     contract.getTransportAmount(),

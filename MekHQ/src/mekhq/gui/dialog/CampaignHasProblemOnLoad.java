@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -144,7 +144,11 @@ public class CampaignHasProblemOnLoad {
      * @return a {@link Person} representing the senior administrator, or {@code null} if none exists
      */
     private @Nullable Person getSpeaker() {
-        return campaign.getSeniorAdminPerson(COMMAND);
+        return campaign.getPlayerForce().getHumanResources()
+                     .getSeniorAdminPerson(COMMAND,
+                           campaign.getCampaignOptions(),
+                           campaign.isClanCampaign(),
+                           campaign.getLocalDate());
     }
 
     /**

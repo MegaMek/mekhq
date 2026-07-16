@@ -47,6 +47,7 @@ import javax.swing.JPanel;
 import megamek.client.ui.util.UIUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.base.AbstractBase;
+import mekhq.campaign.force.Detachment;
 import mekhq.campaign.location.IPlace;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.model.LocationDisplay;
@@ -97,7 +98,7 @@ public class LocationPlacePanel extends JScrollablePanel {
         }
 
         private static String resolveType(IPlace place) {
-            if (place instanceof Campaign) {
+            if (place instanceof Detachment) {
                 return getText("LocationPlacePanel.type.mainForce");
             }
             if (place instanceof AbstractBase base) {

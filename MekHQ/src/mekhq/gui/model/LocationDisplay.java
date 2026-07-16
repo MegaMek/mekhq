@@ -158,7 +158,7 @@ public final class LocationDisplay {
 
     /** Returns {@code true} when {@code item} or any ancestor is the campaign's main-force roster. */
     private static boolean isUnderMainForce(ILocation item, Campaign campaign) {
-        ILocation mainForcePersonnel = campaign.getMainForcePersonnel();
+        ILocation mainForcePersonnel = campaign.getPlayerForce().getPersonnel();
         for (ILocation cursor = item; cursor != null; cursor = cursor.getParentLocation()) {
             if (cursor == mainForcePersonnel) {
                 return true;

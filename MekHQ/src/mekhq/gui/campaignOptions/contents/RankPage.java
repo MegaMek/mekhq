@@ -32,6 +32,7 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 
 import java.awt.BorderLayout;
@@ -141,9 +142,9 @@ class RankPage {
         JScrollPane tableScrollPane = (JScrollPane) SwingUtilities.getAncestorOfClass(JScrollPane.class,
                 ranksTable);
         if (tableScrollPane != null) {
-            Dimension tableSize = new Dimension(RANK_SYSTEMS_PANEL_WIDTH, RANK_TABLE_HEIGHT);
+            Dimension tableSize = new Dimension(scaleForGUI(RANK_SYSTEMS_PANEL_WIDTH), scaleForGUI(RANK_TABLE_HEIGHT));
             tableScrollPane.setPreferredSize(tableSize);
-            tableScrollPane.setMinimumSize(new Dimension(0, RANK_TABLE_HEIGHT));
+            tableScrollPane.setMinimumSize(new Dimension(0, scaleForGUI(RANK_TABLE_HEIGHT)));
             tableScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
             tableScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         }
@@ -155,18 +156,18 @@ class RankPage {
 
     private Dimension getEmbeddedRankSystemsSize() {
         Component view = rankSystemsPane.getViewport().getView();
-        int viewHeight = view == null ? RANK_TABLE_HEIGHT : view.getPreferredSize().height;
+        int viewHeight = view == null ? scaleForGUI(RANK_TABLE_HEIGHT) : view.getPreferredSize().height;
         int horizontalScrollBarHeight = rankSystemsPane.getHorizontalScrollBar().getPreferredSize().height;
 
-        return new Dimension(RANK_SYSTEMS_PANEL_WIDTH, viewHeight + horizontalScrollBarHeight);
+        return new Dimension(scaleForGUI(RANK_SYSTEMS_PANEL_WIDTH), viewHeight + horizontalScrollBarHeight);
     }
 
     private static int getEmbeddedRankColumnWidth(int modelIndex) {
         return switch (modelIndex) {
-            case RankTableModel.COL_NAME_RATE -> RANK_RATE_COLUMN_WIDTH;
-            case RankTableModel.COL_OFFICER -> RANK_OFFICER_COLUMN_WIDTH;
-            case RankTableModel.COL_PAY_MULTI -> RANK_PAY_MULTIPLIER_COLUMN_WIDTH;
-            default -> RANK_NAME_COLUMN_WIDTH;
+            case RankTableModel.COL_NAME_RATE -> scaleForGUI(RANK_RATE_COLUMN_WIDTH);
+            case RankTableModel.COL_OFFICER -> scaleForGUI(RANK_OFFICER_COLUMN_WIDTH);
+            case RankTableModel.COL_PAY_MULTI -> scaleForGUI(RANK_PAY_MULTIPLIER_COLUMN_WIDTH);
+            default -> scaleForGUI(RANK_NAME_COLUMN_WIDTH);
         };
     }
 

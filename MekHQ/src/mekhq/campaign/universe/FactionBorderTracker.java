@@ -89,9 +89,7 @@ public class FactionBorderTracker {
     private volatile boolean invalid = true;
     private volatile boolean cancelTask = false;
 
-    private PlanetarySystem lastSystemsNearOrigin;
-    private double lastSystemsNearRadius;
-    private List<PlanetarySystem> lastSystemsNearResult;
+    private final Map<SystemsNearKey, List<PlanetarySystem>> systemsNearCache = new HashMap<>();
 
     /**
      * Constructs a FactionBorderTracker with the default region of a 1000 ly radius around Terra.
@@ -446,25 +444,19 @@ public class FactionBorderTracker {
      *       {@link #getBorders(Faction, ILocation, double)}/{@link #getBorderSystems(Faction, Faction, ILocation,
      *       double)} calls within one {@code MissionTargetFinder.find()}, or {@code RandomFactionGenerator} selecting
      *       an employer then an enemy for the same location) &mdash; since the result depends only on the (stable,
-     *       session-lifetime) system list's geometry and never on campaign date, the single most recent call is cached
-     *       to skip re-scanning the whole system list each time.</p>
+     *       session-lifetime) system list's geometry and never on campaign date, each distinct (origin, radius) result
+     *       is cached to skip re-scanning the whole system list each time.</p>
      */
     public synchronized List<PlanetarySystem> systemsNear(PlanetarySystem origin, double radius) {
-        if (origin.equals(lastSystemsNearOrigin) && (radius == lastSystemsNearRadius)) {
-            return lastSystemsNearResult;
-        }
-
-        List<PlanetarySystem> nearby = new ArrayList<>();
-        for (PlanetarySystem system : getSystemList()) {
-            if ((radius < 0) || (system.getDistanceTo(origin) <= radius)) {
-                nearby.add(system);
+        return systemsNearCache.computeIfAbsent(new SystemsNearKey(origin, radius), key -> {
+            List<PlanetarySystem> nearby = new ArrayList<>();
+            for (PlanetarySystem system : getSystemList()) {
+                if ((radius < 0) || (system.getDistanceTo(origin) <= radius)) {
+                    nearby.add(system);
+                }
             }
-        }
-
-        lastSystemsNearOrigin = origin;
-        lastSystemsNearRadius = radius;
-        lastSystemsNearResult = nearby;
-        return nearby;
+            return nearby;
+        });
     }
 
     /**
@@ -668,7 +660,11 @@ public class FactionBorderTracker {
         invalid |= now.minusDays(dayThreshold).isAfter(lastUpdate)
                          || now.plusDays(dayThreshold).isBefore(lastUpdate);
 
-        PlanetarySystem loc = event.getCampaign().getCurrentLocation().getCurrentSystem();
+        PlanetarySystem loc = event.getCampaign()
+                                    .getPlayerForce()
+                                    .getForceDetachment()
+                                    .getCurrentLocation()
+                                    .getCurrentSystem();
         if (!regionHex.isCenter(loc.getX(), loc.getY())) {
             invalid |= (distanceThreshold > 0)
                              && (regionHex.distanceTo(loc.getX(), loc.getY()) > distanceThreshold);
@@ -695,6 +691,16 @@ public class FactionBorderTracker {
             recalculate();
         }
     }
+
+    /**
+     * Cache key for {@link #systemsNear(PlanetarySystem, double)}: a specific (origin, radius) query. Results depend
+     * only on the (stable, session-lifetime) system list's geometry and never on campaign date, so a cached entry stays
+     * valid for the tracker's lifetime.
+     *
+     * @param origin the system the search is centered on
+     * @param radius the search radius in light years; a negative radius matches every system
+     */
+    private record SystemsNearKey(PlanetarySystem origin, double radius) {}
 
     /**
      * Class for the region bounding hex.

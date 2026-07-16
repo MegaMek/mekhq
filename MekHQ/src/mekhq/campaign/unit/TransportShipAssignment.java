@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -108,7 +108,7 @@ public class TransportShipAssignment extends TransportAssignment {
     @Override
     public void fixReferences(Campaign campaign, Unit unit) {
         if (getTransportShip() instanceof Unit.UnitRef) {
-            Unit transportShip = campaign.getHangar().getUnit(getTransportShip().getId());
+            Unit transportShip = campaign.getPlayerForce().getHangar().getUnit(getTransportShip().getId());
             if (transportShip != null) {
                 setTransport(transportShip);
             } else {

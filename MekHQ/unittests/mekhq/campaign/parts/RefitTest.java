@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -64,12 +64,11 @@ import megamek.common.options.GameOptions;
 import megamek.common.options.OptionsConstants;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Hangar;
-import mekhq.campaign.Quartermaster;
-import mekhq.campaign.Warehouse;
+import mekhq.campaign.LocalHangar;
+import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.market.ShoppingList;
+import mekhq.campaign.market.ForceShoppingList;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
@@ -82,6 +81,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
@@ -93,7 +93,7 @@ import testUtilities.MHQTestUtilities;
 
 @ExtendWith(value = MockitoExtension.class)
 public class RefitTest {
-    @Mock
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private Campaign mockCampaign;
 
     @Mock
@@ -109,10 +109,10 @@ public class RefitTest {
     private Board mockBoard;
 
     @Mock
-    private Quartermaster mockQuartermaster;
+    private mekhq.campaign.ForceQuartermaster mockQuartermaster;
 
     @Mock
-    private Warehouse mockWarehouse;
+    private LocalWarehouse mockWarehouse;
 
     @BeforeAll
     static void before() {
@@ -139,7 +139,7 @@ public class RefitTest {
 
         lenient().when(mockCampaign.getQuartermaster()).thenReturn(mockQuartermaster);
 
-        lenient().when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
+        lenient().when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(mockWarehouse);
     }
 
     @Test
@@ -788,10 +788,10 @@ public class RefitTest {
     @MockitoSettings(strictness = Strictness.LENIENT)
     // Allegedly unnecessary stubbing for the mockHanger & mockShoppingList
     public void heavyTrackedApcMgToStandard() throws EntityLoadingException, IOException {
-        final Hangar mockHangar = mock(Hangar.class);
-        when(mockCampaign.getHangar()).thenReturn(mockHangar);
-        final ShoppingList mockShoppingList = mock(ShoppingList.class);
-        when(mockCampaign.getShoppingList()).thenReturn(mockShoppingList);
+        final LocalHangar mockHangar = mock(LocalHangar.class);
+        when(mockCampaign.getPlayerForce().getHangar()).thenReturn(mockHangar);
+        final ForceShoppingList mockShoppingList = mock(ForceShoppingList.class);
+        when(mockCampaign.getPlayerForce().getShoppingList()).thenReturn(mockShoppingList);
 
         // Create the original entity backing the unit
         Entity oldEntity = UnitTestUtilities.getHeavyTrackedApcMg();

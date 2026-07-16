@@ -39,6 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.getEntityForUnitTesting;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -101,7 +102,7 @@ class CargoCapacityTest {
 
     @BeforeEach
     public void setup() {
-        mockCampaign = mock(Campaign.class);
+        mockCampaign = mockCampaign();
         mockCampaignOptions = mock(CampaignOptions.class);
         mockGame = mock(Game.class);
         mockGameOptions = mock(GameOptions.class);

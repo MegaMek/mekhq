@@ -45,6 +45,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.util.UUID;
 import java.util.Vector;
@@ -82,7 +83,7 @@ public class LegacyUnitShipTransportTest {
     @Test
     public void basicTransportedUnits() {
         Game mockGame = mock(Game.class);
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
 
         Unit transport = new Unit();
@@ -193,7 +194,7 @@ public class LegacyUnitShipTransportTest {
 
     @Test
     public void testUnitTypeForAerosMatchesAeroBayType() {
-        Campaign campaign = mock(Campaign.class);
+        Campaign campaign = mockCampaign();
 
         // Create a fake entity to back the real transport Unit
         Dropship mockVengeance = mock(Dropship.class);

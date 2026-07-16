@@ -50,7 +50,6 @@ import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Hangar;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
@@ -83,8 +82,55 @@ public record Accountant(Campaign campaign) {
         return campaign().getCampaignOptions();
     }
 
-    private Hangar getHangar() {
-        return campaign().getAllHangar();
+    /**
+     * Calculates the peacetime operating costs (spare parts, fuel, ammo and, optionally, salaries) of the given
+     * formations.
+     *
+     * <p>Units and personnel are resolved by walking the given formations and all of their sub-formations, so
+     * callers only need to supply the formations they care about. This lets the method double as both a whole-campaign
+     * total (by passing every top-level formation) and, in future, a total scoped to some smaller grouping of
+     * formations without any change to this method.</p>
+     *
+     * <p>Salaries, when included, cover both the crews of the resolved units and the campaign's temporary
+     * personnel pools (astechs, medics, and other temporary crew), since those pools are not tied to any particular
+     * formation.</p>
+     *
+     * @param formations              the formations (and, recursively, their sub-formations) to total operating costs
+     *                                for
+     * @param hangar                  the hangar used to resolve unit ids into units
+     * @param campaignOptions         the campaign options used to resolve salaries and temporary crew pay
+     * @param isClanCampaign          whether the campaign is a Clan campaign, used to resolve each person's salary
+     * @param today                   the current campaign date, used to resolve each person's salary
+     * @param temporaryAsTechPoolSize the size of the campaign's temporary astech pool
+     * @param temporaryMedicPool      the size of the campaign's temporary medic pool
+     * @param tempCrewMap             the campaign's other temporary crew roles, mapped to their pool sizes
+     * @param includeSalaries         whether salaries should be included in the total
+     *
+     * @return the total {@link Money} peacetime operating cost of the given formations
+     */
+    public static Money getPeacetimeOperatingCosts(Collection<Formation> formations, mekhq.campaign.LocalHangar hangar,
+          CampaignOptions campaignOptions, boolean isClanCampaign, LocalDate today, int temporaryAsTechPoolSize,
+          int temporaryMedicPool, Map<PersonnelRole, Integer> tempCrewMap, boolean includeSalaries) {
+        Collection<Unit> units = getUnitsInFormations(formations, hangar);
+
+        Money peacetimeCosts = getSparePartsTotal(units).plus(getFuelTotal(units)).plus(getAmmoTotal(units));
+
+        if (includeSalaries && campaignOptions.isPayForSalaries()) {
+            Collection<Person> personnel = getCrewsOfUnits(units);
+            boolean noInfantry = campaignOptions.isInfantryDontCount();
+            peacetimeCosts = peacetimeCosts.plus(getSalaryTotal(personnel,
+                  campaignOptions,
+                  isClanCampaign,
+                  today,
+                  noInfantry));
+            peacetimeCosts = peacetimeCosts.plus(Money.of(sumTempCrewPay(campaignOptions,
+                  temporaryAsTechPoolSize,
+                  temporaryMedicPool,
+                  tempCrewMap,
+                  noInfantry)));
+        }
+
+        return peacetimeCosts;
     }
 
     private Collection<Unit> getAllUnits() {
@@ -99,16 +145,45 @@ public record Accountant(Campaign campaign) {
         return campaign().getLocalDate();
     }
 
+    /**
+     * Static version of {@link #getMonthlyFoodAndHousingExpenses()}, additionally resolving the faction-standing
+     * barrack cost multiplier (if enabled) from the given campaign rather than {@code this.campaign()}.
+     *
+     * @param campaign  the campaign, used to resolve the barrack cost multiplier (faction standings, active AtB
+     *                  contracts, and the current date)
+     * @param personnel the personnel to evaluate
+     * @param location  the location to evaluate; determines whether housing is charged at all and, together with the
+     *                  campaign, whether a faction-standing barrack cost multiplier applies
+     *
+     * @return a {@link Money} object representing the total monthly food and housing expenses
+     */
+    public static Money getMonthlyFoodAndHousingExpenses(Campaign campaign, List<Person> personnel,
+          AbstractLocation location) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean payForFood = campaignOptions.isPayForFood();
+        boolean isOnPlanet = location.isOnPlanet();
+        boolean payForHousing = campaignOptions.isPayForHousing() && isOnPlanet;
+
+        if (!payForFood && !payForHousing) {
+            return Money.zero();
+        }
+
+        double barrackCostMultiplier = 1.0;
+        if (isOnPlanet && campaignOptions.isUseFactionStandingBarracksCostsSafe()) {
+            barrackCostMultiplier = setFactionStandingBarrackCostMultiplier(campaign.getPlayerForce()
+                                                                                  .getFactionStandings(),
+                  location.getCurrentSystem(), campaign.getActiveAtBContracts(), campaign.getLocalDate());
+        }
+
+        return getFoodAndHousingTotal(personnel, payForFood, payForHousing, barrackCostMultiplier);
+    }
+
     private int getTemporaryAsTechPool() {
-        return campaign().getTemporaryAsTechPool();
+        return this.campaign().getPlayerForce().getHumanResources().getTemporaryAsTechPool();
     }
 
     private int getTemporaryMedicPool() {
-        return campaign().getTemporaryMedicPool();
-    }
-
-    private Map<PersonnelRole, Integer> getTempCrewMap() {
-        return campaign().getHumanResources().getTempPersonnelRoleMap();
+        return this.campaign().getPlayerForce().getHumanResources().getTemporaryMedicPool();
     }
 
 
@@ -116,16 +191,8 @@ public record Accountant(Campaign campaign) {
         return getPayRoll(false);
     }
 
-    public Money getPayRoll(boolean noInfantry) {
-        return getPayRollTotal(campaign().getSalaryEligiblePersonnel(),
-              getCampaignOptions(),
-              isClanCampaign(),
-              getLocalDate(),
-              getTemporaryAsTechPool(),
-              getTemporaryMedicPool(),
-              getTempCrewMap(),
-              noInfantry,
-              getCampaignOptions().isPayForSalaries());
+    private Map<PersonnelRole, Integer> getTempCrewMap() {
+        return this.campaign().getPlayerForce().getHumanResources().getTempPersonnelRoleMap();
     }
 
     /**
@@ -261,15 +328,16 @@ public record Accountant(Campaign campaign) {
         return total;
     }
 
-    public Money getOverheadExpenses() {
-        return getOverheadTotal(campaign().getSalaryEligiblePersonnel(),
+    public Money getPayRoll(boolean noInfantry) {
+        return getPayRollTotal(this.campaign().getPlayerForce().getHumanResources().getSalaryEligiblePersonnel(),
               getCampaignOptions(),
               isClanCampaign(),
               getLocalDate(),
               getTemporaryAsTechPool(),
               getTemporaryMedicPool(),
               getTempCrewMap(),
-              getCampaignOptions().isPayForOverhead());
+              noInfantry,
+              getCampaignOptions().isPayForSalaries());
     }
 
     /**
@@ -303,6 +371,17 @@ public record Accountant(Campaign campaign) {
               false).multipliedBy(0.05);
     }
 
+    public Money getOverheadExpenses() {
+        return getOverheadTotal(this.campaign().getPlayerForce().getHumanResources().getSalaryEligiblePersonnel(),
+              getCampaignOptions(),
+              isClanCampaign(),
+              getLocalDate(),
+              getTemporaryAsTechPool(),
+              getTemporaryMedicPool(),
+              getTempCrewMap(),
+              getCampaignOptions().isPayForOverhead());
+    }
+
     /**
      * Calculates the total monthly expenses for food and housing for all active personnel in the campaign.
      *
@@ -325,41 +404,9 @@ public record Accountant(Campaign campaign) {
      * @since 0.50.06
      */
     public Money getMonthlyFoodAndHousingExpenses() {
-        AbstractLocation location = campaign.getCurrentLocation();
-        List<Person> allPersonnel = new ArrayList<>(campaign.getAllPersonnel());
+        AbstractLocation location = campaign.getPlayerForce().getForceDetachment().getCurrentLocation();
+        List<Person> allPersonnel = new ArrayList<>(campaign.getPlayerForce().getHumanResources().getPersonnel());
         return getMonthlyFoodAndHousingExpenses(campaign, allPersonnel, location);
-    }
-
-    /**
-     * Static version of {@link #getMonthlyFoodAndHousingExpenses()}, additionally resolving the faction-standing
-     * barrack cost multiplier (if enabled) from the given campaign rather than {@code this.campaign()}.
-     *
-     * @param campaign  the campaign, used to resolve the barrack cost multiplier (faction standings, active AtB
-     *                  contracts, and the current date)
-     * @param personnel the personnel to evaluate
-     * @param location  the location to evaluate; determines whether housing is charged at all and, together with the
-     *                  campaign, whether a faction-standing barrack cost multiplier applies
-     *
-     * @return a {@link Money} object representing the total monthly food and housing expenses
-     */
-    public static Money getMonthlyFoodAndHousingExpenses(Campaign campaign, List<Person> personnel,
-          AbstractLocation location) {
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean payForFood = campaignOptions.isPayForFood();
-        boolean isOnPlanet = location.isOnPlanet();
-        boolean payForHousing = campaignOptions.isPayForHousing() && isOnPlanet;
-
-        if (!payForFood && !payForHousing) {
-            return Money.zero();
-        }
-
-        double barrackCostMultiplier = 1.0;
-        if (isOnPlanet && campaignOptions.isUseFactionStandingBarracksCostsSafe()) {
-            barrackCostMultiplier = setFactionStandingBarrackCostMultiplier(campaign.getFactionStandings(),
-                  location.getCurrentSystem(), campaign.getActiveAtBContracts(), campaign.getLocalDate());
-        }
-
-        return getFoodAndHousingTotal(personnel, payForFood, payForHousing, barrackCostMultiplier);
     }
 
     /**
@@ -542,7 +589,7 @@ public record Accountant(Campaign campaign) {
      * @return The peacetime costs of the campaign, optionally including salaries.
      */
     public Money getPeacetimeCost(boolean includeSalaries) {
-        return getPeacetimeOperatingCosts(campaign().getFormations().getSubFormations(),
+        return getPeacetimeOperatingCosts(this.campaign().getPlayerForce().getFormations().getSubFormations(),
               getHangar(),
               getCampaignOptions(),
               isClanCampaign(),
@@ -554,57 +601,6 @@ public record Accountant(Campaign campaign) {
     }
 
     /**
-     * Calculates the peacetime operating costs (spare parts, fuel, ammo and, optionally, salaries) of the given
-     * formations.
-     *
-     * <p>Units and personnel are resolved by walking the given formations and all of their sub-formations, so
-     * callers only need to supply the formations they care about. This lets the method double as both a whole-campaign
-     * total (by passing every top-level formation) and, in future, a total scoped to some smaller grouping of
-     * formations without any change to this method.</p>
-     *
-     * <p>Salaries, when included, cover both the crews of the resolved units and the campaign's temporary
-     * personnel pools (astechs, medics, and other temporary crew), since those pools are not tied to any particular
-     * formation.</p>
-     *
-     * @param formations              the formations (and, recursively, their sub-formations) to total operating costs
-     *                                for
-     * @param hangar                  the hangar used to resolve unit ids into units
-     * @param campaignOptions         the campaign options used to resolve salaries and temporary crew pay
-     * @param isClanCampaign          whether the campaign is a Clan campaign, used to resolve each person's salary
-     * @param today                   the current campaign date, used to resolve each person's salary
-     * @param temporaryAsTechPoolSize the size of the campaign's temporary astech pool
-     * @param temporaryMedicPool      the size of the campaign's temporary medic pool
-     * @param tempCrewMap             the campaign's other temporary crew roles, mapped to their pool sizes
-     * @param includeSalaries         whether salaries should be included in the total
-     *
-     * @return the total {@link Money} peacetime operating cost of the given formations
-     */
-    public static Money getPeacetimeOperatingCosts(Collection<Formation> formations, Hangar hangar,
-          CampaignOptions campaignOptions, boolean isClanCampaign, LocalDate today, int temporaryAsTechPoolSize,
-          int temporaryMedicPool, Map<PersonnelRole, Integer> tempCrewMap, boolean includeSalaries) {
-        Collection<Unit> units = getUnitsInFormations(formations, hangar);
-
-        Money peacetimeCosts = getSparePartsTotal(units).plus(getFuelTotal(units)).plus(getAmmoTotal(units));
-
-        if (includeSalaries && campaignOptions.isPayForSalaries()) {
-            Collection<Person> personnel = getCrewsOfUnits(units);
-            boolean noInfantry = campaignOptions.isInfantryDontCount();
-            peacetimeCosts = peacetimeCosts.plus(getSalaryTotal(personnel,
-                  campaignOptions,
-                  isClanCampaign,
-                  today,
-                  noInfantry));
-            peacetimeCosts = peacetimeCosts.plus(Money.of(sumTempCrewPay(campaignOptions,
-                  temporaryAsTechPoolSize,
-                  temporaryMedicPool,
-                  tempCrewMap,
-                  noInfantry)));
-        }
-
-        return peacetimeCosts;
-    }
-
-    /**
      * Resolves every unit assigned to the given formations, recursing into their sub-formations.
      *
      * @param formations the formations to resolve units for
@@ -612,7 +608,8 @@ public record Accountant(Campaign campaign) {
      *
      * @return every unit assigned to the given formations and their sub-formations
      */
-    private static List<Unit> getUnitsInFormations(Collection<Formation> formations, Hangar hangar) {
+    private static List<Unit> getUnitsInFormations(Collection<Formation> formations,
+          mekhq.campaign.LocalHangar hangar) {
         List<Unit> units = new ArrayList<>();
         for (Formation formation : formations) {
             for (UUID unitId : formation.getUnits()) {
@@ -626,6 +623,108 @@ public record Accountant(Campaign campaign) {
         }
 
         return units;
+    }
+
+    /**
+     * Static version of {@link #getForceValue(boolean, boolean, double, double, double, boolean)}.
+     *
+     * @param formations                the formations to evaluate
+     * @param hangar                    the hangar used to resolve unit ids to units
+     * @param campaignFaction           the campaign's faction, used for diminishing returns calculations
+     * @param campaignOptions           the campaign options used to calculate per-unit contract values
+     * @param useDiminishingContractPay whether diminishing returns should be applied (only when the unit count exceeds
+     *                                  the diminishing-returns start)
+     * @param excludeInfantry           if {@code true}, conventional infantry units are excluded from the calculation
+     * @param dropShipContractPercent   inclusion flag for DropShips and Small Craft; if {@code 0}, these units are
+     *                                  excluded
+     * @param warShipContractPercent    inclusion flag for WarShips; if {@code 0}, these units are excluded
+     * @param jumpShipContractPercent   inclusion flag for JumpShips and Space Stations; if {@code 0}, these units are
+     *                                  excluded
+     * @param useEquipmentSaleValue     if {@code true},
+     *                                  {@link #getEquipmentContractValue(CampaignOptions, Unit, boolean)} uses
+     *                                  equipment sale values; if {@code false}, it uses standard values
+     *
+     * @return the total {@link Money} value of all included units, with diminishing returns applied when enabled and
+     *       relevant
+     */
+    public static Money getForceValue(Collection<Formation> formations, mekhq.campaign.LocalHangar hangar,
+          Faction campaignFaction,
+          CampaignOptions campaignOptions, boolean useDiminishingContractPay, boolean excludeInfantry,
+          double dropShipContractPercent, double warShipContractPercent, double jumpShipContractPercent,
+          boolean useEquipmentSaleValue) {
+        List<Money> unitValues = new ArrayList<>();
+
+        Money total = Money.zero();
+        for (Formation formation : formations) {
+            if (!formation.getFormationType().isStandard()) {
+                continue;
+            }
+            if (!formation.getCombatRoleInMemory().isCombatRole()) {
+                continue;
+            }
+
+            for (UUID uuid : formation.getUnits()) {
+                Unit unit = hangar.getUnit(uuid);
+                if (unit == null) {
+                    continue;
+                }
+
+                Entity entity = unit.getEntity();
+                if (entity == null) {
+                    continue;
+                }
+
+                // Infantry
+                if (unit.isConventionalInfantry() && excludeInfantry) {
+                    continue;
+                }
+
+                Money unitValue = getEquipmentContractValue(campaignOptions, unit, useEquipmentSaleValue);
+
+                // DropShips / Small Craft
+                if (entity.isDropShip() || entity.isSmallCraft()) {
+                    if (dropShipContractPercent != 0) {
+                        unitValues.add(unitValue);
+                        total = total.plus(unitValue);
+                    }
+                    continue;
+                }
+
+                // WarShips
+                if (entity.isWarShip()) {
+                    if (warShipContractPercent != 0) {
+                        unitValues.add(unitValue);
+                        total = total.plus(unitValue);
+                    }
+                    continue;
+                }
+
+                // JumpShips / Space Stations
+                if (entity.isJumpShip() || entity.isSpaceStation()) {
+                    if (jumpShipContractPercent != 0) {
+                        unitValues.add(unitValue);
+                        total = total.plus(unitValue);
+                    }
+                    continue;
+                }
+
+                // Other
+                unitValues.add(unitValue);
+                total = total.plus(unitValue);
+            }
+        }
+
+        if (unitValues.isEmpty()) {
+            return Money.zero();
+        }
+
+        // Only process diminishing returns if it is both enabled and relevant.
+        boolean isAffectedByDiminishingReturns = unitValues.size() > getDiminishingReturnsStart(campaignFaction);
+        if (useDiminishingContractPay && isAffectedByDiminishingReturns) {
+            return adjustValuesForDiminishingReturns(campaignFaction, unitValues);
+        }
+
+        return total;
     }
 
     /**
@@ -795,194 +894,9 @@ public record Accountant(Campaign campaign) {
     public Money getForceValue(boolean useDiminishingContractPay, boolean excludeInfantry,
           double dropShipContractPercent, double warShipContractPercent, double jumpShipContractPercent,
           boolean useEquipmentSaleValue) {
-        return getForceValue(campaign().getAllFormations(), getHangar(), campaign().getFaction(),
+        return getForceValue(this.campaign().getPlayerForce().getAllFormations(), getHangar(), campaign().getFaction(),
               getCampaignOptions(), useDiminishingContractPay, excludeInfantry, dropShipContractPercent,
               warShipContractPercent, jumpShipContractPercent, useEquipmentSaleValue);
-    }
-
-    /**
-     * Static version of {@link #getForceValue(boolean, boolean, double, double, double, boolean)}.
-     *
-     * @param formations                the formations to evaluate
-     * @param hangar                    the hangar used to resolve unit ids to units
-     * @param campaignFaction           the campaign's faction, used for diminishing returns calculations
-     * @param campaignOptions           the campaign options used to calculate per-unit contract values
-     * @param useDiminishingContractPay whether diminishing returns should be applied (only when the unit count exceeds
-     *                                  the diminishing-returns start)
-     * @param excludeInfantry           if {@code true}, conventional infantry units are excluded from the calculation
-     * @param dropShipContractPercent   inclusion flag for DropShips and Small Craft; if {@code 0}, these units are
-     *                                  excluded
-     * @param warShipContractPercent    inclusion flag for WarShips; if {@code 0}, these units are excluded
-     * @param jumpShipContractPercent   inclusion flag for JumpShips and Space Stations; if {@code 0}, these units are
-     *                                  excluded
-     * @param useEquipmentSaleValue     if {@code true},
-     *                                  {@link #getEquipmentContractValue(CampaignOptions, Unit, boolean)} uses
-     *                                  equipment sale values; if {@code false}, it uses standard values
-     *
-     * @return the total {@link Money} value of all included units, with diminishing returns applied when enabled and
-     *       relevant
-     */
-    public static Money getForceValue(Collection<Formation> formations, Hangar hangar, Faction campaignFaction,
-          CampaignOptions campaignOptions, boolean useDiminishingContractPay, boolean excludeInfantry,
-          double dropShipContractPercent, double warShipContractPercent, double jumpShipContractPercent,
-          boolean useEquipmentSaleValue) {
-        List<Money> unitValues = new ArrayList<>();
-
-        Money total = Money.zero();
-        for (Formation formation : formations) {
-            if (!formation.getFormationType().isStandard()) {
-                continue;
-            }
-            if (!formation.getCombatRoleInMemory().isCombatRole()) {
-                continue;
-            }
-
-            for (UUID uuid : formation.getUnits()) {
-                Unit unit = hangar.getUnit(uuid);
-                if (unit == null) {
-                    continue;
-                }
-
-                Entity entity = unit.getEntity();
-                if (entity == null) {
-                    continue;
-                }
-
-                // Infantry
-                if (unit.isConventionalInfantry() && excludeInfantry) {
-                    continue;
-                }
-
-                Money unitValue = getEquipmentContractValue(campaignOptions, unit, useEquipmentSaleValue);
-
-                // DropShips / Small Craft
-                if (entity.isDropShip() || entity.isSmallCraft()) {
-                    if (dropShipContractPercent != 0) {
-                        unitValues.add(unitValue);
-                        total = total.plus(unitValue);
-                    }
-                    continue;
-                }
-
-                // WarShips
-                if (entity.isWarShip()) {
-                    if (warShipContractPercent != 0) {
-                        unitValues.add(unitValue);
-                        total = total.plus(unitValue);
-                    }
-                    continue;
-                }
-
-                // JumpShips / Space Stations
-                if (entity.isJumpShip() || entity.isSpaceStation()) {
-                    if (jumpShipContractPercent != 0) {
-                        unitValues.add(unitValue);
-                        total = total.plus(unitValue);
-                    }
-                    continue;
-                }
-
-                // Other
-                unitValues.add(unitValue);
-                total = total.plus(unitValue);
-            }
-        }
-
-        if (unitValues.isEmpty()) {
-            return Money.zero();
-        }
-
-        // Only process diminishing returns if it is both enabled and relevant.
-        boolean isAffectedByDiminishingReturns = unitValues.size() > getDiminishingReturnsStart(campaignFaction);
-        if (useDiminishingContractPay && isAffectedByDiminishingReturns) {
-            return adjustValuesForDiminishingReturns(campaignFaction, unitValues);
-        }
-
-        return total;
-    }
-
-    public Money getTotalEquipmentValue() {
-        return getTotalEquipmentValue(getAllUnits(), campaign().getAllParts());
-    }
-
-    /**
-     * Static version of {@link #getTotalEquipmentValue()}.
-     *
-     * @param units the units to total sell value for
-     * @param parts the parts to evaluate
-     *
-     * @return the total {@link Money} value of all equipment
-     */
-    public static Money getTotalEquipmentValue(Collection<Unit> units, Collection<Part> parts) {
-        Money total = Money.zero();
-        for (Unit unit : units) {
-            total = total.plus(unit.getSellValue());
-        }
-
-        return parts.stream().filter(Part::isSpare).map(Part::getActualValue).reduce(total, Money::plus);
-    }
-
-    public Money getEquipmentContractValue(Unit unit, boolean useSaleValue) {
-        return getEquipmentContractValue(getCampaignOptions(), unit, useSaleValue);
-    }
-
-    /**
-     * Static version of {@link #getEquipmentContractValue(Unit, boolean)}.
-     *
-     * @param campaignOptions the campaign options containing the contract percentages for each unit category
-     * @param unit            the unit to evaluate
-     * @param useSaleValue    if {@code true}, the unit's sell value is used as the base; otherwise its buy cost is
-     *                        used
-     *
-     * @return the {@link Money} contract value of the unit
-     */
-    public static Money getEquipmentContractValue(CampaignOptions campaignOptions, Unit unit, boolean useSaleValue) {
-        Money value;
-        Money percentValue;
-
-        if (useSaleValue) {
-            value = unit.getSellValue();
-        } else {
-            value = unit.getBuyCost();
-        }
-
-        if (unit.getEntity().hasETypeFlag(Entity.ETYPE_DROPSHIP)) {
-            percentValue = value.multipliedBy(campaignOptions.getDropShipContractPercent()).dividedBy(100);
-        } else if (unit.getEntity().hasETypeFlag(Entity.ETYPE_WARSHIP)) {
-            percentValue = value.multipliedBy(campaignOptions.getWarShipContractPercent()).dividedBy(100);
-        } else if (unit.getEntity().hasETypeFlag(Entity.ETYPE_JUMPSHIP) ||
-                         unit.getEntity().hasETypeFlag(Entity.ETYPE_SPACE_STATION)) {
-            percentValue = value.multipliedBy(campaignOptions.getJumpShipContractPercent()).dividedBy(100);
-        } else {
-            percentValue = value.multipliedBy(campaignOptions.getEquipmentContractPercent()).dividedBy(100);
-        }
-
-        return percentValue;
-    }
-
-    /**
-     * Calculates the base monetary value for contracts in the campaign based on the specified campaign options. The
-     * calculation considers whether peacetime costs, equipment contracts, or theoretical payroll costs should be used
-     * as the base value.
-     *
-     * <p>This method retrieves relevant options from the campaign's {@link CampaignOptions}
-     * to control how the base contract value is computed. Based on the campaign settings, it takes into account factors
-     * such as infantry exclusion, contract percentages for different types of units (DropShips, WarShips, JumpShips),
-     * and whether to use the equipment's sale value in the calculations.</p>
-     *
-     * @return A {@link Money} object representing the calculated base contract value, adjusted according to the
-     *       campaign's configuration.
-     */
-    public Money getContractBase() {
-        return getContractBase(getCampaignOptions(),
-              campaign().getFaction(),
-              getLocalDate(),
-              getHangar(),
-              campaign().getSalaryEligiblePersonnel(),
-              getTemporaryAsTechPool(),
-              getTemporaryMedicPool(),
-              getTempCrewMap(),
-              campaign().getAllFormations());
     }
 
     /**
@@ -1003,7 +917,8 @@ public record Accountant(Campaign campaign) {
      *       campaign's configuration
      */
     public static Money getContractBase(CampaignOptions campaignOptions, Faction campaignFaction, LocalDate today,
-          Hangar hangar, List<Person> salaryEligiblePersonnel, int temporaryAsTechPoolSize, int temporaryMedicPool,
+          mekhq.campaign.LocalHangar hangar, List<Person> salaryEligiblePersonnel, int temporaryAsTechPoolSize,
+          int temporaryMedicPool,
           Map<PersonnelRole, Integer> tempCrewMap, List<Formation> formations) {
         final boolean isClanCampaign = campaignFaction.isClan();
 
@@ -1083,6 +998,94 @@ public record Accountant(Campaign campaign) {
     }
 
     /**
+     * Static version of {@link #getTotalEquipmentValue()}.
+     *
+     * @param units the units to total sell value for
+     * @param parts the parts to evaluate
+     *
+     * @return the total {@link Money} value of all equipment
+     */
+    public static Money getTotalEquipmentValue(Collection<Unit> units, Collection<Part> parts) {
+        Money total = Money.zero();
+        for (Unit unit : units) {
+            total = total.plus(unit.getSellValue());
+        }
+
+        return parts.stream().filter(Part::isSpare).map(Part::getActualValue).reduce(total, Money::plus);
+    }
+
+    /**
+     * Static version of {@link #getEquipmentContractValue(Unit, boolean)}.
+     *
+     * @param campaignOptions the campaign options containing the contract percentages for each unit category
+     * @param unit            the unit to evaluate
+     * @param useSaleValue    if {@code true}, the unit's sell value is used as the base; otherwise its buy cost is
+     *                        used
+     *
+     * @return the {@link Money} contract value of the unit
+     */
+    public static Money getEquipmentContractValue(CampaignOptions campaignOptions, Unit unit, boolean useSaleValue) {
+        Money value;
+        Money percentValue;
+
+        if (useSaleValue) {
+            value = unit.getSellValue();
+        } else {
+            value = unit.getBuyCost();
+        }
+
+        if (unit.getEntity().hasETypeFlag(Entity.ETYPE_DROPSHIP)) {
+            percentValue = value.multipliedBy(campaignOptions.getDropShipContractPercent()).dividedBy(100);
+        } else if (unit.getEntity().hasETypeFlag(Entity.ETYPE_WARSHIP)) {
+            percentValue = value.multipliedBy(campaignOptions.getWarShipContractPercent()).dividedBy(100);
+        } else if (unit.getEntity().hasETypeFlag(Entity.ETYPE_JUMPSHIP) ||
+                         unit.getEntity().hasETypeFlag(Entity.ETYPE_SPACE_STATION)) {
+            percentValue = value.multipliedBy(campaignOptions.getJumpShipContractPercent()).dividedBy(100);
+        } else {
+            percentValue = value.multipliedBy(campaignOptions.getEquipmentContractPercent()).dividedBy(100);
+        }
+
+        return percentValue;
+    }
+
+    public Money getTotalEquipmentValue() {
+        return getTotalEquipmentValue(getAllUnits(), campaign().getAllParts());
+    }
+
+    public Money getEquipmentContractValue(Unit unit, boolean useSaleValue) {
+        return getEquipmentContractValue(getCampaignOptions(), unit, useSaleValue);
+    }
+
+    /**
+     * Calculates the base monetary value for contracts in the campaign based on the specified campaign options. The
+     * calculation considers whether peacetime costs, equipment contracts, or theoretical payroll costs should be used
+     * as the base value.
+     *
+     * <p>This method retrieves relevant options from the campaign's {@link CampaignOptions}
+     * to control how the base contract value is computed. Based on the campaign settings, it takes into account factors
+     * such as infantry exclusion, contract percentages for different types of units (DropShips, WarShips, JumpShips),
+     * and whether to use the equipment's sale value in the calculations.</p>
+     *
+     * @return A {@link Money} object representing the calculated base contract value, adjusted according to the
+     *       campaign's configuration.
+     */
+    public Money getContractBase() {
+        return getContractBase(getCampaignOptions(),
+              campaign().getFaction(),
+              getLocalDate(),
+              getHangar(),
+              this.campaign().getPlayerForce().getHumanResources().getSalaryEligiblePersonnel(),
+              getTemporaryAsTechPool(),
+              getTemporaryMedicPool(),
+              getTempCrewMap(),
+              this.campaign().getPlayerForce().getAllFormations());
+    }
+
+    private mekhq.campaign.LocalHangar getHangar() {
+        return this.campaign().getPlayerForce().getHangar();
+    }
+
+    /**
      * Returns a map of every Person and their salary.
      *
      * @return map of personnel to their pay, including pool as a null key
@@ -1090,7 +1093,7 @@ public record Accountant(Campaign campaign) {
      * @see Finances#debit(TransactionType, LocalDate, Money, String, Map, boolean)
      */
     public Map<Person, Money> getPayRollSummary() {
-        return getPayRollSummary(campaign().getSalaryEligiblePersonnel(),
+        return getPayRollSummary(this.campaign().getPlayerForce().getHumanResources().getSalaryEligiblePersonnel(),
               getCampaignOptions(),
               isClanCampaign(),
               getLocalDate(),

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -70,37 +70,71 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
             int roll = Compute.d6(2);
             if (roll == 2) {
                 recruit = switch (Compute.randomInt(4)) {
-                    case 0 -> campaign.newPerson(PersonnelRole.ADMINISTRATOR_COMMAND);
-                    case 1 -> campaign.newPerson(PersonnelRole.ADMINISTRATOR_HR);
-                    case 2 -> campaign.newPerson(PersonnelRole.ADMINISTRATOR_LOGISTICS);
-                    case 3 -> campaign.newPerson(PersonnelRole.ADMINISTRATOR_TRANSPORT);
+                    case 0 -> campaign.getPlayerForce()
+                                    .getHumanResources()
+                                    .newPerson(campaign,
+                                          mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR_COMMAND);
+                    case 1 -> campaign.getPlayerForce()
+                                    .getHumanResources()
+                                    .newPerson(campaign,
+                                          mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR_HR);
+                    case 2 -> campaign.getPlayerForce()
+                                    .getHumanResources()
+                                    .newPerson(campaign,
+                                          mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR_LOGISTICS);
+                    case 3 -> campaign.getPlayerForce()
+                                    .getHumanResources()
+                                    .newPerson(campaign,
+                                          mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR_TRANSPORT);
                     default -> null;
                 };
             } else if (roll == 3 || roll == 11) {
                 int secondaryRoll = Compute.d6();
                 if ((secondaryRoll == 1) && (campaign.getGameYear() > (campaign.getFaction().isClan() ? 2870 : 3050))) {
-                    recruit = campaign.newPerson(PersonnelRole.BA_TECH);
+                    recruit = campaign.getPlayerForce()
+                                    .getHumanResources()
+                                    .newPerson(campaign, mekhq.campaign.personnel.enums.PersonnelRole.BA_TECH);
                 } else if (secondaryRoll < 4) {
-                    recruit = campaign.newPerson(PersonnelRole.MECHANIC);
+                    recruit = campaign.getPlayerForce()
+                                    .getHumanResources()
+                                    .newPerson(campaign, mekhq.campaign.personnel.enums.PersonnelRole.MECHANIC);
                 } else if (secondaryRoll == 4) {
-                    recruit = campaign.newPerson(PersonnelRole.AERO_TEK);
+                    recruit = campaign.getPlayerForce()
+                                    .getHumanResources()
+                                    .newPerson(campaign, mekhq.campaign.personnel.enums.PersonnelRole.AERO_TEK);
                 } else {
-                    recruit = campaign.newPerson(PersonnelRole.MEK_TECH);
+                    recruit = campaign.getPlayerForce()
+                                    .getHumanResources()
+                                    .newPerson(campaign, mekhq.campaign.personnel.enums.PersonnelRole.MEK_TECH);
                 }
             } else if (roll == 4 || roll == 10) {
-                recruit = campaign.newPerson(PersonnelRole.MEKWARRIOR);
+                recruit = campaign.getPlayerForce()
+                                .getHumanResources()
+                                .newPerson(campaign, mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR);
             } else if (roll == 5) {
-                recruit = campaign.newPerson(PersonnelRole.AEROSPACE_PILOT);
+                recruit = campaign.getPlayerForce()
+                                .getHumanResources()
+                                .newPerson(campaign, mekhq.campaign.personnel.enums.PersonnelRole.AEROSPACE_PILOT);
             } else if (roll == 6 || roll == 8) {
                 if (campaign.getFaction().isClan() && (campaign.getGameYear() > 2870) && (Compute.d6(2) > 3)) {
-                    recruit = campaign.newPerson(PersonnelRole.BATTLE_ARMOUR);
-                } else if (!campaign.getFaction().isClan() && (campaign.getGameYear() > 3050) && (Compute.d6(2) > 11)) {
-                    recruit = campaign.newPerson(PersonnelRole.BATTLE_ARMOUR);
+                    recruit = campaign.getPlayerForce()
+                                    .getHumanResources()
+                                    .newPerson(campaign, mekhq.campaign.personnel.enums.PersonnelRole.BATTLE_ARMOUR);
                 } else {
-                    recruit = campaign.newPerson(PersonnelRole.SOLDIER);
+                    if (!campaign.getFaction().isClan() && (campaign.getGameYear() > 3050) && (Compute.d6(2) > 11)) {
+                        recruit = campaign.getPlayerForce()
+                                        .getHumanResources()
+                                        .newPerson(campaign, PersonnelRole.BATTLE_ARMOUR);
+                    } else {
+                        recruit = campaign.getPlayerForce()
+                                        .getHumanResources()
+                                        .newPerson(campaign, PersonnelRole.SOLDIER);
+                    }
                 }
             } else if (roll == 12) {
-                recruit = campaign.newPerson(PersonnelRole.DOCTOR);
+                recruit = campaign.getPlayerForce()
+                                .getHumanResources()
+                                .newPerson(campaign, mekhq.campaign.personnel.enums.PersonnelRole.DOCTOR);
             }
 
             if (null != recruit) {
@@ -113,11 +147,19 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                      */
                     potentialRecruits.remove(recruit);
                     for (int i = 0; i < Compute.d6(); i++) {
-                        potentialRecruits.add(campaign.newPerson(PersonnelRole.VEHICLE_CREW_GROUND));
+                        potentialRecruits.add(campaign.getPlayerForce()
+                                                    .getHumanResources()
+                                                    .newPerson(campaign,
+                                                          mekhq.campaign.personnel.enums.PersonnelRole.VEHICLE_CREW_GROUND));
                     }
                 }
 
-                Person adminHR = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_HR, S_ADMIN);
+                Person adminHR = campaign.getPlayerForce().getHumanResources()
+                                       .findBestInRole(PersonnelRole.ADMINISTRATOR_HR,
+                                             SkillType.S_ADMIN,
+                                             campaign.getCampaignOptions(),
+                                             campaign.isClanCampaign(),
+                                             campaign.getLocalDate());
                 int adminExperienceLevel = EXP_NONE;
                 if (adminHR != null && adminHR.hasSkill(S_ADMIN)) {
                     Skill adminSkill = adminHR.getSkill(S_ADMIN);

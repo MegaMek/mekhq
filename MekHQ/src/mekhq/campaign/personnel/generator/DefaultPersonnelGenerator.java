@@ -147,7 +147,7 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
         person.setWantsChildren(((interestInChildren != 0) && (randomInt(interestInChildren)) != 0));
 
         //check for Bloodname
-        campaign.checkBloodnameAdd(person, false);
+        campaign.getPlayerForce().getHumanResources().checkBloodnameAdd(campaign, person, false);
 
         if (person.getOriginFaction().isClan() &&
                   campaignOptions.isUseAbilities() &&

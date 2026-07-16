@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -74,14 +74,14 @@ import megamek.common.loaders.MekSummary;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.digitalGM.stratCon.StratConScenario;
+import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.TankLocation;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.meks.MekLocation;
-import mekhq.campaign.stratCon.StratConScenario;
-import mekhq.campaign.stratCon.StratConTrackState;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -488,7 +488,7 @@ public class StarLeagueCache {
         // Defines the action when the dialog is being dismissed
         ActionListener dialogDismissActionListener = e -> {
             dialog.dispose();
-            campaign.getFinances().credit(MISCELLANEOUS, campaign.getLocalDate(), proposal,
+            campaign.getPlayerForce().getFinances().credit(MISCELLANEOUS, campaign.getLocalDate(), proposal,
                   resources.getString("transaction.text"));
         };
 
@@ -556,7 +556,7 @@ public class StarLeagueCache {
         // Defines the action when the dialog is being dismissed
         ActionListener dialogDismissActionListener = e -> {
             dialog.dispose();
-            campaign.getFinances().credit(MISCELLANEOUS, campaign.getLocalDate(), proposal,
+            campaign.getPlayerForce().getFinances().credit(MISCELLANEOUS, campaign.getLocalDate(), proposal,
                   resources.getString("transaction.text"));
         };
 

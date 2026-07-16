@@ -32,7 +32,6 @@
  */
 package mekhq.gui.dialog.resupplyAndCaches;
 
-import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.campaign.force.FormationType.CONVOY;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.isProhibitedUnitType;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.estimateCargoRequirements;
@@ -79,7 +78,11 @@ public class DialogContractStart extends JDialog {
                                                        "normal");
 
         new ImmersiveDialogSimple(campaign,
-              campaign.getSeniorAdminPerson(LOGISTICS),
+              campaign.getPlayerForce().getHumanResources()
+                    .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS,
+                          campaign.getCampaignOptions(),
+                          campaign.isClanCampaign(),
+                          campaign.getLocalDate()),
               null,
               generateContractStartMessage(),
               null,
@@ -107,7 +110,7 @@ public class DialogContractStart extends JDialog {
         int playerConvoys = 0;
         double totalPlayerCargoCapacity = 0;
 
-        for (Formation formation : campaign.getAllFormations()) {
+        for (Formation formation : campaign.getPlayerForce().getAllFormations()) {
             if (!formation.isFormationType(CONVOY)) {
                 continue;
             }

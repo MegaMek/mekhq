@@ -193,7 +193,10 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
             btnRecruitment.setEnabled(true);
             btnRecruitment.setText(getTextAt("recruitment.legacy"));
         } else {
-            String availabilityMessage = campaign.getNewPersonnelMarket().getAvailabilityMessage();
+            String availabilityMessage = campaign.getPlayerForce()
+                                               .getHumanResources()
+                                               .getNewPersonnelMarket()
+                                               .getAvailabilityMessage();
             btnRecruitment.setEnabled(availabilityMessage.isBlank());
 
             HiringHallLevel hiringHallLevel = system.getHiringHallLevel(date);
@@ -233,7 +236,7 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
      */
     public String getTitle() {
         LocalDate date = campaign.getLocalDate();
-        AbstractLocation location = campaign.getCurrentLocation();
+        AbstractLocation location = campaign.getPlayerForce().getForceDetachment().getCurrentLocation();
         PlanetarySystem currentSystem = location.getCurrentSystem();
         if (location.isOnPlanet()) {
             return getFormattedTextAt("title.onPlanet", location.getPlanet().getPrintableName(date));
@@ -279,7 +282,7 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
      * @return a formatted HTML string representing the planetary conditions
      */
     public String getPlanetaryConditionsInfo() {
-        Planet planet = campaign.getCurrentLocation().getPlanet();
+        Planet planet = campaign.getPlayerForce().getForceDetachment().getCurrentLocation().getPlanet();
 
         Atmosphere atmosphere = planet.getAtmosphere(campaign.getLocalDate());
         megamek.common.planetaryConditions.Atmosphere pressure = planet.getPressure(campaign.getLocalDate());
@@ -335,7 +338,7 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
      *       string if the player is not currently traveling.
      */
     public String getCourseInfo() {
-        JumpPath jumpPath = campaign.getCurrentLocation().getJumpPath();
+        JumpPath jumpPath = campaign.getPlayerForce().getForceDetachment().getCurrentLocation().getJumpPath();
         if ((jumpPath == null) || jumpPath.isEmpty()) {
             return getTextAt("info.course.notTraveling");
         } else if (jumpPath.getJumps() == 0) {
@@ -352,7 +355,7 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
      *       information, or an empty string if not traveling
      */
     public String getJumpCostInfo() {
-        AbstractLocation location = campaign.getCurrentLocation();
+        AbstractLocation location = campaign.getPlayerForce().getForceDetachment().getCurrentLocation();
         JumpPath jumpPath = location.getJumpPath();
         if ((jumpPath == null) || jumpPath.isEmpty()) {
             return "";
@@ -388,7 +391,7 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
      */
     public String getSocioIndustrialInfo() {
         LocalDate date = campaign.getLocalDate();
-        Planet planet = campaign.getCurrentLocation().getPlanet();
+        Planet planet = campaign.getPlayerForce().getForceDetachment().getCurrentLocation().getPlanet();
         SocioIndustrialData status = planet.getSocioIndustrial(date);
 
         long population = ObjectUtils.firstNonNull(planet.getPopulation(date), 0L);

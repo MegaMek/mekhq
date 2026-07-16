@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -187,7 +187,7 @@ public class StratConReinforcementsConfirmationDialog {
         final List<PersonnelRole> TACTICAL_PROFESSIONS = List.of(MILITARY_ANALYST, MILITARY_THEORIST,
               TACTICAL_ANALYST, INTELLIGENCE_ANALYST);
         Person speaker = null;
-        for (Person potentialSpeaker : campaign.getActivePersonnel(false, false)) {
+        for (Person potentialSpeaker : campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false)) {
             if (!potentialSpeaker.isEmployed()) {
                 continue;
             }
@@ -212,7 +212,11 @@ public class StratConReinforcementsConfirmationDialog {
             return speaker;
         }
 
-        return campaign.getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND);
+        return campaign.getPlayerForce().getHumanResources()
+                     .getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND,
+                           campaign.getCampaignOptions(),
+                           campaign.isClanCampaign(),
+                           campaign.getLocalDate());
     }
 
     /**

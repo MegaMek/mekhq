@@ -51,6 +51,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -246,7 +247,7 @@ public class CurrentLocationTest {
         @BeforeEach
         void setUp() {
             today = LocalDate.of(3025, 1, 1);
-            campaign = mock(Campaign.class);
+            campaign = mockCampaign();
             when(system.getRechargeTime(today, false)).thenReturn(176.0);
             when(campaign.getLocalDate()).thenReturn(today);
         }
@@ -354,11 +355,11 @@ public class CurrentLocationTest {
             when(system.getPrintableName(today)).thenReturn("Test");
             when(system.getRechargeTime(today, false)).thenReturn(176.0);
 
-            campaign = mock(Campaign.class);
+            campaign = mockCampaign();
             when(campaign.getCampaignOptions()).thenReturn(new CampaignOptions());
             when(campaign.getLocalDate()).thenReturn(today);
             when(campaign.isUseCommandCircuit()).thenReturn(false);
-            when(campaign.getAutomatedMothballUnits()).thenReturn(Collections.emptyList());
+            when(campaign.getPlayerForce().getAutomatedMothballUnits()).thenReturn(Collections.emptyList());
             when(campaign.getFutureContracts()).thenReturn(Collections.emptyList());
 
             currentLocation = new CurrentLocation(system, 0.0);
@@ -500,7 +501,7 @@ public class CurrentLocationTest {
                                + "<personId>" + personId + "</personId></location>";
             Node node = parseXml(xml);
 
-            Campaign mockCampaign = mock(Campaign.class);
+            Campaign mockCampaign = mockCampaign();
             when(mockCampaign.getSystemById("Outreach")).thenReturn(mock(PlanetarySystem.class));
 
             CurrentLocation loc = CurrentLocation.generateInstanceFromXML(node, mockCampaign);
@@ -518,7 +519,7 @@ public class CurrentLocationTest {
                                + "<personId>" + personId + "</personId></location>";
             Node node = parseXml(xml);
 
-            Campaign mockCampaign = mock(Campaign.class);
+            Campaign mockCampaign = mockCampaign();
             when(mockCampaign.getSystemById("Outreach")).thenReturn(mock(PlanetarySystem.class));
             CurrentLocation loc = CurrentLocation.generateInstanceFromXML(node, mockCampaign);
 

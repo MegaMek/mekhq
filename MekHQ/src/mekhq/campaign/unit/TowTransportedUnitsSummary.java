@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -80,7 +80,7 @@ public class TowTransportedUnitsSummary extends AbstractTransportedUnitsSummary 
         clearTransportedUnits();
 
         // And now reset the Transported values for all the units we just booted
-        campaign.getHangar().forEachUnit(u -> {
+        campaign.getPlayerForce().getHangar().forEachUnit(u -> {
             if (u.hasTransportAssignment(TOW_TRANSPORT)
                       && Objects.equals(transport, u.getTransportAssignment(TOW_TRANSPORT).getTransport())) {
                 u.setTransportAssignment(TOW_TRANSPORT, null);
@@ -155,7 +155,7 @@ public class TowTransportedUnitsSummary extends AbstractTransportedUnitsSummary 
         clearTransportedUnits();
         for (Unit towTransportedUnit : oldTransportedUnits) {
             if (towTransportedUnit instanceof Unit.UnitRef) {
-                Unit realUnit = campaign.getHangar().getUnit(towTransportedUnit.getId());
+                Unit realUnit = campaign.getPlayerForce().getHangar().getUnit(towTransportedUnit.getId());
                 if (realUnit != null) {
                     if (realUnit.hasTransportAssignment(TOW_TRANSPORT)) {
                         towTrailer(realUnit, null, realUnit.getTransportAssignment(TOW_TRANSPORT).getTransporterType());

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -63,7 +63,11 @@ public class MaplessStratConScenarioPicker extends ImmersiveDialogCore {
 
     public MaplessStratConScenarioPicker(Campaign campaign, List<Scenario> scenarios) {
         super(campaign,
-              campaign.getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND),
+              campaign.getPlayerForce().getHumanResources()
+                    .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND,
+                          campaign.getCampaignOptions(),
+                          campaign.isClanCampaign(),
+                          campaign.getLocalDate()),
               null,
               getInCharacterMessage(campaign.getCommanderAddress(), !scenarios.isEmpty()),
               getButtons(!scenarios.isEmpty()),

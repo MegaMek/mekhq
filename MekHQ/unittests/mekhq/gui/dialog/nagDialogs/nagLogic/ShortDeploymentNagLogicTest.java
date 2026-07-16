@@ -37,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -65,7 +66,7 @@ public class ShortDeploymentNagLogicTest {
     @BeforeEach
     void init() {
         // Initialize the mock objects
-        campaign = mock(Campaign.class);
+        campaign = mockCampaign();
 
         CurrentLocation location = mock(CurrentLocation.class);
 

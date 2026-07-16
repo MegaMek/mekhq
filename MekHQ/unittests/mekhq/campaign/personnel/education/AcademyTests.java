@@ -36,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.util.Arrays;
 import java.util.List;
@@ -173,7 +174,7 @@ class AcademyTests {
         academy.setLocationSystems(List.of("Sol"));
         academy.setFactionDiscount(10);
         Person person = Mockito.mock(Person.class);
-        Campaign campaign = Mockito.mock(Campaign.class);
+        Campaign campaign = mockCampaign();
         PlanetarySystem system = Mockito.mock(PlanetarySystem.class);
         when(campaign.getSystemById("Sol")).thenReturn(system);
         when(system.getFactions(Mockito.any())).thenReturn(List.of("Lyr"));

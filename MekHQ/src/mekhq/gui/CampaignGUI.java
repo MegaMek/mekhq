@@ -33,8 +33,6 @@
  */
 package mekhq.gui;
 
-import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.campaign.force.Formation.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
 import static mekhq.campaign.personnel.skills.SkillType.getExperienceLevelName;
@@ -699,7 +697,10 @@ public class CampaignGUI extends JPanel {
          * present the retirement view to give the player a chance to follow a
          * custom schedule
          */
-        boolean doRetirement = getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty();
+        boolean doRetirement = getCampaign().getPlayerForce()
+                                     .getHumanResources()
+                                     .getRetirementDefectionTracker()
+                                     .getRetirees().isEmpty();
         RetirementDefectionDialog dialog = new RetirementDefectionDialog(this, null, doRetirement);
 
         if (!dialog.wasAborted()) {
@@ -823,13 +824,16 @@ public class CampaignGUI extends JPanel {
         CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
         PersonnelMarketStyle marketStyle = campaignOptions.getPersonnelMarketStyle();
 
-        if (marketStyle != PERSONNEL_MARKET_DISABLED || !getCampaign().getPersonnelMarket().isNone()) {
+        if (marketStyle != PERSONNEL_MARKET_DISABLED || !getCampaign().getPlayerForce()
+                                                               .getHumanResources()
+                                                               .getPersonnelMarket()
+                                                               .isNone()) {
             if (marketStyle == PERSONNEL_MARKET_DISABLED) {
                 PersonnelMarketDialog personnelMarketDialog =
                       new PersonnelMarketDialog(getFrame(), this, getCampaign());
                 personnelMarketDialog.setVisible(true);
             } else {
-                getCampaign().getNewPersonnelMarket().showPersonnelMarketDialog();
+                getCampaign().getPlayerForce().getHumanResources().getNewPersonnelMarket().showPersonnelMarketDialog();
             }
         } else {
             openBulkRecruitmentDialog();
@@ -985,74 +989,94 @@ public class CampaignGUI extends JPanel {
                 return;
             }
             r.setTech(engineer);
-        } else if (getCampaign().getActivePersonnel(false, false).stream().anyMatch(Person::isTech)) {
-            String name;
-            Map<String, Person> techHash = new HashMap<>();
-            List<String> techList = new ArrayList<>();
+        } else {
+            Campaign campaign = getCampaign();
+            if (campaign.getPlayerForce()
+                      .getHumanResources()
+                      .getActivePersonnel(false, false)
+                      .stream()
+                      .anyMatch(Person::isTech)) {
+                String name;
+                Map<String, Person> techHash = new HashMap<>();
+                List<String> techList = new ArrayList<>();
 
-            List<Person> techs = getCampaign().getTechs(false, true);
-            int lastRightTech = 0;
+                Campaign campaign1 = getCampaign();
+                List<Person> techs = campaign1.getPlayerForce()
+                                           .getHumanResources()
+                                           .getTechs(campaign1.getPlayerForce().getHangar().getUnits(),
+                                                 campaign1.getCampaignOptions(),
+                                                 campaign1.isClanCampaign(),
+                                                 campaign1.getLocalDate(),
+                                                 false,
+                                                 true);
+                int lastRightTech = 0;
 
-            for (Person tech : techs) {
-                if (getCampaign().isWorkingOnRefit(tech) || tech.isEngineer()) {
-                    continue;
+                for (Person tech : techs) {
+                    Campaign campaign2 = getCampaign();
+                    if (campaign2.getPlayerForce()
+                              .getHumanResources()
+                              .isWorkingOnRefit(campaign2.getPlayerForce().getHangar(), tech) || tech.isEngineer()) {
+                        continue;
+                    }
+
+                    name = "<html>" +
+                                 tech.getFullName() +
+                                 ", <b>" +
+                                 SkillType.getColoredExperienceLevelName(tech.getSkillLevel(getCampaign(),
+                                       false,
+                                       true)) +
+                                 "</b> " +
+                                 tech.getPrimaryRoleDesc() +
+                                 " (" +
+                                 getCampaign().getTargetFor(r, tech).getValueAsString() +
+                                 "+), " +
+                                 tech.getMinutesLeft() +
+                                 '/' +
+                                 tech.getDailyAvailableTechTime(getCampaign().getCampaignOptions()
+                                                                      .isTechsUseAdministration()) +
+                                 " minutes</html>";
+                    techHash.put(name, tech);
+                    if (tech.isRightTechTypeFor(r)) {
+                        techList.add(lastRightTech++, name);
+                    } else {
+                        techList.add(name);
+                    }
                 }
 
-                name = "<html>" +
-                             tech.getFullName() +
-                             ", <b>" +
-                             SkillType.getColoredExperienceLevelName(tech.getSkillLevel(getCampaign(), false, true)) +
-                             "</b> " +
-                             tech.getPrimaryRoleDesc() +
-                             " (" +
-                             getCampaign().getTargetFor(r, tech).getValueAsString() +
-                             "+), " +
-                             tech.getMinutesLeft() +
-                             '/' +
-                             tech.getDailyAvailableTechTime(getCampaign().getCampaignOptions()
-                                                                  .isTechsUseAdministration()) +
-                             " minutes</html>";
-                techHash.put(name, tech);
-                if (tech.isRightTechTypeFor(r)) {
-                    techList.add(lastRightTech++, name);
-                } else {
-                    techList.add(name);
-                }
-            }
+                String s = (techList.isEmpty()) ?
+                                 null :
+                                 (String) JOptionPane.showInputDialog(frame,
+                                       "Which tech should work on the refit?",
+                                       "Select Tech",
+                                       JOptionPane.PLAIN_MESSAGE,
+                                       null,
+                                       techList.toArray(),
+                                       techList.getFirst());
 
-            String s = (techList.isEmpty()) ?
-                             null :
-                             (String) JOptionPane.showInputDialog(frame,
-                                   "Which tech should work on the refit?",
-                                   "Select Tech",
-                                   JOptionPane.PLAIN_MESSAGE,
-                                   null,
-                                   techList.toArray(),
-                                   techList.getFirst());
-
-            if (null == s) {
-                return;
-            }
-
-            Person selectedTech = techHash.get(s);
-
-            if (!selectedTech.isRightTechTypeFor(r)) {
-                if (JOptionPane.NO_OPTION ==
-                          JOptionPane.showConfirmDialog(null,
-                                "This tech is not appropriate for this unit. Would you like to continue?",
-                                "Incorrect Tech Type",
-                                JOptionPane.YES_NO_OPTION)) {
+                if (null == s) {
                     return;
                 }
-            }
 
-            r.setTech(selectedTech);
-        } else {
-            JOptionPane.showMessageDialog(frame,
-                  "You have no techs available to work on this refit.",
-                  "No Techs",
-                  JOptionPane.WARNING_MESSAGE);
-            return;
+                Person selectedTech = techHash.get(s);
+
+                if (!selectedTech.isRightTechTypeFor(r)) {
+                    if (JOptionPane.NO_OPTION ==
+                              JOptionPane.showConfirmDialog(null,
+                                    "This tech is not appropriate for this unit. Would you like to continue?",
+                                    "Incorrect Tech Type",
+                                    JOptionPane.YES_NO_OPTION)) {
+                        return;
+                    }
+                }
+
+                r.setTech(selectedTech);
+            } else {
+                JOptionPane.showMessageDialog(frame,
+                      "You have no techs available to work on this refit.",
+                      "No Techs",
+                      JOptionPane.WARNING_MESSAGE);
+                return;
+            }
         }
         if (selectModelName) {
             // select a model name
@@ -1119,7 +1143,13 @@ public class CampaignGUI extends JPanel {
     public @Nullable UUID selectTech(Unit unit, String desc, boolean ignoreMaintenance) {
         String name;
         Map<String, Person> techHash = new LinkedHashMap<>();
-        for (Person tech : getCampaign().getTechsExpanded()) {
+        Campaign campaign = getCampaign();
+        for (Person tech : campaign.getPlayerForce()
+                                 .getHumanResources()
+                                 .getTechsExpanded(campaign.getPlayerForce().getHangar().getUnits(),
+                                       campaign.getCampaignOptions(),
+                                       campaign.isClanCampaign(),
+                                       campaign.getLocalDate())) {
             if (tech.isTechLargeVessel()) {
                 Entity entity = unit.getEntity();
                 if (entity == null) {
@@ -1519,12 +1549,12 @@ public class CampaignGUI extends JPanel {
 
     private void refreshTempAsTechs() {
         lblTempAsTechs.setText(statusBarLabel("statusBar.lblTempAsTechs.text",
-              getCampaign().getTemporaryAsTechPool()));
+              getCampaign().getPlayerForce().getHumanResources().getTemporaryAsTechPool()));
     }
 
     private void refreshTempMedics() {
         lblTempMedics.setText(statusBarLabel("statusBar.lblTempMedics.text",
-              getCampaign().getTemporaryMedicPool()));
+              getCampaign().getPlayerForce().getHumanResources().getTemporaryMedicPool()));
     }
 
     private void refreshTempSoldiers() {
@@ -1533,8 +1563,9 @@ public class CampaignGUI extends JPanel {
             return;
         }
         lblTempSoldiers.setVisible(true);
+        Campaign campaign = getCampaign();
         lblTempSoldiers.setText(statusBarLabel("statusBar.lblTempSoldiers.text",
-              getCampaign().getTempCrewPool(PersonnelRole.SOLDIER)));
+              campaign.getPlayerForce().getHumanResources().getTempCrewPool(PersonnelRole.SOLDIER)));
     }
 
     private void refreshTempBattleArmor() {
@@ -1543,8 +1574,9 @@ public class CampaignGUI extends JPanel {
             return;
         }
         lblTempBattleArmor.setVisible(true);
+        Campaign campaign = getCampaign();
         lblTempBattleArmor.setText(statusBarLabel("statusBar.lblTempBattleArmor.text",
-              getCampaign().getTempCrewPool(PersonnelRole.BATTLE_ARMOUR)));
+              campaign.getPlayerForce().getHumanResources().getTempCrewPool(PersonnelRole.BATTLE_ARMOUR)));
     }
 
     private void refreshTempVehicleCrewGround() {
@@ -1554,8 +1586,9 @@ public class CampaignGUI extends JPanel {
             return;
         }
         lblTempVehicleCrewGround.setVisible(true);
+        Campaign campaign = getCampaign();
         lblTempVehicleCrewGround.setText(statusBarLabel("statusBar.lblTempVehicleCrewGround.text",
-              getCampaign().getTempCrewPool(PersonnelRole.VEHICLE_CREW_GROUND)));
+              campaign.getPlayerForce().getHumanResources().getTempCrewPool(PersonnelRole.VEHICLE_CREW_GROUND)));
         refreshVehicleCrewPanelVisibility();
     }
 
@@ -1566,8 +1599,9 @@ public class CampaignGUI extends JPanel {
             return;
         }
         lblTempVehicleCrewVTOL.setVisible(true);
+        Campaign campaign = getCampaign();
         lblTempVehicleCrewVTOL.setText(statusBarLabel("statusBar.lblTempVehicleCrewVTOL.text",
-              getCampaign().getTempCrewPool(PersonnelRole.VEHICLE_CREW_VTOL)));
+              campaign.getPlayerForce().getHumanResources().getTempCrewPool(PersonnelRole.VEHICLE_CREW_VTOL)));
         refreshVehicleCrewPanelVisibility();
     }
 
@@ -1578,8 +1612,9 @@ public class CampaignGUI extends JPanel {
             return;
         }
         lblTempVehicleCrewNaval.setVisible(true);
+        Campaign campaign = getCampaign();
         lblTempVehicleCrewNaval.setText(statusBarLabel("statusBar.lblTempVehicleCrewNaval.text",
-              getCampaign().getTempCrewPool(PersonnelRole.VEHICLE_CREW_NAVAL)));
+              campaign.getPlayerForce().getHumanResources().getTempCrewPool(PersonnelRole.VEHICLE_CREW_NAVAL)));
         refreshVehicleCrewPanelVisibility();
     }
 
@@ -1596,8 +1631,9 @@ public class CampaignGUI extends JPanel {
             return;
         }
         lblTempVesselPilot.setVisible(true);
+        Campaign campaign = getCampaign();
         lblTempVesselPilot.setText(statusBarLabel("statusBar.lblTempVesselPilot.text",
-              getCampaign().getTempCrewPool(PersonnelRole.VESSEL_PILOT)));
+              campaign.getPlayerForce().getHumanResources().getTempCrewPool(PersonnelRole.VESSEL_PILOT)));
         refreshVesselCrewPanelVisibility();
     }
 
@@ -1608,8 +1644,9 @@ public class CampaignGUI extends JPanel {
             return;
         }
         lblTempVesselGunner.setVisible(true);
+        Campaign campaign = getCampaign();
         lblTempVesselGunner.setText(statusBarLabel("statusBar.lblTempVesselGunner.text",
-              getCampaign().getTempCrewPool(PersonnelRole.VESSEL_GUNNER)));
+              campaign.getPlayerForce().getHumanResources().getTempCrewPool(PersonnelRole.VESSEL_GUNNER)));
         refreshVesselCrewPanelVisibility();
     }
 
@@ -1620,8 +1657,9 @@ public class CampaignGUI extends JPanel {
             return;
         }
         lblTempVesselCrew.setVisible(true);
+        Campaign campaign = getCampaign();
         lblTempVesselCrew.setText(statusBarLabel("statusBar.lblTempVesselCrew.text",
-              getCampaign().getTempCrewPool(PersonnelRole.VESSEL_CREW)));
+              campaign.getPlayerForce().getHumanResources().getTempCrewPool(PersonnelRole.VESSEL_CREW)));
         refreshVesselCrewPanelVisibility();
     }
 
@@ -1646,7 +1684,7 @@ public class CampaignGUI extends JPanel {
                                     getCampaign().getCampaignLocationManager().getPlayerBases()
                                           .stream()
                                           .allMatch(base -> base.getBaseHangar().getUnits().isEmpty());
-        boolean noPersonnel = getCampaign().getAllPersonnel().isEmpty();
+        boolean noPersonnel = getCampaign().getPlayerForce().getHumanResources().getPersonnel().isEmpty();
         btnCompanyGenerator.setVisible(emptyHangar && noPersonnel);
     }
 
@@ -1662,7 +1700,9 @@ public class CampaignGUI extends JPanel {
     }
 
     public void undeployUnit(Unit u) {
-        Formation f = getCampaign().getFormation(u.getFormationId());
+        Campaign campaign = getCampaign();
+        int id = u.getFormationId();
+        Formation f = campaign.getPlayerForce().getFormation(id);
         if (f != null) {
             undeployForce(f, false);
         }
@@ -1866,7 +1906,7 @@ public class CampaignGUI extends JPanel {
      */
     private boolean checkForOverdueLoans(DayEndingEvent dayEndingEvent) {
         Campaign campaign = getCampaign();
-        Money overdueAmount = campaign.getFinances().checkOverdueLoanPayments(campaign);
+        Money overdueAmount = campaign.getPlayerForce().getFinances().checkOverdueLoanPayments(campaign);
         if (overdueAmount.isPositive()) {
             String inCharacterMessage = getFormattedTextAt(resourceMap.getBaseBundleName(),
                   "dialogOverdueLoans.ic",
@@ -1875,7 +1915,11 @@ public class CampaignGUI extends JPanel {
                   "dialogOverdueLoans.ooc");
 
             new ImmersiveDialogSimple(campaign,
-                  campaign.getSeniorAdminPerson(LOGISTICS),
+                  campaign.getPlayerForce().getHumanResources()
+                        .getSeniorAdminPerson(Campaign.AdministratorSpecialization.LOGISTICS,
+                              campaign.getCampaignOptions(),
+                              campaign.isClanCampaign(),
+                              campaign.getLocalDate()),
                   null,
                   inCharacterMessage,
                   null,
@@ -1917,7 +1961,11 @@ public class CampaignGUI extends JPanel {
                   "dialogInvalidFaction.ooc");
 
             new ImmersiveDialogSimple(campaign,
-                  campaign.getSeniorAdminPerson(COMMAND),
+                  campaign.getPlayerForce().getHumanResources()
+                        .getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND,
+                              campaign.getCampaignOptions(),
+                              campaign.isClanCampaign(),
+                              campaign.getLocalDate()),
                   null,
                   inCharacterMessage,
                   null,

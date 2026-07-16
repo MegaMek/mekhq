@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2022-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -89,7 +89,9 @@ public enum BattleMekFactionGenerationMethod {
     public Faction generateFaction(final Person person, final Campaign campaign,
           final Faction specifiedFaction) {
         return switch (this) {
-            case CAMPAIGN_FACTION -> campaign.getFaction();
+            case CAMPAIGN_FACTION -> {
+                yield campaign.getFaction();
+            }
             case SPECIFIED_FACTION -> specifiedFaction;
             default -> person.getOriginFaction();
         };

@@ -48,6 +48,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.time.LocalDate;
 
@@ -200,7 +201,7 @@ class SkillCheckUtilityTest {
     @Test
     void testDetermineTargetNumber_UntrainedWithOneLinkedAttribute() {
         // Setup
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         Faction campaignFaction = mock(Faction.class);
         when(mockCampaign.getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
@@ -225,7 +226,7 @@ class SkillCheckUtilityTest {
     @Test
     void testDetermineTargetNumber_UntrainedWithTwoLinkedAttributes() {
         // Setup
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         Faction campaignFaction = mock(Faction.class);
         when(mockCampaign.getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
@@ -389,7 +390,7 @@ class SkillCheckUtilityTest {
     @Test
     void testDetermineTargetNumber_InvalidAttributes() {
         // Setup
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         Faction campaignFaction = mock(Faction.class);
         when(mockCampaign.getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
@@ -420,7 +421,7 @@ class SkillCheckUtilityTest {
     @Test
     void testDetermineTargetNumber_EdgeCaseSkillType() {
         // Setup
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         Faction campaignFaction = mock(Faction.class);
         when(mockCampaign.getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
@@ -447,7 +448,7 @@ class SkillCheckUtilityTest {
     @Test
     void testDetermineTargetNumber_NegativeAttributeModifier() {
         // Setup
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         Faction campaignFaction = mock(Faction.class);
         when(mockCampaign.getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");

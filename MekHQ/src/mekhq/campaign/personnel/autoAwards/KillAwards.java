@@ -142,7 +142,7 @@ public class KillAwards {
 
                         // otherwise, we need to identify all relevant kills across the TO&E
                     } else {
-                        FormationLevel maximumDepth = campaign.getFormation(0).getFormationLevel();
+                        FormationLevel maximumDepth = campaign.getPlayerForce().getFormation(0).getFormationLevel();
 
                         // in the event that the depth of the award exceeds the highest depth of the
                         // origin force
@@ -199,13 +199,19 @@ public class KillAwards {
 
                                 try {
                                     // Get the current formation depth of the origin force
-                                    int depth = campaign.getFormation(originForce).getFormationLevel().getDepth();
+                                    int depth = campaign.getPlayerForce()
+                                                      .getFormation(originForce)
+                                                      .getFormationLevel()
+                                                      .getDepth();
 
                                     // Continue the loop until the depth of the original force is not smaller than
                                     // the award depth
                                     while (depth < awardDepth.getDepth()) {
                                         // Get the ID of the origin force's parent force
-                                        int parentForce = campaign.getFormation(originForce).getParentFormation().getId();
+                                        int parentForce = campaign.getPlayerForce()
+                                                                .getFormation(originForce)
+                                                                .getParentFormation()
+                                                                .getId();
 
                                         // If the depth is greater or equal to the maximum depth, exit the loop
                                         if (depth >= maximumDepth.getDepth()) {
@@ -215,10 +221,13 @@ public class KillAwards {
                                         // Set the origin force to its parent force
                                         originForce = parentForce;
                                         // Update the depth to the depth of the new origin force
-                                        depth = campaign.getFormation(originForce).getFormationLevel().getDepth();
+                                        depth = campaign.getPlayerForce()
+                                                      .getFormation(originForce)
+                                                      .getFormationLevel()
+                                                      .getDepth();
                                     }
 
-                                    Formation originNode = campaign.getFormation(originForce);
+                                    Formation originNode = campaign.getPlayerForce().getFormation(originForce);
                                     temporaryKills = walkToeForKills(killData, originNode);
                                 } catch (Exception e) {
                                     LOGGER.warn("Could not walk toe for force {}. Exception: {} Stacktrace: {}",

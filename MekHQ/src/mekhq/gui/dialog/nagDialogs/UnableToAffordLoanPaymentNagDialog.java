@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -77,9 +77,9 @@ public class UnableToAffordLoanPaymentNagDialog extends ImmersiveDialogNag {
     protected String getInCharacterMessage(Campaign campaign, String key, String commanderAddress) {
         final String RESOURCE_BUNDLE = "mekhq.resources.NagDialogs";
 
-        Finances finances = campaign.getFinances();
+        Finances finances = campaign.getPlayerForce().getFinances();
         Money totalPaymentsDue = getTotalPaymentsDue(finances.getLoans(), campaign.getLocalDate());
-        Money currentFunds = campaign.getFunds();
+        Money currentFunds = campaign.getPlayerForce().getFunds();
         Money deficit = totalPaymentsDue.minus(currentFunds);
 
         return getFormattedTextAt(RESOURCE_BUNDLE,

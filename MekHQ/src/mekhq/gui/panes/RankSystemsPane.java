@@ -215,9 +215,9 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
     @Override
     protected void initialize() {
         // First, we have to initialize the selected rank system.
-        setSelectedRankSystem(getCampaign().getRankSystem().getType().isCampaign()
-                                    ? new RankSystem(getCampaign().getRankSystem())
-                                    : getCampaign().getRankSystem());
+        setSelectedRankSystem(getCampaign().getPlayerForce().getRankSystem().getType().isCampaign()
+                                    ? new RankSystem(getCampaign().getPlayerForce().getRankSystem())
+                                    : getCampaign().getPlayerForce().getRankSystem());
 
         // Then, we can start creating the actual panel
         final DefaultMHQScrollablePanel rankSystemsPanel = new DefaultMHQScrollablePanel(getFrame(),
@@ -749,13 +749,15 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
         }
 
         // Set the selected item
-        getComboRankSystems().setSelectedItem(getCampaign().getRankSystem());
+        getComboRankSystems().setSelectedItem(getCampaign().getPlayerForce().getRankSystem());
     }
     // endregion Button Actions
 
     public void applyToCampaign() {
         exportUserDataRankSystems(false);
         Ranks.reinitializeRankSystems(getCampaign());
-        getCampaign().setRankSystem(getSelectedRankSystem());
+        Campaign campaign1 = getCampaign();
+        final RankSystem rankSystem = getSelectedRankSystem();
+        campaign1.getPlayerForce().setRankSystem(rankSystem);
     }
 }

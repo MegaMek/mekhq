@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -94,7 +94,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         setCountClan(0);
         setCountIS2(0);
 
-        for (Unit u : getCampaign().getHangar().getUnits()) {
+        for (Unit u : getCampaign().getPlayerForce().getHangar().getUnits()) {
             if (!u.isPresent()) {
                 continue;
             }
@@ -133,7 +133,8 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     }
 
     void updateAvailableSupport() {
-        for (Person p : getCampaign().getActivePersonnel(false, false)) {
+        Campaign campaign = getCampaign();
+        for (Person p : campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false)) {
             if (p.isTech()) {
                 updateTechSupportHours(p);
             } else if (p.isDoctor()) {
@@ -269,7 +270,11 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     // 3 + (4/5) = 3 + 0.8 = 3.8 = 4 hours.
     // total = 16 hours.
     private void calcMedicalSupportHoursNeeded() {
-        int activePersonnelCount = getCampaign().getActivePersonnel(false, false).size();
+        Campaign campaign = getCampaign();
+        int activePersonnelCount = campaign.getPlayerForce()
+                                         .getHumanResources()
+                                         .getActivePersonnel(false, false)
+                                         .size();
 
         // Calculated based on 7-person squads
         int numSquads = activePersonnelCount / 7; // integer division intended
@@ -287,7 +292,8 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     }
 
     private void calcAdminSupportHoursNeeded() {
-        int personnelCount = (int) getCampaign().getActivePersonnel(false, false)
+        Campaign campaign = getCampaign();
+        int personnelCount = (int) campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false)
                                          .stream()
                                          .filter(p -> !p.isAdministrator())
                                          .count();
@@ -594,16 +600,16 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     }
 
     private int getYearsInDebt() {
-        int yearsInDebt = getCampaign().getFinances().getFullYearsInDebt(getCampaign().getLocalDate());
-        yearsInDebt += getCampaign().getFinances().getPartialYearsInDebt(getCampaign().getLocalDate());
+        int yearsInDebt = getCampaign().getPlayerForce().getFinances().getFullYearsInDebt(getCampaign().getLocalDate());
+        yearsInDebt += getCampaign().getPlayerForce().getFinances().getPartialYearsInDebt(getCampaign().getLocalDate());
         return yearsInDebt;
     }
 
     @Override
     public int getFinancialValue() {
         int score = getYearsInDebt() * -10;
-        score -= 25 * getCampaign().getFinances().getLoanDefaults();
-        score -= 10 * getCampaign().getFinances().getFailedCollateral();
+        score -= 25 * getCampaign().getPlayerForce().getFinances().getLoanDefaults();
+        score -= 10 * getCampaign().getPlayerForce().getFinances().getFailedCollateral();
 
         return score;
     }
@@ -777,11 +783,13 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
                      "\n" +
                      String.format(TEMPLATE, "Years in Debt:", getYearsInDebt()) +
                      "\n" +
-                     String.format(TEMPLATE, "Loan Defaults:", getCampaign().getFinances().getLoanDefaults()) +
+                     String.format(TEMPLATE,
+                           "Loan Defaults:",
+                           getCampaign().getPlayerForce().getFinances().getLoanDefaults()) +
                      "\n" +
                      String.format(TEMPLATE,
                            "No Collateral Payment:",
-                           getCampaign().getFinances().getFailedCollateral());
+                           getCampaign().getPlayerForce().getFinances().getFailedCollateral());
     }
 
     @Override
