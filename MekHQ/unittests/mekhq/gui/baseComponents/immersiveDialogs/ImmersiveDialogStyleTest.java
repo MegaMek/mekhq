@@ -44,6 +44,8 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.Map;
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
@@ -107,20 +109,54 @@ class ImmersiveDialogStyleTest {
     }
 
     @Test
-    void supplementalControlsUseSignalFocusColors() throws Exception {
+    void responseButtonsUseSignalInteractionStyleAndRemainFocusable() throws Exception {
+        SwingUtilities.invokeAndWait(() -> {
+            JButton button = new JButton("Respond");
+            button.setFocusable(false);
+
+            ImmersiveDialogStyle.applyResponseButtonStyle(button);
+
+            assertTrue(button.isFocusable());
+            assertTrue(button.isFocusPainted());
+            Map<?, ?> styleMap = getStyleMap(button);
+            assertEquals(ImmersiveDialogStyle.getSignalColor(), styleMap.get("focusedBorderColor"));
+            assertEquals(ImmersiveDialogStyle.getSignalColor(), styleMap.get("pressedBorderColor"));
+            assertNotNull(styleMap.get("hoverBorderColor"));
+            assertNotNull(styleMap.get("hoverBackground"));
+            assertNotNull(styleMap.get("pressedBackground"));
+        });
+    }
+
+    @Test
+    void supplementalControlsUseSignalInteractionStyle() throws Exception {
         SwingUtilities.invokeAndWait(() -> {
             JPanel supplementalPanel = new JPanel();
             JSpinner spinner = new JSpinner();
+            JComboBox<String> comboBox = new JComboBox<>();
             supplementalPanel.add(spinner);
+            supplementalPanel.add(comboBox);
 
-            ImmersiveDialogStyle.applySignalFocusStyle(supplementalPanel);
+            ImmersiveDialogStyle.applySupplementalControlStyle(supplementalPanel);
 
-            Object style = spinner.getClientProperty(FLATLAF_STYLE_PROPERTY);
-            assertTrue(style instanceof Map<?, ?>);
-            Map<?, ?> styleMap = (Map<?, ?>) style;
-            assertEquals(ImmersiveDialogStyle.getSignalColor(), styleMap.get("focusColor"));
-            assertEquals(ImmersiveDialogStyle.getSignalColor(), styleMap.get("focusedBorderColor"));
+            assertSupplementalControlStyle(getStyleMap(spinner));
+            assertSupplementalControlStyle(getStyleMap(comboBox));
         });
+    }
+
+    private static void assertSupplementalControlStyle(Map<?, ?> styleMap) {
+        Color signalColor = ImmersiveDialogStyle.getSignalColor();
+        assertEquals(signalColor, styleMap.get("focusColor"));
+        assertEquals(signalColor, styleMap.get("focusedBorderColor"));
+        assertEquals(signalColor, styleMap.get("buttonHoverArrowColor"));
+        assertEquals(signalColor, styleMap.get("buttonPressedArrowColor"));
+        assertNotNull(styleMap.get("buttonSeparatorColor"));
+        assertNotNull(styleMap.get("buttonArrowColor"));
+    }
+
+    private static Map<?, ?> getStyleMap(JComponent component) {
+        Object style = component.getClientProperty(FLATLAF_STYLE_PROPERTY);
+        assertTrue(style instanceof Map<?, ?>);
+        return (Map<?, ?>) style;
     }
 
     private static BufferedImage render(JComponent component, int width, int height) {

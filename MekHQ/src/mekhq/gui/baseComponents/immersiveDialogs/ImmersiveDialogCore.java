@@ -433,7 +433,7 @@ public class ImmersiveDialogCore extends JDialog {
         viewport.add(editorPane, BorderLayout.CENTER);
         if (supplementalPanel != null) {
             supplementalPanel.setOpaque(false);
-            ImmersiveDialogStyle.applySignalFocusStyle(supplementalPanel);
+            ImmersiveDialogStyle.applySupplementalControlStyle(supplementalPanel);
             viewport.add(supplementalPanel, BorderLayout.SOUTH);
             fetchSpinnerFromPanel(supplementalPanel);
             fetchComboBoxFromPanel(supplementalPanel);
@@ -777,6 +777,8 @@ public class ImmersiveDialogCore extends JDialog {
                 continue;
             }
 
+            ImmersiveDialogStyle.applyResponseButtonStyle(button);
+
             // Left-align text, if using vertical layout, otherwise we want text centralized (default)
             if (isVerticalLayout) {
                 button.setHorizontalAlignment(SwingConstants.LEFT);
@@ -818,9 +820,6 @@ public class ImmersiveDialogCore extends JDialog {
         // Final pass: Add buttons to the panel
         for (JButton button : buttonList) {
             buttonPanel.add(button, gbc);
-
-            // This ensures we don't have a button selected by default
-            button.setFocusable(false);
 
             if (isVerticalLayout) {
                 // If we're using a vertical layout, we just want the buttons stacked

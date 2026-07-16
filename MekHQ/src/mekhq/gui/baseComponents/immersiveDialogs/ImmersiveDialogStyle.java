@@ -47,6 +47,7 @@ import java.awt.RenderingHints;
 import java.awt.geom.Path2D;
 import java.util.Map;
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -151,14 +152,36 @@ final class ImmersiveDialogStyle {
         return BorderFactory.createEmptyBorder(scaleForGUI(10), scaleForGUI(6), scaleForGUI(4), scaleForGUI(6));
     }
 
-    static void applySignalFocusStyle(Container container) {
+    static void applyResponseButtonStyle(JButton button) {
+        Color signalColor = getSignalColor();
+        button.setFocusable(true);
+        button.setFocusPainted(true);
+        button.putClientProperty(FLATLAF_STYLE_PROPERTY, Map.of(
+              "arc", 6,
+              "focusColor", withAlpha(signalColor, 100),
+              "focusedBorderColor", signalColor,
+              "hoverBorderColor", getInteractiveSignalColor(),
+              "pressedBorderColor", signalColor,
+              "hoverBackground", mix(getSurfaceColor(), signalColor, isDarkTheme() ? 0.08f : 0.05f),
+              "pressedBackground", mix(getSurfaceColor(), signalColor, isDarkTheme() ? 0.16f : 0.10f)));
+    }
+
+    static void applySupplementalControlStyle(Container container) {
         for (Component child : container.getComponents()) {
             if (child instanceof JSpinner || child instanceof JComboBox<?>) {
-                ((JComponent) child).putClientProperty(FLATLAF_STYLE_PROPERTY,
-                      Map.of("focusColor", getSignalColor(), "focusedBorderColor", getSignalColor()));
+                Color signalColor = getSignalColor();
+                Color subtleSignalColor = getSubtleSignalColor();
+                Color interactiveSignalColor = getInteractiveSignalColor();
+                ((JComponent) child).putClientProperty(FLATLAF_STYLE_PROPERTY, Map.of(
+                      "focusColor", signalColor,
+                      "focusedBorderColor", signalColor,
+                      "buttonSeparatorColor", subtleSignalColor,
+                      "buttonArrowColor", interactiveSignalColor,
+                      "buttonHoverArrowColor", signalColor,
+                      "buttonPressedArrowColor", signalColor));
             }
             if (child instanceof Container childContainer) {
-                applySignalFocusStyle(childContainer);
+                applySupplementalControlStyle(childContainer);
             }
         }
     }
@@ -186,6 +209,10 @@ final class ImmersiveDialogStyle {
 
     private static Color getSubtleSignalColor() {
         return mix(getPanelColor(), getSignalColor(), isDarkTheme() ? 0.42f : 0.30f);
+    }
+
+    private static Color getInteractiveSignalColor() {
+        return mix(getLabelColor(), getSignalColor(), isDarkTheme() ? 0.62f : 0.72f);
     }
 
     private static Color getPanelColor() {
