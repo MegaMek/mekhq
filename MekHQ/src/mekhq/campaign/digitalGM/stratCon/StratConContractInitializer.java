@@ -59,8 +59,6 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
-import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.PlanetarySystem;
 
 /**
  * This class handles StratCon state initialization when a contract is signed.
@@ -70,6 +68,18 @@ public class StratConContractInitializer {
 
     public static final int NUM_FORMATIONS_PER_TRACK = 3;
     public static final int ZERO_CELSIUS_IN_KELVIN = 273;
+
+    /** Legacy sizing: hexes per required formation, laid out as a wider-than-tall rectangle. */
+    private static final int LEGACY_HEXES_PER_FORMATION = 28;
+
+    /**
+     * Improved sizing: dry playable hexes per base sector unit before planetary-size, size-multiplier, and hydrology
+     * adjustments. Roughly a quarter's scouting budget at six hexes per week for thirteen weeks.
+     */
+    private static final int BASE_PLAYABLE_HEXES = 78;
+
+    /** Improved sizing: the minimum dry fraction of a sector, so oceans never leave too little land. */
+    private static final double MINIMUM_LAND_FRACTION = 0.25;
 
     /**
      * Initializes the campaign state given a contract, campaign and contract definition
@@ -97,47 +107,29 @@ public class StratConContractInitializer {
         // scenarios
         // when objective is allied/hostile facility, place those facilities
 
-        int maximumTrackIndex = max(0, contract.getRequiredCombatTeams() / NUM_FORMATIONS_PER_TRACK);
-        // Use the contract's destination planet, not the campaign's current location
-        int planetaryTemperature = getContractPlanetTemperature(contract, campaign);
-
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         boolean isUseMaplessMode = campaignOptions.isUseStratConMaplessMode();
-        for (int x = 0; x < maximumTrackIndex; x++) {
+
+        // Resolve the contract's destination planet once (not the campaign's current location); its data drives every
+        // sector's size and temperature.
+        PlanetProfile planetProfile = PlanetProfile.from(contract, campaign);
+
+        // Decide how many sectors to generate and how large each one is. The planner always returns at least one
+        // sector, so no separate zero-sector fallback is needed.
+        List<SectorSpec> sectorSpecs = StratConSectorPlanner.generateSectorSpecs(contract.getRequiredCombatTeams(),
+              campaignOptions.isUseStratConAlternateSectorCount(),
+              campaignOptions.isUseStratConCondenseSectors());
+
+        for (int index = 0; index < sectorSpecs.size(); index++) {
             int scenarioOdds = getScenarioOdds(contractDefinition);
             int deploymentTime = isUseMaplessMode ? 0 : getDeploymentTime(contractDefinition);
 
-            StratConTrackState track = initializeTrackState(NUM_FORMATIONS_PER_TRACK,
+            StratConTrackState track = initializeTrackState(sectorSpecs.get(index),
+                  planetProfile,
+                  campaignOptions,
                   scenarioOdds,
-                  deploymentTime,
-                  planetaryTemperature);
-            track.setDisplayableName(String.format("Sector %d", x));
-            campaignState.addTrack(track);
-        }
-
-        // a campaign will have X tracks going at a time, where
-        // X = # required lances / 3, rounded up. The last track will have fewer
-        // required lances.
-        int oddLanceCount = contract.getRequiredCombatTeams() % NUM_FORMATIONS_PER_TRACK;
-        if (oddLanceCount > 0) {
-            int scenarioOdds = getScenarioOdds(contractDefinition);
-            int deploymentTime = isUseMaplessMode ? 0 : getDeploymentTime(contractDefinition);
-
-            StratConTrackState track = initializeTrackState(oddLanceCount,
-                  scenarioOdds,
-                  deploymentTime,
-                  planetaryTemperature);
-            track.setDisplayableName(String.format("Sector %d", campaignState.getTrackCount()));
-            campaignState.addTrack(track);
-        }
-
-        // Last chance generation, to ensure we never generate a StratCon map with 0 tracks
-        if (campaignState.getTrackCount() == 0) {
-            int scenarioOdds = getScenarioOdds(contractDefinition);
-            int deploymentTime = isUseMaplessMode ? 0 : getDeploymentTime(contractDefinition);
-
-            StratConTrackState track = initializeTrackState(1, scenarioOdds, deploymentTime, planetaryTemperature);
-            track.setDisplayableName(String.format("Sector %d", campaignState.getTrackCount()));
+                  deploymentTime);
+            track.setDisplayableName(String.format("Sector %d", index));
             campaignState.addTrack(track);
         }
 
@@ -313,82 +305,98 @@ public class StratConContractInitializer {
         return contractDefinition.getScenarioOdds().get(Compute.randomInt(contractDefinition.getScenarioOdds().size()));
     }
 
-    /**
-     * Gets the temperature of the contract's destination planet.
-     *
-     * <p>Uses the contract's system (where the contract takes place), not the campaign's
-     * current location. Falls back to 25C (standard room temperature) if the planet or temperature data is
-     * unavailable.</p>
-     *
-     * @param contract the contract being initialized
-     * @param campaign the campaign (used to get the current date)
-     *
-     * @return the planetary temperature in Celsius
-     */
-    private static int getContractPlanetTemperature(AtBContract contract, Campaign campaign) {
-        final int DEFAULT_TEMPERATURE = 25; // Standard room temperature as fallback
-
-        PlanetarySystem system = contract.getSystem();
-        if (system == null) {
-            LOGGER.warn("Contract {} has no system, using default temperature",
-                  contract.getName());
-            return DEFAULT_TEMPERATURE;
-        }
-
-        Planet planet = system.getPrimaryPlanet();
-        if (planet == null) {
-            LOGGER.warn("System {} has no primary planet, using default temperature",
-                  system.getName(campaign.getLocalDate()));
-            return DEFAULT_TEMPERATURE;
-        }
-
-        Integer temperature = planet.getTemperature(campaign.getLocalDate());
-        if (temperature == null) {
-            LOGGER.warn("Planet {} has no temperature data, using default temperature",
-                  planet.getName(campaign.getLocalDate()));
-            return DEFAULT_TEMPERATURE;
-        }
-
-        return temperature;
-    }
 
     /**
-     * Set up initial state of a track, dimensions are based on number of assigned lances.
+     * Sets up the initial state of a single track from its {@link SectorSpec} and the destination planet's profile.
+     *
+     * <p>Sizing and temperature follow one of two regimes. When either the alternate sector count or sector
+     * condensing is enabled, the track uses the improved sizing (a per-quarter scouting budget scaled by planetary
+     * size, sector size units, the size multiplier, and hydrology) and a latitude-driven temperature. Otherwise it
+     * falls back to the legacy behaviour (a rectangle sized from the formation count and a broad equatorial temperature
+     * swing).</p>
+     *
+     * @param sector          the sector blueprint (size units, required formations, latitude band)
+     * @param planetProfile   the destination planet's resolved data
+     * @param campaignOptions the campaign options governing which sizing/temperature regime applies
+     * @param scenarioOdds    the per-track scenario odds
+     * @param deploymentTime  the per-track deployment time
+     *
+     * @return the initialized track
      */
-    public static StratConTrackState initializeTrackState(int numLances, int scenarioOdds, int deploymentTime,
-          int planetaryTemp) {
-        // to initialize a track,
-        // 1. we set the # of required lances
-        // 2. set the track size to a total of num lances * 28 hexes, a rectangle that is
-        // wider than it is taller
-        // the idea being to create a roughly rectangular playing field that,
-        // if one deploys a scout lance each week to a different spot, can be more or
-        // less fully covered
-
+    public static StratConTrackState initializeTrackState(SectorSpec sector, PlanetProfile planetProfile,
+          CampaignOptions campaignOptions, int scenarioOdds, int deploymentTime) {
         StratConTrackState retVal = new StratConTrackState();
-        retVal.setRequiredLanceCount(numLances);
+        retVal.setRequiredLanceCount(sector.requiredLances());
 
-        // set width and height
-        int numHexes = numLances * 28;
-        int height = (int) Math.floor(Math.sqrt(numHexes));
-        int width = numHexes / height;
-        retVal.setWidth(width);
-        retVal.setHeight(height);
+        boolean useImprovedSizing = campaignOptions.isUseStratConAlternateSectorCount() ||
+                                          campaignOptions.isUseStratConCondenseSectors();
+
+        if (useImprovedSizing) {
+            applyImprovedDimensions(retVal, sector, planetProfile, campaignOptions.getStratConSectorSizeMultiplier());
+            retVal.setTemperature(improvedTemperature(planetProfile, sector.latitudeBand()));
+        } else {
+            applyLegacyDimensions(retVal, sector.requiredLances());
+            retVal.setTemperature(legacyTemperature(planetProfile.temperatureCelsius()));
+        }
 
         retVal.setScenarioOdds(scenarioOdds);
         retVal.setDeploymentTime(deploymentTime);
 
-        // figure out track "average" temperature; this is the equatorial temperature
-        // with
-        // a random number between 10 and -40 added to it: equator is about as hot as it
-        // gets with some exceptions
-        int tempVariation = Compute.randomInt(51) - 40;
-        retVal.setTemperature(planetaryTemp + tempVariation);
-
-        // place terrain based on temperature
+        // Place terrain based on temperature.
+        // TODO (improved terrain generation): when campaignOptions.isUseStratConAlternateSectorTerrain() is set,
+        //  dispatch to the improved terrain generator here instead of the legacy placer.
         StratConTerrainPlacer.InitializeTrackTerrain(retVal);
 
         return retVal;
+    }
+
+    /**
+     * Applies the legacy track dimensions: a total of {@code formations * 28} hexes laid out as a rectangle that is
+     * wider than it is tall, so a scout formation deployed to a fresh spot each week can more or less cover it.
+     */
+    private static void applyLegacyDimensions(StratConTrackState track, int numFormations) {
+        int numHexes = numFormations * LEGACY_HEXES_PER_FORMATION;
+        int height = max(1, (int) Math.floor(Math.sqrt(numHexes)));
+        int width = numHexes / height;
+        track.setWidth(width);
+        track.setHeight(height);
+    }
+
+    /**
+     * Applies the improved (square) track dimensions. Starts from a quarter's scouting budget scaled by planetary size,
+     * multiplies by the sector's size units and the configured size multiplier to get the dry playable target, then
+     * grows the sector to offset ocean so the dry target survives.
+     */
+    private static void applyImprovedDimensions(StratConTrackState track, SectorSpec sector, PlanetProfile profile,
+          double sizeMultiplier) {
+        int perUnitPlayable = (int) Math.round(BASE_PLAYABLE_HEXES * profile.sizeFactor());
+        int playableHexes = max(1, (int) Math.round(sector.unitCount() * perUnitPlayable * sizeMultiplier));
+
+        // Ocean is non-playable, so grow the sector by the dry fraction implied by the planet's water coverage.
+        double landFraction = max(MINIMUM_LAND_FRACTION, 1.0 - (profile.waterPercent() / 100.0));
+        int totalHexes = (int) Math.round(playableHexes / landFraction);
+
+        int dimension = max(1, (int) Math.round(Math.sqrt(totalHexes)));
+        track.setWidth(dimension);
+        track.setHeight(dimension);
+    }
+
+    /**
+     * Improved temperature: the planet's equatorial temperature, shifted colder by the sector's latitude band, plus a
+     * small local variation of -5 to +5 degrees.
+     */
+    private static int improvedTemperature(PlanetProfile profile, LatitudeBand latitudeBand) {
+        int localVariation = Compute.randomInt(11) - 5;
+        return profile.temperatureCelsius() + latitudeBand.getTemperatureOffset() + localVariation;
+    }
+
+    /**
+     * Legacy temperature: the equatorial temperature with a random -40 to +10 degree swing, on the notion that the
+     * equator is about as hot as it gets, with some exceptions.
+     */
+    private static int legacyTemperature(int equatorialTemperature) {
+        int tempVariation = Compute.randomInt(51) - 40;
+        return equatorialTemperature + tempVariation;
     }
 
     /**
