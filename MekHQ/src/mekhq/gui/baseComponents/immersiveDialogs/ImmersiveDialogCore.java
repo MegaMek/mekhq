@@ -433,6 +433,7 @@ public class ImmersiveDialogCore extends JDialog {
         viewport.add(editorPane, BorderLayout.CENTER);
         if (supplementalPanel != null) {
             supplementalPanel.setOpaque(false);
+            ImmersiveDialogStyle.applySignalFocusStyle(supplementalPanel);
             viewport.add(supplementalPanel, BorderLayout.SOUTH);
             fetchSpinnerFromPanel(supplementalPanel);
             fetchComboBoxFromPanel(supplementalPanel);
@@ -477,7 +478,7 @@ public class ImmersiveDialogCore extends JDialog {
 
         JPanel responsePanel = new JPanel(new BorderLayout());
         responsePanel.setOpaque(false);
-        responsePanel.setBorder(ImmersiveDialogStyle.createSectionDividerBorder());
+        responsePanel.setBorder(ImmersiveDialogStyle.createSectionSpacingBorder());
         responsePanel.add(ImmersiveDialogStyle.createSectionHeader(
               getText("ImmersiveDialog.response.title"),
               ImmersiveDialogStyle.getSignalColor()), BorderLayout.NORTH);

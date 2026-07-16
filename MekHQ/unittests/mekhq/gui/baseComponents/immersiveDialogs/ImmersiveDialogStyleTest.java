@@ -35,16 +35,24 @@ package mekhq.gui.baseComponents.immersiveDialogs;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.util.Map;
+import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JSpinner;
 import javax.swing.SwingUtilities;
 
 import org.junit.jupiter.api.Test;
 
 class ImmersiveDialogStyleTest {
+    private static final String FLATLAF_STYLE_PROPERTY = "FlatLaf.style";
     private static final String TITLE_BAR_CAPTION_PROPERTY = "JComponent.titleBarCaption";
     private static final String WINDOW_BUTTONS_PLACEHOLDER_PROPERTY =
           "FlatLaf.fullWindowContent.buttonsPlaceholder";
@@ -69,6 +77,58 @@ class ImmersiveDialogStyleTest {
             assertNull(header.getClientProperty(TITLE_BAR_CAPTION_PROPERTY));
             assertNull(findComponentWithProperty(header, WINDOW_BUTTONS_PLACEHOLDER_PROPERTY));
         });
+    }
+
+    @Test
+    void sectionRuleIsVerticallyCentered() throws Exception {
+        SwingUtilities.invokeAndWait(() -> {
+            JPanel header = ImmersiveDialogStyle.createSectionHeader("TRANSMISSION DATA", Color.CYAN);
+            JComponent rule = (JComponent) ((java.awt.BorderLayout) header.getLayout())
+                                                    .getLayoutComponent(java.awt.BorderLayout.CENTER);
+            rule.setSize(80, 20);
+
+            BufferedImage image = render(rule, 80, 20);
+            assertEquals(0, new Color(image.getRGB(40, 0), true).getAlpha());
+            assertTrue(new Color(image.getRGB(40, 9), true).getAlpha() > 0);
+        });
+    }
+
+    @Test
+    void framedPanelLeavesCutCornersTransparent() throws Exception {
+        SwingUtilities.invokeAndWait(() -> {
+            JPanel panel = ImmersiveDialogStyle.createFramedPanel();
+            panel.setBorder(BorderFactory.createEmptyBorder());
+            panel.setSize(100, 60);
+
+            BufferedImage image = render(panel, 100, 60);
+            assertEquals(0, new Color(image.getRGB(99, 0), true).getAlpha());
+            assertTrue(new Color(image.getRGB(50, 30), true).getAlpha() > 0);
+        });
+    }
+
+    @Test
+    void supplementalControlsUseSignalFocusColors() throws Exception {
+        SwingUtilities.invokeAndWait(() -> {
+            JPanel supplementalPanel = new JPanel();
+            JSpinner spinner = new JSpinner();
+            supplementalPanel.add(spinner);
+
+            ImmersiveDialogStyle.applySignalFocusStyle(supplementalPanel);
+
+            Object style = spinner.getClientProperty(FLATLAF_STYLE_PROPERTY);
+            assertTrue(style instanceof Map<?, ?>);
+            Map<?, ?> styleMap = (Map<?, ?>) style;
+            assertEquals(ImmersiveDialogStyle.getSignalColor(), styleMap.get("focusColor"));
+            assertEquals(ImmersiveDialogStyle.getSignalColor(), styleMap.get("focusedBorderColor"));
+        });
+    }
+
+    private static BufferedImage render(JComponent component, int width, int height) {
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics2D = image.createGraphics();
+        component.paint(graphics2D);
+        graphics2D.dispose();
+        return image;
     }
 
     private static JComponent findComponentWithProperty(Container container, String propertyName) {

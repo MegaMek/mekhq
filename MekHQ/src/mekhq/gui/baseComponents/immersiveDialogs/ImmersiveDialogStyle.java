@@ -38,22 +38,27 @@ import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.awt.geom.Path2D;
+import java.util.Map;
 import javax.swing.BorderFactory;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSeparator;
+import javax.swing.JSpinner;
 import javax.swing.UIManager;
 import javax.swing.border.AbstractBorder;
 import javax.swing.border.Border;
 
 /** Shared visual language for immersive communication dialogs. */
 final class ImmersiveDialogStyle {
+    private static final String FLATLAF_STYLE_PROPERTY = "FlatLaf.style";
     private static final String TITLE_BAR_CAPTION_PROPERTY = "JComponent.titleBarCaption";
     private static final String WINDOW_BUTTONS_PLACEHOLDER_PROPERTY =
           "FlatLaf.fullWindowContent.buttonsPlaceholder";
@@ -106,8 +111,8 @@ final class ImmersiveDialogStyle {
     }
 
     static JPanel createFramedPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(getSurfaceColor());
+        JPanel panel = new AngularTransmissionPanel();
+        panel.setLayout(new BorderLayout());
         panel.setBorder(BorderFactory.createCompoundBorder(new AngularTransmissionBorder(),
               BorderFactory.createEmptyBorder(FRAME_PADDING, FRAME_PADDING, FRAME_PADDING, FRAME_PADDING)));
         return panel;
@@ -127,8 +132,7 @@ final class ImmersiveDialogStyle {
         panel.setBorder(BorderFactory.createEmptyBorder(0, 0, SECTION_GAP, 0));
 
         JLabel label = createTechnicalLabel(title, color, -1.0f);
-        JSeparator separator = new JSeparator();
-        separator.setForeground(withAlpha(color, 150));
+        JComponent separator = new CenteredRule(withAlpha(color, 150));
         panel.add(label, BorderLayout.WEST);
         panel.add(separator, BorderLayout.CENTER);
         return panel;
@@ -143,10 +147,20 @@ final class ImmersiveDialogStyle {
         return panel;
     }
 
-    static Border createSectionDividerBorder() {
-        return BorderFactory.createCompoundBorder(
-              BorderFactory.createMatteBorder(scaleForGUI(1), 0, 0, 0, getSubtleSignalColor()),
-              BorderFactory.createEmptyBorder(scaleForGUI(10), scaleForGUI(6), scaleForGUI(4), scaleForGUI(6)));
+    static Border createSectionSpacingBorder() {
+        return BorderFactory.createEmptyBorder(scaleForGUI(10), scaleForGUI(6), scaleForGUI(4), scaleForGUI(6));
+    }
+
+    static void applySignalFocusStyle(Container container) {
+        for (Component child : container.getComponents()) {
+            if (child instanceof JSpinner || child instanceof JComboBox<?>) {
+                ((JComponent) child).putClientProperty(FLATLAF_STYLE_PROPERTY,
+                      Map.of("focusColor", getSignalColor(), "focusedBorderColor", getSignalColor()));
+            }
+            if (child instanceof Container childContainer) {
+                applySignalFocusStyle(childContainer);
+            }
+        }
     }
 
     static Color getSignalColor() {
@@ -202,6 +216,58 @@ final class ImmersiveDialogStyle {
 
     private static Color withAlpha(Color color, int alpha) {
         return new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
+    }
+
+    private static Path2D createAngularFrame(float left, float top, float right, float bottom) {
+        Path2D frame = new Path2D.Float();
+        frame.moveTo(left, top);
+        frame.lineTo(right - CORNER_CUT, top);
+        frame.lineTo(right, top + CORNER_CUT);
+        frame.lineTo(right, bottom);
+        frame.lineTo(left + CORNER_CUT, bottom);
+        frame.lineTo(left, bottom - CORNER_CUT);
+        frame.closePath();
+        return frame;
+    }
+
+    private static final class CenteredRule extends JComponent {
+        private final Color color;
+
+        private CenteredRule(Color color) {
+            this.color = color;
+        }
+
+        @Override
+        protected void paintComponent(Graphics graphics) {
+            Graphics2D graphics2D = (Graphics2D) graphics.create();
+            graphics2D.setColor(color);
+            int centerY = (getHeight() - 1) / 2;
+            graphics2D.drawLine(0, centerY, getWidth(), centerY);
+            graphics2D.dispose();
+        }
+    }
+
+    private static final class AngularTransmissionPanel extends JPanel {
+        private AngularTransmissionPanel() {
+            setOpaque(false);
+        }
+
+        @Override
+        protected void paintComponent(Graphics graphics) {
+            Graphics2D graphics2D = (Graphics2D) graphics.create();
+            graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            graphics2D.setColor(getSurfaceColor());
+            graphics2D.fill(createAngularFrame(0, 0, getWidth(), getHeight()));
+            graphics2D.dispose();
+        }
+
+        @Override
+        protected void paintChildren(Graphics graphics) {
+            Graphics2D graphics2D = (Graphics2D) graphics.create();
+            graphics2D.clip(createAngularFrame(0, 0, getWidth(), getHeight()));
+            super.paintChildren(graphics2D);
+            graphics2D.dispose();
+        }
     }
 
     private static final class TransmissionBackdropPanel extends JPanel {
@@ -276,15 +342,7 @@ final class ImmersiveDialogStyle {
             float top = yPosition + 0.5f;
             float right = xPosition + width - 1.5f;
             float bottom = yPosition + height - 1.5f;
-            Path2D frame = new Path2D.Float();
-            frame.moveTo(left + CORNER_CUT, top);
-            frame.lineTo(right - CORNER_CUT, top);
-            frame.lineTo(right, top + CORNER_CUT);
-            frame.lineTo(right, bottom);
-            frame.lineTo(left + CORNER_CUT, bottom);
-            frame.lineTo(left, bottom - CORNER_CUT);
-            frame.lineTo(left, top);
-            frame.closePath();
+            Path2D frame = createAngularFrame(left, top, right, bottom);
             graphics2D.draw(frame);
 
             graphics2D.setColor(getSignalColor());
