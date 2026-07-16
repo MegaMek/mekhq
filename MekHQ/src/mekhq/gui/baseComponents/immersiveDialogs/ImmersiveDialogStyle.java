@@ -40,6 +40,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Font;
+import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
@@ -140,16 +141,16 @@ final class ImmersiveDialogStyle {
     }
 
     static JPanel createInformationPanel() {
-          JPanel panel = new InformationPanel();
-          panel.setLayout(new BorderLayout(0, scaleForGUI(3)));
+        JPanel panel = new InformationPanel();
+        panel.setLayout(new BorderLayout(0, scaleForGUI(3)));
         panel.setBorder(BorderFactory.createCompoundBorder(
               BorderFactory.createMatteBorder(0, scaleForGUI(3), 0, 0, getInformationColor()),
-              BorderFactory.createEmptyBorder(scaleForGUI(5), scaleForGUI(10), scaleForGUI(5), scaleForGUI(10))));
+              BorderFactory.createEmptyBorder(SECTION_GAP, scaleForGUI(10), SECTION_GAP, scaleForGUI(10))));
         return panel;
     }
 
     static Border createSectionSpacingBorder() {
-        return BorderFactory.createEmptyBorder(scaleForGUI(10), scaleForGUI(6), scaleForGUI(4), scaleForGUI(6));
+          return BorderFactory.createEmptyBorder(SECTION_GAP, SECTION_GAP, SECTION_GAP, SECTION_GAP);
     }
 
     static void applyResponseButtonStyle(JButton button) {
@@ -167,6 +168,9 @@ final class ImmersiveDialogStyle {
     }
 
     static void applySupplementalControlStyle(Container container) {
+        if (container.getLayout() instanceof FlowLayout flowLayout) {
+            flowLayout.setAlignOnBaseline(true);
+        }
         for (Component child : container.getComponents()) {
             if (child instanceof JSpinner || child instanceof JComboBox<?>) {
                 Color signalColor = getSignalColor();

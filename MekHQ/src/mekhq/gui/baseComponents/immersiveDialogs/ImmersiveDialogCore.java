@@ -470,7 +470,7 @@ public class ImmersiveDialogCore extends JDialog {
 
         JPanel messagePanel = new JPanel(new BorderLayout());
         messagePanel.setOpaque(false);
-        messagePanel.setBorder(new EmptyBorder(scaleForGUI(4), scaleForGUI(6), scaleForGUI(8), scaleForGUI(6)));
+        messagePanel.setBorder(ImmersiveDialogStyle.createSectionSpacingBorder());
         messagePanel.add(ImmersiveDialogStyle.createSectionHeader(
               getText("ImmersiveDialog.message.title"),
               ImmersiveDialogStyle.getSignalColor()), BorderLayout.NORTH);
@@ -757,19 +757,19 @@ public class ImmersiveDialogCore extends JDialog {
                     buttonLabel.append(label);
                 }
 
-                button = new JButton(buttonLabel.toString());
+                button = new TransmissionResponseButton(buttonLabel.toString());
             } else {
                 String label = buttonStrings.btnLabel();
                 String tooltip = buttonStrings.btnTooltip();
                 if (label != null) {
                     String text = String.format("<html><div style='text-align:center;'>%s</div></html>", label);
-                    button = new JButton(text);
+                    button = new TransmissionResponseButton(text);
 
                     if (tooltip != null) {
                         button.setToolTipText(wordWrap(tooltip));
                     }
                 } else if (tooltip != null) {
-                    button = new JButton(tooltip);
+                    button = new TransmissionResponseButton(tooltip);
                 }
             }
 

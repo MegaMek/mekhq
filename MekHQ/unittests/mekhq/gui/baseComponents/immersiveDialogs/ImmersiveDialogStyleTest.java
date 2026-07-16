@@ -40,7 +40,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.FlowLayout;
 import java.awt.Graphics2D;
+import java.awt.Insets;
 import java.awt.image.BufferedImage;
 import java.util.Map;
 import javax.swing.BorderFactory;
@@ -96,6 +98,18 @@ class ImmersiveDialogStyleTest {
     }
 
     @Test
+    void centralSectionsUseUniformSpacing() throws Exception {
+        SwingUtilities.invokeAndWait(() -> {
+            Insets insets = ImmersiveDialogStyle.createSectionSpacingBorder().getBorderInsets(new JPanel());
+
+            assertTrue(insets.top > 0);
+            assertEquals(insets.top, insets.left);
+            assertEquals(insets.top, insets.bottom);
+            assertEquals(insets.top, insets.right);
+        });
+    }
+
+    @Test
     void framedPanelLeavesCutCornersTransparent() throws Exception {
         SwingUtilities.invokeAndWait(() -> {
             JPanel panel = ImmersiveDialogStyle.createFramedPanel();
@@ -138,6 +152,7 @@ class ImmersiveDialogStyleTest {
 
             ImmersiveDialogStyle.applySupplementalControlStyle(supplementalPanel);
 
+            assertTrue(((FlowLayout) supplementalPanel.getLayout()).getAlignOnBaseline());
             assertSupplementalControlStyle(getStyleMap(spinner));
             assertSupplementalControlStyle(getStyleMap(comboBox));
         });
