@@ -73,8 +73,10 @@ public final class StratConSectorGenerator {
         int oceanTargetHexes = (int) Math.round((oceanPercent / 100.0) * track.getWidth() * track.getHeight());
         StratConOceanPlacer.placeOceans(track, hydrologyProfile.type(), oceanTargetHexes, oceanTerrain);
 
-        // Mountains: gravity-driven ranges (occasionally volcanic), never over ocean. Only when the biome offers them.
-        StratConMountainPlacer.placeMountains(track, mountainTerrainFor(biome), profile.gravity());
+        // Mountains: an orogeny profile selected from the planet's conditions shapes the ranges; gravity scales their
+        // number. Volcanic where the profile calls for it, never over ocean, and only when the biome offers mountains.
+        OrogenyProfile orogeny = StratConOrogeny.getInstance().selectProfile(profile);
+        StratConMountainPlacer.placeMountains(track, mountainTerrainFor(biome), orogeny, profile.gravity());
 
         // TODO (phase 3d): replace the base fill below with the weighted dry fill, random variety, and airless set.
         fillEmptyWithBase(track, baseTerrain);

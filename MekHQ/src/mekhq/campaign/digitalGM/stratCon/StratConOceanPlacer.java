@@ -35,12 +35,9 @@ package mekhq.campaign.digitalGM.stratCon;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-import megamek.common.board.Coords;
 import megamek.common.compute.Compute;
 
 /**
@@ -56,8 +53,6 @@ import megamek.common.compute.Compute;
  */
 public final class StratConOceanPlacer {
     private StratConOceanPlacer() {}
-
-    private static final int HEX_DIRECTIONS = 6;
 
     /**
      * Paints roughly {@code oceanTargetHexes} hexes of the given ocean terrain onto the track, in the shape dictated by
@@ -120,7 +115,7 @@ public final class StratConOceanPlacer {
             }
 
             int want = min(perBlob, target - region.size());
-            region.addAll(growBlob(track, seed, want, blocked));
+            region.addAll(StratConHexGeometry.growBlob(track, seed, want, blocked));
         }
         return region;
     }
@@ -129,44 +124,7 @@ public final class StratConOceanPlacer {
      * Grows a single connected water region of roughly {@code target} hexes from the given seed.
      */
     private static Set<StratConCoords> singleBlob(StratConTrackState track, int target, StratConCoords seed) {
-        return growBlob(track, seed, target, new HashSet<>());
-    }
-
-    /**
-     * Grows a connected region from {@code seed} up to {@code size} hexes, never entering a {@code blocked} hex. The
-     * region expands from a randomly chosen frontier hex each step, producing an organic (non-circular) blob.
-     */
-    private static Set<StratConCoords> growBlob(StratConTrackState track, StratConCoords seed, int size,
-          Set<StratConCoords> blocked) {
-        Set<StratConCoords> region = new HashSet<>();
-        if ((size <= 0) || !inBounds(track, seed) || blocked.contains(seed)) {
-            return region;
-        }
-
-        List<StratConCoords> frontier = new ArrayList<>();
-        region.add(seed);
-        frontier.add(seed);
-
-        while ((region.size() < size) && !frontier.isEmpty()) {
-            StratConCoords current = frontier.get(Compute.randomInt(frontier.size()));
-
-            List<StratConCoords> candidates = new ArrayList<>();
-            for (StratConCoords neighbor : neighbors(track, current)) {
-                if (!region.contains(neighbor) && !blocked.contains(neighbor)) {
-                    candidates.add(neighbor);
-                }
-            }
-
-            if (candidates.isEmpty()) {
-                frontier.remove(current);
-                continue;
-            }
-
-            StratConCoords next = candidates.get(Compute.randomInt(candidates.size()));
-            region.add(next);
-            frontier.add(next);
-        }
-        return region;
+        return StratConHexGeometry.growBlob(track, seed, target, new HashSet<>());
     }
 
     /**
@@ -179,7 +137,7 @@ public final class StratConOceanPlacer {
         StratConCoords current = randomEdgeCoords(track);
         region.add(current);
 
-        int direction = Compute.randomInt(HEX_DIRECTIONS);
+        int direction = Compute.randomInt(StratConHexGeometry.HEX_DIRECTIONS);
         int guard = 0;
         int guardLimit = (track.getWidth() * track.getHeight() * 4) + 8;
         while ((region.size() < target) && (guard < guardLimit)) {
@@ -188,14 +146,15 @@ public final class StratConOceanPlacer {
             // Meander: occasionally turn by a single facing left or right.
             if (Compute.randomInt(3) == 0) {
                 direction = (Compute.randomInt(2) == 0) ?
-                                  ((direction + 1) % HEX_DIRECTIONS) :
-                                  ((direction + HEX_DIRECTIONS - 1) % HEX_DIRECTIONS);
+                                  ((direction + 1) % StratConHexGeometry.HEX_DIRECTIONS) :
+                                  ((direction + StratConHexGeometry.HEX_DIRECTIONS - 1) %
+                                   StratConHexGeometry.HEX_DIRECTIONS);
             }
 
             StratConCoords next = current.translate(direction);
-            if (!inBounds(track, next)) {
+            if (!StratConHexGeometry.inBounds(track, next)) {
                 // Turn back inward at the edge rather than walking off the map.
-                direction = (direction + (HEX_DIRECTIONS / 2)) % HEX_DIRECTIONS;
+                direction = (direction + (StratConHexGeometry.HEX_DIRECTIONS / 2)) % StratConHexGeometry.HEX_DIRECTIONS;
                 continue;
             }
 
@@ -224,27 +183,9 @@ public final class StratConOceanPlacer {
     private static Set<StratConCoords> neighborsOf(StratConTrackState track, Set<StratConCoords> region) {
         Set<StratConCoords> result = new HashSet<>();
         for (StratConCoords coords : region) {
-            result.addAll(neighbors(track, coords));
+            result.addAll(StratConHexGeometry.neighbors(track, coords));
         }
         return result;
-    }
-
-    private static List<StratConCoords> neighbors(StratConTrackState track, StratConCoords coords) {
-        List<StratConCoords> result = new ArrayList<>();
-        for (int direction = 0; direction < HEX_DIRECTIONS; direction++) {
-            StratConCoords neighbor = coords.translate(direction);
-            if (inBounds(track, neighbor)) {
-                result.add(neighbor);
-            }
-        }
-        return result;
-    }
-
-    private static boolean inBounds(StratConTrackState track, Coords coords) {
-        return (coords.getX() >= 0) &&
-                     (coords.getX() < track.getWidth()) &&
-                     (coords.getY() >= 0) &&
-                     (coords.getY() < track.getHeight());
     }
 
     private static StratConCoords randomCoords(StratConTrackState track) {

@@ -40,7 +40,8 @@ import java.util.function.Predicate;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests for {@link StratConMountainPlacer}: gravity-driven range counts, volcanic terrain, and ocean avoidance.
+ * Tests for {@link StratConMountainPlacer}: orogeny-driven mountain shapes, gravity-driven counts, volcanic terrain,
+ * and ocean avoidance.
  */
 class StratConMountainPlacerTest {
     private static final String MOUNTAIN = "Mountain";
@@ -55,6 +56,10 @@ class StratConMountainPlacerTest {
         return track;
     }
 
+    private static OrogenyProfile profile(OrogenyProfileType type, double rangeCountModifier, int volcanism) {
+        return new OrogenyProfile(type, null, null, null, null, null, null, rangeCountModifier, volcanism);
+    }
+
     private static long count(StratConTrackState track, Predicate<String> predicate) {
         long total = 0;
         for (int x = 0; x < track.getWidth(); x++) {
@@ -65,6 +70,10 @@ class StratConMountainPlacerTest {
             }
         }
         return total;
+    }
+
+    private static long mountainOrVolcano(StratConTrackState track) {
+        return count(track, terrain -> terrain.equals(MOUNTAIN) || terrain.equals(VOLCANO));
     }
 
     private static void fillOcean(StratConTrackState track) {
@@ -78,50 +87,94 @@ class StratConMountainPlacerTest {
     @Test
     void zeroGravity_placesNoMountains() {
         StratConTrackState track = track();
-        StratConMountainPlacer.placeMountains(track, MOUNTAIN, 0.0);
-
-        assertEquals(0, count(track, terrain -> terrain.equals(MOUNTAIN) || terrain.equals(VOLCANO)));
+        StratConMountainPlacer.placeMountains(track, MOUNTAIN, profile(OrogenyProfileType.CORDILLERA, 1.0, 10), 0.0);
+        assertEquals(0, mountainOrVolcano(track));
     }
 
     @Test
     void noMountainTerrain_placesNothing() {
         StratConTrackState track = track();
-        StratConMountainPlacer.placeMountains(track, null, 2.0);
-
+        StratConMountainPlacer.placeMountains(track, null, profile(OrogenyProfileType.CORDILLERA, 1.0, 10), 2.0);
         assertEquals(0, count(track, terrain -> !terrain.isEmpty()));
     }
 
     @Test
+    void nullOrogeny_placesNothing() {
+        StratConTrackState track = track();
+        StratConMountainPlacer.placeMountains(track, MOUNTAIN, null, 2.0);
+        assertEquals(0, count(track, terrain -> !terrain.isEmpty()));
+    }
+
+    @Test
+    void everyShape_onlyPlacesMountainOrVolcanicTerrain() {
+        for (OrogenyProfileType type : OrogenyProfileType.values()) {
+            StratConTrackState track = track();
+            StratConMountainPlacer.placeMountains(track, MOUNTAIN, profile(type, 1.5, 30), 2.0);
+
+            long stray = count(track,
+                  terrain -> !terrain.isEmpty() && !terrain.equals(MOUNTAIN) && !terrain.equals(VOLCANO));
+            assertEquals(0, stray, type + " placed non-mountain terrain");
+        }
+    }
+
+    @Test
+    void everyShape_neverOverwritesOcean() {
+        for (OrogenyProfileType type : OrogenyProfileType.values()) {
+            StratConTrackState track = track();
+            fillOcean(track);
+
+            for (int run = 0; run < 5; run++) {
+                StratConMountainPlacer.placeMountains(track, MOUNTAIN, profile(type, 1.5, 30), 2.0);
+            }
+
+            assertEquals(SIZE * SIZE, count(track, OCEAN::equals), type + " overwrote ocean");
+            assertEquals(0, mountainOrVolcano(track), type + " placed mountains on an all-ocean sector");
+        }
+    }
+
+    @Test
     void highGravity_placesMountainsAcrossRuns() {
-        long totalMountainHexes = 0;
+        long total = 0;
         for (int run = 0; run < 40; run++) {
             StratConTrackState track = track();
-            StratConMountainPlacer.placeMountains(track, MOUNTAIN, 2.0);
-            totalMountainHexes += count(track, terrain -> terrain.equals(MOUNTAIN) || terrain.equals(VOLCANO));
+            StratConMountainPlacer.placeMountains(track,
+                  MOUNTAIN,
+                  profile(OrogenyProfileType.CORDILLERA, 1.0, 10),
+                  2.0);
+            total += mountainOrVolcano(track);
         }
-        assertTrue(totalMountainHexes > 0, "high gravity should produce mountains across many runs");
+        assertTrue(total > 0, "high gravity should produce mountains across many runs");
     }
 
     @Test
-    void ranges_neverOverwriteOcean() {
-        StratConTrackState track = track();
-        fillOcean(track);
+    void higherRangeCountModifier_placesMoreMountainsOnAverage() {
+        long low = 0;
+        long high = 0;
+        for (int run = 0; run < 80; run++) {
+            StratConTrackState lowTrack = track();
+            StratConMountainPlacer.placeMountains(lowTrack, MOUNTAIN, profile(OrogenyProfileType.CORDILLERA, 0.3, 0),
+                  2.0);
+            low += mountainOrVolcano(lowTrack);
 
-        for (int run = 0; run < 10; run++) {
-            StratConMountainPlacer.placeMountains(track, MOUNTAIN, 2.0);
+            StratConTrackState highTrack = track();
+            StratConMountainPlacer.placeMountains(highTrack, MOUNTAIN, profile(OrogenyProfileType.CORDILLERA, 2.0, 0),
+                  2.0);
+            high += mountainOrVolcano(highTrack);
         }
-
-        assertEquals(SIZE * SIZE, count(track, OCEAN::equals), "ocean hexes must be untouched");
-        assertEquals(0, count(track, terrain -> terrain.equals(MOUNTAIN) || terrain.equals(VOLCANO)));
+        assertTrue(high > low, "a higher range-count modifier should place more mountains on average");
     }
 
     @Test
-    void onlyMountainOrVolcanicTerrainIsPlaced() {
-        StratConTrackState track = track();
-        StratConMountainPlacer.placeMountains(track, MOUNTAIN, 2.0);
-
-        long stray = count(track,
-              terrain -> !terrain.isEmpty() && !terrain.equals(MOUNTAIN) && !terrain.equals(VOLCANO));
-        assertEquals(0, stray, "only mountain or volcanic terrain should be placed");
+    void volcanicArc_isMostlyVolcanic() {
+        long volcano = 0;
+        long mountain = 0;
+        for (int run = 0; run < 40; run++) {
+            StratConTrackState track = track();
+            StratConMountainPlacer.placeMountains(track, MOUNTAIN, profile(OrogenyProfileType.VOLCANIC_ARC, 1.0, 70),
+                  2.0);
+            volcano += count(track, VOLCANO::equals);
+            mountain += count(track, MOUNTAIN::equals);
+        }
+        assertTrue(volcano > mountain, "a 70% volcanism arc should be mostly volcanic");
     }
 }

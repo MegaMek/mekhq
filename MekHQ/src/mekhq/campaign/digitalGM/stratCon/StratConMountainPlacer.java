@@ -33,15 +33,19 @@
 package mekhq.campaign.digitalGM.stratCon;
 
 import static java.lang.Math.max;
+import static java.lang.Math.round;
 
-import jakarta.annotation.Nullable;
-import megamek.common.board.Coords;
+import java.util.HashSet;
+import java.util.Set;
+
+import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 
 /**
- * Places mountain ranges onto a StratCon track. The number of ranges scales with the planet's gravity (a more rugged
- * world has more relief), each range is drawn as a strip, and ranges never overwrite ocean. A small fraction of ranges
- * are drawn as volcanic terrain instead of ordinary mountains.
+ * Places mountains onto a StratCon track in a shape determined by an {@link OrogenyProfile}. The number of mountain
+ * features scales with gravity and the profile's range-count modifier; each profile arranges them differently (long
+ * parallel ranges, short parallel ridges, a single upland, scattered peaks, a volcanic arc, and so on). A per-profile
+ * fraction of features are drawn as volcanic terrain, and mountains never overwrite ocean.
  *
  * @author Illiani
  * @since 0.51.01
@@ -49,80 +53,217 @@ import megamek.common.compute.Compute;
 public final class StratConMountainPlacer {
     private StratConMountainPlacer() {}
 
-    private static final int HEX_DIRECTIONS = 6;
-
-    /** The maximum number of mountain ranges, reached at high gravity. */
+    /** The maximum base feature count, reached at high gravity. */
     private static final int MAX_RANGES = 4;
 
-    /** Percent chance that a given range is drawn as volcanic terrain rather than ordinary mountains. */
-    private static final int VOLCANISM_CHANCE = 10;
-
-    /** The volcanic terrain type used for a volcanic range. */
+    /** The volcanic terrain type used for a volcanic feature. */
     private static final String VOLCANO_TERRAIN = "Volcano";
 
+    // Ridge lengths as a fraction of the larger sector dimension.
+    private static final double LONG_RIDGE_FRACTION = 1.0;
+    private static final double SHORT_RIDGE_FRACTION = 0.34;
+    private static final double ERODED_RIDGE_FRACTION = 0.2;
+
+    // Upland sizes as a fraction of the sector, multiplied by the feature count and capped.
+    private static final double MASSIF_FRACTION = 0.05;
+    private static final double PLATEAU_FRACTION = 0.08;
+    private static final double MAX_UPLAND_FRACTION = 0.5;
+
+    private static final int CLUSTER_MIN_SIZE = 2;
+    private static final int CLUSTER_SIZE_SPREAD = 4;
+    private static final int LAND_SEED_ATTEMPTS = 20;
+
     /**
-     * Places gravity-driven mountain ranges on the track.
+     * Places mountains on the track according to the given orogeny profile.
      *
      * @param track           the track to paint
      * @param mountainTerrain the biome's mountain terrain type, or {@code null} when the biome offers no mountains (in
-     *                        which case no ranges are placed)
-     * @param gravity         the planet's surface gravity in G; higher gravity means more ranges
+     *                        which case nothing is placed)
+     * @param orogeny         the selected orogeny profile, or {@code null} to place nothing
+     * @param gravity         the planet's surface gravity in G; higher gravity means more mountains
      */
-    public static void placeMountains(StratConTrackState track, @Nullable String mountainTerrain, double gravity) {
-        if (mountainTerrain == null) {
+    public static void placeMountains(StratConTrackState track, @Nullable String mountainTerrain,
+          @Nullable OrogenyProfile orogeny, double gravity) {
+        if ((mountainTerrain == null) || (orogeny == null)) {
             return;
         }
 
-        int maxRanges = Math.clamp(Math.round(gravity * 2), 0, MAX_RANGES);
-        int rangeCount = Compute.randomInt(maxRanges + 1);
+        int intensity = Math.clamp(round(gravity * 2 * orogeny.rangeCountModifierOrDefault()), 0, MAX_RANGES);
+        int features = Compute.randomInt(intensity + 1);
+        if (features == 0) {
+            return;
+        }
 
-        for (int range = 0; range < rangeCount; range++) {
-            boolean volcanic = Compute.randomInt(100) < VOLCANISM_CHANCE;
-            drawRange(track, volcanic ? VOLCANO_TERRAIN : mountainTerrain);
+        int volcanism = orogeny.volcanismChanceOrDefault();
+        switch (orogeny.type()) {
+            case CORDILLERA -> parallelRidges(track, mountainTerrain, volcanism, features, LONG_RIDGE_FRACTION);
+            case BASIN_AND_RANGE ->
+                  parallelRidges(track, mountainTerrain, volcanism, features * 2, SHORT_RIDGE_FRACTION);
+            case ERODED_ROLLING -> parallelRidges(track, mountainTerrain, volcanism, features, ERODED_RIDGE_FRACTION);
+            case MASSIF -> upland(track, mountainTerrain, volcanism, features, MASSIF_FRACTION);
+            case PLATEAU -> upland(track, mountainTerrain, volcanism, features, PLATEAU_FRACTION);
+            case SCATTERED_PEAKS -> scatteredPeaks(track, mountainTerrain, volcanism, features * 4);
+            case SHIELD_CRATERED -> clusters(track, mountainTerrain, volcanism, features * 2);
+            case VOLCANIC_ARC -> arc(track, mountainTerrain, volcanism, features);
         }
     }
 
     /**
-     * Draws a single range as a strip from a random start hex, running a random length in a random hex direction. Ocean
-     * hexes on the strip are skipped, so a range never crosses open water.
+     * Draws {@code ridgeCount} roughly parallel straight ridges (all sharing one heading), each of a length scaled from
+     * the sector size.
      */
-    private static void drawRange(StratConTrackState track, String terrain) {
-        int width = track.getWidth();
-        int height = track.getHeight();
+    private static void parallelRidges(StratConTrackState track, String mountainTerrain, int volcanism, int ridgeCount,
+          double lengthFraction) {
+        int length = max(2, (int) round(max(track.getWidth(), track.getHeight()) * lengthFraction));
+        int heading = Compute.randomInt(StratConHexGeometry.HEX_DIRECTIONS);
 
-        StratConCoords start = new StratConCoords(Compute.randomInt(width), Compute.randomInt(height));
-        int direction = Compute.randomInt(HEX_DIRECTIONS);
-        int length = 2 + Compute.randomInt(max(1, max(width, height) - 1));
-
-        StratConCoords end = start;
-        for (int step = 0; step < length; step++) {
-            StratConCoords next = end.translate(direction);
-            if (!inBounds(track, next)) {
-                break;
-            }
-            end = next;
-        }
-
-        // intervening() walks the line with plain Coords and stops on dest.equals(current). StratConCoords.equals is
-        // class-sensitive, so the endpoints passed here must be plain Coords, or the walk never terminates.
-        Coords lineStart = new Coords(start.getX(), start.getY());
-        Coords lineEnd = new Coords(end.getX(), end.getY());
-        for (Coords coords : Coords.intervening(lineStart, lineEnd)) {
-            StratConCoords hex = new StratConCoords(coords.getX(), coords.getY());
-            if (!inBounds(track, hex)) {
-                continue;
-            }
-            if (StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(hex))) {
-                continue;
-            }
-            track.setTerrainTile(hex, terrain);
+        for (int ridge = 0; ridge < ridgeCount; ridge++) {
+            drawStrip(track, randomCoords(track), heading, length, terrainFor(mountainTerrain, volcanism));
         }
     }
 
-    private static boolean inBounds(StratConTrackState track, Coords coords) {
-        return (coords.getX() >= 0) &&
-                     (coords.getX() < track.getWidth()) &&
-                     (coords.getY() >= 0) &&
-                     (coords.getY() < track.getHeight());
+    /**
+     * Grows a single upland region sized from the sector and feature count, painted as one terrain (all mountains, or
+     * all volcanic).
+     */
+    private static void upland(StratConTrackState track, String mountainTerrain, int volcanism, int features,
+          double fraction) {
+        int total = track.getWidth() * track.getHeight();
+        int size = Math.clamp(round(total * fraction * features), 3, (int) round(total * MAX_UPLAND_FRACTION));
+
+        Set<StratConCoords> blob = StratConHexGeometry.growBlob(track,
+              randomLandCoords(track),
+              size,
+              oceanHexes(track));
+        String terrain = terrainFor(mountainTerrain, volcanism);
+        for (StratConCoords coords : blob) {
+            track.setTerrainTile(coords, terrain);
+        }
+    }
+
+    /**
+     * Places several small mountain/volcanic clusters at random land seeds.
+     */
+    private static void clusters(StratConTrackState track, String mountainTerrain, int volcanism, int clusterCount) {
+        Set<StratConCoords> ocean = oceanHexes(track);
+        for (int cluster = 0; cluster < clusterCount; cluster++) {
+            int size = CLUSTER_MIN_SIZE + Compute.randomInt(CLUSTER_SIZE_SPREAD);
+            Set<StratConCoords> blob = StratConHexGeometry.growBlob(track, randomLandCoords(track), size, ocean);
+            String terrain = terrainFor(mountainTerrain, volcanism);
+            for (StratConCoords coords : blob) {
+                track.setTerrainTile(coords, terrain);
+            }
+        }
+    }
+
+    /**
+     * Sprinkles isolated single-hex peaks across the land.
+     */
+    private static void scatteredPeaks(StratConTrackState track, String mountainTerrain, int volcanism, int peakCount) {
+        for (int peak = 0; peak < peakCount; peak++) {
+            StratConCoords coords = randomLandCoords(track);
+            if (!isOcean(track, coords)) {
+                track.setTerrainTile(coords, terrainFor(mountainTerrain, volcanism));
+            }
+        }
+    }
+
+    /**
+     * Draws a single curved chain by walking from a random edge and turning consistently one way, producing an arc
+     * rather than a straight line. Volcanism is rolled per hex, so a high-volcanism profile reads as mostly volcanic.
+     */
+    private static void arc(StratConTrackState track, String mountainTerrain, int volcanism, int features) {
+        int length = max(4, (int) round(max(track.getWidth(), track.getHeight()) * (1.0 + (features * 0.4))));
+        StratConCoords current = randomEdgeCoords(track);
+        int heading = Compute.randomInt(StratConHexGeometry.HEX_DIRECTIONS);
+        int turnBias = (Compute.randomInt(2) == 0) ? 1 : (StratConHexGeometry.HEX_DIRECTIONS - 1);
+
+        for (int step = 0; step < length; step++) {
+            if (StratConHexGeometry.inBounds(track, current) && !isOcean(track, current)) {
+                track.setTerrainTile(current, terrainFor(mountainTerrain, volcanism));
+            }
+
+            if ((step % 3) == 2) {
+                heading = (heading + turnBias) % StratConHexGeometry.HEX_DIRECTIONS;
+            }
+
+            StratConCoords next = current.translate(heading);
+            if (!StratConHexGeometry.inBounds(track, next)) {
+                heading = (heading + (StratConHexGeometry.HEX_DIRECTIONS / 2)) % StratConHexGeometry.HEX_DIRECTIONS;
+                next = current.translate(heading);
+                if (!StratConHexGeometry.inBounds(track, next)) {
+                    break;
+                }
+            }
+            current = next;
+        }
+    }
+
+    /**
+     * Walks a straight strip of {@code length} hexes from {@code start} in {@code heading}, painting each in-bounds,
+     * non-ocean hex.
+     */
+    private static void drawStrip(StratConTrackState track, StratConCoords start, int heading, int length,
+          String terrain) {
+        StratConCoords current = start;
+        for (int step = 0; step < length; step++) {
+            if (StratConHexGeometry.inBounds(track, current) && !isOcean(track, current)) {
+                track.setTerrainTile(current, terrain);
+            }
+            StratConCoords next = current.translate(heading);
+            if (!StratConHexGeometry.inBounds(track, next)) {
+                break;
+            }
+            current = next;
+        }
+    }
+
+    private static String terrainFor(String mountainTerrain, int volcanism) {
+        return (Compute.randomInt(100) < volcanism) ? VOLCANO_TERRAIN : mountainTerrain;
+    }
+
+    private static boolean isOcean(StratConTrackState track, StratConCoords coords) {
+        return StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(coords));
+    }
+
+    private static Set<StratConCoords> oceanHexes(StratConTrackState track) {
+        Set<StratConCoords> ocean = new HashSet<>();
+        for (int x = 0; x < track.getWidth(); x++) {
+            for (int y = 0; y < track.getHeight(); y++) {
+                StratConCoords coords = new StratConCoords(x, y);
+                if (isOcean(track, coords)) {
+                    ocean.add(coords);
+                }
+            }
+        }
+        return ocean;
+    }
+
+    private static StratConCoords randomCoords(StratConTrackState track) {
+        return new StratConCoords(Compute.randomInt(track.getWidth()), Compute.randomInt(track.getHeight()));
+    }
+
+    /**
+     * @return a random non-ocean hex, or the center hex if no land hex is found within a few attempts
+     */
+    private static StratConCoords randomLandCoords(StratConTrackState track) {
+        for (int attempt = 0; attempt < LAND_SEED_ATTEMPTS; attempt++) {
+            StratConCoords coords = randomCoords(track);
+            if (!isOcean(track, coords)) {
+                return coords;
+            }
+        }
+        return new StratConCoords(track.getWidth() / 2, track.getHeight() / 2);
+    }
+
+    private static StratConCoords randomEdgeCoords(StratConTrackState track) {
+        int width = track.getWidth();
+        int height = track.getHeight();
+        return switch (Compute.randomInt(4)) {
+            case 0 -> new StratConCoords(Compute.randomInt(width), 0);
+            case 1 -> new StratConCoords(Compute.randomInt(width), height - 1);
+            case 2 -> new StratConCoords(0, Compute.randomInt(height));
+            default -> new StratConCoords(width - 1, Compute.randomInt(height));
+        };
     }
 }
