@@ -47,9 +47,10 @@ import mekhq.MHQConstants;
  * Loads the urban (settlement) profiles used by improved sector generation from {@code UrbanProfiles.yaml} and picks
  * one for a planet from its combined conditions.
  *
- * <p>Selection is multi-factor, like orogeny: a profile's weight is the product of Gaussian factors for population
- * ({@code log10}), water coverage, habitability, and technology level, each skipped when the profile is indifferent to
- * it. Neighboring profiles still appear for variety; larger sigmas mean more variety.</p>
+ * <p>Selection is multi-factor, like orogeny: a profile's weight is the geometric mean of the Gaussian factors for
+ * population ({@code log10}), water coverage, habitability, and technology level, each skipped when the profile is
+ * indifferent to it. The geometric mean keeps profiles that weight more conditions from being penalized for it.
+ * Neighboring profiles still appear for variety; larger sigmas mean more variety.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -197,22 +198,29 @@ public class StratConUrban {
      */
     static double weight(UrbanProfile profile, PlanetProfile planet, double populationSigma, double waterSigma,
           double habitabilitySigma, double techSigma) {
-        double weight = 1.0;
+        double logSum = 0.0;
+        int factors = 0;
 
         if (profile.populationCenter() != null) {
-            weight *= gaussian(planet.populationLog(), profile.populationCenter(), populationSigma);
+            logSum += Math.log(gaussian(planet.populationLog(), profile.populationCenter(), populationSigma));
+            factors++;
         }
         if (profile.waterCenter() != null) {
-            weight *= gaussian(planet.waterPercent(), profile.waterCenter(), waterSigma);
+            logSum += Math.log(gaussian(planet.waterPercent(), profile.waterCenter(), waterSigma));
+            factors++;
         }
         if (profile.habitabilityCenter() != null) {
-            weight *= gaussian(planet.habitability(), profile.habitabilityCenter(), habitabilitySigma);
+            logSum += Math.log(gaussian(planet.habitability(), profile.habitabilityCenter(), habitabilitySigma));
+            factors++;
         }
         if (profile.techCenter() != null) {
-            weight *= gaussian(planet.techLevel(), profile.techCenter(), techSigma);
+            logSum += Math.log(gaussian(planet.techLevel(), profile.techCenter(), techSigma));
+            factors++;
         }
 
-        return weight;
+        // Geometric mean of the per-condition Gaussians, so a profile that weights more conditions is not penalized for
+        // it. A profile indifferent to everything scores a neutral 1.0.
+        return (factors == 0) ? 1.0 : Math.exp(logSum / factors);
     }
 
     private double weightOf(UrbanProfile profile, PlanetProfile planet) {

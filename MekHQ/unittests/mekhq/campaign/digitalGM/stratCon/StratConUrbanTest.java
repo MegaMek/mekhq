@@ -107,7 +107,8 @@ class StratConUrbanTest {
 
     @Test
     void teemingIndustrialWorld_favorsConurbation() {
-        assertEquals(UrbanProfileType.CONURBATION, highestWeightType(planet(10, 40, 15, HPGRating.A)));
+        // water midway between the coastal and riverine centers, so population + tech decide
+        assertEquals(UrbanProfileType.CONURBATION, highestWeightType(planet(10, 50, 15, HPGRating.A)));
     }
 
     @Test

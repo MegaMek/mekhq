@@ -175,8 +175,10 @@ public class StratConOrogeny {
     }
 
     /**
-     * Computes a profile's unnormalized weight for a planet: the product of Gaussian factors for the conditions the
-     * profile cares about, times its categorical multipliers for the planet's composition and atmosphere.
+     * Computes a profile's unnormalized weight for a planet: the geometric mean of the Gaussian factors for the
+     * conditions the profile cares about, times its categorical multipliers for the planet's composition and
+     * atmosphere. The geometric mean keeps profiles that weight more conditions from being penalized simply for caring
+     * about more of them.
      *
      * @param profile          the profile to weight
      * @param planet           the planet's resolved data
@@ -188,17 +190,23 @@ public class StratConOrogeny {
      */
     static double weight(OrogenyProfile profile, PlanetProfile planet, double gravitySigma, double temperatureSigma,
           double waterSigma) {
-        double weight = 1.0;
+        double logSum = 0.0;
+        int factors = 0;
 
         if (profile.gravityCenter() != null) {
-            weight *= gaussian(planet.gravity(), profile.gravityCenter(), gravitySigma);
+            logSum += Math.log(gaussian(planet.gravity(), profile.gravityCenter(), gravitySigma));
+            factors++;
         }
         if (profile.temperatureCenter() != null) {
-            weight *= gaussian(planet.temperatureCelsius(), profile.temperatureCenter(), temperatureSigma);
+            logSum += Math.log(gaussian(planet.temperatureCelsius(), profile.temperatureCenter(), temperatureSigma));
+            factors++;
         }
         if (profile.waterCenter() != null) {
-            weight *= gaussian(planet.waterPercent(), profile.waterCenter(), waterSigma);
+            logSum += Math.log(gaussian(planet.waterPercent(), profile.waterCenter(), waterSigma));
+            factors++;
         }
+
+        double weight = (factors == 0) ? 1.0 : Math.exp(logSum / factors);
 
         if (planet.hasRockyComposition()) {
             weight *= profile.rockyMultiplierOrDefault();
