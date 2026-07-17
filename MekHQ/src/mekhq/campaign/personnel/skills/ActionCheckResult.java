@@ -34,7 +34,7 @@
 package mekhq.campaign.personnel.skills;
 
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.BARELY_MADE_IT;
-import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginOfSuccessObjectFromMarginValue;
+import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.getMarginOfSuccessObject;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
@@ -102,7 +102,14 @@ public class ActionCheckResult {
      * @return {@code true} if the margin qualifies as a success, {@code false} otherwise
      */
     public static boolean isSuccess(int marginOfSuccess) {
-        return marginOfSuccess >= BARELY_MADE_IT.getValue();
+        return marginOfSuccess >= BARELY_MADE_IT.getLowerBound();
+    }
+
+    /**
+     * Returns corresponding {@link MarginOfSuccess} value for report generation.
+     */
+    public MarginOfSuccess getReportMargin() {
+        return getMarginOfSuccessObject(marginOfSuccess);
     }
 
     /**
@@ -123,18 +130,9 @@ public class ActionCheckResult {
             report.append(" ").append(getTextAt(RESOURCE_BUNDLE, "actionCheckResult.rerolled"));
         }
         if (includeMarginsOfSuccessText) {
-            String color;
-            int neutralMarginValue = BARELY_MADE_IT.getValue();
-            if (marginOfSuccess == neutralMarginValue) {
-                color = ReportingUtilities.getWarningColor();
-            } else if (marginOfSuccess < neutralMarginValue) {
-                color = ReportingUtilities.getNegativeColor();
-            } else {
-                color = ReportingUtilities.getPositiveColor();
-            }
-            MarginOfSuccess marginOfSuccessObject = getMarginOfSuccessObjectFromMarginValue(marginOfSuccess);
-            String marginOfSuccessText =
-                  ReportingUtilities.messageSurroundedBySpanWithColor(color, marginOfSuccessObject.getLabel());
+            MarginOfSuccess reportMargin = getReportMargin();
+            String marginOfSuccessText = ReportingUtilities.messageSurroundedBySpanWithColor(
+                  reportMargin.getColor(), reportMargin.getLabel());
             report.append(" ").append(marginOfSuccessText);
         }
         return report.toString();

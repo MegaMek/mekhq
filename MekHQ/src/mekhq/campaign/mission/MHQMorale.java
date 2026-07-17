@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -52,11 +52,11 @@ import java.time.LocalDate;
 import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.randomEvents.prisoners.PrisonerEventManager;
 import mekhq.campaign.randomEvents.prisoners.PrisonerMissionEndEvent;
-import mekhq.campaign.stratCon.StratConCampaignState;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 
@@ -590,15 +590,15 @@ public class MHQMorale {
                 contract.setRoutEndDate(today.plusMonths(max(1, d6() - 3)).minusDays(1));
 
                 PrisonerMissionEndEvent prisoners = new PrisonerMissionEndEvent(campaign, contract);
-                if (!campaign.getFriendlyPrisoners().isEmpty()) {
+                if (!campaign.getPlayerForce().getHumanResources().getFriendlyPrisoners().isEmpty()) {
                     prisoners.handlePrisoners(true, true);
                 }
 
-                if (!campaign.getCurrentPrisoners().isEmpty()) {
+                if (!campaign.getPlayerForce().getHumanResources().getCurrentPrisoners().isEmpty()) {
                     prisoners.handlePrisoners(true, false);
                 }
 
-                campaign.setTemporaryPrisonerCapacity(DEFAULT_TEMPORARY_CAPACITY);
+                campaign.getPlayerForce().setTemporaryPrisonerCapacity(DEFAULT_TEMPORARY_CAPACITY);
             } else {
                 new ImmersiveDialogNotification(campaign, getFormattedTextAt(RESOURCE_BUNDLE,
                       "stratCon.earlyContractEnd.objectives", contract.getName()), true);

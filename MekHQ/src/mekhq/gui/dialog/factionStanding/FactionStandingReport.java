@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -156,7 +156,7 @@ public class FactionStandingReport extends JDialog {
         this.today = campaign.getLocalDate();
         this.gameYear = today.getYear();
         this.campaignFaction = campaign.getFaction();
-        this.factionStandings = campaign.getFactionStandings();
+        this.factionStandings = campaign.getPlayerForce().getFactionStandings();
         factions = Factions.getInstance();
         this.campaignOptions = campaign.getCampaignOptions();
         this.isFactionStandingEnabled = campaignOptions.isTrackFactionStanding();

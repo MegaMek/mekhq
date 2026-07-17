@@ -66,6 +66,7 @@ import megamek.client.ui.util.UIUtil;
 import megamek.common.event.Subscribe;
 import megamek.common.ui.FastJScrollPane;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.events.NewDayEvent;
 import mekhq.campaign.events.OptionsChangedEvent;
@@ -190,9 +191,11 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
 
         JCheckBox chkAvoidAbandonedSystems = new JCheckBox(resourceMap.getString("chkAvoidAbandonedSystems.text"));
         chkAvoidAbandonedSystems.setToolTipText(wordWrap(resourceMap.getString("chkAvoidAbandonedSystems.toolTipText")));
-        chkAvoidAbandonedSystems.addActionListener(ev -> getCampaign().setIsAvoidingEmptySystems(
-              chkAvoidAbandonedSystems.isSelected()));
-        chkAvoidAbandonedSystems.setSelected(getCampaign().isAvoidingEmptySystems());
+        chkAvoidAbandonedSystems.addActionListener(ev -> {
+            mekhq.campaign.Campaign campaign = getCampaign();
+            campaign.getPlayerForce().setIsAvoidingEmptySystems(chkAvoidAbandonedSystems.isSelected());
+        });
+        chkAvoidAbandonedSystems.setSelected(getCampaign().getPlayerForce().isAvoidingEmptySystems());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 0;
@@ -204,9 +207,11 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
 
         JCheckBox chkUseCommandCircuits = new JCheckBox(resourceMap.getString("chkUseCommandCircuits.text"));
         chkUseCommandCircuits.setToolTipText(wordWrap(resourceMap.getString("chkUseCommandCircuits.toolTipText")));
-        chkUseCommandCircuits.addActionListener(ev -> getCampaign().setIsOverridingCommandCircuitRequirements(
-              chkUseCommandCircuits.isSelected()));
-        chkUseCommandCircuits.setSelected(getCampaign().isOverridingCommandCircuitRequirements());
+        chkUseCommandCircuits.addActionListener(ev -> {
+            Campaign campaign = getCampaign();
+            campaign.getPlayerForce().setIsOverridingCommandCircuitRequirements(chkUseCommandCircuits.isSelected());
+        });
+        chkUseCommandCircuits.setSelected(getCampaign().getPlayerForce().isOverridingCommandCircuitRequirements());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 5;
         gridBagConstraints.gridy = 0;
@@ -237,7 +242,10 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         //the actual map
         panMap = new InterstellarMapPanel(getCampaign(), getCampaignGui());
         // let's go ahead and zoom in on the current location
-        panMap.setSelectedSystem(getCampaign().getCurrentLocation().getCurrentSystem());
+        panMap.setSelectedSystem(getCampaign().getPlayerForce()
+                                       .getForceDetachment()
+                                       .getCurrentLocation()
+                                       .getCurrentSystem());
         panMapView.add(panMap, BorderLayout.CENTER);
 
         JPanel pnlTutorial = new TutorialHyperlinkPanel("mapTab.keyText");
@@ -312,19 +320,21 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
 
         boolean isUseCommandCircuits = getCampaign().isUseCommandCircuit();
         int duration = (int) ceil(jumpPath.getTotalTime(getCampaign().getLocalDate(),
-              getCampaign().getCurrentLocation().getTransitTime(), isUseCommandCircuits));
+              getCampaign().getPlayerForce().getForceDetachment().getCurrentLocation().getTransitTime(),
+              isUseCommandCircuits));
 
         TransportCostCalculations transportCostCalculations = getCampaign().getTransportCostCalculation(EXP_REGULAR);
         Money journeyCost = transportCostCalculations.calculateJumpCostForEntireJourney(duration, jumpPath.getJumps());
 
-        String jumpReport = TransportCostCalculations.performJumpTransaction(getCampaign().getFinances(), jumpPath,
+        String jumpReport = TransportCostCalculations.performJumpTransaction(getCampaign().getPlayerForce()
+                                                                                   .getFinances(), jumpPath,
               getCampaign().getLocalDate(), journeyCost, getCampaign().getCurrentSystem());
 
         if (!jumpReport.isBlank()) {
             getCampaign().addReport(GENERAL, jumpReport);
         }
 
-        getCampaign().getCurrentLocation().setJumpPath(panMap.getJumpPath());
+        getCampaign().getPlayerForce().getForceDetachment().getCurrentLocation().setJumpPath(panMap.getJumpPath());
         refreshPlanetView();
 
         panMap.setJumpPath(new JumpPath());
@@ -334,7 +344,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
 
         abandonMissingPersonnel(getCampaign());
 
-        NewPersonnelMarket personnelMarket = getCampaign().getNewPersonnelMarket();
+        NewPersonnelMarket personnelMarket = getCampaign().getPlayerForce().getHumanResources().getNewPersonnelMarket();
         if (personnelMarket.getAssociatedPersonnelMarketStyle() == MEKHQ) {
             personnelMarket.clearCurrentApplicants();
         }

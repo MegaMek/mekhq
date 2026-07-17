@@ -38,6 +38,8 @@ import static java.lang.Math.max;
 import static java.lang.Math.round;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
+import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.processIgnoredDynamicScenario;
+import static mekhq.campaign.digitalGM.stratCon.SupportPointNegotiation.negotiateAdditionalSupportPoints;
 import static mekhq.campaign.enums.DailyReportType.ACQUISITIONS;
 import static mekhq.campaign.enums.DailyReportType.BATTLE;
 import static mekhq.campaign.enums.DailyReportType.FINANCES;
@@ -48,7 +50,6 @@ import static mekhq.campaign.enums.DailyReportType.POLITICS;
 import static mekhq.campaign.enums.DailyReportType.SKILL_CHECKS;
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
-import static mekhq.campaign.force.Formation.FORMATION_ORIGIN;
 import static mekhq.campaign.force.Formation.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performResupply;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.processAbandonedConvoy;
@@ -80,8 +81,6 @@ import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionT
 import static mekhq.campaign.randomEvents.other.GrayMonday.GRAY_MONDAY_EVENTS_BEGIN;
 import static mekhq.campaign.randomEvents.other.GrayMonday.GRAY_MONDAY_EVENTS_END;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerStatus.BONDSMAN;
-import static mekhq.campaign.stratCon.StratConRulesManager.processIgnoredDynamicScenario;
-import static mekhq.campaign.stratCon.SupportPointNegotiation.negotiateAdditionalSupportPoints;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.PIRACY_SUCCESS_INDEX_FACTION_CODE;
@@ -110,8 +109,11 @@ import megamek.logging.MMLogger;
 import mekhq.MHQOptions;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign.AdministratorSpecialization;
-import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
+import mekhq.campaign.digitalGM.stratCon.StratConCoords;
+import mekhq.campaign.digitalGM.stratCon.StratConFacility;
+import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.DayEndingEvent;
 import mekhq.campaign.events.DeploymentChangedEvent;
@@ -122,7 +124,9 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationNewDayUtil;
+import mekhq.campaign.market.ForceShoppingList;
 import mekhq.campaign.market.PartsInUseManager;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
@@ -177,10 +181,6 @@ import mekhq.campaign.randomEvents.other.RiotScenario;
 import mekhq.campaign.randomEvents.other.VoiceOfKerensky;
 import mekhq.campaign.randomEvents.prisoners.PrisonerEventManager;
 import mekhq.campaign.randomEvents.prisoners.RecoverMIAPersonnel;
-import mekhq.campaign.stratCon.StratConCampaignState;
-import mekhq.campaign.stratCon.StratConCoords;
-import mekhq.campaign.stratCon.StratConFacility;
-import mekhq.campaign.stratCon.StratConTrackState;
 import mekhq.campaign.unit.Maintenance;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -244,17 +244,47 @@ public class CampaignNewDayManager {
         this.campaign = campaign;
         this.campaignOptions = campaign.getCampaignOptions();
         this.faction = campaign.getFaction();
-        this.finances = campaign.getFinances();
-        this.updatedLocation = campaign.getCurrentLocation();
+        this.finances = campaign.getPlayerForce().getFinances();
+        this.updatedLocation = campaign.getPlayerForce().getForceDetachment().getCurrentLocation();
     }
 
-    public void reset() {
-        this.campaignOptions = campaign.getCampaignOptions();
-        this.faction = campaign.getFaction();
-        this.finances = campaign.getFinances();
-        this.updatedLocation = campaign.getCurrentLocation();
+    public static void showRarePersonnelDialog(Campaign campaign, boolean isCampaignStart) {
+        if (!campaign.getPlayerForce().getHumanResources().getNewPersonnelMarket().getHasRarePersonnel()) {
+            return;
+        }
 
-        startDayWithNoInterruptions = true;
+        StringBuilder oocReport = new StringBuilder(
+              campaign.getResources().getString("personnelMarket.rareProfession.outOfCharacter"));
+        for (PersonnelRole profession : campaign.getPlayerForce()
+                                              .getHumanResources()
+                                              .getNewPersonnelMarket()
+                                              .getRareProfessions()) {
+            oocReport.append("<p>- ").append(profession.getLabel(campaign.isClanCampaign())).append("</p>");
+        }
+
+        List<String> buttons = new ArrayList<>();
+        buttons.add(campaign.getResources().getString("personnelMarket.rareProfession.button.later"));
+        buttons.add(campaign.getResources().getString("personnelMarket.rareProfession.button.decline"));
+        if (!isCampaignStart) {
+            buttons.add(campaign.getResources().getString("personnelMarket.rareProfession.button.immediate"));
+        }
+
+        ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
+              campaign.getPlayerForce().getHumanResources()
+                    .getSeniorAdminPerson(AdministratorSpecialization.HR,
+                          campaign.getCampaignOptions(),
+                          campaign.isClanCampaign(),
+                          campaign.getLocalDate()),
+              null,
+              campaign.getResources().getString("personnelMarket.rareProfession.inCharacter"),
+              buttons,
+              oocReport.toString(),
+              null,
+              true);
+
+        if (dialog.getDialogChoice() == 2) {
+            campaign.getPlayerForce().getHumanResources().getNewPersonnelMarket().showPersonnelMarketDialog();
+        }
     }
 
     @Subscribe
@@ -264,6 +294,15 @@ public class CampaignNewDayManager {
         if (event.getCampaign() == this.campaign) {
             startDayWithNoInterruptions = false;
         }
+    }
+
+    public void reset() {
+        this.campaignOptions = campaign.getCampaignOptions();
+        this.faction = campaign.getFaction();
+        this.finances = campaign.getPlayerForce().getFinances();
+        this.updatedLocation = campaign.getPlayerForce().getForceDetachment().getCurrentLocation();
+
+        startDayWithNoInterruptions = true;
     }
 
     /**
@@ -313,64 +352,112 @@ public class CampaignNewDayManager {
             if (!mhqOptions.getNewDaySoldierPoolNoRelease()) {
                 campaign.emptyTempCrewPoolForRole(PersonnelRole.SOLDIER);
             }
-            campaign.fillTempCrewPoolForRole(PersonnelRole.SOLDIER);
-            campaign.distributeTempCrewPoolToUnits(PersonnelRole.SOLDIER);
+            campaign.getPlayerForce()
+                  .getHumanResources()
+                  .fillTempCrewPoolForRole(campaign, campaign.getCampaignOptions(),
+                        PersonnelRole.SOLDIER);
+            campaign.getPlayerForce()
+                  .getHumanResources()
+                  .distributeTempCrewPoolToUnits(campaign, campaign.getCampaignOptions(),
+                        PersonnelRole.SOLDIER);
         }
 
         if (mhqOptions.getNewDayBattleArmorPoolFill()) {
             if (!mhqOptions.getNewDayBattleArmorPoolNoRelease()) {
                 campaign.emptyTempCrewPoolForRole(PersonnelRole.BATTLE_ARMOUR);
             }
-            campaign.fillTempCrewPoolForRole(PersonnelRole.BATTLE_ARMOUR);
-            campaign.distributeTempCrewPoolToUnits(PersonnelRole.BATTLE_ARMOUR);
+            campaign.getPlayerForce()
+                  .getHumanResources()
+                  .fillTempCrewPoolForRole(campaign, campaign.getCampaignOptions(),
+                        PersonnelRole.BATTLE_ARMOUR);
+            campaign.getPlayerForce()
+                  .getHumanResources()
+                  .distributeTempCrewPoolToUnits(campaign, campaign.getCampaignOptions(),
+                        PersonnelRole.BATTLE_ARMOUR);
         }
 
         if (mhqOptions.getNewDayVehicleCrewGroundPoolFill()) {
             if (!mhqOptions.getNewDayVehicleCrewGroundPoolNoRelease()) {
                 campaign.emptyTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_GROUND);
             }
-            campaign.fillTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_GROUND);
-            campaign.distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_GROUND);
+            campaign.getPlayerForce()
+                  .getHumanResources()
+                  .fillTempCrewPoolForRole(campaign, campaign.getCampaignOptions(),
+                        PersonnelRole.VEHICLE_CREW_GROUND);
+            campaign.getPlayerForce()
+                  .getHumanResources()
+                  .distributeTempCrewPoolToUnits(campaign, campaign.getCampaignOptions(),
+                        PersonnelRole.VEHICLE_CREW_GROUND);
         }
 
         if (mhqOptions.getNewDayVehicleCrewVTOLPoolFill()) {
             if (!mhqOptions.getNewDayVehicleCrewVTOLPoolNoRelease()) {
                 campaign.emptyTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_VTOL);
             }
-            campaign.fillTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_VTOL);
-            campaign.distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_VTOL);
+            campaign.getPlayerForce()
+                  .getHumanResources()
+                  .fillTempCrewPoolForRole(campaign, campaign.getCampaignOptions(),
+                        PersonnelRole.VEHICLE_CREW_VTOL);
+            campaign.getPlayerForce()
+                  .getHumanResources()
+                  .distributeTempCrewPoolToUnits(campaign, campaign.getCampaignOptions(),
+                        PersonnelRole.VEHICLE_CREW_VTOL);
         }
 
         if (mhqOptions.getNewDayVehicleCrewNavalPoolFill()) {
             if (!mhqOptions.getNewDayVehicleCrewNavalPoolNoRelease()) {
                 campaign.emptyTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_NAVAL);
             }
-            campaign.fillTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_NAVAL);
-            campaign.distributeTempCrewPoolToUnits(PersonnelRole.VEHICLE_CREW_NAVAL);
+            campaign.getPlayerForce()
+                  .getHumanResources()
+                  .fillTempCrewPoolForRole(campaign, campaign.getCampaignOptions(),
+                        PersonnelRole.VEHICLE_CREW_NAVAL);
+            campaign.getPlayerForce()
+                  .getHumanResources()
+                  .distributeTempCrewPoolToUnits(campaign, campaign.getCampaignOptions(),
+                        PersonnelRole.VEHICLE_CREW_NAVAL);
         }
 
         if (mhqOptions.getNewDayVesselPilotPoolFill()) {
             if (!mhqOptions.getNewDayVesselPilotPoolNoRelease()) {
                 campaign.emptyTempCrewPoolForRole(PersonnelRole.VESSEL_PILOT);
             }
-            campaign.fillTempCrewPoolForRole(PersonnelRole.VESSEL_PILOT);
-            campaign.distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_PILOT);
+            campaign.getPlayerForce()
+                  .getHumanResources()
+                  .fillTempCrewPoolForRole(campaign, campaign.getCampaignOptions(),
+                        PersonnelRole.VESSEL_PILOT);
+            campaign.getPlayerForce()
+                  .getHumanResources()
+                  .distributeTempCrewPoolToUnits(campaign, campaign.getCampaignOptions(),
+                        PersonnelRole.VESSEL_PILOT);
         }
 
         if (mhqOptions.getNewDayVesselGunnerPoolFill()) {
             if (!mhqOptions.getNewDayVesselGunnerPoolNoRelease()) {
                 campaign.emptyTempCrewPoolForRole(PersonnelRole.VESSEL_GUNNER);
             }
-            campaign.fillTempCrewPoolForRole(PersonnelRole.VESSEL_GUNNER);
-            campaign.distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_GUNNER);
+            campaign.getPlayerForce()
+                  .getHumanResources()
+                  .fillTempCrewPoolForRole(campaign, campaign.getCampaignOptions(),
+                        PersonnelRole.VESSEL_GUNNER);
+            campaign.getPlayerForce()
+                  .getHumanResources()
+                  .distributeTempCrewPoolToUnits(campaign, campaign.getCampaignOptions(),
+                        PersonnelRole.VESSEL_GUNNER);
         }
 
         if (mhqOptions.getNewDayVesselCrewPoolFill()) {
             if (!mhqOptions.getNewDayVesselCrewPoolNoRelease()) {
                 campaign.emptyTempCrewPoolForRole(PersonnelRole.VESSEL_CREW);
             }
-            campaign.fillTempCrewPoolForRole(PersonnelRole.VESSEL_CREW);
-            campaign.distributeTempCrewPoolToUnits(PersonnelRole.VESSEL_CREW);
+            campaign.getPlayerForce()
+                  .getHumanResources()
+                  .fillTempCrewPoolForRole(campaign, campaign.getCampaignOptions(),
+                        PersonnelRole.VESSEL_CREW);
+            campaign.getPlayerForce()
+                  .getHumanResources()
+                  .distributeTempCrewPoolToUnits(campaign, campaign.getCampaignOptions(),
+                        PersonnelRole.VESSEL_CREW);
         }
 
         // Ensure we don't have anything that would prevent the new day
@@ -443,7 +530,7 @@ public class CampaignNewDayManager {
 
         campaign.beginReport("<b>" + MekHQ.getMHQOptions().getLongDisplayFormattedDate(today) + "</b>");
 
-        campaign.getPersonnelWhoAdvancedInXP().clear();
+        campaign.getPlayerForce().getHumanResources().getPersonnelWhoAdvancedInXP().clear();
 
         // New Year Changes
         if (isNewYear) {
@@ -455,7 +542,7 @@ public class CampaignNewDayManager {
 
             // Degrade Regard
             List<String> degradedRegardReports =
-                  campaign.getFactionStandings().processRegardDegradation(faction.getShortName(),
+                  campaign.getPlayerForce().getFactionStandings().processRegardDegradation(faction.getShortName(),
                         today.getYear(), campaignOptions.getRegardMultiplier());
             for (String report : degradedRegardReports) {
                 campaign.addReport(POLITICS, report);
@@ -471,7 +558,7 @@ public class CampaignNewDayManager {
         for (AbstractLocation location : new ArrayList<>(campaign.getCampaignLocationManager().getLocations())) {
             location.newDay(campaign, location != updatedLocation);
         }
-        updatedLocation = campaign.getCurrentLocation();
+        updatedLocation = campaign.getPlayerForce().getForceDetachment().getCurrentLocation();
 
 
         updateFacilities();
@@ -480,7 +567,7 @@ public class CampaignNewDayManager {
 
         processAllArrivals();
 
-        campaign.getCampaignLocationManager().pruneEmptyLocations(campaign);
+        campaign.getCampaignLocationManager().pruneEmptyLocations();
 
         if (campaignOptions.isUseRandomDiseases() && campaignOptions.isUseAlternativeAdvancedMedical()) {
             PlanetarySystem currentSystem = updatedLocation.getCurrentSystem();
@@ -501,7 +588,7 @@ public class CampaignNewDayManager {
         }
 
         // Manage the Markets
-        campaign.refreshApplicants(false);
+        campaign.getPlayerForce().getHumanResources().refreshApplicants(campaign, false);
         if (isFirstOfMonth) {
             showRarePersonnelDialog(campaign, false);
         }
@@ -553,14 +640,15 @@ public class CampaignNewDayManager {
             FacilityRentals.payForAllRentedBays(campaign);
         }
 
-        campaign.resetAsTechMinutes();
+        campaign.getPlayerForce().getHumanResources().resetAsTechMinutes(campaign.getCampaignOptions());
 
         processNewDayUnits();
 
         processNewDayFormations();
 
         if (campaign.isProcessProcurement()) {
-            campaign.setShoppingList(campaign.goShopping(campaign.getShoppingList()));
+            ForceShoppingList sl = campaign.goShopping(campaign.getPlayerForce().getShoppingList());
+            campaign.getPlayerForce().setShoppingList(sl);
         }
 
         // check for anything in finances
@@ -577,12 +665,21 @@ public class CampaignNewDayManager {
             campaign.addReport(PERSONNEL, entry);
         }
 
-        if (campaign.getTopUpWeekly() && isMonday) {
-            PartsInUseManager partsInUseManager = new PartsInUseManager(campaign);
-            Set<PartInUse> actualPartsInUse = partsInUseManager.getPartsInUse(campaign.getIgnoreMothballed(),
-                  false,
-                  campaign.getIgnoreSparesUnderQuality());
-            int bought = partsInUseManager.stockUpPartsInUse(actualPartsInUse);
+        if (campaign.getPlayerForce().getTopUpWeekly() && isMonday) {
+            // Each location keeps its own stock levels, so top up the main force and every base independently.
+            List<IPlace> places = new ArrayList<>();
+            places.add(campaign.getPlayerForce().getForceDetachment());
+            places.addAll(campaign.getCampaignLocationManager().getPlayerBases());
+
+            int bought = 0;
+            for (IPlace place : places) {
+                PartsInUseManager partsInUseManager = new PartsInUseManager(campaign, place);
+                Set<PartInUse> actualPartsInUse = partsInUseManager.getPartsInUse(campaign.getPlayerForce()
+                                                                                        .getIgnoreMothballed(),
+                      false,
+                      campaign.getPlayerForce().getIgnoreSparesUnderQuality());
+                bought += partsInUseManager.stockUpPartsInUse(actualPartsInUse);
+            }
             campaign.addReport(ACQUISITIONS, String.format(resources.getString("weeklyStockCheck.text"), bought));
         }
 
@@ -619,32 +716,16 @@ public class CampaignNewDayManager {
         InjuryType newBioweaponAttack = getNewBioweaponAttack(systemId, today, false);
         if (newBioweaponAttack != null) {
             new ImmersiveDialogSimple(campaign,
-                  campaign.getSeniorMedicalPerson(),
+                  campaign.getPlayerForce().getHumanResources()
+                        .getSeniorMedicalPerson(campaign.getCampaignOptions(),
+                              campaign.isClanCampaign(),
+                              campaign.getLocalDate()),
                   null,
                   getFormattedTextAt(RESOURCE_BUNDLE, "bioweaponAttack.inCharacter",
                         campaign.getCommanderAddress()),
                   null,
                   getFormattedTextAt(RESOURCE_BUNDLE, "bioweaponAttack.outOfCharacter",
                         newBioweaponAttack.getSimpleName(), systemName),
-                  null,
-                  false,
-                  ImmersiveDialogWidth.LARGE);
-        }
-    }
-
-    private void checkForDiseaseOutbreaks(String systemName, String systemId) {
-        Set<InjuryType> newOutbreaks = getNewDiseaseOutbreaks(systemId, today, false);
-        Set<InjuryType> availableCures = getAllSystemSpecificDiseasesWithCures(systemId, today, false);
-        for (InjuryType disease : newOutbreaks) {
-            String keySuffix = availableCures.contains(disease) ? "yesCure" : "noCure";
-            new ImmersiveDialogSimple(campaign,
-                  campaign.getSeniorMedicalPerson(),
-                  null,
-                  getFormattedTextAt(RESOURCE_BUNDLE, "diseaseOutbreak.inCharacter." + keySuffix,
-                        campaign.getCommanderAddress()),
-                  null,
-                  getFormattedTextAt(RESOURCE_BUNDLE, "diseaseOutbreak.outOfCharacter." + keySuffix,
-                        disease.getSimpleName(), systemName),
                   null,
                   false,
                   ImmersiveDialogWidth.LARGE);
@@ -659,31 +740,26 @@ public class CampaignNewDayManager {
         }
     }
 
-    /**
-     * Gets all scenario IDs that have at least one standard force assigned to them.
-     *
-     * <p>This method iterates through all forces in the campaign and collects the scenario IDs of those forces that
-     * are classified as standard force types and are currently assigned to a scenario.</p>
-     *
-     * @return a set of scenario IDs that have standard forces assigned, or an empty set if no standard forces are
-     *       deployed
-     *
-     * @author Illiani
-     * @since 0.50.10
-     */
-    private Set<Integer> getAllScenariosWithAssignedStandardForces() {
-        Set<Integer> scenarios = new HashSet<>();
-
-        for (Formation formation : campaign.getAllFormations()) {
-            if (formation.getFormationType().isStandard()) {
-                int scenarioId = formation.getScenarioId();
-                if (scenarioId != NO_ASSIGNED_SCENARIO) {
-                    scenarios.add(scenarioId);
-                }
-            }
+    private void checkForDiseaseOutbreaks(String systemName, String systemId) {
+        Set<InjuryType> newOutbreaks = getNewDiseaseOutbreaks(systemId, today, false);
+        Set<InjuryType> availableCures = getAllSystemSpecificDiseasesWithCures(systemId, today, false);
+        for (InjuryType disease : newOutbreaks) {
+            String keySuffix = availableCures.contains(disease) ? "yesCure" : "noCure";
+            new ImmersiveDialogSimple(campaign,
+                  campaign.getPlayerForce().getHumanResources()
+                        .getSeniorMedicalPerson(campaign.getCampaignOptions(),
+                              campaign.isClanCampaign(),
+                              campaign.getLocalDate()),
+                  null,
+                  getFormattedTextAt(RESOURCE_BUNDLE, "diseaseOutbreak.inCharacter." + keySuffix,
+                        campaign.getCommanderAddress()),
+                  null,
+                  getFormattedTextAt(RESOURCE_BUNDLE, "diseaseOutbreak.outOfCharacter." + keySuffix,
+                        disease.getSimpleName(), systemName),
+                  null,
+                  false,
+                  ImmersiveDialogWidth.LARGE);
         }
-
-        return scenarios;
     }
 
     /**
@@ -699,20 +775,13 @@ public class CampaignNewDayManager {
      * @author Illiani
      * @since 0.50.10
      */
-
-    private void processAllArrivals() {
-        for (AbstractLocation location : new ArrayList<>(campaign.getCampaignLocationManager().getLocations())) {
-            location.processArrivals(campaign);
-        }
-        for (PlayerBase base : campaign.getCampaignLocationManager().getPlayerBases()) {
-            base.processArrivals(campaign);
-        }
-        campaign.processArrivals(campaign);
-    }
-
     private void updateFacilities() {
         updateFieldKitchenCapacity();
         updateMASHTheatreCapacity();
+    }
+
+    private void processAllArrivals() {
+        campaign.getCampaignLocationManager().processAllArrivals(campaign);
     }
 
     /**
@@ -738,6 +807,33 @@ public class CampaignNewDayManager {
     }
 
     /**
+     * Gets all scenario IDs that have at least one standard force assigned to them.
+     *
+     * <p>This method iterates through all forces in the campaign and collects the scenario IDs of those forces that
+     * are classified as standard force types and are currently assigned to a scenario.</p>
+     *
+     * @return a set of scenario IDs that have standard forces assigned, or an empty set if no standard forces are
+     *       deployed
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private Set<Integer> getAllScenariosWithAssignedStandardForces() {
+        Set<Integer> scenarios = new HashSet<>();
+
+        for (Formation formation : campaign.getPlayerForce().getAllFormations()) {
+            if (formation.getFormationType().isStandard()) {
+                int scenarioId = formation.getScenarioId();
+                if (scenarioId != NO_ASSIGNED_SCENARIO) {
+                    scenarios.add(scenarioId);
+                }
+            }
+        }
+
+        return scenarios;
+    }
+
+    /**
      * Updates the status of whether field kitchens are operating within their required capacity.
      *
      * <p>If fatigue is enabled in the campaign options, campaign method calculates the total available
@@ -748,16 +844,18 @@ public class CampaignNewDayManager {
     private void updateFieldKitchenCapacity() {
         if (campaignOptions.isUseFatigue()) {
             int fieldKitchenCapacity =
-                  checkFieldKitchenCapacity(campaign.getFormation(FORMATION_ORIGIN)
-                                                  .getAllUnitsAsUnits(campaign.getHangar(),
+                  checkFieldKitchenCapacity(campaign.getPlayerForce().getFormation(Formation.FORMATION_ORIGIN)
+                                                  .getAllUnitsAsUnits(campaign.getPlayerForce().getHangar(),
                                                         false), campaignOptions.getFieldKitchenCapacity());
-            int fieldKitchenUsage = checkFieldKitchenUsage(campaign.getActivePersonnel(false, false),
+            int fieldKitchenUsage = checkFieldKitchenUsage(campaign.getPlayerForce()
+                                                                 .getHumanResources()
+                                                                 .getActivePersonnel(false, false),
                   campaignOptions.isUseFieldKitchenIgnoreNonCombatants(), campaign);
             boolean withinCapacity = !campaign.isOnContractAndPlanetside() ||
                                            areFieldKitchensWithinCapacity(fieldKitchenCapacity, fieldKitchenUsage);
-            campaign.setFieldKitchenWithinCapacity(withinCapacity);
+            campaign.getPlayerForce().setFieldKitchenWithinCapacity(withinCapacity);
         } else {
-            campaign.setFieldKitchenWithinCapacity(false);
+            campaign.getPlayerForce().setFieldKitchenWithinCapacity(false);
         }
     }
 
@@ -813,7 +911,7 @@ public class CampaignNewDayManager {
         processPersonnelWhoHaveDepartedCampaign(isNewWeek, randomDeath);
 
         // campaign list ensures we don't hit a concurrent modification error
-        List<Person> personnel = campaign.getPersonnelFilteringOutDeparted();
+        List<Person> personnel = campaign.getPlayerForce().getHumanResources().getPersonnelFilteringOutDeparted();
 
         // Prep some data for vocational xp
         int vocationalXpRate = campaignOptions.getVocationalXP();
@@ -834,7 +932,10 @@ public class CampaignNewDayManager {
         int peopleWhoCelebrateCommandersDay = 0;
         int commanderDayTargetNumber = 5;
         boolean isCommandersDay = isCommandersDay(today) &&
-                                        campaign.getCommander() != null &&
+                                        campaign.getPlayerForce().getHumanResources()
+                                              .getCommander(campaign.getCampaignOptions(),
+                                                    campaign.isClanCampaign(),
+                                                    campaign.getLocalDate()) != null &&
                                         campaignOptions.isShowLifeEventDialogCelebrations();
         boolean isCampaignPlanetside = updatedLocation.isOnPlanet();
         boolean isUseAdvancedMedical = campaignOptions.isUseAdvancedMedical();
@@ -898,7 +999,7 @@ public class CampaignNewDayManager {
 
                 if (!person.getStatus().isMIA()) {
                     boolean isWithinCapacity = !campaign.isOnContractAndPlanetside() ||
-                                                     campaign.getFieldKitchenWithinCapacity();
+                                                     campaign.getPlayerForce().getFieldKitchenWithinCapacity();
                     processFatigueRecovery(campaign, person, isWithinCapacity);
                 }
 
@@ -918,7 +1019,7 @@ public class CampaignNewDayManager {
 
                 if (vocationalXpRate > 0) {
                     if (processMonthlyVocationalXp(person, vocationalXpRate)) {
-                        campaign.getPersonnelWhoAdvancedInXP().add(person);
+                        campaign.getPlayerForce().getHumanResources().getPersonnelWhoAdvancedInXP().add(person);
                     }
                 }
 
@@ -1006,10 +1107,10 @@ public class CampaignNewDayManager {
             }
         }
 
-        if (!campaign.getPersonnelWhoAdvancedInXP().isEmpty()) {
+        if (!campaign.getPlayerForce().getHumanResources().getPersonnelWhoAdvancedInXP().isEmpty()) {
             campaign.addReport(GENERAL, String.format(resources.getString("gainedExperience.text"),
                   spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
-                  campaign.getPersonnelWhoAdvancedInXP().size(),
+                  campaign.getPlayerForce().getHumanResources().getPersonnelWhoAdvancedInXP().size(),
                   CLOSING_SPAN_TAG));
         }
 
@@ -1033,17 +1134,6 @@ public class CampaignNewDayManager {
                   campaign,
                   quickTrainOptions,
                   true);
-        }
-    }
-
-    private void processPersonnelWhoHaveDepartedCampaign(boolean isNewWeek, RandomDeath randomDeath) {
-        List<Person> departedPersonnel = campaign.getAllPersonnel().stream()
-                                               .filter(person -> person.getStatus().isFollowAfterLeavingCampaign())
-                                               .toList();
-        for (Person person : departedPersonnel) {
-            if (isNewWeek) {
-                randomDeath.processNewWeek(campaign, today, person);
-            }
         }
     }
 
@@ -1085,6 +1175,17 @@ public class CampaignNewDayManager {
         }
     }
 
+    private void processPersonnelWhoHaveDepartedCampaign(boolean isNewWeek, RandomDeath randomDeath) {
+        List<Person> departedPersonnel = campaign.getPlayerForce().getHumanResources().getPersonnel().stream()
+                                               .filter(person -> person.getStatus().isFollowAfterLeavingCampaign())
+                                               .toList();
+        for (Person person : departedPersonnel) {
+            if (isNewWeek) {
+                randomDeath.processNewWeek(campaign, today, person);
+            }
+        }
+    }
+
     /**
      * Checks if the commander has any burned contacts, and if so, generates and records a report.
      *
@@ -1097,12 +1198,24 @@ public class CampaignNewDayManager {
      */
     private void checkForBurnedContacts() {
         if (campaignOptions.isAllowMonthlyConnections()) {
-            Person commander = campaign.getCommander();
+            Person commander = campaign.getPlayerForce().getHumanResources()
+                                     .getCommander(campaign.getCampaignOptions(),
+                                           campaign.isClanCampaign(),
+                                           campaign.getLocalDate());
             if (commander != null && commander.getBurnedConnectionsEndDate() == null) {
                 String report = commander.checkForBurnedContacts(today);
                 if (!report.isBlank()) {
                     campaign.addReport(PERSONNEL, report);
                 }
+            }
+        }
+    }
+
+    private static void refreshStratConFacilities(List<StratConTrackState> tracks) {
+        for (StratConTrackState trackState : tracks) {
+            Map<StratConCoords, StratConFacility> facilities = trackState.getFacilities();
+            for (StratConFacility facility : facilities.values()) {
+                facility.setIsAvailable(true);
             }
         }
     }
@@ -1195,7 +1308,9 @@ public class CampaignNewDayManager {
 
                 boolean allowBatchalls = true;
                 if (campaignOptions.isUseFactionStandingBatchallRestrictionsSafe()) {
-                    double regard = campaign.getFactionStandings().getRegardForFaction(enemyFactionCode, true);
+                    double regard = campaign.getPlayerForce()
+                                          .getFactionStandings()
+                                          .getRegardForFaction(enemyFactionCode, true);
                     allowBatchalls = FactionStandingUtilities.isBatchallAllowed(regard);
                 }
 
@@ -1208,7 +1323,7 @@ public class CampaignNewDayManager {
                     contract.setBatchallAccepted(batchallAccepted);
 
                     if (!batchallAccepted && campaignOptions.isTrackFactionStanding()) {
-                        List<String> reports = campaign.getFactionStandings()
+                        List<String> reports = campaign.getPlayerForce().getFactionStandings()
                                                      .processRefusedBatchall(faction.getShortName(),
                                                            enemyFactionCode,
                                                            today.getYear(),
@@ -1258,26 +1373,17 @@ public class CampaignNewDayManager {
         }
     }
 
-    private static void refreshStratConFacilities(List<StratConTrackState> tracks) {
-        for (StratConTrackState trackState : tracks) {
-            Map<StratConCoords, StratConFacility> facilities = trackState.getFacilities();
-            for (StratConFacility facility : facilities.values()) {
-                facility.setIsAvailable(true);
-            }
-        }
-    }
-
     /**
      * Processes reputation changes based on various conditions.
      */
     private void processReputationChanges() {
         if (faction.isPirate()) {
-            campaign.setDateOfLastCrime(today);
-            campaign.setCrimePirateModifier(-100);
+            campaign.getPlayerForce().setDateOfLastCrime(today);
+            campaign.getPlayerForce().setCrimePirateModifier(-100);
         }
 
-        LocalDate dateOfLastCrime = campaign.getDateOfLastCrime();
-        int crimePirateModifier = campaign.getCrimePirateModifier();
+        LocalDate dateOfLastCrime = campaign.getPlayerForce().getDateOfLastCrime();
+        int crimePirateModifier = campaign.getPlayerForce().getCrimePirateModifier();
 
         if (today.getDayOfMonth() == 1) {
             if (dateOfLastCrime != null) {
@@ -1288,18 +1394,38 @@ public class CampaignNewDayManager {
                 if (yearsBetween >= 1) {
                     if (crimePirateModifier < 0) {
                         remainingCrimeChange = max(0, 2 + crimePirateModifier);
-                        campaign.changeCrimePirateModifier(2); // campaign is the amount of change specified by CamOps
+                        // campaign is the amount of change specified by CamOps
+                        campaign.getPlayerForce().changeCrimePirateModifier(2);
                     }
 
-                    if (campaign.getRawCrimeRating() < 0 && remainingCrimeChange > 0) {
-                        campaign.changeCrimeRating(remainingCrimeChange);
+                    if (campaign.getPlayerForce().getRawCrimeRating() < 0 && remainingCrimeChange > 0) {
+                        campaign.getPlayerForce().changeCrimeRating(remainingCrimeChange);
                     }
                 }
             }
         }
 
         if (today.getDayOfWeek().equals(DayOfWeek.MONDAY)) {
-            campaign.getReputation().initializeReputation(campaign);
+            campaign.getPlayerForce().getReputation().initializeReputation(campaign);
+        }
+    }
+
+    public void processNewDayUnits() {
+        if (MekHQ.getMHQOptions().getSelfCorrectMaintenance()) {
+            Maintenance.checkAndCorrectMaintenanceSchedule(campaign);
+        }
+
+        LocationNewDayUtil.processAllLocationUnits(campaign);
+
+        // Finally, run Mass Repair Mass Salvage if desired
+        if (MekHQ.getMHQOptions().getNewDayMRMS()) {
+            try {
+                MRMSService.mrmsAllUnits(campaign);
+            } catch (Exception ex) {
+                LOGGER.error("Could not perform mass repair/salvage on units due to an error", ex);
+                campaign.addReport(TECHNICAL,
+                      "ERROR: an error occurred performing mass repair/salvage on units, check the log");
+            }
         }
     }
 
@@ -1311,7 +1437,7 @@ public class CampaignNewDayManager {
         List<UUID> graduatingPersonnel = new ArrayList<>();
         HashMap<UUID, List<Object>> academyAttributesMap = new HashMap<>();
 
-        for (Person person : campaign.getStudents()) {
+        for (Person person : campaign.getPlayerForce().getHumanResources().getStudents()) {
             List<Object> individualAcademyAttributes = new ArrayList<>();
 
             if (EducationController.processNewDay(campaign, person, false)) {
@@ -1338,25 +1464,6 @@ public class CampaignNewDayManager {
         }
     }
 
-    public void processNewDayUnits() {
-        if (MekHQ.getMHQOptions().getSelfCorrectMaintenance()) {
-            Maintenance.checkAndCorrectMaintenanceSchedule(campaign);
-        }
-
-        LocationNewDayUtil.processAllLocationUnits(campaign);
-
-        // Finally, run Mass Repair Mass Salvage if desired
-        if (MekHQ.getMHQOptions().getNewDayMRMS()) {
-            try {
-                MRMSService.mrmsAllUnits(campaign);
-            } catch (Exception ex) {
-                LOGGER.error("Could not perform mass repair/salvage on units due to an error", ex);
-                campaign.addReport(TECHNICAL,
-                      "ERROR: an error occurred performing mass repair/salvage on units, check the log");
-            }
-        }
-    }
-
     private void processNewDayFormations() {
         // update formation levels
         Formation.populateFormationLevelsFromOrigin(campaign);
@@ -1364,7 +1471,7 @@ public class CampaignNewDayManager {
 
         // Update the formation icons based on the end-of-day unit status if desired
         if (MekHQ.getMHQOptions().getNewDayFormationIconOperationalStatus()) {
-            campaign.getFormations().updateFormationIconOperationalStatus(campaign);
+            campaign.getPlayerForce().getFormations().updateFormationIconOperationalStatus(campaign);
         }
     }
 
@@ -1379,12 +1486,13 @@ public class CampaignNewDayManager {
      * @since 0.50.06
      */
     private void performPersonnelCleanUp() {
-        AutomatedPersonnelCleanUp removal = new AutomatedPersonnelCleanUp(campaign.getHumanResources(), today,
+        AutomatedPersonnelCleanUp removal = new AutomatedPersonnelCleanUp(campaign.getPlayerForce().getHumanResources(),
+              today,
               campaignOptions.isUseRemovalExemptRetirees(), campaignOptions.isUseRemovalExemptCemetery());
 
         List<Person> personnelToRemove = removal.getPersonnelToCleanUp();
         for (Person person : personnelToRemove) {
-            campaign.removePerson(person, false);
+            campaign.getPlayerForce().getHumanResources().removePerson(campaign, person, false);
         }
 
         if (!personnelToRemove.isEmpty()) {
@@ -1430,7 +1538,7 @@ public class CampaignNewDayManager {
         }
 
         if (isFirstOfMonth) {
-            String report = campaign.getFactionStandings().updateClimateRegard(faction,
+            String report = campaign.getPlayerForce().getFactionStandings().updateClimateRegard(faction,
                   today,
                   campaignOptions.getRegardMultiplier(),
                   campaignOptions.isTrackClimateRegardChanges());
@@ -1441,7 +1549,7 @@ public class CampaignNewDayManager {
         boolean isInTransit = !updatedLocation.isOnPlanet();
         Factions factions = Factions.getInstance();
 
-        for (Map.Entry<String, Double> standing : new HashMap<>(campaign.getFactionStandings()
+        for (Map.Entry<String, Double> standing : new HashMap<>(campaign.getPlayerForce().getFactionStandings()
                                                                       .getAllFactionStandings()).entrySet()) {
             String relevantFactionCode = standing.getKey();
             Faction relevantFaction = factions.getFaction(relevantFactionCode);
@@ -1456,7 +1564,7 @@ public class CampaignNewDayManager {
             boolean isPirateSpecialCase = campaign.isPirateCampaign() &&
                                                 relevantFactionCode.equals(PIRACY_SUCCESS_INDEX_FACTION_CODE);
             if (relevantFaction.equals(faction) || isMercenarySpecialCase || isPirateSpecialCase) {
-                FactionCensureLevel newCensureLevel = campaign.getFactionStandings().checkForCensure(
+                FactionCensureLevel newCensureLevel = campaign.getPlayerForce().getFactionStandings().checkForCensure(
                       relevantFaction, today, activeMissions, isInTransit);
                 if (newCensureLevel != null) {
                     new FactionCensureEvent(campaign, newCensureLevel, relevantFaction);
@@ -1464,7 +1572,7 @@ public class CampaignNewDayManager {
             }
 
             // Accolade check
-            FactionAccoladeLevel newAccoladeLevel = campaign.getFactionStandings().checkForAccolade(
+            FactionAccoladeLevel newAccoladeLevel = campaign.getPlayerForce().getFactionStandings().checkForAccolade(
                   relevantFaction, today);
 
             if (newAccoladeLevel != null && newAccoladeLevel != FactionAccoladeLevel.NO_ACCOLADE) {
@@ -1474,7 +1582,7 @@ public class CampaignNewDayManager {
         }
 
         // Censure degradation
-        List<String> reports = campaign.getFactionStandings().processCensureDegradation(today);
+        List<String> reports = campaign.getPlayerForce().getFactionStandings().processCensureDegradation(today);
         for (String report : reports) {
             campaign.addReport(POLITICS, report);
         }
@@ -1573,7 +1681,7 @@ public class CampaignNewDayManager {
         if (isBirthday && (person.getAge(today) == 16)) {
             if (campaignOptions.isRewardComingOfAgeAbilities()) {
                 SingleSpecialAbilityGenerator singleSpecialAbilityGenerator = new SingleSpecialAbilityGenerator();
-                singleSpecialAbilityGenerator.rollSPA(campaign, person, true, true, false);
+                singleSpecialAbilityGenerator.rollSPA(campaign, person, true, true, false, false);
             }
 
             if (campaignOptions.isRewardComingOfAgeRPSkills()) {
@@ -1586,7 +1694,8 @@ public class CampaignNewDayManager {
             if (campaignOptions.isChildPortraitsWhenComingOfAge() &&
                       isUsePortraitForRole &&
                       hasDefaultPortrait) {
-                campaign.assignRandomPortraitFor(person);
+                campaign.getPlayerForce().getHumanResources().assignRandomPortraitFor(campaign.getCampaignOptions(),
+                      person);
             }
 
             // We want the event trigger to fire before the dialog is shown, so that the character will have finished
@@ -1596,20 +1705,6 @@ public class CampaignNewDayManager {
             if (campaignOptions.isShowLifeEventDialogComingOfAge()) {
                 new ComingOfAgeAnnouncement(campaign, person);
             }
-        }
-    }
-
-    /**
-     * Process weekly relationship events for a given {@link Person} on Monday. This method triggers specific events
-     * related to divorce, marriage, procreation, and maternity leave.
-     *
-     * @param person The {@link Person} for which to process weekly relationship events
-     */
-    private void processWeeklyRelationshipEvents(Person person) {
-        if (today.getDayOfWeek() == DayOfWeek.MONDAY) {
-            campaign.getDivorce().processNewWeek(campaign, today, person, false);
-            campaign.getMarriage().processNewWeek(campaign, today, person);
-            campaign.getProcreation().processNewWeek(campaign, today, person);
         }
     }
 
@@ -2020,6 +2115,51 @@ public class CampaignNewDayManager {
         return false;
     }
 
+    /**
+     * Process weekly relationship events for a given {@link Person} on Monday. This method triggers specific events
+     * related to divorce, marriage, procreation, and maternity leave.
+     *
+     * @param person The {@link Person} for which to process weekly relationship events
+     */
+    private void processWeeklyRelationshipEvents(Person person) {
+        if (today.getDayOfWeek() == DayOfWeek.MONDAY) {
+            campaign.getPlayerForce().getHumanResources().getDivorce().processNewWeek(campaign, today, person, false);
+            campaign.getPlayerForce().getHumanResources().getMarriage().processNewWeek(campaign, today, person);
+            campaign.getPlayerForce().getHumanResources().getProcreation().processNewWeek(campaign, today, person);
+        }
+    }
+
+    /**
+     * Calculates and processes payment for all types of rented facilities (hospital beds, kitchens, holding cells)
+     * based on the active contracts and current campaign options.
+     *
+     * <p>Generates reports for any failed transactions or payment issues. Adds any generated reports to the campaign
+     * log.</p>
+     *
+     * @author Illiani
+     * @since 0.50.10
+     */
+    private void payForRentedFacilities() {
+        List<Contract> activeContracts = campaign.getActiveContracts();
+        int hospitalRentalCost = campaignOptions.getRentedFacilitiesCostHospitalBeds();
+        Money hospitalRentalFee = FacilityRentals.calculateContractRentalCost(hospitalRentalCost, activeContracts,
+              ContractRentalType.HOSPITAL_BEDS);
+
+        int kitchenRentalCost = campaignOptions.getRentedFacilitiesCostKitchens();
+        Money kitchenRentalFee = FacilityRentals.calculateContractRentalCost(kitchenRentalCost, activeContracts,
+              ContractRentalType.KITCHENS);
+
+        int holdingCellRentalCost = campaignOptions.getRentedFacilitiesCostHoldingCells();
+        Money holdingCellRentalFee = FacilityRentals.calculateContractRentalCost(holdingCellRentalCost, activeContracts,
+              ContractRentalType.HOLDING_CELLS);
+
+        List<String> reports = FacilityRentals.payForAllContractRentals(finances, today, hospitalRentalFee,
+              kitchenRentalFee, holdingCellRentalFee);
+        for (String report : reports) { // No report is generated if the transaction is successful
+            campaign.addReport(FINANCES, report);
+        }
+    }
+
     private void processNewDayATBScenarios() {
         // First, we get the list of all active AtBContracts
         List<AtBContract> contracts = campaign.getActiveAtBContracts(true);
@@ -2047,7 +2187,10 @@ public class CampaignNewDayManager {
             }
 
             if (today.equals(contract.getStartDate())) {
-                campaign.getHangar().getUnits().forEach(unit -> unit.setSite(contract.getRepairLocation()));
+                campaign.getPlayerForce()
+                      .getHangar()
+                      .getUnits()
+                      .forEach(unit -> unit.setSite(contract.getRepairLocation()));
             }
 
             if (today.getDayOfWeek() == DayOfWeek.MONDAY) {
@@ -2122,12 +2265,12 @@ public class CampaignNewDayManager {
             for (final AtBScenario atBScenario : contract.getCurrentAtBScenarios()) {
                 if ((atBScenario.getDate() != null) && atBScenario.getDate().equals(today)) {
                     int forceId = atBScenario.getCombatTeamId();
-                    if ((campaign.getCombatTeamsAsMap().get(forceId) != null) &&
-                              !campaign.getFormationIds().get(forceId).isDeployed()) {
+                    if ((campaign.getPlayerForce().getCombatTeamsAsMap(campaign).get(forceId) != null) &&
+                              !campaign.getPlayerForce().getFormationIds().get(forceId).isDeployed()) {
                         // If any unit in the force is under repair, don't deploy the force
                         // Merely removing the unit from deployment would break with user expectation
                         boolean forceUnderRepair = false;
-                        for (UUID uid : campaign.getFormationIds().get(forceId).getAllUnits(false)) {
+                        for (UUID uid : campaign.getPlayerForce().getFormationIds().get(forceId).getAllUnits(false)) {
                             Unit unit = campaign.getUnit(uid);
                             if ((unit != null) && unit.isUnderRepair()) {
                                 forceUnderRepair = true;
@@ -2136,14 +2279,18 @@ public class CampaignNewDayManager {
                         }
 
                         if (!forceUnderRepair) {
-                            campaign.getFormationIds().get(forceId).setScenarioId(atBScenario.getId(), campaign);
+                            campaign.getPlayerForce()
+                                  .getFormationIds()
+                                  .get(forceId).setScenarioId(atBScenario.getId(), campaign);
                             atBScenario.addForces(forceId);
 
                             campaign.addReport(BATTLE, MessageFormat.format(resources.getString(
                                         "atbScenarioTodayWithForce.format"),
                                   atBScenario.getHyperlinkedName(),
-                                  campaign.getFormationIds().get(forceId).getName()));
-                            MekHQ.triggerEvent(new DeploymentChangedEvent(campaign.getFormationIds().get(forceId),
+                                  campaign.getPlayerForce().getFormationIds().get(forceId).getName()));
+                            MekHQ.triggerEvent(new DeploymentChangedEvent(campaign.getPlayerForce()
+                                                                                .getFormationIds()
+                                                                                .get(forceId),
                                   atBScenario));
                         } else {
                             if (atBScenario.getHasTrack()) {
@@ -2172,37 +2319,6 @@ public class CampaignNewDayManager {
     }
 
     /**
-     * Calculates and processes payment for all types of rented facilities (hospital beds, kitchens, holding cells)
-     * based on the active contracts and current campaign options.
-     *
-     * <p>Generates reports for any failed transactions or payment issues. Adds any generated reports to the campaign
-     * log.</p>
-     *
-     * @author Illiani
-     * @since 0.50.10
-     */
-    private void payForRentedFacilities() {
-        List<Contract> activeContracts = campaign.getActiveContracts();
-        int hospitalRentalCost = campaignOptions.getRentedFacilitiesCostHospitalBeds();
-        Money hospitalRentalFee = FacilityRentals.calculateContractRentalCost(hospitalRentalCost, activeContracts,
-              ContractRentalType.HOSPITAL_BEDS);
-
-        int kitchenRentalCost = campaignOptions.getRentedFacilitiesCostKitchens();
-        Money kitchenRentalFee = FacilityRentals.calculateContractRentalCost(kitchenRentalCost, activeContracts,
-              ContractRentalType.KITCHENS);
-
-        int holdingCellRentalCost = campaignOptions.getRentedFacilitiesCostHoldingCells();
-        Money holdingCellRentalFee = FacilityRentals.calculateContractRentalCost(holdingCellRentalCost, activeContracts,
-              ContractRentalType.HOLDING_CELLS);
-
-        List<String> reports = FacilityRentals.payForAllContractRentals(finances, today, hospitalRentalFee,
-              kitchenRentalFee, holdingCellRentalFee);
-        for (String report : reports) { // No report is generated if the transaction is successful
-            campaign.addReport(FINANCES, report);
-        }
-    }
-
-    /**
      * Updates the value of {@code mashTheatreCapacity} based on the current campaign options and force composition.
      *
      * <p>If the campaign is configured to use MASH theatres, this method calculates the available MASH theatre
@@ -2215,46 +2331,14 @@ public class CampaignNewDayManager {
     private void updateMASHTheatreCapacity() {
         if (campaignOptions.isUseMASHTheatres()) {
             int mashTheatreCapacity =
-                  MASHCapacity.checkMASHCapacity(campaign.getFormation(FORMATION_ORIGIN)
-                                                       .getAllUnitsAsUnits(campaign.getHangar(),
+                  MASHCapacity.checkMASHCapacity(campaign.getPlayerForce().getFormation(Formation.FORMATION_ORIGIN)
+                                                       .getAllUnitsAsUnits(campaign.getPlayerForce().getHangar(),
                                                              false), campaignOptions.getMASHTheatreCapacity());
             mashTheatreCapacity += FacilityRentals.getCapacityIncreaseFromRentals(campaign.getActiveContracts(),
                   ContractRentalType.HOSPITAL_BEDS);
-            campaign.setMashTheatreCapacity(mashTheatreCapacity);
+            campaign.getPlayerForce().setMashTheatreCapacity(mashTheatreCapacity);
         } else {
-            campaign.setMashTheatreCapacity(0);
-        }
-    }
-
-    public static void showRarePersonnelDialog(Campaign campaign, boolean isCampaignStart) {
-        if (!campaign.getNewPersonnelMarket().getHasRarePersonnel()) {
-            return;
-        }
-
-        StringBuilder oocReport = new StringBuilder(
-              campaign.getResources().getString("personnelMarket.rareProfession.outOfCharacter"));
-        for (PersonnelRole profession : campaign.getNewPersonnelMarket().getRareProfessions()) {
-            oocReport.append("<p>- ").append(profession.getLabel(campaign.isClanCampaign())).append("</p>");
-        }
-
-        List<String> buttons = new ArrayList<>();
-        buttons.add(campaign.getResources().getString("personnelMarket.rareProfession.button.later"));
-        buttons.add(campaign.getResources().getString("personnelMarket.rareProfession.button.decline"));
-        if (!isCampaignStart) {
-            buttons.add(campaign.getResources().getString("personnelMarket.rareProfession.button.immediate"));
-        }
-
-        ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
-              campaign.getSeniorAdminPerson(AdministratorSpecialization.HR),
-              null,
-              campaign.getResources().getString("personnelMarket.rareProfession.inCharacter"),
-              buttons,
-              oocReport.toString(),
-              null,
-              true);
-
-        if (dialog.getDialogChoice() == 2) {
-            campaign.getNewPersonnelMarket().showPersonnelMarketDialog();
+            campaign.getPlayerForce().setMashTheatreCapacity(0);
         }
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -90,29 +90,49 @@ public class PersonnelMarketDylan extends PersonnelMarketRandom {
             long choice = mtf.get(Compute.randomInt(Math.max(mtf.size() - 1, 1)));
             if (Compute.randomInt(99) < weight) {
                 if (choice == Entity.ETYPE_MEK) {
-                    p = c.newPerson(PersonnelRole.MEKWARRIOR);
+                    p = c.getPlayerForce()
+                              .getHumanResources()
+                              .newPerson(c, mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR);
                 } else if (choice == Entity.ETYPE_TANK) {
-                    p = c.newPerson(PersonnelRole.VEHICLE_CREW_GROUND);
+                    p = c.getPlayerForce()
+                              .getHumanResources()
+                              .newPerson(c, mekhq.campaign.personnel.enums.PersonnelRole.VEHICLE_CREW_GROUND);
                 } else if (choice == Entity.ETYPE_AEROSPACE_FIGHTER) {
-                    p = c.newPerson(PersonnelRole.AEROSPACE_PILOT);
+                    p = c.getPlayerForce()
+                              .getHumanResources()
+                              .newPerson(c, mekhq.campaign.personnel.enums.PersonnelRole.AEROSPACE_PILOT);
                 } else if (choice == Entity.ETYPE_BATTLEARMOR) {
-                    p = c.newPerson(PersonnelRole.BATTLE_ARMOUR);
+                    p = c.getPlayerForce()
+                              .getHumanResources()
+                              .newPerson(c, mekhq.campaign.personnel.enums.PersonnelRole.BATTLE_ARMOUR);
                 } else if (choice == Entity.ETYPE_INFANTRY) {
-                    p = c.newPerson(PersonnelRole.SOLDIER);
+                    p = c.getPlayerForce()
+                              .getHumanResources()
+                              .newPerson(c, mekhq.campaign.personnel.enums.PersonnelRole.SOLDIER);
                 } else if (choice == Entity.ETYPE_PROTOMEK) {
-                    p = c.newPerson(PersonnelRole.PROTOMEK_PILOT);
+                    p = c.getPlayerForce()
+                              .getHumanResources()
+                              .newPerson(c, mekhq.campaign.personnel.enums.PersonnelRole.PROTOMEK_PILOT);
                 } else if (choice == Entity.ETYPE_CONV_FIGHTER) {
-                    p = c.newPerson(PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT);
+                    p = c.getPlayerForce()
+                              .getHumanResources()
+                              .newPerson(c, mekhq.campaign.personnel.enums.PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT);
                 } else if (choice == Entity.ETYPE_SMALL_CRAFT) {
-                    p = c.newPerson(PersonnelRole.VESSEL_PILOT);
+                    p = c.getPlayerForce()
+                              .getHumanResources()
+                              .newPerson(c, mekhq.campaign.personnel.enums.PersonnelRole.VESSEL_PILOT);
                 } else if (choice == Entity.ETYPE_DROPSHIP) {
-                    p = c.newPerson(vesselRoles.get(Compute.randomInt(vesselRoles.size())));
+                    final mekhq.campaign.personnel.enums.PersonnelRole role = vesselRoles.get(megamek.common.compute.Compute.randomInt(
+                          vesselRoles.size()));
+                    p = c.getPlayerForce().getHumanResources().newPerson(c, role);
                 } else {
-                    p = c.newPerson(PersonnelRole.NONE);
+                    p = c.getPlayerForce()
+                              .getHumanResources()
+                              .newPerson(c, mekhq.campaign.personnel.enums.PersonnelRole.NONE);
                 }
             } else {
                 int roll = Compute.randomInt(personnelRoles.length - PersonnelRole.getCivilianCount());
-                p = c.newPerson(personnelRoles[roll]);
+                p = c.getPlayerForce().getHumanResources().newPerson(c, personnelRoles[roll]);
             }
             retVal.add(p);
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2016-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -61,6 +61,7 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.parts.Part;
@@ -255,7 +256,7 @@ public class MRMSDialog extends JDialog {
         if (refreshCompleteList) {
             completePartsList = new ArrayList<>();
 
-            campaignGUI.getCampaign().getWarehouse().forEachSparePart(part -> {
+            campaignGUI.getCampaign().getPlayerForce().getWarehouse().forEachSparePart(part -> {
                 if (!part.isBeingWorkedOn() &&
                           part.needsFixing() &&
                           !(part instanceof AmmoBin) && (part.getSkillMin() <= SkillType.EXP_LEGENDARY)) {
@@ -994,7 +995,8 @@ public class MRMSDialog extends JDialog {
 
     private void btnStartMRMSActionPerformed(ActionEvent evt) {
         // Not enough Astechs to run the tech teams
-        if (campaignGUI.getCampaign().requiresAdditionalAsTechs()) {
+        Campaign campaign = campaignGUI.getCampaign();
+        if (campaign.getPlayerForce().getHumanResources().requiresAdditionalAsTechs(campaign.getCampaignOptions())) {
             int savePrompt = JOptionPane.showConfirmDialog(null,
                   resources.getString("NotEnoughAstechs.error"),
                   resources.getString("NotEnoughAstechs.errorTitle"),

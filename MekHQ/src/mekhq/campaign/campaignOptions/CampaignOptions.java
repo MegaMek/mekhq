@@ -64,6 +64,7 @@ import megamek.common.preference.PreferenceManager;
 import megamek.logging.MMLogger;
 import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.autoResolve.AutoResolveMethod;
+import mekhq.campaign.digitalGM.stratCon.StratConPlayType;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
@@ -75,7 +76,6 @@ import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle;
-import mekhq.campaign.stratCon.StratConPlayType;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
@@ -277,7 +277,8 @@ public class CampaignOptions {
     private boolean useRandomHitsForVehicles;
     private boolean tougherHealing;
     private boolean useAlternativeAdvancedMedical;
-    private boolean useKinderAlternativeAdvancedMedical;
+    private boolean useAlternativeAdvancedMedicalFewerPermanentInjuries;
+    private double alternativeAdvancedMedicalHealingTimeMultiplier;
     private boolean useRandomDiseases;
     private int maximumPatients;
     private boolean doctorsUseAdministration;
@@ -896,7 +897,8 @@ public class CampaignOptions {
         setUseRandomHitsForVehicles(false);
         setTougherHealing(false);
         useAlternativeAdvancedMedical = false;
-        useKinderAlternativeAdvancedMedical = false;
+        useAlternativeAdvancedMedicalFewerPermanentInjuries = false;
+        alternativeAdvancedMedicalHealingTimeMultiplier = 1.0;
         useRandomDiseases = false;
         setMaximumPatients(25);
         setDoctorsUseAdministration(false);
@@ -2146,12 +2148,22 @@ public class CampaignOptions {
         this.useAlternativeAdvancedMedical = useAlternativeAdvancedMedical;
     }
 
-    public boolean isUseKinderAlternativeAdvancedMedical() {
-        return useKinderAlternativeAdvancedMedical;
+    public boolean isUseAlternativeAdvancedMedicalFewerPermanentInjuries() {
+        return useAlternativeAdvancedMedicalFewerPermanentInjuries;
     }
 
-    public void setUseKinderAlternativeAdvancedMedical(final boolean useKinderAlternativeAdvancedMedical) {
-        this.useKinderAlternativeAdvancedMedical = useKinderAlternativeAdvancedMedical;
+    public void setUseAlternativeAdvancedMedicalFewerPermanentInjuries(
+          final boolean useAlternativeAdvancedMedicalFewerPermanentInjuries) {
+        this.useAlternativeAdvancedMedicalFewerPermanentInjuries = useAlternativeAdvancedMedicalFewerPermanentInjuries;
+    }
+
+    public double getAlternativeAdvancedMedicalHealingTimeMultiplier() {
+        return alternativeAdvancedMedicalHealingTimeMultiplier;
+    }
+
+    public void setAlternativeAdvancedMedicalHealingTimeMultiplier(
+          double alternativeAdvancedMedicalHealingTimeMultiplier) {
+        this.alternativeAdvancedMedicalHealingTimeMultiplier = alternativeAdvancedMedicalHealingTimeMultiplier;
     }
 
     public boolean isUseRandomDiseases() {

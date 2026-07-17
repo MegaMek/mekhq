@@ -40,6 +40,7 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.getEntityForUnitTesting;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -110,7 +111,7 @@ class ResolveScenarioTrackerTest {
         when(scenario.isTraitor(any(Entity.class), any(Campaign.class))).thenReturn(false);
 
         // Mock Campaign
-        campaign = mock(Campaign.class);
+        campaign = mockCampaign();
         when(campaign.getFaction()).thenReturn(null);
         when(campaign.getLocalDate()).thenReturn(LocalDate.of(3067, 1, 1));
         CampaignOptions campaignOptions = new CampaignOptions();

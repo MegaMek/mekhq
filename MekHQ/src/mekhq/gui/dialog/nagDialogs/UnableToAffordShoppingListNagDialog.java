@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -75,8 +75,8 @@ public class UnableToAffordShoppingListNagDialog extends ImmersiveDialogNag {
     protected String getInCharacterMessage(Campaign campaign, String key, String commanderAddress) {
         final String RESOURCE_BUNDLE = "mekhq.resources.NagDialogs";
 
-        Money totalBuyCost = campaign.getShoppingList().getTotalBuyCost();
-        Money currentFunds = campaign.getFunds();
+        Money totalBuyCost = campaign.getPlayerForce().getShoppingList().getTotalBuyCost();
+        Money currentFunds = campaign.getPlayerForce().getFunds();
         Money deficit = totalBuyCost.minus(currentFunds);
 
         return getFormattedTextAt(RESOURCE_BUNDLE,

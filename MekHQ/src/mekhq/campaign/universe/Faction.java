@@ -34,6 +34,8 @@
 package mekhq.campaign.universe;
 
 import static megamek.common.compute.Compute.randomInt;
+import static mekhq.MHQConstants.FORTRESS_REPUBLIC_START;
+import static mekhq.MHQConstants.FORTRESS_REPUBLIC_TERRA_ONLY_END;
 
 import java.awt.Color;
 import java.nio.file.Path;
@@ -48,6 +50,7 @@ import megamek.common.universe.Faction2;
 import megamek.common.universe.FactionLeaderData;
 import megamek.common.universe.FactionTag;
 import megamek.common.universe.HonorRating;
+import mekhq.MHQConstants;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.ranks.RankSystem;
@@ -61,11 +64,15 @@ public class Faction {
     // region Variable Declarations
     public static final String DEFAULT_CODE = "???";
     public static final String MERCENARY_FACTION_CODE = "MERC";
+    public static final String REBEL_FACTION_CODE = "REB";
     public static final String PIRATE_FACTION_CODE = "PIR";
+    public static final String BANDIT_CASTE_FACTION_CODE = "BAN";
     public static final String COMSTAR_FACTION_CODE = "CS";
     public static final String WORD_OF_BLAKE_FACTION_CODE = "WOB";
     public static final String TORTUGA_DOMINIONS_FACTION_CODE = "TD";
     public static final String INDEPENDENT_FACTION_CODE = "IND";
+    public static final String CLAN_FACTION_CODE = "CLAN";
+    public static final String REPUBLIC_OF_THE_SPHERE_FACTION_CODE = "ROS";
 
     private Faction2 faction2;
 
@@ -255,6 +262,15 @@ public class Faction {
     public Optional<String> getCamosFolder(int year) {
         return Optional.ofNullable(faction2 != null ? faction2.getCamosFolder(year) : null);
     }
+
+    /**
+     * @param year the year to check
+     *
+     * @return {@code true} if this faction observed the Ares Conventions in the given year; {@code false} by default
+     */
+public boolean isAresConventionsSignatory(int year) {
+    return faction2 != null && faction2.isAresConventionsSignatory(year);
+}
 
     public int getEraMod(int year) {
         if (eraMods == null) {
@@ -457,6 +473,41 @@ public class Faction {
 
     public boolean isRebelOrPirate() {
         return isRebel() || isPirate();
+    }
+
+    /**
+     * Determines whether the given faction/date/location falls within the Fortress Republic period.
+     *
+     * <p>If {@code factionShortName} is non-{@code null}, only the Republic of the Sphere qualifies. A
+     * {@code null} faction short name is treated as faction-agnostic, and only the date/location rules are
+     * applied.</p>
+     *
+     * <p>Terra remains affected during the Terra-only Fortress Republic window. All other locations are affected
+     * until the general Fortress Republic end date.</p>
+     *
+     * @param factionShortName the faction short name to check, or {@code null} to ignore faction
+     * @param currentDate      the date to check
+     * @param planetName       the planet name to check, or {@code null} if no planet is specified
+     *
+     * @return {@code true} if the supplied values are during the applicable Fortress Republic period; {@code false}
+     *       otherwise
+     */
+    public static boolean isDuringFortressRepublic(@Nullable String factionShortName, LocalDate currentDate,
+          @Nullable String planetName) {
+        if (factionShortName != null && !factionShortName.equals(REPUBLIC_OF_THE_SPHERE_FACTION_CODE)) {
+            return false;
+        }
+
+        if (currentDate.isBefore(FORTRESS_REPUBLIC_START)) {
+            return false;
+        }
+
+        boolean isTerra = planetName != null && planetName.equals("Terra");
+        if (isTerra && currentDate.isBefore(FORTRESS_REPUBLIC_TERRA_ONLY_END)) {
+            return true;
+        }
+
+        return currentDate.isBefore(MHQConstants.FORTRESS_REPUBLIC_END);
     }
 
     public boolean isGovernment() {
@@ -742,5 +793,9 @@ public class Faction {
         }
 
         return false;
+    }
+
+    public boolean isUsesMercenaries(int year) {
+        return faction2 != null ? faction2.isUsesMercenaries(year) : true;
     }
 }

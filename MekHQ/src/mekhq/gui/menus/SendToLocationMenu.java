@@ -81,18 +81,35 @@ public class SendToLocationMenu extends JScrollableMenu {
     public SendToLocationMenu(Campaign campaign, JFrame frame,
           List<? extends ILocation> items,
           Consumer<ILocation> dispatcher) {
+        this(campaign, frame, items, dispatcher, "menu.sendTo.text");
+    }
+
+    /**
+     * @param campaign    the active campaign
+     * @param frame       parent frame for any dialogs
+     * @param items       the {@link ILocation} objects to dispatch (persons, units, or parts)
+     * @param dispatcher  callback invoked with the chosen destination when the user clicks an entry
+     * @param menuTextKey resource-bundle key for this menu's label (e.g. "menu.sendTo.text" or
+     *                    "menu.teleportTo.text"), letting the same destination picker be reused under
+     *                    different top-level labels
+     */
+    public SendToLocationMenu(Campaign campaign, JFrame frame,
+          List<? extends ILocation> items,
+          Consumer<ILocation> dispatcher,
+          String menuTextKey) {
         super("SendToLocationMenu");
-        initialize(campaign, frame, items, dispatcher);
+        initialize(campaign, frame, items, dispatcher, menuTextKey);
     }
 
     private void initialize(Campaign campaign, JFrame frame,
           List<? extends ILocation> items,
-          Consumer<ILocation> dispatcher) {
+          Consumer<ILocation> dispatcher,
+          String menuTextKey) {
         if (items.isEmpty()) {
             return;
         }
 
-        setText(getTextAt(RESOURCE_BUNDLE, "menu.sendTo.text"));
+        setText(getTextAt(RESOURCE_BUNDLE, menuTextKey));
 
         // Determine the ILocation parent all selected items share (if any), to exclude it.
         // ILocation subtypes like Personnel extend LinkedHashMap, so Objects.equals() would
@@ -107,16 +124,16 @@ public class SendToLocationMenu extends JScrollableMenu {
               ? currentLocations.iterator().next()
               : null;
 
-        // Main Force entry (= the campaign itself).
-        // Items at main force are parented to mainForcePersonnel, hangar, or warehouse — not
-        // to the campaign object directly — so check all three sub-resources.
-        boolean alreadyAtMainForce = sharedCurrent == campaign
-              || sharedCurrent == campaign.getMainForcePersonnel()
-              || sharedCurrent == campaign.getHangar()
-              || sharedCurrent == campaign.getWarehouse();
+        // Main Force entry (= the main force's Detachment).
+        // Items at main force are parented to mainForcePersonnel, hangar, or warehouse — not to the
+        // Detachment itself — so check the Detachment and all three sub-resources.
+        boolean alreadyAtMainForce = sharedCurrent == campaign.getPlayerForce().getForceDetachment()
+                                           || sharedCurrent == campaign.getPlayerForce().getPersonnel()
+                                           || sharedCurrent == campaign.getPlayerForce().getHangar()
+                                           || sharedCurrent == campaign.getPlayerForce().getWarehouse();
         if (!alreadyAtMainForce) {
             JMenuItem mainForce = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "label.mainForce.text"));
-            mainForce.addActionListener(e -> dispatcher.accept(campaign));
+            mainForce.addActionListener(e -> dispatcher.accept(campaign.getPlayerForce().getForceDetachment()));
             add(mainForce);
         }
 
@@ -141,7 +158,7 @@ public class SendToLocationMenu extends JScrollableMenu {
             Planet contextPlanet = items.get(0).getPlanet();
             if (contextSystem == null) {
                 contextSystem = campaign.getCurrentSystem();
-                contextPlanet = campaign.getPlanet();
+                contextPlanet = campaign.getPlayerForce().getForceDetachment().getPlanet();
             }
             BaseSettingsDialog dialog = new BaseSettingsDialog(frame, campaign,
                   contextSystem, contextPlanet);

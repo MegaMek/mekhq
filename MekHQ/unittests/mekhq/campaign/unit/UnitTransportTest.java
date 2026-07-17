@@ -42,6 +42,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.util.UUID;
 import java.util.Vector;
@@ -75,7 +76,7 @@ public class UnitTransportTest {
     @EnumSource(value = CampaignTransportType.class)
     public void basicTransportedUnits(CampaignTransportType campaignTransportType) {
         Game mockGame = mock(Game.class);
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
 
         Unit transport = new Unit();
@@ -180,7 +181,7 @@ public class UnitTransportTest {
     @ParameterizedTest
     @EnumSource(value = CampaignTransportType.class)
     public void testUnitTypeForAerosMatchesAeroBayType() {
-        Campaign campaign = mock(Campaign.class);
+        Campaign campaign = mockCampaign();
 
         // Create a fake entity to back the real transport Unit
         Dropship mockVengeance = mock(Dropship.class);

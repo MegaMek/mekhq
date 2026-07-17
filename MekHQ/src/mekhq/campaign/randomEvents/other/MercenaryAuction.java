@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -36,7 +36,6 @@ import static java.lang.Math.max;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.REGULAR;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 import static mekhq.campaign.mission.AtBDynamicScenarioFactory.getEntity;
 import static mekhq.campaign.mission.BotForceRandomizer.UNIT_WEIGHT_UNSPECIFIED;
 import static mekhq.campaign.unit.Unit.getRandomUnitQuality;
@@ -45,7 +44,7 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.stratCon.StratConCampaignState;
+import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.dialog.MercenaryAuctionDialog;
 
@@ -114,7 +113,11 @@ public class MercenaryAuction {
                   maximumBid);
 
             new ImmersiveDialogSimple(campaign,
-                  campaign.getSeniorAdminPerson(TRANSPORT),
+                  campaign.getPlayerForce().getHumanResources()
+                        .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT,
+                              campaign.getCampaignOptions(),
+                              campaign.isClanCampaign(),
+                              campaign.getLocalDate()),
                   null,
                   inCharacterMessage,
                   null,
@@ -154,7 +157,11 @@ public class MercenaryAuction {
 
             // This dialog informs the player their bid was successful
             new ImmersiveDialogSimple(campaign,
-                  campaign.getSeniorAdminPerson(TRANSPORT),
+                  campaign.getPlayerForce().getHumanResources()
+                        .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT,
+                              campaign.getCampaignOptions(),
+                              campaign.isClanCampaign(),
+                              campaign.getLocalDate()),
                   null,
                   getFormattedTextAt(RESOURCE_BUNDLE, "auction.successful", entity.getChassis(), deliveryTime),
                   null,
@@ -164,7 +171,11 @@ public class MercenaryAuction {
         } else {
             // This dialog informs the player their bid was unsuccessful
             new ImmersiveDialogSimple(campaign,
-                  campaign.getSeniorAdminPerson(TRANSPORT),
+                  campaign.getPlayerForce().getHumanResources()
+                        .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT,
+                              campaign.getCampaignOptions(),
+                              campaign.isClanCampaign(),
+                              campaign.getLocalDate()),
                   null,
                   getFormattedTextAt(RESOURCE_BUNDLE, "auction.failure", entity.getChassis()),
                   null,

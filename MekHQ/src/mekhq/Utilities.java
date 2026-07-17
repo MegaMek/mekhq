@@ -465,7 +465,13 @@ public class Utilities {
             // region Solo Pilot
             Person person;
             if (unit.getEntity() instanceof LandAirMek) {
-                person = campaign.newPerson(PersonnelRole.LAM_PILOT, factionCode, oldCrew.getGender());
+                final megamek.common.enums.Gender gender = oldCrew.getGender();
+                person = campaign.getPlayerForce()
+                               .getHumanResources()
+                               .newPerson(campaign,
+                                     mekhq.campaign.personnel.enums.PersonnelRole.LAM_PILOT,
+                                     factionCode,
+                                     gender);
                 person.addSkill(SkillType.S_PILOT_MEK,
                       SkillType.getType(SkillType.S_PILOT_MEK).getTarget() - oldCrew.getPiloting(),
                       0);
@@ -479,7 +485,13 @@ public class Utilities {
                       SkillType.getType(SkillType.S_GUN_AERO).getTarget() - oldCrew.getGunnery(),
                       0);
             } else if (unit.getEntity() instanceof Mek) {
-                person = campaign.newPerson(PersonnelRole.MEKWARRIOR, factionCode, oldCrew.getGender());
+                final megamek.common.enums.Gender gender = oldCrew.getGender();
+                person = campaign.getPlayerForce()
+                               .getHumanResources()
+                               .newPerson(campaign,
+                                     mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR,
+                                     factionCode,
+                                     gender);
                 person.addSkill(SkillType.S_PILOT_MEK,
                       SkillType.getType(SkillType.S_PILOT_MEK).getTarget() - oldCrew.getPiloting(),
                       0);
@@ -487,7 +499,13 @@ public class Utilities {
                       SkillType.getType(SkillType.S_GUN_MEK).getTarget() - oldCrew.getGunnery(),
                       0);
             } else if (unit.getEntity() instanceof Aero) {
-                person = campaign.newPerson(PersonnelRole.AEROSPACE_PILOT, factionCode, oldCrew.getGender());
+                final megamek.common.enums.Gender gender = oldCrew.getGender();
+                person = campaign.getPlayerForce()
+                               .getHumanResources()
+                               .newPerson(campaign,
+                                     mekhq.campaign.personnel.enums.PersonnelRole.AEROSPACE_PILOT,
+                                     factionCode,
+                                     gender);
                 person.addSkill(SkillType.S_PILOT_AERO,
                       SkillType.getType(SkillType.S_PILOT_AERO).getTarget() - oldCrew.getPiloting(),
                       0);
@@ -495,9 +513,13 @@ public class Utilities {
                       SkillType.getType(SkillType.S_GUN_AERO).getTarget() - oldCrew.getGunnery(),
                       0);
             } else if (unit.getEntity() instanceof ConvFighter) {
-                person = campaign.newPerson(PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT,
-                      factionCode,
-                      oldCrew.getGender());
+                final megamek.common.enums.Gender gender = oldCrew.getGender();
+                person = campaign.getPlayerForce()
+                               .getHumanResources()
+                               .newPerson(campaign,
+                                     mekhq.campaign.personnel.enums.PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT,
+                                     factionCode,
+                                     gender);
                 person.addSkill(SkillType.S_PILOT_JET,
                       SkillType.getType(SkillType.S_PILOT_JET).getTarget() - oldCrew.getPiloting(),
                       0);
@@ -505,12 +527,24 @@ public class Utilities {
                       SkillType.getType(SkillType.S_GUN_JET).getTarget() - oldCrew.getPiloting(),
                       0);
             } else if (unit.getEntity() instanceof ProtoMek) {
-                person = campaign.newPerson(PersonnelRole.PROTOMEK_PILOT, factionCode, oldCrew.getGender());
+                final megamek.common.enums.Gender gender = oldCrew.getGender();
+                person = campaign.getPlayerForce()
+                               .getHumanResources()
+                               .newPerson(campaign,
+                                     mekhq.campaign.personnel.enums.PersonnelRole.PROTOMEK_PILOT,
+                                     factionCode,
+                                     gender);
                 person.addSkill(SkillType.S_GUN_PROTO,
                       SkillType.getType(SkillType.S_GUN_PROTO).getTarget() - oldCrew.getGunnery(),
                       0);
             } else if (unit.getEntity() instanceof VTOL) {
-                person = campaign.newPerson(PersonnelRole.VEHICLE_CREW_VTOL, factionCode, oldCrew.getGender());
+                final megamek.common.enums.Gender gender = oldCrew.getGender();
+                person = campaign.getPlayerForce()
+                               .getHumanResources()
+                               .newPerson(campaign,
+                                     mekhq.campaign.personnel.enums.PersonnelRole.VEHICLE_CREW_VTOL,
+                                     factionCode,
+                                     gender);
                 person.addSkill(SkillType.S_PILOT_VTOL,
                       SkillType.getType(SkillType.S_PILOT_VTOL).getTarget() - oldCrew.getPiloting(),
                       0);
@@ -519,7 +553,13 @@ public class Utilities {
                       0);
             } else {
                 // assume tanker if we got here
-                person = campaign.newPerson(PersonnelRole.VEHICLE_CREW_GROUND, factionCode, oldCrew.getGender());
+                final megamek.common.enums.Gender gender = oldCrew.getGender();
+                person = campaign.getPlayerForce()
+                               .getHumanResources()
+                               .newPerson(campaign,
+                                     mekhq.campaign.personnel.enums.PersonnelRole.VEHICLE_CREW_GROUND,
+                                     factionCode,
+                                     gender);
                 person.addSkill(SkillType.S_PILOT_GVEE,
                       SkillType.getType(SkillType.S_PILOT_GVEE).getTarget() - oldCrew.getPiloting(),
                       0);
@@ -537,7 +577,13 @@ public class Utilities {
                 for (int slot = 0; slot < oldCrew.getSlotCount(); slot++) {
                     Person p = null;
                     if (unit.getEntity() instanceof Mek) {
-                        p = campaign.newPerson(PersonnelRole.MEKWARRIOR, factionCode, oldCrew.getGender(slot));
+                        final megamek.common.enums.Gender gender = oldCrew.getGender(slot);
+                        p = campaign.getPlayerForce()
+                                  .getHumanResources()
+                                  .newPerson(campaign,
+                                        mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR,
+                                        factionCode,
+                                        gender);
                         p.addSkill(SkillType.S_PILOT_MEK,
                               SkillType.getType(SkillType.S_PILOT_MEK).getTarget() - oldCrew.getPiloting(slot),
                               0);
@@ -545,7 +591,13 @@ public class Utilities {
                               SkillType.getType(SkillType.S_GUN_MEK).getTarget() - oldCrew.getGunnery(slot),
                               0);
                     } else if (unit.getEntity() instanceof Aero) {
-                        p = campaign.newPerson(PersonnelRole.AEROSPACE_PILOT, factionCode, oldCrew.getGender(slot));
+                        final megamek.common.enums.Gender gender = oldCrew.getGender(slot);
+                        p = campaign.getPlayerForce()
+                                  .getHumanResources()
+                                  .newPerson(campaign,
+                                        mekhq.campaign.personnel.enums.PersonnelRole.AEROSPACE_PILOT,
+                                        factionCode,
+                                        gender);
                         p.addSkill(SkillType.S_PILOT_AERO,
                               SkillType.getType(SkillType.S_PILOT_AERO).getTarget() - oldCrew.getPiloting(slot),
                               0);
@@ -591,33 +643,49 @@ public class Utilities {
                 for (int slot = 0; slot < driversNeeded; slot++) {
                     Person p;
                     if (unit.getEntity() instanceof SmallCraft || unit.getEntity() instanceof Jumpship) {
-                        p = campaign.newPerson(PersonnelRole.VESSEL_PILOT,
-                              factionCode,
-                              oldCrew.getGender(numberPeopleGenerated));
+                        final megamek.common.enums.Gender gender = oldCrew.getGender(numberPeopleGenerated);
+                        p = campaign.getPlayerForce()
+                                  .getHumanResources()
+                                  .newPerson(campaign,
+                                        mekhq.campaign.personnel.enums.PersonnelRole.VESSEL_PILOT,
+                                        factionCode,
+                                        gender);
                         p.addSkill(SkillType.S_PILOT_SPACE,
                               randomSkillFromTarget(SkillType.getType(SkillType.S_PILOT_SPACE).getTarget() -
                                                           oldCrew.getPiloting()),
                               0);
                     } else if (unit.getEntity() instanceof BattleArmor) {
-                        p = campaign.newPerson(PersonnelRole.BATTLE_ARMOUR,
-                              factionCode,
-                              oldCrew.getGender(numberPeopleGenerated));
+                        final megamek.common.enums.Gender gender = oldCrew.getGender(numberPeopleGenerated);
+                        p = campaign.getPlayerForce()
+                                  .getHumanResources()
+                                  .newPerson(campaign,
+                                        mekhq.campaign.personnel.enums.PersonnelRole.BATTLE_ARMOUR,
+                                        factionCode,
+                                        gender);
                         p.addSkill(SkillType.S_GUN_BA,
                               randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_BA).getTarget() -
                                                           oldCrew.getGunnery()),
                               0);
                     } else if (unit.getEntity() instanceof Infantry) {
-                        p = campaign.newPerson(PersonnelRole.SOLDIER,
-                              factionCode,
-                              oldCrew.getGender(numberPeopleGenerated));
+                        final megamek.common.enums.Gender gender = oldCrew.getGender(numberPeopleGenerated);
+                        p = campaign.getPlayerForce()
+                                  .getHumanResources()
+                                  .newPerson(campaign,
+                                        mekhq.campaign.personnel.enums.PersonnelRole.SOLDIER,
+                                        factionCode,
+                                        gender);
                         p.addSkill(SkillType.S_SMALL_ARMS,
                               randomSkillFromTarget(SkillType.getType(SkillType.S_SMALL_ARMS).getTarget() -
                                                           oldCrew.getGunnery()),
                               0);
                     } else if (unit.getEntity() instanceof VTOL) {
-                        p = campaign.newPerson(PersonnelRole.VEHICLE_CREW_VTOL,
-                              factionCode,
-                              oldCrew.getGender(numberPeopleGenerated));
+                        final megamek.common.enums.Gender gender = oldCrew.getGender(numberPeopleGenerated);
+                        p = campaign.getPlayerForce()
+                                  .getHumanResources()
+                                  .newPerson(campaign,
+                                        mekhq.campaign.personnel.enums.PersonnelRole.VEHICLE_CREW_VTOL,
+                                        factionCode,
+                                        gender);
                         p.addSkill(SkillType.S_PILOT_VTOL,
                               SkillType.getType(SkillType.S_PILOT_VTOL).getTarget() - oldCrew.getPiloting(),
                               0);
@@ -625,9 +693,13 @@ public class Utilities {
                               SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(),
                               0);
                     } else if (unit.getEntity() instanceof Mek) {
-                        p = campaign.newPerson(PersonnelRole.MEKWARRIOR,
-                              factionCode,
-                              oldCrew.getGender(numberPeopleGenerated));
+                        final megamek.common.enums.Gender gender = oldCrew.getGender(numberPeopleGenerated);
+                        p = campaign.getPlayerForce()
+                                  .getHumanResources()
+                                  .newPerson(campaign,
+                                        mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR,
+                                        factionCode,
+                                        gender);
                         p.addSkill(SkillType.S_PILOT_MEK,
                               SkillType.getType(SkillType.S_PILOT_MEK).getTarget() - oldCrew.getPiloting(),
                               0);
@@ -636,9 +708,13 @@ public class Utilities {
                               0);
                     } else {
                         // assume tanker if we got here
-                        p = campaign.newPerson(PersonnelRole.VEHICLE_CREW_GROUND,
-                              factionCode,
-                              oldCrew.getGender(numberPeopleGenerated));
+                        final megamek.common.enums.Gender gender = oldCrew.getGender(numberPeopleGenerated);
+                        p = campaign.getPlayerForce()
+                                  .getHumanResources()
+                                  .newPerson(campaign,
+                                        mekhq.campaign.personnel.enums.PersonnelRole.VEHICLE_CREW_GROUND,
+                                        factionCode,
+                                        gender);
                         p.addSkill(SkillType.S_PILOT_GVEE,
                               SkillType.getType(SkillType.S_PILOT_GVEE).getTarget() - oldCrew.getPiloting(),
                               0);
@@ -667,17 +743,25 @@ public class Utilities {
                     for (int slot = 0; slot < unit.getTotalGunnerNeeds(); slot++) {
                         Person p;
                         if (unit.getEntity() instanceof SmallCraft || unit.getEntity() instanceof Jumpship) {
-                            p = campaign.newPerson(PersonnelRole.VESSEL_GUNNER,
-                                  factionCode,
-                                  oldCrew.getGender(numberPeopleGenerated));
+                            final megamek.common.enums.Gender gender = oldCrew.getGender(numberPeopleGenerated);
+                            p = campaign.getPlayerForce()
+                                      .getHumanResources()
+                                      .newPerson(campaign,
+                                            mekhq.campaign.personnel.enums.PersonnelRole.VESSEL_GUNNER,
+                                            factionCode,
+                                            gender);
                             p.addSkill(SkillType.S_GUN_SPACE,
                                   randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_SPACE).getTarget() -
                                                               oldCrew.getGunnery()),
                                   0);
                         } else if (unit.getEntity() instanceof Mek) {
-                            p = campaign.newPerson(PersonnelRole.MEKWARRIOR,
-                                  factionCode,
-                                  oldCrew.getGender(numberPeopleGenerated));
+                            final megamek.common.enums.Gender gender = oldCrew.getGender(numberPeopleGenerated);
+                            p = campaign.getPlayerForce()
+                                      .getHumanResources()
+                                      .newPerson(campaign,
+                                            mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR,
+                                            factionCode,
+                                            gender);
                             p.addSkill(SkillType.S_PILOT_MEK,
                                   SkillType.getType(SkillType.S_PILOT_MEK).getTarget() - oldCrew.getPiloting(),
                                   0);
@@ -686,24 +770,36 @@ public class Utilities {
                                   0);
                         } else {
                             if (unit.getEntity().getMovementMode().isMarine()) {
-                                p = campaign.newPerson(PersonnelRole.VEHICLE_CREW_NAVAL,
-                                      factionCode,
-                                      oldCrew.getGender(numberPeopleGenerated));
+                                final megamek.common.enums.Gender gender = oldCrew.getGender(numberPeopleGenerated);
+                                p = campaign.getPlayerForce()
+                                          .getHumanResources()
+                                          .newPerson(campaign,
+                                                mekhq.campaign.personnel.enums.PersonnelRole.VEHICLE_CREW_NAVAL,
+                                                factionCode,
+                                                gender);
                                 p.addSkill(SkillType.S_PILOT_MEK,
                                       SkillType.getType(SkillType.S_PILOT_NVEE).getTarget() - oldCrew.getPiloting(),
                                       0);
                             } else if (unit.getEntity() instanceof VTOL) {
 
-                                p = campaign.newPerson(PersonnelRole.VEHICLE_CREW_VTOL,
-                                      factionCode,
-                                      oldCrew.getGender(numberPeopleGenerated));
+                                final megamek.common.enums.Gender gender = oldCrew.getGender(numberPeopleGenerated);
+                                p = campaign.getPlayerForce()
+                                          .getHumanResources()
+                                          .newPerson(campaign,
+                                                mekhq.campaign.personnel.enums.PersonnelRole.VEHICLE_CREW_VTOL,
+                                                factionCode,
+                                                gender);
                                 p.addSkill(SkillType.S_PILOT_MEK,
                                       SkillType.getType(SkillType.S_PILOT_VTOL).getTarget() - oldCrew.getPiloting(),
                                       0);
                             } else {
-                                p = campaign.newPerson(PersonnelRole.VEHICLE_CREW_GROUND,
-                                      factionCode,
-                                      oldCrew.getGender(numberPeopleGenerated));
+                                final megamek.common.enums.Gender gender = oldCrew.getGender(numberPeopleGenerated);
+                                p = campaign.getPlayerForce()
+                                          .getHumanResources()
+                                          .newPerson(campaign,
+                                                mekhq.campaign.personnel.enums.PersonnelRole.VEHICLE_CREW_GROUND,
+                                                factionCode,
+                                                gender);
                                 p.addSkill(SkillType.S_PILOT_MEK,
                                       SkillType.getType(SkillType.S_PILOT_GVEE).getTarget() - oldCrew.getPiloting(),
                                       0);
@@ -747,32 +843,51 @@ public class Utilities {
                 } else {
                     role = PersonnelRole.ASTECH;
                 }
-                Person person = campaign.newPerson(role, factionCode, oldCrew.getGender(numberPeopleGenerated));
+                final megamek.common.enums.Gender gender = oldCrew.getGender(numberPeopleGenerated);
+                Person person = campaign.getPlayerForce()
+                                      .getHumanResources()
+                                      .newPerson(campaign, role, factionCode, gender);
 
                 migrateCrewData(person, oldCrew, numberPeopleGenerated++, false);
                 vesselCrew.add(person);
             }
 
             if (unit.canTakeNavigator()) {
-                navigator = campaign.newPerson(PersonnelRole.VESSEL_NAVIGATOR,
-                      factionCode,
-                      oldCrew.getGender(numberPeopleGenerated));
+                final megamek.common.enums.Gender gender = oldCrew.getGender(numberPeopleGenerated);
+                navigator = campaign.getPlayerForce()
+                                  .getHumanResources()
+                                  .newPerson(campaign,
+                                        mekhq.campaign.personnel.enums.PersonnelRole.VESSEL_NAVIGATOR,
+                                        factionCode,
+                                        gender);
                 migrateCrewData(navigator, oldCrew, numberPeopleGenerated++, false);
             }
 
             if (unit.canTakeTechOfficer()) {
                 if (unit.getEntity().getMovementMode().isMarine()) {
-                    consoleCmdr = campaign.newPerson(PersonnelRole.VEHICLE_CREW_NAVAL,
-                          factionCode,
-                          oldCrew.getGender(numberPeopleGenerated));
+                    final megamek.common.enums.Gender gender = oldCrew.getGender(numberPeopleGenerated);
+                    consoleCmdr = campaign.getPlayerForce()
+                                        .getHumanResources()
+                                        .newPerson(campaign,
+                                              mekhq.campaign.personnel.enums.PersonnelRole.VEHICLE_CREW_NAVAL,
+                                              factionCode,
+                                              gender);
                 } else if (unit.getEntity() instanceof VTOL) {
-                    consoleCmdr = campaign.newPerson(PersonnelRole.VEHICLE_CREW_VTOL,
-                          factionCode,
-                          oldCrew.getGender(numberPeopleGenerated));
+                    final megamek.common.enums.Gender gender = oldCrew.getGender(numberPeopleGenerated);
+                    consoleCmdr = campaign.getPlayerForce()
+                                        .getHumanResources()
+                                        .newPerson(campaign,
+                                              mekhq.campaign.personnel.enums.PersonnelRole.VEHICLE_CREW_VTOL,
+                                              factionCode,
+                                              gender);
                 } else {
-                    consoleCmdr = campaign.newPerson(PersonnelRole.VEHICLE_CREW_GROUND,
-                          factionCode,
-                          oldCrew.getGender(numberPeopleGenerated));
+                    final megamek.common.enums.Gender gender = oldCrew.getGender(numberPeopleGenerated);
+                    consoleCmdr = campaign.getPlayerForce()
+                                        .getHumanResources()
+                                        .newPerson(campaign,
+                                              mekhq.campaign.personnel.enums.PersonnelRole.VEHICLE_CREW_GROUND,
+                                              factionCode,
+                                              gender);
                 }
 
                 migrateCrewData(consoleCmdr, oldCrew, numberPeopleGenerated, false);

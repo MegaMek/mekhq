@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -81,7 +81,10 @@ public record FreedomDayAnnouncement(Campaign campaign) {
      */
     public FreedomDayAnnouncement(Campaign campaign) {
         this.campaign = campaign;
-        Person commander = campaign.getCommander();
+        Person commander = campaign.getPlayerForce().getHumanResources()
+                                 .getCommander(campaign.getCampaignOptions(),
+                                       campaign.isClanCampaign(),
+                                       campaign.getLocalDate());
 
         String inCharacterMessage = getInCharacterMessage();
         String outOfCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "freedomDay.message.ooc");
@@ -159,7 +162,7 @@ public record FreedomDayAnnouncement(Campaign campaign) {
         List<Person> factionPool = new ArrayList<>();
         List<Person> activePool = new ArrayList<>();
 
-        for (Person person : campaign.getAllPersonnel()) {
+        for (Person person : campaign.getPlayerForce().getHumanResources().getPersonnel()) {
             if (isIneligible(commander, person)) {
                 continue;
             }

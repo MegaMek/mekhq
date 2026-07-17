@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -70,7 +70,7 @@ public class PersonnelReport extends AbstractReport {
         int countRetired = 0;
         Money salary = Money.zero();
 
-        for (Person person : getCampaign().getPersonnel().values()) {
+        for (Person person : getCampaign().getPlayerForce().getPersonnel().values()) {
             if ((!person.getPrimaryRole().isCombat()) || (!person.getPrisonerStatus().isFreeOrBondsman())) {
                 continue;
             }
@@ -105,8 +105,15 @@ public class PersonnelReport extends AbstractReport {
 
         // Add Salaries of Temp Combat Crew
         for (PersonnelRole role : PersonnelRole.values()) {
-            if (role.isCombat() && getCampaign().isBlobCrewEnabled(role)) {
-                salary = salary.plus(getTempCrewPay(role, getCampaign().getTempCrewPool(role)));
+            if (role.isCombat()) {
+                Campaign campaign1 = getCampaign();
+                if (campaign1.getPlayerForce()
+                          .getHumanResources()
+                          .isBlobCrewEnabled(role, campaign1.getCampaignOptions())) {
+                    Campaign campaign = getCampaign();
+                    salary = salary.plus(getTempCrewPay(role,
+                          campaign.getPlayerForce().getHumanResources().getTempCrewPool(role)));
+                }
             }
         }
 
@@ -124,14 +131,21 @@ public class PersonnelReport extends AbstractReport {
 
         // Add Temp Crew to Combat List
         for (PersonnelRole role : PersonnelRole.values()) {
-            if (role.isCombat() && getCampaign().isBlobCrewEnabled(role)) {
-                int poolSize = getCampaign().getTempCrewPool(role);
-                if (poolSize > 0) {
-                    String labelKey = "combat.temp." + role.name().toLowerCase() + ".text";
-                    String label = resources.containsKey(labelKey) ?
-                        resources.getString(labelKey) :
-                        "Temp " + role.getLabel(getCampaign().getFaction().isClan());
-                    sb.append(String.format("    %-30s    %4s\n", label, poolSize));
+            if (role.isCombat()) {
+                Campaign campaign1 = getCampaign();
+                if (campaign1.getPlayerForce()
+                          .getHumanResources()
+                          .isBlobCrewEnabled(role, campaign1.getCampaignOptions())) {
+                    Campaign campaign = getCampaign();
+                    int poolSize = campaign.getPlayerForce().getHumanResources().getTempCrewPool(role);
+                    if (poolSize > 0) {
+                        String labelKey = "combat.temp." + role.name().toLowerCase() + ".text";
+                        String label;
+                        if (resources.containsKey(labelKey)) {label = resources.getString(labelKey);} else {
+                            label = "Temp " + role.getLabel(getCampaign().getFaction().isClan());
+                        }
+                        sb.append(String.format("    %-30s    %4s\n", label, poolSize));
+                    }
                 }
             }
         }
@@ -172,7 +186,7 @@ public class PersonnelReport extends AbstractReport {
         Money civilianSalaries = Money.zero();
         LocalDate today = getCampaign().getLocalDate();
 
-        for (Person person : getCampaign().getPersonnel().values()) {
+        for (Person person : getCampaign().getPlayerForce().getPersonnel().values()) {
             if (person.getStatus().isCampFollower() && !person.getPrisonerStatus().isCurrentPrisoner()) {
                 campFollowers++;
                 continue;
@@ -229,8 +243,10 @@ public class PersonnelReport extends AbstractReport {
         }
 
         //Add Salaries of Temp Workers
-        salary = salary.plus(getTempCrewPay(PersonnelRole.ASTECH, getCampaign().getTemporaryAsTechPool()));
-        salary = salary.plus(getTempCrewPay(PersonnelRole.MEDIC, getCampaign().getTemporaryMedicPool()));
+        salary = salary.plus(getTempCrewPay(PersonnelRole.ASTECH,
+              getCampaign().getPlayerForce().getHumanResources().getTemporaryAsTechPool()));
+        salary = salary.plus(getTempCrewPay(PersonnelRole.MEDIC,
+              getCampaign().getPlayerForce().getHumanResources().getTemporaryMedicPool()));
 
         StringBuilder sb = new StringBuilder(resources.getString("support.personnel.header.text") + "\n\n");
 
@@ -245,8 +261,11 @@ public class PersonnelReport extends AbstractReport {
         }
 
         //Add Temp Medics and Astechs to Support List
-        sb.append(String.format("    %-30s       %4s\n", "Temp Medics", getCampaign().getTemporaryMedicPool()));
-        sb.append(String.format("    %-30s       %4s\n", "Temp Astechs", getCampaign().getTemporaryAsTechPool()));
+        sb.append(String.format("    %-30s       %4s\n", "Temp Medics",
+              getCampaign().getPlayerForce().getHumanResources().getTemporaryMedicPool()));
+        sb.append(String.format("    %-30s       %4s\n",
+              "Temp Astechs",
+              getCampaign().getPlayerForce().getHumanResources().getTemporaryAsTechPool()));
 
         sb.append(getSecondarySupportPersonnelDetails());
 
@@ -304,7 +323,7 @@ public class PersonnelReport extends AbstractReport {
     public String getSecondarySupportPersonnelDetails() {
         EnumMap<PersonnelRole, Integer> countPersonByType = new EnumMap<>(PersonnelRole.class);
         int countSecondary = 0;
-        for (Person person : getCampaign().getPersonnel().values()) {
+        for (Person person : getCampaign().getPlayerForce().getPersonnel().values()) {
             // Add them to the total count
             final boolean secondarySupport = person.getSecondaryRole().isSupport(true);
 
@@ -335,7 +354,7 @@ public class PersonnelReport extends AbstractReport {
         EnumMap<PersonnelRole, Integer> countPersonByType = new EnumMap<>(PersonnelRole.class);
 
         int countSecondary = 0;
-        for (Person person : getCampaign().getPersonnel().values()) {
+        for (Person person : getCampaign().getPlayerForce().getPersonnel().values()) {
             // Add them to the total count
             final boolean secondaryCombat = person.getSecondaryRole().isCombat();
 

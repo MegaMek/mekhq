@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -49,7 +49,7 @@ public final class UnitTestUtilities {
 
     public static Unit addAndGetUnit(Campaign campaign, Entity entity) {
         campaign.addNewUnit(entity, false, 0, PartQuality.QUALITY_D);
-        for (Unit unit : campaign.getAllHangar().getUnits()) {
+        for (Unit unit : campaign.getPlayerForce().getHangar().getUnits()) {
             return unit;
         }
 

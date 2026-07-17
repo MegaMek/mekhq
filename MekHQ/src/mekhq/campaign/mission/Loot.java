@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011 - Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -218,7 +218,7 @@ public class Loot {
         if (cash.isPositive()) {
             LOGGER.debug("Looting cash: {}", cash);
 
-            campaign.getFinances()
+            campaign.getPlayerForce().getFinances()
                   .credit(TransactionType.MISCELLANEOUS,
                         campaign.getLocalDate(),
                         cash,

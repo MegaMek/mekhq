@@ -130,7 +130,9 @@ public class Inoculations {
         String planetName = currentPlanet.getName(today);
 
         // Determine who, if anyone, needs inoculations
-        Collection<Person> allPersonnel = campaign.getPersonnelFilteringOutDepartedAndAbsent();
+        Collection<Person> allPersonnel = campaign.getPlayerForce()
+                                                .getHumanResources()
+                                                .getPersonnelFilteringOutDepartedAndAbsent();
 
         // Generic inoculations
         Set<Person> militaryPersonnelInNeedOfGenericInoculation = new HashSet<>();
@@ -317,7 +319,7 @@ public class Inoculations {
      */
     private static ImmersiveDialogSimple triggerDialog(Campaign campaign, String planetName, String militaryCost,
           String civilianCost, String totalCost, boolean isAdHoc) {
-        List<Person> doctors = campaign.getDoctors();
+        List<Person> doctors = campaign.getPlayerForce().getHumanResources().getDoctors();
         Person seniorDoctor = getDoctor(doctors, campaign);
 
         String inCharacterKey = isAdHoc ? "Inoculations.prompt.ic.adHoc" : "Inoculations.prompt.ic";
@@ -327,7 +329,7 @@ public class Inoculations {
               seniorDoctor,
               null,
               getFormattedTextAt(RESOURCE_BUNDLE, inCharacterKey, campaign.getCommanderAddress(), planetName,
-                    campaign.getFunds().toAmountString()),
+                    campaign.getPlayerForce().getFunds().toAmountString()),
               getButtons(militaryCost, civilianCost, totalCost),
               getTextAt(RESOURCE_BUNDLE, outOfCharacterKey),
               null,
@@ -356,7 +358,7 @@ public class Inoculations {
     private static void handleDialogChoice(Campaign campaign, int choiceIndex, LocalDate today,
           Money totalInoculationCost, Set<Person> militaryPersonnel, Planet location, Set<Person> civilianPersonnel,
           Money militaryInoculationCost, Money civilianInoculationCost) {
-        Finances finances = campaign.getFinances();
+        Finances finances = campaign.getPlayerForce().getFinances();
         switch (choiceIndex) {
             case DIALOG_CHOICE_EVERYBODY -> {
                 if (payForInoculations(finances, today, totalInoculationCost)) {
@@ -517,13 +519,15 @@ public class Inoculations {
      * @since 0.50.10
      */
     public static void performDiseaseChecks(Campaign campaign) {
-        AbstractLocation location = campaign.getCurrentLocation();
+        AbstractLocation location = campaign.getPlayerForce().getForceDetachment().getCurrentLocation();
         LocalDate today = campaign.getLocalDate();
 
         String planetCode = location.isOnPlanet() ? location.getPlanet().getId() : null;
         String systemCode = location.getCurrentSystem().getId();
 
-        List<Person> allPersonnel = campaign.getPersonnelFilteringOutDepartedAndAbsent();
+        List<Person> allPersonnel = campaign.getPlayerForce()
+                                          .getHumanResources()
+                                          .getPersonnelFilteringOutDepartedAndAbsent();
 
         // Gather the active diseases in the players' campaign
         DiseaseScanResult diseaseScanResult = getActiveDiseases(allPersonnel);

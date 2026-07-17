@@ -154,7 +154,7 @@ public class ContractMarketDialog extends JDialog {
         HashMap<String, Integer> successfulContracts = new HashMap<>();
         List<String> retainers = new ArrayList<>();
         for (AtBContract contract : campaign.getCompletedAtBContracts()) {
-            if (contract.getEmployerCode().equals(campaign.getRetainerEmployerCode())) {
+            if (contract.getEmployerCode().equals(campaign.getPlayerForce().getRetainerEmployerCode())) {
                 continue;
             }
             int num = successfulContracts.getOrDefault(contract.getEmployerCode(), 0);
@@ -299,13 +299,13 @@ public class ContractMarketDialog extends JDialog {
             panelFees.add(spnSharePct);
         }
 
-        boolean isOverridingCommandCircuit = campaign.isOverridingCommandCircuitRequirements();
+        boolean isOverridingCommandCircuit = campaign.getPlayerForce().isOverridingCommandCircuitRequirements();
         boolean isGM = campaign.isGM();
         boolean isUseCommandCircuit = isOverridingCommandCircuit && isGM;
 
         boolean isUseFactionStandingCommandCircuits =
               campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe();
-        FactionStandings factionStandings = campaign.getFactionStandings();
+        FactionStandings factionStandings = campaign.getPlayerForce().getFactionStandings();
 
         Vector<Vector<String>> data = new Vector<>();
         for (Contract contract : contractMarket.getContracts()) {
@@ -350,7 +350,8 @@ public class ContractMarketDialog extends JDialog {
 
             final JumpPath path = campaign.calculateJumpPath(campaign.getCurrentSystem(), contract.getSystem());
             final int days = (int) Math.ceil(path.getTotalTime(contract.getStartDate(),
-                  campaign.getCurrentLocation().getTransitTime(), isUseCommandCircuit));
+                  campaign.getPlayerForce().getForceDetachment().getCurrentLocation().getTransitTime(),
+                  isUseCommandCircuit));
             row.add(Integer.toString(days));
             row.add(String.valueOf(contract.getLengthInMonths()));
             row.add(contract.getTransportCompString());
@@ -426,9 +427,9 @@ public class ContractMarketDialog extends JDialog {
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.NONE;
         panelRetainer.add(lblCurrentRetainer, gbc);
-        if (null != campaign.getRetainerEmployerCode()) {
+        if (null != campaign.getPlayerForce().getRetainerEmployerCode()) {
             lblRetainerEmployer.setText(Factions.getInstance()
-                                              .getFaction(campaign.getRetainerEmployerCode())
+                                              .getFaction(campaign.getPlayerForce().getRetainerEmployerCode())
                                               .getFullName(campaign.getGameYear()));
         }
         gbc.gridx = 1;
@@ -438,12 +439,12 @@ public class ContractMarketDialog extends JDialog {
         gbc.gridx = 0;
         gbc.gridy = 1;
         panelRetainer.add(btnEndRetainer, gbc);
-        lblCurrentRetainer.setVisible(null != campaign.getRetainerEmployerCode());
-        lblRetainerEmployer.setVisible(null != campaign.getRetainerEmployerCode());
-        btnEndRetainer.setVisible(null != campaign.getRetainerEmployerCode());
+        lblCurrentRetainer.setVisible(null != campaign.getPlayerForce().getRetainerEmployerCode());
+        lblRetainerEmployer.setVisible(null != campaign.getPlayerForce().getRetainerEmployerCode());
+        btnEndRetainer.setVisible(null != campaign.getPlayerForce().getRetainerEmployerCode());
         btnEndRetainer.addActionListener(ev -> {
-            campaign.setRetainerEmployerCode(null);
-            campaign.setRetainerStartDate(null);
+            campaign.getPlayerForce().setRetainerEmployerCode(null);
+            campaign.getPlayerForce().setRetainerStartDate(null);
             lblCurrentRetainer.setVisible(false);
             lblRetainerEmployer.setVisible(false);
             btnEndRetainer.setVisible(false);
@@ -470,12 +471,13 @@ public class ContractMarketDialog extends JDialog {
         cbRetainerEmployer.setVisible(!possibleRetainerContracts.isEmpty());
         btnStartRetainer.setVisible(!possibleRetainerContracts.isEmpty());
         btnStartRetainer.addActionListener(e -> {
-            campaign.setRetainerEmployerCode(cbRetainerEmployer.getSelectedItemKey());
+            String code = cbRetainerEmployer.getSelectedItemKey();
+            campaign.getPlayerForce().setRetainerEmployerCode(code);
             lblCurrentRetainer.setVisible(true);
             lblRetainerEmployer.setVisible(true);
             btnEndRetainer.setVisible(true);
             lblRetainerEmployer.setText(Factions.getInstance()
-                                              .getFaction(campaign.getRetainerEmployerCode())
+                                              .getFaction(campaign.getPlayerForce().getRetainerEmployerCode())
                                               .getFullName(campaign.getGameYear()));
             // Remove the selected faction and add the previous one, if any
             countSuccessfulContracts();
@@ -519,7 +521,8 @@ public class ContractMarketDialog extends JDialog {
             row.add(contract.getContractType().toString());
             final JumpPath path = campaign.calculateJumpPath(campaign.getCurrentSystem(), contract.getSystem());
             final int days = (int) Math.ceil(path.getTotalTime(contract.getStartDate(),
-                  campaign.getCurrentLocation().getTransitTime(), finalIsUseCommandCircuit));
+                  campaign.getPlayerForce().getForceDetachment().getCurrentLocation().getTransitTime(),
+                  finalIsUseCommandCircuit));
             row.add(Integer.toString(days));
             row.add(String.valueOf(contract.getLengthInMonths()));
             row.add(contract.getTransportCompString());
@@ -607,12 +610,12 @@ public class ContractMarketDialog extends JDialog {
             }
 
             selectedContract.setName(contractView.getContractName());
-            campaign.getFinances()
+            campaign.getPlayerForce().getFinances()
                   .credit(TransactionType.CONTRACT_PAYMENT,
                         campaign.getLocalDate(),
                         selectedContract.getTotalAdvanceAmount(),
                         "Advance funds for " + selectedContract.getName());
-            campaign.getFinances()
+            campaign.getPlayerForce().getFinances()
                   .credit(TransactionType.CONTRACT_PAYMENT,
                         campaign.getLocalDate(),
                         selectedContract.getTransportAmount(),
@@ -632,7 +635,7 @@ public class ContractMarketDialog extends JDialog {
 
                 // Garrison Type contracts have a dynamic enemy. We update Standing whenever a new enemy is chosen.
                 if (!isGarrisonType) {
-                    FactionStandings factionStandings = campaign.getFactionStandings();
+                    FactionStandings factionStandings = campaign.getPlayerForce().getFactionStandings();
                     String standingsReport =
                           factionStandings.processContractAccept(campaign.getFaction().getShortName(), enemyFaction,
                                 campaign.getLocalDate(), campaign.getCampaignOptions().getRegardMultiplier(), 1);

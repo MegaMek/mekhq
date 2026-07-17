@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -89,7 +89,6 @@ import mekhq.campaign.report.CargoReport;
 import mekhq.campaign.report.HangarReport;
 import mekhq.campaign.report.PersonnelReport;
 import mekhq.campaign.report.TransportReport;
-import mekhq.campaign.universe.factionStanding.GoingRogue;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.adapter.ProcurementTableMouseAdapter;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
@@ -496,8 +495,19 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
         RoundedJButton btnGoRogue = new RoundedJButton(resourceMap.getString("btnGoRogue.text"));
         btnGoRogue.setMaximumSize(new Dimension(Integer.MAX_VALUE, btnGoRogue.getPreferredSize().height));
-        btnGoRogue.addActionListener(e -> new GoingRogue(getCampaign(), getCampaign().getCommander(),
-              getCampaign().getSecondInCommand()));
+        btnGoRogue.addActionListener(e -> {
+            mekhq.campaign.Campaign campaign = getCampaign();
+            Campaign campaign1 = getCampaign();
+            new mekhq.campaign.universe.factionStanding.GoingRogue(getCampaign(),
+                  campaign.getPlayerForce().getHumanResources()
+                        .getCommander(campaign.getCampaignOptions(),
+                              campaign.isClanCampaign(),
+                              campaign.getLocalDate()),
+                  campaign1.getPlayerForce().getHumanResources()
+                        .getSecondInCommand(campaign1.getCampaignOptions(),
+                              campaign1.isClanCampaign(),
+                              campaign1.getLocalDate()));
+        });
 
         RoundedJButton btnFacStanding = new RoundedJButton(resourceMap.getString("btnFactionStanding.text"));
         btnFacStanding.setMaximumSize(new Dimension(Integer.MAX_VALUE, btnFacStanding.getPreferredSize().height));
@@ -871,7 +881,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
         }
 
         String experienceString = "<html><b>" +
-                                        SkillType.getColoredExperienceLevelName(campaign.getReputation()
+                                        SkillType.getColoredExperienceLevelName(campaign.getPlayerForce()
+                                                                                      .getReputation()
                                                                                       .getAverageSkillLevel()) +
                                         "</b></html>";
         lblExperience.setText(experienceString);
@@ -977,7 +988,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
      * refresh the procurement list
      */
     private void refreshProcurementList() {
-        procurementModel.setData(getCampaign().getShoppingList().getShoppingList());
+        procurementModel.setData(getCampaign().getPlayerForce().getShoppingList().getShoppingList());
         refreshProcurementTotalCost();
     }
 
@@ -989,8 +1000,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
         String formatString, totalCostString;
         Money totalCost, funds;
         formatString = resourceMap.getString("lblProcurementTotalCost.text");
-        totalCost = getCampaign().getShoppingList().getTotalBuyCost();
-        funds = getCampaign().getFunds();
+        totalCost = getCampaign().getPlayerForce().getShoppingList().getTotalBuyCost();
+        funds = getCampaign().getPlayerForce().getFunds();
         if (funds.compareTo(totalCost) < 0) {
             String warningColor = ReportingUtilities.getWarningColor();
             String formatedString = "<b>" + totalCost.toAmountAndSymbolString() + "</b>";

@@ -39,6 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.getEntityForUnitTesting;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import megamek.common.Player;
 import megamek.common.enums.SkillLevel;
@@ -69,7 +70,7 @@ class AtBDynamicScenarioFactoryTest {
     @BeforeEach
     public void setUp() {
         // Initialize the mock objects
-        campaign = mock(Campaign.class);
+        campaign = mockCampaign();
         CampaignOptions options = mock(CampaignOptions.class);
         when(options.getNonBinaryDiceSize()).thenReturn(60);
         when(options.isAutoGenerateOpForCallSigns()).thenReturn(false);

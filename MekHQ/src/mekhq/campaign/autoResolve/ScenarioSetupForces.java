@@ -181,7 +181,7 @@ public class ScenarioSetupForces<SCENARIO extends Scenario> extends SetupForces 
         var player = getCleanPlayer();
         game.addPlayer(player.getId(), player);
         var entities = setupPlayerForces(player);
-        var playerSkill = campaign.getReputation().getAverageSkillLevel();
+        var playerSkill = campaign.getPlayerForce().getReputation().getAverageSkillLevel();
         game.setPlayerSkillLevel(player.getId(), playerSkill);
         sendEntities(entities, game);
     }
@@ -242,7 +242,7 @@ public class ScenarioSetupForces<SCENARIO extends Scenario> extends SetupForces 
         var campaignPlayer = campaign.getPlayer();
         var player = new Player(campaignPlayer.getId(), campaign.getName());
         player.setCamouflage(campaign.getCamouflage().clone());
-        player.setColour(campaign.getColour());
+        player.setColour(campaign.getPlayerForce().getColour());
         player.setStartingPos(scenario.getStartingPos());
         player.setStartOffset(scenario.getStartOffset());
         player.setStartWidth(scenario.getStartWidth());
@@ -403,7 +403,7 @@ public class ScenarioSetupForces<SCENARIO extends Scenario> extends SetupForces 
             entity.setNMarines(unit.getMarineCount());
         }
         // Calculate deployment round
-        var force = campaign.getFormationFor(unit);
+        var force = campaign.getPlayerForce().getFormationFor(unit);
         if (force != null) {
             entity.setForceString(force.getFullMMName());
         } else if (!unit.getEntity().getForceString().isBlank()) {

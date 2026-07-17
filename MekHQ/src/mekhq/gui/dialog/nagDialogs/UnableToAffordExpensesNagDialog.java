@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -76,7 +76,7 @@ public class UnableToAffordExpensesNagDialog extends ImmersiveDialogNag {
         final String RESOURCE_BUNDLE = "mekhq.resources.NagDialogs";
 
         Money monthlyExpenses = getMonthlyExpenses(campaign);
-        Money currentFunds = campaign.getFunds();
+        Money currentFunds = campaign.getPlayerForce().getFunds();
         Money deficit = monthlyExpenses.minus(currentFunds);
 
         return getFormattedTextAt(RESOURCE_BUNDLE,

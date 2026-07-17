@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -152,7 +152,11 @@ public class FactionCensureGoingRogueDialog {
      * @since 0.50.07
      */
     private Person getSpeaker() {
-        return campaign.getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND);
+        return campaign.getPlayerForce().getHumanResources()
+                     .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND,
+                           campaign.getCampaignOptions(),
+                           campaign.isClanCampaign(),
+                           campaign.getLocalDate());
     }
 
     /**
@@ -242,7 +246,7 @@ public class FactionCensureGoingRogueDialog {
         );
 
         if (isMerc || isPirate) {
-            FactionStandings factionStandings = campaign.getFactionStandings();
+            FactionStandings factionStandings = campaign.getPlayerForce().getFactionStandings();
             FactionJudgment factionJudgments = factionStandings.getFactionJudgments();
             for (Faction faction : new ArrayList<>(activeFactions)) {
                 String factionShortName = faction.getShortName();

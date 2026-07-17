@@ -50,7 +50,7 @@ import megamek.common.units.EntityMovementMode;
 import megamek.common.units.Infantry;
 import megamek.common.units.LandAirMek;
 import megamek.logging.MMLogger;
-import mekhq.campaign.Hangar;
+import mekhq.campaign.LocalHangar;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
@@ -68,7 +68,7 @@ import mekhq.campaign.universe.Faction;
  * <p>Primary usage:</p>
  * <ul>
  *     <li>Use {@link #getValue()} to retrieve the baseline {@link Money} value for a given category.</li>
- *     <li>Use {@link #getForceValue(Faction, List, Hangar, boolean, boolean, double, double, double, double)} to
+ *     <li>Use {@link #getForceValue(Faction, List, LocalHangar, boolean, boolean, double, double, double, double)} to
  *     compute the total contract value for a set of forces, applying contract percentage multipliers per category.</li>
  * </ul>
  *
@@ -158,7 +158,7 @@ public enum AlternatePaymentModelValues {
      *     <li>marked as a {@code combat role} (as determined by {@code force.getCombatRoleInMemory().isCombatRole()}).</li>
      * </ul>
      *
-     * <p>For each included force, all units returned by {@link Formation#getUnitsAsUnits(Hangar)} are examined.
+     * <p>For each included force, all units returned by {@link Formation#getUnitsAsUnits(LocalHangar)} are examined.
      * {@code null} units and units whose {@link Unit#getEntity()} is {@code null} are skipped.</p>
      *
      * <p>The category-specific percentage parameters are provided as whole percentages (for example, {@code 50.0} for
@@ -185,7 +185,8 @@ public enum AlternatePaymentModelValues {
      * @author Illiani
      * @since 0.50.11
      */
-    public static Money getForceValue(Faction campaignFaction, List<Formation> allFormations, Hangar hangar,
+    public static Money getForceValue(Faction campaignFaction, List<Formation> allFormations,
+            mekhq.campaign.LocalHangar hangar,
                                       boolean useDiminishingContractPay, boolean excludeInfantry, double combatUnitContractPercent,
                                       double dropShipContractPercent, double warShipContractPercent, double jumpShipContractPercent) {
         final double combatMultiplier = combatUnitContractPercent / 100.0;

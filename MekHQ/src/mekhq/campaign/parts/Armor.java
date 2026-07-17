@@ -376,7 +376,9 @@ public class Armor extends Part implements IAcquisitionWork {
         Part newPart = getNewPart();
         newPart.setBrandNew(true);
         newPart.setDaysToArrival(transitDays);
-        if (campaign.getQuartermaster().buyPart(newPart, valueMultiplier, transitDays)) {
+        // Deliver to this order's own warehouse — a base warehouse for a base order, or the campaign warehouse for the
+        // main force.
+        if (campaign.getQuartermaster().buyPart(newPart, valueMultiplier, transitDays, getWarehouse())) {
             return "<font color='" +
                          ReportingUtilities.getPositiveColor() +
                          "'><b> part found</b>.</font> It will be delivered in " +

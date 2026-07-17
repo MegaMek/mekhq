@@ -43,6 +43,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.io.ByteArrayInputStream;
 import java.util.Set;
@@ -257,7 +258,7 @@ public class LocationNodeTest {
 
         @BeforeEach
         void setUp() {
-            mockCampaign = mock(Campaign.class);
+            mockCampaign = mockCampaign();
             mockLocationManager = mock(CampaignLocationManager.class);
             when(mockCampaign.getCampaignLocationManager()).thenReturn(mockLocationManager);
             parentFixed = new FixedLocation(mock(PlanetarySystem.class));

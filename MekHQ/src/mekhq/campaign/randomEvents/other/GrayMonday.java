@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -34,13 +34,11 @@ package mekhq.campaign.randomEvents.other;
 
 import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.campaign.finances.enums.TransactionType.STARTING_CAPITAL;
-import static mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR_COMMAND;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.time.LocalDate;
 
 import megamek.common.annotations.Nullable;
-import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
@@ -77,7 +75,7 @@ public class GrayMonday {
         boolean isEmployerBegging = today.equals(EMPLOYER_BEGGING);
         if (campaign.getCampaignOptions().isSimulateGrayMonday()) {
             if (today.equals(BANKRUPTCY)) {
-                Finances finances = campaign.getFinances();
+                Finances finances = campaign.getPlayerForce().getFinances();
                 Money balance = finances.getBalance();
                 Money adjustedBalance = balance.multipliedBy(0.99);
 
@@ -159,7 +157,11 @@ public class GrayMonday {
      * @return a {@link Person} representing the left speaker, or {@code null} if no suitable speaker is available
      */
     private @Nullable Person getSpeaker() {
-        return campaign.getSeniorAdminPerson(COMMAND);
+        return campaign.getPlayerForce().getHumanResources()
+                     .getSeniorAdminPerson(COMMAND,
+                           campaign.getCampaignOptions(),
+                           campaign.isClanCampaign(),
+                           campaign.getLocalDate());
     }
 
     /**
@@ -179,7 +181,12 @@ public class GrayMonday {
      */
     private Person getEmployerSpeaker(AtBContract contract) {
         String employer = contract.getEmployerFaction().getShortName();
-        Person speaker = campaign.newPerson(ADMINISTRATOR_COMMAND, employer, Gender.RANDOMIZE);
+        Person speaker = campaign.getPlayerForce()
+                               .getHumanResources()
+                               .newPerson(campaign,
+                                     mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR_COMMAND,
+                                     employer,
+                                     megamek.common.enums.Gender.RANDOMIZE);
         speaker.setOriginFaction(Factions.getInstance().getFaction(employer));
 
         return speaker;

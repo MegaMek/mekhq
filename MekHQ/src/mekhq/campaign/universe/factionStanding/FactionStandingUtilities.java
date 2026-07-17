@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -573,7 +573,7 @@ public class FactionStandingUtilities {
         }
 
         LocalDate today = campaign.getLocalDate();
-        for (Person person : campaign.getAllPersonnel()) {
+        for (Person person : campaign.getPlayerForce().getHumanResources().getPersonnel()) {
             if (isExempt(person, today)) {
                 continue;
             }

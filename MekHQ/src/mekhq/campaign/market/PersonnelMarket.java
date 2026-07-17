@@ -548,7 +548,12 @@ public class PersonnelMarket {
     @Deprecated(since = "0.50.06", forRemoval = true)
     public TargetRoll getShipSearchTarget(Campaign campaign, boolean jumpship) {
         TargetRoll target = new TargetRoll(jumpship ? 12 : 10, "Base");
-        Person logisticsAdmin = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_LOGISTICS, SkillType.S_ADMIN);
+        Person logisticsAdmin = campaign.getPlayerForce().getHumanResources()
+                                      .findBestInRole(mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR_LOGISTICS,
+                                            mekhq.campaign.personnel.skills.SkillType.S_ADMIN,
+                                            campaign.getCampaignOptions(),
+                                            campaign.isClanCampaign(),
+                                            campaign.getLocalDate());
 
         int experienceLevel = EXP_ULTRA_GREEN;
         if (logisticsAdmin != null && logisticsAdmin.hasSkill(S_ADMIN)) {

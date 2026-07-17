@@ -32,7 +32,6 @@
  */
 package mekhq.campaign;
 
-import static mekhq.campaign.force.Formation.FORMATION_ORIGIN;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_TETRIS_MASTER;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.areFieldKitchensWithinCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenCapacity;
@@ -57,6 +56,7 @@ import megamek.common.units.Entity;
 import megamek.common.units.Infantry;
 import megamek.common.units.UnitType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.mission.rentals.ContractRentalType;
@@ -131,7 +131,7 @@ public class CampaignSummary {
         totalCombatPersonnel = 0;
         totalSupportPersonnel = 0;
         totalInjuries = 0;
-        for (Person person : campaign.getActivePersonnel(false, false)) {
+        for (Person person : campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false)) {
             if (person.getPrimaryRole().isCombat()) {
                 totalCombatPersonnel++;
             } else if (!person.isDependent()) {
@@ -150,7 +150,7 @@ public class CampaignSummary {
         aeroCount = 0;
         infantryCount = 0;
         int squadCount = 0;
-        for (Unit unit : campaign.getAllHangar().getUnits()) {
+        for (Unit unit : campaign.getPlayerForce().getHangar().getUnits()) {
             Entity entity = unit.getEntity();
             if (unit.isUnmanned() ||
                       unit.isSalvage() ||
@@ -205,7 +205,7 @@ public class CampaignSummary {
         cargoCapacity = cargoStats.getTotalCombinedCargoCapacity();
 
         double tetrisMasterMultiplier = 1.0;
-        for (Person person : campaign.getActivePersonnel(false, false)) {
+        for (Person person : campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false)) {
             PersonnelOptions options = person.getOptions();
             if (options.booleanOption(ADMIN_TETRIS_MASTER)) {
                 tetrisMasterMultiplier += 0.05;
@@ -443,14 +443,16 @@ public class CampaignSummary {
         StringBuilder report = new StringBuilder("<html>");
 
         // Field Kitchens
-        List<Unit> unitsInToe = campaign.getFormation(FORMATION_ORIGIN)
-                                      .getAllUnitsAsUnits(campaign.getAllHangar(), false);
+        List<Unit> unitsInToe = campaign.getPlayerForce().getFormation(Formation.FORMATION_ORIGIN)
+                                      .getAllUnitsAsUnits(campaign.getPlayerForce().getHangar(), false);
         if (campaignOptions.isUseFatigue()) {
             int fieldKitchenCapacity = checkFieldKitchenCapacity(unitsInToe, campaignOptions.getFieldKitchenCapacity());
             fieldKitchenCapacity += FacilityRentals.getCapacityIncreaseFromRentals(campaign.getActiveContracts(),
                   ContractRentalType.KITCHENS);
 
-            int fieldKitchenUsage = checkFieldKitchenUsage(campaign.getActivePersonnel(false, true),
+            int fieldKitchenUsage = checkFieldKitchenUsage(campaign.getPlayerForce()
+                                                                 .getHumanResources()
+                                                                 .getActivePersonnel(false, true),
                   campaignOptions.isUseFieldKitchenIgnoreNonCombatants(), campaign);
 
             boolean isWithinCapacity = areFieldKitchensWithinCapacity(fieldKitchenCapacity, fieldKitchenUsage);
@@ -474,14 +476,17 @@ public class CampaignSummary {
                 report.append("<br>");
             }
 
-            int injuredPersonnel = campaign.getPatients().size();
+            int injuredPersonnel = campaign.getPlayerForce().getHumanResources().getPatients().size();
             boolean useMASHTheatres = campaignOptions.isUseMASHTheatres();
-            int mashTheatreCapacity = useMASHTheatres ? campaign.calculateMASHTheaterCapacity() : Integer.MAX_VALUE;
+            int mashTheatreCapacity;
+            mashTheatreCapacity = useMASHTheatres ?
+                                        campaign.getPlayerForce().calculateMASHTheaterCapacity(campaign) :
+                                        Integer.MAX_VALUE;
 
             final boolean isDoctorsUseAdministration = campaignOptions.isDoctorsUseAdministration();
             final int maximumPatients = campaignOptions.getMaximumPatients();
             int doctorCapacity = 0;
-            for (Person person : campaign.getActivePersonnel(false, false)) {
+            for (Person person : campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false)) {
                 doctorCapacity += person.getDoctorMedicalCapacity(isDoctorsUseAdministration, maximumPatients);
             }
 

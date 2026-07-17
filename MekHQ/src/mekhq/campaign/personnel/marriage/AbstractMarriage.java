@@ -39,7 +39,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import megamek.codeUtilities.ObjectUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
@@ -355,7 +354,7 @@ public abstract class AbstractMarriage {
         Person spouse = null;
 
         if (isInterUnit) {
-            List<Person> activePersonnel = campaign.getActivePersonnel(true, true);
+            List<Person> activePersonnel = campaign.getPlayerForce().getHumanResources().getActivePersonnel(true, true);
             potentialSpouses = new ArrayList<>();
 
             for (Person potentialSpouse : activePersonnel) {
@@ -369,14 +368,17 @@ public abstract class AbstractMarriage {
             }
         }
 
-        if (!isInterUnit && campaign.getCurrentLocation().isOnPlanet()) {
-            List<Gender> possibleGenders = getPossibleGenders(person);
-            if (possibleGenders.isEmpty()) {
-                return;
-            }
+        if (!isInterUnit) {
+            if (campaign.getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet()) {
+                java.util.List<megamek.common.enums.Gender> possibleGenders = getPossibleGenders(person);
+                if (possibleGenders.isEmpty()) {
+                    return;
+                }
 
-            Gender spouseGender = ObjectUtility.getRandomItem(possibleGenders);
-            spouse = createExternalSpouse(campaign, today, person, spouseGender);
+                megamek.common.enums.Gender spouseGender = megamek.codeUtilities.ObjectUtility.getRandomItem(
+                      possibleGenders);
+                spouse = createExternalSpouse(campaign, today, person, spouseGender);
+            }
         }
 
         if (spouse == null) {
@@ -419,7 +421,7 @@ public abstract class AbstractMarriage {
                            Gender.OTHER_FEMALE;
         }
 
-        Person externalSpouse = campaign.newDependent(gender);
+        Person externalSpouse = campaign.getPlayerForce().getHumanResources().newDependent(campaign, gender);
 
         // Calculate person's age and the maximum and minimum allowable spouse ages
         int personAge = person.getAge(today);

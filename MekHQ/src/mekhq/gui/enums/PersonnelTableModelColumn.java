@@ -131,13 +131,13 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
           PersonnelTableModelColumn::getTechUnitAssignment),
     MARKET_UNIT_ASSIGNMENT("Column.UNIT_ASSIGNMENT.title", Comparators.STRING_COMPARATOR,
           (person, campaign) -> {
-              PersonnelMarket market = campaign.getPersonnelMarket();
+              PersonnelMarket market = campaign.getPlayerForce().getHumanResources().getPersonnelMarket();
               Entity entity = (market == null) ? null : market.getAttachedEntity(person);
               return (entity == null) ? "-" : entity.getDisplayName();
           }),
     FORCE("Column.FORCE.title", Comparators.STRING_COMPARATOR,
           (person, campaign) -> {
-              Formation formation = campaign.getFormationFor(person);
+              Formation formation = campaign.getPlayerForce().getFormationFor(person);
               return (formation == null) ? "-" : formation.getName();
           }),
     FORCE_GRAPHICAL("Column.FORCE.title", Comparators.STRING_COMPARATOR,
@@ -306,7 +306,10 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
     IMPLANT_COUNT("Column.IMPLANT_COUNT.title", Comparators.INT_COMPARATOR,
           person -> person.countOptions(PersonnelOptions.MD_ADVANTAGES), Object::toString),
     MANAGEMENT_MODIFIER("Column.MANAGEMENT_MODIFIER.title", Comparators.INT_COMPARATOR,
-          (person, campaign) -> campaign.getRetirementDefectionTracker().getManagementSkillPenalty(person, campaign),
+          (person, campaign) -> campaign.getPlayerForce()
+                                      .getHumanResources()
+                                      .getRetirementDefectionTracker()
+                                      .getManagementSkillPenalty(person, campaign),
           Object::toString),
     FACTION_MODIFIER("Column.FACTION_MODIFIER.title", Comparators.INT_COMPARATOR,
           (person, campaign) ->
@@ -314,8 +317,10 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
                       .stream().mapToInt(TargetRollModifier::value).sum(),
           Object::toString),
     LOYALTY("Column.LOYALTY.title", Comparators.INT_COMPARATOR,
-          (person, campaign) -> person.getAdjustedLoyalty(campaign.getFaction(),
-                campaign.getCampaignOptions().isUseAlternativeAdvancedMedical()), Object::toString),
+          (person, campaign) -> {
+              return person.getAdjustedLoyalty(campaign.getFaction(),
+                    campaign.getCampaignOptions().isUseAlternativeAdvancedMedical());
+          }, Object::toString),
     HIGHEST_EDUCATION("Column.HIGHEST_EDUCATION.title", fieldBasedSorter(EducationLevel::getLevel),
           Person::getEduHighestEducation, Object::toString),
     CURRENT_EDUCATION("Column.CURRENT_EDUCATION.title", fieldBasedSorter(EducationLevel::getLevel),
@@ -512,7 +517,7 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
     }
 
     private static String getForceTextGraphical(Person person, Campaign campaign) {
-        Formation formation = campaign.getFormationFor(person);
+        Formation formation = campaign.getPlayerForce().getFormationFor(person);
         if (formation != null) {
             StringBuilder desc = new StringBuilder("<html><b>").append(formation.getName()).append("</b>");
             Formation parent = formation.getParentFormation();

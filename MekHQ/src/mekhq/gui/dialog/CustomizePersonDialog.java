@@ -2003,9 +2003,12 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     }
 
     private void randomBloodname() {
-        Faction faction = campaign.getFaction().isClan() ?
-                                campaign.getFaction() :
-                                (Faction) choiceFaction.getSelectedItem();
+        Faction faction;
+        if (campaign.getFaction().isClan()) {
+            faction = campaign.getFaction();
+        } else {
+            faction = (mekhq.campaign.universe.Faction) choiceFaction.getSelectedItem();
+        }
         faction = ((faction != null) && faction.isClan()) ? faction : person.getOriginFaction();
         Bloodname bloodname = Bloodname.randomBloodname(faction.getShortName(),
               selectedPhenotype,

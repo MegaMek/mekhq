@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -128,7 +128,10 @@ public class OptimizeInfirmaryAssignments {
           final int healingWaitingPeriod, final List<Person> patients, List<Person> doctors,
           final boolean isOnContractAndPlanetside) {
         boolean useMASHTheatres = campaign.getCampaignOptions().isUseMASHTheatres();
-        int mashTheatreCapacity = useMASHTheatres ? campaign.calculateMASHTheaterCapacity() : Integer.MAX_VALUE;
+        int mashTheatreCapacity;
+        mashTheatreCapacity = useMASHTheatres ?
+                                    campaign.getPlayerForce().calculateMASHTheaterCapacity(campaign) :
+                                    Integer.MAX_VALUE;
 
         int totalPatientCounter = 0;
         int patientCounter = 0;
@@ -177,7 +180,7 @@ public class OptimizeInfirmaryAssignments {
      * experience levels so that the most skilled doctors are assigned first.</p>
      */
     private void organizeDoctors() {
-        doctors = campaign.getDoctors();
+        doctors = campaign.getPlayerForce().getHumanResources().getDoctors();
         doctors.sort((doctor1, doctor2) -> Integer.compare(getDoctorExperienceLevel(doctor2),
               getDoctorExperienceLevel(doctor1)));
     }
@@ -190,7 +193,7 @@ public class OptimizeInfirmaryAssignments {
      * severity value of non-prisoners.</p>
      */
     private void organizePatients() {
-        patients = campaign.getPatients();
+        patients = campaign.getPlayerForce().getHumanResources().getPatients();
         patients.sort((patient1, patient2) -> Integer.compare(getSeverity(patient2), getSeverity(patient1)));
     }
 

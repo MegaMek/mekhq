@@ -137,7 +137,9 @@ public class CommandSummaryPanel extends ScalingWidthConstrainedPanel {
      * Fully recalculates and updates all metrics on the panel.
      */
     private void refreshAll() {
-        String experience = SkillType.getColoredExperienceLevelName(campaign.getReputation().getAverageSkillLevel());
+        String experience = SkillType.getColoredExperienceLevelName(campaign.getPlayerForce()
+                                                                          .getReputation()
+                                                                          .getAverageSkillLevel());
         lblUnitReputationValue.setText(getFormattedTextAt("reputation.text", campaign.getUnitRatingText(), experience));
         int totalBv = AtBDynamicScenarioFactory.getBVBudgetForStratConSingles(campaign, true);
         lblCombatStrengthValue.setText(getFormattedTextAt("combatStrength.text", totalBv));
@@ -149,9 +151,9 @@ public class CommandSummaryPanel extends ScalingWidthConstrainedPanel {
      * alters the formatting accordingly.
      */
     private void refreshFunds() {
-        String amount = campaign.getFunds().toAmountString();
+        String amount = campaign.getPlayerForce().getFunds().toAmountString();
         lblFundsValue.setText(getFormattedTextAt("funds.text", amount));
-        if (campaign.getFinances().hasActiveLoans()) {
+        if (campaign.getPlayerForce().getFinances().hasActiveLoans()) {
             lblFunds.setText(getFormattedTextAt("funds.label.hasLoan", ReportingUtilities.getNegativeColor()));
         } else  {
             lblFunds.setText(getTextAt("funds.label.noLoan"));

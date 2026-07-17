@@ -55,7 +55,7 @@ public class UnableToAffordJumpNagLogic {
      */
     public static boolean unableToAffordNextJump(Campaign campaign) {
         Money nextJumpCost = getNextJumpCost(campaign);
-        return campaign.getFunds().isLessThan(nextJumpCost);
+        return campaign.getPlayerForce().getFunds().isLessThan(nextJumpCost);
     }
 
     /**

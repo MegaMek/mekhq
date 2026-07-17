@@ -67,8 +67,9 @@ import megamek.common.units.Tank;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Warehouse;
+import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.location.ILocatable;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationNode;
@@ -111,7 +112,7 @@ import org.w3c.dom.NodeList;
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
-public abstract class Part implements IPartWork, ITechnology, ILocation {
+public abstract class Part implements IPartWork, ITechnology, ILocatable {
     private static final MMLogger LOGGER = MMLogger.create(Part.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Parts";
 
@@ -412,9 +413,9 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
     }
 
     @Override
-    public @Nullable Warehouse getWarehouse() {
+    public @Nullable LocalWarehouse getWarehouse() {
         IPlace place = getPlace();
-        return place != null ? place.getWarehouse() : campaign.getWarehouse();
+        return place != null ? place.getWarehouse() : campaign.getPlayerForce().getWarehouse();
     }
 
     @Override
@@ -511,7 +512,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
         if (this.isSalvaging()) {
             int inStock = 0;
             if (this instanceof mekhq.campaign.parts.equipment.AmmoBin ammoBin) {
-                Warehouse localWarehouse = getWarehouse();
+                LocalWarehouse localWarehouse = getWarehouse();
                 if (localWarehouse != null) {
                     megamek.common.equipment.AmmoType ammoType = ammoBin.getType();
                     boolean useAmmoByType = campaign.getCampaignOptions().isUseAmmoByType();
@@ -524,7 +525,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
                                         if (spare.isSameAmmoType(ammoType)) {
                                             return spare.getShots();
                                         } else if (useAmmoByType && spare.isCompatibleAmmo(ammoType)) {
-                                            return mekhq.campaign.Quartermaster.convertShots(
+                                            return mekhq.campaign.ForceQuartermaster.convertShots(
                                                   spare.getType(), spare.getShots(), ammoType);
                                         }
                                         return 0;
@@ -1448,6 +1449,12 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
     }
 
     @Override
+    public boolean canBeManuallyDispatched() {
+        // A part still in transit from a purchase hasn't arrived yet, and a reserved part is committed to work.
+        return isPresent() && !isReservedForRefit() && !isReservedForReplacement();
+    }
+
+    @Override
     public boolean isBeingWorkedOn() {
         return getTech() != null;
     }
@@ -2076,14 +2083,14 @@ public abstract class Part implements IPartWork, ITechnology, ILocation {
 
         if (tech instanceof PartPersonRef) {
             UUID id = tech.getId();
-            tech = campaign.getPerson(id);
+            tech = campaign.getPlayerForce().getHumanResources().getPerson(id);
             if (tech == null) {
                 LOGGER.error("Part {} ('{}') references missing tech {}", getId(), getName(), id);
             }
         }
         if (reservedBy instanceof PartPersonRef) {
             UUID id = reservedBy.getId();
-            reservedBy = campaign.getPerson(id);
+            reservedBy = campaign.getPlayerForce().getHumanResources().getPerson(id);
             if (reservedBy == null) {
                 LOGGER.error("Part {} ('{}') references missing tech (reservation) {}", getId(), getName(), id);
             }

@@ -168,7 +168,12 @@ public abstract class AbstractCompanyGenerator {
           final CompanyGenerationOptions options) {
         this.method = method;
         this.options = options;
-        this.personnelGenerator = campaign.getPersonnelGenerator(createFactionSelector(), createPlanetSelector());
+        final AbstractFactionSelector factionSelector = createFactionSelector();
+        final AbstractPlanetSelector planetSelector = createPlanetSelector();
+        this.personnelGenerator = campaign.getPlayerForce().getHumanResources()
+                                        .getPersonnelGenerator(campaign.getCampaignOptions(),
+                                              factionSelector,
+                                              planetSelector);
         this.battleMekWeightClassGenerator = getOptions().getBattleMekWeightClassGenerationMethod().getGenerator();
         this.battleMekQualityGenerator = getOptions().getBattleMekQualityGenerationMethod().getGenerator();
     }
@@ -262,9 +267,13 @@ public abstract class AbstractCompanyGenerator {
 
         final List<CompanyGenerationPersonTracker> initialTrackers = IntStream.range(0, numMekWarriors)
                                                                            .mapToObj(i -> {
-                                                                               final Person person = campaign.newPerson(
-                                                                                     PersonnelRole.MEKWARRIOR,
-                                                                                     getPersonnelGenerator());
+                                                                               final AbstractPersonnelGenerator personnelGenerator1 = getPersonnelGenerator();
+                                                                               final Person person = campaign.getPlayerForce()
+                                                                                                           .getHumanResources()
+                                                                                                           .newPerson(
+                                                                                                                 campaign,
+                                                                                                                 PersonnelRole.MEKWARRIOR,
+                                                                                                                 personnelGenerator1);
                                                                                if (getOptions().isAssignMekWarriorsCallSigns()) {
                                                                                    person.setCallsign(
                                                                                          RandomCallsignGenerator.getInstance()
@@ -318,10 +327,13 @@ public abstract class AbstractCompanyGenerator {
             // Find the best commander using the minimum value from the comparator, use a
             // fallback
             // that can never occur. Then remove the commander from the initial trackers
+            final AbstractPersonnelGenerator personnelGenerator1 = getPersonnelGenerator();
             sortedTrackers.add(initialTrackers.stream()
                                      .min(personnelSorter)
                                      .orElse(new CompanyGenerationPersonTracker(
-                                           campaign.newPerson(PersonnelRole.MEKWARRIOR, getPersonnelGenerator()))));
+                                           campaign.getPlayerForce()
+                                                 .getHumanResources()
+                                                 .newPerson(campaign, PersonnelRole.MEKWARRIOR, personnelGenerator1))));
             initialTrackers.remove(sortedTrackers.getFirst());
         }
 
@@ -425,9 +437,10 @@ public abstract class AbstractCompanyGenerator {
         assignRandomOfficerSkillIncrease(tracker, 2);
 
         if (getOptions().isAutomaticallyAssignRanks()) {
-            final Faction faction = getOptions().isUseSpecifiedFactionToAssignRanks()
-                                          ? getOptions().getSpecifiedFaction()
-                                          : campaign.getFaction();
+            final Faction faction;
+            if (getOptions().isUseSpecifiedFactionToAssignRanks()) {
+                faction = getOptions().getSpecifiedFaction();
+            } else {faction = campaign.getFaction();}
             generateCommandingOfficerRank(faction, tracker, numMekWarriors);
         }
     }
@@ -580,9 +593,10 @@ public abstract class AbstractCompanyGenerator {
     private void generateStandardMekWarrior(final Campaign campaign,
           final CompanyGenerationPersonTracker tracker) {
         if (getOptions().isAutomaticallyAssignRanks()) {
-            final Faction faction = getOptions().isUseSpecifiedFactionToAssignRanks()
-                                          ? getOptions().getSpecifiedFaction()
-                                          : campaign.getFaction();
+            final Faction faction;
+            if (getOptions().isUseSpecifiedFactionToAssignRanks()) {
+                faction = getOptions().getSpecifiedFaction();
+            } else {faction = campaign.getFaction();}
             tracker.getPerson().setRank((faction.isComStarOrWoB() || faction.isClan())
                                               ? 4
                                               : 12);
@@ -616,10 +630,13 @@ public abstract class AbstractCompanyGenerator {
      * @return the newly created support person with the provided role
      */
     private Person generateSupportPerson(final Campaign campaign, final PersonnelRole role) {
-        final Person person = campaign.newPerson(role, getPersonnelGenerator());
+        final AbstractPersonnelGenerator personnelGenerator1 = getPersonnelGenerator();
+        final Person person = campaign.getPlayerForce()
+                                    .getHumanResources()
+                                    .newPerson(campaign, role, personnelGenerator1);
         // All support personnel get assigned Corporal or equivalent as their rank
         if (getOptions().isAutomaticallyAssignRanks()) {
-            switch (campaign.getRankSystem().getCode()) {
+            switch (campaign.getPlayerForce().getRankSystem().getCode()) {
                 case "CCWH":
                 case "CLAN":
                     break;
@@ -648,22 +665,30 @@ public abstract class AbstractCompanyGenerator {
             return;
         }
 
-        final int assistantRank = switch (campaign.getRankSystem().getCode()) {
+        final int assistantRank = switch (campaign.getPlayerForce().getRankSystem().getCode()) {
             case "CCWH", "CLAN" -> 0;
             case "CG", "WOBM", "MAF" -> 4;
             default -> 2;
         };
 
-        for (int i = 0; i < campaign.getAsTechNeed(); i++) {
-            final Person asTech = campaign.newPerson(PersonnelRole.ASTECH, getPersonnelGenerator());
+        for (int i = 0;
+              i < campaign.getPlayerForce().getHumanResources().getAsTechNeed(campaign.getCampaignOptions());
+              i++) {
+            final AbstractPersonnelGenerator personnelGenerator1 = getPersonnelGenerator();
+            final Person asTech = campaign.getPlayerForce()
+                                        .getHumanResources()
+                                        .newPerson(campaign, PersonnelRole.ASTECH, personnelGenerator1);
             if (getOptions().isAutomaticallyAssignRanks()) {
                 asTech.setRank(assistantRank);
             }
             trackers.add(new CompanyGenerationPersonTracker(CompanyGenerationPersonType.ASSISTANT, asTech));
         }
 
-        for (int i = 0; i < campaign.getMedicsNeed(); i++) {
-            final Person medic = campaign.newPerson(PersonnelRole.MEDIC, getPersonnelGenerator());
+        for (int i = 0; i < campaign.getPlayerForce().getHumanResources().getMedicsNeed(); i++) {
+            final AbstractPersonnelGenerator personnelGenerator1 = getPersonnelGenerator();
+            final Person medic = campaign.getPlayerForce()
+                                       .getHumanResources()
+                                       .newPerson(campaign, PersonnelRole.MEDIC, personnelGenerator1);
             if (getOptions().isAutomaticallyAssignRanks()) {
                 medic.setRank(assistantRank);
             }
@@ -688,7 +713,10 @@ public abstract class AbstractCompanyGenerator {
         // Recruit all the personnel, GM-style so that the initial hiring cost is
         // calculated as part
         // of the financial model
-        trackers.forEach(t -> campaign.recruitPerson(t.getPerson(), true, true));
+        trackers.forEach(t -> {
+            Person person = t.getPerson();
+            campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, person, true, true);
+        });
 
         // Now that they are recruited, we can simulate backwards a few years and
         // generate marriages and children
@@ -704,11 +732,17 @@ public abstract class AbstractCompanyGenerator {
 
                 for (final CompanyGenerationPersonTracker tracker : trackers) {
                     if (getOptions().isSimulateRandomMarriages()) {
-                        campaign.getMarriage().processNewWeek(campaign, date, tracker.getPerson());
+                        campaign.getPlayerForce()
+                              .getHumanResources()
+                              .getMarriage()
+                              .processNewWeek(campaign, date, tracker.getPerson());
                     }
 
                     if (getOptions().isSimulateRandomProcreation()) {
-                        campaign.getProcreation().processNewWeek(campaign, date, tracker.getPerson());
+                        campaign.getPlayerForce()
+                              .getHumanResources()
+                              .getProcreation()
+                              .processNewWeek(campaign, date, tracker.getPerson());
                     }
                 }
             }
@@ -1155,11 +1189,12 @@ public abstract class AbstractCompanyGenerator {
      */
     private void generateUnit(final Campaign campaign,
           final List<CompanyGenerationPersonTracker> trackers) {
-        final Formation originFormation = campaign.getFormation(0);
+        final Formation originFormation = campaign.getPlayerForce().getFormation(0);
         final Alphabet[] alphabet = Alphabet.values();
-        final Faction formationIconFaction = getOptions().isUseSpecifiedFactionToGenerateFormationIcons()
-                                                   ? getOptions().getSpecifiedFaction()
-                                                   : campaign.getFaction();
+        final Faction formationIconFaction;
+        if (getOptions().isUseSpecifiedFactionToGenerateFormationIcons()) {
+            formationIconFaction = getOptions().getSpecifiedFaction();
+        } else {formationIconFaction = campaign.getFaction();}
         FormationPieceIcon background = null;
 
         if (getOptions().isGenerateFormationIcons()) {
@@ -1228,7 +1263,7 @@ public abstract class AbstractCompanyGenerator {
             final Formation company = new Formation(getOptions().getForceNamingMethod().getValue(alphabet[i])
                                                           +
                                                           resources.getString("AbstractCompanyGenerator.Company.text"));
-            campaign.addFormation(company, originFormation);
+            campaign.getPlayerForce().addFormation(company, originFormation, campaign);
             for (int y = 0; y < getOptions().getLancesPerCompany(); y++) {
                 createLance(campaign, formationIconFaction, company, trackers, alphabet[y], background);
             }
@@ -1282,9 +1317,10 @@ public abstract class AbstractCompanyGenerator {
           final Formation head, final List<CompanyGenerationPersonTracker> trackers,
           final String name, final @Nullable FormationPieceIcon background) {
         final Formation lance = new Formation(name);
-        campaign.addFormation(lance, head);
+        campaign.getPlayerForce().addFormation(lance, head, campaign);
         for (int i = 0; (i < getOptions().getLanceSize()) && !trackers.isEmpty(); i++) {
-            campaign.addUnitToFormation(trackers.removeFirst().getPerson().getUnit(), lance);
+            final Unit unit = trackers.removeFirst().getPerson().getUnit();
+            campaign.getPlayerForce().addUnitToFormation(unit, lance, campaign);
         }
 
         if (getOptions().isGenerateFormationIcons()) {
@@ -1615,7 +1651,10 @@ public abstract class AbstractCompanyGenerator {
         }
 
         if (getOptions().isStartCourseToContractPlanet()) {
-            campaign.getCurrentLocation().setJumpPath(contract.getJumpPath(campaign));
+            campaign.getPlayerForce()
+                  .getForceDetachment()
+                  .getCurrentLocation()
+                  .setJumpPath(contract.getJumpPath(campaign));
         }
     }
     // endregion Contract
@@ -1677,14 +1716,14 @@ public abstract class AbstractCompanyGenerator {
 
             // Credit the campaign with the starting cash if it is positive
             if (startingCash.isPositive()) {
-                campaign.getFinances().credit(TransactionType.STARTING_CAPITAL,
+                campaign.getPlayerForce().getFinances().credit(TransactionType.STARTING_CAPITAL,
                       campaign.getLocalDate(), startingCash,
                       resources.getString("AbstractCompanyGenerator.CompanyStartupFunding.text"));
             }
 
             // Add the loan if there's one to add
             if (!loan.isZero()) {
-                campaign.getFinances().addLoan(new Loan(loan, 15, 2, FinancialTerm.MONTHLY,
+                campaign.getPlayerForce().getFinances().addLoan(new Loan(loan, 15, 2, FinancialTerm.MONTHLY,
                       100, campaign.getLocalDate()));
             }
         } else {
@@ -1694,7 +1733,7 @@ public abstract class AbstractCompanyGenerator {
 
             // Credit the campaign with the starting cash if it is positive
             if (startingCash.isPositive()) {
-                campaign.getFinances().credit(TransactionType.STARTING_CAPITAL,
+                campaign.getPlayerForce().getFinances().credit(TransactionType.STARTING_CAPITAL,
                       campaign.getLocalDate(), startingCash,
                       resources.getString("AbstractCompanyGenerator.CompanyStartupFunding.text"));
             }
@@ -1911,9 +1950,9 @@ public abstract class AbstractCompanyGenerator {
           final List<Part> parts, final List<Armor> armour,
           final List<AmmoStorage> ammunition) {
         final List<Unit> mothballedUnits = createMothballedSpareUnits(campaign, mothballedEntities);
-        parts.forEach(p -> campaign.getWarehouse().addPart(p, true));
-        armour.forEach(a -> campaign.getWarehouse().addPart(a, true));
-        ammunition.forEach(a -> campaign.getWarehouse().addPart(a, true));
+        parts.forEach(p -> campaign.getPlayerForce().getWarehouse().addPart(p, true));
+        armour.forEach(a -> campaign.getPlayerForce().getWarehouse().addPart(a, true));
+        ammunition.forEach(a -> campaign.getPlayerForce().getWarehouse().addPart(a, true));
         return mothballedUnits;
     }
 

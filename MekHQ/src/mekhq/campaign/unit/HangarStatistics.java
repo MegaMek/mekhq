@@ -44,7 +44,6 @@ import megamek.common.units.FighterSquadron;
 import megamek.common.units.Jumpship;
 import megamek.common.units.SpaceStation;
 import megamek.logging.MMLogger;
-import mekhq.campaign.Hangar;
 
 /**
  * Provides methods to gather statistics on units in a hangar.
@@ -52,16 +51,16 @@ import mekhq.campaign.Hangar;
 public class HangarStatistics {
     private static final MMLogger logger = MMLogger.create(HangarStatistics.class);
 
-    private final Hangar hangar;
+    private final mekhq.campaign.LocalHangar hangar;
     private static final long UNMAPPED_BAY_TYPE = -1L;
     private static final long LIGHT_VEHICLE_BIT = 1L << 62;
     private static final long SUPER_HEAVY_BIT = 1L << 63;
 
-    public HangarStatistics(Hangar hangar) {
+    public HangarStatistics(mekhq.campaign.LocalHangar hangar) {
         this.hangar = hangar;
     }
 
-    public Hangar getHangar() {
+    public mekhq.campaign.LocalHangar getHangar() {
         return hangar;
     }
 

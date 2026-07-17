@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2009-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -74,7 +74,6 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
@@ -131,7 +130,7 @@ public class PersonnelMarketDialog extends JDialog {
         super(frame, true);
         hqView = view;
         this.campaign = campaign;
-        personnelMarket = campaign.getPersonnelMarket();
+        personnelMarket = campaign.getPlayerForce().getHumanResources().getPersonnelMarket();
         personnelModel = new PersonnelTableModel(campaign);
         personnelModel.setData(personnelMarket.getPersonnel());
         initComponents();
@@ -382,7 +381,7 @@ public class PersonnelMarketDialog extends JDialog {
 
     private void hirePerson(ActionEvent evt) {
         if (null != selectedPerson) {
-            if (campaign.getFunds()
+            if (campaign.getPlayerForce().getFunds()
                       .isLessThan((campaign.getCampaignOptions().isPayForRecruitment() ?
                                          selectedPerson.getSalary(campaign).multipliedBy(2) :
                                          Money.zero()).plus(unitCost))) {
@@ -395,7 +394,7 @@ public class PersonnelMarketDialog extends JDialog {
                  * use as a key to any attached entity
                  */
                 UUID pid = selectedPerson.getId();
-                if (campaign.recruitPerson(selectedPerson)) {
+                if (campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, selectedPerson)) {
                     Entity en = personnelMarket.getAttachedEntity(pid);
                     if (null != en) {
                         addUnit(en, true);
@@ -414,7 +413,7 @@ public class PersonnelMarketDialog extends JDialog {
             Entity en = personnelMarket.getAttachedEntity(selectedPerson);
             UUID pid = selectedPerson.getId();
 
-            if (campaign.recruitPerson(selectedPerson, true, true)) {
+            if (campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, selectedPerson, true, true)) {
                 addUnit(en, false);
                 personnelMarket.removePerson(selectedPerson);
                 personnelModel.setData(personnelMarket.getPersonnel());
@@ -429,12 +428,11 @@ public class PersonnelMarketDialog extends JDialog {
             return;
         }
 
-        if (pay &&
-                  !campaign.getFinances()
-                         .debit(TransactionType.UNIT_PURCHASE,
-                               campaign.getLocalDate(),
-                               unitCost,
-                               "Purchased " + en.getShortName())) {
+        if (pay && !campaign.getPlayerForce().getFinances()
+                          .debit(mekhq.campaign.finances.enums.TransactionType.UNIT_PURCHASE,
+                                campaign.getLocalDate(),
+                                unitCost,
+                                "Purchased " + en.getShortName())) {
             return;
         }
 

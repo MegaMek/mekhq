@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -36,7 +36,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import mekhq.campaign.Warehouse;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.AmmoBin;
@@ -103,7 +102,7 @@ public abstract class AbstractPartGenerator {
      *
      * @return a warehouse containing the generated parts
      */
-    public abstract Warehouse generateWarehouse(List<Part> inputParts);
+    public abstract mekhq.campaign.LocalWarehouse generateWarehouse(List<Part> inputParts);
 
     /**
      * This creates a clone of the input part, with it not being omni-podded if it was originally.

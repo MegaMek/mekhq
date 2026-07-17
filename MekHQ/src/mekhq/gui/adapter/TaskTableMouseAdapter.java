@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -51,18 +51,21 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.events.AcquisitionEvent;
 import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.events.parts.PartModeChangedEvent;
+import mekhq.campaign.events.parts.PartWorkEvent;
 import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.meks.MekLocation;
 import mekhq.campaign.parts.missing.MissingPart;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.WorkTime;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.ITechWorkPanel;
 import mekhq.gui.dialog.QuickStripDialog;
 import mekhq.gui.model.TaskTableModel;
 import mekhq.service.mrms.MRMSService;
@@ -72,21 +75,25 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
     private final CampaignGUI gui;
     private final JTable taskTable;
     private final TaskTableModel taskModel;
+    private final ITechWorkPanel techWorkPanel;
 
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.TaskTableMouseAdapter";
     //endregion Variable Declaration
 
     //region Constructors
-    protected TaskTableMouseAdapter(CampaignGUI gui, JTable taskTable, TaskTableModel taskModel) {
+    protected TaskTableMouseAdapter(CampaignGUI gui, JTable taskTable, TaskTableModel taskModel,
+          ITechWorkPanel techWorkPanel) {
         this.gui = gui;
         this.taskTable = taskTable;
         this.taskModel = taskModel;
+        this.techWorkPanel = techWorkPanel;
     }
     //endregion Constructors
 
-    public static void connect(CampaignGUI gui, JTable taskTable, TaskTableModel taskModel) {
-        new TaskTableMouseAdapter(gui, taskTable, taskModel).connect(taskTable);
+    public static void connect(CampaignGUI gui, JTable taskTable, TaskTableModel taskModel,
+          ITechWorkPanel techWorkPanel) {
+        new TaskTableMouseAdapter(gui, taskTable, taskModel, techWorkPanel).connect(taskTable);
     }
 
     @Override
@@ -133,6 +140,16 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
                 }
                 MekHQ.triggerEvent(new UnitChangedEvent(u));
             }
+        } else if (command.equalsIgnoreCase("STRIP")) {
+            Person tech = techWorkPanel.getSelectedTech();
+            if (tech == null) {
+                return;
+            }
+            for (IPartWork work : parts) {
+                if (work instanceof Part part) {
+                    stripPart(campaign, part, tech);
+                }
+            }
         } else if (command.contains("CHANGE_MODE")) {
             String sel = command.split(":")[1];
             for (IPartWork p : parts) {
@@ -150,6 +167,19 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
 
                 reportAndTriggerEvent(p);
             }
+        } else if (command.equalsIgnoreCase("CANCEL")) {
+            for (IPartWork work : parts) {
+                if (!work.isBeingWorkedOn()) {
+                    continue;
+                }
+
+                // Cancel the assignment without refunding the minutes already spent.
+                work.cancelAssignment(false);
+                if (work instanceof Part part) {
+                    MekHQ.triggerEvent(new PartChangedEvent(part));
+                }
+            }
+            taskTable.repaint();
         }
     }
 
@@ -193,6 +223,116 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
         if (partWork instanceof Part) {
             MekHQ.triggerEvent(new PartChangedEvent((Part) partWork));
         }
+    }
+
+    /**
+     * Determines whether a "Strip Part" entry should be shown for the given task.
+     *
+     * <p>The entry is offered for any installed component on a unit that is set to repair. Mek locations are included
+     * even though they cannot actually be stripped from here: they are surfaced (disabled, with an explanation) so the
+     * player understands why, rather than silently omitting the option. Replacement tasks (missing parts) and spare
+     * parts are excluded outright, as are units already in salvage mode (where removal is already the default
+     * task).</p>
+     *
+     * @param part the task to test
+     *
+     * @return {@code true} if a "Strip Part" entry should be shown for this task
+     */
+    static boolean isStripCandidate(Part part) {
+        Unit unit = part.getUnit();
+        if ((unit == null) || unit.isSalvage() || (part instanceof MissingPart)) {
+            return false;
+        }
+        // Mek locations are shown so we can explain why they can't be stripped; everything else must be scrappable.
+        return (part instanceof MekLocation) || !part.canNeverScrap();
+    }
+
+    /**
+     * Computes the salvage-removal target roll for a part as if its unit were in salvage mode, without permanently
+     * changing the unit's salvage state. This lets the repair task list surface the removal target number even though
+     * the unit is set to repair.
+     *
+     * @param part the part to be stripped
+     * @param tech the technician who would perform the removal
+     *
+     * @return the target roll for removing the part, or {@code null} if it cannot be computed
+     */
+    TargetRoll getStripTarget(Part part, Person tech) {
+        Unit unit = part.getUnit();
+        if ((unit == null) || (tech == null)) {
+            return null;
+        }
+
+        boolean wasSalvage = unit.isSalvage();
+        boolean techWasNull = part.getTech() == null;
+        unit.setSalvage(true);
+        // Temporarily set the tech (mirrors RepairTab#updateTechTarget) so the Clan-tech flag resolves correctly.
+        if (techWasNull) {
+            part.setTech(tech);
+        }
+        try {
+            return gui.getCampaign().getTargetFor(part, tech);
+        } finally {
+            if (techWasNull) {
+                part.setTech(null);
+            }
+            unit.setSalvage(wasSalvage);
+        }
+    }
+
+    /**
+     * Computes how many minutes a salvage-removal of the part would take, evaluated as if the unit were in salvage
+     * mode, without permanently changing the unit's salvage state.
+     *
+     * @param part the part to be stripped
+     *
+     * @return the time (in minutes) left to remove the part
+     */
+    int getStripTime(Part part) {
+        Unit unit = part.getUnit();
+        if (unit == null) {
+            return 0;
+        }
+
+        boolean wasSalvage = unit.isSalvage();
+        unit.setSalvage(true);
+        try {
+            return part.getTimeLeft();
+        } finally {
+            unit.setSalvage(wasSalvage);
+        }
+    }
+
+    /**
+     * Performs a salvage-removal ("strip") of a part using the supplied tech, consuming the tech's time and rolling
+     * against the salvage target number exactly as the normal Do Task action would. The part's unit is temporarily
+     * flipped into salvage mode so the work is resolved as a removal rather than a repair; the flag is restored
+     * afterward (a multi-day task keeps salvaging because {@code fixPart} captures the salvage state when it assigns
+     * the tech).
+     *
+     * @param campaign the current campaign
+     * @param part     the part to strip
+     * @param tech     the technician performing the removal
+     */
+    void stripPart(Campaign campaign, Part part, Person tech) {
+        Unit unit = part.getUnit();
+        if (unit == null) {
+            return;
+        }
+
+        boolean wasSalvage = unit.isSalvage();
+        unit.setSalvage(true);
+        try {
+            campaign.fixPart(part, tech);
+        } finally {
+            unit.setSalvage(wasSalvage);
+        }
+
+        if (!unit.isRepairable() && !unit.hasSalvageableParts()) {
+            campaign.removeUnit(unit.getId());
+        }
+        unit.refreshPodSpace();
+        MekHQ.triggerEvent(new PartWorkEvent(tech, part));
     }
 
     @Override
@@ -256,6 +396,57 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
             menuItem.addActionListener(this);
             menuItem.setEnabled(!isBeingWorked);
             popup.add(menuItem);
+        }
+
+        // Cancel task (unassign tech; spent minutes are not refunded).
+        // Unlike Mode/Scrap above, this deliberately omits the (p instanceof Part) guard. Some IPartWork
+        // implementations are not Parts (e.g. PodSpace) yet can still be assigned a tech, so the guarded
+        // isBeingWorked flag would leave Cancel disabled for those in-progress tasks. Enable it for any
+        // IPartWork currently being worked on.
+        boolean anyBeingWorked = false;
+        for (IPartWork p : parts) {
+            anyBeingWorked |= p.isBeingWorkedOn();
+        }
+        menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "TaskTableMouseAdapter.CANCEL"));
+        menuItem.setActionCommand("CANCEL");
+        menuItem.addActionListener(this);
+        menuItem.setEnabled(anyBeingWorked);
+        popup.add(menuItem);
+
+        // Strip part: one-click salvage removal using the currently selected tech, even though the unit is set to
+        // repair. Only offered for a single installed, damaged component so the target number and time can be shown.
+        if (!isBeingWorked && (rows.length == 1) && (partWork instanceof Part stripCandidate)
+              && isStripCandidate(stripCandidate)) {
+            if (stripCandidate instanceof MekLocation) {
+                // Locations can't be stripped from here (armor and equipment must come off first, in order); show a
+                // disabled entry that explains why and points the player at Scrap.
+                menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "TaskTableMouseAdapter.strip.disabled"));
+                menuItem.setToolTipText(getTextAt(RESOURCE_BUNDLE, "TaskTableMouseAdapter.strip.mekLocation.tooltip"));
+                menuItem.setEnabled(false);
+                popup.add(menuItem);
+            } else {
+                Person tech = techWorkPanel.getSelectedTech();
+                TargetRoll target = getStripTarget(stripCandidate, tech);
+                boolean canPerformStrip = !isBeingWorked
+                                                && (tech != null)
+                                                && (target != null)
+                                                && (target.getValue() != TargetRoll.IMPOSSIBLE);
+
+                if (canPerformStrip) {
+                    menuItem = new JMenuItem(getFormattedTextAt(RESOURCE_BUNDLE, "TaskTableMouseAdapter.strip",
+                          target.getValueAsString(), String.valueOf(getStripTime(stripCandidate))));
+                    menuItem.setToolTipText(target.getDesc());
+                } else {
+                    menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "TaskTableMouseAdapter.strip.disabled"));
+                    menuItem.setToolTipText(getTextAt(RESOURCE_BUNDLE,
+                          (tech == null) ? "TaskTableMouseAdapter.strip.noTech.tooltip"
+                                : "TaskTableMouseAdapter.strip.impossible.tooltip"));
+                }
+                menuItem.setActionCommand("STRIP");
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(canPerformStrip);
+                popup.add(menuItem);
+            }
         }
 
         if (gui.getCampaign().isGM()) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -34,8 +34,6 @@ package mekhq.gui.dialog.nagDialogs;
 
 import static java.lang.Math.min;
 import static mekhq.MHQConstants.NAG_UNTREATED_PERSONNEL;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.UntreatedPersonnelNagLogic.calculateTotalDoctorCapacity;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.UntreatedPersonnelNagLogic.campaignHasUntreatedInjuries;
 
@@ -78,7 +76,7 @@ public class UntreatedPersonnelNagDialog extends ImmersiveDialogNag {
             return null;
         }
 
-        List<Person> potentialSpeakers = campaign.getActivePersonnel(false, false);
+        List<Person> potentialSpeakers = campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false);
 
         if (potentialSpeakers.isEmpty()) {
             return getFallbackSpeaker(campaign);
@@ -121,10 +119,18 @@ public class UntreatedPersonnelNagDialog extends ImmersiveDialogNag {
      *       is available.
      */
     private @Nullable Person getFallbackSpeaker(Campaign campaign) {
-        Person speaker = campaign.getSeniorAdminPerson(HR);
+        Person speaker = campaign.getPlayerForce().getHumanResources()
+                               .getSeniorAdminPerson(AdministratorSpecialization.HR,
+                                     campaign.getCampaignOptions(),
+                                     campaign.isClanCampaign(),
+                                     campaign.getLocalDate());
 
         if (speaker == null) {
-            speaker = campaign.getSeniorAdminPerson(COMMAND);
+            speaker = campaign.getPlayerForce().getHumanResources()
+                            .getSeniorAdminPerson(AdministratorSpecialization.COMMAND,
+                                  campaign.getCampaignOptions(),
+                                  campaign.isClanCampaign(),
+                                  campaign.getLocalDate());
         } else {
             return speaker;
         }

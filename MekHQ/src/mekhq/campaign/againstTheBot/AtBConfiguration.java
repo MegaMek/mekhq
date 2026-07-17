@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014 - Carl Spain. All rights reserved.
- * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -59,7 +59,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -356,7 +355,12 @@ public class AtBConfiguration {
         }
 
         TargetRoll target = new TargetRoll(baseShipSearchTarget, "Base");
-        Person logisticsAdmin = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_LOGISTICS, SkillType.S_ADMIN);
+        Person logisticsAdmin = campaign.getPlayerForce().getHumanResources()
+                                      .findBestInRole(mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR_LOGISTICS,
+                                            mekhq.campaign.personnel.skills.SkillType.S_ADMIN,
+                                            campaign.getCampaignOptions(),
+                                            campaign.isClanCampaign(),
+                                            campaign.getLocalDate());
 
         int experienceLevel = EXP_ULTRA_GREEN;
         if (logisticsAdmin != null && logisticsAdmin.hasSkill(S_ADMIN)) {

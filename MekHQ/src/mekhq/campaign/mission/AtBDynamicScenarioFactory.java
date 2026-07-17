@@ -46,6 +46,7 @@ import static megamek.common.planetaryConditions.Atmosphere.THIN;
 import static megamek.common.planetaryConditions.Wind.TORNADO_F4;
 import static megamek.common.units.UnitType.*;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
+import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.scenarioModifierShouldBeBlocked;
 import static mekhq.campaign.enums.DailyReportType.BATTLE;
 import static mekhq.campaign.mission.AtBScenario.selectBotTeamCommanders;
 import static mekhq.campaign.mission.RandomFactionCamouflage.pickRandomCamouflage;
@@ -58,7 +59,6 @@ import static mekhq.campaign.mission.enums.CombatRole.FRONTLINE;
 import static mekhq.campaign.mission.enums.CombatRole.MANEUVER;
 import static mekhq.campaign.mission.enums.CombatRole.PATROL;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_LEGENDARY;
-import static mekhq.campaign.stratCon.StratConRulesManager.scenarioModifierShouldBeBlocked;
 import static mekhq.campaign.universe.IUnitGenerator.unitTypeSupportsWeightClass;
 import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
 
@@ -108,11 +108,18 @@ import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Hangar;
+import mekhq.campaign.LocalHangar;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.camOpsReputation.IUnitRating;
 import mekhq.campaign.campaignOptions.BoardScalingType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.digitalGM.stratCon.StratConBiomeManifest;
+import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
+import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
+import mekhq.campaign.digitalGM.stratCon.StratConFacility;
+import mekhq.campaign.digitalGM.stratCon.StratConFacility.FacilityType;
+import mekhq.campaign.digitalGM.stratCon.StratConScenario;
+import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
@@ -131,13 +138,6 @@ import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.stratCon.StratConBiomeManifest;
-import mekhq.campaign.stratCon.StratConCampaignState;
-import mekhq.campaign.stratCon.StratConContractInitializer;
-import mekhq.campaign.stratCon.StratConFacility;
-import mekhq.campaign.stratCon.StratConFacility.FacilityType;
-import mekhq.campaign.stratCon.StratConScenario;
-import mekhq.campaign.stratCon.StratConTrackState;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -1655,7 +1655,7 @@ public class AtBDynamicScenarioFactory {
                              templateObjective.getAssociatedForceNames()
                                    .contains(ScenarioObjective.FORCE_SHORTCUT_ALL_ENEMY_FORCES))) {
                 objectiveForceNames.add(botForce.getName());
-                calculatedDestinationZone = OffBoardDirection.translateBoardStart(getOppositeEdge(forceTemplate.getActualDeploymentZone()));
+                calculatedDestinationZone = OffBoardDirection.translateStartPosition(getOppositeEdge(forceTemplate.getActualDeploymentZone()));
             }
         }
 
@@ -1665,8 +1665,8 @@ public class AtBDynamicScenarioFactory {
             if (templateObjective.isApplicableToForceTemplate(playerForceTemplate, scenario) ||
                       templateObjective.getAssociatedForceNames()
                             .contains(ScenarioObjective.FORCE_SHORTCUT_ALL_PRIMARY_PLAYER_FORCES)) {
-                objectiveForceNames.add(campaign.getFormation(forceID).getName());
-                calculatedDestinationZone = OffBoardDirection.translateBoardStart(getOppositeEdge(playerForceTemplate.getActualDeploymentZone()));
+                objectiveForceNames.add(campaign.getPlayerForce().getFormation(forceID).getName());
+                calculatedDestinationZone = OffBoardDirection.translateStartPosition(getOppositeEdge(playerForceTemplate.getActualDeploymentZone()));
             }
         }
 
@@ -1677,7 +1677,7 @@ public class AtBDynamicScenarioFactory {
                       templateObjective.getAssociatedForceNames()
                             .contains(ScenarioObjective.FORCE_SHORTCUT_ALL_PRIMARY_PLAYER_FORCES)) {
                 objectiveUnitIDs.add(unitID.toString());
-                calculatedDestinationZone = OffBoardDirection.translateBoardStart(getOppositeEdge(playerForceTemplate.getActualDeploymentZone()));
+                calculatedDestinationZone = OffBoardDirection.translateStartPosition(getOppositeEdge(playerForceTemplate.getActualDeploymentZone()));
             }
         }
 
@@ -1687,7 +1687,7 @@ public class AtBDynamicScenarioFactory {
 
             if (templateObjective.isApplicableToForceTemplate(botForceTemplate, scenario)) {
                 objectiveUnitIDs.add(unitID.toString());
-                calculatedDestinationZone = OffBoardDirection.translateBoardStart(getOppositeEdge(botForceTemplate.getActualDeploymentZone()));
+                calculatedDestinationZone = OffBoardDirection.translateStartPosition(getOppositeEdge(botForceTemplate.getActualDeploymentZone()));
             }
         }
 
@@ -1701,11 +1701,23 @@ public class AtBDynamicScenarioFactory {
 
         // if the objective specifies that it's to reach or prevent reaching a map edge
         // and has been set to "force destination edge", set that here
-        if (actualObjective.getDestinationEdge() == OffBoardDirection.NONE &&
+        boolean destinationEdgeIsNone = actualObjective.getDestinationEdge() == OffBoardDirection.NONE;
+        boolean objectiveIsReachMapEdge = actualObjective.getObjectiveCriterion() == ObjectiveCriterion.ReachMapEdge;
+        boolean objectiveIsPreventReachMapEdge = actualObjective.getObjectiveCriterion() ==
+                                                       ObjectiveCriterion.PreventReachMapEdge;
+        boolean objectiveIsMapEdgeRelevant = objectiveIsReachMapEdge || objectiveIsPreventReachMapEdge;
+        if (destinationEdgeIsNone &&
                   calculatedDestinationZone != OffBoardDirection.NONE &&
-                  (actualObjective.getObjectiveCriterion() == ObjectiveCriterion.ReachMapEdge ||
-                         actualObjective.getObjectiveCriterion() == ObjectiveCriterion.PreventReachMapEdge)) {
+                  objectiveIsMapEdgeRelevant) {
             actualObjective.setDestinationEdge(calculatedDestinationZone);
+        } else if (destinationEdgeIsNone &&
+                         objectiveIsMapEdgeRelevant) {
+            // The edge could not be auto-derived (e.g. the associated force deploys from the map center, so there is
+            // no "opposite" edge to flee toward). Such an objective can never validate, so warn instead of failing
+            // silently; the template should set an explicit <destinationEdge> in this case.
+            LOGGER.warn("Reach/prevent-edge objective '{}' could not auto-resolve a destination edge; " +
+                              "it will never complete unless the scenario template sets an explicit <destinationEdge>.",
+                  actualObjective.getDescription());
         }
 
         return actualObjective;
@@ -1771,7 +1783,7 @@ public class AtBDynamicScenarioFactory {
             ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
 
             if ((forceTemplate != null) && forceTemplate.getContributesToUnitCount()) {
-                primaryUnitCount += campaign.getFormation(forceID).getAllUnits(false).size();
+                primaryUnitCount += campaign.getPlayerForce().getFormation(forceID).getAllUnits(false).size();
             }
         }
 
@@ -1859,28 +1871,30 @@ public class AtBDynamicScenarioFactory {
         } else {
             StratConBiomeManifest biomeManifest = StratConBiomeManifest.getInstance();
             int kelvinTemp = scenario.getTemperature() + StratConContractInitializer.ZERO_CELSIUS_IN_KELVIN;
-            var facilityTempMap = biomeManifest.getTempMap(StratConBiomeManifest.TERRAN_FACILITY_BIOME);
-            var facilityBiomeEntry = facilityTempMap.floorEntry(kelvinTemp);
-            if (facilityBiomeEntry == null) {
-                facilityBiomeEntry = facilityTempMap.firstEntry();
-            }
-            List<String> allowedFacility = facilityBiomeEntry.getValue().allowedTerrainTypes;
+
             var terrainTempMap = biomeManifest.getTempMap(StratConBiomeManifest.TERRAN_BIOME);
             var terrainBiomeEntry = terrainTempMap.floorEntry(kelvinTemp);
             if (terrainBiomeEntry == null) {
                 terrainBiomeEntry = terrainTempMap.firstEntry();
             }
-            List<String> allowedTerrain = terrainBiomeEntry.getValue().allowedTerrainTypes;
-            List<String> allowedTemplate = scenario.getTemplate().mapParameters.allowedTerrainTypes;
-            // try to filter on temp
-            allowedTerrain.addAll(allowedFacility);
-            allowedTemplate.retainAll(allowedTerrain);
-            allowedTemplate = !allowedTemplate.isEmpty() ?
-                                    allowedTemplate :
-                                    scenario.getTemplate().mapParameters.allowedTerrainTypes;
+
+            List<String> allowedTemplate = new ArrayList<>(scenario.getTemplate().mapParameters.allowedTerrainTypes);
+            allowedTemplate.retainAll(terrainBiomeEntry.getValue().allowedTerrainTypes);
+
+            if (allowedTemplate.isEmpty()) {
+                allowedTemplate = scenario.getTemplate().mapParameters.allowedTerrainTypes;
+            }
+
+            if (allowedTemplate.isEmpty()) {
+                // This should never happen. If it does, it means that both allowedTemplate and allowedTerrainTypes
+                // were empty, which likely points to a malformed scenario template.
+                LOGGER.error("No allowed terrain types found for scenario template '{}'; skipping terrain assignment.",
+                      scenario.getTemplate().name);
+                return;
+            }
 
             int terrainIndex = randomInt(allowedTemplate.size());
-            scenario.setTerrainType(scenario.getTemplate().mapParameters.allowedTerrainTypes.get(terrainIndex));
+            scenario.setTerrainType(allowedTemplate.get(terrainIndex));
             scenario.setMapFile();
         }
     }
@@ -3505,7 +3519,7 @@ public class AtBDynamicScenarioFactory {
             for (int forceID : scenario.getForceIDs()) {
                 ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
                 if (forceTemplate != null && forceTemplate.getContributesToBV()) {
-                    Formation formation = campaign.getFormation(forceID);
+                    Formation formation = campaign.getPlayerForce().getFormation(forceID);
                     if (formation != null) {
                         bvBudget += formation.getTotalBV(campaign, forceStandardBattleValue);
                         LOGGER.info("Forced BV contribution for {}: {}", formation.getName(), bvBudget);
@@ -3595,7 +3609,7 @@ public class AtBDynamicScenarioFactory {
         int totalForces = 0;
         int totalBattleValue = 0;
         List<CombatRole> validRoles = List.of(FRONTLINE, MANEUVER, CADRE, PATROL);
-        for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
+        for (CombatTeam combatTeam : campaign.getPlayerForce().getCombatTeamsAsList(campaign)) {
             CombatRole role = combatTeam.getRole();
             if (!validRoles.contains(role)) {
                 continue;
@@ -3662,7 +3676,7 @@ public class AtBDynamicScenarioFactory {
         // averages will be weighted against).
         List<Integer> battleValues = new ArrayList<>();
         List<CombatRole> validRoles = List.of(FRONTLINE, MANEUVER, CADRE, PATROL);
-        for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
+        for (CombatTeam combatTeam : campaign.getPlayerForce().getCombatTeamsAsList(campaign)) {
             CombatRole role = combatTeam.getRole();
             if (!validRoles.contains(role)) {
                 continue;
@@ -3706,7 +3720,7 @@ public class AtBDynamicScenarioFactory {
             // deployed player forces:
             for (int forceID : scenario.getForceIDs()) {
                 ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
-                Formation formation = campaign.getFormation(forceID);
+                Formation formation = campaign.getPlayerForce().getFormation(forceID);
 
                 if (forceTemplate != null && forceTemplate.getContributesToUnitCount() && formation != null) {
                     unitCount += formation.getTotalUnitCount(campaign, isClanBidding);
@@ -3763,7 +3777,7 @@ public class AtBDynamicScenarioFactory {
         int forceCount = 0;
         int unitCount = 0;
         List<CombatRole> validRoles = List.of(FRONTLINE, MANEUVER, CADRE, PATROL);
-        for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
+        for (CombatTeam combatTeam : campaign.getPlayerForce().getCombatTeamsAsList(campaign)) {
             CombatRole role = combatTeam.getRole();
             if (!validRoles.contains(role)) {
                 continue;
@@ -3827,7 +3841,7 @@ public class AtBDynamicScenarioFactory {
         // averages will be weighted against).
         List<Integer> unitCounts = new ArrayList<>();
         List<CombatRole> validRoles = List.of(FRONTLINE, MANEUVER, CADRE, PATROL);
-        for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
+        for (CombatTeam combatTeam : campaign.getPlayerForce().getCombatTeamsAsList(campaign)) {
             CombatRole role = combatTeam.getRole();
             if (!validRoles.contains(role)) {
                 continue;
@@ -4421,7 +4435,7 @@ public class AtBDynamicScenarioFactory {
         }
 
         for (int forceID : scenario.getForceIDs()) {
-            Formation playerFormation = campaign.getFormation(forceID);
+            Formation playerFormation = campaign.getPlayerForce().getFormation(forceID);
 
             for (UUID unitID : playerFormation.getAllUnits(true)) {
                 Unit currentUnit = campaign.getUnit(unitID);
@@ -4473,17 +4487,20 @@ public class AtBDynamicScenarioFactory {
             setDeploymentTurnsStaggeredByLance(untransportedEntities);
         } else if (forceTemplate.getArrivalTurn() == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) {
             if (forceTemplate.getForceAlignment() == ForceAlignment.Opposing.ordinal()) {
-                setDeploymentTurnsForReinforcements(campaign.getAllHangar(),
+                setDeploymentTurnsForReinforcements(campaign.getPlayerForce().getHangar(),
                       scenario,
                       untransportedEntities,
                       scenario.getHostileReinforcementDelayReduction());
             } else if (forceTemplate.getForceAlignment() != ForceAlignment.Third.ordinal()) {
-                setDeploymentTurnsForReinforcements(campaign.getAllHangar(),
+                setDeploymentTurnsForReinforcements(campaign.getPlayerForce().getHangar(),
                       scenario,
                       untransportedEntities,
                       scenario.getFriendlyReinforcementDelayReduction());
             } else {
-                setDeploymentTurnsForReinforcements(campaign.getAllHangar(), scenario, untransportedEntities, 0);
+                setDeploymentTurnsForReinforcements(campaign.getPlayerForce().getHangar(),
+                      scenario,
+                      untransportedEntities,
+                      0);
             }
         } else {
             for (Entity entity : untransportedEntities) {
@@ -4526,12 +4543,12 @@ public class AtBDynamicScenarioFactory {
         // deployment turn explicitly or use a stagger algorithm.
         // For player forces where there's not an associated force template, we calculate the
         // deployment turn as if they were reinforcements
-        Hangar hangar = campaign.getAllHangar();
+        mekhq.campaign.LocalHangar hangar = campaign.getPlayerForce().getHangar();
         for (int forceID : scenario.getForceIDs()) {
             ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
 
             List<Entity> forceEntities = new ArrayList<>();
-            Formation playerFormation = campaign.getFormation(forceID);
+            Formation playerFormation = campaign.getPlayerForce().getFormation(forceID);
 
             for (UUID unitID : playerFormation.getAllUnits(true)) {
                 Unit currentUnit = campaign.getUnit(unitID);
@@ -4595,7 +4612,10 @@ public class AtBDynamicScenarioFactory {
             } else {
                 LOGGER.info("We're using a fallback deployment turn calculation for {}",
                       playerFormation.getName());
-                setDeploymentTurnsForReinforcements(campaign.getAllHangar(), scenario, forceEntities, strategy);
+                setDeploymentTurnsForReinforcements(campaign.getPlayerForce().getHangar(),
+                      scenario,
+                      forceEntities,
+                      strategy);
             }
         }
 
@@ -4617,7 +4637,7 @@ public class AtBDynamicScenarioFactory {
                 if (deployRound == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED_BY_LANCE) {
                     setDeploymentTurnsStaggeredByLance(Collections.singletonList(entity));
                 } else if (deployRound == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) {
-                    setDeploymentTurnsForReinforcements(campaign.getAllHangar(),
+                    setDeploymentTurnsForReinforcements(campaign.getPlayerForce().getHangar(),
                           scenario,
                           Collections.singletonList(entity),
                           strategy);
@@ -4625,7 +4645,7 @@ public class AtBDynamicScenarioFactory {
                     entity.setDeployRound(deployRound);
                 }
             } else {
-                setDeploymentTurnsForReinforcements(campaign.getAllHangar(),
+                setDeploymentTurnsForReinforcements(campaign.getPlayerForce().getHangar(),
                       scenario,
                       Collections.singletonList(entity),
                       strategy);
@@ -4643,13 +4663,14 @@ public class AtBDynamicScenarioFactory {
      * setDeploymentTurnsForReinforcements}, including an additional delay reduction based on the scenario.</p>
      *
      * @param scenario the {@link AtBDynamicScenario} defining friendly delayed reinforcements
-     * @param hangar   the {@link Hangar} containing all possible entities for deployment
+     * @param hangar   the {@link LocalHangar} containing all possible entities for deployment
      * @param strategy an {@link Integer} value affecting the calculated delay for the arrivals
      *
      * @author Illiani
      * @since 0.50.07
      */
-    private static void processDelayedArrivals(AtBDynamicScenario scenario, Hangar hangar, int strategy) {
+    private static void processDelayedArrivals(AtBDynamicScenario scenario, mekhq.campaign.LocalHangar hangar,
+          int strategy) {
         List<Entity> delayedEntities = new ArrayList<>();
         for (UUID unitId : scenario.getFriendlyDelayedReinforcements()) {
             Entity entity = EntityUtilities.getEntityFromUnitId(hangar, unitId);
@@ -4675,12 +4696,12 @@ public class AtBDynamicScenarioFactory {
      * them available immediately.</p>
      *
      * @param scenario the {@link AtBDynamicScenario} defining friendly delayed reinforcements
-     * @param hangar   the {@link Hangar} containing all possible entities for deployment
+     * @param hangar   the {@link LocalHangar} containing all possible entities for deployment
      *
      * @author Illiani
      * @since 0.50.07
      */
-    private static void processInstantArrivals(AtBDynamicScenario scenario, Hangar hangar) {
+    private static void processInstantArrivals(AtBDynamicScenario scenario, mekhq.campaign.LocalHangar hangar) {
         List<UUID> instantReinforcements = scenario.getFriendlyInstantReinforcements();
         for (UUID unitId : instantReinforcements) {
             Unit unit = hangar.getUnit(unitId);
@@ -4711,7 +4732,7 @@ public class AtBDynamicScenarioFactory {
         for (int forceID : scenario.getForceIDs()) {
             ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
             List<Entity> forceEntities = new ArrayList<>();
-            Formation playerFormation = campaign.getFormation(forceID);
+            Formation playerFormation = campaign.getPlayerForce().getFormation(forceID);
 
             for (UUID unitID : playerFormation.getAllUnits(true)) {
                 Unit currentUnit = campaign.getUnit(unitID);
@@ -4790,7 +4811,7 @@ public class AtBDynamicScenarioFactory {
      * speeds, with an optional adjustment via the {@code turnModifier}. It assumes that the reinforcements are not
      * delayed, simplifying the calculation logic compared to the main method.</p>
      *
-     * @param hangar       The {@link Hangar} instance containing the available entities. Used to resolve
+     * @param hangar       The {@link LocalHangar} instance containing the available entities. Used to resolve
      *                     player-transported entities via unit IDs.
      * @param scenario     The {@link Scenario} under which the entities are being deployed. Provides transport linkage
      *                     information and overall deployment context.
@@ -4798,9 +4819,10 @@ public class AtBDynamicScenarioFactory {
      * @param turnModifier A value to subtract from the calculated deployment turn, typically reflecting a strategy
      *                     skill or similar modifier.
      *
-     * @see #setDeploymentTurnsForReinforcements(Hangar, Scenario, List, int, boolean)
+     * @see #setDeploymentTurnsForReinforcements(LocalHangar, Scenario, List, int, boolean)
      */
-    public static void setDeploymentTurnsForReinforcements(Hangar hangar, Scenario scenario, List<Entity> entityList,
+    public static void setDeploymentTurnsForReinforcements(mekhq.campaign.LocalHangar hangar, Scenario scenario,
+          List<Entity> entityList,
           int turnModifier) {
         setDeploymentTurnsForReinforcements(hangar, scenario, entityList, turnModifier, false);
     }
@@ -4825,7 +4847,7 @@ public class AtBDynamicScenarioFactory {
      *   <li>Updates the deployment round for all entities in the list to the calculated arrival turn.</li>
      * </ul>
      *
-     * @param hangar       The {@link Hangar} instance containing the available entities. Used to resolve
+     * @param hangar       The {@link LocalHangar} instance containing the available entities. Used to resolve
      *                     player-transported entities via unit IDs.
      * @param scenario     The {@link Scenario} under which the entities are being deployed. Provides transport linkage
      *                     information and overall deployment context.
@@ -4835,7 +4857,8 @@ public class AtBDynamicScenarioFactory {
      * @param isDelayed    A flag indicating whether the reinforcements were delayed. Delayed reinforcements are
      *                     assigned a higher arrival scale, increasing their arrival turn.
      */
-    public static void setDeploymentTurnsForReinforcements(Hangar hangar, Scenario scenario, List<Entity> entityList,
+    public static void setDeploymentTurnsForReinforcements(mekhq.campaign.LocalHangar hangar, Scenario scenario,
+          List<Entity> entityList,
           int turnModifier, boolean isDelayed) {
         // Build a set of all player transported entities. We don't need to do this for NPC entities
         // as how they're transported is different and their arrival times are better isolated when

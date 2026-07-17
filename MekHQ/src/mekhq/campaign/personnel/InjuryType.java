@@ -242,6 +242,17 @@ public class InjuryType {
             recoveryTime = recoveryTime / 2;
         }
 
+        // Under Alternate Advanced Medical, all healing times are scaled by the campaign's healing-time multiplier.
+        // Applying it here ensures every injury-creation path (combat, surgery, diseases, postpartum, complications,
+        // etc.) is scaled consistently. Injuries with no recovery time (e.g., permanent modifications) are left alone.
+        if (campaign.getCampaignOptions().isUseAlternativeAdvancedMedical() && recoveryTime > 0) {
+            double healingTimeMultiplier = campaign.getCampaignOptions()
+                                                 .getAlternativeAdvancedMedicalHealingTimeMultiplier();
+            if (healingTimeMultiplier != 1.0) {
+                recoveryTime = Math.max(1, (int) Math.round(recoveryTime * healingTimeMultiplier));
+            }
+        }
+
         final String fluff = getFluffText(bodyLocation, severity, person.getGender());
         Injury result = new Injury(recoveryTime, fluff, bodyLocation, this, severity, campaign.getLocalDate(), false);
         result.setVersion(Injury.VERSION);

@@ -83,15 +83,22 @@ class CampaignOptionsNavigationPanel extends JPanel {
     private final JTextField filterField;
     private final JLabel filterStatusLabel;
     private final JTree navigationTree;
+    private final String resourceBundleName;
     private @Nullable CampaignOptionsRoute currentRoute;
     private boolean isSyncingSelection;
     private @Nullable Runnable searchIndexInitializer;
 
     CampaignOptionsNavigationPanel(@Nonnull List<CampaignOptionsRoute> routes,
           @Nonnull Consumer<CampaignOptionsRoute> routeSelectionListener) {
+        this(routes, routeSelectionListener, getCampaignOptionsResourceBundle());
+    }
+
+    CampaignOptionsNavigationPanel(@Nonnull List<CampaignOptionsRoute> routes,
+          @Nonnull Consumer<CampaignOptionsRoute> routeSelectionListener, @Nonnull String resourceBundleName) {
         super(new BorderLayout(0, CONTROL_GAP));
         this.routes = routes;
         this.routeSelectionListener = routeSelectionListener;
+        this.resourceBundleName = resourceBundleName;
 
         setName("campaignOptionsNavigationPanel");
         // Match the content panel's scroll-pane border instead of a TitledBorder. A TitledBorder reserves vertical
@@ -108,8 +115,8 @@ class CampaignOptionsNavigationPanel extends JPanel {
         filterField = new JTextField();
         filterField.setName("txtCampaignOptionsFilter");
         filterField.putClientProperty("JTextField.placeholderText",
-              getTextAt(getCampaignOptionsResourceBundle(), "txtCampaignOptionsFilter.text"));
-        filterField.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(), "txtCampaignOptionsFilter.tooltip"));
+              getTextAt(resourceBundleName, "txtCampaignOptionsFilter.text"));
+        filterField.setToolTipText(getTextAt(resourceBundleName, "txtCampaignOptionsFilter.tooltip"));
         filterField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent documentEvent) {
@@ -147,7 +154,11 @@ class CampaignOptionsNavigationPanel extends JPanel {
         JPanel searchRow = new JPanel(new BorderLayout(CONTROL_GAP, 0));
         searchRow.setName("campaignOptionsSearchRow");
         searchRow.add(filterField, BorderLayout.CENTER);
-        searchRow.add(createTreeControls(), BorderLayout.EAST);
+        // Only offer tree expand/collapse when pages nest under categories; a fully flat tree (every route top-level)
+        // has nothing to expand or collapse.
+        if (routes.stream().anyMatch(route -> !route.isTopLevelRoute())) {
+            searchRow.add(createTreeControls(), BorderLayout.EAST);
+        }
 
         JPanel filterPanel = new JPanel(new BorderLayout(0, CONTROL_GAP));
         filterPanel.setName("campaignOptionsFilterPanel");
@@ -184,7 +195,7 @@ class CampaignOptionsNavigationPanel extends JPanel {
         // unfold icons, and the tooltip covers first-time discovery. Collapse is sized a touch larger so its tighter
         // glyph reads the same as the expand glyph.
         button.setIcon(symbolIcon(iconCodePoint, iconSize, button.getForeground()));
-        button.setToolTipText(getTextAt(getCampaignOptionsResourceBundle(), tooltipKey));
+        button.setToolTipText(getTextAt(resourceBundleName, tooltipKey));
         button.putClientProperty("JButton.buttonType", "toolBarButton");
         setSmallSizeVariant(button);
         int buttonSide = UIUtil.scaleForGUI(28);
@@ -296,7 +307,7 @@ class CampaignOptionsNavigationPanel extends JPanel {
 
         if (!normalizedFilter.isBlank() && matchingRoutes.isEmpty()) {
             root.add(new DefaultMutableTreeNode(new NavigationTreeNode(
-                  getTextAt(getCampaignOptionsResourceBundle(), "campaignOptionsFilter.noMatches"), null)));
+                  getTextAt(resourceBundleName, "campaignOptionsFilter.noMatches"), null)));
         }
 
         navigationTree.setModel(new DefaultTreeModel(root));
@@ -339,11 +350,11 @@ class CampaignOptionsNavigationPanel extends JPanel {
         }
 
         if (matchCount == 0) {
-            filterStatusLabel.setText(getTextAt(getCampaignOptionsResourceBundle(),
-                  "campaignOptionsFilter.noMatches"));
+            String noMatchesText = getTextAt(resourceBundleName, "campaignOptionsFilter.noMatches");
+            filterStatusLabel.setText(noMatchesText);
         } else {
-            filterStatusLabel.setText(String.format(getTextAt(getCampaignOptionsResourceBundle(),
-                  "campaignOptionsFilter.matches"), matchCount));
+            String matchesFormat = getTextAt(resourceBundleName, "campaignOptionsFilter.matches");
+            filterStatusLabel.setText(String.format(matchesFormat, matchCount));
         }
         filterStatusLabel.setVisible(true);
     }

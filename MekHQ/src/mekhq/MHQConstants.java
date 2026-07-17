@@ -58,7 +58,6 @@ public final class MHQConstants extends SuiteConstants {
     public static final int FACTION_GENERATOR_BORDER_RANGE_NEAR_PERIPHERY = 90;
     public static final int FACTION_GENERATOR_BORDER_RANGE_DEEP_PERIPHERY = 210; // a bit more than this distance
     // between HL and NC
-    public static final LocalDate FORTRESS_REPUBLIC = LocalDate.of(3135, Month.NOVEMBER, 1);
     // endregion Faction Generation Constants
 
     // region GUI Constants
@@ -112,6 +111,8 @@ public final class MHQConstants extends SuiteConstants {
     public static final String BELOW_CONTRACT_MINIMUM_BACKGROUND = "belowContractMinimumBackground";
     public static final String IN_TRANSIT_FOREGROUND = "inTransitForeground";
     public static final String IN_TRANSIT_BACKGROUND = "inTransitBackground";
+    public static final String QUEUED_FOR_TRAVEL_FOREGROUND = "queuedForTravelForeground";
+    public static final String QUEUED_FOR_TRAVEL_BACKGROUND = "queuedForTravelBackground";
     public static final String REFITTING_FOREGROUND = "refittingForeground";
     public static final String REFITTING_BACKGROUND = "refittingBackground";
     public static final String MOTHBALLING_FOREGROUND = "mothballingForeground";
@@ -329,6 +330,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String LIFE_PATHS_USER_DIRECTORY_PATH = "/advancedCharacterBuilder/lifePaths";
     public static final String ERAS_FILE_PATH = "data/universe/eras.xml";
     public static final String FACTION_HINTS_FILE = "data/universe/factionhints.xml";
+    public static final String FACTION_DIPLOMACY_DIRECTORY_PATH = "data/universe/factionDiplomacy";
     public static final String FINANCIAL_INSTITUTIONS_FILE_PATH = "data/universe/financialInstitutions.xml";
     public static final String FINANCIAL_CURRENCIES_FILE_PATH = "data/universe/currencies.xml";
     public static final String RANDOM_DEATH_CAUSES_FILE_PATH = "data/universe/randomDeathCauses.xml";
@@ -366,19 +368,10 @@ public final class MHQConstants extends SuiteConstants {
     public static final String TERRAIN_CONDITIONS_ODDS_MANIFEST_PATH = "./data/terrainconditionsodds/TerrainConditionsOddsManifest.xml";
     public static final String HOSTILE_FACILITY_SCENARIO = "Hostile Facility.xml";
     public static final String ALLIED_FACILITY_SCENARIO = "Base Defense.xml";
-    public static final String SCENARIO_MODIFIER_ALLIED_GROUND_UNITS = "PrimaryAlliesGround.xml";
-    public static final String SCENARIO_MODIFIER_ALLIED_AIR_UNITS = "PrimaryAlliesAir.xml";
-    public static final String SCENARIO_MODIFIER_LIAISON_GROUND = "LiaisonGround.xml";
     public static final String SCENARIO_MODIFIER_HOUSE_CO_GROUND = "HouseOfficerGround.xml";
-    public static final String SCENARIO_MODIFIER_INTEGRATED_UNITS_GROUND = "IntegratedAlliesGround.xml";
-    public static final String SCENARIO_MODIFIER_LIAISON_AIR = "LiaisonAir.xml";
     public static final String SCENARIO_MODIFIER_HOUSE_CO_AIR = "HouseOfficerAir.xml";
-    public static final String SCENARIO_MODIFIER_INTEGRATED_UNITS_AIR = "IntegratedAlliesAir.xml";
     public static final String SCENARIO_MODIFIER_TRAINEES_AIR = "AlliedTraineesAir.xml";
     public static final String SCENARIO_MODIFIER_TRAINEES_GROUND = "AlliedTraineesGround.xml";
-    public static final String SCENARIO_MODIFIER_ALLIED_GROUND_SUPPORT = "AlliedGroundSupportImmediate.xml";
-    public static final String SCENARIO_MODIFIER_ALLIED_AIR_SUPPORT = "AlliedAirSupportImmediate.xml";
-    public static final String SCENARIO_MODIFIER_ALLIED_ARTY_SUPPORT = "AlliedArtillerySupportImmediate.xml";
     // endregion StratCon
 
     // region StoryArcs
@@ -418,6 +411,11 @@ public final class MHQConstants extends SuiteConstants {
     public static final LocalDate BATTLE_OF_TUKAYYID = LocalDate.of(3052, 5, 21);
     public static final LocalDate COMSTAR_SCHISM = LocalDate.of(3052, 9, 21);
     public static final LocalDate OPERATION_SCOUR_ENDS = LocalDate.of(3078, 1, 1);
+    public static final LocalDate FORTRESS_REPUBLIC_START = LocalDate.of(3135, Month.NOVEMBER, 1);
+    public static final LocalDate FORTRESS_REPUBLIC_END = LocalDate.of(3149, Month.JANUARY, 1);
+    public static final LocalDate FORTRESS_REPUBLIC_TERRA_ONLY_END = LocalDate.of(3151, Month.JANUARY, 1);
+    public static final LocalDate OPERATION_BULLDOG_START = LocalDate.of(3059, Month.MAY, 20);
+    public static final LocalDate OPERATION_BULLDOG_END = LocalDate.of(3059, Month.AUGUST, 13);
     /**
      * The invasion of Luthien kicks off the Jihad
      */

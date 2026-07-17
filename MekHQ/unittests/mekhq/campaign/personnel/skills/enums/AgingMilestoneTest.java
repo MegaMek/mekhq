@@ -35,8 +35,8 @@ package mekhq.campaign.personnel.skills.enums;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.time.LocalDate;
 import java.util.stream.Stream;
@@ -58,7 +58,7 @@ class AgingMilestoneTest {
 
     @BeforeAll
     static void beforeAll() {
-        mockCampaign = mock(Campaign.class);
+        mockCampaign = mockCampaign();
         when(mockCampaign.getFaction()).thenReturn(Factions.getInstance().getDefaultFaction());
     }
 

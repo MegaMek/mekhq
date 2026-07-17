@@ -212,7 +212,7 @@ public class BiographyPages {
 
         RankSystem rankSystem = presetRankSystem;
         if (rankSystem == null) {
-            rankSystem = campaign.getRankSystem();
+            rankSystem = campaign.getPlayerForce().getRankSystem();
         }
 
         model = new BiographyOptionsModel(options, originOptions);

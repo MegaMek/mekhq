@@ -321,6 +321,30 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.IN_TRANSIT_BACKGROUND, value.getRGB());
     }
 
+    public Color getQueuedForTravelForeground() {
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.QUEUED_FOR_TRAVEL_FOREGROUND, Color.BLACK.getRGB()));
+    }
+
+    public void setQueuedForTravelForeground(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE)
+              .putInt(MHQConstants.QUEUED_FOR_TRAVEL_FOREGROUND, value.getRGB());
+    }
+
+    public Color getQueuedForTravelBackground() {
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
+                               .getInt(MHQConstants.QUEUED_FOR_TRAVEL_BACKGROUND, new Color(0xFFB0FF).getRGB()));
+    }
+
+    public void setQueuedForTravelBackground(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE)
+              .putInt(MHQConstants.QUEUED_FOR_TRAVEL_BACKGROUND, value.getRGB());
+    }
+
+    public ComponentColors getQueuedForTravelColors() {
+        return new ComponentColors(getQueuedForTravelForeground(), getQueuedForTravelBackground());
+    }
+
     public Color getRefittingForeground() {
         return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
                                .getInt(MHQConstants.REFITTING_FOREGROUND, Color.BLACK.getRGB()));

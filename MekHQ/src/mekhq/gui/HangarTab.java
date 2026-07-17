@@ -125,6 +125,12 @@ public final class HangarTab extends CampaignGuiTab {
     private JButton btnAssignTechs;
     private JScrollPane scrollUnitView;
 
+    /**
+     * A unit shown in the detail panel while not present in the grid, e.g. when a link targets a unit outside the
+     * active location scope. Kept so table refreshes that clear the grid selection do not blank the detail panel.
+     */
+    private Unit pinnedUnit;
+
     private UnitTableModel unitModel;
     private TableRowSorter<UnitTableModel> unitSorter;
 
@@ -715,15 +721,30 @@ public final class HangarTab extends CampaignGuiTab {
         if (row != -1) {
             unitTable.setRowSelectionInterval(row, row);
             unitTable.scrollRectToVisible(unitTable.getCellRect(row, 0, true));
+            return;
+        }
+        // The unit is outside the active location scope, so the grid does not contain it. Pin it to the detail panel
+        // so it shows without forcing it onto the grid, surviving later table refreshes.
+        Unit unit = getCampaign().getUnit(id);
+        if (unit != null) {
+            pinnedUnit = unit;
+            unitTable.clearSelection();
+            refreshUnitView();
         }
     }
 
     public void refreshUnitView() {
         int row = unitTable.getSelectedRow();
         if (row < 0) {
-            scrollUnitView.setViewportView(null);
+            if (pinnedUnit != null) {
+                scrollUnitView.setViewportView(new UnitViewPanel(pinnedUnit, getCampaign()));
+                SwingUtilities.invokeLater(() -> scrollUnitView.getVerticalScrollBar().setValue(0));
+            } else {
+                scrollUnitView.setViewportView(null);
+            }
             return;
         }
+        pinnedUnit = null;
         Unit selectedUnit = unitModel.getUnit(unitTable.convertRowIndexToModel(row));
         scrollUnitView.setViewportView(new UnitViewPanel(selectedUnit, getCampaign()));
         // This odd code is to make sure that the scrollbar stays at the top

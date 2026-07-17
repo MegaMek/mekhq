@@ -64,7 +64,7 @@ public class ScenarioWizardUnitRenderer extends JLabel implements ListCellRender
         Campaign campaign = unit.getCampaign();
 
         int valueForceId = unit.getFormationId();
-        Formation formation = campaign.getFormation(valueForceId);
+        Formation formation = campaign.getPlayerForce().getFormation(valueForceId);
 
         // Determine name color
         OperationalStatus operationalStatus = determineLayeredFormationIconOperationalStatus(unit);
@@ -85,7 +85,7 @@ public class ScenarioWizardUnitRenderer extends JLabel implements ListCellRender
         String forceName = "";
         if (formation != null) {
             forceName = formation.getFullName();
-            String originNodeName = ", " + campaign.getFormation(0).getName();
+            String originNodeName = ", " + campaign.getPlayerForce().getFormation(0).getName();
             forceName = forceName.replaceAll(originNodeName, "");
         }
 

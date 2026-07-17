@@ -51,7 +51,10 @@ public class QuickStripDialog {
 
     public QuickStripDialog(Campaign campaign) {
         ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
-              campaign.getSeniorTechPerson(),
+              campaign.getPlayerForce().getHumanResources()
+                    .getSeniorTechPerson(campaign.getCampaignOptions(),
+                          campaign.isClanCampaign(),
+                          campaign.getLocalDate()),
               null,
               getICText(campaign.getCommanderAddress()),
               getOptions(),

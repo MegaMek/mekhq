@@ -35,9 +35,9 @@ package mekhq.campaign.mission;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.time.LocalDate;
 
@@ -145,7 +145,7 @@ class MissionInheritanceFlatteningTest {
      */
     @Test
     void missionCalculateContractIsNoOp() {
-        Campaign campaign = mock(Campaign.class);
+        Campaign campaign = mockCampaign();
         Mission mission = new Mission("plain");
 
         mission.calculateContract(campaign);

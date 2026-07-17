@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -52,10 +52,10 @@ public class CrimeRating {
     protected static Map<String, Integer> calculateCrimeRating(Campaign campaign) {
         Map<String, Integer> crimeRating = new HashMap<>();
 
-        crimeRating.put("piracy", campaign.getCrimePirateModifier());
-        crimeRating.put("other", campaign.getRawCrimeRating());
+        crimeRating.put("piracy", campaign.getPlayerForce().getCrimePirateModifier());
+        crimeRating.put("other", campaign.getPlayerForce().getRawCrimeRating());
 
-        int adjustedCrimeRating = campaign.getAdjustedCrimeRating();
+        int adjustedCrimeRating = campaign.getPlayerForce().getAdjustedCrimeRating();
         crimeRating.put("total", adjustedCrimeRating);
 
         LOGGER.debug("Crime Rating = {}",

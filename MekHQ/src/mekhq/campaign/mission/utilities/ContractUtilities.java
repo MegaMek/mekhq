@@ -64,7 +64,7 @@ public class ContractUtilities {
     public static int calculateBaseNumberOfRequiredLances(Campaign campaign, boolean isCadreDuty,
           boolean bypassVariance, double varianceFactor) {
         int combatForceCount = 0;
-        for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
+        for (CombatTeam combatTeam : campaign.getPlayerForce().getCombatTeamsAsList(campaign)) {
             if (0 >= combatTeam.getSize(campaign)) { // Don't count empty combat teams (or warship-only)
                 continue;
             }
@@ -118,7 +118,7 @@ public class ContractUtilities {
      */
     public static int getEffectiveNumUnits(Campaign campaign) {
         double numUnits = 0;
-        for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
+        for (CombatTeam combatTeam : campaign.getPlayerForce().getCombatTeamsAsList(campaign)) {
             Formation formation = combatTeam.getFormation(campaign);
 
             if (formation == null) {

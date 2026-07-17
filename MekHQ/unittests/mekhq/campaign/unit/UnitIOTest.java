@@ -100,7 +100,12 @@ public class UnitIOTest {
             mockCampaign = spy(MHQTestUtilities.getTestCampaign());
 
             // Enable blob crew for all roles
-            doReturn(true).when(mockCampaign).isBlobCrewEnabled(any(PersonnelRole.class));
+            mekhq.campaign.ForceHumanResources spyHumanResources = spy(mockCampaign.getPlayerForce()
+                                                                             .getHumanResources());
+            mockCampaign.getPlayerForce().setHumanResources(spyHumanResources);
+            doReturn(true).when(spyHumanResources)
+                  .isBlobCrewEnabled(any(mekhq.campaign.personnel.enums.PersonnelRole.class),
+                        any(mekhq.campaign.campaignOptions.CampaignOptions.class));
 
             // Mock getEntities() for XML writing
             doReturn(new Vector<>()).when(mockCampaign).getEntities();
@@ -511,7 +516,12 @@ public class UnitIOTest {
             mockCampaign = spy(MHQTestUtilities.getTestCampaign());
 
             // Enable blob crew for all roles
-            doReturn(true).when(mockCampaign).isBlobCrewEnabled(any(PersonnelRole.class));
+            mekhq.campaign.ForceHumanResources spyHumanResources = spy(mockCampaign.getPlayerForce()
+                                                                             .getHumanResources());
+            mockCampaign.getPlayerForce().setHumanResources(spyHumanResources);
+            doReturn(true).when(spyHumanResources)
+                  .isBlobCrewEnabled(any(mekhq.campaign.personnel.enums.PersonnelRole.class),
+                        any(mekhq.campaign.campaignOptions.CampaignOptions.class));
 
             // Mock getEntities() for XML operations
             doReturn(new Vector<>()).when(mockCampaign).getEntities();

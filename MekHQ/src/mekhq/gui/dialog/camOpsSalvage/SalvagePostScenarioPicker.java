@@ -32,6 +32,7 @@
  */
 package mekhq.gui.dialog.camOpsSalvage;
 
+import static java.lang.Math.round;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -71,7 +72,6 @@ import megamek.common.units.Tank;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Hangar;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Formation;
@@ -119,6 +119,8 @@ public class SalvagePostScenarioPicker {
 
     private final static int PADDING = scaleForGUI(10);
     private final static Dimension DEFAULT_SIZE = scaleForGUI(1200, 600);
+
+    private final static int UNKNOWN_UNIT_WEIGHT = -1;
 
     private final boolean isInSpace;
     private int maximumSalvageTime = 0;
@@ -328,7 +330,10 @@ public class SalvagePostScenarioPicker {
             }
 
             RecoveryTimeData data = RecoveryTimeCalculations.calculateRecoveryTimeForEntity(entity.getDisplayName(),
-                  entity.getRecoveryTime(), scenario, campaign.getCurrentLocation().getPlanet());
+                  entity.getRecoveryTime(), scenario, campaign.getPlayerForce()
+                                                            .getForceDetachment()
+                                                            .getCurrentLocation()
+                                                            .getPlanet());
             recoveryTimeData.put(unit.getId(), data);
         }
     }
@@ -350,11 +355,11 @@ public class SalvagePostScenarioPicker {
     private List<Integer> setSalvageUnits(Campaign campaign, Scenario scenario) {
         List<Integer> salvageFormations = new ArrayList<>();
         salvageUnits = new ArrayList<>();
-        Hangar hangar = campaign.getHangar();
+        mekhq.campaign.LocalHangar hangar = campaign.getPlayerForce().getHangar();
         for (Integer forceId : scenario.getSalvageFormations()) {
             salvageFormations.add(forceId);
 
-            Formation formation = campaign.getFormation(forceId);
+            Formation formation = campaign.getPlayerForce().getFormation(forceId);
             if (formation == null) {
                 LOGGER.error("Force {} not found in campaign", forceId);
                 continue;
@@ -608,9 +613,13 @@ public class SalvagePostScenarioPicker {
             rowPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
             rowPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, scaleForGUI(60)));
 
+            int unitWeight = getUnitWeight(unit);
+            String unitWeightString = unitWeight == UNKNOWN_UNIT_WEIGHT ? "?" : String.valueOf(unitWeight);
+            int plural = unitWeight == 0 ? 0 : 1;
+
             JLabel unitLabel = new JLabel();
             unitLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.unitLabel.unit",
-                  unitName, sellValue.toAmountString()));
+                  unitName, sellValue.toAmountString(), unitWeightString, plural));
 
             RecoveryTimeData data = recoveryTimeData.get(unit.getId());
             if (data != null) {
@@ -720,6 +729,16 @@ public class SalvagePostScenarioPicker {
         dialog.setVisible(true);
 
         return confirmed[0] ? resultHolder.groups : null;
+    }
+
+    private static int getUnitWeight(TestUnit unit) {
+        Entity entity = unit.getEntity();
+        int unitWeight = UNKNOWN_UNIT_WEIGHT;
+        if (entity != null) {
+            unitWeight = (int) round(entity.getWeight());
+        }
+
+        return unitWeight;
     }
 
     private static void confirmationAction(Campaign campaign, JDialog dialog, boolean[] confirmed,

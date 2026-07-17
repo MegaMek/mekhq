@@ -32,6 +32,15 @@
  */
 package mekhq.campaign.mission;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
+
+import java.io.File;
+import java.util.List;
+
 import megamek.common.Player;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.loaders.MekSummary;
@@ -42,16 +51,8 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.UnitGeneratorParameters;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import testUtilities.MHQTestUtilities;
-
-import java.io.File;
-import java.util.List;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class BotForceRandomizerTest {
     private Campaign mockCampaign;
@@ -70,7 +71,7 @@ public class BotForceRandomizerTest {
         IUnitGenerator mockUnitGenerator = mock(IUnitGenerator.class);
         when(mockUnitGenerator.generate(any(UnitGeneratorParameters.class))).thenReturn(mockGeneratedMekSummary);
 
-        mockCampaign = mock(Campaign.class);
+        mockCampaign = mockCampaign();
         when(mockCampaign.getUnitGenerator()).thenReturn(mockUnitGenerator);
         when(mockCampaign.getPlayer()).thenReturn(new Player(1, "player"));
         when(mockCampaign.getCampaignOptions()).thenReturn(new CampaignOptions());

@@ -766,7 +766,7 @@ public class MissionViewPanel extends JScrollablePanel {
     }
 
     static boolean shouldShowContractTimeline(Campaign campaign, Contract contract) {
-        final AbstractLocation currentLocation = campaign.getCurrentLocation();
+        final AbstractLocation currentLocation = campaign.getPlayerForce().getForceDetachment().getCurrentLocation();
         if (currentLocation == ILocation.NO_LOCATION) {
             return false;
         }
@@ -787,7 +787,7 @@ public class MissionViewPanel extends JScrollablePanel {
     }
 
     static String currentLocationDescription(Campaign campaign) {
-        final AbstractLocation currentLocation = campaign.getCurrentLocation();
+        final AbstractLocation currentLocation = campaign.getPlayerForce().getForceDetachment().getCurrentLocation();
         if (currentLocation == ILocation.NO_LOCATION) {
             return getTextAt(RESOURCE_BUNDLE, "contractTimelineBar.location.unknown");
         }

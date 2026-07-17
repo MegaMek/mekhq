@@ -173,7 +173,7 @@ public class MedicalController {
 
     private Person verifyTheatreAvailability(Person patient, Person doctor) {
         if (campaign.getCampaignOptions().isUseMASHTheatres()) {
-            if (!campaign.getMashTheatresWithinCapacity()) {
+            if (!campaign.getPlayerForce().getMashTheatresWithinCapacity(campaign)) {
                 doctor = null;
                 patient.setDoctorId(null, campaign.getCampaignOptions().getNaturalHealingWaitingPeriod());
                 campaign.addReport(MEDICAL, getFormattedTextAt(RESOURCE_BUNDLE,
@@ -295,7 +295,7 @@ public class MedicalController {
             return false;
         }
 
-        if (campaign.getPatientsFor(doctor) > medicalCapacity) {
+        if (campaign.getPlayerForce().getHumanResources().getPatientsFor(doctor) > medicalCapacity) {
             campaign.addReport(MEDICAL, getFormattedTextAt(RESOURCE_BUNDLE, "MedicalController.report.overCapacity",
                   doctor.getHyperlinkedFullTitle(), patient.getHyperlinkedFullTitle()));
             unassignDoctor(patient, doctor);

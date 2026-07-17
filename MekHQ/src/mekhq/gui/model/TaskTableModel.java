@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -169,7 +169,13 @@ public class TaskTableModel extends DataTableModel<IPartWork> {
 
                     if (null == tech) {
                         //Find a valid tech that we can copy their skill from
-                        List<Person> techs = gui.getCampaign().getTechs();
+                        mekhq.campaign.Campaign campaign = gui.getCampaign();
+                        List<Person> techs = campaign.getPlayerForce()
+                                                   .getHumanResources()
+                                                   .getTechs(campaign.getPlayerForce().getHangar().getUnits(),
+                                                         campaign.getCampaignOptions(),
+                                                         campaign.isClanCampaign(),
+                                                         campaign.getLocalDate());
 
                         for (int i = techs.size() - 1; i >= 0; i--) {
                             Person techTemp = techs.get(i);

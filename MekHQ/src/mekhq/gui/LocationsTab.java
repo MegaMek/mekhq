@@ -50,11 +50,12 @@ import megamek.codeUtilities.MathUtility;
 import megamek.common.event.Subscribe;
 import megamek.common.ui.FastJScrollPane;
 import megamek.common.units.UnitType;
+import mekhq.campaign.AbstractMobileLocation;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.base.AbstractBase;
 import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.events.LocationEvent;
+import mekhq.campaign.force.Detachment;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.IPlace;
 import mekhq.campaign.parts.Part;
@@ -240,7 +241,7 @@ public class LocationsTab extends CampaignGuiTab {
         }
 
         private static String resolveType(IPlace place) {
-            if (place instanceof Campaign) {
+            if (place instanceof Detachment) {
                 return getText("LocationPlacePanel.type.mainForce");
             }
             if (place instanceof AbstractBase base) {
@@ -309,7 +310,7 @@ public class LocationsTab extends CampaignGuiTab {
 
         @FunctionalInterface
         private interface TransitCounter {
-            int count(CurrentLocation node);
+            int count(AbstractMobileLocation node);
         }
 
         private static int countInTransit(IPlace place, TransitCounter counter) {
@@ -318,7 +319,9 @@ public class LocationsTab extends CampaignGuiTab {
             }
             int total = 0;
             for (ILocation child : place.getChildLocations()) {
-                if (child instanceof CurrentLocation travel && !travel.isOnPlanet()) {
+                // getTransitTime() > 0 covers both an interplanetary jump ship (equivalent to its former
+                // !isOnPlanet() check, including while recharging at a jump point) and an on-planet convoy.
+                if (child instanceof AbstractMobileLocation travel && travel.getTransitTime() > 0) {
                     total += counter.count(travel);
                 }
             }
@@ -436,7 +439,7 @@ public class LocationsTab extends CampaignGuiTab {
 
         void refresh(Campaign campaign) {
             List<IPlace> places = new ArrayList<>();
-            places.add(campaign);
+            places.add(campaign.getPlayerForce().getForceDetachment());
             places.addAll(campaign.getCampaignLocationManager().getPlayerBases());
             model.setData(places, campaign);
         }

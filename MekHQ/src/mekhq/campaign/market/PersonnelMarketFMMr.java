@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -111,7 +111,7 @@ public class PersonnelMarketFMMr implements PersonnelMarketMethod {
                 q = 6;
             }
             for (int j = 0; j < q; j++) {
-                retVal.add(c.newPerson(role));
+                retVal.add(c.getPlayerForce().getHumanResources().newPerson(c, role));
             }
         }
         return retVal;

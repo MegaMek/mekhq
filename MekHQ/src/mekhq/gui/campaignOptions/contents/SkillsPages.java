@@ -33,7 +33,7 @@
 package mekhq.gui.campaignOptions.contents;
 
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.*;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.CAMPAIGN_OPTIONS_PAGE_CONTENT_WIDTH;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.campaignOptionsPageContentWidth;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
@@ -401,7 +401,7 @@ public class SkillsPages {
         int rowCount = Math.max(1, table.getRowCount());
         int bodyHeight = table.getRowHeight() * rowCount;
         int headerHeight = table.getTableHeader().getPreferredSize().height;
-        int width = Math.max(CAMPAIGN_OPTIONS_PAGE_CONTENT_WIDTH, table.getPreferredSize().width);
+        int width = Math.max(campaignOptionsPageContentWidth(), table.getPreferredSize().width);
         Dimension viewportSize = new Dimension(width, bodyHeight);
         Dimension scrollPaneSize = new Dimension(width, bodyHeight + headerHeight + UIUtil.scaleForGUI(4));
 

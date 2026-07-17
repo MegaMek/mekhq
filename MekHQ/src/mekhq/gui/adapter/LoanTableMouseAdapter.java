@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -90,7 +90,7 @@ public class LoanTableMouseAdapter extends JPopupMenuAdapter {
                 if (pcd.wasCancelled()) {
                     return;
                 }
-                gui.getCampaign().getFinances().defaultOnLoan(selectedLoan,
+                gui.getCampaign().getPlayerForce().getFinances().defaultOnLoan(selectedLoan,
                       pcd.wasPaid());
                 if (pcd.wasPaid()) {
                     for (UUID id : pcd.getUnits()) {
@@ -107,14 +107,14 @@ public class LoanTableMouseAdapter extends JPopupMenuAdapter {
                             }
                         }
                     }
-                    gui.getCampaign().getFinances().setAssets(
+                    gui.getCampaign().getPlayerForce().getFinances().setAssets(
                           pcd.getRemainingAssets());
                 }
             }
         } else if (command.equalsIgnoreCase("PAY_BALANCE")) {
             gui.getCampaign().payOffLoan(selectedLoan);
         } else if (command.equalsIgnoreCase("REMOVE")) {
-            gui.getCampaign().getFinances().removeLoan(selectedLoan);
+            gui.getCampaign().getPlayerForce().getFinances().removeLoan(selectedLoan);
             MekHQ.triggerEvent(new LoanRemovedEvent(selectedLoan));
         }
     }
@@ -134,7 +134,10 @@ public class LoanTableMouseAdapter extends JPopupMenuAdapter {
         menuItem = new JMenuItem("Pay Off Full Balance ("
                                        + loan.determineRemainingValue().toAmountAndSymbolString() + ")");
         menuItem.setActionCommand("PAY_BALANCE");
-        menuItem.setEnabled(gui.getCampaign().getFunds().isGreaterOrEqualThan(loan.determineRemainingValue()));
+        menuItem.setEnabled(gui.getCampaign()
+                                  .getPlayerForce()
+                                  .getFunds()
+                                  .isGreaterOrEqualThan(loan.determineRemainingValue()));
         menuItem.addActionListener(this);
         popup.add(menuItem);
         menuItem = new JMenuItem("Default on This Loan");

@@ -107,7 +107,7 @@ import mekhq.Utilities;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ExtraData;
-import mekhq.campaign.Personnel;
+import mekhq.campaign.LocalPersonnel;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.events.persons.PersonStatusChangedEvent;
@@ -116,6 +116,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.location.AcademyCampusLocation;
+import mekhq.campaign.location.ILocatable;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.log.LogEntry;
@@ -176,7 +177,7 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  * @author Justin "Windchild" Bowen
  */
-public class Person implements ILocation {
+public class Person implements ILocatable {
     // region Variable Declarations
     public static final Map<Integer, Money> MEKWARRIOR_AERO_RANSOM_VALUES;
     public static final Map<Integer, Money> OTHER_RANSOM_VALUES;
@@ -515,7 +516,7 @@ public class Person implements ILocation {
     }
 
     public Person(final String givenName, final String surname, final Campaign campaign) {
-        this(givenName, surname, campaign, campaign.getFaction().getShortName());
+        this(givenName, surname, campaign, campaign.getPlayerForce().getFaction().getShortName());
     }
 
     public Person(final String givenName, final String surname, final @Nullable Campaign campaign,
@@ -567,7 +568,7 @@ public class Person implements ILocation {
         setTotalXPEarnings(0);
         daysToWaitForHealing = 0;
         setGender(Gender.MALE);
-        setRankSystemDirect((campaign == null) ? null : campaign.getRankSystem());
+        setRankSystemDirect((campaign == null) ? null : campaign.getPlayerForce().getRankSystem());
         setRank(0);
         setRankLevel(0);
         setManeiDominiClassDirect(ManeiDominiClass.NONE);
@@ -1546,6 +1547,39 @@ public class Person implements ILocation {
     }
 
     /**
+     * Applies a forced loyalty change to all eligible personnel in the campaign.
+     *
+     * <p>This method iterates through all personnel in the given {@link Campaign} and, for each person who is
+     * neither departed from the unit nor currently a prisoner, calls {@link Person#performForcedDirectionLoyaltyChange}
+     * with the specified parameters. After all changes, if the campaign is using loyalty modifiers, a report about the
+     * group loyalty change is added to the campaign reports.</p>
+     *
+     * @param campaign   the {@link Campaign} whose personnel will have their loyalty modified
+     * @param isPositive {@code true} for a positive loyalty direction change, {@code false} for negative
+     * @param isMajor    {@code true} for a major loyalty change, {@code false} for minor
+     */
+    public static void performMassForcedDirectionLoyaltyChange(Campaign campaign, boolean isPositive,
+          boolean isMajor) {
+        for (Person person : campaign.getPlayerForce().getHumanResources().getPersonnel()) {
+            if (person.getStatus().isDepartedUnit()) {
+                continue;
+            }
+
+            if (person.getPrisonerStatus().isCurrentPrisoner()) {
+                continue;
+            }
+
+            person.performForcedDirectionLoyaltyChange(campaign, isPositive, isMajor, false);
+        }
+
+        if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
+            campaign.addReport(PERSONNEL, String.format(resources.getString("loyaltyChangeGroup.text"),
+                  "<span color=" + getWarningColor() + "'>",
+                  CLOSING_SPAN_TAG));
+        }
+    }
+
+    /**
      * This is used to change the person's PersonnelStatus
      *
      * @param campaign the campaign the person is part of
@@ -1637,7 +1671,10 @@ public class Person implements ILocation {
                 // (mekhq/campaign/personnel/education)
             }
             case PREGNANCY_COMPLICATIONS -> {
-                campaign.getProcreation().processPregnancyComplications(campaign, campaign.getLocalDate(), this);
+                campaign.getPlayerForce()
+                      .getHumanResources()
+                      .getProcreation()
+                      .processPregnancyComplications(campaign, campaign.getLocalDate(), this);
                 campaign.addReport(PERSONNEL, String.format(status.getReportText(), getHyperlinkedFullTitle()));
                 ServiceLogger.changedStatus(this, campaign.getLocalDate(), status);
             }
@@ -1653,7 +1690,10 @@ public class Person implements ILocation {
             setDateOfDeath(today);
 
             if ((genealogy.hasSpouse()) && (!genealogy.getSpouse().getStatus().isDead())) {
-                campaign.getDivorce().widowed(campaign, campaign.getLocalDate(), this);
+                campaign.getPlayerForce()
+                      .getHumanResources()
+                      .getDivorce()
+                      .widowed(campaign, campaign.getLocalDate(), this);
             }
 
             // log death across genealogy
@@ -1687,7 +1727,7 @@ public class Person implements ILocation {
         if (status.isActiveFlexible()) {
             // Check Pregnancy
             if (isPregnant() && getDueDate().isBefore(today)) {
-                campaign.getProcreation().birth(campaign, getDueDate(), this);
+                campaign.getPlayerForce().getHumanResources().getProcreation().birth(campaign, getDueDate(), this);
             }
         } else {
             setDoctorId(null, campaign.getCampaignOptions().getNaturalHealingWaitingPeriod());
@@ -1710,7 +1750,10 @@ public class Person implements ILocation {
             setCommander(false);
 
             // promote second in command
-            Person secondInCommand = campaign.getSecondInCommand();
+            Person secondInCommand = campaign.getPlayerForce().getHumanResources()
+                                           .getSecondInCommand(campaign.getCampaignOptions(),
+                                                 campaign.isClanCampaign(),
+                                                 campaign.getLocalDate());
             if (secondInCommand != null) {
                 secondInCommand.setSecondInCommand(false);
                 secondInCommand.setCommander(true);
@@ -1721,7 +1764,7 @@ public class Person implements ILocation {
                 campaign.addReport(PERSONNEL, getFormattedText("setAsCommander.format",
                       secondInCommandHyperlink));
 
-                campaign.personUpdated(secondInCommand);
+                campaign.getPlayerForce().getHumanResources().personUpdated(campaign, secondInCommand);
             }
         }
 
@@ -1745,7 +1788,7 @@ public class Person implements ILocation {
         this.setEduDaysOfTravel(0);
 
         for (UUID tagAlongId : eduTagAlongs) {
-            Person tagAlong = campaign.getPerson(tagAlongId);
+            Person tagAlong = campaign.getPlayerForce().getHumanResources().getPerson(tagAlongId);
 
             if (tagAlong != null) {
                 tagAlong.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
@@ -1754,31 +1797,6 @@ public class Person implements ILocation {
         this.setEduTagAlongs(new ArrayList<>());
 
         MekHQ.triggerEvent(new PersonStatusChangedEvent(this));
-    }
-
-    /**
-     * If the current character is the campaign commander, adjust loyalty across the entire unit.
-     *
-     * @param campaign The current campaign
-     */
-    private void leadershipMassChangeLoyalty(Campaign campaign) {
-        for (Person person : campaign.getAllPersonnel()) {
-            if (person.getStatus().isDepartedUnit()) {
-                continue;
-            }
-
-            if (person.getPrisonerStatus().isCurrentPrisoner()) {
-                continue;
-            }
-
-            person.performRandomizedLoyaltyChange(campaign, false, false);
-        }
-
-        if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
-            campaign.addReport(PERSONNEL, String.format(resources.getString("loyaltyChangeGroup.text"),
-                  spanOpeningWithCustomColor(getWarningColor()),
-                  CLOSING_SPAN_TAG));
-        }
     }
 
     /**
@@ -1858,20 +1876,12 @@ public class Person implements ILocation {
     }
 
     /**
-     * Applies a forced loyalty change to all eligible personnel in the campaign.
+     * If the current character is the campaign commander, adjust loyalty across the entire unit.
      *
-     * <p>This method iterates through all personnel in the given {@link Campaign} and, for each person who is
-     * neither departed from the unit nor currently a prisoner, calls {@link Person#performForcedDirectionLoyaltyChange}
-     * with the specified parameters. After all changes, if the campaign is using loyalty modifiers, a report about the
-     * group loyalty change is added to the campaign reports.</p>
-     *
-     * @param campaign   the {@link Campaign} whose personnel will have their loyalty modified
-     * @param isPositive {@code true} for a positive loyalty direction change, {@code false} for negative
-     * @param isMajor    {@code true} for a major loyalty change, {@code false} for minor
+     * @param campaign The current campaign
      */
-    public static void performMassForcedDirectionLoyaltyChange(Campaign campaign, boolean isPositive,
-          boolean isMajor) {
-        for (Person person : campaign.getAllPersonnel()) {
+    private void leadershipMassChangeLoyalty(Campaign campaign) {
+        for (Person person : campaign.getPlayerForce().getHumanResources().getPersonnel()) {
             if (person.getStatus().isDepartedUnit()) {
                 continue;
             }
@@ -1880,12 +1890,12 @@ public class Person implements ILocation {
                 continue;
             }
 
-            person.performForcedDirectionLoyaltyChange(campaign, isPositive, isMajor, false);
+            person.performRandomizedLoyaltyChange(campaign, false, false);
         }
 
         if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
             campaign.addReport(PERSONNEL, String.format(resources.getString("loyaltyChangeGroup.text"),
-                  "<span color=" + getWarningColor() + "'>",
+                  spanOpeningWithCustomColor(getWarningColor()),
                   CLOSING_SPAN_TAG));
         }
     }
@@ -2625,7 +2635,8 @@ public class Person implements ILocation {
 
         boolean isIgnoreSPAEligibility = !campaignOptions.isAwardRelevantVeterancySPAs();
         SingleSpecialAbilityGenerator singleSpecialAbilityGenerator = new SingleSpecialAbilityGenerator();
-        String spaGained = singleSpecialAbilityGenerator.rollSPA(campaign, this, true, isIgnoreSPAEligibility, true);
+        String spaGained = singleSpecialAbilityGenerator.rollSPA(campaign, this, true, isIgnoreSPAEligibility, true,
+              false);
         if (spaGained == null) {
             return;
         } else {
@@ -2729,6 +2740,12 @@ public class Person implements ILocation {
 
     public boolean isDeployed() {
         return (getUnit() != null) && (getUnit().getScenarioId() != -1);
+    }
+
+    @Override
+    public boolean canBeManuallyDispatched() {
+        // A deployed person is committed to a scenario, and a student is tied to their academy campus.
+        return !isDeployed() && !getStatus().isStudent();
     }
 
     public String getBiography() {
@@ -3439,7 +3456,7 @@ public class Person implements ILocation {
             // Always save the person's gender, as it would otherwise get confusing fast
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "gender", getGender().name());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bloodGroup", getBloodGroup().name());
-            if (!getRankSystem().equals(campaign.getRankSystem())) {
+            if (!getRankSystem().equals(campaign.getPlayerForce().getRankSystem())) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "rankSystem", getRankSystem().getCode());
             }
             // Always save a person's rank
@@ -5110,7 +5127,7 @@ public class Person implements ILocation {
             setLastRankChangeDate(null);
         }
 
-        campaign.personUpdated(this);
+        campaign.getPlayerForce().getHumanResources().personUpdated(campaign, this);
 
         if (report) {
             if ((rankNumeric > oldRankNumeric) || ((rankNumeric == oldRankNumeric) && (rankLevel > oldRankLevel))) {
@@ -6559,7 +6576,7 @@ public class Person implements ILocation {
     }
 
     public void removeAllTechJobs(final Campaign campaign) {
-        campaign.getAllHangar().forEachUnit(u -> {
+        campaign.getPlayerForce().getHangar().forEachUnit(u -> {
             if (equals(u.getTech())) {
                 u.remove(this, true);
             }
@@ -6569,13 +6586,14 @@ public class Person implements ILocation {
             }
         });
 
-        for (final Part part : campaign.getAllWarehouse().getParts()) {
+        //TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
+        for (final Part part : campaign.getPlayerForce().getWarehouse().getParts()) {
             if (equals(part.getTech())) {
                 part.cancelAssignment(true);
             }
         }
 
-        for (final Formation formation : campaign.getAllFormations()) {
+        for (final Formation formation : campaign.getPlayerForce().getAllFormations()) {
             if (getId().equals(formation.getTechID())) {
                 formation.setTechID(null);
             }
@@ -8872,7 +8890,9 @@ public class Person implements ILocation {
 
             LocalDate today = campaign.getLocalDate();
             Set<Person> victims = new HashSet<>();
-            List<Person> allActivePersonnel = campaign.getActivePersonnel(true, true);
+            List<Person> allActivePersonnel = campaign.getPlayerForce()
+                                                    .getHumanResources()
+                                                    .getActivePersonnel(true, true);
 
             if (isDeployed() && unit != null) {
                 getLocalVictims(today, allActivePersonnel, victims);
@@ -9470,11 +9490,11 @@ public class Person implements ILocation {
     @Override
     public boolean setParent(ILocation parent) {
         ILocation oldParent = getParentLocation();
-        if (ILocation.super.setParent(parent)) {
-            if (oldParent instanceof Personnel personnel) {
+        if (ILocatable.super.setParent(parent)) {
+            if (oldParent instanceof LocalPersonnel personnel) {
                 personnel.remove(getId());
             }
-            if (parent instanceof Personnel personnel) {
+            if (parent instanceof LocalPersonnel personnel) {
                 personnel.put(getId(), this);
             }
             return true;

@@ -85,6 +85,7 @@ import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.utilities.BriefingStyle;
+import mekhq.gui.utilities.MarkdownRenderer;
 
 /**
  * @author Neoancient
@@ -145,7 +146,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
 
     private JTree playerForceTree;
 
-    private JTextArea txtDesc;
+    private JTextPane txtDesc;
 
     private final StubTreeModel playerForceModel;
 
@@ -180,7 +181,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
 
         JPanel statsSection = BriefingStyle.createSectionPanel(scenario.getName());
         panStats = new JPanel();
-        txtDesc = new JTextArea();
+        txtDesc = new JTextPane();
         playerForceTree = new JTree() {
             @Override
             public Dimension getMinimumSize() {
@@ -210,12 +211,11 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
 
         if ((scenario.getReport() != null) && !scenario.getReport().isBlank()) {
             JPanel reportSection = BriefingStyle.createSectionPanel("After-Action Report");
-            JTextArea txtReport = new JTextArea();
+            JTextPane txtReport = new JTextPane();
             txtReport.setName("txtReport");
-            txtReport.setText(scenario.getReport());
             txtReport.setEditable(false);
-            txtReport.setLineWrap(true);
-            txtReport.setWrapStyleWord(true);
+            txtReport.setContentType("text/html");
+            txtReport.setText(MarkdownRenderer.getRenderedHtml(scenario.getReport()));
             txtReport.setBorder(BorderFactory.createEmptyBorder());
             reportSection.add(txtReport, BorderLayout.CENTER);
             gridBagConstraints = new GridBagConstraints();
@@ -278,10 +278,12 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             panStats.add(lblForce, gridBagConstraints);
 
             if (null != scenario.getCombatTeamById(campaign)) {
-                Formation formation = campaign.getFormation(scenario.getCombatTeamId());
+                int id1 = scenario.getCombatTeamId();
+                Formation formation = campaign.getPlayerForce().getFormation(id1);
 
                 if (formation != null) {
-                    lblForceDesc.setText(campaign.getFormation(scenario.getCombatTeamId()).getFullName());
+                    int id = scenario.getCombatTeamId();
+                    lblForceDesc.setText(campaign.getPlayerForce().getFormation(id).getFullName());
                 } else {
                     lblForceDesc.setText("Unknown Force ID: " + scenario.getCombatTeamId());
                 }
@@ -290,7 +292,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
                 forceBuilder.append("<html>");
                 boolean chop = false;
                 for (int forceID : scenario.getForceIDs()) {
-                    forceBuilder.append(campaign.getFormation(forceID).getFullName());
+                    forceBuilder.append(campaign.getPlayerForce().getFormation(forceID).getFullName());
                     forceBuilder.append("<br/>");
                     ScenarioForceTemplate template = ((AtBDynamicScenario) scenario).getPlayerForceTemplates()
                                                            .get(forceID);
@@ -350,10 +352,9 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         }
 
         txtDesc.setName("txtDesc");
-        txtDesc.setText(scenario.getDescription());
         txtDesc.setEditable(false);
-        txtDesc.setLineWrap(true);
-        txtDesc.setWrapStyleWord(true);
+        txtDesc.setContentType("text/html");
+        txtDesc.setText(MarkdownRenderer.getRenderedHtml(scenario.getDescription()));
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y++;
         gridBagConstraints.gridwidth = 3;

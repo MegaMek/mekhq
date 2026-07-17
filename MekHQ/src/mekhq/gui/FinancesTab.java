@@ -276,7 +276,7 @@ public final class FinancesTab extends CampaignGuiTab {
 
     private XYDataset setupFinanceDataset() {
         TimeSeries timeSeries = new TimeSeries("C-Bills");
-        List<Transaction> transactions = getCampaign().getFinances().getTransactions();
+        List<Transaction> transactions = getCampaign().getPlayerForce().getFinances().getTransactions();
 
         Money balance = Money.zero();
         for (Transaction transaction : transactions) {
@@ -299,7 +299,7 @@ public final class FinancesTab extends CampaignGuiTab {
         final DateTimeFormatter df = DateTimeFormatter.ofPattern("MMM-yyyy")
                                            .withLocale(MekHQ.getMHQOptions().getDateLocale());
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        List<Transaction> transactions = getCampaign().getFinances().getTransactions();
+        List<Transaction> transactions = getCampaign().getPlayerForce().getFinances().getTransactions();
 
         String pastMonthYear = "";
         Money monthlyRevenue = Money.zero();
@@ -350,7 +350,7 @@ public final class FinancesTab extends CampaignGuiTab {
     private XYDataset setupNetWorthDataset() {
         TimeSeries timeSeries = new TimeSeries("Net Worth");
         Campaign campaign = getCampaign();
-        List<WeeklyNetWorth> netWorthRecords = campaign.getFinances().getNetWorthOverTime();
+        List<WeeklyNetWorth> netWorthRecords = campaign.getPlayerForce().getFinances().getNetWorthOverTime();
         for (WeeklyNetWorth weeklyNetWorth : netWorthRecords) {
             LocalDate date = weeklyNetWorth.getDate();
             timeSeries.add(new Day(date.getDayOfMonth(), date.getMonth().getValue(), date.getYear()),
@@ -489,8 +489,8 @@ public final class FinancesTab extends CampaignGuiTab {
 
     public void refreshFinancialTransactions() {
         SwingUtilities.invokeLater(() -> {
-            financeModel.setData(getCampaign().getFinances().getTransactions());
-            loanModel.setData(getCampaign().getFinances().getLoans());
+            financeModel.setData(getCampaign().getPlayerForce().getFinances().getTransactions());
+            loanModel.setData(getCampaign().getPlayerForce().getFinances().getLoans());
             refreshFinancialReport();
         });
     }
@@ -601,8 +601,8 @@ public final class FinancesTab extends CampaignGuiTab {
         financialLine.append('\n');
 
 
-        if (!getCampaign().getFinances().getAssets().isEmpty()) {
-            for (Asset asset : getCampaign().getFinances().getAssets()) {
+        if (!getCampaign().getPlayerForce().getFinances().getAssets().isEmpty()) {
+            for (Asset asset : getCampaign().getPlayerForce().getFinances().getAssets()) {
                 StringBuilder assetName = new StringBuilder(asset.getName());
                 if (assetName.length() > 18) {
                     assetName = new StringBuilder(assetName.substring(0, 17));

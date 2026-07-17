@@ -36,7 +36,6 @@ package mekhq.campaign.work;
 import megamek.common.annotations.Nullable;
 import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.location.ILocation;
-import mekhq.campaign.Warehouse;
 import mekhq.campaign.personnel.Person;
 
 public interface IWork extends ILocation {
@@ -71,5 +70,5 @@ public interface IWork extends ILocation {
      * @return the {@code Warehouse} relevant to this work
      */
     @Nullable
-    Warehouse getWarehouse();
+    mekhq.campaign.LocalWarehouse getWarehouse();
 }

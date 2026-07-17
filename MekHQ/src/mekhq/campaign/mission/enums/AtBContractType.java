@@ -35,6 +35,18 @@ package mekhq.campaign.mission.enums;
 import static java.lang.Math.round;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.mission.enums.AtBEventType.*;
+import static mekhq.campaign.mission.newContract.EnemySelectionProfile.AT_WAR;
+import static mekhq.campaign.mission.newContract.EnemySelectionProfile.COVERT;
+import static mekhq.campaign.mission.newContract.EnemySelectionProfile.OCCUPYING_POWER;
+import static mekhq.campaign.mission.newContract.EnemySelectionProfile.PIRATES;
+import static mekhq.campaign.mission.newContract.EnemySelectionProfile.RAIDERS;
+import static mekhq.campaign.mission.newContract.EnemySelectionProfile.REBELS;
+import static mekhq.campaign.mission.newContract.MissionLocationProfile.DEEP_RAID;
+import static mekhq.campaign.mission.newContract.MissionLocationProfile.HIGH_VALUE;
+import static mekhq.campaign.mission.newContract.MissionLocationProfile.INTERIOR_POPULATED;
+import static mekhq.campaign.mission.newContract.MissionLocationProfile.INVASION;
+import static mekhq.campaign.mission.newContract.MissionLocationProfile.OCCUPIED_TERRITORY;
+import static mekhq.campaign.mission.newContract.MissionLocationProfile.REAR_AREA;
 
 import java.util.ResourceBundle;
 
@@ -44,32 +56,111 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.newContract.EnemySelectionProfile;
+import mekhq.campaign.mission.newContract.MissionLocationProfile;
 
 public enum AtBContractType {
     // NEVER SORT THESE ENUM ENTRIES. IT WILL BREAK ATB CONTRACT GENERATION.
-    GARRISON_DUTY("AtBContractType.GARRISON_DUTY.text", "AtBContractType.GARRISON_DUTY.toolTipText", 18, 1.0),
-    CADRE_DUTY("AtBContractType.CADRE_DUTY.text", "AtBContractType.CADRE_DUTY.toolTipText", 12, 0.8),
-    SECURITY_DUTY("AtBContractType.SECURITY_DUTY.text", "AtBContractType.SECURITY_DUTY.toolTipText", 6, 1.2),
-    RIOT_DUTY("AtBContractType.RIOT_DUTY.text", "AtBContractType.RIOT_DUTY.toolTipText", 4, 1.0),
-    PLANETARY_ASSAULT("AtBContractType.PLANETARY_ASSAULT.text", "AtBContractType.PLANETARY_ASSAULT.toolTipText", 9,
-          1.5),
-    RELIEF_DUTY("AtBContractType.RELIEF_DUTY.text", "AtBContractType.RELIEF_DUTY.toolTipText", 9, 1.4),
-    GUERRILLA_WARFARE("AtBContractType.GUERRILLA_WARFARE.text", "AtBContractType.GUERRILLA_WARFARE.toolTipText", 24,
-          2.1),
-    PIRATE_HUNTING("AtBContractType.PIRATE_HUNTING.text", "AtBContractType.PIRATE_HUNTING.toolTipText", 6, 1.0),
-    DIVERSIONARY_RAID("AtBContractType.DIVERSIONARY_RAID.text", "AtBContractType.DIVERSIONARY_RAID.toolTipText", 3,
-          1.8),
-    OBJECTIVE_RAID("AtBContractType.OBJECTIVE_RAID.text", "AtBContractType.OBJECTIVE_RAID.toolTipText", 3, 1.6),
-    RECON_RAID("AtBContractType.RECON_RAID.text", "AtBContractType.RECON_RAID.toolTipText", 3, 1.6),
-    EXTRACTION_RAID("AtBContractType.EXTRACTION_RAID.text", "AtBContractType.EXTRACTION_RAID.toolTipText", 3, 1.6),
-    ASSASSINATION("AtBContractType.ASSASSINATION.text", "AtBContractType.ASSASSINATION.toolTipText", 3, 1.9),
-    ESPIONAGE("AtBContractType.ESPIONAGE.text", "AtBContractType.ESPIONAGE.toolTipText", 12, 2.4),
-    MOLE_HUNTING("AtBContractType.MOLE_HUNTING.text", "AtBContractType.MOLE_HUNTING.toolTipText", 6, 1.2),
-    OBSERVATION_RAID("AtBContractType.OBSERVATION_RAID.text", "AtBContractType.OBSERVATION_RAID.toolTipText", 3, 1.6),
-    RETAINER("AtBContractType.RETAINER.text", "AtBContractType.RETAINER.toolTipText", 12, 1.3),
-    SABOTAGE("AtBContractType.SABOTAGE.text", "AtBContractType.SABOTAGE.toolTipText", 24, 2.4),
-    TERRORISM("AtBContractType.TERRORISM.text", "AtBContractType.TERRORISM.toolTipText", 3, 1.9),
-    UNDEFINED("AtBContractType.UNDEFINED.text", "AtBContractType.UNDEFINED.toolTipText", 1, 1.0);
+    GARRISON_DUTY("AtBContractType.GARRISON_DUTY.text", "AtBContractType.GARRISON_DUTY.toolTipText",
+          18,
+          1.0,
+          EnemySelectionProfile.DEFAULT,
+          MissionLocationProfile.DEFAULT),
+    CADRE_DUTY("AtBContractType.CADRE_DUTY.text", "AtBContractType.CADRE_DUTY.toolTipText",
+          12,
+          0.8,
+          RAIDERS,
+          REAR_AREA),
+    SECURITY_DUTY("AtBContractType.SECURITY_DUTY.text", "AtBContractType.SECURITY_DUTY.toolTipText",
+          6,
+          1.2,
+          EnemySelectionProfile.DEFAULT,
+          INTERIOR_POPULATED),
+    RIOT_DUTY("AtBContractType.RIOT_DUTY.text", "AtBContractType.RIOT_DUTY.toolTipText",
+          4,
+          1.0,
+          REBELS,
+          INTERIOR_POPULATED),
+    PLANETARY_ASSAULT("AtBContractType.PLANETARY_ASSAULT.text", "AtBContractType.PLANETARY_ASSAULT.toolTipText",
+          9,
+          1.5,
+          AT_WAR,
+          INVASION),
+    RELIEF_DUTY("AtBContractType.RELIEF_DUTY.text", "AtBContractType.RELIEF_DUTY.toolTipText",
+          9,
+          1.4,
+          AT_WAR,
+          MissionLocationProfile.DEFAULT),
+    GUERRILLA_WARFARE("AtBContractType.GUERRILLA_WARFARE.text", "AtBContractType.GUERRILLA_WARFARE.toolTipText",
+          24,
+          2.1,
+          OCCUPYING_POWER,
+          OCCUPIED_TERRITORY),
+    PIRATE_HUNTING("AtBContractType.PIRATE_HUNTING.text", "AtBContractType.PIRATE_HUNTING.toolTipText",
+          6,
+          1.0,
+          PIRATES,
+          MissionLocationProfile.DEFAULT),
+    DIVERSIONARY_RAID("AtBContractType.DIVERSIONARY_RAID.text", "AtBContractType.DIVERSIONARY_RAID.toolTipText",
+          3,
+          1.8,
+          EnemySelectionProfile.DEFAULT,
+          DEEP_RAID),
+    OBJECTIVE_RAID("AtBContractType.OBJECTIVE_RAID.text", "AtBContractType.OBJECTIVE_RAID.toolTipText",
+          3,
+          1.6,
+          EnemySelectionProfile.DEFAULT,
+          DEEP_RAID),
+    RECON_RAID("AtBContractType.RECON_RAID.text", "AtBContractType.RECON_RAID.toolTipText",
+          3,
+          1.6,
+          EnemySelectionProfile.DEFAULT,
+          DEEP_RAID),
+    EXTRACTION_RAID("AtBContractType.EXTRACTION_RAID.text", "AtBContractType.EXTRACTION_RAID.toolTipText",
+          3,
+          1.6,
+          EnemySelectionProfile.DEFAULT,
+          DEEP_RAID),
+    ASSASSINATION("AtBContractType.ASSASSINATION.text", "AtBContractType.ASSASSINATION.toolTipText",
+          3,
+          1.9,
+          COVERT,
+          DEEP_RAID),
+    ESPIONAGE("AtBContractType.ESPIONAGE.text", "AtBContractType.ESPIONAGE.toolTipText",
+          12,
+          2.4,
+          COVERT,
+          HIGH_VALUE),
+    MOLE_HUNTING("AtBContractType.MOLE_HUNTING.text", "AtBContractType.MOLE_HUNTING.toolTipText",
+          6,
+          1.2,
+          EnemySelectionProfile.DEFAULT,
+          MissionLocationProfile.DEFAULT),
+    OBSERVATION_RAID("AtBContractType.OBSERVATION_RAID.text", "AtBContractType.OBSERVATION_RAID.toolTipText",
+          3,
+          1.6,
+          EnemySelectionProfile.DEFAULT,
+          DEEP_RAID),
+    RETAINER("AtBContractType.RETAINER.text", "AtBContractType.RETAINER.toolTipText",
+          12,
+          1.3,
+          EnemySelectionProfile.DEFAULT,
+          REAR_AREA),
+    SABOTAGE("AtBContractType.SABOTAGE.text", "AtBContractType.SABOTAGE.toolTipText",
+          24,
+          2.4,
+          COVERT,
+          HIGH_VALUE),
+    TERRORISM("AtBContractType.TERRORISM.text", "AtBContractType.TERRORISM.toolTipText",
+          3,
+          1.9,
+          COVERT,
+          HIGH_VALUE),
+    UNDEFINED("AtBContractType.UNDEFINED.text", "AtBContractType.UNDEFINED.toolTipText",
+          1,
+          1.0,
+          EnemySelectionProfile.DEFAULT,
+          MissionLocationProfile.DEFAULT);
     // endregion Enum Declarations
 
     // region Variable Declarations
@@ -77,17 +168,22 @@ public enum AtBContractType {
     private final String toolTipText;
     private final int constantLength;
     private final double operationsTempoMultiplier;
+    private final EnemySelectionProfile enemySelectionProfile;
+    private final MissionLocationProfile missionLocationProfile;
     // endregion Variable Declarations
 
     // region Constructors
     AtBContractType(final String name, final String toolTipText, final int constantLength,
-          final double operationsTempoMultiplier) {
+          final double operationsTempoMultiplier, final EnemySelectionProfile enemySelectionProfile,
+          final MissionLocationProfile missionLocationProfile) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Mission",
               MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
         this.constantLength = constantLength;
         this.operationsTempoMultiplier = operationsTempoMultiplier;
+        this.enemySelectionProfile = enemySelectionProfile;
+        this.missionLocationProfile = missionLocationProfile;
     }
     // endregion Constructors
 
@@ -103,6 +199,15 @@ public enum AtBContractType {
     public double getOperationsTempoMultiplier() {
         return operationsTempoMultiplier;
     }
+
+    public EnemySelectionProfile getEnemySelectionProfile() {
+        return enemySelectionProfile;
+    }
+
+    public MissionLocationProfile getMissionLocationProfile() {
+        return missionLocationProfile;
+    }
+
     // endregion Getters
 
     // region Boolean Comparison Methods

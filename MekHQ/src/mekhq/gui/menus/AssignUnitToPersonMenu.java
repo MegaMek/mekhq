@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -172,7 +172,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
         // 4) At a different IPlace than the unit
         // Then sorts the remainder based on their full title
         final IPlace unitPlace = units[0].getPlace();
-        List<Person> personnel = campaign.getPersonnel().values()
+        List<Person> personnel = campaign.getPlayerForce().getPersonnel().values()
                                        .stream()
                                        .filter(person -> person.getStatus().isActive())
                                        .filter(person -> !person.getPrisonerStatus().isCurrentPrisoner())

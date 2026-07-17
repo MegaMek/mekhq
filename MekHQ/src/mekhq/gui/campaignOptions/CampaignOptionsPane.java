@@ -66,8 +66,8 @@ import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JSplitPane;
 import javax.swing.JPanel;
+import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
@@ -123,6 +123,29 @@ import mekhq.gui.campaignOptions.optionChangeDialogs.*;
 public class CampaignOptionsPane extends JPanel {
     private static final int CONTENT_MARGIN = UIUtil.scaleForGUI(4);
 
+    // Fixed placeholder logo per category landing page: each category always shows the same emblem, but different
+    // categories show different ones. Files must exist under CampaignOptionsUtilities.getImageDirectory().
+    private static final Map<String, String> CATEGORY_LANDING_LOGOS = Map.ofEntries(
+          Map.entry("humanResourcesCategory", "logo_star_league.png"),
+          Map.entry("personnelCategory", "logo_federated_suns.png"),
+          Map.entry("biographyCategory", "logo_lyran_alliance.png"),
+          Map.entry("relationshipsCategory", "logo_magistracy_of_canopus.png"),
+          Map.entry("salariesCategory", "logo_comstar.png"),
+          Map.entry("turnoverAndRetentionCategory", "logo_mercenaries.png"),
+          Map.entry("advancementCategory", "logo_clan_wolf.png"),
+          Map.entry("awardsAndRandomizationCategory", "logo_clan_jade_falcon.png"),
+          Map.entry("skillsCategory", "logo_clan_ghost_bear.png"),
+          Map.entry("abilityCategory", "logo_clan_nova_cat.png"),
+          Map.entry("logisticsAndMaintenanceCategory", "logo_draconis_combine.png"),
+          Map.entry("repairsAndMaintenanceCategory", "logo_capellan_confederation.png"),
+          Map.entry("suppliesAndAcquisitionCategory", "logo_free_worlds_league.png"),
+          Map.entry("strategicOperationsCategory", "logo_taurian_concordat.png"),
+          Map.entry("financesCategory", "logo_word_of_blake.png"),
+          Map.entry("marketsCategory", "logo_marian_hegemony.png"),
+          Map.entry("systemsCategory", "logo_outworld_alliance.png"),
+          Map.entry("rulesetsCategory", "logo_republic_of_the_sphere.png"));
+    private static final String DEFAULT_CATEGORY_LANDING_LOGO = "logo_star_league.png";
+
     private final JFrame frame;
     private final Campaign campaign;
     private final CampaignOptions campaignOptions;
@@ -144,6 +167,7 @@ public class CampaignOptionsPane extends JPanel {
     private TurnoverAndRetentionPages turnoverAndRetentionPages;
     private AwardsAndRandomizationPages awardsAndRandomizationPages;
     private SkillsPages skillsPages;
+    private AttributesAndTraitsPage attributesAndTraitsPage;
     private AbilitiesPages abilitiesPages;
     private RepairAndMaintenancePages repairAndMaintenancePages;
     private EquipmentAndSuppliesPages equipmentAndSuppliesPages;
@@ -307,6 +331,9 @@ public class CampaignOptionsPane extends JPanel {
                 CampaignOptionsRouteOptions.withoutHelpPanel(),
                 "advancementCategory", "awardsAndRandomizationCategory", "2recruitmentBonusesPage");
         registerParentRoute("advancement.skills", "advancementCategory", "skillsCategory");
+        registerDirectRoute("advancement.skills.attributes-and-traits",
+                this::createAdvancementAttributesAndTraitsPage,
+                "advancementCategory", "skillsCategory", "attributesAndTraitsPage");
         registerDirectRoute("advancement.skills.gunnery", this::createAdvancementGunnerySkillsPage,
                 "advancementCategory", "skillsCategory", "0gunnerySkillsPage");
         registerDirectRoute("advancement.skills.piloting", this::createAdvancementPilotingSkillsPage,
@@ -366,8 +393,6 @@ public class CampaignOptionsPane extends JPanel {
                 "strategicOperationsCategory", "systemsCategory", "reputationPage");
         registerDirectRoute("operations.systems.faction-standing", this::createOperationsFactionStandingPage,
                 "strategicOperationsCategory", "systemsCategory", "factionStandingPage");
-        registerDirectRoute("operations.systems.a-time-of-war", this::createOperationsATimeOfWarPage,
-                "strategicOperationsCategory", "systemsCategory", "atowPage");
         registerParentRoute("operations.rulesets", "strategicOperationsCategory", "rulesetsCategory");
         registerDirectRoute("operations.rulesets.stratcon", this::createOperationsStratConPage,
                 "strategicOperationsCategory", "rulesetsCategory", "stratConGeneralPage");
@@ -391,14 +416,11 @@ public class CampaignOptionsPane extends JPanel {
     }
 
     private void selectRoute(CampaignOptionsRoute route) {
-        // Group/parent routes have no page of their own, so resolve them to their first
-        // child's page. We intentionally
-        // do NOT move the tree highlight onto that child here: re-selecting it would
-        // trap keyboard navigation, because
-        // pressing Up onto a group row would immediately bounce the selection back down
-        // to the group's first child.
-        // Leaving the highlight where the user put it lets Up/Down move one row at a
-        // time in both directions.
+        // Category (parent) routes now have a landing page of their own, so they normally resolve to themselves;
+        // getDefaultDirectRoute only falls back to a child page for a route with no page at all. We intentionally do
+        // NOT move the tree highlight here: re-selecting a child would trap keyboard navigation, because pressing Up
+        // onto a group row would immediately bounce the selection back down to its first child. Leaving the highlight
+        // where the user put it lets Up/Down move one row at a time in both directions.
         CampaignOptionsRoute effectiveRoute = getDefaultDirectRoute(route);
         showDirectRoute(effectiveRoute);
     }
@@ -591,6 +613,7 @@ public class CampaignOptionsPane extends JPanel {
     private void initializeAdvancementSection() {
         awardsAndRandomizationPages = new AwardsAndRandomizationPages(campaign);
         skillsPages = new SkillsPages(campaignOptions);
+        attributesAndTraitsPage = new AttributesAndTraitsPage(campaign);
         abilitiesPages = new AbilitiesPages();
     }
 
@@ -607,7 +630,34 @@ public class CampaignOptionsPane extends JPanel {
     }
 
     private void registerParentRoute(String id, String... titleResourceNames) {
-        registerRoute(CampaignOptionsRouteDescriptor.parent(id, titleResourceNames));
+        // A category (non-leaf) node now shows a landing page of its own - a logo, quote, and explainer - instead of
+        // silently redirecting to its first child. The landing page carries no options, so it hides the Option
+        // Details box via withoutHelpPanel().
+        List<String> landingResourceNames = List.of(titleResourceNames);
+        registerDirectRoute(id, () -> createCategoryLandingPage(landingResourceNames),
+                CampaignOptionsRouteOptions.withoutHelpPanel(), titleResourceNames);
+    }
+
+    /**
+     * Builds the landing page shown when a category (non-leaf) node is selected in the navigation tree. It mirrors the
+     * standard page shell - logo, quote, and an explainer paragraph - but holds no options and hides the Option
+     * Details box. The header title ({@code lbl<category>.text}), quote ({@code <category>.border}), and explainer
+     * ({@code <category>.intro}) are authored per category in the campaign options resource bundle.
+     *
+     * @param titleResourceNames the route's title resource names; the last element identifies the category
+     *
+     * @return the landing page component
+     */
+    private Component createCategoryLandingPage(List<String> titleResourceNames) {
+        String categoryKey = titleResourceNames.get(titleResourceNames.size() - 1);
+        String logoFile = CATEGORY_LANDING_LOGOS.getOrDefault(categoryKey, DEFAULT_CATEGORY_LANDING_LOGO);
+        String logoPath = CampaignOptionsUtilities.getImageDirectory() + logoFile;
+        return CampaignOptionsPagePanel.builder(categoryKey + "Landing", categoryKey, logoPath)
+                .intro(categoryKey)
+                .quote(categoryKey)
+                .showDetailsPanel(false)
+                .standardContentWidth()
+                .build();
     }
 
     private void registerDirectRoute(String id, Supplier<Component> pageFactory, String... titleResourceNames) {
@@ -669,11 +719,6 @@ public class CampaignOptionsPane extends JPanel {
             this.pageFactory = pageFactory;
             this.routeOptions = routeOptions;
             this.titleResourceNames = List.of(titleResourceNames);
-        }
-
-        private static CampaignOptionsRouteDescriptor parent(String id, String... titleResourceNames) {
-            return new CampaignOptionsRouteDescriptor(id, null, CampaignOptionsRouteOptions.defaults(),
-                    titleResourceNames);
         }
 
         private static CampaignOptionsRouteDescriptor direct(String id, Supplier<Component> pageFactory,
@@ -825,6 +870,11 @@ public class CampaignOptionsPane extends JPanel {
         return awardsAndRandomizationPages.recruitmentBonusesPage();
     }
 
+    private JPanel createAdvancementAttributesAndTraitsPage() {
+        ensureCategoryLoaded("advancementCategory");
+        return attributesAndTraitsPage.createPage();
+    }
+
     private JPanel createAdvancementGunnerySkillsPage() {
         ensureCategoryLoaded("advancementCategory");
         return skillsPages.createSkillsPage(COMBAT_GUNNERY);
@@ -935,11 +985,6 @@ public class CampaignOptionsPane extends JPanel {
         return systemsPages.createFactionStandingPage();
     }
 
-    private JPanel createOperationsATimeOfWarPage() {
-        ensureCategoryLoaded("strategicOperationsCategory");
-        return systemsPages.createATOWPage();
-    }
-
     private JPanel createOperationsStratConPage() {
         ensureCategoryLoaded("strategicOperationsCategory");
         return rulesetsPages.createStratConPage();
@@ -993,6 +1038,7 @@ public class CampaignOptionsPane extends JPanel {
         // Advancement
         if (awardsAndRandomizationPages != null) {
             awardsAndRandomizationPages.applyCampaignOptionsToCampaign(options, presetRandomSkillPreferences);
+            attributesAndTraitsPage.applyCampaignOptionsToCampaign(options, presetRandomSkillPreferences);
             skillsPages.applyCampaignOptionsToCampaign(options, presetSkills);
             abilitiesPages.applyCampaignOptionsToCampaign(preset);
         }
@@ -1008,7 +1054,7 @@ public class CampaignOptionsPane extends JPanel {
             financesPages.applyCampaignOptionsToCampaign(options);
             marketsPages.applyCampaignOptionsToCampaign(options);
             rulesetsPages.applyCampaignOptionsToCampaign(options);
-            systemsPages.applyCampaignOptionsToCampaign(options, presetRandomSkillPreferences);
+            systemsPages.applyCampaignOptionsToCampaign(options);
         }
 
         // Tidy up
@@ -1096,7 +1142,7 @@ public class CampaignOptionsPane extends JPanel {
                     campaign.getCampaignFactionIcon(),
                     campaign.getFaction(),
                     campaign.getLocalDate(),
-                    campaign.getFactionStandings(),
+                  campaign.getPlayerForce().getFactionStandings(),
                     campaign.getMissions(),
                     newIsTrackFactionStandings,
                     campaign.getCampaignOptions().getRegardMultiplier());
@@ -1192,7 +1238,7 @@ public class CampaignOptionsPane extends JPanel {
      * @since 0.50.10
      */
     private static void inoculateAllCharacters(Campaign campaign) {
-        final AbstractLocation location = campaign.getCurrentLocation();
+        final AbstractLocation location = campaign.getPlayerForce().getForceDetachment().getCurrentLocation();
         final LocalDate currentDay = campaign.getLocalDate();
 
         final Map<String, Set<InjuryType>> curesBySystem = new HashMap<>();
@@ -1201,7 +1247,7 @@ public class CampaignOptionsPane extends JPanel {
         final String planetId = (planet != null) ? planet.getId() : null;
         final String systemId = (planet != null) ? planet.getParentSystem().getId() : null;
 
-        for (Person person : campaign.getAllPersonnel()) {
+        for (Person person : campaign.getPlayerForce().getHumanResources().getPersonnel()) {
             // Inoculate for current location, if applicable
             if (planet != null) {
                 inoculate(person, planet, planetId, systemId, currentDay, curesBySystem);
@@ -1281,6 +1327,8 @@ public class CampaignOptionsPane extends JPanel {
         // Advancement
         awardsAndRandomizationPages.loadValuesFromCampaignOptions(presetCampaignOptions,
                 campaignPreset.getRandomSkillPreferences());
+        attributesAndTraitsPage.loadValuesFromCampaignOptions(presetCampaignOptions,
+                campaignPreset.getRandomSkillPreferences());
         skillsPages.loadValuesFromCampaignOptions(presetCampaignOptions, campaignPreset.getSkills());
         // The ability page is a special case, so handled differently to other pages
         abilitiesPages.buildAllAbilityInfo(campaignPreset.getSpecialAbilities());
@@ -1293,6 +1341,6 @@ public class CampaignOptionsPane extends JPanel {
         financesPages.loadValuesFromCampaignOptions(presetCampaignOptions);
         marketsPages.loadValuesFromCampaignOptions(presetCampaignOptions);
         rulesetsPages.loadValuesFromCampaignOptions(presetCampaignOptions);
-        systemsPages.loadValuesFromCampaignOptions(presetCampaignOptions, campaignPreset.getRandomSkillPreferences());
+        systemsPages.loadValuesFromCampaignOptions(presetCampaignOptions);
     }
 }

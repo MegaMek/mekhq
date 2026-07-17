@@ -49,8 +49,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Hangar;
-import mekhq.campaign.Warehouse;
+import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
@@ -74,8 +73,8 @@ public final class LocationNewDayUtil {
      * hangar nor a warehouse return immediately.
      */
     public static void processNewDayUnits(IPlace place, Campaign campaign) {
-        Hangar hangar = place.getHangar();
-        Warehouse warehouse = place.getWarehouse();
+        mekhq.campaign.LocalHangar hangar = place.getHangar();
+        LocalWarehouse warehouse = place.getWarehouse();
 
         if (hangar != null) {
             // need to loop through units twice, the first time to do all maintenance and

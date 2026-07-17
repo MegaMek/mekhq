@@ -180,7 +180,7 @@ public class FacilityRentals {
         }
 
         // Returns false if the player cannot afford the rental
-        if (!performRentalTransaction(campaign.getFinances(), campaign.getLocalDate(), totalCost,
+        if (!performRentalTransaction(campaign.getPlayerForce().getFinances(), campaign.getLocalDate(), totalCost,
               ContractRentalType.MAINTENANCE_BAYS)) {
             String report = getFormattedTextAt(RESOURCE_BUNDLE, "FacilityRentals.bay.unableToAfford",
                   spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG, totalCost.toAmountString());
@@ -296,7 +296,7 @@ public class FacilityRentals {
      * @since 0.50.10
      */
     public static void payForAllRentedBays(Campaign campaign) {
-        Finances finances = campaign.getFinances();
+        Finances finances = campaign.getPlayerForce().getFinances();
         LocalDate today = campaign.getLocalDate();
         Money totalCharge = getTotalRentSumFromRentedBays(campaign, finances);
 
@@ -328,7 +328,7 @@ public class FacilityRentals {
 
         List<Mission> activeMissions = campaign.getActiveMissions(false);
         Money totalAvailableFunds = finances.getBalance();
-        Collection<Unit> units = campaign.getAllHangar().getUnits();
+        Collection<Unit> units = campaign.getPlayerForce().getHangar().getUnits();
 
         Money totalCharge = Money.zero();
 
@@ -482,7 +482,7 @@ public class FacilityRentals {
             }
         }
 
-        if (!isBayRentalAllowed || !campaign.getCurrentLocation().isOnPlanet()) {
+        if (!isBayRentalAllowed || !campaign.getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet()) {
             BayRentalDialog.showNoFacilitiesAvailableDialog(campaign);
             return false;
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -106,9 +106,15 @@ public class FactionStandingUltimatumDialog {
     public FactionStandingUltimatumDialog(Campaign campaign, Person challenger, Person incumbent,
           boolean isViolentTransition, String ultimatumName) {
         this.campaign = campaign;
-        Person commander = campaign.getCommander();
+        Person commander = campaign.getPlayerForce().getHumanResources()
+                                 .getCommander(campaign.getCampaignOptions(),
+                                       campaign.isClanCampaign(),
+                                       campaign.getLocalDate());
         String commanderAddress = campaign.getCommanderAddress(false);
-        Person secondInCommand = campaign.getSecondInCommand();
+        Person secondInCommand = campaign.getPlayerForce().getHumanResources()
+                                       .getSecondInCommand(campaign.getCampaignOptions(),
+                                             campaign.isClanCampaign(),
+                                             campaign.getLocalDate());
         Person thirdInCommand = getThirdInCommand(commander, secondInCommand);
         String campaignName = campaign.getName();
 
@@ -334,7 +340,7 @@ public class FactionStandingUltimatumDialog {
     public @Nullable Person getThirdInCommand(Person commander, Person secondInCommand) {
         Person thirdInCommand = null;
 
-        for (Person person : campaign.getActivePersonnel(false, false)) {
+        for (Person person : campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false)) {
             if (person.equals(commander) || person.equals(secondInCommand)) {
                 continue;
             }

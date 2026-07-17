@@ -33,7 +33,9 @@
 package mekhq.gui;
 
 import static megamek.client.ratgenerator.ForceDescriptor.RATING_5;
-import static mekhq.campaign.HumanResources.isUsingLegacyPersonnelMarket;
+import static mekhq.campaign.ForceHumanResources.isUsingLegacyPersonnelMarket;
+import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.generateDailyScenariosForTrack;
+import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.isForceDeployedToStratCon;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.enums.DailyReportType.POLITICS;
 import static mekhq.campaign.force.Formation.NO_ASSIGNED_SCENARIO;
@@ -43,8 +45,6 @@ import static mekhq.campaign.mission.enums.MissionStatus.PARTIAL;
 import static mekhq.campaign.mission.enums.MissionStatus.SUCCESS;
 import static mekhq.campaign.mission.enums.ScenarioStatus.DRAW;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
-import static mekhq.campaign.stratCon.StratConRulesManager.generateDailyScenariosForTrack;
-import static mekhq.campaign.stratCon.StratConRulesManager.isForceDeployedToStratCon;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.gui.dialog.factionStanding.manualMissionDialogs.SimulateMissionDialog.handleFactionRegardUpdates;
@@ -87,9 +87,12 @@ import megameklab.util.UnitPrintManager;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignNewDayManager;
-import mekhq.campaign.Hangar;
+import mekhq.campaign.LocalHangar;
 import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.digitalGM.stratCon.MaplessStratCon;
+import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
+import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.events.DeploymentChangedEvent;
 import mekhq.campaign.events.GMModeEvent;
 import mekhq.campaign.events.OptionsChangedEvent;
@@ -116,9 +119,6 @@ import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.randomEvents.prisoners.PrisonerMissionEndEvent;
-import mekhq.campaign.stratCon.MaplessStratCon;
-import mekhq.campaign.stratCon.StratConCampaignState;
-import mekhq.campaign.stratCon.StratConScenario;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -507,29 +507,35 @@ public final class BriefingTab extends CampaignGuiTab {
 
     private void styleSecondaryButton(AbstractButton button) {
         styleBriefingButton(button);
-        button.setBackground(null);
+        button.setBackground(UIManager.getColor("Button.background"));
         button.setForeground(null);
         button.setFont(button.getFont().deriveFont(Font.PLAIN));
     }
 
     private void stylePrimaryButton(AbstractButton button) {
-        styleBriefingButton(button);
-        button.setFont(button.getFont().deriveFont(Font.BOLD));
-
-        Color background = getUIColor("Button.default.background", "Actions.Blue");
-        if (background != null) {
-            button.setBackground(background);
-        }
-
-        Color foreground = getUIColor("Button.default.foreground", "Button.foreground");
-        if (foreground != null) {
-            button.setForeground(foreground);
-        }
+        styleFilledButton(button,
+              getUIColor("Button.default.background", "Actions.Blue"),
+              getUIColor("Button.default.foreground", "Button.foreground"));
     }
 
     private void styleDangerButton(AbstractButton button) {
+        // Actions.Red is the muted sibling of the Actions.Blue used for primary buttons; a filled red communicates a
+        // destructive action more strongly than red text alone.
+        styleFilledButton(button,
+              getUIColor("Actions.Red"),
+              getUIColor("Button.default.foreground", "Button.foreground"));
+    }
+
+    // Shared emphasized (filled) treatment for primary and danger buttons; they differ only in the colors supplied.
+    private void styleFilledButton(AbstractButton button, Color background, Color foreground) {
         styleBriefingButton(button);
-        button.setForeground(MekHQ.getMHQOptions().getBelowContractMinimumForeground());
+        button.setFont(button.getFont().deriveFont(Font.BOLD));
+        if (background != null) {
+            button.setBackground(background);
+        }
+        if (foreground != null) {
+            button.setForeground(foreground);
+        }
     }
 
     private void styleBriefingButton(AbstractButton button) {
@@ -827,7 +833,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
         PrisonerMissionEndEvent prisoners = new PrisonerMissionEndEvent(getCampaign(), mission);
 
-        if (!getCampaign().getPrisonerDefectors().isEmpty() &&
+        if (!getCampaign().getPlayerForce().getHumanResources().getPrisonerDefectors().isEmpty() &&
                   prisoners.handlePrisonerDefectors() == 0) { // This is the cancel choice index
             return;
         }
@@ -839,7 +845,9 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         // Set up some variables we'll be using later
-        NewPersonnelMarket newPersonnelMarket = getCampaign().getNewPersonnelMarket();
+        NewPersonnelMarket newPersonnelMarket = getCampaign().getPlayerForce()
+                                                      .getHumanResources()
+                                                      .getNewPersonnelMarket();
         boolean marketPreviouslyDisabled = !newPersonnelMarket.getAvailabilityMessage().isBlank();
 
         getCampaign().completeMission(mission, status);
@@ -850,7 +858,8 @@ public final class BriefingTab extends CampaignGuiTab {
 
         LocalDate today = getCampaign().getLocalDate();
         if (xpAward > 0) {
-            for (Person person : getCampaign().getActivePersonnel(false, false)) {
+            Campaign campaign = getCampaign();
+            for (Person person : campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false)) {
                 if (person.isChild(today)) {
                     continue;
                 }
@@ -866,19 +875,20 @@ public final class BriefingTab extends CampaignGuiTab {
         // Prisoners
         boolean wasOverallSuccess = cmd.getStatus() == SUCCESS || cmd.getStatus() == PARTIAL;
 
-        List<Person> POWPersonnel = getCampaign().getFriendlyPrisoners();
+        List<Person> POWPersonnel = getCampaign().getPlayerForce().getHumanResources().getFriendlyPrisoners();
 
         // We only resolve prisoners if there are no active Missions
         if (getCampaign().getActiveMissions(false).isEmpty()) {
-            if (!getCampaign().getFriendlyPrisoners().isEmpty()) {
+            if (!getCampaign().getPlayerForce().getHumanResources().getFriendlyPrisoners().isEmpty()) {
                 prisoners.handlePrisoners(wasOverallSuccess, true);
             }
 
-            if (!getCampaign().getCurrentPrisoners().isEmpty()) {
+            if (!getCampaign().getPlayerForce().getHumanResources().getCurrentPrisoners().isEmpty()) {
                 prisoners.handlePrisoners(wasOverallSuccess, false);
             }
 
-            getCampaign().setTemporaryPrisonerCapacity(DEFAULT_TEMPORARY_CAPACITY);
+            Campaign campaign = getCampaign();
+            campaign.getPlayerForce().setTemporaryPrisonerCapacity(DEFAULT_TEMPORARY_CAPACITY);
         }
 
         // resolve turnover
@@ -893,14 +903,29 @@ public final class BriefingTab extends CampaignGuiTab {
                  * the menu
                  * provided they aren't still assigned to the mission in question.
                  */
-                if (!getCampaign().getRetirementDefectionTracker().isOutstanding(mission.getId())) {
+                if (!getCampaign().getPlayerForce()
+                           .getHumanResources()
+                           .getRetirementDefectionTracker()
+                           .isOutstanding(mission.getId())) {
                     return;
                 }
             } else {
-                if ((getCampaign().getRetirementDefectionTracker().getRetirees(mission) != null) &&
-                          getCampaign().getFinances().getBalance().isGreaterOrEqualThan(rdd.totalPayout())) {
+                if ((getCampaign().getPlayerForce()
+                           .getHumanResources()
+                           .getRetirementDefectionTracker()
+                           .getRetirees(mission) != null) &&
+                          getCampaign().getPlayerForce()
+                                .getFinances()
+                                .getBalance()
+                                .isGreaterOrEqualThan(rdd.totalPayout())) {
                     for (PersonnelRole role : PersonnelRole.getAdministratorRoles()) {
-                        Person admin = getCampaign().findBestInRole(role, SkillType.S_ADMIN);
+                        Campaign campaign = getCampaign();
+                        Person admin = campaign.getPlayerForce().getHumanResources()
+                                             .findBestInRole(role,
+                                                   SkillType.S_ADMIN,
+                                                   campaign.getCampaignOptions(),
+                                                   campaign.isClanCampaign(),
+                                                   campaign.getLocalDate());
                         if (admin != null) {
                             admin.awardXP(getCampaign(), 1);
                             getCampaign().addReport(PERSONNEL, admin.getHyperlinkedName() + " has gained 1 XP.");
@@ -932,7 +957,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
         // Update Faction Standings
         if (campaignOptions.isTrackFactionStanding()) {
-            FactionStandings factionStandings = getCampaign().getFactionStandings();
+            FactionStandings factionStandings = getCampaign().getPlayerForce().getFactionStandings();
             List<String> reports = new ArrayList<>();
 
             double regardMultiplier = campaignOptions.getRegardMultiplier();
@@ -962,14 +987,15 @@ public final class BriefingTab extends CampaignGuiTab {
 
         // Refresh personnel market if it was previously disabled
         if (!isUsingLegacyPersonnelMarket(campaignOptions) && marketPreviouslyDisabled) {
-            getCampaign().refreshApplicants(true);
+            Campaign campaign = getCampaign();
+            campaign.getPlayerForce().getHumanResources().refreshApplicants(campaign, true);
             CampaignNewDayManager.showRarePersonnelDialog(getCampaign(), false);
         }
 
         // Undeploy forces & units
         boolean isCadreDuty = mission instanceof AtBContract && ((AtBContract) mission).getContractType().isCadreDuty();
         boolean hadCadreForces = false;
-        for (Formation formation : getCampaign().getAllFormations()) {
+        for (Formation formation : getCampaign().getPlayerForce().getAllFormations()) {
             if (isCadreDuty && formation.getCombatRoleInMemory().isCadre()) {
                 formation.setCombatRoleInMemory(CombatRole.FRONTLINE);
                 hadCadreForces = true;
@@ -1011,7 +1037,8 @@ public final class BriefingTab extends CampaignGuiTab {
         if (mission instanceof AtBContract contract) {
             if (contract.getEmployerCode().equals(PIRATE_FACTION_CODE)) {
                 // CamOps 'other crimes' value
-                getCampaign().changeCrimePirateModifier(10);
+                Campaign campaign = getCampaign();
+                campaign.getPlayerForce().changeCrimePirateModifier(10);
             }
         }
 
@@ -1119,7 +1146,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
         // Undeploy forces
         for (Scenario scenario : mission.getScenarios()) {
-            for (Formation formation : getCampaign().getAllFormations()) {
+            for (Formation formation : getCampaign().getPlayerForce().getAllFormations()) {
                 if (formation.getScenarioId() == scenario.getId()) {
                     formation.setScenarioId(NO_ASSIGNED_SCENARIO, getCampaign());
                 }
@@ -1382,12 +1409,14 @@ public final class BriefingTab extends CampaignGuiTab {
         boolean wasConfirmed = forcePicker.wasConfirmed();
         if (wasConfirmed) {
             scenario.clearSalvageFormations();
-            Hangar hangar = getCampaign().getHangar();
+            LocalHangar hangar = getCampaign().getPlayerForce().getHangar();
             List<Formation> selectedFormations = forcePicker.getSelectedFormations();
             for (Formation formation : selectedFormations) {
                 scenario.addSalvageFormation(formation.getId());
                 if (formation.getTechID() != null) {
-                    Person tech = getCampaign().getPerson(formation.getTechID());
+                    Campaign campaign = getCampaign();
+                    final UUID id = formation.getTechID();
+                    Person tech = campaign.getPlayerForce().getHumanResources().getPerson(id);
                     if (tech != null && !tech.isEngineer()) {
                         scenario.addSalvageTech(formation.getTechID());
                     }
@@ -1453,10 +1482,13 @@ public final class BriefingTab extends CampaignGuiTab {
         List<UUID> priorSelectedTechs = new ArrayList<>();
         List<Integer> forceIds = scenario.getSalvageFormations();
         for (Integer forceId : forceIds) {
-            Formation formation = getCampaign().getFormation(forceId);
+            Campaign campaign1 = getCampaign();
+            Formation formation = campaign1.getPlayerForce().getFormation(forceId);
             if (formation != null && formation.getFormationType().isSalvage()) {
                 if (formation.getTechID() != null) {
-                    Person tech = getCampaign().getPerson(formation.getTechID());
+                    Campaign campaign = getCampaign();
+                    final UUID id = formation.getTechID();
+                    Person tech = campaign.getPlayerForce().getHumanResources().getPerson(id);
                     if (tech != null && !tech.isEngineer()) {
                         priorSelectedTechs.add(formation.getTechID());
                     }
@@ -1467,7 +1499,8 @@ public final class BriefingTab extends CampaignGuiTab {
         List<Person> availableTechs = getAvailableTechs();
         List<UUID> assignedTechs = scenario.getSalvageTechs();
         for (UUID techID : assignedTechs) {
-            Person tech = getCampaign().getPerson(techID);
+            Campaign campaign = getCampaign();
+            Person tech = campaign.getPlayerForce().getHumanResources().getPerson(techID);
             if (tech != null && !availableTechs.contains(tech) && !tech.isEngineer()) {
                 availableTechs.addFirst(tech);
             }
@@ -1484,7 +1517,8 @@ public final class BriefingTab extends CampaignGuiTab {
         // Add any other techs that were previously selected
         for (UUID techID : scenario.getSalvageTechs()) {
             if (!priorSelectedTechs.contains(techID)) {
-                Person tech = getCampaign().getPerson(techID);
+                Campaign campaign = getCampaign();
+                Person tech = campaign.getPlayerForce().getHumanResources().getPerson(techID);
                 if (tech != null && tech.isSalvageSupervisor()) {
                     priorSelectedTechs.add(techID);
                 }
@@ -1528,7 +1562,16 @@ public final class BriefingTab extends CampaignGuiTab {
      */
     private List<Person> getAvailableTechs() {
         List<Person> availableTechs = new ArrayList<>();
-        for (Person tech : getCampaign().getTechsExpanded(true, false, true)) {
+        Campaign campaign = getCampaign();
+        for (Person tech : campaign.getPlayerForce()
+                                 .getHumanResources()
+                                 .getTechsExpanded(campaign.getPlayerForce().getHangar().getUnits(),
+                                       campaign.getCampaignOptions(),
+                                       campaign.isClanCampaign(),
+                                       campaign.getLocalDate(),
+                                       true,
+                                       false,
+                                       true)) {
             if (!tech.isDeployed() && tech.getMinutesLeft() > 0 && !tech.isEngineer()) {
                 availableTechs.add(tech);
             }
@@ -1572,9 +1615,9 @@ public final class BriefingTab extends CampaignGuiTab {
 
         // Collect eligible salvage forces (We want salvage forces first)
         List<AtBContract> activeContracts = getCampaign().getActiveAtBContracts();
-        Hangar hangar = campaign.getHangar();
+        LocalHangar hangar = campaign.getPlayerForce().getHangar();
         List<Formation> eligibleSalvageFormations = new ArrayList<>();
-        for (Formation formation : getCampaign().getAllFormations()) {
+        for (Formation formation : getCampaign().getPlayerForce().getAllFormations()) {
             Formation parentFormation = formation.getParentFormation();
             if (parentFormation != null && parentFormation.getFormationType().isSalvage()) {
                 continue;
@@ -1605,9 +1648,11 @@ public final class BriefingTab extends CampaignGuiTab {
 
         // Collect eligible Combat Teams
         List<Formation> eligibleCombatTeams = new ArrayList<>();
-        for (CombatTeam combatTeam : getCampaign().getCombatTeamsAsList()) {
+        Campaign campaign1 = getCampaign();
+        for (CombatTeam combatTeam : campaign1.getPlayerForce().getCombatTeamsAsList(campaign1)) {
             int forceId = combatTeam.getFormationId();
-            Formation formation = getCampaign().getFormation(forceId);
+            Campaign campaign2 = getCampaign();
+            Formation formation = campaign2.getPlayerForce().getFormation(forceId);
             if (formation == null) {
                 continue;
             }
@@ -1679,12 +1724,17 @@ public final class BriefingTab extends CampaignGuiTab {
             speaker = contract.getEmployerLiaison();
         } else {
             // If we're not working with an AtBContract we have to generate the liaison each time
-            speaker = getCampaign().newPerson(PersonnelRole.ADMINISTRATOR_COMMAND, "MERC", Gender.RANDOMIZE);
+            Campaign campaign = getCampaign();
+            speaker = campaign.getPlayerForce()
+                            .getHumanResources()
+                            .newPerson(campaign, PersonnelRole.ADMINISTRATOR_COMMAND, "MERC", Gender.RANDOMIZE);
         }
 
         List<Person> forceCommanders = new ArrayList<>();
-        for (Formation formation : getCampaign().getAllFormations()) {
-            Person commander = getCampaign().getPerson(formation.getFormationCommanderID());
+        for (Formation formation : getCampaign().getPlayerForce().getAllFormations()) {
+            Campaign campaign = getCampaign();
+            final UUID id = formation.getFormationCommanderID();
+            Person commander = campaign.getPlayerForce().getHumanResources().getPerson(id);
             if (commander != null) {
                 forceCommanders.add(commander);
             }
@@ -1881,7 +1931,8 @@ public final class BriefingTab extends CampaignGuiTab {
 
         for (Unit unit : unitEntityMap.keySet()) {
             int forceId = unit.getFormationId();
-            Formation formation = getCampaign().getFormation(forceId);
+            Campaign campaign = getCampaign();
+            Formation formation = campaign.getPlayerForce().getFormation(forceId);
 
             // This will occur if the unit doesn't have an associated force
             if (formation == null) {
@@ -1983,7 +2034,9 @@ public final class BriefingTab extends CampaignGuiTab {
             if (combatTeam != null) {
                 int assignedForceId = combatTeam.getFormationId();
                 int cmdrStrategy = 0;
-                Person commander = getCampaign().getPerson(CombatTeam.findCommander(assignedForceId, getCampaign()));
+                Campaign campaign = getCampaign();
+                final UUID id = CombatTeam.findCommander(assignedForceId, getCampaign());
+                Person commander = campaign.getPlayerForce().getHumanResources().getPerson(id);
                 if ((null != commander) && (null != commander.getSkill(SkillType.S_STRATEGY))) {
                     cmdrStrategy = commander.getSkill(SkillType.S_STRATEGY).getLevel();
                 }
@@ -1995,7 +2048,8 @@ public final class BriefingTab extends CampaignGuiTab {
                     }
                 }
 
-                AtBDynamicScenarioFactory.setDeploymentTurnsForReinforcements(getCampaign().getHangar(),
+                AtBDynamicScenarioFactory.setDeploymentTurnsForReinforcements(getCampaign().getPlayerForce()
+                                                                                    .getHangar(),
                       scenario,
                       reinforcementEntities,
                       cmdrStrategy);
@@ -2495,24 +2549,28 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
-        final boolean canStartGame = ((!getCampaign().checkLinkedScenario(scenario.getId())) &&
-                                            (scenario.canStartScenario(getCampaign())));
+        final boolean linkedScenario = getCampaign().checkLinkedScenario(scenario.getId());
+        final boolean canStartGame = !linkedScenario && scenario.canStartScenario(getCampaign());
+        // Preparation actions (adjusting the deployment, exporting or printing the assigned force) do not require the
+        // scenario's date to have arrived - they only need the scenario to be current with a valid deployed force - so
+        // they are gated on the date-free readiness check instead.
+        final boolean canPrepare = !linkedScenario && scenario.canPrepareScenario(getCampaign());
 
         btnStartGame.setEnabled(canStartGame);
         btnJoinGame.setEnabled(canStartGame);
         btnLoadGame.setEnabled(canStartGame);
-        btnGetMul.setEnabled(canStartGame);
+        btnGetMul.setEnabled(canPrepare);
 
         final boolean hasTrack = scenario.getHasTrack();
         if (hasTrack) {
-            btnClearAssignedUnits.setEnabled(canStartGame && getCampaign().isGM());
+            btnClearAssignedUnits.setEnabled(canPrepare && getCampaign().isGM());
         } else {
-            btnClearAssignedUnits.setEnabled(canStartGame);
+            btnClearAssignedUnits.setEnabled(canPrepare);
         }
 
         btnResolveScenario.setEnabled(canStartGame);
         btnAutoResolveScenario.setEnabled(canStartGame);
-        btnPrintRS.setEnabled(canStartGame);
+        btnPrintRS.setEnabled(canPrepare);
         refreshScenarioActionButtonEmphasis();
     }
 

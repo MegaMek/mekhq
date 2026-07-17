@@ -75,6 +75,7 @@ import megamek.common.units.EntityWeightClass;
 import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.parts.enums.PartQuality;
@@ -1119,8 +1120,12 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
               "btnGenerateCompanyName.text",
               "btnGenerateCompanyName.toolTipText",
               evt -> {
-                  lastGeneratedCompanyName = randomMercenaryCompanyNameGenerator(gui.getCampaign()
-                                                                                       .getCommander());
+                  Campaign campaign = gui.getCampaign();
+                  lastGeneratedCompanyName = randomMercenaryCompanyNameGenerator(campaign.getPlayerForce()
+                                                                                       .getHumanResources()
+                                                                                       .getCommander(campaign.getCampaignOptions(),
+                                                                                             campaign.isClanCampaign(),
+                                                                                             campaign.getLocalDate()));
                   txtCompanyNamesGenerated.setText(lastGeneratedCompanyName);
               });
     }
@@ -1145,10 +1150,13 @@ public class GMToolsDialog extends AbstractMHQDialogBasic {
      * @param evt the ActionEvent associated with the button click
      */
     private void assignCompanyName(ActionEvent evt) {
-        if (gui.getCampaign().getFormation(0).getName().equals(gui.getCampaign().getName())) {
-            gui.getCampaign().getFormation(0).setName(lastGeneratedCompanyName);
+        Campaign campaign1 = gui.getCampaign();
+        if (campaign1.getPlayerForce().getFormation(0).getName().equals(gui.getCampaign().getName())) {
+            Campaign campaign = gui.getCampaign();
+            campaign.getPlayerForce().getFormation(0).setName(lastGeneratedCompanyName);
         }
-        gui.getCampaign().setName(lastGeneratedCompanyName);
+        mekhq.campaign.Campaign campaign = gui.getCampaign();
+        campaign.getPlayerForce().setName(lastGeneratedCompanyName);
         gui.refreshAllTabs();
     }
 

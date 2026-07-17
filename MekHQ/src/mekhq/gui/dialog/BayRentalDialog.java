@@ -59,7 +59,11 @@ public class BayRentalDialog extends ImmersiveDialogSimple {
 
     public BayRentalDialog(Campaign campaign, Money rentalCost) {
         super(campaign,
-              campaign.getSeniorAdminPerson(Campaign.AdministratorSpecialization.LOGISTICS),
+              campaign.getPlayerForce().getHumanResources()
+                    .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS,
+                          campaign.getCampaignOptions(),
+                          campaign.isClanCampaign(),
+                          campaign.getLocalDate()),
               null,
               getCenterMessage(campaign.getCommanderAddress(), rentalCost),
               getButtons(),

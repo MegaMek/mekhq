@@ -196,7 +196,7 @@ public class StratConSetupForces extends ScenarioSetupForces<AtBScenario> {
             }
         }
         entity.setDeployRound(deploymentRound);
-        var force = campaign.getFormationFor(unit);
+        var force = campaign.getPlayerForce().getFormationFor(unit);
         if (force != null) {
             entity.setForceString(force.getFullMMName());
         } else if (!unit.getEntity().getForceString().isBlank()) {

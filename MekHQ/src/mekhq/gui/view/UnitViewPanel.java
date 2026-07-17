@@ -166,6 +166,18 @@ public class UnitViewPanel extends JScrollablePanel {
         add(pnlCrew, gridBagConstraints);
         y++;
 
+        LocationSummaryPanel pnlLocation = new LocationSummaryPanel(unit, campaign);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        add(pnlLocation, gridBagConstraints);
+        y++;
+
         if (!unit.getHistory().isBlank()) {
             txtFluff.setName("txtFluff");
             txtFluff.setEditable(false);

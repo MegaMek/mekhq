@@ -293,7 +293,7 @@ public class AtBScenarioModifierApplicator {
                         continue;
                     }
 
-                    Formation playerFormation = campaign.getFormation(forceID);
+                    Formation playerFormation = campaign.getPlayerForce().getFormation(forceID);
 
                     // we can hide the "commander tactics skill" number of units, but we must keep
                     // at least one visible

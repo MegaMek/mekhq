@@ -32,7 +32,6 @@
  */
 package mekhq.gui.dialog;
 
-import static java.lang.Math.ceil;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static megamek.common.options.PilotOptions.LVL3_ADVANTAGES;
@@ -225,7 +224,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         this.campaign = campaign;
         this.campaignOptions = campaign.getCampaignOptions();
         this.isGMMode = isGMMode;
-        surgeon = getSurgeon(campaign.getDoctors()); // can return null
+        surgeon = getSurgeon(campaign.getPlayerForce().getHumanResources().getDoctors()); // can return null
 
         if (patient == null) {
             return;
@@ -413,8 +412,9 @@ public class AdvancedReplacementLimbDialog extends JDialog {
     private JComboBox<ProstheticType> createTreatmentComboBox(List<ProstheticType> options) {
         Faction campaignFaction = campaign.getFaction();
         int currentYear = campaign.getGameYear();
-        boolean isOnPlanet = campaign.getCurrentLocation().isOnPlanet();
-        boolean isUseKinderMode = campaignOptions.isUseKinderAlternativeAdvancedMedical();
+        boolean isOnPlanet = campaign.getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet();
+        double healingTimeMultiplier = campaignOptions.getAlternativeAdvancedMedicalHealingTimeMultiplier();
+
 
         JComboBox<ProstheticType> comboBox = new JComboBox<>();
 
@@ -448,7 +448,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
                     setText(type.toString());
 
                     // Build tooltip with base info and exclusions
-                    String baseTooltip = type.getTooltip(campaignFaction, currentYear, isUseKinderMode);
+                    String baseTooltip = type.getTooltip(campaignFaction, currentYear, healingTimeMultiplier);
                     String exclusions = getExclusions(isOnPlanet, type, campaignFaction, currentYear);
 
                     if (!exclusions.isBlank()) {
@@ -472,7 +472,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
             if (selected == null) {
                 comboBox.setToolTipText(defaultTooltip);
             } else {
-                String baseTooltip = selected.getTooltip(campaignFaction, currentYear, isUseKinderMode);
+                String baseTooltip = selected.getTooltip(campaignFaction, currentYear, healingTimeMultiplier);
                 baseTooltip += getExclusions(isOnPlanet, selected, campaignFaction, currentYear);
                 comboBox.setToolTipText(wordWrap(baseTooltip));
             }
@@ -509,7 +509,8 @@ public class AdvancedReplacementLimbDialog extends JDialog {
             totalCost = totalCost.multipliedBy(10);
         }
 
-        confirmButton.setEnabled(campaign.getFunds().isGreaterOrEqualThan(totalCost) && selectedCount > 0);
+        confirmButton.setEnabled(campaign.getPlayerForce().getFunds().isGreaterOrEqualThan(totalCost) &&
+                                       selectedCount > 0);
 
         List<String> summary = new ArrayList<>();
         if (selectedCount > 0) {
@@ -522,7 +523,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
                   surgeryLevelNeeded));
 
             if (isUseLocalSurgeon) {
-                if (campaign.getCurrentLocation().isOnPlanet()) {
+                if (campaign.getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet()) {
                     summary.add(getTextAt(RESOURCE_BUNDLE,
                           "AdvancedReplacementLimbDialog.status.localSurgeon"));
                 } else {
@@ -671,7 +672,9 @@ public class AdvancedReplacementLimbDialog extends JDialog {
                 }
             }
 
-            if (!selected.isAvailableInCurrentLocation(campaign.getCurrentLocation(), campaign.getLocalDate())) {
+            if (!selected.isAvailableInCurrentLocation(campaign.getPlayerForce()
+                                                             .getForceDetachment()
+                                                             .getCurrentLocation(), campaign.getLocalDate())) {
                 tooltip += getFormattedTextAt(RESOURCE_BUNDLE,
                       "AdvancedReplacementLimbDialog.exclusions.tech", warningColor, CLOSING_SPAN_TAG);
             }
@@ -732,9 +735,8 @@ public class AdvancedReplacementLimbDialog extends JDialog {
         performSurgerySkillChecks(prioritizedSurgeries, successfulSurgeries, unsuccessfulSurgeries);
 
         // Then perform the actual surgeries
-        boolean useKinderMode = campaignOptions.isUseKinderAlternativeAdvancedMedical();
         for (PlannedSurgery surgery : prioritizedSurgeries) {
-            performSurgery(surgery, useKinderMode, successfulSurgeries);
+            performSurgery(surgery, successfulSurgeries);
         }
 
         // Notify the player of the results
@@ -791,7 +793,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
             addImplantsAndAbilities(type);
         }
 
-        campaign.personUpdated(patient);
+        campaign.getPlayerForce().getHumanResources().personUpdated(campaign, patient);
     }
 
     /**
@@ -801,7 +803,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
      * @since 0.50.10
      */
     private void payForSurgeries() {
-        Finances finances = campaign.getFinances();
+        Finances finances = campaign.getPlayerForce().getFinances();
         LocalDate today = campaign.getLocalDate();
         finances.debit(TransactionType.REPAIRS, today, totalCost,
               getFormattedTextAt(RESOURCE_BUNDLE, "AdvancedReplacementLimbDialog.transaction",
@@ -813,14 +815,12 @@ public class AdvancedReplacementLimbDialog extends JDialog {
      * and adds recovery injuries. On failure, adds a failed-surgery recovery injury.
      *
      * @param surgery             the surgery being performed
-     * @param useKinderMode       whether to halve recovery times
      * @param successfulSurgeries the list of surgeries that passed their skill checks
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private void performSurgery(PlannedSurgery surgery, boolean useKinderMode,
-          List<PlannedSurgery> successfulSurgeries) {
+    private void performSurgery(PlannedSurgery surgery, List<PlannedSurgery> successfulSurgeries) {
         BodyLocation location = surgery.location;
         ProstheticType type = surgery.type;
 
@@ -834,18 +834,16 @@ public class AdvancedReplacementLimbDialog extends JDialog {
             // Add recovery period injuries
             InjuryType recoveryInjuryType = getRecoveryInjuryType(surgery);
             Injury recoveryInjury = recoveryInjuryType.newInjury(campaign, patient, GENERIC, 1);
-            adjustForKinderMode(useKinderMode, recoveryInjury);
             patient.addInjury(recoveryInjury);
 
             addImplantsAndAbilities(type);
         } else {
             // Add failed surgery injury
             Injury recoveryInjury = FAILED_SURGERY_RECOVERY.newInjury(campaign, patient, GENERIC, 1);
-            adjustForKinderMode(useKinderMode, recoveryInjury);
             patient.addInjury(recoveryInjury);
         }
 
-        campaign.personUpdated(patient);
+        campaign.getPlayerForce().getHumanResources().personUpdated(campaign, patient);
     }
 
     /**
@@ -975,26 +973,6 @@ public class AdvancedReplacementLimbDialog extends JDialog {
     }
 
     /**
-     * Adjusts an injury's recovery time when "kinder" advanced medical rules are enabled by halving both the original
-     * and current recovery time.
-     *
-     * @param useKinderMode whether kinder mode is active
-     * @param injury        the injury whose recovery time should be adjusted
-     *
-     * @author Illiani
-     * @since 0.50.10
-     */
-    private static void adjustForKinderMode(boolean useKinderMode,
-          Injury injury) {
-        if (useKinderMode) {
-            int originalRecoveryTime = injury.getOriginalTime();
-            int newRecoveryTime = (int) ceil(originalRecoveryTime / 2.0);
-            injury.setOriginalTime(newRecoveryTime);
-            injury.setTime(newRecoveryTime);
-        }
-    }
-
-    /**
      * Creates a temporary local surgeon if needed, with sufficient surgery skill and a small amount of Edge so that
      * local surgeons are not completely ineffective.
      *
@@ -1063,8 +1041,10 @@ public class AdvancedReplacementLimbDialog extends JDialog {
                     .thenComparing(
                           // We shouldn't hit `null` at this point, as any null selections should have been filtered
                           // out
-                          s -> Objects.requireNonNull(
-                                s.type().getCost(campaign.getFaction(), campaign.getGameYear())),
+                          s -> {
+                              return Objects.requireNonNull(
+                                    s.type().getCost(campaign.getFaction(), campaign.getGameYear()));
+                          },
                           Comparator.reverseOrder() // highest cost first
                     )
         );
@@ -1110,7 +1090,9 @@ public class AdvancedReplacementLimbDialog extends JDialog {
                     continue;
                 }
 
-                if (person.outRanksUsingSkillTiebreaker(campaign,
+                if (person.outRanksUsingSkillTiebreaker(campaignOptions,
+                      campaign.isClanCampaign(),
+                      campaign.getLocalDate(),
                       seniorSurgeon)) {
                     seniorSurgeon = person;
                 }
@@ -1214,7 +1196,7 @@ public class AdvancedReplacementLimbDialog extends JDialog {
      */
     public Map<BodyLocation, ProstheticType> getSelectedTreatments() {
         Map<BodyLocation, ProstheticType> selections = new HashMap<>();
-        boolean isPlanetside = campaign.getCurrentLocation().isOnPlanet();
+        boolean isPlanetside = campaign.getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet();
         Faction campaignFaction = campaign.getFaction();
         int currentYear = campaign.getGameYear();
         for (Map.Entry<BodyLocation, JComboBox<ProstheticType>> entry :

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMek.
  *
@@ -127,7 +127,11 @@ public class QuickTrainDialog extends ImmersiveDialogCore {
      */
     public QuickTrainDialog(Campaign campaign, boolean isNobodySelected, QuickTrain.QuickTrainOptions trainingOptions) {
         super(campaign,
-              campaign.getSeniorAdminPerson(Campaign.AdministratorSpecialization.HR),
+              campaign.getPlayerForce().getHumanResources()
+                    .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.HR,
+                          campaign.getCampaignOptions(),
+                          campaign.isClanCampaign(),
+                          campaign.getLocalDate()),
               null,
               getCenterMessage(campaign.getCommanderAddress(), isNobodySelected),
               getButtons(isNobodySelected),

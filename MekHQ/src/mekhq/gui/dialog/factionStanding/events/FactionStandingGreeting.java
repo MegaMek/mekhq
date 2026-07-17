@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -39,13 +39,11 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.util.List;
 
-import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -107,7 +105,8 @@ public class FactionStandingGreeting {
         final Person contractRepresentative = atBContract.getEmployerLiaison();
         final boolean isGuerrillaWarfare = atBContract.getContractType().isGuerrillaType();
         final boolean isIndependent = atBContract.getCommandRights().isIndependent();
-        final FactionStandingLevel factionStandingLevel = getFactionStandingsLevel(campaign.getFactionStandings(),
+        final FactionStandingLevel factionStandingLevel = getFactionStandingsLevel(campaign.getPlayerForce()
+                                                                                         .getFactionStandings(),
               contractRepresentative);
 
         int cargoRequirements = 0;
@@ -146,7 +145,8 @@ public class FactionStandingGreeting {
      */
     private FactionStandingGreeting(Campaign campaign) {
         final Person contractRepresentative = createEmployerLiaison(campaign);
-        final FactionStandingLevel factionStandingLevel = getFactionStandingsLevel(campaign.getFactionStandings(),
+        final FactionStandingLevel factionStandingLevel = getFactionStandingsLevel(campaign.getPlayerForce()
+                                                                                         .getFactionStandings(),
               contractRepresentative);
 
         new ImmersiveDialogSimple(campaign,
@@ -256,8 +256,13 @@ public class FactionStandingGreeting {
 
     public Person createEmployerLiaison(Campaign campaign) {
         Faction campaignFaction = campaign.getFaction();
-        Person employerLiaison = campaign.newPerson(PersonnelRole.MILITARY_LIAISON, campaignFaction.getShortName(),
-              Gender.RANDOMIZE);
+        final String factionCode = campaignFaction.getShortName();
+        Person employerLiaison = campaign.getPlayerForce()
+                                       .getHumanResources()
+                                       .newPerson(campaign,
+                                             mekhq.campaign.personnel.enums.PersonnelRole.MILITARY_LIAISON,
+                                             factionCode,
+                                             megamek.common.enums.Gender.RANDOMIZE);
 
         final RankSystem rankSystem = campaignFaction.getRankSystem();
 

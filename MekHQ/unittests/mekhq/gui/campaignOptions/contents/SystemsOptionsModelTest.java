@@ -33,24 +33,22 @@
 package mekhq.gui.campaignOptions.contents;
 
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import org.junit.jupiter.api.Test;
 
 /**
- * Exhaustive round-trip test for {@link SystemsOptionsModel}, whose fields live partly on {@link CampaignOptions} and
- * partly on {@link RandomSkillPreferences}. Every scalar field is mutated and verified through a save/reload.
- * {@code resetCriminalRecord} is a transient action flag that {@code applyTo} never persists, so it is excluded.
+ * Exhaustive round-trip test for {@link SystemsOptionsModel}, whose fields all live on {@link CampaignOptions}. Every
+ * scalar field is mutated and verified through a save/reload. {@code resetCriminalRecord} is a transient action flag
+ * that {@code applyTo} never persists, so it is excluded.
  */
 class SystemsOptionsModelTest {
     @Test
     void applyToRoundTripsEveryField() {
-        SystemsOptionsModel model = new SystemsOptionsModel(new CampaignOptions(), new RandomSkillPreferences());
+        SystemsOptionsModel model = new SystemsOptionsModel(new CampaignOptions());
         OptionsModelTestSupport.mutateScalarFields(model, "resetCriminalRecord");
 
         CampaignOptions destinationOptions = new CampaignOptions();
-        RandomSkillPreferences destinationPreferences = new RandomSkillPreferences();
-        model.applyTo(destinationOptions, destinationPreferences);
-        SystemsOptionsModel roundTripped = new SystemsOptionsModel(destinationOptions, destinationPreferences);
+        model.applyTo(destinationOptions);
+        SystemsOptionsModel roundTripped = new SystemsOptionsModel(destinationOptions);
 
         OptionsModelTestSupport.assertAllFieldsMatch(model, roundTripped, "resetCriminalRecord");
     }

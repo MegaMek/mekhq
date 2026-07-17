@@ -37,7 +37,7 @@ import megamek.common.enums.SkillLevel;
 import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.campaignOptions.BoardScalingType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.stratCon.StratConPlayType;
+import mekhq.campaign.digitalGM.stratCon.StratConPlayType;
 
 class RulesetsOptionsModel {
     SkillLevel skillLevel;

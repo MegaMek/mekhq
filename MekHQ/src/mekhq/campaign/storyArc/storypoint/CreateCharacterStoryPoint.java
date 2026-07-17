@@ -238,9 +238,12 @@ public class CreateCharacterStoryPoint extends StoryPoint {
             if (null != u && u.isUnmanned()) {
                 u.addPilotOrSoldier(person, false);
                 // only assign to force if properly assigned to a unit
-                Formation formation = getCampaign().getFormation(assignedForceId);
+                Campaign campaign1 = getCampaign();
+                Formation formation = campaign1.getPlayerForce().getFormation(assignedForceId);
                 if (null != formation && null != person.getUnit()) {
-                    getCampaign().addUnitToFormation(u, formation.getId());
+                    mekhq.campaign.Campaign campaign = getCampaign();
+                    int id = formation.getId();
+                    campaign.getPlayerForce().addUnitToFormation(u, id, campaign);
                 }
             }
         }

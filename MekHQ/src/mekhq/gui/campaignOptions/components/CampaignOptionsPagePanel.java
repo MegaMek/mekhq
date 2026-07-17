@@ -34,7 +34,7 @@ package mekhq.gui.campaignOptions.components;
 
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static megamek.client.ui.util.FontHandler.symbolIcon;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.CAMPAIGN_OPTIONS_PANEL_WIDTH;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.campaignOptionsPanelWidth;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.formatBadges;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.setSmallSizeVariant;
@@ -72,7 +72,7 @@ import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
  * expand/collapse-all controls), and an optional
  * quote footer. Arbitrary components can also be interleaved with the sections.
  * Every sectioned page is floored to a
- * shared width ({@link #UNIFORM_SECTION_STACK_WIDTH}) so the dialog's pages
+ * shared width ({@link #uniformSectionStackWidth()}) so the dialog's pages
  * render at a consistent width, while pages
  * whose content is naturally wider keep their size up to the page-width cap.
  * </p>
@@ -89,24 +89,26 @@ public class CampaignOptionsPagePanel extends JPanel {
     private static final int QUOTE_BOTTOM_PADDING = UIUtil.scaleForGUI(8);
     private static final int QUOTE_HORIZONTAL_PADDING = UIUtil.scaleForGUI(24);
     private static final int DEFAULT_HEADER_IMAGE_SIZE = 80;
-    // Shared minimum width every sectioned page is floored to, so form pages render
-    // at a consistent width across the
-    // dialog instead of each page shrinking to its own widest section. Comfortably
-    // covers a two-column form section
-    // (label column plus a long right-column control or checkbox) and stays well
-    // under the page width cap, so wider
-    // table pages and the 950 cap are unaffected.
-    private static final int UNIFORM_SECTION_STACK_WIDTH = UIUtil.scaleForGUI(640);
+    private static int uniformSectionStackWidth() {
+        // Shared minimum width every sectioned page is floored to, so form pages render at a consistent width across
+        // the dialog instead of each page shrinking to its own widest section. Comfortably covers a two-column form
+        // section (label column plus a long right-column control or checkbox) and stays well under the page width cap,
+        // so wider table pages and the 950 cap are unaffected. Resolved on each call (not cached in a static final) so
+        // the pages reflow when the GUI scale changes at runtime.
+        return UIUtil.scaleForGUI(640);
+    }
 
     private final JPanel pageBody;
     private final boolean showDetailsPanel;
     private final String sectionSearchText;
     private final List<SearchableSection> searchableSections;
+    private final String resourceBundleName;
 
     private CampaignOptionsPagePanel(Builder builder) {
         super(null);
         setName("pnl" + builder.name + "Page");
         showDetailsPanel = builder.showDetailsPanel;
+        resourceBundleName = builder.resourceBundleName;
 
         pageBody = new JPanel(new BorderLayout());
         pageBody.setName("pnl" + builder.name + "PageBody");
@@ -139,6 +141,11 @@ public class CampaignOptionsPagePanel extends JPanel {
         sectionSearchText = searchTextBuilder.toString().trim();
         JPanel sectionControls = createSectionControls(sections);
         int sectionStackWidth = getPreferredSectionStackWidth(sections, sectionControls);
+        if (sectionStackWidth == 0 && builder.standardContentWidth) {
+            // A section-less page (such as a category landing page) would otherwise collapse its intro and quote to
+            // the header width; floor it to the shared page width so it matches the dialog's sectioned pages.
+            sectionStackWidth = uniformSectionStackWidth();
+        }
 
         JPanel contentPanel = createContentPanel(builder, renderItems, sections, sectionControls, sectionStackWidth);
         pageBody.add(contentPanel, BorderLayout.CENTER);
@@ -217,16 +224,16 @@ public class CampaignOptionsPagePanel extends JPanel {
     private record SearchableSection(MHQCollapsiblePanel panel, String searchText) {
     }
 
-    private static void appendSectionSearchText(StringBuilder builder, Section section) {
+    private void appendSectionSearchText(StringBuilder builder, Section section) {
         appendResolvedText(builder, section.titleKey(), section.literal());
         appendResolvedText(builder, section.summaryKey(), section.literal());
     }
 
-    private static void appendResolvedText(StringBuilder builder, @Nullable String key, boolean literal) {
+    private void appendResolvedText(StringBuilder builder, @Nullable String key, boolean literal) {
         if (key == null) {
             return;
         }
-        String text = literal ? key : getTextAt(getCampaignOptionsResourceBundle(), key);
+        String text = literal ? key : getTextAt(resourceBundleName, key);
         if (text != null && !text.isBlank()) {
             builder.append(' ').append(text);
         }
@@ -235,7 +242,7 @@ public class CampaignOptionsPagePanel extends JPanel {
     @Override
     public @Nonnull Dimension getPreferredSize() {
         Dimension preferredSize = pageBody.getPreferredSize();
-        return new Dimension(Math.min(preferredSize.width, CAMPAIGN_OPTIONS_PANEL_WIDTH), preferredSize.height);
+        return new Dimension(Math.min(preferredSize.width, campaignOptionsPanelWidth()), preferredSize.height);
     }
 
     @Override
@@ -262,7 +269,8 @@ public class CampaignOptionsPagePanel extends JPanel {
                     builder.imageAddress,
                     builder.includeHeaderBodyText,
                     builder.headerImageSize,
-                    builder.tintHeaderImage);
+                    builder.tintHeaderImage,
+                    builder.resourceBundleName);
 
         JPanel panel = new CampaignOptionsStandardPanel(builder.name);
         GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
@@ -275,7 +283,7 @@ public class CampaignOptionsPagePanel extends JPanel {
         layout.anchor = GridBagConstraints.CENTER;
         panel.add(header, layout);
 
-        if (builder.introComponent != null || builder.introTextKey != null) {
+        if (builder.introComponent != null || builder.introResourceName != null) {
             layout.gridy++;
             int introWidth = sectionStackWidth > 0 ? sectionStackWidth : header.getPreferredSize().width;
             panel.add(createIntroPanel(builder, introWidth), layout);
@@ -347,7 +355,7 @@ public class CampaignOptionsPagePanel extends JPanel {
             introPanel.add(builder.introComponent, BorderLayout.CENTER);
         } else {
             introPanel = new CampaignOptionsIntroPanel(builder.name + "Intro",
-                getTextAt(getCampaignOptionsResourceBundle(), builder.introTextKey),
+                getTextAt(resourceBundleName, builder.introResourceName + ".intro"),
                 textWidth - (introHorizontalPadding * 2));
         }
         introPanel.setBorder(BorderFactory.createEmptyBorder(0,
@@ -380,7 +388,7 @@ public class CampaignOptionsPagePanel extends JPanel {
 
     private String getSectionTitle(Section sectionDefinition) {
         String title = sectionDefinition.literal ? sectionDefinition.titleKey
-              : getTextAt(getCampaignOptionsResourceBundle(), sectionDefinition.titleKey);
+              : getTextAt(resourceBundleName, sectionDefinition.titleKey);
         String badges = formatBadges(sectionDefinition.metadata);
         if (badges.isBlank()) {
             return title;
@@ -396,7 +404,7 @@ public class CampaignOptionsPagePanel extends JPanel {
             return "";
         }
         return sectionDefinition.literal ? sectionDefinition.summaryKey
-              : getTextAt(getCampaignOptionsResourceBundle(), sectionDefinition.summaryKey);
+              : getTextAt(resourceBundleName, sectionDefinition.summaryKey);
     }
 
     private int getPreferredSectionWidth(List<MHQCollapsiblePanel> sections) {
@@ -419,8 +427,8 @@ public class CampaignOptionsPagePanel extends JPanel {
         // is naturally wider than the
         // floor (e.g. table-based pages) keep their larger width; this only grows
         // narrower pages up to the floor, so it
-        // never clips. Tune UNIFORM_SECTION_STACK_WIDTH to adjust the shared width.
-        return Math.max(contentWidth, UNIFORM_SECTION_STACK_WIDTH);
+        // never clips. Tune uniformSectionStackWidth() to adjust the shared width.
+        return Math.max(contentWidth, uniformSectionStackWidth());
     }
 
     private JPanel createSectionControls(List<MHQCollapsiblePanel> sections) {
@@ -440,7 +448,7 @@ public class CampaignOptionsPagePanel extends JPanel {
     }
 
     private JButton createSectionActionButton(String resourceKey, int iconCodePoint, int iconSizeBoost) {
-        JButton button = new JButton(getTextAt(getCampaignOptionsResourceBundle(), resourceKey));
+        JButton button = new JButton(getTextAt(resourceBundleName, resourceKey));
         setSmallSizeVariant(button);
         button.setIcon(symbolIcon(iconCodePoint, button.getFont().getSize() + iconSizeBoost,
               button.getForeground()));
@@ -454,12 +462,12 @@ public class CampaignOptionsPagePanel extends JPanel {
     }
 
     private @Nullable JComponent createQuotePanel(@Nullable String quoteResourceName, int contentWidth) {
-        if (quoteResourceName == null || !ResourceBundle.getBundle(getCampaignOptionsResourceBundle())
+        if (quoteResourceName == null || !ResourceBundle.getBundle(resourceBundleName)
                                            .containsKey(quoteResourceName + ".border")) {
             return null;
         }
 
-        int quotePanelWidth = Math.max(1, Math.min(contentWidth, CAMPAIGN_OPTIONS_PANEL_WIDTH));
+        int quotePanelWidth = Math.max(1, Math.min(contentWidth, campaignOptionsPanelWidth()));
         int quoteHorizontalPadding = getQuoteHorizontalPadding(quotePanelWidth);
         int quoteTextWidth = quotePanelWidth - (quoteHorizontalPadding * 2);
         JPanel quotePanel = new JPanel(new GridBagLayout());
@@ -471,7 +479,7 @@ public class CampaignOptionsPagePanel extends JPanel {
               quoteHorizontalPadding));
 
         JEditorPane quote = new JEditorPane("text/html",
-              formatQuoteText(getTextAt(getCampaignOptionsResourceBundle(), quoteResourceName + ".border")));
+              formatQuoteText(getTextAt(resourceBundleName, quoteResourceName + ".border")));
         quote.setName("txt" + quoteResourceName + "Quote");
         quote.setEditable(false);
         quote.setFocusable(false);
@@ -513,13 +521,15 @@ public class CampaignOptionsPagePanel extends JPanel {
         private final List<Object> bodyItems = new ArrayList<>();
         private CampaignOptionsHeaderPanel headerPanel;
         private String quoteResourceName;
-        private String introTextKey;
+        private String introResourceName;
         private JComponent introComponent;
         private boolean includeHeaderBodyText;
         private int headerImageSize = DEFAULT_HEADER_IMAGE_SIZE;
         private boolean tintHeaderImage = true;
         private boolean sectionsExpandedByDefault;
         private boolean showDetailsPanel = true;
+        private String resourceBundleName = getCampaignOptionsResourceBundle();
+        private boolean standardContentWidth;
 
         private Builder(String name, String headerResourceName, String imageAddress) {
             this.name = name;
@@ -547,8 +557,22 @@ public class CampaignOptionsPagePanel extends JPanel {
             return this;
         }
 
-        public Builder intro(String introTextKey) {
-            this.introTextKey = introTextKey;
+        /**
+         * Sets the resource bundle used to resolve this page's header, intro, section, quote, and control text.
+         * Defaults to the Campaign Options bundle; another consumer (such as the MekHQ Options dialog) passes its own
+         * bundle so the same page shell can be reused.
+         */
+        public Builder resourceBundle(String resourceBundleName) {
+            this.resourceBundleName = resourceBundleName;
+            return this;
+        }
+
+        /**
+         * Sets the explainer paragraph shown under the header, resolved from the {@code <name>.intro} resource key.
+         * Mirrors {@link #quote(String)}, which resolves {@code <name>.border}.
+         */
+        public Builder intro(String introResourceName) {
+            this.introResourceName = introResourceName;
             return this;
         }
 
@@ -561,6 +585,10 @@ public class CampaignOptionsPagePanel extends JPanel {
             return this;
         }
 
+        /**
+         * Sets the centered quote shown at the foot of the page, resolved from the {@code <name>.border} resource key.
+         * Mirrors {@link #intro(String)}, which resolves {@code <name>.intro}.
+         */
         public Builder quote(String quoteResourceName) {
             this.quoteResourceName = quoteResourceName;
             return this;
@@ -568,6 +596,16 @@ public class CampaignOptionsPagePanel extends JPanel {
 
         public Builder showDetailsPanel(boolean showDetailsPanel) {
             this.showDetailsPanel = showDetailsPanel;
+            return this;
+        }
+
+        /**
+         * Floors a section-less page (such as a category landing page) to the standard page content width, so its
+         * intro and quote render at the same width as the dialog's sectioned pages instead of collapsing to the
+         * header width.
+         */
+        public Builder standardContentWidth() {
+            this.standardContentWidth = true;
             return this;
         }
 

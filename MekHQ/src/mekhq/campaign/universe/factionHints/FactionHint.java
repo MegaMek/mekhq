@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -48,6 +48,26 @@ public class FactionHint {
         this.name = name;
         this.start = start;
         this.end = end;
+    }
+
+    String getName() {
+        return name;
+    }
+
+    /**
+     * @return the start date, or {@code null} if the hint has no lower bound
+     */
+    @Nullable
+    LocalDate getStart() {
+        return start;
+    }
+
+    /**
+     * @return the end date, or {@code null} if the hint has no upper bound
+     */
+    @Nullable
+    LocalDate getEnd() {
+        return end;
     }
 
     /**

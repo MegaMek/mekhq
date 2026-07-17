@@ -216,11 +216,13 @@ public abstract class AbstractProcreation {
      * @param mother   the mother of the baby
      */
     protected @Nullable Person determineFather(final Campaign campaign, final Person mother) {
-        return (campaign.getCampaignOptions().isDetermineFatherAtBirth() && mother.getGenealogy().hasSpouse()) ?
-                     mother.getGenealogy().getSpouse() :
-                     ((mother.getExtraData().get(PREGNANCY_FATHER_DATA) != null) ?
-                            campaign.getPerson(UUID.fromString(mother.getExtraData().get(PREGNANCY_FATHER_DATA))) :
-                      null);
+        if ((campaign.getCampaignOptions().isDetermineFatherAtBirth() && mother.getGenealogy().hasSpouse())) {
+            return mother.getGenealogy().getSpouse();
+        } else {
+            if ((mother.getExtraData().get(PREGNANCY_FATHER_DATA) != null)) {
+                return (campaign.getPerson(UUID.fromString(mother.getExtraData().get(PREGNANCY_FATHER_DATA))));
+            } else {return (null);}
+        }
     }
     //endregion Determination Methods
 
@@ -431,9 +433,11 @@ public abstract class AbstractProcreation {
         }
         for (int i = 0; i < size; i++) {
             // Create a baby
-            final Person baby = campaign.newDependent(Gender.RANDOMIZE,
-                  mother.getOriginFaction(),
-                  campaign.getCurrentLocation().getPlanet());
+            Faction originFaction = mother.getOriginFaction();
+            Planet originPlanet = campaign.getPlayerForce().getForceDetachment().getCurrentLocation().getPlanet();
+            final Person baby = campaign.getPlayerForce()
+                                      .getHumanResources()
+                                      .newDependent(campaign, Gender.RANDOMIZE, originFaction, originPlanet);
             baby.setSurname(campaignOptions.getBabySurnameStyle()
                                   .generateBabySurname(mother, father, baby.getGender()));
 
@@ -602,7 +606,9 @@ public abstract class AbstractProcreation {
                 originPlanet = father.getOriginPlanet();
             }
 
-            final Person baby = campaign.newDependent(Gender.RANDOMIZE, originFaction, originPlanet);
+            final Person baby = campaign.getPlayerForce()
+                                      .getHumanResources()
+                                      .newDependent(campaign, Gender.RANDOMIZE, originFaction, originPlanet);
 
             baby.setSurname(campaign.getCampaignOptions()
                                   .getBabySurnameStyle()

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -37,7 +37,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import mekhq.campaign.HumanResources;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.familyTree.Genealogy;
@@ -54,7 +53,7 @@ import mekhq.campaign.personnel.familyTree.Genealogy;
  */
 public class AutomatedPersonnelCleanUp {
     private final LocalDate today;
-    private final HumanResources humanResources;
+    private final mekhq.campaign.ForceHumanResources humanResources;
     private final boolean isUseRemovalExemptRetirees;
     private final boolean isUseRemovalExemptCemetery;
     private final Collection<Person> personnelToProcess;
@@ -69,8 +68,8 @@ public class AutomatedPersonnelCleanUp {
      * @param humanResources             the container for all personnel, used to check whether a character is
      *                                   genealogically
      */
-    public AutomatedPersonnelCleanUp(HumanResources humanResources, LocalDate today,
-          boolean isUseRemovalExemptRetirees, boolean isUseRemovalExemptCemetery) {
+    public AutomatedPersonnelCleanUp(mekhq.campaign.ForceHumanResources humanResources, LocalDate today,
+            boolean isUseRemovalExemptRetirees, boolean isUseRemovalExemptCemetery) {
         this.humanResources = humanResources;
         this.today = today;
         this.personnelToProcess = humanResources.getPersonnel();

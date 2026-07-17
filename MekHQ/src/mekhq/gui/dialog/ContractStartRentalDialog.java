@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -97,7 +97,11 @@ public class ContractStartRentalDialog extends ImmersiveDialogCore {
     public ContractStartRentalDialog(Campaign campaign, Contract contract, int hospitalBedCost, int kitchenCost,
           int holdingCellCost) {
         super(campaign,
-              campaign.getSeniorAdminPerson(Campaign.AdministratorSpecialization.LOGISTICS),
+              campaign.getPlayerForce().getHumanResources()
+                    .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS,
+                          campaign.getCampaignOptions(),
+                          campaign.isClanCampaign(),
+                          campaign.getLocalDate()),
               null,
               getCenterMessage(campaign.getCommanderAddress(), contract, campaign.getGameYear()),
               getButtons(),

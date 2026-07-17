@@ -634,7 +634,7 @@ public class Scenario implements IPlayerSettings {
     public Formation getForces(Campaign campaign) {
         Formation formation = new Formation("Assigned Forces");
         for (int subid : subForceIds) {
-            Formation sub = campaign.getFormation(subid);
+            Formation sub = campaign.getPlayerForce().getFormation(subid);
             if (null != sub) {
                 formation.addSubFormation(sub, false);
             }
@@ -725,7 +725,7 @@ public class Scenario implements IPlayerSettings {
 
     public void clearAllFormationsAndPersonnel(Campaign campaign) {
         for (int fid : subForceIds) {
-            Formation f = campaign.getFormation(fid);
+            Formation f = campaign.getPlayerForce().getFormation(fid);
             if (null != f) {
                 f.clearScenarioIds(campaign);
                 MekHQ.triggerEvent(new DeploymentChangedEvent(f, this));
@@ -967,7 +967,35 @@ public class Scenario implements IPlayerSettings {
 
     }
 
+    /**
+     * Determines whether this scenario can be started now. The base implementation applies only the readiness checks in
+     * {@link #canPrepareScenario(Campaign)}; subclasses may override it to impose additional restrictions, such as
+     * requiring the current date to match the scenario's scheduled date (see {@link AtBScenario}).
+     *
+     * @param c the campaign this scenario belongs to
+     *
+     * @return {@code true} if the scenario can be started
+     */
     public boolean canStartScenario(Campaign c) {
+        return canPrepareScenario(c);
+    }
+
+    /**
+     * Determines whether this scenario is ready for deployment preparation: it is current, has a deployed force, and
+     * meets its required personnel and unit constraints.
+     *
+     * <p>This readiness check intentionally excludes any date-based restriction. In the base {@link Scenario}
+     * implementation {@link #canStartScenario(Campaign)} simply delegates to this method, but subclasses such as
+     * {@link AtBScenario} may override {@code canStartScenario} to additionally require that the scenario be launched on
+     * its scheduled date. Because {@code canPrepareScenario} never applies such a restriction, it is suitable for gating
+     * preparation actions (adjusting the deployment, exporting or printing the assigned force) that players should be
+     * able to perform ahead of the scenario's date.</p>
+     *
+     * @param c the campaign this scenario belongs to
+     *
+     * @return {@code true} if the scenario is current and its deployment requirements are met
+     */
+    public boolean canPrepareScenario(Campaign c) {
 
         if (!getStatus().isCurrent()) {
             return false;

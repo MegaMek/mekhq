@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -34,7 +34,6 @@ package mekhq.campaign.universe.generators.partGenerators;
 
 import java.util.List;
 
-import mekhq.campaign.Warehouse;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.universe.enums.PartGenerationMethod;
 
@@ -52,8 +51,8 @@ public class WindchildPartGenerator extends AbstractPartGenerator {
     //endregion Constructors
 
     @Override
-    public Warehouse generateWarehouse(final List<Part> inputParts) {
-        final Warehouse warehouse = new Warehouse();
+    public mekhq.campaign.LocalWarehouse generateWarehouse(final List<Part> inputParts) {
+        final mekhq.campaign.LocalWarehouse warehouse = new mekhq.campaign.LocalWarehouse();
         inputParts.forEach(part -> warehouse.addPart(clonePart(part), true));
         warehouse.forEachPart(part -> part.setQuantity((int) Math.round(part.getQuantity() / 3.0)));
         return warehouse;
