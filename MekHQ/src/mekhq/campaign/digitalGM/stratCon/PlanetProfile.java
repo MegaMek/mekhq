@@ -44,6 +44,7 @@ import mekhq.campaign.universe.LandMass;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.SourceableValue;
+import mekhq.campaign.universe.enums.HPGRating;
 
 /**
  * Immutable snapshot of the planetary data that drives StratCon improved sector generation, resolved once from a
@@ -65,13 +66,14 @@ import mekhq.campaign.universe.SourceableValue;
  * @param landmassCount      number of distinct landmasses (at least {@code 1})
  * @param gravity            surface gravity in G
  * @param population         primary-planet population, or {@code null} when unknown
+ * @param hpg                the planet's HPG rating, used as a technology/industry proxy ({@code X} when unknown)
  *
  * @author Illiani
  * @since 0.51.01
  */
 public record PlanetProfile(int temperatureCelsius, double diameterKm, int waterPercent, boolean airless,
       @Nullable Atmosphere atmosphere, String composition, int landmassCount, double gravity,
-      @Nullable Long population) {
+      @Nullable Long population, HPGRating hpg) {
     private static final MMLogger LOGGER = MMLogger.create(PlanetProfile.class);
 
     /** Standard room temperature, used when a planet records no temperature. */
@@ -84,6 +86,12 @@ public record PlanetProfile(int temperatureCelsius, double diameterKm, int water
     public static final int NEUTRAL_LANDMASS_COUNT = 1;
     /** Neutral surface gravity in G, used when a planet records none. */
     public static final double NEUTRAL_GRAVITY = 1.0;
+    /** The temperature (Celsius) at which habitability peaks. */
+    public static final int HABITABLE_TEMPERATURE_CELSIUS = 15;
+
+    private static final int HABITABLE_TEMPERATURE_SPAN = 60;
+    private static final double TAINTED_HABITABILITY_FACTOR = 0.4;
+    private static final double NON_BREATHABLE_HABITABILITY_FACTOR = 0.6;
 
     private static final double MIN_SIZE_FACTOR = 0.5;
     private static final double MAX_SIZE_FACTOR = 2.0;
@@ -131,6 +139,46 @@ public record PlanetProfile(int temperatureCelsius, double diameterKm, int water
 
     private boolean compositionContains(String token) {
         return !composition.isEmpty() && composition.contains(token);
+    }
+
+    /**
+     * @return a technology/industry proxy in {@code [0.0, 1.0]} derived from the HPG rating ({@code X} = 0.0, {@code A}
+     *       = 1.0)
+     */
+    public double techLevel() {
+        return hpg.ordinal() / (double) (HPGRating.values().length - 1);
+    }
+
+    /**
+     * @return how liveable the world is, {@code 0.0} (hostile) to {@code 1.0} (temperate and breathable). Airless
+     *       worlds are {@code 0.0}; comfort peaks near {@link #HABITABLE_TEMPERATURE_CELSIUS} and falls off toward
+     *       extremes, reduced further on tainted/toxic or non-breathable atmospheres.
+     */
+    public double habitability() {
+        if (airless) {
+            return 0.0;
+        }
+        double comfort = Math.max(0.0,
+              1.0 -
+                    (Math.abs(temperatureCelsius - HABITABLE_TEMPERATURE_CELSIUS) /
+                           (double) HABITABLE_TEMPERATURE_SPAN));
+        if (taintedOrToxic()) {
+            comfort *= TAINTED_HABITABILITY_FACTOR;
+        } else if (!breathable()) {
+            comfort *= NON_BREATHABLE_HABITABILITY_FACTOR;
+        }
+        return comfort;
+    }
+
+    /**
+     * @return {@code log10} of the population (e.g. 6 for a million, 9 for a billion), or {@code 0.0} when the
+     *       population is unknown or zero
+     */
+    public double populationLog() {
+        if ((population == null) || (population <= 0)) {
+            return 0.0;
+        }
+        return Math.log10(population);
     }
 
     /**
@@ -207,6 +255,7 @@ public record PlanetProfile(int temperatureCelsius, double diameterKm, int water
         double resolvedGravity = (gravity != null) ? gravity : NEUTRAL_GRAVITY;
 
         Long population = planet.getPopulation(date);
+        HPGRating hpg = planet.getHPG(date);
 
         return new PlanetProfile(resolvedTemperature,
               diameter,
@@ -216,7 +265,8 @@ public record PlanetProfile(int temperatureCelsius, double diameterKm, int water
               resolvedComposition,
               resolvedLandmassCount,
               resolvedGravity,
-              population);
+              population,
+              (hpg != null) ? hpg : HPGRating.X);
     }
 
     /**
@@ -233,6 +283,7 @@ public record PlanetProfile(int temperatureCelsius, double diameterKm, int water
               "",
               NEUTRAL_LANDMASS_COUNT,
               NEUTRAL_GRAVITY,
-              null);
+              null,
+              HPGRating.X);
     }
 }

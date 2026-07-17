@@ -61,7 +61,8 @@ class StratConOrogenyTest {
               composition,
               1,
               gravity,
-              null);
+              null,
+              mekhq.campaign.universe.enums.HPGRating.X);
     }
 
     private static OrogenyProfileType highestWeightType(PlanetProfile planet) {

@@ -58,7 +58,8 @@ class StratConTerrainFillerTest {
     }
 
     private static PlanetProfile planet(int water, boolean airless, Atmosphere atmosphere) {
-        return new PlanetProfile(20, PlanetProfile.TERRA_DIAMETER_KM, water, airless, atmosphere, "", 1, 1.0, null);
+        return new PlanetProfile(20, PlanetProfile.TERRA_DIAMETER_KM, water, airless, atmosphere, "", 1, 1.0, null,
+              mekhq.campaign.universe.enums.HPGRating.X);
     }
 
     private static StratConTrackState track() {

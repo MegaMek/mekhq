@@ -35,7 +35,6 @@ package mekhq.campaign.digitalGM.stratCon;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -112,10 +111,11 @@ class StratConSectorGeneratorTest {
     @Test
     void generate_wetWorld_placesSomeOcean() {
         // A very wet planet skews strongly toward high-ocean profiles; across a large sector at least some water lands.
-        PlanetProfile wet = new PlanetProfile(25, PlanetProfile.TERRA_DIAMETER_KM, 80, false, null, "", 1, 1.0, null);
+        PlanetProfile wet = new PlanetProfile(25, PlanetProfile.TERRA_DIAMETER_KM, 80, false, null, "", 1, 1.0, null,
+              mekhq.campaign.universe.enums.HPGRating.X);
         StratConTrackState track = track(24, 24, 25);
         StratConSectorGenerator.generate(track, wet, LatitudeBand.EQUATORIAL);
 
-        assertTrue(oceanHexes(track).size() > 0);
+        assertFalse(oceanHexes(track).isEmpty());
     }
 }
