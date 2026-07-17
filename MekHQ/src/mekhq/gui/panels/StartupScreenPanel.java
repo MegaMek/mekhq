@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2022-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -72,7 +72,7 @@ import mekhq.campaign.storyArc.StoryArcStub;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.AbstractMHQPanel;
 import mekhq.gui.dialog.DataLoadingDialog;
-import mekhq.gui.dialog.MHQOptionsDialog;
+import mekhq.gui.dialog.MHQOptionsTreeDialog;
 import mekhq.gui.dialog.NewPlayerQuickstartDialog;
 import mekhq.gui.dialog.StoryArcSelectionDialog;
 
@@ -219,7 +219,7 @@ public class StartupScreenPanel extends AbstractMHQPanel {
         MegaMekButton btnMHQOptions = new MegaMekButton(resources.getString("MHQOptions.text"),
               UIComponents.MainMenuButton.getComp(),
               true);
-        btnMHQOptions.addActionListener(evt -> new MHQOptionsDialog(getFrame()).setVisible(true));
+        btnMHQOptions.addActionListener(evt -> new MHQOptionsTreeDialog(getFrame()).setVisible(true));
 
         MegaMekButton btnQuit = new MegaMekButton(resources.getString("Quit.text"),
               UIComponents.MainMenuButton.getComp(),

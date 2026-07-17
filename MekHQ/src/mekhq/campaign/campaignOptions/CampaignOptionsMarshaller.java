@@ -363,8 +363,6 @@ public class CampaignOptionsMarshaller {
 
         // region Medical
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAdvancedMedical", campaignOptions.isUseAdvancedMedicalDirect());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useKinderAlternativeAdvancedMedical",
-              campaignOptions.isUseKinderAlternativeAdvancedMedical());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "healWaitingPeriod", campaignOptions.getHealingWaitingPeriod());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
@@ -381,6 +379,10 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "tougherHealing", campaignOptions.isTougherHealing());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAlternativeAdvancedMedical",
               campaignOptions.isUseAlternativeAdvancedMedical());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAlternativeAdvancedMedicalFewerPermanentInjuries",
+              campaignOptions.isUseAlternativeAdvancedMedicalFewerPermanentInjuries());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "alternativeAdvancedMedicalHealingTimeMultiplier",
+              campaignOptions.getAlternativeAdvancedMedicalHealingTimeMultiplier());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomDiseases",
               campaignOptions.isUseRandomDiseases());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "maximumPatients", campaignOptions.getMaximumPatients());

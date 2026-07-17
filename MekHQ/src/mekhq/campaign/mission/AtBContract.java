@@ -973,6 +973,11 @@ public class AtBContract extends Contract {
                 StratConContractInitializer.initializeCampaignState(this, campaign, stratconContractDefinition);
             }
         }
+
+        // Announce that the contract is now fully initialized (its StratCon state, if any, now exists). addMission
+        // already fired MissionNewEvent earlier, but that happens before this initialization, so listeners such as the
+        // StratCon tab need this second signal to pick the contract up immediately rather than only after the next day.
+        MekHQ.triggerEvent(new MissionChangedEvent(this));
     }
 
     public AtBContract(Contract contract, Campaign campaign) {

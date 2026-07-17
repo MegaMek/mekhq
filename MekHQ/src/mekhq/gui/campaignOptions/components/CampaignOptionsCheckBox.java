@@ -37,6 +37,7 @@ import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.processWrapSize;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 
 import javax.swing.JCheckBox;
 
@@ -69,7 +70,7 @@ public class CampaignOptionsCheckBox extends JCheckBox {
      * @param name the name used to fetch the checkbox's text and tooltip, and to set its name
      */
     public CampaignOptionsCheckBox(@Nonnull String name) {
-        this(name, null, null);
+        this(name, (Integer) null, null);
     }
 
     /**
@@ -100,7 +101,7 @@ public class CampaignOptionsCheckBox extends JCheckBox {
      * @param metadata version and flag metadata for displaying badges, or {@code null} for no badges
      */
     public CampaignOptionsCheckBox(@Nonnull String name, @Nullable CampaignOptionsMetadata metadata) {
-        this(name, null, metadata);
+        this(name, (Integer) null, metadata);
     }
 
     /**
@@ -142,6 +143,43 @@ public class CampaignOptionsCheckBox extends JCheckBox {
         }
 
         // Applies font scaling with default scaling disabled
+        setFontScaling(this, false, 1);
+    }
+
+    /**
+     * Generic constructor for reuse outside Campaign Options. Resolves the text and tooltip from {@code name + ".text"}
+     * and {@code name + ".tooltip"} in the given resource bundle, without the Campaign Options {@code "lbl"} key
+     * prefix.
+     *
+     * @param resourceBundleName the resource bundle to resolve the text and tooltip from
+     * @param name               the resource key base and internal name (no {@code "lbl"} prefix is added)
+     */
+    public CampaignOptionsCheckBox(@Nonnull String resourceBundleName, @Nonnull String name) {
+        this(resourceBundleName, name, null);
+    }
+
+    /**
+     * Generic constructor for reuse outside Campaign Options, with option badges. Resolves the text and tooltip from
+     * {@code name + ".text"} and {@code name + ".tooltip"} (or {@code name + ".toolTipText"}) in the given resource
+     * bundle, without the Campaign Options {@code "lbl"} key prefix, and appends the badge symbols for {@code metadata}
+     * (for example the "important information" flag) after the text.
+     *
+     * @param resourceBundleName the resource bundle to resolve the text and tooltip from
+     * @param name               the resource key base and internal name (no {@code "lbl"} prefix is added)
+     * @param metadata           the option's badge metadata, or {@code null} for no badges
+     */
+    public CampaignOptionsCheckBox(@Nonnull String resourceBundleName, @Nonnull String name,
+          @Nullable CampaignOptionsMetadata metadata) {
+        super(String.format("<html><nobr>%s%s</nobr></html>", getTextAt(resourceBundleName, name + ".text"),
+              CampaignOptionsUtilities.formatBadges(metadata)));
+        setName("chk" + name);
+        String tooltipText = getTextAt(resourceBundleName, name + ".tooltip");
+        if (!isResourceKeyValid(tooltipText)) {
+            tooltipText = getTextAt(resourceBundleName, name + ".toolTipText");
+        }
+        if (isResourceKeyValid(tooltipText)) {
+            setToolTipText(wordWrap(tooltipText, processWrapSize(null)));
+        }
         setFontScaling(this, false, 1);
     }
 }

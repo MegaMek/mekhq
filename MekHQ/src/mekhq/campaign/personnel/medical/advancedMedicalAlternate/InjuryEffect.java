@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -1705,7 +1705,7 @@ public enum InjuryEffect {
      * Builds a localized tooltip summarizing key information about all active injury effects.
      *
      * <p><b>Note:</b> For consistency, the order shown in the tooltip is meant to mirror that of
-     * {@link ProstheticType#getTooltip(Faction, int, boolean)}.</p>
+     * {@link ProstheticType#getTooltip(Faction, int, double)}.</p>
      *
      * @param injuryEffects A list of currently active injury effects
      *

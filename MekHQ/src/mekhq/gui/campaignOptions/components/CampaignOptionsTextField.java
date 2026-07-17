@@ -37,6 +37,7 @@ import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.processWrapSize;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 
 import javax.swing.JTextField;
 
@@ -59,7 +60,7 @@ public class CampaignOptionsTextField extends JTextField {
      * @param name the base name used to generate the text field's name and tooltip text.
      */
     public CampaignOptionsTextField(String name) {
-        this(name, null);
+        this(name, (Integer) null);
     }
 
     /**
@@ -86,6 +87,26 @@ public class CampaignOptionsTextField extends JTextField {
         setName("lbl" + name);
 
         // Apply UI font scaling
+        setFontScaling(this, false, 1);
+    }
+
+    /**
+     * Generic constructor for reuse outside Campaign Options. Resolves the tooltip from {@code name + ".tooltip"} in
+     * the given resource bundle, without the Campaign Options {@code "lbl"} key prefix.
+     *
+     * @param resourceBundleName the resource bundle to resolve the tooltip from
+     * @param name               the resource key base and internal name (no {@code "lbl"} prefix is added)
+     */
+    public CampaignOptionsTextField(String resourceBundleName, String name) {
+        super();
+        String tooltipText = getTextAt(resourceBundleName, name + ".tooltip");
+        if (!isResourceKeyValid(tooltipText)) {
+            tooltipText = getTextAt(resourceBundleName, name + ".toolTipText");
+        }
+        if (isResourceKeyValid(tooltipText)) {
+            setToolTipText(wordWrap(tooltipText, processWrapSize(null)));
+        }
+        setName("lbl" + name);
         setFontScaling(this, false, 1);
     }
 }

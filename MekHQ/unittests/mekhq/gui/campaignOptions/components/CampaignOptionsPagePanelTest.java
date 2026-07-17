@@ -36,8 +36,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.awt.Component;
+import java.awt.Container;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JLabel;
 
+import mekhq.gui.baseComponents.MHQCollapsiblePanel;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -71,5 +76,35 @@ class CampaignOptionsPagePanelTest {
                 .build();
 
         assertEquals("", page.getSectionSearchText());
+    }
+
+    @Test
+    void expandSectionsMatchingRevealsOnlyMatchingCollapsedSection() {
+        CampaignOptionsPagePanel page = CampaignOptionsPagePanel.builder("Test", "Test", "")
+                .sectionsExpandedByDefault(false)
+                .literalSection("Alpha Section", "alpha summary", new JLabel())
+                .literalSection("Beta Section", "beta summary", new JLabel())
+                .build();
+        List<MHQCollapsiblePanel> sections = findSections(page);
+
+        boolean matched = page.expandSectionsMatching(text -> text.contains("Beta Section"));
+
+        assertTrue(matched);
+        assertEquals(2, sections.size());
+        assertFalse(sections.get(0).isExpanded());
+        assertTrue(sections.get(1).isExpanded());
+    }
+
+    private static List<MHQCollapsiblePanel> findSections(Container root) {
+        List<MHQCollapsiblePanel> sections = new ArrayList<>();
+        for (Component child : root.getComponents()) {
+            if (child instanceof MHQCollapsiblePanel section) {
+                sections.add(section);
+            }
+            if (child instanceof Container container) {
+                sections.addAll(findSections(container));
+            }
+        }
+        return sections;
     }
 }

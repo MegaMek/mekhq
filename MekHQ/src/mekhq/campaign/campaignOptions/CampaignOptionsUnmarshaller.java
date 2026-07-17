@@ -393,8 +393,18 @@ public class CampaignOptionsUnmarshaller {
             case "tougherHealing" -> campaignOptions.setTougherHealing(parseBoolean(nodeContents));
             case "useAlternativeAdvancedMedical" ->
                   campaignOptions.setUseAlternativeAdvancedMedical(parseBoolean(nodeContents));
-            case "useKinderAlternativeAdvancedMedical" ->
-                  campaignOptions.setUseKinderAlternativeAdvancedMedical(parseBoolean(nodeContents));
+            case "useAlternativeAdvancedMedicalFewerPermanentInjuries" ->
+                  campaignOptions.setUseAlternativeAdvancedMedicalFewerPermanentInjuries(parseBoolean(nodeContents));
+            case "alternativeAdvancedMedicalHealingTimeMultiplier" ->
+                  campaignOptions.setAlternativeAdvancedMedicalHealingTimeMultiplier(parseDouble(nodeContents, 1.0));
+            // Legacy (<= 0.51.00): the old 'kinder' toggle is now expressed as a healing-time multiplier. A saved
+            // value of true maps to the 0.5 multiplier that reproduced the old kinder behavior; false leaves the
+            // multiplier at its 1.0 default.
+            case "useKinderAlternativeAdvancedMedical" -> {
+                if (parseBoolean(nodeContents)) {
+                    campaignOptions.setAlternativeAdvancedMedicalHealingTimeMultiplier(0.5);
+                }
+            }
             case "useRandomDiseases" -> campaignOptions.setUseRandomDiseases(parseBoolean(nodeContents));
             case "maximumPatients" -> campaignOptions.setMaximumPatients(parseInt(nodeContents));
             case "doctorsUseAdministration" -> campaignOptions.setDoctorsUseAdministration(parseBoolean(

@@ -36,6 +36,7 @@ import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static megamek.common.options.OptionsConstants.ALLOWED_YEAR;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.campaignOptionsLegendEntries;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.formatBadges;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
@@ -294,7 +295,7 @@ public class GeneralPage {
               .showDetailsPanel(false)
               .sectionsExpandedByDefault(true)
               .quote("generalPanel")
-              .introComponent(new CampaignOptionsIconLegend())
+              .introComponent(new CampaignOptionsIconLegend(campaignOptionsLegendEntries()))
               .section("lblGeneralCampaignBasicsPanel.text",
                     "lblGeneralCampaignBasicsPanel.summary",
                     createCampaignBasicsPanel())
