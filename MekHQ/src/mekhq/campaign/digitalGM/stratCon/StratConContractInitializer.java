@@ -342,10 +342,13 @@ public class StratConContractInitializer {
         retVal.setScenarioOdds(scenarioOdds);
         retVal.setDeploymentTime(deploymentTime);
 
-        // Place terrain based on temperature.
-        // TODO (improved terrain generation): when campaignOptions.isUseStratConAlternateSectorTerrain() is set,
-        //  dispatch to the improved terrain generator here instead of the legacy placer.
-        StratConTerrainPlacer.InitializeTrackTerrain(retVal);
+        // Place terrain: the improved geography-aware generator when the alternate-terrain option is set, otherwise
+        // the legacy biome-stripe placer.
+        if (campaignOptions.isUseStratConAlternateSectorTerrain()) {
+            StratConSectorGenerator.generate(retVal, planetProfile, sector.latitudeBand());
+        } else {
+            StratConTerrainPlacer.InitializeTrackTerrain(retVal);
+        }
 
         return retVal;
     }

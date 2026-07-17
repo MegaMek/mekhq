@@ -33,6 +33,7 @@
 package mekhq.campaign.digitalGM.stratCon;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -61,6 +62,21 @@ class StratConTrackSizingTest {
               options,
               0,
               0);
+    }
+
+    @Test
+    void alternateTerrain_generatesAFullyTerrainedSector() {
+        CampaignOptions options = options(true, false, 1.0);
+        when(options.isUseStratConAlternateSectorTerrain()).thenReturn(true);
+
+        StratConTrackState track = track(new SectorSpec(1, 9, LatitudeBand.EQUATORIAL), options);
+
+        for (int x = 0; x < track.getWidth(); x++) {
+            for (int y = 0; y < track.getHeight(); y++) {
+                assertFalse(track.getTerrainTile(new StratConCoords(x, y)).isEmpty(),
+                      "improved terrain left hex " + x + "," + y + " empty");
+            }
+        }
     }
 
     @Test
