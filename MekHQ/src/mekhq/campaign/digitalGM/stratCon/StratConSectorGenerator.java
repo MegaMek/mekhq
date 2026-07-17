@@ -32,9 +32,6 @@
  */
 package mekhq.campaign.digitalGM.stratCon;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import jakarta.annotation.Nullable;
 import megamek.common.compute.Compute;
 
@@ -53,18 +50,17 @@ public final class StratConSectorGenerator {
     private StratConSectorGenerator() {}
 
     private static final String FALLBACK_OCEAN_TERRAIN = "Sea";
-    private static final String FALLBACK_BASE_TERRAIN = "Plains";
 
     /**
      * Generates terrain for the given track using the improved pipeline.
      *
-     * @param track   the track to fill; its width, height, and temperature must already be set
-     * @param profile the destination planet's resolved data
+     * @param track        the track to fill; its width, height, and temperature must already be set
+     * @param profile      the destination planet's resolved data
+     * @param latitudeBand the sector's latitude band, which drives the latitudinal terrain gradient
      */
-    public static void generate(StratConTrackState track, PlanetProfile profile) {
+    public static void generate(StratConTrackState track, PlanetProfile profile, LatitudeBand latitudeBand) {
         StratConBiome biome = selectBiome(track.getTemperature());
         String oceanTerrain = oceanTerrainFor(biome);
-        String baseTerrain = baseTerrainFor(biome);
 
         // Hydrology: pick a profile from the planet's water coverage, then place oceans in that profile's shape.
         StratConHydrology hydrology = StratConHydrology.getInstance();
@@ -78,8 +74,11 @@ public final class StratConSectorGenerator {
         OrogenyProfile orogeny = StratConOrogeny.getInstance().selectProfile(profile);
         StratConMountainPlacer.placeMountains(track, mountainTerrainFor(biome), orogeny, profile.gravity());
 
-        // TODO (phase 3d): replace the base fill below with the weighted dry fill, random variety, and airless set.
-        fillEmptyWithBase(track, baseTerrain);
+        // Dry fill: geography-aware terrain that follows moisture, rain shadow, and coldness, painted in coherent
+        // patches from the biome's climate-appropriate terrains.
+        int windDirection = Compute.randomInt(StratConHexGeometry.HEX_DIRECTIONS);
+        StratConTerrainFields fields = StratConTerrainFields.compute(track, latitudeBand, windDirection);
+        StratConTerrainFiller.fill(track, biome, profile, fields);
 
         // Open water carries no fog of war.
         revealOceanHexes(track);
@@ -121,38 +120,6 @@ public final class StratConSectorGenerator {
             }
         }
         return null;
-    }
-
-    /**
-     * @return a random dry, non-mountain, non-urban terrain from the biome to serve as the placeholder base fill
-     */
-    private static String baseTerrainFor(StratConBiome biome) {
-        List<String> candidates = new ArrayList<>();
-        for (String terrainType : biome.allowedTerrainTypes) {
-            if (!StratConBiomeManifest.isOceanTerrain(terrainType) &&
-                      !StratConBiomeManifest.isMountainTerrain(terrainType) &&
-                      !StratConBiomeManifest.isUrbanTerrain(terrainType)) {
-                candidates.add(terrainType);
-            }
-        }
-        if (candidates.isEmpty()) {
-            return FALLBACK_BASE_TERRAIN;
-        }
-        return candidates.get(Compute.randomInt(candidates.size()));
-    }
-
-    /**
-     * Fills every still-empty (dry) hex with the base terrain, leaving ocean hexes untouched.
-     */
-    private static void fillEmptyWithBase(StratConTrackState track, String baseTerrain) {
-        for (int x = 0; x < track.getWidth(); x++) {
-            for (int y = 0; y < track.getHeight(); y++) {
-                StratConCoords coords = new StratConCoords(x, y);
-                if (track.getTerrainTile(coords).isEmpty()) {
-                    track.setTerrainTile(coords, baseTerrain);
-                }
-            }
-        }
     }
 
     /**

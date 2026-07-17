@@ -72,7 +72,7 @@ class StratConSectorGeneratorTest {
     @Test
     void generate_leavesNoEmptyHexes() {
         StratConTrackState track = track(20, 20, 25);
-        StratConSectorGenerator.generate(track, PlanetProfile.neutral(25));
+        StratConSectorGenerator.generate(track, PlanetProfile.neutral(25), LatitudeBand.EQUATORIAL);
 
         for (int x = 0; x < track.getWidth(); x++) {
             for (int y = 0; y < track.getHeight(); y++) {
@@ -85,7 +85,7 @@ class StratConSectorGeneratorTest {
     @Test
     void generate_revealsExactlyTheOceanHexes() {
         StratConTrackState track = track(20, 20, 25);
-        StratConSectorGenerator.generate(track, PlanetProfile.neutral(25));
+        StratConSectorGenerator.generate(track, PlanetProfile.neutral(25), LatitudeBand.EQUATORIAL);
 
         assertEquals(oceanHexes(track), new HashSet<>(track.getRevealedCoords()));
     }
@@ -93,7 +93,9 @@ class StratConSectorGeneratorTest {
     @Test
     void generate_onColdWorld_stillCompletesWithoutError() {
         StratConTrackState track = track(16, 16, -60);
-        assertDoesNotThrow(() -> StratConSectorGenerator.generate(track, PlanetProfile.neutral(-60)));
+        assertDoesNotThrow(() -> StratConSectorGenerator.generate(track,
+              PlanetProfile.neutral(-60),
+              LatitudeBand.NORTH_POLAR));
 
         assertFalse(track.getTerrainTile(new StratConCoords(0, 0)).isEmpty());
     }
@@ -101,7 +103,9 @@ class StratConSectorGeneratorTest {
     @Test
     void generate_onTinySector_doesNotThrow() {
         StratConTrackState track = track(1, 1, 25);
-        assertDoesNotThrow(() -> StratConSectorGenerator.generate(track, PlanetProfile.neutral(25)));
+        assertDoesNotThrow(() -> StratConSectorGenerator.generate(track,
+              PlanetProfile.neutral(25),
+              LatitudeBand.EQUATORIAL));
         assertFalse(track.getTerrainTile(new StratConCoords(0, 0)).isEmpty());
     }
 
@@ -110,7 +114,7 @@ class StratConSectorGeneratorTest {
         // A very wet planet skews strongly toward high-ocean profiles; across a large sector at least some water lands.
         PlanetProfile wet = new PlanetProfile(25, PlanetProfile.TERRA_DIAMETER_KM, 80, false, null, "", 1, 1.0, null);
         StratConTrackState track = track(24, 24, 25);
-        StratConSectorGenerator.generate(track, wet);
+        StratConSectorGenerator.generate(track, wet, LatitudeBand.EQUATORIAL);
 
         assertTrue(oceanHexes(track).size() > 0);
     }

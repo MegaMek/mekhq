@@ -33,6 +33,7 @@
 package mekhq.campaign.digitalGM.stratCon;
 
 import static java.lang.Math.max;
+import static java.lang.Math.min;
 import static java.lang.Math.round;
 
 import java.util.HashSet;
@@ -129,7 +130,8 @@ public final class StratConMountainPlacer {
     private static void upland(StratConTrackState track, String mountainTerrain, int volcanism, int features,
           double fraction) {
         int total = track.getWidth() * track.getHeight();
-        int size = Math.clamp(round(total * fraction * features), 3, (int) round(total * MAX_UPLAND_FRACTION));
+        int cap = max(1, (int) round(total * MAX_UPLAND_FRACTION));
+        int size = min(cap, max(3, (int) round(total * fraction * features)));
 
         Set<StratConCoords> blob = StratConHexGeometry.growBlob(track,
               randomLandCoords(track),
