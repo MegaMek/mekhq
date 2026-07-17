@@ -33,6 +33,7 @@
 package mekhq.campaign.digitalGM.stratCon;
 
 import static mekhq.campaign.digitalGM.stratCon.StratConBiomeManifest.isBarrenTerrain;
+import static mekhq.campaign.digitalGM.stratCon.StratConBiomeManifest.isHillsTerrain;
 import static mekhq.campaign.digitalGM.stratCon.StratConBiomeManifest.isLunarTerrain;
 import static mekhq.campaign.digitalGM.stratCon.StratConBiomeManifest.isMountainTerrain;
 import static mekhq.campaign.digitalGM.stratCon.StratConBiomeManifest.isOceanTerrain;
@@ -84,19 +85,17 @@ class StratConBiomeClassificationTest {
     }
 
     @Test
-    void vegetationPredicate_includesWetHillsButNotDry() {
+    void vegetationPredicate_coversForestsAndPlains() {
         assertTrue(isVegetationTerrain("Forest"));
         assertTrue(isVegetationTerrain("Jungle"));
         assertTrue(isVegetationTerrain("Swamp"));
         assertTrue(isVegetationTerrain("Savannah"));
         assertTrue(isVegetationTerrain("Plains"));
-        assertTrue(isVegetationTerrain("HotHillsWet"));
-        assertFalse(isVegetationTerrain("HotHillsDry"));
         assertFalse(isVegetationTerrain("Desert"));
     }
 
     @Test
-    void barrenPredicate_includesDryHillsAndFrozenGround() {
+    void barrenPredicate_includesDrySteppesAndFrozenGround() {
         assertTrue(isBarrenTerrain("Desert"));
         assertTrue(isBarrenTerrain("Badlands"));
         assertTrue(isBarrenTerrain("Steppe"));
@@ -104,7 +103,6 @@ class StratConBiomeClassificationTest {
         assertTrue(isBarrenTerrain("Glacier"));
         assertTrue(isBarrenTerrain("SnowField"));
         assertTrue(isBarrenTerrain("Tundra"));
-        assertTrue(isBarrenTerrain("HotHillsDry"));
         assertFalse(isBarrenTerrain("Forest"));
     }
 
@@ -118,9 +116,10 @@ class StratConBiomeClassificationTest {
     }
 
     @Test
-    void plainHills_areNeutral() {
-        for (String hills : List.of("Hills", "ColdHills")) {
-            assertEquals(StratConTerrainCategory.NEUTRAL, category(hills));
+    void hillsPredicate_coversEveryHillVariantAndIsNotVegetationOrBarren() {
+        for (String hills : List.of("Hills", "ColdHills", "HotHillsWet", "HotHillsDry")) {
+            assertTrue(isHillsTerrain(hills), hills + " should be hills");
+            assertEquals(StratConTerrainCategory.HILLS, category(hills));
             assertFalse(isVegetationTerrain(hills));
             assertFalse(isBarrenTerrain(hills));
             assertFalse(isMountainTerrain(hills));

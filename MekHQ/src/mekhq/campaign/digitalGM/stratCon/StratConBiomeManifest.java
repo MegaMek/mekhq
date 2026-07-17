@@ -127,6 +127,15 @@ public class StratConBiomeManifest {
         return getInstance().getTerrainCategory(terrainType) == StratConTerrainCategory.BARREN;
     }
 
+    /**
+     * @param terrainType a StratCon terrain type name (as returned by {@link StratConTrackState#getTerrainTile})
+     *
+     * @return {@code true} if the given terrain type is rolling hills
+     */
+    public static boolean isHillsTerrain(String terrainType) {
+        return getInstance().getTerrainCategory(terrainType) == StratConTerrainCategory.HILLS;
+    }
+
     // these constants will eventually be driven by planetary or track data
     /**
      * The "Terran" default biome bucket, used as one of the possible arguments for calls to getTempMap()

@@ -205,4 +205,59 @@ class StratConTerrainFillerTest {
 
         assertTrue(nearWater > inland, "vegetation should cluster nearer the coast than inland");
     }
+
+    @Test
+    void piedmont_concentratesHillsAroundMountains() {
+        StratConBiome biome = biome("Hills", "Forest", "Plains", "Badlands");
+        PlanetProfile breathable = planet(50, false, Atmosphere.BREATHABLE);
+        StratConCoords mountain = new StratConCoords(15, 15);
+
+        long adjacentHills = 0;
+        long adjacentTotal = 0;
+        long farHills = 0;
+        long farTotal = 0;
+        for (int run = 0; run < 8; run++) {
+            StratConTrackState track = track();
+            track.setTerrainTile(mountain, "Mountain");
+            StratConTerrainFields fields = StratConTerrainFields.compute(track, LatitudeBand.EQUATORIAL, 0);
+            StratConTerrainFiller.fill(track, biome, breathable, fields);
+
+            for (StratConCoords neighbor : StratConHexGeometry.neighbors(track, mountain)) {
+                adjacentHills += StratConBiomeManifest.isHillsTerrain(track.getTerrainTile(neighbor)) ? 1 : 0;
+                adjacentTotal++;
+            }
+            for (StratConCoords far : List.of(new StratConCoords(0, 0), new StratConCoords(SIZE - 1, SIZE - 1))) {
+                farHills += StratConBiomeManifest.isHillsTerrain(track.getTerrainTile(far)) ? 1 : 0;
+                farTotal++;
+            }
+        }
+
+        assertTrue(((double) adjacentHills / adjacentTotal) > ((double) farHills / farTotal),
+              "hills should be denser next to mountains than far from them");
+    }
+
+    @Test
+    void riparian_makesWaterAdjacentHexesMostlyVegetation() {
+        StratConBiome biome = biome("Forest", "Plains", "Badlands", "Steppe");
+        PlanetProfile breathable = planet(50, false, Atmosphere.BREATHABLE);
+
+        long bankVegetation = 0;
+        long bankTotal = 0;
+        for (int run = 0; run < 6; run++) {
+            StratConTrackState track = track();
+            for (int y = 0; y < SIZE; y++) {
+                track.setTerrainTile(new StratConCoords(0, y), "Sea");
+            }
+            StratConTerrainFields fields = StratConTerrainFields.compute(track, LatitudeBand.EQUATORIAL, 0);
+            StratConTerrainFiller.fill(track, biome, breathable, fields);
+
+            for (int y = 0; y < SIZE; y++) {
+                bankVegetation += StratConBiomeManifest.isVegetationTerrain(track.getTerrainTile(new StratConCoords(1,
+                      y))) ? 1 : 0;
+                bankTotal++;
+            }
+        }
+
+        assertTrue(((double) bankVegetation / bankTotal) > 0.5, "the immediate riverbank should be mostly vegetation");
+    }
 }

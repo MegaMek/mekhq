@@ -40,7 +40,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 
 /**
@@ -84,6 +86,10 @@ public final class StratConTerrainFiller {
 
     private static final int SMOOTHING_PASSES = 2;
 
+    // Post-fill geographic overrides.
+    private static final int PIEDMONT_CHANCE = 55;
+    private static final int RIPARIAN_CHANCE = 60;
+
     private static final String SWAMP_TERRAIN = "Swamp";
     private static final String FALLBACK_TERRAIN = "Badlands";
 
@@ -123,6 +129,14 @@ public final class StratConTerrainFiller {
         // 2. Smooth the fill into coherent patches without disturbing ocean or mountains.
         for (int pass = 0; pass < SMOOTHING_PASSES; pass++) {
             smooth(track, candidateSet);
+        }
+
+        // 3. Geographic overrides. Airless worlds have neither foothills nor riverbanks.
+        if (!planet.airless()) {
+            placePiedmont(track, biome, fields);
+            if (!planet.taintedOrToxic()) {
+                placeRiparian(track, biome);
+            }
         }
     }
 
@@ -307,5 +321,82 @@ public final class StratConTerrainFiller {
         }
 
         updates.forEach(track::setTerrainTile);
+    }
+
+    /**
+     * Piedmont: rings mountains with foothills by converting some fill hexes immediately adjacent to relief into the
+     * biome's hills terrain, so peaks blend into the lowlands instead of sitting straight on other terrain.
+     */
+    private static void placePiedmont(StratConTrackState track, StratConBiome biome, StratConTerrainFields fields) {
+        String hills = firstTerrainMatching(biome, StratConBiomeManifest::isHillsTerrain);
+        if (hills == null) {
+            return;
+        }
+
+        for (int x = 0; x < track.getWidth(); x++) {
+            for (int y = 0; y < track.getHeight(); y++) {
+                StratConCoords coords = new StratConCoords(x, y);
+                if ((fields.reliefDistanceAt(coords) == 1) &&
+                          isConvertibleFillHex(track, coords) &&
+                          (Compute.randomInt(100) < PIEDMONT_CHANCE)) {
+                    track.setTerrainTile(coords, hills);
+                }
+            }
+        }
+    }
+
+    /**
+     * Riparian: greens the banks by converting some fill hexes adjacent to open water into the biome's vegetation
+     * terrain, so forest hugs coasts and rivers.
+     */
+    private static void placeRiparian(StratConTrackState track, StratConBiome biome) {
+        String vegetation = firstTerrainMatching(biome, StratConBiomeManifest::isVegetationTerrain);
+        if (vegetation == null) {
+            return;
+        }
+
+        for (int x = 0; x < track.getWidth(); x++) {
+            for (int y = 0; y < track.getHeight(); y++) {
+                StratConCoords coords = new StratConCoords(x, y);
+                if (isConvertibleFillHex(track, coords) &&
+                          hasOceanNeighbor(track, coords) &&
+                          (Compute.randomInt(100) < RIPARIAN_CHANCE)) {
+                    track.setTerrainTile(coords, vegetation);
+                }
+            }
+        }
+    }
+
+    /**
+     * @return {@code true} if the hex holds fill terrain that an override may replace (not ocean, mountain, volcanic,
+     *       or urban)
+     */
+    private static boolean isConvertibleFillHex(StratConTrackState track, StratConCoords coords) {
+        String terrain = track.getTerrainTile(coords);
+        return !StratConBiomeManifest.isOceanTerrain(terrain) &&
+                     !StratConBiomeManifest.isMountainTerrain(terrain) &&
+                     !StratConBiomeManifest.isVolcanicTerrain(terrain) &&
+                     !StratConBiomeManifest.isUrbanTerrain(terrain);
+    }
+
+    private static boolean hasOceanNeighbor(StratConTrackState track, StratConCoords coords) {
+        for (StratConCoords neighbor : StratConHexGeometry.neighbors(track, coords)) {
+            if (StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(neighbor))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @return the first terrain in the biome matching the predicate, or {@code null} if the biome offers none
+     */
+    private static @Nullable String firstTerrainMatching(StratConBiome biome, Predicate<String> predicate) {
+        for (String terrain : biome.allowedTerrainTypes) {
+            if (predicate.test(terrain)) {
+                return terrain;
+            }
+        }
+        return null;
     }
 }

@@ -55,6 +55,8 @@ public enum StratConTerrainCategory {
     VEGETATION,
     /** Barren, dry, or frozen ground. Favored on non-breathable, dry, icy, or rocky worlds. */
     BARREN,
-    /** Terrain with no vegetation/barren bias (e.g. plain hills), and the default for anything uncategorized. */
+    /** Rolling hills. Used as the foothill/piedmont ring around mountains, and neutral in the base fill weighting. */
+    HILLS,
+    /** Terrain with no vegetation/barren bias, and the default for anything uncategorized. */
     NEUTRAL
 }
