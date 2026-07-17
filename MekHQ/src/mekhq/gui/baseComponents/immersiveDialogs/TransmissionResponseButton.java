@@ -49,7 +49,7 @@ import javax.swing.Timer;
 /** Response button with a restrained transmission scan on hover or keyboard focus. */
 final class TransmissionResponseButton extends JButton {
     private static final int FRAME_DELAY = 16;
-    static final long SCAN_NANOS_PER_PIXEL = 7_000_000L;
+    static final long SCAN_NANOS_PER_PIXEL = 14_000_000L;
     private static final double FADE_START_PROGRESS = 0.80;
     private static final int TRAIL_ALPHA = 52;
     private static final int LINE_ALPHA = 112;
