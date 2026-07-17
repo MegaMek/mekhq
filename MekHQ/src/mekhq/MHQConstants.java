@@ -360,6 +360,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String STRAT_CON_CONTRACT_PATH = "./data/stratconcontractdefinitions/";
 
     public static final String STRAT_CON_BIOME_MANIFEST_PATH = "./data/stratconbiomedefinitions/StratConBiomeManifest.xml";
+    public static final String STRAT_CON_HYDROLOGY_PROFILES_PATH = "./data/stratconbiomedefinitions/HydrologyProfiles.yaml";
     public static final String TERRAIN_CONDITIONS_ODDS_MANIFEST_PATH = "./data/terrainconditionsodds/TerrainConditionsOddsManifest.xml";
     public static final String HOSTILE_FACILITY_SCENARIO = "Hostile Facility.xml";
     public static final String ALLIED_FACILITY_SCENARIO = "Base Defense.xml";
