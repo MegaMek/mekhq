@@ -35,6 +35,7 @@ package mekhq.campaign.digitalGM.stratCon;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.annotation.Nullable;
 import megamek.common.compute.Compute;
 
 /**
@@ -72,7 +73,9 @@ public final class StratConSectorGenerator {
         int oceanTargetHexes = (int) Math.round((oceanPercent / 100.0) * track.getWidth() * track.getHeight());
         StratConOceanPlacer.placeOceans(track, hydrologyProfile.type(), oceanTargetHexes, oceanTerrain);
 
-        // TODO (phase 3c): place mountains here, gravity-driven, occasionally volcanic.
+        // Mountains: gravity-driven ranges (occasionally volcanic), never over ocean. Only when the biome offers them.
+        StratConMountainPlacer.placeMountains(track, mountainTerrainFor(biome), profile.gravity());
+
         // TODO (phase 3d): replace the base fill below with the weighted dry fill, random variety, and airless set.
         fillEmptyWithBase(track, baseTerrain);
 
@@ -104,6 +107,18 @@ public final class StratConSectorGenerator {
             }
         }
         return FALLBACK_OCEAN_TERRAIN;
+    }
+
+    /**
+     * @return the biome's mountain terrain type, or {@code null} when the biome offers no mountains
+     */
+    private static @Nullable String mountainTerrainFor(StratConBiome biome) {
+        for (String terrainType : biome.allowedTerrainTypes) {
+            if (StratConBiomeManifest.isMountainTerrain(terrainType)) {
+                return terrainType;
+            }
+        }
+        return null;
     }
 
     /**
