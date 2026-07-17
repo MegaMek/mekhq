@@ -38,7 +38,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 import javax.xml.transform.Source;
 
@@ -65,18 +64,67 @@ public class StratConBiomeManifest {
     public static final String FORCE_HOSTILE = "ForceHostile";
 
     /**
-     * The terrain types that represent open water. Ocean hexes are always revealed, are barred from hosting scenarios
-     * or facilities, and are capped so that a sector is always at least partly dry land.
+     * @param terrainType a StratCon terrain type name (as returned by {@link StratConTrackState#getTerrainTile})
+     *
+     * @return {@code true} if the given terrain type is open water (ocean). Ocean hexes are always revealed, are barred
+     *       from hosting scenarios or facilities, and are capped so a sector is always at least partly dry land.
      */
-    public static final Set<String> OCEAN_TERRAIN_TYPES = Set.of("Sea", "ColdSea", "HotSea", "FrozenSea");
+    public static boolean isOceanTerrain(String terrainType) {
+        return getInstance().getTerrainCategory(terrainType) == StratConTerrainCategory.OCEAN;
+    }
 
     /**
      * @param terrainType a StratCon terrain type name (as returned by {@link StratConTrackState#getTerrainTile})
      *
-     * @return {@code true} if the given terrain type is open water (ocean)
+     * @return {@code true} if the given terrain type is mountainous
      */
-    public static boolean isOceanTerrain(String terrainType) {
-        return terrainType != null && OCEAN_TERRAIN_TYPES.contains(terrainType);
+    public static boolean isMountainTerrain(String terrainType) {
+        return getInstance().getTerrainCategory(terrainType) == StratConTerrainCategory.MOUNTAIN;
+    }
+
+    /**
+     * @param terrainType a StratCon terrain type name (as returned by {@link StratConTrackState#getTerrainTile})
+     *
+     * @return {@code true} if the given terrain type is urban
+     */
+    public static boolean isUrbanTerrain(String terrainType) {
+        return getInstance().getTerrainCategory(terrainType) == StratConTerrainCategory.URBAN;
+    }
+
+    /**
+     * @param terrainType a StratCon terrain type name (as returned by {@link StratConTrackState#getTerrainTile})
+     *
+     * @return {@code true} if the given terrain type is volcanic
+     */
+    public static boolean isVolcanicTerrain(String terrainType) {
+        return getInstance().getTerrainCategory(terrainType) == StratConTerrainCategory.VOLCANIC;
+    }
+
+    /**
+     * @param terrainType a StratCon terrain type name (as returned by {@link StratConTrackState#getTerrainTile})
+     *
+     * @return {@code true} if the given terrain type is barren lunar/planetary rock
+     */
+    public static boolean isLunarTerrain(String terrainType) {
+        return getInstance().getTerrainCategory(terrainType) == StratConTerrainCategory.LUNAR;
+    }
+
+    /**
+     * @param terrainType a StratCon terrain type name (as returned by {@link StratConTrackState#getTerrainTile})
+     *
+     * @return {@code true} if the given terrain type is living vegetation
+     */
+    public static boolean isVegetationTerrain(String terrainType) {
+        return getInstance().getTerrainCategory(terrainType) == StratConTerrainCategory.VEGETATION;
+    }
+
+    /**
+     * @param terrainType a StratCon terrain type name (as returned by {@link StratConTrackState#getTerrainTile})
+     *
+     * @return {@code true} if the given terrain type is barren, dry, or frozen ground
+     */
+    public static boolean isBarrenTerrain(String terrainType) {
+        return getInstance().getTerrainCategory(terrainType) == StratConTerrainCategory.BARREN;
     }
 
     // these constants will eventually be driven by planetary or track data
@@ -110,6 +158,8 @@ public class StratConBiomeManifest {
 
     @XmlElement(name = "biomes")
     private List<StratConBiome> biomes = new ArrayList<>();
+    @XmlElement(name = "terrainType")
+    private List<StratConTerrainType> terrainTypes = new ArrayList<>();
     @XmlElement(name = "biomeMapTypes")
     private Map<String, MapTypeList> biomeMapTypes = new HashMap<>();
     @XmlElement(name = "biomeImages")
@@ -120,6 +170,26 @@ public class StratConBiomeManifest {
     // derived fields, populated at load time
     private final Map<String, TreeMap<Integer, StratConBiome>> biomeTempMap = new HashMap<>();
     private final Map<String, List<StratConBiome>> biomeCategoryMap = new HashMap<>();
+    private final Map<String, StratConTerrainType> terrainTypeMap = new HashMap<>();
+
+    /**
+     * @param terrainType a StratCon terrain type name (as returned by {@link StratConTrackState#getTerrainTile})
+     *
+     * @return the terrain's authored {@link StratConTerrainCategory}, or {@link StratConTerrainCategory#NEUTRAL} if the
+     *       terrain is unknown or records no category
+     */
+    public StratConTerrainCategory getTerrainCategory(String terrainType) {
+        if (terrainType == null) {
+            return StratConTerrainCategory.NEUTRAL;
+        }
+
+        StratConTerrainType definition = terrainTypeMap.get(terrainType);
+        if ((definition == null) || (definition.category == null)) {
+            return StratConTerrainCategory.NEUTRAL;
+        }
+
+        return definition.category;
+    }
 
     public TreeMap<Integer, StratConBiome> getTempMap(String category) {
         return biomeTempMap.get(category);
@@ -130,9 +200,16 @@ public class StratConBiomeManifest {
     }
 
     /**
-     * Get the file path for the hex image corresponding to the given terrain type
+     * Get the file path for the hex image corresponding to the given terrain type. Prefers an image declared on the
+     * terrain definition, falling back to the {@code biomeImages} lookup (which also covers non-terrain sprites such as
+     * fog of war and force markers).
      */
     public String getBiomeImage(String biomeType) {
+        StratConTerrainType definition = terrainTypeMap.get(biomeType);
+        if ((definition != null) && (definition.image != null)) {
+            return definition.image;
+        }
+
         if (biomeImages.containsKey(biomeType)) {
             return biomeImages.get(biomeType);
         }
@@ -201,6 +278,15 @@ public class StratConBiomeManifest {
 
         manifest.biomes.add(defaultBiome);
 
+        // Keep ocean detection working in this degraded fallback, since it gates scenario/facility placement and hex
+        // reveal. Other categories default to NEUTRAL, which only softens improved terrain generation.
+        for (String oceanTerrain : new String[] { "Sea", "ColdSea", "HotSea", "FrozenSea" }) {
+            StratConTerrainType ocean = new StratConTerrainType();
+            ocean.name = oceanTerrain;
+            ocean.category = StratConTerrainCategory.OCEAN;
+            manifest.terrainTypeMap.put(oceanTerrain, ocean);
+        }
+
         return manifest;
     }
 
@@ -240,6 +326,12 @@ public class StratConBiomeManifest {
             }
 
             resultingManifest.biomeCategoryMap.get(biome.biomeCategory).add(biome);
+        }
+
+        for (StratConTerrainType terrainType : resultingManifest.terrainTypes) {
+            if (terrainType.name != null) {
+                resultingManifest.terrainTypeMap.put(terrainType.name, terrainType);
+            }
         }
 
         return resultingManifest;
