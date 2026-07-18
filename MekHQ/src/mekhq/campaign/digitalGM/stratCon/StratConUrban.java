@@ -66,7 +66,7 @@ public class StratConUrban {
 
     /** The profile fallen back to when the YAML is missing, empty, or unreadable: indifferent to everything. */
     private static final UrbanProfile DEFAULT_PROFILE = new UrbanProfile(UrbanProfileType.DISPERSED,
-          null, null, null, null, null, null, null);
+          null, null, null, null, null, null, null, null, null);
 
     private static final double PICK_RESOLUTION = 1_000_000.0;
 

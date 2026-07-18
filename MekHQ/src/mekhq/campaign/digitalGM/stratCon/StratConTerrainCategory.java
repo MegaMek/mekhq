@@ -57,6 +57,8 @@ public enum StratConTerrainCategory {
     BARREN,
     /** Rolling hills. Used as the foothill/piedmont ring around mountains, and neutral in the base fill weighting. */
     HILLS,
+    /** Cultivated farmland. Placed as a catchment around cities over arable land, so it is excluded from the base fill. */
+    AGRICULTURE,
     /** Terrain with no vegetation/barren bias, and the default for anything uncategorized. */
     NEUTRAL
 }

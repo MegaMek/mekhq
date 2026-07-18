@@ -53,7 +53,7 @@ class StratConCityPlacerTest {
 
     private static UrbanProfile urban(double cityCountModifier, double clustering, double coastalBias) {
         return new UrbanProfile(UrbanProfileType.DISPERSED, null, null, null, null, cityCountModifier, clustering,
-              coastalBias);
+              coastalBias, null, null);
     }
 
     /** An all-land track. */

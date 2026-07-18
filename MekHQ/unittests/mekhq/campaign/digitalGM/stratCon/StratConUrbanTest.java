@@ -120,7 +120,7 @@ class StratConUrbanTest {
     @Test
     void indifferentProfile_hasNeutralWeightRegardlessOfPlanet() {
         UrbanProfile indifferent = new UrbanProfile(UrbanProfileType.DISPERSED, null, null, null, null, null, null,
-              null);
+              null, null, null);
 
         double dry = StratConUrban.weight(indifferent,
               planet(4, 5, -40, HPGRating.X),
@@ -142,7 +142,7 @@ class StratConUrbanTest {
     @Test
     void populationGaussian_peaksAtCenter() {
         UrbanProfile populationOnly = new UrbanProfile(UrbanProfileType.PRIMATE_CITY, 8.0, null, null, null, null, null,
-              null);
+              null, null, null);
 
         double atCenter = StratConUrban.weight(populationOnly,
               planet(8, 50, 15, HPGRating.C),
@@ -163,10 +163,13 @@ class StratConUrbanTest {
 
     @Test
     void placementDefaults_areNeutralWhenOmitted() {
-        UrbanProfile bare = new UrbanProfile(UrbanProfileType.DISPERSED, null, null, null, null, null, null, null);
+        UrbanProfile bare = new UrbanProfile(UrbanProfileType.DISPERSED, null, null, null, null, null, null, null, null,
+              null);
         assertEquals(1.0, bare.cityCountModifierOrDefault());
         assertEquals(0.0, bare.clusteringOrDefault());
         assertEquals(0.0, bare.coastalBiasOrDefault());
+        assertEquals(1, bare.farmReachOrDefault());
+        assertEquals(0.5, bare.farmDensityOrDefault());
     }
 
     @Test

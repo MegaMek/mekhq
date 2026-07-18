@@ -87,6 +87,8 @@ public final class StratConSectorGenerator {
         if (allowCities) {
             UrbanProfile urban = StratConUrban.getInstance().selectProfile(profile);
             StratConCityPlacer.placeCities(track, profile, urban);
+            // Farmland: a catchment of cultivated hexes radiating out from each city over arable land.
+            StratConFarmPlacer.placeFarms(track, profile, urban);
         }
 
         // Roads: connect the cities and branch each network off the map.

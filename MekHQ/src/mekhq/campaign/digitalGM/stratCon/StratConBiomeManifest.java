@@ -69,6 +69,9 @@ public class StratConBiomeManifest {
      */
     public static final String CITY = "City";
 
+    /** The terrain type name for cultivated farmland, placed as a catchment around cities over arable land. */
+    public static final String FARMLAND = "Farmland";
+
     /**
      * @param terrainType a StratCon terrain type name (as returned by {@link StratConTrackState#getTerrainTile})
      *
@@ -142,6 +145,25 @@ public class StratConBiomeManifest {
         return getInstance().getTerrainCategory(terrainType) == StratConTerrainCategory.HILLS;
     }
 
+    /**
+     * @param terrainType a StratCon terrain type name (as returned by {@link StratConTrackState#getTerrainTile})
+     *
+     * @return {@code true} if the given terrain type is cultivated farmland
+     */
+    public static boolean isAgricultureTerrain(String terrainType) {
+        return getInstance().getTerrainCategory(terrainType) == StratConTerrainCategory.AGRICULTURE;
+    }
+
+    /**
+     * @param terrainType a StratCon terrain type name (as returned by {@link StratConTrackState#getTerrainTile})
+     *
+     * @return {@code true} if the given terrain is arable, i.e. open land a city's agricultural catchment can convert
+     *       to farmland. Driven by the {@code arable} flag on the terrain definition in the biome manifest.
+     */
+    public static boolean isArableTerrain(String terrainType) {
+        return getInstance().isArable(terrainType);
+    }
+
     // these constants will eventually be driven by planetary or track data
     /**
      * The "Terran" default biome bucket, used as one of the possible arguments for calls to getTempMap()
@@ -204,6 +226,20 @@ public class StratConBiomeManifest {
         }
 
         return definition.category;
+    }
+
+    /**
+     * @param terrainType a StratCon terrain type name
+     *
+     * @return {@code true} if the terrain definition marks it arable; {@code false} for unknown terrain
+     */
+    public boolean isArable(String terrainType) {
+        if (terrainType == null) {
+            return false;
+        }
+
+        StratConTerrainType definition = terrainTypeMap.get(terrainType);
+        return (definition != null) && definition.arable;
     }
 
     public TreeMap<Integer, StratConBiome> getTempMap(String category) {

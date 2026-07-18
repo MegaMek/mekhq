@@ -50,13 +50,18 @@ import megamek.common.annotations.Nullable;
  * @param clustering         how tightly cities cluster, {@code 0.0} (spread apart) to {@code 1.0} (tight), or
  *                           {@code null} for spread
  * @param coastalBias        how strongly cities favor the coast, {@code 0.0} to {@code 1.0}, or {@code null} for none
+ * @param farmReach          how many hexes out from a city its farmland catchment extends, or {@code null} for a light
+ *                           default
+ * @param farmDensity        the base chance (0..1) that an arable hex within reach becomes farmland, or {@code null} for
+ *                           a light default
  *
  * @author Illiani
  * @since 0.51.01
  */
 public record UrbanProfile(UrbanProfileType type, @Nullable Double populationCenter, @Nullable Double waterCenter,
       @Nullable Double habitabilityCenter, @Nullable Double techCenter, @Nullable Double cityCountModifier,
-      @Nullable Double clustering, @Nullable Double coastalBias) {
+      @Nullable Double clustering, @Nullable Double coastalBias, @Nullable Integer farmReach,
+      @Nullable Double farmDensity) {
 
     public double cityCountModifierOrDefault() {
         return (cityCountModifier == null) ? 1.0 : cityCountModifier;
@@ -68,5 +73,13 @@ public record UrbanProfile(UrbanProfileType type, @Nullable Double populationCen
 
     public double coastalBiasOrDefault() {
         return (coastalBias == null) ? 0.0 : coastalBias;
+    }
+
+    public int farmReachOrDefault() {
+        return (farmReach == null) ? 1 : farmReach;
+    }
+
+    public double farmDensityOrDefault() {
+        return (farmDensity == null) ? 0.5 : farmDensity;
     }
 }

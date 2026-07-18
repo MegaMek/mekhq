@@ -55,4 +55,11 @@ public class StratConTerrainType {
 
     /** The terrain's broad category. Defaults to {@link StratConTerrainCategory#NEUTRAL} when unspecified. */
     public StratConTerrainCategory category;
+
+    /**
+     * Whether this terrain is arable, i.e. open land that a city's agricultural catchment can convert to farmland.
+     * Defaults to {@code false}, so only terrains explicitly marked in the manifest (open, temperate ground) can be
+     * farmed - never forest, swamp, desert, frozen ground, relief, ocean, or built-up hexes.
+     */
+    public boolean arable;
 }
