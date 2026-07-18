@@ -82,6 +82,10 @@ public class StratConTrackState {
     // city overlay: a city sits on top of the base terrain of its hex; rendered with the generic urban sprite
     private Set<StratConCoords> cities;
 
+    // road overlay: hexes carrying a road, plus the border hexes whose road branches off the map into a neighbor sector
+    private Set<StratConCoords> roads;
+    private Set<StratConCoords> roadExits;
+
     // don't serialize this
     private transient Map<Integer, StratConScenario> backingScenarioMap;
     private transient Map<StratConCoords, StratConStrategicObjective> specificStrategicObjectives;
@@ -104,6 +108,8 @@ public class StratConTrackState {
         strategicObjectives = new ArrayList<>();
         terrainTypes = new HashMap<>();
         cities = new HashSet<>();
+        roads = new HashSet<>();
+        roadExits = new HashSet<>();
     }
 
     public String getDisplayableName() {
@@ -629,12 +635,46 @@ public class StratConTrackState {
     }
 
     /**
-     * Clears all generated terrain, cities, and hex reveals so the sector can be regenerated from scratch. Scenarios,
-     * facilities, and assigned forces are left untouched.
+     * @param coords the hex to test
+     *
+     * @return {@code true} if a road runs through the given hex
+     */
+    public boolean isRoad(StratConCoords coords) {
+        return roads.contains(coords);
+    }
+
+    @XmlElementWrapper(name = "roads")
+    @XmlElement(name = "road")
+    public Set<StratConCoords> getRoads() {
+        return roads;
+    }
+
+    public void setRoads(Set<StratConCoords> roads) {
+        this.roads = roads;
+    }
+
+    /**
+     * @return the border hexes whose road branches off the map into a neighboring sector
+     */
+    @XmlElementWrapper(name = "roadExits")
+    @XmlElement(name = "roadExit")
+    public Set<StratConCoords> getRoadExits() {
+        return roadExits;
+    }
+
+    public void setRoadExits(Set<StratConCoords> roadExits) {
+        this.roadExits = roadExits;
+    }
+
+    /**
+     * Clears all generated terrain, cities, roads, and hex reveals so the sector can be regenerated from scratch.
+     * Scenarios, facilities, and assigned forces are left untouched.
      */
     public void clearForRegeneration() {
         terrainTypes.clear();
         cities.clear();
+        roads.clear();
+        roadExits.clear();
         revealedCoords.clear();
     }
 }
