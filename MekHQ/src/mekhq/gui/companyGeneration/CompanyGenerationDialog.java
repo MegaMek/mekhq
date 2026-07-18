@@ -37,24 +37,19 @@ import static mekhq.campaign.personnel.PersonUtility.reRollAdvantages;
 import static mekhq.campaign.personnel.PersonUtility.reRollLoyalty;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.gui.companyGeneration.components.CompanyGenerationUtilities.getCompanyGenerationResourceBundle;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import megamek.client.ratgenerator.ForceDescriptor;
-import megamek.client.ratgenerator.Ruleset;
 import megamek.client.ui.buttons.MMButton;
 import megamek.client.ui.enums.ValidationState;
 import megamek.common.annotations.Nullable;
@@ -71,7 +66,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
 import mekhq.campaign.universe.companyGeneration.ratgen.CompanyGenerator;
 import mekhq.campaign.universe.companyGeneration.ratgen.ForceDescriptorSnapshot;
@@ -299,17 +293,12 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
                 LOGGER.info("[CompanyGen][Worker] SwingWorker.doInBackground START (thread={})",
                       Thread.currentThread().getName());
 
-                // The ruleset check has to run here rather than alongside the other pre-generation
-                // warnings: findRuleset needs the rulesets parsed, and loading them blocks on
-                // RATGenerator initialization, which must not happen on the EDT. ensureLoaded is
-                // idempotent, so CompanyGenerator.generate calling it again costs nothing.
+                // Loading the rulesets blocks on RATGenerator initialization, which must not happen on
+                // the EDT; ensureLoaded is idempotent, so applyToCampaign touching it again costs
+                // nothing.
                 ForceDescriptorSnapshot snapshot = options.getForceDescriptorSnapshot();
                 int generationYear = snapshot.getYear();
                 RulesetEngineBootstrap.ensureLoaded(generationYear);
-                if (!confirmDefaultsOnlyRuleset(progressDialog, snapshot.getFaction(), generationYear)) {
-                    LOGGER.info("[CompanyGen][Worker] user cancelled at defaults-only ruleset warning");
-                    return null;
-                }
 
                 CompanyGenerator.Result result;
                 try {
@@ -416,73 +405,6 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
             return false;
         }
         return true;
-    }
-
-    /**
-     * Warns, and asks for confirmation, when the chosen faction has no Force Generator ruleset of its own
-     * and none of its parent factions supplies one either. In that case
-     * {@link Ruleset#findRuleset(String)} hands back an empty placeholder and the force is built from the
-     * generic Inner Sphere rules, which will not reflect the faction's doctrine.
-     *
-     * <p>Called from the generation worker thread, because {@code findRuleset} requires the rulesets to be
-     * parsed and parsing them blocks until {@code RATGenerator} has initialized. The confirmation itself is
-     * shown on the EDT.</p>
-     *
-     * <p>Fails open: if the prompt cannot be shown, generation proceeds, matching the behaviour before this
-     * warning existed.</p>
-     *
-     * @param parentDialog the progress dialog to parent the prompt to, so it is not hidden behind it
-     * @param factionCode  the ratgen faction key taken from the force descriptor snapshot
-     * @param year         the generation year, used to render the faction's period-correct name
-     *
-     * @return {@code true} to proceed with generation, {@code false} if the user cancelled
-     */
-    private boolean confirmDefaultsOnlyRuleset(GenerationProgressDialog parentDialog, String factionCode, int year) {
-        if (!Ruleset.findRuleset(factionCode).isDefaultsOnly()) {
-            return true;
-        }
-        LOGGER.info("[CompanyGen] no ruleset for faction {}; confirming generic Inner Sphere fallback",
-              factionCode);
-
-        String factionName = describeFaction(factionCode, year);
-        String message = getFormattedTextAt(getCompanyGenerationResourceBundle(),
-              "warningDefaultsOnlyRuleset.text", factionName)
-              + "\n\n"
-              + getTextAt(getCompanyGenerationResourceBundle(), "warningDefaultsOnlyRuleset.continue");
-        String title = getTextAt(getCompanyGenerationResourceBundle(), "warningDefaultsOnlyRuleset.title");
-
-        boolean[] confirmed = { true };
-        try {
-            SwingUtilities.invokeAndWait(() -> confirmed[0] = JOptionPane.showConfirmDialog(parentDialog,
-                  message,
-                  title,
-                  JOptionPane.OK_CANCEL_OPTION,
-                  JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION);
-        } catch (InterruptedException interruptedException) {
-            Thread.currentThread().interrupt();
-            LOGGER.warn("[CompanyGen] interrupted while confirming defaults-only ruleset; cancelling");
-            return false;
-        } catch (InvocationTargetException invocationTargetException) {
-            LOGGER.error(invocationTargetException,
-                  "[CompanyGen] could not show defaults-only ruleset warning; proceeding with generation");
-            return true;
-        }
-        return confirmed[0];
-    }
-
-    /**
-     * Renders a faction for display, falling back to the raw ratgen key when MekHQ does not know it.
-     * MegaMek's force generator and MekHQ maintain separate faction lists, so a ratgen key such as
-     * {@code IS} has no guaranteed MekHQ counterpart.
-     *
-     * @param factionCode the ratgen faction key
-     * @param year        the year whose period-correct faction name should be used
-     *
-     * @return the faction's full name, or {@code factionCode} when it is unknown to MekHQ
-     */
-    private static String describeFaction(String factionCode, int year) {
-        Faction faction = Factions.getInstance().getFaction(factionCode);
-        return (faction == null) ? factionCode : faction.getFullName(year);
     }
 
     /**
