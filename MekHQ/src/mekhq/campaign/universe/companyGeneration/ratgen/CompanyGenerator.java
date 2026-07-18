@@ -158,6 +158,22 @@ public final class CompanyGenerator {
         long startedAt = System.currentTimeMillis();
         LOGGER.info("[CompanyGen][Pipeline]==================================================");
         LOGGER.info("[CompanyGen][Pipeline]CompanyGenerator.generate() START");
+        ForceDescriptor rolled = rollForceDescriptor(campaign, options, listener);
+        Result result = applyToCampaign(campaign, options, rolled, listener);
+        LOGGER.info("[CompanyGen][Pipeline]CompanyGenerator.generate() DONE in {}ms",
+              System.currentTimeMillis() - startedAt);
+        LOGGER.info("[CompanyGen][Pipeline]==================================================");
+        return result;
+    }
+
+    /**
+     * Stages 0-3: anchor inputs, bootstrap the engine, build the root {@link ForceDescriptor} from the
+     * snapshot, and roll the force via {@link Ruleset#processRoot}. Returns the rolled descriptor
+     * <em>without touching the campaign</em>, so the Force Generator preview can show the TO&amp;E and
+     * composition before the player commits; {@link #applyToCampaign} then materializes it.
+     */
+    public static ForceDescriptor rollForceDescriptor(Campaign campaign, CompanyGenerationOptions options,
+          Ruleset.ProgressListener listener) {
         if (listener != null) {
             listener.updateProgress(0.0, "Preparing generation parameters...");
         }
@@ -255,7 +271,17 @@ public final class CompanyGenerator {
               fd.getFaction(), ruleset.getFaction());
         ruleset.processRoot(fd, listener);
         LOGGER.info("[CompanyGen][Pipeline]  Ruleset.processRoot() -> {}ms", System.currentTimeMillis() - t0);
+        return fd;
+    }
 
+    /**
+     * Stages 4-8: walk the rolled {@code descriptor}, materialize Units + crews into Formations, assign
+     * ranks, generate support personnel and vehicles, apply formation icons and personnel flags, and
+     * stock the spare-parts warehouse. Operates on a descriptor from {@link #rollForceDescriptor}, so
+     * the Force Generator preview commits the exact force the player saw.
+     */
+    public static Result applyToCampaign(Campaign campaign, CompanyGenerationOptions options,
+          ForceDescriptor fd, Ruleset.ProgressListener listener) {
         // 4-7. Walk the resulting tree; for each leaf, materialize a Unit, attach a crew, and place
         // the unit under the current Formation.
         LOGGER.info("[CompanyGen][Pipeline]Stage 4-7: walk tree, materialize Units + crews into Formations");
@@ -463,9 +489,7 @@ public final class CompanyGenerator {
         }
         stockSpareParts(campaign);
 
-        LOGGER.info("[CompanyGen][Pipeline]CompanyGenerator.generate() DONE in {}ms",
-              System.currentTimeMillis() - startedAt);
-        LOGGER.info("[CompanyGen][Pipeline]==================================================");
+        LOGGER.info("[CompanyGen][Pipeline]CompanyGenerator.applyToCampaign() DONE");
         return new Result(fd, generatedPersons);
     }
 

@@ -103,7 +103,7 @@ public class CompanyGenerationPane extends AbstractMHQTabbedPane {
     @Override
     protected void initialize() {
         setupTab = new SetupTab(campaign, options);
-        forceGeneratorTab = new ForceGeneratorTab(campaign, options);
+        forceGeneratorTab = new ForceGeneratorTab(getFrame(), campaign, options);
         sparesTab = new SparesTab(campaign, options);
         otherTab = new OtherTab(campaign, options);
 

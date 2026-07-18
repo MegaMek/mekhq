@@ -174,6 +174,9 @@ public class SetupTab {
     private MMComboBox<SkillLevel> cmbMedicSkillLevel;
 
     // Tech Assignment — three-slot sort grid + per-slot direction
+    private CompanyGenerationCheckBox chkGenerateMedicalReserve;
+    private JSpinner spnMedicalReservePercent;
+
     private CompanyGenerationCheckBox chkAssignTechsToUnits;
     private MMComboBox<TechAssignmentSortFactor> cmbTechAssignmentPrimary;
     private MMComboBox<TechAssignmentSortFactor> cmbTechAssignmentSecondary;
@@ -322,6 +325,7 @@ public class SetupTab {
         gbc.gridx = 1;
         section.add(comboForceNamingMethod, gbc);
 
+        addLeftAlignFiller(section, 2);
         return section;
     }
 
@@ -389,6 +393,7 @@ public class SetupTab {
             section.add(skillCombo, gbc);
         }
 
+        addLeftAlignFiller(section, 6);
         return section;
     }
 
@@ -471,6 +476,20 @@ public class SetupTab {
         gbc.gridx = 1;
         section.add(cmbMedicSkillLevel, gbc);
 
+        // Medical reserve: generation-only spare MekWarriors as injury replacements, sized by a
+        // percentage of the generated combatants. The spinner is live only when the box is checked.
+        chkGenerateMedicalReserve = new CompanyGenerationCheckBox("GenerateMedicalReserve");
+        spnMedicalReservePercent = new JSpinner(new SpinnerNumberModel(10, 0, 100, 5));
+        chkGenerateMedicalReserve.addActionListener(evt ->
+              spnMedicalReservePercent.setEnabled(chkGenerateMedicalReserve.isSelected()));
+        gbc.gridy = 6;
+        gbc.gridx = 0;
+        gbc.gridwidth = 1;
+        section.add(chkGenerateMedicalReserve, gbc);
+        gbc.gridx = 1;
+        section.add(spnMedicalReservePercent, gbc);
+
+        addLeftAlignFiller(section, 2);
         return section;
     }
 
@@ -540,6 +559,7 @@ public class SetupTab {
         addTechSortRow(section, gbc, 3, "TechAssignmentTertiary",
               cmbTechAssignmentTertiary, cmbTechAssignmentTertiaryDirection);
 
+        addLeftAlignFiller(section, 3);
         return section;
     }
 
@@ -614,6 +634,7 @@ public class SetupTab {
               chkAssignCompanyCommanderFlag,
               chkApplyOfficerStatBonusToWorstSkill);
 
+        addLeftAlignFiller(section, 1);
         return section;
     }
 
@@ -638,6 +659,7 @@ public class SetupTab {
               chkAssignMekWarriorsCallSigns,
               chkAssignFounderFlag);
 
+        addLeftAlignFiller(section, 1);
         return section;
     }
 
@@ -677,6 +699,21 @@ public class SetupTab {
             gbc.gridy = i;
             section.add(components[i], gbc);
         }
+    }
+
+    /**
+     * Adds an invisible filler in column {@code gridX} (to the right of the section's real content)
+     * that soaks up all spare horizontal width. Without a weighted column a GridBagLayout centers
+     * the whole grid, which is what left every section floating mid-panel with dead space on both
+     * sides; the filler keeps the real columns at their natural size and anchors them left.
+     */
+    private static void addLeftAlignFiller(JPanel section, int gridX) {
+        GridBagConstraints filler = new GridBagConstraints();
+        filler.gridx = gridX;
+        filler.gridy = 0;
+        filler.weightx = 1.0;
+        filler.fill = GridBagConstraints.HORIZONTAL;
+        section.add(Box.createHorizontalGlue(), filler);
     }
 
     /**
@@ -732,6 +769,10 @@ public class SetupTab {
               sourceOptions.getMedicSkillLevel() == null
                     ? SkillLevel.REGULAR : sourceOptions.getMedicSkillLevel());
         refreshMedicEnablement();
+
+        chkGenerateMedicalReserve.setSelected(sourceOptions.isGenerateMedicalReserve());
+        spnMedicalReservePercent.setValue(sourceOptions.getMedicalReservePercent());
+        spnMedicalReservePercent.setEnabled(chkGenerateMedicalReserve.isSelected());
 
         // Tech Assignment
         chkAssignTechsToUnits.setSelected(sourceOptions.isAssignTechsToUnits());
@@ -807,6 +848,8 @@ public class SetupTab {
         }
         targetOptions.setGenerateMedics(chkGenerateMedics.isSelected());
         targetOptions.setMedicsAsPersonnel(rdoMedicsAsPersonnel.isSelected());
+        targetOptions.setGenerateMedicalReserve(chkGenerateMedicalReserve.isSelected());
+        targetOptions.setMedicalReservePercent((Integer) spnMedicalReservePercent.getValue());
         if (cmbMedicSkillLevel.getSelectedItem() instanceof SkillLevel s) {
             targetOptions.setMedicSkillLevel(s);
         }

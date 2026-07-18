@@ -33,10 +33,14 @@
 package mekhq.gui.companyGeneration.contents;
 
 import java.awt.BorderLayout;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JSplitPane;
 
 import megamek.client.ratgenerator.ForceDescriptor;
 import megamek.client.ui.dialogs.randomArmy.ForceGeneratorOptionsView;
+import megamek.client.ui.dialogs.randomArmy.ForceGeneratorViewUi;
+import megamek.client.ui.util.UIUtil;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Faction;
@@ -61,34 +65,35 @@ public class ForceGeneratorTab {
 
     private static final MMLogger LOGGER = MMLogger.create(ForceGeneratorTab.class);
 
+    private final JFrame frame;
     private final Campaign campaign;
     private CompanyGenerationOptions options;
-    private ForceGeneratorOptionsView optionsView;
+    private ForceGeneratorViewUi viewUi;
 
-    public ForceGeneratorTab(Campaign campaign, CompanyGenerationOptions options) {
+    public ForceGeneratorTab(JFrame frame, Campaign campaign, CompanyGenerationOptions options) {
+        this.frame = frame;
         this.campaign = campaign;
         this.options = options;
     }
 
     public JPanel createTab() {
-        // Constructed lazily here so we only pay the RATGenerator / Ruleset / MekSummaryCache
-        // initialization cost when the dialog is actually shown. The on-generate Consumer is a
-        // no-op because we hide the view's own Generate button and route generation through the
-        // dialog's OK action.
-        optionsView = new ForceGeneratorOptionsView(fd -> {},
-              campaign == null ? null : campaign.getGameOptions());
-        optionsView.setGenerateButtonVisible(false);
+        // Embed MegaMek's full force-generator view: the options panel (left) plus the TO&E tree
+        // (right). The view's own Generate button rolls a preview and fills the TO&E tree and the
+        // Composition Summary; the dialog's Accept button then commits the rolled ForceDescriptor.
+        // Constructed lazily so we only pay the RATGenerator / Ruleset / MekSummaryCache init cost
+        // when the dialog is actually shown.
+        viewUi = new ForceGeneratorViewUi(frame, campaign == null ? null : campaign.getGameOptions());
+
+        ForceGeneratorOptionsView optionsView = viewUi.getOptionsView();
         optionsView.setExportMULButtonVisible(false);
-        optionsView.setClearButtonVisible(false);
         optionsView.setYearFieldEditable(false);
         if (campaign != null) {
             optionsView.setCurrentYear(campaign.getGameYear());
-            // Seed the embedded panel's faction picker from the campaign so the Force Generator
-            // opens pre-aligned to the user's New Campaign choice instead of the megamek view's
-            // built-in "IS" default. Must run AFTER setCurrentYear (which calls yearUpdated ->
-            // refreshFactions and would otherwise reset our selection). The user can still change
-            // the picker mid-dialog; on OK, writeValuesToOptions reads it back as an override on
-            // CompanyGenerationOptions.specifiedFaction so the rank-authority faction follows.
+            // Seed the faction picker from the campaign so the Force Generator opens pre-aligned to
+            // the user's New Campaign choice instead of the megamek view's built-in "IS" default.
+            // Must run AFTER setCurrentYear (which calls yearUpdated -> refreshFactions and would
+            // otherwise reset our selection). On Accept, writeValuesToOptions reads the picker back
+            // as an override on CompanyGenerationOptions.specifiedFaction so ranks follow.
             Faction campaignFaction = campaign.getFaction();
             if (campaignFaction != null) {
                 String code = campaignFaction.getShortName();
@@ -98,10 +103,23 @@ public class ForceGeneratorTab {
             }
         }
 
+        JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+              viewUi.getLeftPanel(), viewUi.getRightPanel());
+        split.setResizeWeight(0.55);
+        split.setDividerLocation(UIUtil.scaleForGUI(760));
+
         JPanel host = new JPanel(new BorderLayout());
         host.setName("pnlForceGeneratorTab");
-        host.add(optionsView, BorderLayout.CENTER);
+        host.add(split, BorderLayout.CENTER);
         return host;
+    }
+
+    /**
+     * The force rolled by the view's most recent Generate, or {@code null} if the player hasn't
+     * previewed yet. The dialog's Accept button commits exactly this descriptor.
+     */
+    public ForceDescriptor getGeneratedForce() {
+        return viewUi == null ? null : viewUi.getGeneratedForce();
     }
 
     /**
@@ -109,7 +127,7 @@ public class ForceGeneratorTab {
      * hasn't run yet. The Company Generation dialog calls this on OK to read the user's selections.
      */
     public ForceGeneratorOptionsView getOptionsView() {
-        return optionsView;
+        return viewUi == null ? null : viewUi.getOptionsView();
     }
 
     /**
@@ -117,6 +135,7 @@ public class ForceGeneratorTab {
      * {@code getOptionsView().buildForceDescriptor()} with a null-guard.
      */
     public ForceDescriptor buildForceDescriptor() {
+        ForceGeneratorOptionsView optionsView = getOptionsView();
         return optionsView == null ? null : optionsView.buildForceDescriptor();
     }
 
@@ -135,6 +154,7 @@ public class ForceGeneratorTab {
      * OK as an alternative to going through {@link #getOptionsView()} directly.
      */
     public void writeValuesToOptions(CompanyGenerationOptions targetOptions) {
+        ForceGeneratorOptionsView optionsView = getOptionsView();
         if (targetOptions == null || optionsView == null) {
             return;
         }

@@ -165,14 +165,16 @@ public final class SupportPersonnelToTOE {
               maintenance.size() + medical.size() + command.size(),
               maintenance.size(), medical.size(), command.size(), useClanStructure);
 
+        // Roll-up formations are named for what the section does (IS "... Company", Clan "... Star").
+        // Command's roll-up is the Headquarters Company; the admin carriers under it stay named by
+        // role (Admin/Command, Admin/Logistical, Admin/Transport, Admin/HR).
+        String echelon = profile.rollupLabel();
         organizeSection(campaign, supportCommand, label("maintenance"), maintenance, profile,
-              useClanStructure, maintenanceVehicles, false);
+              useClanStructure, maintenanceVehicles, label("maintenance") + " " + echelon);
         organizeSection(campaign, supportCommand, label("medical"), medical, profile,
-              useClanStructure, medicalVehicles, false);
-        // Command pools its four administrator roles into shared squads (overflow to a platoon at full
-        // strength) rather than one tiny carrier per role.
+              useClanStructure, medicalVehicles, label("medical") + " " + echelon);
         organizeSection(campaign, supportCommand, label("command"), command, profile,
-              useClanStructure, List.of(), true);
+              useClanStructure, List.of(), label("headquarters") + " " + echelon);
 
         LOGGER.info("[CompanyGen][SupportTOE] organized support staff: maintenance={} medical={} command={} (clan={})",
               maintenance.size(), medical.size(), command.size(), useClanStructure);
@@ -200,7 +202,7 @@ public final class SupportPersonnelToTOE {
      */
     private static void organizeSection(Campaign campaign, Formation supportCommand, String sectionLabel,
           List<Person> people, EchelonProfile profile, boolean useClanStructure, List<VehicleSpec> vehicles,
-          boolean poolProfessions) {
+          String companyLabel) {
         if (people.isEmpty()) {
             return;
         }
@@ -217,11 +219,8 @@ public final class SupportPersonnelToTOE {
         }
         List<Person> remaining = pool.subList(consumed, pool.size());
 
-        // Pooled sections (Command) mix their roles into shared carriers with a squad-overflow rule;
-        // everyone else packs one profession per carrier.
-        List<CarrierSpec> packed = poolProfessions
-              ? packPool(remaining, profile, sectionLabel)
-              : packByProfession(remaining, profile, useClanStructure);
+        // Every section packs one profession per carrier, so carriers group and are named by role.
+        List<CarrierSpec> packed = packByProfession(remaining, profile, useClanStructure);
 
         List<CarrierSpec> topTierCarriers = new ArrayList<>();
         List<CarrierSpec> detachmentCarriers = new ArrayList<>();
@@ -229,11 +228,14 @@ public final class SupportPersonnelToTOE {
             (spec.topTier() ? topTierCarriers : detachmentCarriers).add(spec);
         }
 
-        // Top-tier carriers (platoons / Points) roll up into company / Star formations.
+        // Top-tier carriers (platoons / Points) roll up into a function-named company / Star formation
+        // (e.g. "Headquarters Company", "Maintenance Company"), numbered only when there is more than
+        // one.
         int placed = 0;
         int rollupFormations = ceilDiv(topTierCarriers.size(), profile.topUnitsPerRollup());
         for (int rollupIndex = 0; rollupIndex < rollupFormations; rollupIndex++) {
-            Formation rollup = createFormation(campaign, profile.rollupLabel() + " " + (rollupIndex + 1),
+            String rollupName = rollupFormations > 1 ? companyLabel + " " + (rollupIndex + 1) : companyLabel;
+            Formation rollup = createFormation(campaign, rollupName,
                   FormationType.SUPPORT, section, profile.rollupLevel());
             int inThisRollup = Math.min(profile.topUnitsPerRollup(), topTierCarriers.size() - placed);
             for (int unitIndex = 0; unitIndex < inThisRollup; unitIndex++) {

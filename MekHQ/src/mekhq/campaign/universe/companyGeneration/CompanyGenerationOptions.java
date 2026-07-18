@@ -111,6 +111,11 @@ public class CompanyGenerationOptions {
     private boolean generateMedics;
     private boolean medicsAsPersonnel;
     private SkillLevel medicSkillLevel;
+    // Medical reserve (generation-only): optionally create spare unassigned MekWarriors as injury
+    // replacements, sized as a percentage of the generated combatants. Independent of the
+    // campaign-wide Alternative Advanced Medical rule.
+    private boolean generateMedicalReserve;
+    private int medicalReservePercent;
     // Tech-to-unit assignment sort grid (ratgen pipeline, RULESET_BASED method). Three sort slots
     // each holding a {@link TechAssignmentSortFactor}; the assigner chains them in slot order
     // (primary → secondary → tertiary). Each slot has its own ascending / descending direction.
@@ -273,6 +278,8 @@ public class CompanyGenerationOptions {
         setAstechsAsPersonnel(false);
         setAstechSkillLevel(SkillLevel.REGULAR);
         setGenerateMedics(true);
+        setGenerateMedicalReserve(false);
+        setMedicalReservePercent(10);
         setMedicsAsPersonnel(false);
         setMedicSkillLevel(SkillLevel.REGULAR);
 
@@ -521,6 +528,22 @@ public class CompanyGenerationOptions {
 
     public void setGenerateMedics(final boolean generateMedics) {
         this.generateMedics = generateMedics;
+    }
+
+    public boolean isGenerateMedicalReserve() {
+        return generateMedicalReserve;
+    }
+
+    public void setGenerateMedicalReserve(final boolean generateMedicalReserve) {
+        this.generateMedicalReserve = generateMedicalReserve;
+    }
+
+    public int getMedicalReservePercent() {
+        return medicalReservePercent;
+    }
+
+    public void setMedicalReservePercent(final int medicalReservePercent) {
+        this.medicalReservePercent = medicalReservePercent;
     }
 
     public boolean isMedicsAsPersonnel() {
@@ -1145,6 +1168,8 @@ public class CompanyGenerationOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "astechsAsPersonnel", isAstechsAsPersonnel());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "astechSkillLevel", getAstechSkillLevel().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "generateMedics", isGenerateMedics());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "generateMedicalReserve", isGenerateMedicalReserve());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "medicalReservePercent", getMedicalReservePercent());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "medicsAsPersonnel", isMedicsAsPersonnel());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "medicSkillLevel", getMedicSkillLevel().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techAssignmentPrimarySort",
@@ -1411,6 +1436,12 @@ public class CompanyGenerationOptions {
                         break;
                     case "generateMedics":
                         options.setGenerateMedics(Boolean.parseBoolean(wn.getTextContent().trim()));
+                        break;
+                    case "generateMedicalReserve":
+                        options.setGenerateMedicalReserve(Boolean.parseBoolean(wn.getTextContent().trim()));
+                        break;
+                    case "medicalReservePercent":
+                        options.setMedicalReservePercent(Integer.parseInt(wn.getTextContent().trim()));
                         break;
                     case "medicsAsPersonnel":
                         options.setMedicsAsPersonnel(Boolean.parseBoolean(wn.getTextContent().trim()));

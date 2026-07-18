@@ -53,6 +53,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
+import megamek.client.ratgenerator.ForceDescriptor;
 import megamek.client.ratgenerator.Ruleset;
 import megamek.client.ui.buttons.MMButton;
 import megamek.client.ui.enums.ValidationState;
@@ -167,10 +168,10 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
         JPanel rightButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 4, 0));
         rightButtons.add(new MMButton("btnCancel", resources, "Cancel.text",
               "Cancel.toolTipText", this::cancelActionPerformed));
-        rightButtons.add(new MMButton("btnApply", resources, "Apply.text",
-              "CompanyGenerationDialog.btnApply.toolTipText", this::confirmationActionListener));
-        setOkButton(new MMButton("btnGenerate", resources, "Generate.text",
-              "CompanyGenerationDialog.btnGenerate.toolTipText", this::confirmationActionListener));
+        // Preview lives on the Force Generator tab's own Generate button; the dialog commits the
+        // previewed force with Accept.
+        setOkButton(new MMButton("btnAccept", resources, "Accept.text",
+              "CompanyGenerationDialog.btnAccept.toolTipText", this::confirmationActionListener));
         rightButtons.add(getOkButton());
         panel.add(rightButtons, BorderLayout.EAST);
 
@@ -253,6 +254,18 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
         pane.getSparesTab().writeValuesToOptions(options);
         pane.getOtherTab().writeValuesToOptions(options);
 
+        // Accept commits the exact force the player previewed on the Force Generator tab (its Generate
+        // button rolls the ForceDescriptor and fills the TO&E tree + Composition Summary). Require a
+        // preview first so Accept never silently rolls something the player never saw.
+        ForceDescriptor previewedForce = pane.getForceGeneratorTab().getGeneratedForce();
+        if (previewedForce == null) {
+            JOptionPane.showMessageDialog(getFrame(),
+                  resources.getString("CompanyGenerationDialog.noPreview.text"),
+                  resources.getString("CompanyGenerationDialog.title"),
+                  JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
         // Pre-generation warning. Collects every reason we should give the user one last chance to
         // cancel — long generation (Brigade+ takes minutes), high Person counts (Regiment+ with
         // astech/medic Person mode creates hundreds of named Persons) — and shows a single dialog
@@ -300,7 +313,8 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
 
                 CompanyGenerator.Result result;
                 try {
-                    result = CompanyGenerator.generate(getCampaign(), options, progressDialog.asListener());
+                    result = CompanyGenerator.applyToCampaign(getCampaign(), options, previewedForce,
+                          progressDialog.asListener());
                 } catch (Throwable t) {
                     LOGGER.error(t, "[CompanyGen][Worker] SwingWorker.doInBackground threw");
                     throw t;
@@ -521,7 +535,10 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
     private void processBonusUnitsBasedOnCampaignOptions(List<Person> generatedPersons,
           CompanyGenerationOptions options) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        if (campaignOptions.isUseAlternativeAdvancedMedical()) {
+        // Medical reserve: a generation-only option (independent of the campaign-wide Alternative
+        // Advanced Medical rule). Creates spare unassigned MekWarriors as injury replacements, sized
+        // as a percentage of the generated combatants.
+        if (options.isGenerateMedicalReserve()) {
             int combatants = 0;
             for (Person person : generatedPersons) {
                 if (person.isCombat()) {
@@ -529,11 +546,12 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
                 }
             }
 
-            if (combatants > 0) {
+            int spares = (int) Math.ceil(combatants * options.getMedicalReservePercent() / 100.0);
+            if (spares > 0) {
                 new ImmersiveDialogNotification(campaign,
                       resources.getString("CompanyGenerationDialog.campaignOptions.altAdvancedMedical"),
                       true);
-                for (int i = 0; i < combatants; i++) {
+                for (int i = 0; i < spares; i++) {
                     generateSparePersonnel(options);
                 }
             }
