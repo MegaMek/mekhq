@@ -457,10 +457,10 @@ public final class CompanyGenerator {
             SupportUnitGenerator.generateLogisticsUnits(campaign, supportFaction, true);
         }
         if (campaignOptions.isUseFatigue()) {
-            SupportUnitGenerator.generateCommissaryUnit(campaign, supportFaction, true);
+            SupportUnitGenerator.generateCommissaryUnits(campaign, supportFaction, true);
         }
         if (!campaignOptions.getPrisonerCaptureStyle().isNone()) {
-            SupportUnitGenerator.generateSecurityUnit(campaign, supportFaction, true);
+            SupportUnitGenerator.generateSecurityUnits(campaign, supportFaction, true);
         }
 
         // Re-decorate the formation tree so the support formations created in this stage (they did

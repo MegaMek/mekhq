@@ -187,6 +187,6 @@ public class FatigueTrackingCampaignOptionsChangedConfirmationDialog extends JDi
     }
 
     public static void processFreeUnit(Campaign campaign, Faction faction, boolean isAutomaticallyAssignRanks) {
-        SupportUnitGenerator.generateCommissaryUnit(campaign, faction, isAutomaticallyAssignRanks);
+        SupportUnitGenerator.generateCommissaryUnits(campaign, faction, isAutomaticallyAssignRanks);
     }
 }

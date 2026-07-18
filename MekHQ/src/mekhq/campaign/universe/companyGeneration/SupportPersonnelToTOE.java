@@ -158,7 +158,7 @@ public final class SupportPersonnelToTOE {
               ? List.of(new VehicleSpec(SupportUnitGenerator.SALVAGE_UNIT, SupportUnitGenerator.scaledCount(campaign)))
               : List.of();
         List<VehicleSpec> medicalVehicles = campaignOptions.isUseMASHTheatres()
-              ? List.of(new VehicleSpec(SupportUnitGenerator.MEDICAL_UNIT, 1))
+              ? List.of(new VehicleSpec(SupportUnitGenerator.MEDICAL_UNIT, SupportUnitGenerator.medicalUnitCount(campaign)))
               : List.of();
 
         LOGGER.info("[CompanyGen][SupportTOE] === Support Command: {} staff (maintenance={} medical={} command={}, clan={}) ===",

@@ -187,6 +187,6 @@ public class PrisonerTrackingCampaignOptionsChangedConfirmationDialog extends JD
     }
 
     public static void processFreeUnit(Campaign campaign, Faction faction, boolean automaticallyAssignRanks) {
-        SupportUnitGenerator.generateSecurityUnit(campaign, faction, automaticallyAssignRanks);
+        SupportUnitGenerator.generateSecurityUnits(campaign, faction, automaticallyAssignRanks);
     }
 }

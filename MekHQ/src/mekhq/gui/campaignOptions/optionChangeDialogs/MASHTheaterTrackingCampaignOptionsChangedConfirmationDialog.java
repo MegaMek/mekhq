@@ -187,6 +187,6 @@ public class MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog extends
     }
 
     public static void processFreeUnit(Campaign campaign, Faction faction, boolean isAutomaticallyAssignRanks) {
-        SupportUnitGenerator.generateMedicalUnit(campaign, faction, isAutomaticallyAssignRanks);
+        SupportUnitGenerator.generateMedicalUnits(campaign, faction, isAutomaticallyAssignRanks);
     }
 }
