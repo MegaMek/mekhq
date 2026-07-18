@@ -40,7 +40,10 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
@@ -59,6 +62,8 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.PlanetarySystem;
 
 /**
  * This class handles StratCon state initialization when a contract is signed.
@@ -248,6 +253,15 @@ public class StratConContractInitializer {
             }
         }
 
+        // Now that facilities exist, fold the planet-owner's facilities into each sector's road network. Roads only
+        // exist under the improved terrain generator, and facilities are only placed outside mapless mode.
+        if (!isUseMaplessMode && campaignOptions.isUseStratConAlternateSectorTerrain()) {
+            LocalDate date = campaign.getLocalDate();
+            for (StratConTrackState track : campaignState.getTracks()) {
+                StratConRoadPlacer.recalculateRoads(track, planetOwnedFacilityCoords(track, contract, date));
+            }
+        }
+
         // Determine starting morale
         if (contract.getContractType().isGarrisonDuty() || contract.getContractType().isRetainer()) {
             contract.setMoraleLevel(AtBMoraleLevel.ROUTED);
@@ -365,7 +379,8 @@ public class StratConContractInitializer {
      * Regenerates a single track's terrain in place, as used by the GM "Regenerate Sector" tool. Clears the existing
      * terrain, cities, and fog, then re-runs terrain generation - the improved geography-aware generator when the
      * alternate-terrain option is set, otherwise the legacy placer. The track's dimensions and temperature are kept, a
-     * fresh latitude band is rolled, and scenarios, facilities, and assigned forces are left untouched.
+     * fresh latitude band is rolled, and assigned forces are left untouched. Scenarios and facilities are preserved, but
+     * any that the new coastline leaves on an ocean hex are relocated back onto land.
      *
      * @param track    the track to regenerate
      * @param contract the contract the track belongs to (source of the planet profile and Ares-Conventions status)
@@ -385,6 +400,105 @@ public class StratConContractInitializer {
             StratConSectorGenerator.generate(track, planetProfile, LatitudeBand.random(), allowCities);
         } else {
             StratConTerrainPlacer.InitializeTrackTerrain(track);
+        }
+
+        // A regenerated coastline can leave existing facilities and scenarios sitting on new ocean hexes; move them
+        // back onto land.
+        relocateOccupantsOffOcean(track);
+
+        // Roads only exist under the improved generator; fold the planet-owner's facilities into the new network.
+        if (campaignOptions.isUseStratConAlternateSectorTerrain()) {
+            StratConRoadPlacer.recalculateRoads(track,
+                  planetOwnedFacilityCoords(track, contract, campaign.getLocalDate()));
+        }
+    }
+
+    /**
+     * Returns the hexes of facilities whose owning side controls the contract's planet. Allied (and player) facilities
+     * count when the employer holds the planet; opposing facilities count when the enemy holds it. On a contested world
+     * both sides can qualify; on a world held by neither contract party, none do.
+     *
+     * @param track    the track whose facilities to examine
+     * @param contract the contract (source of the planet and the employer/enemy factions)
+     * @param date     the date at which to evaluate planetary ownership
+     *
+     * @return the coordinates of the qualifying facilities (possibly empty)
+     */
+    private static Set<StratConCoords> planetOwnedFacilityCoords(StratConTrackState track, AtBContract contract,
+          LocalDate date) {
+        Set<StratConCoords> result = new HashSet<>();
+
+        PlanetarySystem system = contract.getSystem();
+        if (system == null) {
+            return result;
+        }
+
+        Set<Faction> owners = system.getFactionSet(date);
+        boolean employerOwns = owners.contains(contract.getEmployerFaction());
+        boolean enemyOwns = owners.contains(contract.getEnemy());
+
+        if (!employerOwns && !enemyOwns) {
+            return result;
+        }
+
+        for (Map.Entry<StratConCoords, StratConFacility> entry : track.getFacilities().entrySet()) {
+            ForceAlignment owner = entry.getValue().getOwner();
+            boolean planetOwned = (enemyOwns && (owner == ForceAlignment.Opposing)) ||
+                                        (employerOwns &&
+                                               ((owner == ForceAlignment.Allied) || (owner == ForceAlignment.Player)));
+            if (planetOwned) {
+                result.add(entry.getKey());
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Moves any facility or scenario that a regeneration left sitting on an ocean hex to a fresh, non-ocean unoccupied
+     * hex, carrying any strategic-objective marker along with it. Occupants are left in place if the sector has no free
+     * land to receive them.
+     *
+     * @param track the freshly regenerated track to clean up
+     */
+    private static void relocateOccupantsOffOcean(StratConTrackState track) {
+        List<StratConCoords> floodedFacilities = new ArrayList<>();
+        for (StratConCoords coords : track.getFacilities().keySet()) {
+            if (StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(coords))) {
+                floodedFacilities.add(coords);
+            }
+        }
+
+        for (StratConCoords source : floodedFacilities) {
+            StratConCoords destination = getUnoccupiedCoords(track);
+            if (destination == null) {
+                break;
+            }
+
+            StratConFacility facility = track.getFacility(source);
+            track.removeFacility(source);
+            track.addFacility(destination, facility);
+            track.moveObjective(source, destination);
+        }
+
+        List<StratConCoords> floodedScenarios = new ArrayList<>();
+        for (StratConCoords coords : track.getScenarios().keySet()) {
+            if (StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(coords))) {
+                floodedScenarios.add(coords);
+            }
+        }
+
+        for (StratConCoords source : floodedScenarios) {
+            StratConCoords destination = getUnoccupiedCoords(track);
+            if (destination == null) {
+                break;
+            }
+
+            StratConScenario scenario = track.getScenario(source);
+            track.getScenarios().remove(source);
+            scenario.setCoords(destination);
+            track.getScenarios().put(destination, scenario);
+            track.moveObjective(source, destination);
         }
     }
 

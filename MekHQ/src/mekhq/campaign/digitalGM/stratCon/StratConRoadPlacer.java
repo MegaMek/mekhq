@@ -32,24 +32,18 @@
  */
 package mekhq.campaign.digitalGM.stratCon;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Builds the road network for a StratCon track: connects the sector's cities with roads and branches each network off
  * the map toward its neighbors.
  *
- * <p>Cities on the same landmass are connected by a minimum spanning tree over shortest land paths (Prim's). Paths are
- * found with Dijkstra where ocean is impassable and mountains are passable but expensive, so roads route around relief
- * when a cheaper way exists. Cities separated by water form independent networks. Every network that can reach the
- * sector edge by land also gets a branch to the nearest border hex, implying the road continues into the neighboring
- * sector; networks boxed in by water stay internal.</p>
+ * <p>Cities are connected by a minimum spanning tree over shortest paths (Prim's). Paths are found with Dijkstra where
+ * mountains are passable but expensive, so roads route around relief when a cheaper way exists. A road may bridge a
+ * single hex of ocean at a high cost, but never two in a row, so cities across a narrow strait can be joined while wide
+ * water still separates networks. Every network that can reach the sector edge also gets a branch to the nearest border
+ * land hex, implying the road continues into the neighboring sector; networks boxed in by wide water stay
+ * internal.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -61,6 +55,12 @@ public final class StratConRoadPlacer {
     private static final int NORMAL_COST = 1;
     /** Movement cost to enter a mountainous or volcanic hex - passable, but roads avoid it when they can. */
     private static final int RELIEF_COST = 5;
+    /**
+     * Movement cost to bridge a single ocean hex - expensive, so roads only span water to reach land they can't
+     * otherwise get to, or when the land detour would be very long. Two ocean hexes can never be crossed in a row, so a
+     * bridge is always exactly one hex.
+     */
+    private static final int BRIDGE_COST = 12;
 
     /** The result of a Dijkstra sweep: least cost to each hex, and the hex each was reached from. */
     private record Pathing(Map<StratConCoords, Integer> distance, Map<StratConCoords, StratConCoords> previous) {}
@@ -74,6 +74,18 @@ public final class StratConRoadPlacer {
      * @param track the track whose roads to (re)compute
      */
     public static void recalculateRoads(StratConTrackState track) {
+        recalculateRoads(track, Collections.emptyList());
+    }
+
+    /**
+     * Clears and rebuilds the track's road network from its current cities plus the given extra endpoints, connecting
+     * them all into one network. The extra endpoints are typically the hexes of facilities belonging to the faction
+     * that owns the planet, so those bases read as sitting on the road grid alongside the cities.
+     *
+     * @param track          the track whose roads to (re)compute
+     * @param extraEndpoints additional hexes to fold into the network (impassable ones are ignored)
+     */
+    public static void recalculateRoads(StratConTrackState track, Collection<StratConCoords> extraEndpoints) {
         Set<StratConCoords> roads = new HashSet<>();
         Set<StratConCoords> roadExits = new HashSet<>();
 
@@ -81,6 +93,11 @@ public final class StratConRoadPlacer {
         for (StratConCoords city : track.getCities()) {
             if (!isImpassable(track, city)) {
                 unconnected.add(city);
+            }
+        }
+        for (StratConCoords endpoint : extraEndpoints) {
+            if (!isImpassable(track, endpoint)) {
+                unconnected.add(endpoint);
             }
         }
 
@@ -170,8 +187,12 @@ public final class StratConRoadPlacer {
                 continue;
             }
 
+            boolean currentIsOcean = isImpassable(track, node.coords());
+
             for (StratConCoords neighbor : StratConHexGeometry.neighbors(track, node.coords())) {
-                if (isImpassable(track, neighbor)) {
+                // Roads may bridge a single ocean hex, but never two in a row, so an ocean neighbor is only reachable
+                // from land.
+                if (isImpassable(track, neighbor) && currentIsOcean) {
                     continue;
                 }
 
@@ -225,6 +246,9 @@ public final class StratConRoadPlacer {
 
     private static int terrainCost(StratConTrackState track, StratConCoords coords) {
         String terrain = track.getTerrainTile(coords);
+        if (StratConBiomeManifest.isOceanTerrain(terrain)) {
+            return BRIDGE_COST;
+        }
         boolean relief = StratConBiomeManifest.isMountainTerrain(terrain) ||
                                StratConBiomeManifest.isVolcanicTerrain(terrain);
         return relief ? RELIEF_COST : NORMAL_COST;

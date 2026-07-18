@@ -447,7 +447,6 @@ public class StratConTrackState {
      *
      * @return True if the operation succeeded, false if it failed
      */
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean moveObjective(StratConCoords source, StratConCoords destination) {
         // safety: don't move it if it's not there; logic prevents two objectives in the same coords
         if (getObjectivesByCoords().containsKey(source) &&

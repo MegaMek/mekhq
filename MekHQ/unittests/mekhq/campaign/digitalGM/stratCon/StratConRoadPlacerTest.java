@@ -43,8 +43,8 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests for {@link StratConRoadPlacer}: connecting cities, avoiding ocean and (where cheaper) mountains, keeping
- * landmasses independent, and branching off the map.
+ * Tests for {@link StratConRoadPlacer}: connecting cities, bridging a single ocean hex (but never two in a row),
+ * avoiding mountains where cheaper, keeping widely-separated landmasses independent, and branching off the map.
  */
 class StratConRoadPlacerTest {
 
@@ -106,26 +106,9 @@ class StratConRoadPlacerTest {
     }
 
     @Test
-    void roadsNeverCrossOcean() {
+    void roadsBridgeASingleOceanHexButNeverTwoInARow() {
         StratConTrackState track = landTrack(9, 5);
-        // an ocean strait down the middle splits the map
-        for (int y = 0; y < 5; y++) {
-            track.setTerrainTile(new StratConCoords(4, y), "Sea");
-        }
-        track.addCity(new StratConCoords(1, 2));
-        track.addCity(new StratConCoords(7, 2));
-
-        StratConRoadPlacer.recalculateRoads(track);
-
-        for (StratConCoords road : track.getRoads()) {
-            assertFalse(StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(road)),
-                  "a road crossed ocean at " + road);
-        }
-    }
-
-    @Test
-    void citiesOnSeparateLandmassesFormSeparateNetworks() {
-        StratConTrackState track = landTrack(9, 5);
+        // a one-hex-wide ocean strait down the middle - bridgeable
         for (int y = 0; y < 5; y++) {
             track.setTerrainTile(new StratConCoords(4, y), "Sea");
         }
@@ -136,7 +119,39 @@ class StratConRoadPlacerTest {
 
         StratConRoadPlacer.recalculateRoads(track);
 
-        assertFalse(roadComponent(track, west).contains(east), "cities across an ocean should not be road-connected");
+        // the strait is only one hex wide, so a bridge joins the two shores into one network
+        assertTrue(roadComponent(track, west).contains(east), "cities across a one-hex strait should be bridged");
+
+        // ...but a bridge is never more than a single hex: no two adjacent road hexes are both ocean
+        for (StratConCoords road : track.getRoads()) {
+            if (!StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(road))) {
+                continue;
+            }
+            for (StratConCoords neighbor : StratConHexGeometry.neighbors(track, road)) {
+                if (track.getRoads().contains(neighbor)) {
+                    assertFalse(StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(neighbor)),
+                          "road bridged two ocean hexes in a row at " + road + " and " + neighbor);
+                }
+            }
+        }
+    }
+
+    @Test
+    void citiesAcrossWideWaterFormSeparateNetworks() {
+        StratConTrackState track = landTrack(10, 5);
+        // a two-hex-wide ocean strait cannot be bridged
+        for (int y = 0; y < 5; y++) {
+            track.setTerrainTile(new StratConCoords(4, y), "Sea");
+            track.setTerrainTile(new StratConCoords(5, y), "Sea");
+        }
+        StratConCoords west = new StratConCoords(1, 2);
+        StratConCoords east = new StratConCoords(8, 2);
+        track.addCity(west);
+        track.addCity(east);
+
+        StratConRoadPlacer.recalculateRoads(track);
+
+        assertFalse(roadComponent(track, west).contains(east), "cities across wide water should not be road-connected");
     }
 
     @Test
