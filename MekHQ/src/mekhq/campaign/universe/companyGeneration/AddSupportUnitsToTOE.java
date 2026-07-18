@@ -131,7 +131,7 @@ public class AddSupportUnitsToTOE {
      * @author Illiani
      * @since 0.51.0
      */
-    private static @NonNull Formation getHqFormation(Campaign campaign) {
+    static @NonNull Formation getHqFormation(Campaign campaign) {
         final Formation ORIGIN_FORMATION = campaign.getFormation(FORMATION_ORIGIN);
 
         // I would prefer to not use string comparison here, but we don't have a more reliable option

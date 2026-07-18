@@ -81,11 +81,6 @@ import mekhq.gui.baseComponents.AbstractMHQValidationButtonDialog;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.campaignOptions.optionChangeDialogs.AdvancedScoutingCampaignOptionsChangedConfirmationDialog;
-import mekhq.gui.campaignOptions.optionChangeDialogs.FatigueTrackingCampaignOptionsChangedConfirmationDialog;
-import mekhq.gui.campaignOptions.optionChangeDialogs.MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog;
-import mekhq.gui.campaignOptions.optionChangeDialogs.PrisonerTrackingCampaignOptionsChangedConfirmationDialog;
-import mekhq.gui.campaignOptions.optionChangeDialogs.SalvageCampaignOptionsChangedConfirmationDialog;
-import mekhq.gui.campaignOptions.optionChangeDialogs.StratConConvoyCampaignOptionsChangedConfirmationDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentDialog;
 
 /**
@@ -544,55 +539,9 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
             }
         }
 
-        final Faction rankAssignmentFaction = options.isUseSpecifiedFactionToAssignRanks()
-                                                     ? options.getSpecifiedFaction()
-                                                     : campaign.getFaction();
-        final boolean isAutomaticallyAssignRanks = options.isAutomaticallyAssignRanks();
-
-        if (campaignOptions.isUseFatigue()) {
-            new ImmersiveDialogNotification(campaign,
-                  resources.getString("CompanyGenerationDialog.campaignOptions.fatigue"),
-                  true);
-            FatigueTrackingCampaignOptionsChangedConfirmationDialog.processFreeUnit(campaign,
-                  rankAssignmentFaction,
-                  isAutomaticallyAssignRanks);
-        }
-
-        if (campaignOptions.isUseMASHTheatres()) {
-            new ImmersiveDialogNotification(campaign,
-                  resources.getString("CompanyGenerationDialog.campaignOptions.mash"),
-                  true);
-            MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog.processFreeUnit(campaign,
-                  rankAssignmentFaction,
-                  isAutomaticallyAssignRanks);
-        }
-
-        if (!campaignOptions.getPrisonerCaptureStyle().isNone()) {
-            new ImmersiveDialogNotification(campaign,
-                  resources.getString("CompanyGenerationDialog.campaignOptions.security"),
-                  true);
-            PrisonerTrackingCampaignOptionsChangedConfirmationDialog.processFreeUnit(campaign,
-                  rankAssignmentFaction,
-                  isAutomaticallyAssignRanks);
-        }
-
-        if (campaignOptions.isUseCamOpsSalvage()) {
-            new ImmersiveDialogNotification(campaign,
-                  resources.getString("CompanyGenerationDialog.campaignOptions.salvage"),
-                  true);
-            SalvageCampaignOptionsChangedConfirmationDialog.processFreeUnits(campaign,
-                  rankAssignmentFaction,
-                  isAutomaticallyAssignRanks);
-        }
-
-        if (campaignOptions.isUseStratCon()) {
-            new ImmersiveDialogNotification(campaign,
-                  resources.getString("CompanyGenerationDialog.campaignOptions.stratCon"),
-                  true);
-            StratConConvoyCampaignOptionsChangedConfirmationDialog.processFreeUnits(campaign,
-                  rankAssignmentFaction,
-                  isAutomaticallyAssignRanks);
-        }
+        // Support-vehicle generation (salvage, MASH, fatigue, StratCon convoy, security) is handled
+        // during generation by SupportPersonnelToTOE and SupportUnitGenerator, so it is not repeated
+        // here. The settings-panel confirmation dialogs still cover toggling those options later.
 
         if (campaignOptions.isUseAdvancedScouting() && campaignOptions.isUseStratCon()) {
             AdvancedScoutingCampaignOptionsChangedConfirmationDialog.processFreeSkills(campaign, true);

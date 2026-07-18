@@ -54,7 +54,11 @@ import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
+import mekhq.campaign.universe.companyGeneration.SupportPersonnelToTOE;
+import mekhq.campaign.universe.companyGeneration.SupportUnitGenerator;
 
 /**
  * Single entry point for the ratgen-driven starting-force pipeline.
@@ -410,6 +414,32 @@ public final class CompanyGenerator {
         // isAssignTechsToUnits; pulls only from the techs SupportPersonnelGenerator just created
         // so we don't steal a pre-existing campaign tech from another duty.
         SupportPersonnelAssigner.assign(campaign, options, supportResult);
+
+        // 7e (continued). Organize the freshly generated support staff into the TOE. Each section
+        // (Maintenance / Medical / Command) becomes infantry-style carrier units crewed by the staff,
+        // nested under a Support Command formation. Crewing a carrier is separate from the setTech
+        // maintenance assignment above, so techs still maintain the combat units.
+        SupportPersonnelToTOE.organize(campaign, supportResult.generatedPersons(), campaign.isClanCampaign());
+
+        // 7e (continued). Grant the standalone support vehicles a command gets for each enabled
+        // capability that has no matching personnel section (logistics convoy, canteen, security).
+        // Salvage and medical vehicles are handled inside SupportPersonnelToTOE.organize above, where
+        // they join their section crewed from the generated staff (no double-generated personnel).
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        Faction supportFaction = campaign.getFaction();
+        if (campaignOptions.isUseStratCon()) {
+            SupportUnitGenerator.generateLogisticsUnits(campaign, supportFaction, true);
+        }
+        if (campaignOptions.isUseFatigue()) {
+            SupportUnitGenerator.generateCommissaryUnit(campaign, supportFaction, true);
+        }
+        if (!campaignOptions.getPrisonerCaptureStyle().isNone()) {
+            SupportUnitGenerator.generateSecurityUnit(campaign, supportFaction, true);
+        }
+
+        // Re-decorate the formation tree so the support formations created in this stage (they did
+        // not exist when Stage 7b applied icons) also get layered TOE icons.
+        FormationIconBuilder.applyIcons(campaign.getFormations(), campaign, options);
 
         // 7d. Personnel flags driven by the Setup tab toggles: commander flag on the top-formation
         // officer, founder flag on every fresh hire (combat + support after the 7e merge above),
