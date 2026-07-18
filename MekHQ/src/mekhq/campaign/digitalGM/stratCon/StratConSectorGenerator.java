@@ -89,6 +89,9 @@ public final class StratConSectorGenerator {
             StratConCityPlacer.placeCities(track, profile, urban);
         }
 
+        // Roads: connect the cities and branch each network off the map.
+        StratConRoadPlacer.recalculateRoads(track);
+
         // Open water carries no fog of war.
         revealOceanHexes(track);
     }
