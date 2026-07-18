@@ -183,6 +183,15 @@ public class AtBGameThread extends GameThread {
                 if (!scenario.getStratConRoadEntryEdges().isEmpty()) {
                     mapSettings.setRoadParam(100);
                 }
+                // StratCon: when the scenario hex borders water, ensure the generator lays down at least one body of
+                // water so a coastal/riverside fight reads as such. Only affects generated (non-fixed) boards.
+                if (scenario.isStratConWaterAdjacent()) {
+                    mapSettings.setWaterParams(Math.max(1, mapSettings.getMinWaterSpots()),
+                          Math.max(2, mapSettings.getMaxWaterSpots()),
+                          mapSettings.getMinWaterSize(),
+                          mapSettings.getMaxWaterSize(),
+                          mapSettings.getProbDeep());
+                }
                 client.sendMapSettings(mapSettings);
                 Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
 

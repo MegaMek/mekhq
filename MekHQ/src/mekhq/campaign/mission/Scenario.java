@@ -167,6 +167,12 @@ public class Scenario implements IPlayerSettings {
      */
     private List<Integer> stratConRoadEntryEdges = new ArrayList<>();
 
+    /**
+     * For StratCon scenarios: whether this hex borders open water (coast, lakeshore, or riverbank). Used at launch to
+     * bias the generated battle map toward including water.
+     */
+    private boolean stratConWaterAdjacent;
+
     // Stores combinations of units and the transports they are assigned to
     private final Map<UUID, List<UUID>> playerTransportLinkages;
     // endregion Variable Declarations
@@ -219,6 +225,7 @@ public class Scenario implements IPlayerSettings {
 
         hasTrack = false;
         stratConRoadEntryEdges = new ArrayList<>();
+        stratConWaterAdjacent = false;
     }
 
     public String getName() {
@@ -1102,6 +1109,9 @@ public class Scenario implements IPlayerSettings {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "stratConRoadEntryEdges",
                   String.join(",", stratConRoadEntryEdges.stream().map(String::valueOf).toList()));
         }
+        if (stratConWaterAdjacent) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "stratConWaterAdjacent", true);
+        }
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usingFixedMap", isUsingFixedMap());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mapSize", mapSizeX, mapSizeY);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "map", map);
@@ -1302,6 +1312,8 @@ public class Scenario implements IPlayerSettings {
                             retVal.stratConRoadEntryEdges.add(Integer.parseInt(token.trim()));
                         }
                     }
+                } else if (wn2.getNodeName().equalsIgnoreCase("stratConWaterAdjacent")) {
+                    retVal.stratConWaterAdjacent = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("mapSize")) {
                     String[] xy = wn2.getTextContent().split(",");
                     retVal.mapSizeX = Integer.parseInt(xy[0]);
@@ -1409,6 +1421,17 @@ public class Scenario implements IPlayerSettings {
 
     public void setStratConRoadEntryEdges(List<Integer> stratConRoadEntryEdges) {
         this.stratConRoadEntryEdges = (stratConRoadEntryEdges == null) ? new ArrayList<>() : stratConRoadEntryEdges;
+    }
+
+    /**
+     * @return {@code true} if this StratCon scenario's hex borders open water (coast, lakeshore, or riverbank)
+     */
+    public boolean isStratConWaterAdjacent() {
+        return stratConWaterAdjacent;
+    }
+
+    public void setStratConWaterAdjacent(boolean stratConWaterAdjacent) {
+        this.stratConWaterAdjacent = stratConWaterAdjacent;
     }
 
     public static String getBoardTypeName(int i) {

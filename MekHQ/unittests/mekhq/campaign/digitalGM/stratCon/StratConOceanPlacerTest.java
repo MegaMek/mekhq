@@ -33,6 +33,7 @@
 package mekhq.campaign.digitalGM.stratCon;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayDeque;
@@ -91,6 +92,23 @@ class StratConOceanPlacerTest {
             }
         }
         return components;
+    }
+
+    @Test
+    void isWaterAdjacent_trueWhenANeighborIsOcean() {
+        StratConTrackState track = track();
+        StratConCoords center = new StratConCoords(10, 10);
+        StratConCoords neighbor = StratConHexGeometry.neighbors(track, center).get(0);
+        track.setTerrainTile(neighbor, OCEAN);
+
+        assertTrue(StratConOceanPlacer.isWaterAdjacent(track, center), "a hex beside ocean should be water-adjacent");
+    }
+
+    @Test
+    void isWaterAdjacent_falseWhenNoNeighborIsOcean() {
+        StratConTrackState track = track();
+        assertFalse(StratConOceanPlacer.isWaterAdjacent(track, new StratConCoords(10, 10)),
+              "a hex with no ocean neighbors should not be water-adjacent");
     }
 
     @Test

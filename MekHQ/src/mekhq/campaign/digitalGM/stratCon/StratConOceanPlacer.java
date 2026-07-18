@@ -55,6 +55,24 @@ public final class StratConOceanPlacer {
     private StratConOceanPlacer() {}
 
     /**
+     * Reports whether a hex borders open water, i.e. it sits on a coast, lakeshore, or riverbank. Used to bias a
+     * scenario's battle map toward water when it spawns next to the sea or a river.
+     *
+     * @param track  the track to read
+     * @param coords the hex to test
+     *
+     * @return {@code true} if any in-bounds neighbor of the hex is ocean terrain
+     */
+    public static boolean isWaterAdjacent(StratConTrackState track, StratConCoords coords) {
+        for (StratConCoords neighbor : StratConHexGeometry.neighbors(track, coords)) {
+            if (StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(neighbor))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Paints roughly {@code oceanTargetHexes} hexes of the given ocean terrain onto the track, in the shape dictated by
      * the profile type.
      *
