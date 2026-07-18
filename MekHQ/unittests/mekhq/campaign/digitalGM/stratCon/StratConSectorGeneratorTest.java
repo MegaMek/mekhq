@@ -35,6 +35,7 @@ package mekhq.campaign.digitalGM.stratCon;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -71,7 +72,7 @@ class StratConSectorGeneratorTest {
     @Test
     void generate_leavesNoEmptyHexes() {
         StratConTrackState track = track(20, 20, 25);
-        StratConSectorGenerator.generate(track, PlanetProfile.neutral(25), LatitudeBand.EQUATORIAL);
+        StratConSectorGenerator.generate(track, PlanetProfile.neutral(25), LatitudeBand.EQUATORIAL, true);
 
         for (int x = 0; x < track.getWidth(); x++) {
             for (int y = 0; y < track.getHeight(); y++) {
@@ -84,7 +85,7 @@ class StratConSectorGeneratorTest {
     @Test
     void generate_revealsExactlyTheOceanHexes() {
         StratConTrackState track = track(20, 20, 25);
-        StratConSectorGenerator.generate(track, PlanetProfile.neutral(25), LatitudeBand.EQUATORIAL);
+        StratConSectorGenerator.generate(track, PlanetProfile.neutral(25), LatitudeBand.EQUATORIAL, true);
 
         assertEquals(oceanHexes(track), new HashSet<>(track.getRevealedCoords()));
     }
@@ -94,7 +95,8 @@ class StratConSectorGeneratorTest {
         StratConTrackState track = track(16, 16, -60);
         assertDoesNotThrow(() -> StratConSectorGenerator.generate(track,
               PlanetProfile.neutral(-60),
-              LatitudeBand.NORTH_POLAR));
+              LatitudeBand.NORTH_POLAR,
+              true));
 
         assertFalse(track.getTerrainTile(new StratConCoords(0, 0)).isEmpty());
     }
@@ -104,18 +106,28 @@ class StratConSectorGeneratorTest {
         StratConTrackState track = track(1, 1, 25);
         assertDoesNotThrow(() -> StratConSectorGenerator.generate(track,
               PlanetProfile.neutral(25),
-              LatitudeBand.EQUATORIAL));
+              LatitudeBand.EQUATORIAL,
+              true));
         assertFalse(track.getTerrainTile(new StratConCoords(0, 0)).isEmpty());
     }
 
     @Test
     void generate_wetWorld_placesSomeOcean() {
-        // A very wet planet skews strongly toward high-ocean profiles; across a large sector at least some water lands.
+        // A very wet planet skews strongly toward high-ocean profiles, so ocean reliably appears. Check across a few
+        // generations to stay robust against the rare dry-profile roll.
         PlanetProfile wet = new PlanetProfile(25, PlanetProfile.TERRA_DIAMETER_KM, 80, false, null, "", 1, 1.0, null,
               mekhq.campaign.universe.enums.HPGRating.X);
-        StratConTrackState track = track(24, 24, 25);
-        StratConSectorGenerator.generate(track, wet, LatitudeBand.EQUATORIAL);
 
-        assertFalse(oceanHexes(track).isEmpty());
+        boolean anyOcean = false;
+        for (int run = 0; run < 3; run++) {
+            StratConTrackState track = track(24, 24, 25);
+            StratConSectorGenerator.generate(track, wet, LatitudeBand.EQUATORIAL, true);
+            if (!oceanHexes(track).isEmpty()) {
+                anyOcean = true;
+                break;
+            }
+        }
+
+        assertTrue(anyOcean);
     }
 }

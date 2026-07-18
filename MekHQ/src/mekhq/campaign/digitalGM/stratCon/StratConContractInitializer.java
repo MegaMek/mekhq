@@ -120,6 +120,11 @@ public class StratConContractInitializer {
               campaignOptions.isUseStratConAlternateSectorCount(),
               campaignOptions.isUseStratConCondenseSectors());
 
+        // Ares Conventions: when both the employer and the enemy are signatories, urban targeting is off-limits.
+        int year = campaign.getLocalDate().getYear();
+        boolean allowCities = !(contract.getEmployerFaction().isAresConventionsSignatory(year) &&
+                                      contract.getEnemy().isAresConventionsSignatory(year));
+
         for (int index = 0; index < sectorSpecs.size(); index++) {
             int scenarioOdds = getScenarioOdds(contractDefinition);
             int deploymentTime = isUseMaplessMode ? 0 : getDeploymentTime(contractDefinition);
@@ -127,6 +132,7 @@ public class StratConContractInitializer {
             StratConTrackState track = initializeTrackState(sectorSpecs.get(index),
                   planetProfile,
                   campaignOptions,
+                  allowCities,
                   scenarioOdds,
                   deploymentTime);
             track.setDisplayableName(String.format("Sector %d", index));
@@ -318,13 +324,15 @@ public class StratConContractInitializer {
      * @param sector          the sector blueprint (size units, required formations, latitude band)
      * @param planetProfile   the destination planet's resolved data
      * @param campaignOptions the campaign options governing which sizing/temperature regime applies
+     * @param allowCities     {@code true} to allow the improved terrain generator to place cities; {@code false}
+     *                        suppresses them (has no effect on the legacy terrain path, which places no cities)
      * @param scenarioOdds    the per-track scenario odds
      * @param deploymentTime  the per-track deployment time
      *
      * @return the initialized track
      */
     public static StratConTrackState initializeTrackState(SectorSpec sector, PlanetProfile planetProfile,
-          CampaignOptions campaignOptions, int scenarioOdds, int deploymentTime) {
+          CampaignOptions campaignOptions, boolean allowCities, int scenarioOdds, int deploymentTime) {
         StratConTrackState retVal = new StratConTrackState();
         retVal.setRequiredLanceCount(sector.requiredLances());
 
@@ -345,7 +353,7 @@ public class StratConContractInitializer {
         // Place terrain: the improved geography-aware generator when the alternate-terrain option is set, otherwise
         // the legacy biome-stripe placer.
         if (campaignOptions.isUseStratConAlternateSectorTerrain()) {
-            StratConSectorGenerator.generate(retVal, planetProfile, sector.latitudeBand());
+            StratConSectorGenerator.generate(retVal, planetProfile, sector.latitudeBand(), allowCities);
         } else {
             StratConTerrainPlacer.InitializeTrackTerrain(retVal);
         }

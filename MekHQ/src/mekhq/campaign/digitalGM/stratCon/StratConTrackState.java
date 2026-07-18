@@ -79,6 +79,9 @@ public class StratConTrackState {
 
     private Map<StratConCoords, String> terrainTypes;
 
+    // city overlay: a city sits on top of the base terrain of its hex; rendered with the generic urban sprite
+    private Set<StratConCoords> cities;
+
     // don't serialize this
     private transient Map<Integer, StratConScenario> backingScenarioMap;
     private transient Map<StratConCoords, StratConStrategicObjective> specificStrategicObjectives;
@@ -100,6 +103,7 @@ public class StratConTrackState {
         stickyForces = new HashSet<>();
         strategicObjectives = new ArrayList<>();
         terrainTypes = new HashMap<>();
+        cities = new HashSet<>();
     }
 
     public String getDisplayableName() {
@@ -594,5 +598,33 @@ public class StratConTrackState {
     @Deprecated(since = "0.51.0", forRemoval = true)
     public void setStrategicObjectives(Map<StratConCoords, String> terrainTypes) {
         this.terrainTypes = terrainTypes;
+    }
+
+    /**
+     * @param coords the hex to test
+     *
+     * @return {@code true} if a city sits on the given hex
+     */
+    public boolean isCity(StratConCoords coords) {
+        return cities.contains(coords);
+    }
+
+    /**
+     * Marks the given hex as holding a city. Cities are an overlay: the hex keeps its base terrain.
+     *
+     * @param coords the hex to make a city
+     */
+    public void addCity(StratConCoords coords) {
+        cities.add(coords);
+    }
+
+    @XmlElementWrapper(name = "cities")
+    @XmlElement(name = "city")
+    public Set<StratConCoords> getCities() {
+        return cities;
+    }
+
+    public void setCities(Set<StratConCoords> cities) {
+        this.cities = cities;
     }
 }

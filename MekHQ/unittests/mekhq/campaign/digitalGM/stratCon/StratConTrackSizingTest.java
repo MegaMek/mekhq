@@ -60,6 +60,7 @@ class StratConTrackSizingTest {
         return StratConContractInitializer.initializeTrackState(spec,
               PlanetProfile.neutral(NEUTRAL_TEMPERATURE),
               options,
+              true,
               0,
               0);
     }

@@ -57,8 +57,11 @@ public final class StratConSectorGenerator {
      * @param track        the track to fill; its width, height, and temperature must already be set
      * @param profile      the destination planet's resolved data
      * @param latitudeBand the sector's latitude band, which drives the latitudinal terrain gradient
+     * @param allowCities  {@code true} to place cities; {@code false} suppresses them entirely (e.g. when both sides
+     *                     observe the Ares Conventions)
      */
-    public static void generate(StratConTrackState track, PlanetProfile profile, LatitudeBand latitudeBand) {
+    public static void generate(StratConTrackState track, PlanetProfile profile, LatitudeBand latitudeBand,
+          boolean allowCities) {
         StratConBiome biome = selectBiome(track.getTemperature());
         String oceanTerrain = oceanTerrainFor(biome);
 
@@ -79,6 +82,12 @@ public final class StratConSectorGenerator {
         int windDirection = Compute.randomInt(StratConHexGeometry.HEX_DIRECTIONS);
         StratConTerrainFields fields = StratConTerrainFields.compute(track, latitudeBand, windDirection);
         StratConTerrainFiller.fill(track, biome, profile, fields);
+
+        // Cities: an overlay whose count comes from population and whose arrangement comes from the urban profile.
+        if (allowCities) {
+            UrbanProfile urban = StratConUrban.getInstance().selectProfile(profile);
+            StratConCityPlacer.placeCities(track, profile, urban);
+        }
 
         // Open water carries no fog of war.
         revealOceanHexes(track);

@@ -63,6 +63,9 @@ public class StratConBiomeManifest {
     public static final String FORCE_FRIENDLY = "ForceFriendly";
     public static final String FORCE_HOSTILE = "ForceHostile";
 
+    /** The single generic urban sprite used to render a city overlay, regardless of the hex's base terrain. */
+    public static final String CITY = "Urban";
+
     /**
      * @param terrainType a StratCon terrain type name (as returned by {@link StratConTrackState#getTerrainTile})
      *

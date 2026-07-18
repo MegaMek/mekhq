@@ -546,6 +546,15 @@ public class StratConPanel extends JPanel implements ActionListener {
                         g2D.setComposite(push);
                     }
 
+                    // Cities render on top of the base terrain and over fog of war - you cannot hide a city. The hex
+                    // still needs to be scouted to reveal its scenarios and facilities, which are drawn in later passes.
+                    if (currentTrack.isCity(currentCoords)) {
+                        BufferedImage cityImage = getImage(StratConBiomeManifest.CITY, ImageType.TerrainTile);
+                        if (cityImage != null) {
+                            g2D.drawImage(cityImage, null, graphHex.xpoints[1], graphHex.ypoints[0]);
+                        }
+                    }
+
                     // useful for graphics coords debugging
                     // g2D.setColor(Color.pink);
                     // g2D.drawString(graphHex.getBounds().getX() + ", " +
@@ -1091,6 +1100,10 @@ public class StratConPanel extends JPanel implements ActionListener {
         infoBuilder.append("<b>Terrain Type:</b> ");
         infoBuilder.append(currentTrack.getTerrainTile(boardState.getSelectedCoords()));
         infoBuilder.append("<br/>");
+
+        if (currentTrack.isCity(boardState.getSelectedCoords())) {
+            infoBuilder.append("<b>City</b><br/>");
+        }
 
         boolean coordsRevealed = currentTrack.hasActiveTrackReveal() ||
                                        currentTrack.getRevealedCoords().contains(boardState.getSelectedCoords());
