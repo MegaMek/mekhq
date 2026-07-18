@@ -114,6 +114,8 @@ public class StratConPanel extends JPanel implements ActionListener {
     private static final String RIGHT_CLICK_COMMAND_ADD_FACILITY = "AddFacility";
     private static final String RIGHT_CLICK_COMMAND_REMOVE_SCENARIO = "RemoveScenario";
     private static final String RIGHT_CLICK_COMMAND_RESET_DEPLOYMENT = "ResetDeployment";
+    private static final String RIGHT_CLICK_COMMAND_ADD_CITY = "AddCity";
+    private static final String RIGHT_CLICK_COMMAND_REMOVE_CITY = "RemoveCity";
 
     /**
      * What to do when drawing a hex
@@ -424,6 +426,21 @@ public class StratConPanel extends JPanel implements ActionListener {
                 }
 
                 rightClickMenu.add(menuItemAddFacility);
+            }
+
+            // City overlay editing: remove an existing city, or add one to any dry hex. Either change recomputes roads.
+            if (currentTrack.isCity(coords)) {
+                JMenuItem menuItemRemoveCity = new JMenuItem();
+                menuItemRemoveCity.setText("Remove City (GM)");
+                menuItemRemoveCity.setActionCommand(RIGHT_CLICK_COMMAND_REMOVE_CITY);
+                menuItemRemoveCity.addActionListener(this);
+                rightClickMenu.add(menuItemRemoveCity);
+            } else if (!StratConBiomeManifest.isOceanTerrain(currentTrack.getTerrainTile(coords))) {
+                JMenuItem menuItemAddCity = new JMenuItem();
+                menuItemAddCity.setText("Add City (GM)");
+                menuItemAddCity.setActionCommand(RIGHT_CLICK_COMMAND_ADD_CITY);
+                menuItemAddCity.addActionListener(this);
+                rightClickMenu.add(menuItemAddCity);
             }
 
             if (scenario != null) {
@@ -1495,6 +1512,14 @@ public class StratConPanel extends JPanel implements ActionListener {
                 StratConFacility newFacility = facility.clone();
                 newFacility.setVisible(currentTrack.getRevealedCoords().contains(selectedCoords));
                 currentTrack.addFacility(selectedCoords, newFacility);
+                break;
+            case RIGHT_CLICK_COMMAND_ADD_CITY:
+                currentTrack.addCity(selectedCoords);
+                StratConRoadPlacer.recalculateRoads(currentTrack);
+                break;
+            case RIGHT_CLICK_COMMAND_REMOVE_CITY:
+                currentTrack.getCities().remove(selectedCoords);
+                StratConRoadPlacer.recalculateRoads(currentTrack);
                 break;
             case RIGHT_CLICK_COMMAND_REMOVE_SCENARIO:
                 StratConScenario scenario = getSelectedScenario();
