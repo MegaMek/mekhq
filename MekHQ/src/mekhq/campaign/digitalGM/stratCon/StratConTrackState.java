@@ -96,6 +96,10 @@ public class StratConTrackState {
 
     private int temperature;
 
+    // how built-up this sector's cities are, 0.0 (hamlets) to 1.0 (dense metropolis), from the planet's population;
+    // carried onto city-hex scenarios to scale the urban area laid onto their battle maps
+    private double urbanizationLevel;
+
     public StratConTrackState() {
         facilities = new HashMap<>();
         scenarios = new HashMap<>();
@@ -571,6 +575,17 @@ public class StratConTrackState {
 
     public void setTemperature(int temp) {
         temperature = temp;
+    }
+
+    /**
+     * @return how built-up this sector's cities are, 0.0 (hamlets) to 1.0 (dense metropolis)
+     */
+    public double getUrbanizationLevel() {
+        return urbanizationLevel;
+    }
+
+    public void setUrbanizationLevel(double urbanizationLevel) {
+        this.urbanizationLevel = urbanizationLevel;
     }
 
     public void setTerrainTile(StratConCoords coords, String terrainTypeName) {

@@ -173,6 +173,18 @@ public class Scenario implements IPlayerSettings {
      */
     private boolean stratConWaterAdjacent;
 
+    /**
+     * For StratCon scenarios: whether this hex holds a city, which sits on top of any base terrain. Used at launch to
+     * lay an appropriately-sized urban area onto the generated battle map. {@link #stratConUrbanization} scales it.
+     */
+    private boolean stratConUrban;
+
+    /**
+     * For StratCon scenarios on a city hex: how built-up the settlement is, 0.0 (hamlet) to 1.0 (dense metropolis),
+     * derived from the sector's population/urban profile. Scales the urban area laid onto the battle map.
+     */
+    private double stratConUrbanization;
+
     // Stores combinations of units and the transports they are assigned to
     private final Map<UUID, List<UUID>> playerTransportLinkages;
     // endregion Variable Declarations
@@ -226,6 +238,8 @@ public class Scenario implements IPlayerSettings {
         hasTrack = false;
         stratConRoadEntryEdges = new ArrayList<>();
         stratConWaterAdjacent = false;
+        stratConUrban = false;
+        stratConUrbanization = 0.0;
     }
 
     public String getName() {
@@ -1112,6 +1126,10 @@ public class Scenario implements IPlayerSettings {
         if (stratConWaterAdjacent) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "stratConWaterAdjacent", true);
         }
+        if (stratConUrban) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "stratConUrban", true);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "stratConUrbanization", stratConUrbanization);
+        }
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usingFixedMap", isUsingFixedMap());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mapSize", mapSizeX, mapSizeY);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "map", map);
@@ -1314,6 +1332,10 @@ public class Scenario implements IPlayerSettings {
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("stratConWaterAdjacent")) {
                     retVal.stratConWaterAdjacent = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("stratConUrban")) {
+                    retVal.stratConUrban = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("stratConUrbanization")) {
+                    retVal.stratConUrbanization = Double.parseDouble(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("mapSize")) {
                     String[] xy = wn2.getTextContent().split(",");
                     retVal.mapSizeX = Integer.parseInt(xy[0]);
@@ -1432,6 +1454,29 @@ public class Scenario implements IPlayerSettings {
 
     public void setStratConWaterAdjacent(boolean stratConWaterAdjacent) {
         this.stratConWaterAdjacent = stratConWaterAdjacent;
+    }
+
+    /**
+     * @return {@code true} if this StratCon scenario's hex holds a city (which overlays any base terrain)
+     */
+    public boolean isStratConUrban() {
+        return stratConUrban;
+    }
+
+    public void setStratConUrban(boolean stratConUrban) {
+        this.stratConUrban = stratConUrban;
+    }
+
+    /**
+     * @return how built-up this StratCon scenario's city is, 0.0 (hamlet) to 1.0 (dense metropolis); only meaningful
+     *       when {@link #isStratConUrban()} is {@code true}
+     */
+    public double getStratConUrbanization() {
+        return stratConUrbanization;
+    }
+
+    public void setStratConUrbanization(double stratConUrbanization) {
+        this.stratConUrbanization = stratConUrbanization;
     }
 
     public static String getBoardTypeName(int i) {

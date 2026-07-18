@@ -67,6 +67,7 @@ import megamek.common.units.IAero;
 import megamek.common.units.Infantry;
 import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
+import mekhq.campaign.digitalGM.stratCon.StratConMapTuner;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
@@ -177,21 +178,9 @@ public class AtBGameThread extends GameThread {
                 }
 
                 MapSettings mapSettings = ScenarioUtils.getMapSettings(scenario);
-                // StratCon: when the scenario sits on a sector road hex, force the random-map generator to lay a road
-                // across the board so it reads as continuing the sector road network. Only affects generated (non-fixed)
-                // boards; fixed maps are used as authored.
-                if (!scenario.getStratConRoadEntryEdges().isEmpty()) {
-                    mapSettings.setRoadParam(100);
-                }
-                // StratCon: when the scenario hex borders water, ensure the generator lays down at least one body of
-                // water so a coastal/riverside fight reads as such. Only affects generated (non-fixed) boards.
-                if (scenario.isStratConWaterAdjacent()) {
-                    mapSettings.setWaterParams(Math.max(1, mapSettings.getMinWaterSpots()),
-                          Math.max(2, mapSettings.getMaxWaterSpots()),
-                          mapSettings.getMinWaterSize(),
-                          mapSettings.getMaxWaterSize(),
-                          mapSettings.getProbDeep());
-                }
+                // StratCon: tune the generated board so it reflects the sector hex being fought on (roads, water,
+                // terrain emphasis, cities). Only affects generated (non-fixed) boards; fixed maps are used as authored.
+                StratConMapTuner.tune(mapSettings, scenario);
                 client.sendMapSettings(mapSettings);
                 Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
 

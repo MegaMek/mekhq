@@ -923,6 +923,10 @@ public class StratConRulesManager {
             backingScenario.setStratConRoadEntryEdges(StratConRoadPlacer.roadEntryEdges(track, coords));
             // Record whether the hex borders water, so the launched board can be biased toward including some.
             backingScenario.setStratConWaterAdjacent(StratConOceanPlacer.isWaterAdjacent(track, coords));
+            // Record whether the hex holds a city, so the launched board can lay an urban area onto any base terrain,
+            // and how built-up the sector is so the city scales appropriately.
+            backingScenario.setStratConUrban(track.isCity(coords));
+            backingScenario.setStratConUrbanization(track.getUrbanizationLevel());
             // for now, if we're using a fixed map or in a facility, don't replace the
             // scenario
             // TODO: facility spaces will always have a relevant biome

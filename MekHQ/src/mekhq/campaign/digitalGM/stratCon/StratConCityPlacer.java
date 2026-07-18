@@ -61,6 +61,9 @@ public final class StratConCityPlacer {
     private static final long POPULATION_SMALL = 1_000_000L;
     private static final long POPULATION_MEDIUM = 100_000_000L;
     private static final long POPULATION_LARGE = 1_000_000_000L;
+    /** Population log10 (~a billion) at which a sector is considered maximally urbanized for battle-map scaling. */
+    private static final double URBANIZATION_POPULATION_LOG = 9.0;
+
     private static final double DENSITY_SMALL = 0.01;
     private static final double DENSITY_MEDIUM = 0.02;
     private static final double DENSITY_LARGE = 0.04;
@@ -83,6 +86,10 @@ public final class StratConCityPlacer {
         if (cityCount <= 0) {
             return;
         }
+
+        // How built-up this sector's cities read on the battle map, from the planet's population (log10 ~9 = billions).
+        // Carried onto city-hex scenarios so a metropolis fights bigger than a frontier hamlet.
+        track.setUrbanizationLevel(Math.clamp(planet.populationLog() / URBANIZATION_POPULATION_LOG, 0.0, 1.0));
 
         double coastalBias = urban.coastalBiasOrDefault();
         double clustering = urban.clusteringOrDefault();
