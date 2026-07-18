@@ -2345,6 +2345,7 @@ public class EducationController {
         // Get the person's experience level and role (combat or non-combat)
         final int experienceLevel = person.getExperienceLevel(campaign, false, true);
         final boolean isCombatRole = person.getPrimaryRole().isCombat();
+        final boolean isDoctor = person.isDoctor();
 
         // We base passRate on US averages
         int passRate = 60 - (Reasoning.values().length / 2);
@@ -2360,8 +2361,10 @@ public class EducationController {
             // Determine education levels for combat roles
             educationLevel = getCombatEducationLevel(experienceLevel, flunked, passRate);
         } else {
+            // Calculate effective experience level (boost for doctors)
+            final int effectiveExperienceLevel = isDoctor ? max(experienceLevel, EXP_VETERAN) : experienceLevel;
             // Determine education levels for non-combat roles
-            educationLevel = getNonCombatEducationLevel(experienceLevel, flunked, passRate);
+            educationLevel = getNonCombatEducationLevel(effectiveExperienceLevel, flunked, passRate);
         }
 
         // Assign the determined education level
