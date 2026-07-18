@@ -905,17 +905,18 @@ public class StratConRulesManager {
             terrainType = track.getTerrainTile(coords);
         }
 
-        var mapTypes = biomeManifest.getBiomeMapTypes();
-
-        // don't have a map list for the given terrain, leave it alone
-        if (!mapTypes.containsKey(terrainType)) {
+        // Resolve the battle-map pool: an exact terrain-name pool, else the terrain's category fallback pool, so
+        // terrains without their own pool (and any added later) still land on an appropriate board. If neither exists,
+        // leave the map alone.
+        StratConBiomeManifest.MapTypeList mapPool = biomeManifest.getMapTypesForTerrain(terrainType);
+        if (mapPool == null) {
             return;
         }
 
         // if we are in space, do not update the map; note that it's ok to do so in low
         // atmosphere
         if (backingScenario.getBoardType() != Scenario.T_SPACE) {
-            var mapTypeList = mapTypes.get(terrainType).mapTypes;
+            var mapTypeList = mapPool.mapTypes;
             backingScenario.setHasTrack(true);
             backingScenario.setTerrainType(terrainType);
             // for now, if we're using a fixed map or in a facility, don't replace the

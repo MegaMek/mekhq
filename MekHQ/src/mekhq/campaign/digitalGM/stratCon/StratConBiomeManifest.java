@@ -251,6 +251,23 @@ public class StratConBiomeManifest {
     }
 
     /**
+     * Resolves the battle-map pool for a terrain type: its own name-keyed pool when one exists, otherwise the pool
+     * keyed by the terrain's {@link StratConTerrainCategory} name. This lets terrains without a dedicated pool - and
+     * any terrain added later - still resolve to an appropriate set of boards.
+     *
+     * @param terrainType a StratCon terrain type name
+     *
+     * @return the resolved map-type pool, or {@code null} if neither an exact nor a category pool is defined
+     */
+    public MapTypeList getMapTypesForTerrain(String terrainType) {
+        MapTypeList exact = biomeMapTypes.get(terrainType);
+        if (exact != null) {
+            return exact;
+        }
+        return biomeMapTypes.get(getTerrainCategory(terrainType).name());
+    }
+
+    /**
      * Get the file path for the hex image corresponding to the given terrain type. Prefers an image declared on the
      * terrain definition, falling back to the {@code biomeImages} lookup (which also covers non-terrain sprites such as
      * fog of war and force markers).
