@@ -530,29 +530,34 @@ public class StratConPanel extends JPanel implements ActionListener {
                         g2D.drawImage(biomeImage, null, graphHex.xpoints[1], graphHex.ypoints[0]);
                     }
 
-                    // draw fog of war if applicable
-                    if (!trackRevealed && !currentTrack.coordsRevealed(x, y)) {
+                    boolean hexUnscouted = !trackRevealed && !currentTrack.coordsRevealed(x, y);
+
+                    // draw the fog of war image on unscouted hexes
+                    if (hexUnscouted) {
                         BufferedImage fogOfWarLayerImage = getImage(StratConBiomeManifest.FOG_OF_WAR,
                               ImageType.TerrainTile);
                         if (fogOfWarLayerImage != null) {
                             fogOfWarLayerImage = addTintToBufferedImage(fogOfWarLayerImage, BLUE);
                             g2D.drawImage(fogOfWarLayerImage, null, graphHex.xpoints[1], graphHex.ypoints[0]);
                         }
-
-                        // needs a little more contrast between revealed and un-revealed hexes
-                        var push = g2D.getComposite();
-                        g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
-                        g2D.fillPolygon(graphHex);
-                        g2D.setComposite(push);
                     }
 
-                    // Cities render on top of the base terrain and over fog of war - you cannot hide a city. The hex
-                    // still needs to be scouted to reveal its scenarios and facilities, which are drawn in later passes.
+                    // Cities render on top of the base terrain - you cannot hide a city.
                     if (currentTrack.isCity(currentCoords)) {
                         BufferedImage cityImage = getImage(StratConBiomeManifest.CITY, ImageType.TerrainTile);
                         if (cityImage != null) {
                             g2D.drawImage(cityImage, null, graphHex.xpoints[1], graphHex.ypoints[0]);
                         }
+                    }
+
+                    // Apply the unscouted contrast tint last, over the city too, so the city stays visible while its hex
+                    // still reads as unscouted. The hex must still be scouted to reveal its scenarios and facilities,
+                    // which are drawn in later passes.
+                    if (hexUnscouted) {
+                        var push = g2D.getComposite();
+                        g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+                        g2D.fillPolygon(graphHex);
+                        g2D.setComposite(push);
                     }
 
                     // useful for graphics coords debugging
