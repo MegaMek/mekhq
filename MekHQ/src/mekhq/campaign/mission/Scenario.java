@@ -160,6 +160,13 @@ public class Scenario implements IPlayerSettings {
 
     private boolean hasTrack;
 
+    /**
+     * For StratCon scenarios spawned on a road hex: the hex directions (0-5) in which the sector road leaves this hex.
+     * Used at launch to trace roads onto the generated battle map so they line up with the sector road network. Empty
+     * for scenarios not on a road.
+     */
+    private List<Integer> stratConRoadEntryEdges = new ArrayList<>();
+
     // Stores combinations of units and the transports they are assigned to
     private final Map<UUID, List<UUID>> playerTransportLinkages;
     // endregion Variable Declarations
@@ -211,6 +218,7 @@ public class Scenario implements IPlayerSettings {
         startingAnySEy = Entity.STARTING_ANY_NONE;
 
         hasTrack = false;
+        stratConRoadEntryEdges = new ArrayList<>();
     }
 
     public String getName() {
@@ -1090,6 +1098,10 @@ public class Scenario implements IPlayerSettings {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "cloaked", isCloaked());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "boardType", boardType);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hasTrack", hasTrack);
+        if (!stratConRoadEntryEdges.isEmpty()) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "stratConRoadEntryEdges",
+                  String.join(",", stratConRoadEntryEdges.stream().map(String::valueOf).toList()));
+        }
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usingFixedMap", isUsingFixedMap());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mapSize", mapSizeX, mapSizeY);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "map", map);
@@ -1282,6 +1294,14 @@ public class Scenario implements IPlayerSettings {
                     retVal.boardType = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("hasTrack")) {
                     retVal.hasTrack = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("stratConRoadEntryEdges")) {
+                    String raw = wn2.getTextContent().trim();
+                    retVal.stratConRoadEntryEdges = new ArrayList<>();
+                    if (!raw.isEmpty()) {
+                        for (String token : raw.split(",")) {
+                            retVal.stratConRoadEntryEdges.add(Integer.parseInt(token.trim()));
+                        }
+                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("mapSize")) {
                     String[] xy = wn2.getTextContent().split(",");
                     retVal.mapSizeX = Integer.parseInt(xy[0]);
@@ -1377,6 +1397,18 @@ public class Scenario implements IPlayerSettings {
 
     public void setHasTrack(boolean b) {
         hasTrack = b;
+    }
+
+    /**
+     * @return the hex directions (0-5) in which a StratCon sector road leaves this scenario's hex; empty when the
+     *       scenario is not on a road
+     */
+    public List<Integer> getStratConRoadEntryEdges() {
+        return stratConRoadEntryEdges;
+    }
+
+    public void setStratConRoadEntryEdges(List<Integer> stratConRoadEntryEdges) {
+        this.stratConRoadEntryEdges = (stratConRoadEntryEdges == null) ? new ArrayList<>() : stratConRoadEntryEdges;
     }
 
     public static String getBoardTypeName(int i) {

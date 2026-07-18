@@ -142,6 +142,38 @@ public final class StratConRoadPlacer {
     }
 
     /**
+     * Reports the hex directions in which a road leaves the given hex, for a scenario spawned on a road hex. A
+     * direction counts when the neighbor in that direction is itself a road hex, or - when the hex is an off-map road
+     * exit - when that direction leaves the sector. This is the geometry a launched battle map uses to trace roads onto
+     * the board so they line up with the sector road network.
+     *
+     * @param track  the track whose road network to read
+     * @param coords the hex to examine
+     *
+     * @return the road-carrying directions (0-5), or an empty list if the hex carries no road
+     */
+    public static List<Integer> roadEntryEdges(StratConTrackState track, StratConCoords coords) {
+        List<Integer> edges = new ArrayList<>();
+        if (!track.isRoad(coords)) {
+            return edges;
+        }
+
+        boolean isExit = track.getRoadExits().contains(coords);
+        for (int direction = 0; direction < StratConHexGeometry.HEX_DIRECTIONS; direction++) {
+            StratConCoords neighbor = coords.translate(direction);
+            if (StratConHexGeometry.inBounds(track, neighbor)) {
+                if (track.isRoad(neighbor)) {
+                    edges.add(direction);
+                }
+            } else if (isExit) {
+                // the road continues off the sector edge in this direction
+                edges.add(direction);
+            }
+        }
+        return edges;
+    }
+
+    /**
      * Extends the network with a road to the nearest border land hex it can reach, marking that hex as an off-map exit.
      * Does nothing if the network is boxed in by water.
      */

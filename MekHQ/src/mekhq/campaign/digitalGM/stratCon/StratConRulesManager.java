@@ -919,6 +919,8 @@ public class StratConRulesManager {
             var mapTypeList = mapPool.mapTypes;
             backingScenario.setHasTrack(true);
             backingScenario.setTerrainType(terrainType);
+            // Record which sector-road edges cross this hex, so the launched board can trace matching roads onto it.
+            backingScenario.setStratConRoadEntryEdges(StratConRoadPlacer.roadEntryEdges(track, coords));
             // for now, if we're using a fixed map or in a facility, don't replace the
             // scenario
             // TODO: facility spaces will always have a relevant biome

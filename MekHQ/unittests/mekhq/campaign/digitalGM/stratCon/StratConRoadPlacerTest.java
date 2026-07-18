@@ -38,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
@@ -171,6 +172,51 @@ class StratConRoadPlacerTest {
             assertTrue(onBorder, "road exit " + exit + " is not on the border");
             assertTrue(track.getRoads().contains(exit), "road exit " + exit + " is not itself a road");
         }
+    }
+
+    @Test
+    void roadEntryEdges_emptyWhenHexHasNoRoad() {
+        StratConTrackState track = landTrack(9, 5);
+        assertTrue(StratConRoadPlacer.roadEntryEdges(track, new StratConCoords(4, 2)).isEmpty(),
+              "a hex with no road should carry no road edges");
+    }
+
+    @Test
+    void roadEntryEdges_pointToAdjacentRoadHexes() {
+        StratConTrackState track = landTrack(9, 5);
+        StratConCoords a = new StratConCoords(4, 2);
+
+        // pick any in-bounds neighbor of a, and note the direction to it
+        StratConCoords b = null;
+        int directionToB = -1;
+        for (int direction = 0; direction < StratConHexGeometry.HEX_DIRECTIONS; direction++) {
+            StratConCoords neighbor = a.translate(direction);
+            if (StratConHexGeometry.inBounds(track, neighbor)) {
+                b = neighbor;
+                directionToB = direction;
+                break;
+            }
+        }
+
+        track.setRoads(new HashSet<>(List.of(a, b)));
+
+        assertTrue(StratConRoadPlacer.roadEntryEdges(track, a).contains(directionToB),
+              "the road edge toward an adjacent road hex should be reported");
+    }
+
+    @Test
+    void roadEntryEdges_includeOffMapDirectionForExit() {
+        StratConTrackState track = landTrack(9, 5);
+        StratConCoords edge = new StratConCoords(0, 2); // on the west border
+        track.setRoads(new HashSet<>(List.of(edge)));
+        track.setRoadExits(new HashSet<>(List.of(edge)));
+
+        List<Integer> edges = StratConRoadPlacer.roadEntryEdges(track, edge);
+
+        boolean leavesMap = edges.stream()
+                                  .anyMatch(direction -> !StratConHexGeometry.inBounds(track,
+                                        edge.translate(direction)));
+        assertTrue(leavesMap, "a road exit hex should carry a road off the sector edge");
     }
 
     @Test
