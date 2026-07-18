@@ -627,4 +627,14 @@ public class StratConTrackState {
     public void setCities(Set<StratConCoords> cities) {
         this.cities = cities;
     }
+
+    /**
+     * Clears all generated terrain, cities, and hex reveals so the sector can be regenerated from scratch. Scenarios,
+     * facilities, and assigned forces are left untouched.
+     */
+    public void clearForRegeneration() {
+        terrainTypes.clear();
+        cities.clear();
+        revealedCoords.clear();
+    }
 }

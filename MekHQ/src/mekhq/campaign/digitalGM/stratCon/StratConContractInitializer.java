@@ -362,6 +362,33 @@ public class StratConContractInitializer {
     }
 
     /**
+     * Regenerates a single track's terrain in place, as used by the GM "Regenerate Sector" tool. Clears the existing
+     * terrain, cities, and fog, then re-runs terrain generation - the improved geography-aware generator when the
+     * alternate-terrain option is set, otherwise the legacy placer. The track's dimensions and temperature are kept, a
+     * fresh latitude band is rolled, and scenarios, facilities, and assigned forces are left untouched.
+     *
+     * @param track    the track to regenerate
+     * @param contract the contract the track belongs to (source of the planet profile and Ares-Conventions status)
+     * @param campaign the campaign (source of options and the current date)
+     */
+    public static void regenerateTrack(StratConTrackState track, AtBContract contract, Campaign campaign) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        PlanetProfile planetProfile = PlanetProfile.from(contract, campaign);
+
+        int year = campaign.getLocalDate().getYear();
+        boolean allowCities = !(contract.getEmployerFaction().isAresConventionsSignatory(year) &&
+                                      contract.getEnemy().isAresConventionsSignatory(year));
+
+        track.clearForRegeneration();
+
+        if (campaignOptions.isUseStratConAlternateSectorTerrain()) {
+            StratConSectorGenerator.generate(track, planetProfile, LatitudeBand.random(), allowCities);
+        } else {
+            StratConTerrainPlacer.InitializeTrackTerrain(track);
+        }
+    }
+
+    /**
      * Applies the legacy track dimensions: a total of {@code formations * 28} hexes laid out as a rectangle that is
      * wider than it is tall, so a scout formation deployed to a fresh spot each week can more or less cover it.
      */

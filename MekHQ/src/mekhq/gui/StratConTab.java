@@ -101,6 +101,9 @@ public class StratConTab extends CampaignGuiTab {
     private List<StratConTrackState> currentSectorTracks;
     private JPanel infoPanel;
     private JLabel infoPanelText;
+    private RoundedJButton btnScoutSector;
+    private RoundedJButton btnResetSectorFog;
+    private RoundedJButton btnRegenerateSector;
     private JLabel campaignStatusText;
     private JLabel objectiveStatusText;
     private JPanel victoryPointsPanel;
@@ -234,6 +237,30 @@ public class StratConTab extends CampaignGuiTab {
         constraints.gridy = gridY++;
         infoPanel.add(btnManageCampaignState, constraints);
 
+        // Add "Scout Sector" button - reveals every hex in the selected sector (GM only)
+        btnScoutSector = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "stratConTab.scoutSector.text"));
+        btnScoutSector.setToolTipText(getTextAt(RESOURCE_BUNDLE, "stratConTab.scoutSector.tooltip"));
+        btnScoutSector.setEnabled(getCampaignGui().getCampaign().isGM());
+        btnScoutSector.addActionListener(evt -> stratconPanel.scoutCurrentSector());
+        constraints.gridy = gridY++;
+        infoPanel.add(btnScoutSector, constraints);
+
+        // Add "Reset Sector Fog" button - un-reveals every hex in the selected sector (GM only)
+        btnResetSectorFog = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "stratConTab.resetSectorFog.text"));
+        btnResetSectorFog.setToolTipText(getTextAt(RESOURCE_BUNDLE, "stratConTab.resetSectorFog.tooltip"));
+        btnResetSectorFog.setEnabled(getCampaignGui().getCampaign().isGM());
+        btnResetSectorFog.addActionListener(evt -> stratconPanel.resetSectorFog());
+        constraints.gridy = gridY++;
+        infoPanel.add(btnResetSectorFog, constraints);
+
+        // Add "Regenerate Sector" button - clears and re-rolls the selected sector's terrain (GM only)
+        btnRegenerateSector = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "stratConTab.regenerateSector.text"));
+        btnRegenerateSector.setToolTipText(getTextAt(RESOURCE_BUNDLE, "stratConTab.regenerateSector.tooltip"));
+        btnRegenerateSector.setEnabled(getCampaignGui().getCampaign().isGM());
+        btnRegenerateSector.addActionListener(evt -> stratconPanel.regenerateCurrentSector());
+        constraints.gridy = gridY++;
+        infoPanel.add(btnRegenerateSector, constraints);
+
         // Add the victory-point progress bar directly above the objectives list
         victoryPointsPanel = new JPanel(new BorderLayout());
         victoryPointsPanel.setOpaque(false);
@@ -341,6 +368,18 @@ public class StratConTab extends CampaignGuiTab {
     public void updateCampaignState() {
         if ((contractSelector == null) || (campaignStatusText == null)) {
             return;
+        }
+
+        // The scout/fog/regenerate sector tools are GM-only conveniences.
+        boolean isGM = getCampaignGui().getCampaign().isGM();
+        if (btnScoutSector != null) {
+            btnScoutSector.setEnabled(isGM);
+        }
+        if (btnResetSectorFog != null) {
+            btnResetSectorFog.setEnabled(isGM);
+        }
+        if (btnRegenerateSector != null) {
+            btnRegenerateSector.setEnabled(isGM);
         }
 
         // campaign state text should contain:

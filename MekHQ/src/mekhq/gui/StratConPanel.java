@@ -71,6 +71,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.stratCon.StratConBiomeManifest;
 import mekhq.campaign.digitalGM.stratCon.StratConBiomeManifest.ImageType;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
+import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.StratConFacilityFactory;
@@ -263,6 +264,62 @@ public class StratConPanel extends JPanel implements ActionListener {
         boardState.selectedY = null;
         infoArea.setText(buildSelectedHexInfo(campaign));
 
+        repaint();
+    }
+
+    /**
+     * Scouts (permanently reveals) every hex in the currently selected sector, then repaints. Unlike the GM sector
+     * reveal, this marks the hexes as revealed, so their contents stay visible afterward.
+     */
+    public void scoutCurrentSector() {
+        if (currentTrack == null) {
+            return;
+        }
+
+        for (int x = 0; x < currentTrack.getWidth(); x++) {
+            for (int y = 0; y < currentTrack.getHeight(); y++) {
+                currentTrack.getRevealedCoords().add(new StratConCoords(x, y));
+            }
+        }
+
+        infoArea.setText(buildSelectedHexInfo(campaign));
+        repaint();
+    }
+
+    /**
+     * GM tool: clears the current sector and regenerates its terrain (and cities/roads), then repaints. Scenarios,
+     * facilities, and assigned forces are left in place.
+     */
+    public void regenerateCurrentSector() {
+        if ((currentTrack == null) || (campaignState == null)) {
+            return;
+        }
+
+        StratConContractInitializer.regenerateTrack(currentTrack, campaignState.getContract(), campaign);
+        infoArea.setText(buildSelectedHexInfo(campaign));
+        repaint();
+    }
+
+    /**
+     * GM tool: un-reveals every hex in the current sector so scouting can be re-tested, then repaints. Open water is
+     * re-revealed, since it never holds fog of war.
+     */
+    public void resetSectorFog() {
+        if (currentTrack == null) {
+            return;
+        }
+
+        currentTrack.getRevealedCoords().clear();
+        for (int x = 0; x < currentTrack.getWidth(); x++) {
+            for (int y = 0; y < currentTrack.getHeight(); y++) {
+                StratConCoords coords = new StratConCoords(x, y);
+                if (StratConBiomeManifest.isOceanTerrain(currentTrack.getTerrainTile(coords))) {
+                    currentTrack.getRevealedCoords().add(coords);
+                }
+            }
+        }
+
+        infoArea.setText(buildSelectedHexInfo(campaign));
         repaint();
     }
 
