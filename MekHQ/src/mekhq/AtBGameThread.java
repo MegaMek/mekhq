@@ -177,6 +177,12 @@ public class AtBGameThread extends GameThread {
                 }
 
                 MapSettings mapSettings = ScenarioUtils.getMapSettings(scenario);
+                // StratCon: when the scenario sits on a sector road hex, force the random-map generator to lay a road
+                // across the board so it reads as continuing the sector road network. Only affects generated (non-fixed)
+                // boards; fixed maps are used as authored.
+                if (!scenario.getStratConRoadEntryEdges().isEmpty()) {
+                    mapSettings.setRoadParam(100);
+                }
                 client.sendMapSettings(mapSettings);
                 Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
 
