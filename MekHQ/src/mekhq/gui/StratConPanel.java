@@ -68,17 +68,9 @@ import megamek.common.util.ImageUtil;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.digitalGM.stratCon.StratConBiomeManifest;
+import mekhq.campaign.digitalGM.stratCon.*;
 import mekhq.campaign.digitalGM.stratCon.StratConBiomeManifest.ImageType;
-import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
-import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
-import mekhq.campaign.digitalGM.stratCon.StratConCoords;
-import mekhq.campaign.digitalGM.stratCon.StratConFacility;
-import mekhq.campaign.digitalGM.stratCon.StratConFacilityFactory;
-import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
-import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario.ScenarioState;
-import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.gui.stratCon.StratConScenarioWizard;
@@ -95,6 +87,11 @@ public class StratConPanel extends JPanel implements ActionListener {
 
     public static final int HEX_X_RADIUS = 42;
     public static final int HEX_Y_RADIUS = 36;
+
+    /** Horizontal pixel spacing between hex columns, matching the map layout, used to place road lines. */
+    private static final int ROAD_STEP_X = (int) Math.floor(HEX_X_RADIUS * 1.5);
+    private static final Color ROAD_COLOR = new Color(110, 75, 45, 205);
+    private static final float ROAD_STROKE_WIDTH = 3.5f;
 
     /** Zoom bounds and the multiplicative step applied per mouse-wheel notch. */
     private static final double MIN_SCALE = 0.5;
@@ -467,6 +464,12 @@ public class StratConPanel extends JPanel implements ActionListener {
         drawHexes(g2D, DrawHexType.Outline);
         g2D.setTransform(originTransform);
         g2D.translate(HEX_X_RADIUS, HEX_Y_RADIUS);
+        drawRoads(g2D);
+        g2D.setTransform(originTransform);
+        g2D.translate(HEX_X_RADIUS, HEX_Y_RADIUS);
+        drawCities(g2D);
+        g2D.setTransform(originTransform);
+        g2D.translate(HEX_X_RADIUS, HEX_Y_RADIUS);
         drawFacilities(g2D);
         g2D.setTransform(originTransform);
         g2D.translate(HEX_X_RADIUS, HEX_Y_RADIUS);
@@ -587,30 +590,17 @@ public class StratConPanel extends JPanel implements ActionListener {
                         g2D.drawImage(biomeImage, null, graphHex.xpoints[1], graphHex.ypoints[0]);
                     }
 
-                    boolean hexUnscouted = !trackRevealed && !currentTrack.coordsRevealed(x, y);
-
-                    // draw the fog of war image on unscouted hexes
-                    if (hexUnscouted) {
+                    // draw fog of war if applicable. Roads and cities are drawn in later passes (over the fog image),
+                    // and the unscouted contrast tint is reapplied there so those hexes still read as unscouted.
+                    if (!trackRevealed && !currentTrack.coordsRevealed(x, y)) {
                         BufferedImage fogOfWarLayerImage = getImage(StratConBiomeManifest.FOG_OF_WAR,
                               ImageType.TerrainTile);
                         if (fogOfWarLayerImage != null) {
                             fogOfWarLayerImage = addTintToBufferedImage(fogOfWarLayerImage, BLUE);
                             g2D.drawImage(fogOfWarLayerImage, null, graphHex.xpoints[1], graphHex.ypoints[0]);
                         }
-                    }
 
-                    // Cities render on top of the base terrain - you cannot hide a city.
-                    if (currentTrack.isCity(currentCoords)) {
-                        BufferedImage cityImage = getImage(StratConBiomeManifest.CITY, ImageType.TerrainTile);
-                        if (cityImage != null) {
-                            g2D.drawImage(cityImage, null, graphHex.xpoints[1], graphHex.ypoints[0]);
-                        }
-                    }
-
-                    // Apply the unscouted contrast tint last, over the city too, so the city stays visible while its hex
-                    // still reads as unscouted. The hex must still be scouted to reveal its scenarios and facilities,
-                    // which are drawn in later passes.
-                    if (hexUnscouted) {
+                        // needs a little more contrast between revealed and un-revealed hexes
                         var push = g2D.getComposite();
                         g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
                         g2D.fillPolygon(graphHex);
@@ -781,6 +771,117 @@ public class StratConPanel extends JPanel implements ActionListener {
             scenarioMarker2.translate(translationVector[0], translationVector[1]);
             graphHex.translate(translationVector[0], translationVector[1]);
         }
+    }
+
+    /**
+     * Renders the road network as semi-transparent lines between hex centers, plus a stub off the map for each network
+     * that branches to the sector edge. Drawn before cities, so a city's sprite sits on top and the road reads as
+     * leading into it.
+     */
+    private void drawRoads(Graphics2D g2D) {
+        var roads = currentTrack.getRoads();
+        if (roads.isEmpty()) {
+            return;
+        }
+
+        Stroke pushStroke = g2D.getStroke();
+        Color pushColor = g2D.getColor();
+        g2D.setStroke(new BasicStroke(ROAD_STROKE_WIDTH, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g2D.setColor(ROAD_COLOR);
+
+        // Draw each undirected road segment once, between adjacent road hexes.
+        for (StratConCoords road : roads) {
+            Point from = hexCenter(road.getX(), road.getY());
+            for (StratConCoords neighbor : StratConHexGeometry.neighbors(currentTrack, road)) {
+                if (roads.contains(neighbor) && isAfter(neighbor, road)) {
+                    Point to = hexCenter(neighbor.getX(), neighbor.getY());
+                    g2D.drawLine(from.x, from.y, to.x, to.y);
+                }
+            }
+        }
+
+        // Draw a stub off the map for each off-map branch.
+        for (StratConCoords exit : currentTrack.getRoadExits()) {
+            Point from = hexCenter(exit.getX(), exit.getY());
+            Point off = offMapPoint(exit);
+            g2D.drawLine(from.x, from.y, off.x, off.y);
+        }
+
+        g2D.setStroke(pushStroke);
+        g2D.setColor(pushColor);
+    }
+
+    /**
+     * Renders the city overlay: the generic urban sprite on each city hex, drawn over terrain, fog, and roads (you
+     * cannot hide a city). Unscouted city hexes keep the fog contrast tint on top, so their hex still reads as
+     * unscouted until it is explored.
+     */
+    private void drawCities(Graphics2D g2D) {
+        Polygon graphHex = generateGraphHex();
+        boolean trackRevealed = currentTrack.hasActiveTrackReveal();
+
+        for (int x = 0; x < currentTrack.getWidth(); x++) {
+            for (int y = 0; y < currentTrack.getHeight(); y++) {
+                StratConCoords currentCoords = new StratConCoords(x, y);
+
+                if (currentTrack.isCity(currentCoords)) {
+                    BufferedImage cityImage = getImage(StratConBiomeManifest.CITY, ImageType.TerrainTile);
+                    if (cityImage != null) {
+                        g2D.drawImage(cityImage, null, graphHex.xpoints[1], graphHex.ypoints[0]);
+                    }
+
+                    if (!trackRevealed && !currentTrack.coordsRevealed(x, y)) {
+                        Color pushColor = g2D.getColor();
+                        var pushComposite = g2D.getComposite();
+                        g2D.setColor(Color.DARK_GRAY);
+                        g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+                        g2D.fillPolygon(graphHex);
+                        g2D.setColor(pushColor);
+                        g2D.setComposite(pushComposite);
+                    }
+                }
+
+                int[] downwardVector = getDownwardYVector();
+                graphHex.translate(downwardVector[0], downwardVector[1]);
+            }
+
+            int[] translationVector = getRightAndUpVector(x % 2 == 0);
+            graphHex.translate(translationVector[0], translationVector[1]);
+        }
+    }
+
+    /**
+     * @return the pixel center of hex {@code (x, y)} in the same translated space as the facility/scenario passes
+     */
+    private Point hexCenter(int x, int y) {
+        int centerX = x * ROAD_STEP_X;
+        int centerY = (y * HEX_Y_RADIUS * 2) + ((x % 2 != 0) ? -HEX_Y_RADIUS : 0);
+        return new Point(centerX, centerY);
+    }
+
+    /**
+     * @return a point one hex beyond the sector edge from the given border hex, for drawing an off-map road stub
+     */
+    private Point offMapPoint(StratConCoords exit) {
+        int x = exit.getX();
+        int y = exit.getY();
+        if (x == 0) {
+            x = -1;
+        } else if (x == (currentTrack.getWidth() - 1)) {
+            x = currentTrack.getWidth();
+        } else if (y == 0) {
+            y = -1;
+        } else if (y == (currentTrack.getHeight() - 1)) {
+            y = currentTrack.getHeight();
+        }
+        return hexCenter(x, y);
+    }
+
+    /**
+     * @return {@code true} if {@code a} sorts after {@code b}, used to draw each undirected road segment only once
+     */
+    private static boolean isAfter(StratConCoords a, StratConCoords b) {
+        return (a.getX() > b.getX()) || ((a.getX() == b.getX()) && (a.getY() > b.getY()));
     }
 
     /**
