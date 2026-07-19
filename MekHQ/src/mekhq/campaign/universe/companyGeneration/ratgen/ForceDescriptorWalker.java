@@ -146,7 +146,13 @@ public final class ForceDescriptorWalker {
               || (descriptor.getAttached() != null && !descriptor.getAttached().isEmpty());
 
         if (!hasChildren) {
-            // Leaf — let the caller turn it into a Unit + crew.
+            // Leaf — let the caller turn it into a Unit + crew, unless the user excluded it in the
+            // preview (right-click -> Exclude from TOE), in which case it is skipped entirely.
+            if (!descriptor.isIncluded()) {
+                LOGGER.info("[CompanyGen][Walker] {}LEAF excluded by user, skipping '{}'",
+                      indent, descriptor.parseName());
+                return 0;
+            }
             String entityChassis = descriptor.getEntity() == null ? "n/a" : descriptor.getEntity().getChassis();
             String entityModel = descriptor.getEntity() == null ? "n/a" : descriptor.getEntity().getModel();
             LOGGER.info("[CompanyGen][Walker] {}LEAF parseName='{}' echelon={} unitType={} hasEntity={} hasCo={} chassis='{}' model='{}'",
@@ -169,6 +175,15 @@ public final class ForceDescriptorWalker {
         }
         int subCount = descriptor.getSubForces() == null ? 0 : descriptor.getSubForces().size();
         int attCount = descriptor.getAttached() == null ? 0 : descriptor.getAttached().size();
+
+        // Drop empty formations: if every unit under this node was excluded in the preview, skip the
+        // whole subtree so no empty Formation is created. A single re-included unit keeps it.
+        if (!hasIncludedLeaf(descriptor)) {
+            LOGGER.info("[CompanyGen][Walker] {}NODE name='{}' has no included units; dropping empty formation",
+                  indent, name);
+            return 0;
+        }
+
         LOGGER.info("[CompanyGen][Walker] {}NODE name='{}' echelon={} subForces={} attached={} -> creating Formation",
               indent, name, descriptor.getEchelon(), subCount, attCount);
 
@@ -195,6 +210,37 @@ public final class ForceDescriptorWalker {
             }
         }
         return leaves;
+    }
+
+    /**
+     * Whether {@code descriptor} contains at least one included unit anywhere beneath it. Used to drop
+     * formations whose units were all excluded in the preview, while keeping a formation that still has
+     * a single re-included unit inside an otherwise-excluded branch.
+     *
+     * @param descriptor the descriptor to test
+     * @return {@code true} if any leaf under {@code descriptor} is included and has an entity
+     */
+    private static boolean hasIncludedLeaf(ForceDescriptor descriptor) {
+        boolean hasChildren = (descriptor.getSubForces() != null && !descriptor.getSubForces().isEmpty())
+              || (descriptor.getAttached() != null && !descriptor.getAttached().isEmpty());
+        if (!hasChildren) {
+            return descriptor.isIncluded() && descriptor.getEntity() != null;
+        }
+        if (descriptor.getSubForces() != null) {
+            for (ForceDescriptor child : descriptor.getSubForces()) {
+                if (hasIncludedLeaf(child)) {
+                    return true;
+                }
+            }
+        }
+        if (descriptor.getAttached() != null) {
+            for (ForceDescriptor child : descriptor.getAttached()) {
+                if (hasIncludedLeaf(child)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**

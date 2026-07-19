@@ -88,6 +88,9 @@ public class ForceGeneratorTab {
         // Constructed lazily so we only pay the RATGenerator / Ruleset / MekSummaryCache init cost
         // when the dialog is actually shown.
         viewUi = new ForceGeneratorViewUi(frame, campaign == null ? null : campaign.getGameOptions());
+        // The dialog commits the previewed tree into the campaign TOE, so let the user right-click to
+        // include/exclude nodes; excluded units are struck out here and skipped by ForceDescriptorWalker.
+        viewUi.setToeExclusionMode(true);
 
         ForceGeneratorOptionsView optionsView = viewUi.getOptionsView();
         optionsView.setExportMULButtonVisible(false);
