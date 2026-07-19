@@ -36,8 +36,8 @@ import java.util.Collection;
 
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
-import mekhq.campaign.digitalGM.stratCon.generation.LatitudeBand;
-import mekhq.campaign.digitalGM.stratCon.generation.PlanetProfile;
+import mekhq.campaign.digitalGM.stratCon.sectorGeneration.LatitudeBand;
+import mekhq.campaign.digitalGM.stratCon.sectorGeneration.PlanetProfile;
 
 /**
  * Strategy for laying down a sector's (track's) terrain. This is the "how is the sector built" seam: a GM can generate

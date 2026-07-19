@@ -39,9 +39,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.digitalGM.stratCon.generation.LatitudeBand;
-import mekhq.campaign.digitalGM.stratCon.generation.PlanetProfile;
-import mekhq.campaign.digitalGM.stratCon.generation.SectorSpec;
+import mekhq.campaign.digitalGM.stratCon.sectorGeneration.LatitudeBand;
+import mekhq.campaign.digitalGM.stratCon.sectorGeneration.PlanetProfile;
+import mekhq.campaign.digitalGM.stratCon.sectorGeneration.SectorSpec;
 import org.junit.jupiter.api.Test;
 
 /**

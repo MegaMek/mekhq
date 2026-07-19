@@ -30,30 +30,38 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.digitalGM.stratCon;
+package mekhq.campaign.digitalGM.stratCon.sectorGeneration;
 
-import megamek.common.loaders.MapSettings;
-import mekhq.campaign.digitalGM.IMapGenerationStrategy;
-import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConMapTuner;
-import mekhq.campaign.mission.AtBScenario;
+import java.util.Collection;
+
+import mekhq.campaign.digitalGM.ISectorGenerationStrategy;
+import mekhq.campaign.digitalGM.stratCon.StratConCoords;
+import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 
 /**
- * Default StratCon implementation of {@link IMapGenerationStrategy}: the standard biome-driven terrain selection.
- * Delegates to {@link StratConRulesManager#setScenarioParametersFromBiome}, so this class introduces the overridable
- * seam without moving any behaviour.
+ * The legacy sector generation: the original biome-stripe terrain placer ({@link StratConTerrainPlacer}). It places no
+ * cities and builds no road network, so {@link #connectFacilitiesToRoads} is a no-op.
  *
  * @author Illiani
  * @since 0.51.01
  */
-public class StratConMapGenerationStrategy implements IMapGenerationStrategy {
+public class LegacyStratConSectorGeneration implements ISectorGenerationStrategy {
 
     @Override
-    public void setScenarioTerrain(StratConTrackState track, StratConScenario scenario, boolean isNoTornadoes) {
-        StratConRulesManager.setScenarioParametersFromBiome(track, scenario, isNoTornadoes);
+    public void initializeTrack(StratConTrackState track, PlanetProfile planetProfile, LatitudeBand latitudeBand,
+          boolean allowCities) {
+        StratConTerrainPlacer.InitializeTrackTerrain(track);
     }
 
     @Override
-    public void tuneMapSettings(MapSettings mapSettings, AtBScenario scenario) {
-        StratConMapTuner.tune(mapSettings, scenario);
+    public void regenerateTrack(StratConTrackState track, PlanetProfile planetProfile, LatitudeBand latitudeBand,
+          boolean allowCities) {
+        track.clearForRegeneration();
+        StratConTerrainPlacer.InitializeTrackTerrain(track);
+    }
+
+    @Override
+    public void connectFacilitiesToRoads(StratConTrackState track, Collection<StratConCoords> facilityCoords) {
+        // Legacy terrain builds no road network, so there is nothing to connect facilities to.
     }
 }

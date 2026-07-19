@@ -30,30 +30,27 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.digitalGM.stratCon;
-
-import megamek.common.loaders.MapSettings;
-import mekhq.campaign.digitalGM.IMapGenerationStrategy;
-import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConMapTuner;
-import mekhq.campaign.mission.AtBScenario;
+package mekhq.campaign.digitalGM.stratCon.sectorGeneration;
 
 /**
- * Default StratCon implementation of {@link IMapGenerationStrategy}: the standard biome-driven terrain selection.
- * Delegates to {@link StratConRulesManager#setScenarioParametersFromBiome}, so this class introduces the overridable
- * seam without moving any behaviour.
+ * The urban (settlement) profiles available to improved sector generation. Each identifies both a bucket of tunable
+ * weighting/placement parameters (authored in {@code UrbanProfiles.yaml}) and a distinct city-placement algorithm. A
+ * new profile therefore needs both a YAML entry and a placement implementation.
  *
  * @author Illiani
  * @since 0.51.01
  */
-public class StratConMapGenerationStrategy implements IMapGenerationStrategy {
-
-    @Override
-    public void setScenarioTerrain(StratConTrackState track, StratConScenario scenario, boolean isNoTornadoes) {
-        StratConRulesManager.setScenarioParametersFromBiome(track, scenario, isNoTornadoes);
-    }
-
-    @Override
-    public void tuneMapSettings(MapSettings mapSettings, AtBScenario scenario) {
-        StratConMapTuner.tune(mapSettings, scenario);
-    }
+public enum UrbanProfileType {
+    /** Cities favor the coast, as ports. */
+    COASTAL_PORTS,
+    /** Cities hug water and river edges. */
+    RIVERINE,
+    /** Cities spread as far apart as possible, agrarian. */
+    DISPERSED,
+    /** One dominant metropolis with a few nearby satellites. */
+    PRIMATE_CITY,
+    /** A tight cluster of adjacent city hexes, a megalopolis. */
+    CONURBATION,
+    /** A few scattered outposts in the more liveable spots. */
+    FRONTIER_OUTPOSTS
 }
