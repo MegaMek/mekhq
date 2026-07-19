@@ -106,6 +106,7 @@ public class StratConTab extends CampaignGuiTab {
     private RoundedJButton btnResetSectorFog;
     private RoundedJButton btnRegenerateSector;
     private RoundedJButton btnResizeSector;
+    private RoundedJButton btnChangeTerrain;
     private RoundedJButton btnEditSupportPoints;
     private RoundedJButton btnEditVictoryPoints;
     private RoundedJButton btnToggleHiddenObjects;
@@ -308,6 +309,13 @@ public class StratConTab extends CampaignGuiTab {
             updateCampaignState();
         });
 
+        // "Change Terrain" - opens the terrain palette and puts the map into paint mode (GM only). It lives here
+        // rather than on the hex right-click menu because the palette paints wherever you drag, not just one hex.
+        btnChangeTerrain = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "stratConTab.changeTerrain.text"));
+        btnChangeTerrain.setToolTipText(getTextAt(RESOURCE_BUNDLE, "stratConTab.changeTerrain.tooltip"));
+        btnChangeTerrain.setEnabled(isGM);
+        btnChangeTerrain.addActionListener(evt -> stratconPanel.openTerrainPaintDialog());
+
         // "Resize Sector" - grows or shrinks the sector at its right and bottom edges (GM only)
         btnResizeSector = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "stratConTab.resizeSector.text"));
         btnResizeSector.setToolTipText(getTextAt(RESOURCE_BUNDLE, "stratConTab.resizeSector.tooltip"));
@@ -337,6 +345,7 @@ public class StratConTab extends CampaignGuiTab {
         gmButtonPanel.add(btnScoutSector);
         gmButtonPanel.add(btnResetSectorFog);
         gmButtonPanel.add(btnRegenerateSector);
+        gmButtonPanel.add(btnChangeTerrain);
         gmButtonPanel.add(btnResizeSector);
         gmButtonPanel.add(btnToggleHiddenObjects);
         gmButtonPanel.add(btnEditSupportPoints);
@@ -487,6 +496,9 @@ public class StratConTab extends CampaignGuiTab {
         }
         if (btnResizeSector != null) {
             btnResizeSector.setEnabled(isGM);
+        }
+        if (btnChangeTerrain != null) {
+            btnChangeTerrain.setEnabled(isGM);
         }
         if (btnToggleHiddenObjects != null) {
             btnToggleHiddenObjects.setEnabled(isGM);

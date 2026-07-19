@@ -118,7 +118,16 @@ public class StratConTerrainPaintDialog extends JDialog {
     private JList<String> buildTerrainList() {
         StratConBiomeManifest manifest = StratConBiomeManifest.getInstance();
 
-        List<String> terrains = new ArrayList<>(manifest.getTerrainTypeNames());
+        // Urban ground is left out on purpose: settlements are an overlay laid on top of whatever terrain a hex has
+        // (see "Add City"), not a terrain you paint. Offering both would give two ways to make a hex a city that
+        // disagree with each other.
+        List<String> terrains = new ArrayList<>();
+        for (String terrain : manifest.getTerrainTypeNames()) {
+            if (!StratConBiomeManifest.isUrbanTerrain(terrain)) {
+                terrains.add(terrain);
+            }
+        }
+
         terrains.sort(Comparator.comparing((String terrain) -> manifest.getTerrainCategory(terrain).name())
                             .thenComparing(terrain -> terrain));
 

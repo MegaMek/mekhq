@@ -60,6 +60,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import megamek.client.ui.util.UIUtil;
+import megamek.common.annotations.Nullable;
 import megamek.common.util.ImageUtil;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -121,7 +122,6 @@ public class StratConPanel extends JPanel implements ActionListener {
     private static final String RIGHT_CLICK_COMMAND_REMOVE_SCENARIO = "RemoveScenario";
     private static final String RIGHT_CLICK_COMMAND_RESET_DEPLOYMENT = "ResetDeployment";
     private static final String RIGHT_CLICK_COMMAND_ADD_CITY = "AddCity";
-    private static final String RIGHT_CLICK_COMMAND_CHANGE_TERRAIN = "ChangeTerrain";
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.AtBStratCon";
 
@@ -635,14 +635,6 @@ public class StratConPanel extends JPanel implements ActionListener {
 
                 rightClickMenu.add(menuItemAddFacility);
             }
-
-            // Terrain painting opens a palette rather than acting on this hex alone, since reshaping a coastline or a
-            // range takes many strokes.
-            JMenuItem menuItemPaintTerrain = new JMenuItem();
-            menuItemPaintTerrain.setText("Change Terrain (GM)");
-            menuItemPaintTerrain.setActionCommand(RIGHT_CLICK_COMMAND_CHANGE_TERRAIN);
-            menuItemPaintTerrain.addActionListener(this);
-            rightClickMenu.add(menuItemPaintTerrain);
 
             // City overlay editing: remove an existing city, or add one to any dry hex. Either change recomputes roads.
             if (currentTrack.isCity(coords)) {
@@ -1720,9 +1712,13 @@ public class StratConPanel extends JPanel implements ActionListener {
             }
         }
 
-        public void setSelectedCoords(StratConCoords coords) {
-            selectedX = coords.getX();
-            selectedY = coords.getY();
+        /**
+         * Sets the selected hex, or clears the selection when given {@code null} (mirroring
+         * {@link #getSelectedCoords}).
+         */
+        public void setSelectedCoords(@Nullable StratConCoords coords) {
+            selectedX = (coords == null) ? null : coords.getX();
+            selectedY = (coords == null) ? null : coords.getY();
         }
     }
 
@@ -1862,9 +1858,6 @@ public class StratConPanel extends JPanel implements ActionListener {
                 newFacility.setVisible(currentTrack.getRevealedCoords().contains(selectedCoords));
                 currentTrack.addFacility(selectedCoords, newFacility);
                 recalculateRoads();
-                break;
-            case RIGHT_CLICK_COMMAND_CHANGE_TERRAIN:
-                openTerrainPaintDialog();
                 break;
             case RIGHT_CLICK_COMMAND_ADD_CITY:
                 currentTrack.addCity(selectedCoords);
