@@ -36,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import mekhq.campaign.digitalGM.stratCon.StratConBiomeManifest.MapTypeList;
 import org.junit.jupiter.api.Test;
@@ -64,20 +65,21 @@ class StratConBiomeMapSelectionTest {
     }
 
     @Test
-    void lunarTerrains_fallBackToLunarPool() {
-        MapTypeList lunar = MANIFEST.getBiomeMapTypes().get("LUNAR");
-        assertNotNull(lunar, "a LUNAR fallback pool should be authored");
-        assertFalse(lunar.mapTypes.isEmpty());
-        assertSame(lunar, MANIFEST.getMapTypesForTerrain("Mars"), "Mars should resolve via LUNAR");
-        assertSame(lunar, MANIFEST.getMapTypesForTerrain("GrayLunar"), "GrayLunar should resolve via LUNAR");
+    void marsAndGrayLunar_resolveToTheirOwnDistinctPools() {
+        MapTypeList mars = MANIFEST.getMapTypesForTerrain("Mars");
+        MapTypeList grayLunar = MANIFEST.getMapTypesForTerrain("GrayLunar");
+
+        assertSame(MANIFEST.getBiomeMapTypes().get("Mars"), mars, "Mars should resolve to its own pool");
+        assertSame(MANIFEST.getBiomeMapTypes().get("GrayLunar"), grayLunar, "GrayLunar should resolve to its own pool");
+        assertTrue(mars.mapTypes.contains("StratconMars"), "Mars should use the Mars mapgen theme");
+        assertTrue(grayLunar.mapTypes.contains("StratconLunar"), "GrayLunar should use the lunar mapgen theme");
     }
 
     @Test
-    void volcano_fallsBackToVolcanicPool() {
+    void volcano_resolvesToItsOwnPool() {
         MapTypeList resolved = MANIFEST.getMapTypesForTerrain("Volcano");
-        assertSame(MANIFEST.getBiomeMapTypes().get("VOLCANIC"), resolved, "Volcano should resolve via VOLCANIC");
-        assertNotNull(resolved);
-        assertFalse(resolved.mapTypes.isEmpty(), "VOLCANIC fallback pool should not be empty");
+        assertSame(MANIFEST.getBiomeMapTypes().get("Volcano"), resolved, "Volcano should resolve to its own pool");
+        assertTrue(resolved.mapTypes.contains("StratconVolcanic"), "Volcano should use the volcanic mapgen theme");
     }
 
     @Test

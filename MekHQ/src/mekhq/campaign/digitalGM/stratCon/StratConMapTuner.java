@@ -60,6 +60,13 @@ public final class StratConMapTuner {
     private static final int WATER_MIN_SPOTS = 1;
     private static final int WATER_MIN_MAX_SPOTS = 2;
 
+    /** City-block count range for an urban hex, scaled from a sparse frontier town to a dense metropolis. */
+    private static final int URBAN_MIN_BLOCKS = 6;
+    private static final int URBAN_MAX_BLOCKS = 26;
+    /** Urbanization thresholds separating town / hub / metropolis city forms. */
+    private static final double URBAN_TOWN_CEILING = 0.33;
+    private static final double URBAN_HUB_CEILING = 0.66;
+
     /**
      * Applies all hex-derived tuning to the given map settings for the given scenario.
      *
@@ -108,8 +115,8 @@ public final class StratConMapTuner {
             }
             case AGRICULTURE -> mapSettings.setPlantedFieldParams(6, 14, 2, 4);
             default -> {
-                // NEUTRAL, LUNAR, VOLCANIC, URBAN, OCEAN: no feature reinforcement here; base comes from the theme
-                // (and, for volcanic, from a later magma pass).
+                // NEUTRAL, LUNAR, VOLCANIC, URBAN, OCEAN: no feature reinforcement here. Lunar and volcanic get their
+                // full look (craters, rubble, magma peaks) from dedicated mapgen themes; the rest come from the theme.
             }
         }
 
@@ -190,5 +197,37 @@ public final class StratConMapTuner {
                   mapSettings.getMaxWaterSize(),
                   mapSettings.getProbDeep());
         }
+    }
+
+    /**
+     * When the hex holds a city, lay an urban area onto the board over whatever base terrain the theme produced (so a
+     * city in the mountains or on volcanic ground still reads as a city). The city's form and size scale with the
+     * sector's urbanization, from a sparse frontier town up to a dense metropolis.
+     */
+    private static void applyUrban(MapSettings mapSettings, AtBScenario scenario) {
+        if (!scenario.isStratConUrban()) {
+            return;
+        }
+
+        double urbanization = Math.clamp(scenario.getStratConUrbanization(), 0.0, 1.0);
+
+        String cityType;
+        if (urbanization < URBAN_TOWN_CEILING) {
+            cityType = "TOWN";
+        } else if (urbanization < URBAN_HUB_CEILING) {
+            cityType = "HUB";
+        } else {
+            cityType = "METRO";
+        }
+
+        int cityBlocks = (int) Math.round(URBAN_MIN_BLOCKS + (urbanization * (URBAN_MAX_BLOCKS - URBAN_MIN_BLOCKS)));
+        int maxFloors = (int) Math.round(2 + (urbanization * 8));       // 2..10 storeys
+        int density = (int) Math.round(40 + (urbanization * 60));       // 40..100% built-up footprint
+        int townSize = (int) Math.round(40 + (urbanization * 60));      // used by the TOWN form
+
+        mapSettings.setCityParams(cityBlocks, cityType, 10, 100, 1, maxFloors, density, townSize);
+
+        // a little paved ground around the buildings
+        mapSettings.setPavementParams(1, 3, 2, 6);
     }
 }
