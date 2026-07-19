@@ -64,6 +64,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 
+import megamek.client.ui.util.UIUtil;
 import megamek.common.util.ImageUtil;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -194,6 +195,10 @@ public class StratConPanel extends JPanel implements ActionListener {
 
         scenarioWizard = new StratConScenarioWizard(campaign, this);
         this.infoArea = infoArea;
+        // The selected-hex info is drawn as a HUD over the (dark) map, so its default text reads white; the HTML's own
+        // colored spans (recon/objective cues) still show through.
+        this.infoArea.setForeground(Color.WHITE);
+        this.infoArea.setOpaque(false);
 
         assignmentUI = new TrackForceAssignmentUI(this);
         assignmentUI.setVisible(false);
@@ -520,6 +525,125 @@ public class StratConPanel extends JPanel implements ActionListener {
         //            g2D.setColor(BLUE);
         //            g2D.drawRect((int) clickedPoint.getX(), (int) clickedPoint.getY(), 2, 2);
         //        }
+
+        // Drawn last, pinned to the corners of the visible viewport, so they stay put as the map scrolls.
+        drawSectorEnvironment(g2D);
+        drawSelectedHexInfo(g2D);
+    }
+
+    /**
+     * Draws the selected-hex info (temperature, terrain, recon status, scenario details) as a translucent box pinned to
+     * the bottom-right of the visible map area. Skipped when no hex is selected. The content wraps to a bounded width
+     * (see {@link #buildSelectedHexInfo}) so long terrain/scenario names do not overflow.
+     */
+    private void drawSelectedHexInfo(Graphics2D g2D) {
+        if ((currentTrack == null) || (boardState.getSelectedCoords() == null)) {
+            return;
+        }
+
+        Dimension content = infoArea.getPreferredSize();
+        if ((content.width <= 0) || (content.height <= 0)) {
+            return;
+        }
+        infoArea.setSize(content);
+
+        int pad = UIUtil.scaleForGUI(8);
+        int margin = UIUtil.scaleForGUI(8);
+        int arc = UIUtil.scaleForGUI(10);
+        int boxWidth = content.width + (pad * 2);
+        int boxHeight = content.height + (pad * 2);
+
+        Rectangle visible = getVisibleRect();
+        int boxX = (visible.x + visible.width) - boxWidth - margin;
+        int boxY = (visible.y + visible.height) - boxHeight - margin;
+
+        g2D.setColor(new Color(0, 0, 0, 190));
+        g2D.fillRoundRect(boxX, boxY, boxWidth, boxHeight, arc, arc);
+        g2D.setColor(new Color(255, 255, 255, 60));
+        g2D.drawRoundRect(boxX, boxY, boxWidth, boxHeight, arc, arc);
+
+        AffineTransform saved = g2D.getTransform();
+        g2D.translate(boxX + pad, boxY + pad);
+        infoArea.paint(g2D);
+        g2D.setTransform(saved);
+    }
+
+    /**
+     * Draws the sector environment HUD (latitude, average temperature, and the generation profiles) as a translucent
+     * box pinned to the top-right of the visible map area. Skipped for legacy sectors that carry no profile data.
+     */
+    private void drawSectorEnvironment(Graphics2D g2D) {
+        if ((currentTrack == null) || (currentTrack.getLatitudeBand() == null)) {
+            return;
+        }
+
+        String[] lines = {
+              "Sector Environment",
+              "Latitude: " + prettifyProfile(currentTrack.getLatitudeBand()),
+              "Avg. Temperature: " + currentTrack.getTemperature() + "°C",
+              "Hydrology: " + prettifyProfile(currentTrack.getHydrologyProfile()),
+              "Terrain: " + prettifyProfile(currentTrack.getOrogenyProfile()),
+              "Settlement: " + prettifyProfile(currentTrack.getUrbanProfile()),
+              "Settlements: " + currentTrack.getCities().size()
+        };
+
+        Font bodyFont = getFont().deriveFont(Font.PLAIN, UIUtil.scaleForGUI(12));
+        Font titleFont = bodyFont.deriveFont(Font.BOLD);
+        FontMetrics bodyMetrics = g2D.getFontMetrics(bodyFont);
+        FontMetrics titleMetrics = g2D.getFontMetrics(titleFont);
+        int lineHeight = bodyMetrics.getHeight();
+
+        int textWidth = titleMetrics.stringWidth(lines[0]);
+        for (int i = 1; i < lines.length; i++) {
+            textWidth = Math.max(textWidth, bodyMetrics.stringWidth(lines[i]));
+        }
+
+        int pad = UIUtil.scaleForGUI(8);
+        int margin = UIUtil.scaleForGUI(8);
+        int arc = UIUtil.scaleForGUI(10);
+        int boxWidth = textWidth + (pad * 2);
+        int boxHeight = (lineHeight * lines.length) + (pad * 2);
+
+        Rectangle visible = getVisibleRect();
+        int boxX = (visible.x + visible.width) - boxWidth - margin;
+        int boxY = visible.y + margin;
+
+        g2D.setColor(new Color(0, 0, 0, 190));
+        g2D.fillRoundRect(boxX, boxY, boxWidth, boxHeight, arc, arc);
+        g2D.setColor(new Color(255, 255, 255, 60));
+        g2D.drawRoundRect(boxX, boxY, boxWidth, boxHeight, arc, arc);
+
+        int textX = boxX + pad;
+        int textY = boxY + pad + bodyMetrics.getAscent();
+        for (int i = 0; i < lines.length; i++) {
+            if (i == 0) {
+                g2D.setFont(titleFont);
+                g2D.setColor(new Color(0xE8, 0xC4, 0x0A));
+            } else {
+                g2D.setFont(bodyFont);
+                g2D.setColor(Color.WHITE);
+            }
+            g2D.drawString(lines[i], textX, textY);
+            textY += lineHeight;
+        }
+    }
+
+    /**
+     * Turns a stored profile/band enum name ({@code COASTAL_PORTS}) into a readable label ({@code Coastal Ports}), or
+     * an em dash when the value is absent.
+     */
+    private static String prettifyProfile(String enumName) {
+        if ((enumName == null) || enumName.isBlank()) {
+            return "—";
+        }
+
+        StringBuilder pretty = new StringBuilder();
+        for (String word : enumName.toLowerCase().split("_")) {
+            if (!word.isEmpty()) {
+                pretty.append(Character.toUpperCase(word.charAt(0))).append(word.substring(1)).append(' ');
+            }
+        }
+        return pretty.toString().trim();
     }
 
     /**
@@ -1304,7 +1428,8 @@ public class StratConPanel extends JPanel implements ActionListener {
 
     private String buildSelectedHexInfo(Campaign campaign) {
         StringBuilder infoBuilder = new StringBuilder();
-        infoBuilder.append("<html><br/>");
+        // Bound the width so long content (e.g. long terrain/scenario names) wraps instead of overflowing the HUD.
+        infoBuilder.append("<html><body style='width: ").append(UIUtil.scaleForGUI(300)).append("px'>");
 
         infoBuilder.append("<b>Average Temperature:</b> ");
         infoBuilder.append(selectedHexTemperature(boardState.getSelectedCoords()));
@@ -1382,7 +1507,7 @@ public class StratConPanel extends JPanel implements ActionListener {
             }
         }
 
-        infoBuilder.append("</html>");
+        infoBuilder.append("</body></html>");
 
         return infoBuilder.toString();
     }

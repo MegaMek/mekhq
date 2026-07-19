@@ -49,7 +49,6 @@ import java.awt.event.MouseEvent;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -109,11 +108,10 @@ public class StratConTab extends CampaignGuiTab {
     private RoundedJButton btnEditSupportPoints;
     private RoundedJButton btnEditVictoryPoints;
     private RoundedJButton btnToggleHiddenObjects;
-    private JLabel campaignStatusText;
     private JLabel objectiveStatusText;
-    private JLabel locationInfoText;
-    private JPanel locationPanel;
     private JPanel threatLevelPanel;
+    private JPanel deploymentTimePanel;
+    private JPanel supportPointsPanel;
     private JPanel victoryPointsPanel;
     private JScrollPane expandedObjectivePanel;
     private boolean objectivesCollapsed = false;
@@ -150,10 +148,6 @@ public class StratConTab extends CampaignGuiTab {
         infoPanelText = new JLabel();
         infoPanelText.setHorizontalAlignment(SwingConstants.LEFT);
         infoPanelText.setVerticalAlignment(SwingConstants.TOP);
-
-        campaignStatusText = new JLabel();
-        campaignStatusText.setHorizontalAlignment(SwingConstants.LEFT);
-        campaignStatusText.setVerticalAlignment(SwingConstants.TOP);
 
         objectiveStatusText = new JLabel();
         objectiveStatusText.setHorizontalAlignment(SwingConstants.LEFT);
@@ -233,80 +227,30 @@ public class StratConTab extends CampaignGuiTab {
         constraints.insets = new Insets(5, 5, 5, 5);
         constraints.gridx = 0;
 
-        // Add campaign status text
-        constraints.gridy = gridY++;
-        infoPanel.add(campaignStatusText, constraints);
+        // The old contract status-text block was removed: the contract name is already in the picker, and the figures
+        // (support points, deployment period) now show as bars below. Support-point / victory-point editing lives on the
+        // "Edit SP (GM)" / "Edit CVP (GM)" bottom-bar buttons; the sector environment and selected-hex stats are HUDs
+        // drawn on the map (see StratConPanel).
 
-        // Support-point / victory-point editing moved to the "Edit SP (GM)" / "Edit CVP (GM)" buttons on the bottom bar.
-
-        // Sector environment panel: latitude, average temperature, and the generation profiles used - immersion detail
-        // for the selected sector. Populated by updateLocationInfo(); hidden for legacy sectors that carry no profiles.
-        locationInfoText = new JLabel();
-        locationInfoText.setHorizontalAlignment(SwingConstants.LEFT);
-        locationInfoText.setVerticalAlignment(SwingConstants.TOP);
-        locationPanel = new JPanel(new BorderLayout());
-        locationPanel.setOpaque(false);
-        locationPanel.setBorder(BorderFactory.createTitledBorder(getTextAt(RESOURCE_BUNDLE,
-              "stratConTab.location.title")));
-        locationPanel.add(locationInfoText, BorderLayout.CENTER);
-        locationPanel.setVisible(false);
-        constraints.gridy = gridY++;
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.weightx = 1.0;
-        infoPanel.add(locationPanel, constraints);
-        constraints.fill = GridBagConstraints.NONE;
-        constraints.weightx = 0.0;
-
-        // The GM sector tools (Scout / Reset Fog / Regenerate / Edit SP / Edit CVP / Toggle Hidden) live in a button bar
-        // along the bottom of the tab; see initializeGmButtonPanel().
-
-        // Add the threat-level bar (per-sector scenario odds) directly above the victory-point bar
-        threatLevelPanel = new JPanel(new BorderLayout());
-        threatLevelPanel.setOpaque(false);
-        constraints.gridy = gridY++;
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.weightx = 1.0;
-        infoPanel.add(threatLevelPanel, constraints);
-        constraints.fill = GridBagConstraints.NONE;
-        constraints.weightx = 0.0;
-
-        // Add the victory-point progress bar directly above the objectives list
-        victoryPointsPanel = new JPanel(new BorderLayout());
-        victoryPointsPanel.setOpaque(false);
-        constraints.gridy = gridY++;
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.weightx = 1.0;
-        infoPanel.add(victoryPointsPanel, constraints);
-        constraints.fill = GridBagConstraints.NONE;
-        constraints.weightx = 0.0;
-
-        // Add the objectives panel. Its height tracks the objective content (see applyObjectiveText) so it is only as
-        // tall as it needs to be; the scroll pane remains as a safety net for unusually long objective lists.
+        // Add the objectives panel above the bars. Its height tracks the objective content (see applyObjectiveText) so
+        // it is only as tall as it needs to be; the scroll pane remains as a safety net for unusually long lists.
         expandedObjectivePanel = new FastJScrollPane(objectiveStatusText);
         expandedObjectivePanel.setBorder(RoundedLineBorder.createRoundedLineBorder());
         constraints.gridy = gridY++;
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.weightx = 1.0;
         infoPanel.add(expandedObjectivePanel, constraints);
-
-        // Reset horizontal fill for subsequent components
         constraints.fill = GridBagConstraints.NONE;
         constraints.weightx = 0.0;
 
-        // Add the selected-hex stats in their own bordered panel (temperature, terrain, recon status, scenario details)
-        JPanel selectedHexPanel = new JPanel(new BorderLayout());
-        selectedHexPanel.setOpaque(false);
-        selectedHexPanel.setBorder(BorderFactory.createTitledBorder(getTextAt(RESOURCE_BUNDLE,
-              "stratConTab.selectedHex.title")));
-        selectedHexPanel.add(infoPanelText, BorderLayout.CENTER);
-        constraints.gridx = 0;
-        constraints.gridy = gridY++;
-        constraints.gridheight = 3;
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.weightx = 1.0;
-        infoPanel.add(selectedHexPanel, constraints);
-        constraints.fill = GridBagConstraints.NONE;
-        constraints.weightx = 0.0;
+        // Bars stack below the objectives, worst-to-objective: threat, deployment time, support points, victory points.
+        threatLevelPanel = addBarPanel(constraints, gridY++);
+        deploymentTimePanel = addBarPanel(constraints, gridY++);
+        supportPointsPanel = addBarPanel(constraints, gridY++);
+        victoryPointsPanel = addBarPanel(constraints, gridY++);
+
+        // The selected-hex stats (temperature, terrain, recon status, scenario details) are drawn as a HUD in the
+        // bottom-right of the map itself; see StratConPanel.drawSelectedHexInfo(). infoPanelText is the label it paints.
 
         // Add a spacer to push all components upward (top alignment)
         constraints.gridx = 0;
@@ -314,6 +258,22 @@ public class StratConTab extends CampaignGuiTab {
         constraints.weighty = 1.0;
         constraints.fill = GridBagConstraints.VERTICAL;
         infoPanel.add(new JPanel(), constraints); // Invisible filler component
+    }
+
+    /**
+     * Creates a horizontally-filling, transparent host panel for a {@link ContractMeterBar}, adds it to the info panel
+     * at the given grid row, and returns it. Restores the shared constraints afterward.
+     */
+    private JPanel addBarPanel(GridBagConstraints constraints, int gridY) {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setOpaque(false);
+        constraints.gridy = gridY;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.weightx = 1.0;
+        infoPanel.add(panel, constraints);
+        constraints.fill = GridBagConstraints.NONE;
+        constraints.weightx = 0.0;
+        return panel;
     }
 
     /**
@@ -502,7 +462,7 @@ public class StratConTab extends CampaignGuiTab {
      * status, VP/SP totals, etc.
      */
     public void updateCampaignState() {
-        if ((contractSelector == null) || (campaignStatusText == null)) {
+        if ((contractSelector == null) || (victoryPointsPanel == null)) {
             return;
         }
 
@@ -527,57 +487,27 @@ public class StratConTab extends CampaignGuiTab {
             btnEditVictoryPoints.setEnabled(isGM);
         }
 
-        // campaign state text should contain:
-        // list of remaining objectives, percentage remaining
-        // current VP
-        // current support points
+        // No active/started contract selected: nothing to chart.
         if (currentContract == null) {
-            campaignStatusText.setText(getTextAt(RESOURCE_BUNDLE, "stratConTab.status.noContract"));
-            expandedObjectivePanel.setVisible(false);
-            victoryPointsPanel.setVisible(false);
-            threatLevelPanel.setVisible(false);
-            locationPanel.setVisible(false);
+            hideInfoBars();
+            applyObjectiveText("");
             return;
         }
 
         LocalDate currentDate = getCampaignGui().getCampaign().getLocalDate();
-
         LocalDate startDate = currentContract.getStartDate();
         if (startDate != null && startDate.isAfter(currentDate)) {
-            campaignStatusText.setText(getTextAt(RESOURCE_BUNDLE, "stratConTab.status.notStarted"));
-            expandedObjectivePanel.setVisible(false);
-            victoryPointsPanel.setVisible(false);
-            threatLevelPanel.setVisible(false);
-            locationPanel.setVisible(false);
+            hideInfoBars();
+            applyObjectiveText("");
             return;
         }
 
         StratConCampaignState campaignState = currentContract.getStratConCampaignState();
         expandedObjectivePanel.setVisible(true);
         updateThreatLevelBar(currentSectorTrack);
+        updateDeploymentTimeBar(currentSectorTrack);
+        updateSupportPointsBar();
         updateVictoryPointsBar(campaignState);
-
-        StringBuilder sb = new StringBuilder();
-        sb.append(getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.status.header",
-              currentContract.getContractType(), currentContract.getName(), campaignState.getBriefingText()));
-
-        LocalDate endingDate = currentContract.getEndingDate();
-        if (endingDate != null && endingDate.isBefore(currentDate)) {
-            sb.append(getTextAt(RESOURCE_BUNDLE, "stratConTab.status.expired"));
-        }
-
-        // Campaign Victory Points are charted by the progress bar above the objectives list, so they are no longer
-        // repeated as text here; only the support-point total remains in the status header.
-        sb.append(getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.status.supportPoints",
-              String.valueOf(campaignState.getSupportPoints())));
-
-        if (currentSectorTrack != null) {
-            sb.append(getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.status.deploymentPeriod",
-                  String.valueOf(currentSectorTrack.getDeploymentTime())));
-        }
-        sb.append("</html>");
-
-        campaignStatusText.setText(sb.toString());
 
         if (currentSectorTrack != null) {
             applyObjectiveText(getStrategicObjectiveText(campaignState, currentSectorTrack));
@@ -585,59 +515,19 @@ public class StratConTab extends CampaignGuiTab {
             applyObjectiveText("");
         }
 
-        updateLocationInfo(currentSectorTrack);
-
         // keep the sector tab colors in sync as objectives are completed/failed over the course of the contract
         applySectorTabColors();
     }
 
     /**
-     * Populates the sector environment panel from the selected track's recorded generation data (latitude, temperature,
-     * and the hydrology/orogeny/urban profiles). Hidden when there is no track, or for legacy sectors that carry no
-     * profile data.
-     *
-     * @param track the currently selected sector's track, or {@code null}
+     * Hides every info-panel bar and the objectives list, for states with no active/started contract.
      */
-    private void updateLocationInfo(StratConTrackState track) {
-        if ((track == null) || (track.getLatitudeBand() == null)) {
-            locationPanel.setVisible(false);
-            return;
-        }
-
-        StringBuilder sb = new StringBuilder("<html>");
-        sb.append(locationRow("stratConTab.location.latitude", prettifyProfile(track.getLatitudeBand())));
-        sb.append(locationRow("stratConTab.location.temperature", track.getTemperature() + "°C"));
-        sb.append(locationRow("stratConTab.location.hydrology", prettifyProfile(track.getHydrologyProfile())));
-        sb.append(locationRow("stratConTab.location.terrain", prettifyProfile(track.getOrogenyProfile())));
-        sb.append(locationRow("stratConTab.location.settlement", prettifyProfile(track.getUrbanProfile())));
-        sb.append(locationRow("stratConTab.location.settlements", String.valueOf(track.getCities().size())));
-        sb.append("</html>");
-
-        locationInfoText.setText(sb.toString());
-        locationPanel.setVisible(true);
-    }
-
-    private String locationRow(String labelKey, String value) {
-        return "<b>" + getTextAt(RESOURCE_BUNDLE, labelKey) + "</b> " + value + "<br>";
-    }
-
-    /**
-     * Turns a stored profile/band enum name ({@code COASTAL_PORTS}) into a readable label ({@code Coastal Ports}), or
-     * an em dash when the value is absent (e.g. no cities were placed).
-     */
-    private String prettifyProfile(String enumName) {
-        if ((enumName == null) || enumName.isBlank()) {
-            return getTextAt(RESOURCE_BUNDLE, "stratConTab.location.none");
-        }
-
-        StringBuilder pretty = new StringBuilder();
-        for (String word : enumName.toLowerCase().split("_")) {
-            if (word.isEmpty()) {
-                continue;
-            }
-            pretty.append(Character.toUpperCase(word.charAt(0))).append(word.substring(1)).append(' ');
-        }
-        return pretty.toString().trim();
+    private void hideInfoBars() {
+        expandedObjectivePanel.setVisible(false);
+        threatLevelPanel.setVisible(false);
+        deploymentTimePanel.setVisible(false);
+        supportPointsPanel.setVisible(false);
+        victoryPointsPanel.setVisible(false);
     }
 
     /**
@@ -691,6 +581,48 @@ public class StratConTab extends CampaignGuiTab {
 
         threatLevelPanel.revalidate();
         threatLevelPanel.repaint();
+    }
+
+    /**
+     * Refreshes the deployment-time bar for the selected sector: how long a deployment lasts, 0 to 10, where a longer
+     * deployment is worse. Hidden when no sector is selected.
+     *
+     * @param track the currently selected sector's track, or {@code null}
+     */
+    private void updateDeploymentTimeBar(StratConTrackState track) {
+        deploymentTimePanel.removeAll();
+
+        if (track == null) {
+            deploymentTimePanel.setVisible(false);
+            return;
+        }
+
+        deploymentTimePanel.setVisible(true);
+        deploymentTimePanel.add(ContractMeterBar.deploymentTime(track.getDeploymentTime()), BorderLayout.CENTER);
+
+        deploymentTimePanel.revalidate();
+        deploymentTimePanel.repaint();
+    }
+
+    /**
+     * Refreshes the support-points bar: the contract's current support points against the reserve it can negotiate up
+     * to. Hidden when there is no positive reserve.
+     */
+    private void updateSupportPointsBar() {
+        supportPointsPanel.removeAll();
+
+        int current = currentContract.getCurrentSupportPoints();
+        int maximum = currentContract.getMaximumSupportPoints();
+        if (maximum <= 0) {
+            supportPointsPanel.setVisible(false);
+            return;
+        }
+
+        supportPointsPanel.setVisible(true);
+        supportPointsPanel.add(ContractMeterBar.supportPoints(current, maximum), BorderLayout.CENTER);
+
+        supportPointsPanel.revalidate();
+        supportPointsPanel.repaint();
     }
 
     /**

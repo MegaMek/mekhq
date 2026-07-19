@@ -233,6 +233,27 @@ public class ContractMeterBar extends JPanel {
     }
 
     /**
+     * Creates a deployment-time gauge running from 0 to 10, where a longer deployment is worse, so the gradient is
+     * reversed (green on the left, red on the right). The marker is positioned within the 0..10 track but labelled with
+     * the actual day count.
+     *
+     * @param days the deployment length in days
+     *
+     * @return the configured gauge
+     */
+    public static @Nonnull ContractMeterBar deploymentTime(final int days) {
+        final int position = Math.max(0, Math.min(10, days));
+        final Color markerColor = markerColor();
+        final List<Marker> markers = new ArrayList<>(3);
+        markers.add(new Marker(10, "10", markerColor, MarkerStyle.TICK, false));
+        markers.add(new Marker(0, "0", markerColor, MarkerStyle.TICK, false));
+        markers.add(new Marker(position, Integer.toString(days), CURRENT_MARKER_COLOR, MarkerStyle.SOLID, true, true));
+        final String tooltip = getFormattedTextAt(RESOURCE_BUNDLE, "contractDeploymentBar.tooltip", days);
+        return new ContractMeterBar(getTextAt(RESOURCE_BUNDLE, "contractDeploymentBar.title.text"), 0, 10,
+              new Color[] { GREEN, GOLD, DEEP_RED }, GREEN.darker(), DEEP_RED.darker(), markers, tooltip);
+    }
+
+    /**
      * Creates a neutral progress gauge of how far the current date has advanced between a contract's start and end.
      * Unlike the value meters, the track is a single neutral color: time has no good or bad direction, so a red-to-green
      * gradient would imply a judgement that does not exist. The start and end are unlabeled ticks (the dates are carried
