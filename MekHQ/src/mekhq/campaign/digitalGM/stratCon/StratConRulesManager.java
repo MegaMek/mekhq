@@ -1585,6 +1585,9 @@ public class StratConRulesManager {
                     facility.setVisible(true);
                     track.addFacility(coords, facility);
                     setupFacilityScenario(scenario, facility);
+                    // A new base belongs on the road grid if the planet's owner holds it, same as one placed at
+                    // contract start.
+                    StratConContractInitializer.connectFacilitiesToRoads(track, contract, campaign);
                 }
             }
         }
@@ -3795,6 +3798,13 @@ public class StratConRulesManager {
 
                     if ((facility != null) && (facility.getOwnershipChangeScore() > 0)) {
                         switchFacilityOwner(facility);
+                    }
+
+                    // Only the planet owner's facilities sit on the road grid, so rebuild it when this scenario may
+                    // have disturbed one: the facility here just changed hands, or an objective destroyed it earlier in
+                    // this resolution (which leaves its hex still carrying road). Other scenarios leave roads alone.
+                    if ((facility != null) || track.isRoad(scenario.getCoords())) {
+                        StratConContractInitializer.connectFacilitiesToRoads(track, (AtBContract) mission, campaign);
                     }
 
                     processTrackForceReturnDates(track, campaign);
