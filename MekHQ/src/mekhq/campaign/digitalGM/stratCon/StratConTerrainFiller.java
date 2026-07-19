@@ -93,9 +93,6 @@ public final class StratConTerrainFiller {
     private static final String SWAMP_TERRAIN = "Swamp";
     private static final String FALLBACK_TERRAIN = "Badlands";
 
-    /** The dry terrain set used on airless worlds, until a dedicated airless biome is authored. */
-    private static final List<String> AIRLESS_TERRAINS = List.of("GrayLunar", "Mars", "Volcano");
-
     /**
      * Fills every empty (dry) hex on the track with terrain, then smooths the fill into coherent patches. Ocean and
      * mountain hexes, already placed, are left untouched.
@@ -142,15 +139,14 @@ public final class StratConTerrainFiller {
 
     /**
      * Builds the candidate dry-terrain set: the biome's dry terrains excluding water, mountains, and urban, with
-     * atmosphere gating (no vegetation on tainted/toxic worlds; the lunar/volcanic set on airless worlds).
+     * atmosphere gating (no vegetation on tainted/toxic worlds). Airless worlds draw from the dedicated {@code Airless}
+     * biome (its lunar/volcanic terrains) rather than the temperature-selected Terran biome.
      */
     static List<String> candidateTerrains(StratConBiome biome, PlanetProfile planet) {
-        if (planet.airless()) {
-            return AIRLESS_TERRAINS;
-        }
+        StratConBiome sourceBiome = planet.airless() ? airlessBiome(biome, planet) : biome;
 
         List<String> candidates = new ArrayList<>();
-        for (String terrain : biome.allowedTerrainTypes) {
+        for (String terrain : sourceBiome.allowedTerrainTypes) {
             if (StratConBiomeManifest.isOceanTerrain(terrain) ||
                       StratConBiomeManifest.isMountainTerrain(terrain) ||
                       StratConBiomeManifest.isUrbanTerrain(terrain)) {
@@ -166,6 +162,24 @@ public final class StratConTerrainFiller {
             candidates.add(FALLBACK_TERRAIN);
         }
         return candidates;
+    }
+
+    /**
+     * Resolves the {@code Airless} biome for the planet's temperature. Falls back to the given biome only in the
+     * degraded case where no airless biome is authored (e.g., a failed manifest load).
+     */
+    private static StratConBiome airlessBiome(StratConBiome fallback, PlanetProfile planet) {
+        var tempMap = StratConBiomeManifest.getInstance().getTempMap(StratConBiomeManifest.AIRLESS_BIOME);
+        if ((tempMap == null) || tempMap.isEmpty()) {
+            return fallback;
+        }
+
+        int kelvin = planet.temperatureCelsius() + StratConContractInitializer.ZERO_CELSIUS_IN_KELVIN;
+        var entry = tempMap.floorEntry(kelvin);
+        if (entry == null) {
+            entry = tempMap.firstEntry();
+        }
+        return entry.getValue();
     }
 
     /**

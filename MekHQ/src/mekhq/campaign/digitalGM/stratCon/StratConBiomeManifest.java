@@ -176,6 +176,12 @@ public class StratConBiomeManifest {
     public static final String TERRAN_FACILITY_BIOME = "TerranFacility";
 
     /**
+     * The "Airless" biome bucket, used for worlds with no atmosphere: its terrains are the lunar/volcanic set the
+     * improved terrain generator fills airless sectors from, replacing what used to be a hardcoded list.
+     */
+    public static final String AIRLESS_BIOME = "Airless";
+
+    /**
      * This enum is used to determine whether an image being retrieved is a terrain tile or a facility
      */
     public enum ImageType {
