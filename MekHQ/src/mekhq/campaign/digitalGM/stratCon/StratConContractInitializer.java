@@ -253,12 +253,13 @@ public class StratConContractInitializer {
             }
         }
 
-        // Now that facilities exist, fold the planet-owner's facilities into each sector's road network. Roads only
-        // exist under the improved terrain generator, and facilities are only placed outside mapless mode.
-        if (!isUseMaplessMode && campaignOptions.isUseStratConAlternateSectorTerrain()) {
+        // Now that facilities exist, fold the planet-owner's facilities into each sector's road network via the GM's
+        // sector-generation strategy (a road-less generator ignores this). Facilities are only placed outside mapless.
+        if (!isUseMaplessMode) {
             LocalDate date = campaign.getLocalDate();
+            var sectorStrategy = StratConGMs.sectorGeneration(campaignOptions);
             for (StratConTrackState track : campaignState.getTracks()) {
-                StratConRoadPlacer.recalculateRoads(track, planetOwnedFacilityCoords(track, contract, date));
+                sectorStrategy.connectFacilitiesToRoads(track, planetOwnedFacilityCoords(track, contract, date));
             }
         }
 
@@ -364,13 +365,9 @@ public class StratConContractInitializer {
         retVal.setScenarioOdds(scenarioOdds);
         retVal.setDeploymentTime(deploymentTime);
 
-        // Place terrain: the improved geography-aware generator when the alternate-terrain option is set, otherwise
-        // the legacy biome-stripe placer.
-        if (campaignOptions.isUseStratConAlternateSectorTerrain()) {
-            StratConSectorGenerator.generate(retVal, planetProfile, sector.latitudeBand(), allowCities);
-        } else {
-            StratConTerrainPlacer.InitializeTrackTerrain(retVal);
-        }
+        // Place terrain via the GM's sector-generation strategy (improved geography-aware pipeline or legacy placer).
+        StratConGMs.sectorGeneration(campaignOptions)
+              .initializeTrack(retVal, planetProfile, sector.latitudeBand(), allowCities);
 
         return retVal;
     }
@@ -379,8 +376,8 @@ public class StratConContractInitializer {
      * Regenerates a single track's terrain in place, as used by the GM "Regenerate Sector" tool. Clears the existing
      * terrain, cities, and fog, then re-runs terrain generation - the improved geography-aware generator when the
      * alternate-terrain option is set, otherwise the legacy placer. The track's dimensions and temperature are kept, a
-     * fresh latitude band is rolled, and assigned forces are left untouched. Scenarios and facilities are preserved, but
-     * any that the new coastline leaves on an ocean hex are relocated back onto land.
+     * fresh latitude band is rolled, and assigned forces are left untouched. Scenarios and facilities are preserved,
+     * but any that the new coastline leaves on an ocean hex are relocated back onto land.
      *
      * @param track    the track to regenerate
      * @param contract the contract the track belongs to (source of the planet profile and Ares-Conventions status)
@@ -394,23 +391,16 @@ public class StratConContractInitializer {
         boolean allowCities = !(contract.getEmployerFaction().isAresConventionsSignatory(year) &&
                                       contract.getEnemy().isAresConventionsSignatory(year));
 
-        track.clearForRegeneration();
-
-        if (campaignOptions.isUseStratConAlternateSectorTerrain()) {
-            StratConSectorGenerator.generate(track, planetProfile, LatitudeBand.random(), allowCities);
-        } else {
-            StratConTerrainPlacer.InitializeTrackTerrain(track);
-        }
+        var sectorStrategy = StratConGMs.sectorGeneration(campaignOptions);
+        sectorStrategy.regenerateTrack(track, planetProfile, LatitudeBand.random(), allowCities);
 
         // A regenerated coastline can leave existing facilities and scenarios sitting on new ocean hexes; move them
         // back onto land.
         relocateOccupantsOffOcean(track);
 
-        // Roads only exist under the improved generator; fold the planet-owner's facilities into the new network.
-        if (campaignOptions.isUseStratConAlternateSectorTerrain()) {
-            StratConRoadPlacer.recalculateRoads(track,
-                  planetOwnedFacilityCoords(track, contract, campaign.getLocalDate()));
-        }
+        // Fold the planet-owner's facilities into the (possibly rebuilt) road network; a road-less generator ignores it.
+        sectorStrategy.connectFacilitiesToRoads(track,
+              planetOwnedFacilityCoords(track, contract, campaign.getLocalDate()));
     }
 
     /**

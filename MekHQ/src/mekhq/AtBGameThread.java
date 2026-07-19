@@ -67,7 +67,7 @@ import megamek.common.units.IAero;
 import megamek.common.units.Infantry;
 import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
-import mekhq.campaign.digitalGM.stratCon.StratConMapTuner;
+import mekhq.campaign.digitalGM.stratCon.StratConGMs;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
@@ -179,8 +179,10 @@ public class AtBGameThread extends GameThread {
 
                 MapSettings mapSettings = ScenarioUtils.getMapSettings(scenario);
                 // StratCon: tune the generated board so it reflects the sector hex being fought on (roads, water,
-                // terrain emphasis, cities). Only affects generated (non-fixed) boards; fixed maps are used as authored.
-                StratConMapTuner.tune(mapSettings, scenario);
+                // terrain emphasis, cities), via the active GM's map-generation strategy. Only affects generated
+                // (non-fixed) boards; fixed maps are used as authored.
+                StratConGMs.mapGeneration(app.getCampaign().getCampaignOptions())
+                      .tuneMapSettings(mapSettings, scenario);
                 client.sendMapSettings(mapSettings);
                 Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
 

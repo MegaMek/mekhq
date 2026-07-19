@@ -32,9 +32,11 @@
  */
 package mekhq.campaign.digitalGM;
 
+import megamek.common.loaders.MapSettings;
 import mekhq.campaign.digitalGM.stratCon.AbstractStratConGM;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
+import mekhq.campaign.mission.AtBScenario;
 
 /**
  * Strategy for building the battlefield &mdash; picking a scenario's terrain and temperature from the biome of its
@@ -59,4 +61,15 @@ public interface IMapGenerationStrategy {
      * @param isNoTornadoes {@code true} if tornado weather should be suppressed
      */
     void setScenarioTerrain(StratConTrackState track, StratConScenario scenario, boolean isNoTornadoes);
+
+    /**
+     * Tunes the map-generation settings for a scenario at launch, so the generated board reflects the sector hex it is
+     * fought on (reinforcing the hex's terrain, tileset, and any road/water/urban features it carries). Called after
+     * the base settings are resolved and before they are sent to the game; only generated (non-fixed) boards are
+     * affected.
+     *
+     * @param mapSettings the settings the board will be generated from
+     * @param scenario    the scenario being launched, carrying its hex context
+     */
+    void tuneMapSettings(MapSettings mapSettings, AtBScenario scenario);
 }

@@ -39,6 +39,7 @@ import mekhq.campaign.digitalGM.IForceDeploymentStrategy;
 import mekhq.campaign.digitalGM.IMapGenerationStrategy;
 import mekhq.campaign.digitalGM.IOpForDeploymentStrategy;
 import mekhq.campaign.digitalGM.IOpForGenerationStrategy;
+import mekhq.campaign.digitalGM.ISectorGenerationStrategy;
 
 /**
  * Entry point for non-GM StratCon code (mainly the deployment UI) to reach the active digital GM's strategies for a
@@ -109,6 +110,19 @@ public final class StratConGMs {
      */
     public static IMapGenerationStrategy mapGeneration(CampaignOptions campaignOptions) {
         return resolveGM(campaignOptions).getMapGenerationStrategy();
+    }
+
+    /**
+     * Resolves the sector-generation (track terrain) strategy of the digital GM governing the given campaign. The GM
+     * selects the concrete generator (improved vs legacy) from the options.
+     *
+     * @param campaignOptions the campaign options used to consult the right GM and generator
+     *
+     * @return the active StratCon GM's {@link ISectorGenerationStrategy}, or the default StratCon strategy when no
+     *       StratCon GM is active
+     */
+    public static ISectorGenerationStrategy sectorGeneration(CampaignOptions campaignOptions) {
+        return resolveGM(campaignOptions).getSectorGenerationStrategy(campaignOptions);
     }
 
     /**

@@ -37,15 +37,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.digitalGM.AbstractDigitalGM;
-import mekhq.campaign.digitalGM.IFacilityStrategy;
-import mekhq.campaign.digitalGM.IForceDeploymentStrategy;
-import mekhq.campaign.digitalGM.IMapGenerationStrategy;
-import mekhq.campaign.digitalGM.IOpForDeploymentStrategy;
-import mekhq.campaign.digitalGM.IOpForGenerationStrategy;
-import mekhq.campaign.digitalGM.IReinforcementStrategy;
-import mekhq.campaign.digitalGM.IScenarioGenerationStrategy;
-import mekhq.campaign.digitalGM.IScenarioLifecycleStrategy;
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.digitalGM.*;
 import mekhq.campaign.events.NewDayEvent;
 import mekhq.campaign.mission.AtBContract;
 
@@ -81,12 +74,29 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
     private final IOpForGenerationStrategy opForGeneration = new StratConOpForGenerationStrategy();
     private final IOpForDeploymentStrategy opForDeployment = new StratConOpForDeploymentStrategy();
     private final IMapGenerationStrategy mapGeneration = new StratConMapGenerationStrategy();
+    private final ISectorGenerationStrategy improvedSectorGeneration = new ImprovedStratConSectorGeneration();
+    private final ISectorGenerationStrategy legacySectorGeneration = new LegacyStratConSectorGeneration();
 
     /**
      * @return the strategy that decides when and how scenarios are generated for this GM
      */
     protected IScenarioGenerationStrategy getScenarioGenerationStrategy() {
         return scenarioGeneration;
+    }
+
+    /**
+     * Selects the strategy that lays down a sector's terrain. The default StratCon GM picks between the improved
+     * geography-aware pipeline and the legacy biome-stripe placer from the {@code useStratConAlternateSectorTerrain}
+     * campaign option; a subclass may override to force a particular generator.
+     *
+     * @param campaignOptions the campaign options that decide which generator applies
+     *
+     * @return the sector-generation strategy for this GM
+     */
+    protected ISectorGenerationStrategy getSectorGenerationStrategy(CampaignOptions campaignOptions) {
+        return campaignOptions.isUseStratConAlternateSectorTerrain() ?
+                     improvedSectorGeneration :
+                     legacySectorGeneration;
     }
 
     /**
