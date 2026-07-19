@@ -44,11 +44,11 @@ import java.util.function.Predicate;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
-import mekhq.campaign.digitalGM.stratCon.StratConBiome;
-import mekhq.campaign.digitalGM.stratCon.StratConBiomeManifest;
 import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
+import mekhq.campaign.digitalGM.stratCon.biome.StratConBiome;
+import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 
 /**
  * Fills the dry (empty) hexes of a track with terrain, choosing each hex's terrain from the biome by weight and then

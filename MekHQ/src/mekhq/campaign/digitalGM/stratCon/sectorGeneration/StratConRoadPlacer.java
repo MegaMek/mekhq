@@ -34,9 +34,9 @@ package mekhq.campaign.digitalGM.stratCon.sectorGeneration;
 
 import java.util.*;
 
-import mekhq.campaign.digitalGM.stratCon.StratConBiomeManifest;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
+import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 
 /**
  * Builds the road network for a StratCon track: connects the sector's cities with roads and branches each network off

@@ -45,6 +45,7 @@ import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlTransient;
 import megamek.common.annotations.Nullable;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.utilities.MHQXMLUtility;
 

@@ -39,9 +39,9 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.function.Predicate;
 
-import mekhq.campaign.digitalGM.stratCon.StratConBiomeManifest;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
+import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 
 /**
  * Per-hex geographic influence fields derived from a track after oceans and mountains are placed, used by the improved

@@ -39,9 +39,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import megamek.common.compute.Compute;
-import mekhq.campaign.digitalGM.stratCon.StratConBiomeManifest;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
+import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 
 /**
  * Paints ocean onto a StratCon track in a shape determined by its {@link HydrologyProfileType}. Every profile produces

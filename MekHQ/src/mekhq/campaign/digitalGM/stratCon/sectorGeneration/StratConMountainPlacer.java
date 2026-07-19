@@ -41,9 +41,9 @@ import java.util.Set;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
-import mekhq.campaign.digitalGM.stratCon.StratConBiomeManifest;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
+import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 
 /**
  * Places mountains onto a StratCon track in a shape determined by an {@link OrogenyProfile}. The number of mountain

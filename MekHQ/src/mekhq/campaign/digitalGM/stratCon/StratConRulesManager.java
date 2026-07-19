@@ -91,6 +91,11 @@ import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario.ScenarioState;
+import mekhq.campaign.digitalGM.stratCon.biome.StratConBiome;
+import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityFactory;
+import mekhq.campaign.digitalGM.stratCon.gm.StratConGMs;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConOceanPlacer;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConRoadPlacer;
 import mekhq.campaign.events.StratConDeploymentEvent;
@@ -1627,7 +1632,7 @@ public class StratConRulesManager {
     /**
      * Applies time-sensitive facility effects.
      */
-    static void processFacilityEffects(StratConTrackState track, StratConCampaignState campaignState,
+    public static void processFacilityEffects(StratConTrackState track, StratConCampaignState campaignState,
           boolean isStartOfMonth) {
         for (StratConFacility facility : track.getFacilities().values()) {
             if (isStartOfMonth) {

@@ -37,11 +37,11 @@ import java.util.List;
 
 import megamek.common.board.Coords;
 import megamek.common.compute.Compute;
-import mekhq.campaign.digitalGM.stratCon.StratConBiome;
-import mekhq.campaign.digitalGM.stratCon.StratConBiomeManifest;
 import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
+import mekhq.campaign.digitalGM.stratCon.biome.StratConBiome;
+import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 
 /**
  * This class handles placement of StratCon terrain

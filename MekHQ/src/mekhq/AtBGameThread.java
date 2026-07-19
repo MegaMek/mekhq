@@ -67,7 +67,7 @@ import megamek.common.units.IAero;
 import megamek.common.units.Infantry;
 import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
-import mekhq.campaign.digitalGM.stratCon.StratConGMs;
+import mekhq.campaign.digitalGM.stratCon.gm.StratConGMs;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;

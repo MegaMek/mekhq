@@ -41,9 +41,9 @@ import java.util.List;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
-import mekhq.campaign.digitalGM.stratCon.StratConBiomeManifest;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
+import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 
 /**
  * Places cities onto a StratCon track as an overlay (a city sits on top of whatever base terrain its hex holds). The

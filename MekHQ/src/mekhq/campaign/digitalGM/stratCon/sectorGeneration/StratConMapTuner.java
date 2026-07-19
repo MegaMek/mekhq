@@ -33,8 +33,8 @@
 package mekhq.campaign.digitalGM.stratCon.sectorGeneration;
 
 import megamek.common.loaders.MapSettings;
-import mekhq.campaign.digitalGM.stratCon.StratConBiomeManifest;
-import mekhq.campaign.digitalGM.stratCon.StratConTerrainCategory;
+import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
+import mekhq.campaign.digitalGM.stratCon.biome.StratConTerrainCategory;
 import mekhq.campaign.mission.AtBScenario;
 
 /**

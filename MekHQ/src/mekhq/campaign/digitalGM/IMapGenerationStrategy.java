@@ -33,9 +33,9 @@
 package mekhq.campaign.digitalGM;
 
 import megamek.common.loaders.MapSettings;
-import mekhq.campaign.digitalGM.stratCon.AbstractStratConGM;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
+import mekhq.campaign.digitalGM.stratCon.gm.AbstractStratConGM;
 import mekhq.campaign.mission.AtBScenario;
 
 /**

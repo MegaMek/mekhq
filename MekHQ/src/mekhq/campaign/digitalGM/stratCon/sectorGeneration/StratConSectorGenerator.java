@@ -34,11 +34,11 @@ package mekhq.campaign.digitalGM.stratCon.sectorGeneration;
 
 import jakarta.annotation.Nullable;
 import megamek.common.compute.Compute;
-import mekhq.campaign.digitalGM.stratCon.StratConBiome;
-import mekhq.campaign.digitalGM.stratCon.StratConBiomeManifest;
 import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
+import mekhq.campaign.digitalGM.stratCon.biome.StratConBiome;
+import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 
 /**
  * The improved StratCon terrain generator: builds a sector's terrain from planetary data and a hydrology profile,

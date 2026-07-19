@@ -38,9 +38,9 @@ import static java.lang.Math.min;
 import java.util.Set;
 
 import megamek.common.compute.Compute;
-import mekhq.campaign.digitalGM.stratCon.StratConBiomeManifest;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
+import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 
 /**
  * Places farmland on a StratCon track as an agricultural catchment around its cities: each city radiates farmland out

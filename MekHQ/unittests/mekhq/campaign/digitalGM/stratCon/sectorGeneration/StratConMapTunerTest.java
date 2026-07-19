@@ -40,7 +40,7 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 
 import megamek.common.loaders.MapSettings;
-import mekhq.campaign.digitalGM.stratCon.StratConBiomeManifest;
+import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 import mekhq.campaign.mission.AtBScenario;
 import org.junit.jupiter.api.Test;
 
