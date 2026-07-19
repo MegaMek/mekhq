@@ -72,6 +72,7 @@ import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.enums.Alphabet;
 
 /**
  * This class handles StratCon state initialization when a contract is signed.
@@ -138,6 +139,16 @@ public class StratConContractInitializer {
         boolean allowCities = !(contract.getEmployerFaction().isAresConventionsSignatory(year) &&
                                       contract.getEnemy().isAresConventionsSignatory(year));
 
+        // Sectors are named after the Greek alphabet in order (Sector Alpha, Sector Beta, ...). When there are more
+        // sectors than letters the letters wrap around, so first tally how many sectors will share each letter; any
+        // letter used more than once is disambiguated with a running suffix (Sector Alpha-1, Sector Alpha-2, ...).
+        Alphabet[] greekLetters = Alphabet.values();
+        int[] letterTotals = new int[greekLetters.length];
+        for (int index = 0; index < sectorSpecs.size(); index++) {
+            letterTotals[index % greekLetters.length]++;
+        }
+        int[] letterSeen = new int[greekLetters.length];
+
         for (int index = 0; index < sectorSpecs.size(); index++) {
             int scenarioOdds = getScenarioOdds(contractDefinition);
             int deploymentTime = isUseMaplessMode ? 0 : getDeploymentTime(contractDefinition);
@@ -148,7 +159,14 @@ public class StratConContractInitializer {
                   allowCities,
                   scenarioOdds,
                   deploymentTime);
-            track.setDisplayableName(String.format("Sector %d", index));
+
+            int letterIndex = index % greekLetters.length;
+            String greek = greekLetters[letterIndex].getGreek();
+            if (letterTotals[letterIndex] > 1) {
+                track.setDisplayableName(String.format("Sector %s-%d", greek, ++letterSeen[letterIndex]));
+            } else {
+                track.setDisplayableName(String.format("Sector %s", greek));
+            }
             campaignState.addTrack(track);
         }
 
