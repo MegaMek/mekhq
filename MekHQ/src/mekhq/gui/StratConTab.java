@@ -232,7 +232,13 @@ public class StratConTab extends CampaignGuiTab {
         // "Edit SP (GM)" / "Edit CVP (GM)" bottom-bar buttons; the sector environment and selected-hex stats are HUDs
         // drawn on the map (see StratConPanel).
 
-        // Add the objectives panel above the bars. Its height tracks the objective content (see applyObjectiveText) so
+        // Bars stack at the top: threat, deployment time, support points, victory points.
+        threatLevelPanel = addBarPanel(constraints, gridY++);
+        deploymentTimePanel = addBarPanel(constraints, gridY++);
+        supportPointsPanel = addBarPanel(constraints, gridY++);
+        victoryPointsPanel = addBarPanel(constraints, gridY++);
+
+        // Add the objectives panel below the bars. Its height tracks the objective content (see applyObjectiveText) so
         // it is only as tall as it needs to be; the scroll pane remains as a safety net for unusually long lists.
         expandedObjectivePanel = new FastJScrollPane(objectiveStatusText);
         expandedObjectivePanel.setBorder(RoundedLineBorder.createRoundedLineBorder());
@@ -242,12 +248,6 @@ public class StratConTab extends CampaignGuiTab {
         infoPanel.add(expandedObjectivePanel, constraints);
         constraints.fill = GridBagConstraints.NONE;
         constraints.weightx = 0.0;
-
-        // Bars stack below the objectives, worst-to-objective: threat, deployment time, support points, victory points.
-        threatLevelPanel = addBarPanel(constraints, gridY++);
-        deploymentTimePanel = addBarPanel(constraints, gridY++);
-        supportPointsPanel = addBarPanel(constraints, gridY++);
-        victoryPointsPanel = addBarPanel(constraints, gridY++);
 
         // The selected-hex stats (temperature, terrain, recon status, scenario details) are drawn as a HUD in the
         // bottom-right of the map itself; see StratConPanel.drawSelectedHexInfo(). infoPanelText is the label it paints.
@@ -676,13 +676,13 @@ public class StratConTab extends CampaignGuiTab {
         String summary = getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.objectives.summary",
               String.valueOf(completedObjectives), String.valueOf(desiredObjectives));
 
-        // Colour the summary to match this sector's tab and detailed objective list: green only when every
-        // objective is complete, red only when every objective has failed, amber while any remain in progress, and
-        // no emphasis colour when the sector has no objectives at all (a 0/0 sector is not "complete").
+        // Colour the summary to match this sector's tab and detailed objective list: green when every objective is
+        // complete, red as soon as any objective has failed, amber while objectives remain outstanding, and no emphasis
+        // colour when the sector has no objectives at all (a 0/0 sector is not "complete").
         String color = switch (sectorObjectiveState(track)) {
             case NONE -> null;
             case ALL_COMPLETE -> ReportingUtilities.getPositiveColor();
-            case ALL_FAILED -> ReportingUtilities.getNegativeColor();
+            case ANY_FAILED -> ReportingUtilities.getNegativeColor();
             case IN_PROGRESS -> ReportingUtilities.getWarningColor();
         };
 
@@ -908,17 +908,17 @@ public class StratConTab extends CampaignGuiTab {
      * The aggregate objective status of a single sector, shared by the sector tab colour and the objective summary
      * one-liner so the two can never disagree.
      */
-    private enum SectorObjectiveState {NONE, ALL_COMPLETE, ALL_FAILED, IN_PROGRESS}
+    private enum SectorObjectiveState {NONE, ALL_COMPLETE, ANY_FAILED, IN_PROGRESS}
 
     /**
      * @return the aggregate objective state for the given sector: {@link SectorObjectiveState#NONE} when it has no
-     *       objectives, {@code ALL_COMPLETE}/{@code ALL_FAILED} only when <em>every</em> objective is complete/failed,
-     *       and {@code IN_PROGRESS} whenever any objectives remain outstanding.
+     *       objectives, {@code ANY_FAILED} as soon as <em>any</em> objective has failed, {@code ALL_COMPLETE} when every
+     *       objective is complete, and {@code IN_PROGRESS} whenever objectives remain outstanding.
      */
     private SectorObjectiveState sectorObjectiveState(StratConTrackState track) {
         boolean hasObjectives = false;
         boolean allCompleted = true;
-        boolean allFailed = true;
+        boolean anyFailed = false;
 
         for (StratConStrategicObjective objective : track.getStrategicObjectives()) {
             hasObjectives = true;
@@ -926,19 +926,19 @@ public class StratConTab extends CampaignGuiTab {
             if (!objective.isObjectiveCompleted(track)) {
                 allCompleted = false;
             }
-            if (!objective.isObjectiveFailed(track)) {
-                allFailed = false;
+            if (objective.isObjectiveFailed(track)) {
+                anyFailed = true;
             }
         }
 
         if (!hasObjectives) {
             return SectorObjectiveState.NONE;
         }
+        if (anyFailed) {
+            return SectorObjectiveState.ANY_FAILED;
+        }
         if (allCompleted) {
             return SectorObjectiveState.ALL_COMPLETE;
-        }
-        if (allFailed) {
-            return SectorObjectiveState.ALL_FAILED;
         }
         return SectorObjectiveState.IN_PROGRESS;
     }
@@ -951,7 +951,7 @@ public class StratConTab extends CampaignGuiTab {
         return switch (sectorObjectiveState(track)) {
             case NONE -> null;
             case ALL_COMPLETE -> MekHQ.getMHQOptions().getFontColorPositive();
-            case ALL_FAILED -> MekHQ.getMHQOptions().getFontColorNegative();
+            case ANY_FAILED -> MekHQ.getMHQOptions().getFontColorNegative();
             case IN_PROGRESS -> MekHQ.getMHQOptions().getFontColorWarning();
         };
     }
