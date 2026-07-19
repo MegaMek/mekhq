@@ -60,6 +60,7 @@ import mekhq.campaign.digitalGM.stratCon.gm.StratConGMs;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.LatitudeBand;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.PlanetProfile;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.SectorSpec;
+import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorGenerator;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorPlanner;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
@@ -94,6 +95,9 @@ public class StratConContractInitializer {
 
     /** Improved sizing: the minimum dry fraction of a sector, so oceans never leave too little land. */
     private static final double MINIMUM_LAND_FRACTION = 0.25;
+
+    /** Terrain given to a newly-exposed hex that has no mapped neighbor to take after (an otherwise blank sector). */
+    private static final String DEFAULT_FILL_TERRAIN = "Plains";
 
     /**
      * Initializes the campaign state given a contract, campaign and contract definition
@@ -435,6 +439,211 @@ public class StratConContractInitializer {
         relocateOccupantsOffOcean(track);
 
         // Fold the planet-owner's facilities into the (possibly rebuilt) road network; a road-less generator ignores it.
+        connectFacilitiesToRoads(track, contract, campaign);
+    }
+
+    /**
+     * What a proposed resize would disturb, so a GM can be told before anything is moved.
+     *
+     * @param facilities how many facilities would be displaced back inside the sector
+     * @param scenarios  how many scenarios would be displaced back inside the sector
+     * @param objectives how many strategic objectives sit on the ground being cut away
+     * @param forces     how many deployed forces would be recalled
+     */
+    public record ResizeImpact(int facilities, int scenarios, int objectives, int forces) {
+        public boolean isEmpty() {
+            return (facilities == 0) && (scenarios == 0) && (objectives == 0) && (forces == 0);
+        }
+    }
+
+    /**
+     * Reports what {@link #resizeTrack} would disturb at the given size, without changing anything.
+     *
+     * @param track     the track to be resized
+     * @param newWidth  the proposed width
+     * @param newHeight the proposed height
+     *
+     * @return a tally of the occupants that would have to be moved or recalled
+     */
+    public static ResizeImpact previewResize(StratConTrackState track, int newWidth, int newHeight) {
+        int facilities = 0;
+        int scenarios = 0;
+        int objectives = 0;
+        int forces = 0;
+
+        for (StratConCoords coords : track.getFacilities().keySet()) {
+            if (isOutside(coords, newWidth, newHeight)) {
+                facilities++;
+            }
+        }
+        for (StratConCoords coords : track.getScenarios().keySet()) {
+            if (isOutside(coords, newWidth, newHeight)) {
+                scenarios++;
+            }
+        }
+        for (StratConStrategicObjective objective : track.getStrategicObjectives()) {
+            if ((objective.getObjectiveCoords() != null) &&
+                      isOutside(objective.getObjectiveCoords(), newWidth, newHeight)) {
+                objectives++;
+            }
+        }
+        for (StratConCoords coords : track.getAssignedForceCoords().values()) {
+            if (isOutside(coords, newWidth, newHeight)) {
+                forces++;
+            }
+        }
+
+        return new ResizeImpact(facilities, scenarios, objectives, forces);
+    }
+
+    /**
+     * Resizes a sector, growing or shrinking it at its right and bottom edges.
+     *
+     * <p>Only those two edges are offered on purpose. StratCon hexes sit on a parity-offset grid - a hex's neighbors
+     * depend on whether its x is odd or even (see {@link StratConCoords#translate}) - so shifting every hex to make
+     * room at the left or top would silently rewire the whole map's adjacency and tear apart coastlines, ranges, and
+     * roads. Growing at the far edges leaves every existing hex on its original coordinates.</p>
+     *
+     * <p>Ground outside the new bounds is discarded, but its occupants are not: facilities and scenarios are moved
+     * back inside (with their strategic objectives), and any force left standing outside is recalled. Call
+     * {@link #previewResize} first so the GM knows what is about to move.</p>
+     *
+     * @param track     the track to resize
+     * @param newWidth  the new width, at least 1
+     * @param newHeight the new height, at least 1
+     * @param contract  the contract, for the planet-owner road rules
+     * @param campaign  the campaign, for the current date and options
+     */
+    public static void resizeTrack(StratConTrackState track, int newWidth, int newHeight, AtBContract contract,
+          Campaign campaign) {
+        int width = max(1, newWidth);
+        int height = max(1, newHeight);
+
+        // Note who is about to be left outside before the bounds move, so they can be re-homed afterward.
+        List<StratConCoords> displacedFacilities = outsideCoords(track.getFacilities().keySet(), width, height);
+        List<StratConCoords> displacedScenarios = outsideCoords(track.getScenarios().keySet(), width, height);
+
+        track.setWidth(width);
+        track.setHeight(height);
+        track.trimToBounds();
+
+        for (StratConCoords source : displacedFacilities) {
+            StratConCoords destination = getUnoccupiedCoords(track);
+            if (destination == null) {
+                break;
+            }
+
+            StratConFacility facility = track.getFacility(source);
+            track.removeFacility(source);
+            track.addFacility(destination, facility);
+            track.moveObjective(source, destination);
+            moveAssignedForces(track, source, destination);
+        }
+
+        for (StratConCoords source : displacedScenarios) {
+            StratConCoords destination = getUnoccupiedCoords(track);
+            if (destination == null) {
+                break;
+            }
+
+            StratConScenario scenario = track.getScenario(source);
+            track.getScenarios().remove(source);
+            scenario.setCoords(destination);
+            track.getScenarios().put(destination, scenario);
+            track.moveObjective(source, destination);
+            moveAssignedForces(track, source, destination);
+        }
+
+        // Anything still outside - a force on empty ground, or an occupant we could not re-home - comes off the map.
+        recallForcesOutsideBounds(track);
+
+        fillNewHexes(track);
+
+        applyTerrainChange(track, contract, campaign);
+    }
+
+    /** Moves any forces deployed to {@code source} along with the occupant that just moved to {@code destination}. */
+    private static void moveAssignedForces(StratConTrackState track, StratConCoords source,
+          StratConCoords destination) {
+        Set<Integer> forces = track.getAssignedCoordForces().remove(source);
+        if ((forces == null) || forces.isEmpty()) {
+            return;
+        }
+
+        track.getAssignedCoordForces().computeIfAbsent(destination, key -> new HashSet<>()).addAll(forces);
+        for (int forceID : forces) {
+            track.getAssignedForceCoords().put(forceID, destination);
+        }
+    }
+
+    /** Recalls every force still standing outside the sector, so no formation is stranded off the map. */
+    private static void recallForcesOutsideBounds(StratConTrackState track) {
+        List<Integer> stranded = new ArrayList<>();
+        for (Map.Entry<Integer, StratConCoords> entry : track.getAssignedForceCoords().entrySet()) {
+            if (track.isOutOfBounds(entry.getValue())) {
+                stranded.add(entry.getKey());
+            }
+        }
+
+        for (int forceID : stranded) {
+            track.unassignFormation(forceID);
+        }
+        track.getAssignedCoordForces().keySet().removeIf(track::isOutOfBounds);
+    }
+
+    /**
+     * Gives newly-exposed hexes terrain by extending their nearest already-mapped neighbor, so a grown sector reads as
+     * more of the same country rather than a blank margin.
+     */
+    private static void fillNewHexes(StratConTrackState track) {
+        for (int x = 0; x < track.getWidth(); x++) {
+            for (int y = 0; y < track.getHeight(); y++) {
+                StratConCoords coords = new StratConCoords(x, y);
+                if (!track.getTerrainTile(coords).isEmpty()) {
+                    continue;
+                }
+
+                // Walking left-to-right and top-to-bottom means the neighbor we copy has already been filled itself,
+                // so terrain propagates outward from the old sector instead of leaving holes.
+                String source = (x > 0) ?
+                                      track.getTerrainTile(new StratConCoords(x - 1, y)) :
+                                      track.getTerrainTile(new StratConCoords(x, max(0, y - 1)));
+                track.setTerrainTile(coords, source.isEmpty() ? DEFAULT_FILL_TERRAIN : source);
+            }
+        }
+    }
+
+    private static boolean isOutside(StratConCoords coords, int width, int height) {
+        return (coords.getX() >= width) || (coords.getY() >= height);
+    }
+
+    private static List<StratConCoords> outsideCoords(Collection<StratConCoords> coords, int width, int height) {
+        List<StratConCoords> outside = new ArrayList<>();
+        for (StratConCoords candidate : coords) {
+            if (isOutside(candidate, width, height)) {
+                outside.add(candidate);
+            }
+        }
+        return outside;
+    }
+
+    /**
+     * Re-settles a track after its terrain has been edited by a GM, so the sector stays internally consistent: cities
+     * and occupants cannot be left sitting on new water, open water carries no fog, and the road network has to be
+     * re-laid because ocean and relief are what drive its path costs.
+     *
+     * <p>Call this once when an edit is finished rather than per hex - it rebuilds the whole road network.</p>
+     *
+     * @param track    the track whose terrain just changed
+     * @param contract the contract, for the planet-owner road rules
+     * @param campaign the campaign, for the current date and options
+     */
+    public static void applyTerrainChange(StratConTrackState track, AtBContract contract, Campaign campaign) {
+        // A city that has just been flooded is no longer a city.
+        track.getCities().removeIf(coords -> StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(coords)));
+
+        StratConSectorGenerator.revealOceanHexes(track);
+        relocateOccupantsOffOcean(track);
         connectFacilitiesToRoads(track, contract, campaign);
     }
 

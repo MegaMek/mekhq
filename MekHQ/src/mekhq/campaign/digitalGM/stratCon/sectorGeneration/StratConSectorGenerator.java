@@ -151,7 +151,7 @@ public final class StratConSectorGenerator {
     /**
      * Adds every ocean hex to the track's revealed set, so open water is always visible.
      */
-    private static void revealOceanHexes(StratConTrackState track) {
+    public static void revealOceanHexes(StratConTrackState track) {
         for (int x = 0; x < track.getWidth(); x++) {
             for (int y = 0; y < track.getHeight(); y++) {
                 StratConCoords coords = new StratConCoords(x, y);

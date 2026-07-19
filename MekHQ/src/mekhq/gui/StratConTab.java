@@ -105,6 +105,7 @@ public class StratConTab extends CampaignGuiTab {
     private RoundedJButton btnScoutSector;
     private RoundedJButton btnResetSectorFog;
     private RoundedJButton btnRegenerateSector;
+    private RoundedJButton btnResizeSector;
     private RoundedJButton btnEditSupportPoints;
     private RoundedJButton btnEditVictoryPoints;
     private RoundedJButton btnToggleHiddenObjects;
@@ -307,6 +308,12 @@ public class StratConTab extends CampaignGuiTab {
             updateCampaignState();
         });
 
+        // "Resize Sector" - grows or shrinks the sector at its right and bottom edges (GM only)
+        btnResizeSector = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "stratConTab.resizeSector.text"));
+        btnResizeSector.setToolTipText(getTextAt(RESOURCE_BUNDLE, "stratConTab.resizeSector.tooltip"));
+        btnResizeSector.setEnabled(isGM);
+        btnResizeSector.addActionListener(evt -> stratconPanel.resizeSector());
+
         // "Toggle Hidden Objects" - reveals/hides cloaked scenarios, invisible facilities, and fog (GM only)
         btnToggleHiddenObjects = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "stratConTab.toggleHiddenObjects.text"));
         btnToggleHiddenObjects.setToolTipText(getTextAt(RESOURCE_BUNDLE, "stratConTab.toggleHiddenObjects.tooltip"));
@@ -330,6 +337,7 @@ public class StratConTab extends CampaignGuiTab {
         gmButtonPanel.add(btnScoutSector);
         gmButtonPanel.add(btnResetSectorFog);
         gmButtonPanel.add(btnRegenerateSector);
+        gmButtonPanel.add(btnResizeSector);
         gmButtonPanel.add(btnToggleHiddenObjects);
         gmButtonPanel.add(btnEditSupportPoints);
         gmButtonPanel.add(btnEditVictoryPoints);
@@ -476,6 +484,9 @@ public class StratConTab extends CampaignGuiTab {
         }
         if (btnRegenerateSector != null) {
             btnRegenerateSector.setEnabled(isGM);
+        }
+        if (btnResizeSector != null) {
+            btnResizeSector.setEnabled(isGM);
         }
         if (btnToggleHiddenObjects != null) {
             btnToggleHiddenObjects.setEnabled(isGM);

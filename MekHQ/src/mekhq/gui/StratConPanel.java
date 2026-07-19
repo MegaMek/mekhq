@@ -39,6 +39,8 @@ import static megamek.utilities.ImageUtilities.addTintToBufferedImage;
 import static mekhq.campaign.digitalGM.stratCon.StratConScenario.ScenarioState.PRIMARY_FORCES_COMMITTED;
 import static mekhq.campaign.digitalGM.stratCon.StratConScenario.ScenarioState.UNRESOLVED;
 import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Allied;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -55,14 +57,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import javax.imageio.ImageIO;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JViewport;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 
 import megamek.client.ui.util.UIUtil;
 import megamek.common.util.ImageUtil;
@@ -71,6 +66,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
+import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer.ResizeImpact;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
@@ -83,6 +79,7 @@ import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityFactory;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConHexGeometry;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBDynamicScenario;
+import mekhq.gui.dialog.StratConTerrainPaintDialog;
 import mekhq.gui.stratCon.StratConScenarioWizard;
 import mekhq.gui.stratCon.TrackForceAssignmentUI;
 import mekhq.utilities.ReportingUtilities;
@@ -124,6 +121,12 @@ public class StratConPanel extends JPanel implements ActionListener {
     private static final String RIGHT_CLICK_COMMAND_REMOVE_SCENARIO = "RemoveScenario";
     private static final String RIGHT_CLICK_COMMAND_RESET_DEPLOYMENT = "ResetDeployment";
     private static final String RIGHT_CLICK_COMMAND_ADD_CITY = "AddCity";
+    private static final String RIGHT_CLICK_COMMAND_CHANGE_TERRAIN = "ChangeTerrain";
+
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.AtBStratCon";
+
+    /** Upper bound offered when resizing a sector by hand, to keep a stray keystroke from generating a huge map. */
+    private static final int MAX_SECTOR_SIZE = 60;
     private static final String RIGHT_CLICK_COMMAND_REMOVE_CITY = "RemoveCity";
 
     /**
@@ -163,6 +166,13 @@ public class StratConPanel extends JPanel implements ActionListener {
     private Point panDragStartScreen;
     private Point panDragLastScreen;
     private boolean panning;
+
+    // GM terrain painting. While paintTerrain is set the panel is in paint mode: left-click and drag lay terrain down
+    // instead of selecting and panning. The expensive consequences of an edit (re-laying roads, moving anyone who ended
+    // up in the water) are deferred to the end of a stroke rather than run per hex.
+    private String paintTerrain;
+    private int paintBrushRadius;
+    private boolean paintStrokeChangedTerrain;
 
     // data structure holding how many unit/scenario/base icons have been drawn in
     // the hex
@@ -217,6 +227,12 @@ public class StratConPanel extends JPanel implements ActionListener {
         @Override
         public void mousePressed(MouseEvent e) {
             if (SwingUtilities.isLeftMouseButton(e)) {
+                // In paint mode the left button is the brush, so it neither selects nor pans.
+                if (isPainting()) {
+                    paintAt(e.getPoint());
+                    return;
+                }
+
                 panDragStartScreen = e.getLocationOnScreen();
                 panDragLastScreen = e.getLocationOnScreen();
                 panning = false;
@@ -225,7 +241,16 @@ public class StratConPanel extends JPanel implements ActionListener {
 
         @Override
         public void mouseDragged(MouseEvent e) {
-            if ((panDragStartScreen == null) || !SwingUtilities.isLeftMouseButton(e)) {
+            if (!SwingUtilities.isLeftMouseButton(e)) {
+                return;
+            }
+
+            if (isPainting()) {
+                paintAt(e.getPoint());
+                return;
+            }
+
+            if (panDragStartScreen == null) {
                 return;
             }
 
@@ -251,6 +276,12 @@ public class StratConPanel extends JPanel implements ActionListener {
 
         @Override
         public void mouseReleased(MouseEvent e) {
+            if (isPainting() && SwingUtilities.isLeftMouseButton(e)) {
+                // The stroke is over, so pay for it once rather than once per hex.
+                finishPaintStroke();
+                return;
+            }
+
             mouseReleasedHandler(e);
             panDragStartScreen = null;
             panDragLastScreen = null;
@@ -307,6 +338,148 @@ public class StratConPanel extends JPanel implements ActionListener {
         }
 
         StratConContractInitializer.regenerateTrack(currentTrack, campaignState.getContract(), campaign);
+        infoArea.setText(buildSelectedHexInfo(campaign));
+        repaint();
+    }
+
+    /**
+     * GM tool: opens the terrain palette, putting the map into paint mode until the palette is closed.
+     */
+    public void openTerrainPaintDialog() {
+        if ((currentTrack == null) || (campaignState == null)) {
+            return;
+        }
+
+        new StratConTerrainPaintDialog(this).setVisible(true);
+    }
+
+    /**
+     * GM tool: prompts for new sector dimensions and applies them, growing or shrinking at the right and bottom edges.
+     * Warns first when the new size would displace anything.
+     */
+    public void resizeSector() {
+        if ((currentTrack == null) || (campaignState == null)) {
+            return;
+        }
+
+        JSpinner widthSpinner = new JSpinner(new SpinnerNumberModel(currentTrack.getWidth(), 1, MAX_SECTOR_SIZE, 1));
+        JSpinner heightSpinner = new JSpinner(new SpinnerNumberModel(currentTrack.getHeight(), 1, MAX_SECTOR_SIZE, 1));
+
+        JPanel prompt = new JPanel(new GridLayout(0, 2, UIUtil.scaleForGUI(5), UIUtil.scaleForGUI(5)));
+        prompt.add(new JLabel(getTextAt(RESOURCE_BUNDLE, "resizeSector.width.label")));
+        prompt.add(widthSpinner);
+        prompt.add(new JLabel(getTextAt(RESOURCE_BUNDLE, "resizeSector.height.label")));
+        prompt.add(heightSpinner);
+
+        if (JOptionPane.showConfirmDialog(this,
+              prompt,
+              getTextAt(RESOURCE_BUNDLE, "resizeSector.title"),
+              JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION) {
+            return;
+        }
+
+        int newWidth = (int) widthSpinner.getValue();
+        int newHeight = (int) heightSpinner.getValue();
+
+        // Shrinking can displace bases, scenarios, objectives, and deployed forces. None of that is silent: say exactly
+        // what will move and let the GM back out.
+        ResizeImpact impact = StratConContractInitializer.previewResize(currentTrack, newWidth, newHeight);
+        if (!impact.isEmpty()) {
+            String warning = getFormattedTextAt(RESOURCE_BUNDLE,
+                  "resizeSector.warning",
+                  impact.facilities(),
+                  impact.scenarios(),
+                  impact.objectives(),
+                  impact.forces());
+
+            if (JOptionPane.showConfirmDialog(this,
+                  warning,
+                  getTextAt(RESOURCE_BUNDLE, "resizeSector.title"),
+                  JOptionPane.YES_NO_OPTION,
+                  JOptionPane.WARNING_MESSAGE) != JOptionPane.YES_OPTION) {
+                return;
+            }
+        }
+
+        StratConContractInitializer.resizeTrack(currentTrack,
+              newWidth,
+              newHeight,
+              campaignState.getContract(),
+              campaign);
+
+        boardState.setSelectedCoords(null);
+        infoArea.setText(buildSelectedHexInfo(campaign));
+        revalidate();
+        repaint();
+    }
+
+    /** Sets the terrain the brush lays down. Called by the terrain palette. */
+    public void setPaintTerrain(String terrain) {
+        this.paintTerrain = terrain;
+    }
+
+    /** Sets the brush radius in hexes: 0 paints a single hex, 1 paints it and its neighbors, and so on. */
+    public void setPaintBrushRadius(int radius) {
+        this.paintBrushRadius = radius;
+    }
+
+    /** @return {@code true} while the terrain palette is open and clicks paint rather than select. */
+    public boolean isPainting() {
+        return paintTerrain != null;
+    }
+
+    /** Leaves paint mode, restoring normal selection and panning. Called when the terrain palette closes. */
+    public void exitPaintMode() {
+        paintTerrain = null;
+        repaint();
+    }
+
+    /** @return the map sprite for a terrain type, for the terrain palette to render alongside the name. */
+    public BufferedImage getTerrainImage(String terrainType) {
+        return getImage(terrainType, ImageType.TerrainTile);
+    }
+
+    /**
+     * Lays the current brush down on the hex under the given point. Only the terrain itself changes here; putting the
+     * sector back in order is deferred to {@link #finishPaintStroke()} so a drag does not rebuild the road network once
+     * per hex.
+     */
+    private void paintAt(Point point) {
+        clickedPoint = point;
+        if (!detectClickedHex()) {
+            return;
+        }
+
+        StratConCoords center = boardState.getSelectedCoords();
+        if (center == null) {
+            return;
+        }
+
+        for (int x = 0; x < currentTrack.getWidth(); x++) {
+            for (int y = 0; y < currentTrack.getHeight(); y++) {
+                StratConCoords coords = new StratConCoords(x, y);
+                if ((center.distance(coords) <= paintBrushRadius) &&
+                          !paintTerrain.equals(currentTrack.getTerrainTile(coords))) {
+                    currentTrack.setTerrainTile(coords, paintTerrain);
+                    paintStrokeChangedTerrain = true;
+                }
+            }
+        }
+
+        repaint();
+    }
+
+    /**
+     * Ends a paint stroke, re-settling the sector around the new terrain: flooded cities go, anyone left in the water
+     * moves ashore, and the road network is re-laid.
+     */
+    private void finishPaintStroke() {
+        if (!paintStrokeChangedTerrain) {
+            return;
+        }
+        paintStrokeChangedTerrain = false;
+
+        StratConContractInitializer.applyTerrainChange(currentTrack, campaignState.getContract(), campaign);
         infoArea.setText(buildSelectedHexInfo(campaign));
         repaint();
     }
@@ -462,6 +635,14 @@ public class StratConPanel extends JPanel implements ActionListener {
 
                 rightClickMenu.add(menuItemAddFacility);
             }
+
+            // Terrain painting opens a palette rather than acting on this hex alone, since reshaping a coastline or a
+            // range takes many strokes.
+            JMenuItem menuItemPaintTerrain = new JMenuItem();
+            menuItemPaintTerrain.setText("Change Terrain (GM)");
+            menuItemPaintTerrain.setActionCommand(RIGHT_CLICK_COMMAND_CHANGE_TERRAIN);
+            menuItemPaintTerrain.addActionListener(this);
+            rightClickMenu.add(menuItemPaintTerrain);
 
             // City overlay editing: remove an existing city, or add one to any dry hex. Either change recomputes roads.
             if (currentTrack.isCity(coords)) {
@@ -1681,6 +1862,9 @@ public class StratConPanel extends JPanel implements ActionListener {
                 newFacility.setVisible(currentTrack.getRevealedCoords().contains(selectedCoords));
                 currentTrack.addFacility(selectedCoords, newFacility);
                 recalculateRoads();
+                break;
+            case RIGHT_CLICK_COMMAND_CHANGE_TERRAIN:
+                openTerrainPaintDialog();
                 break;
             case RIGHT_CLICK_COMMAND_ADD_CITY:
                 currentTrack.addCity(selectedCoords);

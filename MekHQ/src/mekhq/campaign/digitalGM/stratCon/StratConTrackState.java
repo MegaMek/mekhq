@@ -731,4 +731,26 @@ public class StratConTrackState {
         roadExits.clear();
         revealedCoords.clear();
     }
+
+    /**
+     * Drops every terrain tile and overlay now lying outside the sector, after its width or height has been reduced.
+     *
+     * <p>Occupants - facilities, scenarios, and deployed forces - are deliberately left alone here: they are moved
+     * back inside by the caller rather than quietly destroyed along with the ground they stood on.</p>
+     */
+    public void trimToBounds() {
+        terrainTypes.keySet().removeIf(this::isOutOfBounds);
+        cities.removeIf(this::isOutOfBounds);
+        roads.removeIf(this::isOutOfBounds);
+        roadExits.removeIf(this::isOutOfBounds);
+        revealedCoords.removeIf(this::isOutOfBounds);
+    }
+
+    /** @return {@code true} if the given hex lies outside this sector's current bounds. */
+    public boolean isOutOfBounds(StratConCoords coords) {
+        return (coords.getX() < 0) ||
+                     (coords.getY() < 0) ||
+                     (coords.getX() >= width) ||
+                     (coords.getY() >= height);
+    }
 }
