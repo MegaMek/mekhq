@@ -323,28 +323,27 @@ public class StratConBiomeManifest {
         return biomeMapTypes.get(getTerrainCategory(terrainType).name());
     }
 
-    /** Suffix marking a map pool as the facility variant of a terrain or terrain category. */
+    /** Suffix marking a map pool as the facility variant of a terrain. */
     public static final String FACILITY_POOL_SUFFIX = "Facility";
 
     /**
      * Resolves the map-pool key to use for a facility standing on the given terrain, so a base fights on a board that
-     * matches the ground it sits on rather than on climate alone. Prefers a pool keyed by the terrain's own name plus
-     * {@link #FACILITY_POOL_SUFFIX} (terrain names already carry their climate, e.g. {@code ColdForestFacility}),
-     * falling back to the terrain category's facility pool.
+     * matches the ground it sits on rather than on climate alone. The key is the terrain's own name plus
+     * {@link #FACILITY_POOL_SUFFIX}, e.g. {@code ColdForestFacility}.
+     *
+     * <p>Matching is by exact terrain name only: unlike {@link #getMapTypesForTerrain} there is deliberately no
+     * category-level fallback. Terrain names already carry their climate (ColdForest vs Forest vs HotForest), so a
+     * category pool could only be climate-blind - a worse match for an unrecognized terrain than the temperature-banded
+     * facility biome the caller falls back to when this returns {@code null}.</p>
      *
      * @param terrainType a StratCon terrain type name
      *
-     * @return the key of the declared facility pool, or {@code null} if the terrain has no facility pool and the caller
-     *       should fall back to the generic temperature-banded facility biome
+     * @return the key of the declared facility pool, or {@code null} if the terrain declares none and the caller should
+     *       fall back to the generic temperature-banded facility biome
      */
     public @Nullable String getFacilityPoolKey(String terrainType) {
-        String exactKey = terrainType + FACILITY_POOL_SUFFIX;
-        if (biomeMapTypes.containsKey(exactKey)) {
-            return exactKey;
-        }
-
-        String categoryKey = getTerrainCategory(terrainType).name() + FACILITY_POOL_SUFFIX;
-        return biomeMapTypes.containsKey(categoryKey) ? categoryKey : null;
+        String key = terrainType + FACILITY_POOL_SUFFIX;
+        return biomeMapTypes.containsKey(key) ? key : null;
     }
 
     /**

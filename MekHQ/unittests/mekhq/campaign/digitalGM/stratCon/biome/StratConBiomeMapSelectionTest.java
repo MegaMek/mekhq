@@ -152,8 +152,7 @@ class StratConBiomeMapSelectionTest {
             }
 
             for (String mapType : entry.getValue().mapTypes) {
-                assertFalse(mapType.startsWith("City-") || mapType.startsWith("City"),
-                      key + " should not draw the city board " + mapType);
+                assertFalse(mapType.startsWith("City"), key + " should not draw the city board " + mapType);
             }
         }
     }
