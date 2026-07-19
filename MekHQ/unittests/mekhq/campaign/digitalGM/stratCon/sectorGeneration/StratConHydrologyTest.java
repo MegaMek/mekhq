@@ -90,15 +90,38 @@ class StratConHydrologyTest {
 
     @Test
     void selection_favorsTheProfileWhoseCenterMatchesWaterCoverage() {
-        assertEquals(HydrologyProfileType.INLAND, highestWeightType(5));
-        assertEquals(HydrologyProfileType.RIVERLANDS, highestWeightType(16));
-        assertEquals(HydrologyProfileType.LAKELANDS, highestWeightType(22));
-        assertEquals(HydrologyProfileType.MARSHLANDS, highestWeightType(32));
-        assertEquals(HydrologyProfileType.COASTAL, highestWeightType(35));
-        assertEquals(HydrologyProfileType.INLAND_SEA, highestWeightType(40));
-        assertEquals(HydrologyProfileType.PENINSULA, highestWeightType(48));
-        assertEquals(HydrologyProfileType.ISLAND, highestWeightType(60));
-        assertEquals(HydrologyProfileType.ARCHIPELAGO, highestWeightType(70));
+        // Read the centers from the data rather than hard-coding them, so retuning the profiles does not break this.
+        for (HydrologyProfile profile : hydrology().getProfiles()) {
+            assertEquals(profile.type(),
+                  highestWeightType((int) Math.round(profile.gaussianCenter())),
+                  profile.type() + " should be the likeliest profile at its own gaussian center");
+        }
+    }
+
+    @Test
+    void wetterPlanetsYieldWetterSectors() {
+        // The centers are offset well above each profile's own ocean band (a sector is continental interior more often
+        // than the globe as a whole is), but the ordering must still hold: more planetary water, more sector ocean.
+        int previous = -1;
+        for (int water : new int[] { 10, 30, 50, 70, 90 }) {
+            int expectedOcean = expectedOceanPercent(water);
+            assertTrue(expectedOcean > previous,
+                  "a planet at " + water + "% water should not yield drier sectors than a drier planet");
+            previous = expectedOcean;
+        }
+    }
+
+    /** @return the weighted-average mid-band ocean coverage a planet of the given water coverage tends to produce. */
+    private static int expectedOceanPercent(int waterPercent) {
+        StratConHydrology hydrology = hydrology();
+        double totalWeight = 0.0;
+        double weightedOcean = 0.0;
+        for (HydrologyProfile profile : hydrology.getProfiles()) {
+            double weight = StratConHydrology.weight(profile, waterPercent, hydrology.getSigma());
+            totalWeight += weight;
+            weightedOcean += weight * ((profile.minOceanPercent() + profile.maxOceanPercent()) / 2.0);
+        }
+        return (int) Math.round(weightedOcean / totalWeight);
     }
 
     @Test
