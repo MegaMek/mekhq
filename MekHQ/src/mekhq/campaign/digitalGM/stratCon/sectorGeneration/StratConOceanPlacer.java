@@ -101,7 +101,9 @@ public final class StratConOceanPlacer {
             case INLAND_SEA -> singleBlob(track, oceanTarget, centerCoords(track));
             case RIVERLANDS -> river(track, oceanTarget);
             case ISLAND -> complement(track, singleBlob(track, landTarget, centerCoords(track)));
-            case ARCHIPELAGO -> complement(track, scatteredBlobs(track, landTarget, 2, 6, false));
+            // The land blobs are isolated: an archipelago is a group of islands, so they must not fuse into one
+            // landmass the way freely-grown blobs usually did.
+            case ARCHIPELAGO -> complement(track, scatteredBlobs(track, landTarget, 3, 6, true));
             case PENINSULA -> complement(track, singleBlob(track, landTarget, randomEdgeCoords(track)));
         };
 
@@ -113,7 +115,9 @@ public final class StratConOceanPlacer {
     /**
      * Grows one or more disjoint water regions from random seeds until roughly {@code target} hexes are covered.
      *
-     * @param isolate when {@code true}, later blobs may not touch earlier ones (used for a few clearly separate spots)
+     * @param isolate when {@code true}, later blobs may not touch earlier ones, so the blobs stay separate regions
+     *                rather than fusing into one. Isolated runs reject any seed that lands in or beside what is already
+     *                placed, so they get a far larger attempt budget to still reach the target.
      */
     private static Set<StratConCoords> scatteredBlobs(StratConTrackState track, int target, int minBlobs, int maxBlobs,
           boolean isolate) {
@@ -122,7 +126,7 @@ public final class StratConOceanPlacer {
 
         Set<StratConCoords> region = new HashSet<>();
         int attempts = 0;
-        int attemptLimit = blobs * 6;
+        int attemptLimit = blobs * (isolate ? 40 : 6);
         while ((region.size() < target) && (attempts < attemptLimit)) {
             attempts++;
 

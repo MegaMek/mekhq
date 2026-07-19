@@ -177,7 +177,7 @@ class StratConOceanPlacerTest {
 
         Set<StratConCoords> land = hexesOf(track, false);
         assertTrue(land.size() > 0);
-        // Seeded with 2..6 land blobs; they can occasionally merge, but there should be more than one.
+        // Seeded with 3..6 land blobs that are grown in isolation, so they cannot fuse into a single landmass.
         assertTrue(componentCount(track, land) >= 2, "archipelago should have multiple landmasses");
     }
 
