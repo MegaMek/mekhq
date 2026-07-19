@@ -79,8 +79,66 @@ class StratConSectorResizeTest {
         return mock(AtBContract.class);
     }
 
-    private static void resize(StratConTrackState track, int width, int height) {
-        StratConContractInitializer.resizeTrack(track, width, height, contract(), campaign());
+    private static boolean resize(StratConTrackState track, int width, int height) {
+        return StratConContractInitializer.resizeTrack(track, width, height, contract(), campaign());
+    }
+
+    @Test
+    void resize_isRefusedWhenThereIsNowhereToPutTheDisplaced() {
+        // A 1x1 sector has one hex, and the surviving facility already occupies it - so the other two have nowhere to
+        // go. Squeezing them out would destroy them, so the resize is refused instead.
+        StratConTrackState track = track(8, 8);
+        track.addFacility(new StratConCoords(0, 0), new StratConFacility());
+        track.addFacility(new StratConCoords(7, 7), new StratConFacility());
+        track.addFacility(new StratConCoords(6, 6), new StratConFacility());
+
+        assertFalse(StratConContractInitializer.previewResize(track, 1, 1).fits());
+        assertFalse(resize(track, 1, 1), "an impossible resize should be refused");
+    }
+
+    @Test
+    void refusedResize_leavesTheSectorCompletelyUntouched() {
+        StratConTrackState track = track(8, 8);
+        track.addFacility(new StratConCoords(0, 0), new StratConFacility());
+        track.addFacility(new StratConCoords(7, 7), new StratConFacility());
+        track.addFacility(new StratConCoords(6, 6), new StratConFacility());
+
+        resize(track, 1, 1);
+
+        assertEquals(8, track.getWidth(), "a refused resize must not change the width");
+        assertEquals(8, track.getHeight(), "a refused resize must not change the height");
+        assertEquals(3, track.getFacilities().size(), "a refused resize must not lose facilities");
+        assertFalse(track.getTerrainTile(new StratConCoords(7, 7)).isEmpty(),
+              "a refused resize must not trim terrain");
+    }
+
+    @Test
+    void noOccupantIsEverLeftOutsideTheSector() {
+        // The defect this guards: relocation used to give up when it ran out of room, leaving facilities keyed at
+        // coordinates outside the sector - invisible and unreachable, but still counted.
+        StratConTrackState track = track(8, 8);
+        for (int x = 4; x < 8; x++) {
+            track.addFacility(new StratConCoords(x, 7), new StratConFacility());
+        }
+
+        assertTrue(resize(track, 5, 5), "a 5x5 sector has room for four displaced facilities");
+
+        for (StratConCoords coords : track.getFacilities().keySet()) {
+            assertFalse(track.isOutOfBounds(coords), "facility left outside the sector at " + coords);
+        }
+        for (StratConCoords coords : track.getScenarios().keySet()) {
+            assertFalse(track.isOutOfBounds(coords), "scenario left outside the sector at " + coords);
+        }
+        assertEquals(4, track.getFacilities().size(), "no facility should have been lost");
+    }
+
+    @Test
+    void previewResize_reportsRemainingCapacity() {
+        StratConTrackState track = track(8, 8);
+        track.addFacility(new StratConCoords(0, 0), new StratConFacility());
+
+        // 4x4 = 16 hexes, one of them holding the surviving facility.
+        assertEquals(15, StratConContractInitializer.previewResize(track, 4, 4).freeHexes());
     }
 
     @Test

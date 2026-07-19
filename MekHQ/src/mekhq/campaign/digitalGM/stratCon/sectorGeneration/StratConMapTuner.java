@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.digitalGM.stratCon.sectorGeneration;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.loaders.MapSettings;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConTerrainCategory;
@@ -87,7 +88,7 @@ public final class StratConMapTuner {
      * the hex's terrain rather than whatever the selected theme happened to lean toward.
      */
     private static void applyTerrainEmphasis(MapSettings mapSettings, AtBScenario scenario) {
-        String terrain = scenario.getTerrainType();
+        String terrain = groundBeneath(scenario.getTerrainType());
         if ((terrain == null) || terrain.isBlank()) {
             return;
         }
@@ -126,6 +127,33 @@ public final class StratConMapTuner {
         if (theme != null) {
             mapSettings.setTheme(theme);
         }
+    }
+
+    /**
+     * Resolves a scenario's terrain type to the actual ground it stands on.
+     *
+     * <p>A facility scenario's terrain type is a map-pool key rather than a terrain: {@code VolcanoFacility} rather
+     * than {@code Volcano}. That key has to stay on the scenario, because {@link AtBScenario#getTerrainType()}
+     * containing "FACILITY" is what qualifies a scenario for turret placement. But left as-is it resolves to no
+     * category and no theme, so a base on a volcano drew volcanic boards while the tileset stayed generic. Stripping
+     * the suffix here gives the tuner the real ground without disturbing the scenario.</p>
+     *
+     * <p>The generic temperature-banded keys ({@code TemperateFacility} and friends) are deliberately left alone -
+     * "Temperate" is not a terrain, so there is nothing truer to resolve them to.</p>
+     *
+     * @param terrainType the scenario's terrain type, possibly a facility map-pool key
+     *
+     * @return the underlying terrain name, or {@code terrainType} unchanged when it is not a terrain-keyed facility
+     *       pool
+     */
+    private static @Nullable String groundBeneath(@Nullable String terrainType) {
+        if ((terrainType == null) || !terrainType.endsWith(StratConBiomeManifest.FACILITY_POOL_SUFFIX)) {
+            return terrainType;
+        }
+
+        String stripped = terrainType.substring(0,
+              terrainType.length() - StratConBiomeManifest.FACILITY_POOL_SUFFIX.length());
+        return StratConBiomeManifest.getInstance().getTerrainTypeNames().contains(stripped) ? stripped : terrainType;
     }
 
     /**

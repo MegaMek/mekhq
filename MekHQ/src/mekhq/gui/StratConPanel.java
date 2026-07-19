@@ -171,6 +171,7 @@ public class StratConPanel extends JPanel implements ActionListener {
     // instead of selecting and panning. The expensive consequences of an edit (re-laying roads, moving anyone who ended
     // up in the water) are deferred to the end of a stroke rather than run per hex.
     private String paintTerrain;
+    private StratConTerrainPaintDialog terrainPaintDialog;
     private int paintBrushRadius;
     private boolean paintStrokeChangedTerrain;
 
@@ -298,6 +299,9 @@ public class StratConPanel extends JPanel implements ActionListener {
      * Handler for when a specific track is selected - switches rendering to that track.
      */
     public void selectTrack(StratConCampaignState campaignState, StratConTrackState track) {
+        // The palette paints wherever you drag, so it must not outlive the sector it was opened for.
+        closeTerrainPaintDialog();
+
         this.campaignState = campaignState;
         currentTrack = track;
 
@@ -350,7 +354,24 @@ public class StratConPanel extends JPanel implements ActionListener {
             return;
         }
 
-        new StratConTerrainPaintDialog(this).setVisible(true);
+        // One palette at a time: a second would fight the first over the selected terrain and brush.
+        if (terrainPaintDialog != null) {
+            terrainPaintDialog.toFront();
+            return;
+        }
+
+        terrainPaintDialog = new StratConTerrainPaintDialog(this);
+        terrainPaintDialog.setVisible(true);
+    }
+
+    /**
+     * Closes the terrain palette and leaves paint mode, if it is open. Called when the sector changes underneath it, so
+     * a brush aimed at one sector cannot be dragged across another.
+     */
+    private void closeTerrainPaintDialog() {
+        if (terrainPaintDialog != null) {
+            terrainPaintDialog.dispose();
+        }
     }
 
     /**
@@ -381,9 +402,22 @@ public class StratConPanel extends JPanel implements ActionListener {
         int newWidth = (int) widthSpinner.getValue();
         int newHeight = (int) heightSpinner.getValue();
 
+        ResizeImpact impact = StratConContractInitializer.previewResize(currentTrack, newWidth, newHeight);
+
+        // A size with nowhere to put the displaced occupants is refused outright rather than quietly destroying them.
+        if (!impact.fits()) {
+            JOptionPane.showMessageDialog(this,
+                  getFormattedTextAt(RESOURCE_BUNDLE,
+                        "resizeSector.tooSmall",
+                        impact.displacedOccupants(),
+                        impact.freeHexes()),
+                  getTextAt(RESOURCE_BUNDLE, "resizeSector.title"),
+                  JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         // Shrinking can displace bases, scenarios, objectives, and deployed forces. None of that is silent: say exactly
         // what will move and let the GM back out.
-        ResizeImpact impact = StratConContractInitializer.previewResize(currentTrack, newWidth, newHeight);
         if (!impact.isEmpty()) {
             String warning = getFormattedTextAt(RESOURCE_BUNDLE,
                   "resizeSector.warning",
@@ -431,6 +465,7 @@ public class StratConPanel extends JPanel implements ActionListener {
     /** Leaves paint mode, restoring normal selection and panning. Called when the terrain palette closes. */
     public void exitPaintMode() {
         paintTerrain = null;
+        terrainPaintDialog = null;
         repaint();
     }
 
@@ -445,6 +480,12 @@ public class StratConPanel extends JPanel implements ActionListener {
      * per hex.
      */
     private void paintAt(Point point) {
+        // detectClickedHex draws a dry run straight through drawHexes, which dereferences the track without a guard of
+        // its own - unlike paintComponent, which checks before it ever gets there.
+        if (currentTrack == null) {
+            return;
+        }
+
         clickedPoint = point;
         if (!detectClickedHex()) {
             return;

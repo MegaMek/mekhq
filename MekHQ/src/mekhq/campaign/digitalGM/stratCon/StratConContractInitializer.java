@@ -450,9 +450,23 @@ public class StratConContractInitializer {
      * @param objectives how many strategic objectives sit on the ground being cut away
      * @param forces     how many deployed forces would be recalled
      */
-    public record ResizeImpact(int facilities, int scenarios, int objectives, int forces) {
+    public record ResizeImpact(int facilities, int scenarios, int objectives, int forces, int freeHexes) {
         public boolean isEmpty() {
             return (facilities == 0) && (scenarios == 0) && (objectives == 0) && (forces == 0);
+        }
+
+        /** @return how many facilities and scenarios would have to be found a new hex inside the sector. */
+        public int displacedOccupants() {
+            return facilities + scenarios;
+        }
+
+        /**
+         * @return {@code true} if the sector would still have somewhere to put everything that must move. A resize that
+         *       does not fit is refused rather than performed, because the alternative is destroying bases and
+         *       scenarios - and any strategic objective riding on them - to make the numbers work.
+         */
+        public boolean fits() {
+            return displacedOccupants() <= freeHexes;
         }
     }
 
@@ -493,7 +507,32 @@ public class StratConContractInitializer {
             }
         }
 
-        return new ResizeImpact(facilities, scenarios, objectives, forces);
+        return new ResizeImpact(facilities, scenarios, objectives, forces, freeHexes(track, newWidth, newHeight));
+    }
+
+    /**
+     * Counts the hexes that would still be able to take a relocated occupant at the proposed size, mirroring what
+     * {@link #getUnoccupiedCoords(StratConTrackState)} considers eligible: dry land, holding no scenario, no facility,
+     * and no deployed force. Anything already inside the new bounds keeps its hex, so it is counted as taken.
+     */
+    private static int freeHexes(StratConTrackState track, int newWidth, int newHeight) {
+        Collection<StratConCoords> forceCoords = track.getAssignedForceCoords().values();
+        int free = 0;
+
+        for (int x = 0; x < newWidth; x++) {
+            for (int y = 0; y < newHeight; y++) {
+                StratConCoords coords = new StratConCoords(x, y);
+                boolean available = !StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(coords)) &&
+                                          (track.getScenario(coords) == null) &&
+                                          (track.getFacility(coords) == null) &&
+                                          !forceCoords.contains(coords);
+                if (available) {
+                    free++;
+                }
+            }
+        }
+
+        return free;
     }
 
     /**
@@ -514,10 +553,17 @@ public class StratConContractInitializer {
      * @param contract  the contract, for the planet-owner road rules
      * @param campaign  the campaign, for the current date and options
      */
-    public static void resizeTrack(StratConTrackState track, int newWidth, int newHeight, AtBContract contract,
+    public static boolean resizeTrack(StratConTrackState track, int newWidth, int newHeight, AtBContract contract,
           Campaign campaign) {
         int width = max(1, newWidth);
         int height = max(1, newHeight);
+
+        // Refuse a size with nowhere to put everything that would be displaced, BEFORE touching the track. Squeezing
+        // them out would mean destroying bases and scenarios - and any strategic objective riding on them, which would
+        // quietly make the contract unwinnable.
+        if (!previewResize(track, width, height).fits()) {
+            return false;
+        }
 
         // Note who is about to be left outside before the bounds move, so they can be re-homed afterward.
         List<StratConCoords> displacedFacilities = outsideCoords(track.getFacilities().keySet(), width, height);
@@ -530,7 +576,14 @@ public class StratConContractInitializer {
         for (StratConCoords source : displacedFacilities) {
             StratConCoords destination = getUnoccupiedCoords(track);
             if (destination == null) {
-                break;
+                // The capacity check above should have prevented this; drop the facility rather than strand it outside
+                // the sector, where it would be invisible and unreachable but still counted.
+                LOGGER.warn("No room to relocate facility at {} on track {}; removing it.",
+                      source,
+                      track.getDisplayableName());
+                track.removeFacility(source);
+                removeObjectiveAt(track, source);
+                continue;
             }
 
             StratConFacility facility = track.getFacility(source);
@@ -543,7 +596,12 @@ public class StratConContractInitializer {
         for (StratConCoords source : displacedScenarios) {
             StratConCoords destination = getUnoccupiedCoords(track);
             if (destination == null) {
-                break;
+                LOGGER.warn("No room to relocate scenario at {} on track {}; removing it.",
+                      source,
+                      track.getDisplayableName());
+                track.getScenarios().remove(source);
+                removeObjectiveAt(track, source);
+                continue;
             }
 
             StratConScenario scenario = track.getScenario(source);
@@ -554,12 +612,18 @@ public class StratConContractInitializer {
             moveAssignedForces(track, source, destination);
         }
 
-        // Anything still outside - a force on empty ground, or an occupant we could not re-home - comes off the map.
+        // Forces left standing on ground that no longer exists are recalled.
         recallForcesOutsideBounds(track);
 
         fillNewHexes(track);
 
         applyTerrainChange(track, contract, campaign);
+        return true;
+    }
+
+    /** Drops any strategic objective tied to a hex whose occupant could not be saved, so nothing points at dead ground. */
+    private static void removeObjectiveAt(StratConTrackState track, StratConCoords coords) {
+        track.getStrategicObjectives().removeIf(objective -> coords.equals(objective.getObjectiveCoords()));
     }
 
     /** Moves any forces deployed to {@code source} along with the occupant that just moved to {@code destination}. */

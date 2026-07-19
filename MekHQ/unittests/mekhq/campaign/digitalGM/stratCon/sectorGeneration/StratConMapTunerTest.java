@@ -155,4 +155,38 @@ class StratConMapTunerTest {
 
         assertEquals("TOWN", mapSettings.getCityType());
     }
+
+    @Test
+    void facilityTerrain_isTunedAsTheGroundItStandsOn() {
+        // A facility scenario's terrain type is a map-pool key, not a terrain. Left unresolved it matched no category
+        // and no theme, so a base on a volcano drew volcanic boards on a generic tileset.
+        MapSettings mapSettings = MapSettings.getInstance();
+        StratConMapTuner.tune(mapSettings, scenario("VolcanoFacility"));
+
+        assertEquals("volcano", mapSettings.getTheme(), "a facility on a volcano should use the volcanic tileset");
+    }
+
+    @Test
+    void facilityTerrain_resolvesColdGroundConsistently() {
+        // Previously only keys literally starting with "Cold" reached the snow branch, by accident of a prefix test -
+        // so ColdForestFacility got snow while GlacierFacility did not.
+        for (String terrain : List.of("GlacierFacility", "TundraFacility", "SnowFieldFacility", "ColdForestFacility")) {
+            MapSettings mapSettings = MapSettings.getInstance();
+            StratConMapTuner.tune(mapSettings, scenario(terrain));
+
+            assertEquals("snow", mapSettings.getTheme(), terrain + " should use the snow tileset");
+        }
+    }
+
+    @Test
+    void genericFacilityKeys_pickUpNoSpuriousTheme() {
+        // "Temperate" is not a terrain, so there is nothing truer to resolve TemperateFacility to. It must not throw,
+        // and must not be mistaken for volcanic or cold ground.
+        MapSettings mapSettings = MapSettings.getInstance();
+        String before = mapSettings.getTheme();
+
+        StratConMapTuner.tune(mapSettings, scenario("TemperateFacility"));
+
+        assertEquals(before, mapSettings.getTheme(), "a generic facility key should leave the theme alone");
+    }
 }
