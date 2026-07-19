@@ -33,7 +33,6 @@
 package mekhq.campaign.digitalGM.stratCon.sectorGeneration;
 
 import static java.lang.Math.max;
-import static java.lang.Math.min;
 import static java.lang.Math.round;
 
 import java.util.HashSet;
@@ -78,6 +77,18 @@ public final class StratConMountainPlacer {
     private static final int LAND_SEED_ATTEMPTS = 20;
 
     /**
+     * How much of a profile's volcanism a comfortable world sheds. Orogeny is chosen mostly on gravity, temperature,
+     * and water, none of which discriminate strongly enough to keep active volcanism off a settled, temperate world -
+     * so the amount of volcanic ground is damped by habitability here instead. At 1.0 a perfectly habitable world would
+     * have no volcanic ground at all; at 0.0 habitability is ignored. Airless, toxic, and temperature-extreme worlds
+     * score low on habitability and so keep nearly all of their volcanism.
+     *
+     * <p>The per-profile {@code volcanismChance} in {@code OrogenyProfiles.yaml} remains the primary knob; this only
+     * scales it.</p>
+     */
+    private static final double HABITABILITY_VOLCANISM_DAMPING = 0.8;
+
+    /**
      * Places mountains on the track according to the given orogeny profile.
      *
      * @param track           the track to paint
@@ -85,9 +96,12 @@ public final class StratConMountainPlacer {
      *                        which case nothing is placed)
      * @param orogeny         the selected orogeny profile, or {@code null} to place nothing
      * @param gravity         the planet's surface gravity in G; higher gravity means more mountains
+     * @param habitability    the planet's habitability, 0.0 to 1.0; comfortable worlds shed most of their volcanism
+     *                        (see {@link #effectiveVolcanism}). Pass {@code 0.0} to leave the profile's volcanism as
+     *                        authored.
      */
     public static void placeMountains(StratConTrackState track, @Nullable String mountainTerrain,
-          @Nullable OrogenyProfile orogeny, double gravity) {
+          @Nullable OrogenyProfile orogeny, double gravity, double habitability) {
         if ((mountainTerrain == null) || (orogeny == null)) {
             return;
         }
@@ -98,7 +112,7 @@ public final class StratConMountainPlacer {
             return;
         }
 
-        int volcanism = orogeny.volcanismChanceOrDefault();
+        int volcanism = effectiveVolcanism(orogeny, habitability);
         switch (orogeny.type()) {
             case CORDILLERA -> parallelRidges(track, mountainTerrain, volcanism, features, LONG_RIDGE_FRACTION);
             case BASIN_AND_RANGE ->
@@ -110,6 +124,22 @@ public final class StratConMountainPlacer {
             case SHIELD_CRATERED -> clusters(track, mountainTerrain, volcanism, features * 2);
             case VOLCANIC_ARC -> arc(track, mountainTerrain, volcanism, features);
         }
+    }
+
+    /**
+     * @param orogeny      the selected profile, supplying the authored volcanism chance
+     * @param habitability the planet's habitability, 0.0 to 1.0
+     *
+     * @return the percentage of this profile's features that should be volcanic, reduced on worlds comfortable enough
+     *       to settle - a lush, breathable world may still sit on a volcanic arc, but it should not be paved with lava
+     */
+    static int effectiveVolcanism(@Nullable OrogenyProfile orogeny, double habitability) {
+        if (orogeny == null) {
+            return 0;
+        }
+
+        double damping = 1.0 - (HABITABILITY_VOLCANISM_DAMPING * Math.clamp(habitability, 0.0, 1.0));
+        return (int) Math.round(orogeny.volcanismChanceOrDefault() * damping);
     }
 
     /**
@@ -134,7 +164,7 @@ public final class StratConMountainPlacer {
           double fraction) {
         int total = track.getWidth() * track.getHeight();
         int cap = max(1, (int) round(total * MAX_UPLAND_FRACTION));
-        int size = min(cap, max(3, (int) round(total * fraction * features)));
+        int size = Math.clamp((int) round(total * fraction * features), 3, cap);
 
         Set<StratConCoords> blob = StratConHexGeometry.growBlob(track,
               randomLandCoords(track),

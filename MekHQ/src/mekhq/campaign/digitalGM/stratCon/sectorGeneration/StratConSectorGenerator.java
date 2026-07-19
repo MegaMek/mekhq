@@ -86,7 +86,11 @@ public final class StratConSectorGenerator {
         // number. Volcanic where the profile calls for it, never over ocean, and only when the biome offers mountains.
         OrogenyProfile orogeny = StratConOrogeny.getInstance().selectProfile(profile);
         track.setOrogenyProfile(orogeny.type().name());
-        StratConMountainPlacer.placeMountains(track, mountainTerrainFor(biome), orogeny, profile.gravity());
+        StratConMountainPlacer.placeMountains(track,
+              mountainTerrainFor(biome),
+              orogeny,
+              profile.gravity(),
+              profile.habitability());
 
         // Dry fill: geography-aware terrain that follows moisture, rain shadow, and coldness, painted in coherent
         // patches from the biome's climate-appropriate terrains.

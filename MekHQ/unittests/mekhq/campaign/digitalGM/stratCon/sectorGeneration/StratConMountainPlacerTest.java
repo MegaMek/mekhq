@@ -89,21 +89,25 @@ class StratConMountainPlacerTest {
     @Test
     void zeroGravity_placesNoMountains() {
         StratConTrackState track = track();
-        StratConMountainPlacer.placeMountains(track, MOUNTAIN, profile(OrogenyProfileType.CORDILLERA, 1.0, 10), 0.0);
+        StratConMountainPlacer.placeMountains(track,
+              MOUNTAIN,
+              profile(OrogenyProfileType.CORDILLERA, 1.0, 10),
+              0.0,
+              0.0);
         assertEquals(0, mountainOrVolcano(track));
     }
 
     @Test
     void noMountainTerrain_placesNothing() {
         StratConTrackState track = track();
-        StratConMountainPlacer.placeMountains(track, null, profile(OrogenyProfileType.CORDILLERA, 1.0, 10), 2.0);
+        StratConMountainPlacer.placeMountains(track, null, profile(OrogenyProfileType.CORDILLERA, 1.0, 10), 2.0, 0.0);
         assertEquals(0, count(track, terrain -> !terrain.isEmpty()));
     }
 
     @Test
     void nullOrogeny_placesNothing() {
         StratConTrackState track = track();
-        StratConMountainPlacer.placeMountains(track, MOUNTAIN, null, 2.0);
+        StratConMountainPlacer.placeMountains(track, MOUNTAIN, null, 2.0, 0.0);
         assertEquals(0, count(track, terrain -> !terrain.isEmpty()));
     }
 
@@ -111,7 +115,7 @@ class StratConMountainPlacerTest {
     void everyShape_onlyPlacesMountainOrVolcanicTerrain() {
         for (OrogenyProfileType type : OrogenyProfileType.values()) {
             StratConTrackState track = track();
-            StratConMountainPlacer.placeMountains(track, MOUNTAIN, profile(type, 1.5, 30), 2.0);
+            StratConMountainPlacer.placeMountains(track, MOUNTAIN, profile(type, 1.5, 30), 2.0, 0.0);
 
             long stray = count(track,
                   terrain -> !terrain.isEmpty() && !terrain.equals(MOUNTAIN) && !terrain.equals(VOLCANO));
@@ -126,7 +130,7 @@ class StratConMountainPlacerTest {
             fillOcean(track);
 
             for (int run = 0; run < 5; run++) {
-                StratConMountainPlacer.placeMountains(track, MOUNTAIN, profile(type, 1.5, 30), 2.0);
+                StratConMountainPlacer.placeMountains(track, MOUNTAIN, profile(type, 1.5, 30), 2.0, 0.0);
             }
 
             assertEquals(SIZE * SIZE, count(track, OCEAN::equals), type + " overwrote ocean");
@@ -142,7 +146,7 @@ class StratConMountainPlacerTest {
             StratConMountainPlacer.placeMountains(track,
                   MOUNTAIN,
                   profile(OrogenyProfileType.CORDILLERA, 1.0, 10),
-                  2.0);
+                  2.0, 0.0);
             total += mountainOrVolcano(track);
         }
         assertTrue(total > 0, "high gravity should produce mountains across many runs");
@@ -155,12 +159,12 @@ class StratConMountainPlacerTest {
         for (int run = 0; run < 80; run++) {
             StratConTrackState lowTrack = track();
             StratConMountainPlacer.placeMountains(lowTrack, MOUNTAIN, profile(OrogenyProfileType.CORDILLERA, 0.3, 0),
-                  2.0);
+                  2.0, 0.0);
             low += mountainOrVolcano(lowTrack);
 
             StratConTrackState highTrack = track();
             StratConMountainPlacer.placeMountains(highTrack, MOUNTAIN, profile(OrogenyProfileType.CORDILLERA, 2.0, 0),
-                  2.0);
+                  2.0, 0.0);
             high += mountainOrVolcano(highTrack);
         }
         assertTrue(high > low, "a higher range-count modifier should place more mountains on average");
@@ -173,10 +177,48 @@ class StratConMountainPlacerTest {
         for (int run = 0; run < 40; run++) {
             StratConTrackState track = track();
             StratConMountainPlacer.placeMountains(track, MOUNTAIN, profile(OrogenyProfileType.VOLCANIC_ARC, 1.0, 70),
-                  2.0);
+                  2.0, 0.0);
             volcano += count(track, VOLCANO::equals);
             mountain += count(track, MOUNTAIN::equals);
         }
         assertTrue(volcano > mountain, "a 70% volcanism arc should be mostly volcanic");
+    }
+
+    @Test
+    void volcanism_isUnchangedOnAnUninhabitableWorld() {
+        // An airless or lethal world scores 0 habitability and keeps its authored volcanism in full.
+        OrogenyProfile arc = profile(OrogenyProfileType.VOLCANIC_ARC, 1.0, 70);
+
+        assertEquals(70, StratConMountainPlacer.effectiveVolcanism(arc, 0.0));
+    }
+
+    @Test
+    void volcanism_isDampedOnAComfortableWorld() {
+        // The complaint this addresses: orogeny is picked on gravity, temperature and water, none of which stop a
+        // settled temperate world drawing a volcanic profile - so the volcanism itself is damped by habitability.
+        OrogenyProfile arc = profile(OrogenyProfileType.VOLCANIC_ARC, 1.0, 70);
+
+        int comfortable = StratConMountainPlacer.effectiveVolcanism(arc, 1.0);
+
+        assertTrue(comfortable < 70, "a habitable world should shed most of its volcanism, got " + comfortable);
+        assertTrue(comfortable > 0, "a habitable world may still sit on a volcanic arc, got " + comfortable);
+    }
+
+    @Test
+    void volcanism_fallsAsAWorldBecomesMoreHabitable() {
+        OrogenyProfile arc = profile(OrogenyProfileType.VOLCANIC_ARC, 1.0, 70);
+
+        int previous = Integer.MAX_VALUE;
+        for (double habitability : new double[] { 0.0, 0.25, 0.5, 0.75, 1.0 }) {
+            int volcanism = StratConMountainPlacer.effectiveVolcanism(arc, habitability);
+            assertTrue(volcanism <= previous,
+                  "volcanism should not rise as habitability rises (at " + habitability + ')');
+            previous = volcanism;
+        }
+    }
+
+    @Test
+    void volcanism_handlesAMissingProfile() {
+        assertEquals(0, StratConMountainPlacer.effectiveVolcanism(null, 0.5));
     }
 }
