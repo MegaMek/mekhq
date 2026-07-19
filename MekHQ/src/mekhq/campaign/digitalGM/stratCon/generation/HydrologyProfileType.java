@@ -30,30 +30,33 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.digitalGM.stratCon;
-
-import megamek.common.loaders.MapSettings;
-import mekhq.campaign.digitalGM.IMapGenerationStrategy;
-import mekhq.campaign.digitalGM.stratCon.generation.StratConMapTuner;
-import mekhq.campaign.mission.AtBScenario;
+package mekhq.campaign.digitalGM.stratCon.generation;
 
 /**
- * Default StratCon implementation of {@link IMapGenerationStrategy}: the standard biome-driven terrain selection.
- * Delegates to {@link StratConRulesManager#setScenarioParametersFromBiome}, so this class introduces the overridable
- * seam without moving any behaviour.
+ * The hydrology profiles available to improved sector generation. Each identifies both a bucket of tunable numeric
+ * parameters (authored in {@code HydrologyProfiles.yaml}) and a distinct ocean-shape algorithm in the generator. A new
+ * profile therefore needs both a YAML entry and a shape implementation.
  *
  * @author Illiani
  * @since 0.51.01
  */
-public class StratConMapGenerationStrategy implements IMapGenerationStrategy {
-
-    @Override
-    public void setScenarioTerrain(StratConTrackState track, StratConScenario scenario, boolean isNoTornadoes) {
-        StratConRulesManager.setScenarioParametersFromBiome(track, scenario, isNoTornadoes);
-    }
-
-    @Override
-    public void tuneMapSettings(MapSettings mapSettings, AtBScenario scenario) {
-        StratConMapTuner.tune(mapSettings, scenario);
-    }
+public enum HydrologyProfileType {
+    /** Almost dry: one or two small, isolated water spots. */
+    INLAND,
+    /** A meandering river with tributaries: connected, linear water. */
+    RIVERLANDS,
+    /** Scattered medium lakes across the sector. */
+    LAKELANDS,
+    /** Dense scattered small water, wetter than lakelands; pairs with a swamp bias. */
+    MARSHLANDS,
+    /** One large body grown from a corner or edge. */
+    COASTAL,
+    /** One large body in the center of the sector. */
+    INLAND_SEA,
+    /** A land finger with ocean on two or three sides, still joined to one edge. */
+    PENINSULA,
+    /** Water carved around a single central landmass. */
+    ISLAND,
+    /** Several medium land bodies surrounded by water. */
+    ARCHIPELAGO
 }

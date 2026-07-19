@@ -91,6 +91,8 @@ import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario.ScenarioState;
+import mekhq.campaign.digitalGM.stratCon.generation.StratConOceanPlacer;
+import mekhq.campaign.digitalGM.stratCon.generation.StratConRoadPlacer;
 import mekhq.campaign.events.StratConDeploymentEvent;
 import mekhq.campaign.events.scenarios.ScenarioChangedEvent;
 import mekhq.campaign.force.CombatTeam;

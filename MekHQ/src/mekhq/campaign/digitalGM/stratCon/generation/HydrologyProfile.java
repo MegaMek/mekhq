@@ -30,30 +30,20 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.digitalGM.stratCon;
-
-import megamek.common.loaders.MapSettings;
-import mekhq.campaign.digitalGM.IMapGenerationStrategy;
-import mekhq.campaign.digitalGM.stratCon.generation.StratConMapTuner;
-import mekhq.campaign.mission.AtBScenario;
+package mekhq.campaign.digitalGM.stratCon.generation;
 
 /**
- * Default StratCon implementation of {@link IMapGenerationStrategy}: the standard biome-driven terrain selection.
- * Delegates to {@link StratConRulesManager#setScenarioParametersFromBiome}, so this class introduces the overridable
- * seam without moving any behaviour.
+ * A single hydrology profile's tunable parameters, deserialized from {@code HydrologyProfiles.yaml}. The profile's
+ * ocean coverage is rolled uniformly within {@code [minOceanPercent, maxOceanPercent]}, and {@code gaussianCenter} is
+ * the water coverage this profile is most likely to be chosen for.
+ *
+ * @param type            the profile's identity, which also selects its ocean-shape algorithm
+ * @param minOceanPercent the lowest ocean coverage this profile produces, as a percentage
+ * @param maxOceanPercent the highest ocean coverage this profile produces, as a percentage
+ * @param gaussianCenter  the planetary water coverage at which this profile is most strongly favored
  *
  * @author Illiani
  * @since 0.51.01
  */
-public class StratConMapGenerationStrategy implements IMapGenerationStrategy {
-
-    @Override
-    public void setScenarioTerrain(StratConTrackState track, StratConScenario scenario, boolean isNoTornadoes) {
-        StratConRulesManager.setScenarioParametersFromBiome(track, scenario, isNoTornadoes);
-    }
-
-    @Override
-    public void tuneMapSettings(MapSettings mapSettings, AtBScenario scenario) {
-        StratConMapTuner.tune(mapSettings, scenario);
-    }
-}
+public record HydrologyProfile(HydrologyProfileType type, int minOceanPercent, int maxOceanPercent,
+      double gaussianCenter) {}

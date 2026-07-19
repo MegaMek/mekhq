@@ -39,6 +39,8 @@ import java.util.List;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.*;
+import mekhq.campaign.digitalGM.stratCon.generation.ImprovedStratConSectorGeneration;
+import mekhq.campaign.digitalGM.stratCon.generation.LegacyStratConSectorGeneration;
 import mekhq.campaign.events.NewDayEvent;
 import mekhq.campaign.mission.AtBContract;
 

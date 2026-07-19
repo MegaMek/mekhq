@@ -30,30 +30,31 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.digitalGM.stratCon;
-
-import megamek.common.loaders.MapSettings;
-import mekhq.campaign.digitalGM.IMapGenerationStrategy;
-import mekhq.campaign.digitalGM.stratCon.generation.StratConMapTuner;
-import mekhq.campaign.mission.AtBScenario;
+package mekhq.campaign.digitalGM.stratCon.generation;
 
 /**
- * Default StratCon implementation of {@link IMapGenerationStrategy}: the standard biome-driven terrain selection.
- * Delegates to {@link StratConRulesManager#setScenarioParametersFromBiome}, so this class introduces the overridable
- * seam without moving any behaviour.
+ * The mountain-building (orogeny) profiles available to improved sector generation. Each identifies both a bucket of
+ * tunable weighting parameters (authored in {@code OrogenyProfiles.yaml}) and a distinct mountain-shape algorithm in
+ * the mountain placer. A new profile therefore needs both a YAML entry and a shape implementation.
  *
  * @author Illiani
  * @since 0.51.01
  */
-public class StratConMapGenerationStrategy implements IMapGenerationStrategy {
-
-    @Override
-    public void setScenarioTerrain(StratConTrackState track, StratConScenario scenario, boolean isNoTornadoes) {
-        StratConRulesManager.setScenarioParametersFromBiome(track, scenario, isNoTornadoes);
-    }
-
-    @Override
-    public void tuneMapSettings(MapSettings mapSettings, AtBScenario scenario) {
-        StratConMapTuner.tune(mapSettings, scenario);
-    }
+public enum OrogenyProfileType {
+    /** Long, roughly parallel mountain chains. */
+    CORDILLERA,
+    /** Many short, parallel ridges separated by flats. */
+    BASIN_AND_RANGE,
+    /** A single large, clustered rugged upland. */
+    MASSIF,
+    /** Sparse, isolated peaks scattered across the sector. */
+    SCATTERED_PEAKS,
+    /** A curved chain of mostly volcanic peaks. */
+    VOLCANIC_ARC,
+    /** Scattered clusters of volcanic and lunar rock, favored on airless worlds. */
+    SHIELD_CRATERED,
+    /** A few low, worn-down ranges. */
+    ERODED_ROLLING,
+    /** A large, flat-topped upland. */
+    PLATEAU
 }

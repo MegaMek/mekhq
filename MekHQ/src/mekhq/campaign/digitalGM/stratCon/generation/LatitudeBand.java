@@ -30,30 +30,45 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.digitalGM.stratCon;
+package mekhq.campaign.digitalGM.stratCon.generation;
 
-import megamek.common.loaders.MapSettings;
-import mekhq.campaign.digitalGM.IMapGenerationStrategy;
-import mekhq.campaign.digitalGM.stratCon.generation.StratConMapTuner;
-import mekhq.campaign.mission.AtBScenario;
+import megamek.common.compute.Compute;
 
 /**
- * Default StratCon implementation of {@link IMapGenerationStrategy}: the standard biome-driven terrain selection.
- * Delegates to {@link StratConRulesManager#setScenarioParametersFromBiome}, so this class introduces the overridable
- * seam without moving any behaviour.
+ * The latitude band a StratCon sector sits in, used by improved sector generation to bias a sector's temperature away
+ * from the planet's equatorial baseline. Bands grow progressively colder toward the poles; the northern and southern
+ * halves of each band share the same temperature offset.
  *
  * @author Illiani
  * @since 0.51.01
  */
-public class StratConMapGenerationStrategy implements IMapGenerationStrategy {
+public enum LatitudeBand {
+    EQUATORIAL(0),
+    NORTH_TROPICAL(-8),
+    SOUTH_TROPICAL(-8),
+    NORTH_TEMPERATE(-20),
+    SOUTH_TEMPERATE(-20),
+    NORTH_POLAR(-40),
+    SOUTH_POLAR(-40);
 
-    @Override
-    public void setScenarioTerrain(StratConTrackState track, StratConScenario scenario, boolean isNoTornadoes) {
-        StratConRulesManager.setScenarioParametersFromBiome(track, scenario, isNoTornadoes);
+    private final int temperatureOffset;
+
+    LatitudeBand(int temperatureOffset) {
+        this.temperatureOffset = temperatureOffset;
     }
 
-    @Override
-    public void tuneMapSettings(MapSettings mapSettings, AtBScenario scenario) {
-        StratConMapTuner.tune(mapSettings, scenario);
+    /**
+     * @return the temperature offset in degrees Celsius applied to the planet's equatorial temperature for a sector in
+     *       this band (zero at the equator, progressively more negative toward the poles)
+     */
+    public int getTemperatureOffset() {
+        return temperatureOffset;
+    }
+
+    /**
+     * @return a uniformly random latitude band
+     */
+    public static LatitudeBand random() {
+        return values()[Compute.randomInt(values().length)];
     }
 }
