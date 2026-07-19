@@ -282,6 +282,21 @@ public final class CompanyGenerator {
      */
     public static Result applyToCampaign(Campaign campaign, CompanyGenerationOptions options,
           ForceDescriptor fd, Ruleset.ProgressListener listener) {
+        return applyToCampaign(campaign, options, fd, listener, true);
+    }
+
+    /**
+     * As {@link #applyToCampaign(Campaign, CompanyGenerationOptions, ForceDescriptor,
+     * Ruleset.ProgressListener)}, but {@code generateSupport} controls whether support personnel and
+     * vehicles are generated in the same pass. Pass {@code false} to commit only the combat force to
+     * the TOE (phase one of two-phase generation); {@link #generateSupportFromToe} can then be run
+     * later against the committed TOE.
+     *
+     * @param generateSupport {@code true} to also generate support (the one-shot behavior),
+     *                        {@code false} to commit combat only
+     */
+    public static Result applyToCampaign(Campaign campaign, CompanyGenerationOptions options,
+          ForceDescriptor fd, Ruleset.ProgressListener listener, boolean generateSupport) {
         // 4-7. Walk the resulting tree; for each leaf, materialize a Unit, attach a crew, and place
         // the unit under the current Formation.
         LOGGER.info("[CompanyGen][Pipeline]Stage 4-7: walk tree, materialize Units + crews into Formations");
@@ -419,48 +434,12 @@ public final class CompanyGenerator {
         }
         Person rootCommander = RulesetRankAssigner.apply(campaign, options);
 
-        // 7e. Support personnel: techs, doctors, administrators, plus astech and medic assistants.
-        // Reads per-role coverage % and skill level from the Setup tab, scales the canonical CamOps
-        // demand from SupportPersonnelCalculator, and creates the resulting Persons (or astech/medic
-        // pool counts) via SupportPersonnelGenerator. Each generated support Person already has its
-        // rank set by the generator — Stage 7c only ranks Persons in the Formation tree, and
-        // support staff are free-floating campaign personnel.
-        //
-        // Runs before Stage 7d so the founder/callsign flags below sweep across combat AND support
-        // staff in one pass.
-        LOGGER.info("[CompanyGen][Pipeline]Stage 7e: support personnel generation");
-        if (listener != null) {
-            listener.updateProgress(0.0, "Generating support personnel...");
-        }
-        SupportPersonnelGenerator.Result supportResult = SupportPersonnelGenerator.generate(campaign, options);
-        generatedPersons.addAll(supportResult.generatedPersons());
-
-        // 7e (continued). Assign techs to units using the Setup tab's three-slot sort grid (Pilot
-        // Rank / Unit Weight / Pilot Skill, each with its own direction). Gated on
-        // isAssignTechsToUnits; pulls only from the techs SupportPersonnelGenerator just created
-        // so we don't steal a pre-existing campaign tech from another duty.
-        SupportPersonnelAssigner.assign(campaign, options, supportResult);
-
-        // 7e (continued). Organize the freshly generated support staff into the TOE. Each section
-        // (Maintenance / Medical / Command) becomes infantry-style carrier units crewed by the staff,
-        // nested under a Support Command formation. Crewing a carrier is separate from the setTech
-        // maintenance assignment above, so techs still maintain the combat units.
-        SupportPersonnelToTOE.organize(campaign, supportResult.generatedPersons(), campaign.isClanCampaign());
-
-        // 7e (continued). Grant the standalone support vehicles a command gets for each enabled
-        // capability that has no matching personnel section (logistics convoy, canteen, security).
-        // Salvage and medical vehicles are handled inside SupportPersonnelToTOE.organize above, where
-        // they join their section crewed from the generated staff (no double-generated personnel).
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        Faction supportFaction = campaign.getFaction();
-        if (campaignOptions.isUseStratCon()) {
-            SupportUnitGenerator.generateLogisticsUnits(campaign, supportFaction, true);
-        }
-        if (campaignOptions.isUseFatigue()) {
-            SupportUnitGenerator.generateCommissaryUnits(campaign, supportFaction, true);
-        }
-        if (!campaignOptions.getPrisonerCaptureStyle().isNone()) {
-            SupportUnitGenerator.generateSecurityUnits(campaign, supportFaction, true);
+        // 7e. Support: generate support personnel and standalone support vehicles sized to the
+        // campaign's current force, and organize the support staff into the TOE. Extracted into
+        // generateSupportFromToe so support can be (re)generated against the committed TOE, and gated
+        // on generateSupport so combat can be committed on its own (phase one of two-phase generation).
+        if (generateSupport) {
+            generatedPersons.addAll(generateSupportFromToe(campaign, options, listener));
         }
 
         // Re-decorate the formation tree so the support formations created in this stage (they did
@@ -491,6 +470,57 @@ public final class CompanyGenerator {
 
         LOGGER.info("[CompanyGen][Pipeline]CompanyGenerator.applyToCampaign() DONE");
         return new Result(fd, generatedPersons);
+    }
+
+    /**
+     * Stage 7e: generates support personnel (techs, doctors, administrators, plus astech and medic
+     * assistants) and the standalone support vehicles a command gets for each enabled capability, and
+     * organizes the support staff into the TOE. Sized to the campaign's current force composition via
+     * {@link SupportPersonnelCalculator} and the {@link SupportUnitGenerator} capacity calculators, so
+     * it can be run standalone against a committed TOE (phase two of two-phase generation).
+     *
+     * @param campaign the campaign whose current force the support is sized to
+     * @param options  the generation options (per-role coverage %, skill levels, tech assignment)
+     * @param listener optional progress listener; may be {@code null}
+     *
+     * @return the support {@link Person}s created (astech/medic pool hires are not individual Persons)
+     */
+    public static List<Person> generateSupportFromToe(Campaign campaign, CompanyGenerationOptions options,
+          Ruleset.ProgressListener listener) {
+        LOGGER.info("[CompanyGen][Pipeline]Stage 7e: support personnel generation");
+        if (listener != null) {
+            listener.updateProgress(0.0, "Generating support personnel...");
+        }
+        SupportPersonnelGenerator.Result supportResult = SupportPersonnelGenerator.generate(campaign, options);
+
+        // Assign techs to units using the Setup tab's three-slot sort grid (Pilot Rank / Unit Weight /
+        // Pilot Skill, each with its own direction). Gated on isAssignTechsToUnits; pulls only from the
+        // techs SupportPersonnelGenerator just created so we don't steal a pre-existing campaign tech.
+        SupportPersonnelAssigner.assign(campaign, options, supportResult);
+
+        // Organize the freshly generated support staff into the TOE. Each section (Maintenance /
+        // Medical / Command) becomes infantry-style carrier units crewed by the staff, nested under a
+        // Support Command formation. Crewing a carrier is separate from the setTech maintenance
+        // assignment above, so techs still maintain the combat units.
+        SupportPersonnelToTOE.organize(campaign, supportResult.generatedPersons(), campaign.isClanCampaign());
+
+        // Grant the standalone support vehicles a command gets for each enabled capability that has no
+        // matching personnel section (logistics convoy, canteen, security). Salvage and medical
+        // vehicles are handled inside SupportPersonnelToTOE.organize above, where they join their
+        // section crewed from the generated staff (no double-generated personnel).
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        Faction supportFaction = campaign.getFaction();
+        if (campaignOptions.isUseStratCon()) {
+            SupportUnitGenerator.generateLogisticsUnits(campaign, supportFaction, true);
+        }
+        if (campaignOptions.isUseFatigue()) {
+            SupportUnitGenerator.generateCommissaryUnits(campaign, supportFaction, true);
+        }
+        if (!campaignOptions.getPrisonerCaptureStyle().isNone()) {
+            SupportUnitGenerator.generateSecurityUnits(campaign, supportFaction, true);
+        }
+
+        return supportResult.generatedPersons();
     }
 
     /**
