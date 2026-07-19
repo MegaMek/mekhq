@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.personnel;
 
+import static mekhq.campaign.campaignOptions.CampaignOptions.EDGE_AWARD_REPLACEMENT_XP;
+
 import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -387,6 +389,7 @@ public class Award implements Comparable<Award> {
                                 (campaignOptions.getAwardBonusStyle().isXP());
         boolean awardEdge = (campaignOptions.getAwardBonusStyle().isBoth()) ||
                                   (campaignOptions.getAwardBonusStyle().isEdge());
+        boolean isReplaceEdgeAwards = campaignOptions.isUseReplaceEdgeAwards();
 
         int issueCount = person.getAwardController().getNumberOfAwards(this);
 
@@ -405,10 +408,18 @@ public class Award implements Comparable<Award> {
         }
 
         if ((awardEdge) && (edge > 0)) {
-            tooltip.append("Edge: +").append(edge);
+            if (isReplaceEdgeAwards) {
+                tooltip.append("XP (from Edge): +").append(edge * EDGE_AWARD_REPLACEMENT_XP);
 
-            if (issueCount > 1) {
-                tooltip.append(" (+").append(edge * issueCount).append(')');
+                if (issueCount > 1) {
+                    tooltip.append(" (+").append(edge * issueCount * EDGE_AWARD_REPLACEMENT_XP).append(')');
+                }
+            } else {
+                tooltip.append("Edge: +").append(edge);
+
+                if (issueCount > 1) {
+                    tooltip.append(" (+").append(edge * issueCount).append(')');
+                }
             }
 
             tooltip.append("<br>");

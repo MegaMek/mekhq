@@ -342,6 +342,7 @@ public class CampaignOptionsUnmarshaller {
             case "edgeRefreshPeriod" ->
                   campaignOptions.setEdgeRefreshPeriod(EdgeRefreshPeriod.fromString(nodeContents));
             case "useEdge" -> campaignOptions.setUseEdge(parseBoolean(nodeContents));
+            case "useTwistOfFateSurvival" -> campaignOptions.setUseTwistOfFateSurvival(parseBoolean(nodeContents));
             case "useImplants" -> campaignOptions.setUseImplants(parseBoolean(nodeContents));
             case "alternativeQualityAveraging" -> campaignOptions.setAlternativeQualityAveraging(parseBoolean(
                   nodeContents));
@@ -479,6 +480,7 @@ public class CampaignOptionsUnmarshaller {
                 campaignOptions.setRoleBaseSalaries(mergedSalaries);
             }
             case "awardBonusStyle" -> campaignOptions.setAwardBonusStyle(AwardBonus.valueOf(nodeContents));
+            case "useReplaceEdgeAwards" -> campaignOptions.setUseReplaceEdgeAwards(parseBoolean(nodeContents));
             case "enableAutoAwards" -> campaignOptions.setEnableAutoAwards(parseBoolean(nodeContents));
             case "issuePosthumousAwards" -> campaignOptions.setIssuePosthumousAwards(parseBoolean(nodeContents));
             case "issueBestAwardOnly" -> campaignOptions.setIssueBestAwardOnly(parseBoolean(nodeContents));

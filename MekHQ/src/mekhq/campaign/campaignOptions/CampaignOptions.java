@@ -108,6 +108,8 @@ public class CampaignOptions {
 
     public static final int REPUTATION_PERFORMANCE_CUT_OFF_YEARS = 10;
 
+    public static final int EDGE_AWARD_REPLACEMENT_XP = 10;
+
     public static String getTechLevelName(final int techLevel) {
         return switch (techLevel) {
             case TECH_INTRO -> TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_INTRO];
@@ -239,6 +241,7 @@ public class CampaignOptions {
     private boolean onlyCommandersMatterBattleArmor;
     private EdgeRefreshPeriod edgeRefreshPeriod;
     private boolean useEdge;
+    private boolean useTwistOfFateSurvival;
     private boolean useImplants;
     private boolean alternativeQualityAveraging;
     private boolean useAgeEffects;
@@ -321,6 +324,7 @@ public class CampaignOptions {
 
     // Awards
     private AwardBonus awardBonusStyle;
+    private boolean useReplaceEdgeAwards;
     private boolean enableAutoAwards;
     private boolean issuePosthumousAwards;
     private boolean issueBestAwardOnly;
@@ -866,6 +870,7 @@ public class CampaignOptions {
         edgeRefreshPeriod = EdgeRefreshPeriod.WEEKLY;
         setOnlyCommandersMatterBattleArmor(false);
         setUseEdge(false);
+        setUseTwistOfFateSurvival(false);
         setUseImplants(false);
         setAlternativeQualityAveraging(false);
         setUseAgeEffects(false);
@@ -986,6 +991,7 @@ public class CampaignOptions {
 
         // Awards
         setAwardBonusStyle(AwardBonus.BOTH);
+        setUseReplaceEdgeAwards(false);
         setEnableAutoAwards(false);
         setIssuePosthumousAwards(false);
         setIssueBestAwardOnly(true);
@@ -1746,6 +1752,14 @@ public class CampaignOptions {
 
     public void setUseEdge(final boolean useEdge) {
         this.useEdge = useEdge;
+    }
+
+    public boolean isUseTwistOfFateSurvival() {
+        return useTwistOfFateSurvival;
+    }
+
+    public void setUseTwistOfFateSurvival(final boolean useTwistOfFateSurvival) {
+        this.useTwistOfFateSurvival = useTwistOfFateSurvival;
     }
 
     public boolean isUseImplants() {
@@ -3542,6 +3556,14 @@ public class CampaignOptions {
 
     public void setAwardBonusStyle(final AwardBonus awardBonusStyle) {
         this.awardBonusStyle = awardBonusStyle;
+    }
+
+    public boolean isUseReplaceEdgeAwards() {
+        return useReplaceEdgeAwards;
+    }
+
+    public void setUseReplaceEdgeAwards(final boolean useReplaceEdgeAwards) {
+        this.useReplaceEdgeAwards = useReplaceEdgeAwards;
     }
 
     public boolean isEnableAutoAwards() {

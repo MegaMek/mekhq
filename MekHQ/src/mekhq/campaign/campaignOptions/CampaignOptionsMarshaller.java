@@ -290,6 +290,10 @@ public class CampaignOptionsMarshaller {
               "edgeRefreshPeriod",
               campaignOptions.getEdgeRefreshPeriod().getLookupKey());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useEdge", campaignOptions.isUseEdge());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "useTwistOfFateSurvival",
+              campaignOptions.isUseTwistOfFateSurvival());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useImplants", campaignOptions.isUseImplants());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
@@ -476,6 +480,7 @@ public class CampaignOptionsMarshaller {
 
         // region Awards
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "awardBonusStyle", campaignOptions.getAwardBonusStyle().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useReplaceEdgeAwards", campaignOptions.isUseReplaceEdgeAwards());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableAutoAwards", campaignOptions.isEnableAutoAwards());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "issuePosthumousAwards", campaignOptions.isIssuePosthumousAwards());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "issueBestAwardOnly", campaignOptions.isIssueBestAwardOnly());

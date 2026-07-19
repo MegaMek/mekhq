@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.personnel.medical;
 
+import static megamek.common.units.Crew.DEATH;
 import static mekhq.campaign.enums.DailyReportType.MEDICAL;
 import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -129,7 +130,7 @@ public class MedicalController {
     public void processMedicalEvents(Person patient, boolean isUseAgingEffects, boolean isClanCampaign,
           LocalDate today) {
         // Should the character be dead already?
-        if (patient.getTotalInjurySeverity() > Person.DEATH_THRESHOLD) {
+        if (patient.getTotalInjurySeverity() >= DEATH) {
             patient.changeStatus(campaign, today, PersonnelStatus.WOUNDS);
             return; // Early exit as there is no point continuing to process the character
         }
