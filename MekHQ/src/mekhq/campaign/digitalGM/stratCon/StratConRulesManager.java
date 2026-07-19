@@ -895,22 +895,36 @@ public class StratConRulesManager {
 
         // facilities have their own terrain lists
         if (facility != null) {
-            int kelvinTemp = track.getTemperature() + StratConContractInitializer.ZERO_CELSIUS_IN_KELVIN;
-            StratConBiome facilityBiome;
+            // A base belongs on ground that matches the hex it occupies, so prefer the facility pool declared for this
+            // terrain (terrain names already carry their climate). Only when the terrain declares no facility pool do
+            // we fall back to the generic temperature-banded facility biome below.
+            String hexTerrain = track.getTerrainTile(coords);
+            String facilityPoolKey = biomeManifest.getFacilityPoolKey(hexTerrain);
 
-            // if facility doesn't have a biome temp map or no entry for the current
-            // temperature, use the default one
-            if (facility.getBiomes().isEmpty() || (facility.getBiomeTempMap().floorEntry(kelvinTemp) == null)) {
-                var defaultTempMap = biomeManifest.getTempMap(StratConBiomeManifest.TERRAN_FACILITY_BIOME);
-                var biomeEntry = defaultTempMap.floorEntry(kelvinTemp);
-                if (biomeEntry == null) {
-                    biomeEntry = defaultTempMap.firstEntry();
-                }
-                facilityBiome = biomeEntry.getValue();
+            if (facilityPoolKey != null) {
+                terrainType = facilityPoolKey;
             } else {
-                facilityBiome = facility.getBiomeTempMap().floorEntry(kelvinTemp).getValue();
+                // Band on the hex's own temperature, not the sector average, so a volcano hex is treated as hot and a
+                // glacier hex as frozen - matching the scenario temperature set above.
+                int kelvinTemp = track.getTemperature() +
+                                       StratConBiomeManifest.terrainTemperatureOffset(hexTerrain) +
+                                       StratConContractInitializer.ZERO_CELSIUS_IN_KELVIN;
+                StratConBiome facilityBiome;
+
+                // if facility doesn't have a biome temp map or no entry for the current
+                // temperature, use the default one
+                if (facility.getBiomes().isEmpty() || (facility.getBiomeTempMap().floorEntry(kelvinTemp) == null)) {
+                    var defaultTempMap = biomeManifest.getTempMap(StratConBiomeManifest.TERRAN_FACILITY_BIOME);
+                    var biomeEntry = defaultTempMap.floorEntry(kelvinTemp);
+                    if (biomeEntry == null) {
+                        biomeEntry = defaultTempMap.firstEntry();
+                    }
+                    facilityBiome = biomeEntry.getValue();
+                } else {
+                    facilityBiome = facility.getBiomeTempMap().floorEntry(kelvinTemp).getValue();
+                }
+                terrainType = facilityBiome.allowedTerrainTypes.get(randomInt(facilityBiome.allowedTerrainTypes.size()));
             }
-            terrainType = facilityBiome.allowedTerrainTypes.get(randomInt(facilityBiome.allowedTerrainTypes.size()));
         } else {
             terrainType = track.getTerrainTile(coords);
         }

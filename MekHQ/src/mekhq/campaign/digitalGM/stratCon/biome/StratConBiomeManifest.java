@@ -35,9 +35,11 @@ package mekhq.campaign.digitalGM.stratCon.biome;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import javax.xml.transform.Source;
 
@@ -47,6 +49,7 @@ import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
+import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
@@ -295,6 +298,15 @@ public class StratConBiomeManifest {
     }
 
     /**
+     * @return the names of every declared terrain type, ocean terrains included. Note this covers only real terrain -
+     *       not the synthetic map-pool keys (convoy and facility pools, category fallbacks) that also live in
+     *       {@link #getBiomeMapTypes()}.
+     */
+    public Set<String> getTerrainTypeNames() {
+        return Collections.unmodifiableSet(terrainTypeMap.keySet());
+    }
+
+    /**
      * Resolves the battle-map pool for a terrain type: its own name-keyed pool when one exists, otherwise the pool
      * keyed by the terrain's {@link StratConTerrainCategory} name. This lets terrains without a dedicated pool - and
      * any terrain added later - still resolve to an appropriate set of boards.
@@ -309,6 +321,30 @@ public class StratConBiomeManifest {
             return exact;
         }
         return biomeMapTypes.get(getTerrainCategory(terrainType).name());
+    }
+
+    /** Suffix marking a map pool as the facility variant of a terrain or terrain category. */
+    public static final String FACILITY_POOL_SUFFIX = "Facility";
+
+    /**
+     * Resolves the map-pool key to use for a facility standing on the given terrain, so a base fights on a board that
+     * matches the ground it sits on rather than on climate alone. Prefers a pool keyed by the terrain's own name plus
+     * {@link #FACILITY_POOL_SUFFIX} (terrain names already carry their climate, e.g. {@code ColdForestFacility}),
+     * falling back to the terrain category's facility pool.
+     *
+     * @param terrainType a StratCon terrain type name
+     *
+     * @return the key of the declared facility pool, or {@code null} if the terrain has no facility pool and the caller
+     *       should fall back to the generic temperature-banded facility biome
+     */
+    public @Nullable String getFacilityPoolKey(String terrainType) {
+        String exactKey = terrainType + FACILITY_POOL_SUFFIX;
+        if (biomeMapTypes.containsKey(exactKey)) {
+            return exactKey;
+        }
+
+        String categoryKey = getTerrainCategory(terrainType).name() + FACILITY_POOL_SUFFIX;
+        return biomeMapTypes.containsKey(categoryKey) ? categoryKey : null;
     }
 
     /**

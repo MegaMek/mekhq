@@ -38,6 +38,11 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest.MapTypeList;
 import org.junit.jupiter.api.Test;
 
@@ -109,5 +114,62 @@ class StratConBiomeMapSelectionTest {
             assertNotNull(pool, "missing fallback pool for category " + category);
             assertFalse(pool.mapTypes.isEmpty(), "empty fallback pool for category " + category);
         }
+    }
+
+    @Test
+    void facilityPool_matchesTheHexTerrainRatherThanItsTemperature() {
+        // The bug this guards: a base on a volcano used to draw from the temperature-banded pools, so a temperate
+        // sector handed it a temperate town board.
+        String volcano = MANIFEST.getFacilityPoolKey("Volcano");
+        assertNotNull(volcano, "Volcano should declare a facility pool");
+
+        MapTypeList pool = MANIFEST.getMapTypesForTerrain(volcano);
+        assertNotNull(pool);
+        assertTrue(pool.mapTypes.contains("StratconVolcanic"),
+              "a facility on a volcano should be able to fight on volcanic ground");
+    }
+
+    @Test
+    void everyLandTerrainDeclaresAFacilityPool() {
+        for (String terrain : MANIFEST.getTerrainTypeNames()) {
+            if (StratConBiomeManifest.isOceanTerrain(terrain)) {
+                // Facilities never sit on open water.
+                continue;
+            }
+
+            assertNotNull(MANIFEST.getFacilityPoolKey(terrain),
+                  terrain + " has no facility pool, so a base there falls back to temperature alone");
+        }
+    }
+
+    @Test
+    void facilityPools_leanTowardInstallationsRatherThanCities() {
+        // A facility is an installation, not a metropolis: dense-city boards belong to genuinely urban terrain only.
+        for (Map.Entry<String, MapTypeList> entry : MANIFEST.getBiomeMapTypes().entrySet()) {
+            String key = entry.getKey();
+            if (!key.endsWith(StratConBiomeManifest.FACILITY_POOL_SUFFIX) || key.contains("Urban")) {
+                continue;
+            }
+
+            for (String mapType : entry.getValue().mapTypes) {
+                assertFalse(mapType.startsWith("City-") || mapType.startsWith("City"),
+                      key + " should not draw the city board " + mapType);
+            }
+        }
+    }
+
+    @Test
+    void everyDeclaredMapTypeHasAMapGeneratorFile() {
+        // Guards against typos anywhere in the manifest's map pools: every named board must exist on disk.
+        List<String> missing = new ArrayList<>();
+        for (Map.Entry<String, MapTypeList> entry : MANIFEST.getBiomeMapTypes().entrySet()) {
+            for (String mapType : entry.getValue().mapTypes) {
+                if (!new File("./data/mapgen/" + mapType + ".xml").exists()) {
+                    missing.add(entry.getKey() + " -> " + mapType);
+                }
+            }
+        }
+
+        assertTrue(missing.isEmpty(), "map pools name mapgen files that do not exist: " + missing);
     }
 }
