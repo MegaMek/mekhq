@@ -33,8 +33,11 @@
 package mekhq.campaign.digitalGM.stratCon.sectorGeneration;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import megamek.common.board.Coords;
@@ -98,15 +101,51 @@ public final class StratConHexGeometry {
      * @return the hexes covered, including {@code center}
      */
     public static Set<StratConCoords> withinRadius(StratConTrackState track, StratConCoords center, int radius) {
-        Set<StratConCoords> area = new HashSet<>();
-        area.add(center);
+        return stepDistancesWithin(track, center, radius).keySet();
+    }
 
-        Set<StratConCoords> frontier = new HashSet<>(area);
-        for (int ring = 0; ring < radius; ring++) {
+    /**
+     * @param track  the track providing bounds and adjacency
+     * @param center the hex to measure from
+     * @param radius how many steps out to reach
+     *
+     * @return each in-bounds hex within {@code radius} of {@code center}, mapped to how many steps away it is
+     *       ({@code center} itself maps to 0)
+     */
+    public static Map<StratConCoords, Integer> stepDistancesWithin(StratConTrackState track, StratConCoords center,
+          int radius) {
+        return stepDistancesFrom(track, List.of(center), radius);
+    }
+
+    /**
+     * Multi-source breadth-first sweep over the track's hexes, measuring how many steps each hex lies from the nearest
+     * source. Terrain is ignored - this is straight-line hex distance across the map, not travel cost.
+     *
+     * <p>Always prefer this to {@link StratConCoords#distance} when the answer feeds back into the map. See
+     * {@link #withinRadius} for why the inherited coordinate distance disagrees with StratCon's own adjacency.</p>
+     *
+     * @param track     the track providing bounds and adjacency
+     * @param sources   the hexes to measure from; each maps to 0
+     * @param maxRadius how far to sweep, or {@link Integer#MAX_VALUE} to cover the whole track
+     *
+     * @return each reached hex mapped to its distance from the nearest source
+     */
+    public static Map<StratConCoords, Integer> stepDistancesFrom(StratConTrackState track,
+          Collection<StratConCoords> sources, int maxRadius) {
+        Map<StratConCoords, Integer> distances = new HashMap<>();
+        Set<StratConCoords> frontier = new HashSet<>();
+
+        for (StratConCoords source : sources) {
+            if (inBounds(track, source) && (distances.putIfAbsent(source, 0) == null)) {
+                frontier.add(source);
+            }
+        }
+
+        for (int step = 1; (step <= maxRadius) && !frontier.isEmpty(); step++) {
             Set<StratConCoords> nextRing = new HashSet<>();
             for (StratConCoords coords : frontier) {
                 for (StratConCoords neighbor : neighbors(track, coords)) {
-                    if (area.add(neighbor)) {
+                    if (distances.putIfAbsent(neighbor, step) == null) {
                         nextRing.add(neighbor);
                     }
                 }
@@ -114,7 +153,7 @@ public final class StratConHexGeometry {
             frontier = nextRing;
         }
 
-        return area;
+        return distances;
     }
 
     /**

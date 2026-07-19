@@ -132,7 +132,8 @@ class StratConFarmPlacerTest {
         StratConFarmPlacer.placeFarms(track, fertilePlanet(), farmProfile(reach, 1.0));
 
         for (StratConCoords farm : farmland(track)) {
-            assertTrue(city.distance(farm) <= reach, "farmland at " + farm + " is beyond the city's reach");
+            assertTrue(StratConHexGeometry.withinRadius(track, city, reach).contains(farm),
+                  "farmland at " + farm + " is beyond the city's reach");
         }
     }
 

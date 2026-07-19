@@ -39,6 +39,7 @@ import static java.lang.Math.round;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import megamek.common.annotations.Nullable;
@@ -188,6 +189,12 @@ public final class StratConCityPlacer {
         List<Double> weights = new ArrayList<>();
         double total = 0.0;
 
+        // One sweep out from every existing city gives each candidate its distance to the nearest one, measured by
+        // stepping across the map rather than by coordinate distance (see StratConHexGeometry.withinRadius).
+        Map<StratConCoords, Integer> cityDistances = StratConHexGeometry.stepDistancesFrom(track,
+              track.getCities(),
+              Integer.MAX_VALUE);
+
         for (StratConCoords coords : land) {
             if (track.isCity(coords)) {
                 continue;
@@ -199,7 +206,7 @@ public final class StratConCityPlacer {
             }
 
             if (!track.getCities().isEmpty()) {
-                int distance = distanceToNearestCity(track, coords);
+                int distance = cityDistances.getOrDefault(coords, maxDistance);
                 double near = 1.0 / (1.0 + distance);
                 double far = (double) distance / maxDistance;
                 double distanceFactor = (clustering * near) + ((1.0 - clustering) * far);
@@ -227,14 +234,6 @@ public final class StratConCityPlacer {
             }
         }
         return candidates.get(candidates.size() - 1);
-    }
-
-    private static int distanceToNearestCity(StratConTrackState track, StratConCoords coords) {
-        int nearest = Integer.MAX_VALUE;
-        for (StratConCoords city : track.getCities()) {
-            nearest = min(nearest, coords.distance(city));
-        }
-        return nearest;
     }
 
     private static boolean isCoastal(StratConTrackState track, StratConCoords coords) {

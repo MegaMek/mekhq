@@ -123,8 +123,12 @@ public final class StratConRoadPlacer {
         }
 
         // Space ports are the sector's traffic hubs: they cheapen nearby travel and root each network, so the trunk
-        // roads converge on them.
+        // roads converge on them. Their pull is measured once here, by stepping out across the map, rather than per hex
+        // by coordinate distance - see StratConHexGeometry.withinRadius for why that distinction matters.
         Set<StratConCoords> hubs = hubs(track, unconnected);
+        Map<StratConCoords, Integer> hubProximity = StratConHexGeometry.stepDistancesFrom(track,
+              hubs,
+              HUB_ATTRACTION_RADIUS);
 
         while (!unconnected.isEmpty()) {
             StratConCoords seed = pickSeed(unconnected, hubs);
@@ -138,7 +142,7 @@ public final class StratConRoadPlacer {
             boolean grew = true;
             while (grew) {
                 grew = false;
-                Pathing pathing = pathfind(track, network, hubs);
+                Pathing pathing = pathfind(track, network, hubProximity);
 
                 StratConCoords nearest = null;
                 int nearestCost = Integer.MAX_VALUE;
@@ -159,11 +163,11 @@ public final class StratConRoadPlacer {
                 }
             }
 
-            addOffMapBranch(track, network, roads, roadExits, hubs);
+            addOffMapBranch(track, network, roads, roadExits, hubProximity);
         }
 
         // Farm lanes come last, so they feed into the finished trunk network rather than distorting it.
-        connectFarmland(track, roads, hubs);
+        connectFarmland(track, roads, hubProximity);
 
         track.setRoads(roads);
         track.setRoadExits(roadExits);
@@ -197,7 +201,7 @@ public final class StratConRoadPlacer {
      * gets one lane in from the trunk instead of a road down every field.
      */
     private static void connectFarmland(StratConTrackState track, Set<StratConCoords> roads,
-          Set<StratConCoords> hubs) {
+          Map<StratConCoords, Integer> hubProximity) {
         if (roads.isEmpty()) {
             return;
         }
@@ -207,7 +211,7 @@ public final class StratConRoadPlacer {
                 continue;
             }
 
-            Pathing pathing = pathfind(track, roads, hubs);
+            Pathing pathing = pathfind(track, roads, hubProximity);
 
             StratConCoords nearest = null;
             int nearestCost = Integer.MAX_VALUE;
@@ -301,8 +305,8 @@ public final class StratConRoadPlacer {
      * Does nothing if the network is boxed in by water.
      */
     private static void addOffMapBranch(StratConTrackState track, Set<StratConCoords> network,
-          Set<StratConCoords> roads, Set<StratConCoords> roadExits, Set<StratConCoords> hubs) {
-        Pathing pathing = pathfind(track, network, hubs);
+          Set<StratConCoords> roads, Set<StratConCoords> roadExits, Map<StratConCoords, Integer> hubProximity) {
+        Pathing pathing = pathfind(track, network, hubProximity);
 
         StratConCoords nearestBorder = null;
         int nearestCost = Integer.MAX_VALUE;
@@ -323,7 +327,8 @@ public final class StratConRoadPlacer {
     /**
      * Multi-source Dijkstra over the passable land of the track, from every hex in {@code sources}.
      */
-    private static Pathing pathfind(StratConTrackState track, Set<StratConCoords> sources, Set<StratConCoords> hubs) {
+    private static Pathing pathfind(StratConTrackState track, Set<StratConCoords> sources,
+          Map<StratConCoords, Integer> hubProximity) {
         Map<StratConCoords, Integer> distance = new HashMap<>();
         Map<StratConCoords, StratConCoords> previous = new HashMap<>();
         Set<StratConCoords> settled = new HashSet<>();
@@ -351,7 +356,7 @@ public final class StratConRoadPlacer {
                     continue;
                 }
 
-                int candidate = node.distance() + terrainCost(track, neighbor, hubs);
+                int candidate = node.distance() + terrainCost(track, neighbor, hubProximity);
                 if (candidate < distance.getOrDefault(neighbor, Integer.MAX_VALUE)) {
                     distance.put(neighbor, candidate);
                     previous.put(neighbor, node.coords());
@@ -399,7 +404,8 @@ public final class StratConRoadPlacer {
         return StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(coords));
     }
 
-    private static int terrainCost(StratConTrackState track, StratConCoords coords, Set<StratConCoords> hubs) {
+    private static int terrainCost(StratConTrackState track, StratConCoords coords,
+          Map<StratConCoords, Integer> hubProximity) {
         String terrain = track.getTerrainTile(coords);
         if (StratConBiomeManifest.isOceanTerrain(terrain)) {
             // Bridges are costly wherever they are; a nearby hub is no reason to build one.
@@ -407,20 +413,18 @@ public final class StratConRoadPlacer {
         }
         boolean relief = StratConBiomeManifest.isMountainTerrain(terrain) ||
                                StratConBiomeManifest.isVolcanicTerrain(terrain);
-        return hubDiscountedCost(relief ? RELIEF_COST : NORMAL_COST, coords, hubs);
+        return hubDiscountedCost(relief ? RELIEF_COST : NORMAL_COST, coords, hubProximity);
     }
 
     /**
      * Applies the road-hub discount to a hex cost: full strength on the hub itself, tapering to nothing once past
      * {@link #HUB_ATTRACTION_RADIUS}. This is what makes trunk roads prefer to run by way of a space port.
+     *
+     * @param hubProximity how many steps each hex lies from the nearest hub; hexes out of reach are simply absent
      */
-    private static int hubDiscountedCost(int cost, StratConCoords coords, Set<StratConCoords> hubs) {
-        int nearest = Integer.MAX_VALUE;
-        for (StratConCoords hub : hubs) {
-            nearest = Math.min(nearest, coords.distance(hub));
-        }
-
-        if (nearest > HUB_ATTRACTION_RADIUS) {
+    private static int hubDiscountedCost(int cost, StratConCoords coords, Map<StratConCoords, Integer> hubProximity) {
+        Integer nearest = hubProximity.get(coords);
+        if (nearest == null) {
             return cost;
         }
 

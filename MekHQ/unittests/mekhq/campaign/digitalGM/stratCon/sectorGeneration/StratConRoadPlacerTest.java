@@ -319,6 +319,9 @@ class StratConRoadPlacerTest {
 
         StratConRoadPlacer.recalculateRoads(track, List.of(facilityCoords));
 
-        return (int) track.getRoads().stream().filter(road -> facilityCoords.distance(road) <= 2).count();
+        // Measured with the map's own adjacency, not StratConCoords.distance(), which is in a different coordinate
+        // convention (see StratConHexGeometry.withinRadius).
+        Set<StratConCoords> nearFacility = StratConHexGeometry.withinRadius(track, facilityCoords, 2);
+        return (int) track.getRoads().stream().filter(nearFacility::contains).count();
     }
 }

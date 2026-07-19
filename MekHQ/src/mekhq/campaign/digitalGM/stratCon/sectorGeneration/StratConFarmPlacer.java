@@ -35,6 +35,7 @@ package mekhq.campaign.digitalGM.stratCon.sectorGeneration;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
+import java.util.Map;
 import java.util.Set;
 
 import megamek.common.compute.Compute;
@@ -97,17 +98,18 @@ public final class StratConFarmPlacer {
      * converting each with a probability that thins with distance.
      */
     private static void growCatchment(StratConTrackState track, StratConCoords city, int reach, double density) {
-        for (int x = 0; x < track.getWidth(); x++) {
-            for (int y = 0; y < track.getHeight(); y++) {
-                StratConCoords coords = new StratConCoords(x, y);
-                int distance = city.distance(coords);
-                if ((distance < 1) || (distance > reach)) {
-                    continue;
-                }
+        // Measured by stepping across the map rather than by coordinate distance, so the catchment is a ring centered
+        // on the city - see StratConHexGeometry.withinRadius.
+        for (Map.Entry<StratConCoords, Integer> entry : StratConHexGeometry.stepDistancesWithin(track, city, reach)
+                                                              .entrySet()) {
+            int distance = entry.getValue();
+            if (distance < 1) {
+                continue;
+            }
 
-                if (isFarmable(track, coords) && (roll() < (density * distanceFalloff(distance, reach)))) {
-                    track.setTerrainTile(coords, StratConBiomeManifest.FARMLAND);
-                }
+            StratConCoords coords = entry.getKey();
+            if (isFarmable(track, coords) && (roll() < (density * distanceFalloff(distance, reach)))) {
+                track.setTerrainTile(coords, StratConBiomeManifest.FARMLAND);
             }
         }
     }

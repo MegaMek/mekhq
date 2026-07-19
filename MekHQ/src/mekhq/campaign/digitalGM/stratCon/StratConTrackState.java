@@ -58,6 +58,12 @@ import mekhq.utilities.MHQXMLUtility;
 public class StratConTrackState {
     public static final String ROOT_XML_ELEMENT_NAME = "StratConTrackState";
 
+    /**
+     * The six sides of a hex. Kept here rather than taken from {@code StratConHexGeometry} so this core state class
+     * stays independent of the sector-generation package, as its environment fields already do.
+     */
+    private static final int HEX_DIRECTIONS = 6;
+
     // a track has the following characteristics:
     // width/height
     // [future]: terrain information by coordinates
@@ -402,25 +408,53 @@ public class StratConTrackState {
     /**
      * Returns the allied facility coordinates closest to the given coordinates. Null if no allied facilities on the
      * board.
+     *
+     * <p>Closeness is counted in hex steps across the map. It is deliberately not measured with
+     * {@link StratConCoords#distance}: that method is inherited from MegaMek's {@code Coords}, while
+     * {@link StratConCoords#translate} is overridden to correct for the parity-offset layout StratCon stores its hexes
+     * in - so a coordinate distance is measured in a different convention than the map uses, and can name a facility
+     * that is not in fact the nearest.</p>
      */
     @Nullable
     @Deprecated(since = "0.51.0", forRemoval = true)
     public StratConCoords findClosestAlliedFacilityCoords(StratConCoords coords) {
-        int minDistance = Integer.MAX_VALUE;
-        StratConCoords closestFacilityCoords = null;
-
-        for (StratConCoords facilityCoords : facilities.keySet()) {
-            if (facilities.get(facilityCoords).getOwner() == ForceAlignment.Allied) {
-                int distance = facilityCoords.distance(coords);
-
-                if (distance < minDistance) {
-                    minDistance = distance;
-                    closestFacilityCoords = facilityCoords;
-                }
+        Set<StratConCoords> alliedFacilities = new HashSet<>();
+        for (Map.Entry<StratConCoords, StratConFacility> entry : facilities.entrySet()) {
+            if (entry.getValue().getOwner() == ForceAlignment.Allied) {
+                alliedFacilities.add(entry.getKey());
             }
         }
 
-        return closestFacilityCoords;
+        if (alliedFacilities.isEmpty()) {
+            return null;
+        }
+
+        // Step outward a ring at a time; the first allied facility reached is the nearest one. Terrain is ignored, as
+        // it was before - this is distance across the map, not a travel route.
+        Set<StratConCoords> visited = new HashSet<>();
+        visited.add(coords);
+        Set<StratConCoords> frontier = new HashSet<>(visited);
+
+        while (!frontier.isEmpty()) {
+            for (StratConCoords candidate : frontier) {
+                if (alliedFacilities.contains(candidate)) {
+                    return candidate;
+                }
+            }
+
+            Set<StratConCoords> nextRing = new HashSet<>();
+            for (StratConCoords current : frontier) {
+                for (int direction = 0; direction < HEX_DIRECTIONS; direction++) {
+                    StratConCoords neighbor = current.translate(direction);
+                    if (!isOutOfBounds(neighbor) && visited.add(neighbor)) {
+                        nextRing.add(neighbor);
+                    }
+                }
+            }
+            frontier = nextRing;
+        }
+
+        return null;
     }
 
     /**
