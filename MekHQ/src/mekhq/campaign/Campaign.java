@@ -383,6 +383,11 @@ public class Campaign implements ITechManager, IPlace {
     private transient String aggregateReportHTML;
     private transient List<String> newAggregateReports;
 
+    // When set, addNewUnit skips its per-unit UnitNewEvent. Bulk operations that add many units off
+    // the EDT (force generation) set this so event-driven GUI refreshes do not fire mid-operation
+    // and read half-built campaign state; the operation fires one refresh event when it completes.
+    private transient boolean suppressUnitNewEvents;
+
     private boolean fieldKitchenWithinCapacity;
     private int mashTheatreCapacity;
     private int repairBaysRented;
@@ -2074,7 +2079,9 @@ public class Campaign implements ITechManager, IPlace {
 
         checkDuplicateNamesDuringAdd(en);
         addReport(ACQUISITIONS, unit.getHyperlinkedName() + " has been added to the unit roster.");
-        MekHQ.triggerEvent(new UnitNewEvent(unit));
+        if (!suppressUnitNewEvents) {
+            MekHQ.triggerEvent(new UnitNewEvent(unit));
+        }
 
         return unit;
     }
@@ -2268,6 +2275,31 @@ public class Campaign implements ITechManager, IPlace {
 
     public void setFieldKitchenWithinCapacity(boolean fieldKitchenWithinCapacity) {
         this.fieldKitchenWithinCapacity = fieldKitchenWithinCapacity;
+    }
+
+    /**
+     * Whether {@link #addNewUnit(Entity, boolean, int, PartQuality)} is currently suppressing its
+     * per-unit {@link UnitNewEvent}. See {@link #setSuppressUnitNewEvents(boolean)}.
+     *
+     * @return {@code true} while per-unit add events are suppressed
+     */
+    public boolean isSuppressUnitNewEvents() {
+        return suppressUnitNewEvents;
+    }
+
+    /**
+     * Controls whether {@link #addNewUnit(Entity, boolean, int, PartQuality)} fires a
+     * {@link UnitNewEvent} for each unit added. A bulk operation that adds many units off the Swing
+     * event dispatch thread (for example force generation) should set this to {@code true} for its
+     * duration - always in a {@code try}/{@code finally} so it is cleared even on failure - so that
+     * event-driven GUI refreshes do not fire mid-operation and read half-built campaign state. The
+     * operation is responsible for firing a single refresh event (such as
+     * {@link mekhq.campaign.events.OrganizationChangedEvent}) once it completes.
+     *
+     * @param suppressUnitNewEvents {@code true} to suppress per-unit add events, {@code false} to restore them
+     */
+    public void setSuppressUnitNewEvents(boolean suppressUnitNewEvents) {
+        this.suppressUnitNewEvents = suppressUnitNewEvents;
     }
 
     public boolean getMashTheatresWithinCapacity() {

@@ -301,12 +301,21 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
                 RulesetEngineBootstrap.ensureLoaded(generationYear);
 
                 CompanyGenerator.Result result;
+                // Suppress the per-unit UnitNewEvent storm while the worker mutates campaign state off
+                // the EDT. Otherwise the modal progress dialog keeps the EDT pumping events, so the
+                // event-driven tab refreshes (finances, hangar, warehouse) fire mid-generation and read
+                // the half-built campaign - the ConcurrentModificationException source. The single
+                // OrganizationChangedEvent fired from done() -> applyPostGenerationExtras refreshes the
+                // GUI once, after everything is built.
+                getCampaign().setSuppressUnitNewEvents(true);
                 try {
                     result = CompanyGenerator.applyToCampaign(getCampaign(), options, previewedForce,
                           progressDialog.asListener());
                 } catch (Throwable t) {
                     LOGGER.error(t, "[CompanyGen][Worker] SwingWorker.doInBackground threw");
                     throw t;
+                } finally {
+                    getCampaign().setSuppressUnitNewEvents(false);
                 }
                 long elapsedMs = (System.nanoTime() - workerStartNanos) / 1_000_000;
                 LOGGER.info("[CompanyGen][Worker] SwingWorker.doInBackground DONE in {}ms ({} persons)",
