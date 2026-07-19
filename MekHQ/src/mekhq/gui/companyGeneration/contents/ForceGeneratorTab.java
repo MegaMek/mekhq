@@ -41,6 +41,7 @@ import megamek.client.ratgenerator.ForceDescriptor;
 import megamek.client.ui.dialogs.randomArmy.ForceGeneratorOptionsView;
 import megamek.client.ui.dialogs.randomArmy.ForceGeneratorViewUi;
 import megamek.client.ui.util.UIUtil;
+import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Faction;
@@ -65,10 +66,14 @@ public class ForceGeneratorTab {
 
     private static final MMLogger LOGGER = MMLogger.create(ForceGeneratorTab.class);
 
+    /** Component name for the options/TO&E divider, used to persist its position across dialog opens. */
+    private static final String FORCE_GENERATOR_SPLIT_NAME = "forceGeneratorSplitPane";
+
     private final JFrame frame;
     private final Campaign campaign;
     private CompanyGenerationOptions options;
     private ForceGeneratorViewUi viewUi;
+    private JSplitPane splitPane;
 
     public ForceGeneratorTab(JFrame frame, Campaign campaign, CompanyGenerationOptions options) {
         this.frame = frame;
@@ -103,15 +108,29 @@ public class ForceGeneratorTab {
             }
         }
 
-        JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+        // Named so the dialog can register a JSplitPanePreference that persists the divider position.
+        // The saved location (if any) is restored when the dialog manages the preference, overriding
+        // this default; on first run the default below applies.
+        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
               viewUi.getLeftPanel(), viewUi.getRightPanel());
-        split.setResizeWeight(0.55);
-        split.setDividerLocation(UIUtil.scaleForGUI(760));
+        splitPane.setName(FORCE_GENERATOR_SPLIT_NAME);
+        splitPane.setResizeWeight(0.55);
+        splitPane.setDividerLocation(UIUtil.scaleForGUI(760));
 
         JPanel host = new JPanel(new BorderLayout());
         host.setName("pnlForceGeneratorTab");
-        host.add(split, BorderLayout.CENTER);
+        host.add(splitPane, BorderLayout.CENTER);
         return host;
+    }
+
+    /**
+     * The options/TO&E divider, or {@code null} if {@link #createTab()} hasn't run yet. The dialog
+     * registers this with a {@code JSplitPanePreference} so its position persists across opens.
+     *
+     * @return the tab's split pane, or {@code null} if not yet built
+     */
+    public @Nullable JSplitPane getSplitPane() {
+        return splitPane;
     }
 
     /**

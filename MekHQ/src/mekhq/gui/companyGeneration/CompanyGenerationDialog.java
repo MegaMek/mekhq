@@ -47,11 +47,14 @@ import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JSplitPane;
 import javax.swing.SwingWorker;
 
 import megamek.client.ratgenerator.ForceDescriptor;
 import megamek.client.ui.buttons.MMButton;
 import megamek.client.ui.enums.ValidationState;
+import megamek.client.ui.preferences.JSplitPanePreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
@@ -170,6 +173,16 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
         panel.add(rightButtons, BorderLayout.EAST);
 
         return panel;
+    }
+
+    @Override
+    protected void setCustomPreferences(final PreferencesNode preferences) throws Exception {
+        super.setCustomPreferences(preferences);
+        // Persist the Force Generator tab's options/TO&E divider so it reopens where the user left it.
+        JSplitPane forceGeneratorSplit = pane.getForceGeneratorTab().getSplitPane();
+        if (forceGeneratorSplit != null) {
+            preferences.manage(new JSplitPanePreference(forceGeneratorSplit));
+        }
     }
 
     private void confirmationActionListener(final ActionEvent evt) {
