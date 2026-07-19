@@ -37,6 +37,8 @@ import java.util.*;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityType;
 
 /**
  * Builds the road network for a StratCon track: connects the sector's cities with roads and branches each network off
@@ -49,6 +51,11 @@ import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
  * land hex, implying the road continues into the neighboring sector; networks boxed in by wide water stay
  * internal.</p>
  *
+ * <p>Space ports act as hubs: they root their network and cheapen travel around themselves, so the trunk roads
+ * converge
+ * on them. Once the trunk is laid, each block of farmland that isn't already on it gets a single lane in by the
+ * cheapest route, so farming districts are served without paving every field.</p>
+ *
  * @author Illiani
  * @since 0.51.01
  */
@@ -56,15 +63,25 @@ public final class StratConRoadPlacer {
     private StratConRoadPlacer() {}
 
     /** Movement cost to enter an ordinary hex. */
-    private static final int NORMAL_COST = 1;
+    private static final int NORMAL_COST = 10;
     /** Movement cost to enter a mountainous or volcanic hex - passable, but roads avoid it when they can. */
-    private static final int RELIEF_COST = 5;
+    private static final int RELIEF_COST = 50;
     /**
      * Movement cost to bridge a single ocean hex - expensive, so roads only span water to reach land they can't
      * otherwise get to, or when the land detour would be very long. Two ocean hexes can never be crossed in a row, so a
      * bridge is always exactly one hex.
      */
-    private static final int BRIDGE_COST = 12;
+    private static final int BRIDGE_COST = 120;
+
+    /**
+     * The share of a hex's cost waived right beside a road hub, tapering to nothing at {@link #HUB_ATTRACTION_RADIUS}.
+     * Traffic is cheapest near a space port, so the network bends toward it and the trunk roads end up converging there
+     * - all roads lead to Rome.
+     */
+    private static final double HUB_MAX_DISCOUNT = 0.6;
+
+    /** How many hexes a hub's pull reaches. */
+    private static final int HUB_ATTRACTION_RADIUS = 4;
 
     /** The result of a Dijkstra sweep: least cost to each hex, and the hex each was reached from. */
     private record Pathing(Map<StratConCoords, Integer> distance, Map<StratConCoords, StratConCoords> previous) {}
@@ -105,8 +122,12 @@ public final class StratConRoadPlacer {
             }
         }
 
+        // Space ports are the sector's traffic hubs: they cheapen nearby travel and root each network, so the trunk
+        // roads converge on them.
+        Set<StratConCoords> hubs = hubs(track, unconnected);
+
         while (!unconnected.isEmpty()) {
-            StratConCoords seed = unconnected.iterator().next();
+            StratConCoords seed = pickSeed(unconnected, hubs);
             unconnected.remove(seed);
 
             Set<StratConCoords> network = new HashSet<>();
@@ -117,7 +138,7 @@ public final class StratConRoadPlacer {
             boolean grew = true;
             while (grew) {
                 grew = false;
-                Pathing pathing = pathfind(track, network);
+                Pathing pathing = pathfind(track, network, hubs);
 
                 StratConCoords nearest = null;
                 int nearestCost = Integer.MAX_VALUE;
@@ -138,11 +159,109 @@ public final class StratConRoadPlacer {
                 }
             }
 
-            addOffMapBranch(track, network, roads, roadExits);
+            addOffMapBranch(track, network, roads, roadExits, hubs);
         }
+
+        // Farm lanes come last, so they feed into the finished trunk network rather than distorting it.
+        connectFarmland(track, roads, hubs);
 
         track.setRoads(roads);
         track.setRoadExits(roadExits);
+    }
+
+    /** @return those endpoints that hold a space port, the facility type that acts as a road hub. */
+    private static Set<StratConCoords> hubs(StratConTrackState track, Collection<StratConCoords> endpoints) {
+        Set<StratConCoords> hubs = new HashSet<>();
+        for (StratConCoords endpoint : endpoints) {
+            StratConFacility facility = track.getFacility(endpoint);
+            if ((facility != null) && (facility.getFacilityType() == FacilityType.SpacePort)) {
+                hubs.add(endpoint);
+            }
+        }
+        return hubs;
+    }
+
+    /** @return a hub to root this network on when one is still unconnected, otherwise any remaining endpoint. */
+    private static StratConCoords pickSeed(Set<StratConCoords> unconnected, Set<StratConCoords> hubs) {
+        for (StratConCoords candidate : unconnected) {
+            if (hubs.contains(candidate)) {
+                return candidate;
+            }
+        }
+        return unconnected.iterator().next();
+    }
+
+    /**
+     * Runs a farm lane out to every block of farmland that isn't already on the network, joining it by the cheapest
+     * route to the existing roads. Farmland is connected as whole blocks rather than hex by hex, so a farming district
+     * gets one lane in from the trunk instead of a road down every field.
+     */
+    private static void connectFarmland(StratConTrackState track, Set<StratConCoords> roads,
+          Set<StratConCoords> hubs) {
+        if (roads.isEmpty()) {
+            return;
+        }
+
+        for (Set<StratConCoords> cluster : farmClusters(track)) {
+            if (!Collections.disjoint(cluster, roads)) {
+                continue;
+            }
+
+            Pathing pathing = pathfind(track, roads, hubs);
+
+            StratConCoords nearest = null;
+            int nearestCost = Integer.MAX_VALUE;
+            for (StratConCoords farm : cluster) {
+                Integer cost = pathing.distance().get(farm);
+                if ((cost != null) && (cost < nearestCost)) {
+                    nearestCost = cost;
+                    nearest = farm;
+                }
+            }
+
+            if (nearest != null) {
+                roads.addAll(reconstruct(pathing, nearest));
+            }
+        }
+    }
+
+    /** @return the track's farmland hexes grouped into contiguous blocks. */
+    private static List<Set<StratConCoords>> farmClusters(StratConTrackState track) {
+        Set<StratConCoords> remaining = new HashSet<>();
+        for (int x = 0; x < track.getWidth(); x++) {
+            for (int y = 0; y < track.getHeight(); y++) {
+                StratConCoords coords = new StratConCoords(x, y);
+                if (isFarmland(track, coords)) {
+                    remaining.add(coords);
+                }
+            }
+        }
+
+        List<Set<StratConCoords>> clusters = new ArrayList<>();
+        while (!remaining.isEmpty()) {
+            StratConCoords seed = remaining.iterator().next();
+            remaining.remove(seed);
+
+            Set<StratConCoords> cluster = new HashSet<>();
+            cluster.add(seed);
+            Deque<StratConCoords> frontier = new ArrayDeque<>();
+            frontier.add(seed);
+
+            while (!frontier.isEmpty()) {
+                for (StratConCoords neighbor : StratConHexGeometry.neighbors(track, frontier.poll())) {
+                    if (remaining.remove(neighbor)) {
+                        cluster.add(neighbor);
+                        frontier.add(neighbor);
+                    }
+                }
+            }
+            clusters.add(cluster);
+        }
+        return clusters;
+    }
+
+    private static boolean isFarmland(StratConTrackState track, StratConCoords coords) {
+        return StratConBiomeManifest.FARMLAND.equals(track.getTerrainTile(coords));
     }
 
     /**
@@ -182,8 +301,8 @@ public final class StratConRoadPlacer {
      * Does nothing if the network is boxed in by water.
      */
     private static void addOffMapBranch(StratConTrackState track, Set<StratConCoords> network,
-          Set<StratConCoords> roads, Set<StratConCoords> roadExits) {
-        Pathing pathing = pathfind(track, network);
+          Set<StratConCoords> roads, Set<StratConCoords> roadExits, Set<StratConCoords> hubs) {
+        Pathing pathing = pathfind(track, network, hubs);
 
         StratConCoords nearestBorder = null;
         int nearestCost = Integer.MAX_VALUE;
@@ -204,7 +323,7 @@ public final class StratConRoadPlacer {
     /**
      * Multi-source Dijkstra over the passable land of the track, from every hex in {@code sources}.
      */
-    private static Pathing pathfind(StratConTrackState track, Set<StratConCoords> sources) {
+    private static Pathing pathfind(StratConTrackState track, Set<StratConCoords> sources, Set<StratConCoords> hubs) {
         Map<StratConCoords, Integer> distance = new HashMap<>();
         Map<StratConCoords, StratConCoords> previous = new HashMap<>();
         Set<StratConCoords> settled = new HashSet<>();
@@ -232,7 +351,7 @@ public final class StratConRoadPlacer {
                     continue;
                 }
 
-                int candidate = node.distance() + terrainCost(track, neighbor);
+                int candidate = node.distance() + terrainCost(track, neighbor, hubs);
                 if (candidate < distance.getOrDefault(neighbor, Integer.MAX_VALUE)) {
                     distance.put(neighbor, candidate);
                     previous.put(neighbor, node.coords());
@@ -280,13 +399,32 @@ public final class StratConRoadPlacer {
         return StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(coords));
     }
 
-    private static int terrainCost(StratConTrackState track, StratConCoords coords) {
+    private static int terrainCost(StratConTrackState track, StratConCoords coords, Set<StratConCoords> hubs) {
         String terrain = track.getTerrainTile(coords);
         if (StratConBiomeManifest.isOceanTerrain(terrain)) {
+            // Bridges are costly wherever they are; a nearby hub is no reason to build one.
             return BRIDGE_COST;
         }
         boolean relief = StratConBiomeManifest.isMountainTerrain(terrain) ||
                                StratConBiomeManifest.isVolcanicTerrain(terrain);
-        return relief ? RELIEF_COST : NORMAL_COST;
+        return hubDiscountedCost(relief ? RELIEF_COST : NORMAL_COST, coords, hubs);
+    }
+
+    /**
+     * Applies the road-hub discount to a hex cost: full strength on the hub itself, tapering to nothing once past
+     * {@link #HUB_ATTRACTION_RADIUS}. This is what makes trunk roads prefer to run by way of a space port.
+     */
+    private static int hubDiscountedCost(int cost, StratConCoords coords, Set<StratConCoords> hubs) {
+        int nearest = Integer.MAX_VALUE;
+        for (StratConCoords hub : hubs) {
+            nearest = Math.min(nearest, coords.distance(hub));
+        }
+
+        if (nearest > HUB_ATTRACTION_RADIUS) {
+            return cost;
+        }
+
+        double falloff = 1.0 - (nearest / (double) (HUB_ATTRACTION_RADIUS + 1));
+        return Math.max(1, (int) Math.round(cost * (1.0 - (HUB_MAX_DISCOUNT * falloff))));
     }
 }

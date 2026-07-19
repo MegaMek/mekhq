@@ -282,10 +282,8 @@ public class StratConContractInitializer {
         // Now that facilities exist, fold the planet-owner's facilities into each sector's road network via the GM's
         // sector-generation strategy (a road-less generator ignores this). Facilities are only placed outside mapless.
         if (!isUseMaplessMode) {
-            LocalDate date = campaign.getLocalDate();
-            var sectorStrategy = StratConGMs.sectorGeneration(campaignOptions);
             for (StratConTrackState track : campaignState.getTracks()) {
-                sectorStrategy.connectFacilitiesToRoads(track, planetOwnedFacilityCoords(track, contract, date));
+                connectFacilitiesToRoads(track, contract, campaign);
             }
         }
 
@@ -437,8 +435,23 @@ public class StratConContractInitializer {
         relocateOccupantsOffOcean(track);
 
         // Fold the planet-owner's facilities into the (possibly rebuilt) road network; a road-less generator ignores it.
-        sectorStrategy.connectFacilitiesToRoads(track,
-              planetOwnedFacilityCoords(track, contract, campaign.getLocalDate()));
+        connectFacilitiesToRoads(track, contract, campaign);
+    }
+
+    /**
+     * Folds the planet-owner's facilities on the given track into its road network, via the GM's sector-generation
+     * strategy (a road-less generator ignores this). Call after anything that changes which facilities the planet's
+     * owner holds on the track - a GM adding, removing, or capturing one included - so those bases keep reading as
+     * sitting on the road grid alongside the cities.
+     *
+     * @param track    the track whose road network to refresh
+     * @param contract the contract (source of the planet and the employer/enemy factions)
+     * @param campaign the campaign, for the current date and options
+     */
+    public static void connectFacilitiesToRoads(StratConTrackState track, AtBContract contract, Campaign campaign) {
+        StratConGMs.sectorGeneration(campaign.getCampaignOptions())
+              .connectFacilitiesToRoads(track,
+                    planetOwnedFacilityCoords(track, contract, campaign.getLocalDate()));
     }
 
     /**

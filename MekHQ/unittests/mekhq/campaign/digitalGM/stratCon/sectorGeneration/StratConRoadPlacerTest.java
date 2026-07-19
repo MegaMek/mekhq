@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.digitalGM.stratCon.sectorGeneration;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -44,6 +45,8 @@ import java.util.Set;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityType;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -237,5 +240,85 @@ class StratConRoadPlacerTest {
 
         assertTrue(roadComponent(track, a).contains(b), "cities should still be connected");
         assertFalse(track.getRoads().contains(new StratConCoords(1, 0)), "road should detour around the mountain");
+    }
+
+    @Test
+    void farmlandBlockGetsALaneFromTheNetwork() {
+        // Two cities on the west side, and a block of farmland off to the east that no city road would otherwise reach.
+        StratConTrackState track = landTrack(12, 6);
+        StratConCoords a = new StratConCoords(0, 1);
+        StratConCoords b = new StratConCoords(0, 4);
+        track.addCity(a);
+        track.addCity(b);
+
+        Set<StratConCoords> farmland = Set.of(new StratConCoords(9, 2),
+              new StratConCoords(9, 3),
+              new StratConCoords(10, 2));
+        for (StratConCoords farm : farmland) {
+            track.setTerrainTile(farm, StratConBiomeManifest.FARMLAND);
+        }
+
+        StratConRoadPlacer.recalculateRoads(track);
+
+        Set<StratConCoords> network = roadComponent(track, a);
+        assertTrue(network.contains(b), "cities should be connected");
+        assertTrue(farmland.stream().anyMatch(network::contains),
+              "the farmland block should be reachable by road from the cities");
+    }
+
+    @Test
+    void farmlandAlreadyOnTheTrunkGetsNoExtraLane() {
+        // A single farm hex sitting directly between two cities is already served by the trunk road, so it should not
+        // trigger a spur of its own.
+        StratConTrackState track = landTrack(6, 3);
+        track.addCity(new StratConCoords(0, 1));
+        track.addCity(new StratConCoords(4, 1));
+        StratConRoadPlacer.recalculateRoads(track);
+        int trunkSize = track.getRoads().size();
+
+        StratConTrackState farmed = landTrack(6, 3);
+        farmed.addCity(new StratConCoords(0, 1));
+        farmed.addCity(new StratConCoords(4, 1));
+        for (StratConCoords road : track.getRoads()) {
+            farmed.setTerrainTile(road, StratConBiomeManifest.FARMLAND);
+        }
+
+        StratConRoadPlacer.recalculateRoads(farmed);
+
+        assertEquals(trunkSize, farmed.getRoads().size(), "farmland already on the trunk should add no new road hexes");
+    }
+
+    @Test
+    void spacePortDrawsTheTrunkTowardItself() {
+        // Cities at the four corners with a facility in the middle. A space port is a road hub, so the cities should
+        // route through the middle to reach each other; an ordinary base is just another endpoint, leaving the cities
+        // to link around the perimeter and the base hanging off a spur.
+        int hubRoads = roadsNearFacility(FacilityType.SpacePort);
+        int plainRoads = roadsNearFacility(FacilityType.MekBase);
+
+        assertTrue(hubRoads > plainRoads,
+              "a space port should pull more road through its surroundings than a non-hub facility (hub=" +
+                    hubRoads + ", plain=" + plainRoads + ')');
+    }
+
+    /**
+     * Lays roads between four corner cities with a facility of the given type in the middle, and counts how many road
+     * hexes end up close to that facility.
+     */
+    private static int roadsNearFacility(FacilityType facilityType) {
+        StratConTrackState track = landTrack(16, 12);
+        track.addCity(new StratConCoords(1, 1));
+        track.addCity(new StratConCoords(14, 1));
+        track.addCity(new StratConCoords(1, 10));
+        track.addCity(new StratConCoords(14, 10));
+
+        StratConCoords facilityCoords = new StratConCoords(8, 6);
+        StratConFacility facility = new StratConFacility();
+        facility.setFacilityType(facilityType);
+        track.addFacility(facilityCoords, facility);
+
+        StratConRoadPlacer.recalculateRoads(track, List.of(facilityCoords));
+
+        return (int) track.getRoads().stream().filter(road -> facilityCoords.distance(road) <= 2).count();
     }
 }

@@ -81,7 +81,6 @@ import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest.ImageType;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityFactory;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConHexGeometry;
-import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConRoadPlacer;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.gui.stratCon.StratConScenarioWizard;
@@ -310,6 +309,19 @@ public class StratConPanel extends JPanel implements ActionListener {
         StratConContractInitializer.regenerateTrack(currentTrack, campaignState.getContract(), campaign);
         infoArea.setText(buildSelectedHexInfo(campaign));
         repaint();
+    }
+
+    /**
+     * Rebuilds the current sector's road network after a GM edit to its cities or facilities, so the roads keep serving
+     * the settlements that are actually there. Facilities are folded in only when the planet's owner holds them, and a
+     * road-less sector generator ignores the request entirely.
+     */
+    private void recalculateRoads() {
+        if ((currentTrack == null) || (campaignState == null)) {
+            return;
+        }
+
+        StratConContractInitializer.connectFacilitiesToRoads(currentTrack, campaignState.getContract(), campaign);
     }
 
     /**
@@ -1654,9 +1666,12 @@ public class StratConPanel extends JPanel implements ActionListener {
                 break;
             case RIGHT_CLICK_COMMAND_REMOVE_FACILITY:
                 currentTrack.removeFacility(selectedCoords);
+                recalculateRoads();
                 break;
             case RIGHT_CLICK_COMMAND_CAPTURE_FACILITY:
                 StratConRulesManager.switchFacilityOwner(currentTrack.getFacility(selectedCoords));
+                // Whether a facility sits on the road grid depends on who holds it, so a capture can add or drop it.
+                recalculateRoads();
                 break;
             case RIGHT_CLICK_COMMAND_ADD_FACILITY:
                 JMenuItem eventSource = (JMenuItem) evt.getSource();
@@ -1665,14 +1680,15 @@ public class StratConPanel extends JPanel implements ActionListener {
                 StratConFacility newFacility = facility.clone();
                 newFacility.setVisible(currentTrack.getRevealedCoords().contains(selectedCoords));
                 currentTrack.addFacility(selectedCoords, newFacility);
+                recalculateRoads();
                 break;
             case RIGHT_CLICK_COMMAND_ADD_CITY:
                 currentTrack.addCity(selectedCoords);
-                StratConRoadPlacer.recalculateRoads(currentTrack);
+                recalculateRoads();
                 break;
             case RIGHT_CLICK_COMMAND_REMOVE_CITY:
                 currentTrack.getCities().remove(selectedCoords);
-                StratConRoadPlacer.recalculateRoads(currentTrack);
+                recalculateRoads();
                 break;
             case RIGHT_CLICK_COMMAND_REMOVE_SCENARIO:
                 StratConScenario scenario = getSelectedScenario();
