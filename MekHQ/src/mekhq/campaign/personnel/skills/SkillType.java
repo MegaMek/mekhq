@@ -1165,6 +1165,9 @@ public class SkillType {
             case "Career/Any" + RP_ONLY_TAG -> "Career/Any";
             case "Running" + RP_ONLY_TAG -> "Running";
             case "Swimming" + RP_ONLY_TAG -> "Swimming";
+            // Anti-Mek gained its ATOW "(Climbing)" alias in its canonical name; map the legacy
+            // bare name (from older saves and infantry crew-skill data) to the current one.
+            case "Anti-Mek" -> S_ANTI_MEK;
             default -> skillName;
         };
         return skillName;
