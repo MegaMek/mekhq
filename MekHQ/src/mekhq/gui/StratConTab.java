@@ -40,6 +40,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -49,6 +50,7 @@ import java.awt.event.MouseEvent;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -106,6 +108,8 @@ public class StratConTab extends CampaignGuiTab {
     private RoundedJButton btnRegenerateSector;
     private JLabel campaignStatusText;
     private JLabel objectiveStatusText;
+    private JLabel locationInfoText;
+    private JPanel locationPanel;
     private JPanel victoryPointsPanel;
     private JScrollPane expandedObjectivePanel;
     private boolean objectivesCollapsed = false;
@@ -207,6 +211,8 @@ public class StratConTab extends CampaignGuiTab {
               infoScrollPane.getHeight())));
         this.add(infoScrollPane, BorderLayout.EAST);
 
+        this.add(initializeGmButtonPanel(), BorderLayout.SOUTH);
+
         repopulateContractsAndSectors();
     }
 
@@ -237,29 +243,26 @@ public class StratConTab extends CampaignGuiTab {
         constraints.gridy = gridY++;
         infoPanel.add(btnManageCampaignState, constraints);
 
-        // Add "Scout Sector" button - reveals every hex in the selected sector (GM only)
-        btnScoutSector = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "stratConTab.scoutSector.text"));
-        btnScoutSector.setToolTipText(getTextAt(RESOURCE_BUNDLE, "stratConTab.scoutSector.tooltip"));
-        btnScoutSector.setEnabled(getCampaignGui().getCampaign().isGM());
-        btnScoutSector.addActionListener(evt -> stratconPanel.scoutCurrentSector());
+        // Sector environment panel: latitude, average temperature, and the generation profiles used - immersion detail
+        // for the selected sector. Populated by updateLocationInfo(); hidden for legacy sectors that carry no profiles.
+        locationInfoText = new JLabel();
+        locationInfoText.setHorizontalAlignment(SwingConstants.LEFT);
+        locationInfoText.setVerticalAlignment(SwingConstants.TOP);
+        locationPanel = new JPanel(new BorderLayout());
+        locationPanel.setOpaque(false);
+        locationPanel.setBorder(BorderFactory.createTitledBorder(getTextAt(RESOURCE_BUNDLE,
+              "stratConTab.location.title")));
+        locationPanel.add(locationInfoText, BorderLayout.CENTER);
+        locationPanel.setVisible(false);
         constraints.gridy = gridY++;
-        infoPanel.add(btnScoutSector, constraints);
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.weightx = 1.0;
+        infoPanel.add(locationPanel, constraints);
+        constraints.fill = GridBagConstraints.NONE;
+        constraints.weightx = 0.0;
 
-        // Add "Reset Sector Fog" button - un-reveals every hex in the selected sector (GM only)
-        btnResetSectorFog = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "stratConTab.resetSectorFog.text"));
-        btnResetSectorFog.setToolTipText(getTextAt(RESOURCE_BUNDLE, "stratConTab.resetSectorFog.tooltip"));
-        btnResetSectorFog.setEnabled(getCampaignGui().getCampaign().isGM());
-        btnResetSectorFog.addActionListener(evt -> stratconPanel.resetSectorFog());
-        constraints.gridy = gridY++;
-        infoPanel.add(btnResetSectorFog, constraints);
-
-        // Add "Regenerate Sector" button - clears and re-rolls the selected sector's terrain (GM only)
-        btnRegenerateSector = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "stratConTab.regenerateSector.text"));
-        btnRegenerateSector.setToolTipText(getTextAt(RESOURCE_BUNDLE, "stratConTab.regenerateSector.tooltip"));
-        btnRegenerateSector.setEnabled(getCampaignGui().getCampaign().isGM());
-        btnRegenerateSector.addActionListener(evt -> stratconPanel.regenerateCurrentSector());
-        constraints.gridy = gridY++;
-        infoPanel.add(btnRegenerateSector, constraints);
+        // The GM sector tools (Scout / Reset Fog / Regenerate) live in a button bar along the bottom of the tab; see
+        // initializeGmButtonPanel().
 
         // Add the victory-point progress bar directly above the objectives list
         victoryPointsPanel = new JPanel(new BorderLayout());
@@ -297,6 +300,41 @@ public class StratConTab extends CampaignGuiTab {
         constraints.weighty = 1.0;
         constraints.fill = GridBagConstraints.VERTICAL;
         infoPanel.add(new JPanel(), constraints); // Invisible filler component
+    }
+
+    /**
+     * Worker function that builds the GM sector-tool button bar shown along the bottom of the tab. The buttons are
+     * enabled only for a GM (kept in sync by {@link #updateCampaignState()}).
+     *
+     * @return the bottom button bar
+     */
+    private JPanel initializeGmButtonPanel() {
+        boolean isGM = getCampaignGui().getCampaign().isGM();
+
+        // "Scout Sector" - reveals every hex in the selected sector (GM only)
+        btnScoutSector = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "stratConTab.scoutSector.text"));
+        btnScoutSector.setToolTipText(getTextAt(RESOURCE_BUNDLE, "stratConTab.scoutSector.tooltip"));
+        btnScoutSector.setEnabled(isGM);
+        btnScoutSector.addActionListener(evt -> stratconPanel.scoutCurrentSector());
+
+        // "Reset Sector Fog" - un-reveals every hex in the selected sector (GM only)
+        btnResetSectorFog = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "stratConTab.resetSectorFog.text"));
+        btnResetSectorFog.setToolTipText(getTextAt(RESOURCE_BUNDLE, "stratConTab.resetSectorFog.tooltip"));
+        btnResetSectorFog.setEnabled(isGM);
+        btnResetSectorFog.addActionListener(evt -> stratconPanel.resetSectorFog());
+
+        // "Regenerate Sector" - clears and re-rolls the selected sector's terrain (GM only)
+        btnRegenerateSector = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "stratConTab.regenerateSector.text"));
+        btnRegenerateSector.setToolTipText(getTextAt(RESOURCE_BUNDLE, "stratConTab.regenerateSector.tooltip"));
+        btnRegenerateSector.setEnabled(isGM);
+        btnRegenerateSector.addActionListener(evt -> stratconPanel.regenerateCurrentSector());
+
+        int gap = UIUtil.scaleForGUI(5);
+        JPanel gmButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, gap, gap));
+        gmButtonPanel.add(btnScoutSector);
+        gmButtonPanel.add(btnResetSectorFog);
+        gmButtonPanel.add(btnRegenerateSector);
+        return gmButtonPanel;
     }
 
     /**
@@ -390,6 +428,7 @@ public class StratConTab extends CampaignGuiTab {
             campaignStatusText.setText(getTextAt(RESOURCE_BUNDLE, "stratConTab.status.noContract"));
             expandedObjectivePanel.setVisible(false);
             victoryPointsPanel.setVisible(false);
+            locationPanel.setVisible(false);
             return;
         }
 
@@ -400,6 +439,7 @@ public class StratConTab extends CampaignGuiTab {
             campaignStatusText.setText(getTextAt(RESOURCE_BUNDLE, "stratConTab.status.notStarted"));
             expandedObjectivePanel.setVisible(false);
             victoryPointsPanel.setVisible(false);
+            locationPanel.setVisible(false);
             return;
         }
 
@@ -435,8 +475,59 @@ public class StratConTab extends CampaignGuiTab {
             objectiveStatusText.setText("");
         }
 
+        updateLocationInfo(currentSectorTrack);
+
         // keep the sector tab colors in sync as objectives are completed/failed over the course of the contract
         applySectorTabColors();
+    }
+
+    /**
+     * Populates the sector environment panel from the selected track's recorded generation data (latitude, temperature,
+     * and the hydrology/orogeny/urban profiles). Hidden when there is no track, or for legacy sectors that carry no
+     * profile data.
+     *
+     * @param track the currently selected sector's track, or {@code null}
+     */
+    private void updateLocationInfo(StratConTrackState track) {
+        if ((track == null) || (track.getLatitudeBand() == null)) {
+            locationPanel.setVisible(false);
+            return;
+        }
+
+        StringBuilder sb = new StringBuilder("<html>");
+        sb.append(locationRow("stratConTab.location.latitude", prettifyProfile(track.getLatitudeBand())));
+        sb.append(locationRow("stratConTab.location.temperature", track.getTemperature() + "°C"));
+        sb.append(locationRow("stratConTab.location.hydrology", prettifyProfile(track.getHydrologyProfile())));
+        sb.append(locationRow("stratConTab.location.terrain", prettifyProfile(track.getOrogenyProfile())));
+        sb.append(locationRow("stratConTab.location.settlement", prettifyProfile(track.getUrbanProfile())));
+        sb.append(locationRow("stratConTab.location.settlements", String.valueOf(track.getCities().size())));
+        sb.append("</html>");
+
+        locationInfoText.setText(sb.toString());
+        locationPanel.setVisible(true);
+    }
+
+    private String locationRow(String labelKey, String value) {
+        return "<b>" + getTextAt(RESOURCE_BUNDLE, labelKey) + "</b> " + value + "<br>";
+    }
+
+    /**
+     * Turns a stored profile/band enum name ({@code COASTAL_PORTS}) into a readable label ({@code Coastal Ports}), or
+     * an em dash when the value is absent (e.g. no cities were placed).
+     */
+    private String prettifyProfile(String enumName) {
+        if ((enumName == null) || enumName.isBlank()) {
+            return getTextAt(RESOURCE_BUNDLE, "stratConTab.location.none");
+        }
+
+        StringBuilder pretty = new StringBuilder();
+        for (String word : enumName.toLowerCase().split("_")) {
+            if (word.isEmpty()) {
+                continue;
+            }
+            pretty.append(Character.toUpperCase(word.charAt(0))).append(word.substring(1)).append(' ');
+        }
+        return pretty.toString().trim();
     }
 
     /**

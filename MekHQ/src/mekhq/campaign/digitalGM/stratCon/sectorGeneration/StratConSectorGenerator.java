@@ -70,9 +70,14 @@ public final class StratConSectorGenerator {
         StratConBiome biome = selectBiome(track.getTemperature());
         String oceanTerrain = oceanTerrainFor(biome);
 
+        // Record the latitude band for the sector info panel; the urban profile is recorded below when cities are on.
+        track.setLatitudeBand(latitudeBand.name());
+        track.setUrbanProfile(null);
+
         // Hydrology: pick a profile from the planet's water coverage, then place oceans in that profile's shape.
         StratConHydrology hydrology = StratConHydrology.getInstance();
         HydrologyProfile hydrologyProfile = hydrology.selectProfile(profile.waterPercent());
+        track.setHydrologyProfile(hydrologyProfile.type().name());
         int oceanPercent = hydrology.rollOceanPercent(hydrologyProfile);
         int oceanTargetHexes = (int) Math.round((oceanPercent / 100.0) * track.getWidth() * track.getHeight());
         StratConOceanPlacer.placeOceans(track, hydrologyProfile.type(), oceanTargetHexes, oceanTerrain);
@@ -80,6 +85,7 @@ public final class StratConSectorGenerator {
         // Mountains: an orogeny profile selected from the planet's conditions shapes the ranges; gravity scales their
         // number. Volcanic where the profile calls for it, never over ocean, and only when the biome offers mountains.
         OrogenyProfile orogeny = StratConOrogeny.getInstance().selectProfile(profile);
+        track.setOrogenyProfile(orogeny.type().name());
         StratConMountainPlacer.placeMountains(track, mountainTerrainFor(biome), orogeny, profile.gravity());
 
         // Dry fill: geography-aware terrain that follows moisture, rain shadow, and coldness, painted in coherent
@@ -91,6 +97,7 @@ public final class StratConSectorGenerator {
         // Cities: an overlay whose count comes from population and whose arrangement comes from the urban profile.
         if (allowCities) {
             UrbanProfile urban = StratConUrban.getInstance().selectProfile(profile);
+            track.setUrbanProfile(urban.type().name());
             StratConCityPlacer.placeCities(track, profile, urban);
             // Farmland: a catchment of cultivated hexes radiating out from each city over arable land.
             StratConFarmPlacer.placeFarms(track, profile, urban);

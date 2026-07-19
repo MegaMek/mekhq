@@ -101,6 +101,13 @@ public class StratConTrackState {
     // carried onto city-hex scenarios to scale the urban area laid onto their battle maps
     private double urbanizationLevel;
 
+    // Environment summary recorded by the improved generator, for the sector info panel (all null on legacy tracks).
+    // Stored as the profile/band enum names (prettified for display) to keep this core class off the generation package.
+    private String latitudeBand;
+    private String hydrologyProfile;
+    private String orogenyProfile;
+    private String urbanProfile;
+
     public StratConTrackState() {
         facilities = new HashMap<>();
         scenarios = new HashMap<>();
@@ -587,6 +594,38 @@ public class StratConTrackState {
 
     public void setUrbanizationLevel(double urbanizationLevel) {
         this.urbanizationLevel = urbanizationLevel;
+    }
+
+    public String getLatitudeBand() {
+        return latitudeBand;
+    }
+
+    public void setLatitudeBand(String latitudeBand) {
+        this.latitudeBand = latitudeBand;
+    }
+
+    public String getHydrologyProfile() {
+        return hydrologyProfile;
+    }
+
+    public void setHydrologyProfile(String hydrologyProfile) {
+        this.hydrologyProfile = hydrologyProfile;
+    }
+
+    public String getOrogenyProfile() {
+        return orogenyProfile;
+    }
+
+    public void setOrogenyProfile(String orogenyProfile) {
+        this.orogenyProfile = orogenyProfile;
+    }
+
+    public String getUrbanProfile() {
+        return urbanProfile;
+    }
+
+    public void setUrbanProfile(String urbanProfile) {
+        this.urbanProfile = urbanProfile;
     }
 
     public void setTerrainTile(StratConCoords coords, String terrainTypeName) {
