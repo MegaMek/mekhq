@@ -233,7 +233,7 @@ public final class StratConCityPlacer {
                 return candidates.get(index);
             }
         }
-        return candidates.get(candidates.size() - 1);
+        return candidates.getLast();
     }
 
     private static boolean isCoastal(StratConTrackState track, StratConCoords coords) {

@@ -162,8 +162,8 @@ public class ContractMeterBar extends JPanel {
      * Creates a gauge of a contract's accumulated victory points against the score required to declare victory.
      *
      * @param currentScore  the contract's current accumulated victory points (may be negative)
-     * @param requiredScore the victory points required to declare victory; should be positive (callers should fall
-     *                      back to a plain-text display when the requirement is not a positive number)
+     * @param requiredScore the victory points required to declare victory; should be positive (callers should fall back
+     *                      to a plain-text display when the requirement is not a positive number)
      * @param canEndEarly   {@code true} if reaching {@code requiredScore} lets the player declare victory early;
      *                      {@code false} if the contract must run its full term, in which case the title carries a
      *                      concise "full term" cue
@@ -176,7 +176,7 @@ public class ContractMeterBar extends JPanel {
               canEndEarly ? "contractScoreBar.tooltip.canEndEarly" : "contractScoreBar.tooltip.cannotEndEarly",
               currentScore, requiredScore);
         final String titleKey = canEndEarly ? "contractScoreBar.title.text"
-              : "contractScoreBar.title.cannotEndEarly.text";
+                                      : "contractScoreBar.title.cannotEndEarly.text";
         return valueMeter(getTextAt(RESOURCE_BUNDLE, titleKey), currentScore, requiredScore, tooltip);
     }
 
@@ -221,7 +221,7 @@ public class ContractMeterBar extends JPanel {
      * @return the configured gauge
      */
     public static @Nonnull ContractMeterBar threatLevel(final int percent) {
-        final int clamped = Math.max(0, Math.min(100, percent));
+        final int clamped = Math.clamp(percent, 0, 100);
         final Color markerColor = markerColor();
         final List<Marker> markers = new ArrayList<>(3);
         markers.add(new Marker(100, "100", markerColor, MarkerStyle.TICK, false));
@@ -242,7 +242,7 @@ public class ContractMeterBar extends JPanel {
      * @return the configured gauge
      */
     public static @Nonnull ContractMeterBar deploymentTime(final int days) {
-        final int position = Math.max(0, Math.min(10, days));
+        final int position = Math.clamp(days, 0, 10);
         final Color markerColor = markerColor();
         final List<Marker> markers = new ArrayList<>(3);
         markers.add(new Marker(10, "10", markerColor, MarkerStyle.TICK, false));
@@ -255,15 +255,15 @@ public class ContractMeterBar extends JPanel {
 
     /**
      * Creates a neutral progress gauge of how far the current date has advanced between a contract's start and end.
-     * Unlike the value meters, the track is a single neutral color: time has no good or bad direction, so a red-to-green
-     * gradient would imply a judgement that does not exist. The start and end are unlabeled ticks (the dates are carried
-     * in the title), and the current date is the bold accent marker.
+     * Unlike the value meters, the track is a single neutral color: time has no good or bad direction, so a
+     * red-to-green gradient would imply a judgement that does not exist. The start and end are unlabeled ticks (the
+     * dates are carried in the title), and the current date is the bold accent marker.
      *
-     * @param startDate   the contract start date (left end of the track)
-     * @param endDate     the contract end date (right end of the track)
-     * @param currentDate the current date, drawn as the bold accent marker
-     * @param startLabel  the formatted start date, shown in the title
-     * @param endLabel    the formatted end date, shown in the title
+     * @param startDate    the contract start date (left end of the track)
+     * @param endDate      the contract end date (right end of the track)
+     * @param currentDate  the current date, drawn as the bold accent marker
+     * @param startLabel   the formatted start date, shown in the title
+     * @param endLabel     the formatted end date, shown in the title
      * @param currentLabel the formatted current date, shown beneath the current-date marker
      *
      * @return the configured gauge

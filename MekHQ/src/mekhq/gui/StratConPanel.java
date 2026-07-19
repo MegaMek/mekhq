@@ -39,8 +39,14 @@ import static megamek.utilities.ImageUtilities.addTintToBufferedImage;
 import static mekhq.campaign.digitalGM.stratCon.StratConScenario.ScenarioState.PRIMARY_FORCES_COMMITTED;
 import static mekhq.campaign.digitalGM.stratCon.StratConScenario.ScenarioState.UNRESOLVED;
 import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Allied;
+import static mekhq.utilities.MHQInternationalization.getFormattedText;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getAmazingColor;
+import static mekhq.utilities.ReportingUtilities.getPositiveColor;
+import static mekhq.utilities.ReportingUtilities.getWarningColor;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -585,7 +591,8 @@ public class StratConPanel extends JPanel implements ActionListener {
         // except if there is already a non-cloaked scenario here.
         if (StratConRulesManager.canManuallyDeployAnyForce(coords, currentTrack)) {
             JMenuItem menuItemManageForceAssignments = new JMenuItem();
-            menuItemManageForceAssignments.setText("Manage Deployment");
+            menuItemManageForceAssignments.setText(getTextAt(RESOURCE_BUNDLE,
+                  "stratConTab.contextMenu.manageDeployment"));
             menuItemManageForceAssignments.setActionCommand(RIGHT_CLICK_COMMAND_MANAGE_FORCES);
             menuItemManageForceAssignments.addActionListener(this);
             rightClickMenu.add(menuItemManageForceAssignments);
@@ -599,10 +606,12 @@ public class StratConPanel extends JPanel implements ActionListener {
                 JMenuItem menuItemManageScenario = new JMenuItem();
 
                 if (scenario.getCurrentState().equals(UNRESOLVED)) {
-                    menuItemManageScenario.setText("Manage Deployment");
+                    menuItemManageScenario.setText(getTextAt(RESOURCE_BUNDLE,
+                          "stratConTab.contextMenu.manageDeployment"));
                     menuItemManageScenario.setActionCommand(RIGHT_CLICK_COMMAND_MANAGE_FORCES);
                 } else {
-                    menuItemManageScenario.setText("Manage Reinforcements");
+                    menuItemManageScenario.setText(getTextAt(RESOURCE_BUNDLE,
+                          "stratConTab.contextMenu.manageReinforcements"));
                     menuItemManageScenario.setActionCommand(RIGHT_CLICK_COMMAND_MANAGE_SCENARIO);
                 }
 
@@ -616,7 +625,9 @@ public class StratConPanel extends JPanel implements ActionListener {
                 String forceName = campaign.getPlayerForce().getFormation(forceID).getName();
 
                 JCheckBoxMenuItem stickyForceItem = new JCheckBoxMenuItem();
-                stickyForceItem.setText(String.format("%s - remain deployed", forceName));
+                stickyForceItem.setText(getFormattedText(RESOURCE_BUNDLE,
+                      "stratConTab.contextMenu.remainDeployed",
+                      forceName));
                 stickyForceItem.setActionCommand(RIGHT_CLICK_COMMAND_STICKY_FORCE);
                 stickyForceItem.putClientProperty(RIGHT_CLICK_COMMAND_STICKY_FORCE_ID, forceID);
                 stickyForceItem.addActionListener(this);
@@ -632,22 +643,22 @@ public class StratConPanel extends JPanel implements ActionListener {
 
             if (currentTrack.getFacility(coords) != null) {
                 JMenuItem menuItemRemoveFacility = new JMenuItem();
-                menuItemRemoveFacility.setText("Remove Facility (GM)");
+                menuItemRemoveFacility.setText(getTextAt(RESOURCE_BUNDLE, "stratConTab.contextMenu.removeFacility"));
                 menuItemRemoveFacility.setActionCommand(RIGHT_CLICK_COMMAND_REMOVE_FACILITY);
                 menuItemRemoveFacility.addActionListener(this);
                 rightClickMenu.add(menuItemRemoveFacility);
 
                 JMenuItem menuItemSwitchOwner = new JMenuItem();
-                menuItemSwitchOwner.setText("Switch Owner (GM)");
+                menuItemSwitchOwner.setText(getTextAt(RESOURCE_BUNDLE, "stratConTab.contextMenu.switchOwner"));
                 menuItemSwitchOwner.setActionCommand(RIGHT_CLICK_COMMAND_CAPTURE_FACILITY);
                 menuItemSwitchOwner.addActionListener(this);
                 rightClickMenu.add(menuItemSwitchOwner);
             } else {
                 JMenu menuItemAddFacility = new JMenu();
-                menuItemAddFacility.setText("Add Facility (GM)");
+                menuItemAddFacility.setText(getTextAt(RESOURCE_BUNDLE, "stratConTab.contextMenu.addFacility"));
 
                 JMenu menuItemAddAlliedFacility = new JMenu();
-                menuItemAddAlliedFacility.setText("Allied");
+                menuItemAddAlliedFacility.setText(getTextAt(RESOURCE_BUNDLE, "stratConTab.contextMenu.allied"));
                 menuItemAddFacility.add(menuItemAddAlliedFacility);
 
                 for (StratConFacility facility : StratConFacilityFactory.getAlliedFacilities()) {
@@ -660,7 +671,7 @@ public class StratConPanel extends JPanel implements ActionListener {
                 }
 
                 JMenu menuItemAddHostileFacility = new JMenu();
-                menuItemAddHostileFacility.setText("Hostile");
+                menuItemAddHostileFacility.setText(getTextAt(RESOURCE_BUNDLE, "stratConTab.contextMenu.hostile"));
                 menuItemAddFacility.add(menuItemAddHostileFacility);
 
                 for (StratConFacility facility : StratConFacilityFactory.getHostileFacilities()) {
@@ -678,13 +689,13 @@ public class StratConPanel extends JPanel implements ActionListener {
             // City overlay editing: remove an existing city, or add one to any dry hex. Either change recomputes roads.
             if (currentTrack.isCity(coords)) {
                 JMenuItem menuItemRemoveCity = new JMenuItem();
-                menuItemRemoveCity.setText("Remove City (GM)");
+                menuItemRemoveCity.setText(getTextAt(RESOURCE_BUNDLE, "stratConTab.contextMenu.removeCity"));
                 menuItemRemoveCity.setActionCommand(RIGHT_CLICK_COMMAND_REMOVE_CITY);
                 menuItemRemoveCity.addActionListener(this);
                 rightClickMenu.add(menuItemRemoveCity);
             } else if (!StratConBiomeManifest.isOceanTerrain(currentTrack.getTerrainTile(coords))) {
                 JMenuItem menuItemAddCity = new JMenuItem();
-                menuItemAddCity.setText("Add City (GM)");
+                menuItemAddCity.setText(getTextAt(RESOURCE_BUNDLE, "stratConTab.contextMenu.addCity"));
                 menuItemAddCity.setActionCommand(RIGHT_CLICK_COMMAND_ADD_CITY);
                 menuItemAddCity.addActionListener(this);
                 rightClickMenu.add(menuItemAddCity);
@@ -692,13 +703,13 @@ public class StratConPanel extends JPanel implements ActionListener {
 
             if (scenario != null) {
                 JMenuItem removeScenarioItem = new JMenuItem();
-                removeScenarioItem.setText("Remove Scenario (GM)");
+                removeScenarioItem.setText(getTextAt(RESOURCE_BUNDLE, "stratConTab.contextMenu.removeScenario"));
                 removeScenarioItem.setActionCommand(RIGHT_CLICK_COMMAND_REMOVE_SCENARIO);
                 removeScenarioItem.addActionListener(this);
                 rightClickMenu.add(removeScenarioItem);
 
                 JMenuItem resetDeploymentItem = new JMenuItem();
-                resetDeploymentItem.setText("Reset Deployment (GM)");
+                resetDeploymentItem.setText(getTextAt(RESOURCE_BUNDLE, "stratConTab.contextMenu.resetDeployment"));
                 resetDeploymentItem.setActionCommand(RIGHT_CLICK_COMMAND_RESET_DEPLOYMENT);
                 resetDeploymentItem.addActionListener(this);
                 rightClickMenu.add(resetDeploymentItem);
@@ -802,13 +813,17 @@ public class StratConPanel extends JPanel implements ActionListener {
         }
 
         String[] lines = {
-              "Sector Environment",
-              "Latitude: " + prettifyProfile(currentTrack.getLatitudeBand()),
-              "Avg. Temperature: " + currentTrack.getTemperature() + "°C",
-              "Hydrology: " + prettifyProfile(currentTrack.getHydrologyProfile()),
-              "Terrain: " + prettifyProfile(currentTrack.getOrogenyProfile()),
-              "Settlement: " + prettifyProfile(currentTrack.getUrbanProfile()),
-              "Settlements: " + currentTrack.getCities().size()
+              getTextAt(RESOURCE_BUNDLE, "stratConTab.environment.title"),
+              getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.environment.latitude",
+                    prettifyProfile(currentTrack.getLatitudeBand())),
+              getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.environment.temperature",
+                    currentTrack.getTemperature()),
+              getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.environment.hydrology",
+                    prettifyProfile(currentTrack.getHydrologyProfile())),
+              getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.environment.terrain",
+                    prettifyProfile(currentTrack.getOrogenyProfile())),
+              getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.environment.settlement",
+                    currentTrack.getCities().size(), prettifyProfile(currentTrack.getUrbanProfile()))
         };
 
         Font bodyFont = getFont().deriveFont(Font.PLAIN, UIUtil.scaleForGUI(12));
@@ -1655,38 +1670,38 @@ public class StratConPanel extends JPanel implements ActionListener {
         // Bound the width so long content (e.g. long terrain/scenario names) wraps instead of overflowing the HUD.
         infoBuilder.append("<html><body style='width: ").append(UIUtil.scaleForGUI(300)).append("px'>");
 
-        infoBuilder.append("<b>Average Temperature:</b> ");
-        infoBuilder.append(selectedHexTemperature(boardState.getSelectedCoords()));
-        infoBuilder.append("&deg;C<br/>");
-        infoBuilder.append("<b>Terrain Type:</b> ");
-        infoBuilder.append(currentTrack.getTerrainTile(boardState.getSelectedCoords()));
+        infoBuilder.append(getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.environment.temperature",
+              selectedHexTemperature(boardState.getSelectedCoords())));
+        infoBuilder.append("<br/>");
+        infoBuilder.append(getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.environment.terrain",
+              currentTrack.getTerrainTile(boardState.getSelectedCoords())));
         infoBuilder.append("<br/>");
 
         if (currentTrack.isCity(boardState.getSelectedCoords())) {
-            infoBuilder.append("<b>City</b><br/>");
+            infoBuilder.append(getTextAt(RESOURCE_BUNDLE, "stratConTab.hexInfo.city"));
         }
 
         boolean coordsRevealed = currentTrack.hasActiveTrackReveal() ||
                                        currentTrack.getRevealedCoords().contains(boardState.getSelectedCoords());
         if (coordsRevealed) {
-            infoBuilder.append("<span color='")
-                  .append(ReportingUtilities.getPositiveColor())
-                  .append("'><i>Recon Complete</i></span><br/>");
+            infoBuilder.append(getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.hexInfo.reconComplete",
+                  spanOpeningWithCustomColor(getPositiveColor()), CLOSING_SPAN_TAG));
         }
 
         if (currentTrack.getAssignedCoordForces().containsKey(boardState.getSelectedCoords())) {
             for (int forceID : currentTrack.getAssignedCoordForces().get(boardState.getSelectedCoords())) {
                 Formation formation = this.campaign.getPlayerForce().getFormation(forceID);
-                infoBuilder.append(formation.getName()).append(" assigned");
+                infoBuilder.append(getFormattedTextAt(RESOURCE_BUNDLE,
+                      "stratConTab.hexInfo.assignment",
+                      formation.getName()));
 
                 if (currentTrack.getStickyForces().contains(forceID)) {
-                    infoBuilder.append("<i> - remain deployed</i>");
+                    infoBuilder.append(" ").append(getTextAt(RESOURCE_BUNDLE, "stratConTab.hexInfo.sticky"));
                 }
 
                 infoBuilder.append("<br/>")
-                      .append("<i>Returns on ")
-                      .append(currentTrack.getAssignedForceReturnDates().get(forceID))
-                      .append("</i><br/>");
+                      .append(getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.hexInfo.return",
+                            currentTrack.getAssignedForceReturnDates().get(forceID)));
             }
         }
 
@@ -1695,14 +1710,12 @@ public class StratConPanel extends JPanel implements ActionListener {
 
             if ((facility != null) && (facility.getFacilityType() != null)) {
                 if (facility.isStrategicObjective()) {
-                    infoBuilder.append(String.format("<br/><span color='%s'>Contract objective located</span>",
-                          facility.getOwner() == Allied ?
-                                ReportingUtilities.getPositiveColor() :
-                                ReportingUtilities.getNegativeColor()));
+                    infoBuilder.append(getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.hexInfo.strategicObjective",
+                          spanOpeningWithCustomColor(getAmazingColor()), CLOSING_SPAN_TAG));
                 }
                 infoBuilder.append("<span color='")
                       .append(facility.getOwner() == Allied ?
-                                    ReportingUtilities.getPositiveColor() :
+                                    getPositiveColor() :
                                     ReportingUtilities.getNegativeColor())
                       .append("'>")
                       .append("<br/>")
@@ -1716,9 +1729,8 @@ public class StratConPanel extends JPanel implements ActionListener {
             }
 
         } else {
-            infoBuilder.append("<span color='")
-                  .append(MekHQ.getMHQOptions().getFontColorNegative())
-                  .append("'><i>Recon Incomplete</i></span>");
+            infoBuilder.append(getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.hexInfo.reconIncomplete",
+                  spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG));
         }
         infoBuilder.append("<br/>");
 

@@ -55,7 +55,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
  * GM tool: a non-modal terrain palette that puts the sector map into paint mode. Pick a terrain and a brush size, then
  * click or drag across the map to paint hexes; closing the palette leaves paint mode.
  *
- * <p>The dialog is deliberately modeless so the map stays usable underneath it - painting a coastline means many
+ * <p>The dialog is deliberately modeless, so the map stays usable underneath it - painting a coastline means many
  * strokes, not one.</p>
  *
  * @author Illiani

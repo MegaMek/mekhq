@@ -34,6 +34,7 @@ package mekhq.campaign.digitalGM.stratCon.sectorGeneration;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -116,10 +117,13 @@ public class StratConHydrology {
             }
 
             // Drop any entries whose type failed to parse (READ_UNKNOWN_ENUM_VALUES_AS_NULL leaves them null).
-            List<HydrologyProfile> validProfiles = library.profiles()
-                                                         .stream()
-                                                         .filter(profile -> profile.type() != null)
-                                                         .toList();
+            List<HydrologyProfile> validProfiles = new ArrayList<>();
+            for (HydrologyProfile profile : library.profiles()) {
+                if (profile.type() != null) {
+                    validProfiles.add(profile);
+                }
+            }
+
             if (validProfiles.isEmpty()) {
                 LOGGER.warn("Hydrology profiles file {} held no recognizable profiles; using a single default profile",
                       MHQConstants.STRAT_CON_HYDROLOGY_PROFILES_PATH);
@@ -178,7 +182,7 @@ public class StratConHydrology {
         }
 
         if (totalWeight <= 0.0) {
-            return profiles.get(0);
+            return profiles.getFirst();
         }
 
         double roll = (Compute.randomInt((int) PICK_RESOLUTION) / PICK_RESOLUTION) * totalWeight;
@@ -190,7 +194,7 @@ public class StratConHydrology {
             }
         }
 
-        return profiles.get(profiles.size() - 1);
+        return profiles.getLast();
     }
 
     /**

@@ -54,7 +54,6 @@ import mekhq.campaign.personnel.Person;
  * @since 0.51.01
  */
 public class StratConReinforcementStrategy implements IReinforcementStrategy {
-
     @Override
     public ReinforcementEligibilityType getReinforcementType(int forceID, StratConTrackState trackState,
           Campaign campaign, StratConCampaignState campaignState) {

@@ -240,7 +240,7 @@ public class StratConOrogeny {
         }
 
         if (totalWeight <= 0.0) {
-            return profiles.get(0);
+            return profiles.getFirst();
         }
 
         double roll = (Compute.randomInt((int) PICK_RESOLUTION) / PICK_RESOLUTION) * totalWeight;

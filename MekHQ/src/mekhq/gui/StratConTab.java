@@ -602,7 +602,7 @@ public class StratConTab extends CampaignGuiTab {
         }
 
         threatLevelPanel.setVisible(true);
-        int odds = Math.max(0, Math.min(100, track.getScenarioOdds() + track.getScenarioOddsAdjustment()));
+        int odds = Math.clamp(track.getScenarioOdds() + track.getScenarioOddsAdjustment(), 0, 100);
         threatLevelPanel.add(ContractMeterBar.threatLevel(odds), BorderLayout.CENTER);
 
         threatLevelPanel.revalidate();
@@ -938,8 +938,8 @@ public class StratConTab extends CampaignGuiTab {
 
     /**
      * @return the aggregate objective state for the given sector: {@link SectorObjectiveState#NONE} when it has no
-     *       objectives, {@code ANY_FAILED} as soon as <em>any</em> objective has failed, {@code ALL_COMPLETE} when every
-     *       objective is complete, and {@code IN_PROGRESS} whenever objectives remain outstanding.
+     *       objectives, {@code ANY_FAILED} as soon as <em>any</em> objective has failed, {@code ALL_COMPLETE} when
+     *       every objective is complete, and {@code IN_PROGRESS} whenever objectives remain outstanding.
      */
     private SectorObjectiveState sectorObjectiveState(StratConTrackState track) {
         boolean hasObjectives = false;

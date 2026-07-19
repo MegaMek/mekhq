@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.digitalGM.stratCon.sectorGeneration;
 
-import static java.lang.Math.max;
 import static java.lang.Math.min;
 
 import java.util.Map;
@@ -83,7 +82,8 @@ public final class StratConFarmPlacer {
             return;
         }
 
-        double density = min(1.0, max(0.0, urban.farmDensityOrDefault() * farmingScale(planet)));
+        double farmDensityScale = urban.farmDensityOrDefault() * farmingScale(planet);
+        double density = Math.clamp(farmDensityScale, 0.0, 1.0);
         if (density <= 0.0) {
             return;
         }

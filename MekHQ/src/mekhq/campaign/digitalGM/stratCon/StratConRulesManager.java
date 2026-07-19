@@ -3772,7 +3772,7 @@ public class StratConRulesManager {
         Mission mission = tracker.getMission();
 
         if (mission instanceof AtBContract) {
-            StratConCampaignState campaignState = ((AtBContract) mission).getStratConCampaignState();
+            StratConCampaignState campaignState = mission.getStratConCampaignState();
             if (campaignState == null) {
                 return;
             }

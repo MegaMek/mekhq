@@ -297,7 +297,7 @@ public final class StratConTerrainFiller {
                 return candidates.get(index);
             }
         }
-        return candidates.get(candidates.size() - 1);
+        return candidates.getLast();
     }
 
     /**

@@ -47,7 +47,6 @@ import mekhq.campaign.mission.AtBDynamicScenarioFactory;
  * @since 0.51.01
  */
 public class StratConOpForGenerationStrategy implements IOpForGenerationStrategy {
-
     @Override
     public void generateOpFor(AtBDynamicScenario backingScenario, AtBContract contract, Campaign campaign) {
         AtBDynamicScenarioFactory.finalizeScenario(backingScenario, contract, campaign);

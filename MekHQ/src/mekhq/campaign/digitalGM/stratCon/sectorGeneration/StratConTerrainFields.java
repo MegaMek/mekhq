@@ -60,18 +60,14 @@ import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 public final class StratConTerrainFields {
     private static final int UNREACHABLE = Integer.MAX_VALUE / 2;
 
-    private final int width;
-    private final int height;
     private final int[][] waterDistance;
     private final int[][] reliefDistance;
     private final boolean[][] rainShadow;
     private final double[][] coldness;
     private final int moistureReach;
 
-    private StratConTerrainFields(int width, int height, int[][] waterDistance, int[][] reliefDistance,
-          boolean[][] rainShadow, double[][] coldness, int moistureReach) {
-        this.width = width;
-        this.height = height;
+    private StratConTerrainFields(int[][] waterDistance, int[][] reliefDistance, boolean[][] rainShadow,
+          double[][] coldness, int moistureReach) {
         this.waterDistance = waterDistance;
         this.reliefDistance = reliefDistance;
         this.rainShadow = rainShadow;
@@ -99,8 +95,7 @@ public final class StratConTerrainFields {
         double[][] coldness = computeColdness(track, latitudeBand);
         int moistureReach = max(3, (int) round(max(width, height) * 0.5));
 
-        return new StratConTerrainFields(width, height, waterDistance, reliefDistance, rainShadow, coldness,
-              moistureReach);
+        return new StratConTerrainFields(waterDistance, reliefDistance, rainShadow, coldness, moistureReach);
     }
 
     private static boolean isRelief(String terrainType) {

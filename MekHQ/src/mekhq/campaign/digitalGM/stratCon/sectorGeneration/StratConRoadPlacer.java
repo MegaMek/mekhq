@@ -52,9 +52,8 @@ import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityType;
  * internal.</p>
  *
  * <p>Space ports act as hubs: they root their network and cheapen travel around themselves, so the trunk roads
- * converge
- * on them. Once the trunk is laid, each block of farmland that isn't already on it gets a single lane in by the
- * cheapest route, so farming districts are served without paving every field.</p>
+ * converge on them. Once the trunk is laid, each block of farmland that isn't already on it gets a single lane in by
+ * the cheapest route, so farming districts are served without paving every field.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -388,7 +387,10 @@ public final class StratConRoadPlacer {
         List<StratConCoords> border = new ArrayList<>();
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                boolean onBorder = (x == 0) || (x == (width - 1)) || (y == 0) || (y == (height - 1));
+                boolean onBorder = (x == 0) ||
+                                         (x == (width - 1)) ||
+                                         (y == 0) ||
+                                         (y == (height - 1));
                 if (onBorder) {
                     StratConCoords coords = new StratConCoords(x, y);
                     if (!isImpassable(track, coords)) {

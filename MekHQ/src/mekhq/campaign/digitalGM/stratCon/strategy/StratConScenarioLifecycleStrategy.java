@@ -48,7 +48,6 @@ import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
  * @since 0.51.01
  */
 public class StratConScenarioLifecycleStrategy implements IScenarioLifecycleStrategy {
-
     @Override
     public void processForceReturnDates(StratConTrackState track, Campaign campaign) {
         StratConRulesManager.processTrackForceReturnDates(track, campaign);

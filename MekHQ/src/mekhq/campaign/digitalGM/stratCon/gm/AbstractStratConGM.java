@@ -80,7 +80,6 @@ import mekhq.campaign.mission.AtBContract;
  * @since 0.51.01
  */
 public abstract class AbstractStratConGM extends AbstractDigitalGM {
-
     private final IScenarioGenerationStrategy scenarioGeneration = new StratConScenarioGenerationStrategy();
     private final IScenarioLifecycleStrategy scenarioLifecycle = new StratConScenarioLifecycleStrategy();
     private final IFacilityStrategy facility = new StratConFacilityStrategy();

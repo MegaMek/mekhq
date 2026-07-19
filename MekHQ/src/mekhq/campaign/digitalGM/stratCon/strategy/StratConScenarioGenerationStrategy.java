@@ -47,7 +47,6 @@ import mekhq.campaign.mission.AtBContract;
  * @since 0.51.01
  */
 public class StratConScenarioGenerationStrategy implements IScenarioGenerationStrategy {
-
     @Override
     public void generateWeeklyScenarioDates(Campaign campaign, StratConCampaignState campaignState,
           AtBContract contract, StratConTrackState track, boolean singleDropMode) {

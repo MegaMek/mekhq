@@ -158,10 +158,10 @@ public record PlanetProfile(int temperatureCelsius, double diameterKm, int water
         if (airless) {
             return 0.0;
         }
-        double comfort = Math.max(0.0,
-              1.0 -
-                    (Math.abs(temperatureCelsius - HABITABLE_TEMPERATURE_CELSIUS) /
-                           (double) HABITABLE_TEMPERATURE_SPAN));
+
+        int temperatureDistance = Math.abs(temperatureCelsius - HABITABLE_TEMPERATURE_CELSIUS);
+        double temperatureSpan = HABITABLE_TEMPERATURE_SPAN / (double) temperatureDistance;
+        double comfort = Math.max(0.0, 1.0 - temperatureSpan);
         if (taintedOrToxic()) {
             comfort *= TAINTED_HABITABILITY_FACTOR;
         } else if (!breathable()) {

@@ -241,7 +241,7 @@ public class StratConUrban {
         }
 
         if (totalWeight <= 0.0) {
-            return profiles.get(0);
+            return profiles.getFirst();
         }
 
         double roll = (Compute.randomInt((int) PICK_RESOLUTION) / PICK_RESOLUTION) * totalWeight;
@@ -253,6 +253,6 @@ public class StratConUrban {
             }
         }
 
-        return profiles.get(profiles.size() - 1);
+        return profiles.getLast();
     }
 }

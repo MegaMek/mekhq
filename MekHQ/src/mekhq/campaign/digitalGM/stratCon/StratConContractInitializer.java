@@ -96,6 +96,17 @@ public class StratConContractInitializer {
     /** Improved sizing: the minimum dry fraction of a sector, so oceans never leave too little land. */
     private static final double MINIMUM_LAND_FRACTION = 0.25;
 
+    /**
+     * Improved sizing: the most hexes a generated sector may cover, whatever the planet and options ask for. Roughly a
+     * 32x32 sector. Without it, a large ocean world with a condensed multi-unit sector and a doubled size multiplier
+     * asks for several thousand hexes.
+     */
+    private static final int MAX_SECTOR_HEXES = 1024;
+
+    /** Improved sizing: bounds on either dimension, so no shape profile can produce a sliver or a runaway map. */
+    private static final int MIN_SECTOR_DIMENSION = 4;
+    private static final int MAX_SECTOR_DIMENSION = 48;
+
     /** Terrain given to a newly-exposed hex that has no mapped neighbor to take after (an otherwise blank sector). */
     private static final String DEFAULT_FILL_TERRAIN = "Plains";
 
@@ -295,7 +306,9 @@ public class StratConContractInitializer {
         if (contract.getContractType().isGarrisonDuty() || contract.getContractType().isRetainer()) {
             contract.setMoraleLevel(AtBMoraleLevel.ROUTED);
 
-            LocalDate routEnd = contract.getStartDate().plusMonths(max(1, Compute.d6() - 3)).minusDays(1);
+            LocalDate startDate = contract.getStartDate();
+            startDate = startDate == null ? campaign.getLocalDate() : startDate;
+            LocalDate routEnd = startDate.plusMonths(max(1, Compute.d6() - 3)).minusDays(1);
             contract.setRoutEndDate(routEnd);
         } else {
             contract.checkMorale(campaign, campaign.getLocalDate());
@@ -840,11 +853,24 @@ public class StratConContractInitializer {
 
         // Ocean is non-playable, so grow the sector by the dry fraction implied by the planet's water coverage.
         double landFraction = max(MINIMUM_LAND_FRACTION, 1.0 - (profile.waterPercent() / 100.0));
-        int totalHexes = (int) Math.round(playableHexes / landFraction);
 
-        int dimension = max(1, (int) Math.round(Math.sqrt(totalHexes)));
-        track.setWidth(dimension);
-        track.setHeight(dimension);
+        // Cap the area. A large world, a wet world, a condensed multi-unit sector and a doubled size multiplier all
+        // stack, and together they can ask for thousands of hexes - every one of which is drawn on each repaint and
+        // walked by the placers. The ceiling only bites at those extremes; ordinary sectors are well beneath it.
+        int totalHexes = min(MAX_SECTOR_HEXES, (int) Math.round(playableHexes / landFraction));
+
+        // The area is settled; the shape profile decides how it is laid out.
+        double aspectRatio = StratConSectorShape.getInstance().selectProfile().aspectRatioOrDefault();
+        int height = clampDimension((int) Math.round(Math.sqrt(totalHexes / aspectRatio)));
+        int width = clampDimension((int) Math.round(totalHexes / (double) height));
+
+        track.setWidth(width);
+        track.setHeight(height);
+    }
+
+    /** Keeps a sector dimension inside the playable range, so no shape can produce a sliver or a runaway map. */
+    private static int clampDimension(int dimension) {
+        return Math.clamp(dimension, MIN_SECTOR_DIMENSION, MAX_SECTOR_DIMENSION);
     }
 
     /**

@@ -163,7 +163,6 @@ public class StratConFacility implements Cloneable {
         return displayableName;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setDisplayableName(String displayableName) {
         this.displayableName = displayableName;
     }
@@ -172,7 +171,6 @@ public class StratConFacility implements Cloneable {
         return facilityType;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setFacilityType(FacilityType facilityType) {
         this.facilityType = facilityType;
     }
