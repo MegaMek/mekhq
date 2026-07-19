@@ -81,6 +81,43 @@ public final class StratConHexGeometry {
     }
 
     /**
+     * Collects every in-bounds hex within {@code radius} steps of {@code center}, the center included: 1 hex at radius
+     * 0, 7 at radius 1, 19 at radius 2, less where the sector edge clips it.
+     *
+     * <p>The area is grown a ring at a time through {@link #neighbors} rather than measured with
+     * {@link StratConCoords#distance}. {@link StratConCoords} inherits {@code distance} from MegaMek's {@code Coords}
+     * but overrides {@link StratConCoords#translate} to correct for the parity-offset layout StratCon stores its hexes
+     * in, so the inherited distance is measured in a different coordinate convention than the map actually uses. Using
+     * it as a radius yields a lopsided blob that is shifted a row off in the neighboring columns - always prefer this
+     * method for "hexes near a hex".</p>
+     *
+     * @param track  the track providing bounds and adjacency
+     * @param center the hex at the middle of the area
+     * @param radius how many steps out to reach, 0 for the center hex alone
+     *
+     * @return the hexes covered, including {@code center}
+     */
+    public static Set<StratConCoords> withinRadius(StratConTrackState track, StratConCoords center, int radius) {
+        Set<StratConCoords> area = new HashSet<>();
+        area.add(center);
+
+        Set<StratConCoords> frontier = new HashSet<>(area);
+        for (int ring = 0; ring < radius; ring++) {
+            Set<StratConCoords> nextRing = new HashSet<>();
+            for (StratConCoords coords : frontier) {
+                for (StratConCoords neighbor : neighbors(track, coords)) {
+                    if (area.add(neighbor)) {
+                        nextRing.add(neighbor);
+                    }
+                }
+            }
+            frontier = nextRing;
+        }
+
+        return area;
+    }
+
+    /**
      * Grows a connected region from {@code seed} up to {@code size} hexes, never entering a {@code blocked} hex. The
      * region expands from a randomly chosen frontier hex each step, producing an organic (non-circular) blob.
      *

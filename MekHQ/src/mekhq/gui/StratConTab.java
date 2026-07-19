@@ -342,6 +342,9 @@ public class StratConTab extends CampaignGuiTab {
 
         int gap = UIUtil.scaleForGUI(5);
         JPanel gmButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, gap, gap));
+        // The panel is titled rather than tagging every button "(GM)": one label says it once for the whole group.
+        gmButtonPanel.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
+              "stratConTab.gmTools.title")));
         gmButtonPanel.add(btnScoutSector);
         gmButtonPanel.add(btnResetSectorFog);
         gmButtonPanel.add(btnRegenerateSector);

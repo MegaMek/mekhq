@@ -455,14 +455,12 @@ public class StratConPanel extends JPanel implements ActionListener {
             return;
         }
 
-        for (int x = 0; x < currentTrack.getWidth(); x++) {
-            for (int y = 0; y < currentTrack.getHeight(); y++) {
-                StratConCoords coords = new StratConCoords(x, y);
-                if ((center.distance(coords) <= paintBrushRadius) &&
-                          !paintTerrain.equals(currentTrack.getTerrainTile(coords))) {
-                    currentTrack.setTerrainTile(coords, paintTerrain);
-                    paintStrokeChangedTerrain = true;
-                }
+        // Grown through the map's own adjacency; see StratConHexGeometry.withinRadius for why a plain coordinate
+        // distance gives a lopsided brush here.
+        for (StratConCoords coords : StratConHexGeometry.withinRadius(currentTrack, center, paintBrushRadius)) {
+            if (!paintTerrain.equals(currentTrack.getTerrainTile(coords))) {
+                currentTrack.setTerrainTile(coords, paintTerrain);
+                paintStrokeChangedTerrain = true;
             }
         }
 
