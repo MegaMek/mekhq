@@ -53,8 +53,8 @@ import org.junit.jupiter.api.Test;
  */
 class SupportUnitGeneratorTest {
 
-    /** One canteen carries two field kitchens; at the default 150-per-kitchen capacity that feeds 300. */
-    private static final int CANTEEN_COVERAGE = 300;
+    /** Each canteen counts as one field kitchen; at the default capacity that feeds 150 personnel. */
+    private static final int CANTEEN_COVERAGE = 150;
 
     @Test
     void exactMultipleFillsWithoutRoundingUp() {

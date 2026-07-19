@@ -157,12 +157,13 @@ public final class SupportUnitGenerator {
     }
 
     /**
-     * Number of mobile canteens required to feed the command, mirroring the daily field-kitchen
-     * check in {@link Fatigue}: each canteen feeds (the field kitchens it carries x
-     * {@link CampaignOptions#getFieldKitchenCapacity()}) personnel, and the personnel that need
-     * feeding are counted exactly as {@link Fatigue#checkFieldKitchenUsage} counts them (honouring
-     * the ignore-non-combatants option). Never returns fewer than one so an enabled commissary
-     * always fields at least one canteen.
+     * Number of mobile canteens required to feed the command. Each canteen counts as a single field
+     * kitchen worth of coverage ({@link CampaignOptions#getFieldKitchenCapacity()} personnel),
+     * regardless of how many kitchen items the unit model happens to carry, so the count reads as
+     * roughly one canteen per kitchen's worth of personnel. The personnel that need feeding are
+     * counted exactly as {@link Fatigue#checkFieldKitchenUsage} counts them (honouring the
+     * ignore-non-combatants option). Never returns fewer than one so an enabled commissary always
+     * fields at least one canteen.
      *
      * @param campaign the campaign whose roster and options drive the count
      *
@@ -172,8 +173,7 @@ public final class SupportUnitGenerator {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         int personnelNeedingKitchen = Fatigue.checkFieldKitchenUsage(campaign.getActivePersonnel(false, false),
               campaignOptions.isUseFieldKitchenIgnoreNonCombatants(), campaign);
-        int coveragePerCanteen = countEquipment(COMMISSARY_UNIT, MiscType.F_FIELD_KITCHEN)
-              * campaignOptions.getFieldKitchenCapacity();
+        int coveragePerCanteen = campaignOptions.getFieldKitchenCapacity();
         int count = vehiclesForCoverage(personnelNeedingKitchen, coveragePerCanteen);
         LOGGER.info("[CompanyGen][SupportUnits] commissary: {} personnel need feeding, {} fed per canteen -> {} canteen(s)",
               personnelNeedingKitchen, coveragePerCanteen, count);
