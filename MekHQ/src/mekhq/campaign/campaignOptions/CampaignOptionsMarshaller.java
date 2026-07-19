@@ -144,6 +144,7 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowISPurchases", campaignOptions.isAllowISPurchases());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowCanonOnly", campaignOptions.isAllowCanonOnly());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowCanonRefitOnly", campaignOptions.isAllowCanonRefitOnly());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "limitClanTech", campaignOptions.isLimitClanTech());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "variableTechLevel", campaignOptions.isVariableTechLevel());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "factionIntroDate", campaignOptions.isFactionIntroDate());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAmmoByType", campaignOptions.isUseAmmoByType());

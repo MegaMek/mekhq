@@ -266,6 +266,7 @@ public class CampaignOptionsUnmarshaller {
                   campaignOptions.setAcquisitionPersonnelCategory(ProcurementPersonnelPick.fromString(
                         nodeContents));
             case "limitByYear" -> campaignOptions.setLimitByYear(parseBoolean(nodeContents));
+            case "limitClanTech" -> campaignOptions.setLimitClanTech(parseBoolean(nodeContents));
             case "disallowExtinctStuff" -> campaignOptions.setDisallowExtinctStuff(parseBoolean(nodeContents));
             case "allowClanPurchases" -> campaignOptions.setAllowClanPurchases(parseBoolean(nodeContents));
             case "allowISPurchases" -> campaignOptions.setAllowISPurchases(parseBoolean(nodeContents));
