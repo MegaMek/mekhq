@@ -36,6 +36,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.HashSet;
+import java.util.Set;
+
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
@@ -57,6 +62,33 @@ class StratConCityPlacerTest {
     private static UrbanProfile urban(double cityCountModifier, double clustering, double coastalBias) {
         return new UrbanProfile(UrbanProfileType.DISPERSED, null, null, null, null, cityCountModifier, clustering,
               coastalBias, null, null);
+    }
+
+    @Test
+    void primateCity_placesOneContiguousBlob() {
+        StratConTrackState track = landTrack();
+        UrbanProfile primate = new UrbanProfile(UrbanProfileType.PRIMATE_CITY, null, null, null, null, 1.0, 0.0, 0.0,
+              null, null);
+
+        StratConCityPlacer.placeCities(track, planet(2_000_000_000L), primate);
+
+        Set<StratConCoords> cities = track.getCities();
+        assertTrue(cities.size() > 1, "a primate city should place several city hexes");
+
+        // every city hex must be reachable from any other by stepping between adjacent city hexes (one connected blob)
+        Set<StratConCoords> seen = new HashSet<>();
+        Deque<StratConCoords> queue = new ArrayDeque<>();
+        StratConCoords start = cities.iterator().next();
+        seen.add(start);
+        queue.add(start);
+        while (!queue.isEmpty()) {
+            for (StratConCoords neighbor : StratConHexGeometry.neighbors(track, queue.poll())) {
+                if (cities.contains(neighbor) && seen.add(neighbor)) {
+                    queue.add(neighbor);
+                }
+            }
+        }
+        assertEquals(cities.size(), seen.size(), "primate city hexes should form a single connected blob");
     }
 
     /** An all-land track. */

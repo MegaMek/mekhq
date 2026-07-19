@@ -293,11 +293,20 @@ public class StratConTab extends CampaignGuiTab {
         constraints.fill = GridBagConstraints.NONE;
         constraints.weightx = 0.0;
 
-        // Add additional info panel text or components
+        // Add the selected-hex stats in their own bordered panel (temperature, terrain, recon status, scenario details)
+        JPanel selectedHexPanel = new JPanel(new BorderLayout());
+        selectedHexPanel.setOpaque(false);
+        selectedHexPanel.setBorder(BorderFactory.createTitledBorder(getTextAt(RESOURCE_BUNDLE,
+              "stratConTab.selectedHex.title")));
+        selectedHexPanel.add(infoPanelText, BorderLayout.CENTER);
         constraints.gridx = 0;
         constraints.gridy = gridY++;
         constraints.gridheight = 3;
-        infoPanel.add(infoPanelText, constraints);
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.weightx = 1.0;
+        infoPanel.add(selectedHexPanel, constraints);
+        constraints.fill = GridBagConstraints.NONE;
+        constraints.weightx = 0.0;
 
         // Add a spacer to push all components upward (top alignment)
         constraints.gridx = 0;

@@ -37,7 +37,9 @@ import static java.lang.Math.min;
 import static java.lang.Math.round;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
@@ -94,6 +96,13 @@ public final class StratConCityPlacer {
         // Carried onto city-hex scenarios so a metropolis fights bigger than a frontier hamlet.
         track.setUrbanizationLevel(Math.clamp(planet.populationLog() / URBANIZATION_POPULATION_LOG, 0.0, 1.0));
 
+        // Primate City: one dominant metropolis - grow all the city hexes as a single connected blob rather than
+        // scattering them across the sector.
+        if (urban.type() == UrbanProfileType.PRIMATE_CITY) {
+            placePrimateCity(track, land, cityCount, urban.coastalBiasOrDefault());
+            return;
+        }
+
         double coastalBias = urban.coastalBiasOrDefault();
         double clustering = urban.clusteringOrDefault();
         int maxDistance = max(1, track.getWidth() + track.getHeight());
@@ -104,6 +113,35 @@ public final class StratConCityPlacer {
                 break;
             }
             track.addCity(chosen);
+        }
+    }
+
+    /**
+     * Places a Primate City: a single dominant metropolis. Seeds one city hex (respecting the coastal bias) and grows a
+     * connected blob of {@code cityCount} city hexes outward from it, never crossing ocean, so all the cities form one
+     * contiguous urban area instead of separate settlements.
+     */
+    private static void placePrimateCity(StratConTrackState track, List<StratConCoords> land, int cityCount,
+          double coastalBias) {
+        int maxDistance = max(1, track.getWidth() + track.getHeight());
+        StratConCoords seed = pickCityHex(track, land, coastalBias, 0.0, maxDistance);
+        if (seed == null) {
+            return;
+        }
+
+        // The blob may not spread onto water.
+        Set<StratConCoords> ocean = new HashSet<>();
+        for (int x = 0; x < track.getWidth(); x++) {
+            for (int y = 0; y < track.getHeight(); y++) {
+                StratConCoords coords = new StratConCoords(x, y);
+                if (StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(coords))) {
+                    ocean.add(coords);
+                }
+            }
+        }
+
+        for (StratConCoords cityHex : StratConHexGeometry.growBlob(track, seed, cityCount, ocean)) {
+            track.addCity(cityHex);
         }
     }
 
