@@ -38,7 +38,6 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
@@ -53,6 +52,7 @@ import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -69,6 +69,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.digitalGM.stratCon.StratConStrategicObjective;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
+import mekhq.campaign.events.GMModeEvent;
 import mekhq.campaign.events.NewDayEvent;
 import mekhq.campaign.events.StratConDeploymentEvent;
 import mekhq.campaign.events.missions.MissionChangedEvent;
@@ -80,7 +81,6 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.panels.TutorialHyperlinkPanel;
-import mekhq.gui.stratCon.CampaignManagementDialog;
 import mekhq.gui.view.ContractMeterBar;
 import mekhq.utilities.ReportingUtilities;
 
@@ -106,10 +106,14 @@ public class StratConTab extends CampaignGuiTab {
     private RoundedJButton btnScoutSector;
     private RoundedJButton btnResetSectorFog;
     private RoundedJButton btnRegenerateSector;
+    private RoundedJButton btnEditSupportPoints;
+    private RoundedJButton btnEditVictoryPoints;
+    private RoundedJButton btnToggleHiddenObjects;
     private JLabel campaignStatusText;
     private JLabel objectiveStatusText;
     private JLabel locationInfoText;
     private JPanel locationPanel;
+    private JPanel threatLevelPanel;
     private JPanel victoryPointsPanel;
     private JScrollPane expandedObjectivePanel;
     private boolean objectivesCollapsed = false;
@@ -118,8 +122,6 @@ public class StratConTab extends CampaignGuiTab {
     private StratConTrackState currentSectorTrack;
 
     private boolean adjustingSelectors = false;
-
-    CampaignManagementDialog cmd;
 
     //region Constructors
 
@@ -163,7 +165,7 @@ public class StratConTab extends CampaignGuiTab {
                     return;
                 }
                 objectivesCollapsed = !objectivesCollapsed;
-                objectiveStatusText.setText(getStrategicObjectiveText(currentContract.getStratConCampaignState(),
+                applyObjectiveText(getStrategicObjectiveText(currentContract.getStratConCampaignState(),
                       currentSectorTrack));
             }
         });
@@ -203,7 +205,6 @@ public class StratConTab extends CampaignGuiTab {
         this.add(centerPanel, BorderLayout.CENTER);
 
         initializeInfoPanel();
-        cmd = new CampaignManagementDialog(this);
 
         JScrollPane infoScrollPane = new FastJScrollPane(infoPanel);
         infoScrollPane.setBorder(null);
@@ -236,12 +237,7 @@ public class StratConTab extends CampaignGuiTab {
         constraints.gridy = gridY++;
         infoPanel.add(campaignStatusText, constraints);
 
-        // Add "Manage Campaign State" button
-        RoundedJButton btnManageCampaignState = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
-              "stratConTab.manageCampaignState.text"));
-        btnManageCampaignState.addActionListener(this::showCampaignStateManagement);
-        constraints.gridy = gridY++;
-        infoPanel.add(btnManageCampaignState, constraints);
+        // Support-point / victory-point editing moved to the "Edit SP (GM)" / "Edit CVP (GM)" buttons on the bottom bar.
 
         // Sector environment panel: latitude, average temperature, and the generation profiles used - immersion detail
         // for the selected sector. Populated by updateLocationInfo(); hidden for legacy sectors that carry no profiles.
@@ -261,8 +257,18 @@ public class StratConTab extends CampaignGuiTab {
         constraints.fill = GridBagConstraints.NONE;
         constraints.weightx = 0.0;
 
-        // The GM sector tools (Scout / Reset Fog / Regenerate) live in a button bar along the bottom of the tab; see
-        // initializeGmButtonPanel().
+        // The GM sector tools (Scout / Reset Fog / Regenerate / Edit SP / Edit CVP / Toggle Hidden) live in a button bar
+        // along the bottom of the tab; see initializeGmButtonPanel().
+
+        // Add the threat-level bar (per-sector scenario odds) directly above the victory-point bar
+        threatLevelPanel = new JPanel(new BorderLayout());
+        threatLevelPanel.setOpaque(false);
+        constraints.gridy = gridY++;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.weightx = 1.0;
+        infoPanel.add(threatLevelPanel, constraints);
+        constraints.fill = GridBagConstraints.NONE;
+        constraints.weightx = 0.0;
 
         // Add the victory-point progress bar directly above the objectives list
         victoryPointsPanel = new JPanel(new BorderLayout());
@@ -274,11 +280,10 @@ public class StratConTab extends CampaignGuiTab {
         constraints.fill = GridBagConstraints.NONE;
         constraints.weightx = 0.0;
 
-        // Add an expanded objective panel (scrollable)
+        // Add the objectives panel. Its height tracks the objective content (see applyObjectiveText) so it is only as
+        // tall as it needs to be; the scroll pane remains as a safety net for unusually long objective lists.
         expandedObjectivePanel = new FastJScrollPane(objectiveStatusText);
         expandedObjectivePanel.setBorder(RoundedLineBorder.createRoundedLineBorder());
-        expandedObjectivePanel.setBorder(RoundedLineBorder.createRoundedLineBorder());
-        expandedObjectivePanel.setPreferredSize(new Dimension(UIUtil.scaleForGUI(550, 300)));
         constraints.gridy = gridY++;
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.weightx = 1.0;
@@ -327,14 +332,98 @@ public class StratConTab extends CampaignGuiTab {
         btnRegenerateSector = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "stratConTab.regenerateSector.text"));
         btnRegenerateSector.setToolTipText(getTextAt(RESOURCE_BUNDLE, "stratConTab.regenerateSector.tooltip"));
         btnRegenerateSector.setEnabled(isGM);
-        btnRegenerateSector.addActionListener(evt -> stratconPanel.regenerateCurrentSector());
+        btnRegenerateSector.addActionListener(evt -> {
+            stratconPanel.regenerateCurrentSector();
+            // Regeneration re-rolls the sector's environment (latitude, profiles); refresh the info panel to match.
+            updateCampaignState();
+        });
+
+        // "Toggle Hidden Objects" - reveals/hides cloaked scenarios, invisible facilities, and fog (GM only)
+        btnToggleHiddenObjects = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "stratConTab.toggleHiddenObjects.text"));
+        btnToggleHiddenObjects.setToolTipText(getTextAt(RESOURCE_BUNDLE, "stratConTab.toggleHiddenObjects.tooltip"));
+        btnToggleHiddenObjects.setEnabled(isGM);
+        btnToggleHiddenObjects.addActionListener(evt -> stratconPanel.toggleHiddenObjects());
+
+        // "Edit SP" - set the contract's support-point total (GM only)
+        btnEditSupportPoints = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "stratConTab.editSupportPoints.text"));
+        btnEditSupportPoints.setToolTipText(getTextAt(RESOURCE_BUNDLE, "stratConTab.editSupportPoints.tooltip"));
+        btnEditSupportPoints.setEnabled(isGM);
+        btnEditSupportPoints.addActionListener(this::editSupportPoints);
+
+        // "Edit CVP" - set the contract's Campaign Victory Point total (GM only)
+        btnEditVictoryPoints = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "stratConTab.editVictoryPoints.text"));
+        btnEditVictoryPoints.setToolTipText(getTextAt(RESOURCE_BUNDLE, "stratConTab.editVictoryPoints.tooltip"));
+        btnEditVictoryPoints.setEnabled(isGM);
+        btnEditVictoryPoints.addActionListener(this::editVictoryPoints);
 
         int gap = UIUtil.scaleForGUI(5);
         JPanel gmButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, gap, gap));
         gmButtonPanel.add(btnScoutSector);
         gmButtonPanel.add(btnResetSectorFog);
         gmButtonPanel.add(btnRegenerateSector);
+        gmButtonPanel.add(btnToggleHiddenObjects);
+        gmButtonPanel.add(btnEditSupportPoints);
+        gmButtonPanel.add(btnEditVictoryPoints);
         return gmButtonPanel;
+    }
+
+    /**
+     * GM action: prompts for and sets the current contract's support-point total.
+     */
+    private void editSupportPoints(ActionEvent e) {
+        if (currentContract == null) {
+            return;
+        }
+        StratConCampaignState campaignState = currentContract.getStratConCampaignState();
+        if (campaignState == null) {
+            return;
+        }
+
+        Integer value = promptForInt("stratConTab.editSupportPoints.prompt", campaignState.getSupportPoints());
+        if (value != null) {
+            campaignState.setSupportPoints(value);
+            updateCampaignState();
+        }
+    }
+
+    /**
+     * GM action: prompts for and sets the current contract's Campaign Victory Point total.
+     */
+    private void editVictoryPoints(ActionEvent e) {
+        if (currentContract == null) {
+            return;
+        }
+        StratConCampaignState campaignState = currentContract.getStratConCampaignState();
+        if (campaignState == null) {
+            return;
+        }
+
+        Integer value = promptForInt("stratConTab.editVictoryPoints.prompt", campaignState.getVictoryPoints());
+        if (value != null) {
+            campaignState.setVictoryPoints(value);
+            updateCampaignState();
+        }
+    }
+
+    /**
+     * Shows a simple integer input dialog seeded with the current value.
+     *
+     * @param promptKey    the resource key for the prompt message
+     * @param currentValue the value to seed the input with
+     *
+     * @return the entered integer, or {@code null} if cancelled or not a valid integer
+     */
+    private Integer promptForInt(String promptKey, int currentValue) {
+        String input = JOptionPane.showInputDialog(this, getTextAt(RESOURCE_BUNDLE, promptKey),
+              String.valueOf(currentValue));
+        if (input == null) {
+            return null;
+        }
+        try {
+            return Integer.parseInt(input.trim());
+        } catch (NumberFormatException ex) {
+            return null;
+        }
     }
 
     /**
@@ -408,7 +497,7 @@ public class StratConTab extends CampaignGuiTab {
             return;
         }
 
-        // The scout/fog/regenerate sector tools are GM-only conveniences.
+        // The GM button bar tools are GM-only conveniences.
         boolean isGM = getCampaignGui().getCampaign().isGM();
         if (btnScoutSector != null) {
             btnScoutSector.setEnabled(isGM);
@@ -419,6 +508,15 @@ public class StratConTab extends CampaignGuiTab {
         if (btnRegenerateSector != null) {
             btnRegenerateSector.setEnabled(isGM);
         }
+        if (btnToggleHiddenObjects != null) {
+            btnToggleHiddenObjects.setEnabled(isGM);
+        }
+        if (btnEditSupportPoints != null) {
+            btnEditSupportPoints.setEnabled(isGM);
+        }
+        if (btnEditVictoryPoints != null) {
+            btnEditVictoryPoints.setEnabled(isGM);
+        }
 
         // campaign state text should contain:
         // list of remaining objectives, percentage remaining
@@ -428,6 +526,7 @@ public class StratConTab extends CampaignGuiTab {
             campaignStatusText.setText(getTextAt(RESOURCE_BUNDLE, "stratConTab.status.noContract"));
             expandedObjectivePanel.setVisible(false);
             victoryPointsPanel.setVisible(false);
+            threatLevelPanel.setVisible(false);
             locationPanel.setVisible(false);
             return;
         }
@@ -439,12 +538,14 @@ public class StratConTab extends CampaignGuiTab {
             campaignStatusText.setText(getTextAt(RESOURCE_BUNDLE, "stratConTab.status.notStarted"));
             expandedObjectivePanel.setVisible(false);
             victoryPointsPanel.setVisible(false);
+            threatLevelPanel.setVisible(false);
             locationPanel.setVisible(false);
             return;
         }
 
         StratConCampaignState campaignState = currentContract.getStratConCampaignState();
         expandedObjectivePanel.setVisible(true);
+        updateThreatLevelBar(currentSectorTrack);
         updateVictoryPointsBar(campaignState);
 
         StringBuilder sb = new StringBuilder();
@@ -470,9 +571,9 @@ public class StratConTab extends CampaignGuiTab {
         campaignStatusText.setText(sb.toString());
 
         if (currentSectorTrack != null) {
-            objectiveStatusText.setText(getStrategicObjectiveText(campaignState, currentSectorTrack));
+            applyObjectiveText(getStrategicObjectiveText(campaignState, currentSectorTrack));
         } else {
-            objectiveStatusText.setText("");
+            applyObjectiveText("");
         }
 
         updateLocationInfo(currentSectorTrack);
@@ -558,6 +659,43 @@ public class StratConTab extends CampaignGuiTab {
 
         victoryPointsPanel.revalidate();
         victoryPointsPanel.repaint();
+    }
+
+    /**
+     * Refreshes the threat-level bar shown above the victory-point bar. Charts the selected sector's effective scenario
+     * odds (base odds plus facility adjustments) from 0% (calm) to 100% (hostile), running good-to-bad. Hidden when no
+     * sector is selected.
+     *
+     * @param track the currently selected sector's track, or {@code null}
+     */
+    private void updateThreatLevelBar(StratConTrackState track) {
+        threatLevelPanel.removeAll();
+
+        if (track == null) {
+            threatLevelPanel.setVisible(false);
+            return;
+        }
+
+        threatLevelPanel.setVisible(true);
+        int odds = Math.max(0, Math.min(100, track.getScenarioOdds() + track.getScenarioOddsAdjustment()));
+        threatLevelPanel.add(ContractMeterBar.threatLevel(odds), BorderLayout.CENTER);
+
+        threatLevelPanel.revalidate();
+        threatLevelPanel.repaint();
+    }
+
+    /**
+     * Sets the objective text and resizes the objectives panel so it is only as tall as the content needs, rather than
+     * a fixed height. The scroll pane remains as a safety net for unusually long objective lists.
+     *
+     * @param text the objective HTML to display
+     */
+    private void applyObjectiveText(String text) {
+        objectiveStatusText.setText(text);
+        int width = UIUtil.scaleForGUI(550);
+        int height = objectiveStatusText.getPreferredSize().height + UIUtil.scaleForGUI(12);
+        expandedObjectivePanel.setPreferredSize(new Dimension(width, height));
+        expandedObjectivePanel.revalidate();
     }
 
     /**
@@ -877,19 +1015,15 @@ public class StratConTab extends CampaignGuiTab {
         };
     }
 
-    private void showCampaignStateManagement(ActionEvent e) {
-        if ((currentContract == null) || (currentSectorTrack == null)) {
-            return;
-        }
-        cmd.display(getCampaign(), currentContract.getStratConCampaignState(),
-              currentSectorTrack, getCampaign().isGM());
-        cmd.setModalityType(ModalityType.APPLICATION_MODAL);
-        cmd.setVisible(true);
-    }
-
     @Subscribe
     public void handleNewDay(NewDayEvent ev) {
         repopulateContractsAndSectors();
+        updateCampaignState();
+    }
+
+    @Subscribe
+    public void handleGMMode(GMModeEvent ev) {
+        // Toggling GM mode enables/disables the GM button bar, so re-evaluate the tab's state immediately.
         updateCampaignState();
     }
 

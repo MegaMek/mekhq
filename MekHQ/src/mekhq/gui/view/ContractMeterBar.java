@@ -213,6 +213,26 @@ public class ContractMeterBar extends JPanel {
     }
 
     /**
+     * Creates a threat gauge running from 0% (calm) to 100% (hostile). Unlike the value meters, the gradient is
+     * reversed - green on the left, red on the right - because a higher value here is worse, not better.
+     *
+     * @param percent the threat percentage (clamped to 0..100)
+     *
+     * @return the configured gauge
+     */
+    public static @Nonnull ContractMeterBar threatLevel(final int percent) {
+        final int clamped = Math.max(0, Math.min(100, percent));
+        final Color markerColor = markerColor();
+        final List<Marker> markers = new ArrayList<>(3);
+        markers.add(new Marker(100, "100", markerColor, MarkerStyle.TICK, false));
+        markers.add(new Marker(0, "0", markerColor, MarkerStyle.TICK, false));
+        markers.add(new Marker(clamped, clamped + "%", CURRENT_MARKER_COLOR, MarkerStyle.SOLID, true, true));
+        final String tooltip = getFormattedTextAt(RESOURCE_BUNDLE, "contractThreatBar.tooltip", clamped);
+        return new ContractMeterBar(getTextAt(RESOURCE_BUNDLE, "contractThreatBar.title.text"), 0, 100,
+              new Color[] { GREEN, GOLD, DEEP_RED }, GREEN.darker(), DEEP_RED.darker(), markers, tooltip);
+    }
+
+    /**
      * Creates a neutral progress gauge of how far the current date has advanced between a contract's start and end.
      * Unlike the value meters, the track is a single neutral color: time has no good or bad direction, so a red-to-green
      * gradient would imply a judgement that does not exist. The start and end are unlabeled ticks (the dates are carried

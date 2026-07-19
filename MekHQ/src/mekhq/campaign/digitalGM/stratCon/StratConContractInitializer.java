@@ -383,9 +383,10 @@ public class StratConContractInitializer {
     /**
      * Regenerates a single track's terrain in place, as used by the GM "Regenerate Sector" tool. Clears the existing
      * terrain, cities, and fog, then re-runs terrain generation - the improved geography-aware generator when the
-     * alternate-terrain option is set, otherwise the legacy placer. The track's dimensions and temperature are kept, a
-     * fresh latitude band is rolled, and assigned forces are left untouched. Scenarios and facilities are preserved,
-     * but any that the new coastline leaves on an ocean hex are relocated back onto land.
+     * alternate-terrain option is set, otherwise the legacy placer. The track's dimensions are kept, but a fresh
+     * latitude band is rolled and the temperature is recomputed from it, and assigned forces are left untouched.
+     * Scenarios and facilities are preserved, but any that the new coastline leaves on an ocean hex are relocated back
+     * onto land.
      *
      * @param track    the track to regenerate
      * @param contract the contract the track belongs to (source of the planet profile and Ares-Conventions status)
@@ -399,8 +400,19 @@ public class StratConContractInitializer {
         boolean allowCities = !(contract.getEmployerFaction().isAresConventionsSignatory(year) &&
                                       contract.getEnemy().isAresConventionsSignatory(year));
 
+        // Re-roll the latitude band and recompute the temperature from it (matching initializeTrackState), so a
+        // regenerated sector's climate actually changes and drives the new biome selection - not just its terrain.
+        boolean useImprovedSizing = campaignOptions.isUseStratConAlternateSectorCount() ||
+                                          campaignOptions.isUseStratConCondenseSectors();
+        LatitudeBand latitudeBand = LatitudeBand.random();
+        if (useImprovedSizing) {
+            track.setTemperature(improvedTemperature(planetProfile, latitudeBand));
+        } else {
+            track.setTemperature(legacyTemperature(planetProfile.temperatureCelsius()));
+        }
+
         var sectorStrategy = StratConGMs.sectorGeneration(campaignOptions);
-        sectorStrategy.regenerateTrack(track, planetProfile, LatitudeBand.random(), allowCities);
+        sectorStrategy.regenerateTrack(track, planetProfile, latitudeBand, allowCities);
 
         // A regenerated coastline can leave existing facilities and scenarios sitting on new ocean hexes; move them
         // back onto land.

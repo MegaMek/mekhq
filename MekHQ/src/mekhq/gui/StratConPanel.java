@@ -116,7 +116,6 @@ public class StratConPanel extends JPanel implements ActionListener {
 
     private static final String RIGHT_CLICK_COMMAND_MANAGE_FORCES = "ManageForces";
     private static final String RIGHT_CLICK_COMMAND_MANAGE_SCENARIO = "ManageScenario";
-    private static final String RIGHT_CLICK_COMMAND_REVEAL_TRACK = "RevealTrack";
     private static final String RIGHT_CLICK_COMMAND_STICKY_FORCE = "StickyForce";
     private static final String RIGHT_CLICK_COMMAND_STICKY_FORCE_ID = "StickyForceID";
     private static final String RIGHT_CLICK_COMMAND_REMOVE_FACILITY = "RemoveFacility";
@@ -156,7 +155,6 @@ public class StratConPanel extends JPanel implements ActionListener {
 
     private Point clickedPoint;
     private JPopupMenu rightClickMenu;
-    private JMenuItem menuItemGMReveal;
 
     /** Current zoom factor applied to the hex map. 1.0 == no zoom. */
     private double scale = 1.0;
@@ -333,6 +331,20 @@ public class StratConPanel extends JPanel implements ActionListener {
     }
 
     /**
+     * Toggles the current sector's "GM revealed" state, which shows or hides otherwise-hidden objects (cloaked
+     * scenarios, invisible facilities, and unscouted hexes). Formerly the "Reveal/Hide Sector" right-click item.
+     */
+    public void toggleHiddenObjects() {
+        if (currentTrack == null) {
+            return;
+        }
+
+        currentTrack.setGmRevealed(!currentTrack.isGmRevealed());
+        infoArea.setText(buildSelectedHexInfo(campaign));
+        repaint();
+    }
+
+    /**
      * Constructs the right-click context menu, optionally for a scenario
      */
     private void buildRightClickMenu(StratConCoords coords) {
@@ -387,11 +399,7 @@ public class StratConPanel extends JPanel implements ActionListener {
         if ((currentTrack != null) && campaign.isGM()) {
             rightClickMenu.addSeparator();
 
-            menuItemGMReveal = new JMenuItem();
-            menuItemGMReveal.setText(currentTrack.isGmRevealed() ? "Hide Sector (GM)" : "Reveal Sector (GM)");
-            menuItemGMReveal.setActionCommand(RIGHT_CLICK_COMMAND_REVEAL_TRACK);
-            menuItemGMReveal.addActionListener(this);
-            rightClickMenu.add(menuItemGMReveal);
+            // "Reveal/Hide Sector" moved to the "Toggle Hidden Objects" button on the StratCon tab's GM button bar.
 
             if (currentTrack.getFacility(coords) != null) {
                 JMenuItem menuItemRemoveFacility = new JMenuItem();
@@ -1493,10 +1501,6 @@ public class StratConPanel extends JPanel implements ActionListener {
                     scenarioWizard.toFront();
                     scenarioWizard.setVisible(true);
                 }
-                break;
-            case RIGHT_CLICK_COMMAND_REVEAL_TRACK:
-                currentTrack.setGmRevealed(!currentTrack.isGmRevealed());
-                menuItemGMReveal.setText(currentTrack.isGmRevealed() ? "Hide Track" : "Reveal Track");
                 break;
             case RIGHT_CLICK_COMMAND_STICKY_FORCE:
                 JCheckBoxMenuItem source = (JCheckBoxMenuItem) evt.getSource();
