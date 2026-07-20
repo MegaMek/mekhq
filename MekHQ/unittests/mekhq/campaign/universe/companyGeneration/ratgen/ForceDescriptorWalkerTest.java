@@ -46,6 +46,7 @@ import java.util.List;
 
 import megamek.client.ratgenerator.ForceDescriptor;
 import megamek.common.units.Entity;
+import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
 import org.junit.jupiter.api.Test;
@@ -76,6 +77,17 @@ class ForceDescriptorWalkerTest {
         descriptor.setName(name);
         injectEntity(descriptor);
         return descriptor;
+    }
+
+    /** A platoon-echelon node of {@code unitType} whose children are all leaf units (a "loose platoon"). */
+    private static ForceDescriptor loosePlatoon(String name, int unitType) throws Exception {
+        ForceDescriptor platoon = new ForceDescriptor();
+        platoon.setName(name);
+        platoon.setEchelon(3);
+        platoon.setUnitType(unitType);
+        platoon.addSubForce(unit(name + " Unit A"));
+        platoon.addSubForce(unit(name + " Unit B"));
+        return platoon;
     }
 
     private static List<String> namesOfCreatedFormations(Campaign campaign) {
@@ -131,5 +143,27 @@ class ForceDescriptorWalkerTest {
         assertEquals(List.of("Unit C"), handledUnits, "the re-included unit is kept, its excluded sibling dropped");
         assertTrue(namesOfCreatedFormations(campaign).contains("Second Lance"),
               "a lance with one re-included unit keeps its formation");
+    }
+
+    @Test
+    void looseAttachedPlatoonsWrapIntoUnitTypeCompany() throws Exception {
+        ForceDescriptor root = group("Regiment");
+        // Two loose Battle Armor platoons attached directly to the root (no company wrapper).
+        root.addAttached(loosePlatoon("Platoon", UnitType.BATTLE_ARMOR));
+        root.addAttached(loosePlatoon("Platoon", UnitType.BATTLE_ARMOR));
+
+        Campaign campaign = mock(Campaign.class);
+        List<String> handledUnits = new ArrayList<>();
+        ForceDescriptorWalker.walk(root, campaign, new Formation("Headquarters"),
+              (leaf, parent) -> handledUnits.add(leaf.parseName()));
+
+        assertEquals(4, handledUnits.size(), "all four platoon units are placed");
+
+        List<String> createdFormations = namesOfCreatedFormations(campaign);
+        String expectedCompany = UnitType.getTypeDisplayableName(UnitType.BATTLE_ARMOR) + " Company";
+        assertTrue(createdFormations.contains(expectedCompany),
+              "loose BA platoons should nest under a synthesized '" + expectedCompany + "'");
+        assertEquals(1, createdFormations.stream().filter(expectedCompany::equals).count(),
+              "both platoons share one synthesized company (grouped by unit type)");
     }
 }

@@ -32,9 +32,15 @@
  */
 package mekhq.campaign.universe.companyGeneration.ratgen;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import megamek.client.ratgenerator.FactionRecord;
 import megamek.client.ratgenerator.ForceDescriptor;
 import megamek.client.ratgenerator.RATGenerator;
+import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
@@ -123,10 +129,22 @@ public final class ForceDescriptorWalker {
                 }
             }
             if (root.getAttached() != null) {
+                // RATGenerator often hands support/attachment forces in as loose platoons directly
+                // under the root (a stack of BA or infantry platoons with no company wrapper). Group
+                // those by unit type under a synthesized company so the TOE reads as
+                // "<Unit Type> Company -> platoons"; anything that is already a proper formation
+                // (its children are sub-formations, e.g. an aerospace squadron) walks through as-is.
+                List<ForceDescriptor> loosePlatoons = new ArrayList<>();
                 for (ForceDescriptor child : root.getAttached()) {
-                    LOGGER.info("[CompanyGen][Walker]   (attached child of root)");
-                    leaves += walkInternal(child, campaign, parentInCampaign, onLeaf, 0);
+                    if (isLoosePlatoon(child)) {
+                        loosePlatoons.add(child);
+                    } else {
+                        LOGGER.info("[CompanyGen][Walker]   (attached child of root)");
+                        leaves += walkInternal(child, campaign, parentInCampaign, onLeaf, 0);
+                    }
                 }
+                leaves += wrapLoosePlatoonsByUnitType(loosePlatoons, campaign, parentInCampaign,
+                      root.getFaction(), onLeaf);
             }
         } else {
             // Edge cases: the root descriptor is itself a leaf (single-unit generation), or no
@@ -241,6 +259,99 @@ public final class ForceDescriptorWalker {
             }
         }
         return false;
+    }
+
+    /**
+     * Whether {@code descriptor} is a "loose platoon": a formation whose children are all leaf units
+     * (the smallest grouping, such as a BA or infantry platoon) rather than a proper multi-formation
+     * unit. Used to decide which attached nodes to wrap in a synthesized company; a node whose
+     * children are themselves formations (for example an aerospace squadron of flights) is not one.
+     *
+     * @param descriptor the attached descriptor to classify
+     * @return {@code true} if the node's children are all leaf units
+     */
+    private static boolean isLoosePlatoon(ForceDescriptor descriptor) {
+        List<ForceDescriptor> children = childrenOf(descriptor);
+        if (children.isEmpty()) {
+            return false;
+        }
+        for (ForceDescriptor child : children) {
+            if (!childrenOf(child).isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /** The subforce and attached children of {@code descriptor} combined into one list. */
+    private static List<ForceDescriptor> childrenOf(ForceDescriptor descriptor) {
+        List<ForceDescriptor> children = new ArrayList<>();
+        if (descriptor.getSubForces() != null) {
+            children.addAll(descriptor.getSubForces());
+        }
+        if (descriptor.getAttached() != null) {
+            children.addAll(descriptor.getAttached());
+        }
+        return children;
+    }
+
+    /**
+     * Groups {@code platoons} by unit type and, for each group, synthesizes a company formation named
+     * for that unit type (for example "Battle Armor Company") under {@code parent}, then walks the
+     * group's platoons beneath it.
+     *
+     * @param platoons    the loose platoons to wrap (may be empty)
+     * @param campaign    the campaign the formations are added to
+     * @param parent      the formation the synthesized companies hang under
+     * @param factionCode the descriptor faction, used to map the company echelon
+     * @param onLeaf      the leaf handler forwarded to {@link #walkInternal}
+     *
+     * @return the number of leaves visited
+     */
+    private static int wrapLoosePlatoonsByUnitType(List<ForceDescriptor> platoons, Campaign campaign,
+          Formation parent, String factionCode, LeafHandler onLeaf) {
+        if (platoons.isEmpty()) {
+            return 0;
+        }
+        Map<Integer, List<ForceDescriptor>> byUnitType = new LinkedHashMap<>();
+        for (ForceDescriptor platoon : platoons) {
+            byUnitType.computeIfAbsent(platoon.getUnitType(), key -> new ArrayList<>()).add(platoon);
+        }
+
+        int leaves = 0;
+        for (Map.Entry<Integer, List<ForceDescriptor>> entry : byUnitType.entrySet()) {
+            List<ForceDescriptor> group = entry.getValue();
+            String companyName = companyNameForUnitType(entry.getKey());
+            Formation company = new Formation(companyName);
+            // The company sits one echelon above its platoons.
+            Integer platoonEchelon = group.get(0).getEchelon();
+            FormationLevel companyLevel = mapEchelonToFormationLevel(
+                  platoonEchelon == null ? null : platoonEchelon + 1, factionCode);
+            if (companyLevel != null) {
+                company.setFormationLevel(companyLevel);
+            }
+            campaign.addFormation(company, parent);
+            LOGGER.info("[CompanyGen][Walker] synthesized '{}' (level {}) for {} loose platoon(s)",
+                  companyName, companyLevel, group.size());
+            for (ForceDescriptor platoon : group) {
+                leaves += walkInternal(platoon, campaign, company, onLeaf, 1);
+            }
+        }
+        return leaves;
+    }
+
+    /**
+     * A display name for a synthesized company of a unit-type group, e.g. "Battle Armor Company".
+     * Falls back to a generic name when the unit type is unknown.
+     *
+     * @param unitType the {@code UnitType} constant of the group, or {@code null}
+     * @return the company display name
+     */
+    private static String companyNameForUnitType(Integer unitType) {
+        if (unitType == null) {
+            return "Support Company";
+        }
+        return UnitType.getTypeDisplayableName(unitType) + " Company";
     }
 
     /**
