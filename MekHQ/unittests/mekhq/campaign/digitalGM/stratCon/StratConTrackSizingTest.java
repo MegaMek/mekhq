@@ -38,6 +38,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.LatitudeBand;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.PlanetProfile;
@@ -56,6 +59,17 @@ class StratConTrackSizingTest {
         when(options.isUseStratConCondenseSectors()).thenReturn(condense);
         when(options.getStratConSectorSizeMultiplier()).thenReturn(sizeMultiplier);
         return options;
+    }
+
+    /**
+     * Asserts a sector covers roughly the expected number of hexes. Exact equality is not available: the shape profile
+     * rounds each dimension independently, so the laid-out area lands near the target rather than on it.
+     */
+    private static void assertAreaNear(int expectedHexes, StratConTrackState track) {
+        int actual = track.getSize();
+        assertTrue((actual >= (expectedHexes * 0.75)) && (actual <= (expectedHexes * 1.25)),
+              "expected roughly " + expectedHexes + " hexes but got " + actual +
+                    " (" + track.getWidth() + "x" + track.getHeight() + ')');
     }
 
     private static StratConTrackState track(SectorSpec spec, CampaignOptions options) {
@@ -84,40 +98,73 @@ class StratConTrackSizingTest {
     }
 
     @Test
-    void improvedSizing_neutralPlanet_singleUnit_isTwelveByTwelve() {
-        // perUnitPlayable = round(78 * 1.0) = 78; playable = 78; total = round(78 / 0.5) = 156; dim = round(sqrt) = 12
+    void improvedSizing_neutralPlanet_singleUnit_coversRoughlyItsTargetArea() {
+        // perUnitPlayable = round(78 * 1.0) = 78; playable = 78; total = round(78 / 0.5) = 156 hexes. The shape profile
+        // then lays that area out, so the exact dimensions vary - the area is what the sizing math controls.
         StratConTrackState track = track(new SectorSpec(1, 9, LatitudeBand.EQUATORIAL), options(true, false, 1.0));
 
-        assertEquals(12, track.getWidth());
-        assertEquals(12, track.getHeight());
+        assertAreaNear(156, track);
     }
 
     @Test
     void improvedSizing_sizeMultiplierAndUnitCountScaleEquivalently() {
-        // A 2.0 multiplier on one unit and a 1.0 multiplier on two units both double the playable target.
+        // A 2.0 multiplier on one unit and a 1.0 multiplier on two units both double the playable target to 312.
         StratConTrackState doubledByMultiplier = track(new SectorSpec(1, 9, LatitudeBand.EQUATORIAL),
               options(true, false, 2.0));
         StratConTrackState doubledByUnits = track(new SectorSpec(2, 18, LatitudeBand.EQUATORIAL),
               options(true, true, 1.0));
 
-        assertEquals(doubledByUnits.getWidth(), doubledByMultiplier.getWidth());
-        assertEquals(doubledByUnits.getHeight(), doubledByMultiplier.getHeight());
+        // Compared by area, not by dimensions: each track rolls its own shape, so their proportions legitimately differ.
+        assertAreaNear(312, doubledByMultiplier);
+        assertAreaNear(312, doubledByUnits);
     }
 
     @Test
     void improvedSizing_multiplierAlwaysBitesOnCondensedSectors() {
-        // unit count 2 with a 2.0 multiplier: playable = round(2 * 78 * 2) = 312; total = 624; dim = round(sqrt) = 25
+        // unit count 2 with a 2.0 multiplier: playable = round(2 * 78 * 2) = 312; total = 624.
         StratConTrackState track = track(new SectorSpec(2, 18, LatitudeBand.EQUATORIAL), options(true, true, 2.0));
 
-        assertEquals(25, track.getWidth());
-        assertEquals(25, track.getHeight());
+        assertAreaNear(624, track);
     }
 
     @Test
-    void improvedSizing_producesSquareTracks() {
-        StratConTrackState track = track(new SectorSpec(3, 27, LatitudeBand.NORTH_TEMPERATE), options(true, true, 1.0));
+    void improvedSizing_variesTheShapeOfSectors() {
+        // Sectors used to always be square. They are now laid out by a weighted shape profile, so across many rolls
+        // more than one set of proportions should appear - that variety is the whole point.
+        Set<String> shapes = new HashSet<>();
+        for (int roll = 0; roll < 60; roll++) {
+            StratConTrackState track = track(new SectorSpec(1, 9, LatitudeBand.EQUATORIAL), options(true, false, 1.0));
+            shapes.add(track.getWidth() + "x" + track.getHeight());
+        }
 
-        assertEquals(track.getWidth(), track.getHeight());
+        assertTrue(shapes.size() > 1, "every sector came out the same shape: " + shapes);
+    }
+
+    @Test
+    void improvedSizing_keepsEveryDimensionPlayable() {
+        // No shape may produce a sliver, and no combination of planet and options may produce a runaway map.
+        for (int roll = 0; roll < 60; roll++) {
+            StratConTrackState track = track(new SectorSpec(3, 27, LatitudeBand.EQUATORIAL), options(true, true, 2.0));
+
+            assertTrue(track.getWidth() >= 4, "sector too narrow to play: " + track.getWidth());
+            assertTrue(track.getHeight() >= 4, "sector too shallow to play: " + track.getHeight());
+            assertTrue(track.getWidth() <= 48, "sector wider than the ceiling: " + track.getWidth());
+            assertTrue(track.getHeight() <= 48, "sector taller than the ceiling: " + track.getHeight());
+        }
+    }
+
+    @Test
+    void improvedSizing_capsRunawaySectors() {
+        // A big, wet world with a condensed multi-unit sector and a doubled multiplier used to ask for thousands of
+        // hexes (measured at 61x61). The area ceiling holds it to roughly 32x32 worth of map.
+        PlanetProfile bigOceanWorld = new PlanetProfile(20, PlanetProfile.TERRA_DIAMETER_KM * 2, 95, false, null,
+              "Rocky", 1, 1.0, 1_000_000L, mekhq.campaign.universe.enums.HPGRating.X);
+
+        StratConTrackState track = StratConContractInitializer.initializeTrackState(new SectorSpec(3,
+              27,
+              LatitudeBand.EQUATORIAL), bigOceanWorld, options(true, true, 2.0), true, 0, 0);
+
+        assertTrue(track.getSize() <= 1024, "runaway sector was not capped: " + track.getSize() + " hexes");
     }
 
     @Test

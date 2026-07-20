@@ -33,6 +33,7 @@
 package mekhq.campaign.digitalGM.stratCon.sectorGeneration;
 
 import static java.lang.Math.max;
+import static java.lang.Math.min;
 import static java.lang.Math.round;
 
 import java.util.HashSet;
@@ -71,6 +72,9 @@ public final class StratConMountainPlacer {
     private static final double MASSIF_FRACTION = 0.05;
     private static final double PLATEAU_FRACTION = 0.08;
     private static final double MAX_UPLAND_FRACTION = 0.5;
+
+    /** The smallest upland worth drawing, unless the sector itself is too small to hold one. */
+    private static final int MIN_UPLAND_SIZE = 3;
 
     private static final int CLUSTER_MIN_SIZE = 2;
     private static final int CLUSTER_SIZE_SPREAD = 4;
@@ -164,7 +168,9 @@ public final class StratConMountainPlacer {
           double fraction) {
         int total = track.getWidth() * track.getHeight();
         int cap = max(1, (int) round(total * MAX_UPLAND_FRACTION));
-        int size = Math.clamp((int) round(total * fraction * features), 3, cap);
+        // On a sector too small to hold the usual minimum upland, the cap wins - clamping with a floor above the
+        // ceiling throws rather than producing a small upland.
+        int size = Math.clamp((int) round(total * fraction * features), min(MIN_UPLAND_SIZE, cap), cap);
 
         Set<StratConCoords> blob = StratConHexGeometry.growBlob(track,
               randomLandCoords(track),

@@ -62,6 +62,7 @@ import mekhq.campaign.digitalGM.stratCon.sectorGeneration.PlanetProfile;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.SectorSpec;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorGenerator;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorPlanner;
+import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorShape;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
@@ -104,7 +105,7 @@ public class StratConContractInitializer {
     private static final int MAX_SECTOR_HEXES = 1024;
 
     /** Improved sizing: bounds on either dimension, so no shape profile can produce a sliver or a runaway map. */
-    private static final int MIN_SECTOR_DIMENSION = 4;
+    public static final int MIN_SECTOR_DIMENSION = 4;
     private static final int MAX_SECTOR_DIMENSION = 48;
 
     /** Terrain given to a newly-exposed hex that has no mapped neighbor to take after (an otherwise blank sector). */
@@ -859,10 +860,21 @@ public class StratConContractInitializer {
         // walked by the placers. The ceiling only bites at those extremes; ordinary sectors are well beneath it.
         int totalHexes = min(MAX_SECTOR_HEXES, (int) Math.round(playableHexes / landFraction));
 
-        // The area is settled; the shape profile decides how it is laid out.
+        // The area is settled; the shape profile decides how it is laid out. Both dimensions are derived from the
+        // ratio rather than one from the other, so a 1.0 ratio really is square instead of drifting a hex wide.
         double aspectRatio = StratConSectorShape.getInstance().selectProfile().aspectRatioOrDefault();
+        int width = clampDimension((int) Math.round(Math.sqrt(totalHexes * aspectRatio)));
         int height = clampDimension((int) Math.round(Math.sqrt(totalHexes / aspectRatio)));
-        int width = clampDimension((int) Math.round(totalHexes / (double) height));
+
+        // Rounding each dimension independently can nudge the laid-out area just past the ceiling, so trim the longer
+        // side until it fits. The ceiling is meant to be a hard bound, not an approximate one.
+        while (((width * height) > MAX_SECTOR_HEXES) && (max(width, height) > MIN_SECTOR_DIMENSION)) {
+            if (width >= height) {
+                width--;
+            } else {
+                height--;
+            }
+        }
 
         track.setWidth(width);
         track.setHeight(height);

@@ -35,6 +35,7 @@ package mekhq.gui;
 import static java.awt.Color.BLACK;
 import static java.awt.Color.BLUE;
 import static java.awt.Font.BOLD;
+import static java.lang.Math.max;
 import static megamek.utilities.ImageUtilities.addTintToBufferedImage;
 import static mekhq.campaign.digitalGM.stratCon.StratConScenario.ScenarioState.PRIMARY_FORCES_COMMITTED;
 import static mekhq.campaign.digitalGM.stratCon.StratConScenario.ScenarioState.UNRESOLVED;
@@ -389,8 +390,13 @@ public class StratConPanel extends JPanel implements ActionListener {
             return;
         }
 
-        JSpinner widthSpinner = new JSpinner(new SpinnerNumberModel(currentTrack.getWidth(), 1, MAX_SECTOR_SIZE, 1));
-        JSpinner heightSpinner = new JSpinner(new SpinnerNumberModel(currentTrack.getHeight(), 1, MAX_SECTOR_SIZE, 1));
+        // Floor matches what generation guarantees: several placers assume a sector big enough to hold a feature, and
+        // a hand-shrunk 1x1 sector would crash the next regeneration.
+        int minimum = StratConContractInitializer.MIN_SECTOR_DIMENSION;
+        JSpinner widthSpinner = new JSpinner(new SpinnerNumberModel(max(currentTrack.getWidth(), minimum),
+              minimum, MAX_SECTOR_SIZE, 1));
+        JSpinner heightSpinner = new JSpinner(new SpinnerNumberModel(max(currentTrack.getHeight(), minimum),
+              minimum, MAX_SECTOR_SIZE, 1));
 
         JPanel prompt = new JPanel(new GridLayout(0, 2, UIUtil.scaleForGUI(5), UIUtil.scaleForGUI(5)));
         prompt.add(new JLabel(getTextAt(RESOURCE_BUNDLE, "resizeSector.width.label")));

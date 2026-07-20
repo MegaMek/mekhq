@@ -159,9 +159,11 @@ public record PlanetProfile(int temperatureCelsius, double diameterKm, int water
             return 0.0;
         }
 
+        // Comfort falls off linearly with distance from the ideal temperature, reaching zero a full span away. The
+        // division runs distance-over-span, not span-over-distance: inverted, the ideal temperature divides by zero and
+        // scores worst, every temperate world scores zero, and comfort rises with extremity.
         int temperatureDistance = Math.abs(temperatureCelsius - HABITABLE_TEMPERATURE_CELSIUS);
-        double temperatureSpan = HABITABLE_TEMPERATURE_SPAN / (double) temperatureDistance;
-        double comfort = Math.max(0.0, 1.0 - temperatureSpan);
+        double comfort = Math.max(0.0, 1.0 - (temperatureDistance / (double) HABITABLE_TEMPERATURE_SPAN));
         if (taintedOrToxic()) {
             comfort *= TAINTED_HABITABILITY_FACTOR;
         } else if (!breathable()) {
