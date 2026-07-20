@@ -45,7 +45,7 @@ import org.junit.jupiter.api.Test;
 import testUtilities.MHQTestUtilities;
 
 /**
- * Verifies that {@link Campaign#setSuppressUnitNewEvents(boolean)} gates the per-unit
+ * Verifies that {@link Campaign#setBulkGenerationInProgress(boolean)} gates the per-unit
  * {@link UnitNewEvent} fired by {@link Campaign#addNewUnit}. Force generation relies on this to add
  * many units off the Swing event dispatch thread without triggering event-driven GUI refreshes that
  * would read the half-built campaign mid-generation.
@@ -69,11 +69,11 @@ class CampaignAddUnitEventSuppressionTest {
             campaign.addNewUnit(UnitTestUtilities.getLocustLCT1V(), false, 0, PartQuality.QUALITY_D);
             assertEquals(1, unitNewEventCount(eventSpy), "a normal add fires one UnitNewEvent");
 
-            campaign.setSuppressUnitNewEvents(true);
+            campaign.setBulkGenerationInProgress(true);
             campaign.addNewUnit(UnitTestUtilities.getLocustLCT1V(), false, 0, PartQuality.QUALITY_D);
             assertEquals(1, unitNewEventCount(eventSpy), "a suppressed add fires no UnitNewEvent");
 
-            campaign.setSuppressUnitNewEvents(false);
+            campaign.setBulkGenerationInProgress(false);
             campaign.addNewUnit(UnitTestUtilities.getLocustLCT1V(), false, 0, PartQuality.QUALITY_D);
             assertEquals(2, unitNewEventCount(eventSpy), "restoring events fires a UnitNewEvent again");
         }

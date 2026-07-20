@@ -70,6 +70,7 @@ import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.AcquisitionEvent;
 import mekhq.campaign.events.NewDayEvent;
 import mekhq.campaign.events.OptionsChangedEvent;
+import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.events.ProcurementEvent;
 import mekhq.campaign.events.ReportEvent;
 import mekhq.campaign.events.TransitCompleteEvent;
@@ -888,6 +889,16 @@ public final class CommandCenterTab extends CampaignGuiTab {
      */
     private void refreshBasicInfo() {
         final Campaign campaign = getCampaign();
+
+        // While a bulk generation is adding units/parts off the EDT, skip this refresh: the summary
+        // computation walks the campaign's hangar and location tree, which the worker is concurrently
+        // mutating - reading it here threw ConcurrentModificationException from the modal progress
+        // dialog's event pump. The generation fires an OrganizationChangedEvent when it completes,
+        // which reschedules this refresh against the finished, consistent campaign.
+        if (campaign.isBulkGenerationInProgress()) {
+            return;
+        }
+
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
         final CampaignSummary campaignSummary = campaign.getCampaignSummary();
 
@@ -1181,6 +1192,13 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
     @Subscribe
     public void handle(UnitEvent evt) {
+        basicInfoScheduler.schedule();
+    }
+
+    @Subscribe
+    public void handle(OrganizationChangedEvent evt) {
+        // Fired once after a bulk force generation completes (among other org changes); reschedules the
+        // basic-info/cargo refresh that refreshBasicInfo skipped while the generation was in progress.
         basicInfoScheduler.schedule();
     }
 

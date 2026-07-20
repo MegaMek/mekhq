@@ -419,7 +419,7 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
 
     /**
      * Runs one generation phase on a background thread behind a modal progress dialog. Sets the
-     * {@code suppressUnitNewEvents} guard for the duration (so event-driven tab refreshes do not read
+     * {@code bulkGenerationInProgress} guard for the duration (so event-driven tab refreshes do not read
      * the half-built campaign off the EDT), runs {@code work} with the phase's progress listener, and
      * hands the result to {@code onSuccess} on the EDT. On failure a notification is shown and
      * {@code onSuccess} is skipped.
@@ -436,11 +436,11 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
             @Override
             protected T doInBackground() {
                 progressDialog.asListener().updateProgress(0.0, progressMessage);
-                getCampaign().setSuppressUnitNewEvents(true);
+                getCampaign().setBulkGenerationInProgress(true);
                 try {
                     return work.apply(progressDialog.asListener());
                 } finally {
-                    getCampaign().setSuppressUnitNewEvents(false);
+                    getCampaign().setBulkGenerationInProgress(false);
                 }
             }
 

@@ -317,10 +317,12 @@ public class Campaign implements ITechManager {
 
     private final DailyReportLog dailyReportLog = new DailyReportLog();
 
-    // When set, addNewUnit skips its per-unit UnitNewEvent. Bulk operations that add many units off
-    // the EDT (force generation) set this so event-driven GUI refreshes do not fire mid-operation
-    // and read half-built campaign state; the operation fires one refresh event when it completes.
-    private transient boolean suppressUnitNewEvents;
+    // Set while a bulk operation (force generation) is adding many units/parts off the EDT. Guards
+    // event-driven GUI work from firing mid-operation and reading half-built campaign state off the
+    // EDT: addNewUnit skips its per-unit UnitNewEvent, and timer-driven tab refreshes (e.g. the
+    // Command Center cargo/summary computation, which walks the mutating location tree) skip while it
+    // is set. The operation fires one refresh event when it completes.
+    private transient boolean bulkGenerationInProgress;
 
     private Person genericAcquisitionPerson;
 
@@ -1924,7 +1926,7 @@ public class Campaign implements ITechManager {
 
         checkDuplicateNamesDuringAdd(en);
         addReport(ACQUISITIONS, unit.getHyperlinkedName() + " has been added to the unit roster.");
-        if (!suppressUnitNewEvents) {
+        if (!bulkGenerationInProgress) {
             MekHQ.triggerEvent(new UnitNewEvent(unit));
         }
 
@@ -2169,28 +2171,30 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Whether {@link #addNewUnit(Entity, boolean, int, PartQuality)} is currently suppressing its
-     * per-unit {@link UnitNewEvent}. See {@link #setSuppressUnitNewEvents(boolean)}.
+     * Whether a bulk generation (for example the force generator) is currently adding units/parts off
+     * the Swing event dispatch thread. See {@link #setBulkGenerationInProgress(boolean)}.
      *
-     * @return {@code true} while per-unit add events are suppressed
+     * @return {@code true} while a bulk generation is in progress
      */
-    public boolean isSuppressUnitNewEvents() {
-        return suppressUnitNewEvents;
+    public boolean isBulkGenerationInProgress() {
+        return bulkGenerationInProgress;
     }
 
     /**
-     * Controls whether {@link #addNewUnit(Entity, boolean, int, PartQuality)} fires a
-     * {@link UnitNewEvent} for each unit added. A bulk operation that adds many units off the Swing
-     * event dispatch thread (for example force generation) should set this to {@code true} for its
-     * duration - always in a {@code try}/{@code finally} so it is cleared even on failure - so that
-     * event-driven GUI refreshes do not fire mid-operation and read half-built campaign state. The
-     * operation is responsible for firing a single refresh event (such as
-     * {@link mekhq.campaign.events.OrganizationChangedEvent}) once it completes.
+     * Marks that a bulk operation is adding many units/parts off the Swing event dispatch thread (for
+     * example force generation). A caller should set this to {@code true} for the operation's duration -
+     * always in a {@code try}/{@code finally} so it is cleared even on failure - so that event-driven
+     * GUI work does not fire mid-operation and read half-built campaign state off the EDT:
+     * {@link #addNewUnit(Entity, boolean, int, PartQuality)} skips its per-unit {@link UnitNewEvent},
+     * and timer-driven tab refreshes that walk the mutating campaign (such as the Command Center
+     * cargo/summary computation) skip while it is set. The operation is responsible for firing a single
+     * refresh event (such as {@link mekhq.campaign.events.OrganizationChangedEvent}) once it completes.
      *
-     * @param suppressUnitNewEvents {@code true} to suppress per-unit add events, {@code false} to restore them
+     * @param bulkGenerationInProgress {@code true} while the bulk operation runs, {@code false} to restore
+     *                                 normal GUI updates
      */
-    public void setSuppressUnitNewEvents(boolean suppressUnitNewEvents) {
-        this.suppressUnitNewEvents = suppressUnitNewEvents;
+    public void setBulkGenerationInProgress(boolean bulkGenerationInProgress) {
+        this.bulkGenerationInProgress = bulkGenerationInProgress;
     }
 
     /**
