@@ -95,11 +95,29 @@ public class StratConHydrology {
         return instance;
     }
 
+    /**
+     * Test seam: loads the hydrology profiles from an explicit path and installs the result as the singleton.
+     *
+     * <p>Production resolves {@link MHQConstants#STRAT_CON_HYDROLOGY_PROFILES_PATH}, which lives under the
+     * {@code data}
+     * directory that is built when the application launches. That directory does not exist in the test environment, so
+     * tests point this at their own copy under {@code testresources} instead.</p>
+     *
+     * @param path the file to load the hydrology profiles from
+     */
+    public static void loadForTest(String path) {
+        instance = load(path);
+    }
+
     private static StratConHydrology load() {
-        File file = new File(MHQConstants.STRAT_CON_HYDROLOGY_PROFILES_PATH);
+        return load(MHQConstants.STRAT_CON_HYDROLOGY_PROFILES_PATH);
+    }
+
+    private static StratConHydrology load(String path) {
+        File file = new File(path);
         if (!file.exists()) {
             LOGGER.warn("Hydrology profiles file {} does not exist; using a single default profile",
-                  MHQConstants.STRAT_CON_HYDROLOGY_PROFILES_PATH);
+                  path);
             return new StratConHydrology(DEFAULT_SIGMA, List.of(DEFAULT_PROFILE));
         }
 
@@ -112,7 +130,7 @@ public class StratConHydrology {
             Library library = mapper.readValue(file, Library.class);
             if ((library == null) || (library.profiles() == null) || library.profiles().isEmpty()) {
                 LOGGER.warn("Hydrology profiles file {} held no profiles; using a single default profile",
-                      MHQConstants.STRAT_CON_HYDROLOGY_PROFILES_PATH);
+                      path);
                 return new StratConHydrology(DEFAULT_SIGMA, List.of(DEFAULT_PROFILE));
             }
 
@@ -126,7 +144,7 @@ public class StratConHydrology {
 
             if (validProfiles.isEmpty()) {
                 LOGGER.warn("Hydrology profiles file {} held no recognizable profiles; using a single default profile",
-                      MHQConstants.STRAT_CON_HYDROLOGY_PROFILES_PATH);
+                      path);
                 return new StratConHydrology(DEFAULT_SIGMA, List.of(DEFAULT_PROFILE));
             }
 
@@ -134,7 +152,7 @@ public class StratConHydrology {
             return new StratConHydrology(sigma, validProfiles);
         } catch (IOException e) {
             LOGGER.error("Error reading hydrology profiles from {}; using a single default profile",
-                  MHQConstants.STRAT_CON_HYDROLOGY_PROFILES_PATH, e);
+                  path, e);
             return new StratConHydrology(DEFAULT_SIGMA, List.of(DEFAULT_PROFILE));
         }
     }

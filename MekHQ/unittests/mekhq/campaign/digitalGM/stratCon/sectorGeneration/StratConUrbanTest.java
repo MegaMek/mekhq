@@ -40,7 +40,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import mekhq.campaign.digitalGM.stratCon.StratConTestData;
 import mekhq.campaign.universe.enums.HPGRating;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -48,6 +50,11 @@ import org.junit.jupiter.api.Test;
  * authored {@code UrbanProfiles.yaml}.
  */
 class StratConUrbanTest {
+
+    @BeforeAll
+    static void loadStratConData() {
+        StratConTestData.install();
+    }
 
     private static StratConUrban urban() {
         return StratConUrban.getInstance();

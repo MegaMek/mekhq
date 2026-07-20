@@ -437,11 +437,28 @@ public class StratConBiomeManifest {
         return manifest;
     }
 
+    /**
+     * Test seam: loads the biome manifest from an explicit path and installs the result as the singleton.
+     *
+     * <p>Production resolves {@link MHQConstants#STRAT_CON_BIOME_MANIFEST_PATH}, which lives under the {@code data}
+     * directory that is built when the application launches. That directory does not exist in the test environment, so
+     * tests point this at their own copy under {@code testresources} instead.</p>
+     *
+     * @param path the file to load the biome manifest from
+     */
+    public static void loadForTest(String path) {
+        instance = load(path);
+    }
+
     private static StratConBiomeManifest load() {
+        return load(MHQConstants.STRAT_CON_BIOME_MANIFEST_PATH);
+    }
+
+    private static StratConBiomeManifest load(String path) {
         StratConBiomeManifest resultingManifest;
-        File inputFile = new File(MHQConstants.STRAT_CON_BIOME_MANIFEST_PATH);
+        File inputFile = new File(path);
         if (!inputFile.exists()) {
-            logger.warn("Specified file {} does not exist", MHQConstants.STRAT_CON_BIOME_MANIFEST_PATH);
+            logger.warn("Specified file {} does not exist", path);
             return null;
         }
 

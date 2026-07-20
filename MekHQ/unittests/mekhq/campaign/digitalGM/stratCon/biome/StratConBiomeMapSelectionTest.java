@@ -37,13 +37,16 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import mekhq.campaign.digitalGM.stratCon.StratConTestData;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest.MapTypeList;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -51,13 +54,19 @@ import org.junit.jupiter.api.Test;
  * pool-less terrains fall back to their category pool, and unknown terrain falls back to NEUTRAL.
  */
 class StratConBiomeMapSelectionTest {
-    private static final StratConBiomeManifest MANIFEST = StratConBiomeManifest.getInstance();
 
-    /** Where the map generator definitions live once the data files have been staged into the build. */
-    private static final String STAGED_MAP_GEN_PATH = "./data/mapgen";
+    // Resolved in @BeforeAll, not here: a static initializer would run before the test fixtures are installed and
+    // would cache the empty default manifest.
+    private static StratConBiomeManifest MANIFEST;
 
-    /** Where they live in the mm-data source, used when nothing has been staged yet. */
+    /** Where the map generator definitions live in the mm-data source. */
     private static final String MM_DATA_MAP_GEN_PATH = "../../mm-data/data/mapgen";
+
+    @BeforeAll
+    static void loadStratConData() {
+        StratConTestData.install();
+        MANIFEST = StratConBiomeManifest.getInstance();
+    }
 
     @Test
     void exactTerrainPool_winsOverCategoryFallback() {
@@ -166,7 +175,13 @@ class StratConBiomeMapSelectionTest {
     @Test
     void everyDeclaredMapTypeHasAMapGeneratorFile() {
         // Guards against typos anywhere in the manifest's map pools: every named board must exist on disk.
-        File mapGenDirectory = mapGenDirectory();
+        //
+        // The boards themselves are not copied into testresources - there are 148 of them - so this checks the mm-data
+        // source and stands down when that is not checked out. It is a data-validation test rather than a behavioural
+        // one, and has nothing to say when the data it validates is absent.
+        File mapGenDirectory = new File(MM_DATA_MAP_GEN_PATH);
+        assumeTrue(mapGenDirectory.isDirectory(),
+              "mm-data is not available at " + mapGenDirectory.getAbsolutePath() + "; skipping board-name validation");
         List<String> missing = new ArrayList<>();
         for (Map.Entry<String, MapTypeList> entry : MANIFEST.getBiomeMapTypes().entrySet()) {
             for (String mapType : entry.getValue().mapTypes) {
@@ -180,22 +195,4 @@ class StratConBiomeMapSelectionTest {
               "map pools name mapgen files that do not exist under " + mapGenDirectory + ": " + missing);
     }
 
-    /**
-     * @return the directory holding the map generator definitions: the staged copy when the data files have been
-     *       staged, otherwise the mm-data source they are staged from. A fresh checkout has no staged data until
-     *       {@code stageDataFiles} runs, so falling back to the source keeps this test meaningful in CI and in a clean
-     *       local tree rather than failing for want of a build step.
-     */
-    private static File mapGenDirectory() {
-        File staged = new File(STAGED_MAP_GEN_PATH);
-        if (staged.isDirectory()) {
-            return staged;
-        }
-
-        File source = new File(MM_DATA_MAP_GEN_PATH);
-        assertTrue(source.isDirectory(),
-              "Neither staged data nor mm-data source found. Run stageDataFiles first, or ensure mm-data is available"
-                    + " at: " + source.getAbsolutePath());
-        return source;
-    }
 }

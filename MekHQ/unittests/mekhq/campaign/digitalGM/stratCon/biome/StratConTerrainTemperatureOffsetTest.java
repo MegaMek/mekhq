@@ -39,6 +39,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
+import mekhq.campaign.digitalGM.stratCon.StratConTestData;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -46,6 +48,11 @@ import org.junit.jupiter.api.Test;
  * both the selected-hex readout and the real board temperature of every launched scenario.
  */
 class StratConTerrainTemperatureOffsetTest {
+
+    @BeforeAll
+    static void loadStratConData() {
+        StratConTestData.install();
+    }
 
     @Test
     void temperateTerrain_hasNoOffset() {

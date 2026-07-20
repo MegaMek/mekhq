@@ -87,11 +87,28 @@ public class StratConSectorShape {
         return instance;
     }
 
+    /**
+     * Test seam: loads the sector shape profiles from an explicit path and installs the result as the singleton.
+     *
+     * <p>Production resolves {@link MHQConstants#STRAT_CON_SECTOR_SHAPE_PROFILES_PATH}, which lives under the
+     * {@code data} directory that is built when the application launches. That directory does not exist in the test
+     * environment, so tests point this at their own copy under {@code testresources} instead.</p>
+     *
+     * @param path the file to load the sector shape profiles from
+     */
+    public static void loadForTest(String path) {
+        instance = load(path);
+    }
+
     private static StratConSectorShape load() {
-        File file = new File(MHQConstants.STRAT_CON_SECTOR_SHAPE_PROFILES_PATH);
+        return load(MHQConstants.STRAT_CON_SECTOR_SHAPE_PROFILES_PATH);
+    }
+
+    private static StratConSectorShape load(String path) {
+        File file = new File(path);
         if (!file.exists()) {
             LOGGER.warn("Sector shape profiles file {} does not exist; sectors will be square",
-                  MHQConstants.STRAT_CON_SECTOR_SHAPE_PROFILES_PATH);
+                  path);
             return new StratConSectorShape(List.of(DEFAULT_PROFILE));
         }
 
@@ -104,7 +121,7 @@ public class StratConSectorShape {
             Library library = mapper.readValue(file, Library.class);
             if ((library == null) || (library.profiles() == null) || library.profiles().isEmpty()) {
                 LOGGER.warn("Sector shape profiles file {} held no profiles; sectors will be square",
-                      MHQConstants.STRAT_CON_SECTOR_SHAPE_PROFILES_PATH);
+                      path);
                 return new StratConSectorShape(List.of(DEFAULT_PROFILE));
             }
 
@@ -115,14 +132,14 @@ public class StratConSectorShape {
                                                            .toList();
             if (validProfiles.isEmpty()) {
                 LOGGER.warn("Sector shape profiles file {} held no recognizable profiles; sectors will be square",
-                      MHQConstants.STRAT_CON_SECTOR_SHAPE_PROFILES_PATH);
+                      path);
                 return new StratConSectorShape(List.of(DEFAULT_PROFILE));
             }
 
             return new StratConSectorShape(validProfiles);
         } catch (IOException e) {
             LOGGER.error("Error reading sector shape profiles from {}; sectors will be square",
-                  MHQConstants.STRAT_CON_SECTOR_SHAPE_PROFILES_PATH, e);
+                  path, e);
             return new StratConSectorShape(List.of(DEFAULT_PROFILE));
         }
     }

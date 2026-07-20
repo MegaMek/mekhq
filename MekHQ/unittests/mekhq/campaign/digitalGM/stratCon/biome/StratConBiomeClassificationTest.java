@@ -46,6 +46,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
+import mekhq.campaign.digitalGM.stratCon.StratConTestData;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -53,6 +55,11 @@ import org.junit.jupiter.api.Test;
  * {@code terrainType} definitions in the biome manifest.
  */
 class StratConBiomeClassificationTest {
+
+    @BeforeAll
+    static void loadStratConData() {
+        StratConTestData.install();
+    }
 
     private static StratConTerrainCategory category(String terrainType) {
         return StratConBiomeManifest.getInstance().getTerrainCategory(terrainType);

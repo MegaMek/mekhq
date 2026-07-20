@@ -40,8 +40,10 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 
 import megamek.common.loaders.MapSettings;
+import mekhq.campaign.digitalGM.stratCon.StratConTestData;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 import mekhq.campaign.mission.AtBScenario;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -49,6 +51,11 @@ import org.junit.jupiter.api.Test;
  * from a scenario's StratCon hex context.
  */
 class StratConMapTunerTest {
+
+    @BeforeAll
+    static void loadStratConData() {
+        StratConTestData.install();
+    }
 
     /** A scenario stub whose hex carries no road, no water, and no city; tests override the parts they exercise. */
     private static AtBScenario scenario(String terrain) {

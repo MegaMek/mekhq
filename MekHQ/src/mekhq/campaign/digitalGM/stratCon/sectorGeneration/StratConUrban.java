@@ -110,11 +110,28 @@ public class StratConUrban {
               List.of(DEFAULT_PROFILE));
     }
 
+    /**
+     * Test seam: loads the urban profiles from an explicit path and installs the result as the singleton.
+     *
+     * <p>Production resolves {@link MHQConstants#STRAT_CON_URBAN_PROFILES_PATH}, which lives under the {@code data}
+     * directory that is built when the application launches. That directory does not exist in the test environment, so
+     * tests point this at their own copy under {@code testresources} instead.</p>
+     *
+     * @param path the file to load the urban profiles from
+     */
+    public static void loadForTest(String path) {
+        instance = load(path);
+    }
+
     private static StratConUrban load() {
-        File file = new File(MHQConstants.STRAT_CON_URBAN_PROFILES_PATH);
+        return load(MHQConstants.STRAT_CON_URBAN_PROFILES_PATH);
+    }
+
+    private static StratConUrban load(String path) {
+        File file = new File(path);
         if (!file.exists()) {
             LOGGER.warn("Urban profiles file {} does not exist; using a single default profile",
-                  MHQConstants.STRAT_CON_URBAN_PROFILES_PATH);
+                  path);
             return fallback();
         }
 
@@ -127,7 +144,7 @@ public class StratConUrban {
             Library library = mapper.readValue(file, Library.class);
             if ((library == null) || (library.profiles() == null) || library.profiles().isEmpty()) {
                 LOGGER.warn("Urban profiles file {} held no profiles; using a single default profile",
-                      MHQConstants.STRAT_CON_URBAN_PROFILES_PATH);
+                      path);
                 return fallback();
             }
 
@@ -138,7 +155,7 @@ public class StratConUrban {
                                                      .toList();
             if (validProfiles.isEmpty()) {
                 LOGGER.warn("Urban profiles file {} held no recognizable profiles; using a single default profile",
-                      MHQConstants.STRAT_CON_URBAN_PROFILES_PATH);
+                      path);
                 return fallback();
             }
 
@@ -149,7 +166,7 @@ public class StratConUrban {
                   validProfiles);
         } catch (IOException e) {
             LOGGER.error("Error reading urban profiles from {}; using a single default profile",
-                  MHQConstants.STRAT_CON_URBAN_PROFILES_PATH, e);
+                  path, e);
             return fallback();
         }
     }

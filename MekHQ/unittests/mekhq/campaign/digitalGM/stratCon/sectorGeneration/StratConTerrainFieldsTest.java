@@ -37,13 +37,21 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
+import mekhq.campaign.digitalGM.stratCon.StratConTestData;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
  * Tests for {@link StratConTerrainFields}: the moisture, relief-distance, rain-shadow, and coldness fields.
  */
 class StratConTerrainFieldsTest {
+
+    @BeforeAll
+    static void loadStratConData() {
+        StratConTestData.install();
+    }
+
     private static final int SIZE = 20;
 
     private static StratConTrackState track() {

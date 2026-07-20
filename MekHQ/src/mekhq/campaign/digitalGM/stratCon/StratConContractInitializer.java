@@ -138,16 +138,12 @@ public class StratConContractInitializer {
         // work properly
         contract.setStratConCampaignState(campaignState);
 
-        // First, initialize the proper number of tracks. Then:
-        // for each objective:
-        // step 1: calculate objective count
-        // if scaled, multiply # required lances by factor, round up, otherwise just
-        // fixed #
-        // step 2: evenly distribute objectives through tracks
-        // if uneven number remaining, distribute randomly
-        // when objective is specific scenario victory, place specially flagged
-        // scenarios
-        // when objective is allied/hostile facility, place those facilities
+        // First, initialize the proper number of tracks. Then: for each objective:
+        // step 1: calculate objective count if scaled, multiply # required lances by factor, round up, otherwise just
+        // fixed number
+        // step 2: evenly distribute objectives through tracks if uneven number is remaining, distribute randomly
+        // when objective is specific scenario victory, place specially flagged scenarios when objective is
+        // allied/hostile facility, place those facilities
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         boolean isUseMaplessMode = campaignOptions.isUseStratConMaplessMode();

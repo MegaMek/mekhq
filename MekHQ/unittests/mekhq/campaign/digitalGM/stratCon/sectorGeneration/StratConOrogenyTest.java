@@ -39,6 +39,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import mekhq.campaign.digitalGM.stratCon.StratConTestData;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -46,6 +48,11 @@ import org.junit.jupiter.api.Test;
  * the authored {@code OrogenyProfiles.yaml}.
  */
 class StratConOrogenyTest {
+
+    @BeforeAll
+    static void loadStratConData() {
+        StratConTestData.install();
+    }
 
     private static StratConOrogeny orogeny() {
         return StratConOrogeny.getInstance();

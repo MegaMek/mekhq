@@ -38,6 +38,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
+import mekhq.campaign.digitalGM.stratCon.StratConTestData;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -45,6 +47,11 @@ import org.junit.jupiter.api.Test;
  * authored {@code HydrologyProfiles.yaml}.
  */
 class StratConHydrologyTest {
+
+    @BeforeAll
+    static void loadStratConData() {
+        StratConTestData.install();
+    }
 
     private static StratConHydrology hydrology() {
         return StratConHydrology.getInstance();

@@ -41,8 +41,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
+import mekhq.campaign.digitalGM.stratCon.StratConTestData;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -50,6 +52,11 @@ import org.junit.jupiter.api.Test;
  * exactly its open water.
  */
 class StratConSectorGeneratorTest {
+
+    @BeforeAll
+    static void loadStratConData() {
+        StratConTestData.install();
+    }
 
     private static StratConTrackState track(int width, int height, int temperatureCelsius) {
         StratConTrackState track = new StratConTrackState();

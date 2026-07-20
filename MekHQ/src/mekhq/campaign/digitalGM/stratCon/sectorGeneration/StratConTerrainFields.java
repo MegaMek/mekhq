@@ -89,8 +89,8 @@ public final class StratConTerrainFields {
         int width = track.getWidth();
         int height = track.getHeight();
 
-        int[][] waterDistance = bfsDistance(track, StratConBiomeManifest::isOceanTerrain);
-        int[][] reliefDistance = bfsDistance(track, StratConTerrainFields::isRelief);
+        int[][] waterDistance = breadthFirstDistance(track, StratConBiomeManifest::isOceanTerrain);
+        int[][] reliefDistance = breadthFirstDistance(track, StratConTerrainFields::isRelief);
         boolean[][] rainShadow = computeRainShadow(track, windDirection);
         double[][] coldness = computeColdness(track, latitudeBand);
         int moistureReach = max(3, (int) round(max(width, height) * 0.5));
@@ -139,7 +139,7 @@ public final class StratConTerrainFields {
     /**
      * Multi-source breadth-first distance from every hex matching {@code isSource} to every other hex.
      */
-    private static int[][] bfsDistance(StratConTrackState track, Predicate<String> isSource) {
+    private static int[][] breadthFirstDistance(StratConTrackState track, Predicate<String> isSource) {
         int width = track.getWidth();
         int height = track.getHeight();
         int[][] distance = new int[width][height];

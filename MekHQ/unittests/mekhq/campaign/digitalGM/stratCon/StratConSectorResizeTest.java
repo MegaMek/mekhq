@@ -49,6 +49,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer.ResizeImpac
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.universe.Faction;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -56,6 +57,11 @@ import org.junit.jupiter.api.Test;
  * discarded, but its occupants are moved back inside rather than destroyed.
  */
 class StratConSectorResizeTest {
+
+    @BeforeAll
+    static void loadStratConData() {
+        StratConTestData.install();
+    }
     private static final String TERRAIN = "Plains";
 
     private static StratConTrackState track(int width, int height) {

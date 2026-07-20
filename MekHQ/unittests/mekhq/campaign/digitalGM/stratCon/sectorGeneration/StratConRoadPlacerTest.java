@@ -43,10 +43,12 @@ import java.util.List;
 import java.util.Set;
 
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
+import mekhq.campaign.digitalGM.stratCon.StratConTestData;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityType;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -54,6 +56,11 @@ import org.junit.jupiter.api.Test;
  * avoiding mountains where cheaper, keeping widely-separated landmasses independent, and branching off the map.
  */
 class StratConRoadPlacerTest {
+
+    @BeforeAll
+    static void loadStratConData() {
+        StratConTestData.install();
+    }
 
     private static StratConTrackState landTrack(int width, int height) {
         StratConTrackState track = new StratConTrackState();

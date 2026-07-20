@@ -42,9 +42,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
+import mekhq.campaign.digitalGM.stratCon.StratConTestData;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 import mekhq.campaign.universe.enums.HPGRating;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -52,6 +54,12 @@ import org.junit.jupiter.api.Test;
  * arrangement.
  */
 class StratConCityPlacerTest {
+
+    @BeforeAll
+    static void loadStratConData() {
+        StratConTestData.install();
+    }
+
     private static final int SIZE = 20;
 
     private static PlanetProfile planet(Long population) {

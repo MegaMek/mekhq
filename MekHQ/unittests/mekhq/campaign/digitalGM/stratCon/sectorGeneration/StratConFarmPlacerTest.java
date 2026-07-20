@@ -39,9 +39,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
+import mekhq.campaign.digitalGM.stratCon.StratConTestData;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 import mekhq.campaign.universe.enums.HPGRating;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -49,6 +51,12 @@ import org.junit.jupiter.api.Test;
  * and never on the city hex itself.
  */
 class StratConFarmPlacerTest {
+
+    @BeforeAll
+    static void loadStratConData() {
+        StratConTestData.install();
+    }
+
     private static final int SIZE = 20;
 
     /** A fertile, well-settled, high-tech world, so the farming scale is high and farms reliably appear. */

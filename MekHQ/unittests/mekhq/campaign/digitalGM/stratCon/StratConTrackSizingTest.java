@@ -45,12 +45,18 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.LatitudeBand;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.PlanetProfile;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.SectorSpec;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
  * Tests for the sizing and temperature behaviour of {@link StratConContractInitializer#initializeTrackState}.
  */
 class StratConTrackSizingTest {
+
+    @BeforeAll
+    static void loadStratConData() {
+        StratConTestData.install();
+    }
     private static final int NEUTRAL_TEMPERATURE = 25;
 
     private static CampaignOptions options(boolean alternateCount, boolean condense, double sizeMultiplier) {
