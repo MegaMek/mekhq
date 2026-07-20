@@ -142,8 +142,13 @@ public final class SupportPersonnelToTOE {
             return;
         }
 
+        LOGGER.info("[CompanyGen][SupportTOE] organize START: {} support persons -> maintenance={} medical={} command={} (clan={}); role histogram: {}",
+              supportPersonnel.size(), maintenance.size(), medical.size(), command.size(), useClanStructure,
+              roleHistogram(supportPersonnel));
+
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         Formation hqFormation = AddSupportUnitsToTOE.getHqFormation(campaign);
+        LOGGER.info("[CompanyGen][SupportTOE] HQ formation '{}'(id={})", hqFormation.getName(), hqFormation.getId());
         FormationLevel commandLevel = useClanStructure ? FormationLevel.CLUSTER : FormationLevel.REGIMENT;
         Formation supportCommand = createFormation(campaign, label("supportCommand"),
               FormationType.SUPPORT, hqFormation, commandLevel);
@@ -227,6 +232,8 @@ public final class SupportPersonnelToTOE {
         for (CarrierSpec spec : packed) {
             (spec.topTier() ? topTierCarriers : detachmentCarriers).add(spec);
         }
+        LOGGER.info("[CompanyGen][SupportTOE]   section '{}': {} staff, {} crewed onto vehicles, packed into {} top-tier + {} detachment carrier(s); detachments hang directly off the section",
+              sectionLabel, people.size(), consumed, topTierCarriers.size(), detachmentCarriers.size());
 
         // Top-tier carriers (platoons / Points) roll up into a function-named company / Star formation
         // (e.g. "Headquarters Company", "Maintenance Company"), numbered only when there is more than
@@ -317,12 +324,23 @@ public final class SupportPersonnelToTOE {
         return byRole;
     }
 
+    /** Renders a {@code role=count} histogram of the given people for the generation log. */
+    private static String roleHistogram(List<Person> people) {
+        List<String> parts = new ArrayList<>();
+        for (Map.Entry<PersonnelRole, List<Person>> entry : groupByPrimaryRole(people).entrySet()) {
+            parts.add(entry.getKey().name() + "=" + entry.getValue().size());
+        }
+        return String.join(", ", parts);
+    }
+
     /** Packs each profession in {@code people} into its own carriers via {@link #packPool}. */
     private static List<CarrierSpec> packByProfession(List<Person> people, EchelonProfile profile,
           boolean useClanStructure) {
         List<CarrierSpec> specs = new ArrayList<>();
         for (Map.Entry<PersonnelRole, List<Person>> roleEntry : groupByPrimaryRole(people).entrySet()) {
             String professionLabel = roleEntry.getKey().getLabel(useClanStructure);
+            LOGGER.info("[CompanyGen][SupportTOE]   packByProfession role='{}' count={}",
+                  professionLabel, roleEntry.getValue().size());
             specs.addAll(packPool(roleEntry.getValue(), profile, professionLabel));
         }
         return specs;
@@ -349,6 +367,8 @@ public final class SupportPersonnelToTOE {
 
         int remainder = total - index;
         if (remainder == 0) {
+            LOGGER.info("[CompanyGen][SupportTOE]     packPool '{}': total={} -> {} full {} (no remainder)",
+                  label, total, fullTopUnits, profile.topUnitName());
             return specs;
         }
 
@@ -357,15 +377,21 @@ public final class SupportPersonnelToTOE {
         // remainder / squadSize > squadsPerTopUnit - 0.5.
         if (remainder * 2 > 2 * profile.topUnitSize() - profile.squadUnitSize()) {
             specs.add(new CarrierSpec(profile.topUnitName(), crewSlice(people, index, remainder), true, label));
+            LOGGER.info("[CompanyGen][SupportTOE]     packPool '{}': total={} -> {} full {} + 1 understaffed {} (remainder {} promoted to top tier)",
+                  label, total, fullTopUnits, profile.topUnitName(), profile.topUnitName(), remainder);
             return specs;
         }
 
+        int squadCount = 0;
         while (remainder > 0) {
             int crewSize = Math.min(profile.squadUnitSize(), remainder);
             specs.add(new CarrierSpec(profile.squadUnitName(), crewSlice(people, index, crewSize), false, label));
             index += crewSize;
             remainder -= crewSize;
+            squadCount++;
         }
+        LOGGER.info("[CompanyGen][SupportTOE]     packPool '{}': total={} -> {} full {} + {} detachment {}(s)",
+              label, total, fullTopUnits, profile.topUnitName(), squadCount, profile.squadUnitName());
         return specs;
     }
 
@@ -387,7 +413,25 @@ public final class SupportPersonnelToTOE {
         Unit unit = createCarrierUnit(campaign, spec);
         if (unit != null) {
             campaign.addUnitToFormation(unit, parent.getId());
+            LOGGER.info("[CompanyGen][SupportTOE]     filed carrier '{}' ({}) unitId={} crew={} topTier={} under '{}'(id={})",
+                  spec.unitName(), spec.professionLabel(), unit.getId(), spec.crew().size(), spec.topTier(),
+                  parent.getName(), parent.getId());
+        } else {
+            // The unit failed to load, so its crew never made it into the TOE and stay loose in the
+            // roster - the classic "orphaned support personnel" symptom. Log loudly with the crew so a
+            // playtest can see exactly who was dropped and which carrier name failed to resolve.
+            LOGGER.warn("[CompanyGen][SupportTOE]     carrier '{}' ({}) FAILED to load; {} crew left unassigned (orphans): {}",
+                  spec.unitName(), spec.professionLabel(), spec.crew().size(), crewNames(spec.crew()));
         }
+    }
+
+    /** Comma-joined full names of the crew, for orphan diagnostics. */
+    private static String crewNames(List<Person> crew) {
+        List<String> names = new ArrayList<>();
+        for (Person person : crew) {
+            names.add(person.getFullName());
+        }
+        return String.join(", ", names);
     }
 
     /**
@@ -436,6 +480,9 @@ public final class SupportPersonnelToTOE {
         formation.setFormationType(type, true);
         // Set an explicit level so FormationIconBuilder can pick a shape for the support formations.
         formation.setFormationLevel(level);
+        LOGGER.info("[CompanyGen][SupportTOE]   createFormation name='{}' id={} type={} level={} under '{}'(id={})",
+              name, formation.getId(), type, level, parent == null ? "null" : parent.getName(),
+              parent == null ? -1 : parent.getId());
         return formation;
     }
 

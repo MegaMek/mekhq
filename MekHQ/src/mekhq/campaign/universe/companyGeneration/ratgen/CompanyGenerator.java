@@ -439,12 +439,10 @@ public final class CompanyGenerator {
         // generateSupportFromToe so support can be (re)generated against the committed TOE, and gated
         // on generateSupport so combat can be committed on its own (phase one of two-phase generation).
         if (generateSupport) {
+            // generateSupportFromToe applies TOE icons to the support formations it creates, so no
+            // separate re-decoration pass is needed here.
             generatedPersons.addAll(generateSupportFromToe(campaign, options, listener));
         }
-
-        // Re-decorate the formation tree so the support formations created in this stage (they did
-        // not exist when Stage 7b applied icons) also get layered TOE icons.
-        FormationIconBuilder.applyIcons(campaign.getFormations(), campaign, options);
 
         // 7d. Personnel flags driven by the Setup tab toggles: commander flag on the top-formation
         // officer, founder flag on every fresh hire (combat + support after the 7e merge above),
@@ -519,6 +517,13 @@ public final class CompanyGenerator {
         if (!campaignOptions.getPrisonerCaptureStyle().isNone()) {
             SupportUnitGenerator.generateSecurityUnits(campaign, supportFaction, true);
         }
+
+        // Decorate the support formations created above with layered TOE icons. This must happen here
+        // (not only at the tail of applyToCampaign) because the two-phase Command Designer flow calls
+        // this method directly, after applyToCampaign already ran its icon pass with no support
+        // formations in the tree - so without this call the support command commits with blank icons.
+        LOGGER.info("[CompanyGen][Pipeline]Stage 7e: applying formation icons to support formations");
+        FormationIconBuilder.applyIcons(campaign.getFormations(), campaign, options);
 
         return supportResult.generatedPersons();
     }
