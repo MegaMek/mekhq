@@ -59,6 +59,7 @@ import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityFactory;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConGMs;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.LatitudeBand;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.PlanetProfile;
+import mekhq.campaign.digitalGM.stratCon.sectorGeneration.SectorShapeProfile;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.SectorSpec;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorGenerator;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorPlanner;
@@ -904,7 +905,8 @@ public class StratConContractInitializer {
     private record SectorDimensions(int width, int height) {}
 
     /**
-     * Lays a sector's area out into width and height, rolling a fresh {@link SectorShapeProfile} for the proportions.
+     * Lays a sector's area out into width and height, rolling a fresh {@link SectorShapeProfile#SectorShapeProfile} for
+     * the proportions.
      *
      * @param totalHexes the area to lay out
      *
