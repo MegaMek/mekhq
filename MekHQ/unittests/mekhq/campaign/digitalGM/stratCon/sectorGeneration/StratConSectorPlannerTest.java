@@ -51,12 +51,8 @@ import org.junit.jupiter.api.Test;
 class StratConSectorPlannerTest {
     private static final int LEGACY_LANCES_PER_SECTOR = StratConContractInitializer.NUM_FORMATIONS_PER_TRACK;
 
-    private static long countWithUnits(List<SectorSpec> specs, int units) {
-        return specs.stream().filter(spec -> spec.unitCount() == units).count();
-    }
-
-    private static int totalUnits(List<SectorSpec> specs) {
-        return specs.stream().mapToInt(SectorSpec::unitCount).sum();
+    private static int totalTeams(List<SectorSpec> specs) {
+        return specs.stream().mapToInt(SectorSpec::requiredLances).sum();
     }
 
     private static void assertEveryLatitudeAssigned(List<SectorSpec> specs) {
@@ -72,7 +68,6 @@ class StratConSectorPlannerTest {
 
         assertEquals(3, specs.size());
         specs.forEach(spec -> {
-            assertEquals(1, spec.unitCount());
             assertEquals(LEGACY_LANCES_PER_SECTOR, spec.requiredLances());
         });
         assertEveryLatitudeAssigned(specs);
@@ -102,7 +97,6 @@ class StratConSectorPlannerTest {
 
         assertEquals(1, specs.size());
         assertEquals(1, specs.get(0).requiredLances());
-        assertEquals(1, specs.get(0).unitCount());
     }
 
     @Test
@@ -111,7 +105,6 @@ class StratConSectorPlannerTest {
         List<SectorSpec> specs = generateSectorSpecs(135, false, true);
 
         assertEquals(45, specs.size());
-        specs.forEach(spec -> assertEquals(1, spec.unitCount()));
     }
 
     // ---- Alternate count (condense off) ----
@@ -122,7 +115,6 @@ class StratConSectorPlannerTest {
 
         assertEquals(1, specs.size());
         assertEquals(ALTERNATE_FORMATIONS_PER_SECTOR, specs.get(0).requiredLances());
-        assertEquals(1, specs.get(0).unitCount());
     }
 
     @Test
@@ -137,7 +129,6 @@ class StratConSectorPlannerTest {
         List<SectorSpec> specs = generateSectorSpecs(90, true, true);
 
         assertEquals(MAXIMUM_SECTORS, specs.size());
-        specs.forEach(spec -> assertEquals(1, spec.unitCount()));
     }
 
     @Test
@@ -145,56 +136,62 @@ class StratConSectorPlannerTest {
         List<SectorSpec> specs = generateSectorSpecs(135, true, false);
 
         assertEquals(15, specs.size());
-        specs.forEach(spec -> assertEquals(1, spec.unitCount()));
     }
 
     // ---- Condensed layout (alternate count and condense on) ----
 
     @Test
-    void condensed_fifteenSectors_splitsIntoFiveDoubleAndFiveSingle() {
-        List<SectorSpec> specs = generateSectorSpecs(135, true, true); // 135 / 9 = 15 desired
-
-        assertEquals(MAXIMUM_SECTORS, specs.size());
-        assertEquals(5, countWithUnits(specs, 2));
-        assertEquals(5, countWithUnits(specs, 1));
-        assertEquals(15, totalUnits(specs));
-    }
-
-    @Test
-    void condensed_twentyFiveSectors_splitsIntoFiveTripleAndFiveDouble() {
-        List<SectorSpec> specs = generateSectorSpecs(225, true, true); // 225 / 9 = 25 desired
-
-        assertEquals(MAXIMUM_SECTORS, specs.size());
-        assertEquals(5, countWithUnits(specs, 3));
-        assertEquals(5, countWithUnits(specs, 2));
-        assertEquals(25, totalUnits(specs));
-    }
-
-    @Test
-    void condensed_scalesRequiredLancesWithUnitCount() {
-        List<SectorSpec> specs = generateSectorSpecs(225, true, true);
-
-        specs.forEach(spec -> assertEquals(spec.unitCount() * ALTERNATE_FORMATIONS_PER_SECTOR, spec.requiredLances()));
-    }
-
-    @Test
-    void condensed_leadingSectorsAreLarger() {
+    void condensed_fifteenSectorsWorthOfForceFitsIntoTen() {
+        // 135 teams would make fifteen sectors uncondensed; condensed they share out across ten, 13-14 teams apiece.
         List<SectorSpec> specs = generateSectorSpecs(135, true, true);
 
-        // The uneven extra unit goes to the earlier ("older") sectors.
-        assertEquals(2, specs.get(0).unitCount());
-        assertEquals(1, specs.get(specs.size() - 1).unitCount());
+        assertEquals(MAXIMUM_SECTORS, specs.size());
+        assertEquals(135, totalTeams(specs), "condensing should redistribute the teams, not drop them");
+        specs.forEach(spec -> assertTrue((spec.requiredLances() == 13) || (spec.requiredLances() == 14),
+              "expected an even 13-14 team split, got " + spec.requiredLances()));
     }
 
     @Test
-    void condensed_preservesTotalAreaAcrossManyForceSizes() {
+    void condensed_neverExceedsTheSectorCap() {
+        List<SectorSpec> specs = generateSectorSpecs(225, true, true); // 225 / 9 = 25 sectors uncondensed
+
+        assertEquals(MAXIMUM_SECTORS, specs.size());
+    }
+
+    @Test
+    void condensed_sharesEveryTeamOutAcrossTheSectors() {
+        // Condensing must not lose or invent teams: the contract's whole force is still accounted for.
+        List<SectorSpec> specs = generateSectorSpecs(225, true, true);
+
+        assertEquals(225, totalTeams(specs), "condensing should redistribute the teams, not drop them");
+    }
+
+    @Test
+    void condensed_spreadsTheExtraEvenlyRatherThanEnlargingTheLeadingSectors() {
+        // Previously the surplus piled onto the earlier sectors, leaving some enormous and the rest ordinary. Sharing
+        // it out means no sector differs from another by more than the one team an integer split cannot divide.
+        List<SectorSpec> specs = generateSectorSpecs(225, true, true);
+
+        int smallest = specs.stream().mapToInt(SectorSpec::requiredLances).min().orElseThrow();
+        int largest = specs.stream().mapToInt(SectorSpec::requiredLances).max().orElseThrow();
+
+        assertTrue((largest - smallest) <= 1,
+              "sectors should be within one team of each other, but ranged " + smallest + " to " + largest);
+    }
+
+    @Test
+    void condensed_staysEvenAcrossManyForceSizes() {
         for (int desired = MAXIMUM_SECTORS + 1; desired <= 40; desired++) {
             int teams = desired * ALTERNATE_FORMATIONS_PER_SECTOR;
             List<SectorSpec> specs = generateSectorSpecs(teams, true, true);
 
             assertEquals(MAXIMUM_SECTORS, specs.size());
-            assertEquals(desired, totalUnits(specs), "total units should equal the uncondensed desired count");
-            assertTrue(specs.stream().allMatch(spec -> spec.unitCount() >= 1));
+            assertEquals(teams, totalTeams(specs), "every team should still be accounted for at " + teams);
+
+            int smallest = specs.stream().mapToInt(SectorSpec::requiredLances).min().orElseThrow();
+            int largest = specs.stream().mapToInt(SectorSpec::requiredLances).max().orElseThrow();
+            assertTrue((largest - smallest) <= 1, "uneven split at " + teams + " teams");
+            assertTrue(smallest >= 1, "every sector needs at least one team");
         }
     }
 }

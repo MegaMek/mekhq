@@ -33,6 +33,7 @@
 package mekhq.campaign.digitalGM.stratCon.sectorGeneration;
 
 import static java.lang.Math.max;
+import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static mekhq.campaign.digitalGM.stratCon.StratConContractInitializer.NUM_FORMATIONS_PER_TRACK;
 
@@ -75,8 +76,9 @@ public final class StratConSectorPlanner {
      * @param requiredCombatFormations the contract's required combat formation count
      * @param alternateCount           {@code true} to use the alternate one-sector-per-nine-teams count; {@code false}
      *                                 for the legacy one-sector-per-three-teams layout
-     * @param condenseSectors          {@code true} to cap the sector count at {@link #MAXIMUM_SECTORS} by enlarging
-     *                                 sectors; only honored when {@code alternateCount} is {@code true}
+     * @param condenseSectors          {@code true} to cap the sector count at {@link #MAXIMUM_SECTORS}, sharing the
+     *                                 teams that would have formed further sectors across the ones that remain; only
+     *                                 honored when {@code alternateCount} is {@code true}
      *
      * @return a non-empty list of sector specs
      */
@@ -96,53 +98,60 @@ public final class StratConSectorPlanner {
 
         int fullSectors = max(0, requiredCombatFormations / NUM_FORMATIONS_PER_TRACK);
         for (int index = 0; index < fullSectors; index++) {
-            specs.add(new SectorSpec(1, NUM_FORMATIONS_PER_TRACK, LatitudeBand.random()));
+            specs.add(new SectorSpec(NUM_FORMATIONS_PER_TRACK, LatitudeBand.random()));
         }
 
         int remainder = requiredCombatFormations % NUM_FORMATIONS_PER_TRACK;
         if (remainder > 0) {
-            specs.add(new SectorSpec(1, remainder, LatitudeBand.random()));
+            specs.add(new SectorSpec(remainder, LatitudeBand.random()));
         }
 
         // Never generate a contract with zero sectors.
         if (specs.isEmpty()) {
-            specs.add(new SectorSpec(1, 1, LatitudeBand.random()));
+            specs.add(new SectorSpec(1, LatitudeBand.random()));
         }
 
         return specs;
     }
 
     /**
-     * Generates the alternate-count layout (roughly one sector per nine combat teams), optionally condensed to at most
-     * {@link #MAXIMUM_SECTORS} sectors.
+     * Generates the alternate-count layout: roughly one sector per {@link #ALTERNATE_FORMATIONS_PER_SECTOR} combat
+     * teams, capped at {@link #MAXIMUM_SECTORS} when condensing is enabled.
+     *
+     * <p>The contract's teams are then shared out evenly across however many sectors that leaves. Condensing therefore
+     * makes every sector a little larger rather than making the first few enormous and the rest ordinary.</p>
      */
     private static List<SectorSpec> generateAlternateSpecs(int requiredCombatFormations, boolean condenseSectors) {
-        int desiredSectors = max(1, (int) round(requiredCombatFormations / (double) ALTERNATE_FORMATIONS_PER_SECTOR));
+        int desiredSectors = max(1,
+              (int) round(requiredCombatFormations / (double) ALTERNATE_FORMATIONS_PER_SECTOR));
 
-        if (condenseSectors && (desiredSectors > MAXIMUM_SECTORS)) {
-            return generateCondensedSpecs(desiredSectors);
+        if (condenseSectors) {
+            desiredSectors = min(desiredSectors, MAXIMUM_SECTORS);
         }
 
-        List<SectorSpec> specs = new ArrayList<>();
-        for (int index = 0; index < desiredSectors; index++) {
-            specs.add(new SectorSpec(1, ALTERNATE_FORMATIONS_PER_SECTOR, LatitudeBand.random()));
-        }
-        return specs;
+        return shareTeamsEvenly(requiredCombatFormations, desiredSectors);
     }
 
     /**
-     * Distributes {@code desiredSectors} size units across exactly {@link #MAXIMUM_SECTORS} sectors as evenly as
-     * possible, giving the leading ("older") sectors the extra unit when the split is uneven. For example, 15 desired
-     * sectors become five double-sized and five single-sized; 25 become five triple-sized and five double-sized.
+     * Splits the contract's combat teams as evenly as possible across the given number of sectors, so no sector ends up
+     * markedly bigger than its neighbours. Any teams left over by the division are handed one each to the leading
+     * sectors, which is the closest an integer split can get to even.
+     *
+     * @param requiredCombatFormations the contract's total required combat teams
+     * @param sectorCount              how many sectors to split them across, at least one
+     *
+     * @return one spec per sector, each carrying its share of the teams
      */
-    private static List<SectorSpec> generateCondensedSpecs(int desiredSectors) {
-        int baseUnits = desiredSectors / MAXIMUM_SECTORS;
-        int remainder = desiredSectors % MAXIMUM_SECTORS;
+    private static List<SectorSpec> shareTeamsEvenly(int requiredCombatFormations, int sectorCount) {
+        int sectors = max(1, sectorCount);
+        int baseTeams = requiredCombatFormations / sectors;
+        int remainder = requiredCombatFormations % sectors;
 
         List<SectorSpec> specs = new ArrayList<>();
-        for (int index = 0; index < MAXIMUM_SECTORS; index++) {
-            int units = baseUnits + ((index < remainder) ? 1 : 0);
-            specs.add(new SectorSpec(units, units * ALTERNATE_FORMATIONS_PER_SECTOR, LatitudeBand.random()));
+        for (int index = 0; index < sectors; index++) {
+            // A sector always demands at least one team, however small the contract.
+            int teams = max(1, baseTeams + ((index < remainder) ? 1 : 0));
+            specs.add(new SectorSpec(teams, LatitudeBand.random()));
         }
         return specs;
     }
