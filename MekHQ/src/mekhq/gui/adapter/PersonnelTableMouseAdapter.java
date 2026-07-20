@@ -482,11 +482,16 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     person.setPrimaryRole(getCampaign(), role);
                     writePersonalityDescription(person);
                     writeInterviewersNotes(person);
-                    getCampaign().personUpdated(person);
+                    Campaign campaign = getCampaign();
+                    campaign.getPlayerForce().getHumanResources().personUpdated(campaign, person);
                     if (getCampaignOptions().isUsePortraitForRole(role) &&
                               getCampaignOptions().isAssignPortraitOnRoleChange() &&
                               person.getPortrait().hasDefaultFilename()) {
-                        getCampaign().assignRandomPortraitFor(person);
+                        Campaign campaign1 = getCampaign();
+                        campaign1.getPlayerForce()
+                              .getHumanResources()
+                              .assignRandomPortraitFor(campaign1.getCampaignOptions(),
+                                    person);
                     }
                 }
                 break;
@@ -495,17 +500,18 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 PersonnelRole role = PersonnelRole.valueOf(data[1]);
                 for (final Person person : people) {
                     person.setSecondaryRole(role);
-                    getCampaign().personUpdated(person);
+                    Campaign campaign = getCampaign();
+                    campaign.getPlayerForce().getHumanResources().personUpdated(campaign, person);
                 }
                 break;
             }
             case CMD_ADD_PREGNANCY: {
                 Stream.of(people)
                       .filter(person -> person.getGender().isFemale())
-                      .filter(person -> (getCampaign().getProcreation()
+                      .filter(person -> (getCampaign().getPlayerForce().getHumanResources().getProcreation()
                                                .canProcreate(getCampaign().getLocalDate(), person, false) == null))
                       .forEach(person -> {
-                          getCampaign().getProcreation()
+                          getCampaign().getPlayerForce().getHumanResources().getProcreation()
                                 .addPregnancy(getCampaign(), getCampaign().getLocalDate(), person, false);
                           MekHQ.triggerEvent(new PersonChangedEvent(person));
                       });
@@ -513,15 +519,18 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_REMOVE_PREGNANCY: {
                 Stream.of(people).filter(Person::isPregnant).forEach(person -> {
-                    getCampaign().getProcreation().removePregnancy(person);
+                    getCampaign().getPlayerForce().getHumanResources().getProcreation().removePregnancy(person);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 });
                 break;
             }
             case CMD_REMOVE_SPOUSE: {
                 Stream.of(people)
-                      .filter(person -> getCampaign().getDivorce().canDivorce(person, false) == null)
-                      .forEach(person -> getCampaign().getDivorce()
+                      .filter(person -> getCampaign().getPlayerForce()
+                                              .getHumanResources()
+                                              .getDivorce()
+                                              .canDivorce(person, false) == null)
+                      .forEach(person -> getCampaign().getPlayerForce().getHumanResources().getDivorce()
                                                .divorce(getCampaign(),
                                                      getCampaign().getLocalDate(),
                                                      person,
@@ -529,11 +538,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_ADD_SPOUSE: {
-                getCampaign().getMarriage()
+                Campaign campaign = getCampaign();
+                final UUID id = UUID.fromString(data[1]);
+                getCampaign().getPlayerForce().getHumanResources().getMarriage()
                       .marry(getCampaign(),
                             getCampaign().getLocalDate(),
                             selectedPerson,
-                            getCampaign().getPerson(UUID.fromString(data[1])),
+                            campaign.getPlayerForce().getHumanResources().getPerson(id),
                             MergingSurnameStyle.valueOf(data[2]),
                             false);
                 break;
@@ -700,7 +711,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       selectedPerson.getHyperlinkedName(),
                       skillName));
 
-                getCampaign().personUpdated(selectedPerson);
+                Campaign campaign = getCampaign();
+                campaign.getPlayerForce().getHumanResources().personUpdated(campaign, selectedPerson);
                 break;
             }
             case CMD_REPLENISH_EDGE: {
@@ -718,7 +730,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 selectedPerson.removeSkill(skillType.getName());
                 selectedPerson.awardXP(getCampaign(), refundValue);
 
-                getCampaign().personUpdated(selectedPerson);
+                Campaign campaign = getCampaign();
+                campaign.getPlayerForce().getHumanResources().personUpdated(campaign, selectedPerson);
                 break;
             }
             case CMD_BUY_TRAIT: {
@@ -738,7 +751,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                 selectedPerson.spendXP(cost);
 
-                getCampaign().personUpdated(selectedPerson);
+                Campaign campaign = getCampaign();
+                campaign.getPlayerForce().getHumanResources().personUpdated(campaign, selectedPerson);
                 break;
             }
             case CMD_CHANGE_ATTRIBUTE: {
@@ -749,7 +763,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 int cost = MathUtility.parseInt(data[2]);
                 selectedPerson.spendXP(cost);
 
-                getCampaign().personUpdated(selectedPerson);
+                Campaign campaign = getCampaign();
+                campaign.getPlayerForce().getHumanResources().personUpdated(campaign, selectedPerson);
                 break;
             }
             case CMD_SET_ATTRIBUTE: {
@@ -771,7 +786,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 for (Person person : people) {
                     person.setAttributeScore(attribute, choice);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
-                    getCampaign().personUpdated(person);
+                    Campaign campaign = getCampaign();
+                    campaign.getPlayerForce().getHumanResources().personUpdated(campaign, person);
                 }
 
                 break;
@@ -813,7 +829,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     person.setPrimaryRole(getCampaign(), randomProfession);
 
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
-                    getCampaign().personUpdated(person);
+                    Campaign campaign = getCampaign();
+                    campaign.getPlayerForce().getHumanResources().personUpdated(campaign, person);
                 }
 
                 break;
@@ -829,7 +846,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 getCampaign().addReport(PERSONNEL, String.format(resources.getString("removed.format"),
                       selectedPerson.getHyperlinkedName(),
                       displayName));
-                getCampaign().personUpdated(selectedPerson);
+                Campaign campaign = getCampaign();
+                campaign.getPlayerForce().getHumanResources().personUpdated(campaign, selectedPerson);
                 break;
             }
             case CMD_ACQUIRE_ABILITY: {
@@ -842,7 +860,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 getCampaign().addReport(PERSONNEL, String.format(resources.getString("gained.format"),
                       selectedPerson.getHyperlinkedName(),
                       displayName));
-                getCampaign().personUpdated(selectedPerson);
+                Campaign campaign = getCampaign();
+                campaign.getPlayerForce().getHumanResources().personUpdated(campaign, selectedPerson);
                 break;
             }
             case CMD_ACQUIRE_WEAPON_SPECIALIST: {
@@ -860,7 +879,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 getCampaign().addReport(PERSONNEL, String.format(resources.getString("gained.format"),
                       selectedPerson.getHyperlinkedName(),
                       displayName));
-                getCampaign().personUpdated(selectedPerson);
+                Campaign campaign = getCampaign();
+                campaign.getPlayerForce().getHumanResources().personUpdated(campaign, selectedPerson);
                 break;
             }
             case CMD_ACQUIRE_SANDBLASTER: {
@@ -876,7 +896,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 getCampaign().addReport(PERSONNEL, String.format(resources.getString("gained.format"),
                       selectedPerson.getHyperlinkedName(),
                       displayName));
-                getCampaign().personUpdated(selectedPerson);
+                Campaign campaign = getCampaign();
+                campaign.getPlayerForce().getHumanResources().personUpdated(campaign, selectedPerson);
                 break;
             }
             case CMD_ACQUIRE_SPECIALIST: {
@@ -892,7 +913,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 getCampaign().addReport(PERSONNEL, String.format(resources.getString("gained.format"),
                       selectedPerson.getHyperlinkedName(),
                       displayName));
-                getCampaign().personUpdated(selectedPerson);
+                Campaign campaign = getCampaign();
+                campaign.getPlayerForce().getHumanResources().personUpdated(campaign, selectedPerson);
                 break;
             }
             case CMD_ACQUIRE_RANGEMASTER: {
@@ -910,7 +932,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 getCampaign().addReport(PERSONNEL, String.format(resources.getString("gained.format"),
                       selectedPerson.getHyperlinkedName(),
                       displayName));
-                getCampaign().personUpdated(selectedPerson);
+                Campaign campaign = getCampaign();
+                campaign.getPlayerForce().getHumanResources().personUpdated(campaign, selectedPerson);
                 break;
             }
             case CMD_ACQUIRE_ENVIRONMENT_SPECIALIST: {
@@ -926,7 +949,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 getCampaign().addReport(PERSONNEL, String.format(resources.getString("gained.format"),
                       selectedPerson.getHyperlinkedName(),
                       displayName));
-                getCampaign().personUpdated(selectedPerson);
+                Campaign campaign = getCampaign();
+                campaign.getPlayerForce().getHumanResources().personUpdated(campaign, selectedPerson);
                 break;
             }
             case CMD_ACQUIRE_HUMAN_TRO: {
@@ -942,7 +966,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 getCampaign().addReport(PERSONNEL, String.format(resources.getString("gained.format"),
                       selectedPerson.getHyperlinkedName(),
                       displayName));
-                getCampaign().personUpdated(selectedPerson);
+                Campaign campaign = getCampaign();
+                campaign.getPlayerForce().getHumanResources().personUpdated(campaign, selectedPerson);
                 break;
             }
             case CMD_ACQUIRE_CUSTOM_CHOICE: {
@@ -956,7 +981,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 getCampaign().addReport(PERSONNEL, String.format(resources.getString("spaGainedChoices.format"),
                       selectedPerson.getHyperlinkedName(),
                       displayName));
-                getCampaign().personUpdated(selectedPerson);
+                Campaign campaign = getCampaign();
+                campaign.getPlayerForce().getHumanResources().personUpdated(campaign, selectedPerson);
                 break;
             }
             case CMD_CHANGE_STATUS: {
@@ -1033,7 +1059,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_ADOPTION: {
-                Person orphan = getCampaign().getPerson(UUID.fromString(data[1]));
+                Campaign campaign = getCampaign();
+                final UUID id = UUID.fromString(data[1]);
+                Person orphan = campaign.getPlayerForce().getHumanResources().getPerson(id);
                 if (orphan == null) {
                     LOGGER.error("Could not find orphaned person with UUID {}. No changes will be made.", data[1]);
                     return;
@@ -1084,7 +1112,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_ADD_PARENT: {
-                Person newParent = getCampaign().getPerson(UUID.fromString(data[1]));
+                Campaign campaign = getCampaign();
+                final UUID id = UUID.fromString(data[1]);
+                Person newParent = campaign.getPlayerForce().getHumanResources().getPerson(id);
                 if (newParent == null) {
                     LOGGER.warn("Could not find new parent with UUID {}. No changes will be made.", data[1]);
                     return;
@@ -1100,7 +1130,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_REMOVE_PARENT: {
-                Person oldParent = getCampaign().getPerson(UUID.fromString(data[1]));
+                Campaign campaign = getCampaign();
+                final UUID id = UUID.fromString(data[1]);
+                Person oldParent = campaign.getPlayerForce().getHumanResources().getPerson(id);
                 if (oldParent == null) {
                     LOGGER.warn("Could not find old parent with UUID {}. No changes will be made.", data[1]);
                     return;
@@ -1116,7 +1148,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_ADD_CHILD: {
-                Person newChild = getCampaign().getPerson(UUID.fromString(data[1]));
+                Campaign campaign = getCampaign();
+                final UUID id = UUID.fromString(data[1]);
+                Person newChild = campaign.getPlayerForce().getHumanResources().getPerson(id);
                 if (newChild == null) {
                     LOGGER.warn("Could not find new child with UUID {}. No changes will be made.", data[1]);
                     return;
@@ -1132,7 +1166,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_REMOVE_CHILD: {
-                Person oldChild = getCampaign().getPerson(UUID.fromString(data[1]));
+                Campaign campaign = getCampaign();
+                final UUID id = UUID.fromString(data[1]);
+                Person oldChild = campaign.getPlayerForce().getHumanResources().getPerson(id);
                 if (oldChild == null) {
                     LOGGER.warn("Could not find old child with UUID {}. No changes will be made.", data[1]);
                     return;
@@ -1167,7 +1203,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                           total.toAmountAndSymbolString()));
                     getCampaign().addFunds(TransactionType.RANSOM, total, resources.getString("ransom.text"));
                     for (Person person : people) {
-                        getCampaign().removePerson(person, false);
+                        Campaign campaign = getCampaign();
+                        campaign.getPlayerForce().getHumanResources().removePerson(campaign, person, false);
                     }
                 }
                 break;
@@ -1178,7 +1215,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                          .map(person -> person.getRansomValue(getCampaign()))
                                          .collect(Collectors.toList()));
 
-                if (getCampaign().getFunds().isLessThan(total)) {
+                if (getCampaign().getPlayerForce().getFunds().isLessThan(total)) {
                     getCampaign().addReport(FINANCES, String.format(resources.getString("unableToRansom.format"),
                           people.length,
                           total.toAmountAndSymbolString()));
@@ -1208,11 +1245,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     boolean status = Boolean.parseBoolean(data[2]);
                     for (Person person : people) {
                         person.setEdgeTrigger(trigger, status);
-                        getCampaign().personUpdated(person);
+                        Campaign campaign = getCampaign();
+                        campaign.getPlayerForce().getHumanResources().personUpdated(campaign, person);
                     }
                 } else {
                     selectedPerson.changeEdgeTrigger(trigger);
-                    getCampaign().personUpdated(selectedPerson);
+                    Campaign campaign = getCampaign();
+                    campaign.getPlayerForce().getHumanResources().personUpdated(campaign, selectedPerson);
                 }
                 break;
             }
@@ -1226,7 +1265,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                 resources.getString("removeQ.text"),
                                 JOptionPane.YES_NO_OPTION)) {
                     for (Person person : people) {
-                        getCampaign().removePerson(person);
+                        Campaign campaign = getCampaign();
+                        campaign.getPlayerForce().getHumanResources().removePerson(campaign, person);
                     }
                 }
                 break;
@@ -1237,7 +1277,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 if (getCampaignOptions().isUseStratCon()) {
                     for (Person person : people) {
                         if (!person.getPrimaryRole().isCivilian()) {
-                            if (getCampaign().getRetirementDefectionTracker()
+                            if (getCampaign().getPlayerForce().getHumanResources().getRetirementDefectionTracker()
                                       .removeFromCampaign(person, false, true, getCampaign(), null)) {
                                 showDialog = true;
                             } else {
@@ -1255,11 +1295,15 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     if (rdd.wasAborted() ||
                               !getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments())) {
                         for (Person person : people) {
-                            getCampaign().getRetirementDefectionTracker().removePayout(person);
+                            getCampaign().getPlayerForce()
+                                  .getHumanResources()
+                                  .getRetirementDefectionTracker()
+                                  .removePayout(person);
                         }
                     } else {
                         for (final Person person : toRemove) {
-                            getCampaign().removePerson(person);
+                            Campaign campaign = getCampaign();
+                            campaign.getPlayerForce().getHumanResources().removePerson(campaign, person);
                         }
                     }
                 } else {
@@ -1275,7 +1319,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                     resources.getString("removeQ.text"),
                                     JOptionPane.YES_NO_OPTION)) {
                         for (Person person : people) {
-                            getCampaign().removePerson(person);
+                            Campaign campaign = getCampaign();
+                            campaign.getPlayerForce().getHumanResources().removePerson(campaign, person);
                         }
                     }
                 }
@@ -1283,7 +1328,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_EMPLOY: {
                 for (Person person : people) {
-                    getCampaign().employCampFollower(person);
+                    Campaign campaign = getCampaign();
+                    campaign.getPlayerForce().getHumanResources().employCampFollower(campaign, person);
                 }
 
                 break;
@@ -1306,7 +1352,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         }
 
                         String report = performExtremeExpenditure(person,
-                              getCampaign().getFinances(),
+                              getCampaign().getPlayerForce().getFinances(),
                               getCampaign().getLocalDate());
                         getCampaign().addReport(FINANCES, report);
 
@@ -1346,7 +1392,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     Money bounty = bloodmark.getBounty();
                     String bountyReport = String.format(resources.getString("bloodmark.transaction"),
                           person.getFullName());
-                    getCampaign().getFinances().credit(TransactionType.RANSOM, today, bounty, bountyReport);
+                    getCampaign().getPlayerForce()
+                          .getFinances()
+                          .credit(TransactionType.RANSOM, today, bounty, bountyReport);
                     person.changeStatus(getCampaign(), today, PersonnelStatus.HOMICIDE);
                     if (person.getPrisonerStatus().isFree()) { // Deliberately excluding Bondsmen from this check
                         validBounty = true;
@@ -1361,14 +1409,15 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_FAMILY_TREE: {
                 new FamilyTreeDialog(gui.getFrame(),
                       selectedPerson.getGenealogy(),
-                      getCampaign().getPersonnel().values());
+                      getCampaign().getPlayerForce().getPersonnel().values());
                 break;
             }
             case CMD_EDIT: {
                 for (Person person : people) {
                     CustomizePersonDialog npd = new CustomizePersonDialog(getFrame(), true, person, getCampaign());
                     npd.setVisible(true);
-                    getCampaign().personUpdated(selectedPerson);
+                    Campaign campaign = getCampaign();
+                    campaign.getPlayerForce().getHumanResources().personUpdated(campaign, selectedPerson);
                 }
                 break;
             }
@@ -1380,7 +1429,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 if (0 == selectedPerson.getHits()) {
                     selectedPerson.setDoctorId(null, getCampaignOptions().getNaturalHealingWaitingPeriod());
                 }
-                getCampaign().personUpdated(selectedPerson);
+                Campaign campaign = getCampaign();
+                campaign.getPlayerForce().getHumanResources().personUpdated(campaign, selectedPerson);
                 break;
             }
             case CMD_EDIT_PORTRAIT: {
@@ -1390,7 +1440,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     for (Person person : people) {
                         if (!person.getPortrait().equals(portraitDialog.getSelectedItem())) {
                             person.setPortrait(portraitDialog.getSelectedItem());
-                            getCampaign().personUpdated(person);
+                            Campaign campaign = getCampaign();
+                            campaign.getPlayerForce().getHumanResources().personUpdated(campaign, person);
                         }
                     }
                 }
@@ -1607,7 +1658,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       selectedPerson.getCallsign());
                 if (null != s) {
                     selectedPerson.setCallsign(s);
-                    getCampaign().personUpdated(selectedPerson);
+                    Campaign campaign = getCampaign();
+                    campaign.getPlayerForce().getHumanResources().personUpdated(campaign, selectedPerson);
                 }
                 break;
             }
@@ -1679,7 +1731,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_ADD_RANDOM_DISEASE: {
                 InjuryType disease = DiseaseService.catchRandomDisease();
                 Inoculations.triggerDiseaseSpreadMessages(getCampaign(),
-                      !getCampaign().getCurrentLocation().isOnPlanet(),
+                      !getCampaign().getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet(),
                       Set.of(disease.getSimpleName()));
                 for (Person person : people) {
                     Inoculations.applyDisease(getCampaign(), person, disease);
@@ -1745,7 +1797,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
 
-                getCampaign().getFinances().debit(TransactionType.MISCELLANEOUS,
+                getCampaign().getPlayerForce().getFinances().debit(TransactionType.MISCELLANEOUS,
                       getCampaign().getLocalDate(),
                       totalPayment,
                       resources.getString("givePayment.format"));
@@ -1845,7 +1897,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         }
                         effectiveIgnoreDice = true;
                     }
-                    getCampaign().checkBloodnameAdd(person, effectiveIgnoreDice);
+                    Campaign campaign = getCampaign();
+                    campaign.getPlayerForce().getHumanResources().checkBloodnameAdd(campaign,
+                          person,
+                          effectiveIgnoreDice);
                 }
                 break;
             }
@@ -1858,21 +1913,31 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_RANDOM_PORTRAIT: {
                 for (final Person person : people) {
-                    getCampaign().assignRandomPortraitFor(person);
+                    Campaign campaign = getCampaign();
+                    campaign.getPlayerForce().getHumanResources().assignRandomPortraitFor(campaign.getCampaignOptions(),
+                          person);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
             }
             case CMD_RANDOM_ORIGIN: {
                 for (final Person person : people) {
-                    getCampaign().assignRandomOriginFor(person);
+                    Campaign campaign = getCampaign();
+                    campaign.getPlayerForce()
+                          .getHumanResources()
+                          .assignRandomOriginFor(campaign, campaign.getCampaignOptions(),
+                                person);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
             }
             case CMD_RANDOM_ORIGIN_FACTION: {
                 for (final Person person : people) {
-                    final Faction faction = getCampaign().getFactionSelector().selectFaction(getCampaign());
+                    Campaign campaign = getCampaign();
+                    final Faction faction = campaign.getPlayerForce()
+                                                  .getHumanResources()
+                                                  .getFactionSelector(campaign.getCampaignOptions())
+                                                  .selectFaction(getCampaign());
                     if (faction != null) {
                         person.setOriginFaction(faction);
                         MekHQ.triggerEvent(new PersonChangedEvent(person));
@@ -1882,7 +1947,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_RANDOM_ORIGIN_PLANET: {
                 for (final Person person : people) {
-                    final Planet planet = getCampaign().getPlanetSelector()
+                    Campaign campaign = getCampaign();
+                    final Planet planet = campaign.getPlayerForce()
+                                                .getHumanResources()
+                                                .getPlanetSelector(campaign.getCampaignOptions())
                                                 .selectPlanet(getCampaign(), person.getOriginFaction());
                     if (planet != null) {
                         person.setOriginPlanet(planet);
@@ -1948,7 +2016,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
               CLOSING_SPAN_TAG,
               actualCost));
 
-        getCampaign().personUpdated(person);
+        Campaign campaign = getCampaign();
+        campaign.getPlayerForce().getHumanResources().personUpdated(campaign, person);
     }
 
     /**
@@ -1967,7 +2036,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private void replaceLimb(String selectedInjury, Person selectedPerson, Campaign campaign) {
         List<Person> suitableDoctors = new ArrayList<>();
 
-        for (Person person : campaign.getActivePersonnel(false, false)) {
+        for (Person person : campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false)) {
             if (person.isDoctor()) {
                 SkillModifierData skillModifierData = person.getSkillModifierData();
                 Skill skill = person.getSkill(S_SURGERY);
@@ -2012,7 +2081,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     return;
                 }
 
-                campaign.getFinances()
+                campaign.getPlayerForce().getFinances()
                       .debit(MEDICAL_EXPENSES,
                             campaign.getLocalDate(),
                             cost,
@@ -2056,7 +2125,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                 JOptionPane.YES_NO_OPTION)) {
                     continue;
                 } else {
-                    getCampaign().employCampFollower(person);
+                    Campaign campaign = getCampaign();
+                    campaign.getPlayerForce().getHumanResources().employCampFollower(campaign, person);
                 }
             }
 
@@ -2123,7 +2193,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
             if (isExecution) {
                 if (getCampaign().getCampaignOptions().isTrackFactionStanding()) {
-                    FactionStandings factionStandings = getCampaign().getFactionStandings();
+                    FactionStandings factionStandings = getCampaign().getPlayerForce().getFactionStandings();
 
                     List<Person> listOfPrisoners = Arrays.asList(prisoners);
                     List<String> reports =
@@ -2143,7 +2213,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
 
             for (Person prisoner : prisoners) {
-                getCampaign().removePerson(prisoner);
+                Campaign campaign = getCampaign();
+                campaign.getPlayerForce().getHumanResources().removePerson(campaign, prisoner);
             }
         }
     }
@@ -2151,7 +2222,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private void loadGMToolsForPerson(Person person) {
         GMToolsDialog gmToolsDialog = new GMToolsDialog(getFrame(), gui, person);
         gmToolsDialog.setVisible(true);
-        getCampaign().personUpdated(person);
+        Campaign campaign = getCampaign();
+        campaign.getPlayerForce().getHumanResources().personUpdated(campaign, person);
     }
 
     private Person[] getSelectedPeople() {
@@ -2184,7 +2256,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         JMenu changeRankMenu = new JMenu(resources.getString("changeRank.text"));
 
         JMenu changeRankSystemMenu = new JMenu(resources.getString("changeRankSystem.text"));
-        final RankSystem campaignRankSystem = getCampaign().getRankSystem();
+        final RankSystem campaignRankSystem = getCampaign().getPlayerForce().getRankSystem();
         // First allow them to revert to the campaign system
         cbMenuItem = new JCheckBoxMenuItem(resources.getString("useCampaignRankSystem.text"));
         cbMenuItem.setSelected(campaignRankSystem.equals(person.getRankSystem()));
@@ -2343,7 +2415,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         popup.add(changeStatusMenu);
 
         if (!StaticChecks.areAnyFree(selected)) {
-            if (getCampaign().getCurrentLocation().isOnPlanet()) {
+            if (getCampaign().getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet()) {
                 popup.add(newMenuItem(resources.getString("free.text"), CMD_FREE));
                 popup.add(newMenuItem(resources.getString("execute.text"), CMD_EXECUTE));
             } else {
@@ -2360,7 +2432,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         }
 
         if ((oneSelected) && (!person.isChild(getCampaign().getLocalDate()))) {
-            List<Person> orphans = getCampaign().getActivePersonnel(true, true)
+            Campaign campaign = getCampaign();
+            List<Person> orphans = campaign.getPlayerForce().getHumanResources().getActivePersonnel(true, true)
                                          .stream()
                                          .filter(child -> (child.isChild(getCampaign().getLocalDate())) &&
                                                                 (!child.getGenealogy().hasLivingParents()))
@@ -2451,7 +2524,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         }
 
         if (getCampaignOptions().isUseManualDivorce() &&
-                  (Stream.of(selected).anyMatch(p -> getCampaign().getDivorce().canDivorce(person, false) == null))) {
+                  (Stream.of(selected).anyMatch(p -> getCampaign().getPlayerForce()
+                                                           .getHumanResources()
+                                                           .getDivorce()
+                                                           .canDivorce(person, false) == null))) {
             menu = new JMenu(resources.getString("removeSpouse.text"));
 
             for (final SplittingSurnameStyle style : SplittingSurnameStyle.values()) {
@@ -2465,7 +2541,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         }
         if (oneSelected && person.getStatus().isActiveFlexible()) {
             if (getCampaignOptions().isUseManualMarriages() &&
-                      (getCampaign().getMarriage().canMarry(getCampaign().getLocalDate(), person, false) == null)) {
+                      getCampaign().getPlayerForce()
+                            .getHumanResources()
+                            .getMarriage()
+                            .canMarry(getCampaign().getLocalDate(), person, false) == null) {
                 menu = new JMenu(resources.getString("chooseSpouse.text"));
                 JMenu maleMenu = new JMenu(resources.getString("spouseMenuMale.text"));
                 JMenu femaleMenu = new JMenu(resources.getString("spouseMenuFemale.text"));
@@ -2475,9 +2554,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                 // Get all safe potential spouses sorted by age and then by surname
                 final Campaign campaign = getCampaign();
-                final AbstractMarriage marriage = campaign.getMarriage();
+                final AbstractMarriage marriage = campaign.getPlayerForce().getHumanResources().getMarriage();
 
-                final List<Person> personnel = campaign.getPersonnel().values()
+                final List<Person> personnel = campaign.getPlayerForce().getPersonnel().values()
                                                      .stream()
                                                      .filter(potentialSpouse -> marriage.safeSpouse(campaign,
                                                            today,
@@ -2493,7 +2572,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                 for (final Person potentialSpouse : personnel) {
                     final String status;
-                    final String founder = potentialSpouse.isFounder() ? resources.getString("spouseFounder.text") : "";
+                    final String founder = potentialSpouse.isFounder() ?
+                                                 resources.getString("spouseFounder.text") :
+                                                 "";
                     if (potentialSpouse.getPrisonerStatus().isBondsman()) {
                         status = String.format(resources.getString("marriageBondsmanDesc.format"),
                               potentialSpouse.getFullName(),
@@ -4016,7 +4097,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             miCommander.setName("miCommander");
             miCommander.setSelected(person.isCommander());
             miCommander.addActionListener(evt -> {
-                getCampaign().getPersonnel().values().stream().filter(Person::isCommander).forEach(commander -> {
+                getCampaign().getPlayerForce()
+                      .getPersonnel()
+                      .values()
+                      .stream()
+                      .filter(Person::isCommander)
+                      .forEach(commander -> {
                     commander.setCommander(false);
                     getCampaign().addReport(PERSONNEL, String.format(resources.getString("removedCommander.format"),
                           commander.getHyperlinkedFullTitle()));
@@ -4037,7 +4123,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             miSecondInCommand.setName("miSecondInCommand");
             miSecondInCommand.setSelected(person.isSecondInCommand());
             miSecondInCommand.addActionListener(evt -> {
-                getCampaign().getPersonnel()
+                getCampaign().getPlayerForce().getPersonnel()
                       .values()
                       .stream()
                       .filter(Person::isSecondInCommand)
@@ -4379,7 +4465,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             if (getCampaignOptions().isUseManualProcreation()) {
                 if (Stream.of(selected)
                           .filter(p -> p.getGender().isFemale())
-                          .anyMatch(p -> getCampaign().getProcreation()
+                          .anyMatch(p -> getCampaign().getPlayerForce().getHumanResources().getProcreation()
                                                .canProcreate(getCampaign().getLocalDate(), p, false) == null)) {
                     menuItem = new JMenuItem(resources.getString(oneSelected ?
                                                                        "addPregnancy.text" :
@@ -4407,7 +4493,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                 if (personParents.size() < 2) {
                     JMenu newParentMenu = new JMenu(resources.getString("parent.add"));
-                    List<Person> potentialParents = new ArrayList<>(getCampaign().getActivePersonnel(false, true)
+                    Campaign campaign = getCampaign();
+                    List<Person> potentialParents = new ArrayList<>(campaign.getPlayerForce()
+                                                                          .getHumanResources()
+                                                                          .getActivePersonnel(false, true)
                                                                           .stream()
                                                                           .filter(p -> (!p.isChild(getCampaign().getLocalDate())))
                                                                           .toList());
@@ -4442,7 +4531,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
 
                 JMenu newChildMenu = new JMenu(resources.getString("child.add"));
-                List<Person> potentialChildren = new ArrayList<>(getCampaign().getActivePersonnel(false, true)
+                Campaign campaign = getCampaign();
+                List<Person> potentialChildren = new ArrayList<>(campaign.getPlayerForce()
+                                                                       .getHumanResources()
+                                                                       .getActivePersonnel(false, true)
                                                                        .stream()
                                                                        .filter(p -> (p.getGenealogy()
                                                                                            .getParents()

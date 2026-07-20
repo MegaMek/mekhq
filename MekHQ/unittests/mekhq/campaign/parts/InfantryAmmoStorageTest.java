@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -69,7 +69,7 @@ public class InfantryAmmoStorageTest {
 
     @Test
     public void infantryAmmoStorageCtorTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         AmmoType ammoType = getAmmoType(EquipmentTypeLookup.INFANTRY_AMMO);
         InfantryWeapon weaponType = getInfantryWeapon(EquipmentTypeLookup.INFANTRY_ASSAULT_RIFLE);
 
@@ -82,7 +82,7 @@ public class InfantryAmmoStorageTest {
 
     @Test
     public void cloneTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         AmmoType ammoType = getAmmoType(EquipmentTypeLookup.INFANTRY_AMMO);
         InfantryWeapon weaponType = getInfantryWeapon(EquipmentTypeLookup.INFANTRY_ASSAULT_RIFLE);
 
@@ -97,7 +97,7 @@ public class InfantryAmmoStorageTest {
 
     @Test
     public void getNewPartTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         AmmoType ammoType = getAmmoType(EquipmentTypeLookup.INFANTRY_AMMO);
         InfantryWeapon weaponType = getInfantryWeapon(EquipmentTypeLookup.INFANTRY_ASSAULT_RIFLE);
 
@@ -112,7 +112,7 @@ public class InfantryAmmoStorageTest {
 
     @Test
     public void getTechAdvancementTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         AmmoType ammoType = getAmmoType(EquipmentTypeLookup.INFANTRY_AMMO);
         InfantryWeapon weaponType = getInfantryWeapon(EquipmentTypeLookup.INFANTRY_ASSAULT_RIFLE);
 
@@ -125,7 +125,7 @@ public class InfantryAmmoStorageTest {
     public void infantryAmmoStorageWriteToXmlTest() throws ParserConfigurationException, SAXException, IOException {
         AmmoType ammoType = getAmmoType(EquipmentTypeLookup.INFANTRY_AMMO);
         InfantryWeapon weaponType = getInfantryWeapon(EquipmentTypeLookup.INFANTRY_ASSAULT_RIFLE);
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         InfantryAmmoStorage ammoStorage = new InfantryAmmoStorage(0, ammoType, 7 * ammoType.getShots(), weaponType,
               mockCampaign);
         ammoStorage.setId(25);
@@ -166,7 +166,7 @@ public class InfantryAmmoStorageTest {
 
     @Test
     public void isSameAmmoTypeTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         AmmoType ammoType = getAmmoType(EquipmentTypeLookup.INFANTRY_AMMO);
         AmmoType otherAmmoType = getAmmoType(EquipmentTypeLookup.INFANTRY_INFERNO_AMMO);
         InfantryWeapon weaponType = getInfantryWeapon(EquipmentTypeLookup.INFANTRY_ASSAULT_RIFLE);
@@ -183,7 +183,7 @@ public class InfantryAmmoStorageTest {
 
     @Test
     public void isCompatibleAmmoTypeTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         AmmoType ammoType = getAmmoType(EquipmentTypeLookup.INFANTRY_AMMO);
         AmmoType otherAmmoType = getAmmoType(EquipmentTypeLookup.INFANTRY_INFERNO_AMMO);
         InfantryWeapon weaponType = getInfantryWeapon(EquipmentTypeLookup.INFANTRY_ASSAULT_RIFLE);
@@ -197,7 +197,7 @@ public class InfantryAmmoStorageTest {
 
     @Test
     public void isSamePartTypeTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         AmmoType ammoType = getAmmoType(EquipmentTypeLookup.INFANTRY_AMMO);
         AmmoType otherAmmoType = getAmmoType(EquipmentTypeLookup.INFANTRY_INFERNO_AMMO);
         InfantryWeapon weaponType = getInfantryWeapon(EquipmentTypeLookup.INFANTRY_ASSAULT_RIFLE);

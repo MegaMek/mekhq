@@ -1,0 +1,70 @@
+/*
+ * Copyright (C) 2026 The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
+ */
+package mekhq.campaign.digitalGM.stratCon;
+
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.digitalGM.IFacilityStrategy;
+
+/**
+ * Digital GM for StratCon <b>Singles</b> play ({@link StratConPlayType#SINGLES}). Singles uses the same no-op facility
+ * handling as Mapless and additionally caps the campaign to a single scenario per week by enabling
+ * {@linkplain #isSingleDropMode() single-drop mode}. This mirrors the legacy engine, where
+ * {@code isUseStratConMaplessMode()} was already {@code true} for Singles.
+ *
+ * @author Illiani
+ * @since 0.51.01
+ */
+public class SinglesStratConGM extends AbstractStratConGM {
+
+    private final IFacilityStrategy noOpFacility = new NoOpFacilityStrategy();
+
+    @Override
+    public String getName() {
+        return StratConPlayType.SINGLES.getLabel();
+    }
+
+    @Override
+    public boolean isEnabled(CampaignOptions campaignOptions) {
+        return campaignOptions.getStratConPlayType() == StratConPlayType.SINGLES;
+    }
+
+    @Override
+    protected boolean isSingleDropMode() {
+        return true;
+    }
+
+    @Override
+    protected IFacilityStrategy getFacilityStrategy() {
+        return noOpFacility;
+    }
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -230,7 +230,7 @@ public class Bloodmark {
 
         if (person.isUnderProtection()) {
             Money cost = bloodmark.getBounty().multipliedBy(2.0);
-            boolean paymentSuccessful = campaign.getFinances()
+            boolean paymentSuccessful = campaign.getPlayerForce().getFinances()
                                               .debit(TransactionType.MISCELLANEOUS,
                                                     campaign.getLocalDate(),
                                                     cost,

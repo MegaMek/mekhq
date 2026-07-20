@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -39,22 +39,34 @@ import static mekhq.campaign.personnel.enums.PersonnelRole.SOLDIER;
 import static mekhq.campaign.personnel.skills.SkillType.S_GUN_MEK;
 import static mekhq.campaign.personnel.skills.SkillType.S_PILOT_MEK;
 import static mekhq.campaign.personnel.skills.SkillType.S_SMALL_ARMS;
+import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.MAX_CRIME_PENALTY;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerMissionEndEvent.GOOD_EVENT_CHANCE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
+import megamek.common.compute.Compute;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 
 /**
  * This class contains unit tests for the {@link PrisonerMissionEndEvent} class, focusing on the functionality and
@@ -68,14 +80,14 @@ class PrisonerMissionEndEventTest {
     @Test
     void testDetermineGoodEventChance_NoCrime() {
         // Setup
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
-        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         LocalDate today = LocalDate.of(3151, 1, 1);
-        when(mockCampaign.getDateOfLastCrime()).thenReturn(null);
+        when(mockCampaign.getPlayerForce().getDateOfLastCrime()).thenReturn(null);
 
         AtBContract contract = new AtBContract("TEST");
         contract.setStartDate(today.minusYears(1));
@@ -94,15 +106,15 @@ class PrisonerMissionEndEventTest {
         final int CRIME_RATING = 5;
 
         // Setup
-        Campaign mockCampaign = mock(Campaign.class);
-        when(mockCampaign.getAdjustedCrimeRating()).thenReturn(CRIME_RATING);
+        Campaign mockCampaign = mockCampaign();
+        when(mockCampaign.getPlayerForce().getAdjustedCrimeRating()).thenReturn(CRIME_RATING);
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
-        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         LocalDate today = LocalDate.of(3151, 1, 1);
-        when(mockCampaign.getDateOfLastCrime()).thenReturn(today);
+        when(mockCampaign.getPlayerForce().getDateOfLastCrime()).thenReturn(today);
 
         AtBContract contract = new AtBContract("TEST");
         contract.setStartDate(today.minusYears(1));
@@ -122,15 +134,15 @@ class PrisonerMissionEndEventTest {
         final int CRIME_RATING = GOOD_EVENT_CHANCE * 2;
 
         // Setup
-        Campaign mockCampaign = mock(Campaign.class);
-        when(mockCampaign.getAdjustedCrimeRating()).thenReturn(CRIME_RATING);
+        Campaign mockCampaign = mockCampaign();
+        when(mockCampaign.getPlayerForce().getAdjustedCrimeRating()).thenReturn(CRIME_RATING);
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
-        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         LocalDate today = LocalDate.of(3151, 1, 1);
-        when(mockCampaign.getDateOfLastCrime()).thenReturn(today);
+        when(mockCampaign.getPlayerForce().getDateOfLastCrime()).thenReturn(today);
 
         AtBContract contract = new AtBContract("TEST");
         contract.setStartDate(today.minusYears(1));
@@ -149,10 +161,10 @@ class PrisonerMissionEndEventTest {
     void testGetRansom_MekWarrior() {
         final int SKILL_LEVEL = 3;
         // Setup
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
-        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
@@ -166,7 +178,7 @@ class PrisonerMissionEndEventTest {
         Person prisoner = new Person(mockCampaign);
         prisoner.addSkill(S_GUN_MEK, SKILL_LEVEL, 0);
         prisoner.addSkill(S_PILOT_MEK, SKILL_LEVEL, 0);
-        prisoner.setPrimaryRole(mockCampaign, MEKWARRIOR);
+        prisoner.setPrimaryRoleDirect(MEKWARRIOR);
 
         // Act
         PrisonerMissionEndEvent endEvent = new PrisonerMissionEndEvent(mockCampaign, contract);
@@ -182,10 +194,10 @@ class PrisonerMissionEndEventTest {
     void testGetRansom_Other() {
         final int SKILL_LEVEL = 3;
         // Setup
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
-        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
@@ -198,7 +210,7 @@ class PrisonerMissionEndEventTest {
 
         Person prisoner = new Person(mockCampaign);
         prisoner.addSkill(S_SMALL_ARMS, SKILL_LEVEL, 0);
-        prisoner.setPrimaryRole(mockCampaign, SOLDIER);
+        prisoner.setPrimaryRoleDirect(SOLDIER);
 
         // Act
         PrisonerMissionEndEvent endEvent = new PrisonerMissionEndEvent(mockCampaign, contract);
@@ -208,5 +220,129 @@ class PrisonerMissionEndEventTest {
 
         // Assert
         assertEquals(expectedValue, actualValue);
+    }
+
+    // The following tests cover the financial, prisoner-removal, and execution outcome helpers. The "GREGification"
+    // merge rerouted these through getPlayerForce().getFinances() / getHumanResources(); the tests pin the direction
+    // of each transaction (credit vs debit) and the sign/cap of the crime penalty so a reroute regression is caught.
+
+    @Test
+    void testPerformRansom_credit_creditsFinances() {
+        // Setup
+        Campaign mockCampaign = mockCampaign();
+        LocalDate today = LocalDate.of(3151, 1, 1);
+        AtBContract contract = new AtBContract("TEST");
+        PrisonerMissionEndEvent endEvent = new PrisonerMissionEndEvent(mockCampaign, contract);
+        Money ransom = Money.of(1000);
+
+        // Act
+        endEvent.performRansom(true, ransom, today);
+
+        // Assert
+        verify(mockCampaign.getPlayerForce().getFinances())
+              .credit(eq(TransactionType.RANSOM), eq(today), eq(ransom), anyString());
+        verify(mockCampaign.getPlayerForce().getFinances(), never())
+              .debit(eq(TransactionType.RANSOM), eq(today), eq(ransom), anyString());
+    }
+
+    @Test
+    void testPerformRansom_debit_debitsFinances() {
+        // Setup
+        Campaign mockCampaign = mockCampaign();
+        LocalDate today = LocalDate.of(3151, 1, 1);
+        AtBContract contract = new AtBContract("TEST");
+        PrisonerMissionEndEvent endEvent = new PrisonerMissionEndEvent(mockCampaign, contract);
+        Money ransom = Money.of(1000);
+
+        // Act
+        endEvent.performRansom(false, ransom, today);
+
+        // Assert
+        verify(mockCampaign.getPlayerForce().getFinances())
+              .debit(eq(TransactionType.RANSOM), eq(today), eq(ransom), anyString());
+        verify(mockCampaign.getPlayerForce().getFinances(), never())
+              .credit(eq(TransactionType.RANSOM), eq(today), eq(ransom), anyString());
+    }
+
+    @Test
+    void testRemoveAllPrisoners_removesEachPrisoner() {
+        // Setup
+        Campaign mockCampaign = mockCampaign();
+        AtBContract contract = new AtBContract("TEST");
+        PrisonerMissionEndEvent endEvent = new PrisonerMissionEndEvent(mockCampaign, contract);
+        Person first = mock(Person.class);
+        Person second = mock(Person.class);
+
+        // Act
+        endEvent.removeAllPrisoners(List.of(first, second));
+
+        // Assert
+        verify(mockCampaign.getPlayerForce().getHumanResources()).removePerson(mockCampaign, first);
+        verify(mockCampaign.getPlayerForce().getHumanResources()).removePerson(mockCampaign, second);
+    }
+
+    @Test
+    void testExecutePrisoners_crimeNoticed_appliesNegativePenaltyAndRecordsDate() {
+        // Setup
+        Campaign mockCampaign = mockCampaign();
+        LocalDate today = LocalDate.of(3151, 1, 1);
+        when(mockCampaign.getLocalDate()).thenReturn(today);
+        AtBContract contract = new AtBContract("TEST");
+        PrisonerMissionEndEvent endEvent = new PrisonerMissionEndEvent(mockCampaign, contract);
+        List<Person> prisoners = List.of(mock(Person.class), mock(Person.class), mock(Person.class));
+
+        // Act
+        try (MockedStatic<Compute> compute = mockStatic(Compute.class)) {
+            compute.when(() -> Compute.randomInt(100)).thenReturn(0); // 0 < 3 -> crime noticed
+
+            endEvent.executePrisoners(prisoners);
+        }
+
+        // Assert — penalty = min(MAX_CRIME_PENALTY, 3 * 2) = 6
+        verify(mockCampaign.getPlayerForce()).changeCrimeRating(-6);
+        verify(mockCampaign.getPlayerForce()).setDateOfLastCrime(today);
+    }
+
+    @Test
+    void testExecutePrisoners_crimeNoticed_penaltyCappedAtMaximum() {
+        // Setup
+        Campaign mockCampaign = mockCampaign();
+        when(mockCampaign.getLocalDate()).thenReturn(LocalDate.of(3151, 1, 1));
+        AtBContract contract = new AtBContract("TEST");
+        PrisonerMissionEndEvent endEvent = new PrisonerMissionEndEvent(mockCampaign, contract);
+        List<Person> prisoners = new ArrayList<>();
+        for (int i = 0; i < 100; i++) { // 100 * 2 = 200, which exceeds MAX_CRIME_PENALTY
+            prisoners.add(mock(Person.class));
+        }
+
+        // Act
+        try (MockedStatic<Compute> compute = mockStatic(Compute.class)) {
+            compute.when(() -> Compute.randomInt(100)).thenReturn(0);
+
+            endEvent.executePrisoners(prisoners);
+        }
+
+        // Assert
+        verify(mockCampaign.getPlayerForce()).changeCrimeRating(-MAX_CRIME_PENALTY);
+    }
+
+    @Test
+    void testExecutePrisoners_crimeUnnoticed_doesNotChangeCrimeRating() {
+        // Setup
+        Campaign mockCampaign = mockCampaign();
+        when(mockCampaign.getLocalDate()).thenReturn(LocalDate.of(3151, 1, 1));
+        AtBContract contract = new AtBContract("TEST");
+        PrisonerMissionEndEvent endEvent = new PrisonerMissionEndEvent(mockCampaign, contract);
+        List<Person> prisoners = List.of(mock(Person.class), mock(Person.class), mock(Person.class));
+
+        // Act
+        try (MockedStatic<Compute> compute = mockStatic(Compute.class)) {
+            compute.when(() -> Compute.randomInt(100)).thenReturn(99); // 99 < 3 is false -> unnoticed
+
+            endEvent.executePrisoners(prisoners);
+        }
+
+        // Assert
+        verify(mockCampaign.getPlayerForce(), never()).changeCrimeRating(anyInt());
     }
 }

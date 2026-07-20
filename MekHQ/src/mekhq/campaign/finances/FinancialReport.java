@@ -164,12 +164,12 @@ public class FinancialReport {
     public static FinancialReport calculate(Campaign campaign) {
         FinancialReport financialReport = new FinancialReport();
 
-        financialReport.cash = campaign.getFinances().getBalance();
-        financialReport.loans = campaign.getFinances().getLoanBalance();
-        financialReport.assets = campaign.getFinances().getTotalAssetValue();
+        financialReport.cash = campaign.getPlayerForce().getFinances().getBalance();
+        financialReport.loans = campaign.getPlayerForce().getFinances().getLoanBalance();
+        financialReport.assets = campaign.getPlayerForce().getFinances().getTotalAssetValue();
         financialReport.rentals = campaign.getTotalRentFeesExcludingBays();
 
-        campaign.getAllHangar().forEachUnit(u -> {
+        campaign.getPlayerForce().getHangar().forEachUnit(u -> {
             Money value = u.getSellValue();
             if (u.getEntity() instanceof Mek) {
                 financialReport.mek = financialReport.mek.plus(value);
@@ -189,8 +189,9 @@ public class FinancialReport {
             }
         });
 
+        //TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
         financialReport.spareParts = financialReport.spareParts.plus(
-              campaign.getAllWarehouse().streamSpareParts()
+              campaign.getPlayerForce().getWarehouse().streamSpareParts()
                     .map(x -> x.getActualValue().multipliedBy(x.getQuantity()))
                     .collect(Collectors.toList()));
 

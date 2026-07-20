@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MegaMek.
  *
@@ -159,7 +159,8 @@ public class QuickTrain {
                   isLogSkillGain,
                   today);
 
-            campaign.personUpdated(person); // Do this last so we're not spamming person update events
+            // Do this last so we're not spamming person update events
+            campaign.getPlayerForce().getHumanResources().personUpdated(campaign, person);
         }
     }
 

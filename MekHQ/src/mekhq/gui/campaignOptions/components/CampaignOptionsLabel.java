@@ -38,6 +38,7 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOpti
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.processWrapSize;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 
 import javax.swing.JLabel;
 
@@ -133,6 +134,28 @@ public class CampaignOptionsLabel extends JLabel {
         setName("lbl" + name);
 
         // Apply font scaling
+        setFontScaling(this, false, 1);
+    }
+
+    /**
+     * Generic constructor for reuse outside Campaign Options. Resolves the text and tooltip from {@code name + ".text"}
+     * and {@code name + ".tooltip"} in the given resource bundle, without the Campaign Options {@code "lbl"} key
+     * prefix.
+     *
+     * @param resourceBundleName the resource bundle to resolve the text and tooltip from
+     * @param name               the resource key base and internal name (no {@code "lbl"} prefix is added)
+     */
+    public CampaignOptionsLabel(String resourceBundleName, String name) {
+        String labelText = getTextAt(resourceBundleName, name + ".text");
+        setText(String.format("<html>%s</html>", labelText));
+        String tooltipText = getTextAt(resourceBundleName, name + ".tooltip");
+        if (!isResourceKeyValid(tooltipText)) {
+            tooltipText = getTextAt(resourceBundleName, name + ".toolTipText");
+        }
+        if (isResourceKeyValid(tooltipText)) {
+            setToolTipText(wordWrap(tooltipText, processWrapSize(null)));
+        }
+        setName("lbl" + name);
         setFontScaling(this, false, 1);
     }
 

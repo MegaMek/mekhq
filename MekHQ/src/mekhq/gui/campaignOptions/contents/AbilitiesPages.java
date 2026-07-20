@@ -35,7 +35,7 @@ package mekhq.gui.campaignOptions.contents;
 import static mekhq.campaign.personnel.SkillPrerequisite.DISPLAY_GROUP_CLOSE;
 import static mekhq.campaign.personnel.SkillPrerequisite.DISPLAY_GROUP_OPEN;
 import static mekhq.campaign.personnel.SkillPrerequisite.DISPLAY_OR_SEPARATOR;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.CAMPAIGN_OPTIONS_PAGE_CONTENT_WIDTH;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.campaignOptionsPageContentWidth;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -576,13 +576,13 @@ public class AbilitiesPages {
         @Override
         public Dimension getPreferredSize() {
             Dimension preferredSize = super.getPreferredSize();
-            return new Dimension(CAMPAIGN_OPTIONS_PAGE_CONTENT_WIDTH, preferredSize.height);
+            return new Dimension(campaignOptionsPageContentWidth(), preferredSize.height);
         }
 
         @Override
         public Dimension getMaximumSize() {
             Dimension maximumSize = super.getMaximumSize();
-            return new Dimension(CAMPAIGN_OPTIONS_PAGE_CONTENT_WIDTH, maximumSize.height);
+            return new Dimension(campaignOptionsPageContentWidth(), maximumSize.height);
         }
 
         private static JPanel newColumnPanel() {

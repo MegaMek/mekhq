@@ -38,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.util.List;
 
@@ -64,7 +65,7 @@ class LocationDispatchTest {
     void setUp() {
         locationManager = new CampaignLocationManager();
         system = mock(PlanetarySystem.class);
-        campaign = mock(Campaign.class);
+        campaign = mockCampaign();
         when(campaign.getCampaignLocationManager()).thenReturn(locationManager);
         when(campaign.getCurrentSystem()).thenReturn(system);
     }

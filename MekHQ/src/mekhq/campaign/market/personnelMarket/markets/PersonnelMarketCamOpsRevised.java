@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -120,7 +120,7 @@ public class PersonnelMarketCamOpsRevised extends NewPersonnelMarket {
         Factions factions = Factions.getInstance();
         Faction mercenaryFaction = factions.getFaction(MERCENARY_FACTION_CODE);
         Faction pirateFaction = factions.getFaction(PIRATE_FACTION_CODE);
-        FactionStandings factionStandings = getCampaign().getFactionStandings();
+        FactionStandings factionStandings = getCampaign().getPlayerForce().getFactionStandings();
 
         for (Faction faction : systemFactions) {
             if (FactionHints.getInstance().isAtWarWith(getCampaignFaction(), faction, getToday())) {

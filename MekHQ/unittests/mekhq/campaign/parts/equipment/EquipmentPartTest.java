@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -40,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -69,8 +70,7 @@ import megamek.common.units.Mek;
 import megamek.common.units.SmallCraft;
 import megamek.common.weapons.bayWeapons.BayWeapon;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Quartermaster;
-import mekhq.campaign.Warehouse;
+import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
@@ -90,7 +90,7 @@ public class EquipmentPartTest {
 
     @Test
     public void equipmentPartCtorTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         int tonnage = 75;
         double size = 5.0;
@@ -124,7 +124,7 @@ public class EquipmentPartTest {
 
     @Test
     public void cloneTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         int tonnage = 75;
         double size = 5.0;
@@ -162,7 +162,7 @@ public class EquipmentPartTest {
 
     @Test
     public void getMissingPartTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         int tonnage = 75;
         double size = 5.0;
@@ -202,7 +202,7 @@ public class EquipmentPartTest {
 
     @Test
     public void isPartForEquipmentTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         Unit unit = mock(Unit.class);
         Entity entity = mock(Entity.class);
@@ -228,7 +228,7 @@ public class EquipmentPartTest {
 
     @Test
     public void isOmniPoddableTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         double size = 3.0;
         EquipmentType type = mock(EquipmentType.class);
@@ -311,7 +311,7 @@ public class EquipmentPartTest {
 
     @Test
     public void setUnitUpdatesEquipmentTonnage() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         Unit unit = mock(Unit.class);
         Entity entity = mock(Entity.class);
@@ -331,7 +331,7 @@ public class EquipmentPartTest {
 
     @Test
     public void getLocationTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         Unit unit = mock(Unit.class);
         Entity entity = mock(Entity.class);
@@ -366,7 +366,7 @@ public class EquipmentPartTest {
 
     @Test
     public void getLocationNameTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         Unit unit = mock(Unit.class);
         Entity entity = mock(Entity.class);
@@ -407,7 +407,7 @@ public class EquipmentPartTest {
 
     @Test
     public void isInLocationTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         Unit unit = mock(Unit.class);
         Entity entity = mock(Entity.class);
@@ -456,7 +456,7 @@ public class EquipmentPartTest {
 
     @Test
     public void isRearFacingTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         Unit unit = mock(Unit.class);
         Entity entity = mock(Entity.class);
@@ -496,7 +496,7 @@ public class EquipmentPartTest {
     @Test
     public void equipmentPartWriteToXmlTest() throws ParserConfigurationException, SAXException, IOException {
         EquipmentType type = getEquipmentType(EquipmentTypeLookup.JUMP_JET);
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         EquipmentPart equipmentPart = new EquipmentPart(65, type, 42, 18.0, false, mockCampaign);
         equipmentPart.setId(25);
 
@@ -536,10 +536,10 @@ public class EquipmentPartTest {
 
     @Test
     public void removeTest() {
-        Campaign mockCampaign = mock(Campaign.class);
-        Warehouse warehouse = new Warehouse();
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        Campaign mockCampaign = mockCampaign();
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         Unit unit = mock(Unit.class);
@@ -601,10 +601,10 @@ public class EquipmentPartTest {
 
     @Test
     public void salvageTest() {
-        Campaign mockCampaign = mock(Campaign.class);
-        Warehouse warehouse = new Warehouse();
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        Campaign mockCampaign = mockCampaign();
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         Unit unit = mock(Unit.class);
@@ -666,7 +666,7 @@ public class EquipmentPartTest {
 
     @Test
     public void needsFixingTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         double size = 3.0;
         EquipmentType type = mock(EquipmentType.class);
@@ -688,7 +688,7 @@ public class EquipmentPartTest {
 
     @Test
     public void isMountedOnDestroyedLocationTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         Unit unit = mock(Unit.class);
         Entity entity = mock(Entity.class);
@@ -739,7 +739,7 @@ public class EquipmentPartTest {
 
     @Test
     public void onBadHipOrShoulderTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         Unit unit = mock(Unit.class);
         Entity entity = mock(Entity.class);
@@ -791,7 +791,7 @@ public class EquipmentPartTest {
 
     @Test
     public void checkFixableTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         Unit unit = mock(Unit.class);
         Entity entity = mock(Entity.class);
@@ -878,7 +878,7 @@ public class EquipmentPartTest {
 
     @Test
     public void fixTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         Unit unit = mock(Unit.class);
         Entity entity = mock(Entity.class);
@@ -914,7 +914,7 @@ public class EquipmentPartTest {
 
     @Test
     public void updateConditionFromPartWorkingTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         Unit unit = mock(Unit.class);
         Entity entity = mock(Entity.class);
@@ -951,7 +951,7 @@ public class EquipmentPartTest {
 
     @Test
     public void updateConditionFromPartHitTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         Unit unit = mock(Unit.class);
         Entity entity = mock(Entity.class);
@@ -984,7 +984,7 @@ public class EquipmentPartTest {
 
     @Test
     public void updateConditionFromEntityNoUnitOrMountedTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         Unit unit = mock(Unit.class);
         Entity entity = mock(Entity.class);
@@ -1025,7 +1025,7 @@ public class EquipmentPartTest {
 
     @Test
     public void updateConditionFromEntityResetsHitsTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         Unit unit = mock(Unit.class);
         Entity entity = mock(Entity.class);
@@ -1077,7 +1077,7 @@ public class EquipmentPartTest {
 
     @Test
     public void updateConditionFromEntityTakesHitsTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         Unit unit = mock(Unit.class);
         Entity entity = mock(Entity.class);
@@ -1123,12 +1123,12 @@ public class EquipmentPartTest {
 
     @Test
     public void updateConditionFromEntityTakesHitsChecksDestructionTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
-        Warehouse warehouse = new Warehouse();
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         Unit unit = mock(Unit.class);
@@ -1220,10 +1220,10 @@ public class EquipmentPartTest {
 
     @Test
     public void updateConditionFromEntityMissingTest() {
-        Campaign mockCampaign = mock(Campaign.class);
-        Warehouse warehouse = new Warehouse();
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        Campaign mockCampaign = mockCampaign();
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         Unit unit = mock(Unit.class);
@@ -1267,7 +1267,7 @@ public class EquipmentPartTest {
 
     @Test
     public void getBaseTimeTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         Unit unit = mock(Unit.class);
         Entity entity = mock(Entity.class);
@@ -1321,7 +1321,7 @@ public class EquipmentPartTest {
 
     @Test
     public void getDifficultyTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         Unit unit = mock(Unit.class);
         Entity entity = mock(Entity.class);
@@ -1373,7 +1373,7 @@ public class EquipmentPartTest {
 
     @Test
     public void isSamePartTypeTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         Unit unit = mock(Unit.class);
         Entity entity = mock(Entity.class);
@@ -1448,10 +1448,10 @@ public class EquipmentPartTest {
 
     @Test
     public void checkWeaponBayOnlyWeaponRemovedTest() {
-        Campaign mockCampaign = mock(Campaign.class);
-        Warehouse warehouse = new Warehouse();
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        Campaign mockCampaign = mockCampaign();
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         Unit unit = mock(Unit.class);
@@ -1530,10 +1530,10 @@ public class EquipmentPartTest {
 
     @Test
     public void checkWeaponBayWeaponRemovedOthersOkayTest() {
-        Campaign mockCampaign = mock(Campaign.class);
-        Warehouse warehouse = new Warehouse();
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        Campaign mockCampaign = mockCampaign();
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         Unit unit = mock(Unit.class);
@@ -1618,10 +1618,10 @@ public class EquipmentPartTest {
 
     @Test
     public void checkWeaponBayWeaponRemovedOthersDestroyedTest() {
-        Campaign mockCampaign = mock(Campaign.class);
-        Warehouse warehouse = new Warehouse();
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        Campaign mockCampaign = mockCampaign();
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         Unit unit = mock(Unit.class);
@@ -1707,10 +1707,10 @@ public class EquipmentPartTest {
 
     @Test
     public void checkWeaponBayUpdateConditionFromPartGoodWeaponTest() {
-        Campaign mockCampaign = mock(Campaign.class);
-        Warehouse warehouse = new Warehouse();
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        Campaign mockCampaign = mockCampaign();
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         Unit unit = mock(Unit.class);

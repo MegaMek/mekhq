@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -65,7 +65,7 @@ public class CampaignController {
      * Manually registers campaign-related event bus listeners.
      */
     public void activate() {
-        PersonnelMarket personnelMarket = localCampaign.getHumanResources().getPersonnelMarket();
+        PersonnelMarket personnelMarket = localCampaign.getPlayerForce().getHumanResources().getPersonnelMarket();
         if (personnelMarket != null) {
             MekHQ.registerHandler(personnelMarket);
         }
@@ -80,7 +80,7 @@ public class CampaignController {
         if (localCampaign.getStoryArc() != null) {
             MekHQ.unregisterHandler(localCampaign.getStoryArc());
         }
-        PersonnelMarket personnelMarket = localCampaign.getHumanResources().getPersonnelMarket();
+        PersonnelMarket personnelMarket = localCampaign.getPlayerForce().getHumanResources().getPersonnelMarket();
         if (personnelMarket != null) {
             MekHQ.unregisterHandler(personnelMarket);
         }

@@ -59,7 +59,6 @@ import megamek.common.units.Entity;
 import megamek.common.units.EntityMovementMode;
 import megamek.common.units.Infantry;
 import megamek.common.units.LandAirMek;
-import mekhq.campaign.Hangar;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
@@ -67,9 +66,9 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.mockito.MockedStatic;
 
 class AlternatePaymentModelValuesTest {
     @Test
@@ -79,13 +78,24 @@ class AlternatePaymentModelValuesTest {
         assertEquals(Money.of(50_000_000), AlternatePaymentModelValues.LARGE_CRAFT.getValue());
     }
 
+    private static Formation mockForce(boolean isStandard, boolean isCombatRole, List<Unit> units) {
+        Formation formation = mock(Formation.class, RETURNS_DEEP_STUBS);
+
+        when(formation.getFormationType().isStandard()).thenReturn(isStandard);
+        when(formation.getCombatRoleInMemory().isCombatRole()).thenReturn(isCombatRole);
+
+        when(formation.getUnitsAsUnits(any(mekhq.campaign.LocalHangar.class))).thenReturn(units);
+
+        return formation;
+    }
+
     @Test
     void getForceValue_skipsNonStandardForces() {
         Formation nonStandard = mockForce(false, true, List.of(mockUnitWithEntity(mock(Entity.class))));
         Money total = AlternatePaymentModelValues.getForceValue(
               dummyFaction(),
               List.of(nonStandard),
-              mock(Hangar.class),
+              mock(mekhq.campaign.LocalHangar.class),
               false,
               false,
               100, 100, 100, 100
@@ -99,7 +109,7 @@ class AlternatePaymentModelValuesTest {
         Money total = AlternatePaymentModelValues.getForceValue(
               dummyFaction(),
               List.of(nonCombat),
-              mock(Hangar.class),
+              mock(mekhq.campaign.LocalHangar.class),
               false,
               false,
               100, 100, 100, 100
@@ -121,7 +131,7 @@ class AlternatePaymentModelValuesTest {
         Money total = AlternatePaymentModelValues.getForceValue(
               dummyFaction(),
               List.of(formation),
-              mock(Hangar.class),
+              mock(mekhq.campaign.LocalHangar.class),
               false,
               false,
               100, 100, 100, 100
@@ -133,7 +143,7 @@ class AlternatePaymentModelValuesTest {
     @Test
     void getForceValue_doesNotUseDiminishingReturnsWhenDisabled_evenIfUnitCountExceedsStart() {
         Faction faction = dummyFaction();
-        Hangar hangar = mock(Hangar.class);
+        mekhq.campaign.LocalHangar hangar = mock(mekhq.campaign.LocalHangar.class);
 
         // 3 ProtoMeks @ 100% combat multiplier => raw total = 3,000,000
         Formation formation = mockForce(true, true, List.of(
@@ -164,7 +174,7 @@ class AlternatePaymentModelValuesTest {
     @Test
     void getForceValue_usesDiminishingReturnsOnlyWhenEnabled_andUnitCountExceedsStart() {
         Faction faction = dummyFaction();
-        Hangar hangar = mock(Hangar.class);
+        mekhq.campaign.LocalHangar hangar = mock(mekhq.campaign.LocalHangar.class);
 
         // 3 ProtoMeks @ 100% combat multiplier => raw total = 3,000,000
         Formation formation = mockForce(true, true, List.of(
@@ -199,27 +209,6 @@ class AlternatePaymentModelValuesTest {
             assertEquals(diminishedExpected, actual,
                   "When enabled and unit count exceeds start, total must be the diminished-returns sum");
         }
-    }
-
-    @Test
-    void getForceValue_appliesPercentMultipliersByDividingBy100_usingProtoMekBranch() {
-        Entity protoMek = mock(Entity.class);
-        when(protoMek.isProtoMek()).thenReturn(true);
-
-        Unit unit = mockUnitWithEntity(protoMek);
-        Formation formation = mockForce(true, true, List.of(unit));
-
-        // 50% combat multiplier => PROTOMEK(1_000_000) * 0.5 = 500_000
-        Money total = AlternatePaymentModelValues.getForceValue(
-              dummyFaction(),
-              List.of(formation),
-              mock(Hangar.class),
-              false,
-              false,
-              50, 0, 0, 0
-        );
-
-        assertEquals(Money.of(500_000), total);
     }
 
     @Nested
@@ -468,15 +457,25 @@ class AlternatePaymentModelValuesTest {
         }
     }
 
-    private static Formation mockForce(boolean isStandard, boolean isCombatRole, List<Unit> units) {
-        Formation formation = mock(Formation.class, RETURNS_DEEP_STUBS);
+    @Test
+    void getForceValue_appliesPercentMultipliersByDividingBy100_usingProtoMekBranch() {
+        Entity protoMek = mock(Entity.class);
+        when(protoMek.isProtoMek()).thenReturn(true);
 
-        when(formation.getFormationType().isStandard()).thenReturn(isStandard);
-        when(formation.getCombatRoleInMemory().isCombatRole()).thenReturn(isCombatRole);
+        Unit unit = mockUnitWithEntity(protoMek);
+        Formation formation = mockForce(true, true, List.of(unit));
 
-        when(formation.getUnitsAsUnits(any(Hangar.class))).thenReturn(units);
+        // 50% combat multiplier => PROTOMEK(1_000_000) * 0.5 = 500_000
+        Money total = AlternatePaymentModelValues.getForceValue(
+              dummyFaction(),
+              List.of(formation),
+              mock(mekhq.campaign.LocalHangar.class),
+              false,
+              false,
+              50, 0, 0, 0
+        );
 
-        return formation;
+        assertEquals(Money.of(500_000), total);
     }
 
     private static Unit mockUnitWithEntity(Entity entity) {

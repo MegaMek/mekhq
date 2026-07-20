@@ -108,14 +108,14 @@ public final class LocationFilterItem {
      */
     public List<Unit> selectUnits(Campaign campaign) {
         if (isAll()) {
-            List<Unit> units = new ArrayList<>(campaign.getHangar().getUnits());
+            List<Unit> units = new ArrayList<>(campaign.getPlayerForce().getHangar().getUnits());
             for (PlayerBase playerBase : campaign.getCampaignLocationManager().getPlayerBases()) {
                 units.addAll(playerBase.getBaseHangar().getUnits());
             }
             return units;
         }
         if (isMainForce()) {
-            return new ArrayList<>(campaign.getHangar().getUnits());
+            return new ArrayList<>(campaign.getPlayerForce().getHangar().getUnits());
         }
         return new ArrayList<>(base.getBaseHangar().getUnits());
     }
@@ -126,10 +126,10 @@ public final class LocationFilterItem {
      */
     public List<Person> selectPersonnel(Campaign campaign) {
         if (isAll()) {
-            return new ArrayList<>(campaign.getAllPersonnel());
+            return new ArrayList<>(campaign.getPlayerForce().getHumanResources().getPersonnel());
         }
         if (isMainForce()) {
-            return new ArrayList<>(campaign.getMainForcePersonnel().fetchPersonnelAtLocation());
+            return new ArrayList<>(campaign.getPlayerForce().getPersonnel().fetchPersonnelAtLocation());
         }
         return new ArrayList<>(base.fetchPersonnelAtLocation());
     }
@@ -140,14 +140,14 @@ public final class LocationFilterItem {
      */
     public List<Part> selectSpareParts(Campaign campaign) {
         if (isAll()) {
-            List<Part> parts = new ArrayList<>(campaign.getWarehouse().getSpareParts());
+            List<Part> parts = new ArrayList<>(campaign.getPlayerForce().getWarehouse().getSpareParts());
             for (PlayerBase playerBase : campaign.getCampaignLocationManager().getPlayerBases()) {
                 parts.addAll(playerBase.getBaseWarehouse().getSpareParts());
             }
             return parts;
         }
         if (isMainForce()) {
-            return new ArrayList<>(campaign.getWarehouse().getSpareParts());
+            return new ArrayList<>(campaign.getPlayerForce().getWarehouse().getSpareParts());
         }
         return new ArrayList<>(base.getBaseWarehouse().getSpareParts());
     }

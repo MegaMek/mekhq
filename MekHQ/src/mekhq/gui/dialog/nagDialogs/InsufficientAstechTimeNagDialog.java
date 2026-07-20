@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,8 +33,6 @@
 package mekhq.gui.dialog.nagDialogs;
 
 import static mekhq.MHQConstants.NAG_INSUFFICIENT_AS_TECH_TIME;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.InsufficientAsTechTimeNagLogic.getAsTechTimeDeficit;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.InsufficientAsTechTimeNagLogic.hasAsTechTimeDeficit;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -100,7 +98,7 @@ public class InsufficientAstechTimeNagDialog extends ImmersiveDialogNag {
             return null;
         }
 
-        List<Person> potentialSpeakers = campaign.getActivePersonnel(false, false);
+        List<Person> potentialSpeakers = campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false);
 
         if (potentialSpeakers.isEmpty()) {
             return getFallbackSpeaker(campaign);
@@ -143,10 +141,18 @@ public class InsufficientAstechTimeNagDialog extends ImmersiveDialogNag {
      *       is available.
      */
     private @Nullable Person getFallbackSpeaker(Campaign campaign) {
-        Person speaker = campaign.getSeniorAdminPerson(HR);
+        Person speaker = campaign.getPlayerForce().getHumanResources()
+                               .getSeniorAdminPerson(AdministratorSpecialization.HR,
+                                     campaign.getCampaignOptions(),
+                                     campaign.isClanCampaign(),
+                                     campaign.getLocalDate());
 
         if (speaker == null) {
-            speaker = campaign.getSeniorAdminPerson(COMMAND);
+            speaker = campaign.getPlayerForce().getHumanResources()
+                            .getSeniorAdminPerson(AdministratorSpecialization.COMMAND,
+                                  campaign.getCampaignOptions(),
+                                  campaign.isClanCampaign(),
+                                  campaign.getLocalDate());
         } else {
             return speaker;
         }
@@ -162,9 +168,13 @@ public class InsufficientAstechTimeNagDialog extends ImmersiveDialogNag {
 
         if (campaign != null) {
             final Collection<Unit> units = campaign.getUnits();
-            final int possibleAstechPoolMinutes = campaign.getPossibleAsTechPoolMinutes();
+            final int possibleAstechPoolMinutes = campaign.getPlayerForce()
+                                                        .getHumanResources()
+                                                        .getPossibleAsTechPoolMinutes(campaign.getCampaignOptions());
             final boolean isOvertimeAllowed = campaign.isOvertimeAllowed();
-            final int possibleAstechPoolOvertime = campaign.getPossibleAsTechPoolOvertime();
+            final int possibleAstechPoolOvertime = campaign.getPlayerForce()
+                                                         .getHumanResources()
+                                                         .getPossibleAsTechPoolOvertime(campaign.getCampaignOptions());
 
             count = getAsTechTimeDeficit(units,
                   possibleAstechPoolMinutes,

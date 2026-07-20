@@ -64,7 +64,6 @@ import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Hangar;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationType;
 import mekhq.campaign.mission.ScenarioTemplate;
@@ -557,7 +556,7 @@ public class SalvageFormationPicker extends JDialog {
                 case COL_FORMATION_NAME -> data.formation().getName();
                 case COL_FORMATION_TYPE -> data.formationType().getDisplayName();
                 case COL_TOE_TECH -> getTechLabel(data.tech());
-                case COL_CREW_TECHS -> getCrewTechCount(campaign.getHangar(), data.formation());
+                case COL_CREW_TECHS -> getCrewTechCount(campaign.getPlayerForce().getHangar(), data.formation());
                 case COL_CARGO_CAPACITY -> data.maximumCargoCapacity();
                 case COL_TOW_CAPACITY -> data.maximumTowCapacity();
                 case COL_SALVAGE_UNITS -> data.salvageCapableUnits();
@@ -594,7 +593,7 @@ public class SalvageFormationPicker extends JDialog {
             }
         }
 
-        private int getCrewTechCount(Hangar hangar, Formation formation) {
+        private int getCrewTechCount(mekhq.campaign.LocalHangar hangar, Formation formation) {
             int counter = 0;
             for (Unit unit : formation.getAllUnitsAsUnits(hangar, false)) {
                 for (Person crew : unit.getCrew()) {
@@ -680,7 +679,7 @@ public class SalvageFormationPicker extends JDialog {
                 checkBox.setSelected(value != null && (Boolean) value);
                 checkBox.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
 
-                String tugTooltip = data.getTugTooltip(campaign.getHangar());
+                String tugTooltip = data.getTugTooltip(campaign.getPlayerForce().getHangar());
                 checkBox.setToolTipText(!tugTooltip.isBlank() ? wordWrap(tugTooltip) : null);
                 return checkBox;
             }
@@ -701,9 +700,9 @@ public class SalvageFormationPicker extends JDialog {
                     case SalvageFormationTableModel.COL_CREW_TECHS ->
                           wordWrap(data.getAllCrewTechTooltip(campaign, data.formation()));
                     case SalvageFormationTableModel.COL_CARGO_CAPACITY ->
-                          wordWrap(data.getCargoCapacityTooltip(campaign.getHangar()));
+                          wordWrap(data.getCargoCapacityTooltip(campaign.getPlayerForce().getHangar()));
                     case SalvageFormationTableModel.COL_TOW_CAPACITY ->
-                          wordWrap(data.getTowCapacityTooltip(campaign.getHangar()));
+                          wordWrap(data.getTowCapacityTooltip(campaign.getPlayerForce().getHangar()));
                     case SalvageFormationTableModel.COL_SALVAGE_UNITS ->
                           wordWrap(getTextAt(RESOURCE_BUNDLE, "SalvageFormationPicker.column.picks.tooltip"));
                     default -> null;

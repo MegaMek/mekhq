@@ -58,7 +58,7 @@ import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.market.ShoppingList;
+import mekhq.campaign.market.ForceShoppingList;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.work.IAcquisitionWork;
@@ -67,7 +67,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 /**
  * Dialog for reviewing the campaign shopping list and adjusting procurement priority.
  *
- * <p>The dialog displays the current {@link ShoppingList} in a table and provides controls for moving the selected
+ * <p>The dialog displays the current {@link ForceShoppingList} in a table and provides controls for moving the selected
  * item to the top, up one position, down one position, or to the bottom of the list. Row order shows procurement
  * priority: items nearer the top are attempted first.</p>
  *
@@ -77,7 +77,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
  * @since 0.51.0
  */
 public class ShoppingListPriorityDialog extends JDialog {
-    private final ShoppingList shoppingList;
+    private final mekhq.campaign.market.ForceShoppingList shoppingList;
     private final ShoppingListTableModel tableModel;
     private final JTable shoppingTable;
 
@@ -100,7 +100,7 @@ public class ShoppingListPriorityDialog extends JDialog {
         super(owner);
 
         // needs to be static to expose it to the table
-        this.shoppingList = campaign.getShoppingList();
+        this.shoppingList = campaign.getPlayerForce().getShoppingList();
         this.tableModel = new ShoppingListTableModel(campaign, shoppingList);
         this.shoppingTable = new JTable(tableModel);
 
@@ -323,7 +323,7 @@ public class ShoppingListPriorityDialog extends JDialog {
         private static final int N_COL = 8;
 
         private final Campaign campaign;
-        private final ShoppingList shoppingList;
+        private final mekhq.campaign.market.ForceShoppingList shoppingList;
 
         /**
          * Creates a table model backed by the supplied shopping list.
@@ -334,7 +334,7 @@ public class ShoppingListPriorityDialog extends JDialog {
          * @author Illiani
          * @since 0.51.0
          */
-        private ShoppingListTableModel(Campaign campaign, ShoppingList shoppingList) {
+        private ShoppingListTableModel(Campaign campaign, mekhq.campaign.market.ForceShoppingList shoppingList) {
             this.campaign = campaign;
             this.shoppingList = shoppingList;
         }

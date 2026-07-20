@@ -38,11 +38,13 @@ import static org.mockito.Answers.CALLS_REAL_METHODS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -50,10 +52,11 @@ import java.util.List;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignLocationManager;
-import mekhq.campaign.Hangar;
 import mekhq.campaign.JumpPath;
-import mekhq.campaign.Warehouse;
+import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.force.Detachment;
+import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.personnel.Person;
@@ -93,27 +96,32 @@ class EducationControllerTest {
     }
 
     Campaign buildMinimalCampaignMock() {
-        Campaign campaign = mock(Campaign.class);
+        Campaign campaign = mockCampaign();
         when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 1));
 
         CampaignOptions options = mock(CampaignOptions.class);
         when(options.getNaturalHealingWaitingPeriod()).thenReturn(0);
         when(campaign.getCampaignOptions()).thenReturn(options);
 
-        Hangar hangar = mock(Hangar.class);
-        when(campaign.getAllHangar()).thenReturn(hangar);
+        mekhq.campaign.LocalHangar hangar = mock(mekhq.campaign.LocalHangar.class);
+        when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
 
-        Warehouse warehouse = mock(Warehouse.class);
+        LocalWarehouse warehouse = mock(LocalWarehouse.class);
         when(warehouse.getParts()).thenReturn(Collections.emptyList());
-        when(campaign.getAllWarehouse()).thenReturn(warehouse);
+        //TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
+        when(campaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
 
-        when(campaign.getAllFormations()).thenReturn(Collections.emptyList());
+        when(campaign.getPlayerForce().getAllFormations()).thenReturn(Collections.emptyList());
 
         PlanetarySystem currentSystem = mock(PlanetarySystem.class);
         when(currentSystem.getId()).thenReturn("CurrentSystem");
         when(campaign.getCurrentSystem()).thenReturn(currentSystem);
 
         when(campaign.getCampaignLocationManager()).thenReturn(mock(CampaignLocationManager.class));
+
+        PlayerForce playerForce = mock(PlayerForce.class, RETURNS_DEEP_STUBS);
+        when(campaign.getPlayerForce()).thenReturn(playerForce);
+        when(playerForce.getForceDetachment()).thenReturn(mock(Detachment.class));
 
         return campaign;
     }
@@ -138,7 +146,10 @@ class EducationControllerTest {
             person.setEduAcademyNameInSet(ACADEMY_NAME);
             person.setEduAcademySystem("TestSystem");
             person.setEduEducationStage(EducationStage.JOURNEY_TO_CAMPUS);
-            campaign = mock(Campaign.class);
+            campaign = mockCampaign();
+            PlayerForce playerForce = mock(PlayerForce.class, RETURNS_DEEP_STUBS);
+            when(campaign.getPlayerForce()).thenReturn(playerForce);
+            when(playerForce.getForceDetachment()).thenReturn(mock(Detachment.class));
             when(campaign.getCampaignLocationManager()).thenReturn(mock(CampaignLocationManager.class));
             PlanetarySystem destSystem = mock(PlanetarySystem.class);
             when(campaign.getSystemById("TestSystem")).thenReturn(destSystem);
@@ -234,7 +245,10 @@ class EducationControllerTest {
             person.setEduAcademySystem("TestSystem");
 
             destSystem = mock(PlanetarySystem.class);
-            campaign = mock(Campaign.class);
+            campaign = mockCampaign();
+            PlayerForce playerForce = mock(PlayerForce.class, RETURNS_DEEP_STUBS);
+            when(campaign.getPlayerForce()).thenReturn(playerForce);
+            when(playerForce.getForceDetachment()).thenReturn(mock(Detachment.class));
             when(campaign.getCampaignLocationManager()).thenReturn(mock(CampaignLocationManager.class));
             when(campaign.getSystemById("TestSystem")).thenReturn(destSystem);
             when(campaign.getSimplifiedTravelTime(destSystem)).thenReturn(5);

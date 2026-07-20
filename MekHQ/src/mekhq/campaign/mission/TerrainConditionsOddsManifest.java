@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -65,7 +65,7 @@ import megamek.common.planetaryConditions.Weather;
 import megamek.common.planetaryConditions.Wind;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
-import mekhq.campaign.stratCon.StratConBiomeManifest;
+import mekhq.campaign.digitalGM.stratCon.StratConBiomeManifest;
 import mekhq.utilities.MHQXMLUtility;
 
 @XmlRootElement(name = "TerrainConditionsOddsManifest")

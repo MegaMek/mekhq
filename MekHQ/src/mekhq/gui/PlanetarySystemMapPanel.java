@@ -32,7 +32,15 @@
  */
 package mekhq.gui;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -272,31 +280,51 @@ public class PlanetarySystemMapPanel extends JPanel {
                         int radius = diameter / 2;
 
                         // check for current location - we assume you are on primary planet for now
-                        if (PlanetarySystemMapPanel.this.campaign.getCurrentLocation().getCurrentSystem().equals(system)
+                        if (mekhq.gui.PlanetarySystemMapPanel.this.campaign.getPlayerForce()
+                                  .getForceDetachment()
+                                  .getCurrentLocation()
+                                  .getCurrentSystem()
+                                  .equals(system)
                                   && i == system.getPrimaryPlanetPosition()) {
                             updateShipImages();
 
-                            JumpPath jp = PlanetarySystemMapPanel.this.campaign.getCurrentLocation().getJumpPath();
+                            JumpPath jp = mekhq.gui.PlanetarySystemMapPanel.this.campaign.getPlayerForce()
+                                                .getForceDetachment()
+                                                .getCurrentLocation()
+                                                .getJumpPath();
                             int lineX1 = x;
                             int lineY1 = y - radius;
                             int lineX2 = jumpshipX + shipImgSize;
                             int lineY2 = jumpshipY + shipImgSize;
-                            if (!PlanetarySystemMapPanel.this.campaign.getCurrentLocation().isJumpZenith()) {
+                            if (!mekhq.gui.PlanetarySystemMapPanel.this.campaign.getPlayerForce()
+                                       .getForceDetachment()
+                                       .getCurrentLocation()
+                                       .isJumpZenith()) {
                                 lineY2 = jumpshipY - shipImgSize;
                             }
-                            if (null != jp
-                                      &&
-                                      (!PlanetarySystemMapPanel.this.campaign.getCurrentLocation().isAtJumpPoint() ||
-                                             jp.getLastSystem().equals(system))) {
-                                // the unit has a flight plan in this system so draw the line
-                                // in transit so draw a path
-                                g2.setColor(Color.YELLOW);
-                                Stroke dashed = new BasicStroke(3, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0,
-                                      new float[] { 9 }, 0);
-                                g2.setStroke(dashed);
-                                g2.drawLine(lineX1, lineY1, lineX2, lineY2);
+                            if (null != jp) {
+                                if (!mekhq.gui.PlanetarySystemMapPanel.this.campaign.getPlayerForce()
+                                           .getForceDetachment()
+                                           .getCurrentLocation()
+                                           .isAtJumpPoint() ||
+                                          jp.getLastSystem().equals(system)) {
+                                    // the unit has a flight plan in this system so draw the line
+                                    // in transit so draw a path
+                                    g2.setColor(java.awt.Color.YELLOW);
+                                    java.awt.Stroke dashed = new java.awt.BasicStroke(3,
+                                          java.awt.BasicStroke.CAP_BUTT,
+                                          java.awt.BasicStroke.JOIN_BEVEL,
+                                          0,
+                                          new float[] { 9 },
+                                          0);
+                                    g2.setStroke(dashed);
+                                    g2.drawLine(lineX1, lineY1, lineX2, lineY2);
+                                }
                             }
-                            if (PlanetarySystemMapPanel.this.campaign.getCurrentLocation().isAtJumpPoint()) {
+                            if (mekhq.gui.PlanetarySystemMapPanel.this.campaign.getPlayerForce()
+                                      .getForceDetachment()
+                                      .getCurrentLocation()
+                                      .isAtJumpPoint()) {
                                 // draw a ring around jumpship
                                 drawRing(g2, jumpshipX + (shipImgSize / 2), jumpshipY + (shipImgSize / 2),
                                       shipImgSize / 2, Color.ORANGE);
@@ -304,43 +332,59 @@ public class PlanetarySystemMapPanel extends JPanel {
                                     drawRotatedImage(g2, imgJumpshipFleet, 90, jumpshipX, jumpshipY, shipImgSize,
                                           shipImgSize);
                                 }
-                            } else if (PlanetarySystemMapPanel.this.campaign.getCurrentLocation().isOnPlanet()) {
-                                drawRing(g2, x, y, radius, Color.ORANGE);
-                                if (null != imgDropshipFleet) {
-                                    g2.drawImage(imgDropshipFleet, x - radius - shipImgSize, y - radius - shipImgSize,
-                                          shipImgSize, shipImgSize, null);
-                                }
-                                // draw jumpship too
-                                if (null != imgJumpshipFleet) {
-                                    drawRotatedImage(g2, imgJumpshipFleet, 90, jumpshipX, jumpshipY, shipImgSize,
-                                          shipImgSize);
-                                }
                             } else {
-                                if (null != imgDropshipFleet) {
-                                    int lengthX = lineX1 - lineX2;
-                                    int lengthY = lineY1 - lineY2;
-                                    double rotationRequired = getFlightRotation(lengthX, lengthY,
-                                          null != jp && jp.getLastSystem().equals(system),
-                                          PlanetarySystemMapPanel.this.campaign.getCurrentLocation().isJumpZenith());
-                                    int partialX = lineX2
-                                                         +
-                                                         (int) Math.round(lengthX *
-                                                                                PlanetarySystemMapPanel.this.campaign.getCurrentLocation()
-                                                                                      .getPercentageTransit());
-                                    int partialY = lineY2
-                                                         +
-                                                         (int) Math.round(lengthY *
-                                                                                PlanetarySystemMapPanel.this.campaign.getCurrentLocation()
-                                                                                      .getPercentageTransit());
-                                    drawRing(g2, partialX, partialY, shipImgSize / 2, Color.ORANGE);
-                                    drawRotatedImage(g2, imgDropshipFleet, rotationRequired,
-                                          partialX - (shipImgSize / 2), partialY - (shipImgSize / 2), shipImgSize,
-                                          shipImgSize);
-                                }
-                                // draw jumpship too
-                                if (null != imgJumpshipFleet) {
-                                    drawRotatedImage(g2, imgJumpshipFleet, 90, jumpshipX, jumpshipY, shipImgSize,
-                                          shipImgSize);
+                                if (mekhq.gui.PlanetarySystemMapPanel.this.campaign.getPlayerForce()
+                                          .getForceDetachment()
+                                          .getCurrentLocation()
+                                          .isOnPlanet()) {
+                                    drawRing(g2, x, y, radius, java.awt.Color.ORANGE);
+                                    if (null != imgDropshipFleet) {
+                                        g2.drawImage(imgDropshipFleet,
+                                              x - radius - shipImgSize,
+                                              y - radius - shipImgSize,
+                                              shipImgSize,
+                                              shipImgSize,
+                                              null);
+                                    }
+                                    // draw jumpship too
+                                    if (null != imgJumpshipFleet) {
+                                        drawRotatedImage(g2, imgJumpshipFleet, 90, jumpshipX, jumpshipY, shipImgSize,
+                                              shipImgSize);
+                                    }
+                                } else {
+                                    if (null != imgDropshipFleet) {
+                                        int lengthX = lineX1 - lineX2;
+                                        int lengthY = lineY1 - lineY2;
+                                        double rotationRequired = getFlightRotation(lengthX, lengthY,
+                                              null != jp && jp.getLastSystem().equals(system),
+                                              mekhq.gui.PlanetarySystemMapPanel.this.campaign.getPlayerForce()
+                                                    .getForceDetachment()
+                                                    .getCurrentLocation()
+                                                    .isJumpZenith());
+                                        int partialX = lineX2
+                                                             +
+                                                             (int) Math.round(lengthX *
+                                                                                    mekhq.gui.PlanetarySystemMapPanel.this.campaign.getPlayerForce()
+                                                                                          .getForceDetachment()
+                                                                                          .getCurrentLocation()
+                                                                                          .getPercentageTransit());
+                                        int partialY = lineY2
+                                                             +
+                                                             (int) Math.round(lengthY *
+                                                                                    mekhq.gui.PlanetarySystemMapPanel.this.campaign.getPlayerForce()
+                                                                                          .getForceDetachment()
+                                                                                          .getCurrentLocation()
+                                                                                          .getPercentageTransit());
+                                        drawRing(g2, partialX, partialY, shipImgSize / 2, java.awt.Color.ORANGE);
+                                        drawRotatedImage(g2, imgDropshipFleet, rotationRequired,
+                                              partialX - (shipImgSize / 2), partialY - (shipImgSize / 2), shipImgSize,
+                                              shipImgSize);
+                                    }
+                                    // draw jumpship too
+                                    if (null != imgJumpshipFleet) {
+                                        drawRotatedImage(g2, imgJumpshipFleet, 90, jumpshipX, jumpshipY, shipImgSize,
+                                              shipImgSize);
+                                    }
                                 }
                             }
                         }
@@ -693,7 +737,7 @@ public class PlanetarySystemMapPanel extends JPanel {
     private Unit getBestDropship() {
         Unit bestUnit = null;
         double bestWeight = 0.0;
-        for (Unit u : campaign.getHangar().getUnits()) {
+        for (Unit u : campaign.getPlayerForce().getHangar().getUnits()) {
             if ((u.getEntity() instanceof Dropship) && (u.getEntity().getWeight() > bestWeight)) {
                 bestUnit = u;
                 bestWeight = u.getEntity().getWeight();
@@ -711,7 +755,7 @@ public class PlanetarySystemMapPanel extends JPanel {
     private Unit getBestJumpship() {
         Unit bestUnit = null;
         double bestWeight = 0.0;
-        for (Unit u : campaign.getHangar().getUnits()) {
+        for (Unit u : campaign.getPlayerForce().getHangar().getUnits()) {
             if (u.getEntity() instanceof Jumpship && u.getEntity().getWeight() > bestWeight) {
                 bestUnit = u;
                 bestWeight = u.getEntity().getWeight();

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -70,34 +70,60 @@ public record HirePersonnelUnitAction(boolean isGM) implements IUnitAction {
         while (unit.canTakeMoreDrivers()) {
             Person person = null;
             if (unit.getEntity() instanceof LandAirMek) {
-                person = campaign.newPerson(PersonnelRole.LAM_PILOT);
+                person = campaign.getPlayerForce()
+                               .getHumanResources()
+                               .newPerson(campaign, mekhq.campaign.personnel.enums.PersonnelRole.LAM_PILOT);
             } else if (unit.getEntity() instanceof Mek) {
-                person = campaign.newPerson(PersonnelRole.MEKWARRIOR);
+                person = campaign.getPlayerForce()
+                               .getHumanResources()
+                               .newPerson(campaign, mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR);
             } else if (unit.getEntity() instanceof SmallCraft
                              || unit.getEntity() instanceof Jumpship) {
-                person = campaign.newPerson(PersonnelRole.VESSEL_PILOT);
+                person = campaign.getPlayerForce()
+                               .getHumanResources()
+                               .newPerson(campaign, mekhq.campaign.personnel.enums.PersonnelRole.VESSEL_PILOT);
             } else if (unit.getEntity() instanceof ConvFighter) {
-                person = campaign.newPerson(PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT);
+                person = campaign.getPlayerForce()
+                               .getHumanResources()
+                               .newPerson(campaign,
+                                     mekhq.campaign.personnel.enums.PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT);
             } else if (unit.getEntity() instanceof Aero) {
-                person = campaign.newPerson(PersonnelRole.AEROSPACE_PILOT);
+                person = campaign.getPlayerForce()
+                               .getHumanResources()
+                               .newPerson(campaign, mekhq.campaign.personnel.enums.PersonnelRole.AEROSPACE_PILOT);
             } else if (unit.getEntity() instanceof Tank) {
                 person = switch (unit.getEntity().getMovementMode()) {
-                    case VTOL -> campaign.newPerson(PersonnelRole.VEHICLE_CREW_VTOL);
-                    case NAVAL, HYDROFOIL, SUBMARINE -> campaign.newPerson(PersonnelRole.VEHICLE_CREW_NAVAL);
-                    default -> campaign.newPerson(PersonnelRole.VEHICLE_CREW_GROUND);
+                    case VTOL -> campaign.getPlayerForce()
+                                       .getHumanResources()
+                                       .newPerson(campaign,
+                                             mekhq.campaign.personnel.enums.PersonnelRole.VEHICLE_CREW_VTOL);
+                    case NAVAL, HYDROFOIL, SUBMARINE -> campaign.getPlayerForce()
+                                                              .getHumanResources()
+                                                              .newPerson(campaign,
+                                                                    mekhq.campaign.personnel.enums.PersonnelRole.VEHICLE_CREW_NAVAL);
+                    default -> campaign.getPlayerForce()
+                                     .getHumanResources()
+                                     .newPerson(campaign,
+                                           mekhq.campaign.personnel.enums.PersonnelRole.VEHICLE_CREW_GROUND);
                 };
             } else if (unit.getEntity() instanceof ProtoMek) {
-                person = campaign.newPerson(PersonnelRole.PROTOMEK_PILOT);
+                person = campaign.getPlayerForce()
+                               .getHumanResources()
+                               .newPerson(campaign, mekhq.campaign.personnel.enums.PersonnelRole.PROTOMEK_PILOT);
             } else if (unit.getEntity() instanceof BattleArmor) {
-                person = campaign.newPerson(PersonnelRole.BATTLE_ARMOUR);
+                person = campaign.getPlayerForce()
+                               .getHumanResources()
+                               .newPerson(campaign, mekhq.campaign.personnel.enums.PersonnelRole.BATTLE_ARMOUR);
             } else if (unit.getEntity() instanceof Infantry) {
-                person = campaign.newPerson(PersonnelRole.SOLDIER);
+                person = campaign.getPlayerForce()
+                               .getHumanResources()
+                               .newPerson(campaign, mekhq.campaign.personnel.enums.PersonnelRole.SOLDIER);
             }
             if (person == null) {
                 break;
             }
 
-            if (!campaign.recruitPerson(person, isGM, true)) {
+            if (!campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, person, isGM, true)) {
                 return;
             }
 
@@ -112,25 +138,41 @@ public record HirePersonnelUnitAction(boolean isGM) implements IUnitAction {
             Person person = null;
             if (unit.getEntity() instanceof Tank) {
                 if (unit.getEntity().getMovementMode().isMarine()) {
-                    person = campaign.newPerson(PersonnelRole.VEHICLE_CREW_NAVAL);
+                    person = campaign.getPlayerForce()
+                                   .getHumanResources()
+                                   .newPerson(campaign,
+                                         mekhq.campaign.personnel.enums.PersonnelRole.VEHICLE_CREW_NAVAL);
                 } else if (unit.getEntity().getMovementMode().isVTOL()) {
-                    person = campaign.newPerson(PersonnelRole.VEHICLE_CREW_VTOL);
+                    person = campaign.getPlayerForce()
+                                   .getHumanResources()
+                                   .newPerson(campaign,
+                                         mekhq.campaign.personnel.enums.PersonnelRole.VEHICLE_CREW_VTOL);
                 } else {
-                    person = campaign.newPerson(PersonnelRole.VEHICLE_CREW_GROUND);
+                    person = campaign.getPlayerForce()
+                                   .getHumanResources()
+                                   .newPerson(campaign,
+                                         mekhq.campaign.personnel.enums.PersonnelRole.VEHICLE_CREW_GROUND);
                 }
             } else if (unit.getEntity() instanceof SmallCraft
                              || unit.getEntity() instanceof Jumpship) {
-                person = campaign.newPerson(PersonnelRole.VESSEL_GUNNER);
+                person = campaign.getPlayerForce()
+                               .getHumanResources()
+                               .newPerson(campaign, mekhq.campaign.personnel.enums.PersonnelRole.VESSEL_GUNNER);
             } else if (unit.getEntity() instanceof Mek) {
-                person = campaign.newPerson(PersonnelRole.MEKWARRIOR);
+                person = campaign.getPlayerForce()
+                               .getHumanResources()
+                               .newPerson(campaign, mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR);
             } else if (unit.getEntity() instanceof ConvFighter) {
-                person = campaign.newPerson(PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT);
+                person = campaign.getPlayerForce()
+                               .getHumanResources()
+                               .newPerson(campaign,
+                                     mekhq.campaign.personnel.enums.PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT);
             }
 
             if (person == null) {
                 break;
             }
-            if (!campaign.recruitPerson(person, isGM, true)) {
+            if (!campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, person, isGM, true)) {
                 return;
             }
             unit.addGunner(person);
@@ -154,19 +196,21 @@ public record HirePersonnelUnitAction(boolean isGM) implements IUnitAction {
                 role = PersonnelRole.ASTECH;
             }
 
-            Person person = campaign.newPerson(role);
+            Person person = campaign.getPlayerForce().getHumanResources().newPerson(campaign, role);
             if (person == null) {
                 break;
             }
-            if (!campaign.recruitPerson(person, isGM, true)) {
+            if (!campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, person, isGM, true)) {
                 return;
             }
             unit.addVesselCrew(person);
         }
 
         if (unit.canTakeNavigator()) {
-            Person person = campaign.newPerson(PersonnelRole.VESSEL_NAVIGATOR);
-            if (!campaign.recruitPerson(person, isGM, true)) {
+            Person person = campaign.getPlayerForce()
+                                  .getHumanResources()
+                                  .newPerson(campaign, mekhq.campaign.personnel.enums.PersonnelRole.VESSEL_NAVIGATOR);
+            if (!campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, person, isGM, true)) {
                 return;
             }
             unit.setNavigator(person);
@@ -177,16 +221,27 @@ public record HirePersonnelUnitAction(boolean isGM) implements IUnitAction {
             //For vehicle command console we will default to gunner
             if (unit.getEntity() instanceof Tank) {
                 if (unit.getEntity().getMovementMode().isMarine()) {
-                    person = campaign.newPerson(PersonnelRole.VEHICLE_CREW_NAVAL);
+                    person = campaign.getPlayerForce()
+                                   .getHumanResources()
+                                   .newPerson(campaign,
+                                         mekhq.campaign.personnel.enums.PersonnelRole.VEHICLE_CREW_NAVAL);
                 } else if (unit.getEntity().getMovementMode().isVTOL()) {
-                    person = campaign.newPerson(PersonnelRole.VEHICLE_CREW_VTOL);
+                    person = campaign.getPlayerForce()
+                                   .getHumanResources()
+                                   .newPerson(campaign,
+                                         mekhq.campaign.personnel.enums.PersonnelRole.VEHICLE_CREW_VTOL);
                 } else {
-                    person = campaign.newPerson(PersonnelRole.VEHICLE_CREW_GROUND);
+                    person = campaign.getPlayerForce()
+                                   .getHumanResources()
+                                   .newPerson(campaign,
+                                         mekhq.campaign.personnel.enums.PersonnelRole.VEHICLE_CREW_GROUND);
                 }
             } else {
-                person = campaign.newPerson(PersonnelRole.MEKWARRIOR);
+                person = campaign.getPlayerForce()
+                               .getHumanResources()
+                               .newPerson(campaign, mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR);
             }
-            if (!campaign.recruitPerson(person, isGM, true)) {
+            if (!campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, person, isGM, true)) {
                 return;
             }
             unit.setTechOfficer(person);

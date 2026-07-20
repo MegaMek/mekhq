@@ -46,6 +46,7 @@ import javax.swing.tree.TreePath;
 
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.unit.Unit;
@@ -123,7 +124,9 @@ public class TOETransferHandler extends TransferHandler {
         if (parent instanceof Formation) {
             superFormation = (Formation) parent;
         } else if (parent instanceof Unit) {
-            superFormation = gui.getCampaign().getFormation(((Unit) parent).getFormationId());
+            Campaign campaign = gui.getCampaign();
+            int id = ((Unit) parent).getFormationId();
+            superFormation = campaign.getPlayerForce().getFormation(id);
         }
 
         // Extract transfer data.
@@ -142,7 +145,8 @@ public class TOETransferHandler extends TransferHandler {
                 unit = gui.getCampaign().getUnit(UUID.fromString(id));
             }
             if (type.equals("FORCE")) {
-                formation = gui.getCampaign().getFormation(Integer.parseInt(id));
+                Campaign campaign = gui.getCampaign();
+                formation = campaign.getPlayerForce().getFormation(Integer.parseInt(id));
             }
         } catch (UnsupportedFlavorException ufe) {
             LOGGER.error("UnsupportedFlavor: {}", ufe.getMessage());
@@ -178,7 +182,8 @@ public class TOETransferHandler extends TransferHandler {
                 }
             }
             if (type.equals("FORCE")) {
-                formation = gui.getCampaign().getFormation(Integer.parseInt(id));
+                Campaign campaign = gui.getCampaign();
+                formation = campaign.getPlayerForce().getFormation(Integer.parseInt(id));
                 if (formation == null || formation.isDeployed()) {
                     return false;
                 }
@@ -198,16 +203,21 @@ public class TOETransferHandler extends TransferHandler {
         if (parent instanceof Formation) {
             superFormation = (Formation) parent;
         } else if (parent instanceof Unit) {
-            superFormation = gui.getCampaign().getFormation(((Unit) parent).getFormationId());
+            Campaign campaign = gui.getCampaign();
+            int id = ((Unit) parent).getFormationId();
+            superFormation = campaign.getPlayerForce().getFormation(id);
         }
 
         if (superFormation != null) {
             if (unit != null) {
-                gui.getCampaign().addUnitToFormation(unit, superFormation.getId());
+                Campaign campaign = gui.getCampaign();
+                int id = superFormation.getId();
+                campaign.getPlayerForce().addUnitToFormation(unit, id, campaign);
                 return true;
             }
             if (formation != null) {
-                gui.getCampaign().moveFormation(formation, superFormation);
+                mekhq.campaign.Campaign campaign = gui.getCampaign();
+                campaign.getPlayerForce().moveFormation(formation, superFormation, campaign);
                 return true;
             }
         }

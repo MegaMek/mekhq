@@ -38,6 +38,7 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,7 +55,7 @@ import org.junit.jupiter.api.Test;
 public class MissingAvionicsTest {
     @Test
     public void missingLAMAvionicsRepairableOnlyWithBothTorsosAndHead() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         Unit unit = mock(Unit.class);
         LandAirMek entity = mock(LandAirMek.class);
         when(unit.getEntity()).thenReturn(entity);

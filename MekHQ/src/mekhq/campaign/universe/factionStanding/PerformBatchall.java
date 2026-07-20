@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,7 +33,6 @@
 package mekhq.campaign.universe.factionStanding;
 
 import static megamek.common.compute.Compute.randomInt;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -90,7 +89,7 @@ public class PerformBatchall {
         this.campaign = campaign;
         this.clanOpponent = clanOpponent;
         this.enemyFactionCode = enemyFactionCode;
-        standingLevel = getFactionStandingLevel(campaign.getFactionStandings());
+        standingLevel = getFactionStandingLevel(campaign.getPlayerForce().getFactionStandings());
         batchallVersion = randomInt(BATCHALL_OPTIONS_COUNT);
 
         if (campaign.getCampaignOptions().isUseFactionStandingBatchallRestrictionsSafe()) {
@@ -302,7 +301,11 @@ public class PerformBatchall {
      */
     private int getAreYouSureDialog() {
         ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
-              campaign.getSeniorAdminPerson(COMMAND),
+              campaign.getPlayerForce().getHumanResources()
+                    .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND,
+                          campaign.getCampaignOptions(),
+                          campaign.isClanCampaign(),
+                          campaign.getLocalDate()),
               null,
               getAreYouSureDialogText(),
               getAreYouSureDialogOptions(),

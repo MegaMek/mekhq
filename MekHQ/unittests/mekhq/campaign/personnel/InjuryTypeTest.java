@@ -37,12 +37,21 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
 import java.util.EnumSet;
 
+import megamek.common.enums.Gender;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.InjuryLevel;
 import mekhq.campaign.personnel.medical.BodyLocation;
+import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 
 /**
  * Test class for {@link InjuryType} register method
@@ -213,6 +222,79 @@ class InjuryTypeTest {
         // Attempting to retrieve an injury type with a non-existent ID should return null
         InjuryType result = InjuryType.byId(999998);
         assertNull(result, "byId should return null for unregistered IDs");
+    }
+
+    /**
+     * Builds a person whose options never trigger the exceptional-immune-system halving, paired with a campaign whose
+     * Alternate Advanced Medical settings are controlled by the test.
+     */
+    private static Person mockPatient() {
+        Person person = mock(Person.class);
+        PersonnelOptions options = mock(PersonnelOptions.class);
+        when(person.getOptions()).thenReturn(options);
+        when(options.booleanOption(PersonnelOptions.MUTATION_EXCEPTIONAL_IMMUNE_SYSTEM)).thenReturn(false);
+        when(person.getGender()).thenReturn(Gender.MALE);
+        return person;
+    }
+
+    private static Campaign mockCampaign(boolean useAlternateAdvancedMedical, double healingTimeMultiplier) {
+        Campaign campaign = mock(Campaign.class);
+        CampaignOptions campaignOptions = mock(CampaignOptions.class);
+        when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
+        when(campaign.getLocalDate()).thenReturn(LocalDate.of(3151, 1, 1));
+        when(campaignOptions.isUseAlternativeAdvancedMedical()).thenReturn(useAlternateAdvancedMedical);
+        when(campaignOptions.getAlternativeAdvancedMedicalHealingTimeMultiplier()).thenReturn(healingTimeMultiplier);
+        return campaign;
+    }
+
+    @Test
+    void testNewInjuryAppliesHealingTimeMultiplierWhenAlternateAdvancedMedicalEnabled() {
+        InjuryType testInjury = new TestInjuryType("testMultiplierApplied");
+        Person person = mockPatient();
+        Campaign campaign = mockCampaign(true, 2.0);
+
+        try (MockedStatic<InjuryUtil> injuryUtil = mockStatic(InjuryUtil.class)) {
+            injuryUtil.when(() -> InjuryUtil.genHealingTime(campaign, person, testInjury, 1)).thenReturn(10);
+
+            Injury injury = testInjury.newInjury(campaign, person, BodyLocation.GENERIC, 1);
+
+            assertNotNull(injury);
+            assertEquals(20, injury.getOriginalTime(), "Recovery time should be scaled by the 2.0 multiplier");
+            assertEquals(20, injury.getTime(), "Current time should match the scaled recovery time");
+        }
+    }
+
+    @Test
+    void testNewInjuryHealingTimeMultiplierFloorsAtOneDay() {
+        InjuryType testInjury = new TestInjuryType("testMultiplierFloor");
+        Person person = mockPatient();
+        Campaign campaign = mockCampaign(true, 0.1);
+
+        try (MockedStatic<InjuryUtil> injuryUtil = mockStatic(InjuryUtil.class)) {
+            injuryUtil.when(() -> InjuryUtil.genHealingTime(campaign, person, testInjury, 1)).thenReturn(5);
+
+            Injury injury = testInjury.newInjury(campaign, person, BodyLocation.GENERIC, 1);
+
+            assertNotNull(injury);
+            assertEquals(1, injury.getOriginalTime(), "Scaled recovery time should never drop below one day");
+        }
+    }
+
+    @Test
+    void testNewInjuryIgnoresHealingTimeMultiplierWhenAlternateAdvancedMedicalDisabled() {
+        InjuryType testInjury = new TestInjuryType("testMultiplierDisabled");
+        Person person = mockPatient();
+        Campaign campaign = mockCampaign(false, 2.0);
+
+        try (MockedStatic<InjuryUtil> injuryUtil = mockStatic(InjuryUtil.class)) {
+            injuryUtil.when(() -> InjuryUtil.genHealingTime(campaign, person, testInjury, 1)).thenReturn(10);
+
+            Injury injury = testInjury.newInjury(campaign, person, BodyLocation.GENERIC, 1);
+
+            assertNotNull(injury);
+            assertEquals(10, injury.getOriginalTime(),
+                  "Recovery time should be untouched when Alternate Advanced Medical is off");
+        }
     }
 
     @Test

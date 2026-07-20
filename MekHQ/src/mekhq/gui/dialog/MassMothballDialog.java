@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,6 +32,8 @@
  */
 package mekhq.gui.dialog;
 
+import static mekhq.utilities.MHQInternationalization.getText;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -62,8 +64,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.UnitTableMouseAdapter;
 import mekhq.utilities.ReportingUtilities;
-
-import static mekhq.utilities.MHQInternationalization.getText;
 
 /**
  * This class handles the display of the Mass Mothball/Reactivate dialog
@@ -204,7 +204,12 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
         JList<Person> techList = new JList<>();
         DefaultListModel<Person> listModel = new DefaultListModel<>();
 
-        for (Person tech : campaign.getTechs()) {
+        for (Person tech : campaign.getPlayerForce()
+                                 .getHumanResources()
+                                 .getTechs(campaign.getPlayerForce().getHangar().getUnits(),
+                                       campaign.getCampaignOptions(),
+                                       campaign.isClanCampaign(),
+                                       campaign.getLocalDate())) {
             if (tech.canTech(unitsByType.get(unitType).getFirst().getEntity())) {
                 listModel.addElement(tech);
             }
@@ -330,7 +335,8 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
                 if (isMothballing) {
                     if (clearDesignationsCheckbox != null && clearDesignationsCheckbox.isSelected()) {
                         unit.clearCrew();
-                        unit.getCampaign().removeUnitFromFormation(unit);
+                        Campaign campaign1 = unit.getCampaign();
+                        campaign1.getPlayerForce().removeUnitFromFormation(unit, campaign1);
                     }
                     unit.startMothballing(tech);
                 } else {

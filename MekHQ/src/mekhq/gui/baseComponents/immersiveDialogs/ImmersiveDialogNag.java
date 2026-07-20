@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -274,13 +274,25 @@ public class ImmersiveDialogNag {
      */
     protected @Nullable Person getSpeaker(Campaign campaign, @Nullable AdministratorSpecialization specialization) {
         if (specialization == null) {
-            return campaign.getSeniorAdminPerson(COMMAND);
+            return campaign.getPlayerForce().getHumanResources()
+                         .getSeniorAdminPerson(COMMAND,
+                               campaign.getCampaignOptions(),
+                               campaign.isClanCampaign(),
+                               campaign.getLocalDate());
         }
 
-        Person speaker = campaign.getSeniorAdminPerson(specialization);
+        Person speaker = campaign.getPlayerForce().getHumanResources()
+                               .getSeniorAdminPerson(specialization,
+                                     campaign.getCampaignOptions(),
+                                     campaign.isClanCampaign(),
+                                     campaign.getLocalDate());
 
         if (speaker == null && specialization != COMMAND) {
-            speaker = campaign.getSeniorAdminPerson(COMMAND);
+            speaker = campaign.getPlayerForce().getHumanResources()
+                            .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND,
+                                  campaign.getCampaignOptions(),
+                                  campaign.isClanCampaign(),
+                                  campaign.getLocalDate());
         }
 
         return speaker;

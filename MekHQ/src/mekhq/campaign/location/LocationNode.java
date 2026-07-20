@@ -147,7 +147,7 @@ public class LocationNode {
      * serialized through the location tree.</p>
      */
     public static void reconnectChildren(Node xmlNode, Campaign campaign) {
-        reconnectChildren(xmlNode, campaign, campaign);
+        reconnectChildren(xmlNode, campaign.getPlayerForce().getForceDetachment(), campaign);
     }
 
     /**

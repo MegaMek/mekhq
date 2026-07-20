@@ -69,6 +69,8 @@ import megamek.common.icons.Camouflage;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
+import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
+import mekhq.campaign.digitalGM.stratCon.SupportPointNegotiation;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.Money;
@@ -85,8 +87,6 @@ import mekhq.campaign.personnel.ranks.AutoAssignRankForCompanyGenerator;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
-import mekhq.campaign.stratCon.StratConCampaignState;
-import mekhq.campaign.stratCon.SupportPointNegotiation;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -328,10 +328,11 @@ public abstract class AbstractMissionTransition {
     public int getTravelDays(Campaign campaign) {
         if (null != this.getSystem()) {
             boolean isUseCommandCircuit =
-                  FactionStandingUtilities.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(),
+                  FactionStandingUtilities.isUseCommandCircuit(campaign.getPlayerForce()
+                                                                     .isOverridingCommandCircuitRequirements(),
                         campaign.isGM(),
                         campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
-                        campaign.getFactionStandings(), campaign.getFutureAtBContracts());
+                        campaign.getPlayerForce().getFactionStandings(), campaign.getFutureAtBContracts());
 
             JumpPath jumpPath = getJumpPath(campaign);
             if (jumpPath == null) {
@@ -339,7 +340,8 @@ public abstract class AbstractMissionTransition {
             }
 
             double days = Math.round(jumpPath.getTotalTime(campaign.getLocalDate(),
-                  campaign.getCurrentLocation().getTransitTime(), isUseCommandCircuit) * 100.0)
+                  campaign.getPlayerForce().getForceDetachment().getCurrentLocation().getTransitTime(),
+                  isUseCommandCircuit) * 100.0)
                                 / 100.0;
             return (int) ceil(days);
         }
@@ -436,7 +438,10 @@ public abstract class AbstractMissionTransition {
     }
 
     public void createEmployerLiaison(Campaign campaign) {
-        setEmployerLiaison(campaign.newPerson(PersonnelRole.MILITARY_LIAISON, getEmployerCode(), Gender.RANDOMIZE));
+        final String factionCode = getEmployerCode();
+        setEmployerLiaison(campaign.getPlayerForce()
+                                 .getHumanResources()
+                                 .newPerson(campaign, PersonnelRole.MILITARY_LIAISON, factionCode, Gender.RANDOMIZE));
 
         AutoAssignRankForCompanyGenerator.assignAscendingRank(getEmployerLiaison(), RO_MIN);
     }
@@ -608,7 +613,10 @@ public abstract class AbstractMissionTransition {
     }
 
     public void createClanOpponent(Campaign campaign) {
-        setClanOpponent(campaign.newPerson(PersonnelRole.MEKWARRIOR, getEnemyCode(), Gender.RANDOMIZE));
+        final String factionCode = getEnemyCode();
+        setClanOpponent(campaign.getPlayerForce()
+                              .getHumanResources()
+                              .newPerson(campaign, PersonnelRole.MEKWARRIOR, factionCode, Gender.RANDOMIZE));
         if (getClanOpponent() == null) {
             return;
         }
@@ -1230,7 +1238,8 @@ public abstract class AbstractMissionTransition {
         boolean useTwoWayPay = campaign.getCampaignOptions().isUseTwoWayPay();
         boolean isUseCommandCircuits = campaign.isUseCommandCircuitForContract(this);
         int duration = (int) ceil(jumpPath.getTotalTime(campaign.getLocalDate(),
-              campaign.getCurrentLocation().getTransitTime(), isUseCommandCircuits));
+              campaign.getPlayerForce().getForceDetachment().getCurrentLocation().getTransitTime(),
+              isUseCommandCircuits));
         Money transportCost = transportCostCalculations.calculateJumpCostForEntireJourney(duration,
               jumpPath.getJumps());
 

@@ -45,6 +45,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 import megamek.common.util.weightedMaps.WeightedIntMap;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 
 public class BackgroundsController {
@@ -52,7 +53,8 @@ public class BackgroundsController {
                                                   .getBundle("mekhq.resources.RandomMercenaryCompanyNameGenerator");
 
     public static void generateBackground(Campaign campaign, Person person) {
-        if (campaign.getCampaignOptions().isUseToughness()) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        if (campaignOptions.isUseToughness() && campaignOptions.isUseRandomToughness()) {
             Toughness.generateToughness(person);
         }
     }

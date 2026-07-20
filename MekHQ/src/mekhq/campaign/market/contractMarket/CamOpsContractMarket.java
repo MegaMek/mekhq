@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,7 +35,7 @@ package mekhq.campaign.market.contractMarket;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.enums.SkillLevel.GREEN;
 import static megamek.common.enums.SkillLevel.REGULAR;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
+import static mekhq.campaign.mission.newContract.ClanHomeworldsExclusion.violatesHomeworldsExclusion;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_NETWORKER;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.campaign.randomEvents.other.GrayMonday.isGrayMonday;
@@ -45,15 +45,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 
+import megamek.codeUtilities.ObjectUtility;
+import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 import megamek.common.enums.SkillLevel;
 import megamek.common.universe.FactionTag;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.camOpsReputation.ReputationController;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.AtBContract;
@@ -63,7 +63,6 @@ import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.enums.HiringHallLevel;
@@ -85,7 +84,8 @@ public class CamOpsContractMarket extends AbstractContractMarket {
     @Override
     public AtBContract addAtBContract(Campaign campaign) {
         HiringHallModifiers hiringHallModifiers = getHiringHallModifiers(campaign);
-        ReputationController reputation = campaign.getReputation();
+        mekhq.campaign.camOpsReputation.ForceReputationController reputation = campaign.getPlayerForce()
+                                                                                     .getReputation();
         Optional<AtBContract> c = generateContract(campaign, reputation, hiringHallModifiers);
         if (c.isPresent()) {
             AtBContract atbContract = c.get();
@@ -118,11 +118,15 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         //}
         // TODO: CamOpsMarket: allow players to choose negotiators and send them out, removing them
         // from other tasks they're doing. For now just use the highest negotiation skill on the force.
-        int ratingMod = campaign.getReputation().getReputationModifier();
+        int ratingMod = campaign.getPlayerForce().getReputation().getReputationModifier();
         HiringHallModifiers hiringHallModifiers = getHiringHallModifiers(campaign);
         int negotiationSkill = findNegotiationSkill(campaign);
 
-        Person negotiator = campaign.getSeniorAdminPerson(COMMAND);
+        Person negotiator = campaign.getPlayerForce().getHumanResources()
+                                  .getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND,
+                                        campaign.getCampaignOptions(),
+                                        campaign.isClanCampaign(),
+                                        campaign.getLocalDate());
         int negotiatorModifier = 0;
         if (negotiator != null) {
             PersonnelOptions options = negotiator.getOptions();
@@ -154,7 +158,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
 
     @Override
     public double calculatePaymentMultiplier(Campaign campaign, AtBContract contract) {
-        double reputationFactor = campaign.getReputation().getReputationFactor();
+        double reputationFactor = campaign.getPlayerForce().getReputation().getReputationFactor();
         ContractTerms terms = getContractTerms(campaign, contract);
         return terms.getEmploymentMultiplier() * terms.getOperationsTempoMultiplier() * reputationFactor;
     }
@@ -171,10 +175,10 @@ public class CamOpsContractMarket extends AbstractContractMarket {
             return;
         }
         int negotiationSkill = findNegotiationSkill(campaign);
-        int ratingMod = campaign.getReputation().getReputationModifier();
+        int ratingMod = campaign.getPlayerForce().getReputation().getReputationModifier();
 
         if (campaign.getCampaignOptions().isUseFactionStandingNegotiationSafe()) {
-            FactionStandings standings = campaign.getFactionStandings();
+            FactionStandings standings = campaign.getPlayerForce().getFactionStandings();
             double regard = standings.getRegardForFaction(contract.getEmployerCode(), true);
             int negotiationModifier = FactionStandingUtilities.getNegotiationModifier(regard);
             ratingMod += negotiationModifier;
@@ -203,17 +207,23 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         HiringHallModifiers modifiers;
         if (campaign.getFaction().isMercenary()) {
             modifiers = new HiringHallModifiers(campaign.getSystemHiringHallLevel());
-        } else if (campaign.getFaction().isGovernment()) {
-            modifiers = new HiringHallModifiers(HiringHallLevel.GREAT);
         } else {
-            modifiers = new HiringHallModifiers(HiringHallLevel.NONE);
+            if (campaign.getFaction().isGovernment()) {
+                modifiers = new HiringHallModifiers(HiringHallLevel.GREAT);
+            } else {
+                modifiers = new HiringHallModifiers(HiringHallLevel.NONE);
+            }
         }
         return modifiers;
     }
 
     private int findNegotiationSkill(Campaign campaign) {
         // TODO: have pirates use investigation skill instead when it is implemented per CamOps
-        Person negotiator = campaign.findBestAtSkill(SkillType.S_NEGOTIATION);
+        Person negotiator = campaign.getPlayerForce().getHumanResources()
+                                  .findBestAtSkill(mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION,
+                                        campaign.getCampaignOptions(),
+                                        campaign.isClanCampaign(),
+                                        campaign.getLocalDate());
         if (negotiator == null) {
             return 0;
         }
@@ -249,7 +259,8 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         }
     }
 
-    private Optional<AtBContract> generateContract(Campaign campaign, ReputationController reputation,
+    private Optional<AtBContract> generateContract(Campaign campaign,
+            mekhq.campaign.camOpsReputation.ForceReputationController reputation,
           HiringHallModifiers hiringHallModifiers) {
         AtBContract contract = new AtBContract("UnnamedContract");
         lastId++;
@@ -257,6 +268,10 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         contractIds.put(lastId, contract);
         // Step 1: Determine Employer
         Faction employer = determineEmployer(campaign, reputation.getReputationModifier(), hiringHallModifiers);
+        if (employer == null) {
+            // No active faction matches the rolled employer column (e.g. no corporation factions in this era).
+            return Optional.empty();
+        }
         contract.updateEmployer(employer.getShortName(), campaign.getGameYear());
         if (employer.isMercenary()) {
             contract.setMercSubcontract(true);
@@ -264,12 +279,15 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         // Step 2: Determine the mission type
         contract.setContractTypeAndName(determineMission(campaign, employer, reputation.getReputationModifier()));
         ContractTerms contractTerms = getContractTerms(campaign, contract);
-        setEnemyCode(contract);
+        setEnemyCode(contract, campaign);
         setAttacker(contract);
         // Step 3: Set the system location
         try {
-            setSystemId(contract);
+            setSystemId(contract, campaign);
         } catch (NoContractLocationFoundException ex) {
+            return Optional.empty();
+        }
+        if (violatesHomeworldsExclusion(contract, campaign)) {
             return Optional.empty();
         }
         // Step 4: Populate some information about enemies and allies
@@ -312,7 +330,9 @@ public class CamOpsContractMarket extends AbstractContractMarket {
               contract.getSystem().getName(contract.getStartDate()),
               contract.getContractType()));
 
-        contract.clanTechSalvageOverride();
+        if (campaign.getCampaignOptions().isLimitClanTech()) {
+            contract.clanTechSalvageOverride();
+        }
 
         return Optional.of(contract);
     }
@@ -330,7 +350,8 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         }
     }
 
-    private Faction determineEmployer(Campaign campaign, int ratingMod, HiringHallModifiers hiringHallModifiers) {
+    private @Nullable Faction determineEmployer(Campaign campaign, int ratingMod,
+          HiringHallModifiers hiringHallModifiers) {
         Collection<FactionTag> employerTags;
         int roll = Compute.d6(2) + ratingMod + hiringHallModifiers.employersMod;
         if (roll < 6) {
@@ -343,28 +364,47 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         return getRandomEmployer(campaign, employerTags);
     }
 
-    private Faction getRandomEmployer(Campaign campaign, Collection<FactionTag> employerTags) {
+    /**
+     * Picks a random active faction matching every tag of the rolled employer column (see {@link #getEmployerTags}).
+     *
+     * @param campaign     the active campaign; Clan factions other than the campaign's own are never valid employers
+     * @param employerTags the tags a faction must all carry to sit in the rolled employer column
+     *
+     * @return a random qualifying employer faction, or {@code null} if no active faction qualifies
+     */
+    private @Nullable Faction getRandomEmployer(Campaign campaign, Collection<FactionTag> employerTags) {
         Collection<Faction> factions = Factions.getInstance().getActiveFactions(campaign.getLocalDate());
         List<Faction> filtered = new ArrayList<>();
         for (Faction faction : factions) {
             // Clans only hire units within their own clan
-            if (faction.isClan() && !faction.equals(campaign.getFaction())) {
-                continue;
-            }
-            for (FactionTag employerTag : employerTags) {
-                if (!faction.is(employerTag)) {
-                    // The SMALL tag has to be converted to independent for now, since for some reason
-                    // independent is coded as a string.
-                    if (employerTag == FactionTag.SMALL && faction.isIndependent()) {
-                        continue;
-                    }
-                    break;
+            if (faction.isClan()) {
+                if (!faction.equals(campaign.getFaction())) {
+                    continue;
                 }
+            }
+            if (matchesAllEmployerTags(faction, employerTags)) {
                 filtered.add(faction);
             }
         }
-        Random rand = new Random();
-        return filtered.get(rand.nextInt(filtered.size()));
+        return filtered.isEmpty() ? null : ObjectUtility.getRandomItem(filtered);
+    }
+
+    /**
+     * @param faction      the candidate employer faction
+     * @param employerTags the tags of the rolled employer column
+     *
+     * @return {@code true} if the faction carries every one of the given tags; the SMALL tag is also satisfied by an
+     *       independent faction, since independence is coded as a string rather than a tag
+     */
+    static boolean matchesAllEmployerTags(Faction faction, Collection<FactionTag> employerTags) {
+        for (FactionTag employerTag : employerTags) {
+            boolean matches = faction.is(employerTag) ||
+                                    ((employerTag == FactionTag.SMALL) && faction.isIndependent());
+            if (!matches) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private Collection<FactionTag> getEmployerTags(Campaign campaign, int roll, boolean independent) {
@@ -429,7 +469,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
     private ContractTerms getContractTerms(Campaign campaign, AtBContract contract) {
         return new ContractTerms(contract.getContractType(),
               contract.getEmployerFaction(),
-              campaign.getReputation().getReputationFactor(),
+              campaign.getPlayerForce().getReputation().getReputationFactor(),
               campaign.getLocalDate());
     }
 

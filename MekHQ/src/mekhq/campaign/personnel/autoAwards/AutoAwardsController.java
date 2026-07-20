@@ -276,7 +276,7 @@ public class AutoAwardsController {
         LocalDate lastMissionEndDate = getLastMissionEndDate();
 
         // Fetch all personnel in the campaign.
-        Collection<Person> rawPersonnel = campaign.getAllPersonnel();
+        Collection<Person> rawPersonnel = campaign.getPlayerForce().getHumanResources().getPersonnel();
         // Create a list to store Ids of qualifying personnel.
         List<UUID> personnel = new ArrayList<>();
 
@@ -831,7 +831,7 @@ public class AutoAwardsController {
             } catch (Exception e) {
                 data = null;
                 logger.debug("{} is not eligible for any Contract Awards.",
-                      campaign.getPerson(person).getFullName());
+                      campaign.getPlayerForce().getHumanResources().getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -870,7 +870,7 @@ public class AutoAwardsController {
             } catch (Exception e) {
                 data = null;
                 logger.debug("{} is not eligible for any Faction Hunter Awards.",
-                      campaign.getPerson(person).getFullName());
+                      campaign.getPlayerForce().getHumanResources().getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -905,7 +905,8 @@ public class AutoAwardsController {
                 data = InjuryAwards.InjuryAwardsProcessor(campaign, person, injuryAwards, personnel.get(person));
             } catch (Exception e) {
                 data = null;
-                logger.debug("{} is not eligible for any Injury Awards.", campaign.getPerson(person).getFullName());
+                logger.debug("{} is not eligible for any Injury Awards.",
+                      campaign.getPlayerForce().getHumanResources().getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -948,7 +949,7 @@ public class AutoAwardsController {
             } catch (Exception e) {
                 data = null;
                 logger.debug("{} is not eligible for any Kill Awards.",
-                      campaign.getPerson(person).getFullName());
+                      campaign.getPlayerForce().getHumanResources().getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -993,7 +994,7 @@ public class AutoAwardsController {
             } catch (Exception e) {
                 data = null;
                 logger.debug("{} is not eligible for any Scenario Kill Awards.",
-                      campaign.getPerson(person).getFullName());
+                      campaign.getPlayerForce().getHumanResources().getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -1059,7 +1060,7 @@ public class AutoAwardsController {
             // we do everybody here, as we want to capture personnel who were support personnel,
             // even if they're not current support personnel
             for (UUID person : temporaryPersonnelList) {
-                Person p = campaign.getPerson(person);
+                Person p = campaign.getPlayerForce().getHumanResources().getPerson(person);
 
                 if (p.getAutoAwardSupportPoints() > supportPoints) {
                     supportPersonOfTheYear = person;
@@ -1099,7 +1100,8 @@ public class AutoAwardsController {
                 );
             } catch (Exception e) {
                 data = null;
-                logger.debug("{} is not eligible for any Misc Awards.", campaign.getPerson(person).getFullName());
+                logger.debug("{} is not eligible for any Misc Awards.",
+                      campaign.getPlayerForce().getHumanResources().getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -1133,7 +1135,8 @@ public class AutoAwardsController {
                 data = RankAwards.RankAwardsProcessor(campaign, person, rankAwards);
             } catch (Exception e) {
                 data = null;
-                logger.debug("{} is not eligible for any Rank Awards.", campaign.getPerson(person).getFullName());
+                logger.debug("{} is not eligible for any Rank Awards.",
+                      campaign.getPlayerForce().getHumanResources().getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -1167,7 +1170,8 @@ public class AutoAwardsController {
                 data = ScenarioAwards.ScenarioAwardsProcessor(campaign, person, scenarioAwards);
             } catch (Exception e) {
                 data = null;
-                logger.debug("{} is not eligible for any Scenario Awards.", campaign.getPerson(person).getFullName());
+                logger.debug("{} is not eligible for any Scenario Awards.",
+                      campaign.getPlayerForce().getHumanResources().getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -1201,7 +1205,8 @@ public class AutoAwardsController {
                 data = SkillAwards.SkillAwardsProcessor(campaign, person, skillAwards);
             } catch (Exception e) {
                 data = null;
-                logger.debug("{} is not eligible for any Skill Awards.", campaign.getPerson(person).getFullName());
+                logger.debug("{} is not eligible for any Skill Awards.",
+                      campaign.getPlayerForce().getHumanResources().getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -1236,7 +1241,7 @@ public class AutoAwardsController {
             } catch (Exception e) {
                 data = null;
                 logger.debug("{} is not eligible for any Theatre of War Awards.",
-                      campaign.getPerson(person).getFullName());
+                      campaign.getPlayerForce().getHumanResources().getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -1270,7 +1275,8 @@ public class AutoAwardsController {
                 data = TimeAwards.TimeAwardsProcessor(campaign, person, timeAwards);
             } catch (Exception e) {
                 data = null;
-                logger.debug("{} is not eligible for any Time Awards.", campaign.getPerson(person).getFullName());
+                logger.debug("{} is not eligible for any Time Awards.",
+                      campaign.getPlayerForce().getHumanResources().getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -1309,7 +1315,8 @@ public class AutoAwardsController {
                       trainingAwards);
             } catch (Exception e) {
                 data = null;
-                logger.debug("{} is not eligible for any Training Awards.", campaign.getPerson(person).getFullName());
+                logger.debug("{} is not eligible for any Training Awards.",
+                      campaign.getPlayerForce().getHumanResources().getPerson(person).getFullName());
             }
 
             if (data != null) {

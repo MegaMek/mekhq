@@ -41,7 +41,6 @@ import static megamek.common.enums.SkillLevel.NONE;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.enums.SkillLevel.ULTRA_GREEN;
 import static megamek.common.enums.SkillLevel.VETERAN;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.MEKHQ;
 import static mekhq.campaign.personnel.PersonUtility.overrideSkills;
@@ -317,7 +316,11 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
             Campaign campaign = gui.getCampaign();
             String commanderAddress = campaign.getCommanderAddress();
-            Person logisticsAdmin = campaign.getSeniorAdminPerson(LOGISTICS);
+            Person logisticsAdmin = campaign.getPlayerForce().getHumanResources()
+                                          .getSeniorAdminPerson(Campaign.AdministratorSpecialization.LOGISTICS,
+                                                campaign.getCampaignOptions(),
+                                                campaign.isClanCampaign(),
+                                                campaign.getLocalDate());
 
             // Cancel is first (index 0), so closing dialog via X defaults to cancel
             List<String> buttons = List.of(
@@ -525,17 +528,25 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 // Determine the appropriate crew role for this unit
                 PersonnelRole crewRole = unit.getDriverRole();
 
-                if (crewRole != null && gui.getCampaign().isBlobCrewEnabled(crewRole)) {
-                    int currentTempCrew = unit.getTempCrewByPersonnelRole(crewRole);
-                    int needed = maxTempCrewForUnit - currentTempCrew;
+                if (crewRole != null) {
+                    mekhq.campaign.Campaign campaign = gui.getCampaign();
+                    if (campaign.getPlayerForce()
+                              .getHumanResources()
+                              .isBlobCrewEnabled(crewRole, campaign.getCampaignOptions())) {
+                        int currentTempCrew = unit.getTempCrewByPersonnelRole(crewRole);
+                        int needed = maxTempCrewForUnit - currentTempCrew;
 
-                    if (needed > 0) {
-                        // Check available pool for this crew type
-                        int availableInPool = gui.getCampaign().getAvailableTempCrewPool(crewRole);
-                        int toAssign = Math.min(needed, availableInPool);
+                        if (needed > 0) {
+                            // Check available pool for this crew type
+                            Campaign campaign1 = gui.getCampaign();
+                            int availableInPool = campaign1.getPlayerForce()
+                                                        .getHumanResources()
+                                                        .getAvailableTempCrewPool(campaign1, crewRole);
+                            int toAssign = Math.min(needed, availableInPool);
 
-                        if (toAssign > 0) {
-                            unit.setTempCrew(crewRole, currentTempCrew + toAssign);
+                            if (toAssign > 0) {
+                                unit.setTempCrew(crewRole, currentTempCrew + toAssign);
+                            }
                         }
                     }
                 }
@@ -618,8 +629,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                                                                .getCampaignOptions()
                                                                .getCancelledOrderRefundMultiplier());
                 gui.getCampaign().removeUnit(u.getId());
-                gui.getCampaign()
-                      .getFinances()
+                gui.getCampaign().getPlayerForce().getFinances()
                       .credit(TransactionType.EQUIPMENT_PURCHASE,
                             gui.getCampaign().getLocalDate(),
                             refundAmount,
@@ -635,8 +645,9 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             } else {
                 Person tech = pickTechForMothballOrActivation(selectedUnit, "mothballing");
                 if (tech != null) {
+                    Campaign campaign1 = selectedUnit.getCampaign();
                     if ((!selectedUnit.getActiveCrew().isEmpty()) ||
-                              (selectedUnit.getCampaign().getFormationFor(selectedUnit)) != null) {
+                              (campaign1.getPlayerForce().getFormationFor(selectedUnit)) != null) {
                         Campaign campaign = gui.getCampaign();
                         ImmersiveDialogSimple clearAssignments = new ImmersiveDialogSimple(selectedUnit.getCampaign(),
                               tech,
@@ -651,7 +662,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                               false);
                         if (clearAssignments.getDialogChoice() == 1) {
                             selectedUnit.clearCrew();
-                            campaign.removeUnitFromFormation(selectedUnit);
+                            campaign.getPlayerForce().removeUnitFromFormation(selectedUnit, campaign);
                         }
                     }
                     MothballUnitAction mothballUnitAction = new MothballUnitAction(tech, false);
@@ -782,7 +793,8 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
         if (!unit.isSelfCrewed() || isSelfCrewedButHasNoTech(unit)) {
             UUID id = gui.selectTech(unit, description, true);
             if (null != id) {
-                tech = gui.getCampaign().getPerson(id);
+                Campaign campaign = gui.getCampaign();
+                tech = campaign.getPlayerForce().getHumanResources().getPerson(id);
                 if (!tech.getTechUnits().isEmpty()) {
                     if (JOptionPane.YES_OPTION !=
                               JOptionPane.showConfirmDialog(gui.getFrame(),
@@ -1199,9 +1211,17 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     fillDisabledReason = getText("tempCrew.fillWithTempCrew.atFullStrength");
                 } else {
                     PersonnelRole crewRole = unit.getDriverRole();
+                    mekhq.campaign.Campaign campaign = gui.getCampaign();
+                    Campaign campaign1 = gui.getCampaign();
                     boolean hasPool = crewRole != null
-                                            && gui.getCampaign().isBlobCrewEnabled(crewRole)
-                                            && gui.getCampaign().getAvailableTempCrewPool(crewRole) > 0;
+                                            &&
+                                            campaign.getPlayerForce()
+                                                  .getHumanResources()
+                                                  .isBlobCrewEnabled(crewRole, campaign.getCampaignOptions())
+                                            &&
+                                            campaign1.getPlayerForce()
+                                                  .getHumanResources()
+                                                  .getAvailableTempCrewPool(campaign1, crewRole) > 0;
                     if (!hasPool) {
                         fillDisabledReason = getText("tempCrew.fillWithTempCrew.noPoolAvailable");
                     }
@@ -1488,19 +1508,32 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
         PersonnelRole gunnerRole = unit.getGunnerRole();
 
         // Check if driver role is enabled
-        if (driverRole != null && gui.getCampaign().isBlobCrewEnabled(driverRole)) {
-            return true;
+        if (driverRole != null) {
+            mekhq.campaign.Campaign campaign = gui.getCampaign();
+            if (campaign.getPlayerForce()
+                      .getHumanResources()
+                      .isBlobCrewEnabled(driverRole, campaign.getCampaignOptions())) {
+                return true;
+            }
         }
 
         // Check if gunner role is enabled (and different from driver)
-        if (gunnerRole != null && !gunnerRole.equals(driverRole) &&
-                  gui.getCampaign().isBlobCrewEnabled(gunnerRole)) {
-            return true;
+        if (gunnerRole != null && !gunnerRole.equals(driverRole)) {
+            mekhq.campaign.Campaign campaign = gui.getCampaign();
+            if (campaign.getPlayerForce()
+                      .getHumanResources()
+                      .isBlobCrewEnabled(gunnerRole, campaign.getCampaignOptions())) {
+                return true;
+            }
         }
 
         // For vessels, also check vessel crew
         if (unit.getEntity().isSmallCraft() || unit.getEntity().isLargeCraft()) {
-            return gui.getCampaign().isBlobCrewEnabled(PersonnelRole.VESSEL_CREW);
+            mekhq.campaign.Campaign campaign = gui.getCampaign();
+            return campaign.getPlayerForce()
+                         .getHumanResources()
+                         .isBlobCrewEnabled(mekhq.campaign.personnel.enums.PersonnelRole.VESSEL_CREW,
+                               campaign.getCampaignOptions());
         }
 
         return false;

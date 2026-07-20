@@ -459,7 +459,7 @@ public class Finances {
                     addReportInsufficientFunds(campaign, resourceMap.getString("Payroll.text"));
 
                     if (campaignOptions.isUseLoyaltyModifiers()) {
-                        for (Person person : campaign.getAllPersonnel()) {
+                        for (Person person : campaign.getPlayerForce().getHumanResources().getPersonnel()) {
                             if (person.getStatus().isDepartedUnit()) {
                                 continue;
                             }
@@ -629,14 +629,14 @@ public class Finances {
         if (campaign.getCampaignOptions().isTrackTotalEarnings()) {
             boolean sharesForAll = campaign.getCampaignOptions().isSharesForAll();
 
-            int numberOfShares = campaign.getActivePersonnel(false, true)
+            int numberOfShares = campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, true)
                                        .stream()
                                        .mapToInt(person -> person.getNumShares(campaign, sharesForAll))
                                        .sum();
 
             Money singleShare = shares.dividedBy(numberOfShares);
 
-            for (Person person : campaign.getActivePersonnel(false, true)) {
+            for (Person person : campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, true)) {
                 person.payPersonShares(campaign, singleShare, sharesForAll);
             }
         }

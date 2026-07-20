@@ -148,9 +148,9 @@ public class SystemsPages {
         updateModelFromCreatedControls();
 
         if (model.resetCriminalRecord) {
-            campaign.setDateOfLastCrime(null);
-            campaign.setCrimeRating(0);
-            campaign.setCrimePirateModifier(0);
+            campaign.getPlayerForce().setDateOfLastCrime(null);
+            campaign.getPlayerForce().setCrimeRating(0);
+            campaign.getPlayerForce().setCrimePirateModifier(0);
             model.resetCriminalRecord = false;
         }
 

@@ -37,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,14 +62,14 @@ public class ContractUtilitiesTest {
 
     @BeforeAll
     static void beforeAll() {
-        mockCampaign = mock(Campaign.class);
+        mockCampaign = mockCampaign();
     }
 
     @BeforeEach
     void beforeEach() {
         mockCombatTeams = new ArrayList<>();
 
-        when(mockCampaign.getCombatTeamsAsList()).thenReturn(mockCombatTeams);
+        when(mockCampaign.getPlayerForce().getCombatTeamsAsList(mockCampaign)).thenReturn(mockCombatTeams);
     }
 
     @Nested

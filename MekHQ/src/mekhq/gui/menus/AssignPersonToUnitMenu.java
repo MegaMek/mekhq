@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -41,7 +41,6 @@ import javax.swing.JMenuItem;
 
 import megamek.common.units.*;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Hangar;
 import mekhq.campaign.base.AbstractBase;
 import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.personnel.Person;
@@ -190,9 +189,10 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
             // campaign hangar when in the main force. All selected persons must be co-located
             // (enforced above via the in-transit check and the unit co-location filter below).
             AbstractBase effectiveBase = LocationUtils.findEffectiveBase(people[0]);
-            Hangar sourceHangar = (effectiveBase != null)
-                  ? effectiveBase.getBaseHangar()
-                  : campaign.getHangar();
+            mekhq.campaign.LocalHangar sourceHangar;
+            sourceHangar = effectiveBase != null ?
+                                 effectiveBase.getBaseHangar() :
+                                 campaign.getPlayerForce().getHangar();
             final List<Unit> units = HangarSorter.defaultSorting()
                                            .sort(sourceHangar.getUnitsStream().filter(Unit::isAvailable))
                                            .toList();

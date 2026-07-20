@@ -43,9 +43,8 @@ import java.util.List;
 import java.util.UUID;
 
 import mekhq.campaign.FixedLocation;
-import mekhq.campaign.Hangar;
-import mekhq.campaign.Personnel;
-import mekhq.campaign.Warehouse;
+import mekhq.campaign.LocalPersonnel;
+import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.parts.meks.MekSensor;
@@ -84,21 +83,21 @@ public class AbstractBaseTest {
     class ResourceOwnership {
         @Test
         void getWarehouse_returnsBaseWarehouse() {
-            Warehouse wh = base.getWarehouse();
+            LocalWarehouse wh = base.getWarehouse();
             assertNotNull(wh);
             assertSame(wh, base.getBaseWarehouse());
         }
 
         @Test
         void getHangar_returnsBaseHangar() {
-            Hangar h = base.getHangar();
+            mekhq.campaign.LocalHangar h = base.getHangar();
             assertNotNull(h);
             assertSame(h, base.getBaseHangar());
         }
 
         @Test
         void getPersonnel_returnsBasePersonnel() {
-            Personnel p = base.getPersonnel();
+            LocalPersonnel p = base.getPersonnel();
             assertNotNull(p);
             assertSame(p, base.getBasePersonnel());
         }

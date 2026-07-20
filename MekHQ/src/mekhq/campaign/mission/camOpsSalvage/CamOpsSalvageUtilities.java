@@ -66,6 +66,10 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
+import mekhq.campaign.digitalGM.stratCon.StratConCoords;
+import mekhq.campaign.digitalGM.stratCon.StratConScenario;
+import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.finances.Money;
@@ -80,10 +84,6 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.InjurySPAUtility;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
-import mekhq.campaign.stratCon.StratConCampaignState;
-import mekhq.campaign.stratCon.StratConCoords;
-import mekhq.campaign.stratCon.StratConScenario;
-import mekhq.campaign.stratCon.StratConTrackState;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.enums.TransporterType;
@@ -246,7 +246,7 @@ public class CamOpsSalvageUtilities {
             }
 
             if (unitRansoms.isPositive()) {
-                campaign.getFinances()
+                campaign.getPlayerForce().getFinances()
                       .credit(TransactionType.SALVAGE,
                             campaign.getLocalDate(),
                             unitRansoms,
@@ -276,7 +276,7 @@ public class CamOpsSalvageUtilities {
                 ((Contract) mission).addSalvageByUnit(playerTakeHome);
 
                 if (playerTakeHome.isPositive()) {
-                    campaign.getFinances()
+                    campaign.getPlayerForce().getFinances()
                           .credit(TransactionType.SALVAGE_EXCHANGE,
                                 campaign.getLocalDate(),
                                 playerTakeHome,
@@ -551,7 +551,7 @@ public class CamOpsSalvageUtilities {
 
         findTrackAndCoords(scenario, state).ifPresent(loc -> {
             for (int forceId : scenario.getSalvageFormations()) {
-                Formation formation = campaign.getFormation(forceId);
+                Formation formation = campaign.getPlayerForce().getFormation(forceId);
                 if (formation != null) {
                     loc.track().assignForce(forceId, loc.coords(), campaign.getLocalDate(), false);
                 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -78,7 +78,7 @@ public class ProcurementTableModel extends DataTableModel<IAcquisitionWork> {
     //region Constructors
     public ProcurementTableModel(final Campaign campaign) {
         this.campaign = campaign;
-        setData(campaign.getShoppingList().getPartList());
+        setData(campaign.getPlayerForce().getShoppingList().getPartList());
         columnNames = resources.getString("ProcurementTableModel.columnNames").split(",");
     }
     //endregion Constructors
@@ -106,7 +106,7 @@ public class ProcurementTableModel extends DataTableModel<IAcquisitionWork> {
     }
 
     public void removeRow(final IAcquisitionWork acquisition) {
-        getCampaign().getShoppingList().removeItem(acquisition.getNewEquipment());
+        getCampaign().getPlayerForce().getShoppingList().removeItem(acquisition.getNewEquipment());
     }
 
     @Override

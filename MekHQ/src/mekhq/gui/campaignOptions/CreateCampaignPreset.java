@@ -555,8 +555,8 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         final SortedComboBoxModel<RankSystem> rankSystemModel = new SortedComboBoxModel<>(
               (systemA, systemB) -> comparator.compare(systemA.toString(), systemB.toString()));
         rankSystemModel.addAll(Ranks.getRankSystems().values());
-        if ((getCampaign() != null) && getCampaign().getRankSystem().getType().isCampaign()) {
-            rankSystemModel.addElement(getCampaign().getRankSystem());
+        if ((getCampaign() != null) && getCampaign().getPlayerForce().getRankSystem().getType().isCampaign()) {
+            rankSystemModel.addElement(getCampaign().getPlayerForce().getRankSystem());
         }
         setComboRankSystem(new MMComboBox<>("comboRankSystem", rankSystemModel));
         getComboRankSystem().setToolTipText(resources.getString("comboRankSystem.toolTipText"));
@@ -779,21 +779,32 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         getOkButton().setEnabled(false);
         getRootPane().setDefaultButton(getOkButton());
         restoreComboStartingSystem();
-        final Faction faction = (getPreset() == null) || (getPreset().getFaction() == null)
-                                      ? getCampaign().getFaction() : getPreset().getFaction();
+        final Faction faction;
+        if ((getPreset() == null) || (getPreset().getFaction() == null)) {
+            faction = getCampaign().getFaction();
+        } else {
+            faction = getPreset().getFaction();
+        }
         getComboFaction().setSelectedItem(new FactionDisplay(faction, getDate()));
         getComboStartingSystem().setSelectedItem((getPreset() == null) || (getPreset().getPlanet() == null)
                                                        ?
-                                                       getCampaign().getCurrentLocation().getCurrentSystem() :
+                                                       getCampaign().getPlayerForce()
+                                                             .getForceDetachment()
+                                                             .getCurrentLocation()
+                                                             .getCurrentSystem() :
                                                        getPreset().getPlanet().getParentSystem());
         getComboStartingPlanet().setSelectedItem((getPreset() == null) || (getPreset().getPlanet() == null)
                                                        ?
-                                                       getCampaign().getCurrentLocation()
+                                                       getCampaign().getPlayerForce()
+                                                             .getForceDetachment()
+                                                             .getCurrentLocation()
                                                              .getCurrentSystem()
                                                              .getPrimaryPlanet() :
                                                        getPreset().getPlanet());
         getComboRankSystem().setSelectedItem((getPreset() == null) || (getPreset().getRankSystem() == null)
-                                                   ? getCampaign().getRankSystem() : getPreset().getRankSystem());
+                                                   ?
+                                                   getCampaign().getPlayerForce().getRankSystem() :
+                                                   getPreset().getRankSystem());
         if (getPreset() != null) {
             getSpnContractCount().setValue(getPreset().getContractCount());
         }

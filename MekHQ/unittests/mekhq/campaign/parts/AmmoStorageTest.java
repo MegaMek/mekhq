@@ -42,6 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -78,7 +79,7 @@ public class AmmoStorageTest {
     @Test
     public void ammoStorageCtorTest() {
         AmmoType ammoType = getAmmoType("ISAC5 Ammo");
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         AmmoStorage ammoStorage = new AmmoStorage(0, ammoType, ammoType.getShots(), mockCampaign);
 
@@ -90,7 +91,7 @@ public class AmmoStorageTest {
     @Test
     public void getMissingPartTest() {
         AmmoType ammoType = getAmmoType("ISAC5 Ammo");
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         AmmoStorage ammoStorage = new AmmoStorage(0, ammoType, ammoType.getShots(), mockCampaign);
 
@@ -105,7 +106,7 @@ public class AmmoStorageTest {
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaignOptions.getCommonPartPriceMultiplier()).thenReturn(1d);
 
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
         AmmoStorage ammoStorage = new AmmoStorage(0, ammoType, 2 * ammoType.getShots(), mockCampaign);
@@ -127,7 +128,7 @@ public class AmmoStorageTest {
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaignOptions.getCommonPartPriceMultiplier()).thenReturn(1d);
 
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
         AmmoStorage ammoStorage = new AmmoStorage(0, ammoType, 2 * ammoType.getShots(), mockCampaign);
@@ -156,7 +157,7 @@ public class AmmoStorageTest {
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaignOptions.getCommonPartPriceMultiplier()).thenReturn(1d);
 
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
         AmmoStorage ammoStorage = new AmmoStorage(0, ammoType, 2 * ammoType.getShots(), mockCampaign);
@@ -185,7 +186,7 @@ public class AmmoStorageTest {
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaignOptions.getCommonPartPriceMultiplier()).thenReturn(1d);
 
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
         AmmoStorage ammoStorage = new AmmoStorage(0, ammoType, 2 * ammoType.getShots(), mockCampaign);
@@ -263,7 +264,7 @@ public class AmmoStorageTest {
     @Test
     public void isSamePartTypeTest() {
         AmmoType ammoType = getAmmoType("ISAC5 Ammo");
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         AmmoStorage ammoStorage = new AmmoStorage(0, ammoType, ammoType.getShots(), mockCampaign);
 
@@ -301,7 +302,7 @@ public class AmmoStorageTest {
     @Test
     public void isSamePartTypeBombTest() {
         BombType bombType = getBombType("HEBomb");
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         AmmoStorage ammoStorage = new AmmoStorage(0, bombType, bombType.getShots(), mockCampaign);
 
@@ -337,7 +338,7 @@ public class AmmoStorageTest {
     @Test
     public void isSameAmmoTypeTest() {
         AmmoType ammoType = getAmmoType("ISAC5 Ammo");
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         AmmoStorage ammoStorage = new AmmoStorage(0, ammoType, ammoType.getShots(), mockCampaign);
 
@@ -358,7 +359,7 @@ public class AmmoStorageTest {
 
     @Test
     public void isSameAmmoTypeFullHalfTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         // Create Full and Half bins
         Map<String, String> fullAndHalves = getFullAndHalves();
@@ -389,7 +390,7 @@ public class AmmoStorageTest {
     @Test
     public void getTonnageTest() {
         AmmoType isAC5Ammo = getAmmoType("ISAC5 Ammo");
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         AmmoStorage ammoStorage = new AmmoStorage(0, isAC5Ammo, isAC5Ammo.getShots(), mockCampaign);
 
@@ -410,7 +411,7 @@ public class AmmoStorageTest {
         AmmoType mockAmmoType = mock(AmmoType.class);
         double kgPerShot = 0.1;
         when(mockAmmoType.getKgPerShot()).thenReturn(kgPerShot);
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
 
         int shots = 50;
         AmmoStorage ammoStorage = new AmmoStorage(0, mockAmmoType, shots, mockCampaign);
@@ -424,7 +425,7 @@ public class AmmoStorageTest {
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaignOptions.getCommonPartPriceMultiplier()).thenReturn(1d);
 
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
 
         AmmoStorage ammoStorage = new AmmoStorage(0, isAC5Ammo, 0, mockCampaign);
@@ -450,7 +451,7 @@ public class AmmoStorageTest {
     @Test
     public void ammoStorageWriteToXmlTest() throws ParserConfigurationException, SAXException, IOException {
         AmmoType isSRM2InfernoAmmo = getAmmoType("ISSRM2 Inferno Ammo");
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         AmmoStorage ammoStorage = new AmmoStorage(0, isSRM2InfernoAmmo, 3 * isSRM2InfernoAmmo.getShots(), mockCampaign);
         ammoStorage.setId(25);
 
@@ -489,7 +490,7 @@ public class AmmoStorageTest {
     @Test
     public void ammoStorageBombWriteToXmlTest() throws ParserConfigurationException, SAXException, IOException {
         BombType infernoBomb = getBombType("InfernoBomb");
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         AmmoStorage ammoStorage = new AmmoStorage(0, infernoBomb, 3 * infernoBomb.getShots(), mockCampaign);
         ammoStorage.setId(25);
 

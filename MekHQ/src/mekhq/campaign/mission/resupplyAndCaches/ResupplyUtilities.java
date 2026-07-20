@@ -98,7 +98,7 @@ public class ResupplyUtilities {
           AtBDynamicScenario scenario) {
         final int scenarioId = scenario.getId();
 
-        for (Formation formation : campaign.getAllFormations()) {
+        for (Formation formation : campaign.getPlayerForce().getAllFormations()) {
             Formation parentFormation = formation.getParentFormation();
 
             if (parentFormation != null && (formation.getParentFormation().isFormationType(CONVOY))) {
@@ -191,7 +191,7 @@ public class ResupplyUtilities {
     public static int estimateAvailablePlayerCargo(Campaign campaign) {
         double totalPlayerCargoCapacity = 0;
 
-        for (Formation formation : campaign.getAllFormations()) {
+        for (Formation formation : campaign.getPlayerForce().getAllFormations()) {
             if (!formation.isFormationType(CONVOY)) {
                 continue;
             }

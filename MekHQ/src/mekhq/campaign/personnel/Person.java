@@ -46,6 +46,7 @@ import static megamek.common.icons.Portrait.DEFAULT_IMAGE_WIDTH;
 import static megamek.common.icons.Portrait.DEFAULT_PORTRAIT_FILENAME;
 import static megamek.common.icons.Portrait.NO_PORTRAIT_NAME;
 import static megamek.common.options.OptionsConstants.UNOFFICIAL_EI_IMPLANT;
+import static megamek.common.units.Crew.DEATH;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.log.LogEntryType.ASSIGNMENT;
@@ -68,6 +69,7 @@ import static mekhq.campaign.randomEvents.personalities.PersonalityController.ge
 import static mekhq.utilities.MHQInternationalization.getFormattedText;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getAmazingColor;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.getPositiveColor;
 import static mekhq.utilities.ReportingUtilities.getWarningColor;
@@ -107,7 +109,7 @@ import mekhq.Utilities;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ExtraData;
-import mekhq.campaign.Personnel;
+import mekhq.campaign.LocalPersonnel;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.events.persons.PersonStatusChangedEvent;
@@ -483,9 +485,6 @@ public class Person implements ILocatable {
         OTHER_RANSOM_VALUES.put(EXP_HEROIC, Money.of(100000));
         OTHER_RANSOM_VALUES.put(EXP_LEGENDARY, Money.of(150000));
     }
-
-    /** Greater than this value means death */
-    public static int DEATH_THRESHOLD = 5;
     // endregion Variable Declarations
 
     // region Constructors
@@ -503,7 +502,7 @@ public class Person implements ILocatable {
     }
 
     public Person(final String givenName, final String surname, final Campaign campaign) {
-        this(givenName, surname, campaign, campaign.getFaction().getShortName());
+        this(givenName, surname, campaign, campaign.getPlayerForce().getFaction().getShortName());
     }
 
     public Person(final String givenName, final String surname, final @Nullable Campaign campaign,
@@ -555,7 +554,7 @@ public class Person implements ILocatable {
         setTotalXPEarnings(0);
         daysToWaitForHealing = 0;
         setGender(Gender.MALE);
-        setRankSystemDirect((campaign == null) ? null : campaign.getRankSystem());
+        setRankSystemDirect((campaign == null) ? null : campaign.getPlayerForce().getRankSystem());
         setRank(0);
         setRankLevel(0);
         setManeiDominiClassDirect(ManeiDominiClass.NONE);
@@ -1534,6 +1533,39 @@ public class Person implements ILocatable {
     }
 
     /**
+     * Applies a forced loyalty change to all eligible personnel in the campaign.
+     *
+     * <p>This method iterates through all personnel in the given {@link Campaign} and, for each person who is
+     * neither departed from the unit nor currently a prisoner, calls {@link Person#performForcedDirectionLoyaltyChange}
+     * with the specified parameters. After all changes, if the campaign is using loyalty modifiers, a report about the
+     * group loyalty change is added to the campaign reports.</p>
+     *
+     * @param campaign   the {@link Campaign} whose personnel will have their loyalty modified
+     * @param isPositive {@code true} for a positive loyalty direction change, {@code false} for negative
+     * @param isMajor    {@code true} for a major loyalty change, {@code false} for minor
+     */
+    public static void performMassForcedDirectionLoyaltyChange(Campaign campaign, boolean isPositive,
+          boolean isMajor) {
+        for (Person person : campaign.getPlayerForce().getHumanResources().getPersonnel()) {
+            if (person.getStatus().isDepartedUnit()) {
+                continue;
+            }
+
+            if (person.getPrisonerStatus().isCurrentPrisoner()) {
+                continue;
+            }
+
+            person.performForcedDirectionLoyaltyChange(campaign, isPositive, isMajor, false);
+        }
+
+        if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
+            campaign.addReport(PERSONNEL, String.format(resources.getString("loyaltyChangeGroup.text"),
+                  "<span color=" + getWarningColor() + "'>",
+                  CLOSING_SPAN_TAG));
+        }
+    }
+
+    /**
      * This is used to change the person's PersonnelStatus
      *
      * @param campaign the campaign the person is part of
@@ -1549,6 +1581,10 @@ public class Person implements ILocatable {
             campaign.addReport(PERSONNEL,
                   String.format(resources.getString("resurrected.report"), getHyperlinkedFullTitle()));
             ServiceLogger.resurrected(this, today);
+        }
+
+        if (status.isDead() && attemptToCheatDeath(campaign)) {
+            return;
         }
 
         switch (status) {
@@ -1625,7 +1661,10 @@ public class Person implements ILocatable {
                 // (mekhq/campaign/personnel/education)
             }
             case PREGNANCY_COMPLICATIONS -> {
-                campaign.getProcreation().processPregnancyComplications(campaign, campaign.getLocalDate(), this);
+                campaign.getPlayerForce()
+                      .getHumanResources()
+                      .getProcreation()
+                      .processPregnancyComplications(campaign, campaign.getLocalDate(), this);
                 campaign.addReport(PERSONNEL, String.format(status.getReportText(), getHyperlinkedFullTitle()));
                 ServiceLogger.changedStatus(this, campaign.getLocalDate(), status);
             }
@@ -1638,10 +1677,14 @@ public class Person implements ILocatable {
         setStatus(status);
 
         if (status.isDead()) {
+
             setDateOfDeath(today);
 
             if ((genealogy.hasSpouse()) && (!genealogy.getSpouse().getStatus().isDead())) {
-                campaign.getDivorce().widowed(campaign, campaign.getLocalDate(), this);
+                campaign.getPlayerForce()
+                      .getHumanResources()
+                      .getDivorce()
+                      .widowed(campaign, campaign.getLocalDate(), this);
             }
 
             // log death across genealogy
@@ -1675,7 +1718,7 @@ public class Person implements ILocatable {
         if (status.isActiveFlexible()) {
             // Check Pregnancy
             if (isPregnant() && getDueDate().isBefore(today)) {
-                campaign.getProcreation().birth(campaign, getDueDate(), this);
+                campaign.getPlayerForce().getHumanResources().getProcreation().birth(campaign, getDueDate(), this);
             }
         } else {
             setDoctorId(null, campaign.getCampaignOptions().getNaturalHealingWaitingPeriod());
@@ -1698,7 +1741,10 @@ public class Person implements ILocatable {
             setCommander(false);
 
             // promote second in command
-            Person secondInCommand = campaign.getSecondInCommand();
+            Person secondInCommand = campaign.getPlayerForce().getHumanResources()
+                                           .getSecondInCommand(campaign.getCampaignOptions(),
+                                                 campaign.isClanCampaign(),
+                                                 campaign.getLocalDate());
             if (secondInCommand != null) {
                 secondInCommand.setSecondInCommand(false);
                 secondInCommand.setCommander(true);
@@ -1709,7 +1755,7 @@ public class Person implements ILocatable {
                 campaign.addReport(PERSONNEL, getFormattedText("setAsCommander.format",
                       secondInCommandHyperlink));
 
-                campaign.personUpdated(secondInCommand);
+                campaign.getPlayerForce().getHumanResources().personUpdated(campaign, secondInCommand);
             }
         }
 
@@ -1733,7 +1779,7 @@ public class Person implements ILocatable {
         this.setEduDaysOfTravel(0);
 
         for (UUID tagAlongId : eduTagAlongs) {
-            Person tagAlong = campaign.getPerson(tagAlongId);
+            Person tagAlong = campaign.getPlayerForce().getHumanResources().getPerson(tagAlongId);
 
             if (tagAlong != null) {
                 tagAlong.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
@@ -1744,28 +1790,77 @@ public class Person implements ILocatable {
         MekHQ.triggerEvent(new PersonStatusChangedEvent(this));
     }
 
-    /**
-     * If the current character is the campaign commander, adjust loyalty across the entire unit.
-     *
-     * @param campaign The current campaign
-     */
-    private void leadershipMassChangeLoyalty(Campaign campaign) {
-        for (Person person : campaign.getAllPersonnel()) {
-            if (person.getStatus().isDepartedUnit()) {
-                continue;
-            }
+    private boolean attemptToCheatDeath(Campaign campaign) {
+        LocalDate today = campaign.getLocalDate();
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
 
-            if (person.getPrisonerStatus().isCurrentPrisoner()) {
-                continue;
-            }
-
-            person.performRandomizedLoyaltyChange(campaign, false, false);
+        boolean isUseTwistOfFateSurvival = campaignOptions.isUseTwistOfFateSurvival();
+        if (!isUseTwistOfFateSurvival) {
+            return false;
         }
 
-        if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
-            campaign.addReport(PERSONNEL, String.format(resources.getString("loyaltyChangeGroup.text"),
-                  spanOpeningWithCustomColor(getWarningColor()),
-                  CLOSING_SPAN_TAG));
+        if (canUseTwistOfFateSurvival()) {
+            boolean isUseAdvancedMedical = campaignOptions.isUseAdvancedMedical();
+            int choiceEnumeration = isUseAdvancedMedical ? 1 : 0;
+
+            String report = getFormattedTextAt(RESOURCE_BUNDLE, "twistOfFate.escapedDeath",
+                  getHyperlinkedFullTitle(),
+                  getAmazingColor(),
+                  CLOSING_SPAN_TAG,
+                  choiceEnumeration);
+
+            if (getNonPermanentInjurySeverity() >= DEATH) {
+                healExcessHits(campaign);
+                healExcessInjuries(campaign, today);
+
+                MekHQ.triggerEvent(new PersonChangedEvent(this));
+            }
+
+            campaign.addReport(PERSONNEL, report);
+            PersonalLogger.cheatedDeath(this, today);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private void healExcessInjuries(Campaign campaign, LocalDate today) {
+        ArrayList<Injury> potentiallyHealedInjuries = new ArrayList<>();
+        for (Injury injury : getInjuries()) {
+            if (!injury.isPermanent() && injury.getHits() > 0) {
+                potentiallyHealedInjuries.add(injury);
+            }
+        }
+
+        while (!potentiallyHealedInjuries.isEmpty() && getNonPermanentInjurySeverity() >= DEATH) {
+            Injury randomInjury = ObjectUtility.getRandomItem(potentiallyHealedInjuries);
+            clearSpecificInjury(today, randomInjury);
+            potentiallyHealedInjuries.remove(randomInjury);
+
+            String injuryHealingReport = getFormattedTextAt(RESOURCE_BUNDLE, "twistOfFate.miracle.injury",
+                  getHyperlinkedFullTitle(),
+                  randomInjury.getName());
+            campaign.addReport(PERSONNEL, injuryHealingReport);
+
+            if (injuries.isEmpty()) {
+                doctorId = null;
+            }
+        }
+    }
+
+    private void healExcessHits(Campaign campaign) {
+        if (hits >= DEATH) {
+            int hitsHealed = hits - (DEATH - 1);
+            int hitsHealedEnumeration = hitsHealed == 1 ? 0 : 1;
+
+            String hitHealingReport = getFormattedTextAt(RESOURCE_BUNDLE, "twistOfFate.miracle.hits",
+                  getHyperlinkedFullTitle(),
+                  hitsHealed,
+                  hitsHealedEnumeration);
+            campaign.addReport(PERSONNEL, hitHealingReport);
+
+            hits = DEATH - 1;
         }
     }
 
@@ -1846,20 +1941,12 @@ public class Person implements ILocatable {
     }
 
     /**
-     * Applies a forced loyalty change to all eligible personnel in the campaign.
+     * If the current character is the campaign commander, adjust loyalty across the entire unit.
      *
-     * <p>This method iterates through all personnel in the given {@link Campaign} and, for each person who is
-     * neither departed from the unit nor currently a prisoner, calls {@link Person#performForcedDirectionLoyaltyChange}
-     * with the specified parameters. After all changes, if the campaign is using loyalty modifiers, a report about the
-     * group loyalty change is added to the campaign reports.</p>
-     *
-     * @param campaign   the {@link Campaign} whose personnel will have their loyalty modified
-     * @param isPositive {@code true} for a positive loyalty direction change, {@code false} for negative
-     * @param isMajor    {@code true} for a major loyalty change, {@code false} for minor
+     * @param campaign The current campaign
      */
-    public static void performMassForcedDirectionLoyaltyChange(Campaign campaign, boolean isPositive,
-          boolean isMajor) {
-        for (Person person : campaign.getAllPersonnel()) {
+    private void leadershipMassChangeLoyalty(Campaign campaign) {
+        for (Person person : campaign.getPlayerForce().getHumanResources().getPersonnel()) {
             if (person.getStatus().isDepartedUnit()) {
                 continue;
             }
@@ -1868,12 +1955,12 @@ public class Person implements ILocatable {
                 continue;
             }
 
-            person.performForcedDirectionLoyaltyChange(campaign, isPositive, isMajor, false);
+            person.performRandomizedLoyaltyChange(campaign, false, false);
         }
 
         if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
             campaign.addReport(PERSONNEL, String.format(resources.getString("loyaltyChangeGroup.text"),
-                  "<span color=" + getWarningColor() + "'>",
+                  spanOpeningWithCustomColor(getWarningColor()),
                   CLOSING_SPAN_TAG));
         }
     }
@@ -3434,7 +3521,7 @@ public class Person implements ILocatable {
             // Always save the person's gender, as it would otherwise get confusing fast
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "gender", getGender().name());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bloodGroup", getBloodGroup().name());
-            if (!getRankSystem().equals(campaign.getRankSystem())) {
+            if (!getRankSystem().equals(campaign.getPlayerForce().getRankSystem())) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "rankSystem", getRankSystem().getCode());
             }
             // Always save a person's rank
@@ -5105,7 +5192,7 @@ public class Person implements ILocatable {
             setLastRankChangeDate(null);
         }
 
-        campaign.personUpdated(this);
+        campaign.getPlayerForce().getHumanResources().personUpdated(campaign, this);
 
         if (report) {
             if ((rankNumeric > oldRankNumeric) || ((rankNumeric == oldRankNumeric) && (rankLevel > oldRankLevel))) {
@@ -6206,6 +6293,30 @@ public class Person implements ILocatable {
     }
 
     /**
+     * Determines whether the "Twist of Fate Survival" ability can be used based on current permanent Edge.
+     *
+     * <p>If Twist of Fate Survival is enabled and the character has at least 1 permanent Edge, their permanent Edge
+     * score is reduced by 1 and the method returns {@code true}. If the character's current Edge now exceeds their
+     * maximum Edge attribute, their current Edge is reduced accordingly.</p>
+     *
+     * @return {@code true} if the ability can be used and the Edge attribute was reduced.
+     */
+    private boolean canUseTwistOfFateSurvival() {
+        int permanentEdgeScore = getAttributeScore(SkillAttribute.EDGE);
+        if (permanentEdgeScore > 0) {
+            changeAttributeScore(SkillAttribute.EDGE, -1);
+            permanentEdgeScore -= 1;
+            if (getCurrentEdge() > permanentEdgeScore) {
+                setCurrentEdge(permanentEdgeScore);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * @return this person's currently available edge points. Used for weekly refresh.
      */
     public int getCurrentEdge() {
@@ -6554,7 +6665,7 @@ public class Person implements ILocatable {
     }
 
     public void removeAllTechJobs(final Campaign campaign) {
-        campaign.getAllHangar().forEachUnit(u -> {
+        campaign.getPlayerForce().getHangar().forEachUnit(u -> {
             if (equals(u.getTech())) {
                 u.remove(this, true);
             }
@@ -6564,13 +6675,14 @@ public class Person implements ILocatable {
             }
         });
 
-        for (final Part part : campaign.getAllWarehouse().getParts()) {
+        //TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
+        for (final Part part : campaign.getPlayerForce().getWarehouse().getParts()) {
             if (equals(part.getTech())) {
                 part.cancelAssignment(true);
             }
         }
 
-        for (final Formation formation : campaign.getAllFormations()) {
+        for (final Formation formation : campaign.getPlayerForce().getAllFormations()) {
             if (getId().equals(formation.getTechID())) {
                 formation.setTechID(null);
             }
@@ -7728,10 +7840,7 @@ public class Person implements ILocatable {
      */
     public void clearInjuriesExcludingProsthetics(LocalDate today) {
         for (Injury injury : new ArrayList<>(injuries)) {
-            InjurySubType injurySubType = injury.getSubType();
-            if (!injurySubType.isPermanentModification()) {
-                removeInjury(injury, today);
-            }
+            clearSpecificInjury(today, injury);
         }
 
         if (injuries.isEmpty()) {
@@ -7739,6 +7848,13 @@ public class Person implements ILocatable {
         }
 
         MekHQ.triggerEvent(new PersonChangedEvent(this));
+    }
+
+    private void clearSpecificInjury(LocalDate today, Injury injury) {
+        InjurySubType injurySubType = injury.getSubType();
+        if (!injurySubType.isPermanentModification()) {
+            removeInjury(injury, today);
+        }
     }
 
     /**
@@ -8399,7 +8515,7 @@ public class Person implements ILocatable {
             }
 
             int severity = getTotalInjurySeverity();
-            if (severity > DEATH_THRESHOLD) {
+            if (severity >= DEATH) {
                 changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
             }
         }
@@ -8446,7 +8562,7 @@ public class Person implements ILocatable {
                 hits += 1;
             }
 
-            if (!isUseAltAdvancedMedical && getTotalInjurySeverity() > DEATH_THRESHOLD) {
+            if (!isUseAltAdvancedMedical && getTotalInjurySeverity() >= DEATH) {
                 changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
             }
         }
@@ -8724,7 +8840,7 @@ public class Person implements ILocatable {
                 hits += 1;
             }
 
-            if (!isUseAltAdvancedMedical && getTotalInjurySeverity() > DEATH_THRESHOLD) {
+            if (!isUseAltAdvancedMedical && getTotalInjurySeverity() >= DEATH) {
                 changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
             }
 
@@ -8773,7 +8889,7 @@ public class Person implements ILocatable {
                 hits += 1;
             }
 
-            if (!isUseAltAdvancedMedical && getTotalInjurySeverity() > DEATH_THRESHOLD) {
+            if (!isUseAltAdvancedMedical && getTotalInjurySeverity() >= DEATH) {
                 changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
             }
 
@@ -8818,7 +8934,7 @@ public class Person implements ILocatable {
                 hits++;
             }
 
-            if (!isUseAltAdvancedMedical && getTotalInjurySeverity() > DEATH_THRESHOLD) {
+            if (!isUseAltAdvancedMedical && getTotalInjurySeverity() >= DEATH) {
                 changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
             }
 
@@ -8867,7 +8983,9 @@ public class Person implements ILocatable {
 
             LocalDate today = campaign.getLocalDate();
             Set<Person> victims = new HashSet<>();
-            List<Person> allActivePersonnel = campaign.getActivePersonnel(true, true);
+            List<Person> allActivePersonnel = campaign.getPlayerForce()
+                                                    .getHumanResources()
+                                                    .getActivePersonnel(true, true);
 
             if (isDeployed() && unit != null) {
                 getLocalVictims(today, allActivePersonnel, victims);
@@ -8892,7 +9010,7 @@ public class Person implements ILocatable {
                     victim.setHits(currentHits + 1);
                 }
 
-                if (!isUseAltAdvancedMedical && getTotalInjurySeverity() > DEATH_THRESHOLD) {
+                if (!isUseAltAdvancedMedical && getTotalInjurySeverity() >= DEATH) {
                     victim.changeStatus(campaign, campaign.getLocalDate(), victim.equals(this) ?
                                                                                  PersonnelStatus.MEDICAL_COMPLICATIONS :
                                                                                  PersonnelStatus.HOMICIDE);
@@ -9466,10 +9584,10 @@ public class Person implements ILocatable {
     public boolean setParent(ILocation parent) {
         ILocation oldParent = getParentLocation();
         if (ILocatable.super.setParent(parent)) {
-            if (oldParent instanceof Personnel personnel) {
+            if (oldParent instanceof LocalPersonnel personnel) {
                 personnel.remove(getId());
             }
-            if (parent instanceof Personnel personnel) {
+            if (parent instanceof LocalPersonnel personnel) {
                 personnel.put(getId(), this);
             }
             return true;

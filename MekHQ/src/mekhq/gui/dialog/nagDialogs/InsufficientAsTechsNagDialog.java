@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,8 +33,6 @@
 package mekhq.gui.dialog.nagDialogs;
 
 import static mekhq.MHQConstants.NAG_INSUFFICIENT_AS_TECHS;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
 import static mekhq.gui.dialog.nagDialogs.nagLogic.InsufficientAsTechsNagLogic.hasAsTechsNeeded;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
@@ -92,7 +90,7 @@ public class InsufficientAsTechsNagDialog extends ImmersiveDialogNag {
      */
     @Override
     protected @Nullable Person getSpeaker(Campaign campaign, @Nullable AdministratorSpecialization specialization) {
-        List<Person> potentialSpeakers = campaign.getActivePersonnel(false, false);
+        List<Person> potentialSpeakers = campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false);
 
         if (potentialSpeakers.isEmpty()) {
             return getFallbackSpeaker(campaign);
@@ -135,10 +133,18 @@ public class InsufficientAsTechsNagDialog extends ImmersiveDialogNag {
      *       is available.
      */
     private @Nullable Person getFallbackSpeaker(Campaign campaign) {
-        Person speaker = campaign.getSeniorAdminPerson(HR);
+        Person speaker = campaign.getPlayerForce().getHumanResources()
+                               .getSeniorAdminPerson(AdministratorSpecialization.HR,
+                                     campaign.getCampaignOptions(),
+                                     campaign.isClanCampaign(),
+                                     campaign.getLocalDate());
 
         if (speaker == null) {
-            speaker = campaign.getSeniorAdminPerson(COMMAND);
+            speaker = campaign.getPlayerForce().getHumanResources()
+                            .getSeniorAdminPerson(AdministratorSpecialization.COMMAND,
+                                  campaign.getCampaignOptions(),
+                                  campaign.isClanCampaign(),
+                                  campaign.getLocalDate());
         } else {
             return speaker;
         }
@@ -153,7 +159,7 @@ public class InsufficientAsTechsNagDialog extends ImmersiveDialogNag {
         int count = 0;
 
         if (campaign != null) {
-            count = campaign.getAsTechNeed();
+            count = campaign.getPlayerForce().getHumanResources().getAsTechNeed(campaign.getCampaignOptions());
         }
 
         return getFormattedTextAt(RESOURCE_BUNDLE, key + ".ic", commanderAddress, count);

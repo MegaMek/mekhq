@@ -64,6 +64,7 @@ import megamek.common.preference.PreferenceManager;
 import megamek.logging.MMLogger;
 import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.autoResolve.AutoResolveMethod;
+import mekhq.campaign.digitalGM.stratCon.StratConPlayType;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
@@ -75,7 +76,6 @@ import mekhq.campaign.mission.enums.CombatRole;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle;
-import mekhq.campaign.stratCon.StratConPlayType;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
 import mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick;
@@ -107,6 +107,8 @@ public class CampaignOptions {
     public static final double MAXIMUM_WARSHIP_EQUIPMENT_PERCENT = 1.0;
 
     public static final int REPUTATION_PERFORMANCE_CUT_OFF_YEARS = 10;
+
+    public static final int EDGE_AWARD_REPLACEMENT_XP = 10;
 
     public static String getTechLevelName(final int techLevel) {
         return switch (techLevel) {
@@ -222,6 +224,7 @@ public class CampaignOptions {
     private boolean variableTechLevel;
     private boolean factionIntroDate;
     private boolean useAmmoByType; // Unofficial
+    private boolean limitClanTech;
     // endregion Techlimits Tab
 
     // region Personnel Tab
@@ -238,6 +241,7 @@ public class CampaignOptions {
     private boolean onlyCommandersMatterBattleArmor;
     private EdgeRefreshPeriod edgeRefreshPeriod;
     private boolean useEdge;
+    private boolean useTwistOfFateSurvival;
     private boolean useImplants;
     private boolean alternativeQualityAveraging;
     private boolean useAgeEffects;
@@ -277,7 +281,8 @@ public class CampaignOptions {
     private boolean useRandomHitsForVehicles;
     private boolean tougherHealing;
     private boolean useAlternativeAdvancedMedical;
-    private boolean useKinderAlternativeAdvancedMedical;
+    private boolean useAlternativeAdvancedMedicalFewerPermanentInjuries;
+    private double alternativeAdvancedMedicalHealingTimeMultiplier;
     private boolean useRandomDiseases;
     private int maximumPatients;
     private boolean doctorsUseAdministration;
@@ -319,6 +324,7 @@ public class CampaignOptions {
 
     // Awards
     private AwardBonus awardBonusStyle;
+    private boolean useReplaceEdgeAwards;
     private boolean enableAutoAwards;
     private boolean issuePosthumousAwards;
     private boolean issueBestAwardOnly;
@@ -843,6 +849,7 @@ public class CampaignOptions {
         variableTechLevel = false;
         factionIntroDate = false;
         useAmmoByType = false;
+        limitClanTech = true;
         // endregion Techlimits Tab
 
         // region Personnel Tab
@@ -859,6 +866,7 @@ public class CampaignOptions {
         edgeRefreshPeriod = EdgeRefreshPeriod.WEEKLY;
         setOnlyCommandersMatterBattleArmor(false);
         setUseEdge(false);
+        setUseTwistOfFateSurvival(false);
         setUseImplants(false);
         setAlternativeQualityAveraging(false);
         setUseAgeEffects(false);
@@ -896,7 +904,8 @@ public class CampaignOptions {
         setUseRandomHitsForVehicles(false);
         setTougherHealing(false);
         useAlternativeAdvancedMedical = false;
-        useKinderAlternativeAdvancedMedical = false;
+        useAlternativeAdvancedMedicalFewerPermanentInjuries = false;
+        alternativeAdvancedMedicalHealingTimeMultiplier = 1.0;
         useRandomDiseases = false;
         setMaximumPatients(25);
         setDoctorsUseAdministration(false);
@@ -978,6 +987,7 @@ public class CampaignOptions {
 
         // Awards
         setAwardBonusStyle(AwardBonus.BOTH);
+        setUseReplaceEdgeAwards(false);
         setEnableAutoAwards(false);
         setIssuePosthumousAwards(false);
         setIssueBestAwardOnly(true);
@@ -1736,6 +1746,14 @@ public class CampaignOptions {
         this.useEdge = useEdge;
     }
 
+    public boolean isUseTwistOfFateSurvival() {
+        return useTwistOfFateSurvival;
+    }
+
+    public void setUseTwistOfFateSurvival(final boolean useTwistOfFateSurvival) {
+        this.useTwistOfFateSurvival = useTwistOfFateSurvival;
+    }
+
     public boolean isUseImplants() {
         return useImplants;
     }
@@ -2146,12 +2164,22 @@ public class CampaignOptions {
         this.useAlternativeAdvancedMedical = useAlternativeAdvancedMedical;
     }
 
-    public boolean isUseKinderAlternativeAdvancedMedical() {
-        return useKinderAlternativeAdvancedMedical;
+    public boolean isUseAlternativeAdvancedMedicalFewerPermanentInjuries() {
+        return useAlternativeAdvancedMedicalFewerPermanentInjuries;
     }
 
-    public void setUseKinderAlternativeAdvancedMedical(final boolean useKinderAlternativeAdvancedMedical) {
-        this.useKinderAlternativeAdvancedMedical = useKinderAlternativeAdvancedMedical;
+    public void setUseAlternativeAdvancedMedicalFewerPermanentInjuries(
+          final boolean useAlternativeAdvancedMedicalFewerPermanentInjuries) {
+        this.useAlternativeAdvancedMedicalFewerPermanentInjuries = useAlternativeAdvancedMedicalFewerPermanentInjuries;
+    }
+
+    public double getAlternativeAdvancedMedicalHealingTimeMultiplier() {
+        return alternativeAdvancedMedicalHealingTimeMultiplier;
+    }
+
+    public void setAlternativeAdvancedMedicalHealingTimeMultiplier(
+          double alternativeAdvancedMedicalHealingTimeMultiplier) {
+        this.alternativeAdvancedMedicalHealingTimeMultiplier = alternativeAdvancedMedicalHealingTimeMultiplier;
     }
 
     public boolean isUseRandomDiseases() {
@@ -3522,6 +3550,14 @@ public class CampaignOptions {
         this.awardBonusStyle = awardBonusStyle;
     }
 
+    public boolean isUseReplaceEdgeAwards() {
+        return useReplaceEdgeAwards;
+    }
+
+    public void setUseReplaceEdgeAwards(final boolean useReplaceEdgeAwards) {
+        this.useReplaceEdgeAwards = useReplaceEdgeAwards;
+    }
+
     public boolean isEnableAutoAwards() {
         return enableAutoAwards;
     }
@@ -4356,6 +4392,14 @@ public class CampaignOptions {
 
     public void setLimitByYear(final boolean limitByYear) {
         this.limitByYear = limitByYear;
+    }
+
+    public boolean isLimitClanTech() {
+        return limitClanTech;
+    }
+
+    public void setLimitClanTech(final boolean limitClanTech) {
+        this.limitClanTech = limitClanTech;
     }
 
     public boolean isDisallowExtinctStuff() {

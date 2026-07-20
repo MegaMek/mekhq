@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -152,7 +152,7 @@ public class RecoverMIAPersonnel {
      * @param campaign The campaign instance containing the personnel to be checked and updated.
      */
     public static void abandonMissingPersonnel(Campaign campaign) {
-        for (Person person : campaign.getAllPersonnel()) {
+        for (Person person : campaign.getPlayerForce().getHumanResources().getPersonnel()) {
             if (!person.getStatus().isMIA()) {
                 continue;
             }

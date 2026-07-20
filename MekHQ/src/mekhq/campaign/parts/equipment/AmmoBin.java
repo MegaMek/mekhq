@@ -60,7 +60,6 @@ import megamek.common.units.ProtoMek;
 import megamek.common.units.SmallCraft;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Warehouse;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Availability;
@@ -353,7 +352,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
      */
     protected int requisitionAmmo(AmmoType ammoType, int shotsNeeded) {
         Objects.requireNonNull(ammoType);
-        Warehouse warehouse = getWarehouse();
+        mekhq.campaign.LocalWarehouse warehouse = getWarehouse();
         int shotsLoaded = 0;
         while (shotsLoaded < shotsNeeded) {
             int shots = campaign.getQuartermaster().removeAmmo(warehouse, ammoType, shotsNeeded - shotsLoaded);

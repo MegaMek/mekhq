@@ -37,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.util.ResourceBundle;
 
@@ -106,7 +107,7 @@ class BattleMekFactionGenerationMethodTest {
         when(mockPerson.getOriginFaction()).thenReturn(mockOriginFaction);
 
         final Faction mockCampaignFaction = mock(Faction.class);
-        final Campaign mockCampaign = mock(Campaign.class);
+        final Campaign mockCampaign = mockCampaign();
         when(mockCampaign.getFaction()).thenReturn(mockCampaignFaction);
 
         final Faction mockSpecifiedFaction = mock(Faction.class);

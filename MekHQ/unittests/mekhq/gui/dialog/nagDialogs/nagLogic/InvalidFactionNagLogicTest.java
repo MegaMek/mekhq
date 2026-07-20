@@ -37,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.time.LocalDate;
 
@@ -66,7 +67,7 @@ class InvalidFactionNagLogicTest {
     @BeforeEach
     public void setup() {
         // Initialize the mock objects
-        campaign = mock(Campaign.class);
+        campaign = mockCampaign();
         faction = mock(Faction.class);
 
         dateValid = LocalDate.of(3151, 1, 1);

@@ -123,11 +123,10 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
                                                            .multipliedBy(gui.getCampaign()
                                                                                .getCampaignOptions()
                                                                                .getCancelledOrderRefundMultiplier()));
-                    gui.getCampaign().getWarehouse().removePart(p);
+                    gui.getCampaign().getPlayerForce().getWarehouse().removePart(p);
                 }
             }
-            gui.getCampaign()
-                  .getFinances()
+            gui.getCampaign().getPlayerForce().getFinances()
                   .credit(TransactionType.EQUIPMENT_PURCHASE,
                         gui.getCampaign().getLocalDate(),
                         refundAmount,
@@ -141,7 +140,7 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
         } else if (command.equalsIgnoreCase("REMOVE")) {
             for (Part p : parts) {
                 if (null != p) {
-                    gui.getCampaign().getWarehouse().removePart(p);
+                    gui.getCampaign().getPlayerForce().getWarehouse().removePart(p);
                 }
             }
         } else if (command.equalsIgnoreCase("REMOVE_N")) {
@@ -151,7 +150,7 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
                     return;
                 }
                 int quantity = dialog.getValue();
-                gui.getCampaign().getWarehouse().removePart(selectedPart, quantity);
+                gui.getCampaign().getPlayerForce().getWarehouse().removePart(selectedPart, quantity);
             }
         } else if (command.equalsIgnoreCase("ADD_N")) {
             if (null != selectedPart) {
@@ -177,7 +176,7 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
                     clonedPart.setQuantity(quantity);
                 }
 
-                gui.getCampaign().getWarehouse().addPart(clonedPart, true);
+                gui.getCampaign().getPlayerForce().getWarehouse().addPart(clonedPart, true);
             }
         } else if (command.contains("SET_QUALITY")) {
             boolean reverse = gui.getCampaign().getCampaignOptions().isReverseQualityNames();
@@ -251,7 +250,10 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
         } else if (command.equalsIgnoreCase("BUY")) {
             for (Part p : parts) {
                 if (null != p) {
-                    gui.getCampaign().getShoppingList().addShoppingItem(p.getAcquisitionWork(), 1, gui.getCampaign());
+                    gui.getCampaign()
+                          .getPlayerForce()
+                          .getShoppingList()
+                          .addShoppingItem(p.getAcquisitionWork(), 1, gui.getCampaign());
                 }
             }
         } else if (command.equalsIgnoreCase("BUY_N")) {
@@ -266,8 +268,7 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
                     return;
                 }
                 int q = popupValueChoiceDialog.getValue();
-                gui.getCampaign()
-                      .getShoppingList()
+                gui.getCampaign().getPlayerForce().getShoppingList()
                       .addShoppingItem(selectedPart.getAcquisitionWork(), q, gui.getCampaign());
             }
         }

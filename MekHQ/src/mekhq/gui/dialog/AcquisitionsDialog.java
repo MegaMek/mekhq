@@ -45,16 +45,7 @@ import java.awt.Insets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
@@ -70,8 +61,6 @@ import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.RepairTab;
-import mekhq.gui.enums.MHQTabType;
 import mekhq.service.PartsAcquisitionService;
 import mekhq.service.PartsAcquisitionService.PartCountInfo;
 import mekhq.utilities.ReportingUtilities;
@@ -291,8 +280,7 @@ public class AcquisitionsDialog extends JDialog {
             }
 
             if (partCountInfo.getMissingCount() > 0) {
-                campaignGUI.getCampaign()
-                      .getShoppingList()
+                campaignGUI.getCampaign().getPlayerForce().getShoppingList()
                       .addShoppingItem(part.getAcquisitionWork(),
                             partCountInfo.getMissingCount(),
                             campaignGUI.getCampaign());
@@ -516,8 +504,7 @@ public class AcquisitionsDialog extends JDialog {
             btnOrderOne.setToolTipText("Order one item");
             btnOrderOne.setName("btnOrderOne");
             btnOrderOne.addActionListener(ev -> {
-                campaignGUI.getCampaign()
-                      .getShoppingList()
+                campaignGUI.getCampaign().getPlayerForce().getShoppingList()
                       .addShoppingItem(part.getAcquisitionWork(), 1, campaignGUI.getCampaign());
                 refresh();
             });
@@ -537,8 +524,7 @@ public class AcquisitionsDialog extends JDialog {
                 pcd.setVisible(true);
                 quantity = pcd.getValue();
                 if (quantity > 0) {
-                    campaignGUI.getCampaign()
-                          .getShoppingList()
+                    campaignGUI.getCampaign().getPlayerForce().getShoppingList()
                           .addShoppingItem(part.getAcquisitionWork(), quantity, campaignGUI.getCampaign());
                     refresh();
                 }

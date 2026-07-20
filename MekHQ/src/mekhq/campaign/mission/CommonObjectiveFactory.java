@@ -225,10 +225,12 @@ public class CommonObjectiveFactory {
         // some scenarios have a lance assigned
         // some scenarios have individual units assigned
         if (scenario.getCombatTeamId() != AtBScenario.NO_COMBAT_TEAM) {
-            Formation formation = campaign.getFormation(scenario.getCombatTeamId());
+            int id1 = scenario.getCombatTeamId();
+            Formation formation = campaign.getPlayerForce().getFormation(id1);
 
             if (formation != null) {
-                objective.addForce(campaign.getFormation(scenario.getCombatTeamId()).getName());
+                int id = scenario.getCombatTeamId();
+                objective.addForce(campaign.getPlayerForce().getFormation(id).getName());
             }
         } else {
             int unitCount = 0;

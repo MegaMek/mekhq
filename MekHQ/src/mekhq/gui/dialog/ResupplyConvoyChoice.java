@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -102,7 +102,11 @@ public class ResupplyConvoyChoice {
     public ResupplyConvoyChoice(Campaign campaign, boolean isForcedPlayerConvoy, int enhancedTonnage,
           int normalTonnage, double availableCargoSpace, String moraleString) {
         ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
-              campaign.getSeniorAdminPerson(Campaign.AdministratorSpecialization.TRANSPORT),
+              campaign.getPlayerForce().getHumanResources()
+                    .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT,
+                          campaign.getCampaignOptions(),
+                          campaign.isClanCampaign(),
+                          campaign.getLocalDate()),
               null,
               getInCharacterMessage(isForcedPlayerConvoy, campaign.getCommanderAddress(), enhancedTonnage,
                     normalTonnage, availableCargoSpace),

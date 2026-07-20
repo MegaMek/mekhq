@@ -52,7 +52,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.FixedLocation;
 import mekhq.campaign.JumpPath;
-import mekhq.campaign.Personnel;
+import mekhq.campaign.LocalPersonnel;
 import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.location.AcademyCampusLocation;
@@ -65,6 +65,7 @@ import mekhq.gui.model.PersonnelTableModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import testUtilities.MHQTestUtilities;
 
 public class PersonnelTableModelColumnTest {
     //region Variable Declarations
@@ -160,11 +161,11 @@ public class PersonnelTableModelColumnTest {
         private static final LocalDate TODAY = LocalDate.of(3025, 1, 1);
         private static final String CAMPAIGN_NAME = "Test Mercs";
 
-        private Personnel mainForce;
+        private LocalPersonnel mainForce;
 
         @BeforeEach
         void setUp() {
-            mainForce = new Personnel();
+            mainForce = new LocalPersonnel();
         }
 
         private PlanetarySystem mockSystem(String sysName, String planetName) {
@@ -177,13 +178,13 @@ public class PersonnelTableModelColumnTest {
         }
 
         private Campaign mockCampaign() {
-            Campaign campaign = mock(Campaign.class);
+            Campaign campaign = MHQTestUtilities.mockCampaign();
             CampaignOptions opts = mock(CampaignOptions.class);
             when(campaign.getLocalDate()).thenReturn(TODAY);
             when(campaign.getName()).thenReturn(CAMPAIGN_NAME);
-            when(campaign.getMainForcePersonnel()).thenReturn(mainForce);
+            when(campaign.getPlayerForce().getPersonnel()).thenReturn(mainForce);
             when(campaign.getCampaignOptions()).thenReturn(opts);
-            when(campaign.isOverridingCommandCircuitRequirements()).thenReturn(false);
+            when(campaign.getPlayerForce().isOverridingCommandCircuitRequirements()).thenReturn(false);
             when(campaign.isGM()).thenReturn(false);
             when(opts.isUseFactionStandingCommandCircuitSafe()).thenReturn(false);
             when(campaign.getFutureAtBContracts()).thenReturn(List.of());

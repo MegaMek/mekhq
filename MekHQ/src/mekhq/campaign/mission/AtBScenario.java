@@ -75,10 +75,14 @@ import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Hangar;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.againstTheBot.AtBStaticWeightGenerator;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.digitalGM.stratCon.StratConBiomeManifest;
+import mekhq.campaign.digitalGM.stratCon.StratConBiomeManifest.MapTypeList;
+import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
+import mekhq.campaign.digitalGM.stratCon.StratConScenario;
+import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
@@ -91,11 +95,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.stratCon.StratConBiomeManifest;
-import mekhq.campaign.stratCon.StratConBiomeManifest.MapTypeList;
-import mekhq.campaign.stratCon.StratConCampaignState;
-import mekhq.campaign.stratCon.StratConScenario;
-import mekhq.campaign.stratCon.StratConTrackState;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -275,7 +274,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             combatRole = combatTeam.getRole();
             setMissionId(combatTeam.getMissionId());
 
-            for (UUID id : campaign.getFormation(combatTeam.getFormationId()).getAllUnits(true)) {
+            int id1 = combatTeam.getFormationId();
+            for (UUID id : campaign.getPlayerForce().getFormation(id1).getAllUnits(true)) {
                 entityIds.put(id, campaign.getUnit(id).getEntity());
             }
         }
@@ -754,27 +754,29 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         int numAttachedBot = 0;
         if (getContract(campaign).getContractType().isCadreDuty()) {
             numAttachedPlayer = 3;
-        } else if (campaign.getFaction().isMercenary()) {
-            switch (getContract(campaign).getCommandRights()) {
-                case INTEGRATED:
-                    if (campaign.getCampaignOptions().isPlayerControlsAttachedUnits()) {
-                        numAttachedPlayer = 2;
-                    } else {
-                        numAttachedBot = 2;
-                    }
-                    break;
-                case HOUSE:
-                    if (campaign.getCampaignOptions().isPlayerControlsAttachedUnits()) {
+        } else {
+            if (campaign.getFaction().isMercenary()) {
+                switch (getContract(campaign).getCommandRights()) {
+                    case INTEGRATED:
+                        if (campaign.getCampaignOptions().isPlayerControlsAttachedUnits()) {
+                            numAttachedPlayer = 2;
+                        } else {
+                            numAttachedBot = 2;
+                        }
+                        break;
+                    case HOUSE:
+                        if (campaign.getCampaignOptions().isPlayerControlsAttachedUnits()) {
+                            numAttachedPlayer = 1;
+                        } else {
+                            numAttachedBot = 1;
+                        }
+                        break;
+                    case LIAISON:
                         numAttachedPlayer = 1;
-                    } else {
-                        numAttachedBot = 1;
-                    }
-                    break;
-                case LIAISON:
-                    numAttachedPlayer = 1;
-                    break;
-                default:
-                    break;
+                        break;
+                    default:
+                        break;
+                }
             }
         }
 
@@ -875,8 +877,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         if (campaign.getCampaignOptions().isUseDropShips()) {
             if (canAddDropShips()) {
                 boolean dropshipFound = false;
-                Hangar hangar = campaign.getAllHangar();
-                List<UUID> allCombatUnits = campaign.getAllUnitsInTheTOE(true);
+                mekhq.campaign.LocalHangar hangar = campaign.getPlayerForce().getHangar();
+                List<UUID> allCombatUnits = campaign.getPlayerForce().getAllUnitsInTheTOE(true);
                 Collections.shuffle(allCombatUnits); // Remove bias
                 for (UUID unitId : allCombatUnits) {
                     Entity entity = EntityUtilities.getEntityFromUnitId(hangar, unitId);
@@ -2201,7 +2203,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             return null;
         }
 
-        return campaign.getCombatTeamsAsMap().get(combatTeamId);
+        return campaign.getPlayerForce().getCombatTeamsAsMap(campaign).get(combatTeamId);
     }
 
     public void setCombatTeam(CombatTeam combatTeam) {

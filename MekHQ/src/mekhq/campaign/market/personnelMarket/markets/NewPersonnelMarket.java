@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -68,7 +68,6 @@ import java.util.UUID;
 import megamek.Version;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
-import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -289,7 +288,10 @@ public class NewPersonnelMarket {
      * @since 0.50.07
      */
     int performConnectionsRecruitsCheck() {
-        Person commander = campaign.getCommander();
+        Person commander = campaign.getPlayerForce().getHumanResources()
+                                 .getCommander(campaign.getCampaignOptions(),
+                                       campaign.isClanCampaign(),
+                                       campaign.getLocalDate());
         if (commander == null) {
             return 0;
         }
@@ -1006,7 +1008,12 @@ public class NewPersonnelMarket {
         }
         String originFactionCode = applicantOriginFaction.getShortName();
 
-        Person applicant = campaign.newPerson(entry.profession(), originFactionCode, Gender.RANDOMIZE);
+        Person applicant = campaign.getPlayerForce()
+                                 .getHumanResources()
+                                 .newPerson(campaign,
+                                       entry.profession(),
+                                       originFactionCode,
+                                       megamek.common.enums.Gender.RANDOMIZE);
         if (applicant == null) {
             logger.warn("Could not create person for {} game year {} from faction {}",
                   originalEntry.profession(),

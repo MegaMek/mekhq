@@ -43,7 +43,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.AbstractMobileLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.FixedLocation;
-import mekhq.campaign.Personnel;
+import mekhq.campaign.LocalPersonnel;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.AcademyFactory;
@@ -63,7 +63,7 @@ public class AcademyCampusLocation implements IPlace {
     private static final MMLogger LOGGER = MMLogger.create(AcademyCampusLocation.class);
 
     private final LocationNode locationNode;
-    private final Personnel personnel = new Personnel();
+    private final LocalPersonnel personnel = new LocalPersonnel();
     private final String academySet;
     private final String academyName;
 
@@ -92,7 +92,7 @@ public class AcademyCampusLocation implements IPlace {
     }
 
     @Override
-    public Personnel getPersonnel() {
+    public LocalPersonnel getPersonnel() {
         return personnel;
     }
 

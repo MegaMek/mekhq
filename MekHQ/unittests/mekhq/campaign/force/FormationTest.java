@@ -35,6 +35,7 @@ package mekhq.campaign.force;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.util.UUID;
 import java.util.Vector;
@@ -235,7 +236,7 @@ class FormationTest {
 
         @BeforeEach
         void beforeEach() {
-            mockCampaign = mock(Campaign.class);
+            mockCampaign = mockCampaign();
         }
 
         private static Stream<Arguments> factions() {

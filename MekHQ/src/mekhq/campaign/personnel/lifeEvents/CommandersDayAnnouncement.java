@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -34,8 +34,6 @@ package mekhq.campaign.personnel.lifeEvents;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static megamek.common.compute.Compute.randomInt;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.HR;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.time.LocalDate;
@@ -110,7 +108,10 @@ public record CommandersDayAnnouncement(Campaign campaign) {
      */
     private String getInCharacterMessage() {
         // Commander Data
-        Person commander = campaign.getCommander();
+        Person commander = campaign.getPlayerForce().getHumanResources()
+                                 .getCommander(campaign.getCampaignOptions(),
+                                       campaign.isClanCampaign(),
+                                       campaign.getLocalDate());
         String commanderAddress = campaign.getCommanderAddress();
 
         String commanderSurname = commander.getSurname();
@@ -134,10 +135,18 @@ public record CommandersDayAnnouncement(Campaign campaign) {
      * @return the selected {@link Person}, or {@code null} if no suitable speaker is available
      */
     private @Nullable Person getSpeaker() {
-        Person speaker = campaign.getSeniorAdminPerson(HR);
+        Person speaker = campaign.getPlayerForce().getHumanResources()
+                               .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.HR,
+                                     campaign.getCampaignOptions(),
+                                     campaign.isClanCampaign(),
+                                     campaign.getLocalDate());
 
         if (speaker == null) {
-            speaker = campaign.getSeniorAdminPerson(COMMAND);
+            speaker = campaign.getPlayerForce().getHumanResources()
+                            .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND,
+                                  campaign.getCampaignOptions(),
+                                  campaign.isClanCampaign(),
+                                  campaign.getLocalDate());
         } else {
             return speaker;
         }

@@ -51,7 +51,10 @@ public enum CampaignOptionFlag {
     IMPORTANT("IMPORTANT"),
 
     /** Tooltip contains a recommendation */
-    RECOMMENDED("RECOMMENDED");
+    RECOMMENDED("RECOMMENDED"),
+
+    /** Feature is shown in the UI but not yet implemented */
+    UNIMPLEMENTED("UNIMPLEMENTED");
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignOptionsDialog";
 

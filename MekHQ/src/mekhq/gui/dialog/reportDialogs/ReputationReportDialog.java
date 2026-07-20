@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -61,7 +61,7 @@ public class ReputationReportDialog extends AbstractReportDialog {
 
         txtReport.setContentType("text/html");
 
-        txtReport.setText(String.format(getCampaign().getReputation().getReportText(campaign)));
+        txtReport.setText(String.format(getCampaign().getPlayerForce().getReputation().getReportText(campaign)));
 
         txtReport.setName("txtReport");
         txtReport.setEditable(false);

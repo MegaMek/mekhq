@@ -35,9 +35,6 @@ package mekhq.gui.view;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.COMMAND;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.LOGISTICS;
-import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 import static mekhq.campaign.mission.AbstractMissionTransition.UNKNOWN_DIFFICULTY;
 
 import java.awt.Cursor;
@@ -118,13 +115,25 @@ public class ContractSummaryPanel extends JPanel {
                 logRerolls = 1;
                 tranRerolls = 1;
             } else {
-                commandNegotiator = campaign.getSeniorAdminPerson(COMMAND);
+                commandNegotiator = campaign.getPlayerForce().getHumanResources()
+                                          .getSeniorAdminPerson(Campaign.AdministratorSpecialization.COMMAND,
+                                                campaign.getCampaignOptions(),
+                                                campaign.isClanCampaign(),
+                                                campaign.getLocalDate());
                 cmdRerolls = (commandNegotiator == null ||
                                     commandNegotiator.getSkill(SkillType.S_NEGOTIATION) == null) ? 0 : 1;
-                logisticsNegotiator = campaign.getSeniorAdminPerson(LOGISTICS);
+                logisticsNegotiator = campaign.getPlayerForce().getHumanResources()
+                                            .getSeniorAdminPerson(Campaign.AdministratorSpecialization.LOGISTICS,
+                                                  campaign.getCampaignOptions(),
+                                                  campaign.isClanCampaign(),
+                                                  campaign.getLocalDate());
                 logRerolls = (logisticsNegotiator == null ||
                                     logisticsNegotiator.getSkill(SkillType.S_NEGOTIATION) == null) ? 0 : 1;
-                transportNegotiator = campaign.getSeniorAdminPerson(TRANSPORT);
+                transportNegotiator = campaign.getPlayerForce().getHumanResources()
+                                            .getSeniorAdminPerson(Campaign.AdministratorSpecialization.TRANSPORT,
+                                                  campaign.getCampaignOptions(),
+                                                  campaign.isClanCampaign(),
+                                                  campaign.getLocalDate());
                 tranRerolls = (transportNegotiator == null ||
                                      transportNegotiator.getSkill(SkillType.S_NEGOTIATION) == null) ? 0 : 1;
             }
@@ -291,18 +300,21 @@ public class ContractSummaryPanel extends JPanel {
             JumpPath path = campaign.calculateJumpPath(campaign.getCurrentSystem(), contract.getSystem());
 
             boolean isUseCommandCircuit =
-                  FactionStandingUtilities.isUseCommandCircuit(campaign.isOverridingCommandCircuitRequirements(),
+                  FactionStandingUtilities.isUseCommandCircuit(campaign.getPlayerForce()
+                                                                     .isOverridingCommandCircuitRequirements(),
                         campaign.isGM(),
                         campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
-                        campaign.getFactionStandings(), List.of(atBContract));
+                        campaign.getPlayerForce().getFactionStandings(), List.of(atBContract));
 
             int days = (int) Math.ceil(path.getTotalTime(contract.getStartDate(),
-                  campaign.getCurrentLocation().getTransitTime(), isUseCommandCircuit));
+                  campaign.getPlayerForce().getForceDetachment().getCurrentLocation().getTransitTime(),
+                  isUseCommandCircuit));
             int jumps = path.getJumps();
-            if (campaign.getCurrentSystem().getId().equals(contract.getSystemId()) &&
-                      campaign.getCurrentLocation().isOnPlanet()) {
-                days = 0;
-                jumps = 0;
+            if (campaign.getCurrentSystem().getId().equals(contract.getSystemId())) {
+                if (campaign.getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet()) {
+                    days = 0;
+                    jumps = 0;
+                }
             }
             JLabel txtDistance = new JLabel(days + "(" + jumps + ')');
             txtDistance.setName("txtDistance");

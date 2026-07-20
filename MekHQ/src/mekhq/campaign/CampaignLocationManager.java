@@ -394,7 +394,7 @@ public class CampaignLocationManager {
 
     private boolean isStillInCampaign(ILocation traveler, Campaign campaign) {
         return switch (traveler) {
-            case Person person -> campaign.getPerson(person.getId()) != null;
+            case Person person -> {yield campaign.getPerson(person.getId()) != null;}
             case Unit unit -> campaign.getUnit(unit.getId()) != null;
             case Part part -> findPartAnywhere(campaign, part.getId()) != null;
             default -> true;
@@ -417,12 +417,12 @@ public class CampaignLocationManager {
         for (PlayerBase base : playerBases) {
             base.processArrivals(campaign);
         }
-        campaign.processArrivals(campaign);
+        campaign.getPlayerForce().getDetachmentLocationManager().processArrivals(campaign);
     }
 
     /** Searches the campaign warehouse then all base warehouses for a part by ID. */
     public @Nullable Part findPartAnywhere(Campaign campaign, int partId) {
-        Part part = campaign.getWarehouse().getPart(partId);
+        Part part = campaign.getPlayerForce().getWarehouse().getPart(partId);
         if (part != null) {
             return part;
         }
@@ -436,24 +436,24 @@ public class CampaignLocationManager {
     }
 
     /**
-     * Removes any {@link AbstractLocation} entries that have no personnel, parts, or units at any depth in their
-     * subtree, excluding the campaign's own current location.
+     * Removes any tracked top-level {@link AbstractLocation} that is no longer {@link ILocation#isInUse() in use} —
+     * one with no {@link Campaign}, {@link mekhq.campaign.base.AbstractBase}, person, unit, or part anywhere in its
+     * subtree. The main force's current location is retained automatically because the campaign node sits below it.
      *
      * <p>This handles two leak paths: {@link CurrentLocation} travel nodes whose passengers all
      * died or were removed before arriving, and {@link FixedLocation}/{@link AcademyCampusLocation} pairs that were
      * never cleaned up after the last student graduated.</p>
      *
+     * <p>A location whose subtree still holds a queued pending-travel destination is retained even when otherwise
+     * empty: dispatching that queued travel later would dereference the destination, so removing it here would leave
+     * {@link #dispatchPendingTravel} with a detached node.</p>
+     *
      * <p>Call this once per day after all personnel processing has completed.</p>
      */
-    public void pruneEmptyLocations(Campaign campaign) {
-        AbstractLocation mainLocation = campaign.getCurrentLocation();
+    public void pruneEmptyLocations() {
+        Set<ILocation> pendingDestinations = collectPendingDestinations();
         locations.removeIf(location -> {
-            if (location == mainLocation) {
-                return false;
-            }
-            if (!location.fetchPersonnelAtLocation().isEmpty()
-                      || !location.fetchPartsAtLocation().isEmpty()
-                      || !location.fetchUnitsAtLocation().isEmpty()) {
+            if (location.isInUse() || subtreeHoldsPendingDestination(location, pendingDestinations)) {
                 return false;
             }
             if (location instanceof AbstractMobileLocation) {
@@ -467,6 +467,45 @@ public class CampaignLocationManager {
             }
             return true;
         });
+    }
+
+    /**
+     * Returns {@code true} if {@code location} or any node in its subtree is queued as a pending-travel destination, so
+     * that a caller about to remove {@code location} from the tree can spare it — dispatching that queued travel later
+     * would otherwise dereference a detached destination.
+     */
+    public boolean holdsPendingTravelDestination(ILocation location) {
+        return subtreeHoldsPendingDestination(location, collectPendingDestinations());
+    }
+
+    /** Collects the destinations of all queued pending travel into an identity set. */
+    private Set<ILocation> collectPendingDestinations() {
+        Set<ILocation> destinations = Collections.newSetFromMap(new IdentityHashMap<>());
+        for (TravelRoute route : pendingTravel.keySet()) {
+            if (route.destination() != null) {
+                destinations.add(route.destination());
+            }
+        }
+        return destinations;
+    }
+
+    /**
+     * Returns {@code true} if {@code location} or any node in its subtree is one of {@code pendingDestinations}. Used to
+     * spare an otherwise-empty node that queued travel is still bound for.
+     */
+    private static boolean subtreeHoldsPendingDestination(ILocation location, Set<ILocation> pendingDestinations) {
+        if (pendingDestinations.isEmpty()) {
+            return false;
+        }
+        if (pendingDestinations.contains(location)) {
+            return true;
+        }
+        for (ILocation child : location.getChildLocations()) {
+            if (subtreeHoldsPendingDestination(child, pendingDestinations)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -546,7 +585,7 @@ public class CampaignLocationManager {
     @Nonnull
     public AcademyCampusLocation getOrCreateLocalCampusLocation(Campaign campaign, String academySet,
           String academyName) {
-        for (ILocation child : campaign.getChildLocations()) {
+        for (ILocation child : campaign.getPlayerForce().getForceDetachment().getChildLocations()) {
             if (child instanceof AcademyCampusLocation campus
                       && academySet.equals(campus.getAcademySet())
                       && academyName.equals(campus.getAcademyName())) {
@@ -554,7 +593,7 @@ public class CampaignLocationManager {
             }
         }
         AcademyCampusLocation campus = new AcademyCampusLocation(academySet, academyName);
-        LocationNode.LocationManager.setLocation(campus, campaign);
+        LocationNode.LocationManager.setLocation(campus, campaign.getPlayerForce().getForceDetachment());
         return campus;
     }
 
@@ -584,11 +623,11 @@ public class CampaignLocationManager {
      * Writes the {@code <locations>} and {@code <playerBases>} XML blocks.
      */
     public void writeToXML(Campaign campaign, PrintWriter pw, int indent) {
-        AbstractLocation mainForceLocation = campaign.getCurrentLocation();
+        AbstractLocation mainForceLocation = campaign.getPlayerForce().getForceDetachment().getCurrentLocation();
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "locations");
         for (AbstractLocation location : locations) {
             // Skip locations parented to another node — they are serialized inside their parent's XML.
-            // Skip the main force's current location — written separately by ForceLocationManager as <location>.
+            // Skip the main force's current location — written separately by DetachmentLocationManager as <location>.
             if (location.isParented() || location == mainForceLocation) {
                 continue;
             }

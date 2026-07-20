@@ -65,7 +65,7 @@ import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.camOpsReputation.ReputationController;
+import mekhq.campaign.camOpsReputation.ForceReputationController;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.personnel.Person;
@@ -472,8 +472,8 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
             autoAwardsController.ManualController(campaign, false);
         }
 
-        LOGGER.info("[CompanyGen][PostGen] initializing ReputationController");
-        ReputationController reputationController = new ReputationController();
+        LOGGER.info("[CompanyGen][PostGen] initializing ForceReputationController");
+        ForceReputationController reputationController = new ForceReputationController();
         reputationController.initializeReputation(campaign);
         campaign.setReputation(reputationController);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -44,6 +44,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,7 +54,6 @@ import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.WeaponMounted;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Quartermaster;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.LargeCraftAmmoBin;
@@ -64,8 +64,8 @@ import org.mockito.ArgumentCaptor;
 public class AdjustLargeCraftAmmoActionTest {
     @Test
     public void onlyAcceptsEntitiesUsingBayWeapons() {
-        Campaign campaign = mock(Campaign.class);
-        Quartermaster quartermaster = mock(Quartermaster.class);
+        Campaign campaign = mockCampaign();
+        mekhq.campaign.ForceQuartermaster quartermaster = mock(mekhq.campaign.ForceQuartermaster.class);
         when(campaign.getQuartermaster()).thenReturn(quartermaster);
         Unit unit = mock(Unit.class);
         when(unit.getCampaign()).thenReturn(campaign);
@@ -83,8 +83,8 @@ public class AdjustLargeCraftAmmoActionTest {
 
     @Test
     public void doesNothingWithNoAmmoBays() {
-        Campaign campaign = mock(Campaign.class);
-        Quartermaster quartermaster = mock(Quartermaster.class);
+        Campaign campaign = mockCampaign();
+        mekhq.campaign.ForceQuartermaster quartermaster = mock(mekhq.campaign.ForceQuartermaster.class);
         when(campaign.getQuartermaster()).thenReturn(quartermaster);
         Unit unit = mock(Unit.class);
         when(unit.getCampaign()).thenReturn(campaign);
@@ -103,8 +103,8 @@ public class AdjustLargeCraftAmmoActionTest {
 
     @Test
     public void addsMissingBins() {
-        Campaign campaign = mock(Campaign.class);
-        Quartermaster quartermaster = mock(Quartermaster.class);
+        Campaign campaign = mockCampaign();
+        mekhq.campaign.ForceQuartermaster quartermaster = mock(mekhq.campaign.ForceQuartermaster.class);
         when(campaign.getQuartermaster()).thenReturn(quartermaster);
 
         // Put together a unit with 1 bay, with 1 ammo type
@@ -161,8 +161,8 @@ public class AdjustLargeCraftAmmoActionTest {
 
     @Test
     public void updatesExistingBayToMatchType() {
-        Campaign campaign = mock(Campaign.class);
-        Quartermaster quartermaster = mock(Quartermaster.class);
+        Campaign campaign = mockCampaign();
+        mekhq.campaign.ForceQuartermaster quartermaster = mock(mekhq.campaign.ForceQuartermaster.class);
         when(campaign.getQuartermaster()).thenReturn(quartermaster);
 
         // Put together a unit with 1 bay, 1 ammo type, and 1 bin on the unit already
@@ -198,8 +198,8 @@ public class AdjustLargeCraftAmmoActionTest {
 
     @Test
     public void addsMissingBinsSkipsNonLargeCraftBins() {
-        Campaign campaign = mock(Campaign.class);
-        Quartermaster quartermaster = mock(Quartermaster.class);
+        Campaign campaign = mockCampaign();
+        mekhq.campaign.ForceQuartermaster quartermaster = mock(mekhq.campaign.ForceQuartermaster.class);
         when(campaign.getQuartermaster()).thenReturn(quartermaster);
 
         // Put together a unit with 1 bay, with 1 ammo type
@@ -258,8 +258,8 @@ public class AdjustLargeCraftAmmoActionTest {
 
     @Test
     public void updatesExistingBayToMatchTypeSkipsNonLargeCraftBins() {
-        Campaign campaign = mock(Campaign.class);
-        Quartermaster quartermaster = mock(Quartermaster.class);
+        Campaign campaign = mockCampaign();
+        mekhq.campaign.ForceQuartermaster quartermaster = mock(mekhq.campaign.ForceQuartermaster.class);
         when(campaign.getQuartermaster()).thenReturn(quartermaster);
 
         // Put together a unit with 1 bay, 1 ammo type, and 1 bin on the unit already

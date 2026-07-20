@@ -38,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -87,7 +88,7 @@ class InjuryTypesTest {
     void testGenStressEffect_permanentInjuryProducesNoEffects(String injuryName, InjuryType type,
           BodyLocation location, int severity) {
         // Setup
-        Campaign campaign = mock(Campaign.class);
+        Campaign campaign = mockCampaign();
         Person person = mock(Person.class);
         Injury permanentInjury = new Injury(30, injuryName, location, type, severity,
               LocalDate.now(), true);
@@ -121,7 +122,7 @@ class InjuryTypesTest {
     void testGenStressEffect_permanentInjuryCanWorsenButSkipsTimerReset(String injuryName, InjuryType type,
           BodyLocation location, int severity) {
         // Setup
-        Campaign campaign = mock(Campaign.class);
+        Campaign campaign = mockCampaign();
         when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 1));
         Person person = mock(Person.class);
         Injury permanentInjury = new Injury(30, injuryName, location, type, severity,

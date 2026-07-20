@@ -68,4 +68,13 @@ public interface ILocatable extends ILocation {
     default boolean isQueuedForTravel(CampaignLocationManager locationManager) {
         return locationManager.isQueuedForTravel(this);
     }
+
+    /**
+     * A {@link Unit}, {@link Person}, or {@link Part} is a real occupant, so a location node hosting one is always in
+     * use and must not be pruned.
+     */
+    @Override
+    default boolean isInUse() {
+        return true;
+    }
 }

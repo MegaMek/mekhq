@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -489,7 +489,14 @@ public class AutomatedTechAssignments {
      * @since 0.50.11
      */
     public static void handleTheAutomaticAssignmentOfUnmaintainedUnits(Campaign campaign, boolean skipReport) {
-        AutomatedTechAssignments automatedAssignments = new AutomatedTechAssignments(campaign.getTechs(),
+        AutomatedTechAssignments automatedAssignments = new AutomatedTechAssignments(campaign.getPlayerForce()
+                                                                                           .getHumanResources()
+                                                                                           .getTechs(campaign.getPlayerForce()
+                                                                                                           .getHangar()
+                                                                                                           .getUnits(),
+                                                                                                 campaign.getCampaignOptions(),
+                                                                                                 campaign.isClanCampaign(),
+                                                                                                 campaign.getLocalDate()),
               campaign.getUnits());
         List<String> reports = automatedAssignments.getReports();
         if (!reports.isEmpty() && !skipReport) {

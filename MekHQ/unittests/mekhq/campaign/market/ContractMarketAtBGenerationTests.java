@@ -44,6 +44,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -54,9 +55,8 @@ import java.util.Vector;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
-import mekhq.campaign.Hangar;
 import mekhq.campaign.JumpPath;
-import mekhq.campaign.camOpsReputation.ReputationController;
+import mekhq.campaign.LocalHangar;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.finances.Accountant;
@@ -96,15 +96,15 @@ public class ContractMarketAtBGenerationTests {
     @MethodSource(value = "generateData")
     public void addMercWithoutRetainerAtBContractSucceeds(final int gameYear, final int unitRating,
           final boolean isClanEnemy) {
-        Campaign campaign = mock(Campaign.class);
-        when(campaign.getRetainerEmployerCode()).thenReturn(null);
+        Campaign campaign = mockCampaign();
+        when(campaign.getPlayerForce().getRetainerEmployerCode()).thenReturn(null);
         when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
-        ReputationController camOpsReputation = mock(ReputationController.class);
+        mekhq.campaign.camOpsReputation.ForceReputationController camOpsReputation = mock(mekhq.campaign.camOpsReputation.ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
-        when(campaign.getReputation()).thenReturn(camOpsReputation);
+        when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
@@ -121,13 +121,13 @@ public class ContractMarketAtBGenerationTests {
         when(accountant.getOverheadExpenses()).thenReturn(Money.of(1));
         when(campaign.getAccountant()).thenReturn(accountant);
 
-        Hangar hangar = mock(Hangar.class);
+        LocalHangar hangar = mock(LocalHangar.class);
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
-        when(campaign.getAllHangar()).thenReturn(hangar);
+        when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getFormations()).thenReturn(forces);
+        when(campaign.getPlayerForce().getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -174,10 +174,9 @@ public class ContractMarketAtBGenerationTests {
 
         RandomFactionGenerator rfg = mock(RandomFactionGenerator.class);
         RandomFactionGenerator.setInstance(rfg);
-        when(rfg.getEmployer()).thenReturn(employer);
-        when(rfg.getEmployerFaction()).thenReturn(employerFaction);
-        doReturn(enemy).when(rfg).getEnemy(eq(employer), anyBoolean());
-        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
+        when(rfg.getEmployerFaction(any(), any())).thenReturn(employerFaction);
+        doReturn(enemyFaction).when(rfg).getRandomEnemy(anyBoolean(), any(), any(), eq(employerFaction));
+        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString(), any(), any());
 
         FactionHints hints = mock(FactionHints.class);
         when(employerFaction.isISMajorOrSuperPower()).thenReturn(true);
@@ -201,15 +200,15 @@ public class ContractMarketAtBGenerationTests {
     @MethodSource(value = "generateData")
     public void addMercWithoutRetainerMinorPowerAtBContractSucceeds(final int gameYear, final int unitRating,
           final boolean isClanEnemy) {
-        Campaign campaign = mock(Campaign.class);
-        when(campaign.getRetainerEmployerCode()).thenReturn(null);
+        Campaign campaign = mockCampaign();
+        when(campaign.getPlayerForce().getRetainerEmployerCode()).thenReturn(null);
         when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
-        ReputationController camOpsReputation = mock(ReputationController.class);
+        mekhq.campaign.camOpsReputation.ForceReputationController camOpsReputation = mock(mekhq.campaign.camOpsReputation.ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
-        when(campaign.getReputation()).thenReturn(camOpsReputation);
+        when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
@@ -226,13 +225,13 @@ public class ContractMarketAtBGenerationTests {
         when(accountant.getOverheadExpenses()).thenReturn(Money.of(1));
         when(campaign.getAccountant()).thenReturn(accountant);
 
-        Hangar hangar = mock(Hangar.class);
+        LocalHangar hangar = mock(LocalHangar.class);
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
-        when(campaign.getAllHangar()).thenReturn(hangar);
+        when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getFormations()).thenReturn(forces);
+        when(campaign.getPlayerForce().getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -269,7 +268,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(currentSystem).when(campaign).getSystemByName(eq(current));
 
         CurrentLocation currentLocation = mock(CurrentLocation.class);
-        when(campaign.getCurrentLocation()).thenReturn(currentLocation);
+        when(campaign.getPlayerForce().getForceDetachment().getCurrentLocation()).thenReturn(currentLocation);
 
         String missionTarget = "TARGET";
         PlanetarySystem targetSystem = mock(PlanetarySystem.class);
@@ -279,10 +278,9 @@ public class ContractMarketAtBGenerationTests {
 
         RandomFactionGenerator rfg = mock(RandomFactionGenerator.class);
         RandomFactionGenerator.setInstance(rfg);
-        when(rfg.getEmployer()).thenReturn(employer);
-        when(rfg.getEmployerFaction()).thenReturn(employerFaction);
-        doReturn(enemy).when(rfg).getEnemy(eq(employer), anyBoolean());
-        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
+        when(rfg.getEmployerFaction(any(), any())).thenReturn(employerFaction);
+        doReturn(enemyFaction).when(rfg).getRandomEnemy(anyBoolean(), any(), any(), eq(employerFaction));
+        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString(), any(), any());
 
         FactionHints hints = mock(FactionHints.class);
         when(employerFaction.isISMajorOrSuperPower()).thenReturn(false);
@@ -309,15 +307,15 @@ public class ContractMarketAtBGenerationTests {
     @MethodSource(value = "generateData")
     public void addMercWithoutRetainerEmployerNeutralAtBContractSucceeds(final int gameYear, final int unitRating,
           final boolean isClanEnemy) {
-        Campaign campaign = mock(Campaign.class);
-        when(campaign.getRetainerEmployerCode()).thenReturn(null);
+        Campaign campaign = mockCampaign();
+        when(campaign.getPlayerForce().getRetainerEmployerCode()).thenReturn(null);
         when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
-        ReputationController camOpsReputation = mock(ReputationController.class);
+        mekhq.campaign.camOpsReputation.ForceReputationController camOpsReputation = mock(mekhq.campaign.camOpsReputation.ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
-        when(campaign.getReputation()).thenReturn(camOpsReputation);
+        when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
@@ -334,13 +332,13 @@ public class ContractMarketAtBGenerationTests {
         when(accountant.getOverheadExpenses()).thenReturn(Money.of(1));
         when(campaign.getAccountant()).thenReturn(accountant);
 
-        Hangar hangar = mock(Hangar.class);
+        LocalHangar hangar = mock(LocalHangar.class);
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
-        when(campaign.getAllHangar()).thenReturn(hangar);
+        when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getFormations()).thenReturn(forces);
+        when(campaign.getPlayerForce().getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -377,7 +375,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(currentSystem).when(campaign).getSystemByName(eq(current));
 
         CurrentLocation currentLocation = mock(CurrentLocation.class);
-        when(campaign.getCurrentLocation()).thenReturn(currentLocation);
+        when(campaign.getPlayerForce().getForceDetachment().getCurrentLocation()).thenReturn(currentLocation);
 
         String missionTarget = "TARGET";
         PlanetarySystem targetSystem = mock(PlanetarySystem.class);
@@ -387,10 +385,9 @@ public class ContractMarketAtBGenerationTests {
 
         RandomFactionGenerator rfg = mock(RandomFactionGenerator.class);
         RandomFactionGenerator.setInstance(rfg);
-        when(rfg.getEmployer()).thenReturn(employer);
-        when(rfg.getEmployerFaction()).thenReturn(employerFaction);
-        doReturn(enemy).when(rfg).getEnemy(eq(employer), anyBoolean());
-        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
+        when(rfg.getEmployerFaction(any(), any())).thenReturn(employerFaction);
+        doReturn(enemyFaction).when(rfg).getRandomEnemy(anyBoolean(), any(), any(), eq(employerFaction));
+        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString(), any(), any());
 
         FactionHints hints = mock(FactionHints.class);
         when(employerFaction.isISMajorOrSuperPower()).thenReturn(true);
@@ -417,15 +414,15 @@ public class ContractMarketAtBGenerationTests {
     @MethodSource(value = "generateData")
     public void addMercWithoutRetainerEmployerNeutralAtWarAtBContractSucceeds(final int gameYear, final int unitRating,
           final boolean isClanEnemy) {
-        Campaign campaign = mock(Campaign.class);
-        when(campaign.getRetainerEmployerCode()).thenReturn(null);
+        Campaign campaign = mockCampaign();
+        when(campaign.getPlayerForce().getRetainerEmployerCode()).thenReturn(null);
         when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
-        ReputationController camOpsReputation = mock(ReputationController.class);
+        mekhq.campaign.camOpsReputation.ForceReputationController camOpsReputation = mock(mekhq.campaign.camOpsReputation.ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
-        when(campaign.getReputation()).thenReturn(camOpsReputation);
+        when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
@@ -442,13 +439,13 @@ public class ContractMarketAtBGenerationTests {
         when(accountant.getOverheadExpenses()).thenReturn(Money.of(1));
         when(campaign.getAccountant()).thenReturn(accountant);
 
-        Hangar hangar = mock(Hangar.class);
+        LocalHangar hangar = mock(LocalHangar.class);
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
-        when(campaign.getAllHangar()).thenReturn(hangar);
+        when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getFormations()).thenReturn(forces);
+        when(campaign.getPlayerForce().getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -485,7 +482,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(currentSystem).when(campaign).getSystemByName(eq(current));
 
         CurrentLocation currentLocation = mock(CurrentLocation.class);
-        when(campaign.getCurrentLocation()).thenReturn(currentLocation);
+        when(campaign.getPlayerForce().getForceDetachment().getCurrentLocation()).thenReturn(currentLocation);
 
         String missionTarget = "TARGET";
         PlanetarySystem targetSystem = mock(PlanetarySystem.class);
@@ -495,10 +492,9 @@ public class ContractMarketAtBGenerationTests {
 
         RandomFactionGenerator rfg = mock(RandomFactionGenerator.class);
         RandomFactionGenerator.setInstance(rfg);
-        when(rfg.getEmployer()).thenReturn(employer);
-        when(rfg.getEmployerFaction()).thenReturn(employerFaction);
-        doReturn(enemy).when(rfg).getEnemy(eq(employer), anyBoolean());
-        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
+        when(rfg.getEmployerFaction(any(), any())).thenReturn(employerFaction);
+        doReturn(enemyFaction).when(rfg).getRandomEnemy(anyBoolean(), any(), any(), eq(employerFaction));
+        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString(), any(), any());
 
         FactionHints hints = mock(FactionHints.class);
         when(employerFaction.isISMajorOrSuperPower()).thenReturn(true);
@@ -534,15 +530,15 @@ public class ContractMarketAtBGenerationTests {
     @ParameterizedTest
     @MethodSource(value = "generateData")
     public void mercEmployerRetries(final int gameYear, final int unitRating, final boolean isClanEnemy) {
-        Campaign campaign = mock(Campaign.class);
-        when(campaign.getRetainerEmployerCode()).thenReturn(null);
+        Campaign campaign = mockCampaign();
+        when(campaign.getPlayerForce().getRetainerEmployerCode()).thenReturn(null);
         when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
-        ReputationController camOpsReputation = mock(ReputationController.class);
+        mekhq.campaign.camOpsReputation.ForceReputationController camOpsReputation = mock(mekhq.campaign.camOpsReputation.ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
-        when(campaign.getReputation()).thenReturn(camOpsReputation);
+        when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
@@ -559,13 +555,13 @@ public class ContractMarketAtBGenerationTests {
         when(accountant.getOverheadExpenses()).thenReturn(Money.of(1));
         when(campaign.getAccountant()).thenReturn(accountant);
 
-        Hangar hangar = mock(Hangar.class);
+        LocalHangar hangar = mock(LocalHangar.class);
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
-        when(campaign.getAllHangar()).thenReturn(hangar);
+        when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getFormations()).thenReturn(forces);
+        when(campaign.getPlayerForce().getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -606,7 +602,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(currentSystem).when(campaign).getSystemByName(eq(current));
 
         CurrentLocation currentLocation = mock(CurrentLocation.class);
-        when(campaign.getCurrentLocation()).thenReturn(currentLocation);
+        when(campaign.getPlayerForce().getForceDetachment().getCurrentLocation()).thenReturn(currentLocation);
 
         String missionTarget = "TARGET";
         PlanetarySystem targetSystem = mock(PlanetarySystem.class);
@@ -616,10 +612,8 @@ public class ContractMarketAtBGenerationTests {
 
         RandomFactionGenerator rfg = mock(RandomFactionGenerator.class);
         RandomFactionGenerator.setInstance(rfg);
-        // Return "MERC" the first time to coerce a retry
-        when(rfg.getEmployer()).thenReturn("MERC").thenReturn(employer);
-        doReturn(enemy).when(rfg).getEnemy(eq(employer), anyBoolean());
-        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
+        doReturn(enemyFaction).when(rfg).getRandomEnemy(anyBoolean(), any(), any(), eq(employerFaction));
+        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString(), any(), any());
 
         FactionHints hints = mock(FactionHints.class);
         when(employerFaction.isISMajorOrSuperPower()).thenReturn(true);
@@ -627,7 +621,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(false).when(hints).isNeutral(eq(employerFaction));
         doReturn(false).when(hints).isNeutral(eq(enemyFaction));
         when(rfg.getFactionHints()).thenReturn(hints);
-        when(rfg.getEmployerFaction()).thenReturn(employerFaction);
+        when(rfg.getEmployerFaction(any(), any())).thenReturn(employerFaction);
 
         JumpPath jumpPath = mock(JumpPath.class);
         when(jumpPath.getJumps()).thenReturn(1);
@@ -647,15 +641,15 @@ public class ContractMarketAtBGenerationTests {
     @ParameterizedTest
     @MethodSource(value = "generateData")
     public void mercEmployerRetriesFail(final int gameYear, final int unitRating, final boolean isClanEnemy) {
-        Campaign campaign = mock(Campaign.class);
-        when(campaign.getRetainerEmployerCode()).thenReturn(null);
+        Campaign campaign = mockCampaign();
+        when(campaign.getPlayerForce().getRetainerEmployerCode()).thenReturn(null);
         when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
-        ReputationController camOpsReputation = mock(ReputationController.class);
+        mekhq.campaign.camOpsReputation.ForceReputationController camOpsReputation = mock(mekhq.campaign.camOpsReputation.ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
-        when(campaign.getReputation()).thenReturn(camOpsReputation);
+        when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
@@ -673,9 +667,7 @@ public class ContractMarketAtBGenerationTests {
 
         RandomFactionGenerator rfg = mock(RandomFactionGenerator.class);
         RandomFactionGenerator.setInstance(rfg);
-        // Return "MERC" every time
-        when(rfg.getEmployer()).thenReturn("MERC");
-        when(rfg.getEmployerFaction()).thenReturn(employerFaction);
+        when(rfg.getEmployerFaction(any(), any())).thenReturn(employerFaction);
 
         AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
@@ -686,15 +678,15 @@ public class ContractMarketAtBGenerationTests {
     @ParameterizedTest
     @MethodSource(value = "generateData")
     public void mercMissingTargetRetries(final int gameYear, final int unitRating, final boolean isClanEnemy) {
-        Campaign campaign = mock(Campaign.class);
-        when(campaign.getRetainerEmployerCode()).thenReturn(null);
+        Campaign campaign = mockCampaign();
+        when(campaign.getPlayerForce().getRetainerEmployerCode()).thenReturn(null);
         when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
-        ReputationController camOpsReputation = mock(ReputationController.class);
+        mekhq.campaign.camOpsReputation.ForceReputationController camOpsReputation = mock(mekhq.campaign.camOpsReputation.ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
-        when(campaign.getReputation()).thenReturn(camOpsReputation);
+        when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
@@ -711,13 +703,13 @@ public class ContractMarketAtBGenerationTests {
         when(accountant.getOverheadExpenses()).thenReturn(Money.of(1));
         when(campaign.getAccountant()).thenReturn(accountant);
 
-        Hangar hangar = mock(Hangar.class);
+        LocalHangar hangar = mock(LocalHangar.class);
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
-        when(campaign.getAllHangar()).thenReturn(hangar);
+        when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getFormations()).thenReturn(forces);
+        when(campaign.getPlayerForce().getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -754,7 +746,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(currentSystem).when(campaign).getSystemByName(eq(current));
 
         CurrentLocation currentLocation = mock(CurrentLocation.class);
-        when(campaign.getCurrentLocation()).thenReturn(currentLocation);
+        when(campaign.getPlayerForce().getForceDetachment().getCurrentLocation()).thenReturn(currentLocation);
 
         String missionTarget = "TARGET";
         PlanetarySystem targetSystem = mock(PlanetarySystem.class);
@@ -764,11 +756,10 @@ public class ContractMarketAtBGenerationTests {
 
         RandomFactionGenerator rfg = mock(RandomFactionGenerator.class);
         RandomFactionGenerator.setInstance(rfg);
-        when(rfg.getEmployer()).thenReturn(employer);
-        when(rfg.getEmployerFaction()).thenReturn(employerFaction);
-        doReturn(enemy).when(rfg).getEnemy(eq(employer), anyBoolean());
+        when(rfg.getEmployerFaction(any(), any())).thenReturn(employerFaction);
+        doReturn(enemyFaction).when(rfg).getRandomEnemy(anyBoolean(), any(), any(), eq(employerFaction));
         // Don't find the mission target and force a retry
-        doReturn(null).doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
+        doReturn(null).doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString(), any(), any());
 
         FactionHints hints = mock(FactionHints.class);
         when(employerFaction.isISMajorOrSuperPower()).thenReturn(true);
@@ -794,15 +785,15 @@ public class ContractMarketAtBGenerationTests {
     @ParameterizedTest
     @MethodSource(value = "generateData")
     public void mercMissionTargetRetriesFail(final int gameYear, final int unitRating, final boolean isClanEnemy) {
-        Campaign campaign = mock(Campaign.class);
-        when(campaign.getRetainerEmployerCode()).thenReturn(null);
+        Campaign campaign = mockCampaign();
+        when(campaign.getPlayerForce().getRetainerEmployerCode()).thenReturn(null);
         when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
-        ReputationController camOpsReputation = mock(ReputationController.class);
+        mekhq.campaign.camOpsReputation.ForceReputationController camOpsReputation = mock(mekhq.campaign.camOpsReputation.ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
-        when(campaign.getReputation()).thenReturn(camOpsReputation);
+        when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
@@ -819,13 +810,13 @@ public class ContractMarketAtBGenerationTests {
         when(accountant.getOverheadExpenses()).thenReturn(Money.of(1));
         when(campaign.getAccountant()).thenReturn(accountant);
 
-        Hangar hangar = mock(Hangar.class);
+        LocalHangar hangar = mock(LocalHangar.class);
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
-        when(campaign.getAllHangar()).thenReturn(hangar);
+        when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getFormations()).thenReturn(forces);
+        when(campaign.getPlayerForce().getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -862,7 +853,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(currentSystem).when(campaign).getSystemByName(eq(current));
 
         CurrentLocation currentLocation = mock(CurrentLocation.class);
-        when(campaign.getCurrentLocation()).thenReturn(currentLocation);
+        when(campaign.getPlayerForce().getForceDetachment().getCurrentLocation()).thenReturn(currentLocation);
 
         String missionTarget = "TARGET";
         PlanetarySystem targetSystem = mock(PlanetarySystem.class);
@@ -872,11 +863,10 @@ public class ContractMarketAtBGenerationTests {
 
         RandomFactionGenerator rfg = mock(RandomFactionGenerator.class);
         RandomFactionGenerator.setInstance(rfg);
-        when(rfg.getEmployer()).thenReturn(employer);
-        when(rfg.getEmployerFaction()).thenReturn(employerFaction);
-        doReturn(enemy).when(rfg).getEnemy(eq(employer), anyBoolean());
+        when(rfg.getEmployerFaction(any(), any())).thenReturn(employerFaction);
+        doReturn(enemyFaction).when(rfg).getRandomEnemy(anyBoolean(), any(), any(), eq(employerFaction));
         // Don't ever find the mission target and force a retry failure
-        doReturn(null).when(rfg).getMissionTarget(anyString(), anyString());
+        doReturn(null).when(rfg).getMissionTarget(anyString(), anyString(), any(), any());
 
         FactionHints hints = mock(FactionHints.class);
         when(employerFaction.isISMajorOrSuperPower()).thenReturn(true);
@@ -894,15 +884,15 @@ public class ContractMarketAtBGenerationTests {
     @ParameterizedTest
     @MethodSource(value = "generateData")
     public void mercJumpPathRetries(final int gameYear, final int unitRating, final boolean isClanEnemy) {
-        Campaign campaign = mock(Campaign.class);
-        when(campaign.getRetainerEmployerCode()).thenReturn(null);
+        Campaign campaign = mockCampaign();
+        when(campaign.getPlayerForce().getRetainerEmployerCode()).thenReturn(null);
         when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
-        ReputationController camOpsReputation = mock(ReputationController.class);
+        mekhq.campaign.camOpsReputation.ForceReputationController camOpsReputation = mock(mekhq.campaign.camOpsReputation.ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
-        when(campaign.getReputation()).thenReturn(camOpsReputation);
+        when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
@@ -919,13 +909,13 @@ public class ContractMarketAtBGenerationTests {
         when(accountant.getOverheadExpenses()).thenReturn(Money.of(1));
         when(campaign.getAccountant()).thenReturn(accountant);
 
-        Hangar hangar = mock(Hangar.class);
+        LocalHangar hangar = mock(LocalHangar.class);
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
-        when(campaign.getAllHangar()).thenReturn(hangar);
+        when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getFormations()).thenReturn(forces);
+        when(campaign.getPlayerForce().getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -962,7 +952,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(currentSystem).when(campaign).getSystemByName(eq(current));
 
         CurrentLocation currentLocation = mock(CurrentLocation.class);
-        when(campaign.getCurrentLocation()).thenReturn(currentLocation);
+        when(campaign.getPlayerForce().getForceDetachment().getCurrentLocation()).thenReturn(currentLocation);
 
         String missionTarget = "TARGET";
         PlanetarySystem targetSystem = mock(PlanetarySystem.class);
@@ -972,10 +962,9 @@ public class ContractMarketAtBGenerationTests {
 
         RandomFactionGenerator rfg = mock(RandomFactionGenerator.class);
         RandomFactionGenerator.setInstance(rfg);
-        when(rfg.getEmployer()).thenReturn(employer);
-        when(rfg.getEmployerFaction()).thenReturn(employerFaction);
-        doReturn(enemy).when(rfg).getEnemy(eq(employer), anyBoolean());
-        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
+        when(rfg.getEmployerFaction(any(), any())).thenReturn(employerFaction);
+        doReturn(enemyFaction).when(rfg).getRandomEnemy(anyBoolean(), any(), any(), eq(employerFaction));
+        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString(), any(), any());
 
         FactionHints hints = mock(FactionHints.class);
         when(employerFaction.isISMajorOrSuperPower()).thenReturn(true);
@@ -1002,15 +991,15 @@ public class ContractMarketAtBGenerationTests {
     @ParameterizedTest
     @MethodSource(value = "generateData")
     public void mercJumpPathFails(final int gameYear, final int unitRating, final boolean isClanEnemy) {
-        Campaign campaign = mock(Campaign.class);
-        when(campaign.getRetainerEmployerCode()).thenReturn(null);
+        Campaign campaign = mockCampaign();
+        when(campaign.getPlayerForce().getRetainerEmployerCode()).thenReturn(null);
         when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
-        ReputationController camOpsReputation = mock(ReputationController.class);
+        mekhq.campaign.camOpsReputation.ForceReputationController camOpsReputation = mock(mekhq.campaign.camOpsReputation.ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
-        when(campaign.getReputation()).thenReturn(camOpsReputation);
+        when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
@@ -1027,13 +1016,13 @@ public class ContractMarketAtBGenerationTests {
         when(accountant.getOverheadExpenses()).thenReturn(Money.of(1));
         when(campaign.getAccountant()).thenReturn(accountant);
 
-        Hangar hangar = mock(Hangar.class);
+        LocalHangar hangar = mock(LocalHangar.class);
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
-        when(campaign.getAllHangar()).thenReturn(hangar);
+        when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getFormations()).thenReturn(forces);
+        when(campaign.getPlayerForce().getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -1070,7 +1059,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(currentSystem).when(campaign).getSystemByName(eq(current));
 
         CurrentLocation currentLocation = mock(CurrentLocation.class);
-        when(campaign.getCurrentLocation()).thenReturn(currentLocation);
+        when(campaign.getPlayerForce().getForceDetachment().getCurrentLocation()).thenReturn(currentLocation);
 
         String missionTarget = "TARGET";
         PlanetarySystem targetSystem = mock(PlanetarySystem.class);
@@ -1080,10 +1069,9 @@ public class ContractMarketAtBGenerationTests {
 
         RandomFactionGenerator rfg = mock(RandomFactionGenerator.class);
         RandomFactionGenerator.setInstance(rfg);
-        when(rfg.getEmployer()).thenReturn(employer);
-        when(rfg.getEmployerFaction()).thenReturn(employerFaction);
-        doReturn(enemy).when(rfg).getEnemy(eq(employer), anyBoolean());
-        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
+        when(rfg.getEmployerFaction(any(), any())).thenReturn(employerFaction);
+        doReturn(enemyFaction).when(rfg).getRandomEnemy(anyBoolean(), any(), any(), eq(employerFaction));
+        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString(), any(), any());
 
         FactionHints hints = mock(FactionHints.class);
         when(employerFaction.isISMajorOrSuperPower()).thenReturn(true);
@@ -1106,15 +1094,15 @@ public class ContractMarketAtBGenerationTests {
     public void addMercWithRetainerAtBContractSucceeds(final int gameYear, final int unitRating,
           final boolean isClanEnemy) {
         String employer = "EMPLOYER";
-        Campaign campaign = mock(Campaign.class);
-        when(campaign.getRetainerEmployerCode()).thenReturn(employer);
+        Campaign campaign = mockCampaign();
+        when(campaign.getPlayerForce().getRetainerEmployerCode()).thenReturn(employer);
         when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
-        ReputationController camOpsReputation = mock(ReputationController.class);
+        mekhq.campaign.camOpsReputation.ForceReputationController camOpsReputation = mock(mekhq.campaign.camOpsReputation.ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
-        when(campaign.getReputation()).thenReturn(camOpsReputation);
+        when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
@@ -1131,13 +1119,13 @@ public class ContractMarketAtBGenerationTests {
         when(accountant.getOverheadExpenses()).thenReturn(Money.of(1));
         when(campaign.getAccountant()).thenReturn(accountant);
 
-        Hangar hangar = mock(Hangar.class);
+        LocalHangar hangar = mock(LocalHangar.class);
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
-        when(campaign.getAllHangar()).thenReturn(hangar);
+        when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getFormations()).thenReturn(forces);
+        when(campaign.getPlayerForce().getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -1173,7 +1161,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(currentSystem).when(campaign).getSystemByName(eq(current));
 
         CurrentLocation currentLocation = mock(CurrentLocation.class);
-        when(campaign.getCurrentLocation()).thenReturn(currentLocation);
+        when(campaign.getPlayerForce().getForceDetachment().getCurrentLocation()).thenReturn(currentLocation);
 
         String missionTarget = "TARGET";
         PlanetarySystem targetSystem = mock(PlanetarySystem.class);
@@ -1183,10 +1171,9 @@ public class ContractMarketAtBGenerationTests {
 
         RandomFactionGenerator rfg = mock(RandomFactionGenerator.class);
         RandomFactionGenerator.setInstance(rfg);
-        when(rfg.getEmployer()).thenReturn(employer);
-        when(rfg.getEmployerFaction()).thenReturn(employerFaction);
-        doReturn(enemy).when(rfg).getEnemy(eq(employer), anyBoolean());
-        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
+        when(rfg.getEmployerFaction(any(), any())).thenReturn(employerFaction);
+        doReturn(enemyFaction).when(rfg).getRandomEnemy(anyBoolean(), any(), any(), eq(employerFaction));
+        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString(), any(), any());
 
         FactionHints hints = mock(FactionHints.class);
         when(employerFaction.isISMajorOrSuperPower()).thenReturn(true);
@@ -1214,15 +1201,15 @@ public class ContractMarketAtBGenerationTests {
     public void addMercWithRetainerMinorPowerAtBContractSucceeds(final int gameYear, final int unitRating,
           final boolean isClanEnemy) {
         String employer = "EMPLOYER";
-        Campaign campaign = mock(Campaign.class);
-        when(campaign.getRetainerEmployerCode()).thenReturn(employer);
+        Campaign campaign = mockCampaign();
+        when(campaign.getPlayerForce().getRetainerEmployerCode()).thenReturn(employer);
         when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
-        ReputationController camOpsReputation = mock(ReputationController.class);
+        mekhq.campaign.camOpsReputation.ForceReputationController camOpsReputation = mock(mekhq.campaign.camOpsReputation.ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
-        when(campaign.getReputation()).thenReturn(camOpsReputation);
+        when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
@@ -1239,13 +1226,13 @@ public class ContractMarketAtBGenerationTests {
         when(accountant.getOverheadExpenses()).thenReturn(Money.of(1));
         when(campaign.getAccountant()).thenReturn(accountant);
 
-        Hangar hangar = mock(Hangar.class);
+        LocalHangar hangar = mock(LocalHangar.class);
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
-        when(campaign.getAllHangar()).thenReturn(hangar);
+        when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getFormations()).thenReturn(forces);
+        when(campaign.getPlayerForce().getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -1281,7 +1268,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(currentSystem).when(campaign).getSystemByName(eq(current));
 
         CurrentLocation currentLocation = mock(CurrentLocation.class);
-        when(campaign.getCurrentLocation()).thenReturn(currentLocation);
+        when(campaign.getPlayerForce().getForceDetachment().getCurrentLocation()).thenReturn(currentLocation);
 
         String missionTarget = "TARGET";
         PlanetarySystem targetSystem = mock(PlanetarySystem.class);
@@ -1291,10 +1278,9 @@ public class ContractMarketAtBGenerationTests {
 
         RandomFactionGenerator rfg = mock(RandomFactionGenerator.class);
         RandomFactionGenerator.setInstance(rfg);
-        when(rfg.getEmployer()).thenReturn(employer);
-        when(rfg.getEmployerFaction()).thenReturn(employerFaction);
-        doReturn(enemy).when(rfg).getEnemy(eq(employer), anyBoolean());
-        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
+        when(rfg.getEmployerFaction(any(), any())).thenReturn(employerFaction);
+        doReturn(enemyFaction).when(rfg).getRandomEnemy(anyBoolean(), any(), any(), eq(employerFaction));
+        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString(), any(), any());
 
         FactionHints hints = mock(FactionHints.class);
         when(employerFaction.isISMajorOrSuperPower()).thenReturn(false);
@@ -1322,15 +1308,15 @@ public class ContractMarketAtBGenerationTests {
     public void addMercWithRetainerEmployerNeutralAtBContractSucceeds(final int gameYear, final int unitRating,
           final boolean isClanEnemy) {
         String employer = "EMPLOYER";
-        Campaign campaign = mock(Campaign.class);
-        when(campaign.getRetainerEmployerCode()).thenReturn(employer);
+        Campaign campaign = mockCampaign();
+        when(campaign.getPlayerForce().getRetainerEmployerCode()).thenReturn(employer);
         when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
-        ReputationController camOpsReputation = mock(ReputationController.class);
+        mekhq.campaign.camOpsReputation.ForceReputationController camOpsReputation = mock(mekhq.campaign.camOpsReputation.ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
-        when(campaign.getReputation()).thenReturn(camOpsReputation);
+        when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
@@ -1347,13 +1333,13 @@ public class ContractMarketAtBGenerationTests {
         when(accountant.getOverheadExpenses()).thenReturn(Money.of(1));
         when(campaign.getAccountant()).thenReturn(accountant);
 
-        Hangar hangar = mock(Hangar.class);
+        LocalHangar hangar = mock(LocalHangar.class);
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
-        when(campaign.getAllHangar()).thenReturn(hangar);
+        when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getFormations()).thenReturn(forces);
+        when(campaign.getPlayerForce().getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -1389,7 +1375,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(currentSystem).when(campaign).getSystemByName(eq(current));
 
         CurrentLocation currentLocation = mock(CurrentLocation.class);
-        when(campaign.getCurrentLocation()).thenReturn(currentLocation);
+        when(campaign.getPlayerForce().getForceDetachment().getCurrentLocation()).thenReturn(currentLocation);
 
         String missionTarget = "TARGET";
         PlanetarySystem targetSystem = mock(PlanetarySystem.class);
@@ -1399,10 +1385,9 @@ public class ContractMarketAtBGenerationTests {
 
         RandomFactionGenerator rfg = mock(RandomFactionGenerator.class);
         RandomFactionGenerator.setInstance(rfg);
-        when(rfg.getEmployer()).thenReturn(employer);
-        when(rfg.getEmployerFaction()).thenReturn(employerFaction);
-        doReturn(enemy).when(rfg).getEnemy(eq(employer), anyBoolean());
-        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
+        when(rfg.getEmployerFaction(any(), any())).thenReturn(employerFaction);
+        doReturn(enemyFaction).when(rfg).getRandomEnemy(anyBoolean(), any(), any(), eq(employerFaction));
+        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString(), any(), any());
 
         FactionHints hints = mock(FactionHints.class);
         when(employerFaction.isISMajorOrSuperPower()).thenReturn(true);
@@ -1430,15 +1415,15 @@ public class ContractMarketAtBGenerationTests {
     public void addMercWithRetainerEmployerNeutralAtWarAtBContractSucceeds(final int gameYear, final int unitRating,
           final boolean isClanEnemy) {
         String employer = "EMPLOYER";
-        Campaign campaign = mock(Campaign.class);
-        when(campaign.getRetainerEmployerCode()).thenReturn(employer);
+        Campaign campaign = mockCampaign();
+        when(campaign.getPlayerForce().getRetainerEmployerCode()).thenReturn(employer);
         when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
-        ReputationController camOpsReputation = mock(ReputationController.class);
+        mekhq.campaign.camOpsReputation.ForceReputationController camOpsReputation = mock(mekhq.campaign.camOpsReputation.ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
-        when(campaign.getReputation()).thenReturn(camOpsReputation);
+        when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(true);
@@ -1455,13 +1440,13 @@ public class ContractMarketAtBGenerationTests {
         when(accountant.getOverheadExpenses()).thenReturn(Money.of(1));
         when(campaign.getAccountant()).thenReturn(accountant);
 
-        Hangar hangar = mock(Hangar.class);
+        LocalHangar hangar = mock(LocalHangar.class);
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
-        when(campaign.getAllHangar()).thenReturn(hangar);
+        when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getFormations()).thenReturn(forces);
+        when(campaign.getPlayerForce().getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -1497,7 +1482,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(currentSystem).when(campaign).getSystemByName(eq(current));
 
         CurrentLocation currentLocation = mock(CurrentLocation.class);
-        when(campaign.getCurrentLocation()).thenReturn(currentLocation);
+        when(campaign.getPlayerForce().getForceDetachment().getCurrentLocation()).thenReturn(currentLocation);
 
         String missionTarget = "TARGET";
         PlanetarySystem targetSystem = mock(PlanetarySystem.class);
@@ -1507,8 +1492,8 @@ public class ContractMarketAtBGenerationTests {
 
         RandomFactionGenerator rfg = mock(RandomFactionGenerator.class);
         RandomFactionGenerator.setInstance(rfg);
-        doReturn(enemy).when(rfg).getEnemy(eq(employer), anyBoolean());
-        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
+        doReturn(enemyFaction).when(rfg).getRandomEnemy(anyBoolean(), any(), any(), eq(employerFaction));
+        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString(), any(), any());
 
         FactionHints hints = mock(FactionHints.class);
         when(employerFaction.isISMajorOrSuperPower()).thenReturn(true);
@@ -1536,15 +1521,15 @@ public class ContractMarketAtBGenerationTests {
     @MethodSource(value = "generateData")
     public void nonMercAtBContractSucceeds(final int gameYear, final int unitRating, final boolean isClanEnemy) {
         String employer = "EMPLOYER";
-        Campaign campaign = mock(Campaign.class);
-        when(campaign.getRetainerEmployerCode()).thenReturn(null);
+        Campaign campaign = mockCampaign();
+        when(campaign.getPlayerForce().getRetainerEmployerCode()).thenReturn(null);
         when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
-        ReputationController camOpsReputation = mock(ReputationController.class);
+        mekhq.campaign.camOpsReputation.ForceReputationController camOpsReputation = mock(mekhq.campaign.camOpsReputation.ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
-        when(campaign.getReputation()).thenReturn(camOpsReputation);
+        when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(false);
@@ -1562,13 +1547,13 @@ public class ContractMarketAtBGenerationTests {
         when(accountant.getOverheadExpenses()).thenReturn(Money.of(1));
         when(campaign.getAccountant()).thenReturn(accountant);
 
-        Hangar hangar = mock(Hangar.class);
+        LocalHangar hangar = mock(LocalHangar.class);
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
-        when(campaign.getAllHangar()).thenReturn(hangar);
+        when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getFormations()).thenReturn(forces);
+        when(campaign.getPlayerForce().getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -1604,7 +1589,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(currentSystem).when(campaign).getSystemByName(eq(current));
 
         CurrentLocation currentLocation = mock(CurrentLocation.class);
-        when(campaign.getCurrentLocation()).thenReturn(currentLocation);
+        when(campaign.getPlayerForce().getForceDetachment().getCurrentLocation()).thenReturn(currentLocation);
 
         String missionTarget = "TARGET";
         PlanetarySystem targetSystem = mock(PlanetarySystem.class);
@@ -1614,10 +1599,9 @@ public class ContractMarketAtBGenerationTests {
 
         RandomFactionGenerator rfg = mock(RandomFactionGenerator.class);
         RandomFactionGenerator.setInstance(rfg);
-        when(rfg.getEmployer()).thenReturn(employer);
-        when(rfg.getEmployerFaction()).thenReturn(employerFaction);
-        doReturn(enemy).when(rfg).getEnemy(eq(employer), anyBoolean());
-        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
+        when(rfg.getEmployerFaction(any(), any())).thenReturn(employerFaction);
+        doReturn(enemyFaction).when(rfg).getRandomEnemy(anyBoolean(), any(), any(), eq(employerFaction));
+        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString(), any(), any());
 
         FactionHints hints = mock(FactionHints.class);
         when(employerFaction.isISMajorOrSuperPower()).thenReturn(true);
@@ -1645,15 +1629,15 @@ public class ContractMarketAtBGenerationTests {
     public void nonMercMinorPowerAtBContractSucceeds(final int gameYear, final int unitRating,
           final boolean isClanEnemy) {
         String employer = "EMPLOYER";
-        Campaign campaign = mock(Campaign.class);
-        when(campaign.getRetainerEmployerCode()).thenReturn(null);
+        Campaign campaign = mockCampaign();
+        when(campaign.getPlayerForce().getRetainerEmployerCode()).thenReturn(null);
         when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
-        ReputationController camOpsReputation = mock(ReputationController.class);
+        mekhq.campaign.camOpsReputation.ForceReputationController camOpsReputation = mock(mekhq.campaign.camOpsReputation.ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
-        when(campaign.getReputation()).thenReturn(camOpsReputation);
+        when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(false);
@@ -1671,13 +1655,13 @@ public class ContractMarketAtBGenerationTests {
         when(accountant.getOverheadExpenses()).thenReturn(Money.of(1));
         when(campaign.getAccountant()).thenReturn(accountant);
 
-        Hangar hangar = mock(Hangar.class);
+        LocalHangar hangar = mock(LocalHangar.class);
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
-        when(campaign.getAllHangar()).thenReturn(hangar);
+        when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getFormations()).thenReturn(forces);
+        when(campaign.getPlayerForce().getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -1713,7 +1697,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(currentSystem).when(campaign).getSystemByName(eq(current));
 
         CurrentLocation currentLocation = mock(CurrentLocation.class);
-        when(campaign.getCurrentLocation()).thenReturn(currentLocation);
+        when(campaign.getPlayerForce().getForceDetachment().getCurrentLocation()).thenReturn(currentLocation);
 
         String missionTarget = "TARGET";
         PlanetarySystem targetSystem = mock(PlanetarySystem.class);
@@ -1723,10 +1707,9 @@ public class ContractMarketAtBGenerationTests {
 
         RandomFactionGenerator rfg = mock(RandomFactionGenerator.class);
         RandomFactionGenerator.setInstance(rfg);
-        when(rfg.getEmployer()).thenReturn(employer);
-        when(rfg.getEmployerFaction()).thenReturn(employerFaction);
-        doReturn(enemy).when(rfg).getEnemy(eq(employer), anyBoolean());
-        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
+        when(rfg.getEmployerFaction(any(), any())).thenReturn(employerFaction);
+        doReturn(enemyFaction).when(rfg).getRandomEnemy(anyBoolean(), any(), any(), eq(employerFaction));
+        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString(), any(), any());
 
         FactionHints hints = mock(FactionHints.class);
         when(employerFaction.isISMajorOrSuperPower()).thenReturn(false);
@@ -1753,15 +1736,15 @@ public class ContractMarketAtBGenerationTests {
     @MethodSource(value = "generateData")
     public void nonMercNeutralAtBContractSucceeds(final int gameYear, final int unitRating, final boolean isClanEnemy) {
         String employer = "EMPLOYER";
-        Campaign campaign = mock(Campaign.class);
-        when(campaign.getRetainerEmployerCode()).thenReturn(null);
+        Campaign campaign = mockCampaign();
+        when(campaign.getPlayerForce().getRetainerEmployerCode()).thenReturn(null);
         when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
-        ReputationController camOpsReputation = mock(ReputationController.class);
+        mekhq.campaign.camOpsReputation.ForceReputationController camOpsReputation = mock(mekhq.campaign.camOpsReputation.ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
-        when(campaign.getReputation()).thenReturn(camOpsReputation);
+        when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(false);
@@ -1779,13 +1762,13 @@ public class ContractMarketAtBGenerationTests {
         when(accountant.getOverheadExpenses()).thenReturn(Money.of(1));
         when(campaign.getAccountant()).thenReturn(accountant);
 
-        Hangar hangar = mock(Hangar.class);
+        LocalHangar hangar = mock(LocalHangar.class);
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
-        when(campaign.getAllHangar()).thenReturn(hangar);
+        when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getFormations()).thenReturn(forces);
+        when(campaign.getPlayerForce().getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -1821,7 +1804,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(currentSystem).when(campaign).getSystemByName(eq(current));
 
         CurrentLocation currentLocation = mock(CurrentLocation.class);
-        when(campaign.getCurrentLocation()).thenReturn(currentLocation);
+        when(campaign.getPlayerForce().getForceDetachment().getCurrentLocation()).thenReturn(currentLocation);
 
         String missionTarget = "TARGET";
         PlanetarySystem targetSystem = mock(PlanetarySystem.class);
@@ -1831,10 +1814,9 @@ public class ContractMarketAtBGenerationTests {
 
         RandomFactionGenerator rfg = mock(RandomFactionGenerator.class);
         RandomFactionGenerator.setInstance(rfg);
-        when(rfg.getEmployer()).thenReturn(employer);
-        when(rfg.getEmployerFaction()).thenReturn(employerFaction);
-        doReturn(enemy).when(rfg).getEnemy(eq(employer), anyBoolean());
-        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
+        when(rfg.getEmployerFaction(any(), any())).thenReturn(employerFaction);
+        doReturn(enemyFaction).when(rfg).getRandomEnemy(anyBoolean(), any(), any(), eq(employerFaction));
+        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString(), any(), any());
 
         FactionHints hints = mock(FactionHints.class);
         when(employerFaction.isISMajorOrSuperPower()).thenReturn(true);
@@ -1862,15 +1844,15 @@ public class ContractMarketAtBGenerationTests {
     public void nonMercNeutralAtWarAtBContractSucceeds(final int gameYear, final int unitRating,
           final boolean isClanEnemy) {
         String employer = "EMPLOYER";
-        Campaign campaign = mock(Campaign.class);
-        when(campaign.getRetainerEmployerCode()).thenReturn(null);
+        Campaign campaign = mockCampaign();
+        when(campaign.getPlayerForce().getRetainerEmployerCode()).thenReturn(null);
         when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
-        ReputationController camOpsReputation = mock(ReputationController.class);
+        mekhq.campaign.camOpsReputation.ForceReputationController camOpsReputation = mock(mekhq.campaign.camOpsReputation.ForceReputationController.class);
         when(camOpsReputation.getReputationFactor()).thenReturn(0.0);
-        when(campaign.getReputation()).thenReturn(camOpsReputation);
+        when(campaign.getPlayerForce().getReputation()).thenReturn(camOpsReputation);
 
         Faction campaignFaction = mock(Faction.class);
         when(campaignFaction.isMercenary()).thenReturn(false);
@@ -1888,13 +1870,13 @@ public class ContractMarketAtBGenerationTests {
         when(accountant.getOverheadExpenses()).thenReturn(Money.of(1));
         when(campaign.getAccountant()).thenReturn(accountant);
 
-        Hangar hangar = mock(Hangar.class);
+        LocalHangar hangar = mock(LocalHangar.class);
         doReturn(Money.of(1)).when(hangar).getUnitCosts(any(), any());
-        when(campaign.getAllHangar()).thenReturn(hangar);
+        when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
 
         Formation forces = mock(Formation.class);
         doReturn(new Vector<UUID>()).when(forces).getAllUnits(anyBoolean());
-        when(campaign.getFormations()).thenReturn(forces);
+        when(campaign.getPlayerForce().getFormations()).thenReturn(forces);
 
         Factions factions = mock(Factions.class);
         Factions.setInstance(factions);
@@ -1930,7 +1912,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(currentSystem).when(campaign).getSystemByName(eq(current));
 
         CurrentLocation currentLocation = mock(CurrentLocation.class);
-        when(campaign.getCurrentLocation()).thenReturn(currentLocation);
+        when(campaign.getPlayerForce().getForceDetachment().getCurrentLocation()).thenReturn(currentLocation);
 
         String missionTarget = "TARGET";
         PlanetarySystem targetSystem = mock(PlanetarySystem.class);
@@ -1940,8 +1922,8 @@ public class ContractMarketAtBGenerationTests {
 
         RandomFactionGenerator rfg = mock(RandomFactionGenerator.class);
         RandomFactionGenerator.setInstance(rfg);
-        doReturn(enemy).when(rfg).getEnemy(eq(employer), anyBoolean());
-        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString());
+        doReturn(enemyFaction).when(rfg).getRandomEnemy(anyBoolean(), any(), any(), eq(employerFaction));
+        doReturn(missionTarget).when(rfg).getMissionTarget(anyString(), anyString(), any(), any());
 
         FactionHints hints = mock(FactionHints.class);
         when(employerFaction.isISMajorOrSuperPower()).thenReturn(true);

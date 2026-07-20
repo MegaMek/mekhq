@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -122,7 +122,11 @@ public class DialogItinerary {
         ImageIcon speakerIcon;
 
         if (resupplyType.equals(RESUPPLY_LOOT) || resupplyType.equals(RESUPPLY_CONTRACT_END)) {
-            speaker = campaign.getSeniorAdminPerson(AdministratorSpecialization.LOGISTICS);
+            speaker = campaign.getPlayerForce().getHumanResources()
+                            .getSeniorAdminPerson(AdministratorSpecialization.LOGISTICS,
+                                  campaign.getCampaignOptions(),
+                                  campaign.isClanCampaign(),
+                                  campaign.getLocalDate());
 
             if (speaker != null) {
                 speakerName = speaker.getFullTitle();
@@ -195,7 +199,7 @@ public class DialogItinerary {
         JButton confirmButton = new JButton(getFormattedTextAt(RESOURCE_BUNDLE, "confirmAccept.text"));
         confirmButton.addActionListener(e -> {
             dialog.dispose();
-            campaign.getFinances()
+            campaign.getPlayerForce().getFinances()
                   .debit(EQUIPMENT_PURCHASE,
                         campaign.getLocalDate(),
                         resupply.getConvoyContentsValueCalculated(),
@@ -287,7 +291,7 @@ public class DialogItinerary {
         int rationPacks = 0;
         int medicalSupplies = 0;
 
-        for (Person person : campaign.getActivePersonnel(false, false)) {
+        for (Person person : campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false)) {
             PersonnelRole primaryRole = person.getPrimaryRole();
             PersonnelRole secondaryRole = person.getSecondaryRole();
 

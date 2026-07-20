@@ -32,7 +32,7 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
-import static org.mockito.Mockito.mock;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -48,7 +48,7 @@ import org.junit.jupiter.api.Test;
 class MarketsOptionsModelTest {
     @Test
     void applyToRoundTripsEveryField() {
-        Campaign campaign = mock(Campaign.class);
+        Campaign campaign = mockCampaign();
         MarketsOptionsModel model = new MarketsOptionsModel(new CampaignOptions());
         OptionsModelTestSupport.mutateScalarFields(model,
               "personnelMarketStyle",

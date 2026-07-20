@@ -39,6 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.time.LocalDate;
 
@@ -86,7 +87,7 @@ class AbstractMissionTransitionBehaviorTest {
     }
 
     private static Campaign mockCampaignWithOptions() {
-        Campaign campaign = mock(Campaign.class);
+        Campaign campaign = mockCampaign();
         CampaignOptions options = mock(CampaignOptions.class);
         when(campaign.getCampaignOptions()).thenReturn(options);
         return campaign;

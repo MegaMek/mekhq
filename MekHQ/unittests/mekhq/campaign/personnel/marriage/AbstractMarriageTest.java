@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2022-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -70,7 +70,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(value = MockitoExtension.class)
 public class AbstractMarriageTest {
-    @Mock
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private Campaign mockCampaign;
 
     @Mock
@@ -461,10 +461,10 @@ public class AbstractMarriageTest {
     public void testMarry() {
         doCallRealMethod().when(mockMarriage).marry(any(), any(), any(), any(), any(), anyBoolean());
         Faction campaignFaction = mock(Faction.class);
-        when(mockCampaign.getFaction()).thenReturn(campaignFaction);
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(campaignFaction);
         when(campaignFaction.getShortName()).thenReturn("MERC");
 
-        when(mockCampaign.getRankSystem()).thenReturn(mock(RankSystem.class));
+        when(mockCampaign.getPlayerForce().getRankSystem()).thenReturn(mock(RankSystem.class));
         doNothing().when(mockCampaign).addReport(eq(PERSONNEL), any());
 
         final Person origin = new Person("Origin", "Origin", mockCampaign);
@@ -516,7 +516,9 @@ public class AbstractMarriageTest {
 
         final Person mockPerson = mock(Person.class);
         final List<Person> mockPersonnel = new ArrayList<>();
-        when(mockCampaign.getActivePersonnel(true, true)).thenReturn(mockPersonnel);
+        when(mockCampaign.getPlayerForce()
+                   .getHumanResources()
+                   .getActivePersonnel(true, true)).thenReturn(mockPersonnel);
 
         mockMarriage.marryRandomSpouse(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, true, true);
 

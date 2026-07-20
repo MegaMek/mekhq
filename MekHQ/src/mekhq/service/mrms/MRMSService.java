@@ -108,7 +108,13 @@ public class MRMSService {
         }
         campaign.addReport(TECHNICAL, resources.getString("MRMS.StartWarehouse.report"));
 
-        List<Person> techs = campaign.getTechs(true);
+        List<Person> techs = campaign.getPlayerForce()
+                                   .getHumanResources()
+                                   .getTechs(campaign.getPlayerForce().getHangar().getUnits(),
+                                         campaign.getCampaignOptions(),
+                                         campaign.isClanCampaign(),
+                                         campaign.getLocalDate(),
+                                         true);
 
         MRMSPartSet partSet = new MRMSPartSet();
 
@@ -169,7 +175,9 @@ public class MRMSService {
                   unit.isSalvage() ? getTextAt(RESOURCE_BUNDLE, "Salvage") : getTextAt(RESOURCE_BUNDLE, "Repair"));
             campaign.addReport(TECHNICAL, message);
             return message;
-        } else if (campaign.requiresAdditionalAsTechs()) {
+        } else if (campaign.getPlayerForce()
+                         .getHumanResources()
+                         .requiresAdditionalAsTechs(campaign.getCampaignOptions())) {
             String message = resources.getString("MRMS.InsufficientAstechs.report");
             campaign.addReport(TECHNICAL, message);
             return message;
@@ -213,7 +221,12 @@ public class MRMSService {
 
         campaign.addReport(TECHNICAL, msg);
 
-        List<Person> techs = campaign.getTechs();
+        List<Person> techs = campaign.getPlayerForce()
+                                   .getHumanResources()
+                                   .getTechs(campaign.getPlayerForce().getHangar().getUnits(),
+                                         campaign.getCampaignOptions(),
+                                         campaign.isClanCampaign(),
+                                         campaign.getLocalDate());
 
         if (!techs.isEmpty()) {
             List<IPartWork> parts = unit.getPartsNeedingService(true);
@@ -237,7 +250,13 @@ public class MRMSService {
 
     public static void performSingleLocationMRMS(Campaign campaign, Unit unit, IPartWork part) {
         MRMSConfiguredOptions configuredOptions = new MRMSConfiguredOptions(campaign);
-        List<Person> techs = campaign.getTechs(true);
+        List<Person> techs = campaign.getPlayerForce()
+                                   .getHumanResources()
+                                   .getTechs(campaign.getPlayerForce().getHangar().getUnits(),
+                                         campaign.getCampaignOptions(),
+                                         campaign.isClanCampaign(),
+                                         campaign.getLocalDate(),
+                                         true);
         if (!configuredOptions.isEnabled()) {
             campaign.addReport(TECHNICAL, getTextAt(RESOURCE_BUNDLE, "MRMS.CompleteDisabled.report"));
             return;
@@ -246,7 +265,9 @@ public class MRMSService {
                   getTextAt(RESOURCE_BUNDLE, "Salvage"));
             campaign.addReport(TECHNICAL, msg);
             return;
-        } else if (campaign.requiresAdditionalAsTechs()) {
+        } else if (campaign.getPlayerForce()
+                         .getHumanResources()
+                         .requiresAdditionalAsTechs(campaign.getCampaignOptions())) {
             String message = getTextAt(RESOURCE_BUNDLE, "MRMS.InsufficientAstechs.report");
             campaign.addReport(TECHNICAL, message);
             return;
@@ -287,7 +308,9 @@ public class MRMSService {
         if (!configuredOptions.isEnabled()) {
             campaign.addReport(TECHNICAL, resources.getString("MRMS.CompleteDisabled.report"));
             return;
-        } else if (campaign.requiresAdditionalAsTechs()) {
+        } else if (campaign.getPlayerForce()
+                         .getHumanResources()
+                         .requiresAdditionalAsTechs(campaign.getCampaignOptions())) {
             campaign.addReport(TECHNICAL, resources.getString("MRMS.InsufficientAstechs.report"));
             return;
         }
@@ -406,7 +429,12 @@ public class MRMSService {
               campaign);
 
         if (!unitActionsByStatus.isEmpty()) {
-            List<Person> techs = campaign.getTechs();
+            List<Person> techs = campaign.getPlayerForce()
+                                       .getHumanResources()
+                                       .getTechs(campaign.getPlayerForce().getHangar().getUnits(),
+                                             campaign.getCampaignOptions(),
+                                             campaign.isClanCampaign(),
+                                             campaign.getLocalDate());
 
             if (!techs.isEmpty()) {
                 int count = 0;
@@ -481,7 +509,13 @@ public class MRMSService {
 
     private static MRMSUnitAction performUnitMRMS(Campaign campaign, Unit unit, boolean isSalvage,
           List<MRMSOption> mrmsOptions, MRMSConfiguredOptions configuredOptions) {
-        List<Person> techs = campaign.getTechs(true);
+        List<Person> techs = campaign.getPlayerForce()
+                                   .getHumanResources()
+                                   .getTechs(campaign.getPlayerForce().getHangar().getUnits(),
+                                         campaign.getCampaignOptions(),
+                                         campaign.isClanCampaign(),
+                                         campaign.getLocalDate(),
+                                         true);
 
         if (techs.isEmpty()) {
             return new MRMSUnitAction(unit, isSalvage, MRMSUnitAction.STATUS.NO_TECHS);
@@ -1068,7 +1102,8 @@ public class MRMSService {
             boolean assigned = false;
 
             if ((unit != null) && configuredOptions.isUseAssignedTechsFirst()) {
-                Formation formation = campaign.getFormation(unit.getFormationId());
+                int id = unit.getFormationId();
+                Formation formation = campaign.getPlayerForce().getFormation(id);
 
                 if ((formation != null) && (formation.getTechID()) != null) {
                     assigned = formation.getTechID().toString().equals(tech.getId().toString());

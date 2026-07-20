@@ -36,6 +36,7 @@ import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static megamek.common.options.OptionsConstants.ALLOWED_YEAR;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.campaignOptionsLegendEntries;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.formatBadges;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
@@ -49,16 +50,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.time.LocalDate;
 import java.util.List;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JFrame;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.*;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
@@ -78,9 +70,9 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.StartingLocationChoice;
 import mekhq.campaign.universe.enums.StartingLocationMode;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
+import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
 import mekhq.gui.campaignOptions.CampaignOptionsIconLegend;
 import mekhq.gui.campaignOptions.CampaignOptionsMetadata;
-import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
 import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
@@ -167,7 +159,7 @@ public class GeneralPage {
         this.campaign = campaign;
         this.date = campaign.getLocalDate();
         this.camouflage = campaign.getCamouflage();
-        this.unitIcon = campaign.getUnitIcon();
+        this.unitIcon = campaign.getPlayerForce().getUnitIcon();
         this.mode = mode;
 
         initialize();
@@ -220,7 +212,12 @@ public class GeneralPage {
         // Generate new random campaign name
         btnNameGenerator = createButton("NameGenerator");
         btnNameGenerator.addActionListener(event -> {
-            String generatedName = BackgroundsController.randomMercenaryCompanyNameGenerator(campaign.getCommander());
+            String generatedName = BackgroundsController.randomMercenaryCompanyNameGenerator(campaign.getPlayerForce()
+                                                                                                   .getHumanResources()
+                                                                                                   .getCommander(
+                                                                                                         campaign.getCampaignOptions(),
+                                                                                                         campaign.isClanCampaign(),
+                                                                                                         campaign.getLocalDate()));
             txtName.setText(generatedName);
         });
 
@@ -312,7 +309,7 @@ public class GeneralPage {
               .showDetailsPanel(false)
               .sectionsExpandedByDefault(true)
               .quote("generalPanel")
-              .introComponent(new CampaignOptionsIconLegend())
+              .introComponent(new CampaignOptionsIconLegend(campaignOptionsLegendEntries()))
               .section("lblGeneralCampaignBasicsPanel.text",
                     "lblGeneralCampaignBasicsPanel.summary",
                     createCampaignBasicsPanel())
@@ -456,12 +453,9 @@ public class GeneralPage {
      * @return A {@link DefaultComboBoxModel} populated with available {@link FactionDisplay} options.
      */
     private DefaultComboBoxModel<FactionDisplay> buildFactionDisplayOptions() {
-        DefaultComboBoxModel<FactionDisplay> factionModel = new DefaultComboBoxModel<>();
-
-        factionModel.addAll(FactionDisplay.getSortedValidFactionDisplays(Factions.getInstance().getChoosableFactions(),
-              date));
-
-        return factionModel;
+        List<FactionDisplay> factionOptions = FactionDisplay.getSortedValidFactionDisplays(
+              Factions.getInstance().getChoosableFactions(), date);
+        return new DefaultComboBoxModel<>(factionOptions.toArray(FactionDisplay[]::new));
     }
 
     /**
@@ -514,21 +508,17 @@ public class GeneralPage {
         btnDate.repaint();
 
         final FactionDisplay factionDisplay = comboFaction.getSelectedItem();
-        comboFaction.removeAllItems();
-        DefaultComboBoxModel<FactionDisplay> factionModel =
-            (DefaultComboBoxModel<FactionDisplay>) comboFaction.getModel();
-        List<FactionDisplay> validFactions = FactionDisplay.getSortedValidFactionDisplays(
-            Factions.getInstance().getChoosableFactions(), date);
-        factionModel.addAll(validFactions);
-        comboFaction.setSelectedItem(factionDisplay);
+        comboFaction.setModel(buildFactionDisplayOptions());
+        if (factionDisplay != null) {
+            comboFaction.setSelectedItem(factionDisplay);
+        }
 
         if (comboStartingLocationFaction != null) {
             final FactionDisplay startingFactionDisplay = comboStartingLocationFaction.getSelectedItem();
-            comboStartingLocationFaction.removeAllItems();
-            DefaultComboBoxModel<FactionDisplay> startingFactionModel =
-                  (DefaultComboBoxModel<FactionDisplay>) comboStartingLocationFaction.getModel();
-            startingFactionModel.addAll(buildStartingLocationFactionDisplays(date));
-            comboStartingLocationFaction.setSelectedItem(startingFactionDisplay);
+            comboStartingLocationFaction.setModel(buildStartingLocationFactionModel(date));
+            if (startingFactionDisplay != null) {
+                comboStartingLocationFaction.setSelectedItem(startingFactionDisplay);
+            }
         }
     }
 
@@ -625,7 +615,7 @@ public class GeneralPage {
         }
 
         camouflage = campaign.getCamouflage();
-        unitIcon = campaign.getUnitIcon();
+        unitIcon = campaign.getPlayerForce().getUnitIcon();
     }
 
     /**
@@ -638,10 +628,11 @@ public class GeneralPage {
     public void applyCampaignOptionsToCampaign(boolean isStartUp, boolean isSaveAction) {
         // First, we apply any updates to the campaign
         if (!isSaveAction) {
-            campaign.setName(txtName.getText());
+            String s = txtName.getText();
+            campaign.getPlayerForce().setName(s);
 
             if (isStartUp) {
-                campaign.getFormations().setName(campaign.getName());
+                campaign.getPlayerForce().getFormations().setName(campaign.getName());
                 campaign.setLocalDate(date);
             }
 
@@ -655,11 +646,12 @@ public class GeneralPage {
             // Null state handled during validation
             FactionDisplay newFaction = comboFaction.getSelectedItem();
             if (newFaction != null) {
-                campaign.setFaction(newFaction.getFaction());
+                final Faction faction = newFaction.getFaction();
+                campaign.getPlayerForce().setFaction(faction);
             }
 
-            campaign.setCamouflage(camouflage);
-            campaign.setUnitIcon(unitIcon);
+            campaign.getPlayerForce().setCamouflage(camouflage);
+            campaign.getPlayerForce().setUnitIcon(unitIcon);
 
             if (isStartUp) {
                 // Resolve and set the starting system from the starting-location controls
@@ -711,9 +703,8 @@ public class GeneralPage {
     }
 
     private static DefaultComboBoxModel<FactionDisplay> buildStartingLocationFactionModel(LocalDate date) {
-        DefaultComboBoxModel<FactionDisplay> model = new DefaultComboBoxModel<>();
-        model.addAll(buildStartingLocationFactionDisplays(date));
-        return model;
+        List<FactionDisplay> factionOptions = buildStartingLocationFactionDisplays(date);
+        return new DefaultComboBoxModel<>(factionOptions.toArray(FactionDisplay[]::new));
     }
 
     /**

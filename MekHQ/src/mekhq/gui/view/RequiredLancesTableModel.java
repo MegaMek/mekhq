@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014 Carl Spain. All rights reserved.
- * Copyright (C) 2014-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2014-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -68,7 +68,7 @@ class RequiredLancesTableModel extends DataTableModel<AtBContract> {
 
     static int getAssignedCombatElementCount(Campaign campaign, AtBContract contract) {
         int assignedCombatElements = 0;
-        for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
+        for (CombatTeam combatTeam : campaign.getPlayerForce().getCombatTeamsAsList(campaign)) {
             if (!contract.equals(combatTeam.getContract(campaign))) {
                 continue;
             }
@@ -141,7 +141,7 @@ class RequiredLancesTableModel extends DataTableModel<AtBContract> {
 
     private static int getAssignedCombatRoleCount(Campaign campaign, AtBContract contract, CombatRole requiredRole) {
         int assignedCombatElements = 0;
-        for (CombatTeam combatTeam : campaign.getCombatTeamsAsList()) {
+        for (CombatTeam combatTeam : campaign.getPlayerForce().getCombatTeamsAsList(campaign)) {
             if (contract.equals(combatTeam.getContract(campaign)) &&
                       (combatTeam.getRole() == requiredRole) &&
                       combatTeam.isEligible(campaign)) {

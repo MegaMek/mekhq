@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2016-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -64,7 +64,7 @@ public class XPHandler {
         if ((adminXP <= 0) || (campaign.getLocalDate().getDayOfWeek() != DayOfWeek.MONDAY)) {
             return;
         }
-        for (Person person : campaign.getAdmins()) {
+        for (Person person : campaign.getPlayerForce().getHumanResources().getAdmins()) {
             if (person.getPrimaryRole().isAdministrator()) {
                 if (adminXPPeriod > 1) {
                     Integer weeksLeft = person.getExtraData().get(NEXT_ADMIN_XP_DELAY);

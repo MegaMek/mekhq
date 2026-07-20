@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -72,7 +72,7 @@ public class UnableToAffordJumpNagDialog extends ImmersiveDialogNag {
         final String RESOURCE_BUNDLE = "mekhq.resources.NagDialogs";
 
         Money nextJumpCost = getNextJumpCost(campaign);
-        Money currentFunds = campaign.getFunds();
+        Money currentFunds = campaign.getPlayerForce().getFunds();
         Money deficit = nextJumpCost.minus(currentFunds);
 
         return getFormattedTextAt(RESOURCE_BUNDLE,

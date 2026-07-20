@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -42,6 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -55,8 +56,7 @@ import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.Mounted;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Quartermaster;
-import mekhq.campaign.Warehouse;
+import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.meks.MekLocation;
@@ -77,7 +77,7 @@ public class MissingAmmoBinTest {
 
     @Test
     public void missingAmmoBinMRMSOptionType() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         AmmoType ammoType = getAmmoType("ISSRM6 Inferno Ammo");
 
         MissingAmmoBin missingAmmoBin = new MissingAmmoBin(0, ammoType, 18, false, false, mockCampaign);
@@ -87,7 +87,7 @@ public class MissingAmmoBinTest {
 
     @Test
     public void getNewPartTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         AmmoType ammoType = getAmmoType("ISSRM6 Inferno Ammo");
 
         MissingAmmoBin missingAmmoBin = new MissingAmmoBin(0, ammoType, 18, false, false, mockCampaign);
@@ -120,7 +120,7 @@ public class MissingAmmoBinTest {
     @Test
     public void missingAmmoBinWriteToXmlTest() throws ParserConfigurationException, SAXException, IOException {
         AmmoType isSRM2InfernoAmmo = getAmmoType("ISSRM2 Inferno Ammo");
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         MissingAmmoBin missingAmmoBin = new MissingAmmoBin(0, isSRM2InfernoAmmo, 42, false, false, mockCampaign);
         missingAmmoBin.setId(25);
 
@@ -162,7 +162,7 @@ public class MissingAmmoBinTest {
     @Test
     public void oneShotMissingAmmoBinWriteToXmlTest() throws ParserConfigurationException, SAXException, IOException {
         AmmoType isSRM2InfernoAmmo = getAmmoType("ISSRM2 Ammo");
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         MissingAmmoBin missingAmmoBin = new MissingAmmoBin(0, isSRM2InfernoAmmo, 42, true, true, mockCampaign);
         missingAmmoBin.setId(25);
 
@@ -203,7 +203,7 @@ public class MissingAmmoBinTest {
 
     @Test
     public void isAcceptableReplacementSameTypeTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         AmmoType ammoType = getAmmoType("ISSRM6 Inferno Ammo");
         AmmoType otherAmmoType = getAmmoType("ISSRM6 Ammo");
 
@@ -243,7 +243,7 @@ public class MissingAmmoBinTest {
 
     @Test
     public void isAcceptableReplacementDifferentTypeTest() {
-        Campaign mockCampaign = mock(Campaign.class);
+        Campaign mockCampaign = mockCampaign();
         AmmoType ammoType = getAmmoType("ISSRM6 Inferno Ammo");
         AmmoType otherAmmoType = getAmmoType("ISSRM6 Ammo");
 
@@ -285,10 +285,10 @@ public class MissingAmmoBinTest {
 
     @Test
     public void fixFindsAcceptableReplacementTest() {
-        Campaign mockCampaign = mock(Campaign.class);
-        Warehouse warehouse = new Warehouse();
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        Campaign mockCampaign = mockCampaign();
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         AmmoType ammoType = getAmmoType("ISSRM6 Ammo");
@@ -336,10 +336,10 @@ public class MissingAmmoBinTest {
 
     @Test
     public void fixFindsAcceptableOneShotReplacementTest() {
-        Campaign mockCampaign = mock(Campaign.class);
-        Warehouse warehouse = new Warehouse();
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        Campaign mockCampaign = mockCampaign();
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
 
         AmmoType ammoType = getAmmoType("ISSRM6 Inferno Ammo");

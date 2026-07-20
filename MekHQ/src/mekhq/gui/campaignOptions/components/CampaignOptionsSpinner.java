@@ -37,6 +37,7 @@ import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.formatBadges;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
@@ -163,6 +164,30 @@ public class CampaignOptionsSpinner extends JSpinner {
     public CampaignOptionsSpinner(@Nonnull String name, double defaultValue, double minimum, double maximum,
           double stepSize, boolean noTooltip) {
         this(name, defaultValue, minimum, maximum, stepSize, noTooltip, null);
+    }
+
+    /**
+     * Generic constructor for reuse outside Campaign Options. Resolves the tooltip from {@code name + ".tooltip"} in
+     * the given resource bundle, without the Campaign Options {@code "lbl"} key prefix.
+     *
+     * @param resourceBundleName the resource bundle to resolve the tooltip from
+     * @param name               the resource key base and internal name (no {@code "lbl"} prefix is added)
+     * @param defaultValue       the default value of the spinner (integer or double)
+     * @param minimum            the minimum value for the spinner (integer or double)
+     * @param maximum            the maximum value for the spinner (integer or double)
+     * @param stepSize           the step value for incrementing or decrementing the spinner (integer or double)
+     */
+    public CampaignOptionsSpinner(@Nonnull String resourceBundleName, @Nonnull String name, Number defaultValue,
+          Number minimum, Number maximum, Number stepSize) {
+        super(createSpinnerModel(defaultValue, minimum, maximum, stepSize));
+        String tooltipText = getTextAt(resourceBundleName, name + ".tooltip");
+        if (!isResourceKeyValid(tooltipText)) {
+            tooltipText = getTextAt(resourceBundleName, name + ".toolTipText");
+        }
+        if (isResourceKeyValid(tooltipText)) {
+            setToolTipText(wordWrap(tooltipText));
+        }
+        configureSpinner(name);
     }
 
     /**

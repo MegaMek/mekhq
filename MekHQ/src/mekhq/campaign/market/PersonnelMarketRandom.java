@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -64,7 +64,7 @@ public class PersonnelMarketRandom implements PersonnelMarketMethod {
         final PersonnelRole[] personnelRoles = PersonnelRole.values();
         for (int i = 0; i < q; i++) {
             int roll = Compute.randomInt(personnelRoles.length - PersonnelRole.getCivilianCount());
-            Person p = c.newPerson(personnelRoles[roll]);
+            Person p = c.getPlayerForce().getHumanResources().newPerson(c, personnelRoles[roll]);
             personnel.add(p);
         }
         return personnel;

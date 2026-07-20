@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -43,13 +43,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import megamek.common.equipment.EquipmentType;
 import megamek.common.units.Aero;
 import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Quartermaster;
-import mekhq.campaign.Warehouse;
+import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.parts.AeroHeatSink;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
@@ -65,10 +65,10 @@ public class MissingHeatSinkTest {
 
     @Test
     public void missingHeatSinkSelectsCorrectPartDuringRepair() {
-        Campaign mockCampaign = mock(Campaign.class);
-        Warehouse warehouse = new Warehouse();
-        when(mockCampaign.getWarehouse()).thenReturn(warehouse);
-        Quartermaster quartermaster = new Quartermaster(mockCampaign);
+        Campaign mockCampaign = mockCampaign();
+        LocalWarehouse warehouse = new LocalWarehouse();
+        when(mockCampaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
+        mekhq.campaign.ForceQuartermaster quartermaster = new mekhq.campaign.ForceQuartermaster(mockCampaign);
         when(mockCampaign.getQuartermaster()).thenReturn(quartermaster);
         Unit unit = mock(Unit.class);
         doAnswer(inv -> {

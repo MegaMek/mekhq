@@ -130,14 +130,19 @@ public class Maintenance {
 
                 if (maintained) {
                     tech.setMinutesLeft(availableMinutes - minutesUsed);
-                    asTechsUsed = campaign.getAvailableAsTechs(minutesUsed, false);
-                    campaign.setAsTechPoolMinutes(campaign.getAsTechPoolMinutes() - (asTechsUsed * minutesUsed));
+                    asTechsUsed = campaign.getPlayerForce().getHumanResources().getAvailableAsTechs(minutesUsed,
+                          false,
+                          campaign.isOvertimeAllowed(),
+                          campaign.getCampaignOptions());
+                    int minutes = campaign.getPlayerForce().getHumanResources().getAsTechPoolMinutes() -
+                                        (asTechsUsed * minutesUsed);
+                    campaign.getPlayerForce().getHumanResources().setAsTechPoolMinutes(minutes);
                 }
             }
 
             // maybe use the money
             if (campaignOptions.isPayForMaintain()) {
-                if (!(campaign.getFinances().debit(TransactionType.MAINTENANCE,
+                if (!(campaign.getPlayerForce().getFinances().debit(TransactionType.MAINTENANCE,
                       campaign.getLocalDate(),
                       unit.getMaintenanceCost(),
                       "Maintenance for " + unit.getName()))) {
@@ -432,8 +437,9 @@ public class Maintenance {
         }
 
         if (partWork.getUnit().getSite() < SITE_FACILITY_BASIC) {
-            if (campaign.getCurrentLocation().isOnPlanet() && campaignOptions.isUsePlanetaryModifiers()) {
-                Planet planet = campaign.getCurrentLocation().getPlanet();
+            if (campaign.getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet() &&
+                      campaignOptions.isUsePlanetaryModifiers()) {
+                Planet planet = campaign.getPlayerForce().getForceDetachment().getCurrentLocation().getPlanet();
                 Atmosphere atmosphere = planet.getAtmosphere(campaign.getLocalDate());
                 megamek.common.planetaryConditions.Atmosphere planetaryConditions = planet.getPressure(campaign.getLocalDate());
                 int temperature = planet.getTemperature(campaign.getLocalDate());
@@ -562,7 +568,12 @@ public class Maintenance {
         final boolean hasActiveMission = !campaign.getActiveMissions(false).isEmpty();
         final LocalDate today = campaign.getLocalDate();
 
-        List<Person> allTechs = campaign.getTechsExpanded();
+        List<Person> allTechs = campaign.getPlayerForce()
+                                      .getHumanResources()
+                                      .getTechsExpanded(campaign.getPlayerForce().getHangar().getUnits(),
+                                            campaign.getCampaignOptions(),
+                                            campaign.isClanCampaign(),
+                                            campaign.getLocalDate());
         for (Person tech : allTechs) {
             int dailyWorkMinutes = tech.getDailyAvailableTechTime(techsUseAdmin);
 

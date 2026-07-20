@@ -44,6 +44,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileInputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -56,6 +57,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import megamek.Version;
@@ -76,7 +78,7 @@ import mekhq.NullEntityException;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Campaign.AdministratorSpecialization;
 import mekhq.campaign.CampaignFactory;
-import mekhq.campaign.camOpsReputation.ReputationController;
+import mekhq.campaign.camOpsReputation.ForceReputationController;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.finances.CurrencyManager;
@@ -86,8 +88,11 @@ import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.backgrounds.RandomCompanyNameGenerator;
+import mekhq.campaign.personnel.divorce.AbstractDivorce;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
+import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -361,13 +366,31 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaign.getGameYear());
 
                 CampaignOptionsDialogMode mode = isSelect ? STARTUP_ABRIDGED : STARTUP;
-                CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(getFrame(), campaign, preset, mode);
-                setVisible(false); // cede visibility to `optionsDialog`
-                optionsDialog.setVisible(true);
-                if (optionsDialog.wasCanceled()) {
+                // This method runs in a worker thread, but the construction of the UI for Campaign Options must run on
+                // the EDT, so dispatch it there using invokeAndWait.
+                final boolean[] optionsCanceled = { false };
+                try {
+                    SwingUtilities.invokeAndWait(
+                          () -> optionsCanceled[0] = showStartupCampaignOptionsDialog(campaign, preset, mode));
+                } catch (InterruptedException exception) {
+                    Thread.currentThread().interrupt();
                     return null;
-                } else {
-                    setVisible(true); // restore loader visibility
+                } catch (InvocationTargetException exception) {
+                    // Let a genuine UI-construction failure propagate through the worker so done() reports it via its
+                    // ExecutionException handling, rather than returning null (which looks like a normal cancel and
+                    // silently hides the error). The Runnable can only fail with an unchecked throwable, so unwrap the
+                    // cause to keep done()'s per-type error dialogs working.
+                    LOGGER.error("Failed to display the Campaign Options dialog", exception);
+                    if (exception.getCause() instanceof RuntimeException runtimeException) {
+                        throw runtimeException;
+                    }
+                    if (exception.getCause() instanceof Error error) {
+                        throw error;
+                    }
+                    throw exception;
+                }
+                if (optionsCanceled[0]) {
+                    return null;
                 }
 
                 // Starting planet: the campaign options General page resolves and sets the starting system during
@@ -377,14 +400,14 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 }
 
                 // initialize reputation
-                ReputationController reputationController = new ReputationController();
+                ForceReputationController reputationController = new ForceReputationController();
                 reputationController.initializeReputation(campaign);
-                campaign.setReputation(reputationController);
+                campaign.getPlayerForce().setReputation(reputationController);
 
                 // initialize starting faction standings
                 CampaignOptions campaignOptions = campaign.getCampaignOptions();
                 if (campaignOptions.isTrackFactionStanding()) {
-                    FactionStandings factionStandings = campaign.getFactionStandings();
+                    FactionStandings factionStandings = campaign.getPlayerForce().getFactionStandings();
                     String report = factionStandings.updateClimateRegard(campaign.getFaction(),
                           campaign.getLocalDate(), campaignOptions.getRegardMultiplier(),
                           true);
@@ -399,18 +422,21 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                                            "</b>");
 
                 // Setup Personnel Modules
-                campaign.setMarriage(campaignOptions
+                final AbstractMarriage marriage = campaignOptions
                                            .getRandomMarriageMethod()
-                                           .getMethod(campaignOptions));
-                campaign.setDivorce(campaignOptions
+                                                        .getMethod(campaignOptions);
+                campaign.getPlayerForce().getHumanResources().setMarriage(marriage);
+                final AbstractDivorce divorce = campaignOptions
                                           .getRandomDivorceMethod()
-                                          .getMethod(campaignOptions));
-                campaign.setProcreation(campaignOptions
+                                                      .getMethod(campaignOptions);
+                campaign.getPlayerForce().getHumanResources().setDivorce(divorce);
+                final AbstractProcreation procreation = campaignOptions
                                               .getRandomProcreationMethod()
-                                              .getMethod(campaignOptions));
+                                                              .getMethod(campaignOptions);
+                campaign.getPlayerForce().getHumanResources().setProcreation(procreation);
 
                 // Setup Markets
-                campaign.refreshApplicants(true);
+                campaign.getPlayerForce().getHumanResources().refreshApplicants(campaign, true);
                 showRarePersonnelDialog(campaign, true);
                 ContractMarketMethod contractMarketMethod = campaignOptions.getContractMarketMethod();
                 campaign.setContractMarket(contractMarketMethod.getContractMarket());
@@ -503,6 +529,31 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
          */
         private static void handleCampaignUpgrading(MekHQ app, Campaign campaign) {
             CampaignUpgradeDialog.campaignUpgradeDialog(app, campaign);
+        }
+
+        /**
+         * Builds and shows the modal Campaign Options dialog for a brand-new campaign, then reports whether the user
+         * canceled it.
+         *
+         * <p>Must run on the Event Dispatch Thread (it is invoked through {@link SwingUtilities#invokeAndWait} from the
+         * worker thread) because it constructs the dialog's entire Swing component tree.</p>
+         *
+         * @param campaign the new campaign being configured
+         * @param preset   the preset to seed the dialog with, or {@code null}
+         * @param mode     the dialog mode (abridged or full startup)
+         *
+         * @return {@code true} if the user canceled the dialog; {@code false} if the settings were applied
+         */
+        private boolean showStartupCampaignOptionsDialog(final Campaign campaign, final @Nullable CampaignPreset preset,
+              final CampaignOptionsDialogMode mode) {
+            final CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(getFrame(), campaign, preset, mode);
+            setVisible(false); // cede visibility to `optionsDialog`
+            optionsDialog.setVisible(true);
+            if (optionsDialog.wasCanceled()) {
+                return true;
+            }
+            setVisible(true); // restore loader visibility
+            return false;
         }
 
         /**

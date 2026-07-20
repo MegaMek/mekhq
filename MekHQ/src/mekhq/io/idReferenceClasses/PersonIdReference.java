@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -55,7 +55,7 @@ public class PersonIdReference extends Person {
     // endregion Constructors
 
     public static void fixPersonIdReferences(final Campaign campaign) {
-        for (final Person person : campaign.getAllPersonnel()) {
+        for (final Person person : campaign.getPlayerForce().getHumanResources().getPersonnel()) {
             fixGenealogyReferences(campaign, person);
         }
     }
@@ -121,9 +121,12 @@ public class PersonIdReference extends Person {
                 if (familyMemberReference == null) {
                     continue;
                 }
-                final Person familyMember = (familyMemberReference instanceof PersonIdReference)
-                                                  ? campaign.getPerson(familyMemberReference.getId())
-                                                  : familyMemberReference;
+                final Person familyMember;
+                if ((familyMemberReference instanceof mekhq.io.idReferenceClasses.PersonIdReference)) {
+                    familyMember = campaign.getPerson(familyMemberReference.getId());
+                } else {
+                    familyMember = familyMemberReference;
+                }
                 if (familyMember == null) {
                     LOGGER.warn("Failed to find a person with id {}", familyMemberReference.getId());
                 } else {

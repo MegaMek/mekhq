@@ -52,6 +52,8 @@ import javax.swing.tree.TreeSelectionModel;
 import megamek.common.event.Subscribe;
 import megamek.common.ui.FastJScrollPane;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.digitalGM.stratCon.MaplessStratCon;
 import mekhq.campaign.events.DeploymentChangedEvent;
 import mekhq.campaign.events.NetworkChangedEvent;
 import mekhq.campaign.events.OrganizationChangedEvent;
@@ -66,7 +68,6 @@ import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.stratCon.MaplessStratCon;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.TOEMouseAdapter;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
@@ -244,8 +245,15 @@ public final class TOETab extends CampaignGuiTab {
      */
     private void deployToRegularScenario(Scenario selectedScenario) {
         // Get available forces
-        List<Formation> formationOptions = getCampaign().getCombatTeamsAsList().stream()
-                                                 .map(combatTeam -> getCampaign().getFormation(combatTeam.getFormationId()))
+        mekhq.campaign.Campaign campaign = getCampaign();
+        List<Formation> formationOptions = campaign.getPlayerForce()
+                                                 .getCombatTeamsAsList(campaign)
+                                                 .stream()
+                                                 .map(combatTeam -> {
+                                                     Campaign campaign1 = getCampaign();
+                                                     int id = combatTeam.getFormationId();
+                                                     return campaign1.getPlayerForce().getFormation(id);
+                                                 })
                                                  .filter(force -> force != null && !force.isDeployed())
                                                  .sorted(Comparator.comparing(Formation::getFullName))
                                                  .toList();
@@ -340,7 +348,7 @@ public final class TOETab extends CampaignGuiTab {
             // to not select the unit in the TO&E.
         } else if (node instanceof Formation) {
             final JScrollPane scrollForce = new FastJScrollPane(new ForceViewPanel((Formation) node, getCampaign(),
-                this::selectUnitFromForceView, this::selectFormationFromForceView));
+                  this::selectUnitFromForceView, this::selectFormationFromForceView));
             scrollForce.setBorder(null);
             panForceView.add(scrollForce, BorderLayout.CENTER);
             panForceView.setBorder(null);
@@ -370,7 +378,9 @@ public final class TOETab extends CampaignGuiTab {
     }
 
     private TreePath getTreePathForUnit(Unit unit) {
-        Formation formation = getCampaign().getFormation(unit.getFormationId());
+        Campaign campaign = getCampaign();
+        int id = unit.getFormationId();
+        Formation formation = campaign.getPlayerForce().getFormation(id);
         TreePath formationPath = formation == null ? null : getTreePathForFormation(formation);
         return formationPath == null ? null : formationPath.pathByAddingChild(unit);
     }

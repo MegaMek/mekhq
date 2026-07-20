@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.market.contractMarket;
 
-import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
@@ -90,7 +89,11 @@ public class ContractAutomation {
         final String commanderAddress = campaign.getCommanderAddress();
         final List<String> buttonLabels = List.of(getTextAt(RESOURCE_BUNDLE, "generalConfirm.text"),
               getTextAt(RESOURCE_BUNDLE, "generalDecline.text"));
-        final Person speaker = campaign.getSeniorAdminPerson(TRANSPORT);
+        final Person speaker = campaign.getPlayerForce().getHumanResources()
+                                     .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT,
+                                           campaign.getCampaignOptions(),
+                                           campaign.isClanCampaign(),
+                                           campaign.getLocalDate());
 
         // Mothballing
         String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "mothballDescription.text", commanderAddress);
@@ -114,7 +117,8 @@ public class ContractAutomation {
               false);
 
         if (mothballDialog.getDialogChoice() == DIALOG_CONFIRM_OPTION) {
-            campaign.setAutomatedMothballUnits(performAutomatedMothballing(campaign));
+            List<UUID> automatedMothballUnits = performAutomatedMothballing(campaign);
+            campaign.getPlayerForce().setAutomatedMothballUnits(automatedMothballUnits);
         }
 
         // Transit
@@ -153,7 +157,8 @@ public class ContractAutomation {
             boolean useTwoWayPay = campaign.getCampaignOptions().isUseTwoWayPay();
 
             // This will return an empty string if the transaction was successful
-            String jumpReport = TransportCostCalculations.performJumpTransaction(campaign.getFinances(), jumpPath,
+            String jumpReport = TransportCostCalculations.performJumpTransaction(campaign.getPlayerForce()
+                                                                                       .getFinances(), jumpPath,
                   campaign.getLocalDate(),
                   contract.getTotalTransportationFees(campaign).dividedBy(useTwoWayPay ? 2 : 1),
                   campaign.getCurrentSystem());
@@ -181,7 +186,7 @@ public class ContractAutomation {
         List<UUID> mothballTargets = new ArrayList<>();
         MothballUnitAction mothballUnitAction = new MothballUnitAction(null, true);
 
-        for (Formation formation : campaign.getAllFormations()) {
+        for (Formation formation : campaign.getPlayerForce().getAllFormations()) {
             List<UUID> iterationSafeUnitIds = new ArrayList<>(formation.getUnits());
             for (UUID unitId : iterationSafeUnitIds) {
                 Unit unit = campaign.getUnit(unitId);
@@ -228,7 +233,7 @@ public class ContractAutomation {
     public static void performAutomatedActivation(Campaign campaign) {
         ActivateUnitAction activateUnitAction = new ActivateUnitAction(null, true);
 
-        List<UUID> unitIds = campaign.getAutomatedMothballUnits();
+        List<UUID> unitIds = campaign.getPlayerForce().getAutomatedMothballUnits();
         for (UUID unitId : unitIds) {
             Unit unit = campaign.getUnit(unitId);
 
@@ -250,14 +255,18 @@ public class ContractAutomation {
         }
 
         // We still want to clear out any units
-        campaign.setAutomatedMothballUnits(new ArrayList<>());
+        campaign.getPlayerForce().setAutomatedMothballUnits(new ArrayList<UUID>());
     }
 
     public static void outOfContractMothballAutomation(Campaign campaign) {
         final List<String> buttonLabels = List.of(getTextAt(RESOURCE_BUNDLE, "generalConfirm.text"),
               getTextAt(RESOURCE_BUNDLE, "generalDecline.text"));
 
-        final Person speaker = campaign.getSeniorAdminPerson(TRANSPORT);
+        final Person speaker = campaign.getPlayerForce().getHumanResources()
+                                     .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT,
+                                           campaign.getCampaignOptions(),
+                                           campaign.isClanCampaign(),
+                                           campaign.getLocalDate());
 
         final String commanderAddress = campaign.getCommanderAddress();
         String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
@@ -277,7 +286,8 @@ public class ContractAutomation {
               false);
 
         if (mothballDialog.getDialogChoice() == DIALOG_CONFIRM_OPTION) {
-            campaign.setAutomatedMothballUnits(performAutomatedMothballing(campaign));
+            List<UUID> automatedMothballUnits = performAutomatedMothballing(campaign);
+            campaign.getPlayerForce().setAutomatedMothballUnits(automatedMothballUnits);
         }
     }
 }

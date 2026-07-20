@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -103,7 +103,12 @@ public class AssignUnitToTechMenu extends JScrollableMenu {
 
             final IPlace unitPlace = units[0].getPlace();
 
-            for (final Person tech : campaign.getTechs()) {
+            for (final Person tech : campaign.getPlayerForce()
+                                           .getHumanResources()
+                                           .getTechs(campaign.getPlayerForce().getHangar().getUnits(),
+                                                 campaign.getCampaignOptions(),
+                                                 campaign.isClanCampaign(),
+                                                 campaign.getLocalDate())) {
                 if (allShareTech && tech.equals(units[0].getTech())) {
                     continue;
                 }

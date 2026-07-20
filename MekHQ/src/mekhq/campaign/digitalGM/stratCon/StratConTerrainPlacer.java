@@ -1,0 +1,187 @@
+/*
+ * Copyright (C) 2019-2026 The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
+ */
+package mekhq.campaign.digitalGM.stratCon;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import megamek.common.board.Coords;
+import megamek.common.compute.Compute;
+
+/**
+ * This class handles placement of StratCon terrain
+ */
+public class StratConTerrainPlacer {
+    /**
+     * Loads base terrain and "stripes" the passed-in track.
+     *
+     * @param track The track to process.
+     */
+    public static void InitializeTrackTerrain(StratConTrackState track) {
+        // 1. get the correct biome list according to track temperature
+        // 2. pick random biome to be "base terrain"; apply it to all track hexes
+        // 3. "stripe" the other biomes:
+        // striping is "starting coordinate" (random track coord) and "ending
+        // coordinate"
+        // TODO: Maybe more than one of each biome?
+        // TODO: Map category being displayed for some reason
+        int kelvinTemp = track.getTemperature() + StratConContractInitializer.ZERO_CELSIUS_IN_KELVIN;
+        var tempMap = StratConBiomeManifest.getInstance().getTempMap(StratConBiomeManifest.TERRAN_BIOME);
+        var biomeEntry = tempMap.floorEntry(kelvinTemp);
+        // If temperature is below minimum (e.g., planet colder than absolute zero in data),
+        // fall back to the coldest available biome
+        if (biomeEntry == null) {
+            biomeEntry = tempMap.firstEntry();
+        }
+        StratConBiome biome = biomeEntry.getValue();
+
+        // Base terrain is always dry land; ocean is only ever added as "stripes" and is capped below,
+        // so a sector is never dominated by water.
+        List<String> baseCandidates = new ArrayList<>();
+        for (String terrainType : biome.allowedTerrainTypes) {
+            if (!StratConBiomeManifest.isOceanTerrain(terrainType)) {
+                baseCandidates.add(terrainType);
+            }
+        }
+        // Fallback for the (data-error) case where a biome offers only water.
+        if (baseCandidates.isEmpty()) {
+            baseCandidates = biome.allowedTerrainTypes;
+        }
+        String baseTerrain = baseCandidates.get(Compute.randomInt(baseCandidates.size()));
+
+        for (int x = 0; x < track.getWidth(); x++) {
+            for (int y = 0; y < track.getHeight(); y++) {
+                track.setTerrainTile(new StratConCoords(x, y), baseTerrain);
+            }
+        }
+
+        // the following code is useful for quickly displaying all possible (Terran)
+        // terrain types on a newly generated track
+        // unclean, but a pain enough to reproduce that I've left it here
+        /*
+         * int x = 0;
+         * int y = 0;
+         * Set<String> terrainTypes = new HashSet<>();
+         * for (StratConBiome testBiome :
+         * StratConBiomeManifest.getInstance().getTempMap("Terran").values()) {
+         * terrainTypes.addAll(testBiome.allowedTerrainTypes);
+         * }
+         *
+         * for (String biomeName : terrainTypes) {
+         * track.setTerrainTile(new StratConCoords(x, y), biomeName);
+         * x++;
+         * if (x >= track.getWidth()) {
+         * x = 0;
+         * y++;
+         * }
+         * }
+         */
+
+        for (String terrainType : biome.allowedTerrainTypes) {
+            if (!terrainType.equals(baseTerrain)) {
+                DrawStripe(track, terrainType);
+            }
+        }
+
+        // A sector must be at least 25% dry land; convert any excess ocean back to the base terrain.
+        enforceLandMinimum(track, baseTerrain);
+
+        // Ocean hexes are always revealed - open water holds no fog of war.
+        revealOceanHexes(track);
+    }
+
+    /**
+     * Ensures at least 25% of the given track is non-ocean by converting randomly selected excess ocean hexes into the
+     * supplied dry-land base terrain.
+     *
+     * @param track       the track to adjust
+     * @param baseTerrain the dry-land terrain type to convert excess ocean hexes into
+     */
+    private static void enforceLandMinimum(StratConTrackState track, String baseTerrain) {
+        int totalHexes = track.getWidth() * track.getHeight();
+        int minimumLand = (int) Math.ceil(totalHexes * 0.25);
+
+        List<StratConCoords> oceanCoords = new ArrayList<>();
+        for (int x = 0; x < track.getWidth(); x++) {
+            for (int y = 0; y < track.getHeight(); y++) {
+                StratConCoords coords = new StratConCoords(x, y);
+                if (StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(coords))) {
+                    oceanCoords.add(coords);
+                }
+            }
+        }
+
+        int landHexes = totalHexes - oceanCoords.size();
+        while ((landHexes < minimumLand) && !oceanCoords.isEmpty()) {
+            StratConCoords coords = oceanCoords.remove(Compute.randomInt(oceanCoords.size()));
+            track.setTerrainTile(coords, baseTerrain);
+            landHexes++;
+        }
+    }
+
+    /**
+     * Adds every ocean hex on the given track to its revealed-coordinates set, so open water is always visible.
+     *
+     * @param track the track whose ocean hexes should be revealed
+     */
+    private static void revealOceanHexes(StratConTrackState track) {
+        for (int x = 0; x < track.getWidth(); x++) {
+            for (int y = 0; y < track.getHeight(); y++) {
+                StratConCoords coords = new StratConCoords(x, y);
+                if (StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(coords))) {
+                    track.getRevealedCoords().add(coords);
+                }
+            }
+        }
+    }
+
+    /**
+     * Draws a "stripe" of the given terrain type on the given track
+     *
+     * @param track           Track to stripe
+     * @param terrainTypeName Terrain type
+     */
+    private static void DrawStripe(StratConTrackState track, String terrainTypeName) {
+        int startX = Compute.randomInt(track.getWidth());
+        int startY = Compute.randomInt(track.getHeight());
+
+        int endX = Compute.randomInt(track.getWidth());
+        int endY = Compute.randomInt(track.getHeight());
+        Coords startPoint = new Coords(startX, startY);
+        Coords endPoint = new Coords(endX, endY);
+
+        for (Coords coords : StratConCoords.intervening(startPoint, endPoint)) {
+            track.setTerrainTile(new StratConCoords(coords.getX(), coords.getY()), terrainTypeName);
+        }
+    }
+}

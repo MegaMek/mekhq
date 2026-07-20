@@ -1713,7 +1713,7 @@ public class ResolveScenarioTracker {
 
         // Debit the total payout from campaign finances
         if (totalPayout.isPositive()) {
-            campaign.getFinances().debit(
+            campaign.getPlayerForce().getFinances().debit(
                   TransactionType.SALARIES,
                   campaign.getLocalDate(),
                   totalPayout,
@@ -1781,7 +1781,7 @@ public class ResolveScenarioTracker {
         boolean isUseInjuryFatigue = campaignOptions.isUseInjuryFatigue();
         int fatigueRate = campaignOptions.getFatigueRate();
         for (UUID pid : peopleStatus.keySet()) {
-            Person person = campaign.getPerson(pid);
+            Person person = campaign.getPlayerForce().getHumanResources().getPerson(pid);
             PersonStatus status = peopleStatus.get(pid);
             if (null == person || null == status) {
                 continue;
@@ -1821,7 +1821,7 @@ public class ResolveScenarioTracker {
                 }
             } else if (status.isDead()) {
                 person.changeStatus(getCampaign(), getCampaign().getLocalDate(), PersonnelStatus.KIA);
-                getCampaign().getRetirementDefectionTracker()
+                getCampaign().getPlayerForce().getHumanResources().getRetirementDefectionTracker()
                       .removeFromCampaign(person, true, false, getCampaign(), mission);
             }
 
@@ -1838,7 +1838,8 @@ public class ResolveScenarioTracker {
             }
 
             if (status.toRemove()) {
-                getCampaign().removePerson(person, false);
+                Campaign campaign1 = getCampaign();
+                campaign1.getPlayerForce().getHumanResources().removePerson(campaign1, person, false);
             }
         }
 
@@ -1912,7 +1913,7 @@ public class ResolveScenarioTracker {
                 // missing unit
                 if (blc > 0) {
                     Money value = unitValue.multipliedBy(blc);
-                    campaign.getFinances()
+                    campaign.getPlayerForce().getFinances()
                           .credit(TransactionType.BATTLE_LOSS_COMPENSATION,
                                 getCampaign().getLocalDate(),
                                 value,
@@ -1965,7 +1966,7 @@ public class ResolveScenarioTracker {
                 blcValue = blcValue.plus(repairBLC);
                 if ((blc > 0) && blcValue.isPositive()) {
                     Money finalValue = blcValue.multipliedBy(blc);
-                    getCampaign().getFinances()
+                    getCampaign().getPlayerForce().getFinances()
                           .credit(TransactionType.BATTLE_LOSS_COMPENSATION,
                                 getCampaign().getLocalDate(),
                                 finalValue,
@@ -2024,7 +2025,7 @@ public class ResolveScenarioTracker {
         for (UUID pid : peopleStatus.keySet()) {
             PersonStatus status = peopleStatus.get(pid);
             if (status.isMissing()) {
-                Person p = campaign.getPerson(pid);
+                Person p = campaign.getPlayerForce().getHumanResources().getPerson(pid);
                 if (null != p) {
                     mia.add(p);
                 }
@@ -2039,7 +2040,7 @@ public class ResolveScenarioTracker {
         for (UUID pid : peopleStatus.keySet()) {
             PersonStatus status = peopleStatus.get(pid);
             if (status.isDead()) {
-                Person p = campaign.getPerson(pid);
+                Person p = campaign.getPlayerForce().getHumanResources().getPerson(pid);
                 if (null != p) {
                     kia.add(p);
                 }
@@ -2054,7 +2055,7 @@ public class ResolveScenarioTracker {
         for (UUID pid : peopleStatus.keySet()) {
             PersonStatus status = peopleStatus.get(pid);
             if (!status.isDead() && !status.isMissing()) {
-                Person p = campaign.getPerson(pid);
+                Person p = campaign.getPlayerForce().getHumanResources().getPerson(pid);
                 if (null != p) {
                     recovered.add(p);
                 }

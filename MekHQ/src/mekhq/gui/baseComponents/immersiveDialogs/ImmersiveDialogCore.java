@@ -804,7 +804,7 @@ public class ImmersiveDialogCore extends JDialog {
                 int forceId = assignedUnit.getFormationId();
 
                 if (forceId != FORMATION_NONE) {
-                    Formation formation = campaign.getFormation(forceId);
+                    Formation formation = campaign.getPlayerForce().getFormation(forceId);
 
                     if (formation != null) {
                         speakerDescription.append("<br>").append(formation.getName());
@@ -837,7 +837,7 @@ public class ImmersiveDialogCore extends JDialog {
         }
 
         Image baseImage;
-        if (campaign.getAllPersonnel().contains(speaker)) {
+        if (campaign.getPlayerForce().getHumanResources().getPersonnel().contains(speaker)) {
             Portrait portrait = speaker.getPortrait();
 
             if (portrait == null ||

@@ -168,7 +168,7 @@ public class LanceAssignmentView extends JPanel {
                         case LanceAssignmentTableModel.COL_FORCE:
                             if (null != value) {
                                 String forceName = (((Formation) value)).getFullName();
-                                String originNodeName = ", " + campaign.getFormation(0).getName();
+                                String originNodeName = ", " + campaign.getPlayerForce().getFormation(0).getName();
                                 forceName = forceName.replaceAll(originNodeName, "");
                                 setText(forceName);
                             } else {
@@ -293,7 +293,7 @@ public class LanceAssignmentView extends JPanel {
             cbContract.addItem(contract);
         }
         AtBContract defaultContract = activeContracts.isEmpty() ? null : activeContracts.getFirst();
-        for (CombatTeam combatTeam : campaign.getCombatTeamsAsMap().values()) {
+        for (CombatTeam combatTeam : campaign.getPlayerForce().getCombatTeamsAsMap(campaign).values()) {
             if ((combatTeam.getContract(campaign) == null) ||
                       !combatTeam.getContract(campaign).isActiveOn(campaign.getLocalDate(), true)) {
                 combatTeam.setContract(defaultContract);
@@ -301,7 +301,8 @@ public class LanceAssignmentView extends JPanel {
         }
 
         ((DataTableModel<AtBContract>) tblRequiredLances.getModel()).setData(activeContracts);
-        ((DataTableModel<CombatTeam>) tblAssignments.getModel()).setData(campaign.getCombatTeamsAsList());
+        ((DataTableModel<CombatTeam>) tblAssignments.getModel()).setData(campaign.getPlayerForce()
+                                                                               .getCombatTeamsAsList(campaign));
         panRequiredLances.setVisible(tblRequiredLances.getRowCount() > 0);
         updateDeploymentSummary();
     }

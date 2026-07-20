@@ -420,7 +420,7 @@ public class AtBDynamicScenario extends AtBScenario {
      *
      */
     public Person getLanceCommander(Campaign campaign) {
-        CombatTeam combatTeam = getPrimaryCombatTeam(campaign.getCombatTeamsAsMap());
+        CombatTeam combatTeam = getPrimaryCombatTeam(campaign.getPlayerForce().getCombatTeamsAsMap(campaign));
         if (combatTeam == null) {
             return null; // if we don't have forces, just a bunch of units, then get the highest-ranked?
         }

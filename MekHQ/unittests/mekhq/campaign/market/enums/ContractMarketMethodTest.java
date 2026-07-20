@@ -39,6 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -131,7 +132,7 @@ public class ContractMarketMethodTest {
         @BeforeEach
         void beforeEach() {
             mockFaction = mock(Faction.class);
-            mockCampaign = mock(Campaign.class);
+            mockCampaign = mockCampaign();
 
             when(mockCampaign.getFaction()).thenReturn(mockFaction);
 

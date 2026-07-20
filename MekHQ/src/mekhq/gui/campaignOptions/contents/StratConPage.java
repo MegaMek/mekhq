@@ -57,8 +57,8 @@ import megamek.client.ui.models.FileNameComboBoxModel;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.campaignOptions.BoardScalingType;
+import mekhq.campaign.digitalGM.stratCon.StratConPlayType;
 import mekhq.campaign.personnel.skills.Skills;
-import mekhq.campaign.stratCon.StratConPlayType;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
@@ -180,27 +180,28 @@ class StratConPage {
      *
      * @return a {@link JPanel} representing the StratCon Page
      */
-    @Nonnull JPanel createPanel(@Nullable RulesetsOptionsModel model) {
+    @Nonnull
+    JPanel createPanel(@Nullable RulesetsOptionsModel model) {
         // Combos (previously built during initialization)
         comboSkillLevel = new MMComboBox<>("comboSkillLevel", getSkillLevelOptions());
         comboBoardScalingType = new MMComboBox<>("comboBoardScalingType", BoardScalingType.values());
         final DefaultComboBoxModel<AutoResolveMethod> autoResolveTypeModel = new DefaultComboBoxModel<>(
-                AutoResolveMethod.values());
+              AutoResolveMethod.values());
         comboAutoResolveMethod = new MMComboBox<>("comboAutoResolveMethod", autoResolveTypeModel);
         minimapThemeSelector = new MMComboBox<>("minimapThemeSelector",
-                new FileNameComboBoxModel(GUIPreferences.getInstance().getMinimapThemes()));
+              new FileNameComboBoxModel(GUIPreferences.getInstance().getMinimapThemes()));
         comboStratConPlayType = new MMComboBox<>("StratConPlayType", StratConPlayType.values());
         comboStratConPlayType.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(
-                    JList<?> list,
-                    Object value,
-                    int index,
-                    boolean isSelected,
-                    boolean cellHasFocus) {
+                  JList<?> list,
+                  Object value,
+                  int index,
+                  boolean isSelected,
+                  boolean cellHasFocus) {
 
                 JLabel label = (JLabel) super.getListCellRendererComponent(
-                        list, value, index, isSelected, cellHasFocus);
+                      list, value, index, isSelected, cellHasFocus);
 
                 if (value instanceof StratConPlayType type) {
                     label.setToolTipText(type.getTooltip());
@@ -230,7 +231,8 @@ class StratConPage {
         lblAutoResolveNumberOfScenarios.addMouseListener(createTipPanelUpdater("AutoResolveNumberOfScenarios"));
         spnAutoResolveNumberOfScenarios.addMouseListener(createTipPanelUpdater("AutoResolveNumberOfScenarios"));
         chkAutoResolveVictoryChanceEnabled.addMouseListener(createTipPanelUpdater("AutoResolveVictoryChanceEnabled"));
-        chkAutoResolveExperimentalPacarGuiEnabled.addMouseListener(createTipPanelUpdater("AutoResolveExperimentalPacarGuiEnabled"));
+        chkAutoResolveExperimentalPacarGuiEnabled.addMouseListener(createTipPanelUpdater(
+              "AutoResolveExperimentalPacarGuiEnabled"));
         lblMoraleVictory.addMouseListener(createTipPanelUpdater("MoraleVictory"));
         spnMoraleVictory.addMouseListener(createTipPanelUpdater("MoraleVictory"));
         lblMoraleDecisiveVictory.addMouseListener(createTipPanelUpdater("MoraleDecisiveVictory"));
@@ -267,9 +269,10 @@ class StratConPage {
         chkUseDropShips.addMouseListener(createTipPanelUpdater("UseDropShips"));
         chkRegionalMekVariations.addMouseListener(createTipPanelUpdater("RegionalMekVariations"));
         chkAttachedPlayerCamouflage
-                .addMouseListener(createTipPanelUpdater("AttachedPlayerCamouflage"));
+              .addMouseListener(createTipPanelUpdater("AttachedPlayerCamouflage"));
         chkPlayerControlsAttachedUnits.addMouseListener(createTipPanelUpdater("PlayerControlsAttachedUnits"));
-        chkUseAdvancedBuildingGunEmplacements.addMouseListener(createTipPanelUpdater("UseAdvancedBuildingGunEmplacements"));
+        chkUseAdvancedBuildingGunEmplacements.addMouseListener(createTipPanelUpdater(
+              "UseAdvancedBuildingGunEmplacements"));
         lblSPAUpgradeIntensity.addMouseListener(createTipPanelUpdater("SPAUpgradeIntensity"));
         spnSPAUpgradeIntensity.addMouseListener(createTipPanelUpdater("SPAUpgradeIntensity"));
         lblReinforcementBaseTargetNumber.addMouseListener(createTipPanelUpdater("ReinforcementBaseTargetNumber"));
@@ -278,14 +281,14 @@ class StratConPage {
 
         // Content
         lblStratConPlayType = new CampaignOptionsLabel("StratConPlayType",
-                getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.DOCUMENTED));
+              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.DOCUMENTED));
         lblStratConPlayType.addMouseListener(createTipPanelUpdater("StratConPlayType"));
         comboStratConPlayType.addMouseListener(createTipPanelUpdater("StratConPlayType"));
         chkUseAdvancedScouting = new CampaignOptionsCheckBox("UseAdvancedScouting",
-                getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseAdvancedScouting.addMouseListener(createTipPanelUpdater("UseAdvancedScouting"));
         chkNoSeedForces = new CampaignOptionsCheckBox("NoSeedForces",
-                getMetadata(MILESTONE_BEFORE_METADATA));
+              getMetadata(MILESTONE_BEFORE_METADATA));
         chkNoSeedForces.addMouseListener(createTipPanelUpdater("NoSeedForces"));
         chkUseGenericBattleValue = new CampaignOptionsCheckBox("UseGenericBattleValue");
         chkUseGenericBattleValue.addMouseListener(createTipPanelUpdater("UseGenericBattleValue"));
@@ -301,31 +304,31 @@ class StratConPage {
 
         // Layout the Panel
         JPanel panel = CampaignOptionsPagePanel.builder("StratConPage", "StratConPage", imageAddress)
-                .header(stratConHeader)
-                .quote("stratConPage")
-                .section("lblStratConPage.text",
-                        "lblStratConPage.summary",
-                        generalOptionsPanel)
-                .section("lblUniversalScenarioGenerationPanel.text",
-                        "lblUniversalScenarioGenerationPanel.summary",
-                        scenarioGenerationPanel)
-                .section("lblUniversalModifiersPanel.text",
-                        "lblUniversalModifiersPanel.summary",
-                        scenarioModifiersPanel)
-                .section("lblStratConScenarioConditionsPanel.text",
-                        "lblStratConScenarioConditionsPanel.summary",
-                        scenarioConditionsPanel)
-                .section("lblUniversalMoralePanel.text",
-                        "lblUniversalMoralePanel.summary",
-                        moralePanel,
-                        getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM))
-                .section("lblAutoResolvePanel.text",
-                        "lblAutoResolvePanel.summary",
-                        autoResolvePanel,
-                        getMetadata(LEGACY_RULE_BEFORE_METADATA,
-                                CampaignOptionFlag.CUSTOM_SYSTEM,
-                                CampaignOptionFlag.DOCUMENTED))
-                .build();
+                             .header(stratConHeader)
+                             .quote("stratConPage")
+                             .section("lblStratConPage.text",
+                                   "lblStratConPage.summary",
+                                   generalOptionsPanel)
+                             .section("lblUniversalScenarioGenerationPanel.text",
+                                   "lblUniversalScenarioGenerationPanel.summary",
+                                   scenarioGenerationPanel)
+                             .section("lblUniversalModifiersPanel.text",
+                                   "lblUniversalModifiersPanel.summary",
+                                   scenarioModifiersPanel)
+                             .section("lblStratConScenarioConditionsPanel.text",
+                                   "lblStratConScenarioConditionsPanel.summary",
+                                   scenarioConditionsPanel)
+                             .section("lblUniversalMoralePanel.text",
+                                   "lblUniversalMoralePanel.summary",
+                                   moralePanel,
+                                   getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM))
+                             .section("lblAutoResolvePanel.text",
+                                   "lblAutoResolvePanel.summary",
+                                   autoResolvePanel,
+                                   getMetadata(LEGACY_RULE_BEFORE_METADATA,
+                                         CampaignOptionFlag.CUSTOM_SYSTEM,
+                                         CampaignOptionFlag.DOCUMENTED))
+                             .build();
 
         created = true;
         readFromModel(model);
@@ -336,10 +339,8 @@ class StratConPage {
     /**
      * Configures and initializes universal options components for use across pages.
      * <p>
-     * This method sets up and organizes the various UI elements for universal
-     * options, such as skill levels, scenario
-     * generation, map generation, and more. These initialized components are then
-     * used in other methods to build the
+     * This method sets up and organizes the various UI elements for universal options, such as skill levels, scenario
+     * generation, map generation, and more. These initialized components are then used in other methods to build the
      * complete universal options UI.
      * </p>
      */
@@ -347,7 +348,7 @@ class StratConPage {
         // General
         lblSkillLevel = new CampaignOptionsLabel("SkillLevel");
         lblBoardScalingType = new CampaignOptionsLabel("BoardScalingType",
-                getMetadata(MILESTONE_BEFORE_METADATA));
+              getMetadata(MILESTONE_BEFORE_METADATA));
 
         // CallSigns
         chkAutoGenerateOpForCallSigns = new CampaignOptionsCheckBox("AutoGenerateOpForCallSigns");
@@ -367,17 +368,17 @@ class StratConPage {
         chkAttachedPlayerCamouflage = new CampaignOptionsCheckBox("AttachedPlayerCamouflage");
         chkPlayerControlsAttachedUnits = new CampaignOptionsCheckBox("PlayerControlsAttachedUnits");
         chkUseAdvancedBuildingGunEmplacements = new CampaignOptionsCheckBox("UseAdvancedBuildingGunEmplacements",
-                getMetadata(new Version(0, 50, 12)));
+              getMetadata(new Version(0, 50, 12)));
         lblSPAUpgradeIntensity = new CampaignOptionsLabel("SPAUpgradeIntensity");
         spnSPAUpgradeIntensity = new CampaignOptionsSpinner("SPAUpgradeIntensity", 0, -1, 3, 1);
         lblReinforcementBaseTargetNumber = new CampaignOptionsLabel("ReinforcementBaseTargetNumber",
-                getMetadata(new Version(0, 51, 0)));
+              getMetadata(new Version(0, 51, 0)));
         spnReinforcementBaseTargetNumber = new CampaignOptionsSpinner("ReinforcementBaseTargetNumber",
-                7, -10, 10, 1);
+              7, -10, 10, 1);
         chkAutoConfigMunitions = new CampaignOptionsCheckBox("AutoConfigMunitions",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA,
-                        CampaignOptionFlag.CUSTOM_SYSTEM,
-                        CampaignOptionFlag.DOCUMENTED));
+              getMetadata(LEGACY_RULE_BEFORE_METADATA,
+                    CampaignOptionFlag.CUSTOM_SYSTEM,
+                    CampaignOptionFlag.DOCUMENTED));
 
         // Scenario Modifiers
         chkClansObeyBiddingRules = new CampaignOptionsCheckBox("ClansObeyBiddingRules");
@@ -397,7 +398,7 @@ class StratConPage {
         chkUseLightConditions = new CampaignOptionsCheckBox("UseLightConditions");
         chkUsePlanetaryConditions = new CampaignOptionsCheckBox("UsePlanetaryConditions");
         chkUseNoTornadoes = new CampaignOptionsCheckBox("UseNoTornadoes",
-                getMetadata(MILESTONE_BEFORE_METADATA));
+              getMetadata(MILESTONE_BEFORE_METADATA));
         lblFixedMapChance = new CampaignOptionsLabel("FixedMapChance");
         spnFixedMapChance = new CampaignOptionsSpinner("FixedMapChance", 0, 0, 100, 1);
 
@@ -406,55 +407,53 @@ class StratConPage {
 
         // Morale
         lblMoraleDecisiveVictory = new CampaignOptionsLabel("MoraleDecisiveVictory",
-                getMetadata(MILESTONE_BEFORE_METADATA));
+              getMetadata(MILESTONE_BEFORE_METADATA));
         spnMoraleDecisiveVictory = new CampaignOptionsSpinner("MoraleDecisiveVictory",
-                4, 1, 10, 1,
-                getMetadata(MILESTONE_BEFORE_METADATA));
+              4, 1, 10, 1,
+              getMetadata(MILESTONE_BEFORE_METADATA));
         lblMoraleVictory = new CampaignOptionsLabel("MoraleVictory",
-                getMetadata(MILESTONE_BEFORE_METADATA));
+              getMetadata(MILESTONE_BEFORE_METADATA));
         spnMoraleVictory = new CampaignOptionsSpinner("MoraleVictory",
-                2, 1, 10, 1,
-                getMetadata(MILESTONE_BEFORE_METADATA));
+              2, 1, 10, 1,
+              getMetadata(MILESTONE_BEFORE_METADATA));
         lblMoraleDefeat = new CampaignOptionsLabel("MoraleDefeat",
-                getMetadata(MILESTONE_BEFORE_METADATA));
+              getMetadata(MILESTONE_BEFORE_METADATA));
         spnMoraleDefeat = new CampaignOptionsSpinner("MoraleDefeat",
-                -3, -10, -1, 1,
-                getMetadata(MILESTONE_BEFORE_METADATA));
+              -3, -10, -1, 1,
+              getMetadata(MILESTONE_BEFORE_METADATA));
         lblMoraleDecisiveDefeat = new CampaignOptionsLabel("MoraleDecisiveDefeat",
-                getMetadata(MILESTONE_BEFORE_METADATA));
+              getMetadata(MILESTONE_BEFORE_METADATA));
         spnMoraleDecisiveDefeat = new CampaignOptionsSpinner("MoraleDecisiveDefeat",
-                -5, -10, -1, 1,
-                getMetadata(MILESTONE_BEFORE_METADATA));
+              -5, -10, -1, 1,
+              getMetadata(MILESTONE_BEFORE_METADATA));
 
         // Auto Resolve
         lblAutoResolveMethod = new CampaignOptionsLabel("AutoResolveMethod",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblAutoResolveNumberOfScenarios = new CampaignOptionsLabel("AutoResolveNumberOfScenarios",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         spnAutoResolveNumberOfScenarios = new CampaignOptionsSpinner("AutoResolveNumberOfScenarios",
-                250, 10, 1000, 10);
+              250, 10, 1000, 10);
         chkAutoResolveVictoryChanceEnabled = new CampaignOptionsCheckBox("AutoResolveVictoryChanceEnabled",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         lblMinimapTheme = new CampaignOptionsLabel("MinimapTheme",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         chkAutoResolveExperimentalPacarGuiEnabled = new CampaignOptionsCheckBox(
-                "AutoResolveExperimentalPacarGuiEnabled");
+              "AutoResolveExperimentalPacarGuiEnabled");
     }
 
     /**
      * Retrieves the available skill levels as a {@link DefaultComboBoxModel}.
      * <p>
-     * Returns the predefined {@link SkillLevel} values, excluding
-     * {@link SkillLevel#NONE}. Used for populating the
+     * Returns the predefined {@link SkillLevel} values, excluding {@link SkillLevel#NONE}. Used for populating the
      * skill level selector in the universal options UI.
      * </p>
      *
-     * @return a {@link DefaultComboBoxModel} containing available
-     *         {@link SkillLevel} options
+     * @return a {@link DefaultComboBoxModel} containing available {@link SkillLevel} options
      */
     private static DefaultComboBoxModel<SkillLevel> getSkillLevelOptions() {
         final DefaultComboBoxModel<SkillLevel> skillLevelModel = new DefaultComboBoxModel<>(
-                Skills.SKILL_LEVELS);
+              Skills.SKILL_LEVELS);
 
         skillLevelModel.removeElement(SkillLevel.NONE);
 
@@ -463,35 +462,35 @@ class StratConPage {
 
     private @Nonnull JPanel createStratConGeneralOptionsPanel() {
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("StratConGeneralOptionsPanel",
-                LABEL_COLUMN_WIDTH,
-                CONTROL_COLUMN_WIDTH);
+              LABEL_COLUMN_WIDTH,
+              CONTROL_COLUMN_WIDTH);
         panel.addRow(lblStratConPlayType, comboStratConPlayType);
         panel.addRow(lblSkillLevel, comboSkillLevel);
         panel.addRow(lblBoardScalingType, comboBoardScalingType);
         panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
-                chkUseAdvancedScouting,
-                chkNoSeedForces,
-                chkUseGenericBattleValue,
-                chkUseVerboseBidding);
+              chkUseAdvancedScouting,
+              chkNoSeedForces,
+              chkUseGenericBattleValue,
+              chkUseVerboseBidding);
 
         return panel;
     }
 
     private @Nonnull JPanel createStratConScenarioGenerationPanel() {
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("StratConScenarioGenerationPanel",
-                LABEL_COLUMN_WIDTH,
-                CONTROL_COLUMN_WIDTH);
+              LABEL_COLUMN_WIDTH,
+              CONTROL_COLUMN_WIDTH);
         panel.addRow(lblOpForLanceTypeMeks, spnOpForLanceTypeMeks);
         panel.addRow(lblOpForLanceTypeMixed, spnOpForLanceTypeMixed);
         panel.addRow(lblOpForLanceTypeVehicle, spnOpForLanceTypeVehicles);
         panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
-                chkUseDropShips,
-                chkRegionalMekVariations,
-                chkAttachedPlayerCamouflage,
-                chkPlayerControlsAttachedUnits,
-                chkUseAdvancedBuildingGunEmplacements,
-                chkAutoConfigMunitions,
-                chkAutoGenerateOpForCallSigns);
+              chkUseDropShips,
+              chkRegionalMekVariations,
+              chkAttachedPlayerCamouflage,
+              chkPlayerControlsAttachedUnits,
+              chkUseAdvancedBuildingGunEmplacements,
+              chkAutoConfigMunitions,
+              chkAutoGenerateOpForCallSigns);
         panel.addRow(lblSPAUpgradeIntensity, spnSPAUpgradeIntensity);
         panel.addRow(lblReinforcementBaseTargetNumber, spnReinforcementBaseTargetNumber);
         panel.addRow(lblMinimumCallsignSkillLevel, comboMinimumCallsignSkillLevel);
@@ -501,8 +500,8 @@ class StratConPage {
 
     private @Nonnull JPanel createStratConScenarioModifiersPanel() {
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("StratConScenarioModifiersPanel",
-                LABEL_COLUMN_WIDTH,
-                CONTROL_COLUMN_WIDTH);
+              LABEL_COLUMN_WIDTH,
+              CONTROL_COLUMN_WIDTH);
         panel.addRow(lblEnemyFacilityModifierDieSize, spnEnemyFacilityModifierDieSize);
         panel.addRow(lblAlliedFacilityModifierDieSize, spnAlliedFacilityModifierDieSize);
         panel.addRow(lblScenarioModMax, spnScenarioModMax);
@@ -515,14 +514,14 @@ class StratConPage {
 
     private @Nonnull JPanel createStratConScenarioConditionsPanel() {
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("StratConScenarioConditionsPanel",
-                LABEL_COLUMN_WIDTH,
-                CONTROL_COLUMN_WIDTH);
+              LABEL_COLUMN_WIDTH,
+              CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
-                chkRestrictPartsByMission,
-                chkUseWeatherConditions,
-                chkUseLightConditions,
-                chkUsePlanetaryConditions,
-                chkUseNoTornadoes);
+              chkRestrictPartsByMission,
+              chkUseWeatherConditions,
+              chkUseLightConditions,
+              chkUsePlanetaryConditions,
+              chkUseNoTornadoes);
         panel.addRow(lblFixedMapChance, spnFixedMapChance);
 
         return panel;
@@ -536,14 +535,14 @@ class StratConPage {
         // column lines up with the control column of the 2-column sections elsewhere on
         // this page.
         final CampaignOptionsPairedFieldGridPanel panel = new CampaignOptionsPairedFieldGridPanel("StratConMoralePanel",
-                GRID_FIRST_PAIR_COLUMN_WIDTH,
-                GRID_FOLLOWING_PAIR_COLUMN_WIDTH,
-                GRID_CONTROL_COLUMN_WIDTH,
-                2);
+              GRID_FIRST_PAIR_COLUMN_WIDTH,
+              GRID_FOLLOWING_PAIR_COLUMN_WIDTH,
+              GRID_CONTROL_COLUMN_WIDTH,
+              2);
         JComponent[] labels = { lblMoraleDecisiveVictory, lblMoraleVictory,
-                lblMoraleDefeat, lblMoraleDecisiveDefeat };
+                                lblMoraleDefeat, lblMoraleDecisiveDefeat };
         JComponent[] controls = { spnMoraleDecisiveVictory, spnMoraleVictory,
-                spnMoraleDefeat, spnMoraleDecisiveDefeat };
+                                  spnMoraleDefeat, spnMoraleDecisiveDefeat };
         panel.addPairs(labels, controls);
 
         return panel;
@@ -551,12 +550,12 @@ class StratConPage {
 
     private @Nonnull JPanel createStratConAutoResolvePanel() {
         final CampaignOptionsFormPanel panel = new CampaignOptionsFormPanel("StratConAutoResolvePanel",
-                LABEL_COLUMN_WIDTH,
-                CONTROL_COLUMN_WIDTH);
+              LABEL_COLUMN_WIDTH,
+              CONTROL_COLUMN_WIDTH);
         panel.addRow(lblAutoResolveMethod, comboAutoResolveMethod);
         panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
-                chkAutoResolveVictoryChanceEnabled,
-                chkAutoResolveExperimentalPacarGuiEnabled);
+              chkAutoResolveVictoryChanceEnabled,
+              chkAutoResolveExperimentalPacarGuiEnabled);
         panel.addRow(lblMinimapTheme, minimapThemeSelector);
         panel.addRow(lblAutoResolveNumberOfScenarios, spnAutoResolveNumberOfScenarios);
 

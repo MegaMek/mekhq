@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -233,7 +233,7 @@ public class AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog extends 
             return;
         }
 
-        List<Person> personnel = campaign.getPersonnelFilteringOutDeparted();
+        List<Person> personnel = campaign.getPlayerForce().getHumanResources().getPersonnelFilteringOutDeparted();
         for (Person person : personnel) {
             if (!person.getPrimaryRole().isProtoMekPilot() && !person.getSecondaryRole().isProtoMekPilot()) {
                 continue;
@@ -241,13 +241,13 @@ public class AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog extends 
 
             AdvancedMedicalAlternateImplants.giveEIImplant(campaign, person);
 
-            campaign.personUpdated(person);
+            campaign.getPlayerForce().getHumanResources().personUpdated(campaign, person);
         }
     }
 
     public static void processInjuryTransferral(Campaign campaign) {
         LocalDate today = campaign.getLocalDate();
-        List<Person> personnel = campaign.getPersonnelFilteringOutDeparted();
+        List<Person> personnel = campaign.getPlayerForce().getHumanResources().getPersonnelFilteringOutDeparted();
         for (Person person : personnel) {
             // First, Total Warfare-scale 'Hits'
             int hits = person.getHits();

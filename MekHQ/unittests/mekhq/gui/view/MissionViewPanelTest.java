@@ -37,15 +37,15 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.time.LocalDate;
-
-import org.junit.jupiter.api.Test;
 
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.universe.PlanetarySystem;
+import org.junit.jupiter.api.Test;
 
 class MissionViewPanelTest {
     private static final LocalDate CAMPAIGN_DATE = LocalDate.of(3045, 12, 26);
@@ -113,27 +113,27 @@ class MissionViewPanelTest {
     }
 
     private static Campaign campaignOnDate(PlanetarySystem currentSystem, boolean onPlanet) {
-        final Campaign campaign = mock(Campaign.class);
+        final Campaign campaign = mockCampaign();
         final AbstractLocation currentLocation = mock(AbstractLocation.class);
         when(campaign.getLocalDate()).thenReturn(CAMPAIGN_DATE);
-        when(campaign.getCurrentLocation()).thenReturn(currentLocation);
+        when(campaign.getPlayerForce().getForceDetachment().getCurrentLocation()).thenReturn(currentLocation);
         when(currentLocation.getCurrentSystem()).thenReturn(currentSystem);
         when(currentLocation.isOnPlanet()).thenReturn(onPlanet);
         return campaign;
     }
 
     private static Campaign campaignOnDateWithoutCurrentLocation() {
-        final Campaign campaign = mock(Campaign.class);
+        final Campaign campaign = mockCampaign();
         when(campaign.getLocalDate()).thenReturn(CAMPAIGN_DATE);
-        when(campaign.getCurrentLocation()).thenReturn(null);
+        when(campaign.getPlayerForce().getForceDetachment().getCurrentLocation()).thenReturn(null);
         return campaign;
     }
 
     private static Campaign campaignInSpace(PlanetarySystem currentSystem, boolean atJumpPoint) {
-        final Campaign campaign = mock(Campaign.class);
+        final Campaign campaign = mockCampaign();
         final AbstractLocation currentLocation = mock(AbstractLocation.class);
         when(campaign.getLocalDate()).thenReturn(CAMPAIGN_DATE);
-        when(campaign.getCurrentLocation()).thenReturn(currentLocation);
+        when(campaign.getPlayerForce().getForceDetachment().getCurrentLocation()).thenReturn(currentLocation);
         when(currentLocation.getCurrentSystem()).thenReturn(currentSystem);
         when(currentLocation.isOnPlanet()).thenReturn(false);
         when(currentLocation.isAtJumpPoint()).thenReturn(atJumpPoint);

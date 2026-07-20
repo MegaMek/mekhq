@@ -38,6 +38,7 @@ import static megamek.common.enums.SkillLevel.GREEN;
 import static megamek.common.enums.SkillLevel.VETERAN;
 import static mekhq.campaign.mission.Contract.OH_NONE;
 import static mekhq.campaign.mission.ContractDifficulty.calculateContractDifficulty;
+import static mekhq.campaign.universe.Faction.BANDIT_CASTE_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 
 import java.util.List;
@@ -130,6 +131,21 @@ public class PityContracts {
 
         updateEnemyFaction(campaign, contract);
 
+        if (!campaign.isPirateCampaign()) { // Pirate campaigns have fixed contractual terms
+            overrideContractTermsForPityContracts(contract);
+        }
+
+        // The enemy (and possibly the contract type) were just overwritten, so the attacker/defender roles and the
+        // target system - both resolved by addAtBContract() against the *original* enemy/type - are now stale and
+        // need to be redone against the pity contract's actual enemy.
+        contractMarket.setAttacker(contract);
+        try {
+            contractMarket.setSystemId(contract, campaign);
+        } catch (AbstractContractMarket.NoContractLocationFoundException ex) {
+            contractMarket.removeContract(contract);
+            return;
+        }
+
         // We need to rebuild the difficulty estimate as otherwise it will still be reporting for the contract's
         // original enemy
         boolean isUseGenericBattleValue = campaign.getCampaignOptions().isUseGenericBattleValue();
@@ -139,11 +155,8 @@ public class PityContracts {
               combatUnits);
         contract.setContractDifficulty(difficulty);
 
-        if (!campaign.isPirateCampaign()) { // Pirate campaigns have fixed contractual terms
-            overrideContractTermsForPityContracts(contract);
-        }
-
-        contract.setName(AtbMonthlyContractMarket.generateDefaultName(contract.getEmployerName(), contract));
+        contract.setName(AtbMonthlyContractMarket.generateDefaultName(contract.getEmployerName(), contract,
+              campaign));
     }
 
     /**
@@ -158,8 +171,7 @@ public class PityContracts {
      * @since 0.51.0
      */
     static void updateEnemyFaction(Campaign campaign, AtBContract contract) {
-        String banditCasteFactionCode = "BAN";
-        String enemyCode = campaign.isClanCampaign() ? banditCasteFactionCode : PIRATE_FACTION_CODE;
+        String enemyCode = campaign.isClanCampaign() ? BANDIT_CASTE_FACTION_CODE : PIRATE_FACTION_CODE;
 
         contract.setEnemyCode(enemyCode);
         contract.updateEnemy(campaign, campaign.getLocalDate(), enemyCode);

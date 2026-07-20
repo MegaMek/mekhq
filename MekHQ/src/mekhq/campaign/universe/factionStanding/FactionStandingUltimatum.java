@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -34,7 +34,6 @@ package mekhq.campaign.universe.factionStanding;
 
 import java.time.LocalDate;
 
-import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -145,7 +144,12 @@ public class FactionStandingUltimatum {
         PersonnelRole role = agitator.role();
         String factionCode = agitator.factionCode();
 
-        Person person = campaign.newPerson(role, factionCode, Gender.MALE); // Gender is irrelevant here
+        Person person = campaign.getPlayerForce()
+                              .getHumanResources()
+                              .newPerson(campaign,
+                                    role,
+                                    factionCode,
+                                    megamek.common.enums.Gender.MALE); // Gender is irrelevant here
 
         person.setGivenName(name);
         person.setSurname("");

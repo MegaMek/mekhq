@@ -39,13 +39,12 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.lang.reflect.Field;
 
 import megamek.common.equipment.EquipmentType;
 import megamek.common.weapons.infantry.InfantryWeapon;
-import mekhq.campaign.Campaign;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -65,7 +64,7 @@ class InfantryDisposableWeaponPartTest {
 
     private static InfantryDisposableWeaponPart newPart() {
         InfantryWeapon law = (InfantryWeapon) EquipmentType.get(LAW);
-        return new InfantryDisposableWeaponPart(0, law, -1, mock(Campaign.class));
+        return new InfantryDisposableWeaponPart(0, law, -1, mockCampaign());
     }
 
     @Test
@@ -111,7 +110,7 @@ class InfantryDisposableWeaponPartTest {
         assertInstanceOf(InfantryDisposableWeaponPart.class, missing.getNewPart());
 
         // A LAW stocked as a plain EquipmentPart (what the parts store creates) must satisfy the refit/replacement.
-        EquipmentPart stockSpare = new EquipmentPart(0, law, -1, 1.0, false, mock(Campaign.class));
+        EquipmentPart stockSpare = new EquipmentPart(0, law, -1, 1.0, false, mockCampaign());
         assertTrue(missing.isAcceptableReplacement(stockSpare, true),
               "An existing EquipmentPart LAW in the warehouse should be an acceptable replacement");
     }
@@ -127,9 +126,9 @@ class InfantryDisposableWeaponPartTest {
               "IS and Clan variants register under distinct internal names");
 
         MissingInfantryDisposableWeaponPart missing = new MissingInfantryDisposableWeaponPart(0, innerSphereLaser, -1,
-              mock(Campaign.class));
-        EquipmentPart innerSphereSpare = new EquipmentPart(0, innerSphereLaser, -1, 1.0, false, mock(Campaign.class));
-        EquipmentPart clanSpare = new EquipmentPart(0, clanLaser, -1, 1.0, false, mock(Campaign.class));
+              mockCampaign());
+        EquipmentPart innerSphereSpare = new EquipmentPart(0, innerSphereLaser, -1, 1.0, false, mockCampaign());
+        EquipmentPart clanSpare = new EquipmentPart(0, clanLaser, -1, 1.0, false, mockCampaign());
 
         assertTrue(missing.isAcceptableReplacement(innerSphereSpare, true),
               "The exact same weapon type should be an acceptable replacement");

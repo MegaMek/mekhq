@@ -34,8 +34,6 @@ package mekhq.campaign;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 import java.util.stream.Stream;
 
@@ -51,6 +49,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mockito;
 import testUtilities.MHQTestUtilities;
 
 /**
@@ -61,6 +60,7 @@ import testUtilities.MHQTestUtilities;
 public class CampaignNewDayManagerTest {
 
     private Campaign testCampaign;
+    private ForceHumanResources humanResources;
     private CampaignOptions campaignOptions;
     private MHQOptions mhqOptions;
 
@@ -72,6 +72,8 @@ public class CampaignNewDayManagerTest {
     @BeforeEach
     public void setup() {
         testCampaign = spy(MHQTestUtilities.getTestCampaign());
+        humanResources = spy(testCampaign.getPlayerForce().getHumanResources());
+        testCampaign.getPlayerForce().setHumanResources(humanResources);
         campaignOptions = testCampaign.getCampaignOptions();
         mhqOptions = MekHQ.getMHQOptions();
     }
@@ -150,7 +152,7 @@ public class CampaignNewDayManagerTest {
             configureMHQOption(role, mhqOptionEnabled);
 
             // Set initial pool value
-            testCampaign.setTempCrewPool(role, 10);
+            testCampaign.getPlayerForce().getHumanResources().setTempCrewPool(testCampaign, role, 10);
 
             // Act
             processNewDayForRole(role);
@@ -158,11 +160,12 @@ public class CampaignNewDayManagerTest {
             // Assert
             if (shouldDistribute) {
                 // Pool should be reset to 0, then distribution called
-                verify(testCampaign, times(1)).setTempCrewPool(role, 0);
-                verify(testCampaign, times(1)).distributeTempCrewPoolToUnits(role);
+                Mockito.verify(humanResources, Mockito.times(1)).setTempCrewPool(testCampaign, role, 0);
+                Mockito.verify(humanResources, Mockito.times(1))
+                      .distributeTempCrewPoolToUnits(testCampaign, testCampaign.getCampaignOptions(), role);
             } else {
                 // Pool should remain unchanged
-                assertEquals(10, testCampaign.getTempCrewPool(role));
+                assertEquals(10, testCampaign.getPlayerForce().getHumanResources().getTempCrewPool(role));
             }
         }
 
@@ -175,15 +178,21 @@ public class CampaignNewDayManagerTest {
             campaignOptions.setUseBlobInfantry(true);
             mhqOptions.setNewDaySoldierPoolFill(true);
 
-            testCampaign.setTempCrewPool(PersonnelRole.SOLDIER, 10);
-            testCampaign.setTempCrewPool(PersonnelRole.BATTLE_ARMOUR, 20);
+            testCampaign.getPlayerForce().getHumanResources().setTempCrewPool(testCampaign, PersonnelRole.SOLDIER, 10);
+            testCampaign.getPlayerForce().getHumanResources().setTempCrewPool(testCampaign,
+                  PersonnelRole.BATTLE_ARMOUR,
+                  20);
 
             // Act
             processNewDayForRole(PersonnelRole.SOLDIER);
 
             // Assert
-            verify(testCampaign, times(1)).setTempCrewPool(PersonnelRole.SOLDIER, 0);
-            assertEquals(20, testCampaign.getTempCrewPool(PersonnelRole.BATTLE_ARMOUR));
+            Mockito.verify(humanResources, Mockito.times(1))
+                  .setTempCrewPool(testCampaign, PersonnelRole.SOLDIER, 0);
+            assertEquals(20,
+                  testCampaign.getPlayerForce()
+                        .getHumanResources()
+                        .getTempCrewPool(mekhq.campaign.personnel.enums.PersonnelRole.BATTLE_ARMOUR));
         }
 
         /**
@@ -224,11 +233,16 @@ public class CampaignNewDayManagerTest {
          */
         private void processNewDayForRole(PersonnelRole role) {
             boolean mhqOptionEnabled = getMHQOptionForRole(role);
-            boolean campaignOptionEnabled = testCampaign.isBlobCrewEnabled(role);
+            boolean campaignOptionEnabled = testCampaign.getPlayerForce()
+                                                  .getHumanResources()
+                                                  .isBlobCrewEnabled(role, testCampaign.getCampaignOptions());
 
             if (mhqOptionEnabled && campaignOptionEnabled) {
-                testCampaign.setTempCrewPool(role, 0);
-                testCampaign.distributeTempCrewPoolToUnits(role);
+                testCampaign.getPlayerForce().getHumanResources().setTempCrewPool(testCampaign, role, 0);
+                testCampaign.getPlayerForce()
+                      .getHumanResources()
+                      .distributeTempCrewPoolToUnits(testCampaign, testCampaign.getCampaignOptions(),
+                            role);
             }
         }
 

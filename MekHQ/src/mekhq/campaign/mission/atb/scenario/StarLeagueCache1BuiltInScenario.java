@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -38,7 +38,6 @@ import java.util.List;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.common.board.Board;
 import megamek.common.compute.Compute;
-import megamek.common.enums.SkillLevel;
 import megamek.common.loaders.MekSummary;
 import megamek.common.units.Entity;
 import megamek.common.units.EntityWeightClass;
@@ -47,7 +46,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.AtBStaticWeightGenerator;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.mission.CommonObjectiveFactory;
@@ -153,12 +151,16 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
                              2750,
                              (roll == 6) ? DragoonRating.DRAGOON_A.getRating() : DragoonRating.DRAGOON_D.getRating());
         }
-        Entity en = (ms == null) ?
-                          null :
-                          AtBDynamicScenarioFactory.createEntityWithCrew(campaign.getFaction().getShortName(),
-                                SkillLevel.GREEN,
-                                campaign,
-                                ms);
+        Entity en;
+        if ((ms == null)) {
+            en = null;
+        } else {
+            en = mekhq.campaign.mission.AtBDynamicScenarioFactory.createEntityWithCrew(campaign.getFaction()
+                                                                                             .getShortName(),
+                  megamek.common.enums.SkillLevel.GREEN,
+                  campaign,
+                  ms);
+        }
         otherForce.add(en);
 
         // TODO: During SW offer a choice between an employer exchange or a contract

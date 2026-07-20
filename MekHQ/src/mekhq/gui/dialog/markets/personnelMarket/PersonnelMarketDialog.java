@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -549,7 +549,7 @@ public class PersonnelMarketDialog extends JDialog {
                 // 12 months' salary, we double the multiplier from 12 to 24.
                 Money cost = market.getHiringCost(applicant);
 
-                campaign.getFinances()
+                campaign.getPlayerForce().getFinances()
                       .debit(RECRUITMENT,
                             campaign.getLocalDate(),
                             cost,
@@ -557,7 +557,7 @@ public class PersonnelMarketDialog extends JDialog {
                                   "finances.personnelMarket.hire",
                                   applicant.getFullTitle()));
             }
-            campaign.recruitPerson(applicant, isGMHire, true);
+            campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, applicant, isGMHire, true);
         }
 
         // Remove all recruited persons from the applicant list
@@ -627,7 +627,10 @@ public class PersonnelMarketDialog extends JDialog {
         if (campaignFaction.isClan()) {
             setTitle(getTextAt(RESOURCE_BUNDLE, "title.personnelMarket.clan"));
         } else if (campaignFaction.isComStarOrWoB()) {
-            Person commander = campaign.getCommander();
+            Person commander = campaign.getPlayerForce().getHumanResources()
+                                     .getCommander(campaign.getCampaignOptions(),
+                                           campaign.isClanCampaign(),
+                                           campaign.getLocalDate());
             String address = commander != null ? commander.getTitleAndSurname() : campaign.getCommanderAddress(false);
             setTitle(getFormattedTextAt(RESOURCE_BUNDLE,
                   "title.personnelMarket.comStarOrWoB",
@@ -670,7 +673,8 @@ public class PersonnelMarketDialog extends JDialog {
         String closingBrace = CLOSING_SPAN_TAG;
 
         if (noAvailabilityMessage.isBlank()) {
-            if (campaign.getReputation().getReputationRating() < market.getUnitReputationRecruitmentCutoff()) {
+            if (campaign.getPlayerForce().getReputation().getReputationRating() <
+                      market.getUnitReputationRecruitmentCutoff()) {
                 color = MekHQ.getMHQOptions().getFontColorWarningHexColor();
 
                 noAvailabilityMessage = getFormattedTextAt(RESOURCE_BUNDLE,

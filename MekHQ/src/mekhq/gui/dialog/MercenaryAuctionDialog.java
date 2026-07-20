@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,7 +32,6 @@
  */
 package mekhq.gui.dialog;
 
-import static mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.awt.FlowLayout;
@@ -48,9 +47,9 @@ import javax.swing.event.HyperlinkEvent.EventType;
 import megamek.client.ui.dialogs.unitSelectorDialogs.EntityReadoutPanel;
 import megamek.client.ui.util.UIUtil;
 import megamek.client.ui.util.ViewFormatting;
-import megamek.common.units.Entity;
 import megamek.common.annotations.Nullable;
 import megamek.common.templates.TROView;
+import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 
@@ -83,7 +82,11 @@ public class MercenaryAuctionDialog extends ImmersiveDialogCore {
     public MercenaryAuctionDialog(Campaign campaign, Entity entity, int minimumBid, int maximumBid,
           int percentPerStep) {
         super(campaign,
-              campaign.getSeniorAdminPerson(TRANSPORT),
+              campaign.getPlayerForce().getHumanResources()
+                    .getSeniorAdminPerson(mekhq.campaign.Campaign.AdministratorSpecialization.TRANSPORT,
+                          campaign.getCampaignOptions(),
+                          campaign.isClanCampaign(),
+                          campaign.getLocalDate()),
               null,
               createCenterMessage(campaign, entity.getShortName()),
               createButtons(),

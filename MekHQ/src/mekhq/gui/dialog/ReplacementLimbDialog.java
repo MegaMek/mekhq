@@ -74,7 +74,7 @@ public class ReplacementLimbDialog {
 
         final boolean isPlanetside = campaign.getCurrentLocation().isOnPlanet();
         final boolean hasQualifiedDoctors = !suitableDoctors.isEmpty();
-        final boolean hasSufficientFunds = campaign.getFunds().isGreaterOrEqualThan(cost);
+        final boolean hasSufficientFunds = campaign.getPlayerForce().getFunds().isGreaterOrEqualThan(cost);
 
         String inCharacterMessage = createInCharacterMessage(isPlanetside,
               hasQualifiedDoctors,
@@ -180,7 +180,7 @@ public class ReplacementLimbDialog {
     private Person getSpeaker() {
         Person seniorDoctor = null;
 
-        for (Person person : campaign.getActivePersonnel(false, false)) {
+        for (Person person : campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false)) {
             if (person.isDoctor()) {
                 if (person.outRanksUsingSkillTiebreaker(campaign, seniorDoctor)) {
                     seniorDoctor = person;
@@ -191,7 +191,11 @@ public class ReplacementLimbDialog {
         if (seniorDoctor != null) {
             return seniorDoctor;
         } else {
-            return campaign.getSeniorAdminPerson(HR);
+            return campaign.getPlayerForce().getHumanResources()
+                         .getSeniorAdminPerson(HR,
+                               campaign.getCampaignOptions(),
+                               campaign.isClanCampaign(),
+                               campaign.getLocalDate());
         }
     }
 }

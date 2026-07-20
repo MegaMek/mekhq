@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -82,6 +82,9 @@ public class ScenarioTemplate implements Cloneable {
     public boolean isHostileFacility;
     public boolean isAlliedFacility;
 
+    public boolean isSuitedForAmbushes = false;
+    public boolean isSuitedForBungledPatrols = false;
+
     @XmlElement(name = "battlefieldControl")
     @XmlJavaTypeAdapter(value = BattlefieldControlTypeAdapter.class)
     public BattlefieldControlType battlefieldControl = BattlefieldControlType.VICTOR;
@@ -127,6 +130,8 @@ public class ScenarioTemplate implements Cloneable {
         template.stratConScenarioType = this.stratConScenarioType;
         template.shortBriefing = this.shortBriefing;
         template.detailedBriefing = this.detailedBriefing;
+        template.isSuitedForAmbushes = this.isSuitedForAmbushes;
+        template.isSuitedForBungledPatrols = this.isSuitedForBungledPatrols;
         template.isHostileFacility = this.isHostileFacility;
         template.isAlliedFacility = this.isAlliedFacility;
         template.battlefieldControl = this.battlefieldControl;
@@ -194,6 +199,14 @@ public class ScenarioTemplate implements Cloneable {
 
     public boolean isFacilityScenario() {
         return isHostileFacility || isAlliedFacility;
+    }
+
+    public boolean isSuitedForAmbushes() {
+        return isSuitedForAmbushes;
+    }
+
+    public boolean isSuitedForBungledPatrols() {
+        return isSuitedForBungledPatrols;
     }
 
     public BattlefieldControlType getBattlefieldControl() {
