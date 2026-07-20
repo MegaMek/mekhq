@@ -1,107 +1,104 @@
-# Force Generator: Two-Phase Generation (Combat -> Support-from-TOE)
+# Force Generator: Command Designer (Model -> Accept & Build)
 
 **Status:** Design approved; ready to implement.
-**Scope:** MekHQ (Command Generator dialog + generation pipeline). Reuses the MegaMek preview
-include/exclude work already landed on `Implement-Force-Generator-in-MekHQ`.
+**Scope:** MekHQ (Command Designer dialog + generation pipeline) and MegaMek (accumulating preview
+model in the embedded `ForceGeneratorViewUi`). Builds on the include/exclude work already landed on
+`Implement-Force-Generator-in-MekHQ`.
 
-## Problem
+## Concept
 
-Today `CompanyGenerator.applyToCampaign` generates combat units and their support (personnel + support
-vehicles) in a single pass on Accept. Two consequences:
+The Command Generator becomes a **Command Designer**: a design workspace where the player builds an
+**in-memory Model** of a command by rolling combat forces (mix-and-match) and removing what they don't
+want. Nothing touches the campaign until the player hits **Accept & Build**, which generates support for
+the Model and commits the whole command (combat + support) to the official campaign TOE.
 
-1. There is no way to build a force incrementally or to add to an existing command later (e.g. drop in
-   a Battle Armor company). A second run would bolt on a whole second force **and** a duplicate support
-   command (second HQ, duplicate kitchens/medical/security).
-2. Support is sized to a single generation pass rather than to the final committed force, so tuning
-   (kitchen count, HR strain) is hard to reason about.
+Support generation is **command-creation-only** - it happens once, at Accept. After the command exists,
+the player uses the normal build/hire tools. There is no cross-session "add later and top up"; that
+removes the reconciliation-across-sessions complexity.
 
-## Key enabling fact
+## Approved workflow (Model = in-memory, "Option A")
 
-`SupportPersonnelCalculator.compute(Campaign)` is already a **pure function over campaign state** - it
-sizes support demand to the campaign's *current* force composition, not to the generation pass. The
-support-vehicle capacity calculators (`SupportUnitGenerator`) also read `campaign` (active personnel,
-combatant counts). So "generate support from the TOE" is essentially how the math already works; the
-work is to **decouple** support generation into its own step and make it **reconcile against existing
-support**.
+1. **Open** -> empty Model (Design stage). The campaign TOE is untouched.
+2. **Set options** and **Generate** -> the rolled combat command is **added to the Model** (accumulates).
+   Model tree + Composition Summary update.
+3. **Generate again** (different options) -> appends another command to the Model. Mix-and-match.
+4. **Right-click -> Remove** nodes from the Model -> tree + Composition Summary **recalculate**.
+5. Iterate 2-4 until the command looks right.
+6. **Accept & Build** -> summary confirmation -> generates support sized to the Model, commits the whole
+   Model (combat + support) to the **official campaign TOE**, closes.
+7. **Cancel / Discard Model** anytime -> discards the Model; campaign untouched.
 
-## Approved decisions
+## Approved UX (clarity is a first-class requirement)
 
-| # | Decision | Choice |
-|---|----------|--------|
-| 1 | Combat commit | **Accumulate** multiple rolls in the preview, then one **Assign** commits all included units |
-| 2 | UI flow | **Repurpose Accept** into two steps: Assign-to-TOE, then a post-commit Support step |
-| 3 | Replace scope | Wipe **only generator-created** units/personnel (tagged), never manually-added ones |
-| 4 | Top-up model | **Category totals**: recompute total demand per category, subtract existing supply, add the shortfall |
+The risk is a player not realizing the workspace is a non-committed draft, so the Design stage is
+signalled everywhere:
 
-## Workflow (player-facing)
-
-1. **Build combat forces.** Roll a force into the preview tree; include/exclude nodes to pick what you
-   want. Roll again to accumulate more (battalion, then a BA company, then a support lance).
-2. **Assign to TOE.** One action commits the *included* combat units into the campaign TOE (formations
-   + units + crews). No support is generated yet. Generated units are tagged as generator-created.
-3. **Prompt: "Generate support forces from the TOE now?"** Yes runs the support step against the
-   committed TOE; No leaves the command combat-only (support can be generated later).
-
-Re-opening with forces already in the TOE, Assign offers **Add to existing / Replace / Cancel**. "Add"
-is the normal additive path; "Replace" first removes previously generated (tagged) units + support.
+- **Dialog name:** "Command Designer".
+- **Header banner (persistent):** "DESIGN STAGE - this is a model. Nothing is added to your campaign
+  until you Accept & Build."
+- **Preview tree titled** "Command Model (Design)" so it never reads as the live TOE.
+- **Status line:** "Model: N units across M formations - not yet committed."
+- **Empty-state hint:** "Generate a force to start building your command." when the Model is empty.
+- **Commit button:** "Accept & Build Command", tooltip "Generates support and adds this command to your
+  campaign TOE."
+- **Commit confirmation:** "Build this command? N combat units + generated support will be added to your
+  campaign TOE." [Build / Cancel] - the one moment the Model becomes real.
+- **Cancel button:** "Discard Model".
+- Composition Summary always reflects the Model and recalculates on add/remove.
 
 ## Architecture
 
-Split `CompanyGenerator.applyToCampaign` into two independently-callable entry points; the existing
-one-shot Accept becomes "call both in sequence":
+### Accept side (MekHQ) - mostly built
 
-- `commitCombatForces(campaign, descriptor, options)` - walk the filtered `ForceDescriptor`,
-  materialize combat units/crews into the TOE (current Stage 4-7). Tags each created unit/person as
-  generator-created. Stops before support.
-- `generateSupportFromToe(campaign, options)` - current Stage 7e+ logic
-  (`SupportPersonnelGenerator`, `SupportPersonnelToTOE`, `SupportUnitGenerator`) run against current
-  campaign state, made **reconciling** (see below). Callable standalone.
+Accept reuses the Step 1 pipeline split already committed:
 
-### Support reconciliation (the one new algorithm)
+- `commitCombatForces(campaign, modelDescriptor, options)` - materialize the Model's combat units/crews
+  into the campaign TOE.
+- `generateSupportFromToe(campaign, options)` - size + generate support from the now-committed combat
+  (reconciliation + formation reuse make it duplicate-safe within the build).
 
-`generateSupportFromToe` computes **demand - existing supply** per category:
+So Accept = confirmation -> `commitCombatForces(Model)` -> `generateSupportFromToe(campaign)` ->
+post-generation extras. `CompanyGenerator.applyToCampaign(..., generateSupport=false)` already isolates
+the combat commit.
 
-- **Demand** = `SupportPersonnelCalculator.compute(campaign)` (techs, medics, admins/HR, astechs) plus
-  the support-vehicle capacity calcs (canteens, MASH, salvage, logistics, security).
-- **Supply** = count of support already present (existing techs, medics, admins, astechs; existing
-  canteens, MASH trucks, etc.).
-- **Generate** = `max(0, demand - supply)` per category.
+### Model side (MegaMek) - the main new work
 
-This makes the step **idempotent and additive**: fresh command -> full support; run again after adding
-a BA company -> only the shortfall (perhaps +1 canteen, a few techs, one HR admin). No duplicate HQ or
-kitchens.
+Today the embedded `ForceGeneratorViewUi` **replaces** the tree with a single rolled `ForceDescriptor`
+on each Generate. The Model requires:
 
-## Folding in the two tuning items
+- An **accumulating Model descriptor** that each Generate **appends** into (rather than replacing), which
+  the preview tree displays.
+- **Remove** deletes nodes from the Model (the include/exclude work becomes real removal on the Model).
+- The Model descriptor is what `commitCombatForces` walks at Accept.
 
-- **HR strain starts at 0 (approved):** admin demand is bumped until HR capacity >= headcount, i.e.
-  until `RetirementDefectionTracker.getHRStrainModifier(campaign) == 0` for the committed TOE. Because
-  support is computed from the final TOE, a newly generated command shows no HR-strain penalty.
-- **Kitchen capacity (open tuning):** canteen count = `ceil(personnelNeedingKitchen / capacityPerCanteen)
-  - existingCanteens`. Capacity-per-canteen rule still to be confirmed (candidate: 1 kitchen / 150 per
-  canteen instead of the unit's 2 / 300, so the count reads more intuitively).
+## Reuse of already-built pieces
 
-## Generator-created tagging
+- **Step 1 split** (`commitCombatForces` / `generateSupportFromToe`) - committed.
+- **Vehicle + personnel reconciliation, HR-to-zero** - built (personnel uncommitted). Still valuable as a
+  safety within a single Accept; less critical now that support is one-shot at creation.
+- **Formation reuse** (`AddSupportUnitsToTOE`) - built, prevents duplicate support formations.
+- **BA-company nesting** (`ForceDescriptorWalker`) - built; loose attached platoons wrap into a
+  unit-typed company.
+- **Include/exclude tree menu + strikethrough** - the basis for Model removal.
 
-Both the combat-commit and support steps tag created units/personnel as generator-created (mechanism
-TBD - a unit/person flag or a dedicated tag). Used by (a) Replace to remove only generated content, and
-(b) support Supply counting to distinguish generated support from player-added.
+## Build order
 
-## Incremental build order
+1. **Accept side (MekHQ):** wire Accept & Build (confirmation -> `commitCombatForces(Model)` ->
+   `generateSupportFromToe`). Replaces the interim auto-prompt behavior.
+2. **Model side (MegaMek):** accumulate rolls into a Model descriptor + real removal; drive the tree
+   from the Model.
+3. **UX (MekHQ + MegaMek):** rename to Command Designer, banner, tree label, status line, empty-state,
+   button labels, commit confirmation.
+4. Composition Summary recalculation on add/remove.
 
-Each step is independently shippable and testable:
+## Superseded
 
-1. **Split pipeline** into `commitCombatForces` + `generateSupportFromToe` (behavior-preserving; Accept
-   calls both). Regression: one-shot Accept produces the same result as before.
-2. **Reconciliation** (`demand - supply`) in the support step -> idempotent/additive. Regression:
-   running support twice adds nothing the second time; adding combat then support tops up correctly.
-3. **Tuning:** HR-to-zero; kitchen capacity rule.
-4. **UI:** Assign -> support prompt; then the Add/Replace/Cancel warning on re-generation.
+The interim **auto-prompt MVP** (Accept immediately asked "Generate support now?" after the first roll)
+is replaced by this Model workflow and should be removed when the Accept side is rebuilt.
 
-## Open / future considerations
+## Backlog (captured during testing)
 
-- Generator-created tagging mechanism (flag vs tag) and save-game persistence.
-- Replace: confirm it removes tagged support formations cleanly (empty-formation pruning already exists
-  in `ForceDescriptorWalker`).
-- Top-up currently by category totals; per-formation attribution is a possible future refinement.
-- Interaction with the preview include/exclude: excluded combat nodes are already skipped at commit, so
-  they never reach the support demand.
+1. Recalculate the Composition Summary/History box when units are removed from the TOE (folds into the
+   Model removal work).
+2. Hide the Rolled Units box in TOE mode (MegaMek `toeExclusionMode` gate) - vestigial in this workflow.
+3. Cargo Summary - investigate how it is computed (separate).
