@@ -91,6 +91,9 @@ public class ForceGeneratorTab {
         // The dialog commits the previewed tree into the campaign TOE, so let the user right-click to
         // include/exclude nodes; excluded units are struck out here and skipped by ForceDescriptorWalker.
         viewUi.setToeExclusionMode(true);
+        // Command Designer: each Generate accumulates into a Model so the player can mix-and-match
+        // several rolls into one command before committing.
+        viewUi.setAccumulateModel(true);
 
         ForceGeneratorOptionsView optionsView = viewUi.getOptionsView();
         optionsView.setExportMULButtonVisible(false);

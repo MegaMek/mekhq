@@ -44,6 +44,8 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -51,6 +53,7 @@ import javax.swing.JSplitPane;
 import javax.swing.SwingWorker;
 
 import megamek.client.ratgenerator.ForceDescriptor;
+import megamek.client.ratgenerator.Ruleset;
 import megamek.client.ui.buttons.MMButton;
 import megamek.client.ui.enums.ValidationState;
 import megamek.client.ui.preferences.JSplitPanePreference;
@@ -295,82 +298,86 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
         // the user gets feedback during long generations (Star League Defense Force Armies take
         // minutes; without a dialog the app appears frozen). The worker's done() handler runs on
         // the EDT after generation completes and fires the post-gen extras.
+        // Two-phase generation. Phase one commits the previewed combat force to the TOE without
+        // support; on completion the user is asked whether to generate support now. Phase two sizes
+        // support to the committed TOE (topping up rather than duplicating). Each phase runs on a
+        // background thread behind a modal progress dialog.
+        LOGGER.info("[CompanyGen][Worker] okAction: starting combat-commit phase (thread={})",
+              Thread.currentThread().getName());
+        runGenerationPhase("Materializing combat forces...", listener -> {
+            // RATGenerator init must not run on the EDT; ensureLoaded is idempotent.
+            ForceDescriptorSnapshot snapshot = options.getForceDescriptorSnapshot();
+            RulesetEngineBootstrap.ensureLoaded(snapshot.getYear());
+            return CompanyGenerator.applyToCampaign(getCampaign(), options, previewedForce, listener, false);
+        }, combatResult -> {
+            if (combatResult == null) {
+                LOGGER.info("[CompanyGen][Worker] combat phase produced no result; skipping support prompt");
+                return;
+            }
+            List<Person> generatedPersons = new ArrayList<>(combatResult.generatedPersons());
+            int choice = JOptionPane.showConfirmDialog(getFrame(),
+                  "Combat forces have been added to the TOE.\nGenerate support forces from the TOE now?",
+                  resources.getString("CompanyGenerationDialog.title"), JOptionPane.YES_NO_OPTION);
+            if (choice == JOptionPane.YES_OPTION) {
+                runGenerationPhase("Generating support forces...",
+                      supportListener -> CompanyGenerator.generateSupportFromToe(getCampaign(), options,
+                            supportListener),
+                      supportPersons -> {
+                          generatedPersons.addAll(supportPersons);
+                          applyPostGenerationExtras(options, generatedPersons);
+                      });
+            } else {
+                LOGGER.info("[CompanyGen][Worker] user declined support generation; combat-only commit");
+                applyPostGenerationExtras(options, generatedPersons);
+            }
+        });
+    }
+
+    /**
+     * Runs one generation phase on a background thread behind a modal progress dialog. Sets the
+     * {@code suppressUnitNewEvents} guard for the duration (so event-driven tab refreshes do not read
+     * the half-built campaign off the EDT), runs {@code work} with the phase's progress listener, and
+     * hands the result to {@code onSuccess} on the EDT. On failure a notification is shown and
+     * {@code onSuccess} is skipped.
+     *
+     * @param progressMessage the initial progress message
+     * @param work            the background work, given the progress listener
+     * @param onSuccess       EDT callback receiving the work's result
+     * @param <T>             the phase result type
+     */
+    private <T> void runGenerationPhase(String progressMessage,
+          Function<Ruleset.ProgressListener, T> work, Consumer<T> onSuccess) {
         GenerationProgressDialog progressDialog = new GenerationProgressDialog(getFrame());
-        long okStartedNanos = System.nanoTime();
-        LOGGER.info("[CompanyGen][Worker] okAction prepared SwingWorker (thread={})", Thread.currentThread().getName());
-
-        SwingWorker<CompanyGenerator.Result, Void> worker = new SwingWorker<>() {
+        SwingWorker<T, Void> worker = new SwingWorker<>() {
             @Override
-            protected @Nullable CompanyGenerator.Result doInBackground() {
-                long workerStartNanos = System.nanoTime();
-                LOGGER.info("[CompanyGen][Worker] SwingWorker.doInBackground START (thread={})",
-                      Thread.currentThread().getName());
-
-                // Loading the rulesets blocks on RATGenerator initialization, which must not happen on
-                // the EDT; ensureLoaded is idempotent, so applyToCampaign touching it again costs
-                // nothing.
-                ForceDescriptorSnapshot snapshot = options.getForceDescriptorSnapshot();
-                int generationYear = snapshot.getYear();
-                RulesetEngineBootstrap.ensureLoaded(generationYear);
-
-                CompanyGenerator.Result result;
-                // Suppress the per-unit UnitNewEvent storm while the worker mutates campaign state off
-                // the EDT. Otherwise the modal progress dialog keeps the EDT pumping events, so the
-                // event-driven tab refreshes (finances, hangar, warehouse) fire mid-generation and read
-                // the half-built campaign - the ConcurrentModificationException source. The single
-                // OrganizationChangedEvent fired from done() -> applyPostGenerationExtras refreshes the
-                // GUI once, after everything is built.
+            protected T doInBackground() {
+                progressDialog.asListener().updateProgress(0.0, progressMessage);
                 getCampaign().setSuppressUnitNewEvents(true);
                 try {
-                    result = CompanyGenerator.applyToCampaign(getCampaign(), options, previewedForce,
-                          progressDialog.asListener());
-                } catch (Throwable t) {
-                    LOGGER.error(t, "[CompanyGen][Worker] SwingWorker.doInBackground threw");
-                    throw t;
+                    return work.apply(progressDialog.asListener());
                 } finally {
                     getCampaign().setSuppressUnitNewEvents(false);
                 }
-                long elapsedMs = (System.nanoTime() - workerStartNanos) / 1_000_000;
-                LOGGER.info("[CompanyGen][Worker] SwingWorker.doInBackground DONE in {}ms ({} persons)",
-                      elapsedMs, result.generatedPersons().size());
-                return result;
             }
 
             @Override
             protected void done() {
-                LOGGER.info("[CompanyGen][Worker] SwingWorker.done START (thread={})",
-                      Thread.currentThread().getName());
                 progressDialog.finish();
-                CompanyGenerator.Result result;
+                T result;
                 try {
-                    // Surface any uncaught exception from the background thread.
                     result = get();
                 } catch (Exception ex) {
-                    LOGGER.error(ex, "Force generation failed");
+                    LOGGER.error(ex, "[CompanyGen][Worker] generation phase failed");
                     new ImmersiveDialogNotification(campaign,
-                          "Force generation failed: " + ex.getMessage(),
-                          true);
+                          "Force generation failed: " + ex.getMessage(), true);
                     return;
                 }
-                if (result == null) {
-                    // User declined the defaults-only ruleset warning; nothing was generated.
-                    LOGGER.info("[CompanyGen][Worker] SwingWorker.done - generation cancelled, no extras applied");
-                    return;
-                }
-                LOGGER.info("[CompanyGen][Worker] SwingWorker.done -> applyPostGenerationExtras");
-                applyPostGenerationExtras(options, result.generatedPersons());
-                LOGGER.info("[CompanyGen][Worker] SwingWorker.done complete");
+                onSuccess.accept(result);
             }
         };
-
         worker.execute();
-        LOGGER.info("[CompanyGen][Worker] worker.execute() returned (thread={}); about to setVisible(true) on progressDialog",
-              Thread.currentThread().getName());
-        // Modal dialog blocks the EDT until SwingWorker.done() calls finish().
+        // Modal dialog blocks the EDT until the worker's done() calls finish().
         progressDialog.setVisible(true);
-        long modalElapsedMs = (System.nanoTime() - okStartedNanos) / 1_000_000;
-        LOGGER.info("[CompanyGen][Worker] progressDialog.setVisible(true) returned after {}ms (modal closed, thread={})",
-              modalElapsedMs, Thread.currentThread().getName());
     }
 
     /**
