@@ -125,7 +125,7 @@ public final class StratConSectorPlanner {
 
         List<SectorSpec> specs = new ArrayList<>();
         for (int index = 0; index < desiredSectors; index++) {
-            specs.add(new SectorSpec(1, ALTERNATE_FORMATIONS_PER_SECTOR, LatitudeBand.random()));
+            specs.add(new SectorSpec(1, requiredCombatFormations, LatitudeBand.random()));
         }
         return specs;
     }

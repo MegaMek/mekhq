@@ -61,6 +61,12 @@ class StratConTrackSizingTest {
         return options;
     }
 
+    /** @return the dry hexes a sector fronting the given number of combat teams is budgeted, on a Terra-sized world. */
+    private static int playableFor(int combatTeams) {
+        int reconForces = combatTeams / StratConContractInitializer.COMBAT_TEAMS_PER_RECON_FORCE;
+        return reconForces * StratConContractInitializer.RECON_HEXES_PER_QUARTER;
+    }
+
     /**
      * Asserts a sector covers roughly the expected number of hexes. Exact equality is not available: the shape profile
      * rounds each dimension independently, so the laid-out area lands near the target rather than on it.
@@ -98,33 +104,44 @@ class StratConTrackSizingTest {
     }
 
     @Test
-    void improvedSizing_neutralPlanet_singleUnit_coversRoughlyItsTargetArea() {
-        // perUnitPlayable = round(78 * 1.0) = 78; playable = 78; total = round(78 / 0.5) = 156 hexes. The shape profile
-        // then lays that area out, so the exact dimensions vary - the area is what the sizing math controls.
+    void improvedSizing_matchesWhatTheSectorsReconCanCoverInAQuarter() {
+        // The sizing rule: one recon force per three combat teams fronting the sector, each covering
+        // RECON_HEXES_PER_QUARTER dry hexes in three months. A neutral planet is 50% water, so the sector is grown to
+        // twice its dry budget.
         StratConTrackState track = track(new SectorSpec(1, 9, LatitudeBand.EQUATORIAL), options(true, false, 1.0));
 
-        assertAreaNear(156, track);
+        assertAreaNear(playableFor(9) * 2, track);
+    }
+
+    @Test
+    void improvedSizing_aLegacySizedSectorIsBuiltForItsThreeTeams() {
+        // Guards an option mismatch: with only "condense sectors" on, the COUNT is still legacy (a sector per three
+        // teams) while the SIZING is improved. Sizing per sector-unit rather than per team handed each of those small
+        // sectors a full nine-team sector's worth of ground.
+        StratConTrackState track = track(new SectorSpec(1, 3, LatitudeBand.EQUATORIAL), options(true, false, 1.0));
+
+        assertAreaNear(playableFor(3) * 2, track);
     }
 
     @Test
     void improvedSizing_sizeMultiplierAndUnitCountScaleEquivalently() {
-        // A 2.0 multiplier on one unit and a 1.0 multiplier on two units both double the playable target to 312.
+        // A 2.0 multiplier on nine teams and a 1.0 multiplier on eighteen both double the playable target.
         StratConTrackState doubledByMultiplier = track(new SectorSpec(1, 9, LatitudeBand.EQUATORIAL),
               options(true, false, 2.0));
         StratConTrackState doubledByUnits = track(new SectorSpec(2, 18, LatitudeBand.EQUATORIAL),
               options(true, true, 1.0));
 
         // Compared by area, not by dimensions: each track rolls its own shape, so their proportions legitimately differ.
-        assertAreaNear(312, doubledByMultiplier);
-        assertAreaNear(312, doubledByUnits);
+        assertAreaNear(playableFor(18) * 2, doubledByMultiplier);
+        assertAreaNear(playableFor(18) * 2, doubledByUnits);
     }
 
     @Test
     void improvedSizing_multiplierAlwaysBitesOnCondensedSectors() {
-        // unit count 2 with a 2.0 multiplier: playable = round(2 * 78 * 2) = 312; total = 624.
+        // Eighteen teams at a 2.0 multiplier: twice the six recon forces' quarterly budget.
         StratConTrackState track = track(new SectorSpec(2, 18, LatitudeBand.EQUATORIAL), options(true, true, 2.0));
 
-        assertAreaNear(624, track);
+        assertAreaNear(playableFor(18) * 2 * 2, track);
     }
 
     @Test

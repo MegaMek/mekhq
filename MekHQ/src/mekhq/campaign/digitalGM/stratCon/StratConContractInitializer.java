@@ -89,10 +89,21 @@ public class StratConContractInitializer {
     private static final int LEGACY_HEXES_PER_FORMATION = 28;
 
     /**
-     * Improved sizing: dry playable hexes per base sector unit before planetary-size, size-multiplier, and hydrology
-     * adjustments. Roughly a quarter's scouting budget at six hexes per week for thirteen weeks.
+     * Improved sizing: combat teams per assumed recon force. One in three of the teams fronting a sector is taken to be
+     * out scouting it.
      */
-    private static final int BASE_PLAYABLE_HEXES = 78;
+    static final int COMBAT_TEAMS_PER_RECON_FORCE = 3;
+
+    /**
+     * Improved sizing: the dry, playable hexes one recon force is expected to cover in a quarter - two to three hexes a
+     * week over thirteen weeks. A sector is sized so the recon forces fronting it can scout the whole thing inside
+     * three months.
+     *
+     * <p>Note what the underlying mechanic actually reveals, before revising this: a <em>regular</em> deployment
+     * uncovers a single hex (scan range is zero unless a facility grants more), while a Patrol-role deployment covers
+     * its hex plus the six around it. Two to three a week is the realistic blend, not the seven-hex best case.</p>
+     */
+    static final int RECON_HEXES_PER_QUARTER = 33;
 
     /** Improved sizing: the minimum dry fraction of a sector, so oceans never leave too little land. */
     private static final double MINIMUM_LAND_FRACTION = 0.25;
@@ -866,8 +877,15 @@ public class StratConContractInitializer {
      */
     private static void applyImprovedDimensions(StratConTrackState track, SectorSpec sector, PlanetProfile profile,
           double sizeMultiplier) {
-        int perUnitPlayable = (int) Math.round(BASE_PLAYABLE_HEXES * profile.sizeFactor());
-        int playableHexes = max(1, (int) Math.round(sector.unitCount() * perUnitPlayable * sizeMultiplier));
+        // Size the sector to what its recon can cover in a quarter: one recon force per three combat teams fronting
+        // this sector, each scouting RECON_HEXES_PER_QUARTER hexes in three months.
+        //
+        // This keys off requiredLances rather than unitCount deliberately. The two scale together under the alternate
+        // and condensed layouts, but NOT under the legacy layout - a legacy sector is one unit fronting only three
+        // teams, and sizing it per-unit would hand it a full nine-team sector's worth of ground.
+        int reconForces = max(1, sector.requiredLances() / COMBAT_TEAMS_PER_RECON_FORCE);
+        int perForcePlayable = (int) Math.round(RECON_HEXES_PER_QUARTER * profile.sizeFactor());
+        int playableHexes = max(1, (int) Math.round(reconForces * perForcePlayable * sizeMultiplier));
 
         // Ocean is non-playable, so grow the sector by the dry fraction implied by the planet's water coverage.
         double landFraction = max(MINIMUM_LAND_FRACTION, 1.0 - (profile.waterPercent() / 100.0));
