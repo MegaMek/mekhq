@@ -53,6 +53,12 @@ import org.junit.jupiter.api.Test;
 class StratConBiomeMapSelectionTest {
     private static final StratConBiomeManifest MANIFEST = StratConBiomeManifest.getInstance();
 
+    /** Where the map generator definitions live once the data files have been staged into the build. */
+    private static final String STAGED_MAP_GEN_PATH = "./data/mapgen";
+
+    /** Where they live in the mm-data source, used when nothing has been staged yet. */
+    private static final String MM_DATA_MAP_GEN_PATH = "../../mm-data/data/mapgen";
+
     @Test
     void exactTerrainPool_winsOverCategoryFallback() {
         // Forest has its own pool, so it must resolve to that, not to the VEGETATION category pool.
@@ -160,15 +166,36 @@ class StratConBiomeMapSelectionTest {
     @Test
     void everyDeclaredMapTypeHasAMapGeneratorFile() {
         // Guards against typos anywhere in the manifest's map pools: every named board must exist on disk.
+        File mapGenDirectory = mapGenDirectory();
         List<String> missing = new ArrayList<>();
         for (Map.Entry<String, MapTypeList> entry : MANIFEST.getBiomeMapTypes().entrySet()) {
             for (String mapType : entry.getValue().mapTypes) {
-                if (!new File("./data/mapgen/" + mapType + ".xml").exists()) {
+                if (!new File(mapGenDirectory, mapType + ".xml").exists()) {
                     missing.add(entry.getKey() + " -> " + mapType);
                 }
             }
         }
 
-        assertTrue(missing.isEmpty(), "map pools name mapgen files that do not exist: " + missing);
+        assertTrue(missing.isEmpty(),
+              "map pools name mapgen files that do not exist under " + mapGenDirectory + ": " + missing);
+    }
+
+    /**
+     * @return the directory holding the map generator definitions: the staged copy when the data files have been
+     *       staged, otherwise the mm-data source they are staged from. A fresh checkout has no staged data until
+     *       {@code stageDataFiles} runs, so falling back to the source keeps this test meaningful in CI and in a clean
+     *       local tree rather than failing for want of a build step.
+     */
+    private static File mapGenDirectory() {
+        File staged = new File(STAGED_MAP_GEN_PATH);
+        if (staged.isDirectory()) {
+            return staged;
+        }
+
+        File source = new File(MM_DATA_MAP_GEN_PATH);
+        assertTrue(source.isDirectory(),
+              "Neither staged data nor mm-data source found. Run stageDataFiles first, or ensure mm-data is available"
+                    + " at: " + source.getAbsolutePath());
+        return source;
     }
 }

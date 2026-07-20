@@ -179,10 +179,13 @@ public class AtBGameThread extends GameThread {
 
                 MapSettings mapSettings = ScenarioUtils.getMapSettings(scenario);
                 // StratCon: tune the generated board so it reflects the sector hex being fought on (roads, water,
-                // terrain emphasis, cities), via the active GM's map-generation strategy. Only affects generated
-                // (non-fixed) boards; fixed maps are used as authored.
-                StratConGMs.mapGeneration(app.getCampaign().getCampaignOptions())
-                      .tuneMapSettings(mapSettings, scenario);
+                // terrain emphasis, cities), via the active GM's map-generation strategy. Fixed maps are used exactly
+                // as authored, so they are skipped here rather than relying on the generator knobs being ignored
+                // downstream.
+                if (!scenario.isUsingFixedMap()) {
+                    StratConGMs.mapGeneration(app.getCampaign().getCampaignOptions())
+                          .tuneMapSettings(mapSettings, scenario);
+                }
                 client.sendMapSettings(mapSettings);
                 Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
 
