@@ -74,7 +74,11 @@ class StratConOceanPlacerTest {
         return result;
     }
 
-    private static int componentCount(StratConTrackState track, Set<StratConCoords> hexes) {
+    /**
+     * @return the number of connected groups the given hexes form. No track is needed: the flood fill only ever walks
+     *       into hexes already in the set, so it cannot leave the map.
+     */
+    private static int componentCount(Set<StratConCoords> hexes) {
         Set<StratConCoords> unseen = new HashSet<>(hexes);
         int components = 0;
         while (!unseen.isEmpty()) {
@@ -154,8 +158,8 @@ class StratConOceanPlacerTest {
         StratConOceanPlacer.placeOceans(track, HydrologyProfileType.ISLAND, target, OCEAN);
 
         Set<StratConCoords> land = hexesOf(track, false);
-        assertTrue(land.size() > 0);
-        assertEquals(1, componentCount(track, land), "island should carve exactly one landmass");
+        assertFalse(land.isEmpty());
+        assertEquals(1, componentCount(land), "island should carve exactly one landmass");
     }
 
     @Test
@@ -165,8 +169,8 @@ class StratConOceanPlacerTest {
         StratConOceanPlacer.placeOceans(track, HydrologyProfileType.INLAND, target, OCEAN);
 
         Set<StratConCoords> ocean = hexesOf(track, true);
-        assertTrue(ocean.size() > 0);
-        assertTrue(componentCount(track, ocean) <= 2, "inland water should be one or two isolated spots");
+        assertFalse(ocean.isEmpty());
+        assertTrue(componentCount(ocean) <= 2, "inland water should be one or two isolated spots");
     }
 
     @Test
@@ -176,9 +180,9 @@ class StratConOceanPlacerTest {
         StratConOceanPlacer.placeOceans(track, HydrologyProfileType.ARCHIPELAGO, target, OCEAN);
 
         Set<StratConCoords> land = hexesOf(track, false);
-        assertTrue(land.size() > 0);
+        assertFalse(land.isEmpty());
         // Seeded with 3..6 land blobs that are grown in isolation, so they cannot fuse into a single landmass.
-        assertTrue(componentCount(track, land) >= 2, "archipelago should have multiple landmasses");
+        assertTrue(componentCount(land) >= 2, "archipelago should have multiple landmasses");
     }
 
     @Test
@@ -187,6 +191,6 @@ class StratConOceanPlacerTest {
         int target = (int) Math.round(0.22 * SIZE * SIZE);
         StratConOceanPlacer.placeOceans(track, HydrologyProfileType.LAKELANDS, target, OCEAN);
 
-        assertTrue(componentCount(track, hexesOf(track, true)) >= 2, "lakelands should scatter several lakes");
+        assertTrue(componentCount(hexesOf(track, true)) >= 2, "lakelands should scatter several lakes");
     }
 }

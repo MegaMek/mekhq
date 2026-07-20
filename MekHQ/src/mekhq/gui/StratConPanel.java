@@ -236,7 +236,7 @@ public class StratConPanel extends JPanel implements ActionListener {
         public void mousePressed(MouseEvent e) {
             if (SwingUtilities.isLeftMouseButton(e)) {
                 // In paint mode the left button is the brush, so it neither selects nor pans.
-                if (isPainting()) {
+                if (isPaintingTerrain()) {
                     paintAt(e.getPoint());
                     return;
                 }
@@ -253,7 +253,7 @@ public class StratConPanel extends JPanel implements ActionListener {
                 return;
             }
 
-            if (isPainting()) {
+            if (isPaintingTerrain()) {
                 paintAt(e.getPoint());
                 return;
             }
@@ -284,7 +284,7 @@ public class StratConPanel extends JPanel implements ActionListener {
 
         @Override
         public void mouseReleased(MouseEvent e) {
-            if (isPainting() && SwingUtilities.isLeftMouseButton(e)) {
+            if (isPaintingTerrain() && SwingUtilities.isLeftMouseButton(e)) {
                 // The stroke is over, so pay for it once rather than once per hex.
                 finishPaintStroke();
                 return;
@@ -469,8 +469,14 @@ public class StratConPanel extends JPanel implements ActionListener {
         this.paintBrushRadius = radius;
     }
 
-    /** @return {@code true} while the terrain palette is open and clicks paint rather than select. */
-    public boolean isPainting() {
+    /**
+     * Named for the terrain brush rather than {@code isPainting}, which would sit confusingly beside the
+     * package-private {@code JComponent.isPainting} this panel inherits but cannot override - a reader inside the
+     * painting code would have no way to tell the two apart.
+     *
+     * @return {@code true} while the terrain palette is open and clicks paint rather than select.
+     */
+    public boolean isPaintingTerrain() {
         return paintTerrain != null;
     }
 

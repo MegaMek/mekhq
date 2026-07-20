@@ -42,7 +42,11 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests for {@link StratConTrackState#findClosestAlliedFacilityCoords}, which measures in hex steps across the map
  * rather than by the coordinate distance StratConCoords inherits.
+ *
+ * <p>The method under test is deprecated for removal, so exercising it is the whole point of this class; the warning
+ * is suppressed here and nowhere else. Delete this class along with the method.</p>
  */
+@SuppressWarnings("deprecation")
 class StratConTrackStateTest {
 
     private static StratConTrackState track(int width, int height) {
@@ -98,7 +102,6 @@ class StratConTrackStateTest {
     void everyNeighborOfAHexCountsAsEquallyClose() {
         // Guards the parity bug: measured by coordinate distance rather than map adjacency, two of a hex's six
         // neighbors come out as distance 2 while two non-neighbors come out as distance 1.
-        StratConTrackState track = track(14, 14);
         StratConCoords origin = new StratConCoords(6, 6);
 
         for (int direction = 0; direction < 6; direction++) {
