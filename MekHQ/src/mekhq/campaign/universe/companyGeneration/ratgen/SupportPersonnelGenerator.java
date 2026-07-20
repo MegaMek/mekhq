@@ -40,6 +40,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.personnel.generator.AbstractSkillGenerator;
 import mekhq.campaign.personnel.generator.DefaultSkillGenerator;
@@ -90,6 +91,9 @@ public final class SupportPersonnelGenerator {
     private static final int MEDICS_PER_DOCTOR = 4;
     /** Number of administrator roles the total admin demand is split across. */
     private static final int ADMIN_ROLE_COUNT = 4;
+
+    /** Guard on the HR-strain top-up loop so a misconfigured admin skill can't spin it forever. */
+    private static final int MAX_HR_STRAIN_TOPUP = 100;
 
     private SupportPersonnelGenerator() {
         // utility class
@@ -179,6 +183,11 @@ public final class SupportPersonnelGenerator {
         int adminHR = generateRole(campaign, options, skillGen, PersonnelRole.ADMINISTRATOR_HR,
               adminBaselinePerRole, supportRank, targetRankSystem, rankValidator, generated);
 
+        // A freshly generated command should not open with an HR-strain turnover penalty, so top up
+        // HR administrators until the strain modifier reaches zero (no-op when the rule is off).
+        adminHR += topUpHumanResourcesToZeroStrain(campaign, options, skillGen, supportRank,
+              targetRankSystem, rankValidator, generated);
+
         int totalTechs = mekTechs + mechanics + aeroTeks + baTechs;
         int astechs = applyAstechs(campaign, options, skillGen, supportRank, targetRankSystem,
               rankValidator, totalTechs, generated);
@@ -204,7 +213,11 @@ public final class SupportPersonnelGenerator {
           AbstractSkillGenerator skillGen, PersonnelRole role, int baselineDemand, int supportRank,
           RankSystem targetRankSystem, RankValidator rankValidator, List<Person> out) {
         int percent = options.getSupportPersonnelCoveragePercents().getOrDefault(role, 100);
-        int count = SupportPersonnelCalculator.applyPercent(baselineDemand, percent);
+        int target = SupportPersonnelCalculator.applyPercent(baselineDemand, percent);
+        // Reconcile against staff already present so re-running support (for example after adding
+        // combat forces) tops up only the shortfall instead of duplicating existing personnel.
+        int existing = countActiveByRole(campaign, role);
+        int count = Math.max(0, target - existing);
         if (count <= 0) {
             return 0;
         }
@@ -219,6 +232,57 @@ public final class SupportPersonnelGenerator {
             }
         }
         return count;
+    }
+
+    /**
+     * Counts the active personnel whose primary role is {@code role}, used to reconcile support-staff
+     * generation against staff already present.
+     *
+     * @param campaign the campaign to inspect
+     * @param role     the primary role to count
+     *
+     * @return the number of active personnel with that primary role
+     */
+    static int countActiveByRole(Campaign campaign, PersonnelRole role) {
+        int matches = 0;
+        for (Person person : campaign.getActivePersonnel(false, false)) {
+            if (person.getPrimaryRole() == role) {
+                matches++;
+            }
+        }
+        return matches;
+    }
+
+    /**
+     * Generates HR administrators until the campaign's HR-strain modifier reaches zero, so a freshly
+     * generated command does not start with an HR-strain turnover penalty. A no-op when the HR-strain
+     * rule is disabled; guarded by {@link #MAX_HR_STRAIN_TOPUP} against runaway generation.
+     *
+     * @return the number of HR administrators added
+     */
+    private static int topUpHumanResourcesToZeroStrain(Campaign campaign, CompanyGenerationOptions options,
+          AbstractSkillGenerator skillGen, int supportRank, RankSystem targetRankSystem,
+          RankValidator rankValidator, List<Person> out) {
+        if (!campaign.getCampaignOptions().isUseHRStrain()) {
+            return 0;
+        }
+        SkillLevel skillLevel = options.getSupportPersonnelSkillLevels()
+              .getOrDefault(PersonnelRole.ADMINISTRATOR_HR, SkillLevel.REGULAR);
+        int expLvl = toExperienceLevel(skillLevel);
+
+        int added = 0;
+        while (RetirementDefectionTracker.getHRStrainModifier(campaign) > 0 && added < MAX_HR_STRAIN_TOPUP) {
+            Person admin = createAndRecruit(campaign, skillGen, PersonnelRole.ADMINISTRATOR_HR, expLvl,
+                  supportRank, targetRankSystem, rankValidator);
+            if (admin == null) {
+                break;
+            }
+            out.add(admin);
+            added++;
+        }
+        LOGGER.info("[CompanyGen][Pipeline][Support] HR-strain top-up: added {} HR admins, strain modifier now {}",
+              added, RetirementDefectionTracker.getHRStrainModifier(campaign));
+        return added;
     }
 
     /**

@@ -56,6 +56,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import megamek.common.enums.SkillLevel;
+import megamek.common.equipment.EquipmentType;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -68,6 +69,7 @@ import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
+import testUtilities.MHQTestUtilities;
 import mekhq.campaign.universe.companyGeneration.ratgen.SupportPersonnelGenerator.Result;
 import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 import org.apache.logging.log4j.Level;
@@ -478,5 +480,26 @@ class SupportPersonnelGeneratorTest {
             out.add(supplier.get());
         }
         return out;
+    }
+
+    @Test
+    void countActiveByRoleCountsOnlyMatchingPrimaryRole() {
+        // Drives support-personnel reconciliation: generateRole subtracts this count from its target so
+        // a re-run tops up only the shortfall instead of duplicating existing staff.
+        EquipmentType.initializeTypes();
+        SkillType.initializeTypes();
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        recruitWithRole(campaign, PersonnelRole.MEK_TECH);
+        recruitWithRole(campaign, PersonnelRole.MEK_TECH);
+        recruitWithRole(campaign, PersonnelRole.DOCTOR);
+
+        assertEquals(2, SupportPersonnelGenerator.countActiveByRole(campaign, PersonnelRole.MEK_TECH));
+        assertEquals(1, SupportPersonnelGenerator.countActiveByRole(campaign, PersonnelRole.DOCTOR));
+        assertEquals(0, SupportPersonnelGenerator.countActiveByRole(campaign, PersonnelRole.ADMINISTRATOR_HR));
+    }
+
+    private static void recruitWithRole(Campaign campaign, PersonnelRole role) {
+        Person person = campaign.newPerson(role);
+        campaign.recruitPerson(person, PrisonerStatus.FREE, true, true);
     }
 }
