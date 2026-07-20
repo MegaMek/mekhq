@@ -445,6 +445,11 @@ public class StratConContractInitializer {
             track.setTemperature(legacyTemperature(planetProfile.temperatureCelsius()));
         }
 
+        // Re-roll the sector's proportions too, so regenerating does not keep handing back the same shape of map.
+        if (useImprovedSizing) {
+            reshapeForRegeneration(track);
+        }
+
         var sectorStrategy = StratConGMs.sectorGeneration(campaignOptions);
         sectorStrategy.regenerateTrack(track, planetProfile, latitudeBand, allowCities);
 
@@ -579,6 +584,23 @@ public class StratConContractInitializer {
             return false;
         }
 
+        applyNewBounds(track, width, height);
+
+        fillNewHexes(track);
+
+        applyTerrainChange(track, contract, campaign);
+        return true;
+    }
+
+    /**
+     * Moves a sector's bounds and puts its occupants back inside: ground outside the new bounds is discarded, but
+     * facilities and scenarios are relocated (carrying their strategic objectives and any forces deployed to them), and
+     * a force left standing off the map is recalled.
+     *
+     * <p>Callers must check {@link #previewResize} first - this assumes the sector can hold what it is about to
+     * displace.</p>
+     */
+    private static void applyNewBounds(StratConTrackState track, int width, int height) {
         // Note who is about to be left outside before the bounds move, so they can be re-homed afterward.
         List<StratConCoords> displacedFacilities = outsideCoords(track.getFacilities().keySet(), width, height);
         List<StratConCoords> displacedScenarios = outsideCoords(track.getScenarios().keySet(), width, height);
@@ -628,11 +650,6 @@ public class StratConContractInitializer {
 
         // Forces left standing on ground that no longer exists are recalled.
         recallForcesOutsideBounds(track);
-
-        fillNewHexes(track);
-
-        applyTerrainChange(track, contract, campaign);
-        return true;
     }
 
     /** Drops any strategic objective tied to a hex whose occupant could not be saved, so nothing points at dead ground. */
@@ -860,8 +877,24 @@ public class StratConContractInitializer {
         // walked by the placers. The ceiling only bites at those extremes; ordinary sectors are well beneath it.
         int totalHexes = min(MAX_SECTOR_HEXES, (int) Math.round(playableHexes / landFraction));
 
-        // The area is settled; the shape profile decides how it is laid out. Both dimensions are derived from the
-        // ratio rather than one from the other, so a 1.0 ratio really is square instead of drifting a hex wide.
+        SectorDimensions shape = rollSectorShape(totalHexes);
+        track.setWidth(shape.width());
+        track.setHeight(shape.height());
+    }
+
+    /** A sector's laid-out proportions. */
+    private record SectorDimensions(int width, int height) {}
+
+    /**
+     * Lays a sector's area out into width and height, rolling a fresh {@link SectorShapeProfile} for the proportions.
+     *
+     * @param totalHexes the area to lay out
+     *
+     * @return the resulting dimensions, both inside the playable bounds and together inside the area ceiling
+     */
+    private static SectorDimensions rollSectorShape(int totalHexes) {
+        // Both dimensions are derived from the ratio rather than one from the other, so a 1.0 ratio really is square
+        // instead of drifting a hex wide.
         double aspectRatio = StratConSectorShape.getInstance().selectProfile().aspectRatioOrDefault();
         int width = clampDimension((int) Math.round(Math.sqrt(totalHexes * aspectRatio)));
         int height = clampDimension((int) Math.round(Math.sqrt(totalHexes / aspectRatio)));
@@ -876,8 +909,28 @@ public class StratConContractInitializer {
             }
         }
 
-        track.setWidth(width);
-        track.setHeight(height);
+        return new SectorDimensions(width, height);
+    }
+
+    /**
+     * Re-rolls a sector's proportions when it is regenerated, so a regenerated sector is not stuck with the shape it
+     * happened to be given when the contract was signed. Its <em>area</em> is preserved - regeneration re-rolls the
+     * terrain and climate, not how much sector there is to fight over.
+     *
+     * <p>If the new proportions would leave more facilities and scenarios outside the sector than it can re-home, the
+     * current shape is kept. A cosmetic re-roll is not worth destroying anything over.</p>
+     */
+    private static void reshapeForRegeneration(StratConTrackState track) {
+        SectorDimensions shape = rollSectorShape(track.getWidth() * track.getHeight());
+        if ((shape.width() == track.getWidth()) && (shape.height() == track.getHeight())) {
+            return;
+        }
+
+        if (!previewResize(track, shape.width(), shape.height()).fits()) {
+            return;
+        }
+
+        applyNewBounds(track, shape.width(), shape.height());
     }
 
     /** Keeps a sector dimension inside the playable range, so no shape can produce a sliver or a runaway map. */

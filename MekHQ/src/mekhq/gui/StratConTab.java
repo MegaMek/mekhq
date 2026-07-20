@@ -193,10 +193,17 @@ public class StratConTab extends CampaignGuiTab {
 
         JPanel pnlTutorial = new TutorialHyperlinkPanel("stratConTab.keyText");
 
+        // The GM tools sit under the sector pane rather than across the whole tab, so they line up with the map they
+        // act on instead of running beneath the info panel as well. The tutorial link stays below them, at the very
+        // bottom of the column.
+        JPanel centerFooter = new JPanel(new BorderLayout());
+        centerFooter.add(initializeGmButtonPanel(), BorderLayout.NORTH);
+        centerFooter.add(pnlTutorial, BorderLayout.SOUTH);
+
         JPanel centerPanel = new JPanel(new BorderLayout());
         centerPanel.add(contractPanel, BorderLayout.NORTH);
         centerPanel.add(sectorTabs, BorderLayout.CENTER);
-        centerPanel.add(pnlTutorial, BorderLayout.SOUTH);
+        centerPanel.add(centerFooter, BorderLayout.SOUTH);
 
         this.add(centerPanel, BorderLayout.CENTER);
 
@@ -207,8 +214,6 @@ public class StratConTab extends CampaignGuiTab {
         infoScrollPane.setMaximumSize(new Dimension(UIUtil.scaleForGUI(UIUtil.scaleForGUI(600),
               infoScrollPane.getHeight())));
         this.add(infoScrollPane, BorderLayout.EAST);
-
-        this.add(initializeGmButtonPanel(), BorderLayout.SOUTH);
 
         repopulateContractsAndSectors();
     }
@@ -279,10 +284,14 @@ public class StratConTab extends CampaignGuiTab {
     }
 
     /**
-     * Worker function that builds the GM sector-tool button bar shown along the bottom of the tab. The buttons are
-     * enabled only for a GM (kept in sync by {@link #updateCampaignState()}).
+     * Worker function that builds the GM sector-tool button bar shown beneath the sector pane. The buttons are enabled
+     * only for a GM (kept in sync by {@link #updateCampaignState()}).
      *
-     * @return the bottom button bar
+     * <p><b>Call this exactly once.</b> Each call builds a fresh set of buttons and reassigns the fields that track
+     * them, so a second call renders a second bar and leaves the first one's buttons orphaned - still visible, but no
+     * longer reachable by the GM-mode enabling.</p>
+     *
+     * @return the button bar
      */
     private JPanel initializeGmButtonPanel() {
         boolean isGM = getCampaignGui().getCampaign().isGM();

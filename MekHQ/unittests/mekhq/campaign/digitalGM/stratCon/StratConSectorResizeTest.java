@@ -35,16 +35,20 @@ package mekhq.campaign.digitalGM.stratCon;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer.ResizeImpact;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -74,9 +78,29 @@ class StratConSectorResizeTest {
         return campaign;
     }
 
-    /** A contract on a world held by neither party, so no facility is folded into the road network. */
+    /** A campaign with improved sizing on, which is what enables shape profiles (and so the regeneration re-roll). */
+    private static Campaign improvedCampaign() {
+        CampaignOptions options = mock(CampaignOptions.class);
+        when(options.isUseStratConAlternateSectorCount()).thenReturn(true);
+
+        Campaign campaign = mock(Campaign.class);
+        when(campaign.getCampaignOptions()).thenReturn(options);
+        when(campaign.getLocalDate()).thenReturn(LocalDate.of(3151, 1, 1));
+        return campaign;
+    }
+
+    /**
+     * A contract on a world held by neither party, so no facility is folded into the road network. The factions are
+     * stubbed because regeneration consults them for the Ares Conventions before it generates anything.
+     */
     private static AtBContract contract() {
-        return mock(AtBContract.class);
+        Faction faction = mock(Faction.class);
+        when(faction.isAresConventionsSignatory(anyInt())).thenReturn(false);
+
+        AtBContract contract = mock(AtBContract.class);
+        when(contract.getEmployerFaction()).thenReturn(faction);
+        when(contract.getEnemy()).thenReturn(faction);
+        return contract;
     }
 
     private static boolean resize(StratConTrackState track, int width, int height) {
@@ -130,6 +154,35 @@ class StratConSectorResizeTest {
             assertFalse(track.isOutOfBounds(coords), "scenario left outside the sector at " + coords);
         }
         assertEquals(4, track.getFacilities().size(), "no facility should have been lost");
+    }
+
+    @Test
+    void regeneration_reRollsTheSectorShape() {
+        // Regeneration used to leave width and height exactly as the contract first set them, so every regenerate
+        // handed back the same proportions. It now re-rolls the shape while preserving the sector's area.
+        Set<String> shapes = new HashSet<>();
+        for (int roll = 0; roll < 60; roll++) {
+            StratConTrackState track = track(12, 12);
+            StratConContractInitializer.regenerateTrack(track, contract(), improvedCampaign());
+            shapes.add(track.getWidth() + "x" + track.getHeight());
+        }
+
+        assertTrue(shapes.size() > 1, "regeneration always produced the same shape: " + shapes);
+    }
+
+    @Test
+    void regeneration_keepsRoughlyTheSameAmountOfSector() {
+        // Re-rolling the shape must not quietly grow or shrink the sector: regeneration changes the terrain and
+        // climate, not how much ground there is to fight over.
+        for (int roll = 0; roll < 30; roll++) {
+            StratConTrackState track = track(12, 12);
+            StratConContractInitializer.regenerateTrack(track, contract(), improvedCampaign());
+
+            int area = track.getSize();
+            assertTrue((area >= (144 * 0.7)) && (area <= (144 * 1.3)),
+                  "regeneration changed the sector's area to " + area + " (" + track.getWidth() + 'x' +
+                        track.getHeight() + ')');
+        }
     }
 
     @Test
