@@ -42,6 +42,7 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationType;
 import mekhq.campaign.unit.Unit;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Utility class responsible for inserting support units into a campaign's TOE.
@@ -106,15 +107,43 @@ public class AddSupportUnitsToTOE {
      */
     private static void createSubFormation(Campaign campaign, String label, FormationType type,
           List<Unit> units, Formation hqFormation) {
-        Formation subFormation = new Formation(label);
-        campaign.addFormation(subFormation, hqFormation); // needs to be before we add units
-
-        subFormation.setFormationType(type, true); //subtype propagation is largely irrelevant
+        // Reuse an existing sub-formation of this label under the HQ, so a top-up generation (for
+        // example one more canteen when support is regenerated against a grown force) lands in the
+        // existing formation rather than creating a duplicate alongside it.
+        Formation subFormation = findChildFormationByName(campaign, hqFormation, label);
+        if (subFormation == null) {
+            subFormation = new Formation(label);
+            campaign.addFormation(subFormation, hqFormation); // needs to be before we add units
+            subFormation.setFormationType(type, true); //subtype propagation is largely irrelevant
+        }
 
         int subFormationId = subFormation.getId();
         for (Unit unit : units) {
             campaign.addUnitToFormation(unit, subFormationId);
         }
+    }
+
+    /**
+     * Finds the child {@link Formation} of {@code parent} whose name matches {@code label}
+     * (case-insensitive), or {@code null} if none exists. Used to reuse an existing support
+     * sub-formation instead of creating a duplicate on a top-up generation.
+     *
+     * @param campaign the campaign whose formations are searched
+     * @param parent   the formation whose children are considered
+     * @param label    the sub-formation label to match
+     *
+     * @return the matching child formation, or {@code null}
+     */
+    private static @Nullable Formation findChildFormationByName(Campaign campaign, Formation parent,
+          String label) {
+        for (Formation formation : campaign.getAllFormations()) {
+            Formation formationParent = formation.getParentFormation();
+            if (formationParent != null && formationParent.getId() == parent.getId()
+                      && formation.getName().equalsIgnoreCase(label)) {
+                return formation;
+            }
+        }
+        return null;
     }
 
     /**
