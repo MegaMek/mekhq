@@ -41,6 +41,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -290,7 +291,31 @@ public final class TOETab extends CampaignGuiTab {
 
     public void refreshOrganization() {
         SwingUtilities.invokeLater(() -> {
+            // Preserve the tree's expansion and selection across the refresh so adding units (for
+            // example committing a generated command) updates the tree in place rather than
+            // collapsing it back to the root. orgTree.updateUI() re-reads the model but resets the
+            // expansion state, so capture the expanded paths first (materialized into a list, since
+            // the live enumeration would be emptied by the reset) and restore them afterward.
+            List<TreePath> expandedPaths = new ArrayList<>();
+            Object root = orgTree.getModel().getRoot();
+            if (root != null) {
+                Enumeration<TreePath> expanded = orgTree.getExpandedDescendants(new TreePath(root));
+                if (expanded != null) {
+                    while (expanded.hasMoreElements()) {
+                        expandedPaths.add(expanded.nextElement());
+                    }
+                }
+            }
+            TreePath selectionPath = orgTree.getSelectionPath();
+
             orgTree.updateUI();
+
+            for (TreePath path : expandedPaths) {
+                orgTree.expandPath(path);
+            }
+            if (selectionPath != null) {
+                orgTree.setSelectionPath(selectionPath);
+            }
             refreshForceView();
         });
     }
