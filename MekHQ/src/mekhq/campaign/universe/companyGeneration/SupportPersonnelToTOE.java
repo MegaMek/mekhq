@@ -58,15 +58,16 @@ import mekhq.campaign.unit.Unit;
  * <p>Support staff (techs, astechs, doctors, medics, administrators) are grouped into three
  * segregated sections - Maintenance, Medical, and Command - under a "Support Command" formation that
  * hangs off the campaign HQ. Each section's personnel become the soldiers of infantry-style carrier
- * units sized to the faction's echelon: Inner Sphere fills platoons (28), then squads (7), then
- * single-person units; Clan fills Points (25), then squads (5), then single-person units. Every
- * carrier - platoons / Points and the smaller squad detachments alike - rolls up into a company (3
- * platoons) or Star (5 Points) formation under its section, so nothing hangs directly off the
- * section, mirroring how the combat force is organized.</p>
+ * units sized to the faction's echelon: Inner Sphere fills platoons (28), then squads (7); Clan fills
+ * Points (25), then squads (5).</p>
  *
  * <p>Carriers hold a single profession: each role (mek tech, astech, doctor, medic, each administrator
  * type) packs into its own carriers, and the last carrier of a role is left understaffed rather than
- * topped up with a different role.</p>
+ * topped up with a different role. Each profession's carriers then gather into a company / Star
+ * formation named for the profession ("MekTech Company"); a profession that yields a single carrier
+ * hangs that lone platoon / squad directly under the section. Capability vehicles (recovery, MASH)
+ * form their own function-named company. So a section reads as a battalion of profession companies,
+ * mirroring how the combat force is organized.</p>
  *
  * <p>The support personnel keep their real duties: assigning a tech as a carrier's soldier records
  * them in the TOE but does not remove them from the maintenance pool, because tech eligibility keys
@@ -86,24 +87,23 @@ public final class SupportPersonnelToTOE {
     private static final String CLAN_POINT_UNIT = "Clan Support Point";
     private static final String CLAN_SQUAD_UNIT = "Clan Support Squad";
 
-    // Echelon sizes (troopers per carrier, and top-tier carriers per roll-up formation).
+    // Echelon sizes (troopers per carrier).
     private static final int IS_PLATOON_SIZE = 28;
     private static final int IS_SQUAD_SIZE = 7;
-    private static final int IS_PLATOONS_PER_COMPANY = 3;
     private static final int CLAN_POINT_SIZE = 25;
     private static final int CLAN_SQUAD_SIZE = 5;
-    private static final int CLAN_POINTS_PER_STAR = 5;
 
     private SupportPersonnelToTOE() {
         // utility class
     }
 
     /**
-     * Immutable per-faction echelon description: the three carrier unit tiers (top / squad / single),
-     * their trooper capacities, and how many top-tier units roll up into one company / Star formation.
+     * Immutable per-faction echelon description: the two carrier unit tiers (platoon / squad) with
+     * their trooper capacities, the roll-up formation label ("Company" / "Star"), and the formation
+     * levels used for the section and its companies.
      */
     record EchelonProfile(String topUnitName, int topUnitSize, String squadUnitName,
-          int squadUnitSize, int topUnitsPerRollup, String rollupLabel,
+          int squadUnitSize, String rollupLabel,
           FormationLevel sectionLevel, FormationLevel rollupLevel) {}
 
     /**
@@ -171,16 +171,15 @@ public final class SupportPersonnelToTOE {
               maintenance.size() + medical.size() + command.size(),
               maintenance.size(), medical.size(), command.size(), useClanStructure);
 
-        // Roll-up formations are named for what the section does (IS "... Company", Clan "... Star").
-        // Command's roll-up is the Headquarters Company; the admin carriers under it stay named by
-        // role (Admin/Command, Admin/Logistical, Admin/Transport, Admin/HR).
-        String echelon = profile.rollupLabel();
+        // Within each section, staff are grouped by profession into companies (e.g. "MekTech Company");
+        // capability vehicles get their own company named for their function ("Recovery",
+        // "Field Hospital"). Command has no capability vehicles, so its label is unused.
         organizeSection(campaign, supportCommand, label("maintenance"), maintenance, profile,
-              useClanStructure, maintenanceVehicles, label("maintenance") + " " + echelon);
+              useClanStructure, maintenanceVehicles, label("recovery"));
         organizeSection(campaign, supportCommand, label("medical"), medical, profile,
-              useClanStructure, medicalVehicles, label("medical") + " " + echelon);
+              useClanStructure, medicalVehicles, label("fieldHospital"));
         organizeSection(campaign, supportCommand, label("command"), command, profile,
-              useClanStructure, List.of(), label("headquarters") + " " + echelon);
+              useClanStructure, List.of(), label("command"));
 
         LOGGER.info("[CompanyGen][SupportTOE] organized support staff: maintenance={} medical={} command={} (clan={})",
               maintenance.size(), medical.size(), command.size(), useClanStructure);
@@ -188,28 +187,28 @@ public final class SupportPersonnelToTOE {
 
     static EchelonProfile innerSphereProfile() {
         return new EchelonProfile(IS_PLATOON_UNIT, IS_PLATOON_SIZE, IS_SQUAD_UNIT, IS_SQUAD_SIZE,
-              IS_PLATOONS_PER_COMPANY, label("company"),
-              FormationLevel.BATTALION, FormationLevel.COMPANY);
+              label("company"), FormationLevel.BATTALION, FormationLevel.COMPANY);
     }
 
     static EchelonProfile clanProfile() {
         return new EchelonProfile(CLAN_POINT_UNIT, CLAN_POINT_SIZE, CLAN_SQUAD_UNIT, CLAN_SQUAD_SIZE,
-              CLAN_POINTS_PER_STAR, label("star"),
-              FormationLevel.BINARY_OR_TRINARY, FormationLevel.STAR_OR_NOVA);
+              label("star"), FormationLevel.BINARY_OR_TRINARY, FormationLevel.STAR_OR_NOVA);
     }
 
     /**
-     * Packs one section's personnel into carrier units and files them under a new section formation.
-     * Each profession (primary role) is packed on its own so a carrier never mixes roles: full
-     * top-tier carriers first, then one right-sized final carrier for the remainder (understaffed if
-     * it does not fill its tier). Every carrier - top-tier platoons / Points and detachment squads
-     * alike - rolls up into a company / Star formation under the section, so nothing hangs directly off
-     * the battalion-level section. Each carrier is fluff-named after the profession it carries (e.g.
-     * "Support Squad - Command").
+     * Packs one section's personnel into carrier units and files them under the section, grouped by
+     * profession. Each profession (primary role) is packed on its own into platoon / squad carriers.
+     * A profession that yields two or more carriers gets its own company named for it (e.g.
+     * "MekTech Company") gathering its platoons and squads; a profession that yields a single carrier
+     * hangs that lone platoon (or squad) directly under the battalion-level section, as a small
+     * detachment that does not warrant a company of its own. The section's capability vehicles
+     * (recovery / MASH), crewed from the front of the staff pool, get their own function-named company
+     * ("Recovery Company", "Field Hospital Company"). Each carrier is fluff-named after the profession
+     * it carries (e.g. "Support Squad - MekTech").
      */
     private static void organizeSection(Campaign campaign, Formation supportCommand, String sectionLabel,
           List<Person> people, EchelonProfile profile, boolean useClanStructure, List<VehicleSpec> vehicles,
-          String companyLabel) {
+          String vehicleCompanyLabel) {
         if (people.isEmpty()) {
             return;
         }
@@ -217,100 +216,55 @@ public final class SupportPersonnelToTOE {
         Formation section = createFormation(campaign, sectionLabel, FormationType.SUPPORT, supportCommand,
               profile.sectionLevel());
 
-        // Crew this section's capability vehicles from the front of its staff pool, then pack whoever
-        // is left into carriers. This keeps the vehicle's crew from being double-generated.
+        // Capability vehicles get their own company under the section, crewed from the front of the
+        // staff pool so their crew is not double-generated.
         List<Person> pool = new ArrayList<>(people);
         int consumed = 0;
-        for (VehicleSpec vehicle : vehicles) {
-            consumed += addCapabilityVehicles(campaign, section, vehicle, pool, consumed);
+        if (!vehicles.isEmpty()) {
+            Formation vehicleCompany = createFormation(campaign,
+                  vehicleCompanyLabel + " " + profile.rollupLabel(),
+                  FormationType.SUPPORT, section, profile.rollupLevel());
+            for (VehicleSpec vehicle : vehicles) {
+                consumed += addCapabilityVehicles(campaign, vehicleCompany, vehicle, pool, consumed);
+            }
         }
         List<Person> remaining = pool.subList(consumed, pool.size());
 
-        // Every section packs one profession per carrier, so carriers group and are named by role.
-        List<CarrierSpec> packed = packByProfession(remaining, profile, useClanStructure);
-
-        List<CarrierSpec> topTierCarriers = new ArrayList<>();
-        List<CarrierSpec> detachmentCarriers = new ArrayList<>();
-        for (CarrierSpec spec : packed) {
-            (spec.topTier() ? topTierCarriers : detachmentCarriers).add(spec);
+        // Group each profession's carriers into its own company named for the profession. A profession
+        // that produces just one carrier hangs that lone platoon/squad directly under the section.
+        Map<String, List<CarrierSpec>> carriersByProfession = new LinkedHashMap<>();
+        for (CarrierSpec spec : packByProfession(remaining, profile, useClanStructure)) {
+            carriersByProfession.computeIfAbsent(spec.professionLabel(), key -> new ArrayList<>()).add(spec);
         }
-        LOGGER.info("[CompanyGen][SupportTOE]   section '{}': {} staff, {} crewed onto vehicles, packed into {} top-tier + {} detachment carrier(s); all roll up into companies under the section",
-              sectionLabel, people.size(), consumed, topTierCarriers.size(), detachmentCarriers.size());
 
-        // Roll every carrier up into company / Star formations under the section so nothing sits
-        // directly on the battalion-level section - a battalion holds companies, not loose units.
-        // Top-tier platoons / Points fill their companies first, then detachment squads continue into
-        // their own companies (kept apart for clarity). Companies are numbered only when the section
-        // has more than one.
-        int totalCompanies = ceilDiv(topTierCarriers.size(), profile.topUnitsPerRollup())
-              + ceilDiv(detachmentCarriers.size(), profile.topUnitsPerRollup());
-        boolean numberCompanies = totalCompanies > 1;
-        int companyIndex = fileCarriersIntoCompanies(campaign, section, topTierCarriers, profile,
-              companyLabel, numberCompanies, 0);
-        fileCarriersIntoCompanies(campaign, section, detachmentCarriers, profile, companyLabel,
-              numberCompanies, companyIndex);
-
-        LOGGER.info("[CompanyGen][SupportTOE] {}: {} staff, {} crewed onto vehicles, {} company(ies), carriers=[{}]",
-              sectionLabel, people.size(), consumed, totalCompanies,
-              summarizeCarriers(topTierCarriers, detachmentCarriers));
-    }
-
-    /**
-     * Files {@code carriers} into company / Star formations under {@code section}, up to
-     * {@link EchelonProfile#topUnitsPerRollup()} carriers per company, so no carrier hangs directly off
-     * the battalion-level section. Companies are numbered from {@code startIndex + 1}; numbering is
-     * suppressed when {@code numberCompanies} is {@code false} (a single company for the whole section
-     * reads better without a trailing "1").
-     *
-     * @param campaign        the campaign that owns the TOE
-     * @param section         the section formation the companies hang under
-     * @param carriers        the carriers to file (may be empty, in which case no company is created)
-     * @param profile         the echelon profile supplying the company size and formation level
-     * @param companyLabel    the base company / Star name
-     * @param numberCompanies {@code true} to append a running number to each company name
-     * @param startIndex      the zero-based index of the first company created here
-     *
-     * @return the next company index after the ones created here
-     */
-    private static int fileCarriersIntoCompanies(Campaign campaign, Formation section,
-          List<CarrierSpec> carriers, EchelonProfile profile, String companyLabel,
-          boolean numberCompanies, int startIndex) {
-        int companyIndex = startIndex;
-        int placed = 0;
-        int companies = ceilDiv(carriers.size(), profile.topUnitsPerRollup());
-        for (int companyOffset = 0; companyOffset < companies; companyOffset++) {
-            String rollupName = numberCompanies ? companyLabel + " " + (companyIndex + 1) : companyLabel;
-            Formation rollup = createFormation(campaign, rollupName, FormationType.SUPPORT, section,
-                  profile.rollupLevel());
-            int inThisCompany = Math.min(profile.topUnitsPerRollup(), carriers.size() - placed);
-            for (int unitIndex = 0; unitIndex < inThisCompany; unitIndex++) {
-                fileCarrier(campaign, rollup, carriers.get(placed));
-                placed++;
+        int professionCompanies = 0;
+        int loneCarriers = 0;
+        for (Map.Entry<String, List<CarrierSpec>> entry : carriersByProfession.entrySet()) {
+            List<CarrierSpec> carriers = entry.getValue();
+            if (carriers.size() == 1) {
+                fileCarrier(campaign, section, carriers.get(0));
+                loneCarriers++;
+                continue;
             }
-            companyIndex++;
+            Formation company = createFormation(campaign, entry.getKey() + " " + profile.rollupLabel(),
+                  FormationType.SUPPORT, section, profile.rollupLevel());
+            for (CarrierSpec spec : carriers) {
+                fileCarrier(campaign, company, spec);
+            }
+            professionCompanies++;
         }
-        return companyIndex;
-    }
 
-    /** Renders the section's carriers as "profession unitName(crew)" entries for the generation log. */
-    private static String summarizeCarriers(List<CarrierSpec> topTierCarriers, List<CarrierSpec> detachmentCarriers) {
-        List<String> parts = new ArrayList<>();
-        for (CarrierSpec spec : topTierCarriers) {
-            parts.add(spec.professionLabel() + " " + spec.unitName() + "(" + spec.crew().size() + ")");
-        }
-        for (CarrierSpec spec : detachmentCarriers) {
-            parts.add(spec.professionLabel() + " " + spec.unitName() + "(" + spec.crew().size() + ")");
-        }
-        return String.join(", ", parts);
+        LOGGER.info("[CompanyGen][SupportTOE] {}: {} staff, {} crewed onto vehicles, {} profession company(ies), {} lone carrier(s) under the section",
+              sectionLabel, people.size(), consumed, professionCompanies, loneCarriers);
     }
 
     /**
-     * Creates each of {@code vehicle}'s crewless copies, crews it from the section pool starting at
+     * Creates each of {@code vehicle}'s crewless copies, crews it from the staff pool starting at
      * {@code startIndex} (up to the vehicle's full crew size, understaffed if the pool runs out), and
-     * files it under the section. Returns the number of people consumed as crew. Stops early once the
-     * pool is exhausted.
+     * files it under {@code parent} (the section's capability-vehicle company). Returns the number of
+     * people consumed as crew. Stops early once the pool is exhausted.
      */
-    private static int addCapabilityVehicles(Campaign campaign, Formation section, VehicleSpec vehicle,
+    private static int addCapabilityVehicles(Campaign campaign, Formation parent, VehicleSpec vehicle,
           List<Person> pool, int startIndex) {
         MekSummary mekSummary = MekSummaryCache.getInstance().getMek(vehicle.unitName());
         if (mekSummary == null) {
@@ -330,9 +284,9 @@ public final class SupportPersonnelToTOE {
                     unit.addPilotOrSoldier(pool.get(startIndex + consumed + crewIndex));
                 }
                 consumed += crewSize;
-                campaign.addUnitToFormation(unit, section.getId());
-                LOGGER.info("[CompanyGen][SupportTOE]   {} vehicle '{}' crewed with {}/{} staff",
-                      section.getName(), vehicle.unitName(), crewSize, crewNeeded);
+                campaign.addUnitToFormation(unit, parent.getId());
+                LOGGER.info("[CompanyGen][SupportTOE]     {} vehicle '{}' unitId={} crewed with {}/{} staff",
+                      parent.getName(), vehicle.unitName(), unit.getId(), crewSize, crewNeeded);
             } catch (Exception exception) {
                 LOGGER.error(exception, "Unable to load capability vehicle {}: {}", vehicle.unitName(),
                       mekSummary.getSourceFile());
@@ -515,10 +469,6 @@ public final class SupportPersonnelToTOE {
               name, formation.getId(), type, level, parent == null ? "null" : parent.getName(),
               parent == null ? -1 : parent.getId());
         return formation;
-    }
-
-    private static int ceilDiv(int dividend, int divisor) {
-        return (dividend + divisor - 1) / divisor;
     }
 
     private static String label(String key) {
