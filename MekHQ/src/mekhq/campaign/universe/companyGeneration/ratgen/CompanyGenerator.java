@@ -33,7 +33,9 @@
 package mekhq.campaign.universe.companyGeneration.ratgen;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -525,7 +527,53 @@ public final class CompanyGenerator {
         LOGGER.info("[CompanyGen][Pipeline]Stage 7e: applying formation icons to support formations");
         FormationIconBuilder.applyIcons(campaign.getFormations(), campaign, options);
 
+        logOrphanAudit(campaign);
+
         return supportResult.generatedPersons();
+    }
+
+    /**
+     * Post-generation diagnostic that finds members which never made it into the TOE, so a playtest
+     * can locate them from megamek.log alone. Logs every hangar unit not attached to any formation (an
+     * orphan unit, with its crew) and every active person not assigned to a unit (summarized by role,
+     * since many - pooled astechs, unassigned admins - are legitimately unit-less). Purely diagnostic;
+     * it mutates no state.
+     *
+     * @param campaign the campaign whose hangar and roster are audited
+     */
+    private static void logOrphanAudit(Campaign campaign) {
+        List<Unit> orphanUnits = new ArrayList<>();
+        for (Unit unit : campaign.getUnits()) {
+            if (unit.getFormationId() == Formation.FORMATION_NONE) {
+                orphanUnits.add(unit);
+            }
+        }
+
+        Map<PersonnelRole, Integer> unitlessByRole = new EnumMap<>(PersonnelRole.class);
+        int unitlessCount = 0;
+        for (Person person : campaign.getActivePersonnel(false, false)) {
+            if (person.getUnit() == null) {
+                unitlessByRole.merge(person.getPrimaryRole(), 1, Integer::sum);
+                unitlessCount++;
+            }
+        }
+
+        LOGGER.info("[CompanyGen][OrphanAudit] {} unit(s) not in any formation; {} active person(s) not assigned to a unit",
+              orphanUnits.size(), unitlessCount);
+
+        for (Unit orphanUnit : orphanUnits) {
+            List<String> crewNames = new ArrayList<>();
+            for (Person crew : orphanUnit.getCrew()) {
+                crewNames.add(crew.getFullName());
+            }
+            LOGGER.warn("[CompanyGen][OrphanAudit]   ORPHAN UNIT '{}' (id={}) attached to NO formation; crew=[{}]",
+                  orphanUnit.getName(), orphanUnit.getId(),
+                  crewNames.isEmpty() ? "none" : String.join(", ", crewNames));
+        }
+        if (!unitlessByRole.isEmpty()) {
+            LOGGER.info("[CompanyGen][OrphanAudit]   unit-less active personnel by role (in the roster, not the TOE): {}",
+                  unitlessByRole);
+        }
     }
 
     /**
