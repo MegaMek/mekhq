@@ -59,9 +59,10 @@ import mekhq.campaign.unit.Unit;
  * segregated sections - Maintenance, Medical, and Command - under a "Support Command" formation that
  * hangs off the campaign HQ. Each section's personnel become the soldiers of infantry-style carrier
  * units sized to the faction's echelon: Inner Sphere fills platoons (28), then squads (7), then
- * single-person units; Clan fills Points (25), then squads (5), then single-person units. Top-tier
- * units (platoons / Points) roll up into companies (3 platoons) or Stars (5 Points), mirroring how
- * the combat force is organized.</p>
+ * single-person units; Clan fills Points (25), then squads (5), then single-person units. Every
+ * carrier - platoons / Points and the smaller squad detachments alike - rolls up into a company (3
+ * platoons) or Star (5 Points) formation under its section, so nothing hangs directly off the
+ * section, mirroring how the combat force is organized.</p>
  *
  * <p>Carriers hold a single profession: each role (mek tech, astech, doctor, medic, each administrator
  * type) packs into its own carriers, and the last carrier of a role is left understaffed rather than
@@ -201,9 +202,10 @@ public final class SupportPersonnelToTOE {
      * Packs one section's personnel into carrier units and files them under a new section formation.
      * Each profession (primary role) is packed on its own so a carrier never mixes roles: full
      * top-tier carriers first, then one right-sized final carrier for the remainder (understaffed if
-     * it does not fill its tier). Top-tier carriers across the section roll up into company / Star
-     * formations; squad and single-person carriers hang off the section as detachments. Each carrier
-     * is fluff-named after the profession it carries (e.g. "Support Squad - Command").
+     * it does not fill its tier). Every carrier - top-tier platoons / Points and detachment squads
+     * alike - rolls up into a company / Star formation under the section, so nothing hangs directly off
+     * the battalion-level section. Each carrier is fluff-named after the profession it carries (e.g.
+     * "Support Squad - Command").
      */
     private static void organizeSection(Campaign campaign, Formation supportCommand, String sectionLabel,
           List<Person> people, EchelonProfile profile, boolean useClanStructure, List<VehicleSpec> vehicles,
@@ -232,33 +234,62 @@ public final class SupportPersonnelToTOE {
         for (CarrierSpec spec : packed) {
             (spec.topTier() ? topTierCarriers : detachmentCarriers).add(spec);
         }
-        LOGGER.info("[CompanyGen][SupportTOE]   section '{}': {} staff, {} crewed onto vehicles, packed into {} top-tier + {} detachment carrier(s); detachments hang directly off the section",
+        LOGGER.info("[CompanyGen][SupportTOE]   section '{}': {} staff, {} crewed onto vehicles, packed into {} top-tier + {} detachment carrier(s); all roll up into companies under the section",
               sectionLabel, people.size(), consumed, topTierCarriers.size(), detachmentCarriers.size());
 
-        // Top-tier carriers (platoons / Points) roll up into a function-named company / Star formation
-        // (e.g. "Headquarters Company", "Maintenance Company"), numbered only when there is more than
-        // one.
+        // Roll every carrier up into company / Star formations under the section so nothing sits
+        // directly on the battalion-level section - a battalion holds companies, not loose units.
+        // Top-tier platoons / Points fill their companies first, then detachment squads continue into
+        // their own companies (kept apart for clarity). Companies are numbered only when the section
+        // has more than one.
+        int totalCompanies = ceilDiv(topTierCarriers.size(), profile.topUnitsPerRollup())
+              + ceilDiv(detachmentCarriers.size(), profile.topUnitsPerRollup());
+        boolean numberCompanies = totalCompanies > 1;
+        int companyIndex = fileCarriersIntoCompanies(campaign, section, topTierCarriers, profile,
+              companyLabel, numberCompanies, 0);
+        fileCarriersIntoCompanies(campaign, section, detachmentCarriers, profile, companyLabel,
+              numberCompanies, companyIndex);
+
+        LOGGER.info("[CompanyGen][SupportTOE] {}: {} staff, {} crewed onto vehicles, {} company(ies), carriers=[{}]",
+              sectionLabel, people.size(), consumed, totalCompanies,
+              summarizeCarriers(topTierCarriers, detachmentCarriers));
+    }
+
+    /**
+     * Files {@code carriers} into company / Star formations under {@code section}, up to
+     * {@link EchelonProfile#topUnitsPerRollup()} carriers per company, so no carrier hangs directly off
+     * the battalion-level section. Companies are numbered from {@code startIndex + 1}; numbering is
+     * suppressed when {@code numberCompanies} is {@code false} (a single company for the whole section
+     * reads better without a trailing "1").
+     *
+     * @param campaign        the campaign that owns the TOE
+     * @param section         the section formation the companies hang under
+     * @param carriers        the carriers to file (may be empty, in which case no company is created)
+     * @param profile         the echelon profile supplying the company size and formation level
+     * @param companyLabel    the base company / Star name
+     * @param numberCompanies {@code true} to append a running number to each company name
+     * @param startIndex      the zero-based index of the first company created here
+     *
+     * @return the next company index after the ones created here
+     */
+    private static int fileCarriersIntoCompanies(Campaign campaign, Formation section,
+          List<CarrierSpec> carriers, EchelonProfile profile, String companyLabel,
+          boolean numberCompanies, int startIndex) {
+        int companyIndex = startIndex;
         int placed = 0;
-        int rollupFormations = ceilDiv(topTierCarriers.size(), profile.topUnitsPerRollup());
-        for (int rollupIndex = 0; rollupIndex < rollupFormations; rollupIndex++) {
-            String rollupName = rollupFormations > 1 ? companyLabel + " " + (rollupIndex + 1) : companyLabel;
-            Formation rollup = createFormation(campaign, rollupName,
-                  FormationType.SUPPORT, section, profile.rollupLevel());
-            int inThisRollup = Math.min(profile.topUnitsPerRollup(), topTierCarriers.size() - placed);
-            for (int unitIndex = 0; unitIndex < inThisRollup; unitIndex++) {
-                fileCarrier(campaign, rollup, topTierCarriers.get(placed));
+        int companies = ceilDiv(carriers.size(), profile.topUnitsPerRollup());
+        for (int companyOffset = 0; companyOffset < companies; companyOffset++) {
+            String rollupName = numberCompanies ? companyLabel + " " + (companyIndex + 1) : companyLabel;
+            Formation rollup = createFormation(campaign, rollupName, FormationType.SUPPORT, section,
+                  profile.rollupLevel());
+            int inThisCompany = Math.min(profile.topUnitsPerRollup(), carriers.size() - placed);
+            for (int unitIndex = 0; unitIndex < inThisCompany; unitIndex++) {
+                fileCarrier(campaign, rollup, carriers.get(placed));
                 placed++;
             }
+            companyIndex++;
         }
-
-        // Squad and single-person carriers hang directly off the section as detachments.
-        for (CarrierSpec spec : detachmentCarriers) {
-            fileCarrier(campaign, section, spec);
-        }
-
-        LOGGER.info("[CompanyGen][SupportTOE] {}: {} staff, {} crewed onto vehicles, {} rollup(s), carriers=[{}]",
-              sectionLabel, people.size(), consumed, rollupFormations,
-              summarizeCarriers(topTierCarriers, detachmentCarriers));
+        return companyIndex;
     }
 
     /** Renders the section's carriers as "profession unitName(crew)" entries for the generation log. */
