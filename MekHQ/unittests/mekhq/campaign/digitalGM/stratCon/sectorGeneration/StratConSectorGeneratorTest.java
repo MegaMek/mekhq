@@ -35,6 +35,7 @@ package mekhq.campaign.digitalGM.stratCon.sectorGeneration;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashSet;
@@ -44,6 +45,8 @@ import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConTestData;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
+import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorGenerator.GenerationStage;
+import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorGenerator.PipelineOrder;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -139,5 +142,62 @@ class StratConSectorGeneratorTest {
         }
 
         assertTrue(anyOcean);
+    }
+
+    @Test
+    void pipelineOrder_rejectsTerrainFieldsBeforeTheGroundItMeasures() {
+        // Terrain fields measure distance to water and to relief, so computing them first would silently produce a
+        // sector whose terrain ignores its own geography rather than failing.
+        PipelineOrder order = new PipelineOrder();
+        order.enter(GenerationStage.BIOME);
+        order.enter(GenerationStage.OCEANS);
+
+        IllegalStateException thrown = assertThrows(IllegalStateException.class,
+              () -> order.enter(GenerationStage.TERRAIN_FIELDS),
+              "terrain fields should not be computable before mountains are placed");
+        assertTrue(thrown.getMessage().contains("MOUNTAINS"), "the failure should name the missing stage");
+    }
+
+    @Test
+    void pipelineOrder_rejectsRoadsBeforeTheSettlementTheyConnect() {
+        PipelineOrder order = new PipelineOrder();
+        order.enter(GenerationStage.BIOME);
+        order.enter(GenerationStage.OCEANS);
+        order.enter(GenerationStage.MOUNTAINS);
+        order.enter(GenerationStage.TERRAIN_FIELDS);
+        order.enter(GenerationStage.TERRAIN_FILL);
+
+        assertThrows(IllegalStateException.class,
+              () -> order.enter(GenerationStage.ROADS),
+              "roads should not be laid before the cities and farmland they connect");
+    }
+
+    @Test
+    void pipelineOrder_treatsSuppressedCitiesAsSatisfied() {
+        // A sector under the Ares Conventions places no cities, and roads still run over it legitimately - what they
+        // must not do is run before cities that were going to be placed.
+        PipelineOrder order = new PipelineOrder();
+        order.enter(GenerationStage.BIOME);
+        order.enter(GenerationStage.OCEANS);
+        order.enter(GenerationStage.MOUNTAINS);
+        order.enter(GenerationStage.TERRAIN_FIELDS);
+        order.enter(GenerationStage.TERRAIN_FILL);
+        order.skip(GenerationStage.CITIES);
+        order.skip(GenerationStage.FARMLAND);
+
+        assertDoesNotThrow(() -> order.enter(GenerationStage.ROADS));
+        assertTrue(order.hasReached(GenerationStage.ROADS));
+    }
+
+    @Test
+    void pipelineOrder_acceptsTheOrderGenerateActuallyUses() {
+        // Pins the declared order against the real one: if generate() is reordered, one of these two fails.
+        PipelineOrder order = new PipelineOrder();
+
+        assertDoesNotThrow(() -> {
+            for (GenerationStage stage : GenerationStage.values()) {
+                order.enter(stage);
+            }
+        }, "the stages in declaration order should satisfy their own prerequisites");
     }
 }

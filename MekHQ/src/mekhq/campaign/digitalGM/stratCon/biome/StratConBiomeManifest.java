@@ -55,6 +55,31 @@ import mekhq.MHQConstants;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.utilities.MHQXMLUtility;
 
+/**
+ * The authored catalogue of StratCon terrain, loaded once from {@code StratConBiomeManifest.xml} and reachable through
+ * {@link #getInstance()}. Everything the sector generator and the sector map know about terrain comes from here; no
+ * terrain name is hard-coded in the generation code.
+ *
+ * <p>It carries four things:</p>
+ * <ul>
+ *     <li><b>Biomes</b> &mdash; temperature-keyed buckets ({@link #TERRAN_BIOME}, {@link #AIRLESS_BIOME} and their
+ *     facility variants). {@link #getTempMap} returns a bucket as a floor-lookup map, so a sector's temperature
+ *     selects the palette of terrain that can appear in it.</li>
+ *     <li><b>Terrain types</b> &mdash; each terrain's {@link StratConTerrainCategory}, whether it is arable, and its
+ *     temperature offset. The static {@code isOceanTerrain}/{@code isMountainTerrain}/... helpers are category tests
+ *     against this list, and are how the placers ask what a hex is without matching on names.</li>
+ *     <li><b>Map pools</b> &mdash; the mapgen boards a scenario may draw from. {@link #getMapTypesForTerrain} resolves
+ *     a terrain's own pool first and falls back to its category pool, then to {@code NEUTRAL};
+ *     {@link #getFacilityPoolKey} gives the separate pool a base on that terrain fights on.</li>
+ *     <li><b>Images</b> &mdash; the tile and facility sprites the sector map renders, selected by
+ *     {@link ImageType}.</li>
+ * </ul>
+ *
+ * <p>The file lives in mm-data and is staged into {@code data} when the application launches, so it is absent under
+ * test; see {@code StratConTestData} for the fixture seam. A failed load is logged and quietly replaced by a stub of
+ * one all-temperatures biome holding nothing but grasslands, so the symptom is uniformly bland sectors rather than an
+ * exception.</p>
+ */
 @XmlAccessorType(XmlAccessType.NONE)
 public class StratConBiomeManifest {
     private static final MMLogger logger = MMLogger.create(StratConBiomeManifest.class);
