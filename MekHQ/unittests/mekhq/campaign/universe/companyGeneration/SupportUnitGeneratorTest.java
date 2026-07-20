@@ -40,10 +40,14 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 
+import megamek.common.equipment.EquipmentType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.unit.UnitTestUtilities;
 import mekhq.campaign.universe.companyGeneration.SupportUnitGenerator.SecurityTier;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import testUtilities.MHQTestUtilities;
 
 /**
  * Verifies the force-size scaling that drives the standalone capability vehicles, in particular the
@@ -55,6 +59,23 @@ class SupportUnitGeneratorTest {
 
     /** Each canteen counts as one field kitchen; at the default capacity that feeds 150 personnel. */
     private static final int CANTEEN_COVERAGE = 150;
+
+    @BeforeAll
+    static void initializeTypes() {
+        EquipmentType.initializeTypes();
+    }
+
+    @Test
+    void countGeneratedUnitsNamedMatchesByEntityName() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getLocustLCT1V());
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getLocustLCT1V());
+
+        assertEquals(2, SupportUnitGenerator.countGeneratedUnitsNamed(campaign, "Locust LCT-1V"),
+              "both matching units are counted, so reconciliation subtracts them from the target");
+        assertEquals(0, SupportUnitGenerator.countGeneratedUnitsNamed(campaign,
+              "Sherpa Armored Truck (Mobile Canteen)"), "a support unit not present counts zero");
+    }
 
     @Test
     void exactMultipleFillsWithoutRoundingUp() {

@@ -318,13 +318,39 @@ public final class SupportUnitGenerator {
     }
 
     /**
-     * Loads {@code unitName} once, creates {@code count} crewed copies, optionally assigns ranks, and
-     * files the batch into {@code formationType}. A missing unit entry or an unloadable entity is
-     * logged and skipped rather than aborting the whole batch.
+     * Counts the campaign units whose entity matches {@code unitName}. Used to reconcile support-vehicle
+     * generation against what a command already fields, so re-running support (for example after adding
+     * combat forces) tops up only the shortfall instead of duplicating existing support.
+     *
+     * @param campaign the campaign to inspect
+     * @param unitName the support unit name to match (as loaded from the unit cache)
+     *
+     * @return the number of matching units currently in the campaign
+     */
+    static int countGeneratedUnitsNamed(Campaign campaign, String unitName) {
+        int matches = 0;
+        for (Unit unit : campaign.getUnits()) {
+            Entity entity = unit.getEntity();
+            if (entity != null && unitName.equals(entity.getShortNameRaw())) {
+                matches++;
+            }
+        }
+        return matches;
+    }
+
+    /**
+     * Ensures the campaign fields {@code targetCount} of {@code unitName}, generating only the shortfall
+     * beyond what already exists (see {@link #countGeneratedUnitsNamed}). Each fresh copy is loaded
+     * crewed, optionally rank-assigned, and filed into {@code formationType}. A missing unit entry or an
+     * unloadable entity is logged and skipped rather than aborting the whole batch.
      */
     private static void generate(Campaign campaign, Faction faction, boolean autoAssignRanks, String unitName,
-          int count, SupportTOEFormationTypes formationType) {
+          int targetCount, SupportTOEFormationTypes formationType) {
+        int existing = countGeneratedUnitsNamed(campaign, unitName);
+        int count = Math.max(0, targetCount - existing);
         if (count <= 0) {
+            LOGGER.info("[CompanyGen][SupportUnits] {}: target {} x '{}' already met ({} present) -> generating 0",
+                  formationType.name(), targetCount, unitName, existing);
             return;
         }
 
@@ -354,7 +380,7 @@ public final class SupportUnitGenerator {
         if (!units.isEmpty()) {
             AddSupportUnitsToTOE.addSupportUnitsToTOE(campaign, units, formationType);
         }
-        LOGGER.info("[CompanyGen][SupportUnits] {}: generated {}/{} x '{}'",
-              formationType.name(), units.size(), count, unitName);
+        LOGGER.info("[CompanyGen][SupportUnits] {}: generated {}/{} new x '{}' ({} already present, target {})",
+              formationType.name(), units.size(), count, unitName, existing, targetCount);
     }
 }
