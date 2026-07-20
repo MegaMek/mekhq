@@ -39,18 +39,23 @@ import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.gui.companyGeneration.components.CompanyGenerationUtilities.getCompanyGenerationResourceBundle;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import javax.swing.BorderFactory;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.SwingWorker;
+import javax.swing.UIManager;
 
 import megamek.client.ratgenerator.ForceDescriptor;
 import megamek.client.ratgenerator.Ruleset;
@@ -149,7 +154,21 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
         pane.getSparesTab().loadValuesFromOptions(startingOptions);
         pane.getOtherTab().loadValuesFromOptions(startingOptions);
 
-        return new FastJScrollPane(pane);
+        // Persistent design-stage banner so the player always knows this workspace is a draft: nothing
+        // reaches the campaign until "Accept & Build Command". Text-only with a bottom separator (no
+        // background fill) so it reads cleanly under both the light and Darcula look-and-feels.
+        JPanel content = new JPanel(new BorderLayout());
+        JLabel designBanner = new JLabel(resources.getString("CompanyGenerationDialog.banner.text"));
+        Color separatorColor = UIManager.getColor("Separator.foreground");
+        if (separatorColor == null) {
+            separatorColor = Color.GRAY;
+        }
+        designBanner.setBorder(BorderFactory.createCompoundBorder(
+              BorderFactory.createMatteBorder(0, 0, 1, 0, separatorColor),
+              BorderFactory.createEmptyBorder(6, 10, 6, 10)));
+        content.add(designBanner, BorderLayout.NORTH);
+        content.add(new FastJScrollPane(pane), BorderLayout.CENTER);
+        return content;
     }
 
     @Override
@@ -166,11 +185,13 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
         panel.add(leftButtons, BorderLayout.WEST);
 
         JPanel rightButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 4, 0));
-        rightButtons.add(new MMButton("btnCancel", resources, "Cancel.text",
-              "Cancel.toolTipText", this::cancelActionPerformed));
-        // Preview lives on the Force Generator tab's own Generate button; the dialog commits the
-        // previewed force with Accept.
-        setOkButton(new MMButton("btnAccept", resources, "Accept.text",
+        // "Discard Model" rather than a generic Cancel: the dialog is a design workspace, so closing
+        // it throws away an uncommitted model rather than cancelling a settings edit.
+        rightButtons.add(new MMButton("btnCancel", resources, "CompanyGenerationDialog.btnCancel.text",
+              "CompanyGenerationDialog.btnCancel.toolTipText", this::cancelActionPerformed));
+        // The model is built on the Force Generator tab (its Generate button accumulates rolls);
+        // "Accept & Build Command" is the one action that commits the model to the campaign TOE.
+        setOkButton(new MMButton("btnAccept", resources, "CompanyGenerationDialog.btnAccept.text",
               "CompanyGenerationDialog.btnAccept.toolTipText", this::confirmationActionListener));
         rightButtons.add(getOkButton());
         panel.add(rightButtons, BorderLayout.EAST);
@@ -276,11 +297,9 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
             return;
         }
 
-        // Pre-generation warning. Collects every reason we should give the user one last chance to
-        // cancel — long generation (Brigade+ takes minutes), high Person counts (Regiment+ with
-        // astech/medic Person mode creates hundreds of named Persons) — and shows a single dialog
-        // listing all that apply. One Continue/Cancel decision instead of multiple sequential
-        // popups.
+        // One commit gate: this is the moment the design model becomes real. The confirmation states
+        // what will be built and folds in any resource-cost warnings (long generation, high Person
+        // counts) so the player makes a single Build/Cancel decision.
         //
         // Plain text rather than HTML for the message: an HTML-bearing JOptionPane goes through
         // BasicHTML / BasicTextUI / DefaultCaret on dismissal. When this modal disposes and the
@@ -290,18 +309,17 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
         // long-standing Swing bug). Plain text routes through BasicLabelUI instead and avoids the
         // FlowView code path entirely.
         Integer chosenEchelon = options.getForceDescriptorSnapshot().getEchelon();
-        if (!confirmPreGenerationWarnings(options, chosenEchelon)) {
+        int combatUnitCount = countCombatUnits(previewedForce);
+        if (!confirmBuildCommand(options, chosenEchelon, combatUnitCount)) {
             return;
         }
 
-        // Run the ratgen pipeline on a background thread with a modal progress dialog up front so
-        // the user gets feedback during long generations (Star League Defense Force Armies take
-        // minutes; without a dialog the app appears frozen). The worker's done() handler runs on
-        // the EDT after generation completes and fires the post-gen extras.
-        // Two-phase generation. Phase one commits the previewed combat force to the TOE without
-        // support; on completion the user is asked whether to generate support now. Phase two sizes
-        // support to the committed TOE (topping up rather than duplicating). Each phase runs on a
-        // background thread behind a modal progress dialog.
+        // Build the command in two background phases behind a modal progress dialog (long
+        // generations would otherwise look frozen). Phase one commits the model's combat force to
+        // the TOE without support; phase two sizes support to the committed combat force. Support is
+        // command-creation-only, so - unlike the old interim auto-prompt MVP - it always runs as part
+        // of the build rather than asking again mid-flow. The worker's done() handler runs the
+        // post-gen extras on the EDT.
         LOGGER.info("[CompanyGen][Worker] okAction: starting combat-commit phase (thread={})",
               Thread.currentThread().getName());
         runGenerationPhase("Materializing combat forces...", listener -> {
@@ -311,26 +329,92 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
             return CompanyGenerator.applyToCampaign(getCampaign(), options, previewedForce, listener, false);
         }, combatResult -> {
             if (combatResult == null) {
-                LOGGER.info("[CompanyGen][Worker] combat phase produced no result; skipping support prompt");
+                LOGGER.info("[CompanyGen][Worker] combat phase produced no result; skipping support");
                 return;
             }
             List<Person> generatedPersons = new ArrayList<>(combatResult.generatedPersons());
-            int choice = JOptionPane.showConfirmDialog(getFrame(),
-                  "Combat forces have been added to the TOE.\nGenerate support forces from the TOE now?",
-                  resources.getString("CompanyGenerationDialog.title"), JOptionPane.YES_NO_OPTION);
-            if (choice == JOptionPane.YES_OPTION) {
-                runGenerationPhase("Generating support forces...",
-                      supportListener -> CompanyGenerator.generateSupportFromToe(getCampaign(), options,
-                            supportListener),
-                      supportPersons -> {
-                          generatedPersons.addAll(supportPersons);
-                          applyPostGenerationExtras(options, generatedPersons);
-                      });
-            } else {
-                LOGGER.info("[CompanyGen][Worker] user declined support generation; combat-only commit");
-                applyPostGenerationExtras(options, generatedPersons);
-            }
+            runGenerationPhase("Generating support forces...",
+                  supportListener -> CompanyGenerator.generateSupportFromToe(getCampaign(), options,
+                        supportListener),
+                  supportPersons -> {
+                      generatedPersons.addAll(supportPersons);
+                      applyPostGenerationExtras(options, generatedPersons);
+                  });
         });
+    }
+
+    /**
+     * Counts the included combat units in the design model - the leaves the commit walker will
+     * actually materialize. Mirrors {@code ForceDescriptorWalker}'s commit rule (a leaf is committed
+     * only when it is {@link ForceDescriptor#isIncluded()} and has an {@link ForceDescriptor#getEntity()
+     * entity}), so the confirmation count matches what ends up in the TOE, excluding units the player
+     * struck out in the preview.
+     *
+     * @param descriptor the model (or subtree) to count
+     *
+     * @return the number of included combat-unit leaves under {@code descriptor}
+     */
+    private static int countCombatUnits(ForceDescriptor descriptor) {
+        boolean hasChildren = (descriptor.getSubForces() != null && !descriptor.getSubForces().isEmpty())
+              || (descriptor.getAttached() != null && !descriptor.getAttached().isEmpty());
+        if (!hasChildren) {
+            return (descriptor.isIncluded() && descriptor.getEntity() != null) ? 1 : 0;
+        }
+        int count = 0;
+        if (descriptor.getSubForces() != null) {
+            for (ForceDescriptor child : descriptor.getSubForces()) {
+                count += countCombatUnits(child);
+            }
+        }
+        if (descriptor.getAttached() != null) {
+            for (ForceDescriptor child : descriptor.getAttached()) {
+                count += countCombatUnits(child);
+            }
+        }
+        return count;
+    }
+
+    /**
+     * The commit confirmation - the single point at which the design model becomes part of the
+     * campaign. States what will be built ({@code combatUnitCount} combat units plus generated
+     * support) and appends any applicable resource-cost warnings, then offers a Build / Cancel
+     * choice.
+     *
+     * @param options         the generation options driving the build
+     * @param chosenEchelon   the model's top echelon, used to size the resource-cost warnings, or
+     *                        {@code null} if unknown
+     * @param combatUnitCount the number of combat units that will be committed
+     *
+     * @return {@code true} if the player chose Build, {@code false} if they cancelled
+     */
+    private boolean confirmBuildCommand(CompanyGenerationOptions options, Integer chosenEchelon,
+          int combatUnitCount) {
+        StringBuilder message = new StringBuilder(
+              MessageFormat.format(resources.getString("CompanyGenerationDialog.confirmBuild.text"),
+                    combatUnitCount));
+
+        List<String> warnings = collectPreGenerationWarnings(options, chosenEchelon);
+        if (!warnings.isEmpty()) {
+            message.append("\n\n").append(String.join("\n\n", warnings));
+        }
+
+        Object[] buttonLabels = { resources.getString("CompanyGenerationDialog.confirmBuild.build"),
+                                   resources.getString("Cancel.text") };
+        int choice = JOptionPane.showOptionDialog(getFrame(),
+              message.toString(),
+              resources.getString("CompanyGenerationDialog.confirmBuild.title"),
+              JOptionPane.OK_CANCEL_OPTION,
+              JOptionPane.QUESTION_MESSAGE,
+              null,
+              buttonLabels,
+              buttonLabels[0]);
+        boolean build = (choice == 0);
+        if (!build) {
+            LOGGER.info("[CompanyGen][Worker] user cancelled at build confirmation "
+                        + "(combatUnits={}, echelon={}, astechsAsPersonnel={}, medicsAsPersonnel={})",
+                  combatUnitCount, chosenEchelon, options.isAstechsAsPersonnel(), options.isMedicsAsPersonnel());
+        }
+        return build;
     }
 
     /**
@@ -381,8 +465,8 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
     }
 
     /**
-     * Surfaces the pre-generation warnings that apply to the current options and lets the user
-     * confirm or cancel. Two kinds of warning combine into one dialog:
+     * Collects the resource-cost warnings that apply to the current options, for the build
+     * confirmation to display. Two kinds of warning can apply:
      *
      * <ul>
      *   <li><b>Long generation</b> — echelon ≥ 7 (Brigade / Galaxy / Level V or higher). The
@@ -394,10 +478,9 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
      *       since it bloats the Personnel list and slows generation noticeably.</li>
      * </ul>
      *
-     * @return {@code true} if the user accepted or no warning was needed, {@code false} if the
-     *       user cancelled and generation should abort
+     * @return the applicable warning lines, empty if none apply
      */
-    private boolean confirmPreGenerationWarnings(CompanyGenerationOptions options, Integer chosenEchelon) {
+    private List<String> collectPreGenerationWarnings(CompanyGenerationOptions options, Integer chosenEchelon) {
         List<String> warnings = new ArrayList<>();
 
         if (chosenEchelon != null && chosenEchelon >= 7) {
@@ -417,23 +500,7 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
             }
         }
 
-        if (warnings.isEmpty()) {
-            return true;
-        }
-
-        String message = String.join("\n\n", warnings) + "\n\nContinue?";
-        int choice = JOptionPane.showConfirmDialog(getFrame(),
-              message,
-              "Confirm Force Generation",
-              JOptionPane.OK_CANCEL_OPTION,
-              JOptionPane.WARNING_MESSAGE);
-        if (choice != JOptionPane.OK_OPTION) {
-            LOGGER.info("[CompanyGen][Worker] user cancelled at pre-generation warning "
-                        + "(echelon={}, astechsAsPersonnel={}, medicsAsPersonnel={})",
-                  chosenEchelon, options.isAstechsAsPersonnel(), options.isMedicsAsPersonnel());
-            return false;
-        }
-        return true;
+        return warnings;
     }
 
     /**

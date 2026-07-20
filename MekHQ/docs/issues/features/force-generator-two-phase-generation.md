@@ -1,6 +1,8 @@
 # Force Generator: Command Designer (Model -> Accept & Build)
 
-**Status:** Design approved; ready to implement.
+**Status:** Implemented. Model accumulation, the Accept & Build commit flow, and the design-stage UX
+(dialog rename, banner, tree title, status line, empty-state, commit confirmation) are built. Remaining:
+Composition Summary recalculation on remove (backlog item 1) and the two vestigial-UI backlog items.
 **Scope:** MekHQ (Command Designer dialog + generation pipeline) and MegaMek (accumulating preview
 model in the embedded `ForceGeneratorViewUi`). Builds on the include/exclude work already landed on
 `Implement-Force-Generator-in-MekHQ`.
@@ -83,13 +85,15 @@ on each Generate. The Model requires:
 
 ## Build order
 
-1. **Accept side (MekHQ):** wire Accept & Build (confirmation -> `commitCombatForces(Model)` ->
-   `generateSupportFromToe`). Replaces the interim auto-prompt behavior.
-2. **Model side (MegaMek):** accumulate rolls into a Model descriptor + real removal; drive the tree
-   from the Model.
-3. **UX (MekHQ + MegaMek):** rename to Command Designer, banner, tree label, status line, empty-state,
-   button labels, commit confirmation.
-4. Composition Summary recalculation on add/remove.
+1. [DONE] **Accept side (MekHQ):** Accept & Build wired - build confirmation ("Build this command? N
+   combat units plus generated support...") -> combat commit (`applyToCampaign(..., generateSupport=false)`)
+   -> `generateSupportFromToe`, support always generated (command-creation-only). Interim auto-prompt removed.
+2. [DONE] **Model side (MegaMek):** rolls accumulate into a Model descriptor; the include/exclude menu
+   drives removal from the committed set; the tree is driven from the Model.
+3. [DONE] **UX (MekHQ + MegaMek):** renamed to Command Designer, design-stage banner, "Command Model
+   (Design)" tree title, status line ("Model: N unit(s) in M command(s) - not yet committed."),
+   empty-state hint, "Accept & Build Command" / "Discard Model" button labels, Build/Cancel confirmation.
+4. [TODO] Composition Summary recalculation on add/remove (backlog item 1).
 
 ## Superseded
 
