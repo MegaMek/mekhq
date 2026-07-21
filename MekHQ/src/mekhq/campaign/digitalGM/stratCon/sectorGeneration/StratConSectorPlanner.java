@@ -50,13 +50,11 @@ import java.util.List;
  *     <li><b>Legacy</b> (alternate count off): reproduces the historical layout of one sector per three combat teams,
  *     with a final smaller sector for any remainder.</li>
  *     <li><b>Alternate count</b> (alternate count on, condense off): roughly one sector per nine combat teams.</li>
- *     <li><b>Condensed</b> (alternate count and condense on): the alternate count, but capped at ten sectors. A force
- *     that would generate more instead receives ten proportionally larger sectors, so the total mapped area is
- *     preserved.</li>
  * </ul>
  *
- * <p>Condensing is part of the alternate-count system: it has no effect when alternate count is off, since the legacy
- * layout is preserved verbatim in that case.</p>
+ * <p>Condensing caps either layout at {@link #MAXIMUM_SECTORS}. A force that would generate more instead receives ten
+ * proportionally larger sectors, sharing out every team rather than dropping the surplus, so the total mapped area is
+ * preserved.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -77,8 +75,8 @@ public final class StratConSectorPlanner {
      * @param alternateCount           {@code true} to use the alternate one-sector-per-nine-teams count; {@code false}
      *                                 for the legacy one-sector-per-three-teams layout
      * @param condenseSectors          {@code true} to cap the sector count at {@link #MAXIMUM_SECTORS}, sharing the
-     *                                 teams that would have formed further sectors across the ones that remain; only
-     *                                 honored when {@code alternateCount} is {@code true}
+     *                                 teams that would have formed further sectors across the ones that remain;
+     *                                 honored under either count
      *
      * @return a non-empty list of sector specs
      */
@@ -86,17 +84,30 @@ public final class StratConSectorPlanner {
           boolean condenseSectors) {
         return alternateCount ?
                      generateAlternateSpecs(requiredCombatFormations, condenseSectors) :
-                     generateLegacySpecs(requiredCombatFormations);
+                     generateLegacySpecs(requiredCombatFormations, condenseSectors);
     }
 
     /**
      * Reproduces the historical sector layout: one sector per three combat teams, plus a final sector holding any
      * remainder, and a guaranteed minimum of one sector.
+     *
+     * <p>Condensing applies here too. The legacy layout reaches the cap three times sooner than the alternate one - a
+     * thirty-team contract wants ten sectors under legacy against three under alternate - so without this a player who
+     * enabled the cap alone would still be handed dozens of sectors, which is the one thing the option promises not to
+     * do.</p>
      */
-    private static List<SectorSpec> generateLegacySpecs(int requiredCombatFormations) {
+    private static List<SectorSpec> generateLegacySpecs(int requiredCombatFormations, boolean condenseSectors) {
+        int fullSectors = max(0, requiredCombatFormations / NUM_FORMATIONS_PER_TRACK);
+        int naturalSectors = fullSectors + (((requiredCombatFormations % NUM_FORMATIONS_PER_TRACK) > 0) ? 1 : 0);
+
+        if (condenseSectors && (naturalSectors > MAXIMUM_SECTORS)) {
+            // Share every team across the capped count rather than truncating the list, so the contract keeps the
+            // ground it is owed - the same bargain the alternate path strikes.
+            return shareTeamsEvenly(requiredCombatFormations, MAXIMUM_SECTORS);
+        }
+
         List<SectorSpec> specs = new ArrayList<>();
 
-        int fullSectors = max(0, requiredCombatFormations / NUM_FORMATIONS_PER_TRACK);
         for (int index = 0; index < fullSectors; index++) {
             specs.add(new SectorSpec(NUM_FORMATIONS_PER_TRACK, LatitudeBand.random()));
         }

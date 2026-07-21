@@ -100,11 +100,32 @@ class StratConSectorPlannerTest {
     }
 
     @Test
-    void legacy_ignoresCondenseFlag() {
-        // 135 teams would legacy-generate 45 sectors; condense must not cap them when alternate count is off.
+    void legacy_condenseCapsTheSectorCount() {
+        // 135 teams legacy-generate 45 sectors, which the cap must bring down to ten however the count was reached.
+        // The option promises "never more than ten sectors" without qualifying it by the other checkbox.
         List<SectorSpec> specs = generateSectorSpecs(135, false, true);
 
-        assertEquals(45, specs.size());
+        assertEquals(MAXIMUM_SECTORS, specs.size());
+    }
+
+    @Test
+    void legacy_condenseSharesEveryTeamAcrossTheCappedSectors() {
+        // Capping must redistribute rather than truncate: dropping the surplus would quietly cost the contract most of
+        // its ground.
+        List<SectorSpec> specs = generateSectorSpecs(135, false, true);
+
+        assertEquals(135, specs.stream().mapToInt(SectorSpec::requiredLances).sum());
+    }
+
+    @Test
+    void legacy_condenseBelowTheCap_leavesTheHistoricalLayoutAlone() {
+        // 12 teams make four legacy sectors, under the cap, so condensing must not disturb them.
+        List<SectorSpec> specs = generateSectorSpecs(12, false, true);
+
+        assertEquals(4, specs.size());
+        for (SectorSpec spec : specs) {
+            assertEquals(LEGACY_LANCES_PER_SECTOR, spec.requiredLances());
+        }
     }
 
     // ---- Alternate count (condense off) ----

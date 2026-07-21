@@ -48,9 +48,11 @@ import mekhq.MHQConstants;
  * and picks one for a planet from its combined conditions.
  *
  * <p>Unlike hydrology, which weights on a single scalar, orogeny selection is multifactor: a profile's weight is the
- * product of Gaussian factors for gravity, temperature, and water coverage (each skipped when the profile is
- * indifferent to it), times categorical multipliers for rocky, icy, and airless worlds. Neighboring profiles still
- * appear for variety; larger sigmas mean more variety.</p>
+ * geometric mean of Gaussian factors for gravity, temperature, and water coverage (each skipped when the profile is
+ * indifferent to it), times categorical multipliers for rocky, icy, and airless worlds. The mean rather than the
+ * product matters here: each Gaussian is at most 1, so multiplying them would penalize a profile for naming more
+ * conditions, and these profiles name between one and three. Neighboring profiles still appear for variety; larger
+ * sigmas mean more variety.</p>
  *
  * @author Illiani
  * @since 0.51.01
