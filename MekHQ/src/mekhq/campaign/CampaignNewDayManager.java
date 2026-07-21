@@ -319,13 +319,6 @@ public class CampaignNewDayManager {
     public boolean newDay() {
         reset(); // refresh cached values
 
-        // Clear previous daily report nags (we want this near the top so that we can make sure no messages have been
-        // posted prior to this point).
-        CommandCenterTab commandCenter = campaign.getGUI().getCommandCenterTab();
-        for (DailyReportType type : DailyReportType.values()) {
-            commandCenter.clearDailyReportNag(type.getTabIndex());
-        }
-
         // clear previous retirement information
         campaign.getTurnoverRetirementInformation().clear();
 
@@ -487,46 +480,17 @@ public class CampaignNewDayManager {
             campaign.setHasActiveContract();
         }
 
-        // Clear Reports
-        campaign.getCurrentReport().clear();
-        campaign.setCurrentReportHTML("");
-        campaign.getNewReports().clear();
+        // Clear Reports. We also clear the daily report nags here, atomically with the report content: any report
+        // posted earlier in this newDay() (e.g. by pool refills that hire or fire) had its content wiped by the clear()
+        // below, so any nag it raised is stale. Clearing nags at the same moment leaves only genuine, post-beginReport
+        // reports able to flash a tab. (Doing this at the top of newDay() instead let those stale nags survive, so a
+        // tab would flash while showing only the date line.)
+        campaign.getDailyReportLog().clear();
 
-        campaign.getSkillReport().clear();
-        campaign.setSkillReportHTML("");
-        campaign.getNewSkillReports().clear();
-
-        campaign.getBattleReport().clear();
-        campaign.setBattleReportHTML("");
-        campaign.getNewBattleReports().clear();
-
-        campaign.getPoliticsReport().clear();
-        campaign.setPoliticsReportHTML("");
-        campaign.getNewPoliticsReports().clear();
-
-        campaign.getPersonnelReport().clear();
-        campaign.setPersonnelReportHTML("");
-        campaign.getNewPersonnelReports().clear();
-
-        campaign.getMedicalReport().clear();
-        campaign.setMedicalReportHTML("");
-        campaign.getNewMedicalReports().clear();
-
-        campaign.getFinancesReport().clear();
-        campaign.setFinancesReportHTML("");
-        campaign.getNewFinancesReports().clear();
-
-        campaign.getAcquisitionsReport().clear();
-        campaign.setAcquisitionsReportHTML("");
-        campaign.getNewAcquisitionsReports().clear();
-
-        campaign.getTechnicalReport().clear();
-        campaign.setTechnicalReportHTML("");
-        campaign.getNewTechnicalReports().clear();
-
-        campaign.getAggregateReport().clear();
-        campaign.setAggregateReportHTML("");
-        campaign.getNewAggregateReports().clear();
+        CommandCenterTab commandCenter = campaign.getGUI().getCommandCenterTab();
+        for (DailyReportType type : DailyReportType.values()) {
+            commandCenter.clearDailyReportNag(type.getTabIndex());
+        }
 
         campaign.beginReport("<b>" + MekHQ.getMHQOptions().getLongDisplayFormattedDate(today) + "</b>");
 

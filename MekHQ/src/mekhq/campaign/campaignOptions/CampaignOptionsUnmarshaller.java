@@ -266,6 +266,7 @@ public class CampaignOptionsUnmarshaller {
                   campaignOptions.setAcquisitionPersonnelCategory(ProcurementPersonnelPick.fromString(
                         nodeContents));
             case "limitByYear" -> campaignOptions.setLimitByYear(parseBoolean(nodeContents));
+            case "limitClanTech" -> campaignOptions.setLimitClanTech(parseBoolean(nodeContents));
             case "disallowExtinctStuff" -> campaignOptions.setDisallowExtinctStuff(parseBoolean(nodeContents));
             case "allowClanPurchases" -> campaignOptions.setAllowClanPurchases(parseBoolean(nodeContents));
             case "allowISPurchases" -> campaignOptions.setAllowISPurchases(parseBoolean(nodeContents));
@@ -341,6 +342,7 @@ public class CampaignOptionsUnmarshaller {
             case "edgeRefreshPeriod" ->
                   campaignOptions.setEdgeRefreshPeriod(EdgeRefreshPeriod.fromString(nodeContents));
             case "useEdge" -> campaignOptions.setUseEdge(parseBoolean(nodeContents));
+            case "useTwistOfFateSurvival" -> campaignOptions.setUseTwistOfFateSurvival(parseBoolean(nodeContents));
             case "useImplants" -> campaignOptions.setUseImplants(parseBoolean(nodeContents));
             case "alternativeQualityAveraging" -> campaignOptions.setAlternativeQualityAveraging(parseBoolean(
                   nodeContents));
@@ -393,8 +395,18 @@ public class CampaignOptionsUnmarshaller {
             case "tougherHealing" -> campaignOptions.setTougherHealing(parseBoolean(nodeContents));
             case "useAlternativeAdvancedMedical" ->
                   campaignOptions.setUseAlternativeAdvancedMedical(parseBoolean(nodeContents));
-            case "useKinderAlternativeAdvancedMedical" ->
-                  campaignOptions.setUseKinderAlternativeAdvancedMedical(parseBoolean(nodeContents));
+            case "useAlternativeAdvancedMedicalFewerPermanentInjuries" ->
+                  campaignOptions.setUseAlternativeAdvancedMedicalFewerPermanentInjuries(parseBoolean(nodeContents));
+            case "alternativeAdvancedMedicalHealingTimeMultiplier" ->
+                  campaignOptions.setAlternativeAdvancedMedicalHealingTimeMultiplier(parseDouble(nodeContents, 1.0));
+            // Legacy (<= 0.51.00): the old 'kinder' toggle is now expressed as a healing-time multiplier. A saved
+            // value of true maps to the 0.5 multiplier that reproduced the old kinder behavior; false leaves the
+            // multiplier at its 1.0 default.
+            case "useKinderAlternativeAdvancedMedical" -> {
+                if (parseBoolean(nodeContents)) {
+                    campaignOptions.setAlternativeAdvancedMedicalHealingTimeMultiplier(0.5);
+                }
+            }
             case "useRandomDiseases" -> campaignOptions.setUseRandomDiseases(parseBoolean(nodeContents));
             case "maximumPatients" -> campaignOptions.setMaximumPatients(parseInt(nodeContents));
             case "doctorsUseAdministration" -> campaignOptions.setDoctorsUseAdministration(parseBoolean(
@@ -468,6 +480,7 @@ public class CampaignOptionsUnmarshaller {
                 campaignOptions.setRoleBaseSalaries(mergedSalaries);
             }
             case "awardBonusStyle" -> campaignOptions.setAwardBonusStyle(AwardBonus.valueOf(nodeContents));
+            case "useReplaceEdgeAwards" -> campaignOptions.setUseReplaceEdgeAwards(parseBoolean(nodeContents));
             case "enableAutoAwards" -> campaignOptions.setEnableAutoAwards(parseBoolean(nodeContents));
             case "issuePosthumousAwards" -> campaignOptions.setIssuePosthumousAwards(parseBoolean(nodeContents));
             case "issueBestAwardOnly" -> campaignOptions.setIssueBestAwardOnly(parseBoolean(nodeContents));

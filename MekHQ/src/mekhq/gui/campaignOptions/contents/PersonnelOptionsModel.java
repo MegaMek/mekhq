@@ -54,6 +54,7 @@ class PersonnelOptionsModel {
     boolean onlyCommandersMatterInfantry;
     boolean onlyCommandersMatterBattleArmor;
     boolean useEdge;
+    boolean useTwistOfFateSurvival;
     EdgeRefreshPeriod edgeRefreshPeriod;
     int edgeRefreshCost;
     boolean useImplants;
@@ -91,6 +92,7 @@ class PersonnelOptionsModel {
     boolean trackTotalXPEarnings;
     boolean showOriginFaction;
     AwardBonus awardBonusStyle;
+    boolean useReplaceEdgeAwards;
     int awardTierSize;
     boolean enableAutoAwards;
     boolean issuePosthumousAwards;
@@ -116,7 +118,8 @@ class PersonnelOptionsModel {
     boolean useRandomHitsForVehicles;
     boolean tougherHealing;
     boolean useAlternativeAdvancedMedical;
-    boolean useKinderAlternativeAdvancedMedical;
+    boolean useAlternativeAdvancedMedicalFewerPermanentInjuries;
+    double alternativeAdvancedMedicalHealingTimeMultiplier;
     boolean useRandomDiseases;
     int maximumPatients;
     boolean doctorsUseAdministration;
@@ -143,6 +146,7 @@ class PersonnelOptionsModel {
         onlyCommandersMatterInfantry = options.isOnlyCommandersMatterInfantry();
         onlyCommandersMatterBattleArmor = options.isOnlyCommandersMatterBattleArmor();
         useEdge = options.isUseEdge();
+        useTwistOfFateSurvival = options.isUseTwistOfFateSurvival();
         edgeRefreshPeriod = options.getEdgeRefreshPeriod();
         edgeRefreshCost = options.getEdgeRefreshCost();
         useImplants = options.isUseImplants();
@@ -180,6 +184,7 @@ class PersonnelOptionsModel {
         trackTotalXPEarnings = options.isTrackTotalXPEarnings();
         showOriginFaction = options.isShowOriginFaction();
         awardBonusStyle = options.getAwardBonusStyle();
+        useReplaceEdgeAwards = options.isUseReplaceEdgeAwards();
         awardTierSize = options.getAwardTierSize();
         enableAutoAwards = options.isEnableAutoAwards();
         issuePosthumousAwards = options.isIssuePosthumousAwards();
@@ -205,7 +210,8 @@ class PersonnelOptionsModel {
         useRandomHitsForVehicles = options.isUseRandomHitsForVehicles();
         tougherHealing = options.isTougherHealing();
         useAlternativeAdvancedMedical = options.isUseAlternativeAdvancedMedical();
-        useKinderAlternativeAdvancedMedical = options.isUseKinderAlternativeAdvancedMedical();
+        useAlternativeAdvancedMedicalFewerPermanentInjuries = options.isUseAlternativeAdvancedMedicalFewerPermanentInjuries();
+        alternativeAdvancedMedicalHealingTimeMultiplier = options.getAlternativeAdvancedMedicalHealingTimeMultiplier();
         useRandomDiseases = options.isUseRandomDiseases();
         maximumPatients = options.getMaximumPatients();
         doctorsUseAdministration = options.isDoctorsUseAdministration();
@@ -233,6 +239,7 @@ class PersonnelOptionsModel {
         options.setOnlyCommandersMatterInfantry(onlyCommandersMatterInfantry);
         options.setOnlyCommandersMatterBattleArmor(onlyCommandersMatterBattleArmor);
         options.setUseEdge(useEdge);
+        options.setUseTwistOfFateSurvival(useTwistOfFateSurvival);
         options.setEdgeRefreshPeriod(edgeRefreshPeriod);
         options.setEdgeRefreshCost(edgeRefreshCost);
         options.setUseImplants(useImplants);
@@ -271,6 +278,7 @@ class PersonnelOptionsModel {
         options.setShowOriginFaction(showOriginFaction);
         options.setAwardBonusStyle(awardBonusStyle);
         options.setAwardTierSize(awardTierSize);
+        options.setUseReplaceEdgeAwards(useReplaceEdgeAwards);
         options.setEnableAutoAwards(enableAutoAwards);
         options.setIssuePosthumousAwards(issuePosthumousAwards);
         options.setIssueBestAwardOnly(issueBestAwardOnly);
@@ -295,7 +303,9 @@ class PersonnelOptionsModel {
         options.setUseRandomHitsForVehicles(useRandomHitsForVehicles);
         options.setTougherHealing(tougherHealing);
         options.setUseAlternativeAdvancedMedical(useAlternativeAdvancedMedical);
-        options.setUseKinderAlternativeAdvancedMedical(useKinderAlternativeAdvancedMedical);
+        options.setUseAlternativeAdvancedMedicalFewerPermanentInjuries(
+              useAlternativeAdvancedMedicalFewerPermanentInjuries);
+        options.setAlternativeAdvancedMedicalHealingTimeMultiplier(alternativeAdvancedMedicalHealingTimeMultiplier);
         options.setUseRandomDiseases(useRandomDiseases);
         options.setMaximumPatients(maximumPatients);
         options.setDoctorsUseAdministration(doctorsUseAdministration);

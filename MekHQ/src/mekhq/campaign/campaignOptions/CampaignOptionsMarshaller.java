@@ -144,6 +144,7 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowISPurchases", campaignOptions.isAllowISPurchases());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowCanonOnly", campaignOptions.isAllowCanonOnly());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowCanonRefitOnly", campaignOptions.isAllowCanonRefitOnly());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "limitClanTech", campaignOptions.isLimitClanTech());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "variableTechLevel", campaignOptions.isVariableTechLevel());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "factionIntroDate", campaignOptions.isFactionIntroDate());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAmmoByType", campaignOptions.isUseAmmoByType());
@@ -289,6 +290,10 @@ public class CampaignOptionsMarshaller {
               "edgeRefreshPeriod",
               campaignOptions.getEdgeRefreshPeriod().getLookupKey());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useEdge", campaignOptions.isUseEdge());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "useTwistOfFateSurvival",
+              campaignOptions.isUseTwistOfFateSurvival());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useImplants", campaignOptions.isUseImplants());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
@@ -363,8 +368,6 @@ public class CampaignOptionsMarshaller {
 
         // region Medical
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAdvancedMedical", campaignOptions.isUseAdvancedMedicalDirect());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useKinderAlternativeAdvancedMedical",
-              campaignOptions.isUseKinderAlternativeAdvancedMedical());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "healWaitingPeriod", campaignOptions.getHealingWaitingPeriod());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
@@ -381,6 +384,10 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "tougherHealing", campaignOptions.isTougherHealing());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAlternativeAdvancedMedical",
               campaignOptions.isUseAlternativeAdvancedMedical());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAlternativeAdvancedMedicalFewerPermanentInjuries",
+              campaignOptions.isUseAlternativeAdvancedMedicalFewerPermanentInjuries());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "alternativeAdvancedMedicalHealingTimeMultiplier",
+              campaignOptions.getAlternativeAdvancedMedicalHealingTimeMultiplier());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomDiseases",
               campaignOptions.isUseRandomDiseases());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "maximumPatients", campaignOptions.getMaximumPatients());
@@ -473,6 +480,7 @@ public class CampaignOptionsMarshaller {
 
         // region Awards
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "awardBonusStyle", campaignOptions.getAwardBonusStyle().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useReplaceEdgeAwards", campaignOptions.isUseReplaceEdgeAwards());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableAutoAwards", campaignOptions.isEnableAutoAwards());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "issuePosthumousAwards", campaignOptions.isIssuePosthumousAwards());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "issueBestAwardOnly", campaignOptions.isIssueBestAwardOnly());

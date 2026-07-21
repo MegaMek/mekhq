@@ -45,6 +45,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 import java.awt.font.TextAttribute;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
@@ -60,6 +61,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 
 import megamek.common.util.ImageUtil;
@@ -92,6 +94,17 @@ public class StratConPanel extends JPanel implements ActionListener {
 
     public static final int HEX_X_RADIUS = 42;
     public static final int HEX_Y_RADIUS = 36;
+
+    /** Zoom bounds and the multiplicative step applied per mouse-wheel notch. */
+    private static final double MIN_SCALE = 0.5;
+    private static final double MAX_SCALE = 2.0;
+    private static final double ZOOM_STEP = 1.1;
+
+    /**
+     * How far (in screen pixels) a left-mouse press may move before it is treated as a pan rather than a hex-selection
+     * click.
+     */
+    private static final int DRAG_THRESHOLD = 5;
 
     private static final String RIGHT_CLICK_COMMAND_MANAGE_FORCES = "ManageForces";
     private static final String RIGHT_CLICK_COMMAND_MANAGE_SCENARIO = "ManageScenario";
@@ -135,6 +148,14 @@ public class StratConPanel extends JPanel implements ActionListener {
     private JPopupMenu rightClickMenu;
     private JMenuItem menuItemGMReveal;
 
+    /** Current zoom factor applied to the hex map. 1.0 == no zoom. */
+    private double scale = 1.0;
+
+    // Left-mouse-drag panning state, tracked in screen coordinates so it is stable as the view scrolls beneath us.
+    private Point panDragStartScreen;
+    private Point panDragLastScreen;
+    private boolean panning;
+
     // data structure holding how many unit/scenario/base icons have been drawn in
     // the hex
     // used to control how low the text description goes.
@@ -169,12 +190,65 @@ public class StratConPanel extends JPanel implements ActionListener {
         assignmentUI = new TrackForceAssignmentUI(this);
         assignmentUI.setVisible(false);
 
-        addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                mouseReleasedHandler(e);
+        MapInputHandler inputHandler = new MapInputHandler();
+        addMouseListener(inputHandler);
+        addMouseMotionListener(inputHandler);
+        addMouseWheelListener(inputHandler);
+    }
+
+    /**
+     * Handles map navigation input: left-mouse-drag to pan (bounded by the map edges via the enclosing viewport) and
+     * mouse-wheel to zoom in/out centered on the cursor, matching the interstellar map's controls. A left-mouse press
+     * that does not move beyond {@link #DRAG_THRESHOLD} is treated as a hex-selection click instead of a pan.
+     */
+    private class MapInputHandler extends MouseAdapter {
+        @Override
+        public void mousePressed(MouseEvent e) {
+            if (SwingUtilities.isLeftMouseButton(e)) {
+                panDragStartScreen = e.getLocationOnScreen();
+                panDragLastScreen = e.getLocationOnScreen();
+                panning = false;
             }
-        });
+        }
+
+        @Override
+        public void mouseDragged(MouseEvent e) {
+            if ((panDragStartScreen == null) || !SwingUtilities.isLeftMouseButton(e)) {
+                return;
+            }
+
+            Point current = e.getLocationOnScreen();
+
+            // Don't move the map until the cursor travels past the click threshold; below it the gesture is still a
+            // hex-selection click, not a pan.
+            if (!panning) {
+                if ((Math.abs(current.x - panDragStartScreen.x) <= DRAG_THRESHOLD) &&
+                          (Math.abs(current.y - panDragStartScreen.y) <= DRAG_THRESHOLD)) {
+                    return;
+                }
+
+                // Transition into panning; re-anchor here so the first pan step doesn't jump by the threshold distance.
+                panning = true;
+                panDragLastScreen = current;
+                return;
+            }
+
+            panBy(current.x - panDragLastScreen.x, current.y - panDragLastScreen.y);
+            panDragLastScreen = current;
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            mouseReleasedHandler(e);
+            panDragStartScreen = null;
+            panDragLastScreen = null;
+        }
+
+        @Override
+        public void mouseWheelMoved(MouseWheelEvent e) {
+            zoomAt(e);
+            e.consume();
+        }
     }
 
     /**
@@ -405,6 +479,11 @@ public class StratConPanel extends JPanel implements ActionListener {
             translatedClickedPoint = SwingUtilities.convertPoint(this, translatedClickedPoint, this.getParent());
             translatedClickedPoint.translate((int) getVisibleRect().getX(), (int) getVisibleRect().getY());
             translatedClickedPoint.translate(0, -HEX_Y_RADIUS);
+
+            // the hexes are drawn under a zoom scaling, but the polygons we test against are in unscaled model space,
+            // so divide the click point back down by the current scale to line the two up
+            translatedClickedPoint.setLocation(translatedClickedPoint.getX() / scale,
+                  translatedClickedPoint.getY() / scale);
 
             // useful for graphics coords debugging
             // g2D.setColor(Color.ORANGE);
@@ -828,8 +907,95 @@ public class StratConPanel extends JPanel implements ActionListener {
      */
     private void performInitialTransform(Graphics2D g2D) {
         g2D.translate(0, HEX_Y_RADIUS);
-        float scale = 1f;
         g2D.scale(scale, scale);
+    }
+
+    /**
+     * @return the {@link JViewport} this panel is scrolled within, or {@code null} if it is not inside one.
+     */
+    private JViewport getViewport() {
+        Container parent = getParent();
+        return (parent instanceof JViewport) ? (JViewport) parent : null;
+    }
+
+    /**
+     * Clamps a proposed viewport position so the view can never scroll past the edges of the map - this is what keeps
+     * the player from ever losing sight of the hex board.
+     *
+     * @param proposed the desired top-left view position
+     * @param viewport the viewport the map is displayed in
+     *
+     * @return a position guaranteed to keep the map filling (or bounded by) the viewport
+     */
+    private Point clampViewPosition(Point proposed, JViewport viewport) {
+        Dimension viewSize = getPreferredSize();
+        Dimension extent = viewport.getExtentSize();
+
+        int maxX = Math.max(0, viewSize.width - extent.width);
+        int maxY = Math.max(0, viewSize.height - extent.height);
+
+        int x = Math.clamp(proposed.x, 0, maxX);
+        int y = Math.clamp(proposed.y, 0, maxY);
+
+        return new Point(x, y);
+    }
+
+    /**
+     * Pans the map by the given screen-pixel delta, clamped to the map edges. Dragging the mouse right/down moves the
+     * content the same way, which corresponds to decreasing the view position.
+     */
+    private void panBy(int dxScreen, int dyScreen) {
+        JViewport viewport = getViewport();
+        if (viewport == null) {
+            return;
+        }
+
+        Point viewPos = viewport.getViewPosition();
+        Point newPos = new Point(viewPos.x - dxScreen, viewPos.y - dyScreen);
+        viewport.setViewPosition(clampViewPosition(newPos, viewport));
+    }
+
+    /**
+     * Zooms the map in or out one step in response to a mouse-wheel event, keeping the point under the cursor anchored
+     * in place. Rescales the panel (so the scrollbars track the new size) and re-clamps the view to the map edges.
+     */
+    private void zoomAt(MouseWheelEvent e) {
+        double oldScale = scale;
+
+        // use the precise (fractional) rotation so trackpads and high-resolution wheels zoom smoothly instead of in
+        // fixed notches; a raw mouse wheel still reports +/-1 per notch
+        double newScale = oldScale * Math.pow(ZOOM_STEP, -e.getPreciseWheelRotation());
+        newScale = Math.clamp(newScale, MIN_SCALE, MAX_SCALE);
+
+        if (newScale == oldScale) {
+            return;
+        }
+
+        JViewport viewport = getViewport();
+        Point cursor = e.getPoint();
+
+        scale = newScale;
+
+        if (viewport != null) {
+            Point viewPos = viewport.getViewPosition();
+            int cursorInViewX = cursor.x - viewPos.x;
+            int cursorInViewY = cursor.y - viewPos.y;
+
+            double ratio = newScale / oldScale;
+            int newContentX = (int) Math.round(cursor.x * ratio);
+            int newContentY = (int) Math.round(cursor.y * ratio);
+
+            Point target = new Point(newContentX - cursorInViewX, newContentY - cursorInViewY);
+
+            // resize the view synchronously so the viewport clamps against the new dimensions within this same event,
+            // then reposition in one shot. Deferring the reposition (e.g. via invokeLater) paints one frame at the new
+            // scale but the old position first, which is what read as the view "re-centering" on every zoom.
+            setSize(getPreferredSize());
+            viewport.setViewPosition(clampViewPosition(target, viewport));
+        }
+
+        revalidate();
+        repaint();
     }
 
     /**
@@ -860,8 +1026,13 @@ public class StratConPanel extends JPanel implements ActionListener {
             return;
         }
 
-        // left button generally selects a hex
+        // left button generally selects a hex...
         if (e.getButton() == MouseEvent.BUTTON1) {
+            // ...unless the player was dragging to pan the map, in which case suppress the selection
+            if (panning) {
+                return;
+            }
+
             clickedPoint = e.getPoint();
             boolean pointFoundOnBoard = detectClickedHex();
 
@@ -870,7 +1041,7 @@ public class StratConPanel extends JPanel implements ActionListener {
             }
 
             repaint();
-            // right button generally pops up a context menu
+            // right button pops up a context menu
         } else if (e.getButton() == MouseEvent.BUTTON3) {
             clickedPoint = e.getPoint();
             detectClickedHex();
@@ -1171,8 +1342,8 @@ public class StratConPanel extends JPanel implements ActionListener {
     @Override
     public Dimension getPreferredSize() {
         if (currentTrack != null) {
-            int xDimension = (int) Math.floor(HEX_X_RADIUS * 1.75 * currentTrack.getWidth());
-            int yDimension = (int) Math.floor(HEX_Y_RADIUS * 2.1 * currentTrack.getHeight());
+            int xDimension = (int) Math.floor(HEX_X_RADIUS * 1.75 * currentTrack.getWidth() * scale);
+            int yDimension = (int) Math.floor(HEX_Y_RADIUS * 2.1 * currentTrack.getHeight() * scale);
 
             return new Dimension(xDimension, yDimension);
         } else {

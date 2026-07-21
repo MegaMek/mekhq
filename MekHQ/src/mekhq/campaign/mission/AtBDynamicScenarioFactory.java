@@ -3641,9 +3641,9 @@ public class AtBDynamicScenarioFactory {
      * force.
      *
      * <p>This method scans all player-controlled {@link CombatTeam}s that belong to a set of valid combat roles
-     * (Frontline, Maneuver, Cadre, and Patrol). For each qualifying team, the method retrieves the team's associated
-     * {@link Formation} and collects its total BV. These values are then combined to compute a Gaussian-weighted
-     * average, which serves as a representative BV budget for force generation.</p>
+     * (Frontline and Maneuver). For each qualifying team, the method retrieves the team's associated {@link Formation}
+     * and collects its total BV. These values are then combined to compute a Gaussian-weighted average, which serves as
+     * a representative BV budget for force generation.</p>
      *
      * <p><b>Why Gaussian Weighting?</b></p>
      * <p>A simple arithmetic mean can be disproportionately influenced by unusually large or unusually small
@@ -3675,7 +3675,7 @@ public class AtBDynamicScenarioFactory {
         // calculating the gaussian-weighted average. Specifically, we need it to calculate the crude mean (which the
         // averages will be weighted against).
         List<Integer> battleValues = new ArrayList<>();
-        List<CombatRole> validRoles = List.of(FRONTLINE, MANEUVER, CADRE, PATROL);
+        List<CombatRole> validRoles = List.of(FRONTLINE, MANEUVER);
         for (CombatTeam combatTeam : campaign.getPlayerForce().getCombatTeamsAsList(campaign)) {
             CombatRole role = combatTeam.getRole();
             if (!validRoles.contains(role)) {

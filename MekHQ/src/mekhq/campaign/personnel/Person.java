@@ -46,6 +46,7 @@ import static megamek.common.icons.Portrait.DEFAULT_IMAGE_WIDTH;
 import static megamek.common.icons.Portrait.DEFAULT_PORTRAIT_FILENAME;
 import static megamek.common.icons.Portrait.NO_PORTRAIT_NAME;
 import static megamek.common.options.OptionsConstants.UNOFFICIAL_EI_IMPLANT;
+import static megamek.common.units.Crew.DEATH;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.log.LogEntryType.ASSIGNMENT;
@@ -68,6 +69,7 @@ import static mekhq.campaign.randomEvents.personalities.PersonalityController.ge
 import static mekhq.utilities.MHQInternationalization.getFormattedText;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getAmazingColor;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.getPositiveColor;
 import static mekhq.utilities.ReportingUtilities.getWarningColor;
@@ -483,9 +485,6 @@ public class Person implements ILocatable {
         OTHER_RANSOM_VALUES.put(EXP_HEROIC, Money.of(100000));
         OTHER_RANSOM_VALUES.put(EXP_LEGENDARY, Money.of(150000));
     }
-
-    /** Greater than this value means death */
-    public static int DEATH_THRESHOLD = 5;
     // endregion Variable Declarations
 
     // region Constructors
@@ -1584,6 +1583,10 @@ public class Person implements ILocatable {
             ServiceLogger.resurrected(this, today);
         }
 
+        if (status.isDead() && attemptToCheatDeath(campaign)) {
+            return;
+        }
+
         switch (status) {
             case ACTIVE -> {
                 if (getStatus().isMIA()) {
@@ -1674,6 +1677,7 @@ public class Person implements ILocatable {
         setStatus(status);
 
         if (status.isDead()) {
+
             setDateOfDeath(today);
 
             if ((genealogy.hasSpouse()) && (!genealogy.getSpouse().getStatus().isDead())) {
@@ -1784,6 +1788,80 @@ public class Person implements ILocatable {
         this.setEduTagAlongs(new ArrayList<>());
 
         MekHQ.triggerEvent(new PersonStatusChangedEvent(this));
+    }
+
+    private boolean attemptToCheatDeath(Campaign campaign) {
+        LocalDate today = campaign.getLocalDate();
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+
+        boolean isUseTwistOfFateSurvival = campaignOptions.isUseTwistOfFateSurvival();
+        if (!isUseTwistOfFateSurvival) {
+            return false;
+        }
+
+        if (canUseTwistOfFateSurvival()) {
+            boolean isUseAdvancedMedical = campaignOptions.isUseAdvancedMedical();
+            int choiceEnumeration = isUseAdvancedMedical ? 1 : 0;
+
+            String report = getFormattedTextAt(RESOURCE_BUNDLE, "twistOfFate.escapedDeath",
+                  getHyperlinkedFullTitle(),
+                  getAmazingColor(),
+                  CLOSING_SPAN_TAG,
+                  choiceEnumeration);
+
+            if (getNonPermanentInjurySeverity() >= DEATH) {
+                healExcessHits(campaign);
+                healExcessInjuries(campaign, today);
+
+                MekHQ.triggerEvent(new PersonChangedEvent(this));
+            }
+
+            campaign.addReport(PERSONNEL, report);
+            PersonalLogger.cheatedDeath(this, today);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private void healExcessInjuries(Campaign campaign, LocalDate today) {
+        ArrayList<Injury> potentiallyHealedInjuries = new ArrayList<>();
+        for (Injury injury : getInjuries()) {
+            if (!injury.isPermanent() && injury.getHits() > 0) {
+                potentiallyHealedInjuries.add(injury);
+            }
+        }
+
+        while (!potentiallyHealedInjuries.isEmpty() && getNonPermanentInjurySeverity() >= DEATH) {
+            Injury randomInjury = ObjectUtility.getRandomItem(potentiallyHealedInjuries);
+            clearSpecificInjury(today, randomInjury);
+            potentiallyHealedInjuries.remove(randomInjury);
+
+            String injuryHealingReport = getFormattedTextAt(RESOURCE_BUNDLE, "twistOfFate.miracle.injury",
+                  getHyperlinkedFullTitle(),
+                  randomInjury.getName());
+            campaign.addReport(PERSONNEL, injuryHealingReport);
+
+            if (injuries.isEmpty()) {
+                doctorId = null;
+            }
+        }
+    }
+
+    private void healExcessHits(Campaign campaign) {
+        if (hits >= DEATH) {
+            int hitsHealed = hits - (DEATH - 1);
+            int hitsHealedEnumeration = hitsHealed == 1 ? 0 : 1;
+
+            String hitHealingReport = getFormattedTextAt(RESOURCE_BUNDLE, "twistOfFate.miracle.hits",
+                  getHyperlinkedFullTitle(),
+                  hitsHealed,
+                  hitsHealedEnumeration);
+            campaign.addReport(PERSONNEL, hitHealingReport);
+
+            hits = DEATH - 1;
+        }
     }
 
     /**
@@ -6215,6 +6293,30 @@ public class Person implements ILocatable {
     }
 
     /**
+     * Determines whether the "Twist of Fate Survival" ability can be used based on current permanent Edge.
+     *
+     * <p>If Twist of Fate Survival is enabled and the character has at least 1 permanent Edge, their permanent Edge
+     * score is reduced by 1 and the method returns {@code true}. If the character's current Edge now exceeds their
+     * maximum Edge attribute, their current Edge is reduced accordingly.</p>
+     *
+     * @return {@code true} if the ability can be used and the Edge attribute was reduced.
+     */
+    private boolean canUseTwistOfFateSurvival() {
+        int permanentEdgeScore = getAttributeScore(SkillAttribute.EDGE);
+        if (permanentEdgeScore > 0) {
+            changeAttributeScore(SkillAttribute.EDGE, -1);
+            permanentEdgeScore -= 1;
+            if (getCurrentEdge() > permanentEdgeScore) {
+                setCurrentEdge(permanentEdgeScore);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * @return this person's currently available edge points. Used for weekly refresh.
      */
     public int getCurrentEdge() {
@@ -7738,10 +7840,7 @@ public class Person implements ILocatable {
      */
     public void clearInjuriesExcludingProsthetics(LocalDate today) {
         for (Injury injury : new ArrayList<>(injuries)) {
-            InjurySubType injurySubType = injury.getSubType();
-            if (!injurySubType.isPermanentModification()) {
-                removeInjury(injury, today);
-            }
+            clearSpecificInjury(today, injury);
         }
 
         if (injuries.isEmpty()) {
@@ -7749,6 +7848,13 @@ public class Person implements ILocatable {
         }
 
         MekHQ.triggerEvent(new PersonChangedEvent(this));
+    }
+
+    private void clearSpecificInjury(LocalDate today, Injury injury) {
+        InjurySubType injurySubType = injury.getSubType();
+        if (!injurySubType.isPermanentModification()) {
+            removeInjury(injury, today);
+        }
     }
 
     /**
@@ -8409,7 +8515,7 @@ public class Person implements ILocatable {
             }
 
             int severity = getTotalInjurySeverity();
-            if (severity > DEATH_THRESHOLD) {
+            if (severity >= DEATH) {
                 changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
             }
         }
@@ -8456,7 +8562,7 @@ public class Person implements ILocatable {
                 hits += 1;
             }
 
-            if (!isUseAltAdvancedMedical && getTotalInjurySeverity() > DEATH_THRESHOLD) {
+            if (!isUseAltAdvancedMedical && getTotalInjurySeverity() >= DEATH) {
                 changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
             }
         }
@@ -8734,7 +8840,7 @@ public class Person implements ILocatable {
                 hits += 1;
             }
 
-            if (!isUseAltAdvancedMedical && getTotalInjurySeverity() > DEATH_THRESHOLD) {
+            if (!isUseAltAdvancedMedical && getTotalInjurySeverity() >= DEATH) {
                 changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
             }
 
@@ -8783,7 +8889,7 @@ public class Person implements ILocatable {
                 hits += 1;
             }
 
-            if (!isUseAltAdvancedMedical && getTotalInjurySeverity() > DEATH_THRESHOLD) {
+            if (!isUseAltAdvancedMedical && getTotalInjurySeverity() >= DEATH) {
                 changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
             }
 
@@ -8828,7 +8934,7 @@ public class Person implements ILocatable {
                 hits++;
             }
 
-            if (!isUseAltAdvancedMedical && getTotalInjurySeverity() > DEATH_THRESHOLD) {
+            if (!isUseAltAdvancedMedical && getTotalInjurySeverity() >= DEATH) {
                 changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MEDICAL_COMPLICATIONS);
             }
 
@@ -8904,7 +9010,7 @@ public class Person implements ILocatable {
                     victim.setHits(currentHits + 1);
                 }
 
-                if (!isUseAltAdvancedMedical && getTotalInjurySeverity() > DEATH_THRESHOLD) {
+                if (!isUseAltAdvancedMedical && getTotalInjurySeverity() >= DEATH) {
                     victim.changeStatus(campaign, campaign.getLocalDate(), victim.equals(this) ?
                                                                                  PersonnelStatus.MEDICAL_COMPLICATIONS :
                                                                                  PersonnelStatus.HOMICIDE);

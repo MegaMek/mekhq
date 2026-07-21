@@ -62,6 +62,10 @@ class CampaignOptionsHelpPanel extends JPanel {
     private final JEditorPane helpTextPane;
 
     CampaignOptionsHelpPanel() {
+        this(getCampaignOptionsResourceBundle());
+    }
+
+    CampaignOptionsHelpPanel(String resourceBundleName) {
         super(new BorderLayout());
         setName("campaignOptionsHelpPanel");
         // Draw the caption on the same flush frame border the navigation and content panels use. A standard
@@ -72,7 +76,7 @@ class CampaignOptionsHelpPanel extends JPanel {
             frameBorder = BorderFactory.createLineBorder(UIManager.getColor("Component.borderColor"));
         }
         setBorder(new FlushTitledBorder(frameBorder,
-              getTextAt(getCampaignOptionsResourceBundle(), "campaignOptionsHelp.title")));
+              getTextAt(resourceBundleName, "campaignOptionsHelp.title")));
 
         helpTextPane = new JEditorPane();
         helpTextPane.setName("campaignOptionsHelpText");

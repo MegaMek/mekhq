@@ -82,6 +82,7 @@ class TechLimitsPage {
     private MMComboBox<String> choiceTechLevel;
     private JCheckBox variableTechLevelBox;
     private JCheckBox useAmmoByTypeBox;
+    private JCheckBox limitClanTechBox;
 
     private boolean created;
 
@@ -95,7 +96,8 @@ class TechLimitsPage {
      *
      * @return the {@code JPanel} representing the "Tech Limits" page, fully configured with its components and layout.
      */
-    @Nonnull JPanel createPanel(@Nullable EquipmentAndSuppliesOptionsModel model) {
+    @Nonnull
+    JPanel createPanel(@Nullable EquipmentAndSuppliesOptionsModel model) {
         // Header
         String imageAddress = getImageDirectory() + "logo_clan_ghost_bear.png";
         CampaignOptionsHeaderPanel techLimitsHeader = new CampaignOptionsHeaderPanel("TechLimitsPage", imageAddress);
@@ -116,6 +118,10 @@ class TechLimitsPage {
         allowCanonOnlyBox.addMouseListener(createTipPanelUpdater("AllowCanonOnlyBox"));
         allowCanonRefitOnlyBox = new CampaignOptionsCheckBox("AllowCanonRefitOnlyBox");
         allowCanonRefitOnlyBox.addMouseListener(createTipPanelUpdater("AllowCanonRefitOnlyBox"));
+
+        // Clan Tech Refits Pre 3052
+        limitClanTechBox = new CampaignOptionsCheckBox("LimitClanTechBox");
+        limitClanTechBox.addMouseListener(createTipPanelUpdater("LimitClanTechBox"));
 
         // Maximum Tech Level
         lblChoiceTechLevel = new CampaignOptionsLabel("ChoiceTechLevel");
@@ -139,15 +145,15 @@ class TechLimitsPage {
         JPanel purchaseRulesPanel = createPurchaseRulesPanel();
 
         JPanel panel = CampaignOptionsPagePanel.builder("TechLimitsPage", "TechLimitsPage", imageAddress)
-                .header(techLimitsHeader)
-                .quote("techLimitsPage")
-                .section("lblTechLimitsPage.text",
-                        "lblTechLimitsPage.summary",
-                        techLevelPanel)
-                .section("lblTechPurchaseRulesPanel.text",
-                        "lblTechPurchaseRulesPanel.summary",
-                        purchaseRulesPanel)
-                .build();
+                             .header(techLimitsHeader)
+                             .quote("techLimitsPage")
+                             .section("lblTechLimitsPage.text",
+                                   "lblTechLimitsPage.summary",
+                                   techLevelPanel)
+                             .section("lblTechPurchaseRulesPanel.text",
+                                   "lblTechPurchaseRulesPanel.summary",
+                                   purchaseRulesPanel)
+                             .build();
 
         created = true;
         readFromModel(model);
@@ -176,7 +182,8 @@ class TechLimitsPage {
               allowClanPurchasesBox,
               allowISPurchasesBox,
               allowCanonOnlyBox,
-              allowCanonRefitOnlyBox);
+              allowCanonRefitOnlyBox,
+              limitClanTechBox);
 
         return panel;
     }
@@ -216,6 +223,7 @@ class TechLimitsPage {
         allowISPurchasesBox.setSelected(model.allowISPurchases);
         allowCanonOnlyBox.setSelected(model.allowCanonOnly);
         allowCanonRefitOnlyBox.setSelected(model.allowCanonRefitOnly);
+        limitClanTechBox.setSelected(model.limitClanTech);
         choiceTechLevel.setSelectedIndex(model.techLevel);
         variableTechLevelBox.setSelected(model.variableTechLevel);
         useAmmoByTypeBox.setSelected(model.useAmmoByType);
@@ -238,6 +246,7 @@ class TechLimitsPage {
         model.allowISPurchases = allowISPurchasesBox.isSelected();
         model.allowCanonOnly = allowCanonOnlyBox.isSelected();
         model.allowCanonRefitOnly = allowCanonRefitOnlyBox.isSelected();
+        model.limitClanTech = limitClanTechBox.isSelected();
         model.techLevel = choiceTechLevel.getSelectedIndex();
         model.variableTechLevel = variableTechLevelBox.isSelected();
         model.useAmmoByType = useAmmoByTypeBox.isSelected();

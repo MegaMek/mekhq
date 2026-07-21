@@ -89,7 +89,6 @@ import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
-import mekhq.Utilities;
 import mekhq.campaign.*;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.base.PlayerBase;
@@ -237,216 +236,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                                   50));
                         }
                     }
-                } else if (nodeName.equalsIgnoreCase("currentReport")) {
-                    // First, get all the child nodes;
-                    NodeList nl2 = childNode.getChildNodes();
-
-                    // Then, make sure the report is empty. *just* in case.
-                    // ...That is, creating a new campaign throws in a date line
-                    // for us...
-                    // So make sure it's cleared out.
-                    campaign.getCurrentReport().clear();
-
-                    for (int x2 = 0; x2 < nl2.getLength(); x2++) {
-                        Node wn2 = nl2.item(x2);
-
-                        if (wn2.getParentNode() != childNode) {
-                            continue;
-                        }
-
-                        if (wn2.getNodeName().equalsIgnoreCase("reportLine")) {
-                            campaign.getCurrentReport().add(wn2.getTextContent());
-                        }
-                    }
-                } else if (nodeName.equalsIgnoreCase("skillReport")) {
-                    // First, get all the child nodes;
-                    NodeList nl2 = childNode.getChildNodes();
-
-                    // Then, make sure the report is empty. *just* in case.
-                    // ...That is, creating a new campaign throws in a date line
-                    // for us...
-                    // So make sure it's cleared out.
-                    campaign.getSkillReport().clear();
-
-                    for (int x2 = 0; x2 < nl2.getLength(); x2++) {
-                        Node wn2 = nl2.item(x2);
-
-                        if (wn2.getParentNode() != childNode) {
-                            continue;
-                        }
-
-                        if (wn2.getNodeName().equalsIgnoreCase("reportLine")) {
-                            campaign.getSkillReport().add(wn2.getTextContent());
-                        }
-                    }
-                } else if (nodeName.equalsIgnoreCase("battleReport")) {
-                    // First, get all the child nodes;
-                    NodeList nl2 = childNode.getChildNodes();
-
-                    // Then, make sure the report is empty. *just* in case.
-                    // ...That is, creating a new campaign throws in a date line
-                    // for us...
-                    // So make sure it's cleared out.
-                    campaign.getBattleReport().clear();
-
-                    for (int x2 = 0; x2 < nl2.getLength(); x2++) {
-                        Node wn2 = nl2.item(x2);
-
-                        if (wn2.getParentNode() != childNode) {
-                            continue;
-                        }
-
-                        if (wn2.getNodeName().equalsIgnoreCase("reportLine")) {
-                            campaign.getBattleReport().add(wn2.getTextContent());
-                        }
-                    }
-                } else if (nodeName.equalsIgnoreCase("politicsReport")) {
-                    // First, get all the child nodes;
-                    NodeList nl2 = childNode.getChildNodes();
-
-                    // Then, make sure the report is empty. *just* in case.
-                    // ...That is, creating a new campaign throws in a date line
-                    // for us...
-                    // So make sure it's cleared out.
-                    campaign.getPoliticsReport().clear();
-
-                    for (int x2 = 0; x2 < nl2.getLength(); x2++) {
-                        Node wn2 = nl2.item(x2);
-
-                        if (wn2.getParentNode() != childNode) {
-                            continue;
-                        }
-
-                        if (wn2.getNodeName().equalsIgnoreCase("reportLine")) {
-                            campaign.getPoliticsReport().add(wn2.getTextContent());
-                        }
-                    }
-                } else if (nodeName.equalsIgnoreCase("aggregateReport")) {
-                    // First, get all the child nodes;
-                    NodeList nl2 = childNode.getChildNodes();
-
-                    // Then, make sure the report is empty. *just* in case.
-                    // ...That is, creating a new campaign throws in a date line
-                    // for us...
-                    // So make sure it's cleared out.
-                    campaign.getAggregateReport().clear();
-
-                    for (int x2 = 0; x2 < nl2.getLength(); x2++) {
-                        Node wn2 = nl2.item(x2);
-
-                        if (wn2.getParentNode() != childNode) {
-                            continue;
-                        }
-
-                        if (wn2.getNodeName().equalsIgnoreCase("reportLine")) {
-                            campaign.getAggregateReport().add(wn2.getTextContent());
-                        }
-                    }
-                } else if (nodeName.equalsIgnoreCase("personnelReport")) {
-                    // First, get all the child nodes;
-                    NodeList nl2 = childNode.getChildNodes();
-
-                    // Then, make sure the report is empty. *just* in case.
-                    // ...That is, creating a new campaign throws in a date line
-                    // for us...
-                    // So make sure it's cleared out.
-                    campaign.getPersonnelReport().clear();
-
-                    for (int x2 = 0; x2 < nl2.getLength(); x2++) {
-                        Node wn2 = nl2.item(x2);
-
-                        if (wn2.getParentNode() != childNode) {
-                            continue;
-                        }
-
-                        if (wn2.getNodeName().equalsIgnoreCase("reportLine")) {
-                            campaign.getPersonnelReport().add(wn2.getTextContent());
-                        }
-                    }
-                } else if (nodeName.equalsIgnoreCase("medicalReport")) {
-                    // First, get all the child nodes;
-                    NodeList nl2 = childNode.getChildNodes();
-
-                    // Then, make sure the report is empty. *just* in case.
-                    // ...That is, creating a new campaign throws in a date line
-                    // for us...
-                    // So make sure it's cleared out.
-                    campaign.getMedicalReport().clear();
-
-                    for (int x2 = 0; x2 < nl2.getLength(); x2++) {
-                        Node wn2 = nl2.item(x2);
-
-                        if (wn2.getParentNode() != childNode) {
-                            continue;
-                        }
-
-                        if (wn2.getNodeName().equalsIgnoreCase("reportLine")) {
-                            campaign.getMedicalReport().add(wn2.getTextContent());
-                        }
-                    }
-                } else if (nodeName.equalsIgnoreCase("acquisitionsReport")) {
-                    // First, get all the child nodes;
-                    NodeList nl2 = childNode.getChildNodes();
-
-                    // Then, make sure the report is empty. *just* in case.
-                    // ...That is, creating a new campaign throws in a date line
-                    // for us...
-                    // So make sure it's cleared out.
-                    campaign.getAcquisitionsReport().clear();
-
-                    for (int x2 = 0; x2 < nl2.getLength(); x2++) {
-                        Node wn2 = nl2.item(x2);
-
-                        if (wn2.getParentNode() != childNode) {
-                            continue;
-                        }
-
-                        if (wn2.getNodeName().equalsIgnoreCase("reportLine")) {
-                            campaign.getAcquisitionsReport().add(wn2.getTextContent());
-                        }
-                    }
-                } else if (nodeName.equalsIgnoreCase("financesReport")) {
-                    // First, get all the child nodes;
-                    NodeList nl2 = childNode.getChildNodes();
-
-                    // Then, make sure the report is empty. *just* in case.
-                    // ...That is, creating a new campaign throws in a date line
-                    // for us...
-                    // So make sure it's cleared out.
-                    campaign.getFinancesReport().clear();
-
-                    for (int x2 = 0; x2 < nl2.getLength(); x2++) {
-                        Node wn2 = nl2.item(x2);
-
-                        if (wn2.getParentNode() != childNode) {
-                            continue;
-                        }
-
-                        if (wn2.getNodeName().equalsIgnoreCase("reportLine")) {
-                            campaign.getFinancesReport().add(wn2.getTextContent());
-                        }
-                    }
-                } else if (nodeName.equalsIgnoreCase("technicalReport")) {
-                    // First, get all the child nodes;
-                    NodeList nl2 = childNode.getChildNodes();
-
-                    // Then, make sure the report is empty. *just* in case.
-                    // ...That is, creating a new campaign throws in a date line
-                    // for us...
-                    // So make sure it's cleared out.
-                    campaign.getTechnicalReport().clear();
-
-                    for (int x2 = 0; x2 < nl2.getLength(); x2++) {
-                        Node wn2 = nl2.item(x2);
-
-                        if (wn2.getParentNode() != childNode) {
-                            continue;
-                        }
-
-                        if (wn2.getNodeName().equalsIgnoreCase("reportLine")) {
-                            campaign.getTechnicalReport().add(wn2.getTextContent());
-                        }
-                    }
+                } else if (nodeName.equalsIgnoreCase("dailyReportLog")) {
+                    campaign.getDailyReportLog().readFromXML(childNode);
                 } else if (nodeName.equalsIgnoreCase("faction")) {
                     Faction faction = Factions.getInstance().getFaction(childNode.getTextContent());
                     campaign.getPlayerForce().setFaction(faction);
@@ -569,142 +360,6 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             }
         }
 
-        // Update daily reports
-        campaign.setCurrentReportHTML(Utilities.combineString(campaign.getCurrentReport(), Campaign.REPORT_LINEBREAK));
-        List<String> newReports = new ArrayList<>(campaign.getCurrentReport().size() * 2);
-        boolean firstGeneralReport = true;
-        for (String report : campaign.getCurrentReport()) {
-            if (firstGeneralReport) {
-                firstGeneralReport = false;
-            } else {
-                newReports.add(Campaign.REPORT_LINEBREAK);
-            }
-            newReports.add(report);
-        }
-        campaign.setNewReports(newReports);
-
-        campaign.setSkillReportHTML(Utilities.combineString(campaign.getSkillReport(), Campaign.REPORT_LINEBREAK));
-        List<String> newSkillReports = new ArrayList<>(campaign.getSkillReport().size() * 2);
-        boolean firstSkillReport = true;
-        for (String report : campaign.getSkillReport()) {
-            if (firstSkillReport) {
-                firstSkillReport = false;
-            } else {
-                newSkillReports.add(Campaign.REPORT_LINEBREAK);
-            }
-            newSkillReports.add(report);
-        }
-        campaign.setNewSkillReports(newSkillReports);
-
-        campaign.setBattleReportHTML(Utilities.combineString(campaign.getBattleReport(), Campaign.REPORT_LINEBREAK));
-        List<String> newBattleReports = new ArrayList<>(campaign.getBattleReport().size() * 2);
-        boolean firstBattleReport = true;
-        for (String report : campaign.getBattleReport()) {
-            if (firstBattleReport) {
-                firstBattleReport = false;
-            } else {
-                newBattleReports.add(Campaign.REPORT_LINEBREAK);
-            }
-            newBattleReports.add(report);
-        }
-        campaign.setNewBattleReports(newBattleReports);
-
-        campaign.setPoliticsReportHTML(Utilities.combineString(campaign.getPoliticsReport(),
-              Campaign.REPORT_LINEBREAK));
-        List<String> newPoliticsReports = new ArrayList<>(campaign.getPoliticsReport().size() * 2);
-        boolean firstPoliticsReport = true;
-        for (String report : campaign.getPoliticsReport()) {
-            if (firstPoliticsReport) {
-                firstPoliticsReport = false;
-            } else {
-                newPoliticsReports.add(Campaign.REPORT_LINEBREAK);
-            }
-            newPoliticsReports.add(report);
-        }
-        campaign.setNewPoliticsReports(newPoliticsReports);
-
-        campaign.setAggregateReportHTML(Utilities.combineString(campaign.getAggregateReport(),
-              Campaign.REPORT_LINEBREAK));
-        List<String> newAggregateReports = new ArrayList<>(campaign.getAggregateReport().size() * 2);
-        boolean firstAggregateReport = true;
-        for (String report : campaign.getAggregateReport()) {
-            if (firstAggregateReport) {
-                firstAggregateReport = false;
-            } else {
-                newAggregateReports.add(Campaign.REPORT_LINEBREAK);
-            }
-            newAggregateReports.add(report);
-        }
-        campaign.setNewAggregateReports(newAggregateReports);
-
-        campaign.setPersonnelReportHTML(Utilities.combineString(campaign.getPersonnelReport(),
-              Campaign.REPORT_LINEBREAK));
-        List<String> newPersonnelReports = new ArrayList<>(campaign.getPersonnelReport().size() * 2);
-        boolean firstPersonnelReport = true;
-        for (String report : campaign.getPersonnelReport()) {
-            if (firstPersonnelReport) {
-                firstPersonnelReport = false;
-            } else {
-                newPersonnelReports.add(Campaign.REPORT_LINEBREAK);
-            }
-            newPersonnelReports.add(report);
-        }
-        campaign.setNewPersonnelReports(newPersonnelReports);
-
-        campaign.setMedicalReportHTML(Utilities.combineString(campaign.getMedicalReport(), Campaign.REPORT_LINEBREAK));
-        List<String> newMedicalReports = new ArrayList<>(campaign.getMedicalReport().size() * 2);
-        boolean firstMedicalReport = true;
-        for (String report : campaign.getMedicalReport()) {
-            if (firstMedicalReport) {
-                firstMedicalReport = false;
-            } else {
-                newMedicalReports.add(Campaign.REPORT_LINEBREAK);
-            }
-            newMedicalReports.add(report);
-        }
-        campaign.setNewMedicalReports(newMedicalReports);
-
-        campaign.setFinancesReportHTML(Utilities.combineString(campaign.getFinancesReport(),
-              Campaign.REPORT_LINEBREAK));
-        List<String> newFinancesReports = new ArrayList<>(campaign.getFinancesReport().size() * 2);
-        boolean firstFinancesReport = true;
-        for (String report : campaign.getFinancesReport()) {
-            if (firstFinancesReport) {
-                firstFinancesReport = false;
-            } else {
-                newFinancesReports.add(Campaign.REPORT_LINEBREAK);
-            }
-            newFinancesReports.add(report);
-        }
-        campaign.setNewFinancesReports(newFinancesReports);
-
-        campaign.setAcquisitionsReportHTML(Utilities.combineString(campaign.getAcquisitionsReport(),
-              Campaign.REPORT_LINEBREAK));
-        List<String> newAcquisitionsReports = new ArrayList<>(campaign.getAcquisitionsReport().size() * 2);
-        boolean firstAcquisitionsReport = true;
-        for (String report : campaign.getAcquisitionsReport()) {
-            if (firstAcquisitionsReport) {
-                firstAcquisitionsReport = false;
-            } else {
-                newAcquisitionsReports.add(Campaign.REPORT_LINEBREAK);
-            }
-            newAcquisitionsReports.add(report);
-        }
-        campaign.setNewAcquisitionsReports(newAcquisitionsReports);
-
-        campaign.setTechnicalReportHTML(Utilities.combineString(campaign.getTechnicalReport(),
-              Campaign.REPORT_LINEBREAK));
-        List<String> newTechnicalReports = new ArrayList<>(campaign.getTechnicalReport().size() * 2);
-        boolean firstTechnicalReport = true;
-        for (String report : campaign.getTechnicalReport()) {
-            if (firstTechnicalReport) {
-                firstTechnicalReport = false;
-            } else {
-                newTechnicalReports.add(Campaign.REPORT_LINEBREAK);
-            }
-            newTechnicalReports.add(report);
-        }
-        campaign.setNewTechnicalReports(newTechnicalReports);
     }
 
     private static void processPlanetarySystemOverrides(Campaign campaign, Node parentNode)
@@ -1252,18 +907,16 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
     }
 
     /**
-     * Reconnects persons, units, and parts to their travel {@link CurrentLocation} nodes after a
-     * save/load.
+     * Reconnects persons, units, and parts to their travel {@link CurrentLocation} nodes after a save/load.
      *
      * <p>During save, each {@link CurrentLocation} writes the IDs of its direct children
-     * ({@link Person}, {@link Unit}, {@link Part}). On load those parent links are lost because
-     * the {@link LocationNode} tree is not serialized directly. This pass
-     * restores them by looking each item up in the campaign's data structures and re-parenting it
-     * under the correct travel node.</p>
+     * ({@link Person}, {@link Unit}, {@link Part}). On load those parent links are lost because the
+     * {@link LocationNode} tree is not serialized directly. This pass restores them by looking each item up in the
+     * campaign's data structures and re-parenting it under the correct travel node.</p>
      *
      * <p>Units and parts in transit have already been placed in their destination hangar/warehouse
-     * data structure at dispatch time, so the lookup searches base hangars/warehouses as well as
-     * the campaign's main collections.</p>
+     * data structure at dispatch time, so the lookup searches base hangars/warehouses as well as the campaign's main
+     * collections.</p>
      */
     private static void reconnectPersonsToTravelLocations(Campaign campaign) {
         for (AbstractLocation location : campaign.getCampaignLocationManager().getLocations()) {
@@ -1285,7 +938,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                         if (person != null && !person.isParented()) {
                             person.setParent(campaign.getPlayerForce().getPersonnel());
                             LOGGER.warn("reconnectPersonsToTravelLocations: person {} had no parent "
-                                  + "(orphaned arrived node); re-homed to main force", personId);
+                                              + "(orphaned arrived node); re-homed to main force", personId);
                         }
                     }
                     for (UUID unitId : travelLocation.drainPendingUnitIds()) {
@@ -1293,7 +946,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                         if (unit != null && !unit.isParented()) {
                             LocationNode.LocationManager.setLocation(unit, campaign.getPlayerForce().getHangar());
                             LOGGER.warn("reconnectPersonsToTravelLocations: unit {} had no parent "
-                                  + "(orphaned arrived node); re-homed to main hangar", unitId);
+                                              + "(orphaned arrived node); re-homed to main hangar", unitId);
                         }
                     }
                     for (int partId : travelLocation.drainPendingPartIds()) {
@@ -1301,7 +954,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                         if (part != null && !part.isParented()) {
                             LocationNode.LocationManager.setLocation(part, campaign.getPlayerForce().getWarehouse());
                             LOGGER.warn("reconnectPersonsToTravelLocations: part {} had no parent "
-                                  + "(orphaned arrived node); re-homed to main warehouse", partId);
+                                              + "(orphaned arrived node); re-homed to main warehouse", partId);
                         }
                     }
                     continue;
@@ -2902,17 +2555,17 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
               .getHumanResources()
               .getPersonnel()
               .stream().filter(person -> person.getJoinedCampaign() == null).forEach(person -> {
-            if (person.getRecruitment() != null) {
-                person.setJoinedCampaign(person.getRecruitment());
-                LOGGER.info(
-                      "{} doesn't have a date recorded showing when they joined the campaign. Using recruitment date.",
-                      person.getFullTitle());
-            } else {
-                person.setJoinedCampaign(campaign.getLocalDate());
-                LOGGER.info("{} doesn't have a date recorded showing when they joined the campaign. Using current date.",
-                      person.getFullTitle());
-            }
-        });
+                  if (person.getRecruitment() != null) {
+                      person.setJoinedCampaign(person.getRecruitment());
+                      LOGGER.info(
+                            "{} doesn't have a date recorded showing when they joined the campaign. Using recruitment date.",
+                            person.getFullTitle());
+                  } else {
+                      person.setJoinedCampaign(campaign.getLocalDate());
+                      LOGGER.info("{} doesn't have a date recorded showing when they joined the campaign. Using current date.",
+                            person.getFullTitle());
+                  }
+              });
 
         // Reset Random Death to match current campaign options
         campaign.resetRandomDeath();
