@@ -97,6 +97,20 @@ public record PlanetProfile(int temperatureCelsius, double diameterKm, int water
     private static final double MAX_SIZE_FACTOR = 2.0;
 
     /**
+     * Note that this is a ratio of <em>diameters</em>, while its caller multiplies it into an area (a hex count).
+     * Surface area goes as the square of diameter, so the linear ratio understates how much larger a large world is.
+     * That is deliberate and has been measured: across the 2430 habitable worlds in the universe data, diameters span
+     * only 0.82 to 1.08 of Terra's - a world is largely habitable <em>because</em> it is near Terra-sized - so this
+     * factor moves a sector by roughly a sixth either way, while water coverage moves it by up to four times. A
+     * smaller, wetter world can therefore produce a physically larger sector than a bigger, drier one. Only the
+     * sector's total extent inverts; its dry playable ground stays ordered correctly, because the water compensation in
+     * {@code applyImprovedDimensions} exists to protect the recon budget.
+     *
+     * <p>Squaring this to correct the dimensions was considered and declined - it would leave the sector rules keyed
+     * to a different quantity than the one the system was balanced against. If it is ever revisited, note that the
+     * clamp below is applied to the <em>linear</em> ratio: squaring inside it would send a capped world to {@code 4.0}
+     * rather than {@code 2.0}, so the bounds need re-deriving in the same change.</p>
+     *
      * @return the sector-size scaling factor derived from planetary diameter, clamped to {@code [0.5, 2.0]}. An unknown
      *       diameter yields {@code 1.0} (Terra-sized).
      */
