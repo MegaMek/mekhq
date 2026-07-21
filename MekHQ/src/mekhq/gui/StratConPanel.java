@@ -1910,8 +1910,10 @@ public class StratConPanel extends JPanel implements ActionListener {
                 break;
             case RIGHT_CLICK_COMMAND_CAPTURE_FACILITY:
                 StratConRulesManager.switchFacilityOwner(currentTrack.getFacility(selectedCoords));
-                // Whether a facility sits on the road grid depends on who holds it, so a capture can add or drop it.
-                recalculateRoads();
+                // Deliberately does NOT recalculate roads. A road is built ground: taking the base at the end of it
+                // neither lays new road nor tears up the old. Recalculating would also rebuild the whole network from
+                // scratch, so a single capture could redraw roads across the sector - and it would disagree with
+                // capturing the same facility by winning a scenario, which leaves the network alone.
                 break;
             case RIGHT_CLICK_COMMAND_ADD_FACILITY:
                 JMenuItem eventSource = (JMenuItem) evt.getSource();
