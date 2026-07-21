@@ -125,11 +125,11 @@ class StratConSectorCountMethodPersistenceTest {
     @Test
     void anExplicitMethodIsNotOverwrittenByLegacyTags() throws Exception {
         // Defensive: a save should never carry both, but if one did, the newer tag is the authoritative one.
-        String both = saveContaining("<stratConSectorCountMethod>SINGLE</stratConSectorCountMethod>" +
+        String both = saveContaining("<stratConSectorCountMethod>REGIMENTAL</stratConSectorCountMethod>" +
                                            "<useStratConAlternateSectorCount>false</useStratConAlternateSectorCount>" +
                                            "<useStratConCondenseSectors>false</useStratConCondenseSectors>");
 
-        assertEquals(StratConSectorCountMethod.SINGLE, unmarshal(both).getStratConSectorCountMethod());
+        assertEquals(StratConSectorCountMethod.REGIMENTAL, unmarshal(both).getStratConSectorCountMethod());
     }
 
     @Test

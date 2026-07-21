@@ -56,8 +56,8 @@ public enum StratConSectorCountMethod {
     ALTERNATE("ALTERNATE"),
     /** The alternate count, capped at ten sectors, with the surplus teams shared across the ten that remain. */
     CONDENSED("CONDENSED"),
-    /** Exactly one sector, holding every combat team the contract requires. */
-    SINGLE("SINGLE");
+    /** Roughly one sector per regiment, so a contract up to regimental strength fights over a single sector. */
+    REGIMENTAL("REGIMENTAL");
 
     private final String lookupName;
     private final String label;

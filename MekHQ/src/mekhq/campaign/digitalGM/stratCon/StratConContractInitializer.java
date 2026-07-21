@@ -117,6 +117,13 @@ public class StratConContractInitializer {
     private static final int MAX_SECTOR_HEXES = 1024;
 
     /**
+     * Upper bound on the {@link #maximumTeamsPerSector} search. A dry, small world with a reduced size multiplier fits
+     * a great many teams into one sector, and nothing needs the exact figure past this - it only has to be larger than
+     * any contract will ever ask for.
+     */
+    private static final int MAXIMUM_TEAMS_PER_SECTOR_SEARCH_LIMIT = 1000;
+
+    /**
      * The most of a sector's dry land that may be given over to facilities, leaving the rest for scenarios to spawn on
      * over the life of the contract. Ordinary contracts sit well under this; it bites when a large contract's
      * facilities - which scale with its combat teams - are concentrated into few sectors whose area is capped.
@@ -162,7 +169,8 @@ public class StratConContractInitializer {
         // Decide how many sectors to generate and how large each one is. The planner always returns at least one
         // sector, so no separate zero-sector fallback is needed.
         List<SectorSpec> sectorSpecs = StratConSectorPlanner.generateSectorSpecs(contract.getRequiredCombatTeams(),
-              campaignOptions.getStratConSectorCountMethod());
+              campaignOptions.getStratConSectorCountMethod(),
+              maximumTeamsPerSector(planetProfile, campaignOptions.getStratConSectorSizeMultiplier()));
 
         // Ares Conventions: when both the employer and the enemy are signatories, urban targeting is off-limits.
         int year = campaign.getLocalDate().getYear();
@@ -864,9 +872,9 @@ public class StratConContractInitializer {
      * wider than it is tall, so a scout formation deployed to a fresh spot each week can more or less cover it.
      *
      * <p>The area is capped at {@link #MAX_SECTOR_HEXES}, matching the improved path. Nothing reaches that today,
-     * because the legacy count hands every sector at most three formations and so at most 84 hexes - the cap is here
-     * so that a future count method built on legacy sizing cannot produce an unbounded map. No trim loop is needed
-     * after it: {@code width} is the floored quotient of the capped total, so the laid-out area cannot exceed it.</p>
+     * because the legacy count hands every sector at most three formations and so at most 84 hexes - the cap is here so
+     * that a future count method built on legacy sizing cannot produce an unbounded map. No trim loop is needed after
+     * it: {@code width} is the floored quotient of the capped total, so the laid-out area cannot exceed it.</p>
      */
     private static void applyLegacyDimensions(StratConTrackState track, int numFormations) {
         int numHexes = min(MAX_SECTOR_HEXES, numFormations * LEGACY_HEXES_PER_FORMATION);
@@ -883,27 +891,55 @@ public class StratConContractInitializer {
      */
     private static void applyImprovedDimensions(StratConTrackState track, SectorSpec sector, PlanetProfile profile,
           double sizeMultiplier) {
-        // Size the sector to what its own recon can cover in a quarter: a third of the combat teams fronting this
-        // sector are assumed to be recon, and each covers RECON_HEXES_PER_QUARTER hexes of dry ground in three months.
-        //
-        // The recon count is deliberately NOT rounded - a sector fronting four teams gets 1.33 recon teams' worth of
-        // ground, not one team's. Rounding down here undersized every sector whose team count was not a multiple of
-        // three. It is floored at one, because even the smallest sector is scouted by someone.
-        double reconTeams = max(1.0, sector.requiredLances() / (double) COMBAT_TEAMS_PER_RECON_FORCE);
-        double landHexes = reconTeams * RECON_HEXES_PER_QUARTER * profile.sizeFactor() * sizeMultiplier;
-        int playableHexes = max(1, (int) Math.round(landHexes));
-
-        // Ocean is non-playable, so grow the sector by the dry fraction implied by the planet's water coverage.
-        double landFraction = max(MINIMUM_LAND_FRACTION, 1.0 - (profile.waterPercent() / 100.0));
-
-        // Cap the area. A large world, a wet world, a condensed multi-unit sector and a doubled size multiplier all
-        // stack, and together they can ask for thousands of hexes - every one of which is drawn on each repaint and
-        // walked by the placers. The ceiling only bites at those extremes; ordinary sectors are well beneath it.
-        int totalHexes = min(MAX_SECTOR_HEXES, (int) Math.round(playableHexes / landFraction));
+        // The ceiling is a backstop rather than a working limit: the planner has already split the contract into enough
+        // sectors that none of them should ask for more than this. It stays because rounding and the shape roll can
+        // land a hex or two over.
+        int totalHexes = min(MAX_SECTOR_HEXES, requestedHexes(sector.requiredLances(), profile, sizeMultiplier));
 
         SectorDimensions shape = rollSectorShape(totalHexes);
         track.setWidth(shape.width());
         track.setHeight(shape.height());
+    }
+
+    /**
+     * @return the total hexes a sector fronting the given combat teams asks for on this planet, before the area ceiling
+     *       is applied.
+     *
+     *       <p>Size the sector to what its own recon can cover in a quarter: a third of the combat teams fronting it
+     *       are assumed to be recon, and each covers {@link #RECON_HEXES_PER_QUARTER} hexes of dry ground in three
+     *       months. The recon count is deliberately NOT rounded - a sector fronting four teams gets 1.33 recon teams'
+     *       worth of ground, not one team's. Rounding down undersized every sector whose team count was not a multiple
+     *       of three. It is floored at one, because even the smallest sector is scouted by someone. The dry total is
+     *       then grown by the planet's land fraction, since ocean is not playable.</p>
+     */
+    static int requestedHexes(int combatTeams, PlanetProfile profile, double sizeMultiplier) {
+        double reconTeams = max(1.0, combatTeams / (double) COMBAT_TEAMS_PER_RECON_FORCE);
+        double landHexes = reconTeams * RECON_HEXES_PER_QUARTER * profile.sizeFactor() * sizeMultiplier;
+        int playableHexes = max(1, (int) Math.round(landHexes));
+
+        double landFraction = max(MINIMUM_LAND_FRACTION, 1.0 - (profile.waterPercent() / 100.0));
+
+        return (int) Math.round(playableHexes / landFraction);
+    }
+
+    /**
+     * @return the most combat teams a single sector on this planet can front without asking for more ground than
+     *       {@link #MAXIMUM_SECTOR_HEXES} will grant.
+     *
+     *       <p>Used by the planner to split a contract into enough sectors that none of them is clipped by the
+     *       ceiling. The threshold is planetary, not fixed: a dry, small world fits far more teams into one sector than
+     *       a large ocean world does, so this cannot be a constant. Searched rather than solved because the sizing rule
+     *       rounds twice and floors the recon share, which an inverted formula would have to reproduce exactly to stay
+     *       in step with it.</p>
+     */
+    public static int maximumTeamsPerSector(PlanetProfile profile, double sizeMultiplier) {
+        int teams = 1;
+        while ((teams < MAXIMUM_TEAMS_PER_SECTOR_SEARCH_LIMIT) &&
+                     (requestedHexes(teams + 1, profile, sizeMultiplier) <= MAX_SECTOR_HEXES)) {
+            teams++;
+        }
+
+        return teams;
     }
 
     /** A sector's laid-out proportions. */
