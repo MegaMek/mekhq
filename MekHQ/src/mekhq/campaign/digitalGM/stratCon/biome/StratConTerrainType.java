@@ -62,4 +62,16 @@ public class StratConTerrainType {
      * farmed - never forest, swamp, desert, frozen ground, relief, ocean, or built-up hexes.
      */
     public boolean arable;
+
+    /**
+     * The Celsius offset this terrain's local climate applies to a sector's average temperature, used for the
+     * selected-hex readout and for a scenario's board temperature. Defaults to {@code 0}, so only terrains the manifest
+     * gives a value are anything other than temperate.
+     *
+     * <p>This is the terrain's <em>whole</em> offset, not a modifier stacked onto its category: a cold mountain
+     * carries the elevation chill and the cold climate together in one number. Authoring it that way keeps the value a
+     * reader can check against the tile in front of them, rather than one they have to reconstruct from rules
+     * elsewhere.</p>
+     */
+    public int temperatureOffset;
 }

@@ -136,4 +136,41 @@ class StratConTerrainTemperatureOffsetTest {
               terrainTemperatureOffset("ThisTerrainDoesNotExist"),
               "an unrecognized terrain name must be neutral rather than guessing an offset");
     }
+
+    /**
+     * The offsets used to be derived in code by matching terrain-name prefixes and adding a category modifier. They are
+     * now authored per terrain in the manifest. This reproduces the old rule and checks every terrain still comes out
+     * the same, so the move to data changed no sector's climate.
+     */
+    @Test
+    void everyAuthoredOffsetMatchesTheRuleItReplaced() {
+        StratConBiomeManifest manifest = StratConBiomeManifest.getInstance();
+
+        for (String terrain : manifest.getTerrainTypeNames()) {
+            StratConTerrainCategory category = manifest.getTerrainCategory(terrain);
+
+            int expected;
+            if (category == StratConTerrainCategory.VOLCANIC) {
+                expected = 25;
+            } else {
+                expected = (category == StratConTerrainCategory.MOUNTAIN) ? -6 : 0;
+                if (terrain.startsWith("Cold") ||
+                          terrain.equals("Glacier") ||
+                          terrain.equals("SnowField") ||
+                          terrain.equals("FrozenSea") ||
+                          terrain.equals("ArcticDesert") ||
+                          terrain.equals("Tundra")) {
+                    expected -= 8;
+                } else if (terrain.startsWith("Hot") ||
+                                 terrain.equals("Desert") ||
+                                 terrain.equals("Badlands")) {
+                    expected += 8;
+                }
+            }
+
+            assertEquals(expected,
+                  terrainTemperatureOffset(terrain),
+                  terrain + " (" + category + ") should carry the offset the old name-matching rule gave it");
+        }
+    }
 }

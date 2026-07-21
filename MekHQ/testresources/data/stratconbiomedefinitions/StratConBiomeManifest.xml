@@ -170,30 +170,37 @@
     <terrainType>
         <name>ColdSea</name>
         <category>OCEAN</category>
+        <temperatureOffset>-8</temperatureOffset>
     </terrainType>
     <terrainType>
         <name>HotSea</name>
         <category>OCEAN</category>
+        <temperatureOffset>8</temperatureOffset>
     </terrainType>
     <terrainType>
         <name>FrozenSea</name>
         <category>OCEAN</category>
+        <temperatureOffset>-8</temperatureOffset>
     </terrainType>
     <terrainType>
         <name>Mountain</name>
         <category>MOUNTAIN</category>
+        <temperatureOffset>-6</temperatureOffset>
     </terrainType>
     <terrainType>
         <name>ColdMountain</name>
         <category>MOUNTAIN</category>
+        <temperatureOffset>-14</temperatureOffset>
     </terrainType>
     <terrainType>
         <name>HotMountainsWet</name>
         <category>MOUNTAIN</category>
+        <temperatureOffset>2</temperatureOffset>
     </terrainType>
     <terrainType>
         <name>HotMountainsDry</name>
         <category>MOUNTAIN</category>
+        <temperatureOffset>2</temperatureOffset>
     </terrainType>
     <terrainType>
         <name>Urban</name>
@@ -202,14 +209,17 @@
     <terrainType>
         <name>ColdUrban</name>
         <category>URBAN</category>
+        <temperatureOffset>-8</temperatureOffset>
     </terrainType>
     <terrainType>
         <name>HotUrban</name>
         <category>URBAN</category>
+        <temperatureOffset>8</temperatureOffset>
     </terrainType>
     <terrainType>
         <name>Volcano</name>
         <category>VOLCANIC</category>
+        <temperatureOffset>25</temperatureOffset>
     </terrainType>
     <terrainType>
         <name>GrayLunar</name>
@@ -226,10 +236,12 @@
     <terrainType>
         <name>ColdForest</name>
         <category>VEGETATION</category>
+        <temperatureOffset>-8</temperatureOffset>
     </terrainType>
     <terrainType>
         <name>HotForest</name>
         <category>VEGETATION</category>
+        <temperatureOffset>8</temperatureOffset>
     </terrainType>
     <terrainType>
         <name>Jungle</name>
@@ -252,15 +264,18 @@
     <terrainType>
         <name>HotHillsWet</name>
         <category>HILLS</category>
+        <temperatureOffset>8</temperatureOffset>
         <arable>true</arable>
     </terrainType>
     <terrainType>
         <name>Desert</name>
         <category>BARREN</category>
+        <temperatureOffset>8</temperatureOffset>
     </terrainType>
     <terrainType>
         <name>Badlands</name>
         <category>BARREN</category>
+        <temperatureOffset>8</temperatureOffset>
     </terrainType>
     <terrainType>
         <name>Steppe</name>
@@ -270,22 +285,27 @@
     <terrainType>
         <name>ArcticDesert</name>
         <category>BARREN</category>
+        <temperatureOffset>-8</temperatureOffset>
     </terrainType>
     <terrainType>
         <name>Glacier</name>
         <category>BARREN</category>
+        <temperatureOffset>-8</temperatureOffset>
     </terrainType>
     <terrainType>
         <name>SnowField</name>
         <category>BARREN</category>
+        <temperatureOffset>-8</temperatureOffset>
     </terrainType>
     <terrainType>
         <name>Tundra</name>
         <category>BARREN</category>
+        <temperatureOffset>-8</temperatureOffset>
     </terrainType>
     <terrainType>
         <name>HotHillsDry</name>
         <category>HILLS</category>
+        <temperatureOffset>8</temperatureOffset>
     </terrainType>
     <terrainType>
         <name>Hills</name>
@@ -295,6 +315,7 @@
     <terrainType>
         <name>ColdHills</name>
         <category>HILLS</category>
+        <temperatureOffset>-8</temperatureOffset>
     </terrainType>
     <terrainType>
         <name>Farmland</name>

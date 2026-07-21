@@ -203,7 +203,11 @@ public class StratConBiomeManifest {
     /**
      * The Celsius offset a terrain's local climate applies to a sector's average temperature, used both for the
      * selected-hex readout and for a scenario's board temperature. Volcanic ground bakes; mountains, frozen ground, and
-     * "cold" terrain chill; hot/dry terrain warms. Offsets stack (e.g. a cold mountain is both).
+     * "cold" terrain chill; hot/dry terrain warms.
+     *
+     * <p>Read straight from {@link StratConTerrainType#temperatureOffset} in the manifest. It used to be derived here
+     * by matching terrain names against hard-coded prefixes and adding a category modifier, which meant a terrain added
+     * to mm-data silently came out temperate until someone remembered to edit this file too.</p>
      *
      * @param terrainType a StratCon terrain type name
      *
@@ -214,27 +218,8 @@ public class StratConBiomeManifest {
             return 0;
         }
 
-        if (isVolcanicTerrain(terrainType)) {
-            return 25;
-        }
-
-        int offset = 0;
-        if (isMountainTerrain(terrainType)) {
-            offset -= 6; // elevation cooling
-        }
-
-        if (terrainType.startsWith("Cold") ||
-                  terrainType.equals("Glacier") ||
-                  terrainType.equals("SnowField") ||
-                  terrainType.equals("FrozenSea") ||
-                  terrainType.equals("ArcticDesert") ||
-                  terrainType.equals("Tundra")) {
-            offset -= 8;
-        } else if (terrainType.startsWith("Hot") || terrainType.equals("Desert") || terrainType.equals("Badlands")) {
-            offset += 8;
-        }
-
-        return offset;
+        StratConTerrainType definition = getInstance().terrainTypeMap.get(terrainType);
+        return (definition == null) ? 0 : definition.temperatureOffset;
     }
 
     // these constants will eventually be driven by planetary or track data

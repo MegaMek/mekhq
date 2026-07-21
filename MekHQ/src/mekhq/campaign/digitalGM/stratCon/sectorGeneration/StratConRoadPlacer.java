@@ -73,14 +73,9 @@ public final class StratConRoadPlacer {
     private static final int BRIDGE_COST = 120;
 
     /**
-     * The share of a hex's cost waived on a road hub itself, falling off with distance from it. Traffic is cheapest
-     * near a space port, so the network bends toward it and the trunk roads end up converging there - all roads lead
-     * to Rome.
-     *
-     * <p>The falloff divides by {@link #HUB_ATTRACTION_RADIUS} + 1, so the discount is still a little over a tenth at
-     * the edge of the radius and then stops dead outside it, rather than tapering smoothly to nothing. That step is
-     * small enough not to distort routing in practice; dividing by the radius itself would remove it, at the cost of
-     * changing every generated road network.</p>
+     * The share of a hex's cost waived on a road hub itself, tapering linearly to nothing at
+     * {@link #HUB_ATTRACTION_RADIUS}. Traffic is cheapest near a space port, so the network bends toward it and the
+     * trunk roads end up converging there - all roads lead to Rome.
      */
     private static final double HUB_MAX_DISCOUNT = 0.6;
 
@@ -428,9 +423,10 @@ public final class StratConRoadPlacer {
     }
 
     /**
-     * Applies the road-hub discount to a hex cost: full strength on the hub itself, falling with distance and gone
-     * entirely past {@link #HUB_ATTRACTION_RADIUS}. This is what makes trunk roads prefer to run by way of a space
-     * port. See {@link #HUB_MAX_DISCOUNT} for the small step at the edge of the radius.
+     * Applies the road-hub discount to a hex cost: full strength on the hub itself, tapering to nothing by
+     * {@link #HUB_ATTRACTION_RADIUS}. This is what makes trunk roads prefer to run by way of a space port. The taper
+     * reaches zero exactly at the radius, so a hex just inside it costs the same as one just outside and the network
+     * sees no cost step at the boundary.
      *
      * @param hubProximity how many steps each hex lies from the nearest hub; hexes out of reach are simply absent
      */
@@ -440,7 +436,7 @@ public final class StratConRoadPlacer {
             return cost;
         }
 
-        double falloff = 1.0 - (nearest / (double) (HUB_ATTRACTION_RADIUS + 1));
+        double falloff = 1.0 - (nearest / (double) HUB_ATTRACTION_RADIUS);
         return Math.max(1, (int) Math.round(cost * (1.0 - (HUB_MAX_DISCOUNT * falloff))));
     }
 }
