@@ -41,6 +41,7 @@ import static org.mockito.Mockito.when;
 import java.util.HashSet;
 import java.util.Set;
 
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.LatitudeBand;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.PlanetProfile;
@@ -63,8 +64,8 @@ class StratConTrackSizingTest {
 
     private static CampaignOptions options(StratConSectorCountMethod countMethod, double sizeMultiplier) {
         CampaignOptions options = mock(CampaignOptions.class);
-        when(options.getStratConSectorCountMethod()).thenReturn(countMethod);
-        when(options.getStratConSectorSizeMultiplier()).thenReturn(sizeMultiplier);
+        when(options.get(CampaignOption.STRAT_CON_SECTOR_COUNT_METHOD)).thenReturn(countMethod);
+        when(options.get(CampaignOption.STRAT_CON_SECTOR_SIZE_MULTIPLIER)).thenReturn(sizeMultiplier);
         return options;
     }
 
@@ -102,7 +103,7 @@ class StratConTrackSizingTest {
     @Test
     void alternateTerrain_generatesAFullyTerrainedSector() {
         CampaignOptions options = options(StratConSectorCountMethod.ALTERNATE, 1.0);
-        when(options.isUseStratConAlternateSectorTerrain()).thenReturn(true);
+        when(options.get(CampaignOption.USE_STRAT_CON_ALTERNATE_SECTOR_TERRAIN)).thenReturn(true);
 
         StratConTrackState track = track(new SectorSpec(9, LatitudeBand.EQUATORIAL), options);
 

@@ -37,6 +37,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.*;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
@@ -108,7 +109,7 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
      * @return the sector-generation strategy for this GM
      */
     protected ISectorGenerationStrategy getSectorGenerationStrategy(CampaignOptions campaignOptions) {
-        return campaignOptions.isUseStratConAlternateSectorTerrain() ?
+        return campaignOptions.get(CampaignOption.USE_STRAT_CON_ALTERNATE_SECTOR_TERRAIN) ?
                      improvedSectorGeneration :
                      legacySectorGeneration;
     }

@@ -45,7 +45,8 @@ import jakarta.annotation.Nonnull;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.autoResolve.AutoResolveMethod;
-import mekhq.campaign.digitalGM.stratCon.StratConPlayType;
+import mekhq.campaign.digitalGM.stratCon.gm.StratConPlayType;
+import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorCountMethod;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
@@ -860,6 +861,12 @@ public final class CampaignOption<T> {
           of(StratConPlayType.class, StratConPlayType.DISABLED, "stratConPlayType");
     public static final CampaignOption<Boolean> USE_ADVANCED_SCOUTING =
           of(Boolean.class, false, "useAdvancedScouting");
+    public static final CampaignOption<StratConSectorCountMethod> STRAT_CON_SECTOR_COUNT_METHOD =
+          of(StratConSectorCountMethod.class, StratConSectorCountMethod.CONDENSED, "stratConSectorCountMethod");
+    public static final CampaignOption<Boolean> USE_STRAT_CON_ALTERNATE_SECTOR_TERRAIN =
+          of(Boolean.class, true, "useStratConAlternateSectorTerrain");
+    public static final CampaignOption<Double> STRAT_CON_SECTOR_SIZE_MULTIPLIER =
+          of(Double.class, 1.0, "stratConSectorSizeMultiplier");
     public static final CampaignOption<Boolean> NO_SEED_FORCES =
           of(Boolean.class, false, "noSeedForces");
     public static final CampaignOption<SkillLevel> SKILL_LEVEL =

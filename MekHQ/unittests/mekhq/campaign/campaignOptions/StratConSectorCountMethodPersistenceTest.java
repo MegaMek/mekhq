@@ -85,16 +85,17 @@ class StratConSectorCountMethodPersistenceTest {
     @EnumSource(StratConSectorCountMethod.class)
     void everyMethodSurvivesARoundTrip(StratConSectorCountMethod method) throws Exception {
         CampaignOptions options = new CampaignOptions();
-        options.setStratConSectorCountMethod(method);
+        options.set(CampaignOption.STRAT_CON_SECTOR_COUNT_METHOD, method);
 
-        assertEquals(method, unmarshal(marshal(options)).getStratConSectorCountMethod());
+        assertEquals(method, unmarshal(marshal(options)).get(CampaignOption.STRAT_CON_SECTOR_COUNT_METHOD));
     }
 
     @Test
     void newCampaignsDefaultToCondensed() {
         // The two booleans this replaced both defaulted to true, which is what CONDENSED means. A different default
         // here would change sector counts for everyone starting a campaign.
-        assertEquals(StratConSectorCountMethod.CONDENSED, new CampaignOptions().getStratConSectorCountMethod());
+        assertEquals(StratConSectorCountMethod.CONDENSED,
+              new CampaignOptions().get(CampaignOption.STRAT_CON_SECTOR_COUNT_METHOD));
     }
 
     @ParameterizedTest
@@ -108,7 +109,7 @@ class StratConSectorCountMethodPersistenceTest {
                                            condenseSectors +
                                            "</useStratConCondenseSectors>");
 
-        assertEquals(expected, unmarshal(save).getStratConSectorCountMethod());
+        assertEquals(expected, unmarshal(save).get(CampaignOption.STRAT_CON_SECTOR_COUNT_METHOD));
     }
 
     @Test
@@ -119,7 +120,8 @@ class StratConSectorCountMethodPersistenceTest {
                                                     "<useStratConAlternateSectorCount>true" +
                                                     "</useStratConAlternateSectorCount>");
 
-        assertEquals(StratConSectorCountMethod.ALTERNATE, unmarshal(condenseFirst).getStratConSectorCountMethod());
+        assertEquals(StratConSectorCountMethod.ALTERNATE,
+              unmarshal(condenseFirst).get(CampaignOption.STRAT_CON_SECTOR_COUNT_METHOD));
     }
 
     @Test
@@ -129,7 +131,8 @@ class StratConSectorCountMethodPersistenceTest {
                                            "<useStratConAlternateSectorCount>false</useStratConAlternateSectorCount>" +
                                            "<useStratConCondenseSectors>false</useStratConCondenseSectors>");
 
-        assertEquals(StratConSectorCountMethod.REGIMENTAL, unmarshal(both).getStratConSectorCountMethod());
+        assertEquals(StratConSectorCountMethod.REGIMENTAL,
+              unmarshal(both).get(CampaignOption.STRAT_CON_SECTOR_COUNT_METHOD));
     }
 
     @Test

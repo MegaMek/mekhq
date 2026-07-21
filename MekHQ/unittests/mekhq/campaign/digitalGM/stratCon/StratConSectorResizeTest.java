@@ -44,6 +44,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer.ResizeImpact;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
@@ -63,6 +64,7 @@ class StratConSectorResizeTest {
     static void loadStratConData() {
         StratConTestData.install();
     }
+
     private static final String TERRAIN = "Plains";
 
     private static StratConTrackState track(int width, int height) {
@@ -88,7 +90,7 @@ class StratConSectorResizeTest {
     /** A campaign with improved sizing on, which is what enables shape profiles (and so the regeneration re-roll). */
     private static Campaign improvedCampaign() {
         CampaignOptions options = mock(CampaignOptions.class);
-        when(options.getStratConSectorCountMethod()).thenReturn(StratConSectorCountMethod.ALTERNATE);
+        when(options.get(CampaignOption.STRAT_CON_SECTOR_COUNT_METHOD)).thenReturn(StratConSectorCountMethod.ALTERNATE);
 
         Campaign campaign = mock(Campaign.class);
         when(campaign.getCampaignOptions()).thenReturn(options);

@@ -50,6 +50,7 @@ import megamek.common.compute.Compute;
 import megamek.common.util.weightedMaps.WeightedIntMap;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.ObjectiveParameters;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
@@ -169,8 +170,9 @@ public class StratConContractInitializer {
         // Decide how many sectors to generate and how large each one is. The planner always returns at least one
         // sector, so no separate zero-sector fallback is needed.
         List<SectorSpec> sectorSpecs = StratConSectorPlanner.generateSectorSpecs(contract.getRequiredCombatTeams(),
-              campaignOptions.getStratConSectorCountMethod(),
-              maximumTeamsPerSector(planetProfile, campaignOptions.getStratConSectorSizeMultiplier()));
+              campaignOptions.get(CampaignOption.STRAT_CON_SECTOR_COUNT_METHOD),
+              maximumTeamsPerSector(planetProfile,
+                    campaignOptions.get(CampaignOption.STRAT_CON_SECTOR_SIZE_MULTIPLIER)));
 
         // Ares Conventions: when both the employer and the enemy are signatories, urban targeting is off-limits.
         int year = campaign.getLocalDate().getYear();
@@ -415,10 +417,14 @@ public class StratConContractInitializer {
         StratConTrackState retVal = new StratConTrackState();
         retVal.setRequiredLanceCount(sector.requiredLances());
 
-        boolean useImprovedSizing = campaignOptions.getStratConSectorCountMethod().usesImprovedSizing();
+        boolean useImprovedSizing = campaignOptions.get(CampaignOption.STRAT_CON_SECTOR_COUNT_METHOD)
+                                          .usesImprovedSizing();
 
         if (useImprovedSizing) {
-            applyImprovedDimensions(retVal, sector, planetProfile, campaignOptions.getStratConSectorSizeMultiplier());
+            applyImprovedDimensions(retVal,
+                  sector,
+                  planetProfile,
+                  campaignOptions.get(CampaignOption.STRAT_CON_SECTOR_SIZE_MULTIPLIER));
             retVal.setTemperature(improvedTemperature(planetProfile, sector.latitudeBand()));
         } else {
             applyLegacyDimensions(retVal, sector.requiredLances());
@@ -457,7 +463,8 @@ public class StratConContractInitializer {
 
         // Re-roll the latitude band and recompute the temperature from it (matching initializeTrackState), so a
         // regenerated sector's climate actually changes and drives the new biome selection - not just its terrain.
-        boolean useImprovedSizing = campaignOptions.getStratConSectorCountMethod().usesImprovedSizing();
+        boolean useImprovedSizing = campaignOptions.get(CampaignOption.STRAT_CON_SECTOR_COUNT_METHOD)
+                                          .usesImprovedSizing();
         LatitudeBand latitudeBand = LatitudeBand.random();
         if (useImprovedSizing) {
             track.setTemperature(improvedTemperature(planetProfile, latitudeBand));
@@ -924,7 +931,7 @@ public class StratConContractInitializer {
 
     /**
      * @return the most combat teams a single sector on this planet can front without asking for more ground than
-     *       {@link #MAXIMUM_SECTOR_HEXES} will grant.
+     *       {@link #MAX_SECTOR_HEXES} will grant.
      *
      *       <p>Used by the planner to split a contract into enough sectors that none of them is clipped by the
      *       ceiling. The threshold is planetary, not fixed: a dry, small world fits far more teams into one sector than

@@ -49,6 +49,7 @@ import java.util.Optional;
 
 import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.DigitalGMRegistry;
 import mekhq.campaign.digitalGM.IForceDeploymentStrategy;
@@ -254,7 +255,7 @@ class StratConStrategyDelegationTest {
     /** @return campaign options with only the alternate-sector-terrain switch set. */
     private static CampaignOptions optionsWithAlternateTerrain(boolean useAlternateTerrain) {
         CampaignOptions options = mock(CampaignOptions.class);
-        when(options.isUseStratConAlternateSectorTerrain()).thenReturn(useAlternateTerrain);
+        when(options.get(CampaignOption.USE_STRAT_CON_ALTERNATE_SECTOR_TERRAIN)).thenReturn(useAlternateTerrain);
         return options;
     }
 
