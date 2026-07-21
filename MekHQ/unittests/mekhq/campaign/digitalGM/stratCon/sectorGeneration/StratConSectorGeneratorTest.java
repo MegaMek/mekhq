@@ -159,7 +159,7 @@ class StratConSectorGeneratorTest {
     }
 
     @Test
-    void pipelineOrder_rejectsRoadsBeforeTheSettlementTheyConnect() {
+    void pipelineOrder_rejectsFarmlandBeforeTheCitiesItRadiatesFrom() {
         PipelineOrder order = new PipelineOrder();
         order.enter(GenerationStage.BIOME);
         order.enter(GenerationStage.OCEANS);
@@ -168,25 +168,36 @@ class StratConSectorGeneratorTest {
         order.enter(GenerationStage.TERRAIN_FILL);
 
         assertThrows(IllegalStateException.class,
-              () -> order.enter(GenerationStage.ROADS),
-              "roads should not be laid before the cities and farmland they connect");
+              () -> order.enter(GenerationStage.FARMLAND),
+              "farmland should not be placed before the cities it radiates out from");
     }
 
     @Test
     void pipelineOrder_treatsSuppressedCitiesAsSatisfied() {
-        // A sector under the Ares Conventions places no cities, and roads still run over it legitimately - what they
-        // must not do is run before cities that were going to be placed.
+        // A sector under the Ares Conventions places neither cities nor farmland; skipping rather than omitting them
+        // keeps the record complete for anything that follows.
         PipelineOrder order = new PipelineOrder();
         order.enter(GenerationStage.BIOME);
         order.enter(GenerationStage.OCEANS);
         order.enter(GenerationStage.MOUNTAINS);
         order.enter(GenerationStage.TERRAIN_FIELDS);
         order.enter(GenerationStage.TERRAIN_FILL);
-        order.skip(GenerationStage.CITIES);
-        order.skip(GenerationStage.FARMLAND);
 
-        assertDoesNotThrow(() -> order.enter(GenerationStage.ROADS));
-        assertTrue(order.hasReached(GenerationStage.ROADS));
+        assertDoesNotThrow(() -> {
+            order.skip(GenerationStage.CITIES);
+            order.skip(GenerationStage.FARMLAND);
+        });
+        assertTrue(order.hasReached(GenerationStage.FARMLAND));
+    }
+
+    @Test
+    void generate_laysNoRoads() {
+        // Roads are the caller's job now: they span the planet-owner's facilities too, and those are seeded after
+        // generation returns. Laying them here built a network the caller immediately discarded and rebuilt.
+        StratConTrackState track = track(20, 20, 25);
+        StratConSectorGenerator.generate(track, PlanetProfile.neutral(25), LatitudeBand.EQUATORIAL, true);
+
+        assertTrue(track.getRoads().isEmpty(), "generate() should leave the road network to the caller");
     }
 
     @Test

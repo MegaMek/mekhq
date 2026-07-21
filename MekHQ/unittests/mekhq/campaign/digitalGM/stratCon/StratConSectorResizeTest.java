@@ -169,6 +169,23 @@ class StratConSectorResizeTest {
     }
 
     @Test
+    void theCallerLaysTheRoadsThatGenerationNoLongerDoes() {
+        // StratConSectorGenerator.generate() stopped laying roads, because the network has to span facilities seeded
+        // after it returns. This pins the other half of that bargain: connectFacilitiesToRoads must actually build one,
+        // or every sector would come back road-free and nothing would say so.
+        StratConTrackState track = track(12, 12);
+        track.addCity(new StratConCoords(1, 1));
+        track.addCity(new StratConCoords(10, 10));
+
+        StratConContractInitializer.connectFacilitiesToRoads(track, contract(), improvedCampaign());
+
+        assertFalse(track.getRoads().isEmpty(), "the caller should lay a road network connecting the sector's cities");
+        assertTrue(track.getRoads().contains(new StratConCoords(1, 1)),
+              "each city should sit on the network it is connected by");
+        assertTrue(track.getRoads().contains(new StratConCoords(10, 10)));
+    }
+
+    @Test
     void regeneration_reRollsTheSectorShape() {
         // Regeneration used to leave width and height exactly as the contract first set them, so every regenerate
         // handed back the same proportions. It now re-rolls the shape while preserving the sector's area.

@@ -49,7 +49,13 @@ import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
  *
  * <p>The pipeline runs in a strict order: select the biome from temperature, choose a hydrology profile and place
  * oceans, place mountains, derive the geographic fields and fill the remaining dry land from them, place cities and
- * their farmland, lay the roads, then reveal the open water.</p>
+ * their farmland, then reveal the open water.</p>
+ *
+ * <p><b>Roads are not laid here.</b> A sector's road network spans its cities, its farmland <em>and</em> the
+ * planet-owner's facilities, and facilities are seeded after generation returns - so laying roads inside this method
+ * built a network that the caller immediately discarded and rebuilt. The caller lays them once, through
+ * {@code StratConContractInitializer.connectFacilitiesToRoads}, after the sector is populated. Both paths that
+ * generate a sector - initial contract setup and the GM's Regenerate Sector - do so.</p>
  *
  * <h2>Why the order is fixed</h2>
  *
@@ -68,10 +74,7 @@ import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
  *     <li><b>The dry fill needs the fields.</b> This one dependency is enforced by the compiler, because
  *     {@link StratConTerrainFiller#fill} takes the computed fields as a parameter.</li>
  *     <li><b>Farmland needs the cities</b> it radiates out from, so with no cities on the track it places nothing.</li>
- *     <li><b>Roads need both, and so run last.</b> {@link StratConRoadPlacer} spans the cities on the track and then
- *     runs lanes out to the farmland. Run early it lays no network at all - silently, because a sector that
- *     legitimately has no cities is also road-free.</li>
- * </ul>
+ * * </ul>
  *
  * <p>Every one of those failures is silent, and several would pass a casual look at the resulting map. That is what
  * {@link GenerationStage} and {@link PipelineOrder} exist for: the constraint is declared once, and a reordering
@@ -127,8 +130,7 @@ public final class StratConSectorGenerator {
         TERRAIN_FIELDS(OCEANS, MOUNTAINS),
         TERRAIN_FILL(TERRAIN_FIELDS),
         CITIES(TERRAIN_FILL),
-        FARMLAND(CITIES),
-        ROADS(TERRAIN_FILL, CITIES, FARMLAND);
+        FARMLAND(CITIES);
 
         // A plain array rather than an EnumSet: EnumSet.of would touch the enum class while its constants are still
         // being constructed, which fails at class-initialization time.
@@ -253,10 +255,6 @@ public final class StratConSectorGenerator {
             order.skip(GenerationStage.CITIES);
             order.skip(GenerationStage.FARMLAND);
         }
-
-        // Roads: connect the cities and branch each network off the map.
-        order.enter(GenerationStage.ROADS);
-        StratConRoadPlacer.recalculateRoads(track);
 
         // Open water carries no fog of war.
         revealOceanHexes(track);
