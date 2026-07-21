@@ -51,9 +51,31 @@ import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
  * oceans, place mountains, derive the geographic fields and fill the remaining dry land from them, place cities and
  * their farmland, lay the roads, then reveal the open water.</p>
  *
- * <p>That order is a constraint rather than a preference, because the later stages read what the earlier ones wrote
- * off the track. It is declared in {@link GenerationStage} and enforced by {@link PipelineOrder}, so a reordering
- * fails loudly instead of quietly producing a worse sector.</p>
+ * <h2>Why the order is fixed</h2>
+ *
+ * <p>Most stages take the track as an argument and read off it what earlier stages wrote there, rather than being
+ * handed that information directly. Reordering them therefore does not fail on its own - it quietly produces a worse
+ * sector. The dependencies are:</p>
+ *
+ * <ul>
+ *     <li><b>Everything after the biome.</b> The biome fixes which terrain names may appear at this temperature, and
+ *     every later stage draws from that palette.</li>
+ *     <li><b>Mountains need the oceans.</b> {@link StratConMountainPlacer} refuses to overwrite water, so ranges laid
+ *     before the sea would be drowned by it and the sector would lose relief it was meant to have.</li>
+ *     <li><b>Terrain fields need both.</b> {@link StratConTerrainFields} measures every hex's distance to open water
+ *     and to relief. Computed first it measures distance to nothing: moisture reads zero everywhere and the rain
+ *     shadow falls nowhere.</li>
+ *     <li><b>The dry fill needs the fields.</b> This one dependency is enforced by the compiler, because
+ *     {@link StratConTerrainFiller#fill} takes the computed fields as a parameter.</li>
+ *     <li><b>Farmland needs the cities</b> it radiates out from, so with no cities on the track it places nothing.</li>
+ *     <li><b>Roads need both, and so run last.</b> {@link StratConRoadPlacer} spans the cities on the track and then
+ *     runs lanes out to the farmland. Run early it lays no network at all - silently, because a sector that
+ *     legitimately has no cities is also road-free.</li>
+ * </ul>
+ *
+ * <p>Every one of those failures is silent, and several would pass a casual look at the resulting map. That is what
+ * {@link GenerationStage} and {@link PipelineOrder} exist for: the constraint is declared once, and a reordering
+ * throws on the first sector generated instead of shipping subtly wrong terrain.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -64,14 +86,39 @@ public final class StratConSectorGenerator {
     private static final String FALLBACK_OCEAN_TERRAIN = "Sea";
 
     /**
-     * The stages of {@link #generate}, and what each one requires to have already run.
+     * The stages of {@link #generate}, and what each one requires to have already run. See the class javadoc for what
+     * each dependency is and what breaks when it is violated.
      *
-     * <p>The order is not a matter of taste: several stages read what earlier ones wrote off the track rather than
-     * receiving it as an argument, so running them out of order produces a quietly worse sector instead of an error.
-     * {@link StratConTerrainFields} measures each hex's distance to water and to relief, so it is meaningless before
-     * oceans and mountains exist; {@link StratConRoadPlacer} builds its network from the cities and farmland it finds
-     * on the track, so running it first lays no roads at all. Declaring the constraint here makes a reordering fail
-     * immediately and loudly - see {@link PipelineOrder}.</p>
+     * <h2>Why an enum, when there is a class per stage</h2>
+     *
+     * <p>The constant names shadow the placer classes almost one for one, which invites the obvious question: why not
+     * make this an interface the placers implement, so there is a single concept instead of two parallel lists?</p>
+     *
+     * <p>Because this enum <b>declares ordering and nothing else</b>. It holds no behavior, nothing dispatches on it,
+     * and it is never mapped to a class at runtime; its entire content is the prerequisite graph, and its only uses
+     * are the {@link PipelineOrder#enter} calls in {@link #generate}. It is a vocabulary for stating a constraint, not
+     * a second spelling of the placers. Collapsing it into them would not remove a duplicated concept - it would
+     * scatter the constraint across seven files, where no one reading any one of them could see the whole order.</p>
+     *
+     * <p>Making the placers implement a common stage interface is also more expensive than it looks, and would cost
+     * something real:</p>
+     *
+     * <ul>
+     *     <li>They do not share a signature. Ocean placement needs a hydrology type, a hex target and a terrain name;
+     *     mountains need an orogeny profile, gravity and habitability; the fields need a latitude band and a wind
+     *     direction. Unifying them requires a context object carrying all of it.</li>
+     *     <li>That context cannot simply be the track. {@link StratConTrackState} is the save format - it is
+     *     JAXB-bound - so hanging the planet profile, biome, wind direction and field arrays off it would mean writing
+     *     generation scratch into every save, or maintaining transient-field discipline forever.</li>
+     *     <li>It would demote the one ordering constraint the compiler currently enforces.
+     *     {@link StratConTerrainFiller#fill} takes the computed fields as a parameter, so it cannot be called before
+     *     them; on a shared context that becomes a nullable slot checked at runtime, if at all.</li>
+     * </ul>
+     *
+     * <p>A genuinely different way to build a sector is not a second stage list either - it is another
+     * {@link mekhq.campaign.digitalGM.ISectorGenerationStrategy}, which is the seam that already picks between this
+     * generator and the legacy placer. The placers are public and stateless, so such a strategy can compose them in
+     * whatever order it likes without any of the machinery above.</p>
      */
     enum GenerationStage {
         BIOME,
@@ -99,10 +146,17 @@ public final class StratConSectorGenerator {
     /**
      * Records which pipeline stages have been reached, and refuses one whose prerequisites have not.
      *
+     * <p>One instance lives for the duration of a single {@link #generate} call and is thrown away with it, so this
+     * holds no state between sectors and costs a few set operations per sector. The check is a development guard
+     * rather than a runtime feature: it never fires for correct code, and its whole purpose is to convert a silent
+     * degradation into an immediate, named failure the first time a sector is generated after someone reorders the
+     * pipeline.</p>
+     *
      * <p>A stage that is deliberately not run - cities and farmland, when the Ares Conventions suppress them - is
      * {@link #skip(GenerationStage) skipped} rather than omitted, so the stages that follow it still consider their
      * prerequisite satisfied. Roads legitimately run over a sector with no cities; what they cannot do is run
-     * <em>before</em> the cities that were going to be placed.</p>
+     * <em>before</em> the cities that were going to be placed. Omitting the stages instead would make the guard throw
+     * on every Ares-Conventions contract.</p>
      */
     static final class PipelineOrder {
         private final Set<GenerationStage> reached = EnumSet.noneOf(GenerationStage.class);
