@@ -80,7 +80,7 @@ class StratConSectorResizeTest {
     }
 
     private static Campaign campaign() {
-        CampaignOptions options = mock(CampaignOptions.class);
+        CampaignOptions options = new CampaignOptions();
         Campaign campaign = mock(Campaign.class);
         when(campaign.getCampaignOptions()).thenReturn(options);
         when(campaign.getLocalDate()).thenReturn(LocalDate.of(3151, 1, 1));
@@ -89,8 +89,8 @@ class StratConSectorResizeTest {
 
     /** A campaign with improved sizing on, which is what enables shape profiles (and so the regeneration re-roll). */
     private static Campaign improvedCampaign() {
-        CampaignOptions options = mock(CampaignOptions.class);
-        when(options.get(CampaignOption.STRAT_CON_SECTOR_COUNT_METHOD)).thenReturn(StratConSectorCountMethod.ALTERNATE);
+        CampaignOptions options = new CampaignOptions();
+        options.set(CampaignOption.STRAT_CON_SECTOR_COUNT_METHOD, StratConSectorCountMethod.ALTERNATE);
 
         Campaign campaign = mock(Campaign.class);
         when(campaign.getCampaignOptions()).thenReturn(options);

@@ -35,8 +35,6 @@ package mekhq.campaign.digitalGM.stratCon;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -62,10 +60,14 @@ class StratConTrackSizingTest {
 
     private static final int NEUTRAL_TEMPERATURE = 25;
 
+    /**
+     * Real options rather than a mock: every option then falls back to its declared default, so generation reading an
+     * option this test does not care about gets a usable value instead of a mock's null.
+     */
     private static CampaignOptions options(StratConSectorCountMethod countMethod, double sizeMultiplier) {
-        CampaignOptions options = mock(CampaignOptions.class);
-        when(options.get(CampaignOption.STRAT_CON_SECTOR_COUNT_METHOD)).thenReturn(countMethod);
-        when(options.get(CampaignOption.STRAT_CON_SECTOR_SIZE_MULTIPLIER)).thenReturn(sizeMultiplier);
+        CampaignOptions options = new CampaignOptions();
+        options.set(CampaignOption.STRAT_CON_SECTOR_COUNT_METHOD, countMethod);
+        options.set(CampaignOption.STRAT_CON_SECTOR_SIZE_MULTIPLIER, sizeMultiplier);
         return options;
     }
 
@@ -103,7 +105,7 @@ class StratConTrackSizingTest {
     @Test
     void alternateTerrain_generatesAFullyTerrainedSector() {
         CampaignOptions options = options(StratConSectorCountMethod.ALTERNATE, 1.0);
-        when(options.get(CampaignOption.USE_STRAT_CON_ALTERNATE_SECTOR_TERRAIN)).thenReturn(true);
+        options.set(CampaignOption.USE_STRAT_CON_ALTERNATE_SECTOR_TERRAIN, true);
 
         StratConTrackState track = track(new SectorSpec(9, LatitudeBand.EQUATORIAL), options);
 
