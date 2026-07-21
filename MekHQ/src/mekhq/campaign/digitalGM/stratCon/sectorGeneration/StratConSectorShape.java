@@ -69,7 +69,11 @@ public class StratConSectorShape {
 
     private static StratConSectorShape instance;
 
-    /** The root object of {@code SectorShapeProfiles.yaml}. */
+    /**
+     * The root object of {@code SectorShapeProfiles.yaml}.
+     *
+     * @param profiles the authored sector shape profiles to pick between
+     */
     public record Library(List<SectorShapeProfile> profiles) {}
 
     private StratConSectorShape(List<SectorShapeProfile> profiles) {

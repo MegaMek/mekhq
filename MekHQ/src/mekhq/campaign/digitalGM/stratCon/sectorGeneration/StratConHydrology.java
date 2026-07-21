@@ -76,7 +76,12 @@ public class StratConHydrology {
 
     private static StratConHydrology instance;
 
-    /** The root object of {@code HydrologyProfiles.yaml}. */
+    /**
+     * The root object of {@code HydrologyProfiles.yaml}.
+     *
+     * @param sigma    spread of the water-coverage Gaussian, in percentage points
+     * @param profiles the authored hydrology profiles to pick between
+     */
     public record Library(double sigma, List<HydrologyProfile> profiles) {}
 
     private StratConHydrology(double sigma, List<HydrologyProfile> profiles) {

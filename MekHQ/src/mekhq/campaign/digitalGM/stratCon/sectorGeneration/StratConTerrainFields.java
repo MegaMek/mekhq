@@ -104,7 +104,7 @@ public final class StratConTerrainFields {
     }
 
     /**
-     * @return {@code moisture} at the hex: {@code 1.0} on/next to water, falling linearly to {@code 0.0} beyond the
+     * @return {@code moisture} at the hex: {@code 1.0} on water itself, falling linearly with distance to {@code 0.0} beyond the
      *       moisture reach, and {@code 0.0} everywhere when the sector has no water
      */
     public double moistureAt(StratConCoords coords) {

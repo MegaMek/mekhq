@@ -78,7 +78,15 @@ public class StratConUrban {
 
     private static StratConUrban instance;
 
-    /** The root object of {@code UrbanProfiles.yaml}. */
+    /**
+     * The root object of {@code UrbanProfiles.yaml}.
+     *
+     * @param populationSigma   spread of the population Gaussian, in log10 population
+     * @param waterSigma        spread of the water-coverage Gaussian, in percentage points
+     * @param habitabilitySigma spread of the habitability Gaussian, on habitability's 0-1 scale
+     * @param techSigma         spread of the technology Gaussian, on the tech level's 0-1 scale
+     * @param profiles          the authored urban profiles to pick between
+     */
     public record Library(Double populationSigma, Double waterSigma, Double habitabilitySigma, Double techSigma,
           List<UrbanProfile> profiles) {}
 

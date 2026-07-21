@@ -73,9 +73,14 @@ public final class StratConRoadPlacer {
     private static final int BRIDGE_COST = 120;
 
     /**
-     * The share of a hex's cost waived right beside a road hub, tapering to nothing at {@link #HUB_ATTRACTION_RADIUS}.
-     * Traffic is cheapest near a space port, so the network bends toward it and the trunk roads end up converging there
-     * - all roads lead to Rome.
+     * The share of a hex's cost waived on a road hub itself, falling off with distance from it. Traffic is cheapest
+     * near a space port, so the network bends toward it and the trunk roads end up converging there - all roads lead
+     * to Rome.
+     *
+     * <p>The falloff divides by {@link #HUB_ATTRACTION_RADIUS} + 1, so the discount is still a little over a tenth at
+     * the edge of the radius and then stops dead outside it, rather than tapering smoothly to nothing. That step is
+     * small enough not to distort routing in practice; dividing by the radius itself would remove it, at the cost of
+     * changing every generated road network.</p>
      */
     private static final double HUB_MAX_DISCOUNT = 0.6;
 
@@ -368,8 +373,12 @@ public final class StratConRoadPlacer {
     }
 
     /**
-     * Rebuilds the hex path from a source to {@code target} by following the previous-hex links; includes both
-     * endpoints.
+     * Rebuilds the hex path between {@code target} and the search's source by following the previous-hex links;
+     * includes both endpoints.
+     *
+     * <p>The list runs <em>from {@code target} back to the source</em>, because that is the direction the links point.
+     * Every caller only drains it into a set of road hexes, so the order has never mattered - but it will to the first
+     * caller that walks the path.</p>
      */
     private static List<StratConCoords> reconstruct(Pathing pathing, StratConCoords target) {
         List<StratConCoords> path = new ArrayList<>();
@@ -419,8 +428,9 @@ public final class StratConRoadPlacer {
     }
 
     /**
-     * Applies the road-hub discount to a hex cost: full strength on the hub itself, tapering to nothing once past
-     * {@link #HUB_ATTRACTION_RADIUS}. This is what makes trunk roads prefer to run by way of a space port.
+     * Applies the road-hub discount to a hex cost: full strength on the hub itself, falling with distance and gone
+     * entirely past {@link #HUB_ATTRACTION_RADIUS}. This is what makes trunk roads prefer to run by way of a space
+     * port. See {@link #HUB_MAX_DISCOUNT} for the small step at the edge of the radius.
      *
      * @param hubProximity how many steps each hex lies from the nearest hub; hexes out of reach are simply absent
      */

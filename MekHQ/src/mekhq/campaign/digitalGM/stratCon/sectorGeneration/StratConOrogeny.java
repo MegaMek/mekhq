@@ -78,7 +78,14 @@ public class StratConOrogeny {
 
     private static StratConOrogeny instance;
 
-    /** The root object of {@code OrogenyProfiles.yaml}. */
+    /**
+     * The root object of {@code OrogenyProfiles.yaml}.
+     *
+     * @param gravitySigma     spread of the gravity Gaussian, in G
+     * @param temperatureSigma spread of the temperature Gaussian, in degrees Celsius
+     * @param waterSigma       spread of the water-coverage Gaussian, in percentage points
+     * @param profiles         the authored orogeny profiles to pick between
+     */
     public record Library(Double gravitySigma, Double temperatureSigma, Double waterSigma,
           List<OrogenyProfile> profiles) {}
 

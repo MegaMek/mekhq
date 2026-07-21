@@ -495,6 +495,7 @@ public class StratConContractInitializer {
      * @param scenarios  how many scenarios would be displaced back inside the sector
      * @param objectives how many strategic objectives sit on the ground being cut away
      * @param forces     how many deployed forces would be recalled
+     * @param freeHexes  how many hexes inside the new bounds are free to receive a displaced occupant
      */
     public record ResizeImpact(int facilities, int scenarios, int objectives, int forces, int freeHexes) {
         public boolean isEmpty() {

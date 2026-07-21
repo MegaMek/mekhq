@@ -132,7 +132,7 @@ public final class StratConFarmPlacer {
     }
 
     /**
-     * @return an intensity multiplier in roughly {@code [0.2, 1.1]} from the planet's habitability, population, and
+     * @return an intensity multiplier in {@code [0.16, 1.1]} from the planet's habitability, population, and
      *       technology - harsh, empty, or low-tech worlds farm less; comfortable, populous, high-tech worlds farm
      *       more.
      */

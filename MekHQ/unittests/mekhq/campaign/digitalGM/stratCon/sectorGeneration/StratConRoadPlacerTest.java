@@ -235,7 +235,7 @@ class StratConRoadPlacerTest {
     @Test
     void routesAroundMountainsWhenADetourIsCheaper() {
         // Cities two hexes apart with a lone mountain directly between them; the short detour over plains is cheaper
-        // than crossing the (cost-5) mountain, so the road should avoid it.
+        // than crossing the mountain, which costs five times what plains do (RELIEF_COST 50 against NORMAL_COST 10).
         StratConTrackState track = landTrack(4, 3);
         StratConCoords a = new StratConCoords(0, 0);
         StratConCoords b = new StratConCoords(2, 0);

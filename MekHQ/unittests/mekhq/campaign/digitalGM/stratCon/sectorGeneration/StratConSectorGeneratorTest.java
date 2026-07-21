@@ -191,7 +191,9 @@ class StratConSectorGeneratorTest {
 
     @Test
     void pipelineOrder_acceptsTheOrderGenerateActuallyUses() {
-        // Pins the declared order against the real one: if generate() is reordered, one of these two fails.
+        // Checks the prerequisite graph is internally consistent: walking the stages in declaration order never trips
+        // its own guard. It does NOT pin generate() - reordering the enter() calls there would still pass here, and
+        // would instead throw on the first sector generated, which is the guard doing its job.
         PipelineOrder order = new PipelineOrder();
 
         assertDoesNotThrow(() -> {
