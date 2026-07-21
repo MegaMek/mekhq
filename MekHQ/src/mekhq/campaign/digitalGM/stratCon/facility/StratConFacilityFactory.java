@@ -75,40 +75,61 @@ public class StratConFacilityFactory {
      * Worker function that reloads all the facilities from disk
      */
     public static void reloadFacilities() {
+        reloadFacilities(MHQConstants.STRAT_CON_FACILITY_MANIFEST,
+              MHQConstants.STRAT_CON_USER_FACILITY_MANIFEST,
+              MHQConstants.STRAT_CON_FACILITY_PATH);
+    }
+
+    /**
+     * Test seam: reloads the facilities from an explicit manifest and directory.
+     *
+     * <p>The {@code data} directory is built when the application launches, so under test the default paths resolve to
+     * nothing and the facility lists are left empty. That surfaces far downstream as a null facility rather than as a
+     * missing file, so tests that place facilities must call this first - see {@code StratConTestData}.</p>
+     *
+     * @param manifestPath the facility manifest to read
+     * @param facilityPath the directory holding the facility files the manifest names
+     */
+    public static void loadForTest(String manifestPath, String facilityPath) {
+        reloadFacilities(manifestPath, null, facilityPath);
+    }
+
+    private static void reloadFacilities(String manifestPath, @Nullable String userManifestPath, String facilityPath) {
         stratConFacilityList.clear();
         hostileFacilities.clear();
         alliedFacilities.clear();
         stratconFacilityMap.clear();
 
         // load dynamic scenarios
-        StratConFacilityManifest facilityManifest = StratConFacilityManifest
-                                                          .deserialize(MHQConstants.STRAT_CON_FACILITY_MANIFEST);
+        StratConFacilityManifest facilityManifest = StratConFacilityManifest.deserialize(manifestPath);
 
         // load user-specified scenario list
-        StratConFacilityManifest userManifest = StratConFacilityManifest
-                                                      .deserialize(MHQConstants.STRAT_CON_USER_FACILITY_MANIFEST);
+        StratConFacilityManifest userManifest = (userManifestPath == null) ?
+                                                      null :
+                                                      StratConFacilityManifest.deserialize(userManifestPath);
 
         if (facilityManifest != null) {
-            loadFacilitiesFromManifest(facilityManifest);
+            loadFacilitiesFromManifest(facilityManifest, facilityPath);
         }
 
         if (userManifest != null) {
-            loadFacilitiesFromManifest(userManifest);
+            loadFacilitiesFromManifest(userManifest, facilityPath);
         }
     }
 
     /**
      * Helper function that loads scenario templates from the given manifest.
      *
-     * @param manifest The manifest to process
+     * @param manifest     The manifest to process
+     * @param facilityPath the directory holding the facility files the manifest names
      */
-    private static void loadFacilitiesFromManifest(StratConFacilityManifest manifest) {
+    private static void loadFacilitiesFromManifest(StratConFacilityManifest manifest, String facilityPath) {
         if (manifest == null) {
             return;
         }
 
         for (String fileName : manifest.facilityFileNames) {
-            String filePath = Paths.get(MHQConstants.STRAT_CON_FACILITY_PATH, fileName.trim()).toString();
+            String filePath = Paths.get(facilityPath, fileName.trim()).toString();
 
             try {
                 StratConFacility facility = StratConFacility.deserialize(filePath);

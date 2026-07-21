@@ -32,11 +32,13 @@
  */
 package mekhq.campaign.digitalGM.stratCon;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityFactory;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConHydrology;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConOrogeny;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorShape;
@@ -61,6 +63,7 @@ public final class StratConTestData {
     private StratConTestData() {}
 
     private static final String FIXTURE_DIRECTORY = "testresources/data/stratconbiomedefinitions";
+    private static final String FACILITY_DIRECTORY = "testresources/data/stratconfacilities";
 
     private static boolean loaded;
 
@@ -78,6 +81,16 @@ public final class StratConTestData {
         StratConOrogeny.loadForTest(fixture("OrogenyProfiles.yaml"));
         StratConUrban.loadForTest(fixture("UrbanProfiles.yaml"));
         StratConSectorShape.loadForTest(fixture("SectorShapeProfiles.yaml"));
+
+        // Facilities are a directory rather than a single file: the manifest names the files, which sit beside it.
+        StratConFacilityFactory.loadForTest(new File(FACILITY_DIRECTORY, "facilitymanifest.xml").getPath(),
+              FACILITY_DIRECTORY);
+        assertFalse(StratConFacilityFactory.getHostileFacilities().isEmpty(),
+              "No hostile facilities loaded from " + FACILITY_DIRECTORY +
+                    " - copy them from mm-data/data/stratconfacilities/");
+        assertFalse(StratConFacilityFactory.getAlliedFacilities().isEmpty(),
+              "No allied facilities loaded from " + FACILITY_DIRECTORY +
+                    " - copy them from mm-data/data/stratconfacilities/");
 
         loaded = true;
     }
