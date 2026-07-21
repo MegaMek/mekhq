@@ -378,7 +378,7 @@ public final class StratConTerrainFiller {
             for (int y = 0; y < track.getHeight(); y++) {
                 StratConCoords coords = new StratConCoords(x, y);
                 if (isConvertibleFillHex(track, coords) &&
-                          hasOceanNeighbor(track, coords) &&
+                          StratConOceanPlacer.isWaterAdjacent(track, coords) &&
                           (Compute.randomInt(100) < RIPARIAN_CHANCE)) {
                     track.setTerrainTile(coords, vegetation);
                 }
@@ -398,14 +398,6 @@ public final class StratConTerrainFiller {
                      !StratConBiomeManifest.isUrbanTerrain(terrain);
     }
 
-    private static boolean hasOceanNeighbor(StratConTrackState track, StratConCoords coords) {
-        for (StratConCoords neighbor : StratConHexGeometry.neighbors(track, coords)) {
-            if (StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(neighbor))) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     /**
      * @return the first terrain in the biome matching the predicate, or {@code null} if the biome offers none

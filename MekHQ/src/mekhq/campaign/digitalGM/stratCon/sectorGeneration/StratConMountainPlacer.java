@@ -156,7 +156,11 @@ public final class StratConMountainPlacer {
         int heading = Compute.randomInt(StratConHexGeometry.HEX_DIRECTIONS);
 
         for (int ridge = 0; ridge < ridgeCount; ridge++) {
-            drawStrip(track, randomCoords(track), heading, length, terrainFor(mountainTerrain, volcanism));
+            drawStrip(track,
+                  StratConHexGeometry.randomCoords(track),
+                  heading,
+                  length,
+                  terrainFor(mountainTerrain, volcanism));
         }
     }
 
@@ -215,7 +219,7 @@ public final class StratConMountainPlacer {
      */
     private static void arc(StratConTrackState track, String mountainTerrain, int volcanism, int features) {
         int length = max(4, (int) round(max(track.getWidth(), track.getHeight()) * (1.0 + (features * 0.4))));
-        StratConCoords current = randomEdgeCoords(track);
+        StratConCoords current = StratConHexGeometry.randomEdgeCoords(track);
         int heading = Compute.randomInt(StratConHexGeometry.HEX_DIRECTIONS);
         int turnBias = (Compute.randomInt(2) == 0) ? 1 : (StratConHexGeometry.HEX_DIRECTIONS - 1);
 
@@ -280,31 +284,17 @@ public final class StratConMountainPlacer {
         return ocean;
     }
 
-    private static StratConCoords randomCoords(StratConTrackState track) {
-        return new StratConCoords(Compute.randomInt(track.getWidth()), Compute.randomInt(track.getHeight()));
-    }
 
     /**
      * @return a random non-ocean hex, or the center hex if no land hex is found within a few attempts
      */
     private static StratConCoords randomLandCoords(StratConTrackState track) {
         for (int attempt = 0; attempt < LAND_SEED_ATTEMPTS; attempt++) {
-            StratConCoords coords = randomCoords(track);
+            StratConCoords coords = StratConHexGeometry.randomCoords(track);
             if (!isOcean(track, coords)) {
                 return coords;
             }
         }
         return new StratConCoords(track.getWidth() / 2, track.getHeight() / 2);
-    }
-
-    private static StratConCoords randomEdgeCoords(StratConTrackState track) {
-        int width = track.getWidth();
-        int height = track.getHeight();
-        return switch (Compute.randomInt(4)) {
-            case 0 -> new StratConCoords(Compute.randomInt(width), 0);
-            case 1 -> new StratConCoords(Compute.randomInt(width), height - 1);
-            case 2 -> new StratConCoords(0, Compute.randomInt(height));
-            default -> new StratConCoords(width - 1, Compute.randomInt(height));
-        };
     }
 }

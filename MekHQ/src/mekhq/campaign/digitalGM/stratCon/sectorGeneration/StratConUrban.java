@@ -39,7 +39,6 @@ import java.util.List;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import megamek.common.compute.Compute;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 
@@ -68,7 +67,6 @@ public class StratConUrban {
     private static final UrbanProfile DEFAULT_PROFILE = new UrbanProfile(UrbanProfileType.DISPERSED,
           null, null, null, null, null, null, null, null, null);
 
-    private static final double PICK_RESOLUTION = 1_000_000.0;
 
     private final double populationSigma;
     private final double waterSigma;
@@ -260,24 +258,6 @@ public class StratConUrban {
      * @return the chosen profile
      */
     public UrbanProfile selectProfile(PlanetProfile planet) {
-        double totalWeight = 0.0;
-        for (UrbanProfile profile : profiles) {
-            totalWeight += weightOf(profile, planet);
-        }
-
-        if (totalWeight <= 0.0) {
-            return profiles.getFirst();
-        }
-
-        double roll = (Compute.randomInt((int) PICK_RESOLUTION) / PICK_RESOLUTION) * totalWeight;
-        double cumulative = 0.0;
-        for (UrbanProfile profile : profiles) {
-            cumulative += weightOf(profile, planet);
-            if (roll < cumulative) {
-                return profile;
-            }
-        }
-
-        return profiles.getLast();
+        return WeightedProfilePicker.pick(profiles, profile -> weightOf(profile, planet));
     }
 }

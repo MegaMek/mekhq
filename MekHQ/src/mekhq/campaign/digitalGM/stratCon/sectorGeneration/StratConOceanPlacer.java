@@ -97,14 +97,15 @@ public final class StratConOceanPlacer {
             case INLAND -> scatteredBlobs(track, oceanTarget, 1, 2, true);
             case LAKELANDS -> scatteredBlobs(track, oceanTarget, 4, 8, false);
             case MARSHLANDS -> scatteredBlobs(track, oceanTarget, 8, 16, false);
-            case COASTAL -> singleBlob(track, oceanTarget, randomEdgeCoords(track));
-            case INLAND_SEA -> singleBlob(track, oceanTarget, centerCoords(track));
+            case COASTAL -> singleBlob(track, oceanTarget, StratConHexGeometry.randomEdgeCoords(track));
+            case INLAND_SEA -> singleBlob(track, oceanTarget, StratConHexGeometry.centerCoords(track));
             case RIVERLANDS -> river(track, oceanTarget);
-            case ISLAND -> complement(track, singleBlob(track, landTarget, centerCoords(track)));
+            case ISLAND -> complement(track, singleBlob(track, landTarget, StratConHexGeometry.centerCoords(track)));
             // The land blobs are isolated: an archipelago is a group of islands, so they must not fuse into one
             // landmass the way freely-grown blobs usually did.
             case ARCHIPELAGO -> complement(track, scatteredBlobs(track, landTarget, 3, 6, true));
-            case PENINSULA -> complement(track, singleBlob(track, landTarget, randomEdgeCoords(track)));
+            case PENINSULA ->
+                  complement(track, singleBlob(track, landTarget, StratConHexGeometry.randomEdgeCoords(track)));
         };
 
         for (StratConCoords coords : ocean) {
@@ -130,7 +131,7 @@ public final class StratConOceanPlacer {
         while ((region.size() < target) && (attempts < attemptLimit)) {
             attempts++;
 
-            StratConCoords seed = randomCoords(track);
+            StratConCoords seed = StratConHexGeometry.randomCoords(track);
             Set<StratConCoords> blocked = new HashSet<>(region);
             if (isolate) {
                 blocked.addAll(neighborsOf(track, region));
@@ -159,7 +160,7 @@ public final class StratConOceanPlacer {
      */
     private static Set<StratConCoords> river(StratConTrackState track, int target) {
         Set<StratConCoords> region = new HashSet<>();
-        StratConCoords current = randomEdgeCoords(track);
+        StratConCoords current = StratConHexGeometry.randomEdgeCoords(track);
         region.add(current);
 
         int direction = Compute.randomInt(StratConHexGeometry.HEX_DIRECTIONS);
@@ -211,26 +212,5 @@ public final class StratConOceanPlacer {
             result.addAll(StratConHexGeometry.neighbors(track, coords));
         }
         return result;
-    }
-
-    private static StratConCoords randomCoords(StratConTrackState track) {
-        return new StratConCoords(Compute.randomInt(track.getWidth()), Compute.randomInt(track.getHeight()));
-    }
-
-    private static StratConCoords centerCoords(StratConTrackState track) {
-        return new StratConCoords(track.getWidth() / 2, track.getHeight() / 2);
-    }
-
-    private static StratConCoords randomEdgeCoords(StratConTrackState track) {
-        int width = track.getWidth();
-        int height = track.getHeight();
-
-        // Pick one of the four edges, then a random position along it.
-        return switch (Compute.randomInt(4)) {
-            case 0 -> new StratConCoords(Compute.randomInt(width), 0);
-            case 1 -> new StratConCoords(Compute.randomInt(width), height - 1);
-            case 2 -> new StratConCoords(0, Compute.randomInt(height));
-            default -> new StratConCoords(width - 1, Compute.randomInt(height));
-        };
     }
 }

@@ -201,7 +201,7 @@ public final class StratConCityPlacer {
             }
 
             double weight = 1.0;
-            if (isCoastal(track, coords)) {
+            if (StratConOceanPlacer.isWaterAdjacent(track, coords)) {
                 weight += coastalBias * COASTAL_WEIGHT;
             }
 
@@ -236,14 +236,6 @@ public final class StratConCityPlacer {
         return candidates.getLast();
     }
 
-    private static boolean isCoastal(StratConTrackState track, StratConCoords coords) {
-        for (StratConCoords neighbor : StratConHexGeometry.neighbors(track, coords)) {
-            if (StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(neighbor))) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     private static List<StratConCoords> landHexes(StratConTrackState track) {
         List<StratConCoords> land = new ArrayList<>();

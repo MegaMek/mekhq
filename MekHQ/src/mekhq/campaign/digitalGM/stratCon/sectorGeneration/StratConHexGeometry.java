@@ -199,4 +199,34 @@ public final class StratConHexGeometry {
         }
         return region;
     }
+
+    /**
+     * @return a uniformly random hex anywhere in the sector. Used to seed a feature that may start anywhere - a lake, a
+     *       scattered peak - as opposed to one that has to start at an edge or the middle.
+     */
+    public static StratConCoords randomCoords(StratConTrackState track) {
+        return new StratConCoords(Compute.randomInt(track.getWidth()), Compute.randomInt(track.getHeight()));
+    }
+
+    /**
+     * @return a uniformly random hex on one of the sector's four edges. Used to seed features that read as running in
+     *       from off the map, such as a coastline or a mountain range crossing the sector.
+     */
+    public static StratConCoords randomEdgeCoords(StratConTrackState track) {
+        int width = track.getWidth();
+        int height = track.getHeight();
+
+        // Pick one of the four edges, then a random position along it.
+        return switch (Compute.randomInt(4)) {
+            case 0 -> new StratConCoords(Compute.randomInt(width), 0);
+            case 1 -> new StratConCoords(Compute.randomInt(width), height - 1);
+            case 2 -> new StratConCoords(0, Compute.randomInt(height));
+            default -> new StratConCoords(width - 1, Compute.randomInt(height));
+        };
+    }
+
+    /** @return the sector's middle hex, for a feature meant to sit centrally such as a single inland sea or upland. */
+    public static StratConCoords centerCoords(StratConTrackState track) {
+        return new StratConCoords(track.getWidth() / 2, track.getHeight() / 2);
+    }
 }

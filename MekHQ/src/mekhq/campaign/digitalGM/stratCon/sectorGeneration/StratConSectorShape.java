@@ -39,7 +39,6 @@ import java.util.List;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import megamek.common.compute.Compute;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 
@@ -62,8 +61,6 @@ public class StratConSectorShape {
           1.0,
           1.0);
 
-    /** Granularity of the weighted roll. */
-    private static final double PICK_RESOLUTION = 1_000_000.0;
 
     private final List<SectorShapeProfile> profiles;
 
@@ -161,24 +158,6 @@ public class StratConSectorShape {
      * @return the chosen profile
      */
     public SectorShapeProfile selectProfile() {
-        double totalWeight = 0.0;
-        for (SectorShapeProfile profile : profiles) {
-            totalWeight += profile.weightOrDefault();
-        }
-
-        if (totalWeight <= 0.0) {
-            return profiles.get(0);
-        }
-
-        double roll = (Compute.randomInt((int) PICK_RESOLUTION) / PICK_RESOLUTION) * totalWeight;
-        double cumulative = 0.0;
-        for (SectorShapeProfile profile : profiles) {
-            cumulative += profile.weightOrDefault();
-            if (roll < cumulative) {
-                return profile;
-            }
-        }
-
-        return profiles.get(profiles.size() - 1);
+        return WeightedProfilePicker.pick(profiles, SectorShapeProfile::weightOrDefault);
     }
 }

@@ -39,7 +39,6 @@ import java.util.List;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import megamek.common.compute.Compute;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 
@@ -69,7 +68,6 @@ public class StratConOrogeny {
     private static final OrogenyProfile DEFAULT_PROFILE = new OrogenyProfile(OrogenyProfileType.CORDILLERA,
           null, null, null, null, null, null, null, null);
 
-    private static final double PICK_RESOLUTION = 1000000.0;
 
     private final double gravitySigma;
     private final double temperatureSigma;
@@ -260,24 +258,6 @@ public class StratConOrogeny {
      * @return the chosen profile
      */
     public OrogenyProfile selectProfile(PlanetProfile planet) {
-        double totalWeight = 0.0;
-        for (OrogenyProfile profile : profiles) {
-            totalWeight += weightOf(profile, planet);
-        }
-
-        if (totalWeight <= 0.0) {
-            return profiles.getFirst();
-        }
-
-        double roll = (Compute.randomInt((int) PICK_RESOLUTION) / PICK_RESOLUTION) * totalWeight;
-        double cumulative = 0.0;
-        for (OrogenyProfile profile : profiles) {
-            cumulative += weightOf(profile, planet);
-            if (roll < cumulative) {
-                return profile;
-            }
-        }
-
-        return profiles.getLast();
+        return WeightedProfilePicker.pick(profiles, profile -> weightOf(profile, planet));
     }
 }

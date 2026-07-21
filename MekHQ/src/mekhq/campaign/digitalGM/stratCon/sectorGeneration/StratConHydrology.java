@@ -68,8 +68,6 @@ public class StratConHydrology {
           45,
           35.0);
 
-    /** A constant used to define the level of granularity or precision when selecting a hydrology profile. */
-    private static final double PICK_RESOLUTION = 1000000.0;
 
     private final double sigma;
     private final List<HydrologyProfile> profiles;
@@ -199,25 +197,7 @@ public class StratConHydrology {
      * @return the chosen profile
      */
     public HydrologyProfile selectProfile(int waterPercent) {
-        double totalWeight = 0.0;
-        for (HydrologyProfile profile : profiles) {
-            totalWeight += weight(profile, waterPercent, sigma);
-        }
-
-        if (totalWeight <= 0.0) {
-            return profiles.getFirst();
-        }
-
-        double roll = (Compute.randomInt((int) PICK_RESOLUTION) / PICK_RESOLUTION) * totalWeight;
-        double cumulative = 0.0;
-        for (HydrologyProfile profile : profiles) {
-            cumulative += weight(profile, waterPercent, sigma);
-            if (roll < cumulative) {
-                return profile;
-            }
-        }
-
-        return profiles.getLast();
+        return WeightedProfilePicker.pick(profiles, profile -> weight(profile, waterPercent, sigma));
     }
 
     /**
