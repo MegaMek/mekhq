@@ -113,7 +113,9 @@ public final class StratConMapTuner {
             case MOUNTAIN -> {
                 mapSettings.setElevationParams(70, 6, 5);
                 mapSettings.setCliffParam(40);
-                int style = isCold(terrain) ? MapSettings.MOUNTAIN_SNOW_CAPPED : MapSettings.MOUNTAIN_PLAIN;
+                int style = "snow".equals(tilesetTheme(terrain)) ?
+                                  MapSettings.MOUNTAIN_SNOW_CAPPED :
+                                  MapSettings.MOUNTAIN_PLAIN;
                 mapSettings.setMountainParams(1, 7, 16, 5, 9, style);
             }
             case AGRICULTURE -> mapSettings.setPlantedFieldParams(6, 14, 2, 4);
@@ -123,10 +125,19 @@ public final class StratConMapTuner {
             }
         }
 
-        String theme = tilesetTheme(terrain, category);
+        String theme = tilesetTheme(terrain);
         if (theme != null) {
             mapSettings.setTheme(theme);
         }
+    }
+
+    /**
+     * @return the MegaMek tileset theme for the given terrain, or {@code null} to leave the board's default look alone.
+     *       Authored per terrain in the biome manifest, so adding a terrain to mm-data no longer means editing a chain
+     *       of name tests here.
+     */
+    private static @Nullable String tilesetTheme(String terrain) {
+        return StratConBiomeManifest.terrainTilesetTheme(terrain);
     }
 
     /**
@@ -156,54 +167,6 @@ public final class StratConMapTuner {
         return StratConBiomeManifest.getInstance().getTerrainTypeNames().contains(stripped) ? stripped : terrainType;
     }
 
-    /**
-     * @return the tileset theme name that best matches the terrain, or {@code null} to keep the selected theme's own
-     *       tileset
-     */
-    private static String tilesetTheme(String terrain, StratConTerrainCategory category) {
-        if ("Mars".equals(terrain)) {
-            return "mars";
-        }
-        if (category == StratConTerrainCategory.LUNAR) {
-            return "lunar";
-        }
-        if (category == StratConTerrainCategory.VOLCANIC) {
-            return "volcano";
-        }
-        if (isCold(terrain)) {
-            return "snow";
-        }
-        if ("Jungle".equals(terrain)) {
-            return "jungle";
-        }
-        if ("HotForest".equals(terrain)) {
-            return "tropical";
-        }
-        if ("Swamp".equals(terrain)) {
-            return "swamp";
-        }
-        if (isHotDry(terrain)) {
-            return "desert";
-        }
-        return null;
-    }
-
-    private static boolean isCold(String terrain) {
-        return terrain.startsWith("Cold") ||
-                     "Glacier".equals(terrain) ||
-                     "SnowField".equals(terrain) ||
-                     "Tundra".equals(terrain) ||
-                     "ArcticDesert".equals(terrain) ||
-                     "FrozenSea".equals(terrain);
-    }
-
-    private static boolean isHotDry(String terrain) {
-        return "Desert".equals(terrain) ||
-                     "Badlands".equals(terrain) ||
-                     "Steppe".equals(terrain) ||
-                     "HotHillsDry".equals(terrain) ||
-                     "HotMountainsDry".equals(terrain);
-    }
 
     /**
      * When the hex carries a sector road, force the generator to lay a road across the board so it reads as continuing

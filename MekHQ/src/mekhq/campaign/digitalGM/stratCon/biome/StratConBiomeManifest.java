@@ -60,11 +60,12 @@ import mekhq.utilities.MHQXMLUtility;
  * {@link #getInstance()}. Which terrains exist, what category each belongs to, and which boards it can be fought on all
  * come from here, so the placers can ask what a hex is without matching on its name.
  *
- * <p>A handful of decisions do still match on names, and adding a terrain to mm-data means checking them:
- * {@link #terrainTemperatureOffset} below, {@code StratConMapTuner}'s cold/hot-dry theme tests, and the fallback
- * terrain constants in {@code StratConMountainPlacer}, {@code StratConTerrainFiller} and
- * {@code StratConSectorGenerator}. Those lists are maintained by hand and do not all agree - {@code Steppe} counts as
- * hot-dry for tileset selection but carries no temperature offset, for instance.</p>
+ * <p>Temperature offsets and tileset themes are authored here too, per terrain, so a terrain added to mm-data brings
+ * its own climate and look rather than needing a matching edit in the Java. The two are separate fields on purpose:
+ * {@code Steppe} takes the desert tileset while being no warmer than temperate, and {@code HotForest} is warm but
+ * lush. A few name matches do remain outside this class - the fallback terrain constants in
+ * {@code StratConMountainPlacer}, {@code StratConTerrainFiller} and {@code StratConSectorGenerator} - but those name a
+ * single default apiece rather than classifying the whole catalogue.</p>
  *
  * <p>It carries four things:</p>
  * <ul>
@@ -198,6 +199,23 @@ public class StratConBiomeManifest {
      */
     public static boolean isArableTerrain(String terrainType) {
         return getInstance().isArable(terrainType);
+    }
+
+    /**
+     * The MegaMek tileset theme a battle map on the given terrain should use, or {@code null} for the board's default
+     * look. Authored per terrain in the manifest; see {@link StratConTerrainType#tilesetTheme}.
+     *
+     * @param terrainType a StratCon terrain type name
+     *
+     * @return the theme name, or {@code null} when the terrain names none or is unknown
+     */
+    public static @Nullable String terrainTilesetTheme(String terrainType) {
+        if ((terrainType == null) || terrainType.isBlank()) {
+            return null;
+        }
+
+        StratConTerrainType definition = getInstance().terrainTypeMap.get(terrainType);
+        return (definition == null) ? null : definition.tilesetTheme;
     }
 
     /**

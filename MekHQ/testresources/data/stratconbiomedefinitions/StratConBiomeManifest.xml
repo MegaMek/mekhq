@@ -171,6 +171,7 @@
         <name>ColdSea</name>
         <category>OCEAN</category>
         <temperatureOffset>-8</temperatureOffset>
+        <tilesetTheme>snow</tilesetTheme>
     </terrainType>
     <terrainType>
         <name>HotSea</name>
@@ -181,6 +182,7 @@
         <name>FrozenSea</name>
         <category>OCEAN</category>
         <temperatureOffset>-8</temperatureOffset>
+        <tilesetTheme>snow</tilesetTheme>
     </terrainType>
     <terrainType>
         <name>Mountain</name>
@@ -191,6 +193,7 @@
         <name>ColdMountain</name>
         <category>MOUNTAIN</category>
         <temperatureOffset>-14</temperatureOffset>
+        <tilesetTheme>snow</tilesetTheme>
     </terrainType>
     <terrainType>
         <name>HotMountainsWet</name>
@@ -201,6 +204,7 @@
         <name>HotMountainsDry</name>
         <category>MOUNTAIN</category>
         <temperatureOffset>2</temperatureOffset>
+        <tilesetTheme>desert</tilesetTheme>
     </terrainType>
     <terrainType>
         <name>Urban</name>
@@ -210,6 +214,7 @@
         <name>ColdUrban</name>
         <category>URBAN</category>
         <temperatureOffset>-8</temperatureOffset>
+        <tilesetTheme>snow</tilesetTheme>
     </terrainType>
     <terrainType>
         <name>HotUrban</name>
@@ -220,14 +225,17 @@
         <name>Volcano</name>
         <category>VOLCANIC</category>
         <temperatureOffset>25</temperatureOffset>
+        <tilesetTheme>volcano</tilesetTheme>
     </terrainType>
     <terrainType>
         <name>GrayLunar</name>
         <category>LUNAR</category>
+        <tilesetTheme>lunar</tilesetTheme>
     </terrainType>
     <terrainType>
         <name>Mars</name>
         <category>LUNAR</category>
+        <tilesetTheme>mars</tilesetTheme>
     </terrainType>
     <terrainType>
         <name>Forest</name>
@@ -237,19 +245,23 @@
         <name>ColdForest</name>
         <category>VEGETATION</category>
         <temperatureOffset>-8</temperatureOffset>
+        <tilesetTheme>snow</tilesetTheme>
     </terrainType>
     <terrainType>
         <name>HotForest</name>
         <category>VEGETATION</category>
         <temperatureOffset>8</temperatureOffset>
+        <tilesetTheme>tropical</tilesetTheme>
     </terrainType>
     <terrainType>
         <name>Jungle</name>
         <category>VEGETATION</category>
+        <tilesetTheme>jungle</tilesetTheme>
     </terrainType>
     <terrainType>
         <name>Swamp</name>
         <category>VEGETATION</category>
+        <tilesetTheme>swamp</tilesetTheme>
     </terrainType>
     <terrainType>
         <name>Savannah</name>
@@ -271,41 +283,49 @@
         <name>Desert</name>
         <category>BARREN</category>
         <temperatureOffset>8</temperatureOffset>
+        <tilesetTheme>desert</tilesetTheme>
     </terrainType>
     <terrainType>
         <name>Badlands</name>
         <category>BARREN</category>
         <temperatureOffset>8</temperatureOffset>
+        <tilesetTheme>desert</tilesetTheme>
     </terrainType>
     <terrainType>
         <name>Steppe</name>
         <category>BARREN</category>
+        <tilesetTheme>desert</tilesetTheme>
         <arable>true</arable>
     </terrainType>
     <terrainType>
         <name>ArcticDesert</name>
         <category>BARREN</category>
         <temperatureOffset>-8</temperatureOffset>
+        <tilesetTheme>snow</tilesetTheme>
     </terrainType>
     <terrainType>
         <name>Glacier</name>
         <category>BARREN</category>
         <temperatureOffset>-8</temperatureOffset>
+        <tilesetTheme>snow</tilesetTheme>
     </terrainType>
     <terrainType>
         <name>SnowField</name>
         <category>BARREN</category>
         <temperatureOffset>-8</temperatureOffset>
+        <tilesetTheme>snow</tilesetTheme>
     </terrainType>
     <terrainType>
         <name>Tundra</name>
         <category>BARREN</category>
         <temperatureOffset>-8</temperatureOffset>
+        <tilesetTheme>snow</tilesetTheme>
     </terrainType>
     <terrainType>
         <name>HotHillsDry</name>
         <category>HILLS</category>
         <temperatureOffset>8</temperatureOffset>
+        <tilesetTheme>desert</tilesetTheme>
     </terrainType>
     <terrainType>
         <name>Hills</name>
@@ -316,6 +336,7 @@
         <name>ColdHills</name>
         <category>HILLS</category>
         <temperatureOffset>-8</temperatureOffset>
+        <tilesetTheme>snow</tilesetTheme>
     </terrainType>
     <terrainType>
         <name>Farmland</name>

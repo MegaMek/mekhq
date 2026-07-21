@@ -74,4 +74,15 @@ public class StratConTerrainType {
      * elsewhere.</p>
      */
     public int temperatureOffset;
+
+    /**
+     * The MegaMek tileset theme a battle map fought on this terrain is rendered with ({@code snow}, {@code desert},
+     * {@code jungle}, {@code lunar}, and so on). Null when the terrain wants the board's default look.
+     *
+     * <p>Deliberately separate from {@link #temperatureOffset}: this is how the ground <em>looks</em>, not how warm it
+     * is, and the two genuinely differ. {@code Steppe} is dusty enough for the desert tileset while being no warmer
+     * than temperate, and {@code HotForest} is hot but lush, so it takes the tropical theme rather than the desert
+     * one.</p>
+     */
+    public String tilesetTheme;
 }

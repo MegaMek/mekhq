@@ -173,4 +173,65 @@ class StratConTerrainTemperatureOffsetTest {
                   terrain + " (" + category + ") should carry the offset the old name-matching rule gave it");
         }
     }
+
+    /**
+     * Tileset themes moved into the manifest at the same time as the offsets, replacing a chain of name tests in
+     * {@code StratConMapTuner}. This reproduces that chain and checks every terrain still resolves to the same theme.
+     */
+    @Test
+    void everyAuthoredThemeMatchesTheRuleItReplaced() {
+        StratConBiomeManifest manifest = StratConBiomeManifest.getInstance();
+
+        for (String terrain : manifest.getTerrainTypeNames()) {
+            StratConTerrainCategory category = manifest.getTerrainCategory(terrain);
+
+            boolean cold = terrain.startsWith("Cold") ||
+                                 terrain.equals("Glacier") ||
+                                 terrain.equals("SnowField") ||
+                                 terrain.equals("Tundra") ||
+                                 terrain.equals("ArcticDesert") ||
+                                 terrain.equals("FrozenSea");
+            boolean hotDry = terrain.equals("Desert") ||
+                                   terrain.equals("Badlands") ||
+                                   terrain.equals("Steppe") ||
+                                   terrain.equals("HotHillsDry") ||
+                                   terrain.equals("HotMountainsDry");
+
+            String expected;
+            if (terrain.equals("Mars")) {
+                expected = "mars";
+            } else if (category == StratConTerrainCategory.LUNAR) {
+                expected = "lunar";
+            } else if (category == StratConTerrainCategory.VOLCANIC) {
+                expected = "volcano";
+            } else if (cold) {
+                expected = "snow";
+            } else if (terrain.equals("Jungle")) {
+                expected = "jungle";
+            } else if (terrain.equals("HotForest")) {
+                expected = "tropical";
+            } else if (terrain.equals("Swamp")) {
+                expected = "swamp";
+            } else if (hotDry) {
+                expected = "desert";
+            } else {
+                expected = null;
+            }
+
+            assertEquals(expected,
+                  StratConBiomeManifest.terrainTilesetTheme(terrain),
+                  terrain + " (" + category + ") should carry the theme the old name-matching chain gave it");
+        }
+    }
+
+    @Test
+    void themeAndTemperatureAreIndependentAxes() {
+        // The pair the old name lists disagreed on, and deliberately so: Steppe looks arid without being warm, and
+        // HotForest is warm without looking arid. Authoring them separately is the point of having two fields.
+        assertEquals("desert", StratConBiomeManifest.terrainTilesetTheme("Steppe"));
+        assertEquals(0, terrainTemperatureOffset("Steppe"), "Steppe is dusty, not hot");
+
+        assertEquals("tropical", StratConBiomeManifest.terrainTilesetTheme("HotForest"));
+        assertEquals(8, terrainTemperatureOffset("HotForest"), "HotForest is hot, but lush rather than arid");
+    }
 }
