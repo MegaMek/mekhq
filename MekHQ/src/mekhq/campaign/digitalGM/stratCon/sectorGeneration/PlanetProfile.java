@@ -246,15 +246,15 @@ public record PlanetProfile(int temperatureCelsius, double diameterKm, int water
 
         // getAtmosphere() collapses "unknown" and "None" onto NONE, so read the sourced value to tell them apart: a
         // null source means the datum is simply absent (treated as neutral), not that the world is airless.
-        Atmosphere composition = null;
+        Atmosphere atmosphere = null;
         SourceableValue<Atmosphere> sourcedAtmosphere = planet.getSourcedAtmosphere(date);
         if (sourcedAtmosphere != null) {
-            composition = sourcedAtmosphere.getValue();
+            atmosphere = sourcedAtmosphere.getValue();
         }
 
         megamek.common.planetaryConditions.Atmosphere pressure = planet.getPressure(date);
         boolean airless = (pressure == megamek.common.planetaryConditions.Atmosphere.VACUUM) ||
-                                ((composition != null) && composition.isNone());
+                                ((atmosphere != null) && atmosphere.isNone());
 
         String resolvedComposition = "";
         SourceableValue<String> sourcedComposition = planet.getSourcedComposition(date);
@@ -277,7 +277,7 @@ public record PlanetProfile(int temperatureCelsius, double diameterKm, int water
               diameter,
               resolvedWater,
               airless,
-              composition,
+              atmosphere,
               resolvedComposition,
               resolvedLandmassCount,
               resolvedGravity,

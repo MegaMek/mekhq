@@ -62,13 +62,16 @@ import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 public final class StratConCityPlacer {
     private StratConCityPlacer() {}
 
-    // Population thresholds and the fraction of dry hexes that become cities in each tier (§8).
+    // Population thresholds, and the fraction of dry hexes that become cities in each tier.
     private static final long POPULATION_HAMLET = 10_000L;
     private static final long POPULATION_SMALL = 1_000_000L;
     private static final long POPULATION_MEDIUM = 100_000_000L;
     private static final long POPULATION_LARGE = 1_000_000_000L;
-    /** Population log10 (~a billion) at which a sector is considered maximally urbanized for battle-map scaling. */
-    private static final double URBANIZATION_POPULATION_LOG = 9.0;
+    /**
+     * Population log10 (~a billion) at which a world counts as fully settled - the point where urbanization for
+     * battle-map scaling, and farming intensity in {@link StratConFarmPlacer}, both top out.
+     */
+    static final double FULLY_SETTLED_POPULATION_LOG = 9.0;
 
     private static final double DENSITY_SMALL = 0.01;
     private static final double DENSITY_MEDIUM = 0.02;
@@ -89,13 +92,18 @@ public final class StratConCityPlacer {
     public static void placeCities(StratConTrackState track, PlanetProfile planet, UrbanProfile urban) {
         List<StratConCoords> land = landHexes(track);
         int cityCount = min(cityCount(land.size(), planet, urban), land.size());
-        if (cityCount <= 0) {
-            return;
-        }
 
         // How built-up this sector's cities read on the battle map, from the planet's population (log10 ~9 = billions).
         // Carried onto city-hex scenarios so a metropolis fights bigger than a frontier hamlet.
-        track.setUrbanizationLevel(Math.clamp(planet.populationLog() / URBANIZATION_POPULATION_LOG, 0.0, 1.0));
+        //
+        // Set before the no-cities exit, because it describes the planet rather than what was placed. Leaving it unset
+        // there let a regenerated sector keep the previous generation's figure - a sector re-rolled into wilderness
+        // still claiming to be a hive world.
+        track.setUrbanizationLevel(Math.clamp(planet.populationLog() / FULLY_SETTLED_POPULATION_LOG, 0.0, 1.0));
+
+        if (cityCount <= 0) {
+            return;
+        }
 
         // Primate City: one dominant metropolis - grow all the city hexes as a single connected blob rather than
         // scattering them across the sector.

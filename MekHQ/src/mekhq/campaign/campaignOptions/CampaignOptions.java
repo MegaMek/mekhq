@@ -1765,8 +1765,8 @@ public class CampaignOptions {
      * @return {@code true} if the standard advanced medical system is enabled, {@code false} otherwise
      *
      * @see #isUseAdvancedMedical()
-     * @deprecated Use
-     *       {@link CampaignOptions#get(CampaignOption) CampaignOptions.get(CampaignOption.USE_ADVANCED_MEDICAL)}
+     *
+     * @deprecated Use {@link CampaignOptions#get(CampaignOption) CampaignOptions.get(CampaignOption.USE_ADVANCED_MEDICAL)}
      */
     @Deprecated(since = "0.51.01", forRemoval = true)
     public boolean isUseAdvancedMedicalDirect() {
@@ -1890,8 +1890,7 @@ public class CampaignOptions {
     }
 
     /**
-     * @deprecated Use
-     *       {@link CampaignOptions#get(CampaignOption)
+     * @deprecated Use {@link CampaignOptions#get(CampaignOption)
      *       CampaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL_FEWER_PERMANENT_INJURIES)}
      */
     @Deprecated(since = "0.51.01", forRemoval = true)
@@ -1900,8 +1899,7 @@ public class CampaignOptions {
     }
 
     /**
-     * @deprecated Use
-     *       {@link CampaignOptions#set(CampaignOption, Object)
+     * @deprecated Use {@link CampaignOptions#set(CampaignOption, Object)
      *       CampaignOptions.set(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL_FEWER_PERMANENT_INJURIES, value)}
      */
     @Deprecated(since = "0.51.01", forRemoval = true)
@@ -1912,8 +1910,7 @@ public class CampaignOptions {
     }
 
     /**
-     * @deprecated Use
-     *       {@link CampaignOptions#get(CampaignOption)
+     * @deprecated Use {@link CampaignOptions#get(CampaignOption)
      *       CampaignOptions.get(CampaignOption.ALTERNATIVE_ADVANCED_MEDICAL_HEALING_TIME_MULTIPLIER)}
      */
     @Deprecated(since = "0.51.01", forRemoval = true)
@@ -1922,8 +1919,7 @@ public class CampaignOptions {
     }
 
     /**
-     * @deprecated Use
-     *       {@link CampaignOptions#set(CampaignOption, Object)
+     * @deprecated Use {@link CampaignOptions#set(CampaignOption, Object)
      *       CampaignOptions.set(CampaignOption.ALTERNATIVE_ADVANCED_MEDICAL_HEALING_TIME_MULTIPLIER, value)}
      */
     @Deprecated(since = "0.51.01", forRemoval = true)
@@ -1943,8 +1939,7 @@ public class CampaignOptions {
 
     /**
      * @deprecated Use
-     *       {@link CampaignOptions#set(CampaignOption, Object) CampaignOptions.set(CampaignOption.LIMIT_CLAN_TECH,
-     *       value)}
+     *       {@link CampaignOptions#set(CampaignOption, Object) CampaignOptions.set(CampaignOption.LIMIT_CLAN_TECH, value)}
      */
     @Deprecated(since = "0.51.01", forRemoval = true)
     public void setLimitClanTech(final boolean limitClanTech) {
@@ -1961,8 +1956,7 @@ public class CampaignOptions {
     }
 
     /**
-     * @deprecated Use
-     *       {@link CampaignOptions#set(CampaignOption, Object)
+     * @deprecated Use {@link CampaignOptions#set(CampaignOption, Object)
      *       CampaignOptions.set(CampaignOption.USE_TWIST_OF_FATE_SURVIVAL, value)}
      */
     @Deprecated(since = "0.51.01", forRemoval = true)
@@ -1980,8 +1974,7 @@ public class CampaignOptions {
     }
 
     /**
-     * @deprecated Use
-     *       {@link CampaignOptions#set(CampaignOption, Object)
+     * @deprecated Use {@link CampaignOptions#set(CampaignOption, Object)
      *       CampaignOptions.set(CampaignOption.USE_REPLACE_EDGE_AWARDS, value)}
      */
     @Deprecated(since = "0.51.01", forRemoval = true)
@@ -9423,8 +9416,7 @@ public class CampaignOptions {
      *
      * @return {@code true} if faction standing outlawing is enabled, {@code false} otherwise.
      *
-     * @deprecated Use
-     *       {@link CampaignOptions#get(CampaignOption)
+     * @deprecated Use {@link CampaignOptions#get(CampaignOption)
      *       CampaignOptions.get(CampaignOption.USE_FACTION_STANDING_OUTLAWED)}
      */
     @Deprecated(since = "0.51.01", forRemoval = true)

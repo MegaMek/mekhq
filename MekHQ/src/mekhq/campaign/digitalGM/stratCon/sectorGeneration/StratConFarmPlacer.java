@@ -132,13 +132,16 @@ public final class StratConFarmPlacer {
     }
 
     /**
-     * @return an intensity multiplier in {@code [0.16, 1.1]} from the planet's habitability, population, and
-     *       technology - harsh, empty, or low-tech worlds farm less; comfortable, populous, high-tech worlds farm
-     *       more.
+     * @return an intensity multiplier in {@code [0.16, 1.1]} from the planet's habitability, population, and technology
+     *       - harsh, empty, or low-tech worlds farm less; comfortable, populous, high-tech worlds farm more.
      */
     private static double farmingScale(PlanetProfile planet) {
         double habitabilityFactor = 0.35 + (0.65 * planet.habitability());
-        double populationFactor = 0.55 + (0.45 * min(1.0, planet.populationLog() / 9.0));
+        double populationFactor = 0.55 +
+                                        (0.45 *
+                                               min(1.0,
+                                                     planet.populationLog() /
+                                                           StratConCityPlacer.FULLY_SETTLED_POPULATION_LOG));
         double techFactor = 0.85 + (0.25 * planet.techLevel());
         return habitabilityFactor * populationFactor * techFactor;
     }

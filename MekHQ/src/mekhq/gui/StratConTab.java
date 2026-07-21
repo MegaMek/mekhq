@@ -412,6 +412,13 @@ public class StratConTab extends CampaignGuiTab {
      *
      * @return the entered integer, or {@code null} if cancelled or not a valid integer
      */
+    /**
+     * Asks the GM for a whole number, seeded with the current value.
+     *
+     * @return the number entered, or {@code null} if the GM cancelled. Unparseable input is reported rather than
+     *       silently discarded - typing a stray letter used to close the dialog and change nothing, with no way to tell
+     *       that from a deliberate cancel.
+     */
     private Integer promptForInt(String promptKey, int currentValue) {
         String input = JOptionPane.showInputDialog(this, getTextAt(RESOURCE_BUNDLE, promptKey),
               String.valueOf(currentValue));
@@ -421,6 +428,10 @@ public class StratConTab extends CampaignGuiTab {
         try {
             return Integer.parseInt(input.trim());
         } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this,
+                  getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.promptForInt.notANumber", input),
+                  getTextAt(RESOURCE_BUNDLE, "stratConTab.promptForInt.notANumber.title"),
+                  JOptionPane.ERROR_MESSAGE);
             return null;
         }
     }

@@ -68,7 +68,7 @@ public final class StratConTerrainFiller {
 
     private static final int BASE_WEIGHT = 10;
 
-    // Planet-wide biases (§7).
+    // Planet-wide biases.
     private static final int BREATHABLE_VEGETATION = 8;
     private static final int NON_BREATHABLE_VEGETATION = -7;
     private static final int NON_BREATHABLE_BARREN = 8;

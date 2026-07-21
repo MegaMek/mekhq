@@ -279,10 +279,30 @@ public class ContractMeterBar extends JPanel {
         // The track itself runs from start to end (the dates are carried in the title), so the only marker is the bold
         // "today" marker that slides along it; no separate start or end ticks are drawn.
         markers.add(new Marker(current, currentLabel, CURRENT_MARKER_COLOR, MarkerStyle.SOLID, true, true));
-        final String title = getFormattedTextAt(RESOURCE_BUNDLE, "contractTimelineBar.title.text", startLabel,
-              endLabel, daysLeft);
-        final String tooltip = getFormattedTextAt(RESOURCE_BUNDLE, "contractTimelineBar.tooltip", startLabel, endLabel,
-              currentLabel);
+        // An overrun contract reads "0 days left" like one ending today, which is the state a player most needs
+        // telling about, so it gets its own title and tooltip.
+        final boolean expired = currentDate.isAfter(endDate);
+        final String title = expired ?
+                                   getFormattedTextAt(RESOURCE_BUNDLE,
+                                         "contractTimelineBar.title.expired.text",
+                                         startLabel,
+                                         endLabel) :
+                                   getFormattedTextAt(RESOURCE_BUNDLE,
+                                         "contractTimelineBar.title.text",
+                                         startLabel,
+                                         endLabel,
+                                         daysLeft);
+        final String tooltip = expired ?
+                                     getFormattedTextAt(RESOURCE_BUNDLE,
+                                           "contractTimelineBar.expired.tooltip",
+                                           startLabel,
+                                           endLabel,
+                                           currentLabel) :
+                                     getFormattedTextAt(RESOURCE_BUNDLE,
+                                           "contractTimelineBar.tooltip",
+                                           startLabel,
+                                           endLabel,
+                                           currentLabel);
         return new ContractMeterBar(title, start, end, new Color[] { NEUTRAL_TRACK }, null, null, markers, tooltip);
     }
 

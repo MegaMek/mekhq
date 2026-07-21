@@ -44,9 +44,7 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlTransient;
-import megamek.common.annotations.Nullable;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
-import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.utilities.MHQXMLUtility;
 
 /**
@@ -403,58 +401,6 @@ public class StratConTrackState {
 
     public void removeFacility(StratConCoords coords) {
         facilities.remove(coords);
-    }
-
-    /**
-     * Returns the allied facility coordinates closest to the given coordinates. Null if no allied facilities on the
-     * board.
-     *
-     * <p>Closeness is counted in hex steps across the map. It is deliberately not measured with
-     * {@link StratConCoords#distance}: that method is inherited from MegaMek's {@code Coords}, while
-     * {@link StratConCoords#translate} is overridden to correct for the parity-offset layout StratCon stores its hexes
-     * in - so a coordinate distance is measured in a different convention than the map uses, and can name a facility
-     * that is not in fact the nearest.</p>
-     */
-    @Nullable
-    @Deprecated(since = "0.51.0", forRemoval = true)
-    public StratConCoords findClosestAlliedFacilityCoords(StratConCoords coords) {
-        Set<StratConCoords> alliedFacilities = new HashSet<>();
-        for (Map.Entry<StratConCoords, StratConFacility> entry : facilities.entrySet()) {
-            if (entry.getValue().getOwner() == ForceAlignment.Allied) {
-                alliedFacilities.add(entry.getKey());
-            }
-        }
-
-        if (alliedFacilities.isEmpty()) {
-            return null;
-        }
-
-        // Step outward a ring at a time; the first allied facility reached is the nearest one. Terrain is ignored, as
-        // it was before - this is distance across the map, not a travel route.
-        Set<StratConCoords> visited = new HashSet<>();
-        visited.add(coords);
-        Set<StratConCoords> frontier = new HashSet<>(visited);
-
-        while (!frontier.isEmpty()) {
-            for (StratConCoords candidate : frontier) {
-                if (alliedFacilities.contains(candidate)) {
-                    return candidate;
-                }
-            }
-
-            Set<StratConCoords> nextRing = new HashSet<>();
-            for (StratConCoords current : frontier) {
-                for (int direction = 0; direction < HEX_DIRECTIONS; direction++) {
-                    StratConCoords neighbor = current.translate(direction);
-                    if (!isOutOfBounds(neighbor) && visited.add(neighbor)) {
-                        nextRing.add(neighbor);
-                    }
-                }
-            }
-            frontier = nextRing;
-        }
-
-        return null;
     }
 
     /**
