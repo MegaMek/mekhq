@@ -771,9 +771,15 @@ public class StratConContractInitializer {
 
     /**
      * Folds the planet-owner's facilities on the given track into its road network, via the GM's sector-generation
-     * strategy (a road-less generator ignores this). Call after anything that changes which facilities the planet's
-     * owner holds on the track - a GM adding, removing, or capturing one included - so those bases keep reading as
-     * sitting on the road grid alongside the cities.
+     * strategy (a road-less generator ignores this). Call whenever a GM edits what sits on the map - adding or removing
+     * a city, adding or removing a facility - so the network matches the sites that are actually there. Sector
+     * generation and regeneration lay the roads the same way.
+     *
+     * <p>Deliberately <em>not</em> called for anything that happens in play: a facility changing hands, or being
+     * destroyed, during scenario resolution. The line is between editing the map and playing on it. A road is built
+     * ground, so who holds the base at the end of it does not decide whether the road was ever laid - and because this
+     * rebuilds the entire network from scratch, calling it mid-campaign could redraw roads far from the facility that
+     * changed.</p>
      *
      * @param track    the track whose road network to refresh
      * @param contract the contract (source of the planet and the employer/enemy factions)
@@ -851,6 +857,7 @@ public class StratConContractInitializer {
             track.removeFacility(source);
             track.addFacility(destination, facility);
             track.moveObjective(source, destination);
+            moveAssignedForces(track, source, destination);
         }
 
         List<StratConCoords> floodedScenarios = new ArrayList<>();
@@ -871,7 +878,33 @@ public class StratConContractInitializer {
             scenario.setCoords(destination);
             track.getScenarios().put(destination, scenario);
             track.moveObjective(source, destination);
+            moveAssignedForces(track, source, destination);
         }
+
+        // A force standing on ground that just flooded, with no facility or scenario to carry it ashore, is recalled.
+        recallForcesOnOcean(track);
+    }
+
+    /**
+     * Recalls every force left standing on water, so no formation is stranded at sea after a hex floods.
+     *
+     * <p>The ocean counterpart to {@link #recallForcesOutsideBounds}: a regeneration or a GM painting {@code Sea} over
+     * an occupied hex can put a deployed force in water just as a shrink can put one outside the map.</p>
+     */
+    private static void recallForcesOnOcean(StratConTrackState track) {
+        List<Integer> stranded = new ArrayList<>();
+        for (Map.Entry<Integer, StratConCoords> entry : track.getAssignedForceCoords().entrySet()) {
+            if (StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(entry.getValue()))) {
+                stranded.add(entry.getKey());
+            }
+        }
+
+        for (int forceID : stranded) {
+            track.unassignFormation(forceID);
+        }
+        track.getAssignedCoordForces()
+              .keySet()
+              .removeIf(coords -> StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(coords)));
     }
 
     /**

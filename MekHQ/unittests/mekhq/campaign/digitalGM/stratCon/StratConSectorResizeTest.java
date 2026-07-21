@@ -34,6 +34,7 @@ package mekhq.campaign.digitalGM.stratCon;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
@@ -47,6 +48,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer.ResizeImpact;
+import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorCountMethod;
 import mekhq.campaign.mission.AtBContract;
@@ -66,6 +68,7 @@ class StratConSectorResizeTest {
     }
 
     private static final String TERRAIN = "Plains";
+    private static final String OCEAN = "Sea";
 
     private static StratConTrackState track(int width, int height) {
         StratConTrackState track = new StratConTrackState();
@@ -260,6 +263,54 @@ class StratConSectorResizeTest {
         resize(track, 4, 4);
 
         assertFalse(track.getAssignedForceCoords().containsKey(42), "a force left off the map should be recalled");
+    }
+
+    @Test
+    void flooding_carriesADeployedForceAshoreWithItsFacility() {
+        // The parallel of shrink_movesFacilitiesBackInsideRatherThanDestroyingThem: a flooded facility is relocated,
+        // and the force garrisoning it must travel with it rather than be left at sea.
+        StratConTrackState track = track(8, 8);
+        StratConCoords flooded = new StratConCoords(3, 3);
+        track.addFacility(flooded, new StratConFacility());
+        track.assignForce(42, flooded, LocalDate.of(3151, 1, 1), false);
+        track.setTerrainTile(flooded, OCEAN);
+
+        StratConContractInitializer.applyTerrainChange(track, contract(), campaign());
+
+        StratConCoords moved = track.getAssignedForceCoords().get(42);
+        assertNotNull(moved, "a force on a flooded facility should stay deployed, not be dropped");
+        assertFalse(StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(moved)),
+              "a force was left standing on water at " + moved);
+        assertTrue(track.getFacilities().containsKey(moved),
+              "the force should have travelled with the facility it garrisoned");
+    }
+
+    @Test
+    void flooding_recallsAForceLeftStandingOnOpenWater() {
+        // Nothing to carry this one ashore, so it comes home rather than being stranded at sea.
+        StratConTrackState track = track(8, 8);
+        StratConCoords flooded = new StratConCoords(5, 5);
+        track.assignForce(42, flooded, LocalDate.of(3151, 1, 1), false);
+        track.setTerrainTile(flooded, OCEAN);
+
+        StratConContractInitializer.applyTerrainChange(track, contract(), campaign());
+
+        assertFalse(track.getAssignedForceCoords().containsKey(42),
+              "a force on a hex that flooded should be recalled");
+        assertFalse(track.getAssignedCoordForces().containsKey(flooded),
+              "the flooded hex should not still be listed as holding forces");
+    }
+
+    @Test
+    void flooding_leavesForcesOnDryGroundAlone() {
+        StratConTrackState track = track(8, 8);
+        StratConCoords dry = new StratConCoords(1, 1);
+        track.assignForce(42, dry, LocalDate.of(3151, 1, 1), false);
+        track.setTerrainTile(new StratConCoords(5, 5), OCEAN);
+
+        StratConContractInitializer.applyTerrainChange(track, contract(), campaign());
+
+        assertEquals(dry, track.getAssignedForceCoords().get(42), "a force on dry ground should not be disturbed");
     }
 
     @Test

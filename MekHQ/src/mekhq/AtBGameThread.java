@@ -182,7 +182,12 @@ public class AtBGameThread extends GameThread {
                 // terrain emphasis, cities), via the active GM's map-generation strategy. Fixed maps are used exactly
                 // as authored, so they are skipped here rather than relying on the generator knobs being ignored
                 // downstream.
-                if (!scenario.isUsingFixedMap()) {
+                //
+                // getHasTrack() is what limits this to StratCon. Two things would otherwise pull every AtB scenario in:
+                // AtBScenario.setTerrain() gives each one a random terrainType drawn from the biome map pools, and
+                // StratConGMs falls back to the default StratCon GM even with StratCon switched off - so a plain AtB
+                // board would be handed terrain emphasis and a forced theme chosen from a terrain it never fought on.
+                if (!scenario.isUsingFixedMap() && scenario.getHasTrack()) {
                     StratConGMs.mapGeneration(app.getCampaign().getCampaignOptions())
                           .tuneMapSettings(mapSettings, scenario);
                 }

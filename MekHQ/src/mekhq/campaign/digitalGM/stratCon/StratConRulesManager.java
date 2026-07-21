@@ -3815,12 +3815,10 @@ public class StratConRulesManager {
                         switchFacilityOwner(facility);
                     }
 
-                    // Only the planet owner's facilities sit on the road grid, so rebuild it when this scenario may
-                    // have disturbed one: the facility here just changed hands, or an objective destroyed it earlier in
-                    // this resolution (which leaves its hex still carrying road). Other scenarios leave roads alone.
-                    if ((facility != null) || track.isRoad(scenario.getCoords())) {
-                        StratConContractInitializer.connectFacilitiesToRoads(track, (AtBContract) mission, campaign);
-                    }
+                    // Deliberately does not touch the road network. Roads are laid when the sector is generated, and
+                    // afterwards only when a GM edits the map - adding or removing a city or a facility. Resolving a
+                    // scenario is playing on the map, not editing it: taking a base, or losing one, changes who holds
+                    // the ground at the end of a road, not whether the road was ever built.
 
                     processTrackForceReturnDates(track, campaign);
 
