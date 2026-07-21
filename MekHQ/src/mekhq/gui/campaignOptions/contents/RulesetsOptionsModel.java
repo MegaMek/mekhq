@@ -38,6 +38,7 @@ import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.campaignOptions.BoardScalingType;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConPlayType;
+import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorCountMethod;
 
 class RulesetsOptionsModel {
     SkillLevel skillLevel;
@@ -81,8 +82,7 @@ class RulesetsOptionsModel {
     boolean noSeedForces;
     boolean useGenericBattleValue;
     boolean useVerboseBidding;
-    boolean useStratConAlternateSectorCount;
-    boolean useStratConCondenseSectors;
+    StratConSectorCountMethod stratConSectorCountMethod;
     boolean useStratConAlternateSectorTerrain;
     double stratConSectorSizeMultiplier;
 
@@ -128,8 +128,7 @@ class RulesetsOptionsModel {
         noSeedForces = options.isNoSeedForces();
         useGenericBattleValue = options.isUseGenericBattleValue();
         useVerboseBidding = options.isUseVerboseBidding();
-        useStratConAlternateSectorCount = options.isUseStratConAlternateSectorCount();
-        useStratConCondenseSectors = options.isUseStratConCondenseSectors();
+        stratConSectorCountMethod = options.getStratConSectorCountMethod();
         useStratConAlternateSectorTerrain = options.isUseStratConAlternateSectorTerrain();
         stratConSectorSizeMultiplier = options.getStratConSectorSizeMultiplier();
     }
@@ -176,8 +175,7 @@ class RulesetsOptionsModel {
         options.setNoSeedForces(noSeedForces);
         options.setUseGenericBattleValue(useGenericBattleValue);
         options.setUseVerboseBidding(useVerboseBidding);
-        options.setUseStratConAlternateSectorCount(useStratConAlternateSectorCount);
-        options.setUseStratConCondenseSectors(useStratConCondenseSectors);
+        options.setStratConSectorCountMethod(stratConSectorCountMethod);
         options.setUseStratConAlternateSectorTerrain(useStratConAlternateSectorTerrain);
         options.setStratConSectorSizeMultiplier(stratConSectorSizeMultiplier);
     }

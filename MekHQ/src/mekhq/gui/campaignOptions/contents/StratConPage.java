@@ -32,6 +32,7 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
@@ -58,6 +59,7 @@ import megamek.common.enums.SkillLevel;
 import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.campaignOptions.BoardScalingType;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConPlayType;
+import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorCountMethod;
 import mekhq.campaign.personnel.skills.Skills;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
@@ -169,8 +171,8 @@ class StratConPage {
     private JCheckBox chkNoSeedForces;
     private JCheckBox chkUseGenericBattleValue;
     private JCheckBox chkUseVerboseBidding;
-    private JCheckBox chkUseStratConAlternateSectorCount;
-    private JCheckBox chkUseStratConCondenseSectors;
+    private JLabel lblStratConSectorCountMethod;
+    private MMComboBox<StratConSectorCountMethod> comboStratConSectorCountMethod;
     private JCheckBox chkUseStratConAlternateSectorTerrain;
     private JLabel lblStratConSectorSizeMultiplier;
     private JSpinner spnStratConSectorSizeMultiplier;
@@ -195,6 +197,27 @@ class StratConPage {
         comboAutoResolveMethod = new MMComboBox<>("comboAutoResolveMethod", autoResolveTypeModel);
         minimapThemeSelector = new MMComboBox<>("minimapThemeSelector",
               new FileNameComboBoxModel(GUIPreferences.getInstance().getMinimapThemes()));
+        comboStratConSectorCountMethod = new MMComboBox<>("StratConSectorCountMethod",
+              StratConSectorCountMethod.values());
+        comboStratConSectorCountMethod.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(
+                  JList<?> list,
+                  Object value,
+                  int index,
+                  boolean isSelected,
+                  boolean cellHasFocus) {
+
+                JLabel label = (JLabel) super.getListCellRendererComponent(
+                      list, value, index, isSelected, cellHasFocus);
+
+                if (value instanceof StratConSectorCountMethod method) {
+                    label.setToolTipText(wordWrap(method.getTooltip()));
+                }
+
+                return label;
+            }
+        });
         comboStratConPlayType = new MMComboBox<>("StratConPlayType", StratConPlayType.values());
         comboStratConPlayType.setRenderer(new DefaultListCellRenderer() {
             @Override
@@ -299,12 +322,10 @@ class StratConPage {
         chkUseGenericBattleValue.addMouseListener(createTipPanelUpdater("UseGenericBattleValue"));
         chkUseVerboseBidding = new CampaignOptionsCheckBox("UseVerboseBidding");
         chkUseVerboseBidding.addMouseListener(createTipPanelUpdater("UseVerboseBidding"));
-        chkUseStratConAlternateSectorCount = new CampaignOptionsCheckBox("UseStratConAlternateSectorCount",
+        lblStratConSectorCountMethod = new CampaignOptionsLabel("StratConSectorCountMethod",
               getMetadata(new Version(0, 51, 1)));
-        chkUseStratConAlternateSectorCount.addMouseListener(createTipPanelUpdater("UseStratConAlternateSectorCount"));
-        chkUseStratConCondenseSectors = new CampaignOptionsCheckBox("UseStratConCondenseSectors",
-              getMetadata(new Version(0, 51, 1)));
-        chkUseStratConCondenseSectors.addMouseListener(createTipPanelUpdater("UseStratConCondenseSectors"));
+        lblStratConSectorCountMethod.addMouseListener(createTipPanelUpdater("StratConSectorCountMethod"));
+        comboStratConSectorCountMethod.addMouseListener(createTipPanelUpdater("StratConSectorCountMethod"));
         chkUseStratConAlternateSectorTerrain = new CampaignOptionsCheckBox("UseStratConAlternateSectorTerrain",
               getMetadata(new Version(0, 51, 1)));
         chkUseStratConAlternateSectorTerrain.addMouseListener(createTipPanelUpdater("UseStratConAlternateSectorTerrain"));
@@ -490,9 +511,8 @@ class StratConPage {
               chkNoSeedForces,
               chkUseGenericBattleValue,
               chkUseVerboseBidding,
-              chkUseStratConAlternateSectorCount,
-              chkUseStratConCondenseSectors,
               chkUseStratConAlternateSectorTerrain);
+        panel.addRow(lblStratConSectorCountMethod, comboStratConSectorCountMethod);
         panel.addRow(lblStratConSectorSizeMultiplier, spnStratConSectorSizeMultiplier);
 
         return panel;
@@ -636,8 +656,7 @@ class StratConPage {
         chkNoSeedForces.setSelected(model.noSeedForces);
         chkUseGenericBattleValue.setSelected(model.useGenericBattleValue);
         chkUseVerboseBidding.setSelected(model.useVerboseBidding);
-        chkUseStratConAlternateSectorCount.setSelected(model.useStratConAlternateSectorCount);
-        chkUseStratConCondenseSectors.setSelected(model.useStratConCondenseSectors);
+        comboStratConSectorCountMethod.setSelectedItem(model.stratConSectorCountMethod);
         chkUseStratConAlternateSectorTerrain.setSelected(model.useStratConAlternateSectorTerrain);
         spnStratConSectorSizeMultiplier.setValue(model.stratConSectorSizeMultiplier);
     }
@@ -694,8 +713,7 @@ class StratConPage {
         model.noSeedForces = chkNoSeedForces.isSelected();
         model.useGenericBattleValue = chkUseGenericBattleValue.isSelected();
         model.useVerboseBidding = chkUseVerboseBidding.isSelected();
-        model.useStratConAlternateSectorCount = chkUseStratConAlternateSectorCount.isSelected();
-        model.useStratConCondenseSectors = chkUseStratConCondenseSectors.isSelected();
+        model.stratConSectorCountMethod = comboStratConSectorCountMethod.getSelectedItem();
         model.useStratConAlternateSectorTerrain = chkUseStratConAlternateSectorTerrain.isSelected();
         model.stratConSectorSizeMultiplier = (double) spnStratConSectorSizeMultiplier.getValue();
     }

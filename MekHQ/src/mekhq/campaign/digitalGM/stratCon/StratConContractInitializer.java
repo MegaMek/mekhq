@@ -116,6 +116,13 @@ public class StratConContractInitializer {
      */
     private static final int MAX_SECTOR_HEXES = 1024;
 
+    /**
+     * The most of a sector's dry land that may be given over to facilities, leaving the rest for scenarios to spawn on
+     * over the life of the contract. Ordinary contracts sit well under this; it bites when a large contract's
+     * facilities - which scale with its combat teams - are concentrated into few sectors whose area is capped.
+     */
+    private static final double MAXIMUM_FACILITY_COVERAGE = 0.5;
+
     /** Improved sizing: bounds on either dimension, so no shape profile can produce a sliver or a runaway map. */
     public static final int MIN_SECTOR_DIMENSION = 4;
     private static final int MAX_SECTOR_DIMENSION = 48;
@@ -155,8 +162,7 @@ public class StratConContractInitializer {
         // Decide how many sectors to generate and how large each one is. The planner always returns at least one
         // sector, so no separate zero-sector fallback is needed.
         List<SectorSpec> sectorSpecs = StratConSectorPlanner.generateSectorSpecs(contract.getRequiredCombatTeams(),
-              campaignOptions.isUseStratConAlternateSectorCount(),
-              campaignOptions.isUseStratConCondenseSectors());
+              campaignOptions.getStratConSectorCountMethod());
 
         // Ares Conventions: when both the employer and the enemy are signatories, urban targeting is off-limits.
         int year = campaign.getLocalDate().getYear();
@@ -401,8 +407,7 @@ public class StratConContractInitializer {
         StratConTrackState retVal = new StratConTrackState();
         retVal.setRequiredLanceCount(sector.requiredLances());
 
-        boolean useImprovedSizing = campaignOptions.isUseStratConAlternateSectorCount() ||
-                                          campaignOptions.isUseStratConCondenseSectors();
+        boolean useImprovedSizing = campaignOptions.getStratConSectorCountMethod().usesImprovedSizing();
 
         if (useImprovedSizing) {
             applyImprovedDimensions(retVal, sector, planetProfile, campaignOptions.getStratConSectorSizeMultiplier());
@@ -444,8 +449,7 @@ public class StratConContractInitializer {
 
         // Re-roll the latitude band and recompute the temperature from it (matching initializeTrackState), so a
         // regenerated sector's climate actually changes and drives the new biome selection - not just its terrain.
-        boolean useImprovedSizing = campaignOptions.isUseStratConAlternateSectorCount() ||
-                                          campaignOptions.isUseStratConCondenseSectors();
+        boolean useImprovedSizing = campaignOptions.getStratConSectorCountMethod().usesImprovedSizing();
         LatitudeBand latitudeBand = LatitudeBand.random();
         if (useImprovedSizing) {
             track.setTemperature(improvedTemperature(planetProfile, latitudeBand));
@@ -858,9 +862,14 @@ public class StratConContractInitializer {
     /**
      * Applies the legacy track dimensions: a total of {@code formations * 28} hexes laid out as a rectangle that is
      * wider than it is tall, so a scout formation deployed to a fresh spot each week can more or less cover it.
+     *
+     * <p>The area is capped at {@link #MAX_SECTOR_HEXES}, matching the improved path. Nothing reaches that today,
+     * because the legacy count hands every sector at most three formations and so at most 84 hexes - the cap is here
+     * so that a future count method built on legacy sizing cannot produce an unbounded map. No trim loop is needed
+     * after it: {@code width} is the floored quotient of the capped total, so the laid-out area cannot exceed it.</p>
      */
     private static void applyLegacyDimensions(StratConTrackState track, int numFormations) {
-        int numHexes = numFormations * LEGACY_HEXES_PER_FORMATION;
+        int numHexes = min(MAX_SECTOR_HEXES, numFormations * LEGACY_HEXES_PER_FORMATION);
         int height = max(1, (int) Math.floor(Math.sqrt(numHexes)));
         int width = numHexes / height;
         track.setWidth(width);
@@ -1004,14 +1013,17 @@ public class StratConContractInitializer {
      * Avoids places with existing facilities and scenarios, capable of taking facility sub set and setting strategic
      * objective flag.
      */
-    private static void initializeTrackFacilities(StratConTrackState trackState, int numFacilities,
-          ForceAlignment owner, boolean strategicObjective, List<String> modifiers) {
+    // Package-private rather than private so the capacity rules can be tested directly; reaching them through contract
+    // initialization would mean standing up a whole contract to assert on a placement loop.
+    static void initializeTrackFacilities(StratConTrackState trackState, int numFacilities, ForceAlignment owner,
+          boolean strategicObjective, List<String> modifiers) {
 
-        int trackSize = trackState.getWidth() * trackState.getHeight();
+        int capacity = facilityCapacity(trackState);
+        int placed = 0;
 
         for (int fCount = 0; fCount < numFacilities; fCount++) {
-            // if there's no possible empty places to put down a new scenario, then move on
-            if ((trackState.getFacilities().size() + trackState.getScenarios().size()) >= trackSize) {
+            // Stop deliberately at capacity rather than running on until placement happens to fail.
+            if ((trackState.getFacilities().size() + trackState.getScenarios().size()) >= capacity) {
                 break;
             }
 
@@ -1026,11 +1038,10 @@ public class StratConContractInitializer {
             StratConCoords coords = getUnoccupiedCoords(trackState);
 
             if (coords == null) {
-                LOGGER.warn("Unable to place facility on track {}, as all coords were occupied. Aborting.",
-                      trackState.getDisplayableName());
-                return;
+                break;
             }
 
+            placed++;
             trackState.addFacility(coords, sf);
 
             if (strategicObjective) {
@@ -1049,6 +1060,37 @@ public class StratConContractInitializer {
                 trackState.addStrategicObjective(sso);
             }
         }
+
+        if (placed < numFacilities) {
+            LOGGER.info("Sector {} had room for {} of {} {} facilities. The contract asks for facilities in " +
+                              "proportion to its combat teams, but a sector's area is capped, so a large contract in " +
+                              "few sectors can want more than its ground will hold.",
+                  trackState.getDisplayableName(),
+                  placed,
+                  numFacilities,
+                  owner);
+        }
+    }
+
+    /**
+     * @return how many facilities a sector will accept, being a fraction of the hexes that can actually hold one.
+     *
+     *       <p>Two things make this narrower than it looks. Only dry land counts - {@link #getUnoccupiedCoords} never
+     *       returns an ocean hex - so a wet sector holds far fewer facilities than its width times its height would
+     *       suggest. And only part of that land is offered, because scenarios need somewhere to spawn for the life of
+     *       the contract; a sector paved with facilities has nowhere left to fight.</p>
+     */
+    private static int facilityCapacity(StratConTrackState trackState) {
+        int placeable = 0;
+        for (int x = 0; x < trackState.getWidth(); x++) {
+            for (int y = 0; y < trackState.getHeight(); y++) {
+                if (!StratConBiomeManifest.isOceanTerrain(trackState.getTerrainTile(new StratConCoords(x, y)))) {
+                    placeable++;
+                }
+            }
+        }
+
+        return max(1, (int) Math.round(placeable * MAXIMUM_FACILITY_COVERAGE));
     }
 
     /**

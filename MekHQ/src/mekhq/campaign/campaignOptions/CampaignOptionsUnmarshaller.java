@@ -48,6 +48,7 @@ import mekhq.Utilities;
 import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConPlayType;
+import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorCountMethod;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
@@ -908,10 +909,12 @@ public class CampaignOptionsUnmarshaller {
                 }
             }
             case "useAdvancedScouting" -> campaignOptions.setUseAdvancedScouting(parseBoolean(nodeContents));
-            case "useStratConAlternateSectorCount" ->
-                  campaignOptions.setUseStratConAlternateSectorCount(parseBoolean(nodeContents));
-            case "useStratConCondenseSectors" ->
-                  campaignOptions.setUseStratConCondenseSectors(parseBoolean(nodeContents));
+            case "stratConSectorCountMethod" ->
+                  campaignOptions.setStratConSectorCountMethod(StratConSectorCountMethod.fromLookupName(nodeContents));
+            case "useStratConAlternateSectorCount" -> // < 51.01 compatibility handler
+                  campaignOptions.setLegacyStratConAlternateSectorCount(parseBoolean(nodeContents));
+            case "useStratConCondenseSectors" -> // < 51.01 compatibility handler
+                  campaignOptions.setLegacyStratConCondenseSectors(parseBoolean(nodeContents));
             case "useStratConAlternateSectorTerrain" ->
                   campaignOptions.setUseStratConAlternateSectorTerrain(parseBoolean(nodeContents));
             case "stratConSectorSizeMultiplier" ->

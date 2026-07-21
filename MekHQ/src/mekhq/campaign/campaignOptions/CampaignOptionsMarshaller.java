@@ -1150,12 +1150,8 @@ public class CampaignOptionsMarshaller {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAdvancedScouting", campaignOptions.isUseAdvancedScouting());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
-              "useStratConAlternateSectorCount",
-              campaignOptions.isUseStratConAlternateSectorCount());
-        MHQXMLUtility.writeSimpleXMLTag(pw,
-              indent,
-              "useStratConCondenseSectors",
-              campaignOptions.isUseStratConCondenseSectors());
+              "stratConSectorCountMethod",
+              campaignOptions.getStratConSectorCountMethod().getLookupName());
         MHQXMLUtility.writeSimpleXMLTag(pw,
               indent,
               "useStratConAlternateSectorTerrain",

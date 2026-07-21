@@ -45,6 +45,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.LatitudeBand;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.PlanetProfile;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.SectorSpec;
+import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorCountMethod;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -57,12 +58,12 @@ class StratConTrackSizingTest {
     static void loadStratConData() {
         StratConTestData.install();
     }
+
     private static final int NEUTRAL_TEMPERATURE = 25;
 
-    private static CampaignOptions options(boolean alternateCount, boolean condense, double sizeMultiplier) {
+    private static CampaignOptions options(StratConSectorCountMethod countMethod, double sizeMultiplier) {
         CampaignOptions options = mock(CampaignOptions.class);
-        when(options.isUseStratConAlternateSectorCount()).thenReturn(alternateCount);
-        when(options.isUseStratConCondenseSectors()).thenReturn(condense);
+        when(options.getStratConSectorCountMethod()).thenReturn(countMethod);
         when(options.getStratConSectorSizeMultiplier()).thenReturn(sizeMultiplier);
         return options;
     }
@@ -100,7 +101,7 @@ class StratConTrackSizingTest {
 
     @Test
     void alternateTerrain_generatesAFullyTerrainedSector() {
-        CampaignOptions options = options(true, false, 1.0);
+        CampaignOptions options = options(StratConSectorCountMethod.ALTERNATE, 1.0);
         when(options.isUseStratConAlternateSectorTerrain()).thenReturn(true);
 
         StratConTrackState track = track(new SectorSpec(9, LatitudeBand.EQUATORIAL), options);
@@ -118,7 +119,8 @@ class StratConTrackSizingTest {
         // The sizing rule: one recon force per three combat teams fronting the sector, each covering
         // RECON_HEXES_PER_QUARTER dry hexes in three months. A neutral planet is 50% water, so the sector is grown to
         // twice its dry budget.
-        StratConTrackState track = track(new SectorSpec(9, LatitudeBand.EQUATORIAL), options(true, false, 1.0));
+        StratConTrackState track = track(new SectorSpec(9, LatitudeBand.EQUATORIAL),
+              options(StratConSectorCountMethod.ALTERNATE, 1.0));
 
         assertAreaNear(playableFor(9) * 2, track);
     }
@@ -128,7 +130,8 @@ class StratConTrackSizingTest {
         // Guards an option mismatch: with only "condense sectors" on, the COUNT is still legacy (a sector per three
         // teams) while the SIZING is improved. Sizing per sector-unit rather than per team handed each of those small
         // sectors a full nine-team sector's worth of ground.
-        StratConTrackState track = track(new SectorSpec(3, LatitudeBand.EQUATORIAL), options(true, false, 1.0));
+        StratConTrackState track = track(new SectorSpec(3, LatitudeBand.EQUATORIAL),
+              options(StratConSectorCountMethod.ALTERNATE, 1.0));
 
         assertAreaNear(playableFor(3) * 2, track);
     }
@@ -137,9 +140,9 @@ class StratConTrackSizingTest {
     void improvedSizing_sizeMultiplierAndUnitCountScaleEquivalently() {
         // A 2.0 multiplier on nine teams and a 1.0 multiplier on eighteen both double the playable target.
         StratConTrackState doubledByMultiplier = track(new SectorSpec(9, LatitudeBand.EQUATORIAL),
-              options(true, false, 2.0));
+              options(StratConSectorCountMethod.ALTERNATE, 2.0));
         StratConTrackState doubledByTeams = track(new SectorSpec(18, LatitudeBand.EQUATORIAL),
-              options(true, true, 1.0));
+              options(StratConSectorCountMethod.CONDENSED, 1.0));
 
         // Compared by area, not by dimensions: each track rolls its own shape, so their proportions legitimately differ.
         assertAreaNear(playableFor(18) * 2, doubledByMultiplier);
@@ -149,7 +152,8 @@ class StratConTrackSizingTest {
     @Test
     void improvedSizing_multiplierAlwaysBitesOnCondensedSectors() {
         // Eighteen teams at a 2.0 multiplier: twice the six recon forces' quarterly budget.
-        StratConTrackState track = track(new SectorSpec(18, LatitudeBand.EQUATORIAL), options(true, true, 2.0));
+        StratConTrackState track = track(new SectorSpec(18, LatitudeBand.EQUATORIAL),
+              options(StratConSectorCountMethod.CONDENSED, 2.0));
 
         assertAreaNear(playableFor(18) * 2 * 2, track);
     }
@@ -160,7 +164,8 @@ class StratConTrackSizingTest {
         // more than one set of proportions should appear - that variety is the whole point.
         Set<String> shapes = new HashSet<>();
         for (int roll = 0; roll < 60; roll++) {
-            StratConTrackState track = track(new SectorSpec(9, LatitudeBand.EQUATORIAL), options(true, false, 1.0));
+            StratConTrackState track = track(new SectorSpec(9, LatitudeBand.EQUATORIAL),
+                  options(StratConSectorCountMethod.ALTERNATE, 1.0));
             shapes.add(track.getWidth() + "x" + track.getHeight());
         }
 
@@ -171,7 +176,8 @@ class StratConTrackSizingTest {
     void improvedSizing_keepsEveryDimensionPlayable() {
         // No shape may produce a sliver, and no combination of planet and options may produce a runaway map.
         for (int roll = 0; roll < 60; roll++) {
-            StratConTrackState track = track(new SectorSpec(27, LatitudeBand.EQUATORIAL), options(true, true, 2.0));
+            StratConTrackState track = track(new SectorSpec(27, LatitudeBand.EQUATORIAL),
+                  options(StratConSectorCountMethod.CONDENSED, 2.0));
 
             assertTrue(track.getWidth() >= 4, "sector too narrow to play: " + track.getWidth());
             assertTrue(track.getHeight() >= 4, "sector too shallow to play: " + track.getHeight());
@@ -188,7 +194,7 @@ class StratConTrackSizingTest {
               "Rocky", 1, 1.0, 1_000_000L, mekhq.campaign.universe.enums.HPGRating.X);
 
         StratConTrackState track = StratConContractInitializer.initializeTrackState(new SectorSpec(27,
-              LatitudeBand.EQUATORIAL), bigOceanWorld, options(true, true, 2.0), true, 0, 0);
+              LatitudeBand.EQUATORIAL), bigOceanWorld, options(StratConSectorCountMethod.CONDENSED, 2.0), true, 0, 0);
 
         assertTrue(track.getSize() <= 1024, "runaway sector was not capped: " + track.getSize() + " hexes");
     }
@@ -196,15 +202,31 @@ class StratConTrackSizingTest {
     @Test
     void legacySizing_bothFlagsOff_matchesHistoricalRectangle() {
         // numHexes = 3 * 28 = 84; height = floor(sqrt(84)) = 9; width = 84 / 9 = 9
-        StratConTrackState track = track(new SectorSpec(3, LatitudeBand.EQUATORIAL), options(false, false, 1.0));
+        StratConTrackState track = track(new SectorSpec(3, LatitudeBand.EQUATORIAL),
+              options(StratConSectorCountMethod.LEGACY, 1.0));
 
         assertEquals(9, track.getWidth());
         assertEquals(9, track.getHeight());
     }
 
     @Test
+    void legacySizing_isCappedAtTheSameAreaCeilingAsTheImprovedPath() {
+        // Unreachable through the legacy count, which gives a sector three formations at most - this guards the sizing
+        // rule itself, so a count method built on legacy sizing later cannot produce an unbounded map.
+        // 100 * 28 = 2800 hexes uncapped; capped to 1024, height = floor(sqrt(1024)) = 32, width = 1024 / 32 = 32.
+        StratConTrackState track = track(new SectorSpec(100, LatitudeBand.EQUATORIAL),
+              options(StratConSectorCountMethod.LEGACY, 1.0));
+
+        assertTrue((track.getWidth() * track.getHeight()) <= 1024,
+              "legacy sizing produced " + track.getWidth() + "x" + track.getHeight() + ", past the area ceiling");
+        assertEquals(32, track.getWidth());
+        assertEquals(32, track.getHeight());
+    }
+
+    @Test
     void improvedTemperature_equatorialSectorStaysNearEquatorialBaseline() {
-        StratConTrackState track = track(new SectorSpec(9, LatitudeBand.EQUATORIAL), options(true, false, 1.0));
+        StratConTrackState track = track(new SectorSpec(9, LatitudeBand.EQUATORIAL),
+              options(StratConSectorCountMethod.ALTERNATE, 1.0));
 
         // 25 + 0 offset + (-5..+5)
         assertTrue(track.getTemperature() >= NEUTRAL_TEMPERATURE - 5);
@@ -213,7 +235,8 @@ class StratConTrackSizingTest {
 
     @Test
     void improvedTemperature_polarSectorIsSharplyColder() {
-        StratConTrackState track = track(new SectorSpec(9, LatitudeBand.SOUTH_POLAR), options(true, false, 1.0));
+        StratConTrackState track = track(new SectorSpec(9, LatitudeBand.SOUTH_POLAR),
+              options(StratConSectorCountMethod.ALTERNATE, 1.0));
 
         // 25 + (-40) offset + (-5..+5) => -20..-10
         assertTrue(track.getTemperature() >= NEUTRAL_TEMPERATURE - 40 - 5);
@@ -222,7 +245,8 @@ class StratConTrackSizingTest {
 
     @Test
     void trackAlwaysCarriesRequiredFormationCount() {
-        StratConTrackState track = track(new SectorSpec(18, LatitudeBand.NORTH_POLAR), options(true, true, 1.0));
+        StratConTrackState track = track(new SectorSpec(18, LatitudeBand.NORTH_POLAR),
+              options(StratConSectorCountMethod.CONDENSED, 1.0));
 
         assertEquals(18, track.getRequiredLanceCount());
     }

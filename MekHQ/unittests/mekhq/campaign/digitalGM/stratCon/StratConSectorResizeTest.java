@@ -47,6 +47,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer.ResizeImpact;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
+import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorCountMethod;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.BeforeAll;
@@ -87,7 +88,7 @@ class StratConSectorResizeTest {
     /** A campaign with improved sizing on, which is what enables shape profiles (and so the regeneration re-roll). */
     private static Campaign improvedCampaign() {
         CampaignOptions options = mock(CampaignOptions.class);
-        when(options.isUseStratConAlternateSectorCount()).thenReturn(true);
+        when(options.getStratConSectorCountMethod()).thenReturn(StratConSectorCountMethod.ALTERNATE);
 
         Campaign campaign = mock(Campaign.class);
         when(campaign.getCampaignOptions()).thenReturn(options);

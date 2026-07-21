@@ -65,6 +65,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConPlayType;
+import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorCountMethod;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
@@ -662,8 +663,11 @@ public class CampaignOptions {
     private boolean hadAtBEnabledMarker;
     private StratConPlayType stratConPlayType;
     private boolean useAdvancedScouting;
-    private boolean useStratConAlternateSectorCount;
-    private boolean useStratConCondenseSectors;
+    private StratConSectorCountMethod stratConSectorCountMethod;
+    // Migration state for saves predating stratConSectorCountMethod; see setLegacyStratConAlternateSectorCount.
+    private Boolean legacyAlternateSectorCount;
+    private Boolean legacyCondenseSectors;
+    private boolean sectorCountMethodSetExplicitly;
     private boolean useStratConAlternateSectorTerrain;
     private double stratConSectorSizeMultiplier;
     private boolean noSeedForces;
@@ -1355,8 +1359,9 @@ public class CampaignOptions {
         // region Against the Bot Tab
         stratConPlayType = StratConPlayType.DISABLED;
         useAdvancedScouting = false;
-        useStratConAlternateSectorCount = true;
-        useStratConCondenseSectors = true;
+        // CONDENSED matches what the previous pair of booleans defaulted to (both true), so a new campaign behaves as
+        // it did before this became a single choice.
+        stratConSectorCountMethod = StratConSectorCountMethod.CONDENSED;
         useStratConAlternateSectorTerrain = true;
         stratConSectorSizeMultiplier = 1.0;
         noSeedForces = false;
@@ -5095,28 +5100,51 @@ public class CampaignOptions {
     }
 
     /**
-     * @return {@code true} if StratCon uses the alternate sector-count rule (roughly one sector per nine combat teams),
-     *       rather than the legacy fixed three-lances-per-track count. Only meaningful when StratCon is enabled.
+     * @return how many sectors a StratCon contract generates, and therefore how large each one is. Only meaningful
+     *       when StratCon is enabled.
      */
-    public boolean isUseStratConAlternateSectorCount() {
-        return useStratConAlternateSectorCount;
+    public StratConSectorCountMethod getStratConSectorCountMethod() {
+        return stratConSectorCountMethod;
     }
 
-    public void setUseStratConAlternateSectorCount(final boolean useStratConAlternateSectorCount) {
-        this.useStratConAlternateSectorCount = useStratConAlternateSectorCount;
+    public void setStratConSectorCountMethod(final StratConSectorCountMethod stratConSectorCountMethod) {
+        this.stratConSectorCountMethod = stratConSectorCountMethod;
+        this.sectorCountMethodSetExplicitly = true;
     }
 
     /**
-     * @return {@code true} if StratCon condenses sector generation past a hard cap of ten sectors by enlarging existing
-     *       sectors instead of adding new ones, so a force that would generate more than ten sectors instead receives
-     *       ten proportionally larger ones. Only meaningful when StratCon is enabled.
+     * Migration seam for saves written before {@link StratConSectorCountMethod} existed, when the sector count was two
+     * independent booleans. Both arrive as separate nodes in an unknown order, so each one records its value and
+     * recomputes; once both have been seen the result is correct however they were ordered.
+     *
+     * @deprecated since 0.51.01, for removal. Only {@code CampaignOptionsUnmarshaller} should call this.
      */
-    public boolean isUseStratConCondenseSectors() {
-        return useStratConCondenseSectors;
+    @Deprecated(since = "0.51.01", forRemoval = true)
+    public void setLegacyStratConAlternateSectorCount(final boolean alternateCount) {
+        this.legacyAlternateSectorCount = alternateCount;
+        applyLegacySectorCountMigration();
     }
 
-    public void setUseStratConCondenseSectors(final boolean useStratConCondenseSectors) {
-        this.useStratConCondenseSectors = useStratConCondenseSectors;
+    /**
+     * @see #setLegacyStratConAlternateSectorCount(boolean)
+     *
+     * @deprecated since 0.51.01, for removal. Only {@code CampaignOptionsUnmarshaller} should call this.
+     */
+    @Deprecated(since = "0.51.01", forRemoval = true)
+    public void setLegacyStratConCondenseSectors(final boolean condenseSectors) {
+        this.legacyCondenseSectors = condenseSectors;
+        applyLegacySectorCountMigration();
+    }
+
+    private void applyLegacySectorCountMigration() {
+        // A save that already carries the method wins outright: the old booleans are only a fallback for saves that
+        // predate it, and should never overwrite an explicit choice if both somehow appear.
+        if (sectorCountMethodSetExplicitly) {
+            return;
+        }
+
+        stratConSectorCountMethod = StratConSectorCountMethod.fromLegacyOptions(Boolean.TRUE.equals(
+              legacyAlternateSectorCount), Boolean.TRUE.equals(legacyCondenseSectors));
     }
 
     /**

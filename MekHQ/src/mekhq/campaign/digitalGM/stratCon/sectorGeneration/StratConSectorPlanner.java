@@ -47,14 +47,18 @@ import java.util.List;
  *
  * <p>Three regimes are supported:</p>
  * <ul>
- *     <li><b>Legacy</b> (alternate count off): reproduces the historical layout of one sector per three combat teams,
- *     with a final smaller sector for any remainder.</li>
- *     <li><b>Alternate count</b> (alternate count on, condense off): roughly one sector per nine combat teams.</li>
+ *     <li><b>Legacy</b>: the historical layout of one sector per three combat teams, with a final smaller sector for
+ *     any remainder, and no cap.</li>
+ *     <li><b>Alternate</b>: roughly one sector per nine combat teams.</li>
+ *     <li><b>Condensed</b>: the alternate count capped at {@link #MAXIMUM_SECTORS}.</li>
+ *     <li><b>Single</b>: exactly one sector.</li>
  * </ul>
  *
- * <p>Condensing caps either layout at {@link #MAXIMUM_SECTORS}. A force that would generate more instead receives ten
- * proportionally larger sectors, sharing out every team rather than dropping the surplus, so the total mapped area is
- * preserved.</p>
+ * <p>Whenever a method produces fewer sectors than the teams would naturally fill, every team is still shared out
+ * across the sectors that remain rather than being dropped. Sector size follows from the teams assigned to it, so the
+ * total mapped area stays roughly constant however the contract is divided - the pieces just get bigger. The one
+ * exception is the area ceiling applied later in {@code StratConContractInitializer}, which a single sector holding a
+ * very large contract will reach.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -72,39 +76,32 @@ public final class StratConSectorPlanner {
      * Generates the list of sector specs for a contract.
      *
      * @param requiredCombatFormations the contract's required combat formation count
-     * @param alternateCount           {@code true} to use the alternate one-sector-per-nine-teams count; {@code false}
-     *                                 for the legacy one-sector-per-three-teams layout
-     * @param condenseSectors          {@code true} to cap the sector count at {@link #MAXIMUM_SECTORS}, sharing the
-     *                                 teams that would have formed further sectors across the ones that remain;
-     *                                 honored under either count
+     * @param countMethod              how the teams are divided into sectors
      *
      * @return a non-empty list of sector specs
      */
-    public static List<SectorSpec> generateSectorSpecs(int requiredCombatFormations, boolean alternateCount,
-          boolean condenseSectors) {
-        return alternateCount ?
-                     generateAlternateSpecs(requiredCombatFormations, condenseSectors) :
-                     generateLegacySpecs(requiredCombatFormations, condenseSectors);
+    public static List<SectorSpec> generateSectorSpecs(int requiredCombatFormations,
+          StratConSectorCountMethod countMethod) {
+        return switch (countMethod) {
+            case LEGACY -> generateLegacySpecs(requiredCombatFormations);
+            case ALTERNATE -> generateAlternateSpecs(requiredCombatFormations, false);
+            case CONDENSED -> generateAlternateSpecs(requiredCombatFormations, true);
+            // Every team lands in the one sector, so it is sized for the whole contract. Large contracts will reach
+            // the area ceiling in StratConContractInitializer and stop growing there.
+            case SINGLE -> shareTeamsEvenly(requiredCombatFormations, 1);
+        };
     }
 
     /**
      * Reproduces the historical sector layout: one sector per three combat teams, plus a final sector holding any
      * remainder, and a guaranteed minimum of one sector.
      *
-     * <p>Condensing applies here too. The legacy layout reaches the cap three times sooner than the alternate one - a
-     * thirty-team contract wants ten sectors under legacy against three under alternate - so without this a player who
-     * enabled the cap alone would still be handed dozens of sectors, which is the one thing the option promises not to
-     * do.</p>
+     * <p>Uncapped by design: this is the historical layout reproduced exactly, so a large contract really does get
+     * dozens of sectors. A player who wants a ceiling picks {@link StratConSectorCountMethod#CONDENSED} instead, which
+     * is a different count rather than this one with a limit bolted on.</p>
      */
-    private static List<SectorSpec> generateLegacySpecs(int requiredCombatFormations, boolean condenseSectors) {
+    private static List<SectorSpec> generateLegacySpecs(int requiredCombatFormations) {
         int fullSectors = max(0, requiredCombatFormations / NUM_FORMATIONS_PER_TRACK);
-        int naturalSectors = fullSectors + (((requiredCombatFormations % NUM_FORMATIONS_PER_TRACK) > 0) ? 1 : 0);
-
-        if (condenseSectors && (naturalSectors > MAXIMUM_SECTORS)) {
-            // Share every team across the capped count rather than truncating the list, so the contract keeps the
-            // ground it is owed - the same bargain the alternate path strikes.
-            return shareTeamsEvenly(requiredCombatFormations, MAXIMUM_SECTORS);
-        }
 
         List<SectorSpec> specs = new ArrayList<>();
 
