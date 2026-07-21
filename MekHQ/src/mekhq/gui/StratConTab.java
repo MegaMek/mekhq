@@ -66,6 +66,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
+import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConStrategicObjective;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.events.GMModeEvent;
@@ -597,21 +598,28 @@ public class StratConTab extends CampaignGuiTab {
 
     /**
      * Refreshes the threat-level bar shown above the victory-point bar. Charts the selected sector's effective scenario
-     * odds (base odds plus facility adjustments) from 0% (calm) to 100% (hostile), running good-to-bad. Hidden when no
-     * sector is selected.
+     * odds from 0% (calm) to 100% (hostile), running good-to-bad. Hidden when no sector is selected.
+     *
+     * <p>This is the number a deploying force actually rolls against, so it is taken from
+     * {@link StratConRulesManager#calculateScenarioOdds} rather than read off the track: the track carries the base
+     * odds and the facility adjustment, but the enemy's morale shifts the real figure by anywhere from -10 to +50, and
+     * a routed enemy mounts no attacks at all. Showing the track's own numbers understated a dominant enemy badly and
+     * promised a threat that a routed one could not deliver.</p>
      *
      * @param track the currently selected sector's track, or {@code null}
      */
     private void updateThreatLevelBar(StratConTrackState track) {
         threatLevelPanel.removeAll();
 
-        if (track == null) {
+        if ((track == null) || (currentContract == null)) {
             threatLevelPanel.setVisible(false);
             return;
         }
 
         threatLevelPanel.setVisible(true);
-        int odds = Math.clamp(track.getScenarioOdds() + track.getScenarioOddsAdjustment(), 0, 100);
+        // Matches deployForceToCoords, which rolls against the reinforcement figure: this bar answers "if I deploy
+        // here, how likely is a fight?"
+        int odds = Math.clamp(StratConRulesManager.calculateScenarioOdds(track, currentContract, true), 0, 100);
         threatLevelPanel.add(ContractMeterBar.threatLevel(odds), BorderLayout.CENTER);
 
         threatLevelPanel.revalidate();
