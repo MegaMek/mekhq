@@ -881,10 +881,11 @@ public class StratConRulesManager {
         AtBDynamicScenario backingScenario = scenario.getBackingScenario();
         StratConBiomeManifest biomeManifest = StratConBiomeManifest.getInstance();
 
-        // for non-surface scenarios, we will skip the temperature update. Surface scenarios take the sector's average
-        // temperature shifted by the local terrain climate, so a volcano hex fights hot and a glacier hex fights cold.
-        if (backingScenario.getBoardType() != Scenario.T_SPACE &&
-                  backingScenario.getBoardType() != Scenario.T_ATMOSPHERE) {
+        // Take the sector's average temperature shifted by the local terrain climate, so a volcano hex fights hot and a
+        // glacier hex fights cold. Only space is exempt: a low-atmosphere fight is still happening over that hex, and
+        // takes its map and light from the hex below, so it should take its temperature from there too. (Wind and
+        // precipitation are a separate matter - AtBScenario skips those in atmosphere regardless.)
+        if (backingScenario.getBoardType() != Scenario.T_SPACE) {
             backingScenario.setTemperature(track.getTemperature() +
                                                  StratConBiomeManifest.terrainTemperatureOffset(track.getTerrainTile(
                                                        coords)));

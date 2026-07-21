@@ -407,8 +407,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     public void setWeatherConditions(boolean isNoTornadoes) {
-        // weather is irrelevant in these situations.
-        if (getBoardType() == AtBScenario.T_SPACE || getBoardType() == AtBScenario.T_ATMOSPHERE) {
+        // Vacuum has no weather. Low atmosphere does: wind and visibility bear on a fight in a planet's air just as
+        // they do on the ground beneath it, so only space is exempt.
+        if (getBoardType() == AtBScenario.T_SPACE) {
             return;
         }
 
