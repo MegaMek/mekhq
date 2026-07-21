@@ -36,7 +36,6 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import megamek.common.annotations.Nullable;
@@ -179,7 +178,7 @@ public final class StratConMountainPlacer {
         Set<StratConCoords> blob = StratConHexGeometry.growBlob(track,
               randomLandCoords(track),
               size,
-              oceanHexes(track));
+              StratConHexGeometry.oceanHexes(track));
         String terrain = terrainFor(mountainTerrain, volcanism);
         for (StratConCoords coords : blob) {
             track.setTerrainTile(coords, terrain);
@@ -190,7 +189,7 @@ public final class StratConMountainPlacer {
      * Places several small mountain/volcanic clusters at random land seeds.
      */
     private static void clusters(StratConTrackState track, String mountainTerrain, int volcanism, int clusterCount) {
-        Set<StratConCoords> ocean = oceanHexes(track);
+        Set<StratConCoords> ocean = StratConHexGeometry.oceanHexes(track);
         for (int cluster = 0; cluster < clusterCount; cluster++) {
             int size = CLUSTER_MIN_SIZE + Compute.randomInt(CLUSTER_SIZE_SPREAD);
             Set<StratConCoords> blob = StratConHexGeometry.growBlob(track, randomLandCoords(track), size, ocean);
@@ -269,19 +268,6 @@ public final class StratConMountainPlacer {
 
     private static boolean isOcean(StratConTrackState track, StratConCoords coords) {
         return StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(coords));
-    }
-
-    private static Set<StratConCoords> oceanHexes(StratConTrackState track) {
-        Set<StratConCoords> ocean = new HashSet<>();
-        for (int x = 0; x < track.getWidth(); x++) {
-            for (int y = 0; y < track.getHeight(); y++) {
-                StratConCoords coords = new StratConCoords(x, y);
-                if (isOcean(track, coords)) {
-                    ocean.add(coords);
-                }
-            }
-        }
-        return ocean;
     }
 
 

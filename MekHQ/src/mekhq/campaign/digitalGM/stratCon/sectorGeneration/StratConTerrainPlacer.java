@@ -122,7 +122,7 @@ public class StratConTerrainPlacer {
         enforceLandMinimum(track, baseTerrain);
 
         // Ocean hexes are always revealed - open water holds no fog of war.
-        revealOceanHexes(track);
+        StratConSectorGenerator.revealOceanHexes(track);
     }
 
     /**
@@ -159,16 +159,6 @@ public class StratConTerrainPlacer {
      *
      * @param track the track whose ocean hexes should be revealed
      */
-    private static void revealOceanHexes(StratConTrackState track) {
-        for (int x = 0; x < track.getWidth(); x++) {
-            for (int y = 0; y < track.getHeight(); y++) {
-                StratConCoords coords = new StratConCoords(x, y);
-                if (StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(coords))) {
-                    track.getRevealedCoords().add(coords);
-                }
-            }
-        }
-    }
 
     /**
      * Draws a "stripe" of the given terrain type on the given track

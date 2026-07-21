@@ -73,6 +73,25 @@ class StratConCityPlacerTest {
     }
 
     @Test
+    void primateCity_neverSpreadsOntoWater() {
+        // The blob grows outward from its seed rather than picking from the land list, so it needs the ocean handed to
+        // it as a barrier. Given an empty barrier it will happily march into the sea, and the existing tests would not
+        // notice: the contiguous-blob test uses an all-land sector, and the placesOnlyOnLand test uses a profile that
+        // never reaches this path.
+        StratConTrackState track = coastTrack();
+        UrbanProfile primate = new UrbanProfile(UrbanProfileType.PRIMATE_CITY, null, null, null, null, 1.0, 1.0, 0.0,
+              null, null);
+
+        StratConCityPlacer.placeCities(track, planet(2_000_000_000L), primate);
+
+        assertFalse(track.getCities().isEmpty(), "a primate city should place some city hexes");
+        for (StratConCoords city : track.getCities()) {
+            assertFalse(StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(city)),
+                  "the primate city blob spread onto ocean at " + city);
+        }
+    }
+
+    @Test
     void primateCity_placesOneContiguousBlob() {
         StratConTrackState track = landTrack();
         UrbanProfile primate = new UrbanProfile(UrbanProfileType.PRIMATE_CITY, null, null, null, null, 1.0, 0.0, 0.0,

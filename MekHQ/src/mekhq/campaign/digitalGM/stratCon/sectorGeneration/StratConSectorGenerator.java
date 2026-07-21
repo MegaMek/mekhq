@@ -38,7 +38,6 @@ import java.util.Set;
 import jakarta.annotation.Nullable;
 import megamek.common.compute.Compute;
 import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
-import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiome;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
@@ -54,8 +53,8 @@ import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
  * <p><b>Roads are not laid here.</b> A sector's road network spans its cities, its farmland <em>and</em> the
  * planet-owner's facilities, and facilities are seeded after generation returns - so laying roads inside this method
  * built a network that the caller immediately discarded and rebuilt. The caller lays them once, through
- * {@code StratConContractInitializer.connectFacilitiesToRoads}, after the sector is populated. Both paths that
- * generate a sector - initial contract setup and the GM's Regenerate Sector - do so.</p>
+ * {@code StratConContractInitializer.connectFacilitiesToRoads}, after the sector is populated. Both paths that generate
+ * a sector - initial contract setup and the GM's Regenerate Sector - do so.</p>
  *
  * <h2>Why the order is fixed</h2>
  *
@@ -98,10 +97,10 @@ public final class StratConSectorGenerator {
      * make this an interface the placers implement, so there is a single concept instead of two parallel lists?</p>
      *
      * <p>Because this enum <b>declares ordering and nothing else</b>. It holds no behavior, nothing dispatches on it,
-     * and it is never mapped to a class at runtime; its entire content is the prerequisite graph, and its only uses
-     * are the {@link PipelineOrder#enter} calls in {@link #generate}. It is a vocabulary for stating a constraint, not
-     * a second spelling of the placers. Collapsing it into them would not remove a duplicated concept - it would
-     * scatter the constraint across seven files, where no one reading any one of them could see the whole order.</p>
+     * and it is never mapped to a class at runtime; its entire content is the prerequisite graph, and its only uses are
+     * the {@link PipelineOrder#enter} calls in {@link #generate}. It is a vocabulary for stating a constraint, not a
+     * second spelling of the placers. Collapsing it into them would not remove a duplicated concept - it would scatter
+     * the constraint across seven files, where no one reading any one of them could see the whole order.</p>
      *
      * <p>Making the placers implement a common stage interface is also more expensive than it looks, and would cost
      * something real:</p>
@@ -149,10 +148,9 @@ public final class StratConSectorGenerator {
      * Records which pipeline stages have been reached, and refuses one whose prerequisites have not.
      *
      * <p>One instance lives for the duration of a single {@link #generate} call and is thrown away with it, so this
-     * holds no state between sectors and costs a few set operations per sector. The check is a development guard
-     * rather than a runtime feature: it never fires for correct code, and its whole purpose is to convert a silent
-     * degradation into an immediate, named failure the first time a sector is generated after someone reorders the
-     * pipeline.</p>
+     * holds no state between sectors and costs a few set operations per sector. The check is a development guard rather
+     * than a runtime feature: it never fires for correct code, and its whole purpose is to convert a silent degradation
+     * into an immediate, named failure the first time a sector is generated after someone reorders the pipeline.</p>
      *
      * <p>A stage that is deliberately not run - cities and farmland, when the Ares Conventions suppress them - is
      * {@link #skip(GenerationStage) skipped} rather than omitted, so the stages that follow it still consider their
@@ -302,13 +300,6 @@ public final class StratConSectorGenerator {
      * Adds every ocean hex to the track's revealed set, so open water is always visible.
      */
     public static void revealOceanHexes(StratConTrackState track) {
-        for (int x = 0; x < track.getWidth(); x++) {
-            for (int y = 0; y < track.getHeight(); y++) {
-                StratConCoords coords = new StratConCoords(x, y);
-                if (StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(coords))) {
-                    track.getRevealedCoords().add(coords);
-                }
-            }
-        }
+        track.getRevealedCoords().addAll(StratConHexGeometry.oceanHexes(track));
     }
 }

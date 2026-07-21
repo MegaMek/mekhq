@@ -44,6 +44,7 @@ import megamek.common.board.Coords;
 import megamek.common.compute.Compute;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
+import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 
 /**
  * Shared hex-grid helpers used by the improved sector generation placers: bounds checks, neighbor lookup, and growing
@@ -228,5 +229,23 @@ public final class StratConHexGeometry {
     /** @return the sector's middle hex, for a feature meant to sit centrally such as a single inland sea or upland. */
     public static StratConCoords centerCoords(StratConTrackState track) {
         return new StratConCoords(track.getWidth() / 2, track.getHeight() / 2);
+    }
+
+    /**
+     * @return every ocean hex in the sector. Collected in one sweep because several placers need the whole set - to
+     *       keep mountains out of the water, to stop a city blob growing into it, and to reveal it, since open water
+     *       carries no fog of war.
+     */
+    public static Set<StratConCoords> oceanHexes(StratConTrackState track) {
+        Set<StratConCoords> ocean = new HashSet<>();
+        for (int x = 0; x < track.getWidth(); x++) {
+            for (int y = 0; y < track.getHeight(); y++) {
+                StratConCoords coords = new StratConCoords(x, y);
+                if (StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(coords))) {
+                    ocean.add(coords);
+                }
+            }
+        }
+        return ocean;
     }
 }

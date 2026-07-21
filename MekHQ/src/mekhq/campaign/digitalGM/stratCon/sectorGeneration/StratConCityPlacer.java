@@ -37,7 +37,6 @@ import static java.lang.Math.min;
 import static java.lang.Math.round;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -139,15 +138,7 @@ public final class StratConCityPlacer {
         }
 
         // The blob may not spread onto water.
-        Set<StratConCoords> ocean = new HashSet<>();
-        for (int x = 0; x < track.getWidth(); x++) {
-            for (int y = 0; y < track.getHeight(); y++) {
-                StratConCoords coords = new StratConCoords(x, y);
-                if (StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(coords))) {
-                    ocean.add(coords);
-                }
-            }
-        }
+        Set<StratConCoords> ocean = StratConHexGeometry.oceanHexes(track);
 
         for (StratConCoords cityHex : StratConHexGeometry.growBlob(track, seed, cityCount, ocean)) {
             track.addCity(cityHex);
