@@ -57,17 +57,24 @@ import mekhq.utilities.MHQXMLUtility;
 
 /**
  * The authored catalogue of StratCon terrain, loaded once from {@code StratConBiomeManifest.xml} and reachable through
- * {@link #getInstance()}. Everything the sector generator and the sector map know about terrain comes from here; no
- * terrain name is hard-coded in the generation code.
+ * {@link #getInstance()}. Which terrains exist, what category each belongs to, and which boards it can be fought on all
+ * come from here, so the placers can ask what a hex is without matching on its name.
+ *
+ * <p>A handful of decisions do still match on names, and adding a terrain to mm-data means checking them:
+ * {@link #terrainTemperatureOffset} below, {@code StratConMapTuner}'s cold/hot-dry theme tests, and the fallback
+ * terrain constants in {@code StratConMountainPlacer}, {@code StratConTerrainFiller} and
+ * {@code StratConSectorGenerator}. Those lists are maintained by hand and do not all agree - {@code Steppe} counts as
+ * hot-dry for tileset selection but carries no temperature offset, for instance.</p>
  *
  * <p>It carries four things:</p>
  * <ul>
  *     <li><b>Biomes</b> &mdash; temperature-keyed buckets ({@link #TERRAN_BIOME}, {@link #AIRLESS_BIOME} and their
  *     facility variants). {@link #getTempMap} returns a bucket as a floor-lookup map, so a sector's temperature
  *     selects the palette of terrain that can appear in it.</li>
- *     <li><b>Terrain types</b> &mdash; each terrain's {@link StratConTerrainCategory}, whether it is arable, and its
- *     temperature offset. The static {@code isOceanTerrain}/{@code isMountainTerrain}/... helpers are category tests
- *     against this list, and are how the placers ask what a hex is without matching on names.</li>
+ *     <li><b>Terrain types</b> &mdash; each terrain's name, sprite, {@link StratConTerrainCategory} and whether it is
+ *     arable. The static {@code isOceanTerrain}/{@code isMountainTerrain}/... helpers are category tests against this
+ *     list, and are how the placers ask what a hex is without matching on names. Note that the temperature offset is
+ *     <em>not</em> among these fields; see {@link #terrainTemperatureOffset}.</li>
  *     <li><b>Map pools</b> &mdash; the mapgen boards a scenario may draw from. {@link #getMapTypesForTerrain} resolves
  *     a terrain's own pool first and falls back to its category pool, then to {@code NEUTRAL};
  *     {@link #getFacilityPoolKey} gives the separate pool a base on that terrain fights on.</li>
@@ -497,7 +504,7 @@ public class StratConBiomeManifest {
                 resultingManifest = manifestElement.getValue();
             }
         } catch (Exception e) {
-            logger.error("Error Deserializing Facility Manifest", e);
+            logger.error("Error Deserializing Biome Manifest", e);
             return null;
         }
 

@@ -396,13 +396,13 @@ public class StratConContractInitializer {
     /**
      * Sets up the initial state of a single track from its {@link SectorSpec} and the destination planet's profile.
      *
-     * <p>Sizing and temperature follow one of two regimes. When either the alternate sector count or sector
-     * condensing is enabled, the track uses the improved sizing (a per-quarter scouting budget scaled by planetary
-     * size, sector size units, the size multiplier, and hydrology) and a latitude-driven temperature. Otherwise it
-     * falls back to the legacy behaviour (a rectangle sized from the formation count and a broad equatorial temperature
-     * swing).</p>
+     * <p>Sizing and temperature follow one of two regimes, chosen by
+     * {@link StratConSectorCountMethod#usesImprovedSizing()}. Every method but {@code LEGACY} uses the improved sizing
+     * (a per-quarter scouting budget scaled by the sector's combat teams, planetary size, the size multiplier, and
+     * hydrology) and a latitude-driven temperature. {@code LEGACY} keeps the historical behaviour: a rectangle sized
+     * from the formation count, and a broad equatorial temperature swing with no latitude input.</p>
      *
-     * @param sector          the sector blueprint (size units, required formations, latitude band)
+     * @param sector          the sector blueprint (required combat teams, latitude band)
      * @param planetProfile   the destination planet's resolved data
      * @param campaignOptions the campaign options governing which sizing/temperature regime applies
      * @param allowCities     {@code true} to allow the improved terrain generator to place cities; {@code false}
@@ -925,9 +925,10 @@ public class StratConContractInitializer {
     }
 
     /**
-     * Applies the improved (square) track dimensions. Starts from a quarter's scouting budget scaled by planetary size,
-     * multiplies by the sector's size units and the configured size multiplier to get the dry playable target, then
-     * grows the sector to offset ocean so the dry target survives.
+     * Applies the improved track dimensions. Starts from a quarter's scouting budget for the sector's combat teams,
+     * scaled by planetary size and the configured size multiplier to get the dry playable target, then grows the sector
+     * to offset ocean so the dry target survives. The area is laid out by {@link #rollSectorShape}, which rolls a
+     * weighted aspect ratio - sectors are deliberately not square.
      */
     private static void applyImprovedDimensions(StratConTrackState track, SectorSpec sector, PlanetProfile profile,
           double sizeMultiplier) {
