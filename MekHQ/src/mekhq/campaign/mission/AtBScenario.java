@@ -439,10 +439,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
         BlowingSand blowingSand = TCO.rollBlowingSandCondition(getTerrainType());
 
-        // Sand is lifted off the ground, so it belongs to a ground fight rather than to one fought in the air above it.
-        // Wind, weather and fog are left alone here: those are as real at low altitude as at the surface, and the
-        // atmosphere-density checks above already calm them on worlds too thin to carry them.
-        if (getAtmosphere().isLighterThan(Atmosphere.TRACE) || (getBoardType() == AtBScenario.T_ATMOSPHERE)) {
+        if (getAtmosphere().isLighterThan(Atmosphere.TRACE)) {
             blowingSand = BlowingSand.BLOWING_SAND_NONE;
         }
 
