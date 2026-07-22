@@ -55,9 +55,9 @@ public enum StratConSectorCountMethod {
     /** Roughly one sector per nine combat teams: fewer, larger sectors for the same force. */
     ALTERNATE("ALTERNATE"),
     /** The alternate count, capped at ten sectors, with the surplus teams shared across the ten that remain. */
-    CONDENSED("CONDENSED"),
+    ALTERNATE_CONDENSED("ALTERNATE_CONDENSED"),
     /** Roughly one sector per regiment, so a contract up to regimental strength fights over a single sector. */
-    REGIMENTAL("REGIMENTAL");
+    ALTERNATE_REGIMENTAL("ALTERNATE_REGIMENTAL");
 
     private final String lookupName;
     private final String label;
@@ -106,7 +106,7 @@ public enum StratConSectorCountMethod {
                 return method;
             }
         }
-        return CONDENSED;
+        return ALTERNATE_CONDENSED;
     }
 
     /**
@@ -114,7 +114,7 @@ public enum StratConSectorCountMethod {
      *
      * <p>Condensing wins when it is set, because the ten-sector cap was the more visible of the two settings. That
      * folds away the one combination with no equivalent here - condensing without the alternate count, which capped a
-     * legacy count at ten - and those campaigns land on {@link #CONDENSED}.</p>
+     * legacy count at ten - and those campaigns land on {@link #ALTERNATE_CONDENSED}.</p>
      *
      * @param alternateCount  the old {@code useStratConAlternateSectorCount} value
      * @param condenseSectors the old {@code useStratConCondenseSectors} value
@@ -123,7 +123,7 @@ public enum StratConSectorCountMethod {
      */
     public static StratConSectorCountMethod fromLegacyOptions(boolean alternateCount, boolean condenseSectors) {
         if (condenseSectors) {
-            return CONDENSED;
+            return ALTERNATE_CONDENSED;
         }
 
         return alternateCount ? ALTERNATE : LEGACY;

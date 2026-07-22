@@ -862,7 +862,9 @@ public final class CampaignOption<T> {
     public static final CampaignOption<Boolean> USE_ADVANCED_SCOUTING =
           of(Boolean.class, false, "useAdvancedScouting");
     public static final CampaignOption<StratConSectorCountMethod> STRAT_CON_SECTOR_COUNT_METHOD =
-          of(StratConSectorCountMethod.class, StratConSectorCountMethod.CONDENSED, "stratConSectorCountMethod");
+          of(StratConSectorCountMethod.class,
+                StratConSectorCountMethod.ALTERNATE_REGIMENTAL,
+                "stratConSectorCountMethod");
     public static final CampaignOption<Boolean> USE_STRAT_CON_ALTERNATE_SECTOR_TERRAIN =
           of(Boolean.class, true, "useStratConAlternateSectorTerrain");
     public static final CampaignOption<Double> STRAT_CON_SECTOR_SIZE_MULTIPLIER =

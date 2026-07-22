@@ -102,8 +102,8 @@ public final class StratConSectorPlanner {
             // overflow into and keeps its historical layout exactly.
             case LEGACY -> generateLegacySpecs(requiredCombatFormations);
             case ALTERNATE -> generateAlternateSpecs(requiredCombatFormations, false, maximumTeamsPerSector);
-            case CONDENSED -> generateAlternateSpecs(requiredCombatFormations, true, maximumTeamsPerSector);
-            case REGIMENTAL -> generateRegimentalSpecs(requiredCombatFormations, maximumTeamsPerSector);
+            case ALTERNATE_CONDENSED -> generateAlternateSpecs(requiredCombatFormations, true, maximumTeamsPerSector);
+            case ALTERNATE_REGIMENTAL -> generateRegimentalSpecs(requiredCombatFormations, maximumTeamsPerSector);
         };
     }
 
@@ -120,7 +120,8 @@ public final class StratConSectorPlanner {
      * Generates the regimental layout: roughly one sector per {@link #REGIMENTAL_FORMATIONS_PER_SECTOR} combat teams,
      * so a contract fielding up to a regiment gets a single sector and larger ones get a sector per regiment.
      *
-     * <p>Uncapped, like the alternate count it scales from. The cap that {@link StratConSectorCountMethod#CONDENSED}
+     * <p>Uncapped, like the alternate count it scales from. The cap that
+     * {@link StratConSectorCountMethod#ALTERNATE_CONDENSED}
      * applies would need 450 combat teams to bite here - ten regiments - so there is nothing to guard against.</p>
      */
     private static List<SectorSpec> generateRegimentalSpecs(int requiredCombatFormations, int maximumTeamsPerSector) {
@@ -139,8 +140,8 @@ public final class StratConSectorPlanner {
      * remainder, and a guaranteed minimum of one sector.
      *
      * <p>Uncapped by design: this is the historical layout reproduced exactly, so a large contract really does get
-     * dozens of sectors. A player who wants a ceiling picks {@link StratConSectorCountMethod#CONDENSED} instead, which
-     * is a different count rather than this one with a limit bolted on.</p>
+     * dozens of sectors. A player who wants a ceiling picks {@link StratConSectorCountMethod#ALTERNATE_CONDENSED}
+     * instead, which is a different count rather than this one with a limit bolted on.</p>
      */
     private static List<SectorSpec> generateLegacySpecs(int requiredCombatFormations) {
         int fullSectors = max(0, requiredCombatFormations / NUM_FORMATIONS_PER_TRACK);

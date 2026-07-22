@@ -145,7 +145,7 @@ class StratConTrackSizingTest {
         StratConTrackState doubledByMultiplier = track(new SectorSpec(9, LatitudeBand.EQUATORIAL),
               options(StratConSectorCountMethod.ALTERNATE, 2.0));
         StratConTrackState doubledByTeams = track(new SectorSpec(18, LatitudeBand.EQUATORIAL),
-              options(StratConSectorCountMethod.CONDENSED, 1.0));
+              options(StratConSectorCountMethod.ALTERNATE_CONDENSED, 1.0));
 
         // Compared by area, not by dimensions: each track rolls its own shape, so their proportions legitimately differ.
         assertAreaNear(playableFor(18) * 2, doubledByMultiplier);
@@ -156,7 +156,7 @@ class StratConTrackSizingTest {
     void improvedSizing_multiplierAlwaysBitesOnCondensedSectors() {
         // Eighteen teams at a 2.0 multiplier: twice the six recon forces' quarterly budget.
         StratConTrackState track = track(new SectorSpec(18, LatitudeBand.EQUATORIAL),
-              options(StratConSectorCountMethod.CONDENSED, 2.0));
+              options(StratConSectorCountMethod.ALTERNATE_CONDENSED, 2.0));
 
         assertAreaNear(playableFor(18) * 2 * 2, track);
     }
@@ -180,7 +180,7 @@ class StratConTrackSizingTest {
         // No shape may produce a sliver, and no combination of planet and options may produce a runaway map.
         for (int roll = 0; roll < 60; roll++) {
             StratConTrackState track = track(new SectorSpec(27, LatitudeBand.EQUATORIAL),
-                  options(StratConSectorCountMethod.CONDENSED, 2.0));
+                  options(StratConSectorCountMethod.ALTERNATE_CONDENSED, 2.0));
 
             assertTrue(track.getWidth() >= 4, "sector too narrow to play: " + track.getWidth());
             assertTrue(track.getHeight() >= 4, "sector too shallow to play: " + track.getHeight());
@@ -197,7 +197,12 @@ class StratConTrackSizingTest {
               "Rocky", 1, 1.0, 1_000_000L, mekhq.campaign.universe.enums.HPGRating.X);
 
         StratConTrackState track = StratConContractInitializer.initializeTrackState(new SectorSpec(27,
-              LatitudeBand.EQUATORIAL), bigOceanWorld, options(StratConSectorCountMethod.CONDENSED, 2.0), true, 0, 0);
+                    LatitudeBand.EQUATORIAL),
+              bigOceanWorld,
+              options(StratConSectorCountMethod.ALTERNATE_CONDENSED, 2.0),
+              true,
+              0,
+              0);
 
         assertTrue(track.getSize() <= 1024, "runaway sector was not capped: " + track.getSize() + " hexes");
     }
@@ -249,7 +254,7 @@ class StratConTrackSizingTest {
     @Test
     void trackAlwaysCarriesRequiredFormationCount() {
         StratConTrackState track = track(new SectorSpec(18, LatitudeBand.NORTH_POLAR),
-              options(StratConSectorCountMethod.CONDENSED, 1.0));
+              options(StratConSectorCountMethod.ALTERNATE_CONDENSED, 1.0));
 
         assertEquals(18, track.getRequiredLanceCount());
     }

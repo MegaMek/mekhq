@@ -106,7 +106,7 @@ class StratConSectorPlannerTest {
     @Test
     void regimental_aContractUpToARegimentFightsOverOneSector() {
         // 45 lances is a five-battalion regiment; anything up to it rounds to a single sector.
-        List<SectorSpec> specs = generateSectorSpecs(45, StratConSectorCountMethod.REGIMENTAL, UNLIMITED);
+        List<SectorSpec> specs = generateSectorSpecs(45, StratConSectorCountMethod.ALTERNATE_REGIMENTAL, UNLIMITED);
 
         assertEquals(1, specs.size());
         assertEquals(45, specs.getFirst().requiredLances(), "the one sector should hold the whole regiment");
@@ -115,7 +115,7 @@ class StratConSectorPlannerTest {
     @Test
     void regimental_producesOneSectorPerRegiment() {
         // 135 lances is three regiments, so three sectors of 45.
-        List<SectorSpec> specs = generateSectorSpecs(135, StratConSectorCountMethod.REGIMENTAL, UNLIMITED);
+        List<SectorSpec> specs = generateSectorSpecs(135, StratConSectorCountMethod.ALTERNATE_REGIMENTAL, UNLIMITED);
 
         assertEquals(3, specs.size());
         assertEquals(135, totalTeams(specs));
@@ -125,14 +125,14 @@ class StratConSectorPlannerTest {
     @Test
     void regimental_roundsToNearestRegiment() {
         // 22 / 45 = 0.49 -> 1 sector; 23 / 45 = 0.51 -> 1 sector; 68 / 45 = 1.51 -> 2 sectors.
-        assertEquals(1, generateSectorSpecs(22, StratConSectorCountMethod.REGIMENTAL, UNLIMITED).size());
-        assertEquals(1, generateSectorSpecs(23, StratConSectorCountMethod.REGIMENTAL, UNLIMITED).size());
-        assertEquals(2, generateSectorSpecs(68, StratConSectorCountMethod.REGIMENTAL, UNLIMITED).size());
+        assertEquals(1, generateSectorSpecs(22, StratConSectorCountMethod.ALTERNATE_REGIMENTAL, UNLIMITED).size());
+        assertEquals(1, generateSectorSpecs(23, StratConSectorCountMethod.ALTERNATE_REGIMENTAL, UNLIMITED).size());
+        assertEquals(2, generateSectorSpecs(68, StratConSectorCountMethod.ALTERNATE_REGIMENTAL, UNLIMITED).size());
     }
 
     @Test
     void regimental_sharesEveryTeamOutAcrossItsSectors() {
-        List<SectorSpec> specs = generateSectorSpecs(100, StratConSectorCountMethod.REGIMENTAL, UNLIMITED);
+        List<SectorSpec> specs = generateSectorSpecs(100, StratConSectorCountMethod.ALTERNATE_REGIMENTAL, UNLIMITED);
 
         assertEquals(100, totalTeams(specs), "no team should be dropped by the split");
     }
@@ -169,7 +169,7 @@ class StratConSectorPlannerTest {
     @Test
     void regimental_neverProducesZeroSectors() {
         // A contract requiring no combat teams still needs somewhere to fight.
-        List<SectorSpec> specs = generateSectorSpecs(0, StratConSectorCountMethod.REGIMENTAL, UNLIMITED);
+        List<SectorSpec> specs = generateSectorSpecs(0, StratConSectorCountMethod.ALTERNATE_REGIMENTAL, UNLIMITED);
 
         assertEquals(1, specs.size());
         assertTrue(specs.getFirst().requiredLances() >= 1);
@@ -192,7 +192,7 @@ class StratConSectorPlannerTest {
 
     @Test
     void alternate_atCap_isNotCondensed() {
-        List<SectorSpec> specs = generateSectorSpecs(90, StratConSectorCountMethod.CONDENSED, UNLIMITED);
+        List<SectorSpec> specs = generateSectorSpecs(90, StratConSectorCountMethod.ALTERNATE_CONDENSED, UNLIMITED);
 
         assertEquals(MAXIMUM_SECTORS, specs.size());
     }
@@ -209,7 +209,7 @@ class StratConSectorPlannerTest {
     @Test
     void condensed_fifteenSectorsWorthOfForceFitsIntoTen() {
         // 135 teams would make fifteen sectors uncondensed; condensed they share out across ten, 13-14 teams apiece.
-        List<SectorSpec> specs = generateSectorSpecs(135, StratConSectorCountMethod.CONDENSED, UNLIMITED);
+        List<SectorSpec> specs = generateSectorSpecs(135, StratConSectorCountMethod.ALTERNATE_CONDENSED, UNLIMITED);
 
         assertEquals(MAXIMUM_SECTORS, specs.size());
         assertEquals(135, totalTeams(specs), "condensing should redistribute the teams, not drop them");
@@ -221,7 +221,7 @@ class StratConSectorPlannerTest {
     void condensed_yieldsTheTenSectorCapRatherThanExceedARegimentPerSector() {
         // Ten sectors hold 450 teams at a regiment apiece. Past that the regiment limit outranks the sector cap,
         // because an over-regimental sector asks for more ground than the area ceiling grants and loses the rest.
-        List<SectorSpec> specs = generateSectorSpecs(500, StratConSectorCountMethod.CONDENSED, UNLIMITED);
+        List<SectorSpec> specs = generateSectorSpecs(500, StratConSectorCountMethod.ALTERNATE_CONDENSED, UNLIMITED);
 
         assertTrue(specs.size() > MAXIMUM_SECTORS, "expected the sector cap to yield, got " + specs.size());
         assertEquals(500, totalTeams(specs), "no team should be dropped when the cap yields");
@@ -232,7 +232,7 @@ class StratConSectorPlannerTest {
     @Test
     void condensed_holdsAtTenSectorsRightUpToTheRegimentLimit() {
         // 450 teams is exactly ten regiments, so the cap should still hold at ten.
-        List<SectorSpec> specs = generateSectorSpecs(450, StratConSectorCountMethod.CONDENSED, UNLIMITED);
+        List<SectorSpec> specs = generateSectorSpecs(450, StratConSectorCountMethod.ALTERNATE_CONDENSED, UNLIMITED);
 
         assertEquals(MAXIMUM_SECTORS, specs.size());
         specs.forEach(spec -> assertEquals(REGIMENTAL_FORMATIONS_PER_SECTOR, spec.requiredLances()));
@@ -241,7 +241,7 @@ class StratConSectorPlannerTest {
     @Test
     void condensed_neverExceedsTheSectorCap() {
         // 225 / 9 = 25 sectors uncondensed
-        List<SectorSpec> specs = generateSectorSpecs(225, StratConSectorCountMethod.CONDENSED, UNLIMITED);
+        List<SectorSpec> specs = generateSectorSpecs(225, StratConSectorCountMethod.ALTERNATE_CONDENSED, UNLIMITED);
 
         assertEquals(MAXIMUM_SECTORS, specs.size());
     }
@@ -249,7 +249,7 @@ class StratConSectorPlannerTest {
     @Test
     void condensed_sharesEveryTeamOutAcrossTheSectors() {
         // Condensing must not lose or invent teams: the contract's whole force is still accounted for.
-        List<SectorSpec> specs = generateSectorSpecs(225, StratConSectorCountMethod.CONDENSED, UNLIMITED);
+        List<SectorSpec> specs = generateSectorSpecs(225, StratConSectorCountMethod.ALTERNATE_CONDENSED, UNLIMITED);
 
         assertEquals(225, totalTeams(specs), "condensing should redistribute the teams, not drop them");
     }
@@ -258,7 +258,7 @@ class StratConSectorPlannerTest {
     void condensed_spreadsTheExtraEvenlyRatherThanEnlargingTheLeadingSectors() {
         // Previously the surplus piled onto the earlier sectors, leaving some enormous and the rest ordinary. Sharing
         // it out means no sector differs from another by more than the one team an integer split cannot divide.
-        List<SectorSpec> specs = generateSectorSpecs(225, StratConSectorCountMethod.CONDENSED, UNLIMITED);
+        List<SectorSpec> specs = generateSectorSpecs(225, StratConSectorCountMethod.ALTERNATE_CONDENSED, UNLIMITED);
 
         int smallest = specs.stream().mapToInt(SectorSpec::requiredLances).min().orElseThrow();
         int largest = specs.stream().mapToInt(SectorSpec::requiredLances).max().orElseThrow();
@@ -271,7 +271,9 @@ class StratConSectorPlannerTest {
     void condensed_staysEvenAcrossManyForceSizes() {
         for (int desired = MAXIMUM_SECTORS + 1; desired <= 40; desired++) {
             int teams = desired * ALTERNATE_FORMATIONS_PER_SECTOR;
-            List<SectorSpec> specs = generateSectorSpecs(teams, StratConSectorCountMethod.CONDENSED, UNLIMITED);
+            List<SectorSpec> specs = generateSectorSpecs(teams,
+                  StratConSectorCountMethod.ALTERNATE_CONDENSED,
+                  UNLIMITED);
 
             assertEquals(MAXIMUM_SECTORS, specs.size());
             assertEquals(teams, totalTeams(specs), "every team should still be accounted for at " + teams);

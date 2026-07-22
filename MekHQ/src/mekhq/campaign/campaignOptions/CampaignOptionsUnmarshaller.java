@@ -40,7 +40,6 @@ import static mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick.SUPPORT;
 import megamek.Version;
 import megamek.logging.MMLogger;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConPlayType;
-import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorCountMethod;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -53,9 +52,6 @@ public class CampaignOptionsUnmarshaller {
         parentNod.normalize();
         CampaignOptions campaignOptions = new CampaignOptions();
         NodeList childNodes = parentNod.getChildNodes();
-
-        // Runs before the main loop so a save that also carries the modern tag overwrites the migrated value.
-        migrateLegacySectorCountMethod(childNodes, campaignOptions);
 
         for (int i = 0; i < childNodes.getLength(); i++) {
             Node childNode = childNodes.item(i);
@@ -81,42 +77,6 @@ public class CampaignOptionsUnmarshaller {
 
         LOGGER.debug("Load Campaign Options Complete!");
         return campaignOptions;
-    }
-
-    /**
-     * Resolves the pre-0.51.01 sector-count booleans into {@link StratConSectorCountMethod}.
-     *
-     * <p>Handled here rather than in the per-node switch because the two tags only mean something together, and they
-     * arrive in whatever order the save was written in. Reading both up front sidesteps the ordering entirely; a save
-     * that also carries the modern {@code stratConSectorCountMethod} tag then overwrites this when the main loop
-     * reaches it, so an explicit choice always beats the migration.</p>
-     */
-    private static void migrateLegacySectorCountMethod(NodeList childNodes, CampaignOptions campaignOptions) {
-        Boolean alternateCount = null;
-        Boolean condenseSectors = null;
-
-        for (int i = 0; i < childNodes.getLength(); i++) {
-            Node childNode = childNodes.item(i);
-            if (childNode.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-
-            switch (childNode.getNodeName()) {
-                case "useStratConAlternateSectorCount" ->
-                      alternateCount = parseBoolean(childNode.getTextContent().trim());
-                case "useStratConCondenseSectors" -> condenseSectors = parseBoolean(childNode.getTextContent().trim());
-                default -> {
-                }
-            }
-        }
-
-        if ((alternateCount == null) && (condenseSectors == null)) {
-            return;
-        }
-
-        campaignOptions.set(CampaignOption.STRAT_CON_SECTOR_COUNT_METHOD,
-              StratConSectorCountMethod.fromLegacyOptions(Boolean.TRUE.equals(
-                    alternateCount), Boolean.TRUE.equals(condenseSectors)));
     }
 
     /**

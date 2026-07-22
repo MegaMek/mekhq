@@ -94,12 +94,13 @@ class StratConSectorCountMethodPersistenceTest {
     void newCampaignsDefaultToCondensed() {
         // The two booleans this replaced both defaulted to true, which is what CONDENSED means. A different default
         // here would change sector counts for everyone starting a campaign.
-        assertEquals(StratConSectorCountMethod.CONDENSED,
+        assertEquals(StratConSectorCountMethod.ALTERNATE_CONDENSED,
               new CampaignOptions().get(CampaignOption.STRAT_CON_SECTOR_COUNT_METHOD));
     }
 
     @ParameterizedTest
-    @CsvSource({ "false, false, LEGACY", "true, false, ALTERNATE", "true, true, CONDENSED", "false, true, CONDENSED" })
+    @CsvSource({ "false, false, LEGACY", "true, false, ALTERNATE", "true, true, ALTERNATE_CONDENSED",
+                 "false, true, ALTERNATE_CONDENSED" })
     void legacyBooleanPairMigratesToTheEquivalentMethod(boolean alternateCount, boolean condenseSectors,
           StratConSectorCountMethod expected) throws Exception {
         String save = saveContaining("<useStratConAlternateSectorCount>" +
@@ -127,16 +128,17 @@ class StratConSectorCountMethodPersistenceTest {
     @Test
     void anExplicitMethodIsNotOverwrittenByLegacyTags() throws Exception {
         // Defensive: a save should never carry both, but if one did, the newer tag is the authoritative one.
-        String both = saveContaining("<stratConSectorCountMethod>REGIMENTAL</stratConSectorCountMethod>" +
+        String both = saveContaining("<stratConSectorCountMethod>ALTERNATE_REGIMENTAL</stratConSectorCountMethod>" +
                                            "<useStratConAlternateSectorCount>false</useStratConAlternateSectorCount>" +
                                            "<useStratConCondenseSectors>false</useStratConCondenseSectors>");
 
-        assertEquals(StratConSectorCountMethod.REGIMENTAL,
+        assertEquals(StratConSectorCountMethod.ALTERNATE_REGIMENTAL,
               unmarshal(both).get(CampaignOption.STRAT_CON_SECTOR_COUNT_METHOD));
     }
 
     @Test
     void anUnrecognizedMethodFallsBackToCondensed() {
-        assertEquals(StratConSectorCountMethod.CONDENSED, StratConSectorCountMethod.fromLookupName("NOT_A_METHOD"));
+        assertEquals(StratConSectorCountMethod.ALTERNATE_CONDENSED,
+              StratConSectorCountMethod.fromLookupName("NOT_A_METHOD"));
     }
 }
