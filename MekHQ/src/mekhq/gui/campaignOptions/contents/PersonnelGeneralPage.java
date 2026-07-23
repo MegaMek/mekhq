@@ -89,6 +89,7 @@ class PersonnelGeneralPage {
     private JCheckBox chkOnlyCommandersMatterBattleArmor;
     private JCheckBox chkUseEdge;
     private JCheckBox chkUseTwistOfFateSurvival;
+    private JCheckBox chkUseFoundersHavePlotArmor;
     private MMComboBox<EdgeRefreshPeriod> comboEdgeRefreshPeriod;
     private JSpinner spnEdgeRefreshCost;
     private JCheckBox chkUseImplants;
@@ -196,6 +197,9 @@ class PersonnelGeneralPage {
         chkUseEdge.addMouseListener(createTipPanelUpdater("UseEdge"));
         chkUseTwistOfFateSurvival = new CampaignOptionsCheckBox("UseTwistOfFateSurvival");
         chkUseTwistOfFateSurvival.addMouseListener(createTipPanelUpdater("UseTwistOfFateSurvival"));
+        chkUseFoundersHavePlotArmor = new CampaignOptionsCheckBox("UseFoundersHavePlotArmor",
+              getMetadata(new Version(0, 51, 1)));
+        chkUseFoundersHavePlotArmor.addMouseListener(createTipPanelUpdater("UseFoundersHavePlotArmor"));
 
         JLabel lblEdgeRefreshPeriod = new CampaignOptionsLabel("EdgeRefreshPeriod", getMetadata(new Version(0, 51, 0)));
         lblEdgeRefreshPeriod.addMouseListener(createTipPanelUpdater("EdgeRefreshPeriod"));
@@ -239,6 +243,7 @@ class PersonnelGeneralPage {
               chkOnlyCommandersMatterBattleArmor,
               chkUseEdge,
               chkUseTwistOfFateSurvival,
+              chkUseFoundersHavePlotArmor,
               chkUseImplants,
               chkUseAlternativeQualityAveraging);
         panel.addRow(lblEdgeRefreshCost, spnEdgeRefreshCost);
@@ -373,6 +378,7 @@ class PersonnelGeneralPage {
         chkOnlyCommandersMatterBattleArmor.setSelected(model.onlyCommandersMatterBattleArmor);
         chkUseEdge.setSelected(model.useEdge);
         chkUseTwistOfFateSurvival.setSelected(model.useTwistOfFateSurvival);
+        chkUseFoundersHavePlotArmor.setSelected(model.useFoundersHavePlotArmor);
         comboEdgeRefreshPeriod.setSelectedItem(model.edgeRefreshPeriod);
         spnEdgeRefreshCost.setValue(model.edgeRefreshCost);
         chkUseImplants.setSelected(model.useImplants);
@@ -415,6 +421,7 @@ class PersonnelGeneralPage {
         model.onlyCommandersMatterBattleArmor = chkOnlyCommandersMatterBattleArmor.isSelected();
         model.useEdge = chkUseEdge.isSelected();
         model.useTwistOfFateSurvival = chkUseTwistOfFateSurvival.isSelected();
+        model.useFoundersHavePlotArmor = chkUseFoundersHavePlotArmor.isSelected();
         model.edgeRefreshPeriod = comboEdgeRefreshPeriod.getSelectedItem();
         model.edgeRefreshCost = (int) spnEdgeRefreshCost.getValue();
         model.useImplants = chkUseImplants.isSelected();
