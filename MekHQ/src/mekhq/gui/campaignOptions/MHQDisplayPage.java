@@ -43,19 +43,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Objects;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JSlider;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import megamek.Version;
 import megamek.client.ui.Messages;
 import megamek.client.ui.buttons.ColourSelectorButton;
 import megamek.client.ui.util.UIUtil;
@@ -78,6 +70,7 @@ class MHQDisplayPage extends MHQOptionsPage {
     private JTextField fieldLongDisplayDateFormat;
     private JSlider guiScaleSlider;
     private CampaignOptionsCheckBox chkHideUnitFluff;
+    private CampaignOptionsCheckBox chkUseAlternateStratConFogOfWar;
     private CampaignOptionsCheckBox chkHistoricalDailyLog;
     private CampaignOptionsCheckBox chkCompanyGeneratorStartup;
     private CampaignOptionsCheckBox chkShowCompanyGenerator;
@@ -114,13 +107,14 @@ class MHQDisplayPage extends MHQOptionsPage {
         hasTooltips |= registerDetailsTips(interstellarContent);
         hasTooltips |= registerDetailsTips(personnelContent);
         Component page = pageBuilder("MHQDisplayPage", hasTooltips)
-                     .section("lblMHQDisplayGeneralSection.text", "lblMHQDisplayGeneralSection.summary",
-                           generalContent)
-                     .section("lblMHQDisplayInterstellarSection.text", "lblMHQDisplayInterstellarSection.summary",
-                           interstellarContent)
-                     .section("lblMHQDisplayPersonnelSection.text", "lblMHQDisplayPersonnelSection.summary",
-                           personnelContent)
-                     .build();
+                               .section("lblMHQDisplayGeneralSection.text", "lblMHQDisplayGeneralSection.summary",
+                                     generalContent)
+                               .section("lblMHQDisplayInterstellarSection.text",
+                                     "lblMHQDisplayInterstellarSection.summary",
+                                     interstellarContent)
+                               .section("lblMHQDisplayPersonnelSection.text", "lblMHQDisplayPersonnelSection.summary",
+                                     personnelContent)
+                               .build();
         created = true;
         return page;
     }
@@ -164,13 +158,20 @@ class MHQDisplayPage extends MHQOptionsPage {
         panel.addRow(guiScaleLabel, guiScaleControl);
 
         chkHideUnitFluff = checkBox("optionHideUnitFluff", model.hideUnitFluff);
+        chkUseAlternateStratConFogOfWar = checkBox("optionUseAlternateStratConFogOfWar",
+              model.useAlternateStratConFogOfWarDisplay, getMetadata(new Version(0, 51, 1)));
         chkHistoricalDailyLog = checkBox("optionHistoricalDailyLog", model.historicalDailyLog);
         chkCompanyGeneratorStartup = checkBox("chkCompanyGeneratorStartup", model.companyGeneratorStartup,
               getMetadata(null, CampaignOptionFlag.UNIMPLEMENTED));
         chkShowCompanyGenerator = checkBox("chkShowCompanyGenerator", model.showCompanyGenerator);
         chkShowUnitPicturesOnTOE = checkBox("chkShowUnitPicturesOnTOE", model.showUnitPicturesOnTOE);
-        panel.addCheckBoxGrid(2, chkHideUnitFluff, chkHistoricalDailyLog, chkCompanyGeneratorStartup,
-              chkShowCompanyGenerator, chkShowUnitPicturesOnTOE);
+        panel.addCheckBoxGrid(2,
+              chkHideUnitFluff,
+              chkUseAlternateStratConFogOfWar,
+              chkHistoricalDailyLog,
+              chkCompanyGeneratorStartup,
+              chkShowCompanyGenerator,
+              chkShowUnitPicturesOnTOE);
 
         return panel;
     }
@@ -184,9 +185,13 @@ class MHQDisplayPage extends MHQOptionsPage {
         JLabel example = new JLabel();
         String invalidDateFormatText = getTextAt(RESOURCE_BUNDLE, "invalidDateFormat.error");
         Runnable updateExample = () -> example.setText(validateDateFormat(field.getText())
-              ? LocalDate.now().format(DateTimeFormatter.ofPattern(field.getText())
-                    .withLocale(MekHQ.getMHQOptions().getDateLocale()))
-              : invalidDateFormatText);
+                                                             ?
+                                                             LocalDate.now()
+                                                                   .format(DateTimeFormatter.ofPattern(field.getText())
+                                                                                 .withLocale(MekHQ.getMHQOptions()
+                                                                                                   .getDateLocale()))
+                                                             :
+                                                             invalidDateFormatText);
         // Refresh on every document edit (typing, paste, delete), not only on Enter, so the example and validation
         // stay in step with the field instead of lagging behind until an ActionEvent fires.
         field.getDocument().addDocumentListener(new DocumentListener() {
@@ -217,7 +222,7 @@ class MHQDisplayPage extends MHQOptionsPage {
     private boolean validateDateFormat(String format) {
         try {
             LocalDate.now().format(DateTimeFormatter.ofPattern(format)
-                  .withLocale(MekHQ.getMHQOptions().getDateLocale()));
+                                         .withLocale(MekHQ.getMHQOptions().getDateLocale()));
         } catch (Exception ignored) {
             return false;
         }
@@ -347,6 +352,7 @@ class MHQDisplayPage extends MHQOptionsPage {
         }
         model.guiScaleValue = guiScaleSlider.getValue();
         model.hideUnitFluff = chkHideUnitFluff.isSelected();
+        model.useAlternateStratConFogOfWarDisplay = chkUseAlternateStratConFogOfWar.isSelected();
         model.historicalDailyLog = chkHistoricalDailyLog.isSelected();
         model.companyGeneratorStartup = chkCompanyGeneratorStartup.isSelected();
         model.showCompanyGenerator = chkShowCompanyGenerator.isSelected();

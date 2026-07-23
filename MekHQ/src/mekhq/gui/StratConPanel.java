@@ -40,7 +40,6 @@ import static megamek.utilities.ImageUtilities.addTintToBufferedImage;
 import static mekhq.campaign.digitalGM.stratCon.StratConScenario.ScenarioState.PRIMARY_FORCES_COMMITTED;
 import static mekhq.campaign.digitalGM.stratCon.StratConScenario.ScenarioState.UNRESOLVED;
 import static mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment.Allied;
-import static mekhq.utilities.MHQInternationalization.getFormattedText;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -118,6 +117,12 @@ public class StratConPanel extends JPanel implements ActionListener {
      * click.
      */
     private static final int DRAG_THRESHOLD = 5;
+
+    /**
+     * Opacity of an unscouted hex's terrain (and city sprite) under the alternate fog-of-war display: dim enough to be
+     * unmistakably unscouted, but with the ground still just readable.
+     */
+    private static final float ALTERNATE_FOG_ALPHA = 0.25f;
 
     private static final String RIGHT_CLICK_COMMAND_MANAGE_FORCES = "ManageForces";
     private static final String RIGHT_CLICK_COMMAND_MANAGE_SCENARIO = "ManageScenario";
@@ -637,7 +642,7 @@ public class StratConPanel extends JPanel implements ActionListener {
                 String forceName = campaign.getPlayerForce().getFormation(forceID).getName();
 
                 JCheckBoxMenuItem stickyForceItem = new JCheckBoxMenuItem();
-                stickyForceItem.setText(getFormattedText(RESOURCE_BUNDLE,
+                stickyForceItem.setText(getFormattedTextAt(RESOURCE_BUNDLE,
                       "stratConTab.contextMenu.remainDeployed",
                       forceName));
                 stickyForceItem.setActionCommand(RIGHT_CLICK_COMMAND_STICKY_FORCE);
@@ -967,6 +972,8 @@ public class StratConPanel extends JPanel implements ActionListener {
         g2D.setFont(newFont);
 
         boolean trackRevealed = currentTrack.hasActiveTrackReveal();
+        // Read once per pass: this is a java.util.prefs lookup, and per-hex would be a thousand of them per repaint.
+        boolean alternateFogOfWar = MekHQ.getMHQOptions().getUseAlternateStratConFogOfWarDisplay();
 
         for (int x = 0; x < currentTrack.getWidth(); x++) {
             for (int y = 0; y < currentTrack.getHeight(); y++) {
@@ -994,15 +1001,27 @@ public class StratConPanel extends JPanel implements ActionListener {
                     BufferedImage biomeImage = getImage(currentTrack.getTerrainTile(currentCoords),
                           ImageType.TerrainTile);
 
+                    boolean unscouted = !trackRevealed && !currentTrack.coordsRevealed(x, y);
+
                     if (biomeImage != null) {
-                        // left-most and topmost point; experimentally adjusted to avoid empty space in
-                        // the top left
-                        g2D.drawImage(biomeImage, null, graphHex.xpoints[1], graphHex.ypoints[0]);
+                        if (unscouted && alternateFogOfWar) {
+                            // Alternate fog: the terrain itself at quarter strength over the dark base fill, so the
+                            // ground is just legible while the hex still clearly reads as unscouted.
+                            var push = g2D.getComposite();
+                            g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, ALTERNATE_FOG_ALPHA));
+                            g2D.drawImage(biomeImage, null, graphHex.xpoints[1], graphHex.ypoints[0]);
+                            g2D.setComposite(push);
+                        } else {
+                            // left-most and topmost point; experimentally adjusted to avoid empty space in
+                            // the top left
+                            g2D.drawImage(biomeImage, null, graphHex.xpoints[1], graphHex.ypoints[0]);
+                        }
                     }
 
-                    // draw fog of war if applicable. Roads and cities are drawn in later passes (over the fog image),
-                    // and the unscouted contrast tint is reapplied there so those hexes still read as unscouted.
-                    if (!trackRevealed && !currentTrack.coordsRevealed(x, y)) {
+                    // Classic fog of war: the blue-tinted fog layer plus a contrast fill. Roads and cities are drawn
+                    // in later passes (over the fog image), and the unscouted contrast tint is reapplied there so
+                    // those hexes still read as unscouted.
+                    if (unscouted && !alternateFogOfWar) {
                         BufferedImage fogOfWarLayerImage = getImage(StratConBiomeManifest.FOG_OF_WAR,
                               ImageType.TerrainTile);
                         if (fogOfWarLayerImage != null) {
@@ -1223,24 +1242,37 @@ public class StratConPanel extends JPanel implements ActionListener {
 
     /**
      * Renders the city overlay: the generic urban sprite on each city hex, drawn over terrain, fog, and roads (you
-     * cannot hide a city). Unscouted city hexes keep the fog contrast tint on top, so their hex still reads as
-     * unscouted until it is explored.
+     * cannot hide a city). An unscouted city hex still reads as unscouted: under the classic fog display the contrast
+     * tint is reapplied on top of the sprite, and under the alternate display the sprite is drawn at the same quarter
+     * strength as its terrain.
      */
     private void drawCities(Graphics2D g2D) {
         Polygon graphHex = generateGraphHex();
         boolean trackRevealed = currentTrack.hasActiveTrackReveal();
+        // Read once per pass: this is a java.util.prefs lookup, and per-hex would be a thousand of them per repaint.
+        boolean alternateFogOfWar = MekHQ.getMHQOptions().getUseAlternateStratConFogOfWarDisplay();
 
         for (int x = 0; x < currentTrack.getWidth(); x++) {
             for (int y = 0; y < currentTrack.getHeight(); y++) {
                 StratConCoords currentCoords = new StratConCoords(x, y);
 
                 if (currentTrack.isCity(currentCoords)) {
+                    boolean unscouted = !trackRevealed && !currentTrack.coordsRevealed(x, y);
+
                     BufferedImage cityImage = getImage(StratConBiomeManifest.CITY, ImageType.TerrainTile);
                     if (cityImage != null) {
-                        g2D.drawImage(cityImage, null, graphHex.xpoints[1], graphHex.ypoints[0]);
+                        if (unscouted && alternateFogOfWar) {
+                            // Alternate fog: the city sprite at the same quarter strength as its unscouted terrain.
+                            var push = g2D.getComposite();
+                            g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, ALTERNATE_FOG_ALPHA));
+                            g2D.drawImage(cityImage, null, graphHex.xpoints[1], graphHex.ypoints[0]);
+                            g2D.setComposite(push);
+                        } else {
+                            g2D.drawImage(cityImage, null, graphHex.xpoints[1], graphHex.ypoints[0]);
+                        }
                     }
 
-                    if (!trackRevealed && !currentTrack.coordsRevealed(x, y)) {
+                    if (unscouted && !alternateFogOfWar) {
                         Color pushColor = g2D.getColor();
                         var pushComposite = g2D.getComposite();
                         g2D.setColor(Color.DARK_GRAY);

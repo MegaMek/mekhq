@@ -106,6 +106,7 @@ class MHQOptionsModel {
     String longDisplayDateFormat;
     int guiScaleValue;
     boolean hideUnitFluff;
+    boolean useAlternateStratConFogOfWarDisplay;
     boolean historicalDailyLog;
     boolean companyGeneratorStartup;
     boolean showCompanyGenerator;
@@ -203,6 +204,7 @@ class MHQOptionsModel {
         longDisplayDateFormat = options.getLongDisplayDateFormat();
         guiScaleValue = (int) (GUIPreferences.getInstance().getGUIScale() * 10);
         hideUnitFluff = options.getHideUnitFluff();
+        useAlternateStratConFogOfWarDisplay = options.getUseAlternateStratConFogOfWarDisplay();
         historicalDailyLog = options.getHistoricalDailyLog();
         companyGeneratorStartup = options.getCompanyGeneratorStartup();
         showCompanyGenerator = options.getShowCompanyGenerator();
@@ -372,6 +374,7 @@ class MHQOptionsModel {
             MekHQ.updateGuiScaling();
         }
         options.setHideUnitFluff(hideUnitFluff);
+        options.setUseAlternateStratConFogOfWarDisplay(useAlternateStratConFogOfWarDisplay);
         options.setHistoricalDailyLog(historicalDailyLog);
         options.setCompanyGeneratorStartup(companyGeneratorStartup);
         options.setShowCompanyGenerator(showCompanyGenerator);

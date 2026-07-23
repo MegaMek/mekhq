@@ -146,6 +146,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String AWAY_FROM_MAIN_FORCE_FOREGROUND = "awayFromMainForceForeground";
     public static final String AWAY_FROM_MAIN_FORCE_BACKGROUND = "awayFromMainForceBackground";
     public static final String STRAT_CON_HEX_COORD_FOREGROUND = "stratconHexCoordForeground";
+    public static final String USE_ALTERNATE_STRAT_CON_FOG_OF_WAR = "useAlternateStratConFogOfWar";
     public static final String FONT_COLOR_NEGATIVE = "fontColorNegative";
     public static final String FONT_COLOR_AMAZING = "fontColorAmazing";
     public static final String FONT_COLOR_POSITIVE = "fontColorPositive";
