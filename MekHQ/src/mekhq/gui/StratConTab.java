@@ -62,6 +62,7 @@ import jakarta.annotation.Nonnull;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.event.Subscribe;
 import megamek.common.ui.FastJScrollPane;
+import mekhq.MHQOptionsChangedEvent;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
@@ -1020,6 +1021,13 @@ public class StratConTab extends CampaignGuiTab {
     public void handleGMMode(GMModeEvent ev) {
         // Toggling GM mode enables/disables the GM button bar, so re-evaluate the tab's state immediately.
         updateCampaignState();
+    }
+
+    @Subscribe
+    public void handle(MHQOptionsChangedEvent ev) {
+        // The map reads client options while painting (the fog-of-war display style), so a change in MekHQ Options
+        // has to trigger a repaint or the old style lingers until something else dirties the panel.
+        stratconPanel.repaint();
     }
 
     @Subscribe
