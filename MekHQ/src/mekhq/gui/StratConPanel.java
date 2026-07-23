@@ -56,12 +56,15 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.font.TextAttribute;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.Path2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
@@ -106,6 +109,14 @@ public class StratConPanel extends JPanel implements ActionListener {
     private static final int ROAD_STEP_X = (int) Math.floor(HEX_X_RADIUS * 1.5);
     private static final Color ROAD_COLOR = new Color(110, 75, 45, 205);
     private static final float ROAD_STROKE_WIDTH = 3.5f;
+
+    /**
+     * Cartographic casing: a dark outline stroked under the road fill, so the road stays visible on terrain close to
+     * its own color (dusty badlands especially). The casing carries the contrast on light hexes, the fill on dark
+     * ones.
+     */
+    private static final Color ROAD_CASING_COLOR = new Color(40, 26, 14, 230);
+    private static final float ROAD_CASING_STROKE_WIDTH = ROAD_STROKE_WIDTH + 2.5f;
 
     /** Zoom bounds and the multiplicative step applied per mouse-wheel notch. */
     private static final double MIN_SCALE = 0.5;
@@ -1206,6 +1217,17 @@ public class StratConPanel extends JPanel implements ActionListener {
      * Renders the road network as semi-transparent lines between hex centers, plus a stub off the map for each network
      * that branches to the sector edge. Drawn before cities, so a city's sprite sits on top and the road reads as
      * leading into it.
+     *
+     * <p>The whole network is collected into one path and stroked twice: a wide dark casing, then the brown fill on
+     * top. Stroking a single path composites each pass as one shape, so overlapping segments at junctions blend
+     * cleanly instead of stacking their semi-transparent strokes, and no segment's casing can cut across another's
+     * fill.</p>
+     *
+     * <p>Under the alternate fog-of-war display, the portion of the network crossing unscouted hexes is drawn at the
+     * same reduced opacity as the terrain beneath it. This is done with complementary clip regions rather than by
+     * splitting segments: the full-strength pass is clipped away from the unscouted hexes and the faded pass is
+     * clipped to them, so a segment dims exactly at the hex border with no gap or double-draw. Under the classic
+     * display, roads keep their long-standing behavior of drawing at full strength over the fog layer.</p>
      */
     private void drawRoads(Graphics2D g2D) {
         var roads = currentTrack.getRoads();
@@ -1213,31 +1235,106 @@ public class StratConPanel extends JPanel implements ActionListener {
             return;
         }
 
-        Stroke pushStroke = g2D.getStroke();
-        Color pushColor = g2D.getColor();
-        g2D.setStroke(new BasicStroke(ROAD_STROKE_WIDTH, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-        g2D.setColor(ROAD_COLOR);
+        Path2D.Double network = new Path2D.Double();
 
-        // Draw each undirected road segment once, between adjacent road hexes.
+        // Add each undirected road segment once, between adjacent road hexes.
         for (StratConCoords road : roads) {
             Point from = hexCenter(road.getX(), road.getY());
             for (StratConCoords neighbor : StratConHexGeometry.neighbors(currentTrack, road)) {
                 if (roads.contains(neighbor) && isAfter(neighbor, road)) {
                     Point to = hexCenter(neighbor.getX(), neighbor.getY());
-                    g2D.drawLine(from.x, from.y, to.x, to.y);
+                    network.moveTo(from.x, from.y);
+                    network.lineTo(to.x, to.y);
                 }
             }
         }
 
-        // Draw a stub off the map for each off-map branch.
+        // Add a stub off the map for each off-map branch.
         for (StratConCoords exit : currentTrack.getRoadExits()) {
             Point from = hexCenter(exit.getX(), exit.getY());
             Point off = offMapPoint(exit);
-            g2D.drawLine(from.x, from.y, off.x, off.y);
+            network.moveTo(from.x, from.y);
+            network.lineTo(off.x, off.y);
+        }
+
+        Stroke pushStroke = g2D.getStroke();
+        Color pushColor = g2D.getColor();
+
+        Area unscouted = unscoutedRoadArea(roads);
+        if (unscouted == null) {
+            strokeRoadNetwork(g2D, network);
+        } else {
+            Shape pushClip = g2D.getClip();
+            Composite pushComposite = g2D.getComposite();
+
+            // The scouted portion at full strength: the current clip (or the network's own bounds, grown so no
+            // stroke edge is clipped, if there is none) minus the unscouted hexes.
+            Rectangle roomForStrokes = network.getBounds();
+            roomForStrokes.grow((int) ROAD_CASING_STROKE_WIDTH, (int) ROAD_CASING_STROKE_WIDTH);
+            Area scoutedClip = new Area(pushClip != null ? pushClip : roomForStrokes);
+            scoutedClip.subtract(unscouted);
+            g2D.setClip(scoutedClip);
+            strokeRoadNetwork(g2D, network);
+
+            // The unscouted portion, faded to match the terrain it crosses.
+            g2D.setClip(pushClip);
+            g2D.clip(unscouted);
+            g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, ALTERNATE_FOG_ALPHA));
+            strokeRoadNetwork(g2D, network);
+
+            g2D.setComposite(pushComposite);
+            g2D.setClip(pushClip);
         }
 
         g2D.setStroke(pushStroke);
         g2D.setColor(pushColor);
+    }
+
+    /** Strokes the road network once: the dark casing, then the brown fill on top of it. */
+    private void strokeRoadNetwork(Graphics2D g2D, Path2D.Double network) {
+        g2D.setStroke(new BasicStroke(ROAD_CASING_STROKE_WIDTH, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g2D.setColor(ROAD_CASING_COLOR);
+        g2D.draw(network);
+
+        g2D.setStroke(new BasicStroke(ROAD_STROKE_WIDTH, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g2D.setColor(ROAD_COLOR);
+        g2D.draw(network);
+    }
+
+    /**
+     * @return the union of every unscouted <em>road</em> hex's polygon (in road-drawing space), for fading the roads
+     *       that cross them — or {@code null} when nothing needs fading: classic fog display, an active track-wide
+     *       reveal, or a fully scouted network. Only road hexes are collected, not the whole grid: a segment between
+     *       two adjacent hex centers, stroke width included, lies entirely within those two hexes, so other hexes can
+     *       never clip any road ink. Off-map road stubs get a phantom hex beyond the edge that follows their border
+     *       hex's scouted state, so a stub fades as a whole with the hex it exits from.
+     */
+    private @Nullable Area unscoutedRoadArea(Set<StratConCoords> roads) {
+        if (!MekHQ.getMHQOptions().getUseAlternateStratConFogOfWarDisplay() || currentTrack.hasActiveTrackReveal()) {
+            return null;
+        }
+
+        Area unscouted = new Area();
+        for (StratConCoords road : roads) {
+            if (!currentTrack.coordsRevealed(road.getX(), road.getY())) {
+                unscouted.add(hexArea(hexCenter(road.getX(), road.getY())));
+            }
+        }
+
+        for (StratConCoords exit : currentTrack.getRoadExits()) {
+            if (!currentTrack.coordsRevealed(exit.getX(), exit.getY())) {
+                unscouted.add(hexArea(offMapPoint(exit)));
+            }
+        }
+
+        return unscouted.isEmpty() ? null : unscouted;
+    }
+
+    /** @return the hex polygon centered on the given point, as an {@link Area} for clip arithmetic */
+    private Area hexArea(Point center) {
+        Polygon hex = generateGraphHex();
+        hex.translate(center.x, center.y);
+        return new Area(hex);
     }
 
     /**
