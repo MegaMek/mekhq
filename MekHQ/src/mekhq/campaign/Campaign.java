@@ -7338,6 +7338,11 @@ public class Campaign implements ITechManager {
 
     public void setGameOptions(final GameOptions gameOptions) {
         this.gameOptions = gameOptions;
+        // Keep the Game's reference in sync: MegaMek code (e.g. TeamLoadOutGenerator during scenario setup) reads
+        // options through campaign.getGame().getOptions(). Without this, replacing the campaign's options (e.g. when
+        // applying a campaign preset) leaves the Game holding a stale GameOptions object, so later updates such as
+        // the ALLOWED_YEAR sync are never seen there and bot forces get munitions from the wrong era.
+        game.setOptions(gameOptions);
     }
 
     public void setGameOptions(final Vector<IBasicOption> options) {
