@@ -429,7 +429,6 @@ public class Person implements ILocatable {
     private boolean immortal;
     private boolean quickTrainIgnore;
     private boolean salvageSupervisor;
-    private boolean trainer;
     private boolean underProtection;
     private boolean neverAssignMaintenanceAutomatically;
     private boolean coverIllicitMedicalExpenses;
@@ -3341,14 +3340,6 @@ public class Person implements ILocatable {
         this.salvageSupervisor = salvageSupervisor;
     }
 
-    public boolean isTrainer() {
-        return trainer;
-    }
-
-    public void setTrainer(final boolean trainer) {
-        this.trainer = trainer;
-    }
-
     public boolean isUnderProtection() {
         return underProtection;
     }
@@ -3982,7 +3973,6 @@ public class Person implements ILocatable {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "immortal", immortal);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "quickTrainIgnore", quickTrainIgnore);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvageSupervisor", salvageSupervisor);
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "trainer", trainer);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "underProtection", underProtection);
             MHQXMLUtility.writeSimpleXMLTag(pw,
                   indent,
@@ -4621,8 +4611,6 @@ public class Person implements ILocatable {
                     person.setQuickTrainIgnore(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("salvageSupervisor")) {
                     person.setSalvageSupervisor(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (nodeName.equalsIgnoreCase("trainer")) {
-                    person.setTrainer(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("underProtection")) {
                     person.setUnderProtection(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("neverAssignMaintenanceAutomatically")) {
