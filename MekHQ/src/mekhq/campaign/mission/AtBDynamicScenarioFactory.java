@@ -1203,8 +1203,10 @@ public class AtBDynamicScenarioFactory {
                         continue;
                     }
 
+                    boolean forceIsEmpty = forceBV == 0;
                     // The +10% bound allows us to have a degree of leeway when building the force
-                    if ((forceBV + battleValue) <= (forceBVBudget * 1.1)) {
+                    boolean hasNotExceededForceBudget = forceBV <= forceBVBudget * 1.1;
+                    if (forceIsEmpty || hasNotExceededForceBudget) {
                         forceComposition.add(entity);
 
                         for (Transporter transporter : entity.getTransports()) {
