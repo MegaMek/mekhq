@@ -43,15 +43,10 @@ import mekhq.campaign.mission.ScenarioForceTemplate;
  * destination-zone value stored on a {@link ScenarioForceTemplate}. This logic was extracted from the dialog so it can
  * be exercised without constructing the Swing UI.
  *
- * <p><strong>Known defect (behavior preserved on extraction):</strong> the reverse mapping is currently the identity
- * function, which is <em>not</em> the inverse of the forward mapping. The combo box lists edges in the order North,
- * East, South, West, whereas {@link CardinalEdge} indexes them North(0), South(1), West(2), East(3). As a result,
- * loading a saved force back into the editor mislabels three of the four cardinal edges: a stored East is shown as
- * West, a stored South as East, and a stored West as South (a three-way cycle among East, South and West). North,
- * Nearest, None and the two special destinations happen to survive because their stored value equals their combo index.
- * This class deliberately reproduces that long-standing behavior; the asymmetry is pinned by
- * {@code DestinationZoneMapperTest} and is scheduled to be corrected in Phase 1, at which point
- * {@link #storedZoneToComboIndex(int)} becomes a true inverse of {@link #comboIndexToStoredZone(int)}.
+ * <p>The combo box lists edges in the order North, East, South, West, whereas {@link CardinalEdge} indexes them
+ * North(0), South(1), West(2), East(3); the two special destinations map to their own constants. Because the orderings
+ * differ, {@link #storedZoneToComboIndex(int)} must be a genuine inverse of {@link #comboIndexToStoredZone(int)} rather
+ * than the identity function. Both directions are derived from a single mapping table so they cannot drift apart.
  */
 public final class DestinationZoneMapper {
 
@@ -60,6 +55,12 @@ public final class DestinationZoneMapper {
      * for the cardinal/nearest/none entries, and the two special destination constants for the last two.
      */
     private static final Map<Integer, Integer> COMBO_INDEX_TO_STORED_ZONE = new HashMap<>();
+
+    /**
+     * The inverse of {@link #COMBO_INDEX_TO_STORED_ZONE}, derived from it so the two cannot fall out of sync. The
+     * forward values are all distinct, so the inversion is well defined.
+     */
+    private static final Map<Integer, Integer> STORED_ZONE_TO_COMBO_INDEX = new HashMap<>();
 
     static {
         COMBO_INDEX_TO_STORED_ZONE.put(0, CardinalEdge.NORTH.getIndex());
@@ -70,6 +71,10 @@ public final class DestinationZoneMapper {
         COMBO_INDEX_TO_STORED_ZONE.put(5, CardinalEdge.NONE.getIndex());
         COMBO_INDEX_TO_STORED_ZONE.put(6, ScenarioForceTemplate.DESTINATION_EDGE_OPPOSITE_DEPLOYMENT);
         COMBO_INDEX_TO_STORED_ZONE.put(7, ScenarioForceTemplate.DESTINATION_EDGE_RANDOM);
+
+        for (Map.Entry<Integer, Integer> entry : COMBO_INDEX_TO_STORED_ZONE.entrySet()) {
+            STORED_ZONE_TO_COMBO_INDEX.put(entry.getValue(), entry.getKey());
+        }
     }
 
     private DestinationZoneMapper() {
@@ -88,17 +93,15 @@ public final class DestinationZoneMapper {
     }
 
     /**
-     * Reverse mapping used when loading a force into the editor.
-     *
-     * <p>Currently the identity function, which preserves the dialog's existing (defective) behavior described in the
-     * class documentation. Do not "correct" this in isolation: the fix belongs to Phase 1 and flips the paired
-     * assertions in {@code DestinationZoneMapperTest}.
+     * Reverse mapping used when loading a force into the editor: the stored destination-zone value becomes the combo
+     * box index to select. This is the true inverse of {@link #comboIndexToStoredZone(int)}. An unrecognized value
+     * (outside the mapped set) falls back to itself, matching the combo box's own bounds handling.
      *
      * @param storedZone the destination-zone value stored on the force template
      *
      * @return the combo box index to select
      */
     public static int storedZoneToComboIndex(int storedZone) {
-        return storedZone;
+        return STORED_ZONE_TO_COMBO_INDEX.getOrDefault(storedZone, storedZone);
     }
 }

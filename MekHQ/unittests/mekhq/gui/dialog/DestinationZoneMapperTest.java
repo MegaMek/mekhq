@@ -39,14 +39,12 @@ import mekhq.campaign.mission.ScenarioForceTemplate;
 import org.junit.jupiter.api.Test;
 
 /**
- * Characterization tests for {@link DestinationZoneMapper} (Phase 0.4).
+ * Tests for {@link DestinationZoneMapper}.
  *
- * <p>The forward-mapping assertions are correct and permanent. The round-trip assertions deliberately pin a
- * <em>known defect</em>: because {@link DestinationZoneMapper#storedZoneToComboIndex(int)} is currently the identity
- * function, saving a force and loading it back into the editor mislabels three of the four cardinal edges in a
- * three-way cycle (East&rarr;West, South&rarr;East, West&rarr;South). When Phase 1 makes the reverse mapping a true
- * inverse, the {@code *_currentlyMislabeled} assertions will fail; that is the signal to update them to expect the
- * round-trip to return the original combo index (see {@link #roundTrip(int)}).
+ * <p>These began (Phase 0.4) as characterization tests pinning a defect: the reverse mapping was the identity function,
+ * so saving a force and reloading it into the editor mislabeled three of the four cardinal edges in a three-way cycle
+ * (East&rarr;West, South&rarr;East, West&rarr;South). Phase 1.1 made the reverse mapping a true inverse; the round-trip
+ * tests now assert that every destination-zone entry survives a save/load cycle unchanged.
  */
 class DestinationZoneMapperTest {
 
@@ -84,40 +82,18 @@ class DestinationZoneMapperTest {
               DestinationZoneMapper.comboIndexToStoredZone(COMBO_RANDOM));
     }
 
-    // --- Round-trip: entries that survive even with the identity reverse mapping ---------------------------------
+    // --- Round-trip: every entry must survive a save/load cycle unchanged (Phase 1.1 fix) ------------------------
 
     @Test
-    void northNearestNoneAndSpecialsRoundTripCorrectly() {
-        assertEquals(COMBO_NORTH, roundTrip(COMBO_NORTH));
-        assertEquals(COMBO_NEAREST, roundTrip(COMBO_NEAREST));
-        assertEquals(COMBO_NONE, roundTrip(COMBO_NONE));
-        assertEquals(COMBO_OPPOSITE_DEPLOYMENT, roundTrip(COMBO_OPPOSITE_DEPLOYMENT));
-        assertEquals(COMBO_RANDOM, roundTrip(COMBO_RANDOM));
-    }
-
-    // --- Round-trip: the pinned defect (these assertions flip when Phase 1 fixes the reverse mapping) -------------
-
-    @Test
-    void eastIsCurrentlyMislabeledAsWest() {
-        // Correct behavior would be roundTrip(COMBO_EAST) == COMBO_EAST.
-        assertEquals(COMBO_WEST, roundTrip(COMBO_EAST),
-              "Expected the known East->West mislabeling; if this fails, the reverse mapping was fixed - update this "
-                    + "characterization test to expect COMBO_EAST");
-    }
-
-    @Test
-    void southIsCurrentlyMislabeledAsEast() {
-        // Correct behavior would be roundTrip(COMBO_SOUTH) == COMBO_SOUTH.
-        assertEquals(COMBO_EAST, roundTrip(COMBO_SOUTH),
-              "Expected the known South->East mislabeling; if this fails, the reverse mapping was fixed - update this "
-                    + "characterization test to expect COMBO_SOUTH");
-    }
-
-    @Test
-    void westIsCurrentlyMislabeledAsSouth() {
-        // Correct behavior would be roundTrip(COMBO_WEST) == COMBO_WEST.
-        assertEquals(COMBO_SOUTH, roundTrip(COMBO_WEST),
-              "Expected the known West->South mislabeling; if this fails, the reverse mapping was fixed - update this "
-                    + "characterization test to expect COMBO_WEST");
+    void everyDestinationZoneRoundTripsUnchanged() {
+        assertEquals(COMBO_NORTH, roundTrip(COMBO_NORTH), "North should round-trip unchanged");
+        assertEquals(COMBO_EAST, roundTrip(COMBO_EAST), "East should round-trip unchanged (was mislabeled as West)");
+        assertEquals(COMBO_SOUTH, roundTrip(COMBO_SOUTH), "South should round-trip unchanged (was mislabeled as East)");
+        assertEquals(COMBO_WEST, roundTrip(COMBO_WEST), "West should round-trip unchanged (was mislabeled as South)");
+        assertEquals(COMBO_NEAREST, roundTrip(COMBO_NEAREST), "Nearest should round-trip unchanged");
+        assertEquals(COMBO_NONE, roundTrip(COMBO_NONE), "None should round-trip unchanged");
+        assertEquals(COMBO_OPPOSITE_DEPLOYMENT, roundTrip(COMBO_OPPOSITE_DEPLOYMENT),
+              "Opposite Deployment should round-trip unchanged");
+        assertEquals(COMBO_RANDOM, roundTrip(COMBO_RANDOM), "Random should round-trip unchanged");
     }
 }
