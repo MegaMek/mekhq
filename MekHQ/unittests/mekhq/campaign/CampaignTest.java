@@ -67,6 +67,8 @@ import megamek.common.enums.SkillLevel;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.Mounted;
 import megamek.common.icons.Portrait;
+import megamek.common.options.GameOptions;
+import megamek.common.options.OptionsConstants;
 import megamek.common.units.Crew;
 import megamek.common.units.Dropship;
 import megamek.common.units.EntityMovementMode;
@@ -133,6 +135,31 @@ public class CampaignTest {
         assertEquals(6, travelTime);
     }
 
+    /**
+     * Regression test: replacing the campaign's GameOptions (as happens when applying a campaign preset) must also
+     * update the Game's options reference. MegaMek code such as TeamLoadOutGenerator reads options through
+     * campaign.getGame().getOptions(); if the two references diverge, later updates like the ALLOWED_YEAR sync during
+     * scenario setup are applied to one object while the loadout generator reads the other, and bot forces are equipped
+     * with munitions from the wrong era.
+     */
+    @Test
+    void testSetGameOptionsKeepsGameInSync() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+
+        // Sanity check: the constructor wires the same object into both places
+        assertSame(campaign.getGameOptions(), campaign.getGame().getOptions());
+
+        // Replace the options wholesale, as preset application does
+        GameOptions replacementOptions = new GameOptions();
+        campaign.setGameOptions(replacementOptions);
+        assertSame(replacementOptions, campaign.getGame().getOptions());
+
+        // A year written through the campaign accessor (e.g. the pre-scenario ALLOWED_YEAR sync in BriefingTab)
+        // must be visible to code reading through the game, like TeamLoadOutGenerator
+        campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(3019);
+        assertEquals(3019, campaign.getGame().getOptions().intOption(OptionsConstants.ALLOWED_YEAR));
+    }
+
     @Test
     void testGetTechs() {
         List<Person> testPersonList = new ArrayList<>(5);
@@ -144,7 +171,11 @@ public class CampaignTest {
         when(mockTechActive.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockTechActive).getStatus();
         when(mockTechActive.getMinutesLeft()).thenReturn(240);
-        when(mockTechActive.getSkillLevel(any(), anyBoolean(), any(), anyBoolean(), anyBoolean())).thenReturn(SkillLevel.REGULAR);
+        when(mockTechActive.getSkillLevel(any(),
+              anyBoolean(),
+              any(),
+              anyBoolean(),
+              anyBoolean())).thenReturn(SkillLevel.REGULAR);
         when(mockTechActive.getDailyAvailableTechTime(anyBoolean())).thenReturn(240);
         testPersonList.add(mockTechActive);
         testActivePersonList.add(mockTechActive);
@@ -155,7 +186,8 @@ public class CampaignTest {
         when(mockTechActiveTwo.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockTechActiveTwo).getStatus();
         when(mockTechActiveTwo.getMinutesLeft()).thenReturn(1);
-        when(mockTechActiveTwo.getSkillLevel(any(), anyBoolean(), any(), anyBoolean(), anyBoolean())).thenReturn(SkillLevel.REGULAR);
+        when(mockTechActiveTwo.getSkillLevel(any(), anyBoolean(), any(), anyBoolean(), anyBoolean())).thenReturn(
+              SkillLevel.REGULAR);
         when(mockTechActiveTwo.getDailyAvailableTechTime(anyBoolean())).thenReturn(1);
         testPersonList.add(mockTechActiveTwo);
         testActivePersonList.add(mockTechActiveTwo);
@@ -174,7 +206,11 @@ public class CampaignTest {
         when(mockTechNoTime.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockTechNoTime).getStatus();
         when(mockTechNoTime.getMinutesLeft()).thenReturn(0);
-        when(mockTechNoTime.getSkillLevel(any(), anyBoolean(), any(), anyBoolean(), anyBoolean())).thenReturn(SkillLevel.REGULAR);
+        when(mockTechNoTime.getSkillLevel(any(),
+              anyBoolean(),
+              any(),
+              anyBoolean(),
+              anyBoolean())).thenReturn(SkillLevel.REGULAR);
         when(mockTechNoTime.getDailyAvailableTechTime(anyBoolean())).thenReturn(0);
         testPersonList.add(mockTechNoTime);
         testActivePersonList.add(mockTechNoTime);
@@ -209,14 +245,15 @@ public class CampaignTest {
                          ArgumentMatchers.any(),
                          ArgumentMatchers.anyBoolean(),
                          ArgumentMatchers.any())).thenAnswer(inv ->
-                                                         ForceHumanResources.getTechsExpanded(testActivePersonList,
-                                                                 noUnits,
-                                                                 campaignOptions,
-                                                                 false,
-                                                                 today,
-                                                                 false,
-                                                                 false,
-                                                                 false));
+                                                                   ForceHumanResources.getTechsExpanded(
+                                                                         testActivePersonList,
+                                                                         noUnits,
+                                                                         campaignOptions,
+                                                                         false,
+                                                                         today,
+                                                                         false,
+                                                                         false,
+                                                                         false));
         when(testCampaign.getPlayerForce()
                    .getHumanResources()
                    .getTechs(ArgumentMatchers.any(),
@@ -224,15 +261,15 @@ public class CampaignTest {
                          ArgumentMatchers.anyBoolean(),
                          ArgumentMatchers.any(),
                          ArgumentMatchers.anyBoolean())).thenAnswer(inv ->
-                                                                     ForceHumanResources.getTechsExpanded(
-                                                                             testActivePersonList,
-                                                                             noUnits,
-                                                                             campaignOptions,
-                                                                             false,
-                                                                             today,
-                                                                           (boolean) inv.getArgument(4),
-                                                                             false,
-                                                                             false));
+                                                                          ForceHumanResources.getTechsExpanded(
+                                                                                testActivePersonList,
+                                                                                noUnits,
+                                                                                campaignOptions,
+                                                                                false,
+                                                                                today,
+                                                                                (boolean) inv.getArgument(4),
+                                                                                false,
+                                                                                false));
         when(testCampaign.getPlayerForce()
                    .getHumanResources()
                    .getTechs(ArgumentMatchers.any(),
@@ -241,15 +278,15 @@ public class CampaignTest {
                          ArgumentMatchers.any(),
                          ArgumentMatchers.anyBoolean(),
                          ArgumentMatchers.anyBoolean())).thenAnswer(inv ->
-                                                                                   ForceHumanResources.getTechsExpanded(
-                                                                                           testActivePersonList,
-                                                                                           noUnits,
-                                                                                           campaignOptions,
-                                                                                           false,
-                                                                                           today,
-                                                                                         (boolean) inv.getArgument(4),
-                                                                                         (boolean) inv.getArgument(5),
-                                                                                           false));
+                                                                          ForceHumanResources.getTechsExpanded(
+                                                                                testActivePersonList,
+                                                                                noUnits,
+                                                                                campaignOptions,
+                                                                                false,
+                                                                                today,
+                                                                                (boolean) inv.getArgument(4),
+                                                                                (boolean) inv.getArgument(5),
+                                                                                false));
         when(testCampaign.getPlayerForce()
                    .getHumanResources()
                    .getTechsExpanded(ArgumentMatchers.any(),
@@ -259,18 +296,18 @@ public class CampaignTest {
                          ArgumentMatchers.anyBoolean(),
                          ArgumentMatchers.anyBoolean(),
                          ArgumentMatchers.anyBoolean())).thenAnswer(inv ->
-                                                                                                         ForceHumanResources.getTechsExpanded(
-                                                                                                                 testActivePersonList,
-                                                                                                                 noUnits,
-                                                                                                                 campaignOptions,
-                                                                                                                 false,
-                                                                                                                 today,
-                                                                                                               (boolean) inv.getArgument(
-                                                                                                                     4),
-                                                                                                               (boolean) inv.getArgument(
-                                                                                                                     5),
-                                                                                                               (boolean) inv.getArgument(
-                                                                                                                     6)));
+                                                                          ForceHumanResources.getTechsExpanded(
+                                                                                testActivePersonList,
+                                                                                noUnits,
+                                                                                campaignOptions,
+                                                                                false,
+                                                                                today,
+                                                                                (boolean) inv.getArgument(
+                                                                                      4),
+                                                                                (boolean) inv.getArgument(
+                                                                                      5),
+                                                                                (boolean) inv.getArgument(
+                                                                                      6)));
 
         // Test just getting the list of active techs.
         List<Person> expected = new ArrayList<>(3);

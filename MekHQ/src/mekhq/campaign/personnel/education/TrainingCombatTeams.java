@@ -206,7 +206,11 @@ public class TrainingCombatTeams {
         // Then build a set of their skills
         Map<String, Integer> educatorSkills = createSkillsList(campaign, educators);
 
-        ActionCheckResult actionCheckResult = performTrainingSkillCheck(campaign, commander);
+        int formationSize = formation.getUnits().size();
+        int standardLanceSize = campaign.getPlayerForce().getFaction().getFormationBaseSize();
+        int classSizeModifier = max(0, standardLanceSize - formationSize);
+
+        ActionCheckResult actionCheckResult = performTrainingSkillCheck(campaign, commander, classSizeModifier);
 
         performTraining(campaign, formation, commander, educatorSkills, actionCheckResult);
     }
@@ -548,13 +552,15 @@ public class TrainingCombatTeams {
         return !actionCheckResult.isSuccess() || isNothingBeingTrained;
     }
 
-    private static ActionCheckResult performTrainingSkillCheck(Campaign campaign, Person educator) {
+    private static ActionCheckResult performTrainingSkillCheck(Campaign campaign, Person educator,
+          int classSizeModifier) {
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
         boolean isUseEdge = campaignOptions.isUseEdge();
         isUseEdge = isUseEdge && educator.getOptions().booleanOption(EDGE_TRAINING);
 
         ActionCheckResult actionCheckResult =
               educator.checkSkill(S_TRAINING, campaign)
+                    .withMiscModifier(classSizeModifier)
                     .resolve(isUseEdge, getTextAt(RESOURCE_BUNDLE, "trainingCombatTeam.skillCheck"));
         campaign.addReport(SKILL_CHECKS, actionCheckResult.getReport(true));
 
