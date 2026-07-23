@@ -528,9 +528,12 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         return syncDeploymentType;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean getSyncRetreatThreshold() {
         return syncRetreatThreshold;
+    }
+
+    public void setSyncRetreatThreshold(boolean syncRetreatThreshold) {
+        this.syncRetreatThreshold = syncRetreatThreshold;
     }
 
     public int getActualDeploymentZone() {

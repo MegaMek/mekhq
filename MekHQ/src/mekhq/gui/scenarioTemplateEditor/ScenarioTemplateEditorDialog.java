@@ -116,6 +116,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     JCheckBox chkUseArtillery;
     JSpinner spnStartingAltitude;
     JCheckBox chkOffBoard;
+    JCheckBox chkSubjectToRandomRemoval;
+    JCheckBox chkSyncRetreatThreshold;
 
     JPanel panForceList;
     JTextField txtScenarioName;
@@ -725,6 +727,29 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         gbc.gridx++;
         forcedPanel.add(chkOffBoard, gbc);
 
+        JLabel lblSubjectToRandomRemoval = new JLabel("Subject to Random Removal:");
+        lblSubjectToRandomRemoval.setToolTipText(
+              "Whether this force can lose units to modifiers that randomly remove them, e.g. \"Good Intel\".");
+        gbc.gridx--;
+        gbc.gridy++;
+        forcedPanel.add(lblSubjectToRandomRemoval, gbc);
+
+        chkSubjectToRandomRemoval = new JCheckBox();
+        chkSubjectToRandomRemoval.setSelected(true);
+        gbc.gridx++;
+        forcedPanel.add(chkSubjectToRandomRemoval, gbc);
+
+        JLabel lblSyncRetreatThreshold = new JLabel("Sync Retreat Threshold:");
+        lblSyncRetreatThreshold.setToolTipText(
+              "Whether this force shares a retreat threshold with the force it is synchronized to.");
+        gbc.gridx--;
+        gbc.gridy++;
+        forcedPanel.add(lblSyncRetreatThreshold, gbc);
+
+        chkSyncRetreatThreshold = new JCheckBox();
+        gbc.gridx++;
+        forcedPanel.add(chkSyncRetreatThreshold, gbc);
+
         JButton btnAdd = new JButton("Save");
         btnAdd.setActionCommand(ADD_FORCE_COMMAND);
         btnAdd.addActionListener(this);
@@ -859,6 +884,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         chkOffBoard.setSelected(forceTemplate.getDeployOffboard());
         spnStartingAltitude.setValue(forceTemplate.getStartingAltitude());
         chkUseArtillery.setSelected(forceTemplate.getUseArtillery());
+        chkSubjectToRandomRemoval.setSelected(forceTemplate.isSubjectToRandomRemoval());
+        chkSyncRetreatThreshold.setSelected(forceTemplate.getSyncRetreatThreshold());
         selectObjectiveLinkedForces(forceTemplate.getObjectiveLinkedForces());
 
         roleSetsModel.clear();
@@ -1420,6 +1447,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         sft.setStartingAltitude((int) spnStartingAltitude.getValue());
         sft.setUseArtillery(chkUseArtillery.isSelected());
         sft.setDeployOffboard(chkOffBoard.isSelected());
+        sft.setSubjectToRandomRemoval(chkSubjectToRandomRemoval.isSelected());
+        sft.setSyncRetreatThreshold(chkSyncRetreatThreshold.isSelected());
 
         sft.setSyncDeploymentType(SynchronizedDeploymentType.values()[cboSyncDeploymentType.getSelectedIndex()]);
 

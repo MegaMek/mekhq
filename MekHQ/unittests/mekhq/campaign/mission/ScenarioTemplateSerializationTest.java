@@ -259,6 +259,7 @@ class ScenarioTemplateSerializationTest {
         force.setDeployOffboard(true);
         force.setObjectiveLinkedForces(List.of("Alpha"));
         force.setSubjectToRandomRemoval(false);
+        force.setSyncRetreatThreshold(true);
         force.setFixedMul("SomeFixed.mul");
         force.getRoleCollections().add("Skirmisher,Fire_Support");
         return force;
