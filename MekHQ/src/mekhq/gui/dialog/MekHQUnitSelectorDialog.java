@@ -304,12 +304,12 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
      * @param weightClassSelectorIndex The current weight class selection
      * @param tech                     The current tech selection
      * @param techLevelMatch           whether the current tech selection matches
-     * @param unitTypeSelectorIndex    the selected unit-type code
+     * @param unitTypeCode             the selected unit-type code
      *
      * @return true if the unit passes all filters and allowed, false otherwise
      */
     private boolean isAllowedUnit(MekSummary unitSummary, int weightClassSelectorIndex, ITechnology tech,
-          boolean techLevelMatch, int unitTypeSelectorIndex) {
+          boolean techLevelMatch, int unitTypeCode) {
         if (enableYearLimits && (unitSummary.getYear() > allowedYear)) {
             return false;
         }
@@ -333,7 +333,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
             return false;
         }
 
-        if (!matchesUnitTypeSelection(unitSummary, unitTypeSelectorIndex)) {
+        if (!matchesUnitTypeSelection(unitSummary, unitTypeCode)) {
             return false;
         }
 
@@ -364,7 +364,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
         final int weightClassSelectorIndex = comboWeight.getSelectedIndex();
         // Use the base class's gap-robust mapping (the shared combo omits AERO, so a positional
         // selectedIndex - 1 would mismap types that follow it).
-        final int unitTypeSelectorIndex = unitTypeCodeForComboIndex(comboUnitType.getSelectedIndex());
+        final int unitTypeCode = unitTypeCodeForComboIndex(comboUnitType.getSelectedIndex());
         // If the current expression doesn't parse, don't update.
         try {
             unitTypeFilter = new RowFilter<>() {
@@ -385,7 +385,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
                           weightClassSelectorIndex,
                           tech,
                           techLevelMatch,
-                          unitTypeSelectorIndex);
+                          unitTypeCode);
                 }
             };
         } catch (PatternSyntaxException ignored) {
