@@ -1219,15 +1219,14 @@ public class StratConPanel extends JPanel implements ActionListener {
      * leading into it.
      *
      * <p>The whole network is collected into one path and stroked twice: a wide dark casing, then the brown fill on
-     * top. Stroking a single path composites each pass as one shape, so overlapping segments at junctions blend
-     * cleanly instead of stacking their semi-transparent strokes, and no segment's casing can cut across another's
-     * fill.</p>
+     * top. Stroking a single path composites each pass as one shape, so overlapping segments at junctions blend cleanly
+     * instead of stacking their semi-transparent strokes, and no segment's casing can cut across another's fill.</p>
      *
      * <p>Under the alternate fog-of-war display, the portion of the network crossing unscouted hexes is drawn at the
      * same reduced opacity as the terrain beneath it. This is done with complementary clip regions rather than by
-     * splitting segments: the full-strength pass is clipped away from the unscouted hexes and the faded pass is
-     * clipped to them, so a segment dims exactly at the hex border with no gap or double-draw. Under the classic
-     * display, roads keep their long-standing behavior of drawing at full strength over the fog layer.</p>
+     * splitting segments: the full-strength pass is clipped away from the unscouted hexes and the faded pass is clipped
+     * to them, so a segment dims exactly at the hex border with no gap or double-draw. Under the classic display, roads
+     * keep their long-standing behavior of drawing at full strength over the fog layer.</p>
      */
     private void drawRoads(Graphics2D g2D) {
         var roads = currentTrack.getRoads();
@@ -1303,17 +1302,12 @@ public class StratConPanel extends JPanel implements ActionListener {
 
     /**
      * @return the union of every unscouted <em>road</em> hex's polygon (in road-drawing space), for fading the roads
-     *       that cross them — or {@code null} when nothing needs fading: classic fog display, an active track-wide
-     *       reveal, or a fully scouted network. Only road hexes are collected, not the whole grid: a segment between
-     *       two adjacent hex centers, stroke width included, lies entirely within those two hexes, so other hexes can
-     *       never clip any road ink. Off-map road stubs get a phantom hex beyond the edge that follows their border
-     *       hex's scouted state, so a stub fades as a whole with the hex it exits from.
+     *       that cross them — or {@code null} when nothing needs fading. Only road hexes are collected, not the whole
+     *       grid: a segment between two adjacent hex centers, stroke width included, lies entirely within those two
+     *       hexes, so other hexes can never clip any road ink. Off-map road stubs get a phantom hex beyond the edge
+     *       that follows their border hex's scouted state, so a stub fades as a whole with the hex it exits from.
      */
     private @Nullable Area unscoutedRoadArea(Set<StratConCoords> roads) {
-        if (!MekHQ.getMHQOptions().getUseAlternateStratConFogOfWarDisplay() || currentTrack.hasActiveTrackReveal()) {
-            return null;
-        }
-
         Area unscouted = new Area();
         for (StratConCoords road : roads) {
             if (!currentTrack.coordsRevealed(road.getX(), road.getY())) {
