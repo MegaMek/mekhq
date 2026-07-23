@@ -131,6 +131,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     JTextField txtBaseHeight;
     JTextField txtXIncrement;
     JTextField txtYIncrement;
+    JSpinner spnAdditionalMapSheetWide;
+    JSpinner spnAdditionalMapSheetTall;
     JCheckBox chkAllowRotation;
     JCheckBox chkUseAtBSizing;
     JRadioButton btnAllowAllMapTypes;
@@ -835,6 +837,32 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
 
         localGbc.gridy++;
         localGbc.gridx = 0;
+        JLabel lblAdditionalMapSheetWide = new JLabel("Additional Map Sheets Wide:");
+        lblAdditionalMapSheetWide.setToolTipText(
+              "Extra map sheets added to the map's width beyond the base/scaled size.");
+        pnlMapParameters.add(lblAdditionalMapSheetWide, localGbc);
+
+        localGbc.gridx++;
+        spnAdditionalMapSheetWide = new JSpinner(new SpinnerNumberModel(
+              scenarioTemplate.mapParameters.getAdditionalMapSheetWide(), 0, 10, 1));
+        spnAdditionalMapSheetWide.setPreferredSize(spinnerSize);
+        pnlMapParameters.add(spnAdditionalMapSheetWide, localGbc);
+
+        localGbc.gridy++;
+        localGbc.gridx = 0;
+        JLabel lblAdditionalMapSheetTall = new JLabel("Additional Map Sheets Tall:");
+        lblAdditionalMapSheetTall.setToolTipText(
+              "Extra map sheets added to the map's height beyond the base/scaled size.");
+        pnlMapParameters.add(lblAdditionalMapSheetTall, localGbc);
+
+        localGbc.gridx++;
+        spnAdditionalMapSheetTall = new JSpinner(new SpinnerNumberModel(
+              scenarioTemplate.mapParameters.getAdditionalMapSheetTall(), 0, 10, 1));
+        spnAdditionalMapSheetTall.setPreferredSize(spinnerSize);
+        pnlMapParameters.add(spnAdditionalMapSheetTall, localGbc);
+
+        localGbc.gridy++;
+        localGbc.gridx = 0;
         JLabel lblAllowRotation = new JLabel("Allow 90 Degree Rotation:");
         pnlMapParameters.add(lblAllowRotation, localGbc);
 
@@ -1518,6 +1546,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         scenarioTemplate.mapParameters.setBaseWidth(MathUtility.parseInt(txtBaseWidth.getText().trim()));
         scenarioTemplate.mapParameters.setHeightScalingIncrement(MathUtility.parseInt(txtYIncrement.getText().trim()));
         scenarioTemplate.mapParameters.setWidthScalingIncrement(MathUtility.parseInt(txtXIncrement.getText().trim()));
+        scenarioTemplate.mapParameters.setAdditionalMapSheetWide((int) spnAdditionalMapSheetWide.getValue());
+        scenarioTemplate.mapParameters.setAdditionalMapSheetTall((int) spnAdditionalMapSheetTall.getValue());
         scenarioTemplate.mapParameters.setAllowRotation(chkAllowRotation.isSelected());
         scenarioTemplate.mapParameters.setUseStandardAtBSizing(chkUseAtBSizing.isSelected());
 
