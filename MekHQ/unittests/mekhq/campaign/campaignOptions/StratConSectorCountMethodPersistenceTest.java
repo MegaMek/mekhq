@@ -45,16 +45,15 @@ import megamek.Version;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorCountMethod;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.w3c.dom.Node;
 
 /**
- * Round-trip and migration tests for {@link StratConSectorCountMethod}.
+ * Round-trip and default tests for {@link StratConSectorCountMethod}.
  *
- * <p>The migration half matters more than the round trip: this option replaced two independent booleans, and every
- * campaign saved before it existed carries those instead. Reading them wrongly would silently change how many sectors
- * an existing campaign's next contract generates.</p>
+ * <p>The default matters as much as the round trip: no released version ever wrote this tag, so every existing
+ * campaign takes the declared default on load. The briefly-used boolean pair from unreleased branch builds is
+ * deliberately ignored rather than migrated.</p>
  */
 class StratConSectorCountMethodPersistenceTest {
 
@@ -91,54 +90,33 @@ class StratConSectorCountMethodPersistenceTest {
     }
 
     @Test
-    void newCampaignsDefaultToCondensed() {
-        // The two booleans this replaced both defaulted to true, which is what CONDENSED means. A different default
-        // here would change sector counts for everyone starting a campaign.
-        assertEquals(StratConSectorCountMethod.ALTERNATE_CONDENSED,
+    void campaignsDefaultToRegimental() {
+        // The chosen default for new campaigns AND for every save from before this option existed, since absent tags
+        // fall back to the declared default. Changing it changes sector counts for everyone.
+        assertEquals(StratConSectorCountMethod.ALTERNATE_REGIMENTAL,
               new CampaignOptions().get(CampaignOption.STRAT_CON_SECTOR_COUNT_METHOD));
     }
 
-    @ParameterizedTest
-    @CsvSource({ "false, false, LEGACY", "true, false, ALTERNATE", "true, true, ALTERNATE_CONDENSED",
-                 "false, true, ALTERNATE_CONDENSED" })
-    void legacyBooleanPairMigratesToTheEquivalentMethod(boolean alternateCount, boolean condenseSectors,
-          StratConSectorCountMethod expected) throws Exception {
-        String save = saveContaining("<useStratConAlternateSectorCount>" +
-                                           alternateCount +
-                                           "</useStratConAlternateSectorCount>" +
-                                           "<useStratConCondenseSectors>" +
-                                           condenseSectors +
-                                           "</useStratConCondenseSectors>");
-
-        assertEquals(expected, unmarshal(save).get(CampaignOption.STRAT_CON_SECTOR_COUNT_METHOD));
-    }
-
     @Test
-    void legacyBooleanPairMigratesRegardlessOfTagOrder() throws Exception {
-        // The unmarshaller handles one node at a time in document order, so the migration has to converge whichever
-        // of the two it sees first.
-        String condenseFirst = saveContaining("<useStratConCondenseSectors>false</useStratConCondenseSectors>" +
-                                                    "<useStratConAlternateSectorCount>true" +
-                                                    "</useStratConAlternateSectorCount>");
-
-        assertEquals(StratConSectorCountMethod.ALTERNATE,
-              unmarshal(condenseFirst).get(CampaignOption.STRAT_CON_SECTOR_COUNT_METHOD));
-    }
-
-    @Test
-    void anExplicitMethodIsNotOverwrittenByLegacyTags() throws Exception {
-        // Defensive: a save should never carry both, but if one did, the newer tag is the authoritative one.
-        String both = saveContaining("<stratConSectorCountMethod>ALTERNATE_REGIMENTAL</stratConSectorCountMethod>" +
-                                           "<useStratConAlternateSectorCount>false</useStratConAlternateSectorCount>" +
+    void oldSectorCountBooleansAreIgnoredNotMigrated() {
+        // These tags were written only by unreleased builds of this branch, where the sector count was briefly a pair
+        // of booleans. They are deliberately not migrated: such a save takes the modern default, whatever the booleans
+        // said. If this fails because the tags produced LEGACY or ALTERNATE, someone has reintroduced migration.
+        String save = saveContaining("<useStratConAlternateSectorCount>false</useStratConAlternateSectorCount>" +
                                            "<useStratConCondenseSectors>false</useStratConCondenseSectors>");
 
-        assertEquals(StratConSectorCountMethod.ALTERNATE_REGIMENTAL,
-              unmarshal(both).get(CampaignOption.STRAT_CON_SECTOR_COUNT_METHOD));
+        try {
+            assertEquals(StratConSectorCountMethod.ALTERNATE_REGIMENTAL,
+                  unmarshal(save).get(CampaignOption.STRAT_CON_SECTOR_COUNT_METHOD));
+        } catch (Exception e) {
+            throw new AssertionError(e);
+        }
     }
 
     @Test
-    void anUnrecognizedMethodFallsBackToCondensed() {
-        assertEquals(StratConSectorCountMethod.ALTERNATE_CONDENSED,
+    void anUnrecognizedMethodFallsBackToTheDefault() {
+        // Must agree with the declared default: an unreadable tag and an absent one should land in the same place.
+        assertEquals(StratConSectorCountMethod.ALTERNATE_REGIMENTAL,
               StratConSectorCountMethod.fromLookupName("NOT_A_METHOD"));
     }
 }

@@ -106,27 +106,8 @@ public enum StratConSectorCountMethod {
                 return method;
             }
         }
-        return ALTERNATE_CONDENSED;
-    }
-
-    /**
-     * Maps the pre-0.51.01 pair of booleans onto a method, for loading saves written before this option existed.
-     *
-     * <p>Condensing wins when it is set, because the ten-sector cap was the more visible of the two settings. That
-     * folds away the one combination with no equivalent here - condensing without the alternate count, which capped a
-     * legacy count at ten - and those campaigns land on {@link #ALTERNATE_CONDENSED}.</p>
-     *
-     * @param alternateCount  the old {@code useStratConAlternateSectorCount} value
-     * @param condenseSectors the old {@code useStratConCondenseSectors} value
-     *
-     * @return the equivalent method
-     */
-    public static StratConSectorCountMethod fromLegacyOptions(boolean alternateCount, boolean condenseSectors) {
-        if (condenseSectors) {
-            return ALTERNATE_CONDENSED;
-        }
-
-        return alternateCount ? ALTERNATE : LEGACY;
+        // The same landing spot as an absent tag.
+        return ALTERNATE_REGIMENTAL;
     }
 
     @Override

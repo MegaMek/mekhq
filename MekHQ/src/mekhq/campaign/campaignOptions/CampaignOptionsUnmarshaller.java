@@ -118,10 +118,6 @@ public class CampaignOptionsUnmarshaller {
                     campaignOptions.setStratConPlayType(StratConPlayType.MAPLESS);
                 }
             }
-            // < 51.01 compatibility: a pair of booleans replaced by the StratConSectorCountMethod enum. Both are read
-            // up front by migrateLegacySectorCountMethod, which needs to see the pair together; nothing to do here
-            // beyond keeping them off the unexpected-entry warning.
-            case "useStratConAlternateSectorCount", "useStratConCondenseSectors" -> {}
             // Legacy boolean replaced by the alternative advanced medical healing-time multiplier.
             case "useKinderAlternativeAdvancedMedical" -> {
                 if (parseBoolean(nodeContents)) {
