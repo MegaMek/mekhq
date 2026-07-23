@@ -153,9 +153,18 @@ public class ScenarioMapParameters implements Cloneable {
         return additionalMapSheetTall;
     }
 
+    public void setAdditionalMapSheetTall(int additionalMapSheetTall) {
+        this.additionalMapSheetTall = additionalMapSheetTall;
+    }
+
     public int getAdditionalMapSheetWide() {
         return additionalMapSheetWide;
     }
+
+    public void setAdditionalMapSheetWide(int additionalMapSheetWide) {
+        this.additionalMapSheetWide = additionalMapSheetWide;
+    }
+
     public boolean isAllowRotation() {
         return allowRotation;
     }

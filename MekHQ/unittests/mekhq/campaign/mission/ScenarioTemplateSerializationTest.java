@@ -169,27 +169,23 @@ class ScenarioTemplateSerializationTest {
     }
 
     /**
-     * Characterization test pinning a known serialization defect discovered in Phase 0.3.
+     * Regression guard for the {@code additionalMapSheetTall}/{@code Wide} data-loss defect found in Phase 0.3 and
+     * fixed in Phase 1.2.
      *
-     * <p>{@link ScenarioMapParameters#getAdditionalMapSheetTall()} and its {@code Wide} counterpart have getters but
-     * no setters, and their backing fields are private. Under JAXB's default {@code PUBLIC_MEMBER} access these values
-     * are therefore marshaled out (they appear in every shipped template) but cannot be read back in, so a non-zero
-     * value authored in a file is silently dropped the moment the template is loaded. This is real data loss in
-     * production (map dimensions), not a test artifact.
-     *
-     * <p>This test documents the <em>current</em> broken behavior so that the fix (adding setters, in a later phase)
-     * is a deliberate, visible change: when setters are added this assertion will flip and must be updated to expect
-     * the authored value. {@code Gauntlet Run.xml} ships with {@code additionalMapSheetTall = 2}.
+     * <p>These fields have getters and their backing fields are private, but originally had no setters. Under JAXB's
+     * default {@code PUBLIC_MEMBER} access the values were marshaled out (they appear in every shipped template) but
+     * could not be read back in, so a non-zero value authored in a file was silently dropped the moment the template
+     * loaded - real data loss for map dimensions. Phase 1.2 added the setters; this test now asserts the authored value
+     * survives a load. {@code Gauntlet Run.xml} ships with {@code additionalMapSheetTall = 2}.
      */
     @Test
-    void additionalMapSheetFieldsDoNotSurviveLoad() {
+    void additionalMapSheetFieldsSurviveLoad() {
         Path gauntletRun = CORPUS_DIRECTORY.resolve("Gauntlet Run.xml");
         ScenarioTemplate template = ScenarioTemplate.Deserialize(gauntletRun.toFile());
 
         assertNotNull(template, "Failed to deserialize Gauntlet Run.xml");
-        assertEquals(0, template.mapParameters.getAdditionalMapSheetTall(),
-              "additionalMapSheetTall unexpectedly survived load - if setters were added, update this characterization "
-                    + "test to expect the authored value (2)");
+        assertEquals(2, template.mapParameters.getAdditionalMapSheetTall(),
+              "additionalMapSheetTall authored in Gauntlet Run.xml (2) was lost on load");
     }
 
     /**
@@ -217,10 +213,8 @@ class ScenarioTemplateSerializationTest {
         mapParameters.setBaseHeight(45);
         mapParameters.setWidthScalingIncrement(6);
         mapParameters.setHeightScalingIncrement(7);
-        // NOTE: additionalMapSheetTall/Wide are intentionally not set here: they have getters but no setters, so a
-        // value cannot be assigned and, more importantly, cannot survive a round-trip. See
-        // additionalMapSheetFieldsDoNotSurviveLoad() which pins that known defect. Once setters are added (Phase 1/2)
-        // these should be set here and covered like every other field.
+        mapParameters.setAdditionalMapSheetTall(3);
+        mapParameters.setAdditionalMapSheetWide(2);
         mapParameters.setAllowRotation(true);
         mapParameters.setUseStandardAtBSizing(true);
         mapParameters.setMapLocation(MapLocation.SpecificGroundTerrain);
