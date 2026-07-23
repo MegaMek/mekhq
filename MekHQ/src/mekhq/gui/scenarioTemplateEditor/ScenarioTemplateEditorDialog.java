@@ -1484,7 +1484,9 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         initComponents();
         pack();
         validate();
-        setUserPreferences();
+        // Do not re-register user preferences here. The window preference was registered once when the dialog was
+        // constructed, and reloading a template rebuilds the contents but not the window itself; calling
+        // setUserPreferences() again would double-manage the same JWindowPreference.
     }
 
     /**
