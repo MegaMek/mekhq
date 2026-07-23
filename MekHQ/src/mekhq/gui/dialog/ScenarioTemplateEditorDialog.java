@@ -54,6 +54,7 @@ import megamek.client.bot.princess.CardinalEdge;
 import megamek.client.ui.panels.abstractPanels.AbstractScrollablePanel;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.codeUtilities.MathUtility;
 import megamek.common.ui.FastJScrollPane;
 import megamek.common.units.EntityWeightClass;
 import megamek.common.units.UnitType;
@@ -1395,6 +1396,20 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
      * Event handler for the "Save" button.
      */
     private void saveTemplateButtonHandler() {
+        // Validate the free-text map dimensions before mutating anything, so an invalid entry aborts the save cleanly
+        // instead of throwing mid-way and leaving the template partially updated.
+        String dimensionErrors = MapDimensionInput.validate(txtBaseWidth.getText(),
+              txtBaseHeight.getText(),
+              txtXIncrement.getText(),
+              txtYIncrement.getText());
+        if (!dimensionErrors.isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                  dimensionErrors,
+                  "Invalid Map Parameters",
+                  JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         scenarioTemplate.name = txtScenarioName.getText();
         scenarioTemplate.shortBriefing = txtScenarioBriefing.getText();
         scenarioTemplate.detailedBriefing = txtLongBriefing.getText();
@@ -1404,10 +1419,10 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             String terrainType = lstAllowedTerrainTypes.getModel().getElementAt(index);
             scenarioTemplate.mapParameters.allowedTerrainTypes.add(terrainType);
         }
-        scenarioTemplate.mapParameters.setBaseHeight(Integer.parseInt(txtBaseHeight.getText()));
-        scenarioTemplate.mapParameters.setBaseWidth(Integer.parseInt(txtBaseWidth.getText()));
-        scenarioTemplate.mapParameters.setHeightScalingIncrement(Integer.parseInt(txtYIncrement.getText()));
-        scenarioTemplate.mapParameters.setWidthScalingIncrement(Integer.parseInt(txtXIncrement.getText()));
+        scenarioTemplate.mapParameters.setBaseHeight(MathUtility.parseInt(txtBaseHeight.getText().trim()));
+        scenarioTemplate.mapParameters.setBaseWidth(MathUtility.parseInt(txtBaseWidth.getText().trim()));
+        scenarioTemplate.mapParameters.setHeightScalingIncrement(MathUtility.parseInt(txtYIncrement.getText().trim()));
+        scenarioTemplate.mapParameters.setWidthScalingIncrement(MathUtility.parseInt(txtXIncrement.getText().trim()));
         scenarioTemplate.mapParameters.setAllowRotation(chkAllowRotation.isSelected());
         scenarioTemplate.mapParameters.setUseStandardAtBSizing(chkUseAtBSizing.isSelected());
 
