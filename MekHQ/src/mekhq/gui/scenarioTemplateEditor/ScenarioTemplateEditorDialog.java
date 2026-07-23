@@ -145,6 +145,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     JScrollPane objectiveScrollPane;
     JButton btnRemoveObjective;
     JList<String> listMULs;
+    JList<String> lstObjectiveLinkedForces;
 
     AbstractScrollablePanel globalPanel;
 
@@ -554,6 +555,20 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         gbc.gridx = 1;
         forcedPanel.add(scrMulList, gbc);
 
+        JLabel lblObjectiveLinkedForces = new JLabel("Objective-Linked Forces:");
+        lblObjectiveLinkedForces.setToolTipText(
+              "Other forces this force counts toward for objective purposes (e.g. an objective to destroy a share of the enemy).");
+        gbc.gridx = 0;
+        gbc.gridy++;
+        forcedPanel.add(lblObjectiveLinkedForces, gbc);
+
+        lstObjectiveLinkedForces = new JList<>();
+        lstObjectiveLinkedForces.setModel(new DefaultListModel<>());
+        lstObjectiveLinkedForces.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        JScrollPane scrObjectiveLinkedForces = new FastJScrollPane(lstObjectiveLinkedForces);
+        gbc.gridx = 1;
+        forcedPanel.add(scrObjectiveLinkedForces, gbc);
+
         DefaultListModel<String> zoneModel = new DefaultListModel<>();
         for (String s : ScenarioForceTemplate.DEPLOYMENT_ZONES) {
             zoneModel.addElement(s);
@@ -753,6 +768,22 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         chkOffBoard.setSelected(forceTemplate.getDeployOffboard());
         spnStartingAltitude.setValue(forceTemplate.getStartingAltitude());
         chkUseArtillery.setSelected(forceTemplate.getUseArtillery());
+        selectObjectiveLinkedForces(forceTemplate.getObjectiveLinkedForces());
+    }
+
+    /**
+     * Selects the entries in the objective-linked forces list that match the given force IDs. Any listed ID no longer
+     * present in the roster is simply skipped.
+     */
+    private void selectObjectiveLinkedForces(List<String> linkedForceIds) {
+        ListModel<String> model = lstObjectiveLinkedForces.getModel();
+        List<Integer> indices = new ArrayList<>();
+        for (int i = 0; i < model.getSize(); i++) {
+            if (linkedForceIds.contains(model.getElementAt(i))) {
+                indices.add(i);
+            }
+        }
+        lstObjectiveLinkedForces.setSelectedIndices(indices.stream().mapToInt(Integer::intValue).toArray());
     }
 
     /**
@@ -1297,6 +1328,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         sft.setSyncDeploymentType(SynchronizedDeploymentType.values()[cboSyncDeploymentType.getSelectedIndex()]);
 
         sft.setFixedMul(listMULs.getSelectedValue());
+        sft.setObjectiveLinkedForces(new ArrayList<>(lstObjectiveLinkedForces.getSelectedValuesList()));
 
         // if we have picked "None" for synchronization, then set explicit deployment
         // zones.
@@ -1420,9 +1452,14 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
      */
     private void updateForceSyncList() {
         cboSyncForceName.removeAllItems();
+        DefaultListModel<String> objectiveLinkedModel = new DefaultListModel<>();
         for (String forceID : scenarioTemplate.getScenarioForces().keySet()) {
             cboSyncForceName.addItem(forceID);
+            objectiveLinkedModel.addElement(forceID);
         }
+        // Rebuild the objective-linked candidate list from the current roster. Selection is (re)applied by loadForce
+        // when editing, and left empty when adding a new force.
+        lstObjectiveLinkedForces.setModel(objectiveLinkedModel);
 
         boolean forcesAvailableToSync = cboSyncForceName.getItemCount() > 0;
         cboSyncForceName.setEnabled(forcesAvailableToSync);
