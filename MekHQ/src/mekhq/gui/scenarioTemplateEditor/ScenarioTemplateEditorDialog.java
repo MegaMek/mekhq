@@ -146,6 +146,10 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     // the scenario template we're working on
     ScenarioTemplate scenarioTemplate = new ScenarioTemplate();
 
+    // the ID of the force currently loaded into the force editor via "Edit", or null when adding a new force. Used to
+    // update a force in place (and clean up its old key on rename) rather than orphaning or overwriting entries.
+    String editedForceId = null;
+
     /**
      * @param parent Creates a new instance of this dialog with the given parent JFrame.
      */
@@ -1206,7 +1210,19 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             sft.setDeploymentZones(deploymentZones);
         }
 
-        scenarioTemplate.getScenarioForces().put(txtForceName.getText(), sft);
+        ForceRosterEditor.CommitResult commitResult = ForceRosterEditor.commit(scenarioTemplate.getScenarioForces(),
+              editedForceId,
+              sft);
+        if (!commitResult.committed()) {
+            JOptionPane.showMessageDialog(this,
+                  commitResult.errorMessage(),
+                  "Invalid Force Configuration",
+                  JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Back to "add new" mode once the edit has been committed.
+        editedForceId = null;
 
         updateForceSyncList();
         syncDeploymentChangeHandler();
@@ -1262,15 +1278,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             valBuilder.append("Min weight class is greater than max weight class.");
         }
 
-        /*
-         * if (scenarioTemplate.scenarioForces.containsKey(txtForceName.getText())) {
-         * if (valBuilder.length() > 0) {
-         * valBuilder.append("\n");
-         * }
-         *
-         * valBuilder.append("Force with this key already exists!");
-         * }
-         */
+        // Duplicate-ID and rename handling is enforced at commit time by ForceRosterEditor, which has the editing
+        // context this method does not.
 
         return valBuilder.toString();
     }
@@ -1283,6 +1292,12 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     private void deleteForceButtonHandler(String command) {
         String forceIndex = command.substring(REMOVE_FORCE_COMMAND.length());
         scenarioTemplate.getScenarioForces().remove(forceIndex);
+
+        // If we just removed the force being edited, drop back to "add new" mode so a later commit does not resurrect
+        // it under a stale ID.
+        if (forceIndex.equals(editedForceId)) {
+            editedForceId = null;
+        }
 
         updateForceSyncList();
         renderForceList();
@@ -1298,6 +1313,9 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     private void editForceButtonHandler(String command) {
         String forceIndex = command.substring(EDIT_FORCE_COMMAND.length());
         loadForce(scenarioTemplate.getScenarioForces().get(forceIndex));
+        // Remember which force we are editing so committing updates it in place (and handles a rename) instead of
+        // adding a duplicate.
+        editedForceId = forceIndex;
     }
 
     /**
@@ -1459,6 +1477,9 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
                   JOptionPane.ERROR_MESSAGE);
             return;
         }
+
+        // A freshly loaded template starts in "add new" mode; any prior edit context is stale.
+        editedForceId = null;
 
         getContentPane().removeAll();
         globalPanel.removeAll();
