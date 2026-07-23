@@ -44,7 +44,6 @@ import java.awt.event.ItemListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -80,10 +79,6 @@ import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
  */
 public class ScenarioTemplateEditorDialog extends JDialog implements ActionListener {
     private static final MMLogger LOGGER = MMLogger.create(ScenarioTemplateEditorDialog.class);
-
-    // this maps indexes in the destination zone drop down to CardinalEdge enum
-    // values and special cases in the scenario force template
-    private static final Map<Integer, Integer> destinationZoneMapping;
 
     private final Dimension spinnerSize = new Dimension(55, 25);
 
@@ -149,18 +144,6 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
 
     // the scenario template we're working on
     ScenarioTemplate scenarioTemplate = new ScenarioTemplate();
-
-    static {
-        destinationZoneMapping = new HashMap<>();
-        destinationZoneMapping.put(0, CardinalEdge.NORTH.getIndex());
-        destinationZoneMapping.put(1, CardinalEdge.EAST.getIndex());
-        destinationZoneMapping.put(2, CardinalEdge.SOUTH.getIndex());
-        destinationZoneMapping.put(3, CardinalEdge.WEST.getIndex());
-        destinationZoneMapping.put(4, CardinalEdge.NEAREST.getIndex());
-        destinationZoneMapping.put(5, CardinalEdge.NONE.getIndex());
-        destinationZoneMapping.put(6, ScenarioForceTemplate.DESTINATION_EDGE_OPPOSITE_DEPLOYMENT);
-        destinationZoneMapping.put(7, ScenarioForceTemplate.DESTINATION_EDGE_RANDOM);
-    }
 
     /**
      * @param parent Creates a new instance of this dialog with the given parent JFrame.
@@ -666,7 +649,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         cboAlignment.setSelectedIndex(forceTemplate.getForceAlignment());
         cboGenerationMethod.setSelectedIndex(forceTemplate.getGenerationMethod());
         spnMultiplier.setValue(forceTemplate.getForceMultiplier());
-        cboDestinationZone.setSelectedIndex(forceTemplate.getDestinationZone());
+        cboDestinationZone.setSelectedIndex(DestinationZoneMapper.storedZoneToComboIndex(forceTemplate.getDestinationZone()));
         spnRetreatThreshold.setValue(forceTemplate.getRetreatThreshold());
         chkReinforce.setSelected(forceTemplate.getCanReinforceLinked());
         chkContributesToBV.setSelected(forceTemplate.getContributesToBV());
@@ -1182,7 +1165,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             deploymentZones.add(x);
         }
 
-        int destinationZone = destinationZoneMapping.get(cboDestinationZone.getSelectedIndex());
+        int destinationZone = DestinationZoneMapper.comboIndexToStoredZone(cboDestinationZone.getSelectedIndex());
         int retreatThreshold = (int) spnRetreatThreshold.getValue();
 
         int allowedUnitType = cboUnitType.getSelectedIndex() - ScenarioForceTemplate.SPECIAL_UNIT_TYPES.size();
