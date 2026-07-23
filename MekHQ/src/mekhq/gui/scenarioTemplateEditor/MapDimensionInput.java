@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.dialog;
+package mekhq.gui.scenarioTemplateEditor;
 
 /**
  * Validation and parsing for the four free-text map-dimension inputs in {@link ScenarioTemplateEditorDialog} (base

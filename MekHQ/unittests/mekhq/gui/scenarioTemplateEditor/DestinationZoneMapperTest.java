@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.dialog;
+package mekhq.gui.scenarioTemplateEditor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -41,10 +41,10 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests for {@link DestinationZoneMapper}.
  *
- * <p>These began (Phase 0.4) as characterization tests pinning a defect: the reverse mapping was the identity function,
- * so saving a force and reloading it into the editor mislabeled three of the four cardinal edges in a three-way cycle
- * (East&rarr;West, South&rarr;East, West&rarr;South). Phase 1.1 made the reverse mapping a true inverse; the round-trip
- * tests now assert that every destination-zone entry survives a save/load cycle unchanged.
+ * <p>These began (Phase 0.4) as characterization tests pinning a defect: the reverse mapping was the identity
+ * function, so saving a force and reloading it into the editor mislabeled three of the four cardinal edges in a
+ * three-way cycle (East&rarr;West, South&rarr;East, West&rarr;South). Phase 1.1 made the reverse mapping a true
+ * inverse; the round-trip tests now assert that every destination-zone entry survives a save/load cycle unchanged.
  */
 class DestinationZoneMapperTest {
 
