@@ -73,7 +73,7 @@ import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
  *     <li><b>The dry fill needs the fields.</b> This one dependency is enforced by the compiler, because
  *     {@link StratConTerrainFiller#fill} takes the computed fields as a parameter.</li>
  *     <li><b>Farmland needs the cities</b> it radiates out from, so with no cities on the track it places nothing.</li>
- * * </ul>
+ * </ul>
  *
  * <p>Every one of those failures is silent, and several would pass a casual look at the resulting map. That is what
  * {@link GenerationStage} and {@link PipelineOrder} exist for: the constraint is declared once, and a reordering

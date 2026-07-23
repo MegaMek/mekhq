@@ -62,6 +62,7 @@ import mekhq.campaign.digitalGM.stratCon.sectorGeneration.LatitudeBand;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.PlanetProfile;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.SectorShapeProfile;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.SectorSpec;
+import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorCountMethod;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorGenerator;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorPlanner;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorShape;
