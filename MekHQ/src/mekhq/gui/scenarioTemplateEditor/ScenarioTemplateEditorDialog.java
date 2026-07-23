@@ -84,8 +84,6 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     private final Dimension spinnerSize = new Dimension(55, 25);
 
     private final static String ADD_FORCE_COMMAND = "ADD_FORCE";
-    private final static String REMOVE_FORCE_COMMAND = "REMOVE_FORCE_";
-    private final static String EDIT_FORCE_COMMAND = "EDIT_FORCE_";
     private final static String SAVE_TEMPLATE_COMMAND = "SAVE_TEMPLATE";
     private final static String LOAD_TEMPLATE_COMMAND = "LOAD_TEMPLATE";
 
@@ -1108,13 +1106,13 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             panForceList.add(lblMapSize, gbc);
 
             JButton btnRemoveForce = new JButton("Remove");
-            btnRemoveForce.setActionCommand(String.format("%s%s", REMOVE_FORCE_COMMAND, sft.getForceName()));
+            btnRemoveForce.setActionCommand(ForceListCommand.removeCommand(sft.getForceName()));
             btnRemoveForce.addActionListener(this);
             gbc.gridx++;
             panForceList.add(btnRemoveForce, gbc);
 
             JButton btnEditForce = new JButton("Edit");
-            btnEditForce.setActionCommand(String.format("%s%s", EDIT_FORCE_COMMAND, sft.getForceName()));
+            btnEditForce.setActionCommand(ForceListCommand.editCommand(sft.getForceName()));
             btnEditForce.addActionListener(this);
             gbc.gridx++;
             panForceList.add(btnEditForce, gbc);
@@ -1290,7 +1288,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
      * @param command The command string containing the index of the force to remove.
      */
     private void deleteForceButtonHandler(String command) {
-        String forceIndex = command.substring(REMOVE_FORCE_COMMAND.length());
+        String forceIndex = ForceListCommand.removeForceId(command);
         scenarioTemplate.getScenarioForces().remove(forceIndex);
 
         // If we just removed the force being edited, drop back to "add new" mode so a later commit does not resurrect
@@ -1311,7 +1309,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
      * @param command The command string containing the index of the force to edit.
      */
     private void editForceButtonHandler(String command) {
-        String forceIndex = command.substring(EDIT_FORCE_COMMAND.length());
+        String forceIndex = ForceListCommand.editForceId(command);
         loadForce(scenarioTemplate.getScenarioForces().get(forceIndex));
         // Remember which force we are editing so committing updates it in place (and handles a rename) instead of
         // adding a duplicate.
@@ -1497,9 +1495,9 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     public void actionPerformed(ActionEvent e) {
         if (ADD_FORCE_COMMAND.equals(e.getActionCommand())) {
             addForceButtonHandler();
-        } else if (e.getActionCommand().contains(REMOVE_FORCE_COMMAND)) {
+        } else if (ForceListCommand.isRemove(e.getActionCommand())) {
             deleteForceButtonHandler(e.getActionCommand());
-        } else if (e.getActionCommand().contains(EDIT_FORCE_COMMAND)) {
+        } else if (ForceListCommand.isEdit(e.getActionCommand())) {
             editForceButtonHandler(e.getActionCommand());
         } else if (SAVE_TEMPLATE_COMMAND.equals(e.getActionCommand())) {
             saveTemplateButtonHandler();
