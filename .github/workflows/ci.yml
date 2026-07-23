@@ -28,16 +28,19 @@ jobs:
       - name: Find the Right Data Branch
         id: find_data
         shell: bash {0}
+        env:
+          DATA_BRANCH: ${{ github.event.pull_request.head.ref }}
+          DATA_REMOTE_URL: ${{ github.event.pull_request.head.repo.owner.html_url }}/mm-data.git
+          DATA_REPO_OWNER: ${{ github.event.pull_request.head.repo.owner.login }}
         run: |
           if git ls-remote --exit-code --heads \
-            ${{ github.event.pull_request.head.repo.owner.html_url }}/mm-data.git \
-            ${{ github.event.pull_request.head.ref }} > /dev/null 2>&1
+            "$DATA_REMOTE_URL" "$DATA_BRANCH" > /dev/null 2>&1
           then
-            echo "dataRepo=${{ github.event.pull_request.head.repo.owner.login }}/mm-data" >> $GITHUB_OUTPUT
-            echo "dataBranch=${{ github.event.pull_request.head.ref }}" >> $GITHUB_OUTPUT
+            printf 'dataRepo=%s/mm-data\n' "$DATA_REPO_OWNER" >> "$GITHUB_OUTPUT"
+            printf 'dataBranch=%s\n' "$DATA_BRANCH" >> "$GITHUB_OUTPUT"
           else
-            echo "dataRepo=MegaMek/mm-data" >> $GITHUB_OUTPUT
-            echo "dataBranch=main" >> $GITHUB_OUTPUT
+            printf 'dataRepo=MegaMek/mm-data\n' >> "$GITHUB_OUTPUT"
+            printf 'dataBranch=main\n' >> "$GITHUB_OUTPUT"
           fi
 
       - name: Checkout Data Repo
