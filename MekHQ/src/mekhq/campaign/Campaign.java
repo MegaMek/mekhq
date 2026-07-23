@@ -1355,15 +1355,24 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * @return missions List sorted with complete missions at the bottom
+     * @return missions sorted with active missions from oldest to newest, followed by completed missions from newest to
+     *       oldest; active missions without a start date use the campaign date, while completed missions without one
+     *       sort last
      */
     public List<Mission> getSortedMissions() {
-        return getMissions().stream()
-                     .sorted(Comparator.comparing(Mission::getStatus)
-                                   .thenComparing(m -> (m instanceof Contract) ?
-                                                             ((Contract) m).getStartDate() :
-                                                             LocalDate.now()))
-                     .collect(Collectors.toList());
+        List<Mission> sortedMissions = new ArrayList<>(getMissions());
+        sortedMissions.sort(Comparator.comparing((Mission mission) -> mission.getStatus().isCompleted())
+                                  .thenComparingLong(this::getMissionSortKey));
+        return sortedMissions;
+    }
+
+    private long getMissionSortKey(Mission mission) {
+        LocalDate startDate = mission.getStartDate();
+        if (startDate == null) {
+            return mission.getStatus().isCompleted() ? Long.MAX_VALUE : getLocalDate().toEpochDay();
+        }
+        long startDay = startDate.toEpochDay();
+        return mission.getStatus().isCompleted() ? -startDay : startDay;
     }
 
     public List<Mission> getActiveMissions(final boolean excludeEndDateCheck) {
