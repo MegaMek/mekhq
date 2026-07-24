@@ -121,7 +121,9 @@ public class ForceGeneratorTab {
               viewUi.getLeftPanel(), viewUi.getRightPanel());
         splitPane.setName(FORCE_GENERATOR_SPLIT_NAME);
         splitPane.setResizeWeight(0.55);
-        splitPane.setDividerLocation(UIUtil.scaleForGUI(760));
+        // Widened ~10% from 760 so the options column shows every control on first open without the
+        // divider clipping the last few. Restored from the saved preference on subsequent opens.
+        splitPane.setDividerLocation(UIUtil.scaleForGUI(836));
 
         JPanel host = new JPanel(new BorderLayout());
         host.setName("pnlForceGeneratorTab");
