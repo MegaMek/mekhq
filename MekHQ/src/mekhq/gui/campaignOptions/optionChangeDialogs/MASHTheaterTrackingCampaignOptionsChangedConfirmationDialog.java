@@ -60,7 +60,7 @@ import javax.swing.border.EmptyBorder;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.companyGeneration.SupportUnitGenerator;
+import mekhq.campaign.universe.commandGeneration.SupportUnitGenerator;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 

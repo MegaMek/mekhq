@@ -122,7 +122,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.baseComponents.roundedComponents.RoundedMMToggleButton;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog;
-import mekhq.gui.companyGeneration.CompanyGenerationDialog;
+import mekhq.gui.commandGeneration.CommandGenerationDialog;
 import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.glossary.GlossaryDialog;
 import mekhq.gui.enums.MHQTabType;
@@ -543,7 +543,7 @@ public class CampaignGUI extends JPanel {
         btnCompanyGenerator = new RoundedJButton(resourceMap.getString("btnCompanyGenerator.text"));
         btnCompanyGenerator.setToolTipText(resourceMap.getString("btnCompanyGenerator.toolTipText"));
         btnCompanyGenerator.addActionListener(
-              e -> new CompanyGenerationDialog(getFrame(), getCampaign()).setVisible(true));
+              e -> new CommandGenerationDialog(getFrame(), getCampaign()).setVisible(true));
         gridBagConstraints.gridy = 0;
         gridBagConstraints.insets = new Insets(MEDIUM_GAP - 2, SMALL_GAP, -2, SMALL_GAP);
         pnlButton.add(btnCompanyGenerator, gridBagConstraints);

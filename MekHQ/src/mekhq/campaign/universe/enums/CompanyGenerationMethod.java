@@ -99,8 +99,8 @@ public enum CompanyGenerationMethod {
         return switch (this) {
             case AGAINST_THE_BOT -> new AtBCompanyGenerator(campaign, options);
             // RULESET_BASED does not extend AbstractCompanyGenerator — it has its own entry point in
-            // mekhq.campaign.universe.companyGeneration.ratgen.CompanyGenerator. Callers that want the
-            // new pipeline must dispatch via CompanyGenerationDialog rather than this method. Falling
+            // mekhq.campaign.universe.commandGeneration.ratgen.CommandGenerator. Callers that want the
+            // new pipeline must dispatch via CommandGenerationDialog rather than this method. Falling
             // through to Windchild here keeps the legacy callers (which never see RULESET_BASED while
             // it is dev-gated) functional.
             case RULESET_BASED -> new WindchildCompanyGenerator(campaign, options);

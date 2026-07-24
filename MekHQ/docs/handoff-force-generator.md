@@ -19,10 +19,10 @@ Dave keeps MegaMek + mm-data. This handoff is the MekHQ slice only.
 ## What's done on mekhq
 
 **Phase 1 — Plumbing.** All 5 originally-planned classes plus 8 more, in
-`MekHQ/src/mekhq/campaign/universe/companyGeneration/ratgen/`: `CompanyGenerator`, `ForceDescriptorWalker`,
+`MekHQ/src/mekhq/campaign/universe/companyGeneration/ratgen/`: `CommandGenerator`, `ForceDescriptorWalker`,
 `CrewDescriptorAdapter`, `MultiCrewAssembler`, `PersonnelRoleResolver`, `RulesetEngineBootstrap`, `RulesetRankAssigner`,
 `RankAssigner`, `ForceDescriptorSnapshot`, `FormationIconBuilder`, `SupportPersonnelAssigner` + `Calculator` +
-`Generator`. `CompanyGenerationMethod.RULESET_BASED` wired through `CompanyGenerationDialog`.
+`Generator`. `CompanyGenerationMethod.RULESET_BASED` wired through `CommandGenerationDialog`.
 
 **Phase 2 — Non-Mek + multi-crew.** `MultiCrewAssembler` handles drivers, gunners, squads, vessels.
 `PersonnelRoleResolver` covers every `UnitType`.
@@ -31,7 +31,7 @@ Dave keeps MegaMek + mm-data. This handoff is the MekHQ slice only.
 ranks via the faction's rank system. `FormationIconBuilder` classifies icons by dominant unit type with weight-class
 breakpoints (StratOps).
 
-**UI rebuild (beyond plan scope).** `CompanyGenerationPane` with 4 tabs — Setup, Force Generator (embeds
+**UI rebuild (beyond plan scope).** `CommandGenerationPane` with 4 tabs — Setup, Force Generator (embeds
 `ForceGeneratorOptionsView` from megamek), Spares, Other. Styled-component library mirroring `CampaignOptions`. Progress
 dialog + long-generation warning + hang diagnostics. Pre-generation warnings combined into one dialog.
 
@@ -58,7 +58,7 @@ Persons.
 - In `RulesetEngineBootstrap.ensureLoaded(year)`, call
   `Ruleset.addRulesetDirectory(MHQConstants.USER_DATA_DIR + "/forcegenerator/faction_rules")` before
   `Ruleset.loadData()`.
-- In `CompanyGenerator.generate(campaign)`, before `Ruleset.findRuleset(fd).processRoot(...)`, detect fallback-only
+- In `CommandGenerator.generate(campaign)`, before `Ruleset.findRuleset(fd).processRoot(...)`, detect fallback-only
   ruleset state and surface a confirmation: *"No specific ruleset for X; fall back to generic IS rules?" [OK / Cancel]*.
 - Fallback detection: `Ruleset.findRuleset` walks `FactionRecord.getParentFactions()` then drops to `IS_GENERAL_KEY`.
   Need to compare the returned ruleset's faction code against the requested one, or get Dave to add a helper like
@@ -108,7 +108,7 @@ cash/parts scale with leaf count).
 
 ```
 MekHQ/src/mekhq/campaign/universe/companyGeneration/ratgen/
-  CompanyGenerator.java                <- orchestrator; Phase 4 fallback dialog lands here
+  CommandGenerator.java                <- orchestrator; Phase 4 fallback dialog lands here
   RulesetEngineBootstrap.java          <- Phase 4 addRulesetDirectory() call lands here
   ForceDescriptorWalker.java           <- tree -> MekHQ Formations
   MultiCrewAssembler.java              <- per-unit-type crew assembly
@@ -119,7 +119,7 @@ MekHQ/src/mekhq/campaign/universe/companyGeneration/ratgen/
 
 MekHQ/src/mekhq/campaign/universe/enums/CompanyGenerationMethod.java
 MekHQ/src/mekhq/campaign/universe/companyGeneration/CompanyGenerationOptions.java
-MekHQ/src/mekhq/gui/dialog/CompanyGenerationDialog.java
+MekHQ/src/mekhq/gui/dialog/CommandGenerationDialog.java
 MekHQ/src/mekhq/gui/panels/CompanyGenerationOptionsPanel.java
 MekHQ/src/mekhq/campaign/unit/MULParser.java          <- parallel-stream reader lands here
 MekHQ/src/mekhq/campaign/force/Formation.java

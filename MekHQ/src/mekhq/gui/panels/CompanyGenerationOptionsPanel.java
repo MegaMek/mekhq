@@ -834,7 +834,7 @@ public class CompanyGenerationOptionsPanel extends AbstractScrollablePanel {
     /**
      * Builds the Force Generator tab content: a single embedded {@link ForceGeneratorOptionsView}.
      * The panel's own Generate / Export MUL / Clear buttons are hidden (the dialog's OK drives
-     * generation) and its year field is locked to the campaign year — {@code CompanyGenerator}'s
+     * generation) and its year field is locked to the campaign year — {@code CommandGenerator}'s
      * Stage 0 anchors year on the snapshot regardless, but locking the displayed field keeps the UX
      * honest.
      */

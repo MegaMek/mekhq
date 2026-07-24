@@ -77,7 +77,7 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsButton;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsIntroPanel;
-import mekhq.gui.companyGeneration.CompanyGenerationDialog;
+import mekhq.gui.commandGeneration.CommandGenerationDialog;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsTextField;
@@ -241,8 +241,8 @@ public class GeneralPage {
         // the generator's purpose (seeding the starting force) doesn't apply. The button is disabled in
         // those modes (matching how btnDate / btnRandomDate are gated) so it stays visually consistent in
         // the layout but can't be clicked.
-        btnCompanyGenerator = new CampaignOptionsButton("CompanyGenerator");
-        btnCompanyGenerator.addActionListener(e -> new CompanyGenerationDialog(frame, campaign).setVisible(true));
+        btnCompanyGenerator = new CampaignOptionsButton("CommandGenerator");
+        btnCompanyGenerator.addActionListener(e -> new CommandGenerationDialog(frame, campaign).setVisible(true));
         if (mode != CampaignOptionsDialogMode.STARTUP && mode != CampaignOptionsDialogMode.STARTUP_ABRIDGED) {
             btnCompanyGenerator.setEnabled(false);
         }

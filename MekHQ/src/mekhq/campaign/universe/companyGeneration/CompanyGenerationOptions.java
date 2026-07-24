@@ -90,7 +90,7 @@ public class CompanyGenerationOptions {
      * {@code AGAINST_THE_BOT} / {@code WINDCHILD} paths ignore this entirely. Lazy-initialized on first
      * access so old presets parsing without the block still produce a valid instance.
      */
-    private mekhq.campaign.universe.companyGeneration.ratgen.ForceDescriptorSnapshot forceDescriptorSnapshot;
+    private mekhq.campaign.universe.commandGeneration.ratgen.ForceDescriptorSnapshot forceDescriptorSnapshot;
 
     // Personnel
     private Map<PersonnelRole, Integer> supportPersonnel;
@@ -450,15 +450,15 @@ public class CompanyGenerationOptions {
      * Lazy accessor for the ratgen-pipeline inputs. Always non-null; created on first call so legacy
      * presets that never touch the snapshot still hand out a well-formed default instance.
      */
-    public mekhq.campaign.universe.companyGeneration.ratgen.ForceDescriptorSnapshot getForceDescriptorSnapshot() {
+    public mekhq.campaign.universe.commandGeneration.ratgen.ForceDescriptorSnapshot getForceDescriptorSnapshot() {
         if (forceDescriptorSnapshot == null) {
-            forceDescriptorSnapshot = new mekhq.campaign.universe.companyGeneration.ratgen.ForceDescriptorSnapshot();
+            forceDescriptorSnapshot = new mekhq.campaign.universe.commandGeneration.ratgen.ForceDescriptorSnapshot();
         }
         return forceDescriptorSnapshot;
     }
 
     public void setForceDescriptorSnapshot(
-          final mekhq.campaign.universe.companyGeneration.ratgen.ForceDescriptorSnapshot snapshot) {
+          final mekhq.campaign.universe.commandGeneration.ratgen.ForceDescriptorSnapshot snapshot) {
         this.forceDescriptorSnapshot = snapshot;
     }
     // endregion Base Information
@@ -1362,7 +1362,7 @@ public class CompanyGenerationOptions {
                         break;
                     case "forceDescriptorSnapshot":
                         options.setForceDescriptorSnapshot(
-                              mekhq.campaign.universe.companyGeneration.ratgen.ForceDescriptorSnapshot
+                              mekhq.campaign.universe.commandGeneration.ratgen.ForceDescriptorSnapshot
                                     .parseFromXML(wn));
                         break;
                     // endregion Base Information

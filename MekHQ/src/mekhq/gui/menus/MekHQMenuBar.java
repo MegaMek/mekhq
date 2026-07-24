@@ -112,7 +112,7 @@ import mekhq.campaign.universe.Systems;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog;
-import mekhq.gui.companyGeneration.CompanyGenerationDialog;
+import mekhq.gui.commandGeneration.CommandGenerationDialog;
 import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.reportDialogs.CargoReportDialog;
 import mekhq.gui.dialog.reportDialogs.HangarReportDialog;
@@ -570,7 +570,7 @@ public class MekHQMenuBar extends JMenuBar {
         menuManage.add(miScenarioEditor);
 
         miCompanyGenerator = createMenuItem("miCompanyGenerator.text", KeyEvent.VK_C,
-              evt -> new CompanyGenerationDialog(getFrame(), getCampaign()).setVisible(true));
+              evt -> new CommandGenerationDialog(getFrame(), getCampaign()).setVisible(true));
         miCompanyGenerator.setVisible(MekHQ.getMHQOptions().getShowCompanyGenerator());
         menuManage.add(miCompanyGenerator);
 
