@@ -1711,6 +1711,29 @@ public final class BriefingTab extends CampaignGuiTab {
             return true;
         }
 
+        // Compose the briefing body: detailed briefing, then who controls the field, then the objectives, each
+        // separated by a horizontal divider.
+        StringBuilder briefingBody = new StringBuilder(description);
+
+        if (scenario instanceof AtBScenario atBScenario) {
+            String battlefieldControl = atBScenario.getBattlefieldControlDescription();
+            if ((battlefieldControl != null) && !battlefieldControl.isBlank()) {
+                briefingBody.append("<hr>").append(battlefieldControl);
+            }
+        }
+
+        List<ScenarioObjective> objectives = scenario.getScenarioObjectives();
+        if ((objectives != null) && !objectives.isEmpty()) {
+            briefingBody.append("<hr><b>")
+                  .append(getTextAt(RESOURCE_BUNDLE, "dialogScenarioAcceptance.objectives.header"))
+                  .append("</b>");
+            for (ScenarioObjective objective : objectives) {
+                briefingBody.append("<br>").append(objective.getDescription());
+            }
+        }
+
+        description = briefingBody.toString();
+
         Mission mission = null;
         if (scenario.getMissionId() != -1) {
             mission = getCampaign().getMission(scenario.getMissionId());
