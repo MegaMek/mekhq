@@ -75,9 +75,12 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
     // consist
 
     public static final String[] FORCE_ALIGNMENTS = { "Player", "Allied", "Opposing", "Third", "Planet Owner" };
+    // NB: this must stay index-aligned with the ForceGenerationMethod enum (ordinal -> label). The trailing "None"
+    // matches ForceGenerationMethod.None (ordinal 6); omitting it caused an ArrayIndexOutOfBounds whenever a force
+    // using the "None" generation method was rendered or edited.
     public static final String[] FORCE_GENERATION_METHODS = { "Player Supplied", "BV Scaled", "Unit Count Scaled",
                                                               "Fixed Unit Count", "Player/Fixed Unit Count",
-                                                              "Fixed MUL" };
+                                                              "Fixed MUL", "None" };
     public static final String[] FORCE_DEPLOYMENT_SYNC_TYPES = { "None", "Same Edge", "Same Arc", "Opposite Edge",
                                                                  "Opposite Arc" };
     public static final String[] DEPLOYMENT_ZONES = { "Any", "Northwest", "North", "Northeast", "East", "Southeast",

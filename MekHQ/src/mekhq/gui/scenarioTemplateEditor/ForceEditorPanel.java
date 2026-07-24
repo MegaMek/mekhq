@@ -71,7 +71,7 @@ public class ForceEditorPanel extends JPanel {
     private static final ResourceBundle RESOURCES = ResourceBundle.getBundle(
           "mekhq.resources.ScenarioTemplateEditorDialog");
 
-    private final Dimension spinnerSize = new Dimension(55, 25);
+    private final Dimension spinnerSize = new Dimension(75, 25);
 
     private final JComboBox<String> cboAlignment = new JComboBox<>(ScenarioForceTemplate.FORCE_ALIGNMENTS);
     private final JComboBox<String> cboGenerationMethod = new JComboBox<>(ScenarioForceTemplate.FORCE_GENERATION_METHODS);

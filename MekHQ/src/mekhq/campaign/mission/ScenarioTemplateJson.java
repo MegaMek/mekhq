@@ -41,6 +41,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * JSON serialization for {@link ScenarioTemplate} and its object graph. JSON is the write format for standalone
@@ -59,6 +61,27 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 public final class ScenarioTemplateJson {
 
     private static final ObjectMapper MAPPER = buildMapper();
+
+    /**
+     * The MegaMek Data legal notice, emitted as a leading {@code _license} array in every saved template. JSON has no
+     * comment syntax, so the notice the XML files carried in an XML comment is written as data instead. It is ignored
+     * on read (the mapper tolerates unknown properties), so it never reaches the model.
+     */
+    private static final String[] LICENSE_NOTICE = {
+          "MegaMek Data (C) 2025-2026 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.",
+          "To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/",
+          "",
+          "NOTICE: The MegaMek organization is a non-profit group of volunteers creating free software for the "
+                + "BattleTech community.",
+          "",
+          "MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks of The Topps Company, Inc. "
+                + "All Rights Reserved.",
+          "",
+          "Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of InMediaRes Productions, LLC.",
+          "",
+          "MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under Microsoft's "
+                + "\"Game Content Usage Rules\" <https://www.xbox.com/en-US/developers/rules> and it is not endorsed "
+                + "by or affiliated with Microsoft." };
 
     private ScenarioTemplateJson() {
     }
@@ -111,6 +134,14 @@ public final class ScenarioTemplateJson {
      * @throws IOException if the file cannot be written
      */
     static void toFile(ScenarioTemplate template, File outputFile) throws IOException {
-        MAPPER.writeValue(outputFile, template);
+        // Emit the license notice as the first property, then the template's own fields. Injecting it into the tree
+        // (rather than adding a model field) keeps it out of the model and out of the XML/campaign-save path entirely.
+        ObjectNode root = MAPPER.createObjectNode();
+        ArrayNode license = root.putArray("_license");
+        for (String line : LICENSE_NOTICE) {
+            license.add(line);
+        }
+        root.setAll((ObjectNode) MAPPER.valueToTree(template));
+        MAPPER.writeValue(outputFile, root);
     }
 }

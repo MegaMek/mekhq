@@ -294,6 +294,13 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         forceTable = new JTable(forceTableModel);
         forceTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         forceTable.getSelectionModel().addListSelectionListener(e -> updateForceButtonState());
+        // The model has 15 columns; with the default auto-resize they all get squeezed to a few unreadable pixels.
+        // Turn auto-resize off and give each column a sensible width so the table scrolls horizontally instead.
+        forceTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        int[] columnWidths = { 50, 130, 90, 120, 150, 150, 100, 70, 120, 100, 90, 80, 60, 100, 90 };
+        for (int col = 0; col < columnWidths.length && col < forceTable.getColumnCount(); col++) {
+            forceTable.getColumnModel().getColumn(col).setPreferredWidth(columnWidths[col]);
+        }
 
         btnEditForce = new JButton("Edit");
         btnEditForce.setEnabled(false);
