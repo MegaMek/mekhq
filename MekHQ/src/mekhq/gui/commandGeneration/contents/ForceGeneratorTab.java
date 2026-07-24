@@ -33,6 +33,9 @@
 package mekhq.gui.commandGeneration.contents;
 
 import java.awt.BorderLayout;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
@@ -44,9 +47,13 @@ import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
+import mekhq.campaign.universe.commandGeneration.ratgen.ForceDescriptorWalker;
+import mekhq.campaign.universe.commandGeneration.ratgen.FormationNamer;
+import mekhq.campaign.universe.enums.ForceNamingMethod;
 
 /**
  * Wraps the embedded {@link ForceGeneratorOptionsView} from MegaMek. The faction / echelon / unit
@@ -75,6 +82,15 @@ public class ForceGeneratorTab {
     private ForceGeneratorViewUi viewUi;
     private JSplitPane splitPane;
 
+    // Final TOE names for the previewed formations, keyed by descriptor identity. Rebuilt lazily by
+    // previewNameFor after every model change (Generate, Include/Exclude, naming-method switch) so the
+    // preview tree always shows the callsigns the committed TOE will use.
+    private Map<ForceDescriptor, String> previewNameCache;
+
+    // Live source of the Setup tab's Formation Naming Method combo. The options object only receives
+    // the combo's value on OK, so the preview must read the control itself to stay in sync mid-dialog.
+    private Supplier<ForceNamingMethod> namingMethodSupplier;
+
     public ForceGeneratorTab(JFrame frame, Campaign campaign, CommandGenerationOptions options) {
         this.frame = frame;
         this.campaign = campaign;
@@ -94,6 +110,11 @@ public class ForceGeneratorTab {
         // Command Designer: each Generate accumulates into a Model so the player can mix-and-match
         // several rolls into one command before committing.
         viewUi.setAccumulateModel(true);
+        // Show the final TOE callsigns ("Able Company", "Able-1 Battle Lance") on the preview's
+        // formation nodes instead of the engine's per-parent names, recomputed whenever the model
+        // changes so the tree always matches what Accept will commit.
+        viewUi.setToeChangeListener(this::invalidatePreviewNames);
+        viewUi.setFormationNameProvider(this::previewNameFor);
 
         ForceGeneratorOptionsView optionsView = viewUi.getOptionsView();
         optionsView.setExportMULButtonVisible(false);
@@ -148,6 +169,61 @@ public class ForceGeneratorTab {
      */
     public ForceDescriptor getGeneratedForce() {
         return viewUi == null ? null : viewUi.getGeneratedForce();
+    }
+
+    /**
+     * Wires the live source of the Setup tab's Formation Naming Method combo into the preview naming,
+     * and is invoked by the pane during construction.
+     *
+     * @param supplier reads the combo's current selection; {@code null} falls back to the options value
+     */
+    public void setNamingMethodSupplier(@Nullable Supplier<ForceNamingMethod> supplier) {
+        this.namingMethodSupplier = supplier;
+    }
+
+    /**
+     * Drops the cached preview names and repaints the tree. Called by the view after each Generate and
+     * Include/Exclude toggle, and by the pane when the Setup tab's naming method changes.
+     */
+    public void invalidatePreviewNames() {
+        previewNameCache = null;
+        if (viewUi != null) {
+            viewUi.repaintForceTree();
+        }
+    }
+
+    /**
+     * The final TOE name for {@code descriptor}, from a cache rebuilt on demand by running the same
+     * naming traversal the build uses over the currently previewed tree.
+     *
+     * @param descriptor the formation node being rendered
+     * @return the callsign the committed TOE will use, or {@code null} for nodes the walker does not
+     *       name (the tree falls back to the engine name)
+     */
+    private @Nullable String previewNameFor(ForceDescriptor descriptor) {
+        if (previewNameCache == null) {
+            List<String> existingFormationNames = campaign == null
+                  ? List.of()
+                  : campaign.getPlayerForce().getAllFormations().stream()
+                          .map(Formation::getName)
+                          .toList();
+            FormationNamer namer = new FormationNamer(currentNamingMethod(), existingFormationNames);
+            previewNameCache = ForceDescriptorWalker.previewNames(getGeneratedForce(), namer);
+        }
+        return previewNameCache.get(descriptor);
+    }
+
+    /**
+     * The naming method the build would use right now: the Setup tab's live combo selection when wired,
+     * otherwise the value already on the options.
+     *
+     * @return the current naming method, or {@code null} for the namer's default
+     */
+    private @Nullable ForceNamingMethod currentNamingMethod() {
+        if (namingMethodSupplier != null) {
+            return namingMethodSupplier.get();
+        }
+        return options == null ? null : options.getForceNamingMethod();
     }
 
     /**

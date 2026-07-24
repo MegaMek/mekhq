@@ -57,6 +57,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
 import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -165,6 +166,9 @@ public class SetupTab {
     // Force shape
     private CommandGenerationCheckBox chkGenerateMercenaryCompanyCommandLance;
     private MMComboBox<ForceNamingMethod> comboForceNamingMethod;
+    // Notified when the naming-method combo changes, so the Force Generator tab can refresh its
+    // preview callsigns mid-dialog (the options object only receives the combo's value on OK).
+    private Runnable namingMethodChangeListener;
 
     // Support personnel — per-role coverage % + skill level
     private final Map<PersonnelRole, JSpinner> spnSupportCoveragePercents = new LinkedHashMap<>();
@@ -317,6 +321,11 @@ public class SetupTab {
                     list.setToolTipText(namingMethod.getToolTipText());
                 }
                 return this;
+            }
+        });
+        comboForceNamingMethod.addActionListener(actionEvent -> {
+            if (namingMethodChangeListener != null) {
+                namingMethodChangeListener.run();
             }
         });
 
@@ -758,6 +767,29 @@ public class SetupTab {
     /**
      * Pushes values from the supplied options onto this tab's controls. Field-by-field copy.
      */
+    /**
+     * The naming method currently selected in the Formation Naming Method combo. Unlike the options
+     * object — which only receives this value on OK — this reads the live control, so the Force
+     * Generator tab's preview callsigns track mid-dialog changes.
+     *
+     * @return the selected naming method, or {@code null} if the combo has no selection
+     */
+    public @Nullable ForceNamingMethod getSelectedForceNamingMethod() {
+        Object selectedNamingMethod = comboForceNamingMethod == null
+              ? null
+              : comboForceNamingMethod.getSelectedItem();
+        return (selectedNamingMethod instanceof ForceNamingMethod namingMethod) ? namingMethod : null;
+    }
+
+    /**
+     * Registers the callback fired whenever the Formation Naming Method combo changes.
+     *
+     * @param listener the callback, or {@code null} to clear
+     */
+    public void setNamingMethodChangeListener(@Nullable Runnable listener) {
+        this.namingMethodChangeListener = listener;
+    }
+
     public void loadValuesFromOptions(CommandGenerationOptions sourceOptions) {
         this.options = sourceOptions;
         if (sourceOptions == null) {

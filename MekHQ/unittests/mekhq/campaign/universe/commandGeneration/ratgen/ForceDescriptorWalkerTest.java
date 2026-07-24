@@ -150,6 +150,51 @@ class ForceDescriptorWalkerTest {
               "a lance with one re-included unit keeps its formation");
     }
 
+    /**
+     * The preview names must be exactly the names the build produces: both run the same traversal with
+     * equally configured namers, and this test pins that contract.
+     */
+    @Test
+    void previewNamesMatchTheBuiltFormationNames() throws Exception {
+        ForceDescriptor root = group("Battalion");
+        root.setEchelon(5);
+        ForceDescriptor firstCompany = group("A Company");
+        firstCompany.setEchelon(4);
+        ForceDescriptor battleLance = group("Battle Lance");
+        battleLance.setEchelon(3);
+        battleLance.addSubForce(unit("Unit A"));
+        ForceDescriptor fireLance = group("Fire Lance");
+        fireLance.setEchelon(3);
+        fireLance.addSubForce(unit("Unit B"));
+        firstCompany.addSubForce(battleLance);
+        firstCompany.addSubForce(fireLance);
+        ForceDescriptor secondCompany = group("A Company");
+        secondCompany.setEchelon(4);
+        ForceDescriptor secondBattleLance = group("Battle Lance");
+        secondBattleLance.setEchelon(3);
+        secondBattleLance.addSubForce(unit("Unit C"));
+        secondCompany.addSubForce(secondBattleLance);
+        root.addSubForce(firstCompany);
+        root.addSubForce(secondCompany);
+
+        var previewNames = ForceDescriptorWalker.previewNames(root, namer());
+
+        Campaign campaign = mock(Campaign.class);
+        ForceDescriptorWalker.walk(root, campaign, new Formation("Headquarters"), namer(),
+              (leaf, parent) -> { });
+        List<String> builtNames = namesOfCreatedFormations(campaign);
+
+        assertEquals(builtNames.size(), previewNames.size(),
+              "every built formation (no synthesized companies here) must have a previewed name");
+        assertEquals("Able Company", previewNames.get(firstCompany));
+        assertEquals("Able-1 Battle Lance", previewNames.get(battleLance));
+        assertEquals("Able-2 Fire Lance", previewNames.get(fireLance));
+        assertEquals("Baker Company", previewNames.get(secondCompany));
+        assertEquals("Baker-1 Battle Lance", previewNames.get(secondBattleLance));
+        assertTrue(builtNames.containsAll(previewNames.values()),
+              "the preview must show exactly the names the build produces");
+    }
+
     @Test
     void looseAttachedPlatoonsWrapIntoUnitTypeCompany() throws Exception {
         ForceDescriptor root = group("Regiment");

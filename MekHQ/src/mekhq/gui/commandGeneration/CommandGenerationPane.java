@@ -106,6 +106,12 @@ public class CommandGenerationPane extends AbstractMHQTabbedPane {
         addTab(tabTitle("forceGeneratorTab"), wrap(forceGeneratorTab.createTab()));
         addTab(tabTitle("sparesAndFinancesTab"), wrap(sparesAndFinancesTab.createTab()));
 
+        // The preview tree shows the final TOE callsigns, which depend on the Setup tab's Formation
+        // Naming Method: read the combo live (options only get the value on OK) and refresh the
+        // preview names whenever it changes.
+        forceGeneratorTab.setNamingMethodSupplier(setupTab::getSelectedForceNamingMethod);
+        setupTab.setNamingMethodChangeListener(forceGeneratorTab::invalidatePreviewNames);
+
         // The starting-cash preview prices the Force Generator tab's current model, which can change
         // while this tab is hidden - recompute it whenever the user switches onto it.
         addChangeListener(evt -> {
