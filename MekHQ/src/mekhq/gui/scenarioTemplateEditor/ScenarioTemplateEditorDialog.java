@@ -117,8 +117,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     JPanel panForceList;
     TemplatePropertiesPanel templatePropertiesPanel;
     MapParametersPanel mapParametersPanel;
-    JComboBox<String> modifierBox;
-    JList<String> selectedModifiersList;
+    ModifiersPanel modifiersPanel;
     JList<ScenarioObjective> objectiveList;
     JScrollPane objectiveScrollPane;
     JButton btnRemoveObjective;
@@ -838,60 +837,15 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         localGbc.anchor = GridBagConstraints.NORTHWEST;
         pnlMapRow.add(mapParametersPanel, localGbc);
 
+        modifiersPanel = new ModifiersPanel(AtBScenarioModifier.getOrderedModifierKeys());
+        modifiersPanel.load(scenarioTemplate.scenarioModifiers);
         localGbc.gridx = 1;
         localGbc.insets = new Insets(0, 15, 0, 0);
-        pnlMapRow.add(buildModifiersPanel(), localGbc);
+        pnlMapRow.add(modifiersPanel, localGbc);
 
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy++;
         globalPanel.add(pnlMapRow, gridBagConstraints);
-    }
-
-    /**
-     * Builds the "Fixed Modifiers" editor (add/remove template-level scenario modifiers). This section still lives in
-     * the dialog and is a candidate for its own panel in a later increment.
-     */
-    private JPanel buildModifiersPanel() {
-        JPanel pnlModifiers = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.WEST;
-
-        gbc.gridwidth = GridBagConstraints.REMAINDER;
-        pnlModifiers.add(new JLabel("Fixed Modifiers"), gbc);
-        gbc.gridwidth = 1;
-
-        gbc.gridy++;
-        modifierBox = new JComboBox<>();
-        for (String modifierKey : AtBScenarioModifier.getOrderedModifierKeys()) {
-            modifierBox.addItem(modifierKey);
-        }
-        pnlModifiers.add(modifierBox, gbc);
-
-        gbc.gridx++;
-        JButton btnAddModifier = new JButton("Add");
-        btnAddModifier.addActionListener(evt -> addModifierHandler());
-        pnlModifiers.add(btnAddModifier, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.gridheight = 3;
-        selectedModifiersList = new JList<>();
-        selectedModifiersList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        reloadSelectedModifiers();
-
-        JScrollPane modifierScrollPane = new FastJScrollPane(selectedModifiersList);
-        modifierScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        pnlModifiers.add(modifierScrollPane, gbc);
-
-        gbc.gridx++;
-        gbc.gridheight = 1;
-        JButton btnRemoveModifier = new JButton("Remove");
-        btnRemoveModifier.addActionListener(evt -> removeModifierHandler());
-        pnlModifiers.add(btnRemoveModifier, gbc);
-
-        return pnlModifiers;
     }
 
     /**
@@ -1465,6 +1419,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
 
         templatePropertiesPanel.writeInto(scenarioTemplate);
         mapParametersPanel.writeInto(scenarioTemplate.mapParameters);
+        modifiersPanel.writeInto(scenarioTemplate.scenarioModifiers);
 
         FileDialogs.saveScenarioTemplate((JFrame) getOwner(), scenarioTemplate)
               .ifPresent(file -> scenarioTemplate.Serialize(file));
@@ -1520,35 +1475,6 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         } else if (LOAD_TEMPLATE_COMMAND.equals(e.getActionCommand())) {
             loadTemplateButtonHandler();
         }
-    }
-
-    /**
-     * Event handler for the "Add" button next to the fixed modifier dropdown.
-     */
-    public void addModifierHandler() {
-        scenarioTemplate.scenarioModifiers.add(Objects.requireNonNull(modifierBox.getSelectedItem()).toString());
-        reloadSelectedModifiers();
-    }
-
-    /**
-     * Event handler for the "Remove" button next to the "selected modifiers" list.
-     */
-    public void removeModifierHandler() {
-        for (String selectedModifier : selectedModifiersList.getSelectedValuesList()) {
-            scenarioTemplate.scenarioModifiers.remove(selectedModifier);
-        }
-        reloadSelectedModifiers();
-    }
-
-    /**
-     * Re-reads the data source for the "selected modifiers" list.
-     */
-    public void reloadSelectedModifiers() {
-        DefaultListModel<String> selectedModifierModel = new DefaultListModel<>();
-        for (String selectedModifier : scenarioTemplate.scenarioModifiers) {
-            selectedModifierModel.addElement(selectedModifier);
-        }
-        selectedModifiersList.setModel(selectedModifierModel);
     }
 
     /**
