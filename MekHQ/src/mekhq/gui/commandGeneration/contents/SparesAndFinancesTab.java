@@ -122,13 +122,14 @@ public class SparesAndFinancesTab {
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.insets = new Insets(3, 6, 3, 6);
 
-        // Left column: the thirteen-row spares grid with its help text beneath - together roughly
-        // the height of the right column's three stacked sections.
+        // Left column: the help text leads so the player reads what the percentages do before the
+        // thirteen-row spares grid beneath it - together roughly the height of the right column's
+        // three stacked sections.
         JPanel leftColumn = new JPanel();
         leftColumn.setLayout(new BoxLayout(leftColumn, BoxLayout.Y_AXIS));
-        leftColumn.add(buildSparesSection());
-        leftColumn.add(Box.createVerticalStrut(6));
         leftColumn.add(buildHelpSection());
+        leftColumn.add(Box.createVerticalStrut(6));
+        leftColumn.add(buildSparesSection());
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 1;
