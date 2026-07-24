@@ -68,10 +68,9 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
+import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
 import testUtilities.MHQTestUtilities;
 import mekhq.campaign.universe.commandGeneration.ratgen.SupportPersonnelGenerator.Result;
-import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.config.Configurator;
@@ -144,7 +143,7 @@ class SupportPersonnelGeneratorTest {
     void generate_nullArguments_returnsEmptyResult() {
         Result a = SupportPersonnelGenerator.generate(null, null);
         Result b = SupportPersonnelGenerator.generate(mock(Campaign.class), null);
-        Result c = SupportPersonnelGenerator.generate(null, new CompanyGenerationOptions(CompanyGenerationMethod.RULESET_BASED));
+        Result c = SupportPersonnelGenerator.generate(null, new CommandGenerationOptions());
 
         for (Result r : List.of(a, b, c)) {
             assertEquals(0, r.totalTechsGenerated());
@@ -159,7 +158,7 @@ class SupportPersonnelGeneratorTest {
     @Test
     void generate_emptyForce_generatesNoOne() {
         Campaign campaign = newCampaignWithUnits(Collections.emptyList(), 0);
-        CompanyGenerationOptions options = baseOptions();
+        CommandGenerationOptions options = baseOptions();
 
         Result result = SupportPersonnelGenerator.generate(campaign, options, stubSkillGen);
 
@@ -177,7 +176,7 @@ class SupportPersonnelGeneratorTest {
     @Test
     void generate_twelveMeks_atFullCoverage_createsTwelveMekTechs() {
         Campaign campaign = newCampaignWithUnits(repeat(SupportPersonnelGeneratorTest::mekUnit, 12), 12);
-        CompanyGenerationOptions options = baseOptions();
+        CommandGenerationOptions options = baseOptions();
 
         Result result = SupportPersonnelGenerator.generate(campaign, options, stubSkillGen);
 
@@ -188,7 +187,7 @@ class SupportPersonnelGeneratorTest {
     @Test
     void generate_twelveMeks_at200Percent_createsTwentyFourMekTechs() {
         Campaign campaign = newCampaignWithUnits(repeat(SupportPersonnelGeneratorTest::mekUnit, 12), 12);
-        CompanyGenerationOptions options = baseOptions();
+        CommandGenerationOptions options = baseOptions();
         options.getSupportPersonnelCoveragePercents().put(PersonnelRole.MEK_TECH, 200);
 
         Result result = SupportPersonnelGenerator.generate(campaign, options, stubSkillGen);
@@ -199,7 +198,7 @@ class SupportPersonnelGeneratorTest {
     @Test
     void generate_twelveMeks_atZeroCoverage_skipsMekTechs() {
         Campaign campaign = newCampaignWithUnits(repeat(SupportPersonnelGeneratorTest::mekUnit, 12), 12);
-        CompanyGenerationOptions options = baseOptions();
+        CommandGenerationOptions options = baseOptions();
         options.getSupportPersonnelCoveragePercents().put(PersonnelRole.MEK_TECH, 0);
 
         Result result = SupportPersonnelGenerator.generate(campaign, options, stubSkillGen);
@@ -211,7 +210,7 @@ class SupportPersonnelGeneratorTest {
     @Test
     void generate_appliesSkillLevelFromOptions() {
         Campaign campaign = newCampaignWithUnits(List.of(mekUnit()), 1);
-        CompanyGenerationOptions options = baseOptions();
+        CommandGenerationOptions options = baseOptions();
         options.getSupportPersonnelSkillLevels().put(PersonnelRole.MEK_TECH, SkillLevel.ELITE);
 
         SupportPersonnelGenerator.generate(campaign, options, stubSkillGen);
@@ -226,7 +225,7 @@ class SupportPersonnelGeneratorTest {
     @Test
     void generate_recruitsEveryGeneratedPerson() {
         Campaign campaign = newCampaignWithUnits(repeat(SupportPersonnelGeneratorTest::mekUnit, 5), 5);
-        CompanyGenerationOptions options = baseOptions();
+        CommandGenerationOptions options = baseOptions();
 
         Result result = SupportPersonnelGenerator.generate(campaign, options, stubSkillGen);
 
@@ -242,7 +241,7 @@ class SupportPersonnelGeneratorTest {
     void generate_adminDemandSplitEquallyAcrossFourRoles() {
         // 400 personnel + 0 techs = 400. ceil(400/20) = 20 admins. Split / 4 = 5 per admin role.
         Campaign campaign = newCampaignWithUnits(Collections.emptyList(), 400);
-        CompanyGenerationOptions options = baseOptions();
+        CommandGenerationOptions options = baseOptions();
 
         Result result = SupportPersonnelGenerator.generate(campaign, options, stubSkillGen);
 
@@ -257,7 +256,7 @@ class SupportPersonnelGeneratorTest {
     void generate_adminPerRoleCoverage_appliedIndependently() {
         // 400 personnel → 20 admins → 5 per role. With Logistics at 200%, only Logistics scales.
         Campaign campaign = newCampaignWithUnits(Collections.emptyList(), 400);
-        CompanyGenerationOptions options = baseOptions();
+        CommandGenerationOptions options = baseOptions();
         options.getSupportPersonnelCoveragePercents().put(PersonnelRole.ADMINISTRATOR_LOGISTICS, 200);
 
         Result result = SupportPersonnelGenerator.generate(campaign, options, stubSkillGen);
@@ -273,7 +272,7 @@ class SupportPersonnelGeneratorTest {
     @Test
     void generate_astechsOff_skipsAstechCreation() {
         Campaign campaign = newCampaignWithUnits(repeat(SupportPersonnelGeneratorTest::mekUnit, 4), 4);
-        CompanyGenerationOptions options = baseOptions();
+        CommandGenerationOptions options = baseOptions();
         options.setGenerateAstechs(false);
 
         Result result = SupportPersonnelGenerator.generate(campaign, options, stubSkillGen);
@@ -287,7 +286,7 @@ class SupportPersonnelGeneratorTest {
     void generate_astechsAsPool_callsIncreaseAsTechPool_atSixPerTech() {
         // 4 Meks → 4 Mek Techs → 4 × 6 = 24 astechs in the pool.
         Campaign campaign = newCampaignWithUnits(repeat(SupportPersonnelGeneratorTest::mekUnit, 4), 4);
-        CompanyGenerationOptions options = baseOptions();
+        CommandGenerationOptions options = baseOptions();
         options.setGenerateAstechs(true);
         options.setAstechsAsPersonnel(false);
 
@@ -301,7 +300,7 @@ class SupportPersonnelGeneratorTest {
     @Test
     void generate_astechsAsPersonnel_createsIndividualAstechPersons() {
         Campaign campaign = newCampaignWithUnits(repeat(SupportPersonnelGeneratorTest::mekUnit, 2), 2);
-        CompanyGenerationOptions options = baseOptions();
+        CommandGenerationOptions options = baseOptions();
         options.setGenerateAstechs(true);
         options.setAstechsAsPersonnel(true);
 
@@ -316,7 +315,7 @@ class SupportPersonnelGeneratorTest {
     @Test
     void generate_astechsSkippedWhenNoTechs() {
         Campaign campaign = newCampaignWithUnits(Collections.emptyList(), 100);
-        CompanyGenerationOptions options = baseOptions();
+        CommandGenerationOptions options = baseOptions();
         options.setGenerateAstechs(true);
 
         Result result = SupportPersonnelGenerator.generate(campaign, options, stubSkillGen);
@@ -332,7 +331,7 @@ class SupportPersonnelGeneratorTest {
     void generate_medicsAsPool_callsIncreaseMedicPool_atFourPerDoctor() {
         // 100 personnel + 0 techs = 100 → 4 doctors. 4 × 4 = 16 medics.
         Campaign campaign = newCampaignWithUnits(Collections.emptyList(), 100);
-        CompanyGenerationOptions options = baseOptions();
+        CommandGenerationOptions options = baseOptions();
         options.setGenerateMedics(true);
         options.setMedicsAsPersonnel(false);
 
@@ -347,7 +346,7 @@ class SupportPersonnelGeneratorTest {
     @Test
     void generate_medicsAsPersonnel_createsIndividualMedicPersons() {
         Campaign campaign = newCampaignWithUnits(Collections.emptyList(), 50);
-        CompanyGenerationOptions options = baseOptions();
+        CommandGenerationOptions options = baseOptions();
         options.setGenerateMedics(true);
         options.setMedicsAsPersonnel(true);
 
@@ -363,7 +362,7 @@ class SupportPersonnelGeneratorTest {
     @Test
     void generate_medicsOff_skipsMedicCreation() {
         Campaign campaign = newCampaignWithUnits(Collections.emptyList(), 100);
-        CompanyGenerationOptions options = baseOptions();
+        CommandGenerationOptions options = baseOptions();
         options.setGenerateMedics(false);
 
         Result result = SupportPersonnelGenerator.generate(campaign, options, stubSkillGen);
@@ -378,7 +377,7 @@ class SupportPersonnelGeneratorTest {
     @Test
     void generate_personnelModeAstechsAndMedics_appearInGeneratedList() {
         Campaign campaign = newCampaignWithUnits(repeat(SupportPersonnelGeneratorTest::mekUnit, 2), 24);
-        CompanyGenerationOptions options = baseOptions();
+        CommandGenerationOptions options = baseOptions();
         options.setGenerateAstechs(true);
         options.setAstechsAsPersonnel(true);
         options.setGenerateMedics(true);
@@ -399,7 +398,7 @@ class SupportPersonnelGeneratorTest {
     @Test
     void generate_poolModeAstechsAndMedics_doNotAppearInGeneratedList() {
         Campaign campaign = newCampaignWithUnits(repeat(SupportPersonnelGeneratorTest::mekUnit, 2), 24);
-        CompanyGenerationOptions options = baseOptions();
+        CommandGenerationOptions options = baseOptions();
         options.setGenerateAstechs(true);
         options.setAstechsAsPersonnel(false);
         options.setGenerateMedics(true);
@@ -416,8 +415,8 @@ class SupportPersonnelGeneratorTest {
 
     // ===== Helpers =====
 
-    private static CompanyGenerationOptions baseOptions() {
-        CompanyGenerationOptions options = new CompanyGenerationOptions(CompanyGenerationMethod.RULESET_BASED);
+    private static CommandGenerationOptions baseOptions() {
+        CommandGenerationOptions options = new CommandGenerationOptions();
         // Route through the mocked Campaign.getFaction() instead of the real default
         // specifiedFaction (which would resolve through the Ranks singleton — not initialized in
         // unit-test context, and would NPE on getRankSystem). The rank-system-swap path is

@@ -48,7 +48,7 @@ import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
+import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
 import mekhq.campaign.universe.commandGeneration.ratgen.SupportPersonnelCalculator.SupportDemand;
 
 /**
@@ -62,7 +62,7 @@ import mekhq.campaign.universe.commandGeneration.ratgen.SupportPersonnelCalculat
  *   <li>{@link SupportPersonnelCalculator#compute(Campaign)} returns the 100%-coverage demand for
  *       each role from the campaign's current force composition.</li>
  *   <li>For each support role this class multiplies the baseline by the user's per-role coverage
- *       percentage on {@link CompanyGenerationOptions#getSupportPersonnelCoveragePercents()}
+ *       percentage on {@link CommandGenerationOptions#getSupportPersonnelCoveragePercents()}
  *       (default 100%), creates that many Persons via {@link Campaign#newPerson(PersonnelRole)},
  *       regenerates their skills at the user-selected experience tier via
  *       {@link AbstractSkillGenerator#generateSkills(Campaign, Person, int)}, sets the
@@ -128,7 +128,7 @@ public final class SupportPersonnelGenerator {
         }
     }
 
-    public static Result generate(Campaign campaign, CompanyGenerationOptions options) {
+    public static Result generate(Campaign campaign, CommandGenerationOptions options) {
         if (campaign == null || options == null) {
             return new Result(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, new ArrayList<>());
         }
@@ -141,7 +141,7 @@ public final class SupportPersonnelGenerator {
      * {@link AbstractSkillGenerator}. Production callers should use the public single-arg form
      * which constructs a {@link DefaultSkillGenerator} from the campaign's skill preferences.
      */
-    static Result generate(Campaign campaign, CompanyGenerationOptions options,
+    static Result generate(Campaign campaign, CommandGenerationOptions options,
           AbstractSkillGenerator skillGen) {
         if (campaign == null || options == null) {
             return new Result(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, new ArrayList<>());
@@ -209,7 +209,7 @@ public final class SupportPersonnelGenerator {
      * the user-selected skill level and faction-appropriate rank to each. Returns the actual count
      * created (zero if either baseline or coverage is non-positive).
      */
-    private static int generateRole(Campaign campaign, CompanyGenerationOptions options,
+    private static int generateRole(Campaign campaign, CommandGenerationOptions options,
           AbstractSkillGenerator skillGen, PersonnelRole role, int baselineDemand, int supportRank,
           RankSystem targetRankSystem, RankValidator rankValidator, List<Person> out) {
         int percent = options.getSupportPersonnelCoveragePercents().getOrDefault(role, 100);
@@ -260,7 +260,7 @@ public final class SupportPersonnelGenerator {
      *
      * @return the number of HR administrators added
      */
-    private static int topUpHumanResourcesToZeroStrain(Campaign campaign, CompanyGenerationOptions options,
+    private static int topUpHumanResourcesToZeroStrain(Campaign campaign, CommandGenerationOptions options,
           AbstractSkillGenerator skillGen, int supportRank, RankSystem targetRankSystem,
           RankValidator rankValidator, List<Person> out) {
         if (!campaign.getCampaignOptions().isUseHRStrain()) {
@@ -289,7 +289,7 @@ public final class SupportPersonnelGenerator {
      * Pool-or-Person dispatch for astech generation. Returns the number of astechs added (pool
      * count or Person count, semantics depend on the mode).
      */
-    private static int applyAstechs(Campaign campaign, CompanyGenerationOptions options,
+    private static int applyAstechs(Campaign campaign, CommandGenerationOptions options,
           AbstractSkillGenerator skillGen, int supportRank, RankSystem targetRankSystem,
           RankValidator rankValidator, int totalTechs, List<Person> out) {
         if (!options.isGenerateAstechs() || totalTechs <= 0) {
@@ -305,7 +305,7 @@ public final class SupportPersonnelGenerator {
     /**
      * Pool-or-Person dispatch for medic generation. Returns the number of medics added.
      */
-    private static int applyMedics(Campaign campaign, CompanyGenerationOptions options,
+    private static int applyMedics(Campaign campaign, CommandGenerationOptions options,
           AbstractSkillGenerator skillGen, int supportRank, RankSystem targetRankSystem,
           RankValidator rankValidator, int totalDoctors, List<Person> out) {
         if (!options.isGenerateMedics() || totalDoctors <= 0) {
@@ -392,10 +392,10 @@ public final class SupportPersonnelGenerator {
 
     /**
      * Picks the rank-authority faction the same way {@link RulesetRankAssigner#apply} does:
-     * honors {@link CompanyGenerationOptions#isUseSpecifiedFactionToAssignRanks()} and falls back
+     * honors {@link CommandGenerationOptions#isUseSpecifiedFactionToAssignRanks()} and falls back
      * to the campaign's faction.
      */
-    private static Faction resolveFaction(Campaign campaign, CompanyGenerationOptions options) {
+    private static Faction resolveFaction(Campaign campaign, CommandGenerationOptions options) {
         Faction specifiedFaction = options.getSpecifiedFaction();
         Faction campaignFaction = campaign.getFaction();
         boolean useSpecified = options.isUseSpecifiedFactionToAssignRanks();

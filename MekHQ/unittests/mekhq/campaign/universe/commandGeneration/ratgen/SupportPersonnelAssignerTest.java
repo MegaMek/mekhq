@@ -54,8 +54,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
-import mekhq.campaign.universe.enums.CompanyGenerationMethod;
+import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
 import mekhq.campaign.universe.enums.TechAssignmentSortFactor;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -96,7 +95,7 @@ class SupportPersonnelAssignerTest {
         Campaign campaign = newCampaign();
         Unit mek = mekUnit(60, mock(Person.class));
         when(campaign.getActiveUnits()).thenReturn(List.of(mek));
-        CompanyGenerationOptions options = baseOptions();
+        CommandGenerationOptions options = baseOptions();
         options.setAssignTechsToUnits(false);
 
         int assigned = SupportPersonnelAssigner.assign(campaign, options,
@@ -117,7 +116,7 @@ class SupportPersonnelAssignerTest {
     void assign_noUnits_returnsZero() {
         Campaign campaign = newCampaign();
         when(campaign.getActiveUnits()).thenReturn(Collections.emptyList());
-        CompanyGenerationOptions options = baseOptions();
+        CommandGenerationOptions options = baseOptions();
 
         int assigned = SupportPersonnelAssigner.assign(campaign, options,
               resultWithTechs(List.of(mekTech(SkillLevel.REGULAR, 8))));
@@ -130,7 +129,7 @@ class SupportPersonnelAssignerTest {
         Campaign campaign = newCampaign();
         Unit mek = mekUnit(60, mock(Person.class));
         when(campaign.getActiveUnits()).thenReturn(List.of(mek));
-        CompanyGenerationOptions options = baseOptions();
+        CommandGenerationOptions options = baseOptions();
 
         int assigned = SupportPersonnelAssigner.assign(campaign, options,
               resultWithTechs(Collections.emptyList()));
@@ -281,7 +280,7 @@ class SupportPersonnelAssignerTest {
         Unit gruntMek = mekUnit(60, lowRank);
         when(campaign.getActiveUnits()).thenReturn(List.of(gruntMek, officerMek));  // intentionally out-of-order
 
-        CompanyGenerationOptions options = baseOptions();
+        CommandGenerationOptions options = baseOptions();
         // Already PILOT_RANK descending by default, just being explicit
         options.setTechAssignmentPrimarySort(TechAssignmentSortFactor.PILOT_RANK);
         options.setTechAssignmentPrimaryDescending(true);
@@ -307,7 +306,7 @@ class SupportPersonnelAssignerTest {
         Unit assaultMek = mockMekUnit(90, /*weight class*/ 4);
         when(campaign.getActiveUnits()).thenReturn(List.of(lightMek, assaultMek));
 
-        CompanyGenerationOptions options = baseOptions();
+        CommandGenerationOptions options = baseOptions();
         options.setTechAssignmentPrimarySort(TechAssignmentSortFactor.UNIT_WEIGHT);
         options.setTechAssignmentPrimaryDescending(true);
         options.setTechAssignmentSecondarySort(TechAssignmentSortFactor.NONE);
@@ -335,7 +334,7 @@ class SupportPersonnelAssignerTest {
         Unit greenMek = mekUnit(60, greenPilot);
         when(campaign.getActiveUnits()).thenReturn(List.of(eliteMek, greenMek));
 
-        CompanyGenerationOptions options = baseOptions();
+        CommandGenerationOptions options = baseOptions();
         options.setTechAssignmentPrimarySort(TechAssignmentSortFactor.PILOT_SKILL);
         options.setTechAssignmentPrimaryDescending(false);  // ascending: low skill first
         options.setTechAssignmentSecondarySort(TechAssignmentSortFactor.NONE);
@@ -360,7 +359,7 @@ class SupportPersonnelAssignerTest {
         Unit b = mekUnit(60, mock(Person.class));
         when(campaign.getActiveUnits()).thenReturn(List.of(a, b));
 
-        CompanyGenerationOptions options = baseOptions();
+        CommandGenerationOptions options = baseOptions();
         options.setTechAssignmentPrimarySort(TechAssignmentSortFactor.NONE);
         options.setTechAssignmentSecondarySort(TechAssignmentSortFactor.NONE);
         options.setTechAssignmentTertiarySort(TechAssignmentSortFactor.NONE);
@@ -406,8 +405,8 @@ class SupportPersonnelAssignerTest {
 
     // ===== Helpers =====
 
-    private static CompanyGenerationOptions baseOptions() {
-        CompanyGenerationOptions options = new CompanyGenerationOptions(CompanyGenerationMethod.RULESET_BASED);
+    private static CommandGenerationOptions baseOptions() {
+        CommandGenerationOptions options = new CommandGenerationOptions();
         // Route through the mocked Campaign.getFaction() instead of the real default
         // specifiedFaction (which would resolve through the Ranks singleton — not initialized in
         // unit-test context). The assigner doesn't itself touch rank systems, but the

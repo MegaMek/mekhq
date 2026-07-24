@@ -41,7 +41,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
+import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.commandGeneration.contents.ForceGeneratorTab;
 import mekhq.gui.commandGeneration.contents.OtherTab;
@@ -74,7 +74,7 @@ import mekhq.gui.commandGeneration.contents.SparesTab;
 public class CommandGenerationPane extends AbstractMHQTabbedPane {
 
     private final Campaign campaign;
-    private final CompanyGenerationOptions options;
+    private final CommandGenerationOptions options;
 
     private SetupTab setupTab;
     private ForceGeneratorTab forceGeneratorTab;
@@ -84,11 +84,11 @@ public class CommandGenerationPane extends AbstractMHQTabbedPane {
     /**
      * @param frame    the parent {@link JFrame} for this pane
      * @param campaign the {@link Campaign} the dialog is generating into
-     * @param options  the {@link CompanyGenerationOptions} preset to round-trip through the tabs; may be
+     * @param options  the {@link CommandGenerationOptions} preset to round-trip through the tabs; may be
      *                 {@code null}, in which case the tabs supply their own defaults
      */
     public CommandGenerationPane(final JFrame frame, final Campaign campaign,
-          final CompanyGenerationOptions options) {
+          final CommandGenerationOptions options) {
         super(frame, ResourceBundle.getBundle(getCommandGenerationResourceBundle()),
               "commandGenerationDialog");
         this.campaign = campaign;

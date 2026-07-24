@@ -58,7 +58,7 @@ import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
+import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
 import mekhq.campaign.universe.enums.ForceNamingMethod;
 import mekhq.campaign.universe.enums.TechAssignmentSortFactor;
 import mekhq.gui.commandGeneration.components.CommandGenerationCheckBox;
@@ -88,7 +88,7 @@ import mekhq.gui.panels.RandomOriginOptionsPanel;
  * </ol>
  *
  * <p>Coverage / skill / astech / medic fields bind to the new {@code supportPersonnelCoveragePercents},
- * {@code supportPersonnelSkillLevels}, and astech/medic triplet on {@link CompanyGenerationOptions} —
+ * {@code supportPersonnelSkillLevels}, and astech/medic triplet on {@link CommandGenerationOptions} —
  * not the legacy absolute-count {@code supportPersonnel} map (which AtB / Windchild paths still
  * use). The legacy {@code poolAssistants} flag is mirrored from {@code generateAstechs ||
  * generateMedics} on write so old presets stay compatible.</p>
@@ -153,7 +153,7 @@ public class SetupTab {
     };
 
     private final Campaign campaign;
-    private CompanyGenerationOptions options;
+    private CommandGenerationOptions options;
 
     // Force shape
     private CommandGenerationCheckBox chkGenerateMercenaryCompanyCommandLance;
@@ -204,7 +204,7 @@ public class SetupTab {
     // Random origin
     private RandomOriginOptionsPanel randomOriginOptionsPanel;
 
-    public SetupTab(Campaign campaign, CompanyGenerationOptions options) {
+    public SetupTab(Campaign campaign, CommandGenerationOptions options) {
         this.campaign = campaign;
         this.options = options;
     }
@@ -727,9 +727,9 @@ public class SetupTab {
 
     /**
      * Pushes values from the supplied options onto this tab's controls. Field-by-field copy; matches
-     * the legacy {@code CompanyGenerationOptionsPanel.setOptions(CompanyGenerationOptions)} mapping.
+     * the legacy {@code CompanyGenerationOptionsPanel.setOptions(CommandGenerationOptions)} mapping.
      */
-    public void loadValuesFromOptions(CompanyGenerationOptions sourceOptions) {
+    public void loadValuesFromOptions(CommandGenerationOptions sourceOptions) {
         this.options = sourceOptions;
         if (sourceOptions == null) {
             return;
@@ -817,7 +817,7 @@ public class SetupTab {
      * Reads values back from this tab's controls into the supplied options. Same mapping as
      * {@link #loadValuesFromOptions} in reverse.
      */
-    public void writeValuesToOptions(CompanyGenerationOptions targetOptions) {
+    public void writeValuesToOptions(CommandGenerationOptions targetOptions) {
         if (targetOptions == null) {
             return;
         }
@@ -853,11 +853,6 @@ public class SetupTab {
         if (cmbMedicSkillLevel.getSelectedItem() instanceof SkillLevel s) {
             targetOptions.setMedicSkillLevel(s);
         }
-        // Mirror to the legacy poolAssistants flag so AtB / Windchild consumers still see a
-        // sensible value if someone copies this preset across methods. "On" if either auxiliary
-        // is generating, regardless of mode.
-        targetOptions.setPoolAssistants(chkGenerateAstechs.isSelected() || chkGenerateMedics.isSelected());
-
         // Tech Assignment
         targetOptions.setAssignTechsToUnits(chkAssignTechsToUnits.isSelected());
         if (cmbTechAssignmentPrimary.getSelectedItem() instanceof TechAssignmentSortFactor f) {
@@ -902,7 +897,7 @@ public class SetupTab {
         return campaign;
     }
 
-    public CompanyGenerationOptions getOptions() {
+    public CommandGenerationOptions getOptions() {
         return options;
     }
 }

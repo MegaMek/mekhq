@@ -58,7 +58,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
+import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
 import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE;
 import mekhq.campaign.universe.commandGeneration.SupportUnitGenerator;
 
@@ -136,18 +136,18 @@ public final class CommandGenerator {
      * hierarchy, drive verification checks).
      *
      * @param campaign the target {@link Campaign}; receives the generated Formations, Units, and Persons
-     * @param options  the user's {@link CompanyGenerationOptions}; the
-     *                 {@link CompanyGenerationOptions#getForceDescriptorSnapshot()} block supplies the
+     * @param options  the user's {@link CommandGenerationOptions}; the
+     *                 {@link CommandGenerationOptions#getForceDescriptorSnapshot()} block supplies the
      *                 ratgen inputs
      * @return the generated {@link Result} bundling the descriptor tree and the flat list of Persons
      *         the pipeline created (the descriptor is {@code null} if the engine layer failed)
      */
-    public static Result generate(Campaign campaign, CompanyGenerationOptions options) {
+    public static Result generate(Campaign campaign, CommandGenerationOptions options) {
         return generate(campaign, options, null);
     }
 
     /**
-     * Same as {@link #generate(Campaign, CompanyGenerationOptions)} but accepts a
+     * Same as {@link #generate(Campaign, CommandGenerationOptions)} but accepts a
      * {@link Ruleset.ProgressListener} the engine and the rest of the pipeline use to surface status
      * updates. Pass {@code null} to suppress all progress callbacks (the default behavior of the
      * two-arg overload).
@@ -155,7 +155,7 @@ public final class CommandGenerator {
      * <p>The listener is called from a background thread (typically a SwingWorker), so any UI work
      * triggered from it must be dispatched onto the EDT.</p>
      */
-    public static Result generate(Campaign campaign, CompanyGenerationOptions options,
+    public static Result generate(Campaign campaign, CommandGenerationOptions options,
           Ruleset.ProgressListener listener) {
         long startedAt = System.currentTimeMillis();
         LOGGER.info("[CompanyGen][Pipeline]==================================================");
@@ -174,7 +174,7 @@ public final class CommandGenerator {
      * <em>without touching the campaign</em>, so the Force Generator preview can show the TO&amp;E and
      * composition before the player commits; {@link #applyToCampaign} then materializes it.
      */
-    public static ForceDescriptor rollForceDescriptor(Campaign campaign, CompanyGenerationOptions options,
+    public static ForceDescriptor rollForceDescriptor(Campaign campaign, CommandGenerationOptions options,
           Ruleset.ProgressListener listener) {
         if (listener != null) {
             listener.updateProgress(0.0, "Preparing generation parameters...");
@@ -187,7 +187,7 @@ public final class CommandGenerator {
         //   they set up the campaign; asking again on a sub-panel risks divergence. Whatever the
         //   embedded ForceGeneratorOptionsView shows in its year field is informational only.
         //
-        // * Faction falls back to the legacy CompanyGenerationOptions faction picker when the snapshot
+        // * Faction falls back to the legacy CommandGenerationOptions faction picker when the snapshot
         //   is still at its constructor default ("IS"). The embedded panel writes a non-default value
         //   on OK, in which case this is a no-op.
         snap.setYear(campaign.getGameYear());
@@ -282,13 +282,13 @@ public final class CommandGenerator {
      * stock the spare-parts warehouse. Operates on a descriptor from {@link #rollForceDescriptor}, so
      * the Force Generator preview commits the exact force the player saw.
      */
-    public static Result applyToCampaign(Campaign campaign, CompanyGenerationOptions options,
+    public static Result applyToCampaign(Campaign campaign, CommandGenerationOptions options,
           ForceDescriptor fd, Ruleset.ProgressListener listener) {
         return applyToCampaign(campaign, options, fd, listener, true);
     }
 
     /**
-     * As {@link #applyToCampaign(Campaign, CompanyGenerationOptions, ForceDescriptor,
+     * As {@link #applyToCampaign(Campaign, CommandGenerationOptions, ForceDescriptor,
      * Ruleset.ProgressListener)}, but {@code generateSupport} controls whether support personnel and
      * vehicles are generated in the same pass. Pass {@code false} to commit only the combat force to
      * the TOE (phase one of two-phase generation); {@link #generateSupportFromToe} can then be run
@@ -297,7 +297,7 @@ public final class CommandGenerator {
      * @param generateSupport {@code true} to also generate support (the one-shot behavior),
      *                        {@code false} to commit combat only
      */
-    public static Result applyToCampaign(Campaign campaign, CompanyGenerationOptions options,
+    public static Result applyToCampaign(Campaign campaign, CommandGenerationOptions options,
           ForceDescriptor fd, Ruleset.ProgressListener listener, boolean generateSupport) {
         // 4-7. Walk the resulting tree; for each leaf, materialize a Unit, attach a crew, and place
         // the unit under the current Formation.
@@ -485,7 +485,7 @@ public final class CommandGenerator {
      *
      * @return the support {@link Person}s created (astech/medic pool hires are not individual Persons)
      */
-    public static List<Person> generateSupportFromToe(Campaign campaign, CompanyGenerationOptions options,
+    public static List<Person> generateSupportFromToe(Campaign campaign, CommandGenerationOptions options,
           Ruleset.ProgressListener listener) {
         LOGGER.info("[CompanyGen][Pipeline]Stage 7e: support personnel generation");
         if (listener != null) {
@@ -589,7 +589,7 @@ public final class CommandGenerator {
      *       campaigns (Clan MekWarriors get their bloodname instead of a fixed-wing-style callsign).</li>
      * </ul>
      */
-    private static void applyPersonnelFlags(Campaign campaign, CompanyGenerationOptions options,
+    private static void applyPersonnelFlags(Campaign campaign, CommandGenerationOptions options,
           List<Person> generatedPersons, @Nullable Person rootCommander) {
         if (options.isAssignCompanyCommanderFlag() && rootCommander != null) {
             rootCommander.setCommander(true);

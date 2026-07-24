@@ -46,7 +46,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
-import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
+import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
 
 /**
  * Wraps the embedded {@link ForceGeneratorOptionsView} from MegaMek. The faction / echelon / unit
@@ -60,7 +60,7 @@ import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
  *
  * <p>The dialog reads the user's selections on OK via {@link #getOptionsView()} →
  * {@link ForceGeneratorOptionsView#buildForceDescriptor()}, then feeds the result into
- * {@code CompanyGenerationOptions.getForceDescriptorSnapshot().populateFromForceDescriptor(fd)}.</p>
+ * {@code CommandGenerationOptions.getForceDescriptorSnapshot().populateFromForceDescriptor(fd)}.</p>
  */
 public class ForceGeneratorTab {
 
@@ -71,11 +71,11 @@ public class ForceGeneratorTab {
 
     private final JFrame frame;
     private final Campaign campaign;
-    private CompanyGenerationOptions options;
+    private CommandGenerationOptions options;
     private ForceGeneratorViewUi viewUi;
     private JSplitPane splitPane;
 
-    public ForceGeneratorTab(JFrame frame, Campaign campaign, CompanyGenerationOptions options) {
+    public ForceGeneratorTab(JFrame frame, Campaign campaign, CommandGenerationOptions options) {
         this.frame = frame;
         this.campaign = campaign;
         this.options = options;
@@ -104,7 +104,7 @@ public class ForceGeneratorTab {
             // the user's New Campaign choice instead of the megamek view's built-in "IS" default.
             // Must run AFTER setCurrentYear (which calls yearUpdated -> refreshFactions and would
             // otherwise reset our selection). On Accept, writeValuesToOptions reads the picker back
-            // as an override on CompanyGenerationOptions.specifiedFaction so ranks follow.
+            // as an override on CommandGenerationOptions.specifiedFaction so ranks follow.
             Faction campaignFaction = campaign.getFaction();
             if (campaignFaction != null) {
                 String code = campaignFaction.getShortName();
@@ -170,7 +170,7 @@ public class ForceGeneratorTab {
      * driving them. If a future preset round-trip needs to set the view's controls from saved values,
      * that goes here.
      */
-    public void loadValuesFromOptions(CompanyGenerationOptions sourceOptions) {
+    public void loadValuesFromOptions(CommandGenerationOptions sourceOptions) {
         this.options = sourceOptions;
     }
 
@@ -178,7 +178,7 @@ public class ForceGeneratorTab {
      * Reads the user's force-shape picks back into the options' snapshot. The dialog can call this on
      * OK as an alternative to going through {@link #getOptionsView()} directly.
      */
-    public void writeValuesToOptions(CompanyGenerationOptions targetOptions) {
+    public void writeValuesToOptions(CommandGenerationOptions targetOptions) {
         ForceGeneratorOptionsView optionsView = getOptionsView();
         if (targetOptions == null || optionsView == null) {
             return;
@@ -189,7 +189,7 @@ public class ForceGeneratorTab {
             // Override the rank-authority faction with whatever the user picked in the Force Gen
             // panel's faction selector. CommandGenerationDialog seeded both inputs from
             // campaign.getFaction() at dialog open (this tab into cbFaction via createTab,
-            // CompanyGenerationOptions.specifiedFaction via seedSpecifiedFactionFromCampaign).
+            // CommandGenerationOptions.specifiedFaction via seedSpecifiedFactionFromCampaign).
             // If the user changed cbFaction here mid-dialog, that becomes the final authority for
             // rank assignment so the rank picker and the unit picker stay aligned.
             String snapshotFactionCode = fd.getFaction();
@@ -216,7 +216,7 @@ public class ForceGeneratorTab {
         return campaign;
     }
 
-    public CompanyGenerationOptions getOptions() {
+    public CommandGenerationOptions getOptions() {
         return options;
     }
 }

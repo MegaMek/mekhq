@@ -45,7 +45,7 @@ import mekhq.utilities.MHQXMLUtility;
 
 /**
  * User-facing inputs for {@code Ruleset.processRoot}, serialized alongside the rest of
- * {@link mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions} so a preset that targets the
+ * {@link mekhq.campaign.universe.commandGeneration.CommandGenerationOptions} so a preset that targets the
  * ratgen pipeline survives a save/load round-trip.
  *
  * <p>Each field maps to a control on {@link megamek.client.ui.dialogs.randomArmy.ForceGeneratorOptionsView}.

@@ -50,7 +50,7 @@ import mekhq.campaign.icons.LayeredFormationIcon;
 import mekhq.campaign.icons.enums.LayeredFormationIconLayer;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
+import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
 
 /**
  * Builds layered formation icons for the Force Generator pipeline, covering every {@link FormationLevel}
@@ -68,7 +68,7 @@ import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
  * </ul>
  *
  * <p>The campaign root Formation additionally gets a LOGO layer (or a generic-'Mek TYPE fallback)
- * driven by {@link CompanyGenerationOptions#isUseOriginNodeFormationIconLogo()}.</p>
+ * driven by {@link CommandGenerationOptions#isUseOriginNodeFormationIconLogo()}.</p>
  *
  * <p>This is the spiritual replacement for {@code AbstractCompanyGenerator.createLayeredFormationIcon}
  * scaled up to the full {@link FormationLevel} space.</p>
@@ -83,14 +83,14 @@ public final class FormationIconBuilder {
 
     /**
      * Walks the campaign's Formation tree rooted at {@code root} and applies a layered icon to every
-     * non-leaf Formation. Honors the icon-related toggles on {@link CompanyGenerationOptions}: if
+     * non-leaf Formation. Honors the icon-related toggles on {@link CommandGenerationOptions}: if
      * {@code isGenerateFormationIcons()} is off, returns immediately.
      *
      * @param root     the campaign's top-level Formation (typically {@code campaign.getFormations()})
      * @param campaign the campaign whose units feed the weight-class math
      * @param options  the options driving icon-generation toggles
      */
-    public static void applyIcons(Formation root, Campaign campaign, CompanyGenerationOptions options) {
+    public static void applyIcons(Formation root, Campaign campaign, CommandGenerationOptions options) {
         if (root == null || campaign == null || options == null) {
             return;
         }

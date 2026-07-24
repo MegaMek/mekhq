@@ -46,7 +46,7 @@ import javax.swing.SpinnerNumberModel;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
+import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
 import mekhq.gui.commandGeneration.components.CommandGenerationLabel;
 import mekhq.gui.commandGeneration.components.CommandGenerationStandardPanel;
 
@@ -64,7 +64,7 @@ import mekhq.gui.commandGeneration.components.CommandGenerationStandardPanel;
  * <p>The same percentages drive both the starting spare inventory at generation time AND the
  * campaign's ongoing auto-logistics during play, so the player's starting-stock policy persists as
  * their long-term resupply policy. Values are read from and written back to the campaign's
- * {@link CampaignOptions} on load/save — no field duplication on {@link CompanyGenerationOptions}.</p>
+ * {@link CampaignOptions} on load/save — no field duplication on {@link CommandGenerationOptions}.</p>
  *
  * <p>Range 0-500%: 100% targets exact stock parity with units in use; below that = under-stocked,
  * above = bench depth. Step size 5 keeps the spinner snappy.</p>
@@ -76,12 +76,12 @@ public class SparesTab {
     private static final int STEP_PERCENT = 5;
 
     private final Campaign campaign;
-    private CompanyGenerationOptions options;
+    private CommandGenerationOptions options;
 
     /** Ordered map: bundle-key suffix (also the lbl{key}.text key) → spinner. */
     private final Map<String, JSpinner> spinners = new LinkedHashMap<>();
 
-    public SparesTab(Campaign campaign, CompanyGenerationOptions options) {
+    public SparesTab(Campaign campaign, CommandGenerationOptions options) {
         this.campaign = campaign;
         this.options = options;
     }
@@ -168,7 +168,7 @@ public class SparesTab {
      * autoLogistics percentages drive ongoing campaign resupply, so the dialog operates on them
      * directly rather than copying through a Company-Generation-only mirror field.
      */
-    public void loadValuesFromOptions(CompanyGenerationOptions sourceOptions) {
+    public void loadValuesFromOptions(CommandGenerationOptions sourceOptions) {
         this.options = sourceOptions;
         if (campaign == null) {
             return;
@@ -197,7 +197,7 @@ public class SparesTab {
      * via {@code PartsInUseManager.findStockUpAmount}, so this write makes the dialog's selections
      * effective immediately for both the initial spawn and ongoing resupply.
      */
-    public void writeValuesToOptions(CompanyGenerationOptions targetOptions) {
+    public void writeValuesToOptions(CommandGenerationOptions targetOptions) {
         if (campaign == null) {
             return;
         }
@@ -228,7 +228,7 @@ public class SparesTab {
         return campaign;
     }
 
-    public CompanyGenerationOptions getOptions() {
+    public CommandGenerationOptions getOptions() {
         return options;
     }
 }

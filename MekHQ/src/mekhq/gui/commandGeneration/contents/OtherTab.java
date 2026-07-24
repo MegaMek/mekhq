@@ -44,7 +44,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
+import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
 import mekhq.gui.commandGeneration.components.CommandGenerationCheckBox;
 import mekhq.gui.commandGeneration.components.CommandGenerationLabel;
 import mekhq.gui.commandGeneration.components.CommandGenerationStandardPanel;
@@ -67,7 +67,7 @@ import mekhq.gui.commandGeneration.components.CommandGenerationStandardPanel;
 public class OtherTab {
 
     private final Campaign campaign;
-    private CompanyGenerationOptions options;
+    private CommandGenerationOptions options;
 
     // Contracts
     private CommandGenerationCheckBox chkSelectStartingContract;
@@ -88,7 +88,7 @@ public class OtherTab {
     private CommandGenerationCheckBox chkSimulateRandomMarriages;
     private CommandGenerationCheckBox chkSimulateRandomProcreation;
 
-    public OtherTab(Campaign campaign, CompanyGenerationOptions options) {
+    public OtherTab(Campaign campaign, CommandGenerationOptions options) {
         this.campaign = campaign;
         this.options = options;
     }
@@ -255,7 +255,7 @@ public class OtherTab {
         return gbc;
     }
 
-    public void loadValuesFromOptions(CompanyGenerationOptions sourceOptions) {
+    public void loadValuesFromOptions(CommandGenerationOptions sourceOptions) {
         this.options = sourceOptions;
         if (sourceOptions == null) {
             return;
@@ -290,7 +290,7 @@ public class OtherTab {
         chkSimulateRandomProcreation.setEnabled(sim);
     }
 
-    public void writeValuesToOptions(CompanyGenerationOptions targetOptions) {
+    public void writeValuesToOptions(CommandGenerationOptions targetOptions) {
         if (targetOptions == null) {
             return;
         }
@@ -321,7 +321,7 @@ public class OtherTab {
         return campaign;
     }
 
-    public CompanyGenerationOptions getOptions() {
+    public CommandGenerationOptions getOptions() {
         return options;
     }
 }

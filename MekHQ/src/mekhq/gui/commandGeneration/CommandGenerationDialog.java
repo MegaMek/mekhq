@@ -77,11 +77,10 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
+import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
 import mekhq.campaign.universe.commandGeneration.ratgen.CommandGenerator;
 import mekhq.campaign.universe.commandGeneration.ratgen.ForceDescriptorSnapshot;
 import mekhq.campaign.universe.commandGeneration.ratgen.RulesetEngineBootstrap;
-import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 import mekhq.campaign.universe.factionStanding.FactionStandingJudgmentType;
 import mekhq.gui.baseComponents.AbstractMHQValidationButtonDialog;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
@@ -96,8 +95,8 @@ import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentDialog;
  * <p>This dialog used to wrap a monolithic {@code CompanyGenerationOptionsPanel} that exposed
  * AtB / Windchild method pickers alongside the ratgen path. With the deletion of those legacy
  * generators, the dialog runs the ratgen pipeline unconditionally: the four tabs persist user
- * preferences into {@link CompanyGenerationOptions} and the campaign's auto-logistics percentages,
- * then {@link CommandGenerator#generate(Campaign, CompanyGenerationOptions)} performs the actual
+ * preferences into {@link CommandGenerationOptions} and the campaign's auto-logistics percentages,
+ * then {@link CommandGenerator#generate(Campaign, CommandGenerationOptions)} performs the actual
  * generation.</p>
  *
  * @author Justin "Windchild" Bowen (original)
@@ -107,13 +106,13 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
     private static final MMLogger LOGGER = MMLogger.create(CommandGenerationDialog.class);
 
     private Campaign campaign;
-    private CompanyGenerationOptions companyGenerationOptions;
+    private CommandGenerationOptions commandGenerationOptions;
     private CommandGenerationPane pane;
 
     public CommandGenerationDialog(final JFrame frame, final Campaign campaign) {
         super(frame, "CommandGenerationDialog", "CommandGenerationDialog.title");
         setCampaign(campaign);
-        setCompanyGenerationOptions(null);
+        setCommandGenerationOptions(null);
         initialize();
     }
 
@@ -125,12 +124,12 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
         this.campaign = campaign;
     }
 
-    public @Nullable CompanyGenerationOptions getCompanyGenerationOptions() {
-        return companyGenerationOptions;
+    public @Nullable CommandGenerationOptions getCommandGenerationOptions() {
+        return commandGenerationOptions;
     }
 
-    public void setCompanyGenerationOptions(final @Nullable CompanyGenerationOptions companyGenerationOptions) {
-        this.companyGenerationOptions = companyGenerationOptions;
+    public void setCommandGenerationOptions(final @Nullable CommandGenerationOptions commandGenerationOptions) {
+        this.commandGenerationOptions = commandGenerationOptions;
     }
 
     public CommandGenerationPane getPane() {
@@ -139,11 +138,11 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
 
     @Override
     protected Container createCenterPane() {
-        CompanyGenerationOptions startingOptions;
-        if (companyGenerationOptions != null) {
-            startingOptions = companyGenerationOptions;
+        CommandGenerationOptions startingOptions;
+        if (commandGenerationOptions != null) {
+            startingOptions = commandGenerationOptions;
         } else {
-            startingOptions = new CompanyGenerationOptions(CompanyGenerationMethod.RULESET_BASED);
+            startingOptions = new CommandGenerationOptions();
             seedSpecifiedFactionFromCampaign(startingOptions, "createCenterPane");
         }
         pane = new CommandGenerationPane(getFrame(), getCampaign(), startingOptions);
@@ -228,7 +227,7 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
     }
 
     private void restoreDefaultsActionListener(final ActionEvent evt) {
-        CompanyGenerationOptions defaults = new CompanyGenerationOptions(CompanyGenerationMethod.RULESET_BASED);
+        CommandGenerationOptions defaults = new CommandGenerationOptions();
         seedSpecifiedFactionFromCampaign(defaults, "restoreDefaults");
         pane.getSetupTab().loadValuesFromOptions(defaults);
         pane.getForceGeneratorTab().loadValuesFromOptions(defaults);
@@ -237,8 +236,8 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
     }
 
     /**
-     * Overwrites {@link CompanyGenerationOptions#getSpecifiedFaction()} with the current
-     * campaign's faction. The CompanyGenerationOptions constructor defaults specifiedFaction to a
+     * Overwrites {@link CommandGenerationOptions#getSpecifiedFaction()} with the current
+     * campaign's faction. The CommandGenerationOptions constructor defaults specifiedFaction to a
      * global default (typically Mercenary) regardless of campaign, so a Clan campaign loading the
      * dialog for the first time would otherwise have a MERC rank-authority faction seeded —
      * meaning {@code RulesetRankAssigner} resolves to MERC, picks the IS rank-index policy
@@ -249,7 +248,7 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
      * @param caller  identifier for the call site (logged so traces can distinguish first-open
      *                from restore-defaults from OK paths)
      */
-    private void seedSpecifiedFactionFromCampaign(CompanyGenerationOptions options, String caller) {
+    private void seedSpecifiedFactionFromCampaign(CommandGenerationOptions options, String caller) {
         if (options == null || campaign == null) {
             return;
         }
@@ -270,14 +269,14 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
 
     @Override
     protected void okAction() {
-        // Build a CompanyGenerationOptions snapshot from the four tabs. The Setup / Force Generator /
+        // Build a CommandGenerationOptions snapshot from the four tabs. The Setup / Force Generator /
         // Other tabs all round-trip through this object; the Spares tab writes to CampaignOptions
         // directly (see SparesTab.writeValuesToOptions for the rationale).
-        CompanyGenerationOptions options;
-        if (companyGenerationOptions != null) {
-            options = companyGenerationOptions;
+        CommandGenerationOptions options;
+        if (commandGenerationOptions != null) {
+            options = commandGenerationOptions;
         } else {
-            options = new CompanyGenerationOptions(CompanyGenerationMethod.RULESET_BASED);
+            options = new CommandGenerationOptions();
             seedSpecifiedFactionFromCampaign(options, "okAction-fresh");
         }
         pane.getSetupTab().writeValuesToOptions(options);
@@ -387,7 +386,7 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
      *
      * @return {@code true} if the player chose Build, {@code false} if they cancelled
      */
-    private boolean confirmBuildCommand(CompanyGenerationOptions options, Integer chosenEchelon,
+    private boolean confirmBuildCommand(CommandGenerationOptions options, Integer chosenEchelon,
           int combatUnitCount) {
         StringBuilder message = new StringBuilder(
               MessageFormat.format(resources.getString("CommandGenerationDialog.confirmBuild.text"),
@@ -480,7 +479,7 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
      *
      * @return the applicable warning lines, empty if none apply
      */
-    private List<String> collectPreGenerationWarnings(CompanyGenerationOptions options, Integer chosenEchelon) {
+    private List<String> collectPreGenerationWarnings(CommandGenerationOptions options, Integer chosenEchelon) {
         List<String> warnings = new ArrayList<>();
 
         if (chosenEchelon != null && chosenEchelon >= 7) {
@@ -526,7 +525,7 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
      * units) after {@link CommandGenerator#generate} completes. Split out of {@link #okAction()} so
      * the EDT-side cleanup is the only thing the {@link SwingWorker#done()} callback has to do.
      */
-    private void applyPostGenerationExtras(CompanyGenerationOptions options, List<Person> generatedPersons) {
+    private void applyPostGenerationExtras(CommandGenerationOptions options, List<Person> generatedPersons) {
         long startNanos = System.nanoTime();
         LOGGER.info("[CompanyGen][PostGen] START (thread={}, generatedPersons={})",
               Thread.currentThread().getName(), generatedPersons.size());
@@ -551,7 +550,7 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
     }
 
     private void processBonusUnitsBasedOnCampaignOptions(List<Person> generatedPersons,
-          CompanyGenerationOptions options) {
+          CommandGenerationOptions options) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         // Medical reserve: a generation-only option (independent of the campaign-wide Alternative
         // Advanced Medical rule). Creates spare unassigned MekWarriors as injury replacements, sized
@@ -584,7 +583,7 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
         }
     }
 
-    private void generateSparePersonnel(CompanyGenerationOptions options) {
+    private void generateSparePersonnel(CommandGenerationOptions options) {
         Person person = campaign.newPerson(PersonnelRole.MEKWARRIOR);
 
         overrideSkills(campaign, person, PersonnelRole.MEKWARRIOR, SkillLevel.GREEN, true);

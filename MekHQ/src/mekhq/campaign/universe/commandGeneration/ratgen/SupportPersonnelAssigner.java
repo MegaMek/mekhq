@@ -46,7 +46,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
+import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
 import mekhq.campaign.universe.enums.TechAssignmentSortFactor;
 
 /**
@@ -58,7 +58,7 @@ import mekhq.campaign.universe.enums.TechAssignmentSortFactor;
  *
  * <ul>
  *   <li><b>Units</b> are sorted using a chain of 1-3 user-picked sort slots (Pilot Rank /
- *       Unit Weight Class / Pilot Skill) from {@link CompanyGenerationOptions}. Each slot has its
+ *       Unit Weight Class / Pilot Skill) from {@link CommandGenerationOptions}. Each slot has its
  *       own ascending / descending direction. Slots set to {@link TechAssignmentSortFactor#NONE}
  *       are skipped.</li>
  *   <li><b>Techs</b> in each role pool are sorted by quality descending — primarily by
@@ -83,7 +83,7 @@ import mekhq.campaign.universe.enums.TechAssignmentSortFactor;
  *   <tr><td>Infantry</td><td>(no maintenance)</td></tr>
  * </table>
  *
- * <p>Gated on {@link CompanyGenerationOptions#isAssignTechsToUnits()}.</p>
+ * <p>Gated on {@link CommandGenerationOptions#isAssignTechsToUnits()}.</p>
  */
 public final class SupportPersonnelAssigner {
 
@@ -104,7 +104,7 @@ public final class SupportPersonnelAssigner {
      *                         the pool this method draws from
      * @return the number of unit-to-tech assignments made
      */
-    public static int assign(Campaign campaign, CompanyGenerationOptions options,
+    public static int assign(Campaign campaign, CommandGenerationOptions options,
           SupportPersonnelGenerator.Result generationResult) {
         if (campaign == null || options == null || generationResult == null) {
             return 0;
@@ -205,7 +205,7 @@ public final class SupportPersonnelAssigner {
     }
 
     private static Comparator<Unit> buildUnitComparator(Campaign campaign,
-          CompanyGenerationOptions options) {
+          CommandGenerationOptions options) {
         Comparator<Unit> chain = (a, b) -> 0;
         chain = appendSlot(chain, campaign, options.getTechAssignmentPrimarySort(),
               options.isTechAssignmentPrimaryDescending());

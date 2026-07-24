@@ -51,7 +51,7 @@ import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
+import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
 
 /**
  * Tree-aware rank assignment pass for the Force Generator pipeline.
@@ -79,8 +79,8 @@ import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
  * rank system (loaded from {@code data/universe/ranks.xml} per faction) maps the integer index to the
  * faction-appropriate display name.</p>
  *
- * <p>Gated on {@link CompanyGenerationOptions#isAutomaticallyAssignRanks()}. Honors
- * {@link CompanyGenerationOptions#isUseSpecifiedFactionToAssignRanks()} for the faction picker.</p>
+ * <p>Gated on {@link CommandGenerationOptions#isAutomaticallyAssignRanks()}. Honors
+ * {@link CommandGenerationOptions#isUseSpecifiedFactionToAssignRanks()} for the faction picker.</p>
  */
 public final class RulesetRankAssigner {
 
@@ -99,7 +99,7 @@ public final class RulesetRankAssigner {
      *         promote
      */
     @Nullable
-    public static Person apply(Campaign campaign, CompanyGenerationOptions options) {
+    public static Person apply(Campaign campaign, CommandGenerationOptions options) {
         long startNanos = System.nanoTime();
         if (campaign == null || options == null) {
             LOGGER.info("[CompanyGen][RankAssign] apply: campaign or options null, skipping");
@@ -307,7 +307,7 @@ public final class RulesetRankAssigner {
      * {@code ranks.xml} for the canonical command-size-to-slot mapping per family.</p>
      *
      * <p>Package-private so {@code RulesetRankAssignerTest} can pin the mapping without going
-     * through the full {@link #apply(Campaign, CompanyGenerationOptions)} pipeline.</p>
+     * through the full {@link #apply(Campaign, CommandGenerationOptions)} pipeline.</p>
      */
     static int rankIndexForLevel(FormationLevel level) {
         if (level == null) {
