@@ -16,7 +16,7 @@
  * A copy of the GPL should have been included with this project;
  * if not, see <https://www.gnu.org/licenses/>.
  *
- * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * NOTICE: The MekHQ organization is a non-profit group of volunteers
  * creating free software for the BattleTech community.
  *
  * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
@@ -39,35 +39,53 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
 import mekhq.gui.commandGeneration.components.CommandGenerationCheckBox;
 import mekhq.gui.commandGeneration.components.CommandGenerationLabel;
 import mekhq.gui.commandGeneration.components.CommandGenerationStandardPanel;
 
 /**
- * Post-generation rules and miscellany. Four titled sections stacked vertically:
+ * Spares &amp; Finances tab: the merged former Spares and Other tabs, laid out in the two-column
+ * style of the Personnel &amp; Officers tab.
  *
+ * <p><b>Left column - Spare Parts Coverage.</b> Mirrors the AutoLogistics restock percentages from
+ * Campaign Options' Acquisition &amp; Delivery page: the same thirteen part categories, in the same
+ * order, with the same labels, tooltips, and 0-10000 range. The values ARE the campaign options:
+ * spinners load from and write back to the campaign's {@link CampaignOptions} {@code autoLogistics*}
+ * fields directly, so the tab always opens showing whatever is set in Campaign Options and edits
+ * here apply to the campaign on OK - no field duplication on {@link CommandGenerationOptions}. The
+ * same percentages drive both the starting spare inventory at generation time and the campaign's
+ * ongoing auto-logistics resupply during play.</p>
+ *
+ * <p><b>Right column</b> - the post-generation rule sections:</p>
  * <ol>
- *   <li><b>Contracts</b> — Select Starting Contract, Start Course to Contract Planet</li>
- *   <li><b>Finances</b> — Process Finances master toggle plus starting cash / randomization /
- *       minimum-float / initial contract payment / starting-loan / six "Pay For" toggles</li>
- *   <li><b>Starting Simulation</b> — Run Starting Simulation toggle plus duration spinner and the
+ *   <li><b>Contracts</b> - Select Starting Contract, Start Course to Contract Planet</li>
+ *   <li><b>Finances</b> - Process Finances master toggle plus starting cash / randomization /
+ *       minimum-float / starting-loan / six "Pay For" toggles</li>
+ *   <li><b>Starting Simulation</b> - Run Starting Simulation toggle plus duration spinner and the
  *       two random-event toggles (marriages, procreation)</li>
  * </ol>
- *
- * <p>Legacy "Unit Extras" (mothballed counts, AtB/Windchild-only roll customizations) are
- * intentionally omitted — those controls are tied to the soon-to-be-deleted Windchild / AtB
- * generators and have no analogue in the Force Generator pipeline.</p>
  */
-public class OtherTab {
+public class SparesAndFinancesTab {
+
+    // Mirror the Campaign Options AutoLogistics spinners (AcquisitionPage.createAutoLogisticsPanel):
+    // 0-10000 in steps of 1, so no value settable there is ever clamped or rounded here.
+    private static final int MIN_PERCENT = 0;
+    private static final int MAX_PERCENT = 10000;
+    private static final int STEP_PERCENT = 1;
 
     private final Campaign campaign;
     private CommandGenerationOptions options;
+
+    /** Ordered map: bundle-key suffix (also the lbl{key}.text key) → spares spinner. */
+    private final Map<String, JSpinner> spinners = new LinkedHashMap<>();
 
     // Contracts
     private CommandGenerationCheckBox chkSelectStartingContract;
@@ -88,24 +106,112 @@ public class OtherTab {
     private CommandGenerationCheckBox chkSimulateRandomMarriages;
     private CommandGenerationCheckBox chkSimulateRandomProcreation;
 
-    public OtherTab(Campaign campaign, CommandGenerationOptions options) {
+    public SparesAndFinancesTab(Campaign campaign, CommandGenerationOptions options) {
         this.campaign = campaign;
         this.options = options;
     }
 
     public JPanel createTab() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setName("pnlOtherTab");
+        // Two-column composition matching SetupTab: each column is a BoxLayout stack of bordered
+        // sections, pinned north-west so the columns grow downward together.
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setName("pnlSparesAndFinancesTab");
 
-        panel.add(buildContractsSection());
-        panel.add(Box.createVerticalStrut(6));
-        panel.add(buildFinancesSection());
-        panel.add(Box.createVerticalStrut(6));
-        panel.add(buildStartingSimulationSection());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.insets = new Insets(3, 6, 3, 6);
+
+        // Left column: the thirteen-row spares grid with its help text beneath - together roughly
+        // the height of the right column's three stacked sections.
+        JPanel leftColumn = new JPanel();
+        leftColumn.setLayout(new BoxLayout(leftColumn, BoxLayout.Y_AXIS));
+        leftColumn.add(buildSparesSection());
+        leftColumn.add(Box.createVerticalStrut(6));
+        leftColumn.add(buildHelpSection());
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 1;
+        gbc.weightx = 0.5;
+        gbc.weighty = 1.0;
+        panel.add(leftColumn, gbc);
+
+        // Right column: Contracts (2 rows) + Finances (the tallest section) + Starting Simulation.
+        JPanel rightColumn = new JPanel();
+        rightColumn.setLayout(new BoxLayout(rightColumn, BoxLayout.Y_AXIS));
+        rightColumn.add(buildContractsSection());
+        rightColumn.add(Box.createVerticalStrut(6));
+        rightColumn.add(buildFinancesSection());
+        rightColumn.add(Box.createVerticalStrut(6));
+        rightColumn.add(buildStartingSimulationSection());
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.weightx = 0.5;
+        panel.add(rightColumn, gbc);
 
         return panel;
     }
+
+    // region Spares column
+
+    private JPanel buildSparesSection() {
+        CommandGenerationStandardPanel section = new CommandGenerationStandardPanel(
+              "SparesPercentages", true, "SparesPercentages");
+        section.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = sectionConstraints();
+
+        // Same categories and order as the Campaign Options AutoLogistics grid.
+        String[] keys = {
+              "SparesMekHead",
+              "SparesMekLocation",
+              "SparesNonRepairableLocation",
+              "SparesArmor",
+              "SparesAmmunition",
+              "SparesHeatSink",
+              "SparesWeapons",
+              "SparesActuators",
+              "SparesJumpJets",
+              "SparesHeadComponents",
+              "SparesEngines",
+              "SparesGyros",
+              "SparesOther"
+        };
+
+        int row = 0;
+        for (String key : keys) {
+            JSpinner spinner = new JSpinner(new SpinnerNumberModel(100, MIN_PERCENT, MAX_PERCENT, STEP_PERCENT));
+            spinner.setName("spn" + key);
+            spinners.put(key, spinner);
+
+            JLabel label = new CommandGenerationLabel(key);
+            label.setLabelFor(spinner);
+
+            gbc.gridy = row;
+            gbc.gridx = 0;
+            section.add(label, gbc);
+            gbc.gridx = 1;
+            section.add(spinner, gbc);
+            row++;
+        }
+
+        return section;
+    }
+
+    private JPanel buildHelpSection() {
+        CommandGenerationStandardPanel section = new CommandGenerationStandardPanel(
+              "SparesHelp", true, "SparesHelp");
+        section.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = sectionConstraints();
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        section.add(new CommandGenerationLabel("SparesHelpBody", true), gbc);
+        return section;
+    }
+
+    // endregion Spares column
+
+    // region Finances column
 
     private JPanel buildContractsSection() {
         CommandGenerationStandardPanel section = new CommandGenerationStandardPanel(
@@ -244,6 +350,8 @@ public class OtherTab {
         return section;
     }
 
+    // endregion Finances column
+
     private static GridBagConstraints sectionConstraints() {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -255,8 +363,16 @@ public class OtherTab {
         return gbc;
     }
 
+    /**
+     * Reads values into the tab's controls. The spares spinners load from the campaign's
+     * {@link CampaignOptions} (their source of truth); the contract / finance / simulation controls
+     * load from the supplied {@code sourceOptions}.
+     */
     public void loadValuesFromOptions(CommandGenerationOptions sourceOptions) {
         this.options = sourceOptions;
+
+        loadSparesFromCampaignOptions();
+
         if (sourceOptions == null) {
             return;
         }
@@ -290,7 +406,38 @@ public class OtherTab {
         chkSimulateRandomProcreation.setEnabled(sim);
     }
 
+    private void loadSparesFromCampaignOptions() {
+        if (campaign == null) {
+            return;
+        }
+        CampaignOptions co = campaign.getCampaignOptions();
+        if (co == null) {
+            return;
+        }
+        spinners.get("SparesMekHead").setValue(clamp(co.getAutoLogisticsMekHead()));
+        spinners.get("SparesMekLocation").setValue(clamp(co.getAutoLogisticsMekLocation()));
+        spinners.get("SparesNonRepairableLocation").setValue(clamp(co.getAutoLogisticsNonRepairableLocation()));
+        spinners.get("SparesArmor").setValue(clamp(co.getAutoLogisticsArmor()));
+        spinners.get("SparesAmmunition").setValue(clamp(co.getAutoLogisticsAmmunition()));
+        spinners.get("SparesHeatSink").setValue(clamp(co.getAutoLogisticsHeatSink()));
+        spinners.get("SparesWeapons").setValue(clamp(co.getAutoLogisticsWeapons()));
+        spinners.get("SparesActuators").setValue(clamp(co.getAutoLogisticsActuators()));
+        spinners.get("SparesJumpJets").setValue(clamp(co.getAutoLogisticsJumpJets()));
+        spinners.get("SparesHeadComponents").setValue(clamp(co.getAutoLogisticsHeadComponents()));
+        spinners.get("SparesEngines").setValue(clamp(co.getAutoLogisticsEngines()));
+        spinners.get("SparesGyros").setValue(clamp(co.getAutoLogisticsGyros()));
+        spinners.get("SparesOther").setValue(clamp(co.getAutoLogisticsOther()));
+    }
+
+    /**
+     * Writes the tab's controls back out. The spares spinners write to the campaign's
+     * {@link CampaignOptions} (making the dialog's selections effective immediately for both the
+     * initial spawn and ongoing resupply); the contract / finance / simulation controls write to the
+     * supplied {@code targetOptions}.
+     */
     public void writeValuesToOptions(CommandGenerationOptions targetOptions) {
+        writeSparesToCampaignOptions();
+
         if (targetOptions == null) {
             return;
         }
@@ -315,6 +462,35 @@ public class OtherTab {
         targetOptions.setSimulationDuration((Integer) spnSimulationDuration.getValue());
         targetOptions.setSimulateRandomMarriages(chkSimulateRandomMarriages.isSelected());
         targetOptions.setSimulateRandomProcreation(chkSimulateRandomProcreation.isSelected());
+    }
+
+    private void writeSparesToCampaignOptions() {
+        if (campaign == null) {
+            return;
+        }
+        CampaignOptions co = campaign.getCampaignOptions();
+        if (co == null) {
+            return;
+        }
+        co.setAutoLogisticsMekHead((Integer) spinners.get("SparesMekHead").getValue());
+        co.setAutoLogisticsMekLocation((Integer) spinners.get("SparesMekLocation").getValue());
+        co.setAutoLogisticsNonRepairableLocation((Integer) spinners.get("SparesNonRepairableLocation").getValue());
+        co.setAutoLogisticsArmor((Integer) spinners.get("SparesArmor").getValue());
+        co.setAutoLogisticsAmmunition((Integer) spinners.get("SparesAmmunition").getValue());
+        co.setAutoLogisticsHeatSink((Integer) spinners.get("SparesHeatSink").getValue());
+        co.setAutoLogisticsWeapons((Integer) spinners.get("SparesWeapons").getValue());
+        co.setAutoLogisticsActuators((Integer) spinners.get("SparesActuators").getValue());
+        co.setAutoLogisticsJumpJets((Integer) spinners.get("SparesJumpJets").getValue());
+        co.setAutoLogisticsHeadComponents((Integer) spinners.get("SparesHeadComponents").getValue());
+        co.setAutoLogisticsEngines((Integer) spinners.get("SparesEngines").getValue());
+        co.setAutoLogisticsGyros((Integer) spinners.get("SparesGyros").getValue());
+        co.setAutoLogisticsOther((Integer) spinners.get("SparesOther").getValue());
+    }
+
+    private static int clamp(int value) {
+        if (value < MIN_PERCENT) return MIN_PERCENT;
+        if (value > MAX_PERCENT) return MAX_PERCENT;
+        return value;
     }
 
     public Campaign getCampaign() {

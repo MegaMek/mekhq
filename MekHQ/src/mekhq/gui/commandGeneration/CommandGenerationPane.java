@@ -44,9 +44,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.commandGeneration.contents.ForceGeneratorTab;
-import mekhq.gui.commandGeneration.contents.OtherTab;
 import mekhq.gui.commandGeneration.contents.SetupTab;
-import mekhq.gui.commandGeneration.contents.SparesTab;
+import mekhq.gui.commandGeneration.contents.SparesAndFinancesTab;
 
 /**
  * Top-level {@link AbstractMHQTabbedPane} for the Company Generation dialog.
@@ -57,12 +56,13 @@ import mekhq.gui.commandGeneration.contents.SparesTab;
  *       random origin</li>
  *   <li><b>Force Generator</b> — the embedded MegaMek Force Generator panel; the actual generation
  *       inputs (faction / echelon / unit type / weight / rating / experience / transport %)</li>
- *   <li><b>Spares</b> — twelve percentages bound to {@code CampaignOptions.getAutoLogistics*()}</li>
- *   <li><b>Other</b> — finances, contracts, starting simulation, surprises, unit extras</li>
+ *   <li><b>Spares &amp; Finances</b> — the AutoLogistics restock percentages (bound to
+ *       {@code CampaignOptions.getAutoLogistics*()}) alongside contracts, finances, and the
+ *       starting simulation</li>
  * </ol>
  *
- * <p>This Pane is the spiritual counterpart of {@code CampaignOptionsPane}, scaled down to the four
- * tabs the Company Generation dialog needs. The Tab classes themselves live in
+ * <p>This Pane is the spiritual counterpart of {@code CampaignOptionsPane}, scaled down to the three
+ * tabs the Command Designer needs. The Tab classes themselves live in
  * {@link mekhq.gui.commandGeneration.contents} and are plain Java classes following the same
  * "constructor + {@code createTab()} + {@code loadValuesFromOptions()}" convention used in the
  * Campaign Options package.</p>
@@ -74,8 +74,7 @@ public class CommandGenerationPane extends AbstractMHQTabbedPane {
 
     private SetupTab setupTab;
     private ForceGeneratorTab forceGeneratorTab;
-    private SparesTab sparesTab;
-    private OtherTab otherTab;
+    private SparesAndFinancesTab sparesAndFinancesTab;
 
     /**
      * @param frame    the parent {@link JFrame} for this pane
@@ -93,20 +92,18 @@ public class CommandGenerationPane extends AbstractMHQTabbedPane {
     }
 
     /**
-     * Builds and attaches the four tabs. Each tab content is wrapped in a {@link JScrollPane} so dense
+     * Builds and attaches the three tabs. Each tab content is wrapped in a {@link JScrollPane} so dense
      * sub-sections (Setup in particular) can scroll independently of the dialog window size.
      */
     @Override
     protected void initialize() {
         setupTab = new SetupTab(campaign, options);
         forceGeneratorTab = new ForceGeneratorTab(getFrame(), campaign, options);
-        sparesTab = new SparesTab(campaign, options);
-        otherTab = new OtherTab(campaign, options);
+        sparesAndFinancesTab = new SparesAndFinancesTab(campaign, options);
 
         addTab(tabTitle("setupTab"), wrap(setupTab.createTab()));
         addTab(tabTitle("forceGeneratorTab"), wrap(forceGeneratorTab.createTab()));
-        addTab(tabTitle("sparesTab"), wrap(sparesTab.createTab()));
-        addTab(tabTitle("otherTab"), wrap(otherTab.createTab()));
+        addTab(tabTitle("sparesAndFinancesTab"), wrap(sparesAndFinancesTab.createTab()));
     }
 
     public SetupTab getSetupTab() {
@@ -117,12 +114,8 @@ public class CommandGenerationPane extends AbstractMHQTabbedPane {
         return forceGeneratorTab;
     }
 
-    public SparesTab getSparesTab() {
-        return sparesTab;
-    }
-
-    public OtherTab getOtherTab() {
-        return otherTab;
+    public SparesAndFinancesTab getSparesAndFinancesTab() {
+        return sparesAndFinancesTab;
     }
 
     private static String tabTitle(String resourceKey) {

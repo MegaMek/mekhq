@@ -90,12 +90,12 @@ import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentDialog;
 
 /**
  * Top-level dialog for the Command Generator (Command Designer). Hosts a
- * {@link CommandGenerationPane} with four tabs (Setup, Force Generator, Spares, Other) and runs the
- * ratgen pipeline on Accept &amp; Build.
+ * {@link CommandGenerationPane} with three tabs (Personnel &amp; Officers, Force Generator,
+ * Spares &amp; Finances) and runs the ratgen pipeline on Accept &amp; Build.
  *
- * <p>The four tabs persist user preferences into {@link CommandGenerationOptions} and the
- * campaign's auto-logistics percentages, then {@link CommandGenerator} materializes the previewed
- * command into the campaign.</p>
+ * <p>The tabs persist user preferences into {@link CommandGenerationOptions} and the campaign's
+ * auto-logistics percentages, then {@link CommandGenerator} materializes the previewed command into
+ * the campaign.</p>
  *
  * @author Justin "Windchild" Bowen (original)
  */
@@ -148,8 +148,7 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
         // Populate every tab from the supplied options on first show.
         pane.getSetupTab().loadValuesFromOptions(startingOptions);
         pane.getForceGeneratorTab().loadValuesFromOptions(startingOptions);
-        pane.getSparesTab().loadValuesFromOptions(startingOptions);
-        pane.getOtherTab().loadValuesFromOptions(startingOptions);
+        pane.getSparesAndFinancesTab().loadValuesFromOptions(startingOptions);
 
         // Persistent design-stage banner so the player always knows this workspace is a draft: nothing
         // reaches the campaign until "Accept & Build Command". Text-only with a bottom separator (no
@@ -229,8 +228,7 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
         seedSpecifiedFactionFromCampaign(defaults, "restoreDefaults");
         pane.getSetupTab().loadValuesFromOptions(defaults);
         pane.getForceGeneratorTab().loadValuesFromOptions(defaults);
-        pane.getSparesTab().loadValuesFromOptions(defaults);
-        pane.getOtherTab().loadValuesFromOptions(defaults);
+        pane.getSparesAndFinancesTab().loadValuesFromOptions(defaults);
     }
 
     /**
@@ -279,8 +277,7 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
         }
         pane.getSetupTab().writeValuesToOptions(options);
         pane.getForceGeneratorTab().writeValuesToOptions(options);
-        pane.getSparesTab().writeValuesToOptions(options);
-        pane.getOtherTab().writeValuesToOptions(options);
+        pane.getSparesAndFinancesTab().writeValuesToOptions(options);
 
         // Accept commits the exact force the player previewed on the Force Generator tab (its Generate
         // button rolls the ForceDescriptor and fills the TO&E tree + Composition Summary). Require a
