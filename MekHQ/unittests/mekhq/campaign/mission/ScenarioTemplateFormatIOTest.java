@@ -93,6 +93,17 @@ class ScenarioTemplateFormatIOTest {
         assertEquals(toXml(original), toXml(reloaded));
     }
 
+    @Test
+    void embeddingWritePathStaysXml() {
+        // The PrintWriter serializer is what AtBDynamicScenario embeds into campaign saves. It must remain XML even
+        // though standalone files are now written as JSON, since a template is nested inside the XML campaign save.
+        ScenarioTemplate template = ScenarioTemplate.Deserialize(CORPUS_DIRECTORY.resolve("Breakout.xml").toFile());
+        String embedded = toXml(template);
+
+        assertTrue(embedded.stripLeading().startsWith("<"), () -> "embedding must stay XML, got: " + embedded);
+        assertTrue(embedded.contains("<ScenarioTemplate>"), () -> "expected XML root element, got: " + embedded);
+    }
+
     private static String toXml(ScenarioTemplate template) {
         StringWriter stringWriter = new StringWriter();
         try (PrintWriter printWriter = new PrintWriter(stringWriter)) {
