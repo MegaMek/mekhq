@@ -1,0 +1,118 @@
+/*
+ * Copyright (C) 2026 The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
+ */
+package mekhq.campaign.digitalGM.stratCon;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+
+import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.ObjectiveParameters;
+import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+
+/**
+ * Serialization guards for {@link StratConContractDefinition}: JSON is the write format (with the license notice as a
+ * leading, read-ignored block) and legacy XML is still read for backward compatibility.
+ */
+class StratConContractDefinitionSerializationTest {
+
+    @Test
+    void jsonRoundTripPreservesFieldsAndCarriesLicense(@TempDir Path tempDir) throws IOException {
+        StratConContractDefinition original = new StratConContractDefinition();
+        original.setBriefing("Destroy designated targets.");
+        original.setAlliedFacilityCount(-0.3);
+        original.setHostileFacilityCount(-0.5);
+        original.setAllowEarlyVictory(true);
+        original.setScenarioOdds(List.of(22, 32, 42));
+        original.setDeploymentTimes(List.of(3, 4, 5));
+
+        ObjectiveParameters objective = new ObjectiveParameters();
+        objective.objectiveType = StrategicObjectiveType.SpecificScenarioVictory;
+        objective.objectiveCount = -0.5;
+        objective.objectiveScenarios = List.of("Covert Strike.json", "Deep Raid.json");
+        original.setObjectiveParameters(List.of(objective));
+
+        File out = tempDir.resolve("ObjectiveRaid.json").toFile();
+        original.Serialize(out);
+
+        String content = Files.readString(out.toPath());
+        int licenseIdx = content.indexOf("\"_license\"");
+        int briefingIdx = content.indexOf("\"briefing\"");
+        assertTrue(licenseIdx >= 0, "saved JSON should include a _license block");
+        assertTrue(briefingIdx >= 0 && licenseIdx < briefingIdx, "_license should precede the definition fields");
+        assertTrue(content.contains("CC BY-NC-SA 4.0"), "license text should be the MegaMek Data notice");
+
+        StratConContractDefinition reloaded = StratConContractDefinition.Deserialize(out);
+        assertNotNull(reloaded, "a definition carrying a _license block should still deserialize");
+        assertEquals("Destroy designated targets.", reloaded.getBriefing());
+        assertEquals(-0.3, reloaded.getAlliedFacilityCount());
+        assertEquals(-0.5, reloaded.getHostileFacilityCount());
+        assertTrue(reloaded.isAllowEarlyVictory());
+        assertEquals(List.of(22, 32, 42), reloaded.getScenarioOdds());
+        assertEquals(List.of(3, 4, 5), reloaded.getDeploymentTimes());
+        assertEquals(1, reloaded.getObjectiveParameters().size());
+        assertEquals(StrategicObjectiveType.SpecificScenarioVictory,
+              reloaded.getObjectiveParameters().get(0).objectiveType);
+        assertEquals(List.of("Covert Strike.json", "Deep Raid.json"),
+              reloaded.getObjectiveParameters().get(0).objectiveScenarios);
+    }
+
+    @Test
+    void legacyXmlStillReads(@TempDir Path tempDir) throws IOException {
+        String legacyXml = """
+              <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+              <ScenarioTemplate>
+                  <contractTypeName>Objective Raid</contractTypeName>
+                  <briefing>Legacy XML briefing.</briefing>
+                  <alliedFacilityCount>-0.3</alliedFacilityCount>
+                  <hostileFacilityCount>-0.5</hostileFacilityCount>
+                  <allowEarlyVictory>true</allowEarlyVictory>
+              </ScenarioTemplate>
+              """;
+        File xml = tempDir.resolve("legacy.xml").toFile();
+        Files.writeString(xml.toPath(), legacyXml);
+
+        StratConContractDefinition fromXml = StratConContractDefinition.Deserialize(xml);
+        assertNotNull(fromXml, "legacy XML contract definitions must still be readable");
+        assertEquals("Legacy XML briefing.", fromXml.getBriefing());
+        assertEquals(-0.3, fromXml.getAlliedFacilityCount());
+        assertTrue(fromXml.isAllowEarlyVictory());
+    }
+}

@@ -32,19 +32,21 @@
  */
 package mekhq.campaign.digitalGM.stratCon;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
-import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlElementWrapper;
@@ -367,28 +369,29 @@ public class StratConContractDefinition {
      */
     public void Serialize(File outputFile) {
         try {
-            JAXBContext context = JAXBContext.newInstance(StratConContractDefinition.class);
-            JAXBElement<StratConContractDefinition> templateElement = new JAXBElement<>(
-                  new QName(ROOT_XML_ELEMENT_NAME), StratConContractDefinition.class, this);
-            Marshaller m = context.createMarshaller();
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            m.marshal(templateElement, outputFile);
+            StratConContractDefinitionJson.toFile(this, outputFile);
         } catch (Exception e) {
             LOGGER.error("Error serializing {}", outputFile.getPath(), e);
         }
     }
 
     /**
-     * Attempt to deserialize an instance of a ScenarioTemplate from the passed-in file
+     * Attempt to deserialize an instance of a StratConContractDefinition from the passed-in file. JSON is the write
+     * format; XML is still read for legacy/user files. The format is detected by content (a leading '{' is JSON) rather
+     * than file extension, so a file is parsed correctly regardless of what it is named.
      *
      * @param inputFile The source file
      *
-     * @return Possibly an instance of a ScenarioTemplate
+     * @return Possibly an instance of a StratConContractDefinition
      */
     public static StratConContractDefinition Deserialize(File inputFile) {
         StratConContractDefinition resultingDefinition = null;
 
         try {
+            if (isJsonContent(inputFile)) {
+                return StratConContractDefinitionJson.fromFile(inputFile);
+            }
+
             JAXBContext context = JAXBContext.newInstance(StratConContractDefinition.class);
             Unmarshaller um = context.createUnmarshaller();
             try (FileInputStream fileStream = new FileInputStream(inputFile)) {
@@ -402,6 +405,28 @@ public class StratConContractDefinition {
         }
 
         return resultingDefinition;
+    }
+
+    /**
+     * Determines whether a file holds JSON by inspecting its first non-whitespace character. A leading '{' indicates
+     * JSON; anything else (a contract definition XML document begins with '<') is treated as XML.
+     *
+     * @param inputFile the file to inspect
+     *
+     * @return true if the file appears to contain JSON
+     *
+     * @throws IOException if the file cannot be read
+     */
+    private static boolean isJsonContent(File inputFile) throws IOException {
+        try (BufferedReader reader = Files.newBufferedReader(inputFile.toPath(), StandardCharsets.UTF_8)) {
+            int character;
+            while ((character = reader.read()) != -1) {
+                if (!Character.isWhitespace(character)) {
+                    return character == '{';
+                }
+            }
+        }
+        return false;
     }
 
     /**
