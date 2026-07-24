@@ -110,7 +110,9 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
             forceModel.addElement(forceName);
         }
 
-        txtShortDescription.setText(objective.getDescription());
+        txtShortDescription.setText(objective.getOverrideDescription());
+        txtShortDescription.setToolTipText("Leave blank to auto-generate the description from the objective's "
+                                                 + "settings. Custom objectives require text here.");
         cboObjectiveType.setSelectedItem(objective.getObjectiveCriterion());
         cboCountType.setSelectedItem(objective.getAmountType());
         spnAmount.setValue(objective.getAmount());

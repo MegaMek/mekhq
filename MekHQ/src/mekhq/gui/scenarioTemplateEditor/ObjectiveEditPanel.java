@@ -32,6 +32,8 @@
  */
 package mekhq.gui.scenarioTemplateEditor;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
@@ -109,7 +111,7 @@ public class ObjectiveEditPanel extends JDialog {
         initGUI();
         updateForceList();
 
-        txtShortDescription.setText(objective.getDescription());
+        txtShortDescription.setText(objective.getOverrideDescription());
         cboObjectiveType.setSelectedItem(objective.getObjectiveCriterion());
         cboCountType.setSelectedItem(objective.getAmountType());
         txtPercentage.setText(Integer.toString(objective.getAmount()));
@@ -205,6 +207,9 @@ public class ObjectiveEditPanel extends JDialog {
 
         JScrollPane txtScroll = new FastJScrollPane();
         txtShortDescription = new JTextArea();
+        txtShortDescription.setToolTipText(wordWrap("Leave blank to auto-generate the description from the "
+                                                          +
+                                                          "objective's settings. Custom objectives require text here."));
         txtShortDescription.setColumns(40);
         txtShortDescription.setRows(5);
         txtShortDescription.setLineWrap(true);

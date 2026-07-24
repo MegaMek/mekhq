@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.mission;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -61,6 +63,8 @@ import org.w3c.dom.Node;
  */
 public class ScenarioObjective {
     private static final MMLogger LOGGER = MMLogger.create(ScenarioObjective.class);
+
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.ScenarioObjective";
 
     public static final String FORCE_SHORTCUT_ALL_PRIMARY_PLAYER_FORCES = "All Primary Player Forces";
     public static final String FORCE_SHORTCUT_ALL_ENEMY_FORCES = "All Enemy Forces";
@@ -175,7 +179,9 @@ public class ScenarioObjective {
      */
     public ScenarioObjective(ScenarioObjective other) {
         setObjectiveCriterion(other.getObjectiveCriterion());
-        setDescription(other.getDescription());
+        // copy the raw authored override, not getDescription() - otherwise a generated description would be
+        // materialized into the copy's stored field and become a stale override.
+        this.description = other.description;
         this.setDestinationEdge(other.getDestinationEdge());
         this.setFixedAmount(other.getFixedAmount());
         this.setPercentage(other.getPercentage());
@@ -198,12 +204,89 @@ public class ScenarioObjective {
         this.objectiveCriterion = objectiveCriterion;
     }
 
+    /**
+     * Returns the objective's human-readable description. If a description has been authored it is used as-is (an
+     * optional override, and the only meaningful source for {@link ObjectiveCriterion#Custom} objectives); otherwise
+     * the description is generated from the structured definition via {@link #getGeneratedDescription()}, so authors do
+     * not have to hand-write text that merely restates the objective's fields.
+     */
     public String getDescription() {
-        return description;
+        if ((description != null) && !description.isBlank()) {
+            return description;
+        }
+        return getGeneratedDescription();
+    }
+
+    /**
+     * @return the authored description override exactly as stored (empty string if none). Editors bind to this so a
+     *       blank field stays blank (auto-generated) rather than being back-filled with generated text.
+     */
+    public String getOverrideDescription() {
+        return (description == null) ? "" : description;
     }
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    /**
+     * Builds a human-readable description of this objective purely from its structured definition - criterion, amount
+     * (percentage or fixed count), destination edge, time limit, and success/failure effects.
+     * {@link ObjectiveCriterion#Custom} has no structured meaning, so it falls back to the authored text.
+     *
+     * @return the generated description, or the authored text for {@code Custom} objectives
+     */
+    public String getGeneratedDescription() {
+        if (objectiveCriterion == ObjectiveCriterion.Custom) {
+            return getOverrideDescription();
+        }
+
+        String amount = (fixedAmount != null)
+                              ? getFormattedTextAt(RESOURCE_BUNDLE, "objective.amount.units", fixedAmount)
+                              : getFormattedTextAt(RESOURCE_BUNDLE, "objective.amount.percentage", percentage);
+        String edge = ((destinationEdge != null) && (destinationEdge != OffBoardDirection.NONE))
+                            ? getFormattedTextAt(RESOURCE_BUNDLE, "objective.edge.named",
+              destinationEdge.toString().toLowerCase())
+                            : getFormattedTextAt(RESOURCE_BUNDLE, "objective.edge.designated");
+
+        String criterionKey = switch (objectiveCriterion) {
+            case Destroy -> "objective.criterion.destroy";
+            case ForceWithdraw -> "objective.criterion.forceWithdraw";
+            case Capture -> "objective.criterion.capture";
+            case Preserve -> "objective.criterion.preserve";
+            case ReachMapEdge -> "objective.criterion.reachMapEdge";
+            case PreventReachMapEdge -> "objective.criterion.preventReachMapEdge";
+            case Custom -> ""; // handled above
+        };
+        String sentence = getFormattedTextAt(RESOURCE_BUNDLE, criterionKey, amount, edge);
+
+        String timeLimit = getTimeLimitString();
+        if (!timeLimit.isBlank()) {
+            // getTimeLimitString() yields e.g. " within at most 5 turns"; splice it in before the trailing period
+            sentence = sentence.substring(0, sentence.length() - 1) + timeLimit + ".";
+        }
+
+        String effects = describeEffects();
+        return effects.isBlank() ? sentence : sentence + " " + effects;
+    }
+
+    /** Renders the success/failure effects as a compact parenthetical, e.g. {@code (+1 Scenario VP if completed)}. */
+    private String describeEffects() {
+        List<String> parts = new ArrayList<>();
+        for (ObjectiveEffect effect : successEffects) {
+            parts.add(getFormattedTextAt(RESOURCE_BUNDLE, "objective.effect.ifCompleted", describeEffect(effect)));
+        }
+        for (ObjectiveEffect effect : failureEffects) {
+            parts.add(getFormattedTextAt(RESOURCE_BUNDLE, "objective.effect.ifFailed", describeEffect(effect)));
+        }
+        return parts.isEmpty() ? "" : getFormattedTextAt(RESOURCE_BUNDLE, "objective.effects.clause",
+              String.join("; ", parts));
+    }
+
+    private static String describeEffect(ObjectiveEffect effect) {
+        return effect.effectType.isMagnitudeRelevant()
+                     ? String.format(effect.effectType.toString(), effect.howMuch)
+                     : effect.effectType.toString();
     }
 
     public void addForce(String name) {
@@ -336,9 +419,11 @@ public class ScenarioObjective {
     }
 
     public String getTimeLimitString() {
-        return (timeLimitType == TimeLimitType.None) ? ""
-                     : String.format("%s %d turns", isTimeLimitAtMost() ? " within at most" : " for at least",
-              getTimeLimit());
+        if (timeLimitType == TimeLimitType.None) {
+            return "";
+        }
+        return getFormattedTextAt(RESOURCE_BUNDLE,
+              isTimeLimitAtMost() ? "objective.timeLimit.atMost" : "objective.timeLimit.atLeast", getTimeLimit());
     }
 
     /**
