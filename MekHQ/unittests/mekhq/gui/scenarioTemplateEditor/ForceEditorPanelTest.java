@@ -106,6 +106,26 @@ class ForceEditorPanelTest {
     }
 
     @Test
+    void resetReturnsToAddNewDefaults() {
+        ScenarioForceTemplate source = new ScenarioForceTemplate(ForceAlignment.Opposing.ordinal(),
+              ForceGenerationMethod.BVScaled.ordinal(), 1.5, List.of(2), 5, 40, UnitType.TANK);
+        source.setForceName("Bravo");
+        source.setSyncDeploymentType(SynchronizedDeploymentType.None);
+
+        ForceEditorPanel panel = new ForceEditorPanel(List.of());
+        panel.loadForce(source);
+        assertEquals("Bravo", panel.getForceName());
+
+        panel.reset();
+
+        assertEquals("", panel.getForceName());
+        ScenarioForceTemplate afterReset = panel.buildForceTemplate();
+        assertEquals(ForceAlignment.Player.ordinal(), afterReset.getForceAlignment());
+        assertEquals(1, afterReset.getGenerationOrder());
+        assertEquals(50, afterReset.getRetreatThreshold());
+    }
+
+    @Test
     void getForceNameReflectsLoadedForce() {
         ScenarioForceTemplate source = new ScenarioForceTemplate(ForceAlignment.Player.ordinal(),
               ForceGenerationMethod.PlayerSupplied.ordinal(), 1.0, List.of(1), 5, 50,

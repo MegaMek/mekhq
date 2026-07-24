@@ -39,7 +39,11 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -93,6 +97,9 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     // update a force in place (and clean up its old key on rename) rather than orphaning or overwriting entries.
     String editedForceId = null;
 
+    // serialized snapshot of the last saved/loaded editor state, for unsaved-changes detection.
+    private String capturedState = "";
+
     /**
      * @param parent Creates a new instance of this dialog with the given parent JFrame.
      */
@@ -103,6 +110,15 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         pack();
         validate();
         setUserPreferences();
+
+        captureBaseline();
+        setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                closeWithConfirmation();
+            }
+        });
     }
 
     /**
@@ -191,6 +207,11 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         int previousAnchor = gridBagConstraints.anchor;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         globalPanel.add(btnHideShow, gridBagConstraints);
+
+        JButton btnNewForce = new JButton("New Force");
+        btnNewForce.addActionListener(evt -> newForce());
+        gridBagConstraints.gridx++;
+        globalPanel.add(btnNewForce, gridBagConstraints);
         gridBagConstraints.anchor = previousAnchor;
     }
 
@@ -255,7 +276,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         editedForceId = null;
         forceEditorPanel.setAvailableForceIds(scenarioTemplate.getScenarioForces().keySet());
         renderForceList();
-        pack();
+        revalidate();
         repaint();
     }
 
@@ -349,6 +370,68 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         btnLoad.setActionCommand(LOAD_TEMPLATE_COMMAND);
         btnLoad.addActionListener(this);
         globalPanel.add(btnLoad, gridBagConstraints);
+
+        gridBagConstraints.gridx++;
+        JButton btnClose = new JButton("Close");
+        btnClose.addActionListener(e -> closeWithConfirmation());
+        globalPanel.add(btnClose, gridBagConstraints);
+    }
+
+    /**
+     * Resets the force editor to "add a new force" state, so it does not retain the previously edited force's values.
+     */
+    private void newForce() {
+        forceEditorPanel.reset();
+        editedForceId = null;
+    }
+
+    /**
+     * Closes the dialog, prompting first if there are unsaved changes.
+     */
+    private void closeWithConfirmation() {
+        if (isDirty()) {
+            int choice = JOptionPane.showConfirmDialog(this,
+                  "You have unsaved changes. Close anyway?",
+                  "Unsaved Changes",
+                  JOptionPane.YES_NO_OPTION,
+                  JOptionPane.WARNING_MESSAGE);
+            if (choice != JOptionPane.YES_OPTION) {
+                return;
+            }
+        }
+        dispose();
+    }
+
+    /**
+     * Records the current editor state as the "clean" baseline. Called at construction and after a save or load.
+     */
+    private void captureBaseline() {
+        capturedState = currentSerializedState();
+    }
+
+    /**
+     * @return whether the editor state differs from the last captured baseline
+     */
+    private boolean isDirty() {
+        return !currentSerializedState().equals(capturedState);
+    }
+
+    /**
+     * Serializes a snapshot of the current editor state - the live template plus the not-yet-committed panel values -
+     * so it can be compared against the baseline. Uses a clone so the working template is not mutated.
+     */
+    private String currentSerializedState() {
+        ScenarioTemplate snapshot = scenarioTemplate.clone();
+        if (templatePropertiesPanel != null) {
+            templatePropertiesPanel.writeInto(snapshot);
+            mapParametersPanel.writeInto(snapshot.mapParameters);
+            modifiersPanel.writeInto(snapshot.scenarioModifiers);
+        }
+        StringWriter stringWriter = new StringWriter();
+        try (PrintWriter printWriter = new PrintWriter(stringWriter)) {
+            snapshot.Serialize(printWriter);
+        }
+        return stringWriter.toString();
     }
 
 
@@ -396,7 +479,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
 
         forceEditorPanel.setAvailableForceIds(scenarioTemplate.getScenarioForces().keySet());
         renderForceList();
-        pack();
+        revalidate();
         repaint();
     }
 
@@ -420,7 +503,10 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         modifiersPanel.writeInto(scenarioTemplate.scenarioModifiers);
 
         FileDialogs.saveScenarioTemplate((JFrame) getOwner(), scenarioTemplate)
-              .ifPresent(file -> scenarioTemplate.Serialize(file));
+              .ifPresent(file -> {
+                  scenarioTemplate.Serialize(file);
+                  captureBaseline();
+              });
     }
 
     /**
@@ -454,6 +540,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         // Do not re-register user preferences here. The window preference was registered once when the dialog was
         // constructed, and reloading a template rebuilds the contents but not the window itself; calling
         // setUserPreferences() again would double-manage the same JWindowPreference.
+        captureBaseline();
     }
 
     /**

@@ -253,6 +253,41 @@ public class ForceEditorPanel extends JPanel {
     }
 
     /**
+     * Resets the editor to its default "add a new force" state, so it does not retain the last-edited force's values.
+     */
+    public void reset() {
+        cboAlignment.setSelectedIndex(0);
+        cboGenerationMethod.setSelectedIndex(0);
+        spnMultiplier.setValue(1.0);
+        cboDestinationZone.setSelectedIndex(CardinalEdge.NONE.getIndex());
+        spnRetreatThreshold.setValue(50);
+        chkReinforce.setSelected(false);
+        chkContributesToBV.setSelected(false);
+        chkContributesToUnitCount.setSelected(false);
+        txtForceName.setText("");
+        cboSyncDeploymentType.setSelectedIndex(0);
+        cboSyncForceName.setSelectedIndex(cboSyncForceName.getItemCount() > 0 ? 0 : -1);
+        listMULs.clearSelection();
+        lstObjectiveLinkedForces.clearSelection();
+        lstDeployZones.clearSelection();
+        cboUnitType.setSelectedIndex(0);
+        spnArrivalTurn.setValue(0);
+        spnFixedUnitCount.setValue(0);
+        cboMaxWeightClass.setSelectedIndex(EntityWeightClass.WEIGHT_ASSAULT);
+        cboMinWeightClass.setSelectedIndex(EntityWeightClass.WEIGHT_LIGHT);
+        chkContributesToMapSize.setSelected(false);
+        spnGenerationOrder.setValue(1);
+        chkAllowAeroBombs.setSelected(false);
+        spnStartingAltitude.setValue(0);
+        chkUseArtillery.setSelected(false);
+        chkOffBoard.setSelected(false);
+        chkSubjectToRandomRemoval.setSelected(true);
+        chkSyncRetreatThreshold.setSelected(false);
+        roleSetEditorPanel.load(List.of());
+        forceAlignmentChanged();
+    }
+
+    /**
      * @return the force ID currently entered
      */
     public String getForceName() {
