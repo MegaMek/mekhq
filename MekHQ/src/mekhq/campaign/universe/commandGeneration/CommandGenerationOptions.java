@@ -147,19 +147,10 @@ public class CommandGenerationOptions {
     private boolean selectStartingContract;
     private boolean startCourseToContractPlanet;
 
-    // Finances
+    // Finances - the command is granted free; starting cash is working capital sized as a
+    // percentage of the generated units' total purchase cost.
     private boolean processFinances;
-    private int startingCash;
-    private boolean randomizeStartingCash;
-    private int randomStartingCashDiceCount;
-    private int minimumStartingFloat;
-    private boolean startingLoan;
-    private boolean payForSetup;
-    private boolean payForPersonnel;
-    private boolean payForUnits;
-    private boolean payForParts;
-    private boolean payForArmour;
-    private boolean payForAmmunition;
+    private int startingCashPercent;
     // endregion Variable Declarations
 
     // region Constructors
@@ -239,17 +230,7 @@ public class CommandGenerationOptions {
 
         // Finances
         setProcessFinances(true);
-        setStartingCash(60000000);
-        setRandomizeStartingCash(false);
-        setRandomStartingCashDiceCount(18);
-        setMinimumStartingFloat(0);
-        setStartingLoan(true);
-        setPayForSetup(true);
-        setPayForPersonnel(true);
-        setPayForUnits(true);
-        setPayForParts(true);
-        setPayForArmour(true);
-        setPayForAmmunition(true);
+        setStartingCashPercent(10);
     }
     // endregion Constructors
 
@@ -614,92 +595,18 @@ public class CommandGenerationOptions {
         this.processFinances = processFinances;
     }
 
-    public int getStartingCash() {
-        return startingCash;
+    /**
+     * Starting cash as a percentage of the generated units' total purchase cost. {@code 10} grants
+     * working capital worth a tenth of the command's units.
+     *
+     * @return the starting-cash percentage
+     */
+    public int getStartingCashPercent() {
+        return startingCashPercent;
     }
 
-    public void setStartingCash(final int startingCash) {
-        this.startingCash = startingCash;
-    }
-
-    public boolean isRandomizeStartingCash() {
-        return randomizeStartingCash;
-    }
-
-    public void setRandomizeStartingCash(final boolean randomizeStartingCash) {
-        this.randomizeStartingCash = randomizeStartingCash;
-    }
-
-    public int getRandomStartingCashDiceCount() {
-        return randomStartingCashDiceCount;
-    }
-
-    public void setRandomStartingCashDiceCount(final int randomStartingCashDiceCount) {
-        this.randomStartingCashDiceCount = randomStartingCashDiceCount;
-    }
-
-    public int getMinimumStartingFloat() {
-        return minimumStartingFloat;
-    }
-
-    public void setMinimumStartingFloat(final int minimumStartingFloat) {
-        this.minimumStartingFloat = minimumStartingFloat;
-    }
-
-    public boolean isStartingLoan() {
-        return startingLoan;
-    }
-
-    public void setStartingLoan(final boolean startingLoan) {
-        this.startingLoan = startingLoan;
-    }
-
-    public boolean isPayForSetup() {
-        return payForSetup;
-    }
-
-    public void setPayForSetup(final boolean payForSetup) {
-        this.payForSetup = payForSetup;
-    }
-
-    public boolean isPayForPersonnel() {
-        return payForPersonnel;
-    }
-
-    public void setPayForPersonnel(final boolean payForPersonnel) {
-        this.payForPersonnel = payForPersonnel;
-    }
-
-    public boolean isPayForUnits() {
-        return payForUnits;
-    }
-
-    public void setPayForUnits(final boolean payForUnits) {
-        this.payForUnits = payForUnits;
-    }
-
-    public boolean isPayForParts() {
-        return payForParts;
-    }
-
-    public void setPayForParts(final boolean payForParts) {
-        this.payForParts = payForParts;
-    }
-
-    public boolean isPayForArmour() {
-        return payForArmour;
-    }
-
-    public void setPayForArmour(final boolean payForArmour) {
-        this.payForArmour = payForArmour;
-    }
-
-    public boolean isPayForAmmunition() {
-        return payForAmmunition;
-    }
-
-    public void setPayForAmmunition(final boolean payForAmmunition) {
-        this.payForAmmunition = payForAmmunition;
+    public void setStartingCashPercent(final int startingCashPercent) {
+        this.startingCashPercent = startingCashPercent;
     }
     // endregion Getters/Setters
 }

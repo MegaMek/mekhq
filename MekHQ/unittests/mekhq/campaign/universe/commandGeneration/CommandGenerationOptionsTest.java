@@ -119,6 +119,11 @@ class CommandGenerationOptionsTest {
         assertFalse(options.isUseSpecifiedFactionToGenerateFormationIcons());
         assertTrue(options.isGenerateOriginNodeFormationIcon());
         assertFalse(options.isUseOriginNodeFormationIconLogo());
+
+        // Finances: the command is granted free, with working capital defaulting to 10% of the
+        // generated units' purchase cost.
+        assertTrue(options.isProcessFinances());
+        assertEquals(10, options.getStartingCashPercent());
     }
 
     @Test

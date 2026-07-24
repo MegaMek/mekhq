@@ -32,11 +32,17 @@
  */
 package mekhq.campaign.universe.commandGeneration.ratgen;
 
+import static mekhq.campaign.enums.DailyReportType.FINANCES;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -49,6 +55,8 @@ import megamek.common.annotations.Nullable;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.market.PartsInUseManager;
 import mekhq.campaign.parts.PartInUse;
@@ -69,8 +77,8 @@ import mekhq.campaign.universe.commandGeneration.SupportUnitGenerator;
  * {@link ForceDescriptorWalker}, {@link MultiCrewAssembler}, {@link CrewDescriptorAdapter},
  * {@link RankAssigner} — into the pipeline described in
  * {@code docs/plans/force-generator-company-generation.md} (megamek repo): bootstrap →
- * buildDescriptor → processRoot → walk → personnel → units → tree → spares. The finance and
- * contract polish stages remain deferred.</p>
+ * buildDescriptor → processRoot → walk → personnel → units → tree → spares → starting cash. The
+ * contract polish stage remains deferred.</p>
  *
  * <p>The pipeline is split into a pure roll and campaign materialization, giving two consumer
  * patterns:</p>
@@ -101,6 +109,7 @@ public final class CommandGenerator {
     }
 
     private static final MMLogger LOGGER = MMLogger.create(CommandGenerator.class);
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.CommandGenerator";
 
     // Single-thread daemon executor used by the addNewUnit watchdog. Scheduled tasks fire 5s after
     // each addNewUnit call begins; if addNewUnit returns first, the task is cancelled. If it hangs,
@@ -286,6 +295,10 @@ public final class CommandGenerator {
      */
     public static Result applyToCampaign(Campaign campaign, CommandGenerationOptions options,
           ForceDescriptor fd, Ruleset.ProgressListener listener, boolean generateSupport) {
+        // Snapshot the hangar before any unit is created so the starting-cash stage can price only
+        // the units this build adds (see processStartingCash).
+        Set<UUID> preExistingUnitIds = snapshotHangarUnitIds(campaign);
+
         // 4-7. Walk the resulting tree; for each leaf, materialize a Unit, attach a crew, and place
         // the unit under the current Formation.
         LOGGER.info("[CompanyGen][Pipeline]Stage 4-7: walk tree, materialize Units + crews into Formations");
@@ -429,8 +442,12 @@ public final class CommandGenerator {
         // on generateSupport so combat can be committed on its own (phase one of two-phase generation).
         if (generateSupport) {
             // generateSupportFromToe applies TOE icons to the support formations it creates, so no
-            // separate re-decoration pass is needed here.
+            // separate re-decoration pass is needed here. In this single-shot path every unit the
+            // build created is new relative to the pre-walk hangar, so the starting-cash stage prices
+            // exactly this build's units. (The two-phase Command Designer flow instead snapshots
+            // before its combat phase and calls processStartingCash itself after support.)
             generatedPersons.addAll(generateSupportFromToe(campaign, options, listener));
+            processStartingCash(campaign, options, preExistingUnitIds);
         }
 
         // 7d. Personnel flags driven by the Setup tab toggles: commander flag on the top-formation
@@ -517,6 +534,65 @@ public final class CommandGenerator {
         logOrphanAudit(campaign);
 
         return supportResult.generatedPersons();
+    }
+
+    /**
+     * Captures the IDs of every unit currently in the campaign's hangar. Take this snapshot before a
+     * build starts so {@link #processStartingCash} can price only the units that build created - the
+     * Command Designer takes it before its combat phase and passes it back after support generation.
+     *
+     * @param campaign the campaign whose hangar is snapshotted
+     *
+     * @return the IDs of the units present before the build
+     */
+    public static Set<UUID> snapshotHangarUnitIds(Campaign campaign) {
+        Set<UUID> unitIds = new HashSet<>();
+        for (Unit unit : campaign.getUnits()) {
+            unitIds.add(unit.getId());
+        }
+        return unitIds;
+    }
+
+    /**
+     * Stage 9 - starting cash. The generated command itself is granted free; when Process Finances
+     * is on, the campaign is credited working capital equal to
+     * {@link CommandGenerationOptions#getStartingCashPercent()} percent of the generated units'
+     * total purchase cost. Units already in the hangar before the build (per
+     * {@code preExistingUnitIds}) are excluded, so building an additional command into an existing
+     * campaign prices only the new units.
+     *
+     * @param campaign           the campaign to credit
+     * @param options            the generation options carrying the finance toggles
+     * @param preExistingUnitIds hangar unit IDs captured by {@link #snapshotHangarUnitIds} before
+     *                           the build; units with these IDs are not priced
+     */
+    public static void processStartingCash(Campaign campaign, CommandGenerationOptions options,
+          Set<UUID> preExistingUnitIds) {
+        if (!options.isProcessFinances()) {
+            LOGGER.info("[CompanyGen][Pipeline]Stage 9: finances disabled; no starting cash granted");
+            return;
+        }
+        int percent = options.getStartingCashPercent();
+        Money totalUnitValue = Money.zero();
+        int pricedUnits = 0;
+        for (Unit unit : campaign.getUnits()) {
+            if (!preExistingUnitIds.contains(unit.getId())) {
+                totalUnitValue = totalUnitValue.plus(unit.getBuyCost());
+                pricedUnits++;
+            }
+        }
+        Money startingCash = totalUnitValue.multipliedBy(percent).dividedBy(100).round();
+        LOGGER.info("[CompanyGen][Pipeline]Stage 9: starting cash = {}% of {} generated unit(s) worth {} -> {}",
+              percent, pricedUnits, totalUnitValue.toAmountAndSymbolString(),
+              startingCash.toAmountAndSymbolString());
+        if (startingCash.isPositive()) {
+            campaign.getPlayerForce().getFinances().credit(TransactionType.STARTING_CAPITAL,
+                  campaign.getLocalDate(), startingCash,
+                  getTextAt(RESOURCE_BUNDLE, "CommandGenerator.startingCapital.reason"));
+            campaign.addReport(FINANCES, getFormattedTextAt(RESOURCE_BUNDLE,
+                  "CommandGenerator.startingCapital.report",
+                  startingCash.toAmountAndSymbolString(), percent));
+        }
     }
 
     /**

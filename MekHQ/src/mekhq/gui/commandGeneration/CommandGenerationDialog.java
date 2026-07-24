@@ -46,6 +46,8 @@ import java.awt.event.ActionEvent;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import javax.swing.BorderFactory;
@@ -316,6 +318,9 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
         // post-gen extras on the EDT.
         LOGGER.info("[CompanyGen][Worker] okAction: starting combat-commit phase (thread={})",
               Thread.currentThread().getName());
+        // Snapshot the hangar before the combat phase so the starting-cash stage after support can
+        // price exactly the units this build creates (combat + support), not pre-existing ones.
+        Set<UUID> preExistingUnitIds = CommandGenerator.snapshotHangarUnitIds(getCampaign());
         runGenerationPhase("Materializing combat forces...", listener -> {
             // RATGenerator init must not run on the EDT; ensureLoaded is idempotent.
             ForceDescriptorSnapshot snapshot = options.getForceDescriptorSnapshot();
@@ -332,6 +337,7 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
                         supportListener),
                   supportPersons -> {
                       generatedPersons.addAll(supportPersons);
+                      CommandGenerator.processStartingCash(getCampaign(), options, preExistingUnitIds);
                       applyPostGenerationExtras(options, generatedPersons);
                   });
         });

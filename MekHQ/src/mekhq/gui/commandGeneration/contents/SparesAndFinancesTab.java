@@ -67,8 +67,9 @@ import mekhq.gui.commandGeneration.components.CommandGenerationStandardPanel;
  * <p><b>Right column</b> - the post-generation rule sections:</p>
  * <ol>
  *   <li><b>Contracts</b> - Select Starting Contract, Start Course to Contract Planet</li>
- *   <li><b>Finances</b> - Process Finances master toggle plus starting cash / randomization /
- *       minimum-float / starting-loan / six "Pay For" toggles</li>
+ *   <li><b>Finances</b> - Process Finances toggle plus the starting-cash percentage: the command
+ *       is granted free, and starting cash is working capital sized as a percentage of the
+ *       generated units' total purchase cost (default 10%)</li>
  *   <li><b>Starting Simulation</b> - Run Starting Simulation toggle plus duration spinner and the
  *       two random-event toggles (marriages, procreation)</li>
  * </ol>
@@ -93,12 +94,7 @@ public class SparesAndFinancesTab {
 
     // Finances
     private CommandGenerationCheckBox chkProcessFinances;
-    private JSpinner spnStartingCash;
-    private CommandGenerationCheckBox chkRandomizeStartingCash;
-    private JSpinner spnRandomStartingCashDiceCount;
-    private JSpinner spnMinimumStartingFloat;
-    private CommandGenerationCheckBox chkStartingLoan;
-    private final Map<String, CommandGenerationCheckBox> payForToggles = new LinkedHashMap<>();
+    private JSpinner spnStartingCashPercent;
 
     // Starting Simulation
     private CommandGenerationCheckBox chkRunStartingSimulation;
@@ -243,70 +239,22 @@ public class SparesAndFinancesTab {
         GridBagConstraints gbc = sectionConstraints();
 
         chkProcessFinances = new CommandGenerationCheckBox("ProcessFinances");
-        spnStartingCash = new JSpinner(new SpinnerNumberModel(0, 0, 100_000_000, 100_000));
-        spnStartingCash.setName("spnStartingCash");
-        chkRandomizeStartingCash = new CommandGenerationCheckBox("RandomizeStartingCash");
-        spnRandomStartingCashDiceCount = new JSpinner(new SpinnerNumberModel(6, 1, 20, 1));
-        spnRandomStartingCashDiceCount.setName("spnRandomStartingCashDiceCount");
-        spnMinimumStartingFloat = new JSpinner(new SpinnerNumberModel(0, 0, 100_000_000, 100_000));
-        spnMinimumStartingFloat.setName("spnMinimumStartingFloat");
-        chkStartingLoan = new CommandGenerationCheckBox("StartingLoan");
+        spnStartingCashPercent = new JSpinner(new SpinnerNumberModel(10, 0, 1000, 1));
+        spnStartingCashPercent.setName("spnStartingCashPercent");
 
-        chkRandomizeStartingCash.addActionListener(evt -> {
-            boolean randomize = chkRandomizeStartingCash.isSelected();
-            spnStartingCash.setEnabled(!randomize);
-            spnRandomStartingCashDiceCount.setEnabled(randomize);
-        });
+        chkProcessFinances.addActionListener(evt ->
+              spnStartingCashPercent.setEnabled(chkProcessFinances.isSelected()));
 
-        int row = 0;
-        gbc.gridy = row++;
+        gbc.gridy = 0;
         gbc.gridwidth = 2;
         section.add(chkProcessFinances, gbc);
 
         gbc.gridwidth = 1;
-        gbc.gridy = row;
+        gbc.gridy = 1;
         gbc.gridx = 0;
-        section.add(new CommandGenerationLabel("StartingCash"), gbc);
+        section.add(new CommandGenerationLabel("StartingCashPercent"), gbc);
         gbc.gridx = 1;
-        section.add(spnStartingCash, gbc);
-        row++;
-
-        gbc.gridy = row++;
-        gbc.gridx = 0;
-        gbc.gridwidth = 2;
-        section.add(chkRandomizeStartingCash, gbc);
-
-        gbc.gridwidth = 1;
-        gbc.gridy = row;
-        gbc.gridx = 0;
-        section.add(new CommandGenerationLabel("RandomStartingCashDiceCount"), gbc);
-        gbc.gridx = 1;
-        section.add(spnRandomStartingCashDiceCount, gbc);
-        row++;
-
-        gbc.gridy = row;
-        gbc.gridx = 0;
-        section.add(new CommandGenerationLabel("MinimumStartingFloat"), gbc);
-        gbc.gridx = 1;
-        section.add(spnMinimumStartingFloat, gbc);
-        row++;
-
-        gbc.gridy = row++;
-        gbc.gridx = 0;
-        gbc.gridwidth = 2;
-        section.add(chkStartingLoan, gbc);
-
-        // Pay For sub-section
-        String[] payForNames = { "PayForSetup", "PayForPersonnel", "PayForUnits", "PayForParts",
-              "PayForArmour", "PayForAmmunition" };
-        for (String payForName : payForNames) {
-            CommandGenerationCheckBox chk = new CommandGenerationCheckBox(payForName);
-            payForToggles.put(payForName, chk);
-            gbc.gridy = row++;
-            gbc.gridx = 0;
-            gbc.gridwidth = 2;
-            section.add(chk, gbc);
-        }
+        section.add(spnStartingCashPercent, gbc);
 
         return section;
     }
@@ -386,19 +334,8 @@ public class SparesAndFinancesTab {
         chkStartCourseToContractPlanet.setEnabled(chkSelectStartingContract.isSelected());
 
         chkProcessFinances.setSelected(sourceOptions.isProcessFinances());
-        spnStartingCash.setValue(sourceOptions.getStartingCash());
-        chkRandomizeStartingCash.setSelected(sourceOptions.isRandomizeStartingCash());
-        spnRandomStartingCashDiceCount.setValue(sourceOptions.getRandomStartingCashDiceCount());
-        spnStartingCash.setEnabled(!chkRandomizeStartingCash.isSelected());
-        spnRandomStartingCashDiceCount.setEnabled(chkRandomizeStartingCash.isSelected());
-        spnMinimumStartingFloat.setValue(sourceOptions.getMinimumStartingFloat());
-        chkStartingLoan.setSelected(sourceOptions.isStartingLoan());
-        payForToggles.get("PayForSetup").setSelected(sourceOptions.isPayForSetup());
-        payForToggles.get("PayForPersonnel").setSelected(sourceOptions.isPayForPersonnel());
-        payForToggles.get("PayForUnits").setSelected(sourceOptions.isPayForUnits());
-        payForToggles.get("PayForParts").setSelected(sourceOptions.isPayForParts());
-        payForToggles.get("PayForArmour").setSelected(sourceOptions.isPayForArmour());
-        payForToggles.get("PayForAmmunition").setSelected(sourceOptions.isPayForAmmunition());
+        spnStartingCashPercent.setValue(sourceOptions.getStartingCashPercent());
+        spnStartingCashPercent.setEnabled(chkProcessFinances.isSelected());
 
         chkRunStartingSimulation.setSelected(sourceOptions.isRunStartingSimulation());
         spnSimulationDuration.setValue(sourceOptions.getSimulationDuration());
@@ -450,17 +387,7 @@ public class SparesAndFinancesTab {
         targetOptions.setStartCourseToContractPlanet(chkStartCourseToContractPlanet.isSelected());
 
         targetOptions.setProcessFinances(chkProcessFinances.isSelected());
-        targetOptions.setStartingCash((Integer) spnStartingCash.getValue());
-        targetOptions.setRandomizeStartingCash(chkRandomizeStartingCash.isSelected());
-        targetOptions.setRandomStartingCashDiceCount((Integer) spnRandomStartingCashDiceCount.getValue());
-        targetOptions.setMinimumStartingFloat((Integer) spnMinimumStartingFloat.getValue());
-        targetOptions.setStartingLoan(chkStartingLoan.isSelected());
-        targetOptions.setPayForSetup(payForToggles.get("PayForSetup").isSelected());
-        targetOptions.setPayForPersonnel(payForToggles.get("PayForPersonnel").isSelected());
-        targetOptions.setPayForUnits(payForToggles.get("PayForUnits").isSelected());
-        targetOptions.setPayForParts(payForToggles.get("PayForParts").isSelected());
-        targetOptions.setPayForArmour(payForToggles.get("PayForArmour").isSelected());
-        targetOptions.setPayForAmmunition(payForToggles.get("PayForAmmunition").isSelected());
+        targetOptions.setStartingCashPercent((Integer) spnStartingCashPercent.getValue());
 
         targetOptions.setRunStartingSimulation(chkRunStartingSimulation.isSelected());
         targetOptions.setSimulationDuration((Integer) spnSimulationDuration.getValue());
