@@ -32,6 +32,9 @@
  */
 package mekhq.campaign.mission;
 
+import java.io.File;
+import java.io.IOException;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -84,5 +87,30 @@ public final class ScenarioTemplateJson {
      */
     static <T> T fromJson(String json, Class<T> type) throws JsonProcessingException {
         return MAPPER.readValue(json, type);
+    }
+
+    /**
+     * Reads a scenario template from a JSON file.
+     *
+     * @param inputFile the JSON file
+     *
+     * @return the deserialized template
+     *
+     * @throws IOException if the file cannot be read or parsed
+     */
+    static ScenarioTemplate fromFile(File inputFile) throws IOException {
+        return MAPPER.readValue(inputFile, ScenarioTemplate.class);
+    }
+
+    /**
+     * Writes a scenario template to a JSON file.
+     *
+     * @param template   the template to write
+     * @param outputFile the destination file
+     *
+     * @throws IOException if the file cannot be written
+     */
+    static void toFile(ScenarioTemplate template, File outputFile) throws IOException {
+        MAPPER.writeValue(outputFile, template);
     }
 }

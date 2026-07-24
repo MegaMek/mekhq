@@ -32,9 +32,13 @@
  */
 package mekhq.campaign.mission;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -280,20 +284,17 @@ public class ScenarioTemplate implements Cloneable {
     }
 
     /**
-     * Serialize this instance of a scenario template to a File Please pass in a non-null file.
+     * Serialize this instance of a scenario template to a File as JSON. JSON is the write format for standalone
+     * scenario template files; the XML paths ({@link #Serialize(PrintWriter)} and the {@code Node} deserializer) are
+     * retained for the template fragment embedded in campaign saves. Please pass in a non-null file.
      *
      * @param outputFile The destination file.
      */
     public void Serialize(File outputFile) {
         try {
-            JAXBContext context = JAXBContext.newInstance(ScenarioTemplate.class);
-            JAXBElement<ScenarioTemplate> templateElement = new JAXBElement<>(new QName(ROOT_XML_ELEMENT_NAME),
-                  ScenarioTemplate.class, this);
-            Marshaller m = context.createMarshaller();
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            m.marshal(templateElement, outputFile);
+            ScenarioTemplateJson.toFile(this, outputFile);
         } catch (Exception e) {
-            LOGGER.error("", e);
+            LOGGER.error("Error serializing scenario template to JSON", e);
         }
     }
 
@@ -344,6 +345,12 @@ public class ScenarioTemplate implements Cloneable {
         ScenarioTemplate resultingTemplate = null;
 
         try {
+            // JSON is the write format; XML is still read for legacy/user files. Detect by content (a leading '{' is
+            // JSON) rather than extension, so a file is parsed correctly regardless of what it is named.
+            if (isJsonContent(inputFile)) {
+                return ScenarioTemplateJson.fromFile(inputFile);
+            }
+
             JAXBContext context = JAXBContext.newInstance(ScenarioTemplate.class);
             Unmarshaller um = context.createUnmarshaller();
             try (FileInputStream fileStream = new FileInputStream(inputFile)) {
@@ -356,6 +363,28 @@ public class ScenarioTemplate implements Cloneable {
         }
 
         return resultingTemplate;
+    }
+
+    /**
+     * Determines whether a file holds JSON by inspecting its first non-whitespace character. A leading '{' indicates
+     * JSON; anything else (a scenario template XML document begins with '<') is treated as XML.
+     *
+     * @param inputFile the file to inspect
+     *
+     * @return true if the file appears to contain JSON
+     *
+     * @throws IOException if the file cannot be read
+     */
+    private static boolean isJsonContent(File inputFile) throws IOException {
+        try (BufferedReader reader = Files.newBufferedReader(inputFile.toPath(), StandardCharsets.UTF_8)) {
+            int character;
+            while ((character = reader.read()) != -1) {
+                if (!Character.isWhitespace(character)) {
+                    return character == '{';
+                }
+            }
+        }
+        return false;
     }
 
     /**
