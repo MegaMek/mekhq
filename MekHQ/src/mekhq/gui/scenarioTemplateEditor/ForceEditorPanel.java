@@ -41,6 +41,7 @@ import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.ResourceBundle;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 
@@ -63,6 +64,9 @@ import mekhq.campaign.mission.ScenarioForceTemplate.SynchronizedDeploymentType;
  * contract; the containing dialog owns the roster commit and force list.
  */
 public class ForceEditorPanel extends JPanel {
+
+    private static final ResourceBundle RESOURCES = ResourceBundle.getBundle(
+          "mekhq.resources.ScenarioTemplateEditorDialog");
 
     private final Dimension spinnerSize = new Dimension(55, 25);
 
@@ -96,7 +100,7 @@ public class ForceEditorPanel extends JPanel {
     private final JCheckBox chkSubjectToRandomRemoval = new JCheckBox();
     private final JCheckBox chkSyncRetreatThreshold = new JCheckBox();
     private final RoleSetEditorPanel roleSetEditorPanel = new RoleSetEditorPanel();
-    private final JButton btnSave = new JButton("Save");
+    private final JButton btnSave = new JButton(RESOURCES.getString("ForceEditorPanel.save"));
 
     private Runnable onSave;
 
@@ -168,28 +172,28 @@ public class ForceEditorPanel extends JPanel {
         gbc.gridy = 1;
         gbc.anchor = GridBagConstraints.WEST;
 
-        addRow(gbc, "Force Alignment:", cboAlignment);
-        addRow(gbc, "Generation Method:", cboGenerationMethod);
-        addRow(gbc, "Scaling Multiplier:", spnMultiplier);
-        addRow(gbc, "Destination Zone:", cboDestinationZone);
-        addRow(gbc, "Retreat Threshold:", spnRetreatThreshold);
-        addRow(gbc, "Reinforce subsequent scenarios:", chkReinforce);
-        addRow(gbc, "Contributes to BV:", chkContributesToBV);
-        addRow(gbc, "Contributes to Unit Count:", chkContributesToUnitCount);
-        addRow(gbc, "Force ID:", txtForceName);
-        addRow(gbc, "Synchronized Deployment:", cboSyncDeploymentType);
+        addRow(gbc, "ForceEditorPanel.forceAlignment.label", cboAlignment);
+        addRow(gbc, "ForceEditorPanel.generationMethod.label", cboGenerationMethod);
+        addRow(gbc, "ForceEditorPanel.scalingMultiplier.label", spnMultiplier);
+        addRow(gbc, "ForceEditorPanel.destinationZone.label", cboDestinationZone);
+        addRow(gbc, "ForceEditorPanel.retreatThreshold.label", spnRetreatThreshold);
+        addRow(gbc, "ForceEditorPanel.reinforce.label", chkReinforce);
+        addRow(gbc, "ForceEditorPanel.contributesToBV.label", chkContributesToBV);
+        addRow(gbc, "ForceEditorPanel.contributesToUnitCount.label", chkContributesToUnitCount);
+        addRow(gbc, "ForceEditorPanel.forceId.label", txtForceName);
+        addRow(gbc, "ForceEditorPanel.syncDeployment.label", cboSyncDeploymentType);
 
         gbc.gridy++;
         gbc.gridx = 1;
         add(cboSyncForceName, gbc);
 
-        addRow(gbc, "Fixed MUL:", new FastJScrollPane(listMULs));
-        addRow(gbc, "Objective-Linked Forces:", new FastJScrollPane(lstObjectiveLinkedForces));
+        addRow(gbc, "ForceEditorPanel.fixedMul.label", new FastJScrollPane(listMULs));
+        addRow(gbc, "ForceEditorPanel.objectiveLinkedForces.label", new FastJScrollPane(lstObjectiveLinkedForces));
 
         // second column: deployment zones (full height)
         gbc.gridx = 2;
         gbc.gridy = 0;
-        add(new JLabel("Possible Deployment Zones"), gbc);
+        add(new JLabel(RESOURCES.getString("ForceEditorPanel.deploymentZones.label")), gbc);
         gbc.gridy = 1;
         gbc.gridheight = GridBagConstraints.REMAINDER;
         add(lstDeployZones, gbc);
@@ -198,22 +202,22 @@ public class ForceEditorPanel extends JPanel {
         gbc.gridx = 3;
         gbc.gridy = 1;
         gbc.gridheight = 1;
-        add(new JLabel("Unit Type:"), gbc);
+        add(new JLabel(RESOURCES.getString("ForceEditorPanel.unitType.label")), gbc);
         gbc.gridx = 4;
         add(cboUnitType, gbc);
 
-        addGridRow(gbc, "Arrival Turn:", spnArrivalTurn);
-        addGridRow(gbc, "Fixed Unit Count:", spnFixedUnitCount);
-        addGridRow(gbc, "Max Weight:", cboMaxWeightClass);
-        addGridRow(gbc, "Min Weight:", cboMinWeightClass);
-        addGridRow(gbc, "Contributes to Map Size:", chkContributesToMapSize);
-        addGridRow(gbc, "Generation Order:", spnGenerationOrder);
-        addGridRow(gbc, "Allow Aero Bombs:", chkAllowAeroBombs);
-        addGridRow(gbc, "Start Altitude:", spnStartingAltitude);
-        addGridRow(gbc, "Is Artillery:", chkUseArtillery);
-        addGridRow(gbc, "Deploy Off board:", chkOffBoard);
-        addGridRow(gbc, "Subject to Random Removal:", chkSubjectToRandomRemoval);
-        addGridRow(gbc, "Sync Retreat Threshold:", chkSyncRetreatThreshold);
+        addGridRow(gbc, "ForceEditorPanel.arrivalTurn.label", spnArrivalTurn);
+        addGridRow(gbc, "ForceEditorPanel.fixedUnitCount.label", spnFixedUnitCount);
+        addGridRow(gbc, "ForceEditorPanel.maxWeight.label", cboMaxWeightClass);
+        addGridRow(gbc, "ForceEditorPanel.minWeight.label", cboMinWeightClass);
+        addGridRow(gbc, "ForceEditorPanel.contributesToMapSize.label", chkContributesToMapSize);
+        addGridRow(gbc, "ForceEditorPanel.generationOrder.label", spnGenerationOrder);
+        addGridRow(gbc, "ForceEditorPanel.allowAeroBombs.label", chkAllowAeroBombs);
+        addGridRow(gbc, "ForceEditorPanel.startAltitude.label", spnStartingAltitude);
+        addGridRow(gbc, "ForceEditorPanel.isArtillery.label", chkUseArtillery);
+        addGridRow(gbc, "ForceEditorPanel.deployOffBoard.label", chkOffBoard);
+        addGridRow(gbc, "ForceEditorPanel.subjectToRandomRemoval.label", chkSubjectToRandomRemoval);
+        addGridRow(gbc, "ForceEditorPanel.syncRetreatThreshold.label", chkSyncRetreatThreshold);
 
         gbc.gridx = 5;
         add(btnSave, gbc);
@@ -227,20 +231,20 @@ public class ForceEditorPanel extends JPanel {
         add(roleSetEditorPanel, roleGbc);
     }
 
-    /** Adds a label/control pair in the first column pair (gridx 0/1), advancing gridy. */
-    private void addRow(GridBagConstraints gbc, String label, java.awt.Component control) {
+    /** Adds a resource-keyed label/control pair in the first column pair (gridx 0/1), advancing gridy. */
+    private void addRow(GridBagConstraints gbc, String labelKey, java.awt.Component control) {
         gbc.gridx = 0;
         gbc.gridy++;
-        add(new JLabel(label), gbc);
+        add(new JLabel(RESOURCES.getString(labelKey)), gbc);
         gbc.gridx = 1;
         add(control, gbc);
     }
 
-    /** Adds a label/control pair in the third column pair (gridx 3/4), advancing gridy. */
-    private void addGridRow(GridBagConstraints gbc, String label, java.awt.Component control) {
+    /** Adds a resource-keyed label/control pair in the third column pair (gridx 3/4), advancing gridy. */
+    private void addGridRow(GridBagConstraints gbc, String labelKey, java.awt.Component control) {
         gbc.gridx = 3;
         gbc.gridy++;
-        add(new JLabel(label), gbc);
+        add(new JLabel(RESOURCES.getString(labelKey)), gbc);
         gbc.gridx = 4;
         add(control, gbc);
     }
