@@ -122,7 +122,7 @@ public class GeneralPage {
     private JLabel lblFaction;
     private MMComboBox<FactionDisplay> comboFaction;
     private JButton btnRandomFaction;
-    private CampaignOptionsButton btnCompanyGenerator;
+    private CampaignOptionsButton btnCommandGenerator;
     private JLabel lblDate;
     private JButton btnDate;
     private JButton btnRandomDate;
@@ -241,10 +241,10 @@ public class GeneralPage {
         // the generator's purpose (seeding the starting force) doesn't apply. The button is disabled in
         // those modes (matching how btnDate / btnRandomDate are gated) so it stays visually consistent in
         // the layout but can't be clicked.
-        btnCompanyGenerator = new CampaignOptionsButton("CommandGenerator");
-        btnCompanyGenerator.addActionListener(e -> new CommandGenerationDialog(frame, campaign).setVisible(true));
+        btnCommandGenerator = new CampaignOptionsButton("CommandGenerator");
+        btnCommandGenerator.addActionListener(e -> new CommandGenerationDialog(frame, campaign).setVisible(true));
         if (mode != CampaignOptionsDialogMode.STARTUP && mode != CampaignOptionsDialogMode.STARTUP_ABRIDGED) {
-            btnCompanyGenerator.setEnabled(false);
+            btnCommandGenerator.setEnabled(false);
         }
 
         // Date
@@ -329,7 +329,7 @@ public class GeneralPage {
         panel.addRow(lblDate, createInlineControls(btnDate, btnRandomDate));
         panel.addRow(lblName, createInlineControls(createFixedWidthControl(txtName), btnNameGenerator));
         panel.addRow(lblFaction,
-              createInlineControls(createFixedWidthControl(comboFaction), btnRandomFaction, btnCompanyGenerator));
+              createInlineControls(createFixedWidthControl(comboFaction), btnRandomFaction, btnCommandGenerator));
         panel.addRow(lblStartingLocation, startingLocationControl);
         panel.addRow(lblStartingLocationFaction, startingLocationFactionControl);
         panel.addRow(lblStartingWorld, startingWorldControl);

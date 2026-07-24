@@ -140,7 +140,7 @@ public class MekHQMenuBar extends JMenuBar {
     private JMenu menuThemes;
     private JMenuItem miRetirementDefectionDialog;
     private JMenuItem miAwardEligibilityDialog;
-    private JMenuItem miCompanyGenerator;
+    private JMenuItem miCommandGenerator;
     private JMenuItem miPlanetarySystemEditor;
 
     /**
@@ -569,10 +569,10 @@ public class MekHQMenuBar extends JMenuBar {
               evt -> new ScenarioTemplateEditorDialog(getFrame()).setVisible(true));
         menuManage.add(miScenarioEditor);
 
-        miCompanyGenerator = createMenuItem("miCompanyGenerator.text", KeyEvent.VK_C,
+        miCommandGenerator = createMenuItem("miCommandGenerator.text", KeyEvent.VK_C,
               evt -> new CommandGenerationDialog(getFrame(), getCampaign()).setVisible(true));
-        miCompanyGenerator.setVisible(MekHQ.getMHQOptions().getShowCompanyGenerator());
-        menuManage.add(miCompanyGenerator);
+        miCommandGenerator.setVisible(MekHQ.getMHQOptions().getShowCommandGenerator());
+        menuManage.add(miCommandGenerator);
 
         JMenuItem miAutoResolveBehaviorEditor = createMenuItem("miAutoResolveBehaviorSettings.text", KeyEvent.VK_T, evt -> {
             var autoResolveBehaviorSettingsDialog = new AutoResolveBehaviorSettingsDialog(getFrame(), getCampaign());
@@ -1164,7 +1164,7 @@ public class MekHQMenuBar extends JMenuBar {
      */
     @Subscribe
     public void handle(final MHQOptionsChangedEvent mhqOptionsChangedEvent) {
-        miCompanyGenerator.setVisible(MekHQ.getMHQOptions().getShowCompanyGenerator());
+        miCommandGenerator.setVisible(MekHQ.getMHQOptions().getShowCommandGenerator());
     }
 
 }

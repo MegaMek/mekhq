@@ -54,7 +54,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.familyTree.Genealogy;
-import mekhq.campaign.personnel.ranks.AutoAssignRankForCompanyGenerator;
+import mekhq.campaign.personnel.ranks.AutoAssignRankForCommandGenerator;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionCensureGoingRogueDialog;
@@ -214,7 +214,7 @@ public class GoingRogue {
                                          role,
                                          chosenFactionCode,
                                          megamek.common.enums.Gender.RANDOMIZE);
-            AutoAssignRankForCompanyGenerator.assignRankSystemFromFaction(speaker, RO_MIN);
+            AutoAssignRankForCommandGenerator.assignRankSystemFromFaction(speaker, RO_MIN);
             new FactionJudgmentDialog(campaign, speaker, commander, DEFECTION_GREETING_LOOKUP, newFaction,
                   FactionStandingJudgmentType.WELCOME, ImmersiveDialogWidth.MEDIUM, null, null);
         }

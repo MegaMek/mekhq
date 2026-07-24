@@ -106,7 +106,7 @@ class MHQOptionsModel {
     int guiScaleValue;
     boolean hideUnitFluff;
     boolean historicalDailyLog;
-    boolean showCompanyGenerator;
+    boolean showCommandGenerator;
     boolean showUnitPicturesOnTOE;
     // endregion Display - General
 
@@ -201,7 +201,7 @@ class MHQOptionsModel {
         guiScaleValue = (int) (GUIPreferences.getInstance().getGUIScale() * 10);
         hideUnitFluff = options.getHideUnitFluff();
         historicalDailyLog = options.getHistoricalDailyLog();
-        showCompanyGenerator = options.getShowCompanyGenerator();
+        showCommandGenerator = options.getShowCommandGenerator();
         showUnitPicturesOnTOE = options.getShowUnitPicturesOnTOE();
 
         // Display - Interstellar Map
@@ -368,7 +368,7 @@ class MHQOptionsModel {
         }
         options.setHideUnitFluff(hideUnitFluff);
         options.setHistoricalDailyLog(historicalDailyLog);
-        options.setShowCompanyGenerator(showCompanyGenerator);
+        options.setShowCommandGenerator(showCommandGenerator);
         options.setShowUnitPicturesOnTOE(showUnitPicturesOnTOE);
 
         // Display - Interstellar Map

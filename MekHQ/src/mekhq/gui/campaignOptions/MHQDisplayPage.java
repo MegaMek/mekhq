@@ -79,7 +79,7 @@ class MHQDisplayPage extends MHQOptionsPage {
     private JSlider guiScaleSlider;
     private CampaignOptionsCheckBox chkHideUnitFluff;
     private CampaignOptionsCheckBox chkHistoricalDailyLog;
-    private CampaignOptionsCheckBox chkShowCompanyGenerator;
+    private CampaignOptionsCheckBox chkShowCommandGenerator;
     private CampaignOptionsCheckBox chkShowUnitPicturesOnTOE;
 
     // Display - Interstellar Map
@@ -164,10 +164,10 @@ class MHQDisplayPage extends MHQOptionsPage {
 
         chkHideUnitFluff = checkBox("optionHideUnitFluff", model.hideUnitFluff);
         chkHistoricalDailyLog = checkBox("optionHistoricalDailyLog", model.historicalDailyLog);
-        chkShowCompanyGenerator = checkBox("chkShowCompanyGenerator", model.showCompanyGenerator);
+        chkShowCommandGenerator = checkBox("chkShowCommandGenerator", model.showCommandGenerator);
         chkShowUnitPicturesOnTOE = checkBox("chkShowUnitPicturesOnTOE", model.showUnitPicturesOnTOE);
         panel.addCheckBoxGrid(2, chkHideUnitFluff, chkHistoricalDailyLog,
-              chkShowCompanyGenerator, chkShowUnitPicturesOnTOE);
+              chkShowCommandGenerator, chkShowUnitPicturesOnTOE);
 
         return panel;
     }
@@ -345,7 +345,7 @@ class MHQDisplayPage extends MHQOptionsPage {
         model.guiScaleValue = guiScaleSlider.getValue();
         model.hideUnitFluff = chkHideUnitFluff.isSelected();
         model.historicalDailyLog = chkHistoricalDailyLog.isSelected();
-        model.showCompanyGenerator = chkShowCompanyGenerator.isSelected();
+        model.showCommandGenerator = chkShowCommandGenerator.isSelected();
         model.showUnitPicturesOnTOE = chkShowUnitPicturesOnTOE.isSelected();
 
         model.interstellarMapShowJumpRadius = chkInterstellarMapShowJumpRadius.isSelected();

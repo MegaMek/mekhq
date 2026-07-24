@@ -65,7 +65,7 @@ import mekhq.campaign.universe.Faction;
  * @author Illiani
  * @since 0.51.0
  */
-public final class AutoAssignRankForCompanyGenerator {
+public final class AutoAssignRankForCommandGenerator {
     private static final String NO_RANK = "None";
     private static final String MISSING_RANK = "-";
 
@@ -317,6 +317,6 @@ public final class AutoAssignRankForCompanyGenerator {
         }
         person.setRankSystem(rankValidator, rankSystem);
 
-        AutoAssignRankForCompanyGenerator.assignAscendingRank(person, rankLevel);
+        AutoAssignRankForCommandGenerator.assignAscendingRank(person, rankLevel);
     }
 }

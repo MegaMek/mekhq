@@ -199,7 +199,7 @@ public class CampaignGUI extends JPanel {
 
     /* Top Panel */
     private JPanel pnlTop;
-    private RoundedJButton btnCompanyGenerator;
+    private RoundedJButton btnCommandGenerator;
     private final RoundedJButton btnContractMarket =
           new RoundedJButton(resourceMap.getString("btnContractMarket.market"));
     private final RoundedJButton btnUnitMarket = new RoundedJButton(resourceMap.getString("btnUnitMarket.market"));
@@ -540,13 +540,13 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
 
-        btnCompanyGenerator = new RoundedJButton(resourceMap.getString("btnCompanyGenerator.text"));
-        btnCompanyGenerator.setToolTipText(resourceMap.getString("btnCompanyGenerator.toolTipText"));
-        btnCompanyGenerator.addActionListener(
+        btnCommandGenerator = new RoundedJButton(resourceMap.getString("btnCommandGenerator.text"));
+        btnCommandGenerator.setToolTipText(resourceMap.getString("btnCommandGenerator.toolTipText"));
+        btnCommandGenerator.addActionListener(
               e -> new CommandGenerationDialog(getFrame(), getCampaign()).setVisible(true));
         gridBagConstraints.gridy = 0;
         gridBagConstraints.insets = new Insets(MEDIUM_GAP - 2, SMALL_GAP, -2, SMALL_GAP);
-        pnlButton.add(btnCompanyGenerator, gridBagConstraints);
+        pnlButton.add(btnCommandGenerator, gridBagConstraints);
 
         RoundedMMToggleButton btnGMMode = new RoundedMMToggleButton(resourceMap.getString("btnGMMode.text"));
         btnGMMode.setToolTipText(resourceMap.getString("btnGMMode.toolTipText"));
@@ -1687,7 +1687,7 @@ public class CampaignGUI extends JPanel {
                                           .stream()
                                           .allMatch(base -> base.getBaseHangar().getUnits().isEmpty());
         boolean noPersonnel = getCampaign().getPlayerForce().getHumanResources().getPersonnel().isEmpty();
-        btnCompanyGenerator.setVisible(emptyHangar && noPersonnel);
+        btnCommandGenerator.setVisible(emptyHangar && noPersonnel);
     }
 
     public int getTabIndexByName(String tabTitle) {

@@ -94,12 +94,12 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.HISTORICAL_DAILY_LOG, value);
     }
 
-    public boolean getShowCompanyGenerator() {
-        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.SHOW_COMPANY_GENERATOR, true);
+    public boolean getShowCommandGenerator() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.SHOW_COMMAND_GENERATOR, true);
     }
 
-    public void setShowCompanyGenerator(final boolean value) {
-        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.SHOW_COMPANY_GENERATOR, value);
+    public void setShowCommandGenerator(final boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.SHOW_COMMAND_GENERATOR, value);
     }
 
     public boolean getShowUnitPicturesOnTOE() {

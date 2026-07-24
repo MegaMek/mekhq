@@ -46,7 +46,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.ranks.AutoAssignRankForCompanyGenerator;
+import mekhq.campaign.personnel.ranks.AutoAssignRankForCommandGenerator;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitOrder;
@@ -368,7 +368,7 @@ public final class SupportUnitGenerator {
                 Unit unit = campaign.addNewUnit(mekSummary.loadEntity(), true, 0, quality);
                 if (unit != null) {
                     if (autoAssignRanks) {
-                        AutoAssignRankForCompanyGenerator.assignRanks(campaign, unit, faction);
+                        AutoAssignRankForCommandGenerator.assignRanks(campaign, unit, faction);
                     }
                     units.add(unit);
                 }
