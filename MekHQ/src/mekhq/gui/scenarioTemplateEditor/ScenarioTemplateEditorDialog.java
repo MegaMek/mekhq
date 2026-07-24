@@ -70,9 +70,7 @@ import mekhq.campaign.mission.ScenarioForceTemplate.SynchronizedDeploymentType;
 import mekhq.campaign.mission.ScenarioMapParameters;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.ScenarioTemplate;
-import mekhq.campaign.mission.ScenarioTemplate.BattlefieldControlType;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
-import mekhq.campaign.mission.enums.ScenarioType;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 
@@ -120,15 +118,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     JCheckBox chkSyncRetreatThreshold;
 
     JPanel panForceList;
-    JTextField txtScenarioName;
-    JTextArea txtScenarioBriefing;
-    JTextArea txtLongBriefing;
-    JComboBox<ScenarioType> cboScenarioType;
-    JComboBox<BattlefieldControlType> cboBattlefieldControl;
-    JCheckBox chkHostileFacility;
-    JCheckBox chkAlliedFacility;
-    JCheckBox chkSuitedForAmbushes;
-    JCheckBox chkSuitedForBungledPatrols;
+    TemplatePropertiesPanel templatePropertiesPanel;
     JTextField txtBaseWidth;
     JList<String> lstAllowedTerrainTypes;
     JTextField txtBaseHeight;
@@ -194,8 +184,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
-        setupTopFluff(gbc);
-        setupScenarioProperties(gbc);
+        setupTemplateProperties(gbc);
         setupObjectiveEditUI(gbc);
         setupForceEditorHeaders(gbc);
         setupForceEditor(gbc);
@@ -226,103 +215,15 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
      * Sets up text entry boxes in the top - briefing, scenario name, labels.
      *
      */
-    private void setupTopFluff(GridBagConstraints gridBagConstraints) {
-        JLabel lblScenarioName = new JLabel("Scenario Name:");
+    private void setupTemplateProperties(GridBagConstraints gridBagConstraints) {
+        templatePropertiesPanel = new TemplatePropertiesPanel();
+        templatePropertiesPanel.load(scenarioTemplate);
 
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridwidth = GridBagConstraints.REMAINDER;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
-        globalPanel.add(lblScenarioName, gridBagConstraints);
-
-        txtScenarioName = new JTextField(80);
-        txtScenarioName.setText(scenarioTemplate.name);
+        globalPanel.add(templatePropertiesPanel, gridBagConstraints);
         gridBagConstraints.gridy++;
-        globalPanel.add(txtScenarioName, gridBagConstraints);
-
-        JLabel lblScenarioBriefing = new JLabel("Short Briefing:");
-        gridBagConstraints.gridy++;
-        globalPanel.add(lblScenarioBriefing, gridBagConstraints);
-
-        txtScenarioBriefing = new JTextArea(3, 80);
-        txtScenarioBriefing.setEditable(true);
-        txtScenarioBriefing.setLineWrap(true);
-        txtScenarioBriefing.setText(scenarioTemplate.shortBriefing);
-        JScrollPane scrScenarioBriefing = new FastJScrollPane(txtScenarioBriefing);
-        gridBagConstraints.gridy++;
-        globalPanel.add(scrScenarioBriefing, gridBagConstraints);
-
-        JLabel lblLongBriefing = new JLabel("Detailed Briefing:");
-        gridBagConstraints.gridy++;
-        globalPanel.add(lblLongBriefing, gridBagConstraints);
-
-        txtLongBriefing = new JTextArea(5, 80);
-        txtLongBriefing.setEditable(true);
-        txtLongBriefing.setLineWrap(true);
-        txtLongBriefing.setText(scenarioTemplate.detailedBriefing);
-        JScrollPane scrLongBriefing = new FastJScrollPane(txtLongBriefing);
-        gridBagConstraints.gridy++;
-        globalPanel.add(scrLongBriefing, gridBagConstraints);
-    }
-
-    /**
-     * Sets up the top-level scenario property controls: scenario type, battlefield control, and the facility and
-     * ambush/patrol suitability flags. Values are populated from the current template, so this doubles as the load path
-     * (initComponents re-runs when a template is loaded).
-     */
-    private void setupScenarioProperties(GridBagConstraints gridBagConstraints) {
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy++;
-        gridBagConstraints.gridwidth = GridBagConstraints.REMAINDER;
-
-        JPanel pnlScenarioProperties = new JPanel(new GridBagLayout());
-        GridBagConstraints localGbc = new GridBagConstraints();
-        localGbc.gridx = 0;
-        localGbc.gridy = 0;
-        localGbc.anchor = GridBagConstraints.WEST;
-        localGbc.insets = new Insets(0, 0, 0, 5);
-
-        localGbc.gridwidth = GridBagConstraints.REMAINDER;
-        pnlScenarioProperties.add(new JLabel("Scenario Properties:"), localGbc);
-        localGbc.gridwidth = 1;
-
-        localGbc.gridx = 0;
-        localGbc.gridy++;
-        pnlScenarioProperties.add(new JLabel("Scenario Type:"), localGbc);
-        cboScenarioType = new JComboBox<>(ScenarioType.values());
-        cboScenarioType.setSelectedItem(scenarioTemplate.getStratConScenarioType());
-        localGbc.gridx = 1;
-        pnlScenarioProperties.add(cboScenarioType, localGbc);
-
-        localGbc.gridx = 0;
-        localGbc.gridy++;
-        pnlScenarioProperties.add(new JLabel("Battlefield Control:"), localGbc);
-        cboBattlefieldControl = new JComboBox<>(BattlefieldControlType.values());
-        cboBattlefieldControl.setSelectedItem(scenarioTemplate.getBattlefieldControl());
-        localGbc.gridx = 1;
-        pnlScenarioProperties.add(cboBattlefieldControl, localGbc);
-
-        chkHostileFacility = new JCheckBox("Hostile Facility");
-        chkHostileFacility.setSelected(scenarioTemplate.isHostileFacility);
-        localGbc.gridx = 0;
-        localGbc.gridy++;
-        pnlScenarioProperties.add(chkHostileFacility, localGbc);
-
-        chkAlliedFacility = new JCheckBox("Allied Facility");
-        chkAlliedFacility.setSelected(scenarioTemplate.isAlliedFacility);
-        localGbc.gridx = 1;
-        pnlScenarioProperties.add(chkAlliedFacility, localGbc);
-
-        chkSuitedForAmbushes = new JCheckBox("Suited for Ambushes");
-        chkSuitedForAmbushes.setSelected(scenarioTemplate.isSuitedForAmbushes());
-        localGbc.gridx = 0;
-        localGbc.gridy++;
-        pnlScenarioProperties.add(chkSuitedForAmbushes, localGbc);
-
-        chkSuitedForBungledPatrols = new JCheckBox("Suited for Bungled Patrols");
-        chkSuitedForBungledPatrols.setSelected(scenarioTemplate.isSuitedForBungledPatrols());
-        localGbc.gridx = 1;
-        pnlScenarioProperties.add(chkSuitedForBungledPatrols, localGbc);
-
-        globalPanel.add(pnlScenarioProperties, gridBagConstraints);
     }
 
     private void setupObjectiveEditUI(GridBagConstraints gbc) {
@@ -1743,17 +1644,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             return;
         }
 
-        scenarioTemplate.name = txtScenarioName.getText();
-        scenarioTemplate.shortBriefing = txtScenarioBriefing.getText();
-        scenarioTemplate.detailedBriefing = txtLongBriefing.getText();
-
-        // setStratConScenarioType only accepts the enum's name; the combo holds the enum itself.
-        scenarioTemplate.setStratConScenarioType(((ScenarioType) cboScenarioType.getSelectedItem()).name());
-        scenarioTemplate.battlefieldControl = (BattlefieldControlType) cboBattlefieldControl.getSelectedItem();
-        scenarioTemplate.isHostileFacility = chkHostileFacility.isSelected();
-        scenarioTemplate.isAlliedFacility = chkAlliedFacility.isSelected();
-        scenarioTemplate.isSuitedForAmbushes = chkSuitedForAmbushes.isSelected();
-        scenarioTemplate.isSuitedForBungledPatrols = chkSuitedForBungledPatrols.isSelected();
+        templatePropertiesPanel.writeInto(scenarioTemplate);
 
         scenarioTemplate.mapParameters.allowedTerrainTypes.clear();
         for (int index : lstAllowedTerrainTypes.getSelectedIndices()) {

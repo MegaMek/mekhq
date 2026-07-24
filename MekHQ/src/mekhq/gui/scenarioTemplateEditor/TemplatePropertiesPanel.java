@@ -35,6 +35,7 @@ package mekhq.gui.scenarioTemplateEditor;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.util.ResourceBundle;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -57,16 +58,23 @@ import mekhq.campaign.mission.enums.ScenarioType;
  */
 public class TemplatePropertiesPanel extends JPanel {
 
+    private static final ResourceBundle RESOURCES = ResourceBundle.getBundle(
+          "mekhq.resources.ScenarioTemplateEditorDialog");
+
     private final JTextField txtName = new JTextField(80);
     private final JTextArea txtShortBriefing = new JTextArea(3, 80);
     private final JTextArea txtLongBriefing = new JTextArea(5, 80);
     private final JComboBox<ScenarioType> cboScenarioType = new JComboBox<>(ScenarioType.values());
     private final JComboBox<BattlefieldControlType> cboBattlefieldControl =
           new JComboBox<>(BattlefieldControlType.values());
-    private final JCheckBox chkHostileFacility = new JCheckBox("Hostile Facility");
-    private final JCheckBox chkAlliedFacility = new JCheckBox("Allied Facility");
-    private final JCheckBox chkSuitedForAmbushes = new JCheckBox("Suited for Ambushes");
-    private final JCheckBox chkSuitedForBungledPatrols = new JCheckBox("Suited for Bungled Patrols");
+    private final JCheckBox chkHostileFacility = new JCheckBox(
+          RESOURCES.getString("TemplatePropertiesPanel.hostileFacility.label"));
+    private final JCheckBox chkAlliedFacility = new JCheckBox(
+          RESOURCES.getString("TemplatePropertiesPanel.alliedFacility.label"));
+    private final JCheckBox chkSuitedForAmbushes = new JCheckBox(
+          RESOURCES.getString("TemplatePropertiesPanel.suitedForAmbushes.label"));
+    private final JCheckBox chkSuitedForBungledPatrols = new JCheckBox(
+          RESOURCES.getString("TemplatePropertiesPanel.suitedForBungledPatrols.label"));
 
     public TemplatePropertiesPanel() {
         super(new GridBagLayout());
@@ -84,24 +92,24 @@ public class TemplatePropertiesPanel extends JPanel {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(2, 2, 2, 2);
 
-        add(new JLabel("Scenario Name:"), gbc);
+        add(new JLabel(RESOURCES.getString("TemplatePropertiesPanel.scenarioName.label")), gbc);
         gbc.gridy++;
         add(txtName, gbc);
 
         gbc.gridy++;
-        add(new JLabel("Short Briefing:"), gbc);
+        add(new JLabel(RESOURCES.getString("TemplatePropertiesPanel.shortBriefing.label")), gbc);
         gbc.gridy++;
         add(new FastJScrollPane(txtShortBriefing), gbc);
 
         gbc.gridy++;
-        add(new JLabel("Detailed Briefing:"), gbc);
+        add(new JLabel(RESOURCES.getString("TemplatePropertiesPanel.detailedBriefing.label")), gbc);
         gbc.gridy++;
         add(new FastJScrollPane(txtLongBriefing), gbc);
 
         JPanel typeRow = new JPanel();
-        typeRow.add(new JLabel("Scenario Type:"));
+        typeRow.add(new JLabel(RESOURCES.getString("TemplatePropertiesPanel.scenarioType.label")));
         typeRow.add(cboScenarioType);
-        typeRow.add(new JLabel("Battlefield Control:"));
+        typeRow.add(new JLabel(RESOURCES.getString("TemplatePropertiesPanel.battlefieldControl.label")));
         typeRow.add(cboBattlefieldControl);
         gbc.gridy++;
         add(typeRow, gbc);
