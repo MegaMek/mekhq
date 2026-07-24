@@ -65,8 +65,6 @@ import mekhq.utilities.MHQXMLUtility;
 public class StratConContractDefinition {
     private static final MMLogger LOGGER = MMLogger.create(StratConContractDefinition.class);
 
-    public static final String ROOT_XML_ELEMENT_NAME = "ScenarioTemplate";
-
     private static ContractDefinitionManifest definitionManifest;
     private static final Map<AtBContractType, StratConContractDefinition> loadedDefinitions = new HashMap<>();
 

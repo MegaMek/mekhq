@@ -53,10 +53,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * directly, with getters/setters/creators disabled. This mirrors the state JAXB persists (which is field-backed) while
  * avoiding the model's accessor quirks, such as {@code getAllowedTerrainType()} not matching the
  * {@code allowedTerrainTypes} field name, or getter-only collections like {@code roleChoices}.
- *
- * <p>NOTE: Phase 3.0 spike. Only the mapper configuration and generic helpers exist so far; the per-class handling
- * (enum name-string adapters with graceful fallback, and the full round-trip API) is filled in during 3.1, gated by the
- * cross-format equivalence harness (0.5).
  */
 public final class ScenarioTemplateJson {
 
