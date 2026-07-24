@@ -205,6 +205,9 @@ public class SparesAndFinancesTab {
         gbc.gridy = 0;
         gbc.gridwidth = 2;
         gbc.fill = GridBagConstraints.HORIZONTAL;
+        // The bundle text carries a fixed HTML body width so the label wraps; an unconstrained HTML
+        // JLabel reports its whole text as one line of preferred width, which inflated this column
+        // until the finances column was pushed off-screen.
         section.add(new CommandGenerationLabel("SparesHelpBody", true), gbc);
         return section;
     }
