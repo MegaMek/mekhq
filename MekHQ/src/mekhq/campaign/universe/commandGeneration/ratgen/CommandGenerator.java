@@ -63,14 +63,26 @@ import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE;
 import mekhq.campaign.universe.commandGeneration.SupportUnitGenerator;
 
 /**
- * Single entry point for the ratgen-driven starting-force pipeline.
+ * Single entry point for the ratgen-driven Command Generator pipeline.
  *
  * <p>Composes the helpers in this package — {@link RulesetEngineBootstrap},
  * {@link ForceDescriptorWalker}, {@link MultiCrewAssembler}, {@link CrewDescriptorAdapter},
- * {@link RankAssigner} — into the 8-step pipeline described in
+ * {@link RankAssigner} — into the pipeline described in
  * {@code docs/plans/force-generator-company-generation.md} (megamek repo): bootstrap →
  * buildDescriptor → processRoot → walk → personnel → units → tree → spares. The finance and
  * contract polish stages remain deferred.</p>
+ *
+ * <p>The pipeline is split into a pure roll and campaign materialization, giving two consumer
+ * patterns:</p>
+ * <ul>
+ *   <li><b>Player command</b> (the Command Designer): roll — via the embedded Force Generator
+ *       preview or {@link #rollCommand} — then {@link #applyToCampaign} and
+ *       {@link #generateSupportFromToe} materialize Units, Persons, and Formations into the
+ *       campaign TOE.</li>
+ *   <li><b>OpFor</b> (future): seed a {@link ForceDescriptorSnapshot} with the enemy faction and
+ *       year, {@link #rollCommand}, then {@link #collectEntities} - the crewed entities feed a
+ *       {@code BotForce} without creating any campaign state.</li>
+ * </ul>
  */
 public final class CommandGenerator {
 
@@ -127,91 +139,30 @@ public final class CommandGenerator {
     }
 
     /**
-     * Runs the ratgen pipeline end-to-end and applies the result to the given campaign. Returns the
-     * descriptor tree the engine built so callers can inspect the structure (count leaves, log the
-     * hierarchy, drive verification checks).
+     * Rolls a command from the given snapshot without touching any campaign: bootstraps the engine
+     * for the snapshot's year, builds the root {@link ForceDescriptor}, and rolls the force via
+     * {@link Ruleset#processRoot}. Each leaf of the returned tree carries a fully crewed
+     * {@link Entity}.
      *
-     * @param campaign the target {@link Campaign}; receives the generated Formations, Units, and Persons
-     * @param options  the user's {@link CommandGenerationOptions}; the
-     *                 {@link CommandGenerationOptions#getForceDescriptorSnapshot()} block supplies the
-     *                 ratgen inputs
-     * @return the generated {@link Result} bundling the descriptor tree and the flat list of Persons
-     *         the pipeline created (the descriptor is {@code null} if the engine layer failed)
-     */
-    public static Result generate(Campaign campaign, CommandGenerationOptions options) {
-        return generate(campaign, options, null);
-    }
-
-    /**
-     * Same as {@link #generate(Campaign, CommandGenerationOptions)} but accepts a
-     * {@link Ruleset.ProgressListener} the engine and the rest of the pipeline use to surface status
-     * updates. Pass {@code null} to suppress all progress callbacks (the default behavior of the
-     * two-arg overload).
+     * <p>This is the shared pure stage of the pipeline. The player path materializes the roll into
+     * the campaign with {@link #applyToCampaign}; an OpFor consumer instead supplies an enemy
+     * faction/year in the snapshot and harvests the roll with {@link #collectEntities} - it never
+     * touches the campaign-mutating stages. Callers are responsible for anchoring the snapshot's
+     * faction and year before rolling (the Command Designer seeds them from the campaign; an OpFor
+     * caller seeds them from the scenario's enemy).</p>
      *
-     * <p>The listener is called from a background thread (typically a SwingWorker), so any UI work
-     * triggered from it must be dispatched onto the EDT.</p>
+     * @param snap     the roll inputs (faction, year, echelon, unit type, rating, experience,
+     *                 weight class, size modifier, dropship percentage)
+     * @param listener progress listener for status updates, or {@code null} for none; called from
+     *                 the rolling thread, so any UI work it triggers must be dispatched onto the EDT
+     *
+     * @return the rolled descriptor tree, its leaves carrying crewed entities
      */
-    public static Result generate(Campaign campaign, CommandGenerationOptions options,
-          Ruleset.ProgressListener listener) {
-        long startedAt = System.currentTimeMillis();
-        LOGGER.info("[CompanyGen][Pipeline]==================================================");
-        LOGGER.info("[CompanyGen][Pipeline]CommandGenerator.generate() START");
-        ForceDescriptor rolled = rollForceDescriptor(campaign, options, listener);
-        Result result = applyToCampaign(campaign, options, rolled, listener);
-        LOGGER.info("[CompanyGen][Pipeline]CommandGenerator.generate() DONE in {}ms",
-              System.currentTimeMillis() - startedAt);
-        LOGGER.info("[CompanyGen][Pipeline]==================================================");
-        return result;
-    }
-
-    /**
-     * Stages 0-3: anchor inputs, bootstrap the engine, build the root {@link ForceDescriptor} from the
-     * snapshot, and roll the force via {@link Ruleset#processRoot}. Returns the rolled descriptor
-     * <em>without touching the campaign</em>, so the Force Generator preview can show the TO&amp;E and
-     * composition before the player commits; {@link #applyToCampaign} then materializes it.
-     */
-    public static ForceDescriptor rollForceDescriptor(Campaign campaign, CommandGenerationOptions options,
-          Ruleset.ProgressListener listener) {
+    public static ForceDescriptor rollCommand(ForceDescriptorSnapshot snap,
+          @Nullable Ruleset.ProgressListener listener) {
         if (listener != null) {
             listener.updateProgress(0.0, "Preparing generation parameters...");
         }
-        ForceDescriptorSnapshot snap = options.getForceDescriptorSnapshot();
-
-        // Stage 0: anchor inputs that the snapshot shouldn't be allowed to override.
-        //
-        // * Year is always the current campaign year. The user already chose the campaign date when
-        //   they set up the campaign; asking again on a sub-panel risks divergence. Whatever the
-        //   embedded ForceGeneratorOptionsView shows in its year field is informational only.
-        //
-        // * Faction falls back to the legacy CommandGenerationOptions faction picker when the snapshot
-        //   is still at its constructor default ("IS"). The embedded panel writes a non-default value
-        //   on OK, in which case this is a no-op.
-        snap.setYear(campaign.getGameYear());
-        String snapFactionBefore = snap.getFaction();
-        String specifiedFactionCode = options.getSpecifiedFaction() == null
-              ? "null"
-              : options.getSpecifiedFaction().getShortName();
-        String campaignFactionCode = campaign.getFaction() == null
-              ? "null"
-              : campaign.getFaction().getShortName();
-        LOGGER.info("[CompanyGen][Pipeline][Faction] Stage 0 inputs: snap.faction='{}' options.specifiedFaction='{}' campaign.faction='{}' isUseSpecifiedFactionToAssignRanks={}",
-              snapFactionBefore, specifiedFactionCode, campaignFactionCode,
-              options.isUseSpecifiedFactionToAssignRanks());
-        if ("IS".equals(snap.getFaction()) && options.getSpecifiedFaction() != null) {
-            String legacyFactionCode = options.getSpecifiedFaction().getShortName();
-            if (legacyFactionCode != null && !legacyFactionCode.isBlank()) {
-                snap.setFaction(legacyFactionCode);
-                LOGGER.info("[CompanyGen][Pipeline][Faction] Stage 0 swap: snap.faction '{}' -> '{}' (sourced from options.specifiedFaction)",
-                      snapFactionBefore, legacyFactionCode);
-            }
-        } else {
-            LOGGER.info("[CompanyGen][Pipeline][Faction] Stage 0 no swap (snap.faction='{}' specifiedFaction={})",
-                  snap.getFaction(),
-                  options.getSpecifiedFaction() == null ? "null" : specifiedFactionCode);
-        }
-        LOGGER.info("[CompanyGen][Pipeline]Stage 0: anchored snapshot -> faction={} year={} (campaign year) echelon={} unitType={}",
-              snap.getFaction(), snap.getYear(), snap.getEchelon(), snap.getUnitType());
-
         LOGGER.info("[CompanyGen][Pipeline]snapshot: faction={} year={} echelon={} unitType={} rating={} experience={} weightClass={} augmented={} sizeMod={} dropshipPct={} jumpshipPct={} cargo={} flags={} roles={}",
               snap.getFaction(), snap.getYear(), snap.getEchelon(), snap.getUnitType(),
               snap.getRating(), snap.getExperience(), snap.getWeightClass(),
@@ -273,10 +224,50 @@ public final class CommandGenerator {
     }
 
     /**
+     * Harvests the crewed {@link Entity} objects from a rolled descriptor tree - every leaf that is
+     * {@link ForceDescriptor#isIncluded() included} and carries an entity, in tree order (sub-forces
+     * before attached forces at each node). Excluded leaves (struck out in the Command Designer
+     * preview) are skipped, matching the commit walker's rule.
+     *
+     * <p>This is the OpFor-side consumer of {@link #rollCommand}: rolling with an enemy faction/year
+     * and collecting the entities yields exactly the {@code List<Entity>} shape a
+     * {@code BotForce} takes, with each entity already crewed by the engine - no campaign Person,
+     * Unit, or Formation is created. The pipeline deliberately exposes these seams as plain static
+     * methods rather than a materializer interface: the two consumers (campaign TOE commit, entity
+     * harvest) share no state, only the rolled tree. If a configurable materialization policy is
+     * ever needed, introduce an interface over the rolled descriptor - not an abstract class.</p>
+     *
+     * @param descriptor the rolled descriptor (or subtree) to harvest
+     *
+     * @return the included leaves' entities, in tree order; never {@code null}
+     */
+    public static List<Entity> collectEntities(ForceDescriptor descriptor) {
+        List<Entity> entities = new ArrayList<>();
+        collectEntitiesInto(descriptor, entities);
+        return entities;
+    }
+
+    private static void collectEntitiesInto(ForceDescriptor descriptor, List<Entity> entities) {
+        boolean hasChildren = !descriptor.getSubForces().isEmpty() || !descriptor.getAttached().isEmpty();
+        if (!hasChildren) {
+            if (descriptor.isIncluded() && descriptor.getEntity() != null) {
+                entities.add(descriptor.getEntity());
+            }
+            return;
+        }
+        for (ForceDescriptor child : descriptor.getSubForces()) {
+            collectEntitiesInto(child, entities);
+        }
+        for (ForceDescriptor child : descriptor.getAttached()) {
+            collectEntitiesInto(child, entities);
+        }
+    }
+
+    /**
      * Stages 4-8: walk the rolled {@code descriptor}, materialize Units + crews into Formations, assign
      * ranks, generate support personnel and vehicles, apply formation icons and personnel flags, and
-     * stock the spare-parts warehouse. Operates on a descriptor from {@link #rollForceDescriptor}, so
-     * the Force Generator preview commits the exact force the player saw.
+     * stock the spare-parts warehouse. Operates on a rolled descriptor (from the Command Designer
+     * preview or {@link #rollCommand}), so the commit materializes the exact force the player saw.
      */
     public static Result applyToCampaign(Campaign campaign, CommandGenerationOptions options,
           ForceDescriptor fd, Ruleset.ProgressListener listener) {
